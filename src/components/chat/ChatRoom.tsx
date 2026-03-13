@@ -1,20 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useMobile } from '@/hooks/useMobile';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
+import { SignerApproval } from './SignerApproval';
 
 export function ChatRoom() {
-  const { user, logout } = useAuth();
+  const { user, logout, refetch } = useAuth();
   const { messages, loading, sending, error, sendMessage, hideMessage } = useChat();
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const handleSignerApproved = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   if (!user) return null;
+
+  const needsSigner = !user.signerUuid;
 
   return (
     <div className="flex h-[100dvh] bg-[#0a1628] text-white">
@@ -41,23 +48,29 @@ export function ChatRoom() {
           <h2 className="font-semibold text-sm text-gray-300"># zao</h2>
         </header>
 
-        {/* Error banner */}
-        {error && (
-          <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm">
-            {error}
-          </div>
+        {needsSigner ? (
+          <SignerApproval onApproved={handleSignerApproved} />
+        ) : (
+          <>
+            {/* Error banner */}
+            {error && (
+              <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Messages */}
+            <MessageList
+              messages={messages}
+              isAdmin={user.isAdmin}
+              onHide={hideMessage}
+              loading={loading}
+            />
+
+            {/* Input */}
+            <MessageInput onSend={sendMessage} sending={sending} />
+          </>
         )}
-
-        {/* Messages */}
-        <MessageList
-          messages={messages}
-          isAdmin={user.isAdmin}
-          onHide={hideMessage}
-          loading={loading}
-        />
-
-        {/* Input */}
-        <MessageInput onSend={sendMessage} sending={sending} />
       </div>
     </div>
   );

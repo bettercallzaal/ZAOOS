@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { QuotedCastData } from '@/types';
 import { MentionAutocomplete } from './MentionAutocomplete';
 
@@ -12,42 +12,85 @@ const ALL_CHANNELS = [
 
 interface ComposeBarProps {
   hasSigner: boolean;
-  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[]) => Promise<void>;
+  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[]) => Promise<void>;
   sending?: boolean;
   channel?: string;
   quotedCast?: QuotedCastData | null;
   onClearQuote?: () => void;
 }
 
-export function ComposeBar({
+export interface ComposeBarHandle {
+  focus: () => void;
+}
+
+export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function ComposeBar({
   hasSigner,
   onSend,
   sending,
   channel = 'zao',
   quotedCast,
   onClearQuote,
-}: ComposeBarProps) {
+}, ref) {
   const [text, setText] = useState('');
   const [showCrossPost, setShowCrossPost] = useState(false);
   const [crossPostChannels, setCrossPostChannels] = useState<Set<string>>(new Set());
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
-  const [mentionStart, setMentionStart] = useState(0); // cursor position where @ was typed
+  const [mentionStart, setMentionStart] = useState(0);
+  const [imagePreview, setImagePreview] = useState<{ url: string; file?: File } | null>(null);
+  const [uploading, setUploading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => textareaRef.current?.focus(),
+  }));
+
+  const handleImageSelect = async (file: File) => {
+    if (!file.type.startsWith('image/')) return;
+    if (file.size > 5 * 1024 * 1024) return;
+
+    // Show local preview immediately
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview({ url: previewUrl, file });
+  };
+
+  const removeImage = () => {
+    if (imagePreview?.url.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreview.url);
+    }
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = async () => {
     const msg = text.trim();
-    if (!msg) return;
+    if (!msg && !imagePreview) return;
 
     if (hasSigner) {
       try {
+        let embedUrls: string[] | undefined;
+
+        // Upload image if attached
+        if (imagePreview?.file) {
+          setUploading(true);
+          const formData = new FormData();
+          formData.append('file', imagePreview.file);
+          const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+          if (!uploadRes.ok) throw new Error('Image upload failed');
+          const { url: imageUrl } = await uploadRes.json();
+          embedUrls = [imageUrl];
+          setUploading(false);
+        }
+
         const crossPost = crossPostChannels.size > 0 ? [...crossPostChannels] : undefined;
-        await onSend(msg, undefined, quotedCast?.hash, crossPost);
+        await onSend(msg || ' ', undefined, quotedCast?.hash, crossPost, embedUrls);
         setText('');
+        removeImage();
         onClearQuote?.();
         setCrossPostChannels(new Set());
         setShowCrossPost(false);
       } catch {
-        // Error handled by useChat hook
+        setUploading(false);
       }
     } else {
       const encoded = encodeURIComponent(msg);
@@ -154,6 +197,33 @@ export function ComposeBar({
         </div>
       )}
 
+      {/* Image preview */}
+      {imagePreview && (
+        <div className="px-3 pt-2">
+          <div className="relative inline-block">
+            <img
+              src={imagePreview.url}
+              alt="Upload preview"
+              className="h-20 rounded-lg border border-gray-700 object-cover"
+            />
+            <button
+              onClick={removeImage}
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-400"
+              aria-label="Remove image"
+            >
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            {uploading && (
+              <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Cross-post selector */}
       {showCrossPost && hasSigner && (
         <div className="px-3 pt-2">
@@ -201,6 +271,37 @@ export function ComposeBar({
             </button>
           )}
 
+          {/* Image upload */}
+          {hasSigner && (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImageSelect(file);
+                }}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className={`flex-shrink-0 p-2.5 rounded-lg transition-colors ${
+                  imagePreview
+                    ? 'text-[#f5a623] bg-[#f5a623]/10'
+                    : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                }`}
+                title="Attach image"
+                aria-label="Attach image"
+                disabled={uploading}
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                </svg>
+              </button>
+            </>
+          )}
+
           <textarea
             ref={textareaRef}
             value={text}
@@ -243,4 +344,4 @@ export function ComposeBar({
       </div>
     </div>
   );
-}
+});

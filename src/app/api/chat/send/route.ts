@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
 
-    const { text, parentHash, embedHash, channel, crossPostChannels } = parsed.data;
+    const { text, parentHash, embedHash, embedUrls, channel, crossPostChannels } = parsed.data;
     const primaryChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
 
     // Build list of channels to post to
@@ -35,14 +35,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Post to primary channel first
-    const result = await postCast(session.signerUuid, text, primaryChannel, parentHash, embedHash);
+    const result = await postCast(session.signerUuid, text, primaryChannel, parentHash, embedHash, embedUrls);
 
     // Cross-post to additional channels (fire and forget)
     const additionalChannels = [...channels].filter((ch) => ch !== primaryChannel);
     if (additionalChannels.length > 0) {
       Promise.allSettled(
         additionalChannels.map((ch) =>
-          postCast(session.signerUuid!, text, ch, undefined, embedHash)
+          postCast(session.signerUuid!, text, ch, undefined, embedHash, embedUrls)
         )
       ).catch(() => {});
     }

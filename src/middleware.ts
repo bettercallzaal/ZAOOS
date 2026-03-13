@@ -18,8 +18,14 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/auth')) {
     return { limit: 10, windowMs: MINUTE };
   }
-  if (pathname.startsWith('/api/search')) {
+  if (pathname.startsWith('/api/search') || pathname.startsWith('/api/chat/search')) {
     return { limit: 30, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/upload')) {
+    return { limit: 10, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/chat/schedule')) {
+    return { limit: 20, windowMs: MINUTE };
   }
   return null;
 }

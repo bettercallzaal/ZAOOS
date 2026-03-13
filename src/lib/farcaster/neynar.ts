@@ -29,6 +29,7 @@ export async function postCast(
   channelId: string,
   parentHash?: string,
   embedHash?: string,
+  embedUrls?: string[],
 ) {
   const body: Record<string, unknown> = {
     signer_uuid: signerUuid,
@@ -36,7 +37,15 @@ export async function postCast(
     channel_id: channelId,
   };
   if (parentHash) body.parent = parentHash;
-  if (embedHash) body.embeds = [{ cast_id: { hash: embedHash } }];
+
+  const embeds: Record<string, unknown>[] = [];
+  if (embedHash) embeds.push({ cast_id: { hash: embedHash } });
+  if (embedUrls) {
+    for (const url of embedUrls) {
+      embeds.push({ url });
+    }
+  }
+  if (embeds.length > 0) body.embeds = embeds;
 
   const res = await fetch(`${NEYNAR_BASE}/cast`, {
     method: 'POST',

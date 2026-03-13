@@ -1,16 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useMobile } from '@/hooks/useMobile';
 import { usePlayer } from '@/providers/audio';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { QuotedCastData } from '@/types';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
-import { ComposeBar } from './ComposeBar';
+import { ComposeBar, ComposeBarHandle } from './ComposeBar';
 import { ThreadDrawer } from './ThreadDrawer';
 import { SignerConnect } from './SignerConnect';
+import { SearchDialog } from './SearchDialog';
+import { SchedulePanel } from './SchedulePanel';
 import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 import { MusicSidebar } from '@/components/music/MusicSidebar';
 import { SongSubmit } from '@/components/music/SongSubmit';
@@ -27,7 +30,28 @@ export function ChatRoom() {
   const [quotedCast, setQuotedCast] = useState<QuotedCastData | null>(null);
   const [musicSidebarOpen, setMusicSidebarOpen] = useState(false);
   const [songSubmitOpen, setSongSubmitOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const composeRef = useRef<ComposeBarHandle>(null);
   const musicQueue = useMusicQueue(messages);
+
+  // Keyboard shortcuts
+  const shortcutHandlers = useMemo(() => ({
+    onSearch: () => setSearchOpen(true),
+    onFocusCompose: () => composeRef.current?.focus(),
+    onClosePanels: () => {
+      if (searchOpen) { setSearchOpen(false); return; }
+      if (selectedThreadHash) { setSelectedThreadHash(null); return; }
+      if (musicSidebarOpen) { setMusicSidebarOpen(false); return; }
+      if (songSubmitOpen) { setSongSubmitOpen(false); return; }
+      if (scheduleOpen) { setScheduleOpen(false); return; }
+      if (sidebarOpen) { setSidebarOpen(false); return; }
+    },
+    onToggleSidebar: () => setSidebarOpen((o) => !o),
+    onToggleMusic: () => setMusicSidebarOpen((o) => !o),
+  }), [searchOpen, selectedThreadHash, musicSidebarOpen, songSubmitOpen, scheduleOpen, sidebarOpen]);
+
+  useKeyboardShortcuts(shortcutHandlers);
 
   // Stop music when switching channels
   useEffect(() => {
@@ -78,6 +102,30 @@ export function ChatRoom() {
             )}
 
             <h2 className="font-semibold text-sm text-gray-300 flex-1"># {activeChannel}</h2>
+
+            {/* Search */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              aria-label="Search messages"
+              title="Search (Cmd+K)"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </button>
+
+            {/* Scheduled posts */}
+            <button
+              onClick={() => setScheduleOpen(true)}
+              className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              aria-label="Scheduled posts"
+              title="Scheduled posts"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
 
             {/* Song submit */}
             <button
@@ -142,10 +190,11 @@ export function ChatRoom() {
           {!hasSigner ? (
             <div>
               <SignerConnect onSuccess={refetch} />
-              <ComposeBar hasSigner={false} onSend={sendMessage} channel={activeChannel} />
+              <ComposeBar ref={composeRef} hasSigner={false} onSend={sendMessage} channel={activeChannel} />
             </div>
           ) : (
             <ComposeBar
+              ref={composeRef}
               hasSigner={true}
               onSend={sendMessage}
               sending={sending}
@@ -171,6 +220,24 @@ export function ChatRoom() {
         channel={activeChannel}
         isOpen={songSubmitOpen}
         onClose={() => setSongSubmitOpen(false)}
+      />
+
+      {/* Search Dialog */}
+      <SearchDialog
+        channel={activeChannel}
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onOpenThread={(hash) => {
+          setSelectedThreadHash(hash);
+          setSearchOpen(false);
+        }}
+      />
+
+      {/* Scheduled Posts Panel */}
+      <SchedulePanel
+        channel={activeChannel}
+        isOpen={scheduleOpen}
+        onClose={() => setScheduleOpen(false)}
       />
 
       {/* Thread Drawer — fixed overlay, z-50 */}

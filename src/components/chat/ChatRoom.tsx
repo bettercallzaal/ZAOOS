@@ -14,6 +14,8 @@ import { ThreadDrawer } from './ThreadDrawer';
 import { SignerConnect } from './SignerConnect';
 import { SearchDialog } from './SearchDialog';
 import { SchedulePanel } from './SchedulePanel';
+import { FaqPanel } from './FaqPanel';
+import { TutorialPanel } from './TutorialPanel';
 import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 import { MusicSidebar } from '@/components/music/MusicSidebar';
 import { SongSubmit } from '@/components/music/SongSubmit';
@@ -32,6 +34,8 @@ export function ChatRoom() {
   const [songSubmitOpen, setSongSubmitOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [faqOpen, setFaqOpen] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const composeRef = useRef<ComposeBarHandle>(null);
   const musicQueue = useMusicQueue(messages);
 
@@ -40,6 +44,8 @@ export function ChatRoom() {
     onSearch: () => setSearchOpen(true),
     onFocusCompose: () => composeRef.current?.focus(),
     onClosePanels: () => {
+      if (faqOpen) { setFaqOpen(false); return; }
+      if (tutorialOpen) { setTutorialOpen(false); return; }
       if (searchOpen) { setSearchOpen(false); return; }
       if (selectedThreadHash) { setSelectedThreadHash(null); return; }
       if (musicSidebarOpen) { setMusicSidebarOpen(false); return; }
@@ -49,7 +55,7 @@ export function ChatRoom() {
     },
     onToggleSidebar: () => setSidebarOpen((o) => !o),
     onToggleMusic: () => setMusicSidebarOpen((o) => !o),
-  }), [searchOpen, selectedThreadHash, musicSidebarOpen, songSubmitOpen, scheduleOpen, sidebarOpen]);
+  }), [faqOpen, tutorialOpen, searchOpen, selectedThreadHash, musicSidebarOpen, songSubmitOpen, scheduleOpen, sidebarOpen]);
 
   useKeyboardShortcuts(shortcutHandlers);
 
@@ -82,6 +88,8 @@ export function ChatRoom() {
           setSelectedThreadHash(null);
           setSidebarOpen(false);
         }}
+        onOpenFaq={() => { setFaqOpen(true); setSidebarOpen(false); }}
+        onOpenTutorial={() => { setTutorialOpen(true); setSidebarOpen(false); }}
       />
 
       {/* Main chat + music sidebar in a shared flex row */}
@@ -253,6 +261,12 @@ export function ChatRoom() {
           onClose={() => setSelectedThreadHash(null)}
         />
       )}
+
+      {/* FAQ Panel */}
+      <FaqPanel isOpen={faqOpen} onClose={() => setFaqOpen(false)} />
+
+      {/* Tutorial Panel */}
+      <TutorialPanel isOpen={tutorialOpen} onClose={() => setTutorialOpen(false)} />
     </div>
   );
 }

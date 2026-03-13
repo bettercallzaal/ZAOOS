@@ -16,9 +16,11 @@ interface SidebarProps {
   onLogout: () => void;
   activeChannel: string;
   onChannelSelect: (channel: string) => void;
+  onOpenFaq?: () => void;
+  onOpenTutorial?: () => void;
 }
 
-export function Sidebar({ user, isOpen, onClose, onLogout, activeChannel, onChannelSelect }: SidebarProps) {
+export function Sidebar({ user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, onOpenFaq, onOpenTutorial }: SidebarProps) {
   return (
     <>
       {/* Mobile overlay */}
@@ -81,6 +83,29 @@ export function Sidebar({ user, isOpen, onClose, onLogout, activeChannel, onChan
             </svg>
             Respect
           </a>
+        </div>
+
+        {/* Help */}
+        <div className="px-3 mt-4 space-y-1">
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-3 mb-2">Help</p>
+          <button
+            onClick={onOpenTutorial}
+            className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.636 50.636 0 00-2.658-.813A59.906 59.906 0 0112 3.493a59.903 59.903 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />
+            </svg>
+            Getting Started
+          </button>
+          <button
+            onClick={onOpenFaq}
+            className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+            </svg>
+            FAQ
+          </button>
         </div>
 
         {/* Spacer */}

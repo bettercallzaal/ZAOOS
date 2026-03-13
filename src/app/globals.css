@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-navy: #0a1628;
+  --color-navy-light: #0d1b2a;
+  --color-navy-lighter: #1a2a3a;
+  --color-gold: #f5a623;
+  --color-gold-light: #ffd700;
+}
+
+:root {
+  --background: #0a1628;
+  --foreground: #ededed;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Mobile viewport fix */
+html {
+  height: -webkit-fill-available;
+}
+body {
+  min-height: 100dvh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Hide SIWF default styling overrides */
+.fc-authkit-signin-button button {
+  background: linear-gradient(135deg, #f5a623, #ffd700) !important;
+  color: #0a1628 !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  padding: 12px 32px !important;
+  font-size: 16px !important;
+  border: none !important;
+}

@@ -1,0 +1,134 @@
+const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
+
+function headers() {
+  return {
+    'Content-Type': 'application/json',
+    'x-api-key': process.env.NEYNAR_API_KEY!,
+  };
+}
+
+export async function getChannelFeed(channelId: string, cursor?: string, limit = 50) {
+  const params = new URLSearchParams({
+    channel_ids: channelId,
+    limit: String(limit),
+    with_recasts: 'false',
+  });
+  if (cursor) params.set('cursor', cursor);
+
+  const res = await fetch(`${NEYNAR_BASE}/feed/channels?${params}`, {
+    headers: headers(),
+    next: { revalidate: 0 },
+  });
+  if (!res.ok) throw new Error(`Neynar feed error: ${res.status}`);
+  return res.json();
+}
+
+export async function postCast(signerUuid: string, text: string, channelId: string, parentHash?: string) {
+  const body: Record<string, string> = {
+    signer_uuid: signerUuid,
+    text,
+    channel_id: channelId,
+  };
+  if (parentHash) body.parent = parentHash;
+
+  const res = await fetch(`${NEYNAR_BASE}/cast`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Neynar post error: ${res.status}`);
+  return res.json();
+}
+
+export async function getCastThread(hash: string) {
+  const params = new URLSearchParams({
+    identifier: hash,
+    type: 'hash',
+    reply_depth: '1',
+    include_chronological_parent_casts: 'false',
+  });
+  const res = await fetch(`${NEYNAR_BASE}/cast/conversation?${params}`, {
+    headers: headers(),
+    next: { revalidate: 0 },
+  });
+  if (!res.ok) throw new Error(`Neynar thread error: ${res.status}`);
+  return res.json();
+}
+
+export async function getUserByFid(fid: number) {
+  const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${fid}`, {
+    headers: headers(),
+  });
+  if (!res.ok) throw new Error(`Neynar user error: ${res.status}`);
+  const data = await res.json();
+  return data.users?.[0] || null;
+}
+
+export async function getUserByAddress(address: string) {
+  const res = await fetch(`${NEYNAR_BASE}/user/bulk-by-address?addresses=${address}`, {
+    headers: headers(),
+  });
+  if (!res.ok) throw new Error(`Neynar address lookup error: ${res.status}`);
+  const data = await res.json();
+  const users = data[address.toLowerCase()];
+  return users?.[0] || null;
+}
+
+export async function createSigner() {
+  const res = await fetch(`${NEYNAR_BASE}/signer`, {
+    method: 'POST',
+    headers: headers(),
+  });
+  if (!res.ok) throw new Error(`Neynar signer error: ${res.status}`);
+  return res.json();
+}
+
+export async function registerSignedKey(
+  signerUuid: string,
+  appFid: number,
+  deadline: number,
+  signature: string
+) {
+  const res = await fetch(`${NEYNAR_BASE}/signer/signed_key`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({
+      signer_uuid: signerUuid,
+      app_fid: appFid,
+      deadline,
+      signature,
+    }),
+  });
+  if (!res.ok) throw new Error(`Neynar register key error: ${res.status}`);
+  return res.json();
+}
+
+export async function getSignerStatus(signerUuid: string) {
+  const res = await fetch(`${NEYNAR_BASE}/signer?signer_uuid=${signerUuid}`, {
+    headers: headers(),
+  });
+  if (!res.ok) throw new Error(`Neynar signer status error: ${res.status}`);
+  return res.json();
+}
+
+export async function registerUser(
+  signature: string,
+  custodyAddress: string,
+  deadline: number,
+  fname?: string
+) {
+  const body: Record<string, unknown> = {
+    signature,
+    custody_address: custodyAddress,
+    deadline,
+  };
+  if (fname) body.fname = fname;
+
+  const res = await fetch(`${NEYNAR_BASE}/user`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Neynar register error: ${res.status}`);
+  return res.json();
+}

@@ -303,7 +303,7 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
             className={`flex items-center gap-1.5 text-xs px-2 py-1.5 rounded-lg transition-colors ${
               cast.replies.count > 0
                 ? 'text-[#f5a623] hover:bg-[#f5a623]/10'
-                : 'text-gray-500 hover:text-[#f5a623] hover:bg-white/5 sm:opacity-0 sm:group-hover:opacity-100'
+                : 'text-gray-500 hover:text-[#f5a623] hover:bg-white/5'
             }`}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -316,7 +316,7 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
           {hasSigner && onQuote && (
             <button
               onClick={() => onQuote(cast)}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#f5a623] hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors sm:opacity-0 sm:group-hover:opacity-100"
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#f5a623] hover:bg-white/5 px-2 py-1.5 rounded-lg transition-colors"
               aria-label="Quote cast"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>

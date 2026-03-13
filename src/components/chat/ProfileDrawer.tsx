@@ -16,6 +16,12 @@ interface ProfileData {
   viewerContext: { following: boolean; followed_by: boolean } | null;
   isZaoMember: boolean;
   zaoName: string | null;
+  activity: {
+    casts: number;
+    likes: number;
+    recasts: number;
+    replies: number;
+  };
 }
 
 interface ProfileDrawerProps {
@@ -145,11 +151,25 @@ export function ProfileDrawer({ fid, onClose }: ProfileDrawerProps) {
                 )}
               </div>
 
-              {/* Follows you badge */}
-              {profile.viewerContext?.followed_by && (
-                <span className="mt-2 px-2 py-0.5 bg-white/5 text-gray-400 text-xs rounded-full">
-                  Follows you
-                </span>
+              {/* Relationship badges */}
+              {profile.viewerContext && (
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+                  {profile.viewerContext.following && profile.viewerContext.followed_by && (
+                    <span className="px-2.5 py-0.5 bg-[#f5a623]/10 text-[#f5a623] text-xs rounded-full font-medium">
+                      Mutuals
+                    </span>
+                  )}
+                  {profile.viewerContext.followed_by && !profile.viewerContext.following && (
+                    <span className="px-2.5 py-0.5 bg-white/5 text-gray-400 text-xs rounded-full">
+                      Follows you
+                    </span>
+                  )}
+                  {profile.viewerContext.following && !profile.viewerContext.followed_by && (
+                    <span className="px-2.5 py-0.5 bg-white/5 text-gray-400 text-xs rounded-full">
+                      You follow them
+                    </span>
+                  )}
+                </div>
               )}
 
               {/* Bio */}
@@ -159,7 +179,7 @@ export function ProfileDrawer({ fid, onClose }: ProfileDrawerProps) {
                 </p>
               )}
 
-              {/* Stats */}
+              {/* Farcaster stats */}
               <div className="flex gap-6 mt-5">
                 <div className="text-center">
                   <p className="text-base font-bold text-white">{formatCount(profile.followerCount)}</p>
@@ -174,6 +194,31 @@ export function ProfileDrawer({ fid, onClose }: ProfileDrawerProps) {
                   <p className="text-xs text-gray-500">FID</p>
                 </div>
               </div>
+
+              {/* Channel activity stats */}
+              {profile.activity && profile.activity.casts > 0 && (
+                <div className="mt-5 w-full max-w-xs">
+                  <p className="text-xs text-gray-600 uppercase tracking-wider text-center mb-3">ZAO Channel Activity</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="text-center px-2 py-2 rounded-lg bg-white/5">
+                      <p className="text-sm font-bold text-white">{formatCount(profile.activity.casts)}</p>
+                      <p className="text-[10px] text-gray-500">Casts</p>
+                    </div>
+                    <div className="text-center px-2 py-2 rounded-lg bg-white/5">
+                      <p className="text-sm font-bold text-red-400">{formatCount(profile.activity.likes)}</p>
+                      <p className="text-[10px] text-gray-500">Likes</p>
+                    </div>
+                    <div className="text-center px-2 py-2 rounded-lg bg-white/5">
+                      <p className="text-sm font-bold text-green-400">{formatCount(profile.activity.recasts)}</p>
+                      <p className="text-[10px] text-gray-500">Recasts</p>
+                    </div>
+                    <div className="text-center px-2 py-2 rounded-lg bg-white/5">
+                      <p className="text-sm font-bold text-[#f5a623]">{formatCount(profile.activity.replies)}</p>
+                      <p className="text-[10px] text-gray-500">Replies</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Follow button */}
               <button

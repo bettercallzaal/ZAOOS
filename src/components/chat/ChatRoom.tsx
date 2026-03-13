@@ -13,6 +13,7 @@ import { ThreadDrawer } from './ThreadDrawer';
 import { SignerConnect } from './SignerConnect';
 import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 import { MusicSidebar } from '@/components/music/MusicSidebar';
+import { SongSubmit } from '@/components/music/SongSubmit';
 import { useMusicQueue } from '@/hooks/useMusicQueue';
 
 export function ChatRoom() {
@@ -25,6 +26,7 @@ export function ChatRoom() {
   const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
   const [quotedCast, setQuotedCast] = useState<QuotedCastData | null>(null);
   const [musicSidebarOpen, setMusicSidebarOpen] = useState(false);
+  const [songSubmitOpen, setSongSubmitOpen] = useState(false);
   const musicQueue = useMusicQueue(messages);
 
   // Stop music when switching channels
@@ -76,6 +78,18 @@ export function ChatRoom() {
             )}
 
             <h2 className="font-semibold text-sm text-gray-300 flex-1"># {activeChannel}</h2>
+
+            {/* Song submit */}
+            <button
+              onClick={() => setSongSubmitOpen(true)}
+              className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              aria-label="Submit a song"
+              title="Submit a song"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </button>
 
             {/* Music queue toggle */}
             <button
@@ -151,6 +165,13 @@ export function ChatRoom() {
           onClose={() => setMusicSidebarOpen(false)}
         />
       </div>
+
+      {/* Song Submit Panel */}
+      <SongSubmit
+        channel={activeChannel}
+        isOpen={songSubmitOpen}
+        onClose={() => setSongSubmitOpen(false)}
+      />
 
       {/* Thread Drawer — fixed overlay, z-50 */}
       {selectedThreadHash && (

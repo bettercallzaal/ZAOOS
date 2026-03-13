@@ -86,9 +86,10 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
         controller.addListener('playback_update', (data: unknown) => {
           const d = data as { data: { position: number; duration: number; isPaused: boolean } };
           if (d?.data) {
-            dispatch({ type: 'PROGRESS', payload: d.data.position * 1000 });
+            // Spotify IFrame API returns position/duration in ms already
+            dispatch({ type: 'PROGRESS', payload: d.data.position });
             if (d.data.duration) {
-              dispatch({ type: 'SET_DURATION', payload: d.data.duration * 1000 });
+              dispatch({ type: 'SET_DURATION', payload: d.data.duration });
             }
           }
         });
@@ -106,7 +107,7 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
     registerController('spotify', {
       play: () => controllerRef.current?.play(),
       pause: () => controllerRef.current?.pause(),
-      seek: (ms) => controllerRef.current?.seek(ms / 1000),
+      seek: (ms) => controllerRef.current?.seek(ms),
       load: () => {
         // Loading handled in state watcher below
       },

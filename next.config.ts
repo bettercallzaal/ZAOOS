@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['@xmtp/wasm-bindings'],
+
   images: {
     remotePatterns: [
       {
@@ -30,6 +32,23 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '*.audius.co' },            // Audius artwork
     ],
   },
+
+  // XMTP requires COEP/COOP for SharedArrayBuffer (WASM)
+  // Scoped to /messages only — global headers would break Spotify/YouTube iframes
+  async headers() {
+    return [
+      {
+        source: '/messages/:path*',
+        headers: [
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+        ],
+      },
+    ];
+  },
+
+  // Turbopack config (Next.js 16 default bundler)
+  turbopack: {},
 };
 
 export default nextConfig;

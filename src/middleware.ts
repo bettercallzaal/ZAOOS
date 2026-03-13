@@ -27,6 +27,9 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/chat/schedule')) {
     return { limit: 20, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/messages')) {
+    return { limit: 30, windowMs: MINUTE };
+  }
   return null;
 }
 
@@ -58,9 +61,16 @@ export function middleware(request: NextRequest) {
   }
 
   const response = NextResponse.next();
+
+  // XMTP WASM requires COEP/COOP for SharedArrayBuffer — only on /messages routes
+  if (pathname.startsWith('/messages')) {
+    response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  }
+
   return addSecurityHeaders(response);
 }
 
 export const config = {
-  matcher: ['/api/:path*'],
+  matcher: ['/api/:path*', '/messages/:path*'],
 };

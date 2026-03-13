@@ -129,11 +129,44 @@ function audioFromUrl(url: string): TrackMetadata {
   };
 }
 
+const AUDIUS_API = 'https://api.audius.co/v1';
+const AUDIUS_APP = 'ZAO-OS';
+
+async function fetchAudius(url: string): Promise<TrackMetadata | null> {
+  // Step 1: resolve page URL → track object
+  const resolveRes = await fetch(
+    `${AUDIUS_API}/resolve?url=${encodeURIComponent(url)}&app_name=${AUDIUS_APP}`,
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+  );
+  if (!resolveRes.ok) return null;
+
+  const resolved = await resolveRes.json();
+  const track = resolved?.data;
+  if (!track?.id) return null;
+
+  const artworkUrl =
+    track.artwork?.['480x480'] ??
+    track.artwork?.['150x150'] ??
+    '';
+
+  return {
+    id: track.id,
+    type: 'audius',
+    trackName: track.title ?? '',
+    artistName: track.user?.name ?? '',
+    artworkUrl,
+    url,
+    streamUrl: `${AUDIUS_API}/tracks/${track.id}/stream?app_name=${AUDIUS_APP}`,
+    feedId: '',
+  };
+}
+
 const fetchers: Record<TrackType, (url: string) => Promise<TrackMetadata | null>> = {
   spotify: fetchSpotify,
   soundcloud: fetchSoundCloud,
   youtube: fetchYouTube,
   soundxyz: fetchSoundXyz,
+  audius: fetchAudius,
   audio: async (url) => audioFromUrl(url),
 };
 

@@ -23,9 +23,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
 
-    const { text, parentHash, channel } = parsed.data;
+    const { text, parentHash, embedHash, channel } = parsed.data;
     const targetChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
-    const result = await postCast(session.signerUuid, text, targetChannel, parentHash);
+    const result = await postCast(session.signerUuid, text, targetChannel, parentHash, embedHash);
 
     // Send notification to other users (fire and forget)
     const preview = text.length > 80 ? text.slice(0, 80) + '...' : text;

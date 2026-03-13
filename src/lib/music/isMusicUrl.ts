@@ -9,6 +9,7 @@ const MUSIC_PATTERNS: { pattern: string; type: TrackType }[] = [
   { pattern: 'music.youtube.com/watch', type: 'youtube' },
   { pattern: 'youtu.be/', type: 'youtube' },
   { pattern: 'zora.co/collect', type: 'soundxyz' },
+  { pattern: 'audius.co/', type: 'audius' },
   { pattern: 'ipfs://', type: 'audio' },
 ];
 

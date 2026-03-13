@@ -26,8 +26,22 @@ export interface HiddenMessage {
   hidden_at: string;
 }
 
+export interface QuotedCastData {
+  hash: string;
+  author: {
+    fid: number;
+    username: string;
+    display_name: string;
+    pfp_url: string;
+  };
+  text: string;
+  timestamp: string;
+  embeds?: { url?: string }[];
+}
+
 export interface CastEmbed {
   url?: string;
+  cast?: QuotedCastData; // quote cast embed
   metadata?: {
     content_type?: string;
     _status?: string;

@@ -9,6 +9,7 @@ export const castHashSchema = z.string().regex(/^0x[a-f0-9]{40,64}$/i);
 export const sendMessageSchema = z.object({
   text: castTextSchema,
   parentHash: castHashSchema.optional(),
+  embedHash: castHashSchema.optional(), // for quote casts
   channel: channelIdSchema.optional(),
 });
 

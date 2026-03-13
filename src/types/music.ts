@@ -5,7 +5,7 @@ export type AudioController = {
   load: (url: string) => void;
 };
 
-export type TrackType = 'spotify' | 'soundcloud' | 'soundxyz' | 'youtube' | 'audio';
+export type TrackType = 'spotify' | 'soundcloud' | 'soundxyz' | 'youtube' | 'audio' | 'audius';
 
 export type TrackMetadata = {
   id: string;

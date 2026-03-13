@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Cast } from '@/types';
+import { Cast, QuotedCastData } from '@/types';
 import { Message } from './Message';
 
 interface MessageListProps {
@@ -11,11 +11,12 @@ interface MessageListProps {
   hasSigner: boolean;
   onHide: (hash: string) => void;
   onOpenThread?: (hash: string) => void;
+  onQuote?: (cast: QuotedCastData) => void;
   loading: boolean;
   channelId?: string;
 }
 
-export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, loading, channelId = 'zao' }: MessageListProps) {
+export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, loading, channelId = 'zao' }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
@@ -75,6 +76,7 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
             hasSigner={hasSigner}
             onHide={onHide}
             onOpenThread={onOpenThread}
+            onQuote={onQuote}
           />
         ))}
         <div ref={bottomRef} />

@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'img.youtube.com' },        // YouTube thumbnails
       { protocol: 'https', hostname: '*.googleusercontent.com' },
       { protocol: 'https', hostname: '*.ipfs.nftstorage.link' }, // IPFS artwork
+      { protocol: 'https', hostname: '*.audius.co' },            // Audius artwork
     ],
   },
 };

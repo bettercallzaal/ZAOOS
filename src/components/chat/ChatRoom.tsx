@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useMobile } from '@/hooks/useMobile';
 import { usePlayer } from '@/providers/audio';
+import { QuotedCastData } from '@/types';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
 import { ComposeBar } from './ComposeBar';
@@ -20,6 +21,7 @@ export function ChatRoom() {
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
+  const [quotedCast, setQuotedCast] = useState<QuotedCastData | null>(null);
 
   // Stop music when switching channels
   useEffect(() => {
@@ -76,6 +78,7 @@ export function ChatRoom() {
           hasSigner={hasSigner}
           onHide={hideMessage}
           onOpenThread={(hash) => setSelectedThreadHash(hash)}
+          onQuote={(cast) => { setQuotedCast(cast); setSelectedThreadHash(null); }}
           loading={loading}
           channelId={activeChannel}
         />
@@ -90,7 +93,14 @@ export function ChatRoom() {
             <ComposeBar hasSigner={false} onSend={sendMessage} channel={activeChannel} />
           </div>
         ) : (
-          <ComposeBar hasSigner={true} onSend={sendMessage} sending={sending} channel={activeChannel} />
+          <ComposeBar
+            hasSigner={true}
+            onSend={sendMessage}
+            sending={sending}
+            channel={activeChannel}
+            quotedCast={quotedCast}
+            onClearQuote={() => setQuotedCast(null)}
+          />
         )}
       </div>
 

@@ -23,13 +23,20 @@ export async function getChannelFeed(channelId: string, cursor?: string, limit =
   return res.json();
 }
 
-export async function postCast(signerUuid: string, text: string, channelId: string, parentHash?: string) {
-  const body: Record<string, string> = {
+export async function postCast(
+  signerUuid: string,
+  text: string,
+  channelId: string,
+  parentHash?: string,
+  embedHash?: string,
+) {
+  const body: Record<string, unknown> = {
     signer_uuid: signerUuid,
     text,
     channel_id: channelId,
   };
   if (parentHash) body.parent = parentHash;
+  if (embedHash) body.embeds = [{ cast_id: { hash: embedHash } }];
 
   const res = await fetch(`${NEYNAR_BASE}/cast`, {
     method: 'POST',

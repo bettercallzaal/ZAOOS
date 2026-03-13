@@ -46,6 +46,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
 
     registerController('audio', controller);
     registerController('soundxyz', controller);
+    registerController('audius', controller);
 
     return () => {
       audio.pause();
@@ -62,7 +63,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     if (!audio) return;
     const { metadata, status } = state;
 
-    if (!metadata || (metadata.type !== 'audio' && metadata.type !== 'soundxyz')) {
+    if (!metadata || (metadata.type !== 'audio' && metadata.type !== 'soundxyz' && metadata.type !== 'audius')) {
       // Different type — stop our audio
       if (!audio.paused) {
         audio.pause();

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Cast, CastEmbed } from '@/types';
+import { Cast, CastEmbed, QuotedCastData } from '@/types';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { MusicEmbed } from '@/components/music/MusicEmbed';
 
@@ -13,6 +13,7 @@ interface MessageProps {
   hasSigner: boolean;
   onHide: (hash: string) => void;
   onOpenThread?: (hash: string) => void;
+  onQuote?: (cast: QuotedCastData) => void;
 }
 
 function timeAgo(timestamp: string): string {
@@ -106,6 +107,26 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
   return null;
 }
 
+function QuotedCastCard({ cast }: { cast: QuotedCastData }) {
+  return (
+    <div className="mt-2 flex gap-2 px-3 py-2 rounded-lg bg-[#0a1628] border border-gray-700">
+      {cast.author.pfp_url && (
+        <img
+          src={cast.author.pfp_url}
+          alt=""
+          className="w-5 h-5 rounded-full flex-shrink-0 mt-0.5"
+        />
+      )}
+      <div className="flex-1 min-w-0">
+        <span className="text-xs font-medium text-gray-300">
+          {cast.author.display_name || cast.author.username}
+        </span>
+        <p className="text-xs text-gray-400 mt-0.5 line-clamp-3 break-words">{cast.text}</p>
+      </div>
+    </div>
+  );
+}
+
 async function toggleReaction(type: 'like' | 'recast', hash: string, isActive: boolean) {
   const method = isActive ? 'DELETE' : 'POST';
   const res = await fetch('/api/chat/react', {
@@ -116,7 +137,7 @@ async function toggleReaction(type: 'like' | 'recast', hash: string, isActive: b
   return res.ok;
 }
 
-export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenThread }: MessageProps) {
+export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote }: MessageProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const initialLiked = cast.reactions?.likes?.some((l) => l.fid === currentFid) ?? false;
@@ -199,12 +220,21 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
         </div>
         <p className="text-sm text-gray-300 break-words whitespace-pre-wrap">{cast.text}</p>
 
-        {/* Media embeds */}
-        {embeds.length > 0 && (
+        {/* Quoted casts (cast embeds) */}
+        {embeds
+          .filter((e) => e.cast)
+          .map((e, i) => (
+            <QuotedCastCard key={i} cast={e.cast!} />
+          ))}
+
+        {/* Media embeds (URL embeds) */}
+        {embeds.filter((e) => e.url).length > 0 && (
           <div className="space-y-2">
-            {embeds.map((embed, i) => (
-              <EmbedMedia key={i} embed={embed} castHash={cast.hash} />
-            ))}
+            {embeds
+              .filter((e) => e.url)
+              .map((embed, i) => (
+                <EmbedMedia key={i} embed={embed} castHash={cast.hash} />
+              ))}
           </div>
         )}
 
@@ -253,6 +283,19 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
               </svg>
               <span>{cast.replies.count}</span>
+            </button>
+          )}
+
+          {/* Quote */}
+          {hasSigner && onQuote && (
+            <button
+              onClick={() => onQuote(cast)}
+              className="flex items-center gap-1 text-xs text-gray-500 hover:text-[#f5a623] transition-colors opacity-0 group-hover:opacity-100"
+              aria-label="Quote cast"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+              </svg>
             </button>
           )}
         </div>

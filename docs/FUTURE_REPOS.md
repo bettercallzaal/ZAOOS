@@ -113,6 +113,38 @@ GET    /api/taste/digest/:fid       → Weekly music digest
 
 ---
 
+## 5. XMTP Messaging — `zao-dm`
+
+**What:** Encrypted DM and private group chat layer using XMTP protocol, running alongside the public Farcaster channel feed.
+
+**Why separate:** XMTP requires special CORS headers (`Cross-Origin-Embedder-Policy: require-corp`) that can break iframe embeds (Spotify, YouTube). Isolating the DM UI from the music-heavy chat keeps both working cleanly.
+
+**Core features:**
+- Encrypted 1:1 DMs between ZAO members
+- Private group chats (mod channel, working groups, up to 250 members)
+- Token-gated group creation (require allowlist membership)
+- Consent-based spam prevention (XMTP network-level opt-in)
+- Bot/agent messaging (ElizaOS agent can DM members)
+
+**Endpoints / Integration:**
+```
+Client-side SDK — no API needed for basic messaging
+@xmtp/browser-sdk handles encryption + routing
+
+Optional server endpoints:
+GET    /api/xmtp/contacts        → Members with XMTP-enabled wallets
+POST   /api/xmtp/group/create    → Create private group from allowlist
+GET    /api/xmtp/group/:id       → Group metadata
+```
+
+**Stack:** `@xmtp/browser-sdk` (WASM), Airstack API (check XMTP activation), wallet signer from existing auth
+
+**Timeline:** Prototype after ElizaOS agent. Browser SDK should stabilize by mainnet (March 2026).
+
+**Domain:** DM tab within `zaoos.com/dm` (with scoped CORS headers)
+
+---
+
 ## Integration Pattern
 
 ZAO OS (this repo) remains the **client**. It makes simple `fetch()` calls to these services:
@@ -133,8 +165,10 @@ Each service authenticates requests via shared API keys or JWT tokens from the Z
 
 1. **ZID Service** — foundation for everything else (profiles, intros, roles)
 2. **Respect Service** — community incentive layer, feeds into ZIDs
-3. **AI Taste Engine** — personalization once we have enough listening data
-4. **Quilibrium Bridge** — long-term decentralization play
+3. **ElizaOS Agent** — onboarding, support, context help
+4. **XMTP Messaging** — encrypted DMs + private groups
+5. **AI Taste Engine** — personalization once we have enough listening data
+6. **Quilibrium Bridge** — long-term decentralization play
 
 ---
 

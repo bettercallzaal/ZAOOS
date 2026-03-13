@@ -1,6 +1,6 @@
 # ZAO OS
 
-> A music-first, gated Farcaster client for the ZAO community
+> A music-first, gated Farcaster client for the ZAO community — v1.1
 
 ZAO OS is a Discord-style chat client built on [Farcaster](https://farcaster.xyz) where music is the primary content. Members sign in with their Farcaster account, pass an allowlist gate, and chat in gated channels with inline music players, quote casts, reactions, and a music queue sidebar.
 

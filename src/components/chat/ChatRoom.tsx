@@ -1,22 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useMobile } from '@/hooks/useMobile';
+import { usePlayer } from '@/providers/audio';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
 import { ComposeBar } from './ComposeBar';
 import { ThreadDrawer } from './ThreadDrawer';
 import { SignerConnect } from './SignerConnect';
+import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 
 export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
   const [activeChannel, setActiveChannel] = useState('zao');
+  const player = usePlayer();
   const { messages, loading, sending, error, sendMessage, hideMessage } = useChat(activeChannel);
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
+
+  // Stop music when switching channels
+  useEffect(() => {
+    player.stop();
+  }, [activeChannel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!user) return null;
 
@@ -71,6 +79,9 @@ export function ChatRoom() {
           loading={loading}
           channelId={activeChannel}
         />
+
+        {/* Global music player */}
+        <GlobalPlayer />
 
         {/* Signer connect or Compose */}
         {!hasSigner ? (

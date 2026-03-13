@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Cast, CastEmbed } from '@/types';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { MusicEmbed } from '@/components/music/MusicEmbed';
 
 interface MessageProps {
   cast: Cast;
@@ -36,8 +38,14 @@ function isVideoUrl(url: string, embed?: CastEmbed): boolean {
   return /\.(mp4|webm|mov|m3u8)(\?|$)/i.test(url);
 }
 
-function EmbedMedia({ embed }: { embed: CastEmbed }) {
+function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string }) {
   if (!embed.url) return null;
+
+  // Music embed — replaces OG card for music URLs
+  const contentType = embed.metadata?.content_type ?? '';
+  if (contentType.startsWith('audio/') || isMusicUrl(embed.url)) {
+    return <MusicEmbed url={embed.url} castHash={castHash} />;
+  }
 
   if (isImageUrl(embed.url, embed)) {
     return (
@@ -184,7 +192,7 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
         {embeds.length > 0 && (
           <div className="space-y-2">
             {embeds.map((embed, i) => (
-              <EmbedMedia key={i} embed={embed} />
+              <EmbedMedia key={i} embed={embed} castHash={cast.hash} />
             ))}
           </div>
         )}

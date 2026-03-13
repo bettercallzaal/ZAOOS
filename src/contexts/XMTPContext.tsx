@@ -29,6 +29,7 @@ interface XMTPContextValue {
   loadingMessages: boolean;
 
   // Actions
+  autoConnect: (fid: number) => Promise<void>;
   connectWallet: (address: `0x${string}`, signMessage: (msg: string) => Promise<string>) => Promise<void>;
   disconnectWallet: (address: string) => void;
   disconnectAll: () => void;
@@ -110,6 +111,67 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
     setConversations(allMapped);
   }, []);
+
+  /**
+   * Auto-connect using a locally generated key (no MetaMask needed).
+   * This is the default flow for Farcaster-authenticated users.
+   */
+  const autoConnect = useCallback(async (fid: number) => {
+    if (walletsRef.current.size > 0) return; // Already connected
+
+    setIsConnecting(true);
+    setError(null);
+
+    try {
+      const { getOrCreateLocalKey, createLocalSigner, createXMTPClient, saveConnectedWallet } =
+        await import('@/lib/xmtp/client');
+
+      const privateKey = getOrCreateLocalKey(fid);
+      const signer = await createLocalSigner(privateKey);
+      const identifier = await Promise.resolve(signer.getIdentifier());
+      const address = identifier.identifier.toLowerCase();
+
+      setConnectingWallet(address);
+
+      const client = await createXMTPClient(signer, address);
+      await client.conversations.sync();
+
+      const controller = new AbortController();
+      walletsRef.current.set(address, {
+        address,
+        client,
+        streamController: controller,
+      });
+
+      saveConnectedWallet(address);
+      setConnectedWallets(Array.from(walletsRef.current.keys()));
+      await loadAllConversations();
+
+      // Stream new conversations
+      (async () => {
+        try {
+          const stream = await client.conversations.stream({
+            onValue: () => loadAllConversations(),
+          });
+          for await (const _ of stream) {
+            if (controller.signal.aborted) {
+              await stream.return();
+              break;
+            }
+          }
+        } catch {
+          // Stream ended
+        }
+      })();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to connect to XMTP';
+      setError(message);
+      console.error('XMTP auto-connect error:', err);
+    } finally {
+      setIsConnecting(false);
+      setConnectingWallet(null);
+    }
+  }, [loadAllConversations]);
 
   /**
    * Connect a specific wallet to XMTP
@@ -416,6 +478,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         activeConversationId,
         messages,
         loadingMessages,
+        autoConnect,
         connectWallet,
         disconnectWallet,
         disconnectAll,

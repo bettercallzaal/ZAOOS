@@ -18,7 +18,32 @@ export function createWalletSigner(
     }),
     signMessage: async (message: string) => {
       const sig = await signMessage(message);
-      // Convert hex string to Uint8Array
+      const hex = sig.startsWith('0x') ? sig.slice(2) : sig;
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+      }
+      return bytes;
+    },
+  };
+}
+
+/**
+ * Create a local signer from a stored private key (no MetaMask needed).
+ * Uses viem's privateKeyToAccount for signing.
+ */
+export async function createLocalSigner(privateKey: `0x${string}`): Promise<Signer> {
+  const { privateKeyToAccount } = await import('viem/accounts');
+  const account = privateKeyToAccount(privateKey);
+
+  return {
+    type: 'EOA',
+    getIdentifier: () => ({
+      identifierKind: IdentifierKind.Ethereum,
+      identifier: account.address,
+    }),
+    signMessage: async (message: string) => {
+      const sig = await account.signMessage({ message });
       const hex = sig.startsWith('0x') ? sig.slice(2) : sig;
       const bytes = new Uint8Array(hex.length / 2);
       for (let i = 0; i < hex.length; i += 2) {
@@ -58,6 +83,38 @@ export async function createXMTPClient(signer: Signer, address: string) {
 }
 
 /**
+ * Get or generate a local XMTP private key for a FID.
+ * Stored in localStorage — no wallet extension needed.
+ */
+export function getOrCreateLocalKey(fid: number): `0x${string}` {
+  if (typeof window === 'undefined') {
+    throw new Error('Cannot access localStorage on server');
+  }
+
+  const storageKey = `zaoos-xmtp-local-key-${fid}`;
+  const stored = localStorage.getItem(storageKey);
+  if (stored) {
+    return stored as `0x${string}`;
+  }
+
+  // Generate a random 32-byte private key
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  const key = `0x${hex}` as `0x${string}`;
+  localStorage.setItem(storageKey, key);
+  return key;
+}
+
+/**
+ * Get the address for a local key
+ */
+export async function getLocalKeyAddress(fid: number): Promise<`0x${string}`> {
+  const key = getOrCreateLocalKey(fid);
+  const { privateKeyToAccount } = await import('viem/accounts');
+  return privateKeyToAccount(key).address;
+}
+
+/**
  * Get the list of connected wallet addresses from localStorage
  */
 export function getConnectedWallets(): string[] {
@@ -88,33 +145,4 @@ export function removeConnectedWallet(address: string): void {
     (w) => w !== address.toLowerCase()
   );
   localStorage.setItem('zaoos-xmtp-wallets', JSON.stringify(wallets));
-}
-
-/**
- * Check if another tab already has XMTP active using BroadcastChannel
- */
-export function checkTabLock(): { isLocked: boolean; release: () => void } {
-  if (typeof window === 'undefined') return { isLocked: false, release: () => {} };
-
-  const channel = new BroadcastChannel('zaoos-xmtp-lock');
-  let isLocked = false;
-
-  // Ask if anyone else is active
-  channel.postMessage({ type: 'ping' });
-
-  channel.onmessage = (e) => {
-    if (e.data.type === 'ping') {
-      channel.postMessage({ type: 'pong' });
-    }
-    if (e.data.type === 'pong') {
-      isLocked = true;
-    }
-  };
-
-  return {
-    get isLocked() { return isLocked; },
-    release: () => {
-      channel.close();
-    },
-  };
 }

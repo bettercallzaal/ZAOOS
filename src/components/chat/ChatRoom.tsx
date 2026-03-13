@@ -78,7 +78,9 @@ export function ChatRoom() {
         <ThreadDrawer
           threadHash={selectedThreadHash}
           isAdmin={user.isAdmin}
+          hasSigner={hasSigner}
           onHide={hideMessage}
+          onSend={sendMessage}
           onClose={() => setSelectedThreadHash(null)}
         />
       )}

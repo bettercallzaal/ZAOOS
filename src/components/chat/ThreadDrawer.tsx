@@ -1,20 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Cast } from '@/types';
 import { Message } from './Message';
 
 interface ThreadDrawerProps {
   threadHash: string;
   isAdmin: boolean;
+  hasSigner: boolean;
   onHide: (hash: string) => void;
+  onSend: (text: string, parentHash?: string) => Promise<void>;
   onClose: () => void;
 }
 
-export function ThreadDrawer({ threadHash, isAdmin, onHide, onClose }: ThreadDrawerProps) {
+export function ThreadDrawer({ threadHash, isAdmin, hasSigner, onHide, onSend, onClose }: ThreadDrawerProps) {
   const [thread, setThread] = useState<Cast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [sending, setSending] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -27,7 +32,6 @@ export function ThreadDrawer({ threadHash, isAdmin, onHide, onClose }: ThreadDra
         if (!res.ok) throw new Error('Failed to load thread');
         const data = await res.json();
         if (!cancelled) {
-          // data could be { casts: Cast[] } or Cast[] depending on API shape
           const casts: Cast[] = Array.isArray(data) ? data : data.casts ?? [];
           setThread(casts);
         }
@@ -41,10 +45,36 @@ export function ThreadDrawer({ threadHash, isAdmin, onHide, onClose }: ThreadDra
     }
 
     fetchThread();
-    return () => { cancelled = true; };
+    const interval = setInterval(fetchThread, 8000);
+    return () => { cancelled = true; clearInterval(interval); };
   }, [threadHash]);
 
-  // Find parent (first cast) and replies
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [thread.length]);
+
+  const handleReply = async () => {
+    const msg = replyText.trim();
+    if (!msg) return;
+
+    if (hasSigner) {
+      setSending(true);
+      try {
+        await onSend(msg, threadHash);
+        setReplyText('');
+      } catch {
+        // error handled by parent
+      } finally {
+        setSending(false);
+      }
+    } else {
+      const encoded = encodeURIComponent(msg);
+      const url = `https://warpcast.com/~/compose?text=${encoded}&channelKey=zao&parentCastHash=${threadHash}`;
+      window.open(url, '_blank');
+      setReplyText('');
+    }
+  };
+
   const parent = thread[0] ?? null;
   const replies = thread.slice(1);
 
@@ -118,8 +148,44 @@ export function ThreadDrawer({ threadHash, isAdmin, onHide, onClose }: ThreadDra
                   No replies yet
                 </div>
               )}
+
+              <div ref={bottomRef} />
             </div>
           )}
+        </div>
+
+        {/* Reply input */}
+        <div className="border-t border-gray-800 p-3 bg-[#0a1628]">
+          <div className="flex gap-2 items-end">
+            <textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (replyText.trim() && !sending) handleReply();
+                }
+              }}
+              placeholder={hasSigner ? 'Reply...' : 'Reply via Farcaster...'}
+              rows={1}
+              maxLength={1024}
+              disabled={sending}
+              className="flex-1 bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2 resize-none placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623] disabled:opacity-50"
+            />
+            <button
+              onClick={handleReply}
+              disabled={!replyText.trim() || sending}
+              className="bg-[#f5a623] text-[#0a1628] font-medium px-3 py-2 rounded-lg text-sm hover:bg-[#ffd700] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {sending ? (
+                <span className="w-4 h-4 border-2 border-[#0a1628] border-t-transparent rounded-full animate-spin inline-block" />
+              ) : (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </>

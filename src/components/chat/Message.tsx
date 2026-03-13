@@ -129,6 +129,17 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
 
   const embeds = cast.embeds?.filter((e) => e.url) || [];
 
+  // Fallback: scan cast.text for music URLs not already in embeds
+  // (Neynar sometimes doesn't resolve embed metadata for music platforms)
+  const embedUrls = new Set(embeds.map((e) => e.url));
+  const textMusicUrls: string[] = [];
+  const urlMatches = cast.text.match(/https?:\/\/[^\s<>"{}|\\^`[\]]+/g) ?? [];
+  for (const u of urlMatches) {
+    if (!embedUrls.has(u) && isMusicUrl(u)) {
+      textMusicUrls.push(u);
+    }
+  }
+
   const handleLike = async () => {
     if (!hasSigner) return;
     const prev = liked;
@@ -196,6 +207,11 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
             ))}
           </div>
         )}
+
+        {/* Music URLs found in text but not in embeds */}
+        {textMusicUrls.map((url) => (
+          <MusicEmbed key={url} url={url} castHash={cast.hash} />
+        ))}
 
         {/* Reactions bar */}
         <div className="flex items-center gap-4 mt-1.5">

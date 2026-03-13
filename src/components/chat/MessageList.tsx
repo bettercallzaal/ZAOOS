@@ -19,10 +19,23 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
+  const initialScrollDoneRef = useRef(false);
+
+  // Reset scroll state when channel changes
+  useEffect(() => {
+    prevCountRef.current = 0;
+    initialScrollDoneRef.current = false;
+  }, [channelId]);
 
   useEffect(() => {
-    // Auto-scroll when new messages arrive
-    if (messages.length > prevCountRef.current) {
+    if (messages.length === 0) return;
+
+    if (!initialScrollDoneRef.current) {
+      // First load — jump instantly to bottom
+      bottomRef.current?.scrollIntoView({ behavior: 'instant' });
+      initialScrollDoneRef.current = true;
+    } else if (messages.length > prevCountRef.current) {
+      // New message arrived — smooth scroll
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
     prevCountRef.current = messages.length;

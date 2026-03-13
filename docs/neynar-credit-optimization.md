@@ -17,26 +17,59 @@ At 30s polling, 1 channel: **80 × 2/min × 60 × 24 = 230,400 credits/day** jus
 
 ---
 
-## Key Endpoint Costs
+## Complete Credit Cost Reference (Confirmed from Neynar Pricing Page)
 
-| Endpoint | Cost |
+### Feed & Cast (what ZAO OS uses most)
+
+| Endpoint | Credits |
 |---|---|
-| `GET /v2/farcaster/feed/channels` (our main endpoint) | **4 × page limit** |
-| `GET /v2/farcaster/cast` single cast by hash | 2 credits |
-| `POST /v2/farcaster/cast` post a cast | **150 credits** |
-| Webhook: `cast.created` event delivered | **15 credits** |
-| Monthly active signer fee | **20,000 credits/month per signer** |
+| `GET /v2/farcaster/feed/channels` | **4 per cast returned** |
+| `GET /v2/farcaster/feed` (general) | 4 per cast returned |
+| `GET /v2/farcaster/cast/conversation` (threads) | **10 per cast returned** |
+| `GET /v2/farcaster/cast` (single cast) | 4 |
+| `GET /v2/farcaster/casts` (bulk lookup) | 4 per cast |
+| `POST /v2/farcaster/cast` (post a cast) | **150** |
+| `DELETE /v2/farcaster/cast` | 10 |
+
+### Reactions & Channels
+
+| Endpoint | Credits |
+|---|---|
+| `POST /v2/farcaster/reaction` (like/recast) | 10 |
+| `DELETE /v2/farcaster/reaction` | 10 |
+| `GET /v2/farcaster/reactions/cast` | 2 per reaction |
+
+### Webhooks & Streaming
+
+| Method | Credits |
+|---|---|
+| **Data webhooks** (HTTP POST to your endpoint) | **100 cu per delivery** |
+| Kafka stream `cast.created` | 15 cu per event (Growth tier+) |
+| `POST /v2/farcaster/webhook` (create webhook) | 20 (one-time) |
+
+### Signers & Writes
+
+| Item | Credits |
+|---|---|
+| Monthly active signer fee | **20,000 cu/month per active signer** |
+| Sponsored signer add-on | 4,000 cu (managed signer) / 40,000 cu (signed key) |
 
 ---
 
-## Webhook vs. Polling Cost Comparison
+## Webhook vs. Polling Cost Comparison (Corrected)
 
-| Method | Credits (50 casts/day) |
+| Method | Credits (200 casts/day channel) |
 |---|---|
-| Polling every 30s, limit=20 | ~230,400 credits/day |
-| **Webhooks (cast.created)** | **750 credits/day** |
+| Polling every 30s, limit=20, 1 user | ~230,400 credits/day |
+| Polling every 30s, limit=20, 5 users | ~1,152,000 credits/day |
+| **Webhooks (100 cu per delivery)** | **20,000 credits/day** |
+| Kafka stream (Growth tier, 15 cu/event) | 3,000 credits/day |
 
-**Webhooks are ~99% cheaper.** This is the single biggest optimization.
+**Webhooks are ~11x cheaper than polling for 1 user, ~57x cheaper with 5 users.**
+The savings compound with every additional user since polling is per-session.
+
+> Note: Earlier research incorrectly stated 15 cu/webhook — that is the Kafka stream
+> price (a different, higher-tier product). HTTP webhooks cost 100 cu per delivery.
 
 ---
 

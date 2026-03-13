@@ -175,12 +175,14 @@ Neynar charges credits per API call. The architecture is designed to minimize co
 
 | Action | Credits | Notes |
 |---|---|---|
-| `GET /v2/farcaster/feed/channels` | 4 × page limit | We avoid this with webhook caching |
-| Webhook: `cast.created` delivered | 15 credits | ~0.015 credits/cast |
-| `POST /v2/farcaster/cast` | 150 credits | Charged per cast posted |
+| `GET /v2/farcaster/feed/channels` | 4 per cast returned | We avoid this with webhook caching |
+| `GET /v2/farcaster/cast/conversation` | 10 per cast returned | Thread drawer polling |
+| Data webhook delivery | **100 per event** | HTTP push to your endpoint |
+| `POST /v2/farcaster/cast` | 150 | Charged per cast posted |
+| `POST/DELETE /v2/farcaster/reaction` | 10 | Per like/recast action |
 | Monthly active signer | 20,000/month | Per user who posts casts |
 
-**With webhooks enabled:** The feed polling endpoint drops to near-zero. A channel with 200 casts/day costs ~3,000 credits/day vs ~230,000 credits/day with polling.
+**With webhooks enabled:** A 200-cast/day channel costs ~20,000 credits/day via webhook vs ~230,000 credits/day polling (one user) — and polling cost multiplies per concurrent user while webhook cost stays flat.
 
 **If you hit credit limits:** The app falls back to direct Neynar polling automatically when the Supabase cache is empty (e.g., fresh deploy before the first webhook fires).
 

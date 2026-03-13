@@ -145,16 +145,72 @@ GET    /api/xmtp/group/:id       → Group metadata
 
 ---
 
+## 6. Hive Cross-Post — `zao-hive`
+
+**What:** Cross-post ZAO community messages to Hive blockchain, making content visible on PeakD, InLeo, Ecency, and all Hive frontends. Posts earn HIVE/HBD rewards from upvotes.
+
+**Why:** Free transactions (no API costs), on-chain permanent content, built-in monetization, established Hive music community (Hive Open Mic, BlockTunes, NFTTunz).
+
+**Core features:**
+- Cross-post channel messages to Hive as `comment` operations
+- Phase 1: Single ZAO community Hive account (zero user friction)
+- Phase 2: Individual member Hive accounts with stored posting keys
+- Phase 3: ZAO token on Hive Engine (~$1-5 to create)
+
+**Integration:**
+```
+npm install @hiveio/dhive
+
+// Post to Hive
+client.broadcast.comment({
+  author: 'zao-os',
+  body: messageText,
+  parent_permlink: 'music',
+  json_metadata: JSON.stringify({ app: 'zao-os', tags: ['music', 'zao'] })
+}, postingKey);
+```
+
+**Auth:** Stored posting key (mirrors Farcaster signer pattern, cannot move funds)
+
+**Stack:** `@hiveio/dhive`, Hive Keychain SDK (optional), HiveAuth (QR mobile auth)
+
+**Full research:** `docs/HIVE_RESEARCH.md`
+
+---
+
+## 7. ElizaOS Agent — `zao-agent`
+
+**What:** AI agent for community onboarding, support, context help, and crafting content.
+
+**Why separate:** Agent logic has different runtime needs. Consumes ZAO OS APIs but runs independently. Can be deployed to multiple platforms (Farcaster DMs, XMTP, Hive).
+
+**Core features:**
+- Onboard new members (explain community, guide through signer setup)
+- Answer questions about ZAO, channels, music features
+- Help craft posts and content
+- Moderate content (flag spam, suggest actions)
+- Integrate with XMTP for private bot messaging
+
+**Stack:** ElizaOS framework, Claude API, Node.js
+
+**Full research:** saved in memory as `project_elizaos_agent.md`
+
+---
+
 ## Integration Pattern
 
 ZAO OS (this repo) remains the **client**. It makes simple `fetch()` calls to these services:
 
 ```
 ZAO OS Client (zaoos.com)
-  ├── GET zid.zaoos.com/api/zid/:fid        → Profile data
-  ├── GET respect.zaoos.com/api/respect/:fid → Respect balance
-  ├── GET taste.zaoos.com/api/taste/:fid     → Recommendations
-  └── (future) quil-bridge internal gRPC     → Decentralized storage
+  ├── Farcaster (Neynar API)               → Channel casts, social graph
+  ├── Hive (@hiveio/dhive)                 → Cross-post, earn rewards
+  ├── XMTP (@xmtp/browser-sdk)            → Encrypted DMs + groups
+  ├── GET zid.zaoos.com/api/zid/:fid       → Profile data
+  ├── GET respect.zaoos.com/api/respect    → Respect balance
+  ├── GET taste.zaoos.com/api/taste        → Recommendations
+  ├── ElizaOS Agent (zao-agent)            → AI support + onboarding
+  └── (future) quil-bridge internal gRPC   → Decentralized storage
 ```
 
 Each service authenticates requests via shared API keys or JWT tokens from the ZAO OS session.
@@ -163,12 +219,25 @@ Each service authenticates requests via shared API keys or JWT tokens from the Z
 
 ## Build Order
 
+### Phase 1 — Core Infrastructure
 1. **ZID Service** — foundation for everything else (profiles, intros, roles)
 2. **Respect Service** — community incentive layer, feeds into ZIDs
+
+### Phase 2 — Intelligence + Messaging
 3. **ElizaOS Agent** — onboarding, support, context help
 4. **XMTP Messaging** — encrypted DMs + private groups
-5. **AI Taste Engine** — personalization once we have enough listening data
-6. **Quilibrium Bridge** — long-term decentralization play
+5. **Hive Cross-Post** — on-chain content, earn HIVE/HBD rewards
+
+### Phase 3 — Personalization + Decentralization
+6. **AI Taste Engine** — personalization once we have enough listening data
+7. **Quilibrium Bridge** — long-term decentralization play
+
+---
+
+## Research Docs
+- `docs/XMTP_RESEARCH.md` — XMTP protocol, SDK, integration plan
+- `docs/HIVE_RESEARCH.md` — Hive blockchain, InLeo, PeakD, music communities
+- `docs/HUB_STREAMING.md` — @farcaster/shuttle for real-time hub streaming
 
 ---
 

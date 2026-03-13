@@ -20,9 +20,13 @@ export default function LandingPage() {
             const response = await sdk.quickAuth.fetch('/api/miniapp/auth');
             if (response.ok) {
               const data = await response.json();
+              await sdk.actions.ready();
               if (data.hasAccess) {
-                await sdk.actions.ready();
                 router.replace('/chat');
+                return;
+              } else {
+                // Authenticated via Farcaster but not on the allowlist
+                router.replace('/not-allowed');
                 return;
               }
             }

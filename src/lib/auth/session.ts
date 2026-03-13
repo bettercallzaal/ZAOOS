@@ -19,7 +19,7 @@ const sessionOptions = {
   cookieOptions: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: 'strict' as const,
+    sameSite: 'lax' as const, // 'lax' instead of 'strict' — needed for mini app iframe/webview context
     maxAge: 7 * 24 * 60 * 60, // 7 days
   },
 };

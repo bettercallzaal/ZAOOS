@@ -18,6 +18,13 @@ export async function POST() {
     return NextResponse.json({ signerUuid: sessionData.signerUuid, status: 'approved' });
   }
 
+  if (!process.env.APP_SIGNER_PRIVATE_KEY) {
+    return NextResponse.json(
+      { error: 'Managed signer not configured. APP_SIGNER_PRIVATE_KEY is missing from environment.' },
+      { status: 503 }
+    );
+  }
+
   try {
     // Step 1: Create a managed signer
     const signer = await createSigner();

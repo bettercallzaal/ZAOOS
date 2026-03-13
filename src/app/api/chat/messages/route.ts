@@ -3,6 +3,8 @@ import { getSessionData } from '@/lib/auth/session';
 import { getChannelFeed } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
+const ALLOWED_CHANNELS = ['zao', 'zabal', 'coc'];
+
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
   if (!session) {
@@ -10,10 +12,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const channel = req.nextUrl.searchParams.get('channel') || 'zao';
     const cursor = req.nextUrl.searchParams.get('cursor') || undefined;
 
+    if (!ALLOWED_CHANNELS.includes(channel)) {
+      return NextResponse.json({ error: 'Invalid channel' }, { status: 400 });
+    }
+
     // Fetch channel feed from Neynar
-    const feed = await getChannelFeed('zao', cursor);
+    const feed = await getChannelFeed(channel, cursor);
     const casts = feed.casts || [];
 
     // Get hidden message hashes

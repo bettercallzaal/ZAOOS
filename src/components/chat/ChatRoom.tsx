@@ -12,7 +12,8 @@ import { SignerConnect } from './SignerConnect';
 
 export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
-  const { messages, loading, sending, error, sendMessage, hideMessage } = useChat();
+  const [activeChannel, setActiveChannel] = useState('zao');
+  const { messages, loading, sending, error, sendMessage, hideMessage } = useChat(activeChannel);
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
@@ -28,6 +29,12 @@ export function ChatRoom() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onLogout={logout}
+        activeChannel={activeChannel}
+        onChannelSelect={(ch) => {
+          setActiveChannel(ch);
+          setSelectedThreadHash(null);
+          setSidebarOpen(false);
+        }}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -43,7 +50,7 @@ export function ChatRoom() {
               </svg>
             </button>
           )}
-          <h2 className="font-semibold text-sm text-gray-300"># zao</h2>
+          <h2 className="font-semibold text-sm text-gray-300"># {activeChannel}</h2>
         </header>
 
         {/* Error banner */}
@@ -60,16 +67,17 @@ export function ChatRoom() {
           onHide={hideMessage}
           onOpenThread={(hash) => setSelectedThreadHash(hash)}
           loading={loading}
+          channelId={activeChannel}
         />
 
         {/* Signer connect or Compose */}
         {!hasSigner ? (
           <div>
             <SignerConnect onSuccess={refetch} />
-            <ComposeBar hasSigner={false} onSend={sendMessage} />
+            <ComposeBar hasSigner={false} onSend={sendMessage} channel={activeChannel} />
           </div>
         ) : (
-          <ComposeBar hasSigner={true} onSend={sendMessage} sending={sending} />
+          <ComposeBar hasSigner={true} onSend={sendMessage} sending={sending} channel={activeChannel} />
         )}
       </div>
 

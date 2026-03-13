@@ -26,6 +26,17 @@ export interface HiddenMessage {
   hidden_at: string;
 }
 
+export interface CastEmbed {
+  url?: string;
+  metadata?: {
+    content_type?: string;
+    _status?: string;
+    image?: { width_px?: number; height_px?: number };
+    video?: { streams?: { width_px?: number; height_px?: number }[] };
+    html?: { ogTitle?: string; ogDescription?: string; ogImage?: { url?: string }[] };
+  };
+}
+
 export interface Cast {
   hash: string;
   author: {
@@ -38,6 +49,7 @@ export interface Cast {
   timestamp: string;
   replies: { count: number };
   parent_hash: string | null;
+  embeds?: CastEmbed[];
 }
 
 export interface FarcasterUser {

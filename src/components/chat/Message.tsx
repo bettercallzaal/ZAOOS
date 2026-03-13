@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Cast } from '@/types';
+import Image from 'next/image';
+import { Cast, CastEmbed } from '@/types';
 
 interface MessageProps {
   cast: Cast;
@@ -21,8 +22,88 @@ function timeAgo(timestamp: string): string {
   return `${days}d ago`;
 }
 
+function isImageUrl(url: string, embed?: CastEmbed): boolean {
+  const contentType = embed?.metadata?.content_type || '';
+  if (contentType.startsWith('image/')) return true;
+  return /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(url);
+}
+
+function isVideoUrl(url: string, embed?: CastEmbed): boolean {
+  const contentType = embed?.metadata?.content_type || '';
+  if (contentType.startsWith('video/')) return true;
+  return /\.(mp4|webm|mov|m3u8)(\?|$)/i.test(url);
+}
+
+function EmbedMedia({ embed }: { embed: CastEmbed }) {
+  if (!embed.url) return null;
+
+  // Image embed
+  if (isImageUrl(embed.url, embed)) {
+    return (
+      <a href={embed.url} target="_blank" rel="noopener noreferrer" className="block mt-2">
+        <img
+          src={embed.url}
+          alt=""
+          className="rounded-lg max-w-full max-h-80 object-cover"
+          loading="lazy"
+        />
+      </a>
+    );
+  }
+
+  // Video embed
+  if (isVideoUrl(embed.url, embed)) {
+    return (
+      <video
+        src={embed.url}
+        controls
+        preload="metadata"
+        className="rounded-lg max-w-full max-h-80 mt-2"
+      />
+    );
+  }
+
+  // Link preview with OG data
+  const og = embed.metadata?.html;
+  if (og && (og.ogTitle || og.ogImage?.[0]?.url)) {
+    return (
+      <a
+        href={embed.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block mt-2 rounded-lg border border-gray-700 overflow-hidden hover:border-gray-600 transition-colors"
+      >
+        {og.ogImage?.[0]?.url && (
+          <img
+            src={og.ogImage[0].url}
+            alt=""
+            className="w-full max-h-48 object-cover"
+            loading="lazy"
+          />
+        )}
+        {(og.ogTitle || og.ogDescription) && (
+          <div className="p-3 bg-[#0d1b2a]">
+            {og.ogTitle && (
+              <p className="text-sm font-medium text-white truncate">{og.ogTitle}</p>
+            )}
+            {og.ogDescription && (
+              <p className="text-xs text-gray-400 mt-1 line-clamp-2">{og.ogDescription}</p>
+            )}
+            <p className="text-xs text-gray-600 mt-1 truncate">{new URL(embed.url).hostname}</p>
+          </div>
+        )}
+      </a>
+    );
+  }
+
+  // Plain link (no preview)
+  return null;
+}
+
 export function Message({ cast, isAdmin, onHide, onOpenThread }: MessageProps) {
   const [showMenu, setShowMenu] = useState(false);
+
+  const embeds = cast.embeds?.filter((e) => e.url) || [];
 
   return (
     <div
@@ -36,10 +117,13 @@ export function Message({ cast, isAdmin, onHide, onOpenThread }: MessageProps) {
     >
       {/* Avatar */}
       {cast.author.pfp_url ? (
-        <img
+        <Image
           src={cast.author.pfp_url}
           alt={cast.author.display_name}
-          className="w-9 h-9 rounded-full flex-shrink-0 mt-0.5"
+          width={36}
+          height={36}
+          className="rounded-full flex-shrink-0 mt-0.5"
+          unoptimized
         />
       ) : (
         <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 mt-0.5" />
@@ -54,6 +138,16 @@ export function Message({ cast, isAdmin, onHide, onOpenThread }: MessageProps) {
           <span className="text-xs text-gray-500">{timeAgo(cast.timestamp)}</span>
         </div>
         <p className="text-sm text-gray-300 break-words whitespace-pre-wrap">{cast.text}</p>
+
+        {/* Media embeds */}
+        {embeds.length > 0 && (
+          <div className="space-y-2">
+            {embeds.map((embed, i) => (
+              <EmbedMedia key={i} embed={embed} />
+            ))}
+          </div>
+        )}
+
         {cast.replies.count > 0 && (
           <button
             onClick={() => onOpenThread?.(cast.hash)}

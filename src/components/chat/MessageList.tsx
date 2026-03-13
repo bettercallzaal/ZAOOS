@@ -10,9 +10,10 @@ interface MessageListProps {
   onHide: (hash: string) => void;
   onOpenThread?: (hash: string) => void;
   loading: boolean;
+  channelId?: string;
 }
 
-export function MessageList({ messages, isAdmin, onHide, onOpenThread, loading }: MessageListProps) {
+export function MessageList({ messages, isAdmin, onHide, onOpenThread, loading, channelId = 'zao' }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
@@ -38,7 +39,7 @@ export function MessageList({ messages, isAdmin, onHide, onOpenThread, loading }
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center text-gray-500">
           <p className="text-lg mb-1">No messages yet</p>
-          <p className="text-sm">Be the first to post in #zao</p>
+          <p className="text-sm">Be the first to post in #{channelId}</p>
         </div>
       </div>
     );

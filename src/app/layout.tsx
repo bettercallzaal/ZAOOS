@@ -14,7 +14,7 @@ const miniAppEmbed = JSON.stringify({
   button: {
     title: 'Open ZAO OS',
     action: {
-      type: 'launch_frame',
+      type: 'launch_miniapp',
       url: 'https://zaoos.com',
       name: 'ZAO OS',
       splashImageUrl: 'https://zaoos.com/splash.png',
@@ -24,31 +24,24 @@ const miniAppEmbed = JSON.stringify({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://zaoos.com'),
   title: 'ZAO OS',
   description: 'The ZAO Community on Farcaster — gated chat for ZAO members',
-  icons: {
-    icon: [
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-    ],
-    apple: '/apple-touch-icon.png',
-  },
   openGraph: {
     title: 'ZAO OS',
     description: 'The ZAO Community on Farcaster — gated chat for ZAO members',
     url: 'https://zaoos.com',
     siteName: 'ZAO OS',
-    images: [{ url: 'https://zaoos.com/og.png', width: 1200, height: 1200 }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'ZAO OS',
     description: 'The ZAO Community on Farcaster — gated chat for ZAO members',
-    images: ['https://zaoos.com/og.png'],
   },
   other: {
     'fc:miniapp': miniAppEmbed,
+    'fc:frame': miniAppEmbed,
   },
 };
 

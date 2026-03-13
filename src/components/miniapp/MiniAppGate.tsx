@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 interface MiniAppUser {
   fid: number;
@@ -87,7 +88,7 @@ function NoAccessScreen({ username }: { username: string }) {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-[#0a1628] px-6">
       <div className="text-center max-w-sm">
-        <img src="/logo.png" alt="THE ZAO" className="w-24 h-24 mx-auto mb-4 rounded-2xl" />
+        <Image src="/logo.png" alt="THE ZAO" width={96} height={96} className="mx-auto mb-4 rounded-2xl" />
         <h1 className="text-4xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2">
           THE ZAO
         </h1>

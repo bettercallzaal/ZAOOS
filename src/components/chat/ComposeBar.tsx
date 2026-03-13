@@ -6,9 +6,10 @@ interface ComposeBarProps {
   hasSigner: boolean;
   onSend: (text: string) => Promise<void>;
   sending?: boolean;
+  channel?: string;
 }
 
-export function ComposeBar({ hasSigner, onSend, sending }: ComposeBarProps) {
+export function ComposeBar({ hasSigner, onSend, sending, channel = 'zao' }: ComposeBarProps) {
   const [text, setText] = useState('');
 
   const handleSubmit = async () => {
@@ -26,7 +27,7 @@ export function ComposeBar({ hasSigner, onSend, sending }: ComposeBarProps) {
     } else {
       // Fallback: open Farcaster compose
       const encoded = encodeURIComponent(msg);
-      const url = `https://warpcast.com/~/compose?text=${encoded}&channelKey=zao`;
+      const url = `https://warpcast.com/~/compose?text=${encoded}&channelKey=${channel}`;
       window.open(url, '_blank');
       setText('');
     }
@@ -44,7 +45,7 @@ export function ComposeBar({ hasSigner, onSend, sending }: ComposeBarProps) {
               if (text.trim() && !sending) handleSubmit();
             }
           }}
-          placeholder={hasSigner ? 'Type a message...' : 'Type a message, post via Farcaster...'}
+          placeholder={hasSigner ? `Message #${channel}...` : `Message #${channel}, post via Farcaster...`}
           rows={1}
           maxLength={1024}
           disabled={sending}
@@ -70,7 +71,7 @@ export function ComposeBar({ hasSigner, onSend, sending }: ComposeBarProps) {
         </button>
       </div>
       {!hasSigner && (
-        <p className="text-xs text-gray-600 mt-1.5">Opens in Farcaster to post to /zao channel</p>
+        <p className="text-xs text-gray-600 mt-1.5">Opens in Farcaster to post to /{channel} channel</p>
       )}
     </div>
   );

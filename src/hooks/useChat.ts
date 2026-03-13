@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Cast } from '@/types';
 
-export function useChat() {
+export function useChat(channel: string = 'zao') {
   const [messages, setMessages] = useState<Cast[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -12,7 +12,7 @@ export function useChat() {
 
   const fetchMessages = useCallback(async () => {
     try {
-      const res = await fetch('/api/chat/messages');
+      const res = await fetch(`/api/chat/messages?channel=${channel}`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       setMessages(data.casts || []);
@@ -22,9 +22,11 @@ export function useChat() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [channel]);
 
   useEffect(() => {
+    setLoading(true);
+    setMessages([]);
     fetchMessages();
     intervalRef.current = setInterval(fetchMessages, 8000);
     return () => {
@@ -38,13 +40,12 @@ export function useChat() {
       const res = await fetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, parentHash }),
+        body: JSON.stringify({ text, parentHash, channel }),
       });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || 'Failed to send');
       }
-      // Immediately refresh messages
       await fetchMessages();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send');
@@ -52,7 +53,7 @@ export function useChat() {
     } finally {
       setSending(false);
     }
-  }, [fetchMessages]);
+  }, [fetchMessages, channel]);
 
   const hideMessage = useCallback(async (castHash: string, reason?: string) => {
     const res = await fetch('/api/chat/hide', {

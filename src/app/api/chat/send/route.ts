@@ -3,6 +3,8 @@ import { getSessionData } from '@/lib/auth/session';
 import { postCast } from '@/lib/farcaster/neynar';
 import { sendMessageSchema } from '@/lib/validation/schemas';
 
+const ALLOWED_CHANNELS = ['zao', 'zabal', 'coc'];
+
 export async function POST(req: NextRequest) {
   const session = await getSessionData();
   if (!session) {
@@ -20,8 +22,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
 
-    const { text, parentHash } = parsed.data;
-    const result = await postCast(session.signerUuid, text, 'zao', parentHash);
+    const { text, parentHash, channel } = parsed.data;
+    const targetChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
+    const result = await postCast(session.signerUuid, text, targetChannel, parentHash);
 
     return NextResponse.json({ success: true, cast: result.cast });
   } catch (error) {

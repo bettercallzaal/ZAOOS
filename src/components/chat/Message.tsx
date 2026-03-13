@@ -117,14 +117,15 @@ export function Message({ cast, isAdmin, onHide, onOpenThread }: MessageProps) {
     >
       {/* Avatar */}
       {cast.author.pfp_url ? (
-        <Image
-          src={cast.author.pfp_url}
-          alt={cast.author.display_name}
-          width={36}
-          height={36}
-          className="rounded-full flex-shrink-0 mt-0.5"
-          unoptimized
-        />
+        <div className="w-9 h-9 flex-shrink-0 mt-0.5 relative">
+          <Image
+            src={cast.author.pfp_url}
+            alt={cast.author.display_name}
+            fill
+            className="rounded-full object-cover"
+            unoptimized
+          />
+        </div>
       ) : (
         <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 mt-0.5" />
       )}

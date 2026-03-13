@@ -76,16 +76,17 @@ export function Sidebar({ user, isOpen, onClose, onLogout, activeChannel, onChan
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center gap-3">
             {user.pfpUrl ? (
-              <Image
-                src={user.pfpUrl}
-                alt={user.displayName}
-                width={32}
-                height={32}
-                className="rounded-full"
-                unoptimized
-              />
+              <div className="w-8 h-8 relative flex-shrink-0">
+                <Image
+                  src={user.pfpUrl}
+                  alt={user.displayName}
+                  fill
+                  className="rounded-full object-cover"
+                  unoptimized
+                />
+              </div>
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gray-700" />
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0" />
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{user.displayName}</p>

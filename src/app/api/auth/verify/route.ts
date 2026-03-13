@@ -1,20 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { checkAllowlist } from '@/lib/gates/allowlist';
 import { saveSession } from '@/lib/auth/session';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 
+const appClient = createAppClient({
+  ethereum: viemConnector(),
+});
+
 export async function POST(req: NextRequest) {
   try {
-    const { fid, username, displayName, pfpUrl, signerUuid } = await req.json();
+    const { message, signature, nonce, domain } = await req.json();
 
-    if (!fid) {
-      return NextResponse.json({ error: 'Missing FID' }, { status: 400 });
+    if (!message || !signature || !nonce || !domain) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Verify user exists on Farcaster via Neynar
+    // Verify SIWF signature
+    const result = await appClient.verifySignInMessage({
+      message,
+      signature,
+      nonce,
+      domain,
+    });
+
+    if (!result.success) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const fid = result.fid;
+
+    // Get user profile from Neynar
     const user = await getUserByFid(fid);
     if (!user) {
-      return NextResponse.json({ error: 'User not found on Farcaster' }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Check allowlist by FID and all addresses
@@ -35,13 +54,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Not on allowlist', redirect: '/not-allowed' }, { status: 403 });
     }
 
-    // Create session with signer from SIWN
+    // Create session (no signer needed for MVP — posting via Warpcast deep link)
     await saveSession({
       fid,
-      username: username || user.username,
-      displayName: displayName || user.display_name,
-      pfpUrl: pfpUrl || user.pfp_url,
-      signerUuid: signerUuid || null,
+      username: user.username,
+      displayName: user.display_name,
+      pfpUrl: user.pfp_url,
+      signerUuid: null,
     });
 
     return NextResponse.json({

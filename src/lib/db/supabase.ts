@@ -1,7 +1,20 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+let _supabaseAdmin: SupabaseClient | null = null;
 
-// Server-side client with service role (use in API routes only)
-export const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+export function getSupabaseAdmin(): SupabaseClient {
+  if (!_supabaseAdmin) {
+    _supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return _supabaseAdmin;
+}
+
+// Convenience getter - lazy proxy so module can be imported at build time
+export const supabaseAdmin = new Proxy({} as SupabaseClient, {
+  get(_, prop) {
+    return (getSupabaseAdmin() as unknown as Record<string | symbol, unknown>)[prop];
+  },
+});

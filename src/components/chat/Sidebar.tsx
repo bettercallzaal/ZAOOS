@@ -6,7 +6,7 @@ import { SessionData } from '@/types';
 const CHANNELS = [
   { id: 'zao', label: '# zao' },
   { id: 'zabal', label: '# zabal' },
-  { id: 'coc', label: '# coc' },
+  { id: 'cocconcertz', label: '# cocconcertz' },
 ];
 
 interface SidebarProps {

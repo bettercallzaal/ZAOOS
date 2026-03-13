@@ -4,7 +4,7 @@ import { getChannelFeed } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { Cast } from '@/types';
 
-const ALLOWED_CHANNELS = ['zao', 'zabal', 'coc'];
+const ALLOWED_CHANNELS = ['zao', 'zabal', 'cocconcertz'];
 const FEED_LIMIT = 20;
 
 // Map a channel_casts DB row → Cast type expected by the client

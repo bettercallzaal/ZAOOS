@@ -11,6 +11,7 @@ export const sendMessageSchema = z.object({
   parentHash: castHashSchema.optional(),
   embedHash: castHashSchema.optional(), // for quote casts
   channel: channelIdSchema.optional(),
+  crossPostChannels: z.array(channelIdSchema).max(3).optional(), // post to multiple channels
 });
 
 export const hideMessageSchema = z.object({

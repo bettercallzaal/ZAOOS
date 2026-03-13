@@ -118,6 +118,18 @@ export async function getSignerStatus(signerUuid: string) {
   return res.json();
 }
 
+export async function searchUsers(query: string, limit = 5) {
+  const params = new URLSearchParams({
+    q: query,
+    limit: String(limit),
+  });
+  const res = await fetch(`${NEYNAR_BASE}/user/search?${params}`, {
+    headers: headers(),
+  });
+  if (!res.ok) throw new Error(`Neynar search error: ${res.status}`);
+  return res.json();
+}
+
 export async function registerUser(
   signature: string,
   custodyAddress: string,

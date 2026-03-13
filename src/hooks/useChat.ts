@@ -56,13 +56,13 @@ export function useChat(channel: string = 'zao') {
     };
   }, [fetchMessages]);
 
-  const sendMessage = useCallback(async (text: string, parentHash?: string, embedHash?: string) => {
+  const sendMessage = useCallback(async (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[]) => {
     setSending(true);
     try {
       const res = await fetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, parentHash, embedHash, channel }),
+        body: JSON.stringify({ text, parentHash, embedHash, channel, crossPostChannels }),
       });
       if (!res.ok) {
         const data = await res.json();

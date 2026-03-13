@@ -1,11 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { QuotedCastData } from '@/types';
+import { MentionAutocomplete } from './MentionAutocomplete';
+
+const ALL_CHANNELS = [
+  { id: 'zao', label: '#zao' },
+  { id: 'zabal', label: '#zabal' },
+  { id: 'cocconcertz', label: '#cocconcertz' },
+];
 
 interface ComposeBarProps {
   hasSigner: boolean;
-  onSend: (text: string, parentHash?: string, embedHash?: string) => Promise<void>;
+  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[]) => Promise<void>;
   sending?: boolean;
   channel?: string;
   quotedCast?: QuotedCastData | null;
@@ -21,6 +28,11 @@ export function ComposeBar({
   onClearQuote,
 }: ComposeBarProps) {
   const [text, setText] = useState('');
+  const [showCrossPost, setShowCrossPost] = useState(false);
+  const [crossPostChannels, setCrossPostChannels] = useState<Set<string>>(new Set());
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionStart, setMentionStart] = useState(0); // cursor position where @ was typed
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = async () => {
     const msg = text.trim();
@@ -28,9 +40,12 @@ export function ComposeBar({
 
     if (hasSigner) {
       try {
-        await onSend(msg, undefined, quotedCast?.hash);
+        const crossPost = crossPostChannels.size > 0 ? [...crossPostChannels] : undefined;
+        await onSend(msg, undefined, quotedCast?.hash, crossPost);
         setText('');
         onClearQuote?.();
+        setCrossPostChannels(new Set());
+        setShowCrossPost(false);
       } catch {
         // Error handled by useChat hook
       }
@@ -42,8 +57,80 @@ export function ComposeBar({
     }
   };
 
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setText(val);
+
+    // Detect @mention
+    const cursorPos = e.target.selectionStart;
+    const textBeforeCursor = val.slice(0, cursorPos);
+
+    // Find the last @ that starts a mention (preceded by space or start of string)
+    const mentionMatch = textBeforeCursor.match(/(^|[\s])@([a-zA-Z0-9._-]*)$/);
+    if (mentionMatch) {
+      setMentionQuery(mentionMatch[2]);
+      setMentionStart(cursorPos - mentionMatch[2].length);
+    } else {
+      setMentionQuery(null);
+    }
+  };
+
+  const handleMentionSelect = useCallback((username: string) => {
+    // Replace the @query with @username
+    const before = text.slice(0, mentionStart);
+    const after = text.slice(mentionStart + (mentionQuery?.length || 0));
+    const newText = `${before}${username} ${after}`;
+    setText(newText);
+    setMentionQuery(null);
+
+    // Refocus textarea
+    setTimeout(() => {
+      const pos = mentionStart + username.length + 1;
+      textareaRef.current?.focus();
+      textareaRef.current?.setSelectionRange(pos, pos);
+    }, 0);
+  }, [text, mentionStart, mentionQuery]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // If mention dropdown is open, let it handle arrow/enter/tab/esc
+    if (mentionQuery !== null && mentionQuery.length >= 1) {
+      if (['ArrowDown', 'ArrowUp', 'Tab', 'Escape'].includes(e.key)) {
+        return; // handled by MentionAutocomplete
+      }
+      if (e.key === 'Enter') {
+        return; // let MentionAutocomplete handle Enter for selection
+      }
+    }
+
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (text.trim() && !sending) handleSubmit();
+    }
+  };
+
+  const toggleCrossPost = (ch: string) => {
+    setCrossPostChannels((prev) => {
+      const next = new Set(prev);
+      if (next.has(ch)) next.delete(ch);
+      else next.add(ch);
+      return next;
+    });
+  };
+
+  const otherChannels = ALL_CHANNELS.filter((ch) => ch.id !== channel);
+
   return (
-    <div className="border-t border-gray-800 bg-[#0d1b2a]">
+    <div className="border-t border-gray-800 bg-[#0d1b2a] relative">
+      {/* Mention autocomplete */}
+      {mentionQuery !== null && mentionQuery.length >= 1 && (
+        <MentionAutocomplete
+          query={mentionQuery}
+          onSelect={handleMentionSelect}
+          onClose={() => setMentionQuery(null)}
+          position={{ bottom: 70, left: 16 }}
+        />
+      )}
+
       {/* Quote preview */}
       {quotedCast && (
         <div className="px-3 pt-2">
@@ -67,22 +154,63 @@ export function ComposeBar({
         </div>
       )}
 
+      {/* Cross-post selector */}
+      {showCrossPost && hasSigner && (
+        <div className="px-3 pt-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-gray-500">Also post to:</span>
+            {otherChannels.map((ch) => (
+              <button
+                key={ch.id}
+                onClick={() => toggleCrossPost(ch.id)}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  crossPostChannels.has(ch.id)
+                    ? 'border-[#f5a623] bg-[#f5a623]/10 text-[#f5a623]'
+                    : 'border-gray-700 text-gray-400 hover:border-gray-500'
+                }`}
+              >
+                {ch.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="p-3">
         <div className="flex gap-2 items-end">
+          {/* Cross-post toggle */}
+          {hasSigner && (
+            <button
+              onClick={() => setShowCrossPost(!showCrossPost)}
+              className={`relative flex-shrink-0 p-2.5 rounded-lg transition-colors ${
+                showCrossPost || crossPostChannels.size > 0
+                  ? 'text-[#f5a623] bg-[#f5a623]/10'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+              }`}
+              title="Cross-post to other channels"
+              aria-label="Cross-post to other channels"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+              </svg>
+              {crossPostChannels.size > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[#f5a623] text-[#0a1628] rounded-full text-[8px] font-bold flex items-center justify-center">
+                  {crossPostChannels.size}
+                </span>
+              )}
+            </button>
+          )}
+
           <textarea
+            ref={textareaRef}
             value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (text.trim() && !sending) handleSubmit();
-              }
-            }}
+            onChange={handleTextChange}
+            onKeyDown={handleKeyDown}
             placeholder={
               quotedCast
                 ? 'Add a comment...'
                 : hasSigner
-                  ? `Message #${channel}...`
+                  ? `Message #${channel}... (type @ to mention)`
                   : `Message #${channel}, post via Farcaster...`
             }
             rows={1}
@@ -106,7 +234,7 @@ export function ComposeBar({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
               </svg>
             )}
-            {sending ? 'Sending' : 'Post'}
+            {sending ? 'Sending' : crossPostChannels.size > 0 ? `Post (${crossPostChannels.size + 1})` : 'Post'}
           </button>
         </div>
         {!hasSigner && (

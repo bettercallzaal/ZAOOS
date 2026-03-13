@@ -18,6 +18,9 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/auth')) {
     return { limit: 10, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/search')) {
+    return { limit: 30, windowMs: MINUTE };
+  }
   return null;
 }
 

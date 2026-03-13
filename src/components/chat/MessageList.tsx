@@ -12,11 +12,12 @@ interface MessageListProps {
   onHide: (hash: string) => void;
   onOpenThread?: (hash: string) => void;
   onQuote?: (cast: QuotedCastData) => void;
+  onOpenProfile?: (fid: number) => void;
   loading: boolean;
   channelId?: string;
 }
 
-export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, loading, channelId = 'zao' }: MessageListProps) {
+export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, loading, channelId = 'zao' }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
   const prevChannelRef = useRef(channelId);
@@ -107,6 +108,7 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
               onHide={onHide}
               onOpenThread={onOpenThread}
               onQuote={onQuote}
+              onOpenProfile={onOpenProfile}
             />
           ))}
         </div>

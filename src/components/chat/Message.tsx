@@ -14,6 +14,7 @@ interface MessageProps {
   onHide: (hash: string) => void;
   onOpenThread?: (hash: string) => void;
   onQuote?: (cast: QuotedCastData) => void;
+  onOpenProfile?: (fid: number) => void;
 }
 
 function timeAgo(timestamp: string): string {
@@ -151,7 +152,7 @@ async function toggleReaction(type: 'like' | 'recast', hash: string, isActive: b
   return res.ok;
 }
 
-export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote }: MessageProps) {
+export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile }: MessageProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const initialLiked = cast.reactions?.likes?.some((l) => l.fid === currentFid) ?? false;
@@ -211,7 +212,10 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
     >
       {/* Avatar */}
       {cast.author.pfp_url ? (
-        <div className="w-9 h-9 flex-shrink-0 mt-0.5 relative">
+        <button
+          onClick={() => onOpenProfile?.(cast.author.fid)}
+          className="w-9 h-9 flex-shrink-0 mt-0.5 relative cursor-pointer hover:opacity-80 transition-opacity"
+        >
           <Image
             src={cast.author.pfp_url}
             alt={cast.author.display_name}
@@ -219,17 +223,23 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
             className="rounded-full object-cover"
             unoptimized
           />
-        </div>
+        </button>
       ) : (
-        <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 mt-0.5" />
+        <button
+          onClick={() => onOpenProfile?.(cast.author.fid)}
+          className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 mt-0.5 cursor-pointer hover:opacity-80 transition-opacity"
+        />
       )}
 
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2">
-          <span className="font-medium text-sm text-white">
+          <button
+            onClick={() => onOpenProfile?.(cast.author.fid)}
+            className="font-medium text-sm text-white hover:text-[#f5a623] transition-colors cursor-pointer"
+          >
             {cast.author.display_name || cast.author.username}
-          </span>
+          </button>
           <span className="text-xs text-gray-500">{timeAgo(cast.timestamp)}</span>
         </div>
         <p className="text-sm text-gray-300 break-words whitespace-pre-wrap">{cast.text}</p>

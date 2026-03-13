@@ -16,6 +16,7 @@ import { SearchDialog } from './SearchDialog';
 import { SchedulePanel } from './SchedulePanel';
 import { FaqPanel } from './FaqPanel';
 import { TutorialPanel } from './TutorialPanel';
+import { ProfileDrawer } from './ProfileDrawer';
 import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 import { MusicSidebar } from '@/components/music/MusicSidebar';
 import { SongSubmit } from '@/components/music/SongSubmit';
@@ -36,6 +37,7 @@ export function ChatRoom() {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [profileFid, setProfileFid] = useState<number | null>(null);
   const composeRef = useRef<ComposeBarHandle>(null);
   const musicQueue = useMusicQueue(messages);
 
@@ -44,6 +46,7 @@ export function ChatRoom() {
     onSearch: () => setSearchOpen(true),
     onFocusCompose: () => composeRef.current?.focus(),
     onClosePanels: () => {
+      if (profileFid) { setProfileFid(null); return; }
       if (faqOpen) { setFaqOpen(false); return; }
       if (tutorialOpen) { setTutorialOpen(false); return; }
       if (searchOpen) { setSearchOpen(false); return; }
@@ -55,7 +58,7 @@ export function ChatRoom() {
     },
     onToggleSidebar: () => setSidebarOpen((o) => !o),
     onToggleMusic: () => setMusicSidebarOpen((o) => !o),
-  }), [faqOpen, tutorialOpen, searchOpen, selectedThreadHash, musicSidebarOpen, songSubmitOpen, scheduleOpen, sidebarOpen]);
+  }), [profileFid, faqOpen, tutorialOpen, searchOpen, selectedThreadHash, musicSidebarOpen, songSubmitOpen, scheduleOpen, sidebarOpen]);
 
   useKeyboardShortcuts(shortcutHandlers);
 
@@ -187,6 +190,7 @@ export function ChatRoom() {
               setQuotedCast(cast);
               setSelectedThreadHash(null);
             }}
+            onOpenProfile={(fid) => setProfileFid(fid)}
             loading={loading}
             channelId={activeChannel}
           />
@@ -267,6 +271,9 @@ export function ChatRoom() {
 
       {/* Tutorial Panel */}
       <TutorialPanel isOpen={tutorialOpen} onClose={() => setTutorialOpen(false)} />
+
+      {/* Profile Drawer */}
+      <ProfileDrawer fid={profileFid} onClose={() => setProfileFid(null)} />
     </div>
   );
 }

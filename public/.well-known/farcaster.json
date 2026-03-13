@@ -1,8 +1,8 @@
 {
   "accountAssociation": {
-    "header": "GENERATE_AT_farcaster.xyz/~/developers/new",
-    "payload": "GENERATE_AT_farcaster.xyz/~/developers/new",
-    "signature": "GENERATE_AT_farcaster.xyz/~/developers/new"
+    "header": "eyJmaWQiOjE5NjQwLCJ0eXBlIjoiYXV0aCIsImtleSI6IjB4Yjc5Y2RBYkY2ZjJmQjhGZWE3MEMyZTUxNUFFQzM1RTgyN2JGNzkzMiJ9",
+    "payload": "eyJkb21haW4iOiJ6YW9vcy5jb20ifQ",
+    "signature": "zwIMM//1nkSk+6IRXxQ1Lc2GpwiLTbnhtRAI6F3AH7dWXgkdWOxnaYdU4/7OqKNw8n1kTJWXyOZSGwUgsULDRBs="
   },
   "miniapp": {
     "version": "1",

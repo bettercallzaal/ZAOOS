@@ -201,6 +201,7 @@ export function ChatRoom() {
               channel={activeChannel}
               quotedCast={quotedCast}
               onClearQuote={() => setQuotedCast(null)}
+              onSchedule={() => setScheduleOpen(true)}
             />
           )}
         </div>

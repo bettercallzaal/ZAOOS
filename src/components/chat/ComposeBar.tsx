@@ -17,6 +17,7 @@ interface ComposeBarProps {
   channel?: string;
   quotedCast?: QuotedCastData | null;
   onClearQuote?: () => void;
+  onSchedule?: () => void;
 }
 
 export interface ComposeBarHandle {
@@ -30,6 +31,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   channel = 'zao',
   quotedCast,
   onClearQuote,
+  onSchedule,
 }, ref) {
   const [text, setText] = useState('');
   const [showCrossPost, setShowCrossPost] = useState(false);
@@ -38,6 +40,8 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   const [mentionStart, setMentionStart] = useState(0);
   const [imagePreview, setImagePreview] = useState<{ url: string; file?: File } | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [scheduleTime, setScheduleTime] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -97,6 +101,37 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       const url = `https://warpcast.com/~/compose?text=${encoded}&channelKey=${channel}`;
       window.open(url, '_blank');
       setText('');
+    }
+  };
+
+  const handleSchedule = async () => {
+    const msg = text.trim();
+    if (!msg || !scheduleTime) return;
+
+    try {
+      const crossPost = crossPostChannels.size > 0 ? [...crossPostChannels] : undefined;
+      const res = await fetch('/api/chat/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: msg,
+          channel,
+          scheduledFor: new Date(scheduleTime).toISOString(),
+          crossPostChannels: crossPost,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to schedule');
+      }
+      setText('');
+      setShowSchedule(false);
+      setScheduleTime('');
+      setCrossPostChannels(new Set());
+      setShowCrossPost(false);
+      onSchedule?.();
+    } catch {
+      // Error silently
     }
   };
 
@@ -224,6 +259,35 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
         </div>
       )}
 
+      {/* Schedule picker */}
+      {showSchedule && hasSigner && (
+        <div className="px-3 pt-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Schedule for:</span>
+            <input
+              type="datetime-local"
+              value={scheduleTime}
+              onChange={(e) => setScheduleTime(e.target.value)}
+              min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)}
+              className="bg-[#1a2a3a] text-white text-xs rounded-lg px-2 py-1.5 border border-gray-700 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
+            />
+            <button
+              onClick={handleSchedule}
+              disabled={!text.trim() || !scheduleTime}
+              className="text-xs px-3 py-1.5 rounded-lg bg-[#f5a623] text-[#0a1628] font-medium disabled:opacity-50 hover:bg-[#ffd700] transition-colors"
+            >
+              Schedule
+            </button>
+            <button
+              onClick={() => { setShowSchedule(false); setScheduleTime(''); }}
+              className="text-xs text-gray-500 hover:text-white"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Cross-post selector */}
       {showCrossPost && hasSigner && (
         <div className="px-3 pt-2">
@@ -251,7 +315,15 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
           {/* Cross-post toggle */}
           {hasSigner && (
             <button
-              onClick={() => setShowCrossPost(!showCrossPost)}
+              onClick={() => {
+                if (showCrossPost) {
+                  // Closing: clear selections too
+                  setShowCrossPost(false);
+                  setCrossPostChannels(new Set());
+                } else {
+                  setShowCrossPost(true);
+                }
+              }}
               className={`relative flex-shrink-0 p-2.5 rounded-lg transition-colors ${
                 showCrossPost || crossPostChannels.size > 0
                   ? 'text-[#f5a623] bg-[#f5a623]/10'
@@ -302,6 +374,24 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
             </>
           )}
 
+          {/* Schedule toggle */}
+          {hasSigner && (
+            <button
+              onClick={() => setShowSchedule(!showSchedule)}
+              className={`flex-shrink-0 p-2.5 rounded-lg transition-colors ${
+                showSchedule
+                  ? 'text-[#f5a623] bg-[#f5a623]/10'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+              }`}
+              title="Schedule post"
+              aria-label="Schedule post"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          )}
+
           <textarea
             ref={textareaRef}
             value={text}
@@ -321,7 +411,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
           />
           <button
             onClick={handleSubmit}
-            disabled={!text.trim() || sending}
+            disabled={(!text.trim() && !imagePreview) || sending}
             className="bg-[#f5a623] text-[#0a1628] font-medium px-4 py-2.5 rounded-lg text-sm hover:bg-[#ffd700] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1.5"
           >
             {sending ? (

@@ -68,8 +68,15 @@ export function useChat(channel: string = 'zao') {
         const data = await res.json();
         throw new Error(data.error || 'Failed to send');
       }
-      firstHashRef.current = null; // force refresh after send
+      // Force refresh — small delay lets the DB write complete
+      firstHashRef.current = null;
+      await new Promise((r) => setTimeout(r, 500));
       await fetchMessages();
+      // Second fetch in case DB write was slow
+      setTimeout(() => {
+        firstHashRef.current = null;
+        fetchMessages();
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send');
       throw err;

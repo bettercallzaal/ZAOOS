@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { postCast } from '@/lib/farcaster/neynar';
+import { supabaseAdmin } from '@/lib/db/supabase';
 import { sendMessageSchema } from '@/lib/validation/schemas';
 import { sendNotification } from '@/lib/notifications';
 
@@ -37,13 +38,58 @@ export async function POST(req: NextRequest) {
     // Post to primary channel first
     const result = await postCast(session.signerUuid, text, primaryChannel, parentHash, embedHash, embedUrls);
 
+    // Write the new cast to our DB immediately so it shows up on next fetch
+    const castData = result.cast;
+    if (castData?.hash) {
+      const row = {
+        hash: castData.hash,
+        channel_id: primaryChannel,
+        fid: session.fid,
+        author_username: session.username,
+        author_display: session.displayName,
+        author_pfp: session.pfpUrl,
+        text,
+        timestamp: new Date().toISOString(),
+        embeds: castData.embeds ?? [],
+        reactions: { likes_count: 0, recasts_count: 0, likes: [], recasts: [] },
+        replies_count: 0,
+        parent_hash: parentHash ?? null,
+      };
+
+      supabaseAdmin
+        .from('channel_casts')
+        .upsert([row], { onConflict: 'hash' })
+        .then(({ error }) => {
+          if (error) console.error('[send] DB insert error:', error);
+        });
+    }
+
     // Cross-post to additional channels (fire and forget)
     const additionalChannels = [...channels].filter((ch) => ch !== primaryChannel);
     if (additionalChannels.length > 0) {
       Promise.allSettled(
-        additionalChannels.map((ch) =>
-          postCast(session.signerUuid!, text, ch, undefined, embedHash, embedUrls)
-        )
+        additionalChannels.map(async (ch) => {
+          const crossResult = await postCast(session.signerUuid!, text, ch, undefined, embedHash, embedUrls);
+          // Also write cross-posts to DB
+          if (crossResult.cast?.hash) {
+            await supabaseAdmin
+              .from('channel_casts')
+              .upsert([{
+                hash: crossResult.cast.hash,
+                channel_id: ch,
+                fid: session.fid,
+                author_username: session.username,
+                author_display: session.displayName,
+                author_pfp: session.pfpUrl,
+                text,
+                timestamp: new Date().toISOString(),
+                embeds: crossResult.cast.embeds ?? [],
+                reactions: { likes_count: 0, recasts_count: 0, likes: [], recasts: [] },
+                replies_count: 0,
+                parent_hash: null,
+              }], { onConflict: 'hash' });
+          }
+        })
       ).catch(() => {});
     }
 

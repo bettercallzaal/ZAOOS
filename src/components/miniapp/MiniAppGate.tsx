@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { sdk } from '@farcaster/miniapp-sdk';
 
 interface MiniAppUser {
   fid: number;
@@ -16,84 +15,79 @@ interface MiniAppGateProps {
 }
 
 export function MiniAppGate({ children }: MiniAppGateProps) {
-  const [isMiniApp, setIsMiniApp] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<'checking' | 'miniapp' | 'web'>('checking');
   const [user, setUser] = useState<MiniAppUser | null>(null);
 
   useEffect(() => {
     async function init() {
-      // Check if we're inside a Farcaster mini app
       try {
-        const context = sdk.context;
-        if (!context) {
-          // Not a mini app — use normal web flow
-          setIsMiniApp(false);
-          setLoading(false);
+        const { sdk } = await import('@farcaster/miniapp-sdk');
+
+        const inMiniApp = await sdk.isInMiniApp();
+        if (!inMiniApp) {
+          setState('web');
           return;
         }
 
-        setIsMiniApp(true);
+        setState('miniapp');
 
-        // Authenticate via Quick Auth
-        const response = await sdk.quickAuth.fetch('/api/miniapp/auth');
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
+        // We're in a mini app — auto-authenticate via Quick Auth
+        try {
+          const response = await sdk.quickAuth.fetch('/api/miniapp/auth');
+          if (response.ok) {
+            const data = await response.json();
+            setUser(data);
+          }
+        } catch (err) {
+          console.error('Quick Auth failed:', err);
         }
 
         // Signal ready to dismiss splash screen
         await sdk.actions.ready();
       } catch {
-        // Not in mini app context or auth failed
-        setIsMiniApp(false);
-      } finally {
-        setLoading(false);
+        // SDK import failed or not in mini app
+        setState('web');
       }
     }
 
     init();
   }, []);
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-[#0a1628]">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2">
-            THE ZAO
-          </h1>
-          <p className="text-gray-500 text-sm">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Not a mini app — render normal web app
-  if (!isMiniApp) {
+  // Still checking — show nothing (splash screen is visible in mini app)
+  if (state === 'checking') {
     return <>{children}</>;
   }
 
-  // Mini app: user doesn't have access
+  // Normal web — pass through
+  if (state === 'web') {
+    return <>{children}</>;
+  }
+
+  // Mini app: no access
   if (user && !user.hasAccess) {
     return <NoAccessScreen username={user.username} />;
   }
 
-  // Mini app: user has access — render the app
+  // Mini app: has access or still loading user — show app
   return <>{children}</>;
 }
 
 function NoAccessScreen({ username }: { username: string }) {
-  const requestAccess = () => {
-    const text = encodeURIComponent(
-      `@zaal requesting access to ZAO OS! 🎵`
-    );
+  const requestAccess = async () => {
+    const text = encodeURIComponent(`@zaal requesting access to ZAO OS!`);
     const url = `https://warpcast.com/~/compose?text=${text}&channelKey=zao`;
-    sdk.actions.openUrl(url);
+    try {
+      const { sdk } = await import('@farcaster/miniapp-sdk');
+      sdk.actions.openUrl(url);
+    } catch {
+      window.open(url, '_blank');
+    }
   };
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-[#0a1628] px-6">
       <div className="text-center max-w-sm">
+        <img src="/logo.png" alt="THE ZAO" className="w-24 h-24 mx-auto mb-4 rounded-2xl" />
         <h1 className="text-4xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2">
           THE ZAO
         </h1>

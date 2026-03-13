@@ -7,6 +7,7 @@ interface MessageProps {
   cast: Cast;
   isAdmin: boolean;
   onHide: (hash: string) => void;
+  onOpenThread?: (hash: string) => void;
 }
 
 function timeAgo(timestamp: string): string {
@@ -20,7 +21,7 @@ function timeAgo(timestamp: string): string {
   return `${days}d ago`;
 }
 
-export function Message({ cast, isAdmin, onHide }: MessageProps) {
+export function Message({ cast, isAdmin, onHide, onOpenThread }: MessageProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -54,9 +55,12 @@ export function Message({ cast, isAdmin, onHide }: MessageProps) {
         </div>
         <p className="text-sm text-gray-300 break-words whitespace-pre-wrap">{cast.text}</p>
         {cast.replies.count > 0 && (
-          <p className="text-xs text-[#f5a623] mt-1">
+          <button
+            onClick={() => onOpenThread?.(cast.hash)}
+            className="text-xs text-[#f5a623] mt-1 hover:underline cursor-pointer bg-transparent border-none p-0"
+          >
             {cast.replies.count} {cast.replies.count === 1 ? 'reply' : 'replies'}
-          </p>
+          </button>
         )}
       </div>
 

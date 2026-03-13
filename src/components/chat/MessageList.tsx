@@ -8,10 +8,11 @@ interface MessageListProps {
   messages: Cast[];
   isAdmin: boolean;
   onHide: (hash: string) => void;
+  onOpenThread?: (hash: string) => void;
   loading: boolean;
 }
 
-export function MessageList({ messages, isAdmin, onHide, loading }: MessageListProps) {
+export function MessageList({ messages, isAdmin, onHide, onOpenThread, loading }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
@@ -55,6 +56,7 @@ export function MessageList({ messages, isAdmin, onHide, loading }: MessageListP
             cast={cast}
             isAdmin={isAdmin}
             onHide={onHide}
+            onOpenThread={onOpenThread}
           />
         ))}
         <div ref={bottomRef} />

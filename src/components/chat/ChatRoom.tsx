@@ -7,14 +7,19 @@ import { useMobile } from '@/hooks/useMobile';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
 import { ComposeBar } from './ComposeBar';
+import { ThreadDrawer } from './ThreadDrawer';
+import { SignerConnect } from './SignerConnect';
 
 export function ChatRoom() {
-  const { user, logout } = useAuth();
-  const { messages, loading, error, hideMessage } = useChat();
+  const { user, logout, refetch } = useAuth();
+  const { messages, loading, sending, error, sendMessage, hideMessage } = useChat();
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
 
   if (!user) return null;
+
+  const hasSigner = !!user.signerUuid;
 
   return (
     <div className="flex h-[100dvh] bg-[#0a1628] text-white">
@@ -53,12 +58,30 @@ export function ChatRoom() {
           messages={messages}
           isAdmin={user.isAdmin}
           onHide={hideMessage}
+          onOpenThread={(hash) => setSelectedThreadHash(hash)}
           loading={loading}
         />
 
-        {/* Compose via Warpcast */}
-        <ComposeBar />
+        {/* Signer connect or Compose */}
+        {!hasSigner ? (
+          <div>
+            <SignerConnect onSuccess={refetch} />
+            <ComposeBar hasSigner={false} onSend={sendMessage} />
+          </div>
+        ) : (
+          <ComposeBar hasSigner={true} onSend={sendMessage} sending={sending} />
+        )}
       </div>
+
+      {/* Thread Drawer */}
+      {selectedThreadHash && (
+        <ThreadDrawer
+          threadHash={selectedThreadHash}
+          isAdmin={user.isAdmin}
+          onHide={hideMessage}
+          onClose={() => setSelectedThreadHash(null)}
+        />
+      )}
     </div>
   );
 }

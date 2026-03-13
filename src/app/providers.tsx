@@ -1,15 +1,17 @@
 'use client';
 
+import { useMemo } from 'react';
 import { AuthKitProvider } from '@farcaster/auth-kit';
-
-const authKitConfig = {
-  rpcUrl: 'https://mainnet.optimism.io',
-  domain: process.env.NEXT_PUBLIC_SIWF_DOMAIN || 'zaoos.com',
-};
+import '@farcaster/auth-kit/styles.css';  // SignInButton UI styles
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const config = useMemo(() => ({
+    rpcUrl: 'https://mainnet.optimism.io',
+    domain: typeof window !== 'undefined' ? window.location.host : 'zaoos.com',
+  }), []);
+
   return (
-    <AuthKitProvider config={authKitConfig}>
+    <AuthKitProvider config={config}>
       {children}
     </AuthKitProvider>
   );

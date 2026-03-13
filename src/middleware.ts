@@ -30,6 +30,9 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/messages')) {
     return { limit: 30, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/users')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
   return null;
 }
 

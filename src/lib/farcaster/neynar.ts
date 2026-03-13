@@ -139,6 +139,78 @@ export async function searchUsers(query: string, limit = 5) {
   return res.json();
 }
 
+export async function getFollowers(fid: number, viewerFid?: number, sortType: 'desc_chron' | 'algorithmic' = 'desc_chron', cursor?: string, limit = 100) {
+  const params = new URLSearchParams({
+    fid: String(fid),
+    sort_type: sortType,
+    limit: String(limit),
+  });
+  if (viewerFid) params.set('viewer_fid', String(viewerFid));
+  if (cursor) params.set('cursor', cursor);
+
+  const res = await fetch(`${NEYNAR_BASE}/followers?${params}`, {
+    headers: headers(),
+    next: { revalidate: 0 },
+  });
+  if (!res.ok) throw new Error(`Neynar followers error: ${res.status}`);
+  return res.json();
+}
+
+export async function getFollowing(fid: number, viewerFid?: number, sortType: 'desc_chron' | 'algorithmic' = 'desc_chron', cursor?: string, limit = 100) {
+  const params = new URLSearchParams({
+    fid: String(fid),
+    sort_type: sortType,
+    limit: String(limit),
+  });
+  if (viewerFid) params.set('viewer_fid', String(viewerFid));
+  if (cursor) params.set('cursor', cursor);
+
+  const res = await fetch(`${NEYNAR_BASE}/following?${params}`, {
+    headers: headers(),
+    next: { revalidate: 0 },
+  });
+  if (!res.ok) throw new Error(`Neynar following error: ${res.status}`);
+  return res.json();
+}
+
+export async function getRelevantFollowers(targetFid: number, viewerFid: number) {
+  const params = new URLSearchParams({
+    target_fid: String(targetFid),
+    viewer_fid: String(viewerFid),
+  });
+  const res = await fetch(`${NEYNAR_BASE}/followers/relevant?${params}`, {
+    headers: headers(),
+  });
+  if (!res.ok) throw new Error(`Neynar relevant followers error: ${res.status}`);
+  return res.json();
+}
+
+export async function followUser(signerUuid: string, targetFids: number[]) {
+  const res = await fetch(`${NEYNAR_BASE}/user/follow`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({
+      signer_uuid: signerUuid,
+      target_fids: targetFids,
+    }),
+  });
+  if (!res.ok) throw new Error(`Neynar follow error: ${res.status}`);
+  return res.json();
+}
+
+export async function unfollowUser(signerUuid: string, targetFids: number[]) {
+  const res = await fetch(`${NEYNAR_BASE}/user/follow`, {
+    method: 'DELETE',
+    headers: headers(),
+    body: JSON.stringify({
+      signer_uuid: signerUuid,
+      target_fids: targetFids,
+    }),
+  });
+  if (!res.ok) throw new Error(`Neynar unfollow error: ${res.status}`);
+  return res.json();
+}
+
 export async function registerUser(
   signature: string,
   custodyAddress: string,

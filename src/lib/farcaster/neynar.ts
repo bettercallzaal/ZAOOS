@@ -71,8 +71,10 @@ export async function getCastThread(hash: string) {
   return res.json();
 }
 
-export async function getUserByFid(fid: number) {
-  const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${fid}`, {
+export async function getUserByFid(fid: number, viewerFid?: number) {
+  const params = new URLSearchParams({ fids: String(fid) });
+  if (viewerFid) params.set('viewer_fid', String(viewerFid));
+  const res = await fetch(`${NEYNAR_BASE}/user/bulk?${params}`, {
     headers: headers(),
   });
   if (!res.ok) throw new Error(`Neynar user error: ${res.status}`);

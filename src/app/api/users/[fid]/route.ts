@@ -21,7 +21,7 @@ export async function GET(
   try {
     // Fetch user profile and channel activity in parallel
     const [user, allowlistResult, activityResult] = await Promise.all([
-      getUserByFid(targetFid),
+      getUserByFid(targetFid, session.fid),
       supabaseAdmin
         .from('allowlist')
         .select('fid, real_name, ign')

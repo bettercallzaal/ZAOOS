@@ -7,6 +7,7 @@ import { Cast } from '@/types';
 function mapCast(raw: Record<string, unknown>): Cast {
   const author = raw.author as Record<string, unknown>;
   const replies = raw.replies as Record<string, unknown> | undefined;
+  const reactions = raw.reactions as Record<string, unknown> | undefined;
   return {
     hash: raw.hash as string,
     author: {
@@ -18,7 +19,14 @@ function mapCast(raw: Record<string, unknown>): Cast {
     text: (raw.text as string) || '',
     timestamp: (raw.timestamp as string) || '',
     replies: { count: (replies?.count as number) || 0 },
+    reactions: {
+      likes_count: (reactions?.likes_count as number) || 0,
+      recasts_count: (reactions?.recasts_count as number) || 0,
+      likes: (reactions?.likes as { fid: number }[]) || [],
+      recasts: (reactions?.recasts as { fid: number }[]) || [],
+    },
     parent_hash: (raw.parent_hash as string) || null,
+    embeds: (raw.embeds as Cast['embeds']) || [],
   };
 }
 

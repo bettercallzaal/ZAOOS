@@ -64,6 +64,8 @@ export function ChatRoom() {
         <MessageList
           messages={messages}
           isAdmin={user.isAdmin}
+          currentFid={user.fid}
+          hasSigner={hasSigner}
           onHide={hideMessage}
           onOpenThread={(hash) => setSelectedThreadHash(hash)}
           loading={loading}
@@ -87,6 +89,7 @@ export function ChatRoom() {
           threadHash={selectedThreadHash}
           isAdmin={user.isAdmin}
           hasSigner={hasSigner}
+          currentFid={user.fid}
           onHide={hideMessage}
           onSend={sendMessage}
           onClose={() => setSelectedThreadHash(null)}

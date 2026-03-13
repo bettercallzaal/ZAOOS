@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { postCast } from '@/lib/farcaster/neynar';
 import { sendMessageSchema } from '@/lib/validation/schemas';
+import { sendNotification } from '@/lib/notifications';
 
 const ALLOWED_CHANNELS = ['zao', 'zabal', 'coc'];
 
@@ -25,6 +26,16 @@ export async function POST(req: NextRequest) {
     const { text, parentHash, channel } = parsed.data;
     const targetChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
     const result = await postCast(session.signerUuid, text, targetChannel, parentHash);
+
+    // Send notification to other users (fire and forget)
+    const preview = text.length > 80 ? text.slice(0, 80) + '...' : text;
+    sendNotification(
+      `${session.displayName} in #${targetChannel}`,
+      preview,
+      `https://zaoos.com/chat`,
+      `msg-${Date.now()}-${session.fid}`,
+      session.fid // exclude sender
+    ).catch(() => {});
 
     return NextResponse.json({ success: true, cast: result.cast });
   } catch (error) {

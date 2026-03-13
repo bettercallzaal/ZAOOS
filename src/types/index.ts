@@ -48,6 +48,12 @@ export interface Cast {
   text: string;
   timestamp: string;
   replies: { count: number };
+  reactions: {
+    likes_count: number;
+    recasts_count: number;
+    likes: { fid: number }[];
+    recasts: { fid: number }[];
+  };
   parent_hash: string | null;
   embeds?: CastEmbed[];
 }

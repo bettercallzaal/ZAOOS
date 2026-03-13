@@ -8,12 +8,13 @@ interface ThreadDrawerProps {
   threadHash: string;
   isAdmin: boolean;
   hasSigner: boolean;
+  currentFid: number;
   onHide: (hash: string) => void;
   onSend: (text: string, parentHash?: string) => Promise<void>;
   onClose: () => void;
 }
 
-export function ThreadDrawer({ threadHash, isAdmin, hasSigner, onHide, onSend, onClose }: ThreadDrawerProps) {
+export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHide, onSend, onClose }: ThreadDrawerProps) {
   const [thread, setThread] = useState<Cast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +122,8 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, onHide, onSend, o
                   <Message
                     cast={parent}
                     isAdmin={isAdmin}
+                    currentFid={currentFid}
+                    hasSigner={hasSigner}
                     onHide={onHide}
                   />
                 </div>
@@ -139,6 +142,8 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, onHide, onSend, o
                   key={cast.hash}
                   cast={cast}
                   isAdmin={isAdmin}
+                  currentFid={currentFid}
+                  hasSigner={hasSigner}
                   onHide={onHide}
                 />
               ))}

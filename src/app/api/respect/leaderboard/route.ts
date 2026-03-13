@@ -42,6 +42,7 @@ export async function GET() {
       .map((m) => ({
         name: m.ign || m.real_name || `FID ${m.fid}`,
         wallet: m.wallet_address as string,
+        fid: m.fid,
       }));
 
     if (walletsToCheck.length === 0) {
@@ -83,6 +84,7 @@ export async function GET() {
       return {
         name: entry.name,
         wallet: entry.wallet,
+        fid: entry.fid,
         ogRespect: Math.round(ogBalance),
         zorRespect: zorBalance,
         totalRespect: Math.round(total),
@@ -99,7 +101,7 @@ export async function GET() {
       totalZOR: ranked.reduce((sum, e) => sum + e.zorRespect, 0),
     };
 
-    const responseData = { leaderboard: ranked, stats };
+    const responseData = { leaderboard: ranked, stats, currentFid: session.fid };
     cache = { data: responseData, timestamp: Date.now() };
 
     return NextResponse.json(responseData);

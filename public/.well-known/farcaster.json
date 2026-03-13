@@ -11,7 +11,7 @@
     "homeUrl": "https://zaoos.com",
     "splashImageUrl": "https://zaoos.com/splash.png",
     "splashBackgroundColor": "#0a1628",
-    "webhookUrl": "https://api.neynar.com/f/app/e33e84b4-0cb1-48c7-9c37-579b4f427d48/event",
+    "webhookUrl": "https://zaoos.com/api/miniapp/webhook",
     "subtitle": "Gated Farcaster community",
     "description": "ZAO OS - gated chat for the ZAO music community on Farcaster.",
     "primaryCategory": "social",

@@ -7,13 +7,15 @@ import { Message } from './Message';
 interface MessageListProps {
   messages: Cast[];
   isAdmin: boolean;
+  currentFid: number;
+  hasSigner: boolean;
   onHide: (hash: string) => void;
   onOpenThread?: (hash: string) => void;
   loading: boolean;
   channelId?: string;
 }
 
-export function MessageList({ messages, isAdmin, onHide, onOpenThread, loading, channelId = 'zao' }: MessageListProps) {
+export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, loading, channelId = 'zao' }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
@@ -56,6 +58,8 @@ export function MessageList({ messages, isAdmin, onHide, onOpenThread, loading, 
             key={cast.hash}
             cast={cast}
             isAdmin={isAdmin}
+            currentFid={currentFid}
+            hasSigner={hasSigner}
             onHide={onHide}
             onOpenThread={onOpenThread}
           />

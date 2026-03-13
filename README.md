@@ -1,248 +1,300 @@
 # ZAO OS
 
-> A music-first Farcaster client for the ZAO community
+> A music-first, gated Farcaster client for the ZAO community
 
-## Vision
-
-ZAO OS is a decentralized social client built on [Farcaster](https://farcaster.xyz) where **music is the primary content**. It features a reputation-based social network powered by ZAO Respect tokens and a new identity layer (ZIDs) designed for musicians, curators, and listeners.
-
-### Four Pillars
-
-| Pillar | Description |
-|--------|-------------|
-| **Music Feed** | Front page of social posts centered on music — inline audio players, streaming, collecting |
-| **Respect Tokens** | Non-transferable soulbound tokens for social capital — earned, never bought |
-| **ZIDs** | ZAO Identity — wraps Farcaster FIDs with music profiles, reputation, and community roles |
-| **Quilibrium** | Future decentralized infrastructure for privacy-preserving identity and reputation |
+ZAO OS is a Discord-style chat client built on [Farcaster](https://farcaster.xyz) where music is the primary content. Members sign in with their Farcaster account, pass an allowlist gate, and chat in gated channels with inline music players, quote casts, reactions, and a music queue sidebar.
 
 ---
 
-## Research
+## Quick Start (Fork & Deploy)
 
-All research is organized in the `research/` folder. Each topic has its own directory with a README containing findings, code examples, and implementation notes.
+### What You Need (accounts + services)
 
-```
-research/
-├── 01-farcaster-protocol/    # Protocol architecture, message types, auth, contracts
-├── 02-farcaster-hub-api/     # Hub HTTP/gRPC APIs, SDKs, hosted providers (Neynar, Pinata)
-├── 03-music-integration/     # Music APIs (Audius, Sound.xyz, Spotify), Frames v2, audio player
-├── 04-respect-tokens/        # Soulbound reputation system, earning mechanics, EAS attestations
-├── 05-zao-identity/          # ZID schema, database design, creation flow, Hats roles
-├── 06-quilibrium/            # Decentralized compute/storage, QUIL token, integration roadmap
-├── 07-hats-protocol/         # NFT-based role hierarchies for community governance
-├── 08-ai-memory/             # AI memory patterns for personalization
-├── 09-public-apis/           # Curated list of useful public APIs
-├── 10-hypersnap/             # Farcaster tooling
-├── 11-reference-repos/       # All tracked repos, npm packages, external APIs
-├── 12-gating/                # Access control: NFT gates, allowlists, invite codes, Hats
-├── 13-chat-messaging/        # Chat via Farcaster channels + XMTP private messaging
-├── 14-project-structure/     # App structure, task management, dev workflow
-├── 15-mvp-spec/              # Locked MVP spec: gated chat, user flow, file structure
-├── 16-ui-reference/          # CG/Commonwealth Discord-style UI patterns
-├── 17-neynar-onboarding/     # Neynar FID registration + managed signer flow
+| Service | What For | Free? |
+|---|---|---|
+| [Vercel](https://vercel.com) | Hosting | Free tier works |
+| [Supabase](https://supabase.com) | Database | Free tier works |
+| [Neynar](https://dev.neynar.com) | Farcaster API (read feed, post casts) | Paid — see credit notes below |
+
+---
+
+### Step 1 — Clone & install
+
+```bash
+git clone https://github.com/bettercallzaal/ZAOOS.git
+cd ZAOOS
+npm install
 ```
 
-### Quick Links
+---
 
-| Topic | Key Question | Go To |
-|-------|-------------|-------|
-| How does Farcaster work? | Protocol architecture, FIDs, messages | [01-farcaster-protocol](research/01-farcaster-protocol/) |
-| How do I read/write casts? | Hub API endpoints, SDK code examples | [02-farcaster-hub-api](research/02-farcaster-hub-api/) |
-| How to build a music feed? | Audio APIs, Frames v2 players, track schema | [03-music-integration](research/03-music-integration/) |
-| How do Respect tokens work? | Earning, decay, tiers, on-chain attestation | [04-respect-tokens](research/04-respect-tokens/) |
-| What is a ZID? | Identity schema, DB design, onboarding flow | [05-zao-identity](research/05-zao-identity/) |
-| What is Quilibrium? | Decentralized infra, integration roadmap | [06-quilibrium](research/06-quilibrium/) |
-| How to manage community roles? | Hats Protocol NFT hierarchies | [07-hats-protocol](research/07-hats-protocol/) |
-| How to add AI memory? | Persistent memory patterns for social apps | [08-ai-memory](research/08-ai-memory/) |
-| How to gate access? | Allowlists, NFTs, Hats, invite codes | [12-gating](research/12-gating/) |
-| How to build chat? | Channel chat, XMTP DMs, real-time | [13-chat-messaging](research/13-chat-messaging/) |
-| How to structure the project? | App structure, folders, task management | [14-project-structure](research/14-project-structure/) |
-| What exactly is the MVP? | Locked spec, user flow, file structure, API routes | [15-mvp-spec](research/15-mvp-spec/) |
-| What APIs are available? | Music, social, blockchain, media APIs | [09-public-apis](research/09-public-apis/) |
-| What is HyperSnap? | Farcaster tooling | [10-hypersnap](research/10-hypersnap/) |
-| All repos & packages? | GitHub repos, npm packages, API endpoints | [11-reference-repos](research/11-reference-repos/) |
+### Step 2 — Environment variables
+
+Copy `.env.example` to `.env.local` and fill in every value:
+
+```bash
+cp .env.example .env.local
+```
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+# Neynar (Farcaster API)
+NEYNAR_API_KEY=your_neynar_api_key
+# Webhook secret — fill in AFTER Step 5
+NEYNAR_WEBHOOK_SECRET=
+
+# Sign In With Farcaster domain (your production domain, no https://)
+NEXT_PUBLIC_SIWF_DOMAIN=yourdomain.com
+
+# Session encryption (generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+SESSION_SECRET=your_session_secret_here
+
+# App Farcaster ID — the FID of the app account that posts casts
+APP_FID=19640
+
+# App signer private key — generate with: npx tsx scripts/generate-wallet.ts
+APP_SIGNER_PRIVATE_KEY=your_app_signer_private_key
+```
+
+**Getting each value:**
+
+- `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`: Supabase dashboard → Project Settings → API
+- `NEYNAR_API_KEY`: dev.neynar.com → your app → API Keys
+- `APP_FID`: The FID of the Farcaster account that will author casts on behalf of ZAO OS
+- `APP_SIGNER_PRIVATE_KEY`: Run `npx tsx scripts/generate-wallet.ts` — this generates a wallet and registers it as a signer for your app FID
+
+---
+
+### Step 3 — Supabase database setup
+
+Run these two SQL files **in order** in Supabase SQL Editor (supabase.com → your project → SQL Editor):
+
+**File 1 — Core tables** (allowlist, sessions, hidden messages):
+```
+scripts/setup-database.sql
+```
+
+**File 2 — Channel casts cache** (stores Farcaster casts so you don't poll Neynar constantly):
+```
+scripts/add-channel-casts-table.sql
+```
+
+That's all the SQL you need.
+
+---
+
+### Step 4 — Seed the allowlist
+
+The allowlist controls who can access the app. Add members in Supabase:
+
+```sql
+-- Add by FID (Farcaster user ID)
+INSERT INTO allowlist (fid, real_name, ign, is_active)
+VALUES (12345, 'Real Name', 'username', true);
+
+-- Add by wallet address (for users without Farcaster yet)
+INSERT INTO allowlist (wallet_address, real_name, is_active)
+VALUES ('0xabc...', 'Real Name', true);
+```
+
+Or use the CSV import — format your CSV as `real_name,wallet_address,fid` and insert via Supabase's table editor.
+
+---
+
+### Step 5 — Register the Neynar webhook
+
+This is the key step that eliminates Neynar polling costs. Once set up, Neynar **pushes** new casts to your server instead of you pulling constantly.
+
+```bash
+npx tsx scripts/register-neynar-webhook.ts
+```
+
+The script will print a **webhook secret**. Copy it.
+
+Then add it to your environment:
+```env
+NEYNAR_WEBHOOK_SECRET=the_secret_from_above
+```
+
+Add the same variable to Vercel (Step 6).
+
+> **Manual alternative:** dev.neynar.com → your app → Webhooks → Create webhook
+> - URL: `https://yourdomain.com/api/webhooks/neynar`
+> - Event: `cast.created`
+> - Filter: root_parent_urls = `https://warpcast.com/~/channel/YOUR_CHANNEL`
+
+---
+
+### Step 6 — Deploy to Vercel
+
+1. Push your fork to GitHub
+2. Import the repo at vercel.com/new
+3. Add all environment variables from `.env.local`
+4. Deploy
+
+Vercel auto-deploys on every push to `main`.
+
+---
+
+### Step 7 — Configure your channels
+
+The app watches these channels by default: `zao`, `zabal`, `coc`.
+
+To change them, update three places:
+
+```
+src/app/api/chat/messages/route.ts   → ALLOWED_CHANNELS array
+src/app/api/webhooks/neynar/route.ts → WATCHED_CHANNELS array
+scripts/register-neynar-webhook.ts   → CHANNEL_ROOT_URLS array
+```
+
+---
+
+## Switching Neynar Accounts
+
+If you're moving to a new Neynar account:
+
+1. Get the new `NEYNAR_API_KEY` from dev.neynar.com
+2. Update `NEYNAR_API_KEY` in `.env.local` and Vercel
+3. Re-run the webhook registration: `npx tsx scripts/register-neynar-webhook.ts`
+   - This creates a new webhook under the new account
+   - Delete the old webhook in the old Neynar account's dashboard
+4. Update `NEYNAR_WEBHOOK_SECRET` with the new secret from step 3
+5. Redeploy on Vercel
+
+The `APP_FID` and `APP_SIGNER_PRIVATE_KEY` are tied to the Farcaster account (not Neynar), so those stay the same unless you're also changing which Farcaster account posts casts.
+
+---
+
+## Neynar Credit Usage
+
+Neynar charges credits per API call. The architecture is designed to minimize costs:
+
+| Action | Credits | Notes |
+|---|---|---|
+| `GET /v2/farcaster/feed/channels` | 4 × page limit | We avoid this with webhook caching |
+| Webhook: `cast.created` delivered | 15 credits | ~0.015 credits/cast |
+| `POST /v2/farcaster/cast` | 150 credits | Charged per cast posted |
+| Monthly active signer | 20,000/month | Per user who posts casts |
+
+**With webhooks enabled:** The feed polling endpoint drops to near-zero. A channel with 200 casts/day costs ~3,000 credits/day vs ~230,000 credits/day with polling.
+
+**If you hit credit limits:** The app falls back to direct Neynar polling automatically when the Supabase cache is empty (e.g., fresh deploy before the first webhook fires).
+
+See `docs/neynar-credit-optimization.md` for full research and cost breakdown.
 
 ---
 
 ## Tech Stack
 
 ```
-Frontend:       Next.js 14+ (App Router) + React
-Styling:        Tailwind CSS
-Audio:          Howler.js / Web Audio API
-Auth:           @farcaster/auth-kit (Sign In With Farcaster)
-Farcaster:      Neynar SDK + Hub HTTP API
-Music Data:     Audius API + Sound.xyz GraphQL + Spotify Web API
-Database:       PostgreSQL (Prisma ORM)
-On-chain:       Viem + Wagmi (Base / OP Mainnet)
-Identity:       ZIDs (custom) + Hats Protocol (roles)
-Reputation:     EAS (Ethereum Attestation Service)
-Deployment:     Vercel (frontend) + Railway/Fly.io (backend)
-Real-time:      WebSockets + Neynar webhooks
+Framework:    Next.js 15 (App Router) + React
+Styling:      Tailwind CSS v4
+Auth:         Sign In With Farcaster (@farcaster/auth-kit)
+Farcaster:    Neynar API (read feed, post casts, webhooks)
+Database:     Supabase (PostgreSQL)
+Music:        Audius API, Sound.xyz GraphQL, Spotify oEmbed,
+              SoundCloud Widget API, YouTube IFrame API
+Audio:        Native Web Audio (no extra dependencies)
+Deployment:   Vercel
 ```
 
 ---
 
-## Reference Repos
-
-| Repo | Purpose |
-|------|---------|
-| [farcasterxyz/protocol](https://github.com/farcasterxyz/protocol) | Farcaster protocol spec |
-| [farcasterxyz/hub-monorepo](https://github.com/farcasterxyz/hub-monorepo) | Hub node + SDKs |
-| [QuilibriumNetwork](https://github.com/QuilibriumNetwork) | Decentralized infrastructure |
-| [Hats-Protocol/hats-anchor-app](https://github.com/Hats-Protocol/hats-anchor-app) | Role hierarchy NFTs |
-| [farcasterorg/hypersnap](https://github.com/farcasterorg/hypersnap) | Farcaster tooling |
-| [GoogleCloudPlatform/.../always-on-memory-agent](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/gemini/agents/always-on-memory-agent) | AI memory patterns |
-| [thedotmack/claude-mem](https://github.com/thedotmack/claude-mem) | Claude persistent memory |
-| [public-apis/public-apis](https://github.com/public-apis/public-apis) | Public API directory |
-
----
-
-## Architecture Overview
+## Project Structure
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                    ZAO OS Client                     │
-│                  (Next.js + React)                    │
-│                                                       │
-│  ┌─────────┐  ┌──────────┐  ┌─────────┐  ┌────────┐ │
-│  │ Music   │  │  Social  │  │ Profile │  │ Respect│ │
-│  │ Feed    │  │  Graph   │  │  (ZID)  │  │ System │ │
-│  └────┬────┘  └────┬─────┘  └────┬────┘  └───┬────┘ │
-└───────┼────────────┼────────────┼─────────────┼──────┘
-        │            │            │             │
-   ┌────▼────┐  ┌────▼─────┐  ┌──▼──┐   ┌─────▼─────┐
-   │ Music   │  │ Farcaster│  │ ZID │   │  Respect  │
-   │ APIs    │  │ Hub/     │  │ DB  │   │  Ledger   │
-   │         │  │ Neynar   │  │     │   │           │
-   ├─────────┤  └──────────┘  └──┬──┘   └─────┬─────┘
-   │ Audius  │                   │             │
-   │ Sound   │              ┌────▼─────────────▼────┐
-   │ Spotify │              │      PostgreSQL       │
-   │ Zora    │              └────────────┬──────────┘
-   └─────────┘                           │
-                                    ┌────▼────┐
-                                    │  EAS    │
-                                    │ (Base)  │
-                                    └────┬────┘
-                                         │
-                                  ┌──────▼───────┐
-                                  │  Quilibrium  │
-                                  │  (future)    │
-                                  └──────────────┘
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/           # SIWF + session endpoints
+│   │   ├── chat/           # messages, send, hide, thread, react
+│   │   ├── music/          # metadata fetching (artwork, title, artist)
+│   │   └── webhooks/
+│   │       └── neynar/     # Receives cast.created from Neynar
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── chat/               # ChatRoom, Message, MessageList, ComposeBar,
+│   │                       # ThreadDrawer, Sidebar, SignerConnect
+│   └── music/              # GlobalPlayer, MusicEmbed, MusicSidebar,
+│                           # MusicQueueTrackCard, Scrubber, PlayerButtons
+├── hooks/
+│   ├── useChat.ts          # Polling + send (30s interval, visibility-aware)
+│   ├── useMusicQueue.ts    # Extracts music URLs from channel messages
+│   ├── useAuth.ts
+│   └── useMobile.ts
+├── lib/
+│   ├── auth/               # Session (iron-session)
+│   ├── db/                 # Supabase client
+│   ├── farcaster/          # Neynar API wrapper
+│   ├── gates/              # Allowlist check
+│   ├── music/              # isMusicUrl, findMusicEmbed, formatDuration
+│   └── validation/         # Zod schemas
+├── providers/
+│   └── audio/              # AudioProviders stack (PlayerProvider,
+│                           # HTMLAudio, SoundCloud, YouTube, Spotify)
+└── types/
+    ├── index.ts            # Cast, CastEmbed, QuotedCastData, etc.
+    └── music.ts            # TrackType, TrackMetadata, AudioController
+
+scripts/
+├── setup-database.sql          # Run first in Supabase SQL Editor
+├── add-channel-casts-table.sql # Run second — webhook cache table
+├── register-neynar-webhook.ts  # Run once to create Neynar webhook
+└── generate-wallet.ts          # Generate APP_SIGNER_PRIVATE_KEY
+
+docs/
+└── neynar-credit-optimization.md  # Full Neynar cost research
 ```
 
 ---
 
-## Task-Based Roadmap
+## Music Platforms Supported
 
-No timelines. Just tasks, ordered by dependency. Ship each layer before starting the next.
+| Platform | Detection | Metadata | Playback |
+|---|---|---|---|
+| SoundCloud | URL pattern (2+ path segments) | oEmbed (no key) | Widget API |
+| Audius | URL pattern (2+ path segments) | Audius API (no key) | HTML5 Audio (stream URL) |
+| Spotify | URL pattern | oEmbed (no key) | IFrame API |
+| YouTube | URL pattern | oEmbed (no key) | IFrame API |
+| Sound.xyz / Zora | URL pattern | GraphQL | HTML5 Audio |
+| Direct audio | .mp3 .wav .ogg etc | Filename | HTML5 Audio |
 
 ---
 
-### MVP — Gated Chat Client
+## Research
 
-The simplest thing that delivers value: sign in, prove you belong, chat with the community. Mobile-first. Bidirectional with Farcaster.
+All research is in the `docs/` folder and `research/` folder.
 
-- [ ] Initialize Next.js 14+ project (App Router, Tailwind, TypeScript)
-- [ ] Set up Supabase (allowlist, sessions, hidden_messages tables)
-- [ ] Seed allowlist from CSV (real_name, ign, fid, wallet)
-- [ ] Implement Sign In With Farcaster (SIWF) using `@farcaster/auth-kit`
-- [ ] Build allowlist gate (check FID + wallet)
-- [ ] Implement Neynar FID registration (onboard wallet-only users)
-- [ ] Set up Neynar managed signer flow (one-time approval)
-- [ ] Build mobile-first chat UI (Discord-style, sidebar as drawer)
-- [ ] Fetch `/zao` channel feed via Neynar API
-- [ ] Post messages to `/zao` channel via Neynar managed signer
-- [ ] Reply threads — thread view for cast replies
-- [ ] Real-time polling (5-10 sec refresh)
-- [ ] Admin panel — manage allowlist, CSV upload, hide messages
-- [ ] Deploy to Vercel (auto-deploy from github.com/bettercallzaal/ZAOOS)
-- [ ] Invite initial ZAO community members (~50-100)
+| Doc | Topic |
+|---|---|
+| `docs/neynar-credit-optimization.md` | Neynar API costs, webhooks vs polling, credit breakdown |
+| `research/03-music-integration/` | Music APIs, audio players, track schema |
+| `research/15-mvp-spec/` | Locked MVP spec, user flow, file structure |
 
-### Layer 2 — Music in Chat
+---
 
-Add music sharing and playback to the chat experience.
+## Reference Repos (Architecture Inspiration)
 
-- [ ] Detect music URLs in casts (Audius, Sound.xyz, Spotify patterns)
-- [ ] Build `<TrackCard />` component — rich preview for music embeds
-- [ ] Integrate Audius API — pull track metadata, streaming URL, artwork
-- [ ] Build `<AudioPlayer />` — inline play/pause per track
-- [ ] Build persistent player bar — continues playing while scrolling
-- [ ] Sound.xyz integration — music NFT metadata, mint links
-- [ ] Spotify preview integration — 30-sec previews for mainstream tracks
+| Repo | License | What We Borrowed |
+|---|---|---|
+| [Coop-Records/sonata](https://github.com/Coop-Records/sonata) | MIT | Audio provider architecture, PlayerProvider reducer |
+| [stephancill/nook](https://github.com/stephancill/nook) | MIT | Content-type detection for embeds |
+| [farcasterxyz/protocol](https://github.com/farcasterxyz/protocol) | MIT | Protocol spec |
 
-### Layer 3 — Identity (ZIDs)
+---
 
-Wrap Farcaster FIDs with ZAO-specific profiles.
+## Vision
 
-- [ ] Design ZID database schema (music profile, genres, role)
-- [ ] ZID creation flow during onboarding (after SIWF + gate pass)
-- [ ] Profile page — display ZID, music stats, linked wallets
-- [ ] Music profile setup — role (listener/artist/curator), genre preferences
-- [ ] Pull Farcaster profile data (PFP, display name, bio) into ZID
+ZAO OS will evolve from a gated chat client into a full music-social network:
 
-### Layer 4 — Respect Tokens
-
-Social capital system for the community.
-
-- [ ] Respect ledger database schema (actions, balances, tiers)
-- [ ] Basic earning — earn Respect for posting, sharing music
-- [ ] Curation mining — earn Respect when tracks you share get engagement
-- [ ] Peer recognition — "respect" button on posts (like tipping)
-- [ ] Tier system — newcomer/member/curator/elder based on balance
-- [ ] Decay mechanism — weekly decay of unused Respect
-- [ ] Display Respect balance and tier on profiles
-
-### Layer 5 — Community Roles (Hats)
-
-On-chain role management for the ZAO community.
-
-- [ ] Deploy ZAO hat tree on Base (Top Hat → Curators/Artists/Mods)
-- [ ] Integrate `@hatsprotocol/sdk-v1-core` for role checks
-- [ ] Add hat-based gating (wear Curator hat = curator permissions)
-- [ ] Auto-eligibility — Respect threshold triggers hat eligibility
-- [ ] Role badges on profiles (hat = visible role)
-- [ ] Moderator tools — content flagging, hide posts
-
-### Layer 6 — Music Feed
-
-Graduate from chat to a full music social feed.
-
-- [ ] Feed view — algorithmic feed of music posts
-- [ ] Feed ranking — weight by Respect, engagement, freshness, social graph
-- [ ] Channel browsing — genre-based music channels
-- [ ] Frames v2 — inline music player frames for cross-client embeds
-- [ ] Collections — curated playlists/collections by curators
-- [ ] Artist pages — dedicated profiles for verified artists
-
-### Layer 7 — AI & Personalization
-
-Memory-augmented, personalized experience.
-
-- [ ] Implicit taste extraction from listening/sharing behavior
-- [ ] User taste profiles (genres, artists, mood patterns)
-- [ ] Personalized feed ranking based on taste profile
-- [ ] Social memory — "you and X both love Y" connections
-- [ ] AI-powered music discovery recommendations
-
-### Layer 8 — On-Chain & Decentralization
-
-Move key data on-chain for verifiability and portability.
-
-- [ ] EAS attestations for ZID profiles on Base
-- [ ] EAS attestations for Respect score snapshots
-- [ ] Soulbound ERC-5192 for Respect tier badges
-- [ ] NFT gate option (mint ZAO membership NFT)
-- [ ] Quilibrium node integration (experimental)
-- [ ] Quilibrium ZID storage (when SDK matures)
-
-### Layer 9 — Private Messaging
-
-Add encrypted DMs via XMTP.
-
-- [ ] XMTP client integration (`@xmtp/xmtp-js`)
-- [ ] 1:1 DMs between ZAO members
-- [ ] FID → ETH address resolution for XMTP
-- [ ] Group chat via XMTP MLS
-- [ ] Rich messages — reactions, replies, attachments
+1. **MVP** — Gated chat, music playback, quote casts ← *current*
+2. **Layer 2** — Reputation (Respect tokens), ZIDs
+3. **Layer 3** — Music feed, collections, artist profiles
+4. **Layer 4** — On-chain identity, EAS attestations
+5. **Layer 5** — AI personalization, taste profiles
+6. **Layer 6** — Decentralized infrastructure (Quilibrium)

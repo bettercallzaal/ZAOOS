@@ -15,13 +15,15 @@ export function MessagesRoom() {
   const isMobile = useMobile();
   const {
     isConnecting,
+    connectingWallet,
     isConnected,
+    connectedWallets,
     error,
     conversations,
     activeConversationId,
     messages,
     loadingMessages,
-    connect,
+    connectWallet,
     selectConversation,
     sendMessage,
     createDm,
@@ -29,6 +31,7 @@ export function MessagesRoom() {
   } = useXMTPContext();
 
   const [dialogType, setDialogType] = useState<'dm' | 'group' | null>(null);
+  const [showWalletSetup, setShowWalletSetup] = useState(!isConnected);
 
   const activeConversation = conversations.find((c) => c.id === activeConversationId) ?? null;
 
@@ -36,56 +39,58 @@ export function MessagesRoom() {
   const showList = !isMobile || !activeConversationId;
   const showThread = !isMobile || !!activeConversationId;
 
-  const [connectError, setConnectError] = useState<string | null>(null);
-
-  const handleConnect = useCallback(async () => {
-    if (!user) return;
-    setConnectError(null);
+  const handleConnectWallet = useCallback(async (address: `0x${string}`) => {
+    // Get browser wallet provider
+    const ethereum = (window as { ethereum?: { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> } }).ethereum;
+    if (!ethereum) {
+      alert('No wallet extension detected. Install MetaMask or another Ethereum wallet.');
+      return;
+    }
 
     try {
-      // Fetch wallet address from server (uses Neynar getUserByFid)
-      const res = await fetch('/api/users/wallet');
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to fetch wallet address');
-      }
-      const { verifiedAddresses, custodyAddress } = await res.json();
+      // Request accounts — this opens the wallet popup
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' }) as string[];
+      const connectedAddr = accounts?.[0]?.toLowerCase();
 
-      const address: string | null = verifiedAddresses?.[0] ?? custodyAddress ?? null;
-      if (!address) {
-        throw new Error('No wallet address found. Connect a wallet to your Farcaster account first.');
+      if (!connectedAddr) {
+        alert('No account returned from wallet.');
+        return;
       }
 
-      // Get browser wallet provider
-      const ethereum = (window as { ethereum?: { request: (args: { method: string; params?: unknown[] }) => Promise<string> } }).ethereum;
-      if (!ethereum) {
-        throw new Error('No wallet extension detected. Install MetaMask or another Ethereum wallet.');
+      // The user needs to switch to the correct account in their wallet
+      // if the connected account doesn't match the requested one
+      const targetAddr = address.toLowerCase();
+      if (connectedAddr !== targetAddr) {
+        // Try to switch accounts (some wallets support wallet_requestPermissions)
+        try {
+          await ethereum.request({
+            method: 'wallet_requestPermissions',
+            params: [{ eth_accounts: {} }],
+          });
+          const newAccounts = await ethereum.request({ method: 'eth_accounts' }) as string[];
+          const newAddr = newAccounts?.[0]?.toLowerCase();
+          if (newAddr !== targetAddr) {
+            alert(`Please switch to ${address.slice(0, 6)}...${address.slice(-4)} in your wallet and try again.`);
+            return;
+          }
+        } catch {
+          alert(`Please switch to ${address.slice(0, 6)}...${address.slice(-4)} in your wallet and try again.`);
+          return;
+        }
       }
-
-      // Request account access
-      const accounts: string = await ethereum.request({ method: 'eth_requestAccounts' });
-      const connectedAddress = Array.isArray(accounts) ? accounts[0] : null;
-      if (!connectedAddress) {
-        throw new Error('No account returned from wallet. Please try again.');
-      }
-
-      // Use the wallet-connected address for signing (it must match what the user approves)
-      const signingAddress = connectedAddress.toLowerCase();
 
       const signMessage = async (message: string) => {
         return ethereum.request({
           method: 'personal_sign',
-          params: [message, signingAddress],
-        });
+          params: [message, targetAddr],
+        }) as Promise<string>;
       };
 
-      await connect(signingAddress as `0x${string}`, signMessage);
+      await connectWallet(targetAddr as `0x${string}`, signMessage);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Connection failed';
-      setConnectError(msg);
-      console.error('XMTP connection error:', err);
+      console.error('Wallet connection error:', err);
     }
-  }, [user, connect]);
+  }, [connectWallet]);
 
   const handleCreateDm = useCallback(async (address: `0x${string}`) => {
     const convId = await createDm(address);
@@ -103,8 +108,8 @@ export function MessagesRoom() {
 
   if (!user) return null;
 
-  // Not connected to XMTP yet — show connect screen
-  if (!isConnected) {
+  // Show wallet setup screen
+  if (showWalletSetup || !isConnected) {
     return (
       <div className="flex h-[100dvh] bg-[#0a1628] text-white">
         {/* Sidebar placeholder */}
@@ -123,7 +128,14 @@ export function MessagesRoom() {
             </a>
           </div>
         </aside>
-        <ConnectXMTP isConnecting={isConnecting} error={connectError || error} onConnect={handleConnect} />
+        <ConnectXMTP
+          isConnecting={isConnecting}
+          connectingWallet={connectingWallet}
+          connectedWallets={connectedWallets}
+          error={error}
+          onConnectWallet={handleConnectWallet}
+          onContinue={() => setShowWalletSetup(false)}
+        />
       </div>
     );
   }
@@ -133,14 +145,24 @@ export function MessagesRoom() {
       {/* Conversation list sidebar */}
       {showList && (
         <div className={`${isMobile ? 'w-full' : 'w-80 border-r border-gray-800'} bg-[#0d1b2a] flex flex-col`}>
-          {/* Back to channels link */}
-          <div className="px-4 pt-3 pb-1">
+          {/* Back to channels link + wallet count */}
+          <div className="px-4 pt-3 pb-1 flex items-center justify-between">
             <a href="/chat" className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
               </svg>
               Channels
             </a>
+            <button
+              onClick={() => setShowWalletSetup(true)}
+              className="inline-flex items-center gap-1 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+              title="Manage wallets"
+            >
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 110-6h.75a2.25 2.25 0 012.25 2.25V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25A2.25 2.25 0 015.25 3H18" />
+              </svg>
+              {connectedWallets.length} wallet{connectedWallets.length !== 1 ? 's' : ''}
+            </button>
           </div>
           <ConversationList
             conversations={conversations}

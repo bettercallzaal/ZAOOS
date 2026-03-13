@@ -7,17 +7,31 @@ import type { Client, Dm, Group } from '@xmtp/browser-sdk';
 type AnyClient = Client<any>;
 import type { XMTPConversation, XMTPMessage } from '@/types/xmtp';
 
+interface WalletClient {
+  address: string;
+  client: AnyClient;
+  streamController: AbortController | null;
+}
+
 interface XMTPContextValue {
-  client: AnyClient | null;
+  // Multi-wallet state
+  connectedWallets: string[];
+  activeWalletCount: number;
   isConnecting: boolean;
+  connectingWallet: string | null;
   isConnected: boolean;
   error: string | null;
+
+  // Unified inbox
   conversations: XMTPConversation[];
   activeConversationId: string | null;
   messages: XMTPMessage[];
   loadingMessages: boolean;
-  connect: (address: `0x${string}`, signMessage: (msg: string) => Promise<string>) => Promise<void>;
-  disconnect: () => void;
+
+  // Actions
+  connectWallet: (address: `0x${string}`, signMessage: (msg: string) => Promise<string>) => Promise<void>;
+  disconnectWallet: (address: string) => void;
+  disconnectAll: () => void;
   selectConversation: (id: string | null) => void;
   sendMessage: (text: string) => Promise<void>;
   createDm: (peerAddress: `0x${string}`) => Promise<string | null>;
@@ -34,87 +48,114 @@ export function useXMTPContext() {
 }
 
 export function XMTPProvider({ children }: { children: React.ReactNode }) {
-  const clientRef = useRef<AnyClient | null>(null);
+  const walletsRef = useRef<Map<string, WalletClient>>(new Map());
+  const [connectedWallets, setConnectedWallets] = useState<string[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
+  const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [conversations, setConversations] = useState<XMTPConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<XMTPMessage[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
-  const abortRef = useRef<AbortController | null>(null);
   const msgAbortRef = useRef<AbortController | null>(null);
+  // Track which wallet owns the active conversation
+  const activeConvWalletRef = useRef<string | null>(null);
 
-  const loadConversations = useCallback(async (client: AnyClient) => {
-    try {
-      const allConvos = await client.conversations.list();
-      const dms = await client.conversations.listDms();
-      const dmIds = new Set(dms.map((d: Dm) => d.id));
+  /**
+   * Load and merge conversations from all connected wallet clients
+   */
+  const loadAllConversations = useCallback(async () => {
+    const allMapped: XMTPConversation[] = [];
 
-      const mapped: XMTPConversation[] = await Promise.all(
-        allConvos.map(async (conv: Dm | Group) => {
-          const isDm = dmIds.has(conv.id);
-          const lastMsg = await conv.lastMessage();
-          const lastContent = lastMsg?.content;
-          const group = conv as Group;
+    for (const [address, wc] of walletsRef.current.entries()) {
+      try {
+        const allConvos = await wc.client.conversations.list();
+        const dms = await wc.client.conversations.listDms();
+        const dmIds = new Set(dms.map((d: Dm) => d.id));
 
-          return {
-            id: conv.id,
-            type: isDm ? 'dm' as const : 'group' as const,
-            name: (!isDm && group.name) ? group.name : (isDm ? 'Direct Message' : 'Group'),
-            imageUrl: (!isDm && group.imageUrl) ? group.imageUrl : undefined,
-            description: (!isDm && group.description) ? group.description : undefined,
-            peerInboxId: isDm ? await (conv as Dm).peerInboxId() : undefined,
-            lastMessage: typeof lastContent === 'string' ? lastContent : lastContent ? '[media]' : undefined,
-            lastMessageAt: lastMsg?.sentAt,
-            unreadCount: 0,
-          };
-        })
-      );
+        const mapped = await Promise.all(
+          allConvos.map(async (conv: Dm | Group) => {
+            const isDm = dmIds.has(conv.id);
+            const lastMsg = await conv.lastMessage();
+            const lastContent = lastMsg?.content;
+            const group = conv as Group;
 
-      // Sort by last message time, most recent first
-      mapped.sort((a, b) => {
-        const aTime = a.lastMessageAt?.getTime() ?? 0;
-        const bTime = b.lastMessageAt?.getTime() ?? 0;
-        return bTime - aTime;
-      });
-
-      setConversations(mapped);
-    } catch (err) {
-      console.error('Failed to load conversations:', err);
+            return {
+              id: conv.id,
+              type: isDm ? 'dm' as const : 'group' as const,
+              name: (!isDm && group.name) ? group.name : (isDm ? 'Direct Message' : 'Group'),
+              imageUrl: (!isDm && group.imageUrl) ? group.imageUrl : undefined,
+              description: (!isDm && group.description) ? group.description : undefined,
+              peerInboxId: isDm ? await (conv as Dm).peerInboxId() : undefined,
+              lastMessage: typeof lastContent === 'string' ? lastContent : lastContent ? '[media]' : undefined,
+              lastMessageAt: lastMsg?.sentAt,
+              unreadCount: 0,
+              // Tag which wallet this conversation belongs to
+              walletAddress: address,
+            } as XMTPConversation;
+          })
+        );
+        allMapped.push(...mapped);
+      } catch (err) {
+        console.error(`Failed to load conversations for ${address}:`, err);
+      }
     }
+
+    // Sort by last message time, most recent first
+    allMapped.sort((a, b) => {
+      const aTime = a.lastMessageAt?.getTime() ?? 0;
+      const bTime = b.lastMessageAt?.getTime() ?? 0;
+      return bTime - aTime;
+    });
+
+    setConversations(allMapped);
   }, []);
 
-  const connect = useCallback(async (
+  /**
+   * Connect a specific wallet to XMTP
+   */
+  const connectWallet = useCallback(async (
     address: `0x${string}`,
     signMessage: (msg: string) => Promise<string>
   ) => {
-    if (clientRef.current) return;
+    const normalized = address.toLowerCase();
+    if (walletsRef.current.has(normalized)) return; // Already connected
+
     setIsConnecting(true);
+    setConnectingWallet(normalized);
     setError(null);
 
     try {
-      const { createWalletSigner, createXMTPClient } = await import('@/lib/xmtp/client');
+      const { createWalletSigner, createXMTPClient, saveConnectedWallet } = await import('@/lib/xmtp/client');
       const signer = createWalletSigner(address, signMessage);
-      const client = await createXMTPClient(signer);
-      clientRef.current = client;
-      setIsConnected(true);
+      const client = await createXMTPClient(signer, normalized);
 
-      // Load conversations
+      // Sync conversations
       await client.conversations.sync();
-      await loadConversations(client);
 
-      // Stream new conversations in background
+      // Store the client
       const controller = new AbortController();
-      abortRef.current = controller;
+      walletsRef.current.set(normalized, {
+        address: normalized,
+        client,
+        streamController: controller,
+      });
+
+      // Save to localStorage for reconnection awareness
+      saveConnectedWallet(normalized);
+
+      // Update state
+      setConnectedWallets(Array.from(walletsRef.current.keys()));
+
+      // Load merged conversations
+      await loadAllConversations();
+
+      // Stream new conversations for this wallet
       (async () => {
         try {
           const stream = await client.conversations.stream({
-            onValue: () => {
-              if (clientRef.current) loadConversations(clientRef.current);
-            },
+            onValue: () => loadAllConversations(),
           });
-          // Keep stream alive until abort
           for await (const _ of stream) {
             if (controller.signal.aborted) {
               await stream.return();
@@ -127,13 +168,68 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       })();
 
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to connect to XMTP';
+      const message = err instanceof Error ? err.message : 'Failed to connect wallet to XMTP';
       setError(message);
       console.error('XMTP connect error:', err);
     } finally {
       setIsConnecting(false);
+      setConnectingWallet(null);
     }
-  }, [loadConversations]);
+  }, [loadAllConversations]);
+
+  /**
+   * Disconnect a specific wallet
+   */
+  const disconnectWallet = useCallback((address: string) => {
+    const normalized = address.toLowerCase();
+    const wc = walletsRef.current.get(normalized);
+    if (!wc) return;
+
+    wc.streamController?.abort();
+    wc.client.close();
+    walletsRef.current.delete(normalized);
+
+    const { removeConnectedWallet } = require('@/lib/xmtp/client');
+    removeConnectedWallet(normalized);
+
+    setConnectedWallets(Array.from(walletsRef.current.keys()));
+    loadAllConversations();
+  }, [loadAllConversations]);
+
+  /**
+   * Disconnect all wallets
+   */
+  const disconnectAll = useCallback(() => {
+    msgAbortRef.current?.abort();
+    msgAbortRef.current = null;
+
+    for (const [, wc] of walletsRef.current) {
+      wc.streamController?.abort();
+      wc.client.close();
+    }
+    walletsRef.current.clear();
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('zaoos-xmtp-wallets');
+    }
+
+    setConnectedWallets([]);
+    setConversations([]);
+    setMessages([]);
+    setActiveConversationId(null);
+    activeConvWalletRef.current = null;
+  }, []);
+
+  /**
+   * Find which wallet client owns a conversation
+   */
+  const findClientForConversation = useCallback(async (convId: string): Promise<{ client: AnyClient; address: string } | null> => {
+    for (const [address, wc] of walletsRef.current.entries()) {
+      const conv = await wc.client.conversations.getConversationById(convId);
+      if (conv) return { client: wc.client, address };
+    }
+    return null;
+  }, []);
 
   const selectConversation = useCallback(async (id: string | null) => {
     setActiveConversationId(id);
@@ -144,14 +240,24 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       msgAbortRef.current = null;
     }
 
-    if (!id || !clientRef.current) {
+    if (!id) {
       setMessages([]);
+      activeConvWalletRef.current = null;
       return;
     }
 
     setLoadingMessages(true);
     try {
-      const conv = await clientRef.current.conversations.getConversationById(id);
+      const result = await findClientForConversation(id);
+      if (!result) {
+        setMessages([]);
+        return;
+      }
+
+      const { client } = result;
+      activeConvWalletRef.current = result.address;
+
+      const conv = await client.conversations.getConversationById(id);
       if (!conv) {
         setMessages([]);
         return;
@@ -159,7 +265,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
       await conv.sync();
       const rawMessages = await conv.messages({ limit: BigInt(50) });
-      const myInboxId = clientRef.current.inboxId;
+      const myInboxId = client.inboxId;
 
       const decoded: XMTPMessage[] = rawMessages.map((msg) => ({
         id: msg.id,
@@ -179,14 +285,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         try {
           const stream = await conv.stream({
             onValue: (msg) => {
-              if (!clientRef.current) return;
+              if (!client) return;
               const newMsg: XMTPMessage = {
                 id: msg.id,
                 conversationId: id,
                 senderInboxId: msg.senderInboxId,
                 content: typeof msg.content === 'string' ? msg.content : '[media]',
                 sentAt: msg.sentAt,
-                isFromMe: msg.senderInboxId === clientRef.current.inboxId,
+                isFromMe: msg.senderInboxId === client.inboxId,
               };
               setMessages((prev) => {
                 if (prev.some((m) => m.id === newMsg.id)) return prev;
@@ -217,36 +323,49 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoadingMessages(false);
     }
-  }, []);
+  }, [findClientForConversation]);
 
   const sendMessage = useCallback(async (text: string) => {
-    if (!clientRef.current || !activeConversationId || !text.trim()) return;
+    if (!activeConversationId || !text.trim() || !activeConvWalletRef.current) return;
 
-    const conv = await clientRef.current.conversations.getConversationById(activeConversationId);
+    const wc = walletsRef.current.get(activeConvWalletRef.current);
+    if (!wc) return;
+
+    const conv = await wc.client.conversations.getConversationById(activeConversationId);
     if (!conv) return;
 
     await conv.sendText(text.trim());
   }, [activeConversationId]);
 
+  /**
+   * Create a DM using the first connected wallet (or the primary wallet)
+   */
+  const getFirstClient = useCallback((): AnyClient | null => {
+    const first = walletsRef.current.values().next();
+    return first.done ? null : first.value.client;
+  }, []);
+
   const createDm = useCallback(async (peerAddress: `0x${string}`) => {
-    if (!clientRef.current) return null;
+    const client = getFirstClient();
+    if (!client) return null;
 
     try {
       const { IdentifierKind } = await import('@xmtp/browser-sdk');
-      const conv = await clientRef.current.conversations.createDmWithIdentifier({
+      const conv = await client.conversations.createDmWithIdentifier({
         identifierKind: IdentifierKind.Ethereum,
         identifier: peerAddress,
       });
-      await loadConversations(clientRef.current);
+      await loadAllConversations();
       return conv.id;
     } catch (err) {
       console.error('Failed to create DM:', err);
       return null;
     }
-  }, [loadConversations]);
+  }, [getFirstClient, loadAllConversations]);
 
   const createGroup = useCallback(async (name: string, memberAddresses: `0x${string}`[]) => {
-    if (!clientRef.current) return null;
+    const client = getFirstClient();
+    if (!client) return null;
 
     try {
       const { IdentifierKind } = await import('@xmtp/browser-sdk');
@@ -254,59 +373,52 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         identifierKind: IdentifierKind.Ethereum,
         identifier: addr,
       }));
-      const conv = await clientRef.current.conversations.createGroupWithIdentifiers(identifiers, {
+      const conv = await client.conversations.createGroupWithIdentifiers(identifiers, {
         groupName: name,
         groupDescription: `ZAO group: ${name}`,
       });
-      await loadConversations(clientRef.current);
+      await loadAllConversations();
       return conv.id;
     } catch (err) {
       console.error('Failed to create group:', err);
       return null;
     }
-  }, [loadConversations]);
+  }, [getFirstClient, loadAllConversations]);
 
   const refreshConversations = useCallback(async () => {
-    if (!clientRef.current) return;
-    await clientRef.current.conversations.sync();
-    await loadConversations(clientRef.current);
-  }, [loadConversations]);
-
-  const disconnect = useCallback(() => {
-    abortRef.current?.abort();
-    abortRef.current = null;
-    msgAbortRef.current?.abort();
-    msgAbortRef.current = null;
-    if (clientRef.current) {
-      clientRef.current.close();
-      clientRef.current = null;
+    for (const [, wc] of walletsRef.current) {
+      await wc.client.conversations.sync();
     }
-    setIsConnected(false);
-    setConversations([]);
-    setMessages([]);
-    setActiveConversationId(null);
-  }, []);
+    await loadAllConversations();
+  }, [loadAllConversations]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      disconnect();
+      for (const [, wc] of walletsRef.current) {
+        wc.streamController?.abort();
+        wc.client.close();
+      }
+      walletsRef.current.clear();
     };
-  }, [disconnect]);
+  }, []);
 
   return (
     <XMTPContext.Provider
       value={{
-        client: clientRef.current,
+        connectedWallets,
+        activeWalletCount: walletsRef.current.size,
         isConnecting,
-        isConnected,
+        connectingWallet,
+        isConnected: walletsRef.current.size > 0,
         error,
         conversations,
         activeConversationId,
         messages,
         loadingMessages,
-        connect,
-        disconnect,
+        connectWallet,
+        disconnectWallet,
+        disconnectAll,
         selectConversation,
         sendMessage,
         createDm,

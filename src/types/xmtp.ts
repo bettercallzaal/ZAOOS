@@ -24,6 +24,7 @@ export interface XMTPConversation {
   lastMessageAt?: Date;
   unreadCount: number;
   memberCount?: number;
+  walletAddress?: string; // which connected wallet owns this conversation
 }
 
 export interface XMTPMember {

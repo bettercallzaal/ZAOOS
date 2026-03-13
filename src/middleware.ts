@@ -67,7 +67,7 @@ export function middleware(request: NextRequest) {
 
   // XMTP WASM requires COEP/COOP for SharedArrayBuffer — only on /messages routes
   if (pathname.startsWith('/messages')) {
-    response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+    response.headers.set('Cross-Origin-Embedder-Policy', 'credentialless');
     response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   }
 

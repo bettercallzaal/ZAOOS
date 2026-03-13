@@ -36,47 +36,54 @@ export function MessagesRoom() {
   const showList = !isMobile || !activeConversationId;
   const showThread = !isMobile || !!activeConversationId;
 
+  const [connectError, setConnectError] = useState<string | null>(null);
+
   const handleConnect = useCallback(async () => {
     if (!user) return;
+    setConnectError(null);
 
-    // We need the user's wallet address — fetch it from their Farcaster profile
     try {
-      const res = await fetch(`/api/search/users?q=${encodeURIComponent(user.username)}`);
-      const data = await res.json();
-      const farcasterUser = data.users?.find((u: { fid: number }) => u.fid === user.fid);
-
-      let address: string | null = null;
-
-      // Try verified ETH addresses first, then custody address
-      if (farcasterUser?.verified_addresses?.eth_addresses?.length > 0) {
-        address = farcasterUser.verified_addresses.eth_addresses[0];
-      } else if (farcasterUser?.custody_address) {
-        address = farcasterUser.custody_address;
+      // Fetch wallet address from server (uses Neynar getUserByFid)
+      const res = await fetch('/api/users/wallet');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to fetch wallet address');
       }
+      const { verifiedAddresses, custodyAddress } = await res.json();
 
+      const address: string | null = verifiedAddresses?.[0] ?? custodyAddress ?? null;
       if (!address) {
         throw new Error('No wallet address found. Connect a wallet to your Farcaster account first.');
       }
 
-      // For browser wallet signing, we use window.ethereum
+      // Get browser wallet provider
       const ethereum = (window as { ethereum?: { request: (args: { method: string; params?: unknown[] }) => Promise<string> } }).ethereum;
       if (!ethereum) {
-        throw new Error('No wallet detected. Install MetaMask or another wallet extension.');
+        throw new Error('No wallet extension detected. Install MetaMask or another Ethereum wallet.');
       }
 
       // Request account access
-      await ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts: string = await ethereum.request({ method: 'eth_requestAccounts' });
+      const connectedAddress = Array.isArray(accounts) ? accounts[0] : null;
+      if (!connectedAddress) {
+        throw new Error('No account returned from wallet. Please try again.');
+      }
+
+      // Use the wallet-connected address for signing (it must match what the user approves)
+      const signingAddress = connectedAddress.toLowerCase();
 
       const signMessage = async (message: string) => {
         return ethereum.request({
           method: 'personal_sign',
-          params: [message, address],
+          params: [message, signingAddress],
         });
       };
 
-      await connect(address as `0x${string}`, signMessage);
+      await connect(signingAddress as `0x${string}`, signMessage);
     } catch (err) {
-      console.error('Connection error:', err);
+      const msg = err instanceof Error ? err.message : 'Connection failed';
+      setConnectError(msg);
+      console.error('XMTP connection error:', err);
     }
   }, [user, connect]);
 
@@ -116,7 +123,7 @@ export function MessagesRoom() {
             </a>
           </div>
         </aside>
-        <ConnectXMTP isConnecting={isConnecting} error={error} onConnect={handleConnect} />
+        <ConnectXMTP isConnecting={isConnecting} error={connectError || error} onConnect={handleConnect} />
       </div>
     );
   }

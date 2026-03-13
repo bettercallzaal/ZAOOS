@@ -15,9 +15,9 @@ export async function GET(req: NextRequest) {
   const token = authorization.split(' ')[1];
 
   try {
-    // Use the request's host for domain verification (works on preview URLs too)
-    const host = req.headers.get('host') || 'zaoos.com';
-    const domain = host.split(':')[0]; // strip port if present
+    // Use production domain for JWT verification — QuickAuth JWTs are tied
+    // to the domain in the Farcaster manifest (zaoos.com), not the request host
+    const domain = process.env.NEXT_PUBLIC_SIWF_DOMAIN || 'zaoos.com';
 
     const payload = await quickAuthClient.verifyJwt({
       token,

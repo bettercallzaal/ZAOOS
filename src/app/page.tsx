@@ -10,50 +10,20 @@ export default function LandingPage() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    async function checkMiniApp() {
-      try {
-        const { sdk } = await import('@farcaster/miniapp-sdk');
-        const inMiniApp = await sdk.isInMiniApp();
-
-        if (inMiniApp) {
-          try {
-            const response = await sdk.quickAuth.fetch('/api/miniapp/auth');
-            if (response.ok) {
-              const data = await response.json();
-              await sdk.actions.ready();
-              if (data.hasAccess) {
-                router.replace('/chat');
-                return;
-              } else {
-                // Authenticated via Farcaster but not on the allowlist
-                router.replace('/not-allowed');
-                return;
-              }
-            }
-          } catch (err) {
-            console.error('Quick Auth error:', err);
-          }
-
-          // Always call ready() even if auth fails — otherwise infinite loading
-          await sdk.actions.ready();
-        }
-      } catch {
-        // SDK not available
-      }
-      setChecking(false);
-    }
-
-    // Check existing session in parallel
+    // Check for existing session — if already logged in, go to chat
+    // Mini app auth is handled by MiniAppGate (in providers.tsx), not here
     fetch('/api/auth/session')
       .then((res) => res.json())
       .then((data) => {
         if (data.authenticated) {
           router.replace('/chat');
+        } else {
+          setChecking(false);
         }
       })
-      .catch(() => {});
-
-    checkMiniApp();
+      .catch(() => {
+        setChecking(false);
+      });
   }, [router]);
 
   if (checking) {

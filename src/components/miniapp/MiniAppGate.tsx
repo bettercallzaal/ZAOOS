@@ -1,80 +1,95 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-
-interface MiniAppUser {
-  fid: number;
-  hasAccess: boolean;
-  username: string;
-  displayName: string;
-  pfpUrl: string;
-}
 
 interface MiniAppGateProps {
   children: React.ReactNode;
 }
 
+type GateState = 'checking' | 'web' | 'authing' | 'allowed' | 'denied';
+
 export function MiniAppGate({ children }: MiniAppGateProps) {
-  const [state, setState] = useState<'checking' | 'miniapp' | 'web'>('checking');
-  const [user, setUser] = useState<MiniAppUser | null>(null);
+  const [state, setState] = useState<GateState>('checking');
+  const [username, setUsername] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
+    let cancelled = false;
+
     async function init() {
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
-
         const inMiniApp = await sdk.isInMiniApp();
+
         if (!inMiniApp) {
           setState('web');
           return;
         }
 
-        setState('miniapp');
+        // We're in a mini app — call ready() IMMEDIATELY to dismiss splash
+        await sdk.actions.ready();
+        setState('authing');
 
-        // We're in a mini app — auto-authenticate via Quick Auth
+        // Now authenticate via QuickAuth in the background
         try {
           const response = await sdk.quickAuth.fetch('/api/miniapp/auth');
+          if (cancelled) return;
+
           if (response.ok) {
             const data = await response.json();
-            setUser(data);
+            if (data.hasAccess) {
+              setState('allowed');
+              // Navigate to chat if we're on the landing page
+              if (window.location.pathname === '/') {
+                router.replace('/chat');
+              }
+            } else {
+              setUsername(data.username || '');
+              setState('denied');
+            }
+          } else {
+            // Auth failed — show as web fallback
+            setState('web');
           }
         } catch (err) {
           console.error('Quick Auth failed:', err);
+          if (!cancelled) setState('web');
         }
-
-        // Signal ready to dismiss splash screen
-        await sdk.actions.ready();
       } catch {
-        // SDK import failed or not in mini app
+        // SDK not available — normal web context
         setState('web');
       }
     }
 
     init();
-  }, []);
+    return () => { cancelled = true; };
+  }, [router]);
 
-  // Still checking — show nothing (splash screen is visible in mini app)
-  if (state === 'checking') {
+  // Checking or web — render children (normal flow)
+  if (state === 'checking' || state === 'web' || state === 'allowed') {
     return <>{children}</>;
   }
 
-  // Normal web — pass through
-  if (state === 'web') {
-    return <>{children}</>;
+  // Authenticating in mini app — show loading
+  if (state === 'authing') {
+    return (
+      <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628]">
+        <Image src="/logo.png" alt="THE ZAO" width={96} height={96} className="mx-auto mb-4 rounded-2xl" priority />
+        <h1 className="text-3xl font-bold text-[#f5a623] mb-4">THE ZAO</h1>
+        <div className="w-6 h-6 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-500 text-xs mt-3">Signing you in...</p>
+      </div>
+    );
   }
 
-  // Mini app: no access
-  if (user && !user.hasAccess) {
-    return <NoAccessScreen username={user.username} />;
-  }
-
-  // Mini app: has access or still loading user — show app
-  return <>{children}</>;
+  // Denied
+  return <NoAccessScreen username={username} />;
 }
 
 function NoAccessScreen({ username }: { username: string }) {
-  const requestAccess = async () => {
+  const requestAccess = useCallback(async () => {
     const text = encodeURIComponent(`@zaal requesting access to ZAO OS!`);
     const url = `https://warpcast.com/~/compose?text=${text}&channelKey=zao`;
     try {
@@ -83,7 +98,7 @@ function NoAccessScreen({ username }: { username: string }) {
     } catch {
       window.open(url, '_blank');
     }
-  };
+  }, []);
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-[#0a1628] px-6">

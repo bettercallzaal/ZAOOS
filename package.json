@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "patch-package && cp node_modules/@xmtp/wasm-bindings/dist/bindings_wasm_bg.wasm public/bindings_wasm_bg.wasm",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -37,6 +38,7 @@
     "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "patch-package": "^8.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

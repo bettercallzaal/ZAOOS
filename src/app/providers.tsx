@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { AuthKitProvider } from '@farcaster/auth-kit';
+import { MiniAppGate } from '@/components/miniapp/MiniAppGate';
 import '@farcaster/auth-kit/styles.css';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -12,7 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthKitProvider config={config}>
-      {children}
+      <MiniAppGate>{children}</MiniAppGate>
     </AuthKitProvider>
   );
 }

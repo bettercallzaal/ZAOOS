@@ -8,6 +8,7 @@ export default function LandingPage() {
     <main className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628] px-6">
       <div className="text-center max-w-sm">
         {/* Logo */}
+        <img src="/logo.png" alt="THE ZAO" className="w-32 h-32 mx-auto mb-4 rounded-2xl" />
         <h1 className="text-5xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2">
           THE ZAO
         </h1>

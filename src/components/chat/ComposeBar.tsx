@@ -10,6 +10,12 @@ const ALL_CHANNELS = [
   { id: 'cocconcertz', label: '#cocconcertz' },
 ];
 
+export interface ReplyContext {
+  hash: string;
+  authorName: string;
+  text: string;
+}
+
 interface ComposeBarProps {
   hasSigner: boolean;
   onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[]) => Promise<void>;
@@ -18,6 +24,8 @@ interface ComposeBarProps {
   quotedCast?: QuotedCastData | null;
   onClearQuote?: () => void;
   onSchedule?: () => void;
+  replyTo?: ReplyContext | null;
+  onClearReply?: () => void;
 }
 
 export interface ComposeBarHandle {
@@ -32,6 +40,8 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   quotedCast,
   onClearQuote,
   onSchedule,
+  replyTo,
+  onClearReply,
 }, ref) {
   const [text, setText] = useState('');
   const [showCrossPost, setShowCrossPost] = useState(false);
@@ -87,10 +97,12 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
         }
 
         const crossPost = crossPostChannels.size > 0 ? [...crossPostChannels] : undefined;
-        await onSend(msg || ' ', undefined, quotedCast?.hash, crossPost, embedUrls);
+        const parentHash = replyTo?.hash || undefined;
+        await onSend(msg || ' ', parentHash, quotedCast?.hash, crossPost, embedUrls);
         setText('');
         removeImage();
         onClearQuote?.();
+        onClearReply?.();
         setCrossPostChannels(new Set());
         setShowCrossPost(false);
       } catch {
@@ -207,6 +219,32 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
           onClose={() => setMentionQuery(null)}
           position={{ bottom: 70, left: 16 }}
         />
+      )}
+
+      {/* Reply preview */}
+      {replyTo && (
+        <div className="px-3 pt-2">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#0a1628] border border-[#f5a623]/30">
+            <svg className="w-3.5 h-3.5 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+            </svg>
+            <div className="flex-1 min-w-0">
+              <span className="text-xs font-medium text-[#f5a623]">
+                Replying to {replyTo.authorName}
+              </span>
+              <p className="text-xs text-gray-500 truncate">{replyTo.text}</p>
+            </div>
+            <button
+              onClick={onClearReply}
+              className="text-gray-500 hover:text-white flex-shrink-0"
+              aria-label="Cancel reply"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Quote preview */}
@@ -398,11 +436,13 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
             onChange={handleTextChange}
             onKeyDown={handleKeyDown}
             placeholder={
-              quotedCast
-                ? 'Add a comment...'
-                : hasSigner
-                  ? `Message #${channel}... (type @ to mention)`
-                  : `Message #${channel}, post via Farcaster...`
+              replyTo
+                ? `Reply to ${replyTo.authorName}...`
+                : quotedCast
+                  ? 'Add a comment...'
+                  : hasSigner
+                    ? `Message #${channel}... (type @ to mention)`
+                    : `Message #${channel}, post via Farcaster...`
             }
             rows={1}
             maxLength={1024}

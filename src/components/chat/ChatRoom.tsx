@@ -9,7 +9,7 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { QuotedCastData } from '@/types';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
-import { ComposeBar, ComposeBarHandle } from './ComposeBar';
+import { ComposeBar, ComposeBarHandle, ReplyContext } from './ComposeBar';
 import { ThreadDrawer } from './ThreadDrawer';
 import { SignerConnect } from './SignerConnect';
 import { SearchDialog } from './SearchDialog';
@@ -31,6 +31,7 @@ export function ChatRoom() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
   const [quotedCast, setQuotedCast] = useState<QuotedCastData | null>(null);
+  const [replyTo, setReplyTo] = useState<ReplyContext | null>(null);
   const [musicSidebarOpen, setMusicSidebarOpen] = useState(false);
   const [songSubmitOpen, setSongSubmitOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -191,6 +192,11 @@ export function ChatRoom() {
               setSelectedThreadHash(null);
             }}
             onOpenProfile={(fid) => setProfileFid(fid)}
+            onReply={(hash, authorName, text) => {
+              setReplyTo({ hash, authorName, text });
+              setQuotedCast(null);
+              composeRef.current?.focus();
+            }}
             loading={loading}
             channelId={activeChannel}
           />
@@ -214,6 +220,8 @@ export function ChatRoom() {
               quotedCast={quotedCast}
               onClearQuote={() => setQuotedCast(null)}
               onSchedule={() => setScheduleOpen(true)}
+              replyTo={replyTo}
+              onClearReply={() => setReplyTo(null)}
             />
           )}
         </div>

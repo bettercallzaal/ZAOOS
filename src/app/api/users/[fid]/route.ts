@@ -28,11 +28,11 @@ export async function GET(
         .eq('fid', targetFid)
         .eq('is_active', true)
         .maybeSingle(),
-      // Get this user's casts from our cached channel_casts to tally engagement
+      // Get this user's casts from cached channel_casts to tally engagement
       supabaseAdmin
         .from('channel_casts')
-        .select('cast_data')
-        .eq('author_fid', targetFid)
+        .select('reactions, replies_count')
+        .eq('fid', targetFid)
         .order('timestamp', { ascending: false })
         .limit(200),
     ]);
@@ -51,12 +51,11 @@ export async function GET(
 
     if (activityResult.data) {
       for (const row of activityResult.data) {
-        const cast = row.cast_data;
-        if (!cast) continue;
         castCount++;
-        totalLikes += cast.reactions?.likes_count ?? 0;
-        totalRecasts += cast.reactions?.recasts_count ?? 0;
-        totalReplies += cast.replies?.count ?? 0;
+        const reactions = row.reactions as { likes_count?: number; recasts_count?: number } | null;
+        totalLikes += reactions?.likes_count ?? 0;
+        totalRecasts += reactions?.recasts_count ?? 0;
+        totalReplies += row.replies_count ?? 0;
       }
     }
 
@@ -73,7 +72,6 @@ export async function GET(
       viewerContext: user.viewer_context ?? null,
       isZaoMember: !!allowlistRow,
       zaoName: allowlistRow?.real_name || null,
-      // Channel activity stats
       activity: {
         casts: castCount,
         likes: totalLikes,

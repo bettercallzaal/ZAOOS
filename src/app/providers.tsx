@@ -1,18 +1,21 @@
 'use client';
 
-import { useMemo } from 'react';
-import { AuthKitProvider } from '@farcaster/auth-kit';
-import '@farcaster/auth-kit/styles.css';  // SignInButton UI styles
+import { NeynarContextProvider, Theme } from '@neynar/react';
+import '@neynar/react/dist/style.css';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const config = useMemo(() => ({
-    rpcUrl: 'https://mainnet.optimism.io',
-    domain: typeof window !== 'undefined' ? window.location.host : 'zaoos.com',
-  }), []);
-
   return (
-    <AuthKitProvider config={config}>
+    <NeynarContextProvider
+      settings={{
+        clientId: process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID || '',
+        defaultTheme: Theme.Dark,
+        eventsCallbacks: {
+          onAuthSuccess: () => {},
+          onSignout: () => {},
+        },
+      }}
+    >
       {children}
-    </AuthKitProvider>
+    </NeynarContextProvider>
   );
 }

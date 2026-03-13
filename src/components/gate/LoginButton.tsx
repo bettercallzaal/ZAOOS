@@ -1,23 +1,26 @@
 'use client';
 
-import { useCallback } from 'react';
-import { SignInButton, useProfile, type StatusAPIResponse } from '@farcaster/auth-kit';
+import { useEffect, useCallback } from 'react';
+import { NeynarAuthButton, useNeynarContext } from '@neynar/react';
 import { useRouter } from 'next/navigation';
 
 export function LoginButton() {
   const router = useRouter();
-  const profile = useProfile();
+  const { user } = useNeynarContext();
 
-  const handleSuccess = useCallback(async (res: StatusAPIResponse) => {
+  const handleAuth = useCallback(async () => {
+    if (!user) return;
+
     try {
       const response = await fetch('/api/auth/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: res.message || '',
-          signature: res.signature || '',
-          nonce: res.nonce || '',
-          domain: window.location.host,
+          fid: user.fid,
+          username: user.username,
+          displayName: user.display_name,
+          pfpUrl: user.pfp_url,
+          signerUuid: user.signer_uuid,
         }),
       });
 
@@ -26,18 +29,20 @@ export function LoginButton() {
         router.push(data.redirect);
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Auth failed:', error);
     }
-  }, [router]);
+  }, [user, router]);
+
+  // When SIWN completes, verify on our backend
+  useEffect(() => {
+    if (user?.fid) {
+      handleAuth();
+    }
+  }, [user?.fid, handleAuth]);
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <SignInButton
-        onSuccess={handleSuccess}
-      />
-      {profile.isAuthenticated && (
-        <p className="text-sm text-gray-400">Verifying access...</p>
-      )}
+      <NeynarAuthButton label="Sign In With Farcaster" />
     </div>
   );
 }

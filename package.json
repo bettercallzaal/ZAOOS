@@ -11,6 +11,9 @@
   "dependencies": {
     "@farcaster/auth-client": "^0.7.1",
     "@farcaster/auth-kit": "^0.8.2",
+    "@neynar/nodejs-sdk": "^3.137.0",
+    "@neynar/react": "^1.2.22",
+    "@pigment-css/react": "^0.0.30",
     "@supabase/supabase-js": "^2.99.1",
     "iron-session": "^8.0.4",
     "next": "16.1.6",

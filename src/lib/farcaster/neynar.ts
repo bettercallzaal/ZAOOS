@@ -7,7 +7,7 @@ function headers() {
   };
 }
 
-export async function getChannelFeed(channelId: string, cursor?: string, limit = 50) {
+export async function getChannelFeed(channelId: string, cursor?: string, limit = 20) {
   const params = new URLSearchParams({
     channel_ids: channelId,
     limit: String(limit),

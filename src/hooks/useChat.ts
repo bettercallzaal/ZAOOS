@@ -3,19 +3,32 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Cast } from '@/types';
 
+const POLL_INTERVAL = 30_000; // 30 s — was 8 s (reduces Neynar credit usage ~4×)
+
 export function useChat(channel: string = 'zao') {
   const [messages, setMessages] = useState<Cast[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const firstHashRef = useRef<string | null>(null); // dedup: skip setState if top cast unchanged
 
   const fetchMessages = useCallback(async () => {
+    // Pause polling when tab is hidden to save credits
+    if (document.hidden) return;
+
     try {
       const res = await fetch(`/api/chat/messages?channel=${channel}`);
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
-      setMessages(data.casts || []);
+      const casts: Cast[] = data.casts || [];
+
+      // Skip re-render if feed hasn't changed (same top cast hash)
+      const topHash = casts[0]?.hash ?? null;
+      if (topHash && topHash === firstHashRef.current) return;
+      firstHashRef.current = topHash;
+
+      setMessages(casts);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load messages');
@@ -27,10 +40,19 @@ export function useChat(channel: string = 'zao') {
   useEffect(() => {
     setLoading(true);
     setMessages([]);
+    firstHashRef.current = null;
     fetchMessages();
-    intervalRef.current = setInterval(fetchMessages, 8000);
+    intervalRef.current = setInterval(fetchMessages, POLL_INTERVAL);
+
+    // Resume polling immediately when tab becomes visible again
+    const handleVisibility = () => {
+      if (!document.hidden) fetchMessages();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [fetchMessages]);
 
@@ -46,6 +68,7 @@ export function useChat(channel: string = 'zao') {
         const data = await res.json();
         throw new Error(data.error || 'Failed to send');
       }
+      firstHashRef.current = null; // force refresh after send
       await fetchMessages();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send');
@@ -62,6 +85,7 @@ export function useChat(channel: string = 'zao') {
       body: JSON.stringify({ castHash, reason }),
     });
     if (!res.ok) throw new Error('Failed to hide message');
+    firstHashRef.current = null;
     await fetchMessages();
   }, [fetchMessages]);
 

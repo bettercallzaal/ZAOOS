@@ -27,6 +27,10 @@ function timeAgo(timestamp: string): string {
   return `${days}d ago`;
 }
 
+function safeHostname(url: string): string {
+  try { return new URL(url).hostname; } catch { return url.slice(0, 40); }
+}
+
 function isImageUrl(url: string, embed?: CastEmbed): boolean {
   const contentType = embed?.metadata?.content_type || '';
   if (contentType.startsWith('image/')) return true;
@@ -97,7 +101,7 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
             {og.ogDescription && (
               <p className="text-xs text-gray-400 mt-1 line-clamp-2">{og.ogDescription}</p>
             )}
-            <p className="text-xs text-gray-600 mt-1 truncate">{new URL(embed.url).hostname}</p>
+            <p className="text-xs text-gray-600 mt-1 truncate">{safeHostname(embed.url)}</p>
           </div>
         )}
       </a>

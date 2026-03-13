@@ -46,8 +46,16 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
     }
 
     fetchThread();
-    const interval = setInterval(fetchThread, 8000);
-    return () => { cancelled = true; clearInterval(interval); };
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchThread();
+    }, 30_000);
+    const handleVisibility = () => { if (!document.hidden) fetchThread(); };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [threadHash]);
 
   useEffect(() => {

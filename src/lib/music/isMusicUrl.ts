@@ -14,6 +14,12 @@ const MUSIC_PATTERNS: { regex: RegExp; type: TrackType }[] = [
   { regex: /zora\.co\/collect\//, type: 'soundxyz' },
   // Audius track: audius.co/artist/track (2 path segments)
   { regex: /audius\.co\/[^/\s]+\/[^/\s]+/, type: 'audius' },
+  // Apple Music: music.apple.com/{country}/album/... or /song/...
+  { regex: /music\.apple\.com\/[^/\s]+\/(album|song)\//, type: 'applemusic' },
+  // Tidal: tidal.com/browse/track/... or tidal.com/track/...
+  { regex: /tidal\.com\/(browse\/)?track\//, type: 'tidal' },
+  // Bandcamp: {artist}.bandcamp.com/track/{track}
+  { regex: /[^/\s]+\.bandcamp\.com\/track\//, type: 'bandcamp' },
   { regex: /^ipfs:\/\//, type: 'audio' },
 ];
 

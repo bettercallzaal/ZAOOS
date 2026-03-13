@@ -47,6 +47,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     registerController('audio', controller);
     registerController('soundxyz', controller);
     registerController('audius', controller);
+    registerController('bandcamp', controller);
 
     return () => {
       audio.pause();
@@ -63,7 +64,8 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     if (!audio) return;
     const { metadata, status } = state;
 
-    if (!metadata || (metadata.type !== 'audio' && metadata.type !== 'soundxyz' && metadata.type !== 'audius')) {
+    const htmlAudioTypes = ['audio', 'soundxyz', 'audius', 'bandcamp'];
+    if (!metadata || !htmlAudioTypes.includes(metadata.type)) {
       // Different type — stop our audio
       if (!audio.paused) {
         audio.pause();

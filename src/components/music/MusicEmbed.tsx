@@ -49,8 +49,16 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
     };
   }, [url, castHash]);
 
+  // Apple Music & Tidal don't have free streaming embeds — open externally
+  const externalOnly = metadata?.type === 'applemusic' || metadata?.type === 'tidal';
+
   const handlePlayPause = () => {
     if (!metadata) return;
+
+    if (externalOnly) {
+      window.open(url, '_blank');
+      return;
+    }
 
     if (isThisPlaying) {
       if (player.isPlaying) player.pause();
@@ -122,13 +130,17 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
         <p className="text-xs text-gray-600 capitalize mt-0.5">{metadata.type}</p>
       </div>
 
-      {/* Play/pause button */}
+      {/* Play/pause or external link button */}
       <button
         onClick={handlePlayPause}
         className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full bg-[#f5a623] text-[#0d1b2a] hover:bg-[#f5b84a] transition-colors"
-        aria-label={isThisPlaying ? 'Pause' : 'Play'}
+        aria-label={externalOnly ? 'Open' : isThisPlaying ? 'Pause' : 'Play'}
       >
-        {player.isLoading && player.metadata?.feedId === castHash ? (
+        {externalOnly ? (
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          </svg>
+        ) : player.isLoading && player.metadata?.feedId === castHash ? (
           <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <circle cx="12" cy="12" r="10" strokeWidth="3" className="opacity-25" />
             <path

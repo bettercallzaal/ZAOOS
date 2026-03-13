@@ -161,12 +161,112 @@ async function fetchAudius(url: string): Promise<TrackMetadata | null> {
   };
 }
 
+async function fetchAppleMusic(url: string): Promise<TrackMetadata | null> {
+  // Apple Music oEmbed API
+  const res = await fetch(
+    `https://music.apple.com/api/v1/oembed?url=${encodeURIComponent(url)}`,
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+  );
+  if (!res.ok) {
+    // Fallback: parse from URL structure
+    // URL format: music.apple.com/{country}/album/{album-name}/{id}?i={trackId}
+    const match = url.match(/\/album\/([^/]+)\//);
+    const albumName = match?.[1]?.replace(/-/g, ' ') ?? '';
+    return {
+      id: makeId(url),
+      type: 'applemusic',
+      trackName: albumName,
+      artistName: '',
+      artworkUrl: '',
+      url,
+      feedId: '',
+    };
+  }
+  const data = await res.json();
+  return {
+    id: makeId(url),
+    type: 'applemusic',
+    trackName: data.title ?? '',
+    artistName: data.author_name ?? '',
+    artworkUrl: data.thumbnail_url ?? '',
+    url,
+    feedId: '',
+  };
+}
+
+async function fetchTidal(url: string): Promise<TrackMetadata | null> {
+  // Tidal oEmbed API
+  const res = await fetch(
+    `https://oembed.tidal.com/?url=${encodeURIComponent(url)}`,
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+  );
+  if (!res.ok) {
+    // Fallback: extract track ID from URL
+    const match = url.match(/track\/(\d+)/);
+    return {
+      id: match?.[1] ?? makeId(url),
+      type: 'tidal',
+      trackName: 'Tidal Track',
+      artistName: '',
+      artworkUrl: '',
+      url,
+      feedId: '',
+    };
+  }
+  const data = await res.json();
+  return {
+    id: makeId(url),
+    type: 'tidal',
+    trackName: data.title ?? '',
+    artistName: data.author_name ?? '',
+    artworkUrl: data.thumbnail_url ?? '',
+    url,
+    feedId: '',
+  };
+}
+
+async function fetchBandcamp(url: string): Promise<TrackMetadata | null> {
+  // Bandcamp oEmbed API
+  const res = await fetch(
+    `https://bandcamp.com/oembed?url=${encodeURIComponent(url)}&format=json`,
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+  );
+  if (!res.ok) {
+    // Fallback: parse from URL
+    // URL format: {artist}.bandcamp.com/track/{track-name}
+    const artistMatch = url.match(/\/\/([^.]+)\.bandcamp/);
+    const trackMatch = url.match(/\/track\/([^/?]+)/);
+    return {
+      id: makeId(url),
+      type: 'bandcamp',
+      trackName: trackMatch?.[1]?.replace(/-/g, ' ') ?? '',
+      artistName: artistMatch?.[1] ?? '',
+      artworkUrl: '',
+      url,
+      feedId: '',
+    };
+  }
+  const data = await res.json();
+  return {
+    id: makeId(url),
+    type: 'bandcamp',
+    trackName: data.title ?? '',
+    artistName: data.author_name ?? '',
+    artworkUrl: data.thumbnail_url ?? '',
+    url,
+    feedId: '',
+  };
+}
+
 const fetchers: Record<TrackType, (url: string) => Promise<TrackMetadata | null>> = {
   spotify: fetchSpotify,
   soundcloud: fetchSoundCloud,
   youtube: fetchYouTube,
   soundxyz: fetchSoundXyz,
   audius: fetchAudius,
+  applemusic: fetchAppleMusic,
+  tidal: fetchTidal,
+  bandcamp: fetchBandcamp,
   audio: async (url) => audioFromUrl(url),
 };
 

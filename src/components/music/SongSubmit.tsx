@@ -129,6 +129,9 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
       youtube: 'YouTube',
       audius: 'Audius',
       soundxyz: 'Sound.xyz',
+      applemusic: 'Apple Music',
+      tidal: 'Tidal',
+      bandcamp: 'Bandcamp',
       audio: 'Audio',
     };
     return labels[type] || type;
@@ -141,6 +144,9 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
       youtube: 'bg-red-500/20 text-red-400',
       audius: 'bg-purple-500/20 text-purple-400',
       soundxyz: 'bg-blue-500/20 text-blue-400',
+      applemusic: 'bg-pink-500/20 text-pink-400',
+      tidal: 'bg-cyan-500/20 text-cyan-400',
+      bandcamp: 'bg-sky-500/20 text-sky-400',
       audio: 'bg-gray-500/20 text-gray-400',
     };
     return colors[type] || 'bg-gray-500/20 text-gray-400';
@@ -235,7 +241,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
           </div>
 
           <p className="text-xs text-gray-600 mt-2">
-            Supported: Spotify, SoundCloud, YouTube, Audius, Sound.xyz, direct audio files
+            Supported: Spotify, Apple Music, SoundCloud, YouTube, Tidal, Bandcamp, Audius, Sound.xyz, direct audio
           </p>
         </div>
 

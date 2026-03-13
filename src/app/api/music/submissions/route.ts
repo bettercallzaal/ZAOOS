@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     const trackType = isMusicUrl(url);
     if (!trackType) {
       return NextResponse.json({
-        error: 'Not a recognized music URL. Supported: Spotify, SoundCloud, YouTube, Audius, Sound.xyz, or direct audio files.',
+        error: 'Not a recognized music URL. Supported: Spotify, Apple Music, SoundCloud, YouTube, Tidal, Bandcamp, Audius, Sound.xyz, or direct audio files.',
       }, { status: 400 });
     }
 

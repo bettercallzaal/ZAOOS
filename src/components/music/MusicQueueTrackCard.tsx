@@ -12,6 +12,9 @@ const PLATFORM_LABELS: Record<TrackType, string> = {
   soundxyz: 'Sound.xyz',
   youtube: 'YouTube',
   audius: 'Audius',
+  applemusic: 'Apple Music',
+  tidal: 'Tidal',
+  bandcamp: 'Bandcamp',
   audio: 'Audio',
 };
 
@@ -21,6 +24,9 @@ const PLATFORM_COLORS: Record<TrackType, string> = {
   soundxyz: 'text-purple-400',
   youtube: 'text-red-400',
   audius: 'text-purple-500',
+  applemusic: 'text-pink-400',
+  tidal: 'text-cyan-400',
+  bandcamp: 'text-sky-400',
   audio: 'text-blue-400',
 };
 

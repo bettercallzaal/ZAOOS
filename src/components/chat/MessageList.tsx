@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useLayoutEffect } from 'react';
 import { Cast, QuotedCastData } from '@/types';
 import { Message } from './Message';
 
@@ -17,28 +17,50 @@ interface MessageListProps {
 }
 
 export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, loading, channelId = 'zao' }: MessageListProps) {
-  const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
-  const initialScrollDoneRef = useRef(false);
+  const prevChannelRef = useRef(channelId);
 
-  // Reset scroll state when channel changes
-  useEffect(() => {
-    prevCountRef.current = 0;
-    initialScrollDoneRef.current = false;
-  }, [channelId]);
+  // Force scroll to bottom helper
+  const scrollToBottom = (instant = true) => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+    if (!instant) return;
+    // Double-tap: scroll again after images/embeds may have loaded
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+  };
 
-  useEffect(() => {
+  // Scroll to bottom on initial load and channel switch
+  useLayoutEffect(() => {
     if (messages.length === 0) return;
 
-    if (!initialScrollDoneRef.current) {
-      bottomRef.current?.scrollIntoView({ behavior: 'instant' });
-      initialScrollDoneRef.current = true;
+    const channelChanged = prevChannelRef.current !== channelId;
+    prevChannelRef.current = channelId;
+
+    if (channelChanged || prevCountRef.current === 0) {
+      // Initial load or channel switch — snap to bottom immediately
+      scrollToBottom(true);
+      // Also after a short delay for lazy-loaded content
+      setTimeout(() => scrollToBottom(true), 100);
+      setTimeout(() => scrollToBottom(true), 500);
     } else if (messages.length > prevCountRef.current) {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+      // New message arrived — smooth scroll
+      const el = containerRef.current;
+      if (el) {
+        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      }
     }
+
     prevCountRef.current = messages.length;
-  }, [messages.length]);
+  }, [messages.length, channelId]);
+
+  // Reset count when channel changes
+  useEffect(() => {
+    prevCountRef.current = 0;
+  }, [channelId]);
 
   if (loading) {
     return (
@@ -72,20 +94,22 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
 
   return (
     <div ref={containerRef} className="flex-1 overflow-y-auto">
-      <div className="py-2">
-        {sorted.map((cast) => (
-          <Message
-            key={cast.hash}
-            cast={cast}
-            isAdmin={isAdmin}
-            currentFid={currentFid}
-            hasSigner={hasSigner}
-            onHide={onHide}
-            onOpenThread={onOpenThread}
-            onQuote={onQuote}
-          />
-        ))}
-        <div ref={bottomRef} />
+      {/* Spacer pushes messages to the bottom when there are few messages */}
+      <div className="min-h-full flex flex-col justify-end">
+        <div className="py-2">
+          {sorted.map((cast) => (
+            <Message
+              key={cast.hash}
+              cast={cast}
+              isAdmin={isAdmin}
+              currentFid={currentFid}
+              hasSigner={hasSigner}
+              onHide={onHide}
+              onOpenThread={onOpenThread}
+              onQuote={onQuote}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

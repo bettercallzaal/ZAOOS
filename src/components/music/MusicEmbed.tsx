@@ -127,7 +127,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
         {metadata.artistName && (
           <p className="text-xs text-gray-400 truncate">{metadata.artistName}</p>
         )}
-        <p className="text-xs text-gray-600 capitalize mt-0.5">{metadata.type}</p>
+        <span className="inline-block text-[10px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded mt-0.5 capitalize">{metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}</span>
       </div>
 
       {/* Play/pause or external link button */}

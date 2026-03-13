@@ -114,8 +114,9 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
           {loading && (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-gray-500 text-sm">Loading thread...</div>
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <div className="w-6 h-6 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+              <p className="text-gray-500 text-sm">Loading thread...</p>
             </div>
           )}
 

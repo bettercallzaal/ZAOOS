@@ -55,18 +55,19 @@ export default function LandingPage() {
   if (checking) {
     return (
       <main className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628] px-6">
-        <Image src="/logo.png" alt="THE ZAO" width={128} height={128} className="mx-auto mb-4 rounded-2xl" priority />
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent">
+        <Image src="/logo.png" alt="THE ZAO" width={128} height={128} className="mx-auto mb-6 rounded-2xl" priority />
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-4">
           THE ZAO
         </h1>
+        <div className="w-6 h-6 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
       </main>
     );
   }
 
   return (
     <main className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628] px-6">
-      <div className="text-center max-w-sm">
-        <Image src="/logo.png" alt="THE ZAO" width={128} height={128} className="mx-auto mb-4 rounded-2xl" priority />
+      <div className="text-center w-full max-w-md">
+        <Image src="/logo.png" alt="THE ZAO" width={128} height={128} className="mx-auto mb-6 rounded-2xl" priority />
         <h1 className="text-5xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2">
           THE ZAO
         </h1>

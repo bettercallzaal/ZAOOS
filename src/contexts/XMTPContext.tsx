@@ -78,15 +78,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const msgAbortRef = useRef<AbortController | null>(null);
   // Track which wallet owns the active conversation
   const activeConvWalletRef = useRef<string | null>(null);
-  // Cache of allowlist members (address → profile) for resolving XMTP peers
-  const membersByAddrRef = useRef<Map<string, { fid: number; username: string; displayName: string; pfpUrl: string }>>(new Map());
 
   /**
    * Load and merge conversations from all connected wallet clients
    */
   const loadAllConversations = useCallback(async () => {
-    const { getPeerProfiles, savePeerProfile, saveMemberProfile } = await import('@/lib/xmtp/client');
+    const { getPeerProfiles, getMemberProfiles, savePeerProfile } = await import('@/lib/xmtp/client');
     const peerProfiles = getPeerProfiles();
+    const memberProfiles = getMemberProfiles();
     const allMapped: XMTPConversation[] = [];
 
     for (const [address, wc] of walletsRef.current.entries()) {
@@ -102,48 +101,26 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             const lastContent = lastMsg?.content;
             const group = conv as Group;
 
-            // Resolve peer profile for DMs
+            // Resolve peer profile for DMs using two strategies:
+            // 1. Check stored peer profiles (set when creating DMs through our UI)
+            // 2. Look up peer inbox ID in member profiles (set during checkZaoMembers)
             let peer = isDm ? peerProfiles[conv.id] : undefined;
 
-            // If no stored profile, try to resolve from conversation members + allowlist cache
-            if (isDm && !peer && membersByAddrRef.current.size > 0) {
+            if (isDm && !peer) {
               try {
-                const members = await conv.members();
-                const myInboxId = wc.client.inboxId;
-                for (const m of members) {
-                  if (m.inboxId === myInboxId) continue;
-                  const addrs = (m.accountIdentifiers ?? []).map((id: { identifier: string }) => id.identifier.toLowerCase());
-                  for (const a of addrs) {
-                    const match = membersByAddrRef.current.get(a);
-                    if (match) {
-                      peer = match;
-                      // Persist so we don't re-resolve
-                      savePeerProfile(conv.id, match);
-                      saveMemberProfile(m.inboxId, match);
-                      break;
-                    }
+                const peerInboxId = await (conv as Dm).peerInboxId();
+                if (peerInboxId) {
+                  const memberMatch = memberProfiles[peerInboxId];
+                  if (memberMatch) {
+                    peer = memberMatch;
+                    // Persist so we don't re-resolve next time
+                    savePeerProfile(conv.id, memberMatch);
                   }
-                  if (peer) break;
                 }
               } catch { /* non-critical */ }
             }
 
-            // For groups, also resolve members we haven't seen before
-            if (!isDm && membersByAddrRef.current.size > 0) {
-              try {
-                const members = await conv.members();
-                for (const m of members) {
-                  const addrs = (m.accountIdentifiers ?? []).map((id: { identifier: string }) => id.identifier.toLowerCase());
-                  for (const a of addrs) {
-                    const match = membersByAddrRef.current.get(a);
-                    if (match && m.inboxId) {
-                      saveMemberProfile(m.inboxId, match);
-                      break;
-                    }
-                  }
-                }
-              } catch { /* non-critical */ }
-            }
+            const peerInboxId = isDm ? await (conv as Dm).peerInboxId().catch(() => undefined) : undefined;
 
             return {
               id: conv.id,
@@ -151,7 +128,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
               name: (!isDm && group.name) ? group.name : (isDm && peer ? peer.displayName || `@${peer.username}` : isDm ? 'Direct Message' : 'Group'),
               imageUrl: (!isDm && group.imageUrl) ? group.imageUrl : undefined,
               description: (!isDm && group.description) ? group.description : undefined,
-              peerInboxId: isDm ? await (conv as Dm).peerInboxId() : undefined,
+              peerInboxId,
               peerDisplayName: peer ? (peer.displayName || `@${peer.username}`) : undefined,
               peerPfpUrl: peer?.pfpUrl || undefined,
               lastMessage: typeof lastContent === 'string' ? lastContent : undefined,
@@ -190,16 +167,6 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch('/api/members');
       if (!res.ok) return;
       const { members, currentFid } = await res.json();
-
-      // Build address → profile lookup for conversation resolution
-      const addrMap = new Map<string, { fid: number; username: string; displayName: string; pfpUrl: string }>();
-      for (const m of members) {
-        const profile = { fid: m.fid ?? 0, username: m.username ?? m.displayName, displayName: m.displayName, pfpUrl: m.pfpUrl ?? '' };
-        for (const addr of m.addresses) {
-          addrMap.set(addr.toLowerCase(), profile);
-        }
-      }
-      membersByAddrRef.current = addrMap;
 
       // Collect all unique addresses to check
       const allAddresses: string[] = [];
@@ -255,7 +222,36 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
       setZaoMembers(mapped);
 
-      // Reload conversations now that we have member profiles to resolve against
+      // Resolve XMTP inbox IDs for reachable members so we can match DM peers
+      // This is the KEY step — XMTP local keys don't match Farcaster addresses,
+      // so we must map Farcaster address → XMTP inbox ID → profile
+      const reachableMembersForInbox = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
+      if (reachableMembersForInbox.length > 0) {
+        try {
+          const { IdentifierKind } = await import('@xmtp/browser-sdk');
+          const { saveMemberProfile } = await import('@/lib/xmtp/client');
+          for (const m of reachableMembersForInbox) {
+            try {
+              const inboxId = await xmtpClient.fetchInboxIdByIdentifier({
+                identifierKind: IdentifierKind.Ethereum,
+                identifier: m.addresses[0],
+              });
+              if (inboxId) {
+                saveMemberProfile(inboxId, {
+                  fid: m.fid ?? 0,
+                  username: m.username ?? m.displayName,
+                  displayName: m.displayName,
+                  pfpUrl: m.pfpUrl ?? '',
+                });
+              }
+            } catch { /* skip individual failures */ }
+          }
+        } catch (err) {
+          console.error('Inbox ID resolution failed:', err);
+        }
+      }
+
+      // Reload conversations now that we have inbox ID → profile mappings
       await loadAllConversations();
 
       // Auto-create "ZAO General" group if none exists yet

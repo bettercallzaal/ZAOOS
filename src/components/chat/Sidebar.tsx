@@ -121,37 +121,40 @@ export function Sidebar({
             <button
               onClick={onXmtpConnect}
               disabled={xmtpConnecting}
-              className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors disabled:opacity-50"
+              className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/20 text-sm transition-colors hover:bg-[#f5a623]/10 disabled:opacity-50"
             >
               {xmtpConnecting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin flex-shrink-0" />
-                  <span className="text-xs">Connecting...</span>
+                  <span className="text-xs text-gray-400">Setting up...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                  <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                   </svg>
-                  <span className="text-xs">Enable Messaging</span>
+                  <div className="text-left">
+                    <p className="text-xs text-[#f5a623] font-medium">Enable Messaging</p>
+                    <p className="text-[10px] text-gray-500">Encrypted DMs & groups</p>
+                  </div>
                 </>
               )}
             </button>
           ) : xmtpConversations.length === 0 ? (
             <p className="px-3 text-xs text-gray-600">No conversations yet</p>
           ) : (
-            <div className="space-y-0.5 max-h-48 overflow-y-auto">
+            <div className="space-y-0.5 max-h-60 overflow-y-auto">
               {xmtpConversations.map((conv) => (
                 <button
                   key={conv.id}
                   onClick={() => onConversationSelect(conv.id)}
-                  className={`flex items-center gap-2 w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                  className={`flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-md transition-colors ${
                     activeConversationId === conv.id
-                      ? 'bg-[#f5a623]/10 text-[#f5a623] font-medium'
+                      ? 'bg-[#f5a623]/10 text-[#f5a623]'
                       : 'text-gray-400 hover:bg-white/5 hover:text-white'
                   }`}
                 >
-                  <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
                     {conv.type === 'group' ? (
                       <svg className="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
@@ -163,11 +166,16 @@ export function Sidebar({
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs truncate">{conv.peerDisplayName || conv.name}</p>
+                    <div className="flex items-center justify-between gap-1">
+                      <p className="text-xs font-medium truncate">{conv.peerDisplayName || conv.name}</p>
+                      {conv.lastMessageAt && (
+                        <span className="text-[10px] text-gray-600 flex-shrink-0">{timeAgo(conv.lastMessageAt)}</span>
+                      )}
+                    </div>
+                    {conv.lastMessage && (
+                      <p className="text-[10px] text-gray-600 truncate mt-0.5">{conv.lastMessage}</p>
+                    )}
                   </div>
-                  {conv.lastMessageAt && (
-                    <span className="text-[10px] text-gray-600 flex-shrink-0">{timeAgo(conv.lastMessageAt)}</span>
-                  )}
                 </button>
               ))}
             </div>

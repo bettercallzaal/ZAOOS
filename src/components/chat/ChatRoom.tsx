@@ -155,10 +155,26 @@ export function ChatRoom() {
             )}
 
             {viewMode === 'xmtp' ? (
-              <h2 className="font-semibold text-sm text-gray-300 flex-1 truncate">
-                {activeXmtpConversation?.type === 'group' && <span className="text-gray-500 mr-1">#</span>}
-                {activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || 'Message'}
-              </h2>
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <button
+                  onClick={() => xmtp.selectConversation(null)}
+                  className="text-gray-500 hover:text-white transition-colors flex-shrink-0"
+                  title="Back to channel"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
+                <h2 className="font-semibold text-sm text-gray-300 truncate">
+                  {activeXmtpConversation?.type === 'group' && <span className="text-gray-500 mr-1">#</span>}
+                  {activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || 'Message'}
+                </h2>
+                <span title="End-to-end encrypted" className="flex-shrink-0">
+                  <svg className="w-3.5 h-3.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                  </svg>
+                </span>
+              </div>
             ) : (
               <h2 className="font-semibold text-sm text-gray-300 flex-1"># {activeChannel}</h2>
             )}
@@ -230,7 +246,6 @@ export function ChatRoom() {
                 conversation={activeXmtpConversation}
                 messages={xmtp.messages}
                 loading={xmtp.loadingMessages}
-                onBack={isMobile ? () => xmtp.selectConversation(null) : undefined}
               />
               {activeXmtpConversation && (
                 <MessageCompose

@@ -111,7 +111,6 @@ export function MessagesRoom() {
             conversation={activeConversation}
             messages={messages}
             loading={loadingMessages}
-            onBack={isMobile ? () => selectConversation(null) : undefined}
           />
           {activeConversation && (
             <MessageCompose

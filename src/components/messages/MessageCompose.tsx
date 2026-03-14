@@ -39,7 +39,7 @@ export function MessageCompose({ onSend, disabled, placeholder }: MessageCompose
   };
 
   return (
-    <div className="flex-shrink-0 border-t border-gray-800 bg-[#0d1b2a] p-3">
+    <div className="flex-shrink-0 border-t border-gray-800 bg-[#0d1b2a] px-4 py-3">
       <div className="flex items-end gap-2">
         <textarea
           ref={inputRef}

@@ -88,6 +88,17 @@ export function ChatRoom() {
     [messages, contentFilter, sortMode],
   );
 
+  // Auto-reconnect XMTP if previously connected
+  useEffect(() => {
+    if (!user || xmtp.isConnected || xmtp.isConnecting) return;
+    const wallets = typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('zaoos-xmtp-wallets') || '[]')
+      : [];
+    if (wallets.length > 0) {
+      xmtp.autoConnect(user.fid);
+    }
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Reset filters on channel switch
   useEffect(() => {
     setContentFilter('all');

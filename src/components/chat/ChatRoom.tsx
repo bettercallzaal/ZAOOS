@@ -16,6 +16,7 @@ import { SignerConnect } from './SignerConnect';
 import { SearchDialog } from './SearchDialog';
 import { SchedulePanel } from './SchedulePanel';
 import { FaqPanel } from './FaqPanel';
+import { RespectPanel } from './RespectPanel';
 import { TutorialPanel } from './TutorialPanel';
 import { ProfileDrawer } from './ProfileDrawer';
 import { MessageThread } from '@/components/messages/MessageThread';
@@ -43,6 +44,7 @@ export function ChatRoom() {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [respectOpen, setRespectOpen] = useState(false);
   const [profileFid, setProfileFid] = useState<number | null>(null);
   const [dmDialogType, setDmDialogType] = useState<'dm' | 'group' | null>(null);
   const [contentFilter, setContentFilter] = useState<ContentFilter>('all');
@@ -111,6 +113,7 @@ export function ChatRoom() {
     onFocusCompose: () => composeRef.current?.focus(),
     onClosePanels: () => {
       if (profileFid) { setProfileFid(null); return; }
+      if (respectOpen) { setRespectOpen(false); return; }
       if (faqOpen) { setFaqOpen(false); return; }
       if (tutorialOpen) { setTutorialOpen(false); return; }
       if (searchOpen) { setSearchOpen(false); return; }
@@ -122,7 +125,7 @@ export function ChatRoom() {
     },
     onToggleSidebar: () => setSidebarOpen((o) => !o),
     onToggleMusic: () => setMusicSidebarOpen((o) => !o),
-  }), [profileFid, faqOpen, tutorialOpen, searchOpen, selectedThreadHash, musicSidebarOpen, songSubmitOpen, scheduleOpen, sidebarOpen]);
+  }), [profileFid, respectOpen, faqOpen, tutorialOpen, searchOpen, selectedThreadHash, musicSidebarOpen, songSubmitOpen, scheduleOpen, sidebarOpen]);
 
   useKeyboardShortcuts(shortcutHandlers);
 
@@ -153,6 +156,7 @@ export function ChatRoom() {
         onChannelSelect={handleChannelSelect}
         onOpenFaq={() => { setFaqOpen(true); setSidebarOpen(false); }}
         onOpenTutorial={() => { setTutorialOpen(true); setSidebarOpen(false); }}
+        onOpenRespect={() => { setRespectOpen(true); setSidebarOpen(false); }}
         xmtpConnected={xmtp.isConnected}
         xmtpConnecting={xmtp.isConnecting}
         xmtpConversations={xmtp.conversations}
@@ -406,6 +410,7 @@ export function ChatRoom() {
 
       {/* FAQ Panel */}
       <FaqPanel isOpen={faqOpen} onClose={() => setFaqOpen(false)} />
+      <RespectPanel isOpen={respectOpen} onClose={() => setRespectOpen(false)} />
 
       {/* Tutorial Panel */}
       <TutorialPanel isOpen={tutorialOpen} onClose={() => setTutorialOpen(false)} />

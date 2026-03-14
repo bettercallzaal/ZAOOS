@@ -109,13 +109,11 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             if (isDm && !peer) {
               try {
                 const peerInboxId = await (conv as Dm).peerInboxId();
-                if (peerInboxId) {
-                  const memberMatch = memberProfiles[peerInboxId];
-                  if (memberMatch) {
-                    peer = memberMatch;
-                    // Persist so we don't re-resolve next time
-                    savePeerProfile(conv.id, memberMatch);
-                  }
+                const memberMatch = peerInboxId ? memberProfiles[peerInboxId] : undefined;
+                console.log(`[XMTP] DM ${conv.id.slice(0, 8)}: peerInboxId=${peerInboxId?.slice(0, 12) || 'null'}, match=${memberMatch?.displayName || 'none'}, pfp=${!!memberMatch?.pfpUrl}`);
+                if (peerInboxId && memberMatch) {
+                  peer = memberMatch;
+                  savePeerProfile(conv.id, memberMatch);
                 }
               } catch { /* non-critical */ }
             }
@@ -155,7 +153,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /**
-   * Check which ZAO allowlist members are reachable via XMTP
+   * Check which Farcaster follows + ZAO members are reachable via XMTP
    */
   const checkZaoMembers = useCallback(async () => {
     const client = walletsRef.current.values().next();
@@ -164,18 +162,52 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
     setLoadingMembers(true);
     try {
-      const res = await fetch('/api/members');
-      if (!res.ok) return;
-      const { members, currentFid } = await res.json();
+      // Fetch both ZAO members and Farcaster follows in parallel
+      const [membersRes, followsRes] = await Promise.all([
+        fetch('/api/members'),
+        fetch('/api/following/online'),
+      ]);
+
+      const zaoData = membersRes.ok ? await membersRes.json() : { members: [], currentFid: 0 };
+      const followsData = followsRes.ok ? await followsRes.json() : { members: [], currentFid: 0 };
+      const currentFid = zaoData.currentFid || followsData.currentFid;
+
+      // Merge: follows take priority (they have Neynar pfps), ZAO members fill gaps
+      const byFid = new Map<number, { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[]; isZaoMember: boolean }>();
+
+      // Add follows first (they have reliable pfps from Neynar)
+      for (const m of followsData.members || []) {
+        if (m.fid && m.fid !== currentFid) {
+          byFid.set(m.fid, { ...m, isZaoMember: false });
+        }
+      }
+
+      // Add/enrich with ZAO members (may have additional addresses)
+      for (const m of zaoData.members || []) {
+        if (m.fid === currentFid) continue;
+        const existing = m.fid ? byFid.get(m.fid) : undefined;
+        if (existing) {
+          // Merge addresses, prefer follows pfp
+          const addrs = new Set([...existing.addresses, ...m.addresses]);
+          existing.addresses = [...addrs];
+          existing.isZaoMember = true;
+          // If follows data missing pfp, use ZAO data
+          if (!existing.pfpUrl && m.pfpUrl) existing.pfpUrl = m.pfpUrl;
+        } else {
+          // ZAO-only member (not followed)
+          const key = m.fid || -(byFid.size + 1);
+          byFid.set(key, { ...m, isZaoMember: true });
+        }
+      }
+
+      const merged = Array.from(byFid.values());
 
       // Collect all unique addresses to check
       const allAddresses: string[] = [];
       const addrToMemberIdx = new Map<string, number>();
 
-      for (let i = 0; i < members.length; i++) {
-        // Skip self
-        if (members[i].fid === currentFid) continue;
-        for (const addr of members[i].addresses) {
+      for (let i = 0; i < merged.length; i++) {
+        for (const addr of merged[i].addresses) {
           const normalized = addr.toLowerCase();
           if (!addrToMemberIdx.has(normalized)) {
             allAddresses.push(normalized);
@@ -185,7 +217,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Batch canMessage check
-      let reachableSet = new Set<number>(); // indices of reachable members
+      const reachableSet = new Set<number>();
       if (allAddresses.length > 0) {
         try {
           const { IdentifierKind } = await import('@xmtp/browser-sdk');
@@ -205,14 +237,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      const mapped: ZaoMember[] = members
-        .filter((_: unknown, i: number) => {
-          // Keep all non-self members
-          return members[i].fid !== currentFid;
-        })
-        .map((m: { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[] }, origIdx: number) => ({
-          ...m,
-          reachable: reachableSet.has(origIdx),
+      const mapped: ZaoMember[] = merged
+        .map((m, idx) => ({
+          fid: m.fid,
+          username: m.username,
+          displayName: m.displayName,
+          pfpUrl: m.pfpUrl,
+          addresses: m.addresses,
+          reachable: reachableSet.has(idx),
         }))
         // Sort: reachable first, then alphabetical
         .sort((a: ZaoMember, b: ZaoMember) => {
@@ -221,6 +253,15 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         });
 
       setZaoMembers(mapped);
+
+      // Debug: log reachable members and their pfp status
+      const reachable = mapped.filter((m: ZaoMember) => m.reachable);
+      console.log(`[XMTP] ${reachable.length} reachable peers:`, reachable.map((m: ZaoMember) => ({
+        name: m.displayName,
+        fid: m.fid,
+        hasPfp: !!m.pfpUrl,
+        addrs: m.addresses.length,
+      })));
 
       // Resolve XMTP inbox IDs for reachable members so we can match DM peers
       // This is the KEY step — XMTP local keys don't match Farcaster addresses,
@@ -236,6 +277,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
                 identifierKind: IdentifierKind.Ethereum,
                 identifier: m.addresses[0],
               });
+              console.log(`[XMTP] ${m.displayName}: inboxId=${inboxId ? inboxId.slice(0, 12) + '...' : 'null'}, pfp=${!!m.pfpUrl}`);
               if (inboxId) {
                 saveMemberProfile(inboxId, {
                   fid: m.fid ?? 0,
@@ -244,7 +286,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
                   pfpUrl: m.pfpUrl ?? '',
                 });
               }
-            } catch { /* skip individual failures */ }
+            } catch (err) { console.warn(`[XMTP] inbox resolve failed for ${m.displayName}:`, err); }
           }
         } catch (err) {
           console.error('Inbox ID resolution failed:', err);

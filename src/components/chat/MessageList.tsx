@@ -95,7 +95,7 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
   const sorted = [...messages].reverse();
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-y-auto">
+    <div ref={containerRef} className="flex-1 overflow-y-auto" style={{ overflowAnchor: 'none' }}>
       {/* Spacer pushes messages to the bottom when there are few messages */}
       <div className="min-h-full flex flex-col justify-end">
         <div className="py-2">
@@ -115,6 +115,8 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
           ))}
         </div>
       </div>
+      {/* Scroll anchor — browser keeps this element visible as content above expands */}
+      <div style={{ overflowAnchor: 'auto', height: '1px' }} />
     </div>
   );
 }

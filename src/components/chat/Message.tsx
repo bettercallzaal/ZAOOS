@@ -67,12 +67,18 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
   if (isImageUrl(embed.url, embed)) {
     return (
       <a href={embed.url} target="_blank" rel="noopener noreferrer" className="block mt-2">
-        <img
-          src={embed.url}
-          alt=""
-          className="rounded-lg max-w-full max-h-80 object-cover"
-          loading="lazy"
-        />
+        <div className="rounded-lg overflow-hidden max-w-sm bg-gray-800/50" style={{ minHeight: '120px' }}>
+          <img
+            src={embed.url}
+            alt=""
+            className="rounded-lg max-w-full max-h-80 object-cover"
+            loading="lazy"
+            onLoad={(e) => {
+              const container = (e.target as HTMLImageElement).parentElement;
+              if (container) container.style.minHeight = '0';
+            }}
+          />
+        </div>
       </a>
     );
   }
@@ -98,12 +104,18 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
         className="block mt-2 rounded-lg border border-gray-700 overflow-hidden hover:border-gray-600 transition-colors"
       >
         {og.ogImage?.[0]?.url && (
-          <img
-            src={og.ogImage[0].url}
-            alt=""
-            className="w-full max-h-48 object-cover"
-            loading="lazy"
-          />
+          <div className="w-full bg-gray-800/50" style={{ minHeight: '100px' }}>
+            <img
+              src={og.ogImage[0].url}
+              alt=""
+              className="w-full max-h-48 object-cover"
+              loading="lazy"
+              onLoad={(e) => {
+                const container = (e.target as HTMLImageElement).parentElement;
+                if (container) container.style.minHeight = '0';
+              }}
+            />
+          </div>
         )}
         {(og.ogTitle || og.ogDescription) && (
           <div className="p-3 bg-[#0d1b2a]">

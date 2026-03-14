@@ -89,6 +89,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   // In-memory last message cache (avoids calling lastMessage() per conversation)
   const lastMessagesRef = useRef<Map<string, { content: string; sentAt: Date }>>(new Map());
 
+  // Unread message counts per conversation
+  const unreadCountsRef = useRef<Map<string, number>>(new Map());
+
   /**
    * Load conversations from all connected clients.
    * Does NOT call lastMessage() — uses in-memory cache instead.
@@ -140,7 +143,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
               peerPfpUrl: peer?.pfpUrl || undefined,
               lastMessage: cached?.content,
               lastMessageAt: cached?.sentAt,
-              unreadCount: 0,
+              unreadCount: unreadCountsRef.current.get(conv.id) || 0,
               walletAddress: address,
             } as XMTPConversation;
           })
@@ -217,12 +220,23 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
           sentAt: msg.sentAt,
         });
 
-        // Update sidebar
+        // Track unread counts for non-active conversations
+        if (!isFromMe && conversationId !== activeConvIdRef.current) {
+          const current = unreadCountsRef.current.get(conversationId) || 0;
+          unreadCountsRef.current.set(conversationId, current + 1);
+        }
+
+        // Update sidebar with last message + unread count
         setConversations((prev) =>
           prev
             .map((c) =>
               c.id === conversationId
-                ? { ...c, lastMessage: content, lastMessageAt: msg.sentAt }
+                ? {
+                    ...c,
+                    lastMessage: content,
+                    lastMessageAt: msg.sentAt,
+                    unreadCount: unreadCountsRef.current.get(conversationId) || 0,
+                  }
                 : c
             )
             .sort((a, b) => {
@@ -560,6 +574,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const selectConversation = useCallback(async (id: string | null) => {
     setActiveConversationId(id);
     activeConvIdRef.current = id;
+
+    // Clear unread count for selected conversation
+    if (id) {
+      unreadCountsRef.current.set(id, 0);
+      setConversations((prev) =>
+        prev.map((c) => c.id === id ? { ...c, unreadCount: 0 } : c)
+      );
+    }
 
     if (!id) {
       setMessages([]);

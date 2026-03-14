@@ -183,13 +183,24 @@ export function Sidebar({
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
-                      <p className="text-xs font-medium truncate">{conv.peerDisplayName || conv.name}</p>
-                      {conv.lastMessageAt && (
-                        <span className="text-[10px] text-gray-600 flex-shrink-0">{timeAgo(conv.lastMessageAt)}</span>
-                      )}
+                      <p className={`text-xs font-medium truncate ${conv.unreadCount > 0 ? 'text-white' : ''}`}>
+                        {conv.peerDisplayName || conv.name}
+                      </p>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        {conv.unreadCount > 0 && (
+                          <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#f5a623] text-[10px] font-bold text-black flex items-center justify-center">
+                            {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                          </span>
+                        )}
+                        {conv.lastMessageAt && (
+                          <span className="text-[10px] text-gray-600">{timeAgo(conv.lastMessageAt)}</span>
+                        )}
+                      </div>
                     </div>
                     {conv.lastMessage && (
-                      <p className="text-[10px] text-gray-600 truncate mt-0.5">{conv.lastMessage}</p>
+                      <p className={`text-[10px] truncate mt-0.5 ${conv.unreadCount > 0 ? 'text-gray-300' : 'text-gray-600'}`}>
+                        {conv.lastMessage}
+                      </p>
                     )}
                   </div>
                 </button>

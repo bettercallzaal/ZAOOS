@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useMobile } from '@/hooks/useMobile';
@@ -198,8 +199,25 @@ export function ChatRoom() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                   </svg>
                 </button>
+                {activeXmtpConversation?.peerPfpUrl ? (
+                  <div className="w-7 h-7 relative flex-shrink-0">
+                    <Image
+                      src={activeXmtpConversation.peerPfpUrl}
+                      alt=""
+                      fill
+                      className="rounded-full object-cover"
+                      unoptimized
+                    />
+                  </div>
+                ) : activeXmtpConversation?.type === 'group' ? (
+                  <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
+                    </svg>
+                  </div>
+                ) : null}
                 <h2 className="font-semibold text-sm text-gray-300 truncate">
-                  {activeXmtpConversation?.type === 'group' && <span className="text-gray-500 mr-1">#</span>}
+                  {activeXmtpConversation?.type === 'group' && !activeXmtpConversation?.peerPfpUrl && <span className="text-gray-500 mr-1">#</span>}
                   {activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || 'Message'}
                 </h2>
                 <span title="End-to-end encrypted" className="flex-shrink-0">

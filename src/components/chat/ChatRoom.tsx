@@ -189,18 +189,18 @@ export function ChatRoom() {
             )}
 
             {viewMode === 'xmtp' ? (
-              <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
                 <button
                   onClick={() => xmtp.selectConversation(null)}
-                  className="text-gray-500 hover:text-white transition-colors flex-shrink-0"
+                  className="text-gray-400 hover:text-white transition-colors flex-shrink-0 -ml-1 p-1 rounded-lg hover:bg-white/5"
                   title="Back to channel"
                 >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                   </svg>
                 </button>
                 {activeXmtpConversation?.peerPfpUrl ? (
-                  <div className="w-7 h-7 relative flex-shrink-0">
+                  <div className="w-8 h-8 relative flex-shrink-0">
                     <Image
                       src={activeXmtpConversation.peerPfpUrl}
                       alt=""
@@ -210,21 +210,31 @@ export function ChatRoom() {
                     />
                   </div>
                 ) : activeXmtpConversation?.type === 'group' ? (
-                  <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="w-8 h-8 rounded-lg bg-[#f5a623]/15 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
                     </svg>
                   </div>
-                ) : null}
-                <h2 className="font-semibold text-sm text-gray-300 truncate">
-                  {activeXmtpConversation?.type === 'group' && !activeXmtpConversation?.peerPfpUrl && <span className="text-gray-500 mr-1">#</span>}
-                  {activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || 'Message'}
-                </h2>
-                <span title="End-to-end encrypted" className="flex-shrink-0">
-                  <svg className="w-3.5 h-3.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                  </svg>
-                </span>
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0 border border-[#f5a623]/10">
+                    <span className="text-xs text-[#f5a623]/80 font-semibold">
+                      {(activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || '?')[0]?.toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <h2 className="font-semibold text-sm text-white truncate">
+                    {activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || 'Message'}
+                  </h2>
+                  <div className="flex items-center gap-1">
+                    <svg className="w-2.5 h-2.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                    </svg>
+                    <span className="text-[10px] text-gray-500">
+                      {activeXmtpConversation?.type === 'group' ? 'Encrypted group' : 'Encrypted'}
+                    </span>
+                  </div>
+                </div>
               </div>
             ) : (
               <h2 className="font-semibold text-sm text-gray-300 flex-1"># {activeChannel}</h2>

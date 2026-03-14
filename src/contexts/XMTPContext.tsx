@@ -116,18 +116,20 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             // Resolve peer profile for DMs
             let peer = isDm ? peerProfiles[conv.id] : undefined;
 
-            if (isDm && !peer) {
+            let peerInboxId: string | undefined;
+            if (isDm) {
               try {
-                const peerInboxId = await (conv as Dm).peerInboxId();
-                const memberMatch = peerInboxId ? memberProfiles[peerInboxId] : undefined;
-                if (peerInboxId && memberMatch) {
-                  peer = memberMatch;
-                  savePeerProfile(conv.id, memberMatch);
-                }
+                peerInboxId = await (conv as Dm).peerInboxId();
               } catch { /* non-critical */ }
             }
 
-            const peerInboxId = isDm ? await (conv as Dm).peerInboxId().catch(() => undefined) : undefined;
+            if (isDm && !peer && peerInboxId) {
+              const memberMatch = memberProfiles[peerInboxId];
+              if (memberMatch) {
+                peer = memberMatch;
+                savePeerProfile(conv.id, memberMatch);
+              }
+            }
 
             // Use cached last message instead of fetching from DB
             const cached = lastMessagesRef.current.get(conv.id);

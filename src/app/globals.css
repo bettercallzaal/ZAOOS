@@ -67,6 +67,9 @@ body {
 .animate-slide-in {
   animation: slide-in-right 0.2s ease-out;
 }
+.animate-slide-in-right {
+  animation: slide-in-right 0.2s ease-out;
+}
 
 /* Music sidebar slide-in from right (desktop) */
 @keyframes slide-in-left {
@@ -84,6 +87,31 @@ body {
 }
 .animate-slide-up {
   animation: slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in,
+  .animate-slide-in-right,
+  .animate-slide-in-left,
+  .animate-slide-up,
+  .animate-fade-in,
+  .animate-spin {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Hide SIWF default styling overrides */

@@ -1,9 +1,11 @@
+import { ENV } from '@/lib/env';
+
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
 function headers() {
   return {
     'Content-Type': 'application/json',
-    'x-api-key': process.env.NEYNAR_API_KEY!,
+    'x-api-key': ENV.NEYNAR_API_KEY,
   };
 }
 

@@ -3,6 +3,7 @@ import { createClient } from '@farcaster/quick-auth';
 import { checkAllowlist } from '@/lib/gates/allowlist';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { saveSession } from '@/lib/auth/session';
+import { ENV } from '@/lib/env';
 
 const quickAuthClient = createClient();
 
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
   try {
     // Use production domain for JWT verification — QuickAuth JWTs are tied
     // to the domain in the Farcaster manifest (zaoos.com), not the request host
-    const domain = process.env.NEXT_PUBLIC_SIWF_DOMAIN || 'zaoos.com';
+    const domain = ENV.NEXT_PUBLIC_SIWF_DOMAIN || 'zaoos.com';
 
     const payload = await quickAuthClient.verifyJwt({
       token,

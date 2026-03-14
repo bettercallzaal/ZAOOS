@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
+import { ENV } from '@/lib/env';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.NEYNAR_API_KEY!,
+        'x-api-key': ENV.NEYNAR_API_KEY,
       },
       body: JSON.stringify({
         signer_uuid: session.signerUuid,
@@ -66,7 +67,7 @@ export async function DELETE(req: NextRequest) {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.NEYNAR_API_KEY!,
+        'x-api-key': ENV.NEYNAR_API_KEY,
       },
       body: JSON.stringify({
         signer_uuid: session.signerUuid,

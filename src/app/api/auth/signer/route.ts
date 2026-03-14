@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getSession, getSessionData } from '@/lib/auth/session';
+import { getSessionData } from '@/lib/auth/session';
 import { createSigner, registerSignedKey } from '@/lib/farcaster/neynar';
 import { createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
+import { ENV } from '@/lib/env';
 
 // SECURITY: This uses the APP's signer wallet (APP_SIGNER_PRIVATE_KEY),
 // NOT any user's personal wallet. This key was auto-generated at project
@@ -25,13 +26,6 @@ export async function POST() {
     return NextResponse.json({ signerUuid: sessionData.signerUuid, status: 'approved' });
   }
 
-  if (!process.env.APP_SIGNER_PRIVATE_KEY) {
-    return NextResponse.json(
-      { error: 'Managed signer not configured. APP_SIGNER_PRIVATE_KEY is missing from environment.' },
-      { status: 503 }
-    );
-  }
-
   try {
     // Step 1: Create a managed signer
     const signer = await createSigner();
@@ -39,10 +33,10 @@ export async function POST() {
     const publicKey = signer.public_key;
 
     // Step 2: Sign with app wallet to register the key
-    const appFid = parseInt(process.env.APP_FID!);
+    const appFid = parseInt(ENV.APP_FID);
     const deadline = Math.floor(Date.now() / 1000) + 86400; // 24 hours
 
-    const account = privateKeyToAccount(process.env.APP_SIGNER_PRIVATE_KEY! as `0x${string}`);
+    const account = privateKeyToAccount(ENV.APP_SIGNER_PRIVATE_KEY as `0x${string}`);
     const walletClient = createWalletClient({
       account,
       chain: optimism,

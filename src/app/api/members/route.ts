@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { ENV } from '@/lib/env';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -42,7 +43,7 @@ export async function GET() {
         const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${batch.join(',')}`, {
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': process.env.NEYNAR_API_KEY!,
+            'x-api-key': ENV.NEYNAR_API_KEY,
           },
         });
         if (res.ok) {

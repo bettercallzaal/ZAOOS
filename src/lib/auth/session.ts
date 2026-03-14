@@ -1,6 +1,7 @@
 import { getIronSession, IronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import { SessionData } from '@/types';
+import { ENV } from '@/lib/env';
 
 const ADMIN_FIDS = [19640];
 
@@ -14,7 +15,7 @@ export interface SessionPayload {
 }
 
 const sessionOptions = {
-  password: process.env.SESSION_SECRET!,
+  password: ENV.SESSION_SECRET,
   cookieName: 'zaoos_session',
   cookieOptions: {
     secure: process.env.NODE_ENV === 'production',

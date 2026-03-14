@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { ENV } from '@/lib/env';
 
 const WATCHED_CHANNELS = ['zao', 'zabal', 'coc'];
 
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
   // Verify HMAC-SHA512 signature when secret is configured
-  const secret = process.env.NEYNAR_WEBHOOK_SECRET;
+  const secret = ENV.NEYNAR_WEBHOOK_SECRET;
   if (secret) {
     const sig = req.headers.get('X-Neynar-Signature') ?? '';
     const expected = crypto.createHmac('sha512', secret).update(rawBody).digest('hex');

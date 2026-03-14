@@ -436,28 +436,6 @@ See the full **[Research Hub](./research/)** for the complete index with summari
 
 ZAO OS is building toward a future where **artists keep their revenue, curators earn for their taste, and the community owns its social graph.**
 
-### The Problem
-
-Artists earn $0.003-0.005 per Spotify stream. They don't own their data, audience relationships, or IP. Platforms extract value without sharing.
-
-### The ZAO Flywheel
-
-```
-Artists release music on ZAO
-        ↓
-Community curates (share, upvote, recommend)
-        ↓
-Curators earn Respect tokens (soulbound)
-        ↓
-Respect unlocks roles (Curator → Elder → Legend)
-        ↓
-Roles grant revenue share from community fund
-        ↓
-Revenue flows back to artists + curators
-        ↓
-More artists join → more music → more curation → flywheel accelerates
-```
-
 ### 9-Layer Roadmap
 
 | Layer | What | Status |
@@ -471,23 +449,6 @@ More artists join → more music → more curation → flywheel accelerates
 | 7 | **Cross-Platform** — Publish to Lens, Bluesky, Hive, Nostr, X from one compose bar | 📋 Planned |
 | 8 | **Governance** — DAO treasury (Safe), Snapshot voting, Coordinape | 📋 Planned |
 | 9 | **Decentralized Infra** — Quilibrium storage, self-hosted hub | 📋 Planned |
-
----
-
-## Revenue Model
-
-> [!IMPORTANT]
-> Both Sound.xyz and Catalog shut down. The zero-commission NFT-only model proved unsustainable. ZAO builds recurring revenue from day one.
-
-| Stream | How | Artist Split |
-|--------|-----|-------------|
-| **Hypersub Membership** | $5/month on-chain subscription | Community fund |
-| **Music NFT Drops** | 25-edition drops on Sound.xyz/Zora | 100% to artist + curator referral fees |
-| **Sync Licensing** | Community-curated pre-cleared catalog | 100% to artist |
-| **Respect Rewards** | Curation mining → Respect tokens → role access | Reputation (not tradeable) |
-| **Cross-Platform Revenue** | Hive upvotes, Lens collects | Direct to creator |
-
-**Projected revenue:** $12K-$40K/yr at 40 members → $230K-$1.14M/yr at 1,000 members
 
 ---
 

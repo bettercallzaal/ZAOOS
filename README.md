@@ -319,87 +319,114 @@ scripts/
 
 ## Research Library
 
-> **39 research documents** covering every aspect of building a decentralized social media platform for music.
+> **43 research documents · ~300,000+ words** covering every aspect of building a decentralized social media platform for music.
 
-See the full **[Research Hub](./research/)** for the complete index with summaries.
+See the full **[Research Hub](./research/)** for the complete index with summaries and Mermaid architecture diagrams.
 
 <details>
-<summary><strong>Research by Category (39 docs)</strong></summary>
+<summary><strong>Farcaster Protocol & Ecosystem (8 docs)</strong></summary>
 
-### Infrastructure & Protocol
-| # | Topic |
-|---|-------|
-| 01 | Farcaster Protocol (Snapchain, 10K+ TPS, identity) |
-| 02 | Hub API & Neynar (REST, gRPC, managed signers) |
-| 14 | Project Structure (single Next.js app decision) |
-| 17 | Neynar Onboarding (SIWF, FID registration) |
-| 18 | Security Audit (env, sessions, Zod, rate limits) |
-| 33 | Infrastructure (R2/IPFS/Arweave, mobile PWA→Capacitor, real-time, audio, ZK privacy) |
+| # | Topic | Summary |
+|---|-------|---------|
+| 01 | Farcaster Protocol | On-chain identity (Optimism) + Snapchain 10K+ TPS, storage units, channels |
+| 02 | Hub API & Neynar | REST + gRPC APIs, managed signers, SDK usage |
+| 17 | Neynar Onboarding | SIWF + managed signers + FID registration, EIP-712 |
+| 19 | Ecosystem Landscape | Open-source clients, frame frameworks, data providers |
+| 21 | Farcaster Deep Dive (2026) | Neynar acquisition, 40-60K DAU, developer-first pivot |
+| 22 | Ecosystem Players | Top accounts, DEGEN/MOXIE/NOTES/CLANKER, mini apps, Purple DAO |
+| 34 | All Clients Compared | 18+ clients — pros/cons, features, notification systems |
+| 10 | Hypersnap | ⚠️ Incomplete |
 
-### Farcaster Ecosystem
-| # | Topic |
-|---|-------|
-| 19 | Ecosystem Landscape (clients, tools, data providers) |
-| 21 | Deep Dive (Neynar acquisition, 40-60K DAU, developer pivot) |
-| 22 | Ecosystem Players (leaderboards, DEGEN/MOXIE/NOTES/CLANKER) |
-| 34 | Clients & Notifications (18+ clients compared, 3-layer notification system) |
+</details>
 
-### Community & Social
-| # | Topic |
-|---|-------|
-| 12 | Gating (allowlist → NFT → Hats → EAS) |
-| 13 | Chat & Messaging (Farcaster public + XMTP private) |
-| 15 | MVP Specification |
-| 16 | UI Reference (Discord-style, navy+gold) |
-| 20 | Followers/Following (sortable, filterable — unique feature) |
-| 32 | Onboarding & Growth (Privy wallets, 40→1000 strategy, moderation) |
+<details>
+<summary><strong>Music, Curation & Artist Revenue (5 docs)</strong></summary>
 
-### Music & Revenue
-| # | Topic |
-|---|-------|
-| 03 | Music Integration (Audius, Sound.xyz, Spotify, unified Track schema) |
-| 04 | Respect Tokens (soulbound, curation mining, tiers, decay) |
-| 29 | Artist Revenue & IP (streaming economics, NFTs, 0xSplits, sync licensing) |
-| 37 | Competitors & Monetization (Sound.xyz dead, Catalog dead, Coop Records, Hypersub) |
+| # | Topic | Summary |
+|---|-------|---------|
+| 03 | Music Integration | Audius, Sound.xyz, Spotify, SoundCloud, YouTube APIs + unified Track schema |
+| 04 | Respect Tokens | Soulbound reputation: curation mining, tiers, 2% decay, EAS attestation |
+| 29 | Artist Revenue & IP Rights | Streaming economics ($0.003/stream), NFTs, 0xSplits, sync licensing, Hypersub |
+| 37 | Competitors & Monetization | Sound.xyz dead, Catalog dead, Coop Records model, revenue projections |
+| 43 | Live Audio Rooms & Streaming | LiveKit SFU, synchronized listening parties, Livepeer, Huddle01 |
 
-### Identity & Governance
-| # | Topic |
-|---|-------|
-| 05 | ZAO Identity / ZIDs (music profile + Respect + roles) |
-| 06 | Quilibrium (privacy-preserving storage, future migration) |
-| 07 | Hats Protocol (on-chain role trees as ERC-1155) |
-| 31 | Governance & Tokenomics (Wyoming DUNA, Safe multisig, ERC-1155, legal) |
+</details>
 
-### AI & Intelligence
-| # | Topic |
-|---|-------|
-| 08 | AI Memory (implicit + explicit, pgvector, consolidation) |
-| 24 | ZAO AI Agent (ElizaOS + Claude + Hindsight, 4-phase plan) |
-| 26 | Hindsight Memory (91.4% SOTA, retain/recall/reflect, MCP) |
+<details>
+<summary><strong>Community, Social & Growth (6 docs)</strong></summary>
 
-### Cross-Platform
-| # | Topic |
-|---|-------|
-| 28 | Cross-Platform Publishing (11 platforms, fan-out architecture) |
-| 36 | Lens Protocol (V3, collect/monetize, no music apps = opportunity) |
+| # | Topic | Summary |
+|---|-------|---------|
+| 12 | Gating Mechanisms | Allowlist → NFT → Hats → EAS progression |
+| 13 | Chat & Messaging | Farcaster channels (public) + XMTP (private encrypted) |
+| 15 | MVP Specification | Gated chat client, SIWF auth, allowlist, Discord-style UI |
+| 20 | Followers/Following Feed | Sortable/filterable lists — unique differentiator |
+| 32 | Onboarding, Growth & Moderation | Privy wallets, growth 40→1000, tiered moderation, gamification |
+| 35 | Notifications Complete Guide | Mini App push + Supabase Realtime + polling fallback |
 
-### Tools & Reference
-| # | Topic |
-|---|-------|
-| 09 | Public APIs (Tier 1/2/3 landscape) |
-| 11 | Reference Repos (Sonata, Herocast, Nook) |
-| 23 | Austin Griffith / ETH Skills (Scaffold-ETH 2, ERC-8004) |
-| 25 | Public APIs Index (100+ APIs mapped by priority) |
-| 35 | Notifications Guide (complete implementation: push + in-app + polling) |
+</details>
 
-### Meta & Operations
-| # | Topic |
-|---|-------|
-| 10 | Hypersnap (incomplete) |
-| 27 | Comprehensive Overview (master index, gap analysis, vision) |
-| 30 | bettercallzaal GitHub (65 repos, 10 integratable) |
-| 38 | AI Code Audit (auditing AI code, cleanup agents, CI pipeline) |
-| 39 | GitHub Documentation (README, visuals, docs sites, showcase) |
+<details>
+<summary><strong>Identity, Governance & Tokens (5 docs)</strong></summary>
+
+| # | Topic | Summary |
+|---|-------|---------|
+| 05 | ZAO Identity (ZIDs) | FID wrapper + music profile + Respect + roles |
+| 07 | Hats Protocol | On-chain role trees (curator/artist/mod) as ERC-1155 |
+| 23 | Austin Griffith & ETH Skills | Scaffold-ETH 2, BuidlGuidl, ERC-8004, onchain credentials |
+| 31 | Governance, DAO & Tokenomics | Wyoming DUNA, Safe multisig, ERC-1155, Coordinape, legal |
+| 06 | Quilibrium | Privacy-preserving storage, design-compatible but don't block |
+
+</details>
+
+<details>
+<summary><strong>AI Agent & Intelligence (3 docs)</strong></summary>
+
+| # | Topic | Summary |
+|---|-------|---------|
+| 24 | ZAO AI Agent Plan | ElizaOS + Claude + Hindsight, 4-phase plan, separate repo |
+| 08 | AI Memory Architecture | Implicit + explicit memory, pgvector, taste profiles |
+| 26 | Hindsight Memory System | SOTA 91.4% accuracy, retain/recall/reflect, MCP support |
+
+</details>
+
+<details>
+<summary><strong>Cross-Platform Publishing (3 docs)</strong></summary>
+
+| # | Topic | Summary |
+|---|-------|---------|
+| 28 | Cross-Platform Publishing | 11 platforms mapped, fan-out architecture, Ayrshare shortcut |
+| 36 | Lens Protocol Deep Dive | V3 on Lens Chain, collect/monetize, no music apps = opportunity |
+| 37 | Discord & Telegram Bridges | Bot architecture, identity mapping, no production bridge exists yet |
+
+</details>
+
+<details>
+<summary><strong>Technical Infrastructure (5 docs)</strong></summary>
+
+| # | Topic | Summary |
+|---|-------|---------|
+| 41 | Next.js 16 + React 19 | Turbopack, PPR, React Compiler, useOptimistic, "use cache", Tailwind v4 |
+| 42 | Supabase Advanced | Schema design, RLS, Realtime (Broadcast), Edge Functions, pgvector, pg_cron |
+| 33 | Storage, Mobile & Privacy | R2/IPFS/Arweave, PWA→Capacitor, real-time, Semaphore ZK proofs |
+| 14 | Project Structure | Single Next.js app, route groups, feature folders |
+| 16 | UI Reference | Discord-style dark theme, navy + gold design tokens |
+
+</details>
+
+<details>
+<summary><strong>APIs, Security & Operations (8 docs)</strong></summary>
+
+| # | Topic | Summary |
+|---|-------|---------|
+| 09 | Public APIs Landscape | Tier 1/2/3 APIs for music, web3, AI, media, social |
+| 25 | Public APIs Index | 100+ APIs from github.com/public-apis mapped by ZAO feature |
+| 18 | Security Audit Checklist | Env vars, sessions, Zod, rate limits, CSRF, CSP headers |
+| 40 | Codebase Audit Guide | Step-by-step methodology + audit results |
+| 38 | AI Code Audit & Cleanup | AI code problems, cleanup agents, CI pipeline, TypeScript strict |
+| 39 | GitHub Documentation | README best practices, Mermaid diagrams, docs sites, showcase |
+| 11 | Reference Repos | Sonata (MIT), Herocast (AGPL), Nook, Opencast, Litecast |
+| 30 | bettercallzaal GitHub | 65 repos mapped, 10 directly integratable into ZAO OS |
 
 </details>
 

@@ -72,13 +72,13 @@ export function ChatRoom() {
     setSidebarOpen(false);
   }, [xmtp]);
 
-  const handleCreateDm = useCallback(async (address: `0x${string}`) => {
-    const convId = await xmtp.createDm(address);
+  const handleCreateDm = useCallback(async (address: `0x${string}`, peerProfile?: import('@/lib/xmtp/client').XMTPPeerProfile) => {
+    const convId = await xmtp.createDm(address, peerProfile);
     if (convId) xmtp.selectConversation(convId);
   }, [xmtp]);
 
-  const handleCreateGroup = useCallback(async (name: string, addresses: `0x${string}`[]) => {
-    const convId = await xmtp.createGroup(name, addresses);
+  const handleCreateGroup = useCallback(async (name: string, members: { address: `0x${string}`; profile?: import('@/lib/xmtp/client').XMTPPeerProfile }[]) => {
+    const convId = await xmtp.createGroup(name, members);
     if (convId) xmtp.selectConversation(convId);
   }, [xmtp]);
 
@@ -161,6 +161,9 @@ export function ChatRoom() {
         onConversationSelect={handleConversationSelect}
         onNewDm={() => setDmDialogType('dm')}
         onNewGroup={() => setDmDialogType('group')}
+        zaoMembers={xmtp.zaoMembers}
+        loadingMembers={xmtp.loadingMembers}
+        onStartDmWithMember={xmtp.startDmWithMember}
       />
 
       {/* Main chat + music sidebar in a shared flex row */}

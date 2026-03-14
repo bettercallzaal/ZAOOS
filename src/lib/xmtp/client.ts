@@ -146,3 +146,44 @@ export function removeConnectedWallet(address: string): void {
   );
   localStorage.setItem('zaoos-xmtp-wallets', JSON.stringify(wallets));
 }
+
+// ── Peer profile storage ────────────────────────────────────────────
+// Maps XMTP conversation IDs → peer profile info so DMs show usernames
+
+export interface XMTPPeerProfile {
+  fid: number;
+  username: string;
+  displayName: string;
+  pfpUrl: string;
+}
+
+const PEER_STORAGE_KEY = 'zaoos-xmtp-peers';
+
+export function getPeerProfiles(): Record<string, XMTPPeerProfile> {
+  if (typeof window === 'undefined') return {};
+  const stored = localStorage.getItem(PEER_STORAGE_KEY);
+  return stored ? JSON.parse(stored) : {};
+}
+
+export function savePeerProfile(conversationId: string, profile: XMTPPeerProfile): void {
+  if (typeof window === 'undefined') return;
+  const peers = getPeerProfiles();
+  peers[conversationId] = profile;
+  localStorage.setItem(PEER_STORAGE_KEY, JSON.stringify(peers));
+}
+
+// Maps XMTP inbox IDs → profile info for message sender resolution
+const MEMBER_STORAGE_KEY = 'zaoos-xmtp-members';
+
+export function getMemberProfiles(): Record<string, XMTPPeerProfile> {
+  if (typeof window === 'undefined') return {};
+  const stored = localStorage.getItem(MEMBER_STORAGE_KEY);
+  return stored ? JSON.parse(stored) : {};
+}
+
+export function saveMemberProfile(inboxId: string, profile: XMTPPeerProfile): void {
+  if (typeof window === 'undefined') return;
+  const members = getMemberProfiles();
+  members[inboxId] = profile;
+  localStorage.setItem(MEMBER_STORAGE_KEY, JSON.stringify(members));
+}

@@ -9,6 +9,7 @@ import { MessageThread } from './MessageThread';
 import { MessageCompose } from './MessageCompose';
 import { NewConversationDialog } from './NewConversationDialog';
 import { ConnectXMTP } from './ConnectXMTP';
+import type { XMTPPeerProfile } from '@/lib/xmtp/client';
 
 export function MessagesRoom() {
   const { user } = useAuth();
@@ -42,13 +43,13 @@ export function MessagesRoom() {
     await autoConnect(user.fid);
   }, [user, autoConnect]);
 
-  const handleCreateDm = useCallback(async (address: `0x${string}`) => {
-    const convId = await createDm(address);
+  const handleCreateDm = useCallback(async (address: `0x${string}`, peerProfile?: XMTPPeerProfile) => {
+    const convId = await createDm(address, peerProfile);
     if (convId) selectConversation(convId);
   }, [createDm, selectConversation]);
 
-  const handleCreateGroup = useCallback(async (name: string, addresses: `0x${string}`[]) => {
-    const convId = await createGroup(name, addresses);
+  const handleCreateGroup = useCallback(async (name: string, members: { address: `0x${string}`; profile?: XMTPPeerProfile }[]) => {
+    const convId = await createGroup(name, members);
     if (convId) selectConversation(convId);
   }, [createGroup, selectConversation]);
 
@@ -89,9 +90,9 @@ export function MessagesRoom() {
               </svg>
               Channels
             </a>
-            {connectedWallets.length > 0 && (
-              <span className="text-[10px] text-gray-600 font-mono">
-                {connectedWallets[0].slice(0, 6)}...{connectedWallets[0].slice(-4)}
+            {user && (
+              <span className="text-[10px] text-gray-500">
+                @{user.username || `FID ${user.fid}`}
               </span>
             )}
           </div>

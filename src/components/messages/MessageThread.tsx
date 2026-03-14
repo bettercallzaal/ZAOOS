@@ -87,7 +87,7 @@ export function MessageThread({ conversation, messages, loading }: MessageThread
                 >
                   {!msg.isFromMe && !isConsecutive && (
                     <p className="text-xs font-medium text-[#f5a623] mb-0.5">
-                      {msg.senderDisplayName || msg.senderInboxId.slice(0, 8)}
+                      {msg.senderDisplayName || (msg.senderAddress ? `${msg.senderAddress.slice(0, 6)}...${msg.senderAddress.slice(-4)}` : 'Unknown')}
                     </p>
                   )}
                   <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>

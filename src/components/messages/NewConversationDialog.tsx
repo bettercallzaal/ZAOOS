@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import type { XMTPPeerProfile } from '@/lib/xmtp/client';
 
 interface SearchUser {
   fid: number;
@@ -16,8 +17,8 @@ interface NewConversationDialogProps {
   type: 'dm' | 'group';
   isOpen: boolean;
   onClose: () => void;
-  onCreateDm: (address: `0x${string}`) => Promise<void>;
-  onCreateGroup: (name: string, addresses: `0x${string}`[]) => Promise<void>;
+  onCreateDm: (address: `0x${string}`, peerProfile?: XMTPPeerProfile) => Promise<void>;
+  onCreateGroup: (name: string, members: { address: `0x${string}`; profile?: XMTPPeerProfile }[]) => Promise<void>;
 }
 
 const shortAddr = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -142,7 +143,15 @@ export function NewConversationDialog({
           setError('Select a user with a wallet address');
           return;
         }
-        await onCreateDm(selectedAddress as `0x${string}`);
+        const peerProfile: XMTPPeerProfile | undefined = selectedUser
+          ? {
+              fid: selectedUser.fid,
+              username: selectedUser.username,
+              displayName: selectedUser.display_name || selectedUser.username,
+              pfpUrl: selectedUser.pfp_url,
+            }
+          : undefined;
+        await onCreateDm(selectedAddress as `0x${string}`, peerProfile);
       } else {
         if (!groupName.trim()) {
           setError('Enter a group name');
@@ -152,8 +161,16 @@ export function NewConversationDialog({
           setError('Add at least one member');
           return;
         }
-        const addrs = groupMembers.map((m) => m.address as `0x${string}`);
-        await onCreateGroup(groupName.trim(), addrs);
+        const members = groupMembers.map((m) => ({
+          address: m.address as `0x${string}`,
+          profile: {
+            fid: m.user.fid,
+            username: m.user.username,
+            displayName: m.user.display_name || m.user.username,
+            pfpUrl: m.user.pfp_url,
+          } as XMTPPeerProfile,
+        }));
+        await onCreateGroup(groupName.trim(), members);
       }
       // Reset and close
       resetState();

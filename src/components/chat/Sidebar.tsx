@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { SessionData } from '@/types';
 import { XMTPConversation } from '@/types/xmtp';
+import type { ZaoMember } from '@/contexts/XMTPContext';
 
 const CHANNELS = [
   { id: 'zao', label: '# zao' },
@@ -40,13 +41,19 @@ interface SidebarProps {
   onConversationSelect: (id: string) => void;
   onNewDm: () => void;
   onNewGroup: () => void;
+  // ZAO members
+  zaoMembers: ZaoMember[];
+  loadingMembers: boolean;
+  onStartDmWithMember: (member: ZaoMember) => void;
 }
 
 export function Sidebar({
   user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, onOpenFaq, onOpenTutorial,
   xmtpConnected, xmtpConnecting, xmtpConversations, activeConversationId,
   onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
+  zaoMembers, loadingMembers, onStartDmWithMember,
 }: SidebarProps) {
+  const reachableCount = zaoMembers.filter((m) => m.reachable).length;
   return (
     <>
       {/* Mobile overlay */}
@@ -154,17 +161,23 @@ export function Sidebar({
                       : 'text-gray-400 hover:bg-white/5 hover:text-white'
                   }`}
                 >
-                  <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                    {conv.type === 'group' ? (
-                      <svg className="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
-                      </svg>
-                    ) : (
-                      <span className="text-[10px] text-gray-400 font-medium">
-                        {(conv.peerDisplayName || conv.name || '?')[0]?.toUpperCase()}
-                      </span>
-                    )}
-                  </div>
+                  {conv.peerPfpUrl ? (
+                    <div className="w-7 h-7 relative flex-shrink-0">
+                      <Image src={conv.peerPfpUrl} alt="" fill className="rounded-full object-cover" unoptimized />
+                    </div>
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                      {conv.type === 'group' ? (
+                        <svg className="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
+                        </svg>
+                      ) : (
+                        <span className="text-[10px] text-gray-400 font-medium">
+                          {(conv.peerDisplayName || conv.name || '?')[0]?.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
                       <p className="text-xs font-medium truncate">{conv.peerDisplayName || conv.name}</p>
@@ -181,6 +194,74 @@ export function Sidebar({
             </div>
           )}
         </div>
+
+        {/* ZAO Members */}
+        {xmtpConnected && (
+          <div className="px-3 mt-4 space-y-1">
+            <div className="flex items-center justify-between px-3 mb-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">ZAO Members</p>
+              {reachableCount > 0 && (
+                <span className="text-[10px] text-green-400 font-medium">{reachableCount} online</span>
+              )}
+            </div>
+
+            {loadingMembers ? (
+              <div className="flex items-center gap-2 px-3 py-2">
+                <div className="w-3.5 h-3.5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs text-gray-500">Checking members...</span>
+              </div>
+            ) : zaoMembers.length === 0 ? (
+              <p className="px-3 text-xs text-gray-600">No members found</p>
+            ) : (
+              <div className="space-y-0.5 max-h-48 overflow-y-auto">
+                {zaoMembers.map((member) => (
+                  <button
+                    key={member.fid ?? member.displayName}
+                    onClick={() => member.reachable && onStartDmWithMember(member)}
+                    disabled={!member.reachable}
+                    className={`flex items-center gap-2.5 w-full text-left px-3 py-1.5 rounded-md transition-colors ${
+                      member.reachable
+                        ? 'text-gray-300 hover:bg-white/5 hover:text-white cursor-pointer'
+                        : 'text-gray-600 cursor-default'
+                    }`}
+                  >
+                    {/* Avatar + status dot */}
+                    <div className="relative flex-shrink-0">
+                      {member.pfpUrl ? (
+                        <div className="w-6 h-6 relative">
+                          <Image
+                            src={member.pfpUrl}
+                            alt={member.displayName}
+                            fill
+                            className="rounded-full object-cover"
+                            unoptimized
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center">
+                          <span className="text-[9px] text-gray-400 font-medium">
+                            {member.displayName[0]?.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                      <span
+                        className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0d1b2a] ${
+                          member.reachable ? 'bg-green-400' : 'bg-gray-600'
+                        }`}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate">{member.displayName}</p>
+                      {member.username && (
+                        <p className="text-[10px] text-gray-500 truncate">@{member.username}</p>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Pages */}
         <div className="px-3 mt-4 space-y-1">

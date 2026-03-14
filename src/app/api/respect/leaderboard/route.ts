@@ -31,7 +31,7 @@ export async function GET() {
     // Get all members with wallets from allowlist
     const { data: members, error } = await supabaseAdmin
       .from('allowlist')
-      .select('real_name, ign, wallet_address, fid')
+      .select('real_name, ign, wallet_address, fid, username')
       .eq('is_active', true)
       .not('wallet_address', 'is', null);
 
@@ -43,6 +43,7 @@ export async function GET() {
         name: m.ign || m.real_name || `FID ${m.fid}`,
         wallet: m.wallet_address as string,
         fid: m.fid,
+        username: m.username || null,
       }));
 
     if (walletsToCheck.length === 0) {
@@ -85,6 +86,7 @@ export async function GET() {
         name: entry.name,
         wallet: entry.wallet,
         fid: entry.fid,
+        username: entry.username,
         ogRespect: Math.round(ogBalance),
         zorRespect: zorBalance,
         totalRespect: Math.round(total),

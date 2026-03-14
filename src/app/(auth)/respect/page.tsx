@@ -8,6 +8,7 @@ interface RespectEntry {
   name: string;
   wallet: string;
   fid: number | null;
+  username: string | null;
   ogRespect: number;
   zorRespect: number;
   totalRespect: number;
@@ -120,7 +121,7 @@ export default function RespectPage() {
               const isMe = entry.fid === data.currentFid;
               return (
                 <div
-                  key={entry.wallet}
+                  key={entry.fid ?? entry.wallet}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
                     isMe
                       ? 'bg-[#f5a623]/10 border-[#f5a623]/30'
@@ -136,8 +137,8 @@ export default function RespectPage() {
                     <p className={`text-sm font-medium truncate ${isMe ? 'text-[#f5a623]' : 'text-white'}`}>
                       {entry.name}{isMe && ' (you)'}
                     </p>
-                    <p className="text-xs text-gray-500 font-mono truncate">
-                      {entry.wallet.slice(0, 6)}...{entry.wallet.slice(-4)}
+                    <p className="text-xs text-gray-500 truncate">
+                      {entry.username ? `@${entry.username}` : entry.fid ? `FID ${entry.fid}` : `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`}
                     </p>
                   </div>
                   <div className="text-right">

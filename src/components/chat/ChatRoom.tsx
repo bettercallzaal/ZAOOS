@@ -237,7 +237,7 @@ export function ChatRoom() {
                 </div>
               </div>
             ) : (
-              <h2 className="font-semibold text-sm text-gray-300 flex-1"># {activeChannel}</h2>
+              <h2 className="font-semibold text-sm text-white flex-1"># {activeChannel}</h2>
             )}
 
             {viewMode === 'channel' && (

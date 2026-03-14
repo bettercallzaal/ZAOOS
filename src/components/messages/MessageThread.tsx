@@ -48,19 +48,19 @@ export function MessageThread({ conversation, messages, loading }: MessageThread
   if (!conversation) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#0a1628]">
-        <div className="text-center px-6">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#f5a623]/10 flex items-center justify-center">
-            <svg className="w-8 h-8 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+        <div className="text-center px-6 max-w-sm">
+          <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-br from-[#f5a623]/15 to-[#f5a623]/5 flex items-center justify-center border border-[#f5a623]/10">
+            <svg className="w-10 h-10 text-[#f5a623]/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
             </svg>
           </div>
-          <p className="text-white font-semibold text-lg mb-1">Your Messages</p>
-          <p className="text-sm text-gray-500 max-w-xs">Select a conversation from the sidebar or start a new one</p>
-          <div className="flex items-center justify-center gap-1.5 mt-4">
+          <p className="text-white font-semibold text-lg mb-2">Your Messages</p>
+          <p className="text-sm text-gray-400 leading-relaxed">Select a conversation from the sidebar or start a new one</p>
+          <div className="flex items-center justify-center gap-1.5 mt-5 px-4 py-2 rounded-full bg-green-500/5 border border-green-500/10 mx-auto w-fit">
             <svg className="w-3 h-3 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
             </svg>
-            <p className="text-xs text-gray-600">End-to-end encrypted with XMTP</p>
+            <p className="text-xs text-green-500/80">End-to-end encrypted with XMTP</p>
           </div>
         </div>
       </div>
@@ -77,14 +77,14 @@ export function MessageThread({ conversation, messages, loading }: MessageThread
           </div>
         </div>
       ) : messages.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full text-center">
-          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[#1a2a3a] flex items-center justify-center">
-            <svg className="w-7 h-7 text-[#f5a623]/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+        <div className="flex flex-col items-center justify-center h-full text-center px-6">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] border border-gray-800/50 flex items-center justify-center">
+            <svg className="w-8 h-8 text-[#f5a623]/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-gray-300">No messages yet</p>
-          <p className="text-xs text-gray-600 mt-1">Say hello to start the conversation</p>
+          <p className="text-base font-semibold text-white mb-1">No messages yet</p>
+          <p className="text-sm text-gray-500">Say hello to start the conversation</p>
         </div>
       ) : (
         <>

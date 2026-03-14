@@ -218,7 +218,7 @@ export function Sidebar({
 
         {/* Online Members — only show reachable XMTP members */}
         {xmtpConnected && (
-          <div className="px-3 mt-4 space-y-1">
+          <div className="px-3 mt-3 pt-3 border-t border-gray-800/50 space-y-1">
             <button
               onClick={() => setOnlineCollapsed(!onlineCollapsed)}
               className="flex items-center justify-between px-3 mb-2 w-full text-left"
@@ -283,7 +283,7 @@ export function Sidebar({
         )}
 
         {/* Pages */}
-        <div className="px-3 mt-4 space-y-1">
+        <div className="px-3 mt-3 pt-3 border-t border-gray-800/50 space-y-1">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-3 mb-2">Pages</p>
           <a href="/social" className="flex items-center gap-2 px-3 py-2 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
@@ -315,7 +315,7 @@ export function Sidebar({
         </div>
 
         {/* Help */}
-        <div className="px-3 mt-4 space-y-1">
+        <div className="px-3 mt-3 pt-3 border-t border-gray-800/50 space-y-1">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-3 mb-2">Help</p>
           <button
             onClick={onOpenTutorial}
@@ -354,17 +354,17 @@ export function Sidebar({
                 />
               </div>
             ) : (
-              <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0" />
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs text-gray-400 font-medium">{user.displayName?.[0]?.toUpperCase()}</span>
+              </div>
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{user.displayName}</p>
-              <p className="text-xs text-gray-400 truncate">@{user.username}</p>
+              <p className="text-xs text-gray-500 truncate">@{user.username}</p>
             </div>
-          </div>
-          <div className="mt-3 flex justify-end">
             <button
               onClick={onLogout}
-              className="text-xs text-gray-400 hover:text-white"
+              className="text-xs text-gray-500 hover:text-white transition-colors flex-shrink-0"
             >
               Log out
             </button>

@@ -45,5 +45,20 @@ ALTER TABLE allowlist ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hidden_messages ENABLE ROW LEVEL SECURITY;
 
+-- Notification tokens for Farcaster miniapp push notifications
+CREATE TABLE IF NOT EXISTS notification_tokens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  fid BIGINT UNIQUE NOT NULL,
+  token TEXT NOT NULL,
+  url TEXT NOT NULL,
+  enabled BOOLEAN DEFAULT TRUE,
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_notification_tokens_fid ON notification_tokens(fid);
+CREATE INDEX IF NOT EXISTS idx_notification_tokens_enabled ON notification_tokens(enabled) WHERE enabled = TRUE;
+
+ALTER TABLE notification_tokens ENABLE ROW LEVEL SECURITY;
+
 -- RLS policies (service_role bypasses these, so server-side queries work)
 -- No public access policies needed since all access is through service_role

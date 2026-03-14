@@ -7,6 +7,7 @@ import { useMobile } from '@/hooks/useMobile';
 import { usePlayer } from '@/providers/audio';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { QuotedCastData } from '@/types';
+import { useXMTPContext } from '@/contexts/XMTPContext';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
 import { ComposeBar, ComposeBarHandle, ReplyContext } from './ComposeBar';
@@ -17,6 +18,9 @@ import { SchedulePanel } from './SchedulePanel';
 import { FaqPanel } from './FaqPanel';
 import { TutorialPanel } from './TutorialPanel';
 import { ProfileDrawer } from './ProfileDrawer';
+import { MessageThread } from '@/components/messages/MessageThread';
+import { MessageCompose } from '@/components/messages/MessageCompose';
+import { NewConversationDialog } from '@/components/messages/NewConversationDialog';
 import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 import { MusicSidebar } from '@/components/music/MusicSidebar';
 import { SongSubmit } from '@/components/music/SongSubmit';
@@ -39,8 +43,41 @@ export function ChatRoom() {
   const [faqOpen, setFaqOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [profileFid, setProfileFid] = useState<number | null>(null);
+  const [dmDialogType, setDmDialogType] = useState<'dm' | 'group' | null>(null);
   const composeRef = useRef<ComposeBarHandle>(null);
   const musicQueue = useMusicQueue(messages);
+
+  // XMTP context
+  const xmtp = useXMTPContext();
+  const viewMode = xmtp.activeConversationId ? 'xmtp' : 'channel';
+  const activeXmtpConversation = xmtp.conversations.find((c) => c.id === xmtp.activeConversationId) ?? null;
+
+  const handleXmtpConnect = useCallback(async () => {
+    if (!user) return;
+    await xmtp.autoConnect(user.fid);
+  }, [user, xmtp]);
+
+  const handleConversationSelect = useCallback((id: string) => {
+    xmtp.selectConversation(id);
+    setSidebarOpen(false);
+  }, [xmtp]);
+
+  const handleChannelSelect = useCallback((ch: string) => {
+    setActiveChannel(ch);
+    xmtp.selectConversation(null);
+    setSelectedThreadHash(null);
+    setSidebarOpen(false);
+  }, [xmtp]);
+
+  const handleCreateDm = useCallback(async (address: `0x${string}`) => {
+    const convId = await xmtp.createDm(address);
+    if (convId) xmtp.selectConversation(convId);
+  }, [xmtp]);
+
+  const handleCreateGroup = useCallback(async (name: string, addresses: `0x${string}`[]) => {
+    const convId = await xmtp.createGroup(name, addresses);
+    if (convId) xmtp.selectConversation(convId);
+  }, [xmtp]);
 
   // Keyboard shortcuts
   const shortcutHandlers = useMemo(() => ({
@@ -87,13 +124,17 @@ export function ChatRoom() {
         onClose={() => setSidebarOpen(false)}
         onLogout={logout}
         activeChannel={activeChannel}
-        onChannelSelect={(ch) => {
-          setActiveChannel(ch);
-          setSelectedThreadHash(null);
-          setSidebarOpen(false);
-        }}
+        onChannelSelect={handleChannelSelect}
         onOpenFaq={() => { setFaqOpen(true); setSidebarOpen(false); }}
         onOpenTutorial={() => { setTutorialOpen(true); setSidebarOpen(false); }}
+        xmtpConnected={xmtp.isConnected}
+        xmtpConnecting={xmtp.isConnecting}
+        xmtpConversations={xmtp.conversations}
+        activeConversationId={xmtp.activeConversationId}
+        onXmtpConnect={handleXmtpConnect}
+        onConversationSelect={handleConversationSelect}
+        onNewDm={() => setDmDialogType('dm')}
+        onNewGroup={() => setDmDialogType('group')}
       />
 
       {/* Main chat + music sidebar in a shared flex row */}
@@ -113,116 +154,150 @@ export function ChatRoom() {
               </button>
             )}
 
-            <h2 className="font-semibold text-sm text-gray-300 flex-1"># {activeChannel}</h2>
+            {viewMode === 'xmtp' ? (
+              <h2 className="font-semibold text-sm text-gray-300 flex-1 truncate">
+                {activeXmtpConversation?.type === 'group' && <span className="text-gray-500 mr-1">#</span>}
+                {activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || 'Message'}
+              </h2>
+            ) : (
+              <h2 className="font-semibold text-sm text-gray-300 flex-1"># {activeChannel}</h2>
+            )}
 
-            {/* Search */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-              aria-label="Search messages"
-              title="Search (Cmd+K)"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-            </button>
+            {viewMode === 'channel' && (
+              <>
+                {/* Search */}
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                  aria-label="Search messages"
+                  title="Search (Cmd+K)"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
+                </button>
 
-            {/* Scheduled posts */}
-            <button
-              onClick={() => setScheduleOpen(true)}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-              aria-label="Scheduled posts"
-              title="Scheduled posts"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </button>
+                {/* Scheduled posts */}
+                <button
+                  onClick={() => setScheduleOpen(true)}
+                  className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                  aria-label="Scheduled posts"
+                  title="Scheduled posts"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
 
-            {/* Song submit */}
-            <button
-              onClick={() => setSongSubmitOpen(true)}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-              aria-label="Submit a song"
-              title="Submit a song"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-            </button>
+                {/* Song submit */}
+                <button
+                  onClick={() => setSongSubmitOpen(true)}
+                  className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                  aria-label="Submit a song"
+                  title="Submit a song"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </button>
 
-            {/* Music queue toggle */}
-            <button
-              onClick={() => setMusicSidebarOpen((o) => !o)}
-              className={`relative flex items-center justify-center w-8 h-8 rounded-md transition-colors ${
-                musicSidebarOpen
-                  ? 'bg-[#f5a623]/20 text-[#f5a623]'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-              aria-label="Toggle music queue"
-              title="Music queue"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-              </svg>
-              {/* Dot badge when queue has tracks */}
-              {musicQueue.length > 0 && !musicSidebarOpen && (
-                <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#f5a623]" />
-              )}
-            </button>
+                {/* Music queue toggle */}
+                <button
+                  onClick={() => setMusicSidebarOpen((o) => !o)}
+                  className={`relative flex items-center justify-center w-8 h-8 rounded-md transition-colors ${
+                    musicSidebarOpen
+                      ? 'bg-[#f5a623]/20 text-[#f5a623]'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                  aria-label="Toggle music queue"
+                  title="Music queue"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
+                  {musicQueue.length > 0 && !musicSidebarOpen && (
+                    <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#f5a623]" />
+                  )}
+                </button>
+              </>
+            )}
           </header>
 
-          {/* Error banner */}
-          {error && (
-            <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0">
-              {error}
-            </div>
-          )}
-
-          {/* Messages */}
-          <MessageList
-            messages={messages}
-            isAdmin={user.isAdmin}
-            currentFid={user.fid}
-            hasSigner={hasSigner}
-            onHide={hideMessage}
-            onOpenThread={(hash) => setSelectedThreadHash(hash)}
-            onQuote={(cast) => {
-              setQuotedCast(cast);
-              setSelectedThreadHash(null);
-            }}
-            onOpenProfile={(fid) => setProfileFid(fid)}
-            onReply={(hash, authorName, text) => {
-              setReplyTo({ hash, authorName, text });
-              setQuotedCast(null);
-              composeRef.current?.focus();
-            }}
-            loading={loading}
-            channelId={activeChannel}
-          />
-
-          {/* Global music player (mobile + desktop when sidebar closed) */}
-          <GlobalPlayer />
-
-          {/* Signer connect or Compose */}
-          {!hasSigner ? (
-            <div>
-              <SignerConnect onSuccess={refetch} />
-              <ComposeBar ref={composeRef} hasSigner={false} onSend={sendMessage} channel={activeChannel} />
-            </div>
+          {viewMode === 'xmtp' ? (
+            <>
+              {/* XMTP Message Thread */}
+              <MessageThread
+                conversation={activeXmtpConversation}
+                messages={xmtp.messages}
+                loading={xmtp.loadingMessages}
+                onBack={isMobile ? () => xmtp.selectConversation(null) : undefined}
+              />
+              {activeXmtpConversation && (
+                <MessageCompose
+                  onSend={xmtp.sendMessage}
+                  placeholder={
+                    activeXmtpConversation.type === 'dm'
+                      ? `Message ${activeXmtpConversation.peerDisplayName || activeXmtpConversation.name}...`
+                      : `Message #${activeXmtpConversation.name}...`
+                  }
+                />
+              )}
+            </>
           ) : (
-            <ComposeBar
-              ref={composeRef}
-              hasSigner={true}
-              onSend={sendMessage}
-              sending={sending}
-              channel={activeChannel}
-              quotedCast={quotedCast}
-              onClearQuote={() => setQuotedCast(null)}
-              onSchedule={() => setScheduleOpen(true)}
-              replyTo={replyTo}
-              onClearReply={() => setReplyTo(null)}
-            />
+            <>
+              {/* Error banner */}
+              {error && (
+                <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0">
+                  {error}
+                </div>
+              )}
+
+              {/* Farcaster Messages */}
+              <MessageList
+                messages={messages}
+                isAdmin={user.isAdmin}
+                currentFid={user.fid}
+                hasSigner={hasSigner}
+                onHide={hideMessage}
+                onOpenThread={(hash) => setSelectedThreadHash(hash)}
+                onQuote={(cast) => {
+                  setQuotedCast(cast);
+                  setSelectedThreadHash(null);
+                }}
+                onOpenProfile={(fid) => setProfileFid(fid)}
+                onReply={(hash, authorName, text) => {
+                  setReplyTo({ hash, authorName, text });
+                  setQuotedCast(null);
+                  composeRef.current?.focus();
+                }}
+                loading={loading}
+                channelId={activeChannel}
+              />
+
+              {/* Global music player */}
+              <GlobalPlayer />
+
+              {/* Signer connect or Compose */}
+              {!hasSigner ? (
+                <div>
+                  <SignerConnect onSuccess={refetch} />
+                  <ComposeBar ref={composeRef} hasSigner={false} onSend={sendMessage} channel={activeChannel} />
+                </div>
+              ) : (
+                <ComposeBar
+                  ref={composeRef}
+                  hasSigner={true}
+                  onSend={sendMessage}
+                  sending={sending}
+                  channel={activeChannel}
+                  quotedCast={quotedCast}
+                  onClearQuote={() => setQuotedCast(null)}
+                  onSchedule={() => setScheduleOpen(true)}
+                  replyTo={replyTo}
+                  onClearReply={() => setReplyTo(null)}
+                />
+              )}
+            </>
           )}
         </div>
 
@@ -282,6 +357,15 @@ export function ChatRoom() {
 
       {/* Profile Drawer */}
       <ProfileDrawer fid={profileFid} onClose={() => setProfileFid(null)} />
+
+      {/* New DM/Group Dialog */}
+      <NewConversationDialog
+        type={dmDialogType || 'dm'}
+        isOpen={!!dmDialogType}
+        onClose={() => setDmDialogType(null)}
+        onCreateDm={handleCreateDm}
+        onCreateGroup={handleCreateGroup}
+      />
     </div>
   );
 }

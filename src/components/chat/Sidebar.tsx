@@ -2,12 +2,25 @@
 
 import Image from 'next/image';
 import { SessionData } from '@/types';
+import { XMTPConversation } from '@/types/xmtp';
 
 const CHANNELS = [
   { id: 'zao', label: '# zao' },
   { id: 'zabal', label: '# zabal' },
   { id: 'cocconcertz', label: '# cocconcertz' },
 ];
+
+function timeAgo(date?: Date): string {
+  if (!date) return '';
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return 'now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `${days}d`;
+}
 
 interface SidebarProps {
   user: SessionData;
@@ -18,9 +31,22 @@ interface SidebarProps {
   onChannelSelect: (channel: string) => void;
   onOpenFaq?: () => void;
   onOpenTutorial?: () => void;
+  // XMTP
+  xmtpConnected: boolean;
+  xmtpConnecting: boolean;
+  xmtpConversations: XMTPConversation[];
+  activeConversationId: string | null;
+  onXmtpConnect: () => void;
+  onConversationSelect: (id: string) => void;
+  onNewDm: () => void;
+  onNewGroup: () => void;
 }
 
-export function Sidebar({ user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, onOpenFaq, onOpenTutorial }: SidebarProps) {
+export function Sidebar({
+  user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, onOpenFaq, onOpenTutorial,
+  xmtpConnected, xmtpConnecting, xmtpConversations, activeConversationId,
+  onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
+}: SidebarProps) {
   return (
     <>
       {/* Mobile overlay */}
@@ -45,15 +71,15 @@ export function Sidebar({ user, isOpen, onClose, onLogout, activeChannel, onChan
           <p className="text-xs text-gray-500 mt-1">Community on Farcaster</p>
         </div>
 
-        {/* Channels */}
+        {/* Farcaster Posts */}
         <div className="p-3 space-y-1">
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-3 mb-2">Channels</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-3 mb-2">Farcaster Posts</p>
           {CHANNELS.map((ch) => (
             <button
               key={ch.id}
               onClick={() => onChannelSelect(ch.id)}
               className={`block w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                activeChannel === ch.id
+                activeChannel === ch.id && !activeConversationId
                   ? 'bg-[#f5a623]/10 text-[#f5a623] font-medium'
                   : 'text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
@@ -63,15 +89,89 @@ export function Sidebar({ user, isOpen, onClose, onLogout, activeChannel, onChan
           ))}
         </div>
 
-        {/* Messages */}
+        {/* Private Messages */}
         <div className="px-3 mt-4 space-y-1">
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-3 mb-2">Messages</p>
-          <a href="/messages" className="flex items-center gap-2 px-3 py-2 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors">
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-            </svg>
-            Private DMs & Groups
-          </a>
+          <div className="flex items-center justify-between px-3 mb-2">
+            <p className="text-xs text-gray-500 uppercase tracking-wider">Private Messages</p>
+            {xmtpConnected && (
+              <div className="flex gap-1">
+                <button
+                  onClick={onNewDm}
+                  className="p-1 rounded text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                  title="New DM"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </button>
+                <button
+                  onClick={onNewGroup}
+                  className="p-1 rounded text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                  title="New Group"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {!xmtpConnected ? (
+            <button
+              onClick={onXmtpConnect}
+              disabled={xmtpConnecting}
+              className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-md text-gray-400 hover:bg-white/5 hover:text-white text-sm transition-colors disabled:opacity-50"
+            >
+              {xmtpConnecting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                  <span className="text-xs">Connecting...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                  </svg>
+                  <span className="text-xs">Enable Messaging</span>
+                </>
+              )}
+            </button>
+          ) : xmtpConversations.length === 0 ? (
+            <p className="px-3 text-xs text-gray-600">No conversations yet</p>
+          ) : (
+            <div className="space-y-0.5 max-h-48 overflow-y-auto">
+              {xmtpConversations.map((conv) => (
+                <button
+                  key={conv.id}
+                  onClick={() => onConversationSelect(conv.id)}
+                  className={`flex items-center gap-2 w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
+                    activeConversationId === conv.id
+                      ? 'bg-[#f5a623]/10 text-[#f5a623] font-medium'
+                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                    {conv.type === 'group' ? (
+                      <svg className="w-3.5 h-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
+                      </svg>
+                    ) : (
+                      <span className="text-[10px] text-gray-400 font-medium">
+                        {(conv.peerDisplayName || conv.name || '?')[0]?.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs truncate">{conv.peerDisplayName || conv.name}</p>
+                  </div>
+                  {conv.lastMessageAt && (
+                    <span className="text-[10px] text-gray-600 flex-shrink-0">{timeAgo(conv.lastMessageAt)}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Pages */}

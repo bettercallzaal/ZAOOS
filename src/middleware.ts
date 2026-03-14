@@ -65,8 +65,8 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
 
-  // XMTP WASM requires COEP/COOP for SharedArrayBuffer — only on /messages routes
-  if (pathname.startsWith('/messages')) {
+  // XMTP WASM requires COEP/COOP for SharedArrayBuffer
+  if (pathname.startsWith('/messages') || pathname === '/chat') {
     response.headers.set('Cross-Origin-Embedder-Policy', 'credentialless');
     response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   }
@@ -75,5 +75,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/api/:path*', '/messages/:path*'],
+  matcher: ['/api/:path*', '/chat', '/messages/:path*'],
 };

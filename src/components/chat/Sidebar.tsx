@@ -382,7 +382,15 @@ export function Sidebar({
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{user.displayName}</p>
-              <p className="text-xs text-gray-500 truncate">@{user.username}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs text-gray-500 truncate">@{user.username}</p>
+                {hasWallet && (
+                  <span className="flex items-center gap-0.5 text-[9px] text-green-500/70">
+                    <span className="w-1 h-1 rounded-full bg-green-500/70" />
+                    wallet
+                  </span>
+                )}
+              </div>
             </div>
             <button
               onClick={onLogout}

@@ -226,18 +226,25 @@ export function ChatRoom() {
                   <h2 className="font-semibold text-sm text-white truncate">
                     {activeXmtpConversation?.peerDisplayName || activeXmtpConversation?.name || 'Message'}
                   </h2>
-                  <div className="flex items-center gap-1">
-                    <svg className="w-2.5 h-2.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    <span className="text-[10px] text-gray-500">
-                      {activeXmtpConversation?.type === 'group' ? 'Encrypted group' : 'Encrypted'}
-                    </span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                      <span className="text-[10px] text-gray-500">
+                        {activeXmtpConversation?.type === 'group' ? 'Encrypted group' : 'Encrypted'}
+                      </span>
+                    </div>
+                    {xmtp.connectedWallets.length > 0 && (
+                      <span className="text-[10px] text-gray-600">
+                        · {xmtp.connectedWallets.length} wallet{xmtp.connectedWallets.length > 1 ? 's' : ''}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
             ) : (
-              <h2 className="font-semibold text-sm text-white flex-1"># {activeChannel}</h2>
+              <div className="flex-1 min-w-0">
+                <h2 className="font-semibold text-sm text-white"># {activeChannel}</h2>
+              </div>
             )}
 
             {viewMode === 'channel' && (

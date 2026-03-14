@@ -5,6 +5,13 @@ import { createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
 
+// SECURITY: This uses the APP's signer wallet (APP_SIGNER_PRIVATE_KEY),
+// NOT any user's personal wallet. This key was auto-generated at project
+// setup via scripts/generate-wallet.ts and is used only to register
+// Neynar managed signers on behalf of the app (FID 19640).
+// It signs EIP-712 SignedKeyRequest messages on Optimism.
+// Users' personal wallets are never accessed or stored.
+
 const SIGNED_KEY_REQUEST_VALIDATOR = '0x00000000FC700472606ED4fA22623Acf62c60553' as const;
 
 export async function POST() {

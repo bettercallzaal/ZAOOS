@@ -3,8 +3,38 @@ import { IdentifierKind } from '@xmtp/browser-sdk';
 
 const XMTP_ENV = 'production' as const;
 
+// ── Security Notice ─────────────────────────────────────────────────
+//
+// XMTP MESSAGING KEY MANAGEMENT
+//
+// This module generates a dedicated XMTP-only signing key per user.
+// This is NOT the user's personal wallet or Farcaster custody key.
+//
+// How it works:
+// - A random 32-byte key is generated client-side via crypto.getRandomValues()
+// - The key is stored in the browser's localStorage (per FID)
+// - It is used ONLY to sign XMTP messages — never for on-chain transactions
+// - The derived address has no funds and controls no assets
+// - This avoids requiring users to connect MetaMask or sign wallet popups
+//
+// Security considerations:
+// - The key is stored in plaintext in localStorage. This is an accepted
+//   trade-off — XMTP's browser SDK requires client-side signing.
+// - If localStorage is cleared, the XMTP identity is lost and past
+//   encrypted messages cannot be decrypted on this device.
+// - XSS protection is critical — any XSS vulnerability could extract
+//   the XMTP key. We mitigate this by having zero dangerouslySetInnerHTML
+//   usage, validating all inputs with Zod, and using httpOnly session cookies.
+// - This key NEVER leaves the browser. It is never sent to our servers.
+// - Users' personal wallets are NEVER accessed or stored by ZAO OS.
+//
+// ─────────────────────────────────────────────────────────────────────
+
 /**
- * Create an EOA signer from a browser wallet (EIP-1193 provider)
+ * Create an EOA signer from a browser wallet (EIP-1193 provider).
+ * Used when a user explicitly connects their own wallet for XMTP.
+ * ZAO OS does NOT store or access the user's private key — only
+ * the signMessage callback provided by the wallet extension.
  */
 export function createWalletSigner(
   address: `0x${string}`,
@@ -29,8 +59,10 @@ export function createWalletSigner(
 }
 
 /**
- * Create a local signer from a stored private key (no MetaMask needed).
- * Uses viem's privateKeyToAccount for signing.
+ * Create a local signer from a ZAO-generated XMTP key.
+ * This is an app-generated burner key for XMTP messaging ONLY.
+ * It is NOT the user's personal wallet key — ZAO OS never asks for
+ * or touches personal wallet private keys.
  */
 export async function createLocalSigner(privateKey: `0x${string}`): Promise<Signer> {
   const { privateKeyToAccount } = await import('viem/accounts');
@@ -55,7 +87,10 @@ export async function createLocalSigner(privateKey: `0x${string}`): Promise<Sign
 }
 
 /**
- * Get or generate the DB encryption key for a specific wallet's XMTP storage
+ * Get or generate the DB encryption key for XMTP's local message storage.
+ * This encrypts XMTP's IndexedDB/OPFS cache so messages are encrypted at rest
+ * in the browser. The key is stored in localStorage — if cleared, the local
+ * message cache is lost (but messages remain on the XMTP network).
  */
 function getDbEncryptionKey(address: string): Uint8Array {
   if (typeof window === 'undefined') {
@@ -83,8 +118,16 @@ export async function createXMTPClient(signer: Signer, address: string) {
 }
 
 /**
- * Get or generate a local XMTP private key for a FID.
- * Stored in localStorage — no wallet extension needed.
+ * Get or generate a local XMTP-only signing key for a FID.
+ *
+ * SECURITY: This generates an app-specific burner key used exclusively
+ * for XMTP message signing. It is NOT the user's personal wallet key.
+ * - Generated via crypto.getRandomValues() (cryptographically secure)
+ * - Stored in localStorage per FID
+ * - Never sent to any server
+ * - Never used for on-chain transactions or fund transfers
+ * - The derived address holds no assets
+ * - If cleared, XMTP identity is lost (messages not recoverable on this device)
  */
 export function getOrCreateLocalKey(fid: number): `0x${string}` {
   if (typeof window === 'undefined') {
@@ -97,7 +140,7 @@ export function getOrCreateLocalKey(fid: number): `0x${string}` {
     return stored as `0x${string}`;
   }
 
-  // Generate a random 32-byte private key
+  // Generate a random 32-byte XMTP-only signing key (not a wallet key)
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
   const key = `0x${hex}` as `0x${string}`;

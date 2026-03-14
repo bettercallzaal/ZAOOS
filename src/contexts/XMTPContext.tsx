@@ -434,7 +434,12 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, [loadAllConversations]);
 
   /**
-   * Auto-connect using a locally generated key (no MetaMask needed).
+   * Auto-connect using a ZAO-generated XMTP-only key (no MetaMask needed).
+   *
+   * SECURITY: This creates an app-specific burner key for XMTP messaging.
+   * It is NOT the user's personal wallet. ZAO OS never asks for, stores,
+   * or accesses any user's personal wallet private keys. The generated key
+   * is used exclusively for XMTP message signing and holds no funds.
    */
   const autoConnect = useCallback(async (fid: number) => {
     if (walletsRef.current.size > 0) return;

@@ -31,6 +31,12 @@ export const allowlistEntrySchema = z.object({
   real_name: z.string().max(100).optional(),
   ign: z.string().max(100).optional(),
   notes: z.string().max(500).optional(),
+  display_name: z.string().max(100).optional(),
+  pfp_url: z.string().url().optional(),
+  username: z.string().max(100).optional(),
+  custody_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  verified_addresses: z.array(z.string()).optional(),
+  ens_name: z.string().max(200).optional(),
 }).refine(data => data.fid || data.wallet_address, {
   message: 'Either fid or wallet_address is required',
 });

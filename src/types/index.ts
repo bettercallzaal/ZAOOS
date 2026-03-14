@@ -7,6 +7,12 @@ export interface AllowlistEntry {
   is_active: boolean;
   added_at: string;
   notes: string | null;
+  display_name: string | null;
+  pfp_url: string | null;
+  username: string | null;
+  custody_address: string | null;
+  verified_addresses: string[] | null;
+  ens_name: string | null;
 }
 
 export interface SessionData {

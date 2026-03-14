@@ -9,7 +9,7 @@ export async function checkAllowlist(
     return { allowed: false };
   }
 
-  // Check by FID first
+  // Check by FID first (fastest, most reliable)
   if (fid) {
     const { data } = await supabaseAdmin
       .from('allowlist')
@@ -22,17 +22,42 @@ export async function checkAllowlist(
     if (data) return { allowed: true, entry: data as AllowlistEntry };
   }
 
-  // Check by wallet address
+  // Check by wallet address — search across all wallet fields
   if (walletAddress) {
-    const { data } = await supabaseAdmin
+    const addr = walletAddress.toLowerCase();
+
+    // Check primary wallet_address
+    const { data: primaryMatch } = await supabaseAdmin
       .from('allowlist')
       .select('*')
-      .ilike('wallet_address', walletAddress)
+      .ilike('wallet_address', addr)
       .eq('is_active', true)
       .limit(1)
       .single();
 
-    if (data) return { allowed: true, entry: data as AllowlistEntry };
+    if (primaryMatch) return { allowed: true, entry: primaryMatch as AllowlistEntry };
+
+    // Check custody_address
+    const { data: custodyMatch } = await supabaseAdmin
+      .from('allowlist')
+      .select('*')
+      .ilike('custody_address', addr)
+      .eq('is_active', true)
+      .limit(1)
+      .single();
+
+    if (custodyMatch) return { allowed: true, entry: custodyMatch as AllowlistEntry };
+
+    // Check verified_addresses JSONB array
+    const { data: verifiedMatch } = await supabaseAdmin
+      .from('allowlist')
+      .select('*')
+      .contains('verified_addresses', [addr])
+      .eq('is_active', true)
+      .limit(1)
+      .single();
+
+    if (verifiedMatch) return { allowed: true, entry: verifiedMatch as AllowlistEntry };
   }
 
   return { allowed: false };

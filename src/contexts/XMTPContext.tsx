@@ -258,19 +258,25 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       // Reload conversations now that we have member profiles to resolve against
       await loadAllConversations();
 
-      // Auto-create "ZAO General" group if it doesn't exist yet
+      // Auto-create "ZAO General" group if none exists yet
+      // Check ALL conversations (not just localStorage) to prevent duplicates
       const reachableMembers = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
       if (reachableMembers.length > 0) {
         const ZAO_GROUP_KEY = 'zaoos-xmtp-zao-general';
-        const existingGroupId = localStorage.getItem(ZAO_GROUP_KEY);
 
-        // Check if the group still exists in our conversation list
+        // Check if any existing conversation is already named "ZAO General"
         let groupExists = false;
-        if (existingGroupId) {
-          for (const [, wc] of walletsRef.current.entries()) {
-            const conv = await wc.client.conversations.getConversationById(existingGroupId);
-            if (conv) { groupExists = true; break; }
+        for (const [, wc] of walletsRef.current.entries()) {
+          const allConvos = await wc.client.conversations.list();
+          for (const c of allConvos) {
+            const g = c as Group;
+            if (g.name === 'ZAO General') {
+              groupExists = true;
+              localStorage.setItem(ZAO_GROUP_KEY, c.id);
+              break;
+            }
           }
+          if (groupExists) break;
         }
 
         if (!groupExists) {
@@ -352,10 +358,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
       saveConnectedWallet(address);
       setConnectedWallets(Array.from(walletsRef.current.keys()));
-      await loadAllConversations();
 
-      // Check which ZAO members are reachable via XMTP
-      checkZaoMembers();
+      // Check ZAO members first (populates address cache), then load conversations
+      // This ensures profile resolution works on the first load
+      await checkZaoMembers();
 
       // Stream new conversations
       (async () => {

@@ -112,7 +112,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
               peerInboxId: isDm ? await (conv as Dm).peerInboxId() : undefined,
               peerDisplayName: peer?.displayName || peer?.username ? `@${peer.username}` : undefined,
               peerPfpUrl: peer?.pfpUrl || undefined,
-              lastMessage: typeof lastContent === 'string' ? lastContent : lastContent ? '[media]' : undefined,
+              lastMessage: typeof lastContent === 'string' ? lastContent : undefined,
               lastMessageAt: lastMsg?.sentAt,
               unreadCount: 0,
               // Tag which wallet this conversation belongs to
@@ -491,29 +491,30 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const memberProfiles = getMemberProfiles();
       const peer = peerProfiles[id];
 
-      const decoded: XMTPMessage[] = rawMessages.map((msg) => {
-        const isFromMe = msg.senderInboxId === myInboxId;
-        // Try member profile first (group chats), then peer profile (DMs)
-        const memberProfile = memberProfiles[msg.senderInboxId];
-        const senderName = isFromMe
-          ? undefined
-          : memberProfile?.displayName || memberProfile?.username
-            ? `@${memberProfile.username}`
-            : peer?.displayName || peer?.username
-              ? peer.displayName || `@${peer.username}`
-              : undefined;
+      const decoded: XMTPMessage[] = rawMessages
+        .filter((msg) => typeof msg.content === 'string')
+        .map((msg) => {
+          const isFromMe = msg.senderInboxId === myInboxId;
+          const memberProfile = memberProfiles[msg.senderInboxId];
+          const senderName = isFromMe
+            ? undefined
+            : memberProfile?.displayName || memberProfile?.username
+              ? `@${memberProfile.username}`
+              : peer?.displayName || peer?.username
+                ? peer.displayName || `@${peer.username}`
+                : undefined;
 
-        return {
-          id: msg.id,
-          conversationId: id,
-          senderInboxId: msg.senderInboxId,
-          senderDisplayName: senderName,
-          senderPfpUrl: isFromMe ? undefined : memberProfile?.pfpUrl || peer?.pfpUrl || undefined,
-          content: typeof msg.content === 'string' ? msg.content : '[media]',
-          sentAt: msg.sentAt,
-          isFromMe,
-        };
-      });
+          return {
+            id: msg.id,
+            conversationId: id,
+            senderInboxId: msg.senderInboxId,
+            senderDisplayName: senderName,
+            senderPfpUrl: isFromMe ? undefined : memberProfile?.pfpUrl || peer?.pfpUrl || undefined,
+            content: msg.content as string,
+            sentAt: msg.sentAt,
+            isFromMe,
+          };
+        });
 
       setMessages(decoded);
 
@@ -525,6 +526,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
           const stream = await conv.stream({
             onValue: (msg) => {
               if (!client) return;
+              // Skip non-text messages (group updates, etc.)
+              if (typeof msg.content !== 'string') return;
               const isFromMe = msg.senderInboxId === client.inboxId;
               const mp = memberProfiles[msg.senderInboxId];
               const senderName = isFromMe
@@ -540,7 +543,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
                 senderInboxId: msg.senderInboxId,
                 senderDisplayName: senderName,
                 senderPfpUrl: isFromMe ? undefined : mp?.pfpUrl || peer?.pfpUrl || undefined,
-                content: typeof msg.content === 'string' ? msg.content : '[media]',
+                content: msg.content,
                 sentAt: msg.sentAt,
                 isFromMe,
               };

@@ -53,7 +53,7 @@ export function Sidebar({
   onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
   zaoMembers, loadingMembers, onStartDmWithMember,
 }: SidebarProps) {
-  const reachableCount = zaoMembers.filter((m) => m.reachable).length;
+  const onlineMembers = zaoMembers.filter((m) => m.reachable);
   return (
     <>
       {/* Mobile overlay */}
@@ -195,37 +195,31 @@ export function Sidebar({
           )}
         </div>
 
-        {/* ZAO Members */}
+        {/* Online Members — only show reachable XMTP members */}
         {xmtpConnected && (
           <div className="px-3 mt-4 space-y-1">
             <div className="flex items-center justify-between px-3 mb-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">ZAO Members</p>
-              {reachableCount > 0 && (
-                <span className="text-[10px] text-green-400 font-medium">{reachableCount} online</span>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Online</p>
+              {onlineMembers.length > 0 && (
+                <span className="text-[10px] text-green-400 font-medium">{onlineMembers.length}</span>
               )}
             </div>
 
             {loadingMembers ? (
               <div className="flex items-center gap-2 px-3 py-2">
                 <div className="w-3.5 h-3.5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs text-gray-500">Checking members...</span>
+                <span className="text-xs text-gray-500">Checking...</span>
               </div>
-            ) : zaoMembers.length === 0 ? (
-              <p className="px-3 text-xs text-gray-600">No members found</p>
+            ) : onlineMembers.length === 0 ? (
+              <p className="px-3 text-xs text-gray-600">No members online</p>
             ) : (
               <div className="space-y-0.5 max-h-48 overflow-y-auto">
-                {zaoMembers.map((member) => (
+                {onlineMembers.map((member) => (
                   <button
                     key={member.fid ?? member.displayName}
-                    onClick={() => member.reachable && onStartDmWithMember(member)}
-                    disabled={!member.reachable}
-                    className={`flex items-center gap-2.5 w-full text-left px-3 py-1.5 rounded-md transition-colors ${
-                      member.reachable
-                        ? 'text-gray-300 hover:bg-white/5 hover:text-white cursor-pointer'
-                        : 'text-gray-600 cursor-default'
-                    }`}
+                    onClick={() => onStartDmWithMember(member)}
+                    className="flex items-center gap-2.5 w-full text-left px-3 py-1.5 rounded-md transition-colors text-gray-300 hover:bg-white/5 hover:text-white"
                   >
-                    {/* Avatar + status dot */}
                     <div className="relative flex-shrink-0">
                       {member.pfpUrl ? (
                         <div className="w-6 h-6 relative">
@@ -244,11 +238,7 @@ export function Sidebar({
                           </span>
                         </div>
                       )}
-                      <span
-                        className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0d1b2a] ${
-                          member.reachable ? 'bg-green-400' : 'bg-gray-600'
-                        }`}
-                      />
+                      <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0d1b2a] bg-green-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium truncate">{member.displayName}</p>

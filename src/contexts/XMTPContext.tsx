@@ -216,20 +216,24 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // Batch canMessage check
+      // Batch canMessage check — chunk to avoid timeout on large lists
       const reachableSet = new Set<number>();
       if (allAddresses.length > 0) {
         try {
           const { IdentifierKind } = await import('@xmtp/browser-sdk');
-          const identifiers = allAddresses.map((addr) => ({
-            identifierKind: IdentifierKind.Ethereum,
-            identifier: addr,
-          }));
-          const results = await xmtpClient.canMessage(identifiers);
-          for (const [addr, canMsg] of results.entries()) {
-            if (canMsg) {
-              const idx = addrToMemberIdx.get(addr.toLowerCase());
-              if (idx !== undefined) reachableSet.add(idx);
+          const BATCH_SIZE = 100;
+          for (let i = 0; i < allAddresses.length; i += BATCH_SIZE) {
+            const batch = allAddresses.slice(i, i + BATCH_SIZE);
+            const identifiers = batch.map((addr) => ({
+              identifierKind: IdentifierKind.Ethereum,
+              identifier: addr,
+            }));
+            const results = await xmtpClient.canMessage(identifiers);
+            for (const [addr, canMsg] of results.entries()) {
+              if (canMsg) {
+                const idx = addrToMemberIdx.get(addr.toLowerCase());
+                if (idx !== undefined) reachableSet.add(idx);
+              }
             }
           }
         } catch (err) {
@@ -253,31 +257,26 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         });
 
       setZaoMembers(mapped);
+      setLoadingMembers(false); // Show results immediately, inbox resolution continues in background
 
-      // Debug: log reachable members and their pfp status
       const reachable = mapped.filter((m: ZaoMember) => m.reachable);
-      console.log(`[XMTP] ${reachable.length} reachable peers:`, reachable.map((m: ZaoMember) => ({
-        name: m.displayName,
-        fid: m.fid,
-        hasPfp: !!m.pfpUrl,
-        addrs: m.addresses.length,
-      })));
+      console.log(`[XMTP] ${reachable.length} reachable peers found`);
 
-      // Resolve XMTP inbox IDs for reachable members so we can match DM peers
-      // This is the KEY step — XMTP local keys don't match Farcaster addresses,
-      // so we must map Farcaster address → XMTP inbox ID → profile
+      // Resolve XMTP inbox IDs for reachable members in parallel batches
+      // This maps Farcaster address → XMTP inbox ID → profile for DM peer matching
       const reachableMembersForInbox = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
       if (reachableMembersForInbox.length > 0) {
         try {
           const { IdentifierKind } = await import('@xmtp/browser-sdk');
           const { saveMemberProfile } = await import('@/lib/xmtp/client');
-          for (const m of reachableMembersForInbox) {
-            try {
+          const PARALLEL = 10;
+          for (let i = 0; i < reachableMembersForInbox.length; i += PARALLEL) {
+            const batch = reachableMembersForInbox.slice(i, i + PARALLEL);
+            await Promise.allSettled(batch.map(async (m) => {
               const inboxId = await xmtpClient.fetchInboxIdByIdentifier({
                 identifierKind: IdentifierKind.Ethereum,
                 identifier: m.addresses[0],
               });
-              console.log(`[XMTP] ${m.displayName}: inboxId=${inboxId ? inboxId.slice(0, 12) + '...' : 'null'}, pfp=${!!m.pfpUrl}`);
               if (inboxId) {
                 saveMemberProfile(inboxId, {
                   fid: m.fid ?? 0,
@@ -286,8 +285,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
                   pfpUrl: m.pfpUrl ?? '',
                 });
               }
-            } catch (err) { console.warn(`[XMTP] inbox resolve failed for ${m.displayName}:`, err); }
+            }));
           }
+          console.log(`[XMTP] Resolved inbox IDs for ${reachableMembersForInbox.length} reachable peers`);
         } catch (err) {
           console.error('Inbox ID resolution failed:', err);
         }
@@ -296,9 +296,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       // Reload conversations now that we have inbox ID → profile mappings
       await loadAllConversations();
 
-      // Auto-create "ZAO General" group if none exists yet
-      // Check ALL conversations (not just localStorage) to prevent duplicates
-      const reachableMembers = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
+      // Auto-create "ZAO General" group — only ZAO allowlist members, not all follows
+      const zaoFids = new Set((zaoData.members || []).map((m: { fid: number | null }) => m.fid).filter(Boolean));
+      const reachableMembers = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0 && m.fid && zaoFids.has(m.fid));
       if (reachableMembers.length > 0) {
         const ZAO_GROUP_KEY = 'zaoos-xmtp-zao-general';
 

@@ -28,7 +28,7 @@ export async function GET() {
   try {
     const allUsers: NeynarUser[] = [];
     let cursor: string | undefined;
-    const MAX_PAGES = 10; // Safety cap: 10 * 100 = 1000 follows max
+    const MAX_PAGES = 2; // Cap at 200 follows to keep XMTP checks fast
 
     for (let page = 0; page < MAX_PAGES; page++) {
       const data = await getFollowing(session.fid, session.fid, 'desc_chron', cursor, 100);

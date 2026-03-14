@@ -7,6 +7,12 @@ import { Cast } from '@/types';
 const ALLOWED_CHANNELS = ['zao', 'zabal', 'cocconcertz'];
 const FEED_LIMIT = 20;
 
+// Server-side TTL: first request in each window refreshes from Neynar,
+// subsequent requests within the window read from DB (which now has fresh data).
+// This keeps reaction counts up-to-date while sharing the Neynar cost across all users.
+const REFRESH_TTL = 15_000; // 15 seconds
+const lastRefresh: Record<string, number> = {};
+
 // Map a channel_casts DB row → Cast type expected by the client
 function rowToCast(row: Record<string, unknown>): Cast {
   const reactions = (row.reactions ?? {}) as {
@@ -37,8 +43,8 @@ function rowToCast(row: Record<string, unknown>): Cast {
   };
 }
 
-// Backfill: fetch from Neynar and store in DB for future reads
-async function backfillFromNeynar(channel: string): Promise<Cast[]> {
+// Fetch from Neynar and upsert into DB (updates reaction counts + new casts)
+async function refreshFromNeynar(channel: string): Promise<Cast[]> {
   const feed = await getChannelFeed(channel, undefined, FEED_LIMIT);
   const casts: Cast[] = feed.casts || [];
 
@@ -65,7 +71,7 @@ async function backfillFromNeynar(channel: string): Promise<Cast[]> {
       .from('channel_casts')
       .upsert(rows, { onConflict: 'hash' })
       .then(({ error }) => {
-        if (error) console.error('[messages] backfill upsert error:', error);
+        if (error) console.error('[messages] upsert error:', error);
       });
   }
 
@@ -84,28 +90,46 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // ── 1. Read from our own DB (no Neynar credits) ──────────────────────────
-    const { data: dbRows, error: dbError } = await supabaseAdmin
-      .from('channel_casts')
-      .select('*')
-      .eq('channel_id', channel)
-      .order('timestamp', { ascending: false })
-      .limit(FEED_LIMIT);
+    const now = Date.now();
+    const needsRefresh = (now - (lastRefresh[channel] || 0)) > REFRESH_TTL;
 
     let casts: Cast[];
 
-    if (dbError) {
-      console.error('[messages] DB read error:', dbError);
-      // Fall through to Neynar on DB errors
-      casts = await backfillFromNeynar(channel);
-    } else if (!dbRows || dbRows.length === 0) {
-      // ── 2. DB empty → backfill once from Neynar, store for next time ────
-      casts = await backfillFromNeynar(channel);
+    if (needsRefresh) {
+      // ── Refresh window: fetch fresh from Neynar (gets real reaction counts) ──
+      try {
+        casts = await refreshFromNeynar(channel);
+        lastRefresh[channel] = now;
+      } catch (neynarErr) {
+        console.error('[messages] Neynar refresh failed, falling back to DB:', neynarErr);
+        // Fall back to DB on Neynar error
+        const { data: dbRows } = await supabaseAdmin
+          .from('channel_casts')
+          .select('*')
+          .eq('channel_id', channel)
+          .order('timestamp', { ascending: false })
+          .limit(FEED_LIMIT);
+        casts = (dbRows || []).map(rowToCast);
+      }
     } else {
-      casts = dbRows.map(rowToCast);
+      // ── Within TTL: read from DB (which was recently refreshed) ──────────────
+      const { data: dbRows, error: dbError } = await supabaseAdmin
+        .from('channel_casts')
+        .select('*')
+        .eq('channel_id', channel)
+        .order('timestamp', { ascending: false })
+        .limit(FEED_LIMIT);
+
+      if (dbError || !dbRows || dbRows.length === 0) {
+        // DB empty or error — force a Neynar fetch
+        casts = await refreshFromNeynar(channel);
+        lastRefresh[channel] = now;
+      } else {
+        casts = dbRows.map(rowToCast);
+      }
     }
 
-    // ── 3. Filter out admin-hidden messages ─────────────────────────────────
+    // ── Filter out admin-hidden messages ─────────────────────────────────────
     const castHashes = casts.map((c) => c.hash);
     const { data: hiddenData } = await supabaseAdmin
       .from('hidden_messages')

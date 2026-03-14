@@ -16,9 +16,11 @@
     "@farcaster/quick-auth": "^0.0.8",
     "@neynar/nodejs-sdk": "^3.137.0",
     "@neynar/react": "^1.2.22",
+    "@rainbow-me/rainbowkit": "^2.2.10",
     "@supabase/supabase-js": "^2.99.1",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-virtual": "^3.13.22",
+    "@wagmi/core": "^2.22.1",
     "@xmtp/browser-sdk": "^7.0.0",
     "iron-session": "^8.0.4",
     "next": "16.1.6",
@@ -26,6 +28,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "viem": "^2.47.2",
+    "wagmi": "^2.19.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {

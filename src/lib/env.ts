@@ -25,4 +25,5 @@ export const ENV = {
   // Optional
   NEYNAR_WEBHOOK_SECRET: optionalEnv('NEYNAR_WEBHOOK_SECRET'),
   NEXT_PUBLIC_SIWF_DOMAIN: optionalEnv('NEXT_PUBLIC_SIWF_DOMAIN'),
+  NEXT_PUBLIC_WC_PROJECT_ID: optionalEnv('NEXT_PUBLIC_WC_PROJECT_ID'),
 } as const;

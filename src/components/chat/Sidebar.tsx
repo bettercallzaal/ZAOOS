@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { SessionData } from '@/types';
 import { XMTPConversation } from '@/types/xmtp';
 import type { ZaoMember } from '@/contexts/XMTPContext';
@@ -57,6 +59,7 @@ export function Sidebar({
 }: SidebarProps) {
   const onlineMembers = zaoMembers.filter((m) => m.reachable);
   const [onlineCollapsed, setOnlineCollapsed] = useState(false);
+  const { isConnected: hasWallet } = useAccount();
   return (
     <>
       {/* Mobile overlay */}
@@ -212,6 +215,25 @@ export function Sidebar({
                   </button>
                 );
               })}
+            </div>
+          )}
+
+          {/* Wallet connect — shown when XMTP is active but no wallet linked */}
+          {xmtpConnected && !hasWallet && (
+            <div className="mt-2 px-1">
+              <ConnectButton.Custom>
+                {({ openConnectModal }) => (
+                  <button
+                    onClick={openConnectModal}
+                    className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
+                    </svg>
+                    <span className="text-xs">Connect Wallet</span>
+                  </button>
+                )}
+              </ConnectButton.Custom>
             </div>
           )}
         </div>

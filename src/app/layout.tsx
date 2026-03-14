@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import { headers } from 'next/headers';
+import { cookieToInitialState } from 'wagmi';
+import { getWagmiConfig } from '@/lib/wagmi/config';
 import './globals.css';
 import { Providers } from './providers';
 
@@ -53,18 +56,23 @@ export const viewport: Viewport = {
   themeColor: '#0a1628',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const initialState = cookieToInitialState(
+    getWagmiConfig(),
+    (await headers()).get('cookie')
+  );
+
   return (
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://auth.farcaster.xyz" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers wagmiInitialState={initialState}>{children}</Providers>
       </body>
     </html>
   );

@@ -275,39 +275,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
     setLoadingMembers(true);
     try {
-      const [membersRes, followsRes] = await Promise.all([
-        fetch('/api/members'),
-        fetch('/api/following/online'),
-      ]);
-
+      const membersRes = await fetch('/api/members');
       const zaoData = membersRes.ok ? await membersRes.json() : { members: [], currentFid: 0 };
-      const followsData = followsRes.ok ? await followsRes.json() : { members: [], currentFid: 0 };
-      const currentFid = zaoData.currentFid || followsData.currentFid;
+      const currentFid = zaoData.currentFid;
 
-      // Merge: follows take priority (they have Neynar pfps), ZAO members fill gaps
-      const byFid = new Map<number, { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[]; isZaoMember: boolean }>();
-
-      for (const m of followsData.members || []) {
-        if (m.fid && m.fid !== currentFid) {
-          byFid.set(m.fid, { ...m, isZaoMember: false });
-        }
-      }
-
-      for (const m of zaoData.members || []) {
-        if (m.fid === currentFid) continue;
-        const existing = m.fid ? byFid.get(m.fid) : undefined;
-        if (existing) {
-          const addrs = new Set([...existing.addresses, ...m.addresses]);
-          existing.addresses = [...addrs];
-          existing.isZaoMember = true;
-          if (!existing.pfpUrl && m.pfpUrl) existing.pfpUrl = m.pfpUrl;
-        } else {
-          const key = m.fid || -(byFid.size + 1);
-          byFid.set(key, { ...m, isZaoMember: true });
-        }
-      }
-
-      const merged = Array.from(byFid.values());
+      // Only ZAO allowlist members
+      const merged = (zaoData.members || [])
+        .filter((m: { fid: number | null }) => m.fid !== currentFid)
+        .map((m: { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[] }) => ({ ...m }));
 
       // Collect all unique addresses
       const allAddresses: string[] = [];
@@ -348,7 +323,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       }
 
       const mapped: ZaoMember[] = merged
-        .map((m, idx) => ({
+        .map((m: { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[] }, idx: number) => ({
           fid: m.fid,
           username: m.username,
           displayName: m.displayName,
@@ -400,9 +375,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       // Reload conversations with updated profile mappings
       await loadAllConversations();
 
-      // Auto-create ZAO General — only ZAO allowlist members
-      const zaoFids = new Set((zaoData.members || []).map((m: { fid: number | null }) => m.fid).filter(Boolean));
-      const reachableMembers = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0 && m.fid && zaoFids.has(m.fid));
+      // Auto-create ZAO General for reachable ZAO members
+      const reachableMembers = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
       if (reachableMembers.length > 0) {
         const ZAO_GROUP_KEY = 'zaoos-xmtp-zao-general';
         let groupExists = false;

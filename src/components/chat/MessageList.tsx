@@ -16,9 +16,10 @@ interface MessageListProps {
   onReply?: (hash: string, authorName: string, text: string) => void;
   loading: boolean;
   channelId?: string;
+  sortMode?: 'newest' | 'oldest' | 'most_liked' | 'most_replied';
 }
 
-export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, onReply, loading, channelId = 'zao' }: MessageListProps) {
+export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, onReply, loading, channelId = 'zao', sortMode = 'newest' }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
   const prevChannelRef = useRef(channelId);
@@ -91,15 +92,17 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
     );
   }
 
-  // Reverse to show oldest first (Neynar returns newest first)
-  const sorted = [...messages].reverse();
+  // For chronological sorts: reverse so oldest is at top (chat style)
+  // For engagement sorts: keep order as-is (best at top, feed style)
+  const isChatLayout = sortMode === 'newest' || sortMode === 'oldest';
+  const displayMessages = isChatLayout ? [...messages].reverse() : messages;
 
   return (
     <div ref={containerRef} className="flex-1 overflow-y-auto" style={{ overflowAnchor: 'none' }}>
-      {/* Spacer pushes messages to the bottom when there are few messages */}
-      <div className="min-h-full flex flex-col justify-end">
+      {/* Spacer pushes messages to bottom in chat layout */}
+      <div className={isChatLayout ? 'min-h-full flex flex-col justify-end' : ''}>
         <div className="py-2">
-          {sorted.map((cast) => (
+          {displayMessages.map((cast) => (
             <Message
               key={cast.hash}
               cast={cast}

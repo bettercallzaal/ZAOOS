@@ -25,6 +25,7 @@ import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 import { MusicSidebar } from '@/components/music/MusicSidebar';
 import { SongSubmit } from '@/components/music/SongSubmit';
 import { useMusicQueue } from '@/hooks/useMusicQueue';
+import { FeedFilters, filterAndSortCasts, ContentFilter, SortMode } from './FeedFilters';
 
 export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
@@ -44,6 +45,8 @@ export function ChatRoom() {
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [profileFid, setProfileFid] = useState<number | null>(null);
   const [dmDialogType, setDmDialogType] = useState<'dm' | 'group' | null>(null);
+  const [contentFilter, setContentFilter] = useState<ContentFilter>('all');
+  const [sortMode, setSortMode] = useState<SortMode>('newest');
   const composeRef = useRef<ComposeBarHandle>(null);
   const musicQueue = useMusicQueue(messages);
 
@@ -78,6 +81,18 @@ export function ChatRoom() {
     const convId = await xmtp.createGroup(name, addresses);
     if (convId) xmtp.selectConversation(convId);
   }, [xmtp]);
+
+  // Filtered + sorted messages
+  const filteredMessages = useMemo(
+    () => filterAndSortCasts(messages, contentFilter, sortMode),
+    [messages, contentFilter, sortMode],
+  );
+
+  // Reset filters on channel switch
+  useEffect(() => {
+    setContentFilter('all');
+    setSortMode('newest');
+  }, [activeChannel]);
 
   // Keyboard shortcuts
   const shortcutHandlers = useMemo(() => ({
@@ -260,6 +275,16 @@ export function ChatRoom() {
             </>
           ) : (
             <>
+              {/* Feed filters */}
+              <FeedFilters
+                contentFilter={contentFilter}
+                sortMode={sortMode}
+                onContentFilterChange={setContentFilter}
+                onSortChange={setSortMode}
+                resultCount={filteredMessages.length}
+                totalCount={messages.length}
+              />
+
               {/* Error banner */}
               {error && (
                 <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0">
@@ -269,7 +294,7 @@ export function ChatRoom() {
 
               {/* Farcaster Messages */}
               <MessageList
-                messages={messages}
+                messages={filteredMessages}
                 isAdmin={user.isAdmin}
                 currentFid={user.fid}
                 hasSigner={hasSigner}
@@ -287,6 +312,7 @@ export function ChatRoom() {
                 }}
                 loading={loading}
                 channelId={activeChannel}
+                sortMode={sortMode}
               />
 
               {/* Global music player */}

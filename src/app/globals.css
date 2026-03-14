@@ -55,6 +55,10 @@ body {
   background: #555;
 }
 
+/* Hide scrollbar but keep scrolling */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* Thread drawer slide-in animation */
 @keyframes slide-in-right {
   from { transform: translateX(100%); }

@@ -160,6 +160,7 @@ export function ChatRoom() {
         onOpenRespect={() => { setRespectOpen(true); setSidebarOpen(false); }}
         xmtpConnected={xmtp.isConnected}
         xmtpConnecting={xmtp.isConnecting}
+        xmtpError={xmtp.error}
         xmtpConversations={xmtp.conversations}
         activeConversationId={xmtp.activeConversationId}
         onXmtpConnect={handleXmtpConnect}
@@ -314,6 +315,11 @@ export function ChatRoom() {
                 conversation={activeXmtpConversation}
                 messages={xmtp.messages}
                 loading={xmtp.loadingMessages}
+                xmtpState={xmtp.isConnecting ? 'connecting' : xmtp.error ? 'error' : xmtp.isConnected ? 'connected' : 'idle'}
+                xmtpError={xmtp.error}
+                onNewDm={() => setDmDialogType('dm')}
+                onNewGroup={() => setDmDialogType('group')}
+                onRetryConnect={handleXmtpConnect}
               />
               {activeXmtpConversation && (
                 <MessageCompose

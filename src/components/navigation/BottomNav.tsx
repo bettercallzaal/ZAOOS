@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { communityConfig } from '@/../community.config';
 
 const TABS = [
   {
@@ -58,6 +59,7 @@ export function BottomNav() {
   )?.id || 'social';
 
   return (
+    // bg-[#0d1b2a] matches communityConfig.colors.surface
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-gray-800 md:hidden">
       <div className="flex items-center justify-around h-14 px-2 safe-area-bottom">
         {TABS.map((tab) => {
@@ -68,9 +70,10 @@ export function BottomNav() {
               href={tab.href}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 transition-colors ${
                 isActive
-                  ? 'text-[#f5a623]'
+                  ? ''
                   : 'text-gray-500 active:text-gray-300'
               }`}
+              style={isActive ? { color: communityConfig.colors.primary } : undefined}
             >
               {tab.icon}
               <span className="text-[10px] font-medium">{tab.label}</span>

@@ -2,9 +2,10 @@ import { getIronSession, IronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import { SessionData } from '@/types';
 import { ENV } from '@/lib/env';
+import { communityConfig } from '@/../community.config';
 
-const ADMIN_FIDS = [19640];
-const ADMIN_WALLETS = ['0x0000000000000000000000000000000000000000']; // Add admin wallets here
+const ADMIN_FIDS: readonly number[] = communityConfig.adminFids;
+const ADMIN_WALLETS: readonly string[] = communityConfig.adminWallets;
 
 export interface SessionPayload {
   fid?: number;

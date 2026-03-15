@@ -130,7 +130,7 @@ export function SocialPage() {
   const hasSigner = !!user.signerUuid;
 
   return (
-    <div className="flex h-[100dvh] bg-[#0a1628] text-white overflow-hidden">
+    <div className="flex h-[100dvh] pb-14 md:pb-0 bg-[#0a1628] text-white overflow-hidden">
       <div className="flex-1 flex flex-col min-w-0 max-w-2xl mx-auto w-full">
         {/* Header */}
         <header className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex-shrink-0">

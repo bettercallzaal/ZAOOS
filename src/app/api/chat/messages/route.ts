@@ -3,8 +3,9 @@ import { getSessionData } from '@/lib/auth/session';
 import { getChannelFeed } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { Cast } from '@/types';
+import { communityConfig } from '@/../community.config';
 
-const ALLOWED_CHANNELS = ['zao', 'zabal', 'cocconcertz'];
+const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 const FEED_LIMIT = 20;
 
 // Server-side TTL: first request in each window refreshes from Neynar,

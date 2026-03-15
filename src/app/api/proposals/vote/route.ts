@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Proposal is no longer open for voting' }, { status: 400 });
     }
 
-    if (proposal.closes_at && new Date(proposal.closes_at) < new Date()) {
+    if (proposal.closes_at && new Date(proposal.closes_at).getTime() < Date.now()) {
       return NextResponse.json({ error: 'Voting period has ended' }, { status: 400 });
     }
 

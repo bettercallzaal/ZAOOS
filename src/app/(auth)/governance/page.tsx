@@ -75,6 +75,7 @@ export default function GovernancePage() {
   const [newDesc, setNewDesc] = useState('');
   const [newCategory, setNewCategory] = useState('general');
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   // Voting state
   const [voting, setVoting] = useState<string | null>(null);
@@ -101,6 +102,7 @@ export default function GovernancePage() {
   const handleCreateProposal = async () => {
     if (!newTitle.trim() || !newDesc.trim()) return;
     setCreating(true);
+    setCreateError('');
     try {
       const res = await fetch('/api/proposals', {
         method: 'POST',
@@ -116,7 +118,9 @@ export default function GovernancePage() {
         const d = await fetch('/api/proposals').then((r) => r.json());
         setProposals(d.proposals || []);
       }
-    } catch {}
+    } catch {
+      setCreateError('Failed to create proposal. Please try again.');
+    }
     setCreating(false);
   };
 
@@ -370,6 +374,9 @@ export default function GovernancePage() {
                   <p className="text-[10px] text-gray-600">
                     Your vote weight: {myEntry.totalRespect.toLocaleString()} respect
                   </p>
+                )}
+                {createError && (
+                  <p className="text-xs text-red-400">{createError}</p>
                 )}
                 <button
                   onClick={handleCreateProposal}

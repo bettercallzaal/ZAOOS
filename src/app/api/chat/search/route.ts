@@ -2,17 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { communityConfig } from '@/../community.config';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
-const ALLOWED_CHANNELS = ['zao', 'zabal', 'cocconcertz'];
+const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 const SEARCH_LIMIT = 20;
 
 // Channel URL format used by Neynar search
-const CHANNEL_URLS: Record<string, string> = {
-  zao: 'https://farcaster.group/zao',
-  zabal: 'https://farcaster.group/zabal',
-  cocconcertz: 'https://farcaster.group/cocconcertz',
-};
+const CHANNEL_URLS: Record<string, string> = Object.fromEntries(
+  ALLOWED_CHANNELS.map((ch) => [ch, `https://farcaster.group/${ch}`])
+);
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();

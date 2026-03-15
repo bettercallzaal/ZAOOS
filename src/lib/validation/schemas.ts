@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const castTextSchema = z.string().min(1).max(1024);
+export const castTextSchema = z.string().trim().min(1).max(1024);
 
 export const channelIdSchema = z.string().regex(/^[a-z0-9-]+$/);
 

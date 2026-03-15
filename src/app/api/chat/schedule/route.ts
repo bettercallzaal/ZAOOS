@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
+import { communityConfig } from '@/../community.config';
 
-const ALLOWED_CHANNELS = ['zao', 'zabal', 'cocconcertz'];
+const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
 // GET: list user's scheduled casts
 export async function GET() {

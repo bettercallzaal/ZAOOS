@@ -17,6 +17,7 @@ interface UserProfile {
 export default function ToolsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetch('/api/auth/session')
@@ -41,7 +42,7 @@ export default function ToolsPage() {
           });
         }
       })
-      .catch(() => {})
+      .catch(() => setError('Failed to load profile'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -64,6 +65,10 @@ export default function ToolsPage() {
                 <div className="h-3 bg-gray-800 rounded w-20" />
               </div>
             </div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-500/10 rounded-xl p-6 border border-red-500/30 text-center">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
         ) : profile ? (
           <div className="bg-gradient-to-r from-[#0d1b2a] to-[#f5a623]/5 rounded-xl p-6 border border-gray-800">

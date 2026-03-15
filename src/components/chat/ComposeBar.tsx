@@ -3,12 +3,9 @@
 import { useState, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { QuotedCastData } from '@/types';
 import { MentionAutocomplete } from './MentionAutocomplete';
+import { communityConfig } from '@/../community.config';
 
-const ALL_CHANNELS = [
-  { id: 'zao', label: '#zao' },
-  { id: 'zabal', label: '#zabal' },
-  { id: 'cocconcertz', label: '#cocconcertz' },
-];
+const ALL_CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `#${id}` }));
 
 export interface ReplyContext {
   hash: string;

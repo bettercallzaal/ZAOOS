@@ -7,12 +7,9 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { SessionData } from '@/types';
 import { XMTPConversation } from '@/types/xmtp';
 import type { ZaoMember } from '@/contexts/XMTPContext';
+import { communityConfig } from '@/../community.config';
 
-const CHANNELS = [
-  { id: 'zao', label: '# zao' },
-  { id: 'zabal', label: '# zabal' },
-  { id: 'cocconcertz', label: '# cocconcertz' },
-];
+const CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `# ${id}` }));
 
 function timeAgo(date?: Date): string {
   if (!date) return '';

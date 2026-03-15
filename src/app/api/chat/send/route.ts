@@ -4,8 +4,9 @@ import { postCast } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { sendMessageSchema } from '@/lib/validation/schemas';
 import { sendNotification } from '@/lib/notifications';
+import { communityConfig } from '@/../community.config';
 
-const ALLOWED_CHANNELS = ['zao', 'zabal', 'cocconcertz'];
+const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();

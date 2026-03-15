@@ -1,29 +1,40 @@
-# 47 — The ZAO Community & Mutual Ecosystem
+# 47 — The ZAO Community & Ecosystem
 
-> **Status:** Research complete
+> **Status:** Research complete (updated)
 > **Date:** March 2026
-> **Goal:** Document the ZAO itself — its community, governance, culture, mutual communities, and full ecosystem
+> **Goal:** Document the ZAO, its mutual communities, key people, and full ecosystem
 
 ---
 
 ## The ZAO (ZTalent Artist Organization)
 
-A community-driven hub where musicians, artists, and technologists unite to unlock the potential of Web3 for the creative economy. Part DAO, part collective, part talent agency, part educational platform.
+A community-driven hub where musicians, artists, and technologists unite to unlock Web3 for the creative economy. Part DAO, part collective, part talent agency, part educational platform.
 
 **Tagline:** "Demystifying emerging technology for independent artists"
 **Thesis:** "Web2 takes the profit. Web3 gives it back."
 **Website:** [thezao.com](https://www.thezao.com/about)
 
+### The Four Pillars of ZAO OS
+
+ZAO OS carries 4 meanings, each a visible section of the app:
+
+| Pillar | App Tab | What It Covers |
+|--------|---------|---------------|
+| **Artist Organization** | Social | Community, social graph, music curation, shared listening |
+| **Autonomous Organization** | Governance | Respect tokens, fractal democracy, DAO, Hats roles, treasury |
+| **Operating System** | Tools | Artist brand building, cross-platform publishing, AI agent, ZID profiles |
+| **Open Source** | Contribute | GitHub, AI + human coordination, forkability, bounties, docs |
+
 ---
 
 ## Founder: Zaal Panthaki (@BetterCallZaal)
 
-- **Background:** BS in Electrical Engineering (RIT 2022), former Automation Engineer at PCC Structurals (led $1.5M robotics project, 7x throughput increase)
-- **Current:** Building Automation Technician at The Jackson Laboratory + ZAO Founder & Technical Lead
+- **Background:** BS in Electrical Engineering (RIT 2022), former Automation Engineer (led $1.5M robotics project)
+- **Current:** Building Automation Technician at The Jackson Laboratory + ZAO Founder
 - **Based:** Maine (Ellsworth area)
 - **Farcaster:** @bettercallzaal (FID 19640)
-- **Skills:** TypeScript, Python, React, Next.js, Solidity, Supabase, Solana, Base
-- **GitHub:** 65+ public repos, ~1 new repo every 6 days
+- **GitHub:** 65+ public repos
+- **Newsletter:** 329+ daily "Year of the ZAO" editions on Paragraph
 
 ---
 
@@ -34,23 +45,21 @@ A community-driven hub where musicians, artists, and technologists unite to unlo
 | Ecosystem participants | 1,000+ |
 | Newsletter subscribers | 500+ |
 | Weekly fractal meetings held | 77+ |
-| Core ZAO OS members (allowlist) | 40 |
+| Core ZAO OS members | 40 |
 | Revenue generated | $8,000+ |
 | WaveWarZ trading volume | $50,000+ |
 | Daily newsletter editions | 329+ |
-| Smart contract exploits | Zero |
 
 ---
 
-## $ZAO Token (Respect)
+## $ZAO Respect Token
 
 | Detail | Value |
 |--------|-------|
 | **Contract** | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` |
 | **Chain** | Base |
 | **Type** | Soulbound / non-transferable |
-| **Purpose** | On-chain identity and contribution record |
-| **Tradeable?** | No — reputation only, not speculative |
+| **Purpose** | On-chain identity + contribution record |
 
 ### How It's Earned
 
@@ -58,28 +67,30 @@ A community-driven hub where musicians, artists, and technologists unite to unlo
 |----------|--------|
 | Introducing yourself in ZAO Verse | 25 |
 | Video on during meetings | 10 per meeting |
-| Sharing contributions / community help | Ranked (fractal game) |
-| Writing full articles | 50 |
-| Short articles | 10 |
-| Editorial work | 10 |
+| Sharing contributions | Ranked (fractal game) |
+| Full articles | 50 |
+| Short articles / editorial | 10 |
 | Featured on ZAO website | 50 |
-| Bringing 4+ friends to fractal circle | Bonus |
+| Bringing 4+ friends to fractal | Bonus |
+
+### ZID (ZAO ID)
+
+ZID is a sequential membership number — ZID 1 = Zaal, ZID 2 = Candy. Assigned when a user first earns Respect. Lower number = more OG.
 
 ---
 
 ## ZAO Fractal (Governance)
 
-The ZAO uses **fractal democracy** — borrowed from Optimism Fractal / Eden Fractal:
+Weekly Monday meetings using **fractal democracy** (from Optimism Fractal / Eden Fractal):
 
-1. Six or more people gather in a circle (online)
+1. Six+ people gather in a circle (online)
 2. Each shares what they've been building
 3. Group gives feedback and ranks contributions by consensus
 4. Rankings determine Respect token distribution
-5. Happens weekly — both governance and community bonding
 
-**Tools:** Fractalgram (app for playing the Respect Game), fractalbot (7 iterations of Discord governance bot with on-chain Respect submission on Optimism)
+**Tools:** Fractalgram, fractalbot (7 iterations with on-chain Respect submission)
 
-**Philosophy:** "A practice in being seen and seeing others" — consensus-based peer evaluation, not top-down authority.
+**Day 1 Rankings:** Prizem (1st), Candy (2nd), SteveStrange (3rd), Rhia23k (4th), OhnahjiB (5th), Zaal (6th)
 
 ---
 
@@ -90,7 +101,7 @@ BetterCallZaal (brand/builder)
         │
         ├── The ZAO (community/DAO)
         │     ├── ZAO OS (Farcaster client) ← this repo
-        │     ├── ZAO Fractal (governance)
+        │     ├── ZAO Fractal (weekly governance)
         │     ├── $ZAO Respect (soulbound token)
         │     ├── ZAO Festivals
         │     │     ├── ZAO-PALOOZA (NFT NYC)
@@ -99,104 +110,171 @@ BetterCallZaal (brand/builder)
         │     └── ZAO Leaderboard (on-chain)
         │
         ├── ZABAL (coordination engine)
-        │     ├── SongJam integration
+        │     ├── SongJam integration (leaderboard/tracking)
+        │     ├── Magnetiq (connector)
         │     ├── ZABAL token
-        │     ├── Empire Builder
-        │     └── Newsletter bot
+        │     └── Empire Builder
         │
-        ├── WaveWarZ (music battles)
-        │     ├── Solana contracts ($50K+ volume)
-        │     ├── Live voting + streaming
-        │     └── Charity battles
+        ├── WaveWarZ (music battles, Solana)
         │
         ├── COC Concertz (metaverse concerts)
-        │     ├── StiloWorld / Spatial.io
-        │     └── Twitch + YouTube streaming
         │
         └── LTAW3 (Let's Talk About Web3)
-              ├── Weekly Twitch show (Wed 6PM EST)
-              ├── Pods.media archive
-              └── Luma event listings
+              └── Ohnahji University (education)
+```
+
+### Mutual Communities
+
+```
+ZAO Ecosystem
+        │
+        ├── Magnetiq ──── ZABAL connector
+        ├── COC (Community of Communities) ──── Uncle Corvus / cross-community events
+        ├── Quakey ──── mutual community with WaveWarZ (Solana music/gaming)
+        ├── Impact Concerts / Token Smart ──── web3 concert events (22K+ community)
+        ├── Ohnahji University ──── web3 education ("Web3's First HBCU")
+        ├── UVR ──── associated community
+        └── SongJam ──── engagement infrastructure + $SANG token
 ```
 
 ---
 
-## ZABAL
+## Mutual Communities (Deep Dives)
 
-The **streaming + coordination engine** tying everything together. Sits on top of ZAO Festivals, WaveWarZ, Fractals, and governance.
+### Magnetiq (ZABAL Connector)
 
-- **ZABAL token** launched January 1, 2026
-- **SongJam integration** — downloads/transcribes X Spaces, live leaderboard, audio mention tracking
-- **Empire Builder** — gamification for long-term alignment
-- Represents a **Web3 Social Migration** — moving from traditional platforms toward Farcaster
+- **What:** No-code platform on Flow blockchain for utility-based NFT digital memberships ("Magnets")
+- **How:** Allows brands/creators to build, engage, and monetize communities via NFT membership passes
+- **Flow Developer Grant** recipient
+- **Website:** [magnetiq.xyz](https://www.magnetiq.xyz/)
+- **Connection to ZABAL:** Connector in the ZABAL coordination ecosystem — utility NFT memberships as access layer
+
+### COC (Community of Communities)
+
+- **What:** A cross-community collaborative framework bringing web3 communities together for shared events and spaces
+- **Who:** Uncle Corvus (@unclecorvus) — web3 builder behind Ethergrounds (blockchain coffee supply chain) and The Ether Portal
+- **How it works:** Hosts joint X Spaces and events bridging multiple web3 communities
+- **ZAO connection:** Co-hosts spaces with SongJam, shares member overlap with ZAO ecosystem
+- **Also:** Uncle Corvus is building "the world's first cybernetic Web3-enabled food truck" + does charitable work (clean water in Guatemala, children's sports)
+
+### Quakey (WaveWarZ Mutual)
+
+- **What:** Solana-based community with NFT collection (100 exclusive coins by Artist Apollo), metaverse presence (Quakey's Island on Nifty Island), gaming (Quakey Tanks), AR merch, and music NFT collections
+- **Token:** QUAKEY — described as "the ONLY utility-based memecoin"
+- **Partnership:** BlockQuake cryptocurrency exchange
+- **Website:** [quakeycoin.com](https://www.quakeycoin.com/)
+- **WaveWarZ connection:** Both operate on Solana in the web3 music/gaming intersection, shared community participation
+
+### Impact Concerts / Token Smart
+
+- **Token Smart:** Established web3 creator community since 2019
+  - **22,000+ community members**
+  - TokenSmart Radio — 24/7 streaming with archived shows
+  - Hosts metaverse events, music shows, art showcases
+  - Preserves audio archives from 2016-2022 (foundational crypto era)
+  - **Website:** [tokensmart.co](https://www.tokensmart.co/)
+- **Impact Concerts:** Web3 concert initiative connected to the TokenSmart ecosystem
+- **ZAO connection:** Shared focus on web3 creator events and music, community overlap
+
+### Ohnahji University
+
+- **What:** "Web3's First HBCU" — blockchain education for Black and brown communities
+- **Who:** Chancellor Ohnahji B (@OhnahjiB) — co-host of LTAW3, ranked 5th in ZAO Fractal Day 1, has ohnahji.eth
+- **Format:**
+  - Weekly **"ONJU Saturdays"** X Spaces — wallet security, dApps, AI, NFTs, multichain, open source
+  - **"The Alphite Gazette"** on Medium — weekly syllabi recapping sessions
+  - **Ohnahji NFT** — 10K PFP collection as student ID / access token (0.01 ETH mint on Polygon)
+- **Website:** [ohnahjiu.com](https://ohnahjiu.com/)
+- **ZAO connection:** Ohnahji is a core ZAO member — co-hosts LTAW3, participates in fractal governance, streams on Twitch alongside Zaal
+
+### UVR (Associated Community)
+
+- Associated community within the ZAO ecosystem
+- Community-level relationship with shared members and participation
+
+### SongJam (Engagement Infrastructure)
+
+- **What:** Agentic CRM and AI-powered outreach platform for X Spaces — tracks engagement, provides leaderboards
+- **Founder:** Adam Place (@adam_songjam) — CEO, also associated with NUSIC
+- **Website:** [songjam.space](https://www.songjam.space/)
+- **Key features:**
+  - Downloads/transcribes X Spaces instantly
+  - Live leaderboard tracking mentions across X
+  - Audio mention tracking in Spaces
+  - Voice security — cryptographically secures voices against "vishing"
+  - Soulbound token for voice data
+  - Custom soundboard/DJ during Spaces
+- **$SANG token:** Staking with square-root multiplier for scoring amplification
+- **ZABAL Leaderboard** at songjam.space/zabal — tracked all "ZABAL" mentions during the December 2025 "Sing Points" campaign leading to the January 1 $ZABAL token launch
+- **ZAO connection:** Primary engagement tracking infrastructure for ZABAL, bridges Web2 (X) and Web3 (Farcaster)
 
 ---
 
-## WaveWarZ
+## Key People
 
-**Onchain music battle platform** (co-founded by Zaal, 2023):
-- Artists battle by showcasing songs, fans vote for winners
-- Winners + a random fan earn prizes
-- Built on **Solana**, $50,000+ trading volume
+| Person | Handle | Role |
+|--------|--------|------|
+| **Zaal Panthaki** | @bettercallzaal | ZAO Founder, ZABAL architect, LTAW3 host |
+| **Ohnahji B** | @OhnahjiB | Ohnahji University Chancellor, LTAW3 co-host, ohnahji.eth |
+| **EZ** | @EZinCrypto | LTAW3 co-host, streams twitch.tv/ezincrypto |
+| **Uncle Corvus** | @unclecorvus | COC / Ethergrounds / Ether Portal founder |
+| **Adam Place** | @adam_songjam | SongJam Founder & CEO |
+| **BinX** | — | ZAO co-founder |
+| **Mr. McFly** | — | ZAO co-founder |
+| **Prizem** | @Prizem | Community member (Fractal Day 1: 1st) |
+| **Candy** | @Candy | Community member (Fractal Day 1: 2nd, ZID 2) |
+| **SteveStrange** | @SteveStrange | Community member (Fractal Day 1: 3rd) |
+| **Rhia23k** | @Rhia23k | Community member (Fractal Day 1: 4th) |
+| **Losi** | @iamlosi | Web3 musician (Cali, Colombia), performed at ZAO-CHELLA |
+| **Freezetheverse** | — | LTAW3 Intern |
+
+---
+
+## WaveWarZ (Deep Dive)
+
+**Onchain music battles on Solana** (co-founded by Zaal, 2023):
+
+### How Battles Work
+- Two artists compete head-to-head showcasing songs
+- Fans vote for the winner
+- **Super Votes** — enhanced voting power; fans who Super Vote for the winner can win prizes
+- **Sponsorship Auctions** — 1/1 NFT sponsorships; proceeds fund next battle's prize
+- Battles livestreamed on YouTube/Twitch
+
+### Notable Battles
+| Battle | Event |
+|--------|-------|
+| **Visionz vs. Rome** | "Crypto Traders Decided This Music Battle!" |
+| **Hurric4n3ike vs. JANGO UU** | WaveWarZ LIVE Rematch at ZAO-CHELLA (Miami, Dec 2024) |
+| **Indies vs. Classics** | Charity battle — raised $270+ for girl child education + Christmas gifts in Nigeria |
+
+### Stats
+- $50,000+ trading volume
 - 50+ weekly listeners on livestreams
-- Hosted charity battles (raised $270+ for education)
-- [wavewarz.com](https://www.wavewarz.com/)
-
----
-
-## COC Concertz
-
-Live metaverse concerts in **StiloWorld on Spatial.io**:
-- Twitch + YouTube streaming
-- Farcaster Mini App with RSVP system
-- Community voting on performance direction
-- Connected to the broader ZAO ecosystem via /coc channel
+- Multiple battles across 2023-2026
 
 ---
 
 ## ZAO Festivals
 
-| Festival | Location | What |
-|----------|----------|------|
-| **ZAO-PALOOZA** | NFT NYC | 12 artists, 6 new to Web3 |
-| **ZAO-CHELLA** | Art Basel Miami/Wynwood | Digital innovation + music |
-| **ZAO-Stock** | Ellsworth, Maine (2026) | Physical music festival — the culmination |
+| Festival | Location | Year | Highlights |
+|----------|----------|------|------------|
+| **ZAO-PALOOZA** | NFT NYC | 2023 | 12 artists, 6 new to Web3 |
+| **ZAO-CHELLA** | Wynwood, Miami (Art Basel) | Dec 2024 | 10 web3 musicians, collectable trading cards, AR art displays, WaveWarZ LIVE rematch |
+| **ZAO-Stock** | Ellsworth, Maine | 2026 (planned) | Physical music festival — ZABAL is the distribution engine building toward this |
 
 ---
 
 ## LTAW3 (Let's Talk About Web3)
 
-Weekly livestream talk show:
-- **Hosts:** EZ (EZinCrypto), Ohnahji, BetterCallZaal
+- **What:** Weekly livestream talk show
+- **Hosts:** EZ (EZinCrypto), Ohnahji B, BetterCallZaal
 - **When:** Wednesdays 6 PM EST
 - **Where:** Twitch (bettercallzaal, ohnahji, ezincrypto)
 - **Archive:** [Pods.media](https://pods.media/lets-talk-about-web3/)
+- **Events:** Listed on [Luma](https://lu.ma/fw0nct7b)
 - **Topics:** Web3 tech updates, Music NFTs, creator tools, ZAO projects
-
----
-
-## Mutual & Related Communities
-
-### Directly Connected
-
-| Community | Relationship | Platform |
-|-----------|-------------|----------|
-| **SongJam** | ZABAL integration partner, leaderboard | X Spaces, Farcaster |
-| **COC / Uncle Corvus** | Concert community, X Spaces co-hosts | Farcaster, Spatial.io |
-| **Optimism Fractal / Eden Fractal** | Governance model inspiration | Optimism |
-
-### Adjacent Web3 Music Communities
-
-| Community | What They Do | Relationship to ZAO |
-|-----------|-------------|---------------------|
-| **Coop Records / Sonata** | $10M VC-funded onchain label + Farcaster music client | ZAO OS borrows from Sonata (MIT). Different scale (VC vs bootstrapped). |
-| **Songcamp** | ~300 artist web3 hackathon collective | Same mission (artist empowerment), different approach (hackathons vs governance) |
-| **Sound.xyz** | Music NFT platform (now maintenance mode → Vault.fm) | ZAO plans Sound.xyz embed integration |
-| **ACID TEST** | Onchain radio show on Farcaster (chaim.eth) | Part of Farcaster music culture ZAO participates in |
-| **Purple DAO** | Farcaster ecosystem grants DAO | Potential funding source for ZAO OS |
-| **DEGEN** | Farcaster tipping token on Base | Tipping model inspired $ZAO Respect design |
-| **Water & Music** | Research DAO documenting web3 music | ZAO fits their taxonomy of community-first music DAOs |
-| **Audius** | Decentralized music streaming (Solana) | ZAO OS integrates Audius API |
+- **Features:** Intern program (Freezetheverse), guest appearances
 
 ---
 
@@ -204,14 +282,14 @@ Weekly livestream talk show:
 
 | Platform | Handle/URL | Activity |
 |----------|-----------|----------|
-| **Farcaster** | /zao channel, @bettercallzaal | Primary home |
-| **X/Twitter** | @OfficialZao, @bettercallzaal, @WaveWarZ | Active |
-| **Twitch** | bettercallzaal, ohnahji, ezincrypto | Weekly LTAW3 show |
-| **Paragraph** | paragraph.com/@thezao | 329+ daily newsletters, 500+ subs |
-| **Luma** | Event listings | LTAW3 episodes |
-| **Pods.media** | LTAW3 archive | Full episode archive |
-| **GitHub** | github.com/bettercallzaal | 65+ repos |
-| **Website** | thezao.com | Webflow site |
+| **Farcaster** | /zao, /zabal, /coc channels, @bettercallzaal | Primary home |
+| **X/Twitter** | @OfficialZao, @bettercallzaal, @WaveWarZ | Active daily |
+| **Twitch** | bettercallzaal, ohnahji, ezincrypto | Weekly LTAW3 |
+| **Paragraph** | paragraph.com/@thezao | 329+ daily newsletters |
+| **Pods.media** | LTAW3 full archive | All episodes |
+| **Luma** | Event listings | LTAW3 + festivals |
+| **GitHub** | github.com/bettercallzaal | 65+ repos (ZAO OS + ecosystem) |
+| **Website** | thezao.com, wavewarz.com, zaofestivals.com | Webflow |
 
 ---
 
@@ -219,29 +297,14 @@ Weekly livestream talk show:
 
 | Trait | ZAO | Most Web3 Music Communities |
 |-------|-----|----------------------------|
-| **Governance model** | Fractal democracy (weekly circles) | Token voting or none |
-| **Reputation** | Soulbound (non-tradeable) | Tradeable tokens |
-| **Physical events** | ZAO-PALOOZA, ZAO-Stock | Purely online |
+| **Governance** | Fractal democracy (weekly circles) | Token voting or none |
+| **Reputation** | Soulbound $ZAO (non-tradeable) | Tradeable tokens |
+| **Physical events** | ZAO-PALOOZA, ZAO-CHELLA, ZAO-Stock | Purely online |
 | **Funding** | Bootstrapped ($8K+ self-generated) | VC-funded |
-| **Education** | LTAW3 weekly show, Welcome to Web3 | Content-only |
+| **Education** | LTAW3 + Ohnahji University | Content-only |
 | **Tech** | Building own client (ZAO OS) | Use existing platforms |
-| **Daily practice** | 329+ daily newsletter + weekly fractals | Sporadic updates |
-
----
-
-## Timeline
-
-| Period | Milestone |
-|--------|-----------|
-| 2022 | ZAO founded, first smart contracts on Base/Solana |
-| 2023 | WaveWarZ co-founded, ZAO-PALOOZA at NFT NYC |
-| 2024 | ZAO-CHELLA planned for Art Basel Miami |
-| Early 2025 | "Year of the ZAO" daily newsletter begins |
-| Mid 2025 | LTAW3 weekly show established, 77+ fractal meetings |
-| Dec 2025 | ZABAL ecosystem announced, SongJam integration |
-| Jan 1, 2026 | ZABAL token launch |
-| 2026 | ZAO OS development (this repo) |
-| 2026 (planned) | ZAO-Stock: Maine music festival |
+| **Daily practice** | 329+ daily newsletters + weekly fractals | Sporadic updates |
+| **Structure** | 4 pillars (Artist/Autonomous/OS/Open Source) | Single-purpose |
 
 ---
 
@@ -253,9 +316,11 @@ Weekly livestream talk show:
 - [Year of the ZAO newsletters](https://paragraph.com/@thezao)
 - [Zaal Resume](https://hackmd.io/@bB0dXoPfSAuUEqyo43pHZw/Hyq0LS-Z-g)
 - [WaveWarZ](https://www.wavewarz.com/)
-- [SongJam Leaderboard](https://leaderboard.songjam.space/)
+- [SongJam](https://www.songjam.space/)
+- [Magnetiq](https://www.magnetiq.xyz/)
+- [Quakey Coin](https://www.quakeycoin.com/)
+- [TokenSmart](https://www.tokensmart.co/)
+- [Ohnahji University](https://ohnahjiu.com/)
 - [LTAW3 on Pods.media](https://pods.media/lets-talk-about-web3/)
-- [Optimism Fractal](https://optimismfractal.com/)
-- [Fractalgram](https://optimystics.io/fractalgram)
 - [ZAO Festivals](https://zaofestivals.com/)
-- [BetterCallZaal on X](https://x.com/bettercallzaal)
+- [Optimism Fractal](https://optimismfractal.com/)

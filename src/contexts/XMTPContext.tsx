@@ -225,6 +225,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         onValue: () => {
           loadAllConversations();
         },
+        onError: (err: Error) => {
+          console.error('[XMTP] Conversation stream error:', err);
+        },
       });
       convStreamCleanupRef.current = () => { void convStream.end(); };
 
@@ -303,11 +306,23 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             }
           }
         },
+        onError: (err: Error) => {
+          console.error('[XMTP] Message stream error:', err);
+          setStreamConnected(false);
+          // Auto-reconnect on stream-level error
+          setTimeout(() => {
+            if (primaryClientRef.current) {
+              startGlobalStreams(primaryClientRef.current).catch((e) =>
+                console.error('[XMTP] Stream reconnection failed:', e)
+              );
+            }
+          }, 5000);
+        },
       });
       msgStreamCleanupRef.current = () => { void msgStream.end(); };
       setStreamConnected(true);
       console.log('[XMTP] Global streams started');
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('[XMTP] Failed to start streams:', err);
       setStreamConnected(false);
 

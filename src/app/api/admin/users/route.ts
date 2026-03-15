@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { getUserByFid, getUserByAddress } from '@/lib/farcaster/neynar';
+import { getUserByFid, getUserByAddress, searchUsers } from '@/lib/farcaster/neynar';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -69,10 +69,35 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { primary_wallet, fid, role, real_name, ign, notes } = body;
+    let { primary_wallet, fid, role, real_name, ign, notes } = body;
+    const { username: usernameInput } = body;
+
+    // Resolve username to FID if provided
+    if (usernameInput && !fid) {
+      try {
+        const clean = usernameInput.replace(/^@/, '').trim();
+        const searchData = await searchUsers(clean, 1);
+        const match = (searchData.result?.users || []).find(
+          (u: Record<string, unknown>) => (u.username as string)?.toLowerCase() === clean.toLowerCase()
+        );
+        if (match) {
+          fid = match.fid as number;
+        } else {
+          // No exact match — try first result
+          const first = searchData.result?.users?.[0];
+          if (first) {
+            fid = first.fid as number;
+          } else {
+            return NextResponse.json({ error: `No Farcaster user found for "${clean}"` }, { status: 404 });
+          }
+        }
+      } catch {
+        return NextResponse.json({ error: `Failed to look up username "${usernameInput}"` }, { status: 500 });
+      }
+    }
 
     if (!primary_wallet && !fid) {
-      return NextResponse.json({ error: 'Either wallet address or FID is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Wallet address, FID, or username is required' }, { status: 400 });
     }
 
     let wallet = primary_wallet ? primary_wallet.toLowerCase() : '';

@@ -44,8 +44,7 @@ export function UsersTable() {
 
   // Add user state
   const [showAdd, setShowAdd] = useState(false);
-  const [addWallet, setAddWallet] = useState('');
-  const [addFid, setAddFid] = useState('');
+  const [addInput, setAddInput] = useState(''); // wallet, FID, or @username
   const [addName, setAddName] = useState('');
   const [adding, setAdding] = useState(false);
 
@@ -124,31 +123,40 @@ export function UsersTable() {
 
   // ── Add User ──
   const handleAdd = async () => {
-    // Allow either wallet or FID
-    if (!addWallet && !addFid) {
-      showFeedback('error', 'Enter a wallet address or FID');
+    const input = addInput.trim();
+    if (!input) {
+      showFeedback('error', 'Enter a wallet address, FID, or @username');
       return;
     }
-    if (addWallet && !addWallet.match(/^0x[a-fA-F0-9]{40}$/)) {
-      showFeedback('error', 'Invalid wallet address');
+
+    // Determine what the input is
+    const isWallet = /^0x[a-fA-F0-9]{40}$/i.test(input);
+    const isFid = /^\d+$/.test(input);
+    const isUsername = !isWallet && !isFid; // treat anything else as username
+
+    if (isWallet) {
+      // validate format already passed
+    } else if (!isFid && !isUsername) {
+      showFeedback('error', 'Enter a valid wallet (0x...), FID number, or @username');
       return;
     }
+
     setAdding(true);
     try {
+      const body: Record<string, unknown> = { real_name: addName || undefined };
+      if (isWallet) body.primary_wallet = input;
+      else if (isFid) body.fid = parseInt(input);
+      else body.username = input.replace(/^@/, '');
+
       const res = await fetch('/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          primary_wallet: addWallet || undefined,
-          fid: addFid ? parseInt(addFid) : undefined,
-          real_name: addName || undefined,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (res.ok) {
-        showFeedback('success', `Added ${data.user?.display_name || addWallet}`);
-        setAddWallet('');
-        setAddFid('');
+        showFeedback('success', `Added ${data.user?.display_name || data.user?.username || input}`);
+        setAddInput('');
         setAddName('');
         setShowAdd(false);
         fetchUsers();
@@ -335,18 +343,14 @@ export function UsersTable() {
       {showAdd && (
         <div className="bg-[#1a2a3a] rounded-xl p-4 mb-4 border border-gray-700">
           <p className="text-sm font-medium text-gray-300 mb-3">Add New User</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
             <input
-              value={addWallet}
-              onChange={(e) => setAddWallet(e.target.value)}
-              placeholder="Wallet (0x...) or leave empty"
+              value={addInput}
+              onChange={(e) => setAddInput(e.target.value)}
+              placeholder="@username, FID, or 0x wallet"
+              autoFocus
               className="bg-[#0a1628] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
-            />
-            <input
-              value={addFid}
-              onChange={(e) => setAddFid(e.target.value)}
-              placeholder="FID (auto-resolves wallet)"
-              className="bg-[#0a1628] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
+              onKeyDown={(e) => { if (e.key === 'Enter' && addInput.trim()) handleAdd(); }}
             />
             <input
               value={addName}
@@ -356,11 +360,11 @@ export function UsersTable() {
             />
           </div>
           <p className="text-xs text-gray-500 mb-3">
-            Enter a wallet, FID, or both. FID auto-populates Farcaster profile + resolves wallet. Wallet-only users start as Beta.
+            Type a Farcaster @username, FID number, or 0x wallet. Username/FID auto-populates profile + wallet.
           </p>
           <button
             onClick={handleAdd}
-            disabled={adding || (!addWallet && !addFid)}
+            disabled={adding || !addInput.trim()}
             className="bg-[#f5a623] text-[#0a1628] text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#ffd700] disabled:opacity-50 transition-colors"
           >
             {adding ? 'Adding...' : 'Add User'}

@@ -5,6 +5,7 @@ import { mainnet } from 'viem/chains';
 import { checkAllowlist } from '@/lib/gates/allowlist';
 import { saveWalletSession } from '@/lib/auth/session';
 import { getUserByAddress } from '@/lib/farcaster/neynar';
+import { supabaseAdmin } from '@/lib/db/supabase';
 
 const publicClient = createPublicClient({
   chain: mainnet,
@@ -95,6 +96,40 @@ export async function POST(req: NextRequest) {
       displayName,
       pfpUrl,
     });
+
+    // Upsert user record in users table
+    try {
+      const { data: existing } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .eq('primary_wallet', walletAddress)
+        .single();
+
+      if (existing) {
+        // Update last login
+        await supabaseAdmin
+          .from('users')
+          .update({
+            last_login_at: new Date().toISOString(),
+            ...(fid ? { fid, username, display_name: displayName, pfp_url: pfpUrl } : {}),
+          })
+          .eq('id', existing.id);
+      } else {
+        // Create new user record
+        await supabaseAdmin.from('users').insert({
+          primary_wallet: walletAddress,
+          fid: fid || null,
+          username: username || null,
+          display_name: displayName || walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4),
+          pfp_url: pfpUrl || null,
+          role: fid ? 'member' : 'beta',
+          last_login_at: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      // Non-critical — session is still valid
+      console.error('[Auth] Failed to upsert user record:', err);
+    }
 
     return NextResponse.json({
       success: true,

@@ -3,6 +3,7 @@ import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { checkAllowlist } from '@/lib/gates/allowlist';
 import { saveSession } from '@/lib/auth/session';
 import { getUserByFid } from '@/lib/farcaster/neynar';
+import { supabaseAdmin } from '@/lib/db/supabase';
 
 const appClient = createAppClient({
   ethereum: viemConnector(),
@@ -65,6 +66,57 @@ export async function POST(req: NextRequest) {
       authMethod: 'farcaster',
       signerUuid: null,
     });
+
+    // Upsert user record in users table
+    try {
+      const wallet = (primaryWallet || '').toLowerCase();
+      if (wallet) {
+        const { data: existingByWallet } = await supabaseAdmin
+          .from('users')
+          .select('id')
+          .eq('primary_wallet', wallet)
+          .single();
+
+        const { data: existingByFid } = !existingByWallet
+          ? await supabaseAdmin.from('users').select('id').eq('fid', fid).single()
+          : { data: null };
+
+        const existing = existingByWallet || existingByFid;
+
+        if (existing) {
+          await supabaseAdmin
+            .from('users')
+            .update({
+              fid,
+              username: user.username,
+              display_name: user.display_name,
+              pfp_url: user.pfp_url,
+              custody_address: custodyAddress,
+              verified_addresses: verifiedAddresses,
+              bio: user.profile?.bio?.text || null,
+              role: 'member',
+              last_login_at: new Date().toISOString(),
+              ...(wallet ? { primary_wallet: wallet } : {}),
+            })
+            .eq('id', existing.id);
+        } else {
+          await supabaseAdmin.from('users').insert({
+            primary_wallet: wallet,
+            fid,
+            username: user.username,
+            display_name: user.display_name,
+            pfp_url: user.pfp_url,
+            custody_address: custodyAddress,
+            verified_addresses: verifiedAddresses,
+            bio: user.profile?.bio?.text || null,
+            role: 'member',
+            last_login_at: new Date().toISOString(),
+          });
+        }
+      }
+    } catch (err) {
+      console.error('[Auth] Failed to upsert user record:', err);
+    }
 
     return NextResponse.json({
       success: true,

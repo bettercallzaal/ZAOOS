@@ -210,7 +210,7 @@ export function ChatRoom() {
   const hasSigner = !!user.signerUuid;
 
   return (
-    <div className="flex h-[100dvh] pb-14 md:pb-0 bg-[#0a1628] text-white overflow-hidden">
+    <div className="flex h-[100dvh] pb-14 md:pb-0 md:h-[calc(100dvh-2.5rem)] bg-[#0a1628] text-white overflow-hidden">
       <Sidebar
         user={user}
         isOpen={sidebarOpen}

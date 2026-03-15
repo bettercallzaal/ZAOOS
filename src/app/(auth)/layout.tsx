@@ -12,9 +12,9 @@ export default async function AuthLayout({
     redirect('/');
   }
   return (
-    <>
+    <div className="md:pt-10">
       {children}
       <BottomNav />
-    </>
+    </div>
   );
 }

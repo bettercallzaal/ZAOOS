@@ -3,11 +3,12 @@
 import { useState, useCallback, useRef } from 'react';
 import { AllowlistTable } from '@/components/admin/AllowlistTable';
 import { UsersTable } from '@/components/admin/UsersTable';
+import { ZidManager } from '@/components/admin/ZidManager';
 import { CsvUpload } from '@/components/admin/CsvUpload';
 import { HiddenMessages } from '@/components/admin/HiddenMessages';
 import Link from 'next/link';
 
-type Tab = 'users' | 'members' | 'import' | 'moderation';
+type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation';
 
 export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<Tab>('users');
@@ -20,6 +21,7 @@ export function AdminPanel() {
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: 'users', label: 'Users', icon: '👤' },
+    { id: 'zid', label: 'ZIDs', icon: '🏷' },
     { id: 'members', label: 'Allowlist', icon: '👥' },
     { id: 'import', label: 'Import', icon: '📄' },
     { id: 'moderation', label: 'Moderation', icon: '🛡' },
@@ -68,6 +70,7 @@ export function AdminPanel() {
       {/* Content */}
       <div className="max-w-5xl mx-auto p-4 sm:p-6">
         {activeTab === 'users' && <UsersTable />}
+        {activeTab === 'zid' && <ZidManager />}
         {activeTab === 'members' && <AllowlistTable ref={tableRef} />}
         {activeTab === 'import' && <CsvUpload onUploaded={handleUploaded} />}
         {activeTab === 'moderation' && <HiddenMessages />}

@@ -71,22 +71,21 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { primary_wallet, fid, role, real_name, ign, notes } = body;
 
-    if (!primary_wallet) {
-      return NextResponse.json({ error: 'primary_wallet is required' }, { status: 400 });
+    if (!primary_wallet && !fid) {
+      return NextResponse.json({ error: 'Either wallet address or FID is required' }, { status: 400 });
     }
 
-    const wallet = primary_wallet.toLowerCase();
+    let wallet = primary_wallet ? primary_wallet.toLowerCase() : '';
 
     // Build user record
     const userData: Record<string, unknown> = {
-      primary_wallet: wallet,
       role: role || (fid ? 'member' : 'beta'),
       real_name: real_name || null,
       ign: ign || null,
       notes: notes || null,
     };
 
-    // If FID provided, fetch Farcaster profile
+    // If FID provided, fetch Farcaster profile and resolve wallet
     if (fid) {
       try {
         const fcUser = await getUserByFid(fid);
@@ -98,12 +97,27 @@ export async function POST(req: NextRequest) {
           userData.custody_address = fcUser.custody_address;
           userData.verified_addresses = fcUser.verified_addresses?.eth_addresses || [];
           userData.bio = fcUser.profile?.bio?.text || null;
+          // Auto-resolve wallet from Farcaster if not provided
+          if (!wallet) {
+            wallet = (fcUser.custody_address || fcUser.verified_addresses?.eth_addresses?.[0] || '').toLowerCase();
+          }
         }
       } catch {
-        // Non-critical — still create with FID
         userData.fid = fid;
       }
-    } else {
+    }
+
+    // If still no wallet, use FID-based placeholder
+    if (!wallet && fid) {
+      wallet = `fid:${fid}`;
+    }
+    if (!wallet) {
+      return NextResponse.json({ error: 'Could not resolve a wallet address' }, { status: 400 });
+    }
+
+    userData.primary_wallet = wallet;
+
+    if (!fid && wallet && !wallet.startsWith('fid:')) {
       // Try to resolve Farcaster from wallet
       try {
         const fcUser = await getUserByAddress(wallet);

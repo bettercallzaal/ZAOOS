@@ -101,9 +101,35 @@ export function UsersTable() {
   const memberCount = users.filter((u) => u.role === 'member').length;
   const adminCount = users.filter((u) => u.role === 'admin').length;
 
+  // ── Import from Allowlist ──
+  const [importing, setImporting] = useState(false);
+
+  const handleImport = async () => {
+    setImporting(true);
+    try {
+      const res = await fetch('/api/admin/users/import', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        showFeedback('success', data.message);
+        fetchUsers();
+      } else {
+        showFeedback('error', data.error || 'Import failed');
+      }
+    } catch {
+      showFeedback('error', 'Import request failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   // ── Add User ──
   const handleAdd = async () => {
-    if (!addWallet.match(/^0x[a-fA-F0-9]{40}$/)) {
+    // Allow either wallet or FID
+    if (!addWallet && !addFid) {
+      showFeedback('error', 'Enter a wallet address or FID');
+      return;
+    }
+    if (addWallet && !addWallet.match(/^0x[a-fA-F0-9]{40}$/)) {
       showFeedback('error', 'Invalid wallet address');
       return;
     }
@@ -113,7 +139,7 @@ export function UsersTable() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          primary_wallet: addWallet,
+          primary_wallet: addWallet || undefined,
           fid: addFid ? parseInt(addFid) : undefined,
           real_name: addName || undefined,
         }),
@@ -250,6 +276,28 @@ export function UsersTable() {
         </div>
       </div>
 
+      {/* Import from Allowlist */}
+      <button
+        onClick={handleImport}
+        disabled={importing}
+        className={`mb-4 w-full flex items-center justify-center gap-2 px-4 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
+          users.length === 0
+            ? 'py-3 bg-[#f5a623]/10 border border-[#f5a623]/30 text-[#f5a623] hover:bg-[#f5a623]/20'
+            : 'py-2 bg-white/5 border border-gray-700 text-gray-400 hover:text-white hover:bg-white/10'
+        }`}
+      >
+        {importing ? (
+          <>
+            <div className="w-4 h-4 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+            Importing from allowlist...
+          </>
+        ) : (
+          <>
+            {users.length === 0 ? 'Import existing allowlist members into Users table' : 'Sync from allowlist (imports new entries)'}
+          </>
+        )}
+      </button>
+
       {/* Search + Filters + Add */}
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <div className="relative flex-1">
@@ -291,13 +339,13 @@ export function UsersTable() {
             <input
               value={addWallet}
               onChange={(e) => setAddWallet(e.target.value)}
-              placeholder="Wallet address (0x...)"
+              placeholder="Wallet (0x...) or leave empty"
               className="bg-[#0a1628] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
             />
             <input
               value={addFid}
               onChange={(e) => setAddFid(e.target.value)}
-              placeholder="FID (optional)"
+              placeholder="FID (auto-resolves wallet)"
               className="bg-[#0a1628] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
             />
             <input
@@ -308,11 +356,11 @@ export function UsersTable() {
             />
           </div>
           <p className="text-xs text-gray-500 mb-3">
-            If FID is provided, Farcaster profile data will be auto-populated. If only a wallet is provided, the user starts as Beta.
+            Enter a wallet, FID, or both. FID auto-populates Farcaster profile + resolves wallet. Wallet-only users start as Beta.
           </p>
           <button
             onClick={handleAdd}
-            disabled={adding || !addWallet}
+            disabled={adding || (!addWallet && !addFid)}
             className="bg-[#f5a623] text-[#0a1628] text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#ffd700] disabled:opacity-50 transition-colors"
           >
             {adding ? 'Adding...' : 'Add User'}

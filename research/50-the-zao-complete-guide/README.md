@@ -707,6 +707,103 @@ ZAO calls itself "a Nounish crew" — aligning with:
 
 ---
 
+## 21. Competitive Landscape (March 2026)
+
+### The Graveyard
+
+Most competitors from the 2021-2022 boom are gone:
+
+| Project | Status | What Happened |
+|---------|--------|---------------|
+| **Catalog** | Dead | 1/1 music NFT marketplace shut down |
+| **Sound.xyz** | Dead (→ Vault.fm) | Went offline Jan 16, 2026. Pivoted to subscription fan platform. |
+| **Async Art** | Dead | Shut down Oct 2023 |
+| **Royal.io** | Winding down | Closed marketplace. Legacy royalty claims only. |
+| **Arpeggi Labs** | Acquired | Bought by Splice (Jan 2026) |
+| **Stems DAO** | Pivoted | Now "Lowkey" — casual iPhone remix app. Abandoned NFTs. |
+| **Noise DAO** | Dormant | $2.7M music NFT collector DAO. Last activity 2022-2023. |
+| **Dreams Never Die** | Dormant | 3-year runway likely expired. |
+| **HIFI Labs** | Dormant | Spun out Neume (data layer). |
+| **BeatDAO** | Dormant | Website up, no visible activity. |
+
+### Still Alive (Different Models)
+
+| Project | Status | Model | Users |
+|---------|--------|-------|-------|
+| **Audius** | Active | Streaming platform (Spotify competitor) | 7.5M MAU, 250K artists |
+| **Medallion** | Active ($13.7M raised) | Per-artist fan communities | Claims 52% more fans than Facebook Groups |
+| **Nina Protocol** | Active | Self-publishing on Solana/Arweave | Mobile app June 2025 |
+| **Anotherblock** | Restructured | Tokenized royalty investing | Polytrade partnership |
+| **Songcamp** | Slower cadence | Episodic artist cohorts (~300 artists) | Buenos Aires 2024 camp |
+| **RefractionDAO** | Active | IRL web3 art/music events | 1,600 members, global events |
+| **Coop Records** | Active | $10M VC fund + Sonata client | 6-8 portfolio companies |
+
+### On Farcaster Specifically
+
+**ZAO OS is one of only TWO music-focused Farcaster clients**, alongside Sonata:
+
+| Feature | ZAO OS | Sonata |
+|---------|--------|--------|
+| Type | Gated community client | Open curation tool |
+| Access | Allowlist | Anyone |
+| Governance | Fractal + Respect tokens | None |
+| IRL events | Festivals | None |
+| Battles | WaveWarZ | None |
+| Incubator | Yes | No |
+| License | MIT | MIT |
+| Last commit | Today | Nov 2024 |
+
+### What Makes ZAO Truly Unique
+
+No single project combines even 3 of ZAO's 7 pillars:
+
+| Pillar | ZAO | Nearest | Gap |
+|--------|-----|---------|-----|
+| Fractal governance for music | ✅ | Optimism Fractal (builders only) | **No music competitor** |
+| Soulbound reputation | $ZAO Respect | Optimism Respect | **No music competitor** |
+| Custom Farcaster client | ZAO OS | Sonata (open, no governance) | Different model |
+| IRL music festivals | ZAO Festivals | RefractionDAO (no software) | Refraction lacks platform |
+| Onchain music battles | WaveWarZ | None exist | **Completely novel** |
+| Artist incubator | Active | HIFI/DND (both dormant) | **Competitors are dead** |
+| Bonding curve ephemeral tokens | WaveWarZ | None | **Completely novel** |
+
+**The full-stack gap:** No other project attempts to build all of these as an integrated system. ZAO is entering a market where most competitors have died, pivoted, or been acquired. The few survivors are infrastructure/platform plays (Audius, Medallion, Nina), not community-governance plays.
+
+---
+
+## 22. Undocumented Connections & Opportunities
+
+### Key Bridges Not Yet Leveraged
+
+| Connection | What It Means |
+|-----------|---------------|
+| **Candy → Impact3/Milk Road** | Sponsorship Admin role = access to 250K+ subscriber crypto newsletter network |
+| **AttaBotty → Base Onchain Registry** | Official Coinbase-curated directory listing |
+| **GodCloud → Forbes + George Lopez** | Mainstream celebrity bridge |
+| **Mr. McFly → Farmacy Fantoms (Styles P)** | Hip-hop legend connection (16.4K followers) |
+| **FailOften → NEA + Andy Warhol Foundation** | Institutional art world credibility |
+| **Fractal OS angle** | Every fractal community could use ZAO OS tooling |
+
+### Missed Opportunities
+
+| Opportunity | What to Do |
+|-------------|-----------|
+| **Optimism RetroPGF** | Apply — ZAO OS qualifies as public goods on the Superchain |
+| **Purple DAO grants** | Apply — ZAO OS is exactly the type of Farcaster project they fund |
+| **Base ecosystem programs** | Onchain Summer, Base Builds — ZAO is on Base but hasn't participated |
+| **Water & Music** listing | Get catalogued — they track 30+ music DAOs, ZAO isn't listed |
+| **Artist catalog documentation** | 22+ artists, estimated 200-500+ tracks — no centralized discography |
+| **On-chain data investigation** | Query Basescan for $ZAO holder count, $LOANZ activity |
+
+### Undocumented Member Projects
+
+| Project | Person | What It Might Be |
+|---------|--------|-----------------|
+| **808 Wave Club** | GodCloud | Beat-making NFT community |
+| **Z-Town Agency** | Jango UU | Talent/booking agency for web3 artists |
+
+---
+
 ## Sources
 
 - [The ZAO Website](https://www.thezao.com/about)

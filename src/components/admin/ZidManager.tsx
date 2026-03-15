@@ -21,6 +21,7 @@ interface RespectEntry {
   ogRespect: number;
   zorRespect: number;
   totalRespect: number;
+  firstTokenDate: string | null;
 }
 
 export function ZidManager() {
@@ -106,10 +107,17 @@ export function ZidManager() {
   const withoutZid = users.filter((u) => u.zid === null);
 
   // Further split unassigned: has respect vs no respect
-  const eligibleNoZid = withoutZid.filter((u) => {
-    const r = getRespect(u);
-    return r && r.totalRespect > 0;
-  });
+  const eligibleNoZid = withoutZid
+    .filter((u) => {
+      const r = getRespect(u);
+      return r && r.totalRespect > 0;
+    })
+    .sort((a, b) => {
+      // Sort by first token date ascending (earliest first = lowest ZID)
+      const dateA = getRespect(a)?.firstTokenDate || '9999';
+      const dateB = getRespect(b)?.firstTokenDate || '9999';
+      return dateA.localeCompare(dateB);
+    });
   const noRespectNoZid = withoutZid.filter((u) => {
     const r = getRespect(u);
     return !r || r.totalRespect === 0;
@@ -207,6 +215,9 @@ export function ZidManager() {
                       {respect?.ogRespect && respect?.zorRespect ? ' + ' : ''}
                       {respect?.zorRespect ? `${respect.zorRespect} ZOR` : ''}
                     </p>
+                    {respect?.firstTokenDate && (
+                      <p className="text-[10px] text-gray-600">since {respect.firstTokenDate}</p>
+                    )}
                   </div>
                   <button
                     onClick={() => handleAssignZid(user)}
@@ -258,7 +269,9 @@ export function ZidManager() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-white">{respect?.totalRespect.toLocaleString() || '0'}</p>
-                    <p className="text-[10px] text-gray-500">respect</p>
+                    <p className="text-[10px] text-gray-500">
+                      {respect?.firstTokenDate ? `since ${respect.firstTokenDate}` : 'respect'}
+                    </p>
                   </div>
                 </div>
               );

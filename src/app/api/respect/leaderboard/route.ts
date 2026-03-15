@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createPublicClient, http, parseAbi, formatEther, formatUnits } from 'viem';
+import { createPublicClient, http, parseAbi, formatEther, formatUnits, parseAbiItem, pad, toHex } from 'viem';
 import { optimism } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -21,9 +21,84 @@ const zorDetailAbi = parseAbi([
 const ogAbi = parseAbi(['function balanceOf(address) view returns (uint256)']);
 const zorAbi = parseAbi(['function balanceOf(address, uint256) view returns (uint256)']);
 
-// Cache for 5 minutes
+// ERC-20 Transfer event signature
+const TRANSFER_EVENT = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+// ERC-1155 TransferSingle event signature
+const TRANSFER_SINGLE_EVENT = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62';
+
+// Cache for 5 minutes (leaderboard), first-token dates cached longer
 let cache: { data: unknown; timestamp: number } | null = null;
 const CACHE_TTL = 5 * 60 * 1000;
+
+// Persistent cache for first token dates (keyed by wallet address)
+const firstTokenDateCache = new Map<string, string | null>();
+
+/**
+ * Get the date a wallet first received any respect token (OG or ZOR)
+ * by querying Transfer event logs on Optimism.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getFirstTokenDate(
+  client: any,
+  wallet: string
+): Promise<string | null> {
+  const lowerWallet = wallet.toLowerCase();
+
+  // Return cached if we already looked this up
+  if (firstTokenDateCache.has(lowerWallet)) {
+    return firstTokenDateCache.get(lowerWallet) || null;
+  }
+
+  try {
+    const paddedAddr = pad(wallet as `0x${string}`, { size: 32 }).toLowerCase();
+
+    // Query both ERC-20 Transfer(from, to, value) and ERC-1155 TransferSingle
+    // where `to` = this wallet. We only need the earliest one.
+    const [ogLogs, zorLogs] = await Promise.all([
+      // OG Respect (ERC-20): Transfer event, topic[2] = to address
+      client.getLogs({
+        address: OG_RESPECT,
+        event: parseAbiItem('event Transfer(address indexed from, address indexed to, uint256 value)'),
+        args: { to: wallet as `0x${string}` },
+        fromBlock: BigInt(0),
+        toBlock: 'latest',
+      }).catch(() => []),
+      // ZOR Respect (ERC-1155): TransferSingle event, topic[3] = to address
+      client.getLogs({
+        address: ZOR_RESPECT,
+        event: parseAbiItem('event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)'),
+        args: { to: wallet as `0x${string}` },
+        fromBlock: BigInt(0),
+        toBlock: 'latest',
+      }).catch(() => []),
+    ]);
+
+    // Find the earliest block number across both
+    const allBlocks: bigint[] = [];
+    for (const log of ogLogs) {
+      if (log.blockNumber) allBlocks.push(log.blockNumber);
+    }
+    for (const log of zorLogs) {
+      if (log.blockNumber) allBlocks.push(log.blockNumber);
+    }
+
+    if (allBlocks.length === 0) {
+      firstTokenDateCache.set(lowerWallet, null);
+      return null;
+    }
+
+    const earliestBlock = allBlocks.reduce((min, b) => (b < min ? b : min));
+    const block = await client.getBlock({ blockNumber: earliestBlock });
+    const date = new Date(Number(block.timestamp) * 1000).toISOString().split('T')[0];
+
+    firstTokenDateCache.set(lowerWallet, date);
+    return date;
+  } catch (err) {
+    console.error(`Failed to get first token date for ${wallet}:`, err);
+    firstTokenDateCache.set(lowerWallet, null);
+    return null;
+  }
+}
 
 export async function GET() {
   const session = await getSessionData();
@@ -137,7 +212,17 @@ export async function GET() {
         totalRespect: Math.round(total),
         ogPct: Math.round(ogPct * 10) / 10,
         zorPct: Math.round(zorPct * 10) / 10,
+        firstTokenDate: null as string | null,
       };
+    });
+
+    // Fetch first token dates for users with respect (in parallel, batched)
+    const withRespect = leaderboard.filter((e) => e.totalRespect > 0);
+    const dateResults = await Promise.all(
+      withRespect.map((e) => getFirstTokenDate(client, e.wallet))
+    );
+    withRespect.forEach((entry, i) => {
+      entry.firstTokenDate = dateResults[i];
     });
 
     // Sort by total descending, assign ranks

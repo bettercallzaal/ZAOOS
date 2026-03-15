@@ -13,6 +13,7 @@ interface RespectEntry {
   ogRespect: number;
   zorRespect: number;
   totalRespect: number;
+  firstTokenDate: string | null;
 }
 
 interface RespectData {
@@ -150,9 +151,14 @@ export default function RespectPage() {
                         <span className="text-[10px] text-[#f5a623]/70 font-medium flex-shrink-0">ZID #{entry.zid}</span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 truncate">
-                      {entry.username ? `@${entry.username}` : entry.fid ? `FID ${entry.fid}` : `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`}
-                    </p>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="truncate">
+                        {entry.username ? `@${entry.username}` : entry.fid ? `FID ${entry.fid}` : `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`}
+                      </span>
+                      {entry.firstTokenDate && (
+                        <span className="text-[10px] text-gray-600 flex-shrink-0">since {entry.firstTokenDate}</span>
+                      )}
+                    </div>
                   </div>
                   <div className="text-right">
                     <p className={`text-sm font-bold ${isMe ? 'text-[#f5a623]' : 'text-white'}`}>

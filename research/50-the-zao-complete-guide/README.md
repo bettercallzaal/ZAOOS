@@ -81,9 +81,9 @@ ZAO OS carries 4 meanings, each a visible section of the app:
 
 | Person | Real Name | Handle | Role | Background |
 |--------|-----------|--------|------|------------|
-| **Hurric4n3IKE** | Ikechi Nwachukwu | @Hurric4n3IKE | Founder, Developer, MC | Web dev, audio engineer, UX designer, musician. Writes Anchor/Rust smart contracts on Solana. |
+| **Hurric4n3IKE** | Ikechi Nwachukwu | @Hurric4n3IKE | Founder, Developer, MC | Web dev, audio engineer, UX designer, musician (Apple Music/Shazam). Writes Anchor/Rust smart contracts on Solana. |
 | **Zaal** | Zaal Panthaki | @bettercallzaal | Head of Ecosystem | Strategy, partnerships, communications. BS EE, former automation engineer. |
-| **Candy** | Samantha | @CandyToyBoxYT1 | Head of Marketing/Design | CC0 graphics, Web3 Academy Writers Guild, "Web3 Nuances" newsletter, agentic automation. ZID 2. |
+| **Candy** | Samantha Denton-Kinney | @CandyToyBoxYT1 | Co-Founder, Head of Marketing/Design | CC0 graphics, CandyToyBox.eth, Web3 Academy Writers Guild, "Web3 Nuances" newsletter, agentic automation. Sponsorship Admin at Impact3/Milk Road. ZID 2. |
 
 ### ZAO Co-Founders & Key Team
 
@@ -99,7 +99,7 @@ ZAO OS carries 4 meanings, each a visible section of the app:
 | Person | Handle | Role |
 |--------|--------|------|
 | **Ohnahji B** | @OhnahjiB | Co-host, Ohnahji University Chancellor, ohnahji.eth |
-| **EZ** | @EZinCrypto | Co-host, Token Smart community member |
+| **EZ** | @EZinCrypto | Co-host, EZinCrypto.eth. Photographer since age 9, Costa Rica-based, landscape architecture degree, NFT artist (KnownOrigin), Token Smart "Ladz" |
 | **Freezetheverse** | — | LTAW3 Intern |
 
 ### ZAO Stock Production Team
@@ -108,7 +108,7 @@ ZAO OS carries 4 meanings, each a visible section of the app:
 |--------|------|------------|
 | **AttaBotty** | Artist management, production | ZAO co-founder, 20+ years |
 | **DaNici** | Visual design, animation | Blender, multimedia |
-| **FailOften (David Overholt)** | Creative tech, installations | 25+ years, NYU ITP, taught at Kansas City Art Institute. NEA + Andy Warhol Foundation supported. Runs ENTERACT studio. |
+| **FailOften (David Steele Overholt)** | Creative tech, installations | 25+ years, NYU ITP grad, taught 10 years at Kansas City Art Institute (founded Interactive Arts Major). NEA + Andy Warhol Foundation supported. Runs ENTERACT studio in KC. Fortune 100 clients + museums. [failoften.xyz](https://failoften.xyz/) |
 
 ### Fractal Governance Members (Day 1 Rankings)
 
@@ -555,12 +555,13 @@ Featured on thezao.com:
 | **Songs of Eden** | ZAO community artist |
 | **Hurric4n3Ike** | WaveWarZ founder, musician, developer |
 | **AttaBotty** | ZAO co-founder, 10K+ NFTs, 20+ years |
-| **Clejan** | "The Trap Violinist," Atlanta, **289K monthly Spotify listeners** |
-| **NessytheRilla** | Detroit rapper, opened for 6ix9ine, Chief Keef, Doja Cat, D12 |
+| **Clejan** | Zac Clejan, "The Trap Violinist," Atlanta. **289K Spotify listeners**, 900K+ across platforms. Violin since age 2. Opened for Soulja Boy, French Montana, Snoop Dogg, Busta Rhymes. Toured with Lindsey Stirling. [clejan.com](https://clejan.com/) |
+| **NessytheRilla** | Ne$$y, Detroit. Opened for 6ix9ine, Chief Keef, Doja Cat, D12, Obie Trice, Young Jeezy. "As Told By Nessy" NFT collection on OpenSea. |
 | **Jadyn Violet** | UVR founder, NJ indie artist, Raver Realm NFTs |
 | **Maxwell Aden** | ZAO community artist |
-| **GodCloud** | First finger drummer on Ethereum (2021), Forbes mention, worked with George Lopez + Val Kilmer |
-| **Losi** | Singer-songwriter from Cali, Colombia, ZAO-CHELLA performer |
+| **GodCloud** | First finger drummer on Ethereum (2021). Former pro wrestler (tag team gold). Forbes mention. Co-produced NFTs with George Lopez + Val Kilmer via AgencyNFT.io. Onboarded 10K+ people via "NFTs Made Simple." [godcloud.org](https://www.godcloud.org/) |
+| **Jango UU** | NYC, "Unleashed Unchained." Genre-bending: trap, synth rock, folk-pop, ambient R&B. Introduced to Web3 by Zaal. Also releases as "Django" on thezao.com. ZAO-PALOOZA performer + WaveWarZ LIVE competitor. [jangouu.com](https://www.jangouu.com/) |
+| **Losi** | Singer-songwriter from Cali, Colombia. Sells songs to blockchain collectors. ZAO-CHELLA performer. July Community Member of the Month. Active on Hive. |
 | **Stilo** | StiloWorld/Dope Stilo Music Club, 150+ weekly concerts |
 | **DCoop** | Virginia-based, ZAOVille collaborator |
 | **Hexidized** | ZAO community artist |

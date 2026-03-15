@@ -555,14 +555,18 @@ Featured on thezao.com:
 | **Songs of Eden** | ZAO community artist |
 | **Hurric4n3Ike** | WaveWarZ founder, musician, developer |
 | **AttaBotty** | ZAO co-founder, 10K+ NFTs, 20+ years |
-| **Clejan** | Zac Clejan, "The Trap Violinist," Atlanta. **289K Spotify listeners**, 900K+ across platforms. Violin since age 2. Opened for Soulja Boy, French Montana, Snoop Dogg, Busta Rhymes. Toured with Lindsey Stirling. [clejan.com](https://clejan.com/) |
-| **NessytheRilla** | Ne$$y, Detroit. Opened for 6ix9ine, Chief Keef, Doja Cat, D12, Obie Trice, Young Jeezy. "As Told By Nessy" NFT collection on OpenSea. |
+| **Clejan** | Zac Clejan, "The Trap Violinist," Atlanta. **289K Spotify**, 900K+ total. 3 albums (35-40 tracks). Violin age 2. Opened for Snoop/Soulja Boy/Busta Rhymes. Toured w/ Lindsey Stirling. 4+ Sound.xyz drops incl charity NFT. Collab w/ Mr. Darius ("OFF THE STRIP"). [clejan.com](https://clejan.com/) |
+| **NessytheRilla** | Ne$$y, Detroit. 6 albums/projects (40-50 tracks). Opened for 6ix9ine, Chief Keef, Doja Cat, D12. 5+ Nina Protocol (Solana) releases. "As Told By Nessy" NFTs on OpenSea. Poetic Gorilla Music. |
+| **Mr. Darius** | Multidisciplinary artist, published author. **12+ Sound.xyz releases** incl "OFF THE STRIP" cypher w/ Clejan. Also on Audius. Hip-hop + EDM + Wave. [mrdariusmusic.com](https://mrdariusmusic.com/) |
+| **Formerly LEN** | 4 albums + 10+ singles (25-30 tracks). Hip-hop. Stockholm → web3. "No Page Left Unturned" (2024), "Fog of War" (2025). |
+| **Maxwell Aden** | Atlanta pop/R&B. **11.8K Spotify**. "Bounce (feat. Kodie Shane)" = 1M+ video views. |
+| **Goldilox** | **40.4K Spotify monthly listeners**. |
 | **Jadyn Violet** | UVR founder, NJ indie artist, Raver Realm NFTs |
 | **Maxwell Aden** | ZAO community artist |
 | **GodCloud** | First finger drummer on Ethereum (2021). Former pro wrestler (tag team gold). Forbes mention. Co-produced NFTs with George Lopez + Val Kilmer via AgencyNFT.io. Onboarded 10K+ people via "NFTs Made Simple." [godcloud.org](https://www.godcloud.org/) |
 | **Jango UU** | NYC, "Unleashed Unchained." Genre-bending: trap, synth rock, folk-pop, ambient R&B. Introduced to Web3 by Zaal. Also releases as "Django" on thezao.com. ZAO-PALOOZA performer + WaveWarZ LIVE competitor. [jangouu.com](https://www.jangouu.com/) |
 | **Losi** | Singer-songwriter from Cali, Colombia. Sells songs to blockchain collectors. ZAO-CHELLA performer. July Community Member of the Month. Active on Hive. |
-| **Stilo** | StiloWorld/Dope Stilo Music Club, 150+ weekly concerts |
+| **Stilo** | Dope Stilo Music Club. 35-40 tracks incl 32-track "Dopestilo" album. 150+ weekly VR concerts since 2007. New album "TOGETHER" (2026). Bonita NFT access pass. [stilo.world](https://www.stilo.world/) |
 | **DCoop** | Virginia-based, ZAOVille collaborator |
 | **Hexidized** | ZAO community artist |
 | **Formerly LEN** | ZAO community artist |
@@ -707,7 +711,84 @@ ZAO calls itself "a Nounish crew" — aligning with:
 
 ---
 
-## 21. Competitive Landscape (March 2026)
+## 21. Music Catalog Summary
+
+### Combined Stats
+
+| Metric | Value |
+|--------|-------|
+| **Total estimated tracks** | 500-560+ (200-260 excluding Songs of Eden) |
+| **Combined Spotify monthly listeners** | 378,000+ |
+| **Artists with Sound.xyz drops** | 5 (Jadyn Violet, Mr. Darius, Clejan, GodCloud, Jango UU) |
+| **Artists with Nina Protocol releases** | 1 (NessytheRilla — 5+ Solana releases) |
+| **Artists with 10K+ Spotify listeners** | 4 (Clejan 289K, Goldilox 40.4K, Songs of Eden 34.3K, Maxwell Aden 11.8K) |
+
+### Top Artists by Catalog Size
+
+| Artist | Est. Tracks | Genre |
+|--------|------------|-------|
+| Songs of Eden | 300+ | Piano / Wellness |
+| NessytheRilla | 40-50 | Hip-hop / Rap |
+| Clejan | 35-40 | Trap-violin fusion |
+| Stilo | 35-40 | R&B / Metaverse |
+| Formerly LEN | 25-30 | Hip-hop |
+| Jadyn Violet | 20-25 | Alt-pop / Electronic |
+| Jango UU | 12-15 | Synthrock / Experimental rap |
+| Mr. Darius | 12-15 | Hip-hop / EDM / Wave |
+
+### Web3 Music Activity (Ranked)
+
+1. **Jadyn Violet** — Sound.xyz drops, Raver Realm PFP+music (679 minted), Violet Token, 7 raves
+2. **Mr. Darius** — 12+ Sound.xyz releases, Audius, published author
+3. **NessytheRilla** — 5+ Nina Protocol (Solana) releases, OpenSea NFTs
+4. **Clejan** — 4+ Sound.xyz drops including charity NFT
+5. **GodCloud** — RCRDSHP store, GodClip 1/1s on OpenSea, first finger drummer on blockchain
+6. **AttaBotty** — 10,000+ NFTs sold, Base Onchain Registry
+7. **Jango UU** — Sound.xyz + thezao.com drops
+8. **Stilo** — Bonita NFT, VR concerts, Rarible
+
+### Confirmed ZAO Member Collaborations
+
+| Track | Artists | Platform |
+|-------|---------|----------|
+| **OFF THE STRIP (Vegas Freestyle)** | Clejan + Mr. Darius + DYL + Beamer + JJ Frank + C. Hood + Vic + Kaandiid | Sound.xyz |
+| **Focus** | Clejan + Tabiyus | Spotify |
+
+---
+
+## 22. On-Chain Data
+
+### Confirmed NFT Collections
+
+| Collection | Chain | Supply | Minted | Holders | Floor |
+|-----------|-------|--------|--------|---------|-------|
+| **Ohnahji NFT** | Ethereum | 3,304 | 2,219 | 741 | 0.015 ETH |
+| **Raver Realm** (Jadyn Violet) | Ethereum | 1,800 | 679 | — | 0.03-0.51 ETH |
+| **Farmacy Fantoms** (Styles P) | Ethereum | 6,666 | 6,638 | 1,134 | 0.0093 ETH |
+| **ZAO Cards** | Manifold | — | — | — | — |
+
+### Token Contracts
+
+| Token | Chain | Contract | Status |
+|-------|-------|----------|--------|
+| **$ZAO Respect** | Base | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` | Deployed, soulbound |
+| **$LOANZ** | Base + Solana | `0x03315307b202bf9c55ebebb8e9341d30411a0bc4` | Launched Feb 2025 |
+| **WaveWarZ** | Solana | `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` | Active (Anchor/Rust) |
+| **GLANKER** (Empire Builder) | Base | `0x33ac788bc9ccb27e9ec558fb2bde79950a6b9d5b` | ~$63K mcap, 100B supply |
+
+### Data Gaps (Need Direct Explorer Visits)
+
+| Item | What's Missing | Where to Check |
+|------|---------------|----------------|
+| $ZAO Respect | Holders, supply, deploy date | basescan.org |
+| $LOANZ | Holders, price, volume | dexscreener.com/base |
+| WaveWarZ | Transaction count, activity | solscan.io |
+| ZAO Cards | Full collection list, mint counts | app.manifold.xyz |
+| AttaBotty NFTs | Collection addresses, volume | zora.co, opensea.io |
+
+---
+
+## 23. Competitive Landscape (March 2026)
 
 ### The Graveyard
 

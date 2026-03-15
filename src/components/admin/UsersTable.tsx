@@ -13,6 +13,7 @@ interface User {
   custody_address: string | null;
   verified_addresses: string[] | null;
   ens_name: string | null;
+  respect_wallet: string | null;
   role: 'beta' | 'member' | 'admin';
   real_name: string | null;
   ign: string | null;
@@ -181,6 +182,7 @@ export function UsersTable() {
       bio: user.bio || '',
       role: user.role,
       fid: user.fid ? String(user.fid) : '',
+      respect_wallet: user.respect_wallet || '',
       notes: user.notes || '',
     });
   };
@@ -196,6 +198,7 @@ export function UsersTable() {
       if (editForm.ign !== (editingUser.ign || '')) updates.ign = editForm.ign || null;
       if (editForm.bio !== (editingUser.bio || '')) updates.bio = editForm.bio || null;
       if (editForm.role !== editingUser.role) updates.role = editForm.role;
+      if (editForm.respect_wallet !== (editingUser.respect_wallet || '')) updates.respect_wallet = editForm.respect_wallet || null;
       if (editForm.notes !== (editingUser.notes || '')) updates.notes = editForm.notes || null;
 
       // FID linking/unlinking
@@ -490,6 +493,14 @@ function UserCard({
               </div>
             ))}
 
+            {/* Respect Wallet */}
+            {user.respect_wallet && (
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium w-16 text-center">Respect</span>
+                <span className="text-gray-300 font-mono flex-1 truncate">{user.respect_wallet}</span>
+              </div>
+            )}
+
             {/* Bio */}
             {user.bio && (
               <p className="text-gray-400 mt-2 italic">&ldquo;{user.bio}&rdquo;</p>
@@ -636,6 +647,18 @@ function EditUserModal({
             <option value="member">Member (full features)</option>
             <option value="admin">Admin (full + admin panel)</option>
           </select>
+
+          {/* Respect Wallet */}
+          <label className="block text-xs text-gray-500 mb-1">
+            Respect Wallet
+            <span className="text-gray-600 ml-1">— On-chain address for ZID/respect tokens</span>
+          </label>
+          <input
+            value={form.respect_wallet}
+            onChange={(e) => update('respect_wallet', e.target.value)}
+            placeholder="0x... (defaults to primary wallet if empty)"
+            className="w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2.5 mb-3 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623] font-mono"
+          />
 
           {/* Notes */}
           <label className="block text-xs text-gray-500 mb-1">Admin Notes</label>

@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS users (
   verified_addresses JSONB DEFAULT '[]'::jsonb,  -- Additional verified wallets
   ens_name TEXT,                                 -- Primary ENS name
 
+  -- Respect / ZID
+  respect_wallet TEXT,                            -- Wallet for on-chain respect tokens & ZID
+
   -- ZAO-specific
   role TEXT DEFAULT 'beta' CHECK (role IN ('beta', 'member', 'admin')),
   -- beta = wallet-only, limited features

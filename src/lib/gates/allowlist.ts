@@ -60,5 +60,31 @@ export async function checkAllowlist(
     if (verifiedMatch) return { allowed: true, entry: verifiedMatch as AllowlistEntry };
   }
 
+  // Fallback: check users table (for users added via admin panel)
+  if (fid) {
+    const { data: userByFid } = await supabaseAdmin
+      .from('users')
+      .select('id, primary_wallet')
+      .eq('fid', fid)
+      .eq('is_active', true)
+      .limit(1)
+      .single();
+
+    if (userByFid) return { allowed: true };
+  }
+
+  if (walletAddress) {
+    const addr = walletAddress.toLowerCase();
+    const { data: userByWallet } = await supabaseAdmin
+      .from('users')
+      .select('id, primary_wallet')
+      .eq('primary_wallet', addr)
+      .eq('is_active', true)
+      .limit(1)
+      .single();
+
+    if (userByWallet) return { allowed: true };
+  }
+
   return { allowed: false };
 }

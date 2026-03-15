@@ -28,20 +28,23 @@ export async function GET() {
   }
 
   try {
-    // Get all members with wallets from allowlist
-    const { data: members, error } = await supabaseAdmin
-      .from('allowlist')
-      .select('real_name, ign, wallet_address, fid, username')
-      .eq('is_active', true)
-      .not('wallet_address', 'is', null);
+    // Get all members with wallets from users table (primary source)
+    const { data: users, error: usersErr } = await supabaseAdmin
+      .from('users')
+      .select('display_name, ign, real_name, primary_wallet, respect_wallet, fid, username')
+      .eq('is_active', true);
 
-    if (error) throw error;
+    if (usersErr) throw usersErr;
 
-    const walletsToCheck = members
-      .filter((m) => m.wallet_address)
+    // Use respect_wallet if set, fall back to primary_wallet
+    const walletsToCheck = (users || [])
+      .filter((m) => {
+        const w = m.respect_wallet || m.primary_wallet;
+        return w && !w.startsWith('fid:');
+      })
       .map((m) => ({
-        name: m.ign || m.real_name || `FID ${m.fid}`,
-        wallet: m.wallet_address as string,
+        name: m.display_name || m.ign || m.real_name || `FID ${m.fid}`,
+        wallet: (m.respect_wallet || m.primary_wallet) as string,
         fid: m.fid,
         username: m.username || null,
       }));

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createPublicClient, http, parseAbi, formatEther, formatUnits, parseAbiItem, pad, toHex } from 'viem';
+import { createPublicClient, http, parseAbi, formatEther, parseAbiItem } from 'viem';
 import { optimism } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -30,6 +30,9 @@ const TRANSFER_SINGLE_EVENT = '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c08
 let cache: { data: unknown; timestamp: number } | null = null;
 const CACHE_TTL = 5 * 60 * 1000;
 
+// OG contract deployed at block 123349892 (2024-07-30) — no transfers before this
+const DEPLOYMENT_BLOCK = BigInt(123349892);
+
 // Persistent cache for first token dates (keyed by wallet address)
 const firstTokenDateCache = new Map<string, string | null>();
 
@@ -50,8 +53,6 @@ async function getFirstTokenDate(
   }
 
   try {
-    const paddedAddr = pad(wallet as `0x${string}`, { size: 32 }).toLowerCase();
-
     // Query both ERC-20 Transfer(from, to, value) and ERC-1155 TransferSingle
     // where `to` = this wallet. We only need the earliest one.
     const [ogLogs, zorLogs] = await Promise.all([
@@ -60,17 +61,23 @@ async function getFirstTokenDate(
         address: OG_RESPECT,
         event: parseAbiItem('event Transfer(address indexed from, address indexed to, uint256 value)'),
         args: { to: wallet as `0x${string}` },
-        fromBlock: BigInt(0),
+        fromBlock: DEPLOYMENT_BLOCK,
         toBlock: 'latest',
-      }).catch(() => []),
+      }).catch((err: unknown) => {
+        console.error(`OG getLogs failed for ${wallet}:`, err);
+        return [];
+      }),
       // ZOR Respect (ERC-1155): TransferSingle event, topic[3] = to address
       client.getLogs({
         address: ZOR_RESPECT,
         event: parseAbiItem('event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value)'),
         args: { to: wallet as `0x${string}` },
-        fromBlock: BigInt(0),
+        fromBlock: DEPLOYMENT_BLOCK,
         toBlock: 'latest',
-      }).catch(() => []),
+      }).catch((err: unknown) => {
+        console.error(`ZOR getLogs failed for ${wallet}:`, err);
+        return [];
+      }),
     ]);
 
     // Find the earliest block number across both

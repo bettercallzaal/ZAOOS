@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import type { Client, Dm, Group, DecodedMessage } from '@xmtp/browser-sdk';
+import { ConsentState } from '@xmtp/browser-sdk';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = Client<any>;
@@ -30,6 +31,7 @@ interface XMTPContextValue {
   isConnected: boolean;
   error: string | null;
   streamConnected: boolean;
+  tabLocked: boolean;
 
   conversations: XMTPConversation[];
   activeConversationId: string | null;
@@ -92,6 +94,32 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [zaoMembers, setZaoMembers] = useState<ZaoMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
+
+  // Multi-tab OPFS lock detection — XMTP browser SDK uses OPFS which doesn't support concurrent access
+  const [tabLocked, setTabLocked] = useState(false);
+  useEffect(() => {
+    if (typeof BroadcastChannel === 'undefined') return;
+    const channel = new BroadcastChannel('zao-xmtp-tab-lock');
+    const tabId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    // Announce presence
+    channel.postMessage({ type: 'ping', tabId });
+
+    channel.onmessage = (event) => {
+      if (event.data.type === 'ping' && event.data.tabId !== tabId) {
+        // Another tab is active — respond so they know we exist
+        channel.postMessage({ type: 'pong', tabId });
+      }
+      if (event.data.type === 'pong' && event.data.tabId !== tabId) {
+        // We detected another tab — block XMTP connection
+        setTabLocked(true);
+      }
+    };
+
+    return () => {
+      channel.close();
+    };
+  }, []);
 
   // Track active conversation for the global message stream
   const activeConvIdRef = useRef<string | null>(null);
@@ -228,12 +256,17 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         onError: (err: Error) => {
           console.error('[XMTP] Conversation stream error:', err);
         },
+        onFail: () => {
+          console.error('[XMTP] Conversation stream permanently failed');
+          setStreamConnected(false);
+        },
       });
       convStreamCleanupRef.current = () => { void convStream.end(); };
 
       // Stream ALL messages across ALL conversations
       const { getMemberProfiles, getPeerProfiles } = await import('@/lib/xmtp/client');
       const msgStream = await client.conversations.streamAllMessages({
+        consentStates: [ConsentState.Allowed],
         onValue: (msg: DecodedMessage) => {
           if (!isTextMessage(msg)) return;
 
@@ -308,16 +341,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         },
         onError: (err: Error) => {
           console.error('[XMTP] Message stream error:', err);
-          setStreamConnected(false);
-          // Auto-reconnect on stream-level error
-          setTimeout(() => {
-            if (primaryClientRef.current) {
-              startGlobalStreams(primaryClientRef.current).catch((e) =>
-                console.error('[XMTP] Stream reconnection failed:', e)
-              );
-            }
-          }, 5000);
         },
+        onFail: () => {
+          console.error('[XMTP] Message stream permanently failed after retries');
+          setStreamConnected(false);
+          setError('Message stream disconnected. Please refresh to reconnect.');
+        },
+        // SDK built-in retry: 6 attempts with 10s delay by default
+        retryOnFail: true,
       });
       msgStreamCleanupRef.current = () => { void msgStream.end(); };
       setStreamConnected(true);
@@ -491,6 +522,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
    */
   const autoConnect = useCallback(async (fid: number) => {
     if (walletsRef.current.size > 0) return;
+    if (tabLocked) {
+      setError('ZAO OS messaging is open in another tab. Please close the other tab first.');
+      return;
+    }
 
     setIsConnecting(true);
     setError(null);
@@ -509,7 +544,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const client = await createXMTPClient(signer, address);
       primaryClientRef.current = client;
 
-      await client.conversations.syncAll();
+      await client.conversations.syncAll([ConsentState.Allowed]);
 
       walletsRef.current.set(address, { address, client });
       saveConnectedWallet(address);
@@ -529,7 +564,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       setIsConnecting(false);
       setConnectingWallet(null);
     }
-  }, [seedLastMessages, loadAllConversations, checkZaoMembers, startGlobalStreams]);
+  }, [tabLocked, seedLastMessages, loadAllConversations, checkZaoMembers, startGlobalStreams]);
 
   /**
    * Connect a specific wallet to XMTP
@@ -540,6 +575,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   ) => {
     const normalized = address.toLowerCase();
     if (walletsRef.current.has(normalized)) return;
+    if (tabLocked) {
+      setError('ZAO OS messaging is open in another tab. Please close the other tab first.');
+      return;
+    }
 
     setIsConnecting(true);
     setConnectingWallet(normalized);
@@ -551,7 +590,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const client = await createXMTPClient(signer, normalized);
       primaryClientRef.current = client;
 
-      await client.conversations.syncAll();
+      await client.conversations.syncAll([ConsentState.Allowed]);
 
       walletsRef.current.set(normalized, { address: normalized, client });
       saveConnectedWallet(normalized);
@@ -568,7 +607,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       setIsConnecting(false);
       setConnectingWallet(null);
     }
-  }, [seedLastMessages, loadAllConversations, startGlobalStreams]);
+  }, [tabLocked, seedLastMessages, loadAllConversations, startGlobalStreams]);
 
   const disconnectWallet = useCallback(async (address: string) => {
     const normalized = address.toLowerCase();
@@ -725,7 +764,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, [findClientForConversation]);
 
   /**
-   * Send a message with optimistic UI update.
+   * Send a message using SDK's native optimistic send.
+   * sendText(text, true) stores locally for instant UI, publishMessages() sends to network.
    */
   const sendMessage = useCallback(async (text: string) => {
     if (!activeConversationId || !text.trim() || !activeConvWalletRef.current) return;
@@ -736,45 +776,45 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     const conv = await wc.client.conversations.getConversationById(activeConversationId);
     if (!conv) return;
 
-    // Optimistic: show message immediately
-    const optimisticId = `optimistic-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const optimisticMsg: XMTPMessage = {
-      id: optimisticId,
-      conversationId: activeConversationId,
-      senderInboxId: wc.client.inboxId ?? '',
-      content: text.trim(),
-      sentAt: new Date(),
-      isFromMe: true,
-    };
-
-    messageIdSetRef.current.add(optimisticId);
-    setMessages((prev) => [...prev, optimisticMsg]);
-
-    // Update sidebar immediately
-    lastMessagesRef.current.set(activeConversationId, {
-      content: text.trim(),
-      sentAt: optimisticMsg.sentAt,
-    });
-    setConversations((prev) =>
-      prev
-        .map((c) =>
-          c.id === activeConversationId
-            ? { ...c, lastMessage: text.trim(), lastMessageAt: optimisticMsg.sentAt }
-            : c
-        )
-        .sort((a, b) => (b.lastMessageAt?.getTime() ?? 0) - (a.lastMessageAt?.getTime() ?? 0))
-    );
+    const trimmed = text.trim();
 
     try {
-      await conv.sendText(text.trim());
-      // Real message will arrive via stream and dedup against the optimistic one
-      // (stream uses server-assigned ID which differs from optimistic ID — that's fine,
-      // it will appear as a new message but the user won't notice since content is identical)
+      // Step 1: Store locally (optimistic) — returns message ID
+      const msgId = await conv.sendText(trimmed, true);
+
+      // Show optimistic message in UI immediately
+      const optimisticMsg: XMTPMessage = {
+        id: msgId,
+        conversationId: activeConversationId,
+        senderInboxId: wc.client.inboxId ?? '',
+        content: trimmed,
+        sentAt: new Date(),
+        isFromMe: true,
+      };
+
+      messageIdSetRef.current.add(msgId);
+      setMessages((prev) => [...prev, optimisticMsg]);
+
+      // Update sidebar immediately
+      lastMessagesRef.current.set(activeConversationId, {
+        content: trimmed,
+        sentAt: optimisticMsg.sentAt,
+      });
+      setConversations((prev) =>
+        prev
+          .map((c) =>
+            c.id === activeConversationId
+              ? { ...c, lastMessage: trimmed, lastMessageAt: optimisticMsg.sentAt }
+              : c
+          )
+          .sort((a, b) => (b.lastMessageAt?.getTime() ?? 0) - (a.lastMessageAt?.getTime() ?? 0))
+      );
+
+      // Step 2: Publish to network
+      await conv.publishMessages();
     } catch (err) {
       console.error('[XMTP] Failed to send message:', err);
-      // Remove optimistic message on failure
-      messageIdSetRef.current.delete(optimisticId);
-      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+      setError('Failed to send message. Please try again.');
     }
   }, [activeConversationId]);
 
@@ -888,7 +928,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   const refreshConversations = useCallback(async () => {
     for (const [, wc] of walletsRef.current) {
-      await wc.client.conversations.syncAll();
+      await wc.client.conversations.syncAll([ConsentState.Allowed]);
     }
     await seedLastMessages();
     await loadAllConversations();
@@ -916,6 +956,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         isConnected: walletsRef.current.size > 0,
         error,
         streamConnected,
+        tabLocked,
         conversations,
         activeConversationId,
         messages,

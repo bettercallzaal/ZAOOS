@@ -8,6 +8,7 @@ import { YoutubeProvider } from './YoutubeProvider';
 import { SpotifyProvider } from './SpotifyProvider';
 
 export { usePlayer } from './PlayerProvider';
+export type { RepeatMode } from './PlayerProvider';
 
 export function AudioProviders({ children }: { children: ReactNode }) {
   return (

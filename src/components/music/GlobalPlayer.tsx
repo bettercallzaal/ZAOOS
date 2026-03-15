@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { usePlayer } from '@/providers/audio';
+import type { RepeatMode } from '@/providers/audio/PlayerProvider';
 import { Scrubber } from './Scrubber';
 import { formatDuration } from '@/lib/music/formatDuration';
 
@@ -120,11 +121,13 @@ export function GlobalPlayer({
         {/* Center: Controls + Scrubber */}
         <div className="flex-1 flex flex-col items-center gap-1 min-w-0">
           {/* Transport controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ShuffleButton active={player.shuffle} onClick={player.toggleShuffle} />
+
             <button
               onClick={onPrev}
               disabled={!hasPrev}
-              className="text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-default"
+              className="text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-default p-1"
               aria-label="Previous track"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -156,14 +159,16 @@ export function GlobalPlayer({
 
             <button
               onClick={onNext}
-              disabled={!hasNext}
-              className="text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-default"
+              disabled={!hasNext && player.repeat === 'off'}
+              className="text-gray-400 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-default p-1"
               aria-label="Next track"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
               </svg>
             </button>
+
+            <RepeatButton mode={player.repeat} onClick={player.cycleRepeat} />
           </div>
 
           {/* Progress bar */}
@@ -304,5 +309,44 @@ export function GlobalPlayer({
         </div>
       </div>
     </div>
+  );
+}
+
+// ─── Shuffle / Repeat buttons ────────────────────────────────────────────────
+
+function ShuffleButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`p-1 rounded transition-colors ${active ? 'text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'}`}
+      aria-label={active ? 'Disable shuffle' : 'Enable shuffle'}
+      title="Shuffle"
+    >
+      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" />
+      </svg>
+      {active && <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#f5a623]" />}
+    </button>
+  );
+}
+
+function RepeatButton({ mode, onClick }: { mode: RepeatMode; onClick: () => void }) {
+  const active = mode !== 'off';
+  return (
+    <button
+      onClick={onClick}
+      className={`relative p-1 rounded transition-colors ${active ? 'text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'}`}
+      aria-label={mode === 'off' ? 'Enable repeat' : mode === 'all' ? 'Repeat one' : 'Disable repeat'}
+      title={mode === 'off' ? 'Repeat' : mode === 'all' ? 'Repeat all' : 'Repeat one'}
+    >
+      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M4.5 12c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.25 7.5l4.5-3-4.5-3M9.75 16.5l-4.5 3 4.5 3" />
+      </svg>
+      {mode === 'one' && (
+        <span className="absolute -top-0.5 -right-0.5 text-[8px] font-bold text-[#f5a623]">1</span>
+      )}
+      {active && <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#f5a623]" />}
+    </button>
   );
 }

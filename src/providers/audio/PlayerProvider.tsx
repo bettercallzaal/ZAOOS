@@ -15,12 +15,15 @@ import { AudioController, TrackMetadata, TrackType } from '@/types/music';
 // ─── State ────────────────────────────────────────────────────────────────────
 
 export type PlayerStatus = 'idle' | 'loading' | 'playing' | 'paused';
+export type RepeatMode = 'off' | 'all' | 'one';
 
 export type PlayerState = {
   status: PlayerStatus;
   metadata: TrackMetadata | null;
   position: number; // ms
   duration: number; // ms
+  shuffle: boolean;
+  repeat: RepeatMode;
 };
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
@@ -33,13 +36,17 @@ export type PlayerAction =
   | { type: 'PROGRESS'; payload: number }
   | { type: 'SET_DURATION'; payload: number }
   | { type: 'LOADED' }
-  | { type: 'STOP' };
+  | { type: 'STOP' }
+  | { type: 'TOGGLE_SHUFFLE' }
+  | { type: 'CYCLE_REPEAT' };
 
 const initial: PlayerState = {
   status: 'idle',
   metadata: null,
   position: 0,
   duration: 0,
+  shuffle: false,
+  repeat: 'off',
 };
 
 function reducer(state: PlayerState, action: PlayerAction): PlayerState {
@@ -59,7 +66,13 @@ function reducer(state: PlayerState, action: PlayerAction): PlayerState {
     case 'SET_DURATION':
       return { ...state, duration: action.payload };
     case 'STOP':
-      return initial;
+      return { ...initial, shuffle: state.shuffle, repeat: state.repeat };
+    case 'TOGGLE_SHUFFLE':
+      return { ...state, shuffle: !state.shuffle };
+    case 'CYCLE_REPEAT': {
+      const next: RepeatMode = state.repeat === 'off' ? 'all' : state.repeat === 'all' ? 'one' : 'off';
+      return { ...state, repeat: next };
+    }
     default:
       return state;
   }
@@ -72,6 +85,7 @@ type PlayerContextValue = {
   dispatch: Dispatch<PlayerAction>;
   controllers: MutableRefObject<Partial<Record<TrackType, AudioController>>>;
   registerController: (type: TrackType, controller: AudioController) => void;
+  onEndedRef: MutableRefObject<(() => void) | null>;
 };
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -81,6 +95,7 @@ const PlayerContext = createContext<PlayerContextValue | null>(null);
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initial);
   const controllers = useRef<Partial<Record<TrackType, AudioController>>>({});
+  const onEndedRef = useRef<(() => void) | null>(null);
 
   const registerController = useCallback(
     (type: TrackType, controller: AudioController) => {
@@ -90,7 +105,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <PlayerContext.Provider value={{ state, dispatch, controllers, registerController }}>
+    <PlayerContext.Provider value={{ state, dispatch, controllers, registerController, onEndedRef }}>
       {children}
     </PlayerContext.Provider>
   );
@@ -105,7 +120,7 @@ export function usePlayerContext() {
 }
 
 export function usePlayer() {
-  const { state, dispatch, controllers } = usePlayerContext();
+  const { state, dispatch, controllers, onEndedRef } = usePlayerContext();
 
   const getController = () =>
     state.metadata ? (controllers.current[state.metadata.type] ?? null) : null;
@@ -138,6 +153,16 @@ export function usePlayer() {
     stop: () => {
       getController()?.pause();
       dispatch({ type: 'STOP' });
+    },
+
+    shuffle: state.shuffle,
+    repeat: state.repeat,
+    toggleShuffle: () => dispatch({ type: 'TOGGLE_SHUFFLE' }),
+    cycleRepeat: () => dispatch({ type: 'CYCLE_REPEAT' }),
+
+    /** Register a callback for when the current track ends naturally */
+    setOnEnded: (callback: (() => void) | null) => {
+      onEndedRef.current = callback;
     },
   };
 }

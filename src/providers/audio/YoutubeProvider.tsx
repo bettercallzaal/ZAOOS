@@ -58,7 +58,7 @@ function extractVideoId(url: string): string | null {
 }
 
 export function YoutubeProvider({ children }: { children: ReactNode }) {
-  const { state, dispatch, registerController } = usePlayerContext();
+  const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const apiReadyRef = useRef(false);
@@ -160,7 +160,11 @@ export function YoutubeProvider({ children }: { children: ReactNode }) {
               stopProgress();
             } else if (e.data === window.YT.PlayerState.ENDED) {
               stopProgress();
-              dispatch({ type: 'STOP' });
+              if (onEndedRef.current) {
+                onEndedRef.current();
+              } else {
+                dispatch({ type: 'STOP' });
+              }
             }
           },
         },

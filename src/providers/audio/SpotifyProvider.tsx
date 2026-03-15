@@ -35,7 +35,7 @@ function spotifyUriFromUrl(url: string): string {
 }
 
 export function SpotifyProvider({ children }: { children: ReactNode }) {
-  const { state, dispatch, registerController } = usePlayerContext();
+  const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyController | null>(null);
   const apiRef = useRef<SpotifyIFrameAPI | null>(null);
@@ -86,10 +86,17 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
         controller.addListener('playback_update', (data: unknown) => {
           const d = data as { data: { position: number; duration: number; isPaused: boolean } };
           if (d?.data) {
-            // Spotify IFrame API returns position/duration in ms already
             dispatch({ type: 'PROGRESS', payload: d.data.position });
             if (d.data.duration) {
               dispatch({ type: 'SET_DURATION', payload: d.data.duration });
+            }
+            // Detect track end: position within 1s of duration and paused
+            if (d.data.duration > 0 && d.data.isPaused && d.data.position >= d.data.duration - 1000) {
+              if (onEndedRef.current) {
+                onEndedRef.current();
+              } else {
+                dispatch({ type: 'STOP' });
+              }
             }
           }
         });

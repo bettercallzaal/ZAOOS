@@ -51,7 +51,8 @@ export function ChatRoom() {
   const [contentFilter, setContentFilter] = useState<ContentFilter>('all');
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const composeRef = useRef<ComposeBarHandle>(null);
-  const musicQueue = useMusicQueue(messages);
+  const [songSubmissions, setSongSubmissions] = useState<import('@/hooks/useMusicQueue').SubmissionEntry[]>([]);
+  const musicQueue = useMusicQueue(messages, songSubmissions);
 
   // Music queue navigation (prev/next)
   const currentQueueIndex = musicQueue.findIndex((q) => q.castHash === player.metadata?.feedId);
@@ -76,6 +77,40 @@ export function ChatRoom() {
   const handleNextTrack = useCallback(() => {
     if (hasNextTrack) playQueueTrack(currentQueueIndex + 1);
   }, [hasNextTrack, currentQueueIndex, playQueueTrack]);
+
+  // Auto-play next track when current ends (respects shuffle/repeat)
+  useEffect(() => {
+    player.setOnEnded(() => {
+      const idx = musicQueue.findIndex((q) => q.castHash === player.metadata?.feedId);
+      if (idx < 0 || musicQueue.length === 0) { player.stop(); return; }
+
+      let nextEntry;
+
+      if (player.repeat === 'one') {
+        // Repeat current track
+        nextEntry = musicQueue[idx];
+      } else if (player.shuffle) {
+        // Pick random track (excluding current)
+        const others = musicQueue.filter((_, i) => i !== idx);
+        nextEntry = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : null;
+      } else if (idx < musicQueue.length - 1) {
+        nextEntry = musicQueue[idx + 1];
+      } else if (player.repeat === 'all') {
+        // Wrap to beginning
+        nextEntry = musicQueue[0];
+      }
+
+      if (nextEntry) {
+        fetch(`/api/music/metadata?url=${encodeURIComponent(nextEntry.url)}`)
+          .then((r) => r.ok ? r.json() : null)
+          .then((data) => { if (data) player.play({ ...data, feedId: nextEntry!.castHash }); })
+          .catch(() => {});
+      } else {
+        player.stop();
+      }
+    });
+    return () => player.setOnEnded(null);
+  }); // Re-register on every render so closure captures latest queue/shuffle/repeat
 
   // XMTP context
   const xmtp = useXMTPContext();
@@ -126,10 +161,14 @@ export function ChatRoom() {
     }
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset filters on channel switch
+  // Reset filters on channel switch + fetch submissions for queue
   useEffect(() => {
     setContentFilter('all');
     setSortMode('newest');
+    fetch(`/api/music/submissions?channel=${activeChannel}`)
+      .then((r) => r.ok ? r.json() : { submissions: [] })
+      .then((data) => setSongSubmissions(data.submissions || []))
+      .catch(() => setSongSubmissions([]));
   }, [activeChannel]);
 
   // Keyboard shortcuts

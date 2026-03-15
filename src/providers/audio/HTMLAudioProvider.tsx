@@ -4,7 +4,7 @@ import { useEffect, useRef, ReactNode } from 'react';
 import { usePlayerContext } from './PlayerProvider';
 
 export function HTMLAudioProvider({ children }: { children: ReactNode }) {
-  const { state, dispatch, registerController } = usePlayerContext();
+  const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const activeUrlRef = useRef<string | null>(null);
 
@@ -27,9 +27,18 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
       dispatch({ type: 'LOADED' });
     };
 
+    const onEnded = () => {
+      if (onEndedRef.current) {
+        onEndedRef.current();
+      } else {
+        dispatch({ type: 'STOP' });
+      }
+    };
+
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('durationchange', onDurationChange);
     audio.addEventListener('canplay', onCanPlay);
+    audio.addEventListener('ended', onEnded);
 
     const controller = {
       play: () => audio.play().catch(console.error),
@@ -54,6 +63,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('durationchange', onDurationChange);
       audio.removeEventListener('canplay', onCanPlay);
+      audio.removeEventListener('ended', onEnded);
       audioRef.current = null;
     };
   }, [dispatch, registerController]);

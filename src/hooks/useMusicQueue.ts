@@ -9,14 +9,22 @@ export type QueueEntry = {
   url: string;
   type: TrackType;
   castHash: string;
+  submittedBy?: string;
 };
 
-export function useMusicQueue(messages: Cast[]): QueueEntry[] {
+export type SubmissionEntry = {
+  id: string;
+  url: string;
+  track_type: string;
+  submitted_by_username: string;
+};
+
+export function useMusicQueue(messages: Cast[], submissions?: SubmissionEntry[]): QueueEntry[] {
   return useMemo(() => {
     const seen = new Set<string>();
     const tracks: QueueEntry[] = [];
 
-    // Reverse so oldest casts are first in queue
+    // Feed-extracted tracks (oldest first)
     for (const msg of [...messages].reverse()) {
       const embedUrls = (msg.embeds ?? [])
         .filter((e) => e.url)
@@ -28,7 +36,6 @@ export function useMusicQueue(messages: Cast[]): QueueEntry[] {
       const allUrls = [...new Set([...embedUrls, ...textUrls])];
 
       for (const url of allUrls) {
-        // Check MIME type from embeds first
         const embed = msg.embeds?.find((e) => e.url === url);
         const contentType = embed?.metadata?.content_type ?? '';
 
@@ -43,6 +50,21 @@ export function useMusicQueue(messages: Cast[]): QueueEntry[] {
       }
     }
 
+    // Append song submissions (deduplicated against feed tracks)
+    if (submissions) {
+      for (const sub of submissions) {
+        if (!seen.has(sub.url)) {
+          seen.add(sub.url);
+          tracks.push({
+            url: sub.url,
+            type: sub.track_type as TrackType,
+            castHash: sub.id,
+            submittedBy: sub.submitted_by_username,
+          });
+        }
+      }
+    }
+
     return tracks;
-  }, [messages]);
+  }, [messages, submissions]);
 }

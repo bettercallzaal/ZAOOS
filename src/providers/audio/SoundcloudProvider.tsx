@@ -31,7 +31,7 @@ declare global {
 }
 
 export function SoundcloudProvider({ children }: { children: ReactNode }) {
-  const { state, dispatch, registerController } = usePlayerContext();
+  const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const widgetRef = useRef<SCWidget | null>(null);
   const widgetReadyRef = useRef(false);
@@ -79,7 +79,11 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
       });
 
       widget.bind(window.SC.Widget.Events.FINISH, () => {
-        dispatch({ type: 'STOP' });
+        if (onEndedRef.current) {
+          onEndedRef.current();
+        } else {
+          dispatch({ type: 'STOP' });
+        }
       });
 
       registerController('soundcloud', {

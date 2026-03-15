@@ -50,20 +50,31 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
 
   // ── Farcaster User Search ──────────────────────────────────────────────────
 
+  const [fcError, setFcError] = useState<string | null>(null);
+
   const searchFarcaster = useCallback(async (q: string) => {
     if (q.length < 1) {
       setFcResults([]);
+      setFcError(null);
       return;
     }
     setFcLoading(true);
+    setFcError(null);
     try {
       const res = await fetch(`/api/admin/search-users?q=${encodeURIComponent(q)}`);
       if (res.ok) {
         const data = await res.json();
         setFcResults(data.users || []);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        console.error('[Admin Search] API error:', res.status, data);
+        setFcError(data.error || `Search failed (${res.status})`);
+        setFcResults([]);
       }
-    } catch {
-      // Silently fail
+    } catch (err) {
+      console.error('[Admin Search] Network error:', err);
+      setFcError('Network error — check console');
+      setFcResults([]);
     } finally {
       setFcLoading(false);
     }
@@ -357,7 +368,9 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
           )}
 
           {!fcLoading && fcSearch.length >= 1 && fcResults.length === 0 && (
-            <p className="text-sm text-gray-500 text-center py-4">No users found</p>
+            <p className={`text-sm text-center py-4 ${fcError ? 'text-red-400' : 'text-gray-500'}`}>
+              {fcError || 'No users found'}
+            </p>
           )}
 
           {!fcLoading && fcSearch.length < 1 && (

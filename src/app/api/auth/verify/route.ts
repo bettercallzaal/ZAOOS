@@ -54,12 +54,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Not on allowlist', redirect: '/not-allowed' }, { status: 403 });
     }
 
-    // Create session (no signer needed for MVP — posting via Warpcast deep link)
+    // Create session — store wallet address from Farcaster profile for consistency
+    const primaryWallet = user.custody_address || verifiedAddresses[0] || '';
     await saveSession({
       fid,
       username: user.username,
       displayName: user.display_name,
       pfpUrl: user.pfp_url,
+      walletAddress: primaryWallet || undefined,
+      authMethod: 'farcaster',
       signerUuid: null,
     });
 

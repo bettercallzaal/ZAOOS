@@ -17,6 +17,8 @@ export interface AllowlistEntry {
 
 export interface SessionData {
   fid: number;
+  walletAddress: string | null;
+  authMethod: 'farcaster' | 'wallet';
   username: string;
   displayName: string;
   pfpUrl: string;

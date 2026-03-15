@@ -197,10 +197,27 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { id, ...updates } = body;
+    const { id, assign_zid, ...updates } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'User id is required' }, { status: 400 });
+    }
+
+    // Admin-assigned ZID via sequence
+    if (assign_zid) {
+      const { data: zidResult, error: zidErr } = await supabaseAdmin
+        .rpc('assign_next_zid', { target_user_id: id });
+      if (zidErr) {
+        console.error('ZID assignment error:', zidErr);
+        return NextResponse.json({ error: 'Failed to assign ZID' }, { status: 500 });
+      }
+      // Return updated user
+      const { data: updatedUser } = await supabaseAdmin
+        .from('users')
+        .select('*')
+        .eq('id', id)
+        .single();
+      return NextResponse.json({ user: updatedUser });
     }
 
     // If linking a new FID, fetch Farcaster profile

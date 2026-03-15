@@ -9,6 +9,7 @@ interface RespectEntry {
   wallet: string;
   fid: number | null;
   username: string | null;
+  zid: number | null;
   ogRespect: number;
   zorRespect: number;
   totalRespect: number;
@@ -43,7 +44,7 @@ export default function RespectPage() {
   const myEntry = data?.leaderboard.find((e) => e.fid === data.currentFid);
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
       {/* Header */}
       <header className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
         <Link href="/chat" className="text-gray-400 hover:text-white">
@@ -58,7 +59,14 @@ export default function RespectPage() {
         {/* Your Respect card */}
         {myEntry && (
           <div className="bg-gradient-to-r from-[#f5a623]/10 to-[#ffd700]/5 rounded-xl p-5 border border-[#f5a623]/30">
-            <p className="text-xs text-[#f5a623] uppercase tracking-wider mb-3">Your Respect</p>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs text-[#f5a623] uppercase tracking-wider">Your Respect</p>
+              {myEntry.zid && (
+                <span className="text-xs font-bold text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full">
+                  ZID #{myEntry.zid}
+                </span>
+              )}
+            </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-3xl font-bold text-white">{myEntry.totalRespect.toLocaleString()}</p>
@@ -134,9 +142,14 @@ export default function RespectPage() {
                     {entry.rank === 1 ? '\uD83E\uDD47' : entry.rank === 2 ? '\uD83E\uDD48' : entry.rank === 3 ? '\uD83E\uDD49' : entry.rank}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${isMe ? 'text-[#f5a623]' : 'text-white'}`}>
-                      {entry.name}{isMe && ' (you)'}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className={`text-sm font-medium truncate ${isMe ? 'text-[#f5a623]' : 'text-white'}`}>
+                        {entry.name}{isMe && ' (you)'}
+                      </p>
+                      {entry.zid && (
+                        <span className="text-[10px] text-[#f5a623]/70 font-medium flex-shrink-0">ZID #{entry.zid}</span>
+                      )}
+                    </div>
                     <p className="text-xs text-gray-500 truncate">
                       {entry.username ? `@${entry.username}` : entry.fid ? `FID ${entry.fid}` : `${entry.wallet.slice(0, 6)}...${entry.wallet.slice(-4)}`}
                     </p>

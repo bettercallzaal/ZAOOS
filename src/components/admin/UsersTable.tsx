@@ -14,6 +14,7 @@ interface User {
   verified_addresses: string[] | null;
   ens_name: string | null;
   respect_wallet: string | null;
+  zid: number | null;
   role: 'beta' | 'member' | 'admin';
   real_name: string | null;
   ign: string | null;
@@ -168,6 +169,35 @@ export function UsersTable() {
       showFeedback('error', 'Network error');
     } finally {
       setAdding(false);
+    }
+  };
+
+  // ── Assign ZID ──
+  const [assigningZid, setAssigningZid] = useState<string | null>(null);
+
+  const handleAssignZid = async (user: User) => {
+    if (user.zid) {
+      showFeedback('error', `Already has ZID #${user.zid}`);
+      return;
+    }
+    setAssigningZid(user.id);
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: user.id, assign_zid: true }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showFeedback('success', `Assigned ZID #${data.user?.zid}`);
+        fetchUsers();
+      } else {
+        showFeedback('error', data.error || 'Failed to assign ZID');
+      }
+    } catch {
+      showFeedback('error', 'Network error');
+    } finally {
+      setAssigningZid(null);
     }
   };
 
@@ -397,6 +427,8 @@ export function UsersTable() {
               onToggle={() => setExpandedId(expandedId === user.id ? null : user.id)}
               onEdit={() => startEdit(user)}
               onDeactivate={() => handleDeactivate(user)}
+              onAssignZid={() => handleAssignZid(user)}
+              assigningZid={assigningZid === user.id}
               shortAddr={shortAddr}
             />
           ))
@@ -424,6 +456,8 @@ function UserCard({
   onToggle,
   onEdit,
   onDeactivate,
+  onAssignZid,
+  assigningZid,
   shortAddr,
 }: {
   user: User;
@@ -431,6 +465,8 @@ function UserCard({
   onToggle: () => void;
   onEdit: () => void;
   onDeactivate: () => void;
+  onAssignZid: () => void;
+  assigningZid: boolean;
   shortAddr: (a: string) => string;
 }) {
   const name = user.display_name || user.ign || user.real_name || shortAddr(user.primary_wallet);
@@ -453,6 +489,11 @@ function UserCard({
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-white truncate">{name}</span>
             {user.username && <span className="text-xs text-gray-500">@{user.username}</span>}
+            {user.zid && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/30 font-medium">
+                ZID #{user.zid}
+              </span>
+            )}
             <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${ROLE_COLORS[user.role]}`}>
               {ROLE_LABELS[user.role]}
             </span>
@@ -533,6 +574,15 @@ function UserCard({
                 className="text-xs font-medium px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
               >
                 Link FID
+              </button>
+            )}
+            {!user.zid && (
+              <button
+                onClick={onAssignZid}
+                disabled={assigningZid}
+                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors disabled:opacity-50"
+              >
+                {assigningZid ? 'Assigning...' : 'Assign ZID'}
               </button>
             )}
             <div className="ml-auto">

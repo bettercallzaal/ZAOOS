@@ -20,11 +20,17 @@ export async function GET(
 
   try {
     // Fetch user profile and channel activity in parallel
-    const [user, allowlistResult, activityResult] = await Promise.all([
+    const [user, allowlistResult, usersResult, activityResult] = await Promise.all([
       getUserByFid(targetFid, session.fid),
       supabaseAdmin
         .from('allowlist')
         .select('fid, real_name, ign')
+        .eq('fid', targetFid)
+        .eq('is_active', true)
+        .maybeSingle(),
+      supabaseAdmin
+        .from('users')
+        .select('zid, primary_wallet, respect_wallet, bio, display_name, username, pfp_url')
         .eq('fid', targetFid)
         .eq('is_active', true)
         .maybeSingle(),
@@ -42,6 +48,7 @@ export async function GET(
     }
 
     const allowlistRow = allowlistResult.data;
+    const usersRow = usersResult.data;
 
     // Tally engagement from cached casts
     let totalLikes = 0;
@@ -60,12 +67,17 @@ export async function GET(
     }
 
     return NextResponse.json({
+      user: usersRow ? {
+        ...usersRow,
+        fid: user.fid,
+      } : null,
       fid: user.fid,
       username: user.username,
       display_name: user.display_name,
       displayName: user.display_name,
       pfp_url: user.pfp_url,
       pfpUrl: user.pfp_url,
+      zid: usersRow?.zid || null,
       bio: user.profile?.bio?.text || null,
       followerCount: user.follower_count ?? 0,
       followingCount: user.following_count ?? 0,

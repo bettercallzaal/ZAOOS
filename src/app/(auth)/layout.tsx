@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getSessionData } from '@/lib/auth/session';
+import { BottomNav } from '@/components/navigation/BottomNav';
 
 export default async function AuthLayout({
   children,
@@ -10,5 +11,10 @@ export default async function AuthLayout({
   if (!session) {
     redirect('/');
   }
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <BottomNav />
+    </>
+  );
 }

@@ -35,6 +35,7 @@ interface MusicQueueTrackCardProps {
   type: TrackType;
   castHash: string;
   index: number;
+  isCurrentSection?: boolean;
   onPlay?: () => void;
 }
 

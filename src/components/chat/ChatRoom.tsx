@@ -53,6 +53,30 @@ export function ChatRoom() {
   const composeRef = useRef<ComposeBarHandle>(null);
   const musicQueue = useMusicQueue(messages);
 
+  // Music queue navigation (prev/next)
+  const currentQueueIndex = musicQueue.findIndex((q) => q.castHash === player.metadata?.feedId);
+  const hasPrevTrack = currentQueueIndex > 0;
+  const hasNextTrack = currentQueueIndex >= 0 && currentQueueIndex < musicQueue.length - 1;
+
+  const playQueueTrack = useCallback(async (index: number) => {
+    const entry = musicQueue[index];
+    if (!entry) return;
+    try {
+      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(entry.url)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      player.play({ ...data, feedId: entry.castHash });
+    } catch { /* silent */ }
+  }, [musicQueue, player]);
+
+  const handlePrevTrack = useCallback(() => {
+    if (hasPrevTrack) playQueueTrack(currentQueueIndex - 1);
+  }, [hasPrevTrack, currentQueueIndex, playQueueTrack]);
+
+  const handleNextTrack = useCallback(() => {
+    if (hasNextTrack) playQueueTrack(currentQueueIndex + 1);
+  }, [hasNextTrack, currentQueueIndex, playQueueTrack]);
+
   // XMTP context
   const xmtp = useXMTPContext();
   const viewMode = xmtp.activeConversationId ? 'xmtp' : 'channel';
@@ -375,7 +399,15 @@ export function ChatRoom() {
               />
 
               {/* Global music player */}
-              <GlobalPlayer />
+              <GlobalPlayer
+                onPrev={handlePrevTrack}
+                onNext={handleNextTrack}
+                hasPrev={hasPrevTrack}
+                hasNext={hasNextTrack}
+                queueLength={musicQueue.length}
+                onToggleQueue={() => setMusicSidebarOpen((o) => !o)}
+                queueOpen={musicSidebarOpen}
+              />
 
               {/* Signer connect or Compose */}
               {!hasSigner ? (

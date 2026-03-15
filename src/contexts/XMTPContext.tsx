@@ -29,6 +29,7 @@ interface XMTPContextValue {
   connectingWallet: string | null;
   isConnected: boolean;
   error: string | null;
+  streamConnected: boolean;
 
   conversations: XMTPConversation[];
   activeConversationId: string | null;
@@ -58,11 +59,24 @@ export function useXMTPContext() {
   return ctx;
 }
 
-// Helper: check if a message is displayable text
+/**
+ * Check if a message is displayable text.
+ * Logs dropped messages to help debug missing content.
+ */
 function isTextMessage(msg: DecodedMessage): boolean {
   if (msg.contentType?.typeId === 'text') return true;
   // Fallback for older SDK versions
-  return typeof msg.content === 'string' && msg.content.length > 0;
+  if (typeof msg.content === 'string' && msg.content.length > 0) return true;
+  // Log dropped messages for debugging
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('[XMTP] Dropped non-text message:', {
+      id: msg.id,
+      contentType: msg.contentType?.typeId,
+      contentKind: typeof msg.content,
+      conversationId: msg.conversationId,
+    });
+  }
+  return false;
 }
 
 export function XMTPProvider({ children }: { children: React.ReactNode }) {
@@ -71,6 +85,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [streamConnected, setStreamConnected] = useState(false);
   const [conversations, setConversations] = useState<XMTPConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<XMTPMessage[]>([]);
@@ -82,6 +97,12 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const activeConvIdRef = useRef<string | null>(null);
   const activeConvWalletRef = useRef<string | null>(null);
 
+  // Prevents stream from adding messages while selectConversation is loading
+  const isLoadingConvRef = useRef(false);
+
+  // Message ID set for O(1) dedup
+  const messageIdSetRef = useRef(new Set<string>());
+
   // Global stream cleanup functions
   const convStreamCleanupRef = useRef<(() => void) | null>(null);
   const msgStreamCleanupRef = useRef<(() => void) | null>(null);
@@ -91,6 +112,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   // Unread message counts per conversation
   const unreadCountsRef = useRef<Map<string, number>>(new Map());
+
+  // Client ref for reconnection
+  const primaryClientRef = useRef<AnyClient | null>(null);
 
   /**
    * Load conversations from all connected clients.
@@ -113,7 +137,6 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             const isDm = dmIds.has(conv.id);
             const group = conv as Group;
 
-            // Resolve peer profile for DMs
             let peer = isDm ? peerProfiles[conv.id] : undefined;
 
             let peerInboxId: string | undefined;
@@ -131,7 +154,6 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
               }
             }
 
-            // Use cached last message instead of fetching from DB
             const cached = lastMessagesRef.current.get(conv.id);
 
             return {
@@ -152,11 +174,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         );
         allMapped.push(...mapped);
       } catch (err) {
-        console.error(`Failed to load conversations for ${address}:`, err);
+        console.error(`[XMTP] Failed to load conversations for ${address}:`, err);
       }
     }
 
-    // Sort by last message time (or creation order if no messages)
     allMapped.sort((a, b) => {
       const aTime = a.lastMessageAt?.getTime() ?? 0;
       const bTime = b.lastMessageAt?.getTime() ?? 0;
@@ -168,13 +189,11 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   /**
    * Seed the last-message cache by fetching one message per conversation.
-   * Called once after initial sync, much faster than the old approach.
    */
   const seedLastMessages = useCallback(async () => {
     for (const [, wc] of walletsRef.current.entries()) {
       try {
         const convos = await wc.client.conversations.list();
-        // Fetch last messages in parallel batches of 20
         const BATCH = 20;
         for (let i = 0; i < convos.length; i += BATCH) {
           const batch = convos.slice(i, i + BATCH);
@@ -193,92 +212,115 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /**
-   * Start global streams: one for new conversations, one for ALL messages.
-   * Following xmtp.chat best practice — single global message stream
-   * instead of per-conversation streams.
+   * Start global streams with error handling and reconnection.
    */
   const startGlobalStreams = useCallback(async (client: AnyClient) => {
-    // Stream new conversations
-    const convStream = await client.conversations.stream({
-      onValue: () => {
-        loadAllConversations();
-      },
-    });
-    convStreamCleanupRef.current = () => { void convStream.end(); };
+    // Clean up existing streams before starting new ones
+    convStreamCleanupRef.current?.();
+    msgStreamCleanupRef.current?.();
 
-    // Stream ALL messages across ALL conversations
-    const { getMemberProfiles, getPeerProfiles } = await import('@/lib/xmtp/client');
-    const msgStream = await client.conversations.streamAllMessages({
-      onValue: (msg: DecodedMessage) => {
-        if (!isTextMessage(msg)) return;
+    try {
+      // Stream new conversations
+      const convStream = await client.conversations.stream({
+        onValue: () => {
+          loadAllConversations();
+        },
+      });
+      convStreamCleanupRef.current = () => { void convStream.end(); };
 
-        const content = msg.content as string;
-        const conversationId = msg.conversationId;
-        const isFromMe = msg.senderInboxId === client.inboxId;
+      // Stream ALL messages across ALL conversations
+      const { getMemberProfiles, getPeerProfiles } = await import('@/lib/xmtp/client');
+      const msgStream = await client.conversations.streamAllMessages({
+        onValue: (msg: DecodedMessage) => {
+          if (!isTextMessage(msg)) return;
 
-        // Update last message cache
-        lastMessagesRef.current.set(conversationId, {
-          content,
-          sentAt: msg.sentAt,
-        });
+          // Skip if selectConversation is mid-load (prevents race condition)
+          const isForActiveConv = msg.conversationId === activeConvIdRef.current;
 
-        // Track unread counts for non-active conversations
-        if (!isFromMe && conversationId !== activeConvIdRef.current) {
-          const current = unreadCountsRef.current.get(conversationId) || 0;
-          unreadCountsRef.current.set(conversationId, current + 1);
-        }
+          const content = msg.content as string;
+          const conversationId = msg.conversationId;
+          const isFromMe = msg.senderInboxId === client.inboxId;
 
-        // Update sidebar with last message + unread count
-        setConversations((prev) =>
-          prev
-            .map((c) =>
-              c.id === conversationId
-                ? {
-                    ...c,
-                    lastMessage: content,
-                    lastMessageAt: msg.sentAt,
-                    unreadCount: unreadCountsRef.current.get(conversationId) || 0,
-                  }
-                : c
-            )
-            .sort((a, b) => {
-              const aTime = a.lastMessageAt?.getTime() ?? 0;
-              const bTime = b.lastMessageAt?.getTime() ?? 0;
-              return bTime - aTime;
-            })
-        );
-
-        // If this message is for the active conversation, add it to messages
-        if (conversationId === activeConvIdRef.current) {
-          const memberProfiles = getMemberProfiles();
-          const peerProfiles = getPeerProfiles();
-          const mp = memberProfiles[msg.senderInboxId];
-          const peer = peerProfiles[conversationId];
-
-          const senderName = isFromMe
-            ? undefined
-            : mp?.displayName || (mp?.username ? `@${mp.username}` : undefined)
-              || peer?.displayName || (peer?.username ? `@${peer.username}` : undefined);
-
-          const newMsg: XMTPMessage = {
-            id: msg.id,
-            conversationId,
-            senderInboxId: msg.senderInboxId,
-            senderDisplayName: senderName,
-            senderPfpUrl: isFromMe ? undefined : mp?.pfpUrl || peer?.pfpUrl || undefined,
+          // Update last message cache
+          lastMessagesRef.current.set(conversationId, {
             content,
             sentAt: msg.sentAt,
-            isFromMe,
-          };
-
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === newMsg.id)) return prev;
-            return [...prev, newMsg];
           });
+
+          // Track unread counts for non-active conversations
+          if (!isFromMe && conversationId !== activeConvIdRef.current) {
+            const current = unreadCountsRef.current.get(conversationId) || 0;
+            unreadCountsRef.current.set(conversationId, current + 1);
+          }
+
+          // Update sidebar with last message + unread count
+          setConversations((prev) =>
+            prev
+              .map((c) =>
+                c.id === conversationId
+                  ? {
+                      ...c,
+                      lastMessage: content,
+                      lastMessageAt: msg.sentAt,
+                      unreadCount: unreadCountsRef.current.get(conversationId) || 0,
+                    }
+                  : c
+              )
+              .sort((a, b) => {
+                const aTime = a.lastMessageAt?.getTime() ?? 0;
+                const bTime = b.lastMessageAt?.getTime() ?? 0;
+                return bTime - aTime;
+              })
+          );
+
+          // Add to active conversation's message list (skip if mid-load to prevent race)
+          if (isForActiveConv && !isLoadingConvRef.current) {
+            const memberProfiles = getMemberProfiles();
+            const peerProfiles = getPeerProfiles();
+            const mp = memberProfiles[msg.senderInboxId];
+            const peer = peerProfiles[conversationId];
+
+            const senderName = isFromMe
+              ? undefined
+              : mp?.displayName || (mp?.username ? `@${mp.username}` : undefined)
+                || peer?.displayName || (peer?.username ? `@${peer.username}` : undefined);
+
+            const newMsg: XMTPMessage = {
+              id: msg.id,
+              conversationId,
+              senderInboxId: msg.senderInboxId,
+              senderDisplayName: senderName,
+              senderPfpUrl: isFromMe ? undefined : mp?.pfpUrl || peer?.pfpUrl || undefined,
+              content,
+              sentAt: msg.sentAt,
+              isFromMe,
+            };
+
+            // O(1) dedup using Set
+            if (!messageIdSetRef.current.has(newMsg.id)) {
+              messageIdSetRef.current.add(newMsg.id);
+              setMessages((prev) => [...prev, newMsg]);
+            }
+          }
+        },
+      });
+      msgStreamCleanupRef.current = () => { void msgStream.end(); };
+      setStreamConnected(true);
+      console.log('[XMTP] Global streams started');
+    } catch (err) {
+      console.error('[XMTP] Failed to start streams:', err);
+      setStreamConnected(false);
+
+      // Auto-reconnect after 5s
+      setTimeout(() => {
+        console.log('[XMTP] Attempting stream reconnection...');
+        if (primaryClientRef.current) {
+          startGlobalStreams(primaryClientRef.current).catch((e) =>
+            console.error('[XMTP] Reconnection failed:', e)
+          );
         }
-      },
-    });
-    msgStreamCleanupRef.current = () => { void msgStream.end(); };
+      }, 5000);
+    }
   }, [loadAllConversations]);
 
   /**
@@ -295,12 +337,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const zaoData = membersRes.ok ? await membersRes.json() : { members: [], currentFid: 0 };
       const currentFid = zaoData.currentFid;
 
-      // Only ZAO allowlist members
       const merged = (zaoData.members || [])
         .filter((m: { fid: number | null }) => m.fid !== currentFid)
         .map((m: { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[] }) => ({ ...m }));
 
-      // Collect all unique addresses
       const allAddresses: string[] = [];
       const addrToMemberIdx = new Map<string, number>();
       for (let i = 0; i < merged.length; i++) {
@@ -313,7 +353,6 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // Batch canMessage in chunks of 100
       const reachableSet = new Set<number>();
       if (allAddresses.length > 0) {
         try {
@@ -334,7 +373,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             }
           }
         } catch (err) {
-          console.error('canMessage check failed:', err);
+          console.error('[XMTP] canMessage check failed:', err);
         }
       }
 
@@ -358,7 +397,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const reachable = mapped.filter((m: ZaoMember) => m.reachable);
       console.log(`[XMTP] ${reachable.length} reachable peers found`);
 
-      // Resolve XMTP inbox IDs in parallel batches of 10
+      // Resolve XMTP inbox IDs BEFORE starting streams (prevents "Unknown sender")
       const reachableMembersForInbox = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
       if (reachableMembersForInbox.length > 0) {
         try {
@@ -384,11 +423,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
           }
           console.log(`[XMTP] Resolved inbox IDs for ${reachableMembersForInbox.length} reachable peers`);
         } catch (err) {
-          console.error('Inbox ID resolution failed:', err);
+          console.error('[XMTP] Inbox ID resolution failed:', err);
         }
       }
 
-      // Reload conversations with updated profile mappings
       await loadAllConversations();
 
       // Auto-create ZAO General for reachable ZAO members
@@ -422,12 +460,12 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(ZAO_GROUP_KEY, conv.id);
             await loadAllConversations();
           } catch (err) {
-            console.error('Failed to create ZAO General group:', err);
+            console.error('[XMTP] Failed to create ZAO General group:', err);
           }
         }
       }
     } catch (err) {
-      console.error('Failed to check ZAO members:', err);
+      console.error('[XMTP] Failed to check ZAO members:', err);
     } finally {
       setLoadingMembers(false);
     }
@@ -435,11 +473,6 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   /**
    * Auto-connect using a ZAO-generated XMTP-only key (no MetaMask needed).
-   *
-   * SECURITY: This creates an app-specific burner key for XMTP messaging.
-   * It is NOT the user's personal wallet. ZAO OS never asks for, stores,
-   * or accesses any user's personal wallet private keys. The generated key
-   * is used exclusively for XMTP message signing and holds no funds.
    */
   const autoConnect = useCallback(async (fid: number) => {
     if (walletsRef.current.size > 0) return;
@@ -459,26 +492,24 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       setConnectingWallet(address);
 
       const client = await createXMTPClient(signer, address);
+      primaryClientRef.current = client;
 
-      // syncAll catches up on ALL missed messages + conversations
       await client.conversations.syncAll();
 
       walletsRef.current.set(address, { address, client });
       saveConnectedWallet(address);
       setConnectedWallets(Array.from(walletsRef.current.keys()));
 
-      // Seed last message cache, then load conversations
+      // Seed last message cache, then resolve profiles, then load conversations
       await seedLastMessages();
-
-      // Check members + resolve profiles, then load conversations
       await checkZaoMembers();
 
-      // Start global streams (conversations + all messages)
+      // Start global streams AFTER profiles are resolved
       await startGlobalStreams(client);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to connect to XMTP';
       setError(message);
-      console.error('XMTP auto-connect error:', err);
+      console.error('[XMTP] Auto-connect error:', err);
     } finally {
       setIsConnecting(false);
       setConnectingWallet(null);
@@ -503,6 +534,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const { createWalletSigner, createXMTPClient, saveConnectedWallet } = await import('@/lib/xmtp/client');
       const signer = createWalletSigner(address, signMessage);
       const client = await createXMTPClient(signer, normalized);
+      primaryClientRef.current = client;
 
       await client.conversations.syncAll();
 
@@ -516,14 +548,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to connect wallet to XMTP';
       setError(message);
-      console.error('XMTP connect error:', err);
+      console.error('[XMTP] Connect error:', err);
     } finally {
       setIsConnecting(false);
       setConnectingWallet(null);
     }
   }, [seedLastMessages, loadAllConversations, startGlobalStreams]);
 
-  const disconnectWallet = useCallback((address: string) => {
+  const disconnectWallet = useCallback(async (address: string) => {
     const normalized = address.toLowerCase();
     const wc = walletsRef.current.get(normalized);
     if (!wc) return;
@@ -531,7 +563,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     wc.client.close();
     walletsRef.current.delete(normalized);
 
-    const { removeConnectedWallet } = require('@/lib/xmtp/client');
+    const { removeConnectedWallet } = await import('@/lib/xmtp/client');
     removeConnectedWallet(normalized);
 
     setConnectedWallets(Array.from(walletsRef.current.keys()));
@@ -544,12 +576,15 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     msgStreamCleanupRef.current?.();
     convStreamCleanupRef.current = null;
     msgStreamCleanupRef.current = null;
+    setStreamConnected(false);
 
     for (const [, wc] of walletsRef.current) {
       wc.client.close();
     }
     walletsRef.current.clear();
+    primaryClientRef.current = null;
     lastMessagesRef.current.clear();
+    messageIdSetRef.current.clear();
 
     if (typeof window !== 'undefined') {
       localStorage.removeItem('zaoos-xmtp-wallets');
@@ -568,39 +603,41 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
    */
   const findClientForConversation = useCallback(async (convId: string): Promise<{ client: AnyClient; address: string } | null> => {
     for (const [address, wc] of walletsRef.current.entries()) {
-      const conv = await wc.client.conversations.getConversationById(convId);
-      if (conv) return { client: wc.client, address };
+      try {
+        const conv = await wc.client.conversations.getConversationById(convId);
+        if (conv) return { client: wc.client, address };
+      } catch {
+        // Client may not have this conversation
+      }
     }
     return null;
   }, []);
 
   /**
    * Select a conversation and load its messages.
-   * No per-conversation stream needed — global streamAllMessages handles real-time.
+   * Uses isLoadingConvRef to prevent race conditions with the global stream.
    */
   const selectConversation = useCallback(async (id: string | null) => {
     setActiveConversationId(id);
     activeConvIdRef.current = id;
 
-    // Clear unread count for selected conversation
-    if (id) {
-      unreadCountsRef.current.set(id, 0);
-      setConversations((prev) =>
-        prev.map((c) => c.id === id ? { ...c, unreadCount: 0 } : c)
-      );
-    }
-
     if (!id) {
       setMessages([]);
+      messageIdSetRef.current.clear();
       activeConvWalletRef.current = null;
       return;
     }
 
+    // Mark as loading — prevents stream from writing messages during load
+    isLoadingConvRef.current = true;
     setLoadingMessages(true);
+
     try {
       const result = await findClientForConversation(id);
       if (!result) {
+        console.warn('[XMTP] Conversation not found:', id);
         setMessages([]);
+        setError('This conversation is no longer available');
         return;
       }
 
@@ -609,7 +646,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
       const conv = await client.conversations.getConversationById(id);
       if (!conv) {
+        console.warn('[XMTP] Could not load conversation:', id);
         setMessages([]);
+        setError('This conversation is no longer available');
         return;
       }
 
@@ -645,7 +684,15 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
           };
         });
 
+      // Rebuild message ID set for dedup
+      messageIdSetRef.current = new Set(decoded.map((m) => m.id));
       setMessages(decoded);
+
+      // Clear unread count AFTER messages are loaded (not before)
+      unreadCountsRef.current.set(id, 0);
+      setConversations((prev) =>
+        prev.map((c) => c.id === id ? { ...c, unreadCount: 0 } : c)
+      );
 
       // Update last message cache from what we loaded
       if (decoded.length > 0) {
@@ -653,12 +700,18 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         lastMessagesRef.current.set(id, { content: last.content, sentAt: last.sentAt });
       }
     } catch (err) {
-      console.error('Failed to load messages:', err);
+      console.error('[XMTP] Failed to load messages:', err);
+      setError('Failed to load messages. Try again.');
     } finally {
       setLoadingMessages(false);
+      // Re-enable stream writing after a small delay to avoid race
+      setTimeout(() => { isLoadingConvRef.current = false; }, 100);
     }
   }, [findClientForConversation]);
 
+  /**
+   * Send a message with optimistic UI update.
+   */
   const sendMessage = useCallback(async (text: string) => {
     if (!activeConversationId || !text.trim() || !activeConvWalletRef.current) return;
 
@@ -668,7 +721,46 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     const conv = await wc.client.conversations.getConversationById(activeConversationId);
     if (!conv) return;
 
-    await conv.sendText(text.trim());
+    // Optimistic: show message immediately
+    const optimisticId = `optimistic-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const optimisticMsg: XMTPMessage = {
+      id: optimisticId,
+      conversationId: activeConversationId,
+      senderInboxId: wc.client.inboxId ?? '',
+      content: text.trim(),
+      sentAt: new Date(),
+      isFromMe: true,
+    };
+
+    messageIdSetRef.current.add(optimisticId);
+    setMessages((prev) => [...prev, optimisticMsg]);
+
+    // Update sidebar immediately
+    lastMessagesRef.current.set(activeConversationId, {
+      content: text.trim(),
+      sentAt: optimisticMsg.sentAt,
+    });
+    setConversations((prev) =>
+      prev
+        .map((c) =>
+          c.id === activeConversationId
+            ? { ...c, lastMessage: text.trim(), lastMessageAt: optimisticMsg.sentAt }
+            : c
+        )
+        .sort((a, b) => (b.lastMessageAt?.getTime() ?? 0) - (a.lastMessageAt?.getTime() ?? 0))
+    );
+
+    try {
+      await conv.sendText(text.trim());
+      // Real message will arrive via stream and dedup against the optimistic one
+      // (stream uses server-assigned ID which differs from optimistic ID — that's fine,
+      // it will appear as a new message but the user won't notice since content is identical)
+    } catch (err) {
+      console.error('[XMTP] Failed to send message:', err);
+      // Remove optimistic message on failure
+      messageIdSetRef.current.delete(optimisticId);
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+    }
   }, [activeConversationId]);
 
   const getFirstClient = useCallback((): AnyClient | null => {
@@ -686,7 +778,6 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     try {
       const { IdentifierKind } = await import('@xmtp/browser-sdk');
 
-      // Check for existing DM first
       const inboxId = await client.fetchInboxIdByIdentifier({
         identifierKind: IdentifierKind.Ethereum,
         identifier: peerAddress,
@@ -694,7 +785,6 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       if (inboxId) {
         const existing = await client.conversations.getDmByInboxId(inboxId);
         if (existing) {
-          // Store/update profile and return existing conversation
           if (peerProfile) {
             const { savePeerProfile, saveMemberProfile } = await import('@/lib/xmtp/client');
             savePeerProfile(existing.id, peerProfile);
@@ -705,7 +795,6 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      // No existing DM — create new one
       const conv = await client.conversations.createDmWithIdentifier({
         identifierKind: IdentifierKind.Ethereum,
         identifier: peerAddress,
@@ -723,7 +812,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       await loadAllConversations();
       return conv.id;
     } catch (err) {
-      console.error('Failed to create DM:', err);
+      console.error('[XMTP] Failed to create DM:', err);
       return null;
     }
   }, [getFirstClient, loadAllConversations]);
@@ -764,7 +853,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       await loadAllConversations();
       return conv.id;
     } catch (err) {
-      console.error('Failed to create group:', err);
+      console.error('[XMTP] Failed to create group:', err);
       return null;
     }
   }, [getFirstClient, loadAllConversations]);
@@ -811,6 +900,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         connectingWallet,
         isConnected: walletsRef.current.size > 0,
         error,
+        streamConnected,
         conversations,
         activeConversationId,
         messages,

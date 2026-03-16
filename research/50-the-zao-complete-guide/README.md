@@ -34,14 +34,14 @@
 
 ## 1. Overview
 
-**The ZAO (ZTalent Artist Organization)** is a decentralized creator network and infrastructure ecosystem.
+**The ZAO (ZTalent Artist Organization)** is an impact organization focused on bringing the profit margin, the data, and the IP rights back to independent artists.
 
-It combines community governance, live events, music experiments, creator tools, research, media programming, and identity systems into a coordinated ecosystem for independent artists.
+It operates as a network of communities, a cultural movement, and a creator infrastructure ecosystem. The ZAO is not a single product or platform. It is a decentralized ecosystem combining governance, creator infrastructure, live events, media programming, research, and community coordination.
 
-The ZAO is not a single product or platform. It is a network of projects, tools, and communities — some live, some in development, some conceptual — that share a common mission and governance structure.
+The core focus is **creator infrastructure** — building tools and systems that allow creators to launch projects, organize communities, distribute media, and receive revenue directly.
 
 **Website:** [thezao.com](https://www.thezao.com/about)
-**App:** [zaoos.com](https://zaoos.com)
+**App:** [zaoos.com](https://zaoos.com) (under active development and private testing)
 **Code:** [github.com/bettercallzaal/ZAOOS](https://github.com/bettercallzaal/ZAOOS) (MIT license)
 
 ---
@@ -88,7 +88,7 @@ Each iteration teaches the team what works, what doesn't, and how to build somet
 
 The ZAO does not attempt to control artists or extract value from them.
 
-Instead, it builds infrastructure that allows creators to build their own communities and organizations. In this sense, the ecosystem aims to provide the "picks and shovels" for the emerging creator economy — the tools and systems that enable others to build, rather than a platform that captures their output.
+Instead, it builds infrastructure that enables creators to build their own communities and organizations. The ZAO focuses on building infrastructure for creators rather than attempting to control artist communities directly. In this sense, the ecosystem aims to provide the "picks and shovels" for the creator economy — the tools and systems that enable others to build, rather than a platform that captures their output.
 
 The goal for anyone joining the ZAO is straightforward: learn how to create a website, deploy a smart contract, sell something digitally to anyone in the world, and receive that revenue directly.
 
@@ -138,9 +138,9 @@ Projects incubated inside the ZAO that develop their own teams and governance:
 - **WaveWarZ** — music competition and discovery platform (see [Section 6](#6-sub-daos))
 - **ZAO Festivals** — event production arm organizing live and metaverse events
 
-### ZABAL — The Coordination Engine
+### ZABAL — The Coordination Layer
 
-ZABAL is the coordination and rewards layer connecting ecosystem components.
+ZABAL represents the coordination and rewards layer of the BetterCallZaal ecosystem. An important distinction: **ZAO** is the decentralized community organization. **ZABAL** is Zaal's personal ecosystem and coordination layer. ZABAL helps support projects within the ecosystem but does not control ZAO governance.
 
 | Component | What It Does |
 |-----------|-------------|
@@ -165,7 +165,7 @@ The ZAO maintains relationships with independent communities that share members,
 ### Ecosystem Map
 
 ```
-THE ZAO (decentralized creator network)
+THE ZAO (impact organization / creator infrastructure ecosystem)
 │
 ├── CORE
 │   ├── ZAO Fractals (governance)
@@ -173,7 +173,7 @@ THE ZAO (decentralized creator network)
 │   └── Mentorship Network
 │
 ├── ZAO OS (software infrastructure)
-│   ├── Farcaster Client (live)
+│   ├── Farcaster Client (active development, private testing)
 │   ├── Governance tools (partially live)
 │   ├── Identity layer — ZID (in development)
 │   └── Additional tooling (conceptual)
@@ -184,8 +184,8 @@ THE ZAO (decentralized creator network)
 │       ├── Past: ZAO-Palooza, ZAO-Chella
 │       └── Planned: ZAOVille, ZAO Stock
 │
-├── ZABAL (coordination engine)
-│   ├── $ZABAL token (liquid rewards)
+├── ZABAL (BetterCallZaal coordination layer)
+│   ├── $ZABAL token (liquid rewards, no governance power)
 │   ├── SongJam integration
 │   ├── Magnetiq / Proof of Meet
 │   ├── Empire Builder
@@ -256,7 +256,7 @@ It includes tools for governance, research, creator coordination, music discover
 
 These are built, deployed, and functional:
 
-**Farcaster Client** — A gated Farcaster client currently being developed as part of ZAO OS. Built with Next.js 16, React 19, Supabase, and Neynar. The goal is that many ZAO OS capabilities may eventually integrate into this client. However, the Farcaster client is one interface within the ZAO OS ecosystem, not the entire system.
+**Farcaster Client** — A gated Farcaster client currently under active development and private testing. Built with Next.js 16, React 19, Supabase, and Neynar. The client is not fully public yet. The long-term goal is for it to serve as both a social client for creators and an open-source template that other communities can fork and build on. The Farcaster client is one interface within the ZAO OS ecosystem, not the entire system.
 
 Current capabilities:
 - Gated community chat on Farcaster channels (/zao, /zabal, /cocconcertz)
@@ -347,17 +347,17 @@ Both governance tokens share the same properties: non-transferable, illiquid, an
 
 **$ZABAL**
 
-A liquid token used to reward contributors and incentivize ecosystem engagement.
+A liquid reward token. $ZABAL does not grant governance power. It is used for media, promotion, ecosystem rewards, and community incentives. It exists within the BetterCallZaal ecosystem but supports contributors across the ZAO ecosystem.
 
 | Detail | Value |
 |--------|-------|
 | **Contract** | `0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07` |
 | **Chain** | Base |
-| **Type** | Clanker token, liquid, transferable |
-| **Launched** | January 1, 2026 |
-| **Purpose** | Rewarding participation, incentivizing engagement, recognizing contributors |
+| **Type** | Liquid, transferable |
+| **Launched** | January 1, 2026 — through Clanker on Farcaster using Empire Builder |
+| **Purpose** | Media, promotion, ecosystem rewards, community incentives |
 
-Unlike the governance tokens, $ZABAL can be transferred and traded. It serves as the reward layer while governance tokens remain soulbound and reputation-based.
+Unlike the governance tokens, $ZABAL can be transferred and traded. Governance decisions are made using Respect tokens, not $ZABAL.
 
 ### How Respect Is Earned
 
@@ -425,6 +425,8 @@ The fractal governance model traces to Daniel Larimer ("More Equal Animals," 202
 - **Meetings completed:** 90+
 - **Running consistently for:** nearly two years
 
+Fractals remain the primary governance mechanism. Governance proposals and tools may be implemented inside ZAO OS, but governance weight derives from Respect tokens earned through fractals.
+
 The system is designed to be resilient. In March 2026, six members arrived late due to daylight savings time. Instead of canceling, they formed their own group and ran the Respect Game at a different time. The system adapted without a central coordinator.
 
 ### Fractal Community Network
@@ -440,7 +442,9 @@ The system is designed to be resilient. In March 2026, six members arrived late 
 
 ## 11. Events
 
-ZAO Festivals is the event production Sub-DAO. It is important to distinguish between past events and planned events.
+ZAO Festivals organizes community-driven cultural events. These are not the core product of the ZAO — they serve as cultural experiences that grow the ecosystem, strengthen relationships, and build the brand. They are intentionally community-driven gatherings.
+
+It is important to distinguish between past events and planned events.
 
 ### Past Events
 
@@ -454,7 +458,7 @@ ZAO Festivals is the event production Sub-DAO. It is important to distinguish be
 | Event | Location | Target Date | Description |
 |-------|----------|-------------|-------------|
 | **ZAOVille** | Virginia | July 2026 | Collaboration with DCOOP |
-| **ZAO Stock** | Ellsworth, Maine | October 2026 | Physical music festival. A polished music event first, not a Web3 conference. Anyone should be able to attend without knowing anything about blockchain. Aligned with an existing statewide craft fair weekend for marketing exposure. |
+| **ZAO Stock** | Ellsworth, Maine | October 2026 | Intended to become a flagship recurring event. A polished music festival first, not a Web3 conference. Anyone should be able to attend without knowing anything about blockchain. Aligned with an existing statewide craft fair weekend for marketing exposure. |
 
 **ZAO Stock production team:** AttaBotty + DaNici (production/visuals), FailOften/Enteract Studios (creative tech/installations).
 
@@ -559,7 +563,7 @@ Zaal runs case-by-case mentorship with Eduard, Iman, and Jose — covering web3 
 
 ## 15. Artist Roster
 
-Artists featured on thezao.com:
+Artists the ZAO has collaborated with who remain independent. The community's focus is gradually shifting toward active ZAO community members, which currently exceeds 100 participants.
 
 | Artist | Notable |
 |--------|---------|
@@ -664,7 +668,7 @@ The surviving projects serve different functions — streaming, fan clubs, event
 
 | Metric | Value |
 |--------|-------|
-| Ecosystem participants | 1,000+ |
+| Ecosystem participants | 1,000+ (events, livestreams, online community, broader engagement) |
 | Newsletter editions | 400+ |
 | Paid newsletter supporters | 78 |
 | Fractal meetings completed | 90+ |
@@ -723,11 +727,13 @@ The surviving projects serve different functions — streaming, fan clubs, event
 
 ### Long-Term
 
+The ZAO aims to become a global network of creator economies. The long-term role is to serve as support infrastructure for the creator economy — the tools and systems that enable creators to build their own organizations.
+
 - Cross-platform publishing from one compose bar (Farcaster, Lens, Bluesky, Hive, Nostr, X)
 - AI agent for onboarding, music discovery, and curation scoring
 - WaveWarZ on Farcaster as a Mini App
 - Sync licensing collective — pre-cleared community catalog for indie sync agencies
-- ZAO Stock as a recurring annual festival
+- ZAO Stock as a flagship recurring annual festival
 
 ---
 

@@ -1,5 +1,3 @@
-'use client';
-
 export function FollowerSkeleton() {
   return (
     <div className="flex items-center gap-3 px-4 py-3 animate-pulse">

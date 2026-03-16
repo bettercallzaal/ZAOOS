@@ -503,7 +503,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       setLoadingMembers(false);
 
       const reachable = mapped.filter((m: ZaoMember) => m.reachable);
-      console.log(`[XMTP] ${reachable.length} reachable peers found`);
+      console.debug(`[XMTP] ${reachable.length} reachable peers found`);
 
       // Resolve XMTP inbox IDs BEFORE starting streams (prevents "Unknown sender")
       const reachableMembersForInbox = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
@@ -529,7 +529,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
               }
             }));
           }
-          console.log(`[XMTP] Resolved inbox IDs for ${reachableMembersForInbox.length} reachable peers`);
+          console.debug(`[XMTP] Resolved inbox IDs for ${reachableMembersForInbox.length} reachable peers`);
         } catch (err) {
           console.error('[XMTP] Inbox ID resolution failed:', err);
         }

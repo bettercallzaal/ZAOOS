@@ -5,8 +5,9 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useAuth } from '@/hooks/useAuth';
 import { FollowerCard, type FollowerUser } from './FollowerCard';
 import { FollowerSkeletonList } from './FollowerSkeleton';
-import { CommunityGraph } from './CommunityGraph';
-import { DiscoverPanel } from './DiscoverPanel';
+import dynamic from 'next/dynamic';
+const CommunityGraph = dynamic(() => import('./CommunityGraph').then(m => m.CommunityGraph), { ssr: false });
+const DiscoverPanel = dynamic(() => import('./DiscoverPanel').then(m => m.DiscoverPanel), { ssr: false });
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 
 type View = 'followers' | 'following' | 'community' | 'discover';

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { AllowlistTable } from '@/components/admin/AllowlistTable';
-import { UsersTable } from '@/components/admin/UsersTable';
-import { ZidManager } from '@/components/admin/ZidManager';
-import { CsvUpload } from '@/components/admin/CsvUpload';
-import { HiddenMessages } from '@/components/admin/HiddenMessages';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
+
+const AllowlistTable = dynamic(() => import('@/components/admin/AllowlistTable').then(m => ({ default: m.AllowlistTable })), { ssr: false });
+const UsersTable = dynamic(() => import('@/components/admin/UsersTable').then(m => ({ default: m.UsersTable })), { ssr: false });
+const ZidManager = dynamic(() => import('@/components/admin/ZidManager').then(m => ({ default: m.ZidManager })), { ssr: false });
+const CsvUpload = dynamic(() => import('@/components/admin/CsvUpload').then(m => ({ default: m.CsvUpload })), { ssr: false });
+const HiddenMessages = dynamic(() => import('@/components/admin/HiddenMessages').then(m => ({ default: m.HiddenMessages })), { ssr: false });
 
 type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation';
 

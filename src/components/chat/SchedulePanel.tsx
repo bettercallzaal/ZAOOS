@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 interface ScheduledCast {
   id: string;
@@ -20,6 +21,7 @@ interface SchedulePanelProps {
 export function SchedulePanel({ isOpen, onClose, channel }: SchedulePanelProps) {
   const [scheduled, setScheduled] = useState<ScheduledCast[]>([]);
   const [loading, setLoading] = useState(false);
+  useEscapeClose(onClose, isOpen);
 
   useEffect(() => {
     if (!isOpen) return;

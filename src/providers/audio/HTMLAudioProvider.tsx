@@ -63,6 +63,9 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
         audio.src = url;
         audio.load();
       },
+      setVolume: (v: number) => {
+        audio.volume = v;
+      },
     };
 
     registerController('audio', controller);
@@ -97,6 +100,9 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Keep volume in sync
+    audio.volume = state.volume;
+
     if (status === 'loading') {
       const playUrl = metadata.streamUrl ?? metadata.url;
       if (activeUrlRef.current !== playUrl) {
@@ -106,7 +112,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
         // onCanPlay will fire and trigger play + LOADED dispatch
       }
     }
-  }, [state.metadata?.url, state.status, state.metadata?.type]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [state.metadata?.url, state.status, state.metadata?.type, state.volume]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return <>{children}</>;
 }

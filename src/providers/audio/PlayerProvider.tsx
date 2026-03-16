@@ -22,6 +22,7 @@ export type PlayerState = {
   metadata: TrackMetadata | null;
   position: number; // ms
   duration: number; // ms
+  volume: number; // 0–1
   shuffle: boolean;
   repeat: RepeatMode;
   error: string | null;
@@ -39,6 +40,7 @@ export type PlayerAction =
   | { type: 'LOADED' }
   | { type: 'STOP' }
   | { type: 'ERROR'; payload?: string }
+  | { type: 'SET_VOLUME'; payload: number }
   | { type: 'TOGGLE_SHUFFLE' }
   | { type: 'CYCLE_REPEAT' };
 
@@ -47,6 +49,7 @@ const initial: PlayerState = {
   metadata: null,
   position: 0,
   duration: 0,
+  volume: 1,
   shuffle: false,
   repeat: 'off',
   error: null,
@@ -55,7 +58,7 @@ const initial: PlayerState = {
 function reducer(state: PlayerState, action: PlayerAction): PlayerState {
   switch (action.type) {
     case 'PLAY':
-      return { ...initial, status: 'loading', metadata: action.payload, error: null };
+      return { ...initial, status: 'loading', metadata: action.payload, volume: state.volume, error: null };
     case 'ERROR':
       return { ...state, status: 'error', error: action.payload || 'Playback failed' };
     case 'PAUSE':
@@ -71,7 +74,9 @@ function reducer(state: PlayerState, action: PlayerAction): PlayerState {
     case 'SET_DURATION':
       return { ...state, duration: action.payload };
     case 'STOP':
-      return { ...initial, shuffle: state.shuffle, repeat: state.repeat, error: null };
+      return { ...initial, shuffle: state.shuffle, repeat: state.repeat, volume: state.volume, error: null };
+    case 'SET_VOLUME':
+      return { ...state, volume: Math.max(0, Math.min(1, action.payload)) };
     case 'TOGGLE_SHUFFLE':
       return { ...state, shuffle: !state.shuffle };
     case 'CYCLE_REPEAT': {
@@ -162,8 +167,14 @@ export function usePlayer() {
       dispatch({ type: 'STOP' });
     },
 
+    volume: state.volume,
     shuffle: state.shuffle,
     repeat: state.repeat,
+    setVolume: (v: number) => {
+      const clamped = Math.max(0, Math.min(1, v));
+      getController()?.setVolume?.(clamped);
+      dispatch({ type: 'SET_VOLUME', payload: clamped });
+    },
     toggleShuffle: () => dispatch({ type: 'TOGGLE_SHUFFLE' }),
     cycleRepeat: () => dispatch({ type: 'CYCLE_REPEAT' }),
 

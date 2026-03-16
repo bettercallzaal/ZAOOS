@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { usePlayer } from '@/providers/audio';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 interface Submission {
   id: string;
@@ -34,6 +35,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [urlValid, setUrlValid] = useState<boolean | null>(null);
+  useEscapeClose(onClose, isOpen);
   const player = usePlayer();
 
   const fetchSubmissions = useCallback(async () => {

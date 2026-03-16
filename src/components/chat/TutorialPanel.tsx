@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 const TUTORIAL_STEPS = [
   {
@@ -75,6 +76,7 @@ interface TutorialPanelProps {
 
 export function TutorialPanel({ isOpen, onClose }: TutorialPanelProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  useEscapeClose(onClose, isOpen);
 
   if (!isOpen) return null;
 

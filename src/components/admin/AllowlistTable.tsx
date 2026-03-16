@@ -204,7 +204,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
       {/* Feedback toast */}
       {feedback && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all ${
+          className={`fixed top-4 right-4 z-[70] px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition-all ${
             feedback.type === 'success'
               ? 'bg-green-500/20 text-green-400 border border-green-500/30'
               : 'bg-red-500/20 text-red-400 border border-red-500/30'

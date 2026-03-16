@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 const FAQ_ITEMS = [
   {
@@ -56,6 +57,7 @@ interface FaqPanelProps {
 
 export function FaqPanel({ isOpen, onClose }: FaqPanelProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  useEscapeClose(onClose, isOpen);
 
   if (!isOpen) return null;
 

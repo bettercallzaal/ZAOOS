@@ -114,6 +114,45 @@ body {
   }
 }
 
+/*
+ * ─── Z-index scale ───
+ * z-10:    Internal content layers (player elements)
+ * z-30:    Context menus & backdrops (message menu)
+ * z-40:    Navigation (BottomNav, top nav)
+ * z-50:    Panels & drawers (Thread, Music, Profile, Sidebar, Schedule, FAQ, etc.)
+ * z-[60]:  Modals & dialogs (Search, SongSubmit, NewConversation, notification dropdown)
+ * z-[70]:  Toast notifications (feedback alerts)
+ */
+
+/* ─── Accessibility: focus-visible rings ─── */
+*:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove default outline for mouse/touch users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip to content link — hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 100;
+  padding: 8px 16px;
+  background: var(--color-gold);
+  color: var(--color-navy);
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 8px;
+}
+
 /* Hide SIWF default styling overrides */
 .fc-authkit-signin-button button {
   background: linear-gradient(135deg, #f5a623, #ffd700) !important;

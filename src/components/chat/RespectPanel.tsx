@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 interface RespectEntry {
   rank: number;
@@ -28,6 +29,7 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
   const [data, setData] = useState<RespectData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  useEscapeClose(onClose, isOpen);
 
   useEffect(() => {
     if (!isOpen) return;

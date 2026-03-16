@@ -50,9 +50,9 @@ export function MusicSidebar({
   if (isMobile) {
     return (
       <>
-        <div className="fixed inset-0 bg-black/40 z-30" onClick={onClose} />
+        <div className="fixed inset-0 bg-black/40 z-50" onClick={onClose} />
 
-        <div className="fixed inset-x-0 bottom-0 z-40 bg-[#0d1b2a] border-t border-gray-800 rounded-t-2xl animate-slide-up max-h-[75vh] flex flex-col">
+        <div className="fixed inset-x-0 bottom-0 z-50 bg-[#0d1b2a] border-t border-gray-800 rounded-t-2xl animate-slide-up max-h-[75vh] flex flex-col">
           {/* Drag handle */}
           <div className="flex justify-center pt-3 pb-1">
             <div className="w-10 h-1 rounded-full bg-gray-700" />

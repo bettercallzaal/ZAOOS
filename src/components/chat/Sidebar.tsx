@@ -8,6 +8,7 @@ import { SessionData } from '@/types';
 import { XMTPConversation } from '@/types/xmtp';
 import type { ZaoMember } from '@/contexts/XMTPContext';
 import { communityConfig } from '@/../community.config';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 const CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `# ${id}` }));
 
@@ -107,6 +108,7 @@ export function Sidebar({
   const onlineMembers = zaoMembers.filter((m) => m.reachable);
   const { isConnected: hasWallet } = useAccount();
   const unreadCount = xmtpConversations.reduce((n, c) => n + c.unreadCount, 0);
+  useEscapeClose(onClose, isOpen);
 
   return (
     <>

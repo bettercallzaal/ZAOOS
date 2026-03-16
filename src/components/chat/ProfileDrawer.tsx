@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 interface ProfileData {
   fid: number;
@@ -53,6 +54,8 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
   const [followLoading, setFollowLoading] = useState(false);
   const [musicTracks, setMusicTracks] = useState<MusicTrack[]>([]);
   const [musicLoading, setMusicLoading] = useState(false);
+
+  useEscapeClose(onClose, !!fid);
 
   useEffect(() => {
     if (!fid) {

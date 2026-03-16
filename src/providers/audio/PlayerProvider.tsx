@@ -151,7 +151,15 @@ export function usePlayer() {
     isError: state.status === 'error',
     error: state.error,
 
-    play: (metadata: TrackMetadata) => dispatch({ type: 'PLAY', payload: metadata }),
+    play: (metadata: TrackMetadata) => {
+      dispatch({ type: 'PLAY', payload: metadata });
+      // Trigger controller load within user-gesture context so autoplay isn't blocked
+      const controller = controllers.current[metadata.type];
+      if (controller?.load) {
+        const url = metadata.streamUrl ?? metadata.url;
+        controller.load(url);
+      }
+    },
 
     pause: () => {
       getController()?.pause();

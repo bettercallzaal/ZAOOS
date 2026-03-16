@@ -11,6 +11,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
   // Create audio element and register controllers on mount
   useEffect(() => {
     const audio = new Audio();
+    audio.crossOrigin = 'anonymous';
     audioRef.current = audio;
 
     const onTimeUpdate = () =>
@@ -23,7 +24,10 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     };
 
     const onCanPlay = () => {
-      audio.play().catch(console.error);
+      audio.play().catch((err: unknown) => {
+        console.error('[Audio] play blocked:', err);
+        dispatch({ type: 'ERROR', payload: 'Tap play again — browser blocked autoplay' });
+      });
       dispatch({ type: 'LOADED' });
     };
 

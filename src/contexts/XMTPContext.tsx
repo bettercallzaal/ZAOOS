@@ -612,11 +612,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       saveConnectedWallet(address);
       setConnectedWallets(Array.from(walletsRef.current.keys()));
 
-      // Seed last message cache, then resolve profiles, then load conversations
+      // Seed last message cache, load conversations, then start streams
       await seedLastMessages();
-      await checkZaoMembers();
+      await loadAllConversations();
+      await checkZaoMembers().catch((e: unknown) =>
+        console.error('[XMTP] checkZaoMembers non-critical error:', e)
+      );
 
-      // Start global streams AFTER profiles are resolved
+      // Start global streams AFTER conversations are loaded
       await startGlobalStreams(client);
 
       // Clear any previous errors on successful connection

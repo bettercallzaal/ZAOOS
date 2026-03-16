@@ -195,10 +195,21 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { id, assign_zid, ...updates } = body;
+    const { id, assign_zid, ...rawUpdates } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'User id is required' }, { status: 400 });
+    }
+
+    // Allowlist fields that admins can update — prevents arbitrary column injection
+    const ALLOWED_FIELDS = new Set([
+      'fid', 'username', 'display_name', 'pfp_url', 'bio',
+      'primary_wallet', 'respect_wallet', 'role', 'is_active',
+      'custody_address', 'verified_addresses',
+    ]);
+    const updates: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(rawUpdates)) {
+      if (ALLOWED_FIELDS.has(key)) updates[key] = value;
     }
 
     // Admin-assigned ZID via sequence

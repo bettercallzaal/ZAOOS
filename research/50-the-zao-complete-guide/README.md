@@ -381,13 +381,24 @@ Music prediction market on Solana — the **first project incubated from the ZAO
 - **Legal:** Delaware C-Corporation
 - **Stats:** $800-2,500/match, $50K+ total volume, 50+ artist pipeline
 
+### Content Schedule (Current)
+
+| Day | Time | Content | Platform |
+|-----|------|---------|----------|
+| Monday-Friday | 11 AM EST | Community discussion | X Spaces |
+| Monday-Friday | 8:30 PM EST | Quick Battle | YouTube Live |
+| Sunday | 7 PM EST | Big Battle | YouTube Live / wavewarz.com |
+
+**11 live events per week** — one of the highest content cadences in web3 music.
+
 ### Notable Battles
 
 | Battle | Context |
 |--------|---------|
 | Hurric4n3ike vs JANGO UU | Original + ZAO-CHELLA LIVE Rematch (Miami, Dec 2024) |
-| Visionz vs Rome | "Crypto Traders Decided This Music Battle!" |
-| Indies vs Classics | Charity battle — $270+ for girl child education in Nigeria |
+| Visionz vs Rome | "Crypto Traders Decided This Music Battle!" (YouTube) |
+| Ramone vs Armand | Dec 28, R&B JamZ themed |
+| Indies vs Classics | Charity — $220+ fiat matched by Nathan Hill/Liquid NFTs + 0.14 SOL + 1.5% fees = $270+ total. ClassicZ won regulation 2-1, community demanded overtime, Indies won sudden death. |
 
 ### The Incubator Model
 
@@ -592,6 +603,24 @@ The team (Hurric4n3IKE, Zaal, Candy) previously collaborated on Student Loanz be
 | **Utility** | IP rights (instrumentals, stems, acapellas), discounts, event access |
 | **ZAO connection** | Mr. McFly is a community member |
 
+### Community Activity Status (March 2026)
+
+**Thriving:**
+- **One Love Art DAO** — ETH Denver 2026 presence, Miami Art Week, "Visible Violets Vol 2" drop (20 women artists), consistent newsletter
+- **Optimism Fractal** — Weekly Respect Games (Thursdays 17 UTC), live ORDAO contracts at of.frapps.xyz, ~65 Respect holders, Season 5
+- **UVR / Jadyn Violet** — Daily Twitch streams (355/365 streak), new 2026 singles, first LA show, active Raver Realm
+
+**Active but Limited:**
+- **SongJam** — Genesis testnet live, but $SANG bleeding (~$1.4K daily volume). Adam splitting focus with Pump.fun hackathon (Eve/KAITO project)
+- **Empire Builder** — Product live, GLANKER at near-zero volume ($18/day). ZABAL integration is main signal.
+- **Quakey** — Token trading ~$67K daily volume, Nifty Island presence
+- **Magnetiq** — SaaS platform live, pivoting toward general brand community tools
+
+**Quiet / Possibly Dormant:**
+- **COC / Uncle Corvus** — Vision articulated but no shipped product. Ethergrounds still conceptual.
+- **TokenSmart** — Website exists, unclear if new content being produced in 2026
+- **Ohnahji University** — No new Alphite Gazette since 2023. ONJU Saturdays status unclear. NFT not active.
+
 ### Fractal Ecosystem Partners
 
 | Community | Connection |
@@ -735,7 +764,7 @@ ZAO calls itself "a Nounish crew" — aligning with:
 | Weekly fractal meetings | 90+ |
 | Core ZAO OS members | 40 |
 | LTAW3 episodes | 19+ |
-| Revenue generated | $8,000+ |
+| Revenue generated | $10,000+ (festivals + WaveWarZ) |
 | WaveWarZ volume | $50,000+ |
 | NFTs sold (AttaBotty alone) | 10,000+ |
 | Artists in roster | 22+ |

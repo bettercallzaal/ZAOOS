@@ -59,6 +59,7 @@ interface XMTPContextValue {
   clearActionError: () => void;
   reconnectStreams: () => Promise<void>;
   removeConversation: (id: string) => void;
+  leaveGroup: (id: string) => Promise<void>;
   getGroupMembers: (conversationId: string) => Promise<{ inboxId: string; displayName: string; pfpUrl: string; username?: string }[]>;
 }
 
@@ -1067,6 +1068,31 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /**
+   * Leave a group conversation on the XMTP network and remove from UI.
+   */
+  const leaveGroup = useCallback(async (id: string) => {
+    const result = await findClientForConversation(id);
+    if (!result) {
+      showActionError('Could not find this conversation.');
+      return;
+    }
+    try {
+      await result.client.conversations.sync();
+      const convos = await result.client.conversations.list();
+      const conv = convos.find((c) => c.id === id);
+      if (conv && result.client.inboxId) {
+        const group = conv as Group;
+        await group.removeMembers([result.client.inboxId]);
+      }
+    } catch (err) {
+      console.error('[XMTP] Failed to leave group on network:', err);
+      // Still remove locally even if network leave fails
+    }
+    // Remove from local state
+    removeConversation(id);
+  }, [findClientForConversation, removeConversation, showActionError]);
+
+  /**
    * Get the member list for a group conversation.
    * Reads cached profiles from localStorage; falls back to truncated inbox IDs.
    */
@@ -1203,6 +1229,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     clearActionError,
     reconnectStreams,
     removeConversation,
+    leaveGroup,
     getGroupMembers,
   }), [
     connectedWallets, isConnecting, connectingWallet, error, actionError, streamConnected,
@@ -1210,7 +1237,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
     disconnectAll, selectConversation, sendMessage, createDm, createGroup,
     refreshConversations, startDmWithMember, clearError, clearActionError, reconnectStreams,
-    removeConversation, getGroupMembers,
+    removeConversation, leaveGroup, getGroupMembers,
   ]);
 
   return (

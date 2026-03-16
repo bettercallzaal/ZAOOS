@@ -118,6 +118,7 @@ export function Sidebar({
   zaoMembers, loadingMembers, onStartDmWithMember, onGroupInfo,
 }: SidebarProps) {
   const onlineMembers = zaoMembers.filter((m) => m.reachable && m.lastLoginAt);
+  const offlineMembers = zaoMembers.filter((m) => !m.reachable && m.username);
   const { isConnected: hasWallet } = useAccount();
   const unreadCount = xmtpConversations.reduce((n, c) => n + c.unreadCount, 0);
   useEscapeClose(onClose, isOpen);
@@ -406,6 +407,61 @@ export function Sidebar({
                   ))}
                 </div>
               )}
+            </SidebarSection>
+          )}
+
+          {/* ── Not on XMTP (invite via Farcaster) ────────────────────── */}
+          {xmtpConnected && offlineMembers.length > 0 && (
+            <SidebarSection
+              title="Not on XMTP"
+              badge={<span className="text-[10px] text-gray-500 font-medium ml-1">{offlineMembers.length}</span>}
+              defaultOpen={false}
+            >
+              <div className="space-y-0.5 max-h-48 overflow-y-auto">
+                {offlineMembers.map((member) => (
+                  <div
+                    key={member.fid ?? member.displayName}
+                    className="flex items-center gap-2.5 w-full text-left px-3 py-1.5 rounded-md text-gray-500"
+                  >
+                    <div className="relative flex-shrink-0">
+                      {member.pfpUrl ? (
+                        <div className="w-6 h-6 relative opacity-50">
+                          <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" unoptimized />
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
+                          <span className="text-[9px] text-gray-600 font-medium">{member.displayName[0]?.toUpperCase()}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate text-gray-500">{member.displayName}</p>
+                      {member.username && (
+                        <a
+                          href={`https://farcaster.xyz/${member.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-[#f5a623]/60 hover:text-[#f5a623] truncate block transition-colors"
+                          title={`Tag @${member.username} on Farcaster to enable XMTP`}
+                        >
+                          @{member.username}
+                        </a>
+                      )}
+                    </div>
+                    <a
+                      href={`https://farcaster.xyz/~/compose?text=${encodeURIComponent(`@${member.username} enable XMTP messages on ZAO OS so I can ping you! 🎵`)}&channelKey=zao`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1 rounded text-gray-600 hover:text-[#f5a623] hover:bg-[#f5a623]/10 transition-colors flex-shrink-0"
+                      title={`Cast to @${member.username} in /zao`}
+                    >
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014 8.855c-.118.38-.245.754-.38 1.125m.38-1.125a23.91 23.91 0 001.014-5.395m0-3.46c.495.413.811 1.035.811 1.73 0 .695-.316 1.317-.811 1.73m0-3.46a24.347 24.347 0 010 3.46" />
+                      </svg>
+                    </a>
+                  </div>
+                ))}
+              </div>
             </SidebarSection>
           )}
 

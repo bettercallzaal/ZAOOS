@@ -290,6 +290,7 @@ export function ChatRoom() {
             loading={loadingGroupMembers}
             onClose={() => setGroupInfoId(null)}
             onRemove={() => xmtp.removeConversation(groupInfoId)}
+            onLeave={() => xmtp.leaveGroup(groupInfoId)}
           />
         );
       })()}

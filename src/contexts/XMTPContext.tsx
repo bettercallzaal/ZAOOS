@@ -60,6 +60,7 @@ interface XMTPContextValue {
   reconnectStreams: () => Promise<void>;
   removeConversation: (id: string) => void;
   leaveGroup: (id: string) => Promise<void>;
+  refreshMembers: () => Promise<void>;
   getGroupMembers: (conversationId: string) => Promise<{ inboxId: string; displayName: string; pfpUrl: string; username?: string }[]>;
 }
 
@@ -1230,6 +1231,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     reconnectStreams,
     removeConversation,
     leaveGroup,
+    refreshMembers: checkZaoMembers,
     getGroupMembers,
   }), [
     connectedWallets, isConnecting, connectingWallet, error, actionError, streamConnected,
@@ -1237,7 +1239,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
     disconnectAll, selectConversation, sendMessage, createDm, createGroup,
     refreshConversations, startDmWithMember, clearError, clearActionError, reconnectStreams,
-    removeConversation, leaveGroup, getGroupMembers,
+    removeConversation, leaveGroup, checkZaoMembers, getGroupMembers,
   ]);
 
   return (

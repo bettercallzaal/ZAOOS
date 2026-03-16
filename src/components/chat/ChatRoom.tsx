@@ -277,6 +277,7 @@ export function ChatRoom() {
         loadingMembers={xmtp.loadingMembers}
         onStartDmWithMember={handleStartDmWithMember}
         onGroupInfo={handleOpenGroupInfo}
+        onRefreshMembers={xmtp.refreshMembers}
       />
 
       {/* Group Info Drawer */}

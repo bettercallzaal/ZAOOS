@@ -274,7 +274,7 @@ src/
 │   ├── messages/            # ConnectXMTP, MessagesRoom, ConversationList,
 │   │                        # MessageThread, NewConversationDialog, MessageCompose
 │   ├── music/               # GlobalPlayer, MusicEmbed, MusicSidebar,
-│   │                        # SongSubmit, Scrubber, PlayerButtons, MusicQueueTrackCard
+│   │                        # SongSubmit, Scrubber, MusicQueueTrackCard
 │   ├── social/              # SocialPage, FollowerCard, FollowerSkeleton
 │   ├── admin/               # AllowlistTable, CsvUpload, HiddenMessages
 │   └── gate/                # LoginButton, MiniAppGate
@@ -449,6 +449,38 @@ ZAO OS is building toward a future where **artists keep their revenue, curators 
 | 7 | **Cross-Platform** — Publish to Lens, Bluesky, Hive, Nostr, X from one compose bar | 📋 Planned |
 | 8 | **Governance** — DAO treasury (Safe), Snapshot voting, Coordinape | 📋 Planned |
 | 9 | **Decentralized Infra** — Quilibrium storage, self-hosted hub | 📋 Planned |
+
+---
+
+## Next Steps
+
+### Security Hardening
+- [ ] Make Neynar webhook HMAC verification required (currently skips if `NEYNAR_WEBHOOK_SECRET` not set)
+- [ ] Add signature verification to miniapp webhook (blocked by spec — monitor for updates)
+- [ ] Strip wallet addresses from leaderboard API response (expose only to admins)
+- [ ] Add per-user upload rate limiting and storage quota
+- [ ] Replace `select('*')` with explicit column lists in API routes
+- [ ] Refresh `isAdmin` on each request instead of caching in 7-day session
+- [ ] Move SIWE nonce store from in-memory Map to Supabase (multi-instance support)
+- [ ] Add RLS policies to all tables (currently RLS enabled but zero policies — safe as default-deny, fragile if anon client added)
+- [ ] Run `scripts/add-missing-indexes.sql` in Supabase SQL Editor
+
+### Four Pillars — App Navigation
+- [ ] Social tab — content pages (chat, music feed, social graph) ✅ built
+- [ ] Governance tab — Respect leaderboard, future voting UI
+- [ ] Tools tab — profile/ZID view, future cross-post
+- [ ] Contribute tab — GitHub links, future bounty board
+- [ ] Settings page — profile info, signer connect, wallets ✅ built
+
+### Future Implementations
+- [ ] In-app notification UI (bell icon exists, needs notification feed/drawer)
+- [ ] Mini app viewer (iframe + Farcaster Mini App SDK integration)
+- [ ] ZID auto-assignment on first Respect earned
+- [ ] Respect earning API + ledger table with 2% weekly decay
+- [ ] Hats Protocol roles (on-chain ERC-1155)
+- [ ] Cross-platform publishing (compose once → fan out)
+- [ ] AI agent (ElizaOS + Claude)
+- [ ] `community.config.ts` fork template + setup guide
 
 ---
 

@@ -324,10 +324,10 @@ export function Sidebar({
             )}
           </SidebarSection>
 
-          {/* ── Online Members ─────────────────────────────────────────── */}
+          {/* ── Messageable Members ──────────────────────────────────────── */}
           {xmtpConnected && (
             <SidebarSection
-              title="Online"
+              title="Messageable"
               badge={onlineMembers.length > 0 ? (
                 <span className="text-[10px] text-green-400 font-medium ml-1">{onlineMembers.length}</span>
               ) : undefined}
@@ -346,7 +346,7 @@ export function Sidebar({
                   ))}
                 </div>
               ) : onlineMembers.length === 0 ? (
-                <p className="px-3 py-1 text-xs text-gray-600">No members online</p>
+                <p className="px-3 py-1 text-xs text-gray-600">No members messageable</p>
               ) : (
                 <div className="space-y-0.5 max-h-48 overflow-y-auto">
                   {onlineMembers.map((member) => (

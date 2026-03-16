@@ -29,6 +29,10 @@ export async function POST() {
   try {
     // Step 1: Create a managed signer
     const signer = await createSigner();
+    if (!signer?.signer_uuid || !signer?.public_key) {
+      console.error('createSigner returned incomplete data:', signer);
+      return NextResponse.json({ error: 'Signer creation returned invalid data' }, { status: 502 });
+    }
     const signerUuid = signer.signer_uuid;
     const publicKey = signer.public_key;
 
@@ -67,6 +71,10 @@ export async function POST() {
 
     // Step 3: Register signed key to get approval URL
     const registered = await registerSignedKey(signerUuid, appFid, deadline, signature);
+    if (!registered?.signer_uuid || !registered?.status || !registered?.signer_approval_url) {
+      console.error('registerSignedKey returned incomplete data:', registered);
+      return NextResponse.json({ error: 'Key registration returned invalid data' }, { status: 502 });
+    }
 
     return NextResponse.json({
       signerUuid: registered.signer_uuid,

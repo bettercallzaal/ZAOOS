@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { searchUsers, getUserByFid } from '@/lib/farcaster/neynar';
+import { searchUsers, getUserByFid, getUsersByFids } from '@/lib/farcaster/neynar';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
 
@@ -73,35 +73,17 @@ export async function GET(req: NextRequest) {
     const data = await searchUsers(query, 8);
     const users = data.result?.users || [];
 
-    // For search results, fetch full profiles to get wallet addresses
+    // Batch-fetch full profiles to get wallet addresses (single API call)
+    const sliced = users.slice(0, 8);
+    const fids = sliced.map((u: Record<string, unknown>) => u.fid as number);
+    const fullUsers = await getUsersByFids(fids);
+    const fullUserMap = new Map(fullUsers.map((u: Record<string, unknown>) => [u.fid as number, u]));
+
     const enriched = await Promise.all(
-      users.slice(0, 8).map(async (u: Record<string, unknown>) => {
+      sliced.map(async (u: Record<string, unknown>) => {
         const fid = u.fid as number;
-        try {
-          const full = await getUserByFid(fid);
-          if (!full) return null;
-
-          const custodyAddress = full.custody_address || '';
-          const verifiedAddresses: string[] = full.verified_addresses?.eth_addresses || [];
-          const allAddresses = [custodyAddress, ...verifiedAddresses].filter(Boolean);
-
-          // Resolve ENS (do first address only to keep fast)
-          let ensMap: Record<string, string> = {};
-          if (allAddresses.length > 0) {
-            const primaryEns = await resolveEns(allAddresses[0]);
-            if (primaryEns) ensMap[allAddresses[0].toLowerCase()] = primaryEns;
-          }
-
-          return {
-            fid: full.fid,
-            username: full.username,
-            display_name: full.display_name,
-            pfp_url: full.pfp_url,
-            custody_address: custodyAddress,
-            verified_addresses: verifiedAddresses,
-            ens: ensMap,
-          };
-        } catch {
+        const full = fullUserMap.get(fid) as Record<string, unknown> | undefined;
+        if (!full) {
           return {
             fid: u.fid,
             username: u.username,
@@ -112,6 +94,27 @@ export async function GET(req: NextRequest) {
             ens: {},
           };
         }
+
+        const custodyAddress = (full.custody_address as string) || '';
+        const verifiedAddresses: string[] = (full.verified_addresses as Record<string, unknown>)?.eth_addresses as string[] || [];
+        const allAddresses = [custodyAddress, ...verifiedAddresses].filter(Boolean);
+
+        // Resolve ENS (do first address only to keep fast)
+        let ensMap: Record<string, string> = {};
+        if (allAddresses.length > 0) {
+          const primaryEns = await resolveEns(allAddresses[0]);
+          if (primaryEns) ensMap[allAddresses[0].toLowerCase()] = primaryEns;
+        }
+
+        return {
+          fid: full.fid,
+          username: full.username,
+          display_name: full.display_name,
+          pfp_url: full.pfp_url,
+          custody_address: custodyAddress,
+          verified_addresses: verifiedAddresses,
+          ens: ensMap,
+        };
       })
     );
 

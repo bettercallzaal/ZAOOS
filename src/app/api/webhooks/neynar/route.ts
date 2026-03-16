@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       .upsert(row, { onConflict: 'hash' });
   } catch (err) {
     console.error('[webhook/neynar] DB insert error:', err);
-    // Still return 200 so Neynar doesn't retry endlessly
+    return NextResponse.json({ error: 'DB insert failed' }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

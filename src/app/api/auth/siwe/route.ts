@@ -39,6 +39,7 @@ export async function GET() {
  * POST — Verify SIWE signature + check allowlist + create session
  */
 export async function POST(req: NextRequest) {
+  pruneNonces();
   try {
     const { message, signature } = await req.json();
 

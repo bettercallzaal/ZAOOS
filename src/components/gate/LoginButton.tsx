@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { SignInButton, useProfile, type StatusAPIResponse } from '@farcaster/auth-kit';
 import { useRouter } from 'next/navigation';
 import { WalletLoginButton } from './WalletLoginButton';
@@ -8,8 +8,12 @@ import { WalletLoginButton } from './WalletLoginButton';
 export function LoginButton() {
   const router = useRouter();
   const profile = useProfile();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSuccess = useCallback(async (res: StatusAPIResponse) => {
+    setError(null);
+    setLoading(true);
     try {
       const response = await fetch('/api/auth/verify', {
         method: 'POST',
@@ -23,11 +27,20 @@ export function LoginButton() {
       });
 
       const data = await response.json();
+
+      if (!response.ok || data.error) {
+        setError(data.error || 'Verification failed');
+        setLoading(false);
+        return;
+      }
+
       if (data.redirect) {
         router.push(data.redirect);
       }
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (err) {
+      console.error('Login failed:', err);
+      setError('Something went wrong. Please try again.');
+      setLoading(false);
     }
   }, [router]);
 
@@ -48,8 +61,11 @@ export function LoginButton() {
         <div className="farcaster-signin-wrapper">
           <SignInButton onSuccess={handleSuccess} />
         </div>
-        {profile.isAuthenticated && (
+        {profile.isAuthenticated && loading && !error && (
           <p className="text-sm text-gray-400 mt-2">Verifying access...</p>
+        )}
+        {error && (
+          <p className="text-xs text-red-400 text-center mt-2">{error}</p>
         )}
       </div>
     </div>

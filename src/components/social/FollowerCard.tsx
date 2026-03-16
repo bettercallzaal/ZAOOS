@@ -79,7 +79,6 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
               alt={user.display_name}
               fill
               className="rounded-full object-cover"
-              unoptimized
             />
           </div>
         ) : (

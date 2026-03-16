@@ -17,7 +17,7 @@ export async function checkAllowlist(
       .eq('fid', fid)
       .eq('is_active', true)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (data) return { allowed: true, entry: data as AllowlistEntry };
   }
@@ -33,7 +33,7 @@ export async function checkAllowlist(
       .ilike('wallet_address', addr)
       .eq('is_active', true)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (primaryMatch) return { allowed: true, entry: primaryMatch as AllowlistEntry };
 
@@ -44,7 +44,7 @@ export async function checkAllowlist(
       .ilike('custody_address', addr)
       .eq('is_active', true)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (custodyMatch) return { allowed: true, entry: custodyMatch as AllowlistEntry };
 
@@ -55,7 +55,7 @@ export async function checkAllowlist(
       .contains('verified_addresses', [addr])
       .eq('is_active', true)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (verifiedMatch) return { allowed: true, entry: verifiedMatch as AllowlistEntry };
   }
@@ -68,7 +68,7 @@ export async function checkAllowlist(
       .eq('fid', fid)
       .eq('is_active', true)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (userByFid) return { allowed: true };
   }
@@ -81,7 +81,7 @@ export async function checkAllowlist(
       .eq('primary_wallet', addr)
       .eq('is_active', true)
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (userByWallet) return { allowed: true };
   }

@@ -175,7 +175,6 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
             alt={metadata.trackName}
             fill
             className="object-cover"
-            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

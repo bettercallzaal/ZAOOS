@@ -70,9 +70,10 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
         <div className="rounded-lg overflow-hidden max-w-sm bg-gray-800/50" style={{ minHeight: '120px' }}>
           <img
             src={embed.url}
-            alt=""
+            alt="Embedded image"
             className="rounded-lg max-w-full max-h-80 object-cover"
             loading="lazy"
+            decoding="async"
             onLoad={(e) => {
               const container = (e.target as HTMLImageElement).parentElement;
               if (container) container.style.minHeight = '0';
@@ -107,9 +108,10 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
           <div className="w-full bg-gray-800/30" style={{ minHeight: '80px' }}>
             <img
               src={og.ogImage[0].url}
-              alt=""
+              alt={og.ogTitle || 'Link preview image'}
               className="w-full max-h-48 object-cover group-hover/link:opacity-90 transition-opacity"
               loading="lazy"
+              decoding="async"
               onLoad={(e) => {
                 const container = (e.target as HTMLImageElement).parentElement;
                 if (container) container.style.minHeight = '0';
@@ -139,10 +141,12 @@ function QuotedCastCard({ cast }: { cast: QuotedCastData }) {
   return (
     <div className="mt-2 flex gap-2.5 px-3 py-2.5 rounded-xl bg-[#0a1628] border border-gray-800/60">
       {cast.author.pfp_url ? (
-        <img
+        <Image
           src={cast.author.pfp_url}
-          alt=""
-          className="w-5 h-5 rounded-full flex-shrink-0 mt-0.5"
+          alt={`${cast.author.display_name || cast.author.username} avatar`}
+          width={20}
+          height={20}
+          className="rounded-full object-cover flex-shrink-0 mt-0.5"
         />
       ) : (
         <div className="w-5 h-5 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5">

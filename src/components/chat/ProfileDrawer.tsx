@@ -129,7 +129,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
         {/* Close button */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0">
           <h3 className="text-sm font-medium text-gray-400">Profile</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors p-2">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -155,7 +155,6 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                     alt={profile.displayName}
                     fill
                     className="rounded-full object-cover"
-                    unoptimized
                   />
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-gray-700" />
@@ -360,7 +359,6 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                                 alt={track.title}
                                 fill
                                 className="object-cover"
-                                unoptimized
                               />
                             </div>
                           ) : (

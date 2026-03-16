@@ -9,6 +9,7 @@ import { Providers } from './providers';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
 });
 
 const miniAppEmbed = JSON.stringify({

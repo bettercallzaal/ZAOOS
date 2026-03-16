@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
@@ -14,23 +15,24 @@ import { MessageList } from './MessageList';
 import { ComposeBar, ComposeBarHandle, ReplyContext } from './ComposeBar';
 import { ThreadDrawer } from './ThreadDrawer';
 import { SignerConnect } from './SignerConnect';
-import { SearchDialog } from './SearchDialog';
-import { SchedulePanel } from './SchedulePanel';
-import { FaqPanel } from './FaqPanel';
-import { RespectPanel } from './RespectPanel';
-import { TutorialPanel } from './TutorialPanel';
-import { ProfileDrawer } from './ProfileDrawer';
 import { MessageThread } from '@/components/messages/MessageThread';
 import { MessageCompose } from '@/components/messages/MessageCompose';
 import { NewConversationDialog } from '@/components/messages/NewConversationDialog';
 import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 import { MusicSidebar } from '@/components/music/MusicSidebar';
-import { SongSubmit } from '@/components/music/SongSubmit';
 import { useMusicQueue } from '@/hooks/useMusicQueue';
 import { useRadio } from '@/hooks/useRadio';
 import { RadioButton } from '@/components/music/RadioButton';
 import { FeedFilters, filterAndSortCasts, ContentFilter, SortMode } from './FeedFilters';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+
+const SearchDialog = dynamic(() => import('./SearchDialog').then(m => ({ default: m.SearchDialog })), { ssr: false });
+const SongSubmit = dynamic(() => import('@/components/music/SongSubmit').then(m => ({ default: m.SongSubmit })), { ssr: false });
+const SchedulePanel = dynamic(() => import('./SchedulePanel').then(m => ({ default: m.SchedulePanel })), { ssr: false });
+const FaqPanel = dynamic(() => import('./FaqPanel').then(m => ({ default: m.FaqPanel })), { ssr: false });
+const TutorialPanel = dynamic(() => import('./TutorialPanel').then(m => ({ default: m.TutorialPanel })), { ssr: false });
+const RespectPanel = dynamic(() => import('./RespectPanel').then(m => ({ default: m.RespectPanel })), { ssr: false });
+const ProfileDrawer = dynamic(() => import('./ProfileDrawer').then(m => ({ default: m.ProfileDrawer })), { ssr: false });
 
 export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
@@ -277,7 +279,6 @@ export function ChatRoom() {
                       alt=""
                       fill
                       className="rounded-full object-cover"
-                      unoptimized
                     />
                   </div>
                 ) : activeXmtpConversation?.type === 'group' ? (

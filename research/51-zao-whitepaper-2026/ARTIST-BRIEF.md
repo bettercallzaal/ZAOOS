@@ -26,7 +26,7 @@ The problem isn't that these tools don't exist. The problem is that nobody teach
 
 ## What Is the ZAO?
 
-A guild of 40 independent musicians, artists, and builders who learn together, support each other, and keep more of what they earn.
+A guild of independent musicians, artists, and builders who learn together, support each other, and keep more of what they earn. Started in 2023 as a pivot from ZTalent Agency. Currently a tight-knit community of Respect token holders who show up every week.
 
 We don't say "trust us, we'll handle it." We say "here's how it works — let's learn it together."
 
@@ -52,17 +52,15 @@ Nobody tells you what to do. You show up, contribute, and earn your place.
 
 ### WaveWarZ — Music Battles With Real Money
 
-Artists compete head-to-head in 20-minute rounds. Fans engage and trade on who they think will win. Artists earn 1% of all trading activity — directly, automatically. During a recent battle, an artist earned money in 20 minutes just from audience engagement. No streams required.
+Artists compete head-to-head. Fans engage and trade on who they think will win. Artists earn directly from audience engagement — no streams required. Big battles Sundays at 7 PM EST. Quick battles Monday-Friday at 8:30 PM EST on YouTube Live. Daily community discussion at 11 AM on X Spaces.
 
 **[wavewarz.com](https://www.wavewarz.com/)**
 
-### The Collaborative Track — Keep 85-90%
+### Collaborative Projects — Artists Keep the Majority
 
-Work with the community on marketing, distribution, or sync licensing. The ZAO takes 10-15% for services. You keep the rest.
+Work with the community on music, marketing, or sync licensing. Revenue is split transparently — artists keep the vast majority. The ZAO Cypher (multi-artist collab with producers Clejan and GodCloud) is the first project testing this model.
 
-Compare: major labels take 80-85%. We take 10-15%.
-
-The difference: we teach you how to keep the rest.
+Compare: major labels take 80-85%. We're building the opposite.
 
 ### Sync Licensing — Your Music in TV, Film, Games
 

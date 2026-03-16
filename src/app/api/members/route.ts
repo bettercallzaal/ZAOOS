@@ -20,7 +20,8 @@ export async function GET() {
     .from('allowlist')
     .select('id, fid, username, real_name, ign, display_name, pfp_url, wallet_address, custody_address, verified_addresses')
     .eq('is_active', true)
-    .order('ign', { ascending: true });
+    .order('ign', { ascending: true })
+    .limit(500);
 
   if (error) {
     return NextResponse.json({ error: 'Failed to load members' }, { status: 500 });

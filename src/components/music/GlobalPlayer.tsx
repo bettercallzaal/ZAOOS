@@ -91,7 +91,6 @@ export function GlobalPlayer({
                 alt={metadata.trackName}
                 fill
                 className="object-cover"
-                unoptimized
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a2a3a] to-[#0a1628]">
@@ -289,7 +288,6 @@ export function GlobalPlayer({
                 alt={metadata.trackName}
                 fill
                 className="object-cover"
-                unoptimized
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a2a3a] to-[#0a1628]">
@@ -318,7 +316,7 @@ export function GlobalPlayer({
             <button
               onClick={onPrev}
               disabled={!hasPrev}
-              className="text-gray-400 p-1.5 disabled:opacity-30"
+              className="text-gray-400 p-2.5 disabled:opacity-30"
               aria-label="Previous"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -348,7 +346,7 @@ export function GlobalPlayer({
             <button
               onClick={onNext}
               disabled={!hasNext && player.repeat === 'off'}
-              className="text-gray-400 p-1.5 disabled:opacity-30"
+              className="text-gray-400 p-2.5 disabled:opacity-30"
               aria-label="Next"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">

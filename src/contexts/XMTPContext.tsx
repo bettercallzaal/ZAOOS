@@ -135,6 +135,15 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const convStreamCleanupRef = useRef<(() => void) | null>(null);
   const msgStreamCleanupRef = useRef<(() => void) | null>(null);
 
+  // Guard: prevent duplicate stream listeners
+  const streamsActiveRef = useRef(false);
+
+  // Auto-reconnect timer cleanup
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Generation counter for selectConversation race condition prevention
+  const convSelectGenRef = useRef(0);
+
   // In-memory last message cache (avoids calling lastMessage() per conversation)
   const lastMessagesRef = useRef<Map<string, { content: string; sentAt: Date }>>(new Map());
 
@@ -243,6 +252,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
    * Start global streams with error handling and reconnection.
    */
   const startGlobalStreams = useCallback(async (client: AnyClient) => {
+    // Prevent duplicate stream listeners
+    if (streamsActiveRef.current) return;
+    streamsActiveRef.current = true;
+
     // Clean up existing streams before starting new ones
     convStreamCleanupRef.current?.();
     msgStreamCleanupRef.current?.();
@@ -258,6 +271,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         },
         onFail: () => {
           console.error('[XMTP] Conversation stream permanently failed');
+          streamsActiveRef.current = false;
           setStreamConnected(false);
         },
       });
@@ -344,6 +358,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         },
         onFail: () => {
           console.error('[XMTP] Message stream permanently failed after retries');
+          streamsActiveRef.current = false;
           setStreamConnected(false);
           setError('Message stream disconnected. Please refresh to reconnect.');
         },
@@ -357,8 +372,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       console.error('[XMTP] Failed to start streams:', err);
       setStreamConnected(false);
 
-      // Auto-reconnect after 5s
-      setTimeout(() => {
+      // Auto-reconnect after 5s (tracked for cleanup on unmount)
+      streamsActiveRef.current = false;
+      reconnectTimerRef.current = setTimeout(() => {
+        reconnectTimerRef.current = null;
         console.log('[XMTP] Attempting stream reconnection...');
         if (primaryClientRef.current) {
           startGlobalStreams(primaryClientRef.current).catch((e) =>
@@ -630,6 +647,11 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     msgStreamCleanupRef.current?.();
     convStreamCleanupRef.current = null;
     msgStreamCleanupRef.current = null;
+    streamsActiveRef.current = false;
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
     setStreamConnected(false);
 
     for (const [, wc] of walletsRef.current) {
@@ -672,6 +694,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
    * Uses isLoadingConvRef to prevent race conditions with the global stream.
    */
   const selectConversation = useCallback(async (id: string | null) => {
+    // Increment generation to cancel any in-flight selectConversation calls
+    const gen = ++convSelectGenRef.current;
+
     setActiveConversationId(id);
     activeConvIdRef.current = id;
 
@@ -679,6 +704,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       setMessages([]);
       messageIdSetRef.current.clear();
       activeConvWalletRef.current = null;
+      isLoadingConvRef.current = false;
       return;
     }
 
@@ -688,6 +714,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const result = await findClientForConversation(id);
+      if (gen !== convSelectGenRef.current) return; // stale — user switched conversations
       if (!result) {
         console.warn('[XMTP] Conversation not found:', id);
         setMessages([]);
@@ -699,6 +726,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       activeConvWalletRef.current = result.address;
 
       const conv = await client.conversations.getConversationById(id);
+      if (gen !== convSelectGenRef.current) return; // stale
       if (!conv) {
         console.warn('[XMTP] Could not load conversation:', id);
         setMessages([]);
@@ -708,7 +736,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
       // Sync this specific conversation to get latest messages
       await conv.sync();
+      if (gen !== convSelectGenRef.current) return; // stale
       const rawMessages = await conv.messages({ limit: BigInt(50) });
+      if (gen !== convSelectGenRef.current) return; // stale
       const myInboxId = client.inboxId;
 
       const { getPeerProfiles, getMemberProfiles } = await import('@/lib/xmtp/client');
@@ -738,6 +768,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
           };
         });
 
+      if (gen !== convSelectGenRef.current) return; // stale — don't apply results
+
       // Rebuild message ID set for dedup
       messageIdSetRef.current = new Set(decoded.map((m) => m.id));
       setMessages(decoded);
@@ -754,12 +786,15 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         lastMessagesRef.current.set(id, { content: last.content, sentAt: last.sentAt });
       }
     } catch (err) {
+      if (gen !== convSelectGenRef.current) return; // stale — suppress error for cancelled load
       console.error('[XMTP] Failed to load messages:', err);
       setError('Failed to load messages. Try again.');
     } finally {
-      setLoadingMessages(false);
-      // Re-enable stream writing after a small delay to avoid race
-      setTimeout(() => { isLoadingConvRef.current = false; }, 100);
+      // Only update loading state if this is still the current generation
+      if (gen === convSelectGenRef.current) {
+        setLoadingMessages(false);
+        isLoadingConvRef.current = false;
+      }
     }
   }, [findClientForConversation]);
 
@@ -937,8 +972,13 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
       convStreamCleanupRef.current?.();
       msgStreamCleanupRef.current?.();
+      streamsActiveRef.current = false;
       for (const [, wc] of walletsRef.current) {
         wc.client.close();
       }

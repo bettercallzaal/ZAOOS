@@ -32,6 +32,10 @@ export async function GET(req: NextRequest) {
     query = query.eq('role', role);
   }
 
+  if (search) {
+    query = query.or(`display_name.ilike.%${search}%,username.ilike.%${search}%,primary_wallet.ilike.%${search}%,real_name.ilike.%${search}%,ign.ilike.%${search}%,ens_name.ilike.%${search}%`);
+  }
+
   const { data, error } = await query;
 
   if (error) {
@@ -39,21 +43,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 
-  let users = data || [];
-
-  // Client-side search filter (Supabase doesn't support OR ilike easily)
-  if (search) {
-    const q = search.toLowerCase();
-    users = users.filter((u) =>
-      u.display_name?.toLowerCase().includes(q) ||
-      u.username?.toLowerCase().includes(q) ||
-      u.primary_wallet?.toLowerCase().includes(q) ||
-      u.real_name?.toLowerCase().includes(q) ||
-      u.ign?.toLowerCase().includes(q) ||
-      u.ens_name?.toLowerCase().includes(q) ||
-      String(u.fid).includes(q)
-    );
-  }
+  const users = data || [];
 
   return NextResponse.json({ users });
 }

@@ -105,7 +105,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
           <h3 className="text-sm font-semibold text-gray-300">Thread</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white p-1"
+            className="text-gray-400 hover:text-white p-2"
             aria-label="Close thread"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

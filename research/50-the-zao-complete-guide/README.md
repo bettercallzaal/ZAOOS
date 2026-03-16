@@ -305,7 +305,7 @@ The entire fractal governance movement traces to **Daniel Larimer** (creator of 
 
 - **When:** Weekly (Mondays)
 - **Tool:** Fractalgram
-- **77+ meetings** held
+- **90+ meetings** held
 - "While ZABAL drives the speed, the ZAO fractal provides the structure" — ZABAL Update 3
 
 **Resilience story (March 2026):** Six people showed up late because of daylight savings time. Instead of canceling, they formed their own group and ran the Respect Game at a different time. The system didn't break — it adapted. Any group of six can run the game, at any time, anywhere. This is what an autonomous organization looks like in practice.
@@ -732,7 +732,7 @@ ZAO calls itself "a Nounish crew" — aligning with:
 | Newsletter subscribers | 500+ |
 | Newsletter editions | 400+ |
 | Paid supporters | 78 |
-| Weekly fractal meetings | 77+ |
+| Weekly fractal meetings | 90+ |
 | Core ZAO OS members | 40 |
 | LTAW3 episodes | 19+ |
 | Revenue generated | $8,000+ |
@@ -759,7 +759,7 @@ ZAO calls itself "a Nounish crew" — aligning with:
 | Early 2025 | "Year of the ZAO" daily newsletter begins on Paragraph |
 | Feb 2025 | **ZAO-PROS** at ETH Denver. Student $LOANZ launches on Base. |
 | Apr 2025 | LTAW3 podcast launches (Ep 0) |
-| Mid 2025 | 77+ fractal meetings. 329+ daily newsletters. |
+| Mid 2025 | 90+ fractal meetings. 329+ daily newsletters. |
 | Dec 2025 | ZABAL ecosystem announced (Update 3). "December is the rehearsal. 2026 is the empire." |
 | Jan 1, 2026 | ZABAL token launch. Empire Builder integration. |
 | Feb 2026 | ETH Boulder — ZABAL Connector / Proof of Meet with Magnetiq |

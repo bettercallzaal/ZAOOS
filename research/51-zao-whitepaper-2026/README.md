@@ -73,7 +73,7 @@ Plus 22 roster artists, 14+ mutual communities, and a founding membership of 40.
 | What | How Much | Verify |
 |------|----------|--------|
 | Ecosystem participants | 1,000+ | [thezao.com](https://www.thezao.com/about) |
-| Weekly governance meetings | 77+ | Fractal recordings archive |
+| Weekly governance meetings | 90+ | Fractal recordings archive |
 | Newsletter editions | [400+](https://paragraph.com/@thezao) | Paragraph archive |
 | Podcast episodes | [19+](https://pods.media/lets-talk-about-web3/) | Pods.media |
 | Paid supporters | 78 before launching the product | Paragraph dashboard |
@@ -94,7 +94,7 @@ Plus 22 roster artists, 14+ mutual communities, and a founding membership of 40.
 
 **[ZAO OS](https://github.com/bettercallzaal/ZAOOS)** — A gated Farcaster client where the community lives. Music-first. Inline players for Spotify, SoundCloud, Audius, YouTube, Sound.xyz, and direct audio. Encrypted DMs via XMTP. Push notifications via Farcaster Mini App. Followers/following with sorting and filtering. Open source ([MIT license](https://github.com/bettercallzaal/ZAOOS/blob/main/LICENSE)).
 
-**ZAO Fractal** — Weekly governance circles using the [Respect Game](https://optimystics.io/respectgame). Peer-ranked contributions, Fibonacci-weighted soulbound token distribution. 77+ meetings. [$ZAO Respect token on Base](https://basescan.org/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957).
+**ZAO Fractal** — Weekly governance circles using the [Respect Game](https://optimystics.io/respectgame). Peer-ranked contributions, Fibonacci-weighted soulbound token distribution. 90+ meetings. [$ZAO Respect token on Base](https://basescan.org/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957).
 
 **ZAO Festivals** — Four IRL events bridging onchain culture to physical space:
 - [ZAO-PALOOZA](https://app.manifold.xyz/c/zao-card-jango-uu-zaopalooza) (NYC, NFT NYC 2024) — 12 artists, ZAO Cards on Manifold

@@ -104,7 +104,7 @@ Since 2024, the web3 music space collapsed. Sound.xyz shut down. Catalog shut do
 
 They all started with technology and hoped community would follow.
 
-We started with community. We've held 77+ weekly meetings. Published 400+ daily newsletters. Produced 4 festivals. Built our own app. All bootstrapped — zero VC funding. $8,000+ in self-generated revenue.
+We started with community. We've held 90+ weekly meetings. Published 400+ daily newsletters. Produced 4 festivals. Built our own app. All bootstrapped — zero VC funding. $8,000+ in self-generated revenue.
 
 We're still here because we show up every week.
 

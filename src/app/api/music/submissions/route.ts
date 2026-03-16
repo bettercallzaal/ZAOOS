@@ -52,7 +52,9 @@ export async function POST(req: NextRequest) {
     }
 
     const { url, title, artist, note } = parsed.data;
-    const channel = body.channel || 'zao';
+    const { communityConfig } = await import('@/../community.config');
+    const ALLOWED = communityConfig.farcaster.channels;
+    const channel = ALLOWED.includes(body.channel) ? body.channel : 'zao';
 
     // Validate it's a music URL
     const trackType = isMusicUrl(url);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
+import Image from 'next/image';
 import { AllowlistEntry } from '@/types';
 
 interface SearchUser {
@@ -99,9 +100,9 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
     setAddingFid(user.fid);
     try {
       // Use custody address as primary wallet, or first verified address
-      const primaryWallet = user.custody_address || user.verified_addresses[0] || '';
+      const primaryWallet = user.custody_address || user.verified_addresses?.[0] || '';
       // Get ENS name if available
-      const ensName = Object.values(user.ens)[0] || '';
+      const ensName = Object.values(user.ens || {})[0] || '';
 
       const res = await fetch('/api/admin/allowlist', {
         method: 'POST',
@@ -304,7 +305,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {fcResults.map((user) => {
                 const isAdded = alreadyAdded.has(user.fid);
-                const primaryEns = Object.values(user.ens)[0];
+                const primaryEns = Object.values(user.ens || {})[0];
                 return (
                   <div
                     key={user.fid}
@@ -312,7 +313,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                   >
                     {/* Avatar */}
                     {user.pfp_url ? (
-                      <img src={user.pfp_url} alt="" className="w-10 h-10 rounded-full flex-shrink-0" />
+                      <Image src={user.pfp_url} alt="" width={40} height={40} className="rounded-full flex-shrink-0" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0" />
                     )}
@@ -419,7 +420,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                 >
                   {/* Avatar */}
                   {entry.pfp_url ? (
-                    <img src={entry.pfp_url} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
+                    <Image src={entry.pfp_url} alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400">
                       {name.charAt(0).toUpperCase()}

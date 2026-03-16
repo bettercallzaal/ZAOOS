@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { communityConfig } from '@/../community.config';
 
@@ -161,10 +162,12 @@ export function NotificationBell() {
                 >
                   {/* Avatar or type icon */}
                   {n.actor_pfp_url ? (
-                    <img
+                    <Image
                       src={n.actor_pfp_url}
                       alt=""
-                      className="w-8 h-8 rounded-full flex-shrink-0"
+                      width={32}
+                      height={32}
+                      className="rounded-full flex-shrink-0"
                     />
                   ) : (
                     <div

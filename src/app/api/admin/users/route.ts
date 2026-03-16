@@ -22,21 +22,29 @@ export async function GET(req: NextRequest) {
   const role = req.nextUrl.searchParams.get('role');
   const search = req.nextUrl.searchParams.get('q');
 
+  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '200', 10), 500);
+  const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
+
   let query = supabaseAdmin
     .from('users')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('is_active', true)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (role) {
     query = query.eq('role', role);
   }
 
   if (search) {
-    query = query.or(`display_name.ilike.%${search}%,username.ilike.%${search}%,primary_wallet.ilike.%${search}%,real_name.ilike.%${search}%,ign.ilike.%${search}%,ens_name.ilike.%${search}%`);
+    // Sanitize: escape Supabase filter metacharacters and cap length
+    const safe = search.slice(0, 100).replace(/[%_,().]/g, '');
+    if (safe) {
+      query = query.or(`display_name.ilike.%${safe}%,username.ilike.%${safe}%,primary_wallet.ilike.%${safe}%,real_name.ilike.%${safe}%,ign.ilike.%${safe}%,ens_name.ilike.%${safe}%`);
+    }
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query;
 
   if (error) {
     console.error('Failed to fetch users:', error);
@@ -45,7 +53,7 @@ export async function GET(req: NextRequest) {
 
   const users = data || [];
 
-  return NextResponse.json({ users });
+  return NextResponse.json({ users, total: count ?? users.length, limit, offset });
 }
 
 /**

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 
 interface User {
   id: string;
@@ -44,7 +45,7 @@ export function ZidManager() {
         const data = await res.json();
         setUsers(data.users || []);
       }
-    } catch {} finally {
+    } catch (err) { console.error('[ZidManager] fetch users:', err); } finally {
       setLoading(false);
     }
   }, []);
@@ -61,7 +62,7 @@ export function ZidManager() {
         }
         setRespectMap(map);
       }
-    } catch {} finally {
+    } catch (err) { console.error('[ZidManager] fetch respect:', err); } finally {
       setRespectLoading(false);
     }
   }, []);
@@ -193,7 +194,7 @@ export function ZidManager() {
               return (
                 <div key={user.id} className="flex items-center gap-3 bg-[#1a2a3a] rounded-xl px-4 py-3 border border-green-500/20">
                   {user.pfp_url ? (
-                    <img src={user.pfp_url} alt="" className="w-9 h-9 rounded-full flex-shrink-0" />
+                    <Image src={user.pfp_url} alt="" width={36} height={36} className="rounded-full flex-shrink-0" />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                       {user.primary_wallet.slice(2, 4)}
@@ -252,7 +253,7 @@ export function ZidManager() {
                     #{user.zid}
                   </span>
                   {user.pfp_url ? (
-                    <img src={user.pfp_url} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
+                    <Image src={user.pfp_url} alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                       {user.primary_wallet.slice(2, 4)}
@@ -290,7 +291,7 @@ export function ZidManager() {
             {noRespectNoZid.map((user) => (
               <div key={user.id} className="flex items-center gap-3 bg-[#1a2a3a]/50 rounded-xl px-4 py-2.5 opacity-60">
                 {user.pfp_url ? (
-                  <img src={user.pfp_url} alt="" className="w-8 h-8 rounded-full flex-shrink-0" />
+                  <Image src={user.pfp_url} alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                     {user.primary_wallet.slice(2, 4)}

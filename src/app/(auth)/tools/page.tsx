@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 
@@ -78,7 +79,7 @@ export default function ToolsPage() {
           <div className="bg-gradient-to-r from-[#0d1b2a] to-[#f5a623]/5 rounded-xl p-6 border border-gray-800">
             <div className="flex items-center gap-4">
               {profile.pfp_url ? (
-                <img src={profile.pfp_url} alt="" className="w-16 h-16 rounded-full" />
+                <Image src={profile.pfp_url} alt="" width={64} height={64} className="rounded-full" />
               ) : (
                 <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center text-xl text-gray-400 font-bold">
                   {profile.display_name?.[0]?.toUpperCase() || '?'}

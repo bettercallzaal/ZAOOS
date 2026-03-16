@@ -162,9 +162,10 @@ export function ChatRoom() {
   // Auto-reconnect XMTP if previously connected
   useEffect(() => {
     if (!user || xmtp.isConnected || xmtp.isConnecting) return;
-    const wallets = typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('zaoos-xmtp-wallets') || '[]')
-      : [];
+    let wallets: string[] = [];
+    if (typeof window !== 'undefined') {
+      try { wallets = JSON.parse(localStorage.getItem('zaoos-xmtp-wallets') || '[]'); } catch { /* corrupted */ }
+    }
     if (wallets.length > 0) {
       xmtp.autoConnect(user.fid);
     }

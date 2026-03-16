@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 
 interface SearchResult {
   hash: string;
@@ -173,10 +174,12 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
               >
                 <div className="flex items-center gap-2 mb-1">
                   {result.author.pfp_url && (
-                    <img
+                    <Image
                       src={result.author.pfp_url}
                       alt=""
-                      className="w-4 h-4 rounded-full"
+                      width={16}
+                      height={16}
+                      className="rounded-full"
                     />
                   )}
                   <span className="text-xs font-medium text-[#f5a623]">

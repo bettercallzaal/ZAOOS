@@ -1,15 +1,8 @@
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
+import { RequestAccessButton } from './RequestAccessButton';
 
 export default function NotAllowedPage() {
-  const requestAccess = () => {
-    const text = encodeURIComponent('@zaal requesting access to ZAO OS!');
-    const url = `https://warpcast.com/~/compose?text=${text}&channelKey=zao`;
-    window.open(url, '_blank');
-  };
-
   return (
     <main className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628] px-6">
       <div className="text-center w-full max-w-md">
@@ -26,12 +19,7 @@ export default function NotAllowedPage() {
           ZAO OS is currently invite-only for ZAO community members.
         </p>
 
-        <button
-          onClick={requestAccess}
-          className="bg-gradient-to-r from-[#f5a623] to-[#ffd700] text-[#0a1628] font-semibold px-6 py-3 rounded-xl text-sm hover:opacity-90 transition-opacity w-full max-w-xs mx-auto block"
-        >
-          Request Access in /zao
-        </button>
+        <RequestAccessButton />
 
         <div className="mt-8">
           <Link

@@ -1,8 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import type { Client, Dm, Group, DecodedMessage } from '@xmtp/browser-sdk';
-import { ConsentState } from '@xmtp/browser-sdk';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = Client<any>;
@@ -278,7 +277,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       convStreamCleanupRef.current = () => { void convStream.end(); };
 
       // Stream ALL messages across ALL conversations
-      const { getMemberProfiles, getPeerProfiles } = await import('@/lib/xmtp/client');
+      const [{ getMemberProfiles, getPeerProfiles }, { ConsentState }] = await Promise.all([
+        import('@/lib/xmtp/client'),
+        import('@xmtp/browser-sdk'),
+      ]);
       const msgStream = await client.conversations.streamAllMessages({
         consentStates: [ConsentState.Allowed],
         onValue: (msg: DecodedMessage) => {
@@ -472,7 +474,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             await Promise.allSettled(batch.map(async (m) => {
               const inboxId = await xmtpClient.fetchInboxIdByIdentifier({
                 identifierKind: IdentifierKind.Ethereum,
-                identifier: m.addresses[0],
+                identifier: m.addresses[0] ?? '',
               });
               if (inboxId) {
                 saveMemberProfile(inboxId, {
@@ -512,7 +514,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         if (!groupExists) {
           try {
             const { IdentifierKind } = await import('@xmtp/browser-sdk');
-            const identifiers = reachableMembers.map((m: ZaoMember) => ({
+            const identifiers = reachableMembers.filter((m: ZaoMember) => m.addresses.length > 0).map((m: ZaoMember) => ({
               identifierKind: IdentifierKind.Ethereum,
               identifier: m.addresses[0],
             }));
@@ -548,8 +550,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
-      const { getOrCreateLocalKey, createLocalSigner, createXMTPClient, saveConnectedWallet } =
-        await import('@/lib/xmtp/client');
+      const [{ getOrCreateLocalKey, createLocalSigner, createXMTPClient, saveConnectedWallet }, { ConsentState }] =
+        await Promise.all([import('@/lib/xmtp/client'), import('@xmtp/browser-sdk')]);
 
       const privateKey = getOrCreateLocalKey(fid);
       const signer = await createLocalSigner(privateKey);
@@ -602,8 +604,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
-      const { createWalletSigner, createXMTPClient, saveConnectedWallet } = await import('@/lib/xmtp/client');
-      const signer = createWalletSigner(address, signMessage);
+      const [{ createWalletSigner, createXMTPClient, saveConnectedWallet }, { ConsentState }] =
+        await Promise.all([import('@/lib/xmtp/client'), import('@xmtp/browser-sdk')]);
+      const signer = await createWalletSigner(address, signMessage);
       const client = await createXMTPClient(signer, normalized);
       primaryClientRef.current = client;
 
@@ -962,6 +965,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, [createDm, selectConversation]);
 
   const refreshConversations = useCallback(async () => {
+    const { ConsentState } = await import('@xmtp/browser-sdk');
     for (const [, wc] of walletsRef.current) {
       await wc.client.conversations.syncAll([ConsentState.Allowed]);
     }
@@ -986,35 +990,41 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const contextValue = useMemo(() => ({
+    connectedWallets,
+    activeWalletCount: connectedWallets.length,
+    isConnecting,
+    connectingWallet,
+    isConnected: connectedWallets.length > 0,
+    error,
+    streamConnected,
+    tabLocked,
+    conversations,
+    activeConversationId,
+    messages,
+    loadingMessages,
+    zaoMembers,
+    loadingMembers,
+    autoConnect,
+    connectWallet,
+    disconnectWallet,
+    disconnectAll,
+    selectConversation,
+    sendMessage,
+    createDm,
+    createGroup,
+    refreshConversations,
+    startDmWithMember,
+  }), [
+    connectedWallets, isConnecting, connectingWallet, error, streamConnected,
+    tabLocked, conversations, activeConversationId, messages, loadingMessages,
+    zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
+    disconnectAll, selectConversation, sendMessage, createDm, createGroup,
+    refreshConversations, startDmWithMember,
+  ]);
+
   return (
-    <XMTPContext.Provider
-      value={{
-        connectedWallets,
-        activeWalletCount: walletsRef.current.size,
-        isConnecting,
-        connectingWallet,
-        isConnected: walletsRef.current.size > 0,
-        error,
-        streamConnected,
-        tabLocked,
-        conversations,
-        activeConversationId,
-        messages,
-        loadingMessages,
-        zaoMembers,
-        loadingMembers,
-        autoConnect,
-        connectWallet,
-        disconnectWallet,
-        disconnectAll,
-        selectConversation,
-        sendMessage,
-        createDm,
-        createGroup,
-        refreshConversations,
-        startDmWithMember,
-      }}
-    >
+    <XMTPContext.Provider value={contextValue}>
       {children}
     </XMTPContext.Provider>
   );

@@ -6,6 +6,7 @@ import {
   useReducer,
   useRef,
   useCallback,
+  useMemo,
   Dispatch,
   ReactNode,
   MutableRefObject,
@@ -114,8 +115,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const value = useMemo(
+    () => ({ state, dispatch, controllers, registerController, onEndedRef }),
+    [state, registerController],
+  );
+
   return (
-    <PlayerContext.Provider value={{ state, dispatch, controllers, registerController, onEndedRef }}>
+    <PlayerContext.Provider value={value}>
       {children}
     </PlayerContext.Provider>
   );

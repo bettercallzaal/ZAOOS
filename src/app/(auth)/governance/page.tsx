@@ -136,7 +136,7 @@ export default function GovernancePage() {
       // Refresh proposals
       const d = await fetch('/api/proposals').then((r) => r.json());
       setProposals(d.proposals || []);
-    } catch {}
+    } catch (err) { console.error('[governance] vote:', err); }
     setVoting(null);
   };
 

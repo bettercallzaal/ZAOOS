@@ -39,6 +39,18 @@ export default function GlobalError({
             >
               Try again
             </button>
+            <a
+              href="/chat"
+              style={{
+                color: '#9ca3af',
+                fontSize: '0.875rem',
+                textDecoration: 'none',
+                marginTop: '0.75rem',
+                display: 'inline-block',
+              }}
+            >
+              Go home
+            </a>
           </div>
         </main>
       </body>

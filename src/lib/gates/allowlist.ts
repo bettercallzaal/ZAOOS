@@ -30,7 +30,7 @@ export async function checkAllowlist(
     const { data: primaryMatch } = await supabaseAdmin
       .from('allowlist')
       .select('*')
-      .ilike('wallet_address', addr)
+      .eq('wallet_address', addr)
       .eq('is_active', true)
       .limit(1)
       .maybeSingle();
@@ -41,7 +41,7 @@ export async function checkAllowlist(
     const { data: custodyMatch } = await supabaseAdmin
       .from('allowlist')
       .select('*')
-      .ilike('custody_address', addr)
+      .eq('custody_address', addr)
       .eq('is_active', true)
       .limit(1)
       .maybeSingle();

@@ -1,5 +1,4 @@
-import { Client, type Signer } from '@xmtp/browser-sdk';
-import { IdentifierKind } from '@xmtp/browser-sdk';
+import type { Client, Signer } from '@xmtp/browser-sdk';
 
 const XMTP_ENV = 'production' as const;
 
@@ -36,10 +35,11 @@ const XMTP_ENV = 'production' as const;
  * ZAO OS does NOT store or access the user's private key — only
  * the signMessage callback provided by the wallet extension.
  */
-export function createWalletSigner(
+export async function createWalletSigner(
   address: `0x${string}`,
   signMessage: (message: string) => Promise<string>
-): Signer {
+): Promise<Signer> {
+  const { IdentifierKind } = await import('@xmtp/browser-sdk');
   return {
     type: 'EOA',
     getIdentifier: () => ({
@@ -65,7 +65,10 @@ export function createWalletSigner(
  * or touches personal wallet private keys.
  */
 export async function createLocalSigner(privateKey: `0x${string}`): Promise<Signer> {
-  const { privateKeyToAccount } = await import('viem/accounts');
+  const [{ privateKeyToAccount }, { IdentifierKind }] = await Promise.all([
+    import('viem/accounts'),
+    import('@xmtp/browser-sdk'),
+  ]);
   const account = privateKeyToAccount(privateKey);
 
   return {
@@ -114,11 +117,13 @@ function getDbEncryptionKey(address: string): Uint8Array {
 /**
  * Create and initialize an XMTP client for a specific wallet
  */
-export async function createXMTPClient(signer: Signer, address: string) {
+export async function createXMTPClient(signer: Signer, address: string): Promise<Client> {
+  const { Client } = await import('@xmtp/browser-sdk');
   const client = await Client.create(signer, {
     env: XMTP_ENV,
     dbEncryptionKey: getDbEncryptionKey(address),
-  } as Parameters<typeof Client.create>[1]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
   return client;
 }
 

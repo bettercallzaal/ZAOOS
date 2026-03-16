@@ -24,6 +24,17 @@ function timeAgo(date?: Date): string {
   return `${days}d`;
 }
 
+function lastSeen(isoDate: string | null): string {
+  if (!isoDate) return '';
+  const seconds = Math.floor((Date.now() - new Date(isoDate).getTime()) / 1000);
+  if (seconds < 300) return 'Active now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  const days = Math.floor(seconds / 86400);
+  if (days < 7) return `${days}d ago`;
+  return new Date(isoDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
 // ── Collapsible section ──────────────────────────────────────────────────────
 
 function SidebarSection({
@@ -387,9 +398,9 @@ export function Sidebar({
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium truncate">{member.displayName}</p>
-                        {member.username && (
-                          <p className="text-[10px] text-gray-500 truncate">@{member.username}</p>
-                        )}
+                        <p className="text-[10px] text-gray-500 truncate">
+                          {member.lastLoginAt ? lastSeen(member.lastLoginAt) : (member.username ? `@${member.username}` : '')}
+                        </p>
                       </div>
                     </button>
                   ))}

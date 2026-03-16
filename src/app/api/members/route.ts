@@ -77,6 +77,20 @@ export async function GET() {
     }
   }
 
+  // Fetch last_login_at from users table for all members with FIDs
+  const fidsForLogin = (data || []).map((m) => m.fid).filter(Boolean);
+  const loginMap = new Map<number, string>();
+  if (fidsForLogin.length > 0) {
+    const { data: userData } = await supabaseAdmin
+      .from('users')
+      .select('fid, last_login_at')
+      .in('fid', fidsForLogin)
+      .not('last_login_at', 'is', null);
+    for (const u of userData || []) {
+      if (u.fid && u.last_login_at) loginMap.set(u.fid, u.last_login_at);
+    }
+  }
+
   const members = (data || []).map((m) => {
     const enriched = m.fid ? enrichMap.get(m.fid) : undefined;
     return {
@@ -89,6 +103,7 @@ export async function GET() {
         m.custody_address,
         ...((m.verified_addresses as string[]) || []),
       ].filter(Boolean) as string[],
+      lastLoginAt: m.fid ? (loginMap.get(m.fid) || null) : null,
     };
   });
 

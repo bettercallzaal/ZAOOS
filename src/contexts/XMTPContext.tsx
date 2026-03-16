@@ -20,6 +20,7 @@ export interface ZaoMember {
   pfpUrl: string | null;
   addresses: string[];
   reachable: boolean;
+  lastLoginAt: string | null;  // ISO timestamp
 }
 
 interface XMTPContextValue {
@@ -487,13 +488,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       }
 
       const mapped: ZaoMember[] = merged
-        .map((m: { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[] }, idx: number) => ({
+        .map((m: { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[]; lastLoginAt?: string | null }, idx: number) => ({
           fid: m.fid,
           username: m.username,
           displayName: m.displayName,
           pfpUrl: m.pfpUrl,
           addresses: m.addresses,
           reachable: reachableSet.has(idx),
+          lastLoginAt: m.lastLoginAt || null,
         }))
         .sort((a: ZaoMember, b: ZaoMember) => {
           if (a.reachable !== b.reachable) return a.reachable ? -1 : 1;

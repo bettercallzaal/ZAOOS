@@ -29,6 +29,7 @@ interface XMTPContextValue {
   connectingWallet: string | null;
   isConnected: boolean;
   error: string | null;
+  actionError: string | null; // transient errors from DM/group creation (auto-dismiss)
   streamConnected: boolean;
   tabLocked: boolean;
 
@@ -53,7 +54,9 @@ interface XMTPContextValue {
   refreshConversations: () => Promise<void>;
   startDmWithMember: (member: ZaoMember) => Promise<void>;
   clearError: () => void;
+  clearActionError: () => void;
   reconnectStreams: () => Promise<void>;
+  removeConversation: (id: string) => void;
 }
 
 const XMTPContext = createContext<XMTPContextValue | null>(null);
@@ -90,6 +93,13 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const actionErrorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showActionError = useCallback((msg: string) => {
+    if (actionErrorTimerRef.current) clearTimeout(actionErrorTimerRef.current);
+    setActionError(msg);
+    actionErrorTimerRef.current = setTimeout(() => setActionError(null), 5000);
+  }, []);
   const [streamConnected, setStreamConnected] = useState(false);
   const [conversations, setConversations] = useState<XMTPConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
@@ -947,10 +957,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       return conv.id;
     } catch (err) {
       console.error('[XMTP] Failed to create DM:', err);
-      setError('Failed to start conversation. The recipient may not have XMTP enabled.');
+      showActionError('Failed to start conversation. The recipient may not have XMTP enabled.');
       return null;
     }
-  }, [getFirstClient, loadAllConversations]);
+  }, [getFirstClient, loadAllConversations, showActionError]);
 
   const createGroup = useCallback(async (name: string, members: { address: `0x${string}`; profile?: XMTPPeerProfile }[]) => {
     const client = getFirstClient();
@@ -989,10 +999,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       return conv.id;
     } catch (err) {
       console.error('[XMTP] Failed to create group:', err);
-      setError('Failed to create group. Some members may not have XMTP enabled.');
+      showActionError('Failed to create group. Some members may not have XMTP enabled.');
       return null;
     }
-  }, [getFirstClient, loadAllConversations]);
+  }, [getFirstClient, loadAllConversations, showActionError]);
 
   const startDmWithMember = useCallback(async (member: ZaoMember) => {
     if (member.addresses.length === 0) return;
@@ -1021,6 +1031,28 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
    */
   const clearError = useCallback(() => {
     setError(null);
+  }, []);
+
+  const clearActionError = useCallback(() => {
+    if (actionErrorTimerRef.current) clearTimeout(actionErrorTimerRef.current);
+    setActionError(null);
+  }, []);
+
+  /**
+   * Remove a conversation from the local list (hide it).
+   * Does not delete on the XMTP network — just removes from UI.
+   */
+  const removeConversation = useCallback((id: string) => {
+    setConversations((prev) => prev.filter((c) => c.id !== id));
+    if (activeConvIdRef.current === id) {
+      setActiveConversationId(null);
+      activeConvIdRef.current = null;
+      activeConvWalletRef.current = null;
+      setMessages([]);
+      messageIdSetRef.current.clear();
+    }
+    lastMessagesRef.current.delete(id);
+    unreadCountsRef.current.delete(id);
   }, []);
 
   /**
@@ -1058,6 +1090,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         clearTimeout(reconnectTimerRef.current);
         reconnectTimerRef.current = null;
       }
+      if (actionErrorTimerRef.current) {
+        clearTimeout(actionErrorTimerRef.current);
+        actionErrorTimerRef.current = null;
+      }
       convStreamCleanupRef.current?.();
       msgStreamCleanupRef.current?.();
       streamsActiveRef.current = false;
@@ -1075,6 +1111,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     connectingWallet,
     isConnected: connectedWallets.length > 0,
     error,
+    actionError,
     streamConnected,
     tabLocked,
     reconnecting,
@@ -1095,13 +1132,16 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     refreshConversations,
     startDmWithMember,
     clearError,
+    clearActionError,
     reconnectStreams,
+    removeConversation,
   }), [
-    connectedWallets, isConnecting, connectingWallet, error, streamConnected,
+    connectedWallets, isConnecting, connectingWallet, error, actionError, streamConnected,
     tabLocked, reconnecting, conversations, activeConversationId, messages, loadingMessages,
     zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
     disconnectAll, selectConversation, sendMessage, createDm, createGroup,
-    refreshConversations, startDmWithMember, clearError, reconnectStreams,
+    refreshConversations, startDmWithMember, clearError, clearActionError, reconnectStreams,
+    removeConversation,
   ]);
 
   return (

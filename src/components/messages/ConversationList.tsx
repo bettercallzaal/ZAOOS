@@ -22,6 +22,7 @@ interface ConversationListProps {
   onSelect: (id: string) => void;
   onNewDm: () => void;
   onNewGroup: () => void;
+  onRemove?: (id: string) => void;
 }
 
 export function ConversationList({
@@ -30,8 +31,10 @@ export function ConversationList({
   onSelect,
   onNewDm,
   onNewGroup,
+  onRemove,
 }: ConversationListProps) {
   const [filter, setFilter] = useState<'all' | 'dms' | 'groups'>('all');
+  const [swipedId, setSwipedId] = useState<string | null>(null);
 
   const filtered = conversations.filter((c) => {
     if (filter === 'dms') return c.type === 'dm';
@@ -101,63 +104,84 @@ export function ConversationList({
           </div>
         ) : (
           filtered.map((conv) => (
-            <button
-              key={conv.id}
-              onClick={() => onSelect(conv.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-                activeId === conv.id
-                  ? 'bg-[#f5a623]/10 border-l-2 border-[#f5a623]'
-                  : 'hover:bg-white/[0.03] border-l-2 border-transparent'
-              }`}
-            >
-              {/* Avatar */}
-              {conv.imageUrl ? (
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 relative">
-                  <Image src={conv.imageUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" unoptimized />
-                </div>
-              ) : conv.peerPfpUrl ? (
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 relative">
-                  <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" unoptimized />
-                </div>
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                  {conv.type === 'group' ? (
-                    <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                    </svg>
-                  ) : (
-                    <span className="text-sm text-gray-400 font-medium">
-                      {(conv.peerDisplayName || conv.name || '?')[0]?.toUpperCase()}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-white truncate">
-                    {conv.type === 'group' && <span className="text-gray-500 mr-1">#</span>}
-                    {conv.peerDisplayName || conv.name}
-                  </p>
-                  {conv.lastMessageAt && (
-                    <span className="text-xs text-gray-600 flex-shrink-0">
-                      {timeAgo(conv.lastMessageAt)}
-                    </span>
-                  )}
-                </div>
-                {conv.lastMessage && (
-                  <p className="text-xs text-gray-500 truncate mt-0.5">{conv.lastMessage}</p>
+            <div key={conv.id} className="relative group">
+              <button
+                onClick={() => { setSwipedId(null); onSelect(conv.id); }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setSwipedId(swipedId === conv.id ? null : conv.id);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
+                  activeId === conv.id
+                    ? 'bg-[#f5a623]/10 border-l-2 border-[#f5a623]'
+                    : 'hover:bg-white/[0.03] border-l-2 border-transparent'
+                }`}
+              >
+                {/* Avatar */}
+                {conv.imageUrl ? (
+                  <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 relative">
+                    <Image src={conv.imageUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" unoptimized />
+                  </div>
+                ) : conv.peerPfpUrl ? (
+                  <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 relative">
+                    <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" unoptimized />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                    {conv.type === 'group' ? (
+                      <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                      </svg>
+                    ) : (
+                      <span className="text-sm text-gray-400 font-medium">
+                        {(conv.peerDisplayName || conv.name || '?')[0]?.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
                 )}
-              </div>
 
-              {/* Unread badge */}
-              {conv.unreadCount > 0 && (
-                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623] text-black text-xs font-bold flex items-center justify-center">
-                  {conv.unreadCount}
-                </span>
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-white truncate">
+                      {conv.type === 'group' && <span className="text-gray-500 mr-1">#</span>}
+                      {conv.peerDisplayName || conv.name}
+                    </p>
+                    {conv.lastMessageAt && (
+                      <span className="text-xs text-gray-600 flex-shrink-0">
+                        {timeAgo(conv.lastMessageAt)}
+                      </span>
+                    )}
+                  </div>
+                  {conv.lastMessage && (
+                    <p className="text-xs text-gray-500 truncate mt-0.5">{conv.lastMessage}</p>
+                  )}
+                </div>
+
+                {/* Unread badge */}
+                {conv.unreadCount > 0 && (
+                  <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#f5a623] text-black text-xs font-bold flex items-center justify-center">
+                    {conv.unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Remove button — visible on hover (desktop) or context menu (mobile) */}
+              {onRemove && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); setSwipedId(null); onRemove(conv.id); }}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition-all ${
+                    swipedId === conv.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                  aria-label="Remove conversation"
+                  title="Remove from list"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               )}
-            </button>
+            </div>
           ))
         )}
       </div>

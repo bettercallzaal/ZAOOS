@@ -221,6 +221,22 @@ export function ChatRoom() {
 
   return (
     <div className="flex h-[100dvh] pb-14 md:pb-0 md:h-[calc(100dvh-2.5rem)] bg-[#0a1628] text-white overflow-hidden">
+      {/* Action error toast (DM/group creation) */}
+      {xmtp.actionError && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[80] max-w-sm w-full mx-4">
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/15 border border-red-500/30 shadow-lg backdrop-blur-sm">
+            <svg className="w-4 h-4 text-red-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+            </svg>
+            <span className="text-sm text-red-300 flex-1">{xmtp.actionError}</span>
+            <button onClick={xmtp.clearActionError} className="text-red-400/60 hover:text-red-400" aria-label="Dismiss">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
       <Sidebar
         user={user}
         isOpen={sidebarOpen}

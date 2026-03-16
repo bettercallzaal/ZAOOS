@@ -181,7 +181,20 @@ export function YoutubeProvider({ children }: { children: ReactNode }) {
         initPlayer();
       };
     }
+
+    return () => stopProgress();
   }, [state.metadata?.url, state.status, state.metadata?.type]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopProgress();
+      if (playerRef.current) {
+        playerRef.current.destroy();
+        playerRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <>

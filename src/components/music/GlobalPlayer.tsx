@@ -315,7 +315,7 @@ export function GlobalPlayer({
 
             <button
               onClick={onNext}
-              disabled={!hasNext}
+              disabled={!hasNext && player.repeat === 'off'}
               className="text-gray-400 p-1.5 disabled:opacity-30"
               aria-label="Next"
             >

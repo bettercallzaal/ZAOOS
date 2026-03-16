@@ -40,7 +40,18 @@ interface MusicQueueTrackCardProps {
 }
 
 // Simple module-level cache so cards don't re-fetch what MusicEmbed already loaded
+// Capped at 200 entries — oldest evicted first
+const MAX_CACHE = 200;
 const metadataCache = new Map<string, TrackMetadata>();
+
+function cacheSet(key: string, value: TrackMetadata) {
+  if (metadataCache.size >= MAX_CACHE) {
+    // Delete the oldest entry (first key in Map iteration order)
+    const firstKey = metadataCache.keys().next().value;
+    if (firstKey) metadataCache.delete(firstKey);
+  }
+  metadataCache.set(key, value);
+}
 
 export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
   url,
@@ -66,7 +77,7 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
       .then((data: TrackMetadata | null) => {
         if (!cancelled && data) {
           const full = { ...data, feedId: castHash };
-          metadataCache.set(url, full);
+          cacheSet(url, full);
           setMetadata(full);
         }
       })

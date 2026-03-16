@@ -12,11 +12,26 @@ const publicClient = createPublicClient({
   transport: http(),
 });
 
+// In-memory nonce store with expiry (5 min TTL, max 10k entries)
+const NONCE_TTL = 5 * 60 * 1000;
+const MAX_NONCES = 10_000;
+const nonceStore = new Map<string, number>(); // nonce → created timestamp
+
+function pruneNonces() {
+  if (nonceStore.size <= MAX_NONCES) return;
+  const now = Date.now();
+  for (const [n, ts] of nonceStore) {
+    if (now - ts > NONCE_TTL) nonceStore.delete(n);
+  }
+}
+
 /**
  * GET — Generate a nonce for SIWE
  */
 export async function GET() {
+  pruneNonces();
   const nonce = crypto.randomUUID().replace(/-/g, '');
+  nonceStore.set(nonce, Date.now());
   return NextResponse.json({ nonce });
 }
 
@@ -36,6 +51,18 @@ export async function POST(req: NextRequest) {
     if (!siweMessage.address) {
       return NextResponse.json({ error: 'Invalid SIWE message' }, { status: 400 });
     }
+
+    // Validate and consume nonce (one-time use)
+    const nonce = siweMessage.nonce;
+    if (!nonce) {
+      return NextResponse.json({ error: 'Missing nonce' }, { status: 400 });
+    }
+    const nonceTs = nonceStore.get(nonce);
+    if (!nonceTs || Date.now() - nonceTs > NONCE_TTL) {
+      nonceStore.delete(nonce);
+      return NextResponse.json({ error: 'Invalid or expired nonce' }, { status: 400 });
+    }
+    nonceStore.delete(nonce); // consume — prevents replay
 
     // Validate domain matches
     const expectedDomain = req.headers.get('host') || '';

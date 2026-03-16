@@ -48,8 +48,15 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
     };
     loadApi();
 
-    // Poll until SC global and iframe are ready
+    // Poll until SC global and iframe are ready (timeout after 30s)
+    let pollCount = 0;
+    const MAX_POLLS = 150; // 150 × 200ms = 30s
     const interval = setInterval(() => {
+      pollCount++;
+      if (pollCount >= MAX_POLLS) {
+        clearInterval(interval);
+        return;
+      }
       if (!window.SC || !iframeRef.current || widgetRef.current) return;
 
       const widget = window.SC.Widget(iframeRef.current);

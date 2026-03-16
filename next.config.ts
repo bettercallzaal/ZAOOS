@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
           "media-src 'self' blob: https:",
           "connect-src 'self' https: wss:",
           "font-src 'self' https:",
-          "frame-src 'self' https://open.spotify.com https://www.youtube.com https://w.soundcloud.com https://embed.sound.xyz https://audius.co https://relay.farcaster.xyz",
+          "frame-src 'self' https://open.spotify.com https://www.youtube.com https://w.soundcloud.com https://embed.sound.xyz https://audius.co https://relay.farcaster.xyz https://app.neynar.com",
           "worker-src 'self' blob:",
           "base-uri 'self'",
           "form-action 'self'",
@@ -52,14 +52,6 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: securityHeaders,
-      },
-      {
-        source: '/chat',
-        headers: [
-          ...securityHeaders,
-          { key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' },
-          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-        ],
       },
       {
         source: '/messages/:path*',

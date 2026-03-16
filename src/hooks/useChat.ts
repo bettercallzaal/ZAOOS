@@ -10,6 +10,7 @@ export function useChat(channel: string = 'zao') {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const firstHashRef = useRef<string | null>(null); // dedup: skip setState if top cast unchanged
 
@@ -56,8 +57,11 @@ export function useChat(channel: string = 'zao') {
     };
   }, [fetchMessages]);
 
+  const clearSendError = useCallback(() => setSendError(null), []);
+
   const sendMessage = useCallback(async (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[]) => {
     setSending(true);
+    setSendError(null);
     try {
       const res = await fetch('/api/chat/send', {
         method: 'POST',
@@ -95,7 +99,9 @@ export function useChat(channel: string = 'zao') {
         fetchMessages();
       }, 800);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send');
+      const msg = err instanceof Error ? err.message : 'Failed to send';
+      setError(msg);
+      setSendError(msg);
       throw err;
     } finally {
       setSending(false);
@@ -113,5 +119,5 @@ export function useChat(channel: string = 'zao') {
     await fetchMessages();
   }, [fetchMessages]);
 
-  return { messages, loading, sending, error, sendMessage, hideMessage, refetch: fetchMessages };
+  return { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage, refetch: fetchMessages };
 }

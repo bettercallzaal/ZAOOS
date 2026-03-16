@@ -298,12 +298,12 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       {showSchedule && hasSigner && (
         <div className="px-3 pt-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">Schedule for:</span>
+            <span className="text-xs text-gray-500">Schedule ({Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop()}):</span>
             <input
               type="datetime-local"
               value={scheduleTime}
               onChange={(e) => setScheduleTime(e.target.value)}
-              min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)}
+              min={(() => { const d = new Date(Date.now() + 60_000); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; })()}
               className="bg-[#1a2a3a] text-white text-xs rounded-lg px-2 py-1.5 border border-gray-700 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
             />
             <button

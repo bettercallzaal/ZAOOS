@@ -67,13 +67,11 @@ async function refreshFromNeynar(channel: string): Promise<Cast[]> {
       parent_hash: c.parent_hash ?? null,
     }));
 
-    // Fire-and-forget — don't block the response
-    supabaseAdmin
+    // Await the DB write so data is consistent for subsequent reads
+    const { error: upsertErr } = await supabaseAdmin
       .from('channel_casts')
-      .upsert(rows, { onConflict: 'hash' })
-      .then(({ error }) => {
-        if (error) console.error('[messages] upsert error:', error);
-      });
+      .upsert(rows, { onConflict: 'hash' });
+    if (upsertErr) console.error('[messages] upsert error:', upsertErr);
   }
 
   return casts;

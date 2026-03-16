@@ -47,7 +47,7 @@ export function GlobalPlayer({
 
   if (!player.metadata) return null;
 
-  const { metadata, isPlaying, isLoading, position, duration } = player;
+  const { metadata, isPlaying, isLoading, isError, error: playerError, position, duration } = player;
 
   const handlePlayPause = () => {
     if (isPlaying) player.pause();
@@ -69,6 +69,14 @@ export function GlobalPlayer({
               backgroundSize: 'cover',
             }}
           />
+        </div>
+      )}
+
+      {/* Error banner */}
+      {isError && playerError && (
+        <div className="px-4 py-1.5 bg-red-900/40 border-b border-red-800/30 flex items-center justify-between relative z-10">
+          <p className="text-xs text-red-300">{playerError}</p>
+          <button onClick={() => player.stop()} className="text-red-400 hover:text-white text-xs ml-3 flex-shrink-0">Dismiss</button>
         </div>
       )}
 

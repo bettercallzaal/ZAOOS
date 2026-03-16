@@ -14,7 +14,7 @@ import { AudioController, TrackMetadata, TrackType } from '@/types/music';
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
-export type PlayerStatus = 'idle' | 'loading' | 'playing' | 'paused';
+export type PlayerStatus = 'idle' | 'loading' | 'playing' | 'paused' | 'error';
 export type RepeatMode = 'off' | 'all' | 'one';
 
 export type PlayerState = {
@@ -24,6 +24,7 @@ export type PlayerState = {
   duration: number; // ms
   shuffle: boolean;
   repeat: RepeatMode;
+  error: string | null;
 };
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
@@ -37,6 +38,7 @@ export type PlayerAction =
   | { type: 'SET_DURATION'; payload: number }
   | { type: 'LOADED' }
   | { type: 'STOP' }
+  | { type: 'ERROR'; payload?: string }
   | { type: 'TOGGLE_SHUFFLE' }
   | { type: 'CYCLE_REPEAT' };
 
@@ -47,12 +49,15 @@ const initial: PlayerState = {
   duration: 0,
   shuffle: false,
   repeat: 'off',
+  error: null,
 };
 
 function reducer(state: PlayerState, action: PlayerAction): PlayerState {
   switch (action.type) {
     case 'PLAY':
-      return { ...initial, status: 'loading', metadata: action.payload };
+      return { ...initial, status: 'loading', metadata: action.payload, error: null };
+    case 'ERROR':
+      return { ...state, status: 'error', error: action.payload || 'Playback failed' };
     case 'PAUSE':
       return state.status === 'playing' ? { ...state, status: 'paused' } : state;
     case 'RESUME':
@@ -66,7 +71,7 @@ function reducer(state: PlayerState, action: PlayerAction): PlayerState {
     case 'SET_DURATION':
       return { ...state, duration: action.payload };
     case 'STOP':
-      return { ...initial, shuffle: state.shuffle, repeat: state.repeat };
+      return { ...initial, shuffle: state.shuffle, repeat: state.repeat, error: null };
     case 'TOGGLE_SHUFFLE':
       return { ...state, shuffle: !state.shuffle };
     case 'CYCLE_REPEAT': {
@@ -132,6 +137,8 @@ export function usePlayer() {
     duration: state.duration,
     isPlaying: state.status === 'playing',
     isLoading: state.status === 'loading',
+    isError: state.status === 'error',
+    error: state.error,
 
     play: (metadata: TrackMetadata) => dispatch({ type: 'PLAY', payload: metadata }),
 

@@ -35,10 +35,22 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
       }
     };
 
+    const onError = () => {
+      const code = audio.error?.code;
+      const messages: Record<number, string> = {
+        1: 'Playback aborted',
+        2: 'Network error — check your connection',
+        3: 'Audio decode failed',
+        4: 'Audio format not supported',
+      };
+      dispatch({ type: 'ERROR', payload: messages[code ?? 0] || 'Audio failed to load' });
+    };
+
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('durationchange', onDurationChange);
     audio.addEventListener('canplay', onCanPlay);
     audio.addEventListener('ended', onEnded);
+    audio.addEventListener('error', onError);
 
     const controller = {
       play: () => audio.play().catch(console.error),
@@ -64,6 +76,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener('durationchange', onDurationChange);
       audio.removeEventListener('canplay', onCanPlay);
       audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('error', onError);
       audioRef.current = null;
     };
   }, [dispatch, registerController]);

@@ -57,12 +57,10 @@ export async function POST(req: NextRequest) {
         parent_hash: parentHash ?? null,
       };
 
-      supabaseAdmin
+      const { error: dbError } = await supabaseAdmin
         .from('channel_casts')
-        .upsert([row], { onConflict: 'hash' })
-        .then(({ error }) => {
-          if (error) console.error('[send] DB insert error:', error);
-        });
+        .upsert([row], { onConflict: 'hash' });
+      if (dbError) console.error('[send] DB insert error:', dbError);
     }
 
     // Cross-post to additional channels (fire and forget)

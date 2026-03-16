@@ -13,19 +13,21 @@ export async function GET(req: NextRequest) {
   }
 
   const unreadOnly = req.nextUrl.searchParams.get('unread_only') === 'true';
+  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50', 10), 100);
+  const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
 
   let query = supabaseAdmin
     .from('notifications')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('recipient_fid', session.fid)
     .order('created_at', { ascending: false })
-    .limit(50);
+    .range(offset, offset + limit - 1);
 
   if (unreadOnly) {
     query = query.eq('read', false);
   }
 
-  const { data, error } = await query;
+  const { data, error, count: totalCount } = await query;
 
   if (error) {
     console.error('Notifications fetch error:', error);
@@ -39,7 +41,13 @@ export async function GET(req: NextRequest) {
     .eq('recipient_fid', session.fid)
     .eq('read', false);
 
-  return NextResponse.json({ notifications: data || [], unreadCount: count || 0 });
+  return NextResponse.json({
+    notifications: data || [],
+    unreadCount: count || 0,
+    total: totalCount ?? (data?.length || 0),
+    limit,
+    offset,
+  });
 }
 
 /**

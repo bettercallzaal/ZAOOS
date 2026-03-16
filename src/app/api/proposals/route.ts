@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
   }
 
   const status = req.nextUrl.searchParams.get('status');
+  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50', 10), 100);
+  const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
 
   let query = supabaseAdmin
     .from('proposals')
@@ -22,14 +24,15 @@ export async function GET(req: NextRequest) {
       author:users!proposals_author_id_fkey(display_name, username, pfp_url, fid, zid),
       votes:proposal_votes(vote, respect_weight),
       comment_count:proposal_comments(count)
-    `)
-    .order('created_at', { ascending: false });
+    `, { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (status) {
     query = query.eq('status', status);
   }
 
-  const { data, error } = await query;
+  const { data, error, count: totalCount } = await query;
 
   if (error) {
     console.error('Proposals fetch error:', error);
@@ -63,7 +66,7 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  return NextResponse.json({ proposals });
+  return NextResponse.json({ proposals, total: totalCount ?? proposals.length, limit, offset });
 }
 
 /**

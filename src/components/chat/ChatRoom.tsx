@@ -36,7 +36,7 @@ export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
   const [activeChannel, setActiveChannel] = useState('zao');
   const player = usePlayer();
-  const { messages, loading, sending, error, sendMessage, hideMessage } = useChat(activeChannel);
+  const { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage } = useChat(activeChannel);
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
@@ -427,9 +427,17 @@ export function ChatRoom() {
               />
 
               {/* Error banner */}
-              {error && (
+              {error && !sendError && (
                 <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0">
                   {error}
+                </div>
+              )}
+
+              {/* Send error banner — dismissable */}
+              {sendError && (
+                <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0 flex items-center justify-between">
+                  <span>Message failed: {sendError}</span>
+                  <button onClick={clearSendError} className="text-red-300 hover:text-white text-xs ml-3 flex-shrink-0">Dismiss</button>
                 </div>
               )}
 

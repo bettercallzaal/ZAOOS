@@ -9,7 +9,7 @@ import { useMobile } from '@/hooks/useMobile';
 import { usePlayer } from '@/providers/audio';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { QuotedCastData } from '@/types';
-import { useXMTPContext } from '@/contexts/XMTPContext';
+import { useXMTPContext, ZaoMember } from '@/contexts/XMTPContext';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
 import { ComposeBar, ComposeBarHandle, ReplyContext } from './ComposeBar';
@@ -136,6 +136,11 @@ export function ChatRoom() {
     setSidebarOpen(false);
   }, [xmtp]);
 
+  const handleStartDmWithMember = useCallback(async (member: ZaoMember) => {
+    await xmtp.startDmWithMember(member);
+    setSidebarOpen(false);
+  }, [xmtp]);
+
   const handleChannelSelect = useCallback((ch: string) => {
     setActiveChannel(ch);
     xmtp.selectConversation(null);
@@ -258,7 +263,7 @@ export function ChatRoom() {
         onNewGroup={() => setDmDialogType('group')}
         zaoMembers={xmtp.zaoMembers}
         loadingMembers={xmtp.loadingMembers}
-        onStartDmWithMember={xmtp.startDmWithMember}
+        onStartDmWithMember={handleStartDmWithMember}
       />
 
       {/* Main chat + music sidebar in a shared flex row */}
@@ -601,7 +606,7 @@ export function ChatRoom() {
         onCreateDm={handleCreateDm}
         onCreateGroup={handleCreateGroup}
         zaoMembers={xmtp.zaoMembers}
-        onStartDmWithMember={xmtp.startDmWithMember}
+        onStartDmWithMember={handleStartDmWithMember}
       />
     </div>
   );

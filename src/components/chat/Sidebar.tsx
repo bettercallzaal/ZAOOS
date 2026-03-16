@@ -117,7 +117,7 @@ export function Sidebar({
   onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
   zaoMembers, loadingMembers, onStartDmWithMember, onGroupInfo,
 }: SidebarProps) {
-  const onlineMembers = zaoMembers.filter((m) => m.reachable);
+  const onlineMembers = zaoMembers.filter((m) => m.reachable && m.lastLoginAt);
   const { isConnected: hasWallet } = useAccount();
   const unreadCount = xmtpConversations.reduce((n, c) => n + c.unreadCount, 0);
   useEscapeClose(onClose, isOpen);

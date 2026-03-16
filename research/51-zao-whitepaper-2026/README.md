@@ -25,6 +25,8 @@ Founded in 2022. Community first, technology second.
 
 The goal for anyone joining the ZAO is straightforward: learn how to create a website, deploy a smart contract, sell something digitally to anyone in the world, and receive that revenue directly. Feed the individual and teach them how to fish.
 
+How do we teach? Everywhere, all the time, by being around. Workshops. One-on-ones. Livestreams. Podcast episodes. Fractal meetings where someone explains what they built that week and the whole group learns from it. There is no curriculum — the community IS the curriculum. You learn by watching others do it, asking questions, and trying it yourself with people who will help you when you get stuck.
+
 ---
 
 ## 2. The Story
@@ -183,6 +185,8 @@ This is not token voting. It is peer evaluation. You cannot buy Respect. You can
 - **No plutocracy** — the person who earns the most Respect isn't the person with the most money, it's the person who adds the most value
 
 This is governance as a practice, not a vote. It's a weekly ritual of showing up, being seen, and seeing others.
+
+**A recent example:** Last week, six people showed up late because of daylight savings time. Instead of canceling, they formed their own group of six and ran the Respect Game at a different time. The system didn't break — it adapted. That's the resilience of fractal governance: you don't need a central coordinator to schedule a meeting. Any group of six can run the game, at any time, anywhere. That moment moved us closer to what an autonomous organization actually looks like — not a DAO in name, but a DAO in practice.
 
 **Origin:** [Fractal governance](https://moreequalanimals.com/) was created by Daniel Larimer ("More Equal Animals," 2021). First implemented as [Eden on EOS](https://edenfractal.com/), then brought to the Optimism Superchain by [Optimystics](https://optimystics.io/) using [Fractalgram](https://github.com/Optimystics/fractalgram). ZAO Fractal is one node in this growing network.
 

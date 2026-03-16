@@ -308,6 +308,19 @@ The entire fractal governance movement traces to **Daniel Larimer** (creator of 
 - **77+ meetings** held
 - "While ZABAL drives the speed, the ZAO fractal provides the structure" — ZABAL Update 3
 
+**Resilience story (March 2026):** Six people showed up late because of daylight savings time. Instead of canceling, they formed their own group and ran the Respect Game at a different time. The system didn't break — it adapted. Any group of six can run the game, at any time, anywhere. This is what an autonomous organization looks like in practice.
+
+### How Education Works
+
+There is no curriculum — the community IS the curriculum. Education happens everywhere, all the time, by being around:
+- **Workshops** — hands-on sessions on specific tools/skills
+- **One-on-ones** — direct mentorship (Eduard, Iman, Jose)
+- **Livestreams** — LTAW3 weekly, B&Z Builds/Streams
+- **Fractal meetings** — someone explains what they built, the whole group learns
+- **Podcast episodes** — 19+ episodes covering web3 topics
+- **Daily newsletter** — 400+ editions of build-in-public documentation
+- You learn by watching others do it, asking questions, and trying it yourself with people who help when you get stuck.
+
 ### Fractal Community Network
 
 | Community | Chain |
@@ -487,6 +500,7 @@ Part of the Ohnahji × ZAO collaboration network alongside LTAW3.
 | **Whitepaper** | [paragraph.com/@thezao/student-loanz-whitepaper](https://paragraph.com/@thezao/student-loanz-whitepaper) |
 | **ZAO-CHELLA** | Gold Sponsor (Art Basel 2024) |
 | **Supporting** | Gemach DAO (Dr. Justin Goldston), SydTek DAO |
+| **Status** | **Paused** — idea needs energy again. On hold while team focuses on WaveWarZ and ZAO OS. |
 
 The team (Hurric4n3IKE, Zaal, Candy) previously collaborated on Student Loanz before shifting focus fully to WaveWarZ when the DApp reached readiness.
 

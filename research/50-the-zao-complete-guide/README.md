@@ -482,7 +482,7 @@ LTAW3 has ended. It has been replaced by **Let's Talk About Ethereum**, which fo
 
 | Detail | Value |
 |--------|-------|
-| **Hosts** | BetterCallZaal + Ohnahji B + EZinCrypto |
+| **Hosts** | BetterCallZaal + Ohnahji B + Maceo |
 | **Schedule** | Wednesdays 6 PM EST |
 | **Platform** | Twitch (bettercallzaal, ohnahji, ezincrypto) |
 | **LTAW3 archive** | [pods.media/lets-talk-about-web3](https://pods.media/lets-talk-about-web3/) |
@@ -588,7 +588,7 @@ Artists the ZAO has collaborated with who remain independent. The community's fo
 
 ### ZAO Cypher (In Progress)
 
-Multi-artist collaboration. Producers: Clejan and GodCloud. Round-robin cypher format (hip-hop tradition). Revenue distributed via [0xSplits](https://splits.org/) on Base.
+Multi-artist collaboration. Producers: Clejan and GodCloud. Featuring AttaBotty and 6 additional artists. Round-robin cypher format (hip-hop tradition). Revenue distributed via [0xSplits](https://splits.org/) on Base.
 
 ---
 
@@ -672,7 +672,8 @@ The surviving projects serve different functions — streaming, fan clubs, event
 | Newsletter editions | 400+ |
 | Paid newsletter supporters | 78 |
 | Fractal meetings completed | 90+ |
-| Core community members | 40 |
+| Founding members | 40 |
+| Active community members | 100+ |
 | LTAW3 seasons completed | 3 |
 | Revenue generated | $10,000+ (festivals + WaveWarZ) |
 | WaveWarZ on-chain volume | $50,000+ |

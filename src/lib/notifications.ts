@@ -7,6 +7,45 @@ interface NotificationToken {
   enabled: boolean;
 }
 
+type NotificationType = 'message' | 'proposal' | 'vote' | 'comment' | 'member' | 'system';
+
+/**
+ * Create in-app notifications for one or more recipients.
+ * These show up in the notification bell feed inside ZAO OS.
+ */
+export async function createInAppNotification(opts: {
+  recipientFids: number[];
+  type: NotificationType;
+  title: string;
+  body: string;
+  href: string;
+  actorFid?: number;
+  actorDisplayName?: string;
+  actorPfpUrl?: string;
+  metadata?: Record<string, unknown>;
+}) {
+  if (opts.recipientFids.length === 0) return;
+
+  const rows = opts.recipientFids.map((fid) => ({
+    recipient_fid: fid,
+    type: opts.type,
+    title: opts.title,
+    body: opts.body,
+    href: opts.href,
+    actor_fid: opts.actorFid || null,
+    actor_display_name: opts.actorDisplayName || null,
+    actor_pfp_url: opts.actorPfpUrl || null,
+    metadata: opts.metadata || {},
+    read: false,
+  }));
+
+  const { error } = await supabaseAdmin.from('notifications').insert(rows);
+  if (error) console.error('In-app notification error:', error);
+}
+
+/**
+ * Send push notification via Farcaster Mini App protocol.
+ */
 export async function sendNotification(
   title: string,
   body: string,

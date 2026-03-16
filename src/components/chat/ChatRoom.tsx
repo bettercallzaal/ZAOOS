@@ -28,6 +28,7 @@ import { MusicSidebar } from '@/components/music/MusicSidebar';
 import { SongSubmit } from '@/components/music/SongSubmit';
 import { useMusicQueue } from '@/hooks/useMusicQueue';
 import { FeedFilters, filterAndSortCasts, ContentFilter, SortMode } from './FeedFilters';
+import { NotificationBell } from '@/components/navigation/NotificationBell';
 
 export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
@@ -367,6 +368,8 @@ export function ChatRoom() {
                     <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#f5a623]" />
                   )}
                 </button>
+
+                <NotificationBell />
               </>
             )}
           </header>

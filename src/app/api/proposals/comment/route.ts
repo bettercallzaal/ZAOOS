@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { createInAppNotification } from '@/lib/notifications';
 
 /**
  * GET — Get comments for a proposal
@@ -75,6 +76,29 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) throw error;
+
+    // Notify proposal author about the comment (fire and forget)
+    Promise.resolve(
+      supabaseAdmin
+        .from('proposals')
+        .select('author_id, title, users!proposals_author_id_fkey(fid)')
+        .eq('id', proposal_id)
+        .single()
+    ).then(({ data: p }) => {
+      const authorFid = (p?.users as unknown as { fid: number } | null)?.fid;
+      if (authorFid && authorFid !== session.fid) {
+        createInAppNotification({
+          recipientFids: [authorFid],
+          type: 'comment',
+          title: 'New Comment',
+          body: `${session.displayName} commented on "${(p?.title as string || '').slice(0, 60)}"`,
+          href: '/governance',
+          actorFid: session.fid,
+          actorDisplayName: session.displayName,
+          actorPfpUrl: session.pfpUrl,
+        }).catch(() => {});
+      }
+    }).catch(() => {});
 
     return NextResponse.json({ comment });
   } catch (err) {

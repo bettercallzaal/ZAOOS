@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { NotificationBell } from '@/components/navigation/NotificationBell';
 
 interface RespectEntry {
   rank: number;
@@ -145,7 +146,10 @@ export default function GovernancePage() {
       <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-sm text-gray-300">Governance</h2>
-          <Link href="/chat" className="text-xs text-gray-500 hover:text-white">Back to Chat</Link>
+          <div className="flex items-center gap-2">
+            <div className="md:hidden"><NotificationBell /></div>
+            <Link href="/chat" className="text-xs text-gray-500 hover:text-white md:hidden">Back to Chat</Link>
+          </div>
         </div>
         {/* Tab switcher */}
         <div className="flex gap-1 mt-3">

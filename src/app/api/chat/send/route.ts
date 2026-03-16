@@ -3,7 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { postCast } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { sendMessageSchema } from '@/lib/validation/schemas';
-import { sendNotification } from '@/lib/notifications';
+import { sendNotification, createInAppNotification } from '@/lib/notifications';
 import { communityConfig } from '@/../community.config';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
       ).catch(() => {});
     }
 
-    // Send notification to other users (fire and forget)
+    // Send push + in-app notifications (fire and forget)
     const channelList = [...channels].map((c) => `#${c}`).join(', ');
     const preview = text.length > 80 ? text.slice(0, 80) + '...' : text;
     sendNotification(
@@ -104,6 +104,28 @@ export async function POST(req: NextRequest) {
       `msg-${Date.now()}-${session.fid}`,
       session.fid // exclude sender
     ).catch(() => {});
+
+    // In-app notification for all other active members
+    Promise.resolve(
+      supabaseAdmin
+        .from('users')
+        .select('fid')
+        .eq('is_active', true)
+        .neq('fid', session.fid)
+    ).then(({ data: members }) => {
+      if (members?.length) {
+        createInAppNotification({
+          recipientFids: members.map((m) => m.fid).filter(Boolean),
+          type: 'message',
+          title: `${session.displayName} in ${channelList}`,
+          body: preview,
+          href: '/chat',
+          actorFid: session.fid,
+          actorDisplayName: session.displayName,
+          actorPfpUrl: session.pfpUrl,
+        }).catch(() => {});
+      }
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

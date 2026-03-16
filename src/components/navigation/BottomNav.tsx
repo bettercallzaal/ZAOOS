@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { communityConfig } from '@/../community.config';
+import { NotificationBell } from './NotificationBell';
 
 const TABS = [
   {
@@ -69,7 +70,7 @@ export function BottomNav() {
           >
             {communityConfig.name}
           </span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-1">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -89,6 +90,7 @@ export function BottomNav() {
               );
             })}
           </div>
+          <NotificationBell />
         </div>
       </nav>
 

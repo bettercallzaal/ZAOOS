@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { createInAppNotification, sendNotification } from '@/lib/notifications';
 
 /**
  * GET — List proposals with vote tallies
@@ -107,6 +108,36 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) throw error;
+
+    // Notify all active members about the new proposal (fire and forget)
+    Promise.resolve(
+      supabaseAdmin
+        .from('users')
+        .select('fid')
+        .eq('is_active', true)
+        .neq('fid', session.fid)
+    ).then(({ data: members }) => {
+      if (members?.length) {
+        const fids = members.map((m) => m.fid).filter(Boolean);
+        createInAppNotification({
+          recipientFids: fids,
+          type: 'proposal',
+          title: 'New Proposal',
+          body: title.trim().slice(0, 100),
+          href: '/governance',
+          actorFid: session.fid,
+          actorDisplayName: session.displayName,
+          actorPfpUrl: session.pfpUrl,
+        }).catch(() => {});
+        sendNotification(
+          'New Proposal',
+          `${session.displayName}: ${title.trim().slice(0, 80)}`,
+          'https://zaoos.com/governance',
+          `proposal-${proposal.id}`,
+          session.fid
+        ).catch(() => {});
+      }
+    }).catch(() => {});
 
     return NextResponse.json({ proposal });
   } catch (err) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { NotificationBell } from '@/components/navigation/NotificationBell';
 
 interface UserProfile {
   zid: number | null;
@@ -51,7 +52,10 @@ export default function ToolsPage() {
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
         <h2 className="font-semibold text-sm text-gray-300">Tools</h2>
-        <Link href="/chat" className="text-xs text-gray-500 hover:text-white">Back to Chat</Link>
+        <div className="flex items-center gap-2">
+          <div className="md:hidden"><NotificationBell /></div>
+          <Link href="/chat" className="text-xs text-gray-500 hover:text-white md:hidden">Back to Chat</Link>
+        </div>
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">

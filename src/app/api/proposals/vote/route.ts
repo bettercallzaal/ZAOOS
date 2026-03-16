@@ -3,6 +3,7 @@ import { createPublicClient, http, parseAbi, formatEther } from 'viem';
 import { optimism } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { createInAppNotification } from '@/lib/notifications';
 
 const OG_RESPECT = '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as const;
 const ZOR_RESPECT = '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c' as const;
@@ -102,6 +103,29 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) throw error;
+
+    // Notify the proposal author about the vote (fire and forget)
+    Promise.resolve(
+      supabaseAdmin
+        .from('proposals')
+        .select('author_id, title, users!proposals_author_id_fkey(fid)')
+        .eq('id', proposal_id)
+        .single()
+    ).then(({ data: p }) => {
+      const authorFid = (p?.users as unknown as { fid: number } | null)?.fid;
+      if (authorFid && authorFid !== session.fid) {
+        createInAppNotification({
+          recipientFids: [authorFid],
+          type: 'vote',
+          title: `Vote: ${vote}`,
+          body: `${session.displayName} voted ${vote} on "${(p?.title as string || '').slice(0, 60)}"`,
+          href: '/governance',
+          actorFid: session.fid,
+          actorDisplayName: session.displayName,
+          actorPfpUrl: session.pfpUrl,
+        }).catch(() => {});
+      }
+    }).catch(() => {});
 
     return NextResponse.json({ vote: voteData, respectWeight });
   } catch (err) {

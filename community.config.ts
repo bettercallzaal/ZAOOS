@@ -20,7 +20,7 @@ export const communityConfig = {
   // ── Farcaster ─────────────────────────────────────────────────
   farcaster: {
     appFid: 19640,
-    channels: ['zao', 'zabal', 'cocconcertz'],
+    channels: ['zao', 'zabal', 'cocconcertz', 'wavewarz'],
     defaultChannel: 'zao',
   },
 

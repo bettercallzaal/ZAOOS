@@ -135,7 +135,7 @@ export function Sidebar({
         <div className="flex-1 overflow-y-auto py-1">
 
           {/* ── Channels ──────────────────────────────────────────────── */}
-          <SidebarSection title="Channels">
+          <SidebarSection title="Farcaster Channels">
             {CHANNELS.map((ch) => (
               <button
                 key={ch.id}

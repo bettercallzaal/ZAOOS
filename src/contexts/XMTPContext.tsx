@@ -524,7 +524,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             await Promise.allSettled(batch.map(async (m) => {
               const inboxId = await xmtpClient.fetchInboxIdByIdentifier({
                 identifierKind: IdentifierKind.Ethereum,
-                identifier: m.addresses[0] ?? '',
+                identifier: m.xmtpAddress || m.addresses[0] || '',
               });
               if (inboxId) {
                 saveMemberProfile(inboxId, {
@@ -566,7 +566,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             const { IdentifierKind } = await import('@xmtp/browser-sdk');
             const identifiers = reachableMembers.filter((m: ZaoMember) => m.addresses.length > 0).map((m: ZaoMember) => ({
               identifierKind: IdentifierKind.Ethereum,
-              identifier: m.addresses[0],
+              identifier: m.xmtpAddress || m.addresses[0],
             }));
             const conv = await xmtpClient.conversations.createGroupWithIdentifiers(identifiers, {
               groupName: 'ZAO General',
@@ -1089,18 +1089,39 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
       return xmtpMembers.map((m) => {
         const profile = profiles[m.inboxId];
+        if (profile) {
+          return {
+            inboxId: m.inboxId,
+            displayName: profile.displayName,
+            pfpUrl: profile.pfpUrl || '',
+            username: profile.username,
+          };
+        }
+        // Fallback: cross-reference accountIdentifiers with zaoMembers
+        const addresses = (m.accountIdentifiers ?? []).map((id: { identifier: string }) => id.identifier.toLowerCase());
+        const matched = zaoMembers.find((zm) =>
+          zm.addresses.some((a) => addresses.includes(a.toLowerCase()))
+        );
+        if (matched) {
+          return {
+            inboxId: m.inboxId,
+            displayName: matched.displayName,
+            pfpUrl: matched.pfpUrl ?? '',
+            username: matched.username ?? matched.displayName,
+          };
+        }
         return {
           inboxId: m.inboxId,
-          displayName: profile?.displayName || m.inboxId.slice(0, 8),
-          pfpUrl: profile?.pfpUrl || '',
-          username: profile?.username,
+          displayName: m.inboxId.slice(0, 8),
+          pfpUrl: '',
+          username: undefined,
         };
       });
     } catch (err) {
       console.error('[XMTP] Failed to get group members:', err);
       return [];
     }
-  }, [findClientForConversation]);
+  }, [findClientForConversation, zaoMembers]);
 
   /**
    * Manually reconnect streams (user-initiated).

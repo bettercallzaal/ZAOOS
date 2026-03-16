@@ -67,40 +67,12 @@ export async function POST(req: NextRequest) {
       signerUuid: null,
     });
 
-    // Upsert user record in users table
+    // Upsert user record — atomic to prevent race conditions on concurrent logins
     try {
       const wallet = (primaryWallet || '').toLowerCase();
       if (wallet) {
-        const { data: existingByWallet } = await supabaseAdmin
-          .from('users')
-          .select('id')
-          .eq('primary_wallet', wallet)
-          .single();
-
-        const { data: existingByFid } = !existingByWallet
-          ? await supabaseAdmin.from('users').select('id').eq('fid', fid).single()
-          : { data: null };
-
-        const existing = existingByWallet || existingByFid;
-
-        if (existing) {
-          await supabaseAdmin
-            .from('users')
-            .update({
-              fid,
-              username: user.username,
-              display_name: user.display_name,
-              pfp_url: user.pfp_url,
-              custody_address: custodyAddress,
-              verified_addresses: verifiedAddresses,
-              bio: user.profile?.bio?.text || null,
-              role: 'member',
-              last_login_at: new Date().toISOString(),
-              ...(wallet ? { primary_wallet: wallet } : {}),
-            })
-            .eq('id', existing.id);
-        } else {
-          await supabaseAdmin.from('users').insert({
+        await supabaseAdmin.from('users').upsert(
+          {
             primary_wallet: wallet,
             fid,
             username: user.username,
@@ -111,8 +83,9 @@ export async function POST(req: NextRequest) {
             bio: user.profile?.bio?.text || null,
             role: 'member',
             last_login_at: new Date().toISOString(),
-          });
-        }
+          },
+          { onConflict: 'primary_wallet' }
+        );
       }
     } catch (err) {
       console.error('[Auth] Failed to upsert user record:', err);

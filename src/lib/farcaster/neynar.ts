@@ -96,6 +96,20 @@ export async function getUserByFid(fid: number, viewerFid?: number) {
   return data.users?.[0] || null;
 }
 
+export async function getUsersByFids(fids: number[]) {
+  if (!fids.length) return [];
+  const params = new URLSearchParams({ fids: fids.join(',') });
+  const res = await fetch(`${NEYNAR_BASE}/user/bulk?${params}`, {
+    headers: headers(),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar bulk user error ${res.status}: ${body.slice(0, 200)}`);
+  }
+  const data = await res.json();
+  return data.users || [];
+}
+
 export async function getUserByAddress(address: string) {
   const res = await fetch(`${NEYNAR_BASE}/user/bulk-by-address?addresses=${address}`, {
     headers: headers(),

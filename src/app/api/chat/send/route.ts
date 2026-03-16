@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
               }], { onConflict: 'hash' });
           }
         })
-      ).catch(() => {});
+      ).catch((err) => console.error('[notify]', err));
     }
 
     // Send push + in-app notifications (fire and forget)
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
       `https://zaoos.com/chat`,
       `msg-${Date.now()}-${session.fid}`,
       session.fid // exclude sender
-    ).catch(() => {});
+    ).catch((err) => console.error('[notify]', err));
 
     // In-app notification for all other active members
     Promise.resolve(
@@ -121,9 +121,9 @@ export async function POST(req: NextRequest) {
           actorFid: session.fid,
           actorDisplayName: session.displayName,
           actorPfpUrl: session.pfpUrl,
-        }).catch(() => {});
+        }).catch((err) => console.error('[notify]', err));
       }
-    }).catch(() => {});
+    }).catch((err) => console.error('[notify]', err));
 
     return NextResponse.json({
       success: true,

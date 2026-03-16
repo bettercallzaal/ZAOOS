@@ -123,9 +123,9 @@ export async function POST(req: NextRequest) {
           actorFid: session.fid,
           actorDisplayName: session.displayName,
           actorPfpUrl: session.pfpUrl,
-        }).catch(() => {});
+        }).catch((err) => console.error('[notify]', err));
       }
-    }).catch(() => {});
+    }).catch((err) => console.error('[notify]', err));
 
     return NextResponse.json({ vote: voteData, respectWeight });
   } catch (err) {

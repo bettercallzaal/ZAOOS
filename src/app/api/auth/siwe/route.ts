@@ -124,26 +124,10 @@ export async function POST(req: NextRequest) {
       pfpUrl,
     });
 
-    // Upsert user record in users table
+    // Upsert user record — atomic to prevent race conditions on concurrent logins
     try {
-      const { data: existing } = await supabaseAdmin
-        .from('users')
-        .select('id')
-        .eq('primary_wallet', walletAddress)
-        .single();
-
-      if (existing) {
-        // Update last login
-        await supabaseAdmin
-          .from('users')
-          .update({
-            last_login_at: new Date().toISOString(),
-            ...(fid ? { fid, username, display_name: displayName, pfp_url: pfpUrl } : {}),
-          })
-          .eq('id', existing.id);
-      } else {
-        // Create new user record
-        await supabaseAdmin.from('users').insert({
+      await supabaseAdmin.from('users').upsert(
+        {
           primary_wallet: walletAddress,
           fid: fid || null,
           username: username || null,
@@ -151,8 +135,9 @@ export async function POST(req: NextRequest) {
           pfp_url: pfpUrl || null,
           role: fid ? 'member' : 'beta',
           last_login_at: new Date().toISOString(),
-        });
-      }
+        },
+        { onConflict: 'primary_wallet' }
+      );
     } catch (err) {
       // Non-critical — session is still valid
       console.error('[Auth] Failed to upsert user record:', err);

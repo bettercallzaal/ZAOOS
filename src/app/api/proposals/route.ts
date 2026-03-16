@@ -131,16 +131,16 @@ export async function POST(req: NextRequest) {
           actorFid: session.fid,
           actorDisplayName: session.displayName,
           actorPfpUrl: session.pfpUrl,
-        }).catch(() => {});
+        }).catch((err) => console.error('[notify]', err));
         sendNotification(
           'New Proposal',
           `${session.displayName}: ${title.trim().slice(0, 80)}`,
           'https://zaoos.com/governance',
           `proposal-${proposal.id}`,
           session.fid
-        ).catch(() => {});
+        ).catch((err) => console.error('[notify]', err));
       }
-    }).catch(() => {});
+    }).catch((err) => console.error('[notify]', err));
 
     return NextResponse.json({ proposal });
   } catch (err) {

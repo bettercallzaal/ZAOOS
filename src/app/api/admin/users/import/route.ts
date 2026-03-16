@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { getUserByFid } from '@/lib/farcaster/neynar';
+import { getUsersByFids } from '@/lib/farcaster/neynar';
 
 /**
  * POST — Import all allowlist entries into the users table.
@@ -30,6 +30,18 @@ export async function POST() {
     const existingWallets = new Set((existingUsers || []).map((u) => u.primary_wallet?.toLowerCase()).filter(Boolean));
     const existingFids = new Set((existingUsers || []).map((u) => u.fid).filter(Boolean));
 
+    // Batch-fetch all Farcaster profiles in one API call (instead of N+1 per entry)
+    const allFids = entries.map((e) => e.fid).filter(Boolean) as number[];
+    const fcUserMap = new Map<number, Record<string, unknown>>();
+    if (allFids.length > 0) {
+      try {
+        const fcUsers = await getUsersByFids(allFids);
+        for (const u of fcUsers) fcUserMap.set(u.fid, u);
+      } catch (err) {
+        console.warn('[import] Batch Farcaster fetch failed, using cached data:', err);
+      }
+    }
+
     let imported = 0;
     let skipped = 0;
     const errors: string[] = [];
@@ -39,17 +51,11 @@ export async function POST() {
         // Determine primary wallet
         let primaryWallet = (entry.wallet_address || entry.custody_address || '').toLowerCase();
         const verifiedAddresses: string[] = entry.verified_addresses || [];
+        const fcUser = entry.fid ? fcUserMap.get(entry.fid) : undefined;
 
-        // If no wallet but has FID, try to get wallet from Farcaster
-        if (!primaryWallet && entry.fid) {
-          try {
-            const fcUser = await getUserByFid(entry.fid);
-            if (fcUser) {
-              primaryWallet = (fcUser.custody_address || fcUser.verified_addresses?.eth_addresses?.[0] || '').toLowerCase();
-            }
-          } catch {
-            // Can't resolve wallet — generate a placeholder
-          }
+        // If no wallet but have Farcaster data, use it
+        if (!primaryWallet && fcUser) {
+          primaryWallet = ((fcUser.custody_address as string) || (fcUser.verified_addresses as { eth_addresses?: string[] })?.eth_addresses?.[0] || '').toLowerCase();
         }
 
         // If still no wallet, use a placeholder keyed on FID
@@ -68,7 +74,7 @@ export async function POST() {
           continue;
         }
 
-        // Fetch fresh Farcaster data if FID available
+        // Use fresh Farcaster data if available
         let bio: string | null = null;
         let freshDisplayName = entry.display_name;
         let freshPfpUrl = entry.pfp_url;
@@ -76,24 +82,17 @@ export async function POST() {
         let custodyAddress = entry.custody_address;
         let freshVerified = verifiedAddresses;
 
-        if (entry.fid) {
-          try {
-            const fcUser = await getUserByFid(entry.fid);
-            if (fcUser) {
-              freshDisplayName = fcUser.display_name || freshDisplayName;
-              freshPfpUrl = fcUser.pfp_url || freshPfpUrl;
-              freshUsername = fcUser.username || freshUsername;
-              custodyAddress = fcUser.custody_address || custodyAddress;
-              freshVerified = fcUser.verified_addresses?.eth_addresses || freshVerified;
-              bio = fcUser.profile?.bio?.text || null;
+        if (fcUser) {
+          freshDisplayName = (fcUser.display_name as string) || freshDisplayName;
+          freshPfpUrl = (fcUser.pfp_url as string) || freshPfpUrl;
+          freshUsername = (fcUser.username as string) || freshUsername;
+          custodyAddress = (fcUser.custody_address as string) || custodyAddress;
+          freshVerified = (fcUser.verified_addresses as { eth_addresses?: string[] })?.eth_addresses || freshVerified;
+          bio = (fcUser.profile as { bio?: { text?: string } })?.bio?.text || null;
 
-              // Update primary wallet if we got a real one
-              if (primaryWallet.startsWith('fid:') && fcUser.custody_address) {
-                primaryWallet = fcUser.custody_address.toLowerCase();
-              }
-            }
-          } catch {
-            // Use cached data from allowlist
+          // Update primary wallet if we got a real one
+          if (primaryWallet.startsWith('fid:') && fcUser.custody_address) {
+            primaryWallet = (fcUser.custody_address as string).toLowerCase();
           }
         }
 

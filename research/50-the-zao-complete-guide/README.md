@@ -27,6 +27,12 @@
 18. [Frameworks & Philosophy](#18-frameworks--philosophy)
 19. [Key Metrics](#19-key-metrics)
 20. [Timeline](#20-timeline)
+21. [Music Catalog Summary](#21-music-catalog-summary)
+22. [On-Chain Data](#22-on-chain-data)
+23. [Competitive Landscape](#23-competitive-landscape-march-2026)
+24. [Undocumented Connections & Opportunities](#24-undocumented-connections--opportunities)
+25. [Whitepaper vs Reality (Gap Analysis)](#25-whitepaper-vs-reality-gap-analysis)
+26. [Strategic Insights](#26-strategic-insights)
 
 ---
 
@@ -627,32 +633,27 @@ Featured on thezao.com:
 
 | Artist | Notable |
 |--------|---------|
-| **Jango UU** | NYC, introduced to Web3 by Zaal, WaveWarZ competitor |
-| **Songs of Eden** | ZAO community artist |
-| **Hurric4n3Ike** | WaveWarZ founder, musician, developer |
-| **AttaBotty** | ZAO co-founder, 10K+ NFTs, 20+ years |
 | **Clejan** | Zac Clejan, "The Trap Violinist," Atlanta. **289K Spotify**, 900K+ total. 3 albums (35-40 tracks). Violin age 2. Opened for Snoop/Soulja Boy/Busta Rhymes. Toured w/ Lindsey Stirling. 4+ Sound.xyz drops incl charity NFT. Collab w/ Mr. Darius ("OFF THE STRIP"). [clejan.com](https://clejan.com/) |
 | **NessytheRilla** | Ne$$y, Detroit. 6 albums/projects (40-50 tracks). Opened for 6ix9ine, Chief Keef, Doja Cat, D12. 5+ Nina Protocol (Solana) releases. "As Told By Nessy" NFTs on OpenSea. Poetic Gorilla Music. |
+| **GodCloud** | First finger drummer on Ethereum (2021). Former pro wrestler (tag team gold). Forbes mention. Co-produced NFTs with George Lopez + Val Kilmer via AgencyNFT.io. Onboarded 10K+ people via "NFTs Made Simple." [godcloud.org](https://www.godcloud.org/) |
+| **Jango UU** | NYC, "Unleashed Unchained." Genre-bending: trap, synth rock, folk-pop, ambient R&B. Introduced to Web3 by Zaal. ZAO-PALOOZA performer + WaveWarZ LIVE competitor. [jangouu.com](https://www.jangouu.com/) |
+| **Hurric4n3Ike** | WaveWarZ founder, musician, developer |
+| **AttaBotty** | ZAO co-founder, 10K+ NFTs, 20+ years music production and animation |
 | **Mr. Darius** | Multidisciplinary artist, published author. **12+ Sound.xyz releases** incl "OFF THE STRIP" cypher w/ Clejan. Also on Audius. Hip-hop + EDM + Wave. [mrdariusmusic.com](https://mrdariusmusic.com/) |
+| **Jadyn Violet** | UVR founder, NJ indie artist, Raver Realm NFTs, 365-day Twitch streaming challenge |
+| **Stilo** | Dope Stilo Music Club. 35-40 tracks incl 32-track "Dopestilo" album. 150+ weekly VR concerts since 2007. New album "TOGETHER" (2026). Bonita NFT access pass. [stilo.world](https://www.stilo.world/) |
 | **Formerly LEN** | 4 albums + 10+ singles (25-30 tracks). Hip-hop. Stockholm → web3. "No Page Left Unturned" (2024), "Fog of War" (2025). |
 | **Maxwell Aden** | Atlanta pop/R&B. **11.8K Spotify**. "Bounce (feat. Kodie Shane)" = 1M+ video views. |
 | **Goldilox** | **40.4K Spotify monthly listeners**. |
-| **Jadyn Violet** | UVR founder, NJ indie artist, Raver Realm NFTs |
-| **Maxwell Aden** | ZAO community artist |
-| **GodCloud** | First finger drummer on Ethereum (2021). Former pro wrestler (tag team gold). Forbes mention. Co-produced NFTs with George Lopez + Val Kilmer via AgencyNFT.io. Onboarded 10K+ people via "NFTs Made Simple." [godcloud.org](https://www.godcloud.org/) |
-| **Jango UU** | NYC, "Unleashed Unchained." Genre-bending: trap, synth rock, folk-pop, ambient R&B. Introduced to Web3 by Zaal. Also releases as "Django" on thezao.com. ZAO-PALOOZA performer + WaveWarZ LIVE competitor. [jangouu.com](https://www.jangouu.com/) |
-| **Losi** | Singer-songwriter from Cali, Colombia. Sells songs to blockchain collectors. ZAO-CHELLA performer. July Community Member of the Month. Active on Hive. |
-| **Stilo** | Dope Stilo Music Club. 35-40 tracks incl 32-track "Dopestilo" album. 150+ weekly VR concerts since 2007. New album "TOGETHER" (2026). Bonita NFT access pass. [stilo.world](https://www.stilo.world/) |
+| **Losi** | Singer-songwriter from Cali, Colombia. Sells songs to blockchain collectors. ZAO-CHELLA performer. Active on Hive. |
+| **Songs of Eden** | Piano / Wellness. 300+ tracks, 34.3K Spotify monthly listeners. |
 | **DCoop** | Virginia-based, ZAOVille collaborator |
 | **Hexidized** | ZAO community artist |
-| **Formerly LEN** | ZAO community artist |
 | **Joseph Goats** | ZAO community artist |
 | **GESD1** | LTAW3 guest (Ep 17) |
 | **Tabby** | ZAO community artist |
 | **Jaystreetz** | ZAO community artist |
-| **Mr. Darius** | ZAO community artist |
 | **IzMpande** | ZAO community artist |
-| **Goldilox** | ZAO community artist |
 | **Gritbeat** | ZAO community artist |
 
 ### ZAO Cypher Project (In Progress)
@@ -929,7 +930,7 @@ No single project combines even 3 of ZAO's 7 pillars:
 
 ---
 
-## 22. Undocumented Connections & Opportunities
+## 24. Undocumented Connections & Opportunities
 
 ### Key Bridges Not Yet Leveraged
 
@@ -962,7 +963,7 @@ No single project combines even 3 of ZAO's 7 pillars:
 
 ---
 
-## 23. Whitepaper vs Reality (Gap Analysis)
+## 25. Whitepaper vs Reality (Gap Analysis)
 
 ### Built in ZAO OS
 
@@ -1036,7 +1037,7 @@ These emerged organically:
 
 ---
 
-## 24. Strategic Insights
+## 26. Strategic Insights
 
 ### Critical Discovery: Ehrlichman → Hats Protocol
 

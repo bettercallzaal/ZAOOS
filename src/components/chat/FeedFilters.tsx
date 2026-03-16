@@ -186,6 +186,7 @@ export function FeedFilters({
                 : 'text-gray-500 hover:text-white hover:bg-white/5'
             }`}
             title={`Sort: ${sortLabel}`}
+            aria-label={`Sort by ${sortLabel}`}
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
@@ -227,7 +228,7 @@ export function FeedFilters({
           {contentFilter !== 'all' && (
             <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-[10px] font-medium flex-shrink-0">
               {CONTENT_FILTERS.find((f) => f.id === contentFilter)?.label}
-              <button onClick={() => onContentFilterChange('all')} className="hover:text-white">
+              <button onClick={() => onContentFilterChange('all')} className="hover:text-white" aria-label="Clear content filter">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -237,7 +238,7 @@ export function FeedFilters({
           {sortMode !== 'newest' && (
             <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-[10px] font-medium flex-shrink-0">
               {sortLabel}
-              <button onClick={() => onSortChange('newest')} className="hover:text-white">
+              <button onClick={() => onSortChange('newest')} className="hover:text-white" aria-label="Clear sort filter">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>

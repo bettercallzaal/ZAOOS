@@ -27,6 +27,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
   const [addingFid, setAddingFid] = useState<number | null>(null);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchEntries = useCallback(async () => {
     const res = await fetch('/api/admin/allowlist');
@@ -44,9 +45,17 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
   }, [fetchEntries]);
 
   const showFeedback = (type: 'success' | 'error', msg: string) => {
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
     setFeedback({ type, msg });
-    setTimeout(() => setFeedback(null), 3000);
+    feedbackTimerRef.current = setTimeout(() => setFeedback(null), 3000);
   };
+
+  // Cleanup feedback timer on unmount
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    };
+  }, []);
 
   // ── Farcaster User Search ──────────────────────────────────────────────────
 

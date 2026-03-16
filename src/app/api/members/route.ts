@@ -63,15 +63,15 @@ export async function GET() {
     for (const m of needsEnrich) {
       const enriched = enrichMap.get(m.fid);
       if (enriched) {
-        supabaseAdmin
+        const { error: backfillError } = await supabaseAdmin
           .from('allowlist')
           .update({
             username: m.username || enriched.username,
             display_name: m.display_name || enriched.display_name,
             pfp_url: m.pfp_url || enriched.pfp_url,
           })
-          .eq('id', m.id)
-          .then(); // fire-and-forget
+          .eq('id', m.id);
+        if (backfillError) console.error('[members] backfill error for id', m.id, backfillError);
       }
     }
   }

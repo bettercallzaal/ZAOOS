@@ -29,8 +29,9 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  // Focus input when opening
+  // Focus input when opening; abort on close/unmount
   useEffect(() => {
     if (isOpen) {
       setQuery('');
@@ -38,6 +39,9 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
       setSelectedIndex(0);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
+    return () => {
+      abortRef.current?.abort();
+    };
   }, [isOpen]);
 
   const search = useCallback(async (q: string) => {
@@ -45,18 +49,24 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
       setResults([]);
       return;
     }
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/chat/search?q=${encodeURIComponent(q)}&channel=${channel}`);
+      const res = await fetch(`/api/chat/search?q=${encodeURIComponent(q)}&channel=${channel}`, { signal: controller.signal });
+      if (controller.signal.aborted) return;
       if (res.ok) {
         const data = await res.json();
         setResults(data.results || []);
         setSelectedIndex(0);
       }
     } catch {
-      // Silently fail
+      // Silently fail (including aborted requests)
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, [channel]);
 

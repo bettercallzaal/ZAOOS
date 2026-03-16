@@ -55,6 +55,7 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
       pollCount++;
       if (pollCount >= MAX_POLLS) {
         clearInterval(interval);
+        dispatch({ type: 'ERROR', payload: 'SoundCloud player failed to load' });
         return;
       }
       if (!window.SC || !iframeRef.current || widgetRef.current) return;

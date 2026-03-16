@@ -51,7 +51,7 @@ export function createWalletSigner(
       const hex = sig.startsWith('0x') ? sig.slice(2) : sig;
       const bytes = new Uint8Array(hex.length / 2);
       for (let i = 0; i < hex.length; i += 2) {
-        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+        bytes[i >> 1] = parseInt(hex.substring(i, i + 2), 16);
       }
       return bytes;
     },
@@ -79,7 +79,7 @@ export async function createLocalSigner(privateKey: `0x${string}`): Promise<Sign
       const hex = sig.startsWith('0x') ? sig.slice(2) : sig;
       const bytes = new Uint8Array(hex.length / 2);
       for (let i = 0; i < hex.length; i += 2) {
-        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+        bytes[i >> 1] = parseInt(hex.substring(i, i + 2), 16);
       }
       return bytes;
     },
@@ -99,7 +99,12 @@ function getDbEncryptionKey(address: string): Uint8Array {
   const storageKey = `zaoos-xmtp-db-key-${address.toLowerCase()}`;
   const stored = localStorage.getItem(storageKey);
   if (stored) {
-    return new Uint8Array(JSON.parse(stored));
+    try {
+      return new Uint8Array(JSON.parse(stored));
+    } catch {
+      // Corrupted stored key — remove and generate fresh
+      localStorage.removeItem(storageKey);
+    }
   }
   const key = crypto.getRandomValues(new Uint8Array(32));
   localStorage.setItem(storageKey, JSON.stringify(Array.from(key)));
@@ -163,7 +168,14 @@ export async function getLocalKeyAddress(fid: number): Promise<`0x${string}`> {
 export function getConnectedWallets(): string[] {
   if (typeof window === 'undefined') return [];
   const stored = localStorage.getItem('zaoos-xmtp-wallets');
-  return stored ? JSON.parse(stored) : [];
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return [];
+    }
+  }
+  return [];
 }
 
 /**
@@ -205,7 +217,14 @@ const PEER_STORAGE_KEY = 'zaoos-xmtp-peers';
 export function getPeerProfiles(): Record<string, XMTPPeerProfile> {
   if (typeof window === 'undefined') return {};
   const stored = localStorage.getItem(PEER_STORAGE_KEY);
-  return stored ? JSON.parse(stored) : {};
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return {};
+    }
+  }
+  return {};
 }
 
 export function savePeerProfile(conversationId: string, profile: XMTPPeerProfile): void {
@@ -221,7 +240,14 @@ const MEMBER_STORAGE_KEY = 'zaoos-xmtp-members';
 export function getMemberProfiles(): Record<string, XMTPPeerProfile> {
   if (typeof window === 'undefined') return {};
   const stored = localStorage.getItem(MEMBER_STORAGE_KEY);
-  return stored ? JSON.parse(stored) : {};
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return {};
+    }
+  }
+  return {};
 }
 
 export function saveMemberProfile(inboxId: string, profile: XMTPPeerProfile): void {

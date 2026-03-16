@@ -23,24 +23,31 @@ export function MentionAutocomplete({ query, onSelect, onClose, position }: Ment
   const [selectedIndex, setSelectedIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchUsers = useCallback(async (q: string) => {
     if (q.length < 1) {
       setUsers([]);
       return;
     }
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     try {
-      const res = await fetch(`/api/search/users?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`/api/search/users?q=${encodeURIComponent(q)}`, { signal: controller.signal });
+      if (controller.signal.aborted) return;
       if (res.ok) {
         const data = await res.json();
         setUsers(data.users || []);
         setSelectedIndex(0);
       }
     } catch {
-      setUsers([]);
+      if (!controller.signal.aborted) setUsers([]);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, []);
 
@@ -49,6 +56,7 @@ export function MentionAutocomplete({ query, onSelect, onClose, position }: Ment
     debounceRef.current = setTimeout(() => fetchUsers(query), 200);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      abortRef.current?.abort();
     };
   }, [query, fetchUsers]);
 

@@ -71,8 +71,10 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
   const createSpotifyController = (api: SpotifyIFrameAPI, uri: string) => {
     if (!containerRef.current) return;
 
-    // Destroy existing controller
+    // Remove listeners before destroying to prevent leaked event handlers
     if (controllerRef.current) {
+      controllerRef.current.removeListener('playback_update');
+      controllerRef.current.removeListener('ready');
       controllerRef.current.destroy();
       controllerRef.current = null;
     }

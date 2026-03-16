@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     // Cross-post to additional channels (fire and forget)
     const additionalChannels = [...channels].filter((ch) => ch !== primaryChannel);
     if (additionalChannels.length > 0) {
-      Promise.allSettled(
+      await Promise.allSettled(
         additionalChannels.map(async (ch) => {
           const crossResult = await postCast(session.signerUuid!, text, ch, undefined, embedHash, embedUrls);
           // Also write cross-posts to DB

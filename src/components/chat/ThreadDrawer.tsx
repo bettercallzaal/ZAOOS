@@ -24,12 +24,13 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
 
   useEffect(() => {
     let cancelled = false;
+    const abortController = new AbortController();
 
     async function fetchThread() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/chat/thread/${threadHash}`);
+        const res = await fetch(`/api/chat/thread/${threadHash}`, { signal: abortController.signal });
         if (!res.ok) throw new Error('Failed to load thread');
         const data = await res.json();
         if (!cancelled) {
@@ -37,6 +38,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
           setThread(casts);
         }
       } catch (err) {
+        if (cancelled || abortController.signal.aborted) return;
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Failed to load thread');
         }
@@ -53,6 +55,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
     document.addEventListener('visibilitychange', handleVisibility);
     return () => {
       cancelled = true;
+      abortController.abort();
       clearInterval(interval);
       document.removeEventListener('visibilitychange', handleVisibility);
     };

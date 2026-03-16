@@ -48,19 +48,27 @@ export function CommunityGraph() {
   const [sortMode, setSortMode] = useState<SortMode>('mutuals');
 
   useEffect(() => {
-    fetch('/api/social/community-graph')
+    const controller = new AbortController();
+    fetch('/api/social/community-graph', { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error('Failed');
         return r.json();
       })
       .then((data) => {
+        if (controller.signal.aborted) return;
         setMembers(data.members || []);
         setConnections(data.connections || []);
         setStats(data.stats || null);
         setCurrentFid(data.currentFid || null);
       })
-      .catch(() => setError('Failed to load community graph'))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setError('Failed to load community graph');
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => { controller.abort(); };
   }, []);
 
   const sorted = [...members].sort((a, b) => {

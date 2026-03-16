@@ -26,7 +26,7 @@ export const communityConfig = {
 
   // ── Admin ─────────────────────────────────────────────────────
   adminFids: [19640],
-  adminWallets: ['0x0000000000000000000000000000000000000000'],
+  adminWallets: [],
 
   // ── Respect Contracts (Optimism) ──────────────────────────────
   respect: {

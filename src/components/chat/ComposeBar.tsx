@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { QuotedCastData } from '@/types';
 import { MentionAutocomplete } from './MentionAutocomplete';
 import { communityConfig } from '@/../community.config';
@@ -47,6 +47,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   const [mentionStart, setMentionStart] = useState(0);
   const [imagePreview, setImagePreview] = useState<{ url: string; file?: File } | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [showSchedule, setShowSchedule] = useState(false);
   const [scheduleTime, setScheduleTime] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -55,6 +56,15 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   useImperativeHandle(ref, () => ({
     focus: () => textareaRef.current?.focus(),
   }));
+
+  // Revoke any active blob URL on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (imagePreview?.url.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview.url);
+      }
+    };
+  }, [imagePreview]);
 
   const handleImageSelect = async (file: File) => {
     if (!file.type.startsWith('image/')) return;
@@ -70,6 +80,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       URL.revokeObjectURL(imagePreview.url);
     }
     setImagePreview(null);
+    setUploadError(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -79,6 +90,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
 
     if (hasSigner) {
       try {
+        setUploadError(null);
         let embedUrls: string[] | undefined;
 
         // Upload image if attached
@@ -102,8 +114,9 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
         onClearReply?.();
         setCrossPostChannels(new Set());
         setShowCrossPost(false);
-      } catch {
+      } catch (err) {
         setUploading(false);
+        setUploadError(err instanceof Error ? err.message : 'Failed to upload image');
       }
     } else {
       const encoded = encodeURIComponent(msg);
@@ -291,6 +304,13 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Upload error message */}
+      {uploadError && (
+        <div className="px-3 pt-1">
+          <p className="text-xs text-red-400">{uploadError}</p>
         </div>
       )}
 

@@ -37,16 +37,27 @@ export function SocialPage() {
 
   const isListView = view === 'followers' || view === 'following';
 
+  const fetchAbortRef = useRef<AbortController | null>(null);
+
   const fetchUsers = useCallback(async (fid: number, type: 'followers' | 'following', sortKey: SortKey, nextCursor?: string) => {
     const isMore = !!nextCursor;
     if (isMore) setLoadingMore(true);
     else setLoading(true);
 
+    // Abort previous non-pagination request
+    if (!isMore) {
+      fetchAbortRef.current?.abort();
+    }
+    const controller = new AbortController();
+    if (!isMore) fetchAbortRef.current = controller;
+
     try {
       const url = `/api/users/${fid}/${type}?sort=${sortKey}${nextCursor ? `&cursor=${nextCursor}` : ''}`;
-      const res = await fetch(url);
+      const res = await fetch(url, { signal: controller.signal });
       if (!res.ok) throw new Error('Fetch failed');
       const data = await res.json();
+
+      if (controller.signal.aborted) return;
 
       if (isMore) {
         setUsers((prev) => [...prev, ...data.users]);
@@ -55,10 +66,13 @@ export function SocialPage() {
       }
       setCursor(data.next?.cursor || null);
     } catch (err) {
+      if (controller.signal.aborted) return;
       console.error('Failed to fetch:', err);
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+        setLoadingMore(false);
+      }
     }
   }, []);
 
@@ -67,14 +81,19 @@ export function SocialPage() {
     if (!user || !isListView) return;
     setCursor(null);
     fetchUsers(user.fid, view as 'followers' | 'following', sort);
+    return () => {
+      fetchAbortRef.current?.abort();
+    };
   }, [user, view, sort, fetchUsers, isListView]);
 
   // Set total label from user profile
   useEffect(() => {
     if (!user || !isListView) return;
-    fetch(`/api/search/users?q=${encodeURIComponent(user.username)}`)
+    const controller = new AbortController();
+    fetch(`/api/search/users?q=${encodeURIComponent(user.username)}`, { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
+        if (controller.signal.aborted) return;
         const me = data.users?.find((u: { fid: number }) => u.fid === user.fid);
         if (me) {
           setTotalLabel(
@@ -85,6 +104,7 @@ export function SocialPage() {
         }
       })
       .catch(() => {});
+    return () => { controller.abort(); };
   }, [user, view, isListView]);
 
   // Apply client-side filters

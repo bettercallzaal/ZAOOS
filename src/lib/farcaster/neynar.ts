@@ -21,7 +21,10 @@ export async function getChannelFeed(channelId: string, cursor?: string, limit =
     headers: headers(),
     next: { revalidate: 0 },
   });
-  if (!res.ok) throw new Error(`Neynar feed error: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar feed error ${res.status}: ${body.slice(0, 200)}`);
+  }
   return res.json();
 }
 
@@ -54,7 +57,10 @@ export async function postCast(
     headers: headers(),
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Neynar post error: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar post error ${res.status}: ${body.slice(0, 200)}`);
+  }
   return res.json();
 }
 
@@ -69,7 +75,10 @@ export async function getCastThread(hash: string) {
     headers: headers(),
     next: { revalidate: 0 },
   });
-  if (!res.ok) throw new Error(`Neynar thread error: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar thread error ${res.status}: ${body.slice(0, 200)}`);
+  }
   return res.json();
 }
 
@@ -79,7 +88,10 @@ export async function getUserByFid(fid: number, viewerFid?: number) {
   const res = await fetch(`${NEYNAR_BASE}/user/bulk?${params}`, {
     headers: headers(),
   });
-  if (!res.ok) throw new Error(`Neynar user error: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar user error ${res.status}: ${body.slice(0, 200)}`);
+  }
   const data = await res.json();
   return data.users?.[0] || null;
 }
@@ -88,7 +100,10 @@ export async function getUserByAddress(address: string) {
   const res = await fetch(`${NEYNAR_BASE}/user/bulk-by-address?addresses=${address}`, {
     headers: headers(),
   });
-  if (!res.ok) throw new Error(`Neynar address lookup error: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar address lookup error ${res.status}: ${body.slice(0, 200)}`);
+  }
   const data = await res.json();
   const users = data[address.toLowerCase()];
   return users?.[0] || null;

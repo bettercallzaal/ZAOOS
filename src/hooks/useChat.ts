@@ -13,13 +13,19 @@ export function useChat(channel: string = 'zao') {
   const [sendError, setSendError] = useState<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const firstHashRef = useRef<string | null>(null); // dedup: skip setState if top cast unchanged
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchMessages = useCallback(async () => {
     // Pause polling when tab is hidden to save credits
     if (document.hidden) return;
 
+    // Abort any in-flight request for this channel
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
-      const res = await fetch(`/api/chat/messages?channel=${channel}`);
+      const res = await fetch(`/api/chat/messages?channel=${channel}`, { signal: controller.signal });
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
       const casts: Cast[] = data.casts || [];
@@ -32,6 +38,7 @@ export function useChat(channel: string = 'zao') {
       setMessages(casts);
       setError(null);
     } catch (err) {
+      if (controller.signal.aborted) return;
       setError(err instanceof Error ? err.message : 'Failed to load messages');
     } finally {
       setLoading(false);
@@ -53,6 +60,7 @@ export function useChat(channel: string = 'zao') {
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
+      abortRef.current?.abort();
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [fetchMessages]);
@@ -93,7 +101,6 @@ export function useChat(channel: string = 'zao') {
         setMessages((prev) => [optimistic, ...prev]);
       }
       // Refresh to get the real data from server
-      firstHashRef.current = null;
       setTimeout(() => {
         firstHashRef.current = null;
         fetchMessages();

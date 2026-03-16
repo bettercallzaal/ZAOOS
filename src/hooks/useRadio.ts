@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { usePlayer } from '@/providers/audio';
 import type { RadioTrack, RadioPlaylist } from '@/app/api/music/radio/route';
 import type { TrackMetadata } from '@/types/music';
@@ -34,11 +34,24 @@ export function useRadio() {
   const [radioPlaylist, setRadioPlaylist] = useState<RadioPlaylist | null>(null);
   const radioQueueRef = useRef<RadioTrack[]>([]);
   const radioIndexRef = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
+
+  // Abort in-flight radio fetch on unmount
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, []);
 
   const startRadio = useCallback(async () => {
+    // Abort previous in-flight request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setRadioLoading(true);
     try {
-      const res = await fetch('/api/music/radio');
+      const res = await fetch('/api/music/radio', { signal: controller.signal });
       if (!res.ok) throw new Error('Failed to fetch radio');
       const data = await res.json();
       const playlist: RadioPlaylist | undefined = data.playlists?.[0];
@@ -58,6 +71,7 @@ export function useRadio() {
       // Enable shuffle mode in player
       if (!player.shuffle) player.toggleShuffle();
     } catch (err) {
+      if (controller.signal.aborted) return;
       console.error('Radio start failed:', err);
     } finally {
       setRadioLoading(false);

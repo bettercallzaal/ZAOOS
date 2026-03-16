@@ -313,7 +313,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                   >
                     {/* Avatar */}
                     {user.pfp_url ? (
-                      <Image src={user.pfp_url} alt="" width={40} height={40} className="rounded-full flex-shrink-0" />
+                      <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={40} height={40} className="rounded-full flex-shrink-0" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0" />
                     )}
@@ -420,7 +420,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                 >
                   {/* Avatar */}
                   {entry.pfp_url ? (
-                    <Image src={entry.pfp_url} alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
+                    <Image src={entry.pfp_url} alt={`${name} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400">
                       {name.charAt(0).toUpperCase()}

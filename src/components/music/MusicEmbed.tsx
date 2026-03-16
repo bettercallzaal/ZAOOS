@@ -130,6 +130,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
         <button
           onClick={handlePlayPause}
           className="relative w-14 h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 group"
+          aria-label={isThisPlaying ? 'Pause' : 'Play'}
         >
           {metadata.artworkUrl ? (
             <Image

@@ -14,6 +14,7 @@ function makeId(url: string): string {
 async function fetchSpotify(url: string): Promise<TrackMetadata | null> {
   const res = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`, {
     headers: { 'User-Agent': 'ZAO-OS/1.0' },
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) return null;
   const data = await res.json();
@@ -31,7 +32,7 @@ async function fetchSpotify(url: string): Promise<TrackMetadata | null> {
 async function fetchSoundCloud(url: string): Promise<TrackMetadata | null> {
   const res = await fetch(
     `https://soundcloud.com/oembed?url=${encodeURIComponent(url)}&format=json`,
-    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' }, signal: AbortSignal.timeout(10000) },
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -49,7 +50,7 @@ async function fetchSoundCloud(url: string): Promise<TrackMetadata | null> {
 async function fetchYouTube(url: string): Promise<TrackMetadata | null> {
   const res = await fetch(
     `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`,
-    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' }, signal: AbortSignal.timeout(10000) },
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -90,6 +91,7 @@ async function fetchSoundXyz(url: string): Promise<TrackMetadata | null> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'User-Agent': 'ZAO-OS/1.0' },
     body: JSON.stringify({ query }),
+    signal: AbortSignal.timeout(10000),
   });
 
   if (!res.ok) return null;
@@ -136,7 +138,7 @@ async function fetchAudius(url: string): Promise<TrackMetadata | null> {
   // Step 1: resolve page URL → track object
   const resolveRes = await fetch(
     `${AUDIUS_API}/resolve?url=${encodeURIComponent(url)}&app_name=${AUDIUS_APP}`,
-    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' }, signal: AbortSignal.timeout(10000) },
   );
   if (!resolveRes.ok) return null;
 
@@ -165,7 +167,7 @@ async function fetchAppleMusic(url: string): Promise<TrackMetadata | null> {
   // Apple Music oEmbed API
   const res = await fetch(
     `https://music.apple.com/api/v1/oembed?url=${encodeURIComponent(url)}`,
-    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' }, signal: AbortSignal.timeout(10000) },
   );
   if (!res.ok) {
     // Fallback: parse from URL structure
@@ -198,7 +200,7 @@ async function fetchTidal(url: string): Promise<TrackMetadata | null> {
   // Tidal oEmbed API
   const res = await fetch(
     `https://oembed.tidal.com/?url=${encodeURIComponent(url)}`,
-    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' }, signal: AbortSignal.timeout(10000) },
   );
   if (!res.ok) {
     // Fallback: extract track ID from URL
@@ -229,7 +231,7 @@ async function fetchBandcamp(url: string): Promise<TrackMetadata | null> {
   // Bandcamp oEmbed API
   const res = await fetch(
     `https://bandcamp.com/oembed?url=${encodeURIComponent(url)}&format=json`,
-    { headers: { 'User-Agent': 'ZAO-OS/1.0' } },
+    { headers: { 'User-Agent': 'ZAO-OS/1.0' }, signal: AbortSignal.timeout(10000) },
   );
   if (!res.ok) {
     // Fallback: parse from URL

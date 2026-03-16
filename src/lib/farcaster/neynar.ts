@@ -20,6 +20,7 @@ export async function getChannelFeed(channelId: string, cursor?: string, limit =
   const res = await fetch(`${NEYNAR_BASE}/feed/channels?${params}`, {
     headers: headers(),
     next: { revalidate: 0 },
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
     const body = await res.text();
@@ -56,6 +57,7 @@ export async function postCast(
     method: 'POST',
     headers: headers(),
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
     const body = await res.text();
@@ -74,6 +76,7 @@ export async function getCastThread(hash: string) {
   const res = await fetch(`${NEYNAR_BASE}/cast/conversation?${params}`, {
     headers: headers(),
     next: { revalidate: 0 },
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
     const body = await res.text();
@@ -87,6 +90,7 @@ export async function getUserByFid(fid: number, viewerFid?: number) {
   if (viewerFid) params.set('viewer_fid', String(viewerFid));
   const res = await fetch(`${NEYNAR_BASE}/user/bulk?${params}`, {
     headers: headers(),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
     const body = await res.text();
@@ -101,6 +105,7 @@ export async function getUsersByFids(fids: number[]) {
   const params = new URLSearchParams({ fids: fids.join(',') });
   const res = await fetch(`${NEYNAR_BASE}/user/bulk?${params}`, {
     headers: headers(),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
     const body = await res.text();
@@ -113,6 +118,7 @@ export async function getUsersByFids(fids: number[]) {
 export async function getUserByAddress(address: string) {
   const res = await fetch(`${NEYNAR_BASE}/user/bulk-by-address?addresses=${address}`, {
     headers: headers(),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) {
     const body = await res.text();
@@ -127,6 +133,7 @@ export async function createSigner() {
   const res = await fetch(`${NEYNAR_BASE}/signer`, {
     method: 'POST',
     headers: headers(),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar signer error: ${res.status}`);
   return res.json();
@@ -147,6 +154,7 @@ export async function registerSignedKey(
       deadline,
       signature,
     }),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar register key error: ${res.status}`);
   return res.json();
@@ -155,6 +163,7 @@ export async function registerSignedKey(
 export async function getSignerStatus(signerUuid: string) {
   const res = await fetch(`${NEYNAR_BASE}/signer?signer_uuid=${signerUuid}`, {
     headers: headers(),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar signer status error: ${res.status}`);
   return res.json();
@@ -167,6 +176,7 @@ export async function searchUsers(query: string, limit = 5) {
   });
   const res = await fetch(`${NEYNAR_BASE}/user/search?${params}`, {
     headers: headers(),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar search error: ${res.status}`);
   return res.json();
@@ -184,6 +194,7 @@ export async function getFollowers(fid: number, viewerFid?: number, sortType: 'd
   const res = await fetch(`${NEYNAR_BASE}/followers?${params}`, {
     headers: headers(),
     next: { revalidate: 0 },
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar followers error: ${res.status}`);
   return res.json();
@@ -201,6 +212,7 @@ export async function getFollowing(fid: number, viewerFid?: number, sortType: 'd
   const res = await fetch(`${NEYNAR_BASE}/following?${params}`, {
     headers: headers(),
     next: { revalidate: 0 },
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar following error: ${res.status}`);
   return res.json();
@@ -213,6 +225,7 @@ export async function getRelevantFollowers(targetFid: number, viewerFid: number)
   });
   const res = await fetch(`${NEYNAR_BASE}/followers/relevant?${params}`, {
     headers: headers(),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar relevant followers error: ${res.status}`);
   return res.json();
@@ -226,6 +239,7 @@ export async function followUser(signerUuid: string, targetFids: number[]) {
       signer_uuid: signerUuid,
       target_fids: targetFids,
     }),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar follow error: ${res.status}`);
   return res.json();
@@ -239,6 +253,7 @@ export async function unfollowUser(signerUuid: string, targetFids: number[]) {
       signer_uuid: signerUuid,
       target_fids: targetFids,
     }),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar unfollow error: ${res.status}`);
   return res.json();
@@ -261,6 +276,7 @@ export async function registerUser(
     method: 'POST',
     headers: headers(),
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar register error: ${res.status}`);
   return res.json();

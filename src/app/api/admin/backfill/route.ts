@@ -62,7 +62,7 @@ export async function POST() {
     try {
       const res = await fetch(
         `${NEYNAR_BASE}/user/bulk-by-address?addresses=${addresses.join(',')}`,
-        { headers: headers() }
+        { headers: headers(), signal: AbortSignal.timeout(10000) }
       );
 
       if (!res.ok) {

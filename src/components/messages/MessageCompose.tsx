@@ -72,6 +72,7 @@ export function MessageCompose({ onSend, disabled, placeholder }: MessageCompose
                 ? 'bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]'
                 : 'bg-[#1a2a3a] text-gray-600'
             }`}
+            aria-label="Send message"
           >
             {sending ? (
               <div className="w-4 h-4 border-2 border-[#0a1628] border-t-transparent rounded-full animate-spin" />

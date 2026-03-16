@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { getIronSession, IronSession } from 'iron-session';
 import { cookies } from 'next/headers';
 import { SessionData } from '@/types';
@@ -34,7 +35,7 @@ export async function getSession(): Promise<IronSession<SessionPayload>> {
   return getIronSession<SessionPayload>(cookieStore, sessionOptions);
 }
 
-export async function getSessionData(): Promise<SessionData | null> {
+export const getSessionData = cache(async (): Promise<SessionData | null> => {
   const session = await getSession();
   // Valid session: has either FID or wallet address
   if (!session.fid && !session.walletAddress) return null;
@@ -48,7 +49,7 @@ export async function getSessionData(): Promise<SessionData | null> {
     signerUuid: session.signerUuid || null,
     isAdmin: session.isAdmin || false,
   };
-}
+});
 
 export async function saveSession(data: {
   fid: number;

@@ -4,6 +4,7 @@ import { optimism } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
+import { proposalVoteSchema } from '@/lib/validation/schemas';
 
 const OG_RESPECT = '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as const;
 const ZOR_RESPECT = '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c' as const;
@@ -25,15 +26,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { proposal_id, vote } = body;
-
-    if (!proposal_id || !vote) {
-      return NextResponse.json({ error: 'proposal_id and vote are required' }, { status: 400 });
+    const parsed = proposalVoteSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
     }
-
-    if (!['for', 'against', 'abstain'].includes(vote)) {
-      return NextResponse.json({ error: 'Vote must be for, against, or abstain' }, { status: 400 });
-    }
+    const { proposal_id, vote } = parsed.data;
 
     // Check proposal is open
     const { data: proposal } = await supabaseAdmin

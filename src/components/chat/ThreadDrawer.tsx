@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Cast } from '@/types';
 import { Message } from './Message';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface ThreadDrawerProps {
   threadHash: string;
@@ -21,6 +22,9 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
   const [replyText, setReplyText] = useState('');
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(drawerRef, true);
 
   useEffect(() => {
     let cancelled = false;
@@ -99,7 +103,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
       />
 
       {/* Drawer */}
-      <div className="fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-[420px] z-50 flex flex-col bg-[#0d1b2a] border-l border-gray-800 animate-slide-in">
+      <div ref={drawerRef} className="fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-[420px] z-50 flex flex-col bg-[#0d1b2a] border-l border-gray-800 animate-slide-in">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0a1628]">
           <h3 className="text-sm font-semibold text-gray-300">Thread</h3>
@@ -193,6 +197,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
               onClick={handleReply}
               disabled={!replyText.trim() || sending}
               className="bg-[#f5a623] text-[#0a1628] font-medium px-3 py-2 rounded-lg text-sm hover:bg-[#ffd700] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              aria-label="Send reply"
             >
               {sending ? (
                 <span className="w-4 h-4 border-2 border-[#0a1628] border-t-transparent rounded-full animate-spin inline-block" />

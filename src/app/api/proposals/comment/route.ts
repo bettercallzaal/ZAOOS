@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
+import { proposalCommentSchema } from '@/lib/validation/schemas';
 
 /**
  * GET — Get comments for a proposal
@@ -46,11 +47,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { proposal_id, body: commentBody } = body;
-
-    if (!proposal_id || !commentBody?.trim()) {
-      return NextResponse.json({ error: 'proposal_id and body are required' }, { status: 400 });
+    const parsed = proposalCommentSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
     }
+    const { proposal_id, body: commentBody } = parsed.data;
 
     const { data: user } = await supabaseAdmin
       .from('users')

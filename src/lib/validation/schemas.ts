@@ -44,3 +44,38 @@ export const allowlistEntrySchema = z.object({
 export const removeAllowlistSchema = z.object({
   id: z.string().uuid(),
 });
+
+// --- Proposal schemas ---
+
+export const proposalCategorySchema = z.enum([
+  'general',
+  'treasury',
+  'governance',
+  'technical',
+  'community',
+]);
+
+export const createProposalSchema = z.object({
+  title: z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or less'),
+  description: z.string().trim().min(1, 'Description is required').max(5000, 'Description must be 5000 characters or less'),
+  category: proposalCategorySchema.optional().default('general'),
+  closes_at: z
+    .string()
+    .datetime({ message: 'closes_at must be a valid ISO date string' })
+    .refine((val) => new Date(val).getTime() > Date.now(), {
+      message: 'closes_at must be in the future',
+    })
+    .optional(),
+});
+
+export const proposalCommentSchema = z.object({
+  proposal_id: z.string().uuid('proposal_id must be a valid UUID'),
+  body: z.string().trim().min(1, 'Comment body is required').max(2000, 'Comment must be 2000 characters or less'),
+});
+
+export const proposalVoteSchema = z.object({
+  proposal_id: z.string().uuid('proposal_id must be a valid UUID'),
+  vote: z.enum(['for', 'against', 'abstain'] as const, {
+    message: 'Vote must be for, against, or abstain',
+  }),
+});

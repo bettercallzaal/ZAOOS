@@ -6,6 +6,9 @@
 
 ---
 
+> [!NOTE]
+> **This document has been superseded by [Doc 50 — The ZAO Complete Guide](../50-the-zao-complete-guide/).** Retained for historical gap analysis reference.
+
 ## Part 1: What We've Researched (26 Docs, 7 Supplementary)
 
 ### Protocol & Infrastructure (7 docs)

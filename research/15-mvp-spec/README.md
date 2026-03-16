@@ -2,6 +2,11 @@
 
 > The simplest thing that delivers value for ZAO community members.
 
+---
+
+> [!NOTE]
+> **ZAO OS launched March 12, 2026 with 40 beta testers.** This MVP spec is retained as the original design document. For current state, see [Doc 50](../50-the-zao-complete-guide/).
+
 ## What It Is
 
 A mobile-first, Discord-style chat interface at **zaoos.com** where ZAO community members sign in with Farcaster, pass an allowlist gate, and chat in a room that posts to the `/zao` Farcaster channel. **Bidirectional** — messages posted from ZAO OS appear on Farcaster, and messages posted from Farcaster appear in ZAO OS.

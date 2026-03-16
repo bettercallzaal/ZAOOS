@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import type { XMTPPeerProfile } from '@/lib/xmtp/client';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface SearchUser {
   fid: number;
@@ -49,6 +50,9 @@ export function NewConversationDialog({
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(dialogRef, isOpen);
 
   const searchUsers = useCallback(async (q: string, setRes: (u: SearchUser[]) => void, setLoading: (b: boolean) => void) => {
     if (q.length < 1) {
@@ -208,13 +212,13 @@ export function NewConversationDialog({
     <>
       <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-[#0d1b2a] border border-gray-700 rounded-xl w-full max-w-md shadow-xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div ref={dialogRef} className="bg-[#0d1b2a] border border-gray-700 rounded-xl w-full max-w-md shadow-xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-800 flex-shrink-0">
             <h3 className="text-base font-semibold text-white">
               {type === 'dm' ? 'New Message' : 'New Group'}
             </h3>
-            <button onClick={() => { resetState(); onClose(); }} className="text-gray-400 hover:text-white">
+            <button onClick={() => { resetState(); onClose(); }} className="text-gray-400 hover:text-white" aria-label="Close dialog">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -230,7 +234,7 @@ export function NewConversationDialog({
                   <div className="rounded-lg bg-[#1a2a3a] border border-gray-700 p-3">
                     <div className="flex items-center gap-3">
                       {selectedUser.pfp_url ? (
-                        <Image src={selectedUser.pfp_url} alt="" width={40} height={40} className="rounded-full flex-shrink-0" />
+                        <Image src={selectedUser.pfp_url} alt={`${selectedUser.display_name || selectedUser.username || 'User'} avatar`} width={40} height={40} className="rounded-full flex-shrink-0" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0" />
                       )}
@@ -242,6 +246,7 @@ export function NewConversationDialog({
                       <button
                         onClick={() => { setSelectedUser(null); setSelectedAddress(''); }}
                         className="text-gray-500 hover:text-white"
+                        aria-label="Remove selected user"
                       >
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -319,7 +324,7 @@ export function NewConversationDialog({
                             className="flex items-center gap-3 w-full p-2.5 rounded-lg bg-[#1a2a3a] hover:bg-white/5 transition-colors text-left"
                           >
                             {user.pfp_url ? (
-                              <Image src={user.pfp_url} alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
+                              <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
                             ) : (
                               <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0" />
                             )}
@@ -374,10 +379,10 @@ export function NewConversationDialog({
                           className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#1a2a3a] border border-gray-700 text-xs"
                         >
                           {m.user.pfp_url && (
-                            <Image src={m.user.pfp_url} alt="" width={16} height={16} className="rounded-full" />
+                            <Image src={m.user.pfp_url} alt={`${m.user.display_name || m.user.username || 'User'} avatar`} width={16} height={16} className="rounded-full" />
                           )}
                           <span className="text-white">{m.user.display_name || m.user.username}</span>
-                          <button onClick={() => removeGroupMember(m.user.fid)} className="text-gray-500 hover:text-red-400">
+                          <button onClick={() => removeGroupMember(m.user.fid)} className="text-gray-500 hover:text-red-400" aria-label={`Remove ${m.user.display_name || m.user.username}`}>
                             <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -424,7 +429,7 @@ export function NewConversationDialog({
                           className="flex items-center gap-3 w-full p-2.5 rounded-lg bg-[#1a2a3a] hover:bg-white/5 transition-colors text-left disabled:opacity-40"
                         >
                           {user.pfp_url ? (
-                            <Image src={user.pfp_url} alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
+                            <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0" />
                           )}

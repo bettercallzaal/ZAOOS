@@ -87,7 +87,7 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
       >
         {user.pfpUrl ? (
           <div className="w-10 h-10 flex-shrink-0 relative">
-            <Image src={user.pfpUrl} alt="" fill className="rounded-full object-cover" unoptimized />
+            <Image src={user.pfpUrl} alt={`${user.displayName || 'User'} avatar`} fill className="rounded-full object-cover" unoptimized />
           </div>
         ) : (
           <div className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0" />

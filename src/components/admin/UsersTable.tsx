@@ -478,7 +478,7 @@ function UserCard({
       <button onClick={onToggle} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left">
         {/* Avatar */}
         {user.pfp_url ? (
-          <Image src={user.pfp_url} alt="" width={36} height={36} className="rounded-full flex-shrink-0" />
+          <Image src={user.pfp_url} alt={`${name} avatar`} width={36} height={36} className="rounded-full flex-shrink-0" />
         ) : (
           <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
             {user.primary_wallet.slice(2, 4)}

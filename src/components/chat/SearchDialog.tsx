@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface SearchResult {
   hash: string;
@@ -29,8 +30,11 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
   const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  useFocusTrap(dialogRef, isOpen);
 
   // Focus input when opening; abort on close/unmount
   useEffect(() => {
@@ -131,7 +135,7 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
 
       {/* Dialog */}
       <div className="fixed inset-x-4 top-[15%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-lg z-50">
-        <div className="bg-[#0d1b2a] border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
+        <div ref={dialogRef} className="bg-[#0d1b2a] border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
           {/* Search input */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800">
             <svg className="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -176,7 +180,7 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
                   {result.author.pfp_url && (
                     <Image
                       src={result.author.pfp_url}
-                      alt=""
+                      alt={`${result.author.display_name || result.author.username || 'User'} avatar`}
                       width={16}
                       height={16}
                       className="rounded-full"

@@ -1,52 +1,43 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import { getSessionData } from '@/lib/auth/session';
+import { getUserByFid } from '@/lib/farcaster/neynar';
+import { supabaseAdmin } from '@/lib/db/supabase';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { ProfileCard } from './ProfileCard';
 
-interface UserProfile {
-  zid: number | null;
-  display_name: string | null;
-  username: string | null;
-  fid: number | null;
-  pfp_url: string | null;
-  bio: string | null;
-  primary_wallet: string;
-  respect_wallet: string | null;
+async function fetchUserProfile(fid: number) {
+  try {
+    const [user, usersResult] = await Promise.all([
+      getUserByFid(fid),
+      supabaseAdmin
+        .from('users')
+        .select('zid, primary_wallet, respect_wallet, bio, display_name, username, pfp_url')
+        .eq('fid', fid)
+        .eq('is_active', true)
+        .maybeSingle(),
+    ]);
+
+    const usersRow = usersResult.data;
+
+    return {
+      zid: usersRow?.zid || null,
+      display_name: usersRow?.display_name || user?.display_name || null,
+      username: usersRow?.username || user?.username || null,
+      fid,
+      pfp_url: usersRow?.pfp_url || user?.pfp_url || null,
+      bio: user?.profile?.bio?.text || null,
+      primary_wallet: usersRow?.primary_wallet || '',
+      respect_wallet: usersRow?.respect_wallet || null,
+    };
+  } catch (err) {
+    console.error('Failed to fetch user profile:', err);
+    return null;
+  }
 }
 
-export default function ToolsPage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    fetch('/api/auth/session')
-      .then((res) => res.json())
-      .then((session) => {
-        if (session.fid) {
-          return fetch(`/api/users/${session.fid}`).then((r) => r.json());
-        }
-        return null;
-      })
-      .then((data) => {
-        if (data) {
-          setProfile({
-            zid: data.zid || data.user?.zid || null,
-            display_name: data.display_name || data.user?.display_name || null,
-            username: data.username || data.user?.username || null,
-            fid: data.fid || null,
-            pfp_url: data.pfp_url || data.user?.pfp_url || null,
-            bio: data.bio || data.user?.bio || null,
-            primary_wallet: data.user?.primary_wallet || '',
-            respect_wallet: data.user?.respect_wallet || null,
-          });
-        }
-      })
-      .catch(() => setError('Failed to load profile'))
-      .finally(() => setLoading(false));
-  }, []);
+export default async function ToolsPage() {
+  const session = await getSessionData();
+  const profile = session?.fid ? await fetchUserProfile(session.fid) : null;
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
@@ -61,55 +52,8 @@ export default function ToolsPage() {
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
         {/* ZID Profile Card */}
-        {loading ? (
-          <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 animate-pulse">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gray-800" />
-              <div className="space-y-2 flex-1">
-                <div className="h-4 bg-gray-800 rounded w-32" />
-                <div className="h-3 bg-gray-800 rounded w-20" />
-              </div>
-            </div>
-          </div>
-        ) : error ? (
-          <div className="bg-red-500/10 rounded-xl p-6 border border-red-500/30 text-center">
-            <p className="text-sm text-red-400">{error}</p>
-          </div>
-        ) : profile ? (
-          <div className="bg-gradient-to-r from-[#0d1b2a] to-[#f5a623]/5 rounded-xl p-6 border border-gray-800">
-            <div className="flex items-center gap-4">
-              {profile.pfp_url ? (
-                <Image src={profile.pfp_url} alt="" width={64} height={64} className="rounded-full" />
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center text-xl text-gray-400 font-bold">
-                  {profile.display_name?.[0]?.toUpperCase() || '?'}
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-lg font-bold text-white truncate">{profile.display_name}</p>
-                  {profile.zid && (
-                    <span className="text-xs font-bold text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full flex-shrink-0">
-                      ZID #{profile.zid}
-                    </span>
-                  )}
-                </div>
-                {profile.username && (
-                  <p className="text-sm text-gray-400">@{profile.username}</p>
-                )}
-                {!profile.zid && (
-                  <p className="text-xs text-gray-600 mt-1">Earn Respect to get your ZID</p>
-                )}
-              </div>
-            </div>
-            {profile.bio && (
-              <p className="text-sm text-gray-400 mt-4 italic">&ldquo;{profile.bio}&rdquo;</p>
-            )}
-            <div className="mt-4 flex items-center gap-3 text-xs text-gray-600">
-              {profile.fid && <span>FID {profile.fid}</span>}
-              <span className="font-mono">{profile.primary_wallet.slice(0, 6)}...{profile.primary_wallet.slice(-4)}</span>
-            </div>
-          </div>
+        {profile ? (
+          <ProfileCard profile={profile} />
         ) : (
           <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 text-center">
             <p className="text-sm text-gray-400">Log in to see your profile</p>

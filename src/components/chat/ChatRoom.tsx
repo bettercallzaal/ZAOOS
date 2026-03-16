@@ -255,6 +255,7 @@ export function ChatRoom() {
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="text-gray-400 hover:text-white"
+                aria-label="Open sidebar"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -268,6 +269,7 @@ export function ChatRoom() {
                   onClick={() => xmtp.selectConversation(null)}
                   className="text-gray-400 hover:text-white transition-colors flex-shrink-0 -ml-1 p-1 rounded-lg hover:bg-white/5"
                   title="Back to channel"
+                  aria-label="Back to channel"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -277,7 +279,7 @@ export function ChatRoom() {
                   <div className="w-8 h-8 relative flex-shrink-0">
                     <Image
                       src={activeXmtpConversation.peerPfpUrl}
-                      alt=""
+                      alt={`${activeXmtpConversation.peerDisplayName || activeXmtpConversation.name || 'Conversation'} avatar`}
                       fill
                       className="rounded-full object-cover"
                     />

@@ -71,7 +71,7 @@ export function MusicSidebar({
                 {queue.length} track{queue.length !== 1 ? 's' : ''}
               </span>
             </div>
-            <button onClick={onClose} className="text-gray-400 hover:text-white p-1">
+            <button onClick={onClose} className="text-gray-400 hover:text-white p-1" aria-label="Close music sidebar">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -245,6 +245,7 @@ function NowPlayingCard({
             onClick={onPlayPause}
             disabled={player.isLoading}
             className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-[#f5a623] text-[#0d1b2a] hover:bg-[#ffd700] disabled:opacity-50 transition-colors shadow-md shadow-[#f5a623]/20"
+            aria-label={player.isPlaying ? 'Pause' : 'Play'}
           >
             {player.isLoading ? (
               <div className="w-4 h-4 border-2 border-[#0d1b2a] border-t-transparent rounded-full animate-spin" />

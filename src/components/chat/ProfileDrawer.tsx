@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface ProfileData {
   fid: number;
@@ -55,7 +56,10 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
   const [musicTracks, setMusicTracks] = useState<MusicTrack[]>([]);
   const [musicLoading, setMusicLoading] = useState(false);
 
+  const drawerRef = useRef<HTMLDivElement>(null);
+
   useEscapeClose(onClose, !!fid);
+  useFocusTrap(drawerRef, !!fid);
 
   useEffect(() => {
     if (!fid) {
@@ -125,11 +129,11 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
       />
 
       {/* Drawer */}
-      <div className="fixed top-0 right-0 h-full w-full max-w-sm bg-[#0d1b2a] border-l border-gray-800 z-50 flex flex-col animate-slide-in-right overflow-y-auto">
+      <div ref={drawerRef} className="fixed top-0 right-0 h-full w-full max-w-sm bg-[#0d1b2a] border-l border-gray-800 z-50 flex flex-col animate-slide-in-right overflow-y-auto">
         {/* Close button */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0">
           <h3 className="text-sm font-medium text-gray-400">Profile</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors p-2">
+          <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors p-2" aria-label="Close profile">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>

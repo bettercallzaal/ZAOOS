@@ -166,7 +166,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0">
           <h2 className="text-sm font-semibold text-[#f5a623]">Submit a Song</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white p-1">
+          <button onClick={onClose} className="text-gray-400 hover:text-white p-1" aria-label="Close song submit">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -284,6 +284,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                       }}
                       className="w-8 h-8 flex-shrink-0 rounded-full bg-[#f5a623]/10 flex items-center justify-center text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors mt-0.5"
                       title="Play"
+                      aria-label="Play song"
                     >
                       <svg className="w-3.5 h-3.5 ml-0.5" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M8 5v14l11-7z" />
@@ -315,6 +316,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                       onClick={() => handleDelete(sub.id)}
                       className="text-red-400/50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 p-1"
                       title="Remove"
+                      aria-label="Remove submission"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

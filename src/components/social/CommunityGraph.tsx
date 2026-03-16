@@ -202,7 +202,7 @@ export function CommunityGraph() {
                 <div className="w-9 h-9 flex-shrink-0 relative">
                   <Image
                     src={member.pfpUrl}
-                    alt=""
+                    alt={`${member.displayName || member.username || 'Member'} avatar`}
                     fill
                     className="rounded-full object-cover"
                     unoptimized
@@ -257,7 +257,7 @@ export function CommunityGraph() {
           <div className="flex items-center gap-3">
             {selectedNode.pfpUrl && (
               <div className="w-10 h-10 relative flex-shrink-0">
-                <Image src={selectedNode.pfpUrl} alt="" fill className="rounded-full object-cover" unoptimized />
+                <Image src={selectedNode.pfpUrl} alt={`${selectedNode.displayName || selectedNode.username || 'Member'} avatar`} fill className="rounded-full object-cover" unoptimized />
               </div>
             )}
             <div>

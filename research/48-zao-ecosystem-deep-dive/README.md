@@ -7,6 +7,9 @@
 
 ---
 
+> [!NOTE]
+> **For the current state of the ZAO ecosystem, see [Doc 50 — The ZAO Complete Guide](../50-the-zao-complete-guide/).** This document is retained for deep-dive details on specific communities and team profiles.
+
 ## Ecosystem Architecture (Layered)
 
 ```

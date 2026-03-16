@@ -6,6 +6,9 @@
 
 ---
 
+> [!NOTE]
+> **For the current state of the ZAO ecosystem, see [Doc 50 — The ZAO Complete Guide](../50-the-zao-complete-guide/).** This document is retained as a historical precursor.
+
 ## The ZAO (ZTalent Artist Organization)
 
 A community-driven hub where musicians, artists, and technologists unite to unlock Web3 for the creative economy. Part DAO, part collective, part talent agency, part educational platform.

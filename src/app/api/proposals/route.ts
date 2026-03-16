@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification, sendNotification } from '@/lib/notifications';
+import { createProposalSchema } from '@/lib/validation/schemas';
 
 /**
  * GET — List proposals with vote tallies
@@ -81,11 +82,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, description, category, closes_at } = body;
-
-    if (!title?.trim() || !description?.trim()) {
-      return NextResponse.json({ error: 'Title and description are required' }, { status: 400 });
+    const parsed = createProposalSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
     }
+    const { title, description, category, closes_at } = parsed.data;
 
     // Get user row
     const { data: user } = await supabaseAdmin
@@ -101,10 +105,10 @@ export async function POST(req: NextRequest) {
     const { data: proposal, error } = await supabaseAdmin
       .from('proposals')
       .insert({
-        title: title.trim(),
-        description: description.trim(),
+        title,
+        description,
         author_id: user.id,
-        category: category || 'general',
+        category,
         closes_at: closes_at || null,
       })
       .select()

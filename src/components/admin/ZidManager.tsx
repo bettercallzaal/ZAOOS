@@ -194,7 +194,7 @@ export function ZidManager() {
               return (
                 <div key={user.id} className="flex items-center gap-3 bg-[#1a2a3a] rounded-xl px-4 py-3 border border-green-500/20">
                   {user.pfp_url ? (
-                    <Image src={user.pfp_url} alt="" width={36} height={36} className="rounded-full flex-shrink-0" />
+                    <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={36} height={36} className="rounded-full flex-shrink-0" />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                       {user.primary_wallet.slice(2, 4)}
@@ -253,7 +253,7 @@ export function ZidManager() {
                     #{user.zid}
                   </span>
                   {user.pfp_url ? (
-                    <Image src={user.pfp_url} alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
+                    <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                       {user.primary_wallet.slice(2, 4)}
@@ -291,7 +291,7 @@ export function ZidManager() {
             {noRespectNoZid.map((user) => (
               <div key={user.id} className="flex items-center gap-3 bg-[#1a2a3a]/50 rounded-xl px-4 py-2.5 opacity-60">
                 {user.pfp_url ? (
-                  <Image src={user.pfp_url} alt="" width={32} height={32} className="rounded-full flex-shrink-0" />
+                  <Image src={user.pfp_url} alt={`${user.display_name || user.username || 'User'} avatar`} width={32} height={32} className="rounded-full flex-shrink-0" />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs text-gray-400 font-mono">
                     {user.primary_wallet.slice(2, 4)}

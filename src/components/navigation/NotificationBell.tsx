@@ -164,7 +164,7 @@ export function NotificationBell() {
                   {n.actor_pfp_url ? (
                     <Image
                       src={n.actor_pfp_url}
-                      alt=""
+                      alt={`${n.actor_display_name || 'User'} avatar`}
                       width={32}
                       height={32}
                       className="rounded-full flex-shrink-0"

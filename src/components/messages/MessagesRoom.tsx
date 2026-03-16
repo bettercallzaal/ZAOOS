@@ -18,6 +18,8 @@ export function MessagesRoom() {
     isConnecting,
     isConnected,
     error,
+    streamConnected,
+    reconnecting,
     conversations,
     activeConversationId,
     messages,
@@ -28,6 +30,10 @@ export function MessagesRoom() {
     sendMessage,
     createDm,
     createGroup,
+    zaoMembers,
+    startDmWithMember,
+    clearError,
+    reconnectStreams,
   } = useXMTPContext();
 
   const [dialogType, setDialogType] = useState<'dm' | 'group' | null>(null);
@@ -108,6 +114,55 @@ export function MessagesRoom() {
 
       {showThread && (
         <div className="flex-1 flex flex-col min-w-0">
+          {/* Error banner with dismiss and reconnect */}
+          {error && (
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-red-500/10 border-b border-red-500/20 text-sm">
+              <svg className="w-4 h-4 text-red-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+              <span className="text-red-400/90 flex-1">{error}</span>
+              {!reconnecting && !streamConnected && isConnected && (
+                <button
+                  onClick={reconnectStreams}
+                  className="px-3 py-1 rounded text-xs font-semibold bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors flex-shrink-0"
+                >
+                  Reconnect
+                </button>
+              )}
+              {reconnecting && (
+                <div className="w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              )}
+              <button
+                onClick={clearError}
+                className="text-red-400/60 hover:text-red-400 transition-colors flex-shrink-0"
+                aria-label="Dismiss error"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+          {/* Stream disconnected warning (only when no error is showing) */}
+          {!error && !streamConnected && isConnected && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border-b border-yellow-500/20 text-sm">
+              <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse flex-shrink-0" />
+              <span className="text-yellow-400/90 flex-1">
+                {reconnecting ? 'Reconnecting to message stream...' : 'Live updates paused'}
+              </span>
+              {!reconnecting && (
+                <button
+                  onClick={reconnectStreams}
+                  className="px-3 py-1 rounded text-xs font-semibold bg-yellow-500/20 text-yellow-300 hover:bg-yellow-500/30 transition-colors flex-shrink-0"
+                >
+                  Reconnect
+                </button>
+              )}
+              {reconnecting && (
+                <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              )}
+            </div>
+          )}
           <MessageThread
             conversation={activeConversation}
             messages={messages}
@@ -116,8 +171,11 @@ export function MessagesRoom() {
           {activeConversation && (
             <MessageCompose
               onSend={sendMessage}
+              streamDisconnected={isConnected && !streamConnected}
               placeholder={
-                activeConversation.type === 'dm'
+                isConnected && !streamConnected
+                  ? 'Reconnecting...'
+                  : activeConversation.type === 'dm'
                   ? `Message ${activeConversation.peerDisplayName || activeConversation.name}...`
                   : `Message #${activeConversation.name}...`
               }
@@ -132,6 +190,8 @@ export function MessagesRoom() {
         onClose={() => setDialogType(null)}
         onCreateDm={handleCreateDm}
         onCreateGroup={handleCreateGroup}
+        zaoMembers={zaoMembers}
+        onStartDmWithMember={startDmWithMember}
       />
     </div>
   );

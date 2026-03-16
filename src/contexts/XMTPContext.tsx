@@ -40,6 +40,8 @@ interface XMTPContextValue {
   zaoMembers: ZaoMember[];
   loadingMembers: boolean;
 
+  reconnecting: boolean;
+
   autoConnect: (fid: number) => Promise<void>;
   connectWallet: (address: `0x${string}`, signMessage: (msg: string) => Promise<string>) => Promise<void>;
   disconnectWallet: (address: string) => void;
@@ -50,6 +52,8 @@ interface XMTPContextValue {
   createGroup: (name: string, members: { address: `0x${string}`; profile?: XMTPPeerProfile }[]) => Promise<string | null>;
   refreshConversations: () => Promise<void>;
   startDmWithMember: (member: ZaoMember) => Promise<void>;
+  clearError: () => void;
+  reconnectStreams: () => Promise<void>;
 }
 
 const XMTPContext = createContext<XMTPContextValue | null>(null);
@@ -139,6 +143,13 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   // Auto-reconnect timer cleanup
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Reconnection attempt counter (caps retries to prevent infinite loops)
+  const reconnectAttemptsRef = useRef(0);
+  const MAX_RECONNECT_ATTEMPTS = 5;
+
+  // Whether a reconnection is actively in progress
+  const [reconnecting, setReconnecting] = useState(false);
 
   // Generation counter for selectConversation race condition prevention
   const convSelectGenRef = useRef(0);
@@ -272,6 +283,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
           console.error('[XMTP] Conversation stream permanently failed');
           streamsActiveRef.current = false;
           setStreamConnected(false);
+          setError('Live updates disconnected. New conversations may not appear automatically.');
         },
       });
       convStreamCleanupRef.current = () => { void convStream.end(); };
@@ -284,6 +296,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const msgStream = await client.conversations.streamAllMessages({
         consentStates: [ConsentState.Allowed],
         onValue: (msg: DecodedMessage) => {
+          // Reset reconnect counter on successful message receipt
+          reconnectAttemptsRef.current = 0;
           if (!isTextMessage(msg)) return;
 
           // Skip if selectConversation is mid-load (prevents race condition)
@@ -369,22 +383,41 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       });
       msgStreamCleanupRef.current = () => { void msgStream.end(); };
       setStreamConnected(true);
-      console.log('[XMTP] Global streams started');
+      setReconnecting(false);
+      reconnectAttemptsRef.current = 0;
+      // Clear any previous stream error now that streams are healthy
+      setError((prev) => {
+        if (prev && (prev.includes('stream') || prev.includes('disconnected') || prev.includes('reconnect'))) {
+          return null;
+        }
+        return prev;
+      });
     } catch (err: unknown) {
       console.error('[XMTP] Failed to start streams:', err);
       setStreamConnected(false);
-
-      // Auto-reconnect after 5s (tracked for cleanup on unmount)
       streamsActiveRef.current = false;
+
+      reconnectAttemptsRef.current += 1;
+
+      if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
+        setReconnecting(false);
+        setError('Message stream disconnected after multiple retries. Use the reconnect button to try again.');
+        return;
+      }
+
+      // Auto-reconnect with exponential backoff, capped at 30s
+      const delay = Math.min(5000 * Math.pow(1.5, reconnectAttemptsRef.current - 1), 30000);
+      setReconnecting(true);
+      setError(`Stream disconnected. Reconnecting (attempt ${reconnectAttemptsRef.current}/${MAX_RECONNECT_ATTEMPTS})...`);
+
       reconnectTimerRef.current = setTimeout(() => {
         reconnectTimerRef.current = null;
-        console.log('[XMTP] Attempting stream reconnection...');
         if (primaryClientRef.current) {
           startGlobalStreams(primaryClientRef.current).catch((e) =>
             console.error('[XMTP] Reconnection failed:', e)
           );
         }
-      }, 5000);
+      }, delay);
     }
   }, [loadAllConversations]);
 
@@ -575,6 +608,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
       // Start global streams AFTER profiles are resolved
       await startGlobalStreams(client);
+
+      // Clear any previous errors on successful connection
+      setError(null);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to connect to XMTP';
       setError(message);
@@ -619,6 +655,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       await seedLastMessages();
       await loadAllConversations();
       await startGlobalStreams(client);
+
+      // Clear any previous errors on successful connection
+      setError(null);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to connect wallet to XMTP';
       setError(message);
@@ -656,6 +695,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       reconnectTimerRef.current = null;
     }
     setStreamConnected(false);
+    setReconnecting(false);
+    reconnectAttemptsRef.current = 0;
 
     for (const [, wc] of walletsRef.current) {
       wc.client.close();
@@ -906,6 +947,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       return conv.id;
     } catch (err) {
       console.error('[XMTP] Failed to create DM:', err);
+      setError('Failed to start conversation. The recipient may not have XMTP enabled.');
       return null;
     }
   }, [getFirstClient, loadAllConversations]);
@@ -947,6 +989,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       return conv.id;
     } catch (err) {
       console.error('[XMTP] Failed to create group:', err);
+      setError('Failed to create group. Some members may not have XMTP enabled.');
       return null;
     }
   }, [getFirstClient, loadAllConversations]);
@@ -972,6 +1015,41 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     await seedLastMessages();
     await loadAllConversations();
   }, [seedLastMessages, loadAllConversations]);
+
+  /**
+   * Clear the current error state (for user-initiated dismissal).
+   */
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  /**
+   * Manually reconnect streams (user-initiated).
+   */
+  const reconnectStreams = useCallback(async () => {
+    if (!primaryClientRef.current) {
+      setError('No XMTP client available. Please reconnect your wallet.');
+      return;
+    }
+    // Clear any existing reconnect timer
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+    // Tear down existing streams
+    convStreamCleanupRef.current?.();
+    msgStreamCleanupRef.current?.();
+    convStreamCleanupRef.current = null;
+    msgStreamCleanupRef.current = null;
+    streamsActiveRef.current = false;
+
+    // Reset attempt counter for manual reconnection
+    reconnectAttemptsRef.current = 0;
+    setError(null);
+    setReconnecting(true);
+
+    await startGlobalStreams(primaryClientRef.current);
+  }, [startGlobalStreams]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -999,6 +1077,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     error,
     streamConnected,
     tabLocked,
+    reconnecting,
     conversations,
     activeConversationId,
     messages,
@@ -1015,12 +1094,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     createGroup,
     refreshConversations,
     startDmWithMember,
+    clearError,
+    reconnectStreams,
   }), [
     connectedWallets, isConnecting, connectingWallet, error, streamConnected,
-    tabLocked, conversations, activeConversationId, messages, loadingMessages,
+    tabLocked, reconnecting, conversations, activeConversationId, messages, loadingMessages,
     zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
     disconnectAll, selectConversation, sendMessage, createDm, createGroup,
-    refreshConversations, startDmWithMember,
+    refreshConversations, startDmWithMember, clearError, reconnectStreams,
   ]);
 
   return (

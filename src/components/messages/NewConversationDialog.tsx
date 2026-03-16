@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import type { XMTPPeerProfile } from '@/lib/xmtp/client';
+import type { ZaoMember } from '@/contexts/XMTPContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface SearchUser {
@@ -21,6 +22,8 @@ interface NewConversationDialogProps {
   onClose: () => void;
   onCreateDm: (address: `0x${string}`, peerProfile?: XMTPPeerProfile) => Promise<void>;
   onCreateGroup: (name: string, members: { address: `0x${string}`; profile?: XMTPPeerProfile }[]) => Promise<void>;
+  zaoMembers?: ZaoMember[];
+  onStartDmWithMember?: (member: ZaoMember) => void;
 }
 
 const shortAddr = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -31,6 +34,8 @@ export function NewConversationDialog({
   onClose,
   onCreateDm,
   onCreateGroup,
+  zaoMembers = [],
+  onStartDmWithMember,
 }: NewConversationDialogProps) {
   // DM state
   const [search, setSearch] = useState('');
@@ -53,6 +58,21 @@ export function NewConversationDialog({
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(dialogRef, isOpen);
+
+  // Filter ZAO members by search query for quick-pick suggestions
+  const filteredZaoMembers = useMemo(() => {
+    if (type !== 'dm' || !zaoMembers.length) return [];
+    const q = search.toLowerCase().trim();
+    const filtered = q.length === 0
+      ? zaoMembers
+      : zaoMembers.filter(
+          (m) =>
+            m.displayName.toLowerCase().includes(q) ||
+            (m.username && m.username.toLowerCase().includes(q))
+        );
+    // Reachable first, then alphabetical
+    return filtered.slice(0, 8);
+  }, [type, zaoMembers, search]);
 
   const searchUsers = useCallback(async (q: string, setRes: (u: SearchUser[]) => void, setLoading: (b: boolean) => void) => {
     if (q.length < 1) {
@@ -308,7 +328,75 @@ export function NewConversationDialog({
                       </div>
                     </div>
 
-                    {/* Search results */}
+                    {/* ZAO Members quick-pick */}
+                    {!searching && results.length === 0 && filteredZaoMembers.length > 0 && (
+                      <div>
+                        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1.5">
+                          {search.length > 0 ? 'ZAO Members' : 'ZAO Members — tap to message'}
+                        </p>
+                        <div className="space-y-1 max-h-60 overflow-y-auto">
+                          {filteredZaoMembers.map((member) => (
+                            <button
+                              key={member.fid ?? member.displayName}
+                              onClick={() => {
+                                if (member.reachable && onStartDmWithMember) {
+                                  onStartDmWithMember(member);
+                                  resetState();
+                                  onClose();
+                                } else {
+                                  // Fall back to selecting as a regular user for non-reachable
+                                  const addr = member.addresses[0] || '';
+                                  if (addr) {
+                                    selectUser({
+                                      fid: member.fid ?? 0,
+                                      username: member.username ?? member.displayName,
+                                      display_name: member.displayName,
+                                      pfp_url: member.pfpUrl ?? '',
+                                      custody_address: addr,
+                                      verified_addresses: member.addresses,
+                                      ens: {},
+                                    });
+                                  }
+                                }
+                              }}
+                              className={`flex items-center gap-3 w-full p-2.5 rounded-lg transition-colors text-left ${
+                                member.reachable
+                                  ? 'bg-[#1a2a3a] hover:bg-white/5'
+                                  : 'bg-[#1a2a3a]/50 opacity-60'
+                              }`}
+                            >
+                              <div className="relative flex-shrink-0">
+                                {member.pfpUrl ? (
+                                  <Image src={member.pfpUrl} alt={`${member.displayName} avatar`} width={32} height={32} className="rounded-full" />
+                                ) : (
+                                  <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                                    <span className="text-xs text-gray-400 font-medium">{member.displayName[0]?.toUpperCase()}</span>
+                                  </div>
+                                )}
+                                {member.reachable && (
+                                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-[#0d1b2a] bg-green-400" />
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm font-medium text-white truncate">{member.displayName}</span>
+                                  {member.username && (
+                                    <span className="text-xs text-gray-500">@{member.username}</span>
+                                  )}
+                                </div>
+                              </div>
+                              {member.reachable ? (
+                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 font-medium flex-shrink-0">XMTP</span>
+                              ) : (
+                                <span className="text-[10px] text-gray-600 flex-shrink-0">Not on XMTP</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Farcaster search results */}
                     {searching && (
                       <div className="flex items-center justify-center py-4">
                         <div className="w-5 h-5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
@@ -348,7 +436,7 @@ export function NewConversationDialog({
                       </div>
                     )}
 
-                    {!searching && search.length >= 1 && results.length === 0 && (
+                    {!searching && search.length >= 1 && results.length === 0 && filteredZaoMembers.length === 0 && (
                       <p className="text-sm text-gray-500 text-center py-3">No users found</p>
                     )}
                   </>

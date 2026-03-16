@@ -6,11 +6,13 @@ interface MessageComposeProps {
   onSend: (text: string) => Promise<void>;
   disabled?: boolean;
   placeholder?: string;
+  streamDisconnected?: boolean;
 }
 
-export function MessageCompose({ onSend, disabled, placeholder }: MessageComposeProps) {
+export function MessageCompose({ onSend, disabled, placeholder, streamDisconnected }: MessageComposeProps) {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -20,6 +22,7 @@ export function MessageCompose({ onSend, disabled, placeholder }: MessageCompose
   const handleSend = async () => {
     if (!text.trim() || sending || disabled) return;
     setSending(true);
+    setSendError(null);
     try {
       await onSend(text);
       setText('');
@@ -30,6 +33,7 @@ export function MessageCompose({ onSend, disabled, placeholder }: MessageCompose
       inputRef.current?.focus();
     } catch (err) {
       console.error('Failed to send:', err);
+      setSendError('Message failed to send. Tap to retry.');
     } finally {
       setSending(false);
     }
@@ -83,13 +87,29 @@ export function MessageCompose({ onSend, disabled, placeholder }: MessageCompose
             )}
           </button>
         </div>
-        <div className="flex items-center justify-center mt-1.5">
-          <div className="flex items-center gap-1">
-            <svg className="w-2.5 h-2.5 text-green-500/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-            </svg>
-            <span className="text-[10px] text-gray-600">encrypted</span>
-          </div>
+        <div className="flex items-center justify-center mt-1.5 gap-3">
+          {sendError && (
+            <button
+              onClick={handleSend}
+              className="flex items-center gap-1 text-[10px] text-red-400 hover:text-red-300 transition-colors"
+            >
+              <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+              </svg>
+              {sendError}
+            </button>
+          )}
+          {!sendError && (
+            <div className="flex items-center gap-1">
+              <svg className="w-2.5 h-2.5 text-green-500/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+              <span className="text-[10px] text-gray-600">encrypted</span>
+              {streamDisconnected && (
+                <span className="text-[10px] text-yellow-500/80 ml-1">· offline</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -584,6 +584,8 @@ export function ChatRoom() {
         onClose={() => setDmDialogType(null)}
         onCreateDm={handleCreateDm}
         onCreateGroup={handleCreateGroup}
+        zaoMembers={xmtp.zaoMembers}
+        onStartDmWithMember={xmtp.startDmWithMember}
       />
     </div>
   );

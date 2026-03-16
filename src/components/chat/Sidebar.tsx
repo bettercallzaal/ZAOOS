@@ -230,7 +230,21 @@ export function Sidebar({
                 </div>
               </div>
             ) : xmtpConversations.length === 0 ? (
-              <p className="px-3 py-1 text-xs text-gray-600">No conversations yet</p>
+              <div className="px-3 py-2 space-y-2">
+                <p className="text-xs text-gray-600">No conversations yet</p>
+                <button
+                  onClick={onNewDm}
+                  className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/20 text-sm transition-colors hover:bg-[#f5a623]/10"
+                >
+                  <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                  </svg>
+                  <div className="text-left">
+                    <p className="text-xs text-[#f5a623] font-medium">Start a Conversation</p>
+                    <p className="text-[10px] text-gray-500">Message a ZAO member</p>
+                  </div>
+                </button>
+              </div>
             ) : (
               <div className="space-y-0.5 max-h-60 overflow-y-auto">
                 {xmtpConversations.map((conv) => {
@@ -317,7 +331,7 @@ export function Sidebar({
               badge={onlineMembers.length > 0 ? (
                 <span className="text-[10px] text-green-400 font-medium ml-1">{onlineMembers.length}</span>
               ) : undefined}
-              defaultOpen={false}
+              defaultOpen={true}
             >
               {loadingMembers ? (
                 <div className="space-y-1.5 animate-pulse">

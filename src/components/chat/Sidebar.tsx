@@ -119,8 +119,11 @@ export function Sidebar({
 }: SidebarProps) {
   const onlineMembers = zaoMembers.filter((m) => m.reachable && m.lastLoginAt);
   const offlineMembers = zaoMembers.filter((m) => !m.reachable && m.username);
+  const dmConversations = xmtpConversations.filter((c) => c.type === 'dm');
+  const groupConversations = xmtpConversations.filter((c) => c.type === 'group');
+  const dmUnread = dmConversations.reduce((n, c) => n + c.unreadCount, 0);
+  const groupUnread = groupConversations.reduce((n, c) => n + c.unreadCount, 0);
   const { isConnected: hasWallet } = useAccount();
-  const unreadCount = xmtpConversations.reduce((n, c) => n + c.unreadCount, 0);
   useEscapeClose(onClose, isOpen);
 
   return (
@@ -164,40 +167,9 @@ export function Sidebar({
             ))}
           </SidebarSection>
 
-          {/* ── Private Messages ───────────────────────────────────────── */}
-          <SidebarSection
-            title="Messages"
-            badge={unreadCount > 0 ? (
-              <span className="min-w-[16px] h-[16px] px-1 rounded-full bg-[#f5a623] text-[9px] font-bold text-black flex items-center justify-center ml-1">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-            ) : undefined}
-            actions={xmtpConnected ? (
-              <>
-                <button
-                  onClick={onNewDm}
-                  className="p-1 rounded text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
-                  title="New DM"
-                  aria-label="New direct message"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </button>
-                <button
-                  onClick={onNewGroup}
-                  className="p-1 rounded text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
-                  title="New Group"
-                  aria-label="New group chat"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                  </svg>
-                </button>
-              </>
-            ) : undefined}
-          >
-            {!xmtpConnected && !xmtpConnecting ? (
+          {/* ── XMTP Connection State (shown before connected) ─────────── */}
+          {!xmtpConnected && !xmtpConnecting && (
+            <SidebarSection title="Messages">
               <button
                 onClick={onXmtpConnect}
                 className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/20 text-sm transition-colors hover:bg-[#f5a623]/10"
@@ -210,8 +182,10 @@ export function Sidebar({
                   <p className="text-[10px] text-gray-500">Encrypted DMs & groups</p>
                 </div>
               </button>
-            ) : xmtpConnecting ? (
-              /* Skeleton loading while connecting */
+            </SidebarSection>
+          )}
+          {xmtpConnecting && (
+            <SidebarSection title="Messages">
               <div className="space-y-2 animate-pulse">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="flex items-center gap-2.5 px-3 py-2">
@@ -227,7 +201,10 @@ export function Sidebar({
                   <span className="text-[10px] text-gray-500">Setting up encrypted inbox...</span>
                 </div>
               </div>
-            ) : xmtpError ? (
+            </SidebarSection>
+          )}
+          {xmtpConnected && xmtpError && (
+            <SidebarSection title="Messages">
               <div className="px-3 py-2">
                 <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-500/5 border border-red-500/15">
                   <svg className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
@@ -242,117 +219,204 @@ export function Sidebar({
                   </div>
                 </div>
               </div>
-            ) : xmtpConversations.length === 0 ? (
-              <div className="px-3 py-2 space-y-2">
-                <p className="text-xs text-gray-600">No conversations yet</p>
+            </SidebarSection>
+          )}
+
+          {/* ── Direct Messages ────────────────────────────────────────── */}
+          {xmtpConnected && !xmtpError && (
+            <SidebarSection
+              title="Direct Messages"
+              badge={dmUnread > 0 ? (
+                <span className="min-w-[16px] h-[16px] px-1 rounded-full bg-[#f5a623] text-[9px] font-bold text-black flex items-center justify-center ml-1">
+                  {dmUnread > 99 ? '99+' : dmUnread}
+                </span>
+              ) : undefined}
+              actions={
                 <button
                   onClick={onNewDm}
-                  className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/20 text-sm transition-colors hover:bg-[#f5a623]/10"
+                  className="p-1 rounded text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                  title="New DM"
+                  aria-label="New direct message"
                 >
-                  <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
-                  <div className="text-left">
-                    <p className="text-xs text-[#f5a623] font-medium">Start a Conversation</p>
-                    <p className="text-[10px] text-gray-500">Message a ZAO member</p>
-                  </div>
                 </button>
-              </div>
-            ) : (
-              <div className="space-y-0.5 max-h-60 overflow-y-auto">
-                {xmtpConversations.map((conv) => {
-                  const isActive = activeConversationId === conv.id;
-                  const hasUnread = conv.unreadCount > 0;
-                  const initial = (conv.peerDisplayName || conv.name || '?')[0]?.toUpperCase();
-                  return (
-                    <div className="relative group">
-                      <button
-                        onClick={() => onConversationSelect(conv.id)}
-                        className={`flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                          isActive
-                            ? 'bg-[#f5a623]/10 text-[#f5a623]'
-                            : hasUnread
-                            ? 'text-white hover:bg-white/5'
-                            : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                        }`}
-                      >
-                        {conv.peerPfpUrl ? (
-                          <div className="w-8 h-8 relative flex-shrink-0">
-                            <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="rounded-full object-cover" unoptimized />
+              }
+            >
+              {dmConversations.length === 0 ? (
+                <div className="px-3 py-2">
+                  <p className="text-xs text-gray-600">No direct messages yet</p>
+                </div>
+              ) : (
+                <div className="space-y-0.5 max-h-60 overflow-y-auto">
+                  {dmConversations.map((conv) => {
+                    const isActive = activeConversationId === conv.id;
+                    const hasUnread = conv.unreadCount > 0;
+                    const initial = (conv.peerDisplayName || '?')[0]?.toUpperCase();
+                    return (
+                      <div key={conv.id} className="relative group">
+                        <button
+                          onClick={() => onConversationSelect(conv.id)}
+                          className={`flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                            isActive
+                              ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                              : hasUnread
+                              ? 'text-white hover:bg-white/5'
+                              : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
+                          {conv.peerPfpUrl ? (
+                            <div className="w-8 h-8 relative flex-shrink-0">
+                              <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || 'DM'} avatar`} fill className="rounded-full object-cover" unoptimized />
+                            </div>
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0 border border-[#f5a623]/10">
+                              <span className="text-xs text-[#f5a623]/80 font-semibold">{initial}</span>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-1">
+                              <p className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}>
+                                {conv.peerDisplayName || 'Unknown'}
+                              </p>
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                {hasUnread && (
+                                  <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#f5a623] text-[10px] font-bold text-black flex items-center justify-center">
+                                    {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                                  </span>
+                                )}
+                                {conv.lastMessageAt && (
+                                  <span className="text-[10px] text-gray-600">{timeAgo(conv.lastMessageAt)}</span>
+                                )}
+                              </div>
+                            </div>
+                            {conv.lastMessage && (
+                              <p className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {conv.lastMessage}
+                              </p>
+                            )}
                           </div>
-                        ) : conv.type === 'group' ? (
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </SidebarSection>
+          )}
+
+          {/* ── Groups ─────────────────────────────────────────────────── */}
+          {xmtpConnected && !xmtpError && (
+            <SidebarSection
+              title="Groups"
+              badge={groupUnread > 0 ? (
+                <span className="min-w-[16px] h-[16px] px-1 rounded-full bg-[#f5a623] text-[9px] font-bold text-black flex items-center justify-center ml-1">
+                  {groupUnread > 99 ? '99+' : groupUnread}
+                </span>
+              ) : undefined}
+              actions={
+                <button
+                  onClick={onNewGroup}
+                  className="p-1 rounded text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                  title="New Group"
+                  aria-label="New group chat"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </button>
+              }
+            >
+              {groupConversations.length === 0 ? (
+                <div className="px-3 py-2">
+                  <p className="text-xs text-gray-600">No groups yet</p>
+                </div>
+              ) : (
+                <div className="space-y-0.5 max-h-60 overflow-y-auto">
+                  {groupConversations.map((conv) => {
+                    const isActive = activeConversationId === conv.id;
+                    const hasUnread = conv.unreadCount > 0;
+                    return (
+                      <div key={conv.id} className="relative group">
+                        <button
+                          onClick={() => onConversationSelect(conv.id)}
+                          className={`flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                            isActive
+                              ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                              : hasUnread
+                              ? 'text-white hover:bg-white/5'
+                              : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                          }`}
+                        >
                           <div className="w-8 h-8 rounded-lg bg-[#f5a623]/15 flex items-center justify-center flex-shrink-0">
                             <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
                             </svg>
                           </div>
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0 border border-[#f5a623]/10">
-                            <span className="text-xs text-[#f5a623]/80 font-semibold">{initial}</span>
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-1">
-                            <p className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}>
-                              {conv.peerDisplayName || conv.name}
-                              {conv.type === 'group' && conv.memberCount && (
-                                <span className="ml-1.5 text-[10px] text-gray-500 font-normal">
-                                  {conv.memberCount} members
-                                </span>
-                              )}
-                            </p>
-                            <div className="flex items-center gap-1.5 flex-shrink-0">
-                              {hasUnread && (
-                                <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#f5a623] text-[10px] font-bold text-black flex items-center justify-center">
-                                  {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
-                                </span>
-                              )}
-                              {conv.lastMessageAt && (
-                                <span className="text-[10px] text-gray-600">{timeAgo(conv.lastMessageAt)}</span>
-                              )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-1">
+                              <p className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}>
+                                {conv.name || 'Group'}
+                                {conv.memberCount && (
+                                  <span className="ml-1.5 text-[10px] text-gray-500 font-normal">
+                                    {conv.memberCount}
+                                  </span>
+                                )}
+                              </p>
+                              <div className="flex items-center gap-1.5 flex-shrink-0">
+                                {hasUnread && (
+                                  <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#f5a623] text-[10px] font-bold text-black flex items-center justify-center">
+                                    {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                                  </span>
+                                )}
+                                {conv.lastMessageAt && (
+                                  <span className="text-[10px] text-gray-600">{timeAgo(conv.lastMessageAt)}</span>
+                                )}
+                              </div>
                             </div>
+                            {conv.lastMessage && (
+                              <p className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {conv.lastMessage}
+                              </p>
+                            )}
                           </div>
-                          {conv.lastMessage && (
-                            <p className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}>
-                              {conv.lastMessage}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                      {conv.type === 'group' && onGroupInfo && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); onGroupInfo(conv.id); }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded text-gray-500 hover:text-white transition-all"
-                          aria-label="Group info"
-                        >
-                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                          </svg>
                         </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                        {onGroupInfo && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onGroupInfo(conv.id); }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded text-gray-500 hover:text-white transition-all"
+                            aria-label="Group info"
+                          >
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
-            {/* Wallet connect */}
-            {xmtpConnected && !hasWallet && (
-              <ConnectButton.Custom>
-                {({ openConnectModal }) => (
-                  <button
-                    onClick={openConnectModal}
-                    className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors mt-1"
-                  >
-                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
-                    </svg>
-                    <span className="text-xs">Connect Wallet</span>
-                  </button>
-                )}
-              </ConnectButton.Custom>
-            )}
-          </SidebarSection>
+              {/* Wallet connect */}
+              {!hasWallet && (
+                <ConnectButton.Custom>
+                  {({ openConnectModal }) => (
+                    <button
+                      onClick={openConnectModal}
+                      className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors mt-1"
+                    >
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" />
+                      </svg>
+                      <span className="text-xs">Connect Wallet</span>
+                    </button>
+                  )}
+                </ConnectButton.Custom>
+              )}
+            </SidebarSection>
+          )}
 
           {/* ── Messageable Members ──────────────────────────────────────── */}
           {xmtpConnected && (

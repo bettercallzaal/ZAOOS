@@ -9,7 +9,7 @@
 
 1. [What Is The ZAO?](#1-what-is-the-zao)
 2. [The Four Pillars](#2-the-four-pillars)
-3. [Founder & Origin Story](#3-founder--origin-story)
+3. [Founder & The Story](#3-founder--the-story)
 4. [Core Team](#4-core-team)
 5. [The Ecosystem Map](#5-the-ecosystem-map)
 6. [$ZAO Respect Token & ZIDs](#6-zao-respect-token--zids)
@@ -32,14 +32,15 @@
 
 ## 1. What Is The ZAO?
 
-**The ZAO (ZTalent Artist Organization)** is a community-driven decentralized impact network for the creator economy. Part DAO, part collective, part talent agency, part educational platform.
+**The ZAO (ZTalent Artist Organization)** is a community-driven decentralized impact network for the creator economy. Part DAO, part collective, part incubator, part community, part educational platform.
 
 **Tagline:** "Demystifying emerging technology for independent artists"
-**Thesis:** "Web2 takes the profit. Web3 gives it back."
+**Thesis:** "Web2 takes the profit, the audience, and the data. Web3 gives it all back."
 **Website:** [thezao.com](https://www.thezao.com/about)
-**Identity:** "A Nounish crew" — aligned with Nouns DAO values (community-owned, open-source, public goods)
 
-The ZAO empowers creators to own their art, data, and rights. Inspired by Bitcoin's peer-to-peer vision, David Ehrlichman's Impact Networks framework, and fractal democracy.
+The ZAO empowers creators to own their art, their audience, their social graph, and their rights. Inspired by Bitcoin's peer-to-peer vision, David Ehrlichman's Impact Networks framework, and fractal democracy.
+
+**The software:** [ZAO OS](https://zaoos.com) is an open-source, MIT-licensed Farcaster client built specifically for the community — with inline music players, encrypted messaging, fractal governance, and a research library of 54 documents spanning 300,000+ words. Built in public, research-first.
 
 ---
 
@@ -52,11 +53,23 @@ ZAO OS carries 4 meanings, each a visible section of the app:
 | **Z**Talent **A**rtist **O**rganization | Social | Community, social graph, music curation, shared listening |
 | **Z**Talent **A**utonomous **O**rganization | Governance | Respect tokens, fractal democracy, DAO, Hats roles, treasury |
 | **Z**AO **O**perating **S**ystem | Tools | Artist brand building, cross-platform publishing, AI agent, ZID profiles |
-| **Z**AO **O**pen **S**ource | Contribute | GitHub, AI + human coordination, forkability, bounties, docs |
+| **Z**AO **O**pen **S**ource | Contribute | GitHub, AI + human coordination, forkability, planned bounties, docs |
+
+### Why Each Pillar Exists
+
+**Artist Organization (Social)** — Because artists need a community that actually knows them by name. Not an algorithm that surfaces content to strangers — a gated space where members share music, react to each other's work, and build relationships over time. Gated Farcaster chat, inline music players for Spotify/SoundCloud/Audius/YouTube, XMTP encrypted DMs, followers/following, music queue, song submission.
+
+**Autonomous Organization (Governance)** — Because artists deserve a say in how their community is run, not just the people who invested the most money. The Respect Game distributes decision-making power based on contribution, not capital. Weekly fractal meetings, soulbound $ZAO tokens, ZID membership numbers. Hats Protocol roles and community treasury are next.
+
+**Operating System (Tools)** — Because artists need tools that work for them, not platforms that extract from them. ZID profiles give artists a portable identity. Cross-platform publishing lets them reach every audience from one compose bar. The AI agent discovers music and scores curation quality. These are tools the community builds for itself.
+
+**Open Source (Contribute)** — Because the tools should belong to everyone. The codebase is MIT-licensed. `community.config.ts` makes the entire app forkable by changing one file. The research library (54 documents, 300,000+ words) is public knowledge. Any community can fork ZAO OS and make it their own.
 
 ---
 
-## 3. Founder & Origin Story
+## 3. Founder & The Story
+
+> *For the full interactive timeline, see [thezao.com/timeline](https://thezao.com/timeline).*
 
 ### Zaal Panthaki (@BetterCallZaal)
 
@@ -67,59 +80,46 @@ ZAO OS carries 4 meanings, each a visible section of the app:
 | **Current** | Building Automation Technician, The Jackson Laboratory + ZAO Founder |
 | **Based** | Maine (Ellsworth area) |
 | **Farcaster** | @bettercallzaal (FID 19640) |
-| **X/Twitter** | @bettercallzaal |
-| **GitHub** | 65+ public repos |
-| **Newsletter** | 400+ editions across Year of the ZAO, Year of the ZABAL, ZTalent |
+| **GitHub** | [65+ public repos](https://github.com/bettercallzaal) |
+| **Newsletter** | [400+ editions](https://paragraph.com/@thezao) across Year of the ZAO, Year of the ZABAL, ZTalent |
 
-**Origin:** Started ZAO in 2022 after supporting a friend's music career turned into a mission to empower independent artists through Web3. Transitioned from industrial automation engineering to full-time Web3 entrepreneurship.
+The ZAO began in 2022 as ZTalent Agency. In 2023, the team pivoted to focus fully on music and community — dropping the agency model and becoming the ZAO. The bear market turned out to be the best timing — the people still building were serious.
 
----
+**The mission:** Bring the profit margin, the data, the audience, and the IP rights back to independent artists.
 
-## 4. The Founder's Story (In Zaal's Words)
+**The philosophy:** Teach creators how to build independence. The goal for anyone joining the ZAO is to eventually learn how to create a website, deploy a smart contract, sell something digitally to someone anywhere in the world, and receive that revenue directly. Feed the individual and teach them how to fish.
 
-Studied electrical engineering, didn't enjoy coding in school — the syntax felt rigid. Discovered blockchain during the 2023 bear market, where coding became practical: "a tool to build systems that actually move value between people." The bear market was the best timing — "the people still building were serious."
+### Origin
 
-Meeting musicians in web3 shifted the perspective from purely technical work toward the creative economy. The music industry's structural problems (ownership, distribution, payment flows) have well-known solutions in blockchain: peer-to-peer relationships between artists and audiences.
-
-**The mission:** Bring the profit margin, the data, and the IP rights back to independent artists.
-
-**The philosophy:** Teach creators how to build independence. The goal for anyone joining the ZAO is to eventually learn how to create a website, deploy a smart contract, sell something digitally to someone anywhere in the world, and receive that revenue directly. "Feed the individual and teach them how to fish."
-
-### Origin of the ZAO
-
-Started inside another DAO. Most members left. The remaining builders shut it down and focused fully on music. Built the fractal governance system — weekly coordination game where groups of six share contributions and vote for top contributors, distributing $ZAO Respect (soulbound, illiquid, contribution-based). Running consistently for nearly two years.
+The team built a weekly coordination game — small groups of six people sharing contributions and ranking each other — and created a soulbound token called $ZAO Respect to track who was actually showing up. That system has been running consistently for nearly two years, with 90+ meetings completed.
 
 ### The Events Journey
 
-**ZAO-PALOOZA (NYC, 2024):** First major event during NFT NYC. Organized in six weeks with volunteers. Broke even financially. "More importantly, allowed many community members to meet in person for the first time."
+**ZAO-PALOOZA (NYC, 2024):** First major event during NFT NYC. Organized in six weeks with volunteers. Broke even financially — and more importantly, let community members meet in person for the first time.
 
-**ZAO-CHELLA (Miami, 2024):** During Art Week. Brought together multiple onchain music communities. "We tried many new ideas — some worked well, some didn't — but the experience helped clarify our identity within the emerging on-chain music movement." Key goal: build mindshare for onchain music, which has "historically received far less attention than on-chain visual art."
+**ZAO-CHELLA (Miami, 2024):** During Art Week. Brought together multiple onchain music communities. Some experiments worked, some didn't, but it clarified the ZAO's identity within the emerging onchain music movement. Key goal: build mindshare for onchain music, which has historically received far less attention than onchain visual art.
 
 ### WaveWarZ Breakthrough
 
-During a recent event, a musician earned roughly 0.5 SOL simply from trading activity during a battle. "That moment showed us the model can actually work." The project was built by a small core team — one developer originally learned to code through AI tools and helped build the full application.
+During a battle, a musician earned roughly 0.5 SOL simply from trading activity during a 20-minute round. That moment proved the model works — artists can earn from engagement, not just streams.
 
 ### Moving to Maine
 
-Moved from Oregon to rural Maine in 2024. "Very different from tech communities. Quieter, more rural, but an incredibly rich arts culture. Very little blockchain exposure — which creates an interesting opportunity."
-
-Started putting down local roots: volunteering, joining event committees, ski patrolling, getting involved in arts and business initiatives. Joined an organization strengthening the town's small business ecosystem. Discovered the region runs an annual statewide craft fair weekend — by aligning ZAO Stock with it, "we gain statewide marketing exposure while contributing something new: a dedicated music event."
+The founder relocated to rural Maine in 2024 — a region with incredibly rich arts culture and almost zero blockchain exposure. That gap became an opportunity. After joining local organizations, volunteering, and collaborating with a musician who has been working to build a thriving local music scene since the late 1980s, the plan for ZAO Stock took shape.
 
 ### ZAO Stock Vision
 
-"A polished music festival first, not a Web3 conference. Anyone should be able to attend and enjoy without knowing anything about blockchain." Optional activations for those who want to explore the technology. Affordable tickets, community discounts, optional digital experiences. "The technology should enhance the experience — not interrupt it."
+A polished music festival first, not a Web3 conference. Anyone should be able to attend and enjoy without knowing anything about blockchain. The technology enhances the experience — it doesn't interrupt it. By aligning the festival with an existing statewide craft fair weekend, ZAO Stock gains marketing exposure while contributing something new: a dedicated music event that bridges decades of local arts culture with the global onchain music movement. The long-term vision: Maine's first crypto-native music conference — accessible to anyone, powered by onchain tools under the hood.
 
-### Local Music Connection
+### Building Infrastructure (2026)
 
-"One musician I met has been trying to create a thriving music community locally since the late 1980s. People like him bring decades of cultural knowledge and relationships. My goal is to combine their experience with the tools and networks we've developed through Web3."
+ZAO OS — a gated Farcaster client — went into active development with 54 research documents, encrypted messaging via XMTP, inline music players, push notifications, and an MIT-licensed open-source codebase. The research library spans 300,000+ words across every aspect of decentralized community building.
 
-### The Long-Term View
-
-"Each iteration teaches us what works, what doesn't, and how to build something better next time."
+Each iteration teaches the team what works, what doesn't, and how to build something better next time.
 
 ---
 
-## 5. Core Team
+## 4. Core Team
 
 ### WaveWarZ Core Team
 
@@ -135,8 +135,8 @@ Started putting down local roots: volunteering, joining event committees, ski pa
 |--------|--------|------|------------|
 | **AttaBotty** | @AttaBotty | ZAO Co-Founder | William Stewart. 20+ years music production/animation. 10,000+ NFTs sold. Base Onchain Registry. Co-founded AttaBotty Productions with wife DaNici. Florida-based. |
 | **DaNici** | — | Production/Visual | Self-taught graphic designer/animator (Blender). Co-founder of AttaBotty Productions. Creates original content for X, YouTube, Instagram. |
-| **BinX** | — | ZAO Co-Founder | Festival organizing. |
-| **Mr. McFly** | — | Community | Connected through Farmacy Fantoms (Styles P's 6,666 NFT project, 16.4K followers). |
+| **BinX** | — | Former team member | Festival organizing. No longer active. |
+| **Mr. McFly** | — | Community member | Connected through Farmacy Fantoms (Styles P's 6,666 NFT project, 16.4K followers). |
 
 ### LTAW3 Team
 
@@ -153,17 +153,6 @@ Started putting down local roots: volunteering, joining event committees, ski pa
 | **AttaBotty** | Artist management, production | ZAO co-founder, 20+ years |
 | **DaNici** | Visual design, animation | Blender, multimedia |
 | **FailOften (David Steele Overholt)** | Creative tech, installations | 25+ years, NYU ITP grad, taught 10 years at Kansas City Art Institute (founded Interactive Arts Major). NEA + Andy Warhol Foundation supported. Runs ENTERACT studio in KC. Fortune 100 clients + museums. [failoften.xyz](https://failoften.xyz/) |
-
-### Fractal Governance Members (Day 1 Rankings)
-
-| Rank | Person | Handle |
-|------|--------|--------|
-| 1st | **Prizem** | @Prizem |
-| 2nd | **Candy** | @CandyToyBoxYT1 |
-| 3rd | **SteveStrange** | @SteveStrange |
-| 4th | **Rhia23k** | @Rhia23k |
-| 5th | **Ohnahji B** | @OhnahjiB |
-| 6th | **Zaal** | @bettercallzaal |
 
 ### Mentorship Network
 
@@ -743,13 +732,14 @@ Multi-artist collaboration:
 - Recursive structure scales to any size while keeping groups small
 - Natural Sybil resistance through in-person verification
 
-### Nounish Identity
+### Open Source Ethos
 
-ZAO calls itself "a Nounish crew" — aligning with:
+The ZAO shares values with public goods movements but is not aligned with any specific DAO identity. Core principles:
 - Community-owned (not VC-backed)
-- Open source (ZAO OS is MIT)
+- Open source (ZAO OS is MIT-licensed)
 - Creative culture
 - Public goods orientation
+- A Nounish project may be launched in the future, but the ZAO itself is not a Nounish DAO
 
 ---
 
@@ -771,7 +761,7 @@ ZAO calls itself "a Nounish crew" — aligning with:
 | Smart contract exploits | Zero |
 | ZAO festivals held | 4 (PALOOZA, CHELLA, PROS, and planning Stock + Ville) |
 | COC weekly concerts | 150+ |
-| Research documents | 50 |
+| Research documents | 54 |
 | GitHub repos | 65+ |
 
 ---
@@ -780,8 +770,8 @@ ZAO calls itself "a Nounish crew" — aligning with:
 
 | Period | Milestone |
 |--------|-----------|
-| 2022 | ZAO founded by Zaal Panthaki. First smart contracts on Base/Solana. |
-| 2023 | WaveWarZ co-founded (Hurric4n3IKE, Zaal, Candy). Student Loanz collaboration. |
+| 2022 | ZTalent Agency founded by Zaal Panthaki. First smart contracts on Base/Solana. |
+| 2023 | Pivoted to the ZAO (ZTalent Artist Organization) — focus on music + community. WaveWarZ co-founded (Hurric4n3IKE, Zaal, Candy). Student Loanz collaboration. |
 | April 2024 | **ZAO-PALOOZA** at NFT NYC — 12 artists, 6 new to Web3, ZAO Cards on Manifold |
 | 2024 | ZAO Whitepaper Draft 3. WaveWarZ DApp reaches readiness. |
 | Dec 2024 | **ZAO-CHELLA** at Art Basel Miami — 10 artists, WaveWarZ LIVE, AR art, Student $LOANZ Gold Sponsor |
@@ -792,7 +782,7 @@ ZAO calls itself "a Nounish crew" — aligning with:
 | Dec 2025 | ZABAL ecosystem announced (Update 3). "December is the rehearsal. 2026 is the empire." |
 | Jan 1, 2026 | ZABAL token launch. Empire Builder integration. |
 | Feb 2026 | ETH Boulder — ZABAL Connector / Proof of Meet with Magnetiq |
-| Mar 2026 | ZAO OS active development (this repo). 50 research documents. |
+| Mar 2026 | ZAO OS active development (this repo). 54 research documents. 300,000+ words of research. Whitepaper Draft 5. |
 | Jul 2026 | **ZAOVille** (Virginia, with DCOOP) |
 | Oct 3, 2026 | **ZAO Stock** (Ellsworth, Maine — physical music festival) |
 

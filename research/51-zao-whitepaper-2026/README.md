@@ -11,17 +11,17 @@
 
 ## 1. The Problem — and Our Answer
 
-Streaming pays [$0.003 per play](https://royaltyexchange.com/blog/how-music-streaming-platforms-calculate-payouts-per-stream-2025). Labels take [80-85% of revenue](https://www.billboard.com/pro/music-streaming-royalty-payments-explained-song-profits/). Platforms own the data, the audience, and the algorithm. To earn $100K from Spotify alone, an artist needs [33.3 million streams per year](https://newsroom.spotify.com/2025-01-28/on-our-10-billion-milestone-and-a-decade-of-getting-the-world-to-value-music/).
+Streaming pays [$0.003 per play](https://royaltyexchange.com/blog/how-music-streaming-platforms-calculate-payouts-per-stream-2025). Labels take [80-85% of revenue](https://www.billboard.com/pro/music-streaming-royalty-payments-explained-song-profits/). Platforms own the data, the audience, and the algorithm. To earn $100K from Spotify alone, an artist needs [33.3 million streams per year](https://newsroom.spotify.com/2025-01-28/on-our-10-billion-milestone-and-a-decade-of-getting-the-world-to-value-music/). And when a platform changes its algorithm or shuts down, the artist loses their audience, their social graph, and their reach overnight — because none of it belonged to them.
 
-The tools to fix this exist. Blockchain gives you transparent revenue splits. Smart contracts give you automatic royalty distribution. Decentralized identity gives you a portable audience. On-chain attestations give you provable IP ownership.
+The tools to fix this exist. Blockchain gives you transparent revenue splits. Smart contracts give you automatic royalty distribution. Decentralized identity gives you a portable audience and social graph that no platform can take away. On-chain attestations give you provable IP ownership.
 
-**The problem isn't that the technology doesn't exist. The problem is that nobody is teaching artists how to use it.**
+**The problem isn't that the technology doesn't exist. The problem is that the people teaching artists how to use it don't have the distribution or support to reach them.** Builders are building. But they're building in silos, without community infrastructure behind them.
 
-That is what the ZAO does.
+That is where the ZAO comes in.
 
-**The ZAO (ZTalent Artist Organization)** is a guild that teaches independent artists to take back their profit margins, their data, and their IP rights — by learning and building together. We don't tell artists "trust us, we'll handle it." We say "here's how it works, and we'll learn it together."
+**The ZAO (ZTalent Artist Organization)** is a guild that teaches independent artists to take back their profit margins, their data, their audience, and their IP rights — by learning and building together. We don't tell artists "trust us, we'll handle it." We say "here's how it works, and we'll learn it together."
 
-Founded in 2023 as a pivot from ZTalent Agency. Community first, technology second.
+Founded in 2023 — pivoted from ZTalent Agency to focus fully on music and community. Community first, technology second.
 
 The goal for anyone joining the ZAO is straightforward: learn how to create a website, deploy a smart contract, sell something digitally to anyone in the world, and receive that revenue directly. Feed the individual and teach them how to fish.
 
@@ -31,21 +31,29 @@ How do we teach? Everywhere, all the time, by being around. Workshops. One-on-on
 
 ## 2. The Story
 
-The ZAO's founder studied electrical engineering and originally didn't enjoy coding — the syntax felt rigid and frustrating. When he discovered blockchain during the 2023 bear market, coding became something different: a practical tool for building systems that actually move value between people. The bear market turned out to be the best timing — the people still building were serious.
+> *For the full interactive timeline, see [thezao.com/timeline](https://thezao.com/timeline).*
 
-Meeting musicians in web3 shifted the focus from purely technical work toward the creative economy. The music industry's structural problems are well-known. What was less obvious: blockchain offers a clear solution — peer-to-peer relationships between artists and audiences, with no intermediary taking 85%.
+The ZAO began in 2022 as ZTalent Agency. In 2023, the team pivoted to focus fully on music and community — dropping the agency model and becoming the ZAO (ZTalent Artist Organization). The bear market turned out to be the best timing — the people still building were serious.
 
-The ZAO started as ZTalent Agency, then pivoted when the team decided to focus fully on music and community. They built a weekly coordination game — small groups of six people sharing contributions and ranking each other — and created a soulbound token called $ZAO Respect to track who was actually showing up. That system has been running consistently for nearly two years.
+*(Add founding story here — what sparked the pivot, who was in the room, what the first conversation looked like.)*
+
+The team built a weekly coordination game — small groups of six people sharing contributions and ranking each other — and created a soulbound token called $ZAO Respect to track who was actually showing up. That system has been running consistently for nearly two years, with 90+ meetings completed.
+
+*(Add a story about a specific fractal meeting moment that captures the culture — what made someone stay, what surprised a newcomer.)*
 
 The first major event was ZAO-PALOOZA in New York during NFT NYC 2024. Organized in six weeks with volunteers, it broke even financially — and more importantly, let community members meet in person for the first time. Later that year, ZAO-CHELLA during Miami Art Week brought multiple onchain music communities together. Some experiments worked, some didn't, but it clarified the ZAO's identity within the emerging onchain music movement. The key goal behind these events: build mindshare for onchain music, which has historically received far less attention than onchain visual art.
 
-Then WaveWarZ started gaining traction. During a battle, a musician earned roughly 0.5 SOL simply from trading activity during a 20-minute round. That moment proved the model works — artists can earn from engagement, not just streams. The platform was built by a small core team. One of the developers originally learned to code through AI tools and helped build the full application.
+*(Add a specific event moment — a performance, a conversation, a connection that happened because of these gatherings.)*
 
-In 2024, the founder moved from Oregon to rural Maine — quieter, more rural, but with an incredibly rich arts culture and almost zero blockchain exposure. That gap became an opportunity. After joining local organizations, volunteering, and connecting with a musician who has been trying to build a thriving local music scene since the late 1980s, the plan for ZAO Stock took shape: a polished music festival first, not a Web3 conference. Anyone should be able to attend and enjoy the experience without knowing anything about blockchain. The technology enhances the experience — it doesn't interrupt it.
+Then WaveWarZ started gaining traction. During a battle, a musician earned roughly 0.5 SOL simply from trading activity during a 20-minute round. That moment proved the model works — artists can earn from engagement, not just streams.
 
-By aligning the festival with an existing statewide craft fair weekend that draws artists and visitors from across Maine, ZAO Stock gains marketing exposure while contributing something new: a dedicated music event that bridges decades of local arts culture with the global onchain music movement.
+In 2024, the founder relocated to rural Maine — a region with incredibly rich arts culture and almost zero blockchain exposure. That gap became an opportunity. After joining local organizations, volunteering, and collaborating with a musician who has been working to build a thriving local music scene since the late 1980s, the plan for ZAO Stock took shape: a polished music festival first, not a Web3 conference. Anyone should be able to attend and enjoy the experience without knowing anything about blockchain. The technology enhances the experience — it doesn't interrupt it.
 
-Each iteration teaches us what works, what doesn't, and how to build something better next time.
+By aligning the festival with an existing statewide craft fair weekend that draws artists and visitors from across Maine, ZAO Stock gains marketing exposure while contributing something new: a dedicated music event that bridges decades of local arts culture with the global onchain music movement. The long-term vision: Maine's first crypto-native music conference — accessible to anyone, powered by onchain tools under the hood.
+
+In 2026, the team shifted to building infrastructure. ZAO OS — a gated Farcaster client — went into active development with 54 research documents, encrypted messaging via XMTP, inline music players, push notifications, and an MIT-licensed open-source codebase. The research library alone spans 300,000+ words across every aspect of decentralized community building. This whitepaper is itself a product of that research-first development approach.
+
+Each iteration teaches the team what works, what doesn't, and how to build something better next time.
 
 ---
 
@@ -55,14 +63,14 @@ Each iteration teaches us what works, what doesn't, and how to build something b
 
 | Person | Role | Background |
 |--------|------|------------|
-| **[Zaal Panthaki](https://warpcast.com/bettercallzaal)** | Founder, Head of Ecosystem | Electrical engineer (RIT). Former automation lead ($1.5M robotics project). 400+ daily newsletters. [65+ GitHub repos](https://github.com/bettercallzaal). |
+| **[Zaal Panthaki](https://github.com/bettercallzaal)** | Founder, Head of Ecosystem | Electrical engineer (RIT). Former automation lead ($1.5M robotics project). 400+ daily newsletters. [65+ GitHub repos](https://github.com/bettercallzaal). |
 | **[Hurric4n3IKE](https://www.linkedin.com/in/ikechi-nwachukwu/)** | WaveWarZ Founder, Developer | Solana smart contract developer (Anchor/Rust). Audio engineer. Musician. Built WaveWarZ from scratch. |
 | **[Candy](https://x.com/CandyToyBoxYT1)** | Co-Founder, Marketing & Design | CC0 artist. CandyToyBox.eth. Web3 Academy Writers Guild. Agentic automation. ZID 2. |
 | **[AttaBotty](https://www.attabotty.com/)** | Co-Founder, Festivals & Production | 20+ years music production. 10,000+ NFTs sold. Base Onchain Registry. Co-founded AttaBotty Productions. |
 | **[Ohnahji B](https://ohnahjiu.com/)** | Education, LTAW3 Co-Host | Chancellor of Ohnahji University ("Web3's First HBCU"). ohnahji.eth. Weekly ONJU Saturdays educator. |
 | **[EZ](https://knownorigin.io/ezincrypto)** | LTAW3 Co-Host, Artist | EZinCrypto.eth. Photographer since age 9. NFT artist (KnownOrigin). Costa Rica-based. |
 
-Plus 22 roster artists, 14+ mutual communities, and a founding membership of 40.
+The team is supported by a roster of independent artists, a network of mutual communities, and a founding membership that sets the culture before scale. The goal is not to grow fast — it is to grow right.
 
 ---
 
@@ -408,11 +416,11 @@ The ZAO is gated — intentionally. Depth over breadth.
 |---|---|
 | **Website** | [thezao.com](https://www.thezao.com) |
 | **App** | [zaoos.com](https://zaoos.com) |
-| **Farcaster** | [/zao](https://warpcast.com/~/channel/zao) |
+| **Farcaster** | /zao channel |
 | **Newsletter** | [paragraph.com/@thezao](https://paragraph.com/@thezao) |
 | **Podcast** | [LTAW3 on Pods.media](https://pods.media/lets-talk-about-web3/) |
 | **Code** | [github.com/bettercallzaal/ZAOOS](https://github.com/bettercallzaal/ZAOOS) |
-| **Builder** | [@bettercallzaal](https://warpcast.com/bettercallzaal) |
+| **Builder** | [@bettercallzaal on Farcaster](https://github.com/bettercallzaal) |
 
 ---
 

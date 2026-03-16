@@ -20,6 +20,7 @@ export interface ZaoMember {
   pfpUrl: string | null;
   addresses: string[];
   reachable: boolean;
+  xmtpAddress: string | null;  // The specific address that passed canMessage
   lastLoginAt: string | null;  // ISO timestamp
 }
 
@@ -463,7 +464,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      const reachableSet = new Set<number>();
+      const reachableMap = new Map<number, string>(); // memberIdx → reachable address
       if (allAddresses.length > 0) {
         try {
           const { IdentifierKind } = await import('@xmtp/browser-sdk');
@@ -478,7 +479,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
             for (const [addr, canMsg] of results.entries()) {
               if (canMsg) {
                 const idx = addrToMemberIdx.get(addr.toLowerCase());
-                if (idx !== undefined) reachableSet.add(idx);
+                if (idx !== undefined && !reachableMap.has(idx)) {
+                  reachableMap.set(idx, addr.toLowerCase());
+                }
               }
             }
           }
@@ -494,7 +497,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
           displayName: m.displayName,
           pfpUrl: m.pfpUrl,
           addresses: m.addresses,
-          reachable: reachableSet.has(idx),
+          reachable: reachableMap.has(idx),
+          xmtpAddress: reachableMap.get(idx) || null,
           lastLoginAt: m.lastLoginAt || null,
         }))
         .sort((a: ZaoMember, b: ZaoMember) => {
@@ -1012,7 +1016,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   const startDmWithMember = useCallback(async (member: ZaoMember) => {
     if (member.addresses.length === 0) return;
-    const addr = member.addresses[0] as `0x${string}`;
+    // Use the address that passed canMessage, fall back to first address
+    const addr = (member.xmtpAddress || member.addresses[0]) as `0x${string}`;
     const profile: XMTPPeerProfile = {
       fid: member.fid ?? 0,
       username: member.username ?? member.displayName,

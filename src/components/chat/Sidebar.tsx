@@ -170,6 +170,19 @@ export function Sidebar({
           {/* ── XMTP Connection State (shown before connected) ─────────── */}
           {!xmtpConnected && !xmtpConnecting && (
             <SidebarSection title="Messages">
+              {xmtpError && (
+                <div className="px-3 py-2 mb-1">
+                  <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-red-500/5 border border-red-500/15">
+                    <svg className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    <div>
+                      <p className="text-xs text-red-400 font-medium">Connection failed</p>
+                      <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-2">{xmtpError}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <button
                 onClick={onXmtpConnect}
                 className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/20 text-sm transition-colors hover:bg-[#f5a623]/10"
@@ -178,7 +191,7 @@ export function Sidebar({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 119 0v3.75M3.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H3.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                 </svg>
                 <div className="text-left">
-                  <p className="text-xs text-[#f5a623] font-medium">Enable Messaging</p>
+                  <p className="text-xs text-[#f5a623] font-medium">{xmtpError ? 'Retry Connection' : 'Enable Messaging'}</p>
                   <p className="text-[10px] text-gray-500">Encrypted DMs & groups</p>
                 </div>
               </button>
@@ -211,7 +224,7 @@ export function Sidebar({
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                   </svg>
                   <div>
-                    <p className="text-xs text-red-400 font-medium">Connection failed</p>
+                    <p className="text-xs text-red-400 font-medium">Connection issue</p>
                     <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-2">{xmtpError}</p>
                     <button onClick={onXmtpConnect} className="text-[10px] text-[#f5a623] font-medium mt-1.5 hover:text-[#ffd700]">
                       Retry

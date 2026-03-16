@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { communityConfig } from '@/../community.config';
+import { usePlayer } from '@/providers/audio';
 import { NotificationBell } from './NotificationBell';
 
 const TABS = [
@@ -54,6 +55,8 @@ const TABS = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const player = usePlayer();
+  const isPlaying = player.isPlaying || player.isLoading;
 
   const activeTab = TABS.find((tab) =>
     tab.matchPaths.some((p) => pathname.startsWith(p))
@@ -90,6 +93,27 @@ export function BottomNav() {
               );
             })}
           </div>
+          {/* Now playing indicator */}
+          {isPlaying && player.metadata && (
+            <div className="flex items-center gap-2 mr-2 px-2 py-1 rounded-md bg-white/5">
+              <div className="flex items-end gap-px h-3">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="w-[2px] bg-[#f5a623] rounded-full animate-bounce"
+                    style={{
+                      height: `${4 + i * 2}px`,
+                      animationDelay: `${i * 0.15}s`,
+                      animationDuration: '0.6s',
+                    }}
+                  />
+                ))}
+              </div>
+              <span className="text-[10px] text-gray-400 truncate max-w-[120px]">
+                {player.metadata.trackName}
+              </span>
+            </div>
+          )}
           <NotificationBell />
         </div>
       </nav>

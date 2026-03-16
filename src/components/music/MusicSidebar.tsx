@@ -5,6 +5,7 @@ import { Cast } from '@/types';
 import { usePlayer } from '@/providers/audio';
 import { useMusicQueue } from '@/hooks/useMusicQueue';
 import { MusicQueueTrackCard } from './MusicQueueTrackCard';
+import { RadioButton } from './RadioButton';
 import { Scrubber } from './Scrubber';
 import { formatDuration } from '@/lib/music/formatDuration';
 
@@ -14,6 +15,11 @@ interface MusicSidebarProps {
   isOpen: boolean;
   isMobile: boolean;
   onClose: () => void;
+  isRadioMode?: boolean;
+  radioLoading?: boolean;
+  onRadioStart?: () => void;
+  onRadioStop?: () => void;
+  radioPlaylistName?: string;
 }
 
 export function MusicSidebar({
@@ -22,6 +28,11 @@ export function MusicSidebar({
   isOpen,
   isMobile,
   onClose,
+  isRadioMode = false,
+  radioLoading = false,
+  onRadioStart,
+  onRadioStop,
+  radioPlaylistName,
 }: MusicSidebarProps) {
   const player = usePlayer();
   const queue = useMusicQueue(messages);
@@ -67,6 +78,18 @@ export function MusicSidebar({
             </button>
           </div>
 
+          {/* Radio button */}
+          {onRadioStart && onRadioStop && (
+            <RadioButton
+              isRadioMode={isRadioMode}
+              radioLoading={radioLoading}
+              onStart={onRadioStart}
+              onStop={onRadioStop}
+              variant="full"
+              playlistName={radioPlaylistName}
+            />
+          )}
+
           {/* Now Playing — prominent mobile card */}
           {player.metadata && <NowPlayingCard player={player} onPlayPause={handlePlayPause} />}
 
@@ -105,6 +128,18 @@ export function MusicSidebar({
           </svg>
         </button>
       </div>
+
+      {/* Radio button */}
+      {onRadioStart && onRadioStop && (
+        <RadioButton
+          isRadioMode={isRadioMode}
+          radioLoading={radioLoading}
+          onStart={onRadioStart}
+          onStop={onRadioStop}
+          variant="full"
+          playlistName={radioPlaylistName}
+        />
+      )}
 
       {/* Now Playing — prominent card */}
       {player.metadata && <NowPlayingCard player={player} onPlayPause={handlePlayPause} />}

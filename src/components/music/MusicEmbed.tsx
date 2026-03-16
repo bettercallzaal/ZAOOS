@@ -51,7 +51,10 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
     setLoading(true);
     setFetchFailed(false);
 
-    fetch(`/api/music/metadata?url=${encodeURIComponent(url)}`)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    fetch(`/api/music/metadata?url=${encodeURIComponent(url)}`, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error('fetch failed');
         return res.json();
@@ -67,7 +70,8 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
           setFetchFailed(true);
           setLoading(false);
         }
-      });
+      })
+      .finally(() => clearTimeout(timeout));
 
     return () => {
       cancelled = true;

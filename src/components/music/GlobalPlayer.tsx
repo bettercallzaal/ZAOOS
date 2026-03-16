@@ -15,6 +15,7 @@ interface GlobalPlayerProps {
   queueLength?: number;
   onToggleQueue?: () => void;
   queueOpen?: boolean;
+  isRadioMode?: boolean;
 }
 
 export function GlobalPlayer({
@@ -25,6 +26,7 @@ export function GlobalPlayer({
   queueLength = 0,
   onToggleQueue,
   queueOpen = false,
+  isRadioMode = false,
 }: GlobalPlayerProps) {
   const player = usePlayer();
   const [safeBottom, setSafeBottom] = useState(0);
@@ -184,6 +186,14 @@ export function GlobalPlayer({
 
         {/* Right: Queue + platform badge */}
         <div className="flex items-center gap-3 w-36 flex-shrink-0 justify-end">
+          {isRadioMode && (
+            <span className="text-[10px] font-semibold text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 7.5l16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A48.329 48.329 0 0012 6.75z" />
+              </svg>
+              RADIO
+            </span>
+          )}
           <span className="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded capitalize">
             {metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}
           </span>

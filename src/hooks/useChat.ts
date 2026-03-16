@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Cast } from '@/types';
 
-const POLL_INTERVAL = 30_000; // 30 s — was 8 s (reduces Neynar credit usage ~4×)
+const POLL_INTERVAL = 15_000; // 15 s — balance between freshness and Neynar credit usage
 
 export function useChat(channel: string = 'zao') {
   const [messages, setMessages] = useState<Cast[]>([]);
@@ -68,15 +68,32 @@ export function useChat(channel: string = 'zao') {
         const data = await res.json();
         throw new Error(data.error || 'Failed to send');
       }
-      // Force refresh — small delay lets the DB write complete
+      // Optimistic: add sent cast to messages immediately so user sees it
+      const result = await res.json();
+      if (result.cast) {
+        const optimistic: Cast = {
+          hash: result.cast.hash || `temp-${Date.now()}`,
+          author: {
+            fid: 0, // will be replaced on refresh
+            username: '',
+            display_name: '',
+            pfp_url: '',
+          },
+          text,
+          timestamp: new Date().toISOString(),
+          embeds: [],
+          reactions: { likes: [], recasts: [], likes_count: 0, recasts_count: 0 },
+          replies: { count: 0 },
+          parent_hash: parentHash || null,
+        };
+        setMessages((prev) => [optimistic, ...prev]);
+      }
+      // Refresh to get the real data from server
       firstHashRef.current = null;
-      await new Promise((r) => setTimeout(r, 500));
-      await fetchMessages();
-      // Second fetch in case DB write was slow
       setTimeout(() => {
         firstHashRef.current = null;
         fetchMessages();
-      }, 2000);
+      }, 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send');
       throw err;

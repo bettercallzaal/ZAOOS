@@ -37,6 +37,19 @@ export const communityConfig = {
     chain: 'optimism' as const,
   },
 
+  // ── Music / Radio ────────────────────────────────────────────
+  music: {
+    radioName: 'ZAO Radio',
+    /** Audius playlist/album URLs to use as community radio stations */
+    radioPlaylists: [
+      {
+        name: 'Ambition',
+        artist: 'Stilo World',
+        url: 'https://audius.co/dopestilo/album/ambition',
+      },
+    ],
+  },
+
   // ── Navigation Pillars ────────────────────────────────────────
   pillars: {
     social: { label: 'Social', icon: 'chat' },

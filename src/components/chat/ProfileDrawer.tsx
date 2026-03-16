@@ -27,6 +27,7 @@ interface ProfileData {
 interface ProfileDrawerProps {
   fid: number | null;
   onClose: () => void;
+  onStartDm?: (fid: number, username: string, displayName: string, pfpUrl: string, address: string) => void;
 }
 
 function formatCount(n: number): string {
@@ -35,15 +36,28 @@ function formatCount(n: number): string {
   return String(n);
 }
 
-export function ProfileDrawer({ fid, onClose }: ProfileDrawerProps) {
+interface MusicTrack {
+  title: string;
+  artist: string;
+  artworkUrl: string | null;
+  audioUrl: string | null;
+  platform: string;
+  url: string;
+  role: 'creator' | 'collector';
+}
+
+export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(false);
   const [following, setFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [musicTracks, setMusicTracks] = useState<MusicTrack[]>([]);
+  const [musicLoading, setMusicLoading] = useState(false);
 
   useEffect(() => {
     if (!fid) {
       setProfile(null);
+      setMusicTracks([]);
       return;
     }
 
@@ -58,6 +72,24 @@ export function ProfileDrawer({ fid, onClose }: ProfileDrawerProps) {
       .catch((err) => console.error('Profile fetch error:', err))
       .finally(() => setLoading(false));
   }, [fid]);
+
+  // Fetch music NFTs when profile loads with verified addresses
+  useEffect(() => {
+    if (!profile || profile.verifiedAddresses.length === 0) {
+      setMusicTracks([]);
+      return;
+    }
+
+    setMusicLoading(true);
+    const addr = profile.verifiedAddresses[0];
+    fetch(`/api/music/wallet?address=${addr}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.tracks) setMusicTracks(data.tracks);
+      })
+      .catch((err) => console.error('Music fetch error:', err))
+      .finally(() => setMusicLoading(false));
+  }, [profile]);
 
   const handleFollow = useCallback(async () => {
     if (!profile || followLoading) return;
@@ -253,15 +285,29 @@ export function ProfileDrawer({ fid, onClose }: ProfileDrawerProps) {
               </a>
 
               {/* DM link */}
-              <a
-                href="/messages"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors"
+              <button
+                onClick={() => {
+                  if (onStartDm && profile.verifiedAddresses.length > 0) {
+                    onStartDm(
+                      profile.fid,
+                      profile.username,
+                      profile.displayName,
+                      profile.pfpUrl,
+                      profile.verifiedAddresses[0],
+                    );
+                    onClose();
+                  }
+                }}
+                disabled={profile.verifiedAddresses.length === 0}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-gray-400 hover:bg-white/5 hover:text-white transition-colors w-full text-left disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                 </svg>
-                Send Private Message
-              </a>
+                {profile.verifiedAddresses.length > 0
+                  ? 'Send Private Message'
+                  : 'No wallet — DM unavailable'}
+              </button>
 
               {/* Verified addresses */}
               {profile.verifiedAddresses.length > 0 && (
@@ -275,6 +321,86 @@ export function ProfileDrawer({ fid, onClose }: ProfileDrawerProps) {
                 </div>
               )}
             </div>
+
+            {/* Music NFTs section */}
+            {profile.verifiedAddresses.length > 0 && (
+              <>
+                <div className="border-t border-gray-800 mx-4" />
+                <div className="p-4">
+                  <p className="text-xs text-gray-600 uppercase tracking-wider mb-3">Music NFTs</p>
+                  {musicLoading ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="flex items-center gap-3 animate-pulse">
+                          <div className="w-10 h-10 rounded-lg bg-white/5 flex-shrink-0" />
+                          <div className="flex-1 space-y-1.5">
+                            <div className="h-3 bg-white/5 rounded w-3/4" />
+                            <div className="h-2.5 bg-white/5 rounded w-1/2" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : musicTracks.length > 0 ? (
+                    <div className="space-y-1">
+                      {musicTracks.map((track, i) => (
+                        <a
+                          key={i}
+                          href={track.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/5 transition-colors group"
+                        >
+                          {track.artworkUrl ? (
+                            <div className="w-10 h-10 relative rounded-lg overflow-hidden flex-shrink-0 bg-gray-800">
+                              <Image
+                                src={track.artworkUrl}
+                                alt={track.title}
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+                              <svg className="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                              </svg>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-white truncate group-hover:text-[#f5a623] transition-colors">
+                              {track.title}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs text-gray-500 truncate">{track.artist}</span>
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${
+                                track.platform === 'Sound.xyz'
+                                  ? 'bg-purple-500/10 text-purple-400'
+                                  : 'bg-blue-500/10 text-blue-400'
+                              }`}>
+                                {track.platform}
+                              </span>
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
+                                track.role === 'creator'
+                                  ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                                  : 'bg-white/5 text-gray-500'
+                              }`}>
+                                {track.role === 'creator' ? 'Creator' : 'Collected'}
+                              </span>
+                            </div>
+                          </div>
+                          <svg className="w-3.5 h-3.5 text-gray-600 group-hover:text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                          </svg>
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-600 text-center py-3">No music NFTs found</p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         ) : (
           <div className="flex-1 flex items-center justify-center text-gray-500 text-sm">

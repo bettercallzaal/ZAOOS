@@ -27,6 +27,8 @@ import { GlobalPlayer } from '@/components/music/GlobalPlayer';
 import { MusicSidebar } from '@/components/music/MusicSidebar';
 import { SongSubmit } from '@/components/music/SongSubmit';
 import { useMusicQueue } from '@/hooks/useMusicQueue';
+import { useRadio } from '@/hooks/useRadio';
+import { RadioButton } from '@/components/music/RadioButton';
 import { FeedFilters, filterAndSortCasts, ContentFilter, SortMode } from './FeedFilters';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 
@@ -54,6 +56,7 @@ export function ChatRoom() {
   const composeRef = useRef<ComposeBarHandle>(null);
   const [songSubmissions, setSongSubmissions] = useState<import('@/hooks/useMusicQueue').SubmissionEntry[]>([]);
   const musicQueue = useMusicQueue(messages, songSubmissions);
+  const radio = useRadio();
 
   // Music queue navigation (prev/next)
   const currentQueueIndex = musicQueue.findIndex((q) => q.castHash === player.metadata?.feedId);
@@ -79,25 +82,28 @@ export function ChatRoom() {
     if (hasNextTrack) playQueueTrack(currentQueueIndex + 1);
   }, [hasNextTrack, currentQueueIndex, playQueueTrack]);
 
-  // Auto-play next track when current ends (respects shuffle/repeat)
+  // Auto-play next track when current ends (respects shuffle/repeat + radio mode)
   useEffect(() => {
     player.setOnEnded(() => {
+      // Radio mode: always play next radio track
+      if (radio.isRadioMode) {
+        radio.nextRadioTrack();
+        return;
+      }
+
       const idx = musicQueue.findIndex((q) => q.castHash === player.metadata?.feedId);
       if (idx < 0 || musicQueue.length === 0) { player.stop(); return; }
 
       let nextEntry;
 
       if (player.repeat === 'one') {
-        // Repeat current track
         nextEntry = musicQueue[idx];
       } else if (player.shuffle) {
-        // Pick random track (excluding current)
         const others = musicQueue.filter((_, i) => i !== idx);
         nextEntry = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : null;
       } else if (idx < musicQueue.length - 1) {
         nextEntry = musicQueue[idx + 1];
       } else if (player.repeat === 'all') {
-        // Wrap to beginning
         nextEntry = musicQueue[0];
       }
 
@@ -111,7 +117,7 @@ export function ChatRoom() {
       }
     });
     return () => player.setOnEnded(null);
-  }); // Re-register on every render so closure captures latest queue/shuffle/repeat
+  }); // Re-register on every render so closure captures latest queue/shuffle/repeat/radio
 
   // XMTP context
   const xmtp = useXMTPContext();
@@ -309,6 +315,7 @@ export function ChatRoom() {
             ) : (
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-sm text-white"># {activeChannel}</h2>
+                <p className="text-[10px] text-gray-600 -mt-0.5">Posting to Farcaster</p>
               </div>
             )}
 
@@ -349,6 +356,15 @@ export function ChatRoom() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </button>
+
+                {/* ZAO Radio */}
+                <RadioButton
+                  isRadioMode={radio.isRadioMode}
+                  radioLoading={radio.radioLoading}
+                  onStart={radio.startRadio}
+                  onStop={radio.stopRadio}
+                  variant="compact"
+                />
 
                 {/* Music queue toggle */}
                 <button
@@ -442,13 +458,14 @@ export function ChatRoom() {
 
               {/* Global music player */}
               <GlobalPlayer
-                onPrev={handlePrevTrack}
-                onNext={handleNextTrack}
-                hasPrev={hasPrevTrack}
-                hasNext={hasNextTrack}
+                onPrev={radio.isRadioMode ? radio.prevRadioTrack : handlePrevTrack}
+                onNext={radio.isRadioMode ? radio.nextRadioTrack : handleNextTrack}
+                hasPrev={radio.isRadioMode || hasPrevTrack}
+                hasNext={radio.isRadioMode || hasNextTrack}
                 queueLength={musicQueue.length}
                 onToggleQueue={() => setMusicSidebarOpen((o) => !o)}
                 queueOpen={musicSidebarOpen}
+                isRadioMode={radio.isRadioMode}
               />
 
               {/* Signer connect or Compose */}
@@ -482,6 +499,11 @@ export function ChatRoom() {
           isOpen={musicSidebarOpen}
           isMobile={isMobile}
           onClose={() => setMusicSidebarOpen(false)}
+          isRadioMode={radio.isRadioMode}
+          radioLoading={radio.radioLoading}
+          onRadioStart={radio.startRadio}
+          onRadioStop={radio.stopRadio}
+          radioPlaylistName={radio.radioPlaylist?.name}
         />
       </div>
 
@@ -531,7 +553,17 @@ export function ChatRoom() {
       <TutorialPanel isOpen={tutorialOpen} onClose={() => setTutorialOpen(false)} />
 
       {/* Profile Drawer */}
-      <ProfileDrawer fid={profileFid} onClose={() => setProfileFid(null)} />
+      <ProfileDrawer
+        fid={profileFid}
+        onClose={() => setProfileFid(null)}
+        onStartDm={(targetFid, username, displayName, pfpUrl, address) => {
+          setProfileFid(null);
+          const peerProfile = { fid: targetFid, username, displayName, pfpUrl };
+          xmtp.createDm(address as `0x${string}`, peerProfile).then((convId) => {
+            if (convId) xmtp.selectConversation(convId);
+          });
+        }}
+      />
 
       {/* New DM/Group Dialog */}
       <NewConversationDialog

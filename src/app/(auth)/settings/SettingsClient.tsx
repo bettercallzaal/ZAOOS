@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import Script from 'next/script';
 import { useAuth } from '@/hooks/useAuth';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import type { SessionData } from '@/types';
@@ -36,7 +35,8 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const { logout, refetch } = useAuth();
   const [signerStatus, setSignerStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [signerError, setSignerError] = useState<string | null>(null);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [scriptError, setScriptError] = useState(false);
+  const signerContainerRef = useRef<HTMLDivElement>(null);
 
   const hasSigner = !!session?.signerUuid;
 
@@ -66,9 +66,29 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   }, [refetch]);
 
   // Register the global callback for Neynar SIWN
-  if (typeof window !== 'undefined') {
-    (window as unknown as Record<string, unknown>).onSIWNSuccess = handleSignerSuccess;
-  }
+  useEffect(() => {
+    window.onSIWNSuccess = handleSignerSuccess;
+    return () => { delete window.onSIWNSuccess; };
+  }, [handleSignerSuccess]);
+
+  // Load the Neynar SIWN script after the div is in the DOM
+  useEffect(() => {
+    if (hasSigner) return;
+    const container = signerContainerRef.current;
+    if (!container) return;
+
+    const SIWN_URL = 'https://neynarxyz.github.io/siwn/raw/1.2.0/index.js';
+    const existing = document.querySelector(`script[src="${SIWN_URL}"]`);
+    if (existing) existing.remove();
+
+    const script = document.createElement('script');
+    script.src = SIWN_URL;
+    script.async = true;
+    script.onerror = () => setScriptError(true);
+    document.body.appendChild(script);
+
+    return () => { script.remove(); };
+  }, [hasSigner]);
 
   if (!session || !profile) {
     return (
@@ -168,12 +188,6 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
               </div>
             ) : (
               <div>
-                <Script
-                  src="https://neynarxyz.github.io/siwn/raw/1.2.0/index.js"
-                  strategy="lazyOnload"
-                  onLoad={() => setScriptLoaded(true)}
-                />
-
                 {signerStatus === 'success' && (
                   <div className="px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-xs text-green-400 font-medium mb-3">
                     Signer connected successfully!
@@ -191,15 +205,17 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   </div>
                 )}
 
-                {!scriptLoaded ? (
-                  <div className="h-10 w-48 rounded-lg bg-gray-700/50 animate-pulse" />
+                {scriptError ? (
+                  <p className="text-xs text-red-400">Failed to load signer script. Please refresh.</p>
                 ) : (
-                  <div
-                    className="neynar_signin"
-                    data-client_id={process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID}
-                    data-success-callback="onSIWNSuccess"
-                    data-theme="dark"
-                  />
+                  <div ref={signerContainerRef}>
+                    <div
+                      className="neynar_signin"
+                      data-client_id={process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID}
+                      data-success-callback="onSIWNSuccess"
+                      data-theme="dark"
+                    />
+                  </div>
                 )}
 
                 <p className="text-[10px] text-gray-600 mt-2">

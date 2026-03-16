@@ -621,6 +621,13 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       saveConnectedWallet(address);
       setConnectedWallets(Array.from(walletsRef.current.keys()));
 
+      // Persist XMTP address to DB so other members can discover us
+      fetch('/api/users/xmtp-address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ xmtpAddress: address }),
+      }).catch(() => { /* non-critical */ });
+
       // Seed last message cache, load conversations, then start streams
       await seedLastMessages();
       await loadAllConversations();

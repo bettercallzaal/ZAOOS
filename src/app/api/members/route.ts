@@ -77,17 +77,19 @@ export async function GET() {
     }
   }
 
-  // Fetch last_login_at from users table for all members with FIDs
+  // Fetch last_login_at and xmtp_address from users table for all members with FIDs
   const fidsForLogin = (data || []).map((m) => m.fid).filter(Boolean);
   const loginMap = new Map<number, string>();
+  const xmtpAddrMap = new Map<number, string>();
   if (fidsForLogin.length > 0) {
     const { data: userData } = await supabaseAdmin
       .from('users')
-      .select('fid, last_login_at')
+      .select('fid, last_login_at, xmtp_address')
       .in('fid', fidsForLogin)
       .not('last_login_at', 'is', null);
     for (const u of userData || []) {
       if (u.fid && u.last_login_at) loginMap.set(u.fid, u.last_login_at);
+      if (u.fid && u.xmtp_address) xmtpAddrMap.set(u.fid, u.xmtp_address);
     }
   }
 
@@ -99,6 +101,7 @@ export async function GET() {
       displayName: m.display_name || enriched?.display_name || m.ign || m.real_name || (m.fid ? `FID ${m.fid}` : 'Unknown'),
       pfpUrl: m.pfp_url || enriched?.pfp_url || null,
       addresses: [
+        m.fid ? xmtpAddrMap.get(m.fid) : undefined,
         m.wallet_address,
         m.custody_address,
         ...((m.verified_addresses as string[]) || []),

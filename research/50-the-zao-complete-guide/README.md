@@ -321,7 +321,7 @@ There is no curriculum — the community IS the curriculum. Education happens ev
 |-----------|-------|
 | Eden Fractal | EOS → Optimism |
 | Optimism Fractal | Optimism Superchain |
-| ZAO Fractal | Base / Farcaster |
+| ZAO Fractal | Optimism / Farcaster |
 | Spanish Speaking Fractal | — |
 | Alien Worlds Fractal | — |
 | Aquadac | — |
@@ -671,7 +671,7 @@ Multi-artist collaboration:
 
 | Platform | Content | Volume |
 |----------|---------|--------|
-| **Paragraph** | Year of the ZAO (329), Year of the ZABAL (74+), ZTalent (12+), ZABAL Updates (20+) | 400+ posts |
+| **Paragraph** | Year of the ZAO (329+), Year of the ZABAL (74+), ZTalent (12+), ZABAL Updates (20+) | 400+ posts |
 | **Farcaster** | /zao, /zabal, /coc channels, daily casts | Active daily |
 | **X/Twitter** | @zaofestivals, @bettercallzaal, @WaveWarZ | Active daily |
 | **LTAW3 Podcast** | Weekly Web3 discussions | 19+ episodes |

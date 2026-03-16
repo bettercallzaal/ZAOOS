@@ -97,13 +97,14 @@ interface SidebarProps {
   zaoMembers: ZaoMember[];
   loadingMembers: boolean;
   onStartDmWithMember: (member: ZaoMember) => void;
+  onGroupInfo?: (id: string) => void;
 }
 
 export function Sidebar({
   user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, onOpenFaq, onOpenTutorial, onOpenRespect,
   xmtpConnected, xmtpConnecting, xmtpError, xmtpConversations, activeConversationId,
   onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
-  zaoMembers, loadingMembers, onStartDmWithMember,
+  zaoMembers, loadingMembers, onStartDmWithMember, onGroupInfo,
 }: SidebarProps) {
   const onlineMembers = zaoMembers.filter((m) => m.reachable);
   const { isConnected: hasWallet } = useAccount();
@@ -252,55 +253,72 @@ export function Sidebar({
                   const hasUnread = conv.unreadCount > 0;
                   const initial = (conv.peerDisplayName || conv.name || '?')[0]?.toUpperCase();
                   return (
-                    <button
-                      key={conv.id}
-                      onClick={() => onConversationSelect(conv.id)}
-                      className={`flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                        isActive
-                          ? 'bg-[#f5a623]/10 text-[#f5a623]'
-                          : hasUnread
-                          ? 'text-white hover:bg-white/5'
-                          : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                      }`}
-                    >
-                      {conv.peerPfpUrl ? (
-                        <div className="w-8 h-8 relative flex-shrink-0">
-                          <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="rounded-full object-cover" unoptimized />
-                        </div>
-                      ) : conv.type === 'group' ? (
-                        <div className="w-8 h-8 rounded-lg bg-[#f5a623]/15 flex items-center justify-center flex-shrink-0">
-                          <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
-                          </svg>
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0 border border-[#f5a623]/10">
-                          <span className="text-xs text-[#f5a623]/80 font-semibold">{initial}</span>
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1">
-                          <p className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}>
-                            {conv.peerDisplayName || conv.name}
-                          </p>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            {hasUnread && (
-                              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#f5a623] text-[10px] font-bold text-black flex items-center justify-center">
-                                {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
-                              </span>
-                            )}
-                            {conv.lastMessageAt && (
-                              <span className="text-[10px] text-gray-600">{timeAgo(conv.lastMessageAt)}</span>
-                            )}
+                    <div className="relative group">
+                      <button
+                        onClick={() => onConversationSelect(conv.id)}
+                        className={`flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                          isActive
+                            ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                            : hasUnread
+                            ? 'text-white hover:bg-white/5'
+                            : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        {conv.peerPfpUrl ? (
+                          <div className="w-8 h-8 relative flex-shrink-0">
+                            <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="rounded-full object-cover" unoptimized />
                           </div>
-                        </div>
-                        {conv.lastMessage && (
-                          <p className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}>
-                            {conv.lastMessage}
-                          </p>
+                        ) : conv.type === 'group' ? (
+                          <div className="w-8 h-8 rounded-lg bg-[#f5a623]/15 flex items-center justify-center flex-shrink-0">
+                            <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772" />
+                            </svg>
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0 border border-[#f5a623]/10">
+                            <span className="text-xs text-[#f5a623]/80 font-semibold">{initial}</span>
+                          </div>
                         )}
-                      </div>
-                    </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <p className={`text-sm truncate ${hasUnread ? 'font-semibold text-white' : 'font-medium'}`}>
+                              {conv.peerDisplayName || conv.name}
+                              {conv.type === 'group' && conv.memberCount && (
+                                <span className="ml-1.5 text-[10px] text-gray-500 font-normal">
+                                  {conv.memberCount} members
+                                </span>
+                              )}
+                            </p>
+                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                              {hasUnread && (
+                                <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-[#f5a623] text-[10px] font-bold text-black flex items-center justify-center">
+                                  {conv.unreadCount > 99 ? '99+' : conv.unreadCount}
+                                </span>
+                              )}
+                              {conv.lastMessageAt && (
+                                <span className="text-[10px] text-gray-600">{timeAgo(conv.lastMessageAt)}</span>
+                              )}
+                            </div>
+                          </div>
+                          {conv.lastMessage && (
+                            <p className={`text-xs truncate mt-0.5 ${hasUnread ? 'text-gray-300' : 'text-gray-600'}`}>
+                              {conv.lastMessage}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                      {conv.type === 'group' && onGroupInfo && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onGroupInfo(conv.id); }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded text-gray-500 hover:text-white transition-all"
+                          aria-label="Group info"
+                        >
+                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   );
                 })}
               </div>

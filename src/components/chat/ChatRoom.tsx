@@ -16,6 +16,7 @@ import { ComposeBar, ComposeBarHandle, ReplyContext } from './ComposeBar';
 import { ThreadDrawer } from './ThreadDrawer';
 import { SignerConnect } from './SignerConnect';
 import { MessageThread } from '@/components/messages/MessageThread';
+import { GroupInfoDrawer } from '@/components/messages/GroupInfoDrawer';
 import { MessageCompose } from '@/components/messages/MessageCompose';
 import { NewConversationDialog } from '@/components/messages/NewConversationDialog';
 const GlobalPlayer = dynamic(() => import('@/components/music/GlobalPlayer').then(m => ({ default: m.GlobalPlayer })), { ssr: false });
@@ -53,6 +54,9 @@ export function ChatRoom() {
   const [respectOpen, setRespectOpen] = useState(false);
   const [profileFid, setProfileFid] = useState<number | null>(null);
   const [dmDialogType, setDmDialogType] = useState<'dm' | 'group' | null>(null);
+  const [groupInfoId, setGroupInfoId] = useState<string | null>(null);
+  const [groupMembers, setGroupMembers] = useState<{ inboxId: string; displayName: string; pfpUrl: string; username?: string }[]>([]);
+  const [loadingGroupMembers, setLoadingGroupMembers] = useState(false);
   const [contentFilter, setContentFilter] = useState<ContentFilter>('all');
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const composeRef = useRef<ComposeBarHandle>(null);
@@ -156,6 +160,14 @@ export function ChatRoom() {
   const handleCreateGroup = useCallback(async (name: string, members: { address: `0x${string}`; profile?: import('@/lib/xmtp/client').XMTPPeerProfile }[]) => {
     const convId = await xmtp.createGroup(name, members);
     if (convId) xmtp.selectConversation(convId);
+  }, [xmtp]);
+
+  const handleOpenGroupInfo = useCallback(async (convId: string) => {
+    setGroupInfoId(convId);
+    setLoadingGroupMembers(true);
+    const members = await xmtp.getGroupMembers(convId);
+    setGroupMembers(members);
+    setLoadingGroupMembers(false);
   }, [xmtp]);
 
   // Filtered + sorted messages
@@ -264,7 +276,23 @@ export function ChatRoom() {
         zaoMembers={xmtp.zaoMembers}
         loadingMembers={xmtp.loadingMembers}
         onStartDmWithMember={handleStartDmWithMember}
+        onGroupInfo={handleOpenGroupInfo}
       />
+
+      {/* Group Info Drawer */}
+      {groupInfoId && (() => {
+        const conv = xmtp.conversations.find((c) => c.id === groupInfoId);
+        if (!conv) return null;
+        return (
+          <GroupInfoDrawer
+            conversation={conv}
+            members={groupMembers}
+            loading={loadingGroupMembers}
+            onClose={() => setGroupInfoId(null)}
+            onRemove={() => xmtp.removeConversation(groupInfoId)}
+          />
+        );
+      })()}
 
       {/* Main chat + music sidebar in a shared flex row */}
       <div className="flex flex-1 min-w-0">

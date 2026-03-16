@@ -57,6 +57,7 @@ interface XMTPContextValue {
   clearActionError: () => void;
   reconnectStreams: () => Promise<void>;
   removeConversation: (id: string) => void;
+  getGroupMembers: (conversationId: string) => Promise<{ inboxId: string; displayName: string; pfpUrl: string; username?: string }[]>;
 }
 
 const XMTPContext = createContext<XMTPContextValue | null>(null);
@@ -1059,6 +1060,42 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /**
+   * Get the member list for a group conversation.
+   * Reads cached profiles from localStorage; falls back to truncated inbox IDs.
+   */
+  const getGroupMembers = useCallback(async (conversationId: string) => {
+    const result = await findClientForConversation(conversationId);
+    if (!result) return [];
+
+    try {
+      await result.client.conversations.sync();
+      const convos = await result.client.conversations.list();
+      const dms = await result.client.conversations.listDms();
+      const dmIds = new Set(dms.map((d: Dm) => d.id));
+      const conv = convos.find((c) => c.id === conversationId);
+      if (!conv || dmIds.has(conv.id)) return [];
+
+      const group = conv as Group;
+      const xmtpMembers = await group.members();
+      const { getMemberProfiles } = await import('@/lib/xmtp/client');
+      const profiles = getMemberProfiles();
+
+      return xmtpMembers.map((m) => {
+        const profile = profiles[m.inboxId];
+        return {
+          inboxId: m.inboxId,
+          displayName: profile?.displayName || m.inboxId.slice(0, 8),
+          pfpUrl: profile?.pfpUrl || '',
+          username: profile?.username,
+        };
+      });
+    } catch (err) {
+      console.error('[XMTP] Failed to get group members:', err);
+      return [];
+    }
+  }, [findClientForConversation]);
+
+  /**
    * Manually reconnect streams (user-initiated).
    */
   const reconnectStreams = useCallback(async () => {
@@ -1138,13 +1175,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     clearActionError,
     reconnectStreams,
     removeConversation,
+    getGroupMembers,
   }), [
     connectedWallets, isConnecting, connectingWallet, error, actionError, streamConnected,
     tabLocked, reconnecting, conversations, activeConversationId, messages, loadingMessages,
     zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
     disconnectAll, selectConversation, sendMessage, createDm, createGroup,
     refreshConversations, startDmWithMember, clearError, clearActionError, reconnectStreams,
-    removeConversation,
+    removeConversation, getGroupMembers,
   ]);
 
   return (

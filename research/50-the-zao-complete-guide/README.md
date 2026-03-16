@@ -88,9 +88,7 @@ Each iteration teaches the team what works, what doesn't, and how to build somet
 
 The ZAO does not attempt to control artists or extract value from them.
 
-Instead, it builds infrastructure that allows creators to build their own communities and organizations. This philosophy is often described as:
-
-> ZAO builds the picks and shovels for the creative gold rush.
+Instead, it builds infrastructure that allows creators to build their own communities and organizations. In this sense, the ecosystem aims to provide the "picks and shovels" for the emerging creator economy — the tools and systems that enable others to build, rather than a platform that captures their output.
 
 The goal for anyone joining the ZAO is straightforward: learn how to create a website, deploy a smart contract, sell something digitally to anyone in the world, and receive that revenue directly.
 
@@ -111,7 +109,7 @@ There is no curriculum — the community is the curriculum. Education happens th
 
 The ZAO draws from three intellectual traditions:
 
-**Impact Networks** (David Ehrlichman, 2021) — The Five Cs framework: Clarify, Convene, Cultivate, Coordinate, Collaborate. Ehrlichman co-founded [Hats Protocol](https://www.hatsprotocol.xyz/), the on-chain role system the ZAO plans to deploy. The philosophy and the tooling share the same origin.
+**Impact Networks** (David Ehrlichman, 2021) — The Five Cs framework: Clarify, Convene, Cultivate, Coordinate, Collaborate. Ehrlichman co-founded [Hats Protocol](https://www.hatsprotocol.xyz/), which the ZAO is exploring for organizing DAO roles. The philosophy and the tooling share the same origin.
 
 **Fractal Democracy** (Daniel Larimer, 2021) — Small groups reach consensus through face-to-face evaluation. Fibonacci distribution rewards top contributors non-linearly. Soulbound tokens prevent plutocracy. Recursive structure scales while keeping groups small.
 
@@ -197,7 +195,7 @@ THE ZAO (decentralized creator network)
 │   ├── Let's Talk About Ethereum (podcast)
 │   ├── B&Z Builds / B&Z Streams
 │   ├── Year of the ZAO / ZABAL newsletter
-│   └── COC Concertz (metaverse concerts)
+│   └── COC Concertz (collaborative metaverse concerts, Zaal + Thy Rev)
 │
 └── PARTNER COMMUNITIES
     ├── SongJam
@@ -214,7 +212,7 @@ THE ZAO (decentralized creator network)
 
 ### WaveWarZ
 
-A music competition and discovery platform incubated within the ZAO ecosystem before developing into an independent project with its own team.
+A music competition and discovery platform originally incubated within the ZAO ecosystem before developing into an independent project with its own team and infrastructure.
 
 | Detail | Value |
 |--------|-------|
@@ -286,7 +284,7 @@ These are built but not fully deployed or integrated:
 
 These are researched and designed but not yet built:
 
-- **Hats Protocol roles** — Full role tree designed (Council, Curator, Artist, Moderator, Developer). Eligibility modules specified. Not deployed.
+- **Hats Protocol** — Being explored as a tool for organizing DAO roles and contributor teams.
 - **Community treasury** — 3-of-5 Safe multisig planned. Not created.
 - **Cross-platform publishing** — Farcaster, Lens, Bluesky, Hive, Nostr, X from one compose bar. Researched in doc 28.
 - **AI agent** — ElizaOS + Claude + Hindsight memory for onboarding, music discovery, curation scoring. Researched in docs 24, 26.
@@ -332,9 +330,9 @@ The original governance token used in early ZAO governance.
 | **Type** | ERC-20, soulbound, non-transferable |
 | **Purpose** | On-chain record of contributions from the original governance period |
 
-**$ZOR DAO**
+**$ZOR (ZAO Respect)**
 
-The governance token used for future governance participation.
+The newer governance reputation token intended for future governance participation.
 
 | Detail | Value |
 |--------|-------|
@@ -343,7 +341,7 @@ The governance token used for future governance participation.
 | **Type** | ERC-1155, soulbound, non-transferable |
 | **Purpose** | Governance weight in fractal democracy, role assignment, and proposal voting |
 
-Both tokens are earned through the Respect Game (see [Section 10](#10-fractal-governance)). They serve as an on-chain resume of community contribution. The 2% weekly decay mechanism means contributors must continue participating to maintain governance influence.
+Both governance tokens share the same properties: non-transferable, illiquid, and reputation-based. These are not speculative tokens and are used purely for governance reputation. They are earned through the Respect Game (see [Section 10](#10-fractal-governance)) and serve as an on-chain resume of community contribution. The 2% weekly decay mechanism means contributors must continue participating to maintain governance influence.
 
 ### Reward Token (Liquid)
 
@@ -450,7 +448,6 @@ ZAO Festivals is the event production Sub-DAO. It is important to distinguish be
 |-------|----------|------|---------|
 | **ZAO-Palooza** | New York (NFT NYC) | April 3, 2024 | 12 artists (6 new to Web3), ZAO Cards on Manifold. Organized in six weeks with volunteers. Broke even financially. |
 | **ZAO-Chella** | Wynwood, Miami (Art Basel) | Dec 6, 2024 | 10 artists, AR art, trading cards, WaveWarZ LIVE (Hurric4n3ike vs JANGO UU), Student $LOANZ Gold Sponsor |
-| **ZAO-PROS** | Boulder, CO (ETH Denver) | Feb 2025 | Conference activation, ZABAL Connector launch with Magnetiq |
 
 ### Planned Events
 
@@ -463,11 +460,11 @@ ZAO Festivals is the event production Sub-DAO. It is important to distinguish be
 
 ### COC Concertz (Metaverse)
 
-A ZAO project running weekly metaverse concerts on StiloWorld / Spatial.io.
+COC Concertz is a collaborative live music event series organized by Zaal and Thy Rev that brings together artists from the Community of Communities and ZAO ecosystems.
 
+- Platform: StiloWorld on Spatial.io
 - 150+ consecutive weekly "Super Wednesdays" concerts
 - Bonita NFT as access pass
-- ZAO coordinates artists, promotion, and production
 
 ---
 
@@ -513,7 +510,7 @@ The ZAO ecosystem intentionally operates across multiple blockchains. This is a 
 
 | Chain | Purpose | What Lives There |
 |-------|---------|-----------------|
-| **Optimism** | Governance | $ZAO OG Respect (soulbound), $ZOR DAO, Fractal governance contracts (ORDAO) |
+| **Optimism** | Governance | $ZAO OG Respect (soulbound), $ZOR (ZAO Respect), Fractal governance contracts (ORDAO) |
 | **Base** (Ethereum L2) | Rewards + ecosystem | $ZABAL token, $LOANZ (paused), Hats roles (planned) |
 | **Solana** | Speed | WaveWarZ battles + ephemeral bonding curve tokens |
 | **Flow** | Consumer UX | Magnetiq NFT memberships (Proof of Meet) |
@@ -646,7 +643,7 @@ The surviving projects serve different functions — streaming, fan clubs, event
 | Token | Chain | Contract | Type |
 |-------|-------|----------|------|
 | **$ZAO OG Respect** | Optimism | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` | Governance (soulbound) |
-| **$ZOR DAO** | Optimism | `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c` | Governance (soulbound) |
+| **$ZOR (ZAO Respect)** | Optimism | `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c` | Governance (soulbound) |
 | **$ZABAL** | Base | `0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07` | Reward (liquid) |
 | **$LOANZ** | Base | `0x03315307b202bf9c55ebebb8e9341d30411a0bc4` | Paused |
 | **WaveWarZ** | Solana | `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` | Battle contract |
@@ -677,7 +674,7 @@ The surviving projects serve different functions — streaming, fan clubs, event
 | WaveWarZ on-chain volume | $50,000+ |
 | Artists in roster | 22 |
 | Smart contract exploits | Zero |
-| Past festivals | 3 (Palooza, Chella, PROS) |
+| Past festivals | 2 (Palooza, Chella) |
 | Planned festivals | 2 (ZAOVille, ZAO Stock) |
 | COC weekly concerts | 150+ |
 | Research documents | 54 |
@@ -696,7 +693,7 @@ The surviving projects serve different functions — streaming, fan clubs, event
 | 2024 | ZAO Whitepaper Draft 3. WaveWarZ DApp reaches readiness. |
 | Dec 2024 | **ZAO-Chella** at Art Basel Miami — 10 artists, WaveWarZ LIVE, AR art |
 | Early 2025 | "Year of the ZAO" daily newsletter begins on Paragraph |
-| Feb 2025 | **ZAO-PROS** at ETH Denver. Student $LOANZ launches on Base. |
+| Feb 2025 | Student $LOANZ launches on Base. |
 | Apr 2025 | LTAW3 podcast launches |
 | Mid 2025 | 90+ fractal meetings. 329+ daily newsletters. |
 | Dec 2025 | ZABAL ecosystem announced. |
@@ -719,7 +716,7 @@ The surviving projects serve different functions — streaming, fan clubs, event
 
 ### Medium-Term
 
-- Hats Protocol deployment on Optimism — Council, Curator, Artist, Moderator, Developer roles
+- Hats Protocol exploration for organizing DAO roles and contributor teams
 - Async governance proposals with treasury execution
 - Community treasury (Safe multisig)
 - ZAO Cypher release with on-chain splits via 0xSplits

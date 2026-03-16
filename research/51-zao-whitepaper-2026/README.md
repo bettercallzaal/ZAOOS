@@ -23,9 +23,31 @@ That is what the ZAO does.
 
 Founded in 2022. Community first, technology second.
 
+The goal for anyone joining the ZAO is straightforward: learn how to create a website, deploy a smart contract, sell something digitally to anyone in the world, and receive that revenue directly. Feed the individual and teach them how to fish.
+
 ---
 
-## 2. Who We Are
+## 2. The Story
+
+The ZAO's founder studied electrical engineering and originally didn't enjoy coding — the syntax felt rigid and frustrating. When he discovered blockchain during the 2023 bear market, coding became something different: a practical tool for building systems that actually move value between people. The bear market turned out to be the best timing — the people still building were serious.
+
+Meeting musicians in web3 shifted the focus from purely technical work toward the creative economy. The music industry's structural problems are well-known. What was less obvious: blockchain offers a clear solution — peer-to-peer relationships between artists and audiences, with no intermediary taking 85%.
+
+The ZAO started inside another DAO. Most members left. The remaining builders shut it down and focused fully on music. They built a weekly coordination game — small groups of six people sharing contributions and ranking each other — and created a soulbound token called $ZAO Respect to track who was actually showing up. That system has been running consistently for nearly two years.
+
+The first major event was ZAO-PALOOZA in New York during NFT NYC 2024. Organized in six weeks with volunteers, it broke even financially — and more importantly, let community members meet in person for the first time. Later that year, ZAO-CHELLA during Miami Art Week brought multiple onchain music communities together. Some experiments worked, some didn't, but it clarified the ZAO's identity within the emerging onchain music movement. The key goal behind these events: build mindshare for onchain music, which has historically received far less attention than onchain visual art.
+
+Then WaveWarZ started gaining traction. During a battle, a musician earned roughly 0.5 SOL simply from trading activity during a 20-minute round. That moment proved the model works — artists can earn from engagement, not just streams. The platform was built by a small core team. One of the developers originally learned to code through AI tools and helped build the full application.
+
+In 2024, the founder moved from Oregon to rural Maine — quieter, more rural, but with an incredibly rich arts culture and almost zero blockchain exposure. That gap became an opportunity. After joining local organizations, volunteering, and connecting with a musician who has been trying to build a thriving local music scene since the late 1980s, the plan for ZAO Stock took shape: a polished music festival first, not a Web3 conference. Anyone should be able to attend and enjoy the experience without knowing anything about blockchain. The technology enhances the experience — it doesn't interrupt it.
+
+By aligning the festival with an existing statewide craft fair weekend that draws artists and visitors from across Maine, ZAO Stock gains marketing exposure while contributing something new: a dedicated music event that bridges decades of local arts culture with the global onchain music movement.
+
+Each iteration teaches us what works, what doesn't, and how to build something better next time.
+
+---
+
+## 3. Who We Are
 
 ### The Team
 
@@ -42,7 +64,7 @@ Plus 22 roster artists, 14+ mutual communities, and a founding membership of 40.
 
 ---
 
-## 3. What We Built
+## 4. What We Built
 
 ### The Numbers
 
@@ -85,7 +107,7 @@ Plus 22 roster artists, 14+ mutual communities, and a founding membership of 40.
 
 ---
 
-## 4. What We Learned
+## 5. What We Learned
 
 ### The Graveyard
 
@@ -122,7 +144,7 @@ The survivors (Audius at 7.5M MAU, Medallion at $13.7M raised, Nina Protocol, Re
 
 ---
 
-## 5. The Four Pillars
+## 6. The Four Pillars
 
 ZAO OS is organized around four meanings of the name. Each is a section of the app, and each exists because artists need it:
 
@@ -136,7 +158,7 @@ ZAO OS is organized around four meanings of the name. Each is a section of the a
 
 ---
 
-## 6. How Governance Works
+## 7. How Governance Works
 
 ### The Respect Game
 
@@ -168,7 +190,7 @@ This is governance as a practice, not a vote. It's a weekly ritual of showing up
 
 ---
 
-## 7. The Incubator
+## 8. The Incubator
 
 ### How Artists Go From Newcomer to Project Lead
 
@@ -200,7 +222,7 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 
 ---
 
-## 8. The Ecosystem
+## 9. The Ecosystem
 
 ### Music Infrastructure
 - [WaveWarZ](https://www.wavewarz.com/) — onchain music battles (Solana)
@@ -226,7 +248,7 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 
 ---
 
-## 9. The Artists
+## 10. The Artists
 
 22 artists. 378,000+ combined Spotify monthly listeners. 500+ tracks. Hip-hop, trap-violin fusion, R&B, electronic, Latin pop, synthrock, piano, and more.
 
@@ -245,7 +267,7 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 
 ---
 
-## 10. The Network
+## 11. The Network
 
 | Community | What They Bring |
 |-----------|----------------|
@@ -261,7 +283,7 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 
 ---
 
-## 11. Multi-Chain
+## 12. Multi-Chain
 
 | Chain | What | Why |
 |-------|------|-----|
@@ -274,7 +296,7 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 
 ---
 
-## 12. What's Next
+## 13. What's Next
 
 ### Q2 2026: Foundation
 
@@ -305,7 +327,7 @@ A multi-artist collaboration with producers [Clejan](https://clejan.com/) (289K 
 
 ---
 
-## 13. Your First Week in the ZAO
+## 14. Your First Week in the ZAO
 
 **Day 1:** You get in through a member referral. Sign in with Farcaster. ZAO OS loads — it looks like Discord but it's music-first. You see casts from the /zao channel flowing in with inline Spotify and SoundCloud players. You introduce yourself.
 
@@ -323,7 +345,7 @@ Nobody told you what to do. You showed up, contributed, and earned your place.
 
 ---
 
-## 14. Questions We Get Asked
+## 15. Questions We Get Asked
 
 **"Why should I care about 40 people when TikTok has billions?"**
 TikTok doesn't know your name. Your 40 biggest supporters are worth more than 40,000 passive scrollers. The [1000 True Fans](https://kk.org/thetechnium/1000-true-fans/) thesis — updated: 100-300 superfans at $300-500 lifetime value replaces millions of streams. We are building the 100, not chasing the millions.
@@ -348,7 +370,7 @@ Governance. In Discord, the admin has all the power. In the ZAO, power is distri
 
 ---
 
-## 15. Risks
+## 16. Risks
 
 - **Farcaster could fail to grow.** Mitigation: ZAO OS is a Farcaster client today, but cross-platform publishing (planned) reduces dependency. The community exists beyond any protocol.
 
@@ -362,7 +384,7 @@ Governance. In Discord, the admin has all the power. In the ZAO, power is distri
 
 ---
 
-## 16. How to Join
+## 17. How to Join
 
 The ZAO is gated — intentionally. Depth over breadth.
 
@@ -394,7 +416,7 @@ The ZAO is gated — intentionally. Depth over breadth.
 
 ---
 
-## 17. Works Cited
+## 18. Works Cited
 
 - Satoshi Nakamoto. [*Bitcoin: A Peer-to-Peer Electronic Cash System.*](https://bitcoin.org/bitcoin.pdf) 2008.
 - David Ehrlichman. [*Impact Networks.*](https://www.converge.net/book) 2021.

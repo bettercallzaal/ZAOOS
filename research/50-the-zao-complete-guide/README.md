@@ -75,7 +75,51 @@ ZAO OS carries 4 meanings, each a visible section of the app:
 
 ---
 
-## 4. Core Team
+## 4. The Founder's Story (In Zaal's Words)
+
+Studied electrical engineering, didn't enjoy coding in school — the syntax felt rigid. Discovered blockchain during the 2023 bear market, where coding became practical: "a tool to build systems that actually move value between people." The bear market was the best timing — "the people still building were serious."
+
+Meeting musicians in web3 shifted the perspective from purely technical work toward the creative economy. The music industry's structural problems (ownership, distribution, payment flows) have well-known solutions in blockchain: peer-to-peer relationships between artists and audiences.
+
+**The mission:** Bring the profit margin, the data, and the IP rights back to independent artists.
+
+**The philosophy:** Teach creators how to build independence. The goal for anyone joining the ZAO is to eventually learn how to create a website, deploy a smart contract, sell something digitally to someone anywhere in the world, and receive that revenue directly. "Feed the individual and teach them how to fish."
+
+### Origin of the ZAO
+
+Started inside another DAO. Most members left. The remaining builders shut it down and focused fully on music. Built the fractal governance system — weekly coordination game where groups of six share contributions and vote for top contributors, distributing $ZAO Respect (soulbound, illiquid, contribution-based). Running consistently for nearly two years.
+
+### The Events Journey
+
+**ZAO-PALOOZA (NYC, 2024):** First major event during NFT NYC. Organized in six weeks with volunteers. Broke even financially. "More importantly, allowed many community members to meet in person for the first time."
+
+**ZAO-CHELLA (Miami, 2024):** During Art Week. Brought together multiple onchain music communities. "We tried many new ideas — some worked well, some didn't — but the experience helped clarify our identity within the emerging on-chain music movement." Key goal: build mindshare for onchain music, which has "historically received far less attention than on-chain visual art."
+
+### WaveWarZ Breakthrough
+
+During a recent event, a musician earned roughly 0.5 SOL simply from trading activity during a battle. "That moment showed us the model can actually work." The project was built by a small core team — one developer originally learned to code through AI tools and helped build the full application.
+
+### Moving to Maine
+
+Moved from Oregon to rural Maine in 2024. "Very different from tech communities. Quieter, more rural, but an incredibly rich arts culture. Very little blockchain exposure — which creates an interesting opportunity."
+
+Started putting down local roots: volunteering, joining event committees, ski patrolling, getting involved in arts and business initiatives. Joined an organization strengthening the town's small business ecosystem. Discovered the region runs an annual statewide craft fair weekend — by aligning ZAO Stock with it, "we gain statewide marketing exposure while contributing something new: a dedicated music event."
+
+### ZAO Stock Vision
+
+"A polished music festival first, not a Web3 conference. Anyone should be able to attend and enjoy without knowing anything about blockchain." Optional activations for those who want to explore the technology. Affordable tickets, community discounts, optional digital experiences. "The technology should enhance the experience — not interrupt it."
+
+### Local Music Connection
+
+"One musician I met has been trying to create a thriving music community locally since the late 1980s. People like him bring decades of cultural knowledge and relationships. My goal is to combine their experience with the tools and networks we've developed through Web3."
+
+### The Long-Term View
+
+"Each iteration teaches us what works, what doesn't, and how to build something better next time."
+
+---
+
+## 5. Core Team
 
 ### WaveWarZ Core Team
 

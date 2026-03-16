@@ -169,28 +169,29 @@ Zaal runs case-by-case mentorship with: Eduard, Iman, Jose — covering web3 dev
 ## 5. The Ecosystem Map
 
 ```
-BetterCallZaal (brand/builder)
+THE ZAO (decentralized impact network)
 │
-├── THE ZAO (community / DAO)
-│   ├── ZAO OS ← this repo (Farcaster client)
-│   ├── ZAO Fractal (weekly governance, Respect Game)
-│   ├── $ZAO Respect Token (soulbound, Base)
+├── ZAO OS ← this repo (Farcaster client, MIT-licensed)
+│   ├── Gated community chat (Farcaster channels)
+│   ├── Encrypted DMs (XMTP)
+│   ├── Inline music players (6 platforms)
+│   ├── Governance proposals + voting
+│   ├── Respect leaderboard (on-chain, Optimism)
 │   ├── ZID (sequential membership numbers)
-│   └── ZAO Leaderboard (on-chain)
+│   └── Social graph (followers/following)
 │
 ├── WAVEWARZ (music prediction market, Solana)
 │   ├── Core team: Hurric4n3IKE, Zaal, Candy
 │   ├── Ephemeral bonding curve battle tokens
 │   ├── Smart contract: 9TUfEH... (Anchor/Rust)
-│   ├── Delaware C-Corporation
-│   └── Lil WaveWarZ (accessible entry point)
+│   └── Delaware C-Corporation
 │
 ├── ZABAL (coordination engine)
+│   ├── ZABAL token (Clanker, launched Jan 1, 2026)
 │   ├── SongJam integration (leaderboard, $SANG)
-│   ├── Magnetiq / Proof of Meet
+│   ├── Magnetiq / Proof of Meet (collectables + IRL connections)
 │   ├── Empire Builder (Farcaster token utility)
-│   ├── ZABAL token (launched Jan 1, 2026)
-│   └── Empire Builder profile
+│   └── den.show (streaming + clipping platform)
 │
 ├── ZAO FESTIVALS
 │   ├── ZAO-PALOOZA (NYC, April 2024)
@@ -199,24 +200,22 @@ BetterCallZaal (brand/builder)
 │   ├── ZAOVille (Virginia, July 2026)
 │   └── ZAO Stock (Maine, Oct 3, 2026)
 │
+├── COC CONCERTZ (metaverse concerts — ZAO project)
+│   ├── StiloWorld / Spatial.io platform
+│   ├── 150+ consecutive weekly "Super Wednesdays"
+│   └── Bonita NFT access passes
+│
 ├── MEDIA & EDUCATION
-│   ├── Let's Talk About Web3 (podcast, Wed 6PM EST)
+│   ├── Let's Talk About Ethereum (podcast, pivoted from LTAW3)
 │   ├── B&Z Builds (collab build sessions)
 │   ├── B&Z Streams (livestream collabs)
 │   ├── Year of the ZAO / ZABAL newsletter (400+ editions)
-│   └── Student Loanz Initiative ($LOANZ on Base)
-│
-├── COC CONCERTZ (metaverse concerts)
-│   ├── StiloWorld / Spatial.io platform
-│   ├── 150+ consecutive weekly "Super Wednesdays"
-│   ├── Bonita NFT access passes
-│   └── ZAO contributes: artists, coordination, promotion
+│   └── Student Loanz Initiative ($LOANZ on Base — paused)
 │
 └── MUTUAL COMMUNITIES
-    ├── SongJam (voice verification, $SANG, Adam Place)
-    ├── Ohnahji University (Web3's First HBCU)
-    ├── COC — Community of Communities (Uncle Corvus)
-    ├── Magnetiq (Proof of Meet, Flow blockchain)
+    ├── SongJam (voice verification, $SANG — active, part of ZABAL)
+    ├── Ohnahji University (Web3's First HBCU — active, daily streams)
+    ├── Magnetiq (Proof of Meet — active, part of ZABAL Connector)
     ├── Quakey (Solana music/gaming, WaveWarZ mutual)
     ├── Impact Concerts / Token Smart (22K+ since 2019)
     ├── UVR — Underground Violet Rave (Jadyn Violet)
@@ -244,7 +243,7 @@ BetterCallZaal (brand/builder)
 | Detail | Value |
 |--------|-------|
 | **Contract** | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` |
-| **Chain** | Base |
+| **Chain** | Optimism |
 | **Type** | Soulbound / non-transferable / illiquid |
 | **Purpose** | On-chain identity + contribution record |
 
@@ -278,7 +277,7 @@ The entire fractal governance movement traces to **Daniel Larimer** (creator of 
 
 ### How the Respect Game Works
 
-1. Participants sorted into groups of **3-6 people**
+1. Participants sorted into groups of **4-6 people**
 2. Each person gets **~4 minutes** to share what they've built
 3. Group reaches **consensus** on ranking (1-6)
 4. Respect distributed via **Fibonacci sequence**:
@@ -298,7 +297,7 @@ The entire fractal governance movement traces to **Daniel Larimer** (creator of 
 
 ### ZAO Fractal
 
-- **When:** Weekly (Mondays)
+- **When:** Weekly (Mondays), but can happen any time — any group of 4+ can run the game
 - **Tool:** Fractalgram
 - **90+ meetings** held
 - "While ZABAL drives the speed, the ZAO fractal provides the structure" — ZABAL Update 3
@@ -411,7 +410,7 @@ Two economic tracks:
 
 | Component | What |
 |-----------|------|
-| **ZABAL Token** | Launched January 1, 2026 |
+| **ZABAL Token** | Clanker on Base. Contract: `0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07`. Launched January 1, 2026 |
 | **SongJam** | Leaderboard tracking, voice verification (zkProofs), $SANG staking |
 | **Magnetiq** | Proof of Meet — IRL connection tokens via QR scan |
 | **Empire Builder** | Farcaster mini-app for token community rewards |
@@ -456,32 +455,35 @@ POM ≠ POAP:
 **Team:** AttaBotty + DaNici (production/visuals), FailOften/Enteract Studios (creative tech/installations)
 **Challenge:** Funding is the primary barrier to scale.
 
-### COC Concertz (Metaverse)
+### COC Concertz (Metaverse) — ZAO Project
 
 - Platform: **StiloWorld** on Spatial.io
 - **150+ consecutive weekly "Super Wednesdays"** concerts
 - Bonita NFT as access pass
-- ZAO contributes artists, coordination, promotion (Candy + Zaal)
-- COC = Community of Communities, founded by Uncle Corvus, 7 co-founders
+- COC Concertz is a ZAO project — the team coordinates artists, promotion, and production
+- COC = Community of Communities
 
 ---
 
-## 11. Let's Talk About Web3 (LTAW3)
+## 11. Let's Talk About Web3 → Let's Talk About Ethereum
 
-**A podcast by Zaal and Ohnahji** — its own standalone project.
+**A podcast by Zaal and Ohnahji** — its own standalone project, now pivoting.
 
 | Detail | Value |
 |--------|-------|
 | **Hosts** | BetterCallZaal + Ohnahji B + EZinCrypto |
 | **When** | Wednesdays 6 PM EST |
 | **Where** | Twitch (bettercallzaal, ohnahji, ezincrypto) |
-| **Episodes** | 19+ (since April 2025) |
+| **LTAW3 (completed)** | 3 full seasons (since April 2025) |
+| **New direction** | **Let's Talk About Ethereum** — focused on global ETH impact |
 | **Archive** | [pods.media/lets-talk-about-web3](https://pods.media/lets-talk-about-web3/) |
 | **Link** | ltaw3.thezao.com |
 
-**Topics:** Web3 builders, blockchain ecosystems, decentralized communities, creator economy.
+**LTAW3 covered:** Web3 builders, blockchain ecosystems, decentralized communities, creator economy. 3 full seasons completed.
 
-**Notable guests:** GESD1, Hurric4n3IKE, Pichi, DuoDoMusica, Will T.
+**Let's Talk About Ethereum** pivots the focus toward Ethereum ecosystem impact, global builder culture, and the Superchain.
+
+**Notable LTAW3 guests:** GESD1, Hurric4n3IKE, Pichi, DuoDoMusica, Will T.
 
 ---
 
@@ -604,17 +606,17 @@ The team (Hurric4n3IKE, Zaal, Candy) previously collaborated on Student Loanz be
 - **One Love Art DAO** — ETH Denver 2026 presence, Miami Art Week, "Visible Violets Vol 2" drop (20 women artists), consistent newsletter
 - **Optimism Fractal** — Weekly Respect Games (Thursdays 17 UTC), live ORDAO contracts at of.frapps.xyz, ~65 Respect holders, Season 5
 - **UVR / Jadyn Violet** — Daily Twitch streams (355/365 streak), new 2026 singles, first LA show, active Raver Realm
+- **COC Concertz** — Super active as a ZAO project. 150+ consecutive weekly metaverse concerts.
+- **Ohnahji University / Ohnahji B** — Active with daily streams and collaborations. Strong partnership with ZAO.
+- **SongJam** — Active as part of the ZABAL ecosystem. Voice verification, leaderboard tracking.
 
-**Active but Limited:**
-- **SongJam** — Genesis testnet live, but $SANG bleeding (~$1.4K daily volume). Adam splitting focus with Pump.fun hackathon (Eve/KAITO project)
-- **Empire Builder** — Product live, GLANKER at near-zero volume ($18/day). ZABAL integration is main signal.
-- **Quakey** — Token trading ~$67K daily volume, Nifty Island presence
-- **Magnetiq** — SaaS platform live, pivoting toward general brand community tools
+**Active:**
+- **Magnetiq** — Active as part of the ZABAL Connector. Proof of Meet collectables and IRL connection tracking.
+- **Empire Builder** — Product live. ZABAL integration is main signal.
+- **Quakey** — Token trading, Nifty Island presence
 
 **Quiet / Possibly Dormant:**
-- **COC / Uncle Corvus** — Vision articulated but no shipped product. Ethergrounds still conceptual.
 - **TokenSmart** — Website exists, unclear if new content being produced in 2026
-- **Ohnahji University** — No new Alphite Gazette since 2023. ONJU Saturdays status unclear. NFT not active.
 
 ### Fractal Ecosystem Partners
 
@@ -690,11 +692,11 @@ Multi-artist collaboration:
 
 | Chain | What Lives There |
 |-------|-----------------|
-| **Base** (Ethereum L2) | $ZAO Respect (soulbound), $LOANZ (Student Loanz) |
+| **Base** (Ethereum L2) | $LOANZ (Student Loanz), ZABAL token (Clanker), Hats roles (planned) |
 | **Solana** | WaveWarZ battles + ephemeral tokens |
 | **Flow** | Magnetiq NFT memberships (Proof of Meet) |
 | **Polygon** | Ohnahji NFT student IDs |
-| **Optimism** | Fractal governance contracts (ORDAO) |
+| **Optimism** | $ZAO Respect (soulbound), Fractal governance contracts (ORDAO) |
 
 **Challenge:** Unified identity (ZID) across 5 chains.
 
@@ -797,7 +799,7 @@ The ZAO shares values with public goods movements but is not aligned with any sp
 |--------|-------|
 | **Total estimated tracks** | 500-560+ (200-260 excluding Songs of Eden) |
 | **Combined Spotify monthly listeners** | 378,000+ |
-| **Artists with Sound.xyz drops** | 5 (Jadyn Violet, Mr. Darius, Clejan, GodCloud, Jango UU) |
+| **Artists with Sound.xyz drops (historical — platform offline Jan 2026)** | 5 (Jadyn Violet, Mr. Darius, Clejan, GodCloud, Jango UU) |
 | **Artists with Nina Protocol releases** | 1 (NessytheRilla — 5+ Solana releases) |
 | **Artists with 10K+ Spotify listeners** | 4 (Clejan 289K, Goldilox 40.4K, Songs of Eden 34.3K, Maxwell Aden 11.8K) |
 
@@ -849,16 +851,17 @@ The ZAO shares values with public goods movements but is not aligned with any sp
 
 | Token | Chain | Contract | Status |
 |-------|-------|----------|--------|
-| **$ZAO Respect** | Base | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` | Deployed, soulbound |
-| **$LOANZ** | Base + Solana | `0x03315307b202bf9c55ebebb8e9341d30411a0bc4` | Launched Feb 2025 |
+| **$ZAO Respect** | Optimism | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` | Deployed, soulbound |
+| **ZABAL** (Clanker) | Base | `0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07` | Launched Jan 1, 2026 |
+| **$LOANZ** | Base + Solana | `0x03315307b202bf9c55ebebb8e9341d30411a0bc4` | Launched Feb 2025 (paused) |
 | **WaveWarZ** | Solana | `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` | Active (Anchor/Rust) |
-| **GLANKER** (Empire Builder) | Base | `0x33ac788bc9ccb27e9ec558fb2bde79950a6b9d5b` | ~$63K mcap, 100B supply |
+| **GLANKER** (Empire Builder) | Base | `0x33ac788bc9ccb27e9ec558fb2bde79950a6b9d5b` | Empire Builder community token |
 
 ### Data Gaps (Need Direct Explorer Visits)
 
 | Item | What's Missing | Where to Check |
 |------|---------------|----------------|
-| $ZAO Respect | Holders, supply, deploy date | basescan.org |
+| $ZAO Respect | Holders, supply, deploy date | optimistic.etherscan.io |
 | $LOANZ | Holders, price, volume | dexscreener.com/base |
 | WaveWarZ | Transaction count, activity | solscan.io |
 | ZAO Cards | Full collection list, mint counts | app.manifold.xyz |
@@ -976,7 +979,7 @@ No single project combines even 3 of ZAO's 7 pillars:
 | Social graph | **Built** | Followers/following with sorting/filtering |
 | Admin/moderation | **Built** | Hide messages, manage allowlist |
 | Mobile-first | **Built** | Responsive UI, `useMobile` hook |
-| Private messaging | **In progress** | XMTP types, context, client scaffolded |
+| Private messaging | **Built** | XMTP encrypted DMs + group chats, E2E encrypted via MLS protocol |
 | Mini App | **Built** | Farcaster Mini App gate + auth + notifications |
 | Cross-posting | **Built** | Compose bar with scheduling |
 
@@ -984,8 +987,8 @@ No single project combines even 3 of ZAO's 7 pillars:
 
 | Concept | Status |
 |---------|--------|
-| $ZAO Respect Token | Schema designed, RespectPanel UI exists, contract known — not active |
-| ZID system | `assign_next_zid()` designed — not active |
+| $ZAO Respect Token | Contract deployed on Optimism. Leaderboard UI built. On-chain balance queries live. Not yet integrated into governance weight. |
+| ZID system | `assign_next_zid()` built, admin tool functional. Not yet user-facing on profile cards. |
 | Hats Protocol roles | Full tree + eligibility module designed — not deployed |
 | Community treasury | Safe multisig planned — no deployment |
 | EAS attestations | Researched — not implemented |
@@ -994,7 +997,7 @@ No single project combines even 3 of ZAO's 7 pillars:
 
 | Concept | Status |
 |---------|--------|
-| Hivemind (async proposals) | Not designed |
+| Hivemind (async proposals) | **Built** (basic proposals + voting + comments in ZAO OS, no treasury execution) |
 | Incubator pipeline UI | Not designed |
 | Cross-platform publishing | Researched only |
 | AI agent (ElizaOS) | Researched, separate repo decision |
@@ -1015,25 +1018,31 @@ These emerged organically:
 | **COC Concertz** (150+ weekly concerts) | Metaverse concert partnership |
 | **ZAO Cypher** | Multi-artist collaboration project |
 | **Four Pillars framework** | "OS = 4 meanings" — postdates the whitepaper |
-| **50 research documents** | Most extensively researched web3 music project |
+| **54 research documents** | Most extensively researched web3 music project |
 
-### Whitepaper Update Recommendations
+### Whitepaper Update Status (Draft 5 vs Draft 3)
 
-**Should change:**
-1. Rename ZVerse → ZAO OS
-2. Add the Four Pillars framework
-3. Add ZABAL as coordination infrastructure
-4. Add WaveWarZ as proven incubator case study (not hypothetical)
-5. Add Farcaster as the protocol layer (not mentioned in Draft 3)
-6. De-emphasize Quilibrium (correctly deferred)
-7. Add the Ehrlichman → Hats Protocol connection (narrative gold)
-8. Update competitive landscape (Sound.xyz/Catalog dead, validates community-first)
+**Completed in Draft 5:**
+1. ~~Rename ZVerse → ZAO OS~~ ✅
+2. ~~Add the Four Pillars framework~~ ✅
+3. ~~Add ZABAL as coordination infrastructure~~ ✅
+4. ~~Add WaveWarZ as proven incubator case study~~ ✅
+5. ~~Add Farcaster as the protocol layer~~ ✅
+6. ~~De-emphasize Quilibrium~~ ✅
+7. ~~Add the Ehrlichman → Hats Protocol connection~~ ✅
+8. ~~Update competitive landscape~~ ✅
 
-**Should NOT change:**
+**Still valid / unchanged:**
 - 8-step artist journey (valid, needs in-app implementation)
 - Octalysis mapping (right framework, needs more features)
-- Respect token design (sound, needs deployment)
+- Respect token design (sound, partially deployed)
 - Impact Network identity (even more validated now)
+
+**New for Draft 6:**
+- Update LTAW3 → Let's Talk About Ethereum pivot
+- Add audience/social graph portability to thesis
+- Add COC Concertz as ZAO project (not just mutual community)
+- Reflect proposals/voting as built
 
 ---
 
@@ -1088,7 +1097,7 @@ ZAO Top Hat (multisig: Zaal, Candy, Hurric4n3IKE, AttaBotty, Ohnahji)
 └── Developer (ZAO OS contributors)
 ```
 
-Deploy on **Base** (same chain as Respect). Start with just Top Hat + Council + Moderator. Add others when Respect is live.
+Deploy on **Optimism** (same chain as Respect). Start with just Top Hat + Council + Moderator. Add others when Respect is live.
 
 ---
 

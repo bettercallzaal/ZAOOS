@@ -794,6 +794,8 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
     if (typeof window !== 'undefined') {
       localStorage.removeItem('zaoos-xmtp-wallets');
+      localStorage.removeItem('zaoos-xmtp-peers');
+      localStorage.removeItem('zaoos-xmtp-members');
     }
 
     setConnectedWallets([]);

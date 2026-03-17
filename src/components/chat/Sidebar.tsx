@@ -249,9 +249,16 @@ export function Sidebar({
                   <div>
                     <p className="text-xs text-red-400 font-medium">Connection issue</p>
                     <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-2">{xmtpError}</p>
-                    <button onClick={onXmtpConnect} className="text-[10px] text-[#f5a623] font-medium mt-1.5 hover:text-[#ffd700]">
-                      Retry
-                    </button>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <button onClick={onXmtpConnect} className="text-[10px] text-[#f5a623] font-medium hover:text-[#ffd700]">
+                        Retry
+                      </button>
+                      {onResetXmtp && (
+                        <button onClick={onResetXmtp} className="text-[10px] text-red-400/70 font-medium hover:text-red-400">
+                          Reset
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -464,19 +471,22 @@ export function Sidebar({
                 </ConnectButton.Custom>
               )}
 
-              {/* Reset messaging */}
-              {onResetXmtp && (
-                <button
-                  onClick={onResetXmtp}
-                  className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-gray-600 hover:bg-red-500/5 hover:text-red-400 transition-colors mt-1 text-xs"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.985 4.356v4.992" />
-                  </svg>
-                  Reset Messaging
-                </button>
-              )}
             </SidebarSection>
+          )}
+
+          {/* Reset messaging — always visible when XMTP is connected */}
+          {xmtpConnected && onResetXmtp && (
+            <div className="px-3 mt-1">
+              <button
+                onClick={onResetXmtp}
+                className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-gray-600 hover:bg-red-500/5 hover:text-red-400 transition-colors text-xs"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.985 4.356v4.992" />
+                </svg>
+                Reset Messaging
+              </button>
+            </div>
           )}
 
           {/* ── Messageable Members ──────────────────────────────────────── */}

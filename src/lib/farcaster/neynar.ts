@@ -36,6 +36,7 @@ export async function postCast(
   parentHash?: string,
   embedHash?: string,
   embedUrls?: string[],
+  embedFid?: number,
 ) {
   const body: Record<string, unknown> = {
     signer_uuid: signerUuid,
@@ -45,7 +46,15 @@ export async function postCast(
   if (parentHash) body.parent = parentHash;
 
   const embeds: Record<string, unknown>[] = [];
-  if (embedHash) embeds.push({ cast_id: { hash: embedHash } });
+  if (embedHash) {
+    // Neynar requires both hash and fid for cast embeds
+    if (embedFid) {
+      embeds.push({ cast_id: { hash: embedHash, fid: embedFid } });
+    } else {
+      // Fallback: embed as URL which Farcaster will unfurl
+      embeds.push({ url: `https://farcaster.xyz/~/conversations/${embedHash}` });
+    }
+  }
   if (embedUrls) {
     for (const url of embedUrls) {
       embeds.push({ url });

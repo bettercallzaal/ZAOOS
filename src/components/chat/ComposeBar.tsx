@@ -15,7 +15,7 @@ export interface ReplyContext {
 
 interface ComposeBarProps {
   hasSigner: boolean;
-  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[]) => Promise<void>;
+  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[], embedFid?: number) => Promise<void>;
   sending?: boolean;
   channel?: string;
   quotedCast?: QuotedCastData | null;
@@ -107,7 +107,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
 
         const crossPost = crossPostChannels.size > 0 ? [...crossPostChannels] : undefined;
         const parentHash = replyTo?.hash || undefined;
-        await onSend(msg || ' ', parentHash, quotedCast?.hash, crossPost, embedUrls);
+        await onSend(msg || ' ', parentHash, quotedCast?.hash, crossPost, embedUrls, quotedCast?.author.fid);
         setText('');
         removeImage();
         onClearQuote?.();

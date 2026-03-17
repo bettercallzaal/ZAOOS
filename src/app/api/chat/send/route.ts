@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
 
-    const { text, parentHash, embedHash, embedUrls, channel, crossPostChannels } = parsed.data;
+    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels } = parsed.data;
     const primaryChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
 
     // Build list of channels to post to
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Post to primary channel first
-    const result = await postCast(session.signerUuid, text, primaryChannel, parentHash, embedHash, embedUrls);
+    const result = await postCast(session.signerUuid, text, primaryChannel, parentHash, embedHash, embedUrls, embedFid);
 
     // Write the new cast to our DB immediately so it shows up on next fetch
     const castData = result.cast;
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     if (additionalChannels.length > 0) {
       await Promise.allSettled(
         additionalChannels.map(async (ch) => {
-          const crossResult = await postCast(session.signerUuid!, text, ch, undefined, embedHash, embedUrls);
+          const crossResult = await postCast(session.signerUuid!, text, ch, undefined, embedHash, embedUrls, embedFid);
           // Also write cross-posts to DB
           if (crossResult.cast?.hash) {
             await supabaseAdmin

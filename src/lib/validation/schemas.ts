@@ -10,6 +10,7 @@ export const sendMessageSchema = z.object({
   text: castTextSchema,
   parentHash: castHashSchema.optional(),
   embedHash: castHashSchema.optional(), // for quote casts
+  embedFid: z.number().int().positive().optional(), // FID of quoted cast author
   embedUrls: z.array(z.string().url()).max(2).optional(), // image/link embeds
   channel: channelIdSchema.optional(),
   crossPostChannels: z.array(channelIdSchema).max(3).optional(), // post to multiple channels

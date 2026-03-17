@@ -59,13 +59,12 @@ export function LoginButton() {
     <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-5">
       {/* Primary: Wallet Connect */}
       <WalletLoginButton />
-      <p className="text-[10px] text-gray-600 mt-2">Recommended — connect your ZAO wallet</p>
 
       {/* Divider */}
-      <div className="flex items-center gap-4 w-full">
-        <div className="flex-1 h-px bg-gray-700/60" />
-        <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">or sign in with Farcaster</span>
-        <div className="flex-1 h-px bg-gray-700/60" />
+      <div className="flex items-center gap-3 w-full mt-1">
+        <div className="flex-1 h-px bg-gray-700/40" />
+        <span className="text-[10px] text-gray-600 uppercase tracking-wider">or</span>
+        <div className="flex-1 h-px bg-gray-700/40" />
       </div>
 
       {/* Secondary: Farcaster */}

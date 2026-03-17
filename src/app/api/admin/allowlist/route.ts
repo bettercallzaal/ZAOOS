@@ -25,7 +25,26 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch allowlist' }, { status: 500 });
   }
 
-  return NextResponse.json({ entries: data });
+  // Join xmtp_address from users table
+  const fids = (data || []).map((m) => m.fid).filter(Boolean);
+  const xmtpMap = new Map<number, string>();
+  if (fids.length > 0) {
+    const { data: userData } = await supabaseAdmin
+      .from('users')
+      .select('fid, xmtp_address')
+      .in('fid', fids)
+      .not('xmtp_address', 'is', null);
+    for (const u of userData || []) {
+      if (u.fid && u.xmtp_address) xmtpMap.set(u.fid, u.xmtp_address);
+    }
+  }
+
+  const entries = (data || []).map((m) => ({
+    ...m,
+    xmtp_address: m.fid ? (xmtpMap.get(m.fid) || null) : null,
+  }));
+
+  return NextResponse.json({ entries });
 }
 
 export async function POST(req: NextRequest) {

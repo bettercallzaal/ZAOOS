@@ -278,6 +278,7 @@ export function ChatRoom() {
         onStartDmWithMember={handleStartDmWithMember}
         onGroupInfo={handleOpenGroupInfo}
         onRefreshMembers={xmtp.refreshMembers}
+        onResetXmtp={xmtp.disconnectAll}
       />
 
       {/* Group Info Drawer */}

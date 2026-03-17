@@ -13,6 +13,7 @@ export interface AllowlistEntry {
   custody_address: string | null;
   verified_addresses: string[] | null;
   ens_name: string | null;
+  xmtp_address: string | null;
 }
 
 export interface SessionData {

@@ -106,6 +106,7 @@ export async function GET() {
         m.custody_address,
         ...((m.verified_addresses as string[]) || []),
       ].filter(Boolean) as string[],
+      storedXmtpAddress: m.fid ? (xmtpAddrMap.get(m.fid) || null) : null,
       lastLoginAt: m.fid ? (loginMap.get(m.fid) || null) : null,
     };
   });

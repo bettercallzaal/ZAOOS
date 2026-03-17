@@ -450,29 +450,48 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       const zaoData = membersRes.ok ? await membersRes.json() : { members: [], currentFid: 0 };
       const currentFid = zaoData.currentFid;
 
-      const merged = (zaoData.members || [])
-        .filter((m: { fid: number | null }) => m.fid !== currentFid)
-        .map((m: { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[] }) => ({ ...m }));
+      interface MergedMember {
+        fid: number | null;
+        username: string | null;
+        displayName: string;
+        pfpUrl: string | null;
+        addresses: string[];
+        storedXmtpAddress?: string | null;
+        lastLoginAt?: string | null;
+      }
 
-      const allAddresses: string[] = [];
+      const merged: MergedMember[] = (zaoData.members || [])
+        .filter((m: { fid: number | null }) => m.fid !== currentFid)
+        .map((m: MergedMember) => ({ ...m }));
+
+      const reachableMap = new Map<number, string>(); // memberIdx → reachable address
+
+      // Members with a stored XMTP address are immediately reachable (no canMessage needed)
+      const needsCanMessage: string[] = [];
       const addrToMemberIdx = new Map<string, number>();
       for (let i = 0; i < merged.length; i++) {
-        for (const addr of merged[i].addresses) {
-          const normalized = addr.toLowerCase();
-          if (!addrToMemberIdx.has(normalized)) {
-            allAddresses.push(normalized);
-            addrToMemberIdx.set(normalized, i);
+        const m = merged[i];
+        if (m.storedXmtpAddress) {
+          reachableMap.set(i, m.storedXmtpAddress.toLowerCase());
+        } else {
+          // Only check canMessage for members without a stored XMTP address
+          for (const addr of m.addresses) {
+            const normalized = addr.toLowerCase();
+            if (!addrToMemberIdx.has(normalized)) {
+              needsCanMessage.push(normalized);
+              addrToMemberIdx.set(normalized, i);
+            }
           }
         }
       }
 
-      const reachableMap = new Map<number, string>(); // memberIdx → reachable address
-      if (allAddresses.length > 0) {
+      // Run canMessage only for members without a stored address
+      if (needsCanMessage.length > 0) {
         try {
           const { IdentifierKind } = await import('@xmtp/browser-sdk');
           const BATCH_SIZE = 100;
-          for (let i = 0; i < allAddresses.length; i += BATCH_SIZE) {
-            const batch = allAddresses.slice(i, i + BATCH_SIZE);
+          for (let i = 0; i < needsCanMessage.length; i += BATCH_SIZE) {
+            const batch = needsCanMessage.slice(i, i + BATCH_SIZE);
             const identifiers = batch.map((addr) => ({
               identifierKind: IdentifierKind.Ethereum,
               identifier: addr,

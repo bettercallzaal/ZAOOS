@@ -277,6 +277,7 @@ export function ChatRoom() {
         loadingMembers={xmtp.loadingMembers}
         onStartDmWithMember={handleStartDmWithMember}
         onGroupInfo={handleOpenGroupInfo}
+        onRemoveConversation={xmtp.removeConversation}
         onRefreshMembers={xmtp.refreshMembers}
         onResetXmtp={xmtp.disconnectAll}
       />

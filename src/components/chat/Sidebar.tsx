@@ -109,6 +109,7 @@ interface SidebarProps {
   loadingMembers: boolean;
   onStartDmWithMember: (member: ZaoMember) => void;
   onGroupInfo?: (id: string) => void;
+  onRemoveConversation?: (id: string) => void;
   onRefreshMembers?: () => Promise<void>;
   onResetXmtp?: () => void;
 }
@@ -117,7 +118,7 @@ export function Sidebar({
   user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, onOpenFaq, onOpenTutorial, onOpenRespect,
   xmtpConnected, xmtpConnecting, xmtpError, xmtpConversations, activeConversationId,
   onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
-  zaoMembers, loadingMembers, onStartDmWithMember, onGroupInfo, onRefreshMembers, onResetXmtp,
+  zaoMembers, loadingMembers, onStartDmWithMember, onGroupInfo, onRemoveConversation, onRefreshMembers, onResetXmtp,
 }: SidebarProps) {
   const onlineMembers = zaoMembers.filter((m) => m.reachable && m.lastLoginAt);
   const offlineMembers = zaoMembers.filter((m) => !m.reachable && m.username);
@@ -313,6 +314,18 @@ export function Sidebar({
                             )}
                           </div>
                         </button>
+                        {onRemoveConversation && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onRemoveConversation(conv.id); }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 rounded text-gray-500 hover:text-red-400 transition-all"
+                            aria-label="Remove conversation"
+                            title="Remove from list"
+                          >
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     );
                   })}

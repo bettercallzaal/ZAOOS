@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { communityConfig } from '@/../community.config';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 interface Notification {
   id: string;
@@ -56,11 +57,41 @@ export function NotificationBell() {
     }
   }, []);
 
-  // Poll every 30 seconds for new notifications
+  // Initial fetch + Supabase Realtime subscription (falls back to polling)
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30_000);
-    return () => clearInterval(interval);
+
+    let channel: ReturnType<SupabaseClient['channel']> | null = null;
+    let fallbackInterval: ReturnType<typeof setInterval> | null = null;
+
+    try {
+      // Dynamic require so this works even if the browser client isn't configured
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getSupabaseBrowser } = require('@/lib/db/supabase');
+      const supabase: SupabaseClient = getSupabaseBrowser();
+      channel = supabase
+        .channel('notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'in_app_notifications',
+          },
+          () => {
+            fetchNotifications();
+          }
+        )
+        .subscribe();
+    } catch {
+      // Realtime not available — fall back to 30-second polling
+      fallbackInterval = setInterval(fetchNotifications, 30_000);
+    }
+
+    return () => {
+      channel?.unsubscribe();
+      if (fallbackInterval) clearInterval(fallbackInterval);
+    };
   }, [fetchNotifications]);
 
   // Close dropdown on outside click

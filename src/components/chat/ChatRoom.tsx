@@ -39,7 +39,7 @@ export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
   const [activeChannel, setActiveChannel] = useState('zao');
   const player = usePlayer();
-  const { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage } = useChat(activeChannel);
+  const { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage, loadMore, hasMore, loadingMore } = useChat(activeChannel);
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedThreadHash, setSelectedThreadHash] = useState<string | null>(null);
@@ -518,6 +518,9 @@ export function ChatRoom() {
                 loading={loading}
                 channelId={activeChannel}
                 sortMode={sortMode}
+                onLoadMore={loadMore}
+                hasMore={hasMore}
+                loadingMore={loadingMore}
               />
 
               {/* Global music player */}

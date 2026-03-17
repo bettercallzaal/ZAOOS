@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { ProposalComments } from '@/components/governance/ProposalComments';
 
 interface RespectEntry {
   rank: number;
@@ -80,6 +81,9 @@ export default function GovernancePage() {
 
   // Voting state
   const [voting, setVoting] = useState<string | null>(null);
+
+  // Comments expansion state
+  const [expandedComments, setExpandedComments] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/respect/leaderboard')
@@ -427,7 +431,12 @@ export default function GovernancePage() {
                           <span>by {proposal.author?.display_name || proposal.author?.username || 'Unknown'}</span>
                           {proposal.author?.zid && <span className="text-[#f5a623]/60">ZID #{proposal.author.zid}</span>}
                           <span>{new Date(proposal.created_at).toLocaleDateString()}</span>
-                          {proposal.commentCount > 0 && <span>{proposal.commentCount} comments</span>}
+                          <button
+                            onClick={() => setExpandedComments(expandedComments === proposal.id ? null : proposal.id)}
+                            className="text-gray-500 hover:text-white transition-colors cursor-pointer"
+                          >
+                            {proposal.commentCount || 0} comments
+                          </button>
                         </div>
                       </div>
 
@@ -490,6 +499,13 @@ export default function GovernancePage() {
                         }`}>
                           {proposal.status === 'approved' ? 'Approved' :
                            proposal.status === 'rejected' ? 'Rejected' : 'Completed'}
+                        </div>
+                      )}
+
+                      {/* Expandable comments section */}
+                      {expandedComments === proposal.id && data && (
+                        <div className="px-4 pb-4">
+                          <ProposalComments proposalId={proposal.id} currentFid={data.currentFid} />
                         </div>
                       )}
                     </div>

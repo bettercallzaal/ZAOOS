@@ -17,10 +17,14 @@ interface MessageListProps {
   loading: boolean;
   channelId?: string;
   sortMode?: 'newest' | 'oldest' | 'most_liked' | 'most_replied';
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  loadingMore?: boolean;
 }
 
-export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, onReply, loading, channelId = 'zao', sortMode = 'newest' }: MessageListProps) {
+export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, onReply, loading, channelId = 'zao', sortMode = 'newest', onLoadMore, hasMore = false, loadingMore = false }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const prevCountRef = useRef(0);
   const prevChannelRef = useRef(channelId);
 
@@ -65,6 +69,17 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
     prevCountRef.current = 0;
   }, [channelId]);
 
+  // Intersection Observer for infinite scroll — triggers loadMore when sentinel is visible
+  useEffect(() => {
+    if (!onLoadMore || !hasMore) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) onLoadMore(); },
+      { threshold: 0.1 }
+    );
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [onLoadMore, hasMore]);
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -101,6 +116,16 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
     <div ref={containerRef} className="flex-1 overflow-y-auto" style={{ overflowAnchor: 'none' }}>
       {/* Spacer pushes messages to bottom in chat layout */}
       <div className={isChatLayout ? 'min-h-full flex flex-col justify-end' : ''}>
+        {/* Sentinel for loading older messages */}
+        {hasMore && (
+          <div ref={sentinelRef} className="flex justify-center py-2">
+            {loadingMore ? (
+              <div className="w-4 h-4 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <span className="text-xs text-gray-600">Scroll up for older messages</span>
+            )}
+          </div>
+        )}
         <div className="py-2">
           {displayMessages.map((cast) => (
             <Message

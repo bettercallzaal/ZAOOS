@@ -11,6 +11,8 @@ export function useChat(channel: string = 'zao') {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const firstHashRef = useRef<string | null>(null); // dedup: skip setState if top cast unchanged
   const abortRef = useRef<AbortController | null>(null);
@@ -36,6 +38,7 @@ export function useChat(channel: string = 'zao') {
       firstHashRef.current = topHash;
 
       setMessages(casts);
+      setHasMore(data.hasMore ?? false);
       setError(null);
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -45,9 +48,34 @@ export function useChat(channel: string = 'zao') {
     }
   }, [channel]);
 
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore || messages.length === 0) return;
+    setLoadingMore(true);
+    try {
+      // messages are sorted newest-first from the API, so the oldest is the last element
+      const oldestTimestamp = messages[messages.length - 1]?.timestamp;
+      if (!oldestTimestamp) { setLoadingMore(false); return; }
+      const res = await fetch(`/api/chat/messages?channel=${channel}&cursor=${oldestTimestamp}&limit=20`);
+      if (res.ok) {
+        const data = await res.json();
+        const older = (data.casts || []) as Cast[];
+        setHasMore(data.hasMore ?? false);
+        if (older.length > 0) {
+          setMessages(prev => {
+            const existingHashes = new Set(prev.map(m => m.hash));
+            const newMessages = older.filter(m => !existingHashes.has(m.hash));
+            return [...prev, ...newMessages];
+          });
+        }
+      }
+    } catch { /* ignore */ }
+    setLoadingMore(false);
+  }, [channel, messages, loadingMore, hasMore]);
+
   useEffect(() => {
     setLoading(true);
     setMessages([]);
+    setHasMore(true);
     firstHashRef.current = null;
     fetchMessages();
     intervalRef.current = setInterval(fetchMessages, POLL_INTERVAL);
@@ -126,5 +154,5 @@ export function useChat(channel: string = 'zao') {
     await fetchMessages();
   }, [fetchMessages]);
 
-  return { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage, refetch: fetchMessages };
+  return { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage, refetch: fetchMessages, loadMore, hasMore, loadingMore };
 }

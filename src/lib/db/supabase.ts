@@ -19,3 +19,19 @@ export const supabaseAdmin = new Proxy({} as SupabaseClient, {
     return (getSupabaseAdmin() as unknown as Record<string | symbol, unknown>)[prop];
   },
 });
+
+// ---------- Browser-safe client (Realtime, public queries) ----------
+// Uses only NEXT_PUBLIC_* env vars — safe for client components.
+// Reads process.env directly to avoid importing ENV (which requires server secrets).
+let _browserClient: SupabaseClient | null = null;
+
+export function getSupabaseBrowser(): SupabaseClient {
+  if (_browserClient) return _browserClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  }
+  _browserClient = createClient(url, key);
+  return _browserClient;
+}

@@ -88,13 +88,31 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid channel' }, { status: 400 });
   }
 
+  const cursor = req.nextUrl.searchParams.get('cursor'); // ISO timestamp
+  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '20', 10), 50);
+
   try {
     const now = Date.now();
-    const needsRefresh = (now - (lastRefresh[channel] || 0)) > REFRESH_TTL;
+    const needsRefresh = !cursor && (now - (lastRefresh[channel] || 0)) > REFRESH_TTL;
 
     let casts: Cast[];
+    let hasMore = false;
 
-    if (needsRefresh) {
+    if (cursor) {
+      // ── Cursor-based pagination: always read from DB ──────────────────────
+      let query = supabaseAdmin
+        .from('channel_casts')
+        .select('*')
+        .eq('channel_id', channel)
+        .order('timestamp', { ascending: false })
+        .limit(limit + 1); // Fetch one extra to detect hasMore
+
+      query = query.lt('timestamp', cursor);
+
+      const { data: dbRows } = await query;
+      hasMore = (dbRows?.length || 0) > limit;
+      casts = (dbRows || []).slice(0, limit).map(rowToCast);
+    } else if (needsRefresh) {
       // ── Refresh window: fetch fresh from Neynar (gets real reaction counts) ──
       try {
         casts = await refreshFromNeynar(channel);
@@ -107,8 +125,20 @@ export async function GET(req: NextRequest) {
           .select('*')
           .eq('channel_id', channel)
           .order('timestamp', { ascending: false })
-          .limit(FEED_LIMIT);
+          .limit(limit);
         casts = (dbRows || []).map(rowToCast);
+      }
+      // Check if there are older messages beyond this page
+      if (casts.length >= limit) {
+        const oldestTs = casts[casts.length - 1]?.timestamp;
+        if (oldestTs) {
+          const { count } = await supabaseAdmin
+            .from('channel_casts')
+            .select('*', { count: 'exact', head: true })
+            .eq('channel_id', channel)
+            .lt('timestamp', oldestTs);
+          hasMore = (count || 0) > 0;
+        }
       }
     } else {
       // ── Within TTL: read from DB (which was recently refreshed) ──────────────
@@ -117,7 +147,7 @@ export async function GET(req: NextRequest) {
         .select('*')
         .eq('channel_id', channel)
         .order('timestamp', { ascending: false })
-        .limit(FEED_LIMIT);
+        .limit(limit);
 
       if (dbError || !dbRows || dbRows.length === 0) {
         // DB empty or error — force a Neynar fetch
@@ -125,6 +155,18 @@ export async function GET(req: NextRequest) {
         lastRefresh[channel] = now;
       } else {
         casts = dbRows.map(rowToCast);
+      }
+      // Check if there are older messages beyond this page
+      if (casts.length >= limit) {
+        const oldestTs = casts[casts.length - 1]?.timestamp;
+        if (oldestTs) {
+          const { count } = await supabaseAdmin
+            .from('channel_casts')
+            .select('*', { count: 'exact', head: true })
+            .eq('channel_id', channel)
+            .lt('timestamp', oldestTs);
+          hasMore = (count || 0) > 0;
+        }
       }
     }
 
@@ -141,7 +183,7 @@ export async function GET(req: NextRequest) {
 
     const visibleCasts = casts.filter((c) => !hiddenHashes.has(c.hash));
 
-    return NextResponse.json({ casts: visibleCasts });
+    return NextResponse.json({ casts: visibleCasts, hasMore });
   } catch (error) {
     console.error('[messages] error:', error);
     return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });

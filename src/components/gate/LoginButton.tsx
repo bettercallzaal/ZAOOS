@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SignInButton, useProfile, type StatusAPIResponse } from '@farcaster/auth-kit';
 import { useRouter } from 'next/navigation';
 import { WalletLoginButton } from './WalletLoginButton';
@@ -10,6 +10,15 @@ export function LoginButton() {
   const profile = useProfile();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [serverNonce, setServerNonce] = useState<string | undefined>(undefined);
+
+  // Fetch a server-issued nonce for SIWF replay protection
+  useEffect(() => {
+    fetch('/api/auth/verify')
+      .then(r => r.json())
+      .then(d => setServerNonce(d.nonce))
+      .catch(() => {});
+  }, []);
 
   const handleSuccess = useCallback(async (res: StatusAPIResponse) => {
     setError(null);
@@ -31,6 +40,8 @@ export function LoginButton() {
       if (!response.ok || data.error) {
         setError(data.error || 'Verification failed');
         setLoading(false);
+        // Refresh nonce for retry (previous one was consumed or expired)
+        fetch('/api/auth/verify').then(r => r.json()).then(d => setServerNonce(d.nonce)).catch(() => {});
         return;
       }
 
@@ -59,7 +70,7 @@ export function LoginButton() {
       {/* Secondary: Farcaster */}
       <div className="w-full flex flex-col items-center">
         <div className="farcaster-signin-wrapper">
-          <SignInButton onSuccess={handleSuccess} />
+          <SignInButton nonce={serverNonce} onSuccess={handleSuccess} />
         </div>
         {profile.isAuthenticated && loading && !error && (
           <p className="text-sm text-gray-400 mt-2">Verifying access...</p>

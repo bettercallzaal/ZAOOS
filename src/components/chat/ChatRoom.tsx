@@ -180,9 +180,9 @@ export function ChatRoom() {
     [messages, contentFilter, sortMode],
   );
 
-  // Auto-connect XMTP when wallet is available
+  // Auto-connect XMTP when wallet is available (skip if previous attempt errored)
   useEffect(() => {
-    if (!user || xmtp.isConnected || xmtp.isConnecting) return;
+    if (!user || xmtp.isConnected || xmtp.isConnecting || xmtp.error) return;
     if (walletXmtp.canConnect) {
       walletXmtp.connectWalletToXMTP();
     }

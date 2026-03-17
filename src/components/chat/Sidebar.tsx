@@ -2,7 +2,6 @@
 
 import { useState, ReactNode } from 'react';
 import Image from 'next/image';
-import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { SessionData } from '@/types';
 import { XMTPConversation } from '@/types/xmtp';
@@ -128,7 +127,7 @@ export function Sidebar({
   const groupConversations = xmtpConversations.filter((c) => c.type === 'group');
   const dmUnread = dmConversations.reduce((n, c) => n + c.unreadCount, 0);
   const groupUnread = groupConversations.reduce((n, c) => n + c.unreadCount, 0);
-  const { isConnected: hasWallet } = useAccount();
+  const hasWallet = walletConnected ?? false;
   useEscapeClose(onClose, isOpen);
 
   return (

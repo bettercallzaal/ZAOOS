@@ -57,6 +57,14 @@ export function MessagesRoom() {
     }
   }, [walletXmtp]);
 
+  // Auto-connect XMTP when wallet is available (matches ChatRoom behavior)
+  useEffect(() => {
+    if (!user || isConnected || isConnecting || error) return;
+    if (walletXmtp.canConnect) {
+      walletXmtp.connectWalletToXMTP();
+    }
+  }, [user, walletXmtp.canConnect]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleCreateDm = useCallback(async (address: `0x${string}`, peerProfile?: XMTPPeerProfile) => {
     const convId = await createDm(address, peerProfile);
     if (convId) selectConversation(convId);

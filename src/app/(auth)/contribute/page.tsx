@@ -27,7 +27,7 @@ export default function ContributePage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Get Involved</p>
 
           <a
-            href="https://github.com/ZaalOfficial/ZAO-OS"
+            href="https://github.com/bettercallzaal/zaoos"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/30 transition-colors"
@@ -45,7 +45,7 @@ export default function ContributePage() {
           </a>
 
           <a
-            href="https://github.com/bettercallzaal/ZAOOS/issues?q=is%3Aissue+is%3Aopen+label%3Abounty"
+            href="https://github.com/bettercallzaal/zaoos/issues?q=is%3Aissue+is%3Aopen+label%3Abounty"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/30 transition-colors block"
@@ -62,7 +62,7 @@ export default function ContributePage() {
           </a>
 
           <a
-            href="https://github.com/bettercallzaal/ZAOOS/tree/main/research"
+            href="https://github.com/bettercallzaal/zaoos/tree/main/research"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/30 transition-colors block"
@@ -79,7 +79,7 @@ export default function ContributePage() {
           </a>
 
           <a
-            href="https://github.com/bettercallzaal/ZAOOS#forking"
+            href="https://github.com/bettercallzaal/zaoos#forking"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/30 transition-colors block"

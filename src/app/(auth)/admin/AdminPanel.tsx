@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { SyncRespectButton } from '@/components/admin/SyncRespectButton';
 
 const AllowlistTable = dynamic(() => import('@/components/admin/AllowlistTable').then(m => ({ default: m.AllowlistTable })), { ssr: false });
 const UsersTable = dynamic(() => import('@/components/admin/UsersTable').then(m => ({ default: m.UsersTable })), { ssr: false });
@@ -38,12 +39,15 @@ export function AdminPanel() {
             <h1 className="text-lg font-bold text-[#f5a623] tracking-wide">ZAO Admin</h1>
             <p className="text-xs text-gray-500 mt-0.5">Manage your community</p>
           </div>
-          <Link
-            href="/chat"
-            className="text-sm text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            ← Back to chat
-          </Link>
+          <div className="flex items-center gap-2">
+            <SyncRespectButton />
+            <Link
+              href="/chat"
+              className="text-sm text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              ← Back to chat
+            </Link>
+          </div>
         </div>
       </header>
 

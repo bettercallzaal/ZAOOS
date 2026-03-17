@@ -5,6 +5,8 @@ import { checkAllowlist } from '@/lib/gates/allowlist';
 import { saveSession } from '@/lib/auth/session';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { createInAppNotification } from '@/lib/notifications';
+import { communityConfig } from '@/../community.config';
 
 const appClient = createAppClient({
   ethereum: viemConnector(),
@@ -106,6 +108,13 @@ export async function POST(req: NextRequest) {
     try {
       const wallet = (primaryWallet || '').toLowerCase();
       if (wallet) {
+        // Check if this is a first-time login (no existing last_login_at)
+        const { data: existingUser } = await supabaseAdmin
+          .from('users')
+          .select('last_login_at')
+          .eq('primary_wallet', wallet)
+          .single();
+
         await supabaseAdmin.from('users').upsert(
           {
             primary_wallet: wallet,
@@ -121,6 +130,23 @@ export async function POST(req: NextRequest) {
           },
           { onConflict: 'primary_wallet' }
         );
+
+        // Notify admins on first-time member login (fire and forget)
+        if (!existingUser?.last_login_at) {
+          const adminFids = communityConfig.adminFids || [];
+          if (adminFids.length > 0) {
+            createInAppNotification({
+              recipientFids: [...adminFids],
+              type: 'member',
+              title: 'New member joined ZAO OS',
+              body: `${user.display_name || user.username || 'A new user'} logged in for the first time`,
+              href: '/admin',
+              actorFid: fid,
+              actorDisplayName: user.display_name,
+              actorPfpUrl: user.pfp_url,
+            }).catch((err) => console.error('[notify]', err));
+          }
+        }
       }
     } catch (err) {
       console.error('[Auth] Failed to upsert user record:', err);

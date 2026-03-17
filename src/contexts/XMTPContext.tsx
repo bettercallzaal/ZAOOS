@@ -464,62 +464,18 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         .filter((m: { fid: number | null }) => m.fid !== currentFid)
         .map((m: MergedMember) => ({ ...m }));
 
-      const reachableMap = new Map<number, string>(); // memberIdx → reachable address
-
-      // Members with a stored XMTP address are immediately reachable (no canMessage needed)
-      const needsCanMessage: string[] = [];
-      const addrToMemberIdx = new Map<string, number>();
-      for (let i = 0; i < merged.length; i++) {
-        const m = merged[i];
-        if (m.storedXmtpAddress) {
-          reachableMap.set(i, m.storedXmtpAddress.toLowerCase());
-        } else {
-          // Only check canMessage for members without a stored XMTP address
-          for (const addr of m.addresses) {
-            const normalized = addr.toLowerCase();
-            if (!addrToMemberIdx.has(normalized)) {
-              needsCanMessage.push(normalized);
-              addrToMemberIdx.set(normalized, i);
-            }
-          }
-        }
-      }
-
-      // Run canMessage only for members without a stored address
-      if (needsCanMessage.length > 0) {
-        try {
-          const { IdentifierKind } = await import('@xmtp/browser-sdk');
-          const BATCH_SIZE = 100;
-          for (let i = 0; i < needsCanMessage.length; i += BATCH_SIZE) {
-            const batch = needsCanMessage.slice(i, i + BATCH_SIZE);
-            const identifiers = batch.map((addr) => ({
-              identifierKind: IdentifierKind.Ethereum,
-              identifier: addr,
-            }));
-            const results = await xmtpClient.canMessage(identifiers);
-            for (const [addr, canMsg] of results.entries()) {
-              if (canMsg) {
-                const idx = addrToMemberIdx.get(addr.toLowerCase());
-                if (idx !== undefined && !reachableMap.has(idx)) {
-                  reachableMap.set(idx, addr.toLowerCase());
-                }
-              }
-            }
-          }
-        } catch (err) {
-          console.error('[XMTP] canMessage check failed:', err);
-        }
-      }
-
+      // Members are reachable if they have a stored XMTP address or have logged in.
+      // We skip canMessage entirely — auto-generated XMTP keys don't match wallet addresses,
+      // so canMessage always returns false. Instead we trust lastLoginAt + storedXmtpAddress.
       const mapped: ZaoMember[] = merged
-        .map((m: { fid: number | null; username: string | null; displayName: string; pfpUrl: string | null; addresses: string[]; lastLoginAt?: string | null }, idx: number) => ({
+        .map((m: MergedMember) => ({
           fid: m.fid,
           username: m.username,
           displayName: m.displayName,
           pfpUrl: m.pfpUrl,
           addresses: m.addresses,
-          reachable: reachableMap.has(idx),
-          xmtpAddress: reachableMap.get(idx) || null,
+          reachable: !!(m.storedXmtpAddress || m.lastLoginAt),
+          xmtpAddress: m.storedXmtpAddress || m.addresses[0] || null,
           lastLoginAt: m.lastLoginAt || null,
         }))
         .sort((a: ZaoMember, b: ZaoMember) => {

@@ -459,7 +459,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                   ? 'Add a comment...'
                   : hasSigner
                     ? `Message #${channel}... (type @ to mention)`
-                    : `Message #${channel}, post via Farcaster...`
+                    : 'Connect Farcaster to post in channels...'
             }
             rows={1}
             maxLength={1024}

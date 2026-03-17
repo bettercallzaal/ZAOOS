@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { useXMTPContext } from '@/contexts/XMTPContext';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import type { SessionData } from '@/types';
 
@@ -33,6 +34,7 @@ function shortAddr(addr: string) {
 
 export function SettingsClient({ session, profile }: SettingsClientProps) {
   const { logout, refetch } = useAuth();
+  const { isConnected: xmtpConnected } = useXMTPContext();
   const [signerStatus, setSignerStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [signerError, setSignerError] = useState<string | null>(null);
   const [scriptError, setScriptError] = useState(false);
@@ -110,6 +112,62 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+
+        {/* ── Connections ──────────────────────────────────────────── */}
+        <section>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Connections</p>
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+            <div className="space-y-3">
+              {/* Wallet — always connected (it's how they logged in) */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-400" />
+                  <span className="text-sm text-white">Wallet</span>
+                </div>
+                <span className="text-xs text-gray-500 font-mono">
+                  {session.walletAddress ? shortAddr(session.walletAddress) : 'Connected'}
+                </span>
+              </div>
+
+              {/* Farcaster */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${session.fid ? 'bg-green-400' : 'bg-gray-600'}`} />
+                  <span className="text-sm text-white">Farcaster</span>
+                </div>
+                {session.fid ? (
+                  <span className="text-xs text-gray-500">@{profile?.username || `FID ${session.fid}`}</span>
+                ) : (
+                  <span className="text-xs text-gray-500">Not connected</span>
+                )}
+              </div>
+
+              {/* Signer (posting) */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${session.signerUuid ? 'bg-green-400' : 'bg-gray-600'}`} />
+                  <span className="text-sm text-white">Posting</span>
+                </div>
+                {session.signerUuid ? (
+                  <span className="text-xs text-green-500/70">Enabled</span>
+                ) : (
+                  <span className="text-xs text-[#f5a623]">Connect Farcaster first</span>
+                )}
+              </div>
+
+              {/* XMTP Messaging */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${xmtpConnected ? 'bg-green-400' : 'bg-gray-600'}`} />
+                  <span className="text-sm text-white">Messaging</span>
+                </div>
+                <span className={`text-xs ${xmtpConnected ? 'text-green-500/70' : 'text-gray-500'}`}>
+                  {xmtpConnected ? 'Enabled' : 'Auto-enables with wallet'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* ── Profile ──────────────────────────────────────────────── */}
         <section>

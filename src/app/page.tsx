@@ -46,7 +46,7 @@ export default function LandingPage() {
         <h1 className="text-5xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-2 tracking-tight">
           THE ZAO
         </h1>
-        <p className="text-gray-400 text-base mb-3">Music Community on Farcaster</p>
+        <p className="text-gray-400 text-base mb-3">Decentralized Music Community</p>
 
         <div className="flex items-center justify-center gap-4 mb-10 text-xs text-gray-600">
           <span className="flex items-center gap-1.5">

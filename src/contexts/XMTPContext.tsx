@@ -178,12 +178,15 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   // Client ref for reconnection
   const primaryClientRef = useRef<AnyClient | null>(null);
 
+  // Mirror zaoMembers in a ref so stream handlers can access it
+  const zaoMembersRef = useRef<ZaoMember[]>([]);
+
   /**
    * Load conversations from all connected clients.
    * Does NOT call lastMessage() — uses in-memory cache instead.
    */
   const loadAllConversations = useCallback(async () => {
-    const { getPeerProfiles, getMemberProfiles, savePeerProfile } = await import('@/lib/xmtp/client');
+    const { getPeerProfiles, getMemberProfiles, savePeerProfile, saveMemberProfile } = await import('@/lib/xmtp/client');
     const peerProfiles = getPeerProfiles();
     const memberProfiles = getMemberProfiles();
     const allMapped: XMTPConversation[] = [];
@@ -213,6 +216,30 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
               if (memberMatch) {
                 peer = memberMatch;
                 savePeerProfile(conv.id, memberMatch);
+              } else {
+                // Fallback: try to resolve from zaoMembers by matching addresses
+                try {
+                  const dm = conv as Dm;
+                  const peerMembers = await dm.members();
+                  const peerMember = peerMembers.find((m) => m.inboxId === peerInboxId);
+                  if (peerMember) {
+                    const peerAddresses = (peerMember.accountIdentifiers ?? []).map((id: { identifier: string }) => id.identifier.toLowerCase());
+                    const matched = zaoMembersRef.current.find((zm) =>
+                      zm.addresses.some((a) => peerAddresses.includes(a.toLowerCase()))
+                    );
+                    if (matched) {
+                      const resolvedProfile = {
+                        fid: matched.fid ?? 0,
+                        username: matched.username ?? matched.displayName,
+                        displayName: matched.displayName,
+                        pfpUrl: matched.pfpUrl ?? '',
+                      };
+                      peer = resolvedProfile;
+                      savePeerProfile(conv.id, resolvedProfile);
+                      saveMemberProfile(peerInboxId, resolvedProfile);
+                    }
+                  }
+                } catch { /* non-critical */ }
               }
             }
 
@@ -484,6 +511,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         });
 
       setZaoMembers(mapped);
+      zaoMembersRef.current = mapped;
       setLoadingMembers(false);
 
       const reachable = mapped.filter((m: ZaoMember) => m.reachable);

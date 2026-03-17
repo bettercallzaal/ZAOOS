@@ -631,12 +631,15 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ xmtpAddress: address }),
       }).catch(() => { /* non-critical */ });
 
-      // Seed last message cache, load conversations, then start streams
+      // Seed last message cache, load conversations, resolve members, then re-load to apply profiles
       await seedLastMessages();
       await loadAllConversations();
       await checkZaoMembers().catch((e: unknown) =>
         console.error('[XMTP] checkZaoMembers non-critical error:', e)
       );
+      // Re-load conversations now that member profiles are populated
+      // (first load runs before checkZaoMembers, so DMs show as "Unknown")
+      await loadAllConversations();
 
       // Start global streams AFTER conversations are loaded
       await startGlobalStreams(client);

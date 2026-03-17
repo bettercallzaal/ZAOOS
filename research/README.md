@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **43 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **55 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -226,7 +226,7 @@ Start with [40 Audit Guide](./40-codebase-audit-guide/) + [38 AI Code Audit](./3
 
 ## Research Stats
 
-- **Total documents:** 43
+- **Total documents:** 55
 - **Total coverage:** ~300,000+ words
 - **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation
 - **Time span:** January — March 2026

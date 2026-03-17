@@ -61,6 +61,7 @@ interface MemberDetail {
 export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [stats, setStats] = useState<LeaderboardStats | null>(null);
+  const [currentWallet, setCurrentWallet] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -78,6 +79,7 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
         const data = await res.json();
         setLeaderboard(data.leaderboard || []);
         setStats(data.stats || null);
+        setCurrentWallet(data.currentWallet || null);
       } catch {
         setError('Failed to load respect data');
       } finally {
@@ -129,7 +131,10 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
     );
   }
 
-  const myEntry = leaderboard.find((e) => e.fid === currentFid);
+  const myEntry = leaderboard.find((e) =>
+    (e.fid && e.fid === currentFid) ||
+    (e.wallet && currentWallet && e.wallet.toLowerCase() === currentWallet.toLowerCase())
+  );
 
   return (
     <>

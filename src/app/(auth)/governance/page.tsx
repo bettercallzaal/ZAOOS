@@ -32,6 +32,7 @@ interface RespectData {
   leaderboard: RespectEntry[];
   stats: RespectStats;
   currentFid: number;
+  currentWallet: string | null;
 }
 
 interface ProposalTally {
@@ -102,7 +103,10 @@ export default function GovernancePage() {
       .finally(() => setProposalsLoading(false));
   }, []);
 
-  const myEntry = data?.leaderboard.find((e) => e.fid === data.currentFid);
+  const myEntry = data?.leaderboard.find((e) =>
+    (e.fid && e.fid === data.currentFid) ||
+    (e.wallet && data.currentWallet && e.wallet.toLowerCase() === data.currentWallet.toLowerCase())
+  );
 
   const handleCreateProposal = async () => {
     if (!newTitle.trim() || !newDesc.trim()) return;

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { useMobile } from '@/hooks/useMobile';
 import { useXMTPContext } from '@/contexts/XMTPContext';
+import { useWalletXMTP } from '@/hooks/useWalletXMTP';
 import { ConversationList } from './ConversationList';
 import { MessageThread } from './MessageThread';
 import { MessageCompose } from './MessageCompose';
@@ -40,6 +41,8 @@ export function MessagesRoom() {
     removeConversation,
   } = useXMTPContext();
 
+  const walletXmtp = useWalletXMTP();
+
   const [dialogType, setDialogType] = useState<'dm' | 'group' | null>(null);
 
   const activeConversation = conversations.find((c) => c.id === activeConversationId) ?? null;
@@ -47,11 +50,12 @@ export function MessagesRoom() {
   const showList = !isMobile || !activeConversationId;
   const showThread = !isMobile || !!activeConversationId;
 
-  // One-click connect — generates local XMTP identity from FID
+  // Connect XMTP using wallet-based signing
   const handleConnect = useCallback(async () => {
-    if (!user) return;
-    await autoConnect(user.fid);
-  }, [user, autoConnect]);
+    if (walletXmtp.canConnect) {
+      await walletXmtp.connectWalletToXMTP();
+    }
+  }, [walletXmtp]);
 
   const handleCreateDm = useCallback(async (address: `0x${string}`, peerProfile?: XMTPPeerProfile) => {
     const convId = await createDm(address, peerProfile);

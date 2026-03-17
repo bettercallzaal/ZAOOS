@@ -491,18 +491,57 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         .filter((m: { fid: number | null }) => m.fid !== currentFid)
         .map((m: MergedMember) => ({ ...m }));
 
-      // Members are reachable if they have a stored XMTP address or have logged in.
-      // We skip canMessage entirely — auto-generated XMTP keys don't match wallet addresses,
-      // so canMessage always returns false. Instead we trust lastLoginAt + storedXmtpAddress.
+      // Build address-to-member index and batch canMessage checks
+      // Now that XMTP identity = wallet address, canMessage works naturally
+      const allAddresses: string[] = [];
+      const addrToMemberIdx = new Map<string, number>();
+      for (let i = 0; i < merged.length; i++) {
+        for (const addr of merged[i].addresses) {
+          const normalized = addr.toLowerCase();
+          if (!addrToMemberIdx.has(normalized)) {
+            allAddresses.push(normalized);
+            addrToMemberIdx.set(normalized, i);
+          }
+        }
+      }
+
+      const reachableSet = new Set<number>();
+      const reachableAddr = new Map<number, string>();
+      if (allAddresses.length > 0) {
+        try {
+          const { IdentifierKind } = await import('@xmtp/browser-sdk');
+          const BATCH_SIZE = 100;
+          for (let i = 0; i < allAddresses.length; i += BATCH_SIZE) {
+            const batch = allAddresses.slice(i, i + BATCH_SIZE);
+            const identifiers = batch.map((addr) => ({
+              identifierKind: IdentifierKind.Ethereum,
+              identifier: addr,
+            }));
+            const results = await xmtpClient.canMessage(identifiers);
+            for (const [addr, canMsg] of results.entries()) {
+              if (canMsg) {
+                const idx = addrToMemberIdx.get(addr.toLowerCase());
+                if (idx !== undefined && !reachableSet.has(idx)) {
+                  reachableSet.add(idx);
+                  reachableAddr.set(idx, addr.toLowerCase());
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[XMTP] canMessage check failed:', err);
+        }
+      }
+
       const mapped: ZaoMember[] = merged
-        .map((m: MergedMember) => ({
+        .map((m: MergedMember, idx: number) => ({
           fid: m.fid,
           username: m.username,
           displayName: m.displayName,
           pfpUrl: m.pfpUrl,
           addresses: m.addresses,
-          reachable: !!(m.storedXmtpAddress || m.lastLoginAt),
-          xmtpAddress: m.storedXmtpAddress || m.addresses[0] || null,
+          reachable: reachableSet.has(idx),
+          xmtpAddress: reachableAddr.get(idx) || m.storedXmtpAddress || m.addresses[0] || null,
           lastLoginAt: m.lastLoginAt || null,
         }))
         .sort((a: ZaoMember, b: ZaoMember) => {
@@ -687,7 +726,19 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       saveConnectedWallet(normalized);
       setConnectedWallets(Array.from(walletsRef.current.keys()));
 
+      // Persist XMTP address to DB so other members can discover us
+      fetch('/api/users/xmtp-address', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ xmtpAddress: normalized }),
+      }).catch(() => { /* non-critical */ });
+
+      // Full initialization: seed, load, check members, re-load with profiles, start streams
       await seedLastMessages();
+      await loadAllConversations();
+      await checkZaoMembers().catch((e: unknown) =>
+        console.error('[XMTP] checkZaoMembers non-critical error:', e)
+      );
       await loadAllConversations();
       await startGlobalStreams(client);
 
@@ -701,7 +752,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       setIsConnecting(false);
       setConnectingWallet(null);
     }
-  }, [tabLocked, seedLastMessages, loadAllConversations, startGlobalStreams]);
+  }, [tabLocked, seedLastMessages, loadAllConversations, checkZaoMembers, startGlobalStreams]);
 
   const disconnectWallet = useCallback(async (address: string) => {
     const normalized = address.toLowerCase();

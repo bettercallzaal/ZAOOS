@@ -10,6 +10,7 @@ import { usePlayer } from '@/providers/audio';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { QuotedCastData } from '@/types';
 import { useXMTPContext, ZaoMember } from '@/contexts/XMTPContext';
+import { useWalletXMTP } from '@/hooks/useWalletXMTP';
 import { Sidebar } from './Sidebar';
 import { MessageList } from './MessageList';
 import { ComposeBar, ComposeBarHandle, ReplyContext } from './ComposeBar';
@@ -127,13 +128,16 @@ export function ChatRoom() {
 
   // XMTP context
   const xmtp = useXMTPContext();
+  const walletXmtp = useWalletXMTP();
   const viewMode = xmtp.activeConversationId ? 'xmtp' : 'channel';
   const activeXmtpConversation = xmtp.conversations.find((c) => c.id === xmtp.activeConversationId) ?? null;
 
   const handleXmtpConnect = useCallback(async () => {
-    if (!user) return;
-    await xmtp.autoConnect(user.fid);
-  }, [user, xmtp]);
+    if (walletXmtp.canConnect) {
+      await walletXmtp.connectWalletToXMTP();
+    }
+    // Fallback: if no wallet connected, the sidebar will show RainbowKit connect
+  }, [walletXmtp]);
 
   const handleConversationSelect = useCallback((id: string) => {
     xmtp.selectConversation(id);
@@ -176,17 +180,13 @@ export function ChatRoom() {
     [messages, contentFilter, sortMode],
   );
 
-  // Auto-reconnect XMTP if previously connected
+  // Auto-connect XMTP when wallet is available
   useEffect(() => {
     if (!user || xmtp.isConnected || xmtp.isConnecting) return;
-    let wallets: string[] = [];
-    if (typeof window !== 'undefined') {
-      try { wallets = JSON.parse(localStorage.getItem('zaoos-xmtp-wallets') || '[]'); } catch { /* corrupted */ }
+    if (walletXmtp.canConnect) {
+      walletXmtp.connectWalletToXMTP();
     }
-    if (wallets.length > 0) {
-      xmtp.autoConnect(user.fid);
-    }
-  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [user, walletXmtp.canConnect]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset filters on channel switch + fetch submissions for queue
   useEffect(() => {
@@ -270,6 +270,7 @@ export function ChatRoom() {
         xmtpConversations={xmtp.conversations}
         activeConversationId={xmtp.activeConversationId}
         onXmtpConnect={handleXmtpConnect}
+        walletConnected={walletXmtp.isWalletConnected}
         onConversationSelect={handleConversationSelect}
         onNewDm={() => setDmDialogType('dm')}
         onNewGroup={() => setDmDialogType('group')}

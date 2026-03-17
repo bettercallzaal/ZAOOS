@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getSessionData } from '@/lib/auth/session';
 import { BottomNav } from '@/components/navigation/BottomNav';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default async function AuthLayout({
   children,
@@ -13,7 +14,9 @@ export default async function AuthLayout({
   }
   return (
     <div className="md:pt-10">
-      {children}
+      <ErrorBoundary>
+        {children}
+      </ErrorBoundary>
       <BottomNav />
     </div>
   );

@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
+import { castHashSchema } from '@/lib/validation/schemas';
+import { z } from 'zod';
+import { supabaseAdmin } from '@/lib/db/supabase';
+import { createInAppNotification } from '@/lib/notifications';
+
+const reactSchema = z.object({
+  type: z.enum(['like', 'recast']),
+  hash: castHashSchema,
+});
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -15,11 +24,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { type, hash } = await req.json();
-
-    if (!['like', 'recast'].includes(type) || !hash) {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    const body = await req.json().catch(() => null);
+    const parsed = reactSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
+    const { type, hash } = parsed.data;
 
     const res = await fetch(`${NEYNAR_BASE}/reaction`, {
       method: 'POST',
@@ -39,6 +49,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: err.message || 'Reaction failed' }, { status: res.status });
     }
 
+    // Fire-and-forget notification to cast author
+    Promise.resolve(
+      supabaseAdmin
+        .from('channel_casts')
+        .select('fid, author_display')
+        .eq('hash', hash)
+        .single()
+    )
+      .then(({ data: castData }) => {
+        if (castData && castData.fid !== session.fid) {
+          createInAppNotification({
+            recipientFids: [castData.fid],
+            type: 'message',
+            title: `${session.displayName} ${type === 'like' ? 'liked' : 'recasted'} your post`,
+            body: '',
+            href: '/chat',
+            actorFid: session.fid,
+            actorDisplayName: session.displayName,
+            actorPfpUrl: session.pfpUrl,
+          }).catch(() => {});
+        }
+      })
+      .catch(() => {});
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('React error:', error);
@@ -57,11 +91,12 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const { type, hash } = await req.json();
-
-    if (!['like', 'recast'].includes(type) || !hash) {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    const body = await req.json().catch(() => null);
+    const parsed = reactSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
+    const { type, hash } = parsed.data;
 
     const res = await fetch(`${NEYNAR_BASE}/reaction`, {
       method: 'DELETE',

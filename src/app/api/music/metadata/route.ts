@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSessionData } from '@/lib/auth/session';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { TrackMetadata, TrackType } from '@/types/music';
 
@@ -273,6 +274,11 @@ const fetchers: Record<TrackType, (url: string) => Promise<TrackMetadata | null>
 };
 
 export async function GET(request: NextRequest) {
+  const session = await getSessionData();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const url = request.nextUrl.searchParams.get('url');
   if (!url) {
     return NextResponse.json({ error: 'Missing url param' }, { status: 400 });

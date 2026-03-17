@@ -860,6 +860,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     if (!conv) return;
 
     const trimmed = text.trim();
+    if (trimmed.length > 4000) {
+      showActionError('Message too long (max 4000 characters)');
+      return;
+    }
 
     try {
       // Step 1: Store locally (optimistic) — returns message ID
@@ -899,7 +903,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       console.error('[XMTP] Failed to send message:', err);
       setError('Failed to send message. Please try again.');
     }
-  }, [activeConversationId]);
+  }, [activeConversationId, showActionError]);
 
   const getFirstClient = useCallback((): AnyClient | null => {
     const first = walletsRef.current.values().next();

@@ -12,6 +12,12 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/chat/send') || pathname.startsWith('/api/chat/hide')) {
     return { limit: 10, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/chat/react')) {
+    return { limit: 30, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/chat/messages') || pathname.startsWith('/api/chat/thread')) {
+    return { limit: 30, windowMs: MINUTE };
+  }
   if (pathname.startsWith('/api/admin')) {
     return { limit: 5, windowMs: MINUTE };
   }
@@ -68,7 +74,9 @@ export function middleware(request: NextRequest) {
   // Apply rate limiting to API routes
   const config = getRateLimitConfig(pathname);
   if (config) {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+    const ip = request.headers.get('x-real-ip')
+      || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || 'unknown';
     const key = `${ip}:${pathname}`;
     const result = rateLimit(key, config.limit, config.windowMs);
 

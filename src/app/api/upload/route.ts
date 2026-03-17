@@ -28,7 +28,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate unique filename
-    const ext = file.name.split('.').pop() || 'jpg';
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': 'jpg', 'image/png': 'png',
+      'image/gif': 'gif', 'image/webp': 'webp',
+    };
+    const ext = mimeToExt[file.type] || 'jpg';
     const filename = `${session.fid}/${Date.now()}.${ext}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { communityConfig } from '@/../community.config';
 
-const WATCHED_CHANNELS = ['zao', 'zabal', 'coc'];
+const WATCHED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
 // Extract channel ID from Neynar cast object.
 // Neynar sets `channel.id` on casts in a channel, with parent_url as fallback.
@@ -47,14 +48,17 @@ function castToRow(cast: Record<string, unknown>, channelId: string) {
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
-  // Verify HMAC-SHA512 signature when secret is configured
+  // Verify HMAC-SHA512 signature — reject if secret not configured
   const secret = ENV.NEYNAR_WEBHOOK_SECRET;
-  if (secret) {
-    const sig = req.headers.get('X-Neynar-Signature') ?? '';
-    const expected = crypto.createHmac('sha512', secret).update(rawBody).digest('hex');
-    if (sig !== expected) {
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    }
+  if (!secret) {
+    console.error('[webhook] NEYNAR_WEBHOOK_SECRET not configured — rejecting request');
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+  }
+
+  const sig = req.headers.get('X-Neynar-Signature') ?? '';
+  const expected = crypto.createHmac('sha512', secret).update(rawBody).digest('hex');
+  if (sig !== expected) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
   let payload: Record<string, unknown>;
@@ -77,11 +81,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  // Ignore replies (parent_hash set = reply to a cast, not a top-level channel post)
-  // Top-level channel posts have parent_hash = null, parent_url = channel URL
-  if (cast.parent_hash) {
-    return NextResponse.json({ ok: true });
-  }
+  // Cache both top-level posts and replies for thread views
+  // parent_hash is set for replies, null for top-level channel posts
 
   try {
     const row = castToRow(cast, channelId);

@@ -146,9 +146,11 @@ export function getOrCreateLocalKey(fid: number): `0x${string}` {
 
   const storageKey = `zaoos-xmtp-local-key-${fid}`;
   const stored = localStorage.getItem(storageKey);
-  if (stored) {
+  if (stored && /^0x[0-9a-fA-F]{64}$/.test(stored)) {
     return stored as `0x${string}`;
   }
+  // Invalid or missing — remove corrupted data and regenerate
+  if (stored) localStorage.removeItem(storageKey);
 
   // Generate a random 32-byte XMTP-only signing key (not a wallet key)
   const bytes = crypto.getRandomValues(new Uint8Array(32));

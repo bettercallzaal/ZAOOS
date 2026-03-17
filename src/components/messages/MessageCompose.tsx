@@ -59,6 +59,7 @@ export function MessageCompose({ onSend, disabled, placeholder, streamDisconnect
             onKeyDown={handleKeyDown}
             placeholder={placeholder || 'Type a message...'}
             disabled={disabled}
+            maxLength={4000}
             rows={1}
             className="flex-1 bg-[#1a2a3a] text-white text-sm rounded-lg px-4 py-2.5 resize-none placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623] disabled:opacity-50 max-h-32"
             style={{ minHeight: '40px' }}

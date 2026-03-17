@@ -57,8 +57,8 @@ interface Proposal {
 
 const CATEGORY_COLORS: Record<string, string> = {
   general: 'bg-gray-500/10 text-gray-400',
-  music: 'bg-purple-500/10 text-purple-400',
-  tech: 'bg-blue-500/10 text-blue-400',
+  technical: 'bg-blue-500/10 text-blue-400',
+  community: 'bg-purple-500/10 text-purple-400',
   governance: 'bg-[#f5a623]/10 text-[#f5a623]',
   treasury: 'bg-green-500/10 text-green-400',
 };
@@ -373,8 +373,8 @@ export default function GovernancePage() {
                   className="w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2.5 border-0 focus:ring-1 focus:ring-[#f5a623]"
                 >
                   <option value="general">General</option>
-                  <option value="music">Music</option>
-                  <option value="tech">Tech</option>
+                  <option value="technical">Technical</option>
+                  <option value="community">Community</option>
                   <option value="governance">Governance</option>
                   <option value="treasury">Treasury</option>
                 </select>

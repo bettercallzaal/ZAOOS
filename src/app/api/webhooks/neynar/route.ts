@@ -57,7 +57,9 @@ export async function POST(req: NextRequest) {
 
   const sig = req.headers.get('X-Neynar-Signature') ?? '';
   const expected = crypto.createHmac('sha512', secret).update(rawBody).digest('hex');
-  if (sig !== expected) {
+  const sigBuffer = Buffer.from(sig, 'hex');
+  const expectedBuffer = Buffer.from(expected, 'hex');
+  if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 

@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      return NextResponse.json({ error: err.message || 'Reaction failed' }, { status: res.status });
+      console.error('Neynar reaction error:', err);
+      return NextResponse.json({ error: 'Reaction failed' }, { status: res.status });
     }
 
     // Fire-and-forget notification to cast author
@@ -113,7 +114,8 @@ export async function DELETE(req: NextRequest) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      return NextResponse.json({ error: err.message || 'Unreact failed' }, { status: res.status });
+      console.error('Neynar unreact error:', err);
+      return NextResponse.json({ error: 'Reaction failed' }, { status: res.status });
     }
 
     return NextResponse.json({ success: true });

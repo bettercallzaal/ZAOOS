@@ -8,6 +8,10 @@ const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 const SEARCH_LIMIT = 20;
 
+function escapeWildcards(str: string): string {
+  return str.replace(/[%_\\]/g, '\\$&');
+}
+
 // Channel URL format used by Neynar search
 const CHANNEL_URLS: Record<string, string> = Object.fromEntries(
   ALLOWED_CHANNELS.map((ch) => [ch, `https://farcaster.group/${ch}`])
@@ -86,7 +90,7 @@ export async function GET(req: NextRequest) {
       .from('channel_casts')
       .select('*')
       .eq('channel_id', channel)
-      .ilike('text', `%${query}%`)
+      .ilike('text', `%${escapeWildcards(query)}%`)
       .order('timestamp', { ascending: false })
       .limit(SEARCH_LIMIT);
 

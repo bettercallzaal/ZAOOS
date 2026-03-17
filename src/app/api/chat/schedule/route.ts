@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
 import { communityConfig } from '@/../community.config';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
+
+const scheduleSchema = z.object({
+  text: z.string().min(1).max(1024),
+  channel: z.string().min(1),
+  scheduledFor: z.string().datetime(),
+  embedHash: z.string().regex(/^0x[a-f0-9]{40}$/).optional(),
+  embedUrls: z.array(z.string().url()).max(2).optional(),
+  crossPostChannels: z.array(z.string()).optional(),
+});
 
 // GET: list user's scheduled casts
 export async function GET() {
@@ -36,18 +46,20 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { text, channel, scheduledFor, embedHash, embedUrls, crossPostChannels } = body;
-
-    if (!text || typeof text !== 'string' || text.length > 1024) {
-      return NextResponse.json({ error: 'Invalid text' }, { status: 400 });
+    const parsed = scheduleSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
 
+    const { text, channel, scheduledFor, embedHash, embedUrls, crossPostChannels } = parsed.data;
+
     const scheduleDate = new Date(scheduledFor);
-    if (isNaN(scheduleDate.getTime()) || scheduleDate <= new Date()) {
+    if (scheduleDate <= new Date()) {
       return NextResponse.json({ error: 'Scheduled time must be in the future' }, { status: 400 });
     }
 
-    const primaryChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
+    // Validate channel and crossPostChannels against allowed channels
+    const primaryChannel = ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
 
     const { data, error } = await supabaseAdmin
       .from('scheduled_casts')

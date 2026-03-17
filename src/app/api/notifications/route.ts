@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+
+const markReadSchema = z.union([
+  z.object({ all: z.literal(true) }),
+  z.object({ ids: z.array(z.string().uuid()).min(1).max(100) }),
+]);
 
 /**
  * GET — Fetch notifications for the current user
@@ -62,21 +68,23 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
+    const parsed = markReadSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Provide ids (uuid[]) or all: true', details: parsed.error.flatten() }, { status: 400 });
+    }
 
-    if (body.all) {
+    if ('all' in parsed.data) {
       await supabaseAdmin
         .from('notifications')
         .update({ read: true })
         .eq('recipient_fid', session.fid)
         .eq('read', false);
-    } else if (body.ids?.length) {
+    } else {
       await supabaseAdmin
         .from('notifications')
         .update({ read: true })
         .eq('recipient_fid', session.fid)
-        .in('id', body.ids);
-    } else {
-      return NextResponse.json({ error: 'Provide ids or all: true' }, { status: 400 });
+        .in('id', parsed.data.ids);
     }
 
     return NextResponse.json({ success: true });

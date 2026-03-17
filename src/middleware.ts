@@ -57,6 +57,12 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/music/submissions')) {
     return { limit: 5, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/music/metadata')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/music/radio')) {
+    return { limit: 10, windowMs: MINUTE };
+  }
   return null;
 }
 

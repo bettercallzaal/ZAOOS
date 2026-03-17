@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { z } from 'zod';
 import { createAppClient, viemConnector } from '@farcaster/auth-client';
 import { checkAllowlist } from '@/lib/gates/allowlist';
 import { saveSession } from '@/lib/auth/session';
@@ -38,13 +39,22 @@ export async function GET() {
 /**
  * POST — Verify SIWF signature + check allowlist + create session
  */
+const verifySchema = z.object({
+  message: z.string().min(1),
+  signature: z.string().min(1),
+  nonce: z.string().min(1),
+  domain: z.string().min(1),
+});
+
 export async function POST(req: NextRequest) {
   try {
-    const { message, signature, nonce, domain } = await req.json();
-
-    if (!message || !signature || !nonce || !domain) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const body = await req.json();
+    const parsed = verifySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
+
+    const { message, signature, nonce, domain } = parsed.data;
 
     // Validate server-issued nonce (one-time use, 5 min TTL)
     const nonceTimestamp = nonceStore.get(nonce);
@@ -57,7 +67,7 @@ export async function POST(req: NextRequest) {
     // Verify SIWF signature
     const result = await appClient.verifySignInMessage({
       message,
-      signature,
+      signature: signature as `0x${string}`,
       nonce,
       domain,
     });

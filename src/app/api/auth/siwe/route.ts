@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { parseSiweMessage, validateSiweMessage } from 'viem/siwe';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
@@ -38,14 +39,21 @@ export async function GET() {
 /**
  * POST — Verify SIWE signature + check allowlist + create session
  */
+const siweSchema = z.object({
+  message: z.string().min(1),
+  signature: z.string().min(1),
+});
+
 export async function POST(req: NextRequest) {
   pruneNonces();
   try {
-    const { message, signature } = await req.json();
-
-    if (!message || !signature) {
-      return NextResponse.json({ error: 'Missing message or signature' }, { status: 400 });
+    const body = await req.json();
+    const parsed = siweSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
+
+    const { message, signature } = parsed.data;
 
     // Parse and validate the SIWE message
     const siweMessage = parseSiweMessage(message);
@@ -83,7 +91,7 @@ export async function POST(req: NextRequest) {
     const verified = await publicClient.verifyMessage({
       address: siweMessage.address,
       message,
-      signature,
+      signature: signature as `0x${string}`,
     });
 
     if (!verified) {

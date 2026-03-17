@@ -17,12 +17,16 @@ export async function GET() {
 
     if (membersErr) throw membersErr;
 
-    const leaderboard = (members || []).map((m, idx) => ({
+    const rawLeaderboard = (members || []).map((m, idx) => ({
       rank: idx + 1,
       name: m.name,
       wallet: m.wallet_address ?? '',
       fid: m.fid ? Number(m.fid) : null,
+      username: m.username ?? null,
+      zid: m.zid ? Number(m.zid) : null,
       totalRespect: Number(m.total_respect),
+      ogRespect: Number(m.onchain_og),
+      zorRespect: Number(m.onchain_zor),
       fractalRespect: Number(m.fractal_respect),
       fractalCount: m.fractal_count ?? 0,
       onchainOG: Number(m.onchain_og),
@@ -34,11 +38,22 @@ export async function GET() {
       hostingCount: m.hosting_count ?? 0,
     }));
 
+    const ogTotalSupply = rawLeaderboard.reduce((sum, e) => sum + e.ogRespect, 0);
+    const zorTotalSupply = rawLeaderboard.reduce((sum, e) => sum + e.zorRespect, 0);
+
+    const leaderboard = rawLeaderboard.map((e) => ({
+      ...e,
+      ogPct: ogTotalSupply > 0 ? Math.round((e.ogRespect / ogTotalSupply) * 1000) / 10 : 0,
+      zorPct: zorTotalSupply > 0 ? Math.round((e.zorRespect / zorTotalSupply) * 1000) / 10 : 0,
+    }));
+
     const stats = {
       totalMembers: leaderboard.length,
       totalRespect: leaderboard.reduce((sum, e) => sum + e.totalRespect, 0),
       totalOG: leaderboard.reduce((sum, e) => sum + e.onchainOG, 0),
       totalZOR: leaderboard.reduce((sum, e) => sum + e.onchainZOR, 0),
+      ogTotalSupply,
+      zorTotalSupply,
       holdersWithRespect: leaderboard.filter((e) => e.totalRespect > 0).length,
     };
 

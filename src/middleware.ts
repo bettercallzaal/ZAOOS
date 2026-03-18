@@ -63,6 +63,21 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/music/radio')) {
     return { limit: 10, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/respect')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/social')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/members')) {
+    return { limit: 10, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/following')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/miniapp')) {
+    return { limit: 10, windowMs: MINUTE };
+  }
   return null;
 }
 

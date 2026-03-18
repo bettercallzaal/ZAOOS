@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification, sendNotification } from '@/lib/notifications';
@@ -150,5 +151,46 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('Create proposal error:', err);
     return NextResponse.json({ error: 'Failed to create proposal' }, { status: 500 });
+  }
+}
+
+/**
+ * PATCH — Update proposal status (admin only)
+ * Body: { id: uuid, status: 'open' | 'approved' | 'rejected' | 'completed' }
+ */
+export async function PATCH(req: NextRequest) {
+  const session = await getSessionData();
+  if (!session?.isAdmin) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  try {
+    const body = await req.json();
+    const schema = z.object({
+      id: z.string().uuid(),
+      status: z.enum(['open', 'approved', 'rejected', 'completed']),
+    });
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabaseAdmin
+      .from('proposals')
+      .update({ status: parsed.data.status })
+      .eq('id', parsed.data.id);
+
+    if (error) {
+      console.error('Update proposal status error:', error);
+      return NextResponse.json({ error: 'Failed to update proposal' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('PATCH proposal error:', err);
+    return NextResponse.json({ error: 'Failed to update proposal' }, { status: 500 });
   }
 }

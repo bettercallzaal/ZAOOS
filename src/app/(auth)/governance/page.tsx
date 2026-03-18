@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { ProposalComments } from '@/components/governance/ProposalComments';
+import { useAuth } from '@/hooks/useAuth';
 
 interface RespectEntry {
   rank: number;
@@ -85,6 +86,29 @@ export default function GovernancePage() {
 
   // Comments expansion state
   const [expandedComments, setExpandedComments] = useState<string | null>(null);
+
+  // Admin state
+  const { user: authUser } = useAuth();
+  const isAdmin = authUser?.isAdmin ?? false;
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+
+  const handleStatusChange = async (proposalId: string, newStatus: string) => {
+    setUpdatingStatus(proposalId);
+    try {
+      const res = await fetch('/api/proposals', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: proposalId, status: newStatus }),
+      });
+      if (res.ok) {
+        const d = await fetch('/api/proposals').then((r) => r.json());
+        setProposals(d.proposals || []);
+      }
+    } catch (err) {
+      console.error('[governance] status change:', err);
+    }
+    setUpdatingStatus(null);
+  };
 
   useEffect(() => {
     fetch('/api/respect/leaderboard')
@@ -503,6 +527,52 @@ export default function GovernancePage() {
                         }`}>
                           {proposal.status === 'approved' ? 'Approved' :
                            proposal.status === 'rejected' ? 'Rejected' : 'Completed'}
+                        </div>
+                      )}
+
+                      {/* Admin status change buttons */}
+                      {isAdmin && (
+                        <div className="flex items-center gap-1 px-4 py-2 border-t border-gray-800 bg-[#0a1628]/50">
+                          <span className="text-[10px] text-gray-600 mr-1">Admin:</span>
+                          {proposal.status === 'open' && (
+                            <>
+                              <button
+                                onClick={() => handleStatusChange(proposal.id, 'approved')}
+                                disabled={updatingStatus === proposal.id}
+                                className="text-[10px] px-2 py-1 rounded bg-green-500/10 text-green-400 hover:bg-green-500/20 transition-colors disabled:opacity-50"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleStatusChange(proposal.id, 'rejected')}
+                                disabled={updatingStatus === proposal.id}
+                                className="text-[10px] px-2 py-1 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
+                          {proposal.status === 'approved' && (
+                            <button
+                              onClick={() => handleStatusChange(proposal.id, 'completed')}
+                              disabled={updatingStatus === proposal.id}
+                              className="text-[10px] px-2 py-1 rounded bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors disabled:opacity-50"
+                            >
+                              Mark Completed
+                            </button>
+                          )}
+                          {proposal.status !== 'open' && (
+                            <button
+                              onClick={() => handleStatusChange(proposal.id, 'open')}
+                              disabled={updatingStatus === proposal.id}
+                              className="text-[10px] px-2 py-1 rounded bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors disabled:opacity-50"
+                            >
+                              Reopen
+                            </button>
+                          )}
+                          {updatingStatus === proposal.id && (
+                            <span className="text-[10px] text-gray-500 ml-1">Updating...</span>
+                          )}
                         </div>
                       )}
 

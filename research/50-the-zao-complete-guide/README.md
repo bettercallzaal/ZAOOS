@@ -716,25 +716,44 @@ The surviving projects serve different functions — streaming, fan clubs, event
 
 - Activate $ZAO Respect integration — connect on-chain balances to governance weight in ZAO OS
 - Deploy ZID as user-facing identity on profile cards
-- Engagement streaks and gamification
-- OG Badge for founding members
+- Governance fixes — proposal status transitions, deadline enforcement, category alignment
+- Build Hats Protocol reader into ZAO OS — display the live hat tree (tree 226 on Optimism) directly in the app, independent of app.hatsprotocol.xyz
+- Grant applications — Purple DAO (Farcaster-specific), Gitcoin GG25, Optimism RetroPGF
 
 ### Medium-Term
 
-- Hats Protocol exploration for organizing DAO roles and contributor teams
-- Async governance proposals with treasury execution
-- Community treasury (Safe multisig)
+- **Curation prediction markets** — Weekly Track Picks game where members stake Respect points on tracks they believe will gain engagement. Early curators earn more. Uses existing Supabase + Neynar engagement data. No smart contracts needed for MVP.
+- **Community Notes** — Respect-weighted context annotations on casts in the feed. Members add context, community rates helpfulness. Bridging-based algorithm surfaces notes that earn cross-perspective agreement. First implementation on any decentralized social protocol.
+- **ZK credentials** — Semaphore-based anonymous membership proofs. Members prove ZAO membership, role, or reputation level without revealing identity. Enables anonymous governance voting and cross-app credential verification.
 - ZAO Cypher release with on-chain splits via 0xSplits
+- Hats Protocol role management UI — mint, transfer, create hats within ZAO OS
+- Community treasury (Safe multisig)
 
 ### Long-Term
 
 The ZAO aims to become a global network of creator economies. The long-term role is to serve as support infrastructure for the creator economy — the tools and systems that enable creators to build their own organizations.
 
+- **Cross-community fractal coordination** — ZAO OS as infrastructure for any fractal community, not just ZAO. Higher-order fractals where top contributors from different communities (ZAO, Optimism Fractal, Eden Fractal) meet in cross-community Respect Games. Cross-community Respect recognition standard.
+- **AI agent** (ElizaOS) — onboarding, music discovery, curation scoring. pgvector in Supabase for memory. Separate `zao-agent` repo.
 - Cross-platform publishing from one compose bar (Farcaster, Lens, Bluesky, Hive, Nostr, X)
-- AI agent for onboarding, music discovery, and curation scoring
 - WaveWarZ on Farcaster as a Mini App
 - Sync licensing collective — pre-cleared community catalog for indie sync agencies
 - ZAO Stock as a flagship recurring annual festival
+- Futarchy governance experiments — prediction market outcomes informing community decisions
+
+### Ethereum Alignment
+
+The ZAO ecosystem aligns with Vitalik Buterin's philosophical framework across multiple dimensions:
+
+- **Walkaway Test** — MIT-licensed, forkable via `community.config.ts`, contracts immutable on Optimism
+- **Insider Attack Test** — fractal governance, Safe multisig Top Hat, OREC proposals
+- **"Tools not empires"** — the "picks and shovels" philosophy: infrastructure for creators, not a platform that captures output
+- **Info finance** — WaveWarZ (music prediction market) and the Respect Game (peer evaluation) are both info finance primitives
+- **d/acc info defense** — fractal truth-finding, soulbound reputation, open-source everything
+- **CROPS alignment** — open source (MIT), censorship resistant (Farcaster), privacy (XMTP E2E), security (soulbound tokens, RLS)
+- **"Thousand societies"** — each fractal community is one of Vitalik's nested, self-governing collectives at human scale
+
+See research docs 60 and 61 for the full alignment analysis and implementation details.
 
 ---
 

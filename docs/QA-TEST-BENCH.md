@@ -339,8 +339,23 @@ Every test specifies the **exact text, exact element, and exact condition** from
 ### 11.6 Proposal Cards
 - [ ] Category badges: general=gray, technical=blue, community=purple, governance=gold, treasury=green
 - [ ] Vote buttons: **"For"** (green) | **"Against"** (red) | **"Abstain"** (gray)
+- [ ] Vote buttons ONLY shown when `status === 'open'` AND deadline not expired
 - [ ] Closed badges: **"Approved"** (green) | **"Rejected"** (red) | **"Completed"** (blue)
 - [ ] Comments toggle: **"{N} comments"** (clickable)
+
+### 11.7 Deadline Countdown
+- [ ] Proposals with future deadline show: **"Xd Xh remaining"** (gold text)
+- [ ] Proposals with deadline < 24h show: **"Xh Xm remaining"** (gold text)
+- [ ] Proposals with expired deadline show: **"Voting closed"** (red text, red background)
+- [ ] Expired proposals hide vote buttons even if status is still 'open'
+
+### 11.8 Admin Status Controls (admin only)
+- [ ] Open proposals show: **"Approve"** (green) + **"Reject"** (red) buttons
+- [ ] Approved proposals show: **"Mark Completed"** (blue) button
+- [ ] Rejected/Completed proposals show: **"Reopen"** (gold) button
+- [ ] While updating: buttons disabled, shows **"Updating..."**
+- [ ] After status change: proposal list refreshes with new status
+- [ ] Non-admin users: NO status buttons visible
 
 ---
 

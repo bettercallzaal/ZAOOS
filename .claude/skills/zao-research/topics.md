@@ -2,6 +2,8 @@
 
 Use this to quickly find if a topic has already been researched.
 
+**Important:** Always cross-reference research docs with the actual codebase (`src/`). Research docs may contain aspirational designs not yet implemented.
+
 ## Farcaster Protocol & Ecosystem
 - Protocol architecture, Snapchain, identity → `01`
 - Hub API, Neynar SDK, managed signers → `02`
@@ -17,26 +19,25 @@ Use this to quickly find if a topic has already been researched.
 - Live audio rooms (LiveKit, WebRTC, synchronized listening) → `43`
 - Audio player architecture, waveforms, streaming → `33`, `43`
 
-## Curation & Reputation
-- Respect tokens (soulbound, curation mining, tiers, decay) → `04`
+## Respect & Governance
+- Respect tokens (aspirational design — tiers/decay NOT implemented) → `04`
+- ORDAO, OREC governance, Respect1155, Fibonacci scoring → `56`
+- Respect deep dive (on-chain data, scoring math, orclient SDK) → `58`
+- DAO structure, token economics, Wyoming DUNA, Safe multisig → `31`
 - Artist revenue, IP rights, streaming economics → `29`
 - Competitors (Sound.xyz dead, Catalog dead, Coop Records) → `37`
 
 ## Identity & Roles
 - ZAO Identity / ZIDs (music profile + Respect + roles) → `05`
 - Hats Protocol (on-chain role trees, ERC-1155) → `07`
+- Hats Anchor App, DAO tooling landscape → `55`
 - Austin Griffith, ETH Skills, ERC-8004, onchain credentials → `23`
-- Wallet connection patterns → `50`
-
-## Governance & Legal
-- DAO structure, token economics, Wyoming DUNA, Safe multisig → `31`
-- Coordinape, Snapshot, contributor compensation → `31`
-- Legal: Howey Test, GDPR, DMCA, content liability → `31`
 
 ## AI Agent
 - ZAO AI agent plan (ElizaOS + Claude + Hindsight) → `24`
 - AI memory architecture (implicit, explicit, pgvector) → `08`
 - Hindsight memory system (91.4%, retain/recall/reflect) → `26`
+- OpenFang Agent OS (not a fit, but reference architecture) → `46`
 
 ## Community & Growth
 - Gating (allowlist → NFT → Hats → EAS) → `12`
@@ -45,6 +46,7 @@ Use this to quickly find if a topic has already been researched.
 - Followers/following feed (sortable, filterable) → `20`
 - Onboarding, growth 40→1000, moderation, gamification → `32`
 - Notifications (Mini App push + Supabase + polling) → `35`
+- ZAO community ecosystem → `47`, `48`
 
 ## Cross-Platform
 - Publishing to 11 platforms (fan-out architecture) → `28`
@@ -58,6 +60,7 @@ Use this to quickly find if a topic has already been researched.
 - Storage (R2/IPFS/Arweave), mobile (PWA/Capacitor), privacy (ZK) → `33`
 - Project structure, file conventions → `14`
 - UI reference, design tokens → `16`
+- Superpowers agentic skills framework → `54`
 
 ## APIs & Services
 - Public APIs landscape (Tier 1/2/3) → `09`
@@ -70,11 +73,21 @@ Use this to quickly find if a topic has already been researched.
 - Pre-build security checklist → `18`
 - Codebase audit guide + results → `40`
 - AI code audit, cleanup agents, CI pipeline → `38`
+- March 2026 security audit (all fixes verified) → `57`
 - SECURITY.md in project root
+
+## Project Documentation
+- The ZAO Complete Guide (CANONICAL) → `50`
+- Whitepaper Draft 5 → `51`
+- Whitepaper critique → `52`
+- Whitepaper user testing → `53`
+- GitHub documentation, README, showcase → `39`
+- Research organization patterns → `45`
+- Comprehensive overview + gap analysis → `27`
+- bettercallzaal GitHub inventory (65 repos) → `30`
 
 ## Development & Operations
 - Agentic development workflows (Claude Code, GitHub Actions) → `44`
-- GitHub documentation, README, showcase → `39`
 - Reference repos (Sonata, Nook, Litecast) → `11`
-- bettercallzaal GitHub inventory (65 repos) → `30`
-- Comprehensive overview + gap analysis → `27`
+- Sprint plans → `docs/superpowers/plans/`
+- Architecture decisions → `docs/superpowers/plans/2026-03-17-decisions-resolved.md`

@@ -1,13 +1,13 @@
 # Research Document Index
 
-44 research documents in `research/`. Each is a folder with a `README.md`.
+58 research documents in `research/`. Each is a folder with a `README.md`.
 
 | # | Folder Name | Topic |
 |---|-------------|-------|
 | 01 | `01-farcaster-protocol` | Farcaster protocol architecture (Snapchain, identity, storage) |
 | 02 | `02-farcaster-hub-api` | Hub APIs, Neynar SDK, managed signers |
 | 03 | `03-music-integration` | Music APIs (Audius, Sound.xyz, Spotify), Track schema, audio players |
-| 04 | `04-respect-tokens` | Soulbound reputation tokens, curation mining, tiers, decay |
+| 04 | `04-respect-tokens` | Soulbound reputation tokens, curation mining (ASPIRATIONAL — see memory for actual values) |
 | 05 | `05-zao-identity` | ZIDs — FID wrapper + music profile + Respect + roles |
 | 06 | `06-quilibrium` | Privacy-preserving decentralized storage |
 | 07 | `07-hats-protocol` | On-chain role trees (ERC-1155), eligibility modules |
@@ -48,4 +48,16 @@
 | 42 | `42-supabase-advanced-patterns` | Schema design, RLS, Realtime, Edge Functions, pgvector |
 | 43 | `43-webrtc-audio-rooms-streaming` | LiveKit, listening parties, Livepeer, Huddle01 |
 | 44 | `44-agentic-development-workflows` | Claude Code agents, GitHub Actions, continuous development |
-| 50 | `50-wallet-connect` | Wallet connection patterns |
+| 45 | `45-research-organization-patterns` | Research library organization and maintenance |
+| 46 | `46-openfang-agent-os` | OpenFang Agent OS (Rust) — not a fit for ZAO but reference architecture |
+| 47 | `47-zao-community-ecosystem` | ZAO community ecosystem mapping |
+| 48 | `48-zao-ecosystem-deep-dive` | Deep dive into ecosystem components |
+| 50 | `50-the-zao-complete-guide` | **CANONICAL** — The definitive ZAO ecosystem guide |
+| 51 | `51-zao-whitepaper-2026` | Whitepaper Draft 5 |
+| 52 | `52-whitepaper-presentation-critique` | Whitepaper critique and feedback |
+| 53 | `53-whitepaper-user-testing` | User testing results |
+| 54 | `54-superpowers-agentic-skills` | Superpowers framework for Claude Code |
+| 55 | `55-hats-anchor-app-and-tooling` | Hats Anchor App, DAO tooling landscape, OpenFang update |
+| 56 | `56-ordao-respect-system` | ORDAO, OREC governance, Respect1155, Fibonacci scoring |
+| 57 | `57-codebase-security-audit-march-2026` | Security audit: 1 critical, 4 high, 15 medium (all fixed) |
+| 58 | `58-respect-deep-dive` | On-chain token data, scoring math, orclient SDK integration |

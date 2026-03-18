@@ -2,7 +2,7 @@
 
 ## Step 1: Pick the Next Number
 
-Check the highest numbered folder in `research/` and use the next number. Current highest: `50` (but there are gaps — use the next sequential after the last added doc).
+Check the highest numbered folder in `research/` and use the next number. Current highest: `58`. Next doc should be `59`.
 
 ## Step 2: Create the Folder and README
 
@@ -50,7 +50,9 @@ mkdir -p research/{number}-{topic-name}
 3. **Include specific numbers** — versions, prices, dates, stats
 4. **Link sources** at the bottom
 5. **Keep it actionable** — not theoretical, but "here's what to do"
-6. **Match ZAO OS's context** — filter findings through the lens of a 40-member gated Farcaster music community on Next.js/Supabase
+6. **Match ZAO OS's context** — filter findings through the lens of a 100+ member gated Farcaster music community on Next.js/Supabase
+7. **Cross-reference with codebase** — check what's actually built in `src/` before making claims about what exists
+8. **Note aspirational vs actual** — if research describes features not yet built, mark clearly as "aspirational" or "not implemented"
 
 ## Step 4: Update the Research Hub Index
 

@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **56 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **71 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -123,6 +123,27 @@ How to keep the codebase secure, clean, and maintainable.
 | [18](./18-security-audit/) | **Security Audit Checklist** | Pre-build security: env vars, sessions, Zod validation, rate limits, CSRF, CSP headers |
 | [40](./40-codebase-audit-guide/) | **Codebase Audit Guide** | Step-by-step methodology + March 2026 audit results (1 critical, 2 high, 4 medium, 8 passing) |
 | [38](./38-ai-code-audit-cleanup/) | **AI Code Audit & Cleanup** | AI code problems (1.75x more bugs), cleanup agents (Claude Code, Cursor), CI pipeline, TypeScript strict |
+| [57](./57-codebase-security-audit-march-2026/) | **Security Audit (March 2026)** | Full codebase security audit results and fixes |
+| [66](./66-backend-testing-strategy/) | **Backend Testing Strategy** | Vitest + NTARH + MSW stack, 47-route audit, backend testbench checklist, AI-code testing patterns |
+
+---
+
+## Development Workflows & Agent Tooling
+
+How to use AI agents, skills, and autonomous loops to build and maintain ZAO OS.
+
+| # | Topic | Summary |
+|---|-------|---------|
+| [44](./44-agentic-development-workflows/) | **Agentic Development Workflows** | Claude Code as persistent dev partner, hooks, GitHub Actions agents, CI pipeline, PR-based agent workflow |
+| [54](./54-superpowers-agentic-skills/) | **Superpowers Agentic Skills** | Skill system for Claude Code — brainstorming, TDD, debugging, planning, parallel agents, code review |
+| [62](./62-autoresearch-skill-improvement/) | **Autoresearch: Skill Improvement** | Karpathy's autoresearch loop adapted for Claude Code skills — binary checklist scoring, atomic changes, auto-revert |
+| [63](./63-autoresearch-deep-dive-zao-applications/) | **Autoresearch Deep Dive** | Implementation comparison (3 repos), eval loop mechanics, 7 ZAO OS use cases (skills, lint, security, governance, API routes) |
+| [64](./64-incented-zabal-campaigns/) | **Incented + ZABAL Campaigns** | Incented coordination protocol (4-stage staking), ZABAL org campaigns, ZAO OS integration roadmap |
+| [65](./65-zabal-partner-ecosystem/) | **ZABAL Partner Ecosystem** | MAGNETIQ (Proof of Meet), SongJam (leaderboard), Empire Builder (token rewards), Clanker (token launcher) — integration plans |
+| [67](./67-paperclip-ai-agent-company/) | **Paperclip AI: ZAO Agent Company** | Open-source agent orchestrator — org chart, budgets, heartbeats. 5 ZAO agents defined, full startup guide. |
+| [68](./68-alibaba-page-agent/) | **Alibaba Page Agent** | In-page AI copilot via DOM dehydration. Admin copilot potential for ZAO OS. Not yet — Phase 3. |
+| [69](./69-claude-code-tips-best-practices/) | **Claude Code Tips & Best Practices** | 45 tips audited against ZAO OS setup. Gaps: no tests, no HANDOFF.md, no cc-safe. ZAO leads on research/skills. |
+| [70](./70-subagents-vs-agent-teams/) | **Sub-agents vs Agent Teams** | Two multi-agent paradigms + Claude Architect patterns + Cowork starter pack. Maps to Paperclip + Claude Code. |
 
 ---
 

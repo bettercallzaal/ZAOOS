@@ -44,11 +44,13 @@ interface XMTPContextValue {
   loadingMembers: boolean;
 
   reconnecting: boolean;
+  activeXMTPAddress: string | null;
 
   autoConnect: (fid: number) => Promise<void>;
   connectWallet: (address: `0x${string}`, signMessage: (msg: string) => Promise<string>) => Promise<void>;
   disconnectWallet: (address: string) => void;
   disconnectAll: () => void;
+  switchWallet: () => void;
   selectConversation: (id: string | null) => void;
   sendMessage: (text: string) => Promise<void>;
   createDm: (peerAddress: `0x${string}`, peerProfile?: XMTPPeerProfile) => Promise<string | null>;
@@ -92,6 +94,13 @@ function isTextMessage(msg: DecodedMessage): boolean {
   return false;
 }
 
+interface MessagingPrefs {
+  autoJoinGroup: boolean;
+  allowNonZaoDms: boolean;
+}
+
+const PREFS_DEFAULTS: MessagingPrefs = { autoJoinGroup: true, allowNonZaoDms: false };
+
 export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const walletsRef = useRef<Map<string, WalletClient>>(new Map());
   const [connectedWallets, setConnectedWallets] = useState<string[]>([]);
@@ -99,6 +108,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+
+  // User messaging preferences (fetched from DB)
+  const messagingPrefsRef = useRef<MessagingPrefs>(PREFS_DEFAULTS);
   const actionErrorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const showActionError = useCallback((msg: string) => {
     if (actionErrorTimerRef.current) clearTimeout(actionErrorTimerRef.current);
@@ -180,6 +192,17 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   // Mirror zaoMembers in a ref so stream handlers can access it
   const zaoMembersRef = useRef<ZaoMember[]>([]);
+
+  /** Fetch user's messaging preferences from the API */
+  const fetchMessagingPrefs = useCallback(async () => {
+    try {
+      const res = await fetch('/api/users/messaging-prefs');
+      if (res.ok) {
+        const prefs = await res.json();
+        messagingPrefsRef.current = { ...PREFS_DEFAULTS, ...prefs };
+      }
+    } catch { /* use defaults */ }
+  }, []);
 
   /**
    * Load conversations from all connected clients.
@@ -588,9 +611,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
       await loadAllConversations();
 
-      // Auto-create ZAO General for reachable ZAO members
+      // Auto-create ZAO General for reachable ZAO members (if user has autoJoinGroup enabled)
       const reachableMembers = mapped.filter((m: ZaoMember) => m.reachable && m.addresses.length > 0);
-      if (reachableMembers.length > 0) {
+      if (reachableMembers.length > 0 && messagingPrefsRef.current.autoJoinGroup) {
         const ZAO_GROUP_KEY = 'zaoos-xmtp-zao-general';
         let groupExists = false;
         for (const [, wc] of walletsRef.current.entries()) {
@@ -644,6 +667,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
+      // Fetch user messaging preferences before connecting
+      await fetchMessagingPrefs();
+
       const [{ getOrCreateLocalKey, createLocalSigner, createXMTPClient, saveConnectedWallet }, { ConsentState }] =
         await Promise.all([import('@/lib/xmtp/client'), import('@xmtp/browser-sdk')]);
 
@@ -693,7 +719,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       setIsConnecting(false);
       setConnectingWallet(null);
     }
-  }, [tabLocked, seedLastMessages, loadAllConversations, checkZaoMembers, startGlobalStreams]);
+  }, [tabLocked, fetchMessagingPrefs, seedLastMessages, loadAllConversations, checkZaoMembers, startGlobalStreams]);
 
   /**
    * Connect a specific wallet to XMTP
@@ -714,6 +740,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
+      // Fetch user messaging preferences before connecting
+      await fetchMessagingPrefs();
+
       const [{ createWalletSigner, createXMTPClient, saveConnectedWallet }, { ConsentState }] =
         await Promise.all([import('@/lib/xmtp/client'), import('@xmtp/browser-sdk')]);
       const signer = await createWalletSigner(address, signMessage);
@@ -752,7 +781,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       setIsConnecting(false);
       setConnectingWallet(null);
     }
-  }, [tabLocked, seedLastMessages, loadAllConversations, checkZaoMembers, startGlobalStreams]);
+  }, [tabLocked, fetchMessagingPrefs, seedLastMessages, loadAllConversations, checkZaoMembers, startGlobalStreams]);
 
   const disconnectWallet = useCallback(async (address: string) => {
     const normalized = address.toLowerCase();
@@ -1221,6 +1250,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, [findClientForConversation, zaoMembers]);
 
   /**
+   * Switch XMTP wallet — disconnects all and clears saved wallets so the user
+   * returns to the wallet picker screen on the Messages page.
+   */
+  const switchWallet = useCallback(() => {
+    disconnectAll();
+  }, [disconnectAll]);
+
+  /**
    * Manually reconnect streams (user-initiated).
    */
   const reconnectStreams = useCallback(async () => {
@@ -1281,6 +1318,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     streamConnected,
     tabLocked,
     reconnecting,
+    activeXMTPAddress: connectedWallets[0] ?? null,
     conversations,
     activeConversationId,
     messages,
@@ -1291,6 +1329,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     connectWallet,
     disconnectWallet,
     disconnectAll,
+    switchWallet,
     selectConversation,
     sendMessage,
     createDm,
@@ -1308,7 +1347,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     connectedWallets, isConnecting, connectingWallet, error, actionError, streamConnected,
     tabLocked, reconnecting, conversations, activeConversationId, messages, loadingMessages,
     zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
-    disconnectAll, selectConversation, sendMessage, createDm, createGroup,
+    disconnectAll, switchWallet, selectConversation, sendMessage, createDm, createGroup,
     refreshConversations, startDmWithMember, clearError, clearActionError, reconnectStreams,
     removeConversation, leaveGroup, checkZaoMembers, getGroupMembers,
   ]);

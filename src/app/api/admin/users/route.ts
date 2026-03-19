@@ -1,7 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getUserByFid, getUserByAddress, searchUsers } from '@/lib/farcaster/neynar';
+
+const ethAddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/);
+
+const getQuerySchema = z.object({
+  role: z.enum(['member', 'beta', 'admin', 'moderator']).optional(),
+  q: z.string().max(100).optional(),
+  limit: z.coerce.number().int().min(1).max(500).default(200),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+const createUserSchema = z.object({
+  primary_wallet: ethAddressSchema.optional(),
+  fid: z.number().int().positive().optional(),
+  username: z.string().max(100).optional(),
+  role: z.enum(['member', 'beta', 'admin', 'moderator']).optional(),
+  real_name: z.string().max(200).optional(),
+  ign: z.string().max(100).optional(),
+  notes: z.string().max(1000).optional(),
+});
+
+const updateUserSchema = z.object({
+  id: z.string().uuid(),
+  assign_zid: z.boolean().optional(),
+  fid: z.number().int().positive().nullable().optional(),
+  username: z.string().max(100).optional(),
+  display_name: z.string().max(200).optional(),
+  pfp_url: z.string().url().optional(),
+  bio: z.string().max(1000).optional(),
+  primary_wallet: ethAddressSchema.optional(),
+  respect_wallet: ethAddressSchema.optional(),
+  role: z.enum(['member', 'beta', 'admin', 'moderator']).optional(),
+  is_active: z.boolean().optional(),
+  custody_address: ethAddressSchema.optional(),
+  verified_addresses: z.array(ethAddressSchema).optional(),
+});
+
+const deleteUserSchema = z.object({
+  id: z.string().uuid(),
+});
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -19,11 +59,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  const role = req.nextUrl.searchParams.get('role');
-  const search = req.nextUrl.searchParams.get('q');
-
-  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '200', 10), 500);
-  const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
+  const parsed = getQuerySchema.safeParse({
+    role: req.nextUrl.searchParams.get('role') ?? undefined,
+    q: req.nextUrl.searchParams.get('q') ?? undefined,
+    limit: req.nextUrl.searchParams.get('limit') ?? undefined,
+    offset: req.nextUrl.searchParams.get('offset') ?? undefined,
+  });
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid query parameters', details: parsed.error.flatten() }, { status: 400 });
+  }
+  const { role, q: search, limit, offset } = parsed.data;
 
   let query = supabaseAdmin
     .from('users')
@@ -67,9 +112,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { primary_wallet, role, real_name, ign, notes } = body;
-    let { fid } = body;
-    const { username: usernameInput } = body;
+    const parsed = createUserSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+    }
+    const { primary_wallet, role, real_name, ign, notes } = parsed.data;
+    let { fid } = parsed.data;
+    const usernameInput = parsed.data.username;
 
     // Resolve username to FID if provided
     if (usernameInput && !fid) {
@@ -196,22 +245,11 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { id, assign_zid, ...rawUpdates } = body;
-
-    if (!id) {
-      return NextResponse.json({ error: 'User id is required' }, { status: 400 });
+    const parsed = updateUserSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
-
-    // Allowlist fields that admins can update — prevents arbitrary column injection
-    const ALLOWED_FIELDS = new Set([
-      'fid', 'username', 'display_name', 'pfp_url', 'bio',
-      'primary_wallet', 'respect_wallet', 'role', 'is_active',
-      'custody_address', 'verified_addresses',
-    ]);
-    const updates: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(rawUpdates)) {
-      if (ALLOWED_FIELDS.has(key)) updates[key] = value;
-    }
+    const { id, assign_zid, ...updates } = parsed.data;
 
     // Admin-assigned ZID via sequence
     if (assign_zid) {
@@ -285,10 +323,12 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const { id } = await req.json();
-    if (!id) {
-      return NextResponse.json({ error: 'User id is required' }, { status: 400 });
+    const body = await req.json();
+    const parsed = deleteUserSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
+    const { id } = parsed.data;
 
     const { error } = await supabaseAdmin
       .from('users')

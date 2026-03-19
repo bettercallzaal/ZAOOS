@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **56 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **71 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -47,6 +47,8 @@ How ZAO gates access, manages members, grows from 40 to 1000+, and moderates con
 | [20](./20-followers-following-feed/) | **Followers/Following Feed** | Sortable/filterable lists (no other Farcaster client has this), Neynar API patterns |
 | [32](./32-onboarding-growth-moderation/) | **Onboarding, Growth & Moderation** | Privy embedded wallets, growth 40→1000 strategy, tiered moderation, gamification, analytics |
 | [35](./35-notifications-complete-guide/) | **Notifications Complete Guide** | 3-layer hybrid: Mini App push + Supabase Realtime in-app + polling fallback, implementation details |
+| [47](./47-zao-community-ecosystem/) | **ZAO Community Ecosystem** | ZAO community ecosystem mapping |
+| [48](./48-zao-ecosystem-deep-dive/) | **ZAO Ecosystem Deep Dive** | Deep dive into ecosystem components |
 
 ---
 
@@ -61,7 +63,10 @@ On-chain identity, community roles, DAO structure, token economics, and legal co
 | [23](./23-austin-griffith-eth-skills/) | **Austin Griffith & ETH Skills** | Scaffold-ETH 2, BuidlGuidl model, SpeedRunEthereum, ERC-8004 trustless agents, onchain credentials |
 | [31](./31-governance-dao-tokenomics/) | **Governance, DAO & Token Economics** | Wyoming DUNA ($300), Safe multisig, ERC-1155, Coordinape, Howey Test, legal compliance |
 | [06](./06-quilibrium/) | **Quilibrium** | Privacy-preserving storage, Proof of Meaningful Work, design-compatible but don't block on it |
+| [55](./55-hats-anchor-app-and-tooling/) | **Hats Anchor App & Tooling** | DAO tooling landscape, Hats Anchor App, OpenFang update |
 | [56](./56-ordao-respect-system/) | **ORDAO & Respect Game** | OREC consent-based governance, Fibonacci scoring (1-13), Respect1155 ERC-1155 tokens, fractal breakout rooms, parent/child token system |
+| [58](./58-respect-deep-dive/) | **Respect Deep Dive** | On-chain token data, scoring math, orclient SDK integration |
+| [59](./59-hats-tree-integration/) | **Hats Tree Integration** | Hats Protocol tree structure for ZAO roles |
 
 ---
 
@@ -123,6 +128,41 @@ How to keep the codebase secure, clean, and maintainable.
 | [18](./18-security-audit/) | **Security Audit Checklist** | Pre-build security: env vars, sessions, Zod validation, rate limits, CSRF, CSP headers |
 | [40](./40-codebase-audit-guide/) | **Codebase Audit Guide** | Step-by-step methodology + March 2026 audit results (1 critical, 2 high, 4 medium, 8 passing) |
 | [38](./38-ai-code-audit-cleanup/) | **AI Code Audit & Cleanup** | AI code problems (1.75x more bugs), cleanup agents (Claude Code, Cursor), CI pipeline, TypeScript strict |
+| [57](./57-codebase-security-audit-march-2026/) | **Security Audit (March 2026)** | Full codebase security audit results and fixes |
+| [66](./66-backend-testing-strategy/) | **Backend Testing Strategy** | Vitest + NTARH + MSW stack, 47-route audit, backend testbench checklist, AI-code testing patterns |
+
+---
+
+## Development Workflows & Agent Tooling
+
+How to use AI agents, skills, and autonomous loops to build and maintain ZAO OS.
+
+| # | Topic | Summary |
+|---|-------|---------|
+| [44](./44-agentic-development-workflows/) | **Agentic Development Workflows** | Claude Code as persistent dev partner, hooks, GitHub Actions agents, CI pipeline, PR-based agent workflow |
+| [45](./45-research-organization-patterns/) | **Research Organization Patterns** | Research library organization and maintenance |
+| [46](./46-openfang-agent-os/) | **OpenFang Agent OS** | Rust-based agent OS — reference architecture (not a fit for ZAO) |
+| [54](./54-superpowers-agentic-skills/) | **Superpowers Agentic Skills** | Skill system for Claude Code — brainstorming, TDD, debugging, planning, parallel agents, code review |
+| [62](./62-autoresearch-skill-improvement/) | **Autoresearch: Skill Improvement** | Karpathy's autoresearch loop adapted for Claude Code skills — binary checklist scoring, atomic changes, auto-revert |
+| [63](./63-autoresearch-deep-dive-zao-applications/) | **Autoresearch Deep Dive** | Implementation comparison (3 repos), eval loop mechanics, 7 ZAO OS use cases (skills, lint, security, governance, API routes) |
+| [64](./64-incented-zabal-campaigns/) | **Incented + ZABAL Campaigns** | Incented coordination protocol (4-stage staking), ZABAL org campaigns, ZAO OS integration roadmap |
+| [65](./65-zabal-partner-ecosystem/) | **ZABAL Partner Ecosystem** | MAGNETIQ (Proof of Meet), SongJam (leaderboard), Empire Builder (token rewards), Clanker (token launcher) — integration plans |
+| [67](./67-paperclip-ai-agent-company/) | **Paperclip AI: ZAO Agent Company** | Open-source agent orchestrator — org chart, budgets, heartbeats. 5 ZAO agents defined, full startup guide. |
+| [68](./68-alibaba-page-agent/) | **Alibaba Page Agent** | In-page AI copilot via DOM dehydration. Admin copilot potential for ZAO OS. Not yet — Phase 3. |
+| [68](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps spec, SDK integration, notification patterns |
+| [69](./69-claude-code-tips-best-practices/) | **Claude Code Tips & Best Practices** | 45 tips audited against ZAO OS setup. Gaps: no tests, no HANDOFF.md, no cc-safe. ZAO leads on research/skills. |
+| [70](./70-subagents-vs-agent-teams/) | **Sub-agents vs Agent Teams** | Two multi-agent paradigms + Claude Architect patterns + Cowork starter pack. Maps to Paperclip + Claude Code. |
+
+---
+
+## Ethereum & Alignment
+
+Ethereum philosophy, EF alignment, and opportunities for ZAO.
+
+| # | Topic | Summary |
+|---|-------|---------|
+| [60](./60-vitalik-ethereum-philosophy/) | **Vitalik & Ethereum Philosophy** | Vitalik philosophy + EF mandate alignment analysis |
+| [61](./61-ethereum-alignment-opportunities/) | **Ethereum Alignment Opportunities** | Ethereum alignment opportunities for ZAO |
 
 ---
 
@@ -133,6 +173,9 @@ How to document, display, and showcase the project on GitHub.
 | # | Topic | Summary |
 |---|-------|---------|
 | [39](./39-github-documentation-presentation/) | **GitHub Documentation** | README best practices, screenshots, Mermaid diagrams, docs sites (Fumadocs/Nextra), ADRs, badges |
+| [51](./51-zao-whitepaper-2026/) | **ZAO Whitepaper 2026** | Whitepaper Draft 4.5 — vision, tokenomics, governance |
+| [52](./52-whitepaper-presentation-critique/) | **Whitepaper Presentation Critique** | Whitepaper critique and feedback |
+| [53](./53-whitepaper-user-testing/) | **Whitepaper User Testing** | User testing results for the whitepaper |
 
 ---
 
@@ -143,6 +186,7 @@ Project references, existing code inventory, and strategic overviews.
 | # | Topic | Summary |
 |---|-------|---------|
 | [11](./11-reference-repos/) | **Reference Repos** | Sonata (MIT), Herocast (AGPL), Nook (MIT), Opencast (MIT), Litecast (MIT) |
+| [50](./50-the-zao-complete-guide/) | **The ZAO Complete Guide** | Canonical project reference — the definitive ZAO ecosystem guide |
 | [30](./30-bettercallzaal-github/) | **bettercallzaal GitHub Inventory** | 65 repos mapped — 10 directly integratable (fractalbot, zabalbot, zaomusicbot, ZAO-Leaderboard, ZOUNZ) |
 | [27](./27-comprehensive-overview/) | **Comprehensive Overview** | Master index, gap analysis, vision map, flywheel, 9-layer roadmap, research sprint plan |
 | [50](./50-wallet-connect/) | **Wallet Connect** | Wallet connection patterns |
@@ -227,8 +271,8 @@ Start with [40 Audit Guide](./40-codebase-audit-guide/) + [38 AI Code Audit](./3
 
 ## Research Stats
 
-- **Total documents:** 55
+- **Total documents:** 71
 - **Total coverage:** ~300,000+ words
 - **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation
 - **Time span:** January — March 2026
-- **Status:** 42/43 complete, 1 incomplete (Hypersnap)
+- **Status:** 70/71 complete, 1 incomplete (Hypersnap)

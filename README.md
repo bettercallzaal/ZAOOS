@@ -126,7 +126,7 @@ All community branding, channels, contracts, and admin FIDs are in `community.co
 
 ## Research Library
 
-> **58 research documents** covering every aspect of building a decentralized music platform.
+> **71 research documents** covering every aspect of building a decentralized music platform.
 
 Start with:
 - [research/50 — The ZAO Complete Guide](./research/50-the-zao-complete-guide/) — canonical reference

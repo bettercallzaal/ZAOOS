@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS proposals (
   description TEXT NOT NULL,
   author_id UUID NOT NULL REFERENCES users(id),
   status TEXT DEFAULT 'open' CHECK (status IN ('open', 'approved', 'rejected', 'completed')),
-  category TEXT DEFAULT 'general' CHECK (category IN ('general', 'music', 'tech', 'governance', 'treasury')),
+  category TEXT DEFAULT 'general' CHECK (category IN ('general', 'technical', 'community', 'governance', 'treasury')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   closes_at TIMESTAMPTZ  -- optional deadline

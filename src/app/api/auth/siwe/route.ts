@@ -19,7 +19,6 @@ const MAX_NONCES = 10_000;
 const nonceStore = new Map<string, number>(); // nonce → created timestamp
 
 function pruneNonces() {
-  if (nonceStore.size <= MAX_NONCES) return;
   const now = Date.now();
   for (const [n, ts] of nonceStore) {
     if (now - ts > NONCE_TTL) nonceStore.delete(n);

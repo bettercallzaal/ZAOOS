@@ -73,7 +73,7 @@ export default function ContributePage() {
               </svg>
               <div>
                 <p className="text-sm font-medium text-white">Documentation</p>
-                <p className="text-xs text-gray-500">54 research docs + project guides</p>
+                <p className="text-xs text-gray-500">71 research docs + project guides</p>
               </div>
             </div>
           </a>
@@ -101,7 +101,7 @@ export default function ContributePage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Build in Public</p>
           <p className="text-sm text-gray-400">
             ZAO OS is built transparently. Every decision, every line of code, documented and shared.
-            47 research docs and counting.
+            71 research docs and counting.
           </p>
         </div>
       </div>

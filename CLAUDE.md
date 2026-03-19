@@ -30,7 +30,7 @@ src/
 ├── lib/                  # Utilities by domain: auth, db, farcaster, gates, music, xmtp, validation
 └── types/                # TypeScript type definitions
 community.config.ts       # All community branding, channels, contracts, nav — fork-friendly
-research/                 # 54 research docs (see research/README.md)
+research/                 # 71 research docs (see research/README.md)
 scripts/                  # DB setup, wallet generation, webhook registration
 supabase/                 # Database config
 ```
@@ -78,7 +78,7 @@ supabase/                 # Database config
 
 ## Research Library
 
-54 research documents in `research/`. Start with:
+71 research documents in `research/`. Start with:
 - `research/README.md` — full index organized by topic
 - `research/50-the-zao-complete-guide/` — canonical project reference
 - `research/51-zao-whitepaper-2026/` — whitepaper Draft 4.5

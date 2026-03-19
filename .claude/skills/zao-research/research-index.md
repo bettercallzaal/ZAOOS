@@ -1,6 +1,6 @@
 # Research Document Index
 
-58 research documents in `research/`. Each is a folder with a `README.md`.
+71 research documents in `research/`. Each is a folder with a `README.md`.
 
 | # | Folder Name | Topic |
 |---|-------------|-------|
@@ -61,3 +61,17 @@
 | 56 | `56-ordao-respect-system` | ORDAO, OREC governance, Respect1155, Fibonacci scoring |
 | 57 | `57-codebase-security-audit-march-2026` | Security audit: 1 critical, 4 high, 15 medium (all fixed) |
 | 58 | `58-respect-deep-dive` | On-chain token data, scoring math, orclient SDK integration |
+| 59 | `59-hats-tree-integration` | Hats Protocol tree structure for ZAO roles |
+| 60 | `60-vitalik-ethereum-philosophy` | Vitalik philosophy + EF mandate alignment analysis |
+| 61 | `61-ethereum-alignment-opportunities` | Ethereum alignment opportunities for ZAO |
+| 62 | `62-autoresearch-skill-improvement` | Karpathy's autoresearch loop for autonomous skill improvement |
+| 63 | `63-autoresearch-deep-dive-zao-applications` | Implementation comparison, eval loop mechanics, 7 ZAO OS use cases |
+| 64 | `64-incented-zabal-campaigns` | Incented coordination protocol, ZABAL campaigns, ZAO OS integration roadmap |
+| 65 | `65-zabal-partner-ecosystem` | MAGNETIQ, SongJam, Empire Builder, Clanker — partner platforms + integration plans |
+| 66 | `66-backend-testing-strategy` | Vitest + NTARH + MSW stack, 47-route audit, backend testbench checklist |
+| 67 | `67-paperclip-ai-agent-company` | Paperclip AI orchestrator — org chart, budgets, heartbeats, 5 ZAO agents, startup guide |
+| 68 | `68-alibaba-page-agent` | In-page AI copilot, DOM dehydration, admin copilot potential |
+| 69 | `69-claude-code-tips-best-practices` | 45 tips audited vs ZAO, gaps identified, improvements planned |
+| 70 | `70-subagents-vs-agent-teams` | Two multi-agent paradigms, Claude Architect patterns, Cowork starter pack |
+| 50b | `50-wallet-connect` | Wallet connection patterns for web3 |
+| 68b | `68-farcaster-miniapps-integration` | Farcaster Mini Apps integration research |

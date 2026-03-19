@@ -49,17 +49,22 @@ export function MessagesRoom() {
   const showList = !isMobile || !activeConversationId;
   const showThread = !isMobile || !!activeConversationId;
 
-  // Connect XMTP using wallet-based signing
+  // Connect XMTP using wallet-based signing (optional address from wallet picker)
   const handleConnect = useCallback(async () => {
     if (walletXmtp.canConnect) {
       await walletXmtp.connectWalletToXMTP();
     }
   }, [walletXmtp]);
 
-  // Auto-connect XMTP when wallet is available (matches ChatRoom behavior)
+  const handleConnectWithWallet = useCallback(async () => {
+    await handleConnect();
+  }, [handleConnect]);
+
+  // Auto-connect XMTP only if user previously connected (has saved wallets in localStorage)
   useEffect(() => {
     if (!user || isConnected || isConnecting || error) return;
-    if (walletXmtp.canConnect) {
+    const hasPreviousConnection = typeof window !== 'undefined' && localStorage.getItem('zaoos-xmtp-wallets');
+    if (walletXmtp.canConnect && hasPreviousConnection) {
       walletXmtp.connectWalletToXMTP();
     }
   }, [user, walletXmtp.canConnect]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -98,7 +103,7 @@ export function MessagesRoom() {
             </a>
           </div>
         </aside>
-        <ConnectXMTP isConnecting={isConnecting} error={error} onConnect={handleConnect} />
+        <ConnectXMTP isConnecting={isConnecting} error={error} onConnect={handleConnectWithWallet} />
       </div>
     );
   }

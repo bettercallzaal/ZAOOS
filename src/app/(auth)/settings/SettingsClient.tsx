@@ -34,7 +34,7 @@ function shortAddr(addr: string) {
 
 export function SettingsClient({ session, profile }: SettingsClientProps) {
   const { logout, refetch } = useAuth();
-  const { isConnected: xmtpConnected } = useXMTPContext();
+  const { isConnected: xmtpConnected, activeXMTPAddress, switchWallet } = useXMTPContext();
   const [signerStatus, setSignerStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [signerError, setSignerError] = useState<string | null>(null);
   const [scriptError, setScriptError] = useState(false);
@@ -161,9 +161,23 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   <span className={`w-2 h-2 rounded-full ${xmtpConnected ? 'bg-green-400' : 'bg-gray-600'}`} />
                   <span className="text-sm text-white">Messaging</span>
                 </div>
-                <span className={`text-xs ${xmtpConnected ? 'text-green-500/70' : 'text-gray-500'}`}>
-                  {xmtpConnected ? 'Enabled' : 'Auto-enables with wallet'}
-                </span>
+                <div className="flex items-center gap-2">
+                  {xmtpConnected && activeXMTPAddress ? (
+                    <>
+                      <span className="text-xs text-gray-500 font-mono">{shortAddr(activeXMTPAddress)}</span>
+                      <button
+                        onClick={switchWallet}
+                        className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
+                      >
+                        Switch
+                      </button>
+                    </>
+                  ) : (
+                    <span className="text-xs text-gray-500">
+                      {xmtpConnected ? 'Enabled' : 'Enable in Messages'}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

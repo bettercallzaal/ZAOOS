@@ -44,11 +44,13 @@ interface XMTPContextValue {
   loadingMembers: boolean;
 
   reconnecting: boolean;
+  activeXMTPAddress: string | null;
 
   autoConnect: (fid: number) => Promise<void>;
   connectWallet: (address: `0x${string}`, signMessage: (msg: string) => Promise<string>) => Promise<void>;
   disconnectWallet: (address: string) => void;
   disconnectAll: () => void;
+  switchWallet: () => void;
   selectConversation: (id: string | null) => void;
   sendMessage: (text: string) => Promise<void>;
   createDm: (peerAddress: `0x${string}`, peerProfile?: XMTPPeerProfile) => Promise<string | null>;
@@ -1221,6 +1223,14 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
   }, [findClientForConversation, zaoMembers]);
 
   /**
+   * Switch XMTP wallet — disconnects all and clears saved wallets so the user
+   * returns to the wallet picker screen on the Messages page.
+   */
+  const switchWallet = useCallback(() => {
+    disconnectAll();
+  }, [disconnectAll]);
+
+  /**
    * Manually reconnect streams (user-initiated).
    */
   const reconnectStreams = useCallback(async () => {
@@ -1281,6 +1291,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     streamConnected,
     tabLocked,
     reconnecting,
+    activeXMTPAddress: connectedWallets[0] ?? null,
     conversations,
     activeConversationId,
     messages,
@@ -1291,6 +1302,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     connectWallet,
     disconnectWallet,
     disconnectAll,
+    switchWallet,
     selectConversation,
     sendMessage,
     createDm,
@@ -1308,7 +1320,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
     connectedWallets, isConnecting, connectingWallet, error, actionError, streamConnected,
     tabLocked, reconnecting, conversations, activeConversationId, messages, loadingMessages,
     zaoMembers, loadingMembers, autoConnect, connectWallet, disconnectWallet,
-    disconnectAll, selectConversation, sendMessage, createDm, createGroup,
+    disconnectAll, switchWallet, selectConversation, sendMessage, createDm, createGroup,
     refreshConversations, startDmWithMember, clearError, clearActionError, reconnectStreams,
     removeConversation, leaveGroup, checkZaoMembers, getGroupMembers,
   ]);

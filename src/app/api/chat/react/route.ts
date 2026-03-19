@@ -69,10 +69,14 @@ export async function POST(req: NextRequest) {
             actorFid: session.fid,
             actorDisplayName: session.displayName,
             actorPfpUrl: session.pfpUrl,
-          }).catch(() => {});
+          }).catch((err) => {
+            console.error('Reaction notification failed:', err);
+          });
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error('Reaction notification lookup failed:', err);
+      });
 
     return NextResponse.json({ success: true });
   } catch (error) {

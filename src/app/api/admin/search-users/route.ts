@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
         const allAddresses = [custodyAddress, ...verifiedAddresses].filter(Boolean);
 
         // Resolve ENS (do first address only to keep fast)
-        let ensMap: Record<string, string> = {};
+        const ensMap: Record<string, string> = {};
         if (allAddresses.length > 0) {
           const primaryEns = await resolveEns(allAddresses[0]);
           if (primaryEns) ensMap[allAddresses[0].toLowerCase()] = primaryEns;

@@ -67,6 +67,7 @@ async function fetchAllRecords(tableName: string): Promise<Record<string, unknow
 }
 
 // Known session column patterns — columns that look like dates or "ZAO..." with numeric values
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isSessionColumn(fieldName: string): boolean {
   // Session columns in the Airtable are named like "ZAO Fractal #42" or date-like
   // They contain numeric scores (5, 8, 10, 13, 21, 26, 34, 42, 55, 68, 110)

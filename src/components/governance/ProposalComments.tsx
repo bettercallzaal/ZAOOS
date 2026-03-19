@@ -23,6 +23,14 @@ interface ProposalCommentsProps {
   currentFid: number;
 }
 
+function timeAgo(ts: string): string {
+  const s = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
 export function ProposalComments({ proposalId, currentFid }: ProposalCommentsProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +46,9 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
     setLoading(false);
   }, [proposalId]);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- fetchComments sets state after async fetch */
   useEffect(() => { fetchComments(); }, [fetchComments]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = async () => {
     if (!text.trim() || sending) return;
@@ -56,14 +66,6 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
     } catch { /* ignore */ }
     setSending(false);
   };
-
-  function timeAgo(ts: string): string {
-    const s = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
-    if (s < 60) return 'just now';
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`;
-    if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
-    return `${Math.floor(s / 86400)}d ago`;
-  }
 
   // Suppress unused variable lint — currentFid reserved for future "delete own comment" feature
   void currentFid;

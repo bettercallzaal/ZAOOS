@@ -68,6 +68,7 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
     return (
       <a href={embed.url} target="_blank" rel="noopener noreferrer" className="block mt-2">
         <div className="rounded-lg overflow-hidden max-w-sm bg-gray-800/50" style={{ minHeight: '120px' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- external user-shared image URL */}
           <img
             src={embed.url}
             alt="Embedded image"
@@ -106,6 +107,7 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
       >
         {og.ogImage?.[0]?.url && (
           <div className="w-full bg-gray-800/30" style={{ minHeight: '80px' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- external OG image URL */}
             <img
               src={og.ogImage[0].url}
               alt={og.ogTitle || 'Link preview image'}

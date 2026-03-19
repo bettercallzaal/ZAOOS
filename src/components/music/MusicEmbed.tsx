@@ -46,6 +46,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
   const isThisPlaying = isThisTrack && player.isPlaying;
   const isThisLoading = isThisTrack && player.isLoading;
 
+  /* eslint-disable react-hooks/set-state-in-effect -- loading flag before async fetch is intentional */
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -77,6 +78,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
       cancelled = true;
     };
   }, [url, castHash]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const externalOnly = metadata?.type === 'applemusic' || metadata?.type === 'tidal';
 

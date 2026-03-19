@@ -1250,6 +1250,7 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
 
   // Cleanup on unmount
   useEffect(() => {
+    const wallets = walletsRef.current;
     return () => {
       if (reconnectTimerRef.current) {
         clearTimeout(reconnectTimerRef.current);
@@ -1262,10 +1263,10 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
       convStreamCleanupRef.current?.();
       msgStreamCleanupRef.current?.();
       streamsActiveRef.current = false;
-      for (const [, wc] of walletsRef.current) {
+      for (const [, wc] of wallets) {
         wc.client.close();
       }
-      walletsRef.current.clear();
+      wallets.clear();
     };
   }, []);
 

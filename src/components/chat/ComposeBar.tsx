@@ -284,6 +284,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       {imagePreview && (
         <div className="px-3 pt-2">
           <div className="relative inline-block">
+            {/* eslint-disable-next-line @next/next/no-img-element -- blob preview URL not compatible with next/image */}
             <img
               src={imagePreview.url}
               alt="Upload preview"

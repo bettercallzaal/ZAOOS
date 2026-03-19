@@ -41,33 +41,6 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
   const apiRef = useRef<SpotifyIFrameAPI | null>(null);
   const pendingUriRef = useRef<string | null>(null);
 
-  // Load Spotify IFrame API
-  useEffect(() => {
-    if (document.getElementById('spotify-iframe-api')) {
-      if (window.SpotifyIframeApi) apiRef.current = window.SpotifyIframeApi;
-      return;
-    }
-
-    window.onSpotifyIframeApiReady = (api: SpotifyIFrameAPI) => {
-      apiRef.current = api;
-      window.SpotifyIframeApi = api;
-      if (pendingUriRef.current) {
-        createSpotifyController(api, pendingUriRef.current);
-        pendingUriRef.current = null;
-      }
-    };
-
-    const script = document.createElement('script');
-    script.id = 'spotify-iframe-api';
-    script.src = 'https://open.spotify.com/embed/iframe-api/v1';
-    script.async = true;
-    document.head.appendChild(script);
-
-    return () => {
-      window.onSpotifyIframeApiReady = undefined;
-    };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   const createSpotifyController = (api: SpotifyIFrameAPI, uri: string) => {
     if (!containerRef.current) return;
 
@@ -110,6 +83,33 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
       },
     );
   };
+
+  // Load Spotify IFrame API
+  useEffect(() => {
+    if (document.getElementById('spotify-iframe-api')) {
+      if (window.SpotifyIframeApi) apiRef.current = window.SpotifyIframeApi;
+      return;
+    }
+
+    window.onSpotifyIframeApiReady = (api: SpotifyIFrameAPI) => {
+      apiRef.current = api;
+      window.SpotifyIframeApi = api;
+      if (pendingUriRef.current) {
+        createSpotifyController(api, pendingUriRef.current);
+        pendingUriRef.current = null;
+      }
+    };
+
+    const script = document.createElement('script');
+    script.id = 'spotify-iframe-api';
+    script.src = 'https://open.spotify.com/embed/iframe-api/v1';
+    script.async = true;
+    document.head.appendChild(script);
+
+    return () => {
+      window.onSpotifyIframeApiReady = undefined;
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Register controller
   useEffect(() => {

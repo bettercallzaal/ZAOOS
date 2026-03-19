@@ -18,11 +18,13 @@ interface SchedulePanelProps {
   channel: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- channel reserved for future per-channel filtering
 export function SchedulePanel({ isOpen, onClose, channel }: SchedulePanelProps) {
   const [scheduled, setScheduled] = useState<ScheduledCast[]>([]);
   const [loading, setLoading] = useState(false);
   useEscapeClose(onClose, isOpen);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- loading flag before async fetch is intentional */
   useEffect(() => {
     if (!isOpen) return;
     setLoading(true);
@@ -35,6 +37,7 @@ export function SchedulePanel({ isOpen, onClose, channel }: SchedulePanelProps) 
     // Also trigger processing of due casts
     fetch('/api/chat/schedule', { method: 'PATCH' }).catch(() => {});
   }, [isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const cancelCast = async (id: string) => {
     const res = await fetch(`/api/chat/schedule?id=${id}`, { method: 'DELETE' });

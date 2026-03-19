@@ -100,7 +100,7 @@ export async function GET() {
               viewer_context?: { following: boolean; followed_by: boolean };
             };
             if (!user.viewer_context?.following) {
-              const member = membersResult.data?.find((m) => m.fid === user.fid);
+              membersResult.data?.find((m) => m.fid === user.fid);
               unfollowedMembers.push({
                 fid: user.fid,
                 username: user.username,

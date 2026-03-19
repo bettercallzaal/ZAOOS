@@ -27,8 +27,7 @@ export function MessagesRoom() {
     activeConversationId,
     messages,
     loadingMessages,
-    connectedWallets,
-    autoConnect,
+    /* connectedWallets and autoConnect available via useXMTPContext when needed */
     selectConversation,
     sendMessage,
     createDm,
@@ -76,14 +75,7 @@ export function MessagesRoom() {
   }, [createGroup, selectConversation]);
 
   // Auto-dismiss action error toast
-  const [showActionToast, setShowActionToast] = useState(false);
-  useEffect(() => {
-    if (actionError) {
-      setShowActionToast(true);
-    } else {
-      setShowActionToast(false);
-    }
-  }, [actionError]);
+  const showActionToast = !!actionError;
 
   if (!user) return null;
 

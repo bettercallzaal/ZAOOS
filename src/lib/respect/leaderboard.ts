@@ -61,8 +61,8 @@ export interface LeaderboardResult {
  * Get the date a wallet first received any respect token (OG or ZOR)
  * by querying Transfer event logs on Optimism.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getFirstTokenDate(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   client: any,
   wallet: string
 ): Promise<string | null> {

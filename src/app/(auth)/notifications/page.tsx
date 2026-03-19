@@ -50,7 +50,9 @@ export default function NotificationsPage() {
     setLoading(false);
   }, [filter]);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- loading flag before async fetch is intentional */
   useEffect(() => { setLoading(true); fetchNotifications(); }, [fetchNotifications]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const markAllRead = async () => {
     await fetch('/api/notifications', {

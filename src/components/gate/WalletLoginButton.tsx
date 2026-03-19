@@ -76,12 +76,14 @@ export function WalletLoginButton() {
   }, [address, signMessageAsync, router, disconnect]);
 
   // When wallet connects, auto-trigger SIWE signing
+  /* eslint-disable react-hooks/set-state-in-effect -- auto-trigger SIWE on wallet connect */
   useEffect(() => {
     if (isConnected && address && !signingStarted && step === 'connecting') {
       setSigningStarted(true);
       handleSignIn();
     }
   }, [isConnected, address, signingStarted, step, handleSignIn]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleClick = () => {
     setError(null);

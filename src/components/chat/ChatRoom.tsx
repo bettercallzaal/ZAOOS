@@ -189,6 +189,7 @@ export function ChatRoom() {
   }, [user, walletXmtp.canConnect]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset filters on channel switch + fetch submissions for queue
+  /* eslint-disable react-hooks/set-state-in-effect -- resetting filters on channel switch is intentional */
   useEffect(() => {
     setContentFilter('all');
     setSortMode('newest');
@@ -197,6 +198,7 @@ export function ChatRoom() {
       .then((data) => setSongSubmissions(data.submissions || []))
       .catch(() => setSongSubmissions([]));
   }, [activeChannel]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Keyboard shortcuts
   const shortcutHandlers = useMemo(() => ({
@@ -226,11 +228,13 @@ export function ChatRoom() {
   }, [activeChannel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-open music sidebar on desktop when a track starts playing
+  /* eslint-disable react-hooks/set-state-in-effect -- syncing sidebar from player status */
   useEffect(() => {
     if (player.status === 'playing' && !isMobile) {
       setMusicSidebarOpen(true);
     }
   }, [player.status, isMobile]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!user) return null;
 

@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    let { primary_wallet, fid, role, real_name, ign, notes } = body;
+    const { primary_wallet, role, real_name, ign, notes } = body;
+    let { fid } = body;
     const { username: usernameInput } = body;
 
     // Resolve username to FID if provided
@@ -214,7 +215,7 @@ export async function PATCH(req: NextRequest) {
 
     // Admin-assigned ZID via sequence
     if (assign_zid) {
-      const { data: zidResult, error: zidErr } = await supabaseAdmin
+      const { error: zidErr } = await supabaseAdmin
         .rpc('assign_next_zid', { target_user_id: id });
       if (zidErr) {
         console.error('ZID assignment error:', zidErr);

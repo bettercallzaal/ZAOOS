@@ -86,7 +86,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
       audio.removeEventListener('error', onError);
       audioRef.current = null;
     };
-  }, [dispatch, registerController]);
+  }, [dispatch, registerController]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // React to new audio/soundxyz tracks
   useEffect(() => {

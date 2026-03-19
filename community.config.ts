@@ -50,6 +50,40 @@ export const communityConfig = {
     ],
   },
 
+  // ── Ecosystem Partners ──────────────────────────────────────
+  partners: [
+    {
+      name: 'MAGNETIQ',
+      description: 'Proof of Meet hub — verify real-world connections and earn attestations.',
+      url: 'https://app.magnetiq.xyz',
+      icon: 'magnet',
+    },
+    {
+      name: 'SongJam',
+      description: 'Mention leaderboard — track who talks about ZABAL across Farcaster.',
+      url: 'https://songjam.space/zabal',
+      icon: 'music',
+    },
+    {
+      name: 'Empire Builder',
+      description: 'Token empire rewards — stake and earn in the ZABAL ecosystem.',
+      url: 'https://empirebuilder.world',
+      icon: 'castle',
+    },
+    {
+      name: 'Incented',
+      description: 'Community campaigns — bounties and tasks that grow the ZAO.',
+      url: 'https://incented.co/organizations/zabal',
+      icon: 'rocket',
+    },
+    {
+      name: 'Clanker',
+      description: '$ZABAL token launcher — the origin of the community token.',
+      url: 'https://clanker.world',
+      icon: 'coin',
+    },
+  ],
+
   // ── Navigation Pillars ────────────────────────────────────────
   pillars: {
     social: { label: 'Social', icon: 'chat' },

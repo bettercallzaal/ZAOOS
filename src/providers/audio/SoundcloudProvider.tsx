@@ -116,7 +116,7 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
     }, 200);
 
     return () => clearInterval(interval);
-  }, [dispatch, registerController]);
+  }, [dispatch, registerController]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // React to new SoundCloud tracks
   useEffect(() => {

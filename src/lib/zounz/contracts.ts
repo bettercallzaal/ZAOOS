@@ -7,8 +7,11 @@
 
 import { parseAbi } from 'viem';
 
-// ZOUNZ Token contract on Base (from nouns.build URL)
+// ZOUNZ contracts on Base (from nouns.build)
 export const ZOUNZ_TOKEN = '0xCB80Ef04DA68667c9a4450013BDD69269842c883' as const;
+export const ZOUNZ_AUCTION = '0xb2d43035c1d8b84bc816a5044335340dbf214bfb' as const;
+export const ZOUNZ_GOVERNOR = '0x9d98ec4ba9f10c942932cbde7747a3448e56817f' as const;
+export const ZOUNZ_TREASURY = '0x2bb5fd99f870a38644deafe7e4ecb62ac77a213f' as const;
 
 // Nouns Builder Auction ABI (subset we need)
 export const auctionAbi = parseAbi([

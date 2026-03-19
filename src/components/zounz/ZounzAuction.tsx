@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { formatEther, parseEther, createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { ZOUNZ_TOKEN, tokenAbi, auctionAbi } from '@/lib/zounz/contracts';
+import { ZOUNZ_TOKEN, ZOUNZ_AUCTION, tokenAbi, auctionAbi } from '@/lib/zounz/contracts';
 
 interface AuctionState {
   tokenId: bigint;
@@ -56,7 +56,7 @@ function useCountdown(endTime: number) {
 export default function ZounzAuction() {
   const { address, isConnected } = useAccount();
   const [auction, setAuction] = useState<AuctionState | null>(null);
-  const [auctionAddress, setAuctionAddress] = useState<`0x${string}` | null>(null);
+  const [auctionAddress] = useState<`0x${string}`>(ZOUNZ_AUCTION);
   const [tokenMeta, setTokenMeta] = useState<TokenMeta | null>(null);
   const [bidAmount, setBidAmount] = useState('');
   const [loading, setLoading] = useState(true);
@@ -67,26 +67,9 @@ export default function ZounzAuction() {
   const { writeContract, data: txHash, isPending: isBidding, error: bidError } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
-  // Fetch auction contract address from token
-  const fetchAuctionAddress = useCallback(async () => {
-    try {
-      const addr = await client.readContract({
-        address: ZOUNZ_TOKEN,
-        abi: tokenAbi,
-        functionName: 'auction',
-      });
-      setAuctionAddress(addr as `0x${string}`);
-      return addr as `0x${string}`;
-    } catch (err) {
-      console.error('[zounz] Failed to get auction address:', err);
-      return null;
-    }
-  }, []);
-
   // Fetch current auction state
-  const fetchAuction = useCallback(async (auctionAddr?: `0x${string}` | null) => {
-    const addr = auctionAddr || auctionAddress;
-    if (!addr) return;
+  const fetchAuction = useCallback(async () => {
+    const addr = auctionAddress;
 
     try {
       const [auctionData, minIncrement, reserve] = await Promise.all([
@@ -147,10 +130,8 @@ export default function ZounzAuction() {
 
   // Initial load
   useEffect(() => {
-    fetchAuctionAddress().then((addr) => {
-      if (addr) fetchAuction(addr);
-    });
-  }, [fetchAuctionAddress, fetchAuction]);
+    fetchAuction();
+  }, [fetchAuction]);
 
   // Refresh auction every 15 seconds
   useEffect(() => {

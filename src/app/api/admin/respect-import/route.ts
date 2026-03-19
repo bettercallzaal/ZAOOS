@@ -169,7 +169,6 @@ export async function POST() {
     return NextResponse.json({ imported, errors: errors.length > 0 ? errors : [] });
   } catch (err) {
     console.error('Airtable import error:', err);
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return NextResponse.json({ error: `Import failed: ${message}` }, { status: 500 });
+    return NextResponse.json({ error: 'Import failed' }, { status: 500 });
   }
 }

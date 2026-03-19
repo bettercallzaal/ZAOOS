@@ -18,42 +18,47 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const unreadOnly = req.nextUrl.searchParams.get('unread_only') === 'true';
-  const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50', 10), 100);
-  const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
+  try {
+    const unreadOnly = req.nextUrl.searchParams.get('unread_only') === 'true';
+    const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50', 10), 100);
+    const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
 
-  let query = supabaseAdmin
-    .from('notifications')
-    .select('*', { count: 'exact' })
-    .eq('recipient_fid', session.fid)
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
+    let query = supabaseAdmin
+      .from('notifications')
+      .select('*', { count: 'exact' })
+      .eq('recipient_fid', session.fid)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
-  if (unreadOnly) {
-    query = query.eq('read', false);
-  }
+    if (unreadOnly) {
+      query = query.eq('read', false);
+    }
 
-  const { data, error, count: totalCount } = await query;
+    const { data, error, count: totalCount } = await query;
 
-  if (error) {
-    console.error('Notifications fetch error:', error);
+    if (error) {
+      console.error('Notifications fetch error:', error);
+      return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
+    }
+
+    // Also get unread count
+    const { count } = await supabaseAdmin
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('recipient_fid', session.fid)
+      .eq('read', false);
+
+    return NextResponse.json({
+      notifications: data || [],
+      unreadCount: count || 0,
+      total: totalCount ?? (data?.length || 0),
+      limit,
+      offset,
+    });
+  } catch (err) {
+    console.error('Notifications fetch error:', err);
     return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
   }
-
-  // Also get unread count
-  const { count } = await supabaseAdmin
-    .from('notifications')
-    .select('*', { count: 'exact', head: true })
-    .eq('recipient_fid', session.fid)
-    .eq('read', false);
-
-  return NextResponse.json({
-    notifications: data || [],
-    unreadCount: count || 0,
-    total: totalCount ?? (data?.length || 0),
-    limit,
-    offset,
-  });
 }
 
 /**

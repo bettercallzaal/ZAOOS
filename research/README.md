@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **76 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **77 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -18,6 +18,7 @@ Everything about the protocol ZAO OS is built on — how it works, who's buildin
 | [22](./22-farcaster-ecosystem-players/) | **Ecosystem Players & Leaderboards** | Top accounts, tokens (DEGEN/MOXIE/NOTES/CLANKER), mini apps, Purple DAO, analytics tools |
 | [34](./34-farcaster-clients-notifications/) | **All Farcaster Clients Compared** | 18+ clients — pros/cons, features, notification systems, competitive positioning |
 | [73](./73-farcaster-ecosystem-2026-update/) | **Farcaster Ecosystem Update (Mar 2026)** | Neynar acquires Farcaster, Snapchain live, 40-60K DAU, Mini Apps, CLANKER, competitive landscape, ZAO implications |
+| [76](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps SDK, Quick Auth, notifications, cast composition — ZAO OS as a Mini App (folder named 68- due to prior collision) |
 | [10](./10-hypersnap/) | **Hypersnap** | ⚠️ Incomplete — needs manual review |
 
 ---
@@ -153,7 +154,6 @@ How to use AI agents, skills, and autonomous loops to build and maintain ZAO OS.
 | [65](./65-zabal-partner-ecosystem/) | **ZABAL Partner Ecosystem** | MAGNETIQ (Proof of Meet), SongJam (leaderboard), Empire Builder (token rewards), Clanker (token launcher) — integration plans |
 | [67](./67-paperclip-ai-agent-company/) | **Paperclip AI: ZAO Agent Company** | Open-source agent orchestrator — org chart, budgets, heartbeats. 5 ZAO agents defined, full startup guide. |
 | [68](./68-alibaba-page-agent/) | **Alibaba Page Agent** | In-page AI copilot via DOM dehydration. Admin copilot potential for ZAO OS. Not yet — Phase 3. |
-| [68](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps spec, SDK integration, notification patterns |
 | [69](./69-claude-code-tips-best-practices/) | **Claude Code Tips & Best Practices** | 45 tips audited against ZAO OS setup. Gaps: no tests, no HANDOFF.md, no cc-safe. ZAO leads on research/skills. |
 | [70](./70-subagents-vs-agent-teams/) | **Sub-agents vs Agent Teams** | Two multi-agent paradigms + Claude Architect patterns + Cowork starter pack. Maps to Paperclip + Claude Code. |
 | [71](./71-paperclip-rate-limits-multi-agent/) | **Paperclip Rate Limits** | Multi-agent API key management, Anthropic tier limits, thundering herd fix, staggering strategies |
@@ -277,8 +277,8 @@ Start with [40 Audit Guide](./40-codebase-audit-guide/) + [38 AI Code Audit](./3
 
 ## Research Stats
 
-- **Total documents:** 76
+- **Total documents:** 77
 - **Total coverage:** ~300,000+ words
 - **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation
 - **Time span:** January — March 2026
-- **Status:** 75/76 complete, 1 incomplete (Hypersnap)
+- **Status:** 76/77 complete, 1 incomplete (Hypersnap)

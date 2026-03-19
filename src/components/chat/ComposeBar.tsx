@@ -15,7 +15,7 @@ export interface ReplyContext {
 
 interface ComposeBarProps {
   hasSigner: boolean;
-  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[], embedFid?: number) => Promise<void>;
+  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[], embedFid?: number, crossPostBluesky?: boolean) => Promise<void>;
   sending?: boolean;
   channel?: string;
   quotedCast?: QuotedCastData | null;
@@ -43,6 +43,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   const [text, setText] = useState('');
   const [showCrossPost, setShowCrossPost] = useState(false);
   const [crossPostChannels, setCrossPostChannels] = useState<Set<string>>(new Set());
+  const [crossPostBluesky, setCrossPostBluesky] = useState(false);
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionStart, setMentionStart] = useState(0);
   const [imagePreview, setImagePreview] = useState<{ url: string; file?: File } | null>(null);
@@ -107,12 +108,13 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
 
         const crossPost = crossPostChannels.size > 0 ? [...crossPostChannels] : undefined;
         const parentHash = replyTo?.hash || undefined;
-        await onSend(msg || ' ', parentHash, quotedCast?.hash, crossPost, embedUrls, quotedCast?.author.fid);
+        await onSend(msg || ' ', parentHash, quotedCast?.hash, crossPost, embedUrls, quotedCast?.author.fid, crossPostBluesky || undefined);
         setText('');
         removeImage();
         onClearQuote?.();
         onClearReply?.();
         setCrossPostChannels(new Set());
+        setCrossPostBluesky(false);
         setShowCrossPost(false);
       } catch (err) {
         setUploading(false);
@@ -362,6 +364,17 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                 {ch.label}
               </button>
             ))}
+            <button
+              onClick={() => setCrossPostBluesky(!crossPostBluesky)}
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                crossPostBluesky
+                  ? 'border-blue-400 bg-blue-400/10 text-blue-400'
+                  : 'border-gray-700 text-gray-400 hover:border-gray-500'
+              }`}
+              title="Cross-post to @thezao on Bluesky"
+            >
+              Bluesky
+            </button>
           </div>
         </div>
       )}
@@ -376,6 +389,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                   // Closing: clear selections too
                   setShowCrossPost(false);
                   setCrossPostChannels(new Set());
+                  setCrossPostBluesky(false);
                 } else {
                   setShowCrossPost(true);
                 }
@@ -391,9 +405,9 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
               </svg>
-              {crossPostChannels.size > 0 && (
+              {(crossPostChannels.size > 0 || crossPostBluesky) && (
                 <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-[#f5a623] text-[#0a1628] rounded-full text-[8px] font-bold flex items-center justify-center">
-                  {crossPostChannels.size}
+                  {crossPostChannels.size + (crossPostBluesky ? 1 : 0)}
                 </span>
               )}
             </button>
@@ -483,7 +497,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
               </svg>
             )}
-            {sending ? 'Sending' : crossPostChannels.size > 0 ? `Post (${crossPostChannels.size + 1})` : 'Post'}
+            {sending ? 'Sending' : (crossPostChannels.size > 0 || crossPostBluesky) ? `Post (${crossPostChannels.size + (crossPostBluesky ? 1 : 0) + 1})` : 'Post'}
           </button>
         </div>
         {!hasSigner && (

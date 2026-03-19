@@ -95,14 +95,14 @@ export function useChat(channel: string = 'zao') {
 
   const clearSendError = useCallback(() => setSendError(null), []);
 
-  const sendMessage = useCallback(async (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[], embedFid?: number) => {
+  const sendMessage = useCallback(async (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[], embedFid?: number, crossPostBluesky?: boolean) => {
     setSending(true);
     setSendError(null);
     try {
       const res = await fetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels }),
+        body: JSON.stringify({ text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels, crossPostBluesky: crossPostBluesky || undefined }),
       });
       if (!res.ok) {
         const data = await res.json();

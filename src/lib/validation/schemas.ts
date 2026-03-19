@@ -14,6 +14,7 @@ export const sendMessageSchema = z.object({
   embedUrls: z.array(z.string().url()).max(2).optional(), // image/link embeds
   channel: channelIdSchema.optional(),
   crossPostChannels: z.array(channelIdSchema).max(3).optional(), // post to multiple channels
+  crossPostBluesky: z.boolean().optional(), // cross-post to Bluesky
 });
 
 export const hideMessageSchema = z.object({

@@ -1,0 +1,17 @@
+iteration	vector	severity	owasp	stride	confidence	location	description
+0	-	-	-	-	-	-	baseline — 5 npm audit warnings (4 moderate, 1 high)
+1	CSP-weaknesses	High	A05	Tampering	Confirmed	next.config.ts:37	script-src allows unsafe-eval and unsafe-inline — weakens XSS protection
+2	SSRF-image-proxy	High	A10	InfoDisc	Likely	next.config.ts:21	next/image remotePatterns allows hostname: '**' — server-side image proxy can reach internal services
+3	input-validation	Medium	A03	Tampering	Confirmed	src/app/api/users/follow/route.ts:10	Follow/unfollow lacks Zod validation — uses raw typeof check only
+4	webhook-spoofing	Medium	A07	Spoofing	Confirmed	src/app/api/miniapp/webhook/route.ts:5	Mini app webhook has no HMAC verification — FID check only
+5	rate-limit-design	Medium	A04	DoS	Confirmed	src/lib/rate-limit.ts:6	In-memory rate limit store — not shared across instances, resets on restart
+6	nonce-replay	Medium	A07	Spoofing	Likely	src/app/api/auth/verify/route.ts:14	In-memory nonce stores — nonce generated on instance A can't be verified on instance B
+7	audit-logging	Medium	A09	Repudiation	Confirmed	all-api-routes	No structured audit log — admin actions untraceable
+8	input-validation	Medium	A03	Tampering	Confirmed	src/app/api/music/submissions/route.ts:111	Song submission DELETE lacks Zod validation on id field
+9	access-control	Low	A01	EoP	Possible	src/lib/auth/session.ts:71	isAdmin cached at login — revoking admin FID doesn't take immediate effect
+10	ip-spoofing	Low	A04	DoS	Likely	src/middleware.ts:98	x-forwarded-for header used for rate limiting — spoofable on some platforms
+11	webhook-config	Low	A05	Spoofing	Confirmed	src/app/api/webhooks/neynar/route.ts:22	.env.example comment says 'skip verification' but code actually rejects — misleading
+12	vote-weight	Low	A04	Tampering	Possible	src/app/api/proposals/vote/route.ts:44	Vote weight based on current wallet — changeable between votes
+13	security-headers	Info	A05	-	Confirmed	src/middleware.ts	Missing X-XSS-Protection header (deprecated but noted)
+14	dependency-audit	Info	A06	-	Confirmed	package.json	5 npm audit findings: next CSRF/DoS, socket.io-parser, file-type
+15	xss-surface	-	A03	-	-	all-components	No dangerouslySetInnerHTML found — 0 XSS surface from direct injection

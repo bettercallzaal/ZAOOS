@@ -30,7 +30,7 @@ export async function GET(
         .maybeSingle(),
       supabaseAdmin
         .from('users')
-        .select('zid, primary_wallet, respect_wallet, bio, display_name, username, pfp_url')
+        .select('zid, primary_wallet, respect_wallet, bio, display_name, username, pfp_url, hidden_wallets')
         .eq('fid', targetFid)
         .eq('is_active', true)
         .maybeSingle(),
@@ -49,6 +49,7 @@ export async function GET(
 
     const allowlistRow = allowlistResult.data;
     const usersRow = usersResult.data;
+    const hiddenWallets: string[] = (usersRow?.hidden_wallets as string[]) ?? [];
 
     // Tally engagement from cached casts
     let totalLikes = 0;
@@ -66,9 +67,14 @@ export async function GET(
       }
     }
 
+    // Check if viewer is the profile owner (don't hide their own wallets from them)
+    const isOwner = session.fid === targetFid;
+    const ethAddresses = user.verified_addresses?.eth_addresses ?? [];
+
     return NextResponse.json({
       user: usersRow ? {
         ...usersRow,
+        hidden_wallets: undefined,
         fid: user.fid,
       } : null,
       fid: user.fid,
@@ -82,9 +88,11 @@ export async function GET(
       followerCount: user.follower_count ?? 0,
       followingCount: user.following_count ?? 0,
       powerBadge: user.power_badge ?? false,
-      custody_address: user.custody_address ?? null,
-      verified_addresses: { eth_addresses: user.verified_addresses?.eth_addresses ?? [] },
-      verifiedAddresses: user.verified_addresses?.eth_addresses ?? [],
+      custody_address: (!isOwner && hiddenWallets.includes('custody_address')) ? null : (user.custody_address ?? null),
+      verified_addresses: {
+        eth_addresses: (!isOwner && hiddenWallets.includes('verified_addresses')) ? [] : ethAddresses,
+      },
+      verifiedAddresses: (!isOwner && hiddenWallets.includes('verified_addresses')) ? [] : ethAddresses,
       viewerContext: user.viewer_context ?? null,
       isZaoMember: !!allowlistRow,
       zaoName: allowlistRow?.real_name || null,

@@ -9,7 +9,7 @@ async function fetchProfile(fid: number) {
       getUserByFid(fid),
       supabaseAdmin
         .from('users')
-        .select('zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name')
+        .select('zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name, bluesky_handle, bluesky_did')
         .eq('fid', fid)
         .eq('is_active', true)
         .maybeSingle(),
@@ -37,6 +37,7 @@ async function fetchProfile(fid: number) {
       custody_address: neynarUser?.custody_address || null,
       verified_addresses: neynarUser?.verified_addresses?.eth_addresses || [],
       created_at: dbResult.data?.created_at || null,
+      bluesky_handle: dbResult.data?.bluesky_handle || null,
     };
   } catch (err) {
     console.error('Failed to fetch profile for settings:', err);

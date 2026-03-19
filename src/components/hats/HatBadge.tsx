@@ -30,33 +30,60 @@ function setCache(wallet: string, roles: HatRole[]) {
   roleCache.set(wallet.toLowerCase(), { roles, ts: Date.now() });
 }
 
+// Role-based color mapping for visual distinction
+const ROLE_COLORS: Record<string, string> = {
+  ZAO: 'bg-[#f5a623]/15 text-[#f5a623] border-[#f5a623]/20',
+  Configurator: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  'Governance Council': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  'Governance Council Members': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+};
+const DEFAULT_ROLE_COLOR = 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/15';
+
+function getRoleColor(label: string): string {
+  return ROLE_COLORS[label] || DEFAULT_ROLE_COLOR;
+}
+
+type FetchState =
+  | { status: 'idle'; roles: HatRole[] }
+  | { status: 'loading'; roles: HatRole[] }
+  | { status: 'done'; roles: HatRole[] };
+
 export default function HatBadge({ walletAddress, compact = true, maxBadges = 3 }: HatBadgeProps) {
-  const [roles, setRoles] = useState<HatRole[]>([]);
-  const [loading, setLoading] = useState(false);
+  const isValid = walletAddress && /^0x[a-fA-F0-9]{40}$/.test(walletAddress);
+  const initialCached = isValid ? getCached(walletAddress) : null;
+  // Determine initial state: cached → done, valid uncached → loading, otherwise idle
+  const needsFetch = isValid && !initialCached;
+  const [state, setState] = useState<FetchState>(
+    initialCached
+      ? { status: 'done', roles: initialCached }
+      : needsFetch
+        ? { status: 'loading', roles: [] }
+        : { status: 'idle', roles: [] }
+  );
 
   useEffect(() => {
-    if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) return;
+    if (!isValid || getCached(walletAddress)) return;
 
-    const cached = getCached(walletAddress);
-    if (cached) {
-      setRoles(cached);
-      return;
-    }
+    let cancelled = false;
 
-    setLoading(true);
     fetch(`/api/hats/check?wallet=${walletAddress}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed');
         return res.json();
       })
       .then((data) => {
+        if (cancelled) return;
         const r: HatRole[] = data.roles || [];
-        setRoles(r);
         setCache(walletAddress, r);
+        setState({ status: 'done', roles: r });
       })
-      .catch(() => setRoles([]))
-      .finally(() => setLoading(false));
-  }, [walletAddress]);
+      .catch(() => { if (!cancelled) setState({ status: 'done', roles: [] }); });
+
+    return () => { cancelled = true; };
+  }, [walletAddress, isValid]);
+
+  const loading = state.status === 'loading';
+  const roles = state.roles;
 
   if (loading) {
     return (
@@ -75,7 +102,7 @@ export default function HatBadge({ walletAddress, compact = true, maxBadges = 3 
         {visible.map((role) => (
           <span
             key={role.hatId}
-            className="px-1.5 py-0.5 bg-[#f5a623]/10 text-[#f5a623] text-[10px] font-medium rounded-full whitespace-nowrap"
+            className={`px-1.5 py-0.5 text-[10px] font-medium rounded-full border whitespace-nowrap ${getRoleColor(role.label)}`}
             title={role.label}
           >
             {role.label}
@@ -93,7 +120,7 @@ export default function HatBadge({ walletAddress, compact = true, maxBadges = 3 
       {roles.map((role) => (
         <span
           key={role.hatId}
-          className="px-2 py-0.5 bg-[#f5a623]/10 text-[#f5a623] text-xs font-medium rounded-full"
+          className={`px-2 py-0.5 text-xs font-medium rounded-full border ${getRoleColor(role.label)}`}
         >
           {role.label}
         </span>

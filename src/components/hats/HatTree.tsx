@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 interface HatNode {
   id: string;
@@ -23,104 +23,193 @@ interface HatTreeResult {
   timestamp: number;
 }
 
-// Level-based colors for the tree
-const LEVEL_COLORS = [
-  { bg: 'bg-[#f5a623]/15', border: 'border-[#f5a623]/40', text: 'text-[#f5a623]', line: 'bg-[#f5a623]/30' },
-  { bg: 'bg-purple-500/10', border: 'border-purple-500/30', text: 'text-purple-400', line: 'bg-purple-500/20' },
-  { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400', line: 'bg-blue-500/20' },
-  { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', text: 'text-emerald-400', line: 'bg-emerald-500/20' },
+// Level-based accent colors
+const LEVEL_STYLES = [
+  { accent: 'text-[#f5a623]', bg: 'bg-[#f5a623]/10', border: 'border-[#f5a623]/30', dot: 'bg-[#f5a623]' },
+  { accent: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30', dot: 'bg-purple-400' },
+  { accent: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30', dot: 'bg-blue-400' },
+  { accent: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', dot: 'bg-emerald-400' },
 ];
 
-function getColors(level: number) {
-  return LEVEL_COLORS[Math.min(level, LEVEL_COLORS.length - 1)];
+function getStyle(depth: number) {
+  return LEVEL_STYLES[Math.min(depth, LEVEL_STYLES.length - 1)];
 }
 
-function HatNodeVisual({ node, depth = 0 }: { node: HatNode; depth?: number }) {
-  const [expanded, setExpanded] = useState(depth < 2);
-  const hasChildren = node.children.length > 0;
-  const colors = getColors(depth);
-  const isTopHat = depth === 0;
+function countNodes(node: HatNode): number {
+  return 1 + node.children.reduce((sum, c) => sum + countNodes(c), 0);
+}
+
+function countActiveWearers(node: HatNode): number {
+  return node.supply + node.children.reduce((sum, c) => sum + countActiveWearers(c), 0);
+}
+
+function matchesSearch(node: HatNode, query: string): boolean {
+  const q = query.toLowerCase();
+  if (node.label.toLowerCase().includes(q)) return true;
+  if (node.wearers.some((w) => w.toLowerCase().includes(q))) return true;
+  return node.children.some((c) => matchesSearch(c, q));
+}
+
+/** Format a wallet address for display */
+function shortAddr(addr: string) {
+  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+}
+
+/** Supply indicator with color coding */
+function SupplyBadge({ supply, max }: { supply: number; max: number }) {
+  const color =
+    supply >= max
+      ? 'text-red-400 bg-red-500/10'
+      : supply > 0
+        ? 'text-[#f5a623] bg-[#f5a623]/10'
+        : 'text-gray-500 bg-white/5';
 
   return (
-    <div className="flex flex-col items-center">
-      {/* Node card */}
-      <button
-        onClick={() => hasChildren && setExpanded(!expanded)}
-        className={`relative rounded-2xl border-2 transition-all ${colors.bg} ${colors.border} ${
-          hasChildren ? 'cursor-pointer hover:scale-[1.02]' : 'cursor-default'
-        } ${isTopHat ? 'px-6 py-4' : 'px-4 py-3'}`}
-      >
-        {/* Hat icon */}
-        <div className="flex items-center gap-2">
-          <span className={`${isTopHat ? 'text-2xl' : 'text-lg'}`}>
-            {isTopHat ? '\uD83C\uDFA9' : depth === 1 ? '\u2699\uFE0F' : '\uD83E\uDDE2'}
-          </span>
-          <div className="text-left">
-            <p className={`font-semibold ${colors.text} ${isTopHat ? 'text-base' : 'text-sm'}`}>
-              {node.label}
-            </p>
-            {node.supply > 0 && (
-              <p className="text-[10px] text-gray-400">
-                {node.supply} wearer{node.supply !== 1 ? 's' : ''} / {node.maxSupply} max
-              </p>
-            )}
-            {node.supply === 0 && (
-              <p className="text-[10px] text-gray-600">
-                {node.maxSupply > 0 ? `0 / ${node.maxSupply} max` : 'Empty'}
-              </p>
-            )}
+    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${color}`}>
+      {supply}/{max}
+    </span>
+  );
+}
+
+function TreeNode({
+  node,
+  depth = 0,
+  isLast = true,
+  parentLines = [],
+  hideEmpty,
+  searchQuery,
+}: {
+  node: HatNode;
+  depth?: number;
+  isLast?: boolean;
+  parentLines?: boolean[];
+  hideEmpty: boolean;
+  searchQuery: string;
+}) {
+  const [manualExpanded, setManualExpanded] = useState<boolean | null>(null);
+  const [showWearers, setShowWearers] = useState(false);
+  const style = getStyle(depth);
+  const isTopHat = depth === 0;
+
+  // Filter children based on settings
+  const visibleChildren = useMemo(() => {
+    let kids = node.children;
+    if (hideEmpty) {
+      kids = kids.filter((c) => c.supply > 0 || c.children.some((gc) => gc.supply > 0));
+    }
+    if (searchQuery) {
+      kids = kids.filter((c) => matchesSearch(c, searchQuery));
+    }
+    return kids;
+  }, [node.children, hideEmpty, searchQuery]);
+
+  const hasVisibleChildren = visibleChildren.length > 0;
+
+  // When searching, force expand nodes with matches; otherwise use manual or default
+  const expanded = searchQuery
+    ? hasVisibleChildren
+    : manualExpanded ?? depth < 2;
+
+  const toggleExpanded = () => setManualExpanded(expanded ? false : true);
+
+  return (
+    <div className={isTopHat ? '' : 'ml-1'}>
+      {/* Node row */}
+      <div className="flex items-start gap-0 group">
+        {/* Tree guide lines */}
+        {!isTopHat && (
+          <div className="flex items-start flex-shrink-0 select-none" aria-hidden>
+            {parentLines.map((showLine, i) => (
+              <span key={i} className="w-5 flex-shrink-0 inline-block h-full relative">
+                {showLine && (
+                  <span className="absolute left-2 top-0 bottom-0 w-px bg-gray-700/60" />
+                )}
+              </span>
+            ))}
+            <span className="w-5 flex-shrink-0 inline-flex items-start h-8 relative">
+              {/* Vertical line from parent */}
+              <span className={`absolute left-2 top-0 w-px bg-gray-700/60 ${isLast ? 'h-4' : 'h-full'}`} />
+              {/* Horizontal connector */}
+              <span className="absolute left-2 top-4 w-3 h-px bg-gray-700/60" />
+            </span>
           </div>
-        </div>
-
-        {/* Wearer count badge */}
-        {node.supply > 0 && (
-          <span className={`absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${colors.bg} ${colors.text} border ${colors.border}`}>
-            {node.supply}
-          </span>
         )}
 
-        {/* Inactive indicator */}
-        {!node.isActive && (
-          <span className="absolute -top-2 -left-2 w-5 h-5 rounded-full flex items-center justify-center text-[10px] bg-red-500/20 text-red-400 border border-red-500/30">
-            !
-          </span>
-        )}
-
-        {/* Expand indicator */}
-        {hasChildren && (
-          <div className={`mt-1.5 text-center text-[10px] ${colors.text} opacity-60`}>
-            {expanded ? '\u25B2' : `\u25BC ${node.children.length}`}
-          </div>
-        )}
-      </button>
-
-      {/* Connecting line down */}
-      {expanded && hasChildren && (
-        <>
-          <div className={`w-0.5 h-6 ${colors.line}`} />
-
-          {/* Horizontal bar connecting children */}
-          {node.children.length > 1 && (
-            <div className="relative w-full flex justify-center">
-              <div className={`h-0.5 ${getColors(depth + 1).line}`}
-                style={{ width: `${Math.min(90, node.children.length * 30)}%` }}
-              />
-            </div>
+        {/* Node content */}
+        <button
+          onClick={() => hasVisibleChildren && toggleExpanded()}
+          className={`flex items-center gap-2 min-w-0 flex-1 rounded-lg px-2.5 py-2 transition-colors text-left ${
+            hasVisibleChildren ? 'cursor-pointer hover:bg-white/[0.03]' : 'cursor-default'
+          } ${isTopHat ? 'py-3' : ''}`}
+        >
+          {/* Expand/collapse indicator */}
+          {hasVisibleChildren ? (
+            <span className={`text-[10px] w-4 flex-shrink-0 text-center ${style.accent} opacity-70`}>
+              {expanded ? '▼' : '▶'}
+            </span>
+          ) : (
+            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${style.dot} opacity-60 ml-1 mr-1`} />
           )}
 
-          {/* Children */}
-          <div className={`flex gap-3 overflow-x-auto pb-2 ${
-            node.children.length > 3 ? 'flex-wrap justify-center' : 'justify-center'
-          }`}>
-            {node.children.map((child) => (
-              <div key={child.id} className="flex flex-col items-center flex-shrink-0">
-                {/* Connecting line from horizontal bar to child */}
-                <div className={`w-0.5 h-4 ${getColors(depth + 1).line}`} />
-                <HatNodeVisual node={child} depth={depth + 1} />
-              </div>
-            ))}
-          </div>
-        </>
+          {/* Hat label */}
+          <span className={`font-medium truncate ${style.accent} ${isTopHat ? 'text-base' : 'text-sm'}`}>
+            {node.label}
+          </span>
+
+          {/* Inactive badge */}
+          {!node.isActive && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 flex-shrink-0">
+              inactive
+            </span>
+          )}
+
+          {/* Supply badge */}
+          <span className="flex-shrink-0 ml-auto">
+            <SupplyBadge supply={node.supply} max={node.maxSupply} />
+          </span>
+        </button>
+      </div>
+
+      {/* Wearer list (expandable) */}
+      {node.wearers.length > 0 && (
+        <div className={`${isTopHat ? 'ml-6' : ''}`} style={!isTopHat ? { marginLeft: `${(parentLines.length + 1) * 20 + 36}px` } : undefined}>
+          <button
+            onClick={() => setShowWearers(!showWearers)}
+            className="text-[10px] text-gray-500 hover:text-gray-400 transition-colors px-1 -mt-1 mb-0.5"
+          >
+            {showWearers ? 'hide wearers' : `${node.wearers.length} wearer${node.wearers.length !== 1 ? 's' : ''}`}
+          </button>
+          {showWearers && (
+            <div className="flex flex-wrap gap-1 mb-1 px-1">
+              {node.wearers.map((addr) => (
+                <span
+                  key={addr}
+                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${style.bg} ${style.accent}`}
+                  title={addr}
+                >
+                  {shortAddr(addr)}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Children */}
+      {expanded && hasVisibleChildren && (
+        <div>
+          {visibleChildren.map((child, i) => (
+            <TreeNode
+              key={child.id}
+              node={child}
+              depth={depth + 1}
+              isLast={i === visibleChildren.length - 1}
+              parentLines={isTopHat ? [] : [...parentLines, !isLast]}
+              hideEmpty={hideEmpty}
+              searchQuery={searchQuery}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
@@ -130,6 +219,8 @@ export default function HatTree() {
   const [tree, setTree] = useState<HatTreeResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hideEmpty, setHideEmpty] = useState(false);
 
   useEffect(() => {
     fetch('/api/hats/tree')
@@ -141,6 +232,14 @@ export default function HatTree() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  const stats = useMemo(() => {
+    if (!tree?.root) return null;
+    return {
+      totalRoles: countNodes(tree.root),
+      totalWearers: countActiveWearers(tree.root),
+    };
+  }, [tree]);
 
   if (loading) {
     return (
@@ -168,38 +267,58 @@ export default function HatTree() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header stats */}
+    <div className="space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between px-1">
         <div>
           <p className="text-xs text-gray-500 uppercase tracking-wider">ZAO Role Tree</p>
-          <p className="text-[10px] text-gray-600 mt-0.5">Tree {tree.treeId} on Optimism</p>
+          <p className="text-[10px] text-gray-600 mt-0.5">
+            Tree {tree.treeId} on Optimism &middot; {stats?.totalRoles} roles &middot; {stats?.totalWearers} wearers
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <p className="text-sm font-bold text-white">{tree.totalHats}</p>
-            <p className="text-[10px] text-gray-600">roles</p>
-          </div>
-          <a
-            href="https://app.hatsprotocol.xyz/trees/10/226"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] px-2 py-1 rounded-lg bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors"
-          >
-            View on Hats
-          </a>
-        </div>
+        <a
+          href="https://app.hatsprotocol.xyz/trees/10/226"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[10px] px-2 py-1 rounded-lg bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors flex-shrink-0"
+        >
+          View on Hats
+        </a>
       </div>
 
-      {/* Visual tree */}
-      <div className="overflow-x-auto">
-        <div className="min-w-fit py-4">
-          <HatNodeVisual node={tree.root} />
-        </div>
+      {/* Search + filter controls */}
+      <div className="flex items-center gap-2 px-1">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search roles or addresses..."
+          className="flex-1 bg-[#0d1b2a] text-white text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-800 focus:outline-none focus:border-[#f5a623]/40"
+        />
+        <button
+          onClick={() => setHideEmpty(!hideEmpty)}
+          className={`text-[10px] px-2.5 py-2 rounded-lg border transition-colors flex-shrink-0 ${
+            hideEmpty
+              ? 'bg-[#f5a623]/10 border-[#f5a623]/30 text-[#f5a623]'
+              : 'bg-[#0d1b2a] border-gray-800 text-gray-500 hover:text-gray-400'
+          }`}
+          title={hideEmpty ? 'Showing active roles only' : 'Show all roles'}
+        >
+          {hideEmpty ? 'Active only' : 'Show all'}
+        </button>
       </div>
 
-      <p className="text-xs text-gray-600 text-center">
-        Live on-chain data from Optimism. Tap a role to expand.
+      {/* Tree */}
+      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 px-3 py-3 overflow-hidden">
+        <TreeNode
+          node={tree.root}
+          hideEmpty={hideEmpty}
+          searchQuery={searchQuery}
+        />
+      </div>
+
+      <p className="text-[10px] text-gray-600 text-center">
+        Live on-chain data from Optimism. Tap a role to expand. Click wearer count to see addresses.
       </p>
     </div>
   );

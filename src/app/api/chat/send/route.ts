@@ -4,6 +4,7 @@ import { postCast } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { sendMessageSchema } from '@/lib/validation/schemas';
 import { sendNotification, createInAppNotification } from '@/lib/notifications';
+import { postToBluesky } from '@/lib/bluesky/client';
 import { communityConfig } from '@/../community.config';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
 
-    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels } = parsed.data;
+    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels, crossPostBluesky } = parsed.data;
     const primaryChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
 
     // Build list of channels to post to
@@ -90,6 +91,29 @@ export async function POST(req: NextRequest) {
           }
         })
       ).catch((err) => console.error('[notify]', err));
+    }
+
+    // Cross-post to Bluesky (fire and forget)
+    if (crossPostBluesky && !parentHash) {
+      // Always post to community @thezao account
+      postToBluesky(text, 'https://zaoos.com/chat')
+        .catch((err) => console.error('[bluesky/community]', err));
+
+      // Also post to user's personal Bluesky if connected
+      supabaseAdmin
+        .from('users')
+        .select('bluesky_handle, bluesky_app_password')
+        .eq('fid', session.fid)
+        .single()
+        .then(({ data: bskyUser }) => {
+          if (bskyUser?.bluesky_handle && bskyUser?.bluesky_app_password) {
+            return postToBluesky(text, 'https://zaoos.com/chat', {
+              handle: bskyUser.bluesky_handle,
+              appPassword: bskyUser.bluesky_app_password,
+            });
+          }
+        })
+        .catch((err) => console.error('[bluesky/personal]', err));
     }
 
     // Send push + in-app notifications (fire and forget)

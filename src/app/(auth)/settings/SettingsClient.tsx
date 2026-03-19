@@ -28,6 +28,7 @@ interface Profile {
   custody_address: string | null;
   verified_addresses: string[];
   created_at: string | null;
+  bluesky_handle: string | null;
 }
 
 interface SettingsClientProps {
@@ -44,6 +45,8 @@ function formatNumber(n: number): string {
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return n.toString();
 }
+
+type WalletKey = 'primary_wallet' | 'respect_wallet' | 'custody_address' | 'verified_addresses';
 
 interface MessagingPrefs {
   autoJoinGroup: boolean;
@@ -96,6 +99,11 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [prefsLoading, setPrefsLoading] = useState(true);
   const [prefsSaving, setPrefsSaving] = useState(false);
 
+  // Wallet visibility
+  const [hiddenWallets, setHiddenWallets] = useState<WalletKey[]>([]);
+  const [walletVisLoading, setWalletVisLoading] = useState(true);
+  const [walletVisSaving, setWalletVisSaving] = useState(false);
+
   // ZAO profile editing
   const [zaoFields, setZaoFields] = useState({
     display_name: '',
@@ -133,6 +141,16 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
       .finally(() => setPrefsLoading(false));
   }, [session?.fid]);
 
+  // Fetch wallet visibility
+  useEffect(() => {
+    if (!session?.fid) return;
+    fetch('/api/users/wallet-visibility')
+      .then((r) => r.ok ? r.json() : { hidden_wallets: [] })
+      .then((data) => setHiddenWallets(data.hidden_wallets ?? []))
+      .catch(() => {})
+      .finally(() => setWalletVisLoading(false));
+  }, [session?.fid]);
+
   // Fetch respect data
   useEffect(() => {
     if (!session?.fid) return;
@@ -165,6 +183,32 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
       setPrefsSaving(false);
     }
   }, [msgPrefs]);
+
+  const toggleWalletVisibility = useCallback(async (key: WalletKey) => {
+    const isHidden = hiddenWallets.includes(key);
+    const updated = isHidden
+      ? hiddenWallets.filter((k) => k !== key)
+      : [...hiddenWallets, key];
+    setHiddenWallets(updated);
+    setWalletVisSaving(true);
+    try {
+      const res = await fetch('/api/users/wallet-visibility', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hidden_wallets: updated }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setHiddenWallets(data.hidden_wallets);
+      } else {
+        setHiddenWallets(hiddenWallets);
+      }
+    } catch {
+      setHiddenWallets(hiddenWallets);
+    } finally {
+      setWalletVisSaving(false);
+    }
+  }, [hiddenWallets]);
 
   const saveZaoProfile = useCallback(async () => {
     setZaoSaving(true);
@@ -240,12 +284,53 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     return () => { script.remove(); };
   }, [hasSigner]);
 
+  // Bluesky connection state
+  const [blueskyHandle, setBlueskyHandle] = useState(profile?.bluesky_handle || null);
+  const [showBlueskyConnect, setShowBlueskyConnect] = useState(false);
+  const [bskyHandle, setBskyHandle] = useState('');
+  const [bskyAppPassword, setBskyAppPassword] = useState('');
+  const [bskyConnecting, setBskyConnecting] = useState(false);
+  const [bskyError, setBskyError] = useState('');
+
+  const connectBluesky = async () => {
+    if (!bskyHandle || !bskyAppPassword) return;
+    setBskyConnecting(true);
+    setBskyError('');
+    try {
+      const res = await fetch('/api/bluesky', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle: bskyHandle, appPassword: bskyAppPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setBlueskyHandle(data.handle);
+        setShowBlueskyConnect(false);
+        setBskyHandle('');
+        setBskyAppPassword('');
+      } else {
+        setBskyError(data.error || 'Failed to connect');
+      }
+    } catch {
+      setBskyError('Connection failed');
+    }
+    setBskyConnecting(false);
+  };
+
+  const disconnectBluesky = async () => {
+    try {
+      const res = await fetch('/api/bluesky', { method: 'DELETE' });
+      if (res.ok) setBlueskyHandle(null);
+    } catch { /* ignore */ }
+  };
+
   // Connection count for progress indicator
   const connections = [
     !!session?.walletAddress,
     !!session?.fid,
     !!session?.signerUuid,
     xmtpConnected,
+    !!blueskyHandle,
   ];
   const connectedCount = connections.filter(Boolean).length;
 
@@ -274,7 +359,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         <section>
           <div className="flex items-center justify-between px-1 mb-3">
             <p className="text-xs text-gray-500 uppercase tracking-wider">Connections</p>
-            <span className="text-[10px] text-gray-600">{connectedCount} of 4 connected</span>
+            <span className="text-[10px] text-gray-600">{connectedCount} of 5 connected</span>
           </div>
           <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
             <div className="space-y-3">
@@ -339,6 +424,62 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   )}
                 </div>
               </div>
+
+              {/* Bluesky */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${blueskyHandle ? 'bg-blue-400' : 'bg-gray-600'}`} />
+                  <span className="text-sm text-white">Bluesky</span>
+                </div>
+                {blueskyHandle ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-blue-400">@{blueskyHandle}</span>
+                    <button
+                      onClick={disconnectBluesky}
+                      className="text-[10px] text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowBlueskyConnect(!showBlueskyConnect)}
+                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    Connect
+                  </button>
+                )}
+              </div>
+
+              {/* Bluesky connect form */}
+              {showBlueskyConnect && !blueskyHandle && (
+                <div className="bg-[#0a1628] rounded-lg p-3 space-y-2 border border-gray-700">
+                  <p className="text-[10px] text-gray-500">
+                    Create an App Password at bsky.app/settings/app-passwords
+                  </p>
+                  <input
+                    value={bskyHandle}
+                    onChange={(e) => setBskyHandle(e.target.value)}
+                    placeholder="yourname.bsky.social"
+                    className="w-full bg-[#1a2a3a] text-white text-xs rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  />
+                  <input
+                    value={bskyAppPassword}
+                    onChange={(e) => setBskyAppPassword(e.target.value)}
+                    placeholder="App Password (xxxx-xxxx-xxxx-xxxx)"
+                    type="password"
+                    className="w-full bg-[#1a2a3a] text-white text-xs rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  />
+                  {bskyError && <p className="text-[10px] text-red-400">{bskyError}</p>}
+                  <button
+                    onClick={connectBluesky}
+                    disabled={bskyConnecting || !bskyHandle || !bskyAppPassword}
+                    className="w-full text-xs font-medium py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-400 disabled:opacity-50 transition-colors"
+                  >
+                    {bskyConnecting ? 'Verifying...' : 'Connect Bluesky'}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -728,6 +869,23 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 <p className="text-sm text-white font-mono truncate">{profile.primary_wallet || 'Not set'}</p>
               </div>
               {profile.primary_wallet && <CopyButton text={profile.primary_wallet} />}
+              <button
+                onClick={() => toggleWalletVisibility('primary_wallet')}
+                disabled={walletVisLoading || walletVisSaving}
+                className="ml-1 p-1 rounded hover:bg-white/5 transition-colors disabled:opacity-50"
+                title={hiddenWallets.includes('primary_wallet') ? 'Hidden from profile' : 'Visible on profile'}
+              >
+                {hiddenWallets.includes('primary_wallet') ? (
+                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                )}
+              </button>
             </div>
 
             {/* Respect wallet */}
@@ -743,6 +901,23 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   <p className="text-sm text-white font-mono truncate">{profile.respect_wallet}</p>
                 </div>
                 <CopyButton text={profile.respect_wallet} />
+                <button
+                  onClick={() => toggleWalletVisibility('respect_wallet')}
+                  disabled={walletVisLoading || walletVisSaving}
+                  className="ml-1 p-1 rounded hover:bg-white/5 transition-colors disabled:opacity-50"
+                  title={hiddenWallets.includes('respect_wallet') ? 'Hidden from profile' : 'Visible on profile'}
+                >
+                  {hiddenWallets.includes('respect_wallet') ? (
+                    <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  )}
+                </button>
               </div>
             )}
 
@@ -759,13 +934,49 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   <p className="text-sm text-white font-mono truncate">{profile.custody_address}</p>
                 </div>
                 <CopyButton text={profile.custody_address} />
+                <button
+                  onClick={() => toggleWalletVisibility('custody_address')}
+                  disabled={walletVisLoading || walletVisSaving}
+                  className="ml-1 p-1 rounded hover:bg-white/5 transition-colors disabled:opacity-50"
+                  title={hiddenWallets.includes('custody_address') ? 'Hidden from profile' : 'Visible on profile'}
+                >
+                  {hiddenWallets.includes('custody_address') ? (
+                    <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  )}
+                </button>
               </div>
             )}
 
             {/* Verified addresses */}
             {profile.verified_addresses.length > 0 && (
               <div className="px-5 py-4">
-                <p className="text-xs text-gray-500 mb-2">Verified Addresses</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs text-gray-500">Verified Addresses</p>
+                  <button
+                    onClick={() => toggleWalletVisibility('verified_addresses')}
+                    disabled={walletVisLoading || walletVisSaving}
+                    className="p-1 rounded hover:bg-white/5 transition-colors disabled:opacity-50"
+                    title={hiddenWallets.includes('verified_addresses') ? 'Hidden from profile' : 'Visible on profile'}
+                  >
+                    {hiddenWallets.includes('verified_addresses') ? (
+                      <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
                 <div className="space-y-2">
                   {profile.verified_addresses.map((addr) => (
                     <div key={addr} className="flex items-center justify-between">
@@ -776,6 +987,13 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 </div>
               </div>
             )}
+
+            {/* Visibility hint */}
+            <div className="px-5 py-3">
+              <p className="text-[10px] text-gray-600">
+                Toggle the eye icon to show or hide each wallet on your public profile. Hidden wallets are still visible to you here.
+              </p>
+            </div>
           </div>
         </section>
 

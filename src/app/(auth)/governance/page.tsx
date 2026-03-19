@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import dynamic from 'next/dynamic';
 
 const HatTree = dynamic(() => import('@/components/hats/HatTree'), { ssr: false });
+const HatManager = dynamic(() => import('@/components/hats/HatManager'), { ssr: false });
 
 interface RespectEntry {
   rank: number;
@@ -74,7 +75,7 @@ export default function GovernancePage() {
   const [loading, setLoading] = useState(true);
   const [proposalsLoading, setProposalsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [tab, setTab] = useState<'overview' | 'proposals' | 'roles'>('overview');
+  const [tab, setTab] = useState<'overview' | 'proposals' | 'roles' | 'manage'>('overview');
 
   // Create proposal state
   const [showCreate, setShowCreate] = useState(false);
@@ -212,6 +213,16 @@ export default function GovernancePage() {
           >
             Proposals{proposals.filter((p) => p.status === 'open').length > 0 && ` (${proposals.filter((p) => p.status === 'open').length})`}
           </button>
+          {isAdmin && (
+            <button
+              onClick={() => setTab('manage')}
+              className={`flex-1 text-xs font-medium py-2 rounded-lg transition-colors ${
+                tab === 'manage' ? 'bg-[#f5a623]/10 text-[#f5a623]' : 'text-gray-500 hover:text-white'
+              }`}
+            >
+              Manage
+            </button>
+          )}
         </div>
       </header>
 
@@ -379,6 +390,10 @@ export default function GovernancePage() {
 
         {tab === 'roles' && (
           <HatTree />
+        )}
+
+        {tab === 'manage' && isAdmin && (
+          <HatManager />
         )}
 
         {tab === 'proposals' && (

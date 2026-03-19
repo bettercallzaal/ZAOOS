@@ -26,6 +26,13 @@ export const csvRowSchema = z.object({
   wallet_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
 });
 
+export const communityIssueSchema = z.object({
+  title: z.string().trim().min(5, 'Title must be at least 5 characters').max(200),
+  description: z.string().trim().min(10, 'Please describe the issue in detail').max(5000),
+  type: z.enum(['bug', 'feature', 'improvement', 'question']),
+  priority: z.enum(['low', 'medium', 'high']).default('medium'),
+});
+
 export const allowlistEntrySchema = z.object({
   fid: z.number().int().positive().optional(),
   wallet_address: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),

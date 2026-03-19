@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { IssueSubmitForm } from '@/components/community/IssueSubmitForm';
 
 export default function ContributePage() {
   return (
@@ -96,12 +97,21 @@ export default function ContributePage() {
           </a>
         </div>
 
+        {/* Submit Issue */}
+        <div className="bg-[#0d1b2a]/50 rounded-xl p-5 border border-gray-800">
+          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Submit an Issue</p>
+          <p className="text-sm text-gray-400 mb-4">
+            Report bugs, request features, or suggest improvements. Issues go directly to the ZAO AI team for triage.
+          </p>
+          <IssueSubmitForm />
+        </div>
+
         {/* Build in Public */}
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
           <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Build in Public</p>
           <p className="text-sm text-gray-400">
             ZAO OS is built transparently. Every decision, every line of code, documented and shared.
-            71 research docs and counting.
+            74 research docs and counting.
           </p>
         </div>
       </div>

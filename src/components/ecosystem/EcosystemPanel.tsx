@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { communityConfig } from '@/../community.config';
+
+const ZounzAuction = dynamic(() => import('@/components/zounz/ZounzAuction'), { ssr: false });
 
 const ICON_MAP: Record<string, string> = {
   magnet: '\uD83E\uDDF2',
@@ -19,6 +22,7 @@ const EMBED_URLS: Record<string, string> = {
   'Incented': 'https://incented.co/organizations/zabal',
   'MAGNETIQ': 'https://app.magnetiq.xyz',
   'Clanker': 'https://clanker.world',
+  'ZOUNZ': 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883',
 };
 
 export default function EcosystemPanel() {
@@ -27,6 +31,12 @@ export default function EcosystemPanel() {
 
   return (
     <div className="space-y-3">
+      {/* ZOUNZ Auction — Featured */}
+      <div className="mb-4">
+        <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">ZOUNZ Auction</p>
+        <ZounzAuction />
+      </div>
+
       <div className="mb-2">
         <p className="text-xs text-gray-500 uppercase tracking-wider px-1">ZABAL Partner Apps</p>
         <p className="text-xs text-gray-600 px-1 mt-1">Tap a partner to open their ZABAL integration inline.</p>

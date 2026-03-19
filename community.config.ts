@@ -89,7 +89,20 @@ export const communityConfig = {
       url: 'https://clanker.world',
       icon: 'coin',
     },
+    {
+      name: 'ZOUNZ',
+      description: 'ZABAL Nouns DAO — daily NFT auctions funding the community treasury on Base.',
+      url: 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883',
+      icon: 'nouns',
+    },
   ],
+
+  // ── ZOUNZ / Nouns Builder DAO (Base) ───────────────────────
+  zounz: {
+    tokenContract: '0xCB80Ef04DA68667c9a4450013BDD69269842c883' as `0x${string}`,
+    chain: 'base' as const,
+    nounsBuilderUrl: 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883',
+  },
 
   // ── Navigation Pillars ────────────────────────────────────────
   pillars: {

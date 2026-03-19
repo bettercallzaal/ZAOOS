@@ -1,0 +1,105 @@
+'use client';
+
+import { useState } from 'react';
+import { communityConfig } from '@/../community.config';
+
+const ICON_MAP: Record<string, string> = {
+  magnet: '\uD83E\uDDF2',
+  music: '\uD83C\uDFB5',
+  castle: '\uD83C\uDFF0',
+  rocket: '\uD83D\uDE80',
+  coin: '\uD83E\uDE99',
+  nouns: '\u2302',
+};
+
+// Direct ZABAL-specific URLs for iframe embeds
+const EMBED_URLS: Record<string, string> = {
+  'SongJam': 'https://songjam.space/zabal',
+  'Empire Builder': 'https://empirebuilder.world/profile/0x7234c36A71ec237c2Ae7698e8916e0735001E9Af',
+  'Incented': 'https://incented.co/organizations/zabal',
+  'MAGNETIQ': 'https://app.magnetiq.xyz',
+  'Clanker': 'https://clanker.world',
+};
+
+export default function EcosystemPanel() {
+  const { partners } = communityConfig;
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  return (
+    <div className="space-y-3">
+      <div className="mb-2">
+        <p className="text-xs text-gray-500 uppercase tracking-wider px-1">ZABAL Partner Apps</p>
+        <p className="text-xs text-gray-600 px-1 mt-1">Tap a partner to open their ZABAL integration inline.</p>
+      </div>
+
+      {partners.map((partner) => {
+        const isExpanded = expanded === partner.name;
+        const embedUrl = EMBED_URLS[partner.name] || partner.url;
+
+        return (
+          <div
+            key={partner.name}
+            className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden transition-all"
+          >
+            <button
+              onClick={() => setExpanded(isExpanded ? null : partner.name)}
+              className="w-full p-4 flex items-center gap-3 text-left hover:bg-[#0d1b2a]/80 transition-colors"
+            >
+              <span className="text-2xl">{ICON_MAP[partner.icon] || '\uD83D\uDD17'}</span>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-white">{partner.name}</h3>
+                <p className="text-xs text-gray-400 truncate">{partner.description}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={embedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-[10px] text-[#f5a623]/60 hover:text-[#f5a623] transition-colors"
+                >
+                  Open
+                </a>
+                <svg
+                  className={`w-4 h-4 text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </button>
+
+            {isExpanded && (
+              <div className="border-t border-gray-800">
+                <div className="relative w-full bg-[#0a1628]" style={{ height: '70vh', minHeight: '400px' }}>
+                  <iframe
+                    src={embedUrl}
+                    title={`${partner.name} — ZABAL Integration`}
+                    className="w-full h-full border-0"
+                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation-by-user-activation"
+                    loading="lazy"
+                    allow="clipboard-write"
+                  />
+                </div>
+                <div className="flex items-center justify-between px-4 py-2 bg-[#0d1b2a] border-t border-gray-800">
+                  <p className="text-[10px] text-gray-600 truncate">{embedUrl.replace('https://', '')}</p>
+                  <a
+                    href={embedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
+                  >
+                    Open in new tab
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}

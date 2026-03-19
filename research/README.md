@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **77 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **79 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -18,7 +18,7 @@ Everything about the protocol ZAO OS is built on — how it works, who's buildin
 | [22](./22-farcaster-ecosystem-players/) | **Ecosystem Players & Leaderboards** | Top accounts, tokens (DEGEN/MOXIE/NOTES/CLANKER), mini apps, Purple DAO, analytics tools |
 | [34](./34-farcaster-clients-notifications/) | **All Farcaster Clients Compared** | 18+ clients — pros/cons, features, notification systems, competitive positioning |
 | [73](./73-farcaster-ecosystem-2026-update/) | **Farcaster Ecosystem Update (Mar 2026)** | Neynar acquires Farcaster, Snapchain live, 40-60K DAU, Mini Apps, CLANKER, competitive landscape, ZAO implications |
-| [76](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps SDK, Quick Auth, notifications, cast composition — ZAO OS as a Mini App (folder named 68- due to prior collision) |
+| [78](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps SDK, Quick Auth, notifications, cast composition — ZAO OS as a Mini App (folder named 68- due to prior collision) |
 | [10](./10-hypersnap/) | **Hypersnap** | ⚠️ Incomplete — needs manual review |
 
 ---
@@ -71,6 +71,7 @@ On-chain identity, community roles, DAO structure, token economics, and legal co
 | [58](./58-respect-deep-dive/) | **Respect Deep Dive** | On-chain token data, scoring math, orclient SDK integration |
 | [59](./59-hats-tree-integration/) | **Hats Tree Integration** | Hats Protocol tree structure for ZAO roles |
 | [75](./75-hats-protocol-v2-updates/) | **Hats Protocol V2 Updates** | New eligibility modules, HSG v2, subgraph SDK v1.0.0, MCP server for AI, ERC-6551 accounts |
+| [78](./78-nouns-builder-integration/) | **Nouns Builder Integration** | Daily NFT auctions, 5-contract DAO suite, builder-template-app (MIT/Next.js), builder-farcaster, iframe/embed options for ZABAL DAO |
 
 ---
 
@@ -158,6 +159,7 @@ How to use AI agents, skills, and autonomous loops to build and maintain ZAO OS.
 | [70](./70-subagents-vs-agent-teams/) | **Sub-agents vs Agent Teams** | Two multi-agent paradigms + Claude Architect patterns + Cowork starter pack. Maps to Paperclip + Claude Code. |
 | [71](./71-paperclip-rate-limits-multi-agent/) | **Paperclip Rate Limits** | Multi-agent API key management, Anthropic tier limits, thundering herd fix, staggering strategies |
 | [72](./72-paperclip-functionality-deep-dive/) | **Paperclip Functionality Deep Dive** | Full agent lifecycle, 9-step heartbeat, adapter config, "Standing By" root cause + fix, CLI reference |
+| [76](./76-git-branching-ai-agents/) | **Git Branching for AI Agents** | Trunk-based dev with Paperclip agents, short-lived branches, merge strategy for solo founder + AI |
 
 ---
 
@@ -277,8 +279,8 @@ Start with [40 Audit Guide](./40-codebase-audit-guide/) + [38 AI Code Audit](./3
 
 ## Research Stats
 
-- **Total documents:** 77
+- **Total documents:** 79
 - **Total coverage:** ~300,000+ words
 - **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation
 - **Time span:** January — March 2026
-- **Status:** 76/77 complete, 1 incomplete (Hypersnap)
+- **Status:** 78/79 complete, 1 incomplete (Hypersnap)

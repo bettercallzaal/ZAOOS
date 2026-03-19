@@ -277,3 +277,41 @@ Minimum viable cross-post: text (truncated per platform) + link + 1 image.
 | `@hiveio/dhive` | Hive |
 | `twitter-api-v2` | X/Twitter |
 | `bullmq` + `ioredis` | Message queue for fan-out |
+
+---
+
+## Sprint 8 — Nouns Builder / ZABAL DAO Integration
+
+**Dependencies:** Ecosystem tab (done), ZABAL Nouns Builder DAO created on nouns.build
+**Research:** Doc 78 (Nouns Builder Integration)
+
+### Phase 1: Iframe Embed (Quick Win)
+- Add ZABAL Nouns Builder URL to `community.config.ts` partners
+- Members can view auctions and bid from the Ecosystem tab
+- No custom code — just iframe
+
+### Phase 2: Native Auction Widget
+- Build custom auction component using Wagmi + Viem (already in stack)
+- Read auction state from Builder Auction contract
+- Display current bid, time remaining, bid history
+- Allow bidding directly from ZAO OS (wallet already connected)
+- Show treasury balance
+
+### Phase 3: Governance Integration
+- Connect Builder Governor proposals to ZAO governance tab
+- Show ZABAL DAO proposals alongside respect-weighted proposals
+- Link NFT ownership to additional governance weight
+
+### Key Contracts (per Builder DAO)
+| Contract | Purpose |
+|----------|---------|
+| Token | ERC-721 NFT with voting power |
+| Auction | Continuous English auctions |
+| Governor | Proposal + voting (basis-point thresholds) |
+| Treasury | Timelock for executing approved proposals |
+| MetadataRenderer | On-chain NFT artwork |
+
+### Relevant Repos
+- `github.com/BuilderOSS/builder-template-app` — MIT, Next.js, white-label frontend
+- `github.com/BuilderOSS/nouns-builder` — monorepo with SDK, hooks, design system
+- `github.com/BuilderOSS/builder-farcaster` — Farcaster integration (directly relevant)

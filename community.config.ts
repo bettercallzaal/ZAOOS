@@ -37,6 +37,13 @@ export const communityConfig = {
     chain: 'optimism' as const,
   },
 
+  // ── Hats Protocol (Optimism) ─────────────────────────────────
+  hats: {
+    contractAddress: '0x3bc1A0Ad72417f2d411118085256fC53CBdDd137' as `0x${string}`,
+    treeId: 226,
+    chain: 'optimism' as const,
+  },
+
   // ── Music / Radio ────────────────────────────────────────────
   music: {
     radioName: 'ZAO Radio',

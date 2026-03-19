@@ -16,6 +16,7 @@
     "@farcaster/auth-kit": "^0.8.2",
     "@farcaster/miniapp-sdk": "^0.2.3",
     "@farcaster/quick-auth": "^0.0.8",
+    "@hatsprotocol/sdk-v1-core": "^0.12.4",
     "@neynar/nodejs-sdk": "^3.137.0",
     "@neynar/react": "^1.2.22",
     "@rainbow-me/rainbowkit": "^2.2.10",

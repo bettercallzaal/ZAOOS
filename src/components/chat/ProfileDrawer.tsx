@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import HatBadge from '@/components/hats/HatBadge';
 
 interface ProfileData {
   fid: number;
@@ -186,6 +187,12 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                 <p className="text-sm text-gray-500 mt-0.5">@{profile.username}</p>
                 {profile.zaoName && profile.zaoName !== profile.displayName && (
                   <p className="text-xs text-gray-600 mt-1">{profile.zaoName}</p>
+                )}
+                {/* Hat role badges */}
+                {profile.verifiedAddresses.length > 0 && (
+                  <div className="mt-2">
+                    <HatBadge walletAddress={profile.verifiedAddresses[0]} compact={false} />
+                  </div>
                 )}
               </div>
 

@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { ProposalComments } from '@/components/governance/ProposalComments';
 import { useAuth } from '@/hooks/useAuth';
+import dynamic from 'next/dynamic';
+
+const HatTree = dynamic(() => import('@/components/hats/HatTree'), { ssr: false });
 
 interface RespectEntry {
   rank: number;
@@ -71,7 +74,7 @@ export default function GovernancePage() {
   const [loading, setLoading] = useState(true);
   const [proposalsLoading, setProposalsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [tab, setTab] = useState<'overview' | 'proposals'>('overview');
+  const [tab, setTab] = useState<'overview' | 'proposals' | 'roles'>('overview');
 
   // Create proposal state
   const [showCreate, setShowCreate] = useState(false);
@@ -192,6 +195,14 @@ export default function GovernancePage() {
             }`}
           >
             Respect Overview
+          </button>
+          <button
+            onClick={() => setTab('roles')}
+            className={`flex-1 text-xs font-medium py-2 rounded-lg transition-colors ${
+              tab === 'roles' ? 'bg-[#f5a623]/10 text-[#f5a623]' : 'text-gray-500 hover:text-white'
+            }`}
+          >
+            Roles
           </button>
           <button
             onClick={() => setTab('proposals')}
@@ -364,6 +375,10 @@ export default function GovernancePage() {
               Live onchain data from Optimism. Refreshes every 5 minutes.
             </p>
           </>
+        )}
+
+        {tab === 'roles' && (
+          <HatTree />
         )}
 
         {tab === 'proposals' && (

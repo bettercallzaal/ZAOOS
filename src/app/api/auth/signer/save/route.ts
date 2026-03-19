@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     // Verify with Neynar that the signer actually belongs to this user's FID
     const signerStatus = await getSignerStatus(parsed.data.signerUuid);
-    if (signerStatus.fid && signerStatus.fid !== sessionData.fid) {
+    if (!signerStatus.fid || signerStatus.fid !== sessionData.fid) {
       return NextResponse.json(
         { error: 'Signer does not belong to this user' },
         { status: 403 }

@@ -19,7 +19,6 @@ const MAX_NONCES = 10_000;
 const nonceStore = new Map<string, number>(); // nonce → created timestamp
 
 function pruneNonces() {
-  if (nonceStore.size <= MAX_NONCES) return;
   const now = Date.now();
   for (const [n, ts] of nonceStore) {
     if (now - ts > NONCE_TTL) nonceStore.delete(n);
@@ -118,12 +117,15 @@ export async function POST(req: NextRequest) {
     try {
       const wallet = (primaryWallet || '').toLowerCase();
       if (wallet) {
-        // Check if this is a first-time login (no existing last_login_at)
+        // Check for existing user THEN upsert — single read avoids the old
+        // separate-query race where concurrent logins could both see null
         const { data: existingUser } = await supabaseAdmin
           .from('users')
           .select('last_login_at')
           .eq('primary_wallet', wallet)
-          .single();
+          .maybeSingle();
+
+        const isFirstLogin = !existingUser?.last_login_at;
 
         await supabaseAdmin.from('users').upsert(
           {
@@ -138,11 +140,11 @@ export async function POST(req: NextRequest) {
             role: 'member',
             last_login_at: new Date().toISOString(),
           },
-          { onConflict: 'primary_wallet' }
+          { onConflict: 'primary_wallet', ignoreDuplicates: false }
         );
 
         // Notify admins on first-time member login (fire and forget)
-        if (!existingUser?.last_login_at) {
+        if (isFirstLogin) {
           const adminFids = communityConfig.adminFids || [];
           if (adminFids.length > 0) {
             createInAppNotification({

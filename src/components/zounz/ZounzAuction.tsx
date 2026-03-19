@@ -61,8 +61,8 @@ export default function ZounzAuction() {
   const [bidAmount, setBidAmount] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [minBidIncrement, setMinBidIncrement] = useState(10n);
-  const [reservePrice, setReservePrice] = useState(0n);
+  const [minBidIncrement, setMinBidIncrement] = useState(BigInt(10));
+  const [reservePrice, setReservePrice] = useState(BigInt(0));
 
   const { writeContract, data: txHash, isPending: isBidding, error: bidError } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
@@ -82,12 +82,12 @@ export default function ZounzAuction() {
           address: addr,
           abi: auctionAbi,
           functionName: 'minBidIncrement',
-        }).catch(() => 10n),
+        }).catch(() => BigInt(10)),
         client.readContract({
           address: addr,
           abi: auctionAbi,
           functionName: 'reservePrice',
-        }).catch(() => 0n),
+        }).catch(() => BigInt(0)),
       ]);
 
       const [tokenId, highestBid, highestBidder, startTime, endTime, settled] = auctionData as [bigint, bigint, string, number, number, boolean];
@@ -152,10 +152,10 @@ export default function ZounzAuction() {
   const isEnded = auction ? auction.endTime * 1000 < Date.now() : false;
 
   const minNextBid = auction
-    ? auction.highestBid > 0n
-      ? auction.highestBid + (auction.highestBid * minBidIncrement) / 100n
-      : reservePrice > 0n ? reservePrice : parseEther('0.001')
-    : 0n;
+    ? auction.highestBid > BigInt(0)
+      ? auction.highestBid + (auction.highestBid * minBidIncrement) / BigInt(100)
+      : reservePrice > BigInt(0) ? reservePrice : parseEther('0.001')
+    : BigInt(0);
 
   const handleBid = () => {
     if (!auctionAddress || !auction || !bidAmount) return;

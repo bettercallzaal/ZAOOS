@@ -74,6 +74,13 @@ export function useXMTPContext() {
   return ctx;
 }
 
+/** Safe version that returns disconnected defaults when outside XMTPProvider. */
+export function useXMTPContextSafe(): Pick<XMTPContextValue, 'isConnected' | 'activeXMTPAddress' | 'switchWallet'> {
+  const ctx = useContext(XMTPContext);
+  if (!ctx) return { isConnected: false, activeXMTPAddress: null, switchWallet: () => {} };
+  return ctx;
+}
+
 /**
  * Check if a message is displayable text.
  * Logs dropped messages to help debug missing content.

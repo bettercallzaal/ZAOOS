@@ -4,17 +4,24 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { useXMTPContext } from '@/contexts/XMTPContext';
+import { useXMTPContextSafe } from '@/contexts/XMTPContext';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import type { SessionData } from '@/types';
 
 interface Profile {
   fid: number;
   zid: number | null;
-  display_name: string | null;
+  fc_display_name: string | null;
   username: string | null;
   pfp_url: string | null;
-  bio: string | null;
+  fc_bio: string | null;
+  follower_count: number;
+  following_count: number;
+  power_badge: boolean;
+  zao_display_name: string;
+  zao_bio: string;
+  ign: string;
+  real_name: string;
   primary_wallet: string;
   respect_wallet: string | null;
   role: string;
@@ -32,6 +39,12 @@ function shortAddr(addr: string) {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
+function formatNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toString();
+}
+
 interface MessagingPrefs {
   autoJoinGroup: boolean;
   allowNonZaoDms: boolean;
@@ -39,9 +52,40 @@ interface MessagingPrefs {
 
 const PREFS_DEFAULTS: MessagingPrefs = { autoJoinGroup: true, allowNonZaoDms: false };
 
+interface RespectData {
+  member: {
+    total_respect: number;
+    fractal_respect: number;
+    onchain_og: number;
+    onchain_zor: number;
+    fractal_count: number;
+    first_respect_at: string | null;
+  } | null;
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, [text]);
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="text-[10px] text-gray-600 hover:text-[#f5a623] transition-colors flex-shrink-0"
+      title="Copy address"
+    >
+      {copied ? 'Copied' : 'Copy'}
+    </button>
+  );
+}
+
 export function SettingsClient({ session, profile }: SettingsClientProps) {
   const { logout, refetch } = useAuth();
-  const { isConnected: xmtpConnected, activeXMTPAddress, switchWallet } = useXMTPContext();
+  const { isConnected: xmtpConnected, activeXMTPAddress, switchWallet } = useXMTPContextSafe();
   const [signerStatus, setSignerStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [signerError, setSignerError] = useState<string | null>(null);
   const [scriptError, setScriptError] = useState(false);
@@ -52,6 +96,34 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [prefsLoading, setPrefsLoading] = useState(true);
   const [prefsSaving, setPrefsSaving] = useState(false);
 
+  // ZAO profile editing
+  const [zaoFields, setZaoFields] = useState({
+    display_name: '',
+    bio: '',
+    ign: '',
+    real_name: '',
+  });
+  const [zaoEditing, setZaoEditing] = useState(false);
+  const [zaoSaving, setZaoSaving] = useState(false);
+  const [zaoSaved, setZaoSaved] = useState(false);
+
+  // Respect token data
+  const [respect, setRespect] = useState<RespectData>({ member: null });
+  const [respectLoading, setRespectLoading] = useState(true);
+
+  // Initialize ZAO fields from profile
+  useEffect(() => {
+    if (profile) {
+      setZaoFields({
+        display_name: profile.zao_display_name,
+        bio: profile.zao_bio,
+        ign: profile.ign,
+        real_name: profile.real_name,
+      });
+    }
+  }, [profile]);
+
+  // Fetch messaging prefs
   useEffect(() => {
     if (!session?.fid) return;
     fetch('/api/users/messaging-prefs')
@@ -59,6 +131,16 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
       .then((data) => setMsgPrefs({ ...PREFS_DEFAULTS, ...data }))
       .catch(() => {})
       .finally(() => setPrefsLoading(false));
+  }, [session?.fid]);
+
+  // Fetch respect data
+  useEffect(() => {
+    if (!session?.fid) return;
+    fetch(`/api/respect/member?fid=${session.fid}`)
+      .then((r) => r.ok ? r.json() : { member: null })
+      .then((data) => setRespect(data))
+      .catch(() => {})
+      .finally(() => setRespectLoading(false));
   }, [session?.fid]);
 
   const togglePref = useCallback(async (key: keyof MessagingPrefs) => {
@@ -75,7 +157,6 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         const updated = await res.json();
         setMsgPrefs({ ...PREFS_DEFAULTS, ...updated });
       } else {
-        // Revert on failure
         setMsgPrefs((prev) => ({ ...prev, [key]: !newVal }));
       }
     } catch {
@@ -84,6 +165,28 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
       setPrefsSaving(false);
     }
   }, [msgPrefs]);
+
+  const saveZaoProfile = useCallback(async () => {
+    setZaoSaving(true);
+    try {
+      const res = await fetch('/api/users/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(zaoFields),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setZaoFields(updated);
+        setZaoEditing(false);
+        setZaoSaved(true);
+        setTimeout(() => setZaoSaved(false), 2000);
+      }
+    } catch {
+      // Silently fail — user can retry
+    } finally {
+      setZaoSaving(false);
+    }
+  }, [zaoFields]);
 
   const hasSigner = !!session?.signerUuid;
 
@@ -137,6 +240,15 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     return () => { script.remove(); };
   }, [hasSigner]);
 
+  // Connection count for progress indicator
+  const connections = [
+    !!session?.walletAddress,
+    !!session?.fid,
+    !!session?.signerUuid,
+    xmtpConnected,
+  ];
+  const connectedCount = connections.filter(Boolean).length;
+
   if (!session || !profile) {
     return (
       <div className="min-h-[100dvh] bg-[#0a1628] text-white flex items-center justify-center">
@@ -160,7 +272,10 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
 
         {/* ── Connections ──────────────────────────────────────────── */}
         <section>
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Connections</p>
+          <div className="flex items-center justify-between px-1 mb-3">
+            <p className="text-xs text-gray-500 uppercase tracking-wider">Connections</p>
+            <span className="text-[10px] text-gray-600">{connectedCount} of 4 connected</span>
+          </div>
           <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
             <div className="space-y-3">
               {/* Wallet — always connected (it's how they logged in) */}
@@ -228,6 +343,247 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
           </div>
         </section>
 
+        {/* ── Farcaster Identity (read-only) ─────────────────────── */}
+        <section>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Farcaster Identity</p>
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
+            <div className="flex items-center gap-4 mb-4">
+              {profile.pfp_url ? (
+                <Image src={profile.pfp_url} alt={profile.fc_display_name || 'avatar'} width={56} height={56} className="rounded-full" />
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center">
+                  <span className="text-lg text-gray-400 font-bold">{(profile.fc_display_name || '?')[0]?.toUpperCase()}</span>
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-lg font-bold text-white truncate">{profile.fc_display_name || 'Anonymous'}</p>
+                  {profile.power_badge && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-[10px] font-bold flex-shrink-0">
+                      Power
+                    </span>
+                  )}
+                  {profile.zid && (
+                    <span className="px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-xs font-bold flex-shrink-0">
+                      ZID #{profile.zid}
+                    </span>
+                  )}
+                </div>
+                {profile.username && <p className="text-sm text-gray-400">@{profile.username}</p>}
+                <p className="text-xs text-gray-600 mt-0.5">FID {profile.fid}</p>
+              </div>
+            </div>
+            {profile.fc_bio && (
+              <p className="text-sm text-gray-400 leading-relaxed mb-4">{profile.fc_bio}</p>
+            )}
+
+            {/* Farcaster Stats */}
+            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-gray-800/50">
+              <div className="text-center">
+                <p className="text-lg font-bold text-white">{formatNumber(profile.follower_count)}</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider">Followers</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-white">{formatNumber(profile.following_count)}</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider">Following</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-white capitalize">{profile.role}</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider">Role</p>
+              </div>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-gray-800/50 flex items-center gap-3 text-xs text-gray-600">
+              {profile.created_at && (
+                <span>Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+              )}
+              <span>·</span>
+              <a
+                href={`https://farcaster.xyz/${profile.username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#f5a623]/60 hover:text-[#f5a623] transition-colors"
+              >
+                View on Farcaster
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ── ZAO Profile (editable) ──────────────────────────────── */}
+        <section>
+          <div className="flex items-center justify-between px-1 mb-3">
+            <p className="text-xs text-gray-500 uppercase tracking-wider">ZAO Profile</p>
+            {!zaoEditing && (
+              <button
+                onClick={() => setZaoEditing(true)}
+                className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
+              >
+                Edit
+              </button>
+            )}
+          </div>
+          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800/50">
+            {zaoEditing ? (
+              <div className="p-5 space-y-4">
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Display Name</label>
+                  <input
+                    type="text"
+                    value={zaoFields.display_name}
+                    onChange={(e) => setZaoFields((f) => ({ ...f, display_name: e.target.value }))}
+                    maxLength={50}
+                    placeholder="Override your Farcaster name within ZAO"
+                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Bio</label>
+                  <textarea
+                    value={zaoFields.bio}
+                    onChange={(e) => setZaoFields((f) => ({ ...f, bio: e.target.value }))}
+                    maxLength={300}
+                    rows={3}
+                    placeholder="ZAO-specific bio (supplements your Farcaster bio)"
+                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none resize-none"
+                  />
+                  <p className="text-[10px] text-gray-600 mt-1">{zaoFields.bio.length}/300</p>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">IGN (In-Game Name)</label>
+                  <input
+                    type="text"
+                    value={zaoFields.ign}
+                    onChange={(e) => setZaoFields((f) => ({ ...f, ign: e.target.value }))}
+                    maxLength={30}
+                    placeholder="Community handle"
+                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 block mb-1">Real Name</label>
+                  <input
+                    type="text"
+                    value={zaoFields.real_name}
+                    onChange={(e) => setZaoFields((f) => ({ ...f, real_name: e.target.value }))}
+                    maxLength={80}
+                    placeholder="Optional — visible to community members"
+                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    onClick={saveZaoProfile}
+                    disabled={zaoSaving}
+                    className="px-4 py-2 bg-[#f5a623] text-black text-sm font-medium rounded-lg hover:bg-[#ffd700] transition-colors disabled:opacity-50"
+                  >
+                    {zaoSaving ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setZaoEditing(false);
+                      if (profile) {
+                        setZaoFields({
+                          display_name: profile.zao_display_name,
+                          bio: profile.zao_bio,
+                          ign: profile.ign,
+                          real_name: profile.real_name,
+                        });
+                      }
+                    }}
+                    className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {zaoSaved && (
+                  <div className="px-5 py-2 bg-green-500/5 text-xs text-green-400">
+                    Profile saved
+                  </div>
+                )}
+                <div className="px-5 py-4">
+                  <p className="text-xs text-gray-500">Display Name</p>
+                  <p className="text-sm text-white mt-0.5">{zaoFields.display_name || <span className="text-gray-600 italic">Not set</span>}</p>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-xs text-gray-500">Bio</p>
+                  <p className="text-sm text-white mt-0.5">{zaoFields.bio || <span className="text-gray-600 italic">Not set</span>}</p>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-xs text-gray-500">IGN (In-Game Name)</p>
+                  <p className="text-sm text-white mt-0.5">{zaoFields.ign || <span className="text-gray-600 italic">Not set</span>}</p>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-xs text-gray-500">Real Name</p>
+                  <p className="text-sm text-white mt-0.5">{zaoFields.real_name || <span className="text-gray-600 italic">Not set</span>}</p>
+                </div>
+                <div className="px-5 py-3">
+                  <p className="text-[10px] text-gray-600">ZAO profile fields supplement your Farcaster identity within the community.</p>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* ── Respect Tokens ──────────────────────────────────────── */}
+        <section>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Respect Tokens</p>
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
+            {respectLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : respect.member ? (
+              <>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-[#0a1628] rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-[#f5a623]">{respect.member.total_respect}</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Total Respect</p>
+                  </div>
+                  <div className="bg-[#0a1628] rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-purple-400">{respect.member.fractal_count}</p>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Fractals Attended</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">Fractal Respect</span>
+                    <span className="text-sm text-white font-mono">{respect.member.fractal_respect}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">On-chain OG Respect</span>
+                    <span className="text-sm text-white font-mono">{respect.member.onchain_og}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">On-chain ZOR</span>
+                    <span className="text-sm text-white font-mono">{respect.member.onchain_zor}</span>
+                  </div>
+                </div>
+                {respect.member.first_respect_at && (
+                  <div className="mt-3 pt-3 border-t border-gray-800/50">
+                    <p className="text-[10px] text-gray-600">
+                      First respect earned {new Date(respect.member.first_respect_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                )}
+                <div className="mt-3 pt-3 border-t border-gray-800/50">
+                  <Link href="/respect" className="text-xs text-[#f5a623]/60 hover:text-[#f5a623] transition-colors">
+                    View full leaderboard
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-500">No respect tokens yet</p>
+                <p className="text-xs text-gray-600 mt-1">Earn respect by attending Fractal sessions</p>
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* ── Messaging Preferences ────────────────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Messaging</p>
@@ -276,46 +632,6 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   }`}
                 />
               </button>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Profile ──────────────────────────────────────────────── */}
-        <section>
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Profile</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
-            <div className="flex items-center gap-4 mb-4">
-              {profile.pfp_url ? (
-                <Image src={profile.pfp_url} alt={profile.display_name || 'avatar'} width={56} height={56} className="rounded-full" />
-              ) : (
-                <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center">
-                  <span className="text-lg text-gray-400 font-bold">{(profile.display_name || '?')[0]?.toUpperCase()}</span>
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-lg font-bold text-white truncate">{profile.display_name || 'Anonymous'}</p>
-                  {profile.zid && (
-                    <span className="px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-xs font-bold flex-shrink-0">
-                      ZID #{profile.zid}
-                    </span>
-                  )}
-                </div>
-                {profile.username && <p className="text-sm text-gray-400">@{profile.username}</p>}
-                <p className="text-xs text-gray-600 mt-0.5">FID {profile.fid}</p>
-              </div>
-            </div>
-            {profile.bio && (
-              <p className="text-sm text-gray-400 leading-relaxed">{profile.bio}</p>
-            )}
-            <div className="mt-3 pt-3 border-t border-gray-800/50 flex items-center gap-3 text-xs text-gray-600">
-              <span className="capitalize">{profile.role}</span>
-              {profile.created_at && (
-                <>
-                  <span>·</span>
-                  <span>Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
-                </>
-              )}
             </div>
           </div>
         </section>
@@ -411,6 +727,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 <p className="text-xs text-gray-500">Primary Wallet</p>
                 <p className="text-sm text-white font-mono truncate">{profile.primary_wallet || 'Not set'}</p>
               </div>
+              {profile.primary_wallet && <CopyButton text={profile.primary_wallet} />}
             </div>
 
             {/* Respect wallet */}
@@ -425,6 +742,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   <p className="text-xs text-gray-500">Respect Wallet</p>
                   <p className="text-sm text-white font-mono truncate">{profile.respect_wallet}</p>
                 </div>
+                <CopyButton text={profile.respect_wallet} />
               </div>
             )}
 
@@ -440,6 +758,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   <p className="text-xs text-gray-500">Farcaster Custody</p>
                   <p className="text-sm text-white font-mono truncate">{profile.custody_address}</p>
                 </div>
+                <CopyButton text={profile.custody_address} />
               </div>
             )}
 
@@ -447,9 +766,12 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             {profile.verified_addresses.length > 0 && (
               <div className="px-5 py-4">
                 <p className="text-xs text-gray-500 mb-2">Verified Addresses</p>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {profile.verified_addresses.map((addr) => (
-                    <p key={addr} className="text-sm text-white font-mono truncate">{addr}</p>
+                    <div key={addr} className="flex items-center justify-between">
+                      <p className="text-sm text-white font-mono truncate flex-1 min-w-0">{addr}</p>
+                      <CopyButton text={addr} />
+                    </div>
                   ))}
                 </div>
               </div>

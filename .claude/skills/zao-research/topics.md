@@ -12,6 +12,7 @@ Use this to quickly find if a topic has already been researched.
 - Deep dive 2026 (Neynar acquisition, DAU, future) → `21`
 - Players, leaderboards, tokens (DEGEN/MOXIE/NOTES/CLANKER) → `22`
 - All clients compared (18+), notification systems → `34`
+- Farcaster ecosystem 2026 update (Neynar acquisition, Mini Apps, CLANKER) → `73`
 - Hypersnap (incomplete) → `10`
 
 ## Music & Audio
@@ -46,6 +47,7 @@ Use this to quickly find if a topic has already been researched.
 ## Community & Growth
 - Gating (allowlist → NFT → Hats → EAS) → `12`
 - Chat messaging (Farcaster channels + XMTP) → `13`
+- XMTP V3 browser SDK, MLS encryption, mainnet fees → `74`
 - MVP specification → `15`
 - Followers/following feed (sortable, filterable) → `20`
 - Onboarding, growth 40→1000, moderation, gamification → `32`
@@ -78,6 +80,7 @@ Use this to quickly find if a topic has already been researched.
 - Codebase audit guide + results → `40`
 - AI code audit, cleanup agents, CI pipeline → `38`
 - March 2026 security audit (all fixes verified) → `57`
+- Backend testing strategy: Vitest + NTARH + MSW, 47-route audit → `66`
 - SECURITY.md in project root
 
 ## Project Documentation
@@ -92,6 +95,7 @@ Use this to quickly find if a topic has already been researched.
 
 ## Identity & Roles (additions)
 - Hats tree integration for ZAO roles → `59`
+- Hats Protocol V2 updates, new modules, HSG v2, MCP server → `75`
 
 ## Ethereum & Alignment
 - Vitalik philosophy + EF mandate alignment → `60`
@@ -106,11 +110,13 @@ Use this to quickly find if a topic has already been researched.
 - Alibaba Page Agent: in-page AI copilot, DOM dehydration → `68`
 - Claude Code tips: 45 best practices audited against ZAO setup → `69`
 - Sub-agents vs Agent Teams: multi-agent paradigms, Claude Architect patterns → `70`
+- Paperclip rate limits: multi-agent API management, Anthropic tiers, staggering → `71`
+- Paperclip functionality deep dive: full agent lifecycle, heartbeat, adapter config → `72`
 - Sprint plans → `docs/superpowers/plans/`
 - Architecture decisions → `docs/superpowers/plans/2026-03-17-decisions-resolved.md`
 
 ## Wallet & Connection
-- Wallet connection patterns → `50` (wallet-connect)
+- Wallet connection patterns → `49` (wallet-connect)
 
 ## Farcaster Mini Apps
 - Farcaster Mini Apps integration, SDK, notifications → `68` (farcaster-miniapps-integration)

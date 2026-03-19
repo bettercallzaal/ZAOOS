@@ -48,4 +48,4 @@
 | 42 | `42-supabase-advanced-patterns` | Schema design, RLS, Realtime, Edge Functions, pgvector |
 | 43 | `43-webrtc-audio-rooms-streaming` | LiveKit, listening parties, Livepeer, Huddle01 |
 | 44 | `44-agentic-development-workflows` | Claude Code agents, GitHub Actions, continuous development |
-| 50 | `50-wallet-connect` | Wallet connection patterns |
+| 49 | `49-wallet-connect` | Wallet connection patterns |

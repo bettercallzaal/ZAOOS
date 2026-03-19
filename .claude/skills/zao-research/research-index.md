@@ -1,6 +1,6 @@
 # Research Document Index
 
-71 research documents in `research/`. Each is a folder with a `README.md`.
+76 research documents in `research/`. Each is a folder with a `README.md`.
 
 | # | Folder Name | Topic |
 |---|-------------|-------|
@@ -73,5 +73,10 @@
 | 68 | `68-alibaba-page-agent` | In-page AI copilot, DOM dehydration, admin copilot potential |
 | 69 | `69-claude-code-tips-best-practices` | 45 tips audited vs ZAO, gaps identified, improvements planned |
 | 70 | `70-subagents-vs-agent-teams` | Two multi-agent paradigms, Claude Architect patterns, Cowork starter pack |
-| 50b | `50-wallet-connect` | Wallet connection patterns for web3 |
+| 71 | `71-paperclip-rate-limits-multi-agent` | Multi-agent rate limits, Anthropic tiers, thundering herd, staggering |
+| 72 | `72-paperclip-functionality-deep-dive` | Full agent lifecycle, heartbeat steps, adapter config, Standing By fix, CLI |
+| 73 | `73-farcaster-ecosystem-2026-update` | Neynar acquires Farcaster, Snapchain live, 40-60K DAU, Mini Apps, CLANKER, competitive landscape |
+| 74 | `74-xmtp-v4-mls-encryption` | XMTP V3 browser SDK, MLS encryption, mainnet fees, history sync, impact on ZAO OS integration |
+| 75 | `75-hats-protocol-v2-updates` | New eligibility modules, HSG v2, subgraph SDK, MCP server, ERC-6551 accounts, ZAO integration gaps |
+| 49 | `49-wallet-connect` | Wallet connection patterns for web3 |
 | 68b | `68-farcaster-miniapps-integration` | Farcaster Mini Apps integration research |

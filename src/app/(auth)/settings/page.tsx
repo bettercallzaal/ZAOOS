@@ -9,7 +9,7 @@ async function fetchProfile(fid: number) {
       getUserByFid(fid),
       supabaseAdmin
         .from('users')
-        .select('zid, primary_wallet, respect_wallet, role, created_at')
+        .select('zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name')
         .eq('fid', fid)
         .eq('is_active', true)
         .maybeSingle(),
@@ -18,10 +18,19 @@ async function fetchProfile(fid: number) {
     return {
       fid,
       zid: dbResult.data?.zid || null,
-      display_name: neynarUser?.display_name || null,
+      // Farcaster identity (read-only)
+      fc_display_name: neynarUser?.display_name || null,
       username: neynarUser?.username || null,
       pfp_url: neynarUser?.pfp_url || null,
-      bio: neynarUser?.profile?.bio?.text || null,
+      fc_bio: neynarUser?.profile?.bio?.text || null,
+      follower_count: neynarUser?.follower_count ?? 0,
+      following_count: neynarUser?.following_count ?? 0,
+      power_badge: neynarUser?.power_badge ?? false,
+      // ZAO-specific profile (editable)
+      zao_display_name: dbResult.data?.display_name || '',
+      zao_bio: dbResult.data?.bio || '',
+      ign: dbResult.data?.ign || '',
+      real_name: dbResult.data?.real_name || '',
       primary_wallet: dbResult.data?.primary_wallet || '',
       respect_wallet: dbResult.data?.respect_wallet || null,
       role: dbResult.data?.role || 'member',

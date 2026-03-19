@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+
+const querySchema = z.object({
+  wallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  fid: z.coerce.number().int().positive().optional(),
+}).refine(d => d.wallet || d.fid, { message: 'Missing wallet or fid parameter' });
 
 export async function GET(request: NextRequest) {
   const session = await getSessionData();
@@ -8,13 +14,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { searchParams } = new URL(request.url);
-  const wallet = searchParams.get('wallet');
-  const fid = searchParams.get('fid');
-
-  if (!wallet && !fid) {
-    return NextResponse.json({ error: 'Missing wallet or fid parameter' }, { status: 400 });
+  const parsed = querySchema.safeParse({
+    wallet: request.nextUrl.searchParams.get('wallet') ?? undefined,
+    fid: request.nextUrl.searchParams.get('fid') ?? undefined,
+  });
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message || 'Invalid parameters' }, { status: 400 });
   }
+  const { wallet, fid } = parsed.data;
 
   try {
     // Fetch the member
@@ -24,8 +31,8 @@ export async function GET(request: NextRequest) {
 
     if (wallet) {
       memberQuery = memberQuery.ilike('wallet_address', wallet);
-    } else if (fid) {
-      memberQuery = memberQuery.eq('fid', Number(fid));
+    } else if (fid !== undefined) {
+      memberQuery = memberQuery.eq('fid', fid);
     }
 
     const { data: member, error: memberErr } = await memberQuery.maybeSingle();
@@ -50,10 +57,10 @@ export async function GET(request: NextRequest) {
           scoring_era
         )
       `)
-      .or(
-        wallet
-          ? `wallet_address.ilike.${wallet}`
-          : `member_name.eq.${member.name}`
+      .filter(
+        wallet ? 'wallet_address' : 'member_name',
+        wallet ? 'ilike' : 'eq',
+        wallet || member.name
       )
       .order('created_at', { ascending: false });
 

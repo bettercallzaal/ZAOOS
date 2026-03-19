@@ -16,15 +16,16 @@ export async function GET(req: NextRequest) {
   try {
     const status = await getSignerStatus(signerUuid);
 
-    // If approved, verify the signer belongs to the current user before saving
-    if (status.status === 'approved') {
-      if (status.fid && status.fid !== sessionData.fid) {
-        return NextResponse.json(
-          { error: 'Signer does not belong to this user' },
-          { status: 403 }
-        );
-      }
+    // Verify the signer belongs to the current user whenever FID is available
+    if (status.fid && status.fid !== sessionData.fid) {
+      return NextResponse.json(
+        { error: 'Signer does not belong to this user' },
+        { status: 403 }
+      );
+    }
 
+    // Save signer UUID to session once approved
+    if (status.status === 'approved') {
       const session = await getSession();
       session.signerUuid = signerUuid;
       await session.save();

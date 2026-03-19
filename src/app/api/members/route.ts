@@ -16,6 +16,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  try {
   const { data, error } = await supabaseAdmin
     .from('allowlist')
     .select('id, fid, username, real_name, ign, display_name, pfp_url, wallet_address, custody_address, verified_addresses')
@@ -27,9 +28,18 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to load members' }, { status: 500 });
   }
 
-  // Find members with FIDs but missing profile data
-  const needsEnrich = (data || []).filter((m) => m.fid && (!m.pfp_url || !m.username));
-  const enrichMap = new Map<number, { username: string; display_name: string; pfp_url: string }>();
+  // Find members with FIDs that need enrichment (missing profile data OR missing address data)
+  const needsEnrich = (data || []).filter((m) => m.fid && (
+    !m.pfp_url || !m.username ||
+    !m.custody_address || !m.verified_addresses || (m.verified_addresses as string[]).length === 0
+  ));
+  const enrichMap = new Map<number, {
+    username: string;
+    display_name: string;
+    pfp_url: string;
+    custody_address: string | null;
+    verified_addresses: string[];
+  }>();
 
   if (needsEnrich.length > 0) {
     // Batch fetch from Neynar (max 100 per request)
@@ -54,6 +64,8 @@ export async function GET() {
               username: u.username,
               display_name: u.display_name,
               pfp_url: u.pfp_url,
+              custody_address: u.custody_address || null,
+              verified_addresses: u.verified_addresses?.eth_addresses || [],
             });
           }
         }
@@ -64,13 +76,20 @@ export async function GET() {
     for (const m of needsEnrich) {
       const enriched = enrichMap.get(m.fid);
       if (enriched) {
+        const updates: Record<string, unknown> = {
+          username: m.username || enriched.username,
+          display_name: m.display_name || enriched.display_name,
+          pfp_url: m.pfp_url || enriched.pfp_url,
+        };
+        if (enriched.custody_address && !m.custody_address) {
+          updates.custody_address = enriched.custody_address;
+        }
+        if (enriched.verified_addresses.length > 0 && (!m.verified_addresses || (m.verified_addresses as string[]).length === 0)) {
+          updates.verified_addresses = enriched.verified_addresses;
+        }
         const { error: backfillError } = await supabaseAdmin
           .from('allowlist')
-          .update({
-            username: m.username || enriched.username,
-            display_name: m.display_name || enriched.display_name,
-            pfp_url: m.pfp_url || enriched.pfp_url,
-          })
+          .update(updates)
           .eq('id', m.id);
         if (backfillError) console.error('[members] backfill error for id', m.id, backfillError);
       }
@@ -95,21 +114,37 @@ export async function GET() {
 
   const members = (data || []).map((m) => {
     const enriched = m.fid ? enrichMap.get(m.fid) : undefined;
+    // Collect all known addresses: stored XMTP address first (highest priority),
+    // then wallet_address, custody (DB or Neynar), verified (DB or Neynar)
+    const rawAddresses = [
+      m.fid ? xmtpAddrMap.get(m.fid) : undefined,
+      m.wallet_address,
+      m.custody_address || enriched?.custody_address,
+      ...((m.verified_addresses as string[]) || []),
+      ...(enriched?.verified_addresses || []),
+    ].filter(Boolean) as string[];
+    // Deduplicate addresses (case-insensitive)
+    const seen = new Set<string>();
+    const addresses = rawAddresses.filter((addr) => {
+      const lower = addr.toLowerCase();
+      if (seen.has(lower)) return false;
+      seen.add(lower);
+      return true;
+    });
     return {
       fid: m.fid,
       username: m.username || enriched?.username || null,
       displayName: m.display_name || enriched?.display_name || m.ign || m.real_name || (m.fid ? `FID ${m.fid}` : 'Unknown'),
       pfpUrl: m.pfp_url || enriched?.pfp_url || null,
-      addresses: [
-        m.fid ? xmtpAddrMap.get(m.fid) : undefined,
-        m.wallet_address,
-        m.custody_address,
-        ...((m.verified_addresses as string[]) || []),
-      ].filter(Boolean) as string[],
+      addresses,
       storedXmtpAddress: m.fid ? (xmtpAddrMap.get(m.fid) || null) : null,
       lastLoginAt: m.fid ? (loginMap.get(m.fid) || null) : null,
     };
   });
 
   return NextResponse.json({ members, currentFid: session.fid });
+  } catch (err) {
+    console.error('Members fetch error:', err);
+    return NextResponse.json({ error: 'Failed to load members' }, { status: 500 });
+  }
 }

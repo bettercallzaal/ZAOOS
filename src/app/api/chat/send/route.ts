@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
             });
           }
         })
-        .catch((err) => console.error('[bluesky/personal]', err));
+        .then(() => {}, (err) => console.error('[bluesky/personal]', err));
     }
 
     // Send push + in-app notifications (fire and forget)

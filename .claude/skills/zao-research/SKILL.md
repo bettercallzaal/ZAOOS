@@ -1,6 +1,6 @@
 ---
 name: zao-research
-description: Research skill for ZAO OS — search existing research library (71 docs) + codebase, conduct new research, and save findings in the standardized format
+description: Research skill for ZAO OS — search existing research library (76 docs) + codebase, conduct new research, and save findings in the standardized format
 user-invocable: true
 ---
 
@@ -24,7 +24,7 @@ Read community.config.ts for any config related to the topic
 
 This grounds the research in reality. Research docs may be aspirational.
 
-### Step 2: Search Existing Research (71 docs)
+### Step 2: Search Existing Research (76 docs)
 
 Check [research-index.md](./research-index.md) for the full inventory, or search by topic in [topics.md](./topics.md).
 

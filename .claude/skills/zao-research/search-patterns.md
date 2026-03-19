@@ -1,90 +1,91 @@
 # How to Search Existing Research + Codebase
 
+Use Claude's native tools (Grep, Glob, Read) — NOT bash grep/find commands.
+
 ## Search Research Documents
 
 Search all research documents for a keyword:
-```bash
-grep -ri "keyword" research/*/README.md
+```
+Grep pattern="keyword" path="research/" glob="*/README.md"
 ```
 
-Search for a specific topic across research + docs:
-```bash
-grep -ri "topic" research/*/README.md docs/*.md
+Search for a specific technology across research + docs:
+```
+Grep pattern="supabase|neynar|xmtp|livekit" path="research/" glob="*/README.md" output_mode="files_with_matches"
 ```
 
-Find which research docs mention a specific technology:
-```bash
-grep -rli "supabase\|neynar\|xmtp\|livekit" research/*/README.md
+Find a research doc by number:
+```
+Read file_path="research/{number}-{topic}/README.md"
 ```
 
 ## Search the Codebase
 
-These are critical — always check what's actually built before trusting research docs.
+Always check what's actually built before trusting research docs.
 
 ### Find how a feature is implemented
-```bash
-grep -ri "respect\|governance\|proposal" src/app/api/ --include="*.ts" -l
-grep -ri "respect\|governance\|proposal" src/lib/ --include="*.ts" -l
-grep -ri "respect\|governance\|proposal" src/components/ --include="*.tsx" -l
 ```
-
-### Find database schemas
-```bash
-grep -ri "CREATE TABLE\|ALTER TABLE" scripts/*.sql
+Grep pattern="respect|governance|proposal" path="src/app/api/" type="ts"
+Grep pattern="respect|governance|proposal" path="src/lib/" type="ts"
+Grep pattern="respect|governance|proposal" path="src/components/" type="ts"
 ```
 
 ### Find API routes
-```bash
-find src/app/api -name "route.ts" -type f
+```
+Glob pattern="src/app/api/**/route.ts"
 ```
 
-### Find what a component imports/uses
-```bash
-grep -ri "import.*from" src/components/chat/ChatRoom.tsx
+### Find database schemas
+```
+Grep pattern="CREATE TABLE|ALTER TABLE" path="scripts/" glob="*.sql"
+```
+
+### Find what a component imports
+```
+Read file_path="src/components/{feature}/{Component}.tsx" limit=30
 ```
 
 ### Find contract addresses in code
-```bash
-grep -ri "0x[a-fA-F0-9]\{40\}" src/ --include="*.ts" --include="*.tsx"
-grep -ri "0x[a-fA-F0-9]\{40\}" community.config.ts
+```
+Grep pattern="0x[a-fA-F0-9]{40}" path="community.config.ts" output_mode="content"
 ```
 
 ### Find environment variables used
-```bash
-grep -ri "process.env\." src/ --include="*.ts" --include="*.tsx" -h | sort -u
+```
+Grep pattern="process\.env\." path="src/" glob="*.{ts,tsx}" output_mode="content"
 ```
 
 ### Find Zod schemas (validation rules)
-```bash
-grep -ri "z\.\|zodSchema\|safeParse" src/lib/validation/ --include="*.ts"
+```
+Grep pattern="z\.|zodSchema|safeParse" path="src/lib/validation/" type="ts"
 ```
 
-### Find what's "coming soon" or TODO
-```bash
-grep -ri "coming soon\|TODO\|FIXME\|placeholder" src/ --include="*.ts" --include="*.tsx"
+### Find TODOs and placeholders
+```
+Grep pattern="coming soon|TODO|FIXME|placeholder" path="src/" glob="*.{ts,tsx}"
 ```
 
 ## Cross-Reference Patterns
 
 ### Check if a researched feature is actually built
-```bash
-# Example: Is Hats Protocol integrated?
-grep -ri "hats\|@hatsprotocol" src/ package.json
-# If no results → not built yet, only researched
+```
+# Is Hats Protocol integrated?
+Grep pattern="hats|@hatsprotocol" path="src/"
+Grep pattern="hats|@hatsprotocol" path="package.json" output_mode="content"
+# No results → not built yet, only researched
 
-# Example: Is XMTP fully working?
-grep -ri "xmtp" src/ --include="*.ts" --include="*.tsx" -l
-# Shows all XMTP-related files
+# Is XMTP fully working?
+Grep pattern="xmtp" path="src/" glob="*.{ts,tsx}" output_mode="files_with_matches"
 ```
 
 ### Compare research claims vs code reality
-```bash
+```
 # What does research say about respect?
-grep -ri "tier\|decay\|newcomer\|curator\|elder\|legend" research/04-respect-tokens/README.md
+Grep pattern="tier|decay|newcomer|curator|elder|legend" path="research/04-respect-tokens/README.md" output_mode="content"
 
 # What does the code actually do?
-grep -ri "tier\|decay\|newcomer\|curator\|elder\|legend" src/ --include="*.ts" --include="*.tsx"
-# If code has none of these → research is aspirational, not implemented
+Grep pattern="tier|decay|newcomer|curator|elder|legend" path="src/" glob="*.{ts,tsx}"
+# No results → research is aspirational
 ```
 
 ## Key Files to Check First

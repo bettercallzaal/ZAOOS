@@ -441,6 +441,8 @@ export default function GovernancePage() {
                   const forPct = Math.round((proposal.tally.for.weight / totalWeight) * 100);
                   const againstPct = Math.round((proposal.tally.against.weight / totalWeight) * 100);
                   const isVoting = voting === proposal.id;
+                  const isExpired = proposal.closes_at && new Date(proposal.closes_at) < new Date();
+                  const canVote = proposal.status === 'open' && !isExpired;
 
                   return (
                     <div key={proposal.id} className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
@@ -455,6 +457,29 @@ export default function GovernancePage() {
                         <p className="text-xs text-gray-400 line-clamp-3">{proposal.description}</p>
 
                         {/* Author + meta */}
+                        {/* Deadline display */}
+                        {proposal.closes_at && (
+                          <div className="mt-2">
+                            {isExpired ? (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 font-medium">
+                                Voting closed
+                              </span>
+                            ) : (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium">
+                                {(() => {
+                                  const timeLeft = new Date(proposal.closes_at!).getTime() - Date.now();
+                                  const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+                                  const daysLeft = Math.floor(hoursLeft / 24);
+                                  const remainingHours = hoursLeft % 24;
+                                  if (daysLeft > 0) return `${daysLeft}d ${remainingHours}h remaining`;
+                                  if (hoursLeft > 0) return `${hoursLeft}h remaining`;
+                                  return `${Math.max(1, Math.floor(timeLeft / (1000 * 60)))}m remaining`;
+                                })()}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
                         <div className="flex items-center gap-2 mt-3 text-[10px] text-gray-600">
                           <span>by {proposal.author?.display_name || proposal.author?.username || 'Unknown'}</span>
                           {proposal.author?.zid && <span className="text-[#f5a623]/60">ZID #{proposal.author.zid}</span>}
@@ -492,29 +517,36 @@ export default function GovernancePage() {
                       )}
 
                       {/* Vote buttons */}
-                      {proposal.status === 'open' && (
-                        <div className="flex border-t border-gray-800">
-                          <button
-                            onClick={() => handleVote(proposal.id, 'for')}
-                            disabled={isVoting}
-                            className="flex-1 text-xs font-medium py-2.5 text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-50 border-r border-gray-800"
-                          >
-                            For
-                          </button>
-                          <button
-                            onClick={() => handleVote(proposal.id, 'against')}
-                            disabled={isVoting}
-                            className="flex-1 text-xs font-medium py-2.5 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50 border-r border-gray-800"
-                          >
-                            Against
-                          </button>
-                          <button
-                            onClick={() => handleVote(proposal.id, 'abstain')}
-                            disabled={isVoting}
-                            className="flex-1 text-xs font-medium py-2.5 text-gray-500 hover:bg-white/5 transition-colors disabled:opacity-50"
-                          >
-                            Abstain
-                          </button>
+                      {canVote && (
+                        <div className="border-t border-gray-800">
+                          {myEntry && myEntry.totalRespect === 0 && (
+                            <p className="text-[10px] text-yellow-500 px-4 py-1.5 bg-yellow-500/5">
+                              Your vote will be recorded with 0 weight. Earn Respect to increase your influence.
+                            </p>
+                          )}
+                          <div className="flex">
+                            <button
+                              onClick={() => handleVote(proposal.id, 'for')}
+                              disabled={isVoting}
+                              className="flex-1 text-xs font-medium py-2.5 text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-50 border-r border-gray-800"
+                            >
+                              For
+                            </button>
+                            <button
+                              onClick={() => handleVote(proposal.id, 'against')}
+                              disabled={isVoting}
+                              className="flex-1 text-xs font-medium py-2.5 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50 border-r border-gray-800"
+                            >
+                              Against
+                            </button>
+                            <button
+                              onClick={() => handleVote(proposal.id, 'abstain')}
+                              disabled={isVoting}
+                              className="flex-1 text-xs font-medium py-2.5 text-gray-500 hover:bg-white/5 transition-colors disabled:opacity-50"
+                            >
+                              Abstain
+                            </button>
+                          </div>
                         </div>
                       )}
 

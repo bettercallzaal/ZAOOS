@@ -32,6 +32,13 @@ function shortAddr(addr: string) {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
+interface MessagingPrefs {
+  autoJoinGroup: boolean;
+  allowNonZaoDms: boolean;
+}
+
+const PREFS_DEFAULTS: MessagingPrefs = { autoJoinGroup: true, allowNonZaoDms: false };
+
 export function SettingsClient({ session, profile }: SettingsClientProps) {
   const { logout, refetch } = useAuth();
   const { isConnected: xmtpConnected, activeXMTPAddress, switchWallet } = useXMTPContext();
@@ -39,6 +46,44 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [signerError, setSignerError] = useState<string | null>(null);
   const [scriptError, setScriptError] = useState(false);
   const signerContainerRef = useRef<HTMLDivElement>(null);
+
+  // Messaging preferences
+  const [msgPrefs, setMsgPrefs] = useState<MessagingPrefs>(PREFS_DEFAULTS);
+  const [prefsLoading, setPrefsLoading] = useState(true);
+  const [prefsSaving, setPrefsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!session?.fid) return;
+    fetch('/api/users/messaging-prefs')
+      .then((r) => r.ok ? r.json() : PREFS_DEFAULTS)
+      .then((data) => setMsgPrefs({ ...PREFS_DEFAULTS, ...data }))
+      .catch(() => {})
+      .finally(() => setPrefsLoading(false));
+  }, [session?.fid]);
+
+  const togglePref = useCallback(async (key: keyof MessagingPrefs) => {
+    const newVal = !msgPrefs[key];
+    setMsgPrefs((prev) => ({ ...prev, [key]: newVal }));
+    setPrefsSaving(true);
+    try {
+      const res = await fetch('/api/users/messaging-prefs', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [key]: newVal }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setMsgPrefs({ ...PREFS_DEFAULTS, ...updated });
+      } else {
+        // Revert on failure
+        setMsgPrefs((prev) => ({ ...prev, [key]: !newVal }));
+      }
+    } catch {
+      setMsgPrefs((prev) => ({ ...prev, [key]: !newVal }));
+    } finally {
+      setPrefsSaving(false);
+    }
+  }, [msgPrefs]);
 
   const hasSigner = !!session?.signerUuid;
 
@@ -179,6 +224,58 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Messaging Preferences ────────────────────────────────── */}
+        <section>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Messaging</p>
+          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800/50">
+            {/* Auto-join ZAO group */}
+            <div className="flex items-center justify-between px-5 py-4">
+              <div className="flex-1 min-w-0 pr-3">
+                <p className="text-sm text-white">Auto-join ZAO Group</p>
+                <p className="text-xs text-gray-500">Automatically join the ZAO General group when messaging is enabled</p>
+              </div>
+              <button
+                onClick={() => togglePref('autoJoinGroup')}
+                disabled={prefsLoading || prefsSaving}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 ${
+                  msgPrefs.autoJoinGroup ? 'bg-[#f5a623]' : 'bg-gray-700'
+                }`}
+                role="switch"
+                aria-checked={msgPrefs.autoJoinGroup}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    msgPrefs.autoJoinGroup ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Allow DMs from non-ZAO members */}
+            <div className="flex items-center justify-between px-5 py-4">
+              <div className="flex-1 min-w-0 pr-3">
+                <p className="text-sm text-white">Allow External DMs</p>
+                <p className="text-xs text-gray-500">Accept direct messages from people outside the ZAO community</p>
+              </div>
+              <button
+                onClick={() => togglePref('allowNonZaoDms')}
+                disabled={prefsLoading || prefsSaving}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 ${
+                  msgPrefs.allowNonZaoDms ? 'bg-[#f5a623]' : 'bg-gray-700'
+                }`}
+                role="switch"
+                aria-checked={msgPrefs.allowNonZaoDms}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    msgPrefs.allowNonZaoDms ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
             </div>
           </div>
         </section>

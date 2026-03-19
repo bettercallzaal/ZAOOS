@@ -39,6 +39,10 @@ Use this to quickly find if a topic has already been researched.
 - Hindsight memory system (91.4%, retain/recall/reflect) → `26`
 - OpenFang Agent OS (not a fit, but reference architecture) → `46`
 
+## Coordination & Incentives
+- Incented protocol: ZABAL campaigns, staking-based task coordination → `64`
+- ZABAL partner ecosystem: MAGNETIQ, SongJam, Empire Builder, Clanker → `65`
+
 ## Community & Growth
 - Gating (allowlist → NFT → Hats → EAS) → `12`
 - Chat messaging (Farcaster channels + XMTP) → `13`
@@ -86,8 +90,27 @@ Use this to quickly find if a topic has already been researched.
 - Comprehensive overview + gap analysis → `27`
 - bettercallzaal GitHub inventory (65 repos) → `30`
 
+## Identity & Roles (additions)
+- Hats tree integration for ZAO roles → `59`
+
+## Ethereum & Alignment
+- Vitalik philosophy + EF mandate alignment → `60`
+- Ethereum alignment opportunities for ZAO → `61`
+
 ## Development & Operations
 - Agentic development workflows (Claude Code, GitHub Actions) → `44`
 - Reference repos (Sonata, Nook, Litecast) → `11`
+- Autoresearch: autonomous skill/prompt improvement loops → `62`
+- Autoresearch deep dive: implementations, eval loop, 7 ZAO OS use cases → `63`
+- Paperclip AI: agent company orchestrator, org chart, budgets, ZAO startup guide → `67`
+- Alibaba Page Agent: in-page AI copilot, DOM dehydration → `68`
+- Claude Code tips: 45 best practices audited against ZAO setup → `69`
+- Sub-agents vs Agent Teams: multi-agent paradigms, Claude Architect patterns → `70`
 - Sprint plans → `docs/superpowers/plans/`
 - Architecture decisions → `docs/superpowers/plans/2026-03-17-decisions-resolved.md`
+
+## Wallet & Connection
+- Wallet connection patterns → `50` (wallet-connect)
+
+## Farcaster Mini Apps
+- Farcaster Mini Apps integration, SDK, notifications → `68` (farcaster-miniapps-integration)

@@ -6,6 +6,7 @@ import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { ProposalComments } from '@/components/governance/ProposalComments';
 import { useAuth } from '@/hooks/useAuth';
 import dynamic from 'next/dynamic';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 const HatTree = dynamic(() => import('@/components/hats/HatTree'), { ssr: false });
 const HatManager = dynamic(() => import('@/components/hats/HatManager'), { ssr: false });
@@ -279,6 +280,14 @@ export default function GovernancePage() {
                     </div>
                   </div>
                 )}
+                {/* Share your rank */}
+                <div className="mt-3 pt-3 border-t border-[#f5a623]/20">
+                  <ShareToFarcaster
+                    template={shareTemplates.respectRank(myEntry.rank, myEntry.totalRespect)}
+                    variant="button"
+                    label="Share your rank"
+                  />
+                </div>
               </div>
             )}
 
@@ -533,6 +542,11 @@ export default function GovernancePage() {
                           >
                             {proposal.commentCount || 0} comments
                           </button>
+                          <ShareToFarcaster
+                            template={shareTemplates.proposal(proposal.title, 'created')}
+                            variant="compact"
+                            label="Share"
+                          />
                         </div>
                       </div>
 

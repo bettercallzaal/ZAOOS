@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { usePlayer } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 /**
  * Floating "+" button + bottom sheet for quick song submission from any page.
@@ -233,6 +234,15 @@ export function QuickAddSong() {
               >
                 {submitting ? 'Adding...' : metadata ? `Add "${metadata.trackName}"` : 'Add Song'}
               </button>
+
+              {/* Share after adding */}
+              {feedback?.type === 'success' && metadata && (
+                <ShareToFarcaster
+                  template={shareTemplates.songSubmission(metadata.trackName, note || undefined)}
+                  variant="button"
+                  label="Share to Farcaster"
+                />
+              )}
 
               <p className="text-[10px] text-gray-600 text-center">
                 Spotify, Apple Music, SoundCloud, YouTube, Tidal, Bandcamp, Audius, Sound.xyz

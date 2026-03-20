@@ -5,6 +5,7 @@ import { formatEther, parseEther, createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ZOUNZ_TOKEN, ZOUNZ_AUCTION, tokenAbi, auctionAbi } from '@/lib/zounz/contracts';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 interface AuctionState {
   tokenId: bigint;
@@ -297,7 +298,17 @@ export default function ZounzAuction() {
         {/* Footer */}
         <div className="flex items-center justify-between pt-2 border-t border-gray-800">
           <span className="text-[10px] text-gray-600">ZABAL Nouns DAO on Base</span>
-          <span className="text-[10px] text-gray-600">Min increment: {minBidIncrement.toString()}%</span>
+          <div className="flex items-center gap-2">
+            <ShareToFarcaster
+              template={shareTemplates.zounzAuction(
+                auction?.tokenId?.toString() || '1',
+                auction?.highestBid ? formatEther(auction.highestBid) : '0'
+              )}
+              variant="compact"
+              label="Share"
+            />
+            <span className="text-[10px] text-gray-600">Min: {minBidIncrement.toString()}%</span>
+          </div>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { usePlayer } from '@/providers/audio';
 import Image from 'next/image';
 import { formatDuration } from '@/lib/music/formatDuration';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 /**
  * Persistent music player that renders on ALL authenticated pages.
@@ -81,7 +82,11 @@ export function PersistentPlayer() {
           </div>
         </div>
 
-        {/* Platform badge */}
+        {/* Share + Platform badge */}
+        <ShareToFarcaster
+          template={shareTemplates.song(metadata.trackName, metadata.artistName || 'Unknown', metadata.url)}
+          variant="icon"
+        />
         <span className="text-[9px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded capitalize flex-shrink-0">
           {metadata.type === 'applemusic' ? 'Apple' : metadata.type === 'soundxyz' ? 'Sound' : metadata.type}
         </span>

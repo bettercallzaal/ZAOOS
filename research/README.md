@@ -164,6 +164,7 @@ How to use AI agents, skills, and autonomous loops to build and maintain ZAO OS.
 | [76](./76-git-branching-ai-agents/) | **Git Branching for AI Agents** | Trunk-based dev with Paperclip agents, short-lived branches, merge strategy for solo founder + AI |
 | [81](./81-paperclip-multi-company-agents/) | **Paperclip Multi-Company + Advanced Patterns** | Multi-company isolation, 5-level task hierarchy, agent delegation chains, approval workflows |
 | [82](./82-paperclip-clipmart-plugins/) | **Paperclip ClipMart + Plugin System** | Template marketplace, export/import, plugin architecture, building ZAO-specific plugins |
+| [83](./83-elizaos-2026-update/) | **ElizaOS March 2026 Update** | v1.7.2 stable, v2 alpha, Farcaster/XMTP plugins, Supabase adapter, character files, deployment, cost |
 
 ---
 

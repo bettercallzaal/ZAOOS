@@ -20,6 +20,9 @@ interface MusicSidebarProps {
   onRadioStart?: () => void;
   onRadioStop?: () => void;
   radioPlaylistName?: string;
+  availableStations?: string[];
+  currentStationIndex?: number;
+  onSwitchStation?: (index: number) => void;
 }
 
 export function MusicSidebar({
@@ -33,6 +36,9 @@ export function MusicSidebar({
   onRadioStart,
   onRadioStop,
   radioPlaylistName,
+  availableStations = [],
+  currentStationIndex = 0,
+  onSwitchStation,
 }: MusicSidebarProps) {
   const player = usePlayer();
   const queue = useMusicQueue(messages);
@@ -90,6 +96,15 @@ export function MusicSidebar({
             />
           )}
 
+          {/* Station picker */}
+          {isRadioMode && availableStations.length > 1 && onSwitchStation && (
+            <StationPicker
+              stations={availableStations}
+              currentIndex={currentStationIndex}
+              onSwitch={onSwitchStation}
+            />
+          )}
+
           {/* Now Playing — prominent mobile card */}
           {player.metadata && <NowPlayingCard player={player} onPlayPause={handlePlayPause} />}
 
@@ -138,6 +153,15 @@ export function MusicSidebar({
           onStop={onRadioStop}
           variant="full"
           playlistName={radioPlaylistName}
+        />
+      )}
+
+      {/* Station picker */}
+      {isRadioMode && availableStations.length > 1 && onSwitchStation && (
+        <StationPicker
+          stations={availableStations}
+          currentIndex={currentStationIndex}
+          onSwitch={onSwitchStation}
         />
       )}
 
@@ -316,5 +340,35 @@ function QueueContent({
         />
       ))}
     </>
+  );
+}
+
+// ─── Station Picker (horizontal pill buttons) ────────────────────────────────
+
+function StationPicker({
+  stations,
+  currentIndex,
+  onSwitch,
+}: {
+  stations: string[];
+  currentIndex: number;
+  onSwitch: (index: number) => void;
+}) {
+  return (
+    <div className="flex gap-2 px-4 py-2 overflow-x-auto border-b border-gray-800/50 scrollbar-hide">
+      {stations.map((name, i) => (
+        <button
+          key={name}
+          onClick={() => onSwitch(i)}
+          className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+            i === currentIndex
+              ? 'bg-[#f5a623] text-[#0a1628]'
+              : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+          }`}
+        >
+          {name}
+        </button>
+      ))}
+    </div>
   );
 }

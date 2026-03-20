@@ -577,6 +577,9 @@ export function ChatRoom() {
           onRadioStart={radio.startRadio}
           onRadioStop={radio.stopRadio}
           radioPlaylistName={radio.radioPlaylist?.name}
+          availableStations={radio.availableStations}
+          currentStationIndex={radio.currentStationIndex}
+          onSwitchStation={radio.switchStation}
         />
       </div>
 

@@ -31,7 +31,8 @@ export function useRadio() {
   const player = usePlayer();
   const [isRadioMode, setIsRadioMode] = useState(false);
   const [radioLoading, setRadioLoading] = useState(false);
-  const [radioPlaylist, setRadioPlaylist] = useState<RadioPlaylist | null>(null);
+  const [allStations, setAllStations] = useState<RadioPlaylist[]>([]);
+  const [currentStationIndex, setCurrentStationIndex] = useState(0);
   const radioQueueRef = useRef<RadioTrack[]>([]);
   const radioIndexRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
@@ -43,40 +44,47 @@ export function useRadio() {
     };
   }, []);
 
+  const fetchStations = useCallback(async (signal: AbortSignal): Promise<RadioPlaylist[]> => {
+    const res = await fetch('/api/music/radio', { signal });
+    if (!res.ok) throw new Error('Failed to fetch radio');
+    const data = await res.json();
+    return data.playlists ?? [];
+  }, []);
+
+  const playStation = useCallback((playlist: RadioPlaylist) => {
+    if (playlist.tracks.length === 0) return;
+    const shuffled = shuffleArray(playlist.tracks);
+    radioQueueRef.current = shuffled;
+    radioIndexRef.current = 0;
+
+    const first = shuffled[0];
+    const metadata = radioTrackToMetadata(first, `radio-${first.id}`);
+    player.play(metadata);
+    setIsRadioMode(true);
+
+    if (!player.shuffle) player.toggleShuffle();
+  }, [player]);
+
   const startRadio = useCallback(async () => {
-    // Abort previous in-flight request
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
     setRadioLoading(true);
     try {
-      const res = await fetch('/api/music/radio', { signal: controller.signal });
-      if (!res.ok) throw new Error('Failed to fetch radio');
-      const data = await res.json();
-      const playlist: RadioPlaylist | undefined = data.playlists?.[0];
-      if (!playlist || playlist.tracks.length === 0) throw new Error('No tracks');
+      const playlists = await fetchStations(controller.signal);
+      if (playlists.length === 0) throw new Error('No stations');
 
-      setRadioPlaylist(playlist);
-      const shuffled = shuffleArray(playlist.tracks);
-      radioQueueRef.current = shuffled;
-      radioIndexRef.current = 0;
-
-      // Play first track
-      const first = shuffled[0];
-      const metadata = radioTrackToMetadata(first, `radio-${first.id}`);
-      player.play(metadata);
-      setIsRadioMode(true);
-
-      // Enable shuffle mode in player
-      if (!player.shuffle) player.toggleShuffle();
+      setAllStations(playlists);
+      setCurrentStationIndex(0);
+      playStation(playlists[0]);
     } catch (err) {
       if (controller.signal.aborted) return;
       console.error('Radio start failed:', err);
     } finally {
       setRadioLoading(false);
     }
-  }, [player]);
+  }, [fetchStations, playStation]);
 
   const stopRadio = useCallback(() => {
     setIsRadioMode(false);
@@ -84,6 +92,12 @@ export function useRadio() {
     radioIndexRef.current = 0;
     player.stop();
   }, [player]);
+
+  const switchStation = useCallback((index: number) => {
+    if (index < 0 || index >= allStations.length) return;
+    setCurrentStationIndex(index);
+    playStation(allStations[index]);
+  }, [allStations, playStation]);
 
   const nextRadioTrack = useCallback(() => {
     const queue = radioQueueRef.current;
@@ -111,15 +125,22 @@ export function useRadio() {
     player.play(metadata);
   }, [player]);
 
+  const currentStation = allStations[currentStationIndex] ?? null;
+  const availableStations = allStations.map((s) => s.name);
+
   return {
     isRadioMode,
     radioLoading,
-    radioPlaylist,
+    radioPlaylist: currentStation,
     radioQueue: radioQueueRef.current,
     radioIndex: radioIndexRef.current,
     startRadio,
     stopRadio,
     nextRadioTrack,
     prevRadioTrack,
+    // Multi-station
+    availableStations,
+    currentStationIndex,
+    switchStation,
   };
 }

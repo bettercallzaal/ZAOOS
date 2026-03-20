@@ -54,6 +54,11 @@ export const communityConfig = {
         artist: 'Stilo World',
         url: 'https://audius.co/dopestilo/album/ambition',
       },
+      {
+        name: 'Lofi Chill',
+        artist: 'Various Artists',
+        url: 'https://audius.co/audius/playlist/lofi-beats',
+      },
     ],
   },
 

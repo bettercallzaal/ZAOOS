@@ -65,6 +65,21 @@ export default async function ToolsPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Artist Tools</p>
 
           <Link
+            href="/chat"
+            className="block bg-[#0d1b2a] rounded-xl p-4 border border-[#f5a623]/20 hover:border-[#f5a623]/40 transition-colors bg-gradient-to-r from-[#f5a623]/5 to-transparent"
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+              <div>
+                <p className="text-sm font-medium text-white">Music</p>
+                <p className="text-xs text-gray-500">Submit songs, listen to radio, browse the queue</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link
             href="/social"
             className="block bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/30 transition-colors"
           >

@@ -380,13 +380,13 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       )}
 
       <div className="p-3">
-        <div className="flex gap-2 items-end">
-          {/* Cross-post toggle */}
-          {hasSigner && (
+        {/* Action buttons row — above the input */}
+        {hasSigner && (
+          <div className="flex gap-1 mb-2 px-1">
+            {/* Cross-post toggle */}
             <button
               onClick={() => {
                 if (showCrossPost) {
-                  // Closing: clear selections too
                   setShowCrossPost(false);
                   setCrossPostChannels(new Set());
                   setCrossPostBluesky(false);
@@ -394,7 +394,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                   setShowCrossPost(true);
                 }
               }}
-              className={`relative flex-shrink-0 p-2.5 rounded-lg transition-colors ${
+              className={`relative flex-shrink-0 p-1.5 rounded-md transition-colors ${
                 showCrossPost || crossPostChannels.size > 0
                   ? 'text-[#f5a623] bg-[#f5a623]/10'
                   : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
@@ -402,7 +402,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               title="Cross-post to other channels"
               aria-label="Cross-post to other channels"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
               </svg>
               {(crossPostChannels.size > 0 || crossPostBluesky) && (
@@ -411,44 +411,38 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                 </span>
               )}
             </button>
-          )}
 
-          {/* Image upload */}
-          {hasSigner && (
-            <>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleImageSelect(file);
-                }}
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className={`flex-shrink-0 p-2.5 rounded-lg transition-colors ${
-                  imagePreview
-                    ? 'text-[#f5a623] bg-[#f5a623]/10'
-                    : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
-                }`}
-                title="Attach image"
-                aria-label="Attach image"
-                disabled={uploading}
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
-                </svg>
-              </button>
-            </>
-          )}
+            {/* Image upload */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImageSelect(file);
+              }}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex-shrink-0 p-1.5 rounded-md transition-colors ${
+                imagePreview
+                  ? 'text-[#f5a623] bg-[#f5a623]/10'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+              }`}
+              title="Attach image"
+              aria-label="Attach image"
+              disabled={uploading}
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+              </svg>
+            </button>
 
-          {/* Schedule toggle */}
-          {hasSigner && (
+            {/* Schedule toggle */}
             <button
               onClick={() => setShowSchedule(!showSchedule)}
-              className={`flex-shrink-0 p-2.5 rounded-lg transition-colors ${
+              className={`flex-shrink-0 p-1.5 rounded-md transition-colors ${
                 showSchedule
                   ? 'text-[#f5a623] bg-[#f5a623]/10'
                   : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
@@ -456,12 +450,15 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               title="Schedule post"
               aria-label="Schedule post"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </button>
-          )}
+          </div>
+        )}
 
+        {/* Input row — textarea + send only */}
+        <div className="flex gap-2 items-end">
           <textarea
             ref={textareaRef}
             value={text}

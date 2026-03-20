@@ -370,9 +370,10 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         });
         setPushEnabled(false);
       } else {
-        // Enable: request permission through SDK, which triggers the webhook
-        const result = await sdk.actions.requestNotificationPermission();
-        if (result && 'accept' in result) {
+        // Enable: prompt user to add miniapp (which grants notification permission)
+        // The SDK triggers the webhook with notificationDetails on success
+        const result = await sdk.actions.addMiniApp();
+        if (result?.notificationDetails) {
           setPushEnabled(true);
         }
       }

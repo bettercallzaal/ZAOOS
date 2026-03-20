@@ -1,4 +1,6 @@
-# Research Doc 84: Farcaster AI Agents Landscape (March 2026)
+# 88 — Farcaster AI Agents Landscape (March 2026)
+
+> **Note:** Folder is named `84-farcaster-ai-agents-landscape` due to numbering collision. Canonical number is **88**.
 
 ## Context
 

@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **79 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **81 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -18,7 +18,7 @@ Everything about the protocol ZAO OS is built on — how it works, who's buildin
 | [22](./22-farcaster-ecosystem-players/) | **Ecosystem Players & Leaderboards** | Top accounts, tokens (DEGEN/MOXIE/NOTES/CLANKER), mini apps, Purple DAO, analytics tools |
 | [34](./34-farcaster-clients-notifications/) | **All Farcaster Clients Compared** | 18+ clients — pros/cons, features, notification systems, competitive positioning |
 | [73](./73-farcaster-ecosystem-2026-update/) | **Farcaster Ecosystem Update (Mar 2026)** | Neynar acquires Farcaster, Snapchain live, 40-60K DAU, Mini Apps, CLANKER, competitive landscape, ZAO implications |
-| [79](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps SDK, Quick Auth, notifications, cast composition — ZAO OS as a Mini App (folder named 68- due to prior collision) |
+| [81](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps SDK, Quick Auth, notifications, cast composition — ZAO OS as a Mini App (folder named 68- due to prior collision) |
 | [10](./10-hypersnap/) | **Hypersnap** | ⚠️ Incomplete — needs manual review |
 
 ---
@@ -34,6 +34,7 @@ The core of ZAO — how music works in the platform, how artists earn, and how c
 | [29](./29-artist-revenue-ip-rights/) | **Artist Revenue & IP Rights** | Streaming economics ($0.003/stream), music NFTs, 0xSplits, sync licensing ($650M market), fan funding, Hypersub |
 | [37](./37-bridges-competitors-monetization/) | **Competitors & Monetization** | Sound.xyz dead, Catalog dead, Coop Records model, Hypersub pricing, revenue projections ($12K-$1.14M/yr) |
 | [43](./43-webrtc-audio-rooms-streaming/) | **Live Audio Rooms & Streaming** | LiveKit (SFU), synchronized listening parties, Livepeer streaming, Huddle01 (web3-native), cost analysis |
+| [80](./80-jitsi-meet-live-rooms/) | **Jitsi Meet Live Rooms** | Embeddable Jitsi rooms for fractal calls + community meetings, zero-install, self-hostable |
 
 ---
 
@@ -161,6 +162,8 @@ How to use AI agents, skills, and autonomous loops to build and maintain ZAO OS.
 | [71](./71-paperclip-rate-limits-multi-agent/) | **Paperclip Rate Limits** | Multi-agent API key management, Anthropic tier limits, thundering herd fix, staggering strategies |
 | [72](./72-paperclip-functionality-deep-dive/) | **Paperclip Functionality Deep Dive** | Full agent lifecycle, 9-step heartbeat, adapter config, "Standing By" root cause + fix, CLI reference |
 | [76](./76-git-branching-ai-agents/) | **Git Branching for AI Agents** | Trunk-based dev with Paperclip agents, short-lived branches, merge strategy for solo founder + AI |
+| [81](./81-paperclip-multi-company-agents/) | **Paperclip Multi-Company + Advanced Patterns** | Multi-company isolation, 5-level task hierarchy, agent delegation chains, approval workflows |
+| [82](./82-paperclip-clipmart-plugins/) | **Paperclip ClipMart + Plugin System** | Template marketplace, export/import, plugin architecture, building ZAO-specific plugins |
 
 ---
 
@@ -280,8 +283,8 @@ Start with [40 Audit Guide](./40-codebase-audit-guide/) + [38 AI Code Audit](./3
 
 ## Research Stats
 
-- **Total documents:** 79
+- **Total documents:** 81
 - **Total coverage:** ~300,000+ words
 - **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation
 - **Time span:** January — March 2026
-- **Status:** 78/79 complete, 1 incomplete (Hypersnap)
+- **Status:** 80/81 complete, 1 incomplete (Hypersnap)

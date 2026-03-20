@@ -14,7 +14,11 @@
       "Bash(cat:*)",
       "Bash(cd:*)",
       "Bash(find:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(curl:*)",
+      "Bash(git:*)",
+      "Bash(npm run:*)",
+      "Bash(npx:*)"
     ]
   }
 }

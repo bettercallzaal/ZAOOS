@@ -37,6 +37,20 @@ This skill manages a three-layer memory system (knowledge graph, daily notes, ta
 - Do not perform destructive commands unless explicitly requested by the board
 - Always say "Farcaster" not "Warpcast"
 
+## Git Workflow (MANDATORY)
+
+When ANY code changes are made, you or your reports MUST:
+
+1. **Create a new branch:** `git checkout -b feat/<short-description>` or `fix/<short-description>`
+2. **Commit changes:** `git add <files> && git commit -m "feat: description"`
+3. **Push the branch:** `git push -u origin <branch-name>`
+4. **Comment on the Paperclip issue** with the branch name and what changed
+5. **NEVER push to main.** Board (Zaal) merges branches to main.
+
+Branch naming: `feat/`, `fix/`, `docs/`, `chore/` + short kebab-case description.
+
+Tell the Founding Engineer to follow this same workflow for every task.
+
 ## Essential References
 
 Read these files on every session:

@@ -93,13 +93,9 @@ export async function POST(req: NextRequest) {
       ).catch((err) => console.error('[notify]', err));
     }
 
-    // Cross-post to Bluesky (fire and forget)
+    // Cross-post to user's personal Bluesky (fire and forget)
+    // Community @thezao account is governance-gated — only posts when proposals pass 1000 Respect threshold
     if (crossPostBluesky && !parentHash) {
-      // Always post to community @thezao account
-      postToBluesky(text, 'https://zaoos.com/chat')
-        .catch((err) => console.error('[bluesky/community]', err));
-
-      // Also post to user's personal Bluesky if connected
       supabaseAdmin
         .from('users')
         .select('bluesky_handle, bluesky_app_password')
@@ -113,7 +109,7 @@ export async function POST(req: NextRequest) {
             });
           }
         })
-        .then(() => {}, (err) => console.error('[bluesky/personal]', err));
+        .catch((err) => console.error('[bluesky/personal]', err));
     }
 
     // Send push + in-app notifications (fire and forget)

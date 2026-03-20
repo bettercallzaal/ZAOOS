@@ -127,9 +127,95 @@ export async function POST(req: NextRequest) {
       }
     }).catch((err) => console.error('[notify]', err));
 
+    // Check if this vote pushed the proposal over the publish threshold
+    if (vote === 'for') {
+      checkPublishThreshold(proposal_id).catch((err) =>
+        console.error('[publish-threshold]', err)
+      );
+    }
+
     return NextResponse.json({ vote: voteData, respectWeight });
   } catch (err) {
     console.error('Vote error:', err);
     return NextResponse.json({ error: 'Failed to submit vote' }, { status: 500 });
+  }
+}
+
+/**
+ * Check if a proposal has reached the Respect vote threshold for auto-publishing
+ * to @thezao Farcaster account. Non-blocking, fire-and-forget.
+ */
+async function checkPublishThreshold(proposalId: string) {
+  const ENV = await import('@/lib/env').then((m) => m.ENV);
+
+  // Skip if not configured
+  if (!ENV.ZAO_OFFICIAL_SIGNER_UUID || !ENV.ZAO_OFFICIAL_FID) return;
+
+  // Get proposal with publish info
+  const { data: proposal } = await supabaseAdmin
+    .from('proposals')
+    .select('id, publish_text, published_cast_hash, respect_threshold, status')
+    .eq('id', proposalId)
+    .single();
+
+  if (!proposal) return;
+
+  // Skip if already published or no publish_text
+  if (proposal.published_cast_hash) return;
+  if (!proposal.publish_text) return;
+
+  // Sum Respect-weighted FOR votes
+  const { data: votes } = await supabaseAdmin
+    .from('proposal_votes')
+    .select('vote, respect_weight')
+    .eq('proposal_id', proposalId);
+
+  const totalRespectFor = (votes || [])
+    .filter((v: { vote: string }) => v.vote === 'for')
+    .reduce((sum: number, v: { respect_weight: number | null }) => sum + (v.respect_weight || 0), 0);
+
+  const threshold = proposal.respect_threshold || 1000;
+
+  if (totalRespectFor >= threshold) {
+    // Threshold met — trigger publish via internal API
+    console.log(`[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`);
+
+    // Import and call directly instead of HTTP to avoid auth issues
+    const { postCast } = await import('@/lib/farcaster/neynar');
+
+    const { data: fullProposal } = await supabaseAdmin
+      .from('proposals')
+      .select('*, author:users!proposals_author_id_fkey(display_name, username)')
+      .eq('id', proposalId)
+      .single();
+
+    if (!fullProposal) return;
+
+    const authorName = fullProposal.author?.username || fullProposal.author?.display_name || 'ZAO member';
+    const publishText = fullProposal.publish_text;
+    const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance`;
+    const maxLen = 1024 - attribution.length;
+    const castText = publishText.length > maxLen
+      ? publishText.slice(0, maxLen - 3) + '...' + attribution
+      : publishText + attribution;
+
+    const result = await postCast(
+      ENV.ZAO_OFFICIAL_SIGNER_UUID!,
+      castText,
+      'zao',
+    );
+
+    const castHash = result?.cast?.hash;
+
+    await supabaseAdmin
+      .from('proposals')
+      .update({
+        published_cast_hash: castHash,
+        published_at: new Date().toISOString(),
+        status: 'published',
+      })
+      .eq('id', proposalId);
+
+    console.log(`[publish-threshold] Published to @thezao: ${castHash}`);
   }
 }

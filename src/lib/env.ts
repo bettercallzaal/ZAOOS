@@ -26,4 +26,8 @@ export const ENV = {
   NEYNAR_WEBHOOK_SECRET: optionalEnv('NEYNAR_WEBHOOK_SECRET'),
   NEXT_PUBLIC_SIWF_DOMAIN: optionalEnv('NEXT_PUBLIC_SIWF_DOMAIN'),
   NEXT_PUBLIC_WC_PROJECT_ID: optionalEnv('NEXT_PUBLIC_WC_PROJECT_ID'),
+
+  // @thezao official account (governance-powered posting)
+  ZAO_OFFICIAL_FID: optionalEnv('ZAO_OFFICIAL_FID'),
+  ZAO_OFFICIAL_SIGNER_UUID: optionalEnv('ZAO_OFFICIAL_SIGNER_UUID'),
 } as const;

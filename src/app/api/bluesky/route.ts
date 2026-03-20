@@ -69,8 +69,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to get DID from Bluesky' }, { status: 500 });
     }
 
-    // Store credentials — App Passwords are scoped tokens designed for third-party apps.
-    // They cannot change the account password or access sensitive settings.
+    // Store DID, handle, and app password for cross-posting.
+    // App Passwords are scoped tokens — they cannot change the account password or access sensitive settings.
     const { error } = await supabaseAdmin
       .from('users')
       .update({ bluesky_did: did, bluesky_handle: handle, bluesky_app_password: appPassword })
@@ -80,6 +80,20 @@ export async function POST(req: NextRequest) {
       console.error('[bluesky] DB update error:', error);
       return NextResponse.json({ error: 'Failed to save connection' }, { status: 500 });
     }
+
+    // Auto-register as a feed member (so their posts show in ZAO Music feed)
+    const { data: user } = await supabaseAdmin
+      .from('users')
+      .select('id')
+      .eq('fid', session.fid)
+      .single();
+
+    await supabaseAdmin
+      .from('bluesky_members')
+      .upsert(
+        { did, handle, user_id: user?.id || null, added_by: 'self' },
+        { onConflict: 'did' }
+      ).catch((err) => console.error('[bluesky] Auto-register member:', err));
 
     return NextResponse.json({ success: true, handle, did });
   } catch (err) {

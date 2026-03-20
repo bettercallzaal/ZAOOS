@@ -193,7 +193,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="Paste a song link (Spotify, SoundCloud, YouTube...)"
-                className={`w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2.5 pr-8 placeholder-gray-500 focus:outline-none focus:ring-1 ${
+                className={`w-full bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-2.5 pr-8 placeholder-gray-500 focus:outline-none focus:ring-1 ${
                   urlValid === false
                     ? 'focus:ring-red-400 ring-1 ring-red-400/50'
                     : urlValid === true
@@ -215,13 +215,13 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Song title (optional)"
-                className="bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
+                className="bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
               />
               <input
                 value={artist}
                 onChange={(e) => setArtist(e.target.value)}
                 placeholder="Artist (optional)"
-                className="bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
+                className="bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
               />
             </div>
 
@@ -230,7 +230,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Why this song? (optional)"
-                className="flex-1 bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
+                className="flex-1 bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
               />
               <button
                 onClick={handleSubmit}

@@ -109,7 +109,7 @@ export function MessagesRoom() {
   }
 
   return (
-    <div className="flex h-[100dvh] bg-[#0a1628] text-white overflow-hidden">
+    <div className="flex h-[100dvh] bg-[#0a1628] text-white overflow-hidden pb-20 md:pb-0">
       {/* Action error toast (DM/group creation errors) */}
       {showActionToast && actionError && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[80] max-w-sm w-full mx-4">

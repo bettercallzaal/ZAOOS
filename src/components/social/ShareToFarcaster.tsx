@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useMiniApp } from '@/hooks/useMiniApp';
 
 type ShareTemplate = {
   text: string;
@@ -34,8 +35,31 @@ export function ShareToFarcaster({
 }: ShareToFarcasterProps) {
   const [sharing, setSharing] = useState(false);
   const [shared, setShared] = useState(false);
+  const { isMiniApp, composeCast } = useMiniApp();
 
   const handleShare = useCallback(async () => {
+    // In miniapp context, use SDK composeCast for native experience
+    if (isMiniApp) {
+      setSharing(true);
+      try {
+        const success = await composeCast({
+          text: template.text,
+          embeds: template.embeds,
+        });
+        if (success) {
+          setShared(true);
+          setTimeout(() => setShared(false), 3000);
+        } else {
+          // SDK compose failed — fall back to compose URL
+          openComposeUrl(template);
+        }
+      } catch {
+        openComposeUrl(template);
+      }
+      setSharing(false);
+      return;
+    }
+
     if (useSigner) {
       // Post directly via API
       setSharing(true);
@@ -61,7 +85,7 @@ export function ShareToFarcaster({
     } else {
       openComposeUrl(template);
     }
-  }, [template, useSigner]);
+  }, [template, useSigner, isMiniApp, composeCast]);
 
   if (variant === 'icon') {
     return (

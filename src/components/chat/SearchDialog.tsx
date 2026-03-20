@@ -147,7 +147,7 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
               onChange={(e) => handleChange(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={`Search #${channel}...`}
-              className="flex-1 bg-transparent text-white text-sm placeholder-gray-500 focus:outline-none"
+              className="flex-1 bg-transparent text-white text-base md:text-sm placeholder-gray-500 focus:outline-none"
             />
             <kbd className="hidden md:inline text-[10px] text-gray-500 border border-gray-700 rounded px-1.5 py-0.5">
               ESC

@@ -163,7 +163,7 @@ export function QuickAddSong() {
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="Paste any music link..."
                   autoFocus
-                  className={`w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-3 pr-8 placeholder-gray-500 focus:outline-none focus:ring-1 ${
+                  className={`w-full bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-3 pr-8 placeholder-gray-500 focus:outline-none focus:ring-1 ${
                     urlType ? 'focus:ring-green-400 ring-1 ring-green-400/50' :
                     url.trim() && !urlType ? 'focus:ring-red-400 ring-1 ring-red-400/50' :
                     'focus:ring-[#f5a623]'
@@ -223,7 +223,7 @@ export function QuickAddSong() {
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Why this song? (optional)"
-                className="w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
+                className="w-full bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
               />
 
               {/* Submit */}

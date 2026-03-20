@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import type { SessionData } from '@/types';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 interface Profile {
   fid: number;
@@ -324,6 +325,63 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     } catch { /* ignore */ }
   };
 
+  // Push notification state
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
+  const [pushToggling, setPushToggling] = useState(false);
+
+  useEffect(() => {
+    if (!session?.fid) return;
+    // Check if this user has push notifications enabled
+    fetch('/api/notifications/status')
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.enabled === 'boolean') {
+          setPushEnabled(data.enabled);
+        } else {
+          setPushEnabled(false);
+        }
+      })
+      .catch(() => setPushEnabled(false));
+  }, [session?.fid]);
+
+  const togglePushNotifications = async () => {
+    if (pushToggling) return;
+    setPushToggling(true);
+    try {
+      // Use the miniapp SDK to request/revoke notification permissions
+      const { sdk } = await import('@farcaster/miniapp-sdk');
+      const inMiniApp = await sdk.isInMiniApp();
+
+      if (!inMiniApp) {
+        // Can only manage push notifications from within the mini app
+        setPushToggling(false);
+        return;
+      }
+
+      if (pushEnabled) {
+        // Disable: tell the webhook we're disabling
+        await fetch('/api/miniapp/webhook', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'notifications_disabled',
+            fid: session?.fid,
+          }),
+        });
+        setPushEnabled(false);
+      } else {
+        // Enable: request permission through SDK, which triggers the webhook
+        const result = await sdk.actions.requestNotificationPermission();
+        if (result && 'accept' in result) {
+          setPushEnabled(true);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to toggle push notifications:', err);
+    }
+    setPushToggling(false);
+  };
+
   // Connection count for progress indicator
   const connections = [
     !!session?.walletAddress,
@@ -461,14 +519,14 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     value={bskyHandle}
                     onChange={(e) => setBskyHandle(e.target.value)}
                     placeholder="yourname.bsky.social"
-                    className="w-full bg-[#1a2a3a] text-white text-xs rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    className="w-full bg-[#1a2a3a] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400"
                   />
                   <input
                     value={bskyAppPassword}
                     onChange={(e) => setBskyAppPassword(e.target.value)}
                     placeholder="App Password (xxxx-xxxx-xxxx-xxxx)"
                     type="password"
-                    className="w-full bg-[#1a2a3a] text-white text-xs rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    className="w-full bg-[#1a2a3a] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400"
                   />
                   {bskyError && <p className="text-[10px] text-red-400">{bskyError}</p>}
                   <button
@@ -480,6 +538,39 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   </button>
                 </div>
               )}
+
+              {/* Push Notifications */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${pushEnabled ? 'bg-green-400' : 'bg-gray-600'}`} />
+                  <span className="text-sm text-white">Push Notifications</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {pushEnabled === null ? (
+                    <span className="text-xs text-gray-500">Checking...</span>
+                  ) : (
+                    <>
+                      <span className="text-xs text-gray-500">
+                        {pushEnabled ? 'Enabled' : 'Disabled'}
+                      </span>
+                      <button
+                        onClick={togglePushNotifications}
+                        disabled={pushToggling}
+                        className={`relative w-9 h-5 rounded-full transition-colors ${
+                          pushEnabled ? 'bg-green-500' : 'bg-gray-600'
+                        } ${pushToggling ? 'opacity-50' : ''}`}
+                        aria-label={pushEnabled ? 'Disable push notifications' : 'Enable push notifications'}
+                      >
+                        <span
+                          className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                            pushEnabled ? 'translate-x-4' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -548,6 +639,16 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 View on Farcaster
               </a>
             </div>
+
+            {/* Share your ZID */}
+            <div className="mt-3 pt-3 border-t border-gray-800/50">
+              <ShareToFarcaster
+                template={shareTemplates.profile(profile.zid, profile.fc_display_name || profile.zao_display_name || 'ZAO Member')}
+                variant="button"
+                label="Share your ZID"
+                className="w-full justify-center"
+              />
+            </div>
           </div>
         </section>
 
@@ -575,7 +676,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     onChange={(e) => setZaoFields((f) => ({ ...f, display_name: e.target.value }))}
                     maxLength={50}
                     placeholder="Override your Farcaster name within ZAO"
-                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
                   />
                 </div>
                 <div>
@@ -586,7 +687,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     maxLength={300}
                     rows={3}
                     placeholder="ZAO-specific bio (supplements your Farcaster bio)"
-                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none resize-none"
+                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none resize-none"
                   />
                   <p className="text-[10px] text-gray-600 mt-1">{zaoFields.bio.length}/300</p>
                 </div>
@@ -598,7 +699,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     onChange={(e) => setZaoFields((f) => ({ ...f, ign: e.target.value }))}
                     maxLength={30}
                     placeholder="Community handle"
-                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
                   />
                 </div>
                 <div>
@@ -609,7 +710,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     onChange={(e) => setZaoFields((f) => ({ ...f, real_name: e.target.value }))}
                     maxLength={80}
                     placeholder="Optional — visible to community members"
-                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
                   />
                 </div>
                 <div className="flex items-center gap-3 pt-2">
@@ -1015,6 +1116,19 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 Toggle the eye icon to show or hide each wallet on your public profile. Hidden wallets are still visible to you here.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* ── Invite ──────────────────────────────────────────────── */}
+        <section>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Spread the Word</p>
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
+            <ShareToFarcaster
+              template={shareTemplates.invite()}
+              variant="button"
+              label="Invite to ZAO"
+              className="w-full justify-center"
+            />
           </div>
         </section>
 

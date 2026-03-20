@@ -54,13 +54,16 @@ interface Proposal {
   id: string;
   title: string;
   description: string;
-  status: 'open' | 'approved' | 'rejected' | 'completed';
+  status: 'open' | 'approved' | 'rejected' | 'completed' | 'published';
   category: string;
   author: { display_name: string; username: string; pfp_url: string | null; fid: number; zid: number | null };
   created_at: string;
   closes_at: string | null;
   tally: ProposalTally;
   commentCount: number;
+  publish_text?: string | null;
+  published_cast_hash?: string | null;
+  respect_threshold?: number | null;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -84,6 +87,7 @@ export default function GovernancePage() {
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newCategory, setNewCategory] = useState('general');
+  const [newPublishText, setNewPublishText] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
 
@@ -146,12 +150,18 @@ export default function GovernancePage() {
       const res = await fetch('/api/proposals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newTitle, description: newDesc, category: newCategory }),
+        body: JSON.stringify({
+          title: newTitle,
+          description: newDesc,
+          category: newCategory,
+          publish_text: newPublishText.trim() || undefined,
+        }),
       });
       if (res.ok) {
         setShowCreate(false);
         setNewTitle('');
         setNewDesc('');
+        setNewPublishText('');
         setNewCategory('general');
         // Refresh proposals
         const d = await fetch('/api/proposals').then((r) => r.json());
@@ -458,8 +468,22 @@ export default function GovernancePage() {
                   <option value="governance">Governance</option>
                   <option value="treasury">Treasury</option>
                 </select>
+                <div className="bg-[#0a1628] rounded-lg p-3 space-y-2">
+                  <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-medium">Auto-publish to @thezao (optional)</p>
+                  <textarea
+                    value={newPublishText}
+                    onChange={(e) => setNewPublishText(e.target.value)}
+                    placeholder="If this proposal passes 1000 Respect in votes, this text will auto-publish to @thezao on Farcaster + Bluesky..."
+                    rows={2}
+                    maxLength={1024}
+                    className="w-full bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623] resize-none"
+                  />
+                  <p className="text-[10px] text-gray-500">
+                    Leave empty to skip auto-publishing. If filled, the community votes to publish.
+                  </p>
+                </div>
                 {myEntry && (
-                  <p className="text-[10px] text-gray-600">
+                  <p className="text-[10px] text-gray-500">
                     Your vote weight: {myEntry.totalRespect.toLocaleString()} respect
                   </p>
                 )}
@@ -610,11 +634,13 @@ export default function GovernancePage() {
                       {/* Closed status */}
                       {proposal.status !== 'open' && (
                         <div className={`px-4 py-2 border-t border-gray-800 text-xs font-medium ${
+                          proposal.status === 'published' ? 'text-[#f5a623] bg-[#f5a623]/5' :
                           proposal.status === 'approved' ? 'text-green-400 bg-green-500/5' :
                           proposal.status === 'rejected' ? 'text-red-400 bg-red-500/5' :
                           'text-blue-400 bg-blue-500/5'
                         }`}>
-                          {proposal.status === 'approved' ? 'Approved' :
+                          {proposal.status === 'published' ? 'Published to @thezao' :
+                           proposal.status === 'approved' ? 'Approved' :
                            proposal.status === 'rejected' ? 'Rejected' : 'Completed'}
                         </div>
                       )}

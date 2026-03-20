@@ -366,6 +366,7 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
             template={shareTemplates.custom(
               (cast.text.length > 200 ? cast.text.slice(0, 200) + '...' : cast.text) + '\n\nvia The ZAO',
               ['https://zaoos.com'],
+              'zao',
             )}
           />
         </div>

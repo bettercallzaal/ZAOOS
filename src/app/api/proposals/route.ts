@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const { title, description, category, closes_at } = parsed.data;
+    const { title, description, category, closes_at, publish_text, respect_threshold } = parsed.data;
 
     // Get user row
     const { data: user } = await supabaseAdmin
@@ -111,6 +111,8 @@ export async function POST(req: NextRequest) {
         author_id: user.id,
         category,
         closes_at: closes_at || null,
+        publish_text: publish_text || null,
+        respect_threshold: respect_threshold ?? 1000,
       })
       .select()
       .single();

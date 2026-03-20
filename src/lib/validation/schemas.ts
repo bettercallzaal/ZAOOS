@@ -75,6 +75,8 @@ export const createProposalSchema = z.object({
       message: 'closes_at must be in the future',
     })
     .optional(),
+  publish_text: z.string().trim().max(1024, 'Publish text must be 1024 characters or less').optional(),
+  respect_threshold: z.number().int().min(0).optional(),
 });
 
 export const proposalCommentSchema = z.object({

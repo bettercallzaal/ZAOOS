@@ -50,6 +50,17 @@ interface MusicTrack {
   role: 'creator' | 'collector';
 }
 
+interface EnrichedData {
+  activeChannels: { id: string; name: string; imageUrl: string | null }[];
+  communityStats: {
+    songsSubmitted: number;
+    proposalsCreated: number;
+    votesCast: number;
+  };
+  blueskyHandle: string | null;
+  zid: string | null;
+}
+
 export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,6 +68,8 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
   const [followLoading, setFollowLoading] = useState(false);
   const [musicTracks, setMusicTracks] = useState<MusicTrack[]>([]);
   const [musicLoading, setMusicLoading] = useState(false);
+  const [enriched, setEnriched] = useState<EnrichedData | null>(null);
+  const [enrichedLoading, setEnrichedLoading] = useState(false);
 
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -99,6 +112,29 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
       .catch((err) => console.error('Music fetch error:', err))
       .finally(() => setMusicLoading(false));
   }, [profile]);
+
+  // Fetch enriched profile data (channels, community stats)
+  useEffect(() => {
+    if (!fid) {
+      setEnriched(null);
+      return;
+    }
+
+    setEnrichedLoading(true);
+    fetch(`/api/members/profile?fid=${fid}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.error);
+        setEnriched({
+          activeChannels: data.activeChannels || [],
+          communityStats: data.communityStats || { songsSubmitted: 0, proposalsCreated: 0, votesCast: 0 },
+          blueskyHandle: data.blueskyHandle || null,
+          zid: data.zid || null,
+        });
+      })
+      .catch((err) => console.error('Enriched profile fetch error:', err))
+      .finally(() => setEnrichedLoading(false));
+  }, [fid]);
 
   const handleFollow = useCallback(async () => {
     if (!profile || followLoading) return;
@@ -279,6 +315,80 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                 {following ? 'Following' : 'Follow'}
               </button>
             </div>
+
+            {/* Active Channels */}
+            {enrichedLoading ? (
+              <div className="px-6 py-4">
+                <div className="h-3 w-24 bg-white/5 rounded animate-pulse mb-3" />
+                <div className="flex gap-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-7 w-16 bg-white/5 rounded-full animate-pulse" />
+                  ))}
+                </div>
+              </div>
+            ) : enriched && enriched.activeChannels.length > 0 ? (
+              <div className="px-6 py-4">
+                <p className="text-xs text-gray-600 uppercase tracking-wider mb-3">Active Channels</p>
+                <div className="flex flex-wrap gap-2">
+                  {enriched.activeChannels.map((ch) => (
+                    <a
+                      key={ch.id}
+                      href={`https://warpcast.com/~/channel/${ch.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 transition-colors text-xs text-gray-300 hover:text-white"
+                    >
+                      {ch.imageUrl && (
+                        <Image
+                          src={ch.imageUrl}
+                          alt={ch.name}
+                          width={14}
+                          height={14}
+                          className="rounded-full"
+                        />
+                      )}
+                      <span>/{ch.id}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Community Stats */}
+            {enrichedLoading ? (
+              <div className="px-6 py-4">
+                <div className="h-3 w-28 bg-white/5 rounded animate-pulse mb-3" />
+                <div className="grid grid-cols-3 gap-2">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-14 bg-white/5 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              </div>
+            ) : enriched && (enriched.communityStats.songsSubmitted > 0 || enriched.communityStats.proposalsCreated > 0 || enriched.communityStats.votesCast > 0) ? (
+              <div className="px-6 py-4">
+                <p className="text-xs text-gray-600 uppercase tracking-wider mb-3">Community Stats</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center px-2 py-2.5 rounded-lg bg-white/5">
+                    <p className="text-sm font-bold text-[#f5a623]">{enriched.communityStats.songsSubmitted}</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">Songs</p>
+                  </div>
+                  <div className="text-center px-2 py-2.5 rounded-lg bg-white/5">
+                    <p className="text-sm font-bold text-purple-400">{enriched.communityStats.proposalsCreated}</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">Proposals</p>
+                  </div>
+                  <div className="text-center px-2 py-2.5 rounded-lg bg-white/5">
+                    <p className="text-sm font-bold text-green-400">{enriched.communityStats.votesCast}</p>
+                    <p className="text-[10px] text-gray-500 mt-0.5">Votes</p>
+                  </div>
+                </div>
+                {enriched.zid && (
+                  <div className="mt-2 text-center">
+                    <span className="text-[10px] text-gray-600">ZID: </span>
+                    <span className="text-[10px] text-gray-400 font-mono">{enriched.zid}</span>
+                  </div>
+                )}
+              </div>
+            ) : null}
 
             {/* Divider */}
             <div className="border-t border-gray-800 mx-4" />

@@ -120,11 +120,11 @@ export function ConversationList({
                 {/* Avatar */}
                 {conv.imageUrl ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 relative">
-                    <Image src={conv.imageUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" unoptimized />
+                    <Image src={conv.imageUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" />
                   </div>
                 ) : conv.peerPfpUrl ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 relative">
-                    <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" unoptimized />
+                    <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || conv.name || 'Conversation'} avatar`} fill className="object-cover" />
                   </div>
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">

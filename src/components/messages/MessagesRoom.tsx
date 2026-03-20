@@ -178,7 +178,6 @@ export function MessagesRoom() {
                   width={36}
                   height={36}
                   className="rounded-full flex-shrink-0"
-                  unoptimized
                 />
               ) : (
                 <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">

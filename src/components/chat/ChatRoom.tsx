@@ -78,7 +78,7 @@ export function ChatRoom() {
       if (!res.ok) return;
       const data = await res.json();
       player.play({ ...data, feedId: entry.castHash });
-    } catch { /* silent */ }
+    } catch (err) { console.error('[ChatRoom] music play failed:', err); }
   }, [musicQueue, player]);
 
   const handlePrevTrack = useCallback(() => {

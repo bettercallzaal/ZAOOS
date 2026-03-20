@@ -35,6 +35,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# test coverage
+/coverage
+
 # wallet backup
 .wallet-backup.enc
 # XMTP WASM (copied by postinstall)

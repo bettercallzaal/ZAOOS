@@ -1,9 +1,17 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['@xmtp/wasm-bindings'],
 
   experimental: {
+    // React Compiler — auto-memoizes components, eliminates manual useMemo/useCallback
+    reactCompiler: true,
+
     // Tree-shake barrel exports from heavy libraries
     optimizePackageImports: [
       '@tanstack/react-query',
@@ -72,4 +80,4 @@ const nextConfig: NextConfig = {
   turbopack: {},
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

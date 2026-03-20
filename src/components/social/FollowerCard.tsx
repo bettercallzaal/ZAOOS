@@ -59,7 +59,8 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
       if (!res.ok) {
         setIsFollowing(prev);
       }
-    } catch {
+    } catch (err) {
+      console.error('[FollowerCard] follow toggle failed:', err);
       setIsFollowing(prev);
     } finally {
       setLoading(false);

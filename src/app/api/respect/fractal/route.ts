@@ -91,56 +91,57 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Update respect_members totals for each participant
+    // Pre-fetch all existing members in bulk (2 queries instead of 2*N)
+    const scoreWallets = scores.map((s) => s.wallet_address).filter(Boolean) as string[];
+    const scoreNames = scores.map((s) => s.member_name);
+
+    const [walletResult, nameResult] = await Promise.all([
+      scoreWallets.length > 0
+        ? supabaseAdmin
+            .from('respect_members')
+            .select('id, name, wallet_address, total_respect, fractal_respect, fractal_count, first_respect_at')
+            .in('wallet_address', scoreWallets)
+        : Promise.resolve({ data: [] as { id: string; name: string; wallet_address: string | null; total_respect: number; fractal_respect: number; fractal_count: number; first_respect_at: string | null }[] }),
+      supabaseAdmin
+        .from('respect_members')
+        .select('id, name, wallet_address, total_respect, fractal_respect, fractal_count, first_respect_at')
+        .in('name', scoreNames),
+    ]);
+
+    // Build lookup maps: wallet -> member, name -> member
+    type MemberRow = { id: string; name: string; wallet_address: string | null; total_respect: number; fractal_respect: number; fractal_count: number; first_respect_at: string | null };
+    const walletMap = new Map<string, MemberRow>();
+    const nameMap = new Map<string, MemberRow>();
+    for (const m of (walletResult.data || []) as MemberRow[]) {
+      if (m.wallet_address) walletMap.set(m.wallet_address, m);
+    }
+    for (const m of (nameResult.data || []) as MemberRow[]) {
+      nameMap.set(m.name, m);
+    }
+
     const updateResults = await Promise.allSettled(
       scores.map(async (s) => {
-        // Find or create the member
-        let memberId: string | null = null;
+        // Find existing member from pre-fetched data
+        const existing = (s.wallet_address ? walletMap.get(s.wallet_address) : null) || nameMap.get(s.member_name);
 
-        // Try to find by wallet first, then by name
-        if (s.wallet_address) {
-          const { data: existing } = await supabaseAdmin
-            .from('respect_members')
-            .select('id, first_respect_at')
-            .eq('wallet_address', s.wallet_address)
-            .single();
-          if (existing) memberId = existing.id;
-        }
-
-        if (!memberId) {
-          const { data: existing } = await supabaseAdmin
-            .from('respect_members')
-            .select('id, first_respect_at')
-            .eq('name', s.member_name)
-            .single();
-          if (existing) memberId = existing.id;
-        }
-
-        if (memberId) {
+        if (existing) {
           // Existing member: increment totals
-          const { data: current } = await supabaseAdmin
-            .from('respect_members')
-            .select('total_respect, fractal_respect, fractal_count, first_respect_at')
-            .eq('id', memberId)
-            .single();
+          const updates: Record<string, unknown> = {
+            total_respect: Number(existing.total_respect) + s.score,
+            fractal_respect: Number(existing.fractal_respect) + s.score,
+            fractal_count: Number(existing.fractal_count) + 1,
+            updated_at: new Date().toISOString(),
+          };
 
-          if (current) {
-            const updates: Record<string, unknown> = {
-              total_respect: Number(current.total_respect) + s.score,
-              fractal_respect: Number(current.fractal_respect) + s.score,
-              fractal_count: Number(current.fractal_count) + 1,
-              updated_at: new Date().toISOString(),
-            };
-
-            // Set first_respect_at if this is the member's first score
-            if (!current.first_respect_at) {
-              updates.first_respect_at = session_date;
-            }
-
-            await supabaseAdmin
-              .from('respect_members')
-              .update(updates)
-              .eq('id', memberId);
+          // Set first_respect_at if this is the member's first score
+          if (!existing.first_respect_at) {
+            updates.first_respect_at = session_date;
           }
+
+          await supabaseAdmin
+            .from('respect_members')
+            .update(updates)
+            .eq('id', existing.id);
         } else {
           // New member: create row
           await supabaseAdmin

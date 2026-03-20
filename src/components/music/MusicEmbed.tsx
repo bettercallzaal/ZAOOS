@@ -140,7 +140,6 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
               alt={metadata.trackName}
               fill
               className="object-cover"
-              unoptimized
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a2a3a] to-[#0a1628]">

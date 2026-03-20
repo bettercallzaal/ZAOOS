@@ -141,17 +141,22 @@ export async function POST(req: NextRequest) {
               }
             }
 
+            // Separate invalid from successful tokens
+            const invalidFids: number[] = [];
             for (const t of groupTokens) {
               if (invalidTokens.has(t.token)) {
-                // Disable invalid tokens
-                await supabaseAdmin
-                  .from('notification_tokens')
-                  .update({ enabled: false, updated_at: now.toISOString() })
-                  .eq('fid', t.fid);
+                invalidFids.push(t.fid);
                 errors.push({ fid: t.fid, error: 'Invalid token — disabled' });
               } else {
                 sentCount++;
               }
+            }
+            // Bulk-disable invalid tokens in one query
+            if (invalidFids.length > 0) {
+              await supabaseAdmin
+                .from('notification_tokens')
+                .update({ enabled: false, updated_at: now.toISOString() })
+                .in('fid', invalidFids);
             }
           } else {
             const errText = await response.text().catch(() => 'Unknown error');

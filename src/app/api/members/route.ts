@@ -49,33 +49,36 @@ export async function GET() {
       batches.push(fids.slice(i, i + 100));
     }
 
-    for (const batch of batches) {
-      try {
-        const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${batch.join(',')}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': ENV.NEYNAR_API_KEY,
-          },
-        });
-        if (res.ok) {
-          const json = await res.json();
-          for (const u of json.users || []) {
-            enrichMap.set(u.fid, {
-              username: u.username,
-              display_name: u.display_name,
-              pfp_url: u.pfp_url,
-              custody_address: u.custody_address || null,
-              verified_addresses: u.verified_addresses?.eth_addresses || [],
-            });
+    await Promise.allSettled(
+      batches.map(async (batch) => {
+        try {
+          const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${batch.join(',')}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': ENV.NEYNAR_API_KEY,
+            },
+          });
+          if (res.ok) {
+            const json = await res.json();
+            for (const u of json.users || []) {
+              enrichMap.set(u.fid, {
+                username: u.username,
+                display_name: u.display_name,
+                pfp_url: u.pfp_url,
+                custody_address: u.custody_address || null,
+                verified_addresses: u.verified_addresses?.eth_addresses || [],
+              });
+            }
           }
-        }
-      } catch { /* continue without enrichment */ }
-    }
+        } catch { /* continue without enrichment */ }
+      })
+    );
 
-    // Backfill DB so we don't re-fetch next time
-    for (const m of needsEnrich) {
-      const enriched = enrichMap.get(m.fid);
-      if (enriched) {
+    // Backfill DB so we don't re-fetch next time (parallel, non-blocking)
+    const backfillPromises = needsEnrich
+      .filter((m) => enrichMap.has(m.fid))
+      .map((m) => {
+        const enriched = enrichMap.get(m.fid)!;
         const updates: Record<string, unknown> = {
           username: m.username || enriched.username,
           display_name: m.display_name || enriched.display_name,
@@ -87,13 +90,15 @@ export async function GET() {
         if (enriched.verified_addresses.length > 0 && (!m.verified_addresses || (m.verified_addresses as string[]).length === 0)) {
           updates.verified_addresses = enriched.verified_addresses;
         }
-        const { error: backfillError } = await supabaseAdmin
+        return supabaseAdmin
           .from('allowlist')
           .update(updates)
-          .eq('id', m.id);
-        if (backfillError) console.error('[members] backfill error for id', m.id, backfillError);
-      }
-    }
+          .eq('id', m.id)
+          .then(({ error: backfillError }) => {
+            if (backfillError) console.error('[members] backfill error for id', m.id, backfillError);
+          });
+      });
+    await Promise.allSettled(backfillPromises);
   }
 
   // Fetch last_login_at and xmtp_address from users table for all members with FIDs

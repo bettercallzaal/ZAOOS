@@ -27,7 +27,8 @@ async function fetchAllRecords(token: string): Promise<AirtableRecord[]> {
     const res = await fetch(url.toString(), { headers });
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`Airtable error ${res.status}: ${text}`);
+      console.error(`Airtable API error ${res.status}:`, text);
+      throw new Error(`Airtable request failed with status ${res.status}`);
     }
 
     const data = await res.json();
@@ -72,7 +73,7 @@ export async function POST() {
   const airtableToken = process.env.AIRTABLE_TOKEN;
   if (!airtableToken) {
     return NextResponse.json(
-      { error: 'AIRTABLE_TOKEN not configured on server' },
+      { error: 'Airtable integration is not configured' },
       { status: 500 },
     );
   }
@@ -160,7 +161,8 @@ export async function POST() {
         .upsert(row, { onConflict: 'name' });
 
       if (upsertErr) {
-        errors.push(`${name}: ${upsertErr.message}`);
+        console.error(`Respect import upsert error for "${name}":`, upsertErr);
+        errors.push(`${name}: upsert failed`);
       } else {
         imported++;
       }

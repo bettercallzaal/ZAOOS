@@ -154,8 +154,8 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       setCrossPostChannels(new Set());
       setShowCrossPost(false);
       onSchedule?.();
-    } catch {
-      // Error silently
+    } catch (err) {
+      console.error('[ComposeBar] send failed:', err);
     }
   };
 

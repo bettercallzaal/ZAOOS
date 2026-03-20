@@ -116,8 +116,8 @@ export function NewConversationDialog({
         );
         setRes(enriched);
       }
-    } catch {
-      // Silent fail
+    } catch (err) {
+      console.error('[NewConversationDialog] search failed:', err);
     } finally {
       setLoading(false);
     }

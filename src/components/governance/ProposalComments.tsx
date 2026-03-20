@@ -63,7 +63,7 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
         setText('');
         await fetchComments();
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.error('[ProposalComments] send failed:', err); }
     setSending(false);
   };
 
@@ -93,7 +93,7 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
             <div key={c.id} className="flex gap-2">
               {c.author?.pfp_url ? (
                 <div className="w-6 h-6 relative flex-shrink-0">
-                  <Image src={c.author.pfp_url} alt="" fill className="rounded-full object-cover" unoptimized />
+                  <Image src={c.author.pfp_url} alt="" fill className="rounded-full object-cover" />
                 </div>
               ) : (
                 <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">

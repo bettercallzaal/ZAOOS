@@ -243,7 +243,6 @@ export function MessageThread({ conversation, messages, loading, xmtpState = 'co
                           width={32}
                           height={32}
                           className="rounded-full object-cover"
-                          unoptimized
                         />
                       ) : (
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] border border-gray-700/50 flex items-center justify-center">

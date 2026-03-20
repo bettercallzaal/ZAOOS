@@ -77,7 +77,7 @@ export function GroupInfoDrawer({ conversation, members, loading, onClose, onRem
                   <div key={m.inboxId} className="flex items-center gap-3 py-2 px-1 rounded-md">
                     {m.pfpUrl ? (
                       <div className="w-8 h-8 relative flex-shrink-0">
-                        <Image src={m.pfpUrl} alt={m.displayName} fill className="rounded-full object-cover" unoptimized />
+                        <Image src={m.pfpUrl} alt={m.displayName} fill className="rounded-full object-cover" />
                       </div>
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">

@@ -129,7 +129,7 @@ export default function GovernancePage() {
     fetch('/api/proposals')
       .then((res) => res.json())
       .then((d) => setProposals(d.proposals || []))
-      .catch(() => {})
+      .catch((err) => console.error('[governance] proposals fetch:', err))
       .finally(() => setProposalsLoading(false));
   }, []);
 

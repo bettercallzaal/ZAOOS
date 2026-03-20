@@ -82,8 +82,8 @@ export async function GET(req: NextRequest) {
   }
 
   if (search) {
-    // Sanitize: escape Supabase filter metacharacters and cap length
-    const safe = search.slice(0, 100).replace(/[%_,().]/g, '');
+    // Sanitize: strip PostgREST filter metacharacters (%, _, commas, parens, dots, backslashes, quotes, asterisks)
+    const safe = search.slice(0, 100).replace(/[%_,().*\\'"]/g, '');
     if (safe) {
       query = query.or(`display_name.ilike.%${safe}%,username.ilike.%${safe}%,primary_wallet.ilike.%${safe}%,real_name.ilike.%${safe}%,ign.ilike.%${safe}%,ens_name.ilike.%${safe}%`);
     }

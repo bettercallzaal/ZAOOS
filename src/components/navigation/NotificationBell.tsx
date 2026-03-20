@@ -52,8 +52,8 @@ export function NotificationBell() {
       const data = await res.json();
       setNotifications(data.notifications || []);
       setUnreadCount(data.unreadCount || 0);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('[NotificationBell] fetch failed:', err);
     }
   }, []);
 
@@ -117,8 +117,8 @@ export function NotificationBell() {
       });
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('[NotificationBell] mark-read failed:', err);
     }
     setLoading(false);
   };

@@ -8,8 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
     "@atproto/api": "^0.19.4",
@@ -38,6 +40,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/papaparse": "^5.5.2",
@@ -50,6 +53,7 @@
     "patch-package": "^8.0.1",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vite": "^8.0.1",
     "vitest": "^3.2.4"
   }
 }

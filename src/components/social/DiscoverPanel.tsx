@@ -55,8 +55,8 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
       if (res.ok) {
         setFollowingSet((prev) => new Set([...prev, fid]));
       }
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('[DiscoverPanel] follow failed:', err);
     }
     setLoadingFollow(null);
   };
@@ -87,7 +87,7 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
       >
         {user.pfpUrl ? (
           <div className="w-10 h-10 flex-shrink-0 relative">
-            <Image src={user.pfpUrl} alt={`${user.displayName || 'User'} avatar`} fill className="rounded-full object-cover" unoptimized />
+            <Image src={user.pfpUrl} alt={`${user.displayName || 'User'} avatar`} fill className="rounded-full object-cover" />
           </div>
         ) : (
           <div className="w-10 h-10 rounded-full bg-gray-700 flex-shrink-0" />

@@ -149,7 +149,8 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
         body: JSON.stringify({ targetFid: profile.fid }),
       });
       if (!res.ok) throw new Error('Follow action failed');
-    } catch {
+    } catch (err) {
+      console.error('[ProfileDrawer] follow toggle failed:', err);
       setFollowing(prev);
     } finally {
       setFollowLoading(false);

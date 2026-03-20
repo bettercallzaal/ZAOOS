@@ -45,8 +45,8 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
         const data = await res.json();
         setSubmissions(data.submissions || []);
       }
-    } catch {
-      // silent
+    } catch (err) {
+      console.error('[SongSubmit] fetch submissions failed:', err);
     } finally {
       setLoading(false);
     }

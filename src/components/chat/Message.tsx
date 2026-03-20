@@ -248,7 +248,6 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
             alt={cast.author.display_name}
             fill
             className="rounded-full object-cover"
-            unoptimized
           />
         ) : (
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] border border-gray-700/50 flex items-center justify-center">

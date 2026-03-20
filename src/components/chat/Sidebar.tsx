@@ -311,7 +311,7 @@ export function Sidebar({
                         >
                           {conv.peerPfpUrl ? (
                             <div className="w-8 h-8 relative flex-shrink-0">
-                              <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || 'DM'} avatar`} fill className="rounded-full object-cover" unoptimized />
+                              <Image src={conv.peerPfpUrl} alt={`${conv.peerDisplayName || 'DM'} avatar`} fill className="rounded-full object-cover" />
                             </div>
                           ) : (
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0 border border-[#f5a623]/10">
@@ -535,7 +535,7 @@ export function Sidebar({
                       <div className="relative flex-shrink-0">
                         {member.pfpUrl ? (
                           <div className="w-6 h-6 relative">
-                            <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" unoptimized />
+                            <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" />
                           </div>
                         ) : (
                           <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center">
@@ -573,7 +573,7 @@ export function Sidebar({
                     <div className="relative flex-shrink-0">
                       {member.pfpUrl ? (
                         <div className="w-6 h-6 relative opacity-50">
-                          <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" unoptimized />
+                          <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" />
                         </div>
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
@@ -672,7 +672,7 @@ export function Sidebar({
           <div className="flex items-center gap-3">
             {user.pfpUrl ? (
               <div className="w-8 h-8 relative flex-shrink-0">
-                <Image src={user.pfpUrl} alt={user.displayName} fill className="rounded-full object-cover" unoptimized />
+                <Image src={user.pfpUrl} alt={user.displayName} fill className="rounded-full object-cover" />
               </div>
             ) : (
               <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Cast, CastEmbed, QuotedCastData } from '@/types';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { MusicEmbed } from '@/components/music/MusicEmbed';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 interface MessageProps {
   cast: Cast;
@@ -358,6 +359,16 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
               </svg>
             </button>
           )}
+
+          {/* Share to Farcaster */}
+          <ShareToFarcaster
+            variant="icon"
+            className="min-w-[44px] min-h-[36px] !p-1.5 rounded-lg hover:bg-white/5"
+            template={shareTemplates.custom(
+              (cast.text.length > 200 ? cast.text.slice(0, 200) + '...' : cast.text) + '\n\nvia The ZAO',
+              ['https://zaoos.com'],
+            )}
+          />
         </div>
 
         {/* Thread bar — prominent clickable indicator when replies exist */}

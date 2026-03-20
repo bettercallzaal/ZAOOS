@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import HatBadge from '@/components/hats/HatBadge';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 interface ProfileData {
   fid: number;
@@ -296,6 +297,14 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                 </svg>
                 View on Farcaster
               </a>
+
+              {/* Share Profile */}
+              <ShareToFarcaster
+                template={shareTemplates.profile(null, profile.displayName)}
+                variant="button"
+                label="Share Profile"
+                className="w-full justify-center"
+              />
 
               {/* DM link */}
               <button

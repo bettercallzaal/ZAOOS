@@ -1,6 +1,7 @@
-# 87 — Building and Deploying a Farcaster AI Agent with Neynar
+# 85 — Building and Deploying a Farcaster AI Agent with Neynar
 
-> **Note:** Folder is named `84-farcaster-agent-neynar-deployment` due to numbering collision. Canonical number is **87**.
+> **Status:** Research complete
+> **Date:** March 19, 2026
 
 **Date:** 2026-03-19
 **Status:** Deep Technical Research

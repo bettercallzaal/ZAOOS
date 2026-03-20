@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **81 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **88 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -18,7 +18,8 @@ Everything about the protocol ZAO OS is built on — how it works, who's buildin
 | [22](./22-farcaster-ecosystem-players/) | **Ecosystem Players & Leaderboards** | Top accounts, tokens (DEGEN/MOXIE/NOTES/CLANKER), mini apps, Purple DAO, analytics tools |
 | [34](./34-farcaster-clients-notifications/) | **All Farcaster Clients Compared** | 18+ clients — pros/cons, features, notification systems, competitive positioning |
 | [73](./73-farcaster-ecosystem-2026-update/) | **Farcaster Ecosystem Update (Mar 2026)** | Neynar acquires Farcaster, Snapchain live, 40-60K DAU, Mini Apps, CLANKER, competitive landscape, ZAO implications |
-| [81](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps SDK, Quick Auth, notifications, cast composition — ZAO OS as a Mini App (folder named 68- due to prior collision) |
+| [86](./68-farcaster-miniapps-integration/) | **Farcaster Mini Apps Integration** | Mini Apps SDK, Quick Auth, notifications, cast composition — ZAO OS as a Mini App (folder named 68-) |
+| [87](./81-farcaster-social-graph-sharing/) | **Farcaster Social Graph & Sharing** | Neynar user data APIs, social graph analysis, compose/share features for pre-generated member profiles (folder named 81-) |
 | [10](./10-hypersnap/) | **Hypersnap** | ⚠️ Incomplete — needs manual review |
 
 ---
@@ -35,6 +36,7 @@ The core of ZAO — how music works in the platform, how artists earn, and how c
 | [37](./37-bridges-competitors-monetization/) | **Competitors & Monetization** | Sound.xyz dead, Catalog dead, Coop Records model, Hypersub pricing, revenue projections ($12K-$1.14M/yr) |
 | [43](./43-webrtc-audio-rooms-streaming/) | **Live Audio Rooms & Streaming** | LiveKit (SFU), synchronized listening parties, Livepeer streaming, Huddle01 (web3-native), cost analysis |
 | [80](./80-jitsi-meet-live-rooms/) | **Jitsi Meet Live Rooms** | Embeddable Jitsi rooms for fractal calls + community meetings, zero-install, self-hostable |
+| [88](./82-music-social-platform-redesign/) | **Music-First Social Platform Redesign** | Redesign ZAO OS from "chat client with music" into THE social platform for music communities (folder named 82-) |
 
 ---
 
@@ -165,6 +167,8 @@ How to use AI agents, skills, and autonomous loops to build and maintain ZAO OS.
 | [81](./81-paperclip-multi-company-agents/) | **Paperclip Multi-Company + Advanced Patterns** | Multi-company isolation, 5-level task hierarchy, agent delegation chains, approval workflows |
 | [82](./82-paperclip-clipmart-plugins/) | **Paperclip ClipMart + Plugin System** | Template marketplace, export/import, plugin architecture, building ZAO-specific plugins |
 | [83](./83-elizaos-2026-update/) | **ElizaOS March 2026 Update** | v1.7.2 stable, v2 alpha, Farcaster/XMTP plugins, Supabase adapter, character files, deployment, cost |
+| [85](./85-farcaster-agent-technical-setup/) | **Farcaster AI Agent Technical Setup** | Step-by-step Neynar agent setup, FID registration, managed signers, deployment guide |
+| [84](./84-farcaster-ai-agents-landscape/) | **Farcaster AI Agents Landscape** | Full landscape of AI agents/bots on Farcaster as of March 2026, for building ZAO community bot |
 
 ---
 
@@ -284,8 +288,8 @@ Start with [40 Audit Guide](./40-codebase-audit-guide/) + [38 AI Code Audit](./3
 
 ## Research Stats
 
-- **Total documents:** 81
+- **Total documents:** 88
 - **Total coverage:** ~300,000+ words
 - **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation
 - **Time span:** January — March 2026
-- **Status:** 80/81 complete, 1 incomplete (Hypersnap)
+- **Status:** 87/88 complete, 1 incomplete (Hypersnap)

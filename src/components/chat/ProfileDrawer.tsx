@@ -224,7 +224,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                 </div>
                 <p className="text-sm text-gray-500 mt-0.5">@{profile.username}</p>
                 {profile.zaoName && profile.zaoName !== profile.displayName && (
-                  <p className="text-xs text-gray-600 mt-1">{profile.zaoName}</p>
+                  <p className="text-xs text-gray-400 mt-1">{profile.zaoName}</p>
                 )}
                 {/* Hat role badges */}
                 {profile.verifiedAddresses.length > 0 && (
@@ -281,7 +281,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               {/* Channel activity stats */}
               {profile.activity && profile.activity.casts > 0 && (
                 <div className="mt-5 w-full max-w-xs">
-                  <p className="text-xs text-gray-600 uppercase tracking-wider text-center mb-3">ZAO Channel Activity</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider text-center mb-3">ZAO Channel Activity</p>
                   <div className="grid grid-cols-4 gap-2">
                     <div className="text-center px-2 py-2 rounded-lg bg-white/5">
                       <p className="text-sm font-bold text-white">{formatCount(profile.activity.casts)}</p>
@@ -329,7 +329,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               </div>
             ) : enriched && enriched.activeChannels.length > 0 ? (
               <div className="px-6 py-4">
-                <p className="text-xs text-gray-600 uppercase tracking-wider mb-3">Active Channels</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Active Channels</p>
                 <div className="flex flex-wrap gap-2">
                   {enriched.activeChannels.map((ch) => (
                     <a
@@ -367,7 +367,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               </div>
             ) : enriched && (enriched.communityStats.songsSubmitted > 0 || enriched.communityStats.proposalsCreated > 0 || enriched.communityStats.votesCast > 0) ? (
               <div className="px-6 py-4">
-                <p className="text-xs text-gray-600 uppercase tracking-wider mb-3">Community Stats</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Community Stats</p>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="text-center px-2 py-2.5 rounded-lg bg-white/5">
                     <p className="text-sm font-bold text-[#f5a623]">{enriched.communityStats.songsSubmitted}</p>
@@ -384,7 +384,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                 </div>
                 {enriched.zid && (
                   <div className="mt-2 text-center">
-                    <span className="text-[10px] text-gray-600">ZID: </span>
+                    <span className="text-[10px] text-gray-400">ZID: </span>
                     <span className="text-[10px] text-gray-400 font-mono">{enriched.zid}</span>
                   </div>
                 )}
@@ -445,7 +445,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               {/* Verified addresses */}
               {profile.verifiedAddresses.length > 0 && (
                 <div className="px-3 pt-3">
-                  <p className="text-xs text-gray-600 uppercase tracking-wider mb-2">Verified Wallets</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Verified Wallets</p>
                   {profile.verifiedAddresses.map((addr) => (
                     <p key={addr} className="text-xs text-gray-500 font-mono truncate mb-1">
                       {addr}
@@ -460,7 +460,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
               <>
                 <div className="border-t border-gray-800 mx-4" />
                 <div className="p-4">
-                  <p className="text-xs text-gray-600 uppercase tracking-wider mb-3">Music NFTs</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Music NFTs</p>
                   {musicLoading ? (
                     <div className="space-y-3">
                       {[1, 2, 3].map((i) => (
@@ -494,7 +494,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                             </div>
                           ) : (
                             <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                              <svg className="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                              <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                               </svg>
                             </div>
@@ -521,14 +521,14 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                               </span>
                             </div>
                           </div>
-                          <svg className="w-3.5 h-3.5 text-gray-600 group-hover:text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                          <svg className="w-3.5 h-3.5 text-gray-500 group-hover:text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                           </svg>
                         </a>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-gray-600 text-center py-3">No music NFTs found</p>
+                    <p className="text-xs text-gray-500 text-center py-3">No music NFTs found</p>
                   )}
                 </div>
               </>

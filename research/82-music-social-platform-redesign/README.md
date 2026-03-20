@@ -1,4 +1,6 @@
-# 81 — Music-First Social Platform Redesign Research
+# 88 — Music-First Social Platform Redesign Research
+
+> **Note:** Folder is named `82-music-social-platform-redesign` due to numbering collision. Canonical number is **88**.
 
 > **Status:** Research complete
 > **Date:** March 19, 2026

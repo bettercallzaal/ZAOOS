@@ -1,4 +1,6 @@
-# 81 — Farcaster Social Graph APIs & Social Sharing Features
+# 87 — Farcaster Social Graph APIs & Social Sharing Features
+
+> **Note:** Folder is named `81-farcaster-social-graph-sharing` due to numbering collision. Canonical number is **87**.
 
 > **Status:** Research complete
 > **Date:** March 19, 2026

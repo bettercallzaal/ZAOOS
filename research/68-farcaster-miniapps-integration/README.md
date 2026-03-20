@@ -1,6 +1,6 @@
-# 81 — Farcaster Mini Apps Integration for ZAO OS
+# 86 — Farcaster Mini Apps Integration for ZAO OS
 
-> **Note:** Folder is named `68-farcaster-miniapps-integration` due to a numbering collision with doc 68 (Alibaba Page Agent). Canonical number is **81**.
+> **Note:** Folder is named `68-farcaster-miniapps-integration` due to a numbering collision with doc 68 (Alibaba Page Agent). Canonical number is **86**.
 
 **Date:** 2026-03-18
 **Status:** Complete

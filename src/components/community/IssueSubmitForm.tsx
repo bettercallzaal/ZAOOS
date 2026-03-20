@@ -164,7 +164,7 @@ export function IssueSubmitForm() {
         {submitting ? 'Submitting...' : 'Submit Issue to ZAO'}
       </button>
 
-      <p className="text-xs text-gray-600 text-center">
+      <p className="text-xs text-gray-500 text-center">
         Issues are reviewed by the ZAO AI CEO and assigned to the right team member.
       </p>
     </form>

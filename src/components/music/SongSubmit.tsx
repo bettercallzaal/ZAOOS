@@ -242,7 +242,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
             </div>
           </div>
 
-          <p className="text-xs text-gray-600 mt-2">
+          <p className="text-xs text-gray-500 mt-2">
             Supported: Spotify, Apple Music, SoundCloud, YouTube, Tidal, Bandcamp, Audius, Sound.xyz, direct audio
           </p>
         </div>
@@ -306,7 +306,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                       {sub.note && (
                         <p className="text-xs text-gray-500 mt-1 line-clamp-2">&ldquo;{sub.note}&rdquo;</p>
                       )}
-                      <p className="text-[10px] text-gray-600 mt-1">
+                      <p className="text-[10px] text-gray-500 mt-1">
                         by @{sub.submitted_by_username} &middot; {new Date(sub.created_at).toLocaleDateString()}
                       </p>
                     </div>

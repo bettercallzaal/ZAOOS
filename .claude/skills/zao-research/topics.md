@@ -119,4 +119,19 @@ Use this to quickly find if a topic has already been researched.
 - Wallet connection patterns → `49` (wallet-connect)
 
 ## Farcaster Mini Apps
-- Farcaster Mini Apps integration, SDK, notifications → `68` (farcaster-miniapps-integration)
+- Farcaster Mini Apps SDK, Quick Auth, notifications → `86` (folder 68-farcaster-miniapps-integration)
+
+## Recent Additions (76-88)
+- Git branching for AI agents (trunk-based dev) → `76`
+- Bluesky cross-posting (@atproto/api, custom feeds, labeler) → `77`
+- Nouns Builder (daily NFT auctions, DAO suite) → `78`
+- SongJam music player research → `79`
+- Jitsi Meet live rooms → `80`
+- Paperclip multi-company agents → `81`
+- Paperclip ClipMart plugins → `82`
+- ElizaOS 2026 update (v1.7.2, v2 alpha) → `83`
+- Farcaster AI agents landscape → `84`
+- Farcaster agent technical setup (Neynar) → `85`
+- Farcaster Mini Apps (SDK, Quick Auth) → `86` (folder 68-)
+- Farcaster social graph & sharing APIs → `87` (folder 81-)
+- Music-first platform redesign → `88` (folder 82-)

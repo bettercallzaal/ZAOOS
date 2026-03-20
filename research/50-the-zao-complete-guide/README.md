@@ -269,8 +269,13 @@ Current capabilities:
 - Push notifications via Farcaster Mini App
 - Admin panel with allowlist management, CSV upload, message moderation
 - ZID assignment (admin-side)
+- Bluesky cross-posting: custom "ZAO Music" feed generator, member sync, labeler, App Password auth (Phase 3 — see doc 77)
+- Ecosystem partner directory with iframe embeds (MAGNETIQ, SongJam, Empire Builder, Incented, Clanker)
+- Auto-profile enrichment from Neynar on first login
+- Per-address wallet visibility toggles
+- Calls page for community coordination
 
-**Research Library** — 54 documents spanning 300,000+ words. Covers protocol infrastructure, identity systems, music integration, AI agents, governance, revenue models, cross-platform publishing, mobile architecture, and security. MIT-licensed and publicly available on GitHub.
+**Research Library** — 88 documents spanning 400,000+ words. Covers protocol infrastructure, identity systems, music integration, AI agents, governance, revenue models, cross-platform publishing, mobile architecture, and security. MIT-licensed and publicly available on GitHub.
 
 ### Prototypes
 
@@ -704,7 +709,7 @@ The surviving projects serve different functions — streaming, fan clubs, event
 | Dec 2025 | ZABAL ecosystem announced. |
 | Jan 1, 2026 | ZABAL token launch. Empire Builder integration. |
 | Feb 2026 | ETH Boulder — ZABAL Connector / Proof of Meet with Magnetiq |
-| Mar 2026 | ZAO OS active development. 54 research documents. Whitepaper Draft 5. LTAW3 ends, Let's Talk About Ethereum begins. |
+| Mar 2026 | ZAO OS active development: 88 research docs, Bluesky Phase 3, ecosystem partner page, governance UI, Paperclip AI agents. Whitepaper Draft 5. LTAW3 ends, Let's Talk About Ethereum begins. |
 | Jul 2026 | **ZAOVille** planned (Virginia, with DCOOP) |
 | Oct 2026 | **ZAO Stock** planned (Ellsworth, Maine) |
 

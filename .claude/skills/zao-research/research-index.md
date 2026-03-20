@@ -1,6 +1,6 @@
 # Research Document Index
 
-76 research documents in `research/`. Each is a folder with a `README.md`.
+88 research documents in `research/`. Each is a folder with a `README.md`.
 
 | # | Folder Name | Topic |
 |---|-------------|-------|
@@ -79,4 +79,16 @@
 | 74 | `74-xmtp-v4-mls-encryption` | XMTP V3 browser SDK, MLS encryption, mainnet fees, history sync, impact on ZAO OS integration |
 | 75 | `75-hats-protocol-v2-updates` | New eligibility modules, HSG v2, subgraph SDK, MCP server, ERC-6551 accounts, ZAO integration gaps |
 | 49 | `49-wallet-connect` | Wallet connection patterns for web3 |
-| 68b | `68-farcaster-miniapps-integration` | Farcaster Mini Apps integration research |
+| 76 | `76-git-branching-ai-agents` | Trunk-based dev with Paperclip agents, short-lived branches, merge strategy |
+| 77 | `77-bluesky-cross-posting-integration` | Bluesky cross-posting: @atproto/api SDK, App Password + OAuth, custom feeds, ZAO labeler |
+| 78 | `78-nouns-builder-integration` | Nouns Builder: daily NFT auctions, 5-contract DAO suite, builder-template-app (MIT/Next.js) |
+| 79 | `79-songjam-music-player-research` | 2026-music-player (Electron torrent, not useful). ZAO player already better. Borrow: 100ms, treemap |
+| 80 | `80-jitsi-meet-live-rooms` | Jitsi Meet embeddable rooms for fractal calls + community meetings |
+| 81 | `81-paperclip-multi-company-agents` | Multi-company isolation, 5-level task hierarchy, agent delegation chains |
+| 82 | `82-paperclip-clipmart-plugins` | Template marketplace, export/import, plugin architecture |
+| 83 | `83-elizaos-2026-update` | ElizaOS v1.7.2 stable, v2 alpha, Farcaster/XMTP plugins, Supabase adapter |
+| 84 | `84-farcaster-ai-agents-landscape` | Full landscape of AI agents/bots on Farcaster March 2026 |
+| 85 | `85-farcaster-agent-technical-setup` | Step-by-step Neynar agent setup, FID registration, managed signers, deployment |
+| 86 | `68-farcaster-miniapps-integration` | Farcaster Mini Apps SDK, Quick Auth, notifications (folder named 68- due to collision) |
+| 87 | `81-farcaster-social-graph-sharing` | Neynar social graph APIs, sharing features, member profiles (folder named 81-) |
+| 88 | `82-music-social-platform-redesign` | Music-first platform redesign research (folder named 82- due to collision) |

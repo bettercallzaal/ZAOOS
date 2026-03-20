@@ -1,6 +1,6 @@
 ---
 name: zao-research
-description: Research skill for ZAO OS — search existing research library (76 docs) + codebase, conduct new research, and save findings in the standardized format
+description: Research skill for ZAO OS — search existing research library (88 docs) + codebase, conduct new research, and save findings in the standardized format
 user-invocable: true
 ---
 
@@ -24,7 +24,7 @@ Read community.config.ts for any config related to the topic
 
 This grounds the research in reality. Research docs may be aspirational.
 
-### Step 2: Search Existing Research (76 docs)
+### Step 2: Search Existing Research (88 docs)
 
 Check [research-index.md](./research-index.md) for the full inventory, or search by topic in [topics.md](./topics.md).
 
@@ -133,7 +133,7 @@ LiveKit wins: MIT-licensed server, self-hostable on Vercel Edge, smallest bundle
 
 ## Reference Files
 
-- [research-index.md](./research-index.md) — full inventory of all 71 docs
+- [research-index.md](./research-index.md) — full inventory of all 88 docs
 - [topics.md](./topics.md) — docs organized by category
 - [search-patterns.md](./search-patterns.md) — grep/glob patterns for searching
 - [new-research.md](./new-research.md) — template and process for new docs

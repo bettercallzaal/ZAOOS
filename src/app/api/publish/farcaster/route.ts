@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     : publishText + attribution;
 
   try {
-    // Publish to @thezao Farcaster account
+    // Publish to @thezao Farcaster account using @thezao's Neynar API key
     const result = await postCast(
       ENV.ZAO_OFFICIAL_SIGNER_UUID,
       castText,
@@ -91,6 +91,8 @@ export async function POST(req: NextRequest) {
       undefined, // no parent (top-level cast)
       undefined, // no embed hash
       proposal.publish_image_url ? [proposal.publish_image_url] : undefined,
+      undefined, // no embed FID
+      ENV.ZAO_OFFICIAL_NEYNAR_API_KEY, // use @thezao's API key
     );
 
     const castHash = result?.cast?.hash;

@@ -30,4 +30,5 @@ export const ENV = {
   // @thezao official account (governance-powered posting)
   ZAO_OFFICIAL_FID: optionalEnv('ZAO_OFFICIAL_FID'),
   ZAO_OFFICIAL_SIGNER_UUID: optionalEnv('ZAO_OFFICIAL_SIGNER_UUID'),
+  ZAO_OFFICIAL_NEYNAR_API_KEY: optionalEnv('ZAO_OFFICIAL_NEYNAR_API_KEY'),
 } as const;

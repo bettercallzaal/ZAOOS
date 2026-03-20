@@ -203,6 +203,11 @@ async function checkPublishThreshold(proposalId: string) {
       ENV.ZAO_OFFICIAL_SIGNER_UUID!,
       castText,
       'zao',
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      ENV.ZAO_OFFICIAL_NEYNAR_API_KEY,
     );
 
     const castHash = result?.cast?.hash;
@@ -216,6 +221,20 @@ async function checkPublishThreshold(proposalId: string) {
       })
       .eq('id', proposalId);
 
-    console.log(`[publish-threshold] Published to @thezao: ${castHash}`);
+    console.log(`[publish-threshold] Published to @thezao Farcaster: ${castHash}`);
+
+    // Also publish to @thezao Bluesky (if configured)
+    try {
+      const { postToBluesky } = await import('@/lib/bluesky/client');
+      const bskyUri = await postToBluesky(
+        publishText + `\n\n— Proposed by @${authorName} • Approved by ZAO governance`,
+        'https://zaoos.com/governance',
+      );
+      if (bskyUri) {
+        console.log(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
+      }
+    } catch (bskyErr) {
+      console.error('[publish-threshold] Bluesky publish failed:', bskyErr);
+    }
   }
 }

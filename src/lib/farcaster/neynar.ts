@@ -37,6 +37,7 @@ export async function postCast(
   embedHash?: string,
   embedUrls?: string[],
   embedFid?: number,
+  apiKey?: string,
 ) {
   const body: Record<string, unknown> = {
     signer_uuid: signerUuid,
@@ -64,7 +65,7 @@ export async function postCast(
 
   const res = await fetch(`${NEYNAR_BASE}/cast`, {
     method: 'POST',
-    headers: headers(),
+    headers: apiKey ? { 'Content-Type': 'application/json', 'x-api-key': apiKey } : headers(),
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(10000),
   });

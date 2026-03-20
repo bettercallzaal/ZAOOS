@@ -51,6 +51,8 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [showSchedule, setShowSchedule] = useState(false);
   const [scheduleTime, setScheduleTime] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounterRef = useRef(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -219,10 +221,72 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
     });
   };
 
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current++;
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current--;
+    if (dragCounterRef.current === 0) {
+      setIsDragging(false);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    dragCounterRef.current = 0;
+
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      handleImageSelect(file);
+    }
+  }, []);
+
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        e.preventDefault();
+        const file = items[i].getAsFile();
+        if (file) handleImageSelect(file);
+        return;
+      }
+    }
+  }, []);
+
   const otherChannels = ALL_CHANNELS.filter((ch) => ch.id !== channel);
 
   return (
-    <div className="border-t border-gray-800 bg-[#0d1b2a] relative">
+    <div
+      className="border-t border-gray-800 bg-[#0d1b2a] relative"
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      {/* Drag-and-drop overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#0a1628]/80 border-2 border-dashed border-[#f5a623] rounded-lg pointer-events-none">
+          <span className="text-[#f5a623] text-sm font-medium">Drop image here</span>
+        </div>
+      )}
+
       {/* Mention autocomplete */}
       {mentionQuery !== null && mentionQuery.length >= 1 && (
         <MentionAutocomplete
@@ -464,6 +528,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
             value={text}
             onChange={handleTextChange}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             placeholder={
               replyTo
                 ? `Reply to ${replyTo.authorName}...`

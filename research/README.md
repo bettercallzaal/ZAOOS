@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **89 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **90 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -113,6 +113,7 @@ The stack that runs ZAO OS — Next.js, Supabase, storage, mobile, real-time, an
 |---|-------|---------|
 | [41](./41-nextjs16-react19-deep-dive/) | **Next.js 16 + React 19** | Turbopack, PPR, proxy.ts, React Compiler, useOptimistic, "use cache", streaming SSR, Tailwind v4 |
 | [42](./42-supabase-advanced-patterns/) | **Supabase Advanced** | Schema design, RLS deep dive, Realtime (Broadcast > Postgres Changes), Edge Functions, pgvector, pg_cron, migrations |
+| [93](./93-supabase-scaling-optimization/) | **Supabase Scaling & Optimization** | Realtime primitives mapped to features, pg_cron jobs (7 scheduled), pgvector for music taste/semantic search, Edge Functions vs API routes, Storage optimization, indexing audit, branching, cost projections 100-1,000 members |
 | [33](./33-infrastructure-mobile-storage/) | **Storage, Mobile & Privacy** | R2/IPFS/Arweave costs, PWA→Capacitor→React Native, real-time infra, audio tech, Semaphore ZK proofs |
 | [14](./14-project-structure/) | **Project Structure** | Single Next.js app decision, route groups, feature folders, GitHub Projects kanban |
 | [16](./16-ui-reference/) | **UI Reference** | CG/Commonwealth patterns, Discord-style dark theme, navy #0a1628 + gold #f5a623 |

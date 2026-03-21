@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import type { WalletName } from '@solana/wallet-adapter-base';
 import bs58 from 'bs58';
 
 interface SolanaWalletConnectProps {
@@ -10,25 +11,36 @@ interface SolanaWalletConnectProps {
 }
 
 export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnectProps) {
-  const { publicKey, connected, connect, disconnect, select, wallets, signMessage } = useWallet();
+  const { publicKey, connected, connect, disconnect, select, wallets, signMessage, wallet } = useWallet();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [showWalletPicker, setShowWalletPicker] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const pendingConnect = useRef(false);
 
   const shortAddr = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 
-  const handleConnect = useCallback(async (walletName: string) => {
+  // After select() updates the wallet, trigger connect()
+  useEffect(() => {
+    if (pendingConnect.current && wallet && !connected) {
+      pendingConnect.current = false;
+      connect().catch(() => {
+        setError('Failed to connect wallet');
+        setConnecting(false);
+      });
+    }
+    if (connected) {
+      setConnecting(false);
+    }
+  }, [wallet, connected, connect]);
+
+  const handleConnect = useCallback((walletName: string) => {
     setError('');
     setShowWalletPicker(false);
-    try {
-      const wallet = wallets.find(w => w.adapter.name === walletName);
-      if (!wallet) return;
-      select(wallet.adapter.name);
-      await connect();
-    } catch {
-      setError('Failed to connect wallet');
-    }
-  }, [wallets, select, connect]);
+    setConnecting(true);
+    pendingConnect.current = true;
+    select(walletName as WalletName);
+  }, [select]);
 
   const handleVerifyAndSave = useCallback(async () => {
     if (!publicKey || !signMessage) return;
@@ -99,6 +111,19 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
     );
   }
 
+  // Connecting state
+  if (connecting) {
+    return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+          <span className="text-sm text-white">Solana</span>
+        </div>
+        <span className="text-xs text-gray-400">Connecting...</span>
+      </div>
+    );
+  }
+
   // Connected but not yet verified/saved
   if (connected && publicKey) {
     return (
@@ -125,6 +150,8 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
   }
 
   // Not connected — show connect options
+  const availableWallets = wallets.filter(w => w.readyState === 'Installed' || w.readyState === 'Loadable');
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -143,24 +170,32 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
       {showWalletPicker && (
         <div className="mt-2 bg-[#0a1628] rounded-lg p-3 border border-gray-700 space-y-2">
           <p className="text-[10px] text-gray-500">Choose a Solana wallet</p>
-          {wallets.filter(w => w.readyState === 'Installed' || w.readyState === 'Loadable').length === 0 ? (
-            <p className="text-[10px] text-gray-600">No Solana wallets detected. Install Phantom or Solflare.</p>
+          {availableWallets.length === 0 ? (
+            <div className="space-y-2">
+              <p className="text-[10px] text-gray-600">No Solana wallets detected.</p>
+              <a
+                href="https://phantom.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-[10px] text-purple-400 hover:text-purple-300"
+              >
+                Install Phantom &rarr;
+              </a>
+            </div>
           ) : (
-            wallets
-              .filter(w => w.readyState === 'Installed' || w.readyState === 'Loadable')
-              .map(wallet => (
-                <button
-                  key={wallet.adapter.name}
-                  onClick={() => handleConnect(wallet.adapter.name)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1a2a3a] transition-colors text-left"
-                >
-                  {wallet.adapter.icon && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={wallet.adapter.icon} alt={wallet.adapter.name} className="w-5 h-5 rounded" />
-                  )}
-                  <span className="text-sm text-white">{wallet.adapter.name}</span>
-                </button>
-              ))
+            availableWallets.map(w => (
+              <button
+                key={w.adapter.name}
+                onClick={() => handleConnect(w.adapter.name)}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1a2a3a] transition-colors text-left"
+              >
+                {w.adapter.icon && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={w.adapter.icon} alt={w.adapter.name} className="w-5 h-5 rounded" />
+                )}
+                <span className="text-sm text-white">{w.adapter.name}</span>
+              </button>
+            ))
           )}
         </div>
       )}

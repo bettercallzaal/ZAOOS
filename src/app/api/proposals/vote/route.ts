@@ -128,10 +128,13 @@ export async function POST(req: NextRequest) {
     }).catch((err) => console.error('[notify]', err));
 
     // Check if this vote pushed the proposal over the publish threshold
+    // Must await — fire-and-forget gets killed by Vercel function timeout
     if (vote === 'for') {
-      checkPublishThreshold(proposal_id).catch((err) =>
-        console.error('[publish-threshold]', err)
-      );
+      try {
+        await checkPublishThreshold(proposal_id);
+      } catch (err) {
+        console.error('[publish-threshold]', err);
+      }
     }
 
     return NextResponse.json({ vote: voteData, respectWeight });

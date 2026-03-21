@@ -64,14 +64,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') ?? '';
   const initialState = cookieToInitialState(
     getWagmiConfig(),
-    (await headers()).get('cookie')
+    headersList.get('cookie')
   );
 
   return (
     <html lang="en">
       <head>
+        <meta property="csp-nonce" content={nonce} />
         <link rel="preconnect" href="https://auth.farcaster.xyz" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>

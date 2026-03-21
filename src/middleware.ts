@@ -84,11 +84,39 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   return null;
 }
 
-function addSecurityHeaders(response: NextResponse): NextResponse {
+function generateNonce(): string {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  // Convert to base64 without using Buffer (Edge Runtime compatible)
+  return btoa(String.fromCharCode(...array));
+}
+
+function buildCspHeader(nonce: string, isMessagesRoute: boolean): string {
+  const directives = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://neynarxyz.github.io https://api.neynar.com https://open.spotify.com https://www.youtube.com https://w.soundcloud.com`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https: http:",
+    "media-src 'self' blob: https:",
+    "connect-src 'self' https: wss:",
+    "font-src 'self' https:",
+    "frame-src 'self' https://open.spotify.com https://www.youtube.com https://w.soundcloud.com https://embed.sound.xyz https://audius.co https://relay.farcaster.xyz https://app.neynar.com https://embed.tidal.com https://*.bandcamp.com https://embed.music.apple.com https://meet.jit.si https://nouns.build https://songjam.space https://empirebuilder.world https://incented.co https://app.magnetiq.xyz https://clanker.world",
+    "worker-src 'self' blob:",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ];
+  return directives.join('; ');
+}
+
+function addSecurityHeaders(response: NextResponse, nonce?: string, isMessagesRoute?: boolean): NextResponse {
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  if (nonce) {
+    response.headers.set('Content-Security-Policy', buildCspHeader(nonce, isMessagesRoute ?? false));
+  }
   return response;
 }
 
@@ -114,17 +142,32 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const response = NextResponse.next();
+  // Generate nonce for page routes (not API routes)
+  const isPageRoute = !pathname.startsWith('/api/');
+  const nonce = isPageRoute ? generateNonce() : undefined;
+  const isMessagesRoute = pathname.startsWith('/messages');
+
+  const requestHeaders = new Headers(request.headers);
+  if (nonce) {
+    requestHeaders.set('x-nonce', nonce);
+  }
+
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
 
   // XMTP WASM requires COEP/COOP for SharedArrayBuffer
-  if (pathname.startsWith('/messages')) {
+  if (isMessagesRoute) {
     response.headers.set('Cross-Origin-Embedder-Policy', 'credentialless');
     response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   }
 
-  return addSecurityHeaders(response);
+  return addSecurityHeaders(response, nonce, isMessagesRoute);
 }
 
 export const config = {
-  matcher: ['/api/:path*', '/messages/:path*'],
+  matcher: [
+    // Match all routes except static files and Next.js internals
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+  ],
 };

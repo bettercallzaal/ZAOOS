@@ -658,29 +658,36 @@ export default function GovernancePage() {
                               Your vote will be recorded with 0 weight. Earn Respect to increase your influence.
                             </p>
                           )}
-                          <div className="flex">
-                            <button
-                              onClick={() => handleVote(proposal.id, 'for')}
-                              disabled={isVoting}
-                              className="flex-1 text-xs font-medium py-2.5 text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-50 border-r border-gray-800"
-                            >
-                              For
-                            </button>
-                            <button
-                              onClick={() => handleVote(proposal.id, 'against')}
-                              disabled={isVoting}
-                              className="flex-1 text-xs font-medium py-2.5 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50 border-r border-gray-800"
-                            >
-                              Against
-                            </button>
-                            <button
-                              onClick={() => handleVote(proposal.id, 'abstain')}
-                              disabled={isVoting}
-                              className="flex-1 text-xs font-medium py-2.5 text-gray-500 hover:bg-white/5 transition-colors disabled:opacity-50"
-                            >
-                              Abstain
-                            </button>
-                          </div>
+                          {isVoting ? (
+                            <div className="flex items-center justify-center gap-2 py-2.5">
+                              <div className="w-3.5 h-3.5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+                              <span className="text-xs text-gray-400">Recording vote...</span>
+                            </div>
+                          ) : (
+                            <div className="flex">
+                              <button
+                                onClick={() => handleVote(proposal.id, 'for')}
+                                disabled={isVoting}
+                                className="flex-1 text-xs font-medium py-2.5 text-green-400 hover:bg-green-500/10 transition-colors disabled:opacity-50 border-r border-gray-800"
+                              >
+                                For
+                              </button>
+                              <button
+                                onClick={() => handleVote(proposal.id, 'against')}
+                                disabled={isVoting}
+                                className="flex-1 text-xs font-medium py-2.5 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50 border-r border-gray-800"
+                              >
+                                Against
+                              </button>
+                              <button
+                                onClick={() => handleVote(proposal.id, 'abstain')}
+                                disabled={isVoting}
+                                className="flex-1 text-xs font-medium py-2.5 text-gray-500 hover:bg-white/5 transition-colors disabled:opacity-50"
+                              >
+                                Abstain
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
 

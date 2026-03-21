@@ -38,7 +38,20 @@ export function LoginButton() {
       const data = await response.json();
 
       if (!response.ok || data.error) {
-        setError(data.error || 'Verification failed');
+        const serverMsg = data.error || '';
+        let helpfulMsg: string;
+        if (response.status === 403 || serverMsg.toLowerCase().includes('not on allowlist') || serverMsg.toLowerCase().includes('not allowed')) {
+          helpfulMsg = 'Your account is not on the allowlist. Contact an admin to request access.';
+        } else if (response.status === 401 || serverMsg.toLowerCase().includes('signature') || serverMsg.toLowerCase().includes('nonce')) {
+          helpfulMsg = 'Verification failed — your session may have expired. Please try signing in again.';
+        } else if (response.status === 429) {
+          helpfulMsg = 'Too many login attempts. Please wait a moment and try again.';
+        } else if (serverMsg) {
+          helpfulMsg = serverMsg;
+        } else {
+          helpfulMsg = 'Verification failed. Please try again or contact an admin if this persists.';
+        }
+        setError(helpfulMsg);
         setLoading(false);
         // Refresh nonce for retry (previous one was consumed or expired)
         fetch('/api/auth/verify').then(r => r.json()).then(d => setServerNonce(d.nonce)).catch(() => {});
@@ -50,7 +63,7 @@ export function LoginButton() {
       }
     } catch (err) {
       console.error('Login failed:', err);
-      setError('Something went wrong. Please try again.');
+      setError('Connection error — check your internet and try again. If this persists, contact an admin.');
       setLoading(false);
     }
   }, [router]);

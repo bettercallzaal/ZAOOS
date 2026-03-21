@@ -124,27 +124,35 @@ export default async function ToolsPage() {
             </div>
           </a>
 
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 opacity-60">
+        </div>
+
+        {/* Coming Soon */}
+        <div className="space-y-3">
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Coming Soon</p>
+
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-dashed border-gray-700">
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
               </svg>
-              <div>
-                <p className="text-sm font-medium text-white">AI Agent</p>
-                <p className="text-xs text-gray-500">Coming soon</p>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-300">AI Agent</p>
+                <p className="text-xs text-gray-500">Onboarding assistant and community helper</p>
               </div>
+              <span className="text-[10px] font-medium text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full">Soon</span>
             </div>
           </div>
 
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 opacity-60">
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-dashed border-gray-700">
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
               </svg>
-              <div>
-                <p className="text-sm font-medium text-white">Taste Profile</p>
-                <p className="text-xs text-gray-500">Coming soon</p>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-300">Taste Profile</p>
+                <p className="text-xs text-gray-500">AI-powered music taste analysis</p>
               </div>
+              <span className="text-[10px] font-medium text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full">Soon</span>
             </div>
           </div>
         </div>

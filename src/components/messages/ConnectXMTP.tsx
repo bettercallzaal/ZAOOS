@@ -69,9 +69,15 @@ export function ConnectXMTP({ isConnecting, error, onConnect }: ConnectXMTPProps
       <p className="text-sm text-gray-400 max-w-sm mb-2">
         End-to-end encrypted messaging powered by XMTP. DM other ZAO members or create private group chats.
       </p>
-      <p className="text-xs text-gray-500 max-w-sm mb-6">
+      <p className="text-xs text-gray-500 max-w-sm mb-3">
         Choose which wallet to use as your XMTP messaging identity.
       </p>
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#f5a623]/5 border border-[#f5a623]/10 max-w-sm mb-6">
+        <svg className="w-4 h-4 text-[#f5a623] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p className="text-[11px] text-gray-400">One-time wallet signature required. No gas fees. Your messages are end-to-end encrypted.</p>
+      </div>
 
       {error && (
         <div className="mb-4 px-4 py-2 bg-red-900/30 text-red-400 text-xs rounded-lg max-w-sm">

@@ -124,7 +124,20 @@ export default function NotificationsPage() {
           </div>
         ) : notifications.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-sm">{filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}</p>
+            {filter === 'unread' ? (
+              <>
+                <p className="text-gray-400 text-sm font-medium">All caught up!</p>
+                <p className="text-gray-500 text-xs mt-1">No unread notifications.</p>
+                <button
+                  onClick={() => setFilter('all')}
+                  className="mt-3 text-xs font-medium text-[#f5a623] hover:text-[#ffd700] transition-colors"
+                >
+                  View All
+                </button>
+              </>
+            ) : (
+              <p className="text-gray-500 text-sm">No notifications yet</p>
+            )}
           </div>
         ) : (
           <div className="space-y-1">

@@ -102,11 +102,18 @@ export const communityConfig = {
     },
     {
       name: 'WaveWarZ',
-      description: 'Music battles — trade ephemeral tokens to vote for your favorite artist.',
+      description: 'Music battles — trade SOL on outcomes in a Solana prediction market for music.',
       url: '/wavewarz',
       icon: 'battle',
     },
   ],
+
+  // ── WaveWarZ ──────────────────────────────────────────────────
+  wavewarz: {
+    mainApp: 'https://www.wavewarz.com',
+    intelligence: 'https://wavewarz-intelligence.vercel.app',
+    analytics: 'https://analytics-wave-warz.vercel.app',
+  },
 
   // ── ZOUNZ / Nouns Builder DAO (Base) ───────────────────────
   zounz: {

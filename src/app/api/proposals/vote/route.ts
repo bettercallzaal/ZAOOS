@@ -129,15 +129,16 @@ export async function POST(req: NextRequest) {
 
     // Check if this vote pushed the proposal over the publish threshold
     // Must await — fire-and-forget gets killed by Vercel function timeout
+    let published = false;
     if (vote === 'for') {
       try {
-        await checkPublishThreshold(proposal_id);
+        published = await checkPublishThreshold(proposal_id);
       } catch (err) {
         console.error('[publish-threshold]', err);
       }
     }
 
-    return NextResponse.json({ vote: voteData, respectWeight });
+    return NextResponse.json({ vote: voteData, respectWeight, published });
   } catch (err) {
     console.error('Vote error:', err);
     return NextResponse.json({ error: 'Failed to submit vote' }, { status: 500 });
@@ -148,7 +149,7 @@ export async function POST(req: NextRequest) {
  * Check if a proposal has reached the Respect vote threshold for auto-publishing
  * to @thezao Farcaster account. Non-blocking, fire-and-forget.
  */
-async function checkPublishThreshold(proposalId: string) {
+async function checkPublishThreshold(proposalId: string): Promise<boolean> {
   // Get proposal with publish info
   const { data: proposal } = await supabaseAdmin
     .from('proposals')
@@ -156,10 +157,10 @@ async function checkPublishThreshold(proposalId: string) {
     .eq('id', proposalId)
     .single();
 
-  if (!proposal) return;
+  if (!proposal) return false;
 
   // Skip if already published
-  if (proposal.published_cast_hash) return;
+  if (proposal.published_cast_hash) return false;
 
   // Sum Respect-weighted FOR votes
   const { data: votes } = await supabaseAdmin
@@ -182,7 +183,7 @@ async function checkPublishThreshold(proposalId: string) {
       .eq('id', proposalId)
       .single();
 
-    if (!fullProposal) return;
+    if (!fullProposal) return false;
 
     const authorName = fullProposal.author?.username || fullProposal.author?.display_name || 'ZAO member';
     // Use publish_text if set, otherwise fallback to title + description
@@ -246,5 +247,9 @@ async function checkPublishThreshold(proposalId: string) {
         status: 'published',
       })
       .eq('id', proposalId);
+
+    return true;
   }
+
+  return false;
 }

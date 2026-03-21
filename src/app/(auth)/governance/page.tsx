@@ -94,6 +94,7 @@ export default function GovernancePage() {
 
   // Voting state
   const [voting, setVoting] = useState<string | null>(null);
+  const [publishToast, setPublishToast] = useState(false);
 
   // Comments expansion state
   const [expandedComments, setExpandedComments] = useState<string | null>(null);
@@ -177,20 +178,33 @@ export default function GovernancePage() {
   const handleVote = async (proposalId: string, vote: 'for' | 'against' | 'abstain') => {
     setVoting(proposalId);
     try {
-      await fetch('/api/proposals/vote', {
+      const voteRes = await fetch('/api/proposals/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ proposal_id: proposalId, vote }),
       });
-      // Refresh proposals
+      const voteData = await voteRes.json();
+      // Refresh proposals to get updated status (including 'published')
       const d = await fetch('/api/proposals').then((r) => r.json());
       setProposals(d.proposals || []);
+      // Show toast if the vote triggered a publish
+      if (voteData.published) {
+        setPublishToast(true);
+        setTimeout(() => setPublishToast(false), 4000);
+      }
     } catch (err) { console.error('[governance] vote:', err); }
     setVoting(null);
   };
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+      {/* Publish success toast */}
+      {publishToast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#f5a623] text-[#0a1628] text-sm font-medium px-5 py-3 rounded-xl shadow-lg animate-fade-in flex items-center gap-2">
+          <span>Published to @thezao!</span>
+          <button onClick={() => setPublishToast(false)} className="ml-2 text-[#0a1628]/60 hover:text-[#0a1628]">&times;</button>
+        </div>
+      )}
       {/* Header */}
       <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
         <div className="flex items-center justify-between">

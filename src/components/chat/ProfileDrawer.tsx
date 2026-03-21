@@ -198,6 +198,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                     alt={profile.displayName}
                     fill
                     className="rounded-full object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-gray-700" />
@@ -346,6 +347,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                           width={14}
                           height={14}
                           className="rounded-full"
+                          unoptimized
                         />
                       )}
                       <span>/{ch.id}</span>
@@ -490,6 +492,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                                 alt={track.title}
                                 fill
                                 className="object-cover"
+                                unoptimized
                               />
                             </div>
                           ) : (

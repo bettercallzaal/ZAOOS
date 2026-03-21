@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
 import { ENV } from '@/lib/env';
+import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 
 /**
  * POST — Publish a governance-approved proposal to @thezao Farcaster account
@@ -106,6 +107,15 @@ export async function POST(req: NextRequest) {
         status: 'published',
       })
       .eq('id', proposalId);
+
+    logAuditEvent({
+      actorFid: session.fid!,
+      action: 'proposal.publish',
+      targetType: 'proposal',
+      targetId: proposalId,
+      details: { castHash, respectVotes: totalRespectFor, threshold },
+      ipAddress: getClientIp(req),
+    });
 
     return NextResponse.json({
       success: true,

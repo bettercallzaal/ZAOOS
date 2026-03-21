@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { followUser, unfollowUser } from '@/lib/farcaster/neynar';
+import { z } from 'zod';
+
+const followSchema = z.object({
+  targetFid: z.number().int().positive(),
+});
 
 export async function POST(request: NextRequest) {
   const session = await getSessionData();
@@ -8,13 +13,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Signer required' }, { status: 401 });
   }
 
-  const { targetFid } = await request.json();
-  if (!targetFid || typeof targetFid !== 'number') {
-    return NextResponse.json({ error: 'Invalid target FID' }, { status: 400 });
+  const body = await request.json();
+  const parsed = followSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
   }
 
   try {
-    await followUser(session.signerUuid, [targetFid]);
+    await followUser(session.signerUuid, [parsed.data.targetFid]);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Follow error:', err);
@@ -28,13 +34,14 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Signer required' }, { status: 401 });
   }
 
-  const { targetFid } = await request.json();
-  if (!targetFid || typeof targetFid !== 'number') {
-    return NextResponse.json({ error: 'Invalid target FID' }, { status: 400 });
+  const body = await request.json();
+  const parsed = followSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
   }
 
   try {
-    await unfollowUser(session.signerUuid, [targetFid]);
+    await unfollowUser(session.signerUuid, [parsed.data.targetFid]);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Unfollow error:', err);

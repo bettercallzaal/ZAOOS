@@ -100,6 +100,12 @@ export const communityConfig = {
       url: 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883',
       icon: 'nouns',
     },
+    {
+      name: 'WaveWarZ',
+      description: 'Music battles — trade ephemeral tokens to vote for your favorite artist.',
+      url: '/wavewarz',
+      icon: 'battle',
+    },
   ],
 
   // ── ZOUNZ / Nouns Builder DAO (Base) ───────────────────────

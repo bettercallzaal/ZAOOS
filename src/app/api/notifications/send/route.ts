@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 
 /**
  * POST /api/notifications/send
@@ -198,6 +199,14 @@ export async function POST(req: NextRequest) {
           });
       }
     }
+
+    logAuditEvent({
+      actorFid: session.fid!,
+      action: 'notification.broadcast',
+      targetType: 'notification',
+      details: { title, recipientCount: recipientFids.length, sent: sentCount },
+      ipAddress: getClientIp(req),
+    });
 
     return NextResponse.json({
       sent: sentCount,

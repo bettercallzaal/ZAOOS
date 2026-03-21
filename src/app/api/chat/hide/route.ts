@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { hideMessageSchema } from '@/lib/validation/schemas';
+import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();
@@ -31,6 +32,15 @@ export async function POST(req: NextRequest) {
       }, { onConflict: 'cast_hash' });
 
     if (error) throw error;
+
+    logAuditEvent({
+      actorFid: session.fid!,
+      action: 'message.hide',
+      targetType: 'cast',
+      targetId: castHash,
+      details: { reason: reason || null },
+      ipAddress: getClientIp(req),
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

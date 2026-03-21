@@ -205,6 +205,7 @@ export function CommunityGraph() {
                     alt={`${member.displayName || member.username || 'Member'} avatar`}
                     fill
                     className="rounded-full object-cover"
+                    unoptimized
                   />
                 </div>
               ) : (
@@ -256,7 +257,7 @@ export function CommunityGraph() {
           <div className="flex items-center gap-3">
             {selectedNode.pfpUrl && (
               <div className="w-10 h-10 relative flex-shrink-0">
-                <Image src={selectedNode.pfpUrl} alt={`${selectedNode.displayName || selectedNode.username || 'Member'} avatar`} fill className="rounded-full object-cover" />
+                <Image src={selectedNode.pfpUrl} alt={`${selectedNode.displayName || selectedNode.username || 'Member'} avatar`} fill className="rounded-full object-cover" unoptimized />
               </div>
             )}
             <div>

@@ -112,6 +112,7 @@ export function MentionAutocomplete({ query, onSelect, onClose, position }: Ment
                     alt={user.username}
                     fill
                     className="rounded-full object-cover"
+                    unoptimized
                   />
                 </div>
               ) : (

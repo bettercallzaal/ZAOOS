@@ -18,7 +18,7 @@ export function ProfileCard({ profile }: { profile: UserProfile }) {
     <div className="bg-gradient-to-r from-[#0d1b2a] to-[#f5a623]/5 rounded-xl p-6 border border-gray-800">
       <div className="flex items-center gap-4">
         {profile.pfp_url ? (
-          <Image src={profile.pfp_url} alt={`${profile.display_name || 'User'} avatar`} width={64} height={64} className="rounded-full" />
+          <Image src={profile.pfp_url} alt={`${profile.display_name || 'User'} avatar`} width={64} height={64} className="rounded-full" unoptimized />
         ) : (
           <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center text-xl text-gray-400 font-bold">
             {profile.display_name?.[0]?.toUpperCase() || '?'}

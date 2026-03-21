@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { allowlistEntrySchema, removeAllowlistSchema } from '@/lib/validation/schemas';
+import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -76,6 +77,14 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
+    logAuditEvent({
+      actorFid: auth.session.fid!,
+      action: 'allowlist.add',
+      targetType: 'allowlist',
+      details: { entry: parsed.data },
+      ipAddress: getClientIp(req),
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Add allowlist error:', error);
@@ -102,6 +111,14 @@ export async function DELETE(req: NextRequest) {
       .eq('id', parsed.data.id);
 
     if (error) throw error;
+
+    logAuditEvent({
+      actorFid: auth.session.fid!,
+      action: 'allowlist.remove',
+      targetType: 'allowlist',
+      targetId: parsed.data.id,
+      ipAddress: getClientIp(req),
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

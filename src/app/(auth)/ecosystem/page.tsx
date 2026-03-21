@@ -10,6 +10,7 @@ const ICON_MAP: Record<string, string> = {
   castle: '\uD83C\uDFF0',
   rocket: '\uD83D\uDE80',
   coin: '\uD83E\uDE99',
+  battle: '\u2694\uFE0F',
 };
 
 // Direct ZABAL-specific URLs
@@ -45,6 +46,41 @@ export default function EcosystemPage() {
         <div className="space-y-3">
           {partners.map((partner) => {
             const zabalUrl = ZABAL_URLS[partner.name] || partner.url;
+            const isInternal = zabalUrl.startsWith('/');
+
+            const cardContent = (
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">{ICON_MAP[partner.icon] || '\uD83D\uDD17'}</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-white group-hover:text-[#f5a623] transition-colors">
+                    {partner.name}
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">{partner.description}</p>
+                  <p className="text-[10px] text-[#f5a623]/50 mt-1 truncate">
+                    {isInternal ? `zaoos.com${zabalUrl}` : zabalUrl.replace('https://', '')}
+                  </p>
+                </div>
+                <svg className="w-4 h-4 text-gray-600 group-hover:text-[#f5a623] transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  {isInternal ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                  )}
+                </svg>
+              </div>
+            );
+
+            if (isInternal) {
+              return (
+                <Link
+                  key={partner.name}
+                  href={zabalUrl}
+                  className="group block bg-[#0d1b2a] rounded-xl p-5 border border-gray-800 hover:border-[#f5a623]/40 transition-all hover:bg-[#0d1b2a]/80"
+                >
+                  {cardContent}
+                </Link>
+              );
+            }
 
             return (
               <a
@@ -54,19 +90,7 @@ export default function EcosystemPage() {
                 rel="noopener noreferrer"
                 className="group block bg-[#0d1b2a] rounded-xl p-5 border border-gray-800 hover:border-[#f5a623]/40 transition-all hover:bg-[#0d1b2a]/80"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{ICON_MAP[partner.icon] || '\uD83D\uDD17'}</span>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-white group-hover:text-[#f5a623] transition-colors">
-                      {partner.name}
-                    </h3>
-                    <p className="text-xs text-gray-400 mt-0.5">{partner.description}</p>
-                    <p className="text-[10px] text-[#f5a623]/50 mt-1 truncate">{zabalUrl.replace('https://', '')}</p>
-                  </div>
-                  <svg className="w-4 h-4 text-gray-600 group-hover:text-[#f5a623] transition-colors flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                  </svg>
-                </div>
+                {cardContent}
               </a>
             );
           })}

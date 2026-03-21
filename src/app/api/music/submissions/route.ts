@@ -108,10 +108,15 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const { id } = await req.json();
-    if (!id) {
-      return NextResponse.json({ error: 'Missing submission id' }, { status: 400 });
+    const body = await req.json();
+    const deleteSchema = z.object({
+      id: z.string().uuid(),
+    });
+    const parsed = deleteSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
+    const { id } = parsed.data;
 
     // Check ownership or admin
     const { data: submission } = await supabaseAdmin

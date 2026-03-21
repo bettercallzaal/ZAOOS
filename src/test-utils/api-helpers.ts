@@ -26,7 +26,8 @@ import { vi } from 'vitest';
  * @param options - Standard RequestInit (method, body, headers, etc.)
  */
 export function makeRequest(path: string, options?: RequestInit): NextRequest {
-  return new NextRequest(new URL(path, 'http://localhost:3000'), options);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return new NextRequest(new URL(path, 'http://localhost:3000'), options as any);
 }
 
 /**

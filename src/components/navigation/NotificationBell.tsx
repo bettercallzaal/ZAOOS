@@ -201,6 +201,7 @@ export function NotificationBell() {
                       width={32}
                       height={32}
                       className="rounded-full flex-shrink-0"
+                      unoptimized
                     />
                   ) : (
                     <div

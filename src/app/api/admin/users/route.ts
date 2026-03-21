@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getUserByFid, getUserByAddress, searchUsers } from '@/lib/farcaster/neynar';
+import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 
 const ethAddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/);
 
@@ -227,6 +228,15 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
+    logAuditEvent({
+      actorFid: auth.session.fid!,
+      action: 'user.create',
+      targetType: 'user',
+      targetId: data.id,
+      details: { wallet: wallet, fid: userData.fid, role: userData.role },
+      ipAddress: getClientIp(req),
+    });
+
     return NextResponse.json({ user: data });
   } catch (error) {
     console.error('Create user error:', error);
@@ -265,6 +275,15 @@ export async function PATCH(req: NextRequest) {
         .select('*')
         .eq('id', id)
         .single();
+
+      logAuditEvent({
+        actorFid: auth.session.fid!,
+        action: 'user.assign_zid',
+        targetType: 'user',
+        targetId: id,
+        ipAddress: getClientIp(req),
+      });
+
       return NextResponse.json({ user: updatedUser });
     }
 
@@ -306,6 +325,15 @@ export async function PATCH(req: NextRequest) {
       throw error;
     }
 
+    logAuditEvent({
+      actorFid: auth.session.fid!,
+      action: 'user.update',
+      targetType: 'user',
+      targetId: id,
+      details: { fields: Object.keys(updates) },
+      ipAddress: getClientIp(req),
+    });
+
     return NextResponse.json({ user: data });
   } catch (error) {
     console.error('Update user error:', error);
@@ -336,6 +364,14 @@ export async function DELETE(req: NextRequest) {
       .eq('id', id);
 
     if (error) throw error;
+
+    logAuditEvent({
+      actorFid: auth.session.fid!,
+      action: 'user.deactivate',
+      targetType: 'user',
+      targetId: id,
+      ipAddress: getClientIp(req),
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

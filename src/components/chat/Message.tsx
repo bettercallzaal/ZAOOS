@@ -150,6 +150,7 @@ function QuotedCastCard({ cast }: { cast: QuotedCastData }) {
           width={20}
           height={20}
           className="rounded-full object-cover flex-shrink-0 mt-0.5"
+          unoptimized
         />
       ) : (
         <div className="w-5 h-5 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -248,6 +249,7 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
             alt={cast.author.display_name}
             fill
             className="rounded-full object-cover"
+            unoptimized
           />
         ) : (
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] border border-gray-700/50 flex items-center justify-center">

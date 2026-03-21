@@ -535,7 +535,7 @@ export function Sidebar({
                       <div className="relative flex-shrink-0">
                         {member.pfpUrl ? (
                           <div className="w-6 h-6 relative">
-                            <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" />
+                            <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" unoptimized />
                           </div>
                         ) : (
                           <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center">
@@ -573,7 +573,7 @@ export function Sidebar({
                     <div className="relative flex-shrink-0">
                       {member.pfpUrl ? (
                         <div className="w-6 h-6 relative opacity-50">
-                          <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" />
+                          <Image src={member.pfpUrl} alt={member.displayName} fill className="rounded-full object-cover" unoptimized />
                         </div>
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
@@ -672,7 +672,7 @@ export function Sidebar({
           <div className="flex items-center gap-3">
             {user.pfpUrl ? (
               <div className="w-8 h-8 relative flex-shrink-0">
-                <Image src={user.pfpUrl} alt={user.displayName} fill className="rounded-full object-cover" />
+                <Image src={user.pfpUrl} alt={user.displayName} fill className="rounded-full object-cover" unoptimized />
               </div>
             ) : (
               <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">

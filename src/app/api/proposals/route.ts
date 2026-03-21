@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification, sendNotification } from '@/lib/notifications';
 import { createProposalSchema } from '@/lib/validation/schemas';
+import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 
 /**
  * GET — List proposals with vote tallies
@@ -189,6 +190,15 @@ export async function PATCH(req: NextRequest) {
       console.error('Update proposal status error:', error);
       return NextResponse.json({ error: 'Failed to update proposal' }, { status: 500 });
     }
+
+    logAuditEvent({
+      actorFid: session.fid!,
+      action: 'proposal.status_change',
+      targetType: 'proposal',
+      targetId: parsed.data.id,
+      details: { newStatus: parsed.data.status },
+      ipAddress: getClientIp(req),
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {

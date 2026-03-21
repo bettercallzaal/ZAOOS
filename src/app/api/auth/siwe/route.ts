@@ -46,7 +46,6 @@ const siweSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  pruneNonces();
   try {
     const body = await req.json();
     const parsed = siweSchema.safeParse(body);

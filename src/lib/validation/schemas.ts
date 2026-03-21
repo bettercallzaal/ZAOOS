@@ -76,6 +76,7 @@ export const createProposalSchema = z.object({
     })
     .optional(),
   publish_text: z.string().trim().max(1024, 'Publish text must be 1024 characters or less').optional(),
+  publish_image_url: z.string().url().optional(),
   respect_threshold: z.number().int().min(0).optional(),
 });
 

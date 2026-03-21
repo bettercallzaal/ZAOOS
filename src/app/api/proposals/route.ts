@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const { title, description, category, closes_at, publish_text, respect_threshold } = parsed.data;
+    const { title, description, category, closes_at, publish_text, publish_image_url, respect_threshold } = parsed.data;
 
     // Get user row
     const { data: user } = await supabaseAdmin
@@ -117,6 +117,7 @@ export async function POST(req: NextRequest) {
         category,
         closes_at: closes_at || null,
         publish_text: publish_text || null,
+        publish_image_url: publish_image_url || null,
         respect_threshold: respect_threshold ?? 1000,
       })
       .select()

@@ -203,13 +203,16 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           ? publishText.slice(0, maxLen - 3) + '...' + attribution
           : publishText + attribution;
 
+        // Include image as embed URL if set
+        const embedUrls = fullProposal.publish_image_url ? [fullProposal.publish_image_url] : undefined;
+
         const result = await postCast(
           ENV.ZAO_OFFICIAL_SIGNER_UUID,
           castText,
           'zao',
           undefined,
           undefined,
-          undefined,
+          embedUrls,
           undefined,
           ENV.ZAO_OFFICIAL_NEYNAR_API_KEY,
         );

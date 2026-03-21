@@ -10,7 +10,7 @@ import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFar
 
 const HatTree = dynamic(() => import('@/components/hats/HatTree'), { ssr: false });
 const HatManager = dynamic(() => import('@/components/hats/HatManager'), { ssr: false });
-const EcosystemPanel = dynamic(() => import('@/components/ecosystem/EcosystemPanel'), { ssr: false });
+// EcosystemPanel moved to its own /ecosystem tab
 
 interface RespectEntry {
   rank: number;
@@ -81,7 +81,7 @@ export default function GovernancePage() {
   const [loading, setLoading] = useState(true);
   const [proposalsLoading, setProposalsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [tab, setTab] = useState<'overview' | 'proposals' | 'roles' | 'manage' | 'ecosystem'>('overview');
+  const [tab, setTab] = useState<'overview' | 'proposals' | 'roles' | 'manage'>('overview');
 
   // Create proposal state
   const [showCreate, setShowCreate] = useState(false);
@@ -89,6 +89,8 @@ export default function GovernancePage() {
   const [newDesc, setNewDesc] = useState('');
   const [newCategory, setNewCategory] = useState('general');
   const [newPublishText, setNewPublishText] = useState('');
+  const [newPublishImage, setNewPublishImage] = useState<File | null>(null);
+  const [newPublishImagePreview, setNewPublishImagePreview] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
 
@@ -149,6 +151,18 @@ export default function GovernancePage() {
     setCreating(true);
     setCreateError('');
     try {
+      // Upload image if attached
+      let publishImageUrl: string | undefined;
+      if (newPublishImage) {
+        const formData = new FormData();
+        formData.append('file', newPublishImage);
+        const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+        if (uploadRes.ok) {
+          const { url } = await uploadRes.json();
+          publishImageUrl = url;
+        }
+      }
+
       const res = await fetch('/api/proposals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -157,6 +171,7 @@ export default function GovernancePage() {
           description: newDesc,
           category: newCategory,
           publish_text: newPublishText.trim() || undefined,
+          publish_image_url: publishImageUrl,
         }),
       });
       if (res.ok) {
@@ -164,8 +179,9 @@ export default function GovernancePage() {
         setNewTitle('');
         setNewDesc('');
         setNewPublishText('');
+        setNewPublishImage(null);
+        setNewPublishImagePreview(null);
         setNewCategory('general');
-        // Refresh proposals
         const d = await fetch('/api/proposals').then((r) => r.json());
         setProposals(d.proposals || []);
       }
@@ -240,14 +256,6 @@ export default function GovernancePage() {
             }`}
           >
             Proposals{proposals.filter((p) => p.status === 'open').length > 0 && ` (${proposals.filter((p) => p.status === 'open').length})`}
-          </button>
-          <button
-            onClick={() => setTab('ecosystem')}
-            className={`flex-1 text-xs font-medium py-2 rounded-lg transition-colors ${
-              tab === 'ecosystem' ? 'bg-[#f5a623]/10 text-[#f5a623]' : 'text-gray-500 hover:text-white'
-            }`}
-          >
-            Ecosystem
           </button>
           {isAdmin && (
             <button
@@ -440,10 +448,6 @@ export default function GovernancePage() {
           <HatManager />
         )}
 
-        {tab === 'ecosystem' && (
-          <EcosystemPanel />
-        )}
-
         {tab === 'proposals' && (
           <>
             {/* Create Proposal */}
@@ -494,6 +498,39 @@ export default function GovernancePage() {
                     maxLength={1024}
                     className="w-full bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623] resize-none"
                   />
+                  {/* Image attachment */}
+                  <div className="flex items-center gap-2">
+                    <label className="flex items-center gap-1.5 text-[10px] text-gray-400 hover:text-[#f5a623] cursor-pointer transition-colors">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25a2.25 2.25 0 00-2.25-2.25H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                      </svg>
+                      {newPublishImage ? 'Change image' : 'Attach image'}
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/gif,image/webp"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && file.size <= 5 * 1024 * 1024) {
+                            setNewPublishImage(file);
+                            setNewPublishImagePreview(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                    </label>
+                    {newPublishImagePreview && (
+                      <div className="relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={newPublishImagePreview} alt="Preview" className="h-10 rounded border border-gray-700" />
+                        <button
+                          onClick={() => { setNewPublishImage(null); setNewPublishImagePreview(null); }}
+                          className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[8px]"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    )}
+                  </div>
                   <p className="text-[10px] text-gray-500">
                     Leave empty to skip auto-publishing. If filled, the community votes to publish.
                   </p>

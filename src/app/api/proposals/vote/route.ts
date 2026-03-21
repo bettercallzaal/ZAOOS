@@ -237,16 +237,43 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       console.error('[publish-threshold] Bluesky publish failed:', bskyErr);
     }
 
-    // Mark proposal as published with both URIs
-    await supabaseAdmin
+    // Mark proposal as published — try with bluesky URI first, fallback without
+    const updateData: Record<string, unknown> = {
+      published_cast_hash: castHash || 'bluesky-only',
+      published_at: new Date().toISOString(),
+      status: 'published',
+    };
+
+    // Only include bluesky URI if the column exists
+    if (bskyUri) {
+      updateData.published_bluesky_uri = bskyUri;
+    }
+
+    const { error: updateErr } = await supabaseAdmin
       .from('proposals')
-      .update({
-        published_cast_hash: castHash || 'bluesky-only',
-        published_bluesky_uri: bskyUri || null,
-        published_at: new Date().toISOString(),
-        status: 'published',
-      })
+      .update(updateData)
       .eq('id', proposalId);
+
+    if (updateErr) {
+      console.error('[publish-threshold] DB update failed:', updateErr);
+      // Retry without bluesky URI column in case it doesn't exist
+      const { error: retryErr } = await supabaseAdmin
+        .from('proposals')
+        .update({
+          published_cast_hash: castHash || 'bluesky-only',
+          published_at: new Date().toISOString(),
+          status: 'published',
+        })
+        .eq('id', proposalId);
+
+      if (retryErr) {
+        console.error('[publish-threshold] DB retry also failed:', retryErr);
+      } else {
+        console.log('[publish-threshold] DB updated (without bluesky URI column)');
+      }
+    } else {
+      console.log('[publish-threshold] DB updated successfully — status: published');
+    }
 
     return true;
   }

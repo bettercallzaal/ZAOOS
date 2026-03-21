@@ -88,12 +88,13 @@ export async function POST(req: NextRequest) {
       .eq('fid', session.fid)
       .single();
 
-    await supabaseAdmin
+    const { error: memberErr } = await supabaseAdmin
       .from('bluesky_members')
       .upsert(
         { did, handle, user_id: user?.id || null, added_by: 'self' },
         { onConflict: 'did' }
-      ).catch((err) => console.error('[bluesky] Auto-register member:', err));
+      );
+    if (memberErr) console.error('[bluesky] Auto-register member:', memberErr);
 
     return NextResponse.json({ success: true, handle, did });
   } catch (err) {

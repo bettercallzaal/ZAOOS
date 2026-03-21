@@ -88,7 +88,8 @@ export async function GET(req: NextRequest) {
         await supabaseAdmin
           .from('proposals')
           .update({
-            published_cast_hash: bskyUri,
+            published_cast_hash: 'bluesky-only',
+            published_bluesky_uri: bskyUri,
             published_at: new Date().toISOString(),
             status: 'published',
           })

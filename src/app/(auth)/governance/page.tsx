@@ -63,6 +63,7 @@ interface Proposal {
   commentCount: number;
   publish_text?: string | null;
   published_cast_hash?: string | null;
+  published_bluesky_uri?: string | null;
   respect_threshold?: number | null;
 }
 
@@ -640,7 +641,7 @@ export default function GovernancePage() {
                           'text-blue-400 bg-blue-500/5'
                         }`}>
                           {proposal.status === 'published' ? (
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-3 flex-wrap">
                               <span>Published to @thezao</span>
                               {proposal.published_cast_hash && proposal.published_cast_hash !== 'bluesky-only' && (
                                 <a
@@ -649,17 +650,24 @@ export default function GovernancePage() {
                                   rel="noopener noreferrer"
                                   className="text-purple-400 hover:text-purple-300 underline"
                                 >
-                                  Farcaster
+                                  View on Farcaster
                                 </a>
                               )}
-                              <a
-                                href={`https://bsky.app/profile/${process.env.NEXT_PUBLIC_BLUESKY_HANDLE || 'thezao.bsky.social'}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-400 hover:text-blue-300 underline"
-                              >
-                                Bluesky
-                              </a>
+                              {proposal.published_bluesky_uri && (
+                                <a
+                                  href={(() => {
+                                    // Convert at:// URI to bsky.app URL
+                                    const match = proposal.published_bluesky_uri?.match(/at:\/\/(did:[^/]+)\/app\.bsky\.feed\.post\/(.+)/);
+                                    if (match) return `https://bsky.app/profile/${match[1]}/post/${match[2]}`;
+                                    return 'https://bsky.app';
+                                  })()}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:text-blue-300 underline"
+                                >
+                                  View on Bluesky
+                                </a>
+                              )}
                             </div>
                           ) :
                            proposal.status === 'approved' ? 'Approved' :

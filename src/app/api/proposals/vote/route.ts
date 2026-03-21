@@ -222,9 +222,10 @@ async function checkPublishThreshold(proposalId: string) {
     }
 
     // Publish to @thezao Bluesky (independent of Farcaster)
+    let bskyUri: string | null = null;
     try {
       const { postToBluesky } = await import('@/lib/bluesky/client');
-      const bskyUri = await postToBluesky(
+      bskyUri = await postToBluesky(
         publishText + attribution,
         'https://zaoos.com/governance',
       );
@@ -235,11 +236,12 @@ async function checkPublishThreshold(proposalId: string) {
       console.error('[publish-threshold] Bluesky publish failed:', bskyErr);
     }
 
-    // Mark proposal as published (even if only Bluesky succeeded)
+    // Mark proposal as published with both URIs
     await supabaseAdmin
       .from('proposals')
       .update({
         published_cast_hash: castHash || 'bluesky-only',
+        published_bluesky_uri: bskyUri || null,
         published_at: new Date().toISOString(),
         status: 'published',
       })

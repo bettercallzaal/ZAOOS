@@ -66,6 +66,10 @@ export async function GET(req: NextRequest) {
         totalWeight: votes.reduce((s: number, v: { respect_weight: number }) => s + v.respect_weight, 0),
       },
       commentCount: p.comment_count?.[0]?.count || 0,
+      publish_text: p.publish_text || null,
+      published_cast_hash: p.published_cast_hash || null,
+      published_bluesky_uri: p.published_bluesky_uri || null,
+      respect_threshold: p.respect_threshold || 1000,
     };
   });
 

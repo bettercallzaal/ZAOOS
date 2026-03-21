@@ -13,25 +13,27 @@ const appClient = createAppClient({
   ethereum: viemConnector(),
 });
 
-// In-memory nonce store with expiry (5 min TTL, max 10k entries)
-const NONCE_TTL = 5 * 60 * 1000;
-const MAX_NONCES = 10_000;
-const nonceStore = new Map<string, number>(); // nonce → created timestamp
-
-function pruneNonces() {
-  const now = Date.now();
-  for (const [n, ts] of nonceStore) {
-    if (now - ts > NONCE_TTL) nonceStore.delete(n);
-  }
-}
+const NONCE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
  * GET — Generate a nonce for SIWF
+ * Stored in Supabase (persistent across serverless instances)
  */
 export async function GET() {
-  pruneNonces();
   const nonce = crypto.randomBytes(16).toString('hex');
-  nonceStore.set(nonce, Date.now());
+  const expiresAt = new Date(Date.now() + NONCE_TTL).toISOString();
+
+  await supabaseAdmin
+    .from('auth_nonces')
+    .insert({ nonce, expires_at: expiresAt });
+
+  // Prune expired nonces (fire and forget)
+  supabaseAdmin
+    .from('auth_nonces')
+    .delete()
+    .lt('expires_at', new Date().toISOString())
+    .then(() => {}, () => {});
+
   return NextResponse.json({ nonce });
 }
 
@@ -55,13 +57,23 @@ export async function POST(req: NextRequest) {
 
     const { message, signature, nonce, domain } = parsed.data;
 
-    // Validate server-issued nonce (one-time use, 5 min TTL)
-    const nonceTimestamp = nonceStore.get(nonce);
-    if (!nonceTimestamp || Date.now() - nonceTimestamp > NONCE_TTL) {
-      nonceStore.delete(nonce);
-      return NextResponse.json({ error: 'Invalid or expired nonce' }, { status: 400 });
+    // Validate server-issued nonce from Supabase (one-time use, 5 min TTL)
+    const { data: nonceRow } = await supabaseAdmin
+      .from('auth_nonces')
+      .select('nonce, expires_at')
+      .eq('nonce', nonce)
+      .maybeSingle();
+
+    if (!nonceRow || new Date(nonceRow.expires_at) < new Date()) {
+      // Clean up expired nonce if it exists
+      if (nonceRow) {
+        await supabaseAdmin.from('auth_nonces').delete().eq('nonce', nonce);
+      }
+      return NextResponse.json({ error: 'Invalid or expired nonce. Please try signing in again.' }, { status: 400 });
     }
-    nonceStore.delete(nonce); // One-time use — prevents replay
+
+    // Delete nonce immediately — one-time use, prevents replay
+    await supabaseAdmin.from('auth_nonces').delete().eq('nonce', nonce);
 
     // Verify SIWF signature
     const result = await appClient.verifySignInMessage({

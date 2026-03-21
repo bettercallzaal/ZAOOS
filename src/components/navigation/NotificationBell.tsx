@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { communityConfig } from '@/../community.config';
+import { useAuth } from '@/hooks/useAuth';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 interface Notification {
@@ -39,6 +40,7 @@ const TYPE_ICONS: Record<string, string> = {
 };
 
 export function NotificationBell() {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -62,6 +64,9 @@ export function NotificationBell() {
   useEffect(() => {
     fetchNotifications();
 
+    // Need a valid FID to filter the Realtime subscription
+    if (!user?.fid) return;
+
     let channel: ReturnType<SupabaseClient['channel']> | null = null;
     let fallbackInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -71,13 +76,14 @@ export function NotificationBell() {
       const { getSupabaseBrowser } = require('@/lib/db/supabase');
       const supabase: SupabaseClient = getSupabaseBrowser();
       channel = supabase
-        .channel('notifications')
+        .channel(`notifications:${user.fid}`)
         .on(
           'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
-            table: 'in_app_notifications',
+            table: 'notifications',
+            filter: `recipient_fid=eq.${user.fid}`,
           },
           () => {
             fetchNotifications();
@@ -93,7 +99,7 @@ export function NotificationBell() {
       channel?.unsubscribe();
       if (fallbackInterval) clearInterval(fallbackInterval);
     };
-  }, [fetchNotifications]);
+  }, [fetchNotifications, user?.fid]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   // Close dropdown on outside click

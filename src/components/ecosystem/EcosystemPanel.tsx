@@ -6,6 +6,8 @@ import { communityConfig } from '@/../community.config';
 
 const ZounzAuction = dynamic(() => import('@/components/zounz/ZounzAuction'), { ssr: false });
 
+import Link from 'next/link';
+
 const ICON_MAP: Record<string, string> = {
   magnet: '\uD83E\uDDF2',
   music: '\uD83C\uDFB5',
@@ -13,6 +15,7 @@ const ICON_MAP: Record<string, string> = {
   rocket: '\uD83D\uDE80',
   coin: '\uD83E\uDE99',
   nouns: '\u2302',
+  battle: '\u2694\uFE0F',
 };
 
 // Direct ZABAL-specific URLs for iframe embeds
@@ -45,6 +48,29 @@ export default function EcosystemPanel() {
       {partners.map((partner) => {
         const isExpanded = expanded === partner.name;
         const embedUrl = EMBED_URLS[partner.name] || partner.url;
+        const isInternal = embedUrl.startsWith('/');
+
+        // Internal links (like /wavewarz) navigate directly instead of iframe
+        if (isInternal) {
+          return (
+            <Link
+              key={partner.name}
+              href={embedUrl}
+              className="block bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 hover:border-[#f5a623]/40 transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{ICON_MAP[partner.icon] || '\uD83D\uDD17'}</span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-white">{partner.name}</h3>
+                  <p className="text-xs text-gray-400 truncate">{partner.description}</p>
+                </div>
+                <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </Link>
+          );
+        }
 
         return (
           <div

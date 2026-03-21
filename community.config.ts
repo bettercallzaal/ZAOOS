@@ -103,7 +103,7 @@ export const communityConfig = {
     {
       name: 'WaveWarZ',
       description: 'Music battles — trade ephemeral tokens to vote for your favorite artist.',
-      url: '/wavewarz',
+      url: 'https://www.wavewarz.com',
       icon: 'battle',
     },
   ],

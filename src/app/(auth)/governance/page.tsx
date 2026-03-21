@@ -184,14 +184,15 @@ export default function GovernancePage() {
         body: JSON.stringify({ proposal_id: proposalId, vote }),
       });
       const voteData = await voteRes.json();
-      // Refresh proposals to get updated status (including 'published')
-      const d = await fetch('/api/proposals').then((r) => r.json());
-      setProposals(d.proposals || []);
       // Show toast if the vote triggered a publish
       if (voteData.published) {
         setPublishToast(true);
         setTimeout(() => setPublishToast(false), 4000);
       }
+      // Small delay to ensure DB write is committed, then refresh
+      await new Promise((r) => setTimeout(r, 500));
+      const d = await fetch(`/api/proposals?_t=${Date.now()}`).then((r) => r.json());
+      setProposals(d.proposals || []);
     } catch (err) { console.error('[governance] vote:', err); }
     setVoting(null);
   };

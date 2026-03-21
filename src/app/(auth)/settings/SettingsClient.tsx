@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
 import type { SessionData } from '@/types';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
@@ -30,6 +31,7 @@ interface Profile {
   verified_addresses: string[];
   created_at: string | null;
   bluesky_handle: string | null;
+  solana_wallet: string | null;
 }
 
 interface SettingsClientProps {
@@ -285,6 +287,9 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     return () => { script.remove(); };
   }, [hasSigner]);
 
+  // Solana wallet state
+  const [solanaWallet, setSolanaWallet] = useState(profile?.solana_wallet || null);
+
   // Bluesky connection state
   const [blueskyHandle, setBlueskyHandle] = useState(profile?.bluesky_handle || null);
   const [showBlueskyConnect, setShowBlueskyConnect] = useState(false);
@@ -390,6 +395,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     !!session?.signerUuid,
     xmtpConnected,
     !!blueskyHandle,
+    !!solanaWallet,
   ];
   const connectedCount = connections.filter(Boolean).length;
 
@@ -418,7 +424,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         <section>
           <div className="flex items-center justify-between px-1 mb-3">
             <p className="text-xs text-gray-500 uppercase tracking-wider">Connections</p>
-            <span className="text-[10px] text-gray-600">{connectedCount} of 5 connected</span>
+            <span className="text-[10px] text-gray-600">{connectedCount} of {connections.length} connected</span>
           </div>
           <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
             <div className="space-y-3">
@@ -540,6 +546,12 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 </div>
               )}
 
+              {/* Solana Wallet */}
+              <SolanaWalletConnect
+                savedWallet={solanaWallet}
+                onSaved={setSolanaWallet}
+              />
+
               {/* Push Notifications */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -582,7 +594,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
           <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
             <div className="flex items-center gap-4 mb-4">
               {profile.pfp_url ? (
-                <Image src={profile.pfp_url} alt={profile.fc_display_name || 'avatar'} width={56} height={56} className="rounded-full" />
+                <Image src={profile.pfp_url} alt={profile.fc_display_name || 'avatar'} width={56} height={56} className="rounded-full" unoptimized />
               ) : (
                 <div className="w-14 h-14 rounded-full bg-gray-700 flex items-center justify-center">
                   <span className="text-lg text-gray-400 font-bold">{(profile.fc_display_name || '?')[0]?.toUpperCase()}</span>
@@ -1020,6 +1032,20 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     </svg>
                   )}
                 </button>
+              </div>
+            )}
+
+            {/* Solana wallet */}
+            {solanaWallet && (
+              <div className="flex items-center gap-3 px-5 py-4">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-bold text-purple-400">SOL</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500">Solana Wallet</p>
+                  <p className="text-sm text-white font-mono truncate">{solanaWallet}</p>
+                </div>
+                <CopyButton text={solanaWallet} />
               </div>
             )}
 

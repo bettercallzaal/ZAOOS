@@ -148,14 +148,14 @@ export function ShareToFarcaster({
 export const shareTemplates = {
   /** Share a song you're listening to */
   song: (trackName: string, artistName: string, url?: string): ShareTemplate => ({
-    text: `Listening to "${trackName}" by ${artistName} on ZAO OS\n\nMusic artists building onchain`,
+    text: `Vibing to "${trackName}" by ${artistName}\n\nDiscovered on @thezao — where music artists build onchain\n\nWhat are you listening to?`,
     embeds: url ? [url] : ['https://zaoos.com'],
     channel: 'zao',
   }),
 
   /** Share your respect rank */
   respectRank: (rank: number, respect: number): ShareTemplate => ({
-    text: `Ranked #${rank} with ${respect.toLocaleString()} Respect in The ZAO\n\nMusic artists building onchain`,
+    text: `Ranked #${rank} with ${respect.toLocaleString()} Respect in The ZAO\n\nRespect is earned through community participation — fractals, governance, and curation\n\nHow much Respect do you have?`,
     embeds: ['https://zaoos.com/governance'],
     channel: 'zao',
   }),
@@ -163,8 +163,8 @@ export const shareTemplates = {
   /** Share a proposal */
   proposal: (title: string, action: 'created' | 'voted'): ShareTemplate => ({
     text: action === 'created'
-      ? `New proposal in The ZAO: "${title}"\n\nVote now on ZAO OS`
-      : `Just voted on "${title}" in The ZAO\n\nGovernance by the community, for the community`,
+      ? `New proposal in The ZAO: "${title}"\n\nCommunity-driven governance — your Respect tokens = your voting power\n\nVote now on ZAO OS`
+      : `Just voted on "${title}" in The ZAO\n\nOn-chain governance by the community, for the community\n\nHave your say`,
     embeds: ['https://zaoos.com/governance'],
     channel: 'zao',
   }),
@@ -172,22 +172,22 @@ export const shareTemplates = {
   /** Share your ZID profile */
   profile: (zid: number | null, displayName: string): ShareTemplate => ({
     text: zid
-      ? `ZID #${zid} in The ZAO — ${displayName}\n\nMusic artists building onchain`
-      : `${displayName} in The ZAO\n\nMusic artists building onchain`,
+      ? `ZID #${zid} — ${displayName} in The ZAO\n\nMusic artists building onchain together. Governance, respect, collaboration.\n\nJoin The ZAO`
+      : `${displayName} in The ZAO\n\nMusic artists building onchain together. Governance, respect, collaboration.\n\nJoin The ZAO`,
     embeds: ['https://zaoos.com'],
     channel: 'zao',
   }),
 
   /** Share ZOUNZ auction */
   zounzAuction: (tokenId: string, currentBid: string): ShareTemplate => ({
-    text: `ZOUNZ #${tokenId} is live — current bid: ${currentBid} ETH\n\nZABAL Nouns DAO on Base`,
+    text: `ZOUNZ #${tokenId} auction is live!\n\nCurrent bid: ${currentBid} ETH\nZABAL Nouns DAO on Base\n\n1 NFT = 1 governance vote. 100% to treasury.\n\nPlace your bid`,
     embeds: [`https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883/${tokenId}`],
     channel: 'zabal',
   }),
 
   /** Invite to ZAO */
   invite: (): ShareTemplate => ({
-    text: `Music artists building onchain\n\nThe ZAO — a gated community for creators who govern, collaborate, and grow together`,
+    text: `The ZAO — where music artists build onchain\n\nA gated community for creators who govern, collaborate, and grow together\n\nOn-chain governance with Respect tokens\n8-platform music player\nCross-post to Farcaster + Bluesky\nEncrypted messaging\n\nJoin us`,
     embeds: ['https://zaoos.com'],
     channel: 'zao',
   }),
@@ -195,16 +195,39 @@ export const shareTemplates = {
   /** Share a song submission */
   songSubmission: (trackName: string, note?: string): ShareTemplate => ({
     text: note
-      ? `Submitted "${trackName}" to The ZAO\n\n"${note}"\n\nListen on ZAO OS`
-      : `Submitted "${trackName}" to The ZAO\n\nListen on ZAO OS`,
+      ? `Just submitted "${trackName}" to The ZAO\n\n"${note}"\n\nCommunity-curated music. Listen and discover on ZAO OS`
+      : `Just submitted "${trackName}" to The ZAO\n\nCommunity-curated music. Listen and discover on ZAO OS`,
     embeds: ['https://zaoos.com'],
     channel: 'zao',
   }),
 
   /** Share a new member welcome */
   welcomeMember: (username: string): ShareTemplate => ({
-    text: `Welcome @${username} to The ZAO!\n\nMusic artists building onchain`,
+    text: `Welcome @${username} to The ZAO!\n\nAnother music artist joining the onchain movement\n\nGovernance. Respect. Collaboration. Music.\n\nThe ZAO is growing`,
     embeds: ['https://zaoos.com'],
+    channel: 'zao',
+  }),
+
+  /** Share a published governance post */
+  publishedProposal: (title: string, castHash?: string): ShareTemplate => ({
+    text: `The ZAO community has spoken!\n\n"${title}"\n\nApproved by governance — powered by Respect-weighted voting\n\nThis is how decentralized music communities make decisions`,
+    embeds: ['https://zaoos.com/governance'],
+    channel: 'zao',
+  }),
+
+  /** Share the ecosystem */
+  ecosystem: (): ShareTemplate => ({
+    text: `The ZAO Ecosystem\n\nZOUNZ DAO • SongJam • Empire Builder • MAGNETIQ • Incented • Clanker\n\nAll accessible from one app. Music artists building onchain.\n\nExplore the ecosystem`,
+    embeds: ['https://zaoos.com'],
+    channel: 'zabal',
+  }),
+
+  /** Share a fractal call */
+  fractalCall: (weekNumber?: number): ShareTemplate => ({
+    text: weekNumber
+      ? `Fractal Call Week ${weekNumber} happening in The ZAO\n\nPeer-ranked contributions. Fibonacci scoring. Earn Respect.\n\nJoin the call on ZAO OS`
+      : `Fractal calls are how The ZAO distributes Respect\n\nPeer-ranked contributions. Fibonacci scoring. Community governance.\n\nJoin on ZAO OS`,
+    embeds: ['https://zaoos.com/governance'],
     channel: 'zao',
   }),
 

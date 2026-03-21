@@ -7,6 +7,7 @@ import { communityConfig } from '@/../community.config';
 const ZounzAuction = dynamic(() => import('@/components/zounz/ZounzAuction'), { ssr: false });
 
 import Link from 'next/link';
+import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 const ICON_MAP: Record<string, string> = {
   magnet: '\uD83E\uDDF2',
@@ -40,8 +41,9 @@ export default function EcosystemPanel() {
         <ZounzAuction />
       </div>
 
-      <div className="mb-2">
-        <p className="text-xs text-gray-500 uppercase tracking-wider px-1">ZABAL Partner Apps</p>
+      <div className="mb-2 flex items-center justify-between px-1">
+        <p className="text-xs text-gray-500 uppercase tracking-wider">ZABAL Partner Apps</p>
+        <ShareToFarcaster template={shareTemplates.ecosystem()} variant="compact" label="Share Ecosystem" />
         <p className="text-xs text-gray-600 px-1 mt-1">Tap a partner to open their ZABAL integration inline.</p>
       </div>
 

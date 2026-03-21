@@ -146,11 +146,6 @@ export async function POST(req: NextRequest) {
  * to @thezao Farcaster account. Non-blocking, fire-and-forget.
  */
 async function checkPublishThreshold(proposalId: string) {
-  const ENV = await import('@/lib/env').then((m) => m.ENV);
-
-  // Skip if not configured
-  if (!ENV.ZAO_OFFICIAL_SIGNER_UUID || !ENV.ZAO_OFFICIAL_FID) return;
-
   // Get proposal with publish info
   const { data: proposal } = await supabaseAdmin
     .from('proposals')
@@ -177,11 +172,7 @@ async function checkPublishThreshold(proposalId: string) {
   const threshold = proposal.respect_threshold || 1000;
 
   if (totalRespectFor >= threshold) {
-    // Threshold met — trigger publish via internal API
     console.log(`[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`);
-
-    // Import and call directly instead of HTTP to avoid auth issues
-    const { postCast } = await import('@/lib/farcaster/neynar');
 
     const { data: fullProposal } = await supabaseAdmin
       .from('proposals')
@@ -194,40 +185,43 @@ async function checkPublishThreshold(proposalId: string) {
     const authorName = fullProposal.author?.username || fullProposal.author?.display_name || 'ZAO member';
     const publishText = fullProposal.publish_text;
     const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance`;
-    const maxLen = 1024 - attribution.length;
-    const castText = publishText.length > maxLen
-      ? publishText.slice(0, maxLen - 3) + '...' + attribution
-      : publishText + attribution;
 
-    const result = await postCast(
-      ENV.ZAO_OFFICIAL_SIGNER_UUID!,
-      castText,
-      'zao',
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      ENV.ZAO_OFFICIAL_NEYNAR_API_KEY,
-    );
+    let castHash: string | null = null;
 
-    const castHash = result?.cast?.hash;
+    // Publish to @thezao Farcaster (if signer configured)
+    const ENV = await import('@/lib/env').then((m) => m.ENV);
+    if (ENV.ZAO_OFFICIAL_SIGNER_UUID && ENV.ZAO_OFFICIAL_FID) {
+      try {
+        const { postCast } = await import('@/lib/farcaster/neynar');
+        const maxLen = 1024 - attribution.length;
+        const castText = publishText.length > maxLen
+          ? publishText.slice(0, maxLen - 3) + '...' + attribution
+          : publishText + attribution;
 
-    await supabaseAdmin
-      .from('proposals')
-      .update({
-        published_cast_hash: castHash,
-        published_at: new Date().toISOString(),
-        status: 'published',
-      })
-      .eq('id', proposalId);
+        const result = await postCast(
+          ENV.ZAO_OFFICIAL_SIGNER_UUID,
+          castText,
+          'zao',
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          ENV.ZAO_OFFICIAL_NEYNAR_API_KEY,
+        );
+        castHash = result?.cast?.hash || null;
+        console.log(`[publish-threshold] Published to @thezao Farcaster: ${castHash}`);
+      } catch (fcErr) {
+        console.error('[publish-threshold] Farcaster publish failed:', fcErr);
+      }
+    } else {
+      console.warn('[publish-threshold] Farcaster signer not configured — skipping Farcaster publish');
+    }
 
-    console.log(`[publish-threshold] Published to @thezao Farcaster: ${castHash}`);
-
-    // Also publish to @thezao Bluesky (if configured)
+    // Publish to @thezao Bluesky (independent of Farcaster)
     try {
       const { postToBluesky } = await import('@/lib/bluesky/client');
       const bskyUri = await postToBluesky(
-        publishText + `\n\n— Proposed by @${authorName} • Approved by ZAO governance`,
+        publishText + attribution,
         'https://zaoos.com/governance',
       );
       if (bskyUri) {
@@ -236,5 +230,15 @@ async function checkPublishThreshold(proposalId: string) {
     } catch (bskyErr) {
       console.error('[publish-threshold] Bluesky publish failed:', bskyErr);
     }
+
+    // Mark proposal as published (even if only Bluesky succeeded)
+    await supabaseAdmin
+      .from('proposals')
+      .update({
+        published_cast_hash: castHash || 'bluesky-only',
+        published_at: new Date().toISOString(),
+        status: 'published',
+      })
+      .eq('id', proposalId);
   }
 }

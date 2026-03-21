@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { parseSiweMessage, validateSiweMessage } from 'viem/siwe';
 import { createPublicClient, http } from 'viem';
@@ -66,17 +67,17 @@ export async function POST(req: NextRequest) {
     if (!nonce) {
       return NextResponse.json({ error: 'Missing nonce' }, { status: 400 });
     }
-    const { data: nonceRow } = await supabaseAdmin
+    // Atomic nonce validation: delete + return in one query (prevents race conditions)
+    const { data: deletedNonces } = await supabaseAdmin
       .from('auth_nonces')
-      .select('nonce, expires_at')
+      .delete()
       .eq('nonce', nonce)
-      .maybeSingle();
+      .gt('expires_at', new Date().toISOString())
+      .select('nonce');
 
-    if (!nonceRow || new Date(nonceRow.expires_at) < new Date()) {
-      if (nonceRow) await supabaseAdmin.from('auth_nonces').delete().eq('nonce', nonce);
+    if (!deletedNonces || deletedNonces.length === 0) {
       return NextResponse.json({ error: 'Invalid or expired nonce. Please try again.' }, { status: 400 });
     }
-    await supabaseAdmin.from('auth_nonces').delete().eq('nonce', nonce); // consume — prevents replay
 
     // Validate domain matches
     const expectedDomain = req.headers.get('host') || '';

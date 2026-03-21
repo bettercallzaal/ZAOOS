@@ -57,23 +57,17 @@ export async function POST(req: NextRequest) {
 
     const { message, signature, nonce, domain } = parsed.data;
 
-    // Validate server-issued nonce from Supabase (one-time use, 5 min TTL)
-    const { data: nonceRow } = await supabaseAdmin
+    // Atomic nonce validation: delete + return in one query (prevents race conditions)
+    const { data: deletedNonces } = await supabaseAdmin
       .from('auth_nonces')
-      .select('nonce, expires_at')
+      .delete()
       .eq('nonce', nonce)
-      .maybeSingle();
+      .gt('expires_at', new Date().toISOString())
+      .select('nonce');
 
-    if (!nonceRow || new Date(nonceRow.expires_at) < new Date()) {
-      // Clean up expired nonce if it exists
-      if (nonceRow) {
-        await supabaseAdmin.from('auth_nonces').delete().eq('nonce', nonce);
-      }
+    if (!deletedNonces || deletedNonces.length === 0) {
       return NextResponse.json({ error: 'Invalid or expired nonce. Please try signing in again.' }, { status: 400 });
     }
-
-    // Delete nonce immediately — one-time use, prevents replay
-    await supabaseAdmin.from('auth_nonces').delete().eq('nonce', nonce);
 
     // Verify SIWF signature
     const result = await appClient.verifySignInMessage({

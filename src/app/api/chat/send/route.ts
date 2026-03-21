@@ -96,20 +96,24 @@ export async function POST(req: NextRequest) {
     // Cross-post to user's personal Bluesky (fire and forget)
     // Community @thezao account is governance-gated — only posts when proposals pass 1000 Respect threshold
     if (crossPostBluesky && !parentHash) {
-      supabaseAdmin
-        .from('users')
-        .select('bluesky_handle, bluesky_app_password')
-        .eq('fid', session.fid)
-        .single()
-        .then(({ data: bskyUser }) => {
+      (async () => {
+        try {
+          const { data: bskyUser } = await supabaseAdmin
+            .from('users')
+            .select('bluesky_handle, bluesky_app_password')
+            .eq('fid', session.fid)
+            .single();
+
           if (bskyUser?.bluesky_handle && bskyUser?.bluesky_app_password) {
-            return postToBluesky(text, 'https://zaoos.com/chat', {
+            await postToBluesky(text, 'https://zaoos.com/chat', {
               handle: bskyUser.bluesky_handle,
               appPassword: bskyUser.bluesky_app_password,
             });
           }
-        })
-        .catch((err) => console.error('[bluesky/personal]', err));
+        } catch (err) {
+          console.error('[bluesky/personal]', err);
+        }
+      })();
     }
 
     // Send push + in-app notifications (fire and forget)

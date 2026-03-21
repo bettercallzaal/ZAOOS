@@ -16,29 +16,51 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
   const [error, setError] = useState('');
   const [showWalletPicker, setShowWalletPicker] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const pendingConnect = useRef(false);
+  const pendingWalletName = useRef<string | null>(null);
 
   const shortAddr = (addr: string) => `${addr.slice(0, 4)}...${addr.slice(-4)}`;
 
-  // After select() updates the wallet, trigger connect()
+  // Clear connecting state when wallet connects or disconnects
   useEffect(() => {
-    if (pendingConnect.current && wallet && !connected) {
-      pendingConnect.current = false;
-      connect().catch(() => {
-        setError('Failed to connect wallet');
-        setConnecting(false);
-      });
-    }
-    if (connected) {
+    if (connected && publicKey) {
       setConnecting(false);
+      pendingWalletName.current = null;
     }
-  }, [wallet, connected, connect]);
+  }, [connected, publicKey]);
+
+  // After select() updates the wallet adapter, trigger connect()
+  useEffect(() => {
+    if (!pendingWalletName.current || !wallet) return;
+    if (wallet.adapter.name === pendingWalletName.current) {
+      pendingWalletName.current = null;
+      // Small delay to let the adapter fully initialize
+      const timer = setTimeout(() => {
+        connect().catch(() => {
+          setError('Failed to connect — check your wallet extension');
+          setConnecting(false);
+        });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [wallet, connect]);
+
+  // Timeout fallback — don't stay stuck on "Connecting..." forever
+  useEffect(() => {
+    if (!connecting) return;
+    const timeout = setTimeout(() => {
+      if (connecting) {
+        setConnecting(false);
+        setError('Connection timed out — try again');
+      }
+    }, 15000);
+    return () => clearTimeout(timeout);
+  }, [connecting]);
 
   const handleConnect = useCallback((walletName: string) => {
     setError('');
     setShowWalletPicker(false);
     setConnecting(true);
-    pendingConnect.current = true;
+    pendingWalletName.current = walletName;
     select(walletName as WalletName);
   }, [select]);
 

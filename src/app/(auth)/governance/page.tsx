@@ -639,7 +639,29 @@ export default function GovernancePage() {
                           proposal.status === 'rejected' ? 'text-red-400 bg-red-500/5' :
                           'text-blue-400 bg-blue-500/5'
                         }`}>
-                          {proposal.status === 'published' ? 'Published to @thezao' :
+                          {proposal.status === 'published' ? (
+                            <div className="flex items-center gap-3">
+                              <span>Published to @thezao</span>
+                              {proposal.published_cast_hash && proposal.published_cast_hash !== 'bluesky-only' && (
+                                <a
+                                  href={`https://warpcast.com/~/conversations/${proposal.published_cast_hash}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-purple-400 hover:text-purple-300 underline"
+                                >
+                                  Farcaster
+                                </a>
+                              )}
+                              <a
+                                href={`https://bsky.app/profile/${process.env.NEXT_PUBLIC_BLUESKY_HANDLE || 'thezao.bsky.social'}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:text-blue-300 underline"
+                              >
+                                Bluesky
+                              </a>
+                            </div>
+                          ) :
                            proposal.status === 'approved' ? 'Approved' :
                            proposal.status === 'rejected' ? 'Rejected' : 'Completed'}
                         </div>

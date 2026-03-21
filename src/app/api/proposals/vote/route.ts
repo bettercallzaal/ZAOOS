@@ -155,9 +155,8 @@ async function checkPublishThreshold(proposalId: string) {
 
   if (!proposal) return;
 
-  // Skip if already published or no publish_text
+  // Skip if already published
   if (proposal.published_cast_hash) return;
-  if (!proposal.publish_text) return;
 
   // Sum Respect-weighted FOR votes
   const { data: votes } = await supabaseAdmin
@@ -183,7 +182,9 @@ async function checkPublishThreshold(proposalId: string) {
     if (!fullProposal) return;
 
     const authorName = fullProposal.author?.username || fullProposal.author?.display_name || 'ZAO member';
-    const publishText = fullProposal.publish_text;
+    // Use publish_text if set, otherwise fallback to title + description
+    const publishText = fullProposal.publish_text
+      || `${fullProposal.title}\n\n${fullProposal.description}`;
     const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance`;
 
     let castHash: string | null = null;

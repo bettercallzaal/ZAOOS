@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePlayer } from '@/providers/audio';
 import { useRadio } from '@/hooks/useRadio';
 import { communityConfig } from '@/../community.config';
+import { ArtworkImage } from '@/components/music/ArtworkImage';
 
 type Submission = {
   id: string;
@@ -16,6 +17,8 @@ type Submission = {
   submitted_by_username: string;
   submitted_by_display: string | null;
   created_at: string;
+  vote_count: number;
+  user_voted: boolean;
 };
 
 const TABS = ['Radio', 'Submissions', 'Trending', 'Playlists'] as const;
@@ -175,7 +178,9 @@ export function MusicPage() {
         <section id={SECTION_IDS.Submissions}>
           <SubmissionsSection
             submissions={submissions}
+            setSubmissions={setSubmissions}
             loading={submissionsLoading}
+            player={player}
           />
         </section>
 
@@ -308,6 +313,22 @@ function RadioHero({
             </button>
           </div>
 
+          {/* Listen Together */}
+          <div className="flex justify-center mt-4">
+            <Link
+              href="/calls"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-full transition-colors"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+              </svg>
+              <svg className="w-3.5 h-3.5 -ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+              </svg>
+              Listen Together
+            </Link>
+          </div>
+
           {/* Station pills */}
           {radio.availableStations.length > 1 && (
             <div className="flex gap-2 mt-5 overflow-x-auto scrollbar-hide justify-center">
@@ -388,11 +409,112 @@ function RadioHero({
 
 function SubmissionsSection({
   submissions,
+  setSubmissions,
   loading,
+  player,
 }: {
   submissions: Submission[];
+  setSubmissions: React.Dispatch<React.SetStateAction<Submission[]>>;
   loading: boolean;
+  player: ReturnType<typeof usePlayer>;
 }) {
+  const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null);
+  const [votingId, setVotingId] = useState<string | null>(null);
+  const [artworkCache, setArtworkCache] = useState<Record<string, string>>({});
+
+  const handlePlay = useCallback(async (sub: Submission) => {
+    // If already playing this track, toggle pause/resume
+    if (player.metadata?.url === sub.url) {
+      if (player.isPlaying) {
+        player.pause();
+      } else {
+        player.resume();
+      }
+      return;
+    }
+
+    setLoadingTrackId(sub.id);
+    try {
+      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(sub.url)}`);
+      if (!res.ok) throw new Error('Metadata fetch failed');
+      const metadata = await res.json();
+
+      // Cache artwork for this submission
+      if (metadata.artworkUrl) {
+        setArtworkCache((prev) => ({ ...prev, [sub.id]: metadata.artworkUrl }));
+      }
+
+      player.play(metadata);
+    } catch {
+      // Fallback: play with basic metadata
+      player.play({
+        id: sub.id,
+        type: sub.track_type as import('@/types/music').TrackType,
+        trackName: sub.title || 'Untitled Track',
+        artistName: sub.artist || '',
+        artworkUrl: '',
+        url: sub.url,
+        feedId: '',
+      });
+    } finally {
+      setLoadingTrackId(null);
+    }
+  }, [player]);
+
+  const handleVote = useCallback(async (sub: Submission) => {
+    if (votingId) return;
+    setVotingId(sub.id);
+
+    // Capture previous state for rollback
+    const prevVoted = sub.user_voted;
+    const prevCount = sub.vote_count;
+
+    // Optimistic update
+    setSubmissions((prev) =>
+      prev.map((s) =>
+        s.id === sub.id
+          ? {
+              ...s,
+              user_voted: !s.user_voted,
+              vote_count: s.user_voted ? s.vote_count - 1 : s.vote_count + 1,
+            }
+          : s,
+      ),
+    );
+
+    try {
+      const res = await fetch('/api/music/submissions/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId: sub.id }),
+      });
+
+      if (!res.ok) throw new Error('Vote failed');
+
+      const { voted, voteCount } = await res.json();
+
+      // Reconcile with server truth
+      setSubmissions((prev) =>
+        prev.map((s) =>
+          s.id === sub.id
+            ? { ...s, user_voted: voted, vote_count: voteCount }
+            : s,
+        ),
+      );
+    } catch {
+      // Revert optimistic update on error
+      setSubmissions((prev) =>
+        prev.map((s) =>
+          s.id === sub.id
+            ? { ...s, user_voted: prevVoted, vote_count: prevCount }
+            : s,
+        ),
+      );
+    } finally {
+      setVotingId(null);
+    }
+  }, [votingId, setSubmissions]);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -409,7 +531,8 @@ function SubmissionsSection({
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-gray-800 animate-pulse">
-              <div className="w-12 h-12 rounded-lg bg-gray-800" />
+              <div className="w-10 h-10 rounded-full bg-gray-800" />
+              <div className="w-10 h-10 rounded-lg bg-gray-800" />
               <div className="flex-1 space-y-2">
                 <div className="h-3.5 bg-gray-800 rounded w-3/4" />
                 <div className="h-3 bg-gray-800 rounded w-1/2" />
@@ -427,92 +550,247 @@ function SubmissionsSection({
         </div>
       ) : (
         <div className="space-y-2">
-          {submissions.map((sub) => (
-            <div
-              key={sub.id}
-              className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-gray-800 hover:border-gray-700 transition-colors"
-            >
-              {/* Artwork placeholder */}
-              <div className="w-12 h-12 flex-shrink-0 rounded-lg bg-gradient-to-br from-[#1a2a3a] to-[#0a1628] flex items-center justify-center overflow-hidden">
-                <MusicIcon className="w-5 h-5 text-[#f5a623]/30" />
-              </div>
+          {submissions.map((sub) => {
+            const isCurrentTrack = player.metadata?.url === sub.url;
+            const isTrackPlaying = isCurrentTrack && player.isPlaying;
+            const isTrackLoading = loadingTrackId === sub.id;
+            const artwork = artworkCache[sub.id];
 
-              {/* Track info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">
-                  {sub.title || 'Untitled Track'}
-                </p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  {sub.artist && (
-                    <span className="text-xs text-gray-400 truncate">
-                      {sub.artist}
-                    </span>
+            return (
+              <div
+                key={sub.id}
+                className={`flex items-center gap-2.5 p-3 rounded-xl border transition-colors ${
+                  isCurrentTrack
+                    ? 'bg-[#0d1b2a] border-[#f5a623]/30'
+                    : 'bg-[#0d1b2a] border-gray-800 hover:border-gray-700'
+                }`}
+              >
+                {/* Play button */}
+                <button
+                  onClick={() => handlePlay(sub)}
+                  disabled={isTrackLoading}
+                  className={`w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center transition-colors ${
+                    isCurrentTrack
+                      ? 'bg-[#f5a623] text-[#0a1628]'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                  }`}
+                  aria-label={isTrackPlaying ? 'Pause' : 'Play'}
+                >
+                  {isTrackLoading ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  ) : isTrackPlaying ? (
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
                   )}
-                  <span className="text-xs text-gray-500">
-                    by @{sub.submitted_by_username}
-                  </span>
-                </div>
-              </div>
+                </button>
 
-              {/* Platform badge + time */}
-              <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                <span className="text-[10px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded capitalize">
-                  {platformLabel(sub.track_type)}
-                </span>
-                <span className="text-[10px] text-gray-600">
+                {/* Artwork 40x40 */}
+                <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-gradient-to-br from-[#1a2a3a] to-[#0a1628] flex items-center justify-center overflow-hidden">
+                  {artwork || (isCurrentTrack && player.metadata?.artworkUrl) ? (
+                    <Image
+                      src={artwork || player.metadata?.artworkUrl || ''}
+                      alt={sub.title || 'Track artwork'}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <MusicIcon className="w-4 h-4 text-[#f5a623]/30" />
+                  )}
+                </div>
+
+                {/* Track info */}
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-semibold truncate ${
+                    isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
+                  }`}>
+                    {sub.title || 'Untitled Track'}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    {sub.artist && (
+                      <span className="text-xs text-gray-400 truncate max-w-[120px]">
+                        {sub.artist}
+                      </span>
+                    )}
+                    <span className="text-xs text-gray-600 truncate">
+                      @{sub.submitted_by_username}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Vote button */}
+                <button
+                  onClick={() => handleVote(sub)}
+                  disabled={votingId === sub.id}
+                  className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-all flex-shrink-0 ${
+                    sub.user_voted
+                      ? 'bg-[#f5a623]/15 text-[#f5a623]'
+                      : 'bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300'
+                  }`}
+                  aria-label={sub.user_voted ? 'Remove vote' : 'Upvote'}
+                >
+                  <span className="text-sm">{'\uD83D\uDD25'}</span>
+                  {sub.vote_count > 0 && (
+                    <span>{sub.vote_count}</span>
+                  )}
+                </button>
+
+                {/* Time ago */}
+                <span className="text-[10px] text-gray-600 flex-shrink-0 hidden sm:block">
                   {timeAgo(sub.created_at)}
                 </span>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-// ── Trending Section (Placeholder) ─────────────────────────────────────
+// ── Trending Section (Audius API) ───────────────────────────────────────
 
-const TRENDING_PLACEHOLDER = [
-  { title: 'Midnight Groove', artist: 'Stilo World' },
-  { title: 'Golden Hour', artist: 'ZAO Collective' },
-  { title: 'Neon Dreams', artist: 'BassBoy' },
-  { title: 'Sunset Ritual', artist: 'Luna Beats' },
-  { title: 'City Lights', artist: 'DOPE' },
-  { title: 'Horizon', artist: 'CloudNine' },
-];
+type AudiusTrendingTrack = {
+  id: string;
+  title: string;
+  artwork: { '150x150'?: string; '480x480'?: string } | null;
+  user: { name: string };
+  permalink: string;
+  duration: number;
+};
 
 function TrendingSection() {
+  const [tracks, setTracks] = useState<AudiusTrendingTrack[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const player = usePlayer();
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch('https://api.audius.co/v1/tracks/trending?app_name=ZAO-OS&limit=8', {
+      signal: controller.signal,
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('fetch failed');
+        return res.json();
+      })
+      .then((json) => {
+        if (json?.data) {
+          setTracks(json.data);
+        } else {
+          setError(true);
+        }
+      })
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError(true);
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, []);
+
+  const handlePlay = (track: AudiusTrendingTrack) => {
+    const streamUrl = `https://api.audius.co/v1/tracks/${track.id}/stream?app_name=ZAO-OS`;
+    player.play({
+      id: track.id,
+      trackName: track.title,
+      artistName: track.user.name,
+      artworkUrl: track.artwork?.['480x480'] || track.artwork?.['150x150'] || '',
+      streamUrl,
+      url: `https://audius.co${track.permalink}`,
+      type: 'audius',
+      feedId: `trending-${track.id}`,
+    });
+  };
+
   return (
     <div>
-      <h2 className="text-lg font-bold text-white mb-4">Trending in ZAO</h2>
+      <h2 className="text-lg font-bold text-white mb-4">Trending on Audius</h2>
 
-      <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
-        {TRENDING_PLACEHOLDER.map((track, i) => (
-          <div
-            key={i}
-            className="flex-shrink-0 w-[140px] group"
-          >
-            {/* Album art placeholder */}
-            <div className="w-[140px] h-[140px] rounded-xl bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] border border-gray-800 flex items-center justify-center mb-2 group-hover:border-gray-700 transition-colors overflow-hidden relative">
-              <MusicIcon className="w-8 h-8 text-[#f5a623]/20" />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
-                <div className="w-10 h-10 rounded-full bg-[#f5a623]/90 flex items-center justify-center">
-                  <svg className="w-5 h-5 ml-0.5 text-[#0a1628]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </div>
+      {loading ? (
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex-shrink-0 w-[140px] animate-pulse">
+              <div className="w-[140px] h-[140px] rounded-xl bg-gray-800 mb-2" />
+              <div className="h-3.5 bg-gray-800 rounded w-3/4 mb-1" />
+              <div className="h-3 bg-gray-800/60 rounded w-1/2" />
             </div>
-            <p className="text-sm font-medium text-white truncate">{track.title}</p>
-            <p className="text-xs text-gray-500 truncate">{track.artist}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : error || tracks.length === 0 ? (
+        <div className="text-center py-10 rounded-xl bg-[#0d1b2a] border border-gray-800">
+          <MusicIcon className="w-8 h-8 text-[#f5a623]/30 mx-auto mb-2" />
+          <p className="text-sm text-gray-400">Trending unavailable</p>
+          <p className="text-xs text-gray-600 mt-1">Check back later</p>
+        </div>
+      ) : (
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
+          {tracks.map((track) => {
+            const isThisTrack = player.metadata?.feedId === `trending-${track.id}`;
+            const isThisPlaying = isThisTrack && player.isPlaying;
 
-      <p className="text-xs text-gray-600 text-center mt-4">
-        Trending data coming soon
-      </p>
+            return (
+              <button
+                key={track.id}
+                onClick={() => handlePlay(track)}
+                className="flex-shrink-0 w-[140px] group text-left"
+              >
+                {/* Album art */}
+                <div className={`w-[140px] h-[140px] rounded-xl border mb-2 overflow-hidden relative transition-colors ${
+                  isThisTrack
+                    ? 'border-[#f5a623]/40 shadow-lg shadow-[#f5a623]/10'
+                    : 'border-gray-800 group-hover:border-gray-700'
+                }`}>
+                  <ArtworkImage
+                    src={track.artwork?.['480x480'] || track.artwork?.['150x150'] || null}
+                    alt={track.title}
+                    fill
+                    className="object-cover"
+                    sizes="140px"
+                  />
+                  <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${
+                    isThisPlaying ? 'opacity-100 bg-black/40' : 'opacity-0 group-hover:opacity-100 bg-black/30'
+                  }`}>
+                    {isThisPlaying ? (
+                      <div className="flex items-end gap-px">
+                        {[1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className="w-[3px] bg-[#f5a623] rounded-full animate-bounce"
+                            style={{
+                              height: `${6 + i * 3}px`,
+                              animationDelay: `${i * 0.15}s`,
+                              animationDuration: '0.6s',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-[#f5a623]/90 flex items-center justify-center">
+                        <svg className="w-5 h-5 ml-0.5 text-[#0a1628]" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <p className={`text-sm font-medium truncate ${isThisTrack ? 'text-[#f5a623]' : 'text-white'}`}>
+                  {track.title}
+                </p>
+                <p className="text-xs text-gray-500 truncate">{track.user.name}</p>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

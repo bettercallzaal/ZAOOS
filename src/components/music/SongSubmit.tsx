@@ -25,12 +25,25 @@ interface SongSubmitProps {
   onClose: () => void;
 }
 
+const GENRE_TAGS = ['Hip-Hop', 'R&B', 'Electronic', 'Lo-Fi', 'Jazz', 'Afrobeats', 'Soul', 'Experimental'] as const;
+
 export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
   const [artist, setArtist] = useState('');
   const [note, setNote] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+  const toggleTag = (tag: string) => {
+    setTags((prev) =>
+      prev.includes(tag)
+        ? prev.filter((t) => t !== tag)
+        : prev.length < 3
+        ? [...prev, tag]
+        : prev
+    );
+  };
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
@@ -89,6 +102,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
           title: title.trim() || undefined,
           artist: artist.trim() || undefined,
           note: note.trim() || undefined,
+          tags: tags.length > 0 ? tags : undefined,
           channel,
         }),
       });
@@ -100,6 +114,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
         setTitle('');
         setArtist('');
         setNote('');
+        setTags([]);
         fetchSubmissions();
       } else {
         showFeedback('error', data.error || 'Failed to submit');
@@ -206,6 +221,29 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
                   urlValid ? 'text-green-400' : 'text-red-400'
                 }`}>
                   {urlValid ? '✓' : '✗'}
+                </span>
+              )}
+            </div>
+
+            {/* Genre/mood tags */}
+            <div className="flex flex-wrap gap-1.5">
+              {GENRE_TAGS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                    tags.includes(tag)
+                      ? 'bg-[#f5a623] text-[#0a1628]'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+              {tags.length > 0 && (
+                <span className="text-[10px] text-gray-500 self-center ml-1">
+                  {tags.length}/3
                 </span>
               )}
             </div>

@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { communityConfig } from '@/../community.config';
+import { isMusicUrl } from '@/lib/music/isMusicUrl';
 
 const WATCHED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
@@ -94,6 +95,70 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[webhook/neynar] DB insert error:', err);
     return NextResponse.json({ error: 'DB insert failed' }, { status: 500 });
+  }
+
+  // ── Auto-detect music links and add to song_submissions ──────────
+  try {
+    const castText = (cast.text as string) || '';
+    const embeds = (cast.embeds as { url?: string }[]) ?? [];
+
+    // Collect all URLs from text and embeds
+    const urlsInText = castText.match(/https?:\/\/[^\s)]+/g) || [];
+    const embedUrls = embeds.map((e) => e.url).filter(Boolean) as string[];
+    const allUrls = [...new Set([...urlsInText, ...embedUrls])];
+
+    for (const url of allUrls) {
+      const trackType = isMusicUrl(url);
+      if (!trackType) continue;
+
+      const author = (cast.author ?? {}) as Record<string, unknown>;
+
+      // Check for duplicate URL before inserting
+      const { data: existing } = await supabaseAdmin
+        .from('song_submissions')
+        .select('id')
+        .eq('url', url)
+        .limit(1);
+
+      if (existing && existing.length > 0) continue;
+
+      // Extract a title from the cast text (first line or truncated)
+      const titleFromText = castText
+        .replace(/https?:\/\/[^\s)]+/g, '')
+        .trim()
+        .slice(0, 200) || 'Shared track';
+
+      const insertRow: Record<string, unknown> = {
+        url,
+        title: titleFromText,
+        artist: (author.display_name as string) || (author.username as string) || null,
+        track_type: trackType,
+        channel: channelId,
+        submitted_by_fid: author.fid as number,
+        submitted_by_username: (author.username as string) || '',
+        submitted_by_display: (author.display_name as string) || '',
+        source: 'auto',
+      };
+
+      // Try with source column, fall back without if column doesn't exist
+      let result = await supabaseAdmin
+        .from('song_submissions')
+        .insert(insertRow);
+
+      if (result.error && result.error.message?.includes('source')) {
+        delete insertRow.source;
+        result = await supabaseAdmin
+          .from('song_submissions')
+          .insert(insertRow);
+      }
+
+      if (result.error) {
+        console.error('[webhook/neynar] Auto-submit music link error:', result.error);
+      }
+    }
+  } catch (err) {
+    // Non-fatal: log but don't fail the webhook
+    console.error('[webhook/neynar] Auto-detect music error:', err);
   }
 
   return NextResponse.json({ ok: true });

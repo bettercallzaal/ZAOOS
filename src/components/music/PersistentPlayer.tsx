@@ -5,6 +5,7 @@ import { usePlayer } from '@/providers/audio';
 import Image from 'next/image';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
+import { ArtworkImage } from '@/components/music/ArtworkImage';
 
 /**
  * Persistent music player that renders on ALL authenticated pages.
@@ -40,20 +41,12 @@ export function PersistentPlayer() {
       <div className="flex items-center gap-3 px-3 py-2">
         {/* Artwork */}
         <div className={`relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}>
-          {metadata.artworkUrl ? (
-            <Image
-              src={metadata.artworkUrl}
-              alt={metadata.trackName}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a2a3a] to-[#0a1628]">
-              <svg className="w-5 h-5 text-[#f5a623]/50" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-              </svg>
-            </div>
-          )}
+          <ArtworkImage
+            src={metadata.artworkUrl}
+            alt={metadata.trackName}
+            fill
+            className="object-cover"
+          />
           {isPlaying && (
             <div className="absolute inset-0 flex items-end justify-center pb-0.5 bg-gradient-to-t from-black/40 to-transparent">
               <div className="flex items-end gap-px">

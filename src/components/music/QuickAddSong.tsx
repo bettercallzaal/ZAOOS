@@ -11,15 +11,28 @@ import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFar
  * Floating "+" button + bottom sheet for quick song submission from any page.
  * Auto-fetches metadata when a valid music URL is pasted.
  */
+const GENRE_TAGS = ['Hip-Hop', 'R&B', 'Electronic', 'Lo-Fi', 'Jazz', 'Afrobeats', 'Soul', 'Experimental'] as const;
+
 export function QuickAddSong() {
   const [isOpen, setIsOpen] = useState(false);
   const [url, setUrl] = useState('');
   const [note, setNote] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [metadata, setMetadata] = useState<TrackMetadata | null>(null);
   const [loadingMeta, setLoadingMeta] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const player = usePlayer();
+
+  const toggleTag = (tag: string) => {
+    setTags((prev) =>
+      prev.includes(tag)
+        ? prev.filter((t) => t !== tag)
+        : prev.length < 3
+        ? [...prev, tag]
+        : prev
+    );
+  };
 
   // Auto-fetch metadata when URL changes
   const fetchMetadata = useCallback(async (musicUrl: string) => {
@@ -68,6 +81,7 @@ export function QuickAddSong() {
           title: metadata?.trackName || undefined,
           artist: metadata?.artistName || undefined,
           note: note.trim() || undefined,
+          tags: tags.length > 0 ? tags : undefined,
           channel: 'zao',
         }),
       });
@@ -81,6 +95,7 @@ export function QuickAddSong() {
         setTimeout(() => {
           setUrl('');
           setNote('');
+          setTags([]);
           setMetadata(null);
           setFeedback(null);
           setIsOpen(false);
@@ -179,6 +194,29 @@ export function QuickAddSong() {
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
+                  </span>
+                )}
+              </div>
+
+              {/* Genre/mood tags */}
+              <div className="flex flex-wrap gap-1.5">
+                {GENRE_TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => toggleTag(tag)}
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                      tags.includes(tag)
+                        ? 'bg-[#f5a623] text-[#0a1628]'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+                {tags.length > 0 && (
+                  <span className="text-[10px] text-gray-500 self-center ml-1">
+                    {tags.length}/3
                   </span>
                 )}
               </div>

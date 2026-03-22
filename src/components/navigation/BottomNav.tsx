@@ -32,8 +32,8 @@ const TABS = [
   {
     id: 'music',
     label: 'Music',
-    href: '/chat',
-    matchPaths: [] as string[],
+    href: '/music',
+    matchPaths: ['/music'],
     icon: (
       <svg className="w-5 h-5 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V4.5A2.25 2.25 0 0016.5 2.25h0A2.25 2.25 0 0019.5 4.5v0M9 9v10.114" />

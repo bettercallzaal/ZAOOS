@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { TrackMetadata, TrackType } from '@/types/music';
 import { usePlayer } from '@/providers/audio';
 import { formatDuration } from '@/lib/music/formatDuration';
+import type { PlatformLink } from '@/lib/music/songlink';
 
 interface MusicEmbedProps {
   url: string;
@@ -68,6 +69,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
   const [metadata, setMetadata] = useState<TrackMetadata | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchFailed, setFetchFailed] = useState(false);
+  const [alsoPlatforms, setAlsoPlatforms] = useState<PlatformLink[]>([]);
 
   const player = usePlayer();
 
@@ -108,6 +110,32 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
     };
   }, [url, castHash]);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Fetch universal links (Songlink) for cross-platform "Also on:" row
+  useEffect(() => {
+    if (!metadata || metadata.type === 'audio') return;
+    let cancelled = false;
+
+    fetch(`/api/music/resolve?url=${encodeURIComponent(url)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.platforms) {
+          // Filter out the current platform so we only show *other* platforms
+          const currentKey = metadata.type === 'applemusic' ? 'appleMusic'
+            : metadata.type === 'youtube' ? 'youtubeMusic'
+            : metadata.type;
+          const others = (data.platforms as PlatformLink[]).filter(
+            (p) => p.platform !== currentKey,
+          );
+          setAlsoPlatforms(others);
+        }
+      })
+      .catch(() => {
+        // Non-critical — silently ignore
+      });
+
+    return () => { cancelled = true; };
+  }, [metadata, url]);
 
   const externalOnly = metadata?.type === 'applemusic' || metadata?.type === 'tidal';
 
@@ -289,6 +317,29 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
           )}
         </button>
       </div>
+
+      {/* "Also on:" cross-platform links via Songlink */}
+      {alsoPlatforms.length > 0 && (
+        <div className="flex items-center gap-1.5 px-3 pb-2.5 flex-wrap">
+          <span className="text-[10px] text-gray-500 mr-0.5">Also on:</span>
+          {alsoPlatforms.map((p) => (
+            <a
+              key={p.platform}
+              href={p.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]
+                bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: p.color }}
+              />
+              {p.label}
+            </a>
+          ))}
+        </div>
+      )}
 
       {/* Progress bar — shown when this track is playing */}
       {isThisTrack && player.duration > 0 && (

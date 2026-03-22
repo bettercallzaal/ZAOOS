@@ -60,12 +60,10 @@ export async function GET(req: NextRequest) {
   steps.thresholdMet = totalRespectFor >= threshold;
   steps.alreadyPublished = !!proposal.published_cast_hash;
 
-  // Step 3: Check env vars
+  // Step 3: Check publishing capability (boolean only, no secrets)
   const ENV = await import('@/lib/env').then((m) => m.ENV);
-  steps.hasFarcasterSigner = !!ENV.ZAO_OFFICIAL_SIGNER_UUID;
-  steps.hasFarcasterFid = !!ENV.ZAO_OFFICIAL_FID;
-  steps.hasBlueskyHandle = !!process.env.BLUESKY_HANDLE;
-  steps.hasBlueskyPassword = !!process.env.BLUESKY_APP_PASSWORD;
+  steps.farcasterPublishReady = !!(ENV.ZAO_OFFICIAL_SIGNER_UUID && ENV.ZAO_OFFICIAL_FID);
+  steps.blueskyPublishReady = !!(process.env.BLUESKY_HANDLE && process.env.BLUESKY_APP_PASSWORD);
 
   // Step 4: Try Bluesky publish if threshold met
   if (totalRespectFor >= threshold && !proposal.published_cast_hash) {

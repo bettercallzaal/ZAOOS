@@ -47,7 +47,7 @@ export function QuickAddSong() {
   // Debounced URL check
   useEffect(() => {
     if (!url.trim()) {
-      setMetadata(null);
+      queueMicrotask(() => setMetadata(null));
       return;
     }
     const timer = setTimeout(() => fetchMetadata(url.trim()), 500);

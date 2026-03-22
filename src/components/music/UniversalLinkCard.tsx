@@ -34,8 +34,10 @@ export function UniversalLinkCard({ url, castHash }: UniversalLinkCardProps) {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(false);
+    queueMicrotask(() => {
+      setLoading(true);
+      setError(false);
+    });
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12_000);

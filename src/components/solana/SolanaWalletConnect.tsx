@@ -23,7 +23,7 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
   // Clear connecting state when wallet connects or disconnects
   useEffect(() => {
     if (connected && publicKey) {
-      setConnecting(false);
+      queueMicrotask(() => setConnecting(false));
       pendingWalletName.current = null;
     }
   }, [connected, publicKey]);

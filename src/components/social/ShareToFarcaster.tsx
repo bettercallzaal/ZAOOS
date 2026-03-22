@@ -209,7 +209,7 @@ export const shareTemplates = {
   }),
 
   /** Share a published governance post */
-  publishedProposal: (title: string, castHash?: string): ShareTemplate => ({
+  publishedProposal: (title: string): ShareTemplate => ({
     text: `The ZAO community has spoken!\n\n"${title}"\n\nApproved by governance — powered by Respect-weighted voting\n\nThis is how decentralized music communities make decisions`,
     embeds: ['https://zaoos.com/governance'],
     channel: 'zao',

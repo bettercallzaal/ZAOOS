@@ -20,9 +20,9 @@ export function getHatsClient(): HatsClient {
       transport: http('https://mainnet.optimism.io'),
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _client = new HatsClient({
       chainId: HATS_CHAIN_ID,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       publicClient: publicClient as any,
     });
   }

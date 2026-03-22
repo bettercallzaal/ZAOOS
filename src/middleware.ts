@@ -91,7 +91,7 @@ function generateNonce(): string {
   return btoa(String.fromCharCode(...array));
 }
 
-function buildCspHeader(nonce: string, isMessagesRoute: boolean): string {
+function buildCspHeader(nonce: string): string {
   const directives = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://neynarxyz.github.io https://api.neynar.com https://open.spotify.com https://www.youtube.com https://w.soundcloud.com`,
@@ -108,14 +108,14 @@ function buildCspHeader(nonce: string, isMessagesRoute: boolean): string {
   return directives.join('; ');
 }
 
-function addSecurityHeaders(response: NextResponse, nonce?: string, isMessagesRoute?: boolean): NextResponse {
+function addSecurityHeaders(response: NextResponse, nonce?: string): NextResponse {
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   if (nonce) {
-    response.headers.set('Content-Security-Policy', buildCspHeader(nonce, isMessagesRoute ?? false));
+    response.headers.set('Content-Security-Policy', buildCspHeader(nonce));
   }
   return response;
 }
@@ -164,7 +164,7 @@ export function middleware(request: NextRequest) {
     response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   }
 
-  return addSecurityHeaders(response, nonce, isMessagesRoute);
+  return addSecurityHeaders(response, nonce);
 }
 
 export const config = {

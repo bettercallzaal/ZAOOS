@@ -36,8 +36,10 @@ export function ActivityFeed() {
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
-    setError(false);
+    queueMicrotask(() => {
+      setLoading(true);
+      setError(false);
+    });
 
     const filterParam = activeFilter === 'All' ? '' : `?type=${activeFilter.toLowerCase()}`;
     fetch(`/api/activity/feed${filterParam}`, { signal: controller.signal })

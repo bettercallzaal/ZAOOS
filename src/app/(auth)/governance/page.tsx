@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { ProposalComments } from '@/components/governance/ProposalComments';
@@ -98,6 +98,7 @@ export default function GovernancePage() {
   const [createError, setCreateError] = useState('');
 
   // Voting state
+  const fetchCounterRef = useRef(0);
   const [voting, setVoting] = useState<string | null>(null);
   const [publishToast, setPublishToast] = useState(false);
 
@@ -210,7 +211,8 @@ export default function GovernancePage() {
       }
       // Small delay to ensure DB write is committed, then refresh
       await new Promise((r) => setTimeout(r, 500));
-      const d = await fetch(`/api/proposals?_t=${Date.now()}`).then((r) => r.json());
+      fetchCounterRef.current += 1;
+      const d = await fetch(`/api/proposals?_t=${fetchCounterRef.current}`).then((r) => r.json());
       setProposals(d.proposals || []);
     } catch (err) { console.error('[governance] vote:', err); }
     setVoting(null);

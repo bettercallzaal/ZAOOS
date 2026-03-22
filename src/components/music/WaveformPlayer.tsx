@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useCallback, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useWavesurfer } from '@wavesurfer/react';
 
 interface WaveformPlayerProps {
@@ -13,15 +13,8 @@ interface WaveformPlayerProps {
   onSeek?: (position: number) => void;
 }
 
-export default function WaveformPlayer({
-  url,
-  isPlaying,
-  progress,
-  height = 32,
-  waveColor = '#4a5568',
-  progressColor = '#f5a623',
-  onSeek,
-}: WaveformPlayerProps) {
+export default function WaveformPlayer(props: WaveformPlayerProps) {
+  const { url, progress, height = 32, waveColor = '#4a5568', progressColor = '#f5a623', onSeek } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
   const seekingRef = useRef(false);

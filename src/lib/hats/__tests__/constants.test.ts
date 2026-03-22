@@ -35,7 +35,7 @@ describe('Hats constants', () => {
   });
 
   it('has labels for all main hat IDs', () => {
-    for (const [key, id] of Object.entries(HAT_IDS)) {
+    for (const [, id] of Object.entries(HAT_IDS)) {
       expect(HAT_LABELS[id.toString()]).toBeDefined();
       expect(HAT_LABELS[id.toString()]).not.toBe('');
     }

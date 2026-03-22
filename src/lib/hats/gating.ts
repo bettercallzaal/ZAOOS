@@ -8,7 +8,7 @@
  */
 
 import { isWearerOfHat, getWornHats } from './client';
-import { HAT_IDS, PROJECT_HAT_IDS, HAT_LABELS } from './constants';
+import { HAT_IDS, PROJECT_HAT_IDS } from './constants';
 
 // ── Permission types ────────────────────────────────────────
 

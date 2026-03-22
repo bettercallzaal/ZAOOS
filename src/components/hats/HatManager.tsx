@@ -71,7 +71,7 @@ export default function HatManager() {
   // Check if connected wallet is a Configurator
   useEffect(() => {
     if (!address) {
-      setIsAdmin(false);
+      queueMicrotask(() => setIsAdmin(false));
       return;
     }
     fetch(`/api/hats/check?wallet=${address}`)
@@ -88,8 +88,10 @@ export default function HatManager() {
   // Show success on confirmation
   useEffect(() => {
     if (isConfirmed) {
-      setMintSuccess(`Hat minted successfully! Tx: ${txHash?.slice(0, 10)}...`);
-      setMintAddress('');
+      queueMicrotask(() => {
+        setMintSuccess(`Hat minted successfully! Tx: ${txHash?.slice(0, 10)}...`);
+        setMintAddress('');
+      });
       // Refresh tree data
       fetch('/api/hats/tree')
         .then((res) => res.json())

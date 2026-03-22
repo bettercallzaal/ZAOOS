@@ -50,7 +50,7 @@ export function useListeningRoom(userInfo: ListenerInfo | null) {
 
   // Track whether we're the DJ to avoid reacting to our own commands
   const isDJRef = useRef(false);
-  isDJRef.current = isDJ;
+  useEffect(() => { isDJRef.current = isDJ; }, [isDJ]);
 
   // ── Presence sync ──────────────────────────────────────────────────────────
 

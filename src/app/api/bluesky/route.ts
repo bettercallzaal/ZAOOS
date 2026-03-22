@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { AtpAgent, RichText } from '@atproto/api';
+import { AtpAgent } from '@atproto/api';
 
 /**
  * GET — Get current user's Bluesky connection status

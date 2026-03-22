@@ -25,8 +25,10 @@ export default function WaveWarzPage() {
 
   // Reset iframe state when switching views
   useEffect(() => {
-    setIframeLoaded(false);
-    setIframeFailed(false);
+    queueMicrotask(() => {
+      setIframeLoaded(false);
+      setIframeFailed(false);
+    });
   }, [activeView]);
 
   // If iframe hasn't loaded after 8 seconds, show the fallback

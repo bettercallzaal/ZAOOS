@@ -69,6 +69,14 @@ export function MusicPage() {
   const player = usePlayer();
   const radio = useRadio();
 
+  // ── Auto-advance radio tracks when a song ends ───────────────────────
+  useEffect(() => {
+    if (radio.isRadioMode) {
+      player.setOnEnded?.(() => radio.nextRadioTrack());
+      return () => player.setOnEnded?.(null);
+    }
+  }, [radio.isRadioMode, radio.nextRadioTrack, player]);
+
   // ── Fetch submissions ────────────────────────────────────────────────
   useEffect(() => {
     const controller = new AbortController();
@@ -352,7 +360,7 @@ function RadioHero({
           )}
 
           <button
-            onClick={radio.startRadio}
+            onClick={() => radio.startRadio()}
             disabled={radio.radioLoading}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#f5a623] text-[#0a1628] font-semibold text-sm hover:bg-[#ffd700] disabled:opacity-50 transition-colors shadow-lg shadow-[#f5a623]/25"
           >

@@ -65,7 +65,7 @@ export function useRadio() {
     if (!player.shuffle) player.toggleShuffle();
   }, [player]);
 
-  const startRadio = useCallback(async () => {
+  const startRadio = useCallback(async (startIndex = 0) => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -76,8 +76,9 @@ export function useRadio() {
       if (playlists.length === 0) throw new Error('No stations');
 
       setAllStations(playlists);
-      setCurrentStationIndex(0);
-      playStation(playlists[0]);
+      const idx = Math.min(startIndex, playlists.length - 1);
+      setCurrentStationIndex(idx);
+      playStation(playlists[idx]);
     } catch (err) {
       if (controller.signal.aborted) return;
       console.error('Radio start failed:', err);

@@ -366,7 +366,7 @@ function ShuffleButton({ active, onClick }: { active: boolean; onClick: () => vo
   return (
     <button
       onClick={onClick}
-      className={`p-1 rounded transition-colors ${active ? 'text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'}`}
+      className={`relative p-1 rounded transition-colors ${active ? 'text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'}`}
       aria-label={active ? 'Disable shuffle' : 'Enable shuffle'}
       title="Shuffle"
     >

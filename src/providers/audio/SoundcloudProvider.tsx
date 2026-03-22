@@ -98,6 +98,7 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
         play: () => widget.play(),
         pause: () => widget.pause(),
         seek: (ms) => widget.seekTo(ms),
+        setVolume: (v) => (widget as unknown as { setVolume(v: number): void }).setVolume(v * 100),
         load: (url) => {
           if (!widgetReadyRef.current) {
             pendingUrlRef.current = url;

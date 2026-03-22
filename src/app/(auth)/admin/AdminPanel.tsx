@@ -46,10 +46,10 @@ export function AdminPanel() {
             <ImportRespectButton />
             <SyncRespectButton />
             <Link
-              href="/chat"
+              href="/home"
               className="text-sm text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
             >
-              ← Back to chat
+              ← Back
             </Link>
           </div>
         </div>

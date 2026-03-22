@@ -24,7 +24,7 @@ export default function AuthError({
             Try again
           </button>
           <Link
-            href="/chat"
+            href="/home"
             className="text-gray-400 text-sm hover:text-white transition-colors"
           >
             Go home

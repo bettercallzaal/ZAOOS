@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      redirect: '/chat',
+      redirect: '/home',
       hasFarcaster: !!fid,
     });
   } catch (error) {

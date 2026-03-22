@@ -40,7 +40,7 @@ export default function GlobalError({
               Try again
             </button>
             <a
-              href="/chat"
+              href="/home"
               style={{
                 color: '#9ca3af',
                 fontSize: '0.875rem',

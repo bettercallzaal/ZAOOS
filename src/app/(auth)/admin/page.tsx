@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: 'Admin - ZAO OS', robots: { index: fa
 export default async function AdminPage() {
   const session = await getSessionData();
   if (!session?.isAdmin) {
-    redirect('/chat');
+    redirect('/home');
   }
   return <AdminPanel />;
 }

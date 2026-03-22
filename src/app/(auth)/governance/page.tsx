@@ -231,7 +231,7 @@ export default function GovernancePage() {
           <h2 className="font-semibold text-sm text-gray-300">Governance</h2>
           <div className="flex items-center gap-2">
             <div className="md:hidden"><NotificationBell /></div>
-            <Link href="/chat" className="text-xs text-gray-500 hover:text-white md:hidden">Back to Chat</Link>
+            <Link href="/home" className="text-xs text-gray-500 hover:text-white md:hidden">Back</Link>
           </div>
         </div>
         {/* Tab switcher */}

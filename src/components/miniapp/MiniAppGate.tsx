@@ -43,7 +43,7 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
               setState('allowed');
               // Navigate to chat if we're on the landing page
               if (window.location.pathname === '/') {
-                router.replace('/chat');
+                router.replace('/home');
               }
             } else {
               setUsername(data.username || '');

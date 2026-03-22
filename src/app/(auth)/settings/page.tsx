@@ -9,13 +9,13 @@ async function fetchProfile(fid: number) {
       getUserByFid(fid),
       supabaseAdmin
         .from('users')
-        .select('zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name, bluesky_handle, bluesky_did, solana_wallet')
+        .select('zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name, bluesky_handle, bluesky_did, solana_wallet, x_handle, instagram_handle, soundcloud_url, spotify_url, audius_handle')
         .eq('fid', fid)
         .eq('is_active', true)
         .maybeSingle(),
     ]);
 
-    return {
+    const result = {
       fid,
       zid: dbResult.data?.zid || null,
       // Farcaster identity (read-only)
@@ -39,7 +39,27 @@ async function fetchProfile(fid: number) {
       created_at: dbResult.data?.created_at || null,
       bluesky_handle: dbResult.data?.bluesky_handle || null,
       solana_wallet: dbResult.data?.solana_wallet || null,
+      // Social connections
+      x_handle: dbResult.data?.x_handle || null,
+      instagram_handle: dbResult.data?.instagram_handle || null,
+      soundcloud_url: dbResult.data?.soundcloud_url || null,
+      spotify_url: dbResult.data?.spotify_url || null,
+      audius_handle: dbResult.data?.audius_handle || null,
     };
+
+    // Auto-import X handle from Farcaster verified_accounts if not already saved
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const verifiedAccounts = (neynarUser as any)?.verified_accounts as Array<{ platform: string; username: string }> | undefined;
+    const xUsername = verifiedAccounts?.find((a) => a.platform === 'x')?.username;
+    if (xUsername && !result.x_handle) {
+      await supabaseAdmin
+        .from('users')
+        .update({ x_handle: xUsername })
+        .eq('fid', fid);
+      result.x_handle = xUsername;
+    }
+
+    return result;
   } catch (err) {
     console.error('Failed to fetch profile for settings:', err);
     return null;

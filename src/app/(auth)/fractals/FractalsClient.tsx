@@ -6,8 +6,9 @@ import { SessionsTab } from './SessionsTab';
 import { FractalLeaderboardTab } from './FractalLeaderboardTab';
 import { ProposalsTab } from './ProposalsTab';
 import { AboutTab } from './AboutTab';
+import { AnalyticsTab } from './AnalyticsTab';
 
-type Tab = 'sessions' | 'leaderboard' | 'proposals' | 'about';
+type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'proposals' | 'about';
 
 interface Props {
   currentFid: number;
@@ -20,6 +21,7 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
   const TABS: { id: Tab; label: string }[] = [
     { id: 'sessions', label: 'Sessions' },
     { id: 'leaderboard', label: 'Leaderboard' },
+    { id: 'analytics', label: 'Analytics' },
     { id: 'proposals', label: 'Proposals' },
     { id: 'about', label: 'About' },
   ];
@@ -65,6 +67,7 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
       <div className="max-w-lg mx-auto px-4 py-4">
         {activeTab === 'sessions' && <SessionsTab isAdmin={isAdmin} />}
         {activeTab === 'leaderboard' && <FractalLeaderboardTab currentFid={currentFid} />}
+        {activeTab === 'analytics' && <AnalyticsTab />}
         {activeTab === 'proposals' && <ProposalsTab />}
         {activeTab === 'about' && <AboutTab />}
       </div>

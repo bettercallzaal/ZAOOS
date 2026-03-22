@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
 import { ENV } from '@/lib/env';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+
+const publishSchema = z.object({
+  proposalId: z.string().uuid(),
+});
 
 /**
  * POST — Publish a governance-approved proposal to @thezao Farcaster account
@@ -28,10 +33,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { proposalId } = body;
-  if (!proposalId) {
-    return NextResponse.json({ error: 'proposalId required' }, { status: 400 });
+  const parsed = publishSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
   }
+
+  const { proposalId } = parsed.data;
 
   // Fetch the proposal
   const { data: proposal, error: fetchError } = await supabaseAdmin

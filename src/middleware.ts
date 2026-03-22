@@ -43,7 +43,7 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
     return { limit: 20, windowMs: MINUTE };
   }
   if (pathname.startsWith('/api/proposals/vote')) {
-    return { limit: 10, windowMs: MINUTE };
+    return { limit: 3, windowMs: MINUTE };
   }
   if (pathname.startsWith('/api/proposals/comment')) {
     return { limit: 10, windowMs: MINUTE };
@@ -55,7 +55,7 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
     return { limit: 20, windowMs: MINUTE };
   }
   if (pathname.startsWith('/api/music/submissions')) {
-    return { limit: 5, windowMs: MINUTE };
+    return { limit: 2, windowMs: MINUTE };
   }
   if (pathname.startsWith('/api/music/metadata')) {
     return { limit: 20, windowMs: MINUTE };
@@ -126,6 +126,8 @@ export function middleware(request: NextRequest) {
   // Apply rate limiting to API routes
   const config = getRateLimitConfig(pathname);
   if (config) {
+    // Vercel strips user-supplied X-Forwarded-For and sets trusted values.
+    // On non-Vercel deployments, ensure a trusted reverse proxy sets these headers.
     const ip = request.headers.get('x-real-ip')
       || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
       || 'unknown';

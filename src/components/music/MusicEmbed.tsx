@@ -86,7 +86,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
     if (!metadata) return;
 
     if (externalOnly) {
-      window.open(url, '_blank');
+      window.open(url, '_blank', 'noopener,noreferrer');
       return;
     }
 

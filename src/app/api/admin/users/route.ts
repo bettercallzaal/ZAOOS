@@ -83,8 +83,8 @@ export async function GET(req: NextRequest) {
   }
 
   if (search) {
-    // Sanitize: strip PostgREST filter metacharacters (%, _, commas, parens, dots, backslashes, quotes, asterisks)
-    const safe = search.slice(0, 100).replace(/[%_,().*\\'"]/g, '');
+    // Escape PostgREST wildcards and metacharacters for safe .ilike() usage
+    const safe = search.slice(0, 100).replace(/[%_\\]/g, '\\$&').replace(/[,().*'"]/g, '');
     if (safe) {
       query = query.or(`display_name.ilike.%${safe}%,username.ilike.%${safe}%,primary_wallet.ilike.%${safe}%,real_name.ilike.%${safe}%,ign.ilike.%${safe}%,ens_name.ilike.%${safe}%`);
     }

@@ -3,8 +3,15 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
 
+const ALLOWED_WALLET_KEYS = [
+  'custody_address',
+  'verified_addresses',
+  'solana_address',
+  'primary_wallet',
+] as const;
+
 const patchSchema = z.object({
-  hidden_wallets: z.array(z.string().max(100)).max(50).default([]),
+  hidden_wallets: z.array(z.enum(ALLOWED_WALLET_KEYS)).max(10).default([]),
 });
 
 /**

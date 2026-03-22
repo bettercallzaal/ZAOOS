@@ -31,7 +31,7 @@ The existing proposal system already supports governance-gated Farcaster publish
 1. **Cron syncs battle data** at 6 PM EST daily
 2. **Cron generates proposals** for new battles, spotlights, leaderboard, session reminders — these land in the governance tab as `wavewarz` category proposals
 3. **ZAO members vote** on which ones to publish (Respect-weighted, 1000 threshold)
-4. **Approved proposals publish** via WaveWarZ signer UUID to `/wavewarz` Farcaster channel
+4. **Approved proposals publish** via WaveWarZ official signer to `/wavewarz` Farcaster channel
 5. **Members can also create** manual `wavewarz` or `social` proposals from the governance UI
 
 ### Data Flow
@@ -65,14 +65,16 @@ Manual flow:
 ### Signer Routing
 
 When a proposal is approved and publishes:
-- Category `wavewarz` -> publish via `WAVEWARZ_SIGNER_UUID` to `/wavewarz` channel
+- Category `wavewarz` -> publish via `WAVEWARZ_OFFICIAL_SIGNER_UUID` to `/wavewarz` channel
 - Category `social` -> publish via @thezao signer to `/zao` channel
 - All other categories -> existing behavior (publish via @thezao signer)
 
-### New Environment Variable
+### New Environment Variables
 
 ```
-WAVEWARZ_SIGNER_UUID=   # WaveWarZ's Farcaster managed signer UUID (from Neynar)
+WAVEWARZ_OFFICIAL_SIGNER_UUID=     # WaveWarZ's Farcaster managed signer UUID
+WAVEWARZ_OFFICIAL_FID=             # WaveWarZ's Farcaster FID
+WAVEWARZ_OFFICIAL_NEYNAR_API_KEY=  # WaveWarZ's Neynar API key (separate from ZAO's)
 ```
 
 ---
@@ -109,7 +111,7 @@ social: 'bg-pink-500/10 text-pink-400',
 ### Publish Route — Signer Routing
 
 Modify the existing publish route (or the governance publishing logic) to check proposal category:
-- If `category === 'wavewarz'`: use `WAVEWARZ_SIGNER_UUID` and channel `wavewarz`
+- If `category === 'wavewarz'`: use `WAVEWARZ_OFFICIAL_SIGNER_UUID` and channel `wavewarz`
 - Otherwise: use existing @thezao signer
 
 ---
@@ -239,6 +241,54 @@ Join the session: wavewarz.com
 
 ---
 
+## Random Stats Generator
+
+A "Generate WaveWarZ Post" button that pulls a random stat from the synced data and creates a proposal. Available in two places:
+
+### Button Locations
+- **Governance tab** — next to the "New Proposal" button
+- **/wavewarz page** — above the iframe tab switcher
+
+### How It Works
+
+1. User taps "Generate WaveWarZ Post"
+2. `GET /api/wavewarz/random-stat` returns a randomly selected stat
+3. User sees a preview of the generated text
+4. User taps "Create Proposal" to submit it as a `wavewarz` proposal
+5. Community votes, publishes when threshold met
+
+### Random Stat Pool (picks one at random)
+
+| Type | Example |
+|------|---------|
+| Artist win record | "LUI has won 49 WaveWarZ battles with a 69% win rate -- the most wins on the platform." |
+| Volume leader | "LUI has generated 29.59 SOL in trading volume across 71 battles -- more than any other artist." |
+| Undefeated streak | "JED XO is undefeated at 3-0 on WaveWarZ." |
+| Most active artist | "Stormi has battled 75 times on WaveWarZ -- the most dedicated battler on the platform." |
+| Platform total | "WaveWarZ has hosted 647 battles with 423 SOL total trading volume across 43 artists." |
+| Recent battle highlight | "Kata7yst beat DCoopOfficial (+96%) with 1.04 SOL volume in Battle #1774064630." |
+| Biggest single battle | "The highest volume WaveWarZ battle generated {X} SOL in trading." |
+| Win rate leader | "APORKALYPSE has a 73% win rate across 30 battles -- the highest among active battlers." |
+| Earnings leader | "LUI has earned 0.528 SOL in career battle payouts on WaveWarZ." |
+| Charity stats | "WaveWarZ benefit battles have raised ~$1,500 for charity." |
+
+The endpoint queries `wavewarz_artists` and `wavewarz_battle_log` tables, picks a random stat type, finds the relevant data, and formats it using the templates above. Each call returns a different stat.
+
+### API: `GET /api/wavewarz/random-stat`
+
+Returns:
+```json
+{
+  "title": "LUI -- 49 WaveWarZ Wins",
+  "publish_text": "LUI has won 49 WaveWarZ battles with a 69% win rate -- the most wins on the platform.\n\nFull stats: wavewarz-intelligence.vercel.app/leaderboards",
+  "stat_type": "artist_win_record"
+}
+```
+
+The client uses this to pre-fill a proposal creation form. The user can edit the text before submitting.
+
+---
+
 ## API Routes
 
 ### `POST /api/wavewarz/sync` — Daily cron (6 PM EST)
@@ -275,12 +325,14 @@ The governance publishing logic (wherever proposals get published to Farcaster a
 
 ```typescript
 if (proposal.category === 'wavewarz') {
-  // Use WaveWarZ signer UUID + /wavewarz channel
-  signerUuid = process.env.WAVEWARZ_SIGNER_UUID;
+  // Use WaveWarZ's own credentials + /wavewarz channel
+  signerUuid = process.env.WAVEWARZ_OFFICIAL_SIGNER_UUID;
+  neynarApiKey = process.env.WAVEWARZ_OFFICIAL_NEYNAR_API_KEY;
   channel = 'wavewarz';
 } else {
   // Use @thezao signer (existing behavior)
   signerUuid = process.env.APP_SIGNER_UUID;
+  neynarApiKey = process.env.NEYNAR_API_KEY;
   channel = 'zao';
 }
 ```
@@ -344,15 +396,19 @@ Since the WaveWarZ Intelligence dashboard has no public API and its Supabase onl
 ### New Files
 - `src/app/api/wavewarz/sync/route.ts` — Cron sync endpoint (scrape + create proposals)
 - `src/app/api/wavewarz/artists/route.ts` — Leaderboard API
+- `src/app/api/wavewarz/random-stat/route.ts` — Random stat generator endpoint
 - `src/lib/wavewarz/scraper.ts` — Intelligence page scraper
 - `src/lib/wavewarz/proposals.ts` — Proposal generation (templates + creation)
+- `src/lib/wavewarz/random-stats.ts` — Random stat pool logic (10 stat types, queries DB, formats text)
 - `src/lib/wavewarz/constants.ts` — Wallet roster, spotlight thresholds, templates
+- `src/components/wavewarz/GeneratePostButton.tsx` — "Generate WaveWarZ Post" button (reused on governance + /wavewarz pages)
 
 ### Modified Files
 - `src/lib/validation/schemas.ts` — Add `wavewarz` and `social` to `proposalCategorySchema`
-- `src/app/(auth)/governance/page.tsx` — Add category colors for `wavewarz` and `social`
+- `src/app/(auth)/governance/page.tsx` — Add category colors for `wavewarz` and `social`, add GeneratePostButton
+- `src/app/(auth)/wavewarz/page.tsx` — Add GeneratePostButton above tab switcher
 - `community.config.ts` — Add `channel` field to wavewarz config
-- Governance publishing logic — Route `wavewarz` proposals to WaveWarZ signer
+- Governance publishing logic — Route `wavewarz` proposals to WaveWarZ official signer + API key
 - `vercel.json` — Add cron schedule
 
 ### Database

@@ -1,8 +1,8 @@
 # WaveWarZ Social Publisher for ZAO OS
 
 **Date:** March 21, 2026
-**Status:** Approved
-**Goal:** Make ZAO OS the Farcaster publishing hub for WaveWarZ — auto-post battle results, artist spotlights, weekly leaderboards, and session reminders via WaveWarZ's signer UUID, and let ZAO members compose manual posts to the /wavewarz channel.
+**Status:** Approved (v2 — governance-gated)
+**Goal:** Make ZAO OS the Farcaster publishing hub for WaveWarZ — sync battle data, generate proposals for battle results/spotlights/leaderboards/reminders, let ZAO members vote on them, and publish approved proposals via WaveWarZ's signer UUID to the /wavewarz Farcaster channel.
 
 ---
 
@@ -10,17 +10,29 @@
 
 | Decision | Choice |
 |----------|--------|
-| Publisher account | WaveWarZ's Farcaster signer UUID (not @thezao) |
+| Publishing model | Governance-gated proposals (NOT auto-post) — content is proposed, voted on, then published when threshold is reached |
+| Publisher account | WaveWarZ's Farcaster signer UUID |
 | Channel | `/wavewarz` Farcaster channel |
-| Auto-post types | Battle results, artist spotlights, weekly leaderboard, session reminders |
-| Cron schedule | All at 6:00 PM EST daily |
-| Manual posting | ZAO members can compose posts to /wavewarz channel from compose bar |
+| Proposal categories | Add `wavewarz` and `social` to existing proposal categories |
+| Respect threshold | 1000 (same as existing governance publishing) |
+| Cron schedule | Daily 6:00 PM EST — sync data + generate draft proposals |
+| Manual proposals | Any ZAO member can create wavewarz or social proposals |
 | Data source | Scrape WaveWarZ Intelligence artist pages nightly |
-| Tone | No emojis in any auto-posts |
+| Tone | No emojis in generated proposal text |
 
 ---
 
 ## Architecture
+
+### How It Works
+
+The existing proposal system already supports governance-gated Farcaster publishing (proposals with `publish_text` get cast when approved + threshold met). We extend this:
+
+1. **Cron syncs battle data** at 6 PM EST daily
+2. **Cron generates proposals** for new battles, spotlights, leaderboard, session reminders — these land in the governance tab as `wavewarz` category proposals
+3. **ZAO members vote** on which ones to publish (Respect-weighted, 1000 threshold)
+4. **Approved proposals publish** via WaveWarZ signer UUID to `/wavewarz` Farcaster channel
+5. **Members can also create** manual `wavewarz` or `social` proposals from the governance UI
 
 ### Data Flow
 
@@ -32,20 +44,30 @@ Daily 6 PM EST Cron
   |      +--> Upsert wavewarz_artists (stats)
   |      +--> Insert new rows in wavewarz_battle_log
   |
-  +--> Detect new battles since last sync
-  |      |
-  |      +--> Auto-cast each battle result via WaveWarZ signer
+  +--> For each new battle: create proposal (category: wavewarz)
+  |      with pre-filled publish_text, respect_threshold: 1000
   |
-  +--> Check artist spotlight thresholds
-  |      |
-  |      +--> Auto-cast spotlight if threshold crossed (once per tier per artist)
+  +--> Check spotlight thresholds: create proposal if threshold crossed
   |
-  +--> If Sunday: generate weekly leaderboard cast
+  +--> If Sunday: create weekly leaderboard proposal
   |
-  +--> If Mon-Fri: generate session reminder cast
+  +--> If Mon-Fri: create session reminder proposal
   |
-  +--> ZAO members compose manual posts via compose bar -> /wavewarz channel
+  +--> ZAO members vote on proposals in governance tab
+  |
+  +--> When threshold met: publish via WaveWarZ signer to /wavewarz channel
+
+Manual flow:
+  ZAO member -> Create proposal (category: wavewarz or social)
+    -> Community votes -> Threshold met -> Publish via appropriate signer
 ```
+
+### Signer Routing
+
+When a proposal is approved and publishes:
+- Category `wavewarz` -> publish via `WAVEWARZ_SIGNER_UUID` to `/wavewarz` channel
+- Category `social` -> publish via @thezao signer to `/zao` channel
+- All other categories -> existing behavior (publish via @thezao signer)
 
 ### New Environment Variable
 
@@ -55,7 +77,44 @@ WAVEWARZ_SIGNER_UUID=   # WaveWarZ's Farcaster managed signer UUID (from Neynar)
 
 ---
 
-## Database Schema
+## Schema Changes
+
+### Proposal Categories (modify existing)
+
+Current: `general`, `treasury`, `governance`, `technical`, `community`
+
+New: `general`, `treasury`, `governance`, `technical`, `community`, **`wavewarz`**, **`social`**
+
+Change in `src/lib/validation/schemas.ts`:
+```typescript
+export const proposalCategorySchema = z.enum([
+  'general',
+  'treasury',
+  'governance',
+  'technical',
+  'community',
+  'wavewarz',
+  'social',
+]);
+```
+
+### Governance Page Category Colors
+
+Add to `CATEGORY_COLORS` in governance page:
+```typescript
+wavewarz: 'bg-green-500/10 text-green-400',
+social: 'bg-pink-500/10 text-pink-400',
+```
+
+### Publish Route — Signer Routing
+
+Modify the existing publish route (or the governance publishing logic) to check proposal category:
+- If `category === 'wavewarz'`: use `WAVEWARZ_SIGNER_UUID` and channel `wavewarz`
+- Otherwise: use existing @thezao signer
+
+---
+
+## New Database Tables
 
 ### `wavewarz_artists` — Artist stats synced nightly
 
@@ -78,7 +137,6 @@ CREATE TABLE wavewarz_artists (
   zao_fid INTEGER,
   farcaster_username TEXT,
   spotlight_tier TEXT,        -- null, 'rising_star', 'veteran', 'legend'
-  spotlight_cast_hash TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -103,44 +161,32 @@ CREATE TABLE wavewarz_battle_log (
   volume_sol NUMERIC NOT NULL DEFAULT 0,
   battle_type TEXT,           -- 'quick', 'main_event', 'benefit'
   settled_at TIMESTAMPTZ,
-  cast_hash TEXT,             -- hash of the auto-posted cast (null if not yet posted)
+  proposal_id UUID,           -- links to the proposals table (if a proposal was created for this battle)
   synced_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX ON wavewarz_battle_log(settled_at DESC);
-```
-
-### `wavewarz_casts` — Dedup tracker for auto-posts
-
-```sql
-CREATE TABLE wavewarz_casts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  cast_type TEXT NOT NULL,     -- 'battle_result', 'spotlight', 'leaderboard', 'reminder'
-  reference_id TEXT NOT NULL,  -- battle_id, artist name, 'week-2026-12', 'reminder-2026-03-21'
-  cast_hash TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(cast_type, reference_id)
-);
+CREATE INDEX ON wavewarz_battle_log(battle_id);
 ```
 
 ---
 
-## Auto-Post Templates (No Emojis)
+## Proposal Templates (No Emojis)
 
-### Battle Result (per new battle)
+### Battle Result Proposal
 
+**Title:** `{winner_name} beat {loser_name} -- Battle #{battle_id}`
+**Category:** `wavewarz`
+**Description:** `{winner_name} defeated {loser_name} ({margin}) with {volume} SOL trading volume in WaveWarZ Battle #{battle_id}. Vote to publish this result to the /wavewarz Farcaster channel.`
+**Publish text:**
 ```
 {winner_name} beat {loser_name} ({margin}) | {volume} SOL volume | Battle #{battle_id}
 
 Watch battles live: wavewarz.com
 ```
+**Respect threshold:** 1000
 
-Example:
-> Kata7yst beat BennyJ504 (+82%) | 0.048 SOL volume | Battle #1774067319
->
-> Watch battles live: wavewarz.com
-
-### Artist Spotlight (threshold-based, once per tier)
+### Artist Spotlight Proposal
 
 | Tier | Trigger | Label |
 |------|---------|-------|
@@ -148,19 +194,23 @@ Example:
 | Battle Veteran | 10+ wins | "Battle Veteran" |
 | Battle Legend | 25+ wins | "Battle Legend" |
 
+**Title:** `{label}: {artist_name}`
+**Category:** `wavewarz`
+**Description:** `{artist_name} has reached {wins} WaveWarZ wins with {volume} SOL total volume. Vote to spotlight them on the /wavewarz Farcaster channel.`
+**Publish text:**
 ```
 {label}: {artist_name} has {wins} WaveWarZ wins with {volume} SOL total volume.
 
 Artist profile: wavewarz-intelligence.vercel.app/artist/{wallet}
 ```
+**Respect threshold:** 1000
 
-Example:
-> Rising Star: APORKALYPSE has 22 WaveWarZ wins with 10.97 SOL total volume.
->
-> Artist profile: wavewarz-intelligence.vercel.app/artist/CUh7ZWej4qG4daKHA44vV7zNNeonyctt45qHZykz9WGN
+### Weekly Leaderboard Proposal (Sunday)
 
-### Weekly Leaderboard (Sunday 6 PM)
-
+**Title:** `WaveWarZ Weekly Top 5 -- Week of {date}`
+**Category:** `wavewarz`
+**Description:** `This week's top WaveWarZ battlers. Vote to publish to the /wavewarz Farcaster channel.`
+**Publish text:**
 ```
 WaveWarZ Weekly Top 5:
 
@@ -172,33 +222,39 @@ WaveWarZ Weekly Top 5:
 
 Full leaderboard: wavewarz-intelligence.vercel.app/leaderboards
 ```
+**Respect threshold:** 1000
 
-### Session Reminder (Mon-Fri 6 PM)
+### Session Reminder Proposal (Mon-Fri)
 
+**Title:** `WaveWarZ Session Reminder -- {date}`
+**Category:** `wavewarz`
+**Description:** `Reminder for tonight's WaveWarZ battles on X Spaces. Vote to publish to the /wavewarz Farcaster channel.`
+**Publish text:**
 ```
 WaveWarZ battles go LIVE tonight at 8:30 PM EST on X Spaces.
 
 Join the session: wavewarz.com
 ```
+**Respect threshold:** 1000
 
 ---
 
 ## API Routes
 
-### `POST /api/wavewarz/sync` — Nightly cron
+### `POST /api/wavewarz/sync` — Daily cron (6 PM EST)
 
-Called by Vercel cron at 6 PM EST daily. Steps:
+Called by Vercel cron. Steps:
 1. Verify `CRON_SECRET` auth header
-2. For each of 43 known wallets: fetch `wavewarz-intelligence.vercel.app/artist/{wallet}`, parse HTML for stats
+2. For each of 43 known wallets: fetch Intelligence artist page, parse stats
 3. Upsert `wavewarz_artists` rows
 4. Detect new battles (compare `last_battle_id` vs previous sync)
 5. Insert new rows in `wavewarz_battle_log`
-6. For each new battle where `cast_hash` is null: publish battle result cast via Neynar using `WAVEWARZ_SIGNER_UUID`, save cast hash
-7. Check spotlight thresholds: if artist crossed a tier and `spotlight_tier` < new tier, publish spotlight cast, update `spotlight_tier`
-8. If Sunday: publish weekly leaderboard (top 5 by wins)
-9. If Mon-Fri: publish session reminder
-10. All casts go to `/wavewarz` Farcaster channel
-11. All casts tracked in `wavewarz_casts` for dedup
+6. For each new battle (filtered: no self-battles, no zero-volume): create a `wavewarz` category proposal with pre-filled `publish_text`
+7. Check spotlight thresholds: if artist crossed a tier, create spotlight proposal
+8. If Sunday: create weekly leaderboard proposal
+9. If Mon-Fri: create session reminder proposal
+10. Proposals are created with `author_id` set to a system/bot user (or the app's user ID)
+11. All proposals use `respect_threshold: 1000`
 
 ### `GET /api/wavewarz/artists` — Leaderboard
 
@@ -209,35 +265,24 @@ Returns artist data from `wavewarz_artists` table. Params:
 
 Requires session auth.
 
-### `POST /api/wavewarz/publish` — Manual cast
+### Existing `POST /api/proposals` — No changes needed
 
-Allows ZAO members to compose and publish a cast to the `/wavewarz` channel via WaveWarZ's signer. Request body:
-- `text`: string (max 1024 chars)
-- `embeds`: optional array of URLs
+ZAO members can already create proposals. They just select `wavewarz` or `social` as the category and fill in `publish_text`. The existing flow handles voting and publishing.
 
-Requires session auth. Validates input with Zod. Publishes via Neynar `POST /v2/farcaster/cast` with `WAVEWARZ_SIGNER_UUID`.
+### Existing publish flow — Modify signer routing
 
----
-
-## Compose Bar Integration
-
-Add `/wavewarz` as a channel option in the existing compose bar component. When selected:
-- Posts are published via `POST /api/wavewarz/publish` (WaveWarZ signer)
-- UI shows "Posting as WaveWarZ" indicator
-- Same compose UX as existing channel posting
-
----
-
-## community.config.ts Changes
+The governance publishing logic (wherever proposals get published to Farcaster after threshold is met) needs one change:
 
 ```typescript
-wavewarz: {
-  mainApp: 'https://www.wavewarz.com',
-  intelligence: 'https://wavewarz-intelligence.vercel.app',
-  analytics: 'https://analytics-wave-warz.vercel.app',
-  channel: 'wavewarz',        // Farcaster channel
-  // signerUuid stored in env var WAVEWARZ_SIGNER_UUID, not in config
-},
+if (proposal.category === 'wavewarz') {
+  // Use WaveWarZ signer UUID + /wavewarz channel
+  signerUuid = process.env.WAVEWARZ_SIGNER_UUID;
+  channel = 'wavewarz';
+} else {
+  // Use @thezao signer (existing behavior)
+  signerUuid = process.env.APP_SIGNER_UUID;
+  channel = 'zao';
+}
 ```
 
 ---
@@ -255,7 +300,20 @@ wavewarz: {
 }
 ```
 
-Note: `0 23 * * *` = 11 PM UTC = 6 PM EST (UTC-5). Adjust for daylight savings if needed.
+Note: `0 23 * * *` = 11 PM UTC = 6 PM EST (UTC-5).
+
+---
+
+## community.config.ts Changes
+
+```typescript
+wavewarz: {
+  mainApp: 'https://www.wavewarz.com',
+  intelligence: 'https://wavewarz-intelligence.vercel.app',
+  analytics: 'https://analytics-wave-warz.vercel.app',
+  channel: 'wavewarz',
+},
+```
 
 ---
 
@@ -266,47 +324,52 @@ Since the WaveWarZ Intelligence dashboard has no public API and its Supabase onl
 1. For each wallet in the known 43-wallet roster: `GET /artist/{wallet}`
 2. Parse the HTML response for: artist name, wins, losses, total volume, career earnings, last battle details
 3. The Intelligence dashboard renders client-side (Next.js) — the initial HTML contains hydration payloads with the data embedded
-4. If scraping fails (e.g., they change the page structure), fall back to the last known data and log the failure
-5. New wallets can be added to the roster manually or detected from battle log opponent names
+4. If scraping fails, fall back to the last known data and log the failure
+5. New wallets can be added to the roster manually
 
 ---
 
 ## Filter Rules
 
-- **Self-battles** (artist_a == artist_b): sync to DB but do NOT auto-post
-- **Zero-volume battles**: sync to DB but do NOT auto-post
-- **Duplicate detection**: `wavewarz_casts.reference_id` UNIQUE constraint prevents double-posting
-- **Spotlight once per tier**: check `wavewarz_artists.spotlight_tier` before posting; only upgrade, never re-post same tier
+- **Self-battles** (artist_a == artist_b): sync to DB but do NOT create proposal
+- **Zero-volume battles**: sync to DB but do NOT create proposal
+- **Duplicate proposals**: check `wavewarz_battle_log.proposal_id` — if a proposal already exists for this battle, skip
+- **Spotlight once per tier**: check `wavewarz_artists.spotlight_tier` before creating proposal; only upgrade tiers
+- **Session reminder dedup**: only create if no open reminder proposal exists for today
 
 ---
 
 ## Files to Create/Modify
 
 ### New Files
-- `src/app/api/wavewarz/sync/route.ts` — Cron sync endpoint
+- `src/app/api/wavewarz/sync/route.ts` — Cron sync endpoint (scrape + create proposals)
 - `src/app/api/wavewarz/artists/route.ts` — Leaderboard API
-- `src/app/api/wavewarz/publish/route.ts` — Manual cast endpoint
 - `src/lib/wavewarz/scraper.ts` — Intelligence page scraper
-- `src/lib/wavewarz/publisher.ts` — Cast formatting + Neynar publish via WaveWarZ signer
-- `src/lib/wavewarz/constants.ts` — Wallet roster, spotlight thresholds, cast templates
+- `src/lib/wavewarz/proposals.ts` — Proposal generation (templates + creation)
+- `src/lib/wavewarz/constants.ts` — Wallet roster, spotlight thresholds, templates
 
 ### Modified Files
+- `src/lib/validation/schemas.ts` — Add `wavewarz` and `social` to `proposalCategorySchema`
+- `src/app/(auth)/governance/page.tsx` — Add category colors for `wavewarz` and `social`
 - `community.config.ts` — Add `channel` field to wavewarz config
-- Compose bar component — Add `/wavewarz` channel option
+- Governance publishing logic — Route `wavewarz` proposals to WaveWarZ signer
 - `vercel.json` — Add cron schedule
 
 ### Database
-- 3 new Supabase tables: `wavewarz_artists`, `wavewarz_battle_log`, `wavewarz_casts`
+- 2 new Supabase tables: `wavewarz_artists`, `wavewarz_battle_log`
+- No `wavewarz_casts` table needed (proposals table handles dedup)
 - Seed `wavewarz_artists` with 43 known wallets from doc 101
 
 ---
 
 ## Success Criteria
 
-1. Every new WaveWarZ battle gets auto-posted to /wavewarz Farcaster channel within 24 hours
-2. Artist spotlights fire exactly once per tier per artist
-3. Weekly leaderboard posts every Sunday at 6 PM EST
-4. Session reminders post Mon-Fri at 6 PM EST
-5. ZAO members can compose manual posts to /wavewarz channel
-6. No duplicate posts (wavewarz_casts dedup works)
-7. Self-battles and zero-volume battles are filtered from auto-posts
+1. Cron syncs battle data and creates wavewarz proposals daily at 6 PM EST
+2. Battle result proposals appear in governance tab under wavewarz category
+3. Spotlight proposals fire exactly once per tier per artist
+4. Weekly leaderboard proposal created every Sunday
+5. Session reminder proposals created Mon-Fri
+6. Self-battles and zero-volume battles filtered from proposals
+7. When a wavewarz proposal reaches 1000 Respect threshold, it publishes via WaveWarZ signer to /wavewarz channel
+8. ZAO members can manually create wavewarz and social proposals
+9. No duplicate proposals for the same battle

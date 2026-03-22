@@ -31,4 +31,9 @@ export const ENV = {
   ZAO_OFFICIAL_FID: optionalEnv('ZAO_OFFICIAL_FID'),
   ZAO_OFFICIAL_SIGNER_UUID: optionalEnv('ZAO_OFFICIAL_SIGNER_UUID'),
   ZAO_OFFICIAL_NEYNAR_API_KEY: optionalEnv('ZAO_OFFICIAL_NEYNAR_API_KEY'),
+
+  // WaveWarZ official account (governance-powered posting to /wavewarz channel)
+  WAVEWARZ_OFFICIAL_FID: optionalEnv('WAVEWARZ_OFFICIAL_FID'),
+  WAVEWARZ_OFFICIAL_SIGNER_UUID: optionalEnv('WAVEWARZ_OFFICIAL_SIGNER_UUID'),
+  WAVEWARZ_OFFICIAL_NEYNAR_API_KEY: optionalEnv('WAVEWARZ_OFFICIAL_NEYNAR_API_KEY'),
 } as const;

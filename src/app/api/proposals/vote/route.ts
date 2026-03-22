@@ -193,9 +193,14 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
 
     let castHash: string | null = null;
 
-    // Publish to @thezao Farcaster (if signer configured)
+    // Publish to Farcaster (route by category: wavewarz → WaveWarZ signer, else → @thezao)
     const ENV = await import('@/lib/env').then((m) => m.ENV);
-    if (ENV.ZAO_OFFICIAL_SIGNER_UUID && ENV.ZAO_OFFICIAL_FID) {
+    const isWavewarz = fullProposal.category === 'wavewarz';
+    const signerUuid = isWavewarz ? ENV.WAVEWARZ_OFFICIAL_SIGNER_UUID : ENV.ZAO_OFFICIAL_SIGNER_UUID;
+    const neynarApiKey = isWavewarz ? ENV.WAVEWARZ_OFFICIAL_NEYNAR_API_KEY : ENV.ZAO_OFFICIAL_NEYNAR_API_KEY;
+    const publishChannel = isWavewarz ? 'wavewarz' : 'zao';
+
+    if (signerUuid) {
       try {
         const { postCast } = await import('@/lib/farcaster/neynar');
         const maxLen = 1024 - attribution.length;
@@ -207,22 +212,22 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         const embedUrls = fullProposal.publish_image_url ? [fullProposal.publish_image_url] : undefined;
 
         const result = await postCast(
-          ENV.ZAO_OFFICIAL_SIGNER_UUID,
+          signerUuid,
           castText,
-          'zao',
+          publishChannel,
           undefined,
           undefined,
           embedUrls,
           undefined,
-          ENV.ZAO_OFFICIAL_NEYNAR_API_KEY,
+          neynarApiKey,
         );
         castHash = result?.cast?.hash || null;
-        console.log(`[publish-threshold] Published to @thezao Farcaster: ${castHash}`);
+        console.log(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
       } catch (fcErr) {
         console.error('[publish-threshold] Farcaster publish failed:', fcErr);
       }
     } else {
-      console.warn('[publish-threshold] Farcaster signer not configured — skipping Farcaster publish');
+      console.warn(`[publish-threshold] Farcaster signer not configured for ${publishChannel} — skipping`);
     }
 
     // Publish to @thezao Bluesky (independent of Farcaster)

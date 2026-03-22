@@ -62,6 +62,8 @@ export const proposalCategorySchema = z.enum([
   'governance',
   'technical',
   'community',
+  'wavewarz',
+  'social',
 ]);
 
 export const createProposalSchema = z.object({

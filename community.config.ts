@@ -113,6 +113,7 @@ export const communityConfig = {
     mainApp: 'https://www.wavewarz.com',
     intelligence: 'https://wavewarz-intelligence.vercel.app',
     analytics: 'https://analytics-wave-warz.vercel.app',
+    channel: 'wavewarz',
   },
 
   // ── ZOUNZ / Nouns Builder DAO (Base) ───────────────────────

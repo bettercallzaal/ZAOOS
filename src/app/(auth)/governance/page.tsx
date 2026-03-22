@@ -73,6 +73,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   community: 'bg-purple-500/10 text-purple-400',
   governance: 'bg-[#f5a623]/10 text-[#f5a623]',
   treasury: 'bg-green-500/10 text-green-400',
+  wavewarz: 'bg-emerald-500/10 text-emerald-400',
+  social: 'bg-pink-500/10 text-pink-400',
 };
 
 export default function GovernancePage() {

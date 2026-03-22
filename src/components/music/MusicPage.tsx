@@ -71,21 +71,18 @@ export function MusicPage() {
 
   // ── Fetch submissions ────────────────────────────────────────────────
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const res = await fetch('/api/music/submissions?limit=20');
+    const controller = new AbortController();
+    fetch('/api/music/submissions?limit=20', { signal: controller.signal })
+      .then((res) => {
         if (!res.ok) throw new Error('fetch failed');
-        const data = await res.json();
-        if (!cancelled) setSubmissions(data.submissions || []);
-      } catch {
-        // silent
-      } finally {
-        if (!cancelled) setSubmissionsLoading(false);
-      }
-    }
-    load();
-    return () => { cancelled = true; };
+        return res.json();
+      })
+      .then((data) => setSubmissions(data.submissions || []))
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      })
+      .finally(() => setSubmissionsLoading(false));
+    return () => controller.abort();
   }, []);
 
   // ── IntersectionObserver for active tab tracking ─────────────────────

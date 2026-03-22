@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface ActivityItem {
@@ -32,30 +32,31 @@ export function ActivityFeed() {
   const [items, setItems] = useState<ActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
-  const fetchActivity = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const filterParam = activeFilter === 'All' ? '' : `?type=${activeFilter.toLowerCase()}`;
-      const res = await fetch(`/api/activity/feed${filterParam}`);
-      if (!res.ok) {
-        setItems([]);
-        return;
-      }
-      const data = await res.json();
-      setItems(data.items ?? []);
-    } catch {
-      setError(true);
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [activeFilter]);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    fetchActivity();
-  }, [fetchActivity]);
+    const controller = new AbortController();
+    setLoading(true);
+    setError(false);
+
+    const filterParam = activeFilter === 'All' ? '' : `?type=${activeFilter.toLowerCase()}`;
+    fetch(`/api/activity/feed${filterParam}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) { setItems([]); return; }
+        return res.json();
+      })
+      .then((data) => {
+        if (data) setItems(data.items ?? data.activities ?? []);
+      })
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError(true);
+        setItems([]);
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, [activeFilter, retryCount]);
 
   return (
     <div>
@@ -98,7 +99,7 @@ export function ActivityFeed() {
         <div className="text-center py-8">
           <p className="text-xs text-gray-600">Could not load activity</p>
           <button
-            onClick={fetchActivity}
+            onClick={() => setRetryCount((c) => c + 1)}
             className="text-xs text-[#f5a623] hover:text-[#ffd700] mt-2 transition-colors"
           >
             Retry

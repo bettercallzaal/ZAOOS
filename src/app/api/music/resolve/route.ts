@@ -10,7 +10,10 @@ import {
 } from '@/lib/music/songlink';
 
 const QuerySchema = z.object({
-  url: z.string().url('Must be a valid URL'),
+  url: z.string().url('Must be a valid URL').max(2048).refine(
+    (u) => u.startsWith('http://') || u.startsWith('https://'),
+    'Only http/https URLs allowed'
+  ),
 });
 
 /** Cache TTL: 7 days in seconds. */

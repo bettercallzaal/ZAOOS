@@ -9,6 +9,11 @@ const JitsiRoom = dynamic(
   { ssr: false, loading: () => <div className="flex items-center justify-center h-64 text-gray-400">Loading call room...</div> }
 );
 
+const ListeningRoom = dynamic(
+  () => import('@/components/calls/ListeningRoom').then((mod) => mod.ListeningRoom),
+  { ssr: false, loading: () => <div className="flex items-center justify-center h-64 text-gray-400">Loading listening room...</div> }
+);
+
 interface Room {
   id: string;
   label: string;
@@ -27,16 +32,22 @@ function generateRoomName(slug: string): string {
   return `zao-${slug}-${hash}`;
 }
 
+type ActiveRoom =
+  | { mode: 'jitsi'; jitsiName: string; label: string; audioOnly: boolean }
+  | { mode: 'listening'; jitsiName: string; label: string };
+
 export default function CallsPage() {
-  const [activeRoom, setActiveRoom] = useState<{ jitsiName: string; label: string; audioOnly: boolean } | null>(null);
+  const [activeRoom, setActiveRoom] = useState<ActiveRoom | null>(null);
   const [customName, setCustomName] = useState('');
 
   const joinRoom = useCallback((room: Room) => {
-    setActiveRoom({
-      jitsiName: generateRoomName(room.id),
-      label: room.label,
-      audioOnly: room.audioOnly,
-    });
+    const jitsiName = generateRoomName(room.id);
+
+    if (room.id === 'listening-room') {
+      setActiveRoom({ mode: 'listening', jitsiName, label: room.label });
+    } else {
+      setActiveRoom({ mode: 'jitsi', jitsiName, label: room.label, audioOnly: room.audioOnly });
+    }
   }, []);
 
   const joinCustomRoom = useCallback(() => {
@@ -44,6 +55,7 @@ export default function CallsPage() {
     if (!name) return;
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     setActiveRoom({
+      mode: 'jitsi',
       jitsiName: generateRoomName(slug),
       label: name,
       audioOnly: false,
@@ -55,8 +67,19 @@ export default function CallsPage() {
     setActiveRoom(null);
   }, []);
 
-  // Full-screen call view
-  if (activeRoom) {
+  // ── Listening Room view ────────────────────────────────────────────────────
+  if (activeRoom?.mode === 'listening') {
+    return (
+      <ListeningRoom
+        jitsiRoomName={activeRoom.jitsiName}
+        roomLabel={activeRoom.label}
+        onLeave={leaveRoom}
+      />
+    );
+  }
+
+  // ── Full-screen Jitsi call view ────────────────────────────────────────────
+  if (activeRoom?.mode === 'jitsi') {
     return (
       <div className="fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
         <header className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] shrink-0">
@@ -83,7 +106,7 @@ export default function CallsPage() {
     );
   }
 
-  // Room list view
+  // ── Room list view ─────────────────────────────────────────────────────────
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
       <header className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
@@ -105,7 +128,9 @@ export default function CallsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                    {room.audioOnly ? (
+                    {room.id === 'listening-room' ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V4.5A2.25 2.25 0 0016.5 2.25h-3a2.25 2.25 0 00-2.25 2.25v2.553M9 18.75l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66V9" />
+                    ) : room.audioOnly ? (
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
                     ) : (
                       <path strokeLinecap="round" strokeLinejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z" />

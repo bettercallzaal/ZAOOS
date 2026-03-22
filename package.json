@@ -16,6 +16,7 @@
   "dependencies": {
     "@atproto/api": "^0.19.4",
     "@atproto/oauth-client-node": "^0.3.17",
+    "@discordjs/rest": "^2.6.0",
     "@farcaster/auth-client": "^0.7.1",
     "@farcaster/auth-kit": "^0.8.2",
     "@farcaster/miniapp-sdk": "^0.2.3",
@@ -41,6 +42,7 @@
     "@xmtp/browser-sdk": "^7.0.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "bs58": "^6.0.0",
+    "discord-api-types": "^0.38.42",
     "iron-session": "^8.0.4",
     "next": "^16.2.0",
     "papaparse": "^5.5.3",

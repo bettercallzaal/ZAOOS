@@ -83,6 +83,7 @@ On-chain identity, community roles, DAO structure, token economics, and legal co
 | [113](./113-zao-fractal-bot-process/) | **ZAO Fractal Bot + Process** | Discord bot (Python, 52 commands), step-by-step fractal flow, 2x Fibonacci scoring, frapps submission, OG vs ZOR Respect, 90 weeks of sessions, integration plan |
 | [114](./114-zao-fractal-live-infrastructure/) | **ZAO Fractal Live Infrastructure** | What's deployed now, OREC 175 txns, webhook data flow, bot history format, frapps URL format, ZAO OS integration architecture |
 | [115](./115-zao-data-reconciliation/) | **ZAO Respect Data Reconciliation** | Complete data map: OG era (1-73.2) + ORDAO era (74-90+), 6 Airtable CSVs + 3 awards CSVs, 173 members + 42 on-chain, import plan |
+| [116](./116-discord-integration-research/) | **Discord API Integration** | @discordjs/rest for server-side reads, OAuth2 account linking, webhook from bot, supabase-py for bot sync, rate limits |
 | [59](./59-hats-tree-integration/) | **Hats Tree Integration** | Hats Protocol tree structure for ZAO roles |
 | [75](./75-hats-protocol-v2-updates/) | **Hats Protocol V2 Updates** | New eligibility modules, HSG v2, subgraph SDK v1.0.0, MCP server for AI, ERC-6551 accounts |
 | [78](./78-nouns-builder-integration/) | **Nouns Builder Integration** | Daily NFT auctions, 5-contract DAO suite, builder-template-app (MIT/Next.js), builder-farcaster, iframe/embed options for ZABAL DAO |

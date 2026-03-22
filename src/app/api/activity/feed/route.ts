@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     if (filter === 'all' || filter === 'music') {
       const { data: songs } = await supabaseAdmin
         .from('song_submissions')
-        .select('id, title, artist_name, submitted_by_fid, created_at, users!song_submissions_submitted_by_fid_fkey(display_name, pfp_url)')
+        .select('id, title, artist, submitted_by_fid, created_at, users!song_submissions_submitted_by_fid_fkey(display_name, pfp_url)')
         .order('created_at', { ascending: false })
         .limit(limit);
 
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
             displayName: (user as { display_name?: string })?.display_name || 'Member',
             pfpUrl: (user as { pfp_url?: string })?.pfp_url || null,
           },
-          description: `submitted "${s.title}" by ${s.artist_name}`,
+          description: `submitted "${s.title}" by ${s.artist}`,
           timestamp: s.created_at,
           link: '/chat',
         });

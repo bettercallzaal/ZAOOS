@@ -5,12 +5,11 @@ import Image from 'next/image';
 
 interface ActivityItem {
   id: string;
-  type: 'music' | 'governance' | 'social' | 'system';
-  actor_display_name: string;
-  actor_pfp_url: string | null;
-  action_text: string;
-  created_at: string;
-  href?: string;
+  type: string;
+  actor: { fid: number; displayName: string; pfpUrl: string | null };
+  description: string;
+  timestamp: string;
+  link?: string;
 }
 
 const FILTERS = ['All', 'Music', 'Governance', 'Social'] as const;
@@ -41,14 +40,14 @@ export function ActivityFeed() {
       setError(false);
     });
 
-    const filterParam = activeFilter === 'All' ? '' : `?type=${activeFilter.toLowerCase()}`;
+    const filterParam = activeFilter === 'All' ? '' : `?filter=${activeFilter.toLowerCase()}`;
     fetch(`/api/activity/feed${filterParam}`, { signal: controller.signal })
       .then((res) => {
         if (!res.ok) { setItems([]); return; }
         return res.json();
       })
       .then((data) => {
-        if (data) setItems(data.items ?? data.activities ?? []);
+        if (data) setItems(data.activities ?? []);
       })
       .catch((err) => {
         if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -122,10 +121,10 @@ export function ActivityFeed() {
               className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-white/[0.02] transition-colors"
             >
               {/* Avatar */}
-              {item.actor_pfp_url ? (
+              {item.actor.pfpUrl ? (
                 <Image
-                  src={item.actor_pfp_url}
-                  alt={`${item.actor_display_name} avatar`}
+                  src={item.actor.pfpUrl}
+                  alt={`${item.actor.displayName} avatar`}
                   width={32}
                   height={32}
                   className="rounded-full flex-shrink-0"
@@ -133,17 +132,17 @@ export function ActivityFeed() {
                 />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center text-xs font-bold text-gray-500">
-                  {item.actor_display_name?.charAt(0)?.toUpperCase() || '?'}
+                  {item.actor.displayName?.charAt(0)?.toUpperCase() || '?'}
                 </div>
               )}
 
               {/* Action text */}
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-300 leading-snug">
-                  <span className="font-semibold text-white">{item.actor_display_name}</span>{' '}
-                  {item.action_text}
+                  <span className="font-semibold text-white">{item.actor.displayName}</span>{' '}
+                  {item.description}
                 </p>
-                <p className="text-[10px] text-gray-600 mt-0.5">{timeAgo(item.created_at)}</p>
+                <p className="text-[10px] text-gray-600 mt-0.5">{timeAgo(item.timestamp)}</p>
               </div>
             </div>
           ))}

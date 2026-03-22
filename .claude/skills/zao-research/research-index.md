@@ -1,6 +1,6 @@
 # Research Document Index
 
-88 research documents in `research/`. Each is a folder with a `README.md`.
+103 research documents in `research/`. Each is a folder with a `README.md`.
 
 | # | Folder Name | Topic |
 |---|-------------|-------|
@@ -92,3 +92,17 @@
 | 86 | `68-farcaster-miniapps-integration` | Farcaster Mini Apps SDK, Quick Auth, notifications (folder named 68- due to collision) |
 | 87 | `81-farcaster-social-graph-sharing` | Neynar social graph APIs, sharing features, member profiles (folder named 81-) |
 | 88 | `82-music-social-platform-redesign` | Music-first platform redesign research (folder named 82- due to collision) |
+| 95 | `95-solana-wavewarz-multi-wallet-settings` | Solana wallet adapter, WaveWarZ, multi-wallet/social settings redesign |
+| 96 | `96-wavewarz-deep-dive-integration` | WaveWarZ mechanics, economics, 3-tool ecosystem, ZAO integration plan |
+| 97 | `97-wavewarz-integration-blueprints` | WaveWarZ artist discovery pipeline: onchain data, auto-spotlight, profile enrichment, recruitment |
+| 99 | `99-prediction-market-music-battles` | Prediction market music battles: parimutuel pool, Supabase schema, settlement math, UI wireframes |
+| 100 | `100-solana-pda-reading-nextjs` | Solana PDA reading in Next.js: web3.js APIs, buffer-layout, Helius RPC, WaveWarZ vault patterns |
+| 101 | `101-wavewarz-zao-whitepaper` | WaveWarZ × ZAO OS whitepaper: platform deep-dive (647 battles, 43 artists, $38K volume), Artist Discovery Pipeline, governance synergy, 10-day roadmap |
+| 102 | `102-fractals-frapps-ordao-page` | frapps.xyz tech stack, ORDAO orclient SDK, Fibonacci scoring, /fractals page design, what's built vs missing |
+| 103 | `103-fractal-governance-ecosystem` | Eden Fractal (Base), Optimism Fractal (paused), Fractally (dormant), music fractal opportunity, Optimystics roadmap |
+| 104 | `104-fractal-communities-directory` | 25+ fractal communities mapped: active/paused/dormant, chain distribution, ZAO as only music fractal |
+| 105 | `105-fractal-key-people` | Dan SingJoy (Optimystics founder/musician), Tadas Vaitiekunas (ORDAO/OREC creator, sim31 on GitHub) |
+| 106 | `106-dan-singjoy-eden-fractal-deep-dive` | Eden Fractal Epoch 2 deep dive, Dan SingJoy profile, Cignals competition app, Fractal DJ, governance model |
+| 107 | `107-social-connections-x-integration` | X handle auto-import from Farcaster verified_accounts, settings UI redesign (4 sections), social platforms (X, Bluesky, Instagram, SoundCloud, Spotify, Audius), X API pricing |
+| 108 | `108-superchain-ordao-crosschain-fractal` | Superchain ORDAO hub-and-spoke, cross-chain Respect, Hats+Respect auto-gating, Optimism grants |
+| 109 | `109-optimystics-tooling-ecosystem` | orclient SDK v1.4.3 (npm), ornode API, OREC ABI, Cignals alpha, Fractalgram fork analysis |

@@ -54,6 +54,17 @@ Use this to quickly find if a topic has already been researched.
 - Notifications (Mini App push + Supabase + polling) → `35`
 - ZAO community ecosystem → `47`, `48`
 
+## WaveWarZ Integration
+- Solana wallet, initial WaveWarZ + multi-wallet settings → `95`
+- WaveWarZ deep dive: mechanics, economics, 3-tool ecosystem → `96`
+- Artist discovery pipeline: onchain data, auto-spotlight, profile enrichment → `97`
+- Prediction market music battles: parimutuel schema, settlement math → `99`
+- Solana PDA reading in Next.js: web3.js, buffer-layout, Helius → `100`
+- **WaveWarZ × ZAO OS Whitepaper (CANONICAL)**: full platform data (647 battles, 43 artists w/ wallets, $38K volume), Artist Discovery Pipeline architecture, governance synergy, 10-day roadmap → `101`
+
+## Social Connections & Settings
+- X handle auto-import from Farcaster, settings UI redesign, multi-social connections -> `107`
+
 ## Cross-Platform
 - Publishing to 11 platforms (fan-out architecture) → `28`
 - Lens Protocol V3 (collect/monetize, Bonsai) → `36`

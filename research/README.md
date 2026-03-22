@@ -72,6 +72,13 @@ On-chain identity, community roles, DAO structure, token economics, and legal co
 | [55](./55-hats-anchor-app-and-tooling/) | **Hats Anchor App & Tooling** | DAO tooling landscape, Hats Anchor App, OpenFang update |
 | [56](./56-ordao-respect-system/) | **ORDAO & Respect Game** | OREC consent-based governance, Fibonacci scoring (1-13), Respect1155 ERC-1155 tokens, fractal breakout rooms, parent/child token system |
 | [58](./58-respect-deep-dive/) | **Respect Deep Dive** | On-chain token data, scoring math, orclient SDK integration |
+| [102](./102-fractals-frapps-ordao-page/) | **Fractals Page + frapps + ORDAO** | frapps.xyz tech stack, ORDAO orclient SDK, Fibonacci scoring, /fractals page design, what's built vs missing |
+| [103](./103-fractal-governance-ecosystem/) | **Fractal Governance Ecosystem** | Eden Fractal (Base, active), Optimism Fractal (paused), Fractally (dormant), music fractal opportunity, Optimystics roadmap, Competition App |
+| [104](./104-fractal-communities-directory/) | **Fractal Communities Directory** | 25+ communities mapped: active/paused/dormant, chain distribution, ZAO as only music fractal, collaboration opportunities |
+| [105](./105-fractal-key-people/) | **Fractal Key People** | Dan SingJoy (musician/founder/host), Tadas Vaitiekunas (ORDAO/OREC creator), outreach strategy for ZAO |
+| [106](./106-dan-singjoy-eden-fractal-deep-dive/) | **Dan SingJoy + Eden Fractal Deep Dive** | Epoch 2 on Base, Season 12, bi-weekly Thu 17:00 UTC, Cignals competition app, Fractal DJ game, tripartite governance |
+| [108](./108-superchain-ordao-crosschain-fractal/) | **Superchain ORDAO + Cross-Chain** | Hub-and-spoke architecture, ZAO-Eden cross-chain Respect, Hats+Respect auto-gating, Optimism grants opportunities |
+| [109](./109-optimystics-tooling-ecosystem/) | **Optimystics Tooling Ecosystem** | orclient SDK (npm), ornode API (12 endpoints), OREC contract ABI, Cignals alpha, Fractalgram fork analysis, FRAPPS deployment |
 | [59](./59-hats-tree-integration/) | **Hats Tree Integration** | Hats Protocol tree structure for ZAO roles |
 | [75](./75-hats-protocol-v2-updates/) | **Hats Protocol V2 Updates** | New eligibility modules, HSG v2, subgraph SDK v1.0.0, MCP server for AI, ERC-6551 accounts |
 | [78](./78-nouns-builder-integration/) | **Nouns Builder Integration** | Daily NFT auctions, 5-contract DAO suite, builder-template-app (MIT/Next.js), builder-farcaster, iframe/embed options for ZABAL DAO |
@@ -117,6 +124,21 @@ The stack that runs ZAO OS — Next.js, Supabase, storage, mobile, real-time, an
 | [33](./33-infrastructure-mobile-storage/) | **Storage, Mobile & Privacy** | R2/IPFS/Arweave costs, PWA→Capacitor→React Native, real-time infra, audio tech, Semaphore ZK proofs |
 | [14](./14-project-structure/) | **Project Structure** | Single Next.js app decision, route groups, feature folders, GitHub Projects kanban |
 | [16](./16-ui-reference/) | **UI Reference** | CG/Commonwealth patterns, Discord-style dark theme, navy #0a1628 + gold #f5a623 |
+
+---
+
+## WaveWarZ Integration
+
+Solana prediction market for music battles — artist discovery pipeline, profile enrichment, and governance synergy.
+
+| # | Topic | Summary |
+|---|-------|---------|
+| [95](./95-solana-wavewarz-multi-wallet-settings/) | **Solana + WaveWarZ Initial Research** | Solana wallet adapter setup, WaveWarZ partnership overview, multi-wallet settings redesign |
+| [96](./96-wavewarz-deep-dive-integration/) | **WaveWarZ Deep Dive** | Battle mechanics (parimutuel pools), economics (98.5% in ecosystem), 3-tool ecosystem, platform stats |
+| [97](./97-wavewarz-integration-blueprints/) | **Artist Discovery Pipeline** | Artist Discovery Pipeline: sync 43 WaveWarZ artists into Supabase, spotlight auto-casts, profile enrichment, recruitment |
+| [99](./99-prediction-market-music-battles/) | **Prediction Market Schema** | Parimutuel pool mechanics, Supabase schema for ZAO-hosted battles, settlement math, UI wireframes |
+| [100](./100-solana-pda-reading-nextjs/) | **Solana PDA Reading in Next.js** | Battle Vault PDA reads via web3.js, buffer-layout deserialization, Helius RPC setup, WaveWarZ vault patterns |
+| [101](./101-wavewarz-zao-whitepaper/) | **WaveWarZ × ZAO OS Whitepaper** | **CANONICAL** — Full integration strategy: platform deep-dive, artist data (43 wallets, 647 battles, $38K volume), Artist Discovery Pipeline architecture, governance synergy, 10-day roadmap |
 
 ---
 
@@ -290,7 +312,7 @@ Start with [40 Audit Guide](./40-codebase-audit-guide/) + [38 AI Code Audit](./3
 
 ## Research Stats
 
-- **Total documents:** 88
+- **Total documents:** 103
 - **Total coverage:** ~300,000+ words
 - **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation
 - **Time span:** January — March 2026

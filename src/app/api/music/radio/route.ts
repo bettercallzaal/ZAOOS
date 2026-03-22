@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { communityConfig } from '@/../community.config';
 
+// Disable Next.js fetch cache — Audius data should be fresh
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 const AUDIUS_API = 'https://api.audius.co/v1';
 const APP_NAME = 'ZAO-OS';
 
@@ -42,7 +46,10 @@ export async function GET() {
         `${AUDIUS_API}/resolve?url=${encodeURIComponent(config.url)}&app_name=${APP_NAME}`,
         { signal: AbortSignal.timeout(10000), redirect: 'follow' },
       );
-      if (!resolveRes.ok) continue;
+      if (!resolveRes.ok) {
+        console.error(`[radio] Audius resolve failed for ${config.url}: ${resolveRes.status} ${resolveRes.statusText}`);
+        continue;
+      }
 
       const resolved = await resolveRes.json();
       // Audius may return data as object or array
@@ -116,7 +123,9 @@ export async function GET() {
     }
   }
 
+  console.log(`[radio] Resolved ${playlists.length} playlists with ${playlists.reduce((n, p) => n + p.tracks.length, 0)} total tracks`);
+
   return NextResponse.json({ playlists }, {
-    headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=3600' },
+    headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300' },
   });
 }

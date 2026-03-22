@@ -60,8 +60,9 @@ export async function GET() {
     const uniqueParticipants = new Set(scores.map(s => s.wallet_address).filter(Boolean)).size;
     const membersWithRespect = members.filter(m => Number(m.total_respect) > 0).length;
 
-    const ogSessions = sessions.filter(s => s.scoring_era === '1x').length;
-    const ordaoSessions = sessions.filter(s => s.scoring_era === '2x').length;
+    // Distinguish eras by notes content, not scoring_era (OG era had both 1x and 2x)
+    const ordaoSessions = sessions.filter(s => s.notes?.includes('ORDAO')).length;
+    const ogSessions = sessions.length - ordaoSessions;
 
     const participationTimeline = sessions.map(s => ({
       name: s.name,

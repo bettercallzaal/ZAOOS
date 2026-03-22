@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { usePlayer } from '@/providers/audio';
 import { useRadio } from '@/hooks/useRadio';
 import { communityConfig } from '@/../community.config';
+import { NowPlayingHeroSkeleton } from '@/components/music/MusicSkeletons';
 
 export function NowPlayingHero() {
   const player = usePlayer();
@@ -26,6 +27,11 @@ export function NowPlayingHero() {
 
   // Progress bar percentage
   const progress = player.duration > 0 ? (player.position / player.duration) * 100 : 0;
+
+  // Loading state: show skeleton while radio is initializing
+  if (radio.radioLoading && !isActive) {
+    return <NowPlayingHeroSkeleton />;
+  }
 
   if (!isActive) {
     // Idle state: show radio CTA

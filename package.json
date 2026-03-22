@@ -37,6 +37,7 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "@wagmi/core": "^2.22.1",
+    "@wavesurfer/react": "^1.0.12",
     "@xmtp/browser-sdk": "^7.0.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "bs58": "^6.0.0",
@@ -47,9 +48,11 @@
     "posthog-node": "^5.28.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-loading-skeleton": "^3.5.0",
     "tweetnacl": "^1.0.3",
     "viem": "^2.47.2",
     "wagmi": "^2.19.5",
+    "wavesurfer.js": "^7.12.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {

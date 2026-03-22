@@ -35,6 +35,35 @@ const PLATFORM_LABELS: Record<TrackType, string> = {
   audio: 'Audio',
 };
 
+/**
+ * Build a dark-themed Spotify embed URL.
+ * Appends `?theme=0` to force Spotify's dark mode.
+ */
+export function buildSpotifyEmbedUrl(trackUrl: string): string {
+  // Convert open.spotify.com/track/xxx to open.spotify.com/embed/track/xxx
+  const embedBase = trackUrl.replace('open.spotify.com/', 'open.spotify.com/embed/');
+  const sep = embedBase.includes('?') ? '&' : '?';
+  return `${embedBase}${sep}theme=0`;
+}
+
+/**
+ * Build a dark-themed SoundCloud widget URL.
+ * Uses ZAO gold accent, hides clutter.
+ */
+export function buildSoundCloudEmbedUrl(trackUrl: string): string {
+  const params = new URLSearchParams({
+    url: trackUrl,
+    color: '%23f5a623',
+    buying: 'false',
+    sharing: 'false',
+    show_comments: 'false',
+    show_playcount: 'false',
+    hide_related: 'true',
+    auto_play: 'false',
+  });
+  return `https://w.soundcloud.com/player/?${params.toString()}`;
+}
+
 export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
   const [metadata, setMetadata] = useState<TrackMetadata | null>(null);
   const [loading, setLoading] = useState(true);
@@ -101,7 +130,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
   // Loading skeleton
   if (loading) {
     return (
-      <div className="mt-2 rounded-xl border border-gray-700/50 bg-[#0d1b2a] overflow-hidden animate-pulse">
+      <div className="relative rounded-xl overflow-hidden border border-gray-800 bg-[#0d1b2a] mt-2 animate-pulse">
         <div className="flex items-center gap-3 p-3">
           <div className="w-14 h-14 rounded-lg bg-gray-800 flex-shrink-0" />
           <div className="flex-1 space-y-2">
@@ -115,18 +144,61 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
     );
   }
 
-  if (fetchFailed || !metadata) return null;
+  // Error / missing metadata fallback
+  if (fetchFailed || !metadata) {
+    // Detect platform from URL for fallback display
+    const fallbackPlatform = url.includes('spotify') ? 'Spotify'
+      : url.includes('soundcloud') ? 'SoundCloud'
+      : url.includes('audius') ? 'Audius'
+      : url.includes('youtu') ? 'YouTube'
+      : url.includes('sound.xyz') ? 'Sound.xyz'
+      : url.includes('apple') ? 'Apple Music'
+      : url.includes('tidal') ? 'Tidal'
+      : url.includes('bandcamp') ? 'Bandcamp'
+      : 'Source';
+
+    return (
+      <div className="relative rounded-xl overflow-hidden border border-gray-800 bg-[#0d1b2a] mt-2">
+        <span className="absolute top-2 right-2 bg-black/60 text-[10px] text-gray-300 px-2 py-0.5 rounded-full">
+          {fallbackPlatform}
+        </span>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-4 hover:bg-white/5 transition-colors"
+        >
+          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#1a2a3a] to-[#0a1628] flex items-center justify-center flex-shrink-0">
+            <svg className="w-6 h-6 text-[#f5a623]/60" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-300">Listen on {fallbackPlatform}</p>
+            <p className="text-xs text-gray-500 truncate mt-0.5">{url}</p>
+          </div>
+          <svg className="w-5 h-5 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          </svg>
+        </a>
+      </div>
+    );
+  }
 
   const colors = PLATFORM_COLORS[metadata.type] || PLATFORM_COLORS.audio;
 
   return (
     <div
-      className={`mt-2 rounded-xl border overflow-hidden transition-all ${
+      className={`relative rounded-xl overflow-hidden border bg-[#0d1b2a] mt-2 transition-all ${
         isThisTrack
           ? 'border-[#f5a623]/30 bg-[#f5a623]/[0.03] shadow-lg shadow-[#f5a623]/5'
-          : 'border-gray-700/50 bg-[#0d1b2a] hover:border-gray-600/60'
+          : 'border-gray-800 hover:border-gray-600/60'
       }`}
     >
+      {/* Provider badge */}
+      <span className="absolute top-2 right-2 bg-black/60 text-[10px] text-gray-300 px-2 py-0.5 rounded-full z-10">
+        {PLATFORM_LABELS[metadata.type]}
+      </span>
       <div className="flex items-center gap-3 p-3">
         {/* Artwork — larger, with play overlay */}
         <button

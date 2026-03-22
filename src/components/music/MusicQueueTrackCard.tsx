@@ -1,10 +1,11 @@
 'use client';
 
-import { memo, useState, useEffect } from 'react';
+import { memo, useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { TrackMetadata } from '@/types/music';
 import { TrackType } from '@/types/music';
 import { usePlayer } from '@/providers/audio';
+import { WaveformPlayer } from '@/components/music/WaveformPlayerWrapper';
 
 const PLATFORM_LABELS: Record<TrackType, string> = {
   spotify: 'Spotify',
@@ -67,6 +68,19 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
   const [loading, setLoading] = useState(!metadataCache.has(url));
 
   const isCurrentTrack = player.metadata?.feedId === castHash;
+  const progress =
+    isCurrentTrack && player.duration > 0
+      ? player.position / player.duration
+      : 0;
+
+  const handleSeek = useCallback(
+    (position: number) => {
+      if (isCurrentTrack && player.duration > 0) {
+        player.seek(position * player.duration);
+      }
+    },
+    [isCurrentTrack, player],
+  );
 
   useEffect(() => {
     if (metadataCache.has(url)) return;
@@ -141,63 +155,83 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
     );
   }
 
+  const streamUrl = metadata.streamUrl ?? metadata.url;
+  const showWaveform = type === 'audius' && !!streamUrl;
+
   return (
-    <button
-      onClick={handleClick}
-      className={`w-full flex items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-white/5 rounded-sm ${
+    <div
+      className={`w-full transition-colors hover:bg-white/5 rounded-sm ${
         isCurrentTrack ? 'bg-[#f5a623]/10' : ''
       }`}
     >
-      {/* Track number / playing indicator */}
-      <div className="w-5 flex-shrink-0 flex items-center justify-center">
-        {isCurrentTrack && player.isPlaying ? (
-          <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-          </svg>
-        ) : isCurrentTrack ? (
-          <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        ) : (
-          <span className="text-xs text-gray-600">{index + 1}</span>
-        )}
-      </div>
-
-      {/* Artwork */}
-      <div
-        className={`relative w-8 h-8 flex-shrink-0 rounded overflow-hidden bg-gray-800 ${
-          isCurrentTrack && player.isPlaying ? 'ring-1 ring-[#f5a623]' : ''
-        }`}
+      <button
+        onClick={handleClick}
+        className="w-full flex items-center gap-2 px-3 py-2 text-left"
       >
-        {metadata.artworkUrl ? (
-          <Image
-            src={metadata.artworkUrl}
-            alt={metadata.trackName}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+        {/* Track number / playing indicator */}
+        <div className="w-5 flex-shrink-0 flex items-center justify-center">
+          {isCurrentTrack && player.isPlaying ? (
+            <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
             </svg>
-          </div>
-        )}
-      </div>
+          ) : isCurrentTrack ? (
+            <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          ) : (
+            <span className="text-xs text-gray-600">{index + 1}</span>
+          )}
+        </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <p
-          className={`text-xs font-medium truncate ${
-            isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
+        {/* Artwork */}
+        <div
+          className={`relative w-8 h-8 flex-shrink-0 rounded overflow-hidden bg-gray-800 ${
+            isCurrentTrack && player.isPlaying ? 'ring-1 ring-[#f5a623]' : ''
           }`}
         >
-          {metadata.trackName}
-        </p>
-        <p className="text-xs text-gray-400 truncate">
-          {metadata.artistName || PLATFORM_LABELS[type]}
-        </p>
-      </div>
-    </button>
+          {metadata.artworkUrl ? (
+            <Image
+              src={metadata.artworkUrl}
+              alt={metadata.trackName}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <p
+            className={`text-xs font-medium truncate ${
+              isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
+            }`}
+          >
+            {metadata.trackName}
+          </p>
+          <p className="text-xs text-gray-400 truncate">
+            {metadata.artistName || PLATFORM_LABELS[type]}
+          </p>
+        </div>
+      </button>
+
+      {/* Waveform for Audius tracks */}
+      {showWaveform && (
+        <div className="px-3 pb-2 pl-10">
+          <WaveformPlayer
+            url={streamUrl}
+            isPlaying={isCurrentTrack && player.isPlaying}
+            progress={progress}
+            height={24}
+            onSeek={isCurrentTrack ? handleSeek : undefined}
+          />
+        </div>
+      )}
+    </div>
   );
 });

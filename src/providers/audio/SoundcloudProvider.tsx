@@ -145,7 +145,7 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
         ref={iframeRef}
         id="sc-widget"
         allow="autoplay"
-        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/&auto_play=false&color=%23f5a623&buying=false&sharing=false&show_comments=false&show_playcount=false"
+        src="about:blank"
         style={{ display: 'none', position: 'absolute', width: 0, height: 0 }}
         title="SoundCloud Player"
       />

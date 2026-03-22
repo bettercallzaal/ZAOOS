@@ -122,7 +122,25 @@ Chart-focused analytics complement to the Intelligence dashboard.
 
 ---
 
-## Sources
+## Deep Research Additions (March 21, 2026 — Live Data)
+
+### Complete Artist Count & Roster
+All 43 artist wallets have been mapped to names via the Intelligence dashboard. See **Doc 101** for the full table. Key findings:
+
+- **Most wins:** LUI (49W-22L, 69%), Hurric4n3Ike combined (71W-27L across 3 wallets)
+- **Most volume:** LUI (29.59 SOL — 7× the next artist)
+- **Undefeated:** JED XO (3W-0L), Hurric4n3Ike wallet B (8W-3L main events)
+- **Most battles:** Hurric4n3Ike wallet A (78), Stormi (75, 31W-44L — dedicated despite poor record)
+- **Multi-wallet artists:** Hurric4n3Ike (3 wallets), Rome (2 wallets) — DB must handle one-to-many
+
+### Notable Community Mechanics Found
+- **X Spaces are the venue** — all live trading happens Mon-Fri 8:30 PM EST on X Spaces. No Discord, no Telegram, no Farcaster.
+- **Self-battles exist** — CannonJones973 vs CannonJones973 with 4.14 SOL volume is a notable example. These appear to be used for volume/showcase purposes. Filter from feed highlights.
+- **Trader leaderboard not live yet** — shows "No Trade Data Yet." Platform hasn't surfaced trader rankings despite having the infrastructure.
+- **Kata7yst** — 8 battles in 24 hours (Mar 20-21), not in original 43-wallet list, likely a recent joiner who's now the most active artist this week.
+- **"AI LUI" tracks** — LUI has AI-tagged songs that consistently underperform vs their organic tracks. Fan signal: AI-branded music loses.
+
+### Sources
 
 - [WaveWarZ Main App](https://www.wavewarz.com/)
 - [WaveWarZ Intelligence](https://wavewarz-intelligence.vercel.app/)
@@ -131,3 +149,4 @@ Chart-focused analytics complement to the Intelligence dashboard.
 - [WaveWarZ Charity Battle Recap](https://x.com/WaveWarZ/status/1999858390567117201)
 - Existing codebase: `src/app/(auth)/wavewarz/page.tsx`, `community.config.ts`
 - Previous research: Doc 95 (Solana + WaveWarZ initial research)
+- **Doc 101** — WaveWarZ × ZAO OS Whitepaper (canonical synthesis)

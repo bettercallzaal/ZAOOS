@@ -11,7 +11,8 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
   // Create audio element and register controllers on mount
   useEffect(() => {
     const audio = new Audio();
-    audio.crossOrigin = 'anonymous';
+    // Don't set crossOrigin — Audius CDN nodes may not return CORS headers
+    // on redirected stream URLs, causing opaque response failures.
     audioRef.current = audio;
 
     const onTimeUpdate = () =>

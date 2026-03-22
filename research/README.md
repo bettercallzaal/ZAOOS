@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **90 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **91 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -37,6 +37,7 @@ The core of ZAO — how music works in the platform, how artists earn, and how c
 | [43](./43-webrtc-audio-rooms-streaming/) | **Live Audio Rooms & Streaming** | LiveKit (SFU), synchronized listening parties, Livepeer streaming, Huddle01 (web3-native), cost analysis |
 | [80](./80-jitsi-meet-live-rooms/) | **Jitsi Meet Live Rooms** | Embeddable Jitsi rooms for fractal calls + community meetings, zero-install, self-hostable |
 | [88](./82-music-social-platform-redesign/) | **Music-First Social Platform Redesign** | Redesign ZAO OS from "chat client with music" into THE social platform for music communities (folder named 82-) |
+| [100](./100-synchronized-listening-rooms/) | **Synchronized Listening Rooms** | Listening parties via Supabase Broadcast + Presence, DJ mode, chat overlay, Jitsi voice integration, $0 infra |
 
 ---
 
@@ -79,6 +80,7 @@ On-chain identity, community roles, DAO structure, token economics, and legal co
 | [106](./106-dan-singjoy-eden-fractal-deep-dive/) | **Dan SingJoy + Eden Fractal Deep Dive** | Epoch 2 on Base, Season 12, bi-weekly Thu 17:00 UTC, Cignals competition app, Fractal DJ game, tripartite governance |
 | [108](./108-superchain-ordao-crosschain-fractal/) | **Superchain ORDAO + Cross-Chain** | Hub-and-spoke architecture, ZAO-Eden cross-chain Respect, Hats+Respect auto-gating, Optimism grants opportunities |
 | [109](./109-optimystics-tooling-ecosystem/) | **Optimystics Tooling Ecosystem** | orclient SDK (npm), ornode API (12 endpoints), OREC contract ABI, Cignals alpha, Fractalgram fork analysis, FRAPPS deployment |
+| [113](./113-zao-fractal-bot-process/) | **ZAO Fractal Bot + Process** | Discord bot (Python, 52 commands), step-by-step fractal flow, 2x Fibonacci scoring, frapps submission, OG vs ZOR Respect, 90 weeks of sessions, integration plan |
 | [59](./59-hats-tree-integration/) | **Hats Tree Integration** | Hats Protocol tree structure for ZAO roles |
 | [75](./75-hats-protocol-v2-updates/) | **Hats Protocol V2 Updates** | New eligibility modules, HSG v2, subgraph SDK v1.0.0, MCP server for AI, ERC-6551 accounts |
 | [78](./78-nouns-builder-integration/) | **Nouns Builder Integration** | Daily NFT auctions, 5-contract DAO suite, builder-template-app (MIT/Next.js), builder-farcaster, iframe/embed options for ZABAL DAO |

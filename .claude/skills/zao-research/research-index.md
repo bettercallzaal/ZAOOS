@@ -106,3 +106,4 @@
 | 107 | `107-social-connections-x-integration` | X handle auto-import from Farcaster verified_accounts, settings UI redesign (4 sections), social platforms (X, Bluesky, Instagram, SoundCloud, Spotify, Audius), X API pricing |
 | 108 | `108-superchain-ordao-crosschain-fractal` | Superchain ORDAO hub-and-spoke, cross-chain Respect, Hats+Respect auto-gating, Optimism grants |
 | 109 | `109-optimystics-tooling-ecosystem` | orclient SDK v1.4.3 (npm), ornode API, OREC ABI, Cignals alpha, Fractalgram fork analysis |
+| 113 | `113-zao-fractal-bot-process` | ZAO fractal bot (Python/Discord, 52 commands), step-by-step flow, OG vs ZOR Respect, 90 weeks, integration plan |

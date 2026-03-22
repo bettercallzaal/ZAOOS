@@ -58,7 +58,6 @@ export function SessionsTab({ isAdmin }: Props) {
   if (sessions.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-4xl mb-3">🌀</p>
         <p className="text-gray-400 text-sm">No fractal sessions recorded yet.</p>
         {isAdmin && (
           <p className="text-xs text-gray-600 mt-2">Admins can record sessions via the admin panel.</p>

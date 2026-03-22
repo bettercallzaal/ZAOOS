@@ -109,7 +109,7 @@ export function ProposalsTab() {
             return (
               <div key={p.id} className="bg-[#0d1b2a] rounded-xl px-4 py-3 border border-gray-800">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm text-white flex-1 line-clamp-2">
+                  <p className="text-sm text-white flex-1 overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                     {p.title || p.description || `Proposal ${p.id}`}
                   </p>
                   {p.status && (

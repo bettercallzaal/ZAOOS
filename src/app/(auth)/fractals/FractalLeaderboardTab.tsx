@@ -48,13 +48,10 @@ export function FractalLeaderboardTab({ currentFid }: Props) {
   if (entries.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-4xl mb-3">🏆</p>
         <p className="text-gray-400 text-sm">No fractal respect earned yet.</p>
       </div>
     );
   }
-
-  const MEDAL = ['🥇', '🥈', '🥉'];
 
   return (
     <div className="pt-2">
@@ -81,9 +78,7 @@ export function FractalLeaderboardTab({ currentFid }: Props) {
                 isMe ? 'bg-[#f5a623]/10 border border-[#f5a623]/20' : 'bg-[#0d1b2a] hover:bg-[#0d1b2a]/80'
               }`}
             >
-              <span className="w-7 text-center text-sm">
-                {MEDAL[entry.rank - 1] ?? <span className="text-xs text-gray-500">#{entry.rank}</span>}
-              </span>
+              <span className="w-7 text-center text-xs font-bold text-gray-500">#{entry.rank}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
                   {entry.name}

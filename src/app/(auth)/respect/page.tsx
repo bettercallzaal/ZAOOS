@@ -16,6 +16,10 @@ export default async function RespectPage() {
           </svg>
         </Link>
         <h2 className="font-semibold text-sm text-gray-300">Fractal Respect</h2>
+        <div className="flex-1" />
+        <Link href="/fractals" className="text-[10px] text-[#f5a623]/70 hover:text-[#f5a623] transition-colors">
+          Fractals Hub
+        </Link>
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">

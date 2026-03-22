@@ -14,7 +14,7 @@ export default function LandingPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.authenticated) {
-          router.replace('/chat');
+          router.replace('/home');
         } else {
           setChecking(false);
         }

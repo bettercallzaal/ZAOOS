@@ -116,6 +116,57 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Fetch recent votes
+    if (filter === 'all' || filter === 'governance') {
+      const { data: votes } = await supabaseAdmin
+        .from('proposal_votes')
+        .select('id, vote, created_at, proposal_id, voter_fid, proposals(title), users!proposal_votes_voter_fid_fkey(display_name, pfp_url)')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      for (const v of votes || []) {
+        const user = Array.isArray(v.users) ? v.users[0] : v.users;
+        const proposal = Array.isArray(v.proposals) ? v.proposals[0] : v.proposals;
+        activities.push({
+          id: `vote-${v.id}`,
+          type: 'vote',
+          actor: {
+            fid: v.voter_fid,
+            displayName: (user as { display_name?: string })?.display_name || 'Member',
+            pfpUrl: (user as { pfp_url?: string })?.pfp_url || null,
+          },
+          description: `voted ${v.vote} on "${(proposal as { title?: string })?.title || 'a proposal'}"`,
+          timestamp: v.created_at,
+          link: '/governance',
+        });
+      }
+    }
+
+    // Fetch recent casts (chat activity)
+    if (filter === 'all' || filter === 'social') {
+      const { data: casts } = await supabaseAdmin
+        .from('channel_casts')
+        .select('hash, text, author_fid, author_username, author_display_name, author_pfp_url, timestamp')
+        .order('timestamp', { ascending: false })
+        .limit(limit);
+
+      for (const c of casts || []) {
+        const preview = (c.text || '').slice(0, 80) + ((c.text || '').length > 80 ? '...' : '');
+        activities.push({
+          id: `cast-${c.hash}`,
+          type: 'cast',
+          actor: {
+            fid: c.author_fid,
+            displayName: c.author_display_name || c.author_username || 'Member',
+            pfpUrl: c.author_pfp_url || null,
+          },
+          description: `posted: "${preview}"`,
+          timestamp: c.timestamp,
+          link: '/chat',
+        });
+      }
+    }
+
     // Sort all activities by timestamp descending
     activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 

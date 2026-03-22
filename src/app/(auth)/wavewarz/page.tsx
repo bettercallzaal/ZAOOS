@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { communityConfig } from '@/../community.config';
+import { GeneratePostButton } from '@/components/wavewarz/GeneratePostButton';
 
 const { wavewarz } = communityConfig;
 
@@ -59,6 +60,11 @@ export default function WaveWarzPage() {
           <div className="md:hidden"><NotificationBell /></div>
         </div>
       </header>
+
+      {/* Generate WaveWarZ Post */}
+      <div className="px-3 py-2 bg-[#0d1b2a] border-b border-gray-800 flex-shrink-0">
+        <GeneratePostButton />
+      </div>
 
       {/* View switcher */}
       <div className="flex items-center gap-1 px-3 py-2 bg-[#0d1b2a] border-b border-gray-800 flex-shrink-0">

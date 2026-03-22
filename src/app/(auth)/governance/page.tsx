@@ -7,6 +7,7 @@ import { ProposalComments } from '@/components/governance/ProposalComments';
 import { useAuth } from '@/hooks/useAuth';
 import dynamic from 'next/dynamic';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
+import { GeneratePostButton } from '@/components/wavewarz/GeneratePostButton';
 
 const HatTree = dynamic(() => import('@/components/hats/HatTree'), { ssr: false });
 const HatManager = dynamic(() => import('@/components/hats/HatManager'), { ssr: false });
@@ -452,6 +453,11 @@ export default function GovernancePage() {
 
         {tab === 'proposals' && (
           <>
+            {/* Generate WaveWarZ Post */}
+            <div className="mb-3">
+              <GeneratePostButton />
+            </div>
+
             {/* Create Proposal */}
             <button
               onClick={() => setShowCreate(!showCreate)}

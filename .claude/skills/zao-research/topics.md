@@ -64,6 +64,7 @@ Use this to quickly find if a topic has already been researched.
 
 ## Social Connections & Settings
 - X handle auto-import from Farcaster, settings UI redesign, multi-social connections -> `107`
+- Community directory CRM: replace Webflow, engagement scoring, CSV import, on-chain enrichment -> `110`
 
 ## Cross-Platform
 - Publishing to 11 platforms (fan-out architecture) → `28`

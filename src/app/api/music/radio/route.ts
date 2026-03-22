@@ -40,12 +40,14 @@ export async function GET() {
       // Step 1: Resolve the Audius URL to get the playlist/album object
       const resolveRes = await fetch(
         `${AUDIUS_API}/resolve?url=${encodeURIComponent(config.url)}&app_name=${APP_NAME}`,
-        { signal: AbortSignal.timeout(10000) },
+        { signal: AbortSignal.timeout(10000), redirect: 'follow' },
       );
       if (!resolveRes.ok) continue;
 
       const resolved = await resolveRes.json();
-      const data = resolved?.data;
+      // Audius may return data as object or array
+      const rawData = resolved?.data;
+      const data = Array.isArray(rawData) ? rawData[0] : rawData;
       if (!data) continue;
 
       // Audius albums resolve as playlists with is_album=true
@@ -84,7 +86,7 @@ export async function GET() {
         // Batch fetch tracks (Audius supports bulk track fetching)
         const bulkRes = await fetch(
           `${AUDIUS_API}/tracks?id=${trackIds.join(',')}&app_name=${APP_NAME}`,
-          { signal: AbortSignal.timeout(10000) },
+          { signal: AbortSignal.timeout(10000), redirect: 'follow' },
         );
         if (bulkRes.ok) {
           const bulkData = await bulkRes.json();

@@ -57,7 +57,12 @@ export const communityConfig = {
       {
         name: 'Lofi Chill',
         artist: 'Various Artists',
-        url: 'https://audius.co/audius/playlist/lofi-beats',
+        url: 'https://audius.co/audius/playlist/official-audius-exclusives',
+      },
+      {
+        name: 'Electronic',
+        artist: 'Various Artists',
+        url: 'https://audius.co/audius/playlist/hot-new-on-audius-%F0%9F%94%A5',
       },
     ],
   },

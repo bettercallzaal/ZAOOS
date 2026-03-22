@@ -137,7 +137,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
     return () => { cancelled = true; };
   }, [metadata, url]);
 
-  const externalOnly = metadata?.type === 'applemusic' || metadata?.type === 'tidal';
+  const externalOnly = metadata?.type === 'applemusic' || metadata?.type === 'tidal' || metadata?.type === 'bandcamp';
 
   const handlePlayPause = () => {
     if (!metadata) return;

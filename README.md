@@ -42,6 +42,10 @@ scripts/add-channel-casts-table.sql
 scripts/create-proposals.sql
 scripts/create-notifications.sql
 scripts/create-respect-tables.sql
+scripts/create-streaks-tables.sql
+scripts/create-track-of-day.sql
+scripts/fix-scheduled-casts-rls.sql
+scripts/add-notifications-rls.sql
 ```
 
 **App wallet:** Generate a dedicated signing wallet (never use personal keys):
@@ -81,8 +85,9 @@ See `.env.example` for all required environment variables.
 - [x] **Admin panel** — 6-tab admin dashboard (users, ZIDs, allowlist, respect, moderation, import)
   - `src/app/(auth)/admin/`
   - `src/components/admin/` (UsersTable, ZidManager, AllowlistTable, RespectOverview, HiddenMessages, CsvUpload, SyncRespectButton, ImportRespectButton)
-- [x] **Security hardening** — server-side nonce validation, HMAC-SHA512 webhook verification, CSP headers, RLS on all tables, error sanitization, signer ownership checks
+- [x] **Security hardening** — server-side nonce validation, HMAC-SHA512 webhook verification, CSP headers, RLS on all tables, error sanitization, signer ownership checks, scheduled casts RLS fix
   - `src/middleware.ts` · `src/lib/validation/schemas.ts` · `src/lib/db/audit-log.ts`
+  - `scripts/fix-scheduled-casts-rls.sql` · `scripts/add-notifications-rls.sql`
 - [x] **PostHog analytics** — pageview tracking, identified users
   - `src/providers/posthog/` (PostHogProvider, PostHogPageview)
 - [x] **Farcaster Mini App SDK** — auth + webhook for embedding in Farcaster clients
@@ -175,7 +180,10 @@ See `.env.example` for all required environment variables.
 - [x] **Listening rooms** — shared music playback via Supabase Realtime
   - `src/hooks/useListeningRoom.ts`
   - `src/components/calls/ListeningRoom.tsx`
-- [ ] **Track of the Day** — community-curated daily highlight, curator + artist earn Respect
+- [x] **Track of the Day** — daily community-curated highlight with nomination, voting, countdown timer
+  - `src/app/api/music/track-of-day/` (3 routes: list/vote/select)
+  - `src/components/music/TrackOfTheDay.tsx`
+  - `scripts/create-track-of-day.sql`
 - [ ] **AI taste profiles** — personalized music recommendations from listening history
 
 #### Social Graph
@@ -239,7 +247,12 @@ See `.env.example` for all required environment variables.
   - `src/app/api/admin/respect-import/route.ts`
   - `src/components/admin/ImportRespectButton.tsx`
 - [ ] **Airtable full history import** — 130 members, 100+ sessions from 6 CSVs
-- [ ] **Engagement streaks + badges** — daily activity tracking, streak bonuses, OG/Curator badges
+- [x] **Engagement streaks** — daily activity tracking, flame icon, longest streak, freeze mechanics
+  - `src/app/api/streaks/` (2 routes: get streak, record activity)
+  - `src/components/streaks/StreakBadge.tsx`
+  - `scripts/create-streaks-tables.sql`
+- [x] **OG Badge** — founding member badge for ZIDs 1-40
+  - `src/components/badges/OGBadge.tsx`
 
 #### Fractals (ORDAO Governance)
 
@@ -286,8 +299,8 @@ See `.env.example` for all required environment variables.
 - [x] **Bluesky cross-posting** — sync posts, member mapping, feed display
   - `src/app/api/bluesky/` (sync, members, feed)
   - `src/lib/bluesky/` (client.ts, feed.ts, labeler.ts)
-- [x] **Discord member sync** — bidirectional member data sync
-  - `src/app/api/discord/sync/route.ts`
+- [x] **Discord sync** — webhook receiver for wallet registry + fractal session imports from Discord bot
+  - `src/app/api/discord/sync/route.ts` (GET: read members, POST: receive bot data)
 - [ ] **Lens Protocol** — cross-post to Lens with collect/monetize
 - [ ] **Nostr** — cross-post with keypair auth, Wavlake music integration
 - [ ] **Hive / InLeo** — cross-post with on-chain monetization
@@ -412,6 +425,7 @@ See `.env.example` for all required environment variables.
 | `src/lib/validation/schemas.ts` | All Zod schemas |
 | `src/contexts/XMTPContext.tsx` | XMTP state management (500+ lines) |
 | `src/providers/audio/` | 8 audio platform providers |
+| `src/lib/format/timeAgo.ts` | Relative time, deadline countdown, wallet shortener, number formatter |
 | `src/hooks/` | 11 custom hooks (auth, chat, radio, music queue, etc.) |
 
 ---
@@ -458,7 +472,7 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 |--------|-------|--------|
 | **1** | Quick wins — PostHog analytics, ZID badges, notification triggers | Planned |
 | **2** | Governance fixes — proposal categories, status transitions, deadline countdown, rate limits | In Progress |
-| **3** | Engagement — streaks, badges, Track of the Day, referrals | Planned |
+| **3** | Engagement — streaks, badges, Track of the Day, referrals | Partially Done |
 | **4** | Moderation & search — AI moderation, full-text search, music approval queue | Planned |
 | **5** | Hats & Treasury — Hats tree deployment on Optimism, Safe multisig, HSG v2 | Planned (Q3 2026) |
 | **6** | AI Agent — ElizaOS + Claude + pgvector, welcome DMs, music recs | Planned (Q4 2026) |

@@ -297,17 +297,30 @@ See `.env.example` for all required environment variables.
 - [x] **Push notifications** — via Farcaster Mini App protocol
 - [x] **Notification triggers** — posts, reactions, proposals, votes, comments, new members
 
-#### Cross-Posting
+#### Cross-Platform Publishing
+
+Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster is always primary; other platforms receive fire-and-forget copies with content normalization per platform.
 
 - [x] **Bluesky cross-posting** — sync posts, member mapping, feed display
   - `src/app/api/bluesky/` (sync, members, feed)
   - `src/lib/bluesky/` (client.ts, feed.ts, labeler.ts)
 - [x] **Discord sync** — webhook receiver for wallet registry + fractal session imports from Discord bot
   - `src/app/api/discord/sync/route.ts` (GET: read members, POST: receive bot data)
-- [ ] **Lens Protocol** — cross-post to Lens with collect/monetize
-- [ ] **Nostr** — cross-post with keypair auth, Wavlake music integration
-- [ ] **Hive / InLeo** — cross-post with on-chain monetization
-- [ ] **X / Twitter** — cross-post (free tier: 1,500 tweets/mo)
+- [ ] **Multi-platform compose UI** — toggle pills per platform in ComposeBar, "Publish (N)" button, persistent prefs
+  - Planned: `src/components/compose/PlatformToggles.tsx` · `src/components/compose/PublishButton.tsx`
+- [ ] **Content normalization** — per-platform text/image/embed adaptation
+  - Planned: `src/lib/publish/normalize.ts`
+- [ ] **Publish status tracking** — log cross-post results, retry failed publishes
+  - Planned: `scripts/add-publishing-columns.sql` (publish_log table)
+- [ ] **Lens Protocol** — OAuth connect, SDK posting with OpenAction embeds for music links
+  - Planned: `src/app/api/publish/lens/route.ts` · `src/lib/publish/lens.ts`
+- [ ] **Bluesky enhancements** — thread splitting (>300 chars), proper embed cards, image cross-posting
+- [ ] **X / Twitter** — admin-only, shared app credentials, 280-char truncation + link-back
+  - Planned: `src/app/api/publish/x/route.ts` · `src/lib/publish/x.ts`
+- [ ] **Hive / InLeo** — posting key encrypted at rest (AES-256-GCM), markdown-native, tag-based InLeo visibility
+  - Planned: `src/app/api/publish/hive/route.ts` · `src/lib/publish/hive.ts`
+- [ ] **Connected Platforms settings** — connect/disconnect per platform, status display
+  - Planned: `src/components/settings/ConnectedPlatforms.tsx`
 
 #### WaveWarZ Integration
 
@@ -404,6 +417,7 @@ See `.env.example` for all required environment variables.
 | **Analytics** | PostHog + Vercel Analytics | — |
 | **Testing** | Vitest | 3.x |
 | **Video** | Jitsi React SDK | — |
+| **Cross-posting** | @lens-protocol/client, @atproto/api, twitter-api-v2, @hiveio/dhive | — |
 | **Deployment** | Vercel | — |
 
 ### On-Chain Contracts (Optimism)
@@ -478,7 +492,7 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 | **4** | Moderation & search — AI moderation, full-text search, music approval queue | Planned |
 | **5** | Hats & Treasury — Hats tree deployment on Optimism, Safe multisig, HSG v2 | Planned (Q3 2026) |
 | **6** | AI Agent — ElizaOS + Claude + pgvector, welcome DMs, music recs | Planned (Q4 2026) |
-| **7** | Cross-platform — Lens, Bluesky native, Nostr, X, Hive | Planned (2027) |
+| **7** | Cross-platform publishing — Lens, Bluesky enhancements, X (admin), Hive/InLeo | Planned |
 | **8** | Nouns Builder / ZABAL — native auction UI, governance integration | Planned (2027) |
 
 ---

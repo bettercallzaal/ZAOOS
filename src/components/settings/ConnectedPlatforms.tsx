@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -268,48 +268,42 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
     setStatus((prev) => ({ ...prev, bluesky_handle: null }));
   }, []);
 
-  // ── Lens handlers (wallet-based auth via server) ───
+  // ── Lens handlers (wallet lookup — no signing needed) ──
 
   const { address: walletAddress } = useAccount();
-  const { data: walletClient } = useWalletClient();
   const [lensConnecting, setLensConnecting] = useState(false);
   const [lensError, setLensError] = useState<string | null>(null);
+  const [lensMessage, setLensMessage] = useState<string | null>(null);
 
   const connectLensWithWallet = useCallback(async () => {
-    if (!walletAddress || !walletClient) {
+    if (!walletAddress) {
       setLensError('Connect your wallet first');
       return;
     }
     setLensConnecting(true);
     setLensError(null);
+    setLensMessage(null);
     try {
-      // Step 1: Get challenge from OUR server (which calls Lens API)
-      const challengeRes = await fetch(`/api/platforms/lens?wallet=${walletAddress}`);
-      const challengeJson = await challengeRes.json();
-      if (!challengeRes.ok) throw new Error(challengeJson.error || 'Failed to get challenge');
-
-      // Step 2: Sign with wallet (only client-side step)
-      const signature = await walletClient.signMessage({ message: challengeJson.challengeText });
-
-      // Step 3: Send signature to OUR server (which authenticates with Lens)
-      const authRes = await fetch('/api/platforms/lens', {
+      const res = await fetch('/api/platforms/lens', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          challengeId: challengeJson.challengeId,
-          signature,
-        }),
+        body: JSON.stringify({ wallet: walletAddress }),
       });
-      const authJson = await authRes.json();
-      if (!authRes.ok) throw new Error(authJson.error || 'Authentication failed');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to connect');
 
-      setStatus((prev) => ({ ...prev, lens_profile_id: authJson.profileId }));
+      if (json.handle) {
+        setStatus((prev) => ({ ...prev, lens_profile_id: json.handle }));
+      } else {
+        setStatus((prev) => ({ ...prev, lens_profile_id: `wallet:${walletAddress.slice(0, 10)}...` }));
+        setLensMessage(json.message || 'No Lens profile found — create one at hey.xyz');
+      }
     } catch (err) {
       setLensError(err instanceof Error ? err.message : 'Failed to connect Lens');
     } finally {
       setLensConnecting(false);
     }
-  }, [walletAddress, walletClient]);
+  }, [walletAddress]);
 
   const connectLens = useCallback(async () => {
     await connectLensWithWallet();
@@ -418,7 +412,7 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
                 disabled={lensConnecting || !walletAddress}
                 className="text-xs text-green-400 hover:text-green-300 px-3 py-1 rounded-lg border border-green-400/20 hover:border-green-400/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {lensConnecting ? 'Signing...' : 'Connect with Wallet'}
+                {lensConnecting ? 'Looking up...' : 'Connect with Wallet'}
               </button>
             )}
           </div>
@@ -427,6 +421,9 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
           )}
           {lensError && (
             <p className="text-xs text-red-400 mt-2">{lensError}</p>
+          )}
+          {lensMessage && (
+            <p className="text-xs text-amber-400 mt-2">{lensMessage}</p>
           )}
         </div>
 

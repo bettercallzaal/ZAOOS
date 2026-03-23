@@ -54,15 +54,35 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const radioIndexRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
 
+  const cachedStationsRef = useRef<RadioPlaylist[] | null>(null);
+
   useEffect(() => {
     return () => { abortRef.current?.abort(); };
   }, []);
 
+  // Pre-fetch stations on mount so radio starts instantly
+  useEffect(() => {
+    if (cachedStationsRef.current) return;
+    const controller = new AbortController();
+    fetch('/api/music/radio', { signal: controller.signal })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.playlists?.length) {
+          cachedStationsRef.current = data.playlists;
+        }
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+
   const fetchStations = useCallback(async (signal: AbortSignal): Promise<RadioPlaylist[]> => {
+    if (cachedStationsRef.current) return cachedStationsRef.current;
     const res = await fetch('/api/music/radio', { signal });
     if (!res.ok) throw new Error('Failed to fetch radio');
     const data = await res.json();
-    return data.playlists ?? [];
+    const playlists = data.playlists ?? [];
+    if (playlists.length > 0) cachedStationsRef.current = playlists;
+    return playlists;
   }, []);
 
   const playStation = useCallback((playlist: RadioPlaylist) => {

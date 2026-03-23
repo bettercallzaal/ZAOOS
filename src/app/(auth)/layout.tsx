@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
 import { QuickAddSong } from '@/components/music/QuickAddSong';
+import { GlobalSearchProvider } from '@/components/search/GlobalSearchProvider';
 
 export default async function AuthLayout({
   children,
@@ -19,6 +20,7 @@ export default async function AuthLayout({
       <ErrorBoundary>
         {children}
       </ErrorBoundary>
+      <GlobalSearchProvider />
       <QuickAddSong />
       <PersistentPlayerWithRadio />
       <BottomNav />

@@ -242,7 +242,6 @@ These have detailed research docs and/or sprint plans but no code yet:
 | **AI agent** (ElizaOS + Claude + pgvector) | Docs 24, 26, 08 | Sprint 6 (Q4 2026) | Medium |
 | **Engagement streaks & badges** | — | Sprint 3 | High |
 | **Track of the Day** | — | Sprint 3 | High |
-| **Referral system** | — | Sprint 3 | Medium |
 | **AI moderation** | — | Sprint 4 | Medium |
 | **Full-text search** | — | Sprint 4 | Medium |
 | **Music approval queue** | — | Sprint 4 | Low |

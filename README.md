@@ -356,7 +356,6 @@ See `.env.example` for all required environment variables.
 - [ ] **AI agent** — ElizaOS + Claude + pgvector for welcome DMs, music recs, moderation
 - [ ] **AI moderation** — Perspective API + OpenAI Moderation + Claude for content safety
 - [ ] **Full-text search** — Supabase tsvector/tsquery across all content
-- [ ] **Referral system** — invite codes, referrer rewards, accountability
 
 ---
 
@@ -475,7 +474,7 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 |--------|-------|--------|
 | **1** | Quick wins — PostHog analytics, ZID badges, notification triggers | Planned |
 | **2** | Governance fixes — proposal categories, status transitions, deadline countdown, rate limits | Done |
-| **3** | Engagement — streaks, badges, Track of the Day, referrals | Partially Done |
+| **3** | Engagement — streaks, badges, Track of the Day | Done |
 | **4** | Moderation & search — AI moderation, full-text search, music approval queue | Planned |
 | **5** | Hats & Treasury — Hats tree deployment on Optimism, Safe multisig, HSG v2 | Planned (Q3 2026) |
 | **6** | AI Agent — ElizaOS + Claude + pgvector, welcome DMs, music recs | Planned (Q4 2026) |

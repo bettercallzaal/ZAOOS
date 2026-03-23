@@ -37,17 +37,6 @@ New table: `user_badges (id, fid, badge_type, earned_at)`
 - Top track featured daily, curator + artist both earn Respect
 - Weekly listening parties: 1hr, 3-5 tracks, votes, Respect for featured artists
 
-### Referral System
-
-| Parameter | Value |
-|-----------|-------|
-| Invite codes per member | 2-3 (Phase 1), 5 (Phase 2) |
-| Referrer reward on join | 5 Respect |
-| Referrer reward at D30 | 5 more Respect |
-| Referred user bonus | 2 Respect |
-| Cap per person | 10 referrals max |
-| Accountability | Referrer loses rep if referrals get banned |
-
 ### Notification Strategy
 
 | Priority | Trigger | Method |

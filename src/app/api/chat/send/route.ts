@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
 
-    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels, crossPostBluesky } = parsed.data;
+    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels, crossPostBluesky, crossPostLens, crossPostX, crossPostHive } = parsed.data;
     const primaryChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
 
     // Build list of channels to post to
@@ -112,6 +112,72 @@ export async function POST(req: NextRequest) {
           }
         } catch (err) {
           console.error('[bluesky/personal]', err);
+        }
+      })();
+    }
+
+    // Cross-post to Lens (fire and forget)
+    if (crossPostLens && !parentHash) {
+      (async () => {
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://zaoos.com';
+          await fetch(`${baseUrl}/api/publish/lens`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', cookie: req.headers.get('cookie') || '' },
+            body: JSON.stringify({
+              castHash: castData?.hash,
+              text,
+              embedUrls,
+              imageUrls: embedUrls?.filter((u: string) => /\.(jpg|jpeg|png|gif|webp)/i.test(u)),
+              channel,
+            }),
+          });
+        } catch (e) {
+          console.error('[cross-post] Lens failed:', e);
+        }
+      })();
+    }
+
+    // Cross-post to X — admin only (fire and forget)
+    if (crossPostX && !parentHash) {
+      (async () => {
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://zaoos.com';
+          await fetch(`${baseUrl}/api/publish/x`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', cookie: req.headers.get('cookie') || '' },
+            body: JSON.stringify({
+              castHash: castData?.hash,
+              text,
+              embedUrls,
+              imageUrls: embedUrls?.filter((u: string) => /\.(jpg|jpeg|png|gif|webp)/i.test(u)),
+              channel,
+            }),
+          });
+        } catch (e) {
+          console.error('[cross-post] X failed:', e);
+        }
+      })();
+    }
+
+    // Cross-post to Hive (fire and forget)
+    if (crossPostHive && !parentHash) {
+      (async () => {
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://zaoos.com';
+          await fetch(`${baseUrl}/api/publish/hive`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', cookie: req.headers.get('cookie') || '' },
+            body: JSON.stringify({
+              castHash: castData?.hash,
+              text,
+              embedUrls,
+              imageUrls: embedUrls?.filter((u: string) => /\.(jpg|jpeg|png|gif|webp)/i.test(u)),
+              channel,
+            }),
+          });
+        } catch (e) {
+          console.error('[cross-post] Hive failed:', e);
         }
       })();
     }

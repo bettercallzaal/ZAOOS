@@ -9,6 +9,7 @@ import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
 import type { SessionData } from '@/types';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
+import { ConnectedPlatforms } from '@/components/settings/ConnectedPlatforms';
 
 interface Profile {
   fid: number;
@@ -31,6 +32,8 @@ interface Profile {
   verified_addresses: string[];
   created_at: string | null;
   bluesky_handle: string | null;
+  lens_profile_id: string | null;
+  hive_username: string | null;
   solana_wallet: string | null;
   x_handle: string | null;
   instagram_handle: string | null;
@@ -578,61 +581,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 </div>
               </div>
 
-              {/* Bluesky */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${blueskyHandle ? 'bg-blue-400' : 'bg-gray-600'}`} />
-                  <span className="text-sm text-white">Bluesky</span>
-                </div>
-                {blueskyHandle ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-blue-400">@{blueskyHandle}</span>
-                    <button
-                      onClick={disconnectBluesky}
-                      className="text-[10px] text-red-400 hover:text-red-300 transition-colors"
-                    >
-                      Disconnect
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setShowBlueskyConnect(!showBlueskyConnect)}
-                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    Connect
-                  </button>
-                )}
-              </div>
-
-              {/* Bluesky connect form */}
-              {showBlueskyConnect && !blueskyHandle && (
-                <div className="bg-[#0a1628] rounded-lg p-3 space-y-2 border border-gray-700">
-                  <p className="text-[10px] text-gray-500">
-                    Create an App Password at bsky.app/settings/app-passwords
-                  </p>
-                  <input
-                    value={bskyHandle}
-                    onChange={(e) => setBskyHandle(e.target.value)}
-                    placeholder="yourname.bsky.social"
-                    className="w-full bg-[#1a2a3a] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                  />
-                  <input
-                    value={bskyAppPassword}
-                    onChange={(e) => setBskyAppPassword(e.target.value)}
-                    placeholder="App Password (xxxx-xxxx-xxxx-xxxx)"
-                    type="password"
-                    className="w-full bg-[#1a2a3a] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                  />
-                  {bskyError && <p className="text-[10px] text-red-400">{bskyError}</p>}
-                  <button
-                    onClick={connectBluesky}
-                    disabled={bskyConnecting || !bskyHandle || !bskyAppPassword}
-                    className="w-full text-xs font-medium py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-400 disabled:opacity-50 transition-colors"
-                  >
-                    {bskyConnecting ? 'Verifying...' : 'Connect Bluesky'}
-                  </button>
-                </div>
-              )}
+              {/* Cross-posting platforms (Bluesky, Lens, Hive) managed in Connected Platforms section below */}
 
               {/* Solana Wallet */}
               <SolanaWalletConnect
@@ -675,6 +624,17 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             </div>
           </div>
         </section>
+
+        {/* ── Connected Platforms (cross-posting) ─────────────────── */}
+        <ConnectedPlatforms
+          isAdmin={!!session.isAdmin}
+          initialStatus={{
+            bluesky_handle: profile.bluesky_handle,
+            lens_profile_id: profile.lens_profile_id,
+            hive_username: profile.hive_username,
+            x_handle: profile.x_handle,
+          }}
+        />
 
         {/* ── Socials ──────────────────────────────────────────────── */}
         <SocialsSection profile={profile} />

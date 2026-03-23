@@ -15,6 +15,9 @@ export const sendMessageSchema = z.object({
   channel: channelIdSchema.optional(),
   crossPostChannels: z.array(channelIdSchema).max(3).optional(), // post to multiple channels
   crossPostBluesky: z.boolean().optional(), // cross-post to Bluesky
+  crossPostLens: z.boolean().optional(), // cross-post to Lens
+  crossPostX: z.boolean().optional(), // cross-post to X (admin only)
+  crossPostHive: z.boolean().optional(), // cross-post to Hive
 });
 
 export const hideMessageSchema = z.object({

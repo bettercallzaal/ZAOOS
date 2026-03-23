@@ -9,7 +9,7 @@ async function fetchProfile(fid: number) {
       getUserByFid(fid),
       supabaseAdmin
         .from('users')
-        .select('zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name, bluesky_handle, bluesky_did, solana_wallet, x_handle, instagram_handle, soundcloud_url, spotify_url, audius_handle')
+        .select('zid, primary_wallet, respect_wallet, role, created_at, display_name, bio, ign, real_name, bluesky_handle, bluesky_did, solana_wallet, x_handle, instagram_handle, soundcloud_url, spotify_url, audius_handle, lens_profile_id, hive_username')
         .eq('fid', fid)
         .eq('is_active', true)
         .maybeSingle(),
@@ -39,6 +39,9 @@ async function fetchProfile(fid: number) {
       created_at: dbResult.data?.created_at || null,
       bluesky_handle: dbResult.data?.bluesky_handle || null,
       solana_wallet: dbResult.data?.solana_wallet || null,
+      // Cross-posting platforms
+      lens_profile_id: dbResult.data?.lens_profile_id || null,
+      hive_username: dbResult.data?.hive_username || null,
       // Social connections
       x_handle: dbResult.data?.x_handle || null,
       instagram_handle: dbResult.data?.instagram_handle || null,

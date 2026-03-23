@@ -497,13 +497,19 @@ export default function GovernancePage() {
                   <option value="community">Community</option>
                   <option value="governance">Governance</option>
                   <option value="treasury">Treasury</option>
+                  <option value="wavewarz">WaveWarZ</option>
+                  <option value="social">Social</option>
                 </select>
                 <div className="bg-[#0a1628] rounded-lg p-3 space-y-2">
-                  <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-medium">Auto-publish to @thezao (optional)</p>
+                  <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-medium">
+                    {newCategory === 'wavewarz' ? 'Auto-publish to WaveWarZ Farcaster (optional)' : 'Auto-publish to @thezao (optional)'}
+                  </p>
                   <textarea
                     value={newPublishText}
                     onChange={(e) => setNewPublishText(e.target.value)}
-                    placeholder="If this proposal passes 1000 Respect in votes, this text will auto-publish to @thezao on Farcaster + Bluesky..."
+                    placeholder={newCategory === 'wavewarz'
+                      ? "If this proposal passes 1000 Respect in votes, this text will auto-publish to the /wavewarz Farcaster channel..."
+                      : "If this proposal passes 1000 Respect in votes, this text will auto-publish to @thezao on Farcaster + Bluesky..."}
                     rows={2}
                     maxLength={1024}
                     className="w-full bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-3 py-2 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623] resize-none"

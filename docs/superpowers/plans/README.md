@@ -9,6 +9,13 @@
 | **Sprint 1 — Quick Wins** | [sprint-1-quick-wins.md](2026-03-17-sprint-1-quick-wins.md) | Ready to execute | 1-2 days |
 | **Sprint 2 — Respect Activation** | [sprint-2-respect-activation.md](2026-03-17-sprint-2-respect-activation.md) | Ready to execute | 1-2 weeks |
 
+## Recent Additions
+
+| Plan | Status | Effort |
+|------|--------|--------|
+| **Minimax Integration** | [2026-03-22-minimax-integration.md](2026-03-22-minimax-integration.md) | Complete | 1-2 hours |
+| **Home + Music + Nav Fixes** | [2026-03-22-home-music-nav-fixes.md](2026-03-22-home-music-nav-fixes.md) | Ready to execute | 1-2 days |
+
 ## Reference
 
 | Doc | Purpose |

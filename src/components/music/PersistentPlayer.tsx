@@ -88,17 +88,16 @@ export function PersistentPlayer({ onPrev, onNext }: PersistentPlayerProps = {})
         </div>
 
         {/* Previous */}
-        {onPrev && (
-          <button
-            onClick={onPrev}
-            className="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95"
-            aria-label="Previous track"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
-            </svg>
-          </button>
-        )}
+        <button
+          onClick={onPrev}
+          className={`w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95 ${onPrev ? 'text-gray-400 hover:text-white' : 'text-gray-700'}`}
+          aria-label="Previous track"
+          disabled={!onPrev}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+          </svg>
+        </button>
 
         {/* Play/Pause */}
         <button
@@ -121,17 +120,16 @@ export function PersistentPlayer({ onPrev, onNext }: PersistentPlayerProps = {})
         </button>
 
         {/* Next */}
-        {onNext && (
-          <button
-            onClick={onNext}
-            className="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95"
-            aria-label="Next track"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
-            </svg>
-          </button>
-        )}
+        <button
+          onClick={onNext}
+          className={`w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95 ${onNext ? 'text-gray-400 hover:text-white' : 'text-gray-700'}`}
+          aria-label="Next track"
+          disabled={!onNext}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+          </svg>
+        </button>
 
         {/* Close */}
         <button

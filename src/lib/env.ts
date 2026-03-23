@@ -27,6 +27,11 @@ export const ENV = {
   NEXT_PUBLIC_SIWF_DOMAIN: optionalEnv('NEXT_PUBLIC_SIWF_DOMAIN'),
   NEXT_PUBLIC_WC_PROJECT_ID: optionalEnv('NEXT_PUBLIC_WC_PROJECT_ID'),
 
+  // Minimax (optional)
+  MINIMAX_API_KEY: optionalEnv('MINIMAX_API_KEY'),
+  MINIMAX_MODEL: optionalEnv('MINIMAX_MODEL'),
+  MINIMAX_API_URL: optionalEnv('MINIMAX_API_URL'),
+
   // @thezao official account (governance-powered posting)
   ZAO_OFFICIAL_FID: optionalEnv('ZAO_OFFICIAL_FID'),
   ZAO_OFFICIAL_SIGNER_UUID: optionalEnv('ZAO_OFFICIAL_SIGNER_UUID'),

@@ -33,9 +33,11 @@ export function SessionsTab({ isAdmin }: Props) {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [eraFilter, setEraFilter] = useState<'all' | 'og' | 'ordao'>('all');
 
   useEffect(() => {
-    fetch('/api/fractals/sessions?limit=20')
+    fetch('/api/fractals/sessions?limit=200')
       .then((r) => r.json())
       .then((d) => {
         setSessions(d.sessions ?? []);
@@ -68,20 +70,47 @@ export function SessionsTab({ isAdmin }: Props) {
 
   return (
     <div className="space-y-2 pt-2">
-      <div className="flex gap-3 mb-4">
-        <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center">
-          <p className="text-xl font-bold text-[#f5a623]">{total}</p>
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider">Sessions</p>
-        </div>
-        <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center">
-          <p className="text-xl font-bold text-[#f5a623]">
-            {sessions.reduce((sum, s) => sum + s.participant_count, 0)}
-          </p>
-          <p className="text-[10px] text-gray-500 uppercase tracking-wider">Participations</p>
-        </div>
+      {/* Search + Filter */}
+      <input
+        type="text"
+        placeholder="Search sessions or participants..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="w-full bg-[#0d1b2a] border border-gray-800 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none mb-2"
+      />
+      <div className="flex gap-1 mb-3">
+        {(['all', 'og', 'ordao'] as const).map(era => {
+          const ogCount = sessions.filter(s => s.notes?.includes('OG era') || s.notes?.includes('Airtable')).length;
+          const ordaoCount = sessions.filter(s => s.notes?.includes('ORDAO')).length;
+          const label = era === 'all' ? `All (${total})` : era === 'og' ? `OG (${ogCount})` : `ORDAO (${ordaoCount})`;
+          return (
+            <button
+              key={era}
+              onClick={() => setEraFilter(era)}
+              className={`flex-1 py-1.5 text-[10px] font-medium rounded-lg transition-colors ${
+                eraFilter === era
+                  ? 'bg-[#f5a623]/20 text-[#f5a623]'
+                  : 'bg-[#0d1b2a] text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
 
-      {sessions.map((session) => {
+      {sessions.filter(s => {
+        if (search) {
+          const q = search.toLowerCase();
+          const matchName = s.name.toLowerCase().includes(q);
+          const matchHost = s.host_name?.toLowerCase().includes(q);
+          const matchParticipant = s.fractal_scores?.some(sc => sc.member_name.toLowerCase().includes(q));
+          if (!matchName && !matchHost && !matchParticipant) return false;
+        }
+        if (eraFilter === 'og') return s.notes?.includes('OG era') || s.notes?.includes('Airtable');
+        if (eraFilter === 'ordao') return s.notes?.includes('ORDAO');
+        return true;
+      }).map((session) => {
         const isExpanded = expanded === session.id;
         const sorted = [...session.fractal_scores].sort((a, b) => a.rank - b.rank);
 

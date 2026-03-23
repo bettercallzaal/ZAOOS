@@ -574,8 +574,12 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed');
-      setLensHandle(data.handle || data.message || 'Connected');
-      if (!data.hasProfile) setLensError(data.message || null);
+      if (data.handle) {
+        setLensHandle(data.handle);
+      } else {
+        setLensHandle(null);
+        setLensError(data.message || 'No Lens profile found on any connected wallet');
+      }
     } catch (err) {
       setLensError(err instanceof Error ? err.message : 'Failed to connect');
     }

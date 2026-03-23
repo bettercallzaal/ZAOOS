@@ -19,6 +19,7 @@ Use this to quickly find if a topic has already been researched.
 - Music APIs (Audius, Sound.xyz, Spotify, SoundCloud, YouTube) → `03`
 - Live audio rooms (LiveKit, WebRTC, synchronized listening) → `43`
 - Audio player architecture, waveforms, streaming → `33`, `43`
+- SongJam audio spaces iframe embed, 100ms SDK, /zabal page → `119`
 
 ## Respect & Governance
 - Respect tokens (aspirational design — tiers/decay NOT implemented) → `04`

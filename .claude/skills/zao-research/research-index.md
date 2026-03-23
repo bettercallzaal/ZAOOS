@@ -1,6 +1,6 @@
 # Research Document Index
 
-103 research documents in `research/`. Each is a folder with a `README.md`.
+108 research documents in `research/`. Each is a folder with a `README.md`.
 
 | # | Folder Name | Topic |
 |---|-------------|-------|
@@ -109,3 +109,8 @@
 | 110 | `110-community-directory-crm` | Replace Webflow CRM: community_profiles table, /directory page, engagement scoring (10 signals), CSV import, on-chain enrichment, CRM admin tools |
 | 113 | `113-zao-fractal-bot-process` | ZAO fractal bot (Python/Discord, 52 commands), step-by-step flow, OG vs ZOR Respect, 90 weeks, integration plan |
 | 114 | `114-zao-fractal-live-infrastructure` | What's live now, OREC 175 txns, webhook events, bot history format, ZAO OS integration architecture |
+| 115 | `115-zao-data-reconciliation` | ZAO data reconciliation |
+| 116 | `116-discord-integration-research` | Discord integration research |
+| 117 | `117-lens-v3-cross-posting` | Lens v3 cross-posting |
+| 118 | `118-settings-page-redesign` | Settings page redesign |
+| 119 | `119-songjam-audio-spaces-embed` | Embed songjam.space/zabal for live audio rooms, iframe permissions fix, 100ms architecture, LiveAudioRoom component |

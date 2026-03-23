@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **91 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **92 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -88,6 +88,7 @@ On-chain identity, community roles, DAO structure, token economics, and legal co
 | [75](./75-hats-protocol-v2-updates/) | **Hats Protocol V2 Updates** | New eligibility modules, HSG v2, subgraph SDK v1.0.0, MCP server for AI, ERC-6551 accounts |
 | [78](./78-nouns-builder-integration/) | **Nouns Builder Integration** | Daily NFT auctions, 5-contract DAO suite, builder-template-app (MIT/Next.js), builder-farcaster, iframe/embed options for ZABAL DAO |
 | [79](./79-songjam-music-player-research/) | **SongJam Music Player Research** | 2026-music-player is Electron torrent streamer (not useful). ZAO OS player already better. Borrow: 100ms live audio, leaderboard treemap |
+| [119](./119-songjam-audio-spaces-embed/) | **SongJam Audio Spaces Embed** | Embed songjam.space/zabal iframe for live audio rooms. Fix iframe permissions (microphone/camera). 100ms SDK architecture, LiveAudioRoom component, /zabal page structure |
 
 ---
 

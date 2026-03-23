@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
-import { useLensAuth } from '@/hooks/useLensAuth';
+// Lens connection is handled inline — no SDK hook needed
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
 import type { SessionData } from '@/types';
@@ -555,23 +555,38 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     } catch { /* ignore */ }
   };
 
-  // Lens connection state
-  const { isConnecting: lensConnecting, error: lensError, connectedHandle: lensConnectedHandle, connect: lensConnect, walletAddress: lensWalletAddress } = useLensAuth();
+  // Lens connection state — simple server-side lookup, no SDK
   const [lensHandle, setLensHandle] = useState(profile?.lens_profile_id || null);
+  const [lensConnecting, setLensConnecting] = useState(false);
+  const [lensError, setLensError] = useState<string | null>(null);
   const [lensDisconnecting, setLensDisconnecting] = useState(false);
 
-  // Update lens handle when hook connects
-  useEffect(() => {
-    if (lensConnectedHandle && lensConnectedHandle !== lensHandle) {
-      setLensHandle(lensConnectedHandle);
+  const lensConnect = async () => {
+    setLensConnecting(true);
+    setLensError(null);
+    try {
+      const wallet = session?.walletAddress;
+      if (!wallet) { setLensError('No wallet connected'); setLensConnecting(false); return; }
+      const res = await fetch('/api/platforms/lens', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      setLensHandle(data.handle || data.message || 'Connected');
+      if (!data.hasProfile) setLensError(data.message || null);
+    } catch (err) {
+      setLensError(err instanceof Error ? err.message : 'Failed to connect');
     }
-  }, [lensConnectedHandle, lensHandle]);
+    setLensConnecting(false);
+  };
 
   const disconnectLens = async () => {
     setLensDisconnecting(true);
     try {
       const res = await fetch('/api/platforms/lens', { method: 'DELETE' });
-      if (res.ok) setLensHandle(null);
+      if (res.ok) { setLensHandle(null); setLensError(null); }
     } catch { /* ignore */ }
     setLensDisconnecting(false);
   };
@@ -814,10 +829,10 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 ) : (
                   <button
                     onClick={lensConnect}
-                    disabled={lensConnecting || (!lensWalletAddress && !session?.walletAddress)}
+                    disabled={lensConnecting || !session?.walletAddress}
                     className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors disabled:opacity-50"
                   >
-                    {lensConnecting ? 'Signing...' : 'Connect with Wallet'}
+                    {lensConnecting ? 'Checking...' : 'Connect'}
                   </button>
                 )
               }
@@ -827,9 +842,9 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   <p className="text-[10px] text-red-400">{lensError}</p>
                 </div>
               )}
-              {!lensHandle && !lensWalletAddress && !session?.walletAddress && (
+              {!lensHandle && !session?.walletAddress && (
                 <div className="pb-3">
-                  <p className="text-[10px] text-gray-600">Connect your wallet above to link Lens</p>
+                  <p className="text-[10px] text-gray-600">No wallet detected</p>
                 </div>
               )}
             </AccountRow>

@@ -225,9 +225,12 @@ See `.env.example` for all required environment variables.
   - `src/components/governance/ProposalComments.tsx`
 - [x] **Auto-publish threshold** — proposals auto-publish to Farcaster at 1000 Respect votes
   - `src/app/api/publish/farcaster/route.ts`
-- [ ] **Proposal status transitions** — admin workflow: open -> approved -> rejected -> completed
-- [ ] **Auto-close on deadline** — countdown display + block voting after expiry
-- [ ] **Zero-weight vote handling** — label or block votes from 0-Respect members
+- [x] **Proposal status transitions** — admin PATCH endpoint: open -> approved -> rejected -> completed
+  - `src/app/api/proposals/route.ts` (PATCH handler)
+- [x] **Auto-close on deadline** — countdown display via `formatTimeRemaining`, blocks voting after expiry
+  - `src/app/(auth)/governance/page.tsx` · `src/lib/format/timeAgo.ts`
+- [x] **Zero-weight vote handling** — vote recorded with warning, weight displayed transparently
+  - `src/app/api/proposals/vote/route.ts`
 
 #### Respect System
 
@@ -471,7 +474,7 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 | Sprint | Focus | Status |
 |--------|-------|--------|
 | **1** | Quick wins — PostHog analytics, ZID badges, notification triggers | Planned |
-| **2** | Governance fixes — proposal categories, status transitions, deadline countdown, rate limits | In Progress |
+| **2** | Governance fixes — proposal categories, status transitions, deadline countdown, rate limits | Done |
 | **3** | Engagement — streaks, badges, Track of the Day, referrals | Partially Done |
 | **4** | Moderation & search — AI moderation, full-text search, music approval queue | Planned |
 | **5** | Hats & Treasury — Hats tree deployment on Optimism, Safe multisig, HSG v2 | Planned (Q3 2026) |

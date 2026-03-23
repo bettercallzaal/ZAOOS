@@ -72,8 +72,12 @@ export function LoginButton() {
     <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-5">
       {/* Primary: Farcaster */}
       <div className="w-full flex flex-col items-center">
-        <div className="farcaster-signin-wrapper">
-          <SignInButton nonce={serverNonce} onSuccess={handleSuccess} />
+        <div className="farcaster-signin-wrapper" key={serverNonce || 'loading'}>
+          {serverNonce ? (
+            <SignInButton nonce={serverNonce} onSuccess={handleSuccess} />
+          ) : (
+            <div className="h-10 w-48 rounded-lg bg-gray-800 animate-pulse" />
+          )}
         </div>
         {profile.isAuthenticated && loading && !error && (
           <p className="text-sm text-gray-400 mt-2">Verifying access...</p>

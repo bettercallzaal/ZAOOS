@@ -53,6 +53,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   const [crossPostHive, setCrossPostHive] = useState(false);
   const [crossPostEnabled, setCrossPostEnabled] = useState(false);
   const [connectedPlatforms, setConnectedPlatforms] = useState<Set<string>>(new Set());
+  const [platformToast, setPlatformToast] = useState<string | null>(null);
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionStart, setMentionStart] = useState(0);
   const [imagePreview, setImagePreview] = useState<{ url: string; file?: File } | null>(null);
@@ -509,9 +510,19 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
           <PlatformToggles
             selectedPlatforms={selectedPlatforms}
             onToggle={handlePlatformToggle}
+            onNotConnected={(platform) => {
+              setPlatformToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} not connected`);
+              setTimeout(() => setPlatformToast(null), 3000);
+            }}
             connectedPlatforms={connectedPlatforms}
             isAdmin={isAdmin}
           />
+          {platformToast && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-400">
+              <span>{platformToast} —</span>
+              <a href="/settings" className="text-[#f5a623] font-medium hover:underline">Go to Settings</a>
+            </div>
+          )}
         </div>
       )}
 

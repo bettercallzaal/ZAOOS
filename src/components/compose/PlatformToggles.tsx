@@ -13,6 +13,7 @@ const PLATFORMS = [
 interface PlatformTogglesProps {
   selectedPlatforms: Set<string>;
   onToggle: (platform: string) => void;
+  onNotConnected?: (platform: string) => void;
   connectedPlatforms: Set<string>;
   isAdmin: boolean;
 }
@@ -20,14 +21,19 @@ interface PlatformTogglesProps {
 export function PlatformToggles({
   selectedPlatforms,
   onToggle,
+  onNotConnected,
   connectedPlatforms,
   isAdmin,
 }: PlatformTogglesProps) {
   const handleToggle = useCallback(
-    (platformId: string) => {
+    (platformId: string, isConnected: boolean) => {
+      if (!isConnected) {
+        onNotConnected?.(platformId);
+        return;
+      }
       onToggle(platformId);
     },
-    [onToggle]
+    [onToggle, onNotConnected]
   );
 
   const visiblePlatforms = PLATFORMS.filter(
@@ -65,7 +71,7 @@ interface PlatformPillProps {
   alwaysOn: boolean;
   connected: boolean;
   selected: boolean;
-  onToggle: (id: string) => void;
+  onToggle: (id: string, connected: boolean) => void;
 }
 
 function PlatformPill({
@@ -99,7 +105,7 @@ function PlatformPill({
     <div className="relative group flex-shrink-0">
       <button
         type="button"
-        onClick={() => onToggle(id)}
+        onClick={() => onToggle(id, connected)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
         style={
           selected

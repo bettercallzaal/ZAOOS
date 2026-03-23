@@ -11,7 +11,7 @@ import { formatDuration } from '@/lib/music/formatDuration';
 import { TrackCardSkeleton } from '@/components/music/MusicSkeletons';
 
 interface MusicSidebarProps {
-  messages: Cast[];
+  messages?: Cast[];
   activeChannel: string;
   isOpen: boolean;
   isMobile: boolean;
@@ -27,7 +27,7 @@ interface MusicSidebarProps {
 }
 
 export function MusicSidebar({
-  messages,
+  messages = [],
   activeChannel,
   isOpen,
   isMobile,

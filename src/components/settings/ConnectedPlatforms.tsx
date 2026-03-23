@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useAccount, useWalletClient } from 'wagmi';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -267,20 +268,87 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
     setStatus((prev) => ({ ...prev, bluesky_handle: null }));
   }, []);
 
-  // ── Lens handlers ───────────────────────────────────
+  // ── Lens handlers (wallet-based auth) ──────────────
 
-  const connectLens = useCallback(async (data: Record<string, string>) => {
-    const res = await fetch('/api/platforms/lens', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        profileId: data.profileId,
-      }),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error || 'Failed to connect Lens');
-    setStatus((prev) => ({ ...prev, lens_profile_id: data.profileId }));
-  }, []);
+  const { address: walletAddress } = useAccount();
+  const { data: walletClient } = useWalletClient();
+  const [lensConnecting, setLensConnecting] = useState(false);
+  const [lensError, setLensError] = useState<string | null>(null);
+
+  const connectLensWithWallet = useCallback(async () => {
+    if (!walletAddress || !walletClient) {
+      setLensError('Connect your wallet first');
+      return;
+    }
+    setLensConnecting(true);
+    setLensError(null);
+    try {
+      // Step 1: Get challenge from Lens API
+      const challengeRes = await fetch('https://api-v2.lens.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `mutation Challenge($request: ChallengeRequest!) { challenge(request: $request) { id text } }`,
+          variables: { request: { signedBy: walletAddress, for: null } },
+        }),
+      });
+      const challengeData = await challengeRes.json();
+      const challenge = challengeData?.data?.challenge;
+      if (!challenge?.text) throw new Error('Failed to get Lens challenge');
+
+      // Step 2: Sign with wallet
+      const signature = await walletClient.signMessage({ message: challenge.text });
+
+      // Step 3: Authenticate with Lens
+      const authRes = await fetch('https://api-v2.lens.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `mutation Authenticate($request: SignedAuthChallenge!) { authenticate(request: $request) { accessToken refreshToken } }`,
+          variables: { request: { id: challenge.id, signature } },
+        }),
+      });
+      const authData = await authRes.json();
+      const tokens = authData?.data?.authenticate;
+      if (!tokens?.accessToken) throw new Error('Lens authentication failed — do you have a Lens profile on this wallet?');
+
+      // Step 4: Get profile ID
+      const profileRes = await fetch('https://api-v2.lens.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-access-token': `Bearer ${tokens.accessToken}` },
+        body: JSON.stringify({
+          query: `query { defaultProfile(request: { for: "${walletAddress}" }) { id handle { localName } } }`,
+        }),
+      });
+      const profileData = await profileRes.json();
+      const profile = profileData?.data?.defaultProfile;
+      const profileId = profile?.id || walletAddress;
+      const handle = profile?.handle?.localName ? `${profile.handle.localName}.lens` : profileId;
+
+      // Step 5: Save to server
+      const saveRes = await fetch('/api/platforms/lens', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          profileId: handle,
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        }),
+      });
+      if (!saveRes.ok) throw new Error('Failed to save Lens connection');
+
+      setStatus((prev) => ({ ...prev, lens_profile_id: handle }));
+    } catch (err) {
+      setLensError(err instanceof Error ? err.message : 'Failed to connect Lens');
+    } finally {
+      setLensConnecting(false);
+    }
+  }, [walletAddress, walletClient]);
+
+  // Keep old connectLens for fallback (unused but prevents type errors)
+  const connectLens = useCallback(async () => {
+    await connectLensWithWallet();
+  }, [connectLensWithWallet]);
 
   const disconnectLens = useCallback(async () => {
     const res = await fetch('/api/platforms/lens', { method: 'DELETE' });
@@ -350,24 +418,52 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
           ]}
         />
 
-        {/* Lens Protocol */}
-        <PlatformCard
-          id="lens"
-          name="Lens Protocol"
-          icon={<LensIcon className="w-4 h-4 text-green-400" />}
-          accentColor="#00501e"
-          connectedAs={status.lens_profile_id}
-          onConnect={connectLens}
-          onDisconnect={disconnectLens}
-          connectFields={[
-            {
-              key: 'profileId',
-              label: 'Lens Handle or Profile ID',
-              placeholder: 'yourname.lens or 0x01',
-              helpText: 'Enter your Lens handle — we\'ll look up your profile',
-            },
-          ]}
-        />
+        {/* Lens Protocol — wallet-based auth */}
+        <div className="rounded-xl border border-white/[0.06] bg-[#0d1b2a] p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-green-900/30 flex items-center justify-center">
+                <LensIcon className="w-4 h-4 text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-white">Lens Protocol</h3>
+                {status.lens_profile_id ? (
+                  <p className="text-xs text-green-400 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                    Connected as {status.lens_profile_id}
+                  </p>
+                ) : (
+                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-600" />
+                    Not connected
+                  </p>
+                )}
+              </div>
+            </div>
+            {status.lens_profile_id ? (
+              <button
+                onClick={disconnectLens}
+                className="text-xs text-red-400 hover:text-red-300 px-3 py-1 rounded-lg border border-red-400/20 hover:border-red-400/40 transition-colors"
+              >
+                Disconnect
+              </button>
+            ) : (
+              <button
+                onClick={connectLensWithWallet}
+                disabled={lensConnecting || !walletAddress}
+                className="text-xs text-green-400 hover:text-green-300 px-3 py-1 rounded-lg border border-green-400/20 hover:border-green-400/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {lensConnecting ? 'Signing...' : 'Connect with Wallet'}
+              </button>
+            )}
+          </div>
+          {!walletAddress && !status.lens_profile_id && (
+            <p className="text-xs text-gray-500">Connect your wallet above to link Lens</p>
+          )}
+          {lensError && (
+            <p className="text-xs text-red-400 mt-2">{lensError}</p>
+          )}
+        </div>
 
         {/* Hive / InLeo */}
         <PlatformCard

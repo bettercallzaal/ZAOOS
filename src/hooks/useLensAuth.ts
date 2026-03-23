@@ -12,7 +12,7 @@ interface LensAuthState {
 /**
  * Lens Protocol V3 auth hook.
  * Uses wagmi wallet to authenticate with Lens SDK.
- * Dynamic imports all Lens modules to avoid SSR issues.
+ * Captures tokens via custom storage provider.
  */
 export function useLensAuth() {
   const { address } = useAccount();
@@ -32,7 +32,6 @@ export function useLensAuth() {
     setState({ isConnecting: true, error: null, connectedHandle: null });
 
     try {
-      // Dynamic import all Lens SDK modules
       const { PublicClient, mainnet, evmAddress } = await import('@lens-protocol/client');
       const { fetchAccountsAvailable } = await import('@lens-protocol/client/actions');
       const { signMessageWith } = await import('@lens-protocol/client/viem');
@@ -40,9 +39,18 @@ export function useLensAuth() {
       const appAddress = process.env.NEXT_PUBLIC_LENS_APP_ADDRESS
         || '0x8A5Cc31180c37078e1EbA2A23c861Acf351a97cE';
 
+      // Custom storage to capture tokens
+      const tokenStore: Record<string, string> = {};
+      const storage = {
+        getItem: (key: string) => tokenStore[key] || null,
+        setItem: (key: string, value: string) => { tokenStore[key] = value; },
+        removeItem: (key: string) => { delete tokenStore[key]; },
+      };
+
       const client = PublicClient.create({
         environment: mainnet,
         origin: window.location.origin,
+        storage,
       });
 
       // Check for existing Lens accounts
@@ -51,17 +59,15 @@ export function useLensAuth() {
         includeOwned: true,
       });
 
-      // Unwrap the Result type
       const accounts = accountsResult.isOk() ? accountsResult.value : null;
 
-      let sessionClient;
       let handle = address.slice(0, 10) + '...';
+      let loginResult;
 
       if (accounts?.items && accounts.items.length > 0) {
-        // Login with existing account
         const account = accounts.items[0];
         const accountAddr = (account as any).account?.address || (account as any).address;
-        const result = await client.login({
+        loginResult = await client.login({
           accountOwner: {
             account: evmAddress(accountAddr),
             app: evmAddress(appAddress),
@@ -70,45 +76,56 @@ export function useLensAuth() {
           signMessage: signMessageWith(walletClient),
         });
 
-        if (result.isErr()) throw new Error((result.error as any)?.message || 'Login failed');
-        sessionClient = result.value;
-
         const username = (account as any).account?.username?.localName
           || (account as any).username?.localName;
         handle = username ? `${username}.lens` : accountAddr?.slice(0, 10) + '...';
       } else {
-        // Onboard as new user
-        const result = await client.login({
+        loginResult = await client.login({
           onboardingUser: {
             app: evmAddress(appAddress),
             wallet: evmAddress(address),
           },
           signMessage: signMessageWith(walletClient),
         });
-
-        if (result.isErr()) throw new Error((result.error as any)?.message || 'Onboarding failed');
-        sessionClient = result.value;
         handle = 'new:' + address.slice(0, 8);
       }
 
-      // Try to enable signless mode
-      try {
-        const { enableSignless } = await import('@lens-protocol/client/actions');
-        const { handleOperationWith } = await import('@lens-protocol/client/viem');
-        await enableSignless(sessionClient).andThen(handleOperationWith(walletClient));
-      } catch {
-        // Signless may already be enabled or not supported
+      if (loginResult.isErr()) {
+        throw new Error((loginResult.error as any)?.message || 'Login failed');
       }
 
-      // Get credentials to store server-side
+      // Extract tokens from our custom storage
+      const storedKeys = Object.keys(tokenStore);
       let accessToken = '';
       let refreshToken = '';
-      try {
-        const credentials = await (sessionClient as any).getCredentials();
-        accessToken = credentials?.accessToken || '';
-        refreshToken = credentials?.refreshToken || '';
-      } catch {
-        // Some SDK versions don't have getCredentials
+
+      // The SDK stores credentials as JSON in storage
+      for (const key of storedKeys) {
+        try {
+          const val = tokenStore[key];
+          if (val.includes('accessToken') || val.includes('refreshToken')) {
+            const parsed = JSON.parse(val);
+            accessToken = parsed.accessToken || parsed.data?.accessToken || '';
+            refreshToken = parsed.refreshToken || parsed.data?.refreshToken || '';
+            break;
+          }
+          // Sometimes stored as plain token strings
+          if (key.includes('access') && val.startsWith('ey')) accessToken = val;
+          if (key.includes('refresh') && val.startsWith('ey')) refreshToken = val;
+        } catch {
+          // Try as plain string
+          if (key.includes('access')) accessToken = tokenStore[key];
+          if (key.includes('refresh')) refreshToken = tokenStore[key];
+        }
+      }
+
+      // Log what we captured for debugging
+      console.info('[lens-auth] Storage keys:', storedKeys);
+      console.info('[lens-auth] Got tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken });
+
+      // If we still don't have tokens, dump all storage for debugging
+      if (!accessToken) {
+        console.info('[lens-auth] All stored values:', JSON.stringify(tokenStore));
       }
 
       // Save to our server
@@ -131,6 +148,7 @@ export function useLensAuth() {
       setState({ isConnecting: false, error: null, connectedHandle: handle });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to connect Lens';
+      console.error('[lens-auth] Error:', msg);
       setState({ isConnecting: false, error: msg, connectedHandle: null });
     }
   }, [address, walletClient]);

@@ -268,7 +268,7 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
     setStatus((prev) => ({ ...prev, bluesky_handle: null }));
   }, []);
 
-  // ── Lens handlers (wallet-based auth) ──────────────
+  // ── Lens handlers (wallet-based auth via server) ───
 
   const { address: walletAddress } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -283,61 +283,27 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
     setLensConnecting(true);
     setLensError(null);
     try {
-      // Step 1: Get challenge from Lens API
-      const challengeRes = await fetch('https://api-v2.lens.dev', {
+      // Step 1: Get challenge from OUR server (which calls Lens API)
+      const challengeRes = await fetch(`/api/platforms/lens?wallet=${walletAddress}`);
+      const challengeJson = await challengeRes.json();
+      if (!challengeRes.ok) throw new Error(challengeJson.error || 'Failed to get challenge');
+
+      // Step 2: Sign with wallet (only client-side step)
+      const signature = await walletClient.signMessage({ message: challengeJson.challengeText });
+
+      // Step 3: Send signature to OUR server (which authenticates with Lens)
+      const authRes = await fetch('/api/platforms/lens', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: `mutation Challenge($request: ChallengeRequest!) { challenge(request: $request) { id text } }`,
-          variables: { request: { signedBy: walletAddress, for: null } },
+          challengeId: challengeJson.challengeId,
+          signature,
         }),
       });
-      const challengeData = await challengeRes.json();
-      const challenge = challengeData?.data?.challenge;
-      if (!challenge?.text) throw new Error('Failed to get Lens challenge');
+      const authJson = await authRes.json();
+      if (!authRes.ok) throw new Error(authJson.error || 'Authentication failed');
 
-      // Step 2: Sign with wallet
-      const signature = await walletClient.signMessage({ message: challenge.text });
-
-      // Step 3: Authenticate with Lens
-      const authRes = await fetch('https://api-v2.lens.dev', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `mutation Authenticate($request: SignedAuthChallenge!) { authenticate(request: $request) { accessToken refreshToken } }`,
-          variables: { request: { id: challenge.id, signature } },
-        }),
-      });
-      const authData = await authRes.json();
-      const tokens = authData?.data?.authenticate;
-      if (!tokens?.accessToken) throw new Error('Lens authentication failed — do you have a Lens profile on this wallet?');
-
-      // Step 4: Get profile ID
-      const profileRes = await fetch('https://api-v2.lens.dev', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-access-token': `Bearer ${tokens.accessToken}` },
-        body: JSON.stringify({
-          query: `query { defaultProfile(request: { for: "${walletAddress}" }) { id handle { localName } } }`,
-        }),
-      });
-      const profileData = await profileRes.json();
-      const profile = profileData?.data?.defaultProfile;
-      const profileId = profile?.id || walletAddress;
-      const handle = profile?.handle?.localName ? `${profile.handle.localName}.lens` : profileId;
-
-      // Step 5: Save to server
-      const saveRes = await fetch('/api/platforms/lens', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          profileId: handle,
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-        }),
-      });
-      if (!saveRes.ok) throw new Error('Failed to save Lens connection');
-
-      setStatus((prev) => ({ ...prev, lens_profile_id: handle }));
+      setStatus((prev) => ({ ...prev, lens_profile_id: authJson.profileId }));
     } catch (err) {
       setLensError(err instanceof Error ? err.message : 'Failed to connect Lens');
     } finally {
@@ -345,7 +311,6 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
     }
   }, [walletAddress, walletClient]);
 
-  // Keep old connectLens for fallback (unused but prevents type errors)
   const connectLens = useCallback(async () => {
     await connectLensWithWallet();
   }, [connectLensWithWallet]);

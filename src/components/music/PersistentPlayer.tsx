@@ -36,7 +36,9 @@ export function PersistentPlayer({
 }: PersistentPlayerProps) {
   const player = usePlayer();
 
-  const hasTrack = !!player.metadata;
+  // Show restored track as if paused (user sees what was playing before refresh)
+  const restored = player.restoredTrack;
+  const hasTrack = !!player.metadata || !!restored;
 
   // ─── Idle state: entire bar tappable to start radio ────────────────
   if (!hasTrack) {
@@ -75,11 +77,19 @@ export function PersistentPlayer({
     );
   }
 
-  // ─── Active state: track playing ──────────────────────────────────
-  const metadata = player.metadata!;
-  const { isPlaying, isLoading, position, duration } = player;
+  // ─── Active state: track playing or restored ───────────────────────
+  const metadata = player.metadata ?? restored!.metadata;
+  const isPlaying = player.isPlaying;
+  const isLoading = player.isLoading;
+  const position = player.metadata ? player.position : (restored?.position ?? 0);
+  const duration = player.metadata ? player.duration : (restored?.duration ?? 0);
+  const isRestored = !player.metadata && !!restored;
 
   const handlePlayPause = () => {
+    if (isRestored) {
+      player.resumeRestored();
+      return;
+    }
     if (isPlaying) player.pause();
     else player.resume();
   };

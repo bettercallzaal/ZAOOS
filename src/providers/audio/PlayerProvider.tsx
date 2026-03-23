@@ -5,6 +5,7 @@ import {
   useContext,
   useReducer,
   useRef,
+  useState,
   useCallback,
   useEffect,
   useMemo,
@@ -92,12 +93,16 @@ function reducer(state: PlayerState, action: PlayerAction): PlayerState {
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
+type RestoredTrack = { metadata: TrackMetadata; position: number; duration: number } | null;
+
 type PlayerContextValue = {
   state: PlayerState;
   dispatch: Dispatch<PlayerAction>;
   controllers: MutableRefObject<Partial<Record<TrackType, AudioController>>>;
   registerController: (type: TrackType, controller: AudioController) => void;
   onEndedRef: MutableRefObject<(() => void) | null>;
+  restoredTrack: RestoredTrack;
+  clearRestoredTrack: () => void;
 };
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -131,14 +136,19 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     volume: persisted.current.volume ?? 1,
     shuffle: persisted.current.shuffle ?? false,
     repeat: (persisted.current.repeat as RepeatMode) ?? 'off',
-    // Restore metadata as paused so user sees what was playing but it doesn't auto-start
-    metadata: persisted.current.metadata ?? null,
-    status: persisted.current.metadata ? 'paused' : 'idle',
-    position: persisted.current.position ?? 0,
-    duration: persisted.current.duration ?? 0,
   });
   const controllers = useRef<Partial<Record<TrackType, AudioController>>>({});
   const onEndedRef = useRef<(() => void) | null>(null);
+
+  // Restored track info — shown in UI but not loaded into audio until user taps play
+  const [restoredTrack, setRestoredTrack] = useState<{
+    metadata: TrackMetadata;
+    position: number;
+    duration: number;
+  } | null>(() => {
+    const p = persisted.current;
+    return p.metadata ? { metadata: p.metadata, position: p.position ?? 0, duration: p.duration ?? 0 } : null;
+  });
 
   // Persist player state to localStorage
   useEffect(() => {
@@ -165,9 +175,18 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const clearRestoredTrack = useCallback(() => setRestoredTrack(null), []);
+
+  // Clear restored track when actual playback starts
+  useEffect(() => {
+    if (state.status === 'loading' || state.status === 'playing') {
+      setRestoredTrack(null);
+    }
+  }, [state.status]);
+
   const value = useMemo(
-    () => ({ state, dispatch, controllers, registerController, onEndedRef }),
-    [state, registerController],
+    () => ({ state, dispatch, controllers, registerController, onEndedRef, restoredTrack, clearRestoredTrack }),
+    [state, registerController, restoredTrack, clearRestoredTrack],
   );
 
   return (
@@ -186,7 +205,7 @@ export function usePlayerContext() {
 }
 
 export function usePlayer() {
-  const { state, dispatch, controllers, onEndedRef } = usePlayerContext();
+  const { state, dispatch, controllers, onEndedRef, restoredTrack, clearRestoredTrack } = usePlayerContext();
 
   const getController = () =>
     state.metadata ? (controllers.current[state.metadata.type] ?? null) : null;
@@ -245,6 +264,22 @@ export function usePlayer() {
     /** Register a callback for when the current track ends naturally */
     setOnEnded: (callback: (() => void) | null) => {
       onEndedRef.current = callback;
+    },
+
+    /** Track info restored from localStorage (shown in UI before user taps play) */
+    restoredTrack,
+    clearRestoredTrack,
+
+    /** Resume the restored track — does a full play() which loads the audio */
+    resumeRestored: () => {
+      if (!restoredTrack) return;
+      dispatch({ type: 'PLAY', payload: restoredTrack.metadata });
+      const controller = controllers.current[restoredTrack.metadata.type];
+      if (controller?.load) {
+        const url = restoredTrack.metadata.streamUrl ?? restoredTrack.metadata.url;
+        controller.load(url);
+      }
+      clearRestoredTrack();
     },
   };
 }

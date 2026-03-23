@@ -3,16 +3,20 @@
 import { useEffect, useRef, ReactNode } from 'react';
 import { usePlayerContext } from './PlayerProvider';
 
+// Module-level audio element — survives component re-mounts and React strict mode
+let globalAudio: HTMLAudioElement | null = null;
+
 export function HTMLAudioProvider({ children }: { children: ReactNode }) {
   const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const activeUrlRef = useRef<string | null>(null);
 
-  // Create audio element and register controllers on mount
+  // Create audio element once (module-level singleton)
   useEffect(() => {
-    const audio = new Audio();
-    // Don't set crossOrigin — Audius CDN nodes may not return CORS headers
-    // on redirected stream URLs, causing opaque response failures.
+    if (!globalAudio) {
+      globalAudio = new Audio();
+    }
+    const audio = globalAudio;
     audioRef.current = audio;
 
     const onTimeUpdate = () =>
@@ -78,7 +82,8 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     registerController('audius', controller);
 
     return () => {
-      audio.pause();
+      // Don't destroy the audio element — just remove listeners
+      // The module-level singleton persists across re-mounts
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('durationchange', onDurationChange);
       audio.removeEventListener('canplay', onCanPlay);

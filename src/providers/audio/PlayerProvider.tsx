@@ -170,6 +170,53 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     } catch { /* quota exceeded — ignore */ }
   }, [state.metadata, state.position, state.duration, state.volume, state.shuffle, state.repeat]);
 
+  // Media Session API — lock screen controls + background audio keepalive
+  useEffect(() => {
+    if (!('mediaSession' in navigator) || !state.metadata) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: state.metadata.trackName,
+      artist: state.metadata.artistName || 'ZAO Radio',
+      album: 'ZAO OS',
+      artwork: state.metadata.artworkUrl
+        ? [{ src: state.metadata.artworkUrl, sizes: '512x512', type: 'image/jpeg' }]
+        : [],
+    });
+
+    navigator.mediaSession.playbackState = state.status === 'playing' ? 'playing' : 'paused';
+  }, [state.metadata, state.status]);
+
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+
+    const getCtrl = () => {
+      const t = stateRef.current.metadata?.type;
+      return t ? controllers.current[t] ?? null : null;
+    };
+
+    navigator.mediaSession.setActionHandler('play', () => {
+      getCtrl()?.play();
+      dispatch({ type: 'RESUME' });
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      getCtrl()?.pause();
+      dispatch({ type: 'PAUSE' });
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      if (onEndedRef.current) onEndedRef.current();
+    });
+    navigator.mediaSession.setActionHandler('previoustrack', null);
+
+    return () => {
+      navigator.mediaSession.setActionHandler('play', null);
+      navigator.mediaSession.setActionHandler('pause', null);
+      navigator.mediaSession.setActionHandler('nexttrack', null);
+    };
+  }, [dispatch]);
+
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   const registerController = useCallback(
     (type: TrackType, controller: AudioController) => {
       controllers.current[type] = controller;

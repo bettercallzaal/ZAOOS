@@ -75,6 +75,10 @@ export default async function RootLayout({
     <html lang="en">
       <head>
         <meta property="csp-nonce" content={nonce} />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="manifest" href="/manifest.json" />
         <link rel="preconnect" href="https://auth.farcaster.xyz" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>

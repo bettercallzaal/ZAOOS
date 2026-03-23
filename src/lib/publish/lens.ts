@@ -1,11 +1,12 @@
 /**
- * Lens Protocol publishing client.
+ * Lens Protocol V3 publishing.
  *
- * Uses the Lens API v2 GraphQL endpoint directly rather than the
- * @lens-protocol/client SDK, which has an unstable API surface.
- * This keeps the integration dependency-free and easy to maintain.
+ * Uses the official SDK for posting via Grove storage.
+ * Requires signless mode enabled (done during connect in useLensAuth).
  *
- * Docs: https://docs.lens.xyz/docs/publication
+ * Server-side session resume is tricky because the SDK uses localStorage
+ * by default. We attempt SDK-based posting first, then fall back to a
+ * direct GraphQL mutation with the access token in the Authorization header.
  */
 
 import type { NormalizedContent } from '@/lib/publish/normalize';
@@ -14,32 +15,37 @@ import type { NormalizedContent } from '@/lib/publish/normalize';
 // Constants
 // ---------------------------------------------------------------------------
 
-const LENS_API = 'https://api-v2.lens.dev';
+const LENS_GQL = 'https://api.lens.xyz/graphql';
 
 // ---------------------------------------------------------------------------
-// GraphQL helpers
+// Types
 // ---------------------------------------------------------------------------
+
+export interface LensPublishResult {
+  postId: string;
+  postUrl: string;
+}
 
 interface LensGqlResponse<T = unknown> {
   data?: T;
   errors?: { message: string }[];
 }
 
+// ---------------------------------------------------------------------------
+// GraphQL helper
+// ---------------------------------------------------------------------------
+
 async function lensGql<T = unknown>(
   query: string,
   variables: Record<string, unknown>,
-  accessToken?: string,
+  accessToken: string,
 ): Promise<T> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (accessToken) {
-    headers['x-access-token'] = `Bearer ${accessToken}`;
-  }
-
-  const res = await fetch(LENS_API, {
+  const res = await fetch(LENS_GQL, {
     method: 'POST',
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
     body: JSON.stringify({ query, variables }),
   });
 
@@ -62,50 +68,22 @@ async function lensGql<T = unknown>(
 }
 
 // ---------------------------------------------------------------------------
-// Mutations
+// GraphQL mutations (V3)
 // ---------------------------------------------------------------------------
 
-const CREATE_ONCHAIN_POST = `
-  mutation CreateOnchainPostTypedData($request: OnchainPostRequest!) {
-    createOnchainPostTypedData(request: $request) {
-      id
-      typedData {
-        domain {
-          name
-          chainId
-          version
-          verifyingContract
-        }
-        types {
-          Post {
-            name
-            type
-          }
-        }
-        value {
-          nonce
-          deadline
-          profileId
-          contentURI
-          actionModules
-          actionModulesInitDatas
-          referenceModule
-          referenceModuleInitData
-        }
+const CREATE_POST_MUTATION = `
+  mutation CreatePost($request: CreatePostRequest!) {
+    post(request: $request) {
+      ... on PostResponse {
+        hash
       }
-    }
-  }
-`;
-
-const POST_ON_MOMOKA = `
-  mutation PostOnMomoka($request: MomokaPostRequest!) {
-    postOnMomoka(request: $request) {
-      ... on CreateMomokaPublicationResult {
-        id
-        proof
-        momokaId
+      ... on SponsoredTransactionRequest {
+        reason
       }
-      ... on LensProfileManagerRelayError {
+      ... on SelfFundedTransactionRequest {
+        reason
+      }
+      ... on TransactionWillFail {
         reason
       }
     }
@@ -122,89 +100,172 @@ const REFRESH_MUTATION = `
 `;
 
 // ---------------------------------------------------------------------------
+// SDK-based posting (preferred path)
+// ---------------------------------------------------------------------------
+
+async function tryPostWithSdk(
+  accessToken: string,
+  refreshToken: string,
+  contentUri: string,
+): Promise<LensPublishResult | null> {
+  try {
+    const { PublicClient, mainnet } = await import('@lens-protocol/client');
+    const { post } = await import('@lens-protocol/client/actions');
+
+    const client = PublicClient.create({
+      environment: mainnet,
+      origin: 'https://zaoos.com',
+      storage: {
+        // Custom in-memory storage so the SDK doesn't try localStorage
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+      } as unknown as Storage,
+    });
+
+    // Attempt to resume session from stored credentials
+    // This may fail server-side since the SDK expects localStorage
+    const resumed = await client.resumeSession();
+    if (resumed.isErr()) {
+      return null; // Fall back to GraphQL
+    }
+
+    const sessionClient = resumed.value;
+
+    const result = await post(sessionClient, {
+      contentUri: contentUri as `lens://` & string,
+    });
+
+    if (result.isErr()) {
+      return null; // Fall back to GraphQL
+    }
+
+    const postHash =
+      (result.value as { hash?: string })?.hash || 'unknown';
+    return {
+      postId: postHash,
+      postUrl: `https://hey.xyz/posts/${postHash}`,
+    };
+  } catch {
+    // SDK not available or failed — fall back to GraphQL
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GraphQL-based posting (fallback)
+// ---------------------------------------------------------------------------
+
+async function postViaGraphQL(
+  accessToken: string,
+  contentUri: string,
+): Promise<LensPublishResult> {
+  const result = await lensGql<{
+    post:
+      | { hash: string }
+      | { reason: string };
+  }>(CREATE_POST_MUTATION, { request: { contentUri } }, accessToken);
+
+  if ('reason' in result.post) {
+    throw new Error(`Lens post failed: ${result.post.reason}`);
+  }
+
+  const postHash = result.post.hash;
+  return {
+    postId: postHash,
+    postUrl: `https://hey.xyz/posts/${postHash}`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Metadata upload to Grove
+// ---------------------------------------------------------------------------
+
+async function uploadMetadataToGrove(
+  content: NormalizedContent,
+): Promise<string> {
+  try {
+    const { textOnly } = await import('@lens-protocol/metadata');
+    const { StorageClient } = await import(
+      '@lens-protocol/storage-node-client'
+    );
+
+    const metadata = textOnly({ content: content.text });
+    const storageClient = (StorageClient as any).create();
+    const { uri } = await storageClient.uploadAsJson(metadata);
+    return uri;
+  } catch (err) {
+    // If Grove upload fails, fall back to a data URI
+    console.warn('[lens] Grove upload failed, using data URI fallback:', err);
+    const metadata = {
+      $schema:
+        'https://json-schemas.lens.dev/publications/text/3.0.0.json',
+      lens: {
+        id: crypto.randomUUID(),
+        locale: 'en',
+        mainContentFocus: 'TEXT_ONLY',
+        content: content.text,
+        appId: 'zao-os',
+      },
+    };
+    return `data:application/json;base64,${Buffer.from(
+      JSON.stringify(metadata),
+    ).toString('base64')}`;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
-export interface LensPublishResult {
-  postId: string;
-  postUrl: string;
-}
-
 /**
- * Publish a text post to Lens Protocol via the Momoka (gasless) pathway.
+ * Publish content to Lens V3.
  *
- * If Momoka fails (e.g. profile manager not enabled), falls back to logging
- * a placeholder result so the calling code can still proceed. The caller
- * should handle this gracefully.
+ * Strategy:
+ * 1. Build metadata using @lens-protocol/metadata textOnly()
+ * 2. Upload to Grove via @lens-protocol/storage-node-client
+ * 3. Try SDK post() action (needs session resume — may not work server-side)
+ * 4. Fall back to direct GraphQL mutation with access token
  *
- * @param accessToken - A valid Lens v2 access token for the user
- * @param content     - NormalizedContent produced by normalizeForLens()
+ * @param accessToken  - Lens V3 access token (from users table)
+ * @param refreshToken - Lens V3 refresh token (for auto-refresh)
+ * @param content      - NormalizedContent from normalizeForLens()
  */
 export async function publishToLens(
   accessToken: string,
+  refreshToken: string,
   content: NormalizedContent,
 ): Promise<LensPublishResult> {
-  // Build metadata JSON per Lens Metadata Standards v2
-  // In production this should be uploaded to IPFS/Arweave; for now we
-  // create a data URI so the mutation has a valid contentURI.
-  const metadata = {
-    $schema: 'https://json-schemas.lens.dev/publications/text/3.0.0.json',
-    lens: {
-      id: crypto.randomUUID(),
-      locale: 'en',
-      mainContentFocus: 'TEXT_ONLY',
-      content: content.text,
-      ...(content.images.length > 0 && {
-        image: {
-          item: content.images[0],
-          type: 'image/jpeg',
-        },
-        attachments: content.images.map((url) => ({
-          item: url,
-          type: 'image/jpeg',
-          altTag: '',
-        })),
-      }),
-      appId: 'zao-os',
-    },
-  };
+  // Step 1+2: Build metadata and upload to Grove
+  const contentUri = await uploadMetadataToGrove(content);
 
-  // Encode metadata as a data URI for the contentURI field.
-  // In production, upload to IPFS and use the resulting CID URL instead.
-  const contentURI = `data:application/json;base64,${Buffer.from(
-    JSON.stringify(metadata),
-  ).toString('base64')}`;
+  // Step 3: Try SDK-based posting (preferred — handles signless properly)
+  const sdkResult = await tryPostWithSdk(accessToken, refreshToken, contentUri);
+  if (sdkResult) {
+    return sdkResult;
+  }
 
+  // Step 4: Fall back to GraphQL with access token
   try {
-    // Attempt gasless post via Momoka (requires Lens Profile Manager enabled)
-    const result = await lensGql<{
-      postOnMomoka:
-        | { id: string; momokaId: string }
-        | { reason: string };
-    }>(POST_ON_MOMOKA, { request: { contentURI } }, accessToken);
+    return await postViaGraphQL(accessToken, contentUri);
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
 
-    const momoka = result.postOnMomoka;
-
-    if ('reason' in momoka) {
-      throw new Error(`Momoka relay error: ${momoka.reason}`);
+    // If the error looks like an auth issue, try refreshing the token
+    if (
+      errMsg.includes('UNAUTHENTICATED') ||
+      errMsg.includes('expired') ||
+      errMsg.includes('unauthorized')
+    ) {
+      throw new Error(`TOKEN_EXPIRED:${refreshToken}`);
     }
 
-    const postId = momoka.id;
-    // Lens post URLs follow the pattern: https://hey.xyz/posts/<id>
-    const postUrl = `https://hey.xyz/posts/${postId}`;
-
-    return { postId, postUrl };
-  } catch (momokaErr) {
-    // Momoka failed — try onchain typed-data path as fallback.
-    // This requires the frontend to sign the typed data, which we can't do
-    // server-side without the user's wallet. Log and rethrow.
-    console.error('[lens] Momoka post failed, onchain path requires client-side signing:', momokaErr);
-    throw momokaErr;
+    throw err;
   }
 }
 
 /**
- * Refresh an expired Lens access token using a refresh token.
+ * Refresh an expired Lens V3 access token using a refresh token.
  *
  * @returns New access + refresh token pair
  */
@@ -214,7 +275,11 @@ export async function refreshLensToken(refreshToken: string): Promise<{
 }> {
   const result = await lensGql<{
     refresh: { accessToken: string; refreshToken: string };
-  }>(REFRESH_MUTATION, { request: { refreshToken } });
+  }>(
+    REFRESH_MUTATION,
+    { request: { refreshToken } },
+    '', // No auth header needed for refresh
+  );
 
   return result.refresh;
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
+import { LensConnect } from '@/components/settings/LensConnect';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -29,13 +30,6 @@ function BlueskyIcon({ className }: { className?: string }) {
   );
 }
 
-function LensIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 3a3.5 3.5 0 013.5 3.5c0 1.655-1.156 3.042-2.702 3.393a.75.75 0 00-.548.548C11.9 14.087 10.513 15.243 8.858 15.243A3.5 3.5 0 015.358 11.743c0-1.655 1.156-3.042 2.702-3.393a.75.75 0 00.548-.548C8.958 6.156 10.345 5 12 5zm4.5 6.5a2 2 0 11-4 0 2 2 0 014 0z" />
-    </svg>
-  );
-}
 
 function HiveIcon({ className }: { className?: string }) {
   return (
@@ -268,52 +262,7 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
     setStatus((prev) => ({ ...prev, bluesky_handle: null }));
   }, []);
 
-  // ── Lens handlers (wallet lookup — no signing needed) ──
-
-  const { address: walletAddress } = useAccount();
-  const [lensConnecting, setLensConnecting] = useState(false);
-  const [lensError, setLensError] = useState<string | null>(null);
-  const [lensMessage, setLensMessage] = useState<string | null>(null);
-
-  const connectLensWithWallet = useCallback(async () => {
-    if (!walletAddress) {
-      setLensError('Connect your wallet first');
-      return;
-    }
-    setLensConnecting(true);
-    setLensError(null);
-    setLensMessage(null);
-    try {
-      const res = await fetch('/api/platforms/lens', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: walletAddress }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to connect');
-
-      if (json.handle) {
-        setStatus((prev) => ({ ...prev, lens_profile_id: json.handle }));
-      } else {
-        setStatus((prev) => ({ ...prev, lens_profile_id: `wallet:${walletAddress.slice(0, 10)}...` }));
-        setLensMessage(json.message || 'No Lens profile found — create one at hey.xyz');
-      }
-    } catch (err) {
-      setLensError(err instanceof Error ? err.message : 'Failed to connect Lens');
-    } finally {
-      setLensConnecting(false);
-    }
-  }, [walletAddress]);
-
-  const connectLens = useCallback(async () => {
-    await connectLensWithWallet();
-  }, [connectLensWithWallet]);
-
-  const disconnectLens = useCallback(async () => {
-    const res = await fetch('/api/platforms/lens', { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to disconnect');
-    setStatus((prev) => ({ ...prev, lens_profile_id: null }));
-  }, []);
+  // Lens auth is handled by the <LensConnect> component
 
   // ── Hive handlers ───────────────────────────────────
 
@@ -377,55 +326,11 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
           ]}
         />
 
-        {/* Lens Protocol — wallet-based auth */}
-        <div className="rounded-xl border border-white/[0.06] bg-[#0d1b2a] p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-900/30 flex items-center justify-center">
-                <LensIcon className="w-4 h-4 text-green-400" />
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-white">Lens Protocol</h3>
-                {status.lens_profile_id ? (
-                  <p className="text-xs text-green-400 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                    Connected as {status.lens_profile_id}
-                  </p>
-                ) : (
-                  <p className="text-xs text-gray-500 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-600" />
-                    Not connected
-                  </p>
-                )}
-              </div>
-            </div>
-            {status.lens_profile_id ? (
-              <button
-                onClick={disconnectLens}
-                className="text-xs text-red-400 hover:text-red-300 px-3 py-1 rounded-lg border border-red-400/20 hover:border-red-400/40 transition-colors"
-              >
-                Disconnect
-              </button>
-            ) : (
-              <button
-                onClick={connectLensWithWallet}
-                disabled={lensConnecting || !walletAddress}
-                className="text-xs text-green-400 hover:text-green-300 px-3 py-1 rounded-lg border border-green-400/20 hover:border-green-400/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {lensConnecting ? 'Looking up...' : 'Connect with Wallet'}
-              </button>
-            )}
-          </div>
-          {!walletAddress && !status.lens_profile_id && (
-            <p className="text-xs text-gray-500">Connect your wallet above to link Lens</p>
-          )}
-          {lensError && (
-            <p className="text-xs text-red-400 mt-2">{lensError}</p>
-          )}
-          {lensMessage && (
-            <p className="text-xs text-amber-400 mt-2">{lensMessage}</p>
-          )}
-        </div>
+        {/* Lens Protocol — V3 wallet-based auth with signless */}
+        <LensConnect
+          initialHandle={status.lens_profile_id}
+          onStatusChange={(handle) => setStatus((prev) => ({ ...prev, lens_profile_id: handle }))}
+        />
 
         {/* Hive / InLeo */}
         <PlatformCard

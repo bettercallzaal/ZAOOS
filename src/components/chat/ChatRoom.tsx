@@ -222,8 +222,13 @@ export function ChatRoom() {
 
   useKeyboardShortcuts(shortcutHandlers);
 
-  // Stop music when switching channels
+  // Stop music when switching channels (but not on initial mount)
+  const channelMountedRef = useRef(false);
   useEffect(() => {
+    if (!channelMountedRef.current) {
+      channelMountedRef.current = true;
+      return;
+    }
     player.stop();
   }, [activeChannel]); // eslint-disable-line react-hooks/exhaustive-deps
 

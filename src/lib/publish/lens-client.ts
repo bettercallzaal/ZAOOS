@@ -1,26 +1,6 @@
-// src/lib/publish/lens-client.ts
-import { PublicClient, mainnet, testnet } from "@lens-protocol/client";
+// Lens Protocol client — STUB until @lens-protocol packages are installed (Sprint 7).
+// See docs/superpowers/specs/2026-03-23-cross-platform-distribution-design.md
 
-const LENS_APP_ADDRESS = process.env.NEXT_PUBLIC_LENS_APP_ADDRESS
-  || "0x8A5Cc31180c37078e1EbA2A23c861Acf351a97cE";
-
-let clientInstance: ReturnType<typeof PublicClient.create> | null = null;
-
-/**
- * Get or create the Lens V3 PublicClient.
- * Uses mainnet by default. Pass testnet for development.
- */
-export function getLensClient(env: 'mainnet' | 'testnet' = 'mainnet') {
-  if (clientInstance) return clientInstance;
-
-  clientInstance = PublicClient.create({
-    environment: env === 'testnet' ? testnet : mainnet,
-    origin: "https://zaoos.com",
-  });
-
-  return clientInstance;
-}
-
-export function getLensAppAddress() {
-  return LENS_APP_ADDRESS;
+export function getLensClient() {
+  throw new Error('Lens integration not yet available — Sprint 7');
 }

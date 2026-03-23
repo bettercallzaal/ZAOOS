@@ -15,7 +15,7 @@ const ICON_MAP: Record<string, string> = {
 
 // Direct ZABAL-specific URLs
 const ZABAL_URLS: Record<string, string> = {
-  'SongJam': 'https://songjam.space/zabal',
+  'SongJam': '/spaces',
   'Empire Builder': 'https://empirebuilder.world/profile/0x7234c36A71ec237c2Ae7698e8916e0735001E9Af',
   'Incented': 'https://incented.co/organizations/zabal',
   'MAGNETIQ': 'https://app.magnetiq.xyz',

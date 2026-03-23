@@ -77,7 +77,7 @@ export const communityConfig = {
     },
     {
       name: 'SongJam',
-      description: 'Mention leaderboard — track who talks about ZABAL across Farcaster.',
+      description: 'Live audio spaces & ZABAL mention leaderboard — host rooms, earn points.',
       url: 'https://songjam.space/zabal',
       icon: 'music',
     },

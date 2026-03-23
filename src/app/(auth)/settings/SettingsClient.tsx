@@ -555,25 +555,61 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     } catch { /* ignore */ }
   };
 
-  // Lens connection state — simple server-side lookup, no SDK
+  // Lens connection state
   const [lensHandle, setLensHandle] = useState(profile?.lens_profile_id || null);
   const [lensConnecting, setLensConnecting] = useState(false);
   const [lensError, setLensError] = useState<string | null>(null);
   const [lensDisconnecting, setLensDisconnecting] = useState(false);
+  const [lensNeedsAuth, setLensNeedsAuth] = useState(false);
 
-  // Use the Lens SDK hook for wallet-based auth (gets posting tokens)
-  const { connect: lensSDKConnect, isConnecting: lensSDKConnecting, error: lensSDKError, connectedHandle: lensSDKHandle } = useLensAuth();
+  // SDK hook for wallet-based auth (gets posting tokens)
+  const { connect: lensSDKConnect, isConnecting: lensSDKConnecting, error: lensSDKError, connectedHandle: lensSDKHandle, walletAddress: lensWalletAddr } = useLensAuth();
 
   // Sync SDK state to local state
   useEffect(() => {
-    if (lensSDKHandle) setLensHandle(lensSDKHandle);
+    if (lensSDKHandle) { setLensHandle(lensSDKHandle); setLensNeedsAuth(false); }
     if (lensSDKError) setLensError(lensSDKError);
   }, [lensSDKHandle, lensSDKError]);
 
   const lensConnect = async () => {
     setLensConnecting(true);
     setLensError(null);
-    // Use the SDK hook which handles wallet signing + token storage
+
+    // If wagmi wallet is available, go straight to SDK auth (gets tokens for posting)
+    if (lensWalletAddr) {
+      await lensSDKConnect();
+      setLensConnecting(false);
+      return;
+    }
+
+    // Fallback: server-side profile lookup (no tokens, just display)
+    try {
+      const wallet = session?.walletAddress;
+      if (!wallet) { setLensError('No wallet connected'); setLensConnecting(false); return; }
+      const res = await fetch('/api/platforms/lens', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      if (data.handle) {
+        setLensHandle(data.handle);
+        setLensNeedsAuth(true); // Profile found but no tokens yet
+        setLensError('Profile found! Connect wallet below to enable posting.');
+      } else {
+        setLensHandle(null);
+        setLensError(data.message || 'No Lens profile found');
+      }
+    } catch (err) {
+      setLensError(err instanceof Error ? err.message : 'Failed to connect');
+    }
+    setLensConnecting(false);
+  };
+
+  const lensAuthorize = async () => {
+    setLensConnecting(true);
+    setLensError(null);
     await lensSDKConnect();
     setLensConnecting(false);
   };
@@ -835,7 +871,25 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             >
               {lensError && (
                 <div className="pb-3">
-                  <p className="text-[10px] text-red-400">{lensError}</p>
+                  <p className="text-[10px] text-amber-400">{lensError}</p>
+                </div>
+              )}
+              {lensNeedsAuth && lensHandle && (
+                <div className="pb-3 space-y-2">
+                  <p className="text-[10px] text-gray-500">Profile found — authorize posting with your wallet:</p>
+                  {lensWalletAddr ? (
+                    <button
+                      onClick={lensAuthorize}
+                      disabled={lensConnecting}
+                      className="text-[10px] px-3 py-1.5 rounded-lg bg-[#f5a623]/10 border border-[#f5a623]/20 text-[#f5a623] font-medium hover:bg-[#f5a623]/20 transition-colors disabled:opacity-50"
+                    >
+                      {lensConnecting ? 'Signing with wallet...' : 'Authorize Posting'}
+                    </button>
+                  ) : (
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-amber-400">Connect your wallet first (RainbowKit button in the Wallet row above), then come back here.</p>
+                    </div>
+                  )}
                 </div>
               )}
               {!lensHandle && !session?.walletAddress && (

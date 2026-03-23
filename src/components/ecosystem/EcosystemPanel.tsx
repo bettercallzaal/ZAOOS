@@ -21,7 +21,7 @@ const ICON_MAP: Record<string, string> = {
 
 // Direct ZABAL-specific URLs for iframe embeds
 const EMBED_URLS: Record<string, string> = {
-  'SongJam': 'https://songjam.space/zabal',
+  'SongJam': '/spaces',
   'Empire Builder': 'https://empirebuilder.world/profile/0x7234c36A71ec237c2Ae7698e8916e0735001E9Af',
   'Incented': 'https://incented.co/organizations/zabal',
   'MAGNETIQ': 'https://app.magnetiq.xyz',
@@ -117,9 +117,9 @@ export default function EcosystemPanel() {
                     src={embedUrl}
                     title={`${partner.name} — ZABAL Integration`}
                     className="w-full h-full border-0"
-                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation-by-user-activation"
+                    sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation-by-user-activation allow-modals"
                     loading="lazy"
-                    allow="clipboard-write"
+                    allow="clipboard-write; microphone; camera; autoplay"
                   />
                 </div>
                 <div className="flex items-center justify-between px-4 py-2 bg-[#0d1b2a] border-t border-gray-800">

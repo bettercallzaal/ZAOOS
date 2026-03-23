@@ -58,6 +58,7 @@ const PRIMARY_TABS = [
 // Secondary pages shown in the "More" dropdown/sheet
 const MORE_ITEMS = [
   { label: 'Social', href: '/social', icon: '👥' },
+  { label: 'Spaces', href: '/spaces', icon: '🎙️' },
   { label: 'Ecosystem', href: '/ecosystem', icon: '🌐' },
   { label: 'Calls', href: '/calls', icon: '📞' },
   { label: 'WaveWarZ', href: '/wavewarz', icon: '⚔️' },
@@ -67,7 +68,7 @@ const MORE_ITEMS = [
   { label: 'Settings', href: '/settings', icon: '⚙️' },
 ] as const;
 
-const MORE_MATCH_PATHS = ['/ecosystem', '/tools', '/contribute', '/settings', '/social', '/wavewarz', '/directory', '/calls'];
+const MORE_MATCH_PATHS = ['/ecosystem', '/tools', '/contribute', '/settings', '/social', '/spaces', '/wavewarz', '/directory', '/calls'];
 
 export function BottomNav() {
   const pathname = usePathname();

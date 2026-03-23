@@ -155,7 +155,10 @@ export default function GovernancePage() {
   );
 
   const handleCreateProposal = async () => {
-    if (!newTitle.trim() || !newDesc.trim()) return;
+    // Social posts auto-generate title from description
+    if (!newTitle.trim() && newDesc.trim()) setNewTitle(newDesc.trim().slice(0, 100));
+    const effectiveTitle = newTitle.trim() || newDesc.trim().slice(0, 100);
+    if (!effectiveTitle || !newDesc.trim()) return;
     setCreating(true);
     setCreateError('');
     try {
@@ -508,7 +511,7 @@ export default function GovernancePage() {
                 </div>
                 <textarea
                   value={newDesc}
-                  onChange={(e) => { setNewDesc(e.target.value); if (!newTitle) setNewTitle(e.target.value.slice(0, 100)); }}
+                  onChange={(e) => setNewDesc(e.target.value)}
                   placeholder="What's on your mind?"
                   rows={3}
                   maxLength={2000}
@@ -518,10 +521,7 @@ export default function GovernancePage() {
                   <p className="text-xs text-red-400">{createError}</p>
                 )}
                 <button
-                  onClick={() => {
-                    if (!newTitle.trim()) setNewTitle(newDesc.trim().slice(0, 100));
-                    handleCreateProposal();
-                  }}
+                  onClick={handleCreateProposal}
                   disabled={creating || !newDesc.trim()}
                   className="w-full bg-pink-500/20 text-pink-400 text-sm font-medium py-2.5 rounded-lg hover:bg-pink-500/30 disabled:opacity-50 transition-colors border border-pink-500/30"
                 >
@@ -653,7 +653,13 @@ export default function GovernancePage() {
                             {PROPOSAL_CATEGORY_LABELS[proposal.category as ProposalCategory] || proposal.category}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-400 line-clamp-3">{proposal.description}</p>
+                        <p className="text-xs text-gray-400 line-clamp-3">
+                          {proposal.description.split(/(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g).map((part, i) =>
+                            /^https?:\/\//.test(part) ? (
+                              <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-[#f5a623] hover:underline break-all">{part}</a>
+                            ) : part
+                          )}
+                        </p>
 
                         {/* Author + meta */}
                         {/* Deadline display */}

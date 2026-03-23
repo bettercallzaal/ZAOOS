@@ -112,14 +112,16 @@ export function ProposalsTab() {
   }, [loadProposals]);
 
   const handleCreate = async () => {
-    if (!title.trim() || !description.trim()) return;
+    // Social posts auto-generate title from description
+    const effectiveTitle = title.trim() || description.trim().slice(0, 100);
+    if (!effectiveTitle || !description.trim()) return;
     setSubmitting(true);
     setError(null);
     try {
       const res = await fetch('/api/proposals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), description: description.trim(), category }),
+        body: JSON.stringify({ title: effectiveTitle, description: description.trim(), category }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -218,14 +220,14 @@ export function ProposalsTab() {
           <textarea
             placeholder="What's on your mind?"
             value={description}
-            onChange={e => { setDescription(e.target.value); if (!title) setTitle(e.target.value.slice(0, 100)); }}
+            onChange={e => setDescription(e.target.value)}
             rows={3}
             maxLength={2000}
             className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-pink-400/50 focus:outline-none resize-none"
           />
           {error && <p className="text-xs text-red-400">{error}</p>}
           <button
-            onClick={() => { if (!title.trim()) setTitle(description.trim().slice(0, 100)); handleCreate(); }}
+            onClick={handleCreate}
             disabled={submitting || !description.trim()}
             className="w-full bg-pink-500/20 text-pink-400 text-sm font-medium py-2.5 rounded-lg hover:bg-pink-500/30 disabled:opacity-50 transition-colors border border-pink-500/30"
           >
@@ -522,7 +524,13 @@ function ProposalCard({
           {/* Full description */}
           <div className="mt-3">
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Description</p>
-            <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">{p.description}</p>
+            <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+              {p.description.split(/(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g).map((part, i) =>
+                /^https?:\/\//.test(part) ? (
+                  <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-[#f5a623] hover:underline break-all">{part}</a>
+                ) : part
+              )}
+            </p>
           </div>
 
           {/* Detailed vote bar with threshold */}

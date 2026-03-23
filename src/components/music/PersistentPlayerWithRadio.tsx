@@ -1,11 +1,11 @@
 'use client';
 
-import { useRadio } from '@/hooks/useRadio';
+import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { PersistentPlayer } from './PersistentPlayer';
 
 /**
- * Client wrapper that connects PersistentPlayer to the radio hook
- * for prev/next track navigation across all authenticated pages.
+ * Client wrapper that connects PersistentPlayer prev/next to the
+ * shared radio context. Auto-advance is handled in RadioProvider.
  */
 export function PersistentPlayerWithRadio() {
   const radio = useRadio();

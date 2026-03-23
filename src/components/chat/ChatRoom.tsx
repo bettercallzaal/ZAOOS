@@ -23,7 +23,7 @@ import { NewConversationDialog } from '@/components/messages/NewConversationDial
 const GlobalPlayer = dynamic(() => import('@/components/music/GlobalPlayer').then(m => ({ default: m.GlobalPlayer })), { ssr: false });
 const MusicSidebar = dynamic(() => import('@/components/music/MusicSidebar').then(m => ({ default: m.MusicSidebar })), { ssr: false });
 import { useMusicQueue } from '@/hooks/useMusicQueue';
-import { useRadio } from '@/hooks/useRadio';
+import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { RadioButton } from '@/components/music/RadioButton';
 import { FeedFilters, filterAndSortCasts, ContentFilter, SortMode } from './FeedFilters';
 import { NotificationBell } from '@/components/navigation/NotificationBell';

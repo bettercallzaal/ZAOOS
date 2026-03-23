@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/useAuth';
 import { useListeningRoom } from '@/hooks/useListeningRoom';
-import { useRadio } from '@/hooks/useRadio';
+import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { usePlayer } from '@/providers/audio';
 import type { ListenerInfo } from '@/hooks/useListeningRoom';
 

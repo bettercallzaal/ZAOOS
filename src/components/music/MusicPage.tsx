@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePlayer } from '@/providers/audio';
-import { useRadio } from '@/hooks/useRadio';
+import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { communityConfig } from '@/../community.config';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 
@@ -72,16 +72,8 @@ export function MusicPage() {
   const player = usePlayer();
   const radio = useRadio();
 
-  // ── Auto-advance radio tracks when a song ends ───────────────────────
-  const nextTrackRef = useRef(radio.nextRadioTrack);
-  nextTrackRef.current = radio.nextRadioTrack;
-
-  useEffect(() => {
-    if (radio.isRadioMode) {
-      player.setOnEnded?.(() => nextTrackRef.current());
-      return () => player.setOnEnded?.(null);
-    }
-  }, [radio.isRadioMode, player]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Auto-advance is handled in PersistentPlayerWithRadio (layout level)
+  // so it works across ALL pages, not just /music
 
   // ── Fetch submissions ────────────────────────────────────────────────
   useEffect(() => {

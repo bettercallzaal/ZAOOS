@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { usePlayer } from '@/providers/audio';
-import { useRadio } from '@/hooks/useRadio';
+import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { communityConfig } from '@/../community.config';
 import { NowPlayingHeroSkeleton } from '@/components/music/MusicSkeletons';
 

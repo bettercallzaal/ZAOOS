@@ -101,6 +101,7 @@ type PlayerContextValue = {
   controllers: MutableRefObject<Partial<Record<TrackType, AudioController>>>;
   registerController: (type: TrackType, controller: AudioController) => void;
   onEndedRef: MutableRefObject<(() => void) | null>;
+  pendingSeekRef: MutableRefObject<number | null>;
   restoredTrack: RestoredTrack;
   clearRestoredTrack: () => void;
 };
@@ -139,6 +140,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   });
   const controllers = useRef<Partial<Record<TrackType, AudioController>>>({});
   const onEndedRef = useRef<(() => void) | null>(null);
+  const pendingSeekRef = useRef<number | null>(null);
 
   // Restored track info — shown in UI but not loaded into audio until user taps play
   const [restoredTrack, setRestoredTrack] = useState<{
@@ -178,14 +180,24 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const clearRestoredTrack = useCallback(() => setRestoredTrack(null), []);
 
   // Clear restored track when actual playback starts
+  // Seek to pending position when track becomes playing
   useEffect(() => {
     if (state.status === 'loading' || state.status === 'playing') {
       setRestoredTrack(null);
     }
-  }, [state.status]);
+    if (state.status === 'playing' && pendingSeekRef.current !== null && state.metadata) {
+      const seekTo = pendingSeekRef.current;
+      pendingSeekRef.current = null;
+      const controller = controllers.current[state.metadata.type];
+      if (controller?.seek) {
+        // Small delay to ensure audio is ready for seeking
+        setTimeout(() => controller.seek(seekTo), 200);
+      }
+    }
+  }, [state.status, state.metadata]);
 
   const value = useMemo(
-    () => ({ state, dispatch, controllers, registerController, onEndedRef, restoredTrack, clearRestoredTrack }),
+    () => ({ state, dispatch, controllers, registerController, onEndedRef, pendingSeekRef, restoredTrack, clearRestoredTrack }),
     [state, registerController, restoredTrack, clearRestoredTrack],
   );
 
@@ -205,7 +217,7 @@ export function usePlayerContext() {
 }
 
 export function usePlayer() {
-  const { state, dispatch, controllers, onEndedRef, restoredTrack, clearRestoredTrack } = usePlayerContext();
+  const { state, dispatch, controllers, onEndedRef, pendingSeekRef, restoredTrack, clearRestoredTrack } = usePlayerContext();
 
   const getController = () =>
     state.metadata ? (controllers.current[state.metadata.type] ?? null) : null;
@@ -270,9 +282,13 @@ export function usePlayer() {
     restoredTrack,
     clearRestoredTrack,
 
-    /** Resume the restored track — does a full play() which loads the audio */
+    /** Resume the restored track — loads audio and seeks to saved position */
     resumeRestored: () => {
       if (!restoredTrack) return;
+      // Set pending seek so when track reaches 'playing' state it seeks to saved position
+      if (restoredTrack.position > 0) {
+        pendingSeekRef.current = restoredTrack.position;
+      }
       dispatch({ type: 'PLAY', payload: restoredTrack.metadata });
       const controller = controllers.current[restoredTrack.metadata.type];
       if (controller?.load) {

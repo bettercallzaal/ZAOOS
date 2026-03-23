@@ -814,7 +814,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 ) : (
                   <button
                     onClick={lensConnect}
-                    disabled={lensConnecting || !lensWalletAddress}
+                    disabled={lensConnecting || (!lensWalletAddress && !session?.walletAddress)}
                     className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors disabled:opacity-50"
                   >
                     {lensConnecting ? 'Signing...' : 'Connect with Wallet'}
@@ -827,7 +827,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   <p className="text-[10px] text-red-400">{lensError}</p>
                 </div>
               )}
-              {!lensHandle && !lensWalletAddress && (
+              {!lensHandle && !lensWalletAddress && !session?.walletAddress && (
                 <div className="pb-3">
                   <p className="text-[10px] text-gray-600">Connect your wallet above to link Lens</p>
                 </div>

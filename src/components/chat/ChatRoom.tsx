@@ -161,7 +161,7 @@ export function ChatRoom() {
   const hasSigner = !!user.signerUuid;
 
   return (
-    <div className="flex h-[100dvh] pb-28 md:pb-0 md:h-[calc(100dvh-2.5rem)] bg-[#0a1628] text-white overflow-hidden">
+    <div className="flex h-[calc(100dvh-7.5rem)] md:h-[calc(100dvh-2.5rem)] bg-[#0a1628] text-white overflow-hidden">
       {/* Action error toast (DM/group creation) */}
       {xmtp.actionError && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[80] max-w-sm w-full mx-4">

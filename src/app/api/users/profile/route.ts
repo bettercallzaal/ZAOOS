@@ -22,7 +22,7 @@ export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from('users')
-      .select('display_name, bio, ign, real_name')
+      .select('display_name, bio, ign, real_name, bluesky_handle, lens_profile_id, hive_username, publishing_prefs')
       .eq('fid', session.fid)
       .eq('is_active', true)
       .maybeSingle();
@@ -34,6 +34,10 @@ export async function GET() {
       bio: data?.bio || '',
       ign: data?.ign || '',
       real_name: data?.real_name || '',
+      bluesky_handle: data?.bluesky_handle || null,
+      lens_profile_id: data?.lens_profile_id || null,
+      hive_username: data?.hive_username || null,
+      publishing_prefs: data?.publishing_prefs || null,
     });
   } catch (err) {
     console.error('[users/profile] GET error:', err);

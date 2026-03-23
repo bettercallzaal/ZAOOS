@@ -275,13 +275,11 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         profileId: data.profileId,
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
       }),
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || 'Failed to connect Lens');
-    setStatus((prev) => ({ ...prev, lens_profile_id: json.profileId }));
+    setStatus((prev) => ({ ...prev, lens_profile_id: data.profileId }));
   }, []);
 
   const disconnectLens = useCallback(async () => {
@@ -364,21 +362,9 @@ export function ConnectedPlatforms({ isAdmin, initialStatus }: ConnectedPlatform
           connectFields={[
             {
               key: 'profileId',
-              label: 'Profile ID',
-              placeholder: '0x01',
-            },
-            {
-              key: 'accessToken',
-              label: 'Access Token',
-              placeholder: 'eyJ...',
-              type: 'password',
-            },
-            {
-              key: 'refreshToken',
-              label: 'Refresh Token',
-              placeholder: 'eyJ...',
-              type: 'password',
-              helpText: 'Wallet-based OAuth coming soon',
+              label: 'Lens Handle or Profile ID',
+              placeholder: 'yourname.lens or 0x01',
+              helpText: 'Enter your Lens handle — we\'ll look up your profile',
             },
           ]}
         />

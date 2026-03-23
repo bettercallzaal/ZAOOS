@@ -94,60 +94,44 @@ function PlatformPill({
     );
   }
 
-  // Not connected: gray, shows tooltip-style info
-  if (!connected) {
-    return (
-      <div className="relative group flex-shrink-0">
-        <button
-          type="button"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-gray-700 text-gray-500 cursor-default"
-          aria-label={`${name} - Not connected`}
-          tabIndex={0}
-        >
-          {name}
-        </button>
-        {/* Tooltip */}
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus-within:block z-10">
-          <div className="bg-[#1a2a3a] border border-gray-700 rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg">
-            <p className="text-gray-400 mb-1">Not connected</p>
-            <a
-              href="/settings"
-              className="text-[#f5a623] hover:underline"
-            >
-              Connect in Settings &rarr;
-            </a>
-          </div>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2 h-2 bg-[#1a2a3a] border-r border-b border-gray-700 rotate-45" />
-        </div>
-      </div>
-    );
-  }
-
-  // Connected: toggleable
+  // All non-always-on platforms are toggleable (connected or not)
   return (
-    <button
-      type="button"
-      onClick={() => onToggle(id)}
-      className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
-      style={
-        selected
-          ? {
-              borderColor: color,
-              backgroundColor: `${color}15`,
-              color: color,
-            }
-          : {
-              borderColor: '#374151',
-              backgroundColor: 'transparent',
-              color: '#9CA3AF',
-            }
-      }
-      aria-label={`${selected ? 'Deselect' : 'Select'} ${name}`}
-      aria-pressed={selected}
-    >
-      {selected && <CheckIcon />}
-      {name}
-    </button>
+    <div className="relative group flex-shrink-0">
+      <button
+        type="button"
+        onClick={() => onToggle(id)}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
+        style={
+          selected
+            ? {
+                borderColor: color,
+                backgroundColor: `${color}15`,
+                color: color,
+              }
+            : {
+                borderColor: '#374151',
+                backgroundColor: 'transparent',
+                color: '#9CA3AF',
+              }
+        }
+        aria-label={`${selected ? 'Deselect' : 'Select'} ${name}`}
+        aria-pressed={selected}
+      >
+        {selected && <CheckIcon />}
+        {name}
+        {!connected && selected && (
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Not connected yet" />
+        )}
+      </button>
+      {/* Tooltip for unconnected platforms */}
+      {!connected && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus-within:block z-10 pointer-events-none">
+          <div className="bg-[#1a2a3a] border border-gray-700 rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg">
+            <p className="text-gray-400">Connect in <a href="/settings" className="text-[#f5a623] hover:underline pointer-events-auto">Settings</a></p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

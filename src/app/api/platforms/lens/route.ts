@@ -4,9 +4,9 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
 const connectSchema = z.object({
-  profileId: z.string().min(1, 'profileId is required'),
-  accessToken: z.string().min(1, 'accessToken is required'),
-  refreshToken: z.string().min(1, 'refreshToken is required'),
+  profileId: z.string().min(1, 'Profile ID or handle is required'),
+  accessToken: z.string().optional(),
+  refreshToken: z.string().optional(),
 });
 
 /**
@@ -39,13 +39,14 @@ export async function POST(req: NextRequest) {
   const { profileId, accessToken, refreshToken } = parsed.data;
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateData: any = { lens_profile_id: profileId };
+    if (accessToken) updateData.lens_access_token = accessToken;
+    if (refreshToken) updateData.lens_refresh_token = refreshToken;
+
     const { error } = await supabaseAdmin
       .from('users')
-      .update({
-        lens_profile_id: profileId,
-        lens_access_token: accessToken,
-        lens_refresh_token: refreshToken,
-      })
+      .update(updateData)
       .eq('fid', session.fid);
 
     if (error) {

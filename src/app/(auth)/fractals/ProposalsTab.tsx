@@ -178,19 +178,64 @@ export function ProposalsTab() {
         </div>
       )}
 
-      {/* Create Proposal Button */}
-      <button
-        onClick={() => setShowCreate(!showCreate)}
-        className="w-full flex items-center justify-center gap-2 bg-[#f5a623]/10 border border-[#f5a623]/30 rounded-xl px-4 py-3 hover:bg-[#f5a623]/20 transition-colors text-[#f5a623] text-sm font-medium"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-        Create Proposal
-      </button>
+      {/* Create Proposal / Social Post toggle */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => { setShowCreate(showCreate && category !== 'social' ? false : true); setCategory('general'); }}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-3 transition-colors text-sm font-medium ${
+            showCreate && category !== 'social'
+              ? 'bg-gray-700 text-gray-300'
+              : 'bg-[#f5a623]/10 border border-[#f5a623]/30 hover:bg-[#f5a623]/20 text-[#f5a623]'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          {showCreate && category !== 'social' ? 'Cancel' : 'Proposal'}
+        </button>
+        <button
+          onClick={() => { setShowCreate(showCreate && category === 'social' ? false : true); setCategory('social'); }}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-xl px-4 py-3 transition-colors text-sm font-medium ${
+            showCreate && category === 'social'
+              ? 'bg-gray-700 text-gray-300'
+              : 'bg-pink-500/10 border border-pink-500/30 hover:bg-pink-500/20 text-pink-400'
+          }`}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+          </svg>
+          {showCreate && category === 'social' ? 'Cancel' : 'Social Post'}
+        </button>
+      </div>
 
-      {/* Create Form */}
-      {showCreate && (
+      {/* Social Post Form */}
+      {showCreate && category === 'social' && (
+        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-pink-500/20 space-y-3">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400">Social</span>
+            <span className="text-[11px] text-gray-500">Share a thought, link, or update</span>
+          </div>
+          <textarea
+            placeholder="What's on your mind?"
+            value={description}
+            onChange={e => { setDescription(e.target.value); if (!title) setTitle(e.target.value.slice(0, 100)); }}
+            rows={3}
+            maxLength={2000}
+            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-pink-400/50 focus:outline-none resize-none"
+          />
+          {error && <p className="text-xs text-red-400">{error}</p>}
+          <button
+            onClick={() => { if (!title.trim()) setTitle(description.trim().slice(0, 100)); handleCreate(); }}
+            disabled={submitting || !description.trim()}
+            className="w-full bg-pink-500/20 text-pink-400 text-sm font-medium py-2.5 rounded-lg hover:bg-pink-500/30 disabled:opacity-50 transition-colors border border-pink-500/30"
+          >
+            {submitting ? 'Posting...' : 'Post'}
+          </button>
+        </div>
+      )}
+
+      {/* Proposal Create Form */}
+      {showCreate && category !== 'social' && (
         <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-3">
           <input
             type="text"
@@ -211,7 +256,7 @@ export function ProposalsTab() {
             onChange={e => setCategory(e.target.value)}
             className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none"
           >
-            {PROPOSAL_CATEGORIES.map((cat) => (
+            {PROPOSAL_CATEGORIES.filter(c => c !== 'social').map((cat) => (
               <option key={cat} value={cat}>{PROPOSAL_CATEGORY_LABELS[cat]}</option>
             ))}
           </select>

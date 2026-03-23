@@ -207,7 +207,7 @@ describe('proposalCommentSchema', () => {
 });
 
 describe('proposalCategorySchema', () => {
-  const validCategories = ['general', 'treasury', 'governance', 'technical', 'community'];
+  const validCategories = ['general', 'technical', 'community', 'governance', 'treasury', 'wavewarz', 'social'];
 
   it.each(validCategories)('accepts "%s"', (cat) => {
     const result = proposalCategorySchema.safeParse(cat);
@@ -216,6 +216,11 @@ describe('proposalCategorySchema', () => {
 
   it('rejects unknown category', () => {
     const result = proposalCategorySchema.safeParse('art');
+    expect(result.success).toBe(false);
+  });
+
+  it.each(['funding', 'music'])('rejects removed category: %s', (cat) => {
+    const result = proposalCategorySchema.safeParse(cat);
     expect(result.success).toBe(false);
   });
 });

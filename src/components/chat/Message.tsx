@@ -6,6 +6,7 @@ import { Cast, CastEmbed, QuotedCastData } from '@/types';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { MusicEmbed } from '@/components/music/MusicEmbed';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
+import { OGBadge } from '@/components/badges/OGBadge';
 
 interface MessageProps {
   cast: Cast;
@@ -270,13 +271,14 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
             <span className="text-[10px] text-gray-600">reply</span>
           </div>
         )}
-        <div className="flex items-baseline gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => onOpenProfile?.(cast.author.fid)}
             className="font-medium text-sm text-white hover:text-[#f5a623] transition-colors cursor-pointer"
           >
             {cast.author.display_name || cast.author.username}
           </button>
+          <OGBadge zid={cast.author.zid} />
           <span className="text-xs text-gray-500">{timeAgo(cast.timestamp)}</span>
         </div>
         <p className="text-sm text-gray-300 break-words whitespace-pre-wrap">{cast.text}</p>

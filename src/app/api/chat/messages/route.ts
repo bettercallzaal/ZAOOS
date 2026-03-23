@@ -183,7 +183,25 @@ export async function GET(req: NextRequest) {
 
     const visibleCasts = casts.filter((c) => !hiddenHashes.has(c.hash));
 
-    return NextResponse.json({ casts: visibleCasts, hasMore });
+    // ── Enrich authors with ZID (for OG badge) ───────────────────────────────
+    const authorFids = [...new Set(visibleCasts.map((c) => c.author.fid))];
+    let zidMap = new Map<number, number>();
+    if (authorFids.length > 0) {
+      const { data: zidRows } = await supabaseAdmin
+        .from('users')
+        .select('fid, zid')
+        .in('fid', authorFids)
+        .not('zid', 'is', null);
+      if (zidRows) {
+        zidMap = new Map(zidRows.map((r: { fid: number; zid: number }) => [r.fid, r.zid]));
+      }
+    }
+    const enrichedCasts = visibleCasts.map((c) => ({
+      ...c,
+      author: { ...c.author, zid: zidMap.get(c.author.fid) ?? null },
+    }));
+
+    return NextResponse.json({ casts: enrichedCasts, hasMore });
   } catch (error) {
     console.error('[messages] error:', error);
     return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });

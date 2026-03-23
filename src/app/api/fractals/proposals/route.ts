@@ -13,6 +13,7 @@ export async function GET() {
   try {
     const res = await fetch(`${ORNODE_URL}/proposals?limit=20`, {
       next: { revalidate: 60 },
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!res.ok) {

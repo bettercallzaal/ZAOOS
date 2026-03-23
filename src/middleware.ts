@@ -30,6 +30,15 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/upload')) {
     return { limit: 10, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/fractals/webhook')) {
+    return { limit: 30, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/fractals')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/discord')) {
+    return { limit: 5, windowMs: MINUTE };
+  }
   if (pathname.startsWith('/api/chat/schedule')) {
     return { limit: 20, windowMs: MINUTE };
   }
@@ -78,6 +87,12 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/miniapp')) {
     return { limit: 10, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/wavewarz')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/directory')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
   if (pathname.startsWith('/api/bluesky')) {
     return { limit: 5, windowMs: MINUTE };
   }
@@ -94,7 +109,7 @@ function generateNonce(): string {
 function buildCspHeader(nonce: string): string {
   const directives = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval' https://neynarxyz.github.io https://api.neynar.com https://open.spotify.com https://www.youtube.com https://w.soundcloud.com`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://neynarxyz.github.io https://api.neynar.com https://open.spotify.com https://www.youtube.com https://w.soundcloud.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https: http:",
     "media-src 'self' blob: https:",

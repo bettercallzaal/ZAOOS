@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import HatBadge from '@/components/hats/HatBadge';
+import { OGBadge } from '@/components/badges/OGBadge';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 
 interface ProfileData {
@@ -222,6 +223,12 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                       ZAO
                     </span>
                   )}
+                  {enriched?.zid && (
+                    <span className="px-2 py-0.5 bg-[#f5a623] text-[#0a1628] text-[10px] font-bold rounded-full tracking-wide">
+                      ZID #{enriched.zid}
+                    </span>
+                  )}
+                  <OGBadge zid={enriched?.zid ? Number(enriched.zid) : null} />
                 </div>
                 <p className="text-sm text-gray-500 mt-0.5">@{profile.username}</p>
                 {profile.zaoName && profile.zaoName !== profile.displayName && (
@@ -384,12 +391,6 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                     <p className="text-[10px] text-gray-500 mt-0.5">Votes</p>
                   </div>
                 </div>
-                {enriched.zid && (
-                  <div className="mt-2 text-center">
-                    <span className="text-[10px] text-gray-400">ZID: </span>
-                    <span className="text-[10px] text-gray-400 font-mono">{enriched.zid}</span>
-                  </div>
-                )}
               </div>
             ) : null}
 

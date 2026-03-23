@@ -17,15 +17,24 @@ export async function GET(req: NextRequest) {
   }
 
   const status = req.nextUrl.searchParams.get('status');
+  const category = req.nextUrl.searchParams.get('category');
   const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50', 10), 100);
   const offset = Math.max(parseInt(req.nextUrl.searchParams.get('offset') || '0', 10), 0);
+
+  // Look up current user's internal ID for matching their votes
+  const { data: currentUser } = await supabaseAdmin
+    .from('users')
+    .select('id')
+    .eq('fid', session.fid)
+    .single();
+  const currentUserId = currentUser?.id ?? null;
 
   let query = supabaseAdmin
     .from('proposals')
     .select(`
       *,
       author:users!proposals_author_id_fkey(display_name, username, pfp_url, fid, zid),
-      votes:proposal_votes(vote, respect_weight),
+      votes:proposal_votes(vote, respect_weight, voter_id),
       comment_count:proposal_comments(count)
     `, { count: 'exact' })
     .order('created_at', { ascending: false })
@@ -33,6 +42,9 @@ export async function GET(req: NextRequest) {
 
   if (status) {
     query = query.eq('status', status);
+  }
+  if (category) {
+    query = query.eq('category', category);
   }
 
   const { data, error, count: totalCount } = await query;
@@ -66,6 +78,9 @@ export async function GET(req: NextRequest) {
         totalWeight: votes.reduce((s: number, v: { respect_weight: number }) => s + v.respect_weight, 0),
       },
       commentCount: p.comment_count?.[0]?.count || 0,
+      user_vote: currentUserId
+        ? (votes.find((v: { voter_id: string }) => v.voter_id === currentUserId)?.vote ?? null)
+        : null,
       publish_text: p.publish_text || null,
       published_cast_hash: p.published_cast_hash || null,
       published_bluesky_uri: p.published_bluesky_uri || null,
@@ -163,6 +178,18 @@ export async function POST(req: NextRequest) {
 }
 
 /**
+ * Valid status transitions for proposals.
+ * Key = current status, Value = set of statuses it can transition to.
+ */
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  open: ['approved', 'rejected', 'completed'],
+  approved: ['completed', 'open'],
+  rejected: ['open'],
+  completed: ['open'],
+  published: ['completed', 'open'],
+};
+
+/**
  * PATCH — Update proposal status (admin only)
  * Body: { id: uuid, status: 'open' | 'approved' | 'rejected' | 'completed' }
  */
@@ -182,6 +209,25 @@ export async function PATCH(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    // Fetch current proposal to validate transition
+    const { data: current } = await supabaseAdmin
+      .from('proposals')
+      .select('status')
+      .eq('id', parsed.data.id)
+      .single();
+
+    if (!current) {
+      return NextResponse.json({ error: 'Proposal not found' }, { status: 404 });
+    }
+
+    const allowed = VALID_TRANSITIONS[current.status] || [];
+    if (!allowed.includes(parsed.data.status)) {
+      return NextResponse.json(
+        { error: `Cannot transition from "${current.status}" to "${parsed.data.status}"` },
         { status: 400 }
       );
     }

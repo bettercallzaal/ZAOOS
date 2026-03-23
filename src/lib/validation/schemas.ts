@@ -56,17 +56,29 @@ export const removeAllowlistSchema = z.object({
 
 // --- Proposal schemas ---
 
-export const proposalCategorySchema = z.enum([
+export const PROPOSAL_CATEGORIES = [
   'general',
-  'treasury',
-  'governance',
   'technical',
   'community',
-  'funding',
-  'music',
+  'governance',
+  'treasury',
   'wavewarz',
   'social',
-]);
+] as const;
+
+export type ProposalCategory = (typeof PROPOSAL_CATEGORIES)[number];
+
+export const PROPOSAL_CATEGORY_LABELS: Record<ProposalCategory, string> = {
+  general: 'General',
+  technical: 'Technical',
+  community: 'Community',
+  governance: 'Governance',
+  treasury: 'Treasury',
+  wavewarz: 'WaveWarZ',
+  social: 'Social',
+};
+
+export const proposalCategorySchema = z.enum(PROPOSAL_CATEGORIES);
 
 export const createProposalSchema = z.object({
   title: z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or less'),

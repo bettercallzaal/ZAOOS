@@ -23,6 +23,36 @@ export function timeAgo(timestamp: string): string {
 }
 
 /**
+ * Format a future deadline as a countdown string.
+ * Returns "Voting closed" if the date has passed, or a human-readable
+ * remaining time like "2d 5h remaining", "3h remaining", "12m remaining".
+ */
+export function formatTimeRemaining(closesAt: string | Date): string {
+  const deadline = typeof closesAt === 'string' ? new Date(closesAt) : closesAt;
+  const timeLeft = deadline.getTime() - Date.now();
+
+  if (timeLeft <= 0) return 'Voting closed';
+
+  const minutes = Math.floor(timeLeft / (1000 * 60));
+  const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+
+  if (days > 0) return `${days}d ${remainingHours}h remaining`;
+  if (hours > 0) return `${hours}h remaining`;
+  return `${Math.max(1, minutes)}m remaining`;
+}
+
+/**
+ * Check if a deadline has passed.
+ */
+export function isDeadlinePassed(closesAt: string | Date | null | undefined): boolean {
+  if (!closesAt) return false;
+  const deadline = typeof closesAt === 'string' ? new Date(closesAt) : closesAt;
+  return deadline.getTime() < Date.now();
+}
+
+/**
  * Format a wallet address as shortened form: 0x1234...5678
  */
 export function shortAddr(addr: string): string {

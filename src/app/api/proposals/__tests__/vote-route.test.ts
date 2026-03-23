@@ -117,6 +117,36 @@ describe('POST /api/proposals/vote', () => {
     expect(body.error).toBe('Proposal is no longer open for voting');
   });
 
+  it('returns warning when vote has zero respect weight', async () => {
+    mockGetSessionData.mockResolvedValue({ fid: 123, displayName: 'Test', pfpUrl: '' });
+
+    let callCount = 0;
+    const chain: Record<string, unknown> = {};
+    chain.select = vi.fn().mockReturnValue(chain);
+    chain.eq = vi.fn().mockReturnValue(chain);
+    chain.upsert = vi.fn().mockReturnValue(chain);
+    chain.single = vi.fn().mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) {
+        // proposal query
+        return Promise.resolve({ data: { status: 'open', closes_at: null }, error: null });
+      }
+      if (callCount === 2) {
+        // user query
+        return Promise.resolve({ data: { id: 'u1', primary_wallet: '0xabc', respect_wallet: null }, error: null });
+      }
+      // upsert vote
+      return Promise.resolve({ data: { id: 'v1', vote: 'for', respect_weight: 0 }, error: null });
+    });
+    mockFrom.mockReturnValue(chain);
+
+    const res = await POST(makeRequest({ proposal_id: validUuid, vote: 'for' }));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.respectWeight).toBe(0);
+    expect(body.warning).toMatch(/zero weight/);
+  });
+
   it('returns 400 when voting period has ended', async () => {
     mockGetSessionData.mockResolvedValue({ fid: 123 });
 

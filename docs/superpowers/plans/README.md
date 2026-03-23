@@ -1,6 +1,8 @@
 # ZAO OS Implementation Plans
 
 > Active sprint plans for current development. Future sprints are in `future-sprints.md`.
+>
+> **Feature status is tracked in the root [README.md](../../../README.md).** These are execution plans — they track implementation steps for dev sessions, not overall feature status.
 
 ## Current Sprints
 

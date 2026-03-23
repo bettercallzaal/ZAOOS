@@ -8,6 +8,9 @@ import { useAuth } from '@/hooks/useAuth';
 import dynamic from 'next/dynamic';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { GeneratePostButton } from '@/components/wavewarz/GeneratePostButton';
+import { PROPOSAL_CATEGORIES, PROPOSAL_CATEGORY_LABELS } from '@/lib/validation/schemas';
+import type { ProposalCategory } from '@/lib/validation/schemas';
+import { formatTimeRemaining, isDeadlinePassed } from '@/lib/format/timeAgo';
 
 const HatTree = dynamic(() => import('@/components/hats/HatTree'), { ssr: false });
 const HatManager = dynamic(() => import('@/components/hats/HatManager'), { ssr: false });
@@ -101,6 +104,7 @@ export default function GovernancePage() {
   const fetchCounterRef = useRef(0);
   const [voting, setVoting] = useState<string | null>(null);
   const [publishToast, setPublishToast] = useState(false);
+  const [voteWarning, setVoteWarning] = useState<string | null>(null);
 
   // Comments expansion state
   const [expandedComments, setExpandedComments] = useState<string | null>(null);
@@ -209,6 +213,11 @@ export default function GovernancePage() {
         setPublishToast(true);
         setTimeout(() => setPublishToast(false), 4000);
       }
+      // Show warning if vote has zero weight
+      if (voteData.warning) {
+        setVoteWarning(voteData.warning);
+        setTimeout(() => setVoteWarning(null), 6000);
+      }
       // Small delay to ensure DB write is committed, then refresh
       await new Promise((r) => setTimeout(r, 500));
       fetchCounterRef.current += 1;
@@ -225,6 +234,13 @@ export default function GovernancePage() {
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#f5a623] text-[#0a1628] text-sm font-medium px-5 py-3 rounded-xl shadow-lg animate-fade-in flex items-center gap-2">
           <span>Published to @thezao!</span>
           <button onClick={() => setPublishToast(false)} className="ml-2 text-[#0a1628]/60 hover:text-[#0a1628]">&times;</button>
+        </div>
+      )}
+      {/* Zero-weight vote warning toast */}
+      {voteWarning && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-600/90 text-white text-sm font-medium px-5 py-3 rounded-xl shadow-lg animate-fade-in flex items-center gap-2 max-w-sm text-center">
+          <span>{voteWarning}</span>
+          <button onClick={() => setVoteWarning(null)} className="ml-2 text-white/60 hover:text-white">&times;</button>
         </div>
       )}
       {/* Header */}
@@ -492,13 +508,9 @@ export default function GovernancePage() {
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2.5 border-0 focus:ring-1 focus:ring-[#f5a623]"
                 >
-                  <option value="general">General</option>
-                  <option value="technical">Technical</option>
-                  <option value="community">Community</option>
-                  <option value="governance">Governance</option>
-                  <option value="treasury">Treasury</option>
-                  <option value="wavewarz">WaveWarZ</option>
-                  <option value="social">Social</option>
+                  {PROPOSAL_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>{PROPOSAL_CATEGORY_LABELS[cat]}</option>
+                  ))}
                 </select>
                 <div className="bg-[#0a1628] rounded-lg p-3 space-y-2">
                   <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-medium">
@@ -586,7 +598,7 @@ export default function GovernancePage() {
                   const forPct = Math.round((proposal.tally.for.weight / totalWeight) * 100);
                   const againstPct = Math.round((proposal.tally.against.weight / totalWeight) * 100);
                   const isVoting = voting === proposal.id;
-                  const isExpired = proposal.closes_at && new Date(proposal.closes_at) < new Date();
+                  const isExpired = isDeadlinePassed(proposal.closes_at);
                   const canVote = proposal.status === 'open' && !isExpired;
 
                   return (
@@ -596,7 +608,7 @@ export default function GovernancePage() {
                         <div className="flex items-start justify-between gap-2 mb-2">
                           <h3 className="text-sm font-medium text-white">{proposal.title}</h3>
                           <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${CATEGORY_COLORS[proposal.category] || CATEGORY_COLORS.general}`}>
-                            {proposal.category}
+                            {PROPOSAL_CATEGORY_LABELS[proposal.category as ProposalCategory] || proposal.category}
                           </span>
                         </div>
                         <p className="text-xs text-gray-400 line-clamp-3">{proposal.description}</p>
@@ -611,15 +623,7 @@ export default function GovernancePage() {
                               </span>
                             ) : (
                               <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#f5a623]/10 text-[#f5a623] font-medium">
-                                {(() => {
-                                  const timeLeft = new Date(proposal.closes_at!).getTime() - Date.now();
-                                  const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
-                                  const daysLeft = Math.floor(hoursLeft / 24);
-                                  const remainingHours = hoursLeft % 24;
-                                  if (daysLeft > 0) return `${daysLeft}d ${remainingHours}h remaining`;
-                                  if (hoursLeft > 0) return `${hoursLeft}h remaining`;
-                                  return `${Math.max(1, Math.floor(timeLeft / (1000 * 60)))}m remaining`;
-                                })()}
+                                {formatTimeRemaining(proposal.closes_at)}
                               </span>
                             )}
                           </div>

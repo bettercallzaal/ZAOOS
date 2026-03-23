@@ -1,6 +1,18 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import { PROPOSAL_CATEGORIES, PROPOSAL_CATEGORY_LABELS } from '@/lib/validation/schemas';
+import type { ProposalCategory } from '@/lib/validation/schemas';
+import { formatTimeRemaining, isDeadlinePassed } from '@/lib/format/timeAgo';
+import { useAuth } from '@/hooks/useAuth';
+
+const ProposalComments = dynamic(
+  () => import('@/components/governance/ProposalComments').then(m => ({ default: m.ProposalComments })),
+  { ssr: false, loading: () => <div className="animate-pulse h-20 bg-gray-800 rounded mt-4" /> }
+);
+
+/* ── Types ──────────────────────────────────────────────────── */
 
 interface Tally {
   for: { count: number; weight: number };
@@ -21,9 +33,47 @@ interface Proposal {
   closes_at: string | null;
   tally: Tally;
   commentCount: number;
+  user_vote: 'for' | 'against' | 'abstain' | null;
+  respect_threshold: number;
 }
 
+/* ── Constants ──────────────────────────────────────────────── */
+
+const CATEGORY_COLORS: Record<string, string> = {
+  governance: 'bg-[#f5a623]/15 text-[#f5a623] border-[#f5a623]/30',
+  technical: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  community: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  wavewarz: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+  social: 'bg-pink-500/15 text-pink-400 border-pink-500/30',
+  treasury: 'bg-green-500/15 text-green-400 border-green-500/30',
+  general: 'bg-gray-500/15 text-gray-400 border-gray-500/30',
+};
+
+const STATUS_DOT: Record<string, string> = {
+  open: 'bg-green-400',
+  approved: 'bg-[#f5a623]',
+  rejected: 'bg-red-400',
+  completed: 'bg-blue-400',
+  published: 'bg-purple-400',
+  closed: 'bg-gray-500',
+};
+
+const STATUS_BADGE: Record<string, string> = {
+  open: 'text-green-400 bg-green-400/10 border-green-400/20',
+  approved: 'text-[#f5a623] bg-[#f5a623]/10 border-[#f5a623]/20',
+  published: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+  completed: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+  closed: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
+  rejected: 'text-red-400 bg-red-400/10 border-red-400/20',
+};
+
+const STATUS_FILTERS = ['all', 'open', 'approved', 'rejected', 'completed', 'published'] as const;
+const CATEGORY_FILTERS = ['all', 'governance', 'technical', 'community', 'wavewarz', 'social', 'treasury'] as const;
+
+/* ── Component ──────────────────────────────────────────────── */
+
 export function ProposalsTab() {
+  const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -33,15 +83,33 @@ export function ProposalsTab() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Filters
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+
+  // Expand/collapse
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Voting
+  const [voting, setVoting] = useState<string | null>(null);
+  const [voteWarning, setVoteWarning] = useState<string | null>(null);
+
   const loadProposals = useCallback(() => {
-    fetch('/api/proposals?limit=20')
+    const params = new URLSearchParams({ limit: '50' });
+    if (statusFilter !== 'all') params.set('status', statusFilter);
+    if (categoryFilter !== 'all') params.set('category', categoryFilter);
+
+    fetch(`/api/proposals?${params}`)
       .then(r => r.json())
       .then(d => setProposals(d.proposals ?? []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [statusFilter, categoryFilter]);
 
-  useEffect(() => { loadProposals(); }, [loadProposals]);
+  useEffect(() => {
+    setLoading(true);
+    loadProposals();
+  }, [loadProposals]);
 
   const handleCreate = async () => {
     if (!title.trim() || !description.trim()) return;
@@ -69,15 +137,47 @@ export function ProposalsTab() {
     }
   };
 
-  const STATUS_COLORS: Record<string, string> = {
-    open: 'text-green-400 bg-green-400/10',
-    published: 'text-blue-400 bg-blue-400/10',
-    closed: 'text-gray-400 bg-gray-400/10',
-    rejected: 'text-red-400 bg-red-400/10',
+  const handleVote = async (proposalId: string, vote: 'for' | 'against' | 'abstain') => {
+    setVoting(proposalId);
+    try {
+      const res = await fetch('/api/proposals/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proposal_id: proposalId, vote }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        if (data.warning) {
+          setVoteWarning(data.warning);
+          setTimeout(() => setVoteWarning(null), 6000);
+        }
+        // Optimistic update
+        setProposals(prev => prev.map(p =>
+          p.id === proposalId ? { ...p, user_vote: vote } : p
+        ));
+        await new Promise(r => setTimeout(r, 300));
+        loadProposals();
+      }
+    } catch (err) {
+      console.error('[proposals] vote error:', err);
+    }
+    setVoting(null);
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedId(prev => prev === id ? null : id);
   };
 
   return (
     <div className="pt-2 space-y-4">
+      {/* Zero-weight vote warning toast */}
+      {voteWarning && (
+        <div className="bg-amber-600/90 text-white text-sm font-medium px-4 py-3 rounded-xl flex items-center gap-2">
+          <span>{voteWarning}</span>
+          <button onClick={() => setVoteWarning(null)} className="ml-auto text-white/60 hover:text-white shrink-0">&times;</button>
+        </div>
+      )}
+
       {/* Create Proposal Button */}
       <button
         onClick={() => setShowCreate(!showCreate)}
@@ -111,13 +211,9 @@ export function ProposalsTab() {
             onChange={e => setCategory(e.target.value)}
             className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none"
           >
-            <option value="governance">Governance</option>
-            <option value="funding">Funding</option>
-            <option value="community">Community</option>
-            <option value="music">Music</option>
-            <option value="technical">Technical</option>
-            <option value="wavewarz">WaveWarZ</option>
-            <option value="social">Social</option>
+            {PROPOSAL_CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>{PROPOSAL_CATEGORY_LABELS[cat]}</option>
+            ))}
           </select>
           {error && <p className="text-xs text-red-400">{error}</p>}
           <div className="flex gap-2">
@@ -167,60 +263,347 @@ export function ProposalsTab() {
         </div>
       </div>
 
-      {/* Proposals List */}
+      {/* ── Filter Bar ────────────────────────────────────── */}
+      <div className="space-y-2">
+        {/* Status filters */}
+        <div className="flex flex-wrap gap-1.5">
+          <span className="text-[10px] text-gray-600 uppercase tracking-wider self-center mr-1">Status</span>
+          {STATUS_FILTERS.map(s => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors capitalize ${
+                statusFilter === s
+                  ? 'bg-[#f5a623]/15 text-[#f5a623] border-[#f5a623]/40'
+                  : 'bg-gray-800/50 text-gray-500 border-gray-700/50 hover:text-gray-300 hover:border-gray-600'
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+
+        {/* Category filters */}
+        <div className="flex flex-wrap gap-1.5">
+          <span className="text-[10px] text-gray-600 uppercase tracking-wider self-center mr-1">Category</span>
+          {CATEGORY_FILTERS.map(c => {
+            const catColor = c !== 'all' ? CATEGORY_COLORS[c] : undefined;
+            return (
+              <button
+                key={c}
+                onClick={() => setCategoryFilter(c)}
+                className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors capitalize ${
+                  categoryFilter === c
+                    ? (catColor || 'bg-[#f5a623]/15 text-[#f5a623] border-[#f5a623]/40')
+                    : 'bg-gray-800/50 text-gray-500 border-gray-700/50 hover:text-gray-300 hover:border-gray-600'
+                }`}
+              >
+                {c === 'all' ? 'All' : (PROPOSAL_CATEGORY_LABELS[c as ProposalCategory] || c)}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Proposals List ────────────────────────────────── */}
       {loading && (
         <div className="space-y-2">
-          {[1, 2, 3].map(i => <div key={i} className="h-20 bg-[#0d1b2a] rounded-xl animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-24 bg-[#0d1b2a] rounded-xl animate-pulse" />)}
         </div>
       )}
 
       {!loading && proposals.length === 0 && (
         <div className="text-center py-8 bg-[#0d1b2a] rounded-xl">
-          <p className="text-gray-400 text-sm">No proposals yet.</p>
-          <p className="text-xs text-gray-600 mt-1">Be the first to create one.</p>
+          <p className="text-gray-400 text-sm">No proposals found.</p>
+          <p className="text-xs text-gray-600 mt-1">
+            {statusFilter !== 'all' || categoryFilter !== 'all'
+              ? 'Try adjusting your filters.'
+              : 'Be the first to create one.'}
+          </p>
         </div>
       )}
 
       {!loading && proposals.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Community Proposals</p>
-          {proposals.map(p => {
-            const statusKey = p.status.toLowerCase();
-            const colorClass = STATUS_COLORS[statusKey] ?? 'text-gray-400 bg-gray-400/10';
-            const totalWeight = p.tally.totalWeight;
-            const forPct = totalWeight > 0 ? Math.round((p.tally.for.weight / totalWeight) * 100) : 0;
-            return (
-              <div key={p.id} className="bg-[#0d1b2a] rounded-xl px-4 py-3 border border-gray-800">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{p.title}</p>
-                    <p className="text-[10px] text-gray-500 mt-0.5">
-                      by {p.author?.display_name || p.author?.username || 'Unknown'}
-                      {p.category && <span className="ml-1 text-gray-600">/{p.category}</span>}
-                    </p>
-                  </div>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0 ${colorClass}`}>
-                    {p.status}
-                  </span>
-                </div>
-                {/* Vote bar */}
-                {p.tally.totalVoters > 0 && (
-                  <div className="mt-2">
-                    <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-500 rounded-full" style={{ width: `${forPct}%` }} />
-                    </div>
-                    <div className="flex justify-between mt-1 text-[10px] text-gray-600">
-                      <span>{p.tally.for.count} for ({p.tally.for.weight}R)</span>
-                      <span>{p.tally.against.count} against</span>
-                      <span>{p.tally.totalVoters} voters</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">
+            Community Proposals ({proposals.length})
+          </p>
+          {proposals.map(p => (
+            <ProposalCard
+              key={p.id}
+              proposal={p}
+              isExpanded={expandedId === p.id}
+              onToggle={() => toggleExpand(p.id)}
+              onVote={handleVote}
+              isVoting={voting === p.id}
+              currentFid={user?.fid ?? 0}
+            />
+          ))}
         </div>
       )}
     </div>
+  );
+}
+
+/* ── Proposal Card ─────────────────────────────────────────── */
+
+function ProposalCard({
+  proposal: p,
+  isExpanded,
+  onToggle,
+  onVote,
+  isVoting,
+  currentFid,
+}: {
+  proposal: Proposal;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onVote: (id: string, vote: 'for' | 'against' | 'abstain') => void;
+  isVoting: boolean;
+  currentFid: number;
+}) {
+  const statusKey = p.status.toLowerCase();
+  const badgeClass = STATUS_BADGE[statusKey] ?? 'text-gray-400 bg-gray-400/10 border-gray-400/20';
+  const dotClass = STATUS_DOT[statusKey] ?? 'bg-gray-500';
+  const catClass = p.category ? (CATEGORY_COLORS[p.category] ?? CATEGORY_COLORS.general) : null;
+
+  const totalWeight = p.tally.totalWeight;
+  const forPct = totalWeight > 0 ? Math.round((p.tally.for.weight / totalWeight) * 100) : 0;
+  const threshold = p.respect_threshold || 1000;
+  const thresholdPct = Math.min(100, Math.round((p.tally.for.weight / threshold) * 100));
+
+  const expired = p.closes_at ? isDeadlinePassed(p.closes_at) : false;
+  const isClosed = statusKey !== 'open';
+  const canVote = !isClosed && !expired;
+
+  return (
+    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden transition-colors hover:border-gray-700">
+      {/* Collapsed header — always visible, click to expand */}
+      <button
+        onClick={onToggle}
+        className="w-full text-left px-4 py-3 focus:outline-none"
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-white font-medium truncate">{p.title}</p>
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              {/* Category badge */}
+              {catClass && p.category && (
+                <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${catClass}`}>
+                  {PROPOSAL_CATEGORY_LABELS[p.category as ProposalCategory] || p.category}
+                </span>
+              )}
+              {/* Author */}
+              <span className="text-[10px] text-gray-500">
+                by {p.author?.display_name || p.author?.username || 'Unknown'}
+              </span>
+              {/* Time remaining */}
+              {p.closes_at && !expired && (
+                <span className="text-[10px] text-gray-600">
+                  {formatTimeRemaining(p.closes_at)}
+                </span>
+              )}
+              {p.closes_at && expired && (
+                <span className="text-[10px] text-red-400">Voting closed</span>
+              )}
+            </div>
+          </div>
+          {/* Status badge with dot + chevron */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
+            <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${badgeClass}`}>
+              {p.status}
+            </span>
+            <svg
+              className={`w-3.5 h-3.5 text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Compact vote bar — always visible */}
+        {p.tally.totalVoters > 0 && (
+          <div className="mt-2">
+            <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden relative">
+              <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${forPct}%` }} />
+              {/* Threshold marker */}
+              {threshold > 0 && (
+                <div
+                  className="absolute top-0 h-full w-0.5 bg-[#f5a623]"
+                  style={{ left: `${Math.min(100, (threshold / Math.max(totalWeight, threshold)) * 100)}%` }}
+                  title={`Threshold: ${threshold} Respect`}
+                />
+              )}
+            </div>
+            <div className="flex justify-between mt-1 text-[10px] text-gray-600">
+              <span>{p.tally.for.count} for ({p.tally.for.weight}R)</span>
+              <span>{p.tally.against.count} against ({p.tally.against.weight}R)</span>
+              <span>{p.tally.totalVoters} voters</span>
+            </div>
+          </div>
+        )}
+
+        {/* User's vote indicator */}
+        {p.user_vote && (
+          <div className="mt-1.5 flex items-center gap-1">
+            <svg className="w-3 h-3 text-[#f5a623]" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            <span className="text-[10px] text-[#f5a623]">
+              You voted {p.user_vote}
+            </span>
+          </div>
+        )}
+
+        {/* Comment count hint (collapsed only) */}
+        {p.commentCount > 0 && !isExpanded && (
+          <div className="mt-1 flex items-center gap-1 text-[10px] text-gray-600">
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            {p.commentCount} comment{p.commentCount !== 1 ? 's' : ''}
+          </div>
+        )}
+      </button>
+
+      {/* ── Expanded section ────────────────────────────── */}
+      {isExpanded && (
+        <div className="px-4 pb-4 border-t border-gray-800/50">
+          {/* Full description */}
+          <div className="mt-3">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Description</p>
+            <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">{p.description}</p>
+          </div>
+
+          {/* Detailed vote bar with threshold */}
+          <div className="mt-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Vote Progress</p>
+            <div className="relative">
+              <div className="h-3 bg-gray-800 rounded-full overflow-hidden relative">
+                {/* For (green) */}
+                <div
+                  className="h-full bg-green-500 absolute left-0 top-0 rounded-l-full"
+                  style={{ width: `${forPct}%` }}
+                />
+                {/* Against (red) layered from right */}
+                {p.tally.against.weight > 0 && totalWeight > 0 && (
+                  <div
+                    className="h-full bg-red-500/60 absolute right-0 top-0 rounded-r-full"
+                    style={{ width: `${Math.round((p.tally.against.weight / totalWeight) * 100)}%` }}
+                  />
+                )}
+              </div>
+              {/* Threshold marker on detailed bar */}
+              {threshold > 0 && (
+                <div
+                  className="absolute top-0 h-3 w-0.5 bg-[#f5a623] rounded"
+                  style={{ left: `${Math.min(100, (threshold / Math.max(totalWeight, threshold)) * 100)}%` }}
+                />
+              )}
+            </div>
+            <div className="flex items-center justify-between mt-1.5 text-[10px]">
+              <span className="text-green-400">{p.tally.for.weight}R for</span>
+              <span className="text-[#f5a623]">
+                {thresholdPct}% of {threshold}R threshold
+              </span>
+              <span className="text-red-400">{p.tally.against.weight}R against</span>
+            </div>
+            {p.tally.abstain.count > 0 && (
+              <p className="text-[10px] text-gray-600 mt-0.5 text-center">
+                {p.tally.abstain.count} abstain ({p.tally.abstain.weight}R)
+              </p>
+            )}
+          </div>
+
+          {/* Voting buttons */}
+          <div className="mt-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Cast Your Vote</p>
+            {isVoting ? (
+              <div className="flex items-center justify-center gap-2 py-3">
+                <div className="w-3.5 h-3.5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs text-gray-400">Recording vote...</span>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <VoteButton
+                  label="For"
+                  isActive={p.user_vote === 'for'}
+                  disabled={!canVote}
+                  onClick={() => onVote(p.id, 'for')}
+                  activeClass="bg-green-500/20 text-green-400 border-green-500/40"
+                  hoverClass="hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30"
+                />
+                <VoteButton
+                  label="Against"
+                  isActive={p.user_vote === 'against'}
+                  disabled={!canVote}
+                  onClick={() => onVote(p.id, 'against')}
+                  activeClass="bg-red-500/20 text-red-400 border-red-500/40"
+                  hoverClass="hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30"
+                />
+                <VoteButton
+                  label="Abstain"
+                  isActive={p.user_vote === 'abstain'}
+                  disabled={!canVote}
+                  onClick={() => onVote(p.id, 'abstain')}
+                  activeClass="bg-gray-500/20 text-gray-300 border-gray-500/40"
+                  hoverClass="hover:bg-gray-500/10 hover:text-gray-300 hover:border-gray-500/30"
+                />
+              </div>
+            )}
+            {!canVote && (
+              <p className="text-[10px] text-gray-600 mt-1.5">
+                {isClosed ? 'This proposal is no longer open for voting.' : 'Voting period has ended.'}
+              </p>
+            )}
+          </div>
+
+          {/* Comments section (dynamically imported) */}
+          <ProposalComments proposalId={p.id} currentFid={currentFid} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Vote Button ───────────────────────────────────────────── */
+
+function VoteButton({
+  label,
+  isActive,
+  disabled,
+  onClick,
+  activeClass,
+  hoverClass,
+}: {
+  label: string;
+  isActive: boolean;
+  disabled: boolean;
+  onClick: () => void;
+  activeClass: string;
+  hoverClass: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex-1 text-xs font-medium py-2 rounded-lg border transition-all ${
+        isActive
+          ? activeClass
+          : `bg-gray-800/50 text-gray-500 border-gray-700/50 ${disabled ? 'opacity-40 cursor-not-allowed' : hoverClass}`
+      }`}
+    >
+      {isActive && (
+        <svg className="w-3 h-3 inline mr-1 -mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+        </svg>
+      )}
+      {label}
+    </button>
   );
 }

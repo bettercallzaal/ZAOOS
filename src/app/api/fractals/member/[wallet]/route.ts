@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+
+const MEMBER_FIELDS = 'name, wallet_address, total_respect, fractal_respect, onchain_og, onchain_zor, fractal_count, event_respect, hosting_respect, bonus_respect, first_respect_at';
+
+const walletSchema = z.string().min(1).max(100);
 
 export async function GET(
   req: NextRequest,
@@ -12,20 +17,24 @@ export async function GET(
   }
 
   const { wallet } = await params;
-  const lookupValue = wallet.toLowerCase();
+  const parsed = walletSchema.safeParse(wallet);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid lookup value' }, { status: 400 });
+  }
+  const lookupValue = parsed.data.toLowerCase();
 
   try {
     // Try by wallet first, then by name
     let { data: member } = await supabaseAdmin
       .from('respect_members')
-      .select('*')
+      .select(MEMBER_FIELDS)
       .eq('wallet_address', lookupValue)
       .maybeSingle();
 
     if (!member) {
       const { data: byName } = await supabaseAdmin
         .from('respect_members')
-        .select('*')
+        .select(MEMBER_FIELDS)
         .ilike('name', lookupValue)
         .maybeSingle();
       member = byName;
@@ -35,20 +44,32 @@ export async function GET(
       return NextResponse.json({ error: 'Member not found' }, { status: 404 });
     }
 
-    // Get all fractal scores by wallet or name
-    const { data: scores } = await supabaseAdmin
-      .from('fractal_scores')
-      .select(`
-        rank,
-        score,
-        wallet_address,
-        member_name,
-        fractal_sessions (
-          id, name, session_date, scoring_era, participant_count, notes
-        )
-      `)
-      .or(`wallet_address.eq.${member.wallet_address || '__none__'},member_name.eq.${member.name}`)
-      .order('created_at', { ascending: false });
+    // Get scores by wallet and by name separately to avoid .or() filter injection
+    const [walletScores, nameScores] = await Promise.all([
+      member.wallet_address
+        ? supabaseAdmin
+            .from('fractal_scores')
+            .select(`rank, score, wallet_address, member_name, fractal_sessions (id, name, session_date, scoring_era, participant_count, notes)`)
+            .eq('wallet_address', member.wallet_address)
+            .order('created_at', { ascending: false })
+        : Promise.resolve({ data: [] }),
+      supabaseAdmin
+        .from('fractal_scores')
+        .select(`rank, score, wallet_address, member_name, fractal_sessions (id, name, session_date, scoring_era, participant_count, notes)`)
+        .eq('member_name', member.name)
+        .order('created_at', { ascending: false }),
+    ]);
+
+    // Merge and deduplicate
+    const allScores = [...(walletScores.data ?? []), ...(nameScores.data ?? [])];
+    const seen = new Set<string>();
+    const scores = allScores.filter(s => {
+      const sess = Array.isArray(s.fractal_sessions) ? s.fractal_sessions[0] : s.fractal_sessions;
+      const key = `${sess?.id}-${s.rank}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 
     const history = (scores ?? []).map(s => {
       const sess = Array.isArray(s.fractal_sessions) ? s.fractal_sessions[0] : s.fractal_sessions;

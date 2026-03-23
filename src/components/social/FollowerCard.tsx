@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { OGBadge } from '@/components/badges/OGBadge';
 
 export interface FollowerUser {
   fid: number;
@@ -13,6 +14,7 @@ export interface FollowerUser {
   following_count: number;
   power_badge: boolean;
   isZaoMember?: boolean;
+  zid?: number | null;
   viewer_context?: {
     following: boolean;
     followed_by: boolean;
@@ -102,6 +104,7 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
               <path d="M13 2L3 14h9l-1 10 10-12h-9l1-10z" />
             </svg>
           )}
+          <OGBadge zid={user.zid} />
           {isMutual && (
             <span className="text-[9px] font-bold bg-green-500/15 text-green-400 px-1.5 py-0.5 rounded-full flex-shrink-0">
               Mutual

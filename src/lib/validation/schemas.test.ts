@@ -24,7 +24,7 @@ describe('sendMessageSchema', () => {
 });
 
 describe('proposalCategorySchema', () => {
-  it.each(['general', 'treasury', 'governance', 'technical', 'community'])(
+  it.each(['general', 'technical', 'community', 'governance', 'treasury', 'wavewarz', 'social'])(
     'accepts valid category: %s',
     (category) => {
       const result = proposalCategorySchema.safeParse(category);

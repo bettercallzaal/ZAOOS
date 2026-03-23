@@ -24,7 +24,7 @@ export async function applyMemberLabel(
         },
       },
     });
-    console.log(`[labeler] Applied ZAO Member label to ${targetDid}`);
+    console.info(`[labeler] Applied ZAO Member label to ${targetDid}`);
     return true;
   } catch (err) {
     // Self-labels can only be applied to own account.

@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { communityConfig } from '@/../community.config';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import StreakBadge from '@/components/streaks/StreakBadge';
 import { NowPlayingHero } from '@/components/home/NowPlayingHero';
 import { QuickActions } from '@/components/home/QuickActions';
 import { PillarCard } from '@/components/home/PillarCard';
@@ -11,6 +13,20 @@ import { ActivityFeed } from '@/components/home/ActivityFeed';
 
 export function HomePage() {
   const { user } = useAuth();
+  const loginRecorded = useRef(false);
+
+  // Fire-and-forget: record daily login for streak tracking
+  useEffect(() => {
+    if (!user || loginRecorded.current) return;
+    loginRecorded.current = true;
+    fetch('/api/streaks/record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ activity_type: 'login' }),
+    }).catch(() => {
+      // Non-critical — silently ignore failures
+    });
+  }, [user]);
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20 md:pt-12">
@@ -22,6 +38,7 @@ export function HomePage() {
           {communityConfig.name}
         </h1>
         <div className="flex items-center gap-3">
+          <StreakBadge />
           <NotificationBell />
           {user?.pfpUrl ? (
             <Image

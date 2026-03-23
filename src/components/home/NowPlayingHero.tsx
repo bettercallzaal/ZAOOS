@@ -1,6 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePlayer } from '@/providers/audio';
 import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { communityConfig } from '@/../community.config';
@@ -9,6 +11,29 @@ import { NowPlayingHeroSkeleton } from '@/components/music/MusicSkeletons';
 export function NowPlayingHero() {
   const player = usePlayer();
   const radio = useRadio();
+  const [totdTrack, setTotdTrack] = useState<{
+    track_title: string | null;
+    track_artist: string | null;
+  } | null>(null);
+
+  // Fetch today's Track of the Day
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/music/track-of-day', { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error('fetch failed');
+        return res.json();
+      })
+      .then((data) => {
+        if (data.selected) {
+          setTotdTrack(data.selected);
+        }
+      })
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      });
+    return () => controller.abort();
+  }, []);
 
   const isActive = player.metadata !== null;
   const trackName = player.metadata?.trackName ?? '';
@@ -132,6 +157,19 @@ export function NowPlayingHero() {
             <p className="text-[10px] text-[#f5a623]/60 mt-1.5">
               {communityConfig.music.radioName} &middot; {radio.radioPlaylist.name}
             </p>
+          )}
+
+          {/* Track of the Day badge */}
+          {totdTrack && (
+            <Link
+              href="/music"
+              className="inline-flex items-center gap-1 mt-1.5 text-[10px] text-[#f5a623]/70 hover:text-[#f5a623] transition-colors"
+            >
+              <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+              TOTD: {totdTrack.track_title || 'Featured Track'}
+            </Link>
           )}
         </div>
 

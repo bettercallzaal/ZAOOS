@@ -67,6 +67,7 @@ export interface Cast {
     username: string;
     display_name: string;
     pfp_url: string;
+    zid?: number | null;
   };
   text: string;
   timestamp: string;

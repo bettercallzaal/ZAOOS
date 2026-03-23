@@ -1,40 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
 const WEBHOOK_SECRET = process.env.DISCORD_BOT_WEBHOOK_SECRET;
 
+const VALID_EVENTS = [
+  'fractal_started', 'vote_cast', 'round_complete',
+  'fractal_complete', 'fractal_paused', 'fractal_resumed',
+] as const;
+
+const webhookSchema = z.object({
+  event: z.enum(VALID_EVENTS),
+  fractalId: z.string().min(1).max(200),
+  data: z.record(z.string(), z.unknown()),
+});
+
+function timingSafeCompare(a: string, b: string): boolean {
+  const aBuf = Buffer.from(a);
+  const bBuf = Buffer.from(b);
+  if (aBuf.length !== bBuf.length) return false;
+  return crypto.timingSafeEqual(aBuf, bBuf);
+}
+
 /**
  * POST /api/fractals/webhook
  * Receives real-time events from the ZAO fractal Discord bot.
- * Events: fractal_started, vote_cast, round_complete, fractal_complete, fractal_paused, fractal_resumed
  */
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.text();
-
-    // Verify webhook authenticity
-    if (WEBHOOK_SECRET) {
-      const authHeader = req.headers.get('authorization') || '';
-      const token = authHeader.replace('Bearer ', '');
-
-      // Support both Bearer token and HMAC signature
-      const hmacHeader = req.headers.get('x-webhook-signature');
-      if (hmacHeader) {
-        const expected = crypto
-          .createHmac('sha256', WEBHOOK_SECRET)
-          .update(body)
-          .digest('hex');
-        if (hmacHeader !== expected) {
-          return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-        }
-      } else if (token !== WEBHOOK_SECRET) {
-        return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-      }
+    // Fail closed — reject if webhook secret is not configured
+    if (!WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
     }
 
-    const payload = JSON.parse(body);
-    const { event, data, fractalId } = payload;
+    const body = await req.text();
+
+    // Verify webhook authenticity (timing-safe)
+    const authHeader = req.headers.get('authorization') || '';
+    const token = authHeader.replace('Bearer ', '');
+    const hmacHeader = req.headers.get('x-webhook-signature');
+
+    if (hmacHeader) {
+      const expected = crypto
+        .createHmac('sha256', WEBHOOK_SECRET)
+        .update(body)
+        .digest('hex');
+      if (!timingSafeCompare(hmacHeader, expected)) {
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+      }
+    } else if (!timingSafeCompare(token, WEBHOOK_SECRET)) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Validate payload with Zod
+    const parsed = webhookSchema.safeParse(JSON.parse(body));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
+
+    const { event, fractalId } = parsed.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = parsed.data.data as any;
 
     // Store event in a fractal_events table (or use Supabase Realtime)
     // For now, store in a simple events log + update live state

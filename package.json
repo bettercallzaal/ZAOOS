@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "import:fractals": "npx tsx scripts/import-fractal-history.ts"
   },
   "dependencies": {
     "@atproto/api": "^0.19.4",

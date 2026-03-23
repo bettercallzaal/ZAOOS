@@ -43,10 +43,24 @@ export async function GET(
       allowlistFids = new Set((allowlistRows || []).map((r: { fid: number }) => r.fid));
     }
 
-    // Enrich users with ZAO membership
+    // Batch fetch ZIDs for OG badge
+    let zidMap = new Map<number, number>();
+    if (fids.length > 0) {
+      const { data: zidRows } = await supabaseAdmin
+        .from('users')
+        .select('fid, zid')
+        .in('fid', fids)
+        .not('zid', 'is', null);
+      if (zidRows) {
+        zidMap = new Map(zidRows.map((r: { fid: number; zid: number }) => [r.fid, r.zid]));
+      }
+    }
+
+    // Enrich users with ZAO membership + ZID
     users = users.map((u: { fid: number }) => ({
       ...u,
       isZaoMember: allowlistFids.has(u.fid),
+      zid: zidMap.get(u.fid) ?? null,
     }));
 
     // Client-side sorting for non-API sorts

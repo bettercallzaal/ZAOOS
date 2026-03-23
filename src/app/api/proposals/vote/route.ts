@@ -138,7 +138,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ vote: voteData, respectWeight, published });
+    const response: Record<string, unknown> = { vote: voteData, respectWeight, published };
+    if (respectWeight === 0) {
+      response.warning = 'Your vote was recorded but has zero weight. Earn Respect through fractal participation to increase your voting power.';
+    }
+    return NextResponse.json(response);
   } catch (err) {
     console.error('Vote error:', err);
     return NextResponse.json({ error: 'Failed to submit vote' }, { status: 500 });
@@ -175,7 +179,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
   const threshold = proposal.respect_threshold || 1000;
 
   if (totalRespectFor >= threshold) {
-    console.log(`[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`);
+    console.info(`[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`);
 
     const { data: fullProposal } = await supabaseAdmin
       .from('proposals')
@@ -222,7 +226,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           neynarApiKey,
         );
         castHash = result?.cast?.hash || null;
-        console.log(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
+        console.info(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
       } catch (fcErr) {
         console.error('[publish-threshold] Farcaster publish failed:', fcErr);
       }
@@ -239,7 +243,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         'https://zaoos.com/governance',
       );
       if (bskyUri) {
-        console.log(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
+        console.info(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
       }
     } catch (bskyErr) {
       console.error('[publish-threshold] Bluesky publish failed:', bskyErr);
@@ -277,10 +281,10 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       if (retryErr) {
         console.error('[publish-threshold] DB retry also failed:', retryErr);
       } else {
-        console.log('[publish-threshold] DB updated (without bluesky URI column)');
+        console.info('[publish-threshold] DB updated (without bluesky URI column)');
       }
     } else {
-      console.log('[publish-threshold] DB updated successfully — status: published');
+      console.info('[publish-threshold] DB updated successfully — status: published');
     }
 
     return true;

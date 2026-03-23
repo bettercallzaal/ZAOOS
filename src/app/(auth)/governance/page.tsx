@@ -476,19 +476,61 @@ export default function GovernancePage() {
               <GeneratePostButton />
             </div>
 
-            {/* Create Proposal */}
-            <button
-              onClick={() => setShowCreate(!showCreate)}
-              className={`w-full text-sm font-medium px-4 py-3 rounded-xl transition-colors ${
-                showCreate
-                  ? 'bg-gray-700 text-gray-300'
-                  : 'bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]'
-              }`}
-            >
-              {showCreate ? 'Cancel' : '+ New Proposal'}
-            </button>
+            {/* Create Proposal / Social Post toggle */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setShowCreate(showCreate && newCategory !== 'social' ? false : true); setNewCategory('general'); }}
+                className={`flex-1 text-sm font-medium px-4 py-3 rounded-xl transition-colors ${
+                  showCreate && newCategory !== 'social'
+                    ? 'bg-gray-700 text-gray-300'
+                    : 'bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]'
+                }`}
+              >
+                {showCreate && newCategory !== 'social' ? 'Cancel' : '+ Proposal'}
+              </button>
+              <button
+                onClick={() => { setShowCreate(showCreate && newCategory === 'social' ? false : true); setNewCategory('social'); }}
+                className={`flex-1 text-sm font-medium px-4 py-3 rounded-xl transition-colors ${
+                  showCreate && newCategory === 'social'
+                    ? 'bg-gray-700 text-gray-300'
+                    : 'bg-pink-500/20 text-pink-400 hover:bg-pink-500/30 border border-pink-500/30'
+                }`}
+              >
+                {showCreate && newCategory === 'social' ? 'Cancel' : '+ Social Post'}
+              </button>
+            </div>
 
-            {showCreate && (
+            {showCreate && newCategory === 'social' && (
+              <div className="bg-[#0d1b2a] rounded-xl p-4 border border-pink-500/20 space-y-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-400">Social</span>
+                  <span className="text-[11px] text-gray-500">Share a thought, link, or update with the community</span>
+                </div>
+                <textarea
+                  value={newDesc}
+                  onChange={(e) => { setNewDesc(e.target.value); if (!newTitle) setNewTitle(e.target.value.slice(0, 100)); }}
+                  placeholder="What's on your mind?"
+                  rows={3}
+                  maxLength={2000}
+                  className="w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2.5 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-pink-400 resize-none"
+                />
+                {createError && (
+                  <p className="text-xs text-red-400">{createError}</p>
+                )}
+                <button
+                  onClick={() => {
+                    if (!newTitle.trim()) setNewTitle(newDesc.trim().slice(0, 100));
+                    handleCreateProposal();
+                  }}
+                  disabled={creating || !newDesc.trim()}
+                  className="w-full bg-pink-500/20 text-pink-400 text-sm font-medium py-2.5 rounded-lg hover:bg-pink-500/30 disabled:opacity-50 transition-colors border border-pink-500/30"
+                >
+                  {creating ? 'Posting...' : 'Post'}
+                </button>
+              </div>
+            )}
+
+            {showCreate && newCategory !== 'social' && (
               <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-3">
                 <input
                   value={newTitle}
@@ -508,7 +550,7 @@ export default function GovernancePage() {
                   onChange={(e) => setNewCategory(e.target.value)}
                   className="w-full bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2.5 border-0 focus:ring-1 focus:ring-[#f5a623]"
                 >
-                  {PROPOSAL_CATEGORIES.map((cat) => (
+                  {PROPOSAL_CATEGORIES.filter(c => c !== 'social').map((cat) => (
                     <option key={cat} value={cat}>{PROPOSAL_CATEGORY_LABELS[cat]}</option>
                   ))}
                 </select>

@@ -44,4 +44,10 @@ export const ENV = {
   WAVEWARZ_OFFICIAL_FID: optionalEnv('WAVEWARZ_OFFICIAL_FID'),
   WAVEWARZ_OFFICIAL_SIGNER_UUID: optionalEnv('WAVEWARZ_OFFICIAL_SIGNER_UUID'),
   WAVEWARZ_OFFICIAL_NEYNAR_API_KEY: optionalEnv('WAVEWARZ_OFFICIAL_NEYNAR_API_KEY'),
+
+  // X/Twitter cross-posting (shared ZAO app account, admin-only)
+  X_API_KEY: optionalEnv('X_API_KEY'),
+  X_API_SECRET: optionalEnv('X_API_SECRET'),
+  X_ACCESS_TOKEN: optionalEnv('X_ACCESS_TOKEN'),
+  X_ACCESS_SECRET: optionalEnv('X_ACCESS_SECRET'),
 } as const;

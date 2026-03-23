@@ -96,6 +96,12 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/bluesky')) {
     return { limit: 5, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/publish')) {
+    return { limit: 5, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/platforms')) {
+    return { limit: 10, windowMs: MINUTE };
+  }
   return null;
 }
 

@@ -6,6 +6,7 @@ import {
   useReducer,
   useRef,
   useCallback,
+  useEffect,
   useMemo,
   Dispatch,
   ReactNode,
@@ -103,10 +104,59 @@ const PlayerContext = createContext<PlayerContextValue | null>(null);
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
+const STORAGE_KEY = 'zao-player-state';
+
+function loadPersistedState(): Partial<PlayerState> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return {};
+    const saved = JSON.parse(raw);
+    // Only restore metadata + position — don't restore playing status
+    return {
+      metadata: saved.metadata ?? null,
+      position: saved.position ?? 0,
+      duration: saved.duration ?? 0,
+      volume: saved.volume ?? 1,
+      shuffle: saved.shuffle ?? false,
+      repeat: saved.repeat ?? 'off',
+    };
+  } catch { return {}; }
+}
+
 export function PlayerProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initial);
+  const persisted = useRef(loadPersistedState());
+  const [state, dispatch] = useReducer(reducer, {
+    ...initial,
+    volume: persisted.current.volume ?? 1,
+    shuffle: persisted.current.shuffle ?? false,
+    repeat: (persisted.current.repeat as RepeatMode) ?? 'off',
+    // Restore metadata as paused so user sees what was playing but it doesn't auto-start
+    metadata: persisted.current.metadata ?? null,
+    status: persisted.current.metadata ? 'paused' : 'idle',
+    position: persisted.current.position ?? 0,
+    duration: persisted.current.duration ?? 0,
+  });
   const controllers = useRef<Partial<Record<TrackType, AudioController>>>({});
   const onEndedRef = useRef<(() => void) | null>(null);
+
+  // Persist player state to localStorage
+  useEffect(() => {
+    if (!state.metadata) {
+      localStorage.removeItem(STORAGE_KEY);
+      return;
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        metadata: state.metadata,
+        position: state.position,
+        duration: state.duration,
+        volume: state.volume,
+        shuffle: state.shuffle,
+        repeat: state.repeat,
+      }));
+    } catch { /* quota exceeded — ignore */ }
+  }, [state.metadata, state.position, state.duration, state.volume, state.shuffle, state.repeat]);
 
   const registerController = useCallback(
     (type: TrackType, controller: AudioController) => {

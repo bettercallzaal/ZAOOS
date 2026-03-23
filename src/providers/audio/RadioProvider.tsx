@@ -44,9 +44,16 @@ interface RadioState {
 
 const RadioContext = createContext<RadioState | null>(null);
 
+const RADIO_STORAGE_KEY = 'zao-radio-state';
+
 export function RadioProvider({ children }: { children: ReactNode }) {
   const player = usePlayer();
-  const [isRadioMode, setIsRadioMode] = useState(false);
+  const [isRadioMode, setIsRadioMode] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return JSON.parse(localStorage.getItem(RADIO_STORAGE_KEY) || 'false');
+    } catch { return false; }
+  });
   const [radioLoading, setRadioLoading] = useState(false);
   const [allStations, setAllStations] = useState<RadioPlaylist[]>([]);
   const [currentStationIndex, setCurrentStationIndex] = useState(0);
@@ -55,6 +62,11 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const abortRef = useRef<AbortController | null>(null);
 
   const cachedStationsRef = useRef<RadioPlaylist[] | null>(null);
+
+  // Persist radio mode
+  useEffect(() => {
+    try { localStorage.setItem(RADIO_STORAGE_KEY, JSON.stringify(isRadioMode)); } catch {}
+  }, [isRadioMode]);
 
   useEffect(() => {
     return () => { abortRef.current?.abort(); };

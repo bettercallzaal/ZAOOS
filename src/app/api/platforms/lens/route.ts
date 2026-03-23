@@ -16,7 +16,12 @@ async function checkLensProfile(wallet: string) {
   if (data?.errors) {
     console.error('[lens] V3 API errors for', wallet, ':', JSON.stringify(data.errors));
   }
-  return data?.data?.accountsAvailable?.items || [];
+  const items = data?.data?.accountsAvailable?.items || [];
+  // Log what we got to debug missing usernames
+  if (items.length > 0) {
+    console.info('[lens] Found account for', wallet, ':', JSON.stringify(items[0]));
+  }
+  return items;
 }
 
 /**
@@ -67,7 +72,33 @@ export async function POST(req: NextRequest) {
         handle = account?.username?.localName
           || account?.username?.value
           || account?.metadata?.name
-          || (accountAddress ? accountAddress.slice(0, 12) + '...' : null);
+          || null;
+
+        // If we got an address but no username, try fetching the account directly
+        if (!handle && accountAddress) {
+          try {
+            const accountRes = await fetch(LENS_API, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                query: `query { account(request: { address: "${accountAddress}" }) { username { localName value } metadata { name bio } } }`,
+              }),
+            });
+            const accountData = await accountRes.json();
+            const acct = accountData?.data?.account;
+            handle = acct?.username?.localName
+              || acct?.username?.value
+              || acct?.metadata?.name
+              || null;
+            console.info('[lens] Direct account lookup:', JSON.stringify(acct));
+          } catch { /* ignore fallback failure */ }
+        }
+
+        // Final fallback: use short address
+        if (!handle) {
+          handle = `@${accountAddress!.slice(0, 6)}...${accountAddress!.slice(-4)}`;
+        }
+
         matchedWallet = wallet;
         break;
       }

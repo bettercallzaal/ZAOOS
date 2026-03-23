@@ -249,7 +249,8 @@ See `.env.example` for all required environment variables.
 - [x] **Airtable import** — bulk import historical fractal data from CSV
   - `src/app/api/admin/respect-import/route.ts`
   - `src/components/admin/ImportRespectButton.tsx`
-- [ ] **Airtable full history import** — 130 members, 100+ sessions from 6 CSVs
+- [x] **Airtable full history import** — idempotent CLI script handles all 6 CSV types, both Fibonacci eras, recalculates totals
+  - `scripts/import-fractal-history.ts` (run: `npx tsx scripts/import-fractal-history.ts --dir ./data`)
 - [x] **Engagement streaks** — daily activity tracking, flame icon, longest streak, freeze mechanics
   - `src/app/api/streaks/` (2 routes: get streak, record activity)
   - `src/components/streaks/StreakBadge.tsx`
@@ -271,7 +272,9 @@ See `.env.example` for all required environment variables.
   - `src/app/api/fractals/analytics/route.ts`
 - [x] **Discord bot webhook** — real-time fractal events from Discord bot, HMAC auth
   - `src/app/api/fractals/webhook/route.ts`
-- [ ] **Direct OREC contract read** — fallback when ornode is down (read directly from Optimism)
+- [x] **Direct OREC contract read** — viem multicall fallback reads proposals from OREC on Optimism when ornode is down
+  - `src/lib/ordao/client.ts` (fetchProposalsOnChain, fetchRespectBalance, fetchZorBalance)
+  - Wired as automatic fallback in `src/app/api/fractals/proposals/route.ts`
 - [ ] **In-app fractal sessions** — run fractal sessions inside ZAO OS (currently Discord-only)
 
 #### Roles (Hats Protocol)
@@ -441,6 +444,7 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 | `src/lib/validation/schemas.ts` | All Zod schemas |
 | `src/contexts/XMTPContext.tsx` | XMTP state management (500+ lines) |
 | `src/providers/audio/` | 8 audio platform providers |
+| `src/lib/ordao/client.ts` | Direct OREC contract reader via viem — on-chain fallback for proposals + respect |
 | `src/lib/format/timeAgo.ts` | Relative time, deadline countdown, wallet shortener, number formatter |
 | `src/hooks/` | 11 custom hooks (auth, chat, radio, music queue, etc.) |
 

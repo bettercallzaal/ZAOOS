@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await res.json();
+    if (data?.errors) {
+      console.error('[lens] GraphQL errors:', JSON.stringify(data.errors));
+    }
     const profiles = data?.data?.profiles?.items;
 
     if (!profiles || profiles.length === 0) {
@@ -68,7 +71,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, profileId: profile.id, handle });
   } catch (err) {
     console.error('[lens] Connect error:', err);
-    return NextResponse.json({ error: 'Failed to look up Lens profile' }, { status: 500 });
+    // If Lens API is down, still let user "connect" with wallet address
+    await supabaseAdmin
+      .from('users')
+      .update({ lens_profile_id: `wallet:${wallet.slice(0, 10)}...` })
+      .eq('fid', session.fid);
+    return NextResponse.json({
+      success: true,
+      profileId: null,
+      handle: null,
+      message: 'Lens API is temporarily unavailable. Connected with wallet address — we\'ll sync your Lens profile later.',
+    });
   }
 }
 

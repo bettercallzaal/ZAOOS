@@ -449,7 +449,8 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
       const inMiniApp = await sdk.isInMiniApp();
 
       if (!inMiniApp) {
-        // Can only manage push notifications from within the mini app
+        // Show alert — push notifications require the Farcaster mini app
+        alert('Push notifications can only be enabled when using ZAO OS as a Farcaster Mini App. Open ZAO OS from Warpcast to enable.');
         setPushToggling(false);
         return;
       }

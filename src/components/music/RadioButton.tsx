@@ -50,7 +50,7 @@ export function RadioButton({
   // Full variant — card for sidebar
   return (
     <button
-      onClick={isRadioMode ? onStop : onStart}
+      onClick={() => isRadioMode ? onStop() : onStart()}
       disabled={radioLoading}
       className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
         isRadioMode

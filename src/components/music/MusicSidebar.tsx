@@ -118,9 +118,11 @@ export function MusicSidebar({
     );
   }
 
-  // ─── Desktop: right panel ──────────────────────────────────────────────────
+  // ─── Desktop: fixed right drawer ────────────────────────────────────────────
   return (
-    <div className="hidden md:flex flex-col w-[320px] flex-shrink-0 border-l border-gray-800 bg-[#0d1b2a] animate-slide-in-left overflow-hidden">
+    <>
+    <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+    <div className="fixed top-0 right-0 bottom-0 z-50 flex flex-col w-[340px] border-l border-gray-800 bg-[#0d1b2a] shadow-2xl shadow-black/50 animate-slide-in-left overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0a1628] flex-shrink-0">
         <div className="flex items-center gap-2">
@@ -199,6 +201,7 @@ export function MusicSidebar({
         )}
       </div>
     </div>
+    </>
   );
 }
 

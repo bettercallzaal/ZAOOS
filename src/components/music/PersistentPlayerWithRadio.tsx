@@ -4,6 +4,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
+import { useMobile } from '@/hooks/useMobile';
 import { PersistentPlayer } from './PersistentPlayer';
 
 const MusicSidebar = dynamic(
@@ -19,6 +20,7 @@ export function PersistentPlayerWithRadio() {
   const radio = useRadio();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const isMobile = useMobile();
 
   // Determine active channel from path for sidebar header
   const channelMatch = pathname.match(/^\/chat\/?(.*)/);
@@ -40,7 +42,7 @@ export function PersistentPlayerWithRadio() {
       <MusicSidebar
         activeChannel={activeChannel}
         isOpen={sidebarOpen}
-        isMobile={false}
+        isMobile={isMobile}
         onClose={() => setSidebarOpen(false)}
         isRadioMode={radio.isRadioMode}
         radioLoading={radio.radioLoading}

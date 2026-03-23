@@ -35,6 +35,9 @@ interface Proposal {
   commentCount: number;
   user_vote: 'for' | 'against' | 'abstain' | null;
   respect_threshold: number;
+  published_cast_hash: string | null;
+  published_bluesky_uri: string | null;
+  publish_text: string | null;
 }
 
 /* ── Constants ──────────────────────────────────────────────── */
@@ -532,6 +535,35 @@ function ProposalCard({
               )}
             </p>
           </div>
+
+          {/* Published links */}
+          {(p.published_cast_hash || p.published_bluesky_uri) && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wider w-full mb-1">Published To</p>
+              {p.published_cast_hash && (
+                <a
+                  href={`https://warpcast.com/~/conversations/${p.published_cast_hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 text-xs font-medium hover:bg-purple-500/20 transition-colors border border-purple-500/20"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                  View on Farcaster
+                </a>
+              )}
+              {p.published_bluesky_uri && (
+                <a
+                  href={p.published_bluesky_uri.startsWith('http') ? p.published_bluesky_uri : `https://bsky.app/profile/${p.published_bluesky_uri}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-medium hover:bg-blue-500/20 transition-colors border border-blue-500/20"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
+                  View on Bluesky
+                </a>
+              )}
+            </div>
+          )}
 
           {/* Detailed vote bar with threshold */}
           <div className="mt-4">

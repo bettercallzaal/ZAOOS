@@ -34,15 +34,27 @@ function spotifyUriFromUrl(url: string): string {
   return url;
 }
 
+// Module-level container — survives component re-mounts and route changes
+let spotifyContainer: HTMLDivElement | null = null;
+
+function ensureContainer(): HTMLDivElement {
+  if (!spotifyContainer || !document.body.contains(spotifyContainer)) {
+    spotifyContainer = document.createElement('div');
+    spotifyContainer.style.cssText = 'display:none;position:absolute;width:1px;height:1px;overflow:hidden';
+    spotifyContainer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(spotifyContainer);
+  }
+  return spotifyContainer;
+}
+
 export function SpotifyProvider({ children }: { children: ReactNode }) {
   const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
-  const containerRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<SpotifyController | null>(null);
   const apiRef = useRef<SpotifyIFrameAPI | null>(null);
   const pendingUriRef = useRef<string | null>(null);
 
   const createSpotifyController = (api: SpotifyIFrameAPI, uri: string) => {
-    if (!containerRef.current) return;
+    const container = ensureContainer();
 
     // Remove listeners before destroying to prevent leaked event handlers
     if (controllerRef.current) {
@@ -53,7 +65,7 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
     }
 
     api.createController(
-      containerRef.current,
+      container,
       { uri, width: 1, height: 1 },
       (controller) => {
         controllerRef.current = controller;
@@ -145,14 +157,10 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
     }
   }, [state.metadata?.url, state.status, state.metadata?.type]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
-    <>
-      <div
-        ref={containerRef}
-        style={{ display: 'none', position: 'absolute', width: 1, height: 1, overflow: 'hidden' }}
-        aria-hidden="true"
-      />
-      {children}
-    </>
-  );
+  // Ensure container exists on mount
+  useEffect(() => {
+    ensureContainer();
+  }, []);
+
+  return <>{children}</>;
 }

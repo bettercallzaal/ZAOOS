@@ -57,9 +57,24 @@ function extractVideoId(url: string): string | null {
   return null;
 }
 
+// Module-level container — survives component re-mounts and route changes
+let ytContainer: HTMLDivElement | null = null;
+
+function ensureContainer(): HTMLDivElement {
+  if (!ytContainer || !document.body.contains(ytContainer)) {
+    ytContainer = document.createElement('div');
+    ytContainer.style.cssText = 'display:none;position:absolute;width:1px;height:1px;overflow:hidden';
+    ytContainer.setAttribute('aria-hidden', 'true');
+    const inner = document.createElement('div');
+    inner.id = 'yt-player-inner';
+    ytContainer.appendChild(inner);
+    document.body.appendChild(ytContainer);
+  }
+  return ytContainer;
+}
+
 export function YoutubeProvider({ children }: { children: ReactNode }) {
   const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
-  const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const apiReadyRef = useRef(false);
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -131,7 +146,8 @@ export function YoutubeProvider({ children }: { children: ReactNode }) {
     if (!videoId) return;
 
     const initPlayer = () => {
-      if (!apiReadyRef.current || !containerRef.current || !window.YT?.Player) return;
+      if (!apiReadyRef.current || !window.YT?.Player) return;
+      ensureContainer();
 
       // Destroy existing player
       if (playerRef.current) {
@@ -185,27 +201,18 @@ export function YoutubeProvider({ children }: { children: ReactNode }) {
     return () => stopProgress();
   }, [state.metadata?.url, state.status, state.metadata?.type]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Cleanup on unmount
+  // Cleanup on unmount — DON'T destroy the player, just stop progress tracking
+  // The module-level container and player persist across route changes
   useEffect(() => {
     return () => {
       stopProgress();
-      if (playerRef.current) {
-        playerRef.current.destroy();
-        playerRef.current = null;
-      }
     };
   }, []);
 
-  return (
-    <>
-      <div
-        ref={containerRef}
-        style={{ display: 'none', position: 'absolute', width: 1, height: 1, overflow: 'hidden' }}
-        aria-hidden="true"
-      >
-        <div id="yt-player-inner" />
-      </div>
-      {children}
-    </>
-  );
+  // Ensure container exists on mount
+  useEffect(() => {
+    ensureContainer();
+  }, []);
+
+  return <>{children}</>;
 }

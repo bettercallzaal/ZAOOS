@@ -30,9 +30,24 @@ declare global {
   }
 }
 
+// Module-level iframe — survives component re-mounts and route changes
+let scIframe: HTMLIFrameElement | null = null;
+
+function ensureIframe(): HTMLIFrameElement {
+  if (!scIframe || !document.body.contains(scIframe)) {
+    scIframe = document.createElement('iframe');
+    scIframe.id = 'sc-widget';
+    scIframe.allow = 'autoplay';
+    scIframe.src = 'about:blank';
+    scIframe.title = 'SoundCloud Player';
+    scIframe.style.cssText = 'display:none;position:absolute;width:0;height:0';
+    document.body.appendChild(scIframe);
+  }
+  return scIframe;
+}
+
 export function SoundcloudProvider({ children }: { children: ReactNode }) {
   const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
-  const iframeRef = useRef<HTMLIFrameElement>(null);
   const widgetRef = useRef<SCWidget | null>(null);
   const widgetReadyRef = useRef(false);
   const pendingUrlRef = useRef<string | null>(null);
@@ -58,9 +73,10 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'ERROR', payload: 'SoundCloud player failed to load' });
         return;
       }
-      if (!window.SC || !iframeRef.current || widgetRef.current) return;
+      if (!window.SC || widgetRef.current) return;
+      const iframe = ensureIframe();
 
-      const widget = window.SC.Widget(iframeRef.current);
+      const widget = window.SC.Widget(iframe);
       widgetRef.current = widget;
 
       widget.bind(window.SC.Widget.Events.READY, () => {
@@ -140,17 +156,10 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
     // LOADED dispatched via PLAY event handler above
   }, [state.metadata?.url, state.status, state.metadata?.type]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
-    <>
-      <iframe
-        ref={iframeRef}
-        id="sc-widget"
-        allow="autoplay"
-        src="about:blank"
-        style={{ display: 'none', position: 'absolute', width: 0, height: 0 }}
-        title="SoundCloud Player"
-      />
-      {children}
-    </>
-  );
+  // Ensure iframe exists on mount
+  useEffect(() => {
+    ensureIframe();
+  }, []);
+
+  return <>{children}</>;
 }

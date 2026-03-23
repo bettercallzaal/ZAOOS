@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
-// Lens connection is handled inline — no SDK hook needed
+import { useLensAuth } from '@/hooks/useLensAuth';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
 import type { SessionData } from '@/types';
@@ -561,28 +561,20 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [lensError, setLensError] = useState<string | null>(null);
   const [lensDisconnecting, setLensDisconnecting] = useState(false);
 
+  // Use the Lens SDK hook for wallet-based auth (gets posting tokens)
+  const { connect: lensSDKConnect, isConnecting: lensSDKConnecting, error: lensSDKError, connectedHandle: lensSDKHandle } = useLensAuth();
+
+  // Sync SDK state to local state
+  useEffect(() => {
+    if (lensSDKHandle) setLensHandle(lensSDKHandle);
+    if (lensSDKError) setLensError(lensSDKError);
+  }, [lensSDKHandle, lensSDKError]);
+
   const lensConnect = async () => {
     setLensConnecting(true);
     setLensError(null);
-    try {
-      const wallet = session?.walletAddress;
-      if (!wallet) { setLensError('No wallet connected'); setLensConnecting(false); return; }
-      const res = await fetch('/api/platforms/lens', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed');
-      if (data.handle) {
-        setLensHandle(data.handle);
-      } else {
-        setLensHandle(null);
-        setLensError(data.message || 'No Lens profile found on any connected wallet');
-      }
-    } catch (err) {
-      setLensError(err instanceof Error ? err.message : 'Failed to connect');
-    }
+    // Use the SDK hook which handles wallet signing + token storage
+    await lensSDKConnect();
     setLensConnecting(false);
   };
 

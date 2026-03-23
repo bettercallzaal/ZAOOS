@@ -23,7 +23,7 @@ export function RadioButton({
   if (variant === 'compact') {
     return (
       <button
-        onClick={isRadioMode ? onStop : onStart}
+        onClick={() => isRadioMode ? onStop() : onStart()}
         disabled={radioLoading}
         className={`relative flex items-center justify-center w-8 h-8 rounded-md transition-colors ${
           isRadioMode

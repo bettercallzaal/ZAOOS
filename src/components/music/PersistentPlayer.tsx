@@ -58,7 +58,7 @@ export function PersistentPlayer({
 
           {/* Play button — starts radio */}
           <button
-            onClick={isRadioMode ? onRadioStop : onRadioStart}
+            onClick={() => isRadioMode ? onRadioStop?.() : onRadioStart?.()}
             disabled={radioLoading}
             className="w-9 h-9 flex items-center justify-center rounded-full bg-[#f5a623] text-[#0d1b2a] active:scale-95 transition-transform disabled:opacity-60 flex-shrink-0"
             aria-label={isRadioMode ? 'Stop radio' : 'Start radio'}

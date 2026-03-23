@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { Cast } from '@/types';
 import { usePlayer } from '@/providers/audio';
@@ -106,6 +107,9 @@ export function MusicSidebar({
             />
           )}
 
+          {/* Quick add song */}
+          <QuickAddInput player={player} />
+
           {/* Now Playing — prominent mobile card */}
           {player.metadata && <NowPlayingCard player={player} onPlayPause={handlePlayPause} />}
 
@@ -167,6 +171,9 @@ export function MusicSidebar({
           onSwitch={onSwitchStation}
         />
       )}
+
+      {/* Quick add song */}
+      <QuickAddInput player={player} />
 
       {/* Now Playing — prominent card */}
       {player.metadata && <NowPlayingCard player={player} onPlayPause={handlePlayPause} />}
@@ -379,5 +386,57 @@ function StationPicker({
         </button>
       ))}
     </div>
+  );
+}
+
+// ─── Quick Add Input ──────────────────────────────────────────────────────────
+
+function QuickAddInput({ player }: { player: ReturnType<typeof usePlayer> }) {
+  const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = url.trim();
+    if (!trimmed) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(trimmed)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      player.play({ ...data, feedId: `manual-${Date.now()}` });
+      setUrl('');
+    } catch {
+      // silently fail
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-800/50">
+      <input
+        type="url"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+        placeholder="Paste a music link..."
+        className="flex-1 bg-white/5 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50 min-w-0"
+      />
+      <button
+        type="submit"
+        disabled={loading || !url.trim()}
+        className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#f5a623]/15 text-[#f5a623] hover:bg-[#f5a623]/25 disabled:opacity-40 transition-colors flex-shrink-0"
+        aria-label="Play link"
+      >
+        {loading ? (
+          <div className="w-3.5 h-3.5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <svg className="w-3.5 h-3.5 ml-0.5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        )}
+      </button>
+    </form>
   );
 }

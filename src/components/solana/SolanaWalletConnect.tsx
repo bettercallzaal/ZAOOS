@@ -28,22 +28,6 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
     }
   }, [connected, publicKey]);
 
-  // After select() updates the wallet adapter, trigger connect()
-  useEffect(() => {
-    if (!pendingWalletName.current || !wallet) return;
-    if (wallet.adapter.name === pendingWalletName.current) {
-      pendingWalletName.current = null;
-      // Small delay to let the adapter fully initialize
-      const timer = setTimeout(() => {
-        connect().catch(() => {
-          setError('Failed to connect — check your wallet extension');
-          setConnecting(false);
-        });
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [wallet, connect]);
-
   // Timeout fallback — don't stay stuck on "Connecting..." forever
   useEffect(() => {
     if (!connecting) return;
@@ -56,12 +40,20 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
     return () => clearTimeout(timeout);
   }, [connecting]);
 
-  const handleConnect = useCallback((walletName: string) => {
+  const handleConnect = useCallback(async (walletName: string) => {
     setError('');
     setShowWalletPicker(false);
     setConnecting(true);
-    pendingWalletName.current = walletName;
-    select(walletName as WalletName);
+    try {
+      // Select and connect in same user gesture context so popup isn't blocked
+      select(walletName as WalletName);
+      // Small delay for adapter to register, then connect
+      await new Promise(r => setTimeout(r, 150));
+      await connect();
+    } catch {
+      setError('Failed to connect — check your wallet extension');
+      setConnecting(false);
+    }
   }, [select]);
 
   const handleVerifyAndSave = useCallback(async () => {

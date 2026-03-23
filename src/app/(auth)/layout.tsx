@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { getSessionData } from '@/lib/auth/session';
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { PersistentPlayer } from '@/components/music/PersistentPlayer';
+import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
 import { QuickAddSong } from '@/components/music/QuickAddSong';
 
 export default async function AuthLayout({
@@ -20,7 +20,7 @@ export default async function AuthLayout({
         {children}
       </ErrorBoundary>
       <QuickAddSong />
-      <PersistentPlayer />
+      <PersistentPlayerWithRadio />
       <BottomNav />
     </div>
   );

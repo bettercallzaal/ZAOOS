@@ -7,13 +7,17 @@ import { formatDuration } from '@/lib/music/formatDuration';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 
+interface PersistentPlayerProps {
+  onPrev?: () => void;
+  onNext?: () => void;
+}
+
 /**
  * Persistent music player that renders on ALL authenticated pages.
  * Sits above the bottom nav, only visible when a track is loaded.
- * Shows minimal controls — play/pause, track info, progress.
- * Full queue/prev/next controls are in ChatRoom's GlobalPlayer.
+ * Shows minimal controls — play/pause, prev/next, track info, progress.
  */
-export function PersistentPlayer() {
+export function PersistentPlayer({ onPrev, onNext }: PersistentPlayerProps = {}) {
   const player = usePlayer();
   const pathname = usePathname();
 
@@ -75,14 +79,16 @@ export function PersistentPlayer() {
           </div>
         </div>
 
-        {/* Share + Platform badge */}
-        <ShareToFarcaster
-          template={shareTemplates.song(metadata.trackName, metadata.artistName || 'Unknown', metadata.url)}
-          variant="icon"
-        />
-        <span className="text-[9px] text-gray-500 bg-white/5 px-1.5 py-0.5 rounded capitalize flex-shrink-0">
-          {metadata.type === 'applemusic' ? 'Apple' : metadata.type === 'soundxyz' ? 'Sound' : metadata.type}
-        </span>
+        {/* Previous */}
+        <button
+          onClick={onPrev}
+          className="text-gray-400 hover:text-white p-1 flex-shrink-0 transition-colors"
+          aria-label="Previous track"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+          </svg>
+        </button>
 
         {/* Play/Pause */}
         <button
@@ -102,6 +108,17 @@ export function PersistentPlayer() {
               <path d="M8 5v14l11-7z" />
             </svg>
           )}
+        </button>
+
+        {/* Next */}
+        <button
+          onClick={onNext}
+          className="text-gray-400 hover:text-white p-1 flex-shrink-0 transition-colors"
+          aria-label="Next track"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+          </svg>
         </button>
 
         {/* Close */}

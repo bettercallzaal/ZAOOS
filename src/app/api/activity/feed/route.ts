@@ -93,8 +93,9 @@ export async function GET(req: NextRequest) {
     if (filter === 'all' || filter === 'social') {
       const { data: members } = await supabaseAdmin
         .from('users')
-        .select('fid, display_name, pfp_url, created_at')
+        .select('fid, display_name, pfp_url, created_at, last_login_at')
         .eq('is_active', true)
+        .not('last_login_at', 'is', null)
         .order('created_at', { ascending: false })
         .limit(limit);
 

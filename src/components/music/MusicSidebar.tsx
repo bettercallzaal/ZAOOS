@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Cast } from '@/types';
 import { usePlayer } from '@/providers/audio';
@@ -10,6 +10,7 @@ import { RadioButton } from './RadioButton';
 import { Scrubber } from './Scrubber';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { TrackCardSkeleton } from '@/components/music/MusicSkeletons';
+import type { Song } from '@/lib/music/library';
 
 interface MusicSidebarProps {
   messages?: Cast[];
@@ -178,35 +179,14 @@ export function MusicSidebar({
       {/* Now Playing — prominent card */}
       {player.metadata && <NowPlayingCard player={player} onPlayPause={handlePlayPause} />}
 
-      {/* Queue */}
-      <div className="flex-1 overflow-y-auto">
-        {queue.length === 0 && radioLoading ? (
-          <div className="py-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <TrackCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : queue.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#f5a623]/10 to-[#f5a623]/5 flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-[#f5a623]/40" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-              </svg>
-            </div>
-            <p className="text-sm font-medium text-gray-400">No music yet</p>
-            <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">
-              Share a Spotify, SoundCloud, YouTube, or Audius link in #{activeChannel} to build the queue
-            </p>
-          </div>
-        ) : (
-          <div className="py-2">
-            <p className="px-4 pb-2 text-[10px] text-gray-500 font-medium uppercase tracking-wider">
-              {currentIndex >= 0 ? `Up next · ${queue.length - currentIndex - 1} remaining` : `Queue · ${queue.length} tracks`}
-            </p>
-            <QueueContent queue={queue} currentIndex={currentIndex} />
-          </div>
-        )}
-      </div>
+      {/* Tabs: Library | Queue | Playlists */}
+      <SidebarTabs
+        queue={queue}
+        currentIndex={currentIndex}
+        radioLoading={radioLoading}
+        activeChannel={activeChannel}
+        player={player}
+      />
     </div>
     </>
   );
@@ -384,6 +364,270 @@ function StationPicker({
         >
           {name}
         </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Sidebar Tabs ─────────────────────────────────────────────────────────────
+
+type TabId = 'library' | 'queue' | 'playlists';
+
+function SidebarTabs({
+  queue,
+  currentIndex,
+  radioLoading,
+  activeChannel,
+  player,
+}: {
+  queue: ReturnType<typeof useMusicQueue>;
+  currentIndex: number;
+  radioLoading: boolean;
+  activeChannel: string;
+  player: ReturnType<typeof usePlayer>;
+}) {
+  const [activeTab, setActiveTab] = useState<TabId>('library');
+
+  const tabs: { id: TabId; label: string }[] = [
+    { id: 'library', label: 'Library' },
+    { id: 'queue', label: `Queue${queue.length > 0 ? ` (${queue.length})` : ''}` },
+    { id: 'playlists', label: 'Playlists' },
+  ];
+
+  return (
+    <>
+      {/* Tab bar */}
+      <div className="flex border-b border-gray-800 flex-shrink-0">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 py-2 text-xs font-medium transition-colors ${
+              activeTab === tab.id
+                ? 'text-[#f5a623] border-b-2 border-[#f5a623]'
+                : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div className="flex-1 overflow-y-auto">
+        {activeTab === 'library' && <LibraryTab player={player} />}
+        {activeTab === 'queue' && (
+          queue.length === 0 && radioLoading ? (
+            <div className="py-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TrackCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : queue.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+              <p className="text-sm font-medium text-gray-400">No tracks in queue</p>
+              <p className="text-xs text-gray-600 mt-1.5">
+                Play a song or start radio to build the queue
+              </p>
+            </div>
+          ) : (
+            <div className="py-2">
+              <p className="px-4 pb-2 text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+                {currentIndex >= 0 ? `Up next · ${queue.length - currentIndex - 1} remaining` : `Queue · ${queue.length} tracks`}
+              </p>
+              <QueueContent queue={queue} currentIndex={currentIndex} />
+            </div>
+          )
+        )}
+        {activeTab === 'playlists' && <PlaylistsTab />}
+      </div>
+    </>
+  );
+}
+
+// ─── Library Tab ──────────────────────────────────────────────────────────────
+
+function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<'recent' | 'popular' | 'played'>('recent');
+
+  const fetchSongs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ sort, limit: '50' });
+      if (search) params.set('search', search);
+      const res = await fetch(`/api/music/library?${params}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setSongs(data.songs || []);
+      setTotal(data.total || 0);
+    } catch { /* ignore */ }
+    finally { setLoading(false); }
+  }, [search, sort]);
+
+  useEffect(() => {
+    fetchSongs();
+  }, [fetchSongs]);
+
+  // Debounce search
+  const [searchInput, setSearchInput] = useState('');
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(searchInput), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const playSong = async (song: Song) => {
+    player.play({
+      id: song.id,
+      type: song.platform as import('@/types/music').TrackType,
+      trackName: song.title,
+      artistName: song.artist || '',
+      artworkUrl: song.artwork_url || '',
+      url: song.url,
+      streamUrl: song.stream_url || undefined,
+      feedId: `library-${song.id}`,
+    });
+    // Increment play count (fire and forget)
+    fetch('/api/music/library/play', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ songId: song.id }),
+    }).catch(() => {});
+  };
+
+  return (
+    <div className="flex flex-col">
+      {/* Search + sort */}
+      <div className="px-3 py-2 space-y-2 border-b border-gray-800/50">
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          placeholder="Search library..."
+          className="w-full bg-white/5 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
+        />
+        <div className="flex gap-1">
+          {(['recent', 'popular', 'played'] as const).map((s) => (
+            <button
+              key={s}
+              onClick={() => setSort(s)}
+              className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                sort === s ? 'bg-[#f5a623] text-[#0a1628]' : 'bg-white/5 text-gray-400 hover:text-white'
+              }`}
+            >
+              {s === 'recent' ? 'Recent' : s === 'popular' ? 'Most Played' : 'Last Played'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Song list */}
+      {loading ? (
+        <div className="py-2">
+          {Array.from({ length: 5 }).map((_, i) => <TrackCardSkeleton key={i} />)}
+        </div>
+      ) : songs.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+          <p className="text-sm font-medium text-gray-400">
+            {search ? 'No songs found' : 'Library is empty'}
+          </p>
+          <p className="text-xs text-gray-600 mt-1">
+            {search ? 'Try a different search' : 'Share music in chat to start building the library'}
+          </p>
+        </div>
+      ) : (
+        <div className="py-1">
+          <p className="px-3 py-1 text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+            {total} song{total !== 1 ? 's' : ''}
+          </p>
+          {songs.map((song) => (
+            <button
+              key={song.id}
+              onClick={() => playSong(song)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-white/5 transition-colors text-left"
+            >
+              {/* Artwork */}
+              <div className="relative w-9 h-9 flex-shrink-0 rounded-md overflow-hidden bg-gray-800">
+                {song.artwork_url ? (
+                  <Image src={song.artwork_url} alt={song.title} fill className="object-cover" sizes="36px" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-white truncate">{song.title}</p>
+                <div className="flex items-center gap-1.5">
+                  {song.artist && <p className="text-[11px] text-gray-500 truncate">{song.artist}</p>}
+                  <span className="text-[9px] text-gray-600 bg-white/5 px-1 py-0.5 rounded capitalize flex-shrink-0">
+                    {song.platform === 'soundxyz' ? 'Sound' : song.platform}
+                  </span>
+                </div>
+              </div>
+
+              {/* Play count */}
+              {song.play_count > 0 && (
+                <span className="text-[10px] text-gray-600 flex-shrink-0">{song.play_count}x</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Playlists Tab ────────────────────────────────────────────────────────────
+
+function PlaylistsTab() {
+  const [playlists, setPlaylists] = useState<{ id: string; name: string; type: string; trackCount: number }[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/music/playlists')
+      .then((r) => r.ok ? r.json() : { playlists: [] })
+      .then((data) => setPlaylists(data.playlists || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div className="py-2">{Array.from({ length: 3 }).map((_, i) => <TrackCardSkeleton key={i} />)}</div>;
+  }
+
+  if (playlists.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+        <p className="text-sm font-medium text-gray-400">No playlists yet</p>
+        <p className="text-xs text-gray-600 mt-1">Playlists will appear here as you create them</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-1">
+      {playlists.map((pl) => (
+        <div key={pl.id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors">
+          <div className="w-9 h-9 rounded-md bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-[#f5a623]/60" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-white truncate">{pl.name}</p>
+            <p className="text-[11px] text-gray-500">
+              {pl.trackCount} track{pl.trackCount !== 1 ? 's' : ''} · {pl.type === 'totd_archive' ? 'TOTD' : pl.type}
+            </p>
+          </div>
+        </div>
       ))}
     </div>
   );

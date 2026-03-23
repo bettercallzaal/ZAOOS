@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { upsertSong } from '@/lib/music/library';
 import { z } from 'zod';
 
 const VALID_TAGS = ['Hip-Hop', 'R&B', 'Electronic', 'Lo-Fi', 'Jazz', 'Afrobeats', 'Soul', 'Experimental'] as const;
@@ -175,6 +176,18 @@ export async function POST(req: NextRequest) {
     }
 
     if (result.error) throw result.error;
+
+    // Save to song library (fire and forget)
+    upsertSong({
+      url,
+      platform: trackType,
+      title: title || 'Untitled',
+      artist: artist || undefined,
+      submittedByFid: session.fid,
+      source: 'submission',
+      tags: tags as string[] | undefined,
+    }).catch(() => {});
+
     return NextResponse.json({ success: true, submission: result.data });
   } catch (error) {
     console.error('Submit song error:', error);

@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { sendMessageSchema } from '@/lib/validation/schemas';
 import { sendNotification, createInAppNotification } from '@/lib/notifications';
 import { postToBluesky } from '@/lib/bluesky/client';
+import { extractAndSaveSongs } from '@/lib/music/library';
 import { communityConfig } from '@/../community.config';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
@@ -63,6 +64,9 @@ export async function POST(req: NextRequest) {
         .upsert([row], { onConflict: 'hash' });
       if (dbError) console.error('[send] DB insert error:', dbError);
     }
+
+    // Save any music links to the song library (fire and forget)
+    extractAndSaveSongs(text, embedUrls, session.fid, 'chat').catch(() => {});
 
     // Cross-post to additional channels (fire and forget)
     const additionalChannels = [...channels].filter((ch) => ch !== primaryChannel);

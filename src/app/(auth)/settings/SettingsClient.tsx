@@ -5,11 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
+import { useLensAuth } from '@/hooks/useLensAuth';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
 import type { SessionData } from '@/types';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
-import { ConnectedPlatforms } from '@/components/settings/ConnectedPlatforms';
 
 interface Profile {
   fid: number;
@@ -93,6 +93,140 @@ function CopyButton({ text }: { text: string }) {
       title="Copy address"
     >
       {copied ? 'Copied' : 'Copy'}
+    </button>
+  );
+}
+
+// ── Platform SVG Icons ─────────────────────────────────────────────
+
+function WalletIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 110-6h5.25A2.25 2.25 0 0121 6v6zm0 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18V6a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 6m-7.5 6a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+    </svg>
+  );
+}
+
+function FarcasterIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M5.5 3h13v1.5h1V6h1v12h-1v1.5h-1V21h-1.5v-1.5H7V21H5.5v-1.5h-1V18h-1V6h1V4.5h1V3zm2 6v4.5h1.5V9H7.5zm7.5 0v4.5H16.5V9H15z" />
+    </svg>
+  );
+}
+
+function BlueskyIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 568 501" className={className} fill="currentColor">
+      <path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.793 166.471-20.155 71.454-93.57 89.708-159.534 78.663 115.346 19.729 144.665 85.021 81.294 150.313-120.758 124.562-173.715-31.256-187.093-71.174-2.41-7.186-3.542-10.549-2.874-7.688-0.668-2.861-0.464 0.502-2.874 7.688-13.378 39.918-66.335 195.736-187.093 71.174-63.371-65.292-34.052-130.584 81.294-150.313-65.964 11.045-139.379-7.209-159.534-78.663C9.945 203.659 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z" />
+    </svg>
+  );
+}
+
+function LensIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 3a3.5 3.5 0 013.5 3.5c0 1.655-1.156 3.042-2.702 3.393a.75.75 0 00-.548.548C11.9 14.087 10.513 15.243 8.858 15.243A3.5 3.5 0 015.358 11.743c0-1.655 1.156-3.042 2.702-3.393a.75.75 0 00.548-.548C8.958 6.156 10.345 5 12 5zm4.5 6.5a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+  );
+}
+
+function HiveIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M12.506 1.063L7.326 9.3h10.348L12.506 1.063zM18.65 10.3H6.35L1.17 18.537h22.66L18.65 10.3zM6.862 19.537l5.644 3.4 5.644-3.4H6.862z" />
+    </svg>
+  );
+}
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+// ── Status Dot ────────────────────────────────────────────────────
+
+function StatusDot({ status }: { status: 'connected' | 'partial' | 'disconnected' }) {
+  const colors = {
+    connected: 'bg-[#22c55e]',
+    partial: 'bg-[#f59e0b]',
+    disconnected: 'bg-[#4b5563]',
+  };
+  return <span className={`w-2 h-2 rounded-full flex-shrink-0 ${colors[status]}`} />;
+}
+
+// ── Account Row ───────────────────────────────────────────────────
+
+interface AccountRowProps {
+  icon: React.ReactNode;
+  name: string;
+  status: 'connected' | 'partial' | 'disconnected';
+  detail?: string;
+  action?: React.ReactNode;
+  children?: React.ReactNode;
+}
+
+function AccountRow({ icon, name, status, detail, action, children }: AccountRowProps) {
+  return (
+    <div>
+      <div className="flex items-center justify-between py-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <StatusDot status={status} />
+          <span className="w-5 h-5 flex-shrink-0 flex items-center justify-center">{icon}</span>
+          <span className="text-sm text-white">{name}</span>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {detail && <span className="text-xs text-gray-500 font-mono">{detail}</span>}
+          {action}
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── Feature Row ───────────────────────────────────────────────────
+
+interface FeatureRowProps {
+  name: string;
+  detail: string;
+  action: React.ReactNode;
+}
+
+function FeatureRow({ name, detail, action }: FeatureRowProps) {
+  return (
+    <div className="flex items-center justify-between py-3">
+      <div className="flex-1 min-w-0 pr-3">
+        <p className="text-sm text-white">{name}</p>
+        <p className="text-xs text-gray-500 mt-0.5">{detail}</p>
+      </div>
+      <div className="flex-shrink-0">{action}</div>
+    </div>
+  );
+}
+
+// ── Toggle Switch ─────────────────────────────────────────────────
+
+function ToggleSwitch({ on, onToggle, disabled, label }: { on: boolean; onToggle: () => void; disabled?: boolean; label: string }) {
+  return (
+    <button
+      onClick={onToggle}
+      disabled={disabled}
+      className={`relative w-9 h-5 rounded-full transition-colors ${
+        on ? 'bg-green-500' : 'bg-gray-600'
+      } ${disabled ? 'opacity-50' : ''}`}
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+    >
+      <span
+        className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+          on ? 'translate-x-4' : 'translate-x-0'
+        }`}
+      />
     </button>
   );
 }
@@ -421,6 +555,67 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     } catch { /* ignore */ }
   };
 
+  // Lens connection state
+  const { isConnecting: lensConnecting, error: lensError, connectedHandle: lensConnectedHandle, connect: lensConnect, walletAddress: lensWalletAddress } = useLensAuth();
+  const [lensHandle, setLensHandle] = useState(profile?.lens_profile_id || null);
+  const [lensDisconnecting, setLensDisconnecting] = useState(false);
+
+  // Update lens handle when hook connects
+  useEffect(() => {
+    if (lensConnectedHandle && lensConnectedHandle !== lensHandle) {
+      setLensHandle(lensConnectedHandle);
+    }
+  }, [lensConnectedHandle, lensHandle]);
+
+  const disconnectLens = async () => {
+    setLensDisconnecting(true);
+    try {
+      const res = await fetch('/api/platforms/lens', { method: 'DELETE' });
+      if (res.ok) setLensHandle(null);
+    } catch { /* ignore */ }
+    setLensDisconnecting(false);
+  };
+
+  // Hive connection state
+  const [hiveUsername, setHiveUsername] = useState(profile?.hive_username || null);
+  const [showHiveConnect, setShowHiveConnect] = useState(false);
+  const [hiveUser, setHiveUser] = useState('');
+  const [hivePostingKey, setHivePostingKey] = useState('');
+  const [hiveConnecting, setHiveConnecting] = useState(false);
+  const [hiveError, setHiveError] = useState('');
+
+  const connectHive = async () => {
+    if (!hiveUser || !hivePostingKey) return;
+    setHiveConnecting(true);
+    setHiveError('');
+    try {
+      const res = await fetch('/api/platforms/hive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: hiveUser, postingKey: hivePostingKey }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setHiveUsername(data.username);
+        setShowHiveConnect(false);
+        setHiveUser('');
+        setHivePostingKey('');
+      } else {
+        setHiveError(data.error || 'Failed to connect');
+      }
+    } catch {
+      setHiveError('Connection failed');
+    }
+    setHiveConnecting(false);
+  };
+
+  const disconnectHive = async () => {
+    try {
+      const res = await fetch('/api/platforms/hive', { method: 'DELETE' });
+      if (res.ok) setHiveUsername(null);
+    } catch { /* ignore */ }
+  };
+
   // Push notification state
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
   const [pushToggling, setPushToggling] = useState(false);
@@ -480,16 +675,20 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     setPushToggling(false);
   };
 
-  // Connection count for progress indicator
-  const connections = [
+  // Account count for progress indicator
+  const accountConnections = [
     !!session?.walletAddress,
     !!session?.fid,
-    !!session?.signerUuid,
-    xmtpConnected,
     !!blueskyHandle,
+    !!lensHandle,
+    !!hiveUsername,
     !!solanaWallet,
   ];
-  const connectedCount = connections.filter(Boolean).length;
+  const accountConnectedCount = accountConnections.filter(Boolean).length;
+
+  // Cross-posting platform count
+  const crossPostPlatforms = [!!blueskyHandle, !!lensHandle, !!hiveUsername].filter(Boolean).length;
+  const totalCrossPostPlatforms = 3;
 
   if (!session || !profile) {
     return (
@@ -512,130 +711,268 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
 
-        {/* ── Connections ──────────────────────────────────────────── */}
+        {/* ── ACCOUNTS ──────────────────────────────────────────── */}
         <section>
           <div className="flex items-center justify-between px-1 mb-3">
-            <p className="text-xs text-gray-500 uppercase tracking-wider">Connections</p>
-            <span className="text-[10px] text-gray-600">{connectedCount} of {connections.length} connected</span>
+            <p className="text-xs text-gray-500 uppercase tracking-wider">Accounts</p>
+            <span className="text-[10px] text-gray-600">{accountConnectedCount} of {accountConnections.length} connected</span>
           </div>
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
-            <div className="space-y-3">
-              {/* Wallet — always connected (it's how they logged in) */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-400" />
-                  <span className="text-sm text-white">Wallet</span>
-                </div>
-                <span className="text-xs text-gray-500 font-mono">
-                  {session.walletAddress ? shortAddr(session.walletAddress) : 'Connected'}
-                </span>
-              </div>
+          <div className="bg-[#0d1b2a] rounded-xl px-4 border border-gray-800 divide-y divide-gray-800/50">
 
-              {/* Farcaster */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${session.fid ? 'bg-green-400' : 'bg-gray-600'}`} />
-                  <span className="text-sm text-white">Farcaster</span>
-                </div>
-                {session.fid ? (
-                  <span className="text-xs text-gray-500">@{profile?.username || `FID ${session.fid}`}</span>
+            {/* 1. Wallet — always connected */}
+            <AccountRow
+              icon={<WalletIcon className="w-4 h-4 text-[#f5a623]" />}
+              name="Wallet"
+              status="connected"
+              detail={session.walletAddress ? shortAddr(session.walletAddress) : 'Connected'}
+              action={<span className="text-[10px] text-gray-600">Primary</span>}
+            />
+
+            {/* 2. Farcaster */}
+            <AccountRow
+              icon={<FarcasterIcon className="w-4 h-4 text-purple-400" />}
+              name="Farcaster"
+              status={session.fid ? 'connected' : 'disconnected'}
+              detail={session.fid ? `@${profile?.username || `FID ${session.fid}`}` : 'Not connected'}
+              action={
+                session.signerUuid ? (
+                  <span className="text-[10px] text-green-500/70">Posting &#10003;</span>
+                ) : session.fid ? (
+                  <span className="text-[10px] text-[#f59e0b]">No signer</span>
+                ) : null
+              }
+            />
+
+            {/* 3. Bluesky */}
+            <AccountRow
+              icon={<BlueskyIcon className="w-4 h-4 text-blue-400" />}
+              name="Bluesky"
+              status={blueskyHandle ? 'connected' : 'disconnected'}
+              detail={blueskyHandle ? `@${blueskyHandle}` : undefined}
+              action={
+                blueskyHandle ? (
+                  <button
+                    onClick={disconnectBluesky}
+                    className="text-[10px] text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    Disconnect
+                  </button>
                 ) : (
-                  <span className="text-xs text-gray-500">Not connected</span>
-                )}
-              </div>
-
-              {/* Signer (posting) */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${session.signerUuid ? 'bg-green-400' : 'bg-gray-600'}`} />
-                  <span className="text-sm text-white">Posting</span>
+                  <button
+                    onClick={() => { setShowBlueskyConnect(!showBlueskyConnect); setBskyError(''); }}
+                    className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
+                  >
+                    Connect
+                  </button>
+                )
+              }
+            >
+              {/* Bluesky inline connect form */}
+              {showBlueskyConnect && !blueskyHandle && (
+                <div className="pb-3 space-y-2">
+                  <input
+                    value={bskyHandle}
+                    onChange={(e) => setBskyHandle(e.target.value)}
+                    placeholder="yourname.bsky.social"
+                    className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    value={bskyAppPassword}
+                    onChange={(e) => setBskyAppPassword(e.target.value)}
+                    placeholder="App password (xxxx-xxxx-xxxx-xxxx)"
+                    type="password"
+                    className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:border-blue-500"
+                  />
+                  <p className="text-[10px] text-gray-600">Create one at bsky.app/settings/app-passwords</p>
+                  {bskyError && <p className="text-[10px] text-red-400">{bskyError}</p>}
+                  <button
+                    onClick={connectBluesky}
+                    disabled={bskyConnecting}
+                    className="w-full text-xs font-medium py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-400 disabled:opacity-50 transition-colors"
+                  >
+                    {bskyConnecting ? 'Connecting...' : 'Connect Bluesky'}
+                  </button>
                 </div>
-                {session.signerUuid ? (
-                  <span className="text-xs text-green-500/70">Enabled</span>
+              )}
+            </AccountRow>
+
+            {/* 4. Lens */}
+            <AccountRow
+              icon={<LensIcon className="w-4 h-4 text-green-400" />}
+              name="Lens"
+              status={lensHandle ? 'connected' : 'disconnected'}
+              detail={lensHandle || undefined}
+              action={
+                lensHandle ? (
+                  <button
+                    onClick={disconnectLens}
+                    disabled={lensDisconnecting}
+                    className="text-[10px] text-red-400 hover:text-red-300 transition-colors disabled:opacity-50"
+                  >
+                    {lensDisconnecting ? 'Disconnecting...' : 'Disconnect'}
+                  </button>
                 ) : (
-                  <span className="text-xs text-[#f5a623]">Connect Farcaster first</span>
-                )}
-              </div>
-
-              {/* XMTP Messaging */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${xmtpConnected ? 'bg-green-400' : 'bg-gray-600'}`} />
-                  <span className="text-sm text-white">Messaging</span>
+                  <button
+                    onClick={lensConnect}
+                    disabled={lensConnecting || !lensWalletAddress}
+                    className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors disabled:opacity-50"
+                  >
+                    {lensConnecting ? 'Signing...' : 'Connect with Wallet'}
+                  </button>
+                )
+              }
+            >
+              {lensError && (
+                <div className="pb-3">
+                  <p className="text-[10px] text-red-400">{lensError}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  {xmtpConnected && activeXMTPAddress ? (
-                    <>
-                      <span className="text-xs text-gray-500 font-mono">{shortAddr(activeXMTPAddress)}</span>
-                      <button
-                        onClick={switchWallet}
-                        className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
-                      >
-                        Switch
-                      </button>
-                    </>
-                  ) : (
-                    <span className="text-xs text-gray-500">
-                      {xmtpConnected ? 'Enabled' : 'Enable in Messages'}
-                    </span>
-                  )}
+              )}
+              {!lensHandle && !lensWalletAddress && (
+                <div className="pb-3">
+                  <p className="text-[10px] text-gray-600">Connect your wallet above to link Lens</p>
                 </div>
-              </div>
+              )}
+            </AccountRow>
 
-              {/* Cross-posting platforms (Bluesky, Lens, Hive) managed in Connected Platforms section below */}
+            {/* 5. Hive */}
+            <AccountRow
+              icon={<HiveIcon className="w-4 h-4 text-red-400" />}
+              name="Hive"
+              status={hiveUsername ? 'connected' : 'disconnected'}
+              detail={hiveUsername ? `@${hiveUsername}` : undefined}
+              action={
+                hiveUsername ? (
+                  <button
+                    onClick={disconnectHive}
+                    className="text-[10px] text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    Disconnect
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setShowHiveConnect(!showHiveConnect); setHiveError(''); }}
+                    className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
+                  >
+                    Connect
+                  </button>
+                )
+              }
+            >
+              {/* Hive inline connect form */}
+              {showHiveConnect && !hiveUsername && (
+                <div className="pb-3 space-y-2">
+                  <input
+                    value={hiveUser}
+                    onChange={(e) => setHiveUser(e.target.value)}
+                    placeholder="Hive username"
+                    className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:border-red-500"
+                  />
+                  <input
+                    value={hivePostingKey}
+                    onChange={(e) => setHivePostingKey(e.target.value)}
+                    placeholder="Posting key (5K...)"
+                    type="password"
+                    className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:border-red-500"
+                  />
+                  <p className="text-[10px] text-gray-600">Your posting key is encrypted and never shared</p>
+                  {hiveError && <p className="text-[10px] text-red-400">{hiveError}</p>}
+                  <button
+                    onClick={connectHive}
+                    disabled={hiveConnecting}
+                    className="w-full text-xs font-medium py-2 rounded-lg bg-red-600 text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
+                  >
+                    {hiveConnecting ? 'Connecting...' : 'Connect Hive'}
+                  </button>
+                </div>
+              )}
+            </AccountRow>
 
-              {/* Solana Wallet */}
+            {/* 6. Solana */}
+            <div className="py-3">
               <SolanaWalletConnect
                 savedWallet={solanaWallet}
                 onSaved={setSolanaWallet}
               />
-
-              {/* Push Notifications */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${pushEnabled ? 'bg-green-400' : 'bg-gray-600'}`} />
-                  <span className="text-sm text-white">Push Notifications</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {pushEnabled === null ? (
-                    <span className="text-xs text-gray-500">Checking...</span>
-                  ) : (
-                    <>
-                      <span className="text-xs text-gray-500">
-                        {pushEnabled ? 'Enabled' : 'Disabled'}
-                      </span>
-                      <button
-                        onClick={togglePushNotifications}
-                        disabled={pushToggling}
-                        className={`relative w-9 h-5 rounded-full transition-colors ${
-                          pushEnabled ? 'bg-green-500' : 'bg-gray-600'
-                        } ${pushToggling ? 'opacity-50' : ''}`}
-                        aria-label={pushEnabled ? 'Disable push notifications' : 'Enable push notifications'}
-                      >
-                        <span
-                          className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                            pushEnabled ? 'translate-x-4' : 'translate-x-0'
-                          }`}
-                        />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
             </div>
+
+            {/* 7. X / Twitter — admin only */}
+            {!!session.isAdmin && (
+              <AccountRow
+                icon={<XIcon className="w-4 h-4 text-white" />}
+                name="X / Twitter"
+                status={profile.x_handle ? 'connected' : 'disconnected'}
+                detail={profile.x_handle ? `Configured by ZAO` : 'Not configured'}
+                action={
+                  profile.x_handle ? (
+                    <span className="text-[10px] text-gray-600">@{profile.x_handle}</span>
+                  ) : null
+                }
+              />
+            )}
           </div>
         </section>
 
-        {/* ── Connected Platforms (cross-posting) ─────────────────── */}
-        <ConnectedPlatforms
-          isAdmin={!!session.isAdmin}
-          initialStatus={{
-            bluesky_handle: profile.bluesky_handle,
-            lens_profile_id: profile.lens_profile_id,
-            hive_username: profile.hive_username,
-            x_handle: profile.x_handle,
-          }}
-        />
+        {/* ── FEATURES ─────────────────────────────────────────── */}
+        <section>
+          <div className="flex items-center justify-between px-1 mb-3">
+            <p className="text-xs text-gray-500 uppercase tracking-wider">Features</p>
+          </div>
+          <div className="bg-[#0d1b2a] rounded-xl px-4 border border-gray-800 divide-y divide-gray-800/50">
+
+            {/* Messaging (XMTP) */}
+            <FeatureRow
+              name="Messaging (XMTP)"
+              detail={
+                xmtpConnected && activeXMTPAddress
+                  ? shortAddr(activeXMTPAddress)
+                  : xmtpConnected
+                    ? 'Enabled'
+                    : 'Not enabled'
+              }
+              action={
+                xmtpConnected && activeXMTPAddress ? (
+                  <button
+                    onClick={switchWallet}
+                    className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
+                  >
+                    Switch
+                  </button>
+                ) : !xmtpConnected ? (
+                  <Link href="/messages" className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors">
+                    Enable in Messages
+                  </Link>
+                ) : null
+              }
+            />
+
+            {/* Cross-posting */}
+            <FeatureRow
+              name="Cross-posting"
+              detail={`${crossPostPlatforms} of ${totalCrossPostPlatforms} platforms connected`}
+              action={
+                <span className="text-[10px] text-gray-500">
+                  {crossPostPlatforms > 0 ? 'Active' : 'Connect accounts above'}
+                </span>
+              }
+            />
+
+            {/* Push Notifications */}
+            <FeatureRow
+              name="Push Notifications"
+              detail={pushEnabled === null ? 'Checking...' : pushEnabled ? 'Enabled' : 'Disabled'}
+              action={
+                pushEnabled !== null ? (
+                  <ToggleSwitch
+                    on={pushEnabled}
+                    onToggle={togglePushNotifications}
+                    disabled={pushToggling}
+                    label={pushEnabled ? 'Disable push notifications' : 'Enable push notifications'}
+                  />
+                ) : null
+              }
+            />
+          </div>
+        </section>
 
         {/* ── Socials ──────────────────────────────────────────────── */}
         <SocialsSection profile={profile} />

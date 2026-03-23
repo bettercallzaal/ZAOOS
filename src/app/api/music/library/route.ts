@@ -61,8 +61,12 @@ export async function POST(req: NextRequest) {
     // Resolve metadata
     let meta: Record<string, unknown> = {};
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
-      const metaRes = await fetch(`${baseUrl}/api/music/metadata?url=${encodeURIComponent(url)}`);
+      const baseUrl = process.env.NEXT_PUBLIC_URL
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+        || 'http://localhost:3000';
+      const metaRes = await fetch(`${baseUrl}/api/music/metadata?url=${encodeURIComponent(url)}`, {
+        signal: AbortSignal.timeout(8000),
+      });
       if (metaRes.ok) meta = await metaRes.json();
     } catch { /* proceed without metadata */ }
 

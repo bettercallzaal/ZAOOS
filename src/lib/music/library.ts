@@ -193,20 +193,30 @@ export async function extractAndSaveSongs(
     if (!platform) continue;
 
     try {
-      // Fetch metadata
-      const metaRes = await fetch(
-        `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/music/metadata?url=${encodeURIComponent(url)}`,
-      );
-      const meta = metaRes.ok ? await metaRes.json() : null;
+      // Fetch metadata — try multiple base URL options for server-side fetch
+      const baseUrl = process.env.NEXT_PUBLIC_URL
+        || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+        || 'http://localhost:3000';
+
+      let meta: Record<string, unknown> | null = null;
+      try {
+        const metaRes = await fetch(
+          `${baseUrl}/api/music/metadata?url=${encodeURIComponent(url)}`,
+          { signal: AbortSignal.timeout(8000) },
+        );
+        meta = metaRes.ok ? await metaRes.json() : null;
+      } catch {
+        // Metadata fetch failed — save with just URL + platform
+      }
 
       await upsertSong({
         url,
         platform,
-        title: meta?.trackName || 'Untitled',
-        artist: meta?.artistName,
-        artworkUrl: meta?.artworkUrl,
-        streamUrl: meta?.streamUrl,
-        duration: meta?.duration ? Math.floor(meta.duration / 1000) : 0,
+        title: (meta?.trackName as string) || 'Untitled',
+        artist: meta?.artistName as string | undefined,
+        artworkUrl: meta?.artworkUrl as string | undefined,
+        streamUrl: meta?.streamUrl as string | undefined,
+        duration: meta?.duration ? Math.floor((meta.duration as number) / 1000) : 0,
         submittedByFid,
         source,
       });

@@ -85,6 +85,7 @@ See `.env.example` for all required environment variables.
 - [x] **Admin panel** — 6-tab admin dashboard (users, ZIDs, allowlist, respect, moderation, import)
   - `src/app/(auth)/admin/`
   - `src/components/admin/` (UsersTable, ZidManager, AllowlistTable, RespectOverview, HiddenMessages, CsvUpload, SyncRespectButton, ImportRespectButton)
+- [ ] **Admin confirmation modals** — replace native confirm() with styled ConfirmDialog for destructive actions
 - [x] **Security hardening** — server-side nonce validation, HMAC-SHA512 webhook verification, CSP headers, RLS on all tables, error sanitization, signer ownership checks, scheduled casts RLS fix
   - `src/middleware.ts` · `src/lib/validation/schemas.ts` · `src/lib/db/audit-log.ts`
   - `scripts/fix-scheduled-casts-rls.sql` · `scripts/add-notifications-rls.sql`
@@ -118,9 +119,12 @@ See `.env.example` for all required environment variables.
   - `src/app/api/chat/react/route.ts`
 - [x] **Rich compose** — replies, quotes, cross-channel posting, image upload, @mentions
   - `src/components/chat/ComposeBar.tsx` · `src/components/chat/MentionAutocomplete.tsx`
+- [ ] **Compose character count** — visible X/1024 counter, gold at 900, red at 1000
+- [ ] **Scroll-to-bottom button** — floating "New messages" pill when scrolled up in active chat
 - [x] **Cast search** — full-text search across channel casts
   - `src/app/api/chat/search/route.ts`
   - `src/components/chat/SearchDialog.tsx`
+- [ ] **Search scope clarity** — label "Searching channel messages", DM search indicator
 - [x] **Scheduled posts** — full CRUD for future publishing
   - `src/app/api/chat/schedule/route.ts`
   - `src/components/chat/SchedulePanel.tsx`
@@ -157,16 +161,20 @@ See `.env.example` for all required environment variables.
   - `src/providers/audio/` (8 platform-specific providers + PlayerProvider orchestrator)
   - `src/lib/music/` (isMusicUrl, findMusicEmbed, songlink, formatDuration)
   - `src/app/api/music/metadata/route.ts`
+- [ ] **Auto-skip on error** — skip failed tracks after 5s timeout, retry button, 3-failure pause
+- [ ] **Add to queue from chat** — queue button on inline music embeds in chat messages
 - [x] **Persistent player bar** — survives page navigation, scrubber, controls
   - `src/components/music/PersistentPlayer.tsx` · `src/components/music/PersistentPlayerWithRadio.tsx`
   - `src/components/music/GlobalPlayer.tsx` · `src/components/music/Scrubber.tsx`
 - [x] **Music queue** — auto-advance, shuffle, repeat, queue from feed
   - `src/hooks/useMusicQueue.ts`
   - `src/components/music/MusicSidebar.tsx` · `src/components/music/MusicQueueTrackCard.tsx`
+- [ ] **Queue persistence** — save queue to localStorage, restore on refresh
 - [x] **Community radio** — Audius playlist stations with continuous playback
   - `src/app/api/music/radio/route.ts`
   - `src/components/music/RadioButton.tsx` · `src/providers/audio/RadioProvider.tsx`
   - `src/hooks/useRadio.ts`
+- [ ] **Radio + queue integration** — manual queue additions while radio plays, resume radio when queue empties
 - [x] **Song submissions + voting** — community curation per channel
   - `src/app/api/music/submissions/route.ts` · `src/app/api/music/submissions/vote/route.ts`
   - `src/components/music/SongSubmit.tsx` · `src/components/music/QuickAddSong.tsx`
@@ -184,6 +192,7 @@ See `.env.example` for all required environment variables.
   - `src/app/api/music/track-of-day/` (3 routes: list/vote/select)
   - `src/components/music/TrackOfTheDay.tsx`
   - `scripts/create-track-of-day.sql`
+- [ ] **TOTD share to chat** — "Share to #zao" button on Track of the Day
 - [ ] **AI taste profiles** — personalized music recommendations from listening history
 
 #### Social Graph
@@ -196,6 +205,7 @@ See `.env.example` for all required environment variables.
 - [x] **User profiles** — slide-out profile drawer with activity stats, ZID badge, follow state
   - `src/app/api/users/[fid]/route.ts` · `src/app/api/users/profile/route.ts`
   - `src/components/chat/ProfileDrawer.tsx`
+- [ ] **Profile DM shortcut** — "Message" button in ProfileDrawer to start XMTP DM
 - [x] **Follow suggestions** — discover panel with recommendation algorithm
   - `src/app/api/social/suggestions/route.ts`
   - `src/components/social/DiscoverPanel.tsx`
@@ -223,6 +233,7 @@ See `.env.example` for all required environment variables.
 - [x] **Proposal comments** — threaded comments with notifications
   - `src/app/api/proposals/comment/route.ts`
   - `src/components/governance/ProposalComments.tsx`
+- [ ] **Vote breakdown view** — see who voted, vote weight per voter, % of total
 - [x] **Auto-publish threshold** — proposals auto-publish to Farcaster at 1000 Respect votes
   - `src/app/api/publish/farcaster/route.ts`
 - [x] **Proposal status transitions** — admin PATCH endpoint: open -> approved -> rejected -> completed
@@ -255,6 +266,7 @@ See `.env.example` for all required environment variables.
   - `src/app/api/streaks/` (2 routes: get streak, record activity)
   - `src/components/streaks/StreakBadge.tsx`
   - `scripts/create-streaks-tables.sql`
+- [ ] **Streaks wired to all activities** — record streaks from posts, votes, reactions, comments, submissions (not just login)
 - [x] **OG Badge** — founding member badge for ZIDs 1-40
   - `src/components/badges/OGBadge.tsx`
 
@@ -299,6 +311,7 @@ See `.env.example` for all required environment variables.
   - `src/app/api/notifications/route.ts` · `src/app/api/notifications/status/route.ts` · `src/app/api/notifications/send/route.ts`
 - [x] **Push notifications** — via Farcaster Mini App protocol
 - [x] **Notification triggers** — posts, reactions, proposals, votes, comments, new members
+- [ ] **Notification type filters** — filter pills: All, Proposals, Votes, Comments, Members, Music
 
 #### Cross-Platform Publishing
 
@@ -365,6 +378,7 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
   - `src/components/home/` (HomePage, NowPlayingHero, QuickActions, ActivityFeed, PillarCard)
 - [x] **Activity feed** — recent community activity
   - `src/app/api/activity/feed/route.ts`
+- [ ] **Activity feed complete coverage** — ensure all 8 content types populate and deep-link correctly
 - [x] **Onboarding tutorial + FAQ** — guided first-run experience
   - `src/components/chat/TutorialPanel.tsx` · `src/components/chat/FaqPanel.tsx`
 - [x] **Minimax LLM proxy** — alternative LLM for content generation

@@ -34,10 +34,18 @@ export function PersistentPlayer({ onPrev, onNext }: PersistentPlayerProps = {})
 
   return (
     <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80">
-      {/* Thin progress bar */}
-      <div className="h-0.5 bg-gray-800 w-full">
+      {/* Seekable progress bar — tap/click to seek */}
+      <div
+        className="h-2 bg-gray-800 w-full cursor-pointer group hover:h-3 transition-all"
+        onClick={(e) => {
+          if (duration <= 0) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          const fraction = (e.clientX - rect.left) / rect.width;
+          player.seek(fraction * duration);
+        }}
+      >
         <div
-          className="h-full bg-[#f5a623] transition-[width] duration-300"
+          className="h-full bg-[#f5a623] transition-[width] duration-300 pointer-events-none"
           style={{ width: duration > 0 ? `${(position / duration) * 100}%` : '0%' }}
         />
       </div>
@@ -80,15 +88,17 @@ export function PersistentPlayer({ onPrev, onNext }: PersistentPlayerProps = {})
         </div>
 
         {/* Previous */}
-        <button
-          onClick={onPrev}
-          className="text-gray-400 hover:text-white p-1 flex-shrink-0 transition-colors"
-          aria-label="Previous track"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
-          </svg>
-        </button>
+        {onPrev && (
+          <button
+            onClick={onPrev}
+            className="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95"
+            aria-label="Previous track"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+            </svg>
+          </button>
+        )}
 
         {/* Play/Pause */}
         <button
@@ -111,15 +121,17 @@ export function PersistentPlayer({ onPrev, onNext }: PersistentPlayerProps = {})
         </button>
 
         {/* Next */}
-        <button
-          onClick={onNext}
-          className="text-gray-400 hover:text-white p-1 flex-shrink-0 transition-colors"
-          aria-label="Next track"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
-          </svg>
-        </button>
+        {onNext && (
+          <button
+            onClick={onNext}
+            className="text-gray-400 hover:text-white w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95"
+            aria-label="Next track"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+            </svg>
+          </button>
+        )}
 
         {/* Close */}
         <button

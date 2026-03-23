@@ -73,12 +73,15 @@ export function MusicPage() {
   const radio = useRadio();
 
   // ── Auto-advance radio tracks when a song ends ───────────────────────
+  const nextTrackRef = useRef(radio.nextRadioTrack);
+  nextTrackRef.current = radio.nextRadioTrack;
+
   useEffect(() => {
     if (radio.isRadioMode) {
-      player.setOnEnded?.(() => radio.nextRadioTrack());
+      player.setOnEnded?.(() => nextTrackRef.current());
       return () => player.setOnEnded?.(null);
     }
-  }, [radio.isRadioMode, radio.nextRadioTrack, player]);
+  }, [radio.isRadioMode, player]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Fetch submissions ────────────────────────────────────────────────
   useEffect(() => {
@@ -454,7 +457,7 @@ function SubmissionsSection({
         artistName: sub.artist || '',
         artworkUrl: '',
         url: sub.url,
-        feedId: '',
+        feedId: `submission-${sub.id}`,
       });
     } finally {
       setLoadingTrackId(null);
@@ -817,9 +820,7 @@ function PlaylistsSection({ radio }: { radio: ReturnType<typeof useRadio> }) {
                 if (radio.isRadioMode) {
                   radio.switchStation(i);
                 } else {
-                  radio.startRadio();
-                  // After stations load, switch to this one
-                  // The startRadio already defaults to index 0
+                  radio.startRadio(i);
                 }
               }}
               className={`flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${

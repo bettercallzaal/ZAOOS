@@ -27,6 +27,9 @@ export const ENV = {
   NEXT_PUBLIC_SIWF_DOMAIN: optionalEnv('NEXT_PUBLIC_SIWF_DOMAIN'),
   NEXT_PUBLIC_WC_PROJECT_ID: optionalEnv('NEXT_PUBLIC_WC_PROJECT_ID'),
 
+  // Content moderation (optional)
+  PERSPECTIVE_API_KEY: optionalEnv('PERSPECTIVE_API_KEY'),
+
   // Minimax (optional)
   MINIMAX_API_KEY: optionalEnv('MINIMAX_API_KEY'),
   MINIMAX_MODEL: optionalEnv('MINIMAX_MODEL'),

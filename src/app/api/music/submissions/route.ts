@@ -23,14 +23,27 @@ export async function GET(req: NextRequest) {
 
   const channel = req.nextUrl.searchParams.get('channel') || 'zao';
   const limit = Math.min(parseInt(req.nextUrl.searchParams.get('limit') || '50'), 100);
+  const statusParam = req.nextUrl.searchParams.get('status'); // 'pending' | 'all' | null
 
   try {
-    const { data, error } = await supabaseAdmin
+    let query = supabaseAdmin
       .from('song_submissions')
       .select('*')
       .eq('channel', channel)
       .order('created_at', { ascending: false })
       .limit(limit);
+
+    // Admins can filter by status; regular users only see approved
+    if (session.isAdmin && statusParam === 'all') {
+      // No status filter — show everything
+    } else if (session.isAdmin && statusParam === 'pending') {
+      query = query.eq('status', 'pending');
+    } else {
+      // Default: regular users (and admins without filter) see approved only
+      query = query.eq('status', 'approved');
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
@@ -124,6 +137,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'This song has already been submitted to this channel' }, { status: 409 });
     }
 
+    // Auto-approve if submitter is admin, otherwise pending
+    const submissionStatus = session.isAdmin ? 'approved' : 'pending';
+
     // Build insert row — include tags only if provided
     const insertRow: Record<string, unknown> = {
       url,
@@ -135,6 +151,8 @@ export async function POST(req: NextRequest) {
       submitted_by_fid: session.fid,
       submitted_by_username: session.username,
       submitted_by_display: session.displayName,
+      status: submissionStatus,
+      ...(session.isAdmin ? { reviewed_by_fid: session.fid, reviewed_at: new Date().toISOString() } : {}),
     };
     if (tags && tags.length > 0) {
       insertRow.tags = tags;

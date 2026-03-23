@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
   if (!session.isAdmin) return NextResponse.json({ error: 'Admin only' }, { status: 403 });
 
   if (!isDiscordConfigured()) {
-    return NextResponse.json({ error: 'Discord not configured. Set DISCORD_BOT_TOKEN and DISCORD_GUILD_ID.' }, { status: 503 });
+    return NextResponse.json({ error: 'Discord integration not available' }, { status: 503 });
   }
 
   const type = req.nextUrl.searchParams.get('type') || 'members';
@@ -77,7 +78,14 @@ export async function POST(req: NextRequest) {
   const token = authHeader.replace('Bearer ', '');
   const secret = process.env.DISCORD_BOT_WEBHOOK_SECRET;
 
-  if (!secret || token !== secret) {
+  if (!secret) {
+    return NextResponse.json({ error: 'Sync not configured' }, { status: 503 });
+  }
+
+  // Timing-safe token comparison
+  const tokenBuf = Buffer.from(token);
+  const secretBuf = Buffer.from(secret);
+  if (tokenBuf.length !== secretBuf.length || !crypto.timingSafeEqual(tokenBuf, secretBuf)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

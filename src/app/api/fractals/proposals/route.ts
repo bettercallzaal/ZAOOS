@@ -1,6 +1,7 @@
 // src/app/api/fractals/proposals/route.ts
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
+import { fetchProposalsOnChain } from '@/lib/ordao/client';
 
 const ORNODE_URL = 'https://ornode2.frapps.xyz';
 
@@ -10,6 +11,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // ── Primary: try ornode ──────────────────────────────────────────
   try {
     const res = await fetch(`${ORNODE_URL}/proposals?limit=20`, {
       next: { revalidate: 60 },
@@ -17,14 +19,34 @@ export async function GET() {
     });
 
     if (!res.ok) {
-      return NextResponse.json({ proposals: [], total: 0, source: 'unavailable' });
+      throw new Error(`ornode returned ${res.status}`);
     }
 
     const data = await res.json();
     const proposals = Array.isArray(data) ? data : (data.proposals ?? []);
 
+    if (proposals.length === 0) {
+      throw new Error('ornode returned empty proposals');
+    }
+
+    console.log(`[proposals] Served ${proposals.length} proposals from ornode`);
     return NextResponse.json({ proposals, total: proposals.length, source: 'ornode' });
-  } catch {
+  } catch (ornodeErr) {
+    console.warn('[proposals] ornode unavailable, falling back to on-chain read:', ornodeErr instanceof Error ? ornodeErr.message : ornodeErr);
+  }
+
+  // ── Fallback: read directly from OREC contract on Optimism ─────
+  try {
+    const onChainProposals = await fetchProposalsOnChain(20);
+
+    console.log(`[proposals] Served ${onChainProposals.length} proposals from on-chain fallback`);
+    return NextResponse.json({
+      proposals: onChainProposals,
+      total: onChainProposals.length,
+      source: 'onchain',
+    });
+  } catch (onChainErr) {
+    console.error('[proposals] On-chain fallback also failed:', onChainErr instanceof Error ? onChainErr.message : onChainErr);
     return NextResponse.json({ proposals: [], total: 0, source: 'unavailable' });
   }
 }

@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { communityConfig } from '@/../community.config';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { moderateContent } from '@/lib/moderation/moderate';
 
 const WATCHED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
@@ -87,15 +88,55 @@ export async function POST(req: NextRequest) {
   // Cache both top-level posts and replies for thread views
   // parent_hash is set for replies, null for top-level channel posts
 
+  let castRow: ReturnType<typeof castToRow>;
   try {
-    const row = castToRow(cast, channelId);
+    castRow = castToRow(cast, channelId);
     await supabaseAdmin
       .from('channel_casts')
-      .upsert(row, { onConflict: 'hash' });
+      .upsert(castRow, { onConflict: 'hash' });
   } catch (err) {
     console.error('[webhook/neynar] DB insert error:', err);
     return NextResponse.json({ error: 'DB insert failed' }, { status: 500 });
   }
+
+  // ── AI Content Moderation (fire-and-forget) ──────────────────────
+  // Runs asynchronously so the webhook response is not delayed.
+  void (async () => {
+    try {
+      const result = await moderateContent(castRow.text);
+
+      // Always log to moderation_log
+      await supabaseAdmin.from('moderation_log').insert({
+        cast_hash: castRow.hash,
+        fid: castRow.fid,
+        text_preview: castRow.text.slice(0, 500),
+        flagged: result.flagged,
+        categories: result.categories,
+        scores: result.scores,
+        action: result.action,
+      });
+
+      // Auto-hide severely toxic content
+      if (result.action === 'hide') {
+        await supabaseAdmin
+          .from('hidden_messages')
+          .upsert(
+            {
+              cast_hash: castRow.hash,
+              hidden_by_fid: 0, // System / AI moderation
+              reason: `Auto-hidden: ${result.categories.join(', ')}`,
+            },
+            { onConflict: 'cast_hash' },
+          );
+        console.log(`[moderation] Auto-hid cast ${castRow.hash}: ${result.categories.join(', ')}`);
+      } else if (result.action === 'flag') {
+        console.log(`[moderation] Flagged cast ${castRow.hash}: ${result.categories.join(', ')}`);
+      }
+    } catch (err) {
+      // Non-fatal: moderation failure should never break the webhook
+      console.error('[webhook/neynar] Moderation error:', err);
+    }
+  })();
 
   // ── Auto-detect music links and add to song_submissions ──────────
   try {

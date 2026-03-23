@@ -33,6 +33,7 @@ interface Profile {
   created_at: string | null;
   bluesky_handle: string | null;
   lens_profile_id: string | null;
+  lens_has_token: boolean;
   hive_username: string | null;
   solana_wallet: string | null;
   x_handle: string | null;
@@ -560,7 +561,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [lensConnecting, setLensConnecting] = useState(false);
   const [lensError, setLensError] = useState<string | null>(null);
   const [lensDisconnecting, setLensDisconnecting] = useState(false);
-  const [lensNeedsAuth, setLensNeedsAuth] = useState(false);
+  const [lensNeedsAuth, setLensNeedsAuth] = useState(!!profile?.lens_profile_id && !profile?.lens_has_token);
 
   // SDK hook for wallet-based auth (gets posting tokens)
   const { connect: lensSDKConnect, isConnecting: lensSDKConnecting, error: lensSDKError, connectedHandle: lensSDKHandle, walletAddress: lensWalletAddr } = useLensAuth();

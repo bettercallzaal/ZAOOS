@@ -50,4 +50,7 @@ export const ENV = {
   X_API_SECRET: optionalEnv('X_API_SECRET'),
   X_ACCESS_TOKEN: optionalEnv('X_ACCESS_TOKEN'),
   X_ACCESS_SECRET: optionalEnv('X_ACCESS_SECRET'),
+
+  // Lens Protocol V3
+  NEXT_PUBLIC_LENS_APP_ADDRESS: optionalEnv('NEXT_PUBLIC_LENS_APP_ADDRESS'),
 } as const;

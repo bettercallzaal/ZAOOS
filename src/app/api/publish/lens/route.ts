@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
     }
 
     let accessToken: string = user.lens_access_token;
+    const refreshToken: string = user.lens_refresh_token || '';
 
     // Normalize content for Lens
     const content = normalizeForLens({ text, castHash, embedUrls, imageUrls, channel });
@@ -69,12 +70,14 @@ export async function POST(req: NextRequest) {
     // Attempt to publish — if token expired, refresh and retry once
     let result;
     try {
-      result = await publishToLens(accessToken, content);
+      result = await publishToLens(accessToken, refreshToken, content);
     } catch (firstErr) {
-      // Try refreshing the token if we have a refresh token
-      if (user.lens_refresh_token) {
+      const errMsg = firstErr instanceof Error ? firstErr.message : String(firstErr);
+
+      // Handle TOKEN_EXPIRED error from publishToLens (auth failure with refresh hint)
+      if (errMsg.startsWith('TOKEN_EXPIRED:') && refreshToken) {
         try {
-          const refreshed = await refreshLensToken(user.lens_refresh_token);
+          const refreshed = await refreshLensToken(refreshToken);
           accessToken = refreshed.accessToken;
 
           // Persist the new tokens
@@ -87,10 +90,34 @@ export async function POST(req: NextRequest) {
             .eq('fid', session.fid);
 
           // Retry with fresh token
-          result = await publishToLens(accessToken, content);
+          result = await publishToLens(accessToken, refreshed.refreshToken, content);
         } catch (refreshErr) {
           console.error('[publish/lens] Token refresh failed:', refreshErr);
-          // Log failure
+          await logPublish(session.fid, castHash, 'lens', 'failed', null, String(firstErr));
+          return NextResponse.json(
+            {
+              error: 'Lens token expired and refresh failed. Please reconnect your Lens profile.',
+            },
+            { status: 401 },
+          );
+        }
+      } else if (refreshToken) {
+        // Generic failure — try refreshing token and retry once
+        try {
+          const refreshed = await refreshLensToken(refreshToken);
+          accessToken = refreshed.accessToken;
+
+          await supabaseAdmin
+            .from('users')
+            .update({
+              lens_access_token: refreshed.accessToken,
+              lens_refresh_token: refreshed.refreshToken,
+            })
+            .eq('fid', session.fid);
+
+          result = await publishToLens(accessToken, refreshed.refreshToken, content);
+        } catch (refreshErr) {
+          console.error('[publish/lens] Token refresh failed:', refreshErr);
           await logPublish(session.fid, castHash, 'lens', 'failed', null, String(firstErr));
           return NextResponse.json(
             {
@@ -101,7 +128,7 @@ export async function POST(req: NextRequest) {
         }
       } else {
         // No refresh token available
-        await logPublish(session.fid, castHash, 'lens', 'failed', null, String(firstErr));
+        await logPublish(session.fid, castHash, 'lens', 'failed', null, errMsg);
         throw firstErr;
       }
     }

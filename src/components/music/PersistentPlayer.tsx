@@ -94,7 +94,8 @@ export function PersistentPlayer({
   }
 
   // ─── Active state: track playing ──────────────────────────────────
-  const { metadata, isPlaying, isLoading, position, duration } = player;
+  const metadata = player.metadata!;
+  const { isPlaying, isLoading, position, duration } = player;
 
   const handlePlayPause = () => {
     if (isPlaying) player.pause();

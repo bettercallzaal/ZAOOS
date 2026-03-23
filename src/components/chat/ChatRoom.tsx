@@ -20,7 +20,6 @@ import { MessageThread } from '@/components/messages/MessageThread';
 import { GroupInfoDrawer } from '@/components/messages/GroupInfoDrawer';
 import { MessageCompose } from '@/components/messages/MessageCompose';
 import { NewConversationDialog } from '@/components/messages/NewConversationDialog';
-import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { FeedFilters, filterAndSortCasts, ContentFilter, SortMode } from './FeedFilters';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 
@@ -56,7 +55,6 @@ export function ChatRoom() {
   const [contentFilter, setContentFilter] = useState<ContentFilter>('all');
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const composeRef = useRef<ComposeBarHandle>(null);
-  const radio = useRadio();
 
   // XMTP context
   const xmtp = useXMTPContext();
@@ -125,10 +123,6 @@ export function ChatRoom() {
   useEffect(() => {
     setContentFilter('all');
     setSortMode('newest');
-    fetch(`/api/music/submissions?channel=${activeChannel}`)
-      .then((r) => r.ok ? r.json() : { submissions: [] })
-      .then((data) => setSongSubmissions(data.submissions || []))
-      .catch(() => setSongSubmissions([]));
   }, [activeChannel]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -453,22 +447,6 @@ export function ChatRoom() {
           )}
         </div>
 
-        {/* Music sidebar — static in flex on desktop, bottom sheet on mobile */}
-        <MusicSidebar
-          messages={messages}
-          activeChannel={activeChannel}
-          isOpen={musicSidebarOpen}
-          isMobile={isMobile}
-          onClose={() => setMusicSidebarOpen(false)}
-          isRadioMode={radio.isRadioMode}
-          radioLoading={radio.radioLoading}
-          onRadioStart={radio.startRadio}
-          onRadioStop={radio.stopRadio}
-          radioPlaylistName={radio.radioPlaylist?.name}
-          availableStations={radio.availableStations}
-          currentStationIndex={radio.currentStationIndex}
-          onSwitchStation={radio.switchStation}
-        />
       </div>
 
       {/* Song Submit Panel */}

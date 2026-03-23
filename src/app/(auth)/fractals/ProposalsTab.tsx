@@ -116,6 +116,8 @@ export function ProposalsTab() {
             <option value="community">Community</option>
             <option value="music">Music</option>
             <option value="technical">Technical</option>
+            <option value="wavewarz">WaveWarZ</option>
+            <option value="social">Social</option>
           </select>
           {error && <p className="text-xs text-red-400">{error}</p>}
           <div className="flex gap-2">

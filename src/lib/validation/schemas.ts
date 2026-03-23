@@ -62,6 +62,8 @@ export const proposalCategorySchema = z.enum([
   'governance',
   'technical',
   'community',
+  'funding',
+  'music',
   'wavewarz',
   'social',
 ]);

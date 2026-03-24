@@ -158,6 +158,7 @@ Every API mapped, prioritized, and organized by ZAO OS feature.
 |---|-------|---------|
 | [09](./09-public-apis/) | **Public APIs Landscape** | Tier 1/2/3 APIs for music, web3, AI, media, social, notifications |
 | [25](./25-public-apis-index/) | **Public APIs Index (100+)** | Full index from github.com/public-apis — mapped by ZAO feature and priority |
+| [125](./125-coinflow-fiat-checkout/) | **Coinflow Fiat Checkout** | Fiat-to-crypto checkout (cards, ACH, Apple Pay) → USDC on Base. EVM contract settlement, React SDK, 24+ webhook events, Credits system. For memberships, WaveWarZ entries, tips. |
 
 ---
 

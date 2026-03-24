@@ -116,3 +116,5 @@
 | 119 | `119-songjam-audio-spaces-embed` | Embed songjam.space/zabal for live audio rooms, iframe permissions fix, 100ms architecture, LiveAudioRoom component |
 | 122 | `122-songjam-screen-share-pr` | Screen share for SongJam /spaces via Stream Video SDK, PR plan, MyScreenShareButton + ScreenShareView |
 | 123 | `123-dfos-dark-forest-protocol` | DFOS (Dark Forest OS) by Metalabel — private-first creative group infra, Ed25519 chains, did:dfos, ~2K alpha users, philosophy-aligned with ZAO |
+| 124 | `124-sopha-deep-social-farcaster` | Sopha — deep social Farcaster client for curation |
+| 125 | `125-coinflow-fiat-checkout` | Coinflow fiat-to-crypto checkout: cards/ACH/Apple Pay → USDC on Base, EVM contract settlement, React SDK, 24+ webhooks, Credits system |

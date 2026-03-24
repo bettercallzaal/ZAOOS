@@ -1,24 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { getTrendingFeed } from '@/lib/farcaster/neynar';
 import { Cast } from '@/types';
+
+const SOPHA_API = 'https://www.sopha.social/api/feed';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(25),
-  time_window: z.enum(['1h', '6h', '12h', '24h']).default('24h'),
   cursor: z.string().optional(),
 });
 
-// Minimum engagement thresholds
-const MIN_LIKES = 5;
-const MIN_RECASTS = 2;
+// In-memory cache (5-minute TTL)
+let cachedData: { casts: SophaCast[]; cursor: string | null; fetchedAt: number } | null = null;
+const CACHE_TTL = 5 * 60 * 1000;
 
-// In-memory cache for trending casts (5-minute TTL)
-let cachedData: { casts: Cast[]; cursor: string | null; fetchedAt: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+interface SophaCast extends Cast {
+  _qualityScore?: number;
+  _category?: string;
+  _title?: string;
+  _summary?: string;
+  _curatorInfo?: {
+    fid: number;
+    username: string;
+    display_name: string;
+    pfp_url: string;
+  };
+}
 
-function neynarCastToOurCast(c: Record<string, unknown>): Cast {
+function sophaCastToOurCast(c: Record<string, unknown>): SophaCast {
   const author = c.author as Record<string, unknown> | undefined;
   const reactions = c.reactions as Record<string, unknown> | undefined;
   const replies = c.replies as Record<string, unknown> | undefined;
@@ -42,6 +51,12 @@ function neynarCastToOurCast(c: Record<string, unknown>): Cast {
     },
     parent_hash: (c.parent_hash as string) || null,
     embeds: (c.embeds as Cast['embeds']) || [],
+    // Sopha curation metadata
+    _qualityScore: (c._qualityScore as number) || undefined,
+    _category: (c._category as string) || undefined,
+    _title: (c._title as string) || undefined,
+    _summary: (c._summary as string) || undefined,
+    _curatorInfo: (c._curatorInfo as SophaCast['_curatorInfo']) || undefined,
   };
 }
 
@@ -53,7 +68,6 @@ export async function GET(req: NextRequest) {
 
   const raw = {
     limit: req.nextUrl.searchParams.get('limit') ?? undefined,
-    time_window: req.nextUrl.searchParams.get('time_window') ?? undefined,
     cursor: req.nextUrl.searchParams.get('cursor') ?? undefined,
   };
 
@@ -65,7 +79,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const { limit, time_window, cursor } = parsed.data;
+  const { limit, cursor } = parsed.data;
 
   try {
     // Use cache if fresh and no cursor (first page only)
@@ -73,44 +87,45 @@ export async function GET(req: NextRequest) {
     if (!cursor && cachedData && (now - cachedData.fetchedAt) < CACHE_TTL) {
       const sliced = cachedData.casts.slice(0, limit);
       return NextResponse.json(
-        { casts: sliced, cursor: cachedData.cursor },
-        {
-          headers: {
-            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
-          },
-        },
+        { casts: sliced, cursor: cachedData.cursor, source: 'sopha' },
+        { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } },
       );
     }
 
-    // Fetch more than requested to account for filtering
-    const fetchLimit = Math.min(limit * 2, 50);
-    const feed = await getTrendingFeed(fetchLimit, time_window, cursor);
-    const rawCasts: Record<string, unknown>[] = feed.casts || [];
-    const nextCursor: string | null = feed.next?.cursor || null;
+    // Fetch from Sopha's curated feed API
+    const url = new URL(SOPHA_API);
+    if (cursor) url.searchParams.set('cursor', cursor);
 
-    // Convert and filter for minimum engagement
-    const allCasts = rawCasts.map(neynarCastToOurCast);
-    const filtered = allCasts.filter(
-      (c) => c.reactions.likes_count >= MIN_LIKES || c.reactions.recasts_count >= MIN_RECASTS,
-    );
+    const res = await fetch(url.toString(), {
+      headers: { 'Accept': 'application/json' },
+      next: { revalidate: 300 },
+    });
+
+    if (!res.ok) {
+      console.error('[trending] Sopha API error:', res.status);
+      return NextResponse.json({ error: 'Sopha API unavailable' }, { status: 502 });
+    }
+
+    const data = await res.json();
+    const rawCasts: Record<string, unknown>[] = data.casts || [];
+    const nextCursor: string | null = data.next?.cursor || null;
+
+    // Convert with curation metadata preserved
+    const casts = rawCasts.map(sophaCastToOurCast);
 
     // Cache first-page results
     if (!cursor) {
-      cachedData = { casts: filtered, cursor: nextCursor, fetchedAt: now };
+      cachedData = { casts, cursor: nextCursor, fetchedAt: now };
     }
 
-    const result = filtered.slice(0, limit);
+    const result = casts.slice(0, limit);
 
     return NextResponse.json(
-      { casts: result, cursor: nextCursor },
-      {
-        headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
-        },
-      },
+      { casts: result, cursor: nextCursor, source: 'sopha' },
+      { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } },
     );
   } catch (error) {
-    console.error('[trending] error:', error);
-    return NextResponse.json({ error: 'Failed to fetch trending casts' }, { status: 500 });
+    console.error('[trending] Sopha fetch error:', error);
+    return NextResponse.json({ error: 'Failed to fetch curated feed' }, { status: 500 });
   }
 }

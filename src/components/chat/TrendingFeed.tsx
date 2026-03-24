@@ -4,6 +4,14 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Cast, QuotedCastData } from '@/types';
 import { Message } from './Message';
 
+interface SophaCast extends Cast {
+  _qualityScore?: number;
+  _category?: string;
+  _title?: string;
+  _summary?: string;
+  _curatorInfo?: { fid: number; username: string; display_name: string; pfp_url: string };
+}
+
 interface TrendingFeedProps {
   isAdmin: boolean;
   currentFid: number;
@@ -46,7 +54,7 @@ export function TrendingFeed({
   onOpenProfile,
   onReply,
 }: TrendingFeedProps) {
-  const [casts, setCasts] = useState<Cast[]>([]);
+  const [casts, setCasts] = useState<SophaCast[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -199,8 +207,8 @@ export function TrendingFeed({
       {/* Header accent bar */}
       <div className="px-4 py-3 bg-gradient-to-r from-amber-500/5 to-transparent border-b border-amber-500/10 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-amber-400 text-sm font-medium">Trending on Farcaster</span>
-          <span className="text-xs text-gray-600">Last 24h</span>
+          <span className="text-amber-400 text-sm font-medium">Curated by Sopha</span>
+          <span className="text-xs text-gray-600">Deep Social on Farcaster</span>
         </div>
         <button
           onClick={() => fetchTrending(true)}
@@ -224,6 +232,28 @@ export function TrendingFeed({
                 {index + 1}
               </span>
             </div>
+            {/* Sopha curation metadata */}
+            {(cast._title || cast._category || cast._qualityScore) && (
+              <div className="ml-8 mr-4 mt-2 px-3 py-2 rounded-lg bg-amber-500/5 border border-amber-500/10">
+                {cast._title && (
+                  <p className="text-xs font-medium text-amber-300">{cast._title}</p>
+                )}
+                <div className="flex items-center gap-2 mt-1">
+                  {cast._category && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400/80">{cast._category}</span>
+                  )}
+                  {cast._qualityScore && (
+                    <span className="text-[10px] text-gray-500">Quality: {cast._qualityScore}/100</span>
+                  )}
+                  {cast._curatorInfo && (
+                    <span className="text-[10px] text-gray-600">Curated by @{cast._curatorInfo.username}</span>
+                  )}
+                </div>
+                {cast._summary && (
+                  <p className="text-[10px] text-gray-500 mt-1 line-clamp-2">{cast._summary}</p>
+                )}
+              </div>
+            )}
             {/* Engagement highlight bar */}
             <div className="border-l-2 border-amber-500/20 ml-1">
               <Message

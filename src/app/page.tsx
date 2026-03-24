@@ -1,39 +1,12 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
+import { getSessionData } from '@/lib/auth/session';
 import Image from 'next/image';
 import { LoginButton } from '@/components/gate/LoginButton';
 
-export default function LandingPage() {
-  const router = useRouter();
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/auth/session')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.authenticated) {
-          router.replace('/home');
-        } else {
-          setChecking(false);
-        }
-      })
-      .catch(() => {
-        setChecking(false);
-      });
-  }, [router]);
-
-  if (checking) {
-    return (
-      <main className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628] px-6">
-        <Image src="/logo.png" alt="THE ZAO" width={128} height={128} className="mx-auto mb-6 rounded-2xl" priority />
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent mb-4">
-          THE ZAO
-        </h1>
-        <div className="w-6 h-6 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
-      </main>
-    );
+export default async function LandingPage() {
+  const session = await getSessionData();
+  if (session) {
+    redirect('/home');
   }
 
   return (

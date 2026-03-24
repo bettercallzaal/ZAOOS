@@ -59,5 +59,6 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm i @tailwindcss/oxide-linux-x64-gnu || true
 
       - run: npm run build

@@ -7,8 +7,6 @@ import { AuthKitProvider } from '@farcaster/auth-kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { MiniAppGate } from '@/components/miniapp/MiniAppGate';
-import { AudioProviders } from '@/providers/audio';
-import { RadioProvider } from '@/providers/audio/RadioProvider';
 import { getWagmiConfig } from '@/lib/wagmi/config';
 import { SOLANA_ENDPOINT, getSolanaWallets } from '@/lib/solana/config';
 import '@farcaster/auth-kit/styles.css';
@@ -50,11 +48,7 @@ export function Providers({ children, wagmiInitialState }: ProvidersProps) {
           <AuthKitProvider config={authKitConfig}>
             <ConnectionProvider endpoint={SOLANA_ENDPOINT}>
               <WalletProvider wallets={solanaWallets} autoConnect={false}>
-                <AudioProviders>
-                  <RadioProvider>
-                    <MiniAppGate>{children}</MiniAppGate>
-                  </RadioProvider>
-                </AudioProviders>
+                <MiniAppGate>{children}</MiniAppGate>
               </WalletProvider>
             </ConnectionProvider>
           </AuthKitProvider>

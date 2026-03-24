@@ -184,7 +184,6 @@ export function MusicSidebar({
         queue={queue}
         currentIndex={currentIndex}
         radioLoading={radioLoading}
-        activeChannel={activeChannel}
         player={player}
       />
     </div>
@@ -377,13 +376,11 @@ function SidebarTabs({
   queue,
   currentIndex,
   radioLoading,
-  activeChannel,
   player,
 }: {
   queue: ReturnType<typeof useMusicQueue>;
   currentIndex: number;
   radioLoading: boolean;
-  activeChannel: string;
   player: ReturnType<typeof usePlayer>;
 }) {
   const [activeTab, setActiveTab] = useState<TabId>('library');

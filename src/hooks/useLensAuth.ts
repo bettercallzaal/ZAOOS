@@ -65,8 +65,10 @@ export function useLensAuth() {
       let loginResult;
 
       if (accounts?.items && accounts.items.length > 0) {
-        const account = accounts.items[0] as Record<string, Record<string, unknown>>;
-        const accountAddr = (account.account?.address || account.address) as string;
+        // Lens SDK returns AccountManaged | AccountOwned — use unknown + safe access
+        const account = accounts.items[0] as unknown as Record<string, unknown>;
+        const nested = account.account as Record<string, unknown> | undefined;
+        const accountAddr = String(nested?.address || account.address || '');
         loginResult = await client.login({
           accountOwner: {
             account: evmAddress(accountAddr),
@@ -76,10 +78,10 @@ export function useLensAuth() {
           signMessage: signMessageWith(walletClient),
         });
 
-        const nestedUsername = account.account?.username as Record<string, unknown> | undefined;
+        const nestedUsername = nested?.username as Record<string, unknown> | undefined;
         const topUsername = account.username as Record<string, unknown> | undefined;
-        const username = (nestedUsername?.localName || topUsername?.localName) as string | undefined;
-        handle = username ? `${username}.lens` : accountAddr?.slice(0, 10) + '...';
+        const username = String(nestedUsername?.localName || topUsername?.localName || '');
+        handle = username ? `${username}.lens` : accountAddr.slice(0, 10) + '...';
       } else {
         loginResult = await client.login({
           onboardingUser: {
@@ -92,8 +94,8 @@ export function useLensAuth() {
       }
 
       if (loginResult.isErr()) {
-        const err = loginResult.error as Record<string, unknown> | undefined;
-        throw new Error((err?.message as string) || 'Login failed');
+        const err = loginResult.error as unknown as Record<string, unknown> | undefined;
+        throw new Error(String(err?.message || 'Login failed'));
       }
 
       // Extract tokens from our custom storage

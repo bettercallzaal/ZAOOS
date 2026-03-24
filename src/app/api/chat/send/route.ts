@@ -4,7 +4,7 @@ import { postCast } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { sendMessageSchema } from '@/lib/validation/schemas';
 import { sendNotification, createInAppNotification } from '@/lib/notifications';
-import { postToBluesky } from '@/lib/bluesky/client';
+
 import { extractAndSaveSongs } from '@/lib/music/library';
 import { communityConfig } from '@/../community.config';
 

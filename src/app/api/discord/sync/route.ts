@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
 
           if (sessionErr || !session) continue;
 
-          const scoreRows = rankings.map((r, i) => ({
+          const scoreRows = rankings.map((r) => ({
             session_id: session.id,
             member_name: r.display_name,
             wallet_address: null,

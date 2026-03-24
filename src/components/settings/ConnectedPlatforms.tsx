@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAccount } from 'wagmi';
+
 import { LensConnect } from '@/components/settings/LensConnect';
 
 // ── Types ──────────────────────────────────────────────────────────

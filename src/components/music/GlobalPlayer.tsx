@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+
 import { usePlayer } from '@/providers/audio';
 import type { RepeatMode } from '@/providers/audio/PlayerProvider';
 import { Scrubber } from './Scrubber';

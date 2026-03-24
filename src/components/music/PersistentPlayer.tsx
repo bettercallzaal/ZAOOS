@@ -27,10 +27,8 @@ interface PersistentPlayerProps {
 export function PersistentPlayer({
   onPrev,
   onNext,
-  isRadioMode = false,
   radioLoading = false,
   onRadioStart,
-  onRadioStop,
   sidebarOpen = false,
   onToggleSidebar,
 }: PersistentPlayerProps) {

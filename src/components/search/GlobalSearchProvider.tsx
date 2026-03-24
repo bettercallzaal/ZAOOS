@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 
 const GlobalSearch = dynamic(
@@ -15,8 +15,7 @@ const GlobalSearch = dynamic(
 export function GlobalSearchProvider() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => setIsOpen(false), []);
+  const close = () => setIsOpen(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -75,7 +75,7 @@ const CATEGORY_FILTERS = ['all', 'governance', 'technical', 'community', 'wavewa
 
 /* ── Component ──────────────────────────────────────────────── */
 
-export function ProposalsTab({ isAdmin = false, currentFid }: { isAdmin?: boolean; currentFid?: number }) {
+export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFid?: number }) {
   const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);

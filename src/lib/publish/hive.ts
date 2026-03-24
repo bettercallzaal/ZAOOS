@@ -15,7 +15,7 @@ import type { NormalizedContent } from '@/lib/publish/normalize';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
-const AUTH_TAG_LENGTH = 16;
+
 
 /**
  * Derive a 32-byte key from SESSION_SECRET (which may be any length).

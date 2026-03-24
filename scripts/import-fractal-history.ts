@@ -55,11 +55,6 @@ const ERA_2X_SCORES = new Set([10, 16, 26, 42, 68, 110]);
 const RANK_MAP_2X: Record<number, number> = { 110: 1, 68: 2, 42: 3, 26: 4, 16: 5, 10: 6 };
 const RANK_MAP_1X: Record<number, number> = { 55: 1, 34: 2, 21: 3, 13: 4, 8: 5, 5: 6 };
 
-function detectEra(score: number): '1x' | '2x' | null {
-  if (ERA_2X_SCORES.has(score)) return '2x';
-  if (ERA_1X_SCORES.has(score)) return '1x';
-  return null;
-}
 
 function scoreToRank(score: number): number {
   return RANK_MAP_2X[score] || RANK_MAP_1X[score] || 0;

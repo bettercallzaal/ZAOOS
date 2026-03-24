@@ -38,21 +38,6 @@ const SECTION_IDS: Record<Tab, string> = {
   Playlists: 'section-playlists',
 };
 
-// ── Platform badge colors ──────────────────────────────────────────────
-function platformLabel(type: string): string {
-  switch (type) {
-    case 'spotify': return 'Spotify';
-    case 'applemusic': return 'Apple Music';
-    case 'soundcloud': return 'SoundCloud';
-    case 'youtube': return 'YouTube';
-    case 'tidal': return 'Tidal';
-    case 'bandcamp': return 'Bandcamp';
-    case 'audius': return 'Audius';
-    case 'soundxyz': return 'Sound.xyz';
-    case 'audio': return 'Audio';
-    default: return type;
-  }
-}
 
 function timeAgo(dateStr: string): string {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);

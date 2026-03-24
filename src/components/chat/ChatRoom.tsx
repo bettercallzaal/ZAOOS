@@ -22,7 +22,9 @@ import { MessageCompose } from '@/components/messages/MessageCompose';
 import { NewConversationDialog } from '@/components/messages/NewConversationDialog';
 import { FeedFilters, filterAndSortCasts, ContentFilter, SortMode } from './FeedFilters';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { communityConfig } from '@/../community.config';
 
+const TrendingFeed = dynamic(() => import('./TrendingFeed').then(m => ({ default: m.TrendingFeed })), { ssr: false });
 const SearchDialog = dynamic(() => import('./SearchDialog').then(m => ({ default: m.SearchDialog })), { ssr: false });
 const SongSubmit = dynamic(() => import('@/components/music/SongSubmit').then(m => ({ default: m.SongSubmit })), { ssr: false });
 const SchedulePanel = dynamic(() => import('./SchedulePanel').then(m => ({ default: m.SchedulePanel })), { ssr: false });
@@ -34,6 +36,7 @@ const ProfileDrawer = dynamic(() => import('./ProfileDrawer').then(m => ({ defau
 export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
   const [activeChannel, setActiveChannel] = useState('zao');
+  const [isTrending, setIsTrending] = useState(false);
   const player = usePlayer();
   const { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage, loadMore, hasMore, loadingMore } = useChat(activeChannel);
   const isMobile = useMobile();
@@ -59,7 +62,7 @@ export function ChatRoom() {
   // XMTP context
   const xmtp = useXMTPContext();
   const walletXmtp = useWalletXMTP();
-  const viewMode = xmtp.activeConversationId ? 'xmtp' : 'channel';
+  const viewMode = xmtp.activeConversationId ? 'xmtp' : isTrending ? 'trending' : 'channel';
   const activeXmtpConversation = xmtp.conversations.find((c) => c.id === xmtp.activeConversationId) ?? null;
 
   const handleXmtpConnect = useCallback(async () => {
@@ -81,6 +84,14 @@ export function ChatRoom() {
 
   const handleChannelSelect = useCallback((ch: string) => {
     setActiveChannel(ch);
+    setIsTrending(false);
+    xmtp.selectConversation(null);
+    setSelectedThreadHash(null);
+    setSidebarOpen(false);
+  }, [xmtp]);
+
+  const handleTrendingSelect = useCallback(() => {
+    setIsTrending(true);
     xmtp.selectConversation(null);
     setSelectedThreadHash(null);
     setSidebarOpen(false);
@@ -294,6 +305,13 @@ export function ChatRoom() {
                   </div>
                 </div>
               </div>
+            ) : isTrending ? (
+              <div className="flex-1 min-w-0">
+                <h2 className="font-semibold text-sm text-white flex items-center gap-1.5">
+                  <span className="text-amber-400">🔥</span> Trending
+                </h2>
+                <p className="text-[10px] text-gray-600 -mt-0.5">Curated by Sopha</p>
+              </div>
             ) : (
               <div className="flex-1 min-w-0">
                 <h2 className="font-semibold text-sm text-white"># {activeChannel}</h2>
@@ -301,7 +319,7 @@ export function ChatRoom() {
               </div>
             )}
 
-            {viewMode === 'channel' && (
+            {(viewMode === 'channel' || viewMode === 'trending') && (
               <>
                 {/* Search */}
                 <button
@@ -371,76 +389,125 @@ export function ChatRoom() {
             </>
           ) : (
             <>
-              {/* Feed filters */}
-              <FeedFilters
-                contentFilter={contentFilter}
-                sortMode={sortMode}
-                onContentFilterChange={setContentFilter}
-                onSortChange={setSortMode}
-                resultCount={filteredMessages.length}
-                totalCount={messages.length}
-              />
+              {/* Channel / Trending tab bar */}
+              <div className="flex items-center gap-0.5 px-3 py-1.5 bg-[#0d1b2a] border-b border-gray-800 overflow-x-auto no-scrollbar flex-shrink-0">
+                {communityConfig.farcaster.channels.map((ch) => (
+                  <button
+                    key={ch}
+                    onClick={() => handleChannelSelect(ch)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      !isTrending && activeChannel === ch
+                        ? 'bg-[#f5a623]/10 text-[#f5a623]'
+                        : 'text-gray-500 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    #{ch}
+                  </button>
+                ))}
+                <button
+                  onClick={handleTrendingSelect}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${
+                    isTrending
+                      ? 'bg-amber-500/10 text-amber-400'
+                      : 'text-gray-500 hover:text-amber-400 hover:bg-amber-500/5'
+                  }`}
+                >
+                  Trending <span className="text-[10px]">🔥</span>
+                </button>
+              </div>
 
-              {/* Error banner */}
-              {error && !sendError && (
-                <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0">
-                  {error}
-                </div>
-              )}
-
-              {/* Send error banner — dismissable */}
-              {sendError && (
-                <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0 flex items-center justify-between">
-                  <span>Message failed: {sendError}</span>
-                  <button onClick={clearSendError} className="text-red-300 hover:text-white text-xs ml-3 flex-shrink-0">Dismiss</button>
-                </div>
-              )}
-
-              {/* Farcaster Messages */}
-              <MessageList
-                messages={filteredMessages}
-                isAdmin={user.isAdmin}
-                currentFid={user.fid}
-                hasSigner={hasSigner}
-                onHide={hideMessage}
-                onOpenThread={(hash) => setSelectedThreadHash(hash)}
-                onQuote={(cast) => {
-                  setQuotedCast(cast);
-                  setSelectedThreadHash(null);
-                }}
-                onOpenProfile={(fid) => setProfileFid(fid)}
-                onReply={(hash, authorName, text) => {
-                  setReplyTo({ hash, authorName, text });
-                  setQuotedCast(null);
-                  composeRef.current?.focus();
-                }}
-                loading={loading}
-                channelId={activeChannel}
-                sortMode={sortMode}
-                onLoadMore={loadMore}
-                hasMore={hasMore}
-                loadingMore={loadingMore}
-              />
-
-              {/* Signer connect or Compose */}
-              {!hasSigner ? (
-                <div>
-                  <SignerConnect onSuccess={refetch} />
-                  <ComposeBar ref={composeRef} hasSigner={false} onSend={sendMessage} channel={activeChannel} />
-                </div>
-              ) : (
-                <ComposeBar
-                  ref={composeRef}
-                  hasSigner={true}
-                  onSend={sendMessage}
-                  sending={sending}
-                  channel={activeChannel}
-                  quotedCast={quotedCast}
-                  onClearQuote={() => setQuotedCast(null)}
-                  onSchedule={() => setScheduleOpen(true)}
-                  replyTo={replyTo}
-                  onClearReply={() => setReplyTo(null)}
+              {isTrending ? (
+                <TrendingFeed
+                  isAdmin={user.isAdmin}
+                  currentFid={user.fid}
+                  hasSigner={hasSigner}
+                  onHide={hideMessage}
+                  onOpenThread={(hash) => setSelectedThreadHash(hash)}
+                  onQuote={(cast) => {
+                    setQuotedCast(cast);
+                    setSelectedThreadHash(null);
+                  }}
+                  onOpenProfile={(fid) => setProfileFid(fid)}
+                  onReply={(hash, authorName, text) => {
+                    setReplyTo({ hash, authorName, text });
+                    setQuotedCast(null);
+                    composeRef.current?.focus();
+                  }}
                 />
+              ) : (
+                <>
+                  {/* Feed filters */}
+                  <FeedFilters
+                    contentFilter={contentFilter}
+                    sortMode={sortMode}
+                    onContentFilterChange={setContentFilter}
+                    onSortChange={setSortMode}
+                    resultCount={filteredMessages.length}
+                    totalCount={messages.length}
+                  />
+
+                  {/* Error banner */}
+                  {error && !sendError && (
+                    <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0">
+                      {error}
+                    </div>
+                  )}
+
+                  {/* Send error banner — dismissable */}
+                  {sendError && (
+                    <div className="px-4 py-2 bg-red-900/30 text-red-400 text-sm flex-shrink-0 flex items-center justify-between">
+                      <span>Message failed: {sendError}</span>
+                      <button onClick={clearSendError} className="text-red-300 hover:text-white text-xs ml-3 flex-shrink-0">Dismiss</button>
+                    </div>
+                  )}
+
+                  {/* Farcaster Messages */}
+                  <MessageList
+                    messages={filteredMessages}
+                    isAdmin={user.isAdmin}
+                    currentFid={user.fid}
+                    hasSigner={hasSigner}
+                    onHide={hideMessage}
+                    onOpenThread={(hash) => setSelectedThreadHash(hash)}
+                    onQuote={(cast) => {
+                      setQuotedCast(cast);
+                      setSelectedThreadHash(null);
+                    }}
+                    onOpenProfile={(fid) => setProfileFid(fid)}
+                    onReply={(hash, authorName, text) => {
+                      setReplyTo({ hash, authorName, text });
+                      setQuotedCast(null);
+                      composeRef.current?.focus();
+                    }}
+                    loading={loading}
+                    channelId={activeChannel}
+                    sortMode={sortMode}
+                    onLoadMore={loadMore}
+                    hasMore={hasMore}
+                    loadingMore={loadingMore}
+                  />
+
+                  {/* Signer connect or Compose */}
+                  {!hasSigner ? (
+                    <div>
+                      <SignerConnect onSuccess={refetch} />
+                      <ComposeBar ref={composeRef} hasSigner={false} onSend={sendMessage} channel={activeChannel} />
+                    </div>
+                  ) : (
+                    <ComposeBar
+                      ref={composeRef}
+                      hasSigner={true}
+                      onSend={sendMessage}
+                      sending={sending}
+                      channel={activeChannel}
+                      quotedCast={quotedCast}
+                      onClearQuote={() => setQuotedCast(null)}
+                      onSchedule={() => setScheduleOpen(true)}
+                      replyTo={replyTo}
+                      onClearReply={() => setReplyTo(null)}
+                    />
+                  )}
+                </>
               )}
             </>
           )}

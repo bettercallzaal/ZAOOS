@@ -9,6 +9,25 @@ function headers() {
   };
 }
 
+export async function getTrendingFeed(limit = 25, timeWindow = '24h', cursor?: string) {
+  const params = new URLSearchParams({
+    limit: String(limit),
+    time_window: timeWindow,
+  });
+  if (cursor) params.set('cursor', cursor);
+
+  const res = await fetch(`${NEYNAR_BASE}/feed/trending?${params}`, {
+    headers: headers(),
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar trending feed error ${res.status}: ${body.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
 export async function getChannelFeed(channelId: string, cursor?: string, limit = 20) {
   const params = new URLSearchParams({
     channel_ids: channelId,

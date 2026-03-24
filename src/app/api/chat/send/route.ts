@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
 
-    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels, crossPostBluesky, crossPostLens, crossPostX, crossPostHive } = parsed.data;
+    const { text, parentHash, embedHash, embedFid, embedUrls, channel, crossPostChannels } = parsed.data;
     const primaryChannel = channel && ALLOWED_CHANNELS.includes(channel) ? channel : 'zao';
 
     // Build list of channels to post to
@@ -97,122 +97,44 @@ export async function POST(req: NextRequest) {
       ).catch((err) => console.error('[notify]', err));
     }
 
-    // Cross-post to user's personal Bluesky (fire and forget)
-    // Community @thezao account is governance-gated — only posts when proposals pass 1000 Respect threshold
-    if (crossPostBluesky && !parentHash) {
+    // Community cross-post: automatically amplify all top-level posts to ZAO's official accounts
+    // Uses community credentials from env vars — NOT individual user accounts
+    if (!parentHash) {
+      const authorLabel = `@${session.username || session.displayName}`;
+
+      // Cross-post to ZAO's official Bluesky account (fire and forget)
       (async () => {
         try {
-          const { data: bskyUser } = await supabaseAdmin
-            .from('users')
-            .select('bluesky_handle, bluesky_app_password')
-            .eq('fid', session.fid)
-            .single();
-
-          if (bskyUser?.bluesky_handle && bskyUser?.bluesky_app_password) {
-            await postToBluesky(text, 'https://zaoos.com/chat', {
-              handle: bskyUser.bluesky_handle,
-              appPassword: bskyUser.bluesky_app_password,
-            });
-          }
+          const communityText = `${authorLabel}: ${text}`;
+          await postToBluesky(communityText, 'https://zaoos.com/chat');
+          console.info('[cross-post] Bluesky community success');
         } catch (err) {
-          console.error('[bluesky/personal]', err);
+          console.error('[cross-post] Bluesky community failed:', err);
         }
       })();
-    }
 
-    // Lens and Hive deferred — see research/121
-    // Cross-post to Lens disabled (UI hidden, code preserved for future use)
-    // if (crossPostLens && !parentHash) {
-    //   (async () => {
-    //     try {
-    //       const { data: lensUser } = await supabaseAdmin
-    //         .from('users')
-    //         .select('lens_profile_id, lens_access_token, lens_refresh_token')
-    //         .eq('fid', session.fid)
-    //         .single();
-    //
-    //       if (lensUser?.lens_access_token) {
-    //         const { normalizeForLens } = await import('@/lib/publish/normalize');
-    //         const { publishToLens } = await import('@/lib/publish/lens');
-    //         const content = normalizeForLens({ text, castHash: castData?.hash || '', embedUrls, channel });
-    //         const result = await publishToLens(lensUser.lens_access_token, lensUser.lens_refresh_token || '', content, lensUser.lens_profile_id || undefined);
-    //         console.info('[cross-post] Lens success:', result.postUrl);
-    //
-    //         await supabaseAdmin.from('publish_log').insert({
-    //           cast_hash: castData?.hash,
-    //           fid: session.fid,
-    //           platform: 'lens',
-    //           status: 'success',
-    //           platform_post_id: result.postId,
-    //           platform_url: result.postUrl,
-    //         });
-    //       } else {
-    //         console.info('[cross-post] Lens skipped — no access token');
-    //       }
-    //     } catch (e) {
-    //       console.error('[cross-post] Lens failed:', e);
-    //       await supabaseAdmin.from('publish_log').insert({
-    //         cast_hash: castData?.hash,
-    //         fid: session.fid,
-    //         platform: 'lens',
-    //         status: 'failed',
-    //         error_message: e instanceof Error ? e.message : 'Unknown error',
-    //       });
-    //     }
-    //   })();
-    // }
-
-    // Cross-post to X — admin only (fire and forget — direct call)
-    if (crossPostX && !parentHash && session.isAdmin) {
+      // Cross-post to ZAO's official X account (fire and forget)
       (async () => {
         try {
           const { normalizeForX } = await import('@/lib/publish/normalize');
           const { publishToX, getXClient } = await import('@/lib/publish/x');
           const client = getXClient();
           if (!client) { console.info('[cross-post] X skipped — not configured'); return; }
-          const content = normalizeForX({ text, castHash: castData?.hash || '', embedUrls, channel });
+          // Prepend author attribution and truncate to 280 chars
+          const prefix = `${authorLabel}: `;
+          const attributedText = `${prefix}${text}`;
+          const content = normalizeForX({ text: attributedText, castHash: castData?.hash || '', embedUrls, channel });
           const result = await publishToX(content);
-          console.info('[cross-post] X success:', result.tweetUrl);
+          console.info('[cross-post] X community success:', result.tweetUrl);
           await supabaseAdmin.from('publish_log').insert({
             cast_hash: castData?.hash, fid: session.fid, platform: 'x',
             status: 'success', platform_post_id: result.tweetId, platform_url: result.tweetUrl,
           });
         } catch (e) {
-          console.error('[cross-post] X failed:', e);
+          console.error('[cross-post] X community failed:', e);
         }
       })();
     }
-
-    // Cross-post to Hive disabled (UI hidden, code preserved for future use)
-    // Lens and Hive deferred — see research/121
-    // if (crossPostHive && !parentHash) {
-    //   (async () => {
-    //     try {
-    //       const { data: hiveUser } = await supabaseAdmin
-    //         .from('users')
-    //         .select('hive_username, hive_posting_key_encrypted')
-    //         .eq('fid', session.fid)
-    //         .single();
-    //
-    //       if (hiveUser?.hive_username && hiveUser?.hive_posting_key_encrypted) {
-    //         const { normalizeForHive } = await import('@/lib/publish/normalize');
-    //         const { publishToHive, decryptPostingKey } = await import('@/lib/publish/hive');
-    //         const postingKey = decryptPostingKey(hiveUser.hive_posting_key_encrypted);
-    //         const content = normalizeForHive({ text, castHash: castData?.hash || '', embedUrls, channel });
-    //         const result = await publishToHive(hiveUser.hive_username, postingKey, content);
-    //         console.info('[cross-post] Hive success:', result.url);
-    //         await supabaseAdmin.from('publish_log').insert({
-    //           cast_hash: castData?.hash, fid: session.fid, platform: 'hive',
-    //           status: 'success', platform_url: result.url,
-    //         });
-    //       } else {
-    //         console.info('[cross-post] Hive skipped — not connected');
-    //       }
-    //     } catch (e) {
-    //       console.error('[cross-post] Hive failed:', e);
-    //     }
-    //   })();
-    // }
 
     // Send push + in-app notifications (fire and forget)
     const channelList = [...channels].map((c) => `#${c}`).join(', ');

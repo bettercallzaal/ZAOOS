@@ -3,8 +3,6 @@
 import { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { QuotedCastData } from '@/types';
 import { MentionAutocomplete } from './MentionAutocomplete';
-import { PlatformToggles } from '@/components/compose/PlatformToggles';
-import { PublishButton } from '@/components/compose/PublishButton';
 import { communityConfig } from '@/../community.config';
 
 const ALL_CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `#${id}` }));
@@ -17,7 +15,7 @@ export interface ReplyContext {
 
 interface ComposeBarProps {
   hasSigner: boolean;
-  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[], embedFid?: number, crossPostBluesky?: boolean, crossPostLens?: boolean, crossPostX?: boolean, crossPostHive?: boolean) => Promise<void>;
+  onSend: (text: string, parentHash?: string, embedHash?: string, crossPostChannels?: string[], embedUrls?: string[], embedFid?: number) => Promise<void>;
   sending?: boolean;
   channel?: string;
   quotedCast?: QuotedCastData | null;
@@ -25,7 +23,6 @@ interface ComposeBarProps {
   onSchedule?: () => void;
   replyTo?: ReplyContext | null;
   onClearReply?: () => void;
-  isAdmin?: boolean;
 }
 
 export interface ComposeBarHandle {
@@ -42,18 +39,10 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   onSchedule,
   replyTo,
   onClearReply,
-  isAdmin = false,
 }, ref) {
   const [text, setText] = useState('');
   const [showCrossPost, setShowCrossPost] = useState(false);
   const [crossPostChannels, setCrossPostChannels] = useState<Set<string>>(new Set());
-  const [crossPostBluesky, setCrossPostBluesky] = useState(false);
-  const [crossPostLens, setCrossPostLens] = useState(false);
-  const [crossPostX, setCrossPostX] = useState(false);
-  const [crossPostHive, setCrossPostHive] = useState(false);
-  const [crossPostEnabled, setCrossPostEnabled] = useState(false);
-  const [connectedPlatforms, setConnectedPlatforms] = useState<Set<string>>(new Set());
-  const [platformToast, setPlatformToast] = useState<string | null>(null);
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const [mentionStart, setMentionStart] = useState(0);
   const [imagePreview, setImagePreview] = useState<{ url: string; file?: File } | null>(null);
@@ -69,40 +58,6 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   useImperativeHandle(ref, () => ({
     focus: () => textareaRef.current?.focus(),
   }));
-
-  // Fetch connected platforms and publishing prefs on mount
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch('/api/users/profile');
-        if (!res.ok) return;
-        const data = await res.json();
-        const profile = data.profile || data;
-        const connected = new Set<string>();
-        if (profile.bluesky_handle) connected.add('bluesky');
-        // Lens and Hive deferred — see research/121 (not added to connected set)
-        // if (profile.lens_profile_id) connected.add('lens');
-        // if (profile.hive_username) connected.add('hive');
-        if (isAdmin) connected.add('x');
-        setConnectedPlatforms(connected);
-
-        // Apply saved publishing defaults (Lens/Hive deferred)
-        const prefs = profile.publishing_prefs;
-        if (prefs) {
-          if (prefs.crossPostBluesky && connected.has('bluesky')) setCrossPostBluesky(true);
-          // Lens and Hive deferred — see research/121
-          // if (prefs.crossPostLens && connected.has('lens')) setCrossPostLens(true);
-          // if (prefs.crossPostHive && connected.has('hive')) setCrossPostHive(true);
-          if (prefs.crossPostX && connected.has('x')) setCrossPostX(true);
-          if (prefs.crossPostBluesky || prefs.crossPostX) {
-            setCrossPostEnabled(true);
-          }
-        }
-      } catch {
-        // Silently fail — user can still post to Farcaster
-      }
-    })();
-  }, [isAdmin]);
 
   // Revoke any active blob URL on unmount to prevent memory leaks
   useEffect(() => {
@@ -161,20 +116,12 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
           crossPost,
           embedUrls,
           quotedCast?.author.fid,
-          crossPostBluesky || undefined,
-          crossPostLens || undefined,
-          crossPostX || undefined,
-          crossPostHive || undefined,
         );
         setText('');
         removeImage();
         onClearQuote?.();
         onClearReply?.();
         setCrossPostChannels(new Set());
-        setCrossPostBluesky(false);
-        setCrossPostLens(false);
-        setCrossPostX(false);
-        setCrossPostHive(false);
         setShowCrossPost(false);
       } catch (err) {
         setUploading(false);
@@ -330,27 +277,6 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
 
   const otherChannels = ALL_CHANNELS.filter((ch) => ch.id !== channel);
 
-  // Compute selectedPlatforms for PlatformToggles
-  const selectedPlatforms = new Set<string>();
-  selectedPlatforms.add('farcaster');
-  if (crossPostBluesky) selectedPlatforms.add('bluesky');
-  if (crossPostLens) selectedPlatforms.add('lens');
-  if (crossPostX) selectedPlatforms.add('x');
-  if (crossPostHive) selectedPlatforms.add('hive');
-
-  const handlePlatformToggle = (platform: string) => {
-    switch (platform) {
-      case 'bluesky': setCrossPostBluesky((v) => !v); break;
-      // Lens and Hive deferred — see research/121
-      // case 'lens': setCrossPostLens((v) => !v); break;
-      // case 'hive': setCrossPostHive((v) => !v); break;
-      case 'x': setCrossPostX((v) => !v); break;
-    }
-  };
-
-  // Total platform count (farcaster + selected cross-posts + farcaster cross-post channels)
-  const platformCount = selectedPlatforms.size + crossPostChannels.size;
-
   return (
     <div
       className="border-t border-gray-800 bg-[#0d1b2a] relative"
@@ -489,12 +415,11 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
         </div>
       )}
 
-      {/* Cross-post selector */}
+      {/* Cross-post to additional Farcaster channels */}
       {showCrossPost && hasSigner && (
-        <div className="px-3 pt-2 space-y-2">
-          {/* Farcaster cross-post channels */}
+        <div className="px-3 pt-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-gray-500">Farcaster channels:</span>
+            <span className="text-xs text-gray-500">Also post to:</span>
             {otherChannels.map((ch) => (
               <button
                 key={ch.id}
@@ -509,23 +434,6 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               </button>
             ))}
           </div>
-          {/* Platform toggles */}
-          <PlatformToggles
-            selectedPlatforms={selectedPlatforms}
-            onToggle={handlePlatformToggle}
-            onNotConnected={(platform) => {
-              setPlatformToast(`${platform.charAt(0).toUpperCase() + platform.slice(1)} not connected`);
-              setTimeout(() => setPlatformToast(null), 3000);
-            }}
-            connectedPlatforms={connectedPlatforms}
-            isAdmin={isAdmin}
-          />
-          {platformToast && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-400">
-              <span>{platformToast} —</span>
-              <a href="/settings" className="text-[#f5a623] font-medium hover:underline">Go to Settings</a>
-            </div>
-          )}
         </div>
       )}
 
@@ -533,7 +441,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
         {/* Action buttons row — above the input */}
         {hasSigner && (
           <div className="flex gap-1 mb-2 px-1">
-            {/* Cross-post toggle — now handled by PublishButton below */}
+            {/* Action buttons */}
 
             {/* Image upload */}
             <input
@@ -603,27 +511,72 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
             className="flex-1 bg-[#1a2a3a] text-white text-base md:text-sm rounded-lg px-4 py-2.5 resize-none placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#f5a623] disabled:opacity-50"
           />
           {hasSigner ? (
-            <PublishButton
-              platformCount={platformCount}
-              crossPostEnabled={crossPostEnabled}
-              onToggleCrossPost={() => {
-                const next = !crossPostEnabled;
-                setCrossPostEnabled(next);
-                if (next) {
-                  setShowCrossPost(true);
-                } else {
-                  setShowCrossPost(false);
-                  setCrossPostChannels(new Set());
-                  setCrossPostBluesky(false);
-                  setCrossPostLens(false);
-                  setCrossPostX(false);
-                  setCrossPostHive(false);
-                }
-              }}
-              onSubmit={handleSubmit}
-              disabled={(!text.trim() && !imagePreview) || false}
-              loading={sending || false}
-            />
+            <div className="flex items-center gap-1.5">
+              {/* Toggle cross-post to additional Farcaster channels */}
+              {otherChannels.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = !showCrossPost;
+                    setShowCrossPost(next);
+                    if (!next) setCrossPostChannels(new Set());
+                  }}
+                  className={`flex-shrink-0 p-2 rounded-md transition-colors ${
+                    showCrossPost
+                      ? 'text-[#f5a623] bg-[#f5a623]/10'
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+                  }`}
+                  title={showCrossPost ? 'Hide channel cross-post' : 'Post to multiple channels'}
+                  aria-label={showCrossPost ? 'Hide channel cross-post' : 'Post to multiple channels'}
+                  aria-pressed={showCrossPost}
+                >
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+                    />
+                  </svg>
+                </button>
+              )}
+              {/* Send button */}
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={(!text.trim() && !imagePreview) || (sending || false)}
+                className="font-semibold px-4 py-2 rounded-lg text-sm transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]"
+              >
+                {(sending || false) ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-[#0a1628] border-t-transparent rounded-full animate-spin" />
+                    Sending
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                      />
+                    </svg>
+                    Post
+                  </>
+                )}
+              </button>
+            </div>
           ) : (
             <button
               onClick={handleSubmit}

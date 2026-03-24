@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
-import { useLensAuth } from '@/hooks/useLensAuth';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
 import type { SessionData } from '@/types';
@@ -516,147 +515,6 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   // Solana wallet state
   const [solanaWallet, setSolanaWallet] = useState(profile?.solana_wallet || null);
 
-  // Bluesky connection state
-  const [blueskyHandle, setBlueskyHandle] = useState(profile?.bluesky_handle || null);
-  const [showBlueskyConnect, setShowBlueskyConnect] = useState(false);
-  const [bskyHandle, setBskyHandle] = useState('');
-  const [bskyAppPassword, setBskyAppPassword] = useState('');
-  const [bskyConnecting, setBskyConnecting] = useState(false);
-  const [bskyError, setBskyError] = useState('');
-
-  const connectBluesky = async () => {
-    if (!bskyHandle || !bskyAppPassword) return;
-    setBskyConnecting(true);
-    setBskyError('');
-    try {
-      const res = await fetch('/api/bluesky', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ handle: bskyHandle, appPassword: bskyAppPassword }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setBlueskyHandle(data.handle);
-        setShowBlueskyConnect(false);
-        setBskyHandle('');
-        setBskyAppPassword('');
-      } else {
-        setBskyError(data.error || 'Failed to connect');
-      }
-    } catch {
-      setBskyError('Connection failed');
-    }
-    setBskyConnecting(false);
-  };
-
-  const disconnectBluesky = async () => {
-    try {
-      const res = await fetch('/api/bluesky', { method: 'DELETE' });
-      if (res.ok) setBlueskyHandle(null);
-    } catch { /* ignore */ }
-  };
-
-  // Lens connection state
-  const [lensHandle, setLensHandle] = useState(profile?.lens_profile_id || null);
-  const [lensConnecting, setLensConnecting] = useState(false);
-  const [lensError, setLensError] = useState<string | null>(null);
-  const [lensDisconnecting, setLensDisconnecting] = useState(false);
-  const [lensNeedsAuth, setLensNeedsAuth] = useState(!!profile?.lens_profile_id && !profile?.lens_has_token);
-
-  // SDK hook for wallet-based auth (gets posting tokens)
-  const { connect: lensSDKConnect, isConnecting: lensSDKConnecting, error: lensSDKError, connectedHandle: lensSDKHandle, walletAddress: lensWalletAddr } = useLensAuth();
-
-  // Sync SDK state to local state
-  useEffect(() => {
-    if (lensSDKHandle) { setLensHandle(lensSDKHandle); setLensNeedsAuth(false); }
-    if (lensSDKError) setLensError(lensSDKError);
-  }, [lensSDKHandle, lensSDKError]);
-
-  const lensConnect = async () => {
-    setLensConnecting(true);
-    setLensError(null);
-
-    // Always use server-side lookup first (works with all wallets from Farcaster)
-    try {
-      const wallet = session?.walletAddress;
-      if (!wallet) { setLensError('No wallet connected'); setLensConnecting(false); return; }
-      const res = await fetch('/api/platforms/lens', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed');
-      if (data.handle) {
-        setLensHandle(data.handle);
-        setLensNeedsAuth(true); // Profile found but no tokens yet
-        setLensError('Profile found! Connect wallet below to enable posting.');
-      } else {
-        setLensHandle(null);
-        setLensError(data.message || 'No Lens profile found');
-      }
-    } catch (err) {
-      setLensError(err instanceof Error ? err.message : 'Failed to connect');
-    }
-    setLensConnecting(false);
-  };
-
-  const lensAuthorize = async () => {
-    setLensConnecting(true);
-    setLensError(null);
-    await lensSDKConnect();
-    setLensConnecting(false);
-  };
-
-  const disconnectLens = async () => {
-    setLensDisconnecting(true);
-    try {
-      const res = await fetch('/api/platforms/lens', { method: 'DELETE' });
-      if (res.ok) { setLensHandle(null); setLensError(null); }
-    } catch { /* ignore */ }
-    setLensDisconnecting(false);
-  };
-
-  // Hive connection state
-  const [hiveUsername, setHiveUsername] = useState(profile?.hive_username || null);
-  const [showHiveConnect, setShowHiveConnect] = useState(false);
-  const [hiveUser, setHiveUser] = useState('');
-  const [hivePostingKey, setHivePostingKey] = useState('');
-  const [hiveConnecting, setHiveConnecting] = useState(false);
-  const [hiveError, setHiveError] = useState('');
-
-  const connectHive = async () => {
-    if (!hiveUser || !hivePostingKey) return;
-    setHiveConnecting(true);
-    setHiveError('');
-    try {
-      const res = await fetch('/api/platforms/hive', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: hiveUser, postingKey: hivePostingKey }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setHiveUsername(data.username);
-        setShowHiveConnect(false);
-        setHiveUser('');
-        setHivePostingKey('');
-      } else {
-        setHiveError(data.error || 'Failed to connect');
-      }
-    } catch {
-      setHiveError('Connection failed');
-    }
-    setHiveConnecting(false);
-  };
-
-  const disconnectHive = async () => {
-    try {
-      const res = await fetch('/api/platforms/hive', { method: 'DELETE' });
-      if (res.ok) setHiveUsername(null);
-    } catch { /* ignore */ }
-  };
-
   // Push notification state
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
   const [pushToggling, setPushToggling] = useState(false);
@@ -717,18 +575,12 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   };
 
   // Account count for progress indicator
-  // Lens and Hive deferred — see research/121 (excluded from counts)
   const accountConnections = [
     !!session?.walletAddress,
     !!session?.fid,
-    !!blueskyHandle,
     !!solanaWallet,
   ];
   const accountConnectedCount = accountConnections.filter(Boolean).length;
-
-  // Cross-posting platform count (Lens/Hive deferred)
-  const crossPostPlatforms = [!!blueskyHandle].filter(Boolean).length;
-  const totalCrossPostPlatforms = 1;
 
   if (!session || !profile) {
     return (
@@ -783,62 +635,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
               }
             />
 
-            {/* 3. Bluesky */}
-            <AccountRow
-              icon={<BlueskyIcon className="w-4 h-4 text-blue-400" />}
-              name="Bluesky"
-              status={blueskyHandle ? 'connected' : 'disconnected'}
-              detail={blueskyHandle ? `@${blueskyHandle}` : undefined}
-              action={
-                blueskyHandle ? (
-                  <button
-                    onClick={disconnectBluesky}
-                    className="text-[10px] text-red-400 hover:text-red-300 transition-colors"
-                  >
-                    Disconnect
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => { setShowBlueskyConnect(!showBlueskyConnect); setBskyError(''); }}
-                    className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
-                  >
-                    Connect
-                  </button>
-                )
-              }
-            >
-              {/* Bluesky inline connect form */}
-              {showBlueskyConnect && !blueskyHandle && (
-                <div className="pb-3 space-y-2">
-                  <input
-                    value={bskyHandle}
-                    onChange={(e) => setBskyHandle(e.target.value)}
-                    placeholder="yourname.bsky.social"
-                    className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:border-blue-500"
-                  />
-                  <input
-                    value={bskyAppPassword}
-                    onChange={(e) => setBskyAppPassword(e.target.value)}
-                    placeholder="App password (xxxx-xxxx-xxxx-xxxx)"
-                    type="password"
-                    className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:border-blue-500"
-                  />
-                  <p className="text-[10px] text-gray-600">Create one at bsky.app/settings/app-passwords</p>
-                  {bskyError && <p className="text-[10px] text-red-400">{bskyError}</p>}
-                  <button
-                    onClick={connectBluesky}
-                    disabled={bskyConnecting}
-                    className="w-full text-xs font-medium py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-400 disabled:opacity-50 transition-colors"
-                  >
-                    {bskyConnecting ? 'Connecting...' : 'Connect Bluesky'}
-                  </button>
-                </div>
-              )}
-            </AccountRow>
-
-            {/* Lens and Hive deferred — see research/121. Rows hidden from UI, code preserved. */}
-
-            {/* 6. Solana */}
+            {/* 3. Solana */}
             <div className="py-3">
               <SolanaWalletConnect
                 savedWallet={solanaWallet}
@@ -846,20 +643,6 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
               />
             </div>
 
-            {/* 7. X / Twitter — admin only */}
-            {!!session.isAdmin && (
-              <AccountRow
-                icon={<XIcon className="w-4 h-4 text-white" />}
-                name="X / Twitter"
-                status={profile.x_handle ? 'connected' : 'disconnected'}
-                detail={profile.x_handle ? `Configured by ZAO` : 'Not configured'}
-                action={
-                  profile.x_handle ? (
-                    <span className="text-[10px] text-gray-600">@{profile.x_handle}</span>
-                  ) : null
-                }
-              />
-            )}
           </div>
         </section>
 
@@ -893,17 +676,6 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     Enable in Messages
                   </Link>
                 ) : null
-              }
-            />
-
-            {/* Cross-posting */}
-            <FeatureRow
-              name="Cross-posting"
-              detail={`${crossPostPlatforms} of ${totalCrossPostPlatforms} platforms connected`}
-              action={
-                <span className="text-[10px] text-gray-500">
-                  {crossPostPlatforms > 0 ? 'Active' : 'Connect accounts above'}
-                </span>
               }
             />
 

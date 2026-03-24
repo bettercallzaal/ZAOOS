@@ -71,6 +71,13 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
         activeUrlRef.current = url;
         audio.src = url;
         audio.load();
+        // Also call play() directly — on mobile background, the canplay event
+        // may not fire for a new source, preventing auto-advance.
+        // Calling play() here lets the browser buffer + play in one step.
+        // If canplay fires later, its play() call is a no-op on an already-playing element.
+        audio.play().catch(() => {
+          // Silently catch — onCanPlay will retry, or user will see error there
+        });
       },
       setVolume: (v: number) => {
         audio.volume = v;

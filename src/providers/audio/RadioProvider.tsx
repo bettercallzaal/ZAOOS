@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
-import { usePlayer } from '@/providers/audio';
+import { usePlayer, usePlayerContext } from '@/providers/audio';
 import type { RadioTrack, RadioPlaylist } from '@/app/api/music/radio/route';
 import type { TrackMetadata } from '@/types/music';
 
@@ -48,6 +48,7 @@ const RADIO_STORAGE_KEY = 'zao-radio-state';
 
 export function RadioProvider({ children }: { children: ReactNode }) {
   const player = usePlayer();
+  const { onEndedRef } = usePlayerContext();
   const [isRadioMode, setIsRadioMode] = useState(() => {
     if (typeof window === 'undefined') return false;
     try {
@@ -162,16 +163,17 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     player.play(radioTrackToMetadata(track, `radio-${track.id}`));
   }, [player]);
 
-  // Auto-advance when track ends
+  // Auto-advance when track ends — use onEndedRef directly (stable ref)
+  // instead of player.setOnEnded which has an unstable dependency on player
   const nextRef = useRef(nextRadioTrack);
   nextRef.current = nextRadioTrack;
 
   useEffect(() => {
     if (isRadioMode) {
-      player.setOnEnded?.(() => nextRef.current());
-      return () => player.setOnEnded?.(null);
+      onEndedRef.current = () => nextRef.current();
+      return () => { onEndedRef.current = null; };
     }
-  }, [isRadioMode, player]);
+  }, [isRadioMode, onEndedRef]);
 
   const currentStation = allStations[currentStationIndex] ?? null;
 

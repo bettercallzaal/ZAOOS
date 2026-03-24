@@ -440,7 +440,6 @@ export function ChatRoom() {
                   onSchedule={() => setScheduleOpen(true)}
                   replyTo={replyTo}
                   onClearReply={() => setReplyTo(null)}
-                  isAdmin={user.isAdmin}
                 />
               )}
             </>

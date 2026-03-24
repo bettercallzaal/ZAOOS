@@ -10,7 +10,7 @@ import { TidalProvider } from './TidalProvider';
 import { BandcampProvider } from './BandcampProvider';
 import { AppleMusicProvider } from './AppleMusicProvider';
 
-export { usePlayer } from './PlayerProvider';
+export { usePlayer, usePlayerContext } from './PlayerProvider';
 export type { RepeatMode } from './PlayerProvider';
 
 export function AudioProviders({ children }: { children: ReactNode }) {

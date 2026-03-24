@@ -13,11 +13,7 @@ export const sendMessageSchema = z.object({
   embedFid: z.number().int().positive().optional(), // FID of quoted cast author
   embedUrls: z.array(z.string().url()).max(2).optional(), // image/link embeds
   channel: channelIdSchema.optional(),
-  crossPostChannels: z.array(channelIdSchema).max(3).optional(), // post to multiple channels
-  crossPostBluesky: z.boolean().optional(), // cross-post to Bluesky
-  crossPostLens: z.boolean().optional(), // cross-post to Lens (deferred — see research/121, kept for API compat)
-  crossPostX: z.boolean().optional(), // cross-post to X (admin only)
-  crossPostHive: z.boolean().optional(), // cross-post to Hive (deferred — see research/121, kept for API compat)
+  crossPostChannels: z.array(channelIdSchema).max(3).optional(), // post to multiple Farcaster channels
 });
 
 export const hideMessageSchema = z.object({

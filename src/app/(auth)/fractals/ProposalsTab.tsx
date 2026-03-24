@@ -75,7 +75,7 @@ const CATEGORY_FILTERS = ['all', 'governance', 'technical', 'community', 'wavewa
 
 /* ── Component ──────────────────────────────────────────────── */
 
-export function ProposalsTab() {
+export function ProposalsTab({ isAdmin = false, currentFid }: { isAdmin?: boolean; currentFid?: number }) {
   const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -167,6 +167,24 @@ export function ProposalsTab() {
       console.error('[proposals] vote error:', err);
     }
     setVoting(null);
+  };
+
+  const handleStatusChange = async (proposalId: string, newStatus: string) => {
+    if (!isAdmin) return;
+    try {
+      const res = await fetch('/api/proposals', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: proposalId, status: newStatus }),
+      });
+      if (res.ok) {
+        setProposals(prev => prev.map(p =>
+          p.id === proposalId ? { ...p, status: newStatus } : p
+        ));
+      }
+    } catch (err) {
+      console.error('[proposals] status change error:', err);
+    }
   };
 
   const toggleExpand = (id: string) => {
@@ -385,8 +403,10 @@ export function ProposalsTab() {
               isExpanded={expandedId === p.id}
               onToggle={() => toggleExpand(p.id)}
               onVote={handleVote}
+              onStatusChange={isAdmin ? handleStatusChange : undefined}
               isVoting={voting === p.id}
               currentFid={user?.fid ?? 0}
+              isAdmin={isAdmin}
             />
           ))}
         </div>
@@ -402,15 +422,19 @@ function ProposalCard({
   isExpanded,
   onToggle,
   onVote,
+  onStatusChange,
   isVoting,
   currentFid,
+  isAdmin = false,
 }: {
   proposal: Proposal;
   isExpanded: boolean;
   onToggle: () => void;
   onVote: (id: string, vote: 'for' | 'against' | 'abstain') => void;
+  onStatusChange?: (id: string, status: string) => void;
   isVoting: boolean;
   currentFid: number;
+  isAdmin?: boolean;
 }) {
   const statusKey = p.status.toLowerCase();
   const badgeClass = STATUS_BADGE[statusKey] ?? 'text-gray-400 bg-gray-400/10 border-gray-400/20';
@@ -647,6 +671,27 @@ function ProposalCard({
               </p>
             )}
           </div>
+
+          {/* Admin status controls */}
+          {isAdmin && onStatusChange && (
+            <div className="mt-4 pt-3 border-t border-gray-800/50">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Admin Actions</p>
+              <div className="flex flex-wrap gap-2">
+                {p.status === 'open' && (
+                  <>
+                    <button onClick={() => onStatusChange(p.id, 'approved')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors">Approve</button>
+                    <button onClick={() => onStatusChange(p.id, 'rejected')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors">Reject</button>
+                  </>
+                )}
+                {p.status === 'approved' && (
+                  <button onClick={() => onStatusChange(p.id, 'completed')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors">Mark Completed</button>
+                )}
+                {(p.status === 'rejected' || p.status === 'completed') && (
+                  <button onClick={() => onStatusChange(p.id, 'open')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-500/10 text-gray-400 border border-gray-500/20 hover:bg-gray-500/20 transition-colors">Reopen</button>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Comments section (dynamically imported) */}
           <ProposalComments proposalId={p.id} currentFid={currentFid} />

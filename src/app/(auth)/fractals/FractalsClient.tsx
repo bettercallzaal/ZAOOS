@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { SessionsTab } from './SessionsTab';
 import { FractalLeaderboardTab } from './FractalLeaderboardTab';
@@ -9,6 +10,7 @@ import { AboutTab } from './AboutTab';
 import { AnalyticsTab } from './AnalyticsTab';
 
 type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'proposals' | 'about';
+const VALID_TABS: Tab[] = ['sessions', 'leaderboard', 'analytics', 'proposals', 'about'];
 
 interface Props {
   currentFid: number;
@@ -16,7 +18,10 @@ interface Props {
 }
 
 export function FractalsClient({ currentFid, isAdmin }: Props) {
-  const [activeTab, setActiveTab] = useState<Tab>('sessions');
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab') as Tab | null;
+  const initialTab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'sessions';
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const TABS: { id: Tab; label: string }[] = [
     { id: 'sessions', label: 'Sessions' },
@@ -68,7 +73,7 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
         {activeTab === 'sessions' && <SessionsTab isAdmin={isAdmin} />}
         {activeTab === 'leaderboard' && <FractalLeaderboardTab currentFid={currentFid} />}
         {activeTab === 'analytics' && <AnalyticsTab />}
-        {activeTab === 'proposals' && <ProposalsTab />}
+        {activeTab === 'proposals' && <ProposalsTab isAdmin={isAdmin} currentFid={currentFid} />}
         {activeTab === 'about' && <AboutTab />}
       </div>
     </div>

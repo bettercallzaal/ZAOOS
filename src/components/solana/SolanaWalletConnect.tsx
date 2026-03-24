@@ -11,7 +11,7 @@ interface SolanaWalletConnectProps {
 }
 
 export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnectProps) {
-  const { publicKey, connected, connect, disconnect, select, wallets, signMessage, wallet } = useWallet();
+  const { publicKey, connected, connect, disconnect, select, wallets, signMessage } = useWallet();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [showWalletPicker, setShowWalletPicker] = useState(false);
@@ -54,7 +54,7 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
       setError('Failed to connect — check your wallet extension');
       setConnecting(false);
     }
-  }, [select]);
+  }, [select, connect]);
 
   const handleVerifyAndSave = useCallback(async () => {
     if (!publicKey || !signMessage) return;

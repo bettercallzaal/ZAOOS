@@ -65,8 +65,8 @@ export function useLensAuth() {
       let loginResult;
 
       if (accounts?.items && accounts.items.length > 0) {
-        const account = accounts.items[0];
-        const accountAddr = (account as any).account?.address || (account as any).address;
+        const account = accounts.items[0] as Record<string, Record<string, unknown>>;
+        const accountAddr = (account.account?.address || account.address) as string;
         loginResult = await client.login({
           accountOwner: {
             account: evmAddress(accountAddr),
@@ -76,8 +76,9 @@ export function useLensAuth() {
           signMessage: signMessageWith(walletClient),
         });
 
-        const username = (account as any).account?.username?.localName
-          || (account as any).username?.localName;
+        const nestedUsername = account.account?.username as Record<string, unknown> | undefined;
+        const topUsername = account.username as Record<string, unknown> | undefined;
+        const username = (nestedUsername?.localName || topUsername?.localName) as string | undefined;
         handle = username ? `${username}.lens` : accountAddr?.slice(0, 10) + '...';
       } else {
         loginResult = await client.login({
@@ -91,7 +92,8 @@ export function useLensAuth() {
       }
 
       if (loginResult.isErr()) {
-        throw new Error((loginResult.error as any)?.message || 'Login failed');
+        const err = loginResult.error as Record<string, unknown> | undefined;
+        throw new Error((err?.message as string) || 'Login failed');
       }
 
       // Extract tokens from our custom storage

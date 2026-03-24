@@ -239,9 +239,14 @@ describe('PATCH /api/proposals', () => {
   it('returns success when admin updates status', async () => {
     mockGetSessionData.mockResolvedValue({ fid: 123, isAdmin: true });
 
-    const { chain } = chainMock({ data: null, error: null });
-    chain.eq = vi.fn().mockResolvedValue({ data: null, error: null });
-    mockFrom.mockReturnValue(chain);
+    // First call: SELECT .from().select().eq().single() — returns current status
+    const selectChain = chainMock({ data: { status: 'open' }, error: null });
+    // Second call: UPDATE .from().update().eq() — returns success
+    const updateChain = chainMock({ data: null, error: null });
+
+    mockFrom
+      .mockReturnValueOnce(selectChain.chain)
+      .mockReturnValueOnce(updateChain.chain);
 
     const req = makeRequest('/api/proposals', {
       method: 'PATCH',

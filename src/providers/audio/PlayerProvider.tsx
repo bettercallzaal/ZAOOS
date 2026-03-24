@@ -130,13 +130,15 @@ function loadPersistedState(): Partial<PlayerState> {
   } catch { return {}; }
 }
 
+// Load persisted state once at module level — avoids ref access during render
+const _persisted = loadPersistedState();
+
 export function PlayerProvider({ children }: { children: ReactNode }) {
-  const persisted = useRef(loadPersistedState());
   const [state, dispatch] = useReducer(reducer, {
     ...initial,
-    volume: persisted.current.volume ?? 1,
-    shuffle: persisted.current.shuffle ?? false,
-    repeat: (persisted.current.repeat as RepeatMode) ?? 'off',
+    volume: _persisted.volume ?? 1,
+    shuffle: _persisted.shuffle ?? false,
+    repeat: (_persisted.repeat as RepeatMode) ?? 'off',
   });
   const controllers = useRef<Partial<Record<TrackType, AudioController>>>({});
   const onEndedRef = useRef<(() => void) | null>(null);
@@ -148,8 +150,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     position: number;
     duration: number;
   } | null>(() => {
-    const p = persisted.current;
-    return p.metadata ? { metadata: p.metadata, position: p.position ?? 0, duration: p.duration ?? 0 } : null;
+    return _persisted.metadata ? { metadata: _persisted.metadata, position: _persisted.position ?? 0, duration: _persisted.duration ?? 0 } : null;
   });
 
   // Persist player state to localStorage
@@ -169,6 +170,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       }));
     } catch { /* quota exceeded — ignore */ }
   }, [state.metadata, state.position, state.duration, state.volume, state.shuffle, state.repeat]);
+
+  // Ref to current state — for use in stable callbacks that shouldn't re-register on every state change
+  const stateRef = useRef(state);
+  useEffect(() => { stateRef.current = state; });
 
   // Media Session API — lock screen controls + background audio keepalive
   useEffect(() => {
@@ -214,9 +219,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     };
   }, [dispatch]);
 
-  const stateRef = useRef(state);
-  stateRef.current = state;
-
   const registerController = useCallback(
     (type: TrackType, controller: AudioController) => {
       controllers.current[type] = controller;
@@ -226,12 +228,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
 
   const clearRestoredTrack = useCallback(() => setRestoredTrack(null), []);
 
-  // Clear restored track when actual playback starts
   // Seek to pending position when track becomes playing
   useEffect(() => {
-    if (state.status === 'loading' || state.status === 'playing') {
-      setRestoredTrack(null);
-    }
     if (state.status === 'playing' && pendingSeekRef.current !== null && state.metadata) {
       const seekTo = pendingSeekRef.current;
       pendingSeekRef.current = null;
@@ -281,6 +279,7 @@ export function usePlayer() {
 
     play: (metadata: TrackMetadata) => {
       dispatch({ type: 'PLAY', payload: metadata });
+      clearRestoredTrack();
       // Trigger controller load within user-gesture context so autoplay isn't blocked
       const controller = controllers.current[metadata.type];
       if (controller?.load) {

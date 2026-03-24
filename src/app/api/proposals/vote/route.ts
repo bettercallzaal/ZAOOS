@@ -249,6 +249,25 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       console.error('[publish-threshold] Bluesky publish failed:', bskyErr);
     }
 
+    // Publish to @thezaodao X/Twitter (independent of Farcaster + Bluesky)
+    try {
+      const { normalizeForX } = await import('@/lib/publish/normalize');
+      const { publishToX, getXClient } = await import('@/lib/publish/x');
+      const client = getXClient();
+      if (client) {
+        const content = normalizeForX({
+          text: publishText + attribution,
+          castHash: castHash || '',
+        });
+        const xResult = await publishToX(content);
+        console.info(`[publish-threshold] Published to @thezaodao X: ${xResult.tweetUrl}`);
+      } else {
+        console.info('[publish-threshold] X skipped — not configured');
+      }
+    } catch (xErr) {
+      console.error('[publish-threshold] X publish failed:', xErr);
+    }
+
     // Mark proposal as published — try with bluesky URI first, fallback without
     const updateData: Record<string, unknown> = {
       published_cast_hash: castHash || 'bluesky-only',

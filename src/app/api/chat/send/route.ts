@@ -97,44 +97,9 @@ export async function POST(req: NextRequest) {
       ).catch((err) => console.error('[notify]', err));
     }
 
-    // Community cross-post: automatically amplify all top-level posts to ZAO's official accounts
-    // Uses community credentials from env vars — NOT individual user accounts
-    if (!parentHash) {
-      const authorLabel = `@${session.username || session.displayName}`;
-
-      // Cross-post to ZAO's official Bluesky account (fire and forget)
-      (async () => {
-        try {
-          const communityText = `${authorLabel}: ${text}`;
-          await postToBluesky(communityText, 'https://zaoos.com/chat');
-          console.info('[cross-post] Bluesky community success');
-        } catch (err) {
-          console.error('[cross-post] Bluesky community failed:', err);
-        }
-      })();
-
-      // Cross-post to ZAO's official X account (fire and forget)
-      (async () => {
-        try {
-          const { normalizeForX } = await import('@/lib/publish/normalize');
-          const { publishToX, getXClient } = await import('@/lib/publish/x');
-          const client = getXClient();
-          if (!client) { console.info('[cross-post] X skipped — not configured'); return; }
-          // Prepend author attribution and truncate to 280 chars
-          const prefix = `${authorLabel}: `;
-          const attributedText = `${prefix}${text}`;
-          const content = normalizeForX({ text: attributedText, castHash: castData?.hash || '', embedUrls, channel });
-          const result = await publishToX(content);
-          console.info('[cross-post] X community success:', result.tweetUrl);
-          await supabaseAdmin.from('publish_log').insert({
-            cast_hash: castData?.hash, fid: session.fid, platform: 'x',
-            status: 'success', platform_post_id: result.tweetId, platform_url: result.tweetUrl,
-          });
-        } catch (e) {
-          console.error('[cross-post] X community failed:', e);
-        }
-      })();
-    }
+    // Community cross-posting is NOT done here — it only happens when a
+    // proposal reaches 1000 Respect threshold (see /api/proposals/vote/route.ts)
+    // Regular chat messages go to Farcaster only.
 
     // Send push + in-app notifications (fire and forget)
     const channelList = [...channels].map((c) => `#${c}`).join(', ');

@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
     const fids = (users || []).map(u => u.fid).filter(Boolean);
     const wallets = (users || []).map(u => u.primary_wallet?.toLowerCase()).filter(Boolean);
 
-    let respectMap: Record<string, {
+    const respectMap: Record<string, {
       total_respect: number;
       fractal_respect: number;
       onchain_og: number;

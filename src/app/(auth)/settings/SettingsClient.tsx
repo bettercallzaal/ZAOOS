@@ -614,7 +614,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             {/* 1. Wallet — always connected */}
             <AccountRow
               icon={<WalletIcon className="w-4 h-4 text-[#f5a623]" />}
-              name="Wallet"
+              name="Farcaster Wallet"
               status="connected"
               detail={session.walletAddress ? shortAddr(session.walletAddress) : 'Connected'}
               action={<span className="text-[10px] text-gray-600">Primary</span>}

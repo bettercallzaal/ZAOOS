@@ -43,6 +43,12 @@ export function AdminPanel() {
             <p className="text-xs text-gray-500 mt-0.5">Manage your community</p>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              href="/admin/members"
+              className="text-sm text-[#f5a623] hover:text-[#ffd700] bg-[#f5a623]/10 hover:bg-[#f5a623]/20 px-3 py-1.5 rounded-lg transition-colors font-medium"
+            >
+              Member CRM
+            </Link>
             <ImportRespectButton />
             <SyncRespectButton />
             <Link

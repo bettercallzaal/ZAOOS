@@ -63,6 +63,25 @@ export default function MemberCRMPage() {
   const [tierFilter, setTierFilter] = useState<'all' | 'respect_holder' | 'community'>('all');
   const [sortBy, setSortBy] = useState<'respect' | 'name' | 'recent' | 'active'>('respect');
   const [issueFilter, setIssueFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
+  const [fixing, setFixing] = useState<string | null>(null);
+  const [fixResults, setFixResults] = useState<{ action: string; fixed: number; errors: number; details: string[] }[] | null>(null);
+
+  const runFix = async (action: 'link-fids' | 'enrich-profiles' | 'sync-tiers' | 'all') => {
+    setFixing(action);
+    setFixResults(null);
+    try {
+      const res = await fetch('/api/admin/member-fix', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      setFixResults(data.results || []);
+      // Reload health data
+      fetch('/api/admin/member-health').then(r => r.json()).then(d => { setStats(d.stats); setIssues(d.issues || []); });
+    } catch { /* ignore */ }
+    setFixing(null);
+  };
 
   // Load health data
   useEffect(() => {
@@ -241,6 +260,70 @@ export default function MemberCRMPage() {
               <StatCard label="Missing Discord" value={stats.missingDiscord} />
               <StatCard label="Missing Real Name" value={stats.missingRealName} />
               <StatCard label="Never Active" value={stats.neverActive} color="text-red-400" />
+            </div>
+
+            {/* Auto-fix actions */}
+            <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800/50 mb-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Auto-Fix Actions</p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                <button
+                  onClick={() => runFix('link-fids')}
+                  disabled={!!fixing}
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 disabled:opacity-50 transition-colors"
+                >
+                  {fixing === 'link-fids' ? 'Linking...' : 'Link FIDs (wallet → Farcaster)'}
+                </button>
+                <button
+                  onClick={() => runFix('enrich-profiles')}
+                  disabled={!!fixing}
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 disabled:opacity-50 transition-colors"
+                >
+                  {fixing === 'enrich-profiles' ? 'Enriching...' : 'Enrich Profiles (from Neynar)'}
+                </button>
+                <button
+                  onClick={() => runFix('sync-tiers')}
+                  disabled={!!fixing}
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 disabled:opacity-50 transition-colors"
+                >
+                  {fixing === 'sync-tiers' ? 'Syncing...' : 'Sync Tiers (respect → holder)'}
+                </button>
+                <button
+                  onClick={() => runFix('all')}
+                  disabled={!!fixing}
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20 hover:bg-[#f5a623]/20 disabled:opacity-50 transition-colors"
+                >
+                  {fixing === 'all' ? 'Running all...' : 'Run All Fixes'}
+                </button>
+              </div>
+              {fixing && (
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <div className="w-3 h-3 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+                  Running {fixing}... this may take a minute for large batches
+                </div>
+              )}
+              {fixResults && (
+                <div className="space-y-2 mt-2">
+                  {fixResults.map((r, i) => (
+                    <div key={i} className="bg-[#0a1628] rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-medium text-white">{r.action}</span>
+                        <span className="text-xs text-green-400">{r.fixed} fixed</span>
+                        {r.errors > 0 && <span className="text-xs text-red-400">{r.errors} errors</span>}
+                      </div>
+                      {r.details.length > 0 && (
+                        <div className="max-h-32 overflow-y-auto">
+                          {r.details.slice(0, 20).map((d, j) => (
+                            <p key={j} className="text-[10px] text-gray-500">{d}</p>
+                          ))}
+                          {r.details.length > 20 && (
+                            <p className="text-[10px] text-gray-600">...and {r.details.length - 20} more</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Issue severity filter */}

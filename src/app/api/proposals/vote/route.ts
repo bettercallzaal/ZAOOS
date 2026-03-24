@@ -195,7 +195,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       || (fullProposal.title === fullProposal.description
         ? fullProposal.title
         : `${fullProposal.title}\n\n${fullProposal.description}`);
-    const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance`;
+    const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance\nfrom zaoos.com`;
 
     let castHash: string | null = null;
     let fcError: string | null = null;
@@ -263,10 +263,11 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       const { publishToX, getXClient } = await import('@/lib/publish/x');
       const client = getXClient();
       if (client) {
-        const content = normalizeForX({
-          text: publishText + attribution,
-          castHash: castHash || '',
-        });
+        // Custom X text — end with zaoos.com instead of warpcast link
+        const xAttribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance\nfrom zaoos.com`;
+        const xText = publishText + xAttribution;
+        const truncated = xText.length > 280 ? xText.slice(0, 277) + '...' : xText;
+        const content = { text: truncated, images: [] as string[], embeds: [], attribution: '', castHash: castHash || '', castUrl: '' };
         const xResult = await publishToX(content);
         xUrl = xResult.tweetUrl;
         console.info(`[publish-threshold] Published to @thezaodao X: ${xUrl}`);

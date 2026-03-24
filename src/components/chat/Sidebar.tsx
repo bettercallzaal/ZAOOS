@@ -82,6 +82,8 @@ interface SidebarProps {
   onLogout: () => void;
   activeChannel: string;
   onChannelSelect: (channel: string) => void;
+  isTrending?: boolean;
+  onTrendingSelect?: () => void;
   onOpenFaq?: () => void;
   onOpenTutorial?: () => void;
   onOpenRespect?: () => void;
@@ -105,7 +107,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({
-  user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, onOpenFaq, onOpenTutorial, onOpenRespect,
+  user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, isTrending, onTrendingSelect, onOpenFaq, onOpenTutorial, onOpenRespect,
   xmtpConnected, xmtpConnecting, xmtpError, xmtpConversations, activeConversationId,
   onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
   zaoMembers, loadingMembers, onStartDmWithMember, onGroupInfo, onRemoveConversation, onRefreshMembers, onResetXmtp,
@@ -151,7 +153,7 @@ export function Sidebar({
                 key={ch.id}
                 onClick={() => onChannelSelect(ch.id)}
                 className={`block w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
-                  activeChannel === ch.id && !activeConversationId
+                  activeChannel === ch.id && !activeConversationId && !isTrending
                     ? 'bg-[#f5a623]/10 text-[#f5a623] font-medium'
                     : 'text-gray-400 hover:bg-white/5 hover:text-white'
                 }`}
@@ -159,6 +161,19 @@ export function Sidebar({
                 {ch.label}
               </button>
             ))}
+            {/* Trending — powered by Sopha */}
+            {onTrendingSelect && (
+              <button
+                onClick={onTrendingSelect}
+                className={`block w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
+                  isTrending
+                    ? 'bg-amber-500/10 text-amber-400 font-medium'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                🔥 Trending
+              </button>
+            )}
           </SidebarSection>
 
           {/* ── XMTP Connection State (shown before connected) ─────────── */}

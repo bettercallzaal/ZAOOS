@@ -196,6 +196,8 @@ export function ChatRoom() {
         onLogout={logout}
         activeChannel={activeChannel}
         onChannelSelect={handleChannelSelect}
+        isTrending={isTrending}
+        onTrendingSelect={() => { handleTrendingSelect(); setSidebarOpen(false); }}
         onOpenFaq={() => { setFaqOpen(true); setSidebarOpen(false); }}
         onOpenTutorial={() => { setTutorialOpen(true); setSidebarOpen(false); }}
         onOpenRespect={() => { setRespectOpen(true); setSidebarOpen(false); }}

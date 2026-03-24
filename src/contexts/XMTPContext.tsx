@@ -3,8 +3,7 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import type { Client, Dm, Group, DecodedMessage } from '@xmtp/browser-sdk';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyClient = Client<any>;
+type AnyClient = Client<unknown>;
 import type { XMTPConversation, XMTPMessage } from '@/types/xmtp';
 import type { XMTPPeerProfile } from '@/lib/xmtp/client';
 

@@ -6,6 +6,7 @@
  */
 
 import { HatsClient } from '@hatsprotocol/sdk-v1-core';
+import type { PublicClient } from 'viem';
 import { createPublicClient, http } from 'viem';
 import { optimism } from 'viem/chains';
 import { HATS_CHAIN_ID } from './constants';
@@ -22,8 +23,7 @@ export function getHatsClient(): HatsClient {
 
     _client = new HatsClient({
       chainId: HATS_CHAIN_ID,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      publicClient: publicClient as any,
+      publicClient: publicClient as unknown as PublicClient,
     });
   }
   return _client;

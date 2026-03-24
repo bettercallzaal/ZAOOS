@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       playlist_tracks: undefined,
     }));
 
-    return NextResponse.json({ playlists });
+    return NextResponse.json({ playlists }, { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' } });
   } catch (err) {
     console.error('[playlists] list failed:', err);
     return NextResponse.json({ error: 'Failed to load playlists' }, { status: 500 });

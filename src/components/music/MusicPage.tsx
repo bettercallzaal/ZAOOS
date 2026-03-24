@@ -8,6 +8,7 @@ import { usePlayer } from '@/providers/audio';
 import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { communityConfig } from '@/../community.config';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
 
 const TrackOfTheDay = dynamic(
   () => import('@/components/music/TrackOfTheDay').then((m) => m.TrackOfTheDay),
@@ -39,17 +40,6 @@ const SECTION_IDS: Record<Tab, string> = {
 };
 
 
-function timeAgo(dateStr: string): string {
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return 'just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return `${Math.floor(days / 7)}w ago`;
-}
 
 // ── Main Component ─────────────────────────────────────────────────────
 

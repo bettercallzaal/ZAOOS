@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const result = await querySongs(parsed.data);
-    return NextResponse.json(result);
+    return NextResponse.json(result, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } });
   } catch (err) {
     console.error('[library] query failed:', err);
     return NextResponse.json({ error: 'Failed to load library' }, { status: 500 });

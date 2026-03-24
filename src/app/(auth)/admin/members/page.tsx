@@ -74,16 +74,18 @@ export default function MemberCRMPage() {
 
   // Load directory
   useEffect(() => {
-    setLoading(true);
+    const controller = new AbortController();
     const params = new URLSearchParams({ sort: sortBy, limit: '200' });
     if (tierFilter !== 'all') params.set('tier', tierFilter);
     if (search) params.set('search', search);
 
-    fetch(`/api/members/directory?${params}`)
+    fetch(`/api/members/directory?${params}`, { signal: controller.signal })
       .then(r => r.json())
-      .then(d => setMembers(d.members || []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .then(d => { if (!controller.signal.aborted) setMembers(d.members || []); })
+      .catch(() => {})
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+
+    return () => controller.abort();
   }, [search, tierFilter, sortBy]);
 
   if (!user?.isAdmin) {

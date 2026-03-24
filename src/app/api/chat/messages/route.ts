@@ -170,31 +170,34 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // ── Filter out admin-hidden messages ─────────────────────────────────────
+    // ── Filter hidden messages + enrich with ZID in parallel ────────────────
     const castHashes = casts.map((c) => c.hash);
-    const { data: hiddenData } = await supabaseAdmin
-      .from('hidden_messages')
-      .select('cast_hash')
-      .in('cast_hash', castHashes.length > 0 ? castHashes : ['none']);
+    const authorFids = [...new Set(casts.map((c) => c.author.fid))];
+
+    // These two queries are independent: hidden messages by cast hash, ZID by author FID
+    const [hiddenResult, zidResult] = await Promise.all([
+      supabaseAdmin
+        .from('hidden_messages')
+        .select('cast_hash')
+        .in('cast_hash', castHashes.length > 0 ? castHashes : ['none']),
+      authorFids.length > 0
+        ? supabaseAdmin
+            .from('users')
+            .select('fid, zid')
+            .in('fid', authorFids)
+            .not('zid', 'is', null)
+        : Promise.resolve({ data: null }),
+    ]);
 
     const hiddenHashes = new Set(
-      (hiddenData || []).map((h: { cast_hash: string }) => h.cast_hash)
+      (hiddenResult.data || []).map((h: { cast_hash: string }) => h.cast_hash)
     );
 
     const visibleCasts = casts.filter((c) => !hiddenHashes.has(c.hash));
 
-    // ── Enrich authors with ZID (for OG badge) ───────────────────────────────
-    const authorFids = [...new Set(visibleCasts.map((c) => c.author.fid))];
     let zidMap = new Map<number, number>();
-    if (authorFids.length > 0) {
-      const { data: zidRows } = await supabaseAdmin
-        .from('users')
-        .select('fid, zid')
-        .in('fid', authorFids)
-        .not('zid', 'is', null);
-      if (zidRows) {
-        zidMap = new Map(zidRows.map((r: { fid: number; zid: number }) => [r.fid, r.zid]));
-      }
+    if (zidResult.data) {
+      zidMap = new Map(zidResult.data.map((r: { fid: number; zid: number }) => [r.fid, r.zid]));
     }
     const enrichedCasts = visibleCasts.map((c) => ({
       ...c,

@@ -7,6 +7,7 @@ import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { MusicEmbed } from '@/components/music/MusicEmbed';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { OGBadge } from '@/components/badges/OGBadge';
+import { timeAgo } from '@/lib/format/timeAgo';
 
 interface MessageProps {
   cast: Cast;
@@ -20,26 +21,6 @@ interface MessageProps {
   onReply?: (hash: string, authorName: string, text: string) => void;
 }
 
-function timeAgo(timestamp: string): string {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  if (seconds < 60) return 'just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-
-  // Show date for older messages
-  const isThisYear = date.getFullYear() === now.getFullYear();
-  const month = date.toLocaleString('en-US', { month: 'short' });
-  const day = date.getDate();
-  const time = date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-
-  if (isThisYear) return `${month} ${day}, ${time}`;
-  return `${month} ${day}, ${date.getFullYear()}`;
-}
 
 function safeHostname(url: string): string {
   try { return new URL(url).hostname; } catch { return url.slice(0, 40); }

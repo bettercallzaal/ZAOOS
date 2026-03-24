@@ -8,20 +8,10 @@ import { XMTPConversation } from '@/types/xmtp';
 import type { ZaoMember } from '@/contexts/XMTPContext';
 import { communityConfig } from '@/../community.config';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
+import { timeAgoCompact as timeAgo } from '@/lib/format/timeAgo';
 
 const CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `# ${id}` }));
 
-function timeAgo(date?: Date): string {
-  if (!date) return '';
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (seconds < 60) return 'now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  return `${days}d`;
-}
 
 function lastSeen(isoDate: string | null): string {
   if (!isoDate) return '';

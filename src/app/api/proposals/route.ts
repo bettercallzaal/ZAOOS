@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
     };
   });
 
-  return NextResponse.json({ proposals, total: totalCount ?? proposals.length, limit, offset });
+  return NextResponse.json({ proposals, total: totalCount ?? proposals.length, limit, offset }, { headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=10' } });
 }
 
 /**

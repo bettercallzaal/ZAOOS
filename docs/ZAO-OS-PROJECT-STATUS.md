@@ -1,9 +1,10 @@
 # ZAO OS — Full Project Status & Roadmap
 
-> **Date:** March 22, 2026 (updated March 23, 2026)
-> **Author:** Compiled from full codebase + research library audit (91 research docs, 82 API routes, 75+ components)
+> **Date:** March 22, 2026 (updated March 24, 2026)
+> **Author:** Compiled from full codebase + research library audit (136 research docs, 105 API routes, 87+ components)
 >
 > **March 23 Session:** 20 implementation tasks completed across Sprint 1-3 (see changelog below)
+> **March 24 Session:** Sprints 1-4 complete, cross-platform publishing (Farcaster + Bluesky + X), settings redesign, AI moderation, full-text search (see changelog below)
 
 ---
 
@@ -98,6 +99,71 @@
 
 ---
 
+## 0b. March 24 Changelog
+
+**Massive session — Sprints 1-4 fully complete + cross-platform publishing + settings redesign.**
+
+### Sprint 1 — Quick Wins (Completed March 23-24)
+- ZID badges for all members, OG badges for founding members (ZID 1-40)
+- Notification triggers for all key events
+
+### Sprint 4 — Moderation & Search (All Complete)
+| Task | Files Changed | Notes |
+|------|--------------|-------|
+| AI moderation | `src/lib/moderation/moderate.ts`, `src/app/api/moderation/queue/route.ts` | Perspective API integration for content safety scoring |
+| Full-text search | tsvector columns + indexes | Supabase tsvector/tsquery across all content |
+| Music approval queue | `src/app/api/moderation/queue/route.ts` | Curator-reviewed submission pipeline |
+
+### Cross-Platform Publishing (Complete)
+| Task | Files Changed | Notes |
+|------|--------------|-------|
+| Governance auto-publish | `src/app/api/publish/farcaster/route.ts`, `src/app/api/publish/x/route.ts` | Approved proposals (1000+ Respect) auto-publish to Farcaster + Bluesky + X |
+| X / Twitter integration | `src/lib/publish/x.ts`, `src/app/api/publish/x/route.ts` | @thezaodao account, 280-char truncation + link-back |
+| Content normalization | `src/lib/publish/normalize.ts` | Per-platform text/image/embed adaptation |
+| Publish status tracking | `src/app/api/publish/status/route.ts` | Error tracking for all 3 platforms shown in UI |
+| View on platform buttons | Governance UI | "View on Farcaster / View on Bluesky / View on X" on published proposals |
+| Attribution | All publish routes | "Proposed by @author, Approved by ZAO governance, from zaoos.com" |
+| Platform accounts | @thezao (Farcaster), @thezao.bsky.social (Bluesky), @thezaodao (X) | Regular chat messages go to Farcaster only |
+
+### Settings Redesign (Complete)
+| Task | Notes |
+|------|-------|
+| Unified ACCOUNTS section | Wallet, Farcaster, Bluesky, Solana, X connect/disconnect |
+| FEATURES section | Messaging preferences, Push Notifications |
+| SOCIALS section | Display social links |
+| Per-user cross-posting removed | Cross-posting is governance-only now (auto-publish approved proposals) |
+| Solana wallet connect fixed | Connection flow working |
+
+### Lens + Hive (Deferred)
+| Platform | Status | Reason |
+|----------|--------|--------|
+| Lens Protocol | Scaffolded, deferred | Wallet mismatch blocker (see research/121) |
+| Hive / InLeo | Scaffolded, deferred | Lower priority, needs posting key management |
+
+### Other Fixes
+- Console.log cleanup across codebase
+- Multiple security fixes (CSP, RLS, rate limits, error sanitization)
+- Solana wallet connect fixed
+
+### New Files Created (March 24)
+- `src/app/api/publish/x/route.ts`
+- `src/app/api/publish/status/route.ts`
+- `src/app/api/publish/hive/route.ts` (scaffold)
+- `src/app/api/publish/lens/route.ts` (scaffold)
+- `src/app/api/moderation/queue/route.ts`
+- `src/app/api/platforms/lens/` (scaffold)
+- `src/app/api/platforms/hive/` (scaffold)
+- `src/lib/publish/x.ts`
+- `src/lib/publish/normalize.ts`
+- `src/lib/publish/lens.ts` (scaffold)
+- `src/lib/publish/lens-client.ts` (scaffold)
+- `src/lib/publish/hive.ts` (scaffold)
+- `src/lib/moderation/moderate.ts`
+- `src/hooks/useLensAuth.ts`
+- `src/hooks/useENS.ts`
+
+---
+
 ## 1. Project Overview
 
 **ZAO OS** is a gated Farcaster social client for The ZAO (ZTalent Artist Organization) — a decentralized music community with 40+ founding members and 90+ weeks of fractal governance.
@@ -183,14 +249,31 @@
 | **Discord bot webhook** | fractals/webhook | — | Complete |
 | **Fractals page (5 tabs)** | /fractals | FractalsClient (Sessions, Leaderboard, Analytics, Proposals, About) | Complete |
 
+### Cross-Platform Publishing
+| Feature | Routes | Components | Status |
+|---------|--------|------------|--------|
+| **Farcaster publishing** | publish/farcaster | — | Complete |
+| **X / Twitter publishing** | publish/x | — | Complete |
+| **Bluesky cross-posting** | bluesky/sync, bluesky/members, bluesky/feed | — | Complete |
+| **Content normalization** | — | — | Complete (`src/lib/publish/normalize.ts`) |
+| **Publish status tracking** | publish/status | — | Complete |
+| **Lens Protocol** | publish/lens, platforms/lens | useLensAuth | Scaffolded (deferred: wallet mismatch) |
+| **Hive / InLeo** | publish/hive, platforms/hive | — | Scaffolded (deferred) |
+
 ### Integrations
 | Feature | Routes | Components | Status |
 |---------|--------|------------|--------|
-| **Bluesky cross-posting** | bluesky/sync, bluesky/members, bluesky/feed | — | Complete |
 | **Discord sync** | discord/sync | — | Complete |
 | **WaveWarZ data sync** | wavewarz/sync, wavewarz/artists | WaveWarzPage, GeneratePostButton | Complete |
 | **Neynar webhooks** | webhooks/neynar | — | Complete |
 | **Push notifications** | notifications (3 routes) | NotificationBell | Complete |
+
+### Moderation & Search
+| Feature | Routes | Components | Status |
+|---------|--------|------------|--------|
+| **AI moderation** (Perspective API) | moderation/queue | — | Complete |
+| **Full-text search** (tsvector) | — | — | Complete |
+| **Music approval queue** | moderation/queue | — | Complete |
 
 ### Other
 | Feature | Routes | Components | Status |
@@ -199,7 +282,7 @@
 | **Voice/video calls** (Jitsi) | — | CallsPage, JitsiRoom, ListeningRoom | Complete |
 | **Listening rooms** (shared music) | — | useListeningRoom (Supabase Realtime) | Complete |
 | **Contribute page** | — | ContributePage, IssueSubmitForm | Complete |
-| **Settings page** | — | SettingsPage, SettingsClient | Complete |
+| **Settings page** | — | SettingsPage, SettingsClient (ACCOUNTS/FEATURES/SOCIALS) | Complete (redesigned) |
 | **Directory** | directory | — | Complete |
 | **Home dashboard** | — | HomePage, NowPlayingHero, QuickActions, ActivityFeed, PillarCard | Complete |
 | **Error boundaries + loading states** | — | ErrorBoundary, per-route error.tsx/loading.tsx | Complete |
@@ -224,10 +307,13 @@
 ### Active Work Areas
 | Feature | What's Done | What Remains |
 |---------|-------------|--------------|
-| **Fractals page polish** | 5-tab UI, API routes, search/filter, About tab | Data import from Airtable (130 members, 100+ sessions), ornode fallback (ornode is down — read directly from OREC contract) |
+| **Fractals page polish** | 5-tab UI, API routes, search/filter, About tab, OREC on-chain fallback, Airtable CSV import script | Data import execution (130 members, 100+ sessions) |
+| **Cross-platform publishing** | Farcaster + Bluesky + X auto-publish at 1000 Respect, content normalization, error tracking, view-on-platform buttons | Lens (wallet mismatch blocker), Hive (deferred) |
+| **Settings redesign** | Unified ACCOUNTS/FEATURES/SOCIALS sections, Solana wallet connect fixed | — |
+| **AI moderation** | Perspective API integration, moderation queue | Threshold tuning, admin review UI polish |
 | **WaveWarZ social publisher** | Sync cron, artist list, random stat | Native battle display (currently iframe), proposal generation from battle stats |
 | **Discord bot integration** | Webhook receiver, member sync | Full bidirectional sync, fractal session bridging |
-| **Proposal UI improvements** | Research doc 111 started | Category alignment, status transitions, auto-close on deadline |
+| **Proposal UI** | Category badges, status filters, voting buttons, expand/collapse, deadline countdowns, zero-weight handling, auto-close | Vote breakdown view |
 
 ---
 
@@ -240,12 +326,14 @@ These have detailed research docs and/or sprint plans but no code yet:
 | **Hats Protocol roles** | Docs 23, 31 | Sprint 5 (Q3 2026) | Medium |
 | **Community treasury** (Safe multisig) | Doc 31 | Sprint 5 (Q3 2026) | Medium |
 | **AI agent** (ElizaOS + Claude + pgvector) | Docs 24, 26, 08 | Sprint 6 (Q4 2026) | Medium |
-| **Engagement streaks & badges** | — | Sprint 3 | High |
-| **Track of the Day** | — | Sprint 3 | High |
-| **AI moderation** | — | Sprint 4 | Medium |
-| **Full-text search** | — | Sprint 4 | Medium |
-| **Music approval queue** | — | Sprint 4 | Low |
-| **Cross-platform publishing** (Lens, Bluesky native, Nostr, X, Hive) | Docs 28, 36, 77, 96 | Sprint 7 (2027) | Low |
+| **Engagement streaks & badges** | — | Sprint 3 | ~~High~~ **Done** |
+| **Track of the Day** | — | Sprint 3 | ~~High~~ **Done** |
+| **AI moderation** | — | Sprint 4 | ~~Medium~~ **Done** |
+| **Full-text search** | — | Sprint 4 | ~~Medium~~ **Done** |
+| **Music approval queue** | — | Sprint 4 | ~~Low~~ **Done** |
+| **Cross-platform publishing** (X + Farcaster + Bluesky) | Docs 28, 36, 77, 96 | March 24 | ~~Low~~ **Done** |
+| **Lens Protocol** | Doc 121 | Deferred | Scaffolded (wallet mismatch blocker) |
+| **Hive / InLeo** | Docs 28, 36 | Deferred | Scaffolded |
 | **Nouns Builder / ZABAL integration** | — | Sprint 8 | Low |
 | **Taste profiles** (AI music preference) | — | Future | Low |
 | **EAS attestations** | — | Deferred | Low |
@@ -277,19 +365,22 @@ These have detailed research docs and/or sprint plans but no code yet:
                         2026                                    2027
          Mar    Apr    May    Jun    Jul    Aug    Sep    Oct    Nov    Dec    Jan+
          ┌──────┬──────┬──────┬──────┬──────┬──────┬──────┬──────┬──────┬──────┬──────
-Sprint 1 │██████│      │      │      │      │      │      │      │      │      │
-  Quick  │1-2d  │      │      │      │      │      │      │      │      │      │
+Sprint 1 │██DONE│      │      │      │      │      │      │      │      │      │
+  Quick  │ Mar23│      │      │      │      │      │      │      │      │      │
   Wins   │      │      │      │      │      │      │      │      │      │      │
          │      │      │      │      │      │      │      │      │      │      │
-Sprint 2 │██████│██████│      │      │      │      │      │      │      │      │
-  Govern │1-2wk │      │      │      │      │      │      │      │      │      │
+Sprint 2 │██DONE│      │      │      │      │      │      │      │      │      │
+  Govern │ Mar23│      │      │      │      │      │      │      │      │      │
          │      │      │      │      │      │      │      │      │      │      │
-Sprint 3 │      │██████│██████│      │      │      │      │      │      │      │
-  Engage │      │1-2wk │      │      │      │      │      │      │      │      │
+Sprint 3 │██DONE│      │      │      │      │      │      │      │      │      │
+  Engage │ Mar23│      │      │      │      │      │      │      │      │      │
          │      │      │      │      │      │      │      │      │      │      │
-Sprint 4 │      │      │██████│██████│      │      │      │      │      │      │
-  Mod/   │      │      │1-2wk │      │      │      │      │      │      │      │
+Sprint 4 │██DONE│      │      │      │      │      │      │      │      │      │
+  Mod/   │ Mar24│      │      │      │      │      │      │      │      │      │
   Search │      │      │      │      │      │      │      │      │      │      │
+         │      │      │      │      │      │      │      │      │      │      │
+X-Plat   │██DONE│      │      │      │      │      │      │      │      │      │
+  Pub.   │ Mar24│      │      │      │      │      │      │      │      │      │
          │      │      │      │      │      │      │      │      │      │      │
 Sprint 5 │      │      │      │      │██████│██████│██████│      │      │      │
   Hats + │      │      │      │      │    2-3 weeks     │      │      │      │
@@ -344,6 +435,8 @@ See `docs/superpowers/plans/` for detailed sprint execution plans.
 | `src/lib/env.ts` | Centralized env var validation |
 | `src/contexts/XMTPContext.tsx` | 500+ line XMTP state management |
 | `src/providers/audio/` | 8 audio platform providers |
+| `src/lib/publish/` | Cross-platform publishing (Farcaster, X, Bluesky, normalize) |
+| `src/lib/moderation/moderate.ts` | AI content moderation via Perspective API |
 
 ### Database Tables (Known)
 - `users`, `allowlist`, `respect_members`, `fractal_sessions`, `fractal_scores`
@@ -353,6 +446,7 @@ See `docs/superpowers/plans/` for detailed sprint execution plans.
 - `security_audit_log`, `scheduled_casts`
 - `bluesky_members`, `bluesky_feed_posts`
 - `wavewarz_artists`, `wavewarz_battles`
+- `engagement_streaks`, `track_of_day_nominations`, `track_of_day_votes`
 
 ### Blockchain Contracts
 | Contract | Chain | Address |
@@ -425,15 +519,16 @@ See `docs/superpowers/plans/` for detailed sprint execution plans.
 
 | Metric | Count |
 |--------|-------|
-| API routes | 82 |
-| Components | 75+ |
-| Hooks | 11 |
+| API routes | 105 |
+| Components | 87+ |
+| Hooks | 13 |
 | Lib modules | 21+ subdirectories |
 | Type files | 3 |
-| Research docs | 91 |
+| Research docs | 136 |
 | Sprint plans | 8 |
 | Farcaster channels | 4 |
 | Audio platforms | 8 |
+| Cross-post platforms | 3 active (Farcaster, Bluesky, X) + 2 scaffolded (Lens, Hive) |
 | Ecosystem partners | 7 |
 | Blockchain contracts | 5 |
 | Community members | 40+ founding, 130+ total tracked |

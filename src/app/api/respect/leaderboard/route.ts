@@ -61,7 +61,7 @@ export async function GET() {
         },
         currentFid: session.fid,
         currentWallet: session.walletAddress || null,
-      });
+      }, { headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120' } });
     }
 
     // Fallback: read directly from on-chain
@@ -94,7 +94,7 @@ export async function GET() {
       stats: onchain.stats,
       currentFid: session.fid,
       currentWallet: session.walletAddress || null,
-    });
+    }, { headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120' } });
   } catch (err) {
     console.error('Respect leaderboard error:', err);
     return NextResponse.json({ error: 'Failed to load respect data' }, { status: 500 });

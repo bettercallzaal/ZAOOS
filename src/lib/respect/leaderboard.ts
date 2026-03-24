@@ -28,6 +28,14 @@ const CACHE_TTL = 5 * 60 * 1000;
 // Persistent cache for first token dates (keyed by wallet address)
 const firstTokenDateCache = new Map<string, string | null>();
 
+// Module-level viem client for Optimism (reused across calls)
+const optimismClient = createPublicClient({
+  chain: optimism,
+  transport: http('https://mainnet.optimism.io'),
+});
+
+type OptimismPublicClient = typeof optimismClient;
+
 export interface RespectEntry {
   rank: number;
   name: string;
@@ -62,8 +70,7 @@ export interface LeaderboardResult {
  * by querying Transfer event logs on Optimism.
  */
 async function getFirstTokenDate(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  client: any,
+  client: OptimismPublicClient,
   wallet: string
 ): Promise<string | null> {
   const lowerWallet = wallet.toLowerCase();
@@ -158,10 +165,7 @@ export async function fetchLeaderboard(): Promise<LeaderboardResult> {
     return { leaderboard: [], stats: { totalOG: 0, totalZOR: 0, totalMembers: 0, ogTotalSupply: 0, zorTotalSupply: 0, holdersWithRespect: 0 } };
   }
 
-  const client = createPublicClient({
-    chain: optimism,
-    transport: http('https://mainnet.optimism.io'),
-  });
+  const client = optimismClient;
 
   // Build multicall: per-wallet balances + total supply for both tokens
   const contracts = [

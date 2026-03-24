@@ -27,10 +27,10 @@ src/
 ├── hooks/                # Custom hooks: useAuth, useChat, useRadio, useFocusTrap, etc.
 ├── contexts/             # React contexts (XMTPContext)
 ├── providers/            # Provider wrappers (audio)
-├── lib/                  # Utilities by domain: auth, db, farcaster, gates, music, xmtp, validation
+├── lib/                  # Utilities by domain: auth, db, farcaster, gates, music, xmtp, validation, publish, moderation
 └── types/                # TypeScript type definitions
 community.config.ts       # All community branding, channels, contracts, nav — fork-friendly
-research/                 # 88 research docs (see research/README.md)
+research/                 # 136 research docs (see research/README.md)
 scripts/                  # DB setup, wallet generation, webhook registration
 supabase/                 # Database config
 ```
@@ -65,6 +65,8 @@ supabase/                 # Database config
 - **Messaging:** Farcaster casts (public, cached in Supabase) + XMTP (private, E2E encrypted via MLS).
 - **Blockchain:** Wagmi + Viem for wallet integration. Respect tokens on Optimism.
 - **Rate limiting:** Middleware-based per-IP limits on API routes (see `src/middleware.ts`).
+- **Cross-platform publishing:** Approved proposals (1000+ Respect) auto-publish to Farcaster + Bluesky + X. Content normalization per platform. Lens + Hive scaffolded but deferred.
+- **AI moderation:** Perspective API for content safety scoring (`src/lib/moderation/moderate.ts`).
 - **Community config:** All branding, channels, admin FIDs, contracts in `community.config.ts`. Change this file to fork for a different community.
 
 ## Important Files
@@ -74,11 +76,13 @@ supabase/                 # Database config
 - `src/lib/auth/session.ts` — iron-session config
 - `src/lib/db/supabase.ts` — Supabase client setup
 - `src/lib/farcaster/neynar.ts` — Neynar SDK client
-- `scripts/` — DB setup SQL, wallet generation, webhook registration
+- `src/lib/publish/` — cross-platform publishing (Farcaster, X, normalize, Lens/Hive scaffolds)
+- `src/lib/moderation/moderate.ts` — AI content moderation (Perspective API)
+- `scripts/` — DB setup SQL, wallet generation, webhook registration, data import
 
 ## Research Library
 
-88 research documents in `research/`. Start with:
+136 research documents in `research/`. Start with:
 - `research/README.md` — full index organized by topic
 - `research/50-the-zao-complete-guide/` — canonical project reference
 - `research/51-zao-whitepaper-2026/` — whitepaper Draft 4.5

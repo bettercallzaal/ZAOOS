@@ -1,9 +1,13 @@
 /**
  * Format a timestamp as a human-readable relative time string.
  * Used across chat messages, sidebar, notifications, etc.
+ *
+ * Accepts a date string, Date object, or undefined.
+ * Returns "just now", "2m ago", "3h ago", or a formatted date for older messages.
  */
-export function timeAgo(timestamp: string): string {
-  const date = new Date(timestamp);
+export function timeAgo(timestamp: string | Date | undefined): string {
+  if (!timestamp) return '';
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
   const now = new Date();
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
@@ -20,6 +24,42 @@ export function timeAgo(timestamp: string): string {
 
   if (isThisYear) return `${month} ${day}, ${time}`;
   return `${month} ${day}, ${date.getFullYear()}`;
+}
+
+/**
+ * Compact variant: returns short labels without "ago" suffix.
+ * Used in conversation lists, sidebars, and notification badges.
+ *
+ * Returns '', 'now', '2m', '3h', '5d'.
+ */
+export function timeAgoCompact(timestamp: string | Date | undefined): string {
+  if (!timestamp) return '';
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return 'now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `${days}d`;
+}
+
+/**
+ * Simple variant: returns "just now", "Xm ago", "Xh ago", "Xd ago".
+ * Unlike timeAgo(), always uses "Xd ago" for older messages instead of a full date.
+ */
+export function timeAgoSimple(timestamp: string | Date | undefined): string {
+  if (!timestamp) return '';
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 /**

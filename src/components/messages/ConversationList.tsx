@@ -3,18 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { XMTPConversation } from '@/types/xmtp';
+import { timeAgoCompact as timeAgo } from '@/lib/format/timeAgo';
 
-function timeAgo(date?: Date): string {
-  if (!date) return '';
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (seconds < 60) return 'now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h`;
-  const days = Math.floor(hours / 24);
-  return `${days}d`;
-}
 
 interface ConversationListProps {
   conversations: XMTPConversation[];

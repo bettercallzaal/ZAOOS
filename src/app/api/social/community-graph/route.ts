@@ -22,7 +22,7 @@ export async function GET() {
 
   // Return cached graph if fresh
   if (graphCache && Date.now() - graphCache.timestamp < GRAPH_CACHE_TTL) {
-    return NextResponse.json(graphCache.data);
+    return NextResponse.json(graphCache.data, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } });
   }
 
   try {
@@ -153,7 +153,7 @@ export async function GET() {
     // Cache the result
     graphCache = { data: responseData, timestamp: Date.now() };
 
-    return NextResponse.json(responseData);
+    return NextResponse.json(responseData, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } });
   } catch (err) {
     console.error('Community graph error:', err);
     return NextResponse.json({ error: 'Failed to build community graph' }, { status: 500 });

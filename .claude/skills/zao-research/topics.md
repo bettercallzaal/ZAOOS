@@ -73,6 +73,7 @@ Use this to quickly find if a topic has already been researched.
 - Lens Protocol V3 (collect/monetize, Bonsai) → `36`
 - Discord & Telegram bridges → `37`
 - Hive cross-posting → docs/HIVE_RESEARCH.md
+- DFOS (Dark Forest OS): private-first creative group infra, Ed25519 chains, did:dfos, Metalabel → `123`
 
 ## Technical Infrastructure
 - Next.js 16 + React 19 patterns → `41`

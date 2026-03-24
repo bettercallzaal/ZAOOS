@@ -14,19 +14,19 @@ export async function POST() {
   }
 
   try {
-    // Fetch all active allowlist entries
-    const { data: entries, error: fetchErr } = await supabaseAdmin
-      .from('allowlist')
-      .select('*')
-      .eq('is_active', true);
+    // Fetch allowlist entries and existing users in parallel (independent queries)
+    const [allowlistResult, existingUsersResult] = await Promise.all([
+      supabaseAdmin.from('allowlist').select('*').eq('is_active', true),
+      supabaseAdmin.from('users').select('primary_wallet, fid'),
+    ]);
+
+    const { data: entries, error: fetchErr } = allowlistResult;
+    const { data: existingUsers } = existingUsersResult;
 
     if (fetchErr) throw fetchErr;
     if (!entries || entries.length === 0) {
       return NextResponse.json({ imported: 0, skipped: 0, message: 'No allowlist entries to import' });
     }
-
-    // Get existing users to avoid duplicates
-    const { data: existingUsers } = await supabaseAdmin.from('users').select('primary_wallet, fid');
     const existingWallets = new Set((existingUsers || []).map((u) => u.primary_wallet?.toLowerCase()).filter(Boolean));
     const existingFids = new Set((existingUsers || []).map((u) => u.fid).filter(Boolean));
 

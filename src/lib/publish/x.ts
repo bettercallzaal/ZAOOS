@@ -6,6 +6,7 @@
  */
 
 import { TwitterApi } from 'twitter-api-v2';
+import type { SendTweetV2Params } from 'twitter-api-v2';
 import { ENV } from '@/lib/env';
 import { NormalizedContent } from '@/lib/publish/normalize';
 
@@ -73,11 +74,12 @@ export async function publishToX(
     }
 
     // Build tweet payload
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const tweetPayload: any = { text: content.text };
+    const tweetPayload: SendTweetV2Params = { text: content.text };
 
     if (mediaIds.length > 0) {
-      tweetPayload.media = { media_ids: mediaIds };
+      tweetPayload.media = {
+        media_ids: mediaIds as SendTweetV2Params['media'] extends { media_ids?: infer T } ? NonNullable<T> : never,
+      };
     }
 
     const result = await client.v2.tweet(tweetPayload);

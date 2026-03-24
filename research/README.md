@@ -116,6 +116,7 @@ How ZAO distributes content across every social platform from one compose bar.
 | [37](./37-bridges-competitors-monetization/) | **Discord & Telegram Bridges** | discord.js v14 bridge architecture, Telegram Bot API, no production bridge exists yet = opportunity |
 | [77](./77-bluesky-cross-posting-integration/) | **Bluesky Cross-Posting Integration** | @atproto/api SDK, App Password + OAuth flows, 300-char posts, custom feeds, ZAO labeler, 3-phase plan |
 | [96](./96-mastodon-threads-cross-posting/) | **Mastodon + Threads Cross-Posting** | Mastodon REST API + masto.js SDK, multi-instance OAuth, music instances (sonomu.club); Threads 2-step publish, Meta OAuth, 250 posts/24hr, no official SDK |
+| [123](./123-dfos-dark-forest-protocol/) | **DFOS (Dark Forest OS)** | Private-first creative group infrastructure by Metalabel (Kickstarter co-founder). No blockchain, Ed25519 chains, `did:dfos`, ~2K alpha users. Philosophy-aligned with ZAO but different stack. |
 
 ---
 

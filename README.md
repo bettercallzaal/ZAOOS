@@ -46,6 +46,9 @@ scripts/create-streaks-tables.sql
 scripts/create-track-of-day.sql
 scripts/fix-scheduled-casts-rls.sql
 scripts/add-notifications-rls.sql
+scripts/create-music-library.sql
+scripts/add-member-crm-columns.sql
+scripts/fix-proposal-categories-v2.sql
 ```
 
 **App wallet:** Generate a dedicated signing wallet (never use personal keys):
@@ -65,10 +68,11 @@ See `.env.example` for all required environment variables.
 
 ### Platform Core
 
-- [x] **Sign In With Farcaster (SIWF)** — Neynar managed signers, EIP-712 app wallet
+- [x] **Sign In With Farcaster (SIWF)** — Neynar managed signers, EIP-712 app wallet, server nonce validation
   - `src/app/api/auth/` (6 routes: register, session, logout, verify, signer, siwe)
   - `src/lib/auth/session.ts` · `src/lib/farcaster/neynar.ts`
   - `src/hooks/useAuth.ts`
+  - SignInButton waits for server nonce (fixes first-attempt failures), remounts on retry
 - [x] **Sign In With Ethereum (SIWE)** — wallet-first auth for token holders
   - `src/app/api/auth/siwe/route.ts`
   - Wagmi + Viem + RainbowKit integration in app providers
@@ -85,6 +89,15 @@ See `.env.example` for all required environment variables.
 - [x] **Admin panel** — 6-tab admin dashboard (users, ZIDs, allowlist, respect, moderation, import)
   - `src/app/(auth)/admin/`
   - `src/components/admin/` (UsersTable, ZidManager, AllowlistTable, RespectOverview, HiddenMessages, CsvUpload, SyncRespectButton, ImportRespectButton)
+- [x] **Member CRM** — unified directory + data health dashboard at `/admin/members`
+  - `src/app/(auth)/admin/members/page.tsx`
+  - `src/app/api/members/directory/route.ts` — unified member view (identity, wallets, platforms, respect, activity)
+  - `src/app/api/admin/member-health/route.ts` — data quality report (missing fields, tier mismatches, unlinked records)
+  - Member tiers: `respect_holder` (governance) vs `community` (view only)
+  - Activity tracking via `src/lib/db/activity.ts`
+- [x] **ENS resolution** — auto-resolve ENS names for all ETH wallets in settings
+  - `src/hooks/useENS.ts`
+- [x] **Preferred wallet** — users choose which wallet displays on their profile
 - [ ] **Admin confirmation modals** — replace native confirm() with styled ConfirmDialog for destructive actions
 - [x] **Security hardening** — server-side nonce validation, HMAC-SHA512 webhook verification, CSP headers, RLS on all tables, error sanitization, signer ownership checks, scheduled casts RLS fix
   - `src/middleware.ts` · `src/lib/validation/schemas.ts` · `src/lib/db/audit-log.ts`
@@ -163,9 +176,18 @@ See `.env.example` for all required environment variables.
   - `src/app/api/music/metadata/route.ts`
 - [ ] **Auto-skip on error** — skip failed tracks after 5s timeout, retry button, 3-failure pause
 - [ ] **Add to queue from chat** — queue button on inline music embeds in chat messages
-- [x] **Persistent player bar** — survives page navigation, scrubber, controls
-  - `src/components/music/PersistentPlayer.tsx` · `src/components/music/PersistentPlayerWithRadio.tsx`
-  - `src/components/music/GlobalPlayer.tsx` · `src/components/music/Scrubber.tsx`
+- [x] **Unified persistent player** — one player on ALL pages (including chat), idle "ZAO Radio" bar, sidebar drawer
+  - `src/components/music/PersistentPlayer.tsx` — idle state + active state + sidebar toggle
+  - `src/components/music/PersistentPlayerWithRadio.tsx` — global wrapper managing sidebar state
+  - `src/components/music/MusicSidebar.tsx` — right-side drawer with Library/Queue/Playlists tabs
+- [x] **Audio persists across navigation** — module-level singleton pattern for YouTube/SoundCloud/Spotify providers
+  - `src/providers/audio/YoutubeProvider.tsx` · `SoundcloudProvider.tsx` · `SpotifyProvider.tsx`
+- [x] **Player state persists across refresh** — localStorage save/restore, resume at saved position
+  - `src/providers/audio/PlayerProvider.tsx` (restoredTrack, pendingSeekRef)
+- [x] **Media Session API** — lock screen controls, background audio on mobile
+  - Play/pause/next track on lock screen, artwork + title metadata
+- [x] **PWA manifest** — standalone app mode, "Add to Home Screen" for background audio
+  - `public/manifest.json` · apple-mobile-web-app-capable meta tags
 - [x] **Music queue** — auto-advance, shuffle, repeat, queue from feed
   - `src/hooks/useMusicQueue.ts`
   - `src/components/music/MusicSidebar.tsx` · `src/components/music/MusicQueueTrackCard.tsx`
@@ -181,6 +203,13 @@ See `.env.example` for all required environment variables.
 - [x] **Music link resolver** — Songlink/Odesli API with 7-day cache
   - `src/app/api/music/resolve/route.ts`
   - `src/lib/music/songlink.ts`
+- [x] **Music library** — persistent song database, every link shared auto-saved, search/filter/sort
+  - `src/lib/music/library.ts` (upsertSong, querySongs, incrementPlayCount, extractAndSaveSongs)
+  - `src/app/api/music/library/route.ts` — browse + add songs
+  - `src/app/api/music/library/play/route.ts` — track play counts
+  - `scripts/create-music-library.sql` — songs + playlists + playlist_tracks tables
+- [x] **Playlists** — personal + community + TOTD Archive auto-playlist
+  - `src/app/api/music/playlists/` — CRUD + track management
 - [x] **Music NFT discovery** — scan wallets for Sound.xyz + Zora music NFTs
   - `src/app/api/music/wallet/route.ts`
 - [x] **Waveform visualization** — Wavesurfer.js audio waveforms
@@ -225,17 +254,25 @@ See `.env.example` for all required environment variables.
 
 #### Proposals
 
-- [x] **Proposals CRUD** — create, list, update status
+- [x] **Proposals CRUD** — create, list, update status. `/governance` redirects to `/fractals?tab=proposals`
   - `src/app/api/proposals/route.ts` (GET, POST, PATCH)
-  - `src/app/(auth)/governance/`
+  - `src/app/(auth)/fractals/ProposalsTab.tsx` — consolidated proposals + social posts
+- [x] **Social posts** — quick-create with just a text box, auto-categorized as "social", pink accent
+  - Two buttons: "+ Proposal" (gold, full form) and "+ Social Post" (pink, simplified)
+  - Links in descriptions render as clickable gold links
+  - Published post links: "View on Farcaster" / "View on Bluesky" / "View on X" buttons
 - [x] **Respect-weighted voting** — on-chain OG + ZOR balance queried at vote time via multicall
   - `src/app/api/proposals/vote/route.ts`
 - [x] **Proposal comments** — threaded comments with notifications
   - `src/app/api/proposals/comment/route.ts`
   - `src/components/governance/ProposalComments.tsx`
 - [ ] **Vote breakdown view** — see who voted, vote weight per voter, % of total
-- [x] **Auto-publish threshold** — proposals auto-publish to Farcaster at 1000 Respect votes
-  - `src/app/api/publish/farcaster/route.ts`
+- [x] **Auto-publish threshold** — proposals auto-publish to Farcaster + Bluesky + X at 1000 Respect votes
+  - `src/app/api/publish/farcaster/route.ts` · `src/app/api/publish/x/route.ts`
+  - `src/lib/publish/x.ts` · `src/lib/publish/normalize.ts`
+  - Attribution: "Proposed by @author, Approved by ZAO governance, from zaoos.com"
+  - View on Farcaster / View on Bluesky / View on X buttons on published proposals
+  - Error tracking for all 3 platforms shown in UI
 - [x] **Proposal status transitions** — admin PATCH endpoint: open -> approved -> rejected -> completed
   - `src/app/api/proposals/route.ts` (PATCH handler)
 - [x] **Auto-close on deadline** — countdown display via `formatTimeRemaining`, blocks voting after expiry
@@ -251,8 +288,11 @@ See `.env.example` for all required environment variables.
 - [x] **On-chain balance sync** — OG Respect (ERC-20) + ZOR (ERC-1155) on Optimism via multicall
   - `src/app/api/respect/sync/route.ts`
   - `src/components/admin/SyncRespectButton.tsx`
-- [x] **Member respect breakdown** — full history per member
-  - `src/app/api/respect/member/route.ts`
+- [x] **Member respect breakdown** — full history per member with unified ledger
+  - `src/app/api/respect/member/route.ts` — returns `ledger[]` (every point earned: date, source, amount, detail)
+  - `src/app/api/fractals/member/[wallet]/route.ts` — fractal history + events + ledger
+- [x] **Respect Ledger** — transparent timeline in Analytics tab drill-down: date, source (fractal/event), amount, detail
+  - Fractal scores sorted by session number (newest first), with date + participant count + era
 - [x] **Fractal session recording** — admin records weekly fractal results with 2x Fibonacci scoring
   - `src/app/api/respect/fractal/route.ts`
 - [x] **Non-fractal respect events** — 7 event types (introduction, camera, article, hosting, bonus, etc.)
@@ -322,21 +362,21 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
   - `src/lib/bluesky/` (client.ts, feed.ts, labeler.ts)
 - [x] **Discord sync** — webhook receiver for wallet registry + fractal session imports from Discord bot
   - `src/app/api/discord/sync/route.ts` (GET: read members, POST: receive bot data)
-- [ ] **Multi-platform compose UI** — toggle pills per platform in ComposeBar, "Publish (N)" button, persistent prefs
-  - Planned: `src/components/compose/PlatformToggles.tsx` · `src/components/compose/PublishButton.tsx`
-- [ ] **Content normalization** — per-platform text/image/embed adaptation
-  - Planned: `src/lib/publish/normalize.ts`
-- [ ] **Publish status tracking** — log cross-post results, retry failed publishes
-  - Planned: `scripts/add-publishing-columns.sql` (publish_log table)
-- [ ] **Lens Protocol** — OAuth connect, SDK posting with OpenAction embeds for music links
-  - Planned: `src/app/api/publish/lens/route.ts` · `src/lib/publish/lens.ts`
+- [x] **Content normalization** — per-platform text/image/embed adaptation
+  - `src/lib/publish/normalize.ts`
+- [x] **Publish status tracking** — cross-post results with error tracking per platform
+  - `src/app/api/publish/status/route.ts`
+- [x] **X / Twitter publishing** — governance-only auto-publish, @thezaodao account, 280-char truncation + link-back
+  - `src/app/api/publish/x/route.ts` · `src/lib/publish/x.ts`
+- [x] **Connected Platforms settings** — unified ACCOUNTS section (Wallet, Farcaster, Bluesky, Solana, X), FEATURES section, SOCIALS section
+  - Per-user cross-posting toggles removed (governance-only publishing now)
+- [ ] **Lens Protocol** — OAuth connect, SDK posting (deferred: wallet mismatch blocker, see research/121)
+  - Scaffolded: `src/app/api/publish/lens/route.ts` · `src/lib/publish/lens.ts` · `src/lib/publish/lens-client.ts`
 - [ ] **Bluesky enhancements** — thread splitting (>300 chars), proper embed cards, image cross-posting
-- [ ] **X / Twitter** — admin-only, shared app credentials, 280-char truncation + link-back
-  - Planned: `src/app/api/publish/x/route.ts` · `src/lib/publish/x.ts`
-- [ ] **Hive / InLeo** — posting key encrypted at rest (AES-256-GCM), markdown-native, tag-based InLeo visibility
-  - Planned: `src/app/api/publish/hive/route.ts` · `src/lib/publish/hive.ts`
-- [ ] **Connected Platforms settings** — connect/disconnect per platform, status display
-  - Planned: `src/components/settings/ConnectedPlatforms.tsx`
+- [ ] **Hive / InLeo** — posting key encrypted at rest (AES-256-GCM), markdown-native, tag-based InLeo visibility (deferred)
+  - Scaffolded: `src/app/api/publish/hive/route.ts` · `src/lib/publish/hive.ts`
+- [ ] **Multi-platform compose UI** — toggle pills per platform in ComposeBar, "Publish (N)" button
+  - Planned: `src/components/compose/PlatformToggles.tsx` · `src/components/compose/PublishButton.tsx`
 
 #### WaveWarZ Integration
 
@@ -372,8 +412,9 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
   - `src/app/(auth)/ecosystem/`
 - [x] **Directory** — member directory with search
   - `src/app/api/directory/route.ts` · `src/app/api/directory/[slug]/route.ts`
-- [x] **Settings page** — user preferences, messaging settings, wallet visibility
+- [x] **Settings page** — unified ACCOUNTS (Wallet, Farcaster, Bluesky, Solana, X), FEATURES (Messaging, Push), SOCIALS
   - `src/app/api/users/messaging-prefs/route.ts` · `src/app/api/users/wallet-visibility/route.ts`
+  - `src/app/api/platforms/` (Lens, Hive connection endpoints)
 - [x] **Home dashboard** — now playing hero, quick actions, activity feed, pillar cards
   - `src/components/home/` (HomePage, NowPlayingHero, QuickActions, ActivityFeed, PillarCard)
 - [x] **Activity feed** — recent community activity
@@ -384,8 +425,10 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 - [x] **Minimax LLM proxy** — alternative LLM for content generation
   - `src/app/api/chat/minimax/route.ts`
 - [ ] **AI agent** — ElizaOS + Claude + pgvector for welcome DMs, music recs, moderation
-- [ ] **AI moderation** — Perspective API + OpenAI Moderation + Claude for content safety
-- [ ] **Full-text search** — Supabase tsvector/tsquery across all content
+- [x] **AI moderation** — Perspective API for content safety scoring
+  - `src/app/api/moderation/queue/route.ts`
+  - `src/lib/moderation/moderate.ts`
+- [x] **Full-text search** — Supabase tsvector/tsquery across all content
 
 ---
 
@@ -398,7 +441,8 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 - [x] **Neynar webhooks** — receive cast reactions and follow events
   - `src/app/api/webhooks/neynar/route.ts`
 - [ ] **Nouns Builder / ZABAL integration** — native auction UI, governance integration
-- [ ] **Music approval queue** — curator-reviewed submission pipeline
+- [x] **Music approval queue** — curator-reviewed submission pipeline
+  - `src/app/api/moderation/queue/route.ts`
 
 ---
 
@@ -434,7 +478,8 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 | **Analytics** | PostHog + Vercel Analytics | — |
 | **Testing** | Vitest | 3.x |
 | **Video** | Jitsi React SDK | — |
-| **Cross-posting** | @lens-protocol/client, @atproto/api, twitter-api-v2, @hiveio/dhive | — |
+| **Cross-posting** | @atproto/api (Bluesky), twitter-api-v2 (X), @lens-protocol/client (scaffolded), @hiveio/dhive (scaffolded) | — |
+| **Moderation** | Perspective API (Google Jigsaw) | — |
 | **Deployment** | Vercel | — |
 
 ### On-Chain Contracts (Optimism)
@@ -460,7 +505,9 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 | `src/providers/audio/` | 8 audio platform providers |
 | `src/lib/ordao/client.ts` | Direct OREC contract reader via viem — on-chain fallback for proposals + respect |
 | `src/lib/format/timeAgo.ts` | Relative time, deadline countdown, wallet shortener, number formatter |
-| `src/hooks/` | 11 custom hooks (auth, chat, radio, music queue, etc.) |
+| `src/lib/publish/` | Cross-platform publishing (Farcaster, X, normalize, Lens/Hive scaffolds) |
+| `src/lib/moderation/moderate.ts` | AI moderation via Perspective API |
+| `src/hooks/` | 13 custom hooks (auth, chat, radio, music queue, ENS, Lens auth, etc.) |
 
 ---
 
@@ -470,16 +517,16 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 src/
 ├── app/                  # Next.js App Router
 │   ├── (auth)/           # Protected routes (chat, messages, governance, fractals, social, admin, etc.)
-│   ├── api/              # 85+ route handlers: /api/[feature]/[action]/route.ts
+│   ├── api/              # 105+ route handlers: /api/[feature]/[action]/route.ts
 │   └── page.tsx          # Landing / login
 ├── components/           # React components by feature (chat, messages, music, admin, social, etc.)
-├── hooks/                # 11 custom hooks (useAuth, useChat, useRadio, useMusicQueue, etc.)
+├── hooks/                # 13 custom hooks (useAuth, useChat, useRadio, useMusicQueue, useLensAuth, useENS, etc.)
 ├── contexts/             # React contexts (XMTPContext)
 ├── providers/            # Provider wrappers (8 audio providers, PostHog)
-├── lib/                  # Utilities by domain (auth, db, farcaster, gates, music, xmtp, hats, etc.)
+├── lib/                  # Utilities by domain (auth, db, farcaster, gates, music, xmtp, hats, publish, moderation, etc.)
 └── types/                # TypeScript type definitions
 community.config.ts       # All community config — fork-friendly
-research/                 # 91 research docs (see research/README.md)
+research/                 # 136 research docs (see research/README.md)
 scripts/                  # DB setup, wallet generation, webhook registration, data import
 docs/                     # Internal plans, QA checklists, architecture decisions
 ```
@@ -488,7 +535,7 @@ docs/                     # Internal plans, QA checklists, architecture decision
 
 ## Research Library
 
-**91 research documents** covering every aspect of building a decentralized music platform.
+**136 research documents** covering every aspect of building a decentralized music platform.
 
 Start with:
 - [research/50 — The ZAO Complete Guide](./research/50-the-zao-complete-guide/) — canonical ecosystem reference
@@ -504,13 +551,15 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 
 | Sprint | Focus | Status |
 |--------|-------|--------|
-| **1** | Quick wins — PostHog analytics, ZID badges, notification triggers | Planned |
-| **2** | Governance fixes — proposal categories, status transitions, deadline countdown, rate limits | Done |
-| **3** | Engagement — streaks, badges, Track of the Day | Done |
-| **4** | Moderation & search — AI moderation, full-text search, music approval queue | Planned |
+| **1** | Quick wins — ZID badges, OG badges, notification triggers | Done |
+| **2** | Governance fixes — proposal categories, status transitions, deadline countdown, rate limits, security audit | Done |
+| **3** | Engagement — streaks, badges, Track of the Day, activity feed, OG badge, referral system | Done |
+| **4** | Moderation & search — AI moderation (Perspective API), full-text search (tsvector), music approval queue | Done |
+| **Cross-platform** | Approved proposals auto-publish to Farcaster + Bluesky + X at 1000 Respect | Done |
+| **Settings** | Unified accounts section (Wallet, Farcaster, Bluesky, Solana, X), features, socials | Done |
 | **5** | Hats & Treasury — Hats tree deployment on Optimism, Safe multisig, HSG v2 | Planned (Q3 2026) |
 | **6** | AI Agent — ElizaOS + Claude + pgvector, welcome DMs, music recs | Planned (Q4 2026) |
-| **7** | Cross-platform publishing — Lens, Bluesky enhancements, X (admin), Hive/InLeo | Planned |
+| **7** | Additional cross-platform — Lens (deferred: wallet mismatch blocker), Hive/InLeo (deferred) | Planned |
 | **8** | Nouns Builder / ZABAL — native auction UI, governance integration | Planned (2027) |
 
 ---
@@ -520,7 +569,7 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 ZAO OS is open source. Fork it, build on it, make it yours.
 
 - [GitHub Issues](https://github.com/bettercallzaal/zaoos/issues) — bugs and feature requests
-- [Research Library](./research/) — 91 docs of context
+- [Research Library](./research/) — 136 docs of context
 - [QA Test Checklist](./docs/QA-TEST-CHECKLIST.md) — testing procedures
 - [Internal Plans](./docs/superpowers/plans/) — execution plans for upcoming sprints
 

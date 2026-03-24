@@ -1,7 +1,7 @@
 /**
  * Lens Protocol V3 publishing.
- * Posts via the Lens V3 GraphQL API with access tokens.
- * Tokens are obtained during wallet auth in settings (useLensAuth hook).
+ * Uploads metadata to Grove (Lens's decentralized storage),
+ * then posts via the V3 GraphQL API.
  */
 
 import type { NormalizedContent } from '@/lib/publish/normalize';
@@ -14,17 +14,20 @@ export interface LensPublishResult {
 }
 
 /**
- * Publish content to Lens V3 via GraphQL.
- * Requires a valid access token from the connect flow.
+ * Publish content to Lens V3.
+ * 1. Build metadata JSON per Lens Metadata Standards
+ * 2. Upload to Grove via @lens-chain/storage-client → gets lens:// URI
+ * 3. Call post mutation with the lens:// URI
  */
 export async function publishToLens(
   accessToken: string,
   refreshToken: string,
   content: NormalizedContent,
+  handle?: string,
 ): Promise<LensPublishResult> {
   let token = accessToken;
 
-  // Build metadata JSON
+  // Build metadata per Lens V3 spec
   const metadata = {
     $schema: 'https://json-schemas.lens.dev/publications/text/3.0.0.json',
     lens: {
@@ -36,15 +39,17 @@ export async function publishToLens(
     },
   };
 
-  // Upload metadata to a data URI (works for V3 post mutation)
-  const contentURI = `data:application/json;base64,${Buffer.from(
-    JSON.stringify(metadata),
-  ).toString('base64')}`;
+  // Upload to Grove (Lens's decentralized storage)
+  const { StorageClient } = await import('@lens-chain/storage-client');
+  const storageClient = StorageClient.create();
+  const { uri: contentURI } = await storageClient.uploadAsJson(metadata);
 
-  // Try to post
+  console.info('[lens] Uploaded to Grove:', contentURI);
+
+  // Post with the lens:// URI
   const postResult = await lensPost(token, contentURI);
 
-  // If token expired, refresh and retry once
+  // If token expired, refresh and retry
   if (postResult.error?.includes('UNAUTHENTICATED') || postResult.error?.includes('expired')) {
     const refreshed = await refreshLensToken(refreshToken);
     if (refreshed) {
@@ -57,6 +62,13 @@ export async function publishToLens(
   }
 
   if (postResult.error) throw new Error(postResult.error);
+
+  // Override the URL to use the user's profile (more reliable than tx hash)
+  if (handle && postResult.result) {
+    const cleanHandle = handle.replace('.lens', '');
+    postResult.result.postUrl = `https://hey.xyz/u/${cleanHandle}`;
+  }
+
   return postResult.result!;
 }
 
@@ -81,6 +93,7 @@ async function lensPost(token: string, contentURI: string): Promise<{ result?: L
 
     const post = data?.data?.post;
     if (post?.hash) {
+      console.info('[lens] Post transaction hash:', post.hash);
       return {
         result: {
           postId: post.hash,
@@ -93,7 +106,7 @@ async function lensPost(token: string, contentURI: string): Promise<{ result?: L
       return { error: `Lens post failed: ${post.reason}` };
     }
 
-    return { error: 'Unknown Lens post response: ' + JSON.stringify(post) };
+    return { error: 'Unknown Lens response: ' + JSON.stringify(post) };
   } catch (err) {
     return { error: err instanceof Error ? err.message : 'Lens post failed' };
   }

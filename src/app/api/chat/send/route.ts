@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
             const { normalizeForLens } = await import('@/lib/publish/normalize');
             const { publishToLens } = await import('@/lib/publish/lens');
             const content = normalizeForLens({ text, castHash: castData?.hash || '', embedUrls, channel });
-            const result = await publishToLens(lensUser.lens_access_token, lensUser.lens_refresh_token || '', content);
+            const result = await publishToLens(lensUser.lens_access_token, lensUser.lens_refresh_token || '', content, lensUser.lens_profile_id || undefined);
             console.info('[cross-post] Lens success:', result.postUrl);
 
             await supabaseAdmin.from('publish_log').insert({

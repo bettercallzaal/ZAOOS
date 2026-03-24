@@ -25,6 +25,7 @@
     "@hatsprotocol/sdk-v1-core": "^0.12.4",
     "@hiveio/dhive": "^1.3.5",
     "@jitsi/react-sdk": "^1.4.4",
+    "@lens-chain/storage-client": "^1.0.6",
     "@lens-protocol/client": "^0.0.0-canary-20250820102520",
     "@lens-protocol/metadata": "^2.1.0",
     "@neynar/nodejs-sdk": "^3.137.0",

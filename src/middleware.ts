@@ -121,7 +121,7 @@ function buildCspHeader(nonce: string): string {
     "media-src 'self' blob: https:",
     "connect-src 'self' https: wss:",
     "font-src 'self' https:",
-    "frame-src 'self' https://open.spotify.com https://www.youtube.com https://w.soundcloud.com https://embed.sound.xyz https://audius.co https://relay.farcaster.xyz https://app.neynar.com https://embed.tidal.com https://*.bandcamp.com https://embed.music.apple.com https://meet.jit.si https://nouns.build https://songjam.space https://empirebuilder.world https://incented.co https://app.magnetiq.xyz https://clanker.world https://www.wavewarz.com https://wavewarz.com https://wavewarz-intelligence.vercel.app https://analytics-wave-warz.vercel.app",
+    "frame-src 'self' https://open.spotify.com https://www.youtube.com https://w.soundcloud.com https://embed.sound.xyz https://audius.co https://relay.farcaster.xyz https://app.neynar.com https://embed.tidal.com https://*.bandcamp.com https://embed.music.apple.com https://meet.jit.si https://nouns.build https://songjam.space https://www.songjam.space https://empirebuilder.world https://incented.co https://app.magnetiq.xyz https://clanker.world https://www.wavewarz.com https://wavewarz.com https://wavewarz-intelligence.vercel.app https://analytics-wave-warz.vercel.app",
     "worker-src 'self' blob:",
     "base-uri 'self'",
     "form-action 'self'",
@@ -134,7 +134,7 @@ function addSecurityHeaders(response: NextResponse, nonce?: string): NextRespons
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  response.headers.set('Permissions-Policy', 'camera=(self "https://www.songjam.space"), microphone=(self "https://www.songjam.space"), geolocation=()');
   if (nonce) {
     response.headers.set('Content-Security-Policy', buildCspHeader(nonce));
   }

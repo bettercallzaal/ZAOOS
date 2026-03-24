@@ -717,19 +717,18 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   };
 
   // Account count for progress indicator
+  // Lens and Hive deferred — see research/121 (excluded from counts)
   const accountConnections = [
     !!session?.walletAddress,
     !!session?.fid,
     !!blueskyHandle,
-    !!lensHandle,
-    !!hiveUsername,
     !!solanaWallet,
   ];
   const accountConnectedCount = accountConnections.filter(Boolean).length;
 
-  // Cross-posting platform count
-  const crossPostPlatforms = [!!blueskyHandle, !!lensHandle, !!hiveUsername].filter(Boolean).length;
-  const totalCrossPostPlatforms = 3;
+  // Cross-posting platform count (Lens/Hive deferred)
+  const crossPostPlatforms = [!!blueskyHandle].filter(Boolean).length;
+  const totalCrossPostPlatforms = 1;
 
   if (!session || !profile) {
     return (
@@ -837,114 +836,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
               )}
             </AccountRow>
 
-            {/* 4. Lens */}
-            <AccountRow
-              icon={<LensIcon className="w-4 h-4 text-green-400" />}
-              name="Lens"
-              status={lensHandle ? 'connected' : 'disconnected'}
-              detail={lensHandle || undefined}
-              action={
-                lensHandle ? (
-                  <button
-                    onClick={disconnectLens}
-                    disabled={lensDisconnecting}
-                    className="text-[10px] text-red-400 hover:text-red-300 transition-colors disabled:opacity-50"
-                  >
-                    {lensDisconnecting ? 'Disconnecting...' : 'Disconnect'}
-                  </button>
-                ) : (
-                  <button
-                    onClick={lensConnect}
-                    disabled={lensConnecting || !session?.walletAddress}
-                    className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors disabled:opacity-50"
-                  >
-                    {lensConnecting ? 'Checking...' : 'Connect'}
-                  </button>
-                )
-              }
-            >
-              {lensError && (
-                <div className="pb-3">
-                  <p className="text-[10px] text-amber-400">{lensError}</p>
-                </div>
-              )}
-              {lensNeedsAuth && lensHandle && (
-                <div className="pb-3 space-y-2">
-                  <p className="text-[10px] text-gray-500">Profile found — authorize posting with your wallet:</p>
-                  {lensWalletAddr ? (
-                    <button
-                      onClick={lensAuthorize}
-                      disabled={lensConnecting}
-                      className="text-[10px] px-3 py-1.5 rounded-lg bg-[#f5a623]/10 border border-[#f5a623]/20 text-[#f5a623] font-medium hover:bg-[#f5a623]/20 transition-colors disabled:opacity-50"
-                    >
-                      {lensConnecting ? 'Signing with wallet...' : 'Authorize Posting'}
-                    </button>
-                  ) : (
-                    <div className="space-y-1">
-                      <p className="text-[10px] text-amber-400">Connect your wallet first (RainbowKit button in the Wallet row above), then come back here.</p>
-                    </div>
-                  )}
-                </div>
-              )}
-              {!lensHandle && !session?.walletAddress && (
-                <div className="pb-3">
-                  <p className="text-[10px] text-gray-600">No wallet detected</p>
-                </div>
-              )}
-            </AccountRow>
-
-            {/* 5. Hive */}
-            <AccountRow
-              icon={<HiveIcon className="w-4 h-4 text-red-400" />}
-              name="Hive"
-              status={hiveUsername ? 'connected' : 'disconnected'}
-              detail={hiveUsername ? `@${hiveUsername}` : undefined}
-              action={
-                hiveUsername ? (
-                  <button
-                    onClick={disconnectHive}
-                    className="text-[10px] text-red-400 hover:text-red-300 transition-colors"
-                  >
-                    Disconnect
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => { setShowHiveConnect(!showHiveConnect); setHiveError(''); }}
-                    className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors"
-                  >
-                    Connect
-                  </button>
-                )
-              }
-            >
-              {/* Hive inline connect form */}
-              {showHiveConnect && !hiveUsername && (
-                <div className="pb-3 space-y-2">
-                  <input
-                    value={hiveUser}
-                    onChange={(e) => setHiveUser(e.target.value)}
-                    placeholder="Hive username"
-                    className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:border-red-500"
-                  />
-                  <input
-                    value={hivePostingKey}
-                    onChange={(e) => setHivePostingKey(e.target.value)}
-                    placeholder="Posting key (5K...)"
-                    type="password"
-                    className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:border-red-500"
-                  />
-                  <p className="text-[10px] text-gray-600">Your posting key is encrypted and never shared</p>
-                  {hiveError && <p className="text-[10px] text-red-400">{hiveError}</p>}
-                  <button
-                    onClick={connectHive}
-                    disabled={hiveConnecting}
-                    className="w-full text-xs font-medium py-2 rounded-lg bg-red-600 text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
-                  >
-                    {hiveConnecting ? 'Connecting...' : 'Connect Hive'}
-                  </button>
-                </div>
-              )}
-            </AccountRow>
+            {/* Lens and Hive deferred — see research/121. Rows hidden from UI, code preserved. */}
 
             {/* 6. Solana */}
             <div className="py-3">

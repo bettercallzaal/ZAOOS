@@ -4,9 +4,10 @@ import { useCallback } from 'react';
 
 const PLATFORMS = [
   { id: 'farcaster', name: 'Farcaster', color: '#8A63D2', alwaysOn: true },
-  { id: 'lens', name: 'Lens', color: '#00501E' },
+  // Lens and Hive deferred — see research/121
+  // { id: 'lens', name: 'Lens', color: '#00501E' },
   { id: 'bluesky', name: 'Bluesky', color: '#0085FF' },
-  { id: 'hive', name: 'Hive', color: '#E31337' },
+  // { id: 'hive', name: 'Hive', color: '#E31337' },
   { id: 'x', name: 'X', color: '#FFFFFF', adminOnly: true },
 ] as const;
 

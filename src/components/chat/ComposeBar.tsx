@@ -80,19 +80,21 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
         const profile = data.profile || data;
         const connected = new Set<string>();
         if (profile.bluesky_handle) connected.add('bluesky');
-        if (profile.lens_profile_id) connected.add('lens');
-        if (profile.hive_username) connected.add('hive');
+        // Lens and Hive deferred — see research/121 (not added to connected set)
+        // if (profile.lens_profile_id) connected.add('lens');
+        // if (profile.hive_username) connected.add('hive');
         if (isAdmin) connected.add('x');
         setConnectedPlatforms(connected);
 
-        // Apply saved publishing defaults
+        // Apply saved publishing defaults (Lens/Hive deferred)
         const prefs = profile.publishing_prefs;
         if (prefs) {
           if (prefs.crossPostBluesky && connected.has('bluesky')) setCrossPostBluesky(true);
-          if (prefs.crossPostLens && connected.has('lens')) setCrossPostLens(true);
+          // Lens and Hive deferred — see research/121
+          // if (prefs.crossPostLens && connected.has('lens')) setCrossPostLens(true);
+          // if (prefs.crossPostHive && connected.has('hive')) setCrossPostHive(true);
           if (prefs.crossPostX && connected.has('x')) setCrossPostX(true);
-          if (prefs.crossPostHive && connected.has('hive')) setCrossPostHive(true);
-          if (prefs.crossPostBluesky || prefs.crossPostLens || prefs.crossPostX || prefs.crossPostHive) {
+          if (prefs.crossPostBluesky || prefs.crossPostX) {
             setCrossPostEnabled(true);
           }
         }
@@ -339,9 +341,10 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   const handlePlatformToggle = (platform: string) => {
     switch (platform) {
       case 'bluesky': setCrossPostBluesky((v) => !v); break;
-      case 'lens': setCrossPostLens((v) => !v); break;
+      // Lens and Hive deferred — see research/121
+      // case 'lens': setCrossPostLens((v) => !v); break;
+      // case 'hive': setCrossPostHive((v) => !v); break;
       case 'x': setCrossPostX((v) => !v); break;
-      case 'hive': setCrossPostHive((v) => !v); break;
     }
   };
 

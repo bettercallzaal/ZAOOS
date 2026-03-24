@@ -90,6 +90,51 @@ export async function GET(request: NextRequest) {
       return b.session_date.localeCompare(a.session_date);
     });
 
+    // Fetch respect events (non-fractal: introductions, articles, hosting, bonuses, etc.)
+    const eventFilter = wallet ? 'wallet_address' : 'member_name';
+    const eventValue = wallet || member.name;
+    const { data: events } = await supabaseAdmin
+      .from('respect_events')
+      .select('id, event_type, amount, description, event_date, created_at')
+      .ilike(eventFilter, eventValue)
+      .order('event_date', { ascending: false, nullsFirst: false });
+
+    // Build unified ledger: every respect point with date, source, amount, context
+    const ledger: {
+      date: string | null;
+      source: 'fractal' | 'event' | 'onchain';
+      type: string;
+      amount: number;
+      detail: string;
+    }[] = [];
+
+    for (const f of fractalHistory) {
+      ledger.push({
+        date: f.session_date,
+        source: 'fractal',
+        type: `Rank #${f.rank}`,
+        amount: f.score,
+        detail: f.session_name || 'Fractal session',
+      });
+    }
+
+    for (const e of events || []) {
+      ledger.push({
+        date: e.event_date || e.created_at?.split('T')[0] || null,
+        source: 'event',
+        type: e.event_type,
+        amount: Number(e.amount),
+        detail: e.description || e.event_type,
+      });
+    }
+
+    // Sort ledger by date descending
+    ledger.sort((a, b) => {
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return b.date.localeCompare(a.date);
+    });
+
     return NextResponse.json({
       member: {
         name: member.name,
@@ -107,6 +152,13 @@ export async function GET(request: NextRequest) {
         hosting_count: member.hosting_count,
       },
       fractalHistory,
+      events: (events || []).map(e => ({
+        event_type: e.event_type,
+        amount: Number(e.amount),
+        description: e.description,
+        event_date: e.event_date,
+      })),
+      ledger,
     });
   } catch (err) {
     console.error('Respect member error:', err);

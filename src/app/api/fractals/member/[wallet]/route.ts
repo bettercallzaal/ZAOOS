@@ -93,9 +93,43 @@ export async function GET(
       ? Math.round((history.reduce((sum, h) => sum + h.rank, 0) / history.length) * 10) / 10
       : 0;
 
+    // Fetch respect events (non-fractal)
+    const { data: events } = await supabaseAdmin
+      .from('respect_events')
+      .select('event_type, amount, description, event_date, created_at')
+      .or(`member_name.ilike.${lookupValue},wallet_address.ilike.${lookupValue}`)
+      .order('event_date', { ascending: false, nullsFirst: false });
+
+    // Build unified ledger
+    const ledger: { date: string | null; source: string; type: string; amount: number; detail: string }[] = [];
+    for (const h of history) {
+      ledger.push({ date: h.sessionDate, source: 'fractal', type: `Rank #${h.rank}`, amount: h.score, detail: h.sessionName });
+    }
+    for (const e of events || []) {
+      ledger.push({
+        date: e.event_date || e.created_at?.split('T')[0] || null,
+        source: 'event',
+        type: e.event_type,
+        amount: Number(e.amount),
+        detail: e.description || e.event_type,
+      });
+    }
+    ledger.sort((a, b) => {
+      if (!a.date) return 1;
+      if (!b.date) return -1;
+      return b.date.localeCompare(a.date);
+    });
+
     return NextResponse.json({
       member,
       history,
+      events: (events || []).map(e => ({
+        event_type: e.event_type,
+        amount: Number(e.amount),
+        description: e.description,
+        event_date: e.event_date,
+      })),
+      ledger,
       stats: {
         totalSessions: history.length,
         totalFractalRespect,

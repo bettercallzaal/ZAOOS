@@ -46,9 +46,26 @@ interface MemberHistory {
   txHash: string | null;
 }
 
+interface LedgerEntry {
+  date: string | null;
+  source: string;
+  type: string;
+  amount: number;
+  detail: string;
+}
+
+interface RespectEvent {
+  event_type: string;
+  amount: number;
+  description: string;
+  event_date: string;
+}
+
 interface MemberProfile {
   member: Record<string, unknown>;
   history: MemberHistory[];
+  ledger?: LedgerEntry[];
+  events?: RespectEvent[];
   stats: {
     totalSessions: number;
     totalFractalRespect: number;
@@ -315,6 +332,52 @@ export function AnalyticsTab() {
                     ))}
                   </div>
                 </div>
+
+                {/* Respect Ledger — full transparent timeline */}
+                {memberProfile.ledger && memberProfile.ledger.length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Respect Ledger</p>
+                    <p className="text-[10px] text-gray-600 mb-2">Every respect point earned — when, how, and why</p>
+                    <div className="space-y-1 max-h-72 overflow-y-auto">
+                      {memberProfile.ledger.map((entry: { date: string | null; source: string; type: string; amount: number; detail: string }, i: number) => (
+                        <div key={i} className="flex items-center gap-2 text-xs px-2 py-1.5 bg-[#0a1628] rounded">
+                          <span className="text-[10px] text-gray-600 w-16 flex-shrink-0 tabular-nums">
+                            {entry.date || '—'}
+                          </span>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium flex-shrink-0 ${
+                            entry.source === 'fractal' ? 'bg-[#f5a623]/10 text-[#f5a623]' :
+                            entry.source === 'event' ? 'bg-blue-500/10 text-blue-400' :
+                            'bg-purple-500/10 text-purple-400'
+                          }`}>
+                            {entry.source === 'fractal' ? 'Fractal' : entry.type}
+                          </span>
+                          <span className="flex-1 text-gray-400 truncate">{entry.detail}</span>
+                          <span className="font-mono text-green-400 flex-shrink-0">+{entry.amount}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-gray-600 mt-2">
+                      Total: {memberProfile.ledger.reduce((sum: number, e: { amount: number }) => sum + e.amount, 0)} respect from {memberProfile.ledger.length} entries
+                    </p>
+                  </div>
+                )}
+
+                {/* Non-fractal events breakdown */}
+                {memberProfile.events && memberProfile.events.length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Non-Fractal Respect</p>
+                    <div className="space-y-1">
+                      {memberProfile.events.map((e: { event_type: string; amount: number; description: string; event_date: string }, i: number) => (
+                        <div key={i} className="flex items-center gap-2 text-xs px-2 py-1.5 bg-[#0a1628] rounded">
+                          <span className="text-[10px] text-gray-600 w-16 flex-shrink-0">{e.event_date || '—'}</span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-blue-500/10 text-blue-400 capitalize flex-shrink-0">{e.event_type}</span>
+                          <span className="flex-1 text-gray-400 truncate">{e.description || e.event_type}</span>
+                          <span className="font-mono text-green-400 flex-shrink-0">+{e.amount}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="p-4 text-gray-500 text-sm">Member not found.</p>

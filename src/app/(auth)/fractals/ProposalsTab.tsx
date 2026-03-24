@@ -38,6 +38,8 @@ interface Proposal {
   published_cast_hash: string | null;
   published_bluesky_uri: string | null;
   published_x_url: string | null;
+  publish_fc_error: string | null;
+  publish_bsky_error: string | null;
   publish_x_error: string | null;
   publish_text: string | null;
 }
@@ -563,7 +565,7 @@ function ProposalCard({
           </div>
 
           {/* Published links */}
-          {(p.published_cast_hash || p.published_bluesky_uri || p.published_x_url || p.publish_x_error) && (
+          {(p.published_cast_hash || p.published_bluesky_uri || p.published_x_url || p.publish_fc_error || p.publish_bsky_error || p.publish_x_error) && (
             <div className="mt-3 flex flex-wrap gap-2">
               <p className="text-xs text-gray-500 uppercase tracking-wider w-full mb-1">Published To</p>
               {p.published_cast_hash && (
@@ -577,6 +579,12 @@ function ProposalCard({
                   View on Farcaster
                 </a>
               )}
+              {p.publish_fc_error && !p.published_cast_hash && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs border border-red-500/20">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                  Farcaster failed: {p.publish_fc_error}
+                </span>
+              )}
               {p.published_bluesky_uri && (
                 <a
                   href={p.published_bluesky_uri.startsWith('http') ? p.published_bluesky_uri : `https://bsky.app/profile/${p.published_bluesky_uri}`}
@@ -587,6 +595,12 @@ function ProposalCard({
                   <svg className="w-3.5 h-3.5" viewBox="0 0 568 501" fill="currentColor"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.793 166.471-20.155 71.454-93.57 89.708-159.534 78.663 115.346 19.729 144.665 85.021 81.294 150.313-120.758 124.562-173.715-31.256-187.093-71.174-2.41-7.186-3.542-10.549-2.874-7.688-0.668-2.861-0.464 0.502-2.874 7.688-13.378 39.918-66.335 195.736-187.093 71.174-63.371-65.292-34.052-130.584 81.294-150.313-65.964 11.045-139.379-7.209-159.534-78.663C9.945 203.659 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg>
                   View on Bluesky
                 </a>
+              )}
+              {p.publish_bsky_error && !p.published_bluesky_uri && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs border border-red-500/20">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 568 501" fill="currentColor"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.793 166.471-20.155 71.454-93.57 89.708-159.534 78.663 115.346 19.729 144.665 85.021 81.294 150.313-120.758 124.562-173.715-31.256-187.093-71.174-2.41-7.186-3.542-10.549-2.874-7.688-0.668-2.861-0.464 0.502-2.874 7.688-13.378 39.918-66.335 195.736-187.093 71.174-63.371-65.292-34.052-130.584 81.294-150.313-65.964 11.045-139.379-7.209-159.534-78.663C9.945 203.659 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg>
+                  Bluesky failed: {p.publish_bsky_error}
+                </span>
               )}
               {p.published_x_url && (
                 <a

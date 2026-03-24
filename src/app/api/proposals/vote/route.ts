@@ -190,12 +190,17 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     if (!fullProposal) return false;
 
     const authorName = fullProposal.author?.username || fullProposal.author?.display_name || 'ZAO member';
-    // Use publish_text if set, otherwise fallback to title + description
+    // Use publish_text if set, otherwise title only (avoid duplicating if title === description)
     const publishText = fullProposal.publish_text
-      || `${fullProposal.title}\n\n${fullProposal.description}`;
+      || (fullProposal.title === fullProposal.description
+        ? fullProposal.title
+        : `${fullProposal.title}\n\n${fullProposal.description}`);
     const attribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance`;
 
     let castHash: string | null = null;
+    let fcError: string | null = null;
+    let bskyUri: string | null = null;
+    let bskyError: string | null = null;
 
     // Publish to Farcaster (route by category: wavewarz → WaveWarZ signer, else → @thezao)
     const ENV = await import('@/lib/env').then((m) => m.ENV);
@@ -212,7 +217,6 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           ? publishText.slice(0, maxLen - 3) + '...' + attribution
           : publishText + attribution;
 
-        // Include image as embed URL if set
         const embedUrls = fullProposal.publish_image_url ? [fullProposal.publish_image_url] : undefined;
 
         const result = await postCast(
@@ -228,14 +232,15 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         castHash = result?.cast?.hash || null;
         console.info(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
       } catch (fcErr) {
-        console.error('[publish-threshold] Farcaster publish failed:', fcErr);
+        fcError = fcErr instanceof Error ? fcErr.message : 'Farcaster publish failed';
+        console.error('[publish-threshold] Farcaster publish failed:', fcError);
       }
     } else {
-      console.warn(`[publish-threshold] Farcaster signer not configured for ${publishChannel} — skipping`);
+      fcError = `Signer not configured for /${publishChannel}`;
+      console.warn(`[publish-threshold] ${fcError}`);
     }
 
-    // Publish to @thezao Bluesky (independent of Farcaster)
-    let bskyUri: string | null = null;
+    // Publish to @thezao Bluesky
     try {
       const { postToBluesky } = await import('@/lib/bluesky/client');
       bskyUri = await postToBluesky(
@@ -246,7 +251,8 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         console.info(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
       }
     } catch (bskyErr) {
-      console.error('[publish-threshold] Bluesky publish failed:', bskyErr);
+      bskyError = bskyErr instanceof Error ? bskyErr.message : 'Bluesky publish failed';
+      console.error('[publish-threshold] Bluesky publish failed:', bskyError);
     }
 
     // Publish to @thezaodao X/Twitter (independent of Farcaster + Bluesky)
@@ -277,15 +283,18 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       console.error('[publish-threshold] X publish failed:', xError);
     }
 
-    // Mark proposal as published
+    // Mark proposal as published with all platform results
     const updateData: Record<string, unknown> = {
-      published_cast_hash: castHash || 'bluesky-only',
+      published_cast_hash: castHash || null,
       published_at: new Date().toISOString(),
       status: 'published',
     };
 
     if (bskyUri) updateData.published_bluesky_uri = bskyUri;
     if (xUrl) updateData.published_x_url = xUrl;
+    // Store errors for UI display
+    if (fcError) updateData.publish_fc_error = fcError;
+    if (bskyError) updateData.publish_bsky_error = bskyError;
     if (xError) updateData.publish_x_error = xError;
 
     const { error: updateErr } = await supabaseAdmin

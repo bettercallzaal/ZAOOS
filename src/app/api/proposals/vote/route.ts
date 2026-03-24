@@ -250,6 +250,8 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     }
 
     // Publish to @thezaodao X/Twitter (independent of Farcaster + Bluesky)
+    let xUrl: string | null = null;
+    let xError: string | null = null;
     try {
       const { normalizeForX } = await import('@/lib/publish/normalize');
       const { publishToX, getXClient } = await import('@/lib/publish/x');
@@ -260,25 +262,31 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           castHash: castHash || '',
         });
         const xResult = await publishToX(content);
-        console.info(`[publish-threshold] Published to @thezaodao X: ${xResult.tweetUrl}`);
+        xUrl = xResult.tweetUrl;
+        console.info(`[publish-threshold] Published to @thezaodao X: ${xUrl}`);
       } else {
+        xError = 'X not configured — add API keys in env vars';
         console.info('[publish-threshold] X skipped — not configured');
       }
     } catch (xErr) {
-      console.error('[publish-threshold] X publish failed:', xErr);
+      xError = xErr instanceof Error ? xErr.message : 'Unknown X error';
+      // Extract readable error from twitter-api-v2
+      if (xError.includes('CreditsDepleted')) xError = 'X credits depleted — add credits at developer.x.com';
+      else if (xError.includes('403')) xError = 'X permissions error — check app has Read+Write';
+      else if (xError.includes('401')) xError = 'X auth failed — check API keys';
+      console.error('[publish-threshold] X publish failed:', xError);
     }
 
-    // Mark proposal as published — try with bluesky URI first, fallback without
+    // Mark proposal as published
     const updateData: Record<string, unknown> = {
       published_cast_hash: castHash || 'bluesky-only',
       published_at: new Date().toISOString(),
       status: 'published',
     };
 
-    // Only include bluesky URI if the column exists
-    if (bskyUri) {
-      updateData.published_bluesky_uri = bskyUri;
-    }
+    if (bskyUri) updateData.published_bluesky_uri = bskyUri;
+    if (xUrl) updateData.published_x_url = xUrl;
+    if (xError) updateData.publish_x_error = xError;
 
     const { error: updateErr } = await supabaseAdmin
       .from('proposals')

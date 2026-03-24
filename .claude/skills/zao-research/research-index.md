@@ -114,3 +114,4 @@
 | 117 | `117-lens-v3-cross-posting` | Lens v3 cross-posting |
 | 118 | `118-settings-page-redesign` | Settings page redesign |
 | 119 | `119-songjam-audio-spaces-embed` | Embed songjam.space/zabal for live audio rooms, iframe permissions fix, 100ms architecture, LiveAudioRoom component |
+| 122 | `122-songjam-screen-share-pr` | Screen share for SongJam /spaces via Stream Video SDK, PR plan, MyScreenShareButton + ScreenShareView |

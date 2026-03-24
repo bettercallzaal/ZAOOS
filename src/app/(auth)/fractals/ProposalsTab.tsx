@@ -37,6 +37,8 @@ interface Proposal {
   respect_threshold: number;
   published_cast_hash: string | null;
   published_bluesky_uri: string | null;
+  published_x_url: string | null;
+  publish_x_error: string | null;
   publish_text: string | null;
 }
 
@@ -561,7 +563,7 @@ function ProposalCard({
           </div>
 
           {/* Published links */}
-          {(p.published_cast_hash || p.published_bluesky_uri) && (
+          {(p.published_cast_hash || p.published_bluesky_uri || p.published_x_url || p.publish_x_error) && (
             <div className="mt-3 flex flex-wrap gap-2">
               <p className="text-xs text-gray-500 uppercase tracking-wider w-full mb-1">Published To</p>
               {p.published_cast_hash && (
@@ -582,9 +584,26 @@ function ProposalCard({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-medium hover:bg-blue-500/20 transition-colors border border-blue-500/20"
                 >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 568 501" fill="currentColor"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.793 166.471-20.155 71.454-93.57 89.708-159.534 78.663 115.346 19.729 144.665 85.021 81.294 150.313-120.758 124.562-173.715-31.256-187.093-71.174-2.41-7.186-3.542-10.549-2.874-7.688-0.668-2.861-0.464 0.502-2.874 7.688-13.378 39.918-66.335 195.736-187.093 71.174-63.371-65.292-34.052-130.584 81.294-150.313-65.964 11.045-139.379-7.209-159.534-78.663C9.945 203.659 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg>
                   View on Bluesky
                 </a>
+              )}
+              {p.published_x_url && (
+                <a
+                  href={p.published_x_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-500/10 text-gray-300 text-xs font-medium hover:bg-gray-500/20 transition-colors border border-gray-500/20"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  View on X
+                </a>
+              )}
+              {p.publish_x_error && !p.published_x_url && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs border border-red-500/20">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  X failed: {p.publish_x_error}
+                </span>
               )}
             </div>
           )}

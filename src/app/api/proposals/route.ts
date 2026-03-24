@@ -84,6 +84,8 @@ export async function GET(req: NextRequest) {
       publish_text: p.publish_text || null,
       published_cast_hash: p.published_cast_hash || null,
       published_bluesky_uri: p.published_bluesky_uri || null,
+      published_x_url: p.published_x_url || null,
+      publish_x_error: p.publish_x_error || null,
       respect_threshold: p.respect_threshold || 1000,
     };
   });

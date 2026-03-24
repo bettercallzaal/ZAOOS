@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 
-const SONGJAM_URL = 'https://songjam.space/zabal';
+const SONGJAM_URL = 'https://www.songjam.space/zabal';
 
 export default function SpacesPage() {
   return (
@@ -34,7 +34,6 @@ export default function SpacesPage() {
           src={SONGJAM_URL}
           title="SongJam — ZABAL Audio Spaces"
           className="absolute inset-0 w-full h-full border-0"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation-by-user-activation allow-modals"
           allow="microphone; camera; clipboard-write; autoplay"
           loading="lazy"
         />

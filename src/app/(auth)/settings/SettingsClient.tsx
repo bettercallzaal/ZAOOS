@@ -576,14 +576,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     setLensConnecting(true);
     setLensError(null);
 
-    // If wagmi wallet is available, go straight to SDK auth (gets tokens for posting)
-    if (lensWalletAddr) {
-      await lensSDKConnect();
-      setLensConnecting(false);
-      return;
-    }
-
-    // Fallback: server-side profile lookup (no tokens, just display)
+    // Always use server-side lookup first (works with all wallets from Farcaster)
     try {
       const wallet = session?.walletAddress;
       if (!wallet) { setLensError('No wallet connected'); setLensConnecting(false); return; }

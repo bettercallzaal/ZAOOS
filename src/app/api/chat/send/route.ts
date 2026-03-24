@@ -6,6 +6,7 @@ import { sendMessageSchema } from '@/lib/validation/schemas';
 import { sendNotification, createInAppNotification } from '@/lib/notifications';
 
 import { extractAndSaveSongs } from '@/lib/music/library';
+import { touchActivity } from '@/lib/db/activity';
 import { communityConfig } from '@/../community.config';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
@@ -65,7 +66,8 @@ export async function POST(req: NextRequest) {
       if (dbError) console.error('[send] DB insert error:', dbError);
     }
 
-    // Save any music links to the song library (fire and forget)
+    // Track member activity + save music links (fire and forget)
+    touchActivity(session.fid);
     extractAndSaveSongs(text, embedUrls, session.fid, 'chat').catch(() => {});
 
     // Cross-post to additional channels (fire and forget)

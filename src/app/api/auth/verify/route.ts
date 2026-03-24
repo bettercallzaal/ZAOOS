@@ -123,14 +123,20 @@ export async function POST(req: NextRequest) {
     try {
       const wallet = (primaryWallet || '').toLowerCase();
       if (wallet) {
-        // Check for existing user THEN upsert — single read avoids the old
-        // separate-query race where concurrent logins could both see null
-        const { data: existingUser } = await supabaseAdmin
+        // Check by FID first (most reliable), then wallet
+        const { data: existingByFid } = await supabaseAdmin
+          .from('users')
+          .select('last_login_at')
+          .eq('fid', fid)
+          .maybeSingle();
+
+        const { data: existingByWallet } = !existingByFid ? await supabaseAdmin
           .from('users')
           .select('last_login_at')
           .eq('primary_wallet', wallet)
-          .maybeSingle();
+          .maybeSingle() : { data: existingByFid };
 
+        const existingUser = existingByFid || existingByWallet;
         const isFirstLogin = !existingUser?.last_login_at;
 
         await supabaseAdmin.from('users').upsert(

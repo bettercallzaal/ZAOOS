@@ -88,9 +88,11 @@ export async function GET(
     });
 
     const totalFractalRespect = history.reduce((sum, h) => sum + h.score, 0);
-    const firstPlace = history.filter(h => h.rank === 1).length;
-    const avgRank = history.length > 0
-      ? Math.round((history.reduce((sum, h) => sum + h.rank, 0) / history.length) * 10) / 10
+    // Ranks are 1-6 only. Clamp any bad data from imports.
+    const clampedHistory = history.map(h => ({ ...h, rank: Math.min(Math.max(h.rank, 1), 6) }));
+    const firstPlace = clampedHistory.filter(h => h.rank === 1).length;
+    const avgRank = clampedHistory.length > 0
+      ? Math.round((clampedHistory.reduce((sum, h) => sum + h.rank, 0) / clampedHistory.length) * 10) / 10
       : 0;
 
     // Fetch respect events (non-fractal)

@@ -9,6 +9,7 @@ import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
 import type { SessionData } from '@/types';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
+import { useENSNames } from '@/hooks/useENS';
 
 interface Profile {
   fid: number;
@@ -327,10 +328,33 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [prefsLoading, setPrefsLoading] = useState(true);
   const [prefsSaving, setPrefsSaving] = useState(false);
 
-  // Wallet visibility
+  // Wallet visibility + preferred wallet
   const [hiddenWallets, setHiddenWallets] = useState<WalletKey[]>([]);
   const [walletVisLoading, setWalletVisLoading] = useState(true);
   const [walletVisSaving, setWalletVisSaving] = useState(false);
+  const [preferredWallet, setPreferredWallet] = useState<string | null>(null);
+  const [prefWalletSaving, setPrefWalletSaving] = useState(false);
+
+  // ENS resolution for all ETH addresses
+  const allEthAddresses = profile ? [
+    profile.primary_wallet,
+    profile.custody_address,
+    ...(profile.verified_addresses || []),
+  ].filter(Boolean) as string[] : [];
+  const ensNames = useENSNames(allEthAddresses);
+
+  const setPreferred = async (wallet: string) => {
+    setPrefWalletSaving(true);
+    try {
+      const res = await fetch('/api/users/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferred_wallet: wallet }),
+      });
+      if (res.ok) setPreferredWallet(wallet);
+    } catch { /* ignore */ }
+    setPrefWalletSaving(false);
+  };
 
   // ZAO profile editing
   const [zaoFields, setZaoFields] = useState({
@@ -1093,7 +1117,22 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-500">Farcaster Wallet</p>
                 <p className="text-sm text-white font-mono truncate">{profile.primary_wallet || 'Not set'}</p>
+                {profile.primary_wallet && ensNames[profile.primary_wallet.toLowerCase()] && (
+                  <p className="text-xs text-[#f5a623]">{ensNames[profile.primary_wallet.toLowerCase()]}</p>
+                )}
               </div>
+              {profile.primary_wallet && preferredWallet !== profile.primary_wallet && (
+                <button
+                  onClick={() => setPreferred(profile.primary_wallet)}
+                  disabled={prefWalletSaving}
+                  className="text-[9px] text-gray-500 hover:text-[#f5a623] transition-colors disabled:opacity-50"
+                >
+                  Set preferred
+                </button>
+              )}
+              {profile.primary_wallet && preferredWallet === profile.primary_wallet && (
+                <span className="text-[9px] text-[#f5a623]">Preferred</span>
+              )}
               {profile.primary_wallet && <CopyButton text={profile.primary_wallet} />}
               <button
                 onClick={() => toggleWalletVisibility('primary_wallet')}
@@ -1221,9 +1260,24 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   {profile.verified_addresses.map((addr) => {
                     const addrKey = `verified_${addr.toLowerCase()}` as WalletKey;
                     const isHidden = hiddenWallets.includes(addrKey);
+                    const ens = ensNames[addr.toLowerCase()];
                     return (
                       <div key={addr} className="flex items-center justify-between gap-2">
-                        <p className={`text-sm font-mono truncate flex-1 min-w-0 ${isHidden ? 'text-gray-600' : 'text-white'}`}>{addr}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-mono truncate ${isHidden ? 'text-gray-600' : 'text-white'}`}>{addr}</p>
+                          {ens && <p className="text-xs text-[#f5a623]">{ens}</p>}
+                        </div>
+                        {preferredWallet !== addr ? (
+                          <button
+                            onClick={() => setPreferred(addr)}
+                            disabled={prefWalletSaving}
+                            className="text-[9px] text-gray-500 hover:text-[#f5a623] transition-colors disabled:opacity-50 flex-shrink-0"
+                          >
+                            Set preferred
+                          </button>
+                        ) : (
+                          <span className="text-[9px] text-[#f5a623] flex-shrink-0">Preferred</span>
+                        )}
                         <CopyButton text={addr} />
                         <button
                           onClick={() => toggleWalletVisibility(addrKey)}

@@ -303,19 +303,31 @@ export function AnalyticsTab() {
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Session History</p>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
-                    {memberProfile.history.map((h, i) => (
+                    {[...memberProfile.history]
+                      .sort((a, b) => {
+                        // Extract fractal number from session name for sorting (highest first)
+                        const numA = Number(a.sessionName.match(/\d+/)?.[0] || 0);
+                        const numB = Number(b.sessionName.match(/\d+/)?.[0] || 0);
+                        return numB - numA;
+                      })
+                      .map((h, i) => (
                       <div key={i} className="flex items-center gap-2 text-xs px-2 py-1.5 bg-[#0a1628] rounded">
-                        <span className={`w-6 font-bold ${
+                        <span className={`w-6 font-bold flex-shrink-0 ${
                           h.rank === 1 ? 'text-yellow-400' :
                           h.rank === 2 ? 'text-gray-300' :
                           h.rank === 3 ? 'text-amber-600' : 'text-gray-500'
                         }`}>
                           #{h.rank}
                         </span>
-                        <span className="flex-1 text-gray-300 truncate">{h.sessionName}</span>
-                        <span className="font-mono text-[#f5a623]">{h.score}</span>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-gray-300 truncate block">{h.sessionName}</span>
+                          <span className="text-[10px] text-gray-600">
+                            {h.sessionDate || ''}{h.participants ? ` · ${h.participants} participants` : ''}{h.era ? ` · ${h.era}` : ''}
+                          </span>
+                        </div>
+                        <span className="font-mono text-[#f5a623] flex-shrink-0">{h.score}</span>
                         {h.source === 'ordao' && (
-                          <span className="text-[10px] px-1 rounded bg-[#f5a623]/10 text-[#f5a623]">on-chain</span>
+                          <span className="text-[10px] px-1 rounded bg-[#f5a623]/10 text-[#f5a623] flex-shrink-0">on-chain</span>
                         )}
                         {h.txHash && (
                           <a
@@ -323,7 +335,7 @@ export function AnalyticsTab() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={e => e.stopPropagation()}
-                            className="text-[10px] text-[#f5a623]/50 hover:text-[#f5a623]"
+                            className="text-[10px] text-[#f5a623]/50 hover:text-[#f5a623] flex-shrink-0"
                           >
                             tx
                           </a>

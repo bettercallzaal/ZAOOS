@@ -1091,7 +1091,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-gray-500">Primary Wallet</p>
+                <p className="text-xs text-gray-500">Farcaster Wallet</p>
                 <p className="text-sm text-white font-mono truncate">{profile.primary_wallet || 'Not set'}</p>
               </div>
               {profile.primary_wallet && <CopyButton text={profile.primary_wallet} />}

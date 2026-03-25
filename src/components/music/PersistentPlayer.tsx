@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { usePlayer } from '@/providers/audio';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { communityConfig } from '@/../community.config';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
+import { ExpandedPlayer } from '@/components/music/ExpandedPlayer';
 
 interface PersistentPlayerProps {
   onPrev?: () => void;
@@ -85,6 +86,7 @@ export function PersistentPlayer({
   const position = player.metadata ? player.position : (restored?.position ?? 0);
   const duration = player.metadata ? player.duration : (restored?.duration ?? 0);
   const isRestored = !player.metadata && !!restored;
+  const [expanded, setExpanded] = useState(false);
 
   const handlePlayPause = () => {
     if (isRestored) {
@@ -94,6 +96,36 @@ export function PersistentPlayer({
     if (isPlaying) player.pause();
     else player.resume();
   };
+
+  // ─── Swipe to skip on compact bar ──────────────────────────────────
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+
+  const onSwipeStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const onSwipeEnd = useCallback((e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx > 0 && onPrev) { onPrev(); navigator.vibrate?.(10); }
+      else if (dx < 0 && onNext) { onNext(); navigator.vibrate?.(10); }
+    }
+  }, [onPrev, onNext]);
+
+  // ─── Expanded full-screen player ───────────────────────────────────
+  if (expanded && player.metadata) {
+    return (
+      <ExpandedPlayer
+        metadata={player.metadata}
+        onClose={() => setExpanded(false)}
+        onPrev={onPrev}
+        onNext={onNext}
+      />
+    );
+  }
 
   return (
     <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80">
@@ -113,9 +145,17 @@ export function PersistentPlayer({
         />
       </div>
 
-      <div className="flex items-center gap-2 px-3 py-1.5">
-        {/* Artwork */}
-        <div className={`relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}>
+      <div
+        className="flex items-center gap-2 px-3 py-1.5"
+        onTouchStart={onSwipeStart}
+        onTouchEnd={onSwipeEnd}
+      >
+        {/* Artwork — tap to expand */}
+        <button
+          onClick={() => player.metadata && setExpanded(true)}
+          className={`relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}
+          aria-label="Expand player"
+        >
           <ArtworkImage
             src={metadata.artworkUrl}
             alt={metadata.trackName}
@@ -135,10 +175,14 @@ export function PersistentPlayer({
               </div>
             </div>
           )}
-        </div>
+        </button>
 
-        {/* Track info */}
-        <div className="flex-1 min-w-0">
+        {/* Track info — tap to expand */}
+        <button
+          onClick={() => player.metadata && setExpanded(true)}
+          className="flex-1 min-w-0 text-left"
+          aria-label="Expand player"
+        >
           <p className="text-sm font-medium text-white truncate">{metadata.trackName}</p>
           <div className="flex items-center gap-2">
             {metadata.artistName && (
@@ -148,7 +192,7 @@ export function PersistentPlayer({
               {formatDuration(position)} / {formatDuration(duration)}
             </span>
           </div>
-        </div>
+        </button>
 
         {/* Volume */}
         <PersistentVolumeButton />

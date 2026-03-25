@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **92 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **130+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -91,6 +91,7 @@ On-chain identity, community roles, DAO structure, token economics, and legal co
 | [126](./126-music-player-gap-analysis/) | **Music Player Gap Analysis** | ZAO vs Spotify/Audius/SoundCloud/Sonata: 12 missing features (favorites, history, queue, presence, reactions), prioritized build order, competitive matrix |
 | [127](./127-mobile-player-optimization/) | **Mobile Player Optimization** | MediaSession completion, swipe gestures, expanded full-screen player, crossfade/@regosen/gapless-5, Wake Lock, iOS PWA audio workarounds, haptics |
 | [128](./128-music-player-complete-audit/) | **Music Player Complete Audit** | **CANONICAL** — 23 components, 23 API endpoints, 9 platforms, every feature cataloged + verified in code, 17 future features prioritized in 4 tiers |
+| [130](./130-next-music-integrations/) | **Next Music Integrations (Tier 4)** | Spotify Web API (audio features, recs), Audius SDK deep, Farcaster music embeds, AI recs (pgvector + collaborative filtering), Zora music NFTs on Base, Last.fm scrobbling |
 | [119](./119-songjam-audio-spaces-embed/) | **SongJam Audio Spaces Embed** | Embed songjam.space/zabal iframe for live audio rooms. Fix iframe permissions (microphone/camera). 100ms SDK architecture, LiveAudioRoom component, /zabal page structure |
 | [122](./122-songjam-screen-share-pr/) | **SongJam Screen Share PR** | Add screen sharing to SongJam /spaces via Stream Video SDK. PR plan: MyScreenShareButton + ScreenShareView components. No Daily.co needed — Stream has built-in support |
 
@@ -324,8 +325,8 @@ Start with [40 Audit Guide](./40-codebase-audit-guide/) + [38 AI Code Audit](./3
 
 ## Research Stats
 
-- **Total documents:** 103
-- **Total coverage:** ~300,000+ words
-- **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation
+- **Total documents:** 130+
+- **Total coverage:** ~400,000+ words
+- **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation, fractals, WaveWarZ, music player
 - **Time span:** January — March 2026
-- **Status:** 87/88 complete, 1 incomplete (Hypersnap)
+- **Status:** 129/130+ complete, 1 incomplete (Hypersnap)

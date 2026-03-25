@@ -24,6 +24,7 @@ Use this to quickly find if a topic has already been researched.
 - Music player gap analysis: missing features (favorites, history, queue, presence, reactions) → `126`
 - Mobile player optimization: MediaSession, swipe gestures, expanded player, crossfade, gapless, iOS PWA audio → `127`
 - **Music player complete audit (CANONICAL)**: all 23 components, 23 endpoints, future roadmap → `128`
+- Next music integrations (Tier 4): Spotify API, Audius SDK, Farcaster embeds, AI recs, Zora NFTs, scrobbling → `130`
 
 ## Respect & Governance
 - Respect tokens (aspirational design — tiers/decay NOT implemented) → `04`

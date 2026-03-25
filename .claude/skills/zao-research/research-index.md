@@ -121,3 +121,4 @@
 | 126 | `126-music-player-gap-analysis` | Music player gap analysis: ZAO vs Spotify/Audius/SoundCloud/Sonata, 12 missing features prioritized, build order, competitive matrix |
 | 127 | `127-mobile-player-optimization` | Mobile player gaps: MediaSession completion, swipe gestures, expanded player, crossfade, gapless, Wake Lock, iOS PWA audio, haptics |
 | 128 | `128-music-player-complete-audit` | Full audit: 23 components, 23 API endpoints, 9 platforms, all features cataloged, future roadmap with 17 features prioritized |
+| 130 | `130-next-music-integrations` | Tier 4: Spotify Web API, Audius SDK deep, Farcaster music embeds, AI recs (pgvector), Zora NFTs on Base, Last.fm scrobbling |

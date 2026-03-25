@@ -24,9 +24,10 @@ src/
 │   ├── api/              # Route handlers: /api/[feature]/[action]/route.ts
 │   └── page.tsx          # Landing / login
 ├── components/           # React components organized by feature (chat, messages, music, admin, social, etc.)
-├── hooks/                # Custom hooks: useAuth, useChat, useRadio, useFocusTrap, etc.
-├── contexts/             # React contexts (XMTPContext)
-├── providers/            # Provider wrappers (audio)
+│   └── music/            # 30+ components: player, queue, reactions, binaural beats, lyrics, etc.
+├── hooks/                # Custom hooks: useAuth, useChat, useRadio, usePlayerQueue, useNowPlaying, useListeningRoom, etc.
+├── contexts/             # React contexts (XMTPContext, QueueContext)
+├── providers/            # Provider wrappers (audio: PlayerProvider, HTMLAudioProvider)
 ├── lib/                  # Utilities by domain: auth, db, farcaster, gates, music, xmtp, validation, publish, moderation
 └── types/                # TypeScript type definitions
 community.config.ts       # All community branding, channels, contracts, nav — fork-friendly
@@ -67,6 +68,7 @@ supabase/                 # Database config
 - **Rate limiting:** Middleware-based per-IP limits on API routes (see `src/middleware.ts`).
 - **Cross-platform publishing:** Approved proposals (1000+ Respect) auto-publish to Farcaster + Bluesky + X. Content normalization per platform. Lens + Hive scaffolded but deferred.
 - **AI moderation:** Perspective API for content safety scoring (`src/lib/moderation/moderate.ts`).
+- **Music Player:** Multi-platform (9 providers), crossfade engine (dual audio elements), binaural beats (Web Audio API oscillators), MediaSession API (all 8 actions), Wake Lock, respect-weighted curation.
 - **Community config:** All branding, channels, admin FIDs, contracts in `community.config.ts`. Change this file to fork for a different community.
 
 ## Important Files
@@ -78,6 +80,10 @@ supabase/                 # Database config
 - `src/lib/farcaster/neynar.ts` — Neynar SDK client
 - `src/lib/publish/` — cross-platform publishing (Farcaster, X, normalize, Lens/Hive scaffolds)
 - `src/lib/moderation/moderate.ts` — AI content moderation (Perspective API)
+- `src/providers/audio/PlayerProvider.tsx` — player state, MediaSession, Wake Lock, haptics
+- `src/providers/audio/HTMLAudioProvider.tsx` — dual audio element engine with crossfade
+- `src/components/music/BinauralBeats.tsx` — binaural beats with ambient mixer
+- `src/lib/music/curationWeight.ts` — respect-weighted curation formula
 - `scripts/` — DB setup SQL, wallet generation, webhook registration, data import
 
 ## Research Library

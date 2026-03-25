@@ -122,3 +122,4 @@
 | 127 | `127-mobile-player-optimization` | Mobile player gaps: MediaSession completion, swipe gestures, expanded player, crossfade, gapless, Wake Lock, iOS PWA audio, haptics |
 | 128 | `128-music-player-complete-audit` | Full audit: 23 components, 23 API endpoints, 9 platforms, all features cataloged, future roadmap with 17 features prioritized |
 | 130 | `130-next-music-integrations` | Tier 4: Spotify Web API, Audius SDK deep, Farcaster music embeds, AI recs (pgvector), Zora NFTs on Base, Last.fm scrobbling |
+| 131 | `131-onchain-proposals-governance` | On-chain governance: ZOUNZ Governor (already deployed on Base), Snapshot (gasless), OZ Governor + Respect voting, hybrid 3-tab architecture, implementation plan |

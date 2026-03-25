@@ -2,7 +2,7 @@
 // Direct on-chain OREC contract reader — fallback for when ornode (frapps.xyz) is down.
 // Uses viem to read proposals and respect balances from the OREC contract on Optimism.
 
-import { createPublicClient, http, parseAbi, type Address } from 'viem';
+import { createPublicClient, http, fallback, parseAbi, type Address } from 'viem';
 import { optimism } from 'viem/chains';
 
 // ── Contract Addresses (Optimism) ────────────────────────────────
@@ -51,10 +51,15 @@ export const VoteStatus = {
   3: 'Failed',
 } as const;
 
-// ── Viem public client (singleton) ──────────────────────────────
+// ── Viem public client (singleton) — Alchemy primary for reliability ─
 const client = createPublicClient({
   chain: optimism,
-  transport: http('https://mainnet.optimism.io'),
+  transport: fallback([
+    ...(process.env.ALCHEMY_API_KEY
+      ? [http(`https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`)]
+      : []),
+    http('https://mainnet.optimism.io'),
+  ]),
 });
 
 // ── Types ────────────────────────────────────────────────────────

@@ -136,11 +136,28 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Fetch community profiles to merge artist data
+    const userFids = (users || []).map(u => u.fid).filter(Boolean);
+    const profileMap: Record<number, { category: string; thumbnail_url: string | null; cover_image_url: string | null; biography: string | null; is_featured: boolean; slug: string }> = {};
+
+    if (userFids.length > 0) {
+      const { data: profiles } = await supabaseAdmin
+        .from('community_profiles')
+        .select('fid, category, thumbnail_url, cover_image_url, biography, is_featured, slug')
+        .in('fid', userFids);
+
+      for (const p of profiles || []) {
+        if (p.fid) profileMap[p.fid] = p;
+      }
+    }
+
     // Build unified member records
     const members = (users || []).map(u => {
       const respect = (u.fid ? respectMap[`fid:${u.fid}`] : null)
         || (u.primary_wallet ? respectMap[`wallet:${u.primary_wallet.toLowerCase()}`] : null)
         || null;
+
+      const artistProfile = u.fid ? profileMap[u.fid] || null : null;
 
       return {
         // Identity
@@ -185,6 +202,16 @@ export async function GET(req: NextRequest) {
           onchainZOR: respect.onchain_zor,
           fractalCount: respect.fractal_count,
           firstRespectAt: respect.first_respect_at,
+        } : null,
+
+        // Artist profile (from community_profiles)
+        artistProfile: artistProfile ? {
+          category: artistProfile.category,
+          thumbnailUrl: artistProfile.thumbnail_url,
+          coverImageUrl: artistProfile.cover_image_url,
+          biography: artistProfile.biography,
+          isFeatured: artistProfile.is_featured,
+          slug: artistProfile.slug,
         } : null,
 
         // Activity

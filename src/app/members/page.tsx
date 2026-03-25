@@ -13,9 +13,17 @@ interface Member {
   ensName: string | null;
   zid: string | null;
   tier: string;
+  bio: string | null;
   tags: string[];
   platforms: Record<string, string | null>;
   respect: { total: number; fractalCount: number } | null;
+  artistProfile: {
+    category: string;
+    thumbnailUrl: string | null;
+    coverImageUrl: string | null;
+    biography: string | null;
+    isFeatured: boolean;
+  } | null;
 }
 
 export default function MembersDirectoryPage() {
@@ -103,21 +111,31 @@ export default function MembersDirectoryPage() {
               <Link
                 key={m.id}
                 href={`/members/${m.username || m.fid || m.id}`}
-                className="flex items-center gap-3 px-4 py-3 bg-[#0d1b2a] rounded-xl border border-gray-800/50 hover:border-[#f5a623]/30 transition-colors"
+                className="relative flex items-center gap-3 px-4 py-3 bg-[#0d1b2a] rounded-xl border border-gray-800/50 hover:border-[#f5a623]/30 transition-colors overflow-hidden"
               >
+                {/* Cover image background (if artist profile) */}
+                {m.artistProfile?.coverImageUrl && (
+                  <div className="absolute inset-0 opacity-10">
+                    <Image src={m.artistProfile.coverImageUrl} alt="" fill className="object-cover" sizes="400px" />
+                  </div>
+                )}
+
                 {/* PFP */}
                 <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0">
-                  {m.pfpUrl ? (
-                    <Image src={m.pfpUrl} alt="" fill className="object-cover" sizes="48px" />
+                  {(m.artistProfile?.thumbnailUrl || m.pfpUrl) ? (
+                    <Image src={m.artistProfile?.thumbnailUrl || m.pfpUrl || ''} alt="" fill className="object-cover" sizes="48px" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-600 font-bold">
                       {(m.displayName || m.username || '?')[0]?.toUpperCase()}
                     </div>
                   )}
+                  {m.artistProfile?.isFeatured && (
+                    <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#f5a623] rounded-full border border-[#0d1b2a]" title="Featured" />
+                  )}
                 </div>
 
                 {/* Info */}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 relative">
                   <div className="flex items-center gap-1.5">
                     <span className="text-sm font-medium text-white truncate">
                       {m.displayName || m.username || 'Unknown'}
@@ -127,20 +145,34 @@ export default function MembersDirectoryPage() {
                         #{m.zid}
                       </span>
                     )}
+                    {m.artistProfile?.category && m.artistProfile.category !== 'musician' && (
+                      <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-white/5 text-gray-500 capitalize flex-shrink-0">
+                        {m.artistProfile.category}
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
                     {m.username && <span>@{m.username}</span>}
                     {m.ensName && <span className="text-[#f5a623]">{m.ensName}</span>}
+                    {m.artistProfile?.category === 'musician' && (
+                      <span className="text-purple-400">Musician</span>
+                    )}
                     {m.tier === 'respect_holder' && (
-                      <span className="text-green-400">Respect Holder</span>
+                      <span className="text-green-400">Respect</span>
                     )}
                   </div>
+                  {(m.artistProfile?.biography || m.bio) && (
+                    <p className="text-[10px] text-gray-600 truncate mt-0.5">
+                      {m.artistProfile?.biography || m.bio}
+                    </p>
+                  )}
                 </div>
 
                 {/* Respect */}
                 {m.respect && m.respect.total > 0 && (
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right flex-shrink-0 relative">
                     <p className="text-xs font-mono text-[#f5a623]">{m.respect.total}R</p>
+                    <p className="text-[9px] text-gray-600">{m.respect.fractalCount}f</p>
                   </div>
                 )}
               </Link>

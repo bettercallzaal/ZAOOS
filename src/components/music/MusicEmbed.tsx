@@ -8,6 +8,7 @@ import { formatDuration } from '@/lib/music/formatDuration';
 import type { PlatformLink } from '@/lib/music/songlink';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 
 interface MusicEmbedProps {
   url: string;
@@ -281,6 +282,9 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
             )}
           </div>
         </div>
+
+        {/* Add to playlist */}
+        <AddToPlaylistButton songUrl={url} compact className="flex-shrink-0" />
 
         {/* Share to Farcaster */}
         <ShareToFarcaster

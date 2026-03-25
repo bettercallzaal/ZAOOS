@@ -7,6 +7,7 @@ import type { RepeatMode } from '@/providers/audio/PlayerProvider';
 import { Scrubber } from './Scrubber';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
+import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 
 interface GlobalPlayerProps {
   onPrev?: () => void;
@@ -184,8 +185,11 @@ export function GlobalPlayer({
           </div>
         </div>
 
-        {/* Right: Volume + Queue + platform badge */}
+        {/* Right: Volume + Queue + playlist + platform badge */}
         <div className="flex items-center gap-3 w-48 flex-shrink-0 justify-end">
+          {/* Add to playlist */}
+          <AddToPlaylistButton songUrl={metadata.url} compact />
+
           {/* Volume */}
           <div className="flex items-center gap-1.5 group">
             <button
@@ -295,6 +299,9 @@ export function GlobalPlayer({
               </span>
             </div>
           </div>
+
+          {/* Add to playlist (mobile) */}
+          <AddToPlaylistButton songUrl={metadata.url} compact className="flex-shrink-0" />
 
           {/* Controls */}
           <div className="flex items-center gap-1 flex-shrink-0">

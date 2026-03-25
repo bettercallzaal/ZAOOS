@@ -6,6 +6,7 @@ import { TrackMetadata } from '@/types/music';
 import { TrackType } from '@/types/music';
 import { usePlayer } from '@/providers/audio';
 import { WaveformPlayer } from '@/components/music/WaveformPlayerWrapper';
+import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 
 const PLATFORM_LABELS: Record<TrackType, string> = {
   spotify: 'Spotify',
@@ -164,61 +165,66 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
         isCurrentTrack ? 'bg-[#f5a623]/10' : ''
       }`}
     >
-      <button
-        onClick={handleClick}
-        className="w-full flex items-center gap-2 px-3 py-2 text-left"
-      >
-        {/* Track number / playing indicator */}
-        <div className="w-5 flex-shrink-0 flex items-center justify-center">
-          {isCurrentTrack && player.isPlaying ? (
-            <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-            </svg>
-          ) : isCurrentTrack ? (
-            <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          ) : (
-            <span className="text-xs text-gray-600">{index + 1}</span>
-          )}
-        </div>
-
-        {/* Artwork */}
-        <div
-          className={`relative w-8 h-8 flex-shrink-0 rounded overflow-hidden bg-gray-800 ${
-            isCurrentTrack && player.isPlaying ? 'ring-1 ring-[#f5a623]' : ''
-          }`}
+      <div className="flex items-center gap-2 px-3 py-2">
+        <button
+          onClick={handleClick}
+          className="flex items-center gap-2 flex-1 min-w-0 text-left"
         >
-          {metadata.artworkUrl ? (
-            <Image
-              src={metadata.artworkUrl}
-              alt={metadata.trackName}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+          {/* Track number / playing indicator */}
+          <div className="w-5 flex-shrink-0 flex items-center justify-center">
+            {isCurrentTrack && player.isPlaying ? (
+              <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
               </svg>
-            </div>
-          )}
-        </div>
+            ) : isCurrentTrack ? (
+              <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            ) : (
+              <span className="text-xs text-gray-600">{index + 1}</span>
+            )}
+          </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <p
-            className={`text-xs font-medium truncate ${
-              isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
+          {/* Artwork */}
+          <div
+            className={`relative w-8 h-8 flex-shrink-0 rounded overflow-hidden bg-gray-800 ${
+              isCurrentTrack && player.isPlaying ? 'ring-1 ring-[#f5a623]' : ''
             }`}
           >
-            {metadata.trackName}
-          </p>
-          <p className="text-xs text-gray-400 truncate">
-            {metadata.artistName || PLATFORM_LABELS[type]}
-          </p>
-        </div>
-      </button>
+            {metadata.artworkUrl ? (
+              <Image
+                src={metadata.artworkUrl}
+                alt={metadata.trackName}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                </svg>
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <p
+              className={`text-xs font-medium truncate ${
+                isCurrentTrack ? 'text-[#f5a623]' : 'text-white'
+              }`}
+            >
+              {metadata.trackName}
+            </p>
+            <p className="text-xs text-gray-400 truncate">
+              {metadata.artistName || PLATFORM_LABELS[type]}
+            </p>
+          </div>
+        </button>
+
+        {/* Add to playlist */}
+        <AddToPlaylistButton songUrl={url} compact className="flex-shrink-0" />
+      </div>
 
       {/* Waveform for Audius tracks */}
       {showWaveform && (

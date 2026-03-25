@@ -33,7 +33,7 @@ cp .env.example .env.local    # fill in env vars
 npm run dev                    # starts on localhost:3000
 ```
 
-**Database:** Run these SQL scripts in Supabase SQL Editor (in order):
+**Database:** Run SQL scripts from `scripts/` in Supabase SQL Editor. Applied migrations are archived in `scripts/migrations/applied/`. Core setup scripts:
 
 ```
 scripts/setup-database.sql
@@ -44,13 +44,9 @@ scripts/create-notifications.sql
 scripts/create-respect-tables.sql
 scripts/create-streaks-tables.sql
 scripts/create-track-of-day.sql
-scripts/fix-scheduled-casts-rls.sql
-scripts/add-notifications-rls.sql
-scripts/create-music-library.sql
-scripts/add-member-crm-columns.sql
-scripts/fix-proposal-categories-v2.sql
-scripts/create-respect-transfers.sql
 ```
+
+Additional migrations (all in `scripts/migrations/applied/`): music library, playlists, song likes, song reactions, song comments, collaborative playlists, poll config, respect transfers, member CRM columns, and more.
 
 **App wallet:** Generate a dedicated signing wallet (never use personal keys):
 
@@ -91,9 +87,9 @@ See `.env.example` for all required environment variables. Key services:
   - `src/middleware.ts`
 - [x] **Zod validation** — every API route validates input with Zod safeParse
   - `src/lib/validation/schemas.ts`
-- [x] **Admin panel** — 6-tab admin dashboard (users, ZIDs, allowlist, respect, moderation, import)
+- [x] **Admin panel** — 7-tab admin dashboard (users, ZIDs, allowlist, respect, moderation, import, polls)
   - `src/app/(auth)/admin/`
-  - `src/components/admin/` (UsersTable, ZidManager, AllowlistTable, RespectOverview, HiddenMessages, CsvUpload, SyncRespectButton, ImportRespectButton)
+  - `src/components/admin/` (UsersTable, ZidManager, AllowlistTable, RespectOverview, HiddenMessages, CsvUpload, SyncRespectButton, ImportRespectButton, PollConfigEditor)
 - [x] **Member CRM** — unified directory + data health dashboard at `/admin/members`
   - `src/app/(auth)/admin/members/page.tsx`
   - `src/app/api/members/directory/route.ts` — unified member view (identity, wallets, platforms, respect, activity)
@@ -178,60 +174,85 @@ See `.env.example` for all required environment variables. Key services:
 
 #### Music
 
-- [x] **8-platform inline player** — Spotify, SoundCloud, YouTube, Audius, Sound.xyz, Apple Music, Tidal, Bandcamp
+- [x] **9-platform inline player** — Spotify, SoundCloud, YouTube, Audius, Sound.xyz, Apple Music, Tidal, Bandcamp, generic audio
   - `src/components/music/MusicEmbed.tsx` · `src/components/music/UniversalLinkCard.tsx`
-  - `src/providers/audio/` (8 platform-specific providers + PlayerProvider orchestrator)
-  - `src/lib/music/` (isMusicUrl, findMusicEmbed, songlink, formatDuration)
+  - `src/providers/audio/` (9 platform-specific providers + PlayerProvider orchestrator)
+  - `src/lib/music/` (isMusicUrl, findMusicEmbed, songlink, formatDuration, curationWeight)
   - `src/app/api/music/metadata/route.ts`
-- [ ] **Auto-skip on error** — skip failed tracks after 5s timeout, retry button, 3-failure pause
-- [ ] **Add to queue from chat** — queue button on inline music embeds in chat messages
-- [x] **Unified persistent player** — one player on ALL pages (including chat), idle "ZAO Radio" bar, sidebar drawer
-  - `src/components/music/PersistentPlayer.tsx` — idle state + active state + sidebar toggle
-  - `src/components/music/PersistentPlayerWithRadio.tsx` — global wrapper managing sidebar state
-  - `src/components/music/MusicSidebar.tsx` — right-side drawer with Library/Queue/Playlists tabs
-- [x] **Audio persists across navigation** — module-level singleton pattern for YouTube/SoundCloud/Spotify providers
-  - `src/providers/audio/YoutubeProvider.tsx` · `SoundcloudProvider.tsx` · `SpotifyProvider.tsx`
+- [x] **Unified persistent player** — one player on ALL pages, idle "ZAO Radio" bar, sidebar drawer
+  - `src/components/music/PersistentPlayer.tsx` — volume, like, playlist, prev/play/next, expand
+  - `src/components/music/PersistentPlayerWithRadio.tsx` — global wrapper
+  - `src/components/music/MusicSidebar.tsx` — right-side drawer with user queue + channel queue
+- [x] **Expanded full-screen player** — tap compact bar to expand with large artwork, full scrubber, all controls
+  - `src/components/music/ExpandedPlayer.tsx` — shuffle, repeat, like, playlist, share, crossfade toggle, lyrics, waveform comments
+- [x] **Swipe to skip** — horizontal swipe on compact bar and expanded artwork to skip tracks, haptic feedback
+- [x] **Crossfade engine** — dual audio element system for smooth transitions (0-12s configurable)
+  - `src/providers/audio/HTMLAudioProvider.tsx` — dual `<audio>` elements with fade in/out
+  - `src/components/music/CrossfadeSettings.tsx` — settings UI (off / 1s / 2s / 3s / 5s / 8s / 12s)
+  - Configurable in Settings page (Music & Playback section) + quick toggle in expanded player
+- [x] **Complete MediaSession API** — all 8 lock screen actions + progress bar
+  - play, pause, nexttrack, previoustrack, seekbackward, seekforward, seekto, stop
+  - `setPositionState()` for lock screen scrubber + time display
+- [x] **Wake Lock** — `navigator.wakeLock.request('screen')` keeps screen on during playback
+- [x] **Haptic feedback** — `navigator.vibrate(10)` on play, pause, resume, stop, skip
 - [x] **Player state persists across refresh** — localStorage save/restore, resume at saved position
-  - `src/providers/audio/PlayerProvider.tsx` (restoredTrack, pendingSeekRef)
-- [x] **Media Session API** — lock screen controls, background audio on mobile
-  - Play/pause/next track on lock screen, artwork + title metadata
-- [x] **PWA manifest** — standalone app mode, "Add to Home Screen" for background audio
-  - `public/manifest.json` · apple-mobile-web-app-capable meta tags
-- [x] **Music queue** — auto-advance, shuffle, repeat, queue from feed
-  - `src/hooks/useMusicQueue.ts`
-  - `src/components/music/MusicSidebar.tsx` · `src/components/music/MusicQueueTrackCard.tsx`
-- [ ] **Queue persistence** — save queue to localStorage, restore on refresh
-- [x] **Community radio** — Audius playlist stations with continuous playback
-  - `src/app/api/music/radio/route.ts`
-  - `src/components/music/RadioButton.tsx` · `src/providers/audio/RadioProvider.tsx`
-  - `src/hooks/useRadio.ts`
-- [ ] **Radio + queue integration** — manual queue additions while radio plays, resume radio when queue empties
-- [x] **Song submissions + voting** — community curation per channel
+- [x] **Queue management** — add-next, add-to-queue, remove, reorder
+  - `src/hooks/usePlayerQueue.ts` · `src/contexts/QueueContext.tsx`
+  - `src/components/music/QueueActions.tsx` — "Play Next" / "Add to Queue" popover on all track cards
+  - User queue section at top of MusicSidebar with remove buttons
+- [x] **Liked/Favorite songs** — heart button with optimistic toggle, like count, social proof
+  - `src/app/api/music/library/like/route.ts` · `src/components/music/LikeButton.tsx`
+  - "Liked by DanSingJoy + 4 others" social proof on track cards
+- [x] **Add to playlist** — popover with user playlists + inline "New playlist" creation
+  - `src/components/music/AddToPlaylistButton.tsx`
+- [x] **Collaborative playlists** — multi-user playlists with "collab" badge
+  - `collaborative` column on playlists table, API updated for shared adding
+- [x] **Track reactions** — 6 emoji reactions (🔥 ❤️ 🎵 💎 👏 🤯) with counts
+  - `src/app/api/music/library/react/route.ts` · `src/components/music/TrackReactions.tsx`
+- [x] **Now Playing presence** — Supabase Realtime broadcast of current track
+  - `src/hooks/useNowPlaying.ts` · `src/components/music/NowPlayingBar.tsx`
+- [x] **Share track to chat** — one-tap share music URL to /zao channel
+  - `src/components/music/ShareToChatButton.tsx`
+- [x] **Community radio** — 3 Audius stations with continuous playback, station switching
+  - `src/app/api/music/radio/route.ts` · `src/providers/audio/RadioProvider.tsx`
+- [x] **Song submissions + voting** — community curation per channel with admin review
   - `src/app/api/music/submissions/route.ts` · `src/app/api/music/submissions/vote/route.ts`
-  - `src/components/music/SongSubmit.tsx` · `src/components/music/QuickAddSong.tsx`
-- [x] **Music link resolver** — Songlink/Odesli API with 7-day cache
-  - `src/app/api/music/resolve/route.ts`
-  - `src/lib/music/songlink.ts`
-- [x] **Music library** — persistent song database, every link shared auto-saved, search/filter/sort
-  - `src/lib/music/library.ts` (upsertSong, querySongs, incrementPlayCount, extractAndSaveSongs)
-  - `src/app/api/music/library/route.ts` — browse + add songs
-  - `src/app/api/music/library/play/route.ts` — track play counts
-  - `scripts/create-music-library.sql` — songs + playlists + playlist_tracks tables
-- [x] **Playlists** — personal + community + TOTD Archive auto-playlist
+- [x] **Music library** — persistent song database, search/filter/sort, auto-save from chat
+  - `src/lib/music/library.ts` · `src/app/api/music/library/route.ts`
+- [x] **Playlists** — personal + community + collaborative + TOTD Archive
   - `src/app/api/music/playlists/` — CRUD + track management
-- [x] **Music NFT discovery** — multi-chain via Alchemy NFT API (ETH, Optimism, Base) with Sound.xyz + Zora fallback
-  - `src/app/api/music/wallet/route.ts` — primary: Alchemy getNftsForOwner, fallback: direct APIs
-- [x] **Waveform visualization** — Wavesurfer.js audio waveforms
-  - `src/components/music/WaveformPlayer.tsx` · `src/components/music/WaveformPlayerWrapper.tsx`
+- [x] **Listening history** — "History" tab on Music page sorted by last_played_at
+- [x] **Sleep timer** — 15m / 30m / 1hr / end-of-track with countdown badge (desktop)
+  - `src/components/music/SleepTimerButton.tsx`
+- [x] **Lyrics display** — lyrics.ovh + lyrist fallback with in-memory cache, toggle in expanded player
+  - `src/app/api/music/lyrics/route.ts` · `src/components/music/LyricsPanel.tsx`
+- [x] **Waveform comments** — SoundCloud-style timestamped comments on tracks
+  - `src/app/api/music/comments/route.ts` · `src/components/music/WaveformComments.tsx`
+- [x] **Artist profiles** — aggregated stats (tracks, plays, likes) with top tracks
+  - `src/app/api/music/artists/route.ts` · `src/components/music/ArtistCard.tsx`
+- [x] **Respect-weighted curation** — high-Respect members' likes surface tracks higher (ZAO exclusive)
+  - `src/lib/music/curationWeight.ts` — `log2(respect + 1)` weighting formula
+  - `src/app/api/music/trending-weighted/route.ts` · `src/components/music/RespectTrending.tsx`
+- [x] **Top Curators leaderboard** — ranked by total likes received on shared tracks
+  - `src/app/api/music/curators/route.ts` · `src/components/music/TopCurators.tsx`
+- [x] **Binaural beats** — 5 presets (Delta/Theta/Alpha/Beta/Schumann) + custom frequencies
+  - Web Audio API dual oscillators with true stereo channel separation
+  - `src/components/music/BinauralBeats.tsx` — presets, timer, volume, custom carrier/beat sliders
+  - `src/components/music/AmbientMixer.tsx` — white/pink/brown noise layers
+  - Save custom presets to localStorage
+- [x] **Music NFT discovery** — multi-chain via Alchemy NFT API (ETH, Optimism, Base)
+  - `src/app/api/music/wallet/route.ts`
+- [x] **Waveform visualization** — Wavesurfer.js for Audius tracks
+  - `src/components/music/WaveformPlayer.tsx`
 - [x] **Listening rooms** — shared music playback via Supabase Realtime
   - `src/hooks/useListeningRoom.ts`
-  - `src/components/calls/ListeningRoom.tsx`
-- [x] **Track of the Day** — daily community-curated highlight with nomination, voting, countdown timer
-  - `src/app/api/music/track-of-day/` (3 routes: list/vote/select)
-  - `src/components/music/TrackOfTheDay.tsx`
-  - `scripts/create-track-of-day.sql`
-- [ ] **TOTD share to chat** — "Share to #zao" button on Track of the Day
-- [ ] **AI taste profiles** — personalized music recommendations from listening history
+- [x] **Track of the Day** — daily nomination, voting, admin selection, countdown
+  - `src/app/api/music/track-of-day/` (3 routes)
+- [x] **Music page** — 10 tabs: Radio, TOTD, Submissions, Trending, Playlists, Binaural, Liked, History, Curators
+  - `src/components/music/MusicPage.tsx` (39KB)
+- [x] **Volume control** — desktop inline slider + mobile popover on persistent player + full slider in expanded player
+- [x] **Cross-platform links** — Songlink/Odesli "Also on:" row on embeds
+- [ ] **AI taste profiles** — pgvector embeddings for personalized recommendations (researched, doc 130)
 
 #### Social Graph
 
@@ -261,33 +282,48 @@ See `.env.example` for all required environment variables. Key services:
 
 ### Pillar 2: Governance
 
-#### Proposals
+#### Three-Tier Governance System
 
-- [x] **Proposals CRUD** — create, list, update status. `/governance` redirects to `/fractals?tab=proposals`
+**Governance tab has three distinct sections with visual separation:**
+
+##### 1. ZOUNZ On-Chain Proposals (Nouns Builder on Base)
+
+- [x] **ZOUNZ Governor** — reads from deployed Nouns Builder Governor contract on Base
+  - `src/lib/zounz/contracts.ts` — Token, Auction, Governor, Treasury addresses + ABIs
+  - `src/app/api/zounz/proposals/route.ts` — reads proposalCount, threshold, quorum
+  - `src/components/zounz/ZounzProposals.tsx` — proposal count, user voting power (wagmi), links to nouns.build
+  - NFT = 1 vote, trustless on-chain execution via timelock
+- [x] **ZOUNZ Auction** — daily NFT auctions with bid UI
+  - `src/components/zounz/ZounzAuction.tsx`
+
+##### 2. Snapshot Gasless Polls
+
+- [x] **Snapshot weekly priority polls** — one-click creation via `@snapshot-labs/snapshot.js`
+  - `src/lib/snapshot/client.ts` — GraphQL client for active/recent polls
+  - `src/app/api/snapshot/polls/route.ts` — public endpoint for poll data
+  - `src/components/governance/SnapshotPolls.tsx` — active polls with score bar charts, "Vote on Snapshot" links
+  - `src/components/governance/CreateWeeklyPoll.tsx` — admin one-click creator (10 workstream choices, 7-day period)
+  - Approval voting (multi-select), snapshot.js Client712 with viem-to-ethers wallet shim
+- [x] **Admin poll config** — customize choices, templates, duration from admin panel
+  - `src/app/api/admin/poll-config/route.ts` — GET (public) / PUT (admin)
+  - `src/components/admin/PollConfigEditor.tsx` — add/remove/reorder/edit choices, save to DB
+
+##### 3. Community Proposals (Supabase + Respect-Weighted)
+
+- [x] **Proposals CRUD** — create, list, update status. Proposals tab is default on governance page.
   - `src/app/api/proposals/route.ts` (GET, POST, PATCH)
-  - `src/app/(auth)/fractals/ProposalsTab.tsx` — consolidated proposals + social posts
-- [x] **Social posts** — quick-create with just a text box, auto-categorized as "social", pink accent
-  - Two buttons: "+ Proposal" (gold, full form) and "+ Social Post" (pink, simplified)
-  - Links in descriptions render as clickable gold links
-  - Published post links: "View on Farcaster" / "View on Bluesky" / "View on X" buttons
-- [x] **Respect-weighted voting** — on-chain OG + ZOR balance queried at vote time via multicall
-  - `src/app/api/proposals/vote/route.ts`
-- [x] **Proposal comments** — threaded comments with notifications
-  - `src/app/api/proposals/comment/route.ts`
+  - `src/app/(auth)/fractals/ProposalsTab.tsx`
+- [x] **Social posts** — quick-create, auto-categorized "social", pink accent
+- [x] **Respect-weighted voting** — on-chain OG + ZOR balance via multicall, optimistic update
+  - `src/app/api/proposals/vote/route.ts` — with upsert fallback + error revert
+- [x] **7-day voting period** — default closes_at auto-set, deferred publishing until deadline
+- [x] **Auto-publish after deadline** — proposals publish to Farcaster + Bluesky + X only AFTER voting period ends AND 1000R threshold met
+  - Auto-approve check runs on GET /api/proposals for expired proposals
+- [x] **Proposal comments** — threaded with notifications
   - `src/components/governance/ProposalComments.tsx`
-- [ ] **Vote breakdown view** — see who voted, vote weight per voter, % of total
-- [x] **Auto-publish threshold** — proposals auto-publish to Farcaster + Bluesky + X at 1000 Respect votes
-  - `src/app/api/publish/farcaster/route.ts` · `src/app/api/publish/x/route.ts`
-  - `src/lib/publish/x.ts` · `src/lib/publish/normalize.ts`
-  - Attribution: "Proposed by @author, Approved by ZAO governance, from zaoos.com"
-  - View on Farcaster / View on Bluesky / View on X buttons on published proposals
-  - Error tracking for all 3 platforms shown in UI
-- [x] **Proposal status transitions** — admin PATCH endpoint: open -> approved -> rejected -> completed
-  - `src/app/api/proposals/route.ts` (PATCH handler)
-- [x] **Auto-close on deadline** — countdown display via `formatTimeRemaining`, blocks voting after expiry
-  - `src/app/(auth)/governance/page.tsx` · `src/lib/format/timeAgo.ts`
-- [x] **Zero-weight vote handling** — vote recorded with warning, weight displayed transparently
-  - `src/app/api/proposals/vote/route.ts`
+- [x] **Status transitions** — open → approved → rejected → completed → published
+- [x] **Zero-weight vote handling** — vote recorded with warning
+- [ ] **Vote breakdown view** — see who voted, vote weight per voter
 
 #### Respect System
 
@@ -471,7 +507,8 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
   - `src/app/api/community-issues/route.ts`
 - [x] **Neynar webhooks** — receive cast reactions and follow events
   - `src/app/api/webhooks/neynar/route.ts`
-- [ ] **Nouns Builder / ZABAL integration** — native auction UI, governance integration
+- [x] **Nouns Builder / ZOUNZ integration** — on-chain Governor proposals, NFT auction UI, voting power display
+  - `src/components/zounz/ZounzProposals.tsx` · `src/components/zounz/ZounzAuction.tsx`
 - [x] **Music approval queue** — curator-reviewed submission pipeline
   - `src/app/api/moderation/queue/route.ts`
 
@@ -504,7 +541,8 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 | **Blockchain** | Wagmi + Viem (Optimism) | 2.x |
 | **Wallet UI** | RainbowKit | 2.x |
 | **Validation** | Zod | 4.x |
-| **Music** | 8 platform providers + Wavesurfer.js | — |
+| **Music** | 9 platform providers + Wavesurfer.js + Web Audio (binaural) | — |
+| **Governance** | Nouns Builder Governor + Snapshot.js + Supabase | — |
 | **State** | React Query (@tanstack/react-query) | 5.x |
 | **Analytics** | PostHog + Vercel Analytics | — |
 | **Testing** | Vitest | 3.x |
@@ -513,7 +551,9 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 | **Moderation** | Perspective API (Google Jigsaw) | — |
 | **Deployment** | Vercel | — |
 
-### On-Chain Contracts (Optimism)
+### On-Chain Contracts
+
+**Optimism:**
 
 | Contract | Address |
 |----------|---------|
@@ -521,6 +561,15 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 | ZOR Respect (ERC-1155) | `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c` |
 | Hats Protocol v1 | `0x3bc1A0Ad72417f2d411118085256fC53CBdDd137` |
 | Multicall3 | `0xcA11bde05977b3631167028862bE2a173976CA11` |
+
+**Base (ZOUNZ Nouns Builder DAO):**
+
+| Contract | Address |
+|----------|---------|
+| ZOUNZ Token (ERC-721) | `0xCB80Ef04DA68667c9a4450013BDD69269842c883` |
+| ZOUNZ Auction | `0xb2d43035c1d8b84bc816a5044335340dbf214bfb` |
+| ZOUNZ Governor | `0x9d98ec4ba9f10c942932cbde7747a3448e56817f` |
+| ZOUNZ Treasury | `0x2bb5fd99f870a38644deafe7e4ecb62ac77a213f` |
 
 ### Key Files
 
@@ -533,12 +582,15 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 | `src/lib/farcaster/neynar.ts` | Neynar SDK wrapper |
 | `src/lib/validation/schemas.ts` | All Zod schemas |
 | `src/contexts/XMTPContext.tsx` | XMTP state management (500+ lines) |
-| `src/providers/audio/` | 8 audio platform providers |
+| `src/providers/audio/` | 9 audio platform providers + PlayerProvider (crossfade, MediaSession, Wake Lock) |
+| `src/lib/zounz/contracts.ts` | ZOUNZ DAO contract addresses + ABIs (Token, Auction, Governor, Treasury) |
+| `src/lib/snapshot/client.ts` | Snapshot GraphQL client for reading polls |
+| `src/lib/music/curationWeight.ts` | Respect-weighted curation formula: `log2(respect + 1)` |
 | `src/lib/ordao/client.ts` | Direct OREC contract reader via viem — on-chain fallback for proposals + respect |
 | `src/lib/format/timeAgo.ts` | Relative time, deadline countdown, wallet shortener, number formatter |
 | `src/lib/publish/` | Cross-platform publishing (Farcaster, X, normalize, Lens/Hive scaffolds) |
 | `src/lib/moderation/moderate.ts` | AI moderation via Perspective API |
-| `src/hooks/` | 13 custom hooks (auth, chat, radio, music queue, ENS, Lens auth, etc.) |
+| `src/hooks/` | 16+ custom hooks (auth, chat, radio, playerQueue, nowPlaying, listeningRoom, ENS, etc.) |
 
 ---
 
@@ -551,8 +603,8 @@ src/
 │   ├── api/              # 121 route handlers: /api/[feature]/[action]/route.ts
 │   └── page.tsx          # Landing / login
 ├── components/           # React components by feature (chat, messages, music, admin, social, etc.)
-├── hooks/                # 13 custom hooks (useAuth, useChat, useRadio, useMusicQueue, useLensAuth, useENS, etc.)
-├── contexts/             # React contexts (XMTPContext)
+├── hooks/                # 16+ custom hooks (useAuth, useChat, useRadio, usePlayerQueue, useNowPlaying, useListeningRoom, useENS, etc.)
+├── contexts/             # React contexts (XMTPContext, QueueContext)
 ├── providers/            # Provider wrappers (8 audio providers, PostHog)
 ├── lib/                  # Utilities by domain (auth, db, farcaster, gates, music, xmtp, hats, publish, moderation, etc.)
 └── types/                # TypeScript type definitions
@@ -588,10 +640,13 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 | **4** | Moderation & search — AI moderation (Perspective API), full-text search (tsvector), music approval queue | Done |
 | **Cross-platform** | Approved proposals auto-publish to Farcaster + Bluesky + X at 1000 Respect | Done |
 | **Settings** | Unified accounts section (Wallet, Farcaster, Bluesky, Solana, X), features, socials | Done |
+| **Music Player** | 30+ components: liked songs, queue, reactions, crossfade, binaural beats, lyrics, waveform comments, artist profiles, respect-weighted curation, curators leaderboard | Done |
+| **Mobile Polish** | Complete MediaSession (8 actions), expanded player, swipe gestures, haptics, Wake Lock | Done |
+| **Governance** | Three-tier system: ZOUNZ on-chain + Snapshot weekly polls + Community proposals. Admin poll config. 7-day voting + deferred publishing. | Done |
+| **Member Profiles** | Public directory + profiles, ENS resolution, cover images, respect breakdown, badges, completeness indicator | Done |
 | **5** | Hats & Treasury — Hats tree deployment on Optimism, Safe multisig, HSG v2 | Planned (Q3 2026) |
 | **6** | AI Agent — ElizaOS + Claude + pgvector, welcome DMs, music recs | Planned (Q4 2026) |
-| **7** | Additional cross-platform — Lens (deferred: wallet mismatch blocker), Hive/InLeo (deferred) | Planned |
-| **8** | Nouns Builder / ZABAL — native auction UI, governance integration | Planned (2027) |
+| **7** | Music Tier 4 — Farcaster embeds, Audius SDK, Zora collectibles, Spotify features, AI recs | Planned (see doc 130) |
 
 ---
 
@@ -600,7 +655,7 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 ZAO OS is open source. Fork it, build on it, make it yours.
 
 - [GitHub Issues](https://github.com/bettercallzaal/zaoos/issues) — bugs and feature requests
-- [Research Library](./research/) — 136 docs of context
+- [Research Library](./research/) — 133+ docs of context
 - [QA Test Checklist](./docs/QA-TEST-CHECKLIST.md) — testing procedures
 - [Internal Plans](./docs/superpowers/plans/) — execution plans for upcoming sprints
 

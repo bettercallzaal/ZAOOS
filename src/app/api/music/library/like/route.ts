@@ -30,24 +30,57 @@ export async function GET(req: NextRequest) {
       .maybeSingle();
 
     if (!song) {
-      return NextResponse.json({ liked: false, likeCount: 0 });
+      return NextResponse.json({ liked: false, likeCount: 0, likers: [] });
     }
 
-    // Check if user has liked it
-    const { data: like } = await supabaseAdmin
-      .from('user_song_likes')
-      .select('id')
-      .eq('user_fid', session.fid)
-      .eq('song_id', song.id)
-      .maybeSingle();
+    // Check if user has liked it + get total count + get recent likers in parallel
+    const [likeResult, countResult, likersResult] = await Promise.allSettled([
+      supabaseAdmin
+        .from('user_song_likes')
+        .select('id')
+        .eq('user_fid', session.fid)
+        .eq('song_id', song.id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from('user_song_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('song_id', song.id),
+      supabaseAdmin
+        .from('user_song_likes')
+        .select('user_fid')
+        .eq('song_id', song.id)
+        .order('created_at', { ascending: false })
+        .limit(5),
+    ]);
 
-    // Get total like count
-    const { count } = await supabaseAdmin
-      .from('user_song_likes')
-      .select('*', { count: 'exact', head: true })
-      .eq('song_id', song.id);
+    const like = likeResult.status === 'fulfilled' ? likeResult.value.data : null;
+    const count = countResult.status === 'fulfilled' ? countResult.value.count : 0;
+    const likerRows = likersResult.status === 'fulfilled' ? likersResult.value.data : [];
 
-    return NextResponse.json({ liked: !!like, likeCount: count || 0 });
+    // Fetch user details for likers from the users table
+    let likers: Array<{ fid: number; username: string; displayName: string | null }> = [];
+    if (likerRows && likerRows.length > 0) {
+      const fids = likerRows.map((r: { user_fid: number }) => r.user_fid);
+      const { data: users } = await supabaseAdmin
+        .from('users')
+        .select('fid, username, display_name')
+        .in('fid', fids);
+
+      if (users) {
+        // Preserve the order from likerRows (most recent first)
+        const userMap = new Map(users.map((u: { fid: number; username: string; display_name: string | null }) => [u.fid, u]));
+        likers = fids
+          .map((fid: number) => {
+            const u = userMap.get(fid);
+            return u
+              ? { fid: u.fid, username: u.username || '', displayName: u.display_name }
+              : { fid, username: '', displayName: null };
+          })
+          .filter((l: { fid: number; username: string; displayName: string | null }) => l.username);
+      }
+    }
+
+    return NextResponse.json({ liked: !!like, likeCount: count || 0, likers });
   } catch (err) {
     console.error('[like] GET failed:', err);
     return NextResponse.json({ error: 'Failed to check like status' }, { status: 500 });

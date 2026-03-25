@@ -9,6 +9,7 @@ import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
 import { communityConfig } from '@/../community.config';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
+import { RespectTrending } from '@/components/music/RespectTrending';
 
 const TrackOfTheDay = dynamic(
   () => import('@/components/music/TrackOfTheDay').then((m) => m.TrackOfTheDay),
@@ -17,6 +18,11 @@ const TrackOfTheDay = dynamic(
 
 const BinauralBeats = dynamic(
   () => import('@/components/music/BinauralBeats').then((m) => m.BinauralBeats),
+  { ssr: false },
+);
+
+const TopCurators = dynamic(
+  () => import('@/components/music/TopCurators').then((m) => m.TopCurators),
   { ssr: false },
 );
 
@@ -33,7 +39,7 @@ type Submission = {
   user_voted: boolean;
 };
 
-const TABS = ['Radio', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Binaural', 'Liked', 'History'] as const;
+const TABS = ['Radio', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Binaural', 'Liked', 'History', 'Curators'] as const;
 type Tab = (typeof TABS)[number];
 
 const SECTION_IDS: Record<Tab, string> = {
@@ -45,6 +51,7 @@ const SECTION_IDS: Record<Tab, string> = {
   Binaural: 'section-binaural',
   Liked: 'section-liked',
   History: 'section-history',
+  Curators: 'section-curators',
 };
 
 
@@ -182,6 +189,7 @@ export function MusicPage() {
         {/* ── Section 3: Trending ──────────────────────────────────── */}
         <section id={SECTION_IDS.Trending}>
           <TrendingSection />
+          <RespectTrending />
         </section>
 
         {/* ── Section 4: Community Playlists ───────────────────────── */}
@@ -202,6 +210,11 @@ export function MusicPage() {
         {/* ── Section: Listening History ───────────────────── */}
         <section id={SECTION_IDS.History}>
           <HistorySection />
+        </section>
+
+        {/* ── Section: Top Curators ──────────────────────────── */}
+        <section id={SECTION_IDS.Curators}>
+          <TopCurators />
         </section>
       </div>
     </div>

@@ -12,6 +12,7 @@ import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 import { LikeButton } from '@/components/music/LikeButton';
 import { ShareToChatButton } from '@/components/music/ShareToChatButton';
 import { QueueActions } from '@/components/music/QueueActions';
+import { TrackReactions } from '@/components/music/TrackReactions';
 
 interface MusicEmbedProps {
   url: string;
@@ -361,6 +362,11 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
           ))}
         </div>
       )}
+
+      {/* Emoji reactions */}
+      <div className="px-3 pb-2">
+        <TrackReactions songUrl={url} compact className="" />
+      </div>
 
       {/* Progress bar — shown when this track is playing */}
       {isThisTrack && player.duration > 0 && (

@@ -8,6 +8,7 @@ import { Scrubber } from '@/components/music/Scrubber';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 import { ShareToChatButton } from '@/components/music/ShareToChatButton';
+import { TrackReactions } from '@/components/music/TrackReactions';
 import type { TrackMetadata } from '@/types/music';
 
 interface ExpandedPlayerProps {
@@ -249,6 +250,9 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             {metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}
           </span>
         </div>
+
+        {/* Emoji reactions */}
+        <TrackReactions songUrl={metadata.url} className="justify-center" />
 
         {/* Volume slider */}
         <div className="flex items-center gap-3">

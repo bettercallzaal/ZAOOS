@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
-const SIGNING_KEY = process.env.ALCHEMY_WEBHOOK_SIGNING_KEY || '';
+// Two webhooks, two signing keys (ZOR ERC-1155 + OG ERC-20)
+const SIGNING_KEYS = [
+  process.env.ALCHEMY_WEBHOOK_KEY_ZOR,
+  process.env.ALCHEMY_WEBHOOK_KEY_OG,
+  process.env.ALCHEMY_WEBHOOK_SIGNING_KEY, // legacy single-key fallback
+].filter(Boolean) as string[];
+
 const ZOR_CONTRACT = '0x9885cceef7e8371bf8d6f2413723d25917e7445c';
 const OG_CONTRACT = '0x34ce89baa7e4a4b00e17f7e4c0cb97105c216957';
 
@@ -15,20 +21,26 @@ export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
 
-    // Validate HMAC signature
-    if (SIGNING_KEY) {
+    // Validate HMAC signature — try all configured signing keys
+    if (SIGNING_KEYS.length > 0) {
       const signature = req.headers.get('x-alchemy-signature') || '';
-      const hmac = crypto.createHmac('sha256', SIGNING_KEY);
-      hmac.update(rawBody, 'utf8');
-      const expectedSig = hmac.digest('hex');
+      let valid = false;
 
-      try {
-        if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
-          console.warn('[alchemy-webhook] Invalid signature');
-          return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-        }
-      } catch {
-        console.warn('[alchemy-webhook] Signature validation failed (length mismatch)');
+      for (const key of SIGNING_KEYS) {
+        try {
+          const hmac = crypto.createHmac('sha256', key);
+          hmac.update(rawBody, 'utf8');
+          const expectedSig = hmac.digest('hex');
+          if (signature.length === expectedSig.length &&
+              crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
+            valid = true;
+            break;
+          }
+        } catch { /* try next key */ }
+      }
+
+      if (!valid) {
+        console.warn('[alchemy-webhook] Invalid signature — no key matched');
         return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
       }
     }

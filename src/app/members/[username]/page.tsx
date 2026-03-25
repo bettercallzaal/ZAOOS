@@ -21,6 +21,7 @@ interface MemberProfile {
   preferredWallet: string | null;
   hiddenWallets: string[];
   platforms: Record<string, string | null>;
+  ensNames: Record<string, string> | null;
   respect: {
     total: number;
     fractal: number;
@@ -50,6 +51,18 @@ interface MemberProfile {
 
 function shortAddr(addr: string) {
   return addr.length > 12 ? addr.slice(0, 6) + '...' + addr.slice(-4) : addr;
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 export default function MemberProfilePage() {
@@ -98,10 +111,18 @@ export default function MemberProfilePage() {
         <Link href="/members" className="text-xs text-gray-500 hover:text-white">All Members</Link>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      {/* Cover image hero */}
+      {p.artistProfile?.coverImageUrl && (
+        <div className="relative h-40 sm:h-52 overflow-hidden">
+          <Image src={p.artistProfile.coverImageUrl} alt="" fill className="object-cover" sizes="100vw" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628]/60 via-transparent to-[#0a1628]" />
+        </div>
+      )}
+
+      <div className={`max-w-2xl mx-auto px-4 ${p.artistProfile?.coverImageUrl ? '-mt-16 relative z-10' : 'pt-8'}`}>
         {/* Hero */}
         <div className="flex items-start gap-4 mb-6">
-          <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-800 flex-shrink-0">
+          <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-800 flex-shrink-0 ring-2 ring-[#0a1628]">
             {p.pfpUrl ? (
               <Image src={p.pfpUrl} alt="" fill className="object-cover" sizes="80px" />
             ) : (
@@ -123,18 +144,54 @@ export default function MemberProfilePage() {
                   Respect Holder
                 </span>
               )}
+              {p.artistProfile?.isFeatured && (
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20">
+                  Featured
+                </span>
+              )}
+              {p.artistProfile?.category && (
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 capitalize">
+                  {p.artistProfile.category}
+                </span>
+              )}
+              {p.role === 'admin' && (
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                  Admin
+                </span>
+              )}
+              {p.role === 'moderator' && (
+                <span className="text-[9px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  Moderator
+                </span>
+              )}
               {p.social?.powerBadge && (
                 <span className="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400">Power Badge</span>
               )}
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500 mt-1 flex-wrap">
               {p.username && <span>@{p.username}</span>}
-              {p.ensName && <span className="text-[#f5a623]">{p.ensName}</span>}
+              {p.realName && p.realName !== p.displayName && (
+                <span className="text-gray-600">({p.realName})</span>
+              )}
+              {/* Show all ENS names */}
+              {p.ensNames && Object.values(p.ensNames).filter(Boolean).length > 0 ? (
+                Object.values(p.ensNames).filter(Boolean).map((name, i) => (
+                  <span key={i} className="text-[#f5a623]">{name}</span>
+                ))
+              ) : p.ensName ? (
+                <span className="text-[#f5a623]">{p.ensName}</span>
+              ) : null}
               {displayWallet && <span className="font-mono text-xs">{shortAddr(displayWallet)}</span>}
             </div>
             {p.bio && <p className="text-sm text-gray-400 mt-2 line-clamp-3">{p.bio}</p>}
             {p.artistProfile?.biography && !p.bio && (
               <p className="text-sm text-gray-400 mt-2 line-clamp-3">{p.artistProfile.biography}</p>
+            )}
+            {/* Last active */}
+            {p.lastActiveAt && (
+              <p className="text-[10px] text-gray-600 mt-1">
+                Active {timeAgo(p.lastActiveAt)}
+              </p>
             )}
           </div>
         </div>
@@ -147,33 +204,40 @@ export default function MemberProfilePage() {
           </div>
         )}
 
-        {/* Respect stats */}
+        {/* Respect stats — full breakdown */}
         {p.respect && (
           <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4">
             <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Respect</p>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              <div className="text-center bg-[#0a1628] rounded-lg p-2">
                 <p className="text-lg font-bold text-[#f5a623]">{p.respect.total}</p>
-                <p className="text-[10px] text-gray-500">Total</p>
+                <p className="text-[9px] text-gray-500">Total</p>
               </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-white">{p.respect.fractalCount}</p>
-                <p className="text-[10px] text-gray-500">Fractals</p>
+              <div className="text-center bg-[#0a1628] rounded-lg p-2">
+                <p className="text-lg font-bold text-white">{p.respect.fractal}</p>
+                <p className="text-[9px] text-gray-500">Fractal</p>
               </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-white">
-                  {p.respect.onchainOG > 0 || p.respect.onchainZOR > 0
-                    ? `${p.respect.onchainOG + p.respect.onchainZOR}`
-                    : '0'}
-                </p>
-                <p className="text-[10px] text-gray-500">On-chain</p>
+              <div className="text-center bg-[#0a1628] rounded-lg p-2">
+                <p className="text-lg font-bold text-white">{p.respect.event}</p>
+                <p className="text-[9px] text-gray-500">Events</p>
+              </div>
+              <div className="text-center bg-[#0a1628] rounded-lg p-2">
+                <p className="text-lg font-bold text-white">{p.respect.hosting}</p>
+                <p className="text-[9px] text-gray-500">Hosting</p>
+              </div>
+              <div className="text-center bg-[#0a1628] rounded-lg p-2">
+                <p className="text-lg font-bold text-white">{p.respect.onchainOG}</p>
+                <p className="text-[9px] text-gray-500">OG Chain</p>
+              </div>
+              <div className="text-center bg-[#0a1628] rounded-lg p-2">
+                <p className="text-lg font-bold text-white">{p.respect.onchainZOR}</p>
+                <p className="text-[9px] text-gray-500">ZOR Chain</p>
               </div>
             </div>
-            {p.respect.firstRespectAt && (
-              <p className="text-[10px] text-gray-600 mt-2 text-center">
-                Member since {p.respect.firstRespectAt}
-              </p>
-            )}
+            <div className="flex items-center justify-between mt-3 text-[10px] text-gray-600">
+              <span>{p.respect.fractalCount} fractal sessions</span>
+              {p.respect.firstRespectAt && <span>Member since {p.respect.firstRespectAt}</span>}
+            </div>
           </div>
         )}
 
@@ -223,6 +287,11 @@ export default function MemberProfilePage() {
                   className="px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-300 text-xs hover:bg-purple-500/20 transition-colors">
                   Audius
                 </a>
+              )}
+              {p.platforms.discord && (
+                <span className="px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 text-xs">
+                  Discord: {p.platforms.discord}
+                </span>
               )}
               {p.artistProfile?.website && (
                 <a href={p.artistProfile.website} target="_blank" rel="noopener noreferrer"

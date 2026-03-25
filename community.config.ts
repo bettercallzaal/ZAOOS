@@ -128,6 +128,25 @@ export const communityConfig = {
     nounsBuilderUrl: 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883',
   },
 
+  // ── Snapshot Governance ──────────────────────────────────────
+  snapshot: {
+    space: 'zaal.eth',
+    hub: 'https://hub.snapshot.org',
+    graphqlUrl: 'https://hub.snapshot.org/graphql',
+    weeklyPollChoices: [
+      'WAVEWARZ — Competitive Web3 music battles',
+      'ZAO FRACTAL — Fractal governance + Respect Game',
+      'ZAO FESTIVALS — IRL culture-build (ZAO-CHELLA)',
+      'ZAO CARDS — Digital/physical collectibles',
+      'COC CONCERTZ — Community shows with live music',
+      'ZAO NEWSLETTER — Weekly updates & opportunities',
+      'Student $LOANZ — Web3 education funding',
+      'ZAO Calendar — Events, streams, activations',
+      "Let's Talk About Web3 — Weekly live show + Q&A",
+      'Midi-ZAO-NKZ — MIDI-PUNKZ collab',
+    ],
+  },
+
   // ── Navigation Pillars ────────────────────────────────────────
   pillars: {
     social: { label: 'Social', icon: 'chat' },

@@ -17,6 +17,16 @@ const ZounzProposals = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-40 bg-gray-800 rounded-2xl" /> }
 );
 
+const SnapshotPolls = dynamic(
+  () => import('@/components/governance/SnapshotPolls').then(m => ({ default: m.SnapshotPolls })),
+  { ssr: false, loading: () => <div className="animate-pulse h-32 bg-gray-800 rounded-2xl" /> }
+);
+
+const CreateWeeklyPoll = dynamic(
+  () => import('@/components/governance/CreateWeeklyPoll').then(m => ({ default: m.CreateWeeklyPoll })),
+  { ssr: false }
+);
+
 /* ── Types ──────────────────────────────────────────────────── */
 
 interface Tally {
@@ -245,6 +255,22 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
           <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">NFT Voting &middot; Trustless Execution</span>
         </div>
         <ZounzProposals />
+      </div>
+
+      {/* ── Snapshot Polls ────────────────────────────────────── */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+            <line x1="9" y1="9" x2="9.01" y2="9" />
+            <line x1="15" y1="9" x2="15.01" y2="9" />
+          </svg>
+          <h2 className="text-sm font-bold text-[#f5a623] uppercase tracking-wide">Snapshot Polls</h2>
+          <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">Gasless Voting</span>
+        </div>
+        <CreateWeeklyPoll isAdmin={isAdmin} />
+        <SnapshotPolls />
       </div>
 
       {/* ── Separator ──────────────────────────────────────────── */}

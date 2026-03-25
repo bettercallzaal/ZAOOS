@@ -119,3 +119,4 @@
 | 124 | `124-sopha-deep-social-farcaster` | Sopha — deep social Farcaster client for curation |
 | 125 | `125-coinflow-fiat-checkout` | Coinflow fiat-to-crypto checkout: cards/ACH/Apple Pay → USDC on Base, EVM contract settlement, React SDK, 24+ webhooks, Credits system |
 | 126 | `126-music-player-gap-analysis` | Music player gap analysis: ZAO vs Spotify/Audius/SoundCloud/Sonata, 12 missing features prioritized, build order, competitive matrix |
+| 127 | `127-mobile-player-optimization` | Mobile player gaps: MediaSession completion, swipe gestures, expanded player, crossfade, gapless, Wake Lock, iOS PWA audio, haptics |

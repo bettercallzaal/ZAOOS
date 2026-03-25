@@ -22,6 +22,7 @@ Use this to quickly find if a topic has already been researched.
 - SongJam audio spaces iframe embed, 100ms SDK, /zabal page → `119`
 - SongJam screen share PR, Stream Video SDK, MyScreenShareButton → `122`
 - Music player gap analysis: missing features (favorites, history, queue, presence, reactions) → `126`
+- Mobile player optimization: MediaSession, swipe gestures, expanded player, crossfade, gapless, iOS PWA audio → `127`
 
 ## Respect & Governance
 - Respect tokens (aspirational design — tiers/decay NOT implemented) → `04`

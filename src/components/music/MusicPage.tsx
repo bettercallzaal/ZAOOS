@@ -15,6 +15,11 @@ const TrackOfTheDay = dynamic(
   { ssr: false, loading: () => <TrackOfTheDayTabSkeleton /> },
 );
 
+const BinauralBeats = dynamic(
+  () => import('@/components/music/BinauralBeats').then((m) => m.BinauralBeats),
+  { ssr: false },
+);
+
 type Submission = {
   id: string;
   url: string;
@@ -28,7 +33,7 @@ type Submission = {
   user_voted: boolean;
 };
 
-const TABS = ['Radio', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Liked', 'History'] as const;
+const TABS = ['Radio', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Binaural', 'Liked', 'History'] as const;
 type Tab = (typeof TABS)[number];
 
 const SECTION_IDS: Record<Tab, string> = {
@@ -37,6 +42,7 @@ const SECTION_IDS: Record<Tab, string> = {
   Submissions: 'section-submissions',
   Trending: 'section-trending',
   Playlists: 'section-playlists',
+  Binaural: 'section-binaural',
   Liked: 'section-liked',
   History: 'section-history',
 };
@@ -181,6 +187,11 @@ export function MusicPage() {
         {/* ── Section 4: Community Playlists ───────────────────────── */}
         <section id={SECTION_IDS.Playlists}>
           <PlaylistsSection radio={radio} />
+        </section>
+
+        {/* ── Section: Binaural Beats ────────────────────────── */}
+        <section id={SECTION_IDS.Binaural}>
+          <BinauralBeats />
         </section>
 
         {/* ── Section: Liked Songs ─────────────────────────── */}

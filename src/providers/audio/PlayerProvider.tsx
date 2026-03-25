@@ -189,7 +189,18 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     });
 
     navigator.mediaSession.playbackState = state.status === 'playing' ? 'playing' : 'paused';
-  }, [state.metadata, state.status]);
+
+    // Position state — enables lock screen progress bar + scrubber
+    if ('setPositionState' in navigator.mediaSession && state.duration > 0) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: state.duration / 1000,
+          playbackRate: 1,
+          position: Math.min(Math.max(0, state.position / 1000), state.duration / 1000),
+        });
+      } catch { /* ignore invalid state */ }
+    }
+  }, [state.metadata, state.status, state.position, state.duration]);
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
@@ -210,14 +221,79 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     navigator.mediaSession.setActionHandler('nexttrack', () => {
       if (onEndedRef.current) onEndedRef.current();
     });
-    navigator.mediaSession.setActionHandler('previoustrack', null);
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      // Restart current track if > 3s in, otherwise let onPrev handle it
+      const pos = stateRef.current.position;
+      if (pos > 3000) {
+        const ctrl = getCtrl();
+        if (ctrl) ctrl.seek(0);
+        dispatch({ type: 'SEEK', payload: 0 });
+      }
+    });
+
+    // Seek backward (lock screen rewind — 10s default)
+    try {
+      navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+        const skip = (details.seekOffset || 10) * 1000;
+        const newPos = Math.max(0, stateRef.current.position - skip);
+        const ctrl = getCtrl();
+        if (ctrl) ctrl.seek(newPos);
+        dispatch({ type: 'SEEK', payload: newPos });
+      });
+    } catch { /* unsupported */ }
+
+    // Seek forward (lock screen fast-forward — 10s default)
+    try {
+      navigator.mediaSession.setActionHandler('seekforward', (details) => {
+        const skip = (details.seekOffset || 10) * 1000;
+        const newPos = Math.min(stateRef.current.duration, stateRef.current.position + skip);
+        const ctrl = getCtrl();
+        if (ctrl) ctrl.seek(newPos);
+        dispatch({ type: 'SEEK', payload: newPos });
+      });
+    } catch { /* unsupported */ }
+
+    // Seek to specific position (lock screen scrubber drag)
+    try {
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.seekTime != null) {
+          const ms = details.seekTime * 1000;
+          const ctrl = getCtrl();
+          if (ctrl) ctrl.seek(ms);
+          dispatch({ type: 'SEEK', payload: ms });
+        }
+      });
+    } catch { /* unsupported */ }
+
+    // Stop
+    try {
+      navigator.mediaSession.setActionHandler('stop', () => {
+        getCtrl()?.pause();
+        dispatch({ type: 'STOP' });
+      });
+    } catch { /* unsupported */ }
 
     return () => {
       navigator.mediaSession.setActionHandler('play', null);
       navigator.mediaSession.setActionHandler('pause', null);
       navigator.mediaSession.setActionHandler('nexttrack', null);
+      navigator.mediaSession.setActionHandler('previoustrack', null);
+      try { navigator.mediaSession.setActionHandler('seekbackward', null); } catch {}
+      try { navigator.mediaSession.setActionHandler('seekforward', null); } catch {}
+      try { navigator.mediaSession.setActionHandler('seekto', null); } catch {}
+      try { navigator.mediaSession.setActionHandler('stop', null); } catch {}
     };
   }, [dispatch]);
+
+  // Wake Lock — keep screen on during playback
+  useEffect(() => {
+    if (state.status !== 'playing' || !('wakeLock' in navigator)) return;
+    let lock: WakeLockSentinel | null = null;
+    navigator.wakeLock.request('screen')
+      .then((l) => { lock = l; })
+      .catch(() => {}); // Not critical — silently fail
+    return () => { lock?.release(); };
+  }, [state.status]);
 
   const registerController = useCallback(
     (type: TrackType, controller: AudioController) => {
@@ -278,6 +354,7 @@ export function usePlayer() {
     error: state.error,
 
     play: (metadata: TrackMetadata) => {
+      navigator.vibrate?.(10);
       dispatch({ type: 'PLAY', payload: metadata });
       clearRestoredTrack();
       // Trigger controller load within user-gesture context so autoplay isn't blocked
@@ -289,11 +366,13 @@ export function usePlayer() {
     },
 
     pause: () => {
+      navigator.vibrate?.(10);
       getController()?.pause();
       dispatch({ type: 'PAUSE' });
     },
 
     resume: () => {
+      navigator.vibrate?.(10);
       getController()?.play();
       dispatch({ type: 'RESUME' });
     },
@@ -304,6 +383,7 @@ export function usePlayer() {
     },
 
     stop: () => {
+      navigator.vibrate?.(10);
       getController()?.pause();
       dispatch({ type: 'STOP' });
     },

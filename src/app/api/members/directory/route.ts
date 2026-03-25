@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
 const querySchema = z.object({
@@ -13,12 +12,11 @@ const querySchema = z.object({
 });
 
 /**
- * GET /api/members/directory — Unified member CRM view
- * Joins users + respect_members + community_profiles into one response
+ * GET /api/members/directory — Unified member directory
+ * PUBLIC — no auth required. Used by /members page.
+ * Joins users + respect_members into one response.
  */
 export async function GET(req: NextRequest) {
-  const session = await getSessionData();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const params = Object.fromEntries(req.nextUrl.searchParams);
   const parsed = querySchema.safeParse(params);

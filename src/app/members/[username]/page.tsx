@@ -292,6 +292,45 @@ export default function MemberProfilePage() {
           </div>
         )}
 
+        {/* Profile completeness */}
+        {(() => {
+          const missing: string[] = [];
+          if (!p.bio && !p.artistProfile?.biography) missing.push('Bio');
+          if (!p.ensName) missing.push('ENS name');
+          if (!Object.values(p.platforms).some(Boolean)) missing.push('Social platforms');
+          if (!p.respect) missing.push('Respect (join fractal calls!)');
+          if (!p.zid) missing.push('ZID number');
+          if (!p.pfpUrl) missing.push('Profile picture');
+
+          if (missing.length === 0) return null;
+
+          const completeness = Math.round(((6 - missing.length) / 6) * 100);
+
+          return (
+            <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs text-gray-500 uppercase tracking-wider">Profile Completeness</p>
+                <span className={`text-xs font-bold ${completeness >= 80 ? 'text-green-400' : completeness >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
+                  {completeness}%
+                </span>
+              </div>
+              <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden mb-3">
+                <div
+                  className={`h-full rounded-full transition-all ${completeness >= 80 ? 'bg-green-500' : completeness >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                  style={{ width: `${completeness}%` }}
+                />
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {missing.map(m => (
+                  <span key={m} className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                    Missing: {m}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Footer */}
         <div className="text-center pt-4 border-t border-gray-800/50">
           <p className="text-[10px] text-gray-600">

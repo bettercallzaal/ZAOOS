@@ -9,6 +9,7 @@ import type { PlatformLink } from '@/lib/music/songlink';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
+import { LikeButton } from '@/components/music/LikeButton';
 
 interface MusicEmbedProps {
   url: string;
@@ -282,6 +283,9 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
             )}
           </div>
         </div>
+
+        {/* Like */}
+        <LikeButton songUrl={url} compact className="flex-shrink-0" />
 
         {/* Add to playlist */}
         <AddToPlaylistButton songUrl={url} compact className="flex-shrink-0" />

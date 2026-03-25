@@ -7,6 +7,7 @@ import { TrackType } from '@/types/music';
 import { usePlayer } from '@/providers/audio';
 import { WaveformPlayer } from '@/components/music/WaveformPlayerWrapper';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
+import { LikeButton } from '@/components/music/LikeButton';
 
 const PLATFORM_LABELS: Record<TrackType, string> = {
   spotify: 'Spotify',
@@ -221,6 +222,9 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
             </p>
           </div>
         </button>
+
+        {/* Like */}
+        <LikeButton songUrl={url} compact className="flex-shrink-0" />
 
         {/* Add to playlist */}
         <AddToPlaylistButton songUrl={url} compact className="flex-shrink-0" />

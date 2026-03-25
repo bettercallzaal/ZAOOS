@@ -118,3 +118,4 @@
 | 123 | `123-dfos-dark-forest-protocol` | DFOS (Dark Forest OS) by Metalabel — private-first creative group infra, Ed25519 chains, did:dfos, ~2K alpha users, philosophy-aligned with ZAO |
 | 124 | `124-sopha-deep-social-farcaster` | Sopha — deep social Farcaster client for curation |
 | 125 | `125-coinflow-fiat-checkout` | Coinflow fiat-to-crypto checkout: cards/ACH/Apple Pay → USDC on Base, EVM contract settlement, React SDK, 24+ webhooks, Credits system |
+| 126 | `126-music-player-gap-analysis` | Music player gap analysis: ZAO vs Spotify/Audius/SoundCloud/Sonata, 12 missing features prioritized, build order, competitive matrix |

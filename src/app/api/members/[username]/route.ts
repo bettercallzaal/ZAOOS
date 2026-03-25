@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createPublicClient, http } from 'viem';
+import { mainnet } from 'viem/chains';
 import { supabaseAdmin } from '@/lib/db/supabase';
+
+const ethClient = createPublicClient({ chain: mainnet, transport: http('https://eth.llamarpc.com') });
 
 /**
  * GET /api/members/[username] — Unified member profile
@@ -129,6 +133,18 @@ export async function GET(
       } catch { /* non-critical */ }
     }
 
+    // Resolve ENS for primary + preferred wallet
+    const ensNames: Record<string, string> = {};
+    const walletsToResolve = [user.primary_wallet, user.preferred_wallet, ...(user.verified_addresses || [])]
+      .filter((w): w is string => !!w && w.startsWith('0x') && w.length === 42);
+
+    for (const wallet of [...new Set(walletsToResolve)].slice(0, 5)) {
+      try {
+        const name = await ethClient.getEnsName({ address: wallet as `0x${string}` });
+        if (name) ensNames[wallet.toLowerCase()] = name;
+      } catch { /* non-critical */ }
+    }
+
     // Build history entries
     const history = (fractalScores || []).map(s => {
       const sess = Array.isArray(s.fractal_sessions) ? s.fractal_sessions[0] : s.fractal_sessions;
@@ -157,7 +173,8 @@ export async function GET(
       pfpUrl: user.pfp_url,
       realName: user.real_name,
       bio: user.bio,
-      ensName: user.ens_name,
+      ensName: user.ens_name || ensNames[(user.preferred_wallet || user.primary_wallet || '').toLowerCase()] || Object.values(ensNames)[0] || null,
+      ensNames,
       zid: user.zid,
       tier: user.member_tier || 'community',
       role: user.role,

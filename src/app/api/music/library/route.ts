@@ -8,6 +8,7 @@ const querySchema = z.object({
   search: z.string().max(200).optional(),
   platform: z.string().max(20).optional(),
   sort: z.enum(['recent', 'popular', 'played']).optional(),
+  filter: z.enum(['recent', 'liked']).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -26,7 +27,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const result = await querySongs(parsed.data);
+    // If filter=recent, force sort by last_played_at
+    const queryParams = { ...parsed.data };
+    if (queryParams.filter === 'recent') {
+      queryParams.sort = 'played';
+    }
+    const result = await querySongs(queryParams);
     return NextResponse.json(result, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } });
   } catch (err) {
     console.error('[library] query failed:', err);

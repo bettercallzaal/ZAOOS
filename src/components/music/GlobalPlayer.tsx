@@ -8,6 +8,8 @@ import { Scrubber } from './Scrubber';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
+import { LikeButton } from '@/components/music/LikeButton';
+import { SleepTimerButton } from '@/components/music/SleepTimerButton';
 
 interface GlobalPlayerProps {
   onPrev?: () => void;
@@ -185,8 +187,11 @@ export function GlobalPlayer({
           </div>
         </div>
 
-        {/* Right: Volume + Queue + playlist + platform badge */}
-        <div className="flex items-center gap-3 w-48 flex-shrink-0 justify-end">
+        {/* Right: Volume + Sleep Timer + Queue + playlist + platform badge */}
+        <div className="flex items-center gap-3 w-56 flex-shrink-0 justify-end">
+          {/* Like */}
+          <LikeButton songUrl={metadata.url} compact />
+
           {/* Add to playlist */}
           <AddToPlaylistButton songUrl={metadata.url} compact />
 
@@ -222,6 +227,10 @@ export function GlobalPlayer({
               aria-label="Volume"
             />
           </div>
+
+          {/* Sleep Timer */}
+          <SleepTimerButton compact />
+
           {isRadioMode && (
             <span className="text-[10px] font-semibold text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full flex items-center gap-1">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -299,6 +308,9 @@ export function GlobalPlayer({
               </span>
             </div>
           </div>
+
+          {/* Like (mobile) */}
+          <LikeButton songUrl={metadata.url} compact className="flex-shrink-0" />
 
           {/* Add to playlist (mobile) */}
           <AddToPlaylistButton songUrl={metadata.url} compact className="flex-shrink-0" />

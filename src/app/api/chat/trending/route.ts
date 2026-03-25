@@ -1,33 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { getTrendingFeed } from '@/lib/farcaster/neynar';
 import { Cast } from '@/types';
 
 const SOPHA_API = 'https://www.sopha.social/api/feed';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(25),
+  time_window: z.enum(['1h', '6h', '12h', '24h']).default('24h'),
   cursor: z.string().optional(),
 });
 
 // In-memory cache (5-minute TTL)
-let cachedData: { casts: SophaCast[]; cursor: string | null; fetchedAt: number } | null = null;
+let cachedData: { casts: TrendingCast[]; fetchedAt: number } | null = null;
 const CACHE_TTL = 5 * 60 * 1000;
 
-interface SophaCast extends Cast {
+interface TrendingCast extends Cast {
   _qualityScore?: number;
   _category?: string;
   _title?: string;
   _summary?: string;
-  _curatorInfo?: {
-    fid: number;
-    username: string;
-    display_name: string;
-    pfp_url: string;
-  };
+  _curatorInfo?: { fid: number; username: string; display_name: string; pfp_url: string };
+  _source?: 'sopha' | 'neynar';
 }
 
-function sophaCastToOurCast(c: Record<string, unknown>): SophaCast {
+function rawToCast(c: Record<string, unknown>, source: 'sopha' | 'neynar'): TrendingCast {
   const author = c.author as Record<string, unknown> | undefined;
   const reactions = c.reactions as Record<string, unknown> | undefined;
   const replies = c.replies as Record<string, unknown> | undefined;
@@ -51,12 +49,12 @@ function sophaCastToOurCast(c: Record<string, unknown>): SophaCast {
     },
     parent_hash: (c.parent_hash as string) || null,
     embeds: (c.embeds as Cast['embeds']) || [],
-    // Sopha curation metadata
     _qualityScore: (c._qualityScore as number) || undefined,
     _category: (c._category as string) || undefined,
     _title: (c._title as string) || undefined,
     _summary: (c._summary as string) || undefined,
-    _curatorInfo: (c._curatorInfo as SophaCast['_curatorInfo']) || undefined,
+    _curatorInfo: (c._curatorInfo as TrendingCast['_curatorInfo']) || undefined,
+    _source: source,
   };
 }
 
@@ -68,64 +66,80 @@ export async function GET(req: NextRequest) {
 
   const raw = {
     limit: req.nextUrl.searchParams.get('limit') ?? undefined,
+    time_window: req.nextUrl.searchParams.get('time_window') ?? undefined,
     cursor: req.nextUrl.searchParams.get('cursor') ?? undefined,
   };
 
   const parsed = querySchema.safeParse(raw);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid parameters', details: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid parameters', details: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { limit, cursor } = parsed.data;
+  const { limit, time_window } = parsed.data;
 
   try {
-    // Use cache if fresh and no cursor (first page only)
     const now = Date.now();
-    if (!cursor && cachedData && (now - cachedData.fetchedAt) < CACHE_TTL) {
-      const sliced = cachedData.casts.slice(0, limit);
+    if (cachedData && (now - cachedData.fetchedAt) < CACHE_TTL) {
       return NextResponse.json(
-        { casts: sliced, cursor: cachedData.cursor, source: 'sopha' },
+        { casts: cachedData.casts.slice(0, limit), source: 'mixed' },
         { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } },
       );
     }
 
-    // Fetch from Sopha's curated feed API
-    const url = new URL(SOPHA_API);
-    if (cursor) url.searchParams.set('cursor', cursor);
+    // Fetch both sources in parallel
+    const [sophaResult, neynarResult] = await Promise.allSettled([
+      fetch(SOPHA_API, { headers: { 'Accept': 'application/json' } }).then(r => r.ok ? r.json() : null),
+      getTrendingFeed(30, time_window),
+    ]);
 
-    const res = await fetch(url.toString(), {
-      headers: { 'Accept': 'application/json' },
-      next: { revalidate: 300 },
-    });
+    const allCasts: TrendingCast[] = [];
+    const seenHashes = new Set<string>();
 
-    if (!res.ok) {
-      console.error('[trending] Sopha API error:', res.status);
-      return NextResponse.json({ error: 'Sopha API unavailable' }, { status: 502 });
+    // Add Sopha curated casts first (they have quality scores + editorial metadata)
+    if (sophaResult.status === 'fulfilled' && sophaResult.value?.casts) {
+      // Sort Sopha casts by date (newest first) instead of their default quality sort
+      const sophaCasts = (sophaResult.value.casts as Record<string, unknown>[])
+        .map(c => rawToCast(c, 'sopha'))
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+      // Only include Sopha casts from the last 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      for (const cast of sophaCasts) {
+        if (new Date(cast.timestamp) >= thirtyDaysAgo && !seenHashes.has(cast.hash)) {
+          seenHashes.add(cast.hash);
+          allCasts.push(cast);
+        }
+      }
     }
 
-    const data = await res.json();
-    const rawCasts: Record<string, unknown>[] = data.casts || [];
-    const nextCursor: string | null = data.next?.cursor || null;
+    // Add Neynar trending casts (always recent, high engagement)
+    if (neynarResult.status === 'fulfilled' && neynarResult.value?.casts) {
+      const neynarCasts = (neynarResult.value.casts as Record<string, unknown>[])
+        .map(c => rawToCast(c, 'neynar'))
+        .filter(c => c.reactions.likes_count >= 5 || c.reactions.recasts_count >= 2);
 
-    // Convert with curation metadata preserved
-    const casts = rawCasts.map(sophaCastToOurCast);
-
-    // Cache first-page results
-    if (!cursor) {
-      cachedData = { casts, cursor: nextCursor, fetchedAt: now };
+      for (const cast of neynarCasts) {
+        if (!seenHashes.has(cast.hash)) {
+          seenHashes.add(cast.hash);
+          allCasts.push(cast);
+        }
+      }
     }
 
-    const result = casts.slice(0, limit);
+    // Sort all by timestamp (newest first)
+    allCasts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    // Cache
+    cachedData = { casts: allCasts, fetchedAt: now };
 
     return NextResponse.json(
-      { casts: result, cursor: nextCursor, source: 'sopha' },
+      { casts: allCasts.slice(0, limit), source: 'mixed' },
       { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } },
     );
   } catch (error) {
-    console.error('[trending] Sopha fetch error:', error);
-    return NextResponse.json({ error: 'Failed to fetch curated feed' }, { status: 500 });
+    console.error('[trending] error:', error);
+    return NextResponse.json({ error: 'Failed to fetch trending' }, { status: 500 });
   }
 }

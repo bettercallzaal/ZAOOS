@@ -7,6 +7,7 @@ import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { Scrubber } from '@/components/music/Scrubber';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
+import { ShareToChatButton } from '@/components/music/ShareToChatButton';
 import type { TrackMetadata } from '@/types/music';
 
 interface ExpandedPlayerProps {
@@ -214,6 +215,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
         <div className="flex items-center justify-between">
           <LikeButton songUrl={metadata.url} className="flex-shrink-0" />
           <AddToPlaylistButton songUrl={metadata.url} className="flex-shrink-0" />
+          <ShareToChatButton songUrl={metadata.url} trackName={metadata.trackName} className="flex-shrink-0" />
 
           {/* Share (external link) */}
           <a
@@ -227,6 +229,20 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
           </a>
+
+          {/* Crossfade toggle */}
+          <button
+            onClick={() => player.setCrossfade(player.crossfade > 0 ? 0 : 3)}
+            className={`p-1.5 rounded-lg transition-colors ${
+              player.crossfade > 0 ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
+            }`}
+            aria-label={player.crossfade > 0 ? `Crossfade ${player.crossfade}s` : 'Enable crossfade'}
+            title={player.crossfade > 0 ? `Crossfade: ${player.crossfade}s` : 'Crossfade: off'}
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+            </svg>
+          </button>
 
           {/* Platform badge */}
           <span className="text-[10px] text-gray-500 bg-white/5 px-2.5 py-1 rounded-full capitalize">

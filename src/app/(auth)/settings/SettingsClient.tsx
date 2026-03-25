@@ -10,6 +10,7 @@ import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
 import type { SessionData } from '@/types';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { useENSNames } from '@/hooks/useENS';
+import { CrossfadeSettings } from '@/components/music/CrossfadeSettings';
 
 interface Profile {
   fid: number;
@@ -687,6 +688,14 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 ) : null
               }
             />
+          </div>
+        </section>
+
+        {/* ── Music / Playback ─────────────────────────────────────── */}
+        <section>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Music &amp; Playback</p>
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+            <CrossfadeSettings />
           </div>
         </section>
 

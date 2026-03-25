@@ -28,6 +28,7 @@ export type PlayerState = {
   volume: number; // 0–1
   shuffle: boolean;
   repeat: RepeatMode;
+  crossfade: number; // seconds (0 = off, 1-12)
   error: string | null;
 };
 
@@ -45,7 +46,8 @@ export type PlayerAction =
   | { type: 'ERROR'; payload?: string }
   | { type: 'SET_VOLUME'; payload: number }
   | { type: 'TOGGLE_SHUFFLE' }
-  | { type: 'CYCLE_REPEAT' };
+  | { type: 'CYCLE_REPEAT' }
+  | { type: 'SET_CROSSFADE'; payload: number };
 
 const initial: PlayerState = {
   status: 'idle',
@@ -55,6 +57,7 @@ const initial: PlayerState = {
   volume: 1,
   shuffle: false,
   repeat: 'off',
+  crossfade: 0,
   error: null,
 };
 
@@ -86,6 +89,8 @@ function reducer(state: PlayerState, action: PlayerAction): PlayerState {
       const next: RepeatMode = state.repeat === 'off' ? 'all' : state.repeat === 'all' ? 'one' : 'off';
       return { ...state, repeat: next };
     }
+    case 'SET_CROSSFADE':
+      return { ...state, crossfade: Math.max(0, Math.min(12, action.payload)) };
     default:
       return state;
   }
@@ -126,6 +131,7 @@ function loadPersistedState(): Partial<PlayerState> {
       volume: saved.volume ?? 1,
       shuffle: saved.shuffle ?? false,
       repeat: saved.repeat ?? 'off',
+      crossfade: saved.crossfade ?? 0,
     };
   } catch { return {}; }
 }
@@ -139,6 +145,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     volume: _persisted.volume ?? 1,
     shuffle: _persisted.shuffle ?? false,
     repeat: (_persisted.repeat as RepeatMode) ?? 'off',
+    crossfade: _persisted.crossfade ?? 0,
   });
   const controllers = useRef<Partial<Record<TrackType, AudioController>>>({});
   const onEndedRef = useRef<(() => void) | null>(null);
@@ -166,6 +173,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         duration: state.duration,
         volume: state.volume,
         shuffle: state.shuffle,
+        crossfade: state.crossfade,
         repeat: state.repeat,
       }));
     } catch { /* quota exceeded — ignore */ }
@@ -398,6 +406,8 @@ export function usePlayer() {
     },
     toggleShuffle: () => dispatch({ type: 'TOGGLE_SHUFFLE' }),
     cycleRepeat: () => dispatch({ type: 'CYCLE_REPEAT' }),
+    crossfade: state.crossfade,
+    setCrossfade: (seconds: number) => dispatch({ type: 'SET_CROSSFADE', payload: seconds }),
 
     /** Register a callback for when the current track ends naturally */
     setOnEnded: (callback: (() => void) | null) => {

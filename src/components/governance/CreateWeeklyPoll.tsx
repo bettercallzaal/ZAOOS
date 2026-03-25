@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAccount, useWalletClient } from 'wagmi';
 import { communityConfig } from '@/../community.config';
 
@@ -21,7 +21,7 @@ function formatDateShort(d: Date): string {
 }
 
 const SPACE = communityConfig.snapshot.space;
-const CHOICES = communityConfig.snapshot.weeklyPollChoices;
+const FALLBACK_CHOICES = [...communityConfig.snapshot.weeklyPollChoices];
 const HUB = communityConfig.snapshot.hub;
 
 /* ── Component ─────────────────────────────────────────────────── */
@@ -35,6 +35,33 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [choices, setChoices] = useState<string[]>(FALLBACK_CHOICES);
+  const [durationDays, setDurationDays] = useState(7);
+
+  // Fetch poll config from DB (admin-managed choices)
+  useEffect(() => {
+    fetch('/api/admin/poll-config')
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => {
+        if (data.choices && Array.isArray(data.choices) && data.choices.length >= 2) {
+          setChoices(data.choices);
+        }
+        if (data.votingDurationDays) {
+          setDurationDays(data.votingDurationDays);
+        }
+        // Apply title/body templates if present
+        if (data.pollTitleTemplate) {
+          const dateStr = formatDateShort(getNextMonday());
+          setTitle(data.pollTitleTemplate.replace('{date}', dateStr));
+        }
+        if (data.pollBodyTemplate) {
+          setBody(data.pollBodyTemplate);
+        }
+      })
+      .catch(() => {
+        // Silently fall back to community.config.ts defaults
+      });
+  }, []);
 
   // Editable fields
   const nextMonday = useMemo(() => getNextMonday(), []);
@@ -47,14 +74,14 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
   if (!isAdmin) return null;
 
   const startTime = nextMonday;
-  const endTime = new Date(startTime.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const endTime = new Date(startTime.getTime() + durationDays * 24 * 60 * 60 * 1000);
 
   const proposalJson = {
     space: SPACE,
     type: 'approval',
     title,
     body,
-    choices: [...CHOICES],
+    choices: [...choices],
     start: Math.floor(startTime.getTime() / 1000),
     end: Math.floor(endTime.getTime() / 1000),
   };
@@ -111,7 +138,7 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
           type: 'approval',
           title,
           body,
-          choices: [...CHOICES],
+          choices: [...choices],
           start: Math.floor(startTime.getTime() / 1000),
           end: Math.floor(endTime.getTime() / 1000),
           snapshot: parseInt(blockNumber as string, 16),
@@ -178,9 +205,9 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
 
           {/* Choices preview */}
           <div className="space-y-1">
-            <p className="text-[10px] text-gray-500 uppercase tracking-wider">Choices ({CHOICES.length})</p>
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider">Choices ({choices.length})</p>
             <div className="grid gap-1">
-              {CHOICES.map((choice, i) => (
+              {choices.map((choice, i) => (
                 <div key={i} className="text-xs text-gray-400 bg-[#0a1628] rounded-lg px-3 py-1.5 border border-gray-800">
                   {choice}
                 </div>
@@ -193,7 +220,7 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
             <span>Start: {formatDateShort(startTime)}</span>
             <span>&rarr;</span>
             <span>End: {formatDateShort(endTime)}</span>
-            <span className="text-gray-600">(7 days)</span>
+            <span className="text-gray-600">({durationDays} days)</span>
           </div>
 
           {/* Error / Success */}

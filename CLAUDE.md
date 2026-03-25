@@ -69,6 +69,7 @@ supabase/                 # Database config
 - **Cross-platform publishing:** Approved proposals (1000+ Respect) auto-publish to Farcaster + Bluesky + X. Content normalization per platform. Lens + Hive scaffolded but deferred.
 - **AI moderation:** Perspective API for content safety scoring (`src/lib/moderation/moderate.ts`).
 - **Music Player:** Multi-platform (9 providers), crossfade engine (dual audio elements), binaural beats (Web Audio API oscillators), MediaSession API (all 8 actions), Wake Lock, respect-weighted curation.
+- **Governance:** Three-tier system: (1) ZOUNZ Nouns Builder on-chain proposals (NFT voting on Base), (2) Snapshot gasless weekly priority polls via `@snapshot-labs/snapshot.js`, (3) Community proposals (Supabase, Respect-weighted, auto-publishes to Farcaster/Bluesky/X after 7-day voting + 1000R threshold).
 - **Community config:** All branding, channels, admin FIDs, contracts in `community.config.ts`. Change this file to fork for a different community.
 
 ## Important Files
@@ -84,6 +85,10 @@ supabase/                 # Database config
 - `src/providers/audio/HTMLAudioProvider.tsx` — dual audio element engine with crossfade
 - `src/components/music/BinauralBeats.tsx` — binaural beats with ambient mixer
 - `src/lib/music/curationWeight.ts` — respect-weighted curation formula
+- `src/lib/zounz/contracts.ts` — ZOUNZ DAO contract addresses + ABIs (Token, Auction, Governor, Treasury)
+- `src/lib/snapshot/client.ts` — Snapshot GraphQL client for reading polls
+- `src/components/governance/CreateWeeklyPoll.tsx` — One-click Snapshot poll creator
+- `src/components/zounz/ZounzProposals.tsx` — On-chain proposals from ZOUNZ Governor
 - `scripts/` — DB setup SQL, wallet generation, webhook registration, data import
 
 ## Research Library

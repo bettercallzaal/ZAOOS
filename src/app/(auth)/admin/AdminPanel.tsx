@@ -12,8 +12,9 @@ const ZidManager = dynamic(() => import('@/components/admin/ZidManager').then(m 
 const CsvUpload = dynamic(() => import('@/components/admin/CsvUpload').then(m => ({ default: m.CsvUpload })), { ssr: false });
 const HiddenMessages = dynamic(() => import('@/components/admin/HiddenMessages').then(m => ({ default: m.HiddenMessages })), { ssr: false });
 const RespectOverview = dynamic(() => import('@/components/admin/RespectOverview').then(m => ({ default: m.RespectOverview })), { ssr: false });
+const PollConfigEditor = dynamic(() => import('@/components/admin/PollConfigEditor').then(m => ({ default: m.PollConfigEditor })), { ssr: false });
 
-type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect';
+type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls';
 
 export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<Tab>('users');
@@ -31,6 +32,7 @@ export function AdminPanel() {
     { id: 'import', label: 'Import', icon: '📄' },
     { id: 'moderation', label: 'Moderation', icon: '🛡' },
     { id: 'respect', label: 'Respect', icon: '🏅' },
+    { id: 'polls', label: 'Polls', icon: '🗳' },
   ];
 
   return (
@@ -91,6 +93,7 @@ export function AdminPanel() {
         {activeTab === 'import' && <CsvUpload onUploaded={handleUploaded} />}
         {activeTab === 'moderation' && <HiddenMessages />}
         {activeTab === 'respect' && <RespectOverview />}
+        {activeTab === 'polls' && <PollConfigEditor />}
       </div>
     </div>
   );

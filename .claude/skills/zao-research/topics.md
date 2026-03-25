@@ -31,6 +31,7 @@ Use this to quickly find if a topic has already been researched.
 - ORDAO, OREC governance, Respect1155, Fibonacci scoring → `56`
 - On-chain governance: ZOUNZ Governor, Snapshot, OZ Governor + Respect, hybrid architecture → `131`
 - Snapshot weekly priority polls: one-click creation, approval voting, multi-project templates → `132`
+- **Governance system complete audit (CANONICAL)**: all 3 tiers, 5 API routes, 6 components, Respect-weighted voting, auto-publish, future roadmap → `133`
 - Respect deep dive (on-chain data, scoring math, orclient SDK) → `58`
 - DAO structure, token economics, Wyoming DUNA, Safe multisig → `31`
 - Artist revenue, IP rights, streaming economics → `29`

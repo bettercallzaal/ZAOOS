@@ -124,3 +124,4 @@
 | 130 | `130-next-music-integrations` | Tier 4: Spotify Web API, Audius SDK deep, Farcaster music embeds, AI recs (pgvector), Zora NFTs on Base, Last.fm scrobbling |
 | 131 | `131-onchain-proposals-governance` | On-chain governance: ZOUNZ Governor (already deployed on Base), Snapshot (gasless), OZ Governor + Respect voting, hybrid 3-tab architecture, implementation plan |
 | 132 | `132-snapshot-weekly-polls` | Snapshot weekly priority polls: one-click creation via snapshot.js SDK, approval voting, GraphQL read, multi-project templates, governance tab integration |
+| 133 | `133-governance-system-audit` | **CANONICAL** — 3-tier governance audit: ZOUNZ on-chain (Nouns Builder/Base), Snapshot gasless polls, Community proposals (Supabase/Respect-weighted), 5 API routes, 6 components, auto-publish to FC/Bluesky/X, 4 test files, full file inventory + future roadmap |

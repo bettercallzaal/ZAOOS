@@ -20,14 +20,14 @@ interface Props {
 export function FractalsClient({ currentFid, isAdmin }: Props) {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab') as Tab | null;
-  const initialTab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'sessions';
+  const initialTab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'proposals';
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const TABS: { id: Tab; label: string }[] = [
+    { id: 'proposals', label: 'Proposals' },
     { id: 'sessions', label: 'Sessions' },
     { id: 'leaderboard', label: 'Leaderboard' },
     { id: 'analytics', label: 'Analytics' },
-    { id: 'proposals', label: 'Proposals' },
     { id: 'about', label: 'About' },
   ];
 

@@ -128,7 +128,12 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
       const res = await fetch('/api/proposals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: effectiveTitle, description: description.trim(), category }),
+        body: JSON.stringify({
+          title: effectiveTitle,
+          description: description.trim(),
+          category,
+          closes_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7-day voting period
+        }),
       });
       const data = await res.json();
       if (!res.ok) {

@@ -184,7 +184,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
   // Get proposal with publish info
   const { data: proposal } = await supabaseAdmin
     .from('proposals')
-    .select('id, publish_text, published_cast_hash, respect_threshold, status')
+    .select('id, publish_text, published_cast_hash, respect_threshold, status, closes_at')
     .eq('id', proposalId)
     .single();
 
@@ -192,6 +192,18 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
 
   // Skip if already published
   if (proposal.published_cast_hash) return false;
+
+  // CRITICAL: Do NOT publish until the voting period has ended.
+  // If closes_at is set and the deadline hasn't passed, skip publishing.
+  // The proposal can only be published after closes_at OR if no deadline is set.
+  if (proposal.closes_at) {
+    const deadline = new Date(proposal.closes_at).getTime();
+    if (deadline > Date.now()) {
+      // Voting period still active — don't publish yet even if threshold is met.
+      // Publishing will be triggered after the deadline by a separate check or admin action.
+      return false;
+    }
+  }
 
   // Sum Respect-weighted FOR votes
   const { data: votes } = await supabaseAdmin

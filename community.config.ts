@@ -151,6 +151,7 @@ export const communityConfig = {
   pillars: {
     social: { label: 'Social', icon: 'chat' },
     governance: { label: 'Governance', icon: 'star' },
+    library: { label: 'Library', icon: 'book' },
     tools: { label: 'Tools', icon: 'wrench' },
     contribute: { label: 'Contribute', icon: 'code' },
   },

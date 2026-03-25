@@ -102,6 +102,21 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/platforms')) {
     return { limit: 10, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/library/submit')) {
+    return { limit: 3, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/library/vote')) {
+    return { limit: 15, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/library/comments')) {
+    return { limit: 10, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/library/delete')) {
+    return { limit: 10, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/library')) {
+    return { limit: 30, windowMs: MINUTE };
+  }
   return null;
 }
 

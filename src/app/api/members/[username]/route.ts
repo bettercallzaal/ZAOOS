@@ -146,6 +146,67 @@ export async function GET(
       ]);
     }
 
+    // ── External reputation signals (all free, fetched in parallel) ──
+    const primaryWallet = (user.preferred_wallet || user.primary_wallet || '').toLowerCase();
+    const memberFid = user.fid;
+
+    const [openRankData, coinbaseVerified, easAttestations, neynarScoreVal, githubData] = await Promise.allSettled([
+      // OpenRank engagement score
+      memberFid ? fetch('https://graph.cast.k3l.io/scores/global/engagement/fids', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify([memberFid]),
+        signal: AbortSignal.timeout(5000),
+      }).then(r => r.ok ? r.json() : null).then(d => d?.result?.[0] || d?.[0] || null) : Promise.resolve(null),
+
+      // Coinbase Verified ID (EAS on Base)
+      primaryWallet ? fetch('https://base.easscan.org/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `query { attestations(where: { recipient: { equals: "${primaryWallet}" }, schemaId: { equals: "0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9" }, revoked: { equals: false } }, take: 1) { id, time } }`,
+        }),
+        signal: AbortSignal.timeout(5000),
+      }).then(r => r.ok ? r.json() : null).then(d => (d?.data?.attestations?.length || 0) > 0) : Promise.resolve(false),
+
+      // EAS attestation count (Optimism)
+      primaryWallet ? fetch('https://optimism.easscan.org/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `query { attestations(where: { recipient: { equals: "${primaryWallet}" }, revoked: { equals: false } }) { id, schemaId, time } }`,
+        }),
+        signal: AbortSignal.timeout(5000),
+      }).then(r => r.ok ? r.json() : null).then(d => d?.data?.attestations || []) : Promise.resolve([]),
+
+      // Neynar score (already fetched in neynarProfile but need the score field)
+      memberFid ? fetch(
+        `https://api.neynar.com/v2/farcaster/user/bulk?fids=${memberFid}`,
+        { headers: { 'api_key': process.env.NEYNAR_API_KEY || '' }, signal: AbortSignal.timeout(5000) }
+      ).then(r => r.ok ? r.json() : null).then(d => d?.users?.[0]?.experimental?.neynar_user_score ?? null) : Promise.resolve(null),
+
+      // GitHub (if user has github in ENS or we find it)
+      ensTextRecords['com.github'] ? fetch(
+        `https://api.github.com/users/${ensTextRecords['com.github']}`,
+        { signal: AbortSignal.timeout(5000) }
+      ).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+    ]);
+
+    const reputation = {
+      neynarScore: neynarScoreVal.status === 'fulfilled' ? neynarScoreVal.value : null,
+      openRank: openRankData.status === 'fulfilled' && openRankData.value ? {
+        score: openRankData.value.score,
+        rank: openRankData.value.rank,
+      } : null,
+      coinbaseVerified: coinbaseVerified.status === 'fulfilled' ? coinbaseVerified.value : false,
+      easAttestationCount: easAttestations.status === 'fulfilled' ? (easAttestations.value as unknown[]).length : 0,
+      github: githubData.status === 'fulfilled' && githubData.value ? {
+        username: githubData.value.login,
+        repos: githubData.value.public_repos,
+        followers: githubData.value.followers,
+      } : null,
+    };
+
     // Build history entries
     const history = (fractalScores || []).map(s => {
       const sess = Array.isArray(s.fractal_sessions) ? s.fractal_sessions[0] : s.fractal_sessions;
@@ -225,6 +286,9 @@ export async function GET(
 
       // Live Farcaster data
       social: neynarProfile,
+
+      // External reputation signals
+      reputation,
 
       // History
       fractalHistory: history,

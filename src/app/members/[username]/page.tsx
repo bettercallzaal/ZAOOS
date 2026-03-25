@@ -45,6 +45,13 @@ interface MemberProfile {
     website: string | null;
   } | null;
   social: { followerCount: number; followingCount: number; powerBadge: boolean } | null;
+  reputation: {
+    neynarScore: number | null;
+    openRank: { score: number; rank: number } | null;
+    coinbaseVerified: boolean;
+    easAttestationCount: number;
+    github: { username: string; repos: number; followers: number } | null;
+  } | null;
   fractalHistory: { sessionName: string; sessionDate: string | null; era: string; rank: number; score: number; participants: number; source: string }[];
   events: { type: string; amount: number; description: string | null; date: string | null }[];
   lastActiveAt: string | null;
@@ -299,6 +306,71 @@ export default function MemberProfilePage() {
                 <a href={p.artistProfile.website} target="_blank" rel="noopener noreferrer"
                   className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors">
                   Website
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Reputation Signals */}
+        {p.reputation && (p.reputation.neynarScore || p.reputation.openRank || p.reputation.coinbaseVerified || p.reputation.easAttestationCount > 0 || p.reputation.github) && (
+          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Reputation Signals</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {/* Neynar Score */}
+              {p.reputation.neynarScore !== null && (
+                <div className="bg-[#0a1628] rounded-lg p-3">
+                  <p className="text-[10px] text-gray-500 mb-1">Farcaster Score</p>
+                  <p className={`text-lg font-bold ${
+                    p.reputation.neynarScore >= 0.7 ? 'text-green-400' :
+                    p.reputation.neynarScore >= 0.4 ? 'text-yellow-400' : 'text-gray-400'
+                  }`}>
+                    {(p.reputation.neynarScore * 100).toFixed(0)}
+                  </p>
+                  <p className="text-[9px] text-gray-600">Neynar quality</p>
+                </div>
+              )}
+
+              {/* OpenRank */}
+              {p.reputation.openRank && (
+                <div className="bg-[#0a1628] rounded-lg p-3">
+                  <p className="text-[10px] text-gray-500 mb-1">OpenRank</p>
+                  <p className="text-lg font-bold text-purple-400">
+                    #{p.reputation.openRank.rank.toLocaleString()}
+                  </p>
+                  <p className="text-[9px] text-gray-600">Engagement rank</p>
+                </div>
+              )}
+
+              {/* Coinbase Verified */}
+              {p.reputation.coinbaseVerified && (
+                <div className="bg-[#0a1628] rounded-lg p-3">
+                  <p className="text-[10px] text-gray-500 mb-1">Coinbase</p>
+                  <p className="text-lg font-bold text-blue-400">Verified</p>
+                  <p className="text-[9px] text-gray-600">On-chain ID (Base)</p>
+                </div>
+              )}
+
+              {/* EAS Attestations */}
+              {p.reputation.easAttestationCount > 0 && (
+                <div className="bg-[#0a1628] rounded-lg p-3">
+                  <p className="text-[10px] text-gray-500 mb-1">Attestations</p>
+                  <p className="text-lg font-bold text-[#f5a623]">{p.reputation.easAttestationCount}</p>
+                  <p className="text-[9px] text-gray-600">EAS on Optimism</p>
+                </div>
+              )}
+
+              {/* GitHub */}
+              {p.reputation.github && (
+                <a
+                  href={`https://github.com/${p.reputation.github.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#0a1628] rounded-lg p-3 hover:bg-white/5 transition-colors"
+                >
+                  <p className="text-[10px] text-gray-500 mb-1">GitHub</p>
+                  <p className="text-sm font-bold text-white">{p.reputation.github.repos} repos</p>
+                  <p className="text-[9px] text-gray-600">{p.reputation.github.followers} followers · @{p.reputation.github.username}</p>
                 </a>
               )}
             </div>

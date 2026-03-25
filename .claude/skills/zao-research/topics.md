@@ -30,6 +30,7 @@ Use this to quickly find if a topic has already been researched.
 - Respect tokens (aspirational design — tiers/decay NOT implemented) → `04`
 - ORDAO, OREC governance, Respect1155, Fibonacci scoring → `56`
 - On-chain governance: ZOUNZ Governor, Snapshot, OZ Governor + Respect, hybrid architecture → `131`
+- Snapshot weekly priority polls: one-click creation, approval voting, multi-project templates → `132`
 - Respect deep dive (on-chain data, scoring math, orclient SDK) → `58`
 - DAO structure, token economics, Wyoming DUNA, Safe multisig → `31`
 - Artist revenue, IP rights, streaming economics → `29`

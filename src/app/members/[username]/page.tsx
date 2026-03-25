@@ -51,6 +51,9 @@ interface MemberProfile {
     coinbaseVerified: boolean;
     easAttestationCount: number;
     github: { username: string; repos: number; followers: number } | null;
+    snapshot: { totalVotes: number; daoCount: number } | null;
+    audius: { followers: number; tracks: number; playlists: number } | null;
+    efp: { followers: number; following: number } | null;
   } | null;
   fractalHistory: { sessionName: string; sessionDate: string | null; era: string; rank: number; score: number; participants: number; source: string }[];
   events: { type: string; amount: number; description: string | null; date: string | null }[];
@@ -372,6 +375,38 @@ export default function MemberProfilePage() {
                   <p className="text-sm font-bold text-white">{p.reputation.github.repos} repos</p>
                   <p className="text-[9px] text-gray-600">{p.reputation.github.followers} followers · @{p.reputation.github.username}</p>
                 </a>
+              )}
+
+              {/* Snapshot DAO Voting */}
+              {p.reputation.snapshot && p.reputation.snapshot.totalVotes > 0 && (
+                <div className="bg-[#0a1628] rounded-lg p-3">
+                  <p className="text-[10px] text-gray-500 mb-1">Governance</p>
+                  <p className="text-lg font-bold text-orange-400">{p.reputation.snapshot.totalVotes}</p>
+                  <p className="text-[9px] text-gray-600">Snapshot votes · {p.reputation.snapshot.daoCount} DAOs</p>
+                </div>
+              )}
+
+              {/* Audius */}
+              {p.reputation.audius && (
+                <a
+                  href={`https://audius.co/${p.platforms.audius || ''}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#0a1628] rounded-lg p-3 hover:bg-white/5 transition-colors"
+                >
+                  <p className="text-[10px] text-gray-500 mb-1">Audius</p>
+                  <p className="text-sm font-bold text-purple-300">{p.reputation.audius.tracks} tracks</p>
+                  <p className="text-[9px] text-gray-600">{p.reputation.audius.followers} followers · {p.reputation.audius.playlists} playlists</p>
+                </a>
+              )}
+
+              {/* EFP On-Chain Followers */}
+              {p.reputation.efp && p.reputation.efp.followers > 0 && (
+                <div className="bg-[#0a1628] rounded-lg p-3">
+                  <p className="text-[10px] text-gray-500 mb-1">On-Chain Social</p>
+                  <p className="text-lg font-bold text-cyan-400">{p.reputation.efp.followers}</p>
+                  <p className="text-[9px] text-gray-600">EFP followers · {p.reputation.efp.following} following</p>
+                </div>
               )}
             </div>
           </div>

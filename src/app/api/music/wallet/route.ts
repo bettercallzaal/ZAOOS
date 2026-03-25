@@ -46,20 +46,9 @@ export async function GET(req: NextRequest) {
 
   // ── Fallback: Sound.xyz + Zora direct ─────────────────────────
   if (tracks.length === 0) {
-    const [soundTracks, zoraTracks] = await Promise.allSettled([
-      fetchSoundXyz(address),
-      fetchZora(address),
-    ]);
-
-    if (soundTracks.status === 'fulfilled') tracks.push(...soundTracks.value);
-    if (zoraTracks.status === 'fulfilled') {
-      // Deduplicate against Sound.xyz results
-      for (const t of zoraTracks.value) {
-        if (!tracks.some(existing => existing.title === t.title && existing.artist === t.artist)) {
-          tracks.push(t);
-        }
-      }
-    }
+    // Sound.xyz shut down Jan 16, 2026. Only Zora fallback remains.
+    const zoraResult = await fetchZora(address).catch(() => [] as MusicNFT[]);
+    tracks.push(...zoraResult);
     if (tracks.length > 0) source = 'legacy';
   }
 
@@ -157,64 +146,8 @@ async function fetchAlchemyNFTs(address: string, apiKey: string): Promise<MusicN
   return results;
 }
 
-// ── Sound.xyz fallback ──────────────────────────────────────────
-
-async function fetchSoundXyz(address: string): Promise<MusicNFT[]> {
-  const tracks: MusicNFT[] = [];
-
-  const soundRes = await fetch('https://api.sound.xyz/graphql', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: `
-        query ArtistReleases($address: String!) {
-          publicAddress(address: $address) {
-            user {
-              artist {
-                releases(pagination: { limit: 20, offset: 0 }) {
-                  edges { node { title coverImage { url } track { normalizedAudioUrl } webappUri createdAt artist { name } } }
-                }
-              }
-            }
-            nftsOwned(pagination: { limit: 20, offset: 0 } filter: { onlyMusicNfts: true }) {
-              edges { node { release { title coverImage { url } track { normalizedAudioUrl } webappUri artist { name } } createdAt } }
-            }
-          }
-        }
-      `,
-      variables: { address: address.toLowerCase() },
-    }),
-    signal: AbortSignal.timeout(10000),
-  });
-
-  if (!soundRes.ok) return tracks;
-  const data = await soundRes.json();
-  const pa = data?.data?.publicAddress;
-
-  for (const edge of pa?.user?.artist?.releases?.edges || []) {
-    const r = edge.node;
-    if (!r) continue;
-    tracks.push({
-      title: r.title || 'Untitled', artist: r.artist?.name || 'Unknown',
-      artworkUrl: r.coverImage?.url || null, audioUrl: r.track?.normalizedAudioUrl || null,
-      platform: 'Sound.xyz', url: r.webappUri ? `https://www.sound.xyz${r.webappUri}` : '',
-      mintedAt: r.createdAt || null, role: 'creator', chain: 'eth', contractAddress: null, tokenId: null,
-    });
-  }
-
-  for (const edge of pa?.nftsOwned?.edges || []) {
-    const n = edge.node; const r = n?.release;
-    if (!r || tracks.some(t => t.title === r.title)) continue;
-    tracks.push({
-      title: r.title || 'Untitled', artist: r.artist?.name || 'Unknown',
-      artworkUrl: r.coverImage?.url || null, audioUrl: r.track?.normalizedAudioUrl || null,
-      platform: 'Sound.xyz', url: r.webappUri ? `https://www.sound.xyz${r.webappUri}` : '',
-      mintedAt: n.createdAt || null, role: 'collector', chain: 'eth', contractAddress: null, tokenId: null,
-    });
-  }
-
-  return tracks;
-}
+// Sound.xyz shut down January 16, 2026. Vault.fm has no public API.
+// Sound.xyz NFTs are still on-chain and detected via Alchemy NFT scan.
 
 // ── Zora fallback ───────────────────────────────────────────────
 

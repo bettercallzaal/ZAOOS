@@ -150,7 +150,13 @@ export async function GET(
     const primaryWallet = (user.preferred_wallet || user.primary_wallet || '').toLowerCase();
     const memberFid = user.fid;
 
-    const [openRankData, coinbaseVerified, easAttestations, neynarScoreVal, githubData] = await Promise.allSettled([
+    // Audius handle from user's platforms or ENS
+    const audiusHandle = user.audius_handle || ensTextRecords['com.audius'] || null;
+
+    const [
+      openRankData, coinbaseVerified, easAttestations, neynarScoreVal, githubData,
+      snapshotData, audiusData, efpData,
+    ] = await Promise.allSettled([
       // OpenRank engagement score
       memberFid ? fetch('https://graph.cast.k3l.io/scores/global/engagement/fids', {
         method: 'POST',
@@ -179,17 +185,49 @@ export async function GET(
         signal: AbortSignal.timeout(5000),
       }).then(r => r.ok ? r.json() : null).then(d => d?.data?.attestations || []) : Promise.resolve([]),
 
-      // Neynar score (already fetched in neynarProfile but need the score field)
+      // Neynar score
       memberFid ? fetch(
         `https://api.neynar.com/v2/farcaster/user/bulk?fids=${memberFid}`,
         { headers: { 'api_key': process.env.NEYNAR_API_KEY || '' }, signal: AbortSignal.timeout(5000) }
       ).then(r => r.ok ? r.json() : null).then(d => d?.users?.[0]?.experimental?.neynar_user_score ?? null) : Promise.resolve(null),
 
-      // GitHub (if user has github in ENS or we find it)
+      // GitHub
       ensTextRecords['com.github'] ? fetch(
         `https://api.github.com/users/${ensTextRecords['com.github']}`,
         { signal: AbortSignal.timeout(5000) }
       ).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
+
+      // Snapshot DAO voting history
+      primaryWallet ? fetch('https://hub.snapshot.org/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `query { votes(where: { voter: "${primaryWallet}" }, first: 1000) { space { id } } }`,
+        }),
+        signal: AbortSignal.timeout(5000),
+      }).then(r => r.ok ? r.json() : null).then(d => {
+        const votes = d?.data?.votes || [];
+        const spaces = new Set(votes.map((v: { space: { id: string } }) => v.space?.id));
+        return { totalVotes: votes.length, daoCount: spaces.size };
+      }) : Promise.resolve(null),
+
+      // Audius profile
+      audiusHandle ? fetch(
+        `https://api.audius.co/v1/users?handle=${encodeURIComponent(audiusHandle)}&app_name=ZAO-OS`,
+        { signal: AbortSignal.timeout(5000) }
+      ).then(r => r.ok ? r.json() : null).then(d => {
+        const u = d?.data?.[0];
+        return u ? { followers: u.follower_count, tracks: u.track_count, playlists: u.playlist_count } : null;
+      }) : Promise.resolve(null),
+
+      // EFP on-chain followers
+      primaryWallet ? fetch(
+        `https://api.ethfollow.xyz/api/v1/users/${primaryWallet}/stats`,
+        { signal: AbortSignal.timeout(5000) }
+      ).then(r => r.ok ? r.json() : null).then(d => d ? {
+        followers: d.followers_count || 0,
+        following: d.following_count || 0,
+      } : null) : Promise.resolve(null),
     ]);
 
     const reputation = {
@@ -205,6 +243,9 @@ export async function GET(
         repos: githubData.value.public_repos,
         followers: githubData.value.followers,
       } : null,
+      snapshot: snapshotData.status === 'fulfilled' ? snapshotData.value : null,
+      audius: audiusData.status === 'fulfilled' ? audiusData.value : null,
+      efp: efpData.status === 'fulfilled' ? efpData.value : null,
     };
 
     // Build history entries

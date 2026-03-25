@@ -1,292 +1,252 @@
-# 130 — Next Music Integrations for ZAO OS
+# 130 — Next Music Integrations: Deep Research + Implementation Plan
 
-> **Status:** Research complete
+> **Status:** Research complete + implementation plan
 > **Date:** March 25, 2026
-> **Goal:** Map the next wave of music integrations now that Tiers 1-3 are complete — deeper platform APIs, music NFTs, Farcaster music sharing, and AI recommendations
-> **Builds on:** Doc 128 (Complete Audit), Doc 126 (Gap Analysis), Doc 03 (Music Integration), Doc 108 (Music NFT Landscape)
+> **Goal:** Comprehensive research on social music best practices, web3 music monetization, audio-first social features, and a prioritized implementation plan for ZAO OS Tier 4+
+> **Builds on:** Doc 128 (Complete Audit), Doc 126 (Gap Analysis), Doc 108 (Music NFT Landscape), Doc 03 (Music Integration), Doc 29 (Artist Revenue)
 
 ---
 
-## Key Decisions / Recommendations
+## Executive Summary
 
-| Integration | Priority | Recommendation |
-|-------------|----------|----------------|
-| **Spotify Web API** | HIGH | Use for playlist import, audio features (BPM/energy/valence), and recommendations. Requires Premium + app registration. Dev mode needs Premium as of Feb 2026. |
-| **Audius SDK deeper** | HIGH | Already use REST API for radio/trending. Add: full SDK (`@audius/sdk`), user auth, playlist creation on Audius, upload support. Free, no limits. |
-| **Farcaster Mini App music embed** | HIGH | ZAO tracks shared as rich embeds with inline playback. Use `fc:frame:audio` meta tags. Already a Farcaster app — just add embed metadata. |
-| **AI Recommendations (pgvector)** | MEDIUM | Supabase already has pgvector. Store track embeddings (audio features → vectors), query for similarity. Cold-start problem with <100 members — use collaborative filtering on likes/reactions first. |
-| **Zora Music NFTs on Base** | MEDIUM | Mint tracks as collectible NFTs. Zora API is free (<120 req/min). Base is ZAO's chain. "Collect this track" button on track cards. |
-| **Shazam / Audio fingerprinting** | LOW | Cool but niche. Shazam API is paid. AcoustID/Chromaprint is open source but complex. |
-| **Last.fm Scrobbling** | LOW | Scrobble plays to Last.fm for cross-platform listening history. Simple API, free. Nice-to-have. |
+ZAO OS has built the most feature-complete web music player in the Farcaster ecosystem (30+ components, 30+ API endpoints, 9 platforms). The next frontier isn't more player features — it's **social music infrastructure** and **web3 monetization**. This doc maps 14 integrations across 4 phases, grounded in 2026 industry research.
 
 ---
 
-## 1. Spotify Web API (Deep Integration)
+## Part 1: Best Practices for Social Music Players (2026)
 
-### What's Available (March 2026)
+### What Drives Engagement (Data-Backed)
 
-| Endpoint | What it gives ZAO | Auth needed |
-|----------|-------------------|-------------|
-| **Get Recommendations** | "If you like X, try Y" — seed up to 5 tracks/artists/genres | User OAuth |
-| **Get Audio Features** | BPM, energy, danceability, valence, acousticness per track | App token |
-| **Get Audio Analysis** | Detailed beat/segment/section data for visualizations | App token |
-| **Get User's Playlists** | Import Spotify playlists into ZAO | User OAuth |
-| **Search** | Find any track/artist/album on Spotify | App token |
-| **Get User's Top Items** | User's most-played tracks/artists for taste profiling | User OAuth |
+| Feature | Impact | Source |
+|---------|--------|--------|
+| **Collaborative playlists** | Session length +40% when users can influence playlists together | Soundverse 2026 |
+| **Co-listening / Listening parties** | Spotify Jam DAU doubled YoY (Jan 2026) | Spotify Newsroom |
+| **AI personalization** | 19.2% higher retention vs non-personalized experiences | Coherent Market Insights |
+| **Social proof** | "Friends collected" drives 30-60% more engagement on first listen | Rolling Stone Culture Council |
+| **Chat-based music sharing** | Discovery via chat circles now exceeds algorithmic playlists in 2026 | Soundverse 2026 |
+| **Real-time reactions** | Users stay longer when they can react/contribute in real-time | ACM CSCW study |
 
-### February 2026 Changes
+### What ZAO Already Has (Advantage)
 
-- **Dev Mode apps now require Spotify Premium** for the app owner
-- Extended Quota Mode apps are unaffected
-- Some endpoints deprecated or restricted in Dev Mode
+ZAO has **all six** of these engagement drivers built:
+- ✅ Collaborative playlists (shipped today)
+- ✅ Now Playing Presence / co-listening infrastructure (shipped today)
+- ✅ Respect-weighted curation (unique — AI-like personalization via community taste)
+- ✅ Social proof ("Liked by DanSingJoy + 4 others", shipped today)
+- ✅ Share Track to Chat (shipped today)
+- ✅ Track Reactions with emoji (shipped today)
 
-### ZAO Implementation Plan
+**ZAO's competitive moat: no other Farcaster client has ANY of these music-social features.**
 
-```
-Phase 1: App-level auth (no user login needed)
-  - Audio Features for taste profiling (BPM/energy/valence)
-  - Search for Spotify track metadata enrichment
-  - Recommendations seeded by community's most-liked tracks
+### What's Missing (Next Level)
 
-Phase 2: User OAuth (optional Spotify connect)
-  - Import user's Spotify playlists into ZAO
-  - "Top tracks" for personalized recommendations
-  - Listening history import
-```
-
-### Cost
-
-Free for Dev Mode (25 users max). Extended Quota Mode requires application and review — no published pricing.
+| Feature | Why it matters | Who does it |
+|---------|---------------|-------------|
+| **Listening parties (synchronized)** | Co-listening with live chat + reactions. TikTok + Apple Music just launched this (Feb 2026). | TikTok, Spotify Jam, Discord |
+| **AI taste matching** | "You and @DanSingJoy share 73% music taste" — drives collaboration | Spotify Blend |
+| **Track-as-collectible** | Turn any shared track into a collectible NFT — monetizes curation | Zora, Sound.xyz (dead), Catalog |
+| **Revenue splits** | When a track earns, smart contracts auto-split to artist + curator + community | 0xSplits, Royal |
+| **Decentralized storage** | Tracks stored on IPFS/Arweave — censorship-resistant, permanent | Audius (IPFS), Catalog (Arweave) |
 
 ---
 
-## 2. Audius SDK Deep Integration
+## Part 2: Web3 Music Monetization Models (2026)
 
-### Current State in ZAO
+### The 5 Proven Models
 
-- REST API calls to `api.audius.co/v1` for radio, trending, metadata
-- No SDK installed, no user auth, no write operations
+| Model | How it works | Best for ZAO? | Example |
+|-------|-------------|---------------|---------|
+| **1. Collectible tracks** | Fans mint limited-edition track NFTs (ERC-1155). Artist earns from primary + secondary. | YES — Zora on Base, low gas | Zora, Catalog |
+| **2. Royalty splits** | Smart contracts auto-distribute streaming/mint revenue to artist + collaborators + curators | YES — 0xSplits on Base, already deployed | 0xSplits, Royal |
+| **3. Token-gated access** | Hold specific NFT/token → unlock exclusive tracks, early releases, stems | YES — ZAO already has gating infrastructure (Hats, allowlist) | Vault.fm, Unlock Protocol |
+| **4. Curation mining** | Curators earn tokens for discovering/sharing tracks that get popular | YES — Respect-weighted curation already built. Could add token rewards. | Sonata (NOTES token) |
+| **5. Fan shares / royalty ownership** | Fans buy fractional ownership of a song's royalties | MAYBE — complex legally, but Royal.io proved the model | Royal |
 
-### What @audius/sdk Adds
-
-```bash
-npm install @audius/sdk
-```
-
-| Feature | What it enables |
-|---------|----------------|
-| **User auth** | Login with Audius account, access private playlists |
-| **Upload tracks** | ZAO members upload directly to Audius (decentralized storage) |
-| **Create playlists** | Programmatic playlist creation on Audius |
-| **Social graph** | Follow/unfollow, repost, favorite — mirrored from ZAO actions |
-| **Stream URLs** | Authenticated streaming (better quality, no rate limits) |
-| **Notification hooks** | React to Audius events (new followers, reposts) |
-
-### Why This Matters for ZAO
-
-Audius is the only fully open, decentralized music platform. ZAO already uses it for radio. Deep integration means:
-- ZAO members' music lives on Audius (permanent, censorship-resistant)
-- Tracks uploaded via ZAO are automatically available across all Audius clients
-- ZAO becomes an Audius "super-client" for music communities
-
-### Free Tier
-
-No limits, no API key required. Contact `api@audius.co` for dedicated support.
-
----
-
-## 3. Farcaster Mini App Music Embeds
-
-### Current State
-
-ZAO is already a Farcaster app with SIWF auth. Music shared as plain URLs in casts.
-
-### What to Add
-
-Use Farcaster's embed specification to make music URLs render as rich playable cards:
-
-```html
-<!-- In page <head> for any /track/[id] route -->
-<meta property="fc:frame" content="vNext" />
-<meta property="fc:frame:image" content="{artworkUrl}" />
-<meta property="fc:frame:audio" content="{streamUrl}" />
-<meta property="fc:frame:audio:type" content="audio/mpeg" />
-<meta property="fc:frame:button:1" content="Play on ZAO" />
-<meta property="fc:frame:button:1:action" content="link" />
-<meta property="fc:frame:button:1:target" content="https://zaoos.xyz/track/{id}" />
-```
-
-### Implementation
-
-1. Create route: `/track/[id]/page.tsx` — public track page with OG + Frame meta tags
-2. When a ZAO member shares a track URL, Farcaster clients render it as a playable card
-3. Non-members see artwork + "Play on ZAO" button → drives signup
-
-### Share Extensions
-
-Mini Apps support share extensions — ZAO could appear in Warpcast's share sheet when sharing music links, redirecting into the ZAO player.
-
----
-
-## 4. AI-Powered Recommendations (pgvector)
-
-### Architecture
+### ZAO-Specific Implementation
 
 ```
-┌──────────────────────────────────────┐
-│        Supabase (pgvector)           │
-│                                      │
-│  songs table + embedding column      │
-│  (vector(128) for audio features)    │
-│                                      │
-│  user_taste_vectors table            │
-│  (average of liked track embeddings) │
-└──────────────────────────────────────┘
-         │
-         ▼
-┌──────────────────────────────────────┐
-│     Recommendation Engine            │
-│                                      │
-│  1. Collaborative: "Users who liked  │
-│     tracks you liked also liked..."  │
-│                                      │
-│  2. Content-based: cosine similarity │
-│     between track embeddings         │
-│                                      │
-│  3. Hybrid: weighted blend           │
-└──────────────────────────────────────┘
-```
+Phase A: Collectible Tracks (Zora on Base)
+  → "Collect" button on any track card
+  → Mints ERC-1155 on Base via Zora Protocol SDK
+  → Artist sets price (or free + protocol fee ~$2)
+  → Collectors shown on track card as social proof
+  → Revenue auto-split via 0xSplits (artist 85%, ZAO treasury 10%, curator 5%)
 
-### Implementation Plan
+Phase B: Token-Gated Listening
+  → Artists upload exclusive tracks gated by token ownership
+  → Gate options: hold ZAO NFT, hold artist's token, hold N Respect
+  → Uses existing gating infrastructure (src/lib/gates/)
+  → Exclusive tracks marked with a lock icon, unlockable on-demand
 
-**Phase 1: Collaborative filtering (no embeddings needed)**
-- Query `user_song_likes`: find users with similar like patterns
-- Recommend tracks liked by similar users but not by the current user
-- Works immediately with existing data, no API calls
-
-**Phase 2: Content-based with Spotify Audio Features**
-- For each song, fetch audio features (BPM, energy, valence, danceability, etc.)
-- Store as a vector in pgvector
-- Compute user taste vector = average of their liked tracks' vectors
-- Recommend tracks with highest cosine similarity to user's taste vector
-
-**Phase 3: Semantic embeddings**
-- Use Claude API or OpenAI to generate text embeddings from track metadata + user reviews
-- Richer similarity signals beyond audio features
-
-### Cold-Start Mitigation
-
-100 members is small. Mitigations:
-- Start with community-wide popularity (already built: respect-weighted trending)
-- Use genre/platform clustering as fallback
-- Require minimum 10 liked tracks before showing personal recommendations
-
-### Supabase pgvector
-
-Already available in ZAO's Supabase instance (doc 42 confirmed pgvector is enabled):
-
-```sql
-ALTER TABLE songs ADD COLUMN IF NOT EXISTS embedding vector(128);
-CREATE INDEX ON songs USING ivfflat (embedding vector_cosine_ops) WITH (lists = 10);
+Phase C: Curation Mining
+  → Curators who share tracks that later get 10+ likes earn bonus Respect
+  → Top curators leaderboard (already built) becomes entry point
+  → Future: NOTES-like token for curation rewards
 ```
 
 ---
 
-## 5. Zora Music NFTs on Base
+## Part 3: Audio-First Social Features
 
-### Why Zora
+### The Landscape in 2026
 
-- Base is ZAO's primary chain (Respect tokens on Optimism/Base)
-- Zora API is free (<120 req/min, no key needed)
-- "Every post is collectible" — Zora's philosophy aligns with ZAO's curation model
-- $353M trading volume in Q2 2025
+| Platform | Status | Key innovation |
+|----------|--------|---------------|
+| **Clubhouse** | Mostly dead (laid off 2023) | Pioneered audio rooms, but failed to monetize |
+| **X Spaces** | Active, growing | Best discoverability (top of timeline), recordings, no follower minimum |
+| **Discord Stage Channels** | Active | Music bots + stage events, Amazon Music integration |
+| **Telegram Voice Chats** | Active, thousands of listeners | Fully mature, rivals Clubhouse at scale |
+| **Spotify Jam** | Active, DAU doubled YoY | Real-time shared queue, up to 32 people |
+| **SongJam** | Active (Farcaster) | Audio spaces for /zabal, ZAO already has iframe embed (doc 119) |
 
-### Implementation
+### What ZAO Should Build
 
-```
-"Collect this track" button on track cards
-  → Mints a Zora NFT on Base
-  → Track metadata stored on-chain (title, artist, artwork IPFS hash)
-  → Collector gets a token representing their support
-  → Artist earns from primary + secondary sales
-```
-
-### API
-
-```typescript
-// Using Zora's Protocol SDK
-import { createCreatorClient } from '@zoralabs/protocol-sdk';
-
-const creatorClient = createCreatorClient({ chainId: 8453, publicClient }); // Base
-
-// Create a new music collectible
-const { parameters } = await creatorClient.create1155({
-  contract: { name: 'ZAO Music', uri: metadataUri },
-  token: { tokenMetadataURI: trackMetadataUri },
-  account: artistAddress,
-});
-```
-
-### Cost to User
-
-- Mint fee: ~0.000777 ETH on Base (~$2 at current prices)
-- Gas: negligible on Base (<$0.01)
+| Feature | How | Effort |
+|---------|-----|--------|
+| **Listening Rooms (v2)** | Enhance `useListeningRoom.ts` — add live chat, reactions overlay, DJ queue control | ~8 hrs |
+| **Scheduled Listening Events** | Calendar-like event scheduling for album drops, fractal music discussions | ~4 hrs |
+| **Audio Reactions** | Quick audio clips (airhorn, applause, "fire!") played during listening rooms | ~4 hrs |
+| **Farcaster Spaces integration** | Embed SongJam/Farcaster audio spaces within ZAO (already researched in doc 119) | ~2 hrs |
 
 ---
 
-## 6. Last.fm Scrobbling (Nice-to-Have)
+## Part 4: Decentralized Music Infrastructure
 
-### What It Is
+### Current Architecture
 
-Automatically log every track played on ZAO to the user's Last.fm profile.
-
-### API
-
-Free, requires API key (instant approval at last.fm/api):
-
-```typescript
-// Scrobble a track
-POST https://ws.audioscrobbler.com/2.0/
-  method=track.scrobble
-  artist=...&track=...&timestamp=...
-  api_key=...&sk={session_key}
+```
+ZAO OS (Next.js) → Metadata APIs (oEmbed, Audius REST) → Platform CDNs (Spotify, SoundCloud, YouTube)
+                 → Supabase (library, likes, playlists)
+                 → Audius decentralized nodes (radio streams)
 ```
 
-### Implementation
+### Target Architecture
 
-- Add Last.fm connect to Settings (OAuth)
-- On every play, fire-and-forget scrobble via API route
-- Non-critical — silent failure OK
+```
+ZAO OS (Next.js) → @audius/sdk (full SDK, upload, auth)
+                 → Spotify Web API (audio features, recs)
+                 → Zora Protocol SDK (collect on Base)
+                 → 0xSplits (revenue distribution)
+                 → IPFS/Arweave (permanent artwork + metadata)
+                 → Supabase + pgvector (recommendations)
+                 → Farcaster frames (rich music embeds)
+```
+
+### Why Decentralized Storage Matters for ZAO
+
+1. **Permanence** — Artists' tracks survive even if ZAO shuts down
+2. **Portability** — Music owned by artists, playable across any client
+3. **Censorship resistance** — No platform can remove a track
+4. **Audius alignment** — ZAO already uses Audius for radio; going deeper is natural
 
 ---
 
-## Recommended Build Order (Tier 4)
+## Part 5: Implementation Plan (Tier 4 — Phased)
 
-| # | Feature | Effort | Dependencies |
-|---|---------|--------|-------------|
-| 1 | **Farcaster music embeds** | ~4 hrs | None — just meta tags on a /track/[id] route |
-| 2 | **Audius SDK upgrade** | ~6 hrs | `npm install @audius/sdk` |
-| 3 | **Collaborative filtering recs** | ~6 hrs | Existing like data, no new APIs |
-| 4 | **Spotify Audio Features** | ~4 hrs | Spotify app registration + Premium |
-| 5 | **Zora music collectibles** | ~8 hrs | Zora SDK, wallet connection (already have wagmi) |
-| 6 | **pgvector taste embeddings** | ~6 hrs | Spotify Audio Features (Phase 2) |
-| 7 | **Last.fm scrobbling** | ~3 hrs | Last.fm API key |
+### Phase 4A: Social Music Infrastructure (Week 1-2)
+
+| # | Feature | Effort | Files to create/modify |
+|---|---------|--------|----------------------|
+| 1 | **Farcaster music embeds** | 4 hrs | New: `src/app/track/[id]/page.tsx` (public track page with Frame meta tags) |
+| 2 | **Audius SDK upgrade** | 6 hrs | `npm install @audius/sdk`, new: `src/lib/music/audius.ts` (SDK client), update: `RadioProvider.tsx`, `src/app/api/music/radio/route.ts` |
+| 3 | **Collaborative filtering recs** | 6 hrs | New: `src/app/api/music/recommendations/route.ts`, `src/components/music/ForYou.tsx`, SQL: user similarity queries |
+| 4 | **Listening Rooms v2** | 8 hrs | Update: `useListeningRoom.ts`, new: `src/components/music/ListeningRoomChat.tsx`, real-time reactions |
+
+### Phase 4B: Web3 Monetization (Week 3-4)
+
+| # | Feature | Effort | Files to create/modify |
+|---|---------|--------|----------------------|
+| 5 | **Zora music collectibles** | 8 hrs | `npm install @zoralabs/protocol-sdk`, new: `src/lib/music/collect.ts`, `src/components/music/CollectButton.tsx`, SQL: `collected_tracks` table |
+| 6 | **0xSplits revenue splits** | 6 hrs | New: `src/lib/music/splits.ts`, `src/app/api/music/splits/route.ts`, settings for artist split config |
+| 7 | **Token-gated exclusive tracks** | 6 hrs | New: `src/lib/music/tokenGate.ts`, update: gating logic in `src/lib/gates/`, lock icon on gated tracks |
+| 8 | **Spotify Audio Features** | 4 hrs | New: `src/lib/music/spotify.ts` (app auth + audio features), `src/app/api/music/features/route.ts` |
+
+### Phase 4C: AI & Discovery (Week 5-6)
+
+| # | Feature | Effort | Files to create/modify |
+|---|---------|--------|----------------------|
+| 9 | **pgvector taste embeddings** | 6 hrs | SQL: add `embedding vector(128)` to songs, new: `src/lib/music/embeddings.ts`, update recs engine |
+| 10 | **Taste matching** | 4 hrs | New: `src/app/api/music/taste-match/route.ts`, `src/components/music/TasteMatch.tsx` ("You share 73% taste with...") |
+| 11 | **"For You" personalized feed** | 6 hrs | New: `src/components/music/ForYouFeed.tsx`, combines collaborative + content-based recs |
+| 12 | **Spotify playlist import** | 4 hrs | New: `src/app/api/music/import/spotify/route.ts`, OAuth flow in Settings, bulk song upsert |
+
+### Phase 4D: Polish & Distribution (Week 7-8)
+
+| # | Feature | Effort | Files to create/modify |
+|---|---------|--------|----------------------|
+| 13 | **Last.fm scrobbling** | 3 hrs | New: `src/lib/music/lastfm.ts`, OAuth in Settings, fire-and-forget on play |
+| 14 | **Scheduled listening events** | 4 hrs | New: `src/app/api/music/events/route.ts`, `src/components/music/ListeningEvent.tsx`, Supabase `music_events` table |
+
+---
+
+## Part 6: Metrics & Success Criteria
+
+| Metric | Current (March 2026) | Target (June 2026) |
+|--------|---------------------|---------------------|
+| Daily active music listeners | ~10 (estimated) | 50+ |
+| Tracks in library | ~200 | 2,000+ |
+| Average session length (music page) | Unknown | 15+ minutes |
+| Tracks collected (NFTs minted) | 0 | 100+ |
+| "For You" recommendation accuracy | N/A | 60%+ liked |
+| Curators earning Respect from music | 0 | 20+ |
+| Farcaster music embeds (external clicks) | 0 | 500+/month |
+
+---
+
+## Part 7: Tech Stack Additions
+
+| Package | Purpose | Size | License |
+|---------|---------|------|---------|
+| `@audius/sdk` | Full Audius client (auth, upload, social) | ~50KB | Apache 2.0 |
+| `@zoralabs/protocol-sdk` | Mint collectible NFTs on Base | ~30KB | MIT |
+| `0xsplits-sdk` | Revenue split contracts | ~20KB | MIT |
+| None needed for pgvector | Already in Supabase | — | — |
+| None needed for Farcaster frames | Just meta tags | — | — |
+| None needed for collaborative filtering | SQL queries on existing tables | — | — |
 
 ---
 
 ## Sources
 
-- [Spotify Web API Reference](https://developer.spotify.com/documentation/web-api)
-- [Spotify Feb 2026 Migration Guide](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide)
-- [Spotify March 2026 Changelog](https://developer.spotify.com/documentation/web-api/references/changes/march-2026)
+### Social Music Best Practices
+- [Unlocking Social Features in Music Apps — Vocal Media](https://vocal.media/education/unlocking-the-power-of-social-features-how-to-supercharge-user-engagement-in-music-streaming-apps)
+- [Group Chat Music Sharing Trends 2026 — Soundverse](https://www.soundverse.ai/blog/article/group-chat-music-sharing-social-trends-0049)
+- [Music Streaming Retention Drivers — Coherent Market Insights](https://www.coherentmarketinsights.com/blog/media-and-entertainment/what-drives-user-retention-in-music-streaming-apps-2666)
+- [Social Music Curation That Works — ACM CSCW](https://dl.acm.org/doi/10.1145/3449191)
+- [Future of Music 2026 — Rolling Stone Culture Council](https://www.rollingstone.com/culture-council/articles/future-music-2026-dynamic-decentralized-driven-fans-1235493394/)
+
+### Web3 Music Monetization
+- [Music Tokenization in Web3 — BlockchainX](https://www.blockchainx.tech/music-tokenization/)
+- [Web3 Product Monetization 2026 — DEV Community](https://dev.to/yos/how-to-monetize-a-web3-product-in-2026-4-proven-models-key-onchain-metrics-to-track-36if)
+- [Web3 Music Revolution — Bridge Audio](https://www.bridge.audio/blog/how-web3-could-revolutionize-the-music-industry-for-creators/)
+- [State of Music/Web3 Tools — Water & Music](https://www.waterandmusic.com/the-state-of-music-web3-tools-for-artists/)
+- [Tokenizing Music Catalogs — CoinTelegraph](https://cointelegraph.com/news/tokenizing-music-catalogs-web3-revolution)
+
+### Audio Social Platforms
+- [Clubhouse's Decline 2026 — TechnoSports](https://technosports.co.in/clubhouse-social-audio-rise/)
+- [Social Listening Sessions — Soundverse](https://www.soundverse.ai/blog/article/social-listening-sessions-real-time-shared-music-0024)
+- [TikTok + Apple Music Listening Party — 9to5Mac](https://9to5mac.com/2026/02/16/apple-music-and-tiktok-team-up-on-new-listening-party-feature-more/)
+- [Spotify Listening Activity — Spotify Newsroom](https://newsroom.spotify.com/2026-01-07/listening-activity-request-to-jam-messages-updates/)
+
+### Decentralized Infrastructure
+- [Audius + IPFS Case Study — IPFS Docs](https://docs.ipfs.tech/case-studies/audius/)
+- [IPFS Impact on Music — IPFS Blog](https://blog.ipfs.tech/2022-02-10-ipfs-filecoin-impact-on-music-media-culture/)
+
+### Developer APIs
+- [Spotify Web API](https://developer.spotify.com/documentation/web-api)
+- [Spotify Feb 2026 Migration](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide)
 - [Audius JavaScript SDK](https://docs.audius.org/sdk/)
-- [Audius REST API](https://docs.audius.org/api/)
-- [Farcaster Mini Apps Specification](https://miniapps.farcaster.xyz/docs/specification)
-- [Farcaster Audio Frame Discussion](https://github.com/farcasterxyz/protocol/discussions/156)
-- [Farcaster Share Extensions](https://miniapps.farcaster.xyz/docs/guides/share-extension)
-- [Base Docs: Mint on Zora](https://docs.base.org/cookbook/use-case-guides/creator/nft-minting-with-zora)
-- [Zora Protocol SDK Changelog](https://nft-docs.zora.co/changelogs/protocol-sdk)
-- [pgvector 2026 Guide](https://www.instaclustr.com/education/vector-database/pgvector-key-features-tutorial-and-pros-and-cons-2026-guide/)
+- [Farcaster Mini Apps Spec](https://miniapps.farcaster.xyz/docs/specification)
+- [Zora Mint on Base — Base Docs](https://docs.base.org/cookbook/use-case-guides/creator/nft-minting-with-zora)
+- [0xSplits Protocol](https://splits.org/)
+- [0xSplits Contracts — GitHub](https://github.com/0xSplits/splits-contracts)
+- [pgvector 2026 Guide — Instaclustr](https://www.instaclustr.com/education/vector-database/pgvector-key-features-tutorial-and-pros-and-cons-2026-guide/)
+
+### Previous ZAO Research
 - [Doc 128 — Music Player Complete Audit](../128-music-player-complete-audit/)
-- [Doc 42 — Supabase Advanced (pgvector)](../42-supabase-advanced-patterns/)
+- [Doc 126 — Gap Analysis](../126-music-player-gap-analysis/)
+- [Doc 127 — Mobile Optimization](../127-mobile-player-optimization/)
 - [Doc 108 — Music NFT Landscape 2026](../108-music-nft-landscape-2026/)
+- [Doc 42 — Supabase Advanced (pgvector)](../42-supabase-advanced-patterns/)
+- [Doc 29 — Artist Revenue & IP Rights](../29-artist-revenue-ip-rights/)
+- [Doc 119 — SongJam Audio Spaces Embed](../119-songjam-audio-spaces-embed/)

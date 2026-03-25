@@ -102,7 +102,34 @@ export async function POST(req: NextRequest) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('[vote] upsert failed:', error);
+      // If upsert fails due to missing constraint, try insert then update
+      if (error.code === '42P10' || error.message?.includes('ON CONFLICT')) {
+        // Fallback: check if vote exists, then update or insert
+        const { data: existing } = await supabaseAdmin
+          .from('proposal_votes')
+          .select('id')
+          .eq('proposal_id', proposal_id)
+          .eq('voter_id', user.id)
+          .maybeSingle();
+
+        if (existing) {
+          const { error: updateErr } = await supabaseAdmin
+            .from('proposal_votes')
+            .update({ vote, respect_weight: respectWeight })
+            .eq('id', existing.id);
+          if (updateErr) throw updateErr;
+        } else {
+          const { error: insertErr } = await supabaseAdmin
+            .from('proposal_votes')
+            .insert({ proposal_id, voter_id: user.id, vote, respect_weight: respectWeight });
+          if (insertErr) throw insertErr;
+        }
+      } else {
+        throw error;
+      }
+    }
 
     // Notify the proposal author about the vote (fire and forget)
     Promise.resolve(

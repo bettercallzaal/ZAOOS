@@ -148,6 +148,12 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
 
   const handleVote = async (proposalId: string, vote: 'for' | 'against' | 'abstain') => {
     setVoting(proposalId);
+
+    // Optimistic update FIRST — show immediately
+    setProposals(prev => prev.map(p =>
+      p.id === proposalId ? { ...p, user_vote: vote } : p
+    ));
+
     try {
       const res = await fetch('/api/proposals/vote', {
         method: 'POST',
@@ -160,15 +166,28 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
           setVoteWarning(data.warning);
           setTimeout(() => setVoteWarning(null), 6000);
         }
-        // Optimistic update
+        // Refetch after a delay to get updated tallies (cache-bust)
+        await new Promise(r => setTimeout(r, 500));
+        const params = new URLSearchParams({ limit: '50' });
+        if (statusFilter !== 'all') params.set('status', statusFilter);
+        if (categoryFilter !== 'all') params.set('category', categoryFilter);
+        params.set('_t', Date.now().toString()); // cache bust
+        fetch(`/api/proposals?${params}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(d => { if (d?.proposals) setProposals(d.proposals); });
+      } else {
+        // Vote failed — revert optimistic update
+        console.error('[proposals] vote failed:', data.error);
         setProposals(prev => prev.map(p =>
-          p.id === proposalId ? { ...p, user_vote: vote } : p
+          p.id === proposalId ? { ...p, user_vote: null } : p
         ));
-        await new Promise(r => setTimeout(r, 300));
-        loadProposals();
       }
     } catch (err) {
       console.error('[proposals] vote error:', err);
+      // Revert on network error
+      setProposals(prev => prev.map(p =>
+        p.id === proposalId ? { ...p, user_vote: null } : p
+      ));
     }
     setVoting(null);
   };

@@ -12,6 +12,11 @@ const ProposalComments = dynamic(
   { ssr: false, loading: () => <div className="animate-pulse h-20 bg-gray-800 rounded mt-4" /> }
 );
 
+const ZounzProposals = dynamic(
+  () => import('@/components/zounz/ZounzProposals'),
+  { ssr: false, loading: () => <div className="animate-pulse h-40 bg-gray-800 rounded-2xl" /> }
+);
+
 /* ── Types ──────────────────────────────────────────────────── */
 
 interface Tally {
@@ -228,6 +233,33 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
           <button onClick={() => setVoteWarning(null)} className="ml-auto text-white/60 hover:text-white shrink-0">&times;</button>
         </div>
       )}
+
+      {/* ── ZOUNZ On-Chain Governance ───────────────────────── */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+          <h2 className="text-sm font-bold text-[#f5a623] uppercase tracking-wide">ZOUNZ On-Chain</h2>
+          <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">NFT Voting &middot; Trustless Execution</span>
+        </div>
+        <ZounzProposals />
+      </div>
+
+      {/* ── Separator ──────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 py-1">
+        <div className="flex-1 border-t border-gray-700/50" />
+        <span className="text-xs text-gray-500 uppercase tracking-wider">Community Proposals</span>
+        <div className="flex-1 border-t border-gray-700/50" />
+      </div>
+      <div className="flex items-center gap-2 mb-1">
+        <svg className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+        <h2 className="text-sm font-bold text-purple-400 uppercase tracking-wide">Respect-Weighted</h2>
+        <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">Social Publishing</span>
+      </div>
 
       {/* Create Proposal / Social Post toggle */}
       <div className="flex gap-2">

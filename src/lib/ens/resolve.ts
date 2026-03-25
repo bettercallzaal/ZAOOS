@@ -7,13 +7,15 @@ import { createPublicClient, http, fallback, type Address } from 'viem';
 import { mainnet } from 'viem/chains';
 import { normalize } from 'viem/ens';
 
-// Reliable RPC with fallback chain
+// Alchemy as primary (supports ENS Universal Resolver), public RPCs as fallback
 const ensClient = createPublicClient({
   chain: mainnet,
   transport: fallback([
-    http('https://cloudflare-eth.com'),
-    http('https://rpc.ankr.com/eth'),
+    ...(process.env.ALCHEMY_API_KEY
+      ? [http(`https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`)]
+      : []),
     http('https://eth.llamarpc.com'),
+    http('https://ethereum-rpc.publicnode.com'),
   ]),
 });
 

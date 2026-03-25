@@ -49,6 +49,7 @@ scripts/add-notifications-rls.sql
 scripts/create-music-library.sql
 scripts/add-member-crm-columns.sql
 scripts/fix-proposal-categories-v2.sql
+scripts/create-respect-transfers.sql
 ```
 
 **App wallet:** Generate a dedicated signing wallet (never use personal keys):
@@ -60,7 +61,7 @@ npx tsx scripts/generate-wallet.ts
 See `.env.example` for all required environment variables. Key services:
 - **Supabase** — database (required)
 - **Neynar** — Farcaster API (required)
-- **Alchemy** — ENS resolution (free tier, recommended)
+- **Alchemy** — ENS resolution, NFT discovery, respect sync webhooks, transfer history (free tier: 30M CU/month)
 - **PostHog** — analytics (optional)
 
 ---
@@ -218,8 +219,8 @@ See `.env.example` for all required environment variables. Key services:
   - `scripts/create-music-library.sql` — songs + playlists + playlist_tracks tables
 - [x] **Playlists** — personal + community + TOTD Archive auto-playlist
   - `src/app/api/music/playlists/` — CRUD + track management
-- [x] **Music NFT discovery** — scan wallets for Sound.xyz + Zora music NFTs
-  - `src/app/api/music/wallet/route.ts`
+- [x] **Music NFT discovery** — multi-chain via Alchemy NFT API (ETH, Optimism, Base) with Sound.xyz + Zora fallback
+  - `src/app/api/music/wallet/route.ts` — primary: Alchemy getNftsForOwner, fallback: direct APIs
 - [x] **Waveform visualization** — Wavesurfer.js audio waveforms
   - `src/components/music/WaveformPlayer.tsx` · `src/components/music/WaveformPlayerWrapper.tsx`
 - [x] **Listening rooms** — shared music playback via Supabase Realtime
@@ -293,9 +294,15 @@ See `.env.example` for all required environment variables. Key services:
 - [x] **Respect leaderboard** — ranked by on-chain + off-chain respect with expandable details
   - `src/app/api/respect/leaderboard/route.ts`
   - `src/components/chat/RespectPanel.tsx`
-- [x] **On-chain balance sync** — OG Respect (ERC-20) + ZOR (ERC-1155) on Optimism via multicall
-  - `src/app/api/respect/sync/route.ts`
+- [x] **On-chain balance sync** — OG Respect (ERC-20) + ZOR (ERC-1155) on Optimism via Alchemy RPC
+  - `src/app/api/respect/sync/route.ts` — manual admin sync (fallback)
+  - `src/app/api/webhooks/alchemy/route.ts` — **auto-sync via Alchemy webhooks** (real-time on mint)
+  - Dual HMAC signature validation (ZOR + OG separate webhook keys)
   - `src/components/admin/SyncRespectButton.tsx`
+- [x] **On-chain transfer history** — historical respect token transfers with timestamps
+  - `src/app/api/respect/transfers/route.ts` — query + backfill from Alchemy getAssetTransfers
+  - `scripts/create-respect-transfers.sql` — transfers table
+  - On-chain transfers appear in the unified respect ledger on member profiles
 - [x] **Member respect breakdown** — full history per member with unified ledger
   - `src/app/api/respect/member/route.ts` — returns `ledger[]` (every point earned: date, source, amount, detail)
   - `src/app/api/fractals/member/[wallet]/route.ts` — fractal history + events + ledger
@@ -541,7 +548,7 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 src/
 ├── app/                  # Next.js App Router
 │   ├── (auth)/           # Protected routes (chat, messages, governance, fractals, social, admin, etc.)
-│   ├── api/              # 105+ route handlers: /api/[feature]/[action]/route.ts
+│   ├── api/              # 121 route handlers: /api/[feature]/[action]/route.ts
 │   └── page.tsx          # Landing / login
 ├── components/           # React components by feature (chat, messages, music, admin, social, etc.)
 ├── hooks/                # 13 custom hooks (useAuth, useChat, useRadio, useMusicQueue, useLensAuth, useENS, etc.)
@@ -550,7 +557,7 @@ src/
 ├── lib/                  # Utilities by domain (auth, db, farcaster, gates, music, xmtp, hats, publish, moderation, etc.)
 └── types/                # TypeScript type definitions
 community.config.ts       # All community config — fork-friendly
-research/                 # 136 research docs (see research/README.md)
+research/                 # 147 research docs (see research/README.md)
 scripts/                  # DB setup, wallet generation, webhook registration, data import
 docs/                     # Internal plans, QA checklists, architecture decisions
 ```
@@ -559,7 +566,7 @@ docs/                     # Internal plans, QA checklists, architecture decision
 
 ## Research Library
 
-**136 research documents** covering every aspect of building a decentralized music platform.
+**147 research documents** covering every aspect of building a decentralized music platform.
 
 Start with:
 - [research/50 — The ZAO Complete Guide](./research/50-the-zao-complete-guide/) — canonical ecosystem reference

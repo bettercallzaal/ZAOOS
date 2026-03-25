@@ -128,7 +128,10 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
       };
 
       // Get a recent block number for the snapshot
-      const blockNumber = await walletClient.request({ method: 'eth_blockNumber' } as { method: 'eth_blockNumber' });
+      const { createPublicClient, http } = await import('viem');
+      const { mainnet } = await import('viem/chains');
+      const publicClient = createPublicClient({ chain: mainnet, transport: http() });
+      const blockNumber = await publicClient.getBlockNumber();
 
       const receipt = await (client as { proposal: (...args: unknown[]) => Promise<{ id: string }> }).proposal(
         ethersLikeSigner,
@@ -141,7 +144,7 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
           choices: [...choices],
           start: Math.floor(startTime.getTime() / 1000),
           end: Math.floor(endTime.getTime() / 1000),
-          snapshot: parseInt(blockNumber as string, 16),
+          snapshot: Number(blockNumber),
           plugins: JSON.stringify({}),
           app: 'zao-os',
           discussion: '',

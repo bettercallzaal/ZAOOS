@@ -128,6 +128,31 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Fetch on-chain transfers from respect_transfers table
+    const memberWallet = wallet || member.wallet_address;
+    if (memberWallet) {
+      const { data: transfers } = await supabaseAdmin
+        .from('respect_transfers')
+        .select('tx_hash, from_address, token_type, amount, block_timestamp')
+        .ilike('to_address', memberWallet.toLowerCase())
+        .order('block_timestamp', { ascending: false, nullsFirst: false })
+        .limit(50);
+
+      for (const t of transfers || []) {
+        const isMint = t.from_address === '0x0000000000000000000000000000000000000000';
+        const tokenLabel = t.token_type === 'zor_erc1155' ? 'ZOR' : 'OG';
+        ledger.push({
+          date: t.block_timestamp?.split('T')[0] || null,
+          source: 'onchain',
+          type: `${tokenLabel} ${isMint ? 'mint' : 'transfer'}`,
+          amount: Number(t.amount) || 0,
+          detail: isMint
+            ? `${tokenLabel} Respect minted on-chain`
+            : `${tokenLabel} transfer from ${t.from_address.slice(0, 8)}...`,
+        });
+      }
+    }
+
     // Sort ledger by date descending
     ledger.sort((a, b) => {
       if (!a.date) return 1;

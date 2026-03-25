@@ -22,6 +22,8 @@ interface MemberProfile {
   hiddenWallets: string[];
   platforms: Record<string, string | null>;
   ensNames: Record<string, string> | null;
+  ensAvatar: string | null;
+  ensProfile: Record<string, string> | null;
   respect: {
     total: number;
     fractal: number;
@@ -123,8 +125,8 @@ export default function MemberProfilePage() {
         {/* Hero */}
         <div className="flex items-start gap-4 mb-6">
           <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-800 flex-shrink-0 ring-2 ring-[#0a1628]">
-            {p.pfpUrl ? (
-              <Image src={p.pfpUrl} alt="" fill className="object-cover" sizes="80px" />
+            {(p.pfpUrl || p.ensAvatar) ? (
+              <Image src={p.pfpUrl || p.ensAvatar || ''} alt="" fill className="object-cover" sizes="80px" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-gray-600">
                 {(p.displayName || p.username || '?')[0]?.toUpperCase()}
@@ -297,6 +299,50 @@ export default function MemberProfilePage() {
                 <a href={p.artistProfile.website} target="_blank" rel="noopener noreferrer"
                   className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors">
                   Website
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ENS On-Chain Profile */}
+        {p.ensProfile && Object.keys(p.ensProfile).length > 0 && (
+          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">ENS Profile</p>
+              {p.ensName && <span className="text-xs text-[#f5a623]">{p.ensName}</span>}
+            </div>
+            {p.ensProfile.description && (
+              <p className="text-sm text-gray-400 mb-3">{p.ensProfile.description}</p>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {p.ensProfile['com.twitter'] && (
+                <a href={`https://x.com/${p.ensProfile['com.twitter']}`} target="_blank" rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-white/10 text-gray-300 text-xs hover:bg-white/20 transition-colors">
+                  X: @{p.ensProfile['com.twitter']}
+                </a>
+              )}
+              {p.ensProfile['com.github'] && (
+                <a href={`https://github.com/${p.ensProfile['com.github']}`} target="_blank" rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-gray-500/10 text-gray-300 text-xs hover:bg-gray-500/20 transition-colors">
+                  GitHub: {p.ensProfile['com.github']}
+                </a>
+              )}
+              {p.ensProfile['com.discord'] && (
+                <span className="px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 text-xs">
+                  Discord: {p.ensProfile['com.discord']}
+                </span>
+              )}
+              {p.ensProfile.url && (
+                <a href={p.ensProfile.url} target="_blank" rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] text-xs hover:bg-[#f5a623]/20 transition-colors">
+                  {p.ensProfile.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                </a>
+              )}
+              {p.ensProfile.email && (
+                <a href={`mailto:${p.ensProfile.email}`}
+                  className="px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs hover:bg-blue-500/20 transition-colors">
+                  {p.ensProfile.email}
                 </a>
               )}
             </div>

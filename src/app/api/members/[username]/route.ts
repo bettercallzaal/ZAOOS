@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createPublicClient, http } from 'viem';
-import { mainnet } from 'viem/chains';
 import { supabaseAdmin } from '@/lib/db/supabase';
-
-const ethClient = createPublicClient({ chain: mainnet, transport: http('https://eth.llamarpc.com') });
+import { resolveENSNames, getENSTextRecords, getENSAvatar } from '@/lib/ens/resolve';
 
 /**
  * GET /api/members/[username] — Unified member profile
@@ -133,16 +130,20 @@ export async function GET(
       } catch { /* non-critical */ }
     }
 
-    // Resolve ENS for primary + preferred wallet
-    const ensNames: Record<string, string> = {};
+    // Resolve ENS names for all wallets (with forward verification)
     const walletsToResolve = [user.primary_wallet, user.preferred_wallet, ...(user.verified_addresses || [])]
       .filter((w): w is string => !!w && w.startsWith('0x') && w.length === 42);
+    const ensNames = await resolveENSNames(walletsToResolve);
 
-    for (const wallet of [...new Set(walletsToResolve)].slice(0, 5)) {
-      try {
-        const name = await ethClient.getEnsName({ address: wallet as `0x${string}` });
-        if (name) ensNames[wallet.toLowerCase()] = name;
-      } catch { /* non-critical */ }
+    // Fetch ENS text records (avatar, description, socials) if any name resolved
+    const primaryEnsName = ensNames[(user.preferred_wallet || user.primary_wallet || '').toLowerCase()] || Object.values(ensNames)[0] || null;
+    let ensTextRecords: Record<string, string> = {};
+    let ensAvatar: string | null = null;
+    if (primaryEnsName) {
+      [ensTextRecords, ensAvatar] = await Promise.all([
+        getENSTextRecords(primaryEnsName),
+        getENSAvatar(primaryEnsName),
+      ]);
     }
 
     // Build history entries
@@ -173,8 +174,10 @@ export async function GET(
       pfpUrl: user.pfp_url,
       realName: user.real_name,
       bio: user.bio,
-      ensName: user.ens_name || ensNames[(user.preferred_wallet || user.primary_wallet || '').toLowerCase()] || Object.values(ensNames)[0] || null,
+      ensName: user.ens_name || primaryEnsName || null,
       ensNames,
+      ensAvatar,
+      ensProfile: Object.keys(ensTextRecords).length > 0 ? ensTextRecords : null,
       zid: user.zid,
       tier: user.member_tier || 'community',
       role: user.role,

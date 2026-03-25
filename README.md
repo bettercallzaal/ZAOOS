@@ -410,8 +410,21 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 
 - [x] **Ecosystem partner page** — showcase partner projects
   - `src/app/(auth)/ecosystem/`
-- [x] **Directory** — member directory with search
-  - `src/app/api/directory/route.ts` · `src/app/api/directory/[slug]/route.ts`
+- [x] **Public member directory** — unified grid at `/members` with PFP, name, ZID, tier, respect, category, cover images
+  - `src/app/members/page.tsx` (public) · `src/app/api/members/directory/route.ts`
+  - Merges users + respect_members + community_profiles
+  - Search, tier filter (Respect Holders / Community), sort by respect/name/recent
+  - `/directory` redirects here
+- [x] **Public member profiles** — shareable at `/members/[username]` (no login required)
+  - `src/app/members/[username]/page.tsx` · `src/app/api/members/[username]/route.ts`
+  - Shows: respect scores, fractal history, platforms, ENS names, profile completeness
+  - Lookup by username, FID, or wallet address
+  - Server-side ENS resolution for all wallets
+- [ ] **Profile cover image hero** — display artist cover image as banner on profile page
+- [ ] **Respect breakdown** — show fractal/event/hosting/bonus/OG/ZOR individually
+- [ ] **WaveWarZ stats on profile** — wins, losses, volume from wavewarz_artists
+- [ ] **OG image generation** — dynamic social sharing cards for member profiles
+- [ ] **Self-edit profile** — members edit their own bio, category, links, cover image
 - [x] **Settings page** — unified ACCOUNTS (Wallet, Farcaster, Bluesky, Solana, X), FEATURES (Messaging, Push), SOCIALS
   - `src/app/api/users/messaging-prefs/route.ts` · `src/app/api/users/wallet-visibility/route.ts`
   - `src/app/api/platforms/` (Lens, Hive connection endpoints)

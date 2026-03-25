@@ -57,7 +57,11 @@ scripts/fix-proposal-categories-v2.sql
 npx tsx scripts/generate-wallet.ts
 ```
 
-See `.env.example` for all required environment variables.
+See `.env.example` for all required environment variables. Key services:
+- **Supabase** — database (required)
+- **Neynar** — Farcaster API (required)
+- **Alchemy** — ENS resolution (free tier, recommended)
+- **PostHog** — analytics (optional)
 
 ---
 
@@ -95,8 +99,12 @@ See `.env.example` for all required environment variables.
   - `src/app/api/admin/member-health/route.ts` — data quality report (missing fields, tier mismatches, unlinked records)
   - Member tiers: `respect_holder` (governance) vs `community` (view only)
   - Activity tracking via `src/lib/db/activity.ts`
-- [x] **ENS resolution** — auto-resolve ENS names for all ETH wallets in settings
-  - `src/hooks/useENS.ts`
+- [x] **ENS resolution** — server-side via Alchemy RPC with forward verification, text records, avatar
+  - `src/lib/ens/resolve.ts` — shared module (resolveENSNames, getENSTextRecords, getENSAvatar)
+  - `src/app/api/ens/route.ts` — public server-side API (protects Alchemy key)
+  - `src/hooks/useENS.ts` — client hooks call API route (no browser-side RPC)
+  - ENS Profile section on member pages: description, twitter, github, discord from on-chain records
+  - Requires: `ALCHEMY_API_KEY` env var (free tier: 30M CU/month)
 - [x] **Preferred wallet** — users choose which wallet displays on their profile
 - [ ] **Admin confirmation modals** — replace native confirm() with styled ConfirmDialog for destructive actions
 - [x] **Security hardening** — server-side nonce validation, HMAC-SHA512 webhook verification, CSP headers, RLS on all tables, error sanitization, signer ownership checks, scheduled casts RLS fix
@@ -420,8 +428,11 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
   - Shows: respect scores, fractal history, platforms, ENS names, profile completeness
   - Lookup by username, FID, or wallet address
   - Server-side ENS resolution for all wallets
-- [ ] **Profile cover image hero** — display artist cover image as banner on profile page
-- [ ] **Respect breakdown** — show fractal/event/hosting/bonus/OG/ZOR individually
+- [x] **Profile cover image hero** — full-width banner from artist profile with gradient overlay
+- [x] **Respect breakdown** — 6-card grid: Total, Fractal, Events, Hosting, OG Chain, ZOR Chain
+- [x] **Profile badges** — category (musician/producer/etc), featured, admin, moderator, power badge
+- [x] **ENS Profile section** — on-chain identity from ENS text records (twitter, github, discord, website)
+- [x] **Profile completeness indicator** — progress bar showing what's missing
 - [ ] **WaveWarZ stats on profile** — wins, losses, volume from wavewarz_artists
 - [ ] **OG image generation** — dynamic social sharing cards for member profiles
 - [ ] **Self-edit profile** — members edit their own bio, category, links, cover image

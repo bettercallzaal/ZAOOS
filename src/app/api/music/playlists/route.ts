@@ -47,6 +47,7 @@ const createSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   isPublic: z.boolean().optional(),
+  collaborative: z.boolean().optional(),
 });
 
 /**
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
         created_by_fid: session.fid,
         type: 'personal',
         is_public: parsed.data.isPublic ?? false,
+        collaborative: parsed.data.collaborative ?? false,
       })
       .select('*')
       .single();

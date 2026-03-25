@@ -10,6 +10,8 @@ import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFar
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 import { LikeButton } from '@/components/music/LikeButton';
+import { ShareToChatButton } from '@/components/music/ShareToChatButton';
+import { QueueActions } from '@/components/music/QueueActions';
 
 interface MusicEmbedProps {
   url: string;
@@ -289,6 +291,12 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
 
         {/* Add to playlist */}
         <AddToPlaylistButton songUrl={url} compact className="flex-shrink-0" />
+
+        {/* Add to queue */}
+        {metadata && <QueueActions metadata={{ ...metadata, feedId: castHash }} compact className="flex-shrink-0" />}
+
+        {/* Share to chat */}
+        <ShareToChatButton songUrl={url} trackName={metadata.trackName} compact className="flex-shrink-0" />
 
         {/* Share to Farcaster */}
         <ShareToFarcaster

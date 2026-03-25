@@ -8,6 +8,7 @@ import { usePlayer } from '@/providers/audio';
 import { WaveformPlayer } from '@/components/music/WaveformPlayerWrapper';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 import { LikeButton } from '@/components/music/LikeButton';
+import { QueueActions } from '@/components/music/QueueActions';
 
 const PLATFORM_LABELS: Record<TrackType, string> = {
   spotify: 'Spotify',
@@ -228,6 +229,9 @@ export const MusicQueueTrackCard = memo(function MusicQueueTrackCard({
 
         {/* Add to playlist */}
         <AddToPlaylistButton songUrl={url} compact className="flex-shrink-0" />
+
+        {/* Add to queue */}
+        {metadata && <QueueActions metadata={{ ...metadata, feedId: castHash }} compact className="flex-shrink-0" />}
       </div>
 
       {/* Waveform for Audius tracks */}

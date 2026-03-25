@@ -25,6 +25,21 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
+    // Check playlist ownership or collaborative access
+    const { data: playlist, error: plError } = await supabaseAdmin
+      .from('playlists')
+      .select('created_by_fid, collaborative')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (plError) throw plError;
+    if (!playlist) {
+      return NextResponse.json({ error: 'Playlist not found' }, { status: 404 });
+    }
+    if (playlist.created_by_fid !== session.fid && !playlist.collaborative) {
+      return NextResponse.json({ error: 'Not allowed to add to this playlist' }, { status: 403 });
+    }
+
     await addToPlaylist(id, parsed.data.songId, session.fid);
     return NextResponse.json({ success: true });
   } catch (err) {

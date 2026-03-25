@@ -6,6 +6,7 @@ interface Playlist {
   id: string;
   name: string;
   trackCount: number;
+  collaborative?: boolean;
 }
 
 interface AddToPlaylistButtonProps {
@@ -60,7 +61,7 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
   const fetchPlaylists = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/music/playlists?type=personal');
+      const res = await fetch('/api/music/playlists?type=all');
       if (res.ok) {
         const data = await res.json();
         setPlaylists(data.playlists || []);
@@ -180,7 +181,14 @@ export function AddToPlaylistButton({ songUrl, compact = false, className = '' }
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
                   </svg>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-white truncate">{pl.name}</p>
+                    <p className="text-xs text-white truncate flex items-center gap-1">
+                      {pl.name}
+                      {pl.collaborative && (
+                        <span className="inline-flex items-center px-1 py-px rounded text-[8px] font-medium bg-[#f5a623]/15 text-[#f5a623] leading-none">
+                          collab
+                        </span>
+                      )}
+                    </p>
                     <p className="text-[10px] text-gray-500">{pl.trackCount} track{pl.trackCount !== 1 ? 's' : ''}</p>
                   </div>
                   {adding === pl.id ? (

@@ -11,6 +11,8 @@ import { Scrubber } from './Scrubber';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { TrackCardSkeleton } from '@/components/music/MusicSkeletons';
 import type { Song } from '@/lib/music/library';
+import { useQueue } from '@/contexts/QueueContext';
+import type { QueueTrack } from '@/hooks/usePlayerQueue';
 
 interface MusicSidebarProps {
   messages?: Cast[];
@@ -116,6 +118,7 @@ export function MusicSidebar({
 
           {/* Queue list */}
           <div className="flex-1 overflow-y-auto pb-4">
+            <UserQueueSection player={player} />
             <QueueContent queue={queue} currentIndex={currentIndex} onPlay={onClose} />
           </div>
         </div>
@@ -414,27 +417,33 @@ function SidebarTabs({
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'library' && <LibraryTab player={player} />}
         {activeTab === 'queue' && (
-          queue.length === 0 && radioLoading ? (
-            <div className="py-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <TrackCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : queue.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-              <p className="text-sm font-medium text-gray-400">No tracks in queue</p>
-              <p className="text-xs text-gray-600 mt-1.5">
-                Play a song or start radio to build the queue
-              </p>
-            </div>
-          ) : (
-            <div className="py-2">
-              <p className="px-4 pb-2 text-[10px] text-gray-500 font-medium uppercase tracking-wider">
-                {currentIndex >= 0 ? `Up next · ${queue.length - currentIndex - 1} remaining` : `Queue · ${queue.length} tracks`}
-              </p>
-              <QueueContent queue={queue} currentIndex={currentIndex} />
-            </div>
-          )
+          <>
+            {/* User-managed queue */}
+            <UserQueueSection player={player} />
+
+            {/* Channel queue (auto-derived from chat) */}
+            {queue.length === 0 && radioLoading ? (
+              <div className="py-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <TrackCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : queue.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                <p className="text-sm font-medium text-gray-400">No tracks in queue</p>
+                <p className="text-xs text-gray-600 mt-1.5">
+                  Play a song or start radio to build the queue
+                </p>
+              </div>
+            ) : (
+              <div className="py-2">
+                <p className="px-4 pb-2 text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+                  {currentIndex >= 0 ? `Up next · ${queue.length - currentIndex - 1} remaining` : `Channel · ${queue.length} tracks`}
+                </p>
+                <QueueContent queue={queue} currentIndex={currentIndex} />
+              </div>
+            )}
+          </>
         )}
         {activeTab === 'playlists' && <PlaylistsTab />}
       </div>
@@ -626,6 +635,116 @@ function PlaylistsTab() {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+// ─── User Queue Section ───────────────────────────────────────────────────────
+
+function UserQueueSection({ player }: { player: ReturnType<typeof usePlayer> }) {
+  const { queue, currentIndex, removeFromQueue, skipTo } = useQueue();
+
+  if (queue.length === 0) return null;
+
+  const handlePlay = (index: number) => {
+    const metadata = skipTo(index);
+    if (metadata) {
+      player.play(metadata);
+    }
+  };
+
+  return (
+    <div className="border-b border-gray-800/50">
+      <div className="flex items-center justify-between px-4 pt-3 pb-1">
+        <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-semibold">
+          Your Queue
+        </p>
+        <span className="text-[10px] text-gray-500">
+          {queue.length} track{queue.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+      <div className="py-1">
+        {queue.map((entry, i) => (
+          <UserQueueTrackRow
+            key={entry.id}
+            entry={entry}
+            index={i}
+            isCurrent={i === currentIndex}
+            isPlaying={i === currentIndex && player.isPlaying}
+            onPlay={() => handlePlay(i)}
+            onRemove={() => removeFromQueue(entry.id)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UserQueueTrackRow({
+  entry,
+  index,
+  isCurrent,
+  isPlaying,
+  onPlay,
+  onRemove,
+}: {
+  entry: QueueTrack;
+  index: number;
+  isCurrent: boolean;
+  isPlaying: boolean;
+  onPlay: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div
+      className={`flex items-center gap-2 px-3 py-1.5 transition-colors hover:bg-white/5 ${
+        isCurrent ? 'bg-[#f5a623]/10' : ''
+      }`}
+    >
+      <button
+        onClick={onPlay}
+        className="flex items-center gap-2 flex-1 min-w-0 text-left"
+      >
+        {/* Index / playing indicator */}
+        <div className="w-5 flex-shrink-0 flex items-center justify-center">
+          {isPlaying ? (
+            <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+            </svg>
+          ) : isCurrent ? (
+            <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          ) : (
+            <span className="text-xs text-gray-600">{index + 1}</span>
+          )}
+        </div>
+
+        {/* Track info */}
+        <div className="flex-1 min-w-0">
+          <p
+            className={`text-xs font-medium truncate ${
+              isCurrent ? 'text-[#f5a623]' : 'text-white'
+            }`}
+          >
+            {entry.metadata.trackName}
+          </p>
+          <p className="text-xs text-gray-500 truncate">
+            {entry.metadata.artistName || 'Unknown artist'}
+          </p>
+        </div>
+      </button>
+
+      {/* Remove button */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        className="p-1 text-gray-500 hover:text-red-400 transition-colors flex-shrink-0"
+        aria-label="Remove from queue"
+      >
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
   );
 }

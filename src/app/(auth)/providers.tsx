@@ -2,6 +2,7 @@
 
 import { AudioProviders } from '@/providers/audio';
 import { RadioProvider } from '@/providers/audio/RadioProvider';
+import { QueueProvider } from '@/contexts/QueueContext';
 
 /**
  * Audio + Radio providers — only loaded for authenticated routes.
@@ -10,7 +11,9 @@ import { RadioProvider } from '@/providers/audio/RadioProvider';
 export function AuthAudioProviders({ children }: { children: React.ReactNode }) {
   return (
     <AudioProviders>
-      <RadioProvider>{children}</RadioProvider>
+      <QueueProvider>
+        <RadioProvider>{children}</RadioProvider>
+      </QueueProvider>
     </AudioProviders>
   );
 }

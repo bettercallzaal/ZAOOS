@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { AmbientMixer } from '@/components/music/AmbientMixer';
 
 // ─── Presets ──────────────────────────────────────────────────────────
 
@@ -9,9 +10,35 @@ interface BinauralPreset {
   description: string;
   beatFrequency: number;
   carrierFrequency: number;
-  wave: 'delta' | 'theta' | 'alpha' | 'beta';
+  wave: 'delta' | 'theta' | 'alpha' | 'beta' | 'custom';
   icon: string;
   color: string;
+}
+
+// ─── Saved custom preset type ────────────────────────────────────────
+
+interface SavedCustomPreset {
+  carrier: number;
+  beat: number;
+  name: string;
+}
+
+const STORAGE_KEY = 'zao-binaural-custom-presets';
+
+function loadSavedPresets(): SavedCustomPreset[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePresetsToStorage(presets: SavedCustomPreset[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+  } catch { /* storage full or unavailable */ }
 }
 
 const PRESETS: BinauralPreset[] = [
@@ -79,11 +106,31 @@ export function BinauralBeats() {
   const [timerSeconds, setTimerSeconds] = useState(1800); // default 30min
   const [remaining, setRemaining] = useState(0);
 
+  // Custom frequency state
+  const [customExpanded, setCustomExpanded] = useState(false);
+  const [customCarrier, setCustomCarrier] = useState(200);
+  const [customBeat, setCustomBeat] = useState(10);
+  const [savedPresets, setSavedPresets] = useState<SavedCustomPreset[]>([]);
+  const [saveName, setSaveName] = useState('');
+
+  // Load saved presets from localStorage on mount
+  useEffect(() => {
+    setSavedPresets(loadSavedPresets());
+  }, []);
+
   const audioCtxRef = useRef<AudioContext | null>(null);
   const leftOscRef = useRef<OscillatorNode | null>(null);
   const rightOscRef = useRef<OscillatorNode | null>(null);
   const gainRef = useRef<GainNode | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Ensure AudioContext exists (shared with AmbientMixer)
+  const getOrCreateAudioCtx = useCallback(() => {
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioContext();
+    }
+    return audioCtxRef.current;
+  }, []);
 
   const stopAudio = useCallback(() => {
     try {
@@ -104,8 +151,7 @@ export function BinauralBeats() {
     // Stop any existing playback
     stopAudio();
 
-    const ctx = audioCtxRef.current || new AudioContext();
-    audioCtxRef.current = ctx;
+    const ctx = getOrCreateAudioCtx();
 
     if (ctx.state === 'suspended') ctx.resume();
 
@@ -160,7 +206,7 @@ export function BinauralBeats() {
     }
 
     navigator.vibrate?.(10);
-  }, [volume, timerSeconds, stopAudio]);
+  }, [volume, timerSeconds, stopAudio, getOrCreateAudioCtx]);
 
   // Update volume on the fly
   useEffect(() => {
@@ -182,6 +228,58 @@ export function BinauralBeats() {
       startAudio(preset);
     }
   };
+
+  // Play custom frequencies
+  const handlePlayCustom = useCallback(() => {
+    const customPreset: BinauralPreset = {
+      name: `Custom ${customCarrier}/${customBeat}`,
+      description: `${customCarrier} Hz carrier + ${customBeat} Hz beat`,
+      beatFrequency: customBeat,
+      carrierFrequency: customCarrier,
+      wave: 'custom',
+      icon: '\u{2699}\uFE0F',
+      color: 'from-[#f5a623]/20 to-amber-900/20',
+    };
+
+    if (playing && activePreset?.wave === 'custom') {
+      stopAudio();
+    } else {
+      startAudio(customPreset);
+    }
+  }, [customCarrier, customBeat, playing, activePreset, startAudio, stopAudio]);
+
+  // Save a custom preset to localStorage
+  const handleSaveCustom = useCallback(() => {
+    const name = saveName.trim() || `Custom ${customCarrier}/${customBeat}`;
+    const newPreset: SavedCustomPreset = { carrier: customCarrier, beat: customBeat, name };
+    const updated = [...savedPresets, newPreset];
+    setSavedPresets(updated);
+    savePresetsToStorage(updated);
+    setSaveName('');
+  }, [saveName, customCarrier, customBeat, savedPresets]);
+
+  // Delete a saved custom preset
+  const handleDeleteSaved = useCallback((index: number) => {
+    const updated = savedPresets.filter((_, i) => i !== index);
+    setSavedPresets(updated);
+    savePresetsToStorage(updated);
+  }, [savedPresets]);
+
+  // Play a saved custom preset
+  const handlePlaySaved = useCallback((saved: SavedCustomPreset) => {
+    setCustomCarrier(saved.carrier);
+    setCustomBeat(saved.beat);
+    const preset: BinauralPreset = {
+      name: saved.name,
+      description: `${saved.carrier} Hz carrier + ${saved.beat} Hz beat`,
+      beatFrequency: saved.beat,
+      carrierFrequency: saved.carrier,
+      wave: 'custom',
+      icon: '\u{2699}\uFE0F',
+      color: 'from-[#f5a623]/20 to-amber-900/20',
+    };
+    startAudio(preset);
+  }, [startAudio]);
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -262,6 +360,183 @@ export function BinauralBeats() {
           );
         })}
       </div>
+
+      {/* Custom Frequency Section */}
+      <div className="mt-3">
+        <button
+          onClick={() => setCustomExpanded((v) => !v)}
+          className={`w-full flex items-center gap-3 p-3.5 rounded-xl border transition-all text-left ${
+            playing && activePreset?.wave === 'custom'
+              ? 'bg-gradient-to-r from-[#f5a623]/20 to-amber-900/20 border-[#f5a623]/30 shadow-lg shadow-[#f5a623]/5'
+              : 'bg-[#0d1b2a] border-gray-800 hover:border-gray-700'
+          }`}
+        >
+          <div className={`w-11 h-11 flex-shrink-0 rounded-lg flex items-center justify-center text-lg ${
+            playing && activePreset?.wave === 'custom' ? 'bg-[#f5a623]/20' : 'bg-white/5'
+          }`}>
+            {playing && activePreset?.wave === 'custom' ? (
+              <div className="flex items-end gap-px">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="w-[3px] bg-[#f5a623] rounded-full animate-bounce"
+                    style={{
+                      height: `${6 + i * 3}px`,
+                      animationDelay: `${i * 0.15}s`,
+                      animationDuration: '0.6s',
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <span>{'\u2699\uFE0F'}</span>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={`text-sm font-semibold ${
+              playing && activePreset?.wave === 'custom' ? 'text-[#f5a623]' : 'text-white'
+            }`}>
+              Custom Frequency
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">Set your own carrier and beat frequencies</p>
+          </div>
+          <svg
+            className={`w-4 h-4 text-gray-500 flex-shrink-0 transition-transform ${customExpanded ? 'rotate-180' : ''}`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {customExpanded && (
+          <div className="mt-2 p-4 rounded-xl bg-[#0d1b2a] border border-gray-800 space-y-4">
+            {/* Carrier Frequency Slider */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-medium text-gray-300">Carrier Frequency</label>
+                <span className="text-xs font-mono text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full">
+                  {customCarrier} Hz
+                </span>
+              </div>
+              <input
+                type="range"
+                min={50}
+                max={500}
+                step={1}
+                value={customCarrier}
+                onChange={(e) => setCustomCarrier(parseInt(e.target.value, 10))}
+                className="w-full h-1.5 accent-[#f5a623] cursor-pointer"
+                aria-label="Carrier frequency"
+              />
+              <div className="flex justify-between mt-1">
+                <span className="text-[9px] text-gray-600">50 Hz</span>
+                <span className="text-[9px] text-gray-600">500 Hz</span>
+              </div>
+            </div>
+
+            {/* Beat Frequency Slider */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-medium text-gray-300">Beat Frequency</label>
+                <span className="text-xs font-mono text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full">
+                  {customBeat} Hz
+                </span>
+              </div>
+              <input
+                type="range"
+                min={1}
+                max={40}
+                step={0.5}
+                value={customBeat}
+                onChange={(e) => setCustomBeat(parseFloat(e.target.value))}
+                className="w-full h-1.5 accent-[#f5a623] cursor-pointer"
+                aria-label="Beat frequency"
+              />
+              <div className="flex justify-between mt-1">
+                <span className="text-[9px] text-gray-600">1 Hz (Delta)</span>
+                <span className="text-[9px] text-gray-600">40 Hz (Gamma)</span>
+              </div>
+            </div>
+
+            {/* Live preview */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-gray-800/50">
+              <svg className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+              </svg>
+              <p className="text-[10px] text-gray-400 font-mono tabular-nums">
+                Left: {customCarrier} Hz | Right: {customCarrier + customBeat} Hz
+              </p>
+            </div>
+
+            {/* Play + Save buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={handlePlayCustom}
+                className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  playing && activePreset?.wave === 'custom'
+                    ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
+                    : 'bg-[#f5a623]/20 text-[#f5a623] hover:bg-[#f5a623]/30 border border-[#f5a623]/30'
+                }`}
+              >
+                {playing && activePreset?.wave === 'custom' ? 'Stop' : 'Play Custom'}
+              </button>
+              <button
+                onClick={handleSaveCustom}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-white/5 text-gray-300 hover:bg-white/10 border border-gray-800 transition-colors"
+              >
+                Save
+              </button>
+            </div>
+
+            {/* Save name input (optional) */}
+            <input
+              type="text"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              placeholder="Preset name (optional)"
+              className="w-full px-3 py-1.5 rounded-lg bg-white/[0.03] border border-gray-800 text-xs text-gray-300 placeholder:text-gray-600 focus:outline-none focus:border-[#f5a623]/30"
+            />
+
+            {/* Saved presets list */}
+            {savedPresets.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Saved Presets</p>
+                {savedPresets.map((sp, idx) => (
+                  <div
+                    key={`${sp.name}-${idx}`}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-gray-800/50 group"
+                  >
+                    <button
+                      onClick={() => handlePlaySaved(sp)}
+                      className="flex-1 text-left"
+                    >
+                      <p className="text-xs font-medium text-gray-300">{sp.name}</p>
+                      <p className="text-[10px] text-gray-600 font-mono">
+                        {sp.carrier} Hz + {sp.beat} Hz beat
+                      </p>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSaved(idx)}
+                      className="opacity-0 group-hover:opacity-100 p-1 rounded text-gray-600 hover:text-red-400 transition-all"
+                      aria-label={`Delete ${sp.name}`}
+                    >
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Ambient Mixer */}
+      <AmbientMixer getAudioCtx={getOrCreateAudioCtx} />
 
       {/* Controls */}
       <div className="mt-4 space-y-3">

@@ -1,14 +1,16 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { usePlayer } from '@/providers/audio';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { Scrubber } from '@/components/music/Scrubber';
+import { WaveformComments } from '@/components/music/WaveformComments';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 import { ShareToChatButton } from '@/components/music/ShareToChatButton';
 import { TrackReactions } from '@/components/music/TrackReactions';
+import { LyricsPanel } from '@/components/music/LyricsPanel';
 import type { TrackMetadata } from '@/types/music';
 
 interface ExpandedPlayerProps {
@@ -21,6 +23,7 @@ interface ExpandedPlayerProps {
 export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPlayerProps) {
   const player = usePlayer();
   const { isPlaying, isLoading, position, duration } = player;
+  const [showLyrics, setShowLyrics] = useState(false);
 
   // ─── Swipe down to dismiss ──────────────────────────────────────────
   const touchStartY = useRef(0);
@@ -77,46 +80,56 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
         <div className="w-9" /> {/* spacer for centering */}
       </div>
 
-      {/* ─── Artwork (large, swipeable) ────────────────────────────── */}
+      {/* ─── Artwork / Lyrics (large, swipeable) ─────────────────── */}
       <div
         className="flex-1 flex items-center justify-center px-8 min-h-0"
         onTouchStart={onArtworkTouchStart}
         onTouchEnd={onArtworkTouchEnd}
       >
-        <div className={`relative w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-gray-800 shadow-2xl ${
-          isPlaying ? 'ring-2 ring-[#f5a623]/20 shadow-[#f5a623]/10' : ''
-        }`}>
-          <ArtworkImage
-            src={metadata.artworkUrl}
-            alt={metadata.trackName}
-            fill
-            className="object-cover"
-            sizes="320px"
-          />
-          {isPlaying && (
-            <div className="absolute inset-0 flex items-end justify-center pb-4 bg-gradient-to-t from-black/30 to-transparent">
-              <div className="flex items-end gap-1">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="w-1 bg-[#f5a623] rounded-full animate-bounce"
-                    style={{
-                      height: `${10 + i * 4}px`,
-                      animationDelay: `${i * 0.12}s`,
-                      animationDuration: '0.6s',
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          {/* Swipe hint */}
-          <div className="absolute bottom-2 left-0 right-0 flex justify-center pointer-events-none">
-            <span className="text-[9px] text-white/30 bg-black/20 px-2 py-0.5 rounded-full">
-              Swipe to skip
-            </span>
+        {showLyrics ? (
+          <div className="w-full max-w-[360px] h-full flex flex-col bg-white/5 rounded-2xl overflow-hidden">
+            <LyricsPanel
+              trackName={metadata.trackName}
+              artistName={metadata.artistName || ''}
+              className="flex-1 min-h-0"
+            />
           </div>
-        </div>
+        ) : (
+          <div className={`relative w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-gray-800 shadow-2xl ${
+            isPlaying ? 'ring-2 ring-[#f5a623]/20 shadow-[#f5a623]/10' : ''
+          }`}>
+            <ArtworkImage
+              src={metadata.artworkUrl}
+              alt={metadata.trackName}
+              fill
+              className="object-cover"
+              sizes="320px"
+            />
+            {isPlaying && (
+              <div className="absolute inset-0 flex items-end justify-center pb-4 bg-gradient-to-t from-black/30 to-transparent">
+                <div className="flex items-end gap-1">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="w-1 bg-[#f5a623] rounded-full animate-bounce"
+                      style={{
+                        height: `${10 + i * 4}px`,
+                        animationDelay: `${i * 0.12}s`,
+                        animationDuration: '0.6s',
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Swipe hint */}
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center pointer-events-none">
+              <span className="text-[9px] text-white/30 bg-black/20 px-2 py-0.5 rounded-full">
+                Swipe to skip
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ─── Track info ────────────────────────────────────────────── */}
@@ -134,6 +147,15 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
           duration={duration}
           feedId={metadata.feedId}
           onSeek={player.seek}
+        />
+      </div>
+
+      {/* ─── Waveform Comments ───────────────────────────────────── */}
+      <div className="px-8 py-1 flex-shrink-0">
+        <WaveformComments
+          songUrl={metadata.url}
+          duration={duration}
+          position={position}
         />
       </div>
 
@@ -217,6 +239,18 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
           <LikeButton songUrl={metadata.url} className="flex-shrink-0" />
           <AddToPlaylistButton songUrl={metadata.url} className="flex-shrink-0" />
           <ShareToChatButton songUrl={metadata.url} trackName={metadata.trackName} className="flex-shrink-0" />
+
+          {/* Lyrics toggle */}
+          <button
+            onClick={() => setShowLyrics((v) => !v)}
+            className={`p-1.5 rounded-lg text-sm font-bold transition-colors ${
+              showLyrics ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
+            }`}
+            aria-label={showLyrics ? 'Hide lyrics' : 'Show lyrics'}
+            title={showLyrics ? 'Hide lyrics' : 'Show lyrics'}
+          >
+            Aa
+          </button>
 
           {/* Share (external link) */}
           <a

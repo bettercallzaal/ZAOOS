@@ -66,7 +66,7 @@ export default function MemberCRMPage() {
   const [fixing, setFixing] = useState<string | null>(null);
   const [fixResults, setFixResults] = useState<{ action: string; fixed: number; errors: number; details: string[] }[] | null>(null);
 
-  const runFix = async (action: 'link-fids' | 'enrich-profiles' | 'sync-tiers' | 'all') => {
+  const runFix = async (action: 'link-fids' | 'enrich-profiles' | 'import-socials' | 'sync-tiers' | 'link-profiles' | 'all') => {
     setFixing(action);
     setFixResults(null);
     try {
@@ -286,6 +286,20 @@ export default function MemberCRMPage() {
                   className="px-3 py-2 text-xs font-medium rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 disabled:opacity-50 transition-colors"
                 >
                   {fixing === 'sync-tiers' ? 'Syncing...' : 'Sync Tiers (respect → holder)'}
+                </button>
+                <button
+                  onClick={() => runFix('import-socials')}
+                  disabled={!!fixing}
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-pink-500/10 text-pink-400 border border-pink-500/20 hover:bg-pink-500/20 disabled:opacity-50 transition-colors"
+                >
+                  {fixing === 'import-socials' ? 'Importing...' : 'Import Socials (from Farcaster)'}
+                </button>
+                <button
+                  onClick={() => runFix('link-profiles')}
+                  disabled={!!fixing}
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 disabled:opacity-50 transition-colors"
+                >
+                  {fixing === 'link-profiles' ? 'Linking...' : 'Link Artist Profiles'}
                 </button>
                 <button
                   onClick={() => runFix('all')}

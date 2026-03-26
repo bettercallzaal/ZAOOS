@@ -4,7 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
 const actionSchema = z.object({
-  action: z.enum(['link-fids', 'enrich-profiles', 'sync-tiers', 'all']),
+  action: z.enum(['link-fids', 'enrich-profiles', 'import-socials', 'sync-tiers', 'link-profiles', 'all']),
 });
 
 /**
@@ -144,7 +144,131 @@ export async function POST(req: NextRequest) {
       results.push({ action: 'enrich-profiles', fixed: enriched, errors, details });
     }
 
-    // ── 3. Sync member tiers ──────────────────────────────────────
+    // ── 3. Import social handles from Farcaster profiles ──────────
+    if (action === 'import-socials' || action === 'all') {
+      const { data: usersWithFid } = await supabaseAdmin
+        .from('users')
+        .select('id, fid, display_name, x_handle, instagram_handle, bio')
+        .not('fid', 'is', null)
+        .eq('is_active', true);
+
+      let imported = 0;
+      let errors = 0;
+      const details: string[] = [];
+
+      // Batch in groups of 100
+      for (let i = 0; i < (usersWithFid || []).length; i += 100) {
+        const batch = (usersWithFid || []).slice(i, i + 100);
+        const fids = batch.map(u => u.fid).filter(Boolean);
+        if (fids.length === 0) continue;
+
+        try {
+          const response = await fetch(
+            `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fids.join(',')}`,
+            { headers: { 'api_key': process.env.NEYNAR_API_KEY || '' } }
+          );
+          if (!response.ok) continue;
+          const data = await response.json();
+
+          for (const fcUser of data.users || []) {
+            const dbUser = batch.find(u => u.fid === fcUser.fid);
+            if (!dbUser) continue;
+
+            const updates: Record<string, unknown> = {};
+
+            // Import bio if missing
+            if (!dbUser.bio && fcUser.profile?.bio?.text) {
+              updates.bio = fcUser.profile.bio.text;
+            }
+
+            // Import connected accounts from Farcaster profile
+            // Neynar returns connected accounts in the user object
+            const connectedAccounts = fcUser.verified_accounts || [];
+            for (const account of connectedAccounts) {
+              if (account.platform === 'x' && !dbUser.x_handle) {
+                updates.x_handle = account.username;
+              }
+              if (account.platform === 'instagram' && !dbUser.instagram_handle) {
+                updates.instagram_handle = account.username;
+              }
+            }
+
+            // Also check profile bio for common patterns
+            const bioText = fcUser.profile?.bio?.text || '';
+            if (!dbUser.x_handle && !updates.x_handle) {
+              const xMatch = bioText.match(/(?:twitter|x)\.com\/(@?\w+)/i) || bioText.match(/(?:^|\s)@(\w{1,15})(?:\s|$)/);
+              if (xMatch) updates.x_handle = xMatch[1].replace('@', '');
+            }
+
+            if (Object.keys(updates).length > 0) {
+              await supabaseAdmin.from('users').update(updates).eq('id', dbUser.id);
+              details.push(`${fcUser.display_name || fcUser.username}: +${Object.keys(updates).join(', ')}`);
+              imported++;
+            }
+          }
+        } catch {
+          errors++;
+        }
+      }
+
+      results.push({ action: 'import-socials', fixed: imported, errors, details });
+    }
+
+    // ── 4. Link community_profiles to users ─────────────────────────
+    if (action === 'link-profiles' || action === 'all') {
+      let linked = 0;
+      const details: string[] = [];
+
+      // Link by FID
+      const { data: unlinkedByFid } = await supabaseAdmin
+        .from('users')
+        .select('id, fid, display_name, community_profile_id')
+        .not('fid', 'is', null)
+        .is('community_profile_id', null)
+        .eq('is_active', true);
+
+      for (const user of unlinkedByFid || []) {
+        const { data: profile } = await supabaseAdmin
+          .from('community_profiles')
+          .select('id, name')
+          .eq('fid', user.fid)
+          .maybeSingle();
+
+        if (profile) {
+          await supabaseAdmin.from('users').update({ community_profile_id: profile.id }).eq('id', user.id);
+          details.push(`${user.display_name}: linked to profile "${profile.name}"`);
+          linked++;
+        }
+      }
+
+      // Link by name match (fuzzy)
+      const { data: stillUnlinked } = await supabaseAdmin
+        .from('users')
+        .select('id, display_name, username, community_profile_id')
+        .is('community_profile_id', null)
+        .eq('is_active', true);
+
+      for (const user of stillUnlinked || []) {
+        const name = user.display_name || user.username;
+        if (!name) continue;
+
+        const { data: profile } = await supabaseAdmin
+          .from('community_profiles')
+          .select('id, name')
+          .ilike('name', name)
+          .maybeSingle();
+
+        if (profile) {
+          await supabaseAdmin.from('users').update({ community_profile_id: profile.id }).eq('id', user.id);
+          details.push(`${name}: linked to profile "${profile.name}" (name match)`);
+          linked++;
+        }
+      }
+
+      results.push({ action: 'link-profiles', fixed: linked, errors: 0, details });
+    }
+
+    // ── 5. Sync member tiers ──────────────────────────────────────
     if (action === 'sync-tiers' || action === 'all') {
       const { data: users } = await supabaseAdmin
         .from('users')

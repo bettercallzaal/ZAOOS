@@ -4,7 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
 const actionSchema = z.object({
-  action: z.enum(['link-fids', 'enrich-profiles', 'import-socials', 'sync-tiers', 'link-profiles', 'all']),
+  action: z.enum(['link-fids', 'enrich-profiles', 'import-socials', 'sync-tiers', 'link-profiles', 'backfill-dates', 'all']),
 });
 
 /**
@@ -268,7 +268,46 @@ export async function POST(req: NextRequest) {
       results.push({ action: 'link-profiles', fixed: linked, errors: 0, details });
     }
 
-    // ── 5. Sync member tiers ──────────────────────────────────────
+    // ── 5. Backfill first_respect_at from earliest fractal session ──
+    if (action === 'backfill-dates' || action === 'all') {
+      let fixed = 0;
+      const details: string[] = [];
+
+      // Get all members missing first_respect_at
+      const { data: membersNoDate } = await supabaseAdmin
+        .from('respect_members')
+        .select('id, name, wallet_address')
+        .is('first_respect_at', null);
+
+      for (const member of membersNoDate || []) {
+        // Find their earliest fractal score
+        const { data: earliest } = await supabaseAdmin
+          .from('fractal_scores')
+          .select('fractal_sessions(session_date)')
+          .or(`member_name.eq.${member.name}${member.wallet_address ? `,wallet_address.ilike.${member.wallet_address}` : ''}`)
+          .order('created_at', { ascending: true })
+          .limit(1);
+
+        if (earliest && earliest.length > 0) {
+          const sess = Array.isArray(earliest[0].fractal_sessions)
+            ? earliest[0].fractal_sessions[0]
+            : earliest[0].fractal_sessions;
+          const date = (sess as Record<string, unknown>)?.session_date;
+          if (date) {
+            await supabaseAdmin
+              .from('respect_members')
+              .update({ first_respect_at: date as string })
+              .eq('id', member.id);
+            details.push(`${member.name}: first respect ${date}`);
+            fixed++;
+          }
+        }
+      }
+
+      results.push({ action: 'backfill-dates', fixed, errors: 0, details });
+    }
+
+    // ── 6. Sync member tiers ──────────────────────────────────────
     if (action === 'sync-tiers' || action === 'all') {
       const { data: users } = await supabaseAdmin
         .from('users')

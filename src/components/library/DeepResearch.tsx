@@ -84,6 +84,7 @@ export default function DeepResearch() {
             <div key={category} className="rounded-lg ring-1 ring-gray-800 overflow-hidden">
               <button
                 onClick={() => setOpenCategory(openCategory === category ? null : category)}
+                aria-expanded={openCategory === category}
                 className="w-full flex items-center justify-between px-4 py-3 bg-[#0d1b2a] text-left hover:bg-[#1a2a3a] transition-colors"
               >
                 <span className="text-sm font-medium text-white">{category}</span>

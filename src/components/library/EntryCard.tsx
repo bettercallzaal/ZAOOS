@@ -34,6 +34,8 @@ export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: E
   const [hasVoted, setHasVoted] = useState(voted);
   const [commentCount, setCommentCount] = useState(entry.comment_count);
   const [voting, setVoting] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [expandedSummary, setExpandedSummary] = useState(false);
 
   useEffect(() => {
     setHasVoted(voted);
@@ -96,13 +98,14 @@ export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: E
         <p className="text-xs text-gray-500 mb-2 truncate">{entry.url}</p>
       )}
 
-      {entry.og_image && (
+      {entry.og_image && !imgError && (
         <div className="mb-3 overflow-hidden rounded-lg">
           <img
             src={entry.og_image}
             alt=""
             className="w-full h-40 object-cover"
             loading="lazy"
+            onError={() => setImgError(true)}
           />
         </div>
       )}
@@ -135,13 +138,28 @@ export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: E
           <p className="text-sm text-gray-500">Summary unavailable</p>
         )}
         {entry.ai_status === 'complete' && entry.ai_summary && (
-          <p className="text-sm text-gray-300 whitespace-pre-wrap">{entry.ai_summary}</p>
+          <div>
+            <p className="text-sm text-gray-300 whitespace-pre-wrap">
+              {expandedSummary || entry.ai_summary.length <= 500
+                ? entry.ai_summary
+                : `${entry.ai_summary.slice(0, 500)}...`}
+            </p>
+            {entry.ai_summary.length > 500 && (
+              <button
+                onClick={() => setExpandedSummary(!expandedSummary)}
+                className="text-xs text-[#f5a623] mt-1 hover:underline"
+              >
+                {expandedSummary ? 'Show less' : 'Show more'}
+              </button>
+            )}
+          </div>
         )}
       </div>
 
       <div className="flex items-center gap-4 text-sm">
         <button
           onClick={handleVote}
+          aria-label={hasVoted ? 'Remove upvote' : 'Upvote'}
           className={`flex items-center gap-1 transition-colors ${
             hasVoted ? 'text-[#f5a623]' : 'text-gray-400 hover:text-[#f5a623]'
           }`}

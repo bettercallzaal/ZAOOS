@@ -1,15 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import SubmitForm from '@/components/library/SubmitForm';
 import EntryFeed from '@/components/library/EntryFeed';
 import DeepResearch from '@/components/library/DeepResearch';
 import { useAuth } from '@/hooks/useAuth';
 
-export default function LibraryPage() {
+function LibraryContent() {
   const [refreshKey, setRefreshKey] = useState(0);
   const { user } = useAuth();
-  const [activeSection, setActiveSection] = useState<'submissions' | 'research'>('submissions');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const activeSection = (searchParams.get('tab') === 'research' ? 'research' : 'submissions') as 'submissions' | 'research';
+
+  const setActiveSection = (tab: 'submissions' | 'research') => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (tab === 'submissions') {
+      params.delete('tab');
+    } else {
+      params.set('tab', tab);
+    }
+    const query = params.toString();
+    router.replace(`/library${query ? `?${query}` : ''}`, { scroll: false });
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 space-y-8">
@@ -25,8 +39,10 @@ export default function LibraryPage() {
         <SubmitForm onSubmitted={() => setRefreshKey((k) => k + 1)} />
       </section>
 
-      <div className="flex gap-2 border-b border-gray-800 pb-1">
+      <div className="flex gap-2 border-b border-gray-800 pb-1" role="tablist">
         <button
+          role="tab"
+          aria-selected={activeSection === 'submissions'}
           onClick={() => setActiveSection('submissions')}
           className={`px-4 py-2 text-sm font-medium transition-colors ${
             activeSection === 'submissions'
@@ -37,6 +53,8 @@ export default function LibraryPage() {
           Community Submissions
         </button>
         <button
+          role="tab"
+          aria-selected={activeSection === 'research'}
           onClick={() => setActiveSection('research')}
           className={`px-4 py-2 text-sm font-medium transition-colors ${
             activeSection === 'research'
@@ -54,5 +72,13 @@ export default function LibraryPage() {
         <DeepResearch />
       )}
     </div>
+  );
+}
+
+export default function LibraryPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-3xl px-4 py-6"><p className="text-gray-500">Loading...</p></div>}>
+      <LibraryContent />
+    </Suspense>
   );
 }

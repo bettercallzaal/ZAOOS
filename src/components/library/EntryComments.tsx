@@ -79,6 +79,10 @@ export default function EntryComments({ entryId, onCommentAdded }: EntryComments
         </div>
       ))}
 
+      {comments.length === 0 && (
+        <p className="text-xs text-gray-500">No comments yet</p>
+      )}
+
       <form onSubmit={handlePost} className="flex gap-2">
         <input
           type="text"

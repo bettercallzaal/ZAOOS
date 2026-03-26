@@ -14,8 +14,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const entryId = searchParams.get('entry_id');
 
-    if (!entryId) {
-      return NextResponse.json({ error: 'entry_id required' }, { status: 400 });
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!entryId || !uuidRegex.test(entryId)) {
+      return NextResponse.json({ error: 'Valid entry_id required' }, { status: 400 });
     }
 
     const { data: comments, error } = await supabaseAdmin

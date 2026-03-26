@@ -35,6 +35,7 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
   const [activeTag, setActiveTag] = useState('');
   const [sort, setSort] = useState<'newest' | 'upvoted'>('newest');
   const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
@@ -173,10 +174,15 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
           ))}
           {hasMore && (
             <button
-              onClick={() => fetchEntries(false)}
-              className="w-full rounded-lg bg-[#1a2a3a] py-3 text-sm text-gray-300 hover:bg-[#243447]"
+              onClick={async () => {
+                setLoadingMore(true);
+                await fetchEntries(false);
+                setLoadingMore(false);
+              }}
+              disabled={loadingMore}
+              className="w-full rounded-lg bg-[#1a2a3a] py-3 text-sm text-gray-300 hover:bg-[#243447] disabled:opacity-50"
             >
-              Load more
+              {loadingMore ? 'Loading...' : 'Load more'}
             </button>
           )}
         </div>

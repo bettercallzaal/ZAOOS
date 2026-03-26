@@ -58,7 +58,7 @@ export async function generateResearchSummary(content: string): Promise<MinimaxR
       return { summary: null, error: `Minimax: ${data.error.message || data.error.type || 'unknown error'}` };
     }
 
-    const summary =
+    let summary =
       data?.choices?.[0]?.message?.content ??
       data?.reply ??
       null;
@@ -66,6 +66,13 @@ export async function generateResearchSummary(content: string): Promise<MinimaxR
     if (!summary) {
       console.error('[library/minimax] No summary in response:', JSON.stringify(data).slice(0, 200));
       return { summary: null, error: 'No summary in Minimax response' };
+    }
+
+    // Strip <think>...</think> reasoning tags from M2.7 responses
+    summary = summary.replace(/<think>[\s\S]*?<\/think>\s*/g, '').trim();
+
+    if (!summary) {
+      return { summary: null, error: 'Minimax returned only reasoning tokens' };
     }
 
     return { summary, error: null };

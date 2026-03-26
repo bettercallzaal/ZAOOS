@@ -20,10 +20,14 @@ export async function GET(req: NextRequest) {
       .from('research_entries')
       .select('*');
 
+    // Sanitize search for PostgREST filter safety
     if (search) {
-      query = query.or(
-        `topic.ilike.%${search}%,ai_summary.ilike.%${search}%,note.ilike.%${search}%`
-      );
+      const safeSearch = search.replace(/[,().\\%]/g, '');
+      if (safeSearch) {
+        query = query.or(
+          `topic.ilike.%${safeSearch}%,ai_summary.ilike.%${safeSearch}%,note.ilike.%${safeSearch}%`
+        );
+      }
     }
 
     if (tag) {

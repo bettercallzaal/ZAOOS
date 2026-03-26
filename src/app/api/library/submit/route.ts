@@ -12,6 +12,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  if (!session.fid) {
+    return NextResponse.json({ error: 'Farcaster account required to submit' }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
     const parsed = librarySubmitSchema.safeParse(body);
@@ -93,6 +97,8 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         console.error('[library/submit] Failed to update AI summary:', err);
       }
+    }).catch((err) => {
+      console.error('[library/submit] AI summary generation failed:', err);
     });
 
     return NextResponse.json({ success: true, entry });

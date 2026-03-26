@@ -9,6 +9,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  if (!session.fid) {
+    return NextResponse.json({ error: 'Farcaster account required to vote' }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
     const parsed = libraryVoteSchema.safeParse(body);

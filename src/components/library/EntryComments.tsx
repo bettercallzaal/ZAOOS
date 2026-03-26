@@ -29,7 +29,7 @@ export default function EntryComments({ entryId, onCommentAdded }: EntryComments
       const res = await fetch(`/api/library/comments?entry_id=${entryId}`);
       if (res.ok) {
         const data = await res.json();
-        setComments(data.comments);
+        setComments(data.comments ?? []);
       }
     } catch {
       // silent fail

@@ -38,7 +38,7 @@ export default function DeepResearch() {
       const res = await fetch('/api/library/docs');
       if (res.ok) {
         const data = await res.json();
-        setDocs(data.docs);
+        setDocs(data.docs ?? []);
       }
     } catch {
       // silent fail

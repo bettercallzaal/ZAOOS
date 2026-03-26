@@ -50,12 +50,16 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
       if (res.ok) {
         const data = await res.json();
         if (reset) {
-          setEntries(data.entries);
+          setEntries(data.entries ?? []);
         } else {
-          setEntries((prev) => [...prev, ...data.entries]);
+          setEntries((prev) => [...prev, ...(data.entries ?? [])]);
         }
-        setUserVotes(data.userVotes);
-        setHasMore(data.entries.length === 50);
+        if (reset) {
+          setUserVotes(data.userVotes ?? []);
+        } else {
+          setUserVotes((prev) => [...new Set([...prev, ...(data.userVotes ?? [])])]);
+        }
+        setHasMore((data.entries ?? []).length === 50);
       }
     } catch {
       // silent fail

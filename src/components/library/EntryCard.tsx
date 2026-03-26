@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import EntryComments from './EntryComments';
 
 interface Entry {
@@ -33,6 +33,18 @@ export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: E
   const [voteCount, setVoteCount] = useState(entry.upvote_count);
   const [hasVoted, setHasVoted] = useState(voted);
   const [commentCount, setCommentCount] = useState(entry.comment_count);
+
+  useEffect(() => {
+    setHasVoted(voted);
+  }, [voted]);
+
+  useEffect(() => {
+    setVoteCount(entry.upvote_count);
+  }, [entry.upvote_count]);
+
+  useEffect(() => {
+    setCommentCount(entry.comment_count);
+  }, [entry.comment_count]);
 
   const handleVote = async () => {
     setHasVoted(!hasVoted);

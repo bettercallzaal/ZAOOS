@@ -19,6 +19,7 @@ export default function EntryComments({ entryId, onCommentAdded }: EntryComments
   const [loading, setLoading] = useState(true);
   const [body, setBody] = useState('');
   const [posting, setPosting] = useState(false);
+  const [postError, setPostError] = useState('');
 
   useEffect(() => {
     fetchComments();
@@ -57,7 +58,8 @@ export default function EntryComments({ entryId, onCommentAdded }: EntryComments
         onCommentAdded();
       }
     } catch {
-      // silent fail
+      setPostError('Failed to post comment');
+      setTimeout(() => setPostError(''), 3000);
     } finally {
       setPosting(false);
     }
@@ -94,6 +96,7 @@ export default function EntryComments({ entryId, onCommentAdded }: EntryComments
           Post
         </button>
       </form>
+      {postError && <p className="text-xs text-red-400 mt-1">{postError}</p>}
     </div>
   );
 }

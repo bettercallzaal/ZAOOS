@@ -31,9 +31,15 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
   const [userVotes, setUserVotes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [activeTag, setActiveTag] = useState('');
   const [sort, setSort] = useState<'newest' | 'upvoted'>('newest');
   const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const fetchEntries = useCallback(async (reset = false) => {
     const offset = reset ? 0 : entries.length;
@@ -41,7 +47,7 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
       offset: String(offset),
       limit: '50',
       sort,
-      ...(search && { search }),
+      ...(debouncedSearch && { search: debouncedSearch }),
       ...(activeTag && { tag: activeTag }),
     });
 
@@ -66,12 +72,12 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
     } finally {
       setLoading(false);
     }
-  }, [search, activeTag, sort, entries.length]);
+  }, [debouncedSearch, activeTag, sort, entries.length]);
 
   useEffect(() => {
     setLoading(true);
     fetchEntries(true);
-  }, [search, activeTag, sort, refreshKey]);
+  }, [debouncedSearch, activeTag, sort, refreshKey]);
 
   const handleVote = async (entryId: string) => {
     try {

@@ -19,7 +19,10 @@ export async function GET(req: NextRequest) {
       .order('id', { ascending: true });
 
     if (search) {
-      query = query.ilike('title', `%${search}%`);
+      const safeSearch = search.replace(/[%_,().\\]/g, '');
+      if (safeSearch) {
+        query = query.ilike('title', `%${safeSearch}%`);
+      }
     }
 
     if (category) {

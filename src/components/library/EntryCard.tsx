@@ -33,6 +33,7 @@ export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: E
   const [voteCount, setVoteCount] = useState(entry.upvote_count);
   const [hasVoted, setHasVoted] = useState(voted);
   const [commentCount, setCommentCount] = useState(entry.comment_count);
+  const [voting, setVoting] = useState(false);
 
   useEffect(() => {
     setHasVoted(voted);
@@ -47,9 +48,13 @@ export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: E
   }, [entry.comment_count]);
 
   const handleVote = async () => {
+    if (voting) return;
+    setVoting(true);
     setHasVoted(!hasVoted);
     setVoteCount((c) => (hasVoted ? c - 1 : c + 1));
     onVote(entry.id);
+    // Allow next vote after a short delay
+    setTimeout(() => setVoting(false), 500);
   };
 
   const timeAgo = getTimeAgo(entry.created_at);

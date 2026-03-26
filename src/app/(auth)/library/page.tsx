@@ -26,7 +26,7 @@ function LibraryContent() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 space-y-8">
+    <div className="mx-auto max-w-3xl px-4 py-6 pb-20 md:pb-0 space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-white">Library</h1>
         <p className="text-sm text-gray-400 mt-1">

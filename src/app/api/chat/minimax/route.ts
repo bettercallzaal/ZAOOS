@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { messages, model, temperature, max_tokens } = parsed.data;
-    const endpoint = ENV.MINIMAX_API_URL || 'https://api.minimaxi.com/v1/text/chatcompletion_v2';
+    const endpoint = ENV.MINIMAX_API_URL || 'https://api.minimax.io/v1/chat/completions';
     const selectedModel = model || ENV.MINIMAX_MODEL || 'MiniMax-M2.7';
 
     const res = await fetch(endpoint, {

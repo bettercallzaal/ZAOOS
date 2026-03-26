@@ -21,7 +21,7 @@ export async function generateResearchSummary(content: string): Promise<MinimaxR
   }
 
   try {
-    const endpoint = ENV.MINIMAX_API_URL || 'https://api.minimaxi.com/v1/text/chatcompletion_v2';
+    const endpoint = ENV.MINIMAX_API_URL || 'https://api.minimax.io/v1/chat/completions';
     const model = ENV.MINIMAX_MODEL || 'MiniMax-M2.7';
 
     const res = await fetch(endpoint, {
@@ -47,12 +47,24 @@ export async function generateResearchSummary(content: string): Promise<MinimaxR
     }
 
     const data = JSON.parse(text);
+
+    // Check for error responses (Minimax returns 200 with error body)
+    if (data?.base_resp?.status_code && data.base_resp.status_code !== 0) {
+      console.error('[library/minimax] API error in body:', data.base_resp);
+      return { summary: null, error: `Minimax: ${data.base_resp.status_msg || 'unknown error'}` };
+    }
+    if (data?.error) {
+      console.error('[library/minimax] API error:', data.error);
+      return { summary: null, error: `Minimax: ${data.error.message || data.error.type || 'unknown error'}` };
+    }
+
     const summary =
       data?.choices?.[0]?.message?.content ??
       data?.reply ??
       null;
 
     if (!summary) {
+      console.error('[library/minimax] No summary in response:', JSON.stringify(data).slice(0, 200));
       return { summary: null, error: 'No summary in Minimax response' };
     }
 

@@ -157,13 +157,9 @@ export async function GET(
       openRankData, coinbaseVerified, easAttestations, neynarScoreVal, githubData,
       snapshotData, audiusData, efpData,
     ] = await Promise.allSettled([
-      // OpenRank engagement score
-      memberFid ? fetch('https://graph.cast.k3l.io/scores/global/engagement/fids', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify([memberFid]),
-        signal: AbortSignal.timeout(5000),
-      }).then(r => r.ok ? r.json() : null).then(d => d?.result?.[0] || d?.[0] || null) : Promise.resolve(null),
+      // OpenRank engagement score — SSL cert expired as of Mar 2026, disabled until they fix it
+      // Re-enable when graph.cast.k3l.io cert is renewed
+      Promise.resolve(null as { score: number; rank: number } | null),
 
       // Coinbase Verified ID (EAS on Base)
       primaryWallet ? fetch('https://base.easscan.org/graphql', {
@@ -191,9 +187,9 @@ export async function GET(
         { headers: { 'api_key': process.env.NEYNAR_API_KEY || '' }, signal: AbortSignal.timeout(5000) }
       ).then(r => r.ok ? r.json() : null).then(d => d?.users?.[0]?.experimental?.neynar_user_score ?? null) : Promise.resolve(null),
 
-      // GitHub
-      ensTextRecords['com.github'] ? fetch(
-        `https://api.github.com/users/${ensTextRecords['com.github']}`,
+      // GitHub — check ENS text record, or user's stored github handle (from x_handle pattern)
+      (ensTextRecords['com.github'] || user.github_handle) ? fetch(
+        `https://api.github.com/users/${ensTextRecords['com.github'] || user.github_handle}`,
         { signal: AbortSignal.timeout(5000) }
       ).then(r => r.ok ? r.json() : null) : Promise.resolve(null),
 
@@ -211,13 +207,13 @@ export async function GET(
         return { totalVotes: votes.length, daoCount: spaces.size };
       }) : Promise.resolve(null),
 
-      // Audius profile
+      // Audius profile — resolve handle then fetch user
       audiusHandle ? fetch(
-        `https://api.audius.co/v1/users?handle=${encodeURIComponent(audiusHandle)}&app_name=ZAO-OS`,
-        { signal: AbortSignal.timeout(5000) }
+        `https://api.audius.co/v1/resolve?url=https://audius.co/${encodeURIComponent(audiusHandle)}&app_name=ZAO-OS`,
+        { signal: AbortSignal.timeout(5000), redirect: 'follow' }
       ).then(r => r.ok ? r.json() : null).then(d => {
-        const u = d?.data?.[0];
-        return u ? { followers: u.follower_count, tracks: u.track_count, playlists: u.playlist_count } : null;
+        const u = d?.data;
+        return u ? { followers: u.follower_count || 0, tracks: u.track_count || 0, playlists: u.playlist_count || 0, handle: u.handle } : null;
       }) : Promise.resolve(null),
 
       // EFP on-chain followers

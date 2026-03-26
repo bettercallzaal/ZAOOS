@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     if (insertError) throw insertError;
 
-    // Generate AI summary (fire-and-forget, don't block response)
+    // Generate AI summary (awaited so Vercel doesn't kill the function)
     const summaryContent = [
       topic,
       ogDescription && `Description: ${ogDescription}`,
@@ -85,23 +85,25 @@ export async function POST(req: NextRequest) {
       url && `URL: ${url}`,
     ].filter(Boolean).join('\n');
 
-    generateResearchSummary(summaryContent).then(async (result) => {
-      try {
-        await supabaseAdmin
-          .from('research_entries')
-          .update({
-            ai_summary: result.summary,
-            ai_status: result.summary ? 'complete' : 'failed',
-          })
-          .eq('id', entry.id);
-      } catch (err) {
-        console.error('[library/submit] Failed to update AI summary:', err);
-      }
-    }).catch((err) => {
-      console.error('[library/submit] AI summary generation failed:', err);
-    });
+    const aiResult = await generateResearchSummary(summaryContent);
 
-    return NextResponse.json({ success: true, entry });
+    // Update entry with AI summary
+    await supabaseAdmin
+      .from('research_entries')
+      .update({
+        ai_summary: aiResult.summary,
+        ai_status: aiResult.summary ? 'complete' : 'failed',
+      })
+      .eq('id', entry.id);
+
+    return NextResponse.json({
+      success: true,
+      entry: {
+        ...entry,
+        ai_summary: aiResult.summary,
+        ai_status: aiResult.summary ? 'complete' : 'failed',
+      },
+    });
   } catch (error) {
     console.error('[library/submit] Error:', error);
     return NextResponse.json({ error: 'Failed to submit entry' }, { status: 500 });

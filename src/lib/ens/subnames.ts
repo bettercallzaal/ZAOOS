@@ -132,8 +132,8 @@ const publicClient = createPublicClient({
 });
 
 function getWalletClient() {
-  const key = process.env.ENS_OWNER_PRIVATE_KEY;
-  if (!key) throw new Error('ENS_OWNER_PRIVATE_KEY not configured — needed to create subnames');
+  const key = process.env.ENS_OPERATOR_PRIVATE_KEY;
+  if (!key) throw new Error('ENS_OPERATOR_PRIVATE_KEY not configured — run: npx tsx scripts/generate-ens-operator.ts');
   const account = privateKeyToAccount(key as Hex);
   return createWalletClient({
     account,

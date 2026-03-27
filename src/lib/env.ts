@@ -61,6 +61,8 @@ export const ENV = {
   // Discord webhook (cross-posting to Discord channel)
   DISCORD_WEBHOOK_URL: optionalEnv('DISCORD_WEBHOOK_URL'),
 
-  // ENS NameWrapper — private key of the thezao.eth owner wallet (for creating on-chain subnames)
-  ENS_OWNER_PRIVATE_KEY: optionalEnv('ENS_OWNER_PRIVATE_KEY'),
+  // ENS NameWrapper — dedicated operator wallet (NOT the thezao.eth owner)
+  // Generate with: npx tsx scripts/generate-ens-operator.ts
+  // Then approve as operator on app.ens.domains
+  ENS_OPERATOR_PRIVATE_KEY: optionalEnv('ENS_OPERATOR_PRIVATE_KEY'),
 } as const;

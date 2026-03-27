@@ -46,19 +46,37 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     const entryIds = (entries || []).map((e: { id: string }) => e.id);
-    let userVotes: string[] = [];
+
+    // Get current user's vote for each entry
+    let userVotes: Record<string, string> = {}; // entry_id -> vote_type
     if (entryIds.length > 0 && session.fid) {
       const { data: votes } = await supabaseAdmin
         .from('research_entry_votes')
-        .select('entry_id')
+        .select('entry_id, vote_type')
         .eq('fid', session.fid)
         .in('entry_id', entryIds);
-      userVotes = (votes || []).map((v: { entry_id: string }) => v.entry_id);
+      for (const v of votes || []) {
+        userVotes[v.entry_id] = v.vote_type;
+      }
+    }
+
+    // Get all voters per entry (FID + vote_type)
+    let entryVoters: Record<string, { fid: number; vote_type: string }[]> = {};
+    if (entryIds.length > 0) {
+      const { data: allVotes } = await supabaseAdmin
+        .from('research_entry_votes')
+        .select('entry_id, fid, vote_type')
+        .in('entry_id', entryIds);
+      for (const v of allVotes || []) {
+        if (!entryVoters[v.entry_id]) entryVoters[v.entry_id] = [];
+        entryVoters[v.entry_id].push({ fid: v.fid, vote_type: v.vote_type });
+      }
     }
 
     return NextResponse.json({
       entries: entries || [],
       userVotes,
+      entryVoters,
     });
   } catch (error) {
     console.error('[library/entries] Error:', error);

@@ -16,50 +16,84 @@ interface Entry {
   ai_summary: string | null;
   ai_status: 'pending' | 'complete' | 'failed';
   upvote_count: number;
+  downvote_count: number;
   comment_count: number;
   created_at: string;
 }
 
+interface Voter {
+  fid: number;
+  vote_type: string;
+}
+
 interface EntryCardProps {
   entry: Entry;
-  voted: boolean;
-  onVote: (entryId: string) => void;
+  userVoteType: string | null; // 'up' | 'down' | null
+  voters: Voter[];
+  onVote: (entryId: string, voteType: 'up' | 'down') => void;
   isAdmin?: boolean;
   onDelete?: (entryId: string) => void;
 }
 
-export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: EntryCardProps) {
+export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin, onDelete }: EntryCardProps) {
   const [showComments, setShowComments] = useState(false);
-  const [voteCount, setVoteCount] = useState(entry.upvote_count);
-  const [hasVoted, setHasVoted] = useState(voted);
+  const [showVoters, setShowVoters] = useState(false);
+  const [upCount, setUpCount] = useState(entry.upvote_count);
+  const [downCount, setDownCount] = useState(entry.downvote_count ?? 0);
+  const [currentVote, setCurrentVote] = useState<string | null>(userVoteType);
   const [commentCount, setCommentCount] = useState(entry.comment_count);
   const [voting, setVoting] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [expandedSummary, setExpandedSummary] = useState(false);
 
   useEffect(() => {
-    setHasVoted(voted);
-  }, [voted]);
+    setCurrentVote(userVoteType);
+  }, [userVoteType]);
 
   useEffect(() => {
-    setVoteCount(entry.upvote_count);
-  }, [entry.upvote_count]);
+    setUpCount(entry.upvote_count);
+    setDownCount(entry.downvote_count ?? 0);
+  }, [entry.upvote_count, entry.downvote_count]);
 
   useEffect(() => {
     setCommentCount(entry.comment_count);
   }, [entry.comment_count]);
 
-  const handleVote = async () => {
+  const handleVote = (type: 'up' | 'down') => {
     if (voting) return;
     setVoting(true);
-    setHasVoted(!hasVoted);
-    setVoteCount((c) => (hasVoted ? c - 1 : c + 1));
-    onVote(entry.id);
-    // Allow next vote after a short delay
+
+    // Optimistic update
+    if (currentVote === type) {
+      // Toggle off
+      if (type === 'up') setUpCount((c) => c - 1);
+      else setDownCount((c) => c - 1);
+      setCurrentVote(null);
+    } else if (currentVote) {
+      // Switching vote
+      if (currentVote === 'up') {
+        setUpCount((c) => c - 1);
+        setDownCount((c) => c + 1);
+      } else {
+        setDownCount((c) => c - 1);
+        setUpCount((c) => c + 1);
+      }
+      setCurrentVote(type);
+    } else {
+      // New vote
+      if (type === 'up') setUpCount((c) => c + 1);
+      else setDownCount((c) => c + 1);
+      setCurrentVote(type);
+    }
+
+    onVote(entry.id, type);
     setTimeout(() => setVoting(false), 500);
   };
 
   const timeAgo = getTimeAgo(entry.created_at);
+  const upVoters = voters.filter((v) => v.vote_type === 'up');
+  const downVoters = voters.filter((v) => v.vote_type === 'down');
+  const totalVoters = voters.length;
 
   return (
     <div className="rounded-xl bg-[#0d1b2a] p-4 ring-1 ring-gray-800">
@@ -156,18 +190,43 @@ export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: E
         )}
       </div>
 
+      {/* Votes + Comments Actions */}
       <div className="flex items-center gap-4 text-sm">
+        {/* Upvote */}
         <button
-          onClick={handleVote}
-          aria-label={hasVoted ? 'Remove upvote' : 'Upvote'}
+          onClick={() => handleVote('up')}
+          aria-label={currentVote === 'up' ? 'Remove upvote' : 'Upvote'}
           className={`flex items-center gap-1 transition-colors ${
-            hasVoted ? 'text-[#f5a623]' : 'text-gray-400 hover:text-[#f5a623]'
+            currentVote === 'up' ? 'text-[#f5a623]' : 'text-gray-400 hover:text-[#f5a623]'
           }`}
         >
-          <span>{hasVoted ? '▲' : '△'}</span>
-          <span>{voteCount}</span>
+          <span>{currentVote === 'up' ? '▲' : '△'}</span>
+          <span>{upCount}</span>
         </button>
 
+        {/* Downvote */}
+        <button
+          onClick={() => handleVote('down')}
+          aria-label={currentVote === 'down' ? 'Remove downvote' : 'Downvote'}
+          className={`flex items-center gap-1 transition-colors ${
+            currentVote === 'down' ? 'text-red-400' : 'text-gray-400 hover:text-red-400'
+          }`}
+        >
+          <span>{currentVote === 'down' ? '▼' : '▽'}</span>
+          <span>{downCount}</span>
+        </button>
+
+        {/* Voter count — click to see who voted */}
+        {totalVoters > 0 && (
+          <button
+            onClick={() => setShowVoters(!showVoters)}
+            className="text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            {totalVoters} voter{totalVoters !== 1 ? 's' : ''}
+          </button>
+        )}
+
+        {/* Comments */}
         <button
           onClick={() => setShowComments(!showComments)}
           className="text-gray-400 hover:text-white transition-colors"
@@ -176,6 +235,34 @@ export default function EntryCard({ entry, voted, onVote, isAdmin, onDelete }: E
         </button>
       </div>
 
+      {/* Voter list */}
+      {showVoters && totalVoters > 0 && (
+        <div className="mt-3 pt-3 border-t border-gray-800">
+          <p className="text-xs font-medium text-gray-400 mb-2">Votes</p>
+          <div className="flex flex-wrap gap-2">
+            {upVoters.map((v) => (
+              <span
+                key={`up-${v.fid}`}
+                className="inline-flex items-center gap-1 rounded-full bg-[#1a2a3a] px-2.5 py-1 text-xs"
+              >
+                <span className="text-[#f5a623]">▲</span>
+                <span className="text-gray-300">FID {v.fid}</span>
+              </span>
+            ))}
+            {downVoters.map((v) => (
+              <span
+                key={`down-${v.fid}`}
+                className="inline-flex items-center gap-1 rounded-full bg-[#1a2a3a] px-2.5 py-1 text-xs"
+              >
+                <span className="text-red-400">▼</span>
+                <span className="text-gray-300">FID {v.fid}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Comments */}
       {showComments && (
         <div className="mt-3 pt-3 border-t border-gray-800">
           <EntryComments

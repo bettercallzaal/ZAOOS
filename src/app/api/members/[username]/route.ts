@@ -315,7 +315,7 @@ export async function GET(
         slug: communityProfile.slug,
         biography: communityProfile.biography,
         category: communityProfile.category,
-        coverImageUrl: communityProfile.cover_image_url,
+        coverImageUrl: communityProfile.cover_image_url || user.farcaster_banner_url,
         thumbnailUrl: communityProfile.thumbnail_url,
         isFeatured: communityProfile.is_featured,
         website: communityProfile.website,
@@ -335,6 +335,12 @@ export async function GET(
         description: e.description,
         date: e.event_date,
       })),
+
+      // Enriched data
+      location: user.location || null,
+      website: user.website_url || communityProfile?.website || null,
+      farcasterRegisteredAt: user.farcaster_registered_at || null,
+      coverImageUrl: communityProfile?.cover_image_url || user.farcaster_banner_url || null,
 
       // Activity
       lastLoginAt: user.last_login_at,

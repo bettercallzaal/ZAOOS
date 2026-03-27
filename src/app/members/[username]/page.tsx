@@ -57,6 +57,10 @@ interface MemberProfile {
   } | null;
   fractalHistory: { sessionName: string; sessionDate: string | null; era: string; rank: number; score: number; participants: number; source: string }[];
   events: { type: string; amount: number; description: string | null; date: string | null }[];
+  location: string | null;
+  website: string | null;
+  farcasterRegisteredAt: string | null;
+  coverImageUrl: string | null;
   lastActiveAt: string | null;
   createdAt: string;
 }

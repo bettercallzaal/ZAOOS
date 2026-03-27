@@ -21,6 +21,7 @@ export const librarySubmitSchema = z.object({
 
 export const libraryVoteSchema = z.object({
   entry_id: z.string().uuid('entry_id must be a valid UUID'),
+  vote_type: z.enum(['up', 'down']),
 });
 
 export const libraryCommentSchema = z.object({

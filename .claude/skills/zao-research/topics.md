@@ -25,6 +25,24 @@ Use this to quickly find if a topic has already been researched.
 - Mobile player optimization: MediaSession, swipe gestures, expanded player, crossfade, gapless, iOS PWA audio → `127`
 - **Music player complete audit (CANONICAL)**: all 23 components, 23 endpoints, future roadmap → `128`
 - Next music integrations (Tier 4): Spotify API, Audius SDK, Farcaster embeds, AI recs, Zora NFTs, scrobbling → `130`
+- Play counting & stream attribution: which platforms count ZAO OS plays, Last.fm/ListenBrainz scrobbling → `138`
+
+## On-Chain Music Distribution & NFTs
+- Trustware SDK evaluation (crypto payment middleware, too early) → `139`
+- BuilderOSS ecosystem (10 repos, ZOUNZ contracts, builder-template-app, @builderbot) → `140`
+- On-chain distribution landscape 2026 (Zora, 0xSplits, Unchained, Audius, Catalog) → `141`
+- Zora Protocol SDK for music NFTs (create1155, Base chain, code examples) → `142`
+- 0xSplits revenue distribution (automated splits, Zora integration, waterfall/swapper) → `143`
+- ZOUNZ + music NFTs unified (DAO-governed distribution, proposal templates) → `144`
+- Simple NFT platform design (3-step UX, gas sponsorship, mobile-first) → `145`
+- Open contracts multi-artist distribution (forkable trio, community.config.ts fork point) → `146`
+- Full distribution pipeline (Audius + Zora + ZOUNZ, unified dashboard) → `147`
+- Master integration plan (5 phases, 6-8 weeks, all docs consolidated) → `148`
+- BuilderOSS deep dive: every package, hook, UI component, subgraph → `149`
+- Arweave permanent music storage via Irys SDK ($0.04/track, 200+ years) → `150`
+- **ZOUNZ distribution WITHOUT Zora**: Arweave + thirdweb + 0xSplits (supersedes 142/144) → `151`
+- **Arweave ecosystem deep dive (CANONICAL)**: AO compute, ar.io Wayfinder CDN, ArDrive Turbo, GraphQL indexing, ArNS domains, Irys deprecated → `152`
+- **BazAR & atomic assets for music**: Arweave-native marketplace, UCM orderbook, UDL licensing, fractionalization, $U token, primary distribution → `153`
 
 ## Respect & Governance
 - Respect tokens (aspirational design — tiers/decay NOT implemented) → `04`
@@ -160,3 +178,5 @@ Use this to quickly find if a topic has already been researched.
 - Farcaster Mini Apps (SDK, Quick Auth) → `86` (folder 68-)
 - Farcaster social graph & sharing APIs → `87` (folder 81-)
 - Music-first platform redesign → `88` (folder 82-)
+- Skills audit, cleanup & prompt injection security → `137`
+- **Skills & commands master reference (CANONICAL)**: every command, skill, workflow, session flows, how to ask → `154`

@@ -17,8 +17,14 @@ interface Entry {
   ai_summary: string | null;
   ai_status: 'pending' | 'complete' | 'failed';
   upvote_count: number;
+  downvote_count: number;
   comment_count: number;
   created_at: string;
+}
+
+interface Voter {
+  fid: number;
+  vote_type: string;
 }
 
 interface EntryFeedProps {
@@ -28,7 +34,8 @@ interface EntryFeedProps {
 
 export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
   const [entries, setEntries] = useState<Entry[]>([]);
-  const [userVotes, setUserVotes] = useState<string[]>([]);
+  const [userVotes, setUserVotes] = useState<Record<string, string>>({}); // entry_id -> vote_type
+  const [entryVoters, setEntryVoters] = useState<Record<string, Voter[]>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -58,13 +65,12 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
         const data = await res.json();
         if (reset) {
           setEntries(data.entries ?? []);
+          setUserVotes(data.userVotes ?? {});
+          setEntryVoters(data.entryVoters ?? {});
         } else {
           setEntries((prev) => [...prev, ...(data.entries ?? [])]);
-        }
-        if (reset) {
-          setUserVotes(data.userVotes ?? []);
-        } else {
-          setUserVotes((prev) => [...new Set([...prev, ...(data.userVotes ?? [])])]);
+          setUserVotes((prev) => ({ ...prev, ...(data.userVotes ?? {}) }));
+          setEntryVoters((prev) => ({ ...prev, ...(data.entryVoters ?? {}) }));
         }
         setHasMore((data.entries ?? []).length === 50);
       }
@@ -80,18 +86,27 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
     fetchEntries(true);
   }, [debouncedSearch, activeTag, sort, refreshKey]);
 
-  const handleVote = async (entryId: string) => {
+  const handleVote = async (entryId: string, voteType: 'up' | 'down') => {
     try {
       const res = await fetch('/api/library/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entry_id: entryId }),
+        body: JSON.stringify({ entry_id: entryId, vote_type: voteType }),
       });
       if (res.ok) {
         const data = await res.json();
-        setUserVotes((prev) =>
-          data.voted ? [...prev, entryId] : prev.filter((id) => id !== entryId),
-        );
+        // Update user's vote
+        if (data.vote_type) {
+          setUserVotes((prev) => ({ ...prev, [entryId]: data.vote_type }));
+        } else {
+          setUserVotes((prev) => {
+            const next = { ...prev };
+            delete next[entryId];
+            return next;
+          });
+        }
+        // Refresh entries to get updated counts and voter list
+        fetchEntries(true);
       }
     } catch {
       // silent fail
@@ -166,7 +181,8 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
             <EntryCard
               key={entry.id}
               entry={entry}
-              voted={userVotes.includes(entry.id)}
+              userVoteType={userVotes[entry.id] ?? null}
+              voters={entryVoters[entry.id] ?? []}
               onVote={handleVote}
               isAdmin={isAdmin}
               onDelete={handleDelete}

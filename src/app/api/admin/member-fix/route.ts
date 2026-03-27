@@ -85,11 +85,11 @@ export async function POST(req: NextRequest) {
       results.push({ action: 'link-fids', fixed: linked, errors, details });
     }
 
-    // ── 2. Enrich profiles from Neynar ────────────────────────────
+    // ── 2. Enrich profiles from Neynar (all fields) ────────────────
     if (action === 'enrich-profiles' || action === 'all') {
-      const { data: incompleteUsers } = await supabaseAdmin
+      const { data: allUsersWithFid } = await supabaseAdmin
         .from('users')
-        .select('id, fid, display_name, pfp_url, bio, username, custody_address, verified_addresses')
+        .select('id, fid, display_name, pfp_url, bio, username, custody_address, verified_addresses, real_name, x_handle, solana_wallet')
         .not('fid', 'is', null)
         .eq('is_active', true);
 
@@ -97,13 +97,9 @@ export async function POST(req: NextRequest) {
       let errors = 0;
       const details: string[] = [];
 
-      // Batch FIDs in groups of 100 (Neynar bulk limit)
-      const needsEnrich = (incompleteUsers || []).filter(u =>
-        !u.pfp_url || !u.display_name || !u.bio || !u.custody_address
-      );
-
-      for (let i = 0; i < needsEnrich.length; i += 100) {
-        const batch = needsEnrich.slice(i, i + 100);
+      // Batch ALL users with FIDs in groups of 100
+      for (let i = 0; i < (allUsersWithFid || []).length; i += 100) {
+        const batch = (allUsersWithFid || []).slice(i, i + 100);
         const fids = batch.map(u => u.fid).filter(Boolean);
         if (fids.length === 0) continue;
 
@@ -121,6 +117,8 @@ export async function POST(req: NextRequest) {
             if (!dbUser) continue;
 
             const updates: Record<string, unknown> = {};
+
+            // Basic fields (only fill if missing)
             if (!dbUser.display_name && fcUser.display_name) updates.display_name = fcUser.display_name;
             if (!dbUser.pfp_url && fcUser.pfp_url) updates.pfp_url = fcUser.pfp_url;
             if (!dbUser.bio && fcUser.profile?.bio?.text) updates.bio = fcUser.profile.bio.text;
@@ -128,6 +126,50 @@ export async function POST(req: NextRequest) {
             if (!dbUser.custody_address && fcUser.custody_address) updates.custody_address = fcUser.custody_address;
             if ((!dbUser.verified_addresses || dbUser.verified_addresses.length === 0) && fcUser.verified_addresses?.eth_addresses?.length > 0) {
               updates.verified_addresses = fcUser.verified_addresses.eth_addresses;
+            }
+
+            // NEW: Farcaster banner as cover image (profile.banner.url)
+            if (fcUser.profile?.banner?.url) {
+              // Store in a field we can use as cover fallback
+              updates.farcaster_banner_url = fcUser.profile.banner.url;
+            }
+
+            // NEW: Website URL
+            if (fcUser.url) {
+              updates.website_url = fcUser.url;
+            }
+
+            // NEW: Farcaster registration date
+            if (fcUser.registered_at) {
+              updates.farcaster_registered_at = fcUser.registered_at;
+            }
+
+            // NEW: Location from Farcaster profile
+            if (fcUser.profile?.location?.address?.city) {
+              const loc = fcUser.profile.location.address;
+              updates.location = [loc.city, loc.state, loc.country].filter(Boolean).join(', ');
+            }
+
+            // NEW: Auto-detect real_name from display_name
+            // Only set if not already set and display_name looks like a real name
+            // (has a space, no special chars, not all caps)
+            if (!dbUser.real_name && fcUser.display_name) {
+              const name = fcUser.display_name.trim();
+              const looksLikeRealName = /^[A-Z][a-z]+ [A-Z][a-z]+/.test(name) // "First Last"
+                || /^[A-Z][a-z]+ [A-Z]\.?$/.test(name); // "First L."
+              if (looksLikeRealName) {
+                updates.real_name = name;
+              }
+            }
+
+            // NEW: Solana wallet from Neynar verified addresses
+            if (!dbUser.solana_wallet && fcUser.verified_addresses?.sol_addresses?.length > 0) {
+              updates.solana_wallet = fcUser.verified_addresses.sol_addresses[0];
+            }
+
+            // NEW: Neynar score (canonical field, not experimental)
+            if (fcUser.score !== undefined) {
+              updates.neynar_score = fcUser.score;
             }
 
             if (Object.keys(updates).length > 0) {

@@ -11,6 +11,7 @@ import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 import { ShareToChatButton } from '@/components/music/ShareToChatButton';
 import { TrackReactions } from '@/components/music/TrackReactions';
 import { LyricsPanel } from '@/components/music/LyricsPanel';
+import { AudioFiltersPanel, getActiveFilterKey } from '@/components/music/AudioFiltersPanel';
 import type { TrackMetadata } from '@/types/music';
 
 interface ExpandedPlayerProps {
@@ -24,6 +25,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
   const player = usePlayer();
   const { isPlaying, isLoading, position, duration } = player;
   const [showLyrics, setShowLyrics] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   // ─── Swipe down to dismiss ──────────────────────────────────────────
   const touchStartY = useRef(0);
@@ -279,11 +281,30 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             </svg>
           </button>
 
+          {/* Audio filters toggle */}
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            className={`p-1.5 rounded-lg transition-colors ${
+              showFilters || getActiveFilterKey()
+                ? 'text-[#f5a623] bg-[#f5a623]/10'
+                : 'text-gray-400 hover:text-white'
+            }`}
+            aria-label={showFilters ? 'Hide audio filters' : 'Show audio filters'}
+            title={showFilters ? 'Hide filters' : 'Audio filters'}
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+            </svg>
+          </button>
+
           {/* Platform badge */}
           <span className="text-[10px] text-gray-500 bg-white/5 px-2.5 py-1 rounded-full capitalize">
             {metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}
           </span>
         </div>
+
+        {/* Audio filters panel */}
+        <AudioFiltersPanel visible={showFilters} />
 
         {/* Emoji reactions */}
         <TrackReactions songUrl={metadata.url} className="justify-center" />

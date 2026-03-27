@@ -20,6 +20,10 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!audioA) audioA = new Audio();
     if (!audioB) audioB = new Audio();
+
+    // Expose active audio element globally for AudioFiltersPanel (Web Audio API)
+    (globalThis as Record<string, unknown>).__zao_audio_a = audioA;
+    (globalThis as Record<string, unknown>).__zao_audio_b = audioB;
     const audio = getActive();
 
     const onTimeUpdate = () => {

@@ -11,6 +11,11 @@ import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
 import { RespectTrending } from '@/components/music/RespectTrending';
 
+const AudiusDiscover = dynamic(
+  () => import('@/components/music/AudiusDiscover').then((m) => m.AudiusDiscover),
+  { ssr: false },
+);
+
 const TrackOfTheDay = dynamic(
   () => import('@/components/music/TrackOfTheDay').then((m) => m.TrackOfTheDay),
   { ssr: false, loading: () => <TrackOfTheDayTabSkeleton /> },
@@ -39,11 +44,12 @@ type Submission = {
   user_voted: boolean;
 };
 
-const TABS = ['Radio', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Binaural', 'Liked', 'History', 'Curators'] as const;
+const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Binaural', 'Liked', 'History', 'Curators'] as const;
 type Tab = (typeof TABS)[number];
 
 const SECTION_IDS: Record<Tab, string> = {
   Radio: 'section-radio',
+  Discover: 'section-discover',
   'Track of the Day': 'section-totd',
   Submissions: 'section-submissions',
   Trending: 'section-trending',
@@ -171,7 +177,12 @@ export function MusicPage() {
           />
         </section>
 
-        {/* ── Section 2: Track of the Day ──────────────────────────── */}
+        {/* ── Section 2: Discover (Audius) ────────────────────────── */}
+        <section id={SECTION_IDS.Discover}>
+          <AudiusDiscover />
+        </section>
+
+        {/* ── Section 3: Track of the Day ──────────────────────────── */}
         <section id={SECTION_IDS['Track of the Day']}>
           <TrackOfTheDay />
         </section>

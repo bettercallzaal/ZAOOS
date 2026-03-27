@@ -117,6 +117,15 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/library')) {
     return { limit: 30, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/neynar')) {
+    return { limit: 15, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/stream')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/100ms')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
   return null;
 }
 

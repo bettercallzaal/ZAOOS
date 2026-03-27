@@ -6,6 +6,13 @@ const querySchema = z.object({
   search: z.string().max(200).optional(),
   tier: z.enum(['all', 'respect_holder', 'community']).optional(),
   tag: z.string().max(50).optional(),
+  category: z.string().max(50).optional(),
+  location: z.string().max(100).optional(),
+  active_since: z.enum(['7d', '30d', '90d']).optional(),
+  has_ens: z.enum(['true', 'false']).optional(),
+  platform: z.enum(['audius', 'spotify', 'soundcloud', 'bluesky', 'x', 'instagram']).optional(),
+  min_respect: z.coerce.number().int().min(0).optional(),
+  featured: z.enum(['true']).optional(),
   sort: z.enum(['name', 'respect', 'recent', 'active']).optional(),
   limit: z.coerce.number().int().min(1).max(200).default(100),
   offset: z.coerce.number().int().min(0).default(0),
@@ -24,7 +31,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid params' }, { status: 400 });
   }
 
-  const { search, tier, tag, sort = 'respect', limit, offset } = parsed.data;
+  const { search, tier, tag, category, location, active_since, has_ens, platform, min_respect, featured, sort = 'respect', limit, offset } = parsed.data;
 
   try {
     // Base query: users with respect data joined
@@ -55,6 +62,7 @@ export async function GET(req: NextRequest) {
         spotify_url,
         audius_handle,
         solana_wallet,
+        location,
         last_login_at,
         last_active_at,
         created_at,
@@ -75,6 +83,29 @@ export async function GET(req: NextRequest) {
       query = query.or(
         `display_name.ilike.%${search}%,username.ilike.%${search}%,real_name.ilike.%${search}%,ens_name.ilike.%${search}%`
       );
+    }
+
+    if (location) {
+      query = query.ilike('location', `%${location}%`);
+    }
+
+    if (active_since) {
+      const days = active_since === '7d' ? 7 : active_since === '30d' ? 30 : 90;
+      const since = new Date(Date.now() - days * 86400000).toISOString();
+      query = query.gte('last_active_at', since);
+    }
+
+    if (has_ens === 'true') {
+      query = query.not('ens_name', 'is', null);
+    }
+
+    if (platform) {
+      const platformCol: Record<string, string> = {
+        audius: 'audius_handle', spotify: 'spotify_url', soundcloud: 'soundcloud_url',
+        bluesky: 'bluesky_handle', x: 'x_handle', instagram: 'instagram_handle',
+      };
+      const col = platformCol[platform];
+      if (col) query = query.not(col, 'is', null);
     }
 
     // Sort
@@ -214,6 +245,9 @@ export async function GET(req: NextRequest) {
           slug: artistProfile.slug,
         } : null,
 
+        // Extra
+        location: u.location || null,
+
         // Activity
         lastLoginAt: u.last_login_at,
         lastActiveAt: u.last_active_at,
@@ -221,18 +255,38 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    // Re-sort by respect if that's the sort mode (can't do in SQL since it's a join)
-    if (sort === 'respect') {
-      members.sort((a, b) => (b.respect?.total ?? 0) - (a.respect?.total ?? 0));
+    // Post-query filters (need joined data)
+    let filtered = members;
+
+    if (category) {
+      filtered = filtered.filter(m => m.artistProfile?.category?.toLowerCase() === category.toLowerCase());
     }
 
+    if (featured === 'true') {
+      filtered = filtered.filter(m => m.artistProfile?.isFeatured);
+    }
+
+    if (min_respect !== undefined) {
+      filtered = filtered.filter(m => (m.respect?.total ?? 0) >= min_respect);
+    }
+
+    // Re-sort by respect if that's the sort mode (can't do in SQL since it's a join)
+    if (sort === 'respect') {
+      filtered.sort((a, b) => (b.respect?.total ?? 0) - (a.respect?.total ?? 0));
+    }
+
+    // Compute available filter options from full (unfiltered) member set
+    const categories = [...new Set(members.map(m => m.artistProfile?.category).filter(Boolean))] as string[];
+    const locations = [...new Set(members.map(m => m.location).filter(Boolean))] as string[];
+
     return NextResponse.json({
-      members,
-      total: count || 0,
+      members: filtered,
+      total: filtered.length,
       tiers: {
-        respectHolders: members.filter(m => m.tier === 'respect_holder').length,
-        community: members.filter(m => m.tier === 'community').length,
+        respectHolders: filtered.filter(m => m.tier === 'respect_holder').length,
+        community: filtered.filter(m => m.tier === 'community').length,
       },
+      filterOptions: { categories, locations },
     });
   } catch (err) {
     console.error('[directory] error:', err);

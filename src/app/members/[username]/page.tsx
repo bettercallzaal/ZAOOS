@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MemberProfile {
   fid: number | null;
@@ -82,14 +83,180 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+interface EditableFields {
+  bio: string;
+  location: string;
+  website_url: string;
+  bluesky_handle: string;
+  x_handle: string;
+  instagram_handle: string;
+  soundcloud_url: string;
+  spotify_url: string;
+  audius_handle: string;
+  discord_id: string;
+  tags: string;
+}
+
+function EditProfilePanel({ profile, onSave, onCancel }: {
+  profile: MemberProfile;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  const [fields, setFields] = useState<EditableFields>({
+    bio: profile.bio || '',
+    location: profile.location || '',
+    website_url: profile.website || '',
+    bluesky_handle: profile.platforms.bluesky || '',
+    x_handle: profile.platforms.x || '',
+    instagram_handle: profile.platforms.instagram || '',
+    soundcloud_url: profile.platforms.soundcloud || '',
+    spotify_url: profile.platforms.spotify || '',
+    audius_handle: profile.platforms.audius || '',
+    discord_id: profile.platforms.discord || '',
+    tags: (profile.tags || []).join(', '),
+  });
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const body: Record<string, unknown> = {
+        bio: fields.bio,
+        location: fields.location,
+        website_url: fields.website_url,
+        bluesky_handle: fields.bluesky_handle,
+        x_handle: fields.x_handle,
+        instagram_handle: fields.instagram_handle,
+        soundcloud_url: fields.soundcloud_url,
+        spotify_url: fields.spotify_url,
+        audius_handle: fields.audius_handle,
+        discord_id: fields.discord_id,
+        tags: fields.tags.split(',').map(t => t.trim()).filter(Boolean),
+      };
+
+      const res = await fetch('/api/members/me', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save');
+      }
+
+      onSave();
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : 'Failed to save');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputClass = 'w-full bg-[#0a1628] border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50';
+  const labelClass = 'text-[10px] text-gray-500 uppercase tracking-wider block mb-1';
+
+  return (
+    <div className="bg-[#0d1b2a] rounded-xl border border-[#f5a623]/30 p-4 mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm font-medium text-[#f5a623]">Edit Profile</p>
+        <div className="flex gap-2">
+          <button onClick={onCancel} className="px-3 py-1 rounded-lg text-xs text-gray-400 hover:text-white border border-gray-700 transition-colors">
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-3 py-1 rounded-lg text-xs bg-[#f5a623] text-[#0a1628] font-medium hover:bg-[#f5a623]/90 disabled:opacity-50 transition-colors"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </div>
+
+      {saveError && (
+        <p className="text-xs text-red-400 mb-3 bg-red-500/10 rounded-lg px-3 py-2">{saveError}</p>
+      )}
+
+      <div className="space-y-3">
+        <div>
+          <label className={labelClass}>Bio</label>
+          <textarea
+            value={fields.bio}
+            onChange={e => setFields(f => ({ ...f, bio: e.target.value }))}
+            placeholder="Tell the community about yourself..."
+            maxLength={500}
+            rows={3}
+            className={inputClass + ' resize-none'}
+          />
+          <p className="text-[9px] text-gray-600 mt-0.5 text-right">{fields.bio.length}/500</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass}>Location</label>
+            <input type="text" value={fields.location} onChange={e => setFields(f => ({ ...f, location: e.target.value }))} placeholder="NYC, Berlin, Lagos..." className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Website</label>
+            <input type="text" value={fields.website_url} onChange={e => setFields(f => ({ ...f, website_url: e.target.value }))} placeholder="https://yoursite.com" className={inputClass} />
+          </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Tags (comma-separated)</label>
+          <input type="text" value={fields.tags} onChange={e => setFields(f => ({ ...f, tags: e.target.value }))} placeholder="producer, vocalist, web3..." className={inputClass} />
+        </div>
+
+        <p className="text-[10px] text-gray-500 uppercase tracking-wider mt-2">Platforms</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass}>Bluesky</label>
+            <input type="text" value={fields.bluesky_handle} onChange={e => setFields(f => ({ ...f, bluesky_handle: e.target.value }))} placeholder="handle.bsky.social" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>X (Twitter)</label>
+            <input type="text" value={fields.x_handle} onChange={e => setFields(f => ({ ...f, x_handle: e.target.value }))} placeholder="@handle" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Instagram</label>
+            <input type="text" value={fields.instagram_handle} onChange={e => setFields(f => ({ ...f, instagram_handle: e.target.value }))} placeholder="@handle" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Discord</label>
+            <input type="text" value={fields.discord_id} onChange={e => setFields(f => ({ ...f, discord_id: e.target.value }))} placeholder="username#1234" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Audius</label>
+            <input type="text" value={fields.audius_handle} onChange={e => setFields(f => ({ ...f, audius_handle: e.target.value }))} placeholder="handle" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Spotify</label>
+            <input type="text" value={fields.spotify_url} onChange={e => setFields(f => ({ ...f, spotify_url: e.target.value }))} placeholder="https://open.spotify.com/artist/..." className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>SoundCloud</label>
+            <input type="text" value={fields.soundcloud_url} onChange={e => setFields(f => ({ ...f, soundcloud_url: e.target.value }))} placeholder="https://soundcloud.com/..." className={inputClass} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MemberProfilePage() {
   const params = useParams();
   const username = params.username as string;
   const [profile, setProfile] = useState<MemberProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const { user } = useAuth();
 
-  useEffect(() => {
+  const fetchProfile = () => {
+    setLoading(true);
     fetch(`/api/members/${encodeURIComponent(username)}`)
       .then(r => {
         if (!r.ok) throw new Error(r.status === 404 ? 'Member not found' : 'Failed to load');
@@ -98,7 +265,11 @@ export default function MemberProfilePage() {
       .then(setProfile)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
-  }, [username]);
+  };
+
+  useEffect(() => { fetchProfile(); }, [username]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const isOwnProfile = !!(user && profile && user.fid === profile.fid);
 
   if (loading) {
     return (
@@ -230,6 +401,28 @@ export default function MemberProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Edit button (own profile only) */}
+        {isOwnProfile && !editing && (
+          <button
+            onClick={() => setEditing(true)}
+            className="mb-4 px-4 py-2 rounded-lg border border-[#f5a623]/30 text-[#f5a623] text-xs hover:bg-[#f5a623]/5 transition-colors"
+          >
+            Edit Profile
+          </button>
+        )}
+
+        {/* Edit panel */}
+        {editing && profile && (
+          <EditProfilePanel
+            profile={profile}
+            onSave={() => {
+              setEditing(false);
+              fetchProfile();
+            }}
+            onCancel={() => setEditing(false)}
+          />
+        )}
 
         {/* Social stats */}
         {p.social && (

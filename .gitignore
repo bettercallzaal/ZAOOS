@@ -42,3 +42,4 @@ next-env.d.ts
 .wallet-backup.enc
 # XMTP WASM (copied by postinstall)
 public/bindings_wasm_bg.wasm
+.gstack/

@@ -12,7 +12,7 @@
 | [Music, Curation & Artist Revenue](./_categories/music.md) | 22 | Player, streaming, curation, discovery feeds, gap analysis, play counting |
 | [On-Chain Music Distribution & NFTs](./_categories/onchain-distribution.md) | 18 | Arweave, BazAR, atomic assets, 0xSplits, BuilderOSS, thirdweb, ZOUNZ governance |
 | [Community, Social & Growth](./_categories/community.md) | 14 | Gating, messaging, onboarding, notifications, moderation, community directory |
-| [Identity, Governance & Tokens](./_categories/identity-governance.md) | 30 | ZIDs, Hats Protocol, Respect, ORDAO fractals, ZOUNZ DAO, Snapshot, ENS |
+| [Identity, Governance & Tokens](./_categories/identity-governance.md) | 31 | ZIDs, Hats Protocol, Respect, ORDAO fractals, ZOUNZ DAO, Snapshot, ENS, Basenames |
 | [AI Agent & Intelligence](./_categories/ai-agent.md) | 4 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents |
 | [Cross-Platform Publishing](./_categories/cross-platform.md) | 12 | Farcaster, X, Bluesky, Lens, Hive, Mastodon, Threads, Nostr, Reddit |
 | [Technical Infrastructure](./_categories/infrastructure.md) | 8 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4 |
@@ -133,7 +133,7 @@
 
 ## Research Stats
 
-- **Total documents:** 155+
+- **Total documents:** 158+
 - **Total coverage:** ~500,000+ words
 - **Time span:** January — March 2026
 - **Categories:** 13

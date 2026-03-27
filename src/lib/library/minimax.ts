@@ -36,7 +36,7 @@ export async function generateResearchSummary(content: string): Promise<MinimaxR
           { role: 'system', content: LIBRARY_SYSTEM_PROMPT },
           { role: 'user', content: `<submission>\n${content}\n</submission>` },
         ],
-        max_tokens: 1000,
+        max_tokens: 4000,
       }),
     });
 

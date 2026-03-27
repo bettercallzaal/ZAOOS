@@ -285,6 +285,9 @@ export async function GET(
       role: user.role,
       tags: user.tags || [],
 
+      // ZAO subname
+      zaoSubname: user.zao_subname || null,
+
       // Wallets (respect visibility settings)
       primaryWallet: user.primary_wallet,
       preferredWallet: user.preferred_wallet,

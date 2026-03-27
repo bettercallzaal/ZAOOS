@@ -146,3 +146,5 @@
 | 154 | `154-skills-commands-master-reference` | **CANONICAL** — Complete reference for every command, skill, and workflow (48 total): when to use each, session flows, how to ask for features |
 | 155 | `155-music-nft-end-to-end-implementation` | **THE BUILD PLAN** — End-to-end: artist uploads MP3/MP4+art → ArDrive Turbo → atomic asset → BazAR/UCM → collector buys. Every screen, API route, component, DB table, UDL license presets. 52 hours, 5 phases. |
 | 156 | `156-pods-media-podcast-tokenization` | Pods.media analysis (900K mints, $1M rev, Base ERC-721 + Arweave). ZAO clone on pure Arweave atomic assets — same Doc 155 flow + podcast-specific tags + RSS generation from Arweave GraphQL. ~5 days incremental. |
+| 157 | `157-cross-project-asset-audit` | Cross-project asset audit |
+| 158 | `158-zao-member-naming-ens-basenames` | ENS subnames vs Basenames vs custom naming — NameStone gasless `member.thezao.eth` for $5/year, 4 options compared, implementation plan |

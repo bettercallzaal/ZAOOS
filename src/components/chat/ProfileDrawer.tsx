@@ -83,6 +83,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
   const [enriched, setEnriched] = useState<EnrichedData | null>(null);
   const [enrichedLoading, setEnrichedLoading] = useState(false);
   const [reputation, setReputation] = useState<ReputationSignals | null>(null);
+  const [zaoSubname, setZaoSubname] = useState<string | null>(null);
 
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -161,6 +162,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
       .then((res) => res.ok ? res.json() : null)
       .then((data) => {
         if (data?.reputation) setReputation(data.reputation);
+        if (data?.zaoSubname) setZaoSubname(data.zaoSubname);
       })
       .catch(() => { /* non-critical */ });
   }, [profile?.username]);
@@ -259,6 +261,9 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                   <OGBadge zid={enriched?.zid ? Number(enriched.zid) : null} />
                 </div>
                 <p className="text-sm text-gray-500 mt-0.5">@{profile.username}</p>
+                {zaoSubname && (
+                  <p className="text-xs text-[#f5a623] font-mono mt-0.5">{zaoSubname}</p>
+                )}
                 {profile.zaoName && profile.zaoName !== profile.displayName && (
                   <p className="text-xs text-gray-400 mt-1">{profile.zaoName}</p>
                 )}

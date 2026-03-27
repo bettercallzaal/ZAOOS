@@ -13,6 +13,7 @@ interface MemberProfile {
   pfpUrl: string | null;
   realName: string | null;
   bio: string | null;
+  zaoSubname: string | null;
   ensName: string | null;
   zid: string | null;
   tier: string;
@@ -358,6 +359,9 @@ export default function MemberProfilePage() {
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500 mt-1 flex-wrap">
               {p.username && <span>@{p.username}</span>}
+              {p.zaoSubname && (
+                <span className="text-[#f5a623] font-medium">{p.zaoSubname}</span>
+              )}
               {p.realName && p.realName !== p.displayName && (
                 <span className="text-gray-600">({p.realName})</span>
               )}

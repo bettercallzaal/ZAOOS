@@ -60,4 +60,7 @@ export const ENV = {
 
   // Discord webhook (cross-posting to Discord channel)
   DISCORD_WEBHOOK_URL: optionalEnv('DISCORD_WEBHOOK_URL'),
+
+  // NameStone ENS subnames (gasless subdomains for thezao.eth)
+  NAMESTONE_API_KEY: optionalEnv('NAMESTONE_API_KEY'),
 } as const;

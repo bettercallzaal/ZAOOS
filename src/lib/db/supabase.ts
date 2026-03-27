@@ -1,10 +1,12 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { ENV } from '@/lib/env';
 
 let _supabaseAdmin: SupabaseClient | null = null;
 
 export function getSupabaseAdmin(): SupabaseClient {
   if (!_supabaseAdmin) {
+    // Lazy-import ENV to avoid triggering server-only env validation
+    // when client components import getSupabaseBrowser from this module.
+    const { ENV } = require('@/lib/env');
     _supabaseAdmin = createClient(
       ENV.NEXT_PUBLIC_SUPABASE_URL,
       ENV.SUPABASE_SERVICE_ROLE_KEY

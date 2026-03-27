@@ -326,19 +326,29 @@ export default function MemberCRMPage() {
                 <div className="space-y-2 mt-2">
                   {fixResults.map((r, i) => (
                     <div key={i} className="bg-[#0a1628] rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-medium text-white">{r.action}</span>
-                        <span className="text-xs text-green-400">{r.fixed} fixed</span>
-                        {r.errors > 0 && <span className="text-xs text-red-400">{r.errors} errors</span>}
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-white">{r.action}</span>
+                          <span className="text-xs text-green-400">{r.fixed} fixed</span>
+                          {r.errors > 0 && <span className="text-xs text-red-400">{r.errors} errors</span>}
+                        </div>
+                        {r.details.length > 0 && (
+                          <button
+                            onClick={() => {
+                              const text = `${r.action}: ${r.fixed} fixed\n${r.details.join('\n')}`;
+                              navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
+                            }}
+                            className="text-[10px] text-gray-500 hover:text-[#f5a623] transition-colors"
+                          >
+                            Copy log
+                          </button>
+                        )}
                       </div>
                       {r.details.length > 0 && (
-                        <div className="max-h-32 overflow-y-auto">
-                          {r.details.slice(0, 20).map((d, j) => (
+                        <div className="max-h-48 overflow-y-auto">
+                          {r.details.map((d, j) => (
                             <p key={j} className="text-[10px] text-gray-500">{d}</p>
                           ))}
-                          {r.details.length > 20 && (
-                            <p className="text-[10px] text-gray-600">...and {r.details.length - 20} more</p>
-                          )}
                         </div>
                       )}
                     </div>

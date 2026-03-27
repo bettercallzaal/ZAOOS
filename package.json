@@ -15,6 +15,8 @@
     "import:fractals": "npx tsx scripts/import-fractal-history.ts"
   },
   "dependencies": {
+    "@100mslive/hms-video-store": "^0.13.2",
+    "@100mslive/react-sdk": "^0.11.2",
     "@atproto/api": "^0.19.4",
     "@atproto/oauth-client-node": "^0.3.17",
     "@discordjs/rest": "^2.6.0",
@@ -38,6 +40,8 @@
     "@solana/wallet-adapter-react-ui": "^0.9.39",
     "@solana/wallet-adapter-wallets": "^0.19.37",
     "@solana/web3.js": "^1.98.4",
+    "@stream-io/node-sdk": "^0.7.49",
+    "@stream-io/video-react-sdk": "^1.34.1",
     "@supabase/supabase-js": "^2.99.1",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-virtual": "^3.13.22",

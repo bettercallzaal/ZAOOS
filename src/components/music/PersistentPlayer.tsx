@@ -37,6 +37,25 @@ export function PersistentPlayer({
   onToggleSidebar,
 }: PersistentPlayerProps) {
   const player = usePlayer();
+  const [expanded, setExpanded] = useState(false);
+
+  // ─── Swipe to skip on compact bar ──────────────────────────────────
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+
+  const onSwipeStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const onSwipeEnd = useCallback((e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx > 0 && onPrev) { onPrev(); navigator.vibrate?.(10); }
+      else if (dx < 0 && onNext) { onNext(); navigator.vibrate?.(10); }
+    }
+  }, [onPrev, onNext]);
 
   // Show restored track as if paused (user sees what was playing before refresh)
   const restored = player.restoredTrack;
@@ -86,7 +105,6 @@ export function PersistentPlayer({
   const position = player.metadata ? player.position : (restored?.position ?? 0);
   const duration = player.metadata ? player.duration : (restored?.duration ?? 0);
   const isRestored = !player.metadata && !!restored;
-  const [expanded, setExpanded] = useState(false);
 
   const handlePlayPause = () => {
     if (isRestored) {
@@ -96,24 +114,6 @@ export function PersistentPlayer({
     if (isPlaying) player.pause();
     else player.resume();
   };
-
-  // ─── Swipe to skip on compact bar ──────────────────────────────────
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-
-  const onSwipeStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  }, []);
-
-  const onSwipeEnd = useCallback((e: React.TouchEvent) => {
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    const dy = e.changedTouches[0].clientY - touchStartY.current;
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      if (dx > 0 && onPrev) { onPrev(); navigator.vibrate?.(10); }
-      else if (dx < 0 && onNext) { onNext(); navigator.vibrate?.(10); }
-    }
-  }, [onPrev, onNext]);
 
   // ─── Expanded full-screen player ───────────────────────────────────
   if (expanded && player.metadata) {

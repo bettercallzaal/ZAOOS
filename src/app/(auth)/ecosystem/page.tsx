@@ -42,7 +42,7 @@ const ECOSYSTEM_APPS: EcosystemApp[] = [
     name: 'MAGNETIQ',
     icon: '\uD83E\uDDF2',
     description: 'Proof of Meet hub — verify real-world connections and earn attestations.',
-    iframeUrl: 'https://app.magnetiq.xyz',
+    iframeUrl: 'https://zabal.lol',
   },
   {
     name: 'ZOUNZ',

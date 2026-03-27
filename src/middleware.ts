@@ -153,8 +153,13 @@ function buildCspHeader(nonce: string): string {
   return directives.join('; ');
 }
 
-function addSecurityHeaders(response: NextResponse, nonce?: string): NextResponse {
-  response.headers.set('X-Frame-Options', 'DENY');
+function addSecurityHeaders(response: NextResponse, nonce?: string, pathname?: string): NextResponse {
+  // Allow iframe embedding for the embeddable leaderboard endpoint
+  if (pathname?.startsWith('/api/respect/leaderboard/embed')) {
+    response.headers.set('X-Frame-Options', 'ALLOWALL');
+  } else {
+    response.headers.set('X-Frame-Options', 'DENY');
+  }
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
@@ -185,7 +190,7 @@ export function middleware(request: NextRequest) {
         { status: 429 }
       );
       errorResponse.headers.set('Retry-After', String(Math.ceil(config.windowMs / 1000)));
-      return addSecurityHeaders(errorResponse);
+      return addSecurityHeaders(errorResponse, undefined, pathname);
     }
   }
 
@@ -209,7 +214,7 @@ export function middleware(request: NextRequest) {
     response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
   }
 
-  return addSecurityHeaders(response, nonce);
+  return addSecurityHeaders(response, nonce, pathname);
 }
 
 export const config = {

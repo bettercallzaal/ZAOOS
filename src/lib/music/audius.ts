@@ -6,8 +6,9 @@
  * that Audius uses to route requests between discovery nodes.
  */
 
-const AUDIUS_API = 'https://discoveryprovider.audius.co/v1';
-const APP_NAME = 'ZAOOS';
+// Use the official Audius gateway (handles discovery node selection automatically)
+const AUDIUS_API = 'https://api.audius.co/v1';
+const APP_NAME = 'ZAO-OS';
 
 // ---------------------------------------------------------------------------
 // Types

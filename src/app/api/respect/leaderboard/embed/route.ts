@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { fetchLeaderboard } from '@/lib/respect/leaderboard';
+import { fetchLeaderboard, type RespectEntry } from '@/lib/respect/leaderboard';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
@@ -68,15 +68,10 @@ export async function OPTIONS() {
   });
 }
 
-interface LeaderboardEntry {
-  rank: number;
-  name: string;
-  ogRespect: number;
-  zorRespect: number;
-  totalRespect: number;
-}
+// Intentionally public endpoint — any origin can embed this data
+type EmbedEntry = Pick<RespectEntry, 'rank' | 'name' | 'ogRespect' | 'zorRespect' | 'totalRespect'>;
 
-function renderHTML(entries: LeaderboardEntry[], totalMembers: number): string {
+function renderHTML(entries: EmbedEntry[], totalMembers: number): string {
   const rows = entries
     .map(
       (e) => `

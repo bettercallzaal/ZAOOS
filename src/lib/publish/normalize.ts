@@ -113,6 +113,54 @@ export function normalizeForX(input: NormalizeInput): NormalizedContent {
 }
 
 /**
+ * Telegram — 4096-char limit.
+ * Appends "via ZAO OS" attribution. Keeps plain text (MarkdownV2 escaping
+ * is handled by the publish module).
+ */
+export function normalizeForTelegram(input: NormalizeInput): NormalizedContent {
+  const url = castUrl(input.castHash);
+  const attribution = 'via ZAO OS';
+  const footer = `\n\n${attribution}\n${url}`;
+
+  const maxTextLen = 4096 - footer.length;
+  const truncatedText = truncate(input.text, maxTextLen);
+  const text = `${truncatedText}${footer}`;
+
+  return {
+    text,
+    images: input.imageUrls ?? [],
+    embeds: input.embedUrls ?? [],
+    attribution,
+    castHash: input.castHash,
+    castUrl: url,
+  };
+}
+
+/**
+ * Discord — 2000-char text limit for webhook messages.
+ * Keeps text concise; images/embeds are handled separately via rich embeds.
+ */
+export function normalizeForDiscord(input: NormalizeInput): NormalizedContent {
+  const url = castUrl(input.castHash);
+  const attribution = 'Posted via ZAO OS';
+  const footer = `\n\n${attribution}`;
+
+  // Reserve room for footer within the 2000 char limit
+  const maxTextLen = 2000 - footer.length;
+  const truncatedText = truncate(input.text, maxTextLen);
+  const text = `${truncatedText}${footer}`;
+
+  return {
+    text,
+    images: input.imageUrls ?? [],
+    embeds: input.embedUrls ?? [],
+    attribution,
+    castHash: input.castHash,
+    castUrl: url,
+  };
+}
+
+/**
  * Hive — full markdown, no character limit.
  * Converts images to markdown `![]()` syntax, embeds to `[]()` links,
  * and appends a footer with the original cast link.

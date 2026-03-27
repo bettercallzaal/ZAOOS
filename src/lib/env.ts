@@ -53,4 +53,11 @@ export const ENV = {
 
   // Lens Protocol V3
   NEXT_PUBLIC_LENS_APP_ADDRESS: optionalEnv('NEXT_PUBLIC_LENS_APP_ADDRESS'),
+
+  // Telegram Bot API (cross-posting to Telegram channel/group)
+  TELEGRAM_BOT_TOKEN: optionalEnv('TELEGRAM_BOT_TOKEN'),
+  TELEGRAM_CHAT_ID: optionalEnv('TELEGRAM_CHAT_ID'),
+
+  // Discord webhook (cross-posting to Discord channel)
+  DISCORD_WEBHOOK_URL: optionalEnv('DISCORD_WEBHOOK_URL'),
 } as const;

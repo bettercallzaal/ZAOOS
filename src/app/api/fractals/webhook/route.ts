@@ -103,10 +103,12 @@ const RESPECT_POINTS = [110, 68, 42, 26, 16, 10];
 // ---------------------------------------------------------------------------
 
 function timingSafeCompare(a: string, b: string): boolean {
-  const aBuf = Buffer.from(a);
-  const bBuf = Buffer.from(b);
-  if (aBuf.length !== bBuf.length) return false;
-  return crypto.timingSafeEqual(aBuf, bBuf);
+  // HMAC both inputs so digests are always the same length,
+  // preventing length-leak via the early-return timing side-channel.
+  const key = 'fractal-webhook-compare';
+  const aMac = crypto.createHmac('sha256', key).update(a).digest();
+  const bMac = crypto.createHmac('sha256', key).update(b).digest();
+  return crypto.timingSafeEqual(aMac, bMac);
 }
 
 function validateWebhookAuth(req: NextRequest, rawBody: string): boolean {

@@ -7,8 +7,9 @@ import { useState, useCallback } from 'react';
 // Constants
 // ---------------------------------------------------------------------------
 
-const AUDIUS_API = 'https://discoveryprovider.audius.co/v1';
-const APP_NAME = 'ZAOOS';
+// Use the official Audius gateway (handles discovery node selection automatically)
+const AUDIUS_API = 'https://api.audius.co/v1';
+const APP_NAME = 'ZAO-OS';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -47,7 +48,7 @@ async function audiusFetch(
   for (const [k, v] of Object.entries(params)) {
     url.searchParams.set(k, v);
   }
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), { signal: AbortSignal.timeout(10_000) });
   if (!res.ok) throw new Error(`Audius API error: ${res.status}`);
   const json = await res.json();
   return json.data ?? [];
@@ -118,12 +119,5 @@ export function useAudiusSearch() {
 
 /** Build a direct stream URL for an Audius track. */
 export function getStreamUrl(trackId: string): string {
-  return `${AUDIUS_API}/tracks/${trackId}/stream?app_name=${APP_NAME}`;
-}
-
-/** Format seconds into `m:ss` display string. */
-export function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
+  return `${AUDIUS_API}/tracks/${encodeURIComponent(trackId)}/stream?app_name=${APP_NAME}`;
 }

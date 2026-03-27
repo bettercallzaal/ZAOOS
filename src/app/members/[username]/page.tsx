@@ -22,6 +22,7 @@ interface MemberProfile {
   hiddenWallets: string[];
   platforms: Record<string, string | null>;
   ensNames: Record<string, string> | null;
+  basenames: Record<string, string> | null;
   ensAvatar: string | null;
   ensProfile: Record<string, string> | null;
   respect: {
@@ -192,11 +193,15 @@ export default function MemberProfilePage() {
               {/* Show all ENS names */}
               {p.ensNames && Object.values(p.ensNames).filter(Boolean).length > 0 ? (
                 Object.values(p.ensNames).filter(Boolean).map((name, i) => (
-                  <span key={i} className="text-[#f5a623]">{name}</span>
+                  <span key={`ens-${i}`} className="text-[#f5a623]">{name}</span>
                 ))
               ) : p.ensName ? (
                 <span className="text-[#f5a623]">{p.ensName}</span>
               ) : null}
+              {/* Show Basenames */}
+              {p.basenames && Object.values(p.basenames).filter(Boolean).map((name, i) => (
+                <span key={`base-${i}`} className="text-blue-400">{name}</span>
+              ))}
               {displayWallet && <span className="font-mono text-xs">{shortAddr(displayWallet)}</span>}
             </div>
             {p.bio && <p className="text-sm text-gray-400 mt-2 line-clamp-3">{p.bio}</p>}
@@ -424,6 +429,15 @@ export default function MemberProfilePage() {
                   <p className="text-[10px] text-gray-500 mb-1">On-Chain Social</p>
                   <p className="text-lg font-bold text-cyan-400">{p.reputation.efp.followers}</p>
                   <p className="text-[9px] text-gray-600">EFP followers · {p.reputation.efp.following} following</p>
+                </div>
+              )}
+
+              {/* Basename */}
+              {p.basenames && Object.values(p.basenames).filter(Boolean).length > 0 && (
+                <div className="bg-[#0a1628] rounded-lg p-3">
+                  <p className="text-[10px] text-gray-500 mb-1">Basename</p>
+                  <p className="text-sm font-bold text-blue-400">{Object.values(p.basenames)[0]}</p>
+                  <p className="text-[9px] text-gray-600">Base chain identity</p>
                 </div>
               )}
             </div>

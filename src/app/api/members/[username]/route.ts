@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { resolveENSNames, getENSTextRecords, getENSAvatar } from '@/lib/ens/resolve';
+import { resolveENSNames, getENSTextRecords, getENSAvatar, resolveBasenames } from '@/lib/ens/resolve';
 
 /**
  * GET /api/members/[username] — Unified member profile
@@ -133,7 +133,10 @@ export async function GET(
     // Resolve ENS names for all wallets (with forward verification)
     const walletsToResolve = [user.primary_wallet, user.preferred_wallet, ...(user.verified_addresses || [])]
       .filter((w): w is string => !!w && w.startsWith('0x') && w.length === 42);
-    const ensNames = await resolveENSNames(walletsToResolve);
+    const [ensNames, basenames] = await Promise.all([
+      resolveENSNames(walletsToResolve),
+      resolveBasenames(walletsToResolve),
+    ]);
 
     // Fetch ENS text records (avatar, description, socials) if any name resolved
     const primaryEnsName = ensNames[(user.preferred_wallet || user.primary_wallet || '').toLowerCase()] || Object.values(ensNames)[0] || null;
@@ -274,6 +277,7 @@ export async function GET(
       bio: user.bio,
       ensName: user.ens_name || primaryEnsName || null,
       ensNames,
+      basenames,
       ensAvatar,
       ensProfile: Object.keys(ensTextRecords).length > 0 ? ensTextRecords : null,
       zid: user.zid,

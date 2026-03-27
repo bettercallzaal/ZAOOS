@@ -130,3 +130,68 @@ export async function getFullENSProfile(address: string): Promise<{
 
   return { name, avatar, records };
 }
+
+// ── Basenames (Base chain ENS) ──
+
+import { base } from 'viem/chains';
+
+const baseClient = createPublicClient({
+  chain: base,
+  transport: fallback([
+    ...(process.env.ALCHEMY_API_KEY
+      ? [http(`https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`)]
+      : []),
+    http('https://mainnet.base.org'),
+    http('https://base-rpc.publicnode.com'),
+  ]),
+});
+
+const BASENAMES_RESOLVER = '0xC6d566A56A1aFf6508b41f6c90ff131615583BCD' as const;
+
+const basenameCache = new Map<string, string | null>();
+
+/**
+ * Reverse-resolve a Base address to its Basename (.base.eth).
+ * Uses L2 Reverse Registrar on Base chain.
+ */
+export async function resolveBasename(address: string): Promise<string | null> {
+  const key = address.toLowerCase();
+  if (basenameCache.has(key)) return basenameCache.get(key)!;
+
+  try {
+    // Base uses the standard ENS reverse resolution on L2
+    const name = await baseClient.getEnsName({
+      address: key as Address,
+      universalResolverAddress: BASENAMES_RESOLVER,
+    });
+
+    if (!name) {
+      basenameCache.set(key, null);
+      return null;
+    }
+
+    basenameCache.set(key, name);
+    return name;
+  } catch {
+    basenameCache.set(key, null);
+    return null;
+  }
+}
+
+/**
+ * Resolve Basenames for multiple addresses. Returns a map of address → name.
+ */
+export async function resolveBasenames(addresses: string[]): Promise<Record<string, string>> {
+  const unique = [...new Set(
+    addresses.filter(a => a && a.startsWith('0x') && a.length === 42).map(a => a.toLowerCase())
+  )];
+
+  const results: Record<string, string> = {};
+
+  for (const addr of unique.slice(0, 10)) {
+    const name = await resolveBasename(addr);
+    if (name) results[addr] = name;
+  }
+
+  return results;
+}

@@ -51,6 +51,16 @@ interface MusicTrack {
   role: 'creator' | 'collector';
 }
 
+interface ReputationSignals {
+  neynarScore: number | null;
+  coinbaseVerified: boolean;
+  easAttestationCount: number;
+  github: { username: string; repos: number; followers: number } | null;
+  snapshot: { totalVotes: number; daoCount: number } | null;
+  audius: { followers: number; tracks: number; playlists: number } | null;
+  efp: { followers: number; following: number } | null;
+}
+
 interface EnrichedData {
   activeChannels: { id: string; name: string; imageUrl: string | null }[];
   communityStats: {
@@ -60,6 +70,7 @@ interface EnrichedData {
   };
   blueskyHandle: string | null;
   zid: string | null;
+  reputation: ReputationSignals | null;
 }
 
 export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
@@ -71,6 +82,7 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
   const [musicLoading, setMusicLoading] = useState(false);
   const [enriched, setEnriched] = useState<EnrichedData | null>(null);
   const [enrichedLoading, setEnrichedLoading] = useState(false);
+  const [reputation, setReputation] = useState<ReputationSignals | null>(null);
 
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -131,11 +143,27 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
           communityStats: data.communityStats || { songsSubmitted: 0, proposalsCreated: 0, votesCast: 0 },
           blueskyHandle: data.blueskyHandle || null,
           zid: data.zid || null,
+          reputation: null,
         });
       })
       .catch((err) => console.error('Enriched profile fetch error:', err))
       .finally(() => setEnrichedLoading(false));
   }, [fid]);
+
+  // Fetch reputation signals from public member profile (non-blocking)
+  useEffect(() => {
+    if (!profile?.username) {
+      setReputation(null);
+      return;
+    }
+
+    fetch(`/api/members/${encodeURIComponent(profile.username)}`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data?.reputation) setReputation(data.reputation);
+      })
+      .catch(() => { /* non-critical */ });
+  }, [profile?.username]);
 
   const handleFollow = useCallback(async () => {
     if (!profile || followLoading) return;
@@ -393,6 +421,62 @@ export function ProfileDrawer({ fid, onClose, onStartDm }: ProfileDrawerProps) {
                 </div>
               </div>
             ) : null}
+
+            {/* Reputation Signals */}
+            {reputation && (reputation.neynarScore || reputation.coinbaseVerified || reputation.easAttestationCount > 0 || reputation.github || reputation.snapshot || reputation.audius || reputation.efp) && (
+              <div className="px-6 py-4">
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Reputation</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {reputation.neynarScore !== null && (
+                    <div className="bg-white/5 rounded-lg px-3 py-2">
+                      <p className={`text-sm font-bold ${
+                        reputation.neynarScore >= 0.7 ? 'text-green-400' :
+                        reputation.neynarScore >= 0.4 ? 'text-yellow-400' : 'text-gray-400'
+                      }`}>
+                        {(reputation.neynarScore * 100).toFixed(0)}
+                      </p>
+                      <p className="text-[9px] text-gray-500">Farcaster Score</p>
+                    </div>
+                  )}
+                  {reputation.coinbaseVerified && (
+                    <div className="bg-white/5 rounded-lg px-3 py-2">
+                      <p className="text-sm font-bold text-blue-400">Verified</p>
+                      <p className="text-[9px] text-gray-500">Coinbase ID</p>
+                    </div>
+                  )}
+                  {reputation.easAttestationCount > 0 && (
+                    <div className="bg-white/5 rounded-lg px-3 py-2">
+                      <p className="text-sm font-bold text-[#f5a623]">{reputation.easAttestationCount}</p>
+                      <p className="text-[9px] text-gray-500">Attestations</p>
+                    </div>
+                  )}
+                  {reputation.github && (
+                    <div className="bg-white/5 rounded-lg px-3 py-2">
+                      <p className="text-sm font-bold text-white">{reputation.github.repos}</p>
+                      <p className="text-[9px] text-gray-500">GitHub repos</p>
+                    </div>
+                  )}
+                  {reputation.snapshot && reputation.snapshot.totalVotes > 0 && (
+                    <div className="bg-white/5 rounded-lg px-3 py-2">
+                      <p className="text-sm font-bold text-orange-400">{reputation.snapshot.totalVotes}</p>
+                      <p className="text-[9px] text-gray-500">DAO votes</p>
+                    </div>
+                  )}
+                  {reputation.audius && (
+                    <div className="bg-white/5 rounded-lg px-3 py-2">
+                      <p className="text-sm font-bold text-purple-300">{reputation.audius.tracks}</p>
+                      <p className="text-[9px] text-gray-500">Audius tracks</p>
+                    </div>
+                  )}
+                  {reputation.efp && reputation.efp.followers > 0 && (
+                    <div className="bg-white/5 rounded-lg px-3 py-2">
+                      <p className="text-sm font-bold text-cyan-400">{reputation.efp.followers}</p>
+                      <p className="text-[9px] text-gray-500">On-chain followers</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Divider */}
             <div className="border-t border-gray-800 mx-4" />

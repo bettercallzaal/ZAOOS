@@ -34,71 +34,52 @@ export interface AudioFilterPreset {
 // ── Presets ─────────────────────────────────────────────────────────────
 
 export const AUDIO_FILTERS: Record<string, AudioFilterPreset> = {
-  bassBoost: {
-    name: 'Bass Boost',
-    description: 'Pumps up the low end with a +12dB shelf at 150Hz',
-    icon: '\uD83D\uDD0A',
-    nodes: [
-      { type: 'biquad', filter: 'lowshelf', frequency: 150, gain: 12 },
-    ],
-  },
-
-  trebleBoost: {
-    name: 'Treble Boost',
-    description: 'Brightens the highs with a +8dB shelf at 4kHz',
-    icon: '\u2728',
-    nodes: [
-      { type: 'biquad', filter: 'highshelf', frequency: 4000, gain: 8 },
-    ],
-  },
-
   nightcore: {
     name: 'Nightcore',
-    description: 'Speeds up playback 1.25x with a bright high-end lift',
+    description: 'Speeds up playback 1.25x — energetic, higher pitch',
     icon: '\uD83C\uDF19',
     playbackRate: 1.25,
-    nodes: [
-      { type: 'biquad', filter: 'highshelf', frequency: 4000, gain: 4 },
-    ],
+    nodes: [],
   },
 
   vaporwave: {
     name: 'Vaporwave',
-    description: 'Slows playback to 0.8x with a warm low-end boost',
+    description: 'Slows to 0.8x — dreamy, pitched down',
     icon: '\uD83C\uDF05',
     playbackRate: 0.8,
-    nodes: [
-      { type: 'biquad', filter: 'lowshelf', frequency: 200, gain: 4 },
-    ],
+    nodes: [],
   },
 
-  lofi: {
-    name: 'Lo-fi',
-    description: 'Rolls off highs above 3kHz for a muffled, vintage feel',
-    icon: '\uD83D\uDCFC',
-    nodes: [
-      { type: 'biquad', filter: 'lowpass', frequency: 3000 },
-      { type: 'gain', gain: 0.85 },
-    ],
+  chipmunk: {
+    name: 'Chipmunk',
+    description: 'Speeds up to 1.5x — fast and squeaky',
+    icon: '\uD83D\uDC3F\uFE0F',
+    playbackRate: 1.5,
+    nodes: [],
   },
 
-  vocalBoost: {
-    name: 'Vocal Boost',
-    description: 'Lifts vocal presence around 3kHz',
-    icon: '\uD83C\uDFA4',
-    nodes: [
-      { type: 'biquad', filter: 'peaking', frequency: 3000, Q: 1, gain: 6 },
-    ],
+  slowed: {
+    name: 'Slowed',
+    description: 'Slowed to 0.85x — chopped & screwed vibes',
+    icon: '\uD83D\uDD7A',
+    playbackRate: 0.85,
+    nodes: [],
   },
 
-  deepBass: {
-    name: 'Deep Bass',
-    description: 'Massive sub-bass boost at 80Hz with a 200Hz low-pass roll-off',
-    icon: '\uD83D\uDCA5',
-    nodes: [
-      { type: 'biquad', filter: 'lowshelf', frequency: 80, gain: 15 },
-      { type: 'biquad', filter: 'lowpass', frequency: 200 },
-    ],
+  daycore: {
+    name: 'Daycore',
+    description: 'Slowed to 0.7x — ambient, deep pitch',
+    icon: '\u2600\uFE0F',
+    playbackRate: 0.7,
+    nodes: [],
+  },
+
+  speedUp: {
+    name: 'Speed Up',
+    description: 'Speeds up to 1.15x — subtle energy boost',
+    icon: '\u26A1',
+    playbackRate: 1.15,
+    nodes: [],
   },
 } as const;
 

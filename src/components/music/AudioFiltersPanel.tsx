@@ -3,15 +3,25 @@
 import { useCallback, useState } from 'react';
 import { AUDIO_FILTERS, type AudioFilterPreset } from '@/lib/music/audioFilters';
 
-// ── Module-level singletons (persist across re-mounts) ──
-let sharedAudioContext: AudioContext | null = null;
-let sharedSourceNode: MediaElementAudioSourceNode | null = null;
-let sharedActiveNodes: AudioNode[] = [];
+// ── Module-level state (persists across re-mounts) ──
 let sharedActiveFilterKey: string | null = null;
-let sharedConnectedElement: HTMLAudioElement | null = null;
 
 export function getActiveFilterKey(): string | null {
   return sharedActiveFilterKey;
+}
+
+/** Find the currently active audio element from the player */
+function getAudioElement(): HTMLAudioElement | null {
+  // Try globalThis first (set by HTMLAudioProvider)
+  const a = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined;
+  const b = (globalThis as Record<string, unknown>).__zao_audio_b as HTMLAudioElement | undefined;
+  // Return whichever one has a src and isn't paused, or the first with a src
+  if (a && !a.paused && a.src) return a;
+  if (b && !b.paused && b.src) return b;
+  if (a?.src) return a;
+  if (b?.src) return b;
+  // Fallback to DOM query
+  return document.querySelector('audio');
 }
 
 interface AudioFiltersPanelProps {
@@ -21,99 +31,34 @@ interface AudioFiltersPanelProps {
 export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
   const [activeKey, setActiveKey] = useState<string | null>(sharedActiveFilterKey);
 
-  const ensureAudioContext = useCallback((): {
-    ctx: AudioContext;
-    source: MediaElementAudioSourceNode;
-  } | null => {
-    try {
-      if (sharedAudioContext && sharedSourceNode) {
-        if (sharedAudioContext.state === 'suspended') {
-          sharedAudioContext.resume();
-        }
-        return { ctx: sharedAudioContext, source: sharedSourceNode };
-      }
-
-      // Find the active audio element — try globalThis first, then DOM query
-      let audioEl = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined;
-      if (!audioEl) {
-        audioEl = document.querySelector('audio') as HTMLAudioElement | undefined;
-      }
-      if (!audioEl) {
-        console.warn('[AudioFilters] No audio element found — play a track first');
-        return null;
-      }
-
-      // Set crossOrigin to allow Web Audio API processing
-      audioEl.crossOrigin = 'anonymous';
-
-      const ctx = new AudioContext();
-      const source = ctx.createMediaElementSource(audioEl);
-      source.connect(ctx.destination);
-
-      sharedAudioContext = ctx;
-      sharedSourceNode = source;
-      sharedConnectedElement = audioEl;
-
-      return { ctx, source };
-    } catch (err) {
-      console.error('[AudioFilters] Failed to create audio context:', err);
-      return null;
-    }
-  }, []);
-
   const activateFilter = useCallback((key: string, preset: AudioFilterPreset) => {
-    const result = ensureAudioContext();
-    if (!result) return;
+    const audioEl = getAudioElement();
+    if (!audioEl) {
+      console.warn('[AudioFilters] No audio element — play a track first');
+      return;
+    }
 
-    const { ctx, source } = result;
-
-    // If tapping the already-active filter, toggle it off
+    // Toggle off if tapping active filter
     if (sharedActiveFilterKey === key) {
-      clearFilterInternal(source, ctx.destination);
+      audioEl.playbackRate = 1.0;
+      sharedActiveFilterKey = null;
       setActiveKey(null);
       return;
     }
 
-    // Remove existing filter chain
-    if (sharedActiveNodes.length > 0) {
-      clearFilterInternal(source, ctx.destination);
-    }
+    // Apply the preset's playback rate (nightcore = 1.25x, vaporwave = 0.8x, others = 1.0)
+    audioEl.playbackRate = preset.playbackRate ?? 1.0;
 
-    try {
-      // Disconnect source from destination to insert filter chain
-      source.disconnect();
-
-      // Build chain: source -> node[0] -> node[1] -> ... -> destination
-      const nodes: AudioNode[] = [];
-      let previous: AudioNode = source;
-
-      for (const config of preset.nodes) {
-        const node = createAudioNode(ctx, config);
-        previous.connect(node);
-        nodes.push(node);
-        previous = node;
-      }
-      previous.connect(ctx.destination);
-
-      sharedActiveNodes = nodes;
-      sharedActiveFilterKey = key;
-      setActiveKey(key);
-
-      // Apply playbackRate for nightcore/vaporwave
-      if (sharedConnectedElement) {
-        sharedConnectedElement.playbackRate = preset.playbackRate ?? 1.0;
-      }
-    } catch (err) {
-      console.error('[AudioFilters] Failed to apply filter:', err);
-      // Reconnect source directly on failure
-      try { source.connect(ctx.destination); } catch { /* already connected */ }
-    }
-  }, [ensureAudioContext]);
+    sharedActiveFilterKey = key;
+    setActiveKey(key);
+  }, []);
 
   const clearFilter = useCallback(() => {
-    if (sharedAudioContext && sharedSourceNode) {
-      clearFilterInternal(sharedSourceNode, sharedAudioContext.destination);
+    const audioEl = getAudioElement();
+    if (audioEl) {
+      audioEl.playbackRate = 1.0;
     }
+    sharedActiveFilterKey = null;
     setActiveKey(null);
   }, []);
 
@@ -162,51 +107,4 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
       </div>
     </div>
   );
-}
-
-// ── Internal helpers ──
-
-function clearFilterInternal(source: AudioNode, destination: AudioNode) {
-  try {
-    source.disconnect();
-    for (const node of sharedActiveNodes) {
-      node.disconnect();
-    }
-    source.connect(destination);
-  } catch { /* ignore disconnect errors */ }
-
-  sharedActiveNodes = [];
-  sharedActiveFilterKey = null;
-
-  if (sharedConnectedElement) {
-    sharedConnectedElement.playbackRate = 1.0;
-  }
-}
-
-function createAudioNode(ctx: AudioContext, config: import('@/lib/music/audioFilters').AudioNodeConfig): AudioNode {
-  switch (config.type) {
-    case 'biquad': {
-      const bq = ctx.createBiquadFilter();
-      bq.type = config.filter;
-      if (config.frequency !== undefined) bq.frequency.value = config.frequency;
-      if (config.gain !== undefined) bq.gain.value = config.gain;
-      if (config.Q !== undefined) bq.Q.value = config.Q;
-      return bq;
-    }
-    case 'gain': {
-      const g = ctx.createGain();
-      g.gain.value = config.gain;
-      return g;
-    }
-    case 'stereoPanner': {
-      const p = ctx.createStereoPanner();
-      p.pan.value = config.pan;
-      return p;
-    }
-    case 'delay': {
-      const d = ctx.createDelay();
-      d.delayTime.value = config.delayTime;
-      return d;
-    }
-  }
 }

@@ -1,24 +1,15 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import {
-  AUDIO_FILTERS,
-  applyFilter,
-  removeFilter,
-  type AudioFilterPreset,
-} from '@/lib/music/audioFilters';
+import { AUDIO_FILTERS, type AudioFilterPreset } from '@/lib/music/audioFilters';
 
-// ── Module-level singletons (survive re-mounts, persist across expanded player open/close) ──
+// ── Module-level singletons (persist across re-mounts) ──
 let sharedAudioContext: AudioContext | null = null;
 let sharedSourceNode: MediaElementAudioSourceNode | null = null;
 let sharedActiveNodes: AudioNode[] = [];
 let sharedActiveFilterKey: string | null = null;
 let sharedConnectedElement: HTMLAudioElement | null = null;
 
-/**
- * Returns the current active filter key (module-level). Used by ExpandedPlayer
- * to highlight the filter toggle when a filter is active.
- */
 export function getActiveFilterKey(): string | null {
   return sharedActiveFilterKey;
 }
@@ -30,40 +21,44 @@ interface AudioFiltersPanelProps {
 export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
   const [activeKey, setActiveKey] = useState<string | null>(sharedActiveFilterKey);
 
-  /**
-   * Lazily create AudioContext + MediaElementSourceNode on first filter activation.
-   * Must be called inside a user gesture handler (click/tap) to comply with autoplay policy.
-   * A MediaElementSourceNode can only be created once per audio element, so we store it.
-   */
   const ensureAudioContext = useCallback((): {
     ctx: AudioContext;
     source: MediaElementAudioSourceNode;
   } | null => {
-    if (sharedAudioContext && sharedSourceNode) {
-      // Resume if suspended (browser may suspend after inactivity)
-      if (sharedAudioContext.state === 'suspended') {
-        sharedAudioContext.resume();
+    try {
+      if (sharedAudioContext && sharedSourceNode) {
+        if (sharedAudioContext.state === 'suspended') {
+          sharedAudioContext.resume();
+        }
+        return { ctx: sharedAudioContext, source: sharedSourceNode };
       }
-      return { ctx: sharedAudioContext, source: sharedSourceNode };
-    }
 
-    // Get the audio element exposed by HTMLAudioProvider via globalThis
-    const audioEl = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined;
-    if (!audioEl) {
-      console.warn('[AudioFilters] No audio element found — is music playing?');
+      // Find the active audio element — try globalThis first, then DOM query
+      let audioEl = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined;
+      if (!audioEl) {
+        audioEl = document.querySelector('audio') as HTMLAudioElement | undefined;
+      }
+      if (!audioEl) {
+        console.warn('[AudioFilters] No audio element found — play a track first');
+        return null;
+      }
+
+      // Set crossOrigin to allow Web Audio API processing
+      audioEl.crossOrigin = 'anonymous';
+
+      const ctx = new AudioContext();
+      const source = ctx.createMediaElementSource(audioEl);
+      source.connect(ctx.destination);
+
+      sharedAudioContext = ctx;
+      sharedSourceNode = source;
+      sharedConnectedElement = audioEl;
+
+      return { ctx, source };
+    } catch (err) {
+      console.error('[AudioFilters] Failed to create audio context:', err);
       return null;
     }
-
-    const ctx = new AudioContext();
-    const source = ctx.createMediaElementSource(audioEl);
-    // Connect source directly to destination (passthrough until a filter is applied)
-    source.connect(ctx.destination);
-
-    sharedAudioContext = ctx;
-    sharedSourceNode = source;
-    sharedConnectedElement = audioEl;
-
-    return { ctx, source };
   }, []);
 
   const activateFilter = useCallback((key: string, preset: AudioFilterPreset) => {
@@ -72,51 +67,54 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
 
     const { ctx, source } = result;
 
-    // Remove existing filter chain if any
-    if (sharedActiveNodes.length > 0) {
-      removeFilter(source, ctx.destination, sharedActiveNodes, sharedConnectedElement ?? undefined);
-      sharedActiveNodes = [];
-    }
-
     // If tapping the already-active filter, toggle it off
     if (sharedActiveFilterKey === key) {
-      sharedActiveFilterKey = null;
+      clearFilterInternal(source, ctx.destination);
       setActiveKey(null);
-      if (sharedConnectedElement) {
-        sharedConnectedElement.playbackRate = 1.0;
-      }
       return;
     }
 
-    // Apply new filter
-    const nodes = applyFilter(ctx, source, ctx.destination, preset);
-    sharedActiveNodes = nodes;
-    sharedActiveFilterKey = key;
-    setActiveKey(key);
+    // Remove existing filter chain
+    if (sharedActiveNodes.length > 0) {
+      clearFilterInternal(source, ctx.destination);
+    }
 
-    // Apply playbackRate for nightcore/vaporwave presets
-    if (sharedConnectedElement) {
-      sharedConnectedElement.playbackRate = preset.playbackRate ?? 1.0;
+    try {
+      // Disconnect source from destination to insert filter chain
+      source.disconnect();
+
+      // Build chain: source -> node[0] -> node[1] -> ... -> destination
+      const nodes: AudioNode[] = [];
+      let previous: AudioNode = source;
+
+      for (const config of preset.nodes) {
+        const node = createAudioNode(ctx, config);
+        previous.connect(node);
+        nodes.push(node);
+        previous = node;
+      }
+      previous.connect(ctx.destination);
+
+      sharedActiveNodes = nodes;
+      sharedActiveFilterKey = key;
+      setActiveKey(key);
+
+      // Apply playbackRate for nightcore/vaporwave
+      if (sharedConnectedElement) {
+        sharedConnectedElement.playbackRate = preset.playbackRate ?? 1.0;
+      }
+    } catch (err) {
+      console.error('[AudioFilters] Failed to apply filter:', err);
+      // Reconnect source directly on failure
+      try { source.connect(ctx.destination); } catch { /* already connected */ }
     }
   }, [ensureAudioContext]);
 
   const clearFilter = useCallback(() => {
-    if (sharedAudioContext && sharedSourceNode && sharedActiveNodes.length > 0) {
-      removeFilter(
-        sharedSourceNode,
-        sharedAudioContext.destination,
-        sharedActiveNodes,
-        sharedConnectedElement ?? undefined,
-      );
-      sharedActiveNodes = [];
+    if (sharedAudioContext && sharedSourceNode) {
+      clearFilterInternal(sharedSourceNode, sharedAudioContext.destination);
     }
-
-    sharedActiveFilterKey = null;
     setActiveKey(null);
-
-    if (sharedConnectedElement) {
-      sharedConnectedElement.playbackRate = 1.0;
-    }
   }, []);
 
   const filterEntries = Object.entries(AUDIO_FILTERS);
@@ -129,9 +127,7 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
       }`}
     >
       <div className="px-8 pb-3 space-y-2">
-        {/* Filter pills — horizontal scroll */}
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
-          {/* Off button */}
           <button
             onClick={clearFilter}
             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
@@ -158,7 +154,6 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
           ))}
         </div>
 
-        {/* Active filter description */}
         {activePreset && (
           <p className="text-[10px] text-gray-500 text-center leading-tight">
             {activePreset.description}
@@ -167,4 +162,51 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
       </div>
     </div>
   );
+}
+
+// ── Internal helpers ──
+
+function clearFilterInternal(source: AudioNode, destination: AudioNode) {
+  try {
+    source.disconnect();
+    for (const node of sharedActiveNodes) {
+      node.disconnect();
+    }
+    source.connect(destination);
+  } catch { /* ignore disconnect errors */ }
+
+  sharedActiveNodes = [];
+  sharedActiveFilterKey = null;
+
+  if (sharedConnectedElement) {
+    sharedConnectedElement.playbackRate = 1.0;
+  }
+}
+
+function createAudioNode(ctx: AudioContext, config: import('@/lib/music/audioFilters').AudioNodeConfig): AudioNode {
+  switch (config.type) {
+    case 'biquad': {
+      const bq = ctx.createBiquadFilter();
+      bq.type = config.filter;
+      if (config.frequency !== undefined) bq.frequency.value = config.frequency;
+      if (config.gain !== undefined) bq.gain.value = config.gain;
+      if (config.Q !== undefined) bq.Q.value = config.Q;
+      return bq;
+    }
+    case 'gain': {
+      const g = ctx.createGain();
+      g.gain.value = config.gain;
+      return g;
+    }
+    case 'stereoPanner': {
+      const p = ctx.createStereoPanner();
+      p.pan.value = config.pan;
+      return p;
+    }
+    case 'delay': {
+      const d = ctx.createDelay();
+      d.delayTime.value = config.delayTime;
+      return d;
+    }
+  }
 }

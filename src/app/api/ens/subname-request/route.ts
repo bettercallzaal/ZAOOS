@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { isValidSubname, sanitizeSubname } from '@/lib/ens/namestone';
+import { isValidSubname, sanitizeSubname } from '@/lib/ens/subnames';
 
 const requestSchema = z.object({
   requestedName: z.string().min(1).max(63),

@@ -4,13 +4,12 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import {
   createSubnameWithFallback,
-  deleteSubname,
-  listSubnames,
   batchCreateSubnames,
   buildMemberTextRecords,
   isValidSubname,
   sanitizeSubname,
-} from '@/lib/ens/namestone';
+  getSubnameOwner,
+} from '@/lib/ens/subnames';
 
 const createSchema = z.object({
   fid: z.number().int().positive(),
@@ -36,18 +35,14 @@ export async function GET() {
   }
 
   try {
-    const [namestoneNames, { data: users }] = await Promise.all([
-      listSubnames(),
-      supabaseAdmin
-        .from('users')
-        .select('fid, username, display_name, primary_wallet, zao_subname, zid, pfp_url')
-        .eq('is_active', true)
-        .not('primary_wallet', 'is', null)
-        .order('zid', { ascending: true, nullsFirst: false }),
-    ]);
+    const { data: users } = await supabaseAdmin
+      .from('users')
+      .select('fid, username, display_name, primary_wallet, zao_subname, zid, pfp_url')
+      .eq('is_active', true)
+      .not('primary_wallet', 'is', null)
+      .order('zid', { ascending: true, nullsFirst: false });
 
     return NextResponse.json({
-      namestone: namestoneNames,
       members: (users || []).map(u => ({
         fid: u.fid,
         username: u.username,
@@ -103,14 +98,15 @@ export async function POST(req: NextRequest) {
 
       // Update DB for successfully created names
       for (let i = 0; i < members.length; i++) {
-        const fullName = result.created.find(n =>
-          n.startsWith(sanitizeSubname(toCreate[i].name)) ||
-          n.startsWith(`${sanitizeSubname(toCreate[i].name)}-`)
+        const sanitized = sanitizeSubname(toCreate[i].name);
+        const entry = result.created.find(c =>
+          c.name.startsWith(sanitized) ||
+          c.name.startsWith(`${sanitized}-`)
         );
-        if (fullName) {
+        if (entry) {
           await supabaseAdmin
             .from('users')
-            .update({ zao_subname: fullName })
+            .update({ zao_subname: entry.name })
             .eq('fid', members[i].fid);
         }
       }
@@ -182,20 +178,16 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
-    const { fid, name } = parsed.data;
+    const { fid } = parsed.data;
 
-    const delResult = await deleteSubname(name);
-    if (!delResult.success) {
-      return NextResponse.json({ error: delResult.error }, { status: 500 });
-    }
-
-    // Clear from DB
+    // On-chain subnames can't be deleted, but we clear the DB association
+    // The subname still exists on-chain but ZAO OS stops displaying it
     await supabaseAdmin
       .from('users')
       .update({ zao_subname: null })
       .eq('fid', fid);
 
-    return NextResponse.json({ success: true, message: `Revoked ${name}.thezao.eth` });
+    return NextResponse.json({ success: true, message: 'Subname unlinked from member profile' });
   } catch (err) {
     console.error('[admin/ens-subnames] delete error:', err);
     return NextResponse.json({ error: 'Failed to revoke subname' }, { status: 500 });

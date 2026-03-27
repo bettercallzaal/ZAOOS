@@ -3,11 +3,11 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import {
-  updateSubname,
+  createSubname,
   buildMemberTextRecords,
   isValidSubname,
   sanitizeSubname,
-} from '@/lib/ens/namestone';
+} from '@/lib/ens/subnames';
 
 const reviewSchema = z.object({
   requestId: z.string().uuid(),
@@ -95,11 +95,8 @@ export async function PATCH(req: NextRequest) {
 
     const textRecords = buildMemberTextRecords({ username: user.username, pfpUrl: user.pfp_url, bio: user.bio });
 
-    // Update in NameStone (delete old + create new)
-    const oldName = request.current_name?.replace('.thezao.eth', '') || '';
-    const result = oldName
-      ? await updateSubname(oldName, newName, user.primary_wallet, textRecords)
-      : await (await import('@/lib/ens/namestone')).createSubname(newName, user.primary_wallet, textRecords);
+    // Create new on-chain subname (old one stays with the member — it's their NFT)
+    const result = await createSubname(newName, user.primary_wallet, textRecords);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 });

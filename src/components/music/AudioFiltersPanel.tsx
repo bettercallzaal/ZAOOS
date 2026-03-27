@@ -1,26 +1,21 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { AUDIO_FILTERS, type AudioFilterPreset } from '@/lib/music/audioFilters';
+import { AUDIO_FILTERS, FILTER_CATEGORIES, type AudioFilterPreset } from '@/lib/music/audioFilters';
 
-// ── Module-level state (persists across re-mounts) ──
 let sharedActiveFilterKey: string | null = null;
 
 export function getActiveFilterKey(): string | null {
   return sharedActiveFilterKey;
 }
 
-/** Find the currently active audio element from the player */
 function getAudioElement(): HTMLAudioElement | null {
-  // Try globalThis first (set by HTMLAudioProvider)
   const a = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined;
   const b = (globalThis as Record<string, unknown>).__zao_audio_b as HTMLAudioElement | undefined;
-  // Return whichever one has a src and isn't paused, or the first with a src
   if (a && !a.paused && a.src) return a;
   if (b && !b.paused && b.src) return b;
   if (a?.src) return a;
   if (b?.src) return b;
-  // Fallback to DOM query
   return document.querySelector('audio');
 }
 
@@ -30,15 +25,12 @@ interface AudioFiltersPanelProps {
 
 export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
   const [activeKey, setActiveKey] = useState<string | null>(sharedActiveFilterKey);
+  const [activeCategory, setActiveCategory] = useState(0);
 
   const activateFilter = useCallback((key: string, preset: AudioFilterPreset) => {
     const audioEl = getAudioElement();
-    if (!audioEl) {
-      console.warn('[AudioFilters] No audio element — play a track first');
-      return;
-    }
+    if (!audioEl) return;
 
-    // Toggle off if tapping active filter
     if (sharedActiveFilterKey === key) {
       audioEl.playbackRate = 1.0;
       sharedActiveFilterKey = null;
@@ -46,52 +38,70 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
       return;
     }
 
-    // Apply the preset's playback rate (nightcore = 1.25x, vaporwave = 0.8x, others = 1.0)
     audioEl.playbackRate = preset.playbackRate ?? 1.0;
-
     sharedActiveFilterKey = key;
     setActiveKey(key);
   }, []);
 
   const clearFilter = useCallback(() => {
     const audioEl = getAudioElement();
-    if (audioEl) {
-      audioEl.playbackRate = 1.0;
-    }
+    if (audioEl) audioEl.playbackRate = 1.0;
     sharedActiveFilterKey = null;
     setActiveKey(null);
   }, []);
 
-  const filterEntries = Object.entries(AUDIO_FILTERS);
+  const currentCategory = FILTER_CATEGORIES[activeCategory];
+  const categoryFilters = currentCategory.keys
+    .filter((k) => AUDIO_FILTERS[k])
+    .map((k) => ({ key: k, preset: AUDIO_FILTERS[k] }));
+
   const activePreset = activeKey ? AUDIO_FILTERS[activeKey] : null;
 
   return (
     <div
       className={`overflow-hidden transition-all duration-300 ease-in-out ${
-        visible ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+        visible ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
       }`}
     >
-      <div className="px-8 pb-3 space-y-2">
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
+      <div className="px-4 pb-3 space-y-2">
+        {/* Category tabs */}
+        <div className="flex gap-1 justify-center">
+          {FILTER_CATEGORIES.map((cat, i) => (
+            <button
+              key={cat.label}
+              onClick={() => setActiveCategory(i)}
+              className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-all ${
+                activeCategory === i
+                  ? 'bg-[#f5a623]/15 text-[#f5a623]'
+                  : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+              }`}
+            >
+              {cat.icon} {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Filter pills */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
           <button
             onClick={clearFilter}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+            className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
               !activeKey
                 ? 'bg-white/10 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-gray-200'
+                : 'bg-white/5 text-gray-400 hover:bg-white/10'
             }`}
           >
             Off
           </button>
 
-          {filterEntries.map(([key, preset]) => (
+          {categoryFilters.map(({ key, preset }) => (
             <button
               key={key}
               onClick={() => activateFilter(key, preset)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all whitespace-nowrap ${
                 activeKey === key
-                  ? 'bg-[#f5a623]/15 text-[#f5a623] border border-[#f5a623]/50 shadow-sm shadow-[#f5a623]/10'
-                  : 'bg-white/5 text-gray-400 border border-transparent hover:bg-white/10 hover:text-gray-200'
+                  ? 'bg-[#f5a623]/15 text-[#f5a623] border border-[#f5a623]/50'
+                  : 'bg-white/5 text-gray-400 border border-transparent hover:bg-white/10'
               }`}
             >
               {preset.icon} {preset.name}
@@ -99,10 +109,22 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
           ))}
         </div>
 
+        {/* Active filter info */}
         {activePreset && (
-          <p className="text-[10px] text-gray-500 text-center leading-tight">
-            {activePreset.description}
-          </p>
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-[10px] text-[#f5a623] font-medium">
+              {activePreset.icon} {activePreset.name}
+            </span>
+            <span className="text-[10px] text-gray-500">
+              {activePreset.playbackRate !== 1.0
+                ? `${activePreset.playbackRate}x`
+                : ''
+              }
+            </span>
+            <span className="text-[10px] text-gray-600">
+              {activePreset.description}
+            </span>
+          </div>
         )}
       </div>
     </div>

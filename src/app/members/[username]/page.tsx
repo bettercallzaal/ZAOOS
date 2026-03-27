@@ -127,15 +127,15 @@ export default function MemberProfilePage() {
         <Link href="/members" className="text-xs text-gray-500 hover:text-white">All Members</Link>
       </nav>
 
-      {/* Cover image hero */}
-      {p.artistProfile?.coverImageUrl && (
+      {/* Cover image hero — from artist profile or Farcaster banner */}
+      {(p.coverImageUrl || p.artistProfile?.coverImageUrl) && (
         <div className="relative h-40 sm:h-52 overflow-hidden">
-          <Image src={p.artistProfile.coverImageUrl} alt="" fill className="object-cover" sizes="100vw" />
+          <Image src={p.coverImageUrl || p.artistProfile?.coverImageUrl || ''} alt="" fill className="object-cover" sizes="100vw" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a1628]/60 via-transparent to-[#0a1628]" />
         </div>
       )}
 
-      <div className={`max-w-2xl mx-auto px-4 ${p.artistProfile?.coverImageUrl ? '-mt-16 relative z-10' : 'pt-8'}`}>
+      <div className={`max-w-2xl mx-auto px-4 ${(p.coverImageUrl || p.artistProfile?.coverImageUrl) ? '-mt-16 relative z-10' : 'pt-8'}`}>
         {/* Hero */}
         <div className="flex items-start gap-4 mb-6">
           <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-gray-800 flex-shrink-0 ring-2 ring-[#0a1628]">
@@ -203,12 +203,26 @@ export default function MemberProfilePage() {
             {p.artistProfile?.biography && !p.bio && (
               <p className="text-sm text-gray-400 mt-2 line-clamp-3">{p.artistProfile.biography}</p>
             )}
-            {/* Last active */}
-            {p.lastActiveAt && (
-              <p className="text-[10px] text-gray-600 mt-1">
-                Active {timeAgo(p.lastActiveAt)}
-              </p>
-            )}
+            {/* Location + dates */}
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+              {p.location && (
+                <span className="text-[10px] text-gray-600">📍 {p.location}</span>
+              )}
+              {p.farcasterRegisteredAt && (
+                <span className="text-[10px] text-gray-600">
+                  On Farcaster since {new Date(p.farcasterRegisteredAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                </span>
+              )}
+              {p.lastActiveAt && (
+                <span className="text-[10px] text-gray-600">Active {timeAgo(p.lastActiveAt)}</span>
+              )}
+              {p.website && (
+                <a href={p.website.startsWith('http') ? p.website : `https://${p.website}`} target="_blank" rel="noopener noreferrer"
+                  className="text-[10px] text-[#f5a623] hover:underline">
+                  {p.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                </a>
+              )}
+            </div>
           </div>
         </div>
 

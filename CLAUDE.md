@@ -31,7 +31,7 @@ src/
 ├── lib/                  # Utilities by domain: auth, db, farcaster, gates, music, xmtp, validation, publish, moderation
 └── types/                # TypeScript type definitions
 community.config.ts       # All community branding, channels, contracts, nav — fork-friendly
-research/                 # 136 research docs (see research/README.md)
+research/                 # 155+ research docs (see research/README.md)
 scripts/                  # DB setup, wallet generation, webhook registration
 supabase/                 # Database config
 ```
@@ -93,12 +93,37 @@ supabase/                 # Database config
 
 ## Research Library
 
-136 research documents in `research/`. Start with:
+155+ research documents in `research/`. Start with:
 - `research/README.md` — full index organized by topic
 - `research/50-the-zao-complete-guide/` — canonical project reference
 - `research/51-zao-whitepaper-2026/` — whitepaper Draft 4.5
+- `research/154-skills-commands-master-reference/` — **CANONICAL** all commands/skills reference
 
 Use the `/zao-research` skill for conducting new research.
+
+## Skills & Commands
+
+9 project skills in `.claude/skills/`, 8 autoresearch subcommands, 1 command (minimax), plus ~30 gstack/superpowers skills. See [Doc 154](research/154-skills-commands-master-reference/) for the complete reference.
+
+**Most-used commands:**
+
+| Command | When to Use |
+|---------|-------------|
+| `/catchup` | Start of session — restore context |
+| `/new-route feature/action` | Scaffold API route with ZAO conventions |
+| `/new-component feature/Name` | Scaffold component with dark theme, mobile-first |
+| `/fix-issue 42` | Fix a GitHub issue end-to-end |
+| `/check-env` | Validate env vars before deploy |
+| `/standup` | Generate build-in-public notes |
+| `/zao-research topic` | Research with 155+ doc library + web |
+| `/review` | Pre-landing PR review |
+| `/ship` | Ship workflow: tests → review → PR |
+| `/qa` | QA test the site, find and fix bugs |
+| `/investigate` | Root cause debugging |
+| `/autoresearch goal` | Autonomous iteration toward a measurable goal |
+| `/autoresearch:security` | STRIDE + OWASP security audit |
+
+**How to ask for new features:** Describe the outcome you want for users, not the implementation. Let the skill system figure out the workflow. See Doc 154, Part 13.
 
 ## Style Preferences
 

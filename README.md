@@ -609,7 +609,7 @@ src/
 ├── lib/                  # Utilities by domain (auth, db, farcaster, gates, music, xmtp, hats, publish, moderation, etc.)
 └── types/                # TypeScript type definitions
 community.config.ts       # All community config — fork-friendly
-research/                 # 147 research docs (see research/README.md)
+research/                 # 155+ research docs (see research/README.md)
 scripts/                  # DB setup, wallet generation, webhook registration, data import
 docs/                     # Internal plans, QA checklists, architecture decisions
 ```
@@ -618,12 +618,14 @@ docs/                     # Internal plans, QA checklists, architecture decision
 
 ## Research Library
 
-**147 research documents** covering every aspect of building a decentralized music platform.
+**155+ research documents** covering every aspect of building a decentralized music platform — protocol, identity, music, AI agents, governance, revenue, cross-platform publishing, on-chain distribution, Arweave, NFTs, reputation, security, and developer tooling.
 
 Start with:
 - [research/50 — The ZAO Complete Guide](./research/50-the-zao-complete-guide/) — canonical ecosystem reference
 - [research/51 — ZAO Whitepaper 2026](./research/51-zao-whitepaper-2026/) — Draft 4.5
 - [research/56 — ORDAO Respect System](./research/56-ordao-respect-system/) — on-chain governance
+- [research/154 — Skills & Commands Master Reference](./research/154-skills-commands-master-reference/) — all 48 dev commands/skills
+- [research/155 — Music NFT End-to-End](./research/155-music-nft-end-to-end-implementation/) — upload → mint → buy implementation plan
 - [research/README.md](./research/) — full index organized by topic
 
 ---
@@ -644,9 +646,10 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 | **Mobile Polish** | Complete MediaSession (8 actions), expanded player, swipe gestures, haptics, Wake Lock | Done |
 | **Governance** | Three-tier system: ZOUNZ on-chain + Snapshot weekly polls + Community proposals. Admin poll config. 7-day voting + deferred publishing. | Done |
 | **Member Profiles** | Public directory + profiles, ENS resolution, cover images, respect breakdown, badges, completeness indicator | Done |
+| **On-Chain Distribution** | Music NFTs via Arweave atomic assets + BazAR/UCM + 0xSplits. Upload → mint → buy. (see docs 150-155) | Planned |
 | **5** | Hats & Treasury — Hats tree deployment on Optimism, Safe multisig, HSG v2 | Planned (Q3 2026) |
 | **6** | AI Agent — ElizaOS + Claude + pgvector, welcome DMs, music recs | Planned (Q4 2026) |
-| **7** | Music Tier 4 — Farcaster embeds, Audius SDK, Zora collectibles, Spotify features, AI recs | Planned (see doc 130) |
+| **7** | Music Tier 4 — Farcaster embeds, Audius SDK, AI recs, Last.fm scrobbling | Planned (see doc 130) |
 
 ---
 
@@ -655,7 +658,7 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 ZAO OS is open source. Fork it, build on it, make it yours.
 
 - [GitHub Issues](https://github.com/bettercallzaal/zaoos/issues) — bugs and feature requests
-- [Research Library](./research/) — 133+ docs of context
+- [Research Library](./research/) — 155+ docs of context
 - [QA Test Checklist](./docs/QA-TEST-CHECKLIST.md) — testing procedures
 - [Internal Plans](./docs/superpowers/plans/) — execution plans for upcoming sprints
 

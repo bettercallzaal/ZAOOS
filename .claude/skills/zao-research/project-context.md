@@ -42,7 +42,9 @@ The Farcaster client (this repo) is one interface within the ZAO OS ecosystem. I
 | Gamification | Not built | — |
 | AI agent | Not built | — |
 | Hats Protocol | Not built | — |
-| Cross-platform posting | Not built (Farcaster only) | — |
+| Cross-platform publishing | Built (Farcaster + Bluesky + X) | `src/lib/publish/` |
+| Snapshot weekly polls | Built | `src/lib/snapshot/`, `src/components/governance/CreateWeeklyPoll.tsx` |
+| ZOUNZ on-chain proposals | Built | `src/components/zounz/ZounzProposals.tsx`, `src/lib/zounz/` |
 
 ## On-Chain Infrastructure
 

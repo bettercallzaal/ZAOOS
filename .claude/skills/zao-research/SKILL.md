@@ -1,6 +1,6 @@
 ---
 name: zao-research
-description: Research skill for ZAO OS — search existing research library (88 docs) + codebase, conduct new research, and save findings in the standardized format
+description: Research skill for ZAO OS — search existing research library (155+ docs) + codebase, conduct new research, and save findings in the standardized format
 user-invocable: true
 ---
 

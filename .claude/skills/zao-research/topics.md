@@ -43,6 +43,8 @@ Use this to quickly find if a topic has already been researched.
 - **ZOUNZ distribution WITHOUT Zora**: Arweave + thirdweb + 0xSplits (supersedes 142/144) → `151`
 - **Arweave ecosystem deep dive (CANONICAL)**: AO compute, ar.io Wayfinder CDN, ArDrive Turbo, GraphQL indexing, ArNS domains, Irys deprecated → `152`
 - **BazAR & atomic assets for music**: Arweave-native marketplace, UCM orderbook, UDL licensing, fractionalization, $U token, primary distribution → `153`
+- **Music NFT end-to-end implementation (THE BUILD PLAN)**: upload MP3+art → mint → buy, every file/route/component, ArDrive Turbo + Arweave Wallet Kit, 52hrs → `155`
+- Pods.media podcast tokenization: Pods still active (900K mints, $1M rev), ZAO clone on Arweave atomic assets, RSS from GraphQL, ~5 days → `156`
 
 ## Respect & Governance
 - Respect tokens (aspirational design — tiers/decay NOT implemented) → `04`

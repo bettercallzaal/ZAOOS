@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **154 research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **155+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -78,6 +78,8 @@ How ZAO distributes music on-chain — minting, collecting, revenue splits, and 
 | [151](./151-zounz-distribution-without-zora/) | **ZOUNZ Distribution Without Zora** | Arweave + thirdweb ERC-1155 + 0xSplits. No protocol fees. YOU own the contract. Supersedes 142/144. |
 | [152](./152-arweave-ecosystem-deep-dive/) | **Arweave Ecosystem Deep Dive** | Full ecosystem: AO compute, ar.io CDN, ArDrive Turbo (NOT Irys — deprecated), GraphQL indexing. |
 | [153](./153-bazar-arweave-atomic-assets-music/) | **BazAR & Atomic Assets for Music** | Atomic assets = data + contract + license in ONE tx. UCM orderbook, UDL licensing, $U token. |
+| [155](./155-music-nft-end-to-end-implementation/) | **Music NFT End-to-End Implementation** | **THE BUILD PLAN** — Artist uploads MP3+art → mints atomic asset → collectors buy. Every screen, API route, DB table. ArDrive Turbo + Arweave Wallet Kit. 52 hrs / 5 weeks. |
+| [156](./156-pods-media-podcast-tokenization/) | **Pods.media & Podcast Tokenization** | Pods is ACTIVE (900K mints, $1M rev, Base ERC-721 + Arweave). ZAO clone on pure Arweave atomic assets — same Doc 155 flow + podcast tags + RSS generation. ~5 days incremental. |
 
 ---
 
@@ -344,8 +346,165 @@ Start with [154 Skills Master Reference](./154-skills-commands-master-reference/
 
 ## Research Stats
 
-- **Total documents:** 154
+- **Total documents:** 155+
 - **Total coverage:** ~500,000+ words
 - **Topics:** Protocol, identity, music, AI agents, governance, revenue, cross-platform, mobile, storage, privacy, notifications, competitors, onboarding, moderation, code quality, infrastructure, live audio, documentation, fractals, WaveWarZ, music player, on-chain distribution, Arweave, NFTs, reputation, skills, security
 - **Time span:** January — March 2026
-- **Status:** 153/154 complete, 1 incomplete (Hypersnap)
+
+---
+
+## What's Built vs What's Next
+
+### Built (Shipping Today)
+
+| Feature | Status | Key Files |
+|---------|--------|-----------|
+| **Farcaster auth (SIWF + wallet)** | ✅ Complete | `src/lib/auth/session.ts` |
+| **Gated community (allowlist + NFT)** | ✅ Complete | `src/lib/gates/` |
+| **Public chat (Farcaster casts)** | ✅ Complete | `src/components/chat/` |
+| **Private messaging (XMTP MLS)** | ✅ Complete | `src/contexts/XMTPContext.tsx` |
+| **Music player (9 platforms)** | ✅ Complete | `src/providers/audio/`, 30+ components |
+| **Crossfade engine (dual audio)** | ✅ Complete | `src/providers/audio/HTMLAudioProvider.tsx` |
+| **Binaural beats + ambient mixer** | ✅ Complete | `src/components/music/BinauralBeats.tsx` |
+| **MediaSession (lock screen controls)** | ✅ Complete | `src/providers/audio/PlayerProvider.tsx` |
+| **Song submissions + voting** | ✅ Complete | `src/app/api/music/submissions/` |
+| **Respect-weighted trending** | ✅ Complete | `src/app/api/music/trending-weighted/` |
+| **Now Playing presence** | ✅ Complete | `src/hooks/useNowPlaying.ts` |
+| **Playlists** | ✅ Complete | `src/app/api/music/playlists/` |
+| **Track of the day** | ✅ Complete | `src/app/api/music/track-of-day/` |
+| **Lyrics lookup** | ✅ Complete | `src/app/api/music/lyrics/` |
+| **Songlink cross-platform links** | ✅ Complete | `src/lib/music/songlink.ts` |
+| **Internal play counting** | ✅ Complete | `src/app/api/music/library/play/` |
+| **Farcaster cross-posting** | ✅ Complete | `src/lib/publish/farcaster.ts` |
+| **X (Twitter) cross-posting** | ✅ Complete | `src/lib/publish/x.ts` |
+| **Hive/InLeo cross-posting** | ✅ Complete | `src/app/api/publish/hive/` |
+| **Community proposals (Supabase)** | ✅ Complete | `src/app/api/proposals/` |
+| **Snapshot polls** | ✅ Complete | `src/components/governance/CreateWeeklyPoll.tsx` |
+| **ZOUNZ auction display** | ✅ Complete | `src/components/zounz/ZounzAuction.tsx` |
+| **ZOUNZ governance read** | ✅ Complete | `src/components/zounz/ZounzProposals.tsx` |
+| **Hats Protocol roles** | ✅ Complete | `src/components/hats/HatManager.tsx` |
+| **Respect scoring (OG + ZOR)** | ✅ Complete | `src/app/api/respect/` |
+| **Fractal webhook receiver** | ✅ Complete | `src/app/api/fractals/webhook/` |
+| **Music NFT wallet detection** | ✅ Complete | `src/app/api/music/wallet/` |
+| **AI content moderation** | ✅ Complete | `src/lib/moderation/moderate.ts` |
+| **Rate limiting middleware** | ✅ Complete | `src/middleware.ts` |
+| **Notifications (in-app)** | ✅ Complete | `src/app/api/notifications/` |
+| **Admin panel** | ✅ Complete | `src/app/(auth)/admin/` |
+| **Jitsi live rooms** | ✅ Complete | `src/app/(auth)/calls/` |
+| **WaveWarZ API sync** | ✅ Complete | `src/app/api/wavewarz/` |
+| **Solana wallet in settings** | ✅ Complete | Wallet adapter config |
+| **Bluesky OAuth storage** | ✅ Partial | Auth works, no publish route |
+
+### Not Yet Built (Researched, Ready to Go)
+
+| Feature | Priority | Effort | Research Doc |
+|---------|----------|--------|-------------|
+| **Arweave music upload** | 🔴 High | 12 hrs | [155](./155-music-nft-end-to-end-implementation/) |
+| **Music NFT mint UI** | 🔴 High | 14 hrs | [155](./155-music-nft-end-to-end-implementation/) |
+| **Collect/buy button** | 🔴 High | 10 hrs | [155](./155-music-nft-end-to-end-implementation/) |
+| **BazAR marketplace integration** | 🔴 High | 8 hrs | [153](./153-bazar-arweave-atomic-assets-music/) |
+| **Last.fm scrobbling** | 🟠 Medium | 3 hrs | [138](./138-play-counting-stream-attribution/) |
+| **ListenBrainz scrobbling** | 🟠 Medium | 2 hrs | [138](./138-play-counting-stream-attribution/) |
+| **Bluesky publish route** | 🟠 Medium | 2 hrs | [77](./77-bluesky-cross-posting-integration/) |
+| **In-app ZOUNZ voting** | 🟠 Medium | 8 hrs | [149](./149-buildeross-deep-dive-everything/) |
+| **In-app proposal creation** | 🟠 Medium | 6 hrs | [149](./149-buildeross-deep-dive-everything/) |
+| **@builderbot notifications** | 🟠 Medium | 2 hrs | [149](./149-buildeross-deep-dive-everything/) |
+| **0xSplits revenue splits** | 🟠 Medium | 4 hrs | [143](./143-0xsplits-revenue-distribution/) |
+| **WaveWarZ battle UI** | 🟠 Medium | 8 hrs | [99](./99-prediction-market-music-battles/) |
+| **Synchronized listening rooms** | 🟡 Future | 12 hrs | [100](./100-synchronized-listening-rooms/) |
+| **LiveKit audio rooms** | 🟡 Future | 16 hrs | [43](./43-webrtc-audio-rooms-streaming/) |
+| **ElizaOS community agent** | 🟡 Future | 20 hrs | [83](./83-elizaos-2026-update/) |
+| **AI taste recommendations** | 🟡 Future | 20 hrs | [08](./08-ai-memory/), [110](./110-music-discovery-feeds/) |
+| **Apple Music (MusicKit JS)** | 🟡 Future | 8 hrs | [138](./138-play-counting-stream-attribution/) |
+| **Mastodon cross-posting** | 🟡 Future | 4 hrs | [96](./96-additional-cross-posting-platforms/) |
+| **Nostr cross-posting** | 🟡 Future | 6 hrs | [97](./97-nostr-reddit-cross-posting/) |
+| **Cross-chain fractal governance** | 🟡 Future | 20 hrs | [108](./108-superchain-ordao-crosschain-fractal/) |
+| **Mobile player optimization** | 🟡 Future | 12 hrs | [127](./127-mobile-player-optimization/) |
+| **Native community directory** | 🟡 Future | 10 hrs | [110](./110-community-directory-crm/) |
+| **External reputation signals** | 🟡 Future | 8 hrs | [134](./134-external-reputation-signals-comprehensive/) |
+| **ArNS permanent domain** | 🟡 Future | 2 hrs | [152](./152-arweave-ecosystem-deep-dive/) |
+
+### Scoreboard
+
+| Category | Built | To Do | Completion |
+|----------|-------|-------|------------|
+| Auth & Gating | 3/3 | 0 | 100% |
+| Chat & Messaging | 2/2 | 0 | 100% |
+| Music Player | 10/10 | 0 | 100% |
+| Music Library & Curation | 7/7 | 0 | 100% |
+| Music Scrobbling & Discovery | 0/5 | 5 | 0% |
+| On-Chain Music NFTs | 1/8 | 7 | 12% |
+| Cross-Platform Publishing | 3/6 | 3 | 50% |
+| Governance | 4/7 | 3 | 57% |
+| AI Agent & Intelligence | 1/4 | 3 | 25% |
+| Live Audio | 1/3 | 2 | 33% |
+| Profile & Reputation | 2/4 | 2 | 50% |
+| Mobile & Infrastructure | 3/5 | 2 | 60% |
+| **Overall** | **37/64** | **27** | **58%** |
+
+---
+
+## Future Vision: Researched but Not Yet Built
+
+Everything below has been deeply researched (with doc references) but is not yet implemented in the codebase. This is the roadmap of what ZAO OS can become.
+
+### On-Chain Music Distribution (Arweave + BazAR)
+
+The big one. ZAO artists should be able to upload a track + cover art and mint it as a permanently stored, purchasable music NFT — no crypto knowledge required.
+
+- **Arweave permanent storage** — Upload MP3/MP4 + cover art via ArDrive Turbo, stored forever for ~$0.05/track (Docs: [150](./150-arweave-permanent-music-storage/), [152](./152-arweave-ecosystem-deep-dive/))
+- **Atomic assets on BazAR** — Data + smart contract + license in ONE Arweave transaction. Tradeable on the UCM orderbook (Doc: [153](./153-bazar-arweave-atomic-assets-music/))
+- **UDL licensing** — Artists set royalties, derivative rights, commercial terms on-chain. Enforced automatically (Doc: [153](./153-bazar-arweave-atomic-assets-music/))
+- **End-to-end mint + buy flow** — 3-screen artist wizard, 1-click collector "Collect" button, ArConnect wallet integration (Doc: [155](./155-music-nft-end-to-end-implementation/))
+- **0xSplits revenue distribution** — Automated 80% artist / 10% treasury / 10% curator splits on Base (Doc: [143](./143-0xsplits-revenue-distribution/))
+- **ZOUNZ DAO-governed releases** — Treasury proposals fund artist releases, revenue flows back via splits (Docs: [144](./144-zounz-music-nft-unified-distribution/), [149](./149-buildeross-deep-dive-everything/))
+- **ar.io Wayfinder CDN** — Decentralized gateway for streaming Arweave audio, no single point of failure (Doc: [152](./152-arweave-ecosystem-deep-dive/))
+- **ArNS permanent domain** — `zao.ar.io` music portal that works even if the main site goes down (Doc: [152](./152-arweave-ecosystem-deep-dive/))
+
+### Music Discovery & Scrobbling
+
+- **Last.fm scrobbling** — Universal play reporting after 30s of playback. ~3 hours to implement (Doc: [138](./138-play-counting-stream-attribution/))
+- **ListenBrainz** — Open-source scrobbling alternative, no API approval needed. ~2 hours (Doc: [138](./138-play-counting-stream-attribution/))
+- **Apple Music via MusicKit JS** — In-app playback that pays artists ~$0.01/stream, highest royalty rate (Doc: [138](./138-play-counting-stream-attribution/))
+- **AI taste graph + recommendations** — pgvector embeddings for collaborative filtering on a 100-member community (Docs: [08](./08-ai-memory/), [110](./110-music-discovery-feeds/))
+- **Play completion tracking** — play_start, play_complete, skip events for better curation data (Doc: [110](./110-music-discovery-feeds/))
+
+### AI Agent & Autonomy
+
+- **ElizaOS community agent** — Farcaster bot for daily digests, onboarding help, governance discussion, music recommendations (Docs: [24](./24-zao-ai-agent/), [83](./83-elizaos-2026-update/))
+- **pgvector memory system** — Vector embeddings for AI recall/reflect, taste profiles, personalized discovery (Doc: [08](./08-ai-memory/))
+- **Hindsight agent memory** — 91.4% LongMemEval score, per-user memory banks, MCP support (Doc: [26](./26-hindsight-agent-memory/))
+
+### Live Audio & Social Listening
+
+- **Synchronized listening rooms** — Supabase Broadcast + Presence for DJ mode, chat overlay, $0 infrastructure cost (Doc: [100](./100-synchronized-listening-rooms/))
+- **LiveKit audio rooms** — SFU-based voice rooms for fractal calls + listening parties, free tier covers 100 members (Doc: [43](./43-webrtc-audio-rooms-streaming/))
+
+### Cross-Platform Publishing
+
+- **Bluesky publishing** — OAuth is built, publish route is not. @atproto/api SDK ready (Doc: [77](./77-bluesky-cross-posting-integration/))
+- **Mastodon / Threads** — Major platform gaps. masto.js SDK + Meta OAuth researched (Doc: [96](./96-additional-cross-posting-platforms/))
+- **Nostr** — Decentralized music community overlap. Wavlake integration opportunity (Doc: [97](./97-nostr-reddit-cross-posting/))
+
+### Governance Upgrades
+
+- **In-app proposal creation + voting** — Currently links out to nouns.build. BuilderOSS has `create-proposal-ui` + `proposal-ui` packages (Doc: [149](./149-buildeross-deep-dive-everything/))
+- **@builderbot Farcaster notifications** — Auto-notify ZOUNZ members of proposal activity via Farcaster DCs (Doc: [149](./149-buildeross-deep-dive-everything/))
+- **Goldsky subgraph** — Query ZOUNZ data via GraphQL instead of slow RPC calls. Already deployed on Base (Doc: [149](./149-buildeross-deep-dive-everything/))
+- **Cross-chain fractal governance** — Hub-and-spoke model with Hats + Respect across Optimism + Base (Doc: [108](./108-superchain-ordao-crosschain-fractal/))
+
+### Profile & Reputation
+
+- **External reputation signals** — OpenRank, Human Passport, Gitcoin Passport, DegenScore (Doc: [134](./134-external-reputation-signals-comprehensive/))
+- **Airstack single API** — Replace 5-6 API calls with one unified social+wallet data source (Doc: [135](./135-exhaustive-profile-enrichment-signals/))
+
+### WaveWarZ Integration
+
+- **Battle visualization UI** — Artist spotlight, battle pool mechanics, prediction market betting (Docs: [96](./96-additional-cross-posting-platforms/), [99](./99-prediction-market-music-battles/))
+- **API sync is built** — `/api/wavewarz/sync` exists, just needs frontend
+
+### Mobile & Infrastructure
+
+- **Mobile player optimization** — MediaSession completion, swipe gestures, expanded player, Wake Lock, iOS PWA audio (Doc: [127](./127-mobile-player-optimization/))
+- **Music player gap analysis** — 12 features missing vs Spotify/Audius: favorites, history, queue persistence, presence (Doc: [126](./126-music-player-gap-analysis/))
+- **Native community directory** — Replace Webflow CRM with in-app member directory + engagement scoring (Doc: [110](./110-community-directory-crm/))

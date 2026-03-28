@@ -176,6 +176,20 @@ export const communityConfig = {
     tools: { label: 'Tools', icon: 'wrench' },
     contribute: { label: 'Contribute', icon: 'code' },
   },
+
+  // ── Arweave / ArDrive Turbo ──────────────────────────────────
+  arweave: {
+    gateway: 'https://arweave.net',
+    bazarUrl: 'https://bazar.arweave.net',
+    appName: 'ZAO-OS',
+    appVersion: '1.0.0',
+    defaultLicense: 'collectible' as const,
+    udlContractTx: 'yRj4a5KMctX_uOmKWCFJIjmY8DeJcusVk6-HzLiM_t8',
+    maxAudioSize: 50 * 1024 * 1024,
+    maxCoverSize: 5 * 1024 * 1024,
+    allowedAudioTypes: ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/flac', 'audio/ogg', 'audio/aac'],
+    allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+  },
 } as const;
 
 export type CommunityConfig = typeof communityConfig;

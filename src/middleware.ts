@@ -8,135 +8,73 @@ interface RateLimitConfig {
   windowMs: number;
 }
 
+// Rate limit configs ordered from most-specific to least-specific prefix.
+// The first matching prefix wins, so sub-routes must appear before their parent.
+const RATE_LIMITS: [string, RateLimitConfig][] = [
+  // Chat sub-routes (before /api/chat catch-all paths)
+  ['/api/chat/send',      { limit: 10, windowMs: MINUTE }],
+  ['/api/chat/hide',      { limit: 10, windowMs: MINUTE }],
+  ['/api/chat/react',     { limit: 30, windowMs: MINUTE }],
+  ['/api/chat/messages',  { limit: 30, windowMs: MINUTE }],
+  ['/api/chat/thread',    { limit: 30, windowMs: MINUTE }],
+  ['/api/chat/search',    { limit: 30, windowMs: MINUTE }],
+  ['/api/chat/schedule',  { limit: 20, windowMs: MINUTE }],
+  ['/api/chat/assistant', { limit: 20, windowMs: MINUTE }],
+
+  // Fractals sub-routes
+  ['/api/fractals/webhook', { limit: 30, windowMs: MINUTE }],
+  ['/api/fractals',         { limit: 20, windowMs: MINUTE }],
+
+  // Users sub-routes
+  ['/api/users/follow', { limit: 15, windowMs: MINUTE }],
+  ['/api/users',        { limit: 20, windowMs: MINUTE }],
+
+  // Proposals sub-routes
+  ['/api/proposals/vote',    { limit: 3,  windowMs: MINUTE }],
+  ['/api/proposals/comment', { limit: 10, windowMs: MINUTE }],
+  ['/api/proposals',         { limit: 5,  windowMs: MINUTE }],
+
+  // Music sub-routes
+  ['/api/music/submissions', { limit: 2,  windowMs: MINUTE }],
+  ['/api/music/metadata',    { limit: 20, windowMs: MINUTE }],
+  ['/api/music/radio',       { limit: 10, windowMs: MINUTE }],
+
+  // Library sub-routes
+  ['/api/library/submit',   { limit: 3,  windowMs: MINUTE }],
+  ['/api/library/vote',     { limit: 15, windowMs: MINUTE }],
+  ['/api/library/comments', { limit: 10, windowMs: MINUTE }],
+  ['/api/library/delete',   { limit: 10, windowMs: MINUTE }],
+  ['/api/library',          { limit: 30, windowMs: MINUTE }],
+
+  // Top-level routes (no sub-route ordering concerns)
+  ['/api/admin',         { limit: 5,  windowMs: MINUTE }],
+  ['/api/auth',          { limit: 10, windowMs: MINUTE }],
+  ['/api/search',        { limit: 30, windowMs: MINUTE }],
+  ['/api/upload',        { limit: 10, windowMs: MINUTE }],
+  ['/api/discord',       { limit: 5,  windowMs: MINUTE }],
+  ['/api/messages',      { limit: 30, windowMs: MINUTE }],
+  ['/api/notifications', { limit: 20, windowMs: MINUTE }],
+  ['/api/respect',       { limit: 20, windowMs: MINUTE }],
+  ['/api/social',        { limit: 20, windowMs: MINUTE }],
+  ['/api/members',       { limit: 10, windowMs: MINUTE }],
+  ['/api/following',     { limit: 20, windowMs: MINUTE }],
+  ['/api/miniapp',       { limit: 10, windowMs: MINUTE }],
+  ['/api/wavewarz',      { limit: 20, windowMs: MINUTE }],
+  ['/api/directory',     { limit: 20, windowMs: MINUTE }],
+  ['/api/bluesky',       { limit: 5,  windowMs: MINUTE }],
+  ['/api/publish',       { limit: 5,  windowMs: MINUTE }],
+  ['/api/platforms',     { limit: 10, windowMs: MINUTE }],
+  ['/api/neynar',        { limit: 15, windowMs: MINUTE }],
+  ['/api/stream',        { limit: 20, windowMs: MINUTE }],
+  ['/api/100ms',         { limit: 20, windowMs: MINUTE }],
+  ['/api/songjam',       { limit: 20, windowMs: MINUTE }],
+  ['/api/livepeer',      { limit: 10, windowMs: MINUTE }],
+  ['/api/broadcast',     { limit: 15, windowMs: MINUTE }],
+];
+
 function getRateLimitConfig(pathname: string): RateLimitConfig | null {
-  if (pathname.startsWith('/api/chat/send') || pathname.startsWith('/api/chat/hide')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/chat/react')) {
-    return { limit: 30, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/chat/messages') || pathname.startsWith('/api/chat/thread')) {
-    return { limit: 30, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/admin')) {
-    return { limit: 5, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/auth')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/search') || pathname.startsWith('/api/chat/search')) {
-    return { limit: 30, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/upload')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/fractals/webhook')) {
-    return { limit: 30, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/fractals')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/discord')) {
-    return { limit: 5, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/chat/schedule')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/messages')) {
-    return { limit: 30, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/users/follow')) {
-    return { limit: 15, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/users')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/proposals/vote')) {
-    return { limit: 3, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/proposals/comment')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/proposals')) {
-    return { limit: 5, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/notifications')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/music/submissions')) {
-    return { limit: 2, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/music/metadata')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/music/radio')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/respect')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/social')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/members')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/following')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/miniapp')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/wavewarz')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/directory')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/bluesky')) {
-    return { limit: 5, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/publish')) {
-    return { limit: 5, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/platforms')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/library/submit')) {
-    return { limit: 3, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/library/vote')) {
-    return { limit: 15, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/library/comments')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/library/delete')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/library')) {
-    return { limit: 30, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/neynar')) {
-    return { limit: 15, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/stream')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/100ms')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/songjam')) {
-    return { limit: 20, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/livepeer')) {
-    return { limit: 10, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/broadcast')) {
-    return { limit: 15, windowMs: MINUTE };
-  }
-  if (pathname.startsWith('/api/chat/assistant')) {
-    return { limit: 20, windowMs: MINUTE };
+  for (const [prefix, config] of RATE_LIMITS) {
+    if (pathname.startsWith(prefix)) return config;
   }
   return null;
 }

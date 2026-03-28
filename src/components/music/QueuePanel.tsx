@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, memo } from 'react';
 import Image from 'next/image';
 import { useQueue } from '@/contexts/QueueContext';
 import { usePlayer } from '@/providers/audio';
@@ -149,7 +149,7 @@ export function QueuePanel({ onClose }: QueuePanelProps) {
 
 // ─── Queue Item ──────────────────────────────────────────────────────────────
 
-function QueueItem({
+const QueueItem = memo(function QueueItem({
   entry,
   index,
   isCurrent,
@@ -258,7 +258,7 @@ function QueueItem({
       </button>
     </div>
   );
-}
+});
 
 // ─── Shared Icons ────────────────────────────────────────────────────────────
 

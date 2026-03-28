@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import Image from 'next/image';
 import { Cast, CastEmbed, QuotedCastData } from '@/types';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
@@ -161,7 +161,7 @@ async function toggleReaction(type: 'like' | 'recast', hash: string, isActive: b
   return res.ok;
 }
 
-export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, onReply }: MessageProps) {
+export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenThread, onQuote, onOpenProfile, onReply }: MessageProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const initialLiked = cast.reactions?.likes?.some((l) => l.fid === currentFid) ?? false;
@@ -400,4 +400,4 @@ export function Message({ cast, isAdmin, currentFid, hasSigner, onHide, onOpenTh
       )}
     </div>
   );
-}
+});

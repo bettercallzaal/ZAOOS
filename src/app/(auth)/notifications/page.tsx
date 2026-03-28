@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import Image from 'next/image';
 import { PageHeader } from '@/components/navigation/PageHeader';
 
@@ -135,32 +135,7 @@ export default function NotificationsPage() {
         ) : (
           <div className="space-y-1">
             {notifications.map(n => (
-              <a
-                key={n.id}
-                href={n.href}
-                onClick={() => !n.read && markRead(n.id)}
-                className={`flex items-start gap-3 px-3 py-3 rounded-lg transition-colors ${
-                  n.read ? 'hover:bg-white/5' : 'bg-[#f5a623]/5 hover:bg-[#f5a623]/10'
-                }`}
-              >
-                {n.actor_pfp_url ? (
-                  <div className="w-8 h-8 relative flex-shrink-0">
-                    <Image src={n.actor_pfp_url} alt="" fill className="rounded-full object-cover" unoptimized />
-                  </div>
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d={typeIcons[n.type] || typeIcons.system} />
-                    </svg>
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm ${n.read ? 'text-gray-300' : 'text-white font-medium'}`}>{n.title}</p>
-                  {n.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{n.body}</p>}
-                  <p className="text-[10px] text-gray-600 mt-1">{timeAgo(n.created_at)}</p>
-                </div>
-                {!n.read && <span className="w-2 h-2 rounded-full bg-[#f5a623] flex-shrink-0 mt-2" />}
-              </a>
+              <NotificationItem key={n.id} notification={n} onMarkRead={markRead} />
             ))}
           </div>
         )}
@@ -168,3 +143,41 @@ export default function NotificationsPage() {
     </div>
   );
 }
+
+// ─── Notification Item ──────────────────────────────────────────────────────
+
+const NotificationItem = memo(function NotificationItem({
+  notification: n,
+  onMarkRead,
+}: {
+  notification: Notification;
+  onMarkRead: (id: string) => void;
+}) {
+  return (
+    <a
+      href={n.href}
+      onClick={() => !n.read && onMarkRead(n.id)}
+      className={`flex items-start gap-3 px-3 py-3 rounded-lg transition-colors ${
+        n.read ? 'hover:bg-white/5' : 'bg-[#f5a623]/5 hover:bg-[#f5a623]/10'
+      }`}
+    >
+      {n.actor_pfp_url ? (
+        <div className="w-8 h-8 relative flex-shrink-0">
+          <Image src={n.actor_pfp_url} alt="" fill className="rounded-full object-cover" unoptimized />
+        </div>
+      ) : (
+        <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center flex-shrink-0">
+          <svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d={typeIcons[n.type] || typeIcons.system} />
+          </svg>
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm ${n.read ? 'text-gray-300' : 'text-white font-medium'}`}>{n.title}</p>
+        {n.body && <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{n.body}</p>}
+        <p className="text-[10px] text-gray-600 mt-1">{timeAgo(n.created_at)}</p>
+      </div>
+      {!n.read && <span className="w-2 h-2 rounded-full bg-[#f5a623] flex-shrink-0 mt-2" />}
+    </a>
+  );
+});

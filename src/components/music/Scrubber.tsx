@@ -41,7 +41,7 @@ export function Scrubber({ position, duration, feedId, onSeek }: ScrubberProps) 
         {formatDuration(position)}
       </span>
 
-      <div className="relative flex-1 flex items-end gap-px" style={{ height: 32 }}>
+      <div className="relative flex-1 flex items-end gap-px h-8">
         {/* Waveform bars */}
         {bars.map((heightPct, i) => (
           <div

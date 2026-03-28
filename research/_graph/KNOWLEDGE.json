@@ -1,0 +1,4154 @@
+{
+  "version": 1,
+  "generated": "2026-03-28",
+  "doc_count": 191,
+  "docs": [
+    {
+      "id": "001",
+      "slug": "farcaster-protocol",
+      "title": "Farcaster Protocol",
+      "category": "farcaster",
+      "tags": [
+        "farcaster"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "A sufficiently decentralized social protocol with a hybrid onchain/offchain architecture.",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "002",
+      "slug": "farcaster-hub-api",
+      "title": "Farcaster Hub API",
+      "category": "farcaster",
+      "tags": [
+        "api",
+        "farcaster",
+        "neynar",
+        "streaming"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Base: http://<hub>:2281/v1/",
+      "related": [
+        "112",
+        "081",
+        "085",
+        "084",
+        "082"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "003",
+      "slug": "music-integration",
+      "title": "Music Integration Research",
+      "category": "music",
+      "tags": [
+        "farcaster",
+        "music-player"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "No dominant music-first Farcaster client exists. Current state:",
+      "related": [
+        "182",
+        "162",
+        "112",
+        "082",
+        "043"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "004",
+      "slug": "respect-tokens",
+      "title": "ZAO Respect Tokens \u2014 Social Capital System",
+      "category": "governance",
+      "tags": [
+        "api",
+        "ens",
+        "farcaster",
+        "fractal",
+        "respect"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "respect_earned = (collectors_after_you - collectors_before_you) * time_decay_factor",
+      "related": [
+        "115",
+        "112",
+        "081",
+        "061",
+        "058"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "005",
+      "slug": "zao-identity",
+      "title": "ZIDs \u2014 ZAO Decentralized Identity",
+      "category": "community",
+      "tags": [
+        "hats",
+        "identity"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "A ZID is a ZAO-specific identity that extends a Farcaster FID with community context.",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "006",
+      "slug": "quilibrium",
+      "title": "Quilibrium Network",
+      "category": "infrastructure",
+      "tags": [
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "A decentralized protocol combining compute, storage, and networking into a unified infrastructure layer. Founded by Cassandra Heart.",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "007",
+      "slug": "hats-protocol",
+      "title": "Hats Protocol \u2014 NFT Role Hierarchies",
+      "category": "onchain",
+      "tags": [
+        "hats",
+        "nft"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "An on-chain, tree-structured role and permissions system. Every \"hat\" is a non-transferable, revocable ERC-1155-compatible token representing a rol...",
+      "related": [
+        "029",
+        "012"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "008",
+      "slug": "ai-memory",
+      "title": "AI Memory Patterns",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "AI automatically extracts facts from conversations. User never says \"remember this.\"",
+      "related": [
+        "171",
+        "168",
+        "154",
+        "137",
+        "091"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "009",
+      "slug": "public-apis",
+      "title": "Public APIs for ZAO OS",
+      "category": "other",
+      "tags": [
+        "api",
+        "streaming"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on public apis for zao os",
+      "related": [
+        "112",
+        "002"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "010",
+      "slug": "hypersnap",
+      "title": "HyperSnap",
+      "category": "other",
+      "tags": [],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Research incomplete \u2014 unable to fetch live repo data. The `farcasterorg/hypersnap` repo is not in training data.",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "011",
+      "slug": "reference-repos",
+      "title": "Reference Repositories",
+      "category": "other",
+      "tags": [],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "All repos being tracked for ZAO OS development",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "012",
+      "slug": "gating",
+      "title": "Gating Access to ZAO OS",
+      "category": "infrastructure",
+      "tags": [
+        "hats",
+        "next.js",
+        "nft"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Simplest to ship. No on-chain dependencies. Add NFT/Hats later.",
+      "related": [
+        "037",
+        "029",
+        "007"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "013",
+      "slug": "chat-messaging",
+      "title": "Chat & Messaging on Farcaster",
+      "category": "farcaster",
+      "tags": [
+        "farcaster",
+        "open-source",
+        "threads",
+        "xmtp"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Warpcast deprecated its native DMs and switched to XMTP. Farcaster has no protocol-level DM system.",
+      "related": [
+        "196",
+        "183",
+        "162",
+        "055",
+        "019"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "014",
+      "slug": "project-structure",
+      "title": "Project Structure & Organization",
+      "category": "other",
+      "tags": [
+        "farcaster",
+        "next.js",
+        "workflow"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Why: One person building. Monorepos solve multi-team coordination problems you don't have. Every successful indie Farcaster client started as a sin...",
+      "related": [
+        "182",
+        "085",
+        "043",
+        "042",
+        "037"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "015",
+      "slug": "mvp-spec",
+      "title": "MVP Spec \u2014 Gated Chat Client",
+      "category": "farcaster",
+      "tags": [
+        "farcaster",
+        "neynar",
+        "supabase"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "A mobile-first, Discord-style chat interface at zaoos.com where ZAO community members sign in with Farcaster, pass an allowlist gate, and chat in a...",
+      "related": [
+        "024",
+        "020",
+        "156",
+        "085",
+        "084"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "016",
+      "slug": "ui-reference",
+      "title": "UI Reference \u2014 CG / Commonwealth",
+      "category": "infrastructure",
+      "tags": [
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "All-in-one web3 community platform replacing Discord + Discourse + Snapshot. Open source. Has discussions, governance, and Discord-style chat chann...",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "017",
+      "slug": "neynar-onboarding",
+      "title": "Neynar FID Registration & Managed Signers",
+      "category": "farcaster",
+      "tags": [
+        "farcaster",
+        "neynar"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "POST https://api.neynar.com/v2/farcaster/signer",
+      "related": [
+        "085",
+        "084",
+        "081",
+        "073",
+        "035"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "018",
+      "slug": "security-audit",
+      "title": "Security Audit \u2014 Pre-Build",
+      "category": "security",
+      "tags": [
+        "neynar",
+        "security",
+        "supabase",
+        "ui-design"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "secure: process.env.NODE_ENV === 'production', // HTTPS only",
+      "related": [
+        "040",
+        "085",
+        "057",
+        "038",
+        "035"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "019",
+      "slug": "farcaster-ecosystem-landscape",
+      "title": "Farcaster Ecosystem Landscape Analysis",
+      "category": "farcaster",
+      "tags": [
+        "farcaster",
+        "neynar",
+        "open-source"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "6. Music & Community Projects",
+      "related": [
+        "183",
+        "162",
+        "085",
+        "084",
+        "081"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "020",
+      "slug": "followers-following-feed",
+      "title": "20 \u2014 Followers / Following Feed (Sortable, Filterable)",
+      "category": "other",
+      "tags": [
+        "farcaster",
+        "mobile",
+        "neynar",
+        "supabase"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Same params as followers. Default limit 25, max 100. Same cursor pagination.",
+      "related": [
+        "024",
+        "021",
+        "015",
+        "182",
+        "156"
+      ],
+      "code_paths": [
+        "src/lib/gates/"
+      ]
+    },
+    {
+      "id": "021",
+      "slug": "farcaster-deep-dive",
+      "title": "Farcaster Landscape Research (2025-2026)",
+      "category": "farcaster",
+      "tags": [
+        "farcaster",
+        "mobile",
+        "moderation",
+        "neynar"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "6. Technical Best Practices",
+      "related": [
+        "024",
+        "020",
+        "182",
+        "175",
+        "085"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "022",
+      "slug": "farcaster-ecosystem-players",
+      "title": "22 \u2014 Farcaster Ecosystem Players, Leaderboards & Active Users",
+      "category": "music",
+      "tags": [
+        "farcaster",
+        "music-player"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on farcaster ecosystem players, leaderboards & active users",
+      "related": [
+        "182",
+        "162",
+        "112",
+        "082",
+        "043"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "023",
+      "slug": "austin-griffith-eth-skills",
+      "title": "23 \u2014 Austin Griffith, Scaffold-ETH & the ETH Skills Ecosystem",
+      "category": "dev-workflows",
+      "tags": [
+        "ai-agent",
+        "ethereum",
+        "farcaster",
+        "hats",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Pivoted heavily into AI agents on Ethereum:",
+      "related": [
+        "055",
+        "171",
+        "168",
+        "162",
+        "154"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "024",
+      "slug": "zao-ai-agent",
+      "title": "24 \u2014 ZAO AI Agent: Research, Architecture & Plan",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "elizaos",
+        "farcaster",
+        "moderation",
+        "neynar",
+        "supabase"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "8. Music Intelligence Layer",
+      "related": [
+        "085",
+        "084",
+        "083",
+        "094",
+        "090"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "025",
+      "slug": "public-apis-index",
+      "title": "25 \u2014 Public APIs Index for ZAO OS",
+      "category": "other",
+      "tags": [
+        "ai-agent",
+        "api",
+        "moderation"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on public apis index for zao os",
+      "related": [
+        "094",
+        "092",
+        "071",
+        "024"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "026",
+      "slug": "hindsight-agent-memory",
+      "title": "26 \u2014 Hindsight: Agent Memory System (vectorize-io/hindsight)",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "An open-source agent memory system by Vectorize.io that organizes memories the way human cognition works. Instead of basic vector store + retrieval...",
+      "related": [
+        "171",
+        "168",
+        "154",
+        "137",
+        "091"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "027",
+      "slug": "comprehensive-overview",
+      "title": "27 \u2014 Comprehensive Research Overview & Cross-Platform Expansion Plan",
+      "category": "cross-platform",
+      "tags": [
+        "cross-posting",
+        "ens",
+        "lens",
+        "mobile",
+        "revenue"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on comprehensive research overview & cross-platform expansion plan",
+      "related": [
+        "036",
+        "117",
+        "121",
+        "120",
+        "096"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "028",
+      "slug": "cross-platform-publishing",
+      "title": "28 \u2014 Cross-Platform Publishing: Publish Once, Distribute Everywhere",
+      "category": "cross-platform",
+      "tags": [
+        "bluesky",
+        "cross-posting",
+        "farcaster",
+        "lens",
+        "mastodon",
+        "nostr"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on cross-platform publishing: publish once, distribute everywhere",
+      "related": [
+        "096",
+        "183",
+        "177",
+        "123",
+        "097"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "029",
+      "slug": "artist-revenue-ip-rights",
+      "title": "29 \u2014 Artist Revenue, IP Rights & the ZAO Revenue Model",
+      "category": "onchain",
+      "tags": [
+        "audius",
+        "cross-posting",
+        "hats",
+        "nft",
+        "revenue"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Per dollar of streaming revenue:",
+      "related": [
+        "183",
+        "162",
+        "155",
+        "147",
+        "144"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "030",
+      "slug": "bettercallzaal-github",
+      "title": "30 \u2014 bettercallzaal GitHub Projects Inventory",
+      "category": "other",
+      "tags": [
+        "ai-agent",
+        "discord",
+        "elizaos",
+        "farcaster",
+        "fractal",
+        "music-player"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on bettercallzaal github projects inventory",
+      "related": [
+        "182",
+        "162",
+        "085",
+        "084",
+        "083"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "031",
+      "slug": "governance-dao-tokenomics",
+      "title": "31 \u2014 Governance, DAO Structure & Token Economics",
+      "category": "governance",
+      "tags": [
+        "dao",
+        "farcaster",
+        "governance",
+        "revenue",
+        "snapshot"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on governance, dao structure & token economics",
+      "related": [
+        "147",
+        "184",
+        "182",
+        "151",
+        "144"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "032",
+      "slug": "onboarding-growth-moderation",
+      "title": "32 \u2014 Onboarding, Growth, Moderation, Engagement & Discovery",
+      "category": "community",
+      "tags": [
+        "moderation"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "6. \"Track of the Day\" curation feature",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "033",
+      "slug": "infrastructure-mobile-storage",
+      "title": "33 \u2014 Infrastructure: Media Storage, Mobile, Real-Time, Audio & Privacy",
+      "category": "infrastructure",
+      "tags": [
+        "audio-rooms",
+        "mobile",
+        "music-player",
+        "supabase"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "6. Storage: Cloudflare R2 for serving + Pinata IPFS for permanence. Arweave for NFT audio.",
+      "related": [
+        "185",
+        "192",
+        "190",
+        "189",
+        "182"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "034",
+      "slug": "farcaster-clients-notifications",
+      "title": "34 \u2014 Farcaster Clients Comparison & Notification Architecture",
+      "category": "farcaster",
+      "tags": [
+        "ai-agent",
+        "cross-posting",
+        "farcaster",
+        "neynar",
+        "notifications"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on farcaster clients comparison & notification architecture",
+      "related": [
+        "085",
+        "084",
+        "081",
+        "073",
+        "035"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "035",
+      "slug": "notifications-complete-guide",
+      "title": "35 \u2014 Notifications: Complete Implementation Guide",
+      "category": "infrastructure",
+      "tags": [
+        "farcaster",
+        "neynar",
+        "notifications",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+      "related": [
+        "085",
+        "034",
+        "182",
+        "140",
+        "118"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/notifications/"
+      ]
+    },
+    {
+      "id": "036",
+      "slug": "lens-protocol-deep-dive",
+      "title": "36 \u2014 Lens Protocol Deep Dive",
+      "category": "cross-platform",
+      "tags": [
+        "cross-posting",
+        "ens",
+        "lens",
+        "revenue"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Lens V3's collect system lets artists attach configurable pricing to posts. Curators who share collectable posts earn referral fees. This directly ...",
+      "related": [
+        "027",
+        "117",
+        "121",
+        "120",
+        "096"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "037",
+      "slug": "bridges-competitors-monetization",
+      "title": "37 \u2014 Platform Bridges, Competitor Deep Dives, Monetization & SEO",
+      "category": "other",
+      "tags": [
+        "discord",
+        "farcaster",
+        "next.js",
+        "nft",
+        "revenue"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Sound.xyz entered maintenance mode in 2025. New uploads disabled. Team pivoted to Vault.fm (direct fan messaging + exclusive content). The zero-com...",
+      "related": [
+        "182",
+        "157",
+        "162",
+        "155",
+        "144"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "038",
+      "slug": "ai-code-audit-cleanup",
+      "title": "38 \u2014 AI Code Audit, Cleanup Agents & Codebase Efficiency",
+      "category": "security",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "next.js",
+        "security",
+        "supabase",
+        "testing"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "45% of AI-generated code contains security flaws \u2014 and this rate has NOT improved even as models get better at syntax.",
+      "related": [
+        "137",
+        "044",
+        "195",
+        "091",
+        "089"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "039",
+      "slug": "github-documentation-presentation",
+      "title": "39 \u2014 GitHub Documentation, Presentation & Research Display",
+      "category": "other",
+      "tags": [
+        "next.js",
+        "snapshot"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "6. Features \u2014 3-5 bullets with screenshot/GIF",
+      "related": [
+        "182"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "040",
+      "slug": "codebase-audit-guide",
+      "title": "40 \u2014 Codebase Audit Guide: Step-by-Step",
+      "category": "security",
+      "tags": [
+        "claude-code",
+        "neynar",
+        "security",
+        "supabase",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "If you're short on time, these 7 checks cover the critical security baseline:",
+      "related": [
+        "018",
+        "038",
+        "168",
+        "137",
+        "085"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/",
+        "src/lib/"
+      ]
+    },
+    {
+      "id": "041",
+      "slug": "nextjs16-react19-deep-dive",
+      "title": "41 \u2014 Next.js 16 + React 19 Deep Dive",
+      "category": "infrastructure",
+      "tags": [
+        "next.js",
+        "streaming",
+        "supabase",
+        "testing"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "\"use cache\"  // default: in-memory LRU on server",
+      "related": [
+        "038",
+        "192",
+        "163",
+        "116",
+        "044"
+      ],
+      "code_paths": [
+        "src/middleware/"
+      ]
+    },
+    {
+      "id": "042",
+      "slug": "supabase-advanced-patterns",
+      "title": "42 \u2014 Supabase Advanced Patterns",
+      "category": "infrastructure",
+      "tags": [
+        "ai-agent",
+        "database",
+        "next.js",
+        "supabase",
+        "workflow"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Start normalized (users, posts, reactions, follows, channels). PostgreSQL handles joins well. Only denormalize (add reaction_count to posts) when y...",
+      "related": [
+        "176",
+        "038",
+        "194",
+        "174",
+        "166"
+      ],
+      "code_paths": [
+        "src/types/database/"
+      ]
+    },
+    {
+      "id": "043",
+      "slug": "webrtc-audio-rooms-streaming",
+      "title": "43 \u2014 WebRTC Audio Rooms, Live Listening Parties & Streaming",
+      "category": "music",
+      "tags": [
+        "audio-rooms",
+        "farcaster",
+        "music-player",
+        "next.js",
+        "streaming",
+        "webrtc"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on webrtc audio rooms, live listening parties & streaming",
+      "related": [
+        "112",
+        "182",
+        "082",
+        "192",
+        "185"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/rooms/",
+        "src/hooks/useListeningParty/",
+        "src/hooks/useRoom/",
+        "src/lib/livekit/"
+      ]
+    },
+    {
+      "id": "044",
+      "slug": "agentic-development-workflows",
+      "title": "44 \u2014 Agentic Development Workflows: AI Agents Building & Maintaining ZAO OS",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "elizaos",
+        "skills",
+        "supabase",
+        "testing"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "41% of all code written in 2025 was AI-generated. 56% of engineers do 70%+ of their work with AI. The shift: humans go from writing code to definin...",
+      "related": [
+        "137",
+        "089",
+        "038",
+        "195",
+        "171"
+      ],
+      "code_paths": [
+        "src/lib/xmtp/"
+      ]
+    },
+    {
+      "id": "045",
+      "slug": "research-organization-patterns",
+      "title": "45 \u2014 Research Organization Patterns: How Others Do It",
+      "category": "other",
+      "tags": [
+        "ethereum"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on research organization patterns: how others do it",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "046",
+      "slug": "openfang-agent-os",
+      "title": "46 \u2014 OpenFang: Agent Operating System (RightNow-AI)",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "An open-source Agent Operating System written entirely in Rust. Not a chatbot framework \u2014 a full runtime for autonomous AI agents that run on sched...",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "047",
+      "slug": "zao-community-ecosystem",
+      "title": "47 \u2014 The ZAO Community & Ecosystem",
+      "category": "community",
+      "tags": [
+        "fractal",
+        "songjam",
+        "wavewarz"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "A community-driven hub where musicians, artists, and technologists unite to unlock Web3 for the creative economy. Part DAO, part collective, part t...",
+      "related": [
+        "048"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "048",
+      "slug": "zao-ecosystem-deep-dive",
+      "title": "48 \u2014 ZAO Ecosystem Deep Dive: Communities, People, Architecture",
+      "category": "community",
+      "tags": [
+        "education",
+        "songjam",
+        "wavewarz",
+        "whitepaper"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "\u251c\u2500\u2500 ZAO Fractal Governance (weekly Monday circles)",
+      "related": [
+        "051",
+        "047"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "050",
+      "slug": "the-zao-complete-guide",
+      "title": "The ZAO: Complete Guide",
+      "category": "community",
+      "tags": [
+        "education",
+        "ethereum",
+        "fractal",
+        "nft"
+      ],
+      "status": "canonical",
+      "date": "2026-03",
+      "summary": "The ZAO (ZTalent Artist Organization) is an impact organization focused on bringing the profit margin, the data, and the IP rights back to independ...",
+      "related": [
+        "061"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "051",
+      "slug": "zao-whitepaper-2026",
+      "title": "The ZAO \u2014 2026 Whitepaper",
+      "category": "community",
+      "tags": [
+        "education",
+        "whitepaper"
+      ],
+      "status": "canonical",
+      "date": "2026-03",
+      "summary": "A Decentralized Impact Network for the Creator Economy",
+      "related": [
+        "048"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "052",
+      "slug": "whitepaper-presentation-critique",
+      "title": "52 \u2014 Whitepaper Presentation, Critique & Recording Guide",
+      "category": "community",
+      "tags": [
+        "ethereum",
+        "farcaster",
+        "ui-design",
+        "whitepaper"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Traditional 20-50 page PDF whitepapers are now secondary documents. Nobody reads them cover-to-cover.",
+      "related": [
+        "182",
+        "140",
+        "118",
+        "085",
+        "082"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "053",
+      "slug": "whitepaper-user-testing",
+      "title": "53 \u2014 Whitepaper User Testing: 4 Personas Read Draft 4.4",
+      "category": "dev-workflows",
+      "tags": [
+        "testing",
+        "whitepaper"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Pattern: Trust and execution evidence are strong (7/10). Clarity and accessibility are weak (4/10). The gap between \"these people are real\" and \"I ...",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "054",
+      "slug": "superpowers-agentic-skills",
+      "title": "54 \u2014 Superpowers: Agentic Skills Framework for Claude Code",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "An agentic skills framework by Jesse Vincent (obra) that enforces structured development workflows for AI coding agents. 14 composable skills that ...",
+      "related": [
+        "171",
+        "168",
+        "154",
+        "137",
+        "091"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "055",
+      "slug": "hats-anchor-app-and-tooling",
+      "title": "55 \u2014 Hats Anchor App, DAO Tooling & Ecosystem Research",
+      "category": "community",
+      "tags": [
+        "ai-agent",
+        "dao",
+        "farcaster",
+        "fractal",
+        "hats",
+        "xmtp"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "The Hats Anchor App is the production web interface for creating, managing, and claiming organizational roles on the Hats Protocol. Available at ap...",
+      "related": [
+        "184",
+        "030",
+        "023",
+        "194",
+        "162"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "056",
+      "slug": "ordao-respect-system",
+      "title": "ORDAO & Respect Game System -- Research",
+      "category": "governance",
+      "tags": [
+        "dao",
+        "fractal",
+        "respect"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "ORDAO is a governance toolset built by Optimystics for DAOs that use non-transferable reputation tokens (\"Respect\"). At its core is the Optimistic ...",
+      "related": [
+        "058",
+        "184",
+        "115",
+        "102",
+        "055"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "057",
+      "slug": "codebase-security-audit-march-2026",
+      "title": "57 \u2014 Codebase Security Audit (March 17, 2026)",
+      "category": "security",
+      "tags": [
+        "miniapps",
+        "neynar",
+        "security"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "File: `src/app/api/auth/register/route.ts`",
+      "related": [
+        "040",
+        "018"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/middleware/"
+      ]
+    },
+    {
+      "id": "058",
+      "slug": "respect-deep-dive",
+      "title": "58 \u2014 Respect System Deep Dive: Scoring Math, On-Chain State & ORDAO Integration",
+      "category": "governance",
+      "tags": [
+        "dao",
+        "fractal",
+        "respect"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Deep dive into the Respect token system: frozen legacy token, ORDAO mechanics, and respect-weighted governance",
+      "related": [
+        "056",
+        "184",
+        "115",
+        "102",
+        "055"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "059",
+      "slug": "hats-tree-integration",
+      "title": "59 \u2014 ZAO Hats Tree: On-Chain State & ZAO OS Integration Plan",
+      "category": "other",
+      "tags": [
+        "hats"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Tree 226 on Optimism, queried directly from the Hats Protocol contract.",
+      "related": [],
+      "code_paths": [
+        "src/lib/hats/"
+      ]
+    },
+    {
+      "id": "060",
+      "slug": "vitalik-ethereum-philosophy",
+      "title": "60 \u2014 Vitalik's Ethereum Philosophy & EF Mandate: ZAO Alignment Analysis",
+      "category": "other",
+      "tags": [
+        "ethereum"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Six essays by Vitalik Buterin plus the new Ethereum Foundation mandate form a coherent philosophical arc. Together they describe: what alignment me...",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "061",
+      "slug": "ethereum-alignment-opportunities",
+      "title": "61 \u2014 Ethereum Alignment Opportunities: ZK Credentials, Curation Markets, Community Notes, Cross-Community Fractals & Grants",
+      "category": "governance",
+      "tags": [
+        "ethereum",
+        "farcaster",
+        "fractal"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Members prove things (membership, reputation level, role) without revealing their identity or exact holdings.",
+      "related": [
+        "055",
+        "052",
+        "050",
+        "030",
+        "023"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "062",
+      "slug": "autoresearch-skill-improvement",
+      "title": "62 \u2014 Autoresearch: Autonomous Skill & Prompt Improvement",
+      "category": "ai-agent",
+      "tags": [
+        "autoresearch",
+        "claude-code",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Andrej Karpathy (OpenAI co-founder, former Tesla AI lead) released autoresearch in March 2026 \u2014 a 630-line MIT-licensed script that lets an AI agen...",
+      "related": [
+        "171",
+        "168",
+        "164",
+        "154",
+        "089"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "063",
+      "slug": "autoresearch-deep-dive-zao-applications",
+      "title": "63 \u2014 Autoresearch Deep Dive: Implementations & ZAO OS Applications",
+      "category": "ai-agent",
+      "tags": [
+        "autoresearch",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Winner for ZAO OS: uditgoenka/autoresearch \u2014 the guard mechanism prevents regressions (critical when improving skills that touch the 62-doc researc...",
+      "related": [
+        "171",
+        "170",
+        "168",
+        "164",
+        "154"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/validation/",
+        "src/middleware/"
+      ]
+    },
+    {
+      "id": "064",
+      "slug": "incented-zabal-campaigns",
+      "title": "64 \u2014 Incented Protocol: ZABAL Campaigns & ZAO OS Integration",
+      "category": "other",
+      "tags": [],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Incented is a Web3 coordination protocol for community-based organizations. It provides infrastructure for transparent, staking-incentivized collab...",
+      "related": [],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "065",
+      "slug": "zabal-partner-ecosystem",
+      "title": "65 \u2014 ZABAL Partner Ecosystem: MAGNETIQ, SongJam, Empire Builder, Clanker",
+      "category": "music",
+      "tags": [
+        "songjam",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "ZABAL operates as the streaming + coordination engine for the BCZ \u2192 ZAO \u2192 WaveWarZ ecosystem. Four partner platforms form the coordination layer:",
+      "related": [],
+      "code_paths": [
+        "src/app/"
+      ]
+    },
+    {
+      "id": "066",
+      "slug": "backend-testing-strategy",
+      "title": "66 \u2014 Backend Testing Strategy for ZAO OS",
+      "category": "dev-workflows",
+      "tags": [
+        "ai-agent",
+        "testing"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on backend testing strategy for zao os",
+      "related": [
+        "195",
+        "137",
+        "089",
+        "044",
+        "038"
+      ],
+      "code_paths": [
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "067",
+      "slug": "paperclip-ai-agent-company",
+      "title": "67 \u2014 Paperclip AI: Running ZAO as an AI Agent Company",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "paperclip",
+        "skills",
+        "workflow"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Paperclip is an open-source control plane for orchestrating AI agents into a structured company. Created by @dotta, MIT license, launched March 202...",
+      "related": [
+        "174",
+        "089",
+        "076",
+        "070",
+        "194"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/chat/",
+        "src/components/music/"
+      ]
+    },
+    {
+      "id": "068",
+      "slug": "alibaba-page-agent",
+      "title": "68 \u2014 Alibaba Page Agent: In-Page AI Copilot for ZAO OS",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Page Agent is a JavaScript in-page GUI agent by Alibaba that enables natural language control of web interfaces. Unlike Playwright/Selenium (server...",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "069",
+      "slug": "claude-code-tips-best-practices",
+      "title": "69 \u2014 Claude Code Tips & Best Practices for ZAO OS",
+      "category": "ai-agent",
+      "tags": [
+        "claude-code"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Repo: github.com/ykdojo/claude-code-tips",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "070",
+      "slug": "subagents-vs-agent-teams",
+      "title": "70 \u2014 Sub-agents vs Agent Teams + Claude Architect Patterns for ZAO OS",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "multi-agent",
+        "skills",
+        "workflow"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "\u251c\u2500\u2500 Sub-agent A (research) \u2192 returns summary",
+      "related": [
+        "194",
+        "171",
+        "168",
+        "154",
+        "091"
+      ],
+      "code_paths": [
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "071",
+      "slug": "paperclip-rate-limits-multi-agent",
+      "title": "Research 71: Paperclip AI Rate Limiting & Multi-Agent API Key Management",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "api",
+        "claude-code",
+        "multi-agent",
+        "paperclip"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Problem: Running 5 Paperclip agents (CEO, Founding Engineer, Security Auditor, Research Agent, +1) on ONE Anthropic API key causes persistent rate ...",
+      "related": [
+        "194",
+        "171",
+        "168",
+        "165",
+        "154"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "072",
+      "slug": "paperclip-functionality-deep-dive",
+      "title": "72 \u2014 Paperclip Functionality Deep Dive: How Agents Actually Work",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "paperclip"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "The Paperclip skill (injected into every agent) has this rule in Step 4:",
+      "related": [
+        "089",
+        "071",
+        "196",
+        "195",
+        "194"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "073",
+      "slug": "farcaster-ecosystem-2026-update",
+      "title": "73 \u2014 Farcaster Ecosystem Update (March 2026)",
+      "category": "farcaster",
+      "tags": [
+        "ai-agent",
+        "farcaster",
+        "neynar"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "What happened: On January 21, 2026, Neynar acquired Farcaster from Merkle Manufactory \u2014 the protocol, app, repos, contracts, and Clanker. Merkle re...",
+      "related": [
+        "085",
+        "084",
+        "034",
+        "024",
+        "162"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "074",
+      "slug": "xmtp-v4-mls-encryption",
+      "title": "74 \u2014 XMTP V3 Browser SDK & MLS Encryption",
+      "category": "farcaster",
+      "tags": [
+        "xmtp"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "XMTP does not call their current release \"v4.\" The current stable platform is XMTP V3 with the unified `@xmtp/browser-sdk` package (replacing the o...",
+      "related": [],
+      "code_paths": [
+        "src/contexts/XMTPContext/",
+        "src/hooks/useWalletXMTP/",
+        "src/lib/xmtp/",
+        "src/types/xmtp/"
+      ]
+    },
+    {
+      "id": "075",
+      "slug": "hats-protocol-v2-updates",
+      "title": "75 \u2014 Hats Protocol V2 Updates & New Tooling",
+      "category": "other",
+      "tags": [
+        "hats",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "ZAO OS has a complete, well-structured Hats integration matching the architecture in doc 59.",
+      "related": [
+        "023"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/hats/",
+        "src/lib/hats/"
+      ]
+    },
+    {
+      "id": "076",
+      "slug": "git-branching-ai-agents",
+      "title": "76 \u2014 Git Branching Strategy for ZAO OS + Paperclip Agents",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "git",
+        "paperclip",
+        "workflow"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "main (stale \u2014 22 commits behind)",
+      "related": [
+        "174",
+        "067",
+        "195",
+        "194",
+        "166"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "077",
+      "slug": "bluesky-cross-posting-integration",
+      "title": "77 \u2014 Bluesky Cross-Posting Integration for ZAO OS",
+      "category": "cross-platform",
+      "tags": [
+        "bluesky",
+        "cross-posting",
+        "farcaster"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Post to a ZAO community Bluesky account alongside Farcaster channels.",
+      "related": [
+        "183",
+        "028",
+        "177",
+        "175",
+        "123"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/chat/",
+        "src/hooks/useChat/",
+        "src/lib/bluesky/",
+        "src/lib/validation/"
+      ]
+    },
+    {
+      "id": "078",
+      "slug": "nouns-builder-integration",
+      "title": "Research 78: Nouns Protocol & Nouns Builder Integration",
+      "category": "governance",
+      "tags": [
+        "dao",
+        "farcaster",
+        "ui-design"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Relevance: Governance infrastructure, DAO tooling, treasury management for ZAO OS",
+      "related": [
+        "140",
+        "182",
+        "118",
+        "085",
+        "082"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "079",
+      "slug": "songjam-music-player-research",
+      "title": "79 \u2014 SongJam Ecosystem & Music Player Research",
+      "category": "music",
+      "tags": [
+        "audio-rooms",
+        "music-player",
+        "songjam"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "An Electron desktop app that streams torrents. NOT a multi-platform music player.",
+      "related": [
+        "185",
+        "122",
+        "119",
+        "112",
+        "043"
+      ],
+      "code_paths": [
+        "src/components/music/",
+        "src/providers/audio/"
+      ]
+    },
+    {
+      "id": "080",
+      "slug": "jitsi-meet-live-rooms",
+      "title": "80 \u2014 Jitsi Meet Live Rooms for ZAO OS",
+      "category": "music",
+      "tags": [
+        "audio-rooms"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Uses @jitsi/react-sdk or raw IFrame API. Must be client-only (ssr: false).",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "081",
+      "slug": "farcaster-social-graph-sharing",
+      "title": "87 \u2014 Farcaster Social Graph APIs & Social Sharing Features",
+      "category": "farcaster",
+      "tags": [
+        "api",
+        "cross-posting",
+        "farcaster",
+        "neynar"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Note: Folder is named 81-farcaster-social-graph-sharing due to numbering collision. Canonical number is 87.",
+      "related": [
+        "085",
+        "034",
+        "002",
+        "183",
+        "175"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/app/layout/",
+        "src/lib/farcaster/"
+      ]
+    },
+    {
+      "id": "082",
+      "slug": "music-social-platform-redesign",
+      "title": "88 \u2014 Music-First Social Platform Redesign Research",
+      "category": "music",
+      "tags": [
+        "audius",
+        "cross-posting",
+        "farcaster",
+        "music-player",
+        "streaming",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Note: Folder is named 82-music-social-platform-redesign due to numbering collision. Canonical number is 88.",
+      "related": [
+        "182",
+        "112",
+        "183",
+        "181",
+        "162"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "083",
+      "slug": "elizaos-2026-update",
+      "title": "83 \u2014 ElizaOS March 2026 Update: Current State for ZAO Community Bot",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "elizaos",
+        "farcaster",
+        "supabase"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "10. GitHub Health & Ecosystem",
+      "related": [
+        "024",
+        "090",
+        "085",
+        "084",
+        "044"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "084",
+      "slug": "farcaster-ai-agents-landscape",
+      "title": "84 \u2014 Farcaster AI Agents Landscape (March 2026)",
+      "category": "farcaster",
+      "tags": [
+        "ai-agent",
+        "elizaos",
+        "farcaster",
+        "neynar"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Deep research on the full landscape of AI agents, bots, and automated accounts on Farcaster as of March 2026. Conducted for building a ZAO communit...",
+      "related": [
+        "085",
+        "024",
+        "083",
+        "073",
+        "034"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "085",
+      "slug": "farcaster-agent-technical-setup",
+      "title": "85 \u2014 Building and Deploying a Farcaster AI Agent with Neynar",
+      "category": "farcaster",
+      "tags": [
+        "ai-agent",
+        "cross-posting",
+        "elizaos",
+        "farcaster",
+        "next.js",
+        "neynar",
+        "ui-design"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Technical setup guide for building Farcaster AI agents with Neynar and signing infrastructure",
+      "related": [
+        "084",
+        "034",
+        "024",
+        "182",
+        "083"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "089",
+      "slug": "paperclip-gstack-autoresearch-stack",
+      "title": "89 \u2014 Paperclip + gstack + Autoresearch: The AI Company Stack",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "autoresearch",
+        "claude-code",
+        "paperclip",
+        "skills",
+        "testing"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "What it is: Open-source orchestration layer. Org charts, budgets, task tickets, heartbeat scheduling, governance.",
+      "related": [
+        "171",
+        "168",
+        "154",
+        "137",
+        "044"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/auth/"
+      ]
+    },
+    {
+      "id": "090",
+      "slug": "ai-run-community-agent-os",
+      "title": "90 \u2014 AI-Run Community: Self-Improving Agent OS for ZAO",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "autoresearch",
+        "elizaos",
+        "paperclip",
+        "supabase"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "The \"whoa\" moment: ZAO members open the app and discover that while they slept, the AI posted a personalized daily digest in /zao, welcomed a new m...",
+      "related": [
+        "089",
+        "083",
+        "044",
+        "024",
+        "174"
+      ],
+      "code_paths": [
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "091",
+      "slug": "top-claude-skills-mcp-repos",
+      "title": "91 \u2014 Top Claude Skills, MCP Servers & GitHub Repos for ZAO OS",
+      "category": "dev-workflows",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "multi-agent",
+        "next.js",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "What: Pulls up-to-date, version-specific documentation from official library sources directly into prompts. No more hallucinated APIs from stale tr...",
+      "related": [
+        "171",
+        "168",
+        "154",
+        "070",
+        "194"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "092",
+      "slug": "public-apis-2026-update",
+      "title": "92 \u2014 Public APIs 2026 Update: Best Free APIs for ZAO OS",
+      "category": "other",
+      "tags": [
+        "api",
+        "moderation"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Not integrated but researched: Audius full API (doc 3), LiveKit (doc 43), PostHog (doc 9), Privy (doc 9), Hive (docs folder)",
+      "related": [
+        "025"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/app/layout/",
+        "src/components/calls/",
+        "src/lib/bluesky/",
+        "src/lib/db/",
+        "src/lib/farcaster/",
+        "src/lib/hats/",
+        "src/lib/moderation/",
+        "src/lib/music/",
+        "src/lib/wagmi/"
+      ]
+    },
+    {
+      "id": "093",
+      "slug": "missing-infrastructure-gaps",
+      "title": "93 \u2014 Missing Infrastructure: Testing, CI/CD, Monitoring, Design System, PWA",
+      "category": "dev-workflows",
+      "tags": [
+        "testing",
+        "ui-design",
+        "workflow"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Update .claude/rules/tests.md \u2014 remove MSW recommendation, document the vi.mock() pattern that's actually used.",
+      "related": [],
+      "code_paths": [
+        "src/app/",
+        "src/app/sw/",
+        "src/test/"
+      ]
+    },
+    {
+      "id": "094",
+      "slug": "moderation-onboarding-analytics",
+      "title": "94 \u2014 Content Moderation, Onboarding UX & Community Analytics",
+      "category": "community",
+      "tags": [
+        "ai-agent",
+        "elizaos",
+        "moderation"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Layer 1: Pre-publish text screening (every outbound cast)",
+      "related": [
+        "024",
+        "090",
+        "085",
+        "084",
+        "083"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "095",
+      "slug": "solana-wavewarz-multi-wallet-settings",
+      "title": "95 \u2014 Solana + WaveWarz Integration & Multi-Wallet/Social Settings Redesign",
+      "category": "wavewarz",
+      "tags": [
+        "solana",
+        "ui-design",
+        "wallet",
+        "wavewarz"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Current state: ZAO OS uses Wagmi + Viem for EVM wallets (Optimism, Base, Mainnet). Auth is via iron-session with wallet signature (SIWE) or Farcast...",
+      "related": [
+        "180",
+        "100"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/layout/",
+        "src/lib/validation/",
+        "src/lib/wagmi/"
+      ]
+    },
+    {
+      "id": "096",
+      "slug": "cross-post-api-deep-dive",
+      "title": "96 \u2014 Cross-Post API Deep Dive: Platform-by-Platform Integration Guide",
+      "category": "cross-platform",
+      "tags": [
+        "api",
+        "cross-posting",
+        "lens",
+        "mastodon",
+        "nostr",
+        "threads",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Wavlake is alive and active:",
+      "related": [
+        "028",
+        "177",
+        "118",
+        "117",
+        "097"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "097",
+      "slug": "nostr-cross-posting-integration",
+      "title": "97 \u2014 Nostr Cross-Posting Integration for ZAO OS",
+      "category": "cross-platform",
+      "tags": [
+        "bluesky",
+        "cross-posting",
+        "nostr"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Nostr is a natural fit for ZAO OS. It is the only decentralized social protocol with a thriving music economy (Wavlake), micropayments (Lightning),...",
+      "related": [
+        "028",
+        "183",
+        "177",
+        "096",
+        "077"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/chat/",
+        "src/lib/bluesky/",
+        "src/lib/nostr/",
+        "src/lib/validation/"
+      ]
+    },
+    {
+      "id": "098",
+      "slug": "supabase-database-optimizations",
+      "title": "98 \u2014 Supabase Database Optimizations for ZAO OS",
+      "category": "infrastructure",
+      "tags": [
+        "database",
+        "fractal",
+        "next.js"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "6. Database Triggers \u2014 Automation",
+      "related": [
+        "176",
+        "116",
+        "042"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/navigation/",
+        "src/hooks/useRealtimeNotifications/",
+        "src/lib/db/"
+      ]
+    },
+    {
+      "id": "099",
+      "slug": "prediction-market-music-battles",
+      "title": "99 \u2014 Prediction Market Music Battles for ZAO OS",
+      "category": "music",
+      "tags": [
+        "open-source",
+        "wavewarz"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Simple voting (\"which song do you like?\") has weak signal. Everyone clicks and moves on. Prediction market mechanics create:",
+      "related": [],
+      "code_paths": [
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "100",
+      "slug": "solana-pda-reading-nextjs",
+      "title": "100 \u2014 Reading Solana PDA Data from Next.js (WaveWarZ Battle Vaults)",
+      "category": "wavewarz",
+      "tags": [
+        "next.js",
+        "solana",
+        "wavewarz"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "import { Connection, PublicKey, clusterApiUrl } from \"@solana/web3.js\";",
+      "related": [
+        "180",
+        "095"
+      ],
+      "code_paths": [
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "101",
+      "slug": "wavewarz-zao-whitepaper",
+      "title": "101 \u2014 WaveWarZ \u00d7 ZAO OS: Integration Whitepaper",
+      "category": "wavewarz",
+      "tags": [
+        "nft",
+        "solana",
+        "supabase"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "WaveWarZ is a Solana prediction market for music battles \u2014 closer in mechanics to Polymarket than to pump.fun. Founded by Ikechi Nwachukwu (stage n...",
+      "related": [],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/lib/solana/"
+      ]
+    },
+    {
+      "id": "102",
+      "slug": "fractals-frapps-ordao-page",
+      "title": "102 \u2014 Fractals Page: frapps, ORDAO, and ZAO Fractal Governance",
+      "category": "governance",
+      "tags": [
+        "dao",
+        "fractal",
+        "governance"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "frapps = Fractal Apps \u2014 a deployment platform + open-source toolkit for fractal governance.",
+      "related": [
+        "184",
+        "147",
+        "105",
+        "103",
+        "058"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/lib/ordao/",
+        "src/lib/respect/"
+      ]
+    },
+    {
+      "id": "103",
+      "slug": "fractal-governance-ecosystem",
+      "title": "103 \u2014 Fractal Governance Ecosystem Deep Dive (March 2026)",
+      "category": "governance",
+      "tags": [
+        "fractal",
+        "governance"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Research into the fractal governance ecosystem for ZAO OS integration \u2014 Eden Fractal, Optimism Fractal, Fractally, Optimystics tooling, and music-s...",
+      "related": [
+        "184",
+        "105",
+        "102"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "104",
+      "slug": "fractal-communities-directory",
+      "title": "104 \u2014 Complete Fractal Communities Directory (March 2026)",
+      "category": "governance",
+      "tags": [
+        "fractal"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on complete fractal communities directory (march 2026)",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "105",
+      "slug": "fractal-key-people",
+      "title": "Research Doc 105: Key People in the Fractal Governance Ecosystem",
+      "category": "governance",
+      "tags": [
+        "fractal",
+        "governance"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Topic: Dan Singjoy (Optimystics) & Tadas Vaitiekunas (ORDAO)",
+      "related": [
+        "184",
+        "103",
+        "102"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "106",
+      "slug": "dan-singjoy-eden-fractal-deep-dive",
+      "title": "Research Doc 106: Dan SingJoy & Eden Fractal Deep Dive",
+      "category": "governance",
+      "tags": [
+        "fractal",
+        "hats"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Topic: Comprehensive profile of Dan SingJoy, Eden Fractal operations, governance model, tools, and ZAO's active participation",
+      "related": [
+        "184",
+        "055"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "107",
+      "slug": "music-page-layout-design",
+      "title": "107 \u2014 Music Page Layout & Design for ZAO OS",
+      "category": "music",
+      "tags": [
+        "mobile",
+        "music-player",
+        "ui-design"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Spotify \u2014 Algorithm-driven carousels. Hero banner \u2192 horizontal scroll rows (Made For You, Recently Played, New Releases). Square cards. Bottom nav:...",
+      "related": [
+        "182",
+        "190",
+        "189",
+        "181",
+        "152"
+      ],
+      "code_paths": [
+        "src/app/"
+      ]
+    },
+    {
+      "id": "108",
+      "slug": "music-nft-landscape-2026",
+      "title": "Research 100: Music NFT Landscape 2026 \u2014 ZAO OS Integration",
+      "category": "music",
+      "tags": [
+        "music-player",
+        "nft",
+        "revenue",
+        "streaming",
+        "zora"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Platforms now call them \"Digital Pressings,\" \"Access Passes,\" or \"Fan Shares.\" The speculative era is over \u2014 utility is king. 71% of NFT music proj...",
+      "related": [
+        "147",
+        "142",
+        "112",
+        "162",
+        "155"
+      ],
+      "code_paths": [
+        "src/lib/gates/",
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "109",
+      "slug": "optimystics-tooling-ecosystem",
+      "title": "Research 109: Optimystics Tooling Ecosystem \u2014 ZAO OS Integration Guide",
+      "category": "community",
+      "tags": [
+        "fractal",
+        "open-source",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Purpose: Deep technical research on production-ready Optimystics tools for ZAO OS Phase 2 ORDAO integration.",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "110",
+      "slug": "community-directory-crm",
+      "title": "110 \u2014 Community Directory & CRM for ZAO OS",
+      "category": "community",
+      "tags": [],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on community directory & crm for zao os",
+      "related": [],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/chat/",
+        "src/components/social/"
+      ]
+    },
+    {
+      "id": "111",
+      "slug": "proposal-ui-best-practices",
+      "title": "111 \u2014 Proposal UI Best Practices for ZAO OS",
+      "category": "governance",
+      "tags": [
+        "governance",
+        "snapshot",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "src/app/(auth)/fractals/ProposalsTab.tsx (226 lines) has these issues:",
+      "related": [
+        "182",
+        "133",
+        "131",
+        "031"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/governance/",
+        "src/components/wavewarz/"
+      ]
+    },
+    {
+      "id": "112",
+      "slug": "audius-api-deep-dive",
+      "title": "111 \u2014 Audius API Deep Dive for ZAO OS Integration",
+      "category": "music",
+      "tags": [
+        "api",
+        "audio-rooms",
+        "audius",
+        "farcaster",
+        "music-player",
+        "nft",
+        "streaming"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "6. Content Nodes and Streaming Architecture",
+      "related": [
+        "162",
+        "082",
+        "043",
+        "182",
+        "167"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/music/",
+        "src/types/music/"
+      ]
+    },
+    {
+      "id": "113",
+      "slug": "top-10-music-fixes",
+      "title": "113 \u2014 Top 10 Music Fixes for ZAO OS",
+      "category": "music",
+      "tags": [],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Audius artwork URLs use CDN subdomains like `audius-content-12.figment.io` and `creatornode2.audius.co` which are NOT in `next.config.ts` remotePat...",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "114",
+      "slug": "zao-fractal-live-infrastructure",
+      "title": "114 \u2014 ZAO Fractal Live Infrastructure + Bot Data Flow (March 2026)",
+      "category": "governance",
+      "tags": [
+        "fractal"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Only `zaal.eth` and `civilmonkey.eth` have ever called Vote/Execute on the OREC contract. This means Zaal is personally submitting most fractal res...",
+      "related": [],
+      "code_paths": [
+        "src/lib/respect/"
+      ]
+    },
+    {
+      "id": "115",
+      "slug": "zao-data-reconciliation",
+      "title": "115 \u2014 ZAO Respect Data Reconciliation Plan (March 2026)",
+      "category": "governance",
+      "tags": [
+        "fractal",
+        "respect",
+        "supabase"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Transition point: Fractal 73 was skipped (one day off), 73.2 is the last OG-tracked fractal. Fractal 74 onward = ORDAO on-chain submissions.",
+      "related": [
+        "116",
+        "058",
+        "056",
+        "004"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "116",
+      "slug": "discord-integration-research",
+      "title": "Doc 116 \u2014 Discord Integration Research for ZAO OS",
+      "category": "other",
+      "tags": [
+        "discord",
+        "fractal",
+        "next.js",
+        "supabase",
+        "threads"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Goal: Connect ZAO OS (Next.js on Vercel) with the Discord bot and Discord API",
+      "related": [
+        "185",
+        "182",
+        "115",
+        "098",
+        "042"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/",
+        "src/lib/discord/",
+        "src/lib/env/"
+      ]
+    },
+    {
+      "id": "117",
+      "slug": "lens-v3-cross-posting",
+      "title": "117 \u2014 Lens Protocol V3 Cross-Posting for ZAO OS",
+      "category": "cross-platform",
+      "tags": [
+        "cross-posting",
+        "ens",
+        "lens"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "npm install @lens-protocol/client@canary @lens-protocol/metadata",
+      "related": [
+        "036",
+        "027",
+        "121",
+        "120",
+        "096"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/settings/",
+        "src/lib/publish/"
+      ]
+    },
+    {
+      "id": "118",
+      "slug": "settings-page-redesign",
+      "title": "118 \u2014 Settings Page Redesign",
+      "category": "infrastructure",
+      "tags": [
+        "farcaster",
+        "lens",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Current problem: The settings page has 3 separate sections that overlap:",
+      "related": [
+        "182",
+        "140",
+        "123",
+        "096",
+        "085"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/components/settings/",
+        "src/components/solana/"
+      ]
+    },
+    {
+      "id": "119",
+      "slug": "songjam-audio-spaces-embed",
+      "title": "119 \u2014 SongJam Audio Spaces Embed for ZAO OS",
+      "category": "music",
+      "tags": [
+        "audio-rooms",
+        "songjam"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "The `/zabal` route on songjam.space is a community empire page (not a standalone audio room). It includes:",
+      "related": [
+        "122",
+        "079"
+      ],
+      "code_paths": [
+        "src/app/spaces/",
+        "src/components/ecosystem/"
+      ]
+    },
+    {
+      "id": "120",
+      "slug": "lens-v3-posting-fix",
+      "title": "120 \u2014 Lens V3 Posting Fix: Grove Storage + Correct URI Format",
+      "category": "cross-platform",
+      "tags": [
+        "ens",
+        "lens"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Our code uses a `data:application/json;base64,...` URI as the `contentUri` in the post mutation. The Lens V3 API accepts this and returns a transac...",
+      "related": [
+        "121",
+        "117",
+        "036",
+        "027"
+      ],
+      "code_paths": [
+        "src/lib/publish/"
+      ]
+    },
+    {
+      "id": "121",
+      "slug": "lens-v3-auth-verdict",
+      "title": "121 \u2014 Lens V3 Auth Verdict: Can We Post Server-Side?",
+      "category": "cross-platform",
+      "tags": [
+        "ens",
+        "lens"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Lens V3 requires a wallet signature to authenticate. Period. There is no server API key, no app-level posting, no way to bypass wallet signing enti...",
+      "related": [
+        "120",
+        "117",
+        "036",
+        "027"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "122",
+      "slug": "songjam-screen-share-pr",
+      "title": "122 \u2014 SongJam Screen Share PR: Stream Video SDK Integration",
+      "category": "music",
+      "tags": [
+        "audio-rooms",
+        "screen-share",
+        "songjam"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "SongJam runs two separate audio/video SDKs for different features:",
+      "related": [
+        "119",
+        "079"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/spaces/",
+        "src/middleware/"
+      ]
+    },
+    {
+      "id": "123",
+      "slug": "dfos-dark-forest-protocol",
+      "title": "123 \u2014 DFOS (Dark Forest Operating System)",
+      "category": "other",
+      "tags": [
+        "audio-rooms",
+        "bluesky",
+        "farcaster",
+        "lens"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "DFOS stands for Dark Forest Operating System \u2014 named after Yancey Strickler's 2019 essay \"The Dark Forest Theory of the Internet,\" which argued mea...",
+      "related": [
+        "028",
+        "183",
+        "160",
+        "118",
+        "112"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "124",
+      "slug": "sopha-deep-social-farcaster",
+      "title": "124 \u2014 Sopha: Deep Social on Farcaster (Curation Client)",
+      "category": "farcaster",
+      "tags": [
+        "farcaster"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Sopha is a niche Farcaster client that deliberately filters for depth over volume. While Warpcast is Twitter-like (short casts, algorithmic feed), ...",
+      "related": [],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/chat/",
+        "src/components/miniapp/"
+      ]
+    },
+    {
+      "id": "125",
+      "slug": "coinflow-fiat-checkout",
+      "title": "125 \u2014 Coinflow Fiat Checkout for ZAO OS",
+      "category": "onchain",
+      "tags": [
+        "coinflow"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "\u2192 Coinflow authorizes via payment processor + fraud checks",
+      "related": [],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/payments/"
+      ]
+    },
+    {
+      "id": "126",
+      "slug": "music-player-gap-analysis",
+      "title": "126 \u2014 Music Player Gap Analysis: What ZAO OS Is Missing",
+      "category": "music",
+      "tags": [
+        "music-player"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on music player gap analysis: what zao os is missing",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "127",
+      "slug": "ens-integration-deep-dive",
+      "title": "127 \u2014 ENS Integration Deep Dive for ZAO OS",
+      "category": "onchain",
+      "tags": [
+        "ens"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Members with ENS names may have rich profile data stored on-chain:",
+      "related": [],
+      "code_paths": [
+        "src/app/api/",
+        "src/hooks/useENS/",
+        "src/lib/ens/"
+      ]
+    },
+    {
+      "id": "128",
+      "slug": "free-api-keys-alchemy-enhancements",
+      "title": "128 \u2014 Free API Keys & Alchemy Enhancements for ZAO OS",
+      "category": "onchain",
+      "tags": [
+        "api"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "We're only using Alchemy for ENS. The same key unlocks:",
+      "related": [],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/ens/"
+      ]
+    },
+    {
+      "id": "129",
+      "slug": "alchemy-apis-deep-integration",
+      "title": "129 \u2014 Alchemy APIs Deep Integration for ZAO OS",
+      "category": "onchain",
+      "tags": [
+        "api"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Free tier: 30M CU/month. Current + planned usage:",
+      "related": [],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/ens/",
+        "src/lib/ordao/"
+      ]
+    },
+    {
+      "id": "130",
+      "slug": "next-music-integrations",
+      "title": "130 \u2014 Next Music Integrations: Deep Research + Implementation Plan",
+      "category": "music",
+      "tags": [
+        "music-player",
+        "revenue"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "ZAO OS has built the most feature-complete web music player in the Farcaster ecosystem (30+ components, 30+ API endpoints, 9 platforms). The next f...",
+      "related": [
+        "108"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/app/track/",
+        "src/components/music/",
+        "src/lib/gates/",
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "131",
+      "slug": "onchain-proposals-governance",
+      "title": "131 \u2014 On-Chain Proposals & Governance for ZAO OS",
+      "category": "governance",
+      "tags": [
+        "governance",
+        "snapshot",
+        "supabase"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Problem: Proposals and votes live in Supabase \u2014 not on-chain. This means:",
+      "related": [
+        "133",
+        "111",
+        "031"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/zounz/",
+        "src/lib/zounz/"
+      ]
+    },
+    {
+      "id": "132",
+      "slug": "snapshot-weekly-polls",
+      "title": "132 \u2014 Snapshot Weekly Priority Polls for ZAO OS",
+      "category": "governance",
+      "tags": [
+        "snapshot"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Admin clicks \"Create Weekly Poll\" in ZAO OS",
+      "related": [],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/governance/",
+        "src/lib/snapshot/"
+      ]
+    },
+    {
+      "id": "133",
+      "slug": "governance-system-audit",
+      "title": "133 \u2014 Governance System: Complete Audit",
+      "category": "governance",
+      "tags": [
+        "cross-posting",
+        "governance",
+        "security",
+        "snapshot"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "+------------------------------------------------------------------+",
+      "related": [
+        "131",
+        "111",
+        "031"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/governance/",
+        "src/components/zounz/",
+        "src/lib/snapshot/",
+        "src/lib/zounz/"
+      ]
+    },
+    {
+      "id": "134",
+      "slug": "external-reputation-signals-comprehensive",
+      "title": "134 \u2014 External Reputation Signals \u2014 Comprehensive Inventory",
+      "category": "onchain",
+      "tags": [
+        "ens"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "const res = await fetch('https://graph.cast.k3l.io/scores/global/engagement/fids', {",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "135",
+      "slug": "exhaustive-profile-enrichment-signals",
+      "title": "135 \u2014 Exhaustive Profile Enrichment Signals",
+      "category": "other",
+      "tags": [],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "One API to replace 5-6 individual calls. Airstack's single GraphQL query resolves:",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "136",
+      "slug": "api-status-verification-march-2026",
+      "title": "136 \u2014 API Status Verification \u2014 March 2026",
+      "category": "infrastructure",
+      "tags": [
+        "api"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on api status verification \u2014 march 2026",
+      "related": [],
+      "code_paths": [
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "137",
+      "slug": "skills-audit-security-practices",
+      "title": "137 \u2014 Skills Audit, Cleanup & Security Best Practices",
+      "category": "security",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "security",
+        "skills",
+        "testing"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on skills audit, cleanup & security best practices",
+      "related": [
+        "089",
+        "044",
+        "038",
+        "195",
+        "171"
+      ],
+      "code_paths": [
+        "src/blog/"
+      ]
+    },
+    {
+      "id": "138",
+      "slug": "play-counting-stream-attribution",
+      "title": "138 \u2014 Do Plays on ZAO OS Count? Stream Attribution Deep Dive",
+      "category": "other",
+      "tags": [
+        "open-source",
+        "streaming"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Why these work: ZAO OS loads the official platform embed/widget, which handles authentication and play reporting internally. The platform sees thes...",
+      "related": [],
+      "code_paths": [
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "139",
+      "slug": "trustware-sdk-deep-dive",
+      "title": "139 \u2014 Trustware SDK: Secure Crypto Payments & Asset Infrastructure",
+      "category": "infrastructure",
+      "tags": [],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Trustware is a blockchain middleware company founded in 2022 by Norma Carty and Jonathan Frazier (Wilmington, DE). Techstars '23 cohort with $120K ...",
+      "related": [],
+      "code_paths": [
+        "src/lib/payments/",
+        "src/lib/zounz/"
+      ]
+    },
+    {
+      "id": "140",
+      "slug": "buildeross-nouns-protocol-ecosystem",
+      "title": "140 \u2014 BuilderOSS: The Complete Nouns Builder Protocol Ecosystem",
+      "category": "governance",
+      "tags": [
+        "dao",
+        "farcaster",
+        "ui-design"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "github.com/BuilderOSS \u2014 10 repos total (5 active, 5 archived)",
+      "related": [
+        "078",
+        "182",
+        "118",
+        "085",
+        "082"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/zounz/",
+        "src/lib/zounz/"
+      ]
+    },
+    {
+      "id": "141",
+      "slug": "onchain-music-distribution-landscape",
+      "title": "141 \u2014 On-Chain Music Distribution Landscape 2026",
+      "category": "music",
+      "tags": [
+        "revenue",
+        "zora"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+      "related": [
+        "151",
+        "147",
+        "143",
+        "142",
+        "108"
+      ],
+      "code_paths": [
+        "src/lib/wagmi/",
+        "src/lib/zounz/"
+      ]
+    },
+    {
+      "id": "142",
+      "slug": "zora-protocol-sdk-music-nfts",
+      "title": "142 \u2014 Zora Protocol SDK: Building ZAO's Music NFT Minting Platform",
+      "category": "music",
+      "tags": [
+        "nft",
+        "revenue",
+        "ui-design",
+        "zora"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "\u2502   \u251c\u2500\u2500 create/route.ts      # Create new 1155 contract + first token",
+      "related": [
+        "108",
+        "155",
+        "151",
+        "147",
+        "145"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/music/",
+        "src/components/zounz/",
+        "src/lib/music/",
+        "src/lib/wagmi/"
+      ]
+    },
+    {
+      "id": "143",
+      "slug": "0xsplits-revenue-distribution",
+      "title": "143 \u2014 0xSplits: Automated Revenue Distribution for ZAO Artists",
+      "category": "onchain",
+      "tags": [
+        "revenue",
+        "zora"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Revenue In (ETH from NFT mints)",
+      "related": [
+        "151",
+        "147",
+        "142",
+        "141",
+        "108"
+      ],
+      "code_paths": [
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "144",
+      "slug": "zounz-music-nft-unified-distribution",
+      "title": "144 \u2014 ZOUNZ + Music NFTs: Unified DAO-Powered Music Distribution",
+      "category": "music",
+      "tags": [
+        "dao",
+        "nft",
+        "revenue"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Most music distribution services are centralized companies (DistroKid, TuneCore, Unchained). ZAO can be the first DAO that IS a distribution servic...",
+      "related": [
+        "155",
+        "151",
+        "147",
+        "142",
+        "108"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "145",
+      "slug": "simple-nft-platform-design",
+      "title": "145 \u2014 Simple NFT Platform Design: Music Collectibles for ZAO Members",
+      "category": "music",
+      "tags": [
+        "mobile",
+        "nft",
+        "ui-design"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Most music NFT platforms are too complex for artists:",
+      "related": [
+        "182",
+        "142",
+        "107"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/music/"
+      ]
+    },
+    {
+      "id": "146",
+      "slug": "open-contracts-multi-artist-distribution",
+      "title": "146 \u2014 Open Contracts: Multi-Artist Distribution via Forkable Smart Contracts",
+      "category": "onchain",
+      "tags": [
+        "open-source"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Every contract ZAO uses is already open source. The innovation is combining them into a reproducible template:",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "147",
+      "slug": "audius-zora-zounz-full-pipeline",
+      "title": "147 \u2014 The Full Distribution Pipeline: Audius Streaming + Zora Collecting + ZOUNZ Governance",
+      "category": "music",
+      "tags": [
+        "audius",
+        "dao",
+        "governance",
+        "revenue",
+        "streaming",
+        "zora"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Artist uploads ONE track via ZAO OS",
+      "related": [
+        "151",
+        "108",
+        "031",
+        "184",
+        "144"
+      ],
+      "code_paths": [
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "148",
+      "slug": "master-integration-plan-onchain-distribution",
+      "title": "148 \u2014 Master Integration Plan: ZAO On-Chain Music Distribution Service",
+      "category": "music",
+      "tags": [
+        "revenue"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+      "related": [],
+      "code_paths": [
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "149",
+      "slug": "buildeross-deep-dive-everything",
+      "title": "149 \u2014 BuilderOSS Deep Dive: Everything ZAO Can Use",
+      "category": "infrastructure",
+      "tags": [
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on buildeross deep dive: everything zao can use",
+      "related": [],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/hats/",
+        "src/lib/zounz/"
+      ]
+    },
+    {
+      "id": "150",
+      "slug": "arweave-permanent-music-storage",
+      "title": "150 \u2014 Arweave: Permanent Music Storage for ZAO OS",
+      "category": "music",
+      "tags": [
+        "arweave",
+        "nft"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Break-even: Arweave pays for itself vs IPFS pinning after ~2 months for a music library.",
+      "related": [
+        "155"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "151",
+      "slug": "zounz-distribution-without-zora",
+      "title": "151 \u2014 ZOUNZ Music Distribution Without Zora: Arweave + Thirdweb + 0xSplits",
+      "category": "music",
+      "tags": [
+        "arweave",
+        "dao",
+        "open-source",
+        "revenue",
+        "zora"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+      "related": [
+        "147",
+        "155",
+        "153",
+        "144",
+        "143"
+      ],
+      "code_paths": [
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "152",
+      "slug": "arweave-ecosystem-deep-dive",
+      "title": "152 \u2014 Arweave Ecosystem Deep Dive: Building a Full Music Layer on the Permaweb",
+      "category": "music",
+      "tags": [
+        "arweave",
+        "music-player",
+        "streaming",
+        "ui-design"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+      "related": [
+        "082",
+        "182",
+        "181",
+        "112",
+        "108"
+      ],
+      "code_paths": [
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "153",
+      "slug": "bazar-arweave-atomic-assets-music",
+      "title": "153 \u2014 BazAR & Atomic Assets: Arweave-Native Music Distribution for ZAO",
+      "category": "music",
+      "tags": [
+        "arweave",
+        "revenue"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Unlike ERC-721/1155 NFTs where the media lives on IPFS and the contract lives on Ethereum/Base, atomic assets store EVERYTHING in one Arweave trans...",
+      "related": [
+        "155",
+        "151"
+      ],
+      "code_paths": [
+        "src/components/music/",
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "154",
+      "slug": "skills-commands-master-reference",
+      "title": "154 \u2014 Skills & Commands Master Reference",
+      "category": "dev-workflows",
+      "tags": [
+        "ai-agent",
+        "autoresearch",
+        "claude-code",
+        "multi-agent",
+        "skills"
+      ],
+      "status": "canonical",
+      "date": "2026-03",
+      "summary": "These are the commands you'll use most often, in the order you'll typically use them.",
+      "related": [
+        "171",
+        "168",
+        "091",
+        "089",
+        "070"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/",
+        "src/components/music/"
+      ]
+    },
+    {
+      "id": "155",
+      "slug": "music-nft-end-to-end-implementation",
+      "title": "155 \u2014 End-to-End Music NFT: Upload \u2192 Mint \u2192 Buy (Implementation Plan)",
+      "category": "music",
+      "tags": [
+        "arweave",
+        "nft",
+        "revenue"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "This doc solves that. Every screen, every API call, every file.",
+      "related": [
+        "153",
+        "151",
+        "150",
+        "144",
+        "142"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/music/",
+        "src/lib/music/",
+        "src/providers/ArweaveProvider/"
+      ]
+    },
+    {
+      "id": "156",
+      "slug": "pods-media-podcast-tokenization",
+      "title": "156 \u2014 Pods.media & Podcast Tokenization: Can ZAO Clone It on Arweave?",
+      "category": "onchain",
+      "tags": [
+        "arweave",
+        "farcaster",
+        "podcast",
+        "supabase"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Pods.media is NOT defunct \u2014 it's actively operating with significant traction:",
+      "related": [
+        "083",
+        "024",
+        "020",
+        "015"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/podcasts/"
+      ]
+    },
+    {
+      "id": "157",
+      "slug": "cross-project-asset-audit",
+      "title": "157 \u2014 Cross-Project Asset Audit: Reusable Code from Sibling ZAO Projects",
+      "category": "other",
+      "tags": [
+        "discord",
+        "farcaster",
+        "nft",
+        "security"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Path: /Users/zaalpanthaki/Documents/ZAOUNZ/",
+      "related": [
+        "037",
+        "182",
+        "162",
+        "112",
+        "030"
+      ],
+      "code_paths": [
+        "src/commands/filter/",
+        "src/commands/lofi/",
+        "src/commands/radio/",
+        "src/hooks/useAudius/",
+        "src/lib/respect/",
+        "src/linksData/",
+        "src/providers/FarcasterProvider/",
+        "src/providers/WalletProvider/",
+        "src/services/audius/",
+        "src/utils/djPerms/"
+      ]
+    },
+    {
+      "id": "158",
+      "slug": "zao-member-naming-ens-basenames",
+      "title": "158 \u2014 ZAO Member Naming: ENS Subnames vs Basenames vs Custom",
+      "category": "onchain",
+      "tags": [
+        "ens",
+        "identity"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "How it works: Register `thezao.eth` on-chain ($5/year). Use NameStone REST API to create gasless off-chain subnames (`zaal.thezao.eth`, `candy.thez...",
+      "related": [],
+      "code_paths": [
+        "src/lib/ens/"
+      ]
+    },
+    {
+      "id": "159",
+      "slug": "feature-inventory-qa-checklist",
+      "title": "159 \u2014 ZAO OS Feature Inventory & QA Checklist",
+      "category": "other",
+      "tags": [
+        "music-player",
+        "testing"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Test each feature on the live Vercel deployment. For each one:",
+      "related": [],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/",
+        "src/hooks/",
+        "src/lib/"
+      ]
+    },
+    {
+      "id": "160",
+      "slug": "audio-spaces-landscape-comparison",
+      "title": "160 \u2014 Audio Spaces Landscape: Farcaster Apps, X Spaces Competitors & Provider Comparison",
+      "category": "music",
+      "tags": [
+        "audio-rooms",
+        "farcaster"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on audio spaces landscape: farcaster apps, x spaces competitors & provider comparison",
+      "related": [
+        "123",
+        "112",
+        "043"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "161",
+      "slug": "agent-harness-engineering-langchain",
+      "title": "161 \u2014 Agent Harness Engineering: LangChain DeepAgents, Virtual Filesystems & the Ralph Loop",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Viv Trivedy (@vtrivedy10, LangChain) has been publishing a series on harness engineering \u2014 the discipline of building structured systems around LLM...",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "162",
+      "slug": "open-source-projects-directory",
+      "title": "162 \u2014 Open Source Projects Directory for ZAO OS",
+      "category": "community",
+      "tags": [
+        "ai-agent",
+        "audius",
+        "farcaster",
+        "music-player",
+        "nft",
+        "open-source"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on open source projects directory for zao os",
+      "related": [
+        "112",
+        "183",
+        "182",
+        "167",
+        "082"
+      ],
+      "code_paths": [
+        "src/lib/publish/"
+      ]
+    },
+    {
+      "id": "163",
+      "slug": "multistreaming-platforms-integration",
+      "title": "163 \u2014 Multistreaming Platforms: Restream, StreamYard, Meld, Livepeer for ZAO OS",
+      "category": "music",
+      "tags": [
+        "streaming",
+        "supabase"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "\u251c\u2500\u2500 Tier 1: Direct RTMP (Free, built-in)",
+      "related": [
+        "192",
+        "041"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "164",
+      "slug": "skills-research-workflow-improvements",
+      "title": "164 \u2014 Skills, Research Workflow & Autoresearch Improvements",
+      "category": "ai-agent",
+      "tags": [
+        "autoresearch",
+        "claude-code",
+        "open-source",
+        "skills",
+        "workflow"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "The current `/zao-research` skill uses WebSearch + WebFetch for external research, but has no structured way to search and read open-source code. W...",
+      "related": [
+        "171",
+        "168",
+        "154",
+        "089",
+        "070"
+      ],
+      "code_paths": [
+        "src/hooks/usePlayer/",
+        "src/hooks/usePlayerQueue/",
+        "src/lib/neynar/"
+      ]
+    },
+    {
+      "id": "165",
+      "slug": "claude-code-multi-session-management",
+      "title": "Doc 165 \u2014 Claude Code Multi-Session Management",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "multi-agent",
+        "streaming"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Complete reference for managing, monitoring, and orchestrating multiple Claude Code CLI sessions in parallel.",
+      "related": [
+        "194",
+        "171",
+        "168",
+        "154",
+        "091"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "166",
+      "slug": "dev-workflow-improvements",
+      "title": "166 \u2014 ZAO OS Developer Workflow Improvements",
+      "category": "dev-workflows",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "workflow"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "23.6% of all commits are fixes. Many fix the immediately preceding feature:",
+      "related": [
+        "194",
+        "070",
+        "196",
+        "195",
+        "174"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "167",
+      "slug": "audio-apis-music-players-displays",
+      "title": "167 \u2014 Audio APIs, Music Players & Display Patterns",
+      "category": "music",
+      "tags": [
+        "api",
+        "audius",
+        "music-player",
+        "open-source"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "src/components/music/   \u2192 42 files (players, queue, embeds, visualization, submissions)",
+      "related": [
+        "162",
+        "112",
+        "185",
+        "183",
+        "182"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/music/",
+        "src/hooks/",
+        "src/lib/equalizer/",
+        "src/lib/music/",
+        "src/providers/audio/"
+      ]
+    },
+    {
+      "id": "168",
+      "slug": "claude-code-community-innovations-march2026",
+      "title": "168 \u2014 Claude Code Community Innovations: Autoresearch 10x, Council of High Intelligence, Learn Vibe Build",
+      "category": "governance",
+      "tags": [
+        "ai-agent",
+        "autoresearch",
+        "claude-code",
+        "education",
+        "multi-agent",
+        "skills",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Source: @itsolelehmann, March 17, 2026 \u2014 5,257 likes, 2.4M views",
+      "related": [
+        "171",
+        "154",
+        "091",
+        "089",
+        "070"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "169",
+      "slug": "ai-education-music-creators-landscape",
+      "title": "169 \u2014 AI Education for Music Creators: Landscape Gap & ZAO Opportunity",
+      "category": "music",
+      "tags": [
+        "education"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Learn Vibe Build feeds into ETHBoulder (Feb 13-15, 2026) \u2014 a regen-tech unconference focused on public goods, community tooling, AI+society, decent...",
+      "related": [],
+      "code_paths": [
+        "src/app/"
+      ]
+    },
+    {
+      "id": "170",
+      "slug": "autoresearch-10x-eval-checklists-zao-skills",
+      "title": "170 \u2014 Autoresearch 10x: Binary Eval Checklists for ZAO OS Skills",
+      "category": "ai-agent",
+      "tags": [
+        "autoresearch",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on autoresearch 10x: binary eval checklists for zao os skills",
+      "related": [
+        "171",
+        "168",
+        "164",
+        "154",
+        "089"
+      ],
+      "code_paths": [
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "171",
+      "slug": "council-high-intelligence-multi-agent-deliberation",
+      "title": "171 \u2014 Council of High Intelligence: Multi-Agent Deliberation for ZAO OS",
+      "category": "governance",
+      "tags": [
+        "ai-agent",
+        "autoresearch",
+        "claude-code",
+        "multi-agent",
+        "skills"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Source: @nyk_builderz, March 19, 2026 \u2014 184 likes, 83.8K views",
+      "related": [
+        "168",
+        "154",
+        "091",
+        "089",
+        "070"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "172",
+      "slug": "solo-founder-ai-dev-workflow",
+      "title": "169 \u2014 Solo Founder AI-Powered Development: The ZAO OS Case Study",
+      "category": "ai-agent",
+      "tags": [
+        "workflow"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "24 feature domains: admin, calls, chat, contribute, directory, ecosystem, fractals, governance, home, library, members, messages, music, notificati...",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "173",
+      "slug": "farcaster-miniapps-integration",
+      "title": "86 \u2014 Farcaster Mini Apps Integration for ZAO OS",
+      "category": "farcaster",
+      "tags": [
+        "farcaster",
+        "miniapps"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Category: Technical / Integration",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "174",
+      "slug": "paperclip-multi-company-agents",
+      "title": "Paperclip AI: Multi-Company Support & Advanced Agent Coordination",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "paperclip",
+        "workflow"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Research Doc 81 \u2014 2026-03-19",
+      "related": [
+        "076",
+        "067",
+        "194",
+        "166",
+        "090"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "175",
+      "slug": "paperclip-clipmart-plugins",
+      "title": "Research Doc 82 \u2014 Paperclip AI: ClipMart Marketplace & Plugin System",
+      "category": "ai-agent",
+      "tags": [
+        "cross-posting",
+        "farcaster",
+        "moderation",
+        "paperclip"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Relevance: ZAO OS agent orchestration layer (builds on Doc 81)",
+      "related": [
+        "183",
+        "085",
+        "082",
+        "081",
+        "077"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "176",
+      "slug": "supabase-scaling-optimization",
+      "title": "93 \u2014 Supabase Scaling & Optimization for ZAO OS",
+      "category": "infrastructure",
+      "tags": [
+        "ai-agent",
+        "bluesky",
+        "database",
+        "next.js"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "6. Indexing Strategies for 22 Tables",
+      "related": [
+        "042",
+        "098",
+        "091",
+        "085",
+        "038"
+      ],
+      "code_paths": [
+        "src/components/navigation/",
+        "src/middleware/"
+      ]
+    },
+    {
+      "id": "177",
+      "slug": "mastodon-threads-cross-posting",
+      "title": "96 \u2014 Mastodon + Threads Cross-Posting Integration for ZAO OS",
+      "category": "cross-platform",
+      "tags": [
+        "bluesky",
+        "cross-posting",
+        "mastodon",
+        "threads"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Mastodon uses a RESTful API with JSON payloads. Every Mastodon instance runs its own independent API.",
+      "related": [
+        "096",
+        "028",
+        "183",
+        "097",
+        "077"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/chat/",
+        "src/hooks/useChat/",
+        "src/lib/",
+        "src/lib/crosspost/",
+        "src/lib/mastodon/",
+        "src/lib/threads/",
+        "src/lib/validation/"
+      ]
+    },
+    {
+      "id": "178",
+      "slug": "wavewarz-deep-dive-integration",
+      "title": "96 \u2014 WaveWarZ Deep Dive & ZAO OS Integration",
+      "category": "wavewarz",
+      "tags": [
+        "cross-posting",
+        "wavewarz"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Not \"ephemeral tokens.\" WaveWarZ is a Solana prediction market for music battles \u2014 closer to Polymarket for music than pump.fun.",
+      "related": [],
+      "code_paths": [
+        "src/app/"
+      ]
+    },
+    {
+      "id": "179",
+      "slug": "reddit-cross-posting-integration",
+      "title": "97 \u2014 Reddit Cross-Posting Integration for ZAO OS",
+      "category": "cross-platform",
+      "tags": [
+        "ai-agent",
+        "cross-posting",
+        "reddit"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on reddit cross-posting integration for zao os",
+      "related": [
+        "085",
+        "034"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/chat/",
+        "src/lib/reddit/",
+        "src/lib/validation/"
+      ]
+    },
+    {
+      "id": "180",
+      "slug": "wavewarz-integration-blueprints",
+      "title": "97 \u2014 WaveWarZ Artist Discovery Pipeline for ZAO OS",
+      "category": "wavewarz",
+      "tags": [
+        "solana",
+        "wavewarz"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "WaveWarZ has 43+ indie artists (mostly hip-hop/R&B) competing in 647+ battles with real SOL at stake. These are exactly ZAO's target audience \u2014 ind...",
+      "related": [
+        "100",
+        "095"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/lib/solana/"
+      ]
+    },
+    {
+      "id": "181",
+      "slug": "music-player-ui-showcase",
+      "title": "105 \u2014 Music Player UI Patterns & Showcase Design",
+      "category": "music",
+      "tags": [
+        "audius",
+        "music-player",
+        "ui-design"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "6. Music Discovery Feed Designs",
+      "related": [
+        "182",
+        "082",
+        "167",
+        "162",
+        "152"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "182",
+      "slug": "home-screen-dashboard-design",
+      "title": "106 \u2014 Home Screen / Dashboard Design for Music Community Platforms",
+      "category": "music",
+      "tags": [
+        "audius",
+        "discord",
+        "farcaster",
+        "mobile",
+        "music-player",
+        "next.js",
+        "snapshot",
+        "ui-design"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Discord's major UI overhaul (February-March 2025) restructured navigation significantly:",
+      "related": [
+        "082",
+        "181",
+        "162",
+        "112",
+        "107"
+      ],
+      "code_paths": [
+        "src/app/"
+      ]
+    },
+    {
+      "id": "183",
+      "slug": "social-connections-x-integration",
+      "title": "107 \u2014 Social Connections & X Integration for ZAO OS",
+      "category": "infrastructure",
+      "tags": [
+        "audius",
+        "bluesky",
+        "cross-posting",
+        "farcaster",
+        "open-source"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Neynar's /v2/farcaster/user/bulk endpoint (which ZAO already calls via getUserByFid() in src/lib/farcaster/neynar.ts:98) returns a verified_account...",
+      "related": [
+        "162",
+        "082",
+        "077",
+        "028",
+        "182"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/lib/farcaster/"
+      ]
+    },
+    {
+      "id": "184",
+      "slug": "superchain-ordao-crosschain-fractal",
+      "title": "108 \u2014 Superchain ORDAO & Cross-Chain Fractal Governance",
+      "category": "governance",
+      "tags": [
+        "dao",
+        "fractal",
+        "governance",
+        "hats"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Superchain ORDAO extends the ORDAO governance framework across multiple OP Stack chains (Optimism, Base, and future Superchain members). The concep...",
+      "related": [
+        "102",
+        "055",
+        "147",
+        "106",
+        "105"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "185",
+      "slug": "synchronized-listening-rooms",
+      "title": "100 \u2014 Synchronized Listening Rooms & Collaborative Music Experiences",
+      "category": "music",
+      "tags": [
+        "audio-rooms",
+        "discord",
+        "music-player",
+        "open-source",
+        "supabase"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on synchronized listening rooms & collaborative music experiences",
+      "related": [
+        "033",
+        "196",
+        "192",
+        "182",
+        "167"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/calls/",
+        "src/components/music/",
+        "src/hooks/useRadio/",
+        "src/lib/db/",
+        "src/providers/audio/"
+      ]
+    },
+    {
+      "id": "186",
+      "slug": "music-discovery-feeds",
+      "title": "Music Discovery Feed \u2014 Research & Implementation Plan",
+      "category": "music",
+      "tags": [],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Scope: ZAO OS (Next.js 16 + Supabase + Neynar/Farcaster), ~100-member gated community",
+      "related": [],
+      "code_paths": [
+        "src/lib/music/"
+      ]
+    },
+    {
+      "id": "187",
+      "slug": "songlink-odesli-api",
+      "title": "111 \u2014 Songlink/Odesli API for Universal Music Links",
+      "category": "music",
+      "tags": [
+        "api"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on songlink/odesli api for universal music links",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "188",
+      "slug": "zao-fractal-bot-process",
+      "title": "113 \u2014 ZAO Fractal Bot + Process Deep Dive (March 2026)",
+      "category": "governance",
+      "tags": [
+        "fractal"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "From thezao.com and the fractal session prompt:",
+      "related": [],
+      "code_paths": []
+    },
+    {
+      "id": "189",
+      "slug": "mobile-player-optimization",
+      "title": "127 \u2014 Mobile Music Player Optimization & Advanced Features",
+      "category": "music",
+      "tags": [
+        "mobile",
+        "music-player"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on mobile music player optimization & advanced features",
+      "related": [
+        "190",
+        "182",
+        "107",
+        "033"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "190",
+      "slug": "music-player-complete-audit",
+      "title": "128 \u2014 ZAO OS Music Player: Complete Audit & Future Roadmap",
+      "category": "music",
+      "tags": [
+        "mobile",
+        "music-player",
+        "security"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Comprehensive research on zao os music player: complete audit & future roadmap",
+      "related": [
+        "189",
+        "182",
+        "107",
+        "033"
+      ],
+      "code_paths": [
+        "src/app/api/",
+        "src/components/music/",
+        "src/lib/music/",
+        "src/providers/audio/"
+      ]
+    },
+    {
+      "id": "191",
+      "slug": "reputation-scoring-systems",
+      "title": "133 \u2014 Reputation Scoring Systems for ZAO OS",
+      "category": "other",
+      "tags": [
+        "ethereum",
+        "neynar"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Fractal Respect     \u00d7 0.30   (core governance)",
+      "related": [],
+      "code_paths": [
+        "src/components/social/"
+      ]
+    },
+    {
+      "id": "192",
+      "slug": "multiplatform-streaming-rtmp",
+      "title": "161 \u2014 Multi-Platform Streaming from ZAO OS Audio Rooms (RTMP Out)",
+      "category": "music",
+      "tags": [
+        "audio-rooms",
+        "streaming",
+        "supabase"
+      ],
+      "status": "current",
+      "date": "2026-03",
+      "summary": "Stream.io's SDK can forward any call to external RTMP destinations. The platform:",
+      "related": [
+        "185",
+        "163",
+        "112",
+        "043",
+        "041"
+      ],
+      "code_paths": [
+        "src/app/",
+        "src/app/api/",
+        "src/components/spaces/"
+      ]
+    },
+    {
+      "id": "194",
+      "slug": "claude-code-multi-terminal-management",
+      "title": "165 \u2014 Claude Code Multi-Terminal Management",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "multi-agent",
+        "music-player",
+        "workflow",
+        "xmtp"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "TL;DR for Zaal: Install claude-squad for the dashboard, use `--permission-mode auto` for the \"yes to all\" feel, and `--worktree --tmux` for paralle...",
+      "related": [
+        "070",
+        "171",
+        "168",
+        "166",
+        "165"
+      ],
+      "code_paths": [
+        "src/app/api/"
+      ]
+    },
+    {
+      "id": "195",
+      "slug": "dev-workflow-tools-automations",
+      "title": "Doc 166 \u2014 Developer Workflow Tools & Automations for Solo Devs Using Claude Code (2026)",
+      "category": "dev-workflows",
+      "tags": [
+        "ai-agent",
+        "claude-code",
+        "git",
+        "testing"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Claude Code's hook system replaces the need for traditional Husky + lint-staged setups. Hooks provide guaranteed execution (deterministic), unlike ...",
+      "related": [
+        "137",
+        "089",
+        "044",
+        "038",
+        "196"
+      ],
+      "code_paths": [
+        "src/auth/",
+        "src/lib/auth/",
+        "src/middleware/"
+      ]
+    },
+    {
+      "id": "196",
+      "slug": "solo-dev-ai-coding-landscape-2026",
+      "title": "Doc 170 \u2014 Solo Developer + AI Coding Landscape 2026",
+      "category": "ai-agent",
+      "tags": [
+        "ai-agent",
+        "audio-rooms",
+        "claude-code",
+        "open-source",
+        "threads"
+      ],
+      "status": "superseded",
+      "date": "2026-03",
+      "summary": "Comprehensive research on doc 170 \u2014 solo developer + ai coding landscape 2026",
+      "related": [
+        "195",
+        "194",
+        "185",
+        "171",
+        "168"
+      ],
+      "code_paths": []
+    }
+  ]
+}

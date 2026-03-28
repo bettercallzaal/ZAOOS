@@ -1,0 +1,280 @@
+{
+  "chains": [
+    {
+      "topic": "Audio Rooms / Spaces",
+      "chain": [
+        "043",
+        "080",
+        "119",
+        "122",
+        "160"
+      ],
+      "canonical": "160",
+      "note": "Doc 160 is the latest audio spaces landscape comparison"
+    },
+    {
+      "topic": "Farcaster Ecosystem Overview",
+      "chain": [
+        "019",
+        "022",
+        "034",
+        "073"
+      ],
+      "canonical": "073",
+      "note": "Doc 073 is the 2026 ecosystem update"
+    },
+    {
+      "topic": "Lens Protocol Cross-Posting",
+      "chain": [
+        "036",
+        "117",
+        "120",
+        "121"
+      ],
+      "canonical": "121",
+      "note": "Doc 121 has the final Lens v3 auth verdict"
+    },
+    {
+      "topic": "Music Player",
+      "chain": [
+        "003",
+        "079",
+        "107",
+        "113",
+        "126",
+        "130",
+        "181",
+        "189",
+        "190"
+      ],
+      "canonical": "190",
+      "note": "Doc 190 is the complete music player audit"
+    },
+    {
+      "topic": "Public APIs",
+      "chain": [
+        "009",
+        "025",
+        "092",
+        "136"
+      ],
+      "canonical": "136",
+      "note": "Doc 136 is the API status verification for March 2026"
+    },
+    {
+      "topic": "Security Audit",
+      "chain": [
+        "018",
+        "038",
+        "057",
+        "137"
+      ],
+      "canonical": "057",
+      "note": "Doc 057 is the comprehensive March 2026 security audit"
+    },
+    {
+      "topic": "Hats Protocol",
+      "chain": [
+        "007",
+        "055",
+        "059",
+        "075"
+      ],
+      "canonical": "075",
+      "note": "Doc 075 covers Hats Protocol v2 updates"
+    },
+    {
+      "topic": "Music NFT Distribution",
+      "chain": [
+        "108",
+        "141",
+        "142",
+        "144",
+        "145",
+        "146",
+        "147",
+        "148",
+        "151",
+        "155"
+      ],
+      "canonical": "155",
+      "note": "Doc 155 is the end-to-end music NFT implementation guide"
+    },
+    {
+      "topic": "Fractal Governance",
+      "chain": [
+        "056",
+        "058",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "114",
+        "115"
+      ],
+      "canonical": "114",
+      "note": "Doc 114 covers ZAO fractal live infrastructure"
+    },
+    {
+      "topic": "Paperclip AI Agent",
+      "chain": [
+        "067",
+        "071",
+        "072",
+        "089",
+        "174",
+        "175"
+      ],
+      "canonical": "175",
+      "note": "Doc 175 covers Paperclip Clipmart plugins"
+    },
+    {
+      "topic": "Cross-Platform Publishing",
+      "chain": [
+        "028",
+        "077",
+        "096",
+        "097",
+        "177",
+        "179",
+        "183"
+      ],
+      "canonical": "096",
+      "note": "Doc 096 is the deep cross-post API dive; newer docs cover individual platforms"
+    },
+    {
+      "topic": "WaveWarz",
+      "chain": [
+        "095",
+        "099",
+        "101",
+        "178",
+        "180"
+      ],
+      "canonical": "180",
+      "note": "Doc 180 has WaveWarz integration blueprints"
+    },
+    {
+      "topic": "Supabase / Database",
+      "chain": [
+        "042",
+        "098",
+        "176"
+      ],
+      "canonical": "176",
+      "note": "Doc 176 covers Supabase scaling optimization"
+    },
+    {
+      "topic": "Dev Workflow & AI Coding",
+      "chain": [
+        "044",
+        "069",
+        "076",
+        "154",
+        "164",
+        "166",
+        "172",
+        "195",
+        "196"
+      ],
+      "canonical": "154",
+      "note": "Doc 154 is the canonical skills/commands master reference"
+    },
+    {
+      "topic": "Arweave Storage",
+      "chain": [
+        "150",
+        "152",
+        "153"
+      ],
+      "canonical": "153",
+      "note": "Doc 153 covers Bazar atomic assets for music on Arweave"
+    },
+    {
+      "topic": "ENS / Naming",
+      "chain": [
+        "127",
+        "158"
+      ],
+      "canonical": "158",
+      "note": "Doc 158 covers ZAO member naming with ENS + Basenames"
+    },
+    {
+      "topic": "Multistreaming / RTMP",
+      "chain": [
+        "163",
+        "192"
+      ],
+      "canonical": "192",
+      "note": "Doc 192 is multiplatform streaming RTMP research"
+    },
+    {
+      "topic": "Claude Code Workflows",
+      "chain": [
+        "069",
+        "165",
+        "168",
+        "194"
+      ],
+      "canonical": "168",
+      "note": "Doc 168 covers Claude Code community innovations March 2026"
+    },
+    {
+      "topic": "ZAO Whitepaper",
+      "chain": [
+        "051",
+        "052",
+        "053",
+        "101"
+      ],
+      "canonical": "051",
+      "note": "Doc 051 is the canonical whitepaper Draft 4.5"
+    },
+    {
+      "topic": "Nouns Builder / BuilderOSS",
+      "chain": [
+        "078",
+        "131",
+        "140",
+        "149"
+      ],
+      "canonical": "149",
+      "note": "Doc 149 is the BuilderOSS deep dive"
+    },
+    {
+      "topic": "Reputation / Scoring",
+      "chain": [
+        "134",
+        "135",
+        "191"
+      ],
+      "canonical": "191",
+      "note": "Doc 191 covers reputation scoring systems"
+    },
+    {
+      "topic": "AI Agent Landscape",
+      "chain": [
+        "024",
+        "046",
+        "083",
+        "084",
+        "085",
+        "090"
+      ],
+      "canonical": "090",
+      "note": "Doc 090 covers AI-run community agent OS"
+    },
+    {
+      "topic": "ZAO Complete Guide",
+      "chain": [
+        "027",
+        "047",
+        "048",
+        "050"
+      ],
+      "canonical": "050",
+      "note": "Doc 050 is the canonical complete guide to The ZAO"
+    }
+  ]
+}

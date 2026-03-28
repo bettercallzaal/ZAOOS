@@ -10,13 +10,14 @@ import type { TrackMetadata } from '@/types/music';
 interface RoomMusicPanelProps {
   roomId: string;
   isHost: boolean;
+  onOpenMusicBrowser?: () => void;
 }
 
 /**
  * Music/DJ panel for Spaces rooms.
  * Splits into guest (no audio providers) and authenticated (full DJ) modes.
  */
-export function RoomMusicPanel({ roomId, isHost }: RoomMusicPanelProps) {
+export function RoomMusicPanel({ roomId, isHost, onOpenMusicBrowser }: RoomMusicPanelProps) {
   const { user } = useAuth();
 
   // Guest users don't have AudioProviders — show minimal prompt
@@ -24,7 +25,7 @@ export function RoomMusicPanel({ roomId, isHost }: RoomMusicPanelProps) {
     return <GuestMusicPanel />;
   }
 
-  return <AuthenticatedMusicPanel roomId={roomId} isHost={isHost} />;
+  return <AuthenticatedMusicPanel roomId={roomId} isHost={isHost} onOpenMusicBrowser={onOpenMusicBrowser} />;
 }
 
 // ─── Guest Panel ───────────────────────────────────────────────────────────────
@@ -50,7 +51,7 @@ function GuestMusicPanel() {
 
 // ─── Authenticated Panel (uses useListeningRoom which requires AudioProviders) ─
 
-function AuthenticatedMusicPanel({ roomId, isHost }: { roomId: string; isHost: boolean }) {
+function AuthenticatedMusicPanel({ roomId, isHost, onOpenMusicBrowser }: { roomId: string; isHost: boolean; onOpenMusicBrowser?: () => void }) {
   const { user } = useAuth();
 
   const userInfo: ListenerInfo | null = user
@@ -208,9 +209,19 @@ function AuthenticatedMusicPanel({ roomId, isHost }: { roomId: string; isHost: b
                   </>
                 )}
               </button>
-              <p className="text-[10px] text-gray-600 text-center">
-                or play any track from the music tab
-              </p>
+              {onOpenMusicBrowser && (
+                <button
+                  onClick={onOpenMusicBrowser}
+                  className="w-full py-3 rounded-lg bg-[#f5a62320] text-[#f5a623] text-sm hover:bg-[#f5a62340] transition-colors flex items-center justify-center gap-2"
+                >
+                  <MusicIcon /> Browse Music
+                </button>
+              )}
+              {!onOpenMusicBrowser && (
+                <p className="text-[10px] text-gray-600 text-center">
+                  or play any track from the music tab
+                </p>
+              )}
             </div>
           ) : (
             <div className="text-center py-3 text-gray-600 text-xs">

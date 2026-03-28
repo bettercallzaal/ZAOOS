@@ -4,16 +4,65 @@ import { useState } from 'react';
 
 export type RoomProvider = 'stream' | '100ms';
 
+export type RoomTheme = 'default' | 'music' | 'podcast' | 'ama' | 'chill';
+
+interface ThemeOption {
+  id: RoomTheme;
+  label: string;
+  description: string;
+  dot: string;
+  active: string;
+}
+
+const THEMES: ThemeOption[] = [
+  {
+    id: 'default',
+    label: 'Default',
+    description: 'Navy/gold ZAO theme',
+    dot: 'bg-[#f5a623]',
+    active: 'border-[#f5a623]/60 bg-[#f5a623]/10 text-[#f5a623]',
+  },
+  {
+    id: 'music',
+    label: 'Music',
+    description: 'Purple gradient',
+    dot: 'bg-purple-500',
+    active: 'border-purple-500/60 bg-purple-500/10 text-purple-300',
+  },
+  {
+    id: 'podcast',
+    label: 'Podcast',
+    description: 'Warm conversation',
+    dot: 'bg-amber-500',
+    active: 'border-amber-500/60 bg-amber-500/10 text-amber-300',
+  },
+  {
+    id: 'ama',
+    label: 'AMA',
+    description: 'Q&A style',
+    dot: 'bg-yellow-400',
+    active: 'border-yellow-400/60 bg-yellow-400/10 text-yellow-300',
+  },
+  {
+    id: 'chill',
+    label: 'Chill',
+    description: 'Relaxed vibes',
+    dot: 'bg-teal-500',
+    active: 'border-teal-500/60 bg-teal-500/10 text-teal-300',
+  },
+];
+
 interface HostRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateRoom: (title: string, description: string, provider: RoomProvider) => Promise<void>;
+  onCreateRoom: (title: string, description: string, provider: RoomProvider, theme: RoomTheme) => Promise<void>;
 }
 
 export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [provider, setProvider] = useState<RoomProvider>('stream');
+  const [theme, setTheme] = useState<RoomTheme>('default');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,10 +75,11 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
     setLoading(true);
     setError(null);
     try {
-      await onCreateRoom(title.trim(), description.trim(), provider);
+      await onCreateRoom(title.trim(), description.trim(), provider, theme);
       setTitle('');
       setDescription('');
       setProvider('stream');
+      setTheme('default');
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create room');
@@ -80,6 +130,30 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
                 <span className="block text-xs opacity-70 mb-0.5">Audio</span>
                 100ms
               </button>
+            </div>
+          </div>
+
+          {/* Theme selector */}
+          <div className="mb-4">
+            <label className="text-gray-400 text-sm mb-2 block">Theme</label>
+            <div className="grid grid-cols-5 gap-1.5">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTheme(t.id)}
+                  disabled={loading}
+                  title={t.description}
+                  className={`flex flex-col items-center gap-1.5 px-1 py-2.5 rounded-lg border text-xs font-medium transition-colors ${
+                    theme === t.id
+                      ? t.active
+                      : 'bg-[#0a1628] border-gray-700 text-gray-500 hover:border-gray-600 hover:text-gray-400'
+                  }`}
+                >
+                  <span className={`w-3 h-3 rounded-full ${t.dot}`} />
+                  {t.label}
+                </button>
+              ))}
             </div>
           </div>
 

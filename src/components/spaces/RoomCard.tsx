@@ -1,7 +1,15 @@
 'use client';
 
 import type { Room } from '@/lib/spaces/roomsDb';
-import type { RoomProvider } from './HostRoomModal';
+import type { RoomProvider, RoomTheme } from './HostRoomModal';
+
+const THEME_STYLES: Record<RoomTheme, { border: string; badge: string; label: string }> = {
+  default: { border: 'hover:border-[#f5a623]/30', badge: '', label: '' },
+  music:   { border: 'hover:border-purple-500/30', badge: 'bg-purple-500/20 text-purple-400', label: 'Music' },
+  podcast: { border: 'hover:border-amber-500/30',  badge: 'bg-amber-500/20 text-amber-400',   label: 'Podcast' },
+  ama:     { border: 'hover:border-yellow-400/30', badge: 'bg-yellow-400/20 text-yellow-300', label: 'AMA' },
+  chill:   { border: 'hover:border-teal-500/30',   badge: 'bg-teal-500/20 text-teal-400',     label: 'Chill' },
+};
 
 export interface UnifiedRoom {
   id: string;
@@ -14,6 +22,7 @@ export interface UnifiedRoom {
   created_at: string;
   participant_count: number;
   provider: RoomProvider;
+  theme?: RoomTheme;
 }
 
 interface RoomCardProps {
@@ -23,8 +32,11 @@ interface RoomCardProps {
 }
 
 export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
+  const themeKey = (room.theme ?? 'default') as RoomTheme;
+  const themeStyle = THEME_STYLES[themeKey] ?? THEME_STYLES.default;
+
   return (
-    <div className="bg-[#0d1b2a] border border-gray-800 rounded-xl p-5 hover:border-[#f5a623]/30 transition-all duration-200 group">
+    <div className={`bg-[#0d1b2a] border border-gray-800 rounded-xl p-5 ${themeStyle.border} transition-all duration-200 group`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2.5 w-2.5">
@@ -39,6 +51,11 @@ export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
           ) : (
             <span className="text-[10px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">
               100ms
+            </span>
+          )}
+          {themeStyle.label && (
+            <span className={`text-[10px] px-2 py-0.5 rounded-full ${themeStyle.badge}`}>
+              {themeStyle.label}
             </span>
           )}
         </div>

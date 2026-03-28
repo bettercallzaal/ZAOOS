@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { RoomList } from '@/components/spaces/RoomList';
-import { HostRoomModal, type RoomProvider } from '@/components/spaces/HostRoomModal';
+import { HostRoomModal, type RoomProvider, type RoomTheme } from '@/components/spaces/HostRoomModal';
 import { generateCallId } from '@/lib/spaces/streamHelpers';
 import type { UnifiedRoom } from '@/components/spaces/RoomCard';
 
@@ -13,7 +13,7 @@ export default function PublicSpacesPage() {
   const { user } = useAuth();
   const [showHostModal, setShowHostModal] = useState(false);
 
-  const handleCreateRoom = async (title: string, description: string, provider: RoomProvider) => {
+  const handleCreateRoom = async (title: string, description: string, provider: RoomProvider, theme: RoomTheme) => {
     if (!user) throw new Error('Not authenticated');
 
     if (provider === 'stream') {
@@ -26,6 +26,7 @@ export default function PublicSpacesPage() {
           title,
           description,
           streamCallId,
+          theme,
         }),
       });
 
@@ -37,7 +38,7 @@ export default function PublicSpacesPage() {
       const res = await fetch('/api/100ms/rooms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({ title, theme }),
       });
 
       if (!res.ok) throw new Error('Failed to create room');

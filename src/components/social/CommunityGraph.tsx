@@ -1,7 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import force graph to handle SSR and load failures
+const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
+  ssr: false,
+  loading: () => null,
+});
+
+/* ---------- Types ---------- */
 
 interface MemberNode {
   fid: number;
@@ -29,24 +37,69 @@ interface GraphStats {
   disconnectedCount: number;
 }
 
-function formatCount(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
+interface GraphNode {
+  id: number;
+  name: string;
+  username: string;
+  pfpUrl: string | null;
+  zid: number | null;
+  followerCount: number;
+  mutuals: number;
+  engagement: number;
+  val: number; // node size
 }
 
-type SortMode = 'mutuals' | 'communityFollowers' | 'followerCount' | 'zid';
+interface GraphLink {
+  source: number;
+  target: number;
+}
+
+/* ---------- Helpers ---------- */
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, value));
+}
+
+/* ---------- Component ---------- */
 
 export function CommunityGraph() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const graphRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [dimensions, setDimensions] = useState({ width: 600, height: 500 });
+
   const [members, setMembers] = useState<MemberNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [stats, setStats] = useState<GraphStats | null>(null);
-  const [currentFid, setCurrentFid] = useState<number | null>(null);
+  const [engagementMap, setEngagementMap] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedMember, setSelectedMember] = useState<number | null>(null);
-  const [sortMode, setSortMode] = useState<SortMode>('mutuals');
 
+  const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
+  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [forceGraphFailed, setForceGraphFailed] = useState(false);
+
+  // Image cache for canvas node rendering
+  const imageCache = useRef<Map<string, HTMLImageElement>>(new Map());
+
+  // Resize observer
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setDimensions({
+          width: entry.contentRect.width,
+          height: Math.max(400, entry.contentRect.height),
+        });
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Fetch community graph data
   useEffect(() => {
     const controller = new AbortController();
     fetch('/api/social/community-graph', { signal: controller.signal })
@@ -59,7 +112,6 @@ export function CommunityGraph() {
         setMembers(data.members || []);
         setConnections(data.connections || []);
         setStats(data.stats || null);
-        setCurrentFid(data.currentFid || null);
       })
       .catch(() => {
         if (controller.signal.aborted) return;
@@ -71,25 +123,168 @@ export function CommunityGraph() {
     return () => { controller.abort(); };
   }, []);
 
-  const sorted = [...members].sort((a, b) => {
-    if (sortMode === 'mutuals') return b.mutuals - a.mutuals;
-    if (sortMode === 'communityFollowers') return b.communityFollowers - a.communityFollowers;
-    if (sortMode === 'followerCount') return b.followerCount - a.followerCount;
-    if (sortMode === 'zid') return (a.zid || 999) - (b.zid || 999);
-    return 0;
-  });
-
-  const selectedNode = selectedMember ? members.find((m) => m.fid === selectedMember) : null;
-  const selectedConnections = selectedMember
-    ? {
-        follows: connections.filter((c) => c.from === selectedMember).map((c) => c.to),
-        followedBy: connections.filter((c) => c.to === selectedMember).map((c) => c.from),
+  // Fetch engagement scores once members load
+  useEffect(() => {
+    if (members.length === 0) return;
+    const fids = members.map((m) => m.fid);
+    // Batch in groups of 100
+    const batches: number[][] = [];
+    for (let i = 0; i < fids.length; i += 100) {
+      batches.push(fids.slice(i, i + 100));
+    }
+    Promise.allSettled(
+      batches.map((batch) =>
+        fetch(`/api/social/engagement?fids=${batch.join(',')}`).then((r) =>
+          r.ok ? r.json() : null
+        )
+      )
+    ).then((results) => {
+      const merged: Record<string, number> = {};
+      for (const result of results) {
+        if (result.status === 'fulfilled' && result.value?.scores) {
+          for (const [fid, data] of Object.entries(result.value.scores)) {
+            merged[fid] = (data as { global: number }).global || 0;
+          }
+        }
       }
-    : null;
-  const selectedMutuals = selectedConnections
-    ? selectedConnections.follows.filter((f) => selectedConnections.followedBy.includes(f))
-    : [];
+      setEngagementMap(merged);
+    });
+  }, [members]);
 
+  // Build graph data
+  const graphData = useMemo(() => {
+    const maxEngagement = Math.max(
+      1,
+      ...Object.values(engagementMap).map((v) => v || 0)
+    );
+
+    const nodes: GraphNode[] = members.map((m) => {
+      const eng = engagementMap[String(m.fid)] || 0;
+      const normalizedEng = eng / maxEngagement;
+      return {
+        id: m.fid,
+        name: m.displayName || m.username,
+        username: m.username,
+        pfpUrl: m.pfpUrl,
+        zid: m.zid,
+        followerCount: m.followerCount,
+        mutuals: m.mutuals,
+        engagement: eng,
+        val: clamp(4 + normalizedEng * 16, 4, 20),
+      };
+    });
+
+    const links: GraphLink[] = connections.map((c) => ({
+      source: c.from,
+      target: c.to,
+    }));
+
+    return { nodes, links };
+  }, [members, connections, engagementMap]);
+
+  // Set of neighbor IDs for the hovered node
+  const neighborSet = useMemo(() => {
+    if (!hoveredNode) return null;
+    const set = new Set<number>();
+    set.add(hoveredNode.id);
+    for (const link of graphData.links) {
+      const src = typeof link.source === 'object' ? (link.source as any).id : link.source;
+      const tgt = typeof link.target === 'object' ? (link.target as any).id : link.target;
+      if (src === hoveredNode.id) set.add(tgt);
+      if (tgt === hoveredNode.id) set.add(src);
+    }
+    return set;
+  }, [hoveredNode, graphData.links]);
+
+  // Canvas node rendering with images
+  const nodeCanvasObject = useCallback(
+    (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+      const gNode = node as GraphNode;
+      const radius = gNode.val || 6;
+      const x = node.x ?? 0;
+      const y = node.y ?? 0;
+
+      // Dim non-neighbors on hover
+      const dimmed = neighborSet && !neighborSet.has(gNode.id);
+      ctx.globalAlpha = dimmed ? 0.15 : 1;
+
+      // Draw circle
+      const color = gNode.zid ? '#f5a623' : '#6b7280';
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      // Draw avatar if available and scale is large enough
+      if (gNode.pfpUrl && globalScale > 0.6) {
+        const cached = imageCache.current.get(gNode.pfpUrl);
+        if (cached && cached.complete) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(x, y, radius - 1, 0, 2 * Math.PI);
+          ctx.clip();
+          ctx.drawImage(cached, x - radius + 1, y - radius + 1, (radius - 1) * 2, (radius - 1) * 2);
+          ctx.restore();
+        } else if (!cached) {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = gNode.pfpUrl;
+          imageCache.current.set(gNode.pfpUrl, img);
+        }
+      }
+
+      // Draw label at sufficient zoom
+      if (globalScale > 1.2) {
+        const label = gNode.name;
+        const fontSize = Math.max(10 / globalScale, 2);
+        ctx.font = `${fontSize}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = dimmed ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.9)';
+        ctx.fillText(label, x, y + radius + 2);
+      }
+
+      ctx.globalAlpha = 1;
+    },
+    [neighborSet]
+  );
+
+  const nodePointerAreaPaint = useCallback(
+    (node: any, color: string, ctx: CanvasRenderingContext2D) => {
+      const radius = (node as GraphNode).val || 6;
+      ctx.beginPath();
+      ctx.arc(node.x ?? 0, node.y ?? 0, radius + 2, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.fill();
+    },
+    []
+  );
+
+  const handleNodeHover = useCallback((node: any) => {
+    setHoveredNode(node as GraphNode | null);
+  }, []);
+
+  const handleNodeClick = useCallback(
+    (node: any, event: MouseEvent) => {
+      const gNode = node as GraphNode;
+      setSelectedNode((prev) => (prev?.id === gNode.id ? null : gNode));
+      setTooltipPos({ x: event.clientX, y: event.clientY });
+    },
+    []
+  );
+
+  const linkColor = useCallback(
+    (link: any) => {
+      if (!neighborSet) return 'rgba(245,166,35,0.12)';
+      const src = typeof link.source === 'object' ? link.source.id : link.source;
+      const tgt = typeof link.target === 'object' ? link.target.id : link.target;
+      if (neighborSet.has(src) && neighborSet.has(tgt)) return 'rgba(245,166,35,0.5)';
+      return 'rgba(245,166,35,0.04)';
+    },
+    [neighborSet]
+  );
+
+  // Loading state
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
@@ -99,6 +294,7 @@ export function CommunityGraph() {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="px-4 py-8 text-center">
@@ -108,196 +304,133 @@ export function CommunityGraph() {
   }
 
   return (
-    <div className="px-4 py-4 space-y-4">
-      {/* Stats Overview */}
+    <div className="flex flex-col gap-3">
+      {/* Stats row */}
       {stats && (
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-[#0d1b2a] rounded-lg p-3 border border-gray-800 text-center">
-            <p className="text-lg font-bold text-white">{stats.totalMembers}</p>
-            <p className="text-[10px] text-gray-500">Members</p>
-          </div>
-          <div className="bg-[#0d1b2a] rounded-lg p-3 border border-gray-800 text-center">
-            <p className="text-lg font-bold text-[#f5a623]">{stats.totalConnections}</p>
-            <p className="text-[10px] text-gray-500">Connections</p>
-          </div>
-          <div className="bg-[#0d1b2a] rounded-lg p-3 border border-gray-800 text-center">
-            <p className="text-lg font-bold text-white">{stats.density}%</p>
-            <p className="text-[10px] text-gray-500">Density</p>
-          </div>
+        <div className="flex items-center gap-4 px-4 text-xs text-gray-400">
+          <span>
+            <span className="text-white font-medium">{stats.totalMembers}</span> members
+          </span>
+          <span>
+            <span className="text-[#f5a623] font-medium">{stats.totalConnections}</span> connections
+          </span>
+          <span>
+            <span className="text-white font-medium">{stats.density}%</span> density
+          </span>
         </div>
       )}
 
-      {/* Most Connected */}
-      {stats?.mostConnected && stats.mostConnected.length > 0 && (
-        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
-          <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Most Connected</p>
-          <div className="space-y-1.5">
-            {stats.mostConnected.map((m, i) => (
-              <div key={m.fid} className="flex items-center gap-2 text-sm">
-                <span className="text-gray-600 w-4 text-right">{i + 1}.</span>
-                <span className="text-white font-medium truncate flex-1">{m.displayName}</span>
-                <span className="text-xs text-[#f5a623]">{m.mutuals} mutuals</span>
-              </div>
-            ))}
-          </div>
-          {(stats.disconnectedCount ?? 0) > 0 && (
-            <p className="text-[10px] text-gray-600 mt-2">
-              {stats.disconnectedCount} member{stats.disconnectedCount > 1 ? 's' : ''} not connected to anyone
-            </p>
-          )}
-        </div>
-      )}
+      {/* Legend */}
+      <div className="flex items-center gap-4 px-4 text-[10px] text-gray-500">
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#f5a623] inline-block" />
+          ZAO member
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-gray-500 inline-block" />
+          Other
+        </span>
+        <span>Size = engagement</span>
+      </div>
 
-      {/* Sort tabs */}
-      <div className="flex gap-1 overflow-x-auto scrollbar-hide">
-        {([
-          { key: 'mutuals' as SortMode, label: 'Mutuals' },
-          { key: 'communityFollowers' as SortMode, label: 'Community Followers' },
-          { key: 'followerCount' as SortMode, label: 'Total Followers' },
-          { key: 'zid' as SortMode, label: 'ZID' },
-        ]).map((s) => (
-          <button
-            key={s.key}
-            onClick={() => setSortMode(s.key)}
-            className={`px-3 py-1.5 text-xs rounded-full whitespace-nowrap transition-colors ${
-              sortMode === s.key
-                ? 'bg-[#f5a623]/10 text-[#f5a623] font-medium'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
+      {/* Graph container */}
+      <div
+        ref={containerRef}
+        className="relative w-full bg-[#0a1628] rounded-xl overflow-hidden border border-gray-800"
+        style={{ height: 500 }}
+      >
+        {!forceGraphFailed ? (
+          <ForceGraph2D
+            ref={graphRef}
+            graphData={graphData}
+            width={dimensions.width}
+            height={dimensions.height}
+            backgroundColor="#0a1628"
+            nodeId="id"
+            nodeVal="val"
+            nodeCanvasObject={nodeCanvasObject}
+            nodePointerAreaPaint={nodePointerAreaPaint}
+            onNodeHover={handleNodeHover}
+            onNodeClick={handleNodeClick}
+            linkColor={linkColor}
+            linkWidth={0.5}
+            linkDirectionalParticles={0}
+            d3AlphaDecay={0.02}
+            d3VelocityDecay={0.3}
+            cooldownTicks={100}
+            enableZoomInteraction={true}
+            enablePanInteraction={true}
+            enableNodeDrag={true}
+            onEngineStop={() => {
+              // Zoom to fit after initial layout
+              graphRef.current?.zoomToFit?.(400, 40);
+            }}
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+            Graph visualization unavailable
+          </div>
+        )}
+
+        {/* Click tooltip / popup */}
+        {selectedNode && (
+          <div
+            className="absolute z-50 bg-[#0d1b2a] border border-[#f5a623]/30 rounded-xl p-4 shadow-lg w-64"
+            style={{
+              left: Math.min(
+                tooltipPos.x - (containerRef.current?.getBoundingClientRect().left ?? 0),
+                dimensions.width - 270
+              ),
+              top: Math.min(
+                tooltipPos.y - (containerRef.current?.getBoundingClientRect().top ?? 0) + 10,
+                dimensions.height - 200
+              ),
+            }}
           >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Member Grid */}
-      <div className="space-y-1">
-        {sorted.map((member) => {
-          const isSelected = selectedMember === member.fid;
-          const isMe = member.fid === currentFid;
-          const isHighlighted = selectedMember
-            ? selectedConnections?.follows.includes(member.fid) ||
-              selectedConnections?.followedBy.includes(member.fid)
-            : false;
-          const isMutual = selectedMember ? selectedMutuals.includes(member.fid) : false;
-
-          return (
             <button
-              key={member.fid}
-              onClick={() => setSelectedMember(isSelected ? null : member.fid)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-left ${
-                isSelected
-                  ? 'bg-[#f5a623]/10 border border-[#f5a623]/30'
-                  : isHighlighted
-                  ? isMutual
-                    ? 'bg-green-500/10 border border-green-500/20'
-                    : 'bg-blue-500/10 border border-blue-500/20'
-                  : selectedMember
-                  ? 'opacity-30 border border-transparent'
-                  : 'hover:bg-white/[0.03] border border-transparent'
-              }`}
+              onClick={() => setSelectedNode(null)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-white text-xs"
             >
-              {/* PFP */}
-              {member.pfpUrl ? (
-                <div className="w-9 h-9 flex-shrink-0 relative">
-                  <Image
-                    src={member.pfpUrl}
-                    alt={`${member.displayName || member.username || 'Member'} avatar`}
-                    fill
-                    className="rounded-full object-cover"
-                    unoptimized
-                  />
-                </div>
-              ) : (
-                <div className="w-9 h-9 rounded-full bg-gray-700 flex-shrink-0" />
-              )}
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-medium text-white truncate">
-                    {member.displayName}
-                  </span>
-                  {member.zid && (
-                    <span className="text-[9px] font-bold bg-[#f5a623]/20 text-[#f5a623] px-1 py-0.5 rounded-full">
-                      #{member.zid}
-                    </span>
-                  )}
-                  {isMe && (
-                    <span className="text-[9px] bg-white/10 text-gray-400 px-1 py-0.5 rounded">you</span>
-                  )}
-                </div>
-                <span className="text-xs text-gray-500">@{member.username}</span>
-              </div>
-
-              {/* Connection stats */}
-              <div className="flex-shrink-0 text-right">
-                <div className="flex items-center gap-2 text-[11px]">
-                  {member.mutuals > 0 && (
-                    <span className="text-green-400" title="Mutual follows in community">
-                      {member.mutuals} mutual{member.mutuals > 1 ? 's' : ''}
-                    </span>
-                  )}
-                  <span className="text-gray-600">{formatCount(member.followerCount)}</span>
-                </div>
-                {isHighlighted && selectedMember && (
-                  <span className={`text-[10px] ${isMutual ? 'text-green-400' : 'text-blue-400'}`}>
-                    {isMutual ? 'Mutual' : selectedConnections?.follows.includes(member.fid) ? 'Follows' : 'Follower'}
-                  </span>
-                )}
-              </div>
+              x
             </button>
-          );
-        })}
+            <div className="flex items-center gap-3 mb-3">
+              {selectedNode.pfpUrl ? (
+                <img
+                  src={selectedNode.pfpUrl}
+                  alt={selectedNode.name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gray-700" />
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white truncate">{selectedNode.name}</p>
+                <p className="text-xs text-gray-500">@{selectedNode.username}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center text-xs mb-3">
+              <div>
+                <p className="font-bold text-white">{selectedNode.followerCount.toLocaleString()}</p>
+                <p className="text-gray-500">Followers</p>
+              </div>
+              <div>
+                <p className="font-bold text-green-400">{selectedNode.mutuals}</p>
+                <p className="text-gray-500">Mutuals</p>
+              </div>
+              <div>
+                <p className="font-bold text-[#f5a623]">{selectedNode.engagement.toFixed(4)}</p>
+                <p className="text-gray-500">Engagement</p>
+              </div>
+            </div>
+            <a
+              href={`/members/${selectedNode.username}`}
+              className="block text-center text-xs bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 rounded-lg py-1.5 transition-colors"
+            >
+              View Profile
+            </a>
+          </div>
+        )}
       </div>
-
-      {/* Selected Member Detail */}
-      {selectedNode && selectedConnections && (
-        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-[#f5a623]/30 space-y-3">
-          <div className="flex items-center gap-3">
-            {selectedNode.pfpUrl && (
-              <div className="w-10 h-10 relative flex-shrink-0">
-                <Image src={selectedNode.pfpUrl} alt={`${selectedNode.displayName || selectedNode.username || 'Member'} avatar`} fill className="rounded-full object-cover" unoptimized />
-              </div>
-            )}
-            <div>
-              <p className="text-sm font-semibold text-white">{selectedNode.displayName}</p>
-              <p className="text-xs text-gray-500">@{selectedNode.username}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div>
-              <p className="text-sm font-bold text-green-400">{selectedMutuals.length}</p>
-              <p className="text-[10px] text-gray-500">Mutuals</p>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-blue-400">{selectedConnections.follows.length}</p>
-              <p className="text-[10px] text-gray-500">Follows</p>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-purple-400">{selectedConnections.followedBy.length}</p>
-              <p className="text-[10px] text-gray-500">Followers</p>
-            </div>
-          </div>
-
-          {selectedMutuals.length > 0 && (
-            <div>
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Mutual with</p>
-              <div className="flex flex-wrap gap-1">
-                {selectedMutuals.map((fid) => {
-                  const m = members.find((n) => n.fid === fid);
-                  return m ? (
-                    <span key={fid} className="text-[11px] bg-green-500/10 text-green-400 px-2 py-0.5 rounded-full">
-                      {m.displayName}
-                    </span>
-                  ) : null;
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

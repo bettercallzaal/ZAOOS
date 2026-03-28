@@ -2,7 +2,30 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import type { FollowerUser } from './FollowerCard';
+
+const Sparkline = dynamic(() => import('./Sparkline').then((m) => ({ default: m.Sparkline })), { ssr: false });
+
+interface GrowthData {
+  followers: number[];
+  following: number[];
+  engagement: number[];
+  currentFollowers: number;
+  currentFollowing: number;
+  currentEngagement: number;
+  followerChange: number;
+  followingChange: number;
+  engagementChange: number;
+}
+
+interface Unfollower {
+  fid: number;
+  username: string;
+  display_name: string;
+  pfp_url: string | null;
+  unfollowed_at: string;
+}
 
 interface NetworkStats {
   followerCount: number;
@@ -70,6 +93,10 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
   const [loading, setLoading] = useState(true);
   const [followingFids, setFollowingFids] = useState<Set<number>>(new Set());
   const [followLoading, setFollowLoading] = useState<number | null>(null);
+  const [growth, setGrowth] = useState<GrowthData | null>(null);
+  const [growthLoading, setGrowthLoading] = useState(true);
+  const [unfollowers, setUnfollowers] = useState<Unfollower[] | null>(null);
+  const [unfollowersLoading, setUnfollowersLoading] = useState(true);
 
   const computeStats = useCallback((followers: FollowerUser[], profile: { follower_count: number; following_count: number }) => {
     const { follower_count: fc, following_count: fgc } = profile;
@@ -132,6 +159,31 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
     })().catch(() => { if (!s.aborted) setLoading(false); });
     return () => { ac.abort(); };
   }, [currentFid, computeStats]);
+
+  // Fetch growth trends + unfollowers (graceful 404 handling)
+  useEffect(() => {
+    const ac = new AbortController();
+    const s = ac.signal;
+    (async () => {
+      const [gR, uR] = await Promise.allSettled([
+        fetch(`/api/social/growth?days=30`, { signal: s }),
+        fetch(`/api/social/unfollowers`, { signal: s }),
+      ]);
+      if (s.aborted) return;
+      if (gR.status === 'fulfilled' && gR.value.ok) {
+        try { setGrowth(await gR.value.json()); } catch { /* malformed */ }
+      }
+      setGrowthLoading(false);
+      if (uR.status === 'fulfilled' && uR.value.ok) {
+        try {
+          const d = await uR.value.json();
+          setUnfollowers(d.unfollowers || d || []);
+        } catch { /* malformed */ }
+      }
+      setUnfollowersLoading(false);
+    })().catch(() => { if (!s.aborted) { setGrowthLoading(false); setUnfollowersLoading(false); } });
+    return () => { ac.abort(); };
+  }, [currentFid]);
 
   const handleFollow = async (targetFid: number) => {
     setFollowLoading(targetFid);
@@ -198,6 +250,83 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
         ) : null}
       </div>
 
+      {/* Growth Trends */}
+      <div>
+        <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Growth Trends (30d)</h3>
+        {growthLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 animate-pulse">
+                <Skel className="h-3 w-20 mb-3" />
+                <Skel className="h-8 w-full mb-2" />
+                <div className="flex justify-between"><Skel className="h-5 w-12" /><Skel className="h-4 w-10" /></div>
+              </div>
+            ))}
+          </div>
+        ) : growth ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {([
+              { label: 'Followers', data: growth.followers, value: growth.currentFollowers, change: growth.followerChange, color: '#f5a623' },
+              { label: 'Following', data: growth.following, value: growth.currentFollowing, change: growth.followingChange, color: '#60a5fa' },
+              { label: 'Engagement', data: growth.engagement, value: growth.currentEngagement, change: growth.engagementChange, color: '#a78bfa' },
+            ] as const).map((metric) => (
+              <div key={metric.label} className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+                <p className="text-[11px] text-gray-500 mb-2">{metric.label}</p>
+                <Sparkline data={metric.data} color={metric.color} width={120} height={32} />
+                <div className="flex items-baseline justify-between mt-2">
+                  <span className="text-lg font-bold text-white">
+                    {metric.label === 'Engagement' ? `${metric.value}%` : fmt(metric.value)}
+                  </span>
+                  <span className={`text-xs font-medium ${metric.change > 0 ? 'text-green-400' : metric.change < 0 ? 'text-red-400' : 'text-gray-500'}`}>
+                    {metric.change > 0 ? '+' : ''}{metric.change}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 px-4 py-8 text-center">
+            <p className="text-sm text-gray-500">Growth tracking starts tomorrow</p>
+            <p className="text-[11px] text-gray-600 mt-1">Daily snapshots will build your trend charts over time</p>
+          </div>
+        )}
+      </div>
+
+      {/* Recent Unfollowers */}
+      <div>
+        <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Recent Unfollowers</h3>
+        {unfollowersLoading ? (
+          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-2.5 animate-pulse">
+                <Skel className="w-8 h-8 rounded-full" />
+                <div className="flex-1 space-y-1.5"><Skel className="h-3.5 w-24" /><Skel className="h-2.5 w-16" /></div>
+              </div>
+            ))}
+          </div>
+        ) : unfollowers && unfollowers.length > 0 ? (
+          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800">
+            {unfollowers.slice(0, 8).map((u) => (
+              <div key={u.fid} className="flex items-center gap-3 px-3 py-2.5">
+                <Avatar src={u.pfp_url} alt={`${u.display_name || u.username} avatar`} />
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm font-medium text-white truncate block">{u.display_name || u.username}</span>
+                  <span className="text-[11px] text-gray-500">@{u.username}</span>
+                </div>
+                <span className="text-[10px] text-red-400/70 flex-shrink-0">
+                  {u.unfollowed_at ? new Date(u.unfollowed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'Recently'}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 px-4 py-8 text-center">
+            <p className="text-sm text-gray-500">No unfollower data yet</p>
+            <p className="text-[11px] text-gray-600 mt-1">Unfollowers are tracked with daily snapshots of your network</p>
+          </div>
+        )}
+      </div>
+
       {/* Top Engaged Followers */}
       <div>
         <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Top Engaged Followers</h3>
@@ -252,26 +381,49 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
         )}
       </div>
 
-      {/* Channel Rankings (only renders if API exists) */}
+      {/* Channel Influence */}
       {channelRanks !== null && (
         <div>
-          <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">/thezao Channel Rankings</h3>
+          <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">/thezao Channel Influence</h3>
           <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 space-y-3">
             {userRank && (
               <div className="flex items-center justify-between pb-3 border-b border-gray-800">
                 <span className="text-xs text-gray-400">Your rank</span>
-                <span className="text-lg font-bold text-[#f5a623]">#{userRank}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-[#f5a623]">#{userRank}</span>
+                  <span className="text-[10px] text-gray-600">of {channelRanks.length}</span>
+                </div>
               </div>
             )}
-            <div className="space-y-2">
-              {channelRanks.map((entry, i) => (
-                <div key={entry.fid} className={`flex items-center gap-2.5 text-sm ${entry.fid === currentFid ? 'text-[#f5a623]' : 'text-white'}`}>
-                  <span className="text-gray-600 w-5 text-right text-xs">{i + 1}.</span>
-                  <Avatar src={entry.pfp_url} alt={`${entry.display_name || entry.username} avatar`} small />
-                  <span className="font-medium truncate flex-1">{entry.display_name}</span>
-                  <span className="text-[11px] text-gray-500 tabular-nums">{entry.score}</span>
-                </div>
-              ))}
+            <div className="space-y-1">
+              {channelRanks.map((entry, i) => {
+                const isMe = entry.fid === currentFid;
+                return (
+                  <div
+                    key={entry.fid}
+                    className={`flex items-center gap-2.5 text-sm px-2 py-1.5 rounded-lg transition-colors ${
+                      isMe ? 'bg-[#f5a623]/10 ring-1 ring-[#f5a623]/30' : 'hover:bg-white/[0.02]'
+                    }`}
+                  >
+                    <span className={`w-5 text-right text-xs tabular-nums ${isMe ? 'text-[#f5a623] font-bold' : 'text-gray-600'}`}>
+                      {i + 1}.
+                    </span>
+                    <Avatar src={entry.pfp_url} alt={`${entry.display_name || entry.username} avatar`} small />
+                    <span className={`font-medium truncate flex-1 ${isMe ? 'text-[#f5a623]' : 'text-white'}`}>
+                      {entry.display_name}
+                      {isMe && <span className="text-[9px] ml-1.5 opacity-60">you</span>}
+                    </span>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <span className="text-[11px] text-gray-500 tabular-nums">{entry.score}</span>
+                      {i === 0 && (
+                        <svg className="w-3 h-3 text-[#f5a623]" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 1l2.928 6.856L20 8.59l-5.072 4.574L16.18 20 10 16.29 3.82 20l1.252-6.836L0 8.59l7.072-.734L10 1z" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

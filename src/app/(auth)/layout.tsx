@@ -4,7 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthAudioProviders } from './providers';
-import { LazyPlayer } from '@/components/music/LazyPlayer';
+import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
 import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
 
 export default async function AuthLayout({
@@ -25,7 +25,7 @@ export default async function AuthLayout({
         <Suspense fallback={null}>
           <LazyGlobalSearch />
         </Suspense>
-        <LazyPlayer />
+        <PersistentPlayerWithRadio />
         <BottomNav />
       </div>
     </AuthAudioProviders>

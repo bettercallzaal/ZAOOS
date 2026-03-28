@@ -32,3 +32,5 @@
 | [165](../165-claude-code-multi-terminal-management/) | **Claude Code Multi-Terminal Management** | claude-squad TUI, ccboard cost tracking, permission modes, worktrees + tmux, headless scripting, session naming |
 | [166](../166-dev-workflow-improvements/) | **Dev Workflow Improvements** | 580-commit analysis, 7 automations: pre-commit hooks, auto-format, session context, GH Actions review bot, scheduled agents, build gate, macOS notifications |
 | [168](../168-claude-code-community-innovations-march2026/) | **Claude Code Community Innovations (March 2026)** | Autoresearch 10x (Ole Lehmann), Council of High Intelligence multi-agent deliberation (Nyk), Learn Vibe Build education |
+| [170](../170-autoresearch-10x-eval-checklists-zao-skills/) | **Autoresearch 10x: Eval Checklists for ZAO Skills** | Lehmann vs uditgoenka comparison, ready-to-use binary eval checklists for 5 ZAO skills, dashboard + eval-guide to adopt |
+| [171](../171-council-high-intelligence-multi-agent-deliberation/) | **Council of High Intelligence** | 11-agent structured deliberation (CC0), 6 polarity pairs, 3-round protocol, anti-recursion safeguards, 3 ZAO custom triads, 6 tools compared |

@@ -90,6 +90,7 @@ Use this to quickly find if a topic has already been researched.
 - Onboarding, growth 40→1000, moderation, gamification → `32`
 - Notifications (Mini App push + Supabase + polling) → `35`
 - ZAO community ecosystem → `47`, `48`
+- AI education for music creators: Learn Vibe Build, landscape gap, ZAO Builders pilot design → `169`
 
 ## WaveWarZ Integration
 - Solana wallet, initial WaveWarZ + multi-wallet settings → `95`
@@ -167,6 +168,9 @@ Use this to quickly find if a topic has already been researched.
 - Claude Code multi-terminal management (claude-squad, ccboard, permission modes, worktrees, tmux) → `165`
 - Dev workflow improvements: git history analysis, pre-commit hooks, auto-format, GH Actions review, scheduled agents, test coverage gaps → `166`
 - Community innovations March 2026: autoresearch 10x, Council of High Intelligence, Learn Vibe Build → `168`
+- Autoresearch 10x: binary eval checklists for 5 ZAO skills, Lehmann vs uditgoenka, dashboard/eval-guide to steal → `170`
+- Council of High Intelligence: 11-agent deliberation, CC0, polarity pairs, 3 ZAO custom triads, install guide → `171`
+- Solo founder AI dev case study: 584 commits/16 days, ZAO OS build log, productivity paradox, publishable article → `172`
 - Paperclip rate limits: multi-agent API management, Anthropic tiers, staggering → `71`
 - Paperclip functionality deep dive: full agent lifecycle, heartbeat, adapter config → `72`
 - Sprint plans → `docs/superpowers/plans/`

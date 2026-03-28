@@ -20,3 +20,4 @@
 | [107](../107-social-connections-x-integration/) | **Social Connections & X Integration** | Pull X handles from Neynar, X API free tier cross-posting, settings UI restructure |
 | [110](../110-community-directory-crm/) | **Community Directory & CRM** | Replace Webflow CRM with native member directory: profiles, social links, on-chain stats |
 | [118](../118-settings-page-redesign/) | **Settings Page Redesign** | Unify 3 overlapping settings sections into one logical layout |
+| [169](../169-ai-education-music-creators-landscape/) | **AI Education for Music Creators** | Learn Vibe Build analysis, landscape gap (no music-specific AI cohorts), ZAO Builders pilot design |

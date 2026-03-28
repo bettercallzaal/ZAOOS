@@ -20,5 +20,65 @@
       "Bash(npm run:*)",
       "Bash(npx:*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "if": "Bash(git commit*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$PROJECT_DIR\" && STAGED=$(git diff --cached --name-only --diff-filter=d | grep -E '\\.(ts|tsx)$' | tr '\\n' ' '); if [ -n \"$STAGED\" ]; then npx eslint --max-warnings 10 $STAGED 2>&1 | tail -20; fi",
+            "statusMessage": "Linting staged files..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "if": "Bash(git push*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$PROJECT_DIR\" && npm run typecheck 2>&1 | tail -10",
+            "statusMessage": "Typechecking before push..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "prompt",
+            "if": "Write(research/*)",
+            "prompt": "A research document was just written. Score it against this 8-point checklist (1 point each):\n1. Recommendations/key decisions at the TOP (table or bullet list before body)\n2. ZAO OS-specific (references Next.js 16, Supabase, Farcaster, 100-member community, or codebase paths)\n3. Numbers, versions, and dates included (not vague 'recently' or 'many')\n4. Sources linked at bottom with URLs\n5. Cross-referenced with existing research docs or codebase state\n6. Actionable (tells you what to DO, not just what exists)\n7. Open-source code searched (mentions grep.app, GitHub repos, or code search results)\n8. Reference implementations documented with repo name, license, and key patterns\n\nScore: X/8. If score < 6, respond with a warning listing which items are missing and suggest the author revise before finalizing. If score >= 6, respond with the score and brief confirmation.",
+            "statusMessage": "Scoring research quality..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(src/**/*.ts)|Edit(src/**/*.tsx)|Write(src/**/*.ts)|Write(src/**/*.tsx)",
+            "command": "cd \"$PROJECT_DIR\" && npx eslint --fix \"$TOOL_ARG_FILE_PATH\" 2>/dev/null; exit 0",
+            "statusMessage": "Auto-formatting..."
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"'\"$NOTIFICATION_MESSAGE\"'\" with title \"Claude Code\" sound name \"Glass\"'"
+          }
+        ]
+      }
+    ]
   }
 }

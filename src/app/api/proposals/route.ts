@@ -151,6 +151,43 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
+    // Announce new proposal to Telegram and Discord (fire and forget)
+    Promise.allSettled([
+      // Telegram
+      (async () => {
+        if (!process.env.TELEGRAM_BOT_TOKEN) return;
+        const { publishToTelegram, escapeMarkdownV2 } = await import('@/lib/publish/telegram');
+        const descTruncated = description.length > 200 ? description.slice(0, 200) + '...' : description;
+        const msgText = `📋 New Proposal: ${title}\n\nBy ${session.displayName}\n\n${descTruncated}\n\nVote on ZAO OS`;
+        const result = await publishToTelegram({
+          text: escapeMarkdownV2(msgText),
+        });
+        if (!result.success) {
+          console.error('[proposals] Telegram announce failed:', result.error);
+        }
+      })(),
+      // Discord
+      (async () => {
+        if (!process.env.DISCORD_WEBHOOK_URL) return;
+        const { publishToDiscord, buildZaoEmbed } = await import('@/lib/publish/discord');
+        const descTruncated = description.length > 200 ? description.slice(0, 200) + '...' : description;
+        const embed = buildZaoEmbed({
+          title: `📋 New Proposal: ${title}`,
+          description: descTruncated,
+          url: 'https://zaoos.com/governance',
+          footerText: `Proposed by ${session.displayName}`,
+        });
+        const result = await publishToDiscord({
+          text: '',
+          embeds: [embed],
+          username: 'ZAO OS',
+        });
+        if (!result.success) {
+          console.error('[proposals] Discord announce failed:', result.error);
+        }
+      })(),
+    ]).catch((err) => console.error('[proposals] Cross-post error:', err));
+
     // Notify all active members about the new proposal (fire and forget)
     Promise.resolve(
       supabaseAdmin

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
+import { broadcastToChannels } from '@/lib/publish/broadcast';
 import { z } from 'zod';
 
 const reviewSchema = z.object({
@@ -79,6 +80,12 @@ export async function POST(req: NextRequest) {
         actorDisplayName: session.displayName,
         actorPfpUrl: session.pfpUrl,
       });
+
+      // Fire-and-forget broadcast to Telegram + Discord
+      broadcastToChannels({
+        text: `🎵 New track approved: ${trackLabel}\n\nListen on ZAO OS`,
+        title: 'New Track Approved',
+      }).catch(console.error);
     }
 
     return NextResponse.json({ success: true, status: newStatus });

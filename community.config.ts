@@ -67,6 +67,18 @@ export const communityConfig = {
     ],
   },
 
+  // ── Cross-Posting Channels ─────────────────────────────────
+  crossPosting: {
+    telegram: {
+      channelName: 'THE ZAO',
+      channelUrl: 'https://t.me/thezao',
+    },
+    discord: {
+      serverName: 'THE ZAO',
+      inviteUrl: 'https://discord.gg/thezao',
+    },
+  },
+
   // ── Ecosystem Partners ──────────────────────────────────────
   partners: [
     {

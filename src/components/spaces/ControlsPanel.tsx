@@ -32,7 +32,7 @@ export function ControlsPanel({
       <MicButton />
       <CameraButton />
       {isHost && <LiveButton />}
-      {isHost && <ScreenShareButton isAuthenticated={isAuthenticated} />}
+      <ScreenShareButton isHost={isHost} isAuthenticated={isAuthenticated} roomType={roomType} />
 
       {/* Music toggle */}
       {isAuthenticated && (

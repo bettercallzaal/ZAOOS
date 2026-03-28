@@ -150,6 +150,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const controllers = useRef<Partial<Record<TrackType, AudioController>>>({});
   const onEndedRef = useRef<(() => void) | null>(null);
   const pendingSeekRef = useRef<number | null>(null);
+  const scrobbledRef = useRef(false);
+  const nowPlayingRef = useRef('');
 
   // Restored track info — shown in UI but not loaded into audio until user taps play
   const [restoredTrack, setRestoredTrack] = useState<{
@@ -182,6 +184,46 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   // Ref to current state — for use in stable callbacks that shouldn't re-register on every state change
   const stateRef = useRef(state);
   useEffect(() => { stateRef.current = state; });
+
+  // Last.fm scrobbling — nowPlaying on track change, scrobble at 50% or 4 minutes
+  useEffect(() => {
+    const { position, duration, metadata, status } = state;
+    if (status !== 'playing' || !metadata || !duration) return;
+
+    // Send nowPlaying on track change
+    const trackKey = `${metadata.artistName}-${metadata.trackName}`;
+    if (trackKey !== nowPlayingRef.current) {
+      nowPlayingRef.current = trackKey;
+      scrobbledRef.current = false;
+      fetch('/api/music/scrobble', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          artist: metadata.artistName,
+          track: metadata.trackName,
+          action: 'nowplaying',
+        }),
+      }).catch(() => {});
+    }
+
+    // Scrobble after 50% or 4 minutes (Last.fm standard)
+    if (!scrobbledRef.current && duration > 30000) {
+      const halfDuration = duration / 2;
+      const fourMinutes = 240000;
+      if (position > Math.min(halfDuration, fourMinutes)) {
+        scrobbledRef.current = true;
+        fetch('/api/music/scrobble', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            artist: metadata.artistName,
+            track: metadata.trackName,
+            action: 'scrobble',
+          }),
+        }).catch(() => {});
+      }
+    }
+  }, [state.position, state.duration, state.metadata, state.status]);
 
   // Media Session API — lock screen controls + background audio keepalive
   useEffect(() => {

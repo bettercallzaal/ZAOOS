@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
-import { SolanaWalletConnect } from '@/components/solana/SolanaWalletConnect';
+import { LazySolanaWalletConnect } from '@/components/solana/LazySolanaWalletConnect';
 import type { SessionData } from '@/types';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { useENSNames } from '@/hooks/useENS';
@@ -710,7 +710,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
 
             {/* 3. Solana */}
             <div className="py-3">
-              <SolanaWalletConnect
+              <LazySolanaWalletConnect
                 savedWallet={solanaWallet}
                 onSaved={setSolanaWallet}
               />

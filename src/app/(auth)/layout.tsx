@@ -3,10 +3,9 @@ import { redirect } from 'next/navigation';
 import { getSessionData } from '@/lib/auth/session';
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
-import { QuickAddSong } from '@/components/music/QuickAddSong';
-import { GlobalSearchProvider } from '@/components/search/GlobalSearchProvider';
 import { AuthAudioProviders } from './providers';
+import { LazyPlayer } from '@/components/music/LazyPlayer';
+import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
 
 export default async function AuthLayout({
   children,
@@ -24,12 +23,9 @@ export default async function AuthLayout({
           {children}
         </ErrorBoundary>
         <Suspense fallback={null}>
-          <GlobalSearchProvider />
+          <LazyGlobalSearch />
         </Suspense>
-        <Suspense fallback={null}>
-          <QuickAddSong />
-        </Suspense>
-        <PersistentPlayerWithRadio />
+        <LazyPlayer />
         <BottomNav />
       </div>
     </AuthAudioProviders>

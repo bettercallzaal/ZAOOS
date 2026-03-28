@@ -5,8 +5,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { AuthAudioProviders } from '@/app/(auth)/providers';
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
-import { GlobalSearchProvider } from '@/components/search/GlobalSearchProvider';
+import { LazyPlayer } from '@/components/music/LazyPlayer';
+import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
 
 /**
  * Spaces layout — public page with full chrome for authenticated users.
@@ -32,9 +32,9 @@ export default function SpacesLayout({ children }: { children: React.ReactNode }
             {children}
           </ErrorBoundary>
           <Suspense fallback={null}>
-            <GlobalSearchProvider />
+            <LazyGlobalSearch />
           </Suspense>
-          <PersistentPlayerWithRadio />
+          <LazyPlayer />
           <BottomNav />
         </div>
       </AuthAudioProviders>

@@ -20,7 +20,13 @@ const nextConfig: NextConfig = {
       '@atproto/api',
       'wagmi',
       'viem',
+      'viem/chains',
+      'viem/accounts',
       '@supabase/supabase-js',
+      '@solana/wallet-adapter-react',
+      '@solana/wallet-adapter-wallets',
+      '@solana/web3.js',
+      '@xmtp/browser-sdk',
     ],
   },
 

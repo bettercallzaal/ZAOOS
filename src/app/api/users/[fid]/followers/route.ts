@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
-import { getFollowers } from '@/lib/farcaster/neynar';
+import { getFollowers, getRelevantFollowers } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
 export async function GET(
@@ -23,13 +23,27 @@ export async function GET(
   const sort = searchParams.get('sort') || 'recent';
 
   // Map sort tab to Neynar sort_type
-  const sortType = sort === 'relevant' ? 'algorithmic' as const : 'desc_chron' as const;
+  const sortType = sort === 'trending' ? 'algorithmic' as const : 'desc_chron' as const;
 
   try {
-    const data = await getFollowers(targetFid, session.fid, sortType, cursor, 100);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let users: any[];
+    let nextCursor: { cursor?: string } | null = null;
 
-    // Extract user objects from the response
-    let users = (data.users || []).map((item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item);
+    if (sort === 'relevant' && session.fid) {
+      // Use the dedicated relevant followers endpoint for viewer-relative relevance
+      const relevantData = await getRelevantFollowers(targetFid, session.fid);
+      // The relevant endpoint returns { top_relevant_followers_hydrated: [...] }
+      // Each entry has { user, ... } — extract the user objects
+      const topRelevant = relevantData.top_relevant_followers_hydrated || [];
+      users = topRelevant.map((item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item);
+      // Relevant followers endpoint returns a fixed list — no pagination
+    } else {
+      const data = await getFollowers(targetFid, session.fid, sortType, cursor, 100);
+      // Extract user objects from the response
+      users = (data.users || []).map((item: { user?: Record<string, unknown> } & Record<string, unknown>) => item.user || item);
+      nextCursor = data.next || null;
+    }
 
     // Batch check allowlist membership
     const fids = users.map((u: { fid: number }) => u.fid).filter(Boolean);
@@ -78,7 +92,7 @@ export async function GET(
 
     return NextResponse.json({
       users,
-      next: data.next || null,
+      next: nextCursor,
     });
   } catch (err) {
     console.error('Followers error:', err);

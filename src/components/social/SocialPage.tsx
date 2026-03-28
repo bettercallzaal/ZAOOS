@@ -8,16 +8,18 @@ import { FollowerSkeletonList } from './FollowerSkeleton';
 import dynamic from 'next/dynamic';
 const CommunityGraph = dynamic(() => import('./CommunityGraph').then(m => m.CommunityGraph), { ssr: false });
 const DiscoverPanel = dynamic(() => import('./DiscoverPanel').then(m => m.DiscoverPanel), { ssr: false });
+const SocialAnalytics = dynamic(() => import('./SocialAnalytics').then(m => m.SocialAnalytics), { ssr: false });
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import { MiniSpaceBanner } from './MiniSpaceBanner';
 
-type View = 'followers' | 'following' | 'community' | 'discover';
-type SortKey = 'recent' | 'relevant' | 'popular' | 'mutual' | 'zao';
+type View = 'followers' | 'following' | 'community' | 'discover' | 'analytics';
+type SortKey = 'recent' | 'relevant' | 'popular' | 'mutual' | 'zao' | 'trending';
 
 const SORT_TABS: { key: SortKey; label: string }[] = [
   { key: 'recent', label: 'Recent' },
   { key: 'relevant', label: 'Relevant' },
+  { key: 'trending', label: 'Trending' },
   { key: 'popular', label: 'Popular' },
   { key: 'mutual', label: 'Mutual' },
   { key: 'zao', label: 'ZAO' },
@@ -201,6 +203,7 @@ export function SocialPage() {
             { key: 'followers' as View, label: 'Followers' },
             { key: 'following' as View, label: 'Following' },
             { key: 'community' as View, label: 'Community' },
+            { key: 'analytics' as View, label: 'Analytics' },
             { key: 'discover' as View, label: 'Discover' },
           ]).map((t) => (
             <button
@@ -221,6 +224,13 @@ export function SocialPage() {
         {view === 'community' && (
           <div className="flex-1 overflow-y-auto">
             <CommunityGraph />
+          </div>
+        )}
+
+        {/* Analytics View */}
+        {view === 'analytics' && (
+          <div className="flex-1 overflow-y-auto">
+            <SocialAnalytics currentFid={user.fid} />
           </div>
         )}
 

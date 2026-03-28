@@ -103,6 +103,7 @@ Use this to quickly find if a topic has already been researched.
 ## Social Connections & Settings
 - X handle auto-import from Farcaster, settings UI redesign, multi-social connections -> `107`
 - Community directory CRM: replace Webflow, engagement scoring, CSV import, on-chain enrichment -> `110`
+- **Social graph analytics & discovery**: Neynar v2 + OpenRank + Airstack comparison, 9 components audited, 4-phase integration plan (OpenRank, relevant followers, persistent graph, on-chain signals) -> `198`
 
 ## Payments & Fiat On-Ramp
 - Coinflow fiat checkout (cards, ACH, Apple Pay → USDC on EVM), React SDK, webhooks, Credits → `125`

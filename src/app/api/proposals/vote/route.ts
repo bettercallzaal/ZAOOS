@@ -35,12 +35,22 @@ export async function POST(req: NextRequest) {
     }
     const { proposal_id, vote } = parsed.data;
 
-    // Check proposal is open
-    const { data: proposal } = await supabaseAdmin
-      .from('proposals')
-      .select('status, closes_at')
-      .eq('id', proposal_id)
-      .single();
+    // Fetch proposal and user in parallel (independent queries)
+    const [proposalResult, userResult] = await Promise.all([
+      supabaseAdmin
+        .from('proposals')
+        .select('status, closes_at')
+        .eq('id', proposal_id)
+        .single(),
+      supabaseAdmin
+        .from('users')
+        .select('id, primary_wallet, respect_wallet')
+        .eq('fid', session.fid)
+        .single(),
+    ]);
+
+    const proposal = proposalResult.data;
+    const user = userResult.data;
 
     if (!proposal) {
       return NextResponse.json({ error: 'Proposal not found' }, { status: 404 });
@@ -53,13 +63,6 @@ export async function POST(req: NextRequest) {
     if (proposal.closes_at && new Date(proposal.closes_at).getTime() < Date.now()) {
       return NextResponse.json({ error: 'Voting period has ended' }, { status: 400 });
     }
-
-    // Get user
-    const { data: user } = await supabaseAdmin
-      .from('users')
-      .select('id, primary_wallet, respect_wallet')
-      .eq('fid', session.fid)
-      .single();
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -241,15 +244,19 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     let bskyUri: string | null = null;
     let bskyError: string | null = null;
 
-    // Publish to Farcaster (route by category: wavewarz → WaveWarZ signer, else → @thezao)
+    // Publish to Farcaster + Bluesky in parallel (independent of each other)
     const ENV = await import('@/lib/env').then((m) => m.ENV);
     const isWavewarz = fullProposal.category === 'wavewarz';
     const signerUuid = isWavewarz ? ENV.WAVEWARZ_OFFICIAL_SIGNER_UUID : ENV.ZAO_OFFICIAL_SIGNER_UUID;
     const neynarApiKey = isWavewarz ? ENV.WAVEWARZ_OFFICIAL_NEYNAR_API_KEY : ENV.ZAO_OFFICIAL_NEYNAR_API_KEY;
     const publishChannel = isWavewarz ? 'wavewarz' : 'zao';
 
-    if (signerUuid) {
-      try {
+    const [fcResult, bskyResult] = await Promise.allSettled([
+      // Farcaster
+      (async () => {
+        if (!signerUuid) {
+          throw new Error(`Signer not configured for /${publishChannel}`);
+        }
         const { postCast } = await import('@/lib/farcaster/neynar');
         const maxLen = 1024 - attribution.length;
         const castText = publishText.length > maxLen
@@ -268,33 +275,44 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           undefined,
           neynarApiKey,
         );
-        castHash = result?.cast?.hash || null;
-        console.info(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
-      } catch (fcErr) {
-        fcError = fcErr instanceof Error ? fcErr.message : 'Farcaster publish failed';
+        return result?.cast?.hash || null;
+      })(),
+
+      // Bluesky
+      (async () => {
+        const { postToBluesky } = await import('@/lib/bluesky/client');
+        return postToBluesky(
+          publishText + attribution,
+          'https://zaoos.com/governance',
+        );
+      })(),
+    ]);
+
+    // Extract Farcaster result
+    if (fcResult.status === 'fulfilled') {
+      castHash = fcResult.value;
+      console.info(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
+    } else {
+      fcError = fcResult.reason instanceof Error ? fcResult.reason.message : 'Farcaster publish failed';
+      if (fcError.includes('Signer not configured')) {
+        console.warn(`[publish-threshold] ${fcError}`);
+      } else {
         console.error('[publish-threshold] Farcaster publish failed:', fcError);
       }
-    } else {
-      fcError = `Signer not configured for /${publishChannel}`;
-      console.warn(`[publish-threshold] ${fcError}`);
     }
 
-    // Publish to @thezao Bluesky
-    try {
-      const { postToBluesky } = await import('@/lib/bluesky/client');
-      bskyUri = await postToBluesky(
-        publishText + attribution,
-        'https://zaoos.com/governance',
-      );
+    // Extract Bluesky result
+    if (bskyResult.status === 'fulfilled') {
+      bskyUri = bskyResult.value;
       if (bskyUri) {
         console.info(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
       }
-    } catch (bskyErr) {
-      bskyError = bskyErr instanceof Error ? bskyErr.message : 'Bluesky publish failed';
+    } else {
+      bskyError = bskyResult.reason instanceof Error ? bskyResult.reason.message : 'Bluesky publish failed';
       console.error('[publish-threshold] Bluesky publish failed:', bskyError);
     }
 
-    // Publish to X, Telegram, and Discord in parallel (independent of Farcaster + Bluesky)
+    // Publish to X, Telegram, and Discord in parallel (may use castHash from Farcaster)
     let xUrl: string | null = null;
     let xError: string | null = null;
     let telegramMessageId: number | null = null;

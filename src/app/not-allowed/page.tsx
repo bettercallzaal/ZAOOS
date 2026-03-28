@@ -1,6 +1,14 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { RequestAccessButton } from './RequestAccessButton';
+
+export const metadata: Metadata = {
+  title: 'Access Restricted — ZAO OS',
+  description:
+    'ZAO OS is currently invite-only for ZAO community members. Request access to join the decentralized music community.',
+  robots: { index: false, follow: false },
+};
 
 export default function NotAllowedPage() {
   return (

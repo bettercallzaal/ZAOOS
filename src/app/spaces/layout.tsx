@@ -1,46 +1,28 @@
-'use client';
+import type { Metadata } from 'next';
+import { SpacesLayoutClient } from './SpacesLayoutClient';
 
-import { Suspense } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { AuthAudioProviders } from '@/app/(auth)/providers';
-import { BottomNav } from '@/components/navigation/BottomNav';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { LazyPlayer } from '@/components/music/LazyPlayer';
-import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
+export const metadata: Metadata = {
+  title: 'Spaces — ZAO OS',
+  description:
+    'Live audio rooms for the ZAO community. Join conversations, listen to music together, and connect with fellow artists in real time.',
+  openGraph: {
+    title: 'Spaces — ZAO OS',
+    description:
+      'Live audio rooms for the ZAO community. Join conversations and connect with fellow artists.',
+    url: 'https://zaoos.com/spaces',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Spaces — ZAO OS',
+    description:
+      'Live audio rooms for the ZAO community. Join conversations and connect with fellow artists.',
+  },
+};
 
 /**
- * Spaces layout — public page with full chrome for authenticated users.
- * Guest users get the page without nav/player/audio providers.
+ * Spaces layout — server component for SEO metadata,
+ * delegates rendering to SpacesLayoutClient for auth-dependent chrome.
  */
 export default function SpacesLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-[100dvh] bg-[#0a1628] flex items-center justify-center text-gray-400">
-        Loading...
-      </div>
-    );
-  }
-
-  // Authenticated users get full layout matching (auth) pages
-  if (user) {
-    return (
-      <AuthAudioProviders>
-        <div className="md:pt-10">
-          <ErrorBoundary>
-            {children}
-          </ErrorBoundary>
-          <Suspense fallback={null}>
-            <LazyGlobalSearch />
-          </Suspense>
-          <LazyPlayer />
-          <BottomNav />
-        </div>
-      </AuthAudioProviders>
-    );
-  }
-
-  // Guest users get minimal layout
-  return <>{children}</>;
+  return <SpacesLayoutClient>{children}</SpacesLayoutClient>;
 }

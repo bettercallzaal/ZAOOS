@@ -50,6 +50,9 @@ function ScreenShareView() {
 export function RoomView({ isHost, isAuthenticated = false, roomId }: RoomViewProps) {
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const { useCallCustomData } = useCallStateHooks();
+  const callCustomData = useCallCustomData();
+  const roomTitle = (callCustomData as Record<string, string>)?.title || 'Audio Room';
 
   const handleStartBroadcast = async (_targets: BroadcastTarget[]) => {
     // Phase 2: wire up actual RTMP relay API here
@@ -84,6 +87,7 @@ export function RoomView({ isHost, isAuthenticated = false, roomId }: RoomViewPr
         onStartBroadcast={handleStartBroadcast}
         onStopBroadcast={handleStopBroadcast}
         isBroadcasting={isBroadcasting}
+        roomTitle={roomTitle}
       />
     </div>
   );

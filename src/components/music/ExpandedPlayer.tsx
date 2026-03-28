@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { usePlayer } from '@/providers/audio';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
@@ -16,7 +17,13 @@ import { SleepTimer } from '@/components/music/SleepTimer';
 import { ShareMenu } from '@/components/music/ShareMenu';
 import { QueuePanel } from '@/components/music/QueuePanel';
 import { useQueue } from '@/contexts/QueueContext';
+import { extractDominantColor } from '@/lib/music/colorExtractor';
 import type { TrackMetadata } from '@/types/music';
+
+const SpectrumVisualizer = dynamic(
+  () => import('@/components/music/SpectrumVisualizer'),
+  { ssr: false }
+);
 
 interface ExpandedPlayerProps {
   metadata: TrackMetadata;
@@ -32,6 +39,14 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
   const [showLyrics, setShowLyrics] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
+  const [bgColor, setBgColor] = useState({ r: 10, g: 22, b: 40 }); // navy default
+  const [activePanel, setActivePanel] = useState<'eq' | 'lyrics' | 'queue' | 'share' | null>(null);
+
+  useEffect(() => {
+    if (metadata?.artworkUrl) {
+      extractDominantColor(metadata.artworkUrl).then(setBgColor);
+    }
+  }, [metadata?.artworkUrl]);
 
   // ─── Swipe down to dismiss ──────────────────────────────────────────
   const touchStartY = useRef(0);
@@ -69,12 +84,21 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-[#0a1628] flex flex-col"
+      className="fixed inset-0 z-50 bg-[#0a1628] flex flex-col relative overflow-hidden"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
+      {/* ─── Glassmorphism background layers ───────────────────────── */}
+      <div
+        className="absolute inset-0 transition-colors duration-500 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.2), transparent 70%)`,
+        }}
+      />
+      <div className="absolute inset-0 backdrop-blur-xl pointer-events-none" />
+
       {/* ─── Header: drag handle + close ───────────────────────────── */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0">
+      <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0">
         <button
           onClick={onClose}
           className="p-2 text-gray-400 hover:text-white transition-colors"
@@ -90,7 +114,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
 
       {/* ─── Artwork / Lyrics (large, swipeable) ─────────────────── */}
       <div
-        className="flex-1 flex items-center justify-center px-8 min-h-0"
+        className="relative z-10 flex-1 flex items-center justify-center px-8 min-h-0"
         onTouchStart={onArtworkTouchStart}
         onTouchEnd={onArtworkTouchEnd}
       >
@@ -141,7 +165,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
       </div>
 
       {/* ─── Track info ────────────────────────────────────────────── */}
-      <div className="px-8 pt-6 pb-2 flex-shrink-0">
+      <div className="relative z-10 px-8 pt-6 pb-2 flex-shrink-0">
         <p className="text-xl font-bold text-white truncate">{metadata.trackName}</p>
         {metadata.artistName && (
           <p className="text-sm text-gray-400 truncate mt-1">{metadata.artistName}</p>
@@ -149,7 +173,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
       </div>
 
       {/* ─── Scrubber ──────────────────────────────────────────────── */}
-      <div className="px-8 py-2 flex-shrink-0">
+      <div className="relative z-10 px-8 py-2 flex-shrink-0">
         <Scrubber
           position={position}
           duration={duration}
@@ -159,7 +183,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
       </div>
 
       {/* ─── Waveform Comments ───────────────────────────────────── */}
-      <div className="px-8 py-1 flex-shrink-0">
+      <div className="relative z-10 px-8 py-1 flex-shrink-0">
         <WaveformComments
           songUrl={metadata.url}
           duration={duration}
@@ -168,7 +192,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
       </div>
 
       {/* ─── Transport controls ────────────────────────────────────── */}
-      <div className="flex items-center justify-center gap-6 py-4 flex-shrink-0">
+      <div className="relative z-10 flex items-center justify-center gap-6 py-4 flex-shrink-0">
         {/* Shuffle */}
         <button
           onClick={player.toggleShuffle}
@@ -240,8 +264,71 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
         </button>
       </div>
 
+      {/* ─── Spectrum Visualizer ───────────────────────────────────── */}
+      <div className="relative z-10 flex-shrink-0">
+        <SpectrumVisualizer isPlaying={isPlaying} className="mx-4 my-3" />
+      </div>
+
+      {/* ─── Panel icon bar ────────────────────────────────────────── */}
+      <div className="relative z-10 flex justify-around border-t border-white/10 pt-3 mt-1 px-8 flex-shrink-0">
+        {[
+          { id: 'eq' as const, icon: '🎚️', label: 'EQ' },
+          { id: 'lyrics' as const, icon: '🎵', label: 'Lyrics' },
+          { id: 'queue' as const, icon: '📝', label: 'Queue' },
+          { id: 'share' as const, icon: '🔗', label: 'Share' },
+        ].map((item) => (
+          <button
+            key={item.id}
+            onClick={() => {
+              const next = activePanel === item.id ? null : item.id;
+              setActivePanel(next);
+              if (item.id === 'lyrics') setShowLyrics(next === 'lyrics');
+              if (item.id === 'queue') setShowQueue(next === 'queue');
+              if (item.id === 'eq') setShowFilters(next === 'eq');
+            }}
+            className={`flex flex-col items-center gap-1 text-xs transition-colors ${
+              activePanel === item.id ? 'text-[#f5a623]' : 'text-gray-500'
+            }`}
+          >
+            <span className="text-lg">{item.icon}</span>
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ─── Active panel content ───────────────────────────────────── */}
+      {activePanel !== null && (
+        <div className="relative z-10 px-4 flex-shrink-0">
+          {activePanel === 'lyrics' && (
+            <div className="w-full max-h-48 bg-white/5 rounded-2xl overflow-hidden">
+              <LyricsPanel
+                trackName={metadata.trackName}
+                artistName={metadata.artistName || ''}
+                className="h-48"
+              />
+            </div>
+          )}
+          {activePanel === 'queue' && (
+            <QueuePanel onClose={() => { setActivePanel(null); setShowQueue(false); }} />
+          )}
+          {activePanel === 'share' && (
+            <div className="flex justify-center py-3">
+              <ShareMenu
+                trackName={metadata.trackName}
+                artistName={metadata.artistName || ''}
+                artworkUrl={metadata.artworkUrl}
+                trackUrl={metadata.url}
+              />
+            </div>
+          )}
+          {activePanel === 'eq' && (
+            <AudioFiltersPanel visible={true} />
+          )}
+        </div>
+      )}
+
       {/* ─── Action buttons + Volume ───────────────────────────────── */}
-      <div className="px-8 pb-6 flex-shrink-0 space-y-4">
+      <div className="relative z-10 px-8 pb-6 flex-shrink-0 space-y-4">
         {/* Actions row */}
         <div className="flex items-center justify-between">
           <LikeButton songUrl={metadata.url} className="flex-shrink-0" />

@@ -29,7 +29,7 @@ async function fetchRoom(id: string): Promise<Room> {
   return data.room;
 }
 
-export default function RoomPage() {
+export default function PublicRoomPage() {
   const params = useParams();
   const router = useRouter();
   const roomId = params.id as string;
@@ -143,17 +143,27 @@ export default function RoomPage() {
             <p className="text-gray-400 text-xs">{room.description}</p>
           )}
         </div>
-        <button
-          onClick={handleLeave}
-          className="px-4 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors"
-        >
-          {isHost ? 'End Room' : 'Leave'}
-        </button>
+        <div className="flex items-center gap-2">
+          {!user && (
+            <a
+              href="/"
+              className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
+            >
+              Sign in to speak
+            </a>
+          )}
+          <button
+            onClick={handleLeave}
+            className="px-4 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors"
+          >
+            {isHost ? 'End Room' : 'Leave'}
+          </button>
+        </div>
       </header>
       <div className="flex-1">
         <StreamVideo client={client}>
           <StreamCall call={call}>
-            <RoomView isHost={isHost} />
+            <RoomView isHost={isHost} roomId={room.id} />
           </StreamCall>
         </StreamVideo>
       </div>

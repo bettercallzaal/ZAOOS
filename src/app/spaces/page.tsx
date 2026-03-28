@@ -5,11 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { RoomList } from '@/components/spaces/RoomList';
 import { HostRoomModal } from '@/components/spaces/HostRoomModal';
-import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { generateCallId } from '@/lib/spaces/streamHelpers';
 import type { Room } from '@/lib/spaces/roomsDb';
 
-export default function SpacesPage() {
+export default function PublicSpacesPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [showHostModal, setShowHostModal] = useState(false);
@@ -43,7 +42,14 @@ export default function SpacesPage() {
       <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex-shrink-0">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-sm text-gray-300">Spaces</h2>
-          <div className="md:hidden"><NotificationBell /></div>
+          {!user && (
+            <a
+              href="/"
+              className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
+            >
+              Sign in to host
+            </a>
+          )}
         </div>
       </header>
 
@@ -56,11 +62,13 @@ export default function SpacesPage() {
         />
       </div>
 
-      <HostRoomModal
-        isOpen={showHostModal}
-        onClose={() => setShowHostModal(false)}
-        onCreateRoom={handleCreateRoom}
-      />
+      {user && (
+        <HostRoomModal
+          isOpen={showHostModal}
+          onClose={() => setShowHostModal(false)}
+          onCreateRoom={handleCreateRoom}
+        />
+      )}
     </div>
   );
 }

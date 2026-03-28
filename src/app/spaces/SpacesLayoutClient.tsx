@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { AuthAudioProviders } from '@/app/(auth)/providers';
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { LazyPlayer } from '@/components/music/LazyPlayer';
+import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
 import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
 import ChannelSidebar from '@/components/spaces/ChannelSidebar';
 import ChannelStrip from '@/components/spaces/ChannelStrip';
@@ -167,7 +167,7 @@ export function SpacesLayoutClient({ children }: { children: React.ReactNode }) 
           <Suspense fallback={null}>
             <LazyGlobalSearch />
           </Suspense>
-          <LazyPlayer />
+          <PersistentPlayerWithRadio />
           <BottomNav />
         </div>
       </AuthAudioProviders>

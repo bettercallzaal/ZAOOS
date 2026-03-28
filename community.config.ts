@@ -28,6 +28,15 @@ export const communityConfig = {
   adminFids: [19640],
   adminWallets: [],
 
+  // ── Spaces ─────────────────────────────────────────────────────
+  voiceChannels: [
+    { id: 'general-hangout', name: 'General Hangout', emoji: '💬', description: 'Casual conversation' },
+    { id: 'fractal-call', name: 'Fractal Call', emoji: '📞', description: 'Monday 6pm EST weekly fractal' },
+    { id: 'music-lounge', name: 'Music Lounge', emoji: '🎵', description: 'Always-on listening room' },
+    { id: 'tech-talk', name: 'Tech Talk', emoji: '💻', description: 'Technical discussions' },
+    { id: 'coworking', name: 'Coworking', emoji: '🏢', description: 'Silent cowork with ambient presence' },
+  ],
+
   // ── Respect Contracts (Optimism) ──────────────────────────────
   respect: {
     ogContract: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as `0x${string}`,

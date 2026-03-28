@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSession } from '@/lib/auth/session'
 import { getSupabaseAdmin } from '@/lib/db/supabase'
 import { scrobble, updateNowPlaying } from '@/lib/music/lastfm'
+import { submitListen, submitNowPlaying } from '@/lib/music/listenbrainz'
 
 const ScrobbleSchema = z.object({
   artist: z.string().min(1),
@@ -29,26 +30,43 @@ export async function POST(req: NextRequest) {
     const supabase = getSupabaseAdmin()
     const { data: settings } = await supabase
       .from('user_settings')
-      .select('lastfm_session_key')
+      .select('lastfm_session_key, listenbrainz_token')
       .eq('fid', session.fid)
       .single()
 
-    if (!settings?.lastfm_session_key) {
+    if (!settings?.lastfm_session_key && !settings?.listenbrainz_token) {
       return NextResponse.json({ error: 'Last.fm not connected' }, { status: 400 })
     }
 
     const sk = settings.lastfm_session_key
 
-    if (action === 'scrobble') {
-      await scrobble({
-        artist,
-        track,
-        album,
-        timestamp: Math.floor(Date.now() / 1000),
-        sk,
-      })
-    } else {
-      await updateNowPlaying({ artist, track, album, sk })
+    // Last.fm scrobble
+    if (sk) {
+      if (action === 'scrobble') {
+        await scrobble({ artist, track, album, timestamp: Math.floor(Date.now() / 1000), sk });
+      } else {
+        await updateNowPlaying({ artist, track, album, sk });
+      }
+    }
+
+    // ListenBrainz scrobble (fire-and-forget)
+    if (settings?.listenbrainz_token) {
+      try {
+        if (action === 'scrobble') {
+          await submitListen({
+            artist, track, album,
+            timestamp: Math.floor(Date.now() / 1000),
+            userToken: settings.listenbrainz_token,
+          });
+        } else {
+          await submitNowPlaying({
+            artist, track, album,
+            userToken: settings.listenbrainz_token,
+          });
+        }
+      } catch (lbError) {
+        console.error('[scrobble] ListenBrainz error:', lbError);
+      }
     }
 
     return NextResponse.json({ success: true })

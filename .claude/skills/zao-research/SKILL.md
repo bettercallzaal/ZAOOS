@@ -92,9 +92,47 @@ Use WebSearch and WebFetch to gather information beyond code. Always:
 See [new-research.md](./new-research.md) for the template. Key rules:
 - Next available number: check `research/` folder for highest number, use next
 - Create folder: `research/{number}-{topic-name}/README.md`
-- Put recommendations/decisions at the TOP — readers get value in 30 seconds
+- **The FIRST section after the header MUST be "## Key Decisions / Recommendations"** — this is non-negotiable. No preamble, no background, no context paragraphs before it. Readers get value in 30 seconds.
 - Include a "Reference Implementations" section when open-source code was found
 - Update `research/README.md` index in the appropriate topic category
+
+### Mandatory Document Structure
+
+Every research doc MUST follow this skeleton. Sections marked REQUIRED cannot be omitted.
+
+```markdown
+# {number} — {Title}
+
+> **Status:** Research complete
+> **Date:** {date}
+> **Goal:** {one sentence}
+
+## Key Decisions / Recommendations          ← REQUIRED, MUST be first ## section
+
+| Decision | Recommendation |
+|----------|----------------|
+| ...      | USE X because [reason] |
+
+## Comparison of Options                     ← REQUIRED, 3+ rows minimum
+
+| Option | Col A | Col B | Col C |
+|--------|-------|-------|-------|
+| X      | ...   | ...   | ...   |
+| Y      | ...   | ...   | ...   |
+| Z      | ...   | ...   | ...   |
+
+## ZAO OS Integration                       ← REQUIRED, must reference file paths
+
+How this connects to the codebase. Reference specific files like
+`src/app/api/...`, `src/components/...`, `community.config.ts`.
+
+## {Additional sections as needed}
+
+## Sources                                   ← REQUIRED, 2+ URLs minimum
+
+- [Source 1](https://...)
+- [Source 2](https://...)
+```
 
 ### Step 7: Update Skill Indexes
 
@@ -109,8 +147,11 @@ After saving a new doc, update these files in this skill:
 - **NEVER trust research docs over code.** If doc 4 says "respect has tiers" but `src/lib/respect/` has no tier logic, the code wins. Mark the discrepancy.
 - **NEVER skip the codebase check.** Even if you think the topic is purely external, check if any part of it is already built or referenced in the code.
 - **NEVER skip the open-source code search.** Even if the topic seems novel, someone has likely built something similar. Check grep.app or GitHub first.
-- **NEVER write vague recommendations** like "consider using X." Say "USE X because [reason], here's how it fits ZAO OS's stack."
-- **NEVER omit sources.** Every claim from external research must have a linked source. Every code reference must include repo, file path, and license.
+- **NEVER write vague recommendations** like "consider using X." Say "USE X because [reason], here's how it fits ZAO OS's stack." See the Banned Phrases table below.
+- **NEVER omit the comparison table.** Every research doc MUST include a markdown table comparing at least 3 options/alternatives with multiple columns. Even if the choice is obvious, show why by comparing.
+- **NEVER omit sources.** Every doc MUST end with a `## Sources` section containing at least 2 clickable URLs. Every claim from external research must have a linked source.
+- **NEVER omit ZAO OS file paths.** Every doc MUST reference at least 1 specific file path from the codebase (e.g., `src/app/api/...`, `src/components/...`, `community.config.ts`).
+- **NEVER omit concrete numbers.** Every doc MUST contain at least 3 specific numbers (versions, prices, dates, stats, limits). No vague "recently" or "many."
 - **NEVER forget to update the index.** A research doc that isn't in `research/README.md` is invisible.
 - **NEVER copy code without checking the license.** MIT/Apache-2.0 = safe. AGPL = viral, flag it. No license = assume proprietary.
 
@@ -125,20 +166,47 @@ Research docs contain aspirational designs that may not match what's actually bu
 
 When in doubt, check `community.config.ts` and the actual API routes for ground truth.
 
-## Quality Checklist (Score Every Output Against This)
+## Hard Requirements (All 6 Must Pass — Binary, No Exceptions)
 
-Before saving any research doc, verify ALL 8 items:
+Every research doc MUST pass ALL 6 of these checks. If any fails, revise before saving.
 
-- [ ] Recommendations/key decisions at the top (not buried in body)
-- [ ] Specific to ZAO OS (references tech stack, community size, or codebase paths)
-- [ ] Numbers, versions, and dates included (not vague "recently" or "many")
-- [ ] Sources linked at the bottom with URLs
+| # | Requirement | How to Verify |
+|---|-------------|---------------|
+| 1 | **Recommendations FIRST** | The FIRST `##` section is "Key Decisions / Recommendations" — no background, no intro, no context before it |
+| 2 | **At least 1 ZAO OS file path** | Doc references a specific file like `src/app/api/...`, `src/components/...`, `src/lib/...`, or `community.config.ts` |
+| 3 | **At least 3 specific numbers** | Contains 3+ concrete numbers: versions (e.g., v2.1.0), prices ($0/mo), dates (March 2026), stats (42KB bundle), limits (100 participants) |
+| 4 | **Sources section with 2+ URLs** | A `## Sources` section at the bottom with at least 2 clickable URLs (docs, repos, specs) |
+| 5 | **Comparison table with 3+ options** | A markdown table comparing at least 3 alternatives/options with multiple columns |
+| 6 | **No vague language** | Zero instances of banned phrases (see list below) |
+
+### Banned Phrases — NEVER Use These
+
+The following phrases are BANNED from research output. Use the direct alternative instead.
+
+| BANNED phrase | USE INSTEAD |
+|---------------|-------------|
+| "consider using" | "USE [X] because [reason]" |
+| "it might be worth" | "[X] is worth it because [reason]" or "SKIP [X] because [reason]" |
+| "you could explore" | "USE [X]" or "SKIP [X]" |
+| "it may be beneficial" | "[X] saves [time/money/complexity] because [reason]" |
+| "one option is" | "The best option is [X] because [reason]" |
+| "worth investigating" | "INVESTIGATE [X] — [specific question to answer]" |
+| "potentially useful" | "[X] solves [specific problem]" or "SKIP [X] — not needed because [reason]" |
+| "could be interesting" | "[X] does [specific thing ZAO needs]" |
+| "it depends" | State the decision for ZAO's specific context |
+
+**Rule: Every recommendation must be a direct statement.** Not "you might want to use LiveKit" but "USE LiveKit — free tier covers 100 participants, MIT-licensed, 42KB bundle."
+
+## Additional Quality Checks
+
+Beyond the 6 hard requirements, also verify:
+
 - [ ] Cross-referenced with existing research or codebase state
 - [ ] Actionable (tells you what to DO, not just what exists)
 - [ ] Open-source code searched (grep.app / GitHub / known reference repos)
 - [ ] Reference implementations documented with repo, license, and key patterns (if applicable)
 
-**Scoring:** Count passing items out of 8. Target: 7/8 or 8/8 on every doc. If score < 6/8, revise before saving.
+**Scoring:** All 6 hard requirements must pass (binary). Additional checks are best-effort — target 3/4 or 4/4.
 
 ## Worked Example: Good vs Bad Research Output
 
@@ -199,7 +267,7 @@ export default async function RoomPage({ params }: { params: { name: string } })
 
 - [LiveKit Docs](https://docs.livekit.io)
 - [livekit/meet repo](https://github.com/livekit/meet) — Apache-2.0
-- [Doc 43 — WebRTC Audio Rooms](../43-webrtc-audio-rooms-streaming/)
+- [Doc 43 — WebRTC Audio Rooms](../043-webrtc-audio-rooms-streaming/)
 ```
 
 ## Reference Repos for ZAO OS

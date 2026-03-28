@@ -95,8 +95,8 @@ supabase/                 # Database config
 
 155+ research documents in `research/`. Start with:
 - `research/README.md` — full index organized by topic
-- `research/50-the-zao-complete-guide/` — canonical project reference
-- `research/51-zao-whitepaper-2026/` — whitepaper Draft 4.5
+- `research/050-the-zao-complete-guide/` — canonical project reference
+- `research/051-zao-whitepaper-2026/` — whitepaper Draft 4.5
 - `research/154-skills-commands-master-reference/` — **CANONICAL** all commands/skills reference
 
 Use the `/zao-research` skill for conducting new research.

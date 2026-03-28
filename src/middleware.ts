@@ -135,6 +135,9 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/broadcast')) {
     return { limit: 15, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/chat/assistant')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
   return null;
 }
 

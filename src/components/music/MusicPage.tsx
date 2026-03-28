@@ -11,6 +11,13 @@ import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
 import { RespectTrending } from '@/components/music/RespectTrending';
 import { PageHeader } from '@/components/navigation/PageHeader';
+import type { OmnibarResult } from '@/components/music/MusicOmnibar';
+import type { TrackMetadata } from '@/types/music';
+
+const MusicOmnibar = dynamic(
+  () => import('@/components/music/MusicOmnibar'),
+  { ssr: false },
+);
 
 const AudiusDiscover = dynamic(
   () => import('@/components/music/AudiusDiscover').then((m) => m.AudiusDiscover),
@@ -143,9 +150,31 @@ export function MusicPage() {
     else player.resume();
   };
 
+  const handleOmnibarPlay = useCallback(
+    (track: OmnibarResult) => {
+      const metadata: TrackMetadata = {
+        id: track.id,
+        type: (track.platform as TrackMetadata['type']) || 'audio',
+        trackName: track.title,
+        artistName: track.artist,
+        artworkUrl: track.artworkUrl,
+        url: track.url,
+        streamUrl: track.streamUrl,
+        feedId: track.id,
+      };
+      player.play(metadata);
+    },
+    [player],
+  );
+
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-24 md:pt-12">
       <PageHeader title="Music" subtitle="Radio, playlists & discovery" />
+
+      {/* ── Smart Omnibar ────────────────────────────────────────── */}
+      <div className="max-w-2xl mx-auto px-4 pt-4">
+        <MusicOmnibar onPlay={handleOmnibarPlay} />
+      </div>
 
       {/* ── Track of the Day Hero Banner ─────────────────────────── */}
       <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-0">

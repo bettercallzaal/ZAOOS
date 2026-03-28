@@ -120,7 +120,7 @@ function addSecurityHeaders(response: NextResponse, nonce?: string, pathname?: s
   return response;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Apply rate limiting to API routes
@@ -132,7 +132,7 @@ export function middleware(request: NextRequest) {
       || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
       || 'unknown';
     const key = `${ip}:${pathname}`;
-    const result = rateLimit(key, config.limit, config.windowMs);
+    const result = await rateLimit(key, config.limit, config.windowMs);
 
     if (!result.success) {
       const errorResponse = NextResponse.json(

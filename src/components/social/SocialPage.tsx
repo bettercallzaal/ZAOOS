@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 const CommunityGraph = dynamic(() => import('./CommunityGraph').then(m => m.CommunityGraph), { ssr: false });
 const DiscoverPanel = dynamic(() => import('./DiscoverPanel').then(m => m.DiscoverPanel), { ssr: false });
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { PageHeader } from '@/components/navigation/PageHeader';
 import { MiniSpaceBanner } from './MiniSpaceBanner';
 
 type View = 'followers' | 'following' | 'community' | 'discover';
@@ -36,6 +37,13 @@ export function SocialPage() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [totalLabel, setTotalLabel] = useState('');
   const parentRef = useRef<HTMLDivElement>(null);
+
+  // Advanced filters
+  const [minFollowers, setMinFollowers] = useState(0);
+  const [zaoOnly, setZaoOnly] = useState(false);
+  const [mutualOnly, setMutualOnly] = useState(false);
+  const [hasBio, setHasBio] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const isListView = view === 'followers' || view === 'following';
 
@@ -92,16 +100,16 @@ export function SocialPage() {
   useEffect(() => {
     if (!user || !isListView) return;
     const controller = new AbortController();
-    fetch(`/api/search/users?q=${encodeURIComponent(user.username)}`, { signal: controller.signal })
+    fetch(`/api/users/${user.fid}`, { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         if (controller.signal.aborted) return;
-        const me = data.users?.find((u: { fid: number }) => u.fid === user.fid);
-        if (me) {
+        const u = data.user || data;
+        if (u) {
           setTotalLabel(
             view === 'followers'
-              ? `${me.follower_count?.toLocaleString() ?? '?'} followers`
-              : `${me.following_count?.toLocaleString() ?? '?'} following`
+              ? `${(u.follower_count ?? 0).toLocaleString()} followers`
+              : `${(u.following_count ?? 0).toLocaleString()} following`
           );
         }
       })
@@ -132,8 +140,26 @@ export function SocialPage() {
       );
     }
 
+    if (minFollowers > 0) {
+      result = result.filter((u) => u.follower_count >= minFollowers);
+    }
+
+    if (zaoOnly) {
+      result = result.filter((u) => u.isZaoMember);
+    }
+
+    if (mutualOnly) {
+      result = result.filter((u) => u.viewer_context?.following && u.viewer_context?.followed_by);
+    }
+
+    if (hasBio) {
+      result = result.filter((u) => u.profile?.bio?.text && u.profile.bio.text.trim().length > 0);
+    }
+
     return result;
-  }, [users, search, powerBadgeOnly, hideSpam]);
+  }, [users, search, powerBadgeOnly, hideSpam, minFollowers, zaoOnly, mutualOnly, hasBio]);
+
+  const activeFilterCount = [powerBadgeOnly, hideSpam, minFollowers > 0, zaoOnly, mutualOnly, hasBio].filter(Boolean).length;
 
   // Virtual scrolling
   const virtualizer = useVirtualizer({
@@ -160,20 +186,11 @@ export function SocialPage() {
     <div className="flex h-[100dvh] pb-14 md:pb-0 md:h-[calc(100dvh-2.5rem)] bg-[#0a1628] text-white overflow-hidden">
       <div className="flex-1 flex flex-col min-w-0 max-w-2xl mx-auto w-full">
         {/* Header */}
-        <header className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex-shrink-0">
-          <a href="/home" className="text-gray-400 hover:text-white transition-colors md:hidden" aria-label="Back to chat">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-          </a>
-          <div className="flex-1">
-            <h1 className="text-base font-semibold text-white">Social Graph</h1>
-            {isListView && totalLabel && <p className="text-xs text-gray-500">{totalLabel}</p>}
-          </div>
-          <div className="md:hidden">
-            <NotificationBell />
-          </div>
-        </header>
+        <PageHeader
+          title="Social Graph"
+          subtitle={isListView && totalLabel ? totalLabel : 'Your Farcaster network'}
+          rightAction={<div className="md:hidden"><NotificationBell /></div>}
+        />
 
         {/* Live room banner — only renders when a room is active */}
         <MiniSpaceBanner />
@@ -250,32 +267,90 @@ export function SocialPage() {
               ))}
             </div>
 
-            {/* Filter toggles */}
-            <div className="flex items-center gap-4 px-4 pb-3">
-              <label className="flex items-center gap-1.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={powerBadgeOnly}
-                  onChange={(e) => setPowerBadgeOnly(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50"
-                />
-                <span className="text-xs text-gray-400">Power badge</span>
-              </label>
-              <label className="flex items-center gap-1.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={hideSpam}
-                  onChange={(e) => setHideSpam(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50"
-                />
-                <span className="text-xs text-gray-400">Hide spam</span>
-              </label>
+            {/* Filter bar */}
+            <div className="flex items-center gap-2 px-4 pb-2">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border transition-colors ${
+                  showFilters || activeFilterCount > 0
+                    ? 'border-[#f5a623]/50 text-[#f5a623] bg-[#f5a623]/5'
+                    : 'border-gray-700/50 text-gray-400 hover:text-white'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                </svg>
+                Filters
+                {activeFilterCount > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-[#f5a623] text-[#0a1628] text-[10px] font-bold flex items-center justify-center">{activeFilterCount}</span>
+                )}
+              </button>
+              {/* Quick toggles */}
+              {[
+                { label: 'ZAO', active: zaoOnly, toggle: () => setZaoOnly(!zaoOnly) },
+                { label: 'Mutual', active: mutualOnly, toggle: () => setMutualOnly(!mutualOnly) },
+                { label: 'No spam', active: hideSpam, toggle: () => setHideSpam(!hideSpam) },
+              ].map((t) => (
+                <button
+                  key={t.label}
+                  onClick={t.toggle}
+                  className={`px-2.5 py-1 text-[11px] rounded-full border transition-colors ${
+                    t.active
+                      ? 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/40'
+                      : 'text-gray-500 border-gray-700/50 hover:text-white hover:border-gray-600'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
               {filtered.length !== users.length && (
-                <span className="text-xs text-gray-600 ml-auto">
-                  {filtered.length} of {users.length}
+                <span className="text-[10px] text-gray-600 ml-auto">
+                  {filtered.length}/{users.length}
                 </span>
               )}
             </div>
+
+            {/* Expanded filter panel */}
+            {showFilters && (
+              <div className="mx-4 mb-2 p-3 bg-[#0d1b2a] rounded-xl border border-gray-800 space-y-3">
+                <div className="flex flex-wrap gap-3">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked={powerBadgeOnly} onChange={(e) => setPowerBadgeOnly(e.target.checked)} className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50" />
+                    <span className="text-xs text-gray-400">Power badge only</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="checkbox" checked={hasBio} onChange={(e) => setHasBio(e.target.checked)} className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50" />
+                    <span className="text-xs text-gray-400">Has bio</span>
+                  </label>
+                </div>
+                <div>
+                  <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Min followers</label>
+                  <div className="flex gap-1.5">
+                    {[0, 10, 100, 1000, 10000].map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => setMinFollowers(n)}
+                        className={`px-2.5 py-1 text-[11px] rounded-full border transition-colors ${
+                          minFollowers === n
+                            ? 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/40'
+                            : 'text-gray-500 border-gray-700/50 hover:text-white'
+                        }`}
+                      >
+                        {n === 0 ? 'Any' : n >= 1000 ? `${n / 1000}K+` : `${n}+`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={() => { setPowerBadgeOnly(false); setHideSpam(false); setMinFollowers(0); setZaoOnly(false); setMutualOnly(false); setHasBio(false); }}
+                    className="text-[11px] text-red-400 hover:text-red-300"
+                  >
+                    Clear all filters
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* User list with virtual scrolling */}
             <div ref={parentRef} className="flex-1 overflow-y-auto">

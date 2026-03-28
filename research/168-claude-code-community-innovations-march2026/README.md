@@ -189,10 +189,10 @@ A full 11-member council consumes significant context and API cost. For a solo f
 
 | Existing Doc | Relationship to This Research |
 |---|---|
-| [Doc 62 — Autoresearch Skill Improvement](../62-autoresearch-skill-improvement/) | Covers the same autoresearch loop. Doc 168 adds Lehmann's binary checklist pattern and specific results data. |
-| [Doc 63 — Autoresearch Deep Dive](../63-autoresearch-deep-dive-zao-applications/) | 7 ZAO use cases for autoresearch. Doc 168 adds the eval checklist template for `/zao-research`. |
-| [Doc 70 — Sub-agents vs Agent Teams](../70-subagents-vs-agent-teams/) | Two multi-agent paradigms. Doc 168 adds a third: structured adversarial deliberation (Council). |
-| [Doc 89 — Paperclip + gstack + Autoresearch Stack](../89-paperclip-gstack-autoresearch-stack/) | Workflow tool ecosystem. Council adds a new decision-making layer. |
+| [Doc 62 — Autoresearch Skill Improvement](../062-autoresearch-skill-improvement/) | Covers the same autoresearch loop. Doc 168 adds Lehmann's binary checklist pattern and specific results data. |
+| [Doc 63 — Autoresearch Deep Dive](../063-autoresearch-deep-dive-zao-applications/) | 7 ZAO use cases for autoresearch. Doc 168 adds the eval checklist template for `/zao-research`. |
+| [Doc 70 — Sub-agents vs Agent Teams](../070-subagents-vs-agent-teams/) | Two multi-agent paradigms. Doc 168 adds a third: structured adversarial deliberation (Council). |
+| [Doc 89 — Paperclip + gstack + Autoresearch Stack](../089-paperclip-gstack-autoresearch-stack/) | Workflow tool ecosystem. Council adds a new decision-making layer. |
 | [Doc 154 — Skills & Commands Master Reference](../154-skills-commands-master-reference/) | Would need updating if Council is installed as `/council` command. |
 
 ---

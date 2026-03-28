@@ -193,4 +193,4 @@ CREATE TABLE broadcast_targets (
 - [Livepeer Multistream Docs](https://docs.livepeer.org/developers/guides/multistream)
 - [Livepeer webrtmp-sdk](https://github.com/livepeer/webrtmp-sdk)
 - [Livepeer "Multistream Twitter Spaces"](https://livepeer.studio/blog/how-to-multistream-twitter-spaces-with-livepeer-studio)
-- [Doc 161 — Multi-Platform Streaming RTMP](../161-multiplatform-streaming-rtmp/)
+- [Doc 161 — Multi-Platform Streaming RTMP](../192-multiplatform-streaming-rtmp/)

@@ -6,7 +6,7 @@
 
 | # | Topic | Summary |
 |---|-------|---------|
-| [24](../24-zao-ai-agent/) | **ZAO AI Agent Plan** | ElizaOS + Claude + Hindsight, 4-phase plan (support → music discovery → moderation → autonomous) |
-| [08](../08-ai-memory/) | **AI Memory Architecture** | Implicit + explicit memory patterns, pgvector, taste profiles, consolidation pipeline |
-| [26](../26-hindsight-agent-memory/) | **Hindsight Memory System** | SOTA agent memory (91.4% LongMemEval), retain/recall/reflect, MCP support |
-| [90](../90-ai-run-community-agent-os/) | **AI-Run Community: Agent OS** | Autonomous community agents (daily digests, onboarding, governance) via Paperclip + ElizaOS |
+| [24](../024-zao-ai-agent/) | **ZAO AI Agent Plan** | ElizaOS + Claude + Hindsight, 4-phase plan (support → music discovery → moderation → autonomous) |
+| [08](../008-ai-memory/) | **AI Memory Architecture** | Implicit + explicit memory patterns, pgvector, taste profiles, consolidation pipeline |
+| [26](../026-hindsight-agent-memory/) | **Hindsight Memory System** | SOTA agent memory (91.4% LongMemEval), retain/recall/reflect, MCP support |
+| [90](../090-ai-run-community-agent-os/) | **AI-Run Community: Agent OS** | Autonomous community agents (daily digests, onboarding, governance) via Paperclip + ElizaOS |

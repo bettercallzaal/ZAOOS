@@ -163,10 +163,10 @@ src/
 
 | Doc | Relevance |
 |-----|-----------|
-| [78 — Nouns Builder Integration](../78-nouns-builder-integration/) | ZOUNZ deployment details |
+| [78 — Nouns Builder Integration](../078-nouns-builder-integration/) | ZOUNZ deployment details |
 | [108 — Music NFT Landscape](../108-music-nft-landscape-2026/) | Platform comparison, market size |
-| [29 — Artist Revenue](../29-artist-revenue-ip-rights/) | Revenue models, streaming economics |
-| [128 — Music Player Audit](../128-music-player-complete-audit/) | Existing music infrastructure |
+| [29 — Artist Revenue](../029-artist-revenue-ip-rights/) | Revenue models, streaming economics |
+| [128 — Music Player Audit](../190-music-player-complete-audit/) | Existing music infrastructure |
 | [130 — Next Music Integrations](../130-next-music-integrations/) | Tier 4 features including Zora + Splits |
 | [131 — On-Chain Governance](../131-onchain-proposals-governance/) | ZOUNZ Governor integration |
 | [138 — Play Counting](../138-play-counting-stream-attribution/) | Stream attribution for tracking |

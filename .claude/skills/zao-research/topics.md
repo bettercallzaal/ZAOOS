@@ -180,7 +180,7 @@ Use this to quickly find if a topic has already been researched.
 - Wallet connection patterns → `49` (wallet-connect)
 
 ## Farcaster Mini Apps
-- Farcaster Mini Apps SDK, Quick Auth, notifications → `86` (folder 68-farcaster-miniapps-integration)
+- Farcaster Mini Apps SDK, Quick Auth, notifications → `86` (folder 173-farcaster-miniapps-integration)
 
 ## Recent Additions (76-88)
 - Git branching for AI agents (trunk-based dev) → `76`

@@ -445,8 +445,8 @@ Artist creates track
 | [150 — Arweave Storage](../150-arweave-permanent-music-storage/) | Basic Arweave intro (superseded by this doc for upload tool choice) |
 | [151 — Distribution Without Zora](../151-zounz-distribution-without-zora/) | Uses Arweave + thirdweb + 0xSplits stack |
 | [149 — BuilderOSS Deep Dive](../149-buildeross-deep-dive-everything/) | ZOUNZ governance layer |
-| [33 — Infrastructure & Storage](../33-infrastructure-mobile-storage/) | Original storage strategy (Arweave for NFTs) |
-| [128 — Music Player Audit](../128-music-player-complete-audit/) | Existing player infrastructure |
+| [33 — Infrastructure & Storage](../033-infrastructure-mobile-storage/) | Original storage strategy (Arweave for NFTs) |
+| [128 — Music Player Audit](../190-music-player-complete-audit/) | Existing player infrastructure |
 | [138 — Play Counting](../138-play-counting-stream-attribution/) | Stream attribution (AO could replace) |
 
 ## Sources

@@ -140,8 +140,8 @@ If ZAO were to run a music-specific AI education cohort, here's what it could lo
 
 | Doc | Connection |
 |-----|-----------|
-| [Doc 32 — Onboarding & Growth](../32-onboarding-growth-moderation/) | Growth strategies could include education as an onboarding funnel |
-| [Doc 50 — The ZAO Complete Guide](../50-the-zao-complete-guide/) | Community pillars include education/knowledge sharing |
+| [Doc 32 — Onboarding & Growth](../032-onboarding-growth-moderation/) | Growth strategies could include education as an onboarding funnel |
+| [Doc 50 — The ZAO Complete Guide](../050-the-zao-complete-guide/) | Community pillars include education/knowledge sharing |
 | [Doc 154 — Skills & Commands Reference](../154-skills-commands-master-reference/) | The skills library IS the curriculum — already structured |
 | [Doc 168 — Community Innovations](../168-claude-code-community-innovations-march2026/) | Brief Learn Vibe Build mention; this doc goes deeper |
 

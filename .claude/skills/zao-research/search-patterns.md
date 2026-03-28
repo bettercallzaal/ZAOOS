@@ -81,7 +81,7 @@ Grep pattern="xmtp" path="src/" glob="*.{ts,tsx}" output_mode="files_with_matche
 ### Compare research claims vs code reality
 ```
 # What does research say about respect?
-Grep pattern="tier|decay|newcomer|curator|elder|legend" path="research/04-respect-tokens/README.md" output_mode="content"
+Grep pattern="tier|decay|newcomer|curator|elder|legend" path="research/004-respect-tokens/README.md" output_mode="content"
 
 # What does the code actually do?
 Grep pattern="tier|decay|newcomer|curator|elder|legend" path="src/" glob="*.{ts,tsx}"
@@ -100,7 +100,7 @@ Grep pattern="tier|decay|newcomer|curator|elder|legend" path="src/" glob="*.{ts,
 | Security policy | `SECURITY.md` |
 | Project conventions | `CLAUDE.md` |
 | Sprint plans | `docs/superpowers/plans/` |
-| Canonical guide | `research/50-the-zao-complete-guide/README.md` |
+| Canonical guide | `research/050-the-zao-complete-guide/README.md` |
 
 ## Also Check These Locations
 

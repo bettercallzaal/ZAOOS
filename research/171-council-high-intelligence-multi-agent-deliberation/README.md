@@ -237,10 +237,10 @@ After installing, edit `~/.claude/skills/council/SKILL.md` to add the 3 ZAO-spec
 
 | Doc | Relationship |
 |-----|-------------|
-| [Doc 70 — Sub-agents vs Agent Teams](../70-subagents-vs-agent-teams/) | Two multi-agent paradigms. Doc 171 adds a third: structured adversarial deliberation. |
+| [Doc 70 — Sub-agents vs Agent Teams](../070-subagents-vs-agent-teams/) | Two multi-agent paradigms. Doc 171 adds a third: structured adversarial deliberation. |
 | [Doc 168 — Community Innovations](../168-claude-code-community-innovations-march2026/) | Brief Council summary. Doc 171 is the deep dive with ZAO-specific triads and installation. |
-| [Doc 67 — Paperclip AI](../67-paperclip-ai-agent-company/) | Agent company orchestrator. Council complements Paperclip for strategic decisions that inform what Paperclip agents build. |
-| [Doc 89 — Paperclip + gstack + Autoresearch](../89-paperclip-gstack-autoresearch-stack/) | Full agent tool stack. Council adds the deliberation layer. |
+| [Doc 67 — Paperclip AI](../067-paperclip-ai-agent-company/) | Agent company orchestrator. Council complements Paperclip for strategic decisions that inform what Paperclip agents build. |
+| [Doc 89 — Paperclip + gstack + Autoresearch](../089-paperclip-gstack-autoresearch-stack/) | Full agent tool stack. Council adds the deliberation layer. |
 | [Doc 154 — Skills & Commands](../154-skills-commands-master-reference/) | Would need updating to add `/council` as a new command after install. |
 
 ---

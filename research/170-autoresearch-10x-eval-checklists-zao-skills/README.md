@@ -252,8 +252,8 @@ rm -rf /tmp/autoresearch-update
 
 | Doc | Relationship |
 |-----|-------------|
-| [Doc 62 — Autoresearch: Skill Improvement](../62-autoresearch-skill-improvement/) | Core loop documentation. Doc 170 adds ZAO-specific eval checklists and Lehmann comparison. |
-| [Doc 63 — Autoresearch Deep Dive](../63-autoresearch-deep-dive-zao-applications/) | 7 ZAO use cases. Doc 170 adds concrete eval checklists for 5 skills with baselines. |
+| [Doc 62 — Autoresearch: Skill Improvement](../062-autoresearch-skill-improvement/) | Core loop documentation. Doc 170 adds ZAO-specific eval checklists and Lehmann comparison. |
+| [Doc 63 — Autoresearch Deep Dive](../063-autoresearch-deep-dive-zao-applications/) | 7 ZAO use cases. Doc 170 adds concrete eval checklists for 5 skills with baselines. |
 | [Doc 164 — Skills/Research Workflow Improvements](../164-skills-research-workflow-improvements/) | Skill improvement goals. Doc 170 provides the eval framework to measure improvement. |
 | [Doc 168 — Community Innovations](../168-claude-code-community-innovations-march2026/) | Brief Lehmann summary. Doc 170 is the deep dive with actionable checklists. |
 | [Doc 154 — Skills & Commands Master Reference](../154-skills-commands-master-reference/) | Full skill inventory. Doc 170 prioritizes which 5 skills to autoresearch first. |

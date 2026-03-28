@@ -215,4 +215,4 @@ For production, register a ZAO-specific app to get a dedicated address.
 - [Lens Create a Post](https://lens.xyz/docs/protocol/feeds/post)
 - [Lens GraphQL API](https://lens.xyz/docs/protocol/getting-started/graphql)
 - [Lens SDK GitHub](https://github.com/lens-protocol/lens-sdk)
-- [Doc 36 — Lens Protocol Deep Dive](../36-lens-protocol-deep-dive/)
+- [Doc 36 — Lens Protocol Deep Dive](../036-lens-protocol-deep-dive/)

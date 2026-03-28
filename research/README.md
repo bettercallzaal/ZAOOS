@@ -28,16 +28,16 @@
 
 | If you're... | Start here |
 |-------------|-----------|
-| **Building features** | [41 Next.js 16](./41-nextjs16-react19-deep-dive/) + [42 Supabase](./42-supabase-advanced-patterns/) + [15 MVP Spec](./15-mvp-spec/) |
-| **Working on music** | [128 Player Audit](./128-music-player-complete-audit/) + [130 Next Integrations](./130-next-music-integrations/) + [03 Music Integration](./03-music-integration/) |
+| **Building features** | [41 Next.js 16](./041-nextjs16-react19-deep-dive/) + [42 Supabase](./042-supabase-advanced-patterns/) + [15 MVP Spec](./015-mvp-spec/) |
+| **Working on music** | [128 Player Audit](./190-music-player-complete-audit/) + [130 Next Integrations](./130-next-music-integrations/) + [03 Music Integration](./003-music-integration/) |
 | **Distributing music on-chain** | [155 End-to-End Plan](./155-music-nft-end-to-end-implementation/) + [152 Arweave Deep Dive](./152-arweave-ecosystem-deep-dive/) + [153 BazAR](./153-bazar-arweave-atomic-assets-music/) |
 | **Working on governance** | [133 Governance Audit](./133-governance-system-audit/) + [149 BuilderOSS](./149-buildeross-deep-dive-everything/) + [131 On-Chain](./131-onchain-proposals-governance/) |
-| **Growing the community** | [32 Onboarding](./32-onboarding-growth-moderation/) + [35 Notifications](./35-notifications-complete-guide/) + [110 Directory](./110-community-directory-crm/) |
-| **Cross-posting content** | [28 Cross-Platform](./28-cross-platform-publishing/) + [77 Bluesky](./77-bluesky-cross-posting-integration/) + [121 Lens Verdict](./121-lens-v3-auth-verdict/) |
-| **Building the AI agent** | [24 Agent Plan](./24-zao-ai-agent/) + [83 ElizaOS](./83-elizaos-2026-update/) + [26 Hindsight](./26-hindsight-agent-memory/) |
-| **Auditing code** | [57 Security Audit](./57-codebase-security-audit-march-2026/) + [137 Skills Security](./137-skills-audit-security-practices/) + [66 Testing](./66-backend-testing-strategy/) |
-| **Using Claude Code skills** | [154 Skills Master Reference](./154-skills-commands-master-reference/) + [69 Tips](./69-claude-code-tips-best-practices/) + [54 Superpowers](./54-superpowers-agentic-skills/) |
-| **Understanding the project** | [50 Complete Guide](./50-the-zao-complete-guide/) + [51 Whitepaper](./51-zao-whitepaper-2026/) + [27 Overview](./27-comprehensive-overview/) |
+| **Growing the community** | [32 Onboarding](./032-onboarding-growth-moderation/) + [35 Notifications](./035-notifications-complete-guide/) + [110 Directory](./110-community-directory-crm/) |
+| **Cross-posting content** | [28 Cross-Platform](./028-cross-platform-publishing/) + [77 Bluesky](./077-bluesky-cross-posting-integration/) + [121 Lens Verdict](./121-lens-v3-auth-verdict/) |
+| **Building the AI agent** | [24 Agent Plan](./024-zao-ai-agent/) + [83 ElizaOS](./083-elizaos-2026-update/) + [26 Hindsight](./026-hindsight-agent-memory/) |
+| **Auditing code** | [57 Security Audit](./057-codebase-security-audit-march-2026/) + [137 Skills Security](./137-skills-audit-security-practices/) + [66 Testing](./066-backend-testing-strategy/) |
+| **Using Claude Code skills** | [154 Skills Master Reference](./154-skills-commands-master-reference/) + [69 Tips](./069-claude-code-tips-best-practices/) + [54 Superpowers](./054-superpowers-agentic-skills/) |
+| **Understanding the project** | [50 Complete Guide](./050-the-zao-complete-guide/) + [51 Whitepaper](./051-zao-whitepaper-2026/) + [27 Overview](./027-comprehensive-overview/) |
 
 ---
 
@@ -110,21 +110,21 @@
 | BazAR marketplace | High | 8 hrs | [153](./153-bazar-arweave-atomic-assets-music/) |
 | Last.fm scrobbling | Medium | 3 hrs | [138](./138-play-counting-stream-attribution/) |
 | ListenBrainz scrobbling | Medium | 2 hrs | [138](./138-play-counting-stream-attribution/) |
-| Bluesky publish route | Medium | 2 hrs | [77](./77-bluesky-cross-posting-integration/) |
+| Bluesky publish route | Medium | 2 hrs | [77](./077-bluesky-cross-posting-integration/) |
 | In-app ZOUNZ voting | Medium | 8 hrs | [149](./149-buildeross-deep-dive-everything/) |
 | In-app proposal creation | Medium | 6 hrs | [149](./149-buildeross-deep-dive-everything/) |
 | @builderbot notifications | Medium | 2 hrs | [149](./149-buildeross-deep-dive-everything/) |
 | 0xSplits revenue splits | Medium | 4 hrs | [143](./143-0xsplits-revenue-distribution/) |
-| WaveWarZ battle UI | Medium | 8 hrs | [99](./99-prediction-market-music-battles/) |
+| WaveWarZ battle UI | Medium | 8 hrs | [99](./099-prediction-market-music-battles/) |
 | Synchronized listening rooms | Future | 12 hrs | [100](./100-synchronized-listening-rooms/) |
-| LiveKit audio rooms | Future | 16 hrs | [43](./43-webrtc-audio-rooms-streaming/) |
-| ElizaOS community agent | Future | 20 hrs | [83](./83-elizaos-2026-update/) |
-| AI taste recommendations | Future | 20 hrs | [08](./08-ai-memory/) |
+| LiveKit audio rooms | Future | 16 hrs | [43](./043-webrtc-audio-rooms-streaming/) |
+| ElizaOS community agent | Future | 20 hrs | [83](./083-elizaos-2026-update/) |
+| AI taste recommendations | Future | 20 hrs | [08](./008-ai-memory/) |
 | Apple Music (MusicKit) | Future | 8 hrs | [138](./138-play-counting-stream-attribution/) |
-| Mastodon cross-posting | Future | 4 hrs | [96](./96-additional-cross-posting-platforms/) |
-| Nostr cross-posting | Future | 6 hrs | [97](./97-nostr-reddit-cross-posting/) |
-| Cross-chain fractal governance | Future | 20 hrs | [108](./108-superchain-ordao-crosschain-fractal/) |
-| Mobile player optimization | Future | 12 hrs | [127](./127-mobile-player-optimization/) |
+| Mastodon cross-posting | Future | 4 hrs | [177](./177-mastodon-threads-cross-posting/) |
+| Nostr cross-posting | Future | 6 hrs | [097](./097-nostr-cross-posting-integration/) |
+| Cross-chain fractal governance | Future | 20 hrs | [108](./184-superchain-ordao-crosschain-fractal/) |
+| Mobile player optimization | Future | 12 hrs | [127](./189-mobile-player-optimization/) |
 | Native community directory | Future | 10 hrs | [110](./110-community-directory-crm/) |
 | External reputation signals | Future | 8 hrs | [134](./134-external-reputation-signals-comprehensive/) |
 | ArNS permanent domain | Future | 2 hrs | [152](./152-arweave-ecosystem-deep-dive/) |

@@ -145,10 +145,10 @@ User hits play
 
 | Doc | Relevance |
 |-----|-----------|
-| [128 — Music Player Complete Audit](../128-music-player-complete-audit/) | Canonical inventory of all 23 components, confirms play_count exists |
+| [128 — Music Player Complete Audit](../190-music-player-complete-audit/) | Canonical inventory of all 23 components, confirms play_count exists |
 | [126 — Music Player Gap Analysis](../126-music-player-gap-analysis/) | Identified missing listening history UI |
 | [130 — Next Music Integrations](../130-next-music-integrations/) | Last.fm scrobbling planned for Phase 4D |
-| [110 — Music Discovery Feeds](../110-music-discovery-feeds/) | Proposed `track_engagement` schema |
+| [110 — Music Discovery Feeds](../186-music-discovery-feeds/) | Proposed `track_engagement` schema |
 | [112 — Audius API Deep Dive](../112-audius-api-deep-dive/) | Audius stream endpoint + `skip_play_count` param |
 
 ## Sources

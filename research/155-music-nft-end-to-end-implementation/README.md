@@ -650,7 +650,7 @@ In `MusicEmbed.tsx` (existing component, ~290 lines), add alongside existing act
 | [150 — Arweave Storage](../150-arweave-permanent-music-storage/) | Cost analysis, upload options |
 | [151 — Distribution Without Zora](../151-zounz-distribution-without-zora/) | thirdweb ERC-1155 as secondary (optional) |
 | [145 — Simple NFT Platform](../145-simple-nft-platform-design/) | UX design for non-crypto artists |
-| [128 — Music Player Audit](../128-music-player-complete-audit/) | Existing player infrastructure |
+| [128 — Music Player Audit](../190-music-player-complete-audit/) | Existing player infrastructure |
 
 ## Sources
 

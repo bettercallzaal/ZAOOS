@@ -1,12 +1,16 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthAudioProviders } from '@/app/(auth)/providers';
+import { BottomNav } from '@/components/navigation/BottomNav';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
+import { GlobalSearchProvider } from '@/components/search/GlobalSearchProvider';
 
 /**
- * Spaces layout — conditionally wraps with audio providers
- * when user is authenticated, so music/DJ features work.
- * Guest users get the page without audio providers.
+ * Spaces layout — public page with full chrome for authenticated users.
+ * Guest users get the page without nav/player/audio providers.
  */
 export default function SpacesLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -19,11 +23,24 @@ export default function SpacesLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  // Authenticated users get full audio providers for music/DJ features
+  // Authenticated users get full layout matching (auth) pages
   if (user) {
-    return <AuthAudioProviders>{children}</AuthAudioProviders>;
+    return (
+      <AuthAudioProviders>
+        <div className="md:pt-10">
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+          <Suspense fallback={null}>
+            <GlobalSearchProvider />
+          </Suspense>
+          <PersistentPlayerWithRadio />
+          <BottomNav />
+        </div>
+      </AuthAudioProviders>
+    );
   }
 
-  // Guest users get the page without audio providers
+  // Guest users get minimal layout
   return <>{children}</>;
 }

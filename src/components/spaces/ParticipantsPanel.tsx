@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallStateHooks, hasAudio, ParticipantsAudio } from '@stream-io/video-react-sdk';
+import { useCallStateHooks, hasAudio, hasVideo, ParticipantsAudio, Video } from '@stream-io/video-react-sdk';
 
 export function ParticipantsPanel() {
   const { useParticipants } = useCallStateHooks();
@@ -21,13 +21,24 @@ export function ParticipantsPanel() {
           <div className="grid grid-cols-4 md:grid-cols-5 gap-3">
             {speakers.map((p) => (
               <div key={p.sessionId} className="flex flex-col items-center">
-                <div className={`w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold border-2 ${p.isSpeaking ? 'border-green-400 scale-110' : 'border-transparent'} transition-all`}>
-                  {p.image ? (
-                    <img src={p.image} alt="" className="w-full h-full rounded-full object-cover" />
-                  ) : (
-                    <span>{(p.name || '?')[0]}</span>
-                  )}
-                </div>
+                {hasVideo(p) ? (
+                  <div className={`w-24 h-[72px] rounded-lg overflow-hidden bg-gray-900 border-2 ${p.isSpeaking ? 'border-green-400' : 'border-transparent'} transition-all`}>
+                    <Video
+                      participant={p}
+                      trackType="videoTrack"
+                      className="w-full h-full object-cover"
+                      VideoPlaceholder={null}
+                    />
+                  </div>
+                ) : (
+                  <div className={`w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold border-2 ${p.isSpeaking ? 'border-green-400 scale-110' : 'border-transparent'} transition-all`}>
+                    {p.image ? (
+                      <img src={p.image} alt="" className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      <span>{(p.name || '?')[0]}</span>
+                    )}
+                  </div>
+                )}
                 <span className="text-white text-xs mt-1 truncate max-w-[60px]">{p.name}</span>
                 {p.isSpeaking && (
                   <span className="text-green-400 text-[10px] animate-pulse">speaking</span>
@@ -46,13 +57,24 @@ export function ParticipantsPanel() {
           <div className="grid grid-cols-5 md:grid-cols-6 gap-3">
             {listeners.map((p) => (
               <div key={p.sessionId} className="flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 text-sm">
-                  {p.image ? (
-                    <img src={p.image} alt="" className="w-full h-full rounded-full object-cover" />
-                  ) : (
-                    <span>{(p.name || '?')[0]}</span>
-                  )}
-                </div>
+                {hasVideo(p) ? (
+                  <div className="w-20 h-[60px] rounded-lg overflow-hidden bg-gray-900 border border-gray-700">
+                    <Video
+                      participant={p}
+                      trackType="videoTrack"
+                      className="w-full h-full object-cover"
+                      VideoPlaceholder={null}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 text-sm">
+                    {p.image ? (
+                      <img src={p.image} alt="" className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      <span>{(p.name || '?')[0]}</span>
+                    )}
+                  </div>
+                )}
                 <span className="text-gray-400 text-[10px] mt-1 truncate max-w-[50px]">{p.name}</span>
               </div>
             ))}

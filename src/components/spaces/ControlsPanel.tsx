@@ -1,6 +1,7 @@
 'use client';
 
 import { MicButton } from './MicButton';
+import { CameraButton } from './CameraButton';
 import { LiveButton } from './LiveButton';
 import { ScreenShareButton } from './ScreenShareButton';
 
@@ -15,6 +16,7 @@ export function ControlsPanel({ isHost, isAuthenticated = false, onBroadcast, is
   return (
     <div className="flex items-center justify-center gap-4 px-6 py-4 flex-wrap">
       <MicButton />
+      <CameraButton />
       {isHost && <LiveButton />}
       {isHost && <ScreenShareButton isAuthenticated={isAuthenticated} />}
       {isHost && (

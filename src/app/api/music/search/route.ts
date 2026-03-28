@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSession } from '@/lib/auth/session'
 import { searchAudiusTracks } from '@/lib/music/audius'
+import { searchTidal } from '@/lib/music/tidal'
 import { getSupabaseAdmin } from '@/lib/db/supabase'
 
 const SearchSchema = z.object({
@@ -25,9 +26,10 @@ export async function GET(req: NextRequest) {
 
     const { q, genre, limit } = parsed.data
 
-    const [audiusResult, libraryResult] = await Promise.allSettled([
+    const [audiusResult, libraryResult, tidalResult] = await Promise.allSettled([
       searchAudiusTracks(q, limit),
       searchLibrary(q, limit),
+      process.env.TIDAL_CLIENT_ID ? searchTidal(q, Math.min(limit, 5)) : Promise.resolve([]),
     ])
 
     const results: SearchResult[] = []
@@ -69,10 +71,33 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    if (tidalResult.status === 'fulfilled' && tidalResult.value) {
+      for (const track of tidalResult.value) {
+        const isDupe = results.some(
+          (r) =>
+            r.title.toLowerCase() === track.title.toLowerCase() &&
+            r.artist.toLowerCase() === track.artist.toLowerCase(),
+        )
+        if (!isDupe) {
+          results.push({
+            id: `tidal-${track.id}`,
+            title: track.title,
+            artist: track.artist,
+            artworkUrl: track.artworkUrl,
+            platform: 'tidal',
+            url: track.url,
+            streamUrl: track.url,
+            playCount: 0,
+          })
+        }
+      }
+    }
+
     // Suppress unused genre variable lint warning — reserved for future filtering
     void genre
 
-    return NextResponse.json({ results, sources: ['audius', 'library'] })
+    const sources = ['audius', 'library', ...(process.env.TIDAL_CLIENT_ID ? ['tidal'] : [])]
+    return NextResponse.json({ results, sources })
   } catch (error) {
     console.error('Music search error:', error)
     return NextResponse.json({ error: 'Search failed' }, { status: 500 })

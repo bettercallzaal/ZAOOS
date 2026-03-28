@@ -49,6 +49,11 @@ const MintTrack = dynamic(
   { ssr: false },
 );
 
+const PermawebLibrary = dynamic(
+  () => import('@/components/music/PermawebLibrary'),
+  { ssr: false },
+);
+
 type Submission = {
   id: string;
   url: string;
@@ -62,7 +67,7 @@ type Submission = {
   user_voted: boolean;
 };
 
-const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Create', 'Binaural', 'Liked', 'History', 'Curators'] as const;
+const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Create', 'Binaural', 'Liked', 'History', 'Curators', 'Permaweb'] as const;
 type Tab = (typeof TABS)[number];
 
 const SECTION_IDS: Record<Tab, string> = {
@@ -77,6 +82,7 @@ const SECTION_IDS: Record<Tab, string> = {
   Liked: 'section-liked',
   History: 'section-history',
   Curators: 'section-curators',
+  Permaweb: 'section-permaweb',
 };
 
 
@@ -289,6 +295,11 @@ export function MusicPage() {
         {/* ── Section: Top Curators ──────────────────────────── */}
         <section id={SECTION_IDS.Curators}>
           <TopCurators />
+        </section>
+
+        {/* ── Section: Permaweb Library ─────────────────────── */}
+        <section id={SECTION_IDS.Permaweb}>
+          <PermawebLibrary />
         </section>
       </div>
 

@@ -4,39 +4,53 @@ description: Use when starting a new session, after /clear, or when context is l
 disable-model-invocation: true
 ---
 
-# Catchup — Restore Work Context
+# Catchup — Quick Context Restore
 
-Reload your working context after `/clear` or at the start of a new session.
-
-## What It Does
-
-Reads uncommitted changes, recent commits, open branches, and running processes to reconstruct what you're working on.
-
-## Output
-
-Provide a concise summary covering:
-
-1. **Branch & Status** — current branch, uncommitted changes, staged files
-2. **Recent Work** — last 10 commits with messages
-3. **Uncommitted Changes** — what's modified but not committed (read the diffs)
-4. **Open TODOs** — any TODO/FIXME/HACK in recently modified files
-5. **Next Steps** — infer what the user was likely working on and what comes next
+Fast session start. Gather state, detect in-progress work, report concisely.
 
 ## Context to Gather
 
+Run ALL of these:
+
 ```
-Git branch: !`git branch --show-current`
-Git status: !`git status --short`
-Recent commits: !`git log --oneline -10`
-Uncommitted diff: !`git diff --stat`
-Recently modified files: !`git diff --name-only HEAD~3`
+Git branch:          !`git branch --show-current`
+Git status:          !`git status --short`
+Recent commits:      !`git log --oneline -5`
+Uncommitted diff:    !`git diff --stat`
+Staged diff:         !`git diff --cached --stat`
+Untracked files:     !`git ls-files --others --exclude-standard`
 ```
 
-Read the actual content of any uncommitted changed files to understand the work in progress.
+Then detect in-progress work — this step is MANDATORY:
+
+1. **Read diffs** (not full files): run `git diff` and `git diff --cached` to understand what changed
+2. **Scan for TODOs**: in every file listed by `git status`, search for `TODO|FIXME|HACK|XXX|WIP` and record the file path + comment text
+3. **Check for plan files**: look in `.superpowers/plans/` and `docs/superpowers/plans/` — if any exist, read them
+
+## Output Format
+
+Respond with EXACTLY these 4 sections. Total output MUST be under 500 words — aim for 200-400.
+
+### Branch
+State the current git branch name. Note if ahead/behind remote.
+
+### Modified Files
+List every file from `git status` with its path. Use a bullet list. Group by status (modified/staged/untracked) only if 10+ files; otherwise flat list is fine.
+
+### In-Progress Work
+This section is MANDATORY — never skip it, never leave it empty. Based on diffs and TODO scan:
+- Summarize what was being worked on (1-2 sentences max)
+- List any `TODO`, `FIXME`, `HACK`, `XXX`, or `WIP` comments found, with file path and comment text
+- If a plan file exists, state its goal in one line
+- If working tree is clean and no TODOs found, write exactly: "Clean working tree — no in-progress work detected."
+
+### Suggested Next Steps
+1-3 bullet points. Infer from the changes and TODOs what to do next.
 
 ## Rules
 
-- Never modify any files — this is read-only
-- If there are no changes, say so clearly
-- Focus on WHAT and WHY, not listing every file
-- If a plan file exists in the conversation or `docs/superpowers/plans/`, read it
+- Read-only — never modify files
+- Read diffs, not full file contents
+- Do NOT narrate commit history beyond the 5-line `git log` output
+- Every file path from `git status` MUST appear in the Modified Files section
+- The In-Progress Work section MUST contain concrete TODO/WIP findings or an explicit "none" statement

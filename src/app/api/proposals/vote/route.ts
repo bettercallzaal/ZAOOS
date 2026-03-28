@@ -294,33 +294,115 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       console.error('[publish-threshold] Bluesky publish failed:', bskyError);
     }
 
-    // Publish to @thezaodao X/Twitter (independent of Farcaster + Bluesky)
+    // Publish to X, Telegram, and Discord in parallel (independent of Farcaster + Bluesky)
     let xUrl: string | null = null;
     let xError: string | null = null;
-    try {
-      const { normalizeForX } = await import('@/lib/publish/normalize');
-      const { publishToX, getXClient } = await import('@/lib/publish/x');
-      const client = getXClient();
-      if (client) {
-        // Custom X text — end with zaoos.com instead of warpcast link
+    let telegramMessageId: number | null = null;
+    let telegramError: string | null = null;
+    let discordMessageId: string | null = null;
+    let discordError: string | null = null;
+
+    const parallelPublishResults = await Promise.allSettled([
+      // X/Twitter
+      (async () => {
+        const { publishToX, getXClient } = await import('@/lib/publish/x');
+        const client = getXClient();
+        if (!client) {
+          return { platform: 'x' as const, error: 'X not configured — add API keys in env vars' };
+        }
         const xAttribution = `\n\n— Proposed by @${authorName} • Approved by ZAO governance\nfrom zaoos.com`;
         const xText = publishText + xAttribution;
         const truncated = xText.length > 280 ? xText.slice(0, 277) + '...' : xText;
         const content = { text: truncated, images: [] as string[], embeds: [], attribution: '', castHash: castHash || '', castUrl: '' };
         const xResult = await publishToX(content);
-        xUrl = xResult.tweetUrl;
-        console.info(`[publish-threshold] Published to @thezaodao X: ${xUrl}`);
-      } else {
-        xError = 'X not configured — add API keys in env vars';
-        console.info('[publish-threshold] X skipped — not configured');
+        return { platform: 'x' as const, url: xResult.tweetUrl };
+      })(),
+
+      // Telegram — only attempt if env vars are set
+      (async () => {
+        if (!process.env.TELEGRAM_BOT_TOKEN) {
+          return { platform: 'telegram' as const, skipped: true };
+        }
+        const { normalizeForTelegram } = await import('@/lib/publish/normalize');
+        const { publishToTelegram, escapeMarkdownV2 } = await import('@/lib/publish/telegram');
+        const normalized = normalizeForTelegram({
+          text: publishText + attribution,
+          castHash: castHash || 'proposal',
+        });
+        const result = await publishToTelegram({
+          text: escapeMarkdownV2(normalized.text),
+        });
+        if (!result.success) {
+          return { platform: 'telegram' as const, error: result.error };
+        }
+        return { platform: 'telegram' as const, messageId: result.messageId };
+      })(),
+
+      // Discord — only attempt if env var is set
+      (async () => {
+        if (!process.env.DISCORD_WEBHOOK_URL) {
+          return { platform: 'discord' as const, skipped: true };
+        }
+        const { normalizeForDiscord } = await import('@/lib/publish/normalize');
+        const { publishToDiscord, buildZaoEmbed } = await import('@/lib/publish/discord');
+        const normalized = normalizeForDiscord({
+          text: publishText + attribution,
+          castHash: castHash || 'proposal',
+        });
+        const embed = buildZaoEmbed({
+          title: fullProposal.title || 'ZAO Proposal',
+          description: normalized.text,
+          url: 'https://zaoos.com/governance',
+          imageUrl: fullProposal.publish_image_url || undefined,
+        });
+        const result = await publishToDiscord({
+          text: normalized.text,
+          embeds: [embed],
+          username: 'ZAO OS',
+        });
+        if (!result.success) {
+          return { platform: 'discord' as const, error: result.error };
+        }
+        return { platform: 'discord' as const, messageId: result.messageId };
+      })(),
+    ]);
+
+    // Process parallel results
+    for (const result of parallelPublishResults) {
+      if (result.status === 'rejected') continue;
+      const val = result.value;
+      if (val.platform === 'x') {
+        if ('error' in val) {
+          xError = val.error || 'Unknown X error';
+          if (xError.includes('CreditsDepleted')) xError = 'X credits depleted — add credits at developer.x.com';
+          else if (xError.includes('403')) xError = 'X permissions error — check app has Read+Write';
+          else if (xError.includes('401')) xError = 'X auth failed — check API keys';
+          console.error('[publish-threshold] X publish failed:', xError);
+        } else if ('url' in val) {
+          xUrl = val.url ?? null;
+          console.info(`[publish-threshold] Published to @thezaodao X: ${xUrl}`);
+        }
+      } else if (val.platform === 'telegram') {
+        if ('skipped' in val) {
+          console.info('[publish-threshold] Telegram skipped — not configured');
+        } else if ('error' in val) {
+          telegramError = val.error || 'Telegram publish failed';
+          console.error('[publish-threshold] Telegram publish failed:', telegramError);
+        } else if ('messageId' in val) {
+          telegramMessageId = val.messageId ?? null;
+          console.info(`[publish-threshold] Published to Telegram: ${telegramMessageId}`);
+        }
+      } else if (val.platform === 'discord') {
+        if ('skipped' in val) {
+          console.info('[publish-threshold] Discord skipped — not configured');
+        } else if ('error' in val) {
+          discordError = val.error || 'Discord publish failed';
+          console.error('[publish-threshold] Discord publish failed:', discordError);
+        } else if ('messageId' in val) {
+          discordMessageId = val.messageId ?? null;
+          console.info(`[publish-threshold] Published to Discord: ${discordMessageId}`);
+        }
       }
-    } catch (xErr) {
-      xError = xErr instanceof Error ? xErr.message : 'Unknown X error';
-      // Extract readable error from twitter-api-v2
-      if (xError.includes('CreditsDepleted')) xError = 'X credits depleted — add credits at developer.x.com';
-      else if (xError.includes('403')) xError = 'X permissions error — check app has Read+Write';
-      else if (xError.includes('401')) xError = 'X auth failed — check API keys';
-      console.error('[publish-threshold] X publish failed:', xError);
     }
 
     // Mark proposal as published with all platform results
@@ -332,10 +414,14 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
 
     if (bskyUri) updateData.published_bluesky_uri = bskyUri;
     if (xUrl) updateData.published_x_url = xUrl;
+    if (telegramMessageId) updateData.published_telegram_id = telegramMessageId;
+    if (discordMessageId) updateData.published_discord_id = discordMessageId;
     // Store errors for UI display
     if (fcError) updateData.publish_fc_error = fcError;
     if (bskyError) updateData.publish_bsky_error = bskyError;
     if (xError) updateData.publish_x_error = xError;
+    if (telegramError) updateData.publish_telegram_error = telegramError;
+    if (discordError) updateData.publish_discord_error = discordError;
 
     const { error: updateErr } = await supabaseAdmin
       .from('proposals')

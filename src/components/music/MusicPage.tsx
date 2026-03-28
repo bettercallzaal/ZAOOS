@@ -31,6 +31,11 @@ const TopCurators = dynamic(
   { ssr: false },
 );
 
+const AiMusicGenerator = dynamic(
+  () => import('@/components/music/AiMusicGenerator').then((m) => m.AiMusicGenerator),
+  { ssr: false },
+);
+
 type Submission = {
   id: string;
   url: string;
@@ -44,7 +49,7 @@ type Submission = {
   user_voted: boolean;
 };
 
-const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Binaural', 'Liked', 'History', 'Curators'] as const;
+const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Create', 'Binaural', 'Liked', 'History', 'Curators'] as const;
 type Tab = (typeof TABS)[number];
 
 const SECTION_IDS: Record<Tab, string> = {
@@ -54,6 +59,7 @@ const SECTION_IDS: Record<Tab, string> = {
   Submissions: 'section-submissions',
   Trending: 'section-trending',
   Playlists: 'section-playlists',
+  Create: 'section-create',
   Binaural: 'section-binaural',
   Liked: 'section-liked',
   History: 'section-history',
@@ -206,6 +212,11 @@ export function MusicPage() {
         {/* ── Section 4: Community Playlists ───────────────────────── */}
         <section id={SECTION_IDS.Playlists}>
           <PlaylistsSection radio={radio} />
+        </section>
+
+        {/* ── Section: AI Music Generator ───────────────────── */}
+        <section id={SECTION_IDS.Create}>
+          <AiMusicGenerator />
         </section>
 
         {/* ── Section: Binaural Beats ────────────────────────── */}

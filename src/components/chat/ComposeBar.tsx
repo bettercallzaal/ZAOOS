@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHand
 import { QuotedCastData } from '@/types';
 import { MentionAutocomplete } from './MentionAutocomplete';
 import { communityConfig } from '@/../community.config';
+import { generateHashtags } from '@/lib/ai/textAnalysis';
 
 const ALL_CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `#${id}` }));
 
@@ -51,6 +52,8 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   const [showSchedule, setShowSchedule] = useState(false);
   const [scheduleTime, setScheduleTime] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [suggestedHashtags, setSuggestedHashtags] = useState<string[]>([]);
+  const hashtagTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dragCounterRef = useRef(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,6 +61,25 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
   useImperativeHandle(ref, () => ({
     focus: () => textareaRef.current?.focus(),
   }));
+
+  // Debounced auto-hashtag generation (500ms, 20+ chars)
+  useEffect(() => {
+    if (hashtagTimerRef.current) clearTimeout(hashtagTimerRef.current);
+
+    if (text.length < 20) {
+      setSuggestedHashtags([]);
+      return;
+    }
+
+    hashtagTimerRef.current = setTimeout(() => {
+      const tags = generateHashtags(text, 5);
+      setSuggestedHashtags(tags);
+    }, 500);
+
+    return () => {
+      if (hashtagTimerRef.current) clearTimeout(hashtagTimerRef.current);
+    };
+  }, [text]);
 
   // Revoke any active blob URL on unmount to prevent memory leaks
   useEffect(() => {
@@ -119,6 +141,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
         );
         setText('');
         removeImage();
+        setSuggestedHashtags([]);
         onClearQuote?.();
         onClearReply?.();
         setCrossPostChannels(new Set());
@@ -431,6 +454,29 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                 }`}
               >
                 {ch.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Auto-hashtag suggestions */}
+      {suggestedHashtags.length > 0 && (
+        <div className="px-3 pt-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {suggestedHashtags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => {
+                  const separator = text.endsWith(' ') || text.length === 0 ? '' : ' ';
+                  setText((prev) => prev + separator + tag);
+                  setSuggestedHashtags((prev) => prev.filter((t) => t !== tag));
+                  textareaRef.current?.focus();
+                }}
+                className="text-[11px] px-2 py-0.5 rounded-full border border-gray-700/50 text-gray-500 hover:text-gray-300 hover:border-gray-600 transition-colors"
+              >
+                {tag}
               </button>
             ))}
           </div>

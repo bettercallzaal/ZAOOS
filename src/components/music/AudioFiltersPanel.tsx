@@ -1,9 +1,18 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { AUDIO_FILTERS, FILTER_CATEGORIES, type AudioFilterPreset } from '@/lib/music/audioFilters';
 
 let sharedActiveFilterKey: string | null = null;
+
+const SPEED_PRESETS = [
+  { label: '0.5x', value: 0.5 },
+  { label: '0.75x', value: 0.75 },
+  { label: '1.0x', value: 1.0 },
+  { label: '1.25x', value: 1.25 },
+  { label: '1.5x', value: 1.5 },
+  { label: '2.0x', value: 2.0 },
+] as const;
 
 export function getActiveFilterKey(): string | null {
   return sharedActiveFilterKey;
@@ -26,6 +35,8 @@ interface AudioFiltersPanelProps {
 export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
   const [activeKey, setActiveKey] = useState<string | null>(sharedActiveFilterKey);
   const [activeCategory, setActiveCategory] = useState(0);
+  const [customSpeed, setCustomSpeed] = useState(1.0);
+  const sliderRef = useRef<HTMLInputElement>(null);
 
   const activateFilter = useCallback((key: string, preset: AudioFilterPreset) => {
     const audioEl = getAudioElement();
@@ -35,17 +46,37 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
       audioEl.playbackRate = 1.0;
       sharedActiveFilterKey = null;
       setActiveKey(null);
+      setCustomSpeed(1.0);
       return;
     }
 
-    audioEl.playbackRate = preset.playbackRate ?? 1.0;
+    const rate = preset.playbackRate ?? 1.0;
+    audioEl.playbackRate = rate;
     sharedActiveFilterKey = key;
     setActiveKey(key);
+    setCustomSpeed(rate);
   }, []);
 
   const clearFilter = useCallback(() => {
     const audioEl = getAudioElement();
     if (audioEl) audioEl.playbackRate = 1.0;
+    sharedActiveFilterKey = null;
+    setActiveKey(null);
+    setCustomSpeed(1.0);
+  }, []);
+
+  const handleCustomSpeed = useCallback((speed: number) => {
+    const audioEl = getAudioElement();
+    if (audioEl) audioEl.playbackRate = speed;
+    setCustomSpeed(speed);
+    sharedActiveFilterKey = 'custom';
+    setActiveKey('custom');
+  }, []);
+
+  const resetSpeed = useCallback(() => {
+    const audioEl = getAudioElement();
+    if (audioEl) audioEl.playbackRate = 1.0;
+    setCustomSpeed(1.0);
     sharedActiveFilterKey = null;
     setActiveKey(null);
   }, []);
@@ -60,7 +91,7 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
   return (
     <div
       className={`overflow-hidden transition-all duration-300 ease-in-out ${
-        visible ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+        visible ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
       }`}
     >
       <div className="px-4 pb-3 space-y-2">
@@ -110,7 +141,16 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
         </div>
 
         {/* Active filter info */}
-        {activePreset && (
+        {activeKey === 'custom' ? (
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-[10px] text-[#f5a623] font-medium">
+              🎛️ Custom
+            </span>
+            <span className="text-[10px] text-gray-500">
+              {customSpeed.toFixed(2)}x
+            </span>
+          </div>
+        ) : activePreset ? (
           <div className="flex items-center justify-center gap-2">
             <span className="text-[10px] text-[#f5a623] font-medium">
               {activePreset.icon} {activePreset.name}
@@ -125,7 +165,54 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
               {activePreset.description}
             </span>
           </div>
-        )}
+        ) : null}
+
+        {/* Custom Speed Slider */}
+        <div className="space-y-1.5 pt-1 border-t border-white/5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-gray-400 font-medium">Custom Speed</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-[#f5a623] font-mono font-semibold tabular-nums min-w-[3ch] text-right">
+                {customSpeed.toFixed(2)}x
+              </span>
+              {customSpeed !== 1.0 && (
+                <button
+                  onClick={resetSpeed}
+                  className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-white/5 text-gray-400 hover:bg-white/10 hover:text-gray-200 transition-all"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
+          </div>
+
+          <input
+            ref={sliderRef}
+            type="range"
+            min={0.25}
+            max={4.0}
+            step={0.05}
+            value={customSpeed}
+            onChange={(e) => handleCustomSpeed(parseFloat(e.target.value))}
+            className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-[#f5a623] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#f5a623] [&::-webkit-slider-thumb]:shadow-[0_0_4px_rgba(245,166,35,0.5)]"
+          />
+
+          <div className="flex gap-1 justify-center">
+            {SPEED_PRESETS.map(({ label, value }) => (
+              <button
+                key={label}
+                onClick={() => handleCustomSpeed(value)}
+                className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${
+                  Math.abs(customSpeed - value) < 0.01
+                    ? 'bg-[#f5a623]/15 text-[#f5a623]'
+                    : 'bg-white/5 text-gray-500 hover:bg-white/10 hover:text-gray-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

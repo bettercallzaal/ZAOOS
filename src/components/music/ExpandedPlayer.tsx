@@ -12,6 +12,10 @@ import { ShareToChatButton } from '@/components/music/ShareToChatButton';
 import { TrackReactions } from '@/components/music/TrackReactions';
 import { LyricsPanel } from '@/components/music/LyricsPanel';
 import { AudioFiltersPanel, getActiveFilterKey } from '@/components/music/AudioFiltersPanel';
+import { SleepTimer } from '@/components/music/SleepTimer';
+import { ShareMenu } from '@/components/music/ShareMenu';
+import { QueuePanel } from '@/components/music/QueuePanel';
+import { useQueue } from '@/contexts/QueueContext';
 import type { TrackMetadata } from '@/types/music';
 
 interface ExpandedPlayerProps {
@@ -23,9 +27,11 @@ interface ExpandedPlayerProps {
 
 export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPlayerProps) {
   const player = usePlayer();
+  const { queueLength } = useQueue();
   const { isPlaying, isLoading, position, duration } = player;
   const [showLyrics, setShowLyrics] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showQueue, setShowQueue] = useState(false);
 
   // ─── Swipe down to dismiss ──────────────────────────────────────────
   const touchStartY = useRef(0);
@@ -254,18 +260,13 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             Aa
           </button>
 
-          {/* Share (external link) */}
-          <a
-            href={metadata.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1.5 text-gray-400 hover:text-white transition-colors"
-            aria-label="Open source"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-            </svg>
-          </a>
+          {/* Share menu (Farcaster, X, copy link, download card) */}
+          <ShareMenu
+            trackName={metadata.trackName}
+            artistName={metadata.artistName || ''}
+            artworkUrl={metadata.artworkUrl}
+            trackUrl={metadata.url}
+          />
 
           {/* Crossfade toggle */}
           <button
@@ -280,6 +281,9 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
             </svg>
           </button>
+
+          {/* Sleep timer */}
+          <SleepTimer />
 
           {/* Audio filters toggle */}
           <button
@@ -297,6 +301,25 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             </svg>
           </button>
 
+          {/* Queue toggle */}
+          <button
+            onClick={() => setShowQueue((v) => !v)}
+            className={`relative p-1.5 rounded-lg transition-colors ${
+              showQueue ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
+            }`}
+            aria-label={showQueue ? 'Hide queue' : 'Up Next'}
+            title={showQueue ? 'Hide queue' : 'Up Next'}
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+            </svg>
+            {queueLength > 0 && (
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#f5a623] text-[8px] font-bold text-[#0a1628] flex items-center justify-center">
+                {queueLength > 9 ? '9+' : queueLength}
+              </span>
+            )}
+          </button>
+
           {/* Platform badge */}
           <span className="text-[10px] text-gray-500 bg-white/5 px-2.5 py-1 rounded-full capitalize">
             {metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}
@@ -305,6 +328,11 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
 
         {/* Audio filters panel */}
         <AudioFiltersPanel visible={showFilters} />
+
+        {/* Queue panel */}
+        {showQueue && (
+          <QueuePanel onClose={() => setShowQueue(false)} />
+        )}
 
         {/* Emoji reactions */}
         <TrackReactions songUrl={metadata.url} className="justify-center" />

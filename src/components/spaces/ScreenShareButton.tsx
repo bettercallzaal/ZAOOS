@@ -3,15 +3,19 @@
 import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 
 interface ScreenShareButtonProps {
-  isAuthenticated: boolean;
+  isHost?: boolean;
+  isAuthenticated?: boolean;
+  roomType?: 'voice_channel' | 'stage';
 }
 
-export function ScreenShareButton({ isAuthenticated }: ScreenShareButtonProps) {
+export function ScreenShareButton({ isHost, isAuthenticated, roomType }: ScreenShareButtonProps) {
   const call = useCall();
   const { useScreenShareState } = useCallStateHooks();
   const { screenShare, isMute: isNotSharing } = useScreenShareState();
 
-  if (!isAuthenticated) return null;
+  // Voice channel: all authenticated users can share. Stage: host only.
+  const shouldShow = isAuthenticated && (roomType === 'voice_channel' || isHost);
+  if (!shouldShow) return null;
 
   const isSharing = !isNotSharing;
 

@@ -2,7 +2,9 @@
 
 import Image from 'next/image';
 import type { Room } from '@/lib/spaces/roomsDb';
-import type { RoomProvider, RoomTheme } from './HostRoomModal';
+import type { RoomTheme } from './HostRoomModal';
+
+export type RoomProvider = 'stream' | '100ms';
 
 const THEME_STYLES: Record<RoomTheme, { border: string; badge: string; label: string }> = {
   default: { border: 'hover:border-[#f5a623]/30', badge: '', label: '' },

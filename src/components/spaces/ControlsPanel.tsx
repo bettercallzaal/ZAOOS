@@ -4,21 +4,63 @@ import { MicButton } from './MicButton';
 import { CameraButton } from './CameraButton';
 import { LiveButton } from './LiveButton';
 import { ScreenShareButton } from './ScreenShareButton';
+import { LayoutToggle } from './LayoutToggle';
 
 interface ControlsPanelProps {
   isHost: boolean;
   isAuthenticated?: boolean;
   onBroadcast?: () => void;
   isBroadcasting?: boolean;
+  roomType?: 'voice_channel' | 'stage';
+  onMusicToggle?: () => void;
+  onLayoutToggle?: () => void;
+  layout?: 'content-first' | 'speakers-first';
 }
 
-export function ControlsPanel({ isHost, isAuthenticated = false, onBroadcast, isBroadcasting }: ControlsPanelProps) {
+export function ControlsPanel({
+  isHost,
+  isAuthenticated = false,
+  onBroadcast,
+  isBroadcasting,
+  roomType,
+  onMusicToggle,
+  onLayoutToggle,
+  layout,
+}: ControlsPanelProps) {
   return (
-    <div className="flex items-center justify-center gap-4 px-6 py-4 flex-wrap">
+    <div className="flex items-center justify-center gap-3 px-4 py-3 flex-wrap">
       <MicButton />
       <CameraButton />
       {isHost && <LiveButton />}
-      {isHost && <ScreenShareButton isAuthenticated={isAuthenticated} />}
+      <ScreenShareButton isHost={isHost} isAuthenticated={isAuthenticated} roomType={roomType} />
+
+      {/* Music toggle */}
+      {isAuthenticated && (
+        <button
+          onClick={onMusicToggle}
+          className="px-3 py-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-300 hover:text-white border border-gray-700 hover:border-gray-500"
+          title="Toggle music panel"
+        >
+          🎵
+        </button>
+      )}
+
+      {/* Layout toggle — host only, stages only */}
+      {isHost && roomType === 'stage' && layout && onLayoutToggle && (
+        <LayoutToggle layout={layout} onToggle={onLayoutToggle} />
+      )}
+
+      {/* Raise hand — audience in stages */}
+      {!isHost && roomType === 'stage' && (
+        <button
+          className="px-3 py-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-300 hover:text-[#f5a623] border border-gray-700 hover:border-[#f5a623]/50"
+          title="Raise hand"
+        >
+          ✋
+        </button>
+      )}
+
+      {/* Broadcast button */}
       {isHost && (
         <button
           onClick={onBroadcast}

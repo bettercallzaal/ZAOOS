@@ -44,6 +44,11 @@ const AiMusicGenerator = dynamic(
   { ssr: false },
 );
 
+const MintTrack = dynamic(
+  () => import('@/components/music/MintTrack'),
+  { ssr: false },
+);
+
 type Submission = {
   id: string;
   url: string;
@@ -80,6 +85,7 @@ const SECTION_IDS: Record<Tab, string> = {
 
 export function MusicPage() {
   const [activeTab, setActiveTab] = useState<Tab>('Radio');
+  const [showMint, setShowMint] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(true);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -169,7 +175,21 @@ export function MusicPage() {
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-24 md:pt-12">
-      <PageHeader title="Music" subtitle="Radio, playlists & discovery" />
+      <PageHeader
+        title="Music"
+        subtitle="Radio, playlists & discovery"
+        rightAction={
+          <button
+            onClick={() => setShowMint(true)}
+            className="px-4 py-2 rounded-lg bg-[#f5a623] text-[#0a1628] text-sm font-medium hover:bg-[#f5a623]/90 transition-colors flex items-center gap-1.5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Mint Track
+          </button>
+        }
+      />
 
       {/* ── Smart Omnibar ────────────────────────────────────────── */}
       <div className="max-w-2xl mx-auto px-4 pt-4">
@@ -271,6 +291,9 @@ export function MusicPage() {
           <TopCurators />
         </section>
       </div>
+
+      {/* ── Mint Track Modal ──────────────────────────────────── */}
+      <MintTrack isOpen={showMint} onClose={() => setShowMint(false)} />
     </div>
   );
 }

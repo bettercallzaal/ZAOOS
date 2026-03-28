@@ -79,3 +79,11 @@ CREATE TABLE IF NOT EXISTS space_participant_points (
 ALTER TABLE space_participant_points ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "points_select" ON space_participant_points FOR SELECT USING (true);
 CREATE POLICY "points_insert" ON space_participant_points FOR INSERT WITH CHECK (true);
+
+-- Phase 1: Voice channels + stages
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS room_type TEXT DEFAULT 'stage' CHECK (room_type IN ('voice_channel', 'stage'));
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS persistent BOOLEAN DEFAULT false;
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS channel_id TEXT;
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS theme TEXT DEFAULT 'default';
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS layout_preference TEXT DEFAULT 'content-first' CHECK (layout_preference IN ('content-first', 'speakers-first'));
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ DEFAULT now();

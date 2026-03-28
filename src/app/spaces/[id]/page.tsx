@@ -79,6 +79,19 @@ export default function PublicRoomPage() {
           await newCall.join();
         }
 
+        // Fire-and-forget session tracking on join
+        if (roomData) {
+          fetch('/api/spaces/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              roomId: roomData.id,
+              roomName: roomData.title,
+              roomType: roomData.room_type ?? 'stage',
+            }),
+          }).catch(() => {});
+        }
+
         if (mounted) {
           setClient(newClient);
           setCall(newCall);
@@ -97,7 +110,32 @@ export default function PublicRoomPage() {
     };
   }, [roomId, user, authLoading]);
 
+  // End session on browser close / tab close
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (room?.id) {
+        fetch('/api/spaces/session', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roomId: room.id }),
+          keepalive: true,
+        });
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [room?.id]);
+
   const handleLeave = async () => {
+    // End session tracking (keepalive so it survives navigation)
+    if (room?.id) {
+      fetch('/api/spaces/session', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId: room.id }),
+        keepalive: true,
+      }).catch(() => {});
+    }
     if (call) await call.leave().catch(console.error);
     if (client) await client.disconnectUser().catch(console.error);
     if (isHost && room) {
@@ -163,7 +201,13 @@ export default function PublicRoomPage() {
       <div className="flex-1">
         <StreamVideo client={client}>
           <StreamCall call={call}>
-            <RoomView isHost={isHost} isAuthenticated={!!user} roomId={room.id} />
+            <RoomView
+              isHost={isHost}
+              isAuthenticated={!!user}
+              roomId={room.id}
+              roomType={room.room_type}
+              hostFid={room.host_fid}
+            />
           </StreamCall>
         </StreamVideo>
       </div>

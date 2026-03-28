@@ -13,6 +13,7 @@ export interface FollowerUser {
   follower_count: number;
   following_count: number;
   power_badge: boolean;
+  active_status?: 'active' | 'inactive';
   isZaoMember?: boolean;
   zid?: number | null;
   viewer_context?: {
@@ -123,6 +124,9 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
         <div className="flex items-center gap-3 mt-1">
           <span className="text-[11px] text-gray-600">{formatCount(user.follower_count)} followers</span>
           <span className="text-[11px] text-gray-600">{formatCount(user.following_count)} following</span>
+          {user.active_status === 'inactive' && (
+            <span className="text-[10px] text-red-400/70 bg-red-400/10 px-1.5 py-0.5 rounded">Inactive</span>
+          )}
         </div>
       </div>
 

@@ -61,6 +61,16 @@ export async function GET(
       zid: zidMap.get(u.fid) ?? null,
     }));
 
+    // "inactive" sort — surface inactive accounts first for churn management
+    if (sort === 'inactive') {
+      users.sort((a: { active_status?: string; follower_count?: number }, b: { active_status?: string; follower_count?: number }) => {
+        const aInactive = a.active_status === 'inactive' ? 0 : 1;
+        const bInactive = b.active_status === 'inactive' ? 0 : 1;
+        if (aInactive !== bInactive) return aInactive - bInactive;
+        return (a.follower_count ?? 0) - (b.follower_count ?? 0);
+      });
+    }
+
     if (sort === 'popular') {
       users.sort((a: { follower_count?: number }, b: { follower_count?: number }) =>
         (b.follower_count ?? 0) - (a.follower_count ?? 0)

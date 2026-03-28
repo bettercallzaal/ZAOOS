@@ -14,7 +14,7 @@ import { PageHeader } from '@/components/navigation/PageHeader';
 import { MiniSpaceBanner } from './MiniSpaceBanner';
 
 type View = 'followers' | 'following' | 'community' | 'discover' | 'analytics';
-type SortKey = 'recent' | 'relevant' | 'popular' | 'mutual' | 'zao' | 'trending';
+type SortKey = 'recent' | 'relevant' | 'popular' | 'mutual' | 'zao' | 'trending' | 'inactive';
 
 const SORT_TABS: { key: SortKey; label: string }[] = [
   { key: 'recent', label: 'Recent' },
@@ -23,6 +23,7 @@ const SORT_TABS: { key: SortKey; label: string }[] = [
   { key: 'popular', label: 'Popular' },
   { key: 'mutual', label: 'Mutual' },
   { key: 'zao', label: 'ZAO' },
+  { key: 'inactive', label: 'Inactive' },
 ];
 
 export function SocialPage() {
@@ -158,8 +159,19 @@ export function SocialPage() {
       result = result.filter((u) => u.profile?.bio?.text && u.profile.bio.text.trim().length > 0);
     }
 
+    // "Inactive" sort — show inactive users first (churn candidates)
+    if (sort === 'inactive') {
+      result = result.sort((a, b) => {
+        const aInactive = a.active_status === 'inactive' ? 0 : 1;
+        const bInactive = b.active_status === 'inactive' ? 0 : 1;
+        if (aInactive !== bInactive) return aInactive - bInactive;
+        // Among inactive, sort by lowest follower count (most likely dead accounts)
+        return (a.follower_count || 0) - (b.follower_count || 0);
+      });
+    }
+
     return result;
-  }, [users, search, powerBadgeOnly, hideSpam, minFollowers, zaoOnly, mutualOnly, hasBio]);
+  }, [users, search, powerBadgeOnly, hideSpam, minFollowers, zaoOnly, mutualOnly, hasBio, sort]);
 
   const activeFilterCount = [powerBadgeOnly, hideSpam, minFollowers > 0, zaoOnly, mutualOnly, hasBio].filter(Boolean).length;
 
@@ -300,6 +312,7 @@ export function SocialPage() {
                 { label: 'ZAO', active: zaoOnly, toggle: () => setZaoOnly(!zaoOnly) },
                 { label: 'Mutual', active: mutualOnly, toggle: () => setMutualOnly(!mutualOnly) },
                 { label: 'No spam', active: hideSpam, toggle: () => setHideSpam(!hideSpam) },
+                { label: 'Inactive', active: sort === 'inactive', toggle: () => setSort(sort === 'inactive' ? 'recent' : 'inactive') },
               ].map((t) => (
                 <button
                   key={t.label}

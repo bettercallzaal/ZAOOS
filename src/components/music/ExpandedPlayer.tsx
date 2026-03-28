@@ -24,6 +24,7 @@ const SpectrumVisualizer = dynamic(
   () => import('@/components/music/SpectrumVisualizer'),
   { ssr: false }
 );
+const EqualizerPanel = dynamic(() => import('@/components/music/EqualizerPanel'), { ssr: false });
 
 interface ExpandedPlayerProps {
   metadata: TrackMetadata;
@@ -322,7 +323,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             </div>
           )}
           {activePanel === 'eq' && (
-            <AudioFiltersPanel visible={true} />
+            <EqualizerPanel />
           )}
         </div>
       )}

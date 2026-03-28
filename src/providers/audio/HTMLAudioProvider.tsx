@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, ReactNode } from 'react';
 import { usePlayerContext } from './PlayerProvider';
+import { getEqualizer } from '@/lib/music/equalizer';
 
 // Module-level audio elements — survive component re-mounts and React strict mode
 let audioA: HTMLAudioElement | null = null;
@@ -116,6 +117,9 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
           activeAudioRef.current = activeAudioRef.current === 'A' ? 'B' : 'A';
           activeUrlRef.current = url;
 
+          // Connect EQ to the new active element
+          try { getEqualizer().connect(inactive); } catch {}
+
           // Fade: ramp new up, old down
           performCrossfade(crossfadeSec);
           return;
@@ -127,6 +131,8 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
         activeUrlRef.current = url;
         active.src = url;
         active.load();
+        // Connect EQ to the active element
+        try { getEqualizer().connect(active); } catch {}
         active.play().catch(() => {});
       },
       setVolume: (v: number) => {

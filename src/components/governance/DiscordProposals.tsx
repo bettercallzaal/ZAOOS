@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-/* ── Types ──────────────────────────────────────────────── */
+/* -- Types --------------------------------------------------------- */
 
 interface VoteAgg {
   yes_count: number;
@@ -31,12 +31,14 @@ interface DiscordProposal {
   created_at: string;
   closed_at: string | null;
   votes: VoteAgg;
+  userVote: 'yes' | 'no' | 'abstain' | null;
 }
 
 type StatusFilter = 'all' | 'active' | 'closed';
 type SortMode = 'newest' | 'most_votes' | 'most_weight';
+type VoteValue = 'yes' | 'no' | 'abstain';
 
-/* ── Constants ──────────────────────────────────────────── */
+/* -- Constants ----------------------------------------------------- */
 
 const TYPE_COLORS: Record<string, string> = {
   curate: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
@@ -50,7 +52,22 @@ const STATUS_BADGE: Record<string, string> = {
   closed: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
 };
 
-/* ── Helpers ────────────────────────────────────────────── */
+const VOTE_BUTTON_STYLES: Record<VoteValue, { base: string; active: string }> = {
+  yes: {
+    base: 'border-green-500/30 text-green-400/70 hover:bg-green-500/15 hover:text-green-400 hover:border-green-500/50',
+    active: 'bg-green-500/20 text-green-400 border-green-500/50 ring-1 ring-green-500/30',
+  },
+  no: {
+    base: 'border-red-500/30 text-red-400/70 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/50',
+    active: 'bg-red-500/20 text-red-400 border-red-500/50 ring-1 ring-red-500/30',
+  },
+  abstain: {
+    base: 'border-gray-500/30 text-gray-400/70 hover:bg-gray-500/15 hover:text-gray-300 hover:border-gray-500/50',
+    active: 'bg-gray-500/20 text-gray-300 border-gray-500/50 ring-1 ring-gray-500/30',
+  },
+};
+
+/* -- Helpers ------------------------------------------------------- */
 
 function truncate(text: string, max: number): string {
   if (text.length <= max) return text;
@@ -77,7 +94,7 @@ function timeRemaining(createdAt: string): string {
   return `${hours}h remaining`;
 }
 
-/* ── Skeleton ───────────────────────────────────────────── */
+/* -- Skeleton ------------------------------------------------------ */
 
 function ProposalSkeleton() {
   return (
@@ -98,7 +115,7 @@ function ProposalSkeleton() {
   );
 }
 
-/* ── Vote Bar ───────────────────────────────────────────── */
+/* -- Vote Bar ------------------------------------------------------ */
 
 function VoteBar({ votes }: { votes: VoteAgg }) {
   const total = votes.yes_weight + votes.no_weight;
@@ -134,9 +151,113 @@ function VoteBar({ votes }: { votes: VoteAgg }) {
   );
 }
 
-/* ── Proposal Card ──────────────────────────────────────── */
+/* -- Vote Buttons -------------------------------------------------- */
 
-function ProposalCard({ proposal }: { proposal: DiscordProposal }) {
+function VoteButtons({
+  proposal,
+  userDiscordId,
+  onVote,
+}: {
+  proposal: DiscordProposal;
+  userDiscordId: string | null;
+  onVote: (proposalId: number, vote: VoteValue) => Promise<void>;
+}) {
+  const [submitting, setSubmitting] = useState<VoteValue | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Don't render if proposal is closed
+  if (proposal.status !== 'active') return null;
+
+  // Not authenticated or no discord_id
+  if (!userDiscordId) {
+    return (
+      <p className="text-[10px] text-gray-500 italic">
+        Link your Discord account in Settings to vote
+      </p>
+    );
+  }
+
+  const handleVote = async (vote: VoteValue) => {
+    setSubmitting(vote);
+    setError(null);
+    try {
+      await onVote(proposal.id, vote);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Vote failed');
+    } finally {
+      setSubmitting(null);
+    }
+  };
+
+  const votes: VoteValue[] = ['yes', 'no', 'abstain'];
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-2">
+        {votes.map(v => {
+          const isActive = proposal.userVote === v;
+          const isLoading = submitting === v;
+          const isDisabled = submitting !== null;
+          const styles = VOTE_BUTTON_STYLES[v];
+
+          return (
+            <button
+              key={v}
+              onClick={() => handleVote(v)}
+              disabled={isDisabled}
+              className={`text-[11px] font-medium px-3 py-1 rounded-full border transition-all duration-200 capitalize ${
+                isActive ? styles.active : styles.base
+              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+              {isLoading ? (
+                <span className="inline-flex items-center gap-1">
+                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  {v}
+                </span>
+              ) : (
+                <>
+                  {isActive && (
+                    <svg className="inline w-3 h-3 mr-1 -ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  {v}
+                </>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      {proposal.userVote && (
+        <p className="text-[10px] text-gray-500">
+          You voted: <span className={
+            proposal.userVote === 'yes' ? 'text-green-400' :
+            proposal.userVote === 'no' ? 'text-red-400' :
+            'text-gray-400'
+          }>{proposal.userVote}</span>
+        </p>
+      )}
+      {error && (
+        <p className="text-[10px] text-red-400">{error}</p>
+      )}
+    </div>
+  );
+}
+
+/* -- Proposal Card ------------------------------------------------- */
+
+function ProposalCard({
+  proposal,
+  userDiscordId,
+  onVote,
+}: {
+  proposal: DiscordProposal;
+  userDiscordId: string | null;
+  onVote: (proposalId: number, vote: VoteValue) => Promise<void>;
+}) {
   const typeColor = TYPE_COLORS[proposal.proposal_type] ?? TYPE_COLORS.text;
   const statusColor = STATUS_BADGE[proposal.status] ?? STATUS_BADGE.closed;
 
@@ -192,6 +313,9 @@ function ProposalCard({ proposal }: { proposal: DiscordProposal }) {
       {/* Vote bar */}
       <VoteBar votes={proposal.votes} />
 
+      {/* Vote buttons (active proposals only, authenticated users with discord_id) */}
+      <VoteButtons proposal={proposal} userDiscordId={userDiscordId} onVote={onVote} />
+
       {/* Footer: metadata */}
       <div className="flex items-center justify-between text-[10px] text-gray-500 pt-1">
         <div className="flex items-center gap-3">
@@ -213,12 +337,13 @@ function ProposalCard({ proposal }: { proposal: DiscordProposal }) {
   );
 }
 
-/* ── Main Component ─────────────────────────────────────── */
+/* -- Main Component ------------------------------------------------ */
 
 export function DiscordProposals() {
   const [proposals, setProposals] = useState<DiscordProposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userDiscordId, setUserDiscordId] = useState<string | null>(null);
 
   // Filters & sort
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -236,7 +361,10 @@ export function DiscordProposals() {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
       })
-      .then(d => setProposals(d.proposals ?? []))
+      .then(d => {
+        setProposals(d.proposals ?? []);
+        setUserDiscordId(d.userDiscordId ?? null);
+      })
       .catch(err => {
         console.error('[DiscordProposals] fetch error:', err);
         setError('Failed to load Discord proposals');
@@ -246,6 +374,35 @@ export function DiscordProposals() {
 
   useEffect(() => {
     fetchProposals();
+  }, [fetchProposals]);
+
+  // Handle vote submission with optimistic update
+  const handleVote = useCallback(async (proposalId: number, vote: VoteValue) => {
+    // Optimistically update the UI
+    setProposals(prev => prev.map(p => {
+      if (p.id !== proposalId) return p;
+      return { ...p, userVote: vote };
+    }));
+
+    const res = await fetch('/api/discord/proposals/vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ proposalId, vote }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      // Revert optimistic update
+      fetchProposals();
+      throw new Error(data.error || 'Vote failed');
+    }
+
+    // Update with real vote counts from server
+    setProposals(prev => prev.map(p => {
+      if (p.id !== proposalId) return p;
+      return { ...p, votes: data.votes, userVote: vote };
+    }));
   }, [fetchProposals]);
 
   // Client-side sort
@@ -359,7 +516,12 @@ export function DiscordProposals() {
       {!loading && !error && sorted.length > 0 && (
         <div className="space-y-3">
           {sorted.map(p => (
-            <ProposalCard key={p.id} proposal={p} />
+            <ProposalCard
+              key={p.id}
+              proposal={p}
+              userDiscordId={userDiscordId}
+              onVote={handleVote}
+            />
           ))}
         </div>
       )}

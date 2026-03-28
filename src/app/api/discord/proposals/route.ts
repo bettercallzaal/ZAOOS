@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { getSessionData } from '@/lib/auth/session';
 
 /**
  * GET /api/discord/proposals — Fetch Discord proposals with aggregated vote data
  * Query params:
  *   status: 'active' | 'closed' | 'all' (default: 'all')
  *   type:   'curate' | 'text' | 'governance' | 'funding' (optional filter)
+ *
+ * If the user is authenticated and has a linked discord_id, the response
+ * includes `userVote` on each proposal (the vote_value they cast, or null).
+ * Also includes `userDiscordId` at the top level so the client knows
+ * whether the user can vote.
  */
 export async function GET(req: NextRequest) {
   const supabase = getSupabaseAdmin();
@@ -88,7 +94,36 @@ export async function GET(req: NextRequest) {
       voteMap.set(v.proposal_id, agg);
     }
 
-    // Merge proposals with vote data
+    // Check if user is authenticated and has a linked discord_id
+    let userDiscordId: string | null = null;
+    const userVoteMap = new Map<number, string>(); // proposal_id -> vote_value
+
+    const session = await getSessionData();
+    if (session?.fid) {
+      const { data: user } = await supabase
+        .from('users')
+        .select('discord_id')
+        .eq('fid', session.fid)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (user?.discord_id) {
+        userDiscordId = user.discord_id as string;
+
+        // Fetch this user's votes for the returned proposals
+        const { data: userVotes } = await supabase
+          .from('discord_proposal_votes')
+          .select('proposal_id, vote_value')
+          .eq('voter_id', userDiscordId)
+          .in('proposal_id', proposalIds);
+
+        for (const uv of userVotes ?? []) {
+          userVoteMap.set(uv.proposal_id, uv.vote_value);
+        }
+      }
+    }
+
+    // Merge proposals with vote data and user's vote
     const enriched = proposals.map(p => ({
       ...p,
       votes: voteMap.get(p.id) ?? {
@@ -96,9 +131,14 @@ export async function GET(req: NextRequest) {
         yes_weight: 0, no_weight: 0, abstain_weight: 0,
         total_votes: 0, total_weight: 0,
       },
+      userVote: userVoteMap.get(p.id) ?? null,
     }));
 
-    return NextResponse.json({ proposals: enriched, total: enriched.length });
+    return NextResponse.json({
+      proposals: enriched,
+      total: enriched.length,
+      userDiscordId,
+    });
   } catch (err) {
     console.error('[discord/proposals] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

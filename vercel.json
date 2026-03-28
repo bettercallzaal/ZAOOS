@@ -3,6 +3,10 @@
     {
       "path": "/api/wavewarz/sync",
       "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/follower-snapshot",
+      "schedule": "0 6 * * *"
     }
   ]
 }

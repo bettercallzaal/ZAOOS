@@ -1,8 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useListeningRoom, type ListenerInfo } from '@/hooks/useListeningRoom';
+import { useRadio } from '@/hooks/useRadio';
+import { usePlayer } from '@/providers/audio';
+import type { TrackMetadata } from '@/types/music';
 
 interface RoomMusicPanelProps {
   roomId: string;
@@ -55,6 +58,7 @@ function AuthenticatedMusicPanel({ roomId, isHost }: { roomId: string; isHost: b
     : null;
 
   const room = useListeningRoom(userInfo);
+  const radio = useRadio();
 
   // Join the listening room when the component mounts
   useEffect(() => {
@@ -67,10 +71,40 @@ function AuthenticatedMusicPanel({ roomId, isHost }: { roomId: string; isHost: b
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, userInfo?.fid]);
 
-  const { currentTrack, isPlaying, isDJ, djInfo, listeners, broadcastPause, broadcastResume } = room;
+  const {
+    currentTrack,
+    isPlaying,
+    isDJ,
+    djInfo,
+    listeners,
+    broadcastPlay,
+    broadcastPause,
+    broadcastResume,
+    broadcastSkip,
+  } = room;
+
+  const handleStartRadio = async () => {
+    await radio.startRadio();
+  };
+
+  const handleSkipRadioTrack = () => {
+    radio.nextRadioTrack();
+  };
 
   return (
     <div className="border-t border-gray-800 bg-[#0d1b2a]">
+      {/* Auto-broadcast player state changes to room listeners when DJ.
+          This ensures radio track changes (which bypass broadcastPlay) are
+          automatically synced to all listeners in the room. */}
+      {isDJ && (
+        <PlayerBroadcastBridge
+          isDJ={isDJ}
+          isRadioMode={radio.isRadioMode}
+          broadcastPlay={broadcastPlay}
+          broadcastSkip={broadcastSkip}
+        />
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-1">
         <div className="flex items-center gap-2">
@@ -126,6 +160,17 @@ function AuthenticatedMusicPanel({ roomId, isHost }: { roomId: string; isHost: b
             {/* Playing indicator for listeners / Controls for DJ */}
             {isDJ ? (
               <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Skip button — only shown in radio mode */}
+                {radio.isRadioMode && (
+                  <button
+                    onClick={handleSkipRadioTrack}
+                    className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                    title="Skip to next track"
+                  >
+                    <SkipIcon />
+                  </button>
+                )}
+                {/* Play / Pause */}
                 <button
                   onClick={() => (isPlaying ? broadcastPause() : broadcastResume())}
                   className="w-8 h-8 rounded-full bg-[#f5a623] flex items-center justify-center hover:bg-[#ffd700] transition-colors"
@@ -143,15 +188,89 @@ function AuthenticatedMusicPanel({ roomId, isHost }: { roomId: string; isHost: b
         </div>
       ) : (
         <div className="px-4 pb-3">
-          <div className="text-center py-3 text-gray-600 text-xs">
-            {isDJ
-              ? 'Play a track from the music tab to start DJing'
-              : 'No music playing yet'}
-          </div>
+          {isDJ ? (
+            <div className="flex flex-col items-center gap-2 py-2">
+              {/* Start Radio CTA */}
+              <button
+                onClick={handleStartRadio}
+                disabled={radio.radioLoading}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f5a623] text-[#0a1628] text-xs font-semibold hover:bg-[#ffd700] disabled:opacity-60 transition-colors w-full justify-center"
+              >
+                {radio.radioLoading ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-[#0a1628] border-t-transparent rounded-full animate-spin" />
+                    Loading radio...
+                  </>
+                ) : (
+                  <>
+                    <RadioIcon />
+                    Start ZAO Radio
+                  </>
+                )}
+              </button>
+              <p className="text-[10px] text-gray-600 text-center">
+                or play any track from the music tab
+              </p>
+            </div>
+          ) : (
+            <div className="text-center py-3 text-gray-600 text-xs">
+              No music playing yet
+            </div>
+          )}
         </div>
       )}
     </div>
   );
+}
+
+// ─── PlayerBroadcastBridge ────────────────────────────────────────────────────
+// Invisible component that watches player.metadata and auto-broadcasts to the
+// room channel whenever the DJ starts a new track (e.g. via radio or manual play).
+// This ensures listeners stay in sync without the DJ having to manually trigger
+// a broadcast — radio and manual plays are both picked up automatically.
+
+function PlayerBroadcastBridge({
+  isDJ,
+  isRadioMode,
+  broadcastPlay,
+  broadcastSkip,
+}: {
+  isDJ: boolean;
+  isRadioMode: boolean;
+  broadcastPlay: (track: TrackMetadata) => void;
+  broadcastSkip: (track: TrackMetadata) => void;
+}) {
+  const player = usePlayer();
+  const lastBroadcastIdRef = useRef<string | null>(null);
+  const hasInitialBroadcastRef = useRef(false);
+
+  useEffect(() => {
+    if (!isDJ) return;
+    if (!player.metadata) return;
+
+    const trackId = player.metadata.feedId ?? player.metadata.id;
+    if (trackId === lastBroadcastIdRef.current) return;
+
+    lastBroadcastIdRef.current = trackId;
+
+    if (isRadioMode && hasInitialBroadcastRef.current) {
+      // Subsequent radio track — broadcast as a skip
+      broadcastSkip(player.metadata);
+    } else {
+      // First track or a manual (non-radio) play
+      broadcastPlay(player.metadata);
+      hasInitialBroadcastRef.current = true;
+    }
+  }, [isDJ, player.metadata, isRadioMode, broadcastPlay, broadcastSkip]);
+
+  // Reset initial-broadcast flag when radio mode turns off
+  useEffect(() => {
+    if (!isRadioMode) {
+      hasInitialBroadcastRef.current = false;
+    }
+  }, [isRadioMode]);
+
+  return null;
 }
 
 // ─── Icons ─────────────────────────────────────────────────────────────────────
@@ -172,6 +291,36 @@ function MusicIcon() {
       <path d="M9 18V5l12-2v13" />
       <circle cx="6" cy="18" r="3" />
       <circle cx="18" cy="16" r="3" />
+    </svg>
+  );
+}
+
+function RadioIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="flex-shrink-0"
+    >
+      <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
+      <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
+      <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
+      <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19" />
+    </svg>
+  );
+}
+
+function SkipIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z" />
     </svg>
   );
 }

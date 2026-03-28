@@ -163,7 +163,7 @@ export default function PublicRoomPage() {
       <div className="flex-1">
         <StreamVideo client={client}>
           <StreamCall call={call}>
-            <RoomView isHost={isHost} roomId={room.id} />
+            <RoomView isHost={isHost} isAuthenticated={!!user} roomId={room.id} />
           </StreamCall>
         </StreamVideo>
       </div>

@@ -2,18 +2,21 @@
 
 import { MicButton } from './MicButton';
 import { LiveButton } from './LiveButton';
+import { ScreenShareButton } from './ScreenShareButton';
 
 interface ControlsPanelProps {
   isHost: boolean;
+  isAuthenticated?: boolean;
   onBroadcast?: () => void;
   isBroadcasting?: boolean;
 }
 
-export function ControlsPanel({ isHost, onBroadcast, isBroadcasting }: ControlsPanelProps) {
+export function ControlsPanel({ isHost, isAuthenticated = false, onBroadcast, isBroadcasting }: ControlsPanelProps) {
   return (
-    <div className="flex items-center justify-center gap-4 px-6 py-4">
+    <div className="flex items-center justify-center gap-4 px-6 py-4 flex-wrap">
       <MicButton />
       {isHost && <LiveButton />}
+      {isHost && <ScreenShareButton isAuthenticated={isAuthenticated} />}
       {isHost && (
         <button
           onClick={onBroadcast}

@@ -351,14 +351,19 @@ export async function POST(req: NextRequest) {
 
     // ── 6. Sync member tiers ──────────────────────────────────────
     if (action === 'sync-tiers' || action === 'all') {
-      const { data: users } = await supabaseAdmin
-        .from('users')
-        .select('id, fid, primary_wallet, member_tier')
-        .eq('is_active', true);
+      // Fetch users and respect members in parallel (independent queries)
+      const [usersResult, respectMembersResult] = await Promise.all([
+        supabaseAdmin
+          .from('users')
+          .select('id, fid, primary_wallet, member_tier')
+          .eq('is_active', true),
+        supabaseAdmin
+          .from('respect_members')
+          .select('id, fid, wallet_address, total_respect, onchain_og, onchain_zor'),
+      ]);
 
-      const { data: respectMembers } = await supabaseAdmin
-        .from('respect_members')
-        .select('fid, wallet_address, total_respect, onchain_og, onchain_zor');
+      const { data: users } = usersResult;
+      const { data: respectMembers } = respectMembersResult;
 
       let upgraded = 0;
       let linked = 0;
@@ -377,16 +382,9 @@ export async function POST(req: NextRequest) {
 
           const updates: Record<string, unknown> = {};
 
-          // Link respect_member_id if not set
+          // Link respect_member_id using already-fetched data (no extra query needed)
           if (respect) {
-            // Get the respect_member id
-            const { data: rm } = await supabaseAdmin
-              .from('respect_members')
-              .select('id')
-              .or(`fid.eq.${user.fid || 0},wallet_address.ilike.${(user.primary_wallet || '').toLowerCase()}`)
-              .limit(1)
-              .maybeSingle();
-            if (rm) updates.respect_member_id = rm.id;
+            updates.respect_member_id = respect.id;
           }
 
           if (hasRespect && user.member_tier !== 'respect_holder') {

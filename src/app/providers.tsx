@@ -2,15 +2,22 @@
 
 import { useMemo, useState } from 'react';
 import { type State, WagmiProvider } from 'wagmi';
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { AuthKitProvider } from '@farcaster/auth-kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { MiniAppGate } from '@/components/miniapp/MiniAppGate';
 import { getWagmiConfig } from '@/lib/wagmi/config';
-import { SOLANA_ENDPOINT, getSolanaWallets } from '@/lib/solana/config';
-import '@farcaster/auth-kit/styles.css';
-import '@rainbow-me/rainbowkit/styles.css';
+
+// Lazy-load heavy wallet/auth providers — not needed on initial page render
+import dynamic from 'next/dynamic';
+
+const LazyRainbowKit = dynamic(
+  () => import('@/components/providers/RainbowKitWrapper').then(m => ({ default: m.RainbowKitWrapper })),
+  { ssr: false },
+);
+
+const LazyAuthKit = dynamic(
+  () => import('@/components/providers/AuthKitWrapper').then(m => ({ default: m.AuthKitWrapper })),
+  { ssr: false },
+);
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -18,13 +25,6 @@ interface ProvidersProps {
 }
 
 export function Providers({ children, wagmiInitialState }: ProvidersProps) {
-  const authKitConfig = useMemo(() => ({
-    rpcUrl: 'https://mainnet.optimism.io',
-    domain: typeof window !== 'undefined' ? window.location.host : 'zaoos.com',
-  }), []);
-
-  const solanaWallets = useMemo(() => getSolanaWallets(), []);
-
   const [wagmiConfig] = useState(() => getWagmiConfig());
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
@@ -38,21 +38,11 @@ export function Providers({ children, wagmiInitialState }: ProvidersProps) {
   return (
     <WagmiProvider config={wagmiConfig} initialState={wagmiInitialState}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider
-          theme={darkTheme({
-            accentColor: '#f5a623',
-            accentColorForeground: '#0a1628',
-            borderRadius: 'medium',
-          })}
-        >
-          <AuthKitProvider config={authKitConfig}>
-            <ConnectionProvider endpoint={SOLANA_ENDPOINT}>
-              <WalletProvider wallets={solanaWallets} autoConnect={false}>
-                <MiniAppGate>{children}</MiniAppGate>
-              </WalletProvider>
-            </ConnectionProvider>
-          </AuthKitProvider>
-        </RainbowKitProvider>
+        <LazyRainbowKit>
+          <LazyAuthKit>
+            <MiniAppGate>{children}</MiniAppGate>
+          </LazyAuthKit>
+        </LazyRainbowKit>
       </QueryClientProvider>
     </WagmiProvider>
   );

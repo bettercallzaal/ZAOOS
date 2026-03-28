@@ -1,6 +1,6 @@
 # Research Document Index
 
-108 research documents in `research/`. Each is a folder with a `README.md`.
+109 research documents in `research/`. Each is a folder with a `README.md`.
 
 | # | Folder Name | Topic |
 |---|-------------|-------|
@@ -163,3 +163,4 @@
 | 171 | `171-council-high-intelligence-multi-agent-deliberation` | Council of High Intelligence deep dive: 11-agent deliberation, CC0 license, 6 polarity pairs, 3-round protocol, anti-recursion/convergence safeguards, 3 ZAO custom triads, install guide, 6 tools compared |
 | 172 | `172-solo-founder-ai-dev-workflow` | Solo founder AI dev case study: 584 commits in 16 days, 46K LOC, ZAO OS build log, productivity paradox, fix-commit analysis, publishable article |
 | 198 | `198-social-graph-analytics-discovery` | Social graph analytics & discovery: Neynar v2 + OpenRank + Airstack comparison, 9 existing components audited, 4-phase integration plan (OpenRank scores, relevant followers, persistent graph, on-chain signals), 20 sources |
+| 199 | `199-advanced-social-graph-features` | Advanced social graph features: unfollower tracking (Hatecast pattern), force-directed visualization (react-force-graph-2d vs sigma.js vs d3-force — 6 libs compared), growth analytics (daily cron snapshots), conversation clustering, influence mapping (OpenRank overlay), 9 Farcaster analytics tools surveyed, 21 sources |

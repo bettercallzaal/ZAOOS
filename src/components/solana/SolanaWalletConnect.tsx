@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useWallet } from '@solana/wallet-adapter-react';
 import type { WalletName } from '@solana/wallet-adapter-base';
 import bs58 from 'bs58';
@@ -204,8 +205,7 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1a2a3a] transition-colors text-left"
               >
                 {w.adapter.icon && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={w.adapter.icon} alt={w.adapter.name} className="w-5 h-5 rounded" />
+                  <Image src={w.adapter.icon} alt={`${w.adapter.name} wallet icon`} width={20} height={20} className="w-5 h-5 rounded" unoptimized />
                 )}
                 <span className="text-sm text-white">{w.adapter.name}</span>
               </button>

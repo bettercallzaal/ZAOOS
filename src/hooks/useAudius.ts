@@ -62,7 +62,7 @@ async function audiusFetch(
  * Fetch trending tracks from Audius with optional genre filter.
  * Data is cached and refetched via react-query.
  */
-export function useAudiusTrending(genre?: string, time: string = 'week') {
+export function useAudiusTrending(genre?: string, time: string = 'week', enabled = true) {
   return useQuery<AudiusTrack[]>({
     queryKey: ['audius', 'trending', genre ?? 'All', time],
     queryFn: () => {
@@ -70,6 +70,7 @@ export function useAudiusTrending(genre?: string, time: string = 'week') {
       if (genre && genre !== 'All') params.genre = genre;
       return audiusFetch('/tracks/trending', params);
     },
+    enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
@@ -78,10 +79,11 @@ export function useAudiusTrending(genre?: string, time: string = 'week') {
  * Fetch underground/emerging tracks from Audius.
  * Data is cached and refetched via react-query.
  */
-export function useAudiusUnderground() {
+export function useAudiusUnderground(enabled = true) {
   return useQuery<AudiusTrack[]>({
     queryKey: ['audius', 'underground'],
     queryFn: () => audiusFetch('/tracks/trending/underground'),
+    enabled,
     staleTime: 5 * 60 * 1000,
   });
 }

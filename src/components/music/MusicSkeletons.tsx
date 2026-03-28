@@ -14,7 +14,7 @@ export function TrackCardSkeleton() {
         <Skeleton width={48} height={48} borderRadius={8} />
         <div className="flex-1 min-w-0">
           <Skeleton width="60%" height={14} />
-          <Skeleton width="40%" height={12} style={{ marginTop: 4 }} />
+          <Skeleton width="40%" height={12} className="mt-1" />
         </div>
         <Skeleton width={32} height={12} />
       </div>
@@ -31,12 +31,12 @@ export function NowPlayingHeroSkeleton() {
           <Skeleton width={80} height={80} borderRadius={12} className="flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <Skeleton width="60%" height={14} />
-            <Skeleton width="40%" height={12} style={{ marginTop: 6 }} />
+            <Skeleton width="40%" height={12} className="mt-1.5" />
             <Skeleton
               width="100%"
               height={4}
               borderRadius={2}
-              style={{ marginTop: 12 }}
+              className="mt-3"
             />
           </div>
         </div>

@@ -5,8 +5,10 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import DiscordIntro from '@/components/members/DiscordIntro';
-import DiscordActivity from '@/components/members/DiscordActivity';
+import dynamic from 'next/dynamic';
+
+const DiscordIntro = dynamic(() => import('@/components/members/DiscordIntro'), { ssr: false });
+const DiscordActivity = dynamic(() => import('@/components/members/DiscordActivity'), { ssr: false });
 
 interface MemberProfile {
   fid: number | null;

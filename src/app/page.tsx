@@ -1,7 +1,26 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getSessionData } from '@/lib/auth/session';
 import Image from 'next/image';
 import { LoginButton } from '@/components/gate/LoginButton';
+
+export const metadata: Metadata = {
+  title: 'ZAO OS — The ZAO Community',
+  description:
+    'A gated Farcaster community for music artists who govern, collaborate, and build onchain together. Encrypted messaging, live audio spaces, and respect-weighted governance.',
+  openGraph: {
+    title: 'ZAO OS — The ZAO Community',
+    description:
+      'A gated Farcaster community for music artists who govern, collaborate, and build onchain together.',
+    url: 'https://zaoos.com',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ZAO OS — The ZAO Community',
+    description:
+      'A gated Farcaster community for music artists who govern, collaborate, and build onchain together.',
+  },
+};
 
 export default async function LandingPage() {
   const session = await getSessionData();

@@ -3,13 +3,15 @@
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { SessionsTab } from './SessionsTab';
-import { FractalLeaderboardTab } from './FractalLeaderboardTab';
-import { ProposalsTab } from './ProposalsTab';
-import { AboutTab } from './AboutTab';
-import { AnalyticsTab } from './AnalyticsTab';
-import { EventsCalendar } from '@/components/governance/EventsCalendar';
-import { LiveFractalDashboard } from '@/components/governance/LiveFractalDashboard';
+import dynamic from 'next/dynamic';
+
+const SessionsTab = dynamic(() => import('./SessionsTab').then(m => ({ default: m.SessionsTab })), { ssr: false });
+const FractalLeaderboardTab = dynamic(() => import('./FractalLeaderboardTab').then(m => ({ default: m.FractalLeaderboardTab })), { ssr: false });
+const ProposalsTab = dynamic(() => import('./ProposalsTab').then(m => ({ default: m.ProposalsTab })), { ssr: false });
+const AboutTab = dynamic(() => import('./AboutTab').then(m => ({ default: m.AboutTab })), { ssr: false });
+const AnalyticsTab = dynamic(() => import('./AnalyticsTab').then(m => ({ default: m.AnalyticsTab })), { ssr: false });
+const EventsCalendar = dynamic(() => import('@/components/governance/EventsCalendar').then(m => ({ default: m.EventsCalendar })), { ssr: false });
+const LiveFractalDashboard = dynamic(() => import('@/components/governance/LiveFractalDashboard').then(m => ({ default: m.LiveFractalDashboard })), { ssr: false });
 
 type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'proposals' | 'events' | 'live' | 'about';
 const VALID_TABS: Tab[] = ['sessions', 'leaderboard', 'analytics', 'proposals', 'events', 'live', 'about'];

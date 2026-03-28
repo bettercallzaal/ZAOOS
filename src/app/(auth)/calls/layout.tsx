@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Calls — The ZAO',
+  title: 'Calls — ZAO OS',
   description: 'Voice and video rooms for fractal calls and community hangouts',
 };
 

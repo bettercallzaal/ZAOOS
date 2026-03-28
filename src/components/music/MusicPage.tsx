@@ -10,6 +10,7 @@ import { communityConfig } from '@/../community.config';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { timeAgoSimple as timeAgo } from '@/lib/format/timeAgo';
 import { RespectTrending } from '@/components/music/RespectTrending';
+import { PageHeader } from '@/components/navigation/PageHeader';
 
 const AudiusDiscover = dynamic(
   () => import('@/components/music/AudiusDiscover').then((m) => m.AudiusDiscover),
@@ -144,6 +145,8 @@ export function MusicPage() {
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-24 md:pt-12">
+      <PageHeader title="Music" subtitle="Radio, playlists & discovery" />
+
       {/* ── Track of the Day Hero Banner ─────────────────────────── */}
       <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-0">
         <TrackOfTheDayBanner />

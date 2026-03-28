@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { PageHeader } from '@/components/navigation/PageHeader';
 import { communityConfig } from '@/../community.config';
 import { GeneratePostButton } from '@/components/wavewarz/GeneratePostButton';
 
@@ -43,25 +43,24 @@ export default function WaveWarzPage() {
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-2 border-b border-gray-800 bg-[#0d1b2a] flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <Link href="/ecosystem" className="text-gray-500 hover:text-white text-xs">
-            &larr;
-          </Link>
-          <h2 className="font-semibold text-sm text-white">WaveWarZ</h2>
-        </div>
-        <div className="flex items-center gap-3">
-          <a
-            href={currentUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] text-gray-500 hover:text-white transition-colors"
-          >
-            Open in tab
-          </a>
-          <div className="md:hidden"><NotificationBell /></div>
-        </div>
-      </header>
+      <PageHeader
+        title="WaveWarZ"
+        subtitle="Music prediction battles"
+        backHref="/ecosystem"
+        rightAction={
+          <div className="flex items-center gap-3">
+            <a
+              href={currentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-gray-500 hover:text-white transition-colors"
+            >
+              Open in tab
+            </a>
+            <div className="md:hidden"><NotificationBell /></div>
+          </div>
+        }
+      />
 
       {/* Generate WaveWarZ Post */}
       <div className="px-3 py-2 bg-[#0d1b2a] border-b border-gray-800 flex-shrink-0">

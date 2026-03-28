@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { PageHeader } from '@/components/navigation/PageHeader';
 import { NEXUS_LINKS, type NexusCategory, type NexusLink } from '@/lib/nexus/links';
 
 // ── Ecosystem App Definitions ─────────────────────────────────────────────────
@@ -168,14 +169,11 @@ export default function EcosystemPage() {
   return (
     <div className="flex flex-col min-h-[100dvh] bg-[#0a1628] text-white">
       {/* Header */}
-      <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-sm text-gray-300">Ecosystem</h2>
-          <div className="flex items-center gap-2">
-            <div className="md:hidden"><NotificationBell /></div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Ecosystem"
+        subtitle="Apps & integrations"
+        rightAction={<div className="md:hidden"><NotificationBell /></div>}
+      />
 
       {/* App Selector Bar — sticky, horizontal scroll */}
       <div className="sticky top-0 z-20 bg-[#0d1b2a]/95 backdrop-blur-sm border-b border-gray-800 flex-shrink-0">

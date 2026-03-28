@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { PageHeader } from '@/components/navigation/PageHeader';
 import { SyncRespectButton } from '@/components/admin/SyncRespectButton';
 import { ImportRespectButton } from '@/components/admin/ImportRespectButton';
 
@@ -40,12 +41,10 @@ export function AdminPanel() {
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white">
       {/* Header */}
-      <header className="border-b border-gray-800 px-4 sm:px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-[#f5a623] tracking-wide">ZAO Admin</h1>
-            <p className="text-xs text-gray-500 mt-0.5">Manage your community</p>
-          </div>
+      <PageHeader
+        title="ZAO Admin"
+        subtitle="Manage your community"
+        rightAction={
           <div className="flex items-center gap-2">
             <Link
               href="/admin/members"
@@ -55,15 +54,9 @@ export function AdminPanel() {
             </Link>
             <ImportRespectButton />
             <SyncRespectButton />
-            <Link
-              href="/home"
-              className="text-sm text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors"
-            >
-              ← Back
-            </Link>
           </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Tab Navigation */}
       <div className="border-b border-gray-800">

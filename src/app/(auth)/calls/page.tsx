@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { PageHeader } from '@/components/navigation/PageHeader';
 
 const JitsiRoom = dynamic(
   () => import('@/components/calls/JitsiRoom').then((mod) => mod.JitsiRoom),
@@ -85,10 +86,7 @@ export default function CallsPage() {
   // ── Room list view ─────────────────────────────────────────────────────────
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
-      <header className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
-        <h2 className="font-semibold text-sm text-gray-300">Calls</h2>
-        <Link href="/tools" className="text-xs text-gray-500 hover:text-white">Back to Tools</Link>
-      </header>
+      <PageHeader title="Calls" backHref="/tools" />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
         {/* Spaces banner */}

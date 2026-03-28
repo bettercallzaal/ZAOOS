@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { PageHeader } from '@/components/navigation/PageHeader';
 
 interface Notification {
   id: string;
@@ -75,26 +76,18 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-[#0a1628] text-white">
+    <div className="min-h-[100dvh] bg-[#0a1628] pb-20 text-white">
+      <PageHeader
+        title="Notifications"
+        backHref="/home"
+        count={unreadCount > 0 ? unreadCount : undefined}
+        rightAction={unreadCount > 0 ? (
+          <button onClick={markAllRead} className="text-xs text-[#f5a623] hover:text-[#ffd700] font-medium">
+            Mark all read
+          </button>
+        ) : undefined}
+      />
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <a href="/home" className="text-gray-400 hover:text-white transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-            </a>
-            <h1 className="text-lg font-bold">Notifications</h1>
-            {unreadCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-[#f5a623] text-black text-xs font-bold">{unreadCount}</span>
-            )}
-          </div>
-          {unreadCount > 0 && (
-            <button onClick={markAllRead} className="text-xs text-[#f5a623] hover:text-[#ffd700] font-medium">
-              Mark all read
-            </button>
-          )}
-        </div>
 
         <div className="flex gap-2 mb-4">
           {(['all', 'unread'] as const).map(f => (

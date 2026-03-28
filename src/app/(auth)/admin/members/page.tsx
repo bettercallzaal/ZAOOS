@@ -119,7 +119,7 @@ export default function MemberCRMPage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-lg font-bold">Member CRM</h1>
-          <p className="text-xs text-gray-500 mt-1">Unified member directory + data health</p>
+          <p className="text-xs text-gray-500 mt-1">Unified members + data health</p>
         </div>
 
         {/* Tab bar */}
@@ -130,7 +130,7 @@ export default function MemberCRMPage() {
               tab === 'directory' ? 'bg-[#f5a623]/10 text-[#f5a623]' : 'text-gray-500 hover:text-white'
             }`}
           >
-            Directory ({members.length})
+            Members ({members.length})
           </button>
           <button
             onClick={() => setTab('health')}

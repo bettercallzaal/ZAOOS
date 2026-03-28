@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { PageHeader } from '@/components/navigation/PageHeader';
 
 interface Member {
   id: string;
@@ -148,18 +149,15 @@ export default function MembersDirectoryPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white">
-      {/* Header */}
-      <nav className="border-b border-gray-800 px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="text-[#f5a623] font-bold text-sm">THE ZAO</Link>
-        <span className="text-xs text-gray-500">{members.length} members</span>
-      </nav>
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+      <PageHeader
+        title="Members"
+        subtitle="The decentralized music community"
+        backHref="/"
+        count={members.length}
+      />
 
-      <div className="max-w-3xl mx-auto px-4 py-6">
-        <div className="mb-4">
-          <h1 className="text-xl font-bold">ZAO Members</h1>
-          <p className="text-xs text-gray-500 mt-1">The decentralized music community</p>
-        </div>
+      <div className="max-w-3xl mx-auto px-4 py-4">
 
         {/* Quick presets */}
         <div className="flex gap-1.5 overflow-x-auto pb-2 mb-3 scrollbar-none">

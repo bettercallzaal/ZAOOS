@@ -29,3 +29,6 @@
 | [89](../89-paperclip-gstack-autoresearch-stack/) | **Paperclip + gstack + Autoresearch Stack** | AI-agent workflow tools: gstack skills, Conductor parallel sessions, autoresearch loops |
 | [91](../91-top-claude-skills-mcp-repos/) | **Top Claude Skills & MCP Repos** | Evaluation of viral "Top 50 Claude Skills" list for ZAO OS (Context7, Tavily, gstack) |
 | [154](../154-skills-commands-master-reference/) | **Skills & Commands Master Reference** | **CANONICAL** — All 48 commands/skills, when to use each, session flows, how to ask for features |
+| [165](../165-claude-code-multi-terminal-management/) | **Claude Code Multi-Terminal Management** | claude-squad TUI, ccboard cost tracking, permission modes, worktrees + tmux, headless scripting, session naming |
+| [166](../166-dev-workflow-improvements/) | **Dev Workflow Improvements** | 580-commit analysis, 7 automations: pre-commit hooks, auto-format, session context, GH Actions review bot, scheduled agents, build gate, macOS notifications |
+| [168](../168-claude-code-community-innovations-march2026/) | **Claude Code Community Innovations (March 2026)** | Autoresearch 10x (Ole Lehmann), Council of High Intelligence multi-agent deliberation (Nyk), Learn Vibe Build education |

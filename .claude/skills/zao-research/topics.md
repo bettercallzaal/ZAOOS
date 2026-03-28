@@ -23,6 +23,7 @@ Use this to quickly find if a topic has already been researched.
 
 ## Music & Audio
 - Music APIs (Audius, Sound.xyz, Spotify, SoundCloud, YouTube) → `03`
+- Audio APIs 2026, music players, displays, EQ, spectrum, reference implementations → `167`
 - Live audio rooms (LiveKit, WebRTC, synchronized listening) → `43`
 - Audio player architecture, waveforms, streaming → `33`, `43`
 - SongJam audio spaces iframe embed, 100ms SDK, /zabal page → `119`
@@ -163,6 +164,9 @@ Use this to quickly find if a topic has already been researched.
 - Alibaba Page Agent: in-page AI copilot, DOM dehydration → `68`
 - Claude Code tips: 45 best practices audited against ZAO setup → `69`
 - Sub-agents vs Agent Teams: multi-agent paradigms, Claude Architect patterns → `70`
+- Claude Code multi-terminal management (claude-squad, ccboard, permission modes, worktrees, tmux) → `165`
+- Dev workflow improvements: git history analysis, pre-commit hooks, auto-format, GH Actions review, scheduled agents, test coverage gaps → `166`
+- Community innovations March 2026: autoresearch 10x, Council of High Intelligence, Learn Vibe Build → `168`
 - Paperclip rate limits: multi-agent API management, Anthropic tiers, staggering → `71`
 - Paperclip functionality deep dive: full agent lifecycle, heartbeat, adapter config → `72`
 - Sprint plans → `docs/superpowers/plans/`

@@ -6,6 +6,7 @@ import SubmitForm from '@/components/library/SubmitForm';
 import EntryFeed from '@/components/library/EntryFeed';
 import DeepResearch from '@/components/library/DeepResearch';
 import { useAuth } from '@/hooks/useAuth';
+import { PageHeader } from '@/components/navigation/PageHeader';
 
 function LibraryContent() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -26,13 +27,9 @@ function LibraryContent() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 pb-20 md:pb-0 space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Library</h1>
-        <p className="text-sm text-gray-400 mt-1">
-          Submit links, topics, and resources. AI analyzes how they fit into ZAO.
-        </p>
-      </div>
+    <div className="pb-20 md:pb-0">
+      <PageHeader title="Library" subtitle="Submit links, topics, and resources" />
+      <div className="mx-auto max-w-3xl px-4 py-4 space-y-6">
 
       <section>
         <h2 className="text-lg font-semibold text-white mb-3">Submit</h2>
@@ -71,6 +68,7 @@ function LibraryContent() {
       ) : (
         <DeepResearch />
       )}
+      </div>
     </div>
   );
 }

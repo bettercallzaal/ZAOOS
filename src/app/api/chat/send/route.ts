@@ -108,8 +108,9 @@ export async function POST(req: NextRequest) {
           if (!process.env.TELEGRAM_BOT_TOKEN) return;
           const { normalizeForTelegram } = await import('@/lib/publish/normalize');
           const { publishToTelegram, escapeMarkdownV2 } = await import('@/lib/publish/telegram');
+          const farcasterLink = `https://warpcast.com/~/conversations/${castData.hash}`;
           const normalized = normalizeForTelegram({
-            text: `${session.displayName} in #${primaryChannel}:\n\n${text}`,
+            text: `${session.displayName} in #${primaryChannel}:\n\n${text}\n\n🔗 View on Farcaster: ${farcasterLink}\n🌐 Join ZAO OS: https://zaoos.com`,
             castHash: castData.hash,
           });
           const result = await publishToTelegram({
@@ -128,10 +129,11 @@ export async function POST(req: NextRequest) {
             text,
             castHash: castData.hash,
           });
+          const farcasterLink = `https://warpcast.com/~/conversations/${castData.hash}`;
           const embed = buildZaoEmbed({
             title: `#${primaryChannel}`,
-            description: normalized.text,
-            url: 'https://zaoos.com/chat',
+            description: `${normalized.text}\n\n[View on Farcaster](${farcasterLink}) · [Join ZAO OS](https://zaoos.com)`,
+            url: farcasterLink,
             footerText: `${session.displayName} via ZAO OS`,
           });
           const result = await publishToDiscord({

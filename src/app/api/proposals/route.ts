@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
         if (!process.env.TELEGRAM_BOT_TOKEN) return;
         const { publishToTelegram, escapeMarkdownV2 } = await import('@/lib/publish/telegram');
         const descTruncated = description.length > 200 ? description.slice(0, 200) + '...' : description;
-        const msgText = `📋 New Proposal: ${title}\n\nBy ${session.displayName}\n\n${descTruncated}\n\nVote on ZAO OS`;
+        const msgText = `📋 New Proposal: ${title}\n\nBy ${session.displayName}\n\n${descTruncated}\n\n🗳️ Vote on ZAO OS: https://zaoos.com/governance\n🌐 Join the community: https://zaoos.com`;
         const result = await publishToTelegram({
           text: escapeMarkdownV2(msgText),
         });
@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
         const descTruncated = description.length > 200 ? description.slice(0, 200) + '...' : description;
         const embed = buildZaoEmbed({
           title: `📋 New Proposal: ${title}`,
-          description: descTruncated,
+          description: `${descTruncated}\n\n[Vote on ZAO OS](https://zaoos.com/governance) · [Join the community](https://zaoos.com)`,
           url: 'https://zaoos.com/governance',
           footerText: `Proposed by ${session.displayName}`,
         });

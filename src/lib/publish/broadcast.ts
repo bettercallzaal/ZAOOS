@@ -23,6 +23,10 @@ export interface BroadcastOptions {
   imageUrl?: string;
   /** Discord embed color hex string (default gold #f5a623). */
   color?: string;
+  /** Farcaster cast hash — used to build a link to the cast. */
+  castHash?: string;
+  /** Direct URL to link to (overrides default ZAO OS link). */
+  url?: string;
 }
 
 export interface BroadcastResult {
@@ -47,9 +51,21 @@ export async function broadcastToChannels(
   const hasTelegram = !!process.env.TELEGRAM_BOT_TOKEN;
   const hasDiscord = !!process.env.DISCORD_WEBHOOK_URL;
 
+  // Build links to append
+  const farcasterLink = options.castHash
+    ? `https://warpcast.com/~/conversations/${options.castHash}`
+    : null;
+  const pageUrl = options.url ?? 'https://zaoos.com';
+  const linksSuffix = farcasterLink
+    ? `\n\n🔗 View on Farcaster: ${farcasterLink}\n🌐 Join ZAO OS: ${pageUrl}`
+    : `\n\n🌐 Join ZAO OS: ${pageUrl}`;
+  const discordLinks = farcasterLink
+    ? `\n\n[View on Farcaster](${farcasterLink}) · [Join ZAO OS](${pageUrl})`
+    : `\n\n[Join ZAO OS](${pageUrl})`;
+
   const telegramPromise = hasTelegram
     ? publishToTelegram({
-        text: options.text,
+        text: options.text + linksSuffix,
         imageUrl: options.imageUrl,
         parseMode: 'HTML',
         disablePreview: false,
@@ -58,12 +74,13 @@ export async function broadcastToChannels(
 
   const discordPromise = hasDiscord
     ? publishToDiscord({
-        text: options.text,
+        text: options.title ? '' : options.text,
         embeds: options.title
           ? [
               buildZaoEmbed({
                 title: options.title,
-                description: options.text,
+                description: options.text + discordLinks,
+                url: farcasterLink ?? pageUrl,
                 imageUrl: options.imageUrl,
               }),
             ]

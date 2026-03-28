@@ -27,6 +27,11 @@ const CreateWeeklyPoll = dynamic(
   { ssr: false }
 );
 
+const DiscordProposals = dynamic(
+  () => import('@/components/governance/DiscordProposals').then(m => ({ default: m.DiscordProposals })),
+  { ssr: false, loading: () => <div className="animate-pulse h-40 bg-gray-800 rounded-2xl" /> }
+);
+
 /* ── Types ──────────────────────────────────────────────────── */
 
 interface Tally {
@@ -272,6 +277,9 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
         <CreateWeeklyPoll isAdmin={isAdmin} />
         <SnapshotPolls />
       </div>
+
+      {/* ── Discord Bot Proposals ──────────────────────────────── */}
+      <DiscordProposals />
 
       {/* ── Separator ──────────────────────────────────────────── */}
       <div className="flex items-center gap-3 py-1">

@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import DiscordIntro from '@/components/members/DiscordIntro';
+import DiscordActivity from '@/components/members/DiscordActivity';
 
 interface MemberProfile {
   fid: number | null;
@@ -428,6 +430,11 @@ export default function MemberProfilePage() {
           />
         )}
 
+        {/* Discord Intro */}
+        {p.platforms.discord && (
+          <DiscordIntro discordId={p.platforms.discord} />
+        )}
+
         {/* Social stats */}
         {p.social && (
           <div className="flex gap-4 mb-6 text-sm">
@@ -471,6 +478,11 @@ export default function MemberProfilePage() {
               {p.respect.firstRespectAt && <span>Member since {p.respect.firstRespectAt}</span>}
             </div>
           </div>
+        )}
+
+        {/* Discord Activity (cross-platform stats) */}
+        {p.platforms.discord && (
+          <DiscordActivity discordId={p.platforms.discord} />
         )}
 
         {/* Platforms */}

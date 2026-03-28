@@ -8,9 +8,11 @@ import { FractalLeaderboardTab } from './FractalLeaderboardTab';
 import { ProposalsTab } from './ProposalsTab';
 import { AboutTab } from './AboutTab';
 import { AnalyticsTab } from './AnalyticsTab';
+import { EventsCalendar } from '@/components/governance/EventsCalendar';
+import { LiveFractalDashboard } from '@/components/governance/LiveFractalDashboard';
 
-type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'proposals' | 'about';
-const VALID_TABS: Tab[] = ['sessions', 'leaderboard', 'analytics', 'proposals', 'about'];
+type Tab = 'sessions' | 'leaderboard' | 'analytics' | 'proposals' | 'events' | 'live' | 'about';
+const VALID_TABS: Tab[] = ['sessions', 'leaderboard', 'analytics', 'proposals', 'events', 'live', 'about'];
 
 interface Props {
   currentFid: number;
@@ -25,6 +27,8 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
 
   const TABS: { id: Tab; label: string }[] = [
     { id: 'proposals', label: 'Proposals' },
+    { id: 'live', label: 'Live' },
+    { id: 'events', label: 'Events' },
     { id: 'sessions', label: 'Sessions' },
     { id: 'leaderboard', label: 'Leaderboard' },
     { id: 'analytics', label: 'Analytics' },
@@ -74,6 +78,8 @@ export function FractalsClient({ currentFid, isAdmin }: Props) {
         {activeTab === 'leaderboard' && <FractalLeaderboardTab currentFid={currentFid} />}
         {activeTab === 'analytics' && <AnalyticsTab />}
         {activeTab === 'proposals' && <ProposalsTab isAdmin={isAdmin} currentFid={currentFid} />}
+        {activeTab === 'events' && <EventsCalendar />}
+        {activeTab === 'live' && <LiveFractalDashboard />}
         {activeTab === 'about' && <AboutTab />}
       </div>
     </div>

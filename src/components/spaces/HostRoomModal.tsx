@@ -2,15 +2,18 @@
 
 import { useState } from 'react';
 
+export type RoomProvider = 'stream' | '100ms';
+
 interface HostRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateRoom: (title: string, description: string) => Promise<void>;
+  onCreateRoom: (title: string, description: string, provider: RoomProvider) => Promise<void>;
 }
 
 export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [provider, setProvider] = useState<RoomProvider>('stream');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,9 +26,10 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
     setLoading(true);
     setError(null);
     try {
-      await onCreateRoom(title.trim(), description.trim());
+      await onCreateRoom(title.trim(), description.trim(), provider);
       setTitle('');
       setDescription('');
+      setProvider('stream');
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create room');
@@ -46,6 +50,39 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
         )}
 
         <form onSubmit={handleSubmit}>
+          {/* Provider selector */}
+          <div className="mb-4">
+            <label className="text-gray-400 text-sm mb-2 block">Provider</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setProvider('stream')}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors ${
+                  provider === 'stream'
+                    ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
+                    : 'bg-[#0a1628] border-gray-700 text-gray-400 hover:border-gray-600'
+                }`}
+                disabled={loading}
+              >
+                <span className="block text-xs opacity-70 mb-0.5">Audio</span>
+                Stream.io
+              </button>
+              <button
+                type="button"
+                onClick={() => setProvider('100ms')}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors ${
+                  provider === '100ms'
+                    ? 'bg-orange-500/20 border-orange-500/50 text-orange-300'
+                    : 'bg-[#0a1628] border-gray-700 text-gray-400 hover:border-gray-600'
+                }`}
+                disabled={loading}
+              >
+                <span className="block text-xs opacity-70 mb-0.5">Audio</span>
+                100ms
+              </button>
+            </div>
+          </div>
+
           <div className="mb-4">
             <label className="text-gray-400 text-sm mb-1 block">Title *</label>
             <input

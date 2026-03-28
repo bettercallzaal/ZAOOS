@@ -54,6 +54,7 @@
     "bs58": "^6.0.0",
     "discord-api-types": "^0.38.42",
     "iron-session": "^8.0.4",
+    "jsonwebtoken": "^9.0.3",
     "next": "^16.2.0",
     "papaparse": "^5.5.3",
     "posthog-js": "^1.363.1",
@@ -71,6 +72,7 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^16.2.0",
     "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/papaparse": "^5.5.2",
     "@types/react": "^19",

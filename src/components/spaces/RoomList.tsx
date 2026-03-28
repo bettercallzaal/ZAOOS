@@ -2,52 +2,104 @@
 
 import { useState, useEffect } from 'react';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
-import type { Room } from '@/lib/spaces/roomsDb';
-import { RoomCard } from './RoomCard';
+import { RoomCard, type UnifiedRoom } from './RoomCard';
 
 interface RoomListProps {
   currentFid?: number;
-  onJoinRoom: (room: Room) => void;
+  onJoinRoom: (room: UnifiedRoom) => void;
   onHostRoom: () => void;
   isAuthenticated: boolean;
 }
 
 export function RoomList({ currentFid, onJoinRoom, onHostRoom, isAuthenticated }: RoomListProps) {
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<UnifiedRoom[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const fetchAllRooms = async () => {
+    const supabase = getSupabaseBrowser();
+
+    const [streamResult, msResult] = await Promise.allSettled([
+      supabase
+        .from('rooms')
+        .select('*')
+        .eq('state', 'live')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('ms_rooms')
+        .select('*')
+        .eq('state', 'active')
+        .order('created_at', { ascending: false }),
+    ]);
+
+    const streamRooms: UnifiedRoom[] =
+      streamResult.status === 'fulfilled' && streamResult.value.data
+        ? streamResult.value.data.map((r: Record<string, unknown>) => ({
+            id: r.id as string,
+            title: r.title as string,
+            description: r.description as string | null,
+            host_fid: r.host_fid as number,
+            host_name: r.host_name as string,
+            host_username: r.host_username as string,
+            host_pfp: r.host_pfp as string | null,
+            created_at: r.created_at as string,
+            participant_count: r.participant_count as number,
+            provider: 'stream' as const,
+          }))
+        : [];
+
+    const msRooms: UnifiedRoom[] =
+      msResult.status === 'fulfilled' && msResult.value.data
+        ? msResult.value.data.map((r: Record<string, unknown>) => ({
+            id: r.id as string,
+            title: r.title as string,
+            description: null,
+            host_fid: r.host_fid as number,
+            host_name: r.host_name as string,
+            host_username: undefined,
+            host_pfp: null,
+            created_at: r.created_at as string,
+            participant_count: r.participant_count as number,
+            provider: '100ms' as const,
+          }))
+        : [];
+
+    const combined = [...streamRooms, ...msRooms].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    setRooms(combined);
+    setLoading(false);
+  };
 
   useEffect(() => {
     const supabase = getSupabaseBrowser();
 
-    supabase
-      .from('rooms')
-      .select('*')
-      .eq('state', 'live')
-      .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        setRooms(data || []);
-        setLoading(false);
-      });
+    fetchAllRooms();
 
-    const channel = supabase
+    // Subscribe to changes on both tables
+    const streamChannel = supabase
       .channel('live-rooms')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'rooms' },
-        () => {
-          supabase
-            .from('rooms')
-            .select('*')
-            .eq('state', 'live')
-            .order('created_at', { ascending: false })
-            .then(({ data }) => setRooms(data || []));
-        }
+        () => fetchAllRooms()
+      )
+      .subscribe();
+
+    const msChannel = supabase
+      .channel('live-ms-rooms')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'ms_rooms' },
+        () => fetchAllRooms()
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(streamChannel);
+      supabase.removeChannel(msChannel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
@@ -91,7 +143,7 @@ export function RoomList({ currentFid, onJoinRoom, onHostRoom, isAuthenticated }
         <div className="grid gap-4 md:grid-cols-2">
           {rooms.map((room) => (
             <RoomCard
-              key={room.id}
+              key={`${room.provider}-${room.id}`}
               room={room}
               isOwner={currentFid === room.host_fid}
               onJoin={onJoinRoom}

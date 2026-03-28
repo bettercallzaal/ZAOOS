@@ -13,8 +13,9 @@ const CsvUpload = dynamic(() => import('@/components/admin/CsvUpload').then(m =>
 const HiddenMessages = dynamic(() => import('@/components/admin/HiddenMessages').then(m => ({ default: m.HiddenMessages })), { ssr: false });
 const RespectOverview = dynamic(() => import('@/components/admin/RespectOverview').then(m => ({ default: m.RespectOverview })), { ssr: false });
 const PollConfigEditor = dynamic(() => import('@/components/admin/PollConfigEditor').then(m => ({ default: m.PollConfigEditor })), { ssr: false });
+const DiscordLinkManager = dynamic(() => import('@/components/admin/DiscordLinkManager').then(m => ({ default: m.DiscordLinkManager })), { ssr: false });
 
-type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls';
+type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls' | 'discord';
 
 export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<Tab>('users');
@@ -33,6 +34,7 @@ export function AdminPanel() {
     { id: 'moderation', label: 'Moderation', icon: '🛡' },
     { id: 'respect', label: 'Respect', icon: '🏅' },
     { id: 'polls', label: 'Polls', icon: '🗳' },
+    { id: 'discord', label: 'Discord', icon: '💬' },
   ];
 
   return (
@@ -94,6 +96,7 @@ export function AdminPanel() {
         {activeTab === 'moderation' && <HiddenMessages />}
         {activeTab === 'respect' && <RespectOverview />}
         {activeTab === 'polls' && <PollConfigEditor />}
+        {activeTab === 'discord' && <DiscordLinkManager />}
       </div>
     </div>
   );

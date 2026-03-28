@@ -4,37 +4,54 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { RoomList } from '@/components/spaces/RoomList';
-import { HostRoomModal } from '@/components/spaces/HostRoomModal';
+import { HostRoomModal, type RoomProvider } from '@/components/spaces/HostRoomModal';
 import { generateCallId } from '@/lib/spaces/streamHelpers';
-import type { Room } from '@/lib/spaces/roomsDb';
+import type { UnifiedRoom } from '@/components/spaces/RoomCard';
 
 export default function PublicSpacesPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [showHostModal, setShowHostModal] = useState(false);
 
-  const handleCreateRoom = async (title: string, description: string) => {
+  const handleCreateRoom = async (title: string, description: string, provider: RoomProvider) => {
     if (!user) throw new Error('Not authenticated');
 
-    const streamCallId = generateCallId();
+    if (provider === 'stream') {
+      const streamCallId = generateCallId();
 
-    const res = await fetch('/api/stream/rooms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title,
-        description,
-        streamCallId,
-      }),
-    });
+      const res = await fetch('/api/stream/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description,
+          streamCallId,
+        }),
+      });
 
-    if (!res.ok) throw new Error('Failed to create room');
-    const { room } = await res.json();
-    router.push(`/spaces/${room.id}`);
+      if (!res.ok) throw new Error('Failed to create room');
+      const { room } = await res.json();
+      router.push(`/spaces/${room.id}`);
+    } else {
+      // 100ms provider
+      const res = await fetch('/api/100ms/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      });
+
+      if (!res.ok) throw new Error('Failed to create room');
+      const { room } = await res.json();
+      router.push(`/spaces/hms/${room.id}`);
+    }
   };
 
-  const handleJoinRoom = (room: Room) => {
-    router.push(`/spaces/${room.id}`);
+  const handleJoinRoom = (room: UnifiedRoom) => {
+    if (room.provider === '100ms') {
+      router.push(`/spaces/hms/${room.id}`);
+    } else {
+      router.push(`/spaces/${room.id}`);
+    }
   };
 
   return (

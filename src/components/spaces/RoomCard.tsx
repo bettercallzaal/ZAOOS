@@ -1,11 +1,25 @@
 'use client';
 
 import type { Room } from '@/lib/spaces/roomsDb';
+import type { RoomProvider } from './HostRoomModal';
+
+export interface UnifiedRoom {
+  id: string;
+  title: string;
+  description?: string | null;
+  host_fid: number;
+  host_name: string;
+  host_username?: string;
+  host_pfp?: string | null;
+  created_at: string;
+  participant_count: number;
+  provider: RoomProvider;
+}
 
 interface RoomCardProps {
-  room: Room;
+  room: UnifiedRoom;
   isOwner: boolean;
-  onJoin: (room: Room) => void;
+  onJoin: (room: UnifiedRoom) => void;
 }
 
 export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
@@ -18,6 +32,15 @@ export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
           </span>
           <span className="text-green-400 text-xs font-medium">Live</span>
+          {room.provider === 'stream' ? (
+            <span className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full">
+              Stream.io
+            </span>
+          ) : (
+            <span className="text-[10px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">
+              100ms
+            </span>
+          )}
         </div>
         {isOwner && (
           <span className="text-[10px] bg-[#f5a623]/20 text-[#f5a623] px-2 py-0.5 rounded-full">
@@ -40,7 +63,9 @@ export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
           )}
           <div>
             <span className="text-gray-300 text-xs">{room.host_name}</span>
-            <span className="text-gray-600 text-xs ml-1">@{room.host_username}</span>
+            {room.host_username && (
+              <span className="text-gray-600 text-xs ml-1">@{room.host_username}</span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-3">

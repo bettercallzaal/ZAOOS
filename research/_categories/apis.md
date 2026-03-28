@@ -13,3 +13,4 @@
 | [128](../128-free-api-keys-alchemy-enhancements/) | **Free API Keys & Alchemy Enhancements** | Free APIs (Alchemy NFT, Zerion, The Graph) to enhance existing features |
 | [129](../129-alchemy-apis-deep-integration/) | **Alchemy APIs Deep Integration** | Maximize free tier: webhooks for ZOR sync, transfer history, budget analysis |
 | [136](../136-api-status-verification-march-2026/) | **API Status Verification (March 2026)** | Which APIs are active vs deprecated (Sound.xyz dead, Neynar acquired Farcaster) |
+| [162](../162-open-source-projects-directory/) | **Open Source Projects Directory** | 29 projects from opensourceprojects.dev + GitHub — Audius API, Sonata, Frog/Frames, Umami, Funkwhale |

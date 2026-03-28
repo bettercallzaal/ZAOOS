@@ -15,6 +15,12 @@ Use this to quickly find if a topic has already been researched.
 - Farcaster ecosystem 2026 update (Neynar acquisition, Mini Apps, CLANKER) → `73`
 - Hypersnap (incomplete) → `10`
 
+## Dev Workflows & Agent Tooling
+- Skills, research workflow & autoresearch improvements (MCP servers, OSS code search, self-improvement) → `164`
+- Skills audit, cleanup & security best practices → `137`
+- Skills & commands master reference → `154`
+- Claude Code multi-terminal management (claude-squad, ccboard, permission modes, worktrees, tmux) → `165`
+
 ## Music & Audio
 - Music APIs (Audius, Sound.xyz, Spotify, SoundCloud, YouTube) → `03`
 - Live audio rooms (LiveKit, WebRTC, synchronized listening) → `43`
@@ -68,6 +74,7 @@ Use this to quickly find if a topic has already been researched.
 - AI memory architecture (implicit, explicit, pgvector) → `08`
 - Hindsight memory system (91.4%, retain/recall/reflect) → `26`
 - OpenFang Agent OS (not a fit, but reference architecture) → `46`
+- **Agent harness engineering (LangChain DeepAgents)**: Agent=Model+Harness, virtual filesystems, Ralph Loop, context rot, subagent orchestration, ZAO agent architecture → `161`
 
 ## Coordination & Incentives
 - Incented protocol: ZABAL campaigns, staking-based task coordination → `64`
@@ -119,6 +126,7 @@ Use this to quickly find if a topic has already been researched.
 - Neynar credit optimization → docs/neynar-credit-optimization.md
 - XMTP research → docs/XMTP_RESEARCH.md
 - Mini App research → docs/MINIAPP_RESEARCH.md
+- Open source projects directory (29 projects: Audius, Sonata, Frog/Frames, Umami, Funkwhale) → `162`
 
 ## Security & Code Quality
 - Pre-build security checklist → `18`

@@ -117,6 +117,15 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
   // Expand/collapse
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  // Section accordion — community open by default
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    zounz: false,
+    snapshot: false,
+    discord: false,
+    community: true,
+  });
+  const toggleSection = (key: string) => setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+
   // Voting
   const [voting, setVoting] = useState<string | null>(null);
   const [voteWarning, setVoteWarning] = useState<string | null>(null);
@@ -249,51 +258,53 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
         </div>
       )}
 
-      {/* ── ZOUNZ On-Chain Governance ───────────────────────── */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-          </svg>
-          <h2 className="text-sm font-bold text-[#f5a623] uppercase tracking-wide">ZOUNZ On-Chain</h2>
-          <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">NFT Voting &middot; Trustless Execution</span>
-        </div>
+      {/* ── ZOUNZ On-Chain ───────────────────────────────────── */}
+      <AccordionSection
+        title="ZOUNZ On-Chain"
+        subtitle="NFT Voting"
+        color="text-[#f5a623]"
+        isOpen={openSections.zounz}
+        onToggle={() => toggleSection('zounz')}
+        icon={<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>}
+      >
         <ZounzProposals />
-      </div>
+      </AccordionSection>
 
       {/* ── Snapshot Polls ────────────────────────────────────── */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-            <line x1="9" y1="9" x2="9.01" y2="9" />
-            <line x1="15" y1="9" x2="15.01" y2="9" />
-          </svg>
-          <h2 className="text-sm font-bold text-[#f5a623] uppercase tracking-wide">Snapshot Polls</h2>
-          <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">Gasless Voting</span>
-        </div>
+      <AccordionSection
+        title="Snapshot Polls"
+        subtitle="Gasless Voting"
+        color="text-blue-400"
+        isOpen={openSections.snapshot}
+        onToggle={() => toggleSection('snapshot')}
+        icon={<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>}
+      >
         <CreateWeeklyPoll isAdmin={isAdmin} />
         <SnapshotPolls />
-      </div>
+      </AccordionSection>
 
-      {/* ── Discord Bot Proposals ──────────────────────────────── */}
-      <DiscordProposals />
+      {/* ── Discord Proposals ─────────────────────────────────── */}
+      <AccordionSection
+        title="Discord Proposals"
+        subtitle="Bot Imported"
+        color="text-indigo-400"
+        isOpen={openSections.discord}
+        onToggle={() => toggleSection('discord')}
+        icon={<svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>}
+      >
+        <DiscordProposals />
+      </AccordionSection>
 
-      {/* ── Separator ──────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 py-1">
-        <div className="flex-1 border-t border-gray-700/50" />
-        <span className="text-xs text-gray-500 uppercase tracking-wider">Community Proposals</span>
-        <div className="flex-1 border-t border-gray-700/50" />
-      </div>
-      <div className="flex items-center gap-2 mb-1">
-        <svg className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-        <h2 className="text-sm font-bold text-purple-400 uppercase tracking-wide">Respect-Weighted</h2>
-        <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">Social Publishing</span>
-      </div>
+      {/* ── Community Proposals ────────────────────────────────── */}
+      <AccordionSection
+        title="Community Proposals"
+        subtitle="Respect-Weighted"
+        color="text-purple-400"
+        count={proposals.length}
+        isOpen={openSections.community}
+        onToggle={() => toggleSection('community')}
+        icon={<svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>}
+      >
 
       {/* Create Proposal / Social Post toggle */}
       <div className="flex gap-2">
@@ -396,40 +407,9 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
         </div>
       )}
 
-      {/* ORDAO External Link */}
-      <a
-        href="https://zao.frapps.xyz"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-between w-full bg-[#0d1b2a] border border-gray-800 rounded-xl px-4 py-3 hover:border-[#f5a623]/30 transition-colors"
-      >
-        <div>
-          <p className="text-xs font-medium text-white">ORDAO On-Chain Governance</p>
-          <p className="text-[10px] text-gray-500">Submit fractal results + vote on-chain</p>
-        </div>
-        <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-        </svg>
-      </a>
-
-      {/* Contracts */}
-      <div className="bg-[#0d1b2a] rounded-xl p-3 space-y-1">
-        <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">On-Chain Contracts (Optimism)</p>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400">OREC</span>
-          <a href="https://optimistic.etherscan.io/address/0xcB05F9254765CA521F7698e61E0A6CA6456Be532" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-[#f5a623]/70 hover:text-[#f5a623] transition-colors">0xcB05...e532</a>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400">ZOR (Respect1155)</span>
-          <a href="https://optimistic.etherscan.io/address/0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-[#f5a623]/70 hover:text-[#f5a623] transition-colors">0x9885...45c</a>
-        </div>
-      </div>
-
-      {/* ── Filter Bar ────────────────────────────────────── */}
+      {/* Filters */}
       <div className="space-y-2">
-        {/* Status filters */}
         <div className="flex flex-wrap gap-1.5">
-          <span className="text-[10px] text-gray-600 uppercase tracking-wider self-center mr-1">Status</span>
           {STATUS_FILTERS.map(s => (
             <button
               key={s}
@@ -444,10 +424,7 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
             </button>
           ))}
         </div>
-
-        {/* Category filters */}
         <div className="flex flex-wrap gap-1.5">
-          <span className="text-[10px] text-gray-600 uppercase tracking-wider self-center mr-1">Category</span>
           {CATEGORY_FILTERS.map(c => {
             const catColor = c !== 'all' ? CATEGORY_COLORS[c] : undefined;
             return (
@@ -467,15 +444,15 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
         </div>
       </div>
 
-      {/* ── Proposals List ────────────────────────────────── */}
+      {/* Proposals list */}
       {loading && (
         <div className="space-y-2">
-          {[1, 2, 3].map(i => <div key={i} className="h-24 bg-[#0d1b2a] rounded-xl animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-20 bg-[#0d1b2a] rounded-xl animate-pulse" />)}
         </div>
       )}
 
       {!loading && proposals.length === 0 && (
-        <div className="text-center py-8 bg-[#0d1b2a] rounded-xl">
+        <div className="text-center py-6 bg-[#0d1b2a] rounded-xl">
           <p className="text-gray-400 text-sm">No proposals found.</p>
           <p className="text-xs text-gray-600 mt-1">
             {statusFilter !== 'all' || categoryFilter !== 'all'
@@ -487,9 +464,6 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
 
       {!loading && proposals.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">
-            Community Proposals ({proposals.length})
-          </p>
           {proposals.map(p => (
             <ProposalCard
               key={p.id}
@@ -503,6 +477,82 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
               isAdmin={isAdmin}
             />
           ))}
+        </div>
+      )}
+      </AccordionSection>
+
+      {/* ── ORDAO + Contracts (bottom) ──────────────────────── */}
+      <div className="space-y-2">
+        <a
+          href="https://zao.frapps.xyz"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between w-full bg-[#0d1b2a] border border-gray-800 rounded-xl px-4 py-2.5 hover:border-[#f5a623]/30 transition-colors"
+        >
+          <div>
+            <p className="text-xs font-medium text-white">ORDAO On-Chain Governance</p>
+            <p className="text-[10px] text-gray-500">Submit fractal results + vote on-chain</p>
+          </div>
+          <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+        <div className="flex items-center gap-4 px-3 py-2 text-[10px] text-gray-600">
+          <span className="text-gray-500">Contracts:</span>
+          <a href="https://optimistic.etherscan.io/address/0xcB05F9254765CA521F7698e61E0A6CA6456Be532" target="_blank" rel="noopener noreferrer" className="font-mono text-[#f5a623]/50 hover:text-[#f5a623] transition-colors">OREC</a>
+          <a href="https://optimistic.etherscan.io/address/0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c" target="_blank" rel="noopener noreferrer" className="font-mono text-[#f5a623]/50 hover:text-[#f5a623] transition-colors">ZOR</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Accordion Section ────────────────────────────────────── */
+
+function AccordionSection({
+  title,
+  subtitle,
+  color,
+  icon,
+  count,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  color: string;
+  icon: React.ReactNode;
+  count?: number;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-2.5 px-4 py-3 text-left hover:bg-white/[0.02] transition-colors"
+      >
+        <span className={color}>{icon}</span>
+        <span className={`text-sm font-semibold ${color}`}>{title}</span>
+        <span className="text-[10px] text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">{subtitle}</span>
+        {count !== undefined && count > 0 && (
+          <span className="text-[10px] text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded-full ml-auto mr-2">{count}</span>
+        )}
+        <svg
+          className={`w-3.5 h-3.5 text-gray-600 transition-transform ml-auto shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {isOpen && (
+        <div className="px-4 pb-4 space-y-3">
+          {children}
         </div>
       )}
     </div>
@@ -539,10 +589,20 @@ function ProposalCard({
   const forPct = totalWeight > 0 ? Math.round((p.tally.for.weight / totalWeight) * 100) : 0;
   const threshold = p.respect_threshold || 1000;
   const thresholdPct = Math.min(100, Math.round((p.tally.for.weight / threshold) * 100));
+  const passedThreshold = p.tally.for.weight >= threshold;
 
   const expired = p.closes_at ? isDeadlinePassed(p.closes_at) : false;
   const isClosed = statusKey !== 'open';
   const canVote = !isClosed && !expired;
+
+  // Derive display status — show "passed" if threshold met while still open
+  const displayStatus = statusKey === 'open' && passedThreshold ? 'passed' : p.status;
+  const displayBadgeClass = statusKey === 'open' && passedThreshold
+    ? 'text-[#f5a623] bg-[#f5a623]/10 border-[#f5a623]/20'
+    : badgeClass;
+  const displayDotClass = statusKey === 'open' && passedThreshold
+    ? 'bg-[#f5a623]'
+    : dotClass;
 
   return (
     <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden transition-colors hover:border-gray-700">
@@ -578,9 +638,9 @@ function ProposalCard({
           </div>
           {/* Status badge with dot + chevron */}
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
-            <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${badgeClass}`}>
-              {p.status}
+            <span className={`w-1.5 h-1.5 rounded-full ${displayDotClass}`} />
+            <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${displayBadgeClass}`}>
+              {displayStatus}
             </span>
             <svg
               className={`w-3.5 h-3.5 text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -641,182 +701,144 @@ function ProposalCard({
 
       {/* ── Expanded section ────────────────────────────── */}
       {isExpanded && (
-        <div className="px-4 pb-4 border-t border-gray-800/50">
-          {/* Full description */}
-          <div className="mt-3">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Description</p>
-            <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+        <div className="px-4 pb-4 border-t border-gray-800/50 space-y-3">
+          {/* Description — skip if same as title (social posts) */}
+          {p.description !== p.title && (
+            <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed mt-3">
               {p.description.split(/(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g).map((part, i) =>
                 /^https?:\/\//.test(part) ? (
                   <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-[#f5a623] hover:underline break-all">{part}</a>
                 ) : part
               )}
             </p>
-          </div>
-
-          {/* Published links */}
-          {(p.published_cast_hash || p.published_bluesky_uri || p.published_x_url || p.publish_fc_error || p.publish_bsky_error || p.publish_x_error) && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider w-full mb-1">Published To</p>
-              {p.published_cast_hash && (
-                <a
-                  href={`https://warpcast.com/~/conversations/${p.published_cast_hash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 text-xs font-medium hover:bg-purple-500/20 transition-colors border border-purple-500/20"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                  View on Farcaster
-                </a>
-              )}
-              {p.publish_fc_error && !p.published_cast_hash && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs border border-red-500/20">
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                  Farcaster failed: {p.publish_fc_error}
-                </span>
-              )}
-              {p.published_bluesky_uri && (
-                <a
-                  href={p.published_bluesky_uri.startsWith('http') ? p.published_bluesky_uri : `https://bsky.app/profile/${p.published_bluesky_uri}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-400 text-xs font-medium hover:bg-blue-500/20 transition-colors border border-blue-500/20"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 568 501" fill="currentColor"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.793 166.471-20.155 71.454-93.57 89.708-159.534 78.663 115.346 19.729 144.665 85.021 81.294 150.313-120.758 124.562-173.715-31.256-187.093-71.174-2.41-7.186-3.542-10.549-2.874-7.688-0.668-2.861-0.464 0.502-2.874 7.688-13.378 39.918-66.335 195.736-187.093 71.174-63.371-65.292-34.052-130.584 81.294-150.313-65.964 11.045-139.379-7.209-159.534-78.663C9.945 203.659 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg>
-                  View on Bluesky
-                </a>
-              )}
-              {p.publish_bsky_error && !p.published_bluesky_uri && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs border border-red-500/20">
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 568 501" fill="currentColor"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.793 166.471-20.155 71.454-93.57 89.708-159.534 78.663 115.346 19.729 144.665 85.021 81.294 150.313-120.758 124.562-173.715-31.256-187.093-71.174-2.41-7.186-3.542-10.549-2.874-7.688-0.668-2.861-0.464 0.502-2.874 7.688-13.378 39.918-66.335 195.736-187.093 71.174-63.371-65.292-34.052-130.584 81.294-150.313-65.964 11.045-139.379-7.209-159.534-78.663C9.945 203.659 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg>
-                  Bluesky failed: {p.publish_bsky_error}
-                </span>
-              )}
-              {p.published_x_url && (
-                <a
-                  href={p.published_x_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-500/10 text-gray-300 text-xs font-medium hover:bg-gray-500/20 transition-colors border border-gray-500/20"
-                >
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                  View on X
-                </a>
-              )}
-              {p.publish_x_error && !p.published_x_url && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs border border-red-500/20">
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                  X failed: {p.publish_x_error}
-                </span>
-              )}
-            </div>
           )}
 
-          {/* Detailed vote bar with threshold */}
-          <div className="mt-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Vote Progress</p>
+          {/* Threshold progress — single clean bar */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5 text-[10px]">
+              <span className="text-green-400 font-medium">{p.tally.for.weight}R for</span>
+              <span className={passedThreshold ? 'text-[#f5a623] font-medium' : 'text-gray-500'}>
+                {passedThreshold ? 'Threshold reached' : `${thresholdPct}% of ${threshold}R`}
+              </span>
+              <span className="text-red-400">{p.tally.against.weight > 0 ? `${p.tally.against.weight}R against` : ''}</span>
+            </div>
             <div className="relative">
-              <div className="h-3 bg-gray-800 rounded-full overflow-hidden relative">
-                {/* For (green) */}
+              <div className="h-2 bg-gray-800 rounded-full overflow-hidden relative">
                 <div
-                  className="h-full bg-green-500 absolute left-0 top-0 rounded-l-full"
-                  style={{ width: `${forPct}%` }}
+                  className={`h-full rounded-full transition-all ${passedThreshold ? 'bg-[#f5a623]' : 'bg-green-500'}`}
+                  style={{ width: `${Math.min(100, (p.tally.for.weight / Math.max(totalWeight, threshold)) * 100)}%` }}
                 />
-                {/* Against (red) layered from right */}
                 {p.tally.against.weight > 0 && totalWeight > 0 && (
                   <div
                     className="h-full bg-red-500/60 absolute right-0 top-0 rounded-r-full"
-                    style={{ width: `${Math.round((p.tally.against.weight / totalWeight) * 100)}%` }}
+                    style={{ width: `${Math.round((p.tally.against.weight / Math.max(totalWeight, threshold)) * 100)}%` }}
                   />
                 )}
               </div>
-              {/* Threshold marker on detailed bar */}
-              {threshold > 0 && (
+              {!passedThreshold && threshold > 0 && (
                 <div
-                  className="absolute top-0 h-3 w-0.5 bg-[#f5a623] rounded"
+                  className="absolute top-0 h-2 w-0.5 bg-[#f5a623] rounded"
                   style={{ left: `${Math.min(100, (threshold / Math.max(totalWeight, threshold)) * 100)}%` }}
                 />
               )}
             </div>
-            <div className="flex items-center justify-between mt-1.5 text-[10px]">
-              <span className="text-green-400">{p.tally.for.weight}R for</span>
-              <span className="text-[#f5a623]">
-                {thresholdPct}% of {threshold}R threshold
-              </span>
-              <span className="text-red-400">{p.tally.against.weight}R against</span>
+            <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-600">
+              <span>{p.tally.totalVoters} voter{p.tally.totalVoters !== 1 ? 's' : ''}</span>
+              {p.tally.abstain.count > 0 && <span>{p.tally.abstain.count} abstain</span>}
             </div>
-            {p.tally.abstain.count > 0 && (
-              <p className="text-[10px] text-gray-600 mt-0.5 text-center">
-                {p.tally.abstain.count} abstain ({p.tally.abstain.weight}R)
-              </p>
-            )}
           </div>
 
-          {/* Voting buttons */}
-          <div className="mt-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Cast Your Vote</p>
-            {isVoting ? (
-              <div className="flex items-center justify-center gap-2 py-3">
-                <div className="w-3.5 h-3.5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
-                <span className="text-xs text-gray-400">Recording vote...</span>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <VoteButton
-                  label="For"
-                  isActive={p.user_vote === 'for'}
-                  disabled={!canVote}
-                  onClick={() => onVote(p.id, 'for')}
-                  activeClass="bg-green-500/20 text-green-400 border-green-500/40"
-                  hoverClass="hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30"
-                />
-                <VoteButton
-                  label="Against"
-                  isActive={p.user_vote === 'against'}
-                  disabled={!canVote}
-                  onClick={() => onVote(p.id, 'against')}
-                  activeClass="bg-red-500/20 text-red-400 border-red-500/40"
-                  hoverClass="hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30"
-                />
-                <VoteButton
-                  label="Abstain"
-                  isActive={p.user_vote === 'abstain'}
-                  disabled={!canVote}
-                  onClick={() => onVote(p.id, 'abstain')}
-                  activeClass="bg-gray-500/20 text-gray-300 border-gray-500/40"
-                  hoverClass="hover:bg-gray-500/10 hover:text-gray-300 hover:border-gray-500/30"
-                />
-              </div>
-            )}
-            {!canVote && (
-              <p className="text-[10px] text-gray-600 mt-1.5">
-                {isClosed ? 'This proposal is no longer open for voting.' : 'Voting period has ended.'}
-              </p>
-            )}
-          </div>
-
-          {/* Admin status controls */}
-          {isAdmin && onStatusChange && (
-            <div className="mt-4 pt-3 border-t border-gray-800/50">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Admin Actions</p>
-              <div className="flex flex-wrap gap-2">
-                {p.status === 'open' && (
-                  <>
-                    <button onClick={() => onStatusChange(p.id, 'approved')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors">Approve</button>
-                    <button onClick={() => onStatusChange(p.id, 'rejected')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors">Reject</button>
-                  </>
-                )}
-                {p.status === 'approved' && (
-                  <button onClick={() => onStatusChange(p.id, 'completed')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors">Mark Completed</button>
-                )}
-                {(p.status === 'rejected' || p.status === 'completed') && (
-                  <button onClick={() => onStatusChange(p.id, 'open')} className="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-500/10 text-gray-400 border border-gray-500/20 hover:bg-gray-500/20 transition-colors">Reopen</button>
-                )}
-              </div>
+          {/* Published links */}
+          {(p.published_cast_hash || p.published_bluesky_uri || p.published_x_url) && (
+            <div className="flex flex-wrap gap-1.5">
+              {p.published_cast_hash && (
+                <a href={`https://warpcast.com/~/conversations/${p.published_cast_hash}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-400 text-[11px] font-medium hover:bg-purple-500/20 transition-colors border border-purple-500/20">
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                  Farcaster
+                </a>
+              )}
+              {p.published_bluesky_uri && (
+                <a href={p.published_bluesky_uri.startsWith('http') ? p.published_bluesky_uri : `https://bsky.app/profile/${p.published_bluesky_uri}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-[11px] font-medium hover:bg-blue-500/20 transition-colors border border-blue-500/20">
+                  <svg className="w-3 h-3" viewBox="0 0 568 501" fill="currentColor"><path d="M123.121 33.664C188.241 82.553 258.281 181.68 284 234.873c25.719-53.192 95.759-152.32 160.879-201.21C491.866-1.611 568-28.906 568 57.947c0 17.346-9.945 145.713-15.793 166.471-20.155 71.454-93.57 89.708-159.534 78.663 115.346 19.729 144.665 85.021 81.294 150.313-120.758 124.562-173.715-31.256-187.093-71.174-2.41-7.186-3.542-10.549-2.874-7.688-0.668-2.861-0.464 0.502-2.874 7.688-13.378 39.918-66.335 195.736-187.093 71.174-63.371-65.292-34.052-130.584 81.294-150.313-65.964 11.045-139.379-7.209-159.534-78.663C9.945 203.659 0 75.293 0 57.947 0-28.906 76.135-1.611 123.121 33.664Z"/></svg>
+                  Bluesky
+                </a>
+              )}
+              {p.published_x_url && (
+                <a href={p.published_x_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-500/10 text-gray-300 text-[11px] font-medium hover:bg-gray-500/20 transition-colors border border-gray-500/20">
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  X
+                </a>
+              )}
             </div>
           )}
 
-          {/* Comments section (dynamically imported) */}
+          {/* Publish errors — compact */}
+          {(p.publish_fc_error || p.publish_bsky_error || p.publish_x_error) && !(p.published_cast_hash && p.published_bluesky_uri && p.published_x_url) && (
+            <div className="text-[10px] text-red-400/70 space-y-0.5">
+              {p.publish_fc_error && !p.published_cast_hash && <p>Farcaster: {p.publish_fc_error}</p>}
+              {p.publish_bsky_error && !p.published_bluesky_uri && <p>Bluesky: {p.publish_bsky_error}</p>}
+              {p.publish_x_error && !p.published_x_url && <p>X: {p.publish_x_error}</p>}
+            </div>
+          )}
+
+          {/* Voting buttons — only show if user can still vote or hasn't voted */}
+          {canVote && (
+            <div>
+              {isVoting ? (
+                <div className="flex items-center justify-center gap-2 py-2">
+                  <div className="w-3.5 h-3.5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+                  <span className="text-xs text-gray-400">Recording vote...</span>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <VoteButton
+                    label="For"
+                    isActive={p.user_vote === 'for'}
+                    disabled={false}
+                    onClick={() => onVote(p.id, 'for')}
+                    activeClass="bg-green-500/20 text-green-400 border-green-500/40"
+                    hoverClass="hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30"
+                  />
+                  <VoteButton
+                    label="Against"
+                    isActive={p.user_vote === 'against'}
+                    disabled={false}
+                    onClick={() => onVote(p.id, 'against')}
+                    activeClass="bg-red-500/20 text-red-400 border-red-500/40"
+                    hoverClass="hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30"
+                  />
+                  <VoteButton
+                    label="Abstain"
+                    isActive={p.user_vote === 'abstain'}
+                    disabled={false}
+                    onClick={() => onVote(p.id, 'abstain')}
+                    activeClass="bg-gray-500/20 text-gray-300 border-gray-500/40"
+                    hoverClass="hover:bg-gray-500/10 hover:text-gray-300 hover:border-gray-500/30"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Admin status controls — inline, no header */}
+          {isAdmin && onStatusChange && (
+            <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-800/50">
+              {p.status === 'open' && (
+                <>
+                  <button onClick={() => onStatusChange(p.id, 'approved')} className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors">Approve</button>
+                  <button onClick={() => onStatusChange(p.id, 'rejected')} className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-colors">Reject</button>
+                </>
+              )}
+              {p.status === 'approved' && (
+                <button onClick={() => onStatusChange(p.id, 'completed')} className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors">Mark Completed</button>
+              )}
+              {(p.status === 'rejected' || p.status === 'completed') && (
+                <button onClick={() => onStatusChange(p.id, 'open')} className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-gray-500/10 text-gray-400 border border-gray-500/20 hover:bg-gray-500/20 transition-colors">Reopen</button>
+              )}
+            </div>
+          )}
+
+          {/* Comments */}
           <ProposalComments proposalId={p.id} currentFid={currentFid} />
         </div>
       )}

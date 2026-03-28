@@ -148,3 +148,10 @@
 | 156 | `156-pods-media-podcast-tokenization` | Pods.media analysis (900K mints, $1M rev, Base ERC-721 + Arweave). ZAO clone on pure Arweave atomic assets — same Doc 155 flow + podcast-specific tags + RSS generation from Arweave GraphQL. ~5 days incremental. |
 | 157 | `157-cross-project-asset-audit` | Cross-project asset audit |
 | 158 | `158-zao-member-naming-ens-basenames` | ENS subnames vs Basenames vs custom naming — NameStone gasless `member.thezao.eth` for $5/year, 4 options compared, implementation plan |
+| 159 | `159-feature-inventory-qa-checklist` | Feature inventory QA checklist |
+| 160 | `160-audio-spaces-landscape-comparison` | Audio spaces landscape comparison |
+| 161 | `161-agent-harness-engineering-langchain` | Agent harness engineering (LangChain DeepAgents): Agent=Model+Harness, virtual filesystems, Ralph Loop, context rot, subagents, Supabase backend, ZAO agent architecture |
+| 162 | `162-open-source-projects-directory` | 29 open source projects from opensourceprojects.dev + GitHub — Audius API, Sonata, Herocast, FarcasterKit, Frog/Frames, Umami, Funkwhale, Navidrome |
+| 163 | `163-multistreaming-platforms-integration` | Multistreaming platforms integration |
+| 164 | `164-skills-research-workflow-improvements` | Skills, research tool & autoresearch improvements: grep.app MCP, Sourcegraph, Context7, open-source code search in research workflow, Karpathy self-improvement loop on skills, hook-based quality gates |
+| 165 | `165-claude-code-multi-terminal-management` | Claude Code multi-terminal management: claude-squad TUI, ccboard cost tracking, permission modes (auto/allowedTools), worktrees, headless mode, tmux setups, session naming/resume |

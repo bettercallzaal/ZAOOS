@@ -50,6 +50,7 @@
     "@wagmi/core": "^2.22.1",
     "@wavesurfer/react": "^1.0.12",
     "@xmtp/browser-sdk": "^7.0.0",
+    "audiomotion-analyzer": "^4.5.4",
     "babel-plugin-react-compiler": "^1.0.0",
     "bs58": "^6.0.0",
     "discord-api-types": "^0.38.42",

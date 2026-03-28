@@ -129,6 +129,12 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/songjam')) {
     return { limit: 20, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/livepeer')) {
+    return { limit: 10, windowMs: MINUTE };
+  }
+  if (pathname.startsWith('/api/broadcast')) {
+    return { limit: 15, windowMs: MINUTE };
+  }
   return null;
 }
 

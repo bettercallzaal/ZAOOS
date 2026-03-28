@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/useAuth';
 import { useListeningRoom } from '@/hooks/useListeningRoom';
@@ -377,7 +378,7 @@ export function ListeningRoom({ jitsiRoomName, roomLabel, onLeave }: ListeningRo
                     >
                       <span className="text-[10px] text-gray-700 w-4 text-right shrink-0">{i + 1}</span>
                       {track.artworkUrl ? (
-                        <img src={track.artworkUrl} alt="" className="w-7 h-7 rounded object-cover shrink-0" />
+                        <Image src={track.artworkUrl} alt={`${track.title} artwork`} width={28} height={28} className="w-7 h-7 rounded object-cover shrink-0" unoptimized />
                       ) : (
                         <div className="w-7 h-7 rounded bg-gray-800 shrink-0" />
                       )}

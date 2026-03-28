@@ -1,7 +1,7 @@
 import { getSessionData } from '@/lib/auth/session';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { SettingsClient } from './SettingsClient';
+import { SettingsClientLoader } from './SettingsClientLoader';
 
 async function fetchProfile(fid: number) {
   try {
@@ -75,7 +75,7 @@ export default async function SettingsPage() {
   const profile = session?.fid ? await fetchProfile(session.fid) : null;
 
   return (
-    <SettingsClient
+    <SettingsClientLoader
       session={session}
       profile={profile}
     />

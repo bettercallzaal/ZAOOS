@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useCallStateHooks, hasAudio, hasVideo, ParticipantsAudio, Video } from '@stream-io/video-react-sdk';
 
 export function ParticipantsPanel() {
@@ -33,7 +34,7 @@ export function ParticipantsPanel() {
                 ) : (
                   <div className={`w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-semibold border-2 ${p.isSpeaking ? 'border-green-400 scale-110' : 'border-transparent'} transition-all`}>
                     {p.image ? (
-                      <img src={p.image} alt="" className="w-full h-full rounded-full object-cover" />
+                      <Image src={p.image} alt={`${p.name || 'Speaker'} avatar`} width={56} height={56} className="w-full h-full rounded-full object-cover" unoptimized />
                     ) : (
                       <span>{(p.name || '?')[0]}</span>
                     )}
@@ -69,7 +70,7 @@ export function ParticipantsPanel() {
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 text-sm">
                     {p.image ? (
-                      <img src={p.image} alt="" className="w-full h-full rounded-full object-cover" />
+                      <Image src={p.image} alt={`${p.name || 'Listener'} avatar`} width={40} height={40} className="w-full h-full rounded-full object-cover" unoptimized />
                     ) : (
                       <span>{(p.name || '?')[0]}</span>
                     )}

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { Room } from '@/lib/spaces/roomsDb';
 import type { RoomProvider, RoomTheme } from './HostRoomModal';
 
@@ -76,7 +77,7 @@ export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {room.host_pfp && (
-            <img src={room.host_pfp} alt="" className="w-6 h-6 rounded-full" />
+            <Image src={room.host_pfp} alt={`${room.host_name} profile picture`} width={24} height={24} className="w-6 h-6 rounded-full" />
           )}
           <div>
             <span className="text-gray-300 text-xs">{room.host_name}</span>

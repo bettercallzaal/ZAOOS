@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getSessionData } from '@/lib/auth/session';
-import { RespectLeaderboard } from './RespectLeaderboard';
+import { RespectPageClient } from './RespectPageClient';
 
 export default async function RespectPage() {
   const session = await getSessionData();
@@ -23,7 +23,7 @@ export default async function RespectPage() {
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
-        <RespectLeaderboard currentFid={currentFid} />
+        <RespectPageClient currentFid={currentFid} />
 
         <p className="text-xs text-gray-600 text-center">
           Respect data from community database. On-chain balances synced from Optimism.

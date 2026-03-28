@@ -12,6 +12,14 @@ const MindshareLeaderboard = dynamic(
   { ssr: false },
 );
 
+const SongjamLeaderboard = dynamic(
+  () =>
+    import('@/components/respect/SongjamLeaderboard').then(
+      (m) => m.SongjamLeaderboard,
+    ),
+  { ssr: false },
+);
+
 interface LeaderboardEntry {
   rank: number;
   name: string;
@@ -29,7 +37,7 @@ interface LeaderboardEntry {
   hostingCount: number;
 }
 
-type Tab = 'leaderboard' | 'mindshare';
+type Tab = 'leaderboard' | 'mindshare' | 'songjam';
 
 interface RespectPageClientProps {
   currentFid: number;
@@ -59,6 +67,7 @@ export function RespectPageClient({ currentFid }: RespectPageClientProps) {
   const tabs: { id: Tab; label: string }[] = [
     { id: 'leaderboard', label: 'Leaderboard' },
     { id: 'mindshare', label: 'Mindshare' },
+    { id: 'songjam', label: 'Songjam' },
   ];
 
   return (
@@ -102,6 +111,8 @@ export function RespectPageClient({ currentFid }: RespectPageClientProps) {
           )}
         </>
       )}
+
+      {activeTab === 'songjam' && <SongjamLeaderboard />}
     </>
   );
 }

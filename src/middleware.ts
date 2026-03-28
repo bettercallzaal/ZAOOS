@@ -126,6 +126,9 @@ function getRateLimitConfig(pathname: string): RateLimitConfig | null {
   if (pathname.startsWith('/api/100ms')) {
     return { limit: 20, windowMs: MINUTE };
   }
+  if (pathname.startsWith('/api/songjam')) {
+    return { limit: 20, windowMs: MINUTE };
+  }
   return null;
 }
 

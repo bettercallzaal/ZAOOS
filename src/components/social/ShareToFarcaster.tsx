@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useMiniApp } from '@/hooks/useMiniApp';
+import { publishCast } from '@/lib/farcaster/neynarActions';
 
 type ShareTemplate = {
   text: string;
@@ -61,22 +62,12 @@ export function ShareToFarcaster({
     }
 
     if (useSigner) {
-      // Post directly via API
+      // Post directly via /api/neynar/cast
       setSharing(true);
       try {
-        const res = await fetch('/api/chat/send', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: template.text,
-            channel: template.channel || 'zao',
-            embedUrls: template.embeds,
-          }),
-        });
-        if (res.ok) {
-          setShared(true);
-          setTimeout(() => setShared(false), 3000);
-        }
+        await publishCast(template.text, template.embeds ?? []);
+        setShared(true);
+        setTimeout(() => setShared(false), 3000);
       } catch {
         // Fall back to compose URL
         openComposeUrl(template);

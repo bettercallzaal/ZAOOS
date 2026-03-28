@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 const CommunityGraph = dynamic(() => import('./CommunityGraph').then(m => m.CommunityGraph), { ssr: false });
 const DiscoverPanel = dynamic(() => import('./DiscoverPanel').then(m => m.DiscoverPanel), { ssr: false });
 import { NotificationBell } from '@/components/navigation/NotificationBell';
+import { MiniSpaceBanner } from './MiniSpaceBanner';
 
 type View = 'followers' | 'following' | 'community' | 'discover';
 type SortKey = 'recent' | 'relevant' | 'popular' | 'mutual' | 'zao';
@@ -173,6 +174,9 @@ export function SocialPage() {
             <NotificationBell />
           </div>
         </header>
+
+        {/* Live room banner — only renders when a room is active */}
+        <MiniSpaceBanner />
 
         {/* Main view tabs */}
         <div className="flex border-b border-gray-800 bg-[#0d1b2a]">

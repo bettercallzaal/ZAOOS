@@ -125,6 +125,11 @@ export function PersistentPlayer({
 
   return (
     <>
+    {/* Screen reader announcement for track changes */}
+    <div aria-live="polite" aria-atomic="true" className="sr-only">
+      {metadata && `Now playing: ${metadata.trackName} by ${metadata.artistName}`}
+    </div>
+
     {/* Expanded full-screen player — overlay on top of compact bar */}
     {expanded && metadata && (
       <ExpandedPlayer
@@ -239,7 +244,7 @@ export function PersistentPlayer({
         {/* Previous */}
         <button
           onClick={onPrev}
-          className={`w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95 ${onPrev ? 'text-gray-400 hover:text-white' : 'text-gray-700'}`}
+          className={`w-10 h-10 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-1 focus-visible:ring-offset-[#0d1b2a] rounded-lg outline-none ${onPrev ? 'text-gray-400 hover:text-white' : 'text-gray-700'}`}
           aria-label="Previous track"
           disabled={!onPrev}
         >
@@ -252,7 +257,7 @@ export function PersistentPlayer({
         <button
           onClick={handlePlayPause}
           disabled={isLoading}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-white text-[#0d1b2a] active:scale-95 transition-transform disabled:opacity-60 flex-shrink-0"
+          className="w-11 h-11 flex items-center justify-center rounded-full bg-white text-[#0d1b2a] active:scale-95 transition-transform disabled:opacity-60 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-[#f5a623] outline-none"
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
           {isLoading ? (
@@ -271,7 +276,7 @@ export function PersistentPlayer({
         {/* Next */}
         <button
           onClick={onNext}
-          className={`w-8 h-8 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95 ${onNext ? 'text-gray-400 hover:text-white' : 'text-gray-700'}`}
+          className={`w-10 h-10 flex items-center justify-center flex-shrink-0 transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-1 focus-visible:ring-offset-[#0d1b2a] rounded-lg outline-none ${onNext ? 'text-gray-400 hover:text-white' : 'text-gray-700'}`}
           aria-label="Next track"
           disabled={!onNext}
         >

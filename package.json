@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "analyze": "ANALYZE=true next build",
     "import:fractals": "npx tsx scripts/import-fractal-history.ts"
   },
@@ -79,6 +80,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.2.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",

@@ -93,15 +93,24 @@ export function NotificationBell() {
   }, [fetchNotifications, user?.fid]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // Close dropdown on outside click
+  // Close dropdown on outside click or Escape key
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
-    if (open) document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    if (open) {
+      document.addEventListener('mousedown', handleClick);
+      document.addEventListener('keydown', handleKey);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
   }, [open]);
 
   const markAllRead = async () => {
@@ -156,23 +165,34 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 max-h-96 bg-[#0d1b2a] border border-gray-800 rounded-xl shadow-2xl overflow-hidden z-[60]">
+        <div className="fixed inset-x-0 top-14 mx-2 max-h-[70vh] sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mx-0 sm:mt-2 sm:w-96 sm:max-h-[28rem] bg-[#0d1b2a] border border-gray-800 rounded-xl shadow-2xl overflow-hidden z-[60]">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800">
-            <span className="text-sm font-semibold text-white">Notifications</span>
+            <span className="text-sm font-semibold text-white">
+              Notifications
+              {unreadCount > 0 && (
+                <span
+                  className="ml-2 inline-flex items-center justify-center min-w-[20px] h-5 rounded-full text-[11px] font-bold text-white px-1.5"
+                  style={{ backgroundColor: communityConfig.colors.primary }}
+                >
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </span>
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
                 disabled={loading}
-                className="text-xs text-gray-500 hover:text-white transition-colors"
+                className="text-xs font-medium transition-colors disabled:opacity-50"
+                style={{ color: communityConfig.colors.primary }}
               >
-                Mark all read
+                {loading ? 'Marking...' : 'Mark all read'}
               </button>
             )}
           </div>
 
           {/* List */}
-          <div className="overflow-y-auto max-h-80">
+          <div className="overflow-y-auto max-h-[calc(70vh-3rem)] sm:max-h-96">
             {notifications.length === 0 ? (
               <div className="px-4 py-8 text-center text-sm text-gray-600">
                 No notifications yet
@@ -187,7 +207,7 @@ export function NotificationBell() {
                     setOpen(false);
                   }}
                   className={`flex items-start gap-3 px-4 py-3 border-b border-gray-800/50 hover:bg-white/5 transition-colors ${
-                    !n.read ? 'bg-white/[0.02]' : ''
+                    !n.read ? 'bg-[#f5a623]/[0.04]' : 'opacity-75'
                   }`}
                 >
                   {/* Avatar or type icon */}

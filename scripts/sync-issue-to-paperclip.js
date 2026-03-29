@@ -129,6 +129,7 @@ async function addGitHubComment(issueNumber, body) {
       'Authorization': `Bearer ${GITHUB_TOKEN}`,
       'Content-Type': 'application/json',
       'Accept': 'application/vnd.github+json',
+      'User-Agent': 'ZAO-Orchestrator-GitHubAction/1.0',
       'X-GitHub-Api-Version': '2022-11-28'
     }
   };

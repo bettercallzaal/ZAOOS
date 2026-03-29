@@ -272,10 +272,10 @@ export function CommunityGraph() {
   );
 
   const linkColor = useCallback(
-    (link: GraphLink & { source: number | GraphNode; target: number | GraphNode }) => {
+    (link: Record<string, unknown>) => {
       if (!neighborSet) return 'rgba(245,166,35,0.12)';
-      const src = typeof link.source === 'object' ? link.source.id : link.source;
-      const tgt = typeof link.target === 'object' ? link.target.id : link.target;
+      const src = typeof link.source === 'object' ? (link.source as GraphNode).id : link.source as number;
+      const tgt = typeof link.target === 'object' ? (link.target as GraphNode).id : link.target as number;
       if (neighborSet.has(src) && neighborSet.has(tgt)) return 'rgba(245,166,35,0.5)';
       return 'rgba(245,166,35,0.04)';
     },

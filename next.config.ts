@@ -46,6 +46,7 @@ const nextConfig: NextConfig = {
       // Decentralized storage
       { protocol: 'https', hostname: '*.ipfs.dweb.link' },
       { protocol: 'https', hostname: 'ipfs.io' },
+      { protocol: 'https', hostname: 'ipfs.decentralized-content.com' },
       { protocol: 'https', hostname: 'arweave.net' },
       { protocol: 'https', hostname: 'nfts.imgix.net' },
       // ENS / NFT avatars

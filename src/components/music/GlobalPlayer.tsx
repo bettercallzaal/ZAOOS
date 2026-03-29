@@ -80,7 +80,7 @@ export function GlobalPlayer({
       {isError && playerError && (
         <div className="px-4 py-1.5 bg-red-900/40 border-b border-red-800/30 flex items-center justify-between relative z-10">
           <p className="text-xs text-red-300">{playerError}</p>
-          <button onClick={() => player.stop()} className="text-red-400 hover:text-white text-xs ml-3 flex-shrink-0">Dismiss</button>
+          <button onClick={() => player.pause()} className="text-red-400 hover:text-white text-xs ml-3 flex-shrink-0">Dismiss</button>
         </div>
       )}
 
@@ -264,9 +264,9 @@ export function GlobalPlayer({
           )}
 
           <button
-            onClick={() => player.stop()}
+            onClick={(e) => { e.stopPropagation(); player.pause(); }}
             className="text-gray-500 hover:text-gray-300 transition-colors p-1"
-            aria-label="Close player"
+            aria-label="Pause"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -80,7 +80,9 @@ export async function GET(request: NextRequest) {
       engagementScore: row.engagement_score,
     }));
 
-    return NextResponse.json({ fid, days, history });
+    return NextResponse.json({ fid, days, history }, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=30' },
+    });
   } catch (err) {
     console.error('Growth route error:', err);
     return NextResponse.json(

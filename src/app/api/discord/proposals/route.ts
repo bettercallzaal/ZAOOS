@@ -138,6 +138,8 @@ export async function GET(req: NextRequest) {
       proposals: enriched,
       total: enriched.length,
       userDiscordId,
+    }, {
+      headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=30' },
     });
   } catch (err) {
     console.error('[discord/proposals] Unexpected error:', err);

@@ -159,7 +159,9 @@ export async function GET() {
         .map((c) => c.name),
     }));
 
-    return NextResponse.json({ tracks });
+    return NextResponse.json({ tracks }, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=30' },
+    });
   } catch (err) {
     console.error('[trending-weighted] unexpected error:', err);
     return NextResponse.json({ error: 'Failed to load trending tracks' }, { status: 500 });

@@ -50,7 +50,9 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json({ sessions: sessions ?? [], total: count ?? 0 });
+    return NextResponse.json({ sessions: sessions ?? [], total: count ?? 0 }, {
+      headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=30' },
+    });
   } catch (err) {
     console.error('Fractal sessions error:', err);
     return NextResponse.json({ error: 'Failed to load sessions' }, { status: 500 });

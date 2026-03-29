@@ -80,6 +80,8 @@ export async function GET() {
       nominations: enrichedNominations,
       isPastCutoff,
       today,
+    }, {
+      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=30' },
     });
   } catch (error) {
     console.error('Track of the Day GET error:', error);

@@ -202,7 +202,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { preview } = parsed.data;
-    let walletMap = parsed.data.walletMap;
+    const walletMap = parsed.data.walletMap;
 
     // If no wallet map provided, try to build one from discord_intros + known data
     // The wallet map is discord_id -> wallet_address

@@ -99,7 +99,7 @@ export function RoomList({ currentFid, onJoinRoom, onHostRoom, isAuthenticated }
       supabase.removeChannel(streamChannel);
       supabase.removeChannel(msChannel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   if (loading) {

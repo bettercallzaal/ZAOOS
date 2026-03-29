@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       .eq('discord_id', discordId)
       .maybeSingle();
 
-    let fractalStats = {
+    const fractalStats = {
       totalRespect: 0,
       participationCount: 0,
       bestRank: 0,

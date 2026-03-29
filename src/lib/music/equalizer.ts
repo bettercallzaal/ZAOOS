@@ -28,6 +28,10 @@ export class AudioEqualizer {
   private ensureContext() {
     if (!this.context) {
       this.context = new AudioContext()
+      // Resume immediately — may be suspended by browser autoplay policy
+      if (this.context.state === 'suspended') {
+        this.context.resume().catch(() => {});
+      }
       this.filters = FREQUENCIES.map((freq, i) => {
         const filter = this.context!.createBiquadFilter()
         filter.type = FILTER_TYPES[i]
@@ -45,6 +49,10 @@ export class AudioEqualizer {
 
   connect(element: HTMLAudioElement) {
     this.ensureContext()
+    // Ensure context is running (user may have interacted since creation)
+    if (this.context?.state === 'suspended') {
+      this.context.resume().catch(() => {});
+    }
     if (this.activeElement === element) return
 
     let source = this.connectedSources.get(element)

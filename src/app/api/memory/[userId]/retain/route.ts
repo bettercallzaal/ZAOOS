@@ -14,7 +14,7 @@ const RetainBodySchema = z.object({
     'reaction',
     'governance_vote',
   ]),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function POST(

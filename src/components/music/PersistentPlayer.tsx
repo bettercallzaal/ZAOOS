@@ -196,7 +196,7 @@ export function PersistentPlayer({
                 x="1" y="1" width="42" height="42" rx="9" ry="9"
                 fill="none" stroke="#f5a623" strokeWidth="2"
                 strokeDasharray={`${(position / duration) * 168} 168`}
-                className="transition-[stroke-dasharray] duration-300"
+                className="motion-safe:transition-[stroke-dasharray] motion-safe:duration-300"
               />
             </svg>
           )}
@@ -206,7 +206,7 @@ export function PersistentPlayer({
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="w-[2px] bg-[#f5a623] rounded-full animate-bounce"
+                    className="w-[2px] bg-[#f5a623] rounded-full motion-safe:animate-bounce"
                     style={{ height: `${5 + i * 2}px`, animationDelay: `${i * 0.15}s`, animationDuration: '0.6s' }}
                   />
                 ))}

@@ -96,7 +96,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
           background: `radial-gradient(circle at 50% 30%, rgba(${bgColor.r}, ${bgColor.g}, ${bgColor.b}, 0.2), transparent 70%)`,
         }}
       />
-      <div className="absolute inset-0 backdrop-blur-xl pointer-events-none" />
+      <div className="absolute inset-0 backdrop-blur-xl backdrop-saturate-150 backdrop-brightness-75 pointer-events-none" />
 
       {/* ─── Header: drag handle + close ───────────────────────────── */}
       <div className="relative z-10 flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0">

@@ -200,14 +200,15 @@ export function PersistentPlayer({
               className="object-cover"
             />
           </motion.div>
-          {/* Progress ring */}
+          {/* Progress ring — circle around artwork */}
           {duration > 0 && (
-            <svg className="absolute -inset-0.5 w-[44px] h-[44px] -rotate-90 pointer-events-none" viewBox="0 0 44 44">
-              <rect x="1" y="1" width="42" height="42" rx="9" ry="9" fill="none" stroke="rgba(245,166,35,0.15)" strokeWidth="2" />
-              <rect
-                x="1" y="1" width="42" height="42" rx="9" ry="9"
-                fill="none" stroke="#f5a623" strokeWidth="2"
-                strokeDasharray={`${(position / duration) * 168} 168`}
+            <svg className="absolute -inset-1 w-[48px] h-[48px] -rotate-90 pointer-events-none" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" r="22" fill="none" stroke="rgba(245,166,35,0.15)" strokeWidth="2.5" />
+              <circle
+                cx="24" cy="24" r="22"
+                fill="none" stroke="#f5a623" strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeDasharray={`${(position / duration) * 138.2} 138.2`}
                 className="motion-safe:transition-[stroke-dasharray] motion-safe:duration-300"
               />
             </svg>

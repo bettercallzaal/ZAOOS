@@ -1,0 +1,17 @@
+name: Sync GitHub Issues to Paperclip
+
+on:
+  issues:
+    types: [opened, closed, labeled]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync issue to Paperclip
+        run: node scripts/sync-issue-to-paperclip.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_API_KEY }}
+          PAPERCLIP_COMPANY_ID: ${{ secrets.PAPERCLIP_COMPANY_ID }}
+          PAPERCLIP_API_URL: ${{ secrets.PAPERCLIP_API_URL }}

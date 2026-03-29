@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
+import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 
 const TokenSchema = z.object({
   userId: z.string().min(1),
@@ -33,6 +34,16 @@ export async function POST(req: NextRequest) {
     }
 
     const { userId, role, roomId } = parsed.data;
+
+    // Verify requested userId matches session user's FID
+    if (userId !== String(session.fid)) {
+      return NextResponse.json({ error: 'Forbidden: cannot generate token for another user' }, { status: 403 });
+    }
+
+    // Role validation — non-admins cannot request host role
+    if (role === 'host' && !session.isAdmin) {
+      return NextResponse.json({ error: 'Forbidden: only admins can request host role' }, { status: 403 });
+    }
 
     // Generate management token
     const managementToken = jwt.sign(
@@ -93,6 +104,16 @@ export async function POST(req: NextRequest) {
       appSecret,
       { algorithm: 'HS256', expiresIn: '24h', jwtid: crypto.randomUUID() }
     );
+
+    // Audit log token generation
+    logAuditEvent({
+      actorFid: session.fid,
+      action: '100ms.token.generate',
+      targetType: 'user',
+      targetId: userId,
+      details: { userId, role, roomId: hmsRoomId },
+      ipAddress: getClientIp(req),
+    });
 
     return NextResponse.json({ token: appToken, roomId: hmsRoomId });
   } catch (error) {

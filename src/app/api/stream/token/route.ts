@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { StreamClient } from '@stream-io/node-sdk';
 import { z } from 'zod';
+import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 
 const TokenSchema = z.object({
   userId: z.string().min(1),
@@ -29,8 +30,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
 
+    // Verify requested userId matches session user's FID
+    if (parsed.data.userId !== String(session.fid)) {
+      return NextResponse.json({ error: 'Forbidden: cannot generate token for another user' }, { status: 403 });
+    }
+
     const client = new StreamClient(apiKey, apiSecret);
     const token = client.generateUserToken({ user_id: parsed.data.userId });
+
+    // Audit log token generation
+    logAuditEvent({
+      actorFid: session.fid,
+      action: 'stream.token.generate',
+      targetType: 'user',
+      targetId: parsed.data.userId,
+      details: { userId: parsed.data.userId },
+      ipAddress: getClientIp(req),
+    });
 
     return NextResponse.json({ token });
   } catch (error) {

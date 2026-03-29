@@ -24,8 +24,14 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
 
   // Create audio elements once (module-level singletons)
   useEffect(() => {
-    if (!audioA) audioA = new Audio();
-    if (!audioB) audioB = new Audio();
+    if (!audioA) {
+      audioA = new Audio();
+      audioA.crossOrigin = 'anonymous';
+    }
+    if (!audioB) {
+      audioB = new Audio();
+      audioB.crossOrigin = 'anonymous';
+    }
 
     // Expose active audio element globally for AudioFiltersPanel (Web Audio API)
     (globalThis as Record<string, unknown>).__zao_audio_a = audioA;

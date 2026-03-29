@@ -18,9 +18,9 @@ import { ListenBrainzConnect } from './ListenBrainzConnect';
 import { SocialsSection } from './SocialsSection';
 import { CrossPostingSection } from './CrossPostingSection';
 import dynamic from 'next/dynamic';
-const TwitchConnect = dynamic(() => import('@/components/settings/TwitchConnect').then(m => m.default || m), { ssr: false });
-const KickConnect = dynamic(() => import('@/components/settings/KickConnect').then(m => m.default || m), { ssr: false });
-const FacebookConnect = dynamic(() => import('@/components/settings/FacebookConnect').then(m => m.default || m), { ssr: false });
+const TwitchConnect = dynamic(() => import('@/components/settings/TwitchConnect').then(m => ({ default: m.TwitchConnect })), { ssr: false });
+const KickConnect = dynamic(() => import('@/components/settings/KickConnect').then(m => ({ default: m.KickConnect })), { ssr: false });
+const FacebookConnect = dynamic(() => import('@/components/settings/FacebookConnect').then(m => ({ default: m.FacebookConnect })), { ssr: false });
 
 interface Profile {
   fid: number;

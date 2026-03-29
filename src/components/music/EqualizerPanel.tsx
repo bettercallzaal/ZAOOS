@@ -61,7 +61,7 @@ export default function EqualizerPanel() {
               onChange={(e) => handleGainChange(i, Number(e.target.value))}
               className="w-full accent-[#f5a623]"
               style={{
-                writingMode: 'vertical-lr' as any,
+                writingMode: 'vertical-lr' as React.CSSProperties['writingMode'],
                 direction: 'rtl',
                 height: 120,
                 width: 28,

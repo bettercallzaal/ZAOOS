@@ -64,7 +64,7 @@ function clamp(value: number, min: number, max: number) {
 
 export function CommunityGraph() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const graphRef = useRef<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const graphRef = useRef<{ zoomToFit?: (duration: number, padding: number) => void }>(null);
   const [dimensions, setDimensions] = useState({ width: 600, height: 500 });
 
   const [members, setMembers] = useState<MemberNode[]>([]);
@@ -188,8 +188,8 @@ export function CommunityGraph() {
     const set = new Set<number>();
     set.add(hoveredNode.id);
     for (const link of graphData.links) {
-      const src = typeof link.source === 'object' ? (link.source as any).id : link.source;
-      const tgt = typeof link.target === 'object' ? (link.target as any).id : link.target;
+      const src = typeof link.source === 'object' ? (link.source as GraphNode).id : link.source;
+      const tgt = typeof link.target === 'object' ? (link.target as GraphNode).id : link.target;
       if (src === hoveredNode.id) set.add(tgt);
       if (tgt === hoveredNode.id) set.add(src);
     }
@@ -198,26 +198,25 @@ export function CommunityGraph() {
 
   // Canvas node rendering with images
   const nodeCanvasObject = useCallback(
-    (node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-      const gNode = node as GraphNode;
-      const radius = gNode.val || 6;
+    (node: GraphNode & { x?: number; y?: number }, ctx: CanvasRenderingContext2D, globalScale: number) => {
+      const radius = node.val || 6;
       const x = node.x ?? 0;
       const y = node.y ?? 0;
 
       // Dim non-neighbors on hover
-      const dimmed = neighborSet && !neighborSet.has(gNode.id);
+      const dimmed = neighborSet && !neighborSet.has(node.id);
       ctx.globalAlpha = dimmed ? 0.15 : 1;
 
       // Draw circle
-      const color = gNode.zid ? '#f5a623' : '#6b7280';
+      const color = node.zid ? '#f5a623' : '#6b7280';
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, 2 * Math.PI);
       ctx.fillStyle = color;
       ctx.fill();
 
       // Draw avatar if available and scale is large enough
-      if (gNode.pfpUrl && globalScale > 0.6) {
-        const cached = imageCache.current.get(gNode.pfpUrl);
+      if (node.pfpUrl && globalScale > 0.6) {
+        const cached = imageCache.current.get(node.pfpUrl);
         if (cached && cached.complete) {
           ctx.save();
           ctx.beginPath();
@@ -228,14 +227,14 @@ export function CommunityGraph() {
         } else if (!cached) {
           const img = new Image();
           img.crossOrigin = 'anonymous';
-          img.src = gNode.pfpUrl;
-          imageCache.current.set(gNode.pfpUrl, img);
+          img.src = node.pfpUrl;
+          imageCache.current.set(node.pfpUrl, img);
         }
       }
 
       // Draw label at sufficient zoom
       if (globalScale > 1.2) {
-        const label = gNode.name;
+        const label = node.name;
         const fontSize = Math.max(10 / globalScale, 2);
         ctx.font = `${fontSize}px sans-serif`;
         ctx.textAlign = 'center';
@@ -250,8 +249,8 @@ export function CommunityGraph() {
   );
 
   const nodePointerAreaPaint = useCallback(
-    (node: any, color: string, ctx: CanvasRenderingContext2D) => {
-      const radius = (node as GraphNode).val || 6;
+    (node: GraphNode & { x?: number; y?: number }, color: string, ctx: CanvasRenderingContext2D) => {
+      const radius = node.val || 6;
       ctx.beginPath();
       ctx.arc(node.x ?? 0, node.y ?? 0, radius + 2, 0, 2 * Math.PI);
       ctx.fillStyle = color;
@@ -260,21 +259,20 @@ export function CommunityGraph() {
     []
   );
 
-  const handleNodeHover = useCallback((node: any) => {
-    setHoveredNode(node as GraphNode | null);
+  const handleNodeHover = useCallback((node: GraphNode | null) => {
+    setHoveredNode(node);
   }, []);
 
   const handleNodeClick = useCallback(
-    (node: any, event: MouseEvent) => {
-      const gNode = node as GraphNode;
-      setSelectedNode((prev) => (prev?.id === gNode.id ? null : gNode));
+    (node: GraphNode, event: MouseEvent) => {
+      setSelectedNode((prev) => (prev?.id === node.id ? null : node));
       setTooltipPos({ x: event.clientX, y: event.clientY });
     },
     []
   );
 
   const linkColor = useCallback(
-    (link: any) => {
+    (link: GraphLink & { source: number | GraphNode; target: number | GraphNode }) => {
       if (!neighborSet) return 'rgba(245,166,35,0.12)';
       const src = typeof link.source === 'object' ? link.source.id : link.source;
       const tgt = typeof link.target === 'object' ? link.target.id : link.target;

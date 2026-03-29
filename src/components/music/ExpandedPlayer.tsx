@@ -268,180 +268,54 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
 
       {/* ─── Spectrum Visualizer ───────────────────────────────────── */}
       <div className="relative z-10 flex-shrink-0">
-        <SpectrumVisualizer isPlaying={isPlaying} className="mx-4 my-3" />
-      </div>
-
-      {/* ─── Panel icon bar ────────────────────────────────────────── */}
-      <div className="relative z-10 flex justify-around border-t border-white/10 pt-3 mt-1 px-8 flex-shrink-0">
-        {[
-          { id: 'eq' as const, icon: '🎚️', label: 'EQ' },
-          { id: 'lyrics' as const, icon: '🎵', label: 'Lyrics' },
-          { id: 'queue' as const, icon: '📝', label: 'Queue' },
-          { id: 'share' as const, icon: '🔗', label: 'Share' },
-        ].map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActivePanel(p => p === item.id ? null : item.id)}
-            className={`flex flex-col items-center gap-1 text-xs transition-colors ${
-              activePanel === item.id ? 'text-[#f5a623]' : 'text-gray-500'
-            }`}
-          >
-            <span className="text-lg">{item.icon}</span>
-            {item.label}
-          </button>
-        ))}
+        <SpectrumVisualizer isPlaying={isPlaying} className="mx-4 my-2" />
       </div>
 
       {/* ─── Active panel content ───────────────────────────────────── */}
       {activePanel !== null && activePanel !== 'lyrics' && (
-        <div className="relative z-10 px-4 flex-shrink-0">
-          {activePanel === 'queue' && (
-            <QueuePanel onClose={() => setActivePanel(null)} />
-          )}
+        <div className="relative z-10 px-4 flex-shrink-0 max-h-48 overflow-y-auto">
+          {activePanel === 'queue' && <QueuePanel onClose={() => setActivePanel(null)} />}
           {activePanel === 'share' && (
-            <div className="flex justify-center py-3">
-              <ShareMenu
-                trackName={metadata.trackName}
-                artistName={metadata.artistName || ''}
-                artworkUrl={metadata.artworkUrl}
-                trackUrl={metadata.url}
-              />
+            <div className="flex justify-center py-2">
+              <ShareMenu trackName={metadata.trackName} artistName={metadata.artistName || ''} artworkUrl={metadata.artworkUrl} trackUrl={metadata.url} />
             </div>
           )}
-          {activePanel === 'eq' && (
-            <>
-              <EqualizerPanel />
-              <AudioFiltersPanel visible />
-            </>
-          )}
+          {activePanel === 'eq' && <><EqualizerPanel /><AudioFiltersPanel visible /></>}
         </div>
       )}
 
-      {/* ─── Action buttons + Volume ───────────────────────────────── */}
-      <div className="relative z-10 px-8 pb-6 flex-shrink-0 space-y-4">
-        {/* Actions row */}
+      {/* ─── Single action bar — icons only, no labels ─────────────── */}
+      <div className="relative z-10 px-6 pb-4 flex-shrink-0 space-y-3 mt-auto">
         <div className="flex items-center justify-between">
-          <LikeButton songUrl={metadata.url} className="flex-shrink-0" />
-          <AddToPlaylistButton songUrl={metadata.url} className="flex-shrink-0" />
-          <ShareToChatButton songUrl={metadata.url} trackName={metadata.trackName} className="flex-shrink-0" />
-
-          {/* Lyrics toggle */}
-          <button
-            onClick={() => setActivePanel(p => p === 'lyrics' ? null : 'lyrics')}
-            className={`p-1.5 rounded-lg text-sm font-bold transition-colors ${
-              activePanel === 'lyrics' ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
-            }`}
-            aria-label={activePanel === 'lyrics' ? 'Hide lyrics' : 'Show lyrics'}
-            title={activePanel === 'lyrics' ? 'Hide lyrics' : 'Show lyrics'}
-          >
-            Aa
+          <LikeButton songUrl={metadata.url} compact className="flex-shrink-0" />
+          <AddToPlaylistButton songUrl={metadata.url} compact className="flex-shrink-0" />
+          <button onClick={() => setActivePanel(p => p === 'lyrics' ? null : 'lyrics')} className={`p-2 rounded-lg transition-colors ${activePanel === 'lyrics' ? 'text-[#f5a623]' : 'text-gray-500 hover:text-white'}`} aria-label="Lyrics">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V4.5l-10.5 3v7.003" /><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.875a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" /></svg>
           </button>
-
-          {/* Share toggle */}
-          <button
-            onClick={() => setActivePanel(p => p === 'share' ? null : 'share')}
-            className={`p-1.5 rounded-lg transition-colors ${
-              activePanel === 'share' ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
-            }`}
-            aria-label={activePanel === 'share' ? 'Hide share' : 'Share'}
-            title={activePanel === 'share' ? 'Hide share' : 'Share'}
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
-            </svg>
+          <button onClick={() => setActivePanel(p => p === 'share' ? null : 'share')} className={`p-2 rounded-lg transition-colors ${activePanel === 'share' ? 'text-[#f5a623]' : 'text-gray-500 hover:text-white'}`} aria-label="Share">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" /></svg>
           </button>
-
-          {/* Crossfade toggle */}
-          <button
-            onClick={() => player.setCrossfade(player.crossfade > 0 ? 0 : 3)}
-            className={`p-1.5 rounded-lg transition-colors ${
-              player.crossfade > 0 ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
-            }`}
-            aria-label={player.crossfade > 0 ? `Crossfade ${player.crossfade}s` : 'Enable crossfade'}
-            title={player.crossfade > 0 ? `Crossfade: ${player.crossfade}s` : 'Crossfade: off'}
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
-            </svg>
+          <button onClick={() => setActivePanel(p => p === 'eq' ? null : 'eq')} className={`p-2 rounded-lg transition-colors ${activePanel === 'eq' ? 'text-[#f5a623]' : 'text-gray-500 hover:text-white'}`} aria-label="EQ">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
           </button>
-
-          {/* Sleep timer */}
+          <button onClick={() => setActivePanel(p => p === 'queue' ? null : 'queue')} className={`relative p-2 rounded-lg transition-colors ${activePanel === 'queue' ? 'text-[#f5a623]' : 'text-gray-500 hover:text-white'}`} aria-label="Queue">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" /></svg>
+            {queueLength > 0 && <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#f5a623] text-[8px] font-bold text-[#0a1628] flex items-center justify-center">{queueLength > 9 ? '9+' : queueLength}</span>}
+          </button>
           <SleepTimer />
-
-          {/* Audio filters toggle */}
-          <button
-            onClick={() => setActivePanel(p => p === 'eq' ? null : 'eq')}
-            className={`p-1.5 rounded-lg transition-colors ${
-              activePanel === 'eq' || getActiveFilterKey()
-                ? 'text-[#f5a623] bg-[#f5a623]/10'
-                : 'text-gray-400 hover:text-white'
-            }`}
-            aria-label={activePanel === 'eq' ? 'Hide audio filters' : 'Show audio filters'}
-            title={activePanel === 'eq' ? 'Hide filters' : 'Audio filters'}
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-            </svg>
-          </button>
-
-          {/* Queue toggle */}
-          <button
-            onClick={() => setActivePanel(p => p === 'queue' ? null : 'queue')}
-            className={`relative p-1.5 rounded-lg transition-colors ${
-              activePanel === 'queue' ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
-            }`}
-            aria-label={activePanel === 'queue' ? 'Hide queue' : 'Up Next'}
-            title={activePanel === 'queue' ? 'Hide queue' : 'Up Next'}
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
-            </svg>
-            {queueLength > 0 && (
-              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#f5a623] text-[8px] font-bold text-[#0a1628] flex items-center justify-center">
-                {queueLength > 9 ? '9+' : queueLength}
-              </span>
-            )}
-          </button>
-
-          {/* Platform badge */}
-          <span className="text-[10px] text-gray-500 bg-white/5 px-2.5 py-1 rounded-full capitalize">
-            {metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}
-          </span>
         </div>
 
-        {/* Emoji reactions */}
-        <TrackReactions songUrl={metadata.url} className="justify-center" />
-
-        {/* Volume slider */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => player.setVolume(player.volume > 0 ? 0 : 1)}
-            className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
-            aria-label={player.volume === 0 ? 'Unmute' : 'Mute'}
-          >
-            {player.volume === 0 ? (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-              </svg>
-            )}
+        {/* Volume — compact */}
+        <div className="flex items-center gap-2 px-1">
+          <button onClick={() => player.setVolume(player.volume > 0 ? 0 : 1)} className="text-gray-500 hover:text-white transition-colors" aria-label="Mute">
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+              {player.volume === 0
+                ? <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+                : <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+              }
+            </svg>
           </button>
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.05}
-            value={player.volume}
-            onChange={(e) => player.setVolume(parseFloat(e.target.value))}
-            className="flex-1 h-1.5 accent-[#f5a623] cursor-pointer"
-            aria-label="Volume"
-          />
-          <span className="text-[10px] text-gray-500 tabular-nums w-6 text-right flex-shrink-0">
-            {Math.round(player.volume * 100)}
-          </span>
+          <input type="range" min={0} max={1} step={0.05} value={player.volume} onChange={(e) => player.setVolume(parseFloat(e.target.value))} className="flex-1 h-1 accent-[#f5a623] cursor-pointer" aria-label="Volume" />
         </div>
       </div>
     </div>

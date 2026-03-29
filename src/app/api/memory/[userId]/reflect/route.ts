@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
-import { hindsight } from '@/lib/hindsight';
+import { getHindsightClient } from '@/lib/hindsight';
 
 const ReflectBodySchema = z.object({
   prompt: z.string().min(1).max(2000),
@@ -33,7 +33,11 @@ export async function POST(
     }
 
     const { prompt } = parsed.data;
-    const reflection = await hindsight.reflect(userId, prompt);
+
+    const hindsight = await getHindsightClient();
+    if (!hindsight) return NextResponse.json({ error: 'Hindsight not available' }, { status: 503 });
+
+    const reflection = await (hindsight as any).reflect(userId, prompt);
 
     return NextResponse.json({ reflection });
   } catch (error) {

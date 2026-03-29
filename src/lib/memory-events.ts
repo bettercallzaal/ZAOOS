@@ -1,4 +1,4 @@
-import { hindsight } from './hindsight';
+import { getHindsightClient } from './hindsight';
 
 // ============================================================================
 // Event Types
@@ -123,7 +123,10 @@ export async function retainEvent(
 ): Promise<void> {
   try {
     const content = serializeEventToText(event);
-    await hindsight.retain(userFid, content, {
+    const hindsight = await getHindsightClient();
+    if (!hindsight) return;
+
+    await (hindsight as any).retain(userFid, content, {
       metadata: {
         eventType: event.type,
         timestamp: event.timestamp,

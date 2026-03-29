@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
-import { hindsight } from '@/lib/hindsight';
+import { getHindsightClient } from '@/lib/hindsight';
 
 // Community bank ID - uses a shared bank for community-wide memories
 const COMMUNITY_BANK_ID = 'zao-community';
@@ -33,7 +33,10 @@ export async function GET(request: NextRequest) {
     const { q: query, limit } = parsed.data;
 
     // Recall from community bank
-    const results = await hindsight.recall(COMMUNITY_BANK_ID, query, { limit });
+    const hindsight = await getHindsightClient();
+    if (!hindsight) return NextResponse.json({ error: 'Hindsight not available' }, { status: 503 });
+
+    const results = await (hindsight as any).recall(COMMUNITY_BANK_ID, query, { limit });
 
     return NextResponse.json({
       memories: results.map((r: { content: string; score: number; metadata?: Record<string, unknown> }) => ({

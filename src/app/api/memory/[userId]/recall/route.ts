@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
-import { hindsight } from '@/lib/hindsight';
+import { getHindsightClient } from '@/lib/hindsight';
 
 const RecallQuerySchema = z.object({
   q: z.string().min(1).max(500),
@@ -37,7 +37,11 @@ export async function GET(
     }
 
     const { q: query, limit } = parsed.data;
-    const results = await hindsight.recall(userId, query, { limit });
+
+    const hindsight = await getHindsightClient();
+    if (!hindsight) return NextResponse.json({ error: 'Hindsight not available' }, { status: 503 });
+
+    const results = await (hindsight as any).recall(userId, query, { limit });
 
     return NextResponse.json({
       memories: results.map((r: { content: string; score: number; metadata?: Record<string, unknown> }) => ({

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import dynamic from 'next/dynamic';
 import { usePlayer } from '@/providers/audio';
 import { formatDuration } from '@/lib/music/formatDuration';
@@ -128,7 +129,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             />
           </div>
         ) : (
-          <div className={`relative w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-gray-800 shadow-2xl ${
+          <motion.div layoutId="player-artwork" className={`relative w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-gray-800 shadow-2xl ${
             isPlaying ? 'ring-2 ring-[#f5a623]/20 shadow-[#f5a623]/10' : ''
           }`}>
             <ArtworkImage
@@ -161,7 +162,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
                 Swipe to skip
               </span>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
 

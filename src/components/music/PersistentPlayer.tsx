@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { AnimatePresence, motion, LayoutGroup } from 'motion/react';
 import { usePlayer } from '@/providers/audio';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
@@ -124,21 +125,32 @@ export function PersistentPlayer({
   };
 
   return (
-    <>
+    <LayoutGroup>
     {/* Screen reader announcement for track changes */}
     <div aria-live="polite" aria-atomic="true" className="sr-only">
       {metadata && `Now playing: ${metadata.trackName} by ${metadata.artistName}`}
     </div>
 
-    {/* Expanded full-screen player — overlay on top of compact bar */}
-    {expanded && metadata && (
-      <ExpandedPlayer
-        metadata={metadata}
-        onClose={() => setExpanded(false)}
-        onPrev={onPrev}
-        onNext={onNext}
-      />
-    )}
+    {/* Expanded full-screen player — animated overlay */}
+    <AnimatePresence>
+      {expanded && metadata && (
+        <motion.div
+          key="expanded-player"
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 100 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="fixed inset-0 z-50"
+        >
+          <ExpandedPlayer
+            metadata={metadata}
+            onClose={() => setExpanded(false)}
+            onPrev={onPrev}
+            onNext={onNext}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
 
     <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80">
       {/* Seekable progress bar */}
@@ -180,14 +192,14 @@ export function PersistentPlayer({
           className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-visible bg-gray-800"
           aria-label="Expand player"
         >
-          <div className="w-10 h-10 rounded-lg overflow-hidden">
+          <motion.div layoutId="player-artwork" className="w-10 h-10 rounded-lg overflow-hidden">
             <ArtworkImage
               src={metadata.artworkUrl}
               alt={metadata.trackName}
               fill
               className="object-cover"
             />
-          </div>
+          </motion.div>
           {/* Progress ring */}
           {duration > 0 && (
             <svg className="absolute -inset-0.5 w-[44px] h-[44px] -rotate-90 pointer-events-none" viewBox="0 0 44 44">
@@ -314,7 +326,7 @@ export function PersistentPlayer({
         )}
       </div>
     </div>
-    </>
+    </LayoutGroup>
   );
 }
 

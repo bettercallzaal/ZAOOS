@@ -105,7 +105,12 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Mint failed');
+      if (!res.ok) {
+        if (res.status === 503) {
+          throw new Error('Arweave minting is not yet configured. This feature is coming soon.');
+        }
+        throw new Error(data.error || 'Mint failed');
+      }
 
       setResult({
         txId: data.asset.txId,
@@ -146,14 +151,21 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
   // ---------- Render MintSuccess ----------
   if (result) {
     return (
-      <MintSuccess
-        title={title}
-        artist={artist}
-        txId={result.txId}
-        coverUrl={result.coverUrl}
-        bazarUrl={result.bazarUrl}
-        onClose={handleClose}
-      />
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+      >
+        <div className="w-full max-w-lg rounded-2xl border border-[#f5a623]/20 bg-[#0d1b2a] p-6 shadow-xl">
+          <MintSuccess
+            title={title}
+            artist={artist}
+            txId={result.txId}
+            coverUrl={result.coverUrl}
+            bazarUrl={result.bazarUrl}
+            onClose={handleClose}
+          />
+        </div>
+      </div>
     );
   }
 

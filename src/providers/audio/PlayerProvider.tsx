@@ -335,6 +335,47 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     };
   }, [dispatch]);
 
+  // Global keyboard shortcuts — Space, arrows, M
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Don't intercept when typing in inputs/textareas
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target as HTMLElement)?.isContentEditable) return;
+
+      const ctrl = controllers.current[state.metadata?.type ?? 'audio'];
+      switch (e.key) {
+        case ' ':
+          e.preventDefault();
+          if (state.status === 'playing') { ctrl?.pause(); dispatch({ type: 'PAUSE' }); }
+          else if (state.status === 'paused') { ctrl?.play(); dispatch({ type: 'RESUME' }); }
+          break;
+        case 'ArrowRight':
+          if (e.shiftKey && onEndedRef.current) { onEndedRef.current(); } // Shift+Right = next track
+          else if (state.metadata) { ctrl?.seek((state.position + 10000)); dispatch({ type: 'SEEK', payload: state.position + 10000 }); }
+          break;
+        case 'ArrowLeft':
+          if (state.metadata) { ctrl?.seek(Math.max(0, state.position - 10000)); dispatch({ type: 'SEEK', payload: Math.max(0, state.position - 10000) }); }
+          break;
+        case 'ArrowUp':
+          if (e.shiftKey) { const v = Math.min(1, state.volume + 0.1); ctrl?.setVolume?.(v); dispatch({ type: 'SET_VOLUME', payload: v }); }
+          break;
+        case 'ArrowDown':
+          if (e.shiftKey) { const v = Math.max(0, state.volume - 0.1); ctrl?.setVolume?.(v); dispatch({ type: 'SET_VOLUME', payload: v }); }
+          break;
+        case 'm':
+        case 'M':
+          if (!e.metaKey && !e.ctrlKey) {
+            const v = state.volume > 0 ? 0 : 1;
+            ctrl?.setVolume?.(v);
+            dispatch({ type: 'SET_VOLUME', payload: v });
+          }
+          break;
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [state.status, state.metadata?.type, state.position, state.volume, dispatch]);
+
   // Wake Lock — keep screen on during playback
   useEffect(() => {
     if (state.status !== 'playing' || !('wakeLock' in navigator)) return;

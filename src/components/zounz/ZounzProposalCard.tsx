@@ -46,6 +46,13 @@ export default function ZounzProposalCard({
     hash: txHash,
   });
 
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const totalVotes = proposal.forVotes + proposal.againstVotes + proposal.abstainVotes;
   const forPct = totalVotes > 0 ? (proposal.forVotes / totalVotes) * 100 : 0;
   const againstPct = totalVotes > 0 ? (proposal.againstVotes / totalVotes) * 100 : 0;

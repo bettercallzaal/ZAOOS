@@ -179,7 +179,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         repeat: state.repeat,
       }));
     } catch { /* quota exceeded — ignore */ }
-  }, [state.metadata, state.position, state.duration, state.volume, state.shuffle, state.repeat]);
+  }, [state.metadata, state.position, state.duration, state.volume, state.shuffle, state.repeat, state.crossfade]);
 
   // Ref to current state — for use in stable callbacks that shouldn't re-register on every state change
   const stateRef = useRef(state);

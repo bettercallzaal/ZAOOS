@@ -101,7 +101,7 @@ export function PersistentPlayer({
   }
 
   // ─── Active state: track playing or restored ───────────────────────
-  const metadata = player.metadata ?? restored!.metadata;
+  const metadata = player.metadata ?? restored?.metadata;
   const isPlaying = player.isPlaying;
   const isLoading = player.isLoading;
   const position = player.metadata ? player.position : (restored?.position ?? 0);

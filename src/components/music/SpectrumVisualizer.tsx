@@ -21,7 +21,7 @@ export default function SpectrumVisualizer({ isPlaying, className }: SpectrumVis
       const AudioMotionAnalyzer = (await import('audiomotion-analyzer')).default
 
       // Get the currently active audio element
-      const audioEl = (globalThis as any).__zao_audio_a as HTMLAudioElement | undefined
+      const audioEl = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined
       if (!audioEl) return
 
       try {
@@ -71,8 +71,8 @@ export default function SpectrumVisualizer({ isPlaying, className }: SpectrumVis
     if (!analyzer) return
 
     const checkActive = () => {
-      const audioA = (globalThis as any).__zao_audio_a as HTMLAudioElement | undefined
-      const audioB = (globalThis as any).__zao_audio_b as HTMLAudioElement | undefined
+      const audioA = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined
+      const audioB = (globalThis as Record<string, unknown>).__zao_audio_b as HTMLAudioElement | undefined
       const active = audioA && !audioA.paused ? audioA : audioB && !audioB.paused ? audioB : null
       if (active) {
         try { analyzer.connectInput(active) } catch {}

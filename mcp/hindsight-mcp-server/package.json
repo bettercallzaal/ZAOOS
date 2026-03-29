@@ -1,0 +1,19 @@
+{
+  "name": "@zaoos/hindsight-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server wrapper for Hindsight memory system",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@vectorize-io/hindsight-client": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

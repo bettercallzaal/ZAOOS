@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import { useAuth } from '@/hooks/useAuth';
 import { useXMTPContextSafe } from '@/contexts/XMTPContext';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
@@ -435,6 +436,18 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
   const [pushToggling, setPushToggling] = useState(false);
 
+  // Dark mode state
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [themeToggling, setThemeToggling] = useState(false);
+
+  const toggleDarkMode = useCallback(() => {
+    if (themeToggling) return;
+    setThemeToggling(true);
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    // Reset after brief delay to prevent rapid toggling
+    setTimeout(() => setThemeToggling(false), 300);
+  }, [themeToggling, resolvedTheme, setTheme]);
+
   useEffect(() => {
     if (!session?.fid) return;
     // Check if this user has push notifications enabled
@@ -601,6 +614,20 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     label={pushEnabled ? 'Disable push notifications' : 'Enable push notifications'}
                   />
                 ) : null
+              }
+            />
+
+            {/* Dark Mode */}
+            <FeatureRow
+              name="Dark Mode"
+              detail={resolvedTheme === 'dark' ? 'On' : 'Off'}
+              action={
+                <ToggleSwitch
+                  on={resolvedTheme === 'dark'}
+                  onToggle={toggleDarkMode}
+                  disabled={themeToggling}
+                  label={resolvedTheme === 'dark' ? 'Disable dark mode' : 'Enable dark mode'}
+                />
               }
             />
           </div>

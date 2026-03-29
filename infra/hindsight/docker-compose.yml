@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:latest
+    container_name: zaoos-hindsight
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8888:8888"   # API — localhost only
+      - "9999:9999"   # UI (optional, for debugging)
+    environment:
+      # LLM backend for reflection/synthesis
+      HINDSIGHT_API_LLM_PROVIDER: ${HINDSIGHT_LLM_PROVIDER:-openai}
+      HINDSIGHT_API_LLM_API_KEY: ${HINDSIGHT_API_KEY}
+      # Database
+      HINDSIGHT_DB_PASSWORD: ${HINDSIGHT_DB_PASSWORD:-change-me-in-prod}
+      HINDSIGHT_DB_HOST: hindsight-db
+      HINDSIGHT_DB_PORT: 5432
+      HINDSIGHT_DB_USER: hindsight
+      HINDSIGHT_DB_NAME: hindsight
+      # Optional: customize port binding
+      # HINDSIGHT_API_PORT: 8888
+    volumes:
+      - hindsight-data:/home/hindsight/.pg0
+    depends_on:
+      hindsight-db:
+        condition: service_healthy
+
+  hindsight-db:
+    image: postgres:16-alpine
+    container_name: zaoos-hindsight-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hindsight
+      POSTGRES_USER: hindsight
+      POSTGRES_PASSWORD: ${HINDSIGHT_DB_PASSWORD:-change-me-in-prod}
+    volumes:
+      - hindsight-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hindsight -d hindsight"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  hindsight-data:
+  hindsight-db-data:

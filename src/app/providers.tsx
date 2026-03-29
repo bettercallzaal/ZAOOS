@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { type State, WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from 'next-themes';
 import { MiniAppGate } from '@/components/miniapp/MiniAppGate';
 import { getWagmiConfig } from '@/lib/wagmi/config';
 
@@ -38,11 +39,13 @@ export function Providers({ children, wagmiInitialState }: ProvidersProps) {
   return (
     <WagmiProvider config={wagmiConfig} initialState={wagmiInitialState}>
       <QueryClientProvider client={queryClient}>
-        <LazyRainbowKit>
-          <LazyAuthKit>
-            <MiniAppGate>{children}</MiniAppGate>
-          </LazyAuthKit>
-        </LazyRainbowKit>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange={false}>
+          <LazyRainbowKit>
+            <LazyAuthKit>
+              <MiniAppGate>{children}</MiniAppGate>
+            </LazyAuthKit>
+          </LazyRainbowKit>
+        </ThemeProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

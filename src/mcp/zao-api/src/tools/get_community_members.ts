@@ -28,15 +28,18 @@ export async function getCommunityMembers(args: GetCommunityMembersArgs) {
   }
 
   // Fetch respect scores to enrich the member data
-  const fids = data.map((p: any) => p.fid);
+  interface ProfileRow { fid: string; username: string; display_name: string; role: string; joined_at: string; is_active: boolean }
+  interface ScoreRow { fid: string; respect_score: number }
+
+  const fids = (data as ProfileRow[]).map((p) => p.fid);
   const { data: scores } = await supabase
     .from("respect_scores")
     .select("fid, respect_score")
     .in("fid", fids);
 
-  const scoreMap = new Map(scores?.map((s: any) => [s.fid, s.respect_score]) || []);
+  const scoreMap = new Map((scores as ScoreRow[] | null)?.map((s) => [s.fid, s.respect_score]) || []);
 
-  const members: CommunityMember[] = data.map((p: any) => ({
+  const members: CommunityMember[] = (data as ProfileRow[]).map((p) => ({
     fid: p.fid,
     username: p.username,
     display_name: p.display_name,

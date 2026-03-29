@@ -101,14 +101,15 @@ export const tools: Tool[] = [
   }
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const toolHandlers: Record<string, (args: any) => Promise<unknown>> = {
-  get_profile: getProfile as (args: any) => Promise<unknown>,
-  get_casts: getCasts as (args: any) => Promise<unknown>,
-  get_respect_score: getRespectScore as (args: any) => Promise<unknown>,
-  get_community_members: getCommunityMembers as (args: any) => Promise<unknown>,
-  get_recents: getRecents as (args: any) => Promise<unknown>,
-  search_casts: searchCasts as (args: any) => Promise<unknown>,
-  get_room_history: getRoomHistory as (args: any) => Promise<unknown>,
-  get_proposals: getProposals as (args: any) => Promise<unknown>
+import type { ToolArgs } from "../types/index.js";
+
+export const toolHandlers: Record<string, (args: ToolArgs) => Promise<unknown>> = {
+  get_profile: getProfile as (args: ToolArgs) => Promise<unknown>,
+  get_casts: getCasts as (args: ToolArgs) => Promise<unknown>,
+  get_respect_score: getRespectScore as (args: ToolArgs) => Promise<unknown>,
+  get_community_members: getCommunityMembers as (args: ToolArgs) => Promise<unknown>,
+  get_recents: getRecents as (args: ToolArgs) => Promise<unknown>,
+  search_casts: searchCasts as (args: ToolArgs) => Promise<unknown>,
+  get_room_history: getRoomHistory as (args: ToolArgs) => Promise<unknown>,
+  get_proposals: getProposals as (args: ToolArgs) => Promise<unknown>
 };

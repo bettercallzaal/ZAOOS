@@ -30,7 +30,8 @@ export async function searchCasts(args: SearchCastsArgs) {
   }
 
   // Add a placeholder relevance_score (in production, this could be computed by Supabase full-text search)
-  const casts: SearchCast[] = data.map((c: any) => ({
+  interface CastRow { fid: string; username: string; text: string; timestamp: string }
+  const casts: SearchCast[] = (data as CastRow[]).map((c) => ({
     fid: c.fid,
     username: c.username,
     text: c.text,

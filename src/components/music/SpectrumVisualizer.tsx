@@ -7,21 +7,26 @@ interface SpectrumVisualizerProps {
   className?: string
 }
 
+interface ZaoGlobal {
+  __zao_audio_a?: HTMLAudioElement
+  __zao_audio_b?: HTMLAudioElement
+}
+
 export default function SpectrumVisualizer({ isPlaying, className }: SpectrumVisualizerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const analyzerRef = useRef<any>(null)
+  const analyzerRef = useRef<InstanceType<typeof import('audiomotion-analyzer').default> | null>(null)
   const [visible, setVisible] = useState(true)
 
   useEffect(() => {
     if (!containerRef.current || !visible) return
 
-    let analyzer: any = null
+    let analyzer: InstanceType<typeof import('audiomotion-analyzer').default> | null = null
 
     async function init() {
       const AudioMotionAnalyzer = (await import('audiomotion-analyzer')).default
 
       // Get the currently active audio element
-      const audioEl = (globalThis as any).__zao_audio_a as HTMLAudioElement | undefined
+      const audioEl = (globalThis as ZaoGlobal).__zao_audio_a as HTMLAudioElement | undefined
       if (!audioEl) return
 
       try {
@@ -71,8 +76,8 @@ export default function SpectrumVisualizer({ isPlaying, className }: SpectrumVis
     if (!analyzer) return
 
     const checkActive = () => {
-      const audioA = (globalThis as any).__zao_audio_a as HTMLAudioElement | undefined
-      const audioB = (globalThis as any).__zao_audio_b as HTMLAudioElement | undefined
+      const audioA = (globalThis as ZaoGlobal).__zao_audio_a
+      const audioB = (globalThis as ZaoGlobal).__zao_audio_b
       const active = audioA && !audioA.paused ? audioA : audioB && !audioB.paused ? audioB : null
       if (active) {
         try { analyzer.connectInput(active) } catch {}

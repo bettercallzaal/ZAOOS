@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     const entryIds = (entries || []).map((e: { id: string }) => e.id);
 
     // Get current user's vote for each entry
-    let userVotes: Record<string, string> = {}; // entry_id -> vote_type
+    const userVotes: Record<string, string> = {}; // entry_id -> vote_type
     if (entryIds.length > 0 && session.fid) {
       const { data: votes } = await supabaseAdmin
         .from('research_entry_votes')
@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get all voters per entry (FID + vote_type)
-    let entryVoters: Record<string, { fid: number; vote_type: string }[]> = {};
+    const entryVoters: Record<string, { fid: number; vote_type: string }[]> = {};
     if (entryIds.length > 0) {
       const { data: allVotes } = await supabaseAdmin
         .from('research_entry_votes')

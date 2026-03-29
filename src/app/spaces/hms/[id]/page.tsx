@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/useAuth';
 import type { MSRoom } from '@/lib/social/msRoomsDb';
@@ -99,12 +100,12 @@ export default function HMSRoomPage() {
         </div>
         <div className="flex items-center gap-2">
           {!user && (
-            <a
+            <Link
               href="/"
               className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
             >
               Sign in to speak
-            </a>
+            </Link>
           )}
         </div>
       </header>

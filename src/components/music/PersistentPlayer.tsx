@@ -126,6 +126,7 @@ export function PersistentPlayer({
   return (
     <>
     {/* Expanded full-screen player — overlay on top of compact bar */}
+    {(() => { if (expanded) console.log('[Player] Expanded state:', expanded, 'metadata:', !!metadata); return null; })()}
     {expanded && metadata && (
       <ExpandedPlayer
         metadata={metadata}
@@ -171,7 +172,7 @@ export function PersistentPlayer({
       >
         {/* Artwork — tap to expand, with progress ring */}
         <button
-          onClick={() => metadata && setExpanded(true)}
+          onClick={() => { console.log('[Player] Artwork clicked, metadata:', !!metadata, 'expanded:', expanded); if (metadata) setExpanded(true); }}
           className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-visible bg-gray-800"
           aria-label="Expand player"
         >
@@ -212,7 +213,7 @@ export function PersistentPlayer({
 
         {/* Track info — tap to expand */}
         <button
-          onClick={() => metadata && setExpanded(true)}
+          onClick={() => { console.log('[Player] Track info clicked, metadata:', !!metadata); if (metadata) setExpanded(true); }}
           className="flex-1 min-w-0 text-left"
           aria-label="Expand player"
         >

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Cast } from '@/types';
 import { Message } from './Message';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useEscapeClose } from '@/hooks/useEscapeClose';
 
 interface ThreadDrawerProps {
   threadHash: string;
@@ -25,6 +26,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(drawerRef, true);
+  useEscapeClose(onClose, true);
 
   useEffect(() => {
     let cancelled = false;
@@ -103,10 +105,16 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
       />
 
       {/* Drawer */}
-      <div ref={drawerRef} className="fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-[420px] z-50 flex flex-col bg-[#0d1b2a] border-l border-gray-800 animate-slide-in">
+      <div
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="thread-drawer-title"
+        className="fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-[420px] z-50 flex flex-col bg-[#0d1b2a] border-l border-gray-800 animate-slide-in"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0a1628]">
-          <h3 className="text-sm font-semibold text-gray-300">Thread</h3>
+          <h3 id="thread-drawer-title" className="text-sm font-semibold text-gray-300">Thread</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white p-2"

@@ -16,13 +16,14 @@ import { getEngagementScores } from '@/lib/openrank/client';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Auth check: verify CRON_SECRET if set
+    // Auth check: require CRON_SECRET (never run unauthenticated)
     const cronSecret = process.env.CRON_SECRET;
-    if (cronSecret) {
-      const authHeader = request.headers.get('authorization');
-      if (authHeader !== `Bearer ${cronSecret}`) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
+    if (!cronSecret) {
+      return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+    }
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Fetch active members with FIDs

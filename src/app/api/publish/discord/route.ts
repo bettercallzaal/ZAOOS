@@ -27,6 +27,9 @@ export async function POST(req: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (!session.isAdmin) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
 
     // Check Discord is configured (env var or will be provided in body)
     // We check after parsing so webhookUrl override can satisfy this

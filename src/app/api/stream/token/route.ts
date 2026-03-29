@@ -8,6 +8,13 @@ const TokenSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth guard — prevent unauthenticated token minting
+    const { getSessionData } = await import('@/lib/auth/session');
+    const session = await getSessionData();
+    if (!session?.fid) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY;
     const apiSecret = process.env.STREAM_API_SECRET;
 

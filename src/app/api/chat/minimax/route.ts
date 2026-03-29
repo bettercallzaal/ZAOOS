@@ -13,6 +13,13 @@ const minimaxSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Auth guard — prevent unauthenticated LLM proxy usage
+  const { getSessionData } = await import('@/lib/auth/session');
+  const session = await getSessionData();
+  if (!session?.fid) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   if (!ENV.MINIMAX_API_KEY) {
     return NextResponse.json({ error: 'Minimax not configured' }, { status: 503 });
   }

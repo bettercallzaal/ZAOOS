@@ -47,12 +47,15 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
     const channelChanged = prevChannelRef.current !== channelId;
     prevChannelRef.current = channelId;
 
+    let t1: ReturnType<typeof setTimeout> | undefined;
+    let t2: ReturnType<typeof setTimeout> | undefined;
+
     if (channelChanged || prevCountRef.current === 0) {
       // Initial load or channel switch — snap to bottom immediately
       scrollToBottom(true);
       // Also after a short delay for lazy-loaded content
-      setTimeout(() => scrollToBottom(true), 100);
-      setTimeout(() => scrollToBottom(true), 500);
+      t1 = setTimeout(() => scrollToBottom(true), 100);
+      t2 = setTimeout(() => scrollToBottom(true), 500);
     } else if (messages.length > prevCountRef.current) {
       // New message arrived — smooth scroll
       const el = containerRef.current;
@@ -62,6 +65,10 @@ export function MessageList({ messages, isAdmin, currentFid, hasSigner, onHide, 
     }
 
     prevCountRef.current = messages.length;
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [messages.length, channelId]);
 
   // Reset count when channel changes

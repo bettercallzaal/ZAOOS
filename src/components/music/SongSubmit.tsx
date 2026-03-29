@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { usePlayer } from '@/providers/audio';
 import { useEscapeClose } from '@/hooks/useEscapeClose';
@@ -48,8 +48,11 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [urlValid, setUrlValid] = useState<boolean | null>(null);
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout>>();
   useEscapeClose(onClose, isOpen);
   const player = usePlayer();
+
+  useEffect(() => () => clearTimeout(feedbackTimerRef.current), []);
 
   const fetchSubmissions = useCallback(async () => {
     try {
@@ -80,7 +83,8 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
 
   const showFeedback = (type: 'success' | 'error', msg: string) => {
     setFeedback({ type, msg });
-    setTimeout(() => setFeedback(null), 3000);
+    clearTimeout(feedbackTimerRef.current);
+    feedbackTimerRef.current = setTimeout(() => setFeedback(null), 3000);
   };
 
   const handleSubmit = async () => {

@@ -17,6 +17,8 @@ export async function GET() {
     return NextResponse.json({
       active: active.status === 'fulfilled' ? active.value : [],
       recent: recent.status === 'fulfilled' ? recent.value : [],
+    }, {
+      headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=30' },
     });
   } catch (err) {
     console.error('[snapshot/polls] Error fetching polls:', err);

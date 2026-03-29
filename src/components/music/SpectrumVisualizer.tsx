@@ -26,7 +26,7 @@ export default function SpectrumVisualizer({ isPlaying, className }: SpectrumVis
       const AudioMotionAnalyzer = (await import('audiomotion-analyzer')).default
 
       // Get the currently active audio element
-      const audioEl = (globalThis as ZaoGlobal).__zao_audio_a as HTMLAudioElement | undefined
+      const audioEl = (globalThis as ZaoGlobal).__zao_audio_a
       if (!audioEl) return
 
       try {

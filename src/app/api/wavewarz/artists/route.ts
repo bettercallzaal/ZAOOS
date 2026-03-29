@@ -33,5 +33,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch artists' }, { status: 500 });
   }
 
-  return NextResponse.json({ artists: data });
+  return NextResponse.json({ artists: data }, {
+    headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=30' },
+  });
 }

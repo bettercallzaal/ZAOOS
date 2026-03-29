@@ -7,7 +7,8 @@ import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { communityConfig } from '@/../community.config';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
-import { ExpandedPlayer } from '@/components/music/ExpandedPlayer';
+import dynamic from 'next/dynamic';
+const ExpandedPlayer = dynamic(() => import('@/components/music/ExpandedPlayer').then(m => ({ default: m.ExpandedPlayer })), { ssr: false });
 
 interface PersistentPlayerProps {
   onPrev?: () => void;
@@ -68,6 +69,7 @@ export function PersistentPlayer({
         <button
           onClick={() => radioLoading ? undefined : onRadioStart?.()}
           disabled={radioLoading}
+          aria-label={radioLoading ? 'Loading ZAO Radio' : 'Play ZAO Radio'}
           className="w-full flex items-center gap-3 px-3 py-2.5 active:bg-white/5 transition-colors disabled:opacity-70"
         >
           {/* Radio icon */}
@@ -99,7 +101,7 @@ export function PersistentPlayer({
   }
 
   // ─── Active state: track playing or restored ───────────────────────
-  const metadata = player.metadata ?? restored!.metadata;
+  const metadata = player.metadata ?? restored?.metadata;
   const isPlaying = player.isPlaying;
   const isLoading = player.isLoading;
   const position = player.metadata ? player.position : (restored?.position ?? 0);
@@ -131,12 +133,24 @@ export function PersistentPlayer({
     <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80">
       {/* Seekable progress bar */}
       <div
-        className="h-1.5 bg-gray-800 w-full cursor-pointer group hover:h-2.5 transition-all"
+        role="slider"
+        aria-label="Playback progress"
+        aria-valuemin={0}
+        aria-valuemax={duration > 0 ? Math.round(duration) : 100}
+        aria-valuenow={Math.round(position)}
+        aria-valuetext={`${formatDuration(position)} of ${formatDuration(duration)}`}
+        tabIndex={0}
+        className="h-1.5 bg-gray-800 w-full cursor-pointer group hover:h-2.5 transition-all focus-visible:h-2.5"
         onClick={(e) => {
           if (duration <= 0) return;
           const rect = e.currentTarget.getBoundingClientRect();
           const fraction = (e.clientX - rect.left) / rect.width;
           player.seek(fraction * duration);
+        }}
+        onKeyDown={(e) => {
+          if (duration <= 0) return;
+          if (e.key === 'ArrowRight') player.seek(Math.min(position + 10, duration));
+          else if (e.key === 'ArrowLeft') player.seek(Math.max(position - 10, 0));
         }}
       >
         <div
@@ -247,11 +261,11 @@ export function PersistentPlayer({
           </svg>
         </button>
 
-        {/* Pause (was Stop — stop nulls metadata and hides the player) */}
+        {/* Dismiss player */}
         <button
           onClick={(e) => { e.stopPropagation(); player.pause(); }}
           className="text-gray-500 hover:text-gray-300 transition-colors p-1 flex-shrink-0"
-          aria-label="Pause"
+          aria-label="Dismiss player"
         >
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

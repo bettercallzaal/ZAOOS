@@ -266,7 +266,7 @@ export function GlobalPlayer({
           <button
             onClick={(e) => { e.stopPropagation(); player.pause(); }}
             className="text-gray-500 hover:text-gray-300 transition-colors p-1"
-            aria-label="Pause"
+            aria-label="Dismiss player"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -278,7 +278,15 @@ export function GlobalPlayer({
       {/* ─── Mobile: compact + swipe-friendly ──────────────────────── */}
       <div className="flex sm:hidden flex-col relative z-10">
         {/* Progress bar on top — thin, always visible */}
-        <div className="h-1 bg-gray-800 w-full">
+        <div
+          role="progressbar"
+          aria-label="Playback progress"
+          aria-valuemin={0}
+          aria-valuemax={duration > 0 ? Math.round(duration) : 100}
+          aria-valuenow={Math.round(position)}
+          aria-valuetext={`${formatDuration(position)} of ${formatDuration(duration)}`}
+          className="h-1 bg-gray-800 w-full"
+        >
           <div
             className="h-full bg-[#f5a623] transition-[width] duration-300"
             style={{ width: duration > 0 ? `${(position / duration) * 100}%` : '0%' }}
@@ -439,6 +447,7 @@ function VolumeButton({ player }: { player: ReturnType<typeof usePlayer> }) {
           <button
             onClick={() => player.setVolume(player.volume > 0 ? 0 : 1)}
             className="text-[10px] text-gray-500 hover:text-white transition-colors"
+            aria-label={player.volume === 0 ? 'Unmute' : 'Mute'}
           >
             {player.volume === 0 ? 'Unmute' : 'Mute'}
           </button>

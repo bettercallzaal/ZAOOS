@@ -26,6 +26,9 @@ export async function POST(req: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (!session.isAdmin) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
 
     // Check Telegram is configured
     if (!process.env.TELEGRAM_BOT_TOKEN) {

@@ -7,6 +7,13 @@ import { getSupabaseAdmin } from '@/lib/db/supabase';
  *   discord_id: string (required) — Discord user ID or username
  */
 export async function GET(req: NextRequest) {
+  // Auth guard — prevent unauthenticated data enumeration
+  const { getSessionData } = await import('@/lib/auth/session');
+  const session = await getSessionData();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const supabase = getSupabaseAdmin();
   const discordId = req.nextUrl.searchParams.get('discord_id');
 

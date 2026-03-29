@@ -97,6 +97,11 @@ export function SleepTimer() {
   // ─── "End of track" mode — pause when track ends ────────────────────
   // We detect this by watching position approach duration
   const endOfTrackFiredRef = useRef(false);
+  const endOfTrackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => clearTimeout(endOfTrackTimerRef.current);
+  }, []);
 
   useEffect(() => {
     if (mode !== 'endOfTrack') {
@@ -113,7 +118,8 @@ export function SleepTimer() {
     ) {
       endOfTrackFiredRef.current = true;
       // Small delay so the track finishes naturally
-      setTimeout(() => {
+      clearTimeout(endOfTrackTimerRef.current);
+      endOfTrackTimerRef.current = setTimeout(() => {
         player.pause();
         sharedTimerEnd = null;
         sharedTimerMode = null;

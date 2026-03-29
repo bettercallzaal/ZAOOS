@@ -44,9 +44,12 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
   const [activePanel, setActivePanel] = useState<'eq' | 'lyrics' | 'queue' | 'share' | null>(null);
 
   useEffect(() => {
-    if (metadata?.artworkUrl) {
-      extractDominantColor(metadata.artworkUrl).then(setBgColor);
-    }
+    if (!metadata?.artworkUrl) return;
+    let cancelled = false;
+    extractDominantColor(metadata.artworkUrl)
+      .then((color) => { if (!cancelled) setBgColor(color); })
+      .catch(() => {});
+    return () => { cancelled = true; };
   }, [metadata?.artworkUrl]);
 
   // ─── Swipe down to dismiss ──────────────────────────────────────────

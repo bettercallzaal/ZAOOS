@@ -70,7 +70,7 @@ export function AudiusDiscover() {
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const queueToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => clearTimeout(queueToastTimerRef.current), []);
+  useEffect(() => () => { if (queueToastTimerRef.current) clearTimeout(queueToastTimerRef.current); }, []);
 
   const player = usePlayer();
   const { addToQueue } = useQueue();
@@ -99,7 +99,7 @@ export function AudiusDiscover() {
     (track: AudiusTrack) => {
       addToQueue(toTrackMetadata(track));
       setQueueToast('Added to queue');
-      clearTimeout(queueToastTimerRef.current);
+      if (queueToastTimerRef.current) clearTimeout(queueToastTimerRef.current);
       queueToastTimerRef.current = setTimeout(() => setQueueToast(null), 1500);
     },
     [addToQueue],

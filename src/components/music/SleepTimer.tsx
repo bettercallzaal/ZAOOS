@@ -100,7 +100,7 @@ export function SleepTimer() {
   const endOfTrackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    return () => clearTimeout(endOfTrackTimerRef.current);
+    return () => { if (endOfTrackTimerRef.current) clearTimeout(endOfTrackTimerRef.current); };
   }, []);
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export function SleepTimer() {
     ) {
       endOfTrackFiredRef.current = true;
       // Small delay so the track finishes naturally
-      clearTimeout(endOfTrackTimerRef.current);
+      if (endOfTrackTimerRef.current) clearTimeout(endOfTrackTimerRef.current);
       endOfTrackTimerRef.current = setTimeout(() => {
         player.pause();
         sharedTimerEnd = null;

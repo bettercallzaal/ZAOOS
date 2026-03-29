@@ -17,7 +17,7 @@ export function ShareToChatButton({ songUrl, trackName, compact = false, classNa
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => clearTimeout(errorTimerRef.current), []);
+  useEffect(() => () => { if (errorTimerRef.current) clearTimeout(errorTimerRef.current); }, []);
 
   // Reset success indicator after 1.5s
   useEffect(() => {
@@ -46,7 +46,7 @@ export function ShareToChatButton({ songUrl, trackName, compact = false, classNa
       setStatus('success');
     } catch {
       setStatus('error');
-      clearTimeout(errorTimerRef.current);
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
       errorTimerRef.current = setTimeout(() => setStatus('idle'), 2000);
     }
   };

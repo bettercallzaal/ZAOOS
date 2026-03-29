@@ -54,11 +54,11 @@ export function SubnameManager() {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
-  useEffect(() => () => clearTimeout(messageTimerRef.current), []);
+  useEffect(() => () => { if (messageTimerRef.current) clearTimeout(messageTimerRef.current); }, []);
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
-    clearTimeout(messageTimerRef.current);
+    if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
     messageTimerRef.current = setTimeout(() => setMessage(null), 5000);
   };
 

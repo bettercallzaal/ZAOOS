@@ -52,7 +52,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
   useEscapeClose(onClose, isOpen);
   const player = usePlayer();
 
-  useEffect(() => () => clearTimeout(feedbackTimerRef.current), []);
+  useEffect(() => () => { if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current); }, []);
 
   const fetchSubmissions = useCallback(async () => {
     try {
@@ -83,7 +83,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
 
   const showFeedback = (type: 'success' | 'error', msg: string) => {
     setFeedback({ type, msg });
-    clearTimeout(feedbackTimerRef.current);
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
     feedbackTimerRef.current = setTimeout(() => setFeedback(null), 3000);
   };
 

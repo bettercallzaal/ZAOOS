@@ -4,13 +4,14 @@ let _supabaseAdmin: SupabaseClient | null = null;
 
 export function getSupabaseAdmin(): SupabaseClient {
   if (!_supabaseAdmin) {
-    // Lazy-import ENV to avoid triggering server-only env validation
+    // Read env vars directly to avoid triggering server-only env validation
     // when client components import getSupabaseBrowser from this module.
-    const { ENV } = require('@/lib/env');
-    _supabaseAdmin = createClient(
-      ENV.NEXT_PUBLIC_SUPABASE_URL,
-      ENV.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) {
+      throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    }
+    _supabaseAdmin = createClient(url, key);
   }
   return _supabaseAdmin;
 }

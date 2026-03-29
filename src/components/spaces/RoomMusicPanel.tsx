@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useListeningRoom, type ListenerInfo } from '@/hooks/useListeningRoom';
 import { useRadio } from '@/hooks/useRadio';
@@ -38,12 +39,12 @@ function GuestMusicPanel() {
           <MusicIcon />
           <span className="text-xs text-gray-500">Music</span>
         </div>
-        <a
+        <Link
           href="/"
           className="text-xs text-[#f5a623]/70 hover:text-[#f5a623] transition-colors"
         >
           Sign in to DJ
-        </a>
+        </Link>
       </div>
     </div>
   );

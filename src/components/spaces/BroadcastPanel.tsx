@@ -75,9 +75,14 @@ export function BroadcastPanel({
   }, [roomId]);
 
   useEffect(() => {
-    fetchViewers();
+    let cancelled = false;
+    const poll = async () => {
+      if (!cancelled) await fetchViewers();
+    };
+    poll();
     viewerRef.current = setInterval(fetchViewers, 10_000);
     return () => {
+      cancelled = true;
       if (viewerRef.current) clearInterval(viewerRef.current);
     };
   }, [fetchViewers]);

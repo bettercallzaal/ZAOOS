@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'viem/chains';
 import { ZOUNZ_GOVERNOR, governorAbi } from '@/lib/zounz/contracts';
@@ -46,13 +46,19 @@ export default function ZounzProposalCard({
     hash: txHash,
   });
 
+  const [now, setNow] = useState(() => Math.floor(Date.now() / 1000));
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   const totalVotes = proposal.forVotes + proposal.againstVotes + proposal.abstainVotes;
   const forPct = totalVotes > 0 ? (proposal.forVotes / totalVotes) * 100 : 0;
   const againstPct = totalVotes > 0 ? (proposal.againstVotes / totalVotes) * 100 : 0;
   const isActive = proposal.status === 'Active';
   const canVote = isActive && address && votingPower > 0;
 
-  const now = Math.floor(Date.now() / 1000);
   const endTime = proposal.voteEnd;
   const secondsLeft = Math.max(0, endTime - now);
   const timeLeftHrs = Math.floor(secondsLeft / 3600);

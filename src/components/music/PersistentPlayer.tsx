@@ -169,18 +169,32 @@ export function PersistentPlayer({
         onTouchStart={onSwipeStart}
         onTouchEnd={onSwipeEnd}
       >
-        {/* Artwork — tap to expand */}
+        {/* Artwork — tap to expand, with progress ring */}
         <button
           onClick={() => metadata && setExpanded(true)}
-          className={`relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}
+          className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-visible bg-gray-800"
           aria-label="Expand player"
         >
-          <ArtworkImage
-            src={metadata.artworkUrl}
-            alt={metadata.trackName}
-            fill
-            className="object-cover"
-          />
+          <div className="w-10 h-10 rounded-lg overflow-hidden">
+            <ArtworkImage
+              src={metadata.artworkUrl}
+              alt={metadata.trackName}
+              fill
+              className="object-cover"
+            />
+          </div>
+          {/* Progress ring */}
+          {duration > 0 && (
+            <svg className="absolute -inset-0.5 w-[44px] h-[44px] -rotate-90 pointer-events-none" viewBox="0 0 44 44">
+              <rect x="1" y="1" width="42" height="42" rx="9" ry="9" fill="none" stroke="rgba(245,166,35,0.15)" strokeWidth="2" />
+              <rect
+                x="1" y="1" width="42" height="42" rx="9" ry="9"
+                fill="none" stroke="#f5a623" strokeWidth="2"
+                strokeDasharray={`${(position / duration) * 168} 168`}
+                className="transition-[stroke-dasharray] duration-300"
+              />
+            </svg>
+          )}
           {isPlaying && (
             <div className="absolute inset-0 flex items-end justify-center pb-0.5 bg-gradient-to-t from-black/40 to-transparent">
               <div className="flex items-end gap-px">

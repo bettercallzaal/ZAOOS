@@ -8,6 +8,9 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Sync issue to Paperclip
         run: node scripts/sync-issue-to-paperclip.js
         env:

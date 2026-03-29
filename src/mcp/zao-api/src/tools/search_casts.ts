@@ -6,6 +6,11 @@ interface SearchCastsArgs extends ToolArgs {
   query: string;
 }
 
+/** Escape ILIKE special characters to prevent pattern injection */
+function escapeLike(str: string): string {
+  return str.replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
+
 export async function searchCasts(args: SearchCastsArgs) {
   const { query } = args;
 
@@ -17,7 +22,7 @@ export async function searchCasts(args: SearchCastsArgs) {
     supabase
       .from("casts")
       .select("fid, username, text, timestamp")
-      .ilike("text", `%${query}%`)
+      .ilike("text", `%${escapeLike(query)}%`)
       .order("timestamp", { ascending: false })
       .limit(50),
     new Promise<never>((_, reject) =>

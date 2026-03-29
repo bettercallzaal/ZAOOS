@@ -12,7 +12,8 @@ const server = new Server(
 server.setRequestHandler(ListToolsRequestSchema, () => ({ tools }));
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
+  const { name } = request.params;
+  const args = request.params.arguments ?? {};
   const handler = toolHandlers[name];
 
   if (!handler) {

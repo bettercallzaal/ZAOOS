@@ -16,7 +16,8 @@ export async function getRecents(args: GetRecentsArgs) {
       .from("casts")
       .select("fid, username, text, timestamp, reactions")
       .gte("timestamp", new Date(Date.now() - safeHours * 60 * 60 * 1000).toISOString())
-      .order("timestamp", { ascending: false }),
+      .order("timestamp", { ascending: false })
+      .limit(200),
     new Promise<never>((_, reject) =>
       setTimeout(() => reject(new MCPError("Query timeout", "TIMEOUT", 504)), 10000)
     )

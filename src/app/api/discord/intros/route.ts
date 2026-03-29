@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 
       if (error) {
         console.error('[Discord intros] Query error:', error);
-        return NextResponse.json({ error: 'Failed to fetch intro' }, { status: 500 });
+        return NextResponse.json({ intro: null });
       }
 
       if (!data) {
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       console.error('[Discord intros] Query error:', error);
-      return NextResponse.json({ error: 'Failed to fetch intros' }, { status: 500 });
+      return NextResponse.json({ intros: [], total: 0 });
     }
 
     return NextResponse.json({

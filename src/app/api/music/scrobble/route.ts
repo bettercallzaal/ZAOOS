@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (!settings?.lastfm_session_key && !settings?.listenbrainz_token) {
-      return NextResponse.json({ error: 'Last.fm not connected' }, { status: 400 })
+      return NextResponse.json({ skipped: true, reason: 'No scrobbling service connected' })
     }
 
     const sk = settings.lastfm_session_key

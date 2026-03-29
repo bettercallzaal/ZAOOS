@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { TrackMetadata } from '@/types/music';
 
 export interface QueueTrack {
@@ -9,9 +9,28 @@ export interface QueueTrack {
   addedAt: number;
 }
 
+const QUEUE_KEY = 'zao-player-queue';
+const INDEX_KEY = 'zao-player-queue-index';
+
+function loadPersistedQueue(): { queue: QueueTrack[]; index: number } {
+  try {
+    const q = localStorage.getItem(QUEUE_KEY);
+    const i = localStorage.getItem(INDEX_KEY);
+    return { queue: q ? JSON.parse(q) : [], index: i ? parseInt(i, 10) : -1 };
+  } catch { return { queue: [], index: -1 }; }
+}
+
 export function usePlayerQueue() {
-  const [queue, setQueue] = useState<QueueTrack[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [queue, setQueue] = useState<QueueTrack[]>(() => loadPersistedQueue().queue);
+  const [currentIndex, setCurrentIndex] = useState(() => loadPersistedQueue().index);
+
+  // Persist queue to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+      localStorage.setItem(INDEX_KEY, String(currentIndex));
+    } catch { /* quota exceeded — ignore */ }
+  }, [queue, currentIndex]);
 
   const addNext = useCallback((metadata: TrackMetadata) => {
     // Insert after current track

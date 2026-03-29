@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamically import force graph to handle SSR and load failures
-const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
+// Dynamically import force graph — cast as any to bypass complex generic mismatches
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ForceGraph2D = dynamic(() => import('react-force-graph-2d') as any, {
   ssr: false,
   loading: () => null,
-});
+}) as any;
 
 /* ---------- Types ---------- */
 
@@ -64,7 +65,8 @@ function clamp(value: number, min: number, max: number) {
 
 export function CommunityGraph() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const graphRef = useRef<{ zoomToFit?: (duration: number, padding: number) => void }>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const graphRef = useRef<any>(null);
   const [dimensions, setDimensions] = useState({ width: 600, height: 500 });
 
   const [members, setMembers] = useState<MemberNode[]>([]);

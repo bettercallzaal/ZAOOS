@@ -8,7 +8,10 @@ import { communityConfig } from '@/../community.config';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
 import dynamic from 'next/dynamic';
-const ExpandedPlayer = dynamic(() => import('@/components/music/ExpandedPlayer').then(m => ({ default: m.ExpandedPlayer })), { ssr: false });
+const ExpandedPlayer = dynamic(() => import('@/components/music/ExpandedPlayer').then(m => ({ default: m.ExpandedPlayer })), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 z-50 bg-[#0a1628] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" /></div>,
+});
 
 interface PersistentPlayerProps {
   onPrev?: () => void;
@@ -117,19 +120,18 @@ export function PersistentPlayer({
     else player.resume();
   };
 
-  // ─── Expanded full-screen player ───────────────────────────────────
-  if (expanded && player.metadata) {
-    return (
+  return (
+    <>
+    {/* Expanded full-screen player — overlay on top of compact bar */}
+    {expanded && player.metadata && (
       <ExpandedPlayer
         metadata={player.metadata}
         onClose={() => setExpanded(false)}
         onPrev={onPrev}
         onNext={onNext}
       />
-    );
-  }
+    )}
 
-  return (
     <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80">
       {/* Seekable progress bar */}
       <div
@@ -290,6 +292,7 @@ export function PersistentPlayer({
         )}
       </div>
     </div>
+    </>
   );
 }
 

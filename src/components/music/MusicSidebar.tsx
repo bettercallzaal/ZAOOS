@@ -493,7 +493,7 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
       artistName: song.artist || '',
       artworkUrl: song.artwork_url || '',
       url: song.url,
-      streamUrl: song.stream_url || undefined,
+      streamUrl: song.stream_url || (song.platform === 'audius' ? `https://api.audius.co/v1/tracks/${song.id}/stream?app_name=ZAO-OS` : undefined),
       feedId: `library-${song.id}`,
     });
     // Increment play count (fire and forget)

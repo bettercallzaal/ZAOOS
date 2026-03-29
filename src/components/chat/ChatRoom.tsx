@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 import { useMobile } from '@/hooks/useMobile';
-import { usePlayer } from '@/providers/audio';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { QuotedCastData } from '@/types';
 import { useXMTPContext, ZaoMember } from '@/contexts/XMTPContext';
@@ -37,7 +36,6 @@ export function ChatRoom() {
   const { user, logout, refetch } = useAuth();
   const [activeChannel, setActiveChannel] = useState('zao');
   const [isTrending, setIsTrending] = useState(false);
-  const player = usePlayer();
   const { messages, loading, sending, error, sendError, clearSendError, sendMessage, hideMessage, loadMore, hasMore, loadingMore } = useChat(activeChannel);
   const isMobile = useMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -157,15 +155,7 @@ export function ChatRoom() {
 
   useKeyboardShortcuts(shortcutHandlers);
 
-  // Stop music when switching channels (but not on initial mount)
-  const channelMountedRef = useRef(false);
-  useEffect(() => {
-    if (!channelMountedRef.current) {
-      channelMountedRef.current = true;
-      return;
-    }
-    player.stop();
-  }, [activeChannel]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Music persists across channel switches — no stop on channel change
 
   if (!user) return null;
 

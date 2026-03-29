@@ -51,7 +51,7 @@ export function RespectTrending() {
       trackName: track.song.title,
       artistName: track.song.artist || 'Unknown Artist',
       artworkUrl: track.song.artworkUrl || '',
-      streamUrl: track.song.url,
+      streamUrl: track.song.stream_url || (track.song.platform === 'audius' ? `https://api.audius.co/v1/tracks/${track.song.id}/stream?app_name=ZAO-OS` : undefined),
       url: track.song.url,
       type: track.song.platform as TrackType,
       feedId: `respect-trending-${track.song.id}`,

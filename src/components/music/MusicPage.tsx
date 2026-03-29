@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { usePlayer } from '@/providers/audio';
 import { useRadioContext as useRadio } from '@/providers/audio/RadioProvider';
+import { useQueue } from '@/contexts/QueueContext';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import type { OmnibarResult } from '@/components/music/MusicOmnibar';
 import type { TrackMetadata } from '@/types/music';
@@ -87,6 +88,7 @@ export function MusicPage() {
 
   const player = usePlayer();
   const radio = useRadio();
+  const queue = useQueue();
 
   // Auto-advance is handled in PersistentPlayerWithRadio (layout level)
   // so it works across ALL pages, not just /music
@@ -186,7 +188,16 @@ export function MusicPage() {
 
       {/* ── Smart Omnibar ────────────────────────────────────────── */}
       <div className="max-w-2xl mx-auto px-4 pt-4">
-        <MusicOmnibar onPlay={handleOmnibarPlay} />
+        <MusicOmnibar onPlay={handleOmnibarPlay} onQueue={(track) => queue.addToQueue({
+          id: track.id,
+          type: (track.platform as TrackMetadata['type']) || 'audio',
+          trackName: track.title,
+          artistName: track.artist,
+          artworkUrl: track.artworkUrl,
+          url: track.url,
+          streamUrl: track.streamUrl,
+          feedId: track.id,
+        })} />
       </div>
 
       {/* ── Track of the Day Hero Banner ─────────────────────────── */}

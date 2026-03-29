@@ -45,13 +45,21 @@ export function RespectTrending() {
     return () => controller.abort();
   }, []);
 
-  const handlePlay = (track: WeightedTrack) => {
+  const handlePlay = async (track: WeightedTrack) => {
+    // Resolve metadata at play time to get correct streamUrl (DB ID ≠ Audius ID)
+    try {
+      const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(track.song.url)}`);
+      if (res.ok) {
+        const metadata = await res.json();
+        player.play({ ...metadata, feedId: `respect-trending-${track.song.id}` });
+        return;
+      }
+    } catch { /* fallback below */ }
     player.play({
       id: track.song.id,
       trackName: track.song.title,
       artistName: track.song.artist || 'Unknown Artist',
       artworkUrl: track.song.artworkUrl || '',
-      streamUrl: track.song.platform === 'audius' ? `https://api.audius.co/v1/tracks/${track.song.id}/stream?app_name=ZAO-OS` : undefined,
       url: track.song.url,
       type: track.song.platform as TrackType,
       feedId: `respect-trending-${track.song.id}`,

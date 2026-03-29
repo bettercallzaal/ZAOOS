@@ -67,6 +67,7 @@ export function LikedSongsSection() {
         artistName: song.artist || '',
         artworkUrl: song.artwork_url || '',
         url: song.url,
+        streamUrl: song.stream_url || (song.platform === 'audius' ? `https://api.audius.co/v1/tracks/${song.id}/stream?app_name=ZAO-OS` : undefined),
         feedId: `liked-${song.id}`,
       });
     } finally {

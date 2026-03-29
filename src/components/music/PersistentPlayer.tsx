@@ -35,8 +35,10 @@ interface PersistentPlayerProps {
 export function PersistentPlayer({
   onPrev,
   onNext,
+  isRadioMode = false,
   radioLoading = false,
   onRadioStart,
+  onRadioStop,
   sidebarOpen = false,
   onToggleSidebar,
 }: PersistentPlayerProps) {
@@ -152,8 +154,8 @@ export function PersistentPlayer({
         }}
         onKeyDown={(e) => {
           if (duration <= 0) return;
-          if (e.key === 'ArrowRight') player.seek(Math.min(position + 10, duration));
-          else if (e.key === 'ArrowLeft') player.seek(Math.max(position - 10, 0));
+          if (e.key === 'ArrowRight') player.seek(Math.min(position + 10000, duration));
+          else if (e.key === 'ArrowLeft') player.seek(Math.max(position - 10000, 0));
         }}
       >
         <div
@@ -266,7 +268,7 @@ export function PersistentPlayer({
 
         {/* Dismiss player */}
         <button
-          onClick={(e) => { e.stopPropagation(); player.pause(); }}
+          onClick={(e) => { e.stopPropagation(); if (isRadioMode && onRadioStop) onRadioStop(); player.stop(); }}
           className="text-gray-500 hover:text-gray-300 transition-colors p-1 flex-shrink-0"
           aria-label="Dismiss player"
         >

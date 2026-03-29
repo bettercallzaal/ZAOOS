@@ -37,9 +37,6 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
   const player = usePlayer();
   const { queueLength } = useQueue();
   const { isPlaying, isLoading, position, duration } = player;
-  const [showLyrics, setShowLyrics] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [showQueue, setShowQueue] = useState(false);
   const [bgColor, setBgColor] = useState({ r: 10, g: 22, b: 40 }); // navy default
   const [activePanel, setActivePanel] = useState<'eq' | 'lyrics' | 'queue' | 'share' | null>(null);
 
@@ -122,7 +119,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
         onTouchStart={onArtworkTouchStart}
         onTouchEnd={onArtworkTouchEnd}
       >
-        {showLyrics ? (
+        {activePanel === 'lyrics' ? (
           <div className="w-full max-w-[360px] h-full flex flex-col bg-white/5 rounded-2xl overflow-hidden">
             <LyricsPanel
               trackName={metadata.trackName}
@@ -283,13 +280,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
         ].map((item) => (
           <button
             key={item.id}
-            onClick={() => {
-              const next = activePanel === item.id ? null : item.id;
-              setActivePanel(next);
-              if (item.id === 'lyrics') setShowLyrics(next === 'lyrics');
-              if (item.id === 'queue') setShowQueue(next === 'queue');
-              if (item.id === 'eq') setShowFilters(next === 'eq');
-            }}
+            onClick={() => setActivePanel(p => p === item.id ? null : item.id)}
             className={`flex flex-col items-center gap-1 text-xs transition-colors ${
               activePanel === item.id ? 'text-[#f5a623]' : 'text-gray-500'
             }`}
@@ -301,19 +292,10 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
       </div>
 
       {/* ─── Active panel content ───────────────────────────────────── */}
-      {activePanel !== null && (
+      {activePanel !== null && activePanel !== 'lyrics' && (
         <div className="relative z-10 px-4 flex-shrink-0">
-          {activePanel === 'lyrics' && (
-            <div className="w-full max-h-48 bg-white/5 rounded-2xl overflow-hidden">
-              <LyricsPanel
-                trackName={metadata.trackName}
-                artistName={metadata.artistName || ''}
-                className="h-48"
-              />
-            </div>
-          )}
           {activePanel === 'queue' && (
-            <QueuePanel onClose={() => { setActivePanel(null); setShowQueue(false); }} />
+            <QueuePanel onClose={() => setActivePanel(null)} />
           )}
           {activePanel === 'share' && (
             <div className="flex justify-center py-3">
@@ -326,7 +308,10 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             </div>
           )}
           {activePanel === 'eq' && (
-            <EqualizerPanel />
+            <>
+              <EqualizerPanel />
+              <AudioFiltersPanel visible />
+            </>
           )}
         </div>
       )}
@@ -341,23 +326,29 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
 
           {/* Lyrics toggle */}
           <button
-            onClick={() => setShowLyrics((v) => !v)}
+            onClick={() => setActivePanel(p => p === 'lyrics' ? null : 'lyrics')}
             className={`p-1.5 rounded-lg text-sm font-bold transition-colors ${
-              showLyrics ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
+              activePanel === 'lyrics' ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
             }`}
-            aria-label={showLyrics ? 'Hide lyrics' : 'Show lyrics'}
-            title={showLyrics ? 'Hide lyrics' : 'Show lyrics'}
+            aria-label={activePanel === 'lyrics' ? 'Hide lyrics' : 'Show lyrics'}
+            title={activePanel === 'lyrics' ? 'Hide lyrics' : 'Show lyrics'}
           >
             Aa
           </button>
 
-          {/* Share menu (Farcaster, X, copy link, download card) */}
-          <ShareMenu
-            trackName={metadata.trackName}
-            artistName={metadata.artistName || ''}
-            artworkUrl={metadata.artworkUrl}
-            trackUrl={metadata.url}
-          />
+          {/* Share toggle */}
+          <button
+            onClick={() => setActivePanel(p => p === 'share' ? null : 'share')}
+            className={`p-1.5 rounded-lg transition-colors ${
+              activePanel === 'share' ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
+            }`}
+            aria-label={activePanel === 'share' ? 'Hide share' : 'Share'}
+            title={activePanel === 'share' ? 'Hide share' : 'Share'}
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+            </svg>
+          </button>
 
           {/* Crossfade toggle */}
           <button
@@ -378,14 +369,14 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
 
           {/* Audio filters toggle */}
           <button
-            onClick={() => setShowFilters((v) => !v)}
+            onClick={() => setActivePanel(p => p === 'eq' ? null : 'eq')}
             className={`p-1.5 rounded-lg transition-colors ${
-              showFilters || getActiveFilterKey()
+              activePanel === 'eq' || getActiveFilterKey()
                 ? 'text-[#f5a623] bg-[#f5a623]/10'
                 : 'text-gray-400 hover:text-white'
             }`}
-            aria-label={showFilters ? 'Hide audio filters' : 'Show audio filters'}
-            title={showFilters ? 'Hide filters' : 'Audio filters'}
+            aria-label={activePanel === 'eq' ? 'Hide audio filters' : 'Show audio filters'}
+            title={activePanel === 'eq' ? 'Hide filters' : 'Audio filters'}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
@@ -394,12 +385,12 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
 
           {/* Queue toggle */}
           <button
-            onClick={() => setShowQueue((v) => !v)}
+            onClick={() => setActivePanel(p => p === 'queue' ? null : 'queue')}
             className={`relative p-1.5 rounded-lg transition-colors ${
-              showQueue ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
+              activePanel === 'queue' ? 'text-[#f5a623] bg-[#f5a623]/10' : 'text-gray-400 hover:text-white'
             }`}
-            aria-label={showQueue ? 'Hide queue' : 'Up Next'}
-            title={showQueue ? 'Hide queue' : 'Up Next'}
+            aria-label={activePanel === 'queue' ? 'Hide queue' : 'Up Next'}
+            title={activePanel === 'queue' ? 'Hide queue' : 'Up Next'}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
@@ -416,14 +407,6 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             {metadata.type === 'applemusic' ? 'Apple Music' : metadata.type === 'soundxyz' ? 'Sound.xyz' : metadata.type}
           </span>
         </div>
-
-        {/* Audio filters panel */}
-        <AudioFiltersPanel visible={showFilters} />
-
-        {/* Queue panel */}
-        {showQueue && (
-          <QueuePanel onClose={() => setShowQueue(false)} />
-        )}
 
         {/* Emoji reactions */}
         <TrackReactions songUrl={metadata.url} className="justify-center" />

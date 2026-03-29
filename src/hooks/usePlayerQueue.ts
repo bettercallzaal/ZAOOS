@@ -48,6 +48,13 @@ export function usePlayerQueue() {
       next.splice(toIndex, 0, moved);
       return next;
     });
+    // Adjust currentIndex to follow the currently-playing track
+    setCurrentIndex(ci => {
+      if (ci === fromIndex) return toIndex;
+      if (fromIndex < ci && toIndex >= ci) return ci - 1;
+      if (fromIndex > ci && toIndex <= ci) return ci + 1;
+      return ci;
+    });
   }, []);
 
   const clearQueue = useCallback(() => {

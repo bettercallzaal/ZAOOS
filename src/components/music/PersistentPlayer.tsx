@@ -7,7 +7,8 @@ import { ArtworkImage } from '@/components/music/ArtworkImage';
 import { communityConfig } from '@/../community.config';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
-import { ExpandedPlayer } from '@/components/music/ExpandedPlayer';
+import dynamic from 'next/dynamic';
+const ExpandedPlayer = dynamic(() => import('@/components/music/ExpandedPlayer').then(m => ({ default: m.ExpandedPlayer })), { ssr: false });
 
 interface PersistentPlayerProps {
   onPrev?: () => void;

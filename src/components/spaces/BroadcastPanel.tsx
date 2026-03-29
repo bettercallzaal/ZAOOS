@@ -79,7 +79,7 @@ export function BroadcastPanel({
     const poll = async () => {
       if (!cancelled) await fetchViewers();
     };
-    poll();
+    void poll();
     viewerRef.current = setInterval(fetchViewers, 10_000);
     return () => {
       cancelled = true;

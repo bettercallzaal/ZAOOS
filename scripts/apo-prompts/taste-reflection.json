@@ -1,0 +1,59 @@
+{
+  "name": "taste-reflection",
+  "description": "Synthesize weekly taste profile from user memory data",
+  "currentPrompt": "You are analyzing the recent activity of a ZAO OS community member.\nBased on their recent memories (casts, track shares, room participation, Respect transactions),\nsynthesize a taste profile with the following structure:\n\n1. **Music Preferences** — Genres, artists, vibes they gravitate toward\n2. **Community Behavior** — How they engage (supportive, collaborative, competitive, etc.)\n3. **Tone & Voice** — How they communicate (formal, casual, hype, introspective, etc.)\n4. **Notable Patterns** — Recurring interests or behaviors\n5. **Recommended Actions** — How the agent can best support them\n\nKeep it concise: 3–5 sentences per section.",
+  "testCases": [
+    {
+      "input": "MEMORIES:\n- Shared 12 tracks this week: 8 lo-fi hip-hop, 3 jazz, 1 ambient\n- Cast: 'this new Nujabes tribute album is incredible'\n- Gave 45 Respect to @musicfan for their playlist\n- Joined listening room 'Late Night Beats' 4 times\n- Cast: 'we need more chill vibes in the channel'",
+      "criteria": [
+        "Music section identifies lo-fi hip-hop and jazz preferences",
+        "Mentions Nujabes specifically",
+        "Community section notes generous Respect giving",
+        "Tone section captures the chill/laid-back vibe",
+        "All 5 sections present",
+        "3-5 sentences per section"
+      ]
+    },
+    {
+      "input": "MEMORIES:\n- 0 casts this week\n- 0 tracks shared\n- 0 Respect given\n- Viewed 3 governance proposals without voting\n- Opened the app 2 times, total session time 4 minutes",
+      "criteria": [
+        "Identifies this as an inactive/lurking member",
+        "Does not fabricate interests from no data",
+        "Recommended Actions suggests re-engagement approaches",
+        "All 5 sections present even with limited data",
+        "Honest about lack of signal"
+      ]
+    },
+    {
+      "input": "MEMORIES:\n- Submitted 3 governance proposals (all passed)\n- 200+ Respect given across 15 members\n- Cast: 'governance is the backbone of any DAO'\n- Created 2 weekly polls on Snapshot\n- Organized fractal session, 8 participants\n- Shared 2 tracks: 1 punk, 1 electronic\n- Cast: 'accountability > vibes'",
+      "criteria": [
+        "Community section highlights governance leadership",
+        "Music section notes limited but diverse taste (punk + electronic)",
+        "Tone section captures formal/accountability-focused voice",
+        "Notable Patterns identifies governance as primary interest",
+        "Recommended Actions suggests governance-related support"
+      ]
+    },
+    {
+      "input": "MEMORIES:\n- First week in ZAO\n- Cast: 'just joined, excited to be here!'\n- Shared 1 track: a popular Drake song\n- Gave 5 Respect to the welcome message\n- Asked 'how does curation work?' in chat",
+      "criteria": [
+        "Identifies this as a new member",
+        "Does not over-analyze limited data",
+        "Recommended Actions suggests onboarding help",
+        "Tone is welcoming, not judgmental about mainstream music taste"
+      ]
+    },
+    {
+      "input": "MEMORIES:\n- Shared 30 tracks this week across 6 genres\n- Top genres: afrobeats (8), house (7), reggaeton (5), R&B (4), dancehall (3), amapiano (3)\n- Cast: 'the algorithm should weight community picks higher'\n- Gave 150 Respect to 20 different members\n- Participated in 6 listening rooms\n- Created 1 playlist: 'Global Grooves'\n- Cast: 'music is political, always has been'",
+      "criteria": [
+        "Music section captures the global/diverse taste accurately",
+        "Lists specific genres from the data",
+        "Community section notes high engagement (30 tracks, 150 Respect, 6 rooms)",
+        "Notable Patterns identifies curation activism",
+        "Tone captures opinionated/passionate voice"
+      ]
+    }
+  ],
+  "gradingPrompt": "Rate this output 0.0-1.0 on: (1) accuracy of profile synthesis from the memory data, (2) all 5 sections present and substantive, (3) conciseness (3-5 sentences per section), (4) no hallucinated details beyond what the memories show. Return JSON: {\"score\": number, \"feedback\": string}",
+  "maxRounds": 3
+}

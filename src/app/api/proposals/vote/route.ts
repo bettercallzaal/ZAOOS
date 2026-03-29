@@ -187,7 +187,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
   // Get proposal with publish info
   const { data: proposal } = await supabaseAdmin
     .from('proposals')
-    .select('id, publish_text, published_cast_hash, respect_threshold, status, closes_at')
+    .select('id, publish_text, published_cast_hash, respect_threshold, status, closes_at, category')
     .eq('id', proposalId)
     .single();
 

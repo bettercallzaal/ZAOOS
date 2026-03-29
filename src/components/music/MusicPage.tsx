@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/navigation/PageHeader';
 import type { OmnibarResult } from '@/components/music/MusicOmnibar';
 import type { TrackMetadata } from '@/types/music';
 import { RespectTrending } from '@/components/music/RespectTrending';
+import { NowPlayingBar } from '@/components/music/NowPlayingBar';
 import { RadioHero } from '@/components/music/MusicRadioHero';
 import { SubmissionsSection } from '@/components/music/MusicSubmissions';
 import type { Submission } from '@/components/music/MusicSubmissions';
@@ -185,6 +186,9 @@ export function MusicPage() {
           </button>
         }
       />
+
+      {/* ── Who's Listening ────────────────────────────────────────── */}
+      <NowPlayingBar />
 
       {/* ── Smart Omnibar ────────────────────────────────────────── */}
       <div className="max-w-2xl mx-auto px-4 pt-4">

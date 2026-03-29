@@ -17,6 +17,7 @@ import { TrendingSection } from '@/components/music/MusicTrending';
 import { PlaylistsSection } from '@/components/music/MusicPlaylists';
 import { LikedSongsSection, HistorySection } from '@/components/music/MusicLibrarySections';
 import { TrackOfTheDayBanner, TrackOfTheDayTabSkeleton } from '@/components/music/MusicPageUtils';
+import { FeaturedArtists } from '@/components/music/FeaturedArtists';
 
 const MusicOmnibar = dynamic(
   () => import('@/components/music/MusicOmnibar'),
@@ -58,7 +59,17 @@ const PermawebLibrary = dynamic(
   { ssr: false },
 );
 
-const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Playlists', 'Create', 'Binaural', 'Liked', 'History', 'Curators', 'Permaweb'] as const;
+const FarcasterMusicFeed = dynamic(
+  () => import('@/components/music/FarcasterMusicFeed').then((m) => m.FarcasterMusicFeed),
+  { ssr: false },
+);
+
+const CollaborativePlaylists = dynamic(
+  () => import('@/components/music/CollaborativePlaylists').then((m) => m.CollaborativePlaylists),
+  { ssr: false },
+);
+
+const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Farcaster', 'Playlists', 'Collab', 'Create', 'Binaural', 'Liked', 'History', 'Curators', 'Permaweb'] as const;
 type Tab = (typeof TABS)[number];
 
 const SECTION_IDS: Record<Tab, string> = {
@@ -67,7 +78,9 @@ const SECTION_IDS: Record<Tab, string> = {
   'Track of the Day': 'section-totd',
   Submissions: 'section-submissions',
   Trending: 'section-trending',
+  Farcaster: 'section-farcaster',
   Playlists: 'section-playlists',
+  Collab: 'section-collab',
   Create: 'section-create',
   Binaural: 'section-binaural',
   Liked: 'section-liked',
@@ -243,6 +256,9 @@ export function MusicPage() {
           />
         </section>
 
+        {/* ── Featured Artists ────────────────────────────────────── */}
+        <FeaturedArtists />
+
         {/* ── Section 2: Discover (Audius) ────────────────────────── */}
         <section id={SECTION_IDS.Discover}>
           <AudiusDiscover />
@@ -269,9 +285,19 @@ export function MusicPage() {
           <RespectTrending />
         </section>
 
+        {/* ── Section: Farcaster Music Discovery ──────────────────── */}
+        <section id={SECTION_IDS.Farcaster}>
+          <FarcasterMusicFeed />
+        </section>
+
         {/* ── Section 4: Community Playlists ───────────────────────── */}
         <section id={SECTION_IDS.Playlists}>
           <PlaylistsSection radio={radio} />
+        </section>
+
+        {/* ── Section: Collaborative Playlists ────────────────── */}
+        <section id={SECTION_IDS.Collab}>
+          <CollaborativePlaylists />
         </section>
 
         {/* ── Section: AI Music Generator ───────────────────── */}

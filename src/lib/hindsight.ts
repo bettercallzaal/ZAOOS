@@ -8,6 +8,7 @@ let _client: unknown = null;
 export async function getHindsightClient() {
   if (_client) return _client;
   try {
+    // @ts-expect-error — package is optional, only installed when Hindsight is configured
     const { HindsightClient } = await import('@vectorize-io/hindsight-client');
     _client = new HindsightClient({ baseUrl: HINDSIGHT_BASE_URL });
     return _client;

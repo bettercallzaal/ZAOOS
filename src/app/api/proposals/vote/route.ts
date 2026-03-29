@@ -196,14 +196,12 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
   // Skip if already published
   if (proposal.published_cast_hash) return false;
 
-  // CRITICAL: Do NOT publish until the voting period has ended.
-  // If closes_at is set and the deadline hasn't passed, skip publishing.
-  // The proposal can only be published after closes_at OR if no deadline is set.
-  if (proposal.closes_at) {
+  // Social posts publish immediately when threshold is met.
+  // All other categories wait for the voting period to end.
+  const isSocial = proposal.category === 'social';
+  if (!isSocial && proposal.closes_at) {
     const deadline = new Date(proposal.closes_at).getTime();
     if (deadline > Date.now()) {
-      // Voting period still active — don't publish yet even if threshold is met.
-      // Publishing will be triggered after the deadline by a separate check or admin action.
       return false;
     }
   }

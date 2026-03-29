@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
@@ -94,12 +95,12 @@ export default function PublicSpacesPage() {
                 + Create Stage
               </button>
             ) : (
-              <a
+              <Link
                 href="/"
                 className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
               >
                 Sign in to host
-              </a>
+              </Link>
             )}
           </div>
         </div>

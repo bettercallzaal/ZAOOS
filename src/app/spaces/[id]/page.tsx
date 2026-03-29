@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { StreamCall, StreamVideo, StreamVideoClient, type Call } from '@stream-io/video-react-sdk';
 import '@stream-io/video-react-sdk/dist/css/styles.css';
@@ -183,12 +184,12 @@ export default function PublicRoomPage() {
         </div>
         <div className="flex items-center gap-2">
           {!user && (
-            <a
+            <Link
               href="/"
               className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
             >
               Sign in to speak
-            </a>
+            </Link>
           )}
           <button
             onClick={handleLeave}

@@ -4,7 +4,7 @@ const https = require('https');
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const PAPERCLIP_API_KEY = process.env.PAPERCLIP_API_KEY;
 const PAPERCLIP_COMPANY_ID = process.env.PAPERCLIP_COMPANY_ID;
-const PAPERCLIP_API_URL = process.env.PAPERCLIP_API_URL || 'https://saturday-alone-symbols-operation.trycloudflare.com';
+const PAPERCLIP_API_URL = process.env.PAPERCLIP_API_URL || 'https://paperclip.zaoos.com';
 
 // GitHub Actions injects GITHUB_EVENT_PATH which contains the webhook payload
 const eventPath = process.env.GITHUB_EVENT_PATH;

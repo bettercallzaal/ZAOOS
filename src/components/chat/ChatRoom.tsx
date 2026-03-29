@@ -392,10 +392,12 @@ export function ChatRoom() {
           ) : (
             <>
               {/* Channel / Trending tab bar */}
-              <div className="flex items-center gap-0.5 px-3 py-1.5 bg-[#0d1b2a] border-b border-gray-800 overflow-x-auto no-scrollbar flex-shrink-0">
+              <div role="tablist" aria-label="Channels" className="flex items-center gap-0.5 px-3 py-1.5 bg-[#0d1b2a] border-b border-gray-800 overflow-x-auto no-scrollbar flex-shrink-0">
                 {communityConfig.farcaster.channels.map((ch) => (
                   <button
                     key={ch}
+                    role="tab"
+                    aria-selected={!isTrending && activeChannel === ch}
                     onClick={() => handleChannelSelect(ch)}
                     className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                       !isTrending && activeChannel === ch
@@ -407,6 +409,8 @@ export function ChatRoom() {
                   </button>
                 ))}
                 <button
+                  role="tab"
+                  aria-selected={isTrending}
                   onClick={handleTrendingSelect}
                   className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${
                     isTrending
@@ -414,7 +418,7 @@ export function ChatRoom() {
                       : 'text-gray-500 hover:text-amber-400 hover:bg-amber-500/5'
                   }`}
                 >
-                  Trending <span className="text-[10px]">🔥</span>
+                  Trending <span className="text-[10px]" aria-hidden="true">🔥</span>
                 </button>
               </div>
 

@@ -84,7 +84,7 @@ export function BottomNav() {
   return (
     <>
       {/* Desktop: top tab bar with all items visible */}
-      <nav className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-[#0d1b2a] border-b border-gray-800">
+      <nav aria-label="Main navigation" className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-[#0d1b2a] border-b border-gray-800">
         <div className="flex items-center h-10 px-4 max-w-6xl mx-auto">
           <span
             className="text-sm font-bold mr-6 tracking-wide"
@@ -99,6 +99,7 @@ export function BottomNav() {
                 <Link
                   key={tab.id}
                   href={tab.href}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     isActive
                       ? 'bg-white/10'
@@ -135,11 +136,14 @@ export function BottomNav() {
             <div className="relative">
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
+                aria-label="More navigation items"
+                aria-expanded={moreOpen}
+                aria-haspopup="menu"
                 className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   moreOpen ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
                 }`}
               >
-                <span>···</span>
+                <span aria-hidden="true">···</span>
               </button>
               {moreOpen && (
                 <>
@@ -191,7 +195,7 @@ export function BottomNav() {
       </nav>
 
       {/* Mobile: bottom tab bar with More menu */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-gray-800">
+      <nav aria-label="Main navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-gray-800">
         {/* More menu (slides up from bottom) */}
         {moreOpen && (
           <>
@@ -228,6 +232,7 @@ export function BottomNav() {
               <Link
                 key={tab.id}
                 href={tab.href}
+                aria-current={isActive ? 'page' : undefined}
                 className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 transition-colors ${
                   isActive ? '' : 'text-gray-500 active:text-gray-300'
                 }`}
@@ -241,6 +246,9 @@ export function BottomNav() {
           {/* More button */}
           <button
             onClick={() => setMoreOpen(!moreOpen)}
+            aria-label="More navigation items"
+            aria-expanded={moreOpen}
+            aria-haspopup="menu"
             className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 transition-colors ${
               activeTab === 'more' || moreOpen ? '' : 'text-gray-500 active:text-gray-300'
             }`}

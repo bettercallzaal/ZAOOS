@@ -24,9 +24,15 @@ export default async function AuthLayout({
   }
   return (
     <AuthAudioProviders>
+      {/* Skip to main content — hidden until focused by keyboard */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <div className="md:pt-10">
         <ErrorBoundary>
-          {children}
+          <main id="main-content">
+            {children}
+          </main>
         </ErrorBoundary>
         <Suspense fallback={null}>
           <LazyGlobalSearch />

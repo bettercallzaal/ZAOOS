@@ -124,9 +124,9 @@ export function PersistentPlayer({
   return (
     <>
     {/* Expanded full-screen player — overlay on top of compact bar */}
-    {expanded && player.metadata && (
+    {expanded && metadata && (
       <ExpandedPlayer
-        metadata={player.metadata}
+        metadata={metadata}
         onClose={() => setExpanded(false)}
         onPrev={onPrev}
         onNext={onNext}
@@ -169,7 +169,7 @@ export function PersistentPlayer({
       >
         {/* Artwork — tap to expand */}
         <button
-          onClick={() => player.metadata && setExpanded(true)}
+          onClick={() => metadata && setExpanded(true)}
           className={`relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800 ${isPlaying ? 'ring-1 ring-[#f5a623]/30' : ''}`}
           aria-label="Expand player"
         >
@@ -196,7 +196,7 @@ export function PersistentPlayer({
 
         {/* Track info — tap to expand */}
         <button
-          onClick={() => player.metadata && setExpanded(true)}
+          onClick={() => metadata && setExpanded(true)}
           className="flex-1 min-w-0 text-left"
           aria-label="Expand player"
         >

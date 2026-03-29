@@ -48,7 +48,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
   const [urlValid, setUrlValid] = useState<boolean | null>(null);
-  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEscapeClose(onClose, isOpen);
   const player = usePlayer();
 

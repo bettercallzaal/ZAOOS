@@ -15,7 +15,7 @@ interface ShareToChatButtonProps {
  */
 export function ShareToChatButton({ songUrl, trackName, compact = false, className = '' }: ShareToChatButtonProps) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
-  const errorTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => clearTimeout(errorTimerRef.current), []);
 

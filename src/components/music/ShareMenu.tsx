@@ -15,7 +15,7 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const copiedTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => clearTimeout(copiedTimerRef.current), []);
 

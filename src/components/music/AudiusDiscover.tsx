@@ -68,7 +68,7 @@ export function AudiusDiscover() {
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const queueToastTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const queueToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => clearTimeout(queueToastTimerRef.current), []);
 

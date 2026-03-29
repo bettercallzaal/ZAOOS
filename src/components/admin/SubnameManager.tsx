@@ -27,7 +27,7 @@ export function SubnameManager() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const messageTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [createFid, setCreateFid] = useState('');
   const [createName, setCreateName] = useState('');
 

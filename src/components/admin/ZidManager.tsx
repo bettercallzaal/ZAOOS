@@ -32,7 +32,7 @@ export function ZidManager() {
   const [respectLoading, setRespectLoading] = useState(true);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
-  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => clearTimeout(feedbackTimerRef.current), []);
 

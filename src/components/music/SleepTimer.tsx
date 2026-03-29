@@ -97,7 +97,7 @@ export function SleepTimer() {
   // ─── "End of track" mode — pause when track ends ────────────────────
   // We detect this by watching position approach duration
   const endOfTrackFiredRef = useRef(false);
-  const endOfTrackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const endOfTrackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => clearTimeout(endOfTrackTimerRef.current);

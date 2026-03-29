@@ -30,20 +30,22 @@ export interface BroadcastState {
   startedAt?: string;
 }
 
-/** Minimal call interface — avoids importing Stream.io SDK types. */
+/** Minimal call interface — avoids importing Stream.io SDK types directly. */
 export interface RTMPCall {
-  startRTMP(p: { address: string }): Promise<unknown>;
-  stopRTMP(p: { address: string }): Promise<unknown>;
+  startRTMPBroadcasts(data: {
+    broadcasts: Array<{ name: string; stream_url: string; stream_key?: string }>;
+  }): Promise<unknown>;
+  stopRTMPBroadcast(name: string): Promise<unknown>;
+  stopAllRTMPBroadcasts(): Promise<unknown>;
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function rtmpAddress(target: BroadcastTarget): string {
-  // Most platforms expect the key appended to the URL path
-  const separator = target.rtmpUrl.endsWith('/') ? '' : '/';
-  return `${target.rtmpUrl}${separator}${target.streamKey}`;
+/** Create a unique broadcast name for a target. */
+function broadcastName(target: BroadcastTarget): string {
+  return `${target.platform}-${target.name}`.replace(/\s+/g, '-').toLowerCase();
 }
 
 function updateTarget(
@@ -79,20 +81,24 @@ async function startDirect(
   targets: BroadcastTarget[],
   now: string,
 ): Promise<BroadcastState> {
-  const updated = await Promise.all(
-    targets.map(async (target): Promise<BroadcastTarget> => {
-      try {
-        await call.startRTMP({ address: rtmpAddress(target) });
-        return { ...target, status: 'connected', startedAt: now };
-      } catch (err) {
-        return {
-          ...target,
-          status: 'error',
-          error: err instanceof Error ? err.message : 'Unknown error',
-        };
-      }
-    }),
-  );
+  // Stream.io supports starting multiple RTMP broadcasts in a single call
+  const broadcasts = targets.map((t) => ({
+    name: broadcastName(t),
+    stream_url: t.rtmpUrl,
+    stream_key: t.streamKey,
+  }));
+
+  let updated: BroadcastTarget[];
+  try {
+    await call.startRTMPBroadcasts({ broadcasts });
+    updated = targets.map((t) => ({ ...t, status: 'connected' as const, startedAt: now }));
+  } catch (err) {
+    updated = targets.map((t) => ({
+      ...t,
+      status: 'error' as const,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    }));
+  }
 
   return {
     mode: 'direct',
@@ -134,9 +140,11 @@ async function startRelay(
   }
 
   // 2. Push single RTMP from the call to Livepeer ingest
-  const ingestUrl = `${stream.rtmpIngestUrl}/${stream.streamKey}`;
+  const ingestUrl = stream.rtmpIngestUrl;
   try {
-    await call.startRTMP({ address: ingestUrl });
+    await call.startRTMPBroadcasts({
+      broadcasts: [{ name: 'livepeer-relay', stream_url: ingestUrl, stream_key: stream.streamKey }],
+    });
   } catch (err) {
     // Clean up the Livepeer stream we just created
     await deleteLivepeerStream(stream.id).catch(() => {});
@@ -179,7 +187,7 @@ export async function stopTarget(
   if (!target) throw new Error(`Target not found: ${platform}`);
 
   try {
-    await call.stopRTMP({ address: rtmpAddress(target) });
+    await call.stopRTMPBroadcast(broadcastName(target));
   } catch {
     // Best-effort stop — still mark as stopped
   }
@@ -206,16 +214,10 @@ export async function stopAll(
       await deleteLivepeerStream(state.livepeerStreamId).catch(() => {});
     }
     // Stop the single RTMP from the call to Livepeer
-    if (state.livepeerIngestUrl) {
-      await call.stopRTMP({ address: state.livepeerIngestUrl }).catch(() => {});
-    }
+    await call.stopAllRTMPBroadcasts().catch(() => {});
   } else {
-    // Direct mode — stop each target individually
-    await Promise.allSettled(
-      state.targets
-        .filter((t) => t.status === 'connected')
-        .map((t) => call.stopRTMP({ address: rtmpAddress(t) })),
-    );
+    // Direct mode — stop all RTMP broadcasts
+    await call.stopAllRTMPBroadcasts().catch(() => {});
   }
 
   return {
@@ -245,7 +247,9 @@ export async function retryTarget(
 
   let patch: Partial<BroadcastTarget>;
   try {
-    await call.startRTMP({ address: rtmpAddress(target) });
+    await call.startRTMPBroadcasts({
+      broadcasts: [{ name: broadcastName(target), stream_url: target.rtmpUrl, stream_key: target.streamKey }],
+    });
     patch = { status: 'connected', startedAt: new Date().toISOString(), error: undefined };
   } catch (err) {
     patch = {

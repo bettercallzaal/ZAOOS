@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { BroadcastTarget } from '@/lib/spaces/rtmpManager';
 
-interface BroadcastTarget {
+interface ModalBroadcastTarget {
   id: string;
   platform: 'youtube' | 'twitch' | 'kick' | 'facebook' | 'custom';
   name: string;
@@ -21,7 +22,7 @@ interface ConnectedPlatform {
 interface BroadcastModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onStartBroadcast: (targets: BroadcastTarget[]) => Promise<void>;
+  onStartBroadcast: (targets: BroadcastTarget[], mode: 'direct' | 'relay') => Promise<void>;
   onStopBroadcast: () => Promise<void>;
   isBroadcasting: boolean;
   roomTitle?: string;
@@ -37,7 +38,8 @@ const PLATFORM_META: Record<string, { icon: string; color: string; label: string
 
 export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadcast, isBroadcasting, roomTitle }: BroadcastModalProps) {
   const [connectedPlatforms, setConnectedPlatforms] = useState<ConnectedPlatform[]>([]);
-  const [customTargets, setCustomTargets] = useState<BroadcastTarget[]>([]);
+  const [customTargets, setCustomTargets] = useState<ModalBroadcastTarget[]>([]);
+  const [mode, setMode] = useState<'direct' | 'relay'>('direct');
   const [loading, setLoading] = useState(false);
   const [fetchingPlatforms, setFetchingPlatforms] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,7 +103,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
   };
 
   const updateCustomTarget = (id: string, field: 'rtmpUrl' | 'streamKey' | 'name', value: string) => {
-    setCustomTargets(customTargets.map((t) => (t.id === id ? { ...t, [field]: value } : t)));
+    setCustomTargets((prev) => prev.map((t) => (t.id === id ? { ...t, [field]: value } : t)));
   };
 
   const enabledPlatformCount =
@@ -121,7 +123,13 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
     setError(null);
 
     try {
-      const allTargets: BroadcastTarget[] = [...validCustom];
+      const allTargets: BroadcastTarget[] = validCustom.map((t) => ({
+        platform: t.platform,
+        name: t.name,
+        rtmpUrl: t.rtmpUrl,
+        streamKey: t.streamKey,
+        status: 'connecting' as const,
+      }));
 
       // Fetch RTMP details for connected platforms via server
       if (enabledPlatforms.length > 0) {
@@ -137,11 +145,11 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
         if (data.destinations) {
           for (const dest of data.destinations) {
             allTargets.push({
-              id: `${dest.platform}-${Date.now()}`,
               platform: dest.platform,
               name: dest.name,
               rtmpUrl: dest.rtmpUrl,
               streamKey: dest.streamKey,
+              status: 'connecting' as const,
             });
           }
         }
@@ -152,7 +160,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
         return;
       }
 
-      await onStartBroadcast(allTargets);
+      await onStartBroadcast(allTargets, mode);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start broadcast');
     } finally {
@@ -315,6 +323,35 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
                 <p className="text-sm">Add a destination to start broadcasting</p>
                 <p className="text-xs mt-1">Your room audio will stream to connected platforms or any RTMP endpoint</p>
               </div>
+            )}
+
+            {/* Mode toggle */}
+            <div className="flex gap-2 mt-4 mb-1">
+              <button
+                onClick={() => setMode('direct')}
+                className={`flex-1 flex flex-col items-center gap-0.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  mode === 'direct'
+                    ? 'bg-[#f5a623] text-[#0a1628]'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+              >
+                <span>Direct</span>
+                <span className={`text-[10px] font-normal ${mode === 'direct' ? 'text-[#0a1628]/70' : 'text-gray-500'}`}>Lower latency</span>
+              </button>
+              <button
+                onClick={() => setMode('relay')}
+                className={`flex-1 flex flex-col items-center gap-0.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  mode === 'relay'
+                    ? 'bg-[#f5a623] text-[#0a1628]'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+              >
+                <span>Relay</span>
+                <span className={`text-[10px] font-normal ${mode === 'relay' ? 'text-[#0a1628]/70' : 'text-gray-500'}`}>Stable for 3+</span>
+              </button>
+            </div>
+            {mode === 'direct' && enabledPlatformCount >= 3 && (
+              <p className="text-[10px] text-amber-400 mb-3">Relay mode recommended for 3+ platforms</p>
             )}
           </>
         )}

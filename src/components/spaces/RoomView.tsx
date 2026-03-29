@@ -2,17 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useCallStateHooks } from '@stream-io/video-react-sdk';
+import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 import { useRadio } from '@/hooks/useRadio';
 import { useMobile } from '@/hooks/useMobile';
+import { startBroadcast, stopTarget, stopAll, retryTarget, type BroadcastState, type BroadcastTarget } from '@/lib/spaces/rtmpManager';
 import { DescriptionPanel } from './DescriptionPanel';
 import { ControlsPanel } from './ControlsPanel';
 import { PermissionRequests } from './PermissionRequests';
 import { RoomMusicPanel } from './RoomMusicPanel';
 import { BroadcastModal } from './BroadcastModal';
+import { BroadcastPanel } from './BroadcastPanel';
 import { ContentView } from './ContentView';
 import { SpeakersGrid } from './SpeakersGrid';
-import type { BroadcastTarget } from './BroadcastModal';
 
 const MusicSidebar = dynamic(
   () => import('@/components/music/MusicSidebar').then((m) => ({ default: m.MusicSidebar })),
@@ -35,8 +36,9 @@ export function RoomView({
   hostFid,
 }: RoomViewProps) {
   const [showBroadcast, setShowBroadcast] = useState(false);
-  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [broadcastState, setBroadcastState] = useState<BroadcastState | null>(null);
   const [showMusicSidebar, setShowMusicSidebar] = useState(false);
+  const call = useCall();
   const radio = useRadio();
   const isMobile = useMobile();
 
@@ -66,14 +68,35 @@ export function RoomView({
     setPreviousLayout(null);
   };
 
-  const handleStartBroadcast = async (_targets: BroadcastTarget[]) => {
-    // Phase 2: wire up actual RTMP relay API here
-    setIsBroadcasting(true);
+  const handleStartBroadcast = async (targets: BroadcastTarget[], mode: 'direct' | 'relay') => {
+    if (!call) return;
+    const state = await startBroadcast(call, targets, mode, roomTitle);
+    setBroadcastState(state);
+    setShowBroadcast(false);
   };
 
   const handleStopBroadcast = async () => {
-    // Phase 2: call API to stop RTMP streams
-    setIsBroadcasting(false);
+    if (!call || !broadcastState) return;
+    await stopAll(call, broadcastState);
+    setBroadcastState(null);
+  };
+
+  const handleStopTarget = async (platform: string) => {
+    if (!call || !broadcastState) return;
+    const updated = await stopTarget(call, broadcastState, platform);
+    setBroadcastState(updated);
+  };
+
+  const handleRetryTarget = async (platform: string) => {
+    if (!call || !broadcastState) return;
+    const updated = await retryTarget(call, broadcastState, platform);
+    setBroadcastState(updated);
+  };
+
+  const handleStopAll = async () => {
+    if (!call || !broadcastState) return;
+    await stopAll(call, broadcastState);
+    setBroadcastState(null);
   };
 
   return (
@@ -93,12 +116,23 @@ export function RoomView({
             <SpeakersGrid hostFid={hostFid} />
           )}
 
+          {broadcastState?.isLive && (
+            <div className="flex justify-center px-4 py-2 border-t border-gray-800 bg-[#0d1b2a]">
+              <BroadcastPanel
+                state={broadcastState}
+                onStopTarget={handleStopTarget}
+                onRetryTarget={handleRetryTarget}
+                onStopAll={handleStopAll}
+                roomId={roomId ?? ''}
+              />
+            </div>
+          )}
           <div className="border-t border-gray-800 bg-[#0d1b2a]">
             <ControlsPanel
               isHost={isHost}
               isAuthenticated={isAuthenticated}
               onBroadcast={() => setShowBroadcast(true)}
-              isBroadcasting={isBroadcasting}
+              isBroadcasting={broadcastState?.isLive ?? false}
               roomType={roomType}
               onMusicToggle={() => setShowMusicSidebar((prev) => !prev)}
               onLayoutToggle={handleToggleLayout}
@@ -172,11 +206,11 @@ export function RoomView({
       )}
 
       <BroadcastModal
-        isOpen={showBroadcast}
+        isOpen={showBroadcast && !broadcastState?.isLive}
         onClose={() => setShowBroadcast(false)}
         onStartBroadcast={handleStartBroadcast}
         onStopBroadcast={handleStopBroadcast}
-        isBroadcasting={isBroadcasting}
+        isBroadcasting={broadcastState?.isLive ?? false}
         roomTitle={roomTitle}
       />
     </div>

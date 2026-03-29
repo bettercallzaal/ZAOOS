@@ -1,11 +1,17 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { getSessionData } from '@/lib/auth/session';
 import { BottomNav } from '@/components/navigation/BottomNav';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthAudioProviders } from './providers';
 import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
 import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
+
+const PWAInstallPrompt = dynamic(
+  () => import('@/components/navigation/PWAInstallPrompt'),
+  { ssr: false }
+);
 
 export default async function AuthLayout({
   children,
@@ -27,6 +33,7 @@ export default async function AuthLayout({
         </Suspense>
         <PersistentPlayerWithRadio />
         <BottomNav />
+        <PWAInstallPrompt />
       </div>
     </AuthAudioProviders>
   );

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
-import { hindsight } from '@/lib/hindsight';
+import { getHindsightClient } from '@/lib/hindsight';
 
 const RetainBodySchema = z.object({
   content: z.string().min(1).max(10000),
@@ -44,7 +44,12 @@ export async function POST(
 
     const { content, eventType, metadata } = parsed.data;
 
-    const result = await hindsight.retain(userId, content, {
+    const hindsight = await getHindsightClient();
+    if (!hindsight) {
+      return NextResponse.json({ error: 'Hindsight client not available' }, { status: 503 });
+    }
+
+    const result = await (hindsight as { retain: (userId: string, content: string, opts: unknown) => Promise<Record<string, unknown>> }).retain(userId, content, {
       metadata: {
         eventType,
         ...metadata,

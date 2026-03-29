@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface ShareToChatButtonProps {
   songUrl: string;
@@ -15,6 +15,9 @@ interface ShareToChatButtonProps {
  */
 export function ShareToChatButton({ songUrl, trackName, compact = false, className = '' }: ShareToChatButtonProps) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => () => clearTimeout(errorTimerRef.current), []);
 
   // Reset success indicator after 1.5s
   useEffect(() => {
@@ -43,7 +46,8 @@ export function ShareToChatButton({ songUrl, trackName, compact = false, classNa
       setStatus('success');
     } catch {
       setStatus('error');
-      setTimeout(() => setStatus('idle'), 2000);
+      clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = setTimeout(() => setStatus('idle'), 2000);
     }
   };
 

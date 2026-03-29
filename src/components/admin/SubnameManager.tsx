@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface Member {
   fid: number;
@@ -27,6 +27,7 @@ export function SubnameManager() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const messageTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const [createFid, setCreateFid] = useState('');
   const [createName, setCreateName] = useState('');
 
@@ -53,10 +54,12 @@ export function SubnameManager() {
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => () => clearTimeout(messageTimerRef.current), []);
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
-    setTimeout(() => setMessage(null), 5000);
+    clearTimeout(messageTimerRef.current);
+    messageTimerRef.current = setTimeout(() => setMessage(null), 5000);
   };
 
   const handleBatchCreate = async () => {

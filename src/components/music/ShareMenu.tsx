@@ -15,6 +15,9 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => () => clearTimeout(copiedTimerRef.current), []);
 
   // Close on outside click
   useEffect(() => {
@@ -68,7 +71,8 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
     try {
       await navigator.clipboard.writeText(trackUrl);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback for older browsers
       const textarea = document.createElement('textarea');
@@ -78,7 +82,8 @@ export function ShareMenu({ trackName, artistName, artworkUrl, trackUrl, classNa
       document.execCommand('copy');
       document.body.removeChild(textarea);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = setTimeout(() => setCopied(false), 2000);
     }
   };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { usePlayer } from '@/providers/audio';
 import { useQueue } from '@/contexts/QueueContext';
@@ -68,6 +68,9 @@ export function AudiusDiscover() {
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const queueToastTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => () => clearTimeout(queueToastTimerRef.current), []);
 
   const player = usePlayer();
   const { addToQueue } = useQueue();
@@ -96,7 +99,8 @@ export function AudiusDiscover() {
     (track: AudiusTrack) => {
       addToQueue(toTrackMetadata(track));
       setQueueToast('Added to queue');
-      setTimeout(() => setQueueToast(null), 1500);
+      clearTimeout(queueToastTimerRef.current);
+      queueToastTimerRef.current = setTimeout(() => setQueueToast(null), 1500);
     },
     [addToQueue],
   );

@@ -17,6 +17,10 @@ import { LastfmConnect } from './LastfmConnect';
 import { ListenBrainzConnect } from './ListenBrainzConnect';
 import { SocialsSection } from './SocialsSection';
 import { CrossPostingSection } from './CrossPostingSection';
+import dynamic from 'next/dynamic';
+const TwitchConnect = dynamic(() => import('@/components/settings/TwitchConnect').then(m => m.default || m), { ssr: false });
+const KickConnect = dynamic(() => import('@/components/settings/KickConnect').then(m => m.default || m), { ssr: false });
+const FacebookConnect = dynamic(() => import('@/components/settings/FacebookConnect').then(m => m.default || m), { ssr: false });
 
 interface Profile {
   fid: number;
@@ -655,6 +659,16 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
 
         {/* ── Cross-Posting Channels ──────────────────────────────── */}
         <CrossPostingSection />
+
+        {/* ── Streaming Platforms ─────────────────────────────────── */}
+        <section>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Streaming Platforms</p>
+          <div className="space-y-3">
+            <TwitchConnect />
+            <KickConnect />
+            <FacebookConnect />
+          </div>
+        </section>
 
         {/* ── Farcaster Identity (read-only) ─────────────────────── */}
         <section>

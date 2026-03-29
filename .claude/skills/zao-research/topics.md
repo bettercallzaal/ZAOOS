@@ -33,6 +33,8 @@ Use this to quickly find if a topic has already been researched.
 - **Music player complete audit (CANONICAL)**: all 23 components, 23 endpoints, future roadmap → `128`
 - Next music integrations (Tier 4): Spotify API, Audius SDK, Farcaster embeds, AI recs, Zora NFTs, scrobbling → `130`
 - Play counting & stream attribution: which platforms count ZAO OS plays, Last.fm/ListenBrainz scrobbling → `138`
+- **AI video generation for music**: Seedance 2.0, Neural Frames, Freebeat, Kling 3.0, Runway Gen-4, Sora 2 — pricing, music-specific features, API status, ZAO integration paths → `209`
+- **Music player UI best practices 2026**: platform comparison, gap analysis (polish not features), quick wins (a11y, animations, glassmorphism), Motion transitions, keyboard shortcuts, WCAG audit, social features → `211`
 
 ## On-Chain Music Distribution & NFTs
 - Trustware SDK evaluation (crypto payment middleware, too early) → `139`
@@ -76,6 +78,7 @@ Use this to quickly find if a topic has already been researched.
 - Hindsight memory system (91.4%, retain/recall/reflect) → `26`
 - OpenFang Agent OS (not a fit, but reference architecture) → `46`
 - **Agent harness engineering (LangChain DeepAgents)**: Agent=Model+Harness, virtual filesystems, Ralph Loop, context rot, subagent orchestration, ZAO agent architecture → `161`
+- **Microsoft Agent Lightning**: RL training for agents (APO/GRPO/PPO/SFT), LightningRL hierarchical RL, Python+GPU — SKIP for ZAO now, steal APO evaluate-critique-rewrite pattern → `210`
 
 ## Coordination & Incentives
 - Incented protocol: ZABAL campaigns, staking-based task coordination → `64`
@@ -192,6 +195,7 @@ Use this to quickly find if a topic has already been researched.
 - Jitsi Meet live rooms → `80`
 - Paperclip multi-company agents → `81`
 - Paperclip ClipMart plugins → `82`
+- Paperclip plugins ecosystem update (11 community plugins, install plan, v2026.325.0) → `208`
 - ElizaOS 2026 update (v1.7.2, v2 alpha) → `83`
 - Farcaster AI agents landscape → `84`
 - Farcaster agent technical setup (Neynar) → `85`

@@ -28,3 +28,4 @@
 | [128](../190-music-player-complete-audit/) | **Music Player Complete Audit** | **CANONICAL** — 23 components, 23 endpoints, 9 platforms, 17 future features in 4 tiers |
 | [130](../130-next-music-integrations/) | **Next Music Integrations (Tier 4)** | Spotify Web API, Audius SDK deep, Farcaster music embeds, AI recs, Zora NFTs, Last.fm |
 | [138](../138-play-counting-stream-attribution/) | **Play Counting & Stream Attribution** | Do ZAO plays count? Spotify/SC/YT embeds = YES. Audius API = probably. Sound.xyz/Apple = NO |
+| [209](../209-ai-video-generation-tools/) | **AI Video Generation Tools** | Seedance 2.0 ($0.05/5s), Neural Frames ($19/mo, 8-stem beat sync), Freebeat ($9.99/mo), Kling/Runway/Sora compared, music video workflows, ZAO integration paths |

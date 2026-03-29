@@ -13,6 +13,11 @@
   --foreground: #ededed;
 }
 
+.light {
+  --background: #f8fafc;
+  --foreground: #0a1628;
+}
+
 * {
   box-sizing: border-box;
 }

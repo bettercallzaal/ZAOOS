@@ -14,10 +14,14 @@ interface WaveformCommentsProps {
   songUrl: string;
   duration: number;
   position: number;
+  onSeek?: (ms: number) => void;
   className?: string;
 }
 
-export function WaveformComments({ songUrl, duration, position, className = '' }: WaveformCommentsProps) {
+/** Threshold in ms — comments within this range of the playhead are highlighted */
+const HIGHLIGHT_THRESHOLD_MS = 3000;
+
+export function WaveformComments({ songUrl, duration, position, onSeek, className = '' }: WaveformCommentsProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [hoveredComment, setHoveredComment] = useState<Comment | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -107,17 +111,23 @@ export function WaveformComments({ songUrl, duration, position, className = '' }
         {/* Comment markers */}
         {comments.map((c) => {
           const leftPct = Math.min((c.timestampMs / duration) * 100, 100);
+          const isNear = Math.abs(c.timestampMs - position) <= HIGHLIGHT_THRESHOLD_MS;
           return (
             <div
               key={c.id}
               className="absolute bottom-0 -translate-x-1/2 cursor-pointer group"
               style={{ left: `${leftPct}%` }}
+              onClick={() => onSeek?.(c.timestampMs)}
               onMouseEnter={() => setHoveredComment(c)}
               onMouseLeave={() => setHoveredComment(null)}
               onTouchStart={() => setHoveredComment(c)}
             >
-              {/* Marker dot */}
-              <div className="w-2.5 h-2.5 rounded-full bg-[#f5a623] border border-[#0a1628] shadow-sm hover:scale-150 transition-transform mb-[-2px]" />
+              {/* Marker dot — highlighted when near playhead */}
+              <div className={`w-2.5 h-2.5 rounded-full border shadow-sm hover:scale-150 transition-all mb-[-2px] ${
+                isNear
+                  ? 'bg-[#ffd700] border-[#f5a623] scale-125 ring-2 ring-[#f5a623]/40'
+                  : 'bg-[#f5a623] border-[#0a1628]'
+              }`} />
 
               {/* Floating bubble on hover */}
               {hoveredComment?.id === c.id && (

@@ -189,6 +189,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
           songUrl={metadata.url}
           duration={duration}
           position={position}
+          onSeek={(ms) => player.seek(ms)}
         />
       </div>
 

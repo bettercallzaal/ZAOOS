@@ -1,30 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '@/lib/db/supabase';
 import { runWeeklyReflection, TASTE_REFLECT_PROMPT } from '@/lib/memory-recall';
 
 const CRON_SECRET = process.env.CRON_SECRET;
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify cron secret
-    const authHeader = request.headers.get('authorization');
-    if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    // Require CRON_SECRET to be configured
+    if (!CRON_SECRET) {
+      console.error('CRON_SECRET not configured');
       return NextResponse.json(
-        { error: 'Supabase configuration missing' },
+        { error: 'CRON_SECRET not configured' },
         { status: 500 }
       );
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Verify cron secret
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${CRON_SECRET}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Get all active ZAO members
-    const { data: members, error: membersError } = await supabase
+    const { data: members, error: membersError } = await supabaseAdmin
       .from('members')
       .select('fid, username')
       .eq('status', 'active');
@@ -48,7 +46,7 @@ export async function POST(request: NextRequest) {
         const reflection = await runWeeklyReflection(String(member.fid));
 
         // Store in Supabase taste_profiles table
-        const { error: insertError } = await supabase
+        const { error: insertError } = await supabaseAdmin
           .from('taste_profiles')
           .insert({
             user_fid: member.fid,
@@ -82,8 +80,15 @@ export async function POST(request: NextRequest) {
 
 // Also support GET for simple cron health checks
 export async function GET(request: NextRequest) {
+  if (!CRON_SECRET) {
+    return NextResponse.json(
+      { error: 'CRON_SECRET not configured' },
+      { status: 500 }
+    );
+  }
+
   const authHeader = request.headers.get('authorization');
-  if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   return NextResponse.json({ status: 'ok', schedule: 'Sunday 18:00 UTC' });

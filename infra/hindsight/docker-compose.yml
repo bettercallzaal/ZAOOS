@@ -6,7 +6,7 @@ services:
     container_name: zaoos-hindsight
     restart: unless-stopped
     ports:
-      - "8888:8888"   # API
+      - "127.0.0.1:8888:8888"   # API — localhost only
       - "9999:9999"   # UI (optional, for debugging)
     environment:
       # LLM backend for reflection/synthesis

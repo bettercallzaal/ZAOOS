@@ -31,6 +31,10 @@ CREATE INDEX IF NOT EXISTS idx_memory_events_type ON memory_events(event_type);
 CREATE INDEX IF NOT EXISTS idx_memory_events_created ON memory_events(created_at DESC);
 
 -- Row Level Security
+-- NOTE: ZAO OS uses iron-session (not Supabase Auth) for authentication.
+-- These tables are accessed via the Supabase service role in API routes,
+-- which bypasses RLS. The auth.jwt() policies below are a secondary defense
+-- layer and do not apply to the primary access path.
 ALTER TABLE taste_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE memory_events ENABLE ROW LEVEL SECURITY;
 

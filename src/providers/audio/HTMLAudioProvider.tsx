@@ -63,6 +63,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     const onCanPlay = (e: Event) => {
       if (!isActive(e)) return;
       const a = getActive();
+      console.log('[Audio] canplay fired, src:', a.src?.substring(0, 60), 'duration:', a.duration, 'volume:', a.volume);
       a.play().catch((err: unknown) => {
         console.error('[Audio] play blocked:', err);
         dispatch({ type: 'ERROR', payload: 'Tap play again — browser blocked autoplay' });
@@ -84,6 +85,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     const onError = (e: Event) => {
       if (!isActive(e)) return;
       const a = getActive();
+      console.error('[Audio] error event:', a.error?.code, a.error?.message, 'src:', a.src?.substring(0, 60));
       const code = a.error?.code;
       const messages: Record<number, string> = {
         1: 'Playback aborted',
@@ -143,11 +145,18 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
         clearCrossfade();
         const active = getActive();
         activeUrlRef.current = url;
+        console.log('[Audio] Loading URL:', url.substring(0, 80), '...');
         active.src = url;
+        active.volume = volumeRef.current;
         active.load();
         // Connect EQ to the active element
         try { getEqualizer().connect(active); } catch {}
-        active.play().catch(() => {});
+        active.play().then(() => {
+          console.log('[Audio] Play started, volume:', active.volume, 'paused:', active.paused);
+        }).catch((err) => {
+          console.error('[Audio] Play failed:', err);
+          dispatch({ type: 'ERROR', payload: 'Tap play again — browser blocked autoplay' });
+        });
       },
       setVolume: (v: number) => {
         getActive().volume = v;

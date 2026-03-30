@@ -20,6 +20,7 @@ export interface Room {
   thumbnail_url: string | null;
   layout_preference: 'content-first' | 'speakers-first';
   last_active_at: string;
+  recording_url: string | null;
 }
 
 export async function createRoom(data: {
@@ -159,4 +160,27 @@ export async function updateRoom(id: string, data: {
 
   if (error) throw new Error(`Failed to update room: ${error.message}`);
   return room;
+}
+
+export async function updateRecording(roomId: string, url: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('rooms')
+    .update({ recording_url: url })
+    .eq('id', roomId);
+
+  if (error) throw new Error(`Failed to update recording: ${error.message}`);
+}
+
+export async function getPastRooms(days: number = 7): Promise<Room[]> {
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabaseAdmin
+    .from('rooms')
+    .select('*')
+    .eq('state', 'ended')
+    .eq('room_type', 'stage')
+    .gte('ended_at', since)
+    .order('ended_at', { ascending: false });
+
+  if (error) throw new Error(`Failed to fetch past rooms: ${error.message}`);
+  return data ?? [];
 }

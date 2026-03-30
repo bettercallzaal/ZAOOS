@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getRoomById, endRoom, updateRoom } from '@/lib/spaces/roomsDb';
+import { getRoomById, endRoom, updateRoom, updateRecording } from '@/lib/spaces/roomsDb';
 import { getSessionData } from '@/lib/auth/session';
 import { getValidTwitchToken, updateTwitchChannel } from '@/lib/twitch/client';
 
@@ -27,6 +27,7 @@ const UpdateSchema = z.object({
   description: z.string().max(500).optional(),
   theme: z.string().max(50).optional(),
   thumbnail_url: z.string().url().max(500).optional(),
+  recording_url: z.string().url().max(500).optional(),
 });
 
 export async function PATCH(
@@ -57,6 +58,10 @@ export async function PATCH(
 
     if (parsed.data.action === 'end') {
       await endRoom(id);
+      // Store recording URL if provided
+      if (parsed.data.recording_url) {
+        await updateRecording(id, parsed.data.recording_url);
+      }
       return NextResponse.json({ success: true });
     }
 

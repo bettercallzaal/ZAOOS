@@ -162,6 +162,16 @@ function AuthenticatedMusicPanel({ roomId, isHost, onOpenMusicBrowser }: { roomI
             {/* Playing indicator for listeners / Controls for DJ */}
             {isDJ ? (
               <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Browse music button */}
+                {onOpenMusicBrowser && (
+                  <button
+                    onClick={onOpenMusicBrowser}
+                    className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                    title="Browse music"
+                  >
+                    <BrowseIcon />
+                  </button>
+                )}
                 {/* Skip button — only shown in radio mode */}
                 {radio.isRadioMode && (
                   <button
@@ -325,6 +335,15 @@ function RadioIcon() {
       <circle cx="12" cy="12" r="2" fill="currentColor" />
       <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
       <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19" />
+    </svg>
+  );
+}
+
+function BrowseIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <path d="M21 21l-4.35-4.35" />
     </svg>
   );
 }

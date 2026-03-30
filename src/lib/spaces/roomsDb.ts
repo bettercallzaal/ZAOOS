@@ -17,6 +17,7 @@ export interface Room {
   persistent: boolean;
   channel_id: string | null;
   theme: string;
+  thumbnail_url: string | null;
   layout_preference: 'content-first' | 'speakers-first';
   last_active_at: string;
 }
@@ -135,4 +136,27 @@ export async function updateLayoutPreference(roomId: string, layout: 'content-fi
     .from('rooms')
     .update({ layout_preference: layout })
     .eq('id', roomId);
+}
+
+export async function updateRoom(id: string, data: {
+  title?: string;
+  description?: string;
+  theme?: string;
+  thumbnail_url?: string;
+}): Promise<Room> {
+  const updates: Record<string, unknown> = {};
+  if (data.title !== undefined) updates.title = data.title;
+  if (data.description !== undefined) updates.description = data.description;
+  if (data.theme !== undefined) updates.theme = data.theme;
+  if (data.thumbnail_url !== undefined) updates.thumbnail_url = data.thumbnail_url;
+
+  const { data: room, error } = await supabaseAdmin
+    .from('rooms')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw new Error(`Failed to update room: ${error.message}`);
+  return room;
 }

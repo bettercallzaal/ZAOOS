@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRoomById, endRoom } from '@/lib/spaces/roomsDb';
+import { z } from 'zod';
+import { getRoomById, endRoom, updateRoom } from '@/lib/spaces/roomsDb';
 import { getSessionData } from '@/lib/auth/session';
 
 export async function GET(
@@ -19,6 +20,14 @@ export async function GET(
   }
 }
 
+const UpdateSchema = z.object({
+  action: z.enum(['end', 'update']).optional().default('end'),
+  title: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+  theme: z.string().max(50).optional(),
+  thumbnail_url: z.string().url().max(500).optional(),
+});
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -36,13 +45,31 @@ export async function PATCH(
     }
 
     if (room.host_fid !== session.fid) {
-      return NextResponse.json({ error: 'Only the host can end the room' }, { status: 403 });
+      return NextResponse.json({ error: 'Only the host can modify the room' }, { status: 403 });
     }
 
-    await endRoom(id);
-    return NextResponse.json({ success: true });
+    const body = await req.json();
+    const parsed = UpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    if (parsed.data.action === 'end') {
+      await endRoom(id);
+      return NextResponse.json({ success: true });
+    }
+
+    // Update room details
+    const updated = await updateRoom(id, {
+      title: parsed.data.title,
+      description: parsed.data.description,
+      theme: parsed.data.theme,
+      thumbnail_url: parsed.data.thumbnail_url,
+    });
+
+    return NextResponse.json({ room: updated });
   } catch (error) {
-    console.error('End room error:', error);
-    return NextResponse.json({ error: 'Failed to end room' }, { status: 500 });
+    console.error('Room update error:', error);
+    return NextResponse.json({ error: 'Failed to update room' }, { status: 500 });
   }
 }

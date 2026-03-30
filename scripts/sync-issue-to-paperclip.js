@@ -1,5 +1,4 @@
-import https from 'node:https';
-import fs from 'node:fs';
+const https = require('https');
 
 // GitHub Actions provides these via the @actions/github context
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -9,10 +8,12 @@ const PAPERCLIP_API_URL = process.env.PAPERCLIP_API_URL || 'https://paperclip.za
 
 // GitHub Actions injects GITHUB_EVENT_PATH which contains the webhook payload
 const eventPath = process.env.GITHUB_EVENT_PATH;
+const eventName = process.env.GITHUB_EVENT_NAME;
 
 let issueData;
 
 if (eventPath) {
+  const fs = require('fs');
   issueData = JSON.parse(fs.readFileSync(eventPath, 'utf8')).issue;
 } else {
   console.error('GITHUB_EVENT_PATH not set — cannot get issue data');
@@ -20,7 +21,7 @@ if (eventPath) {
 }
 
 const issue = issueData;
-
+const action = process.env.GITHUB_ACTION_PATH ? 'unknown' : eventName;
 
 async function makeRequest(url, method, body, headers = {}) {
   return new Promise((resolve, reject) => {
@@ -65,7 +66,7 @@ function mapPriority(labels) {
   return 'medium';
 }
 
-function mapStatus(/* _action */) {
+function mapStatus(action) {
   // action is from GITHUB_EVENT_NAME: issues, pull_request, etc.
   // We care about the issue action type
   if (issue.action === 'opened') return 'in_progress';
@@ -74,6 +75,7 @@ function mapStatus(/* _action */) {
 }
 
 async function syncIssue() {
+  const issueId = issue.id;
   const issueNumber = issue.number;
   const title = `[GitHub #${issueNumber}] ${issue.title}`;
   const description = `${issue.body || ''}\n\n---\n**Source:** GitHub Issue #${issueNumber}\n**Labels:** ${issue.labels.map(l => l.name).join(', ') || 'none'}\n**Author:** ${issue.user.login}\n**URL:** ${issue.html_url}`;

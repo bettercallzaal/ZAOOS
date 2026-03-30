@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Party {
   id: string;
@@ -27,6 +28,7 @@ function timeUntil(dateStr: string): string {
 }
 
 export function ListeningParties() {
+  const router = useRouter();
   const [parties, setParties] = useState<Party[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -140,7 +142,10 @@ export function ListeningParties() {
             Hosted by {party.host_name || `FID ${party.host_fid}`}
             {party.participant_count > 0 && ` \u00b7 ${party.participant_count} listening`}
           </p>
-          <button className="mt-3 w-full py-2 rounded-lg bg-[#f5a623]/20 text-[#f5a623] text-sm font-medium hover:bg-[#f5a623]/30 transition-colors">
+          <button
+            onClick={() => router.push(`/music?party=${party.id}`)}
+            className="mt-3 w-full py-2 rounded-lg bg-[#f5a623]/20 text-[#f5a623] text-sm font-medium hover:bg-[#f5a623]/30 transition-colors"
+          >
             Join Party
           </button>
         </div>

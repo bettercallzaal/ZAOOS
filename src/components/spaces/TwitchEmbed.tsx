@@ -30,7 +30,7 @@ export function TwitchEmbed({ channel, visible }: TwitchEmbedProps) {
       {expanded && (
         <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
           <iframe
-            src={`https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=zaoos.com&muted=true`}
+            src={`https://player.twitch.tv/?channel=${encodeURIComponent(channel)}&parent=${typeof window !== 'undefined' ? window.location.hostname : 'zaoos.com'}&muted=true`}
             className="absolute inset-0 w-full h-full"
             allowFullScreen
             allow="autoplay; encrypted-media"

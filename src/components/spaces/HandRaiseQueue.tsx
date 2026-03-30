@@ -75,7 +75,7 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
       <button
         onClick={() => doAction(myStatus === 'raised' ? 'lower' : 'raise')}
         disabled={loading}
-        className={`p-2.5 rounded-xl text-sm transition-colors border ${
+        className={`relative p-2.5 rounded-xl text-sm transition-colors border ${
           myStatus === 'raised'
             ? 'bg-[#f5a623]/15 border-[#f5a623]/40 text-[#f5a623]'
             : 'bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border-gray-700/50 hover:border-[#f5a623]/40'

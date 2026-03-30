@@ -162,7 +162,7 @@ export function SocialPage() {
 
     // "Inactive" sort — show inactive users first (churn candidates)
     if (sort === 'inactive') {
-      result = result.sort((a, b) => {
+      result = [...result].sort((a, b) => {
         const aInactive = a.active_status === 'inactive' ? 0 : 1;
         const bInactive = b.active_status === 'inactive' ? 0 : 1;
         if (aInactive !== bInactive) return aInactive - bInactive;

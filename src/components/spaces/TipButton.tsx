@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import { base } from 'viem/chains';
@@ -37,20 +37,22 @@ export function TipButton({ recipientAddress, recipientName, roomId }: TipButton
     });
   };
 
-  // Fire-and-forget tip log
-  if (isSuccess && txHash && !logged) {
-    setLogged(true);
-    fetch('/api/spaces/tips', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        roomId,
-        amount,
-        txHash,
-        chain: 'base',
-      }),
-    }).catch(() => {});
-  }
+  // Fire-and-forget tip log — run in useEffect to avoid setState during render
+  useEffect(() => {
+    if (isSuccess && txHash && !logged) {
+      setLogged(true);
+      fetch('/api/spaces/tips', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId,
+          amount,
+          txHash,
+          chain: 'base',
+        }),
+      }).catch(() => {});
+    }
+  }, [isSuccess, txHash, logged, roomId, amount]);
 
   const handleClose = () => {
     setOpen(false);

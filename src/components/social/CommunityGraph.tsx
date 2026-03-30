@@ -226,6 +226,11 @@ export function CommunityGraph() {
           ctx.drawImage(cached, x - radius + 1, y - radius + 1, (radius - 1) * 2, (radius - 1) * 2);
           ctx.restore();
         } else if (!cached) {
+          // Cap cache at 100 entries to prevent memory leaks
+          if (imageCache.current.size >= 100) {
+            const firstKey = imageCache.current.keys().next().value;
+            if (firstKey) imageCache.current.delete(firstKey);
+          }
           const img = new Image();
           img.crossOrigin = 'anonymous';
           img.src = node.pfpUrl;

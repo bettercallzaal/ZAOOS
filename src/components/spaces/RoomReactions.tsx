@@ -30,10 +30,13 @@ export function RoomReactions({ roomId, fid }: RoomReactionsProps) {
     }, ANIMATION_MS);
   }, []);
 
-  // Subscribe to Supabase Realtime channel for reactions
+  const channelRef = useRef<ReturnType<ReturnType<typeof getSupabaseBrowser>['channel']> | null>(null);
+
+  // Store the channel created in the useEffect so handleReact can reuse it
   useEffect(() => {
     const supabase = getSupabaseBrowser();
     const channel = supabase.channel(`room-reactions:${roomId}`);
+    channelRef.current = channel;
 
     channel
       .on('broadcast', { event: 'reaction' }, (payload) => {
@@ -46,15 +49,14 @@ export function RoomReactions({ roomId, fid }: RoomReactionsProps) {
 
     return () => {
       supabase.removeChannel(channel);
+      channelRef.current = null;
     };
   }, [roomId, fid, addFloating]);
 
   const handleReact = (emoji: string) => {
     addFloating(emoji);
-    // Broadcast to others
-    const supabase = getSupabaseBrowser();
-    const channel = supabase.channel(`room-reactions:${roomId}`);
-    channel.send({ type: 'broadcast', event: 'reaction', payload: { emoji, fid } });
+    // Broadcast to others via the existing channel
+    channelRef.current?.send({ type: 'broadcast', event: 'reaction', payload: { emoji, fid } });
   };
 
   return (

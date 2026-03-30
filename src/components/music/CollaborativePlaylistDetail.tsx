@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePlayer } from '@/providers/audio';
+import { useAuth } from '@/hooks/useAuth';
 import type { TrackMetadata } from '@/types/music';
 import type { Playlist, Track, PlaylistMember } from './CollaborativePlaylists';
 
@@ -125,6 +126,7 @@ function TrackRow({ track, onVote, onPlay }: {
 // ── Expanded Playlist Detail ───────────────────────────────────────────
 export function PlaylistDetail({ playlist, onBack }: { playlist: Playlist; onBack: () => void }) {
   const player = usePlayer();
+  const { user } = useAuth();
   const [tracks, setTracks] = useState<Track[]>([]);
   const [members, setMembers] = useState<PlaylistMember[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,8 +149,9 @@ export function PlaylistDetail({ playlist, onBack }: { playlist: Playlist; onBac
   useEffect(() => { fetchDetail(); }, [fetchDetail]);
 
   useEffect(() => {
-    setIsMember(playlist.member_fids?.length > 0);
-  }, [playlist.member_fids]);
+    const myFid = user?.fid;
+    setIsMember(!!myFid && Array.isArray(playlist.member_fids) && playlist.member_fids.includes(myFid));
+  }, [playlist.member_fids, user?.fid]);
 
   const handleVote = async (trackId: string, vote: 1 | -1) => {
     const res = await fetch(`/api/music/playlists/collaborative/${playlist.id}/vote`, {

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePlayer } from '@/providers/audio';
+import { useQueue } from '@/contexts/QueueContext';
 import type { TrackMetadata } from '@/types/music';
 
 interface TopTrack {
@@ -45,6 +46,7 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
   const [artist, setArtist] = useState<ArtistData | null>(initialData || null);
   const [loading, setLoading] = useState(!initialData);
   const player = usePlayer();
+  const { addToQueue } = useQueue();
 
   useEffect(() => {
     if (initialData) return;
@@ -74,8 +76,23 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
 
   const playAll = useCallback(() => {
     if (!artist?.topTracks.length) return;
+    // Play the first track immediately, queue the rest
     playTrack(artist.topTracks[0]);
-  }, [artist, playTrack]);
+    for (let i = 1; i < artist.topTracks.length; i++) {
+      const track = artist.topTracks[i];
+      const metadata: TrackMetadata = {
+        id: track.id,
+        type: (track.platform as TrackMetadata['type']) || 'audio',
+        trackName: track.title,
+        artistName: track.artist,
+        artworkUrl: track.artworkUrl || '',
+        url: track.url,
+        streamUrl: track.streamUrl || undefined,
+        feedId: track.id,
+      };
+      addToQueue(metadata);
+    }
+  }, [artist, playTrack, addToQueue]);
 
   if (loading) return <ArtistSpotlightSkeleton />;
   if (!artist) return null;

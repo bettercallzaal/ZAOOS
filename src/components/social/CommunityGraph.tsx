@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, Component, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 
 // Dynamically import force graph — cast to bypass complex generic mismatches
@@ -8,6 +8,35 @@ const ForceGraph2D = dynamic(
   () => import('react-force-graph-2d').then((mod) => mod.default) as Promise<React.ComponentType<Record<string, unknown>>>,
   { ssr: false, loading: () => null }
 ) as React.ComponentType<Record<string, unknown>>;
+
+/* ---------- Error Boundary ---------- */
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class GraphErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
 
 /* ---------- Types ---------- */
 
@@ -79,6 +108,8 @@ export function CommunityGraph() {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [forceGraphFailed] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [highlightedNodeId, setHighlightedNodeId] = useState<number | null>(null);
 
   // Image cache for canvas node rendering
   const imageCache = useRef<Map<string, HTMLImageElement>>(new Map());
@@ -197,16 +228,50 @@ export function CommunityGraph() {
     return set;
   }, [hoveredNode, graphData.links]);
 
+  // Search: find matching node
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setHighlightedNodeId(null);
+      return;
+    }
+    const q = searchQuery.toLowerCase();
+    const match = graphData.nodes.find(
+      (n) =>
+        n.name.toLowerCase().includes(q) ||
+        n.username.toLowerCase().includes(q)
+    );
+    setHighlightedNodeId(match ? match.id : null);
+  }, [searchQuery, graphData.nodes]);
+
+  // Average connections
+  const avgConnections = useMemo(() => {
+    if (graphData.nodes.length === 0) return 0;
+    const totalMutuals = graphData.nodes.reduce((sum, n) => sum + n.mutuals, 0);
+    return (totalMutuals / graphData.nodes.length).toFixed(1);
+  }, [graphData.nodes]);
+
   // Canvas node rendering with images
   const nodeCanvasObject = useCallback(
     (node: GraphNode & { x?: number; y?: number }, ctx: CanvasRenderingContext2D, globalScale: number) => {
-      const radius = node.val || 6;
+      const isHighlighted = highlightedNodeId === node.id;
+      const radius = isHighlighted ? (node.val || 6) * 1.5 : (node.val || 6);
       const x = node.x ?? 0;
       const y = node.y ?? 0;
 
-      // Dim non-neighbors on hover
-      const dimmed = neighborSet && !neighborSet.has(node.id);
+      // Dim non-neighbors on hover, or dim non-matching on search
+      const dimmedByHover = neighborSet && !neighborSet.has(node.id);
+      const dimmedBySearch = highlightedNodeId !== null && !isHighlighted;
+      const dimmed = dimmedByHover || dimmedBySearch;
       ctx.globalAlpha = dimmed ? 0.15 : 1;
+
+      // Gold ring for highlighted (search) node
+      if (isHighlighted) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius + 3, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#f5a623';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+      }
 
       // Draw circle
       const color = node.zid ? '#f5a623' : '#6b7280';
@@ -251,7 +316,7 @@ export function CommunityGraph() {
 
       ctx.globalAlpha = 1;
     },
-    [neighborSet]
+    [neighborSet, highlightedNodeId]
   );
 
   const nodePointerAreaPaint = useCallback(
@@ -321,6 +386,9 @@ export function CommunityGraph() {
           <span>
             <span className="text-white font-medium">{stats.density}%</span> density
           </span>
+          <span>
+            <span className="text-white font-medium">{avgConnections}</span> avg connections
+          </span>
         </div>
       )}
 
@@ -337,12 +405,43 @@ export function CommunityGraph() {
         <span>Size = engagement</span>
       </div>
 
+      {/* Search input */}
+      <div className="px-4">
+        <div className="relative max-w-xs">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search members..."
+            className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50 transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs"
+            >
+              X
+            </button>
+          )}
+        </div>
+        {searchQuery && highlightedNodeId === null && (
+          <p className="text-xs text-gray-500 mt-1">No matching member found</p>
+        )}
+      </div>
+
       {/* Graph container */}
       <div
         ref={containerRef}
         className="relative w-full bg-[#0a1628] rounded-xl overflow-hidden border border-gray-800"
         style={{ height: 500 }}
       >
+        <GraphErrorBoundary
+          fallback={
+            <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+              Graph visualization encountered an error. Please refresh the page.
+            </div>
+          }
+        >
         {!forceGraphFailed ? (
           <ForceGraph2D
             ref={graphRef}
@@ -375,63 +474,105 @@ export function CommunityGraph() {
             Graph visualization unavailable
           </div>
         )}
+        </GraphErrorBoundary>
+
+        {/* Zoom controls */}
+        <div className="absolute bottom-3 right-3 flex flex-col gap-1 z-40">
+          <button
+            onClick={() => graphRef.current?.zoom?.(graphRef.current.zoom() * 1.4, 300)}
+            className="w-8 h-8 bg-[#0d1b2a]/90 border border-gray-700 rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-sm font-bold transition-colors"
+            title="Zoom in"
+          >
+            +
+          </button>
+          <button
+            onClick={() => graphRef.current?.zoom?.(graphRef.current.zoom() * 0.6, 300)}
+            className="w-8 h-8 bg-[#0d1b2a]/90 border border-gray-700 rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-sm font-bold transition-colors"
+            title="Zoom out"
+          >
+            -
+          </button>
+          <button
+            onClick={() => graphRef.current?.zoomToFit?.(400, 40)}
+            className="w-8 h-8 bg-[#0d1b2a]/90 border border-gray-700 rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-xs transition-colors"
+            title="Reset / fit all"
+          >
+            &#x27F3;
+          </button>
+        </div>
 
         {/* Click tooltip / popup */}
         {selectedNode && (
           <div
-            className="absolute z-50 bg-[#0d1b2a] border border-[#f5a623]/30 rounded-xl p-4 shadow-lg w-64"
+            className="absolute z-50 bg-[#0d1b2a] border border-[#f5a623]/30 rounded-xl p-4 shadow-lg w-72"
             style={{
               left: Math.min(
                 tooltipPos.x - (containerRef.current?.getBoundingClientRect().left ?? 0),
-                dimensions.width - 270
+                dimensions.width - 290
               ),
               top: Math.min(
                 tooltipPos.y - (containerRef.current?.getBoundingClientRect().top ?? 0) + 10,
-                dimensions.height - 200
+                dimensions.height - 260
               ),
             }}
           >
             <button
               onClick={() => setSelectedNode(null)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-white text-xs"
+              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-md text-gray-500 hover:text-white hover:bg-gray-700/50 text-sm transition-colors"
+              aria-label="Close"
             >
-              x
+              X
             </button>
             <div className="flex items-center gap-3 mb-3">
               {selectedNode.pfpUrl ? (
                 <img
                   src={selectedNode.pfpUrl}
                   alt={selectedNode.name}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-12 h-12 rounded-full object-cover ring-2 ring-[#f5a623]/30"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-gray-700" />
+                <div className="w-12 h-12 rounded-full bg-gray-700 ring-2 ring-gray-600" />
               )}
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-white truncate">{selectedNode.name}</p>
                 <p className="text-xs text-gray-500">@{selectedNode.username}</p>
+                {selectedNode.zid && (
+                  <span className="inline-block mt-0.5 text-[10px] font-medium text-[#f5a623] bg-[#f5a623]/10 px-1.5 py-0.5 rounded">
+                    ZID #{selectedNode.zid}
+                  </span>
+                )}
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2 text-center text-xs mb-3">
-              <div>
+              <div className="bg-[#0a1628] rounded-lg py-1.5">
                 <p className="font-bold text-white">{selectedNode.followerCount.toLocaleString()}</p>
                 <p className="text-gray-500">Followers</p>
               </div>
-              <div>
+              <div className="bg-[#0a1628] rounded-lg py-1.5">
                 <p className="font-bold text-green-400">{selectedNode.mutuals}</p>
                 <p className="text-gray-500">Mutuals</p>
               </div>
-              <div>
+              <div className="bg-[#0a1628] rounded-lg py-1.5">
                 <p className="font-bold text-[#f5a623]">{selectedNode.engagement.toFixed(4)}</p>
                 <p className="text-gray-500">Engagement</p>
               </div>
             </div>
-            <a
-              href={`/members/${selectedNode.username}`}
-              className="block text-center text-xs bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 rounded-lg py-1.5 transition-colors"
-            >
-              View Profile
-            </a>
+            <div className="flex gap-2">
+              <a
+                href={`/members/${selectedNode.username}`}
+                className="flex-1 block text-center text-xs font-medium bg-[#f5a623] text-[#0a1628] hover:bg-[#f5a623]/90 rounded-lg py-2 transition-colors"
+              >
+                View Profile
+              </a>
+              <a
+                href={`https://warpcast.com/${selectedNode.username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 block text-center text-xs font-medium bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 rounded-lg py-2 transition-colors"
+              >
+                View on Farcaster
+              </a>
+            </div>
           </div>
         )}
       </div>

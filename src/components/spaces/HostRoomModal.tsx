@@ -2,8 +2,25 @@
 
 import { useState } from 'react';
 import { TokenGateSection, type GateConfig } from './TokenGateSection';
+import { communityConfig } from '../../../community.config';
+import type { AudioProvider } from '@/lib/spaces/roomsDb';
 
 export type RoomTheme = 'default' | 'music' | 'podcast' | 'ama' | 'chill';
+
+const PROVIDERS: { id: AudioProvider; label: string; description: string; badge: string }[] = [
+  {
+    id: 'stream',
+    label: 'Stream.io',
+    description: 'HiFi music mode, native RTMP multistream',
+    badge: '🎵',
+  },
+  {
+    id: '100ms',
+    label: '100ms',
+    description: 'Live transcription, best for fractal meetings',
+    badge: '🎙️',
+  },
+];
 
 interface ThemeOption {
   id: RoomTheme;
@@ -54,13 +71,20 @@ const THEMES: ThemeOption[] = [
 interface HostRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateRoom: (title: string, description: string, theme: RoomTheme, gateConfig?: GateConfig | null) => Promise<void>;
+  onCreateRoom: (
+    title: string,
+    description: string,
+    theme: RoomTheme,
+    gateConfig?: GateConfig | null,
+    provider?: AudioProvider
+  ) => Promise<void>;
 }
 
 export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [theme, setTheme] = useState<RoomTheme>('default');
+  const [provider, setProvider] = useState<AudioProvider>(communityConfig.audioProvider ?? 'stream');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [titleTouched, setTitleTouched] = useState(false);
@@ -78,7 +102,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
     setLoading(true);
     setError(null);
     try {
-      await onCreateRoom(title.trim(), description.trim(), theme, gateConfig);
+      await onCreateRoom(title.trim(), description.trim(), theme, gateConfig, provider);
       setTitle('');
       setDescription('');
       setTheme('default');
@@ -193,6 +217,35 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
 
           {/* Token Gate */}
           <TokenGateSection value={gateConfig} onChange={setGateConfig} disabled={loading} />
+
+          {/* Audio Provider */}
+          <div className="mb-5">
+            <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
+              Audio Provider
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {PROVIDERS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setProvider(p.id)}
+                  disabled={loading}
+                  className={`flex flex-col gap-1 px-3 py-3 rounded-xl border text-left text-sm transition-all ${
+                    provider === p.id
+                      ? 'border-[#f5a623] bg-[#f5a623]/10 text-white'
+                      : 'border-gray-700/50 bg-[#0a1628] text-gray-400 hover:border-gray-600'
+                  }`}
+                >
+                  <span className="text-base">{p.badge}</span>
+                  <span className="font-semibold text-white">{p.label}</span>
+                  <span className="text-xs text-gray-500 leading-tight">{p.description}</span>
+                </button>
+              ))}
+            </div>
+            <p className="text-gray-600 text-xs mt-1.5">
+              {provider === 'stream' ? '🎵 Best for music rooms — HiFi stereo mode, native multistream' : '🎙️ Best for fractal meetings — live transcription included'}
+            </p>
+          </div>
 
           {/* Broadcast to section */}
           <div className="mb-6">

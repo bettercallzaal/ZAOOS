@@ -24,6 +24,8 @@ const CreateRoomSchema = z.object({
   description: z.string().max(500).optional().default(''),
   streamCallId: z.string().min(1),
   gate_config: GateConfigSchema.optional(),
+  /** Audio provider: 'stream' (default) or '100ms' */
+  provider: z.enum(['stream', '100ms']).optional().default('stream'),
 });
 
 export async function POST(req: NextRequest) {
@@ -48,6 +50,7 @@ export async function POST(req: NextRequest) {
       hostPfp: session.pfpUrl,
       streamCallId: parsed.data.streamCallId,
       gateConfig: parsed.data.gate_config || undefined,
+      provider: parsed.data.provider,
     });
 
     // Fire-and-forget: set Twitch channel title + category

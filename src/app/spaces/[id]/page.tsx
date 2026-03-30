@@ -11,6 +11,7 @@ import { createStreamUser, createGuestUser } from '@/lib/spaces/streamHelpers';
 import { RoomView } from '@/components/spaces/RoomView';
 import { EditRoomModal } from '@/components/spaces/EditRoomModal';
 import { TwitchStreamInfo } from '@/components/spaces/TwitchStreamInfo';
+import { AudioRoomAdapter } from '@/components/spaces/AudioRoomAdapter';
 import type { Room } from '@/lib/spaces/roomsDb';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY || '';
@@ -219,6 +220,19 @@ export default function PublicRoomPage() {
             Back to Spaces
           </button>
         </div>
+      </div>
+    );
+  }
+
+  // 100ms rooms render via the AudioRoomAdapter — skip Stream.io initialization
+  if (room?.provider === '100ms') {
+    return (
+      <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col">
+        <AudioRoomAdapter
+          room={room}
+          user={user}
+          onLeave={handleLeave}
+        />
       </div>
     );
   }

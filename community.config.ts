@@ -54,6 +54,12 @@ export const communityConfig = {
     { id: 'coworking', name: 'Coworking', emoji: '🏢', description: 'Silent cowork with ambient presence' },
   ],
 
+  // ── Audio Provider ───────────────────────────────────────────
+  // Default audio provider for Spaces. Can be overridden per-room.
+  // 'stream' — Stream.io (HiFi music mode, native RTMP multistream)
+  // '100ms'  — 100ms (built-in transcription, best for fractal meetings)
+  audioProvider: 'stream' as 'stream' | '100ms',
+
   // ── Respect Contracts (Optimism) ──────────────────────────────
   /** On-chain reputation tokens — used for weighted voting and curation.
    *  If your community doesn't have on-chain tokens, leave these as-is;

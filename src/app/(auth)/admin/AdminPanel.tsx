@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/navigation/PageHeader';
 import { SyncRespectButton } from '@/components/admin/SyncRespectButton';
 import { ImportRespectButton } from '@/components/admin/ImportRespectButton';
 
-const ExportButton = dynamic(() => import('@/components/admin/ExportButton').then(m => ({ default: m.ExportButton })), { ssr: false });
+const ExportButton = dynamic(() => import('@/components/admin/ExportButton'), { ssr: false });
 
 const AllowlistTable = dynamic(() => import('@/components/admin/AllowlistTable').then(m => ({ default: m.AllowlistTable })), { ssr: false });
 const UsersTable = dynamic(() => import('@/components/admin/UsersTable').then(m => ({ default: m.UsersTable })), { ssr: false });
@@ -18,9 +18,9 @@ const RespectOverview = dynamic(() => import('@/components/admin/RespectOverview
 const PollConfigEditor = dynamic(() => import('@/components/admin/PollConfigEditor').then(m => ({ default: m.PollConfigEditor })), { ssr: false });
 const DiscordLinkManager = dynamic(() => import('@/components/admin/DiscordLinkManager').then(m => ({ default: m.DiscordLinkManager })), { ssr: false });
 const EngagementOverview = dynamic(() => import('@/components/admin/EngagementOverview').then(m => ({ default: m.EngagementOverview })), { ssr: false });
-const AuditLog = dynamic(() => import('@/components/admin/AuditLog').then(m => ({ default: m.AuditLog })), { ssr: false });
-const QuickStats = dynamic(() => import('@/components/admin/QuickStats').then(m => ({ default: m.QuickStats })), { ssr: false });
-const OnboardingFunnel = dynamic(() => import('@/components/admin/OnboardingFunnel').then(m => ({ default: m.OnboardingFunnel })), { ssr: false });
+const AuditLog = dynamic(() => import('@/components/admin/AuditLog'), { ssr: false });
+const QuickStats = dynamic(() => import('@/components/admin/QuickStats'), { ssr: false });
+const OnboardingFunnel = dynamic(() => import('@/components/admin/OnboardingFunnel'), { ssr: false });
 const DormantMembers = dynamic(() => import('@/components/admin/DormantMembers').then(m => ({ default: m.DormantMembers })), { ssr: false });
 
 type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls' | 'discord' | 'engagement' | 'audit' | 'funnel' | 'dormant';

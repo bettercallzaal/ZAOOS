@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **155+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **165+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -16,7 +16,7 @@
 | [AI Agent & Intelligence](./_categories/ai-agent.md) | 6 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents, live room AI |
 | [Cross-Platform Publishing](./_categories/cross-platform.md) | 12 | Farcaster, X, Bluesky, Lens, Hive, Mastodon, Threads, Nostr, Reddit |
 | [Technical Infrastructure](./_categories/infrastructure.md) | 9 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming features |
-| [APIs & External Services](./_categories/apis.md) | 7 | 1,400+ APIs mapped, Alchemy, Coinflow, free tier maximization |
+| [APIs & External Services](./_categories/apis.md) | 8 | 1,400+ APIs mapped, Alchemy, Coinflow, free tier maximization, 30+ zero-cost integrations |
 | [WaveWarZ Integration](./_categories/wavewarz.md) | 6 | Solana prediction markets, artist pipeline, battle mechanics |
 | [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |
 | [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 23 | Claude Code skills, Paperclip agents, autoresearch, git branching |

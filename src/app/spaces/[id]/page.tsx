@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { createStreamUser, createGuestUser } from '@/lib/spaces/streamHelpers';
 import { RoomView } from '@/components/spaces/RoomView';
 import { EditRoomModal } from '@/components/spaces/EditRoomModal';
+import { TwitchStreamInfo } from '@/components/spaces/TwitchStreamInfo';
 import type { Room } from '@/lib/spaces/roomsDb';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY || '';
@@ -209,6 +210,7 @@ export default function PublicRoomPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {isHost && <TwitchStreamInfo />}
           {!user && (
             <Link
               href="/"

@@ -88,6 +88,18 @@ export async function POST(req: NextRequest) {
       if (!targetFid) {
         return NextResponse.json({ error: 'targetFid required' }, { status: 400 });
       }
+
+      // Only the room host can invite or dismiss
+      const { data: room } = await db
+        .from('rooms')
+        .select('host_fid')
+        .eq('id', roomId)
+        .single();
+
+      if (!room || room.host_fid !== session.fid) {
+        return NextResponse.json({ error: 'Only the host can invite or dismiss' }, { status: 403 });
+      }
+
       await db
         .from('room_hand_raises')
         .update({ status: action === 'invite' ? 'invited' : 'dismissed' })

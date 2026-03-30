@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
 import { checkTokenGate, type TokenGateConfig } from '@/lib/spaces/tokenGate';
 import { logger } from '@/lib/logger';
 
@@ -16,6 +17,11 @@ const GateCheckSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionData();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const parsed = GateCheckSchema.safeParse(body);
     if (!parsed.success) {

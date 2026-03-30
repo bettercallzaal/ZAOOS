@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getSessionData } from '@/lib/auth/session';
 import { getPastRooms } from '@/lib/spaces/roomsDb';
 import { logger } from '@/lib/logger';
 
@@ -9,6 +10,11 @@ const QuerySchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getSessionData();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const url = new URL(req.url);
     const parsed = QuerySchema.safeParse({ days: url.searchParams.get('days') ?? 7 });
     const days = parsed.success ? parsed.data.days : 7;

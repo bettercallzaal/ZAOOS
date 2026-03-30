@@ -56,6 +56,11 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getSessionData();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const roomId = req.nextUrl.searchParams.get('roomId');
     if (!roomId) {
       return NextResponse.json({ error: 'roomId required' }, { status: 400 });

@@ -16,6 +16,11 @@ const CreateScheduledSchema = z.object({
 
 export async function GET() {
   try {
+    const session = await getSessionData();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { data, error } = await supabaseAdmin
       .from('scheduled_rooms')
       .select('*')

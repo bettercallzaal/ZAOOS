@@ -27,19 +27,16 @@ export async function POST(
       throw rsvpError;
     }
 
-    // Increment RSVP count
-    const { data: room } = await supabaseAdmin
-      .from('scheduled_rooms')
-      .select('rsvp_count')
-      .eq('id', id)
-      .single();
+    // Recount RSVPs atomically from the source-of-truth table
+    const { count } = await supabaseAdmin
+      .from('room_rsvps')
+      .select('*', { count: 'exact', head: true })
+      .eq('scheduled_room_id', id);
 
-    if (room) {
-      await supabaseAdmin
-        .from('scheduled_rooms')
-        .update({ rsvp_count: (room.rsvp_count || 0) + 1 })
-        .eq('id', id);
-    }
+    await supabaseAdmin
+      .from('scheduled_rooms')
+      .update({ rsvp_count: count ?? 0 })
+      .eq('id', id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -68,19 +65,16 @@ export async function DELETE(
 
     if (error) throw error;
 
-    // Decrement count
-    const { data: room } = await supabaseAdmin
-      .from('scheduled_rooms')
-      .select('rsvp_count')
-      .eq('id', id)
-      .single();
+    // Recount RSVPs atomically from the source-of-truth table
+    const { count } = await supabaseAdmin
+      .from('room_rsvps')
+      .select('*', { count: 'exact', head: true })
+      .eq('scheduled_room_id', id);
 
-    if (room && (room.rsvp_count || 0) > 0) {
-      await supabaseAdmin
-        .from('scheduled_rooms')
-        .update({ rsvp_count: room.rsvp_count - 1 })
-        .eq('id', id);
-    }
+    await supabaseAdmin
+      .from('scheduled_rooms')
+      .update({ rsvp_count: count ?? 0 })
+      .eq('id', id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

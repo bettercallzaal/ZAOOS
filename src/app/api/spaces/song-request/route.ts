@@ -123,6 +123,27 @@ export async function PATCH(req: NextRequest) {
     const { requestId, status } = parsed.data;
     const db = getSupabaseAdmin();
 
+    // Look up the song request to find its room, then verify the caller is the host
+    const { data: songReq } = await db
+      .from('song_requests')
+      .select('room_id')
+      .eq('id', requestId)
+      .single();
+
+    if (!songReq) {
+      return NextResponse.json({ error: 'Song request not found' }, { status: 404 });
+    }
+
+    const { data: room } = await db
+      .from('rooms')
+      .select('host_fid')
+      .eq('id', songReq.room_id)
+      .single();
+
+    if (!room || room.host_fid !== session.fid) {
+      return NextResponse.json({ error: 'Only the host can accept or reject requests' }, { status: 403 });
+    }
+
     const { data, error } = await db
       .from('song_requests')
       .update({ status })

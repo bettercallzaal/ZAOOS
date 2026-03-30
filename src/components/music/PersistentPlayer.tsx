@@ -202,7 +202,7 @@ export function PersistentPlayer({
           </motion.div>
           {/* Progress ring — circle around artwork */}
           {duration > 0 && (
-            <svg className="absolute -inset-1 w-[48px] h-[48px] -rotate-90 pointer-events-none" viewBox="0 0 48 48">
+            <svg className="absolute -inset-1 w-[48px] h-[48px] -rotate-90 pointer-events-none z-10" viewBox="0 0 48 48">
               <circle cx="24" cy="24" r="22" fill="none" stroke="rgba(245,166,35,0.15)" strokeWidth="2.5" />
               <circle
                 cx="24" cy="24" r="22"

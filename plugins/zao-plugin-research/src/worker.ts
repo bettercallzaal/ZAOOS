@@ -89,9 +89,9 @@ function searchDocs(
 }
 
 const plugin = definePlugin({
-  async setup(ctx: any) {
-    const config = ctx.config ?? {};
-    if (config.researchDir) {
+  async setup(ctx) {
+    const config = (await ctx.config.get()) as Record<string, unknown>;
+    if (typeof config.researchDir === 'string') {
       researchDir = config.researchDir;
     }
 

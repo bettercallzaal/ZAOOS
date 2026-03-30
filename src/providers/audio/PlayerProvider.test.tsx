@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { PlayerProvider, usePlayer, usePlayerContext } from './PlayerProvider';
 import type { PlayerAction } from './PlayerProvider';
@@ -34,7 +34,6 @@ vi.stubGlobal('MediaMetadata', class MediaMetadata {
 });
 
 // Mock navigator.mediaSession
-const mockSetMetadata = vi.fn();
 const mockSetActionHandler = vi.fn();
 const mockSetPositionState = vi.fn();
 const mockWakeLock = { request: vi.fn().mockResolvedValue({ release: vi.fn() }) };
@@ -111,7 +110,6 @@ describe('usePlayer actions', () => {
   });
 
   it('play() dispatches PLAY and registers controller', () => {
-    const mockController = { play: vi.fn(), pause: vi.fn(), seek: vi.fn(), load: vi.fn() };
     const { result } = renderHook(() => usePlayer(), { wrapper: Wrapper });
 
     // Register a mock controller

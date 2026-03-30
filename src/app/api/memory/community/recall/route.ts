@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const hindsight = await getHindsightClient();
     if (!hindsight) return NextResponse.json({ error: 'Hindsight not available' }, { status: 503 });
 
-    const results = await (hindsight as any).recall(COMMUNITY_BANK_ID, query, { limit });
+    const results = await hindsight.recall(COMMUNITY_BANK_ID, query, { limit });
 
     return NextResponse.json({
       memories: results.map((r: { content: string; score: number; metadata?: Record<string, unknown> }) => ({

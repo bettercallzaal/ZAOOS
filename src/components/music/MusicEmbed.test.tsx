@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { MusicEmbed } from './MusicEmbed';
-import { PlayerProvider, usePlayer } from '@/providers/audio';
+import { PlayerProvider } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
 import React from 'react';
 
@@ -46,7 +46,7 @@ vi.stubGlobal('MediaMetadata', class MediaMetadata {
 });
 
 // ─── Mock child components ─────────────────────────────────────────────────────
-vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="embed-artwork" /> }));
+vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="embed-artwork" alt="" /> }));
 vi.mock('./LikeButton', () => ({ LikeButton: () => <button>Like</button> }));
 vi.mock('./AddToPlaylistButton', () => ({ AddToPlaylistButton: () => <button>Add</button> }));
 vi.mock('./QueueActions', () => ({ QueueActions: () => <button>Queue</button> }));
@@ -103,8 +103,7 @@ describe('MusicEmbed', () => {
 
   it('renders loading skeleton while fetching metadata', () => {
     // Delay the fetch so we can catch the loading state
-    let resolve: (v: unknown) => void;
-    global.fetch = vi.fn(() => new Promise((r) => { resolve = r; })) as unknown as typeof fetch;
+    global.fetch = vi.fn(() => new Promise(() => {})) as unknown as typeof fetch;
 
     render(
       <TestWrapper>
@@ -359,11 +358,6 @@ describe('MusicEmbed — player state integration', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Blinding Lights')).toBeInTheDocument();
-    });
-
-    // Now simulate playing this track
-    const { result } = require('@testing-library/react').renderHook(() => usePlayer(), {
-      wrapper: ({ children }) => <PlayerProvider>{children}</PlayerProvider>,
     });
 
     // Note: we can't easily test the "isThisTrack" highlight in this setup

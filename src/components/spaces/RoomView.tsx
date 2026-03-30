@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 import { useRadio } from '@/hooks/useRadio';
-import { useMobile } from '@/hooks/useMobile';
 import { useAutoStreamMarker } from '@/hooks/useAutoStreamMarker';
 import { startBroadcast, stopTarget, stopAll, retryTarget, type BroadcastState, type BroadcastTarget } from '@/lib/spaces/rtmpManager';
 import { DescriptionPanel } from './DescriptionPanel';
@@ -59,7 +58,6 @@ export function RoomView({
   const [twitchInfo, setTwitchInfo] = useState<{ username: string; canSend: boolean } | null>(null);
   const call = useCall();
   const radio = useRadio();
-  const isMobile = useMobile();
 
   // Auto-create Twitch stream markers on track changes (host only)
   useAutoStreamMarker(isHost, !!twitchInfo);

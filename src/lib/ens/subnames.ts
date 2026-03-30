@@ -15,7 +15,6 @@ import {
   http,
   fallback,
   namehash,
-  encodeFunctionData,
   type Address,
   type Hex,
 } from 'viem';

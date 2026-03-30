@@ -396,7 +396,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
                 {/* Cover preview */}
                 {coverFile ? (
                   <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-800">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    { }
                     <img
                       src={URL.createObjectURL(coverFile)}
                       alt="Cover preview"

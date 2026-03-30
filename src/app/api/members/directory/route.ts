@@ -126,7 +126,7 @@ export async function GET(req: NextRequest) {
         break;
     }
 
-    const { data: users, error, count } = await query.range(offset, offset + limit - 1);
+    const { data: users, error } = await query.range(offset, offset + limit - 1);
     if (error) throw error;
 
     // Fetch respect data for these members

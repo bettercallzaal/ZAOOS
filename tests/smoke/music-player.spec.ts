@@ -77,7 +77,6 @@ test('music player shows track controls when track is active', async ({ page }) 
   // The PersistentPlayer renders in the layout on all authenticated pages.
   // Without a real track, it shows "ZAO Radio — tap to play".
   // We verify the player zone is present.
-  const playerZone = page.locator('[class*="persistent"], [class*="player"]').first();
   // Fall back to checking the page title
   await expect(page).toHaveTitle(/Music/);
 });

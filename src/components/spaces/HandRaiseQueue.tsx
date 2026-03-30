@@ -20,7 +20,7 @@ interface HandRaiseQueueProps {
   isHost: boolean;
 }
 
-export function HandRaiseQueue({ roomId, fid, username, pfpUrl, isHost }: HandRaiseQueueProps) {
+export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
   const [raises, setRaises] = useState<HandRaise[]>([]);
   const [myStatus, setMyStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

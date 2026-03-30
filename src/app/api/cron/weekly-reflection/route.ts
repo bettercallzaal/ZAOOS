@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { runWeeklyReflection, TASTE_REFLECT_PROMPT } from '@/lib/memory-recall';
+import { runWeeklyReflection } from '@/lib/memory-recall';
 
 const CRON_SECRET = process.env.CRON_SECRET;
 

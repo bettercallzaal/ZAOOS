@@ -8,7 +8,6 @@ import {
   buildMemberTextRecords,
   isValidSubname,
   sanitizeSubname,
-  getSubnameOwner,
 } from '@/lib/ens/subnames';
 
 const createSchema = z.object({

@@ -509,7 +509,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [pushToggling, setPushToggling] = useState(false);
 
   // Dark mode state
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [themeToggling, setThemeToggling] = useState(false);
 
   const toggleDarkMode = useCallback(() => {

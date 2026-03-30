@@ -86,10 +86,6 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
   const maxR = 36;
   const leftR = maxR;
   const rightR = maxR;
-  const overlap = Math.min(
-    maxR,
-    Math.max(8, (sharedFollowers / Math.max(1, Math.min(totalYours, totalTheirs))) * maxR * 2)
-  );
 
   return (
     <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4">

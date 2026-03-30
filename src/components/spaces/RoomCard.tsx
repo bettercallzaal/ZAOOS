@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import type { Room } from '@/lib/spaces/roomsDb';
 import type { RoomTheme } from './HostRoomModal';
 
 export type RoomProvider = 'stream' | '100ms';

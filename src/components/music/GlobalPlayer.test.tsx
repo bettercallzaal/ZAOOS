@@ -58,7 +58,7 @@ vi.stubGlobal('MediaMetadata', class MediaMetadata {
 
 // ─── Mock child components ─────────────────────────────────────────────────────
 vi.mock('./Scrubber', () => ({ Scrubber: () => <div data-testid="scrubber" /> }));
-vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="artwork" /> }));
+vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="artwork" alt="" /> }));
 vi.mock('./AddToPlaylistButton', () => ({ AddToPlaylistButton: () => <button>Add</button> }));
 vi.mock('./LikeButton', () => ({ LikeButton: () => <button>Like</button> }));
 vi.mock('./SleepTimerButton', () => ({ SleepTimerButton: () => <button>Timer</button> }));

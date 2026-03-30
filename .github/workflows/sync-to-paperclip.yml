@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Sync issue to Paperclip
-        run: node scripts/sync-issue-to-paperclip.js
+        run: node scripts/sync-issue-to-paperclip.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_API_KEY }}

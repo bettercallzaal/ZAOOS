@@ -10,9 +10,14 @@ const CommunityGraph = dynamic(() => import('./CommunityGraph').then(m => m.Comm
 const ConversationClusters = dynamic(() => import('./ConversationClusters').then(m => m.ConversationClusters), { ssr: false });
 const DiscoverPanel = dynamic(() => import('./DiscoverPanel').then(m => m.DiscoverPanel), { ssr: false });
 const SocialAnalytics = dynamic(() => import('./SocialAnalytics').then(m => m.SocialAnalytics), { ssr: false });
+const EngagementHeatmap = dynamic(() => import('./EngagementHeatmap').then(m => m.EngagementHeatmap), { ssr: false });
 import { CommunityStats } from './CommunityStats';
+import { CommunityMilestones } from './CommunityMilestones';
+import { CommunityLeaderboards } from './CommunityLeaderboards';
 import { WhosOnline } from './WhosOnline';
 import { CommunityActivityFeed } from './CommunityActivityFeed';
+import { MemberSpotlight } from './MemberSpotlight';
+import { MemberMap } from './MemberMap';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import { MiniSpaceBanner } from './MiniSpaceBanner';
@@ -239,10 +244,14 @@ export function SocialPage() {
         {/* Community Graph View */}
         {view === 'community' && (
           <div className="flex-1 overflow-y-auto">
+            <MemberSpotlight />
             <CommunityStats />
+            <CommunityMilestones />
+            <CommunityLeaderboards />
             <WhosOnline />
             <ConversationClusters />
             <CommunityActivityFeed />
+            <MemberMap />
             <CommunityGraph />
           </div>
         )}
@@ -251,6 +260,7 @@ export function SocialPage() {
         {view === 'analytics' && (
           <div className="flex-1 overflow-y-auto">
             <SocialAnalytics currentFid={user.fid} />
+            <EngagementHeatmap />
           </div>
         )}
 

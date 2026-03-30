@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 
 const DiscordIntro = dynamic(() => import('@/components/members/DiscordIntro'), { ssr: false });
 const DiscordActivity = dynamic(() => import('@/components/members/DiscordActivity'), { ssr: false });
+const NetworkComparison = dynamic(() => import('@/components/social/NetworkComparison'), { ssr: false });
 
 interface MemberProfile {
   fid: number | null;
@@ -450,6 +451,13 @@ export default function MemberProfilePage() {
           <div className="flex gap-4 mb-6 text-sm">
             <span><strong className="text-white">{p.social.followerCount.toLocaleString()}</strong> <span className="text-gray-500">followers</span></span>
             <span><strong className="text-white">{p.social.followingCount.toLocaleString()}</strong> <span className="text-gray-500">following</span></span>
+          </div>
+        )}
+
+        {/* Network comparison — show when viewing another member's profile */}
+        {p.fid && user && p.fid !== user.fid && (
+          <div className="mb-4">
+            <NetworkComparison targetFid={p.fid} targetUsername={p.username || ''} />
           </div>
         )}
 

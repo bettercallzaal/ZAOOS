@@ -7,6 +7,7 @@ import { FollowerCard, type FollowerUser } from './FollowerCard';
 import { FollowerSkeletonList } from './FollowerSkeleton';
 import dynamic from 'next/dynamic';
 const CommunityGraph = dynamic(() => import('./CommunityGraph').then(m => m.CommunityGraph), { ssr: false });
+const ConversationClusters = dynamic(() => import('./ConversationClusters').then(m => m.ConversationClusters), { ssr: false });
 const DiscoverPanel = dynamic(() => import('./DiscoverPanel').then(m => m.DiscoverPanel), { ssr: false });
 const SocialAnalytics = dynamic(() => import('./SocialAnalytics').then(m => m.SocialAnalytics), { ssr: false });
 import { NotificationBell } from '@/components/navigation/NotificationBell';
@@ -235,6 +236,7 @@ export function SocialPage() {
         {/* Community Graph View */}
         {view === 'community' && (
           <div className="flex-1 overflow-y-auto">
+            <ConversationClusters />
             <CommunityGraph />
           </div>
         )}

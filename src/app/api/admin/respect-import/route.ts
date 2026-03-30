@@ -89,6 +89,28 @@ function collectFieldNames(records: AirtableRecord[]): Set<string> {
   return names;
 }
 
+/** Safely extract a string from an Airtable field (handles arrays, numbers, nulls). */
+function asString(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value === 'string') return value.trim() || null;
+  if (Array.isArray(value)) {
+    // Linked records / lookups return arrays like ["0x123..."]
+    const first = value[0];
+    return typeof first === 'string' ? first.trim() || null : first != null ? String(first) : null;
+  }
+  if (typeof value === 'number') return String(value);
+  return String(value);
+}
+
+/** Safely extract a number from an Airtable field. */
+function asNumber(value: unknown): number {
+  if (value == null) return 0;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') return Number(value) || 0;
+  if (Array.isArray(value)) return asNumber(value[0]);
+  return 0;
+}
+
 // ─── Step 1: Import Wallet Data (run first so other steps can use it) ─
 
 async function importWallets(
@@ -101,8 +123,8 @@ async function importWallets(
   const walletField = findField(fields, ['ETH WALLET', 'Wallet', 'wallet_address', 'ETH WALLET (from Wallet Data 2)']);
 
   for (const r of records) {
-    const name = (r.fields[nameField] as string)?.trim();
-    const wallet = walletField ? (r.fields[walletField] as string)?.trim().toLowerCase() : null;
+    const name = asString(r.fields[nameField]);
+    const wallet = walletField ? asString(r.fields[walletField])?.toLowerCase() ?? null : null;
 
     if (name && wallet && wallet.startsWith('0x')) {
       walletMap.set(name, wallet);
@@ -122,7 +144,7 @@ async function importSummary(
   const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
 
   for (const r of records) {
-    const name = (r.fields[nameField] as string)?.trim();
+    const name = asString(r.fields[nameField]);
     if (!name) continue;
 
     const wallet = walletMap.get(name) || null;
@@ -216,11 +238,10 @@ async function importRespectSessions(
     // Collect scores for this session
     const scores: { name: string; wallet: string | null; score: number }[] = [];
     for (const r of records) {
-      const val = r.fields[col];
-      const score = typeof val === 'number' ? val : Number(val);
+      const score = asNumber(r.fields[col]);
       if (!score || score <= 0) continue;
 
-      const memberName = (r.fields[nameField] as string)?.trim();
+      const memberName = asString(r.fields[nameField]);
       if (!memberName) continue;
 
       scores.push({
@@ -302,10 +323,10 @@ async function importHosts(records: AirtableRecord[], stats: SyncStats) {
   const dateField = findField(fields, ['Date', 'date']);
 
   for (const r of records) {
-    const name = (r.fields[nameField] as string)?.trim();
+    const name = asString(r.fields[nameField]);
     if (!name) continue;
 
-    const amount = amountField ? Number(r.fields[amountField]) || 0 : 0;
+    const amount = amountField ? asNumber(r.fields[amountField]) : 0;
     if (amount === 0 && !countField) continue;
 
     // Check for duplicate
@@ -328,7 +349,7 @@ async function importHosts(records: AirtableRecord[], stats: SyncStats) {
         event_type: 'hosting',
         amount,
         description: 'Fractal hosting — synced from Airtable',
-        event_date: dateField ? (r.fields[dateField] as string) || null : null,
+        event_date: dateField ? asString(r.fields[dateField]) : null,
       });
     }
     stats.hosts++;
@@ -345,14 +366,14 @@ async function importFestivals(records: AirtableRecord[], stats: SyncStats) {
   const dateField = findField(fields, ['Date', 'date']);
 
   for (const r of records) {
-    const name = (r.fields[nameField] as string)?.trim();
+    const name = asString(r.fields[nameField]);
     if (!name) continue;
 
-    const amount = amountField ? Number(r.fields[amountField]) || 0 : 0;
+    const amount = amountField ? asNumber(r.fields[amountField]) : 0;
     if (amount === 0) continue;
 
     const description = descField
-      ? (r.fields[descField] as string)?.trim() || 'Festival respect'
+      ? asString(r.fields[descField]) || 'Festival respect'
       : 'Festival respect';
 
     // Deduplicate by name + type + amount
@@ -370,7 +391,7 @@ async function importFestivals(records: AirtableRecord[], stats: SyncStats) {
         event_type: 'festival',
         amount,
         description: `${description} — synced from Airtable`,
-        event_date: dateField ? (r.fields[dateField] as string) || null : null,
+        event_date: dateField ? asString(r.fields[dateField]) : null,
       });
     }
     stats.festivals++;
@@ -388,17 +409,17 @@ async function importMisc(records: AirtableRecord[], stats: SyncStats) {
   const dateField = findField(fields, ['Date', 'date']);
 
   for (const r of records) {
-    const name = (r.fields[nameField] as string)?.trim();
+    const name = asString(r.fields[nameField]);
     if (!name) continue;
 
-    const amount = amountField ? Number(r.fields[amountField]) || 0 : 0;
+    const amount = amountField ? asNumber(r.fields[amountField]) : 0;
     if (amount === 0) continue;
 
     const eventType = typeField
-      ? (r.fields[typeField] as string)?.trim().toLowerCase() || 'other'
+      ? asString(r.fields[typeField])?.toLowerCase() || 'other'
       : 'other';
     const description = descField
-      ? (r.fields[descField] as string)?.trim() || null
+      ? asString(r.fields[descField])
       : null;
 
     // Deduplicate
@@ -417,7 +438,7 @@ async function importMisc(records: AirtableRecord[], stats: SyncStats) {
         event_type: eventType,
         amount,
         description: description ? `${description} — synced from Airtable` : 'Misc — synced from Airtable',
-        event_date: dateField ? (r.fields[dateField] as string) || null : null,
+        event_date: dateField ? asString(r.fields[dateField]) : null,
       });
     }
     stats.misc++;
@@ -606,8 +627,8 @@ export async function POST() {
     if (summaryWalletField) {
       const summaryNameField = findField(summaryFields, ['Name', 'name', 'Member']) || 'Name';
       for (const r of summaryRecords) {
-        const name = (r.fields[summaryNameField] as string)?.trim();
-        const wallet = (r.fields[summaryWalletField] as string)?.trim().toLowerCase();
+        const name = asString(r.fields[summaryNameField]);
+        const wallet = asString(r.fields[summaryWalletField])?.toLowerCase() ?? null;
         if (name && wallet && wallet.startsWith('0x') && !walletMap.has(name)) {
           walletMap.set(name, wallet);
         }

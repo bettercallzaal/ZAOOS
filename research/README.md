@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **168+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **226+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -19,7 +19,7 @@
 | [APIs & External Services](./_categories/apis.md) | 9 | 1,400+ APIs mapped, Alchemy, Coinflow, payment infrastructure (Stripe/Coinbase/0xSplits), 30+ zero-cost integrations |
 | [WaveWarZ Integration](./_categories/wavewarz.md) | 6 | Solana prediction markets, artist pipeline, battle mechanics |
 | [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |
-| [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 23 | Claude Code skills, Paperclip agents, autoresearch, git branching |
+| [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 24 | Claude Code skills, Paperclip agents, autoresearch, git branching |
 | [Other (Ethereum, Docs, Reference)](./_categories/other.md) | 12 | Whitepaper, GitHub docs, reference repos, Ethereum alignment |
 
 ---
@@ -134,7 +134,7 @@
 
 ## Research Stats
 
-- **Total documents:** 166+
+- **Total documents:** 226+
 - **Total coverage:** ~500,000+ words
 - **Time span:** January — March 2026
 - **Categories:** 13

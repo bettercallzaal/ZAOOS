@@ -8,6 +8,7 @@ import '@stream-io/video-react-sdk/dist/css/styles.css';
 import { useAuth } from '@/hooks/useAuth';
 import { createStreamUser, createGuestUser } from '@/lib/spaces/streamHelpers';
 import { RoomView } from '@/components/spaces/RoomView';
+import { EditRoomModal } from '@/components/spaces/EditRoomModal';
 import type { Room } from '@/lib/spaces/roomsDb';
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY || '';
@@ -173,13 +174,38 @@ export default function PublicRoomPage() {
 
   if (!client || !call || !room) return null;
 
+  const [showEdit, setShowEdit] = useState(false);
+
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col">
+      {showEdit && room && (
+        <EditRoomModal
+          roomId={room.id}
+          currentTitle={room.title}
+          currentDescription={room.description || ''}
+          currentTheme={room.theme || 'default'}
+          onClose={() => setShowEdit(false)}
+          onSaved={(updated) => setRoom(prev => prev ? { ...prev, ...updated } : prev)}
+        />
+      )}
       <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex items-center justify-between">
-        <div>
-          <h1 className="text-white font-bold">{room.title}</h1>
-          {room.description && (
-            <p className="text-gray-400 text-xs">{room.description}</p>
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="min-w-0">
+            <h1 className="text-white font-bold truncate">{room.title}</h1>
+            {room.description && (
+              <p className="text-gray-400 text-xs truncate">{room.description}</p>
+            )}
+          </div>
+          {isHost && (
+            <button
+              onClick={() => setShowEdit(true)}
+              className="p-1.5 text-gray-500 hover:text-[#f5a623] transition-colors flex-shrink-0"
+              aria-label="Edit room"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+              </svg>
+            </button>
           )}
         </div>
         <div className="flex items-center gap-2">

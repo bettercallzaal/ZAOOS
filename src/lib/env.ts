@@ -61,6 +61,12 @@ export const ENV = {
   // Discord webhook (cross-posting to Discord channel)
   DISCORD_WEBHOOK_URL: optionalEnv('DISCORD_WEBHOOK_URL'),
 
+  // Threads (Meta Graph API — requires approved Meta Business App)
+  THREADS_APP_ID: optionalEnv('THREADS_APP_ID'),
+  THREADS_APP_SECRET: optionalEnv('THREADS_APP_SECRET'),
+  THREADS_ACCESS_TOKEN: optionalEnv('THREADS_ACCESS_TOKEN'),
+  THREADS_USER_ID: optionalEnv('THREADS_USER_ID'),
+
   // ENS NameWrapper — dedicated operator wallet (NOT the thezao.eth owner)
   // Generate with: npx tsx scripts/generate-ens-operator.ts
   // Then approve as operator on app.ens.domains

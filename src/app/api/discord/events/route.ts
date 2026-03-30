@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * Day-of-week helpers for calculating next occurrence.
@@ -94,7 +95,7 @@ export async function GET() {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('[discord/events] Supabase error:', error);
+      logger.error('[discord/events] Supabase error:', error);
       return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
     }
 
@@ -133,7 +134,7 @@ export async function GET() {
 
     return NextResponse.json({ events: enriched });
   } catch (err) {
-    console.error('[discord/events] Error:', err);
+    logger.error('[discord/events] Error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

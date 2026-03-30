@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(500).default(50),
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
       headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=30' },
     });
   } catch (err) {
-    console.error('Fractal sessions error:', err);
+    logger.error('Fractal sessions error:', err);
     return NextResponse.json({ error: 'Failed to load sessions' }, { status: 500 });
   }
 }

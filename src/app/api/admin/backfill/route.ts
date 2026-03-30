@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 const headers = () => ({
@@ -66,7 +67,7 @@ export async function POST() {
       );
 
       if (!res.ok) {
-        console.error(`Neynar bulk-by-address error: ${res.status}`);
+        logger.error(`Neynar bulk-by-address error: ${res.status}`);
         for (const e of batch) {
           results.push({ id: e.id, ign: e.ign, status: `neynar_error_${res.status}` });
         }
@@ -112,7 +113,7 @@ export async function POST() {
         }
       }
     } catch (err) {
-      console.error('Backfill batch error:', err);
+      logger.error('Backfill batch error:', err);
       for (const e of batch) {
         results.push({ id: e.id, ign: e.ign, status: 'error' });
       }

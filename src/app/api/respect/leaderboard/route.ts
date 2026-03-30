@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { fetchLeaderboard } from '@/lib/respect/leaderboard';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   const session = await getSessionData();
@@ -96,7 +97,7 @@ export async function GET() {
       currentWallet: session.walletAddress || null,
     }, { headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120' } });
   } catch (err) {
-    console.error('Respect leaderboard error:', err);
+    logger.error('Respect leaderboard error:', err);
     return NextResponse.json({ error: 'Failed to load respect data' }, { status: 500 });
   }
 }

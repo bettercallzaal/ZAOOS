@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
     const { data: assets, error } = await query;
 
     if (error) {
-      console.error('[music/permaweb] Error:', error);
+      logger.error('[music/permaweb] Error:', error);
       return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
     }
 
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest) {
       headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' },
     });
   } catch (error) {
-    console.error('[music/permaweb] Error:', error);
+    logger.error('[music/permaweb] Error:', error);
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/social/growth?fid=123&days=30
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
       .order('snapshot_date', { ascending: true });
 
     if (error) {
-      console.error('Growth query error:', error);
+      logger.error('Growth query error:', error);
       return NextResponse.json(
         { error: 'Failed to fetch growth data' },
         { status: 500 }
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
       headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=30' },
     });
   } catch (err) {
-    console.error('Growth route error:', err);
+    logger.error('Growth route error:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -29,7 +30,7 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (usersErr) {
-      console.error('[discord-link] Users query error:', usersErr);
+      logger.error('[discord-link] Users query error:', usersErr);
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 
@@ -39,7 +40,7 @@ export async function GET() {
       .select('discord_id');
 
     if (introsErr) {
-      console.error('[discord-link] Intros query error:', introsErr);
+      logger.error('[discord-link] Intros query error:', introsErr);
     }
 
     // Fetch proposal counts per discord_id
@@ -48,7 +49,7 @@ export async function GET() {
       .select('author_id');
 
     if (proposalsErr) {
-      console.error('[discord-link] Proposals query error:', proposalsErr);
+      logger.error('[discord-link] Proposals query error:', proposalsErr);
     }
 
     // Fetch vote counts per discord_id
@@ -57,7 +58,7 @@ export async function GET() {
       .select('voter_id');
 
     if (votesErr) {
-      console.error('[discord-link] Votes query error:', votesErr);
+      logger.error('[discord-link] Votes query error:', votesErr);
     }
 
     // Build lookup maps
@@ -95,7 +96,7 @@ export async function GET() {
       },
     });
   } catch (err) {
-    console.error('[discord-link] GET error:', err);
+    logger.error('[discord-link] GET error:', err);
     return NextResponse.json({ error: 'Failed to fetch discord link data' }, { status: 500 });
   }
 }
@@ -148,7 +149,7 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error('[discord-link] PATCH error:', error);
+      logger.error('[discord-link] PATCH error:', error);
       return NextResponse.json({ error: 'Failed to update discord link' }, { status: 500 });
     }
 
@@ -167,7 +168,7 @@ export async function PATCH(req: NextRequest) {
       user: data,
     });
   } catch (err) {
-    console.error('[discord-link] PATCH error:', err);
+    logger.error('[discord-link] PATCH error:', err);
     return NextResponse.json({ error: 'Failed to update discord link' }, { status: 500 });
   }
 }
@@ -234,7 +235,7 @@ export async function POST(req: NextRequest) {
       .eq('is_active', true);
 
     if (usersErr) {
-      console.error('[discord-link] POST users error:', usersErr);
+      logger.error('[discord-link] POST users error:', usersErr);
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 
@@ -341,7 +342,7 @@ export async function POST(req: NextRequest) {
       total: (users || []).length,
     });
   } catch (err) {
-    console.error('[discord-link] POST error:', err);
+    logger.error('[discord-link] POST error:', err);
     return NextResponse.json({ error: 'Bulk link failed' }, { status: 500 });
   }
 }

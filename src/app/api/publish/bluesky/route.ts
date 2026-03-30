@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { normalizeForBluesky } from '@/lib/publish/normalize';
 import { publishToBluesky, isBlueskyConfigured } from '@/lib/publish/bluesky';
+import { logger } from '@/lib/logger';
 
 const publishBlueskySchema = z.object({
   castHash: z.string().min(1),
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, platformUrl: result.postUrl });
   } catch (err) {
-    console.error('[publish/bluesky] Error:', err);
+    logger.error('[publish/bluesky] Error:', err);
     const message = err instanceof Error ? err.message : 'Failed to publish to Bluesky';
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }

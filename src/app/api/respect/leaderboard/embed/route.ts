@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { fetchLeaderboard, type RespectEntry } from '@/lib/respect/leaderboard';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
       { headers: CORS_HEADERS }
     );
   } catch (err) {
-    console.error('Embed leaderboard error:', err);
+    logger.error('Embed leaderboard error:', err);
     return NextResponse.json(
       { error: 'Failed to load leaderboard data' },
       { status: 500, headers: CORS_HEADERS }

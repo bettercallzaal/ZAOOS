@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSession } from '@/lib/auth/session'
 import { getSupabaseAdmin } from '@/lib/db/supabase'
+import { logger } from '@/lib/logger';
 
 const HistorySchema = z.object({
   period: z.enum(['today', 'week', 'month', 'all']).default('week'),
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
     const { data, count, error } = await query
 
     if (error) {
-      console.error('History query error:', error)
+      logger.error('History query error:', error)
       return NextResponse.json({ error: 'Failed to fetch history' }, { status: 500 })
     }
 
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
       hasMore: (offset + limit) < (count ?? 0),
     })
   } catch (error) {
-    console.error('History error:', error)
+    logger.error('History error:', error)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }

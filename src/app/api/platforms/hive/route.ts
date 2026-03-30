@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { encryptPostingKey, getHiveClient } from '@/lib/publish/hive';
+import { logger } from '@/lib/logger';
 
 const connectSchema = z.object({
   username: z.string().min(1).max(16),
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
       .eq('fid', session.fid);
 
     if (updateError) {
-      console.error('[platforms/hive] Update error:', updateError);
+      logger.error('[platforms/hive] Update error:', updateError);
       return NextResponse.json(
         { error: 'Failed to save Hive credentials' },
         { status: 500 },
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
       username,
     });
   } catch (err) {
-    console.error('[platforms/hive] Connect error:', err);
+    logger.error('[platforms/hive] Connect error:', err);
     return NextResponse.json(
       { error: 'Failed to connect Hive account' },
       { status: 500 },
@@ -105,7 +106,7 @@ export async function DELETE() {
       .eq('fid', session.fid);
 
     if (updateError) {
-      console.error('[platforms/hive] Delete error:', updateError);
+      logger.error('[platforms/hive] Delete error:', updateError);
       return NextResponse.json(
         { error: 'Failed to disconnect Hive account' },
         { status: 500 },
@@ -114,7 +115,7 @@ export async function DELETE() {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[platforms/hive] Disconnect error:', err);
+    logger.error('[platforms/hive] Disconnect error:', err);
     return NextResponse.json(
       { error: 'Failed to disconnect Hive account' },
       { status: 500 },

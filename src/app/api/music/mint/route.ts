@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { uploadToArweave, buildMusicTags, isArweaveConfigured } from '@/lib/music/arweave';
 import type { LicensePreset } from '@/lib/music/arweave';
+import { logger } from '@/lib/logger';
 
 const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/flac', 'audio/ogg', 'audio/aac'];
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -116,7 +117,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (dbError) {
-      console.error('[music/mint] DB error:', dbError);
+      logger.error('[music/mint] DB error:', dbError);
     }
 
     return NextResponse.json({
@@ -131,7 +132,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[music/mint] Error:', error);
+    logger.error('[music/mint] Error:', error);
     const message = error instanceof Error ? error.message : 'Mint failed';
     return NextResponse.json({ error: message }, { status: 500 });
   }

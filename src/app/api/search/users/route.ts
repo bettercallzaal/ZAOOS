@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { searchUsers } from '@/lib/farcaster/neynar';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ users });
   } catch (error) {
-    console.error('User search error:', error);
+    logger.error('User search error:', error);
     return NextResponse.json({ users: [] });
   }
 }

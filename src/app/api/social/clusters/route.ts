@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -131,7 +132,7 @@ export async function GET() {
       headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=120' },
     });
   } catch (err) {
-    console.error('Clusters error:', err);
+    logger.error('Clusters error:', err);
     return NextResponse.json({ error: 'Failed to build clusters' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { optimism } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 const { ogContract: OG_RESPECT, zorContract: ZOR_RESPECT, zorTokenId: ZOR_TOKEN_ID } =
   communityConfig.respect;
@@ -35,7 +36,7 @@ export async function POST() {
       .not('wallet_address', 'is', null);
 
     if (membersErr) {
-      console.error('Failed to fetch respect_members:', membersErr);
+      logger.error('Failed to fetch respect_members:', membersErr);
       return NextResponse.json({ error: 'Failed to fetch members' }, { status: 500 });
     }
 
@@ -115,7 +116,7 @@ export async function POST() {
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (err) {
-    console.error('Respect sync error:', err);
+    logger.error('Respect sync error:', err);
     return NextResponse.json({ error: 'Failed to sync on-chain balances' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { normalizeForThreads } from '@/lib/publish/normalize';
 import { publishToThreads, isThreadsConfigured } from '@/lib/publish/threads';
+import { logger } from '@/lib/logger';
 
 const publishThreadsSchema = z.object({
   castHash: z.string().min(1),
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
       platformUrl: result.postUrl,
     });
   } catch (err) {
-    console.error('[publish/threads] Error:', err);
+    logger.error('[publish/threads] Error:', err);
 
     const message =
       err instanceof Error ? err.message : 'Failed to publish to Threads';

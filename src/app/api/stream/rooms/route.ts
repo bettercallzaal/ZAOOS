@@ -9,6 +9,7 @@ import {
   TWITCH_CATEGORY_DJS,
 } from '@/lib/twitch/client';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { logger } from '@/lib/logger';
 
 const GateConfigSchema = z.object({
   type: z.enum(['erc20', 'erc721', 'erc1155']),
@@ -51,17 +52,17 @@ export async function POST(req: NextRequest) {
 
     // Fire-and-forget: set Twitch channel title + category
     syncTwitchOnCreate(session.fid, parsed.data.title).catch(err =>
-      console.error('[room-create] Twitch sync failed:', err)
+      logger.error('[room-create] Twitch sync failed:', err)
     );
 
     // Fire-and-forget: auto-cast go-live announcement to /zao channel
     castGoLive(parsed.data.title, room.id).catch(err =>
-      console.error('[room-create] Go-live cast failed:', err)
+      logger.error('[room-create] Go-live cast failed:', err)
     );
 
     return NextResponse.json({ room });
   } catch (error) {
-    console.error('Create room error:', error);
+    logger.error('Create room error:', error);
     return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });
   }
 }

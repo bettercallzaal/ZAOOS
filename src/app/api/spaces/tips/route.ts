@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const TipSchema = z.object({
   roomId: z.string().uuid().optional(),
@@ -42,13 +43,13 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Failed to log tip:', error);
+      logger.error('Failed to log tip:', error);
       return NextResponse.json({ error: 'Failed to log tip' }, { status: 500 });
     }
 
     return NextResponse.json({ tip: data });
   } catch (err) {
-    console.error('Tip API error:', err);
+    logger.error('Tip API error:', err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -68,13 +69,13 @@ export async function GET(req: NextRequest) {
       .limit(50);
 
     if (error) {
-      console.error('Failed to fetch tips:', error);
+      logger.error('Failed to fetch tips:', error);
       return NextResponse.json({ error: 'Failed to fetch tips' }, { status: 500 });
     }
 
     return NextResponse.json({ tips: data || [] });
   } catch (err) {
-    console.error('Tips GET error:', err);
+    logger.error('Tips GET error:', err);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

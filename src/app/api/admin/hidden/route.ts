@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   const session = await getSessionData();
@@ -24,7 +25,7 @@ export async function GET() {
 
     return NextResponse.json({ messages: data });
   } catch (err) {
-    console.error('Hidden messages fetch error:', err);
+    logger.error('Hidden messages fetch error:', err);
     return NextResponse.json({ error: 'Failed to fetch hidden messages' }, { status: 500 });
   }
 }

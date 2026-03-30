@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { fetchProposalsOnChain } from '@/lib/ordao/client';
+import { logger } from '@/lib/logger';
 
 const ORNODE_URL = 'https://ornode2.frapps.xyz';
 
@@ -29,24 +30,24 @@ export async function GET() {
       throw new Error('ornode returned empty proposals');
     }
 
-    console.log(`[proposals] Served ${proposals.length} proposals from ornode`);
+    logger.info(`[proposals] Served ${proposals.length} proposals from ornode`);
     return NextResponse.json({ proposals, total: proposals.length, source: 'ornode' });
   } catch (ornodeErr) {
-    console.warn('[proposals] ornode unavailable, falling back to on-chain read:', ornodeErr instanceof Error ? ornodeErr.message : ornodeErr);
+    logger.warn('[proposals] ornode unavailable, falling back to on-chain read:', ornodeErr instanceof Error ? ornodeErr.message : ornodeErr);
   }
 
   // ── Fallback: read directly from OREC contract on Optimism ─────
   try {
     const onChainProposals = await fetchProposalsOnChain(20);
 
-    console.log(`[proposals] Served ${onChainProposals.length} proposals from on-chain fallback`);
+    logger.info(`[proposals] Served ${onChainProposals.length} proposals from on-chain fallback`);
     return NextResponse.json({
       proposals: onChainProposals,
       total: onChainProposals.length,
       source: 'onchain',
     });
   } catch (onChainErr) {
-    console.error('[proposals] On-chain fallback also failed:', onChainErr instanceof Error ? onChainErr.message : onChainErr);
+    logger.error('[proposals] On-chain fallback also failed:', onChainErr instanceof Error ? onChainErr.message : onChainErr);
     return NextResponse.json({ proposals: [], total: 0, source: 'unavailable' });
   }
 }

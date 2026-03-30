@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { startSession, endSessionByFid } from '@/lib/spaces/sessionsDb';
 import { updateLastActive } from '@/lib/spaces/roomsDb';
+import { logger } from '@/lib/logger';
 
 const joinSchema = z.object({
   roomId: z.string().uuid(),
@@ -41,13 +42,13 @@ export async function POST(req: NextRequest) {
     ]);
 
     if (sessionId.status === 'rejected') {
-      console.error('Failed to start session:', sessionId.reason);
+      logger.error('Failed to start session:', sessionId.reason);
       return NextResponse.json({ error: 'Failed to start session' }, { status: 500 });
     }
 
     return NextResponse.json({ sessionId: sessionId.value });
   } catch (err) {
-    console.error('POST /api/spaces/session error:', err);
+    logger.error('POST /api/spaces/session error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -80,7 +81,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error('PATCH /api/spaces/session error:', err);
+    logger.error('PATCH /api/spaces/session error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

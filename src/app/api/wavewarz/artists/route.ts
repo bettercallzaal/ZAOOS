@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query;
 
   if (error) {
-    console.error('[wavewarz-artists] Fetch error:', error);
+    logger.error('[wavewarz-artists] Fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch artists' }, { status: 500 });
   }
 

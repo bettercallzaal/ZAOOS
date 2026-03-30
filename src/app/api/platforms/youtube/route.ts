@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -23,7 +24,7 @@ export async function GET() {
       channelId: data.platform_user_id,
     });
   } catch (error) {
-    console.error('YouTube platform GET error:', error);
+    logger.error('YouTube platform GET error:', error);
     return NextResponse.json({ error: 'Failed to get YouTube info' }, { status: 500 });
   }
 }
@@ -40,13 +41,13 @@ export async function DELETE() {
       .eq('platform', 'youtube');
 
     if (error) {
-      console.error('YouTube disconnect error:', error);
+      logger.error('YouTube disconnect error:', error);
       return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('YouTube platform DELETE error:', error);
+    logger.error('YouTube platform DELETE error:', error);
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

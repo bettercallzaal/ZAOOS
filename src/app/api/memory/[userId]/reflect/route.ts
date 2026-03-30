@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { getHindsightClient } from '@/lib/hindsight';
+import { logger } from '@/lib/logger';
 
 const ReflectBodySchema = z.object({
   prompt: z.string().min(1).max(2000),
@@ -41,7 +42,7 @@ export async function POST(
 
     return NextResponse.json({ reflection });
   } catch (error) {
-    console.error('Failed to reflect on memories:', error);
+    logger.error('Failed to reflect on memories:', error);
     return NextResponse.json(
       { error: 'Failed to reflect on memories' },
       { status: 500 }

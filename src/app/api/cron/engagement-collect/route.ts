@@ -4,6 +4,7 @@ import { fetchThreadsInsights } from '@/lib/publish/threads-insights';
 import { isThreadsConfigured } from '@/lib/publish/threads';
 import { fetchXInsights } from '@/lib/publish/x-insights';
 import { getXClient } from '@/lib/publish/x';
+import { logger } from '@/lib/logger';
 
 interface CollectResult {
   platform: string;
@@ -32,7 +33,7 @@ async function collectPlatform(
     .order('created_at', { ascending: false });
 
   if (postsError) {
-    console.error(`[cron/engagement-collect] DB error fetching ${platform} posts:`, postsError);
+    logger.error(`[cron/engagement-collect] DB error fetching ${platform} posts:`, postsError);
     return { platform, collected: 0, failed: 0, total: 0 };
   }
 
@@ -60,7 +61,7 @@ async function collectPlatform(
         });
 
       if (insertError) {
-        console.error(
+        logger.error(
           `[cron/engagement-collect] Insert error for ${platform}/${post.platform_post_id}:`,
           insertError,
         );
@@ -74,7 +75,7 @@ async function collectPlatform(
   const collected = results.filter((r) => r.status === 'fulfilled').length;
   const failed = results.filter((r) => r.status === 'rejected').length;
 
-  console.log(
+  logger.info(
     `[cron/engagement-collect] ${platform}: ${collected}/${posts.length} (${failed} failed)`,
   );
 
@@ -135,7 +136,7 @@ export async function GET(request: NextRequest) {
       platforms: platformResults,
     });
   } catch (err) {
-    console.error('[cron/engagement-collect] Error:', err);
+    logger.error('[cron/engagement-collect] Error:', err);
     return NextResponse.json({ error: 'Engagement collection failed' }, { status: 500 });
   }
 }

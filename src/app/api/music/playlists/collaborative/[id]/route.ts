@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -65,7 +66,7 @@ export async function GET(_req: NextRequest, ctx: RouteContext) {
       members,
     });
   } catch (err) {
-    console.error('[collaborative-playlist] GET error:', err);
+    logger.error('[collaborative-playlist] GET error:', err);
     return NextResponse.json({ error: 'Failed to fetch playlist' }, { status: 500 });
   }
 }
@@ -108,7 +109,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
 
     return NextResponse.json({ playlist: updated });
   } catch (err) {
-    console.error('[collaborative-playlist] PATCH error:', err);
+    logger.error('[collaborative-playlist] PATCH error:', err);
     return NextResponse.json({ error: 'Failed to update playlist' }, { status: 500 });
   }
 }
@@ -138,7 +139,7 @@ export async function DELETE(_req: NextRequest, ctx: RouteContext) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[collaborative-playlist] DELETE error:', err);
+    logger.error('[collaborative-playlist] DELETE error:', err);
     return NextResponse.json({ error: 'Failed to delete playlist' }, { status: 500 });
   }
 }

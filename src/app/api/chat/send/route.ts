@@ -8,6 +8,7 @@ import { sendNotification, createInAppNotification } from '@/lib/notifications';
 import { extractAndSaveSongs } from '@/lib/music/library';
 import { touchActivity } from '@/lib/db/activity';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
       const { error: dbError } = await supabaseAdmin
         .from('channel_casts')
         .upsert([row], { onConflict: 'hash' });
-      if (dbError) console.error('[send] DB insert error:', dbError);
+      if (dbError) logger.error('[send] DB insert error:', dbError);
     }
 
     // Track member activity + save music links (fire and forget)
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
               }], { onConflict: 'hash' });
           }
         })
-      ).catch((err) => console.error('[notify]', err));
+      ).catch((err) => logger.error('[notify]', err));
     }
 
     // Cross-post to Telegram and Discord (fire and forget, non-blocking)
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
             text: escapeMarkdownV2(normalized.text),
           });
           if (!result.success) {
-            console.error('[chat/send] Telegram cross-post failed:', result.error);
+            logger.error('[chat/send] Telegram cross-post failed:', result.error);
           }
         })(),
         // Discord
@@ -142,10 +143,10 @@ export async function POST(req: NextRequest) {
             username: 'ZAO OS',
           });
           if (!result.success) {
-            console.error('[chat/send] Discord cross-post failed:', result.error);
+            logger.error('[chat/send] Discord cross-post failed:', result.error);
           }
         })(),
-      ]).catch((err) => console.error('[chat/send] Cross-post error:', err));
+      ]).catch((err) => logger.error('[chat/send] Cross-post error:', err));
     }
 
     // Send push + in-app notifications (fire and forget)
@@ -157,7 +158,7 @@ export async function POST(req: NextRequest) {
       `https://zaoos.com/chat`,
       `msg-${Date.now()}-${session.fid}`,
       session.fid // exclude sender
-    ).catch((err) => console.error('[notify]', err));
+    ).catch((err) => logger.error('[notify]', err));
 
     // In-app notification for all other active members
     Promise.resolve(
@@ -177,9 +178,9 @@ export async function POST(req: NextRequest) {
           actorFid: session.fid,
           actorDisplayName: session.displayName,
           actorPfpUrl: session.pfpUrl,
-        }).catch((err) => console.error('[notify]', err));
+        }).catch((err) => logger.error('[notify]', err));
       }
-    }).catch((err) => console.error('[notify]', err));
+    }).catch((err) => logger.error('[notify]', err));
 
     return NextResponse.json({
       success: true,
@@ -187,7 +188,7 @@ export async function POST(req: NextRequest) {
       crossPosted: additionalChannels,
     });
   } catch (error) {
-    console.error('Send message error:', error);
+    logger.error('Send message error:', error);
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
   }
 }

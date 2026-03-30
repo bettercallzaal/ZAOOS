@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
       rtmpUrl: data.rtmp_url,
     });
   } catch (error) {
-    console.error('Twitch platform GET error:', error);
+    logger.error('Twitch platform GET error:', error);
     return NextResponse.json({ error: 'Failed to get Twitch info' }, { status: 500 });
   }
 }
@@ -60,13 +61,13 @@ export async function DELETE() {
       .eq('platform', 'twitch');
 
     if (error) {
-      console.error('Twitch disconnect error:', error);
+      logger.error('Twitch disconnect error:', error);
       return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Twitch platform DELETE error:', error);
+    logger.error('Twitch platform DELETE error:', error);
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

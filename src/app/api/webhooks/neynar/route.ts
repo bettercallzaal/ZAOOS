@@ -5,6 +5,7 @@ import { ENV } from '@/lib/env';
 import { communityConfig } from '@/../community.config';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { moderateContent } from '@/lib/moderation/moderate';
+import { logger } from '@/lib/logger';
 
 const WATCHED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
   // Verify HMAC-SHA512 signature — reject if secret not configured
   const secret = ENV.NEYNAR_WEBHOOK_SECRET;
   if (!secret) {
-    console.error('[webhook] NEYNAR_WEBHOOK_SECRET not configured — rejecting request');
+    logger.error('[webhook] NEYNAR_WEBHOOK_SECRET not configured — rejecting request');
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
   }
 
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
       .from('channel_casts')
       .upsert(castRow, { onConflict: 'hash' });
   } catch (err) {
-    console.error('[webhook/neynar] DB insert error:', err);
+    logger.error('[webhook/neynar] DB insert error:', err);
     return NextResponse.json({ error: 'DB insert failed' }, { status: 500 });
   }
 
@@ -128,13 +129,13 @@ export async function POST(req: NextRequest) {
             },
             { onConflict: 'cast_hash' },
           );
-        console.log(`[moderation] Auto-hid cast ${castRow.hash}: ${result.categories.join(', ')}`);
+        logger.info(`[moderation] Auto-hid cast ${castRow.hash}: ${result.categories.join(', ')}`);
       } else if (result.action === 'flag') {
-        console.log(`[moderation] Flagged cast ${castRow.hash}: ${result.categories.join(', ')}`);
+        logger.info(`[moderation] Flagged cast ${castRow.hash}: ${result.categories.join(', ')}`);
       }
     } catch (err) {
       // Non-fatal: moderation failure should never break the webhook
-      console.error('[webhook/neynar] Moderation error:', err);
+      logger.error('[webhook/neynar] Moderation error:', err);
     }
   })();
 
@@ -194,12 +195,12 @@ export async function POST(req: NextRequest) {
       }
 
       if (result.error) {
-        console.error('[webhook/neynar] Auto-submit music link error:', result.error);
+        logger.error('[webhook/neynar] Auto-submit music link error:', result.error);
       }
     }
   } catch (err) {
     // Non-fatal: log but don't fail the webhook
-    console.error('[webhook/neynar] Auto-detect music error:', err);
+    logger.error('[webhook/neynar] Auto-detect music error:', err);
   }
 
   return NextResponse.json({ ok: true });

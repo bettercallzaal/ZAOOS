@@ -4,6 +4,7 @@ import { base } from 'viem/chains';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
 import { ZOUNZ_GOVERNOR, ZOUNZ_AUCTION } from '@/lib/zounz/contracts';
+import { logger } from '@/lib/logger';
 
 const client = createPublicClient({
   chain: base,
@@ -144,7 +145,7 @@ export async function GET(request: NextRequest) {
       events,
     });
   } catch (error) {
-    console.error('[cron/zounz-events] Error:', error);
+    logger.error('[cron/zounz-events] Error:', error);
     return NextResponse.json({ error: 'Cron failed' }, { status: 500 });
   }
 }

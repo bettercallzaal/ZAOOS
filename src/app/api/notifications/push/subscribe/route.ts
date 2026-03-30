@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const subscriptionSchema = z.object({
   subscription: z.object({
@@ -48,13 +49,13 @@ export async function POST(request: NextRequest) {
       );
 
     if (error) {
-      console.error('[push/subscribe] Supabase error:', error);
+      logger.error('[push/subscribe] Supabase error:', error);
       return NextResponse.json({ error: 'Failed to save subscription' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[push/subscribe] Error:', error);
+    logger.error('[push/subscribe] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -82,7 +83,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[push/subscribe] Delete error:', error);
+    logger.error('[push/subscribe] Delete error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

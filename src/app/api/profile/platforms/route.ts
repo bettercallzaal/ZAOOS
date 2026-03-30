@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET — Fetch the current user's connected platform statuses.
@@ -22,7 +23,7 @@ export async function GET() {
       .single();
 
     if (error) {
-      console.error('[profile/platforms] DB error:', error);
+      logger.error('[profile/platforms] DB error:', error);
       return NextResponse.json({ error: 'Failed to fetch platform status' }, { status: 500 });
     }
 
@@ -33,7 +34,7 @@ export async function GET() {
       x_handle: user?.x_handle ?? null,
     });
   } catch (err) {
-    console.error('[profile/platforms] Error:', err);
+    logger.error('[profile/platforms] Error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

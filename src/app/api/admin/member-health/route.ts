@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/admin/member-health — Data quality report for member CRM
@@ -126,7 +127,7 @@ export async function GET() {
 
     return NextResponse.json({ stats, issues });
   } catch (err) {
-    console.error('[member-health] error:', err);
+    logger.error('[member-health] error:', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

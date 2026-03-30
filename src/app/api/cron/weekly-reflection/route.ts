@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { runWeeklyReflection } from '@/lib/memory-recall';
+import { logger } from '@/lib/logger';
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -8,7 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     // Require CRON_SECRET to be configured
     if (!CRON_SECRET) {
-      console.error('CRON_SECRET not configured');
+      logger.error('CRON_SECRET not configured');
       return NextResponse.json(
         { error: 'CRON_SECRET not configured' },
         { status: 500 }
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
       .eq('status', 'active');
 
     if (membersError) {
-      console.error('Failed to fetch members:', membersError);
+      logger.error('Failed to fetch members:', membersError);
       return NextResponse.json(
         { error: 'Failed to fetch members' },
         { status: 500 }
@@ -55,14 +56,14 @@ export async function POST(request: NextRequest) {
           });
 
         if (insertError) {
-          console.error(`Failed to store reflection for ${member.fid}:`, insertError);
+          logger.error(`Failed to store reflection for ${member.fid}:`, insertError);
           results.errors.push(`User ${member.fid}: failed to store reflection`);
           results.failed++;
         } else {
           results.processed++;
         }
       } catch (err) {
-        console.error(`Reflection failed for ${member.fid}:`, err);
+        logger.error(`Reflection failed for ${member.fid}:`, err);
         results.errors.push(`User ${member.fid}: ${err instanceof Error ? err.message : 'unknown error'}`);
         results.failed++;
       }
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(results);
   } catch (error) {
-    console.error('Weekly reflection cron failed:', error);
+    logger.error('Weekly reflection cron failed:', error);
     return NextResponse.json(
       { error: 'Weekly reflection cron failed' },
       { status: 500 }

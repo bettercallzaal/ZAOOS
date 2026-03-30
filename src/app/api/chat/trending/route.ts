@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getTrendingFeed } from '@/lib/farcaster/neynar';
 import { Cast } from '@/types';
+import { logger } from '@/lib/logger';
 
 const SOPHA_API = 'https://www.sopha.social/api/feed';
 
@@ -139,7 +140,7 @@ export async function GET(req: NextRequest) {
       { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } },
     );
   } catch (error) {
-    console.error('[trending] error:', error);
+    logger.error('[trending] error:', error);
     return NextResponse.json({ error: 'Failed to fetch trending' }, { status: 500 });
   }
 }

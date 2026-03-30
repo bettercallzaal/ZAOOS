@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const patchSchema = z.object({
   x_handle: z.string().max(50).trim().optional().nullable(),
@@ -40,7 +41,7 @@ export async function GET() {
       audius_handle: data?.audius_handle || null,
     });
   } catch (err) {
-    console.error('[users/socials] GET error:', err);
+    logger.error('[users/socials] GET error:', err);
     return NextResponse.json({ error: 'Failed to load socials' }, { status: 500 });
   }
 }
@@ -73,7 +74,7 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[users/socials] PATCH error:', err);
+    logger.error('[users/socials] PATCH error:', err);
     return NextResponse.json({ error: 'Failed to update socials' }, { status: 500 });
   }
 }

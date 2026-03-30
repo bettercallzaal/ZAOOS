@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { communityIssueSchema } from '@/lib/validation/schemas';
+import { logger } from '@/lib/logger';
 
 const PAPERCLIP_API_URL = process.env.PAPERCLIP_API_URL || 'http://localhost:3100';
 const PAPERCLIP_API_KEY = process.env.PAPERCLIP_API_KEY || '';
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
     .range(offset, offset + limit - 1);
 
   if (error) {
-    console.error('Community issues fetch error:', error);
+    logger.error('Community issues fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch issues' }, { status: 500 });
   }
 
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (dbError) {
-    console.error('Community issue insert error:', dbError);
+    logger.error('Community issue insert error:', dbError);
     return NextResponse.json({ error: 'Failed to save issue' }, { status: 500 });
   }
 
@@ -127,7 +128,7 @@ export async function POST(req: NextRequest) {
       }
     } catch (err) {
       // Non-blocking — log but don't fail the request
-      console.error('Paperclip forwarding error:', err);
+      logger.error('Paperclip forwarding error:', err);
     }
   }
 

@@ -3,6 +3,7 @@ import { createPublicClient, http, parseAbiItem } from 'viem';
 import { base } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { ZOUNZ_GOVERNOR, ZOUNZ_TOKEN } from '@/lib/zounz/contracts';
+import { logger } from '@/lib/logger';
 
 // Nouns Builder Goldsky subgraph (may be 404 — falls back to getLogs)
 const SUBGRAPH_URL =
@@ -93,7 +94,7 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error) {
-    console.error('[zounz/proposals/list] Unhandled error:', error);
+    logger.error('[zounz/proposals/list] Unhandled error:', error);
     return NextResponse.json({ error: 'Failed to fetch proposals' }, { status: 500 });
   }
 }
@@ -135,7 +136,7 @@ async function trySubgraph(): Promise<ZounzProposal[] | null> {
     });
 
     if (!res.ok) {
-      console.warn('[zounz/proposals/list] Subgraph HTTP error:', res.status);
+      logger.warn('[zounz/proposals/list] Subgraph HTTP error:', res.status);
       return null;
     }
 
@@ -160,7 +161,7 @@ async function trySubgraph(): Promise<ZounzProposal[] | null> {
     }
 
     if (!rawProposals) {
-      console.warn('[zounz/proposals/list] Subgraph returned no DAO data');
+      logger.warn('[zounz/proposals/list] Subgraph returned no DAO data');
       return null;
     }
 
@@ -179,7 +180,7 @@ async function trySubgraph(): Promise<ZounzProposal[] | null> {
       timeCreated: Number(p.timeCreated),
     }));
   } catch (err) {
-    console.warn('[zounz/proposals/list] Subgraph fetch failed:', err);
+    logger.warn('[zounz/proposals/list] Subgraph fetch failed:', err);
     return null;
   }
 }
@@ -222,7 +223,7 @@ async function tryGetLogs(): Promise<ZounzProposal[] | null> {
     ]);
 
     if (createdLogs.status === 'rejected') {
-      console.warn('[zounz/proposals/list] getLogs failed:', createdLogs.reason);
+      logger.warn('[zounz/proposals/list] getLogs failed:', createdLogs.reason);
       return null;
     }
 
@@ -298,7 +299,7 @@ async function tryGetLogs(): Promise<ZounzProposal[] | null> {
 
     return proposals;
   } catch (err) {
-    console.warn('[zounz/proposals/list] getLogs fallback failed:', err);
+    logger.warn('[zounz/proposals/list] getLogs fallback failed:', err);
     return null;
   }
 }

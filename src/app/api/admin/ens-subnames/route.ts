@@ -9,6 +9,7 @@ import {
   isValidSubname,
   sanitizeSubname,
 } from '@/lib/ens/subnames';
+import { logger } from '@/lib/logger';
 
 const createSchema = z.object({
   fid: z.number().int().positive(),
@@ -53,7 +54,7 @@ export async function GET() {
       })),
     });
   } catch (err) {
-    console.error('[admin/ens-subnames] list error:', err);
+    logger.error('[admin/ens-subnames] list error:', err);
     return NextResponse.json({ error: 'Failed to list subnames' }, { status: 500 });
   }
 }
@@ -156,7 +157,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, subname: result.fullName });
   } catch (err) {
-    console.error('[admin/ens-subnames] create error:', err);
+    logger.error('[admin/ens-subnames] create error:', err);
     return NextResponse.json({ error: 'Failed to create subname' }, { status: 500 });
   }
 }
@@ -188,7 +189,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Subname unlinked from member profile' });
   } catch (err) {
-    console.error('[admin/ens-subnames] delete error:', err);
+    logger.error('[admin/ens-subnames] delete error:', err);
     return NextResponse.json({ error: 'Failed to revoke subname' }, { status: 500 });
   }
 }

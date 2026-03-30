@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { TrackMetadata, TrackType } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 function makeId(url: string): string {
   let hash = 0;
@@ -298,7 +299,7 @@ export async function GET(request: NextRequest) {
       headers: { 'Cache-Control': 'public, max-age=3600' },
     });
   } catch (err) {
-    console.error('[music/metadata] error:', err);
+    logger.error('[music/metadata] error:', err);
     return NextResponse.json({ error: 'Metadata fetch failed' }, { status: 500 });
   }
 }

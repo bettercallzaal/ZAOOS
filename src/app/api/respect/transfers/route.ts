@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const OG_CONTRACT = '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957';
 const ZOR_CONTRACT = '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c';
@@ -66,7 +67,7 @@ export async function GET(req: NextRequest) {
       total: data?.length || 0,
     });
   } catch (err) {
-    console.error('[respect/transfers] error:', err);
+    logger.error('[respect/transfers] error:', err);
     return NextResponse.json({ error: 'Failed to load transfers' }, { status: 500 });
   }
 }
@@ -78,7 +79,7 @@ export async function GET(req: NextRequest) {
 async function syncTransfersFromAlchemy(filterAddress?: string) {
   const apiKey = process.env.ALCHEMY_API_KEY;
   if (!apiKey) {
-    console.warn('[respect/transfers] No ALCHEMY_API_KEY — skipping sync');
+    logger.warn('[respect/transfers] No ALCHEMY_API_KEY — skipping sync');
     return;
   }
 
@@ -118,7 +119,7 @@ async function syncTransfersFromAlchemy(filterAddress?: string) {
         });
 
         if (!res.ok) {
-          console.error(`[transfers-sync] Alchemy returned ${res.status}`);
+          logger.error(`[transfers-sync] Alchemy returned ${res.status}`);
           break;
         }
 
@@ -155,7 +156,7 @@ async function syncTransfersFromAlchemy(filterAddress?: string) {
         console.info(`[transfers-sync] ${contract.type}: stored ${transfers.length} transfers (page ${pages + 1})`);
         pages++;
       } catch (err) {
-        console.error(`[transfers-sync] ${contract.type} page ${pages} failed:`, err);
+        logger.error(`[transfers-sync] ${contract.type} page ${pages} failed:`, err);
         break;
       }
     } while (pageKey && pages < 20); // Max 20 pages = 20K transfers

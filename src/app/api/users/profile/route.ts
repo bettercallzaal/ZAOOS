@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const patchSchema = z.object({
   display_name: z.string().max(50).trim().optional(),
@@ -40,7 +41,7 @@ export async function GET() {
       publishing_prefs: data?.publishing_prefs || null,
     });
   } catch (err) {
-    console.error('[users/profile] GET error:', err);
+    logger.error('[users/profile] GET error:', err);
     return NextResponse.json({ error: 'Failed to load profile' }, { status: 500 });
   }
 }
@@ -81,7 +82,7 @@ export async function PATCH(req: Request) {
       real_name: data.real_name || '',
     });
   } catch (err) {
-    console.error('[users/profile] PATCH error:', err);
+    logger.error('[users/profile] PATCH error:', err);
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
   }
 }

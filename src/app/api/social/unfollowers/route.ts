@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/social/unfollowers
@@ -32,7 +33,7 @@ export async function GET() {
       .limit(50);
 
     if (error) {
-      console.error('Unfollowers query error:', error);
+      logger.error('Unfollowers query error:', error);
       return NextResponse.json(
         { error: 'Failed to fetch unfollowers' },
         { status: 500 }
@@ -44,7 +45,7 @@ export async function GET() {
       total: data?.length ?? 0,
     });
   } catch (err) {
-    console.error('Unfollowers route error:', err);
+    logger.error('Unfollowers route error:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

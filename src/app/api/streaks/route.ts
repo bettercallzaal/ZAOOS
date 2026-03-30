@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   const session = await getSessionData();
@@ -16,7 +17,7 @@ export async function GET() {
       .maybeSingle();
 
     if (error) {
-      console.error('Streak fetch error:', error);
+      logger.error('Streak fetch error:', error);
       return NextResponse.json({ error: 'Failed to fetch streak data' }, { status: 500 });
     }
 
@@ -73,7 +74,7 @@ export async function GET() {
       },
     });
   } catch (err) {
-    console.error('Streak GET error:', err);
+    logger.error('Streak GET error:', err);
     return NextResponse.json({ error: 'Failed to load streak data' }, { status: 500 });
   }
 }

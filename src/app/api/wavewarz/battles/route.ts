@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
     const { data: battles, error } = await query;
 
     if (error) {
-      console.error('[wavewarz/battles] Error:', error);
+      logger.error('[wavewarz/battles] Error:', error);
       return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
     }
 
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
       headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' },
     });
   } catch (error) {
-    console.error('[wavewarz/battles] Error:', error);
+    logger.error('[wavewarz/battles] Error:', error);
     return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 });
   }
 }

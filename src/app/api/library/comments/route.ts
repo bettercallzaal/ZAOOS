@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { libraryCommentSchema } from '@/lib/validation/library-schemas';
 import { moderateContent } from '@/lib/moderation/moderate';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ comments: comments || [] });
   } catch (error) {
-    console.error('[library/comments] GET error:', error);
+    logger.error('[library/comments] GET error:', error);
     return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
   }
 }
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ comment });
   } catch (error) {
-    console.error('[library/comments] POST error:', error);
+    logger.error('[library/comments] POST error:', error);
     return NextResponse.json({ error: 'Failed to post comment' }, { status: 500 });
   }
 }

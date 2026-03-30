@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { AtpAgent } from '@atproto/api';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const addMemberSchema = z.object({
   handle: z.string().min(1).max(200),
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ member });
   } catch (err) {
-    console.error('[bluesky/members] Add error:', err);
+    logger.error('[bluesky/members] Add error:', err);
     return NextResponse.json({ error: 'Failed to add member' }, { status: 500 });
   }
 }
@@ -120,7 +121,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[bluesky/members] Delete error:', err);
+    logger.error('[bluesky/members] Delete error:', err);
     return NextResponse.json({ error: 'Failed to remove member' }, { status: 500 });
   }
 }

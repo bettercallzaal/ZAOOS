@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getLeaderboard } from '@/lib/spaces/sessionsDb';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   period: z.enum(['week', 'month', 'all']).default('week'),
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
       totalCommunityMinutes,
     });
   } catch (error) {
-    console.error('[spaces/leaderboard] Error:', error);
+    logger.error('[spaces/leaderboard] Error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch leaderboard' },
       { status: 500 }

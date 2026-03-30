@@ -8,6 +8,7 @@ import {
   isValidSubname,
   sanitizeSubname,
 } from '@/lib/ens/subnames';
+import { logger } from '@/lib/logger';
 
 const reviewSchema = z.object({
   requestId: z.string().uuid(),
@@ -32,7 +33,7 @@ export async function GET() {
 
     return NextResponse.json({ requests: requests || [] });
   } catch (err) {
-    console.error('[admin/ens-subnames/requests] list error:', err);
+    logger.error('[admin/ens-subnames/requests] list error:', err);
     return NextResponse.json({ error: 'Failed to list requests' }, { status: 500 });
   }
 }
@@ -116,7 +117,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success: true, subname: result.fullName });
   } catch (err) {
-    console.error('[admin/ens-subnames/requests] review error:', err);
+    logger.error('[admin/ens-subnames/requests] review error:', err);
     return NextResponse.json({ error: 'Failed to review request' }, { status: 500 });
   }
 }

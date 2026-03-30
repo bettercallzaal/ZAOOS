@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { AtpAgent } from '@atproto/api';
+import { logger } from '@/lib/logger';
 
 /**
  * GET — Get current user's Bluesky connection status
@@ -77,7 +78,7 @@ export async function POST(req: NextRequest) {
       .eq('fid', session.fid);
 
     if (error) {
-      console.error('[bluesky] DB update error:', error);
+      logger.error('[bluesky] DB update error:', error);
       return NextResponse.json({ error: 'Failed to save connection' }, { status: 500 });
     }
 
@@ -94,11 +95,11 @@ export async function POST(req: NextRequest) {
         { did, handle, user_id: user?.id || null, added_by: 'self' },
         { onConflict: 'did' }
       );
-    if (memberErr) console.error('[bluesky] Auto-register member:', memberErr);
+    if (memberErr) logger.error('[bluesky] Auto-register member:', memberErr);
 
     return NextResponse.json({ success: true, handle, did });
   } catch (err) {
-    console.error('[bluesky] Connect error:', err);
+    logger.error('[bluesky] Connect error:', err);
     return NextResponse.json({ error: 'Failed to connect Bluesky' }, { status: 500 });
   }
 }
@@ -119,13 +120,13 @@ export async function DELETE() {
       .eq('fid', session.fid);
 
     if (error) {
-      console.error('[bluesky] Disconnect error:', error);
+      logger.error('[bluesky] Disconnect error:', error);
       return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[bluesky] Disconnect error:', err);
+    logger.error('[bluesky] Disconnect error:', err);
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

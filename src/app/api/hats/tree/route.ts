@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { fetchHatTree } from '@/lib/hats/tree';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   const session = await getSessionData();
@@ -12,7 +13,7 @@ export async function GET() {
     const tree = await fetchHatTree();
     return NextResponse.json(tree);
   } catch (err) {
-    console.error('[hats/tree] Error:', err);
+    logger.error('[hats/tree] Error:', err);
     return NextResponse.json({ error: 'Failed to load hat tree' }, { status: 500 });
   }
 }

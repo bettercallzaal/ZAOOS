@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { logger } from '@/lib/logger';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (sessionError) {
-      console.error('Failed to insert fractal session:', sessionError);
+      logger.error('Failed to insert fractal session:', sessionError);
       return NextResponse.json({ error: 'Failed to create fractal session' }, { status: 500 });
     }
 
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
       .insert(scoreRows);
 
     if (scoresError) {
-      console.error('Failed to insert fractal scores:', scoresError);
+      logger.error('Failed to insert fractal scores:', scoresError);
       return NextResponse.json({ error: 'Failed to insert scores' }, { status: 500 });
     }
 
@@ -154,7 +155,7 @@ export async function POST(req: NextRequest) {
             if (oldTotal < milestone && newTotal >= milestone) {
               autoCastToZao(
                 `\u{1F3C6} ${s.member_name} just reached ${milestone} Respect!`,
-              ).catch((err) => console.error('[respect-milestone-cast]', err));
+              ).catch((err) => logger.error('[respect-milestone-cast]', err));
               break;
             }
           }
@@ -217,7 +218,7 @@ export async function POST(req: NextRequest) {
     // Check for any failed updates
     const failures = updateResults.filter((r) => r.status === 'rejected');
     if (failures.length > 0) {
-      console.error('Some member updates failed:', failures);
+      logger.error('Some member updates failed:', failures);
     }
 
     return NextResponse.json({
@@ -227,7 +228,7 @@ export async function POST(req: NextRequest) {
       warnings: failures.length > 0 ? `${failures.length} member update(s) failed` : undefined,
     });
   } catch (error) {
-    console.error('Record fractal session error:', error);
+    logger.error('Record fractal session error:', error);
     return NextResponse.json({ error: 'Failed to record fractal session' }, { status: 500 });
   }
 }

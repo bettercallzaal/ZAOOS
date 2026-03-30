@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   search: z.string().max(200).optional(),
@@ -275,7 +276,7 @@ export async function GET(req: NextRequest) {
       pagination: { limit: parseInt(limit), offset, hasMore: (count ?? 0) > offset + members.length },
     });
   } catch (err) {
-    console.error('[directory] error:', err);
+    logger.error('[directory] error:', err);
     return NextResponse.json({ error: 'Failed to load directory' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -109,7 +110,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(responseData);
   } catch (err) {
-    console.error('Compare error:', err);
+    logger.error('Compare error:', err);
     return NextResponse.json({ error: 'Failed to compare networks' }, { status: 500 });
   }
 }

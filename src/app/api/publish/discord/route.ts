@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { normalizeForDiscord } from '@/lib/publish/normalize';
 import { publishToDiscord, buildZaoEmbed } from '@/lib/publish/discord';
+import { logger } from '@/lib/logger';
 
 const publishDiscordSchema = z.object({
   text: z.string().min(1).max(2000),
@@ -113,7 +114,7 @@ export async function POST(req: NextRequest) {
       messageId: result.messageId,
     });
   } catch (err) {
-    console.error('[publish/discord] Error:', err);
+    logger.error('[publish/discord] Error:', err);
 
     const message =
       err instanceof Error ? err.message : 'Failed to publish to Discord';

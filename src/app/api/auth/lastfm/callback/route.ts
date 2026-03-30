@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSession as getLastfmSession } from '@/lib/music/lastfm';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.redirect(new URL('/settings?lastfm=connected', req.url));
   } catch (error) {
-    console.error('[lastfm/callback] Error:', error);
+    logger.error('[lastfm/callback] Error:', error);
     return NextResponse.redirect(new URL('/settings?error=lastfm_failed', req.url));
   }
 }

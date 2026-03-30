@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   fid: z.coerce.number().int().positive(),
@@ -70,7 +71,7 @@ export async function GET(req: NextRequest) {
       },
     );
   } catch (error) {
-    console.error('Overlay now-playing GET error:', error);
+    logger.error('Overlay now-playing GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

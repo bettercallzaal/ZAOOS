@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const CollectSchema = z.object({
   assetTxId: z.string().min(1),
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
       collectedCount: (asset.collected_count || 0) + 1,
     });
   } catch (error) {
-    console.error('[music/collect] Error:', error);
+    logger.error('[music/collect] Error:', error);
     return NextResponse.json({ error: 'Collection failed' }, { status: 500 });
   }
 }

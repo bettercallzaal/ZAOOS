@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { getHindsightClient } from '@/lib/hindsight';
+import { logger } from '@/lib/logger';
 
 // Community bank ID - uses a shared bank for community-wide memories
 const COMMUNITY_BANK_ID = 'zao-community';
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error('Failed to recall community memories:', error);
+    logger.error('Failed to recall community memories:', error);
     return NextResponse.json(
       { error: 'Failed to recall community memories' },
       { status: 500 }

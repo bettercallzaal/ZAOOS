@@ -5,6 +5,7 @@ import { librarySubmitSchema } from '@/lib/validation/library-schemas';
 import { isUrl, extractOGMetadata } from '@/lib/library/og-extract';
 import { generateResearchSummary } from '@/lib/library/minimax';
 import { moderateContent } from '@/lib/moderation/moderate';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();
@@ -105,7 +106,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[library/submit] Error:', error);
+    logger.error('[library/submit] Error:', error);
     return NextResponse.json({ error: 'Failed to submit entry' }, { status: 500 });
   }
 }

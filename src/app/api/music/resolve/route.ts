@@ -8,6 +8,7 @@ import {
   RateLimitError,
   type UniversalMusicCard,
 } from '@/lib/music/songlink';
+import { logger } from '@/lib/logger';
 
 const QuerySchema = z.object({
   url: z.string().url('Must be a valid URL').max(2048).refine(
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     // Store in cache (fire-and-forget, don't block response)
     storeInCache(url, card).catch((err) => {
-      console.error('[music/resolve] cache write failed:', err);
+      logger.error('[music/resolve] cache write failed:', err);
     });
 
     return NextResponse.json(card, {
@@ -63,14 +64,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     if (err instanceof RateLimitError) {
-      console.warn('[music/resolve] rate limited by Songlink');
+      logger.warn('[music/resolve] rate limited by Songlink');
       return NextResponse.json(
         { error: 'Music link service is temporarily busy. Try again shortly.' },
         { status: 429 },
       );
     }
 
-    console.error('[music/resolve] error:', err);
+    logger.error('[music/resolve] error:', err);
     return NextResponse.json(
       { error: 'Failed to resolve music links' },
       { status: 500 },
@@ -98,7 +99,7 @@ async function getCached(url: string): Promise<UniversalMusicCard | null> {
       if (error.code === '42P01' || error.message?.includes('does not exist')) {
         return null;
       }
-      console.warn('[music/resolve] cache read error:', error.message);
+      logger.warn('[music/resolve] cache read error:', error.message);
       return null;
     }
 
@@ -137,7 +138,7 @@ async function storeInCache(url: string, card: UniversalMusicCard): Promise<void
       );
 
     if (error && error.code !== '42P01' && !error.message?.includes('does not exist')) {
-      console.warn('[music/resolve] cache write error:', error.message);
+      logger.warn('[music/resolve] cache write error:', error.message);
     }
   } catch {
     // Silently skip — caching is best-effort

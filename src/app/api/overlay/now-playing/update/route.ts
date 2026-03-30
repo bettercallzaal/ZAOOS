@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const updateSchema = z.object({
   trackName: z.string().min(1).max(300),
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Overlay now-playing update error:', error);
+    logger.error('Overlay now-playing update error:', error);
     return NextResponse.json({ error: 'Failed to update now playing' }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getChannelMessages, getGuildMembers, isDiscordConfigured } from '@/lib/discord/client';
+import { logger } from '@/lib/logger';
 
 const INTROS_CHANNEL_ID = process.env.DISCORD_INTROS_CHANNEL_ID || '1145135336477950053';
 
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'Invalid type. Use: members, intros' }, { status: 400 });
     }
   } catch (err) {
-    console.error('[Discord sync] Error:', err);
+    logger.error('[Discord sync] Error:', err);
     return NextResponse.json({ error: 'Failed to read Discord data' }, { status: 500 });
   }
 }
@@ -157,7 +158,7 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (err) {
-    console.error('[Discord sync] POST error:', err);
+    logger.error('[Discord sync] POST error:', err);
     return NextResponse.json({ error: 'Sync failed' }, { status: 500 });
   }
 }

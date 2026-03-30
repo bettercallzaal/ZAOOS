@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { Livepeer } from 'livepeer';
+import { logger } from '@/lib/logger';
 
 function getLivepeerClient() {
   const apiKey = process.env.LIVEPEER_API_KEY;
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
   } catch (error) {
-    console.error('Get Livepeer stream error:', error);
+    logger.error('Get Livepeer stream error:', error);
     return NextResponse.json({ error: 'Failed to get stream' }, { status: 500 });
   }
 }
@@ -41,7 +42,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete Livepeer stream error:', error);
+    logger.error('Delete Livepeer stream error:', error);
     return NextResponse.json({ error: 'Failed to delete stream' }, { status: 500 });
   }
 }

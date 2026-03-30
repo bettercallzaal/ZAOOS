@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import Papa from 'papaparse';
 import { csvRowSchema } from '@/lib/validation/schemas';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
-    console.error('CSV upload error:', error);
+    logger.error('CSV upload error:', error);
     return NextResponse.json({ error: 'Failed to process CSV' }, { status: 500 });
   }
 }

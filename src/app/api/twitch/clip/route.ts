@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getValidTwitchToken, createTwitchClip } from '@/lib/twitch/client';
+import { logger } from '@/lib/logger';
 
 /** POST — create a Twitch clip */
 export async function POST() {
@@ -26,7 +27,7 @@ export async function POST() {
       editUrl: result.editUrl,
     });
   } catch (error) {
-    console.error('Twitch clip error:', error);
+    logger.error('Twitch clip error:', error);
     return NextResponse.json({ error: 'Failed to create clip' }, { status: 500 });
   }
 }

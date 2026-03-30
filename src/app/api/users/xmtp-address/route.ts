@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const schema = z.object({
   xmtpAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
     .eq('fid', session.fid);
 
   if (error) {
-    console.error('[xmtp-address] Failed to save:', error);
+    logger.error('[xmtp-address] Failed to save:', error);
     return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
   }
 

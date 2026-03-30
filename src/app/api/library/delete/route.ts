@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { libraryDeleteSchema } from '@/lib/validation/library-schemas';
+import { logger } from '@/lib/logger';
 
 export async function DELETE(req: NextRequest) {
   const session = await getSessionData();
@@ -34,7 +35,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[library/delete] Error:', error);
+    logger.error('[library/delete] Error:', error);
     return NextResponse.json({ error: 'Failed to delete entry' }, { status: 500 });
   }
 }

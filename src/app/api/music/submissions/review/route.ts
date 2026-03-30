@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
 import { broadcastToChannels } from '@/lib/publish/broadcast';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const reviewSchema = z.object({
   submission_id: z.string().uuid(),
@@ -85,12 +86,12 @@ export async function POST(req: NextRequest) {
       broadcastToChannels({
         text: `🎵 New track approved: ${trackLabel}\n\nListen on ZAO OS`,
         title: 'New Track Approved',
-      }).catch(console.error);
+      }).catch(logger.error);
     }
 
     return NextResponse.json({ success: true, status: newStatus });
   } catch (error) {
-    console.error('Review submission error:', error);
+    logger.error('Review submission error:', error);
     return NextResponse.json({ error: 'Failed to review submission' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
 
     return NextResponse.json({ track }, { status: 201 });
   } catch (err) {
-    console.error('[collaborative-tracks] POST error:', err);
+    logger.error('[collaborative-tracks] POST error:', err);
     return NextResponse.json({ error: 'Failed to add track' }, { status: 500 });
   }
 }
@@ -141,7 +142,7 @@ export async function DELETE(req: NextRequest, ctx: RouteContext) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[collaborative-tracks] DELETE error:', err);
+    logger.error('[collaborative-tracks] DELETE error:', err);
     return NextResponse.json({ error: 'Failed to remove track' }, { status: 500 });
   }
 }

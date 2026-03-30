@@ -4,6 +4,7 @@ import { getChannelFeed } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { Cast } from '@/types';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 const FEED_LIMIT = 20;
@@ -71,7 +72,7 @@ async function refreshFromNeynar(channel: string): Promise<Cast[]> {
     const { error: upsertErr } = await supabaseAdmin
       .from('channel_casts')
       .upsert(rows, { onConflict: 'hash' });
-    if (upsertErr) console.error('[messages] upsert error:', upsertErr);
+    if (upsertErr) logger.error('[messages] upsert error:', upsertErr);
   }
 
   return casts;
@@ -118,7 +119,7 @@ export async function GET(req: NextRequest) {
         casts = await refreshFromNeynar(channel);
         lastRefresh[channel] = now;
       } catch (neynarErr) {
-        console.error('[messages] Neynar refresh failed, falling back to DB:', neynarErr);
+        logger.error('[messages] Neynar refresh failed, falling back to DB:', neynarErr);
         // Fall back to DB on Neynar error
         const { data: dbRows } = await supabaseAdmin
           .from('channel_casts')
@@ -206,7 +207,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ casts: enrichedCasts, hasMore });
   } catch (error) {
-    console.error('[messages] error:', error);
+    logger.error('[messages] error:', error);
     return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
   }
 }

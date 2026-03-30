@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { isValidSubname, sanitizeSubname } from '@/lib/ens/subnames';
+import { logger } from '@/lib/logger';
 
 const requestSchema = z.object({
   requestedName: z.string().min(1).max(63),
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
       });
 
     if (insertError) {
-      console.error('[ens/subname-request] insert error:', insertError);
+      logger.error('[ens/subname-request] insert error:', insertError);
       return NextResponse.json({ error: 'Failed to submit request' }, { status: 500 });
     }
 
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
       message: `Request submitted for ${sanitized}.thezao.eth. An admin will review it.`,
     });
   } catch (err) {
-    console.error('[ens/subname-request] error:', err);
+    logger.error('[ens/subname-request] error:', err);
     return NextResponse.json({ error: 'Failed to submit request' }, { status: 500 });
   }
 }

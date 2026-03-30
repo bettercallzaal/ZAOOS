@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 // Disable Next.js fetch cache — Audius data should be fresh
 export const dynamic = 'force-dynamic';
@@ -47,7 +48,7 @@ export async function GET() {
         { signal: AbortSignal.timeout(10000), redirect: 'follow' },
       );
       if (!resolveRes.ok) {
-        console.error(`[radio] Audius resolve failed for ${config.url}: ${resolveRes.status} ${resolveRes.statusText}`);
+        logger.error(`[radio] Audius resolve failed for ${config.url}: ${resolveRes.status} ${resolveRes.statusText}`);
         continue;
       }
 
@@ -119,7 +120,7 @@ export async function GET() {
         });
       }
     } catch (err) {
-      console.error(`Radio playlist fetch failed for ${config.url}:`, err);
+      logger.error(`Radio playlist fetch failed for ${config.url}:`, err);
     }
   }
 

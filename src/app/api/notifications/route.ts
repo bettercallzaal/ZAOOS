@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const markReadSchema = z.union([
   z.object({ all: z.literal(true) }),
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
     const { data, error, count: totalCount } = await query;
 
     if (error) {
-      console.error('Notifications fetch error:', error);
+      logger.error('Notifications fetch error:', error);
       return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
     }
 
@@ -56,7 +57,7 @@ export async function GET(req: NextRequest) {
       offset,
     });
   } catch (err) {
-    console.error('Notifications fetch error:', err);
+    logger.error('Notifications fetch error:', err);
     return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
   }
 }

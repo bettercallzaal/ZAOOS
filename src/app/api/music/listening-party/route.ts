@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const createSchema = z.object({
   title: z.string().min(1).max(200),
@@ -30,7 +31,7 @@ export async function GET() {
 
     return NextResponse.json({ parties: parties || [] });
   } catch (err) {
-    console.error('[listening-party] GET failed:', err);
+    logger.error('[listening-party] GET failed:', err);
     return NextResponse.json(
       { error: 'Failed to load listening parties' },
       { status: 500 },
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ party }, { status: 201 });
   } catch (err) {
-    console.error('[listening-party] POST failed:', err);
+    logger.error('[listening-party] POST failed:', err);
     return NextResponse.json(
       { error: 'Failed to create listening party' },
       { status: 500 },

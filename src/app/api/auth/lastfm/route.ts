@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getAuthUrl } from '@/lib/music/lastfm';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -23,7 +24,7 @@ export async function GET() {
 
     return NextResponse.json({ connected, connectUrl });
   } catch (error) {
-    console.error('[lastfm/status] Error:', error);
+    logger.error('[lastfm/status] Error:', error);
     return NextResponse.json({ error: 'Failed to check status' }, { status: 500 });
   }
 }

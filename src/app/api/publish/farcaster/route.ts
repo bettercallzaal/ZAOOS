@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
 import { ENV } from '@/lib/env';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 const publishSchema = z.object({
   proposalId: z.string().uuid(),
@@ -132,7 +133,7 @@ export async function POST(req: NextRequest) {
       threshold,
     });
   } catch (err) {
-    console.error('[publish/farcaster] Error:', err);
+    logger.error('[publish/farcaster] Error:', err);
     return NextResponse.json({ error: 'Failed to publish cast' }, { status: 500 });
   }
 }

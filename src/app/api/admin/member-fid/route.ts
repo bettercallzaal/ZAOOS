@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const updateSchema = z.object({
   updates: z.array(z.object({
@@ -51,7 +52,7 @@ export async function GET() {
       },
     });
   } catch (err) {
-    console.error('Member FID list error:', err);
+    logger.error('Member FID list error:', err);
     return NextResponse.json({ error: 'Failed to load members' }, { status: 500 });
   }
 }
@@ -90,7 +91,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ updated, errors });
   } catch (err) {
-    console.error('Member FID update error:', err);
+    logger.error('Member FID update error:', err);
     return NextResponse.json({ error: 'Failed to update FIDs' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { Livepeer } from 'livepeer';
+import { logger } from '@/lib/logger';
 
 const CreateStreamSchema = z.object({
   name: z.string().min(1).max(100),
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Livepeer stream error:', error);
+    logger.error('Livepeer stream error:', error);
     return NextResponse.json({ error: 'Failed to create stream' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const statusSchema = z.object({
   castHash: z.string().min(1, 'castHash is required'),
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('[publish/status] DB error:', error);
+      logger.error('[publish/status] DB error:', error);
       return NextResponse.json({ error: 'Failed to fetch publish status' }, { status: 500 });
     }
 
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ results });
   } catch (err) {
-    console.error('[publish/status] Error:', err);
+    logger.error('[publish/status] Error:', err);
     return NextResponse.json({ error: 'Failed to fetch publish status' }, { status: 500 });
   }
 }

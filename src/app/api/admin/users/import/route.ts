@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getUsersByFids } from '@/lib/farcaster/neynar';
+import { logger } from '@/lib/logger';
 
 /**
  * POST — Import all allowlist entries into the users table.
@@ -38,7 +39,7 @@ export async function POST() {
         const fcUsers = await getUsersByFids(allFids);
         for (const u of fcUsers) fcUserMap.set(u.fid, u);
       } catch (err) {
-        console.warn('[import] Batch Farcaster fetch failed, using cached data:', err);
+        logger.warn('[import] Batch Farcaster fetch failed, using cached data:', err);
       }
     }
 
@@ -139,7 +140,7 @@ export async function POST() {
       message: `Imported ${imported} users, skipped ${skipped} duplicates${errors.length > 0 ? `, ${errors.length} errors` : ''}`,
     });
   } catch (error) {
-    console.error('Import users error:', error);
+    logger.error('Import users error:', error);
     return NextResponse.json({ error: 'Import failed' }, { status: 500 });
   }
 }

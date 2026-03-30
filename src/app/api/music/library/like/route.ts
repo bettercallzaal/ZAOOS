@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { upsertSong } from '@/lib/music/library';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { logger } from '@/lib/logger';
 
 const likeSchema = z.object({
   url: z.string().url().max(500),
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ liked: !!like, likeCount: count || 0, likers });
   } catch (err) {
-    console.error('[like] GET failed:', err);
+    logger.error('[like] GET failed:', err);
     return NextResponse.json({ error: 'Failed to check like status' }, { status: 500 });
   }
 }
@@ -145,7 +146,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ liked, likeCount: count || 0 });
   } catch (err) {
-    console.error('[like] POST failed:', err);
+    logger.error('[like] POST failed:', err);
     return NextResponse.json({ error: 'Failed to toggle like' }, { status: 500 });
   }
 }

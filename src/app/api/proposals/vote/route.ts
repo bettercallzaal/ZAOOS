@@ -5,6 +5,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
 import { proposalVoteSchema } from '@/lib/validation/schemas';
+import { logger } from '@/lib/logger';
 
 const OG_RESPECT = '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as const;
 const ZOR_RESPECT = '0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c' as const;
@@ -106,7 +107,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error('[vote] upsert failed:', error);
+      logger.error('[vote] upsert failed:', error);
       // If upsert fails due to missing constraint, try insert then update
       if (error.code === '42P10' || error.message?.includes('ON CONFLICT')) {
         // Fallback: check if vote exists, then update or insert
@@ -153,9 +154,9 @@ export async function POST(req: NextRequest) {
           actorFid: session.fid,
           actorDisplayName: session.displayName,
           actorPfpUrl: session.pfpUrl,
-        }).catch((err) => console.error('[notify]', err));
+        }).catch((err) => logger.error('[notify]', err));
       }
-    }).catch((err) => console.error('[notify]', err));
+    }).catch((err) => logger.error('[notify]', err));
 
     // Check if this vote pushed the proposal over the publish threshold
     // Must await — fire-and-forget gets killed by Vercel function timeout
@@ -164,7 +165,7 @@ export async function POST(req: NextRequest) {
       try {
         published = await checkPublishThreshold(proposal_id);
       } catch (err) {
-        console.error('[publish-threshold]', err);
+        logger.error('[publish-threshold]', err);
       }
     }
 
@@ -174,7 +175,7 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json(response);
   } catch (err) {
-    console.error('Vote error:', err);
+    logger.error('Vote error:', err);
     return NextResponse.json({ error: 'Failed to submit vote' }, { status: 500 });
   }
 }
@@ -293,9 +294,9 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     } else {
       fcError = fcResult.reason instanceof Error ? fcResult.reason.message : 'Farcaster publish failed';
       if (fcError.includes('Signer not configured')) {
-        console.warn(`[publish-threshold] ${fcError}`);
+        logger.warn(`[publish-threshold] ${fcError}`);
       } else {
-        console.error('[publish-threshold] Farcaster publish failed:', fcError);
+        logger.error('[publish-threshold] Farcaster publish failed:', fcError);
       }
     }
 
@@ -307,7 +308,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       }
     } else {
       bskyError = bskyResult.reason instanceof Error ? bskyResult.reason.message : 'Bluesky publish failed';
-      console.error('[publish-threshold] Bluesky publish failed:', bskyError);
+      logger.error('[publish-threshold] Bluesky publish failed:', bskyError);
     }
 
     // Publish to X, Telegram, and Discord in parallel (may use castHash from Farcaster)
@@ -414,7 +415,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           if (xError.includes('CreditsDepleted')) xError = 'X credits depleted — add credits at developer.x.com';
           else if (xError.includes('403')) xError = 'X permissions error — check app has Read+Write';
           else if (xError.includes('401')) xError = 'X auth failed — check API keys';
-          console.error('[publish-threshold] X publish failed:', xError);
+          logger.error('[publish-threshold] X publish failed:', xError);
         } else if ('url' in val) {
           xUrl = val.url ?? null;
           console.info(`[publish-threshold] Published to @thezaodao X: ${xUrl}`);
@@ -424,7 +425,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           console.info('[publish-threshold] Telegram skipped — not configured');
         } else if ('error' in val) {
           telegramError = val.error || 'Telegram publish failed';
-          console.error('[publish-threshold] Telegram publish failed:', telegramError);
+          logger.error('[publish-threshold] Telegram publish failed:', telegramError);
         } else if ('messageId' in val) {
           telegramMessageId = val.messageId ?? null;
           console.info(`[publish-threshold] Published to Telegram: ${telegramMessageId}`);
@@ -434,7 +435,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           console.info('[publish-threshold] Discord skipped — not configured');
         } else if ('error' in val) {
           discordError = val.error || 'Discord publish failed';
-          console.error('[publish-threshold] Discord publish failed:', discordError);
+          logger.error('[publish-threshold] Discord publish failed:', discordError);
         } else if ('messageId' in val) {
           discordMessageId = val.messageId ?? null;
           console.info(`[publish-threshold] Published to Discord: ${discordMessageId}`);
@@ -444,7 +445,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           console.info('[publish-threshold] Threads skipped — not configured');
         } else if ('error' in val) {
           threadsError = val.error || 'Threads publish failed';
-          console.error('[publish-threshold] Threads publish failed:', threadsError);
+          logger.error('[publish-threshold] Threads publish failed:', threadsError);
         } else if ('url' in val) {
           threadsUrl = val.url ?? null;
           console.info(`[publish-threshold] Published to Threads: ${threadsUrl}`);
@@ -478,7 +479,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       .eq('id', proposalId);
 
     if (updateErr) {
-      console.error('[publish-threshold] DB update failed:', updateErr);
+      logger.error('[publish-threshold] DB update failed:', updateErr);
       // Retry without bluesky URI column in case it doesn't exist
       const { error: retryErr } = await supabaseAdmin
         .from('proposals')
@@ -490,7 +491,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         .eq('id', proposalId);
 
       if (retryErr) {
-        console.error('[publish-threshold] DB retry also failed:', retryErr);
+        logger.error('[publish-threshold] DB retry also failed:', retryErr);
       } else {
         console.info('[publish-threshold] DB updated (without bluesky URI column)');
       }

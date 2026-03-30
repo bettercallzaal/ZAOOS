@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const SONGJAM_LEADERBOARD_BASE = 'https://songjamspace-leaderboard.logesh-063.workers.dev';
 
@@ -44,7 +45,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Songjam leaderboard error:', error);
+    logger.error('Songjam leaderboard error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
 
     const tokenData = await tokenRes.json();
     if (!tokenData.access_token) {
-      console.error('Twitch token exchange failed:', tokenData);
+      logger.error('Twitch token exchange failed:', tokenData);
       return NextResponse.redirect(new URL('/settings?error=twitch_token', req.nextUrl.origin));
     }
 
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest) {
     const twitchUser = userData.data?.[0];
 
     if (!twitchUser) {
-      console.error('Twitch user fetch failed:', userData);
+      logger.error('Twitch user fetch failed:', userData);
       return NextResponse.redirect(new URL('/settings?error=twitch_user', req.nextUrl.origin));
     }
 
@@ -90,13 +91,13 @@ export async function GET(req: NextRequest) {
     );
 
     if (dbError) {
-      console.error('Twitch DB upsert error:', dbError);
+      logger.error('Twitch DB upsert error:', dbError);
       return NextResponse.redirect(new URL('/settings?error=twitch_save', req.nextUrl.origin));
     }
 
     return NextResponse.redirect(new URL('/settings?connected=twitch', req.nextUrl.origin));
   } catch (err) {
-    console.error('Twitch callback error:', err);
+    logger.error('Twitch callback error:', err);
     return NextResponse.redirect(new URL('/settings?error=twitch_unknown', req.nextUrl.origin));
   }
 }

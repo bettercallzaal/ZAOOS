@@ -5,6 +5,7 @@ import { createWalletClient, http } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 // SECURITY: This uses the APP's signer wallet (APP_SIGNER_PRIVATE_KEY),
 // NOT any user's personal wallet. This key was auto-generated at project
@@ -30,7 +31,7 @@ export async function POST() {
     // Step 1: Create a managed signer
     const signer = await createSigner();
     if (!signer?.signer_uuid || !signer?.public_key) {
-      console.error('createSigner returned incomplete data: missing signer_uuid or public_key');
+      logger.error('createSigner returned incomplete data: missing signer_uuid or public_key');
       return NextResponse.json({ error: 'Signer creation returned invalid data' }, { status: 502 });
     }
     const signerUuid = signer.signer_uuid;
@@ -72,7 +73,7 @@ export async function POST() {
     // Step 3: Register signed key to get approval URL
     const registered = await registerSignedKey(signerUuid, appFid, deadline, signature);
     if (!registered?.signer_uuid || !registered?.status || !registered?.signer_approval_url) {
-      console.error('registerSignedKey returned incomplete data: missing required fields');
+      logger.error('registerSignedKey returned incomplete data: missing required fields');
       return NextResponse.json({ error: 'Key registration returned invalid data' }, { status: 502 });
     }
 
@@ -82,7 +83,7 @@ export async function POST() {
       approvalUrl: registered.signer_approval_url,
     });
   } catch (error) {
-    console.error('Signer creation error:', error);
+    logger.error('Signer creation error:', error);
     return NextResponse.json({ error: 'Failed to create signer' }, { status: 500 });
   }
 }

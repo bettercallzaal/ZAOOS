@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ENV } from '@/lib/env';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const minimaxSchema = z.object({
   messages: z.array(z.object({
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     const text = await res.text();
     if (!res.ok) {
-      console.error('[minimax] API error:', res.status, text);
+      logger.error('[minimax] API error:', res.status, text);
       return NextResponse.json({ error: 'Minimax request failed', details: text }, { status: res.status });
     }
 
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('[minimax] Unexpected error:', error);
+    logger.error('[minimax] Unexpected error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
     const tokenData = await tokenRes.json();
 
     if (!tokenData.access_token) {
-      console.error('Facebook token exchange failed:', tokenData);
+      logger.error('Facebook token exchange failed:', tokenData);
       return NextResponse.redirect(new URL('/settings?error=facebook_token', req.nextUrl.origin));
     }
 
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
     const userData = await userRes.json();
 
     if (!userData.id) {
-      console.error('Facebook user fetch failed:', userData);
+      logger.error('Facebook user fetch failed:', userData);
       return NextResponse.redirect(new URL('/settings?error=facebook_user', req.nextUrl.origin));
     }
 
@@ -97,13 +98,13 @@ export async function GET(req: NextRequest) {
     );
 
     if (dbError) {
-      console.error('Facebook DB upsert error:', dbError);
+      logger.error('Facebook DB upsert error:', dbError);
       return NextResponse.redirect(new URL('/settings?error=facebook_save', req.nextUrl.origin));
     }
 
     return NextResponse.redirect(new URL('/settings?connected=facebook', req.nextUrl.origin));
   } catch (err) {
-    console.error('Facebook callback error:', err);
+    logger.error('Facebook callback error:', err);
     return NextResponse.redirect(new URL('/settings?error=facebook_unknown', req.nextUrl.origin));
   }
 }

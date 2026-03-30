@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { getHindsightClient } from '@/lib/hindsight';
+import { logger } from '@/lib/logger';
 
 const RecallQuerySchema = z.object({
   q: z.string().min(1).max(500),
@@ -51,7 +52,7 @@ export async function GET(
       })),
     });
   } catch (error) {
-    console.error('Failed to recall memories:', error);
+    logger.error('Failed to recall memories:', error);
     return NextResponse.json(
       { error: 'Failed to recall memories' },
       { status: 500 }

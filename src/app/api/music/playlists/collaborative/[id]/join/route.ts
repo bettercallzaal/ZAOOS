@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -41,7 +42,7 @@ export async function POST(_req: Request, ctx: RouteContext) {
 
     return NextResponse.json({ success: true, role: 'contributor' });
   } catch (err) {
-    console.error('[collaborative-join] POST error:', err);
+    logger.error('[collaborative-join] POST error:', err);
     return NextResponse.json({ error: 'Failed to join playlist' }, { status: 500 });
   }
 }

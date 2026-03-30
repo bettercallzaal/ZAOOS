@@ -7,6 +7,7 @@ import type { PromptConfig } from '@/lib/apo/types';
 import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
+import { logger } from '@/lib/logger';
 
 const RequestSchema = z.object({
   promptName: z.string().min(1),
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
     const result = await runAPO(config);
     return NextResponse.json(result);
   } catch (err) {
-    console.error('[apo/run] Error:', err);
+    logger.error('[apo/run] Error:', err);
     return NextResponse.json(
       { error: 'APO optimization failed' },
       { status: 500 },

@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import type { TrackType } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -206,7 +207,7 @@ export async function GET(request: NextRequest) {
       },
     );
   } catch (err) {
-    console.error('[music/feed] error:', err);
+    logger.error('[music/feed] error:', err);
     return NextResponse.json({ error: 'Failed to fetch music feed' }, { status: 500 });
   }
 }

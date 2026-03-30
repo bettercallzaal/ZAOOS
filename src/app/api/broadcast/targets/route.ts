@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getUserTargets, createTarget, deleteTarget } from '@/lib/broadcast/targetsDb';
+import { logger } from '@/lib/logger';
 
 const CreateTargetSchema = z.object({
   platform: z.enum(['youtube', 'twitch', 'tiktok', 'facebook', 'kick', 'custom']),
@@ -21,7 +22,7 @@ export async function GET() {
     const targets = await getUserTargets(session.fid);
     return NextResponse.json({ targets });
   } catch (error) {
-    console.error('Get targets error:', error);
+    logger.error('Get targets error:', error);
     return NextResponse.json({ error: 'Failed to fetch targets' }, { status: 500 });
   }
 }
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ target });
   } catch (error) {
-    console.error('Create target error:', error);
+    logger.error('Create target error:', error);
     return NextResponse.json({ error: 'Failed to create target' }, { status: 500 });
   }
 }
@@ -67,7 +68,7 @@ export async function DELETE(req: NextRequest) {
     await deleteTarget(id, session.fid);
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete target error:', error);
+    logger.error('Delete target error:', error);
     return NextResponse.json({ error: 'Failed to delete target' }, { status: 500 });
   }
 }

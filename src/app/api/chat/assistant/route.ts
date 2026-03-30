@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { logger } from '@/lib/logger';
 
 const AssistantSchema = z.object({
   messages: z.array(z.object({
@@ -134,7 +135,7 @@ export async function POST(req: NextRequest) {
 
     const text = await res.text();
     if (!res.ok) {
-      console.error('[assistant] Minimax error:', res.status, text);
+      logger.error('[assistant] Minimax error:', res.status, text);
       return NextResponse.json({ error: 'AI request failed' }, { status: 500 });
     }
 
@@ -147,7 +148,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('[assistant] Error:', error);
+    logger.error('[assistant] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

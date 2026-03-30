@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   targetFid: z.coerce.number().int().positive(),
@@ -98,7 +99,7 @@ export async function GET(req: NextRequest) {
       sharedCount: sharedIds.length,
     });
   } catch (err) {
-    console.error('[taste-match] GET failed:', err);
+    logger.error('[taste-match] GET failed:', err);
     return NextResponse.json(
       { error: 'Failed to compute taste match' },
       { status: 500 },

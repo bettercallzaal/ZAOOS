@@ -4,6 +4,7 @@ import { checkAllowlist } from '@/lib/gates/allowlist';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { saveSession } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 const quickAuthClient = createClient();
 
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest) {
       pfpUrl: neynarUser?.pfp_url || '',
     });
   } catch (error) {
-    console.error('Mini app auth error:', error);
+    logger.error('Mini app auth error:', error);
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 }

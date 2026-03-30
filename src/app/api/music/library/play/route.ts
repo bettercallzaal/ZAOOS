@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { incrementPlayCount } from '@/lib/music/library';
+import { logger } from '@/lib/logger';
 
 const schema = z.object({ songId: z.string().uuid() });
 
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     await incrementPlayCount(parsed.data.songId);
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[library] play count failed:', err);
+    logger.error('[library] play count failed:', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

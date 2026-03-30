@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import * as crypto from 'crypto';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // Zod schemas — one per event type, matching bot's WebIntegration payloads
@@ -149,7 +150,7 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Fail closed if webhook secret is not configured
     if (!process.env.FRACTAL_BOT_WEBHOOK_SECRET) {
-      console.error('[fractal-webhook] FRACTAL_BOT_WEBHOOK_SECRET not configured');
+      logger.error('[fractal-webhook] FRACTAL_BOT_WEBHOOK_SECRET not configured');
       return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
     }
 
@@ -158,7 +159,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Authenticate
     if (!validateWebhookAuth(req, rawBody)) {
-      console.warn('[fractal-webhook] Unauthorized request');
+      logger.warn('[fractal-webhook] Unauthorized request');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -173,7 +174,7 @@ export async function POST(req: NextRequest) {
     // 5. Validate envelope
     const envelopeParsed = webhookEnvelopeSchema.safeParse(body);
     if (!envelopeParsed.success) {
-      console.warn('[fractal-webhook] Invalid envelope:', envelopeParsed.error.flatten());
+      logger.warn('[fractal-webhook] Invalid envelope:', envelopeParsed.error.flatten());
       return NextResponse.json(
         { error: 'Invalid payload', details: envelopeParsed.error.flatten() },
         { status: 400 },
@@ -186,7 +187,7 @@ export async function POST(req: NextRequest) {
     const dataSchema = dataSchemas[event];
     const dataParsed = dataSchema.safeParse(data);
     if (!dataParsed.success) {
-      console.warn(`[fractal-webhook] Invalid ${event} data:`, dataParsed.error.flatten());
+      logger.warn(`[fractal-webhook] Invalid ${event} data:`, dataParsed.error.flatten());
       return NextResponse.json(
         { error: `Invalid data for ${event}`, details: dataParsed.error.flatten() },
         { status: 400 },
@@ -194,7 +195,7 @@ export async function POST(req: NextRequest) {
     }
 
     const validatedData = dataParsed.data;
-    console.log(`[fractal-webhook] ${event} for fractal ${fractalId}`);
+    logger.info(`[fractal-webhook] ${event} for fractal ${fractalId}`);
 
     // 7. Process event — update main tables + log to audit table
     const [eventResult] = await Promise.allSettled([
@@ -204,13 +205,13 @@ export async function POST(req: NextRequest) {
 
     // If the main processing failed, return 500 (audit log failure is non-fatal)
     if (eventResult.status === 'rejected') {
-      console.error(`[fractal-webhook] ${event} processing failed:`, eventResult.reason);
+      logger.error(`[fractal-webhook] ${event} processing failed:`, eventResult.reason);
       return NextResponse.json({ error: 'Failed to process event' }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true, event });
   } catch (err) {
-    console.error('[fractal-webhook] Unhandled error:', err);
+    logger.error('[fractal-webhook] Unhandled error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -271,7 +272,7 @@ async function handleFractalStarted(
     );
 
   if (error) {
-    console.error('[fractal-webhook] fractal_started upsert error:', error);
+    logger.error('[fractal-webhook] fractal_started upsert error:', error);
     throw error;
   }
 }
@@ -301,7 +302,7 @@ async function handleVoteCast(
     .eq('discord_thread_id', fractalId);
 
   if (error) {
-    console.error('[fractal-webhook] vote_cast update error:', error);
+    logger.error('[fractal-webhook] vote_cast update error:', error);
     // Non-fatal: vote is already recorded in the audit log
   }
 }
@@ -329,7 +330,7 @@ async function handleRoundComplete(
     .eq('discord_thread_id', fractalId);
 
   if (error) {
-    console.error('[fractal-webhook] round_complete update error:', error);
+    logger.error('[fractal-webhook] round_complete update error:', error);
   }
 }
 
@@ -359,12 +360,12 @@ async function handleFractalComplete(
     .single();
 
   if (findError) {
-    console.error('[fractal-webhook] fractal_complete session update error:', findError);
+    logger.error('[fractal-webhook] fractal_complete session update error:', findError);
     throw findError;
   }
 
   if (!session?.id) {
-    console.error('[fractal-webhook] fractal_complete: no session found for', fractalId);
+    logger.error('[fractal-webhook] fractal_complete: no session found for', fractalId);
     return;
   }
 
@@ -383,7 +384,7 @@ async function handleFractalComplete(
     .insert(scoreRows);
 
   if (scoresError) {
-    console.error('[fractal-webhook] fractal_complete scores insert error:', scoresError);
+    logger.error('[fractal-webhook] fractal_complete scores insert error:', scoresError);
     // Do not throw — the session was already marked complete
   }
 }
@@ -398,7 +399,7 @@ async function handleFractalPaused(fractalId: string) {
     .eq('discord_thread_id', fractalId);
 
   if (error) {
-    console.error('[fractal-webhook] fractal_paused update error:', error);
+    logger.error('[fractal-webhook] fractal_paused update error:', error);
   }
 }
 
@@ -412,7 +413,7 @@ async function handleFractalResumed(fractalId: string) {
     .eq('discord_thread_id', fractalId);
 
   if (error) {
-    console.error('[fractal-webhook] fractal_resumed update error:', error);
+    logger.error('[fractal-webhook] fractal_resumed update error:', error);
   }
 }
 
@@ -431,6 +432,6 @@ async function logEvent(fractalId: string, eventType: string, payload: unknown) 
   if (error) {
     // fractal_events table may not exist yet — log but do not throw.
     // The main event processing should still succeed even if audit logging fails.
-    console.error(`[fractal-webhook] Failed to log ${eventType} event:`, error);
+    logger.error(`[fractal-webhook] Failed to log ${eventType} event:`, error);
   }
 }

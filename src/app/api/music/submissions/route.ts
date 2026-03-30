@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { upsertSong } from '@/lib/music/library';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const VALID_TAGS = ['Hip-Hop', 'R&B', 'Electronic', 'Lo-Fi', 'Jazz', 'Afrobeats', 'Soul', 'Experimental'] as const;
 
@@ -94,7 +95,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ submissions: enriched });
   } catch (error) {
-    console.error('Fetch submissions error:', error);
+    logger.error('Fetch submissions error:', error);
     return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 });
   }
 }
@@ -190,7 +191,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, submission: result.data });
   } catch (error) {
-    console.error('Submit song error:', error);
+    logger.error('Submit song error:', error);
     return NextResponse.json({ error: 'Failed to submit song' }, { status: 500 });
   }
 }
@@ -236,7 +237,7 @@ export async function DELETE(req: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete submission error:', error);
+    logger.error('Delete submission error:', error);
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }

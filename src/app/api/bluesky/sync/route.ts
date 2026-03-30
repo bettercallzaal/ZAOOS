@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { syncMemberPosts } from '@/lib/bluesky/feed';
+import { logger } from '@/lib/logger';
 
 /**
  * POST — Sync Bluesky member posts into the feed index (admin only)
@@ -16,7 +17,7 @@ export async function POST() {
     const result = await syncMemberPosts();
     return NextResponse.json(result);
   } catch (err) {
-    console.error('[bluesky/sync] Error:', err);
+    logger.error('[bluesky/sync] Error:', err);
     return NextResponse.json({ error: 'Sync failed' }, { status: 500 });
   }
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   track: z.string().min(1).max(200),
@@ -101,7 +102,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('[frame] Error generating frame:', error);
+    logger.error('[frame] Error generating frame:', error);
     return new Response('Internal server error', {
       status: 500,
       headers: { 'Content-Type': 'text/plain' },

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFeedSkeleton } from '@/lib/bluesky/feed';
+import { logger } from '@/lib/logger';
 
 /**
  * GET — Bluesky Feed Generator endpoint
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('[bluesky/feed] Error:', err);
+    logger.error('[bluesky/feed] Error:', err);
     return NextResponse.json({ feed: [] }, { status: 500 });
   }
 }

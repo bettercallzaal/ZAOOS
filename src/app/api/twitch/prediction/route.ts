@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getValidTwitchToken, createTwitchPrediction, endTwitchPrediction } from '@/lib/twitch/client';
+import { logger } from '@/lib/logger';
 
 const createSchema = z.object({
   title: z.string().min(1).max(45),
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
       outcomes: result.outcomes,
     });
   } catch (error) {
-    console.error('Twitch prediction create error:', error);
+    logger.error('Twitch prediction create error:', error);
     return NextResponse.json({ error: 'Failed to create prediction' }, { status: 500 });
   }
 }
@@ -92,7 +93,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Twitch prediction end error:', error);
+    logger.error('Twitch prediction end error:', error);
     return NextResponse.json({ error: 'Failed to resolve prediction' }, { status: 500 });
   }
 }

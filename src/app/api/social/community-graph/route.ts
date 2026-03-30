@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -67,7 +68,7 @@ export async function GET() {
           }
         }
       } catch (err) {
-        console.error('Graph profile fetch error:', err);
+        logger.error('Graph profile fetch error:', err);
       }
     }
 
@@ -97,7 +98,7 @@ export async function GET() {
                 }
               }
             } catch (err) {
-              console.error(`Graph fetch error for viewer ${viewerFid}:`, err);
+              logger.error(`Graph fetch error for viewer ${viewerFid}:`, err);
             }
           }
         })
@@ -155,7 +156,7 @@ export async function GET() {
 
     return NextResponse.json(responseData, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } });
   } catch (err) {
-    console.error('Community graph error:', err);
+    logger.error('Community graph error:', err);
     return NextResponse.json({ error: 'Failed to build community graph' }, { status: 500 });
   }
 }

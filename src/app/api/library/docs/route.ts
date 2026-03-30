@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ docs: docs || [] });
   } catch (error) {
-    console.error('[library/docs] Error:', error);
+    logger.error('[library/docs] Error:', error);
     return NextResponse.json({ error: 'Failed to fetch docs' }, { status: 500 });
   }
 }

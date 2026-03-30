@@ -8,6 +8,7 @@ import { checkAllowlist } from '@/lib/gates/allowlist';
 import { saveWalletSession } from '@/lib/auth/session';
 import { getUserByAddress } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const publicClient = createPublicClient({
   chain: mainnet,
@@ -154,7 +155,7 @@ export async function POST(req: NextRequest) {
       );
     } catch (err) {
       // Non-critical — session is still valid
-      console.error('[Auth] Failed to upsert user record:', err);
+      logger.error('[Auth] Failed to upsert user record:', err);
     }
 
     return NextResponse.json({
@@ -163,7 +164,7 @@ export async function POST(req: NextRequest) {
       hasFarcaster: !!fid,
     });
   } catch (error) {
-    console.error('SIWE verify error:', error);
+    logger.error('SIWE verify error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

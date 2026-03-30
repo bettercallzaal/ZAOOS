@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/artists/featured — Featured artists for spotlight carousel
@@ -74,7 +75,7 @@ export async function GET() {
       headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=120' },
     });
   } catch (err) {
-    console.error('[artists/featured] error:', err);
+    logger.error('[artists/featured] error:', err);
     return NextResponse.json({ error: 'Failed to load featured artists' }, { status: 500 });
   }
 }

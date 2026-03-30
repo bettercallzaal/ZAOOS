@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ profiles: data, total: count ?? 0, limit, offset });
   } catch (err) {
-    console.error('[directory] GET error:', err);
+    logger.error('[directory] GET error:', err);
     return NextResponse.json({ error: 'Failed to fetch directory' }, { status: 500 });
   }
 }
@@ -67,7 +68,7 @@ export async function PATCH(req: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[directory] PATCH error:', err);
+    logger.error('[directory] PATCH error:', err);
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
   }
 }

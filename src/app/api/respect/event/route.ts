@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { logger } from '@/lib/logger';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (eventError) {
-      console.error('Failed to insert respect event:', eventError);
+      logger.error('Failed to insert respect event:', eventError);
       return NextResponse.json({ error: 'Failed to create respect event' }, { status: 500 });
     }
 
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest) {
         .eq('id', memberId);
 
       if (updateError) {
-        console.error('Failed to update member totals:', updateError);
+        logger.error('Failed to update member totals:', updateError);
         // Event was still recorded — return success with warning
         return NextResponse.json({
           success: true,
@@ -170,7 +171,7 @@ export async function POST(req: NextRequest) {
         .insert(newMember);
 
       if (insertError) {
-        console.error('Failed to create member record:', insertError);
+        logger.error('Failed to create member record:', insertError);
         return NextResponse.json({
           success: true,
           event_id: event.id,
@@ -190,7 +191,7 @@ export async function POST(req: NextRequest) {
       if (oldTotal < milestone && newTotal >= milestone) {
         autoCastToZao(
           `\u{1F3C6} ${member_name} just reached ${milestone} Respect!`,
-        ).catch((err) => console.error('[respect-milestone-cast]', err));
+        ).catch((err) => logger.error('[respect-milestone-cast]', err));
         break; // Only announce the highest crossed milestone
       }
     }
@@ -200,7 +201,7 @@ export async function POST(req: NextRequest) {
       event_id: event.id,
     });
   } catch (error) {
-    console.error('Record respect event error:', error);
+    logger.error('Record respect event error:', error);
     return NextResponse.json({ error: 'Failed to record respect event' }, { status: 500 });
   }
 }

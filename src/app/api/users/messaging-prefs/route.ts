@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const DEFAULTS = { autoJoinGroup: true, allowNonZaoDms: false };
 
@@ -27,7 +28,7 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    console.error('[messaging-prefs] GET error:', error);
+    logger.error('[messaging-prefs] GET error:', error);
     return NextResponse.json({ error: 'Failed to load preferences' }, { status: 500 });
   }
 
@@ -66,7 +67,7 @@ export async function PATCH(req: Request) {
     .eq('fid', session.fid);
 
   if (error) {
-    console.error('[messaging-prefs] PATCH error:', error);
+    logger.error('[messaging-prefs] PATCH error:', error);
     return NextResponse.json({ error: 'Failed to save preferences' }, { status: 500 });
   }
 

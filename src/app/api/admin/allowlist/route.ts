@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { allowlistEntrySchema, removeAllowlistSchema } from '@/lib/validation/schemas';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -48,7 +49,7 @@ export async function GET() {
 
     return NextResponse.json({ entries });
   } catch (err) {
-    console.error('Allowlist fetch error:', err);
+    logger.error('Allowlist fetch error:', err);
     return NextResponse.json({ error: 'Failed to fetch allowlist' }, { status: 500 });
   }
 }
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Add allowlist error:', error);
+    logger.error('Add allowlist error:', error);
     return NextResponse.json({ error: 'Failed to add entry' }, { status: 500 });
   }
 }
@@ -122,7 +123,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Remove allowlist error:', error);
+    logger.error('Remove allowlist error:', error);
     return NextResponse.json({ error: 'Failed to remove entry' }, { status: 500 });
   }
 }

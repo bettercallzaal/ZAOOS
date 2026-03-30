@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID || '';
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET || '';
@@ -101,7 +102,7 @@ export async function GET() {
     );
 
     if (!streamRes.ok) {
-      console.error('Twitch stream info fetch failed:', streamRes.status);
+      logger.error('Twitch stream info fetch failed:', streamRes.status);
       return NextResponse.json({ isLive: false, connected: true });
     }
 
@@ -127,7 +128,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Twitch stream-info error:', error);
+    logger.error('Twitch stream-info error:', error);
     return NextResponse.json({ error: 'Failed to fetch stream info' }, { status: 500 });
   }
 }

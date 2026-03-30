@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/discord/proposals — Fetch Discord proposals with aggregated vote data
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
     const { data: proposals, error: proposalsErr } = await query;
 
     if (proposalsErr) {
-      console.error('[discord/proposals] Query error:', proposalsErr);
+      logger.error('[discord/proposals] Query error:', proposalsErr);
       return NextResponse.json({ error: 'Failed to fetch proposals' }, { status: 500 });
     }
 
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
       .in('proposal_id', proposalIds);
 
     if (votesErr) {
-      console.error('[discord/proposals] Votes query error:', votesErr);
+      logger.error('[discord/proposals] Votes query error:', votesErr);
     }
 
     // Aggregate votes per proposal
@@ -142,7 +143,7 @@ export async function GET(req: NextRequest) {
       headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=30' },
     });
   } catch (err) {
-    console.error('[discord/proposals] Unexpected error:', err);
+    logger.error('[discord/proposals] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

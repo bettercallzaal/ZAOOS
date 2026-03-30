@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getRoomById, endRoom, updateRoom, updateRecording } from '@/lib/spaces/roomsDb';
 import { getSessionData } from '@/lib/auth/session';
 import { getValidTwitchToken, updateTwitchChannel } from '@/lib/twitch/client';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -16,7 +17,7 @@ export async function GET(
     }
     return NextResponse.json({ room });
   } catch (error) {
-    console.error('Get room error:', error);
+    logger.error('Get room error:', error);
     return NextResponse.json({ error: 'Failed to get room' }, { status: 500 });
   }
 }
@@ -76,13 +77,13 @@ export async function PATCH(
     // Sync title to connected streaming platforms (fire-and-forget)
     if (parsed.data.title) {
       syncStreamTitle(session.fid, parsed.data.title).catch(err =>
-        console.error('[room-update] Platform sync failed:', err)
+        logger.error('[room-update] Platform sync failed:', err)
       );
     }
 
     return NextResponse.json({ room: updated });
   } catch (error) {
-    console.error('Room update error:', error);
+    logger.error('Room update error:', error);
     return NextResponse.json({ error: 'Failed to update room' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getFollowing } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
@@ -88,7 +89,7 @@ export async function GET(
       next: data.next || null,
     });
   } catch (err) {
-    console.error('Following error:', err);
+    logger.error('Following error:', err);
     return NextResponse.json({ error: 'Failed to fetch following' }, { status: 500 });
   }
 }

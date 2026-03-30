@@ -71,7 +71,7 @@ export function PersistentPlayer({
   // ─── Idle state: entire bar tappable to start radio ────────────────
   if (!hasTrack) {
     return (
-      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80">
+      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <button
           onClick={() => radioLoading ? undefined : onRadioStart?.()}
           disabled={radioLoading}
@@ -202,7 +202,7 @@ export function PersistentPlayer({
           </motion.div>
           {/* Progress ring — circle around artwork */}
           {duration > 0 && (
-            <svg className="absolute -inset-1 w-[48px] h-[48px] -rotate-90 pointer-events-none" viewBox="0 0 48 48">
+            <svg className="absolute -inset-1 w-[48px] h-[48px] -rotate-90 pointer-events-none z-10" viewBox="0 0 48 48">
               <circle cx="24" cy="24" r="22" fill="none" stroke="rgba(245,166,35,0.15)" strokeWidth="2.5" />
               <circle
                 cx="24" cy="24" r="22"

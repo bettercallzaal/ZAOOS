@@ -11,3 +11,4 @@
 | [26](../026-hindsight-agent-memory/) | **Hindsight Memory System** | SOTA agent memory (91.4% LongMemEval), retain/recall/reflect, MCP support |
 | [90](../090-ai-run-community-agent-os/) | **AI-Run Community: Agent OS** | Autonomous community agents (daily digests, onboarding, governance) via Paperclip + ElizaOS |
 | [210](../210-microsoft-agent-lightning/) | **Microsoft Agent Lightning** | RL training for AI agents (MIT, 15.6K stars), APO/GRPO/PPO/SFT, LightningRL — Python+GPU, SKIP for now, steal APO pattern |
+| [216](../216-ai-features-live-rooms-music/) | **AI Features for Live Rooms & Music** | Auto-transcription (Deepgram), song ID (ACRCloud), audio moderation, AI DJ (Minimax+Cyanite), sentiment analysis, auto-highlights — pricing, integration plan |

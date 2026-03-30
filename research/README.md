@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **155+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **165+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -9,14 +9,14 @@
 | Category | Docs | Description |
 |----------|------|-------------|
 | [Farcaster Protocol & Ecosystem](./_categories/farcaster.md) | 12 | Protocol architecture, Neynar, Mini Apps, ecosystem landscape |
-| [Music, Curation & Artist Revenue](./_categories/music.md) | 22 | Player, streaming, curation, discovery feeds, gap analysis, play counting |
+| [Music, Curation & Artist Revenue](./_categories/music.md) | 23 | Player, streaming, curation, discovery feeds, gap analysis, play counting |
 | [On-Chain Music Distribution & NFTs](./_categories/onchain-distribution.md) | 18 | Arweave, BazAR, atomic assets, 0xSplits, BuilderOSS, thirdweb, ZOUNZ governance |
 | [Community, Social & Growth](./_categories/community.md) | 14 | Gating, messaging, onboarding, notifications, moderation, community directory |
 | [Identity, Governance & Tokens](./_categories/identity-governance.md) | 31 | ZIDs, Hats Protocol, Respect, ORDAO fractals, ZOUNZ DAO, Snapshot, ENS, Basenames |
-| [AI Agent & Intelligence](./_categories/ai-agent.md) | 5 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents, harness engineering |
+| [AI Agent & Intelligence](./_categories/ai-agent.md) | 6 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents, live room AI |
 | [Cross-Platform Publishing](./_categories/cross-platform.md) | 12 | Farcaster, X, Bluesky, Lens, Hive, Mastodon, Threads, Nostr, Reddit |
-| [Technical Infrastructure](./_categories/infrastructure.md) | 8 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4 |
-| [APIs & External Services](./_categories/apis.md) | 7 | 1,400+ APIs mapped, Alchemy, Coinflow, free tier maximization |
+| [Technical Infrastructure](./_categories/infrastructure.md) | 9 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming features |
+| [APIs & External Services](./_categories/apis.md) | 8 | 1,400+ APIs mapped, Alchemy, Coinflow, free tier maximization, 30+ zero-cost integrations |
 | [WaveWarZ Integration](./_categories/wavewarz.md) | 6 | Solana prediction markets, artist pipeline, battle mechanics |
 | [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |
 | [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 23 | Claude Code skills, Paperclip agents, autoresearch, git branching |
@@ -124,7 +124,7 @@
 | Mastodon cross-posting | Future | 4 hrs | [177](./177-mastodon-threads-cross-posting/) |
 | Nostr cross-posting | Future | 6 hrs | [097](./097-nostr-cross-posting-integration/) |
 | Cross-chain fractal governance | Future | 20 hrs | [108](./184-superchain-ordao-crosschain-fractal/) |
-| Mobile player optimization | Future | 12 hrs | [127](./189-mobile-player-optimization/) |
+| Mobile player optimization | Future | 12 hrs | [127](./189-mobile-player-optimization/), [220](./220-mobile-first-music-ux-patterns/) |
 | Native community directory | Future | 10 hrs | [110](./110-community-directory-crm/) |
 | External reputation signals | Future | 8 hrs | [134](./134-external-reputation-signals-comprehensive/) |
 | ArNS permanent domain | Future | 2 hrs | [152](./152-arweave-ecosystem-deep-dive/) |

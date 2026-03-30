@@ -29,3 +29,5 @@
 | [130](../130-next-music-integrations/) | **Next Music Integrations (Tier 4)** | Spotify Web API, Audius SDK deep, Farcaster music embeds, AI recs, Zora NFTs, Last.fm |
 | [138](../138-play-counting-stream-attribution/) | **Play Counting & Stream Attribution** | Do ZAO plays count? Spotify/SC/YT embeds = YES. Audius API = probably. Sound.xyz/Apple = NO |
 | [209](../209-ai-video-generation-tools/) | **AI Video Generation Tools** | Seedance 2.0 ($0.05/5s), Neural Frames ($19/mo, 8-stem beat sync), Freebeat ($9.99/mo), Kling/Runway/Sora compared, music video workflows, ZAO integration paths |
+| [213](../213-zao-stock-planning/) | **ZAO Stock: Festival Planning** | IRL music festival, Maine October 2026 — venue, artist payments (0xSplits), NFT tickets/POAP, Magnetiq IRL meets, ZAO Card drops, volunteer coordination |
+| [216](../216-ai-features-live-rooms-music/) | **AI Features for Live Rooms & Music** | Auto-transcription, song identification, audio moderation, AI DJ assistant, sentiment analysis, auto-highlights — 6 features, pricing matrix, phased implementation |

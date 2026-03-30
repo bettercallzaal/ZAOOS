@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -175,6 +176,22 @@ export async function POST(req: NextRequest) {
           event_id: event.id,
           warning: 'Event recorded but member record failed to create',
         });
+      }
+    }
+
+    // Fire-and-forget: check for respect milestones and auto-cast
+    const newTotal = memberId && memberData
+      ? Number(memberData.total_respect) + amount
+      : amount;
+    const oldTotal = memberId && memberData ? Number(memberData.total_respect) : 0;
+
+    const MILESTONES = [100, 500, 1000] as const;
+    for (const milestone of MILESTONES) {
+      if (oldTotal < milestone && newTotal >= milestone) {
+        autoCastToZao(
+          `\u{1F3C6} ${member_name} just reached ${milestone} Respect!`,
+        ).catch((err) => console.error('[respect-milestone-cast]', err));
+        break; // Only announce the highest crossed milestone
       }
     }
 

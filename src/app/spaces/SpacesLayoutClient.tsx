@@ -24,8 +24,8 @@ export function SpacesLayoutClient({ children }: { children: React.ReactNode }) 
 
   // Voice channels + live stages state
   const [channels, setChannels] = useState<Room[]>([]);
-  const [stages, setStages] = useState<Room[]>([]);
-  const [roomsLoading, setRoomsLoading] = useState(true);
+  const [, setStages] = useState<Room[]>([]);
+  const [, setRoomsLoading] = useState(true);
 
   // Connected voice channel state
   const [connectedRoomId, setConnectedRoomId] = useState<string | null>(null);

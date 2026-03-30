@@ -4,16 +4,23 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useCall, useCallStateHooks } from '@stream-io/video-react-sdk';
 import { useRadio } from '@/hooks/useRadio';
-import { useMobile } from '@/hooks/useMobile';
+import { useAutoStreamMarker } from '@/hooks/useAutoStreamMarker';
 import { startBroadcast, stopTarget, stopAll, retryTarget, type BroadcastState, type BroadcastTarget } from '@/lib/spaces/rtmpManager';
 import { DescriptionPanel } from './DescriptionPanel';
 import { ControlsPanel } from './ControlsPanel';
 import { PermissionRequests } from './PermissionRequests';
 import { RoomMusicPanel } from './RoomMusicPanel';
+import { RoomTrackQueue } from './RoomTrackQueue';
+import { SongRequests } from './SongRequests';
 import { BroadcastModal } from './BroadcastModal';
 import { BroadcastPanel } from './BroadcastPanel';
 import { ContentView } from './ContentView';
 import { SpeakersGrid } from './SpeakersGrid';
+import { TwitchChatPanel } from './TwitchChatPanel';
+import { TwitchEmbed } from './TwitchEmbed';
+import { RoomReactions } from './RoomReactions';
+import { HandRaiseQueue } from './HandRaiseQueue';
+import { RoomChat } from './RoomChat';
 
 const MusicSidebar = dynamic(
   () => import('@/components/music/MusicSidebar').then((m) => ({ default: m.MusicSidebar })),
@@ -26,6 +33,9 @@ interface RoomViewProps {
   roomId?: string;
   roomType?: 'voice_channel' | 'stage';
   hostFid?: number;
+  userFid?: number;
+  username?: string;
+  pfpUrl?: string;
 }
 
 export function RoomView({
@@ -34,13 +44,23 @@ export function RoomView({
   roomId,
   roomType = 'voice_channel',
   hostFid,
+  userFid,
+  username,
+  pfpUrl,
 }: RoomViewProps) {
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [broadcastState, setBroadcastState] = useState<BroadcastState | null>(null);
   const [showMusicSidebar, setShowMusicSidebar] = useState(false);
+  const [musicSidebarTab, setMusicSidebarTab] = useState<'browse' | 'queue' | 'requests'>('browse');
+  const [requestCount, setRequestCount] = useState(0);
+  const [showTwitchChat, setShowTwitchChat] = useState(false);
+  const [showRoomChat, setShowRoomChat] = useState(false);
+  const [twitchInfo, setTwitchInfo] = useState<{ username: string; canSend: boolean } | null>(null);
   const call = useCall();
   const radio = useRadio();
-  const isMobile = useMobile();
+
+  // Auto-create Twitch stream markers on track changes (host only)
+  useAutoStreamMarker(isHost, !!twitchInfo);
 
   const [layout, setLayout] = useState<'content-first' | 'speakers-first'>(
     roomType === 'voice_channel' ? 'speakers-first' : 'content-first'
@@ -51,6 +71,52 @@ export function RoomView({
   const callCustomData = useCallCustomData();
   const hasScreenShareActive = useHasOngoingScreenShare();
   const roomTitle = (callCustomData as Record<string, string>)?.title || 'Audio Room';
+
+  // Fetch Twitch connection info for the host (all viewers see the embed, host gets chat)
+  useEffect(() => {
+    // Host: fetch own info (includes stream key). Non-host: look up host's public Twitch username.
+    const url = isHost
+      ? '/api/platforms/twitch'
+      : hostFid
+        ? `/api/platforms/twitch?fid=${hostFid}`
+        : null;
+    if (!url) return;
+
+    fetch(url)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.connected && d.username) {
+          if (isHost) {
+            // Host can also chat
+            fetch(`/api/twitch/chat?channel=${encodeURIComponent(d.username)}`)
+              .then((r2) => r2.json())
+              .then((c) => setTwitchInfo({ username: d.username, canSend: c.canSend ?? false }))
+              .catch(() => setTwitchInfo({ username: d.username, canSend: false }));
+          } else {
+            setTwitchInfo({ username: d.username, canSend: false });
+          }
+        }
+      })
+      .catch(() => {});
+  }, [isHost, hostFid]);
+
+  // Poll for song request count (badge on Requests tab)
+  useEffect(() => {
+    if (!roomId) return;
+    const poll = async () => {
+      try {
+        const res = await fetch(`/api/spaces/song-request?roomId=${roomId}`);
+        if (res.ok) {
+          const data = await res.json();
+          const pending = (data.requests ?? []).filter((r: { status: string }) => r.status === 'pending');
+          setRequestCount(pending.length);
+        }
+      } catch { /* ignore */ }
+    };
+    poll();
+    const interval = setInterval(poll, 10_000);
+    return () => clearInterval(interval);
+  }, [roomId]);
 
   // Auto-switch to content-first when screen share starts, restore when it stops
   useEffect(() => {
@@ -107,6 +173,10 @@ export function RoomView({
           <div className="border-b border-gray-800 bg-[#0d1b2a]">
             <DescriptionPanel />
           </div>
+          <TwitchEmbed
+            channel={twitchInfo?.username ?? ''}
+            visible={!!twitchInfo?.username}
+          />
           {isHost && <PermissionRequests />}
 
           {/* Dual layout: content-first or speakers-first */}
@@ -114,6 +184,17 @@ export function RoomView({
             <ContentView isHost={isHost} />
           ) : (
             <SpeakersGrid hostFid={hostFid} />
+          )}
+
+          {/* Host: hand raise queue */}
+          {isHost && roomId && userFid && (
+            <HandRaiseQueue
+              roomId={roomId}
+              fid={userFid}
+              username={username ?? ''}
+              pfpUrl={pfpUrl ?? ''}
+              isHost={isHost}
+            />
           )}
 
           {broadcastState?.isLive && (
@@ -127,6 +208,11 @@ export function RoomView({
               />
             </div>
           )}
+          {/* Floating emoji reactions */}
+          {roomId && userFid && (
+            <RoomReactions roomId={roomId} fid={userFid} />
+          )}
+
           <div className="border-t border-gray-800 bg-[#0d1b2a]">
             <ControlsPanel
               isHost={isHost}
@@ -137,16 +223,66 @@ export function RoomView({
               onMusicToggle={() => setShowMusicSidebar((prev) => !prev)}
               onLayoutToggle={handleToggleLayout}
               layout={layout}
+              twitchUsername={twitchInfo?.username ?? null}
+              onTwitchChat={() => setShowTwitchChat((prev) => !prev)}
+              roomId={roomId}
+              userFid={userFid}
+              username={username}
+              pfpUrl={pfpUrl}
+              onRoomChat={() => setShowRoomChat((prev) => !prev)}
             />
           </div>
           {roomId && <RoomMusicPanel roomId={roomId} isHost={isHost} onOpenMusicBrowser={() => setShowMusicSidebar(true)} />}
         </div>
 
-        {/* Desktop music sidebar */}
+        {/* Desktop room chat sidebar */}
+        {showRoomChat && roomId && userFid && (
+          <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
+            <RoomChat
+              roomId={roomId}
+              fid={userFid}
+              username={username ?? ''}
+              pfpUrl={pfpUrl ?? ''}
+              onClose={() => setShowRoomChat(false)}
+            />
+          </div>
+        )}
+
+        {/* Desktop Twitch chat sidebar */}
+        {showTwitchChat && twitchInfo && (
+          <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
+            <TwitchChatPanel
+              twitchUsername={twitchInfo.username}
+              canSend={twitchInfo.canSend}
+              onClose={() => setShowTwitchChat(false)}
+            />
+          </div>
+        )}
+
+        {/* Desktop music sidebar with tabs: Browse / Queue / Requests */}
         {showMusicSidebar && (
           <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
             <div className="flex items-center justify-between p-3 border-b border-gray-800">
-              <span className="text-white text-sm font-medium">Browse Music</span>
+              <div className="flex gap-1">
+                {(['browse', 'queue', 'requests'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setMusicSidebarTab(tab)}
+                    className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors relative ${
+                      musicSidebarTab === tab
+                        ? 'bg-[#f5a623]/15 text-[#f5a623]'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {tab === 'browse' ? 'Browse' : tab === 'queue' ? 'Queue' : 'Requests'}
+                    {tab === 'requests' && requestCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#f5a623] text-[#0a1628] text-[9px] font-bold flex items-center justify-center">
+                        {requestCount}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
               <button
                 onClick={() => setShowMusicSidebar(false)}
                 className="text-gray-400 hover:text-white transition-colors"
@@ -155,10 +291,94 @@ export function RoomView({
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">
+              {musicSidebarTab === 'browse' && (
+                <MusicSidebar
+                  activeChannel="zao"
+                  isOpen={showMusicSidebar}
+                  isMobile={false}
+                  onClose={() => setShowMusicSidebar(false)}
+                  isRadioMode={radio.isRadioMode}
+                  radioLoading={radio.radioLoading}
+                  onRadioStart={radio.startRadio}
+                  onRadioStop={radio.stopRadio}
+                  radioPlaylistName={radio.radioPlaylist?.name}
+                  availableStations={radio.availableStations}
+                  currentStationIndex={radio.currentStationIndex}
+                  onSwitchStation={radio.switchStation}
+                />
+              )}
+              {musicSidebarTab === 'queue' && (
+                <RoomTrackQueue isHost={isHost} />
+              )}
+              {musicSidebarTab === 'requests' && roomId && (
+                <SongRequests roomId={roomId} isHost={isHost} />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile room chat overlay */}
+      {showRoomChat && roomId && userFid && (
+        <div className="md:hidden fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
+          <RoomChat
+            roomId={roomId}
+            fid={userFid}
+            username={username ?? ''}
+            pfpUrl={pfpUrl ?? ''}
+            onClose={() => setShowRoomChat(false)}
+          />
+        </div>
+      )}
+
+      {/* Mobile Twitch chat overlay */}
+      {showTwitchChat && twitchInfo && (
+        <div className="md:hidden fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
+          <TwitchChatPanel
+            twitchUsername={twitchInfo.username}
+            canSend={twitchInfo.canSend}
+            onClose={() => setShowTwitchChat(false)}
+          />
+        </div>
+      )}
+
+      {/* Mobile music overlay with tabs */}
+      {showMusicSidebar && (
+        <div className="md:hidden fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
+          <div className="flex items-center justify-between p-3 border-b border-gray-800">
+            <div className="flex gap-1">
+              {(['browse', 'queue', 'requests'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setMusicSidebarTab(tab)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors relative ${
+                    musicSidebarTab === tab
+                      ? 'bg-[#f5a623]/15 text-[#f5a623]'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  {tab === 'browse' ? 'Browse' : tab === 'queue' ? 'Queue' : 'Requests'}
+                  {tab === 'requests' && requestCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#f5a623] text-[#0a1628] text-[9px] font-bold flex items-center justify-center">
+                      {requestCount}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowMusicSidebar(false)}
+              className="text-gray-400 hover:text-white text-xl transition-colors"
+            >
+              &#10005;
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {musicSidebarTab === 'browse' && (
               <MusicSidebar
                 activeChannel="zao"
                 isOpen={showMusicSidebar}
-                isMobile={false}
+                isMobile={true}
                 onClose={() => setShowMusicSidebar(false)}
                 isRadioMode={radio.isRadioMode}
                 radioLoading={radio.radioLoading}
@@ -169,38 +389,13 @@ export function RoomView({
                 currentStationIndex={radio.currentStationIndex}
                 onSwitchStation={radio.switchStation}
               />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Mobile music overlay */}
-      {showMusicSidebar && (
-        <div className="md:hidden fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
-          <div className="flex items-center justify-between p-3 border-b border-gray-800">
-            <span className="text-white font-medium">Browse Music</span>
-            <button
-              onClick={() => setShowMusicSidebar(false)}
-              className="text-gray-400 hover:text-white text-xl transition-colors"
-            >
-              &#10005;
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            <MusicSidebar
-              activeChannel="zao"
-              isOpen={showMusicSidebar}
-              isMobile={true}
-              onClose={() => setShowMusicSidebar(false)}
-              isRadioMode={radio.isRadioMode}
-              radioLoading={radio.radioLoading}
-              onRadioStart={radio.startRadio}
-              onRadioStop={radio.stopRadio}
-              radioPlaylistName={radio.radioPlaylist?.name}
-              availableStations={radio.availableStations}
-              currentStationIndex={radio.currentStationIndex}
-              onSwitchStation={radio.switchStation}
-            />
+            )}
+            {musicSidebarTab === 'queue' && (
+              <RoomTrackQueue isHost={isHost} />
+            )}
+            {musicSidebarTab === 'requests' && roomId && (
+              <SongRequests roomId={roomId} isHost={isHost} />
+            )}
           </div>
         </div>
       )}

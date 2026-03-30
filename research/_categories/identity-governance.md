@@ -37,3 +37,4 @@
 | [135](../135-exhaustive-profile-enrichment-signals/) | **Exhaustive Profile Enrichment** | Every possible profile data point; Airstack as single API replacing 5-6 individual calls |
 | [127](../127-ens-integration-deep-dive/) | **ENS Integration Deep Dive** | Fix ENS resolution, text records, evaluate zao.eth subdomains via NameStone |
 | [158](../158-zao-member-naming-ens-basenames/) | **ZAO Member Naming** | ENS subnames vs Basenames vs custom — NameStone gasless `member.thezao.eth` for $5/year |
+| [214](../214-zao-knowledge-graph/) | **ZAO Knowledge Graph** | ZID-first identity + relationship graph: cross-chain wallets, IRL meets (Magnetiq), fractal co-attendance, social graph edges |

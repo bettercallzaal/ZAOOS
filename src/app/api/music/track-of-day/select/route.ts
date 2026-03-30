@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 // POST — select today's Track of the Day
 // Admin-only manual selection, OR auto-select if past cutoff (6pm EST)
@@ -70,6 +71,14 @@ export async function POST() {
       .single();
 
     if (updateError) throw updateError;
+
+    // Fire-and-forget: auto-cast Track of the Day announcement
+    const title = selected.title || 'Unknown Track';
+    const artist = selected.artist || 'Unknown Artist';
+    autoCastToZao(
+      `\u{1F3B5} Track of the Day: ${title} by ${artist} \u2014 Listen on ZAO OS: zaoos.com/music`,
+      'https://zaoos.com/music',
+    ).catch((err) => console.error('[totd] Auto-cast failed:', err));
 
     return NextResponse.json({ success: true, selected });
   } catch (error) {

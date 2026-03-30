@@ -17,8 +17,11 @@ export interface Room {
   persistent: boolean;
   channel_id: string | null;
   theme: string;
+  thumbnail_url: string | null;
   layout_preference: 'content-first' | 'speakers-first';
   last_active_at: string;
+  recording_url: string | null;
+  gate_config: Record<string, unknown> | null;
 }
 
 export async function createRoom(data: {
@@ -32,6 +35,7 @@ export async function createRoom(data: {
   roomType?: 'voice_channel' | 'stage';
   theme?: string;
   layoutPreference?: 'content-first' | 'speakers-first';
+  gateConfig?: { type: string; contractAddress: string; chainId: number; minBalance?: string; tokenId?: string };
 }): Promise<Room> {
   const { data: room, error } = await supabaseAdmin
     .from('rooms')
@@ -48,6 +52,7 @@ export async function createRoom(data: {
       room_type: data.roomType || 'stage',
       theme: data.theme || 'default',
       layout_preference: data.layoutPreference || 'content-first',
+      gate_config: data.gateConfig || null,
     })
     .select()
     .single();
@@ -135,4 +140,50 @@ export async function updateLayoutPreference(roomId: string, layout: 'content-fi
     .from('rooms')
     .update({ layout_preference: layout })
     .eq('id', roomId);
+}
+
+export async function updateRoom(id: string, data: {
+  title?: string;
+  description?: string;
+  theme?: string;
+  thumbnail_url?: string;
+}): Promise<Room> {
+  const updates: Record<string, unknown> = {};
+  if (data.title !== undefined) updates.title = data.title;
+  if (data.description !== undefined) updates.description = data.description;
+  if (data.theme !== undefined) updates.theme = data.theme;
+  if (data.thumbnail_url !== undefined) updates.thumbnail_url = data.thumbnail_url;
+
+  const { data: room, error } = await supabaseAdmin
+    .from('rooms')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw new Error(`Failed to update room: ${error.message}`);
+  return room;
+}
+
+export async function updateRecording(roomId: string, url: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('rooms')
+    .update({ recording_url: url })
+    .eq('id', roomId);
+
+  if (error) throw new Error(`Failed to update recording: ${error.message}`);
+}
+
+export async function getPastRooms(days: number = 7): Promise<Room[]> {
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabaseAdmin
+    .from('rooms')
+    .select('*')
+    .eq('state', 'ended')
+    .eq('room_type', 'stage')
+    .gte('ended_at', since)
+    .order('ended_at', { ascending: false });
+
+  if (error) throw new Error(`Failed to fetch past rooms: ${error.message}`);
+  return data ?? [];
 }

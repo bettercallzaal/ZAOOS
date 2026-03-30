@@ -49,7 +49,7 @@ export async function POST(
       return NextResponse.json({ error: 'Hindsight client not available' }, { status: 503 });
     }
 
-    const result = await (hindsight as { retain: (userId: string, content: string, opts: unknown) => Promise<Record<string, unknown>> }).retain(userId, content, {
+    const result = await (hindsight as unknown as { retain: (userId: string, content: string, opts: unknown) => Promise<Record<string, unknown>> }).retain(userId, content, {
       metadata: {
         eventType,
         ...metadata,

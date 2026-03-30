@@ -8,6 +8,7 @@ import { getUserByFid } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
 import { communityConfig } from '@/../community.config';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 const appClient = createAppClient({
   ethereum: viemConnector(),
@@ -170,6 +171,12 @@ export async function POST(req: NextRequest) {
               actorPfpUrl: user.pfp_url,
             }).catch((err) => console.error('[notify]', err));
           }
+
+          // Fire-and-forget: auto-cast welcome announcement
+          const handle = user.username ? `@${user.username}` : (user.display_name || 'a new member');
+          autoCastToZao(
+            `Welcome ${handle} to The ZAO! \u{1F3B6}`,
+          ).catch((err) => console.error('[welcome-cast]', err));
         }
       }
     } catch (err) {

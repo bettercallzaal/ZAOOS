@@ -51,7 +51,7 @@ export function NotificationBell() {
   }, []);
 
   // Initial fetch + Supabase Realtime subscription (falls back to polling)
-  /* eslint-disable react-hooks/set-state-in-effect -- initial fetch triggers async setState */
+   
   useEffect(() => {
     fetchNotifications();
 
@@ -91,7 +91,7 @@ export function NotificationBell() {
       if (fallbackInterval) clearInterval(fallbackInterval);
     };
   }, [fetchNotifications, user?.fid]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   // Close dropdown on outside click or Escape key
   useEffect(() => {

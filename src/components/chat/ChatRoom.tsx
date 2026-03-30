@@ -128,12 +128,12 @@ export function ChatRoom() {
   }, [user, walletXmtp.canConnect]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reset filters on channel switch + fetch submissions for queue
-  /* eslint-disable react-hooks/set-state-in-effect -- resetting filters on channel switch is intentional */
+   
   useEffect(() => {
     setContentFilter('all');
     setSortMode('newest');
   }, [activeChannel]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   // Keyboard shortcuts
   const shortcutHandlers = useMemo(() => ({

@@ -3,6 +3,7 @@
 import { useNowPlaying, NowPlayingEntry } from '@/hooks/useNowPlaying';
 import { usePlayer } from '@/providers/audio';
 import { useAuth } from '@/hooks/useAuth';
+import { useOverlaySync } from '@/hooks/useOverlaySync';
 
 /**
  * Horizontal scrolling bar showing members currently listening.
@@ -11,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
  */
 export function NowPlayingBar() {
   const { user } = useAuth();
+  useOverlaySync(user?.fid);
   const { presenceState } = useNowPlaying(
     user ? { fid: user.fid, username: user.username } : null,
   );

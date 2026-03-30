@@ -36,8 +36,6 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     // Expose active audio element globally for AudioFiltersPanel (Web Audio API)
     (globalThis as Record<string, unknown>).__zao_audio_a = audioA;
     (globalThis as Record<string, unknown>).__zao_audio_b = audioB;
-    const audio = getActive();
-
     // Only process events from the ACTIVE audio element to prevent
     // inactive element's canplay/ended/error from corrupting state
     const isActive = (e: Event) => e.target === getActive();
@@ -53,7 +51,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
         const timeLeft = a.duration - a.currentTime;
         if (timeLeft <= crossfadeSec && timeLeft > 0 && onEndedRef.current) {
           // Start crossfade — trigger next track early
-          startCrossfade(crossfadeSec);
+          startCrossfade();
         }
       }
     };
@@ -187,7 +185,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
 
   // ─── Crossfade helpers ──────────────────────────────────────────────
 
-  function startCrossfade(durationSec: number) {
+  function startCrossfade() {
     if (crossfadeTimerRef.current) return; // already crossfading
     // Trigger next track via onEnded callback — the load() will handle the crossfade
     if (onEndedRef.current) {

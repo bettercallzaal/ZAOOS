@@ -37,7 +37,7 @@ export async function POST(
     const hindsight = await getHindsightClient();
     if (!hindsight) return NextResponse.json({ error: 'Hindsight not available' }, { status: 503 });
 
-    const reflection = await (hindsight as any).reflect(userId, prompt);
+    const reflection = await hindsight.reflect(userId, prompt);
 
     return NextResponse.json({ reflection });
   } catch (error) {

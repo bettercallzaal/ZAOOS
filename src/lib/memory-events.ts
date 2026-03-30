@@ -126,7 +126,7 @@ export async function retainEvent(
     const hindsight = await getHindsightClient();
     if (!hindsight) return;
 
-    await (hindsight as any).retain(userFid, content, {
+    await hindsight.retain(userFid, content, {
       metadata: {
         eventType: event.type,
         timestamp: event.timestamp,

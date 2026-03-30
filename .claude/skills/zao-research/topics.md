@@ -16,6 +16,7 @@ Use this to quickly find if a topic has already been researched.
 - Hypersnap (incomplete) → `10`
 
 ## Dev Workflows & Agent Tooling
+- Vercel integrations, Airtable, custom integration console → `212`
 - Skills, research workflow & autoresearch improvements (MCP servers, OSS code search, self-improvement) → `164`
 - Skills audit, cleanup & security best practices → `137`
 - Skills & commands master reference → `154`

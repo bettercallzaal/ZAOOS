@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getRoomById, endRoom } from '@/lib/spaces/roomsDb';
+import { z } from 'zod';
+import { getRoomById, endRoom, updateRoom, updateRecording } from '@/lib/spaces/roomsDb';
 import { getSessionData } from '@/lib/auth/session';
+import { getValidTwitchToken, updateTwitchChannel } from '@/lib/twitch/client';
 
 export async function GET(
   req: NextRequest,
@@ -19,6 +21,15 @@ export async function GET(
   }
 }
 
+const UpdateSchema = z.object({
+  action: z.enum(['end', 'update']).optional().default('end'),
+  title: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+  theme: z.string().max(50).optional(),
+  thumbnail_url: z.string().url().max(500).optional(),
+  recording_url: z.string().url().max(500).optional(),
+});
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -36,13 +47,54 @@ export async function PATCH(
     }
 
     if (room.host_fid !== session.fid) {
-      return NextResponse.json({ error: 'Only the host can end the room' }, { status: 403 });
+      return NextResponse.json({ error: 'Only the host can modify the room' }, { status: 403 });
     }
 
-    await endRoom(id);
-    return NextResponse.json({ success: true });
+    const body = await req.json();
+    const parsed = UpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    if (parsed.data.action === 'end') {
+      await endRoom(id);
+      // Store recording URL if provided
+      if (parsed.data.recording_url) {
+        await updateRecording(id, parsed.data.recording_url);
+      }
+      return NextResponse.json({ success: true });
+    }
+
+    // Update room details
+    const updated = await updateRoom(id, {
+      title: parsed.data.title,
+      description: parsed.data.description,
+      theme: parsed.data.theme,
+      thumbnail_url: parsed.data.thumbnail_url,
+    });
+
+    // Sync title to connected streaming platforms (fire-and-forget)
+    if (parsed.data.title) {
+      syncStreamTitle(session.fid, parsed.data.title).catch(err =>
+        console.error('[room-update] Platform sync failed:', err)
+      );
+    }
+
+    return NextResponse.json({ room: updated });
   } catch (error) {
-    console.error('End room error:', error);
-    return NextResponse.json({ error: 'Failed to end room' }, { status: 500 });
+    console.error('Room update error:', error);
+    return NextResponse.json({ error: 'Failed to update room' }, { status: 500 });
   }
+}
+
+/** Sync room title to connected streaming platforms (Twitch, YouTube, etc.) */
+async function syncStreamTitle(fid: number, title: string) {
+  const token = await getValidTwitchToken(fid);
+  if (token) {
+    const ok = await updateTwitchChannel(token.accessToken, token.userId, { title });
+    if (ok) {
+      console.info('[twitch-sync] Title updated to:', title);
+    }
+  }
+  // YouTube title sync could go here in the future
 }

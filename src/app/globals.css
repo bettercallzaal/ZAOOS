@@ -96,6 +96,15 @@ body {
   animation: slide-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Slide down (BottomSheet exit) */
+@keyframes slide-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+.animate-slide-down {
+  animation: slide-down 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 /* Fade in */
 @keyframes fade-in {
   from { opacity: 0; }
@@ -111,6 +120,7 @@ body {
   .animate-slide-in-right,
   .animate-slide-in-left,
   .animate-slide-up,
+  .animate-slide-down,
   .animate-fade-in,
   .animate-spin {
     animation-duration: 0.01ms !important;

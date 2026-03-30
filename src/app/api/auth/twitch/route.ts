@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await getSessionData();
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -12,8 +12,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Twitch client ID not configured' }, { status: 500 });
   }
 
-  const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin}/api/auth/twitch/callback`;
-  const scopes = 'channel:read:stream_key channel:manage:broadcast chat:read';
+  const redirectUri = 'https://zaoos.com/api/auth/twitch/callback';
+  const scopes = 'channel:read:stream_key channel:manage:broadcast chat:read chat:edit channel:manage:polls channel:manage:predictions clips:edit channel:read:subscriptions moderator:read:followers';
 
   const url = new URL('https://id.twitch.tv/oauth2/authorize');
   url.searchParams.set('client_id', clientId);

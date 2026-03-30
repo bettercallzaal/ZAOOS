@@ -43,7 +43,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
   const [loading, setLoading] = useState(false);
   const [fetchingPlatforms, setFetchingPlatforms] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [, setShowCustomForm] = useState(false);
 
   // Fetch connected platforms when modal opens
   useEffect(() => {

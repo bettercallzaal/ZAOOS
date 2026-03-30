@@ -15,6 +15,7 @@ import { BroadcastPanel } from './BroadcastPanel';
 import { ContentView } from './ContentView';
 import { SpeakersGrid } from './SpeakersGrid';
 import { TwitchChatPanel } from './TwitchChatPanel';
+import { TwitchEmbed } from './TwitchEmbed';
 
 const MusicSidebar = dynamic(
   () => import('@/components/music/MusicSidebar').then((m) => ({ default: m.MusicSidebar })),
@@ -55,22 +56,33 @@ export function RoomView({
   const hasScreenShareActive = useHasOngoingScreenShare();
   const roomTitle = (callCustomData as Record<string, string>)?.title || 'Audio Room';
 
-  // Fetch Twitch connection info for the host
+  // Fetch Twitch connection info for the host (all viewers see the embed, host gets chat)
   useEffect(() => {
-    if (!isHost) return;
-    fetch('/api/platforms/twitch')
+    // Host: fetch own info (includes stream key). Non-host: look up host's public Twitch username.
+    const url = isHost
+      ? '/api/platforms/twitch'
+      : hostFid
+        ? `/api/platforms/twitch?fid=${hostFid}`
+        : null;
+    if (!url) return;
+
+    fetch(url)
       .then((r) => r.json())
       .then((d) => {
         if (d.connected && d.username) {
-          // Check chat capability via the chat endpoint
-          fetch(`/api/twitch/chat?channel=${encodeURIComponent(d.username)}`)
-            .then((r2) => r2.json())
-            .then((c) => setTwitchInfo({ username: d.username, canSend: c.canSend ?? false }))
-            .catch(() => setTwitchInfo({ username: d.username, canSend: false }));
+          if (isHost) {
+            // Host can also chat
+            fetch(`/api/twitch/chat?channel=${encodeURIComponent(d.username)}`)
+              .then((r2) => r2.json())
+              .then((c) => setTwitchInfo({ username: d.username, canSend: c.canSend ?? false }))
+              .catch(() => setTwitchInfo({ username: d.username, canSend: false }));
+          } else {
+            setTwitchInfo({ username: d.username, canSend: false });
+          }
         }
       })
       .catch(() => {});
-  }, [isHost]);
+  }, [isHost, hostFid]);
 
   // Auto-switch to content-first when screen share starts, restore when it stops
   useEffect(() => {
@@ -127,6 +139,10 @@ export function RoomView({
           <div className="border-b border-gray-800 bg-[#0d1b2a]">
             <DescriptionPanel />
           </div>
+          <TwitchEmbed
+            channel={twitchInfo?.username ?? ''}
+            visible={!!twitchInfo?.username}
+          />
           {isHost && <PermissionRequests />}
 
           {/* Dual layout: content-first or speakers-first */}

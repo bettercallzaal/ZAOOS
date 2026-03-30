@@ -1,11 +1,30 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await getSessionData();
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Optional: look up another user's public Twitch info by FID (no secrets)
+    const lookupFid = req.nextUrl.searchParams.get('fid');
+    if (lookupFid) {
+      const { data } = await supabaseAdmin
+        .from('connected_platforms')
+        .select('platform_username, platform_display_name')
+        .eq('user_fid', Number(lookupFid))
+        .eq('platform', 'twitch')
+        .single();
+
+      if (!data) return NextResponse.json({ connected: false });
+
+      return NextResponse.json({
+        connected: true,
+        username: data.platform_username,
+        displayName: data.platform_display_name,
+      });
+    }
 
     const { data, error } = await supabaseAdmin
       .from('connected_platforms')

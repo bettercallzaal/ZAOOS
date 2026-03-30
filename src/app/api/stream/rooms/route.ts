@@ -8,6 +8,7 @@ import {
   TWITCH_CATEGORY_MUSIC,
   TWITCH_CATEGORY_DJS,
 } from '@/lib/twitch/client';
+import { postCast } from '@/lib/farcaster/neynar';
 
 const CreateRoomSchema = z.object({
   title: z.string().min(1).max(100),
@@ -43,6 +44,11 @@ export async function POST(req: NextRequest) {
       console.error('[room-create] Twitch sync failed:', err)
     );
 
+    // Fire-and-forget: auto-cast go-live announcement to /zao channel
+    castGoLive(parsed.data.title, room.id).catch(err =>
+      console.error('[room-create] Go-live cast failed:', err)
+    );
+
     return NextResponse.json({ room });
   } catch (error) {
     console.error('Create room error:', error);
@@ -67,4 +73,15 @@ async function syncTwitchOnCreate(fid: number, title: string) {
   if (ok) {
     console.info(`[room-create] Twitch channel set — title: "${title}", category: ${gameId}`);
   }
+}
+
+/** Auto-post a go-live cast to the /zao Farcaster channel */
+async function castGoLive(title: string, roomId: string) {
+  const signerUuid = process.env.ZAO_OFFICIAL_SIGNER_UUID;
+  const neynarApiKey = process.env.ZAO_OFFICIAL_NEYNAR_API_KEY;
+  if (!signerUuid || !neynarApiKey) return;
+
+  const text = `${title} is now live on ZAO OS! \u{1F399}\uFE0F Join: https://zaoos.com/spaces/${roomId}`;
+  await postCast(signerUuid, text, 'zao', undefined, undefined, undefined, undefined, neynarApiKey);
+  console.info(`[room-create] Go-live cast posted for room ${roomId}`);
 }

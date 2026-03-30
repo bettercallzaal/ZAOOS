@@ -447,8 +447,6 @@ async function enrichAndReconcile(stats: SyncStats) {
   }
 
   // Build update rows
-  const updatePromises: Promise<unknown>[] = [];
-
   for (const member of membersRes.data || []) {
     const fractal = memberAgg.get(member.name);
     const events = eventAgg.get(member.name);
@@ -484,14 +482,9 @@ async function enrichAndReconcile(stats: SyncStats) {
       stats.firstRespectSet++;
     }
 
-    updatePromises.push(
-      supabaseAdmin.from('respect_members').update(updates).eq('id', member.id).then(),
-    );
+    await supabaseAdmin.from('respect_members').update(updates).eq('id', member.id);
     stats.enriched++;
   }
-
-  // Run all member updates in parallel (small dataset, ~40 members)
-  await Promise.allSettled(updatePromises);
 }
 
 // ─── Stats ──────────────────────────────────────────────────────────

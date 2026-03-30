@@ -2,11 +2,13 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 
+// Allow up to 60s on Vercel Pro for this heavy sync
+export const maxDuration = 60;
+
 // ─── Airtable config ────────────────────────────────────────────────
 const AIRTABLE_BASE_ID = 'appTUNG04rjZ9kSF4';
 const AIRTABLE_BASE = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`;
 
-// All 6 tabs from the ZAO TOKENS (ORDAO) base
 const TABLES = {
   summary: 'Summary',
   respect: 'Respect',
@@ -16,7 +18,6 @@ const TABLES = {
   wallets: 'Wallet Data',
 } as const;
 
-// Fibonacci score → rank mapping
 const RANK_MAP_2X: Record<number, number> = { 110: 1, 68: 2, 42: 3, 26: 4, 16: 5, 10: 6 };
 const RANK_MAP_1X: Record<number, number> = { 55: 1, 34: 2, 21: 3, 13: 4, 8: 5, 5: 6 };
 
@@ -24,7 +25,6 @@ function scoreToRank(score: number): number {
   return RANK_MAP_2X[score] || RANK_MAP_1X[score] || 0;
 }
 
-// Summary fields to skip when scanning for session columns in the Respect tab
 const SKIP_FIELDS = new Set([
   'Name', 'name', 'Member', 'Wallet', 'ETH WALLET', 'ETH WALLET (from Wallet Data 2)',
   'Total Respect', 'Total Points', 'Total', 'On-chain Balance', 'On-chain', 'Onchain',
@@ -35,9 +35,8 @@ const SKIP_FIELDS = new Set([
 
 type AirtableRecord = { id: string; fields: Record<string, unknown> };
 
-// ─── Airtable API helpers ───────────────────────────────────────────
+// ─── Helpers ────────────────────────────────────────────────────────
 
-/** Rate-limit delay — Airtable allows 5 req/sec */
 const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 async function fetchAllRecords(token: string, tableName: string): Promise<AirtableRecord[]> {
@@ -46,7 +45,7 @@ async function fetchAllRecords(token: string, tableName: string): Promise<Airtab
   const headers = { Authorization: `Bearer ${token}` };
 
   do {
-    await delay(220); // ~4.5 req/sec to stay under limit
+    if (offset) await delay(220);
 
     const url = new URL(`${AIRTABLE_BASE}/${encodeURIComponent(tableName)}`);
     url.searchParams.set('pageSize', '100');
@@ -70,39 +69,27 @@ async function fetchAllRecords(token: string, tableName: string): Promise<Airtab
 }
 
 function findField(fieldNames: Set<string>, candidates: string[]): string | null {
-  for (const c of candidates) {
-    if (fieldNames.has(c)) return c;
-  }
-  for (const c of candidates) {
-    for (const f of fieldNames) {
-      if (f.toLowerCase() === c.toLowerCase()) return f;
-    }
-  }
+  for (const c of candidates) if (fieldNames.has(c)) return c;
+  for (const c of candidates) for (const f of fieldNames) if (f.toLowerCase() === c.toLowerCase()) return f;
   return null;
 }
 
 function collectFieldNames(records: AirtableRecord[]): Set<string> {
   const names = new Set<string>();
-  for (const r of records) {
-    for (const key of Object.keys(r.fields)) names.add(key);
-  }
+  for (const r of records) for (const key of Object.keys(r.fields)) names.add(key);
   return names;
 }
 
-/** Safely extract a string from an Airtable field (handles arrays, numbers, nulls). */
 function asString(value: unknown): string | null {
   if (value == null) return null;
   if (typeof value === 'string') return value.trim() || null;
   if (Array.isArray(value)) {
-    // Linked records / lookups return arrays like ["0x123..."]
     const first = value[0];
     return typeof first === 'string' ? first.trim() || null : first != null ? String(first) : null;
   }
-  if (typeof value === 'number') return String(value);
   return String(value);
 }
 
-/** Safely extract a number from an Airtable field. */
 function asNumber(value: unknown): number {
   if (value == null) return 0;
   if (typeof value === 'number') return value;
@@ -111,49 +98,65 @@ function asNumber(value: unknown): number {
   return 0;
 }
 
-// ─── Step 1: Import Wallet Data (run first so other steps can use it) ─
+// ─── Step 1: Build wallet map ───────────────────────────────────────
 
-async function importWallets(
-  records: AirtableRecord[],
-  walletMap: Map<string, string>,
-  stats: SyncStats,
-) {
-  const fields = collectFieldNames(records);
-  const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
-  const walletField = findField(fields, ['ETH WALLET', 'Wallet', 'wallet_address', 'ETH WALLET (from Wallet Data 2)']);
+function buildWalletMap(
+  walletRecords: AirtableRecord[],
+  summaryRecords: AirtableRecord[],
+): Map<string, string> {
+  const walletMap = new Map<string, string>();
 
-  for (const r of records) {
-    const name = asString(r.fields[nameField]);
-    const wallet = walletField ? asString(r.fields[walletField])?.toLowerCase() ?? null : null;
+  // From Wallet Data tab
+  if (walletRecords.length > 0) {
+    const fields = collectFieldNames(walletRecords);
+    const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
+    const walletField = findField(fields, ['ETH WALLET', 'Wallet', 'wallet_address', 'ETH WALLET (from Wallet Data 2)']);
 
-    if (name && wallet && wallet.startsWith('0x')) {
-      walletMap.set(name, wallet);
-      stats.wallets++;
+    for (const r of walletRecords) {
+      const name = asString(r.fields[nameField]);
+      const wallet = walletField ? asString(r.fields[walletField])?.toLowerCase() ?? null : null;
+      if (name && wallet && wallet.startsWith('0x')) walletMap.set(name, wallet);
     }
   }
+
+  // Fallback from Summary tab
+  if (summaryRecords.length > 0) {
+    const fields = collectFieldNames(summaryRecords);
+    const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
+    const walletField = findField(fields, ['ETH WALLET (from Wallet Data 2)', 'ETH WALLET', 'Wallet']);
+    if (walletField) {
+      for (const r of summaryRecords) {
+        const name = asString(r.fields[nameField]);
+        const wallet = asString(r.fields[walletField])?.toLowerCase() ?? null;
+        if (name && wallet && wallet.startsWith('0x') && !walletMap.has(name)) {
+          walletMap.set(name, wallet);
+        }
+      }
+    }
+  }
+
+  return walletMap;
 }
 
-// ─── Step 2: Import Summary (members) ───────────────────────────────
+// ─── Step 2: Upsert members (batched) ───────────────────────────────
 
-async function importSummary(
+async function importMembers(
   records: AirtableRecord[],
   walletMap: Map<string, string>,
-  stats: SyncStats,
-) {
+): Promise<number> {
+  if (records.length === 0) return 0;
+
   const fields = collectFieldNames(records);
   const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
 
+  // Build rows
+  const rows: Record<string, unknown>[] = [];
   for (const r of records) {
     const name = asString(r.fields[nameField]);
     if (!name) continue;
-
-    const wallet = walletMap.get(name) || null;
-
-    const memberData = {
+    rows.push({
       name,
-      wallet_address: wallet,
-      // Totals will be recalculated from raw scores in enrichment pass
-      // but set initial values so the row exists
+      wallet_address: walletMap.get(name) || null,
       total_respect: 0,
       fractal_respect: 0,
       event_respect: 0,
@@ -162,29 +165,21 @@ async function importSummary(
       onchain_og: 0,
       onchain_zor: 0,
       updated_at: new Date().toISOString(),
-    };
-
-    const { data: existing } = await supabaseAdmin
-      .from('respect_members')
-      .select('id')
-      .eq('name', name)
-      .maybeSingle();
-
-    if (existing) {
-      // Only update wallet if we have a new one and they don't
-      const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-      if (wallet) updates.wallet_address = wallet;
-      await supabaseAdmin.from('respect_members').update(updates).eq('id', existing.id);
-    } else {
-      await supabaseAdmin.from('respect_members').insert(memberData);
-    }
-    stats.members++;
+    });
   }
+
+  // Batch upsert — Supabase handles duplicates via onConflict
+  const { error } = await supabaseAdmin
+    .from('respect_members')
+    .upsert(rows, { onConflict: 'name', ignoreDuplicates: false });
+
+  if (error) console.error('[Airtable Sync] Members upsert error:', error.message);
+  return rows.length;
 }
 
-// ─── Step 3: Import Respect tab (per-session scores as columns) ─────
+// ─── Step 3: Import sessions + scores (batched) ─────────────────────
 
-async function importRespectSessions(
+async function importSessions(
   records: AirtableRecord[],
   walletMap: Map<string, string>,
   stats: SyncStats,
@@ -194,319 +189,267 @@ async function importRespectSessions(
   const fields = collectFieldNames(records);
   const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
 
-  // Detect session columns: "ZAO Fractal #42", "ZAO Fractactal #5", etc.
+  // Detect session columns
   const sessionCols: { col: string; num: number }[] = [];
   for (const f of fields) {
     if (SKIP_FIELDS.has(f)) continue;
     const match = f.match(
       /^ZAO\s+(?:Fractal|Fractactal|Fractctal|FRACTAL|Respect)\s+#?(\d+\.?\d*)\s*(?:Respect)?$/i,
     );
-    if (match) {
-      sessionCols.push({ col: f, num: parseFloat(match[1]) });
-    }
+    if (match) sessionCols.push({ col: f, num: parseFloat(match[1]) });
   }
-  sessionCols.sort((a, b) => a.num - b.num);
 
+  // Fallback: any numeric column not in SKIP_FIELDS
   if (sessionCols.length === 0) {
-    // Fallback: any numeric column that isn't a known summary field
     for (const f of fields) {
       if (SKIP_FIELDS.has(f)) continue;
-      const hasNumeric = records.some(r => {
-        const v = r.fields[f];
-        return typeof v === 'number' && v > 0;
-      });
-      if (hasNumeric) sessionCols.push({ col: f, num: sessionCols.length + 1 });
+      if (records.some(r => typeof r.fields[f] === 'number' && (r.fields[f] as number) > 0)) {
+        sessionCols.push({ col: f, num: sessionCols.length + 1 });
+      }
     }
   }
 
-  // Pre-fetch existing sessions
-  const { data: existingSessions } = await supabaseAdmin
+  sessionCols.sort((a, b) => a.num - b.num);
+  if (sessionCols.length === 0) return;
+
+  // Delete all existing OG-era sessions + scores for clean re-import
+  const { data: existingOG } = await supabaseAdmin
     .from('fractal_sessions')
-    .select('id, name');
-  const sessionsByName = new Map<string, string>();
-  for (const s of existingSessions || []) {
-    sessionsByName.set(s.name, s.id);
+    .select('id')
+    .like('notes', '%synced from Airtable%');
+
+  if (existingOG && existingOG.length > 0) {
+    const ids = existingOG.map(s => s.id);
+    // Delete scores first (FK constraint)
+    for (let i = 0; i < ids.length; i += 50) {
+      const batch = ids.slice(i, i + 50);
+      await supabaseAdmin.from('fractal_scores').delete().in('session_id', batch);
+    }
+    // Delete sessions
+    for (let i = 0; i < ids.length; i += 50) {
+      const batch = ids.slice(i, i + 50);
+      await supabaseAdmin.from('fractal_sessions').delete().in('id', batch);
+    }
   }
 
-  // OG era fractal 1 started ~June 2024, weekly cadence
   const startDate = new Date('2024-06-10');
 
-  for (const { col, num } of sessionCols) {
+  // Insert all sessions in one batch
+  const sessionRows = sessionCols.map(({ num }) => {
     const scoringEra = num <= 52 ? '1x' : '2x';
-    const sessionName = `ZAO Fractal ${num}`;
+    const weeksOffset = Math.floor(num) - 1;
+    const estimatedDate = new Date(startDate.getTime() + weeksOffset * 7 * 86400000);
 
-    // Collect scores for this session
+    return {
+      name: `ZAO Fractal ${num}`,
+      session_date: estimatedDate.toISOString().split('T')[0],
+      scoring_era: scoringEra,
+      participant_count: 0, // updated below
+      notes: 'OG era — synced from Airtable API',
+    };
+  });
+
+  const { data: insertedSessions, error: sessErr } = await supabaseAdmin
+    .from('fractal_sessions')
+    .insert(sessionRows)
+    .select('id, name');
+
+  if (sessErr || !insertedSessions) {
+    console.error('[Airtable Sync] Sessions insert error:', sessErr?.message);
+    return;
+  }
+
+  const sessionIdMap = new Map<string, string>();
+  for (const s of insertedSessions) sessionIdMap.set(s.name, s.id);
+
+  stats.sessions = insertedSessions.length;
+
+  // Build all score rows
+  const allScoreRows: Record<string, unknown>[] = [];
+  const participantCounts = new Map<string, number>();
+
+  for (const { col, num } of sessionCols) {
+    const sessionName = `ZAO Fractal ${num}`;
+    const sessionId = sessionIdMap.get(sessionName);
+    if (!sessionId) continue;
+
     const scores: { name: string; wallet: string | null; score: number }[] = [];
     for (const r of records) {
       const score = asNumber(r.fields[col]);
       if (!score || score <= 0) continue;
-
       const memberName = asString(r.fields[nameField]);
       if (!memberName) continue;
+      scores.push({ name: memberName, wallet: walletMap.get(memberName) || null, score });
+    }
 
-      scores.push({
-        name: memberName,
-        wallet: walletMap.get(memberName) || null,
-        score,
+    scores.sort((a, b) => b.score - a.score);
+    participantCounts.set(sessionId, scores.length);
+
+    for (let i = 0; i < scores.length; i++) {
+      allScoreRows.push({
+        session_id: sessionId,
+        member_name: scores[i].name,
+        wallet_address: scores[i].wallet,
+        rank: scoreToRank(scores[i].score) || (i + 1),
+        score: scores[i].score,
       });
     }
-    if (scores.length === 0) continue;
-    scores.sort((a, b) => b.score - a.score);
+  }
 
-    // Estimate session date
-    const weeksOffset = Math.floor(num) - 1;
-    const estimatedDate = new Date(startDate.getTime() + weeksOffset * 7 * 86400000);
-    const sessionDate = estimatedDate.toISOString().split('T')[0];
+  // Batch insert scores (chunks of 200 to avoid payload limits)
+  for (let i = 0; i < allScoreRows.length; i += 200) {
+    const batch = allScoreRows.slice(i, i + 200);
+    const { error: scErr } = await supabaseAdmin.from('fractal_scores').insert(batch);
+    if (scErr) console.error(`[Airtable Sync] Scores batch error:`, scErr.message);
+  }
+  stats.scores = allScoreRows.length;
 
-    let sessionId = sessionsByName.get(sessionName);
-
-    if (sessionId) {
-      await supabaseAdmin
-        .from('fractal_sessions')
-        .update({
-          session_date: sessionDate,
-          scoring_era: scoringEra,
-          participant_count: scores.length,
-          notes: 'OG era — synced from Airtable API',
-        })
-        .eq('id', sessionId);
-
-      // Clear old scores for clean re-import
-      await supabaseAdmin.from('fractal_scores').delete().eq('session_id', sessionId);
-    } else {
-      const { data: session, error: sessionErr } = await supabaseAdmin
-        .from('fractal_sessions')
-        .insert({
-          name: sessionName,
-          session_date: sessionDate,
-          scoring_era: scoringEra,
-          participant_count: scores.length,
-          notes: 'OG era — synced from Airtable API',
-        })
-        .select('id')
-        .single();
-
-      if (sessionErr || !session) {
-        console.error(`Session ${sessionName} failed:`, sessionErr?.message);
-        continue;
-      }
-      sessionId = session.id;
-    }
-
-    sessionsByName.set(sessionName, sessionId!);
-
-    const scoreRows = scores.map((s, i) => ({
-      session_id: sessionId,
-      member_name: s.name,
-      wallet_address: s.wallet,
-      rank: scoreToRank(s.score) || (i + 1),
-      score: s.score,
-    }));
-
-    const { error: scoresErr } = await supabaseAdmin.from('fractal_scores').insert(scoreRows);
-    if (scoresErr) {
-      console.error(`Scores for ${sessionName} failed:`, scoresErr.message);
-    } else {
-      stats.sessions++;
-      stats.scores += scoreRows.length;
-    }
+  // Update participant counts
+  for (const [sessionId, count] of participantCounts) {
+    await supabaseAdmin.from('fractal_sessions').update({ participant_count: count }).eq('id', sessionId);
   }
 }
 
-// ─── Step 4: Import Fractal Hosts ───────────────────────────────────
+// ─── Step 4: Import events (hosts, festivals, misc) — batched ───────
 
-async function importHosts(records: AirtableRecord[], stats: SyncStats) {
-  const fields = collectFieldNames(records);
-  const nameField = findField(fields, ['Name', 'name', 'Member', 'Host']) || 'Name';
-  const amountField = findField(fields, ['Amount', 'Points', 'Score', 'Respect', 'Total']);
-  const countField = findField(fields, ['Count', 'Times Hosted', 'Sessions Hosted']);
-  const dateField = findField(fields, ['Date', 'date']);
+async function importEvents(
+  hostRecords: AirtableRecord[],
+  festivalRecords: AirtableRecord[],
+  miscRecords: AirtableRecord[],
+  stats: SyncStats,
+) {
+  // Clear existing Airtable-synced events for clean re-import
+  await supabaseAdmin.from('respect_events').delete().like('description', '%synced from Airtable%');
 
-  for (const r of records) {
-    const name = asString(r.fields[nameField]);
-    if (!name) continue;
+  const eventRows: Record<string, unknown>[] = [];
 
-    const amount = amountField ? asNumber(r.fields[amountField]) : 0;
-    if (amount === 0 && !countField) continue;
+  // Hosts
+  if (hostRecords.length > 0) {
+    const fields = collectFieldNames(hostRecords);
+    const nameField = findField(fields, ['Name', 'name', 'Member', 'Host']) || 'Name';
+    const amountField = findField(fields, ['Amount', 'Points', 'Score', 'Respect', 'Total']);
+    const dateField = findField(fields, ['Date', 'date']);
 
-    // Check for duplicate
-    const { data: existing } = await supabaseAdmin
-      .from('respect_events')
-      .select('id')
-      .eq('member_name', name)
-      .eq('event_type', 'hosting')
-      .maybeSingle();
+    for (const r of hostRecords) {
+      const name = asString(r.fields[nameField]);
+      if (!name) continue;
+      const amount = amountField ? asNumber(r.fields[amountField]) : 0;
+      if (amount === 0) continue;
 
-    if (existing) {
-      // Update existing
-      await supabaseAdmin
-        .from('respect_events')
-        .update({ amount, description: 'Fractal hosting — synced from Airtable' })
-        .eq('id', existing.id);
-    } else {
-      await supabaseAdmin.from('respect_events').insert({
+      eventRows.push({
         member_name: name,
         event_type: 'hosting',
         amount,
         description: 'Fractal hosting — synced from Airtable',
         event_date: dateField ? asString(r.fields[dateField]) : null,
       });
+      stats.hosts++;
     }
-    stats.hosts++;
   }
-}
 
-// ─── Step 5: Import ZAO Festivals ───────────────────────────────────
+  // Festivals
+  if (festivalRecords.length > 0) {
+    const fields = collectFieldNames(festivalRecords);
+    const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
+    const amountField = findField(fields, ['Amount', 'Points', 'Score', 'Respect', 'Total']);
+    const descField = findField(fields, ['Festival', 'Description', 'Event', 'Notes']);
+    const dateField = findField(fields, ['Date', 'date']);
 
-async function importFestivals(records: AirtableRecord[], stats: SyncStats) {
-  const fields = collectFieldNames(records);
-  const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
-  const amountField = findField(fields, ['Amount', 'Points', 'Score', 'Respect', 'Total']);
-  const descField = findField(fields, ['Festival', 'Description', 'Event', 'Notes']);
-  const dateField = findField(fields, ['Date', 'date']);
+    for (const r of festivalRecords) {
+      const name = asString(r.fields[nameField]);
+      if (!name) continue;
+      const amount = amountField ? asNumber(r.fields[amountField]) : 0;
+      if (amount === 0) continue;
+      const desc = descField ? asString(r.fields[descField]) || 'Festival respect' : 'Festival respect';
 
-  for (const r of records) {
-    const name = asString(r.fields[nameField]);
-    if (!name) continue;
-
-    const amount = amountField ? asNumber(r.fields[amountField]) : 0;
-    if (amount === 0) continue;
-
-    const description = descField
-      ? asString(r.fields[descField]) || 'Festival respect'
-      : 'Festival respect';
-
-    // Deduplicate by name + type + amount
-    const { data: existing } = await supabaseAdmin
-      .from('respect_events')
-      .select('id')
-      .eq('member_name', name)
-      .eq('event_type', 'festival')
-      .eq('amount', amount)
-      .maybeSingle();
-
-    if (!existing) {
-      await supabaseAdmin.from('respect_events').insert({
+      eventRows.push({
         member_name: name,
         event_type: 'festival',
         amount,
-        description: `${description} — synced from Airtable`,
+        description: `${desc} — synced from Airtable`,
         event_date: dateField ? asString(r.fields[dateField]) : null,
       });
+      stats.festivals++;
     }
-    stats.festivals++;
   }
-}
 
-// ─── Step 6: Import Misc events ─────────────────────────────────────
+  // Misc
+  if (miscRecords.length > 0) {
+    const fields = collectFieldNames(miscRecords);
+    const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
+    const amountField = findField(fields, ['Amount', 'Points', 'Score', 'Respect', 'Total']);
+    const typeField = findField(fields, ['Type', 'Category', 'Event Type']);
+    const descField = findField(fields, ['Description', 'Notes', 'Reason']);
+    const dateField = findField(fields, ['Date', 'date']);
 
-async function importMisc(records: AirtableRecord[], stats: SyncStats) {
-  const fields = collectFieldNames(records);
-  const nameField = findField(fields, ['Name', 'name', 'Member']) || 'Name';
-  const amountField = findField(fields, ['Amount', 'Points', 'Score', 'Respect', 'Total']);
-  const typeField = findField(fields, ['Type', 'Category', 'Event Type']);
-  const descField = findField(fields, ['Description', 'Notes', 'Reason']);
-  const dateField = findField(fields, ['Date', 'date']);
+    for (const r of miscRecords) {
+      const name = asString(r.fields[nameField]);
+      if (!name) continue;
+      const amount = amountField ? asNumber(r.fields[amountField]) : 0;
+      if (amount === 0) continue;
+      const eventType = typeField ? asString(r.fields[typeField])?.toLowerCase() || 'other' : 'other';
+      const desc = descField ? asString(r.fields[descField]) : null;
 
-  for (const r of records) {
-    const name = asString(r.fields[nameField]);
-    if (!name) continue;
-
-    const amount = amountField ? asNumber(r.fields[amountField]) : 0;
-    if (amount === 0) continue;
-
-    const eventType = typeField
-      ? asString(r.fields[typeField])?.toLowerCase() || 'other'
-      : 'other';
-    const description = descField
-      ? asString(r.fields[descField])
-      : null;
-
-    // Deduplicate
-    const query = supabaseAdmin
-      .from('respect_events')
-      .select('id')
-      .eq('member_name', name)
-      .eq('event_type', eventType)
-      .eq('amount', amount);
-
-    const { data: existing } = await query.maybeSingle();
-
-    if (!existing) {
-      await supabaseAdmin.from('respect_events').insert({
+      eventRows.push({
         member_name: name,
         event_type: eventType,
         amount,
-        description: description ? `${description} — synced from Airtable` : 'Misc — synced from Airtable',
+        description: desc ? `${desc} — synced from Airtable` : 'Misc — synced from Airtable',
         event_date: dateField ? asString(r.fields[dateField]) : null,
       });
+      stats.misc++;
     }
-    stats.misc++;
+  }
+
+  // Batch insert all events
+  for (let i = 0; i < eventRows.length; i += 200) {
+    const batch = eventRows.slice(i, i + 200);
+    const { error } = await supabaseAdmin.from('respect_events').insert(batch);
+    if (error) console.error('[Airtable Sync] Events batch error:', error.message);
   }
 }
 
-// ─── Step 7: Enrichment pass — recalculate everything from raw data ─
+// ─── Step 5: Enrichment — recalculate totals from raw data ──────────
 
 async function enrichAndReconcile(stats: SyncStats) {
-  // 1. Recalculate fractal_respect + fractal_count from fractal_scores
-  const { data: allScores } = await supabaseAdmin
-    .from('fractal_scores')
-    .select('member_name, score, session_id');
+  // Fetch all data in parallel
+  const [scoresRes, eventsRes, sessionsRes, membersRes] = await Promise.all([
+    supabaseAdmin.from('fractal_scores').select('member_name, score, session_id'),
+    supabaseAdmin.from('respect_events').select('member_name, event_type, amount'),
+    supabaseAdmin.from('fractal_sessions').select('id, session_date').order('session_date', { ascending: true }),
+    supabaseAdmin.from('respect_members').select('id, name, first_respect_at'),
+  ]);
 
+  // Aggregate fractal scores
   const memberAgg = new Map<string, { fractalTotal: number; sessionIds: Set<string> }>();
-  for (const s of allScores || []) {
-    if (!memberAgg.has(s.member_name)) {
-      memberAgg.set(s.member_name, { fractalTotal: 0, sessionIds: new Set() });
-    }
+  for (const s of scoresRes.data || []) {
+    if (!memberAgg.has(s.member_name)) memberAgg.set(s.member_name, { fractalTotal: 0, sessionIds: new Set() });
     const m = memberAgg.get(s.member_name)!;
     m.fractalTotal += Number(s.score);
     m.sessionIds.add(s.session_id);
   }
 
-  // 2. Aggregate respect_events by member + type
-  const { data: allEvents } = await supabaseAdmin
-    .from('respect_events')
-    .select('member_name, event_type, amount');
-
+  // Aggregate events
   const eventAgg = new Map<string, { hosting: number; bonus: number; events: number; hostCount: number }>();
-  for (const e of allEvents || []) {
-    if (!eventAgg.has(e.member_name)) {
-      eventAgg.set(e.member_name, { hosting: 0, bonus: 0, events: 0, hostCount: 0 });
-    }
+  for (const e of eventsRes.data || []) {
+    if (!eventAgg.has(e.member_name)) eventAgg.set(e.member_name, { hosting: 0, bonus: 0, events: 0, hostCount: 0 });
     const m = eventAgg.get(e.member_name)!;
     const amount = Number(e.amount);
-    switch (e.event_type) {
-      case 'hosting':
-        m.hosting += amount;
-        m.hostCount++;
-        break;
-      case 'festival':
-      case 'bonus':
-        m.bonus += amount;
-        break;
-      default:
-        m.events += amount;
-        break;
-    }
+    if (e.event_type === 'hosting') { m.hosting += amount; m.hostCount++; }
+    else if (e.event_type === 'festival' || e.event_type === 'bonus') { m.bonus += amount; }
+    else { m.events += amount; }
   }
 
-  // 3. Get earliest session date per member for first_respect_at
-  const { data: sessions } = await supabaseAdmin
-    .from('fractal_sessions')
-    .select('id, session_date')
-    .order('session_date', { ascending: true });
-
+  // Session date lookup
   const sessionDateMap = new Map<string, string>();
-  for (const s of sessions || []) {
+  for (const s of sessionsRes.data || []) {
     if (s.session_date) sessionDateMap.set(s.id, s.session_date);
   }
 
-  // 4. Fetch all members
-  const { data: members } = await supabaseAdmin
-    .from('respect_members')
-    .select('id, name, first_respect_at');
+  // Build update rows
+  const updatePromises: Promise<unknown>[] = [];
 
-  for (const member of members || []) {
+  for (const member of membersRes.data || []) {
     const fractal = memberAgg.get(member.name);
     const events = eventAgg.get(member.name);
 
@@ -516,9 +459,7 @@ async function enrichAndReconcile(stats: SyncStats) {
     const hostingCount = events?.hostCount || 0;
     const bonusRespect = events?.bonus || 0;
     const eventRespect = events?.events || 0;
-    const totalRespect = fractalRespect + hostingRespect + bonusRespect + eventRespect;
 
-    // Find earliest session date
     let earliestDate: string | null = null;
     if (fractal) {
       for (const sid of fractal.sessionIds) {
@@ -528,7 +469,7 @@ async function enrichAndReconcile(stats: SyncStats) {
     }
 
     const updates: Record<string, unknown> = {
-      total_respect: totalRespect,
+      total_respect: fractalRespect + hostingRespect + bonusRespect + eventRespect,
       fractal_respect: fractalRespect,
       event_respect: eventRespect,
       hosting_respect: hostingRespect,
@@ -543,12 +484,17 @@ async function enrichAndReconcile(stats: SyncStats) {
       stats.firstRespectSet++;
     }
 
-    await supabaseAdmin.from('respect_members').update(updates).eq('id', member.id);
+    updatePromises.push(
+      supabaseAdmin.from('respect_members').update(updates).eq('id', member.id),
+    );
     stats.enriched++;
   }
+
+  // Run all member updates in parallel (small dataset, ~40 members)
+  await Promise.allSettled(updatePromises);
 }
 
-// ─── Stats tracking ─────────────────────────────────────────────────
+// ─── Stats ──────────────────────────────────────────────────────────
 
 interface SyncStats {
   wallets: number;
@@ -565,44 +511,22 @@ interface SyncStats {
 
 // ─── Main handler ───────────────────────────────────────────────────
 
-/**
- * POST /api/admin/respect-import
- * Admin-only: full sync from all 6 Airtable tabs into Supabase.
- * Imports members, sessions, scores, hosts, festivals, misc events,
- * then recalculates all totals from raw data.
- */
 export async function POST() {
   const session = await getSessionData();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-  if (!session.isAdmin) {
-    return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-  }
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session.isAdmin) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
 
   const airtableToken = process.env.AIRTABLE_TOKEN;
-  if (!airtableToken) {
-    return NextResponse.json(
-      { error: 'AIRTABLE_TOKEN not configured' },
-      { status: 500 },
-    );
-  }
+  if (!airtableToken) return NextResponse.json({ error: 'AIRTABLE_TOKEN not configured' }, { status: 500 });
 
   const stats: SyncStats = {
-    wallets: 0,
-    members: 0,
-    sessions: 0,
-    scores: 0,
-    hosts: 0,
-    festivals: 0,
-    misc: 0,
-    enriched: 0,
-    firstRespectSet: 0,
-    errors: [],
+    wallets: 0, members: 0, sessions: 0, scores: 0,
+    hosts: 0, festivals: 0, misc: 0,
+    enriched: 0, firstRespectSet: 0, errors: [],
   };
 
   try {
-    // Fetch all 6 tables from Airtable API
+    // Fetch all 6 tables (parallel — each table is independent)
     console.log('[Airtable Sync] Fetching all tables...');
 
     const [walletRecords, summaryRecords, respectRecords, hostRecords, festivalRecords, miscRecords] =
@@ -617,57 +541,35 @@ export async function POST() {
 
     console.log(`[Airtable Sync] Fetched: ${walletRecords.length} wallets, ${summaryRecords.length} summary, ${respectRecords.length} respect, ${hostRecords.length} hosts, ${festivalRecords.length} festivals, ${miscRecords.length} misc`);
 
-    // Build wallet map first (used by all other steps)
-    const walletMap = new Map<string, string>();
-    await importWallets(walletRecords, walletMap, stats);
+    // 1. Build wallet map (pure computation, no DB)
+    const walletMap = buildWalletMap(walletRecords, summaryRecords);
+    stats.wallets = walletMap.size;
 
-    // Also extract wallets from Summary tab as fallback
-    const summaryFields = collectFieldNames(summaryRecords);
-    const summaryWalletField = findField(summaryFields, ['ETH WALLET (from Wallet Data 2)', 'ETH WALLET', 'Wallet']);
-    if (summaryWalletField) {
-      const summaryNameField = findField(summaryFields, ['Name', 'name', 'Member']) || 'Name';
-      for (const r of summaryRecords) {
-        const name = asString(r.fields[summaryNameField]);
-        const wallet = asString(r.fields[summaryWalletField])?.toLowerCase() ?? null;
-        if (name && wallet && wallet.startsWith('0x') && !walletMap.has(name)) {
-          walletMap.set(name, wallet);
-        }
-      }
-    }
+    // 2. Upsert members (batch)
+    console.log('[Airtable Sync] Upserting members...');
+    stats.members = await importMembers(summaryRecords, walletMap);
 
-    // Import in order
-    console.log('[Airtable Sync] Step 1/6: Members...');
-    await importSummary(summaryRecords, walletMap, stats);
+    // 3. Import sessions + scores (batch)
+    console.log('[Airtable Sync] Importing sessions + scores...');
+    await importSessions(respectRecords, walletMap, stats);
 
-    console.log('[Airtable Sync] Step 2/6: Fractal sessions + scores...');
-    await importRespectSessions(respectRecords, walletMap, stats);
+    // 4. Import events — hosts, festivals, misc (batch)
+    console.log('[Airtable Sync] Importing events...');
+    await importEvents(hostRecords, festivalRecords, miscRecords, stats);
 
-    console.log('[Airtable Sync] Step 3/6: Fractal hosts...');
-    await importHosts(hostRecords, stats);
-
-    console.log('[Airtable Sync] Step 4/6: ZAO Festivals...');
-    await importFestivals(festivalRecords, stats);
-
-    console.log('[Airtable Sync] Step 5/6: Misc events...');
-    await importMisc(miscRecords, stats);
-
-    console.log('[Airtable Sync] Step 6/6: Enrichment pass...');
+    // 5. Enrichment — recalculate totals
+    console.log('[Airtable Sync] Enriching...');
     await enrichAndReconcile(stats);
 
-    console.log('[Airtable Sync] Complete:', stats);
+    console.log('[Airtable Sync] Complete:', JSON.stringify(stats));
 
     return NextResponse.json({
       success: true,
       stats: {
-        wallets: stats.wallets,
-        members: stats.members,
-        sessions: stats.sessions,
-        scores: stats.scores,
-        hosts: stats.hosts,
-        festivals: stats.festivals,
-        misc: stats.misc,
-        enriched: stats.enriched,
-        firstRespectSet: stats.firstRespectSet,
+        wallets: stats.wallets, members: stats.members,
+        sessions: stats.sessions, scores: stats.scores,
+        hosts: stats.hosts, festivals: stats.festivals, misc: stats.misc,
+        enriched: stats.enriched, firstRespectSet: stats.firstRespectSet,
       },
       errors: stats.errors.length > 0 ? stats.errors : [],
     });

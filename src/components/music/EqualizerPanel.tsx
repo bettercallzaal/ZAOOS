@@ -17,6 +17,7 @@ export default function EqualizerPanel() {
   const handleGainChange = useCallback((index: number, value: number) => {
     const eq = getEqualizer()
     eq.setGain(index, value)
+    eq.connectIfActive()
     setGains(eq.getGains())
     setActivePreset(null)
   }, [])
@@ -24,6 +25,7 @@ export default function EqualizerPanel() {
   const handlePreset = useCallback((name: string) => {
     const eq = getEqualizer()
     eq.applyPreset(name)
+    eq.connectIfActive()
     setGains(eq.getGains())
     setActivePreset(name)
   }, [])

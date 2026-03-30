@@ -20,9 +20,26 @@ export class AudioEqualizer {
   private connectedSources = new Map<HTMLAudioElement, MediaElementAudioSourceNode>()
   private activeElement: HTMLAudioElement | null = null
   private gains: number[] = [0, 0, 0, 0, 0]
+  private visibilityHandler: (() => void) | null = null
 
   constructor() {
     this.loadSettings()
+  }
+
+  /** Returns true if any EQ band is non-zero (not flat) */
+  isActive(): boolean {
+    return this.gains.some(g => g !== 0)
+  }
+
+  /** Connect to the currently playing audio element (called when EQ settings change) */
+  connectIfActive() {
+    if (this.isActive() && !this.activeElement) {
+      // Look for the active audio element via the global refs set by HTMLAudioProvider
+      const audioA = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined
+      const audioB = (globalThis as Record<string, unknown>).__zao_audio_b as HTMLAudioElement | undefined
+      const active = audioA && !audioA.paused ? audioA : audioB && !audioB.paused ? audioB : null
+      if (active) this.connect(active)
+    }
   }
 
   private ensureContext() {
@@ -44,6 +61,14 @@ export class AudioEqualizer {
         this.filters[i].connect(this.filters[i + 1])
       }
       this.filters[this.filters.length - 1].connect(this.context.destination)
+
+      // Resume AudioContext when returning to the app — browsers suspend it in background
+      this.visibilityHandler = () => {
+        if (!document.hidden && this.context?.state === 'suspended') {
+          this.context.resume().catch(() => {})
+        }
+      }
+      document.addEventListener('visibilitychange', this.visibilityHandler)
     }
   }
 
@@ -115,7 +140,18 @@ export class AudioEqualizer {
     } catch {}
   }
 
+  /** Resume the AudioContext — call on user interaction or visibility change */
+  resume() {
+    if (this.context?.state === 'suspended') {
+      this.context.resume().catch(() => {})
+    }
+  }
+
   destroy() {
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler)
+      this.visibilityHandler = null
+    }
     this.connectedSources.forEach((source) => {
       try { source.disconnect() } catch {}
     })

@@ -16,8 +16,10 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
   // Refs to avoid stale closures in the main useEffect
   const crossfadeRef = useRef(state.crossfade);
   const volumeRef = useRef(state.volume);
+  const statusRef = useRef(state.status);
   crossfadeRef.current = state.crossfade;
   volumeRef.current = state.volume;
+  statusRef.current = state.status;
 
   const getActive = () => (activeAudioRef.current === 'A' ? audioA : audioB)!;
   const getInactive = () => (activeAudioRef.current === 'A' ? audioB : audioA)!;
@@ -137,8 +139,12 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
           activeAudioRef.current = activeAudioRef.current === 'A' ? 'B' : 'A';
           activeUrlRef.current = url;
 
-          // Connect EQ to the new active element
-          try { getEqualizer().connect(inactive); } catch {}
+          // Only route through EQ if user has non-flat settings — avoids AudioContext
+          // capturing audio output, which breaks background playback
+          const eq = getEqualizer();
+          if (eq.isActive()) {
+            try { eq.connect(inactive); } catch {}
+          }
 
           // Fade: ramp new up, old down
           performCrossfade(crossfadeSec);
@@ -153,8 +159,12 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
         active.src = url;
         active.volume = volumeRef.current;
         active.load();
-        // Connect EQ to the active element
-        try { getEqualizer().connect(active); } catch {}
+        // Only route through EQ if user has non-flat settings — avoids AudioContext
+        // capturing audio output, which breaks background playback
+        const eq = getEqualizer();
+        if (eq.isActive()) {
+          try { eq.connect(active); } catch {}
+        }
         active.play().then(() => {
           console.log('[Audio] Play started, volume:', active.volume, 'paused:', active.paused);
         }).catch((err) => {
@@ -227,6 +237,25 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
       crossfadeTimerRef.current = null;
     }
   }
+
+  // Resume AudioContext and audio playback when returning from background
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) return;
+      // Resume AudioContext if EQ captured the audio output
+      const eq = getEqualizer();
+      eq.resume();
+
+      // On some mobile browsers, the audio element gets paused when backgrounded
+      // even though MediaSession is set up. Re-trigger play if state says "playing".
+      const active = getActive();
+      if (active && active.src && active.paused && statusRef.current === 'playing') {
+        active.play().catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // React to new audio/soundxyz tracks
   useEffect(() => {

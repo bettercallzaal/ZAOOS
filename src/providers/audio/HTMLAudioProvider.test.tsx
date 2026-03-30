@@ -59,6 +59,8 @@ vi.stubGlobal('Audio', vi.fn(() => stableMockAudio));
 vi.mock('@/lib/music/equalizer', () => ({
   getEqualizer: () => ({
     connect: vi.fn(),
+    isActive: () => false,
+    resume: vi.fn(),
   }),
 }));
 

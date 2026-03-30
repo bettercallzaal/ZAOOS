@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generated": "2026-03-28",
-  "doc_count": 193,
+  "doc_count": 194,
   "docs": [
     {
       "id": "001",
@@ -4206,6 +4206,32 @@
         "199",
         "207",
         "213"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "215",
+      "slug": "215-zao-task-forces-2026",
+      "title": "Doc 215 \u2014 ZAO Task Forces & Team Structure: 6-Month Roadmap",
+      "category": "community",
+      "tags": [
+        "governance",
+        "task-forces",
+        "teams",
+        "zao-os",
+        "zao-stock",
+        "wavewarz",
+        "community",
+        "whitepaper"
+      ],
+      "status": "current",
+      "date": "2026-03-30",
+      "summary": "8 task forces for Q2-Q4 2026: TF-01 ZAO OS Core, TF-02 Agent Squad, TF-03 Governance & Identity, TF-04 ZAO Stock, TF-05 Music Intelligence, TF-06 WaveWarZ, TF-07 Community Growth, TF-08 Knowledge & Research. Priority stack: agent squad first, then /ecosystem page, then venue. Human vs agent responsibility matrix. 6-month roadmap.",
+      "related": [
+        "051",
+        "213",
+        "214",
+        "207"
       ],
       "code_paths": []
     }

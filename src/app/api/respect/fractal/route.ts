@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -119,15 +120,20 @@ export async function POST(req: NextRequest) {
       nameMap.set(m.name, m);
     }
 
+    const MILESTONES = [100, 500, 1000] as const;
+
     const updateResults = await Promise.allSettled(
       scores.map(async (s) => {
         // Find existing member from pre-fetched data
         const existing = (s.wallet_address ? walletMap.get(s.wallet_address) : null) || nameMap.get(s.member_name);
 
         if (existing) {
+          const oldTotal = Number(existing.total_respect);
+          const newTotal = oldTotal + s.score;
+
           // Existing member: increment totals
           const updates: Record<string, unknown> = {
-            total_respect: Number(existing.total_respect) + s.score,
+            total_respect: newTotal,
             fractal_respect: Number(existing.fractal_respect) + s.score,
             fractal_count: Number(existing.fractal_count) + 1,
             updated_at: new Date().toISOString(),
@@ -142,6 +148,16 @@ export async function POST(req: NextRequest) {
             .from('respect_members')
             .update(updates)
             .eq('id', existing.id);
+
+          // Fire-and-forget: check for respect milestones
+          for (const milestone of MILESTONES) {
+            if (oldTotal < milestone && newTotal >= milestone) {
+              autoCastToZao(
+                `\u{1F3C6} ${s.member_name} just reached ${milestone} Respect!`,
+              ).catch((err) => console.error('[respect-milestone-cast]', err));
+              break;
+            }
+          }
         } else {
           // New member: create row
           await supabaseAdmin

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
 
 const createSchema = z.object({
   name: z.string().min(1).max(100),
@@ -112,6 +113,12 @@ export async function POST(req: NextRequest) {
       fid: session.fid,
       role: 'owner',
     });
+
+    // Fire-and-forget: auto-cast new playlist announcement
+    autoCastToZao(
+      `\u{1F4DD} New playlist: ${name} \u2014 Join and add tracks: zaoos.com/music`,
+      'https://zaoos.com/music',
+    ).catch((err) => console.error('[playlist-cast]', err));
 
     return NextResponse.json({ playlist }, { status: 201 });
   } catch (err) {

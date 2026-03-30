@@ -8,12 +8,21 @@ import {
   TWITCH_CATEGORY_MUSIC,
   TWITCH_CATEGORY_DJS,
 } from '@/lib/twitch/client';
-import { postCast } from '@/lib/farcaster/neynar';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
+
+const GateConfigSchema = z.object({
+  type: z.enum(['erc20', 'erc721', 'erc1155']),
+  contractAddress: z.string().min(1),
+  chainId: z.number().int(),
+  minBalance: z.string().optional(),
+  tokenId: z.string().optional(),
+}).optional().nullable();
 
 const CreateRoomSchema = z.object({
   title: z.string().min(1).max(100),
   description: z.string().max(500).optional().default(''),
   streamCallId: z.string().min(1),
+  gate_config: GateConfigSchema.optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -37,6 +46,7 @@ export async function POST(req: NextRequest) {
       hostUsername: session.username,
       hostPfp: session.pfpUrl,
       streamCallId: parsed.data.streamCallId,
+      gateConfig: parsed.data.gate_config || undefined,
     });
 
     // Fire-and-forget: set Twitch channel title + category
@@ -77,11 +87,8 @@ async function syncTwitchOnCreate(fid: number, title: string) {
 
 /** Auto-post a go-live cast to the /zao Farcaster channel */
 async function castGoLive(title: string, roomId: string) {
-  const signerUuid = process.env.ZAO_OFFICIAL_SIGNER_UUID;
-  const neynarApiKey = process.env.ZAO_OFFICIAL_NEYNAR_API_KEY;
-  if (!signerUuid || !neynarApiKey) return;
-
-  const text = `${title} is now live on ZAO OS! \u{1F399}\uFE0F Join: https://zaoos.com/spaces/${roomId}`;
-  await postCast(signerUuid, text, 'zao', undefined, undefined, undefined, undefined, neynarApiKey);
-  console.info(`[room-create] Go-live cast posted for room ${roomId}`);
+  await autoCastToZao(
+    `${title} is now live on ZAO OS! \u{1F399}\uFE0F Join: https://zaoos.com/spaces/${roomId}`,
+    `https://zaoos.com/spaces/${roomId}`,
+  );
 }

@@ -9,7 +9,8 @@ export interface TokenGateConfig {
   tokenId?: string;
 }
 
-const CHAINS: Record<number, (typeof base)> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const CHAINS: Record<number, any> = {
   1: mainnet,
   8453: base,
   10: optimism,

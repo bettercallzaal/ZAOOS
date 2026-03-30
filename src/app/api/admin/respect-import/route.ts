@@ -272,7 +272,7 @@ async function importRespectSessions(
       sessionId = session.id;
     }
 
-    sessionsByName.set(sessionName, sessionId);
+    sessionsByName.set(sessionName, sessionId!);
 
     const scoreRows = scores.map((s, i) => ({
       session_id: sessionId,

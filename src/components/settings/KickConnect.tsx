@@ -125,13 +125,15 @@ export function KickConnect() {
           >
             {disconnecting ? 'Disconnecting...' : 'Disconnect'}
           </button>
-        ) : (
+        ) : process.env.NEXT_PUBLIC_KICK_CLIENT_ID ? (
           <a
             href="/api/auth/kick"
             className="text-xs px-3 py-1.5 rounded-lg font-semibold text-[#0a1628] bg-[#f5a623] hover:bg-[#ffd700] transition-colors"
           >
             Connect
           </a>
+        ) : (
+          <span className="text-xs text-gray-600">Coming soon</span>
         )}
       </div>
 

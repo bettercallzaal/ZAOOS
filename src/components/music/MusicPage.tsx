@@ -59,6 +59,11 @@ const PermawebLibrary = dynamic(
   { ssr: false },
 );
 
+const ListeningParties = dynamic(
+  () => import('@/components/music/ListeningParties').then((m) => m.ListeningParties),
+  { ssr: false },
+);
+
 const FarcasterMusicFeed = dynamic(
   () => import('@/components/music/FarcasterMusicFeed').then((m) => m.FarcasterMusicFeed),
   { ssr: false },
@@ -69,7 +74,12 @@ const CollaborativePlaylists = dynamic(
   { ssr: false },
 );
 
-const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Farcaster', 'Playlists', 'Collab', 'Create', 'Binaural', 'Liked', 'History', 'Curators', 'Permaweb'] as const;
+const WeeklyDigest = dynamic(
+  () => import('@/components/music/WeeklyDigest').then((m) => m.WeeklyDigest),
+  { ssr: false },
+);
+
+const TABS = ['Radio', 'Discover', 'Track of the Day', 'Submissions', 'Trending', 'Digest', 'Farcaster', 'Playlists', 'Collab', 'Parties', 'Create', 'Binaural', 'Liked', 'History', 'Curators', 'Permaweb'] as const;
 type Tab = (typeof TABS)[number];
 
 const SECTION_IDS: Record<Tab, string> = {
@@ -78,9 +88,11 @@ const SECTION_IDS: Record<Tab, string> = {
   'Track of the Day': 'section-totd',
   Submissions: 'section-submissions',
   Trending: 'section-trending',
+  Digest: 'section-digest',
   Farcaster: 'section-farcaster',
   Playlists: 'section-playlists',
   Collab: 'section-collab',
+  Parties: 'section-parties',
   Create: 'section-create',
   Binaural: 'section-binaural',
   Liked: 'section-liked',
@@ -285,6 +297,11 @@ export function MusicPage() {
           <RespectTrending />
         </section>
 
+        {/* ── Section: Weekly Digest ────────────────────────────── */}
+        <section id={SECTION_IDS.Digest}>
+          <WeeklyDigest />
+        </section>
+
         {/* ── Section: Farcaster Music Discovery ──────────────────── */}
         <section id={SECTION_IDS.Farcaster}>
           <FarcasterMusicFeed />
@@ -298,6 +315,11 @@ export function MusicPage() {
         {/* ── Section: Collaborative Playlists ────────────────── */}
         <section id={SECTION_IDS.Collab}>
           <CollaborativePlaylists />
+        </section>
+
+        {/* ── Section: Listening Parties ────────────────────── */}
+        <section id={SECTION_IDS.Parties}>
+          <ListeningParties />
         </section>
 
         {/* ── Section: AI Music Generator ───────────────────── */}

@@ -61,6 +61,18 @@ export function UsersTable() {
   // Expanded user
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
+  // Bulk selection
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulking, setBulking] = useState(false);
+  const toggleSelect = (id: string) => setSelected(prev => {
+    const next = new Set(prev);
+    next.has(id) ? next.delete(id) : next.add(id);
+    return next;
+  });
+  const toggleAll = () => setSelected(prev =>
+    prev.size === filtered.length ? new Set() : new Set(filtered.map(u => u.id))
+  );
+
   const showFeedback = (type: 'success' | 'error', msg: string) => {
     setFeedback({ type, msg });
     if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
@@ -417,6 +429,24 @@ export function UsersTable() {
         </p>
       )}
 
+      {/* Select all + count */}
+      {filtered.length > 0 && (
+        <div className="flex items-center gap-3 mb-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selected.size === filtered.length && filtered.length > 0}
+              onChange={toggleAll}
+              className="rounded border-gray-600 bg-[#0d1b2a] text-[#f5a623] focus:ring-[#f5a623]/50"
+            />
+            <span className="text-[10px] text-gray-500">Select all ({filtered.length})</span>
+          </label>
+          {selected.size > 0 && (
+            <span className="text-[10px] text-[#f5a623]">{selected.size} selected</span>
+          )}
+        </div>
+      )}
+
       {/* User Cards */}
       <div className="space-y-2">
         {filtered.length === 0 ? (
@@ -425,20 +455,78 @@ export function UsersTable() {
           </div>
         ) : (
           filtered.map((user) => (
-            <UserCard
-              key={user.id}
-              user={user}
-              expanded={expandedId === user.id}
-              onToggle={() => setExpandedId(expandedId === user.id ? null : user.id)}
-              onEdit={() => startEdit(user)}
-              onDeactivate={() => handleDeactivate(user)}
-              onAssignZid={() => handleAssignZid(user)}
-              assigningZid={assigningZid === user.id}
-              shortAddr={shortAddr}
-            />
+            <div key={user.id} className="flex items-start gap-2">
+              <input
+                type="checkbox"
+                checked={selected.has(user.id)}
+                onChange={() => toggleSelect(user.id)}
+                className="mt-4 rounded border-gray-600 bg-[#0d1b2a] text-[#f5a623] focus:ring-[#f5a623]/50 flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <UserCard
+                  user={user}
+                  expanded={expandedId === user.id}
+                  onToggle={() => setExpandedId(expandedId === user.id ? null : user.id)}
+                  onEdit={() => startEdit(user)}
+                  onDeactivate={() => handleDeactivate(user)}
+                  onAssignZid={() => handleAssignZid(user)}
+                  assigningZid={assigningZid === user.id}
+                  shortAddr={shortAddr}
+                />
+              </div>
+            </div>
           ))
         )}
       </div>
+
+      {/* Bulk Action Bar */}
+      {selected.size > 0 && (
+        <div className="sticky bottom-0 bg-[#0d1b2a] border-t border-gray-700 p-3 -mx-4 sm:-mx-6 px-4 sm:px-6 flex items-center gap-3 mt-4 rounded-t-xl">
+          <span className="text-xs text-gray-400">{selected.size} selected</span>
+          <button
+            onClick={async () => {
+              setBulking(true);
+              for (const id of selected) {
+                await fetch('/api/admin/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, role: 'member' }) });
+              }
+              setBulking(false); setSelected(new Set()); fetchUsers(); showFeedback('success', `Set ${selected.size} users to Member`);
+            }}
+            disabled={bulking}
+            className="text-xs px-3 py-1.5 rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 disabled:opacity-50 transition-colors"
+          >
+            Set Member
+          </button>
+          <button
+            onClick={async () => {
+              setBulking(true);
+              for (const id of selected) {
+                await fetch('/api/admin/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, assign_zid: true }) });
+              }
+              setBulking(false); setSelected(new Set()); fetchUsers(); showFeedback('success', `Assigned ZIDs to ${selected.size} users`);
+            }}
+            disabled={bulking}
+            className="text-xs px-3 py-1.5 rounded-lg bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20 hover:bg-[#f5a623]/20 disabled:opacity-50 transition-colors"
+          >
+            Assign ZIDs
+          </button>
+          <button
+            onClick={async () => {
+              if (!confirm(`Deactivate ${selected.size} users?`)) return;
+              setBulking(true);
+              for (const id of selected) {
+                await fetch('/api/admin/users', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+              }
+              setBulking(false); setSelected(new Set()); fetchUsers(); showFeedback('success', `Deactivated ${selected.size} users`);
+            }}
+            disabled={bulking}
+            className="text-xs px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 disabled:opacity-50 transition-colors"
+          >
+            Deactivate
+          </button>
+          {bulking && <div className="w-3 h-3 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />}
+          <button onClick={() => setSelected(new Set())} className="text-xs text-gray-500 ml-auto hover:text-white transition-colors">Clear</button>
+        </div>
+      )}
 
       {/* Edit Modal */}
       {editingUser && (

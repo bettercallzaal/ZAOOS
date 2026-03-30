@@ -40,9 +40,9 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
     setLoading(false);
   }, [proposalId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect -- fetchComments sets state after async fetch */
+   
   useEffect(() => { fetchComments(); }, [fetchComments]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   const handleSubmit = async () => {
     if (!text.trim() || sending) return;

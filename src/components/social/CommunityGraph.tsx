@@ -3,12 +3,11 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 
-// Dynamically import force graph — cast as any to bypass complex generic mismatches
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ForceGraph2D = dynamic(() => import('react-force-graph-2d') as any, {
-  ssr: false,
-  loading: () => null,
-}) as any;
+// Dynamically import force graph — cast to bypass complex generic mismatches
+const ForceGraph2D = dynamic(
+  () => import('react-force-graph-2d').then((mod) => mod.default) as Promise<React.ComponentType<Record<string, unknown>>>,
+  { ssr: false, loading: () => null }
+) as React.ComponentType<Record<string, unknown>>;
 
 /* ---------- Types ---------- */
 
@@ -79,7 +78,7 @@ export function CommunityGraph() {
   const [hoveredNode, setHoveredNode] = useState<GraphNode | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const [forceGraphFailed, setForceGraphFailed] = useState(false);
+  const [forceGraphFailed] = useState(false);
 
   // Image cache for canvas node rendering
   const imageCache = useRef<Map<string, HTMLImageElement>>(new Map());

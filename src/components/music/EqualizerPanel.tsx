@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import { getEqualizer, FREQUENCIES, EQ_PRESETS } from '@/lib/music/equalizer'
+import { getEqualizer, EQ_PRESETS } from '@/lib/music/equalizer'
 
 const BAND_LABELS = ['60', '230', '910', '3.6k', '14k']
 

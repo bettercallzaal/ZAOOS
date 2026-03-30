@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { PlayerProvider, usePlayer, usePlayerContext } from './PlayerProvider';
+import type { PlayerAction } from './PlayerProvider';
 import type { TrackMetadata } from '@/types/music';
 import React from 'react';
 
@@ -24,8 +25,15 @@ vi.stubGlobal('localStorage', {
 
 vi.stubGlobal('fetch', vi.fn());
 
+vi.stubGlobal('MediaMetadata', class MediaMetadata {
+  title: string; artist: string; album: string; artwork: unknown[];
+  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+    this.title = init.title ?? ''; this.artist = init.artist ?? '';
+    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
+  }
+});
+
 // Mock navigator.mediaSession
-const mockSetMetadata = vi.fn();
 const mockSetActionHandler = vi.fn();
 const mockSetPositionState = vi.fn();
 const mockWakeLock = { request: vi.fn().mockResolvedValue({ release: vi.fn() }) };
@@ -97,10 +105,11 @@ describe('PlayerProvider initial state', () => {
 describe('usePlayer actions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Restore wakeLock.request implementation after clearAllMocks wipes it
+    mockWakeLock.request.mockResolvedValue({ release: vi.fn() });
   });
 
   it('play() dispatches PLAY and registers controller', () => {
-    const mockController = { play: vi.fn(), pause: vi.fn(), seek: vi.fn(), load: vi.fn() };
     const { result } = renderHook(() => usePlayer(), { wrapper: Wrapper });
 
     // Register a mock controller
@@ -115,17 +124,25 @@ describe('usePlayer actions', () => {
   });
 
   it('pause() dispatches PAUSE when playing', () => {
-    const { result } = renderHook(() => usePlayer(), { wrapper: Wrapper });
+    const { result } = renderHook(
+      () => ({ player: usePlayer(), ctx: usePlayerContext() }),
+      { wrapper: Wrapper },
+    );
 
     act(() => {
-      result.current.play(spotifyTrack);
+      result.current.player.play(spotifyTrack);
     });
+    // Simulate controller firing LOADED (loading → playing)
+    act(() => {
+      result.current.ctx.dispatch({ type: 'LOADED' } as PlayerAction);
+    });
+    expect(result.current.player.status).toBe('playing');
 
     act(() => {
-      result.current.pause();
+      result.current.player.pause();
     });
 
-    expect(result.current.status).toBe('paused');
+    expect(result.current.player.status).toBe('paused');
   });
 
   it('pause() does nothing when already paused', () => {
@@ -247,6 +264,11 @@ describe('usePlayer actions', () => {
 // ─── Reducer ──────────────────────────────────────────────────────────────────
 describe('PlayerProvider reducer', () => {
   // Test the reducer logic through the public API
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Restore wakeLock.request implementation after clearAllMocks wipes it
+    mockWakeLock.request.mockResolvedValue({ release: vi.fn() });
+  });
 
   it('PLAY action resets position to 0', () => {
     const { result } = renderHook(() => usePlayer(), { wrapper: Wrapper });
@@ -271,14 +293,21 @@ describe('PlayerProvider reducer', () => {
   });
 
   it('RESUME transitions paused to playing', () => {
-    const { result } = renderHook(() => usePlayer(), { wrapper: Wrapper });
+    const { result } = renderHook(
+      () => ({ player: usePlayer(), ctx: usePlayerContext() }),
+      { wrapper: Wrapper },
+    );
 
-    act(() => result.current.play(spotifyTrack));
-    act(() => result.current.pause());
-    expect(result.current.status).toBe('paused');
+    act(() => result.current.player.play(spotifyTrack));
+    // Simulate controller firing LOADED (loading → playing)
+    act(() => result.current.ctx.dispatch({ type: 'LOADED' } as PlayerAction));
+    expect(result.current.player.status).toBe('playing');
 
-    act(() => result.current.resume());
-    expect(result.current.status).toBe('playing');
+    act(() => result.current.player.pause());
+    expect(result.current.player.status).toBe('paused');
+
+    act(() => result.current.player.resume());
+    expect(result.current.player.status).toBe('playing');
   });
 
   it('RESUME does nothing when not paused', () => {

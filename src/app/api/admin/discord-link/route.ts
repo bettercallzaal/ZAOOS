@@ -14,7 +14,7 @@ async function requireAdmin() {
 /**
  * GET /api/admin/discord-link — All users with discord link status + discord data counts
  */
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const auth = await requireAdmin();
   if ('error' in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });

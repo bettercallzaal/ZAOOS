@@ -26,7 +26,7 @@ export async function recallMemories(
     const hindsight = await getHindsightClient();
     if (!hindsight) return [];
 
-    const results = await (hindsight as any).recall(userFid, query, { limit });
+    const results = await hindsight.recall(userFid, query, { limit });
     return results;
   } catch (error) {
     console.error(`Failed to recall memories for user ${userFid}:`, error);
@@ -124,7 +124,7 @@ export async function reflectOnMemories(
     const hindsight = await getHindsightClient();
     if (!hindsight) return '';
 
-    const result = await (hindsight as any).reflect(userFid, prompt);
+    const result = await hindsight.reflect(userFid, prompt);
     return result;
   } catch (error) {
     console.error(`Failed to reflect on memories for user ${userFid}:`, error);
@@ -154,10 +154,10 @@ export async function recallMemoriesByType(
     if (!hindsight) return [];
 
     // Note: metadataFilter depends on Hindsight version support
-    const results = await (hindsight as any).recall(userFid, query, {
+    const results = await hindsight.recall(userFid, query, {
       limit,
       metadataFilter: { eventType },
-    } as { limit: number; metadataFilter?: Record<string, string> });
+    });
     return results;
   } catch (error) {
     // Fallback to regular recall if metadataFilter not supported

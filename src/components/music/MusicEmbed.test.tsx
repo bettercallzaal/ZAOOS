@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { MusicEmbed } from './MusicEmbed';
-import { PlayerProvider, usePlayer } from '@/providers/audio';
+import { PlayerProvider } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
 import React from 'react';
 
@@ -37,8 +37,16 @@ vi.stubGlobal('navigator', {
   wakeLock: { request: vi.fn().mockResolvedValue({ release: vi.fn() }) },
 });
 
+vi.stubGlobal('MediaMetadata', class MediaMetadata {
+  title: string; artist: string; album: string; artwork: unknown[];
+  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+    this.title = init.title ?? ''; this.artist = init.artist ?? '';
+    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
+  }
+});
+
 // ─── Mock child components ─────────────────────────────────────────────────────
-vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="embed-artwork" /> }));
+vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="embed-artwork" alt="" /> }));
 vi.mock('./LikeButton', () => ({ LikeButton: () => <button>Like</button> }));
 vi.mock('./AddToPlaylistButton', () => ({ AddToPlaylistButton: () => <button>Add</button> }));
 vi.mock('./QueueActions', () => ({ QueueActions: () => <button>Queue</button> }));
@@ -86,7 +94,7 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
 describe('MusicEmbed', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
@@ -95,8 +103,7 @@ describe('MusicEmbed', () => {
 
   it('renders loading skeleton while fetching metadata', () => {
     // Delay the fetch so we can catch the loading state
-    let resolve: (v: unknown) => void;
-    global.fetch = vi.fn(() => new Promise((r) => { resolve = r; })) as unknown as typeof fetch;
+    global.fetch = vi.fn(() => new Promise(() => {})) as unknown as typeof fetch;
 
     render(
       <TestWrapper>
@@ -159,7 +166,8 @@ describe('MusicEmbed', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Spotify')).toBeInTheDocument();
+      // Platform label renders in both overlay badge and inline badge
+      expect(screen.getAllByText('Spotify').length).toBeGreaterThan(0);
     });
   });
 
@@ -280,7 +288,7 @@ describe('MusicEmbed', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Apple Music')).toBeInTheDocument();
+      expect(screen.getAllByText('Apple Music').length).toBeGreaterThan(0);
     });
   });
 
@@ -299,7 +307,7 @@ describe('MusicEmbed', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Bandcamp')).toBeInTheDocument();
+      expect(screen.getAllByText('Bandcamp').length).toBeGreaterThan(0);
     });
   });
 
@@ -318,7 +326,7 @@ describe('MusicEmbed', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Tidal')).toBeInTheDocument();
+      expect(screen.getAllByText('Tidal').length).toBeGreaterThan(0);
     });
   });
 });
@@ -326,7 +334,7 @@ describe('MusicEmbed', () => {
 describe('MusicEmbed — player state integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
@@ -352,11 +360,6 @@ describe('MusicEmbed — player state integration', () => {
       expect(screen.getByText('Blinding Lights')).toBeInTheDocument();
     });
 
-    // Now simulate playing this track
-    const { result } = require('@testing-library/react').renderHook(() => usePlayer(), {
-      wrapper: ({ children }) => <PlayerProvider>{children}</PlayerProvider>,
-    });
-
     // Note: we can't easily test the "isThisTrack" highlight in this setup
     // because the MusicEmbed and usePlayer are in different component trees.
     // This is a structural limitation of the test. The important thing is
@@ -367,7 +370,7 @@ describe('MusicEmbed — player state integration', () => {
 describe('MusicEmbed — platform colors', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
@@ -401,7 +404,8 @@ describe('MusicEmbed — platform colors', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText(label)).toBeInTheDocument();
+        // Platform label renders in both overlay badge and inline badge
+        expect(screen.getAllByText(label).length).toBeGreaterThan(0);
       });
     });
   });

@@ -12,7 +12,7 @@ interface ZaoGlobal {
   __zao_audio_b?: HTMLAudioElement
 }
 
-export default function SpectrumVisualizer({ isPlaying, className }: SpectrumVisualizerProps) {
+export default function SpectrumVisualizer({ className }: SpectrumVisualizerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const analyzerRef = useRef<InstanceType<typeof import('audiomotion-analyzer').default> | null>(null)
   const [visible, setVisible] = useState(true)

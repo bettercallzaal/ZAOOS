@@ -31,7 +31,7 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
   const [error, setError] = useState('');
   useEscapeClose(onClose, isOpen);
 
-  /* eslint-disable react-hooks/set-state-in-effect -- loading flag before async fetch is intentional */
+   
   useEffect(() => {
     if (!isOpen) return;
     setLoading(true);
@@ -44,7 +44,7 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [isOpen]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   if (!isOpen) return null;
 

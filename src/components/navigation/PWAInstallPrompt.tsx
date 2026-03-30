@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
@@ -44,21 +44,20 @@ export default function PWAInstallPrompt() {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
-  // Auto-hide after 15 seconds if user doesn't interact
-  useEffect(() => {
-    if (!showPrompt) return;
-    const timer = setTimeout(() => animateClose(), 15000);
-    return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showPrompt]);
-
-  const animateClose = () => {
+  const animateClose = useCallback(() => {
     setIsExiting(true);
     setTimeout(() => {
       setShowPrompt(false);
       setIsExiting(false);
     }, 300);
-  };
+  }, []);
+
+  // Auto-hide after 15 seconds if user doesn't interact
+  useEffect(() => {
+    if (!showPrompt) return;
+    const timer = setTimeout(() => animateClose(), 15000);
+    return () => clearTimeout(timer);
+  }, [showPrompt, animateClose]);
 
   const handleInstall = async () => {
     if (deferredPrompt && 'prompt' in deferredPrompt) {

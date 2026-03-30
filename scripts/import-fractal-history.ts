@@ -49,9 +49,6 @@ const CSV_DIR = dirFlagIndex >= 0 && process.argv[dirFlagIndex + 1]
 
 // ─── Fibonacci score constants ───────────────────────────────────────
 
-const ERA_1X_SCORES = new Set([5, 8, 13, 21, 34, 55]);
-const ERA_2X_SCORES = new Set([10, 16, 26, 42, 68, 110]);
-
 const RANK_MAP_2X: Record<number, number> = { 110: 1, 68: 2, 42: 3, 26: 4, 16: 5, 10: 6 };
 const RANK_MAP_1X: Record<number, number> = { 55: 1, 34: 2, 21: 3, 13: 4, 8: 5, 5: 6 };
 

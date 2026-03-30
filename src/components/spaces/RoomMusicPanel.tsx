@@ -52,7 +52,7 @@ function GuestMusicPanel() {
 
 // ─── Authenticated Panel (uses useListeningRoom which requires AudioProviders) ─
 
-function AuthenticatedMusicPanel({ roomId, isHost, onOpenMusicBrowser }: { roomId: string; isHost: boolean; onOpenMusicBrowser?: () => void }) {
+function AuthenticatedMusicPanel({ roomId, onOpenMusicBrowser }: { roomId: string; isHost: boolean; onOpenMusicBrowser?: () => void }) {
   const { user } = useAuth();
 
   const userInfo: ListenerInfo | null = user

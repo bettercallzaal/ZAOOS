@@ -404,7 +404,7 @@ export function segmentTopics(
   const selectedBoundaries: number[] = [0];
   const usedIndices = new Set<number>([0]);
 
-  for (const [idx, _score] of boundaryScores) {
+  for (const [idx] of boundaryScores) {
     if (selectedBoundaries.length >= targetSegments) break;
     // Ensure minimum spacing
     const tooClose = [...usedIndices].some(

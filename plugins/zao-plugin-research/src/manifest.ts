@@ -1,4 +1,4 @@
-export default {
+const manifest = {
   id: "zao.research-library",
   apiVersion: 1,
   version: "0.1.0",
@@ -93,3 +93,5 @@ export default {
     },
   ],
 };
+
+export default manifest;

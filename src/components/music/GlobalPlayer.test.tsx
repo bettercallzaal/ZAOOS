@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 import { GlobalPlayer } from './GlobalPlayer';
-import { PlayerProvider, usePlayer } from '@/providers/audio';
+import { PlayerProvider, usePlayer, usePlayerContext } from '@/providers/audio';
 import type { TrackMetadata } from '@/types/music';
 import React from 'react';
 
@@ -33,6 +33,8 @@ vi.stubGlobal('localStorage', {
   removeItem: vi.fn(),
 });
 
+const mockWakeLockRequest = vi.fn().mockResolvedValue({ release: vi.fn() });
+
 vi.stubGlobal('navigator', {
   vibrate: vi.fn(),
   mediaSession: {
@@ -41,14 +43,22 @@ vi.stubGlobal('navigator', {
     setActionHandler: vi.fn(),
     setPositionState: vi.fn(),
   },
-  wakeLock: { request: vi.fn().mockResolvedValue({ release: vi.fn() }) },
+  wakeLock: { request: mockWakeLockRequest },
 });
 
 vi.stubGlobal('fetch', vi.fn());
 
+vi.stubGlobal('MediaMetadata', class MediaMetadata {
+  title: string; artist: string; album: string; artwork: unknown[];
+  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+    this.title = init.title ?? ''; this.artist = init.artist ?? '';
+    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
+  }
+});
+
 // ─── Mock child components ─────────────────────────────────────────────────────
 vi.mock('./Scrubber', () => ({ Scrubber: () => <div data-testid="scrubber" /> }));
-vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="artwork" /> }));
+vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="artwork" alt="" /> }));
 vi.mock('./AddToPlaylistButton', () => ({ AddToPlaylistButton: () => <button>Add</button> }));
 vi.mock('./LikeButton', () => ({ LikeButton: () => <button>Like</button> }));
 vi.mock('./SleepTimerButton', () => ({ SleepTimerButton: () => <button>Timer</button> }));
@@ -67,6 +77,8 @@ function PlayerWithTrack({ track, children }: { track: TrackMetadata; children: 
 describe('GlobalPlayer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Restore wakeLock.request implementation after clearAllMocks wipes it
+    mockWakeLockRequest.mockResolvedValue({ release: vi.fn() });
   });
 
   it('renders nothing when no metadata is playing', () => {
@@ -87,7 +99,8 @@ describe('GlobalPlayer', () => {
         </PlayerWithTrack>
       </PlayerProvider>,
     );
-    expect(screen.getByText('Golden Hour')).toBeInTheDocument();
+    // Track name renders in both mobile and desktop views
+    expect(screen.getAllByText('Golden Hour').length).toBeGreaterThan(0);
   });
 
   it('renders artist name', () => {
@@ -98,7 +111,8 @@ describe('GlobalPlayer', () => {
         </PlayerWithTrack>
       </PlayerProvider>,
     );
-    expect(screen.getByText('JVK')).toBeInTheDocument();
+    // Artist name renders in both mobile and desktop views
+    expect(screen.getAllByText('JVK').length).toBeGreaterThan(0);
   });
 
   it('renders platform badge with track type', () => {
@@ -131,7 +145,9 @@ describe('GlobalPlayer', () => {
         </PlayerWithTrack>
       </PlayerProvider>,
     );
-    expect(screen.getByTestId('artwork')).toBeInTheDocument();
+    // GlobalPlayer renders both mobile and desktop layouts, so multiple artwork elements exist
+    const artworks = screen.getAllByTestId('artwork');
+    expect(artworks.length).toBeGreaterThan(0);
   });
 
   it('renders volume slider', () => {
@@ -154,9 +170,9 @@ describe('GlobalPlayer', () => {
         </PlayerWithTrack>
       </PlayerProvider>,
     );
-    // The close button has aria-label "Pause"
-    const closeBtn = screen.getByRole('button', { name: /pause/i });
-    expect(closeBtn).toBeInTheDocument();
+    // The dismiss button closes the player; status is 'loading' so play/pause btn shows 'Play'
+    const dismissBtn = screen.getByRole('button', { name: /dismiss player/i });
+    expect(dismissBtn).toBeInTheDocument();
   });
 
   it('renders prev button disabled when hasPrev is false', () => {
@@ -167,8 +183,11 @@ describe('GlobalPlayer', () => {
         </PlayerWithTrack>
       </PlayerProvider>,
     );
-    const prevBtn = screen.getByRole('button', { name: /previous/i });
-    expect(prevBtn).toBeDisabled();
+    // GlobalPlayer renders both mobile and desktop layouts — multiple prev buttons exist
+    const prevBtns = screen.getAllByRole('button', { name: /previous/i });
+    expect(prevBtns.length).toBeGreaterThan(0);
+    // All prev buttons should be disabled when hasPrev is false
+    prevBtns.forEach((btn) => expect(btn).toBeDisabled());
   });
 
   it('renders next button enabled when hasNext is true', () => {
@@ -179,8 +198,11 @@ describe('GlobalPlayer', () => {
         </PlayerWithTrack>
       </PlayerProvider>,
     );
-    const nextBtn = screen.getByRole('button', { name: /next/i });
-    expect(nextBtn).not.toBeDisabled();
+    // GlobalPlayer renders both mobile and desktop layouts — multiple next buttons exist
+    const nextBtns = screen.getAllByRole('button', { name: /next/i });
+    expect(nextBtns.length).toBeGreaterThan(0);
+    // All next buttons should be enabled when hasNext is true
+    nextBtns.forEach((btn) => expect(btn).not.toBeDisabled());
   });
 
   it('renders shuffle button', () => {
@@ -233,22 +255,29 @@ describe('GlobalPlayer', () => {
 describe('GlobalPlayer — usePlayer integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Restore wakeLock.request implementation after clearAllMocks wipes it
+    mockWakeLockRequest.mockResolvedValue({ release: vi.fn() });
   });
 
   it('pause() transitions status to paused', async () => {
-    const { result } = renderHook(() => usePlayer(), {
-      wrapper: ({ children }) => <PlayerProvider>{children}</PlayerProvider>,
+    const { result } = renderHook(
+      () => ({ player: usePlayer(), ctx: usePlayerContext() }),
+      { wrapper: ({ children }) => <PlayerProvider>{children}</PlayerProvider> },
+    );
+
+    await act(async () => {
+      result.current.player.play(spotifyTrack);
+    });
+    // Simulate controller firing LOADED (loading → playing)
+    await act(async () => {
+      result.current.ctx.dispatch({ type: 'LOADED' });
     });
 
     await act(async () => {
-      result.current.play(spotifyTrack);
+      result.current.player.pause();
     });
 
-    await act(async () => {
-      result.current.pause();
-    });
-
-    expect(result.current.status).toBe('paused');
+    expect(result.current.player.status).toBe('paused');
   });
 
   it('seek() updates position', async () => {

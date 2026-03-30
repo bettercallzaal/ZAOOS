@@ -25,7 +25,6 @@ export async function GET() {
     }
 
     // Step 2: Get like counts for all songs
-    const songIds = songs.map((s: { id: string }) => s.id);
     const { data: likes, error: likesError } = await supabaseAdmin
       .from('user_song_likes')
       .select('song_id');

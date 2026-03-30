@@ -200,7 +200,7 @@ export default function ZounzAuction() {
       {/* NFT Image */}
       {tokenMeta?.image && (
         <div className="aspect-square bg-[#0a1628] flex items-center justify-center overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img
             src={tokenMeta.image}
             alt={tokenMeta.name}

@@ -8,7 +8,6 @@ import {
   selectIsConnectedToRoom,
   selectPeers,
   selectIsPeerAudioEnabled,
-  selectLocalPeer,
   selectIsLocalAudioEnabled,
 } from '@100mslive/react-sdk';
 
@@ -16,7 +15,6 @@ function HMSRoomInner({ userName, role, onLeave }: { userName: string; role: str
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peers = useHMSStore(selectPeers);
-  const localPeer = useHMSStore(selectLocalPeer);
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const [joining, setJoining] = useState(false);
 

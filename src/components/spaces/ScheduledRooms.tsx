@@ -81,7 +81,7 @@ export default function ScheduledRooms({ category }: ScheduledRoomsProps) {
     if (res.ok) {
       setRsvpSet((prev) => {
         const next = new Set(prev);
-        isRsvped ? next.delete(roomId) : next.add(roomId);
+        if (isRsvped) { next.delete(roomId); } else { next.add(roomId); }
         return next;
       });
       // Optimistic update count

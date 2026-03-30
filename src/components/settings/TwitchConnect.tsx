@@ -206,3 +206,5 @@ export function TwitchConnect() {
     </div>
   );
 }
+
+export default TwitchConnect;

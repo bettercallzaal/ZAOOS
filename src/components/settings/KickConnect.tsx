@@ -207,3 +207,4 @@ export function KickConnect() {
     </div>
   );
 }
+export default KickConnect;

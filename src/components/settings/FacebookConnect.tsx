@@ -172,3 +172,4 @@ export function FacebookConnect() {
     </div>
   );
 }
+export default FacebookConnect;

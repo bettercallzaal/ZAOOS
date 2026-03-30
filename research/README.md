@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **165+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **167+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -15,8 +15,8 @@
 | [Identity, Governance & Tokens](./_categories/identity-governance.md) | 31 | ZIDs, Hats Protocol, Respect, ORDAO fractals, ZOUNZ DAO, Snapshot, ENS, Basenames |
 | [AI Agent & Intelligence](./_categories/ai-agent.md) | 6 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents, live room AI |
 | [Cross-Platform Publishing](./_categories/cross-platform.md) | 12 | Farcaster, X, Bluesky, Lens, Hive, Mastodon, Threads, Nostr, Reddit |
-| [Technical Infrastructure](./_categories/infrastructure.md) | 9 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming features |
-| [APIs & External Services](./_categories/apis.md) | 8 | 1,400+ APIs mapped, Alchemy, Coinflow, free tier maximization, 30+ zero-cost integrations |
+| [Technical Infrastructure](./_categories/infrastructure.md) | 10 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming, smart contracts |
+| [APIs & External Services](./_categories/apis.md) | 9 | 1,400+ APIs mapped, Alchemy, Coinflow, payment infrastructure (Stripe/Coinbase/0xSplits), 30+ zero-cost integrations |
 | [WaveWarZ Integration](./_categories/wavewarz.md) | 6 | Solana prediction markets, artist pipeline, battle mechanics |
 | [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |
 | [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 23 | Claude Code skills, Paperclip agents, autoresearch, git branching |
@@ -30,8 +30,8 @@
 |-------------|-----------|
 | **Building features** | [41 Next.js 16](./041-nextjs16-react19-deep-dive/) + [42 Supabase](./042-supabase-advanced-patterns/) + [15 MVP Spec](./015-mvp-spec/) |
 | **Working on music** | [128 Player Audit](./190-music-player-complete-audit/) + [130 Next Integrations](./130-next-music-integrations/) + [03 Music Integration](./003-music-integration/) |
-| **Distributing music on-chain** | [155 End-to-End Plan](./155-music-nft-end-to-end-implementation/) + [152 Arweave Deep Dive](./152-arweave-ecosystem-deep-dive/) + [153 BazAR](./153-bazar-arweave-atomic-assets-music/) |
-| **Working on governance** | [133 Governance Audit](./133-governance-system-audit/) + [149 BuilderOSS](./149-buildeross-deep-dive-everything/) + [131 On-Chain](./131-onchain-proposals-governance/) |
+| **Distributing music on-chain** | [155 End-to-End Plan](./155-music-nft-end-to-end-implementation/) + [152 Arweave Deep Dive](./152-arweave-ecosystem-deep-dive/) + [153 BazAR](./153-bazar-arweave-atomic-assets-music/) + [223 Smart Contracts](./223-smart-contract-development-guide/) |
+| **Working on governance** | [133 Governance Audit](./133-governance-system-audit/) + [149 BuilderOSS](./149-buildeross-deep-dive-everything/) + [131 On-Chain](./131-onchain-proposals-governance/) + [223 Smart Contracts](./223-smart-contract-development-guide/) |
 | **Growing the community** | [32 Onboarding](./032-onboarding-growth-moderation/) + [35 Notifications](./035-notifications-complete-guide/) + [110 Directory](./110-community-directory-crm/) |
 | **Cross-posting content** | [28 Cross-Platform](./028-cross-platform-publishing/) + [77 Bluesky](./077-bluesky-cross-posting-integration/) + [121 Lens Verdict](./121-lens-v3-auth-verdict/) |
 | **Building the AI agent** | [24 Agent Plan](./024-zao-ai-agent/) + [83 ElizaOS](./083-elizaos-2026-update/) + [26 Hindsight](./026-hindsight-agent-memory/) |
@@ -133,7 +133,7 @@
 
 ## Research Stats
 
-- **Total documents:** 162+
+- **Total documents:** 166+
 - **Total coverage:** ~500,000+ words
 - **Time span:** January — March 2026
 - **Categories:** 13

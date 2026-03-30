@@ -131,10 +131,13 @@ export async function GET(req: NextRequest) {
     const [respectResult, profilesResult] = await Promise.all([
       (async () => {
         if (fids.length === 0 && wallets.length === 0) return { data: [] };
+        // Build OR clause — Supabase .or() takes comma-separated filter strings; empty string = no-op
+        const fidClause = fids.length > 0 ? `fid.in.(${fids.join(',')})` : '';
+        const walletClause = wallets.length > 0 ? `wallet_address.in.(${wallets.map(w => `"${w}"`).join(',')})` : '';
         return supabaseAdmin
           .from('respect_members')
           .select('fid, wallet_address, total_respect, fractal_respect, onchain_og, onchain_zor, fractal_count, first_respect_at')
-          .or(fids.length > 0 ? `fid.in.(${fids.join(',')})` : null, wallets.length > 0 ? `wallet_address.in.(${wallets.map(w => `"${w}"`).join(',')})` : null);
+          .or(`${fidClause}${fidClause && walletClause ? ',' : ''}${walletClause}`);
       })(),
       (async () => {
         if (fids.length === 0) return { data: [] };

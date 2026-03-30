@@ -258,10 +258,12 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
         </button>
       </div>
 
-      {/* ─── Spectrum Visualizer ───────────────────────────────────── */}
-      <div className="relative z-10 flex-shrink-0">
-        <SpectrumVisualizer isPlaying={isPlaying} className="mx-4 my-2" />
-      </div>
+      {/* ─── Spectrum Visualizer — only show when playing ──────────── */}
+      {isPlaying && (
+        <div className="relative z-10 flex-shrink-0 h-12 mx-4">
+          <SpectrumVisualizer isPlaying={isPlaying} className="h-full" />
+        </div>
+      )}
 
       {/* ─── Active panel content ───────────────────────────────────── */}
       {activePanel !== null && activePanel !== 'lyrics' && (

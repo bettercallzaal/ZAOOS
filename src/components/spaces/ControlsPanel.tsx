@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { MicButton } from './MicButton';
 import { CameraButton } from './CameraButton';
 import { LiveButton } from './LiveButton';
 import { ScreenShareButton } from './ScreenShareButton';
 import { LayoutToggle } from './LayoutToggle';
+import { TwitchInteractivePanel } from './TwitchInteractivePanel';
 
 interface ControlsPanelProps {
   isHost: boolean;
@@ -31,7 +33,10 @@ export function ControlsPanel({
   twitchUsername,
   onTwitchChat,
 }: ControlsPanelProps) {
+  const [showTwitchPanel, setShowTwitchPanel] = useState(false);
+
   return (
+    <div className="space-y-3">
     <div className="flex items-center justify-center gap-3 px-4 py-3 flex-wrap">
       <MicButton />
       <CameraButton />
@@ -78,6 +83,24 @@ export function ControlsPanel({
         </button>
       )}
 
+      {/* Twitch interactive (polls/predictions/clips) — host only when Twitch connected */}
+      {isHost && twitchUsername && (
+        <button
+          onClick={() => setShowTwitchPanel((p) => !p)}
+          className={`px-3 py-2.5 rounded-xl text-sm transition-colors flex items-center gap-1.5 border ${
+            showTwitchPanel
+              ? 'bg-[#9146ff]/20 border-[#9146ff]/40 text-[#9146ff]'
+              : 'bg-[#1a2a3a] text-gray-300 hover:text-[#9146ff] border-gray-700 hover:border-[#9146ff]/50'
+          }`}
+          title="Twitch Polls, Predictions & Clips"
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
+          </svg>
+          Interact
+        </button>
+      )}
+
       {/* Broadcast button */}
       {isHost && (
         isBroadcasting ? (
@@ -97,6 +120,10 @@ export function ControlsPanel({
           </button>
         )
       )}
+    </div>
+
+    {/* Twitch interactive panel (expandable) */}
+    {showTwitchPanel && <div className="px-4"><TwitchInteractivePanel /></div>}
     </div>
   );
 }

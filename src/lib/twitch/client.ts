@@ -263,3 +263,224 @@ export async function createTwitchMarker(
     return false;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Polls
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a Twitch poll (e.g. "What should I play next?").
+ */
+export async function createTwitchPoll(
+  accessToken: string,
+  userId: string,
+  opts: { title: string; choices: string[]; duration?: number }
+): Promise<{ id: string } | null> {
+  const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  if (!clientId) return null;
+
+  try {
+    const res = await fetch('https://api.twitch.tv/helix/polls', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Client-Id': clientId,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        broadcaster_id: userId,
+        title: opts.title.slice(0, 60),
+        choices: opts.choices.map((c) => ({ title: c.slice(0, 25) })),
+        duration: opts.duration ?? 60,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('[twitch] Create poll failed:', res.status, errText);
+      return null;
+    }
+
+    const data = await res.json();
+    const poll = data.data?.[0];
+    return poll ? { id: poll.id } : null;
+  } catch (err) {
+    console.error('[twitch] Create poll error:', err);
+    return null;
+  }
+}
+
+/**
+ * End a Twitch poll.
+ * status: TERMINATED (show results) or ARCHIVED (discard).
+ */
+export async function endTwitchPoll(
+  accessToken: string,
+  userId: string,
+  pollId: string,
+  status: 'TERMINATED' | 'ARCHIVED'
+): Promise<boolean> {
+  const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  if (!clientId) return false;
+
+  try {
+    const res = await fetch('https://api.twitch.tv/helix/polls', {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Client-Id': clientId,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        broadcaster_id: userId,
+        id: pollId,
+        status,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('[twitch] End poll failed:', res.status, errText);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[twitch] End poll error:', err);
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Predictions
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a Twitch prediction (e.g. "Will the DJ drop bass?").
+ */
+export async function createTwitchPrediction(
+  accessToken: string,
+  userId: string,
+  opts: { title: string; outcomes: string[]; duration?: number }
+): Promise<{ id: string; outcomes: { id: string; title: string }[] } | null> {
+  const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  if (!clientId) return null;
+
+  try {
+    const res = await fetch('https://api.twitch.tv/helix/predictions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Client-Id': clientId,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        broadcaster_id: userId,
+        title: opts.title.slice(0, 45),
+        outcomes: opts.outcomes.map((o) => ({ title: o.slice(0, 25) })),
+        prediction_window: opts.duration ?? 120,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('[twitch] Create prediction failed:', res.status, errText);
+      return null;
+    }
+
+    const data = await res.json();
+    const pred = data.data?.[0];
+    if (!pred) return null;
+    return {
+      id: pred.id,
+      outcomes: (pred.outcomes ?? []).map((o: { id: string; title: string }) => ({
+        id: o.id,
+        title: o.title,
+      })),
+    };
+  } catch (err) {
+    console.error('[twitch] Create prediction error:', err);
+    return null;
+  }
+}
+
+/**
+ * End a Twitch prediction with a winning outcome.
+ */
+export async function endTwitchPrediction(
+  accessToken: string,
+  userId: string,
+  predictionId: string,
+  winningOutcomeId: string
+): Promise<boolean> {
+  const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  if (!clientId) return false;
+
+  try {
+    const res = await fetch('https://api.twitch.tv/helix/predictions', {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Client-Id': clientId,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        broadcaster_id: userId,
+        id: predictionId,
+        status: 'RESOLVED',
+        winning_outcome_id: winningOutcomeId,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('[twitch] End prediction failed:', res.status, errText);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[twitch] End prediction error:', err);
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Clips
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a clip of the current live stream.
+ * Returns the clip id and edit URL, or null on failure.
+ */
+export async function createTwitchClip(
+  accessToken: string,
+  userId: string
+): Promise<{ id: string; editUrl: string } | null> {
+  const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
+  if (!clientId) return null;
+
+  try {
+    const res = await fetch(
+      `https://api.twitch.tv/helix/clips?broadcaster_id=${encodeURIComponent(userId)}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Client-Id': clientId,
+        },
+      }
+    );
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('[twitch] Create clip failed:', res.status, errText);
+      return null;
+    }
+
+    const data = await res.json();
+    const clip = data.data?.[0];
+    return clip ? { id: clip.id, editUrl: clip.edit_url } : null;
+  } catch (err) {
+    console.error('[twitch] Create clip error:', err);
+    return null;
+  }
+}

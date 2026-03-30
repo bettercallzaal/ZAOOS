@@ -218,9 +218,10 @@ const OVERLAY_STYLES = ['card', 'bar', 'minimal', 'fullscreen'] as const;
 
 function StreamOverlays({ fid }: { fid: number }) {
   const [style, setStyle] = useState<string>('card');
+  const [size, setSize] = useState<string>('medium');
   const [copied, setCopied] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const overlayUrl = `https://zaoos.com/overlay/now-playing?fid=${fid}&style=${style}`;
+  const overlayUrl = `https://zaoos.com/overlay/now-playing?fid=${fid}&style=${style}&size=${size}`;
 
   const copyUrl = useCallback((url: string, key: string) => {
     navigator.clipboard.writeText(url);
@@ -246,6 +247,12 @@ function StreamOverlays({ fid }: { fid: number }) {
             <span className="text-[10px] text-gray-500 mr-1">Style:</span>
             {OVERLAY_STYLES.map((s) => (
               <button key={s} onClick={() => setStyle(s)} className={`px-2 py-0.5 text-[10px] rounded-full capitalize transition-colors ${style === s ? 'bg-[#f5a623] text-black font-medium' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>{s}</button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className="text-[10px] text-gray-500 mr-1">Size:</span>
+            {(['small', 'medium', 'large'] as const).map((s) => (
+              <button key={s} onClick={() => setSize(s)} className={`px-2 py-0.5 text-[10px] rounded-full capitalize transition-colors ${size === s ? 'bg-[#f5a623] text-black font-medium' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>{s}</button>
             ))}
           </div>
           <button onClick={() => setShowPreview(!showPreview)} className="text-[10px] text-[#f5a623] hover:underline mt-2">

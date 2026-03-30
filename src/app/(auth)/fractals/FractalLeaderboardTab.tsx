@@ -33,7 +33,6 @@ export function FractalLeaderboardTab({ currentFid }: Props) {
     fetch('/api/respect/leaderboard')
       .then((r) => r.json())
       .then((d) => {
-        // Deduplicate by name (keep highest total)
         const seen = new Map<string, LeaderboardEntry>();
         for (const e of d.leaderboard ?? []) {
           const existing = seen.get(e.name);
@@ -63,6 +62,16 @@ export function FractalLeaderboardTab({ currentFid }: Props) {
   const totalRespect = entries.reduce((s, e) => s + e.totalRespect, 0);
   const totalMembers = entries.filter(e => e.totalRespect > 0).length;
 
+  // Find current user in the full sorted list (not filtered by search)
+  const me = useMemo(() => {
+    const sorted = [...entries]
+      .filter(e => e.totalRespect > 0)
+      .sort((a, b) => b.totalRespect - a.totalRespect);
+    const idx = sorted.findIndex(e => e.fid === currentFid);
+    if (idx === -1) return null;
+    return { ...sorted[idx], rank: idx + 1, totalMembers: sorted.length };
+  }, [entries, currentFid]);
+
   if (loading) {
     return (
       <div className="space-y-2 pt-2">
@@ -80,9 +89,77 @@ export function FractalLeaderboardTab({ currentFid }: Props) {
     { key: 'fractalCount', label: 'Sessions' },
   ];
 
+  // Percentile (top X%)
+  const percentile = me ? Math.round((me.rank / me.totalMembers) * 100) : 0;
+
   return (
     <div className="pt-2 space-y-3">
-      {/* Stats */}
+      {/* My Stats Card */}
+      {me && (
+        <div className="bg-gradient-to-br from-[#f5a623]/10 to-[#0d1b2a] rounded-xl border border-[#f5a623]/20 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs text-[#f5a623] font-medium uppercase tracking-wider">Your Stats</p>
+              <p className="text-lg font-bold text-white">{me.name}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-[#f5a623]">#{me.rank}</p>
+              <p className="text-[10px] text-gray-500">of {me.totalMembers}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-4 gap-2 mb-3">
+            <div className="bg-[#0a1628]/60 rounded-lg p-2 text-center">
+              <p className="text-lg font-bold text-white">{me.totalRespect.toLocaleString()}</p>
+              <p className="text-[10px] text-gray-500">Total R</p>
+            </div>
+            <div className="bg-[#0a1628]/60 rounded-lg p-2 text-center">
+              <p className="text-lg font-bold text-white">{me.fractalCount}</p>
+              <p className="text-[10px] text-gray-500">Sessions</p>
+            </div>
+            <div className="bg-[#0a1628]/60 rounded-lg p-2 text-center">
+              <p className="text-lg font-bold text-white">{me.fractalRespect.toLocaleString()}</p>
+              <p className="text-[10px] text-gray-500">Fractal R</p>
+            </div>
+            <div className="bg-[#0a1628]/60 rounded-lg p-2 text-center">
+              <p className="text-lg font-bold text-white">{me.onchainOG.toLocaleString()}</p>
+              <p className="text-[10px] text-gray-500">On-Chain</p>
+            </div>
+          </div>
+
+          {/* Respect breakdown bar */}
+          <div className="h-2 bg-[#0a1628] rounded-full overflow-hidden flex">
+            {me.fractalRespect > 0 && (
+              <div
+                className="bg-[#f5a623] h-full"
+                style={{ width: `${(me.fractalRespect / Math.max(me.totalRespect, 1)) * 100}%` }}
+              />
+            )}
+            {me.eventRespect > 0 && (
+              <div
+                className="bg-blue-500 h-full"
+                style={{ width: `${(me.eventRespect / Math.max(me.totalRespect, 1)) * 100}%` }}
+              />
+            )}
+            {(me.hostingRespect + me.bonusRespect) > 0 && (
+              <div
+                className="bg-purple-500 h-full"
+                style={{ width: `${((me.hostingRespect + me.bonusRespect) / Math.max(me.totalRespect, 1)) * 100}%` }}
+              />
+            )}
+          </div>
+          <div className="flex justify-between mt-1.5 text-[10px] text-gray-600">
+            <span>Top {percentile}% of members</span>
+            <span className="flex items-center gap-2">
+              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#f5a623]" />Fractal</span>
+              {me.eventRespect > 0 && <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" />Events</span>}
+              {(me.hostingRespect + me.bonusRespect) > 0 && <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-purple-500" />Host/Bonus</span>}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Community Stats */}
       <div className="flex gap-3">
         <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center">
           <p className="text-xl font-bold text-[#f5a623]">{totalMembers}</p>

@@ -49,17 +49,25 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL('/settings?error=kick_token', req.nextUrl.origin));
     }
 
-    // Get user info
-    const userRes = await fetch('https://api.kick.com/public/v1/users/me', {
-      headers: {
-        Authorization: `Bearer ${tokenData.access_token}`,
-      },
-    });
-    const userData = await userRes.json();
-    const kickUser = userData?.data ?? userData;
+    // Get user info — try multiple endpoints (Kick API evolves)
+    let kickUser: Record<string, unknown> | null = null;
+    for (const endpoint of [
+      'https://api.kick.com/public/v1/users',
+      'https://api.kick.com/public/v1/users/me',
+      'https://api.kick.com/v1/user',
+    ]) {
+      const userRes = await fetch(endpoint, {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+      });
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        kickUser = userData?.data?.[0] ?? userData?.data ?? userData;
+        if (kickUser?.id || kickUser?.user_id) break;
+      }
+    }
 
     if (!kickUser?.id && !kickUser?.user_id) {
-      logger.error('Kick user fetch failed:', userData);
+      logger.error('Kick user fetch failed — all endpoints returned no user');
       return NextResponse.redirect(new URL('/settings?error=kick_user', req.nextUrl.origin));
     }
 

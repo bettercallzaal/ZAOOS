@@ -212,6 +212,67 @@ function ToggleSwitch({ on, onToggle, disabled, label }: { on: boolean; onToggle
   );
 }
 
+// ── Stream Overlays ──────────────────────────────────────────────
+
+const OVERLAY_STYLES = ['card', 'bar', 'minimal', 'fullscreen'] as const;
+
+function StreamOverlays({ fid }: { fid: number }) {
+  const [style, setStyle] = useState<string>('card');
+  const [copied, setCopied] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const overlayUrl = `https://zaoos.com/overlay/now-playing?fid=${fid}&style=${style}`;
+
+  const copyUrl = useCallback((url: string, key: string) => {
+    navigator.clipboard.writeText(url);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 1500);
+  }, []);
+
+  return (
+    <section>
+      <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Stream Overlays</p>
+      <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-4">
+        {/* Now Playing */}
+        <div>
+          <p className="text-sm text-white font-medium">Now Playing Overlay</p>
+          <p className="text-xs text-gray-500 mt-0.5">Copy this URL into OBS as a Browser Source to show what you&apos;re playing.</p>
+          <div className="flex items-center gap-2 mt-2">
+            <code className="flex-1 text-[11px] text-gray-300 bg-[#0a1628] rounded px-2 py-1.5 truncate border border-gray-700">{overlayUrl}</code>
+            <button onClick={() => copyUrl(overlayUrl, 'np')} className="px-2.5 py-1.5 text-xs rounded bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors flex-shrink-0">
+              {copied === 'np' ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <div className="flex items-center gap-1.5 mt-2">
+            <span className="text-[10px] text-gray-500 mr-1">Style:</span>
+            {OVERLAY_STYLES.map((s) => (
+              <button key={s} onClick={() => setStyle(s)} className={`px-2 py-0.5 text-[10px] rounded-full capitalize transition-colors ${style === s ? 'bg-[#f5a623] text-black font-medium' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>{s}</button>
+            ))}
+          </div>
+          <button onClick={() => setShowPreview(!showPreview)} className="text-[10px] text-[#f5a623] hover:underline mt-2">
+            {showPreview ? 'Hide Preview' : 'Show Preview'}
+          </button>
+          {showPreview && <iframe src={overlayUrl} className="w-[300px] h-[200px] rounded border border-gray-700 mt-2" title="Overlay preview" />}
+        </div>
+        {/* Coming Soon overlays */}
+        {[
+          { label: 'Room Chat Overlay', url: `/overlay/chat?roomId=...`, desc: 'Show live room chat on stream' },
+          { label: 'Recent Tips Overlay', url: `/overlay/tips?fid=${fid}`, desc: 'Display recent tip activity' },
+        ].map((item) => (
+          <div key={item.label} className="opacity-50">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-white font-medium">{item.label}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+              </div>
+              <span className="text-[10px] text-gray-600 border border-gray-700 rounded px-1.5 py-0.5">Coming Soon</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function SettingsClient({ session, profile }: SettingsClientProps) {
   const { logout, refetch } = useAuth();
   const { isConnected: xmtpConnected, activeXMTPAddress, switchWallet } = useXMTPContextSafe();
@@ -669,6 +730,9 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             <FacebookConnect />
           </div>
         </section>
+
+        {/* ── Stream Overlays ──────────────────────────────────── */}
+        <StreamOverlays fid={session.fid} />
 
         {/* ── Farcaster Identity (read-only) ─────────────────────── */}
         <section>

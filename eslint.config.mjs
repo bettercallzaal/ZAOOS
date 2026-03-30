@@ -22,7 +22,7 @@ const eslintConfig = defineConfig([
     rules: {
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/purity": "warn",
-      "react-hooks/ref-access-during-render": "warn",
+      "react-hooks/refs": "warn",
     },
   },
 ]);

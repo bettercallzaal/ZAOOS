@@ -49,38 +49,40 @@ export async function GET() {
     const communityChannels = communityConfig.farcaster.channels;
     const discoveredChannels = new Set<string>(communityChannels);
 
-    // Fetch recent casts from a sample of members to discover channels they post in
-    const sampleFids = members.slice(0, 20).map(m => m.fid);
-    const discoveryBatches = [];
-    for (let i = 0; i < sampleFids.length; i += 5) {
-      discoveryBatches.push(sampleFids.slice(i, i + 5));
-    }
+    // Fetch recent casts from ALL members to discover channels they post in
+    // Also track per-member channel activity for "Your Channels"
+    const memberChannelMap = new Map<number, Set<string>>(); // fid → channels
+    const allFids = members.map(m => m.fid).filter(Boolean) as number[];
 
-    for (const batch of discoveryBatches) {
+    // Process in batches of 5 to respect Neynar rate limits
+    for (let i = 0; i < allFids.length; i += 5) {
+      const batch = allFids.slice(i, i + 5);
       const results = await Promise.allSettled(
         batch.map(async (fid) => {
           const res = await fetch(
-            `${NEYNAR_BASE}/feed?feed_type=filter&filter_type=fids&fids=${fid}&limit=25`,
+            `${NEYNAR_BASE}/feed?feed_type=filter&filter_type=fids&fids=${fid}&limit=50`,
             { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(5000) }
           );
-          if (!res.ok) return [];
+          if (!res.ok) return { fid, channels: [] as string[] };
           const data = await res.json();
-          return (data.casts || [])
+          const channels = (data.casts || [])
             .filter((c: { root_parent_url?: string }) => c.root_parent_url?.includes('channel/'))
             .map((c: { root_parent_url: string }) => {
               const match = c.root_parent_url.match(/channel\/([^/]+)/);
               return match?.[1];
             })
-            .filter(Boolean);
+            .filter(Boolean) as string[];
+          return { fid, channels: [...new Set(channels)] };
         })
       );
       for (const r of results) {
-        if (r.status === 'fulfilled') {
-          for (const ch of r.value) discoveredChannels.add(ch);
+        if (r.status === 'fulfilled' && r.value) {
+          const { fid, channels } = r.value;
+          memberChannelMap.set(fid, new Set(channels));
+          for (const ch of channels) discoveredChannels.add(ch);
         }
       }
-      // Rate limit: brief pause between batches
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 150));
     }
 
     const allChannels = [...discoveredChannels];
@@ -95,69 +97,55 @@ export async function GET() {
     );
     const memberFids = new Set(members.map((m) => m.fid).filter(Boolean));
 
-    // For each channel, fetch recent casts and find which ZAO members posted
-    const channelActivities: ChannelActivity[] = [];
-    const BATCH_SIZE = 3; // Limit concurrent Neynar calls
-
-    for (let i = 0; i < allChannels.length; i += BATCH_SIZE) {
-      const batch = allChannels.slice(i, i + BATCH_SIZE);
-
-      const results = await Promise.allSettled(
-        batch.map(async (channelId) => {
-          const params = new URLSearchParams({
-            channel_ids: channelId,
-            limit: '100',
-            with_recasts: 'false',
-          });
-          const res = await fetch(`${NEYNAR_BASE}/feed/channels?${params}`, {
-            headers: { 'x-api-key': ENV.NEYNAR_API_KEY },
-            signal: AbortSignal.timeout(10000),
-          });
-          if (!res.ok) return null;
-          const data = await res.json();
-          return { channelId, casts: data.casts || [] };
-        })
-      );
-
-      for (const result of results) {
-        if (result.status !== 'fulfilled' || !result.value) continue;
-        const { channelId, casts } = result.value;
-
-        // Find unique ZAO members who posted in this channel
-        const seenFids = new Set<number>();
-        const channelMembers: ChannelActivity['members'] = [];
-
-        for (const cast of casts) {
-          const fid = cast.author?.fid;
-          if (!fid || !memberFids.has(fid) || seenFids.has(fid)) continue;
-          seenFids.add(fid);
-          const profile = profileMap.get(fid);
-          if (profile) {
-            channelMembers.push(profile);
-          }
-        }
-
-        if (channelMembers.length >= 2) {
-          channelActivities.push({
-            channelId,
-            channelName: formatChannelName(channelId),
-            members: channelMembers,
-          });
-        }
+    // Build clusters from the member channel data we already collected (no extra API calls!)
+    const channelMembersMap = new Map<string, Set<number>>();
+    for (const [fid, channels] of memberChannelMap) {
+      for (const ch of channels) {
+        if (!channelMembersMap.has(ch)) channelMembersMap.set(ch, new Set());
+        channelMembersMap.get(ch)!.add(fid);
       }
     }
 
-    // Sort by member count descending
-    channelActivities.sort((a, b) => b.members.length - a.members.length);
+    // Build cluster list — include ALL channels (even 1 member)
+    const channelActivities: ChannelActivity[] = [];
+    for (const [channelId, fids] of channelMembersMap) {
+      const channelMembers = [...fids]
+        .map(fid => profileMap.get(fid))
+        .filter(Boolean) as ChannelActivity['members'];
+      if (channelMembers.length > 0) {
+        channelActivities.push({
+          channelId,
+          channelName: formatChannelName(channelId),
+          members: channelMembers,
+        });
+      }
+    }
 
-    const clusters = channelActivities.map((ca) => ({
-      name: ca.channelName,
-      channelId: ca.channelId,
-      members: ca.members.slice(0, 20), // Cap displayed members
-      size: ca.members.length,
-    }));
+    // Sort: community channels first, then by member count
+    channelActivities.sort((a, b) => {
+      const aIsCommunity = communityChannels.includes(a.channelId) ? 1 : 0;
+      const bIsCommunity = communityChannels.includes(b.channelId) ? 1 : 0;
+      if (aIsCommunity !== bIsCommunity) return bIsCommunity - aIsCommunity;
+      return b.members.length - a.members.length;
+    });
 
-    const responseData = { clusters };
+    // Separate into shared clusters (2+) and solo channels (1 member)
+    const sharedClusters = channelActivities
+      .filter(ca => ca.members.length >= 2)
+      .map(ca => ({ name: ca.channelName, channelId: ca.channelId, members: ca.members.slice(0, 20), size: ca.members.length }));
+
+    // Current user's channels (all channels they post in)
+    const currentUserChannels = memberChannelMap.get(session.fid);
+    const yourChannels = currentUserChannels
+      ? [...currentUserChannels].map(ch => ({
+          channelId: ch,
+          name: formatChannelName(ch),
+          memberCount: channelMembersMap.get(ch)?.size || 0,
+        }))
+        .sort((a, b) => b.memberCount - a.memberCount)
+      : [];
+
+    const responseData = { clusters: sharedClusters, yourChannels, totalChannelsScanned: allChannels.length };
     clusterCache = { data: responseData, timestamp: Date.now() };
 
     return NextResponse.json(responseData, {

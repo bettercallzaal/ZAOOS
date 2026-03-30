@@ -15,13 +15,19 @@ interface Cluster {
   size: number;
 }
 
+interface YourChannel {
+  channelId: string;
+  name: string;
+  memberCount: number;
+}
+
 interface Props {
-  /** When a cluster is selected, emit its member FIDs so parent can filter */
   onFilterMembers?: (fids: number[] | null) => void;
 }
 
 export function ConversationClusters({ onFilterMembers }: Props) {
   const [clusters, setClusters] = useState<Cluster[]>([]);
+  const [yourChannels, setYourChannels] = useState<YourChannel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeCluster, setActiveCluster] = useState<string | null>(null);
@@ -34,7 +40,10 @@ export function ConversationClusters({ onFilterMembers }: Props) {
         return r.json();
       })
       .then((data) => {
-        if (!controller.signal.aborted) setClusters(data.clusters || []);
+        if (!controller.signal.aborted) {
+          setClusters(data.clusters || []);
+          setYourChannels(data.yourChannels || []);
+        }
       })
       .catch(() => {
         if (!controller.signal.aborted) setError('Failed to load clusters');
@@ -72,12 +81,37 @@ export function ConversationClusters({ onFilterMembers }: Props) {
       <p className="text-red-400 text-sm">{error}</p>
     </div>
   );
-  if (clusters.length === 0) return null;
+  if (clusters.length === 0 && yourChannels.length === 0) return null;
 
   return (
-    <div className="px-4 py-3">
+    <div className="px-4 py-3 space-y-4">
+      {/* Your Channels */}
+      {yourChannels.length > 0 && (
+        <div>
+          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
+            Your Channels ({yourChannels.length})
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {yourChannels.map((ch) => (
+              <span
+                key={ch.channelId}
+                className="px-2.5 py-1 rounded-full text-[11px] bg-[#0d1b2a] border border-gray-800 text-gray-300"
+              >
+                /{ch.channelId}
+                {ch.memberCount > 1 && (
+                  <span className="text-[#f5a623] ml-1">{ch.memberCount}</span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Shared Clusters (2+ members) */}
+      {clusters.length > 0 && (
+      <div>
       <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
-        Channel Clusters
+        Shared Channels ({clusters.length})
       </p>
       <div className="flex gap-2.5 overflow-x-auto scrollbar-hide pb-1">
         {clusters.map((cluster) => {
@@ -135,6 +169,8 @@ export function ConversationClusters({ onFilterMembers }: Props) {
           );
         })}
       </div>
+      </div>
+      )}
     </div>
   );
 }

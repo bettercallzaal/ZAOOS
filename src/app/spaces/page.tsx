@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
+import { PageHeader } from '@/components/navigation/PageHeader';
 import StageCard from '@/components/spaces/StageCard';
 import { HostRoomModal, type RoomTheme } from '@/components/spaces/HostRoomModal';
 import { generateCallId } from '@/lib/spaces/streamHelpers';
@@ -74,60 +75,105 @@ export default function PublicSpacesPage() {
     router.push(`/spaces/${room.id}`);
   };
 
-  return (
-    <div className="text-white flex flex-col">
-      <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]/50 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h2 className="font-semibold text-sm text-gray-300">Live Stages</h2>
-            {stages.length > 0 && (
-              <span className="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded-full font-semibold">
-                {stages.length} live
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {user ? (
-              <button
-                onClick={() => setShowHostModal(true)}
-                className="px-3.5 py-1.5 bg-[#f5a623] hover:bg-[#ffd700] text-[#0a1628] text-xs font-semibold rounded-lg transition-colors"
-              >
-                + Create Stage
-              </button>
-            ) : (
-              <Link
-                href="/"
-                className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
-              >
-                Sign in to host
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+  // Separate user's own active rooms from others
+  const { myRooms, otherRooms } = useMemo(() => {
+    if (!user) return { myRooms: [], otherRooms: stages };
+    const my = stages.filter((s) => s.host_fid === user.fid);
+    const other = stages.filter((s) => s.host_fid !== user.fid);
+    return { myRooms: my, otherRooms: other };
+  }, [stages, user]);
 
-      <div className="flex-1 px-4 py-6 max-w-4xl mx-auto w-full">
+  return (
+    <div className="text-white flex flex-col min-h-[100dvh] bg-[#0a1628]">
+      <PageHeader
+        title="Spaces"
+        subtitle={stages.length > 0 ? `${stages.length} live now` : 'Audio stages'}
+        backHref="/home"
+        count={stages.length > 0 ? stages.length : undefined}
+        rightAction={
+          user ? (
+            <button
+              onClick={() => setShowHostModal(true)}
+              className="flex items-center gap-1.5 px-4 py-2 bg-[#f5a623] hover:bg-[#ffd700] text-[#0a1628] text-sm font-bold rounded-xl transition-colors shadow-lg shadow-[#f5a623]/20"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Go Live
+            </button>
+          ) : (
+            <Link
+              href="/"
+              className="px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
+            >
+              Sign in to host
+            </Link>
+          )
+        }
+      />
+
+      <div className="flex-1 px-4 py-6 max-w-4xl mx-auto w-full space-y-6">
         {loading ? (
           <div className="grid gap-4 md:grid-cols-2">
             {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="bg-[#111d2e] border border-gray-800 rounded-lg p-5 animate-pulse h-40"
-              />
+              <div key={i} className="bg-[#111d2e] border border-gray-800 rounded-xl p-5 animate-pulse h-44" />
             ))}
           </div>
         ) : stages.length === 0 ? (
-          <div className="text-center py-16 text-gray-500">
-            <p className="text-3xl mb-3">🎙️</p>
-            <p className="text-base mb-1">No live stages right now</p>
-            <p className="text-sm text-gray-600">Create one to go live!</p>
+          /* Empty state */
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-16 h-16 rounded-full bg-[#f5a623]/10 flex items-center justify-center mb-5">
+              <svg className="w-8 h-8 text-[#f5a623]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+              </svg>
+            </div>
+            <h3 className="text-white text-lg font-semibold mb-1">No live stages yet</h3>
+            <p className="text-gray-500 text-sm mb-6 max-w-xs">
+              Start a stage to go live with your community. Listeners can join and request to speak.
+            </p>
+            {user && (
+              <button
+                onClick={() => setShowHostModal(true)}
+                className="flex items-center gap-2 px-6 py-2.5 bg-[#f5a623] hover:bg-[#ffd700] text-[#0a1628] font-bold rounded-xl transition-colors shadow-lg shadow-[#f5a623]/20"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Create a Stage
+              </button>
+            )}
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {stages.map((stage) => (
-              <StageCard key={stage.id} room={stage} onJoin={handleJoinStage} />
-            ))}
-          </div>
+          <>
+            {/* Your active rooms section */}
+            {myRooms.length > 0 && (
+              <section>
+                <h3 className="text-xs font-semibold text-[#f5a623] uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#f5a623] animate-pulse" />
+                  Your Active Rooms
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {myRooms.map((stage) => (
+                    <StageCard key={stage.id} room={stage} onJoin={handleJoinStage} isOwn />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* All live stages */}
+            <section>
+              {myRooms.length > 0 && (
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                  All Live Stages
+                </h3>
+              )}
+              <div className="grid gap-4 md:grid-cols-2">
+                {(myRooms.length > 0 ? otherRooms : stages).map((stage) => (
+                  <StageCard key={stage.id} room={stage} onJoin={handleJoinStage} />
+                ))}
+              </div>
+            </section>
+          </>
         )}
       </div>
 

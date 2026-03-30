@@ -34,96 +34,197 @@ export function ControlsPanel({
   onTwitchChat,
 }: ControlsPanelProps) {
   const [showTwitchPanel, setShowTwitchPanel] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+
+  const hasExtras = (isAuthenticated && onMusicToggle) ||
+    (isHost && roomType === 'stage' && layout && onLayoutToggle) ||
+    (twitchUsername && onTwitchChat) ||
+    (isHost && twitchUsername) ||
+    (!isHost && roomType === 'stage');
 
   return (
-    <div className="space-y-3">
-    <div className="flex items-center justify-center gap-3 px-4 py-3 flex-wrap">
-      <MicButton />
-      <CameraButton />
-      {isHost && <LiveButton />}
-      <ScreenShareButton isHost={isHost} isAuthenticated={isAuthenticated} roomType={roomType} />
+    <div className="space-y-0">
+      <div className="border-t border-gray-800 bg-[#0d1b2a]/80 backdrop-blur-sm">
+        <div className="flex items-center justify-center gap-2 px-4 py-3 max-w-2xl mx-auto">
+          {/* Group 1: Audio controls */}
+          <div className="flex items-center gap-2">
+            <MicButton />
+            <CameraButton />
+          </div>
 
-      {/* Music toggle */}
-      {isAuthenticated && (
-        <button
-          onClick={onMusicToggle}
-          className="px-3 py-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-300 hover:text-white border border-gray-700 hover:border-gray-500"
-          title="Toggle music panel"
-        >
-          🎵
-        </button>
-      )}
+          {/* Divider */}
+          <div className="w-px h-6 bg-gray-700/50 mx-1 hidden sm:block" />
 
-      {/* Layout toggle — host only, stages only */}
-      {isHost && roomType === 'stage' && layout && onLayoutToggle && (
-        <LayoutToggle layout={layout} onToggle={onLayoutToggle} />
-      )}
+          {/* Group 2: Stream controls */}
+          <div className="flex items-center gap-2">
+            {isHost && <LiveButton />}
+            <ScreenShareButton isHost={isHost} isAuthenticated={isAuthenticated} roomType={roomType} />
 
-      {/* Raise hand — audience in stages */}
-      {!isHost && roomType === 'stage' && (
-        <button
-          className="px-3 py-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-300 hover:text-[#f5a623] border border-gray-700 hover:border-[#f5a623]/50"
-          title="Raise hand"
-        >
-          ✋
-        </button>
-      )}
+            {/* Broadcast button */}
+            {isHost && (
+              isBroadcasting ? (
+                <button
+                  onClick={onBroadcast}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/15 border border-red-500/25 text-red-400 text-xs font-semibold hover:bg-red-500/25 transition-colors"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                  </span>
+                  LIVE
+                </button>
+              ) : (
+                <button
+                  onClick={onBroadcast}
+                  className="p-2.5 rounded-xl transition-colors bg-[#1a2a3a] text-gray-400 hover:text-white border border-gray-700/50 hover:border-gray-600"
+                  title="Broadcast"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 7.5l16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A48.329 48.329 0 0012 6.75z" />
+                  </svg>
+                </button>
+              )
+            )}
+          </div>
 
-      {/* Twitch Chat button — shown when host has Twitch connected */}
-      {twitchUsername && onTwitchChat && (
-        <button
-          onClick={onTwitchChat}
-          className="px-3 py-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-300 hover:text-[#9146ff] border border-gray-700 hover:border-[#9146ff]/50 flex items-center gap-1.5"
-          title="Twitch Chat"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
-            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
-          </svg>
-          Chat
-        </button>
-      )}
+          {/* Divider before extras */}
+          {hasExtras && <div className="w-px h-6 bg-gray-700/50 mx-1 hidden sm:block" />}
 
-      {/* Twitch interactive (polls/predictions/clips) — host only when Twitch connected */}
-      {isHost && twitchUsername && (
-        <button
-          onClick={() => setShowTwitchPanel((p) => !p)}
-          className={`px-3 py-2.5 rounded-xl text-sm transition-colors flex items-center gap-1.5 border ${
-            showTwitchPanel
-              ? 'bg-[#9146ff]/20 border-[#9146ff]/40 text-[#9146ff]'
-              : 'bg-[#1a2a3a] text-gray-300 hover:text-[#9146ff] border-gray-700 hover:border-[#9146ff]/50'
-          }`}
-          title="Twitch Polls, Predictions & Clips"
-        >
-          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
-            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
-          </svg>
-          Interact
-        </button>
-      )}
+          {/* Group 3: Extras - visible on desktop */}
+          <div className="hidden sm:flex items-center gap-2">
+            {/* Music toggle */}
+            {isAuthenticated && onMusicToggle && (
+              <button
+                onClick={onMusicToggle}
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-white border border-gray-700/50 hover:border-gray-600"
+                title="Toggle music panel"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+                </svg>
+              </button>
+            )}
 
-      {/* Broadcast button */}
-      {isHost && (
-        isBroadcasting ? (
-          <button
-            onClick={onBroadcast}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-medium"
-          >
-            <span className="animate-pulse">📡</span>
-            LIVE
-          </button>
-        ) : (
-          <button
-            onClick={onBroadcast}
-            className="px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2 bg-[#1a2a3a] text-gray-300 hover:text-white border border-gray-700"
-          >
-            📡 Broadcast
-          </button>
-        )
-      )}
-    </div>
+            {/* Layout toggle */}
+            {isHost && roomType === 'stage' && layout && onLayoutToggle && (
+              <LayoutToggle layout={layout} onToggle={onLayoutToggle} />
+            )}
 
-    {/* Twitch interactive panel (expandable) */}
-    {showTwitchPanel && <div className="px-4"><TwitchInteractivePanel /></div>}
+            {/* Raise hand */}
+            {!isHost && roomType === 'stage' && (
+              <button
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border border-gray-700/50 hover:border-[#f5a623]/40"
+                title="Raise hand"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l-.075 5.925m3.075-5.925a1.575 1.575 0 013.15 0v1.5m-3.15-1.5v5.925m3.15-5.925v3.075M16.5 12.75v-3m0 3c0 3.375-2.7 6.75-6 6.75s-6-3.375-6-6.75V7.5m0 0a1.575 1.575 0 013.15 0" />
+                </svg>
+              </button>
+            )}
+
+            {/* Twitch Chat */}
+            {twitchUsername && onTwitchChat && (
+              <button
+                onClick={onTwitchChat}
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#9146ff] border border-gray-700/50 hover:border-[#9146ff]/40"
+                title="Twitch Chat"
+              >
+                <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+                  <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
+                </svg>
+              </button>
+            )}
+
+            {/* Twitch interactive (polls/predictions/clips) */}
+            {isHost && twitchUsername && (
+              <button
+                onClick={() => setShowTwitchPanel((p) => !p)}
+                className={`p-2.5 rounded-xl text-sm transition-colors border ${
+                  showTwitchPanel
+                    ? 'bg-[#9146ff]/15 border-[#9146ff]/30 text-[#9146ff]'
+                    : 'bg-[#1a2a3a] text-gray-400 hover:text-[#9146ff] border-gray-700/50 hover:border-[#9146ff]/40'
+                }`}
+                title="Twitch Polls, Predictions & Clips"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Mobile: "More" overflow button */}
+          {hasExtras && (
+            <div className="sm:hidden relative">
+              <button
+                onClick={() => setShowMore(!showMore)}
+                className={`p-2.5 rounded-xl text-sm transition-colors border ${
+                  showMore
+                    ? 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/30'
+                    : 'bg-[#1a2a3a] text-gray-400 border-gray-700/50 hover:text-white'
+                }`}
+                title="More options"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                </svg>
+              </button>
+
+              {/* Mobile overflow menu */}
+              {showMore && (
+                <div className="absolute bottom-full right-0 mb-2 bg-[#111d2e] border border-gray-700 rounded-xl shadow-xl shadow-black/30 py-1.5 min-w-[180px] z-10">
+                  {isAuthenticated && onMusicToggle && (
+                    <button
+                      onClick={() => { onMusicToggle(); setShowMore(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+                      </svg>
+                      Music
+                    </button>
+                  )}
+                  {!isHost && roomType === 'stage' && (
+                    <button
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-[#f5a623] transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l-.075 5.925m3.075-5.925a1.575 1.575 0 013.15 0v1.5m-3.15-1.5v5.925m3.15-5.925v3.075M16.5 12.75v-3m0 3c0 3.375-2.7 6.75-6 6.75s-6-3.375-6-6.75V7.5m0 0a1.575 1.575 0 013.15 0" />
+                      </svg>
+                      Raise hand
+                    </button>
+                  )}
+                  {twitchUsername && onTwitchChat && (
+                    <button
+                      onClick={() => { onTwitchChat(); setShowMore(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-[#9146ff] transition-colors"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
+                        <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
+                      </svg>
+                      Twitch Chat
+                    </button>
+                  )}
+                  {isHost && twitchUsername && (
+                    <button
+                      onClick={() => { setShowTwitchPanel((p) => !p); setShowMore(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-[#9146ff] transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                      </svg>
+                      Interact
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Twitch interactive panel (expandable) */}
+      {showTwitchPanel && <div className="px-4"><TwitchInteractivePanel /></div>}
     </div>
   );
 }

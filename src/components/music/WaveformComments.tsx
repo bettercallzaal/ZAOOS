@@ -27,16 +27,19 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
   const [isAdding, setIsAdding] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
 
   // Fetch comments on mount
   useEffect(() => {
     if (!songUrl) return;
-    fetch(`/api/music/comments?url=${encodeURIComponent(songUrl)}`)
+    const controller = new AbortController();
+    fetch(`/api/music/comments?url=${encodeURIComponent(songUrl)}`, { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : { comments: [] }))
-      .then((data) => setComments(data.comments || []))
-      .catch(() => {});
+      .then((data) => { if (!controller.signal.aborted) setComments(data.comments || []); })
+      .catch((err) => { if (err?.name !== 'AbortError') setError('Failed to load comments'); });
+    return () => { controller.abort(); };
   }, [songUrl]);
 
   // Focus input when adding
@@ -66,9 +69,12 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
         setComments((prev) => [...prev, data.comment].sort((a, b) => a.timestampMs - b.timestampMs));
         setNewComment('');
         setIsAdding(false);
+        setError('');
+      } else {
+        setError('Failed to post comment');
       }
     } catch {
-      // Silent fail
+      setError('Failed to post comment');
     } finally {
       setIsSubmitting(false);
     }
@@ -80,9 +86,12 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
       if (res.ok) {
         setComments((prev) => prev.filter((c) => c.id !== id));
         setHoveredComment(null);
+        setError('');
+      } else {
+        setError('Failed to delete comment');
       }
     } catch {
-      // Silent fail
+      setError('Failed to delete comment');
     }
   }, []);
 
@@ -160,6 +169,9 @@ export function WaveformComments({ songUrl, duration, position, onSeek, classNam
           );
         })}
       </div>
+
+      {/* Error message */}
+      {error && <p className="mt-1 text-red-400 text-xs">{error}</p>}
 
       {/* Add comment UI */}
       <div className="mt-2 flex items-center gap-2">

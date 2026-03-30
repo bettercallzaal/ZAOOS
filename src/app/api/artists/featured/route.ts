@@ -41,16 +41,20 @@ export async function GET() {
 
     const userMap = new Map((users || []).map(u => [u.fid, u]));
 
-    // Fetch song counts per FID
-    const { data: songCounts } = await supabaseAdmin
-      .from('songs')
-      .select('submitted_by_fid')
-      .in('submitted_by_fid', fids);
-
+    // Fetch song counts per FID using head: true + count to avoid fetching all rows
     const countMap = new Map<number, number>();
-    for (const s of songCounts || []) {
-      if (s.submitted_by_fid) {
-        countMap.set(s.submitted_by_fid, (countMap.get(s.submitted_by_fid) || 0) + 1);
+    const countResults = await Promise.allSettled(
+      fids.map(async (fid) => {
+        const { count } = await supabaseAdmin
+          .from('songs')
+          .select('submitted_by_fid', { count: 'exact', head: true })
+          .eq('submitted_by_fid', fid);
+        return { fid, count: count || 0 };
+      })
+    );
+    for (const result of countResults) {
+      if (result.status === 'fulfilled') {
+        countMap.set(result.value.fid, result.value.count);
       }
     }
 

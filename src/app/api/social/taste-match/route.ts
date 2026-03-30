@@ -43,11 +43,13 @@ export async function GET(req: NextRequest) {
       supabaseAdmin
         .from('user_song_likes')
         .select('song_id')
-        .eq('user_fid', session.fid),
+        .eq('user_fid', session.fid)
+        .limit(1000),
       supabaseAdmin
         .from('user_song_likes')
         .select('song_id')
-        .eq('user_fid', targetFid),
+        .eq('user_fid', targetFid)
+        .limit(1000),
     ]);
 
     const myLikes =

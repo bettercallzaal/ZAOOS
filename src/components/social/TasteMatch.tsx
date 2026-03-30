@@ -32,15 +32,22 @@ function matchColor(pct: number): string {
 export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
   const [data, setData] = useState<TasteMatchData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!targetFid) return;
+    const controller = new AbortController();
     setLoading(true);
-    fetch(`/api/social/taste-match?targetFid=${targetFid}`)
+    setError('');
+    fetch(`/api/social/taste-match?targetFid=${targetFid}`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => setData(d))
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
+      .then((d) => { if (!controller.signal.aborted) setData(d); })
+      .catch((err) => {
+        if (controller.signal.aborted) return;
+        setError('Couldn\'t calculate taste match');
+      })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => { controller.abort(); };
   }, [targetFid]);
 
   if (loading) {
@@ -51,6 +58,11 @@ export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
     );
   }
 
+  if (error) return (
+    <div className="p-3 rounded-xl bg-white/5 border border-gray-800">
+      <p className="text-red-400 text-sm">{error}</p>
+    </div>
+  );
   if (!data || (data.totalYours === 0 && data.totalTheirs === 0)) return null;
 
   return (

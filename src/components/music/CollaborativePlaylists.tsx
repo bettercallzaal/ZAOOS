@@ -118,15 +118,19 @@ function PlaylistCard({ playlist, onClick }: { playlist: Playlist; onClick: () =
 export function CollaborativePlaylists() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
 
   const fetchPlaylists = useCallback(async () => {
     try {
+      setError('');
       const res = await fetch('/api/music/playlists/collaborative');
-      if (!res.ok) return;
+      if (!res.ok) throw new Error('Failed to load');
       const data = await res.json();
       setPlaylists(data.playlists || []);
+    } catch {
+      setError('Failed to load playlists');
     } finally {
       setLoading(false);
     }
@@ -152,7 +156,12 @@ export function CollaborativePlaylists() {
         )}
       </div>
 
-      {selectedPlaylist ? (
+      {error ? (
+        <div className="text-center py-8">
+          <p className="text-red-400 text-sm">{error}</p>
+          <button onClick={fetchPlaylists} className="mt-2 text-xs text-[#f5a623] hover:underline">Retry</button>
+        </div>
+      ) : selectedPlaylist ? (
         <PlaylistDetail playlist={selectedPlaylist} onBack={() => { setSelectedPlaylist(null); fetchPlaylists(); }} />
       ) : loading ? (
         <div className="space-y-3">

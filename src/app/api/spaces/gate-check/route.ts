@@ -5,11 +5,11 @@ import { checkTokenGate, type TokenGateConfig } from '@/lib/spaces/tokenGate';
 import { logger } from '@/lib/logger';
 
 const GateCheckSchema = z.object({
-  walletAddress: z.string().min(1),
+  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid Ethereum address'),
   gateConfig: z.object({
     type: z.enum(['erc20', 'erc721', 'erc1155']),
-    contractAddress: z.string().min(1),
-    chainId: z.number().int(),
+    contractAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid contract address'),
+    chainId: z.number().int().refine(id => [1, 8453, 10].includes(id), { message: 'Unsupported chainId' }),
     minBalance: z.string().optional(),
     tokenId: z.string().optional(),
   }),

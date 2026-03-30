@@ -35,16 +35,21 @@ export function ListeningParties() {
   const [title, setTitle] = useState('');
   const [trackInput, setTrackInput] = useState('');
   const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
 
-  const fetchParties = useCallback(() => {
-    fetch('/api/music/listening-party')
+  const fetchParties = useCallback((signal?: AbortSignal) => {
+    fetch('/api/music/listening-party', { signal })
       .then((r) => (r.ok ? r.json() : { parties: [] }))
       .then((d) => setParties(d.parties || []))
-      .catch(() => {})
+      .catch((err) => { if (err?.name !== 'AbortError') { /* ignore */ } })
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { fetchParties(); }, [fetchParties]);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchParties(controller.signal);
+    return () => { controller.abort(); };
+  }, [fetchParties]);
 
   const handleCreate = async () => {
     if (!title.trim() || !trackInput.trim()) return;
@@ -55,6 +60,7 @@ export function ListeningParties() {
       .filter((u) => u.startsWith('http'));
     if (trackUrls.length === 0) { setCreating(false); return; }
 
+    setCreateError('');
     try {
       const res = await fetch('/api/music/listening-party', {
         method: 'POST',
@@ -66,8 +72,12 @@ export function ListeningParties() {
         setTrackInput('');
         setShowForm(false);
         fetchParties();
+      } else {
+        setCreateError('Failed to create party. Try again.');
       }
-    } catch { /* ignore */ }
+    } catch {
+      setCreateError('Failed to create party. Try again.');
+    }
     setCreating(false);
   };
 
@@ -110,6 +120,7 @@ export function ListeningParties() {
           >
             {creating ? 'Creating...' : 'Start Party'}
           </button>
+          {createError && <p className="text-red-400 text-xs">{createError}</p>}
         </div>
       )}
 

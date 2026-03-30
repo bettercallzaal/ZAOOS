@@ -67,7 +67,12 @@ export function ConversationClusters({ onFilterMembers }: Props) {
     );
   }
 
-  if (error || clusters.length === 0) return null;
+  if (error) return (
+    <div className="px-4 py-3">
+      <p className="text-red-400 text-sm">{error}</p>
+    </div>
+  );
+  if (clusters.length === 0) return null;
 
   return (
     <div className="px-4 py-3">

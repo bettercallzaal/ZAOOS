@@ -36,17 +36,23 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetch('/api/social/suggestions')
+    const controller = new AbortController();
+    fetch('/api/social/suggestions', { signal: controller.signal })
       .then((r) => {
         if (!r.ok) throw new Error('Failed');
         return r.json();
       })
       .then((data) => {
-        setSuggestions(data.suggestions || []);
-        setUnfollowedMembers(data.unfollowedMembers || []);
+        if (!controller.signal.aborted) {
+          setSuggestions(data.suggestions || []);
+          setUnfollowedMembers(data.unfollowedMembers || []);
+        }
       })
-      .catch(() => setError('Failed to load suggestions'))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!controller.signal.aborted) setError('Failed to load suggestions');
+      })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => { controller.abort(); };
   }, []);
 
   // Search Farcaster users

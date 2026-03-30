@@ -17,6 +17,7 @@ interface FeaturedArtist {
 export function FeaturedArtists() {
   const [artists, setArtists] = useState<FeaturedArtist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [expandedUsername, setExpandedUsername] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -27,12 +28,17 @@ export function FeaturedArtists() {
       .then(data => {
         if (!cancelled && data?.artists) setArtists(data.artists);
       })
-      .catch(() => {})
+      .catch(() => { if (!cancelled) setError('Failed to load featured artists'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, []);
 
   if (loading) return <FeaturedArtistsSkeleton />;
+  if (error) return (
+    <section>
+      <p className="text-red-400 text-sm py-4">{error}</p>
+    </section>
+  );
   if (artists.length === 0) return null;
 
   return (

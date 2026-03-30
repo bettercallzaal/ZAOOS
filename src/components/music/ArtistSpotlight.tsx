@@ -45,6 +45,7 @@ interface Props {
 export function ArtistSpotlight({ username, initialData, onClose }: Props) {
   const [artist, setArtist] = useState<ArtistData | null>(initialData || null);
   const [loading, setLoading] = useState(!initialData);
+  const [error, setError] = useState('');
   const player = usePlayer();
   const { addToQueue } = useQueue();
 
@@ -52,10 +53,11 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
     if (initialData) return;
     let cancelled = false;
     setLoading(true);
+    setError('');
     fetch(`/api/artists/${encodeURIComponent(username)}`)
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (!cancelled && data) setArtist(data); })
-      .catch(() => {})
+      .catch(() => { if (!cancelled) setError('Failed to load artist'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [username, initialData]);
@@ -95,6 +97,11 @@ export function ArtistSpotlight({ username, initialData, onClose }: Props) {
   }, [artist, playTrack, addToQueue]);
 
   if (loading) return <ArtistSpotlightSkeleton />;
+  if (error) return (
+    <div className="rounded-2xl bg-[#0d1b2a] border border-white/10 p-6 text-center">
+      <p className="text-red-400 text-sm">{error}</p>
+    </div>
+  );
   if (!artist) return null;
 
   return (

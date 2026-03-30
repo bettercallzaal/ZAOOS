@@ -67,7 +67,12 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
     );
   }
 
-  if (error || !data) return null;
+  if (error) return (
+    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4">
+      <p className="text-red-400 text-sm text-center">{error}</p>
+    </div>
+  );
+  if (!data) return null;
 
   const { sharedFollowers, sharedFollowing, totalYours, totalTheirs, topShared } = data;
   const hasShared = sharedFollowers > 0 || sharedFollowing > 0;

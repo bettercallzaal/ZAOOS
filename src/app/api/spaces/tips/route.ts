@@ -6,8 +6,8 @@ import { logger } from '@/lib/logger';
 
 const TipSchema = z.object({
   roomId: z.string().uuid().optional(),
-  amount: z.string().min(1),
-  txHash: z.string().min(1),
+  amount: z.string().regex(/^\d+\.?\d*$/, 'amount must be a numeric string'),
+  txHash: z.string().regex(/^0x[a-fA-F0-9]{64}$/, 'txHash must be a valid transaction hash'),
   chain: z.string().default('base'),
   recipientFid: z.number().int().optional(),
 });

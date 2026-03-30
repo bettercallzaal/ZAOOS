@@ -1,5 +1,7 @@
 import { supabaseAdmin } from '@/lib/db/supabase';
 
+export type AudioProvider = 'stream' | '100ms';
+
 export interface Room {
   id: string;
   title: string;
@@ -22,6 +24,8 @@ export interface Room {
   last_active_at: string;
   recording_url: string | null;
   gate_config: Record<string, unknown> | null;
+  /** Audio provider — defaults to 'stream' if not set */
+  provider?: AudioProvider;
 }
 
 export async function createRoom(data: {
@@ -36,6 +40,7 @@ export async function createRoom(data: {
   theme?: string;
   layoutPreference?: 'content-first' | 'speakers-first';
   gateConfig?: { type: string; contractAddress: string; chainId: number; minBalance?: string; tokenId?: string };
+  provider?: AudioProvider;
 }): Promise<Room> {
   const { data: room, error } = await supabaseAdmin
     .from('rooms')
@@ -53,6 +58,7 @@ export async function createRoom(data: {
       theme: data.theme || 'default',
       layout_preference: data.layoutPreference || 'content-first',
       gate_config: data.gateConfig || null,
+      provider: data.provider || 'stream',
     })
     .select()
     .single();

@@ -14,7 +14,7 @@ import SpacesTabs from '@/components/spaces/SpacesTabs';
 import CategoryFilter from '@/components/spaces/CategoryFilter';
 import ScheduledRooms from '@/components/spaces/ScheduledRooms';
 import PastRooms from '@/components/spaces/PastRooms';
-import type { Room } from '@/lib/spaces/roomsDb';
+import type { Room, AudioProvider } from '@/lib/spaces/roomsDb';
 
 export default function PublicSpacesPage() {
   const router = useRouter();
@@ -50,13 +50,19 @@ export default function PublicSpacesPage() {
     return () => { supabase.removeChannel(channel); };
   }, [fetchStages]);
 
-  const handleCreateRoom = async (title: string, description: string, theme: RoomTheme, gateConfig?: GateConfig | null) => {
+  const handleCreateRoom = async (
+    title: string,
+    description: string,
+    theme: RoomTheme,
+    gateConfig?: GateConfig | null,
+    provider: AudioProvider = 'stream'
+  ) => {
     if (!user) throw new Error('Not authenticated');
     const streamCallId = generateCallId();
     const res = await fetch('/api/stream/rooms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, streamCallId, theme, room_type: 'stage', gate_config: gateConfig || null }),
+      body: JSON.stringify({ title, description, streamCallId, theme, room_type: 'stage', gate_config: gateConfig || null, provider }),
     });
     if (!res.ok) throw new Error('Failed to create room');
     const { room } = await res.json();

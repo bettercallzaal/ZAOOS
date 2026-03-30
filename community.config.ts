@@ -37,6 +37,12 @@ export const communityConfig = {
     { id: 'coworking', name: 'Coworking', emoji: '🏢', description: 'Silent cowork with ambient presence' },
   ],
 
+  // ── Audio Provider ───────────────────────────────────────────
+  // Default audio provider for Spaces. Can be overridden per-room.
+  // 'stream' — Stream.io (HiFi music mode, native RTMP multistream)
+  // '100ms'  — 100ms (built-in transcription, best for fractal meetings)
+  audioProvider: 'stream' as 'stream' | '100ms',
+
   // ── Respect Contracts (Optimism) ──────────────────────────────
   respect: {
     ogContract: '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as `0x${string}`,

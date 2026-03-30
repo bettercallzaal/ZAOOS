@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Twitch client ID not configured' }, { status: 500 });
   }
 
-  const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin}/api/auth/twitch/callback`;
+  const redirectUri = `${(process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin).trim()}/api/auth/twitch/callback`;
   const scopes = 'channel:read:stream_key channel:manage:broadcast chat:read';
 
   const url = new URL('https://id.twitch.tv/oauth2/authorize');

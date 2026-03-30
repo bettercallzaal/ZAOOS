@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/settings?error=twitch_config', req.nextUrl.origin));
   }
 
-  const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin}/api/auth/twitch/callback`;
+  const redirectUri = `${(process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin).trim()}/api/auth/twitch/callback`;
 
   try {
     // Exchange code for token

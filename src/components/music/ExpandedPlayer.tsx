@@ -83,7 +83,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-[#0a1628] flex flex-col overflow-hidden"
+      className="fixed inset-0 z-50 bg-[#0a1628] flex flex-col overflow-y-auto"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >

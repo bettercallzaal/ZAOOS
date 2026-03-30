@@ -43,6 +43,7 @@ export default function PublicRoomPage() {
   const [room, setRoom] = useState<Room | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
 
   const isHost = user?.fid === room?.host_fid;
 
@@ -174,8 +175,6 @@ export default function PublicRoomPage() {
   }
 
   if (!client || !call || !room) return null;
-
-  const [showEdit, setShowEdit] = useState(false);
 
   const THEME_ACCENTS: Record<string, string> = {
     default: '#f5a623',

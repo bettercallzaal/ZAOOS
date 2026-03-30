@@ -123,8 +123,9 @@ export async function GET() {
 
     // Sort: community channels first, then by member count
     channelActivities.sort((a, b) => {
-      const aIsCommunity = communityChannels.includes(a.channelId) ? 1 : 0;
-      const bIsCommunity = communityChannels.includes(b.channelId) ? 1 : 0;
+      const communitySet = new Set<string>(communityChannels);
+      const aIsCommunity = communitySet.has(a.channelId) ? 1 : 0;
+      const bIsCommunity = communitySet.has(b.channelId) ? 1 : 0;
       if (aIsCommunity !== bIsCommunity) return bIsCommunity - aIsCommunity;
       return b.members.length - a.members.length;
     });

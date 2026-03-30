@@ -84,7 +84,7 @@ export async function checkTokenGate(
         functionName: 'balanceOf',
         args: [address],
       });
-      return { allowed: balance > 0n, balance: balance.toString() };
+      return { allowed: balance > BigInt(0), balance: balance.toString() };
     }
 
     case 'erc1155': {
@@ -95,7 +95,7 @@ export async function checkTokenGate(
         functionName: 'balanceOf',
         args: [address, BigInt(gate.tokenId)],
       });
-      return { allowed: balance > 0n, balance: balance.toString() };
+      return { allowed: balance > BigInt(0), balance: balance.toString() };
     }
 
     default:

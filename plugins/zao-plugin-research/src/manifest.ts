@@ -6,7 +6,7 @@ export default {
   description:
     "Exposes the ZAO OS research library (190+ docs) to agents via search, browse, and read tools.",
   author: "ZAO <team@zaoos.com>",
-  categories: ["knowledge"] as const,
+  categories: ["automation"] as const,
 
   capabilities: [
     "agent.tools.register",

@@ -5,7 +5,7 @@ export default {
     displayName: "ZAO Research Library",
     description: "Exposes the ZAO OS research library (190+ docs) to agents via search, browse, and read tools.",
     author: "ZAO <team@zaoos.com>",
-    categories: ["knowledge"],
+    categories: ["automation"],
     capabilities: [
         "agent.tools.register",
         "http.outbound",

@@ -5,7 +5,7 @@ declare const _default: {
     displayName: string;
     description: string;
     author: string;
-    categories: readonly ["knowledge"];
+    categories: readonly ["automation"];
     capabilities: string[];
     entrypoints: {
         worker: string;

@@ -418,7 +418,7 @@ async function enrichAndReconcile(stats: SyncStats) {
     supabaseAdmin.from('fractal_scores').select('member_name, score, session_id'),
     supabaseAdmin.from('respect_events').select('member_name, event_type, amount'),
     supabaseAdmin.from('fractal_sessions').select('id, session_date').order('session_date', { ascending: true }),
-    supabaseAdmin.from('respect_members').select('id, name, first_respect_at'),
+    supabaseAdmin.from('respect_members').select('id, name, first_respect_at, onchain_og'),
   ]);
 
   // Aggregate fractal scores
@@ -467,8 +467,11 @@ async function enrichAndReconcile(stats: SyncStats) {
       }
     }
 
+    const calculated = fractalRespect + hostingRespect + bonusRespect + eventRespect;
+    const onchainOg = Number(member.onchain_og) || 0;
+
     const updates: Record<string, unknown> = {
-      total_respect: fractalRespect + hostingRespect + bonusRespect + eventRespect,
+      total_respect: Math.max(calculated, onchainOg),
       fractal_respect: fractalRespect,
       event_respect: eventRespect,
       hosting_respect: hostingRespect,

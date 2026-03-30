@@ -37,6 +37,14 @@ vi.stubGlobal('navigator', {
   wakeLock: { request: vi.fn().mockResolvedValue({ release: vi.fn() }) },
 });
 
+vi.stubGlobal('MediaMetadata', class MediaMetadata {
+  title: string; artist: string; album: string; artwork: unknown[];
+  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+    this.title = init.title ?? ''; this.artist = init.artist ?? '';
+    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
+  }
+});
+
 // ─── Mock child components ─────────────────────────────────────────────────────
 vi.mock('./ArtworkImage', () => ({ ArtworkImage: () => <img data-testid="embed-artwork" /> }));
 vi.mock('./LikeButton', () => ({ LikeButton: () => <button>Like</button> }));
@@ -86,7 +94,7 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
 describe('MusicEmbed', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
@@ -159,7 +167,8 @@ describe('MusicEmbed', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Spotify')).toBeInTheDocument();
+      // Platform label renders in both overlay badge and inline badge
+      expect(screen.getAllByText('Spotify').length).toBeGreaterThan(0);
     });
   });
 
@@ -280,7 +289,7 @@ describe('MusicEmbed', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Apple Music')).toBeInTheDocument();
+      expect(screen.getAllByText('Apple Music').length).toBeGreaterThan(0);
     });
   });
 
@@ -299,7 +308,7 @@ describe('MusicEmbed', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Bandcamp')).toBeInTheDocument();
+      expect(screen.getAllByText('Bandcamp').length).toBeGreaterThan(0);
     });
   });
 
@@ -318,7 +327,7 @@ describe('MusicEmbed', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Tidal')).toBeInTheDocument();
+      expect(screen.getAllByText('Tidal').length).toBeGreaterThan(0);
     });
   });
 });
@@ -326,7 +335,7 @@ describe('MusicEmbed', () => {
 describe('MusicEmbed — player state integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
@@ -367,7 +376,7 @@ describe('MusicEmbed — player state integration', () => {
 describe('MusicEmbed — platform colors', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
@@ -401,7 +410,8 @@ describe('MusicEmbed — platform colors', () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText(label)).toBeInTheDocument();
+        // Platform label renders in both overlay badge and inline badge
+        expect(screen.getAllByText(label).length).toBeGreaterThan(0);
       });
     });
   });

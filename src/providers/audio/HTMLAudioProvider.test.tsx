@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { PlayerProvider, usePlayer } from './PlayerProvider';
 import { HTMLAudioProvider } from './HTMLAudioProvider';
@@ -27,32 +27,33 @@ const spotifyTrack: TrackMetadata = {
 };
 
 // ─── Mock audio element ────────────────────────────────────────────────────────
-let mockAudioPlay: ReturnType<typeof vi.fn>;
-let mockAudioPause: ReturnType<typeof vi.fn>;
-let mockAudioLoad: ReturnType<typeof vi.fn>;
-let mockAudioSeek: ReturnType<typeof vi.fn>;
+// Module-level stable mock — HTMLAudioProvider uses module-level singletons
+// (audioA/audioB) that persist across tests, so the mock must also persist.
+const mockAudioPlay = vi.fn(() => Promise.resolve(undefined));
+const mockAudioPause = vi.fn();
+const mockAudioLoad = vi.fn();
+const mockAudioSeek = vi.fn();
 
-function makeMockAudio() {
-  mockAudioPlay = vi.fn().mockResolvedValue(undefined);
-  mockAudioPause = vi.fn();
-  mockAudioLoad = vi.fn();
-  mockAudioSeek = vi.fn();
-  return {
-    play: mockAudioPlay,
-    pause: mockAudioPause,
-    load: mockAudioLoad,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    get currentTime() { return 0; },
-    set currentTime(v) { mockAudioSeek(v); },
-    get duration() { return 30; },
-    get paused() { return true; },
-    get volume() { return 1; },
-    set volume(v) {},
-    get src() { return ''; },
-    set src(s) {},
-  };
-}
+const stableMockAudio = {
+  play: mockAudioPlay,
+  pause: mockAudioPause,
+  load: mockAudioLoad,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  crossOrigin: '',
+  get currentTime() { return 0; },
+  set currentTime(v: number) { mockAudioSeek(v); },
+  get duration() { return 30; },
+  get paused() { return true; },
+  get volume() { return 1; },
+  set volume(v: number) {},
+  get src() { return ''; },
+  set src(s: string) {},
+  error: null,
+  removeAttribute: vi.fn(),
+};
+
+vi.stubGlobal('Audio', vi.fn(() => stableMockAudio));
 
 // ─── Mock getEqualizer ────────────────────────────────────────────────────────
 vi.mock('@/lib/music/equalizer', () => ({
@@ -69,6 +70,14 @@ vi.stubGlobal('localStorage', {
 });
 
 vi.stubGlobal('fetch', vi.fn());
+
+vi.stubGlobal('MediaMetadata', class MediaMetadata {
+  title: string; artist: string; album: string; artwork: unknown[];
+  constructor(init: { title?: string; artist?: string; album?: string; artwork?: unknown[] }) {
+    this.title = init.title ?? ''; this.artist = init.artist ?? '';
+    this.album = init.album ?? ''; this.artwork = init.artwork ?? [];
+  }
+});
 
 vi.stubGlobal('navigator', {
   vibrate: vi.fn(),
@@ -92,16 +101,14 @@ function DualWrapper({ children }: { children: React.ReactNode }) {
 
 // ─── Tests ─────────────────────────────────────────────────────────────────────
 describe('HTMLAudioProvider', () => {
-  let mockAudioInstance: ReturnType<typeof makeMockAudio>;
-
   beforeEach(() => {
-    vi.clearAllMocks();
-    mockAudioInstance = makeMockAudio();
-    vi.stubGlobal('Audio', vi.fn(() => mockAudioInstance));
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
+    mockAudioPlay.mockClear();
+    mockAudioPause.mockClear();
+    mockAudioLoad.mockClear();
+    mockAudioSeek.mockClear();
+    // Re-apply play implementation after clear (mockClear preserves implementation,
+    // but be explicit to guard against any upstream changes)
+    mockAudioPlay.mockImplementation(() => Promise.resolve(undefined));
   });
 
   it('registers audio controller with the player', async () => {
@@ -168,16 +175,8 @@ describe('HTMLAudioProvider', () => {
   });
 
   it('handles audio error event gracefully', async () => {
-    // Simulate error by triggering the error event listener
-    const errorHandler = vi.fn();
-    vi.stubGlobal('Audio', vi.fn(() => ({
-      ...makeMockAudio(),
-      play: vi.fn().mockRejectedValue(new Error('play blocked')),
-      addEventListener: vi.fn((event, handler) => {
-        if (event === 'error') errorHandler.mockImplementation(handler as (e: Event) => void);
-      }),
-      removeEventListener: vi.fn(),
-    })));
+    // Temporarily make play reject to simulate blocked autoplay
+    mockAudioPlay.mockImplementation(() => Promise.reject(new Error('play blocked')));
 
     const { result } = renderHook(() => usePlayer(), { wrapper: DualWrapper });
 
@@ -185,8 +184,11 @@ describe('HTMLAudioProvider', () => {
       result.current.play(audioTrack);
     });
 
-    // Should transition to error state (play was blocked)
-    expect(result.current.status === 'loading' || result.current.status === 'error' || result.current.status === 'playing').toBe(true);
+    // Should transition to error state or remain loading (play was blocked)
+    expect(['loading', 'error', 'playing']).toContain(result.current.status);
+
+    // Restore normal play behavior
+    mockAudioPlay.mockImplementation(() => Promise.resolve(undefined));
   });
 
   it('multiple play calls do not crash', async () => {
@@ -206,12 +208,11 @@ describe('HTMLAudioProvider', () => {
 
 describe('HTMLAudioProvider — crossfade', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    vi.stubGlobal('Audio', vi.fn(() => makeMockAudio()));
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
+    mockAudioPlay.mockClear();
+    mockAudioPause.mockClear();
+    mockAudioLoad.mockClear();
+    mockAudioSeek.mockClear();
+    mockAudioPlay.mockImplementation(() => Promise.resolve(undefined));
   });
 
   it('setCrossfade() enables crossfade mode', async () => {
@@ -236,13 +237,11 @@ describe('HTMLAudioProvider — crossfade', () => {
 
 describe('HTMLAudioProvider — volume', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    const audio = makeMockAudio();
-    vi.stubGlobal('Audio', vi.fn(() => audio));
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
+    mockAudioPlay.mockClear();
+    mockAudioPause.mockClear();
+    mockAudioLoad.mockClear();
+    mockAudioSeek.mockClear();
+    mockAudioPlay.mockImplementation(() => Promise.resolve(undefined));
   });
 
   it('volume changes are reflected in player state', async () => {

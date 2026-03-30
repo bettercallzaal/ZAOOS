@@ -120,6 +120,7 @@ export async function GET(req: NextRequest) {
         break;
     }
 
+    const { data: users, error, count } = await query.range(offset, offset + parseInt(limit) - 1);
     if (error) throw error;
 
     const userList = users || [];

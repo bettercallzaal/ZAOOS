@@ -1,6 +1,6 @@
 export default function RespectLoading() {
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       {/* Header */}
       <header className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
         <div className="w-5 h-5 bg-gray-800 rounded animate-pulse" />

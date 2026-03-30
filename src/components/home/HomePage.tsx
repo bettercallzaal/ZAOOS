@@ -288,7 +288,7 @@ export function HomePage() {
   }, [user]);
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20 md:pt-12">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36 md:pt-12">
       {/* Header */}
       <header className="px-4 py-3 flex items-center justify-between">
         <h1 className="text-lg font-bold tracking-wide bg-gradient-to-r from-[#f5a623] to-[#ffd700] bg-clip-text text-transparent">

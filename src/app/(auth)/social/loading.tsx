@@ -1,6 +1,6 @@
 export default function SocialLoading() {
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       {/* Header */}
       <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
         <div className="flex items-center justify-between mb-3">

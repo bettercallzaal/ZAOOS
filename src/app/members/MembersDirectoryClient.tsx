@@ -177,7 +177,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       <PageHeader
         title="Members"
         subtitle="The decentralized music community"

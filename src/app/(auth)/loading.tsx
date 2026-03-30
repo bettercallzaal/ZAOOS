@@ -1,6 +1,6 @@
 export default function AuthLoading() {
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       {/* Header placeholder */}
       <div className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
         <div className="h-4 w-32 bg-gray-800 rounded animate-pulse" />

@@ -197,7 +197,7 @@ export default function MemberCRMPage() {
   const filteredIssues = issueFilter === 'all' ? issues : issues.filter(i => i.severity === issueFilter);
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">

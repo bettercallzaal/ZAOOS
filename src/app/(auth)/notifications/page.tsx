@@ -76,7 +76,7 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] pb-20 text-white">
+    <div className="min-h-[100dvh] bg-[#0a1628] pb-36 text-white">
       <PageHeader
         title="Notifications"
         backHref="/home"

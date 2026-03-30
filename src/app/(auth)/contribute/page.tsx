@@ -4,7 +4,7 @@ import { IssueSubmitForm } from '@/components/community/IssueSubmitForm';
 
 export default function ContributePage() {
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       <PageHeader title="Contribute" subtitle="Help build ZAO OS" rightAction={<div className="md:hidden"><NotificationBell /></div>} />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">

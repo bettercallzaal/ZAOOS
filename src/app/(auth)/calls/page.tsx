@@ -85,7 +85,7 @@ export default function CallsPage() {
 
   // ── Room list view ─────────────────────────────────────────────────────────
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       <PageHeader title="Calls" backHref="/tools" />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">

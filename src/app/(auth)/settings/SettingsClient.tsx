@@ -592,7 +592,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-20">
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       <PageHeader title="Settings" rightAction={<div className="md:hidden"><NotificationBell /></div>} />
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">

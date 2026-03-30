@@ -27,7 +27,7 @@ function LibraryContent() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] pb-20 md:pb-0">
+    <div className="min-h-[100dvh] bg-[#0a1628] pb-36 md:pb-0">
       <PageHeader title="Library" subtitle="Submit links, topics, and resources" />
       <div className="mx-auto max-w-3xl px-4 py-4 space-y-6">
 

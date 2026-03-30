@@ -16,3 +16,5 @@
 | [16](../016-ui-reference/) | **UI Reference** | Discord-style dark theme, navy #0a1628 + gold #f5a623 |
 | [213](../213-spaces-streaming-architecture-debug-guide/) | **Spaces & Streaming Architecture** | Full /spaces debug guide — Go Live flow, Stream.io + 100ms + Livepeer, RTMP multistream, SongJam patterns |
 | [214](../214-twitch-api-deep-integration/) | **Twitch API Deep Integration** | Comprehensive Twitch Helix API feature map — 100+ endpoints, scopes, chat bridge, polls, clips, EventSub, DJ Program, priority matrix |
+| [215](../215-obs-restream-streamyard-feature-analysis/) | **OBS + Restream + StreamYard Feature Analysis** | Complete feature inventory of all 3 platforms, 120+ OBS WebSocket requests, Restream API mapping, gap analysis, 13 buildable features for ZAO OS Spaces, overlay system + OBS bridge + chat aggregation |
+| [216](../216-web3-streaming-features-tipping-gating-tickets/) | **Web3 Streaming Features: Tipping, Token Gates, NFT Tickets** | Wallet-to-wallet tipping (ETH/USDC/DEGEN), token-gated rooms (ERC-20/721/1155), NFT tickets via Unlock Protocol, implementation plan with file paths, security considerations |

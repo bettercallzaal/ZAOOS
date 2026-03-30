@@ -9,13 +9,13 @@
 | Category | Docs | Description |
 |----------|------|-------------|
 | [Farcaster Protocol & Ecosystem](./_categories/farcaster.md) | 12 | Protocol architecture, Neynar, Mini Apps, ecosystem landscape |
-| [Music, Curation & Artist Revenue](./_categories/music.md) | 22 | Player, streaming, curation, discovery feeds, gap analysis, play counting |
+| [Music, Curation & Artist Revenue](./_categories/music.md) | 23 | Player, streaming, curation, discovery feeds, gap analysis, play counting |
 | [On-Chain Music Distribution & NFTs](./_categories/onchain-distribution.md) | 18 | Arweave, BazAR, atomic assets, 0xSplits, BuilderOSS, thirdweb, ZOUNZ governance |
 | [Community, Social & Growth](./_categories/community.md) | 14 | Gating, messaging, onboarding, notifications, moderation, community directory |
 | [Identity, Governance & Tokens](./_categories/identity-governance.md) | 31 | ZIDs, Hats Protocol, Respect, ORDAO fractals, ZOUNZ DAO, Snapshot, ENS, Basenames |
-| [AI Agent & Intelligence](./_categories/ai-agent.md) | 5 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents, harness engineering |
+| [AI Agent & Intelligence](./_categories/ai-agent.md) | 6 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents, live room AI |
 | [Cross-Platform Publishing](./_categories/cross-platform.md) | 12 | Farcaster, X, Bluesky, Lens, Hive, Mastodon, Threads, Nostr, Reddit |
-| [Technical Infrastructure](./_categories/infrastructure.md) | 8 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4 |
+| [Technical Infrastructure](./_categories/infrastructure.md) | 9 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming features |
 | [APIs & External Services](./_categories/apis.md) | 7 | 1,400+ APIs mapped, Alchemy, Coinflow, free tier maximization |
 | [WaveWarZ Integration](./_categories/wavewarz.md) | 6 | Solana prediction markets, artist pipeline, battle mechanics |
 | [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |

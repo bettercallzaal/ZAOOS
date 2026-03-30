@@ -1,7 +1,7 @@
 {
   "version": 1,
   "generated": "2026-03-28",
-  "doc_count": 191,
+  "doc_count": 193,
   "docs": [
     {
       "id": "001",
@@ -4147,6 +4147,65 @@
         "185",
         "171",
         "168"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "213",
+      "slug": "213-zao-stock-planning",
+      "title": "Doc 213 \u2014 ZAO Stock: Festival Planning",
+      "category": "community",
+      "tags": [
+        "zao-stock",
+        "festival",
+        "irl-events",
+        "music",
+        "maine",
+        "community",
+        "onchain",
+        "poap",
+        "magnetiq",
+        "governance"
+      ],
+      "status": "current",
+      "date": "2026-03-29",
+      "summary": "ZAO Stock IRL music festival \u2014 Maine, October 2026. Venue research, artist payments via 0xSplits, NFT ticketing/POAP, Magnetiq IRL meet tokens, ZAO Card drops, volunteer coordination. History of ZAO-PALOOZA, ZAO-CHELLA, ZAO-PROS. What's built vs what needs building.",
+      "related": [
+        "051",
+        "064",
+        "102",
+        "198",
+        "214"
+      ],
+      "code_paths": []
+    },
+    {
+      "id": "214",
+      "slug": "214-zao-knowledge-graph",
+      "title": "Doc 214 \u2014 ZAO Knowledge Graph: Member Identity & Relationship Mapping",
+      "category": "community",
+      "tags": [
+        "knowledge-graph",
+        "identity",
+        "social-graph",
+        "zid",
+        "magnetiq",
+        "farcaster",
+        "governance",
+        "respect",
+        "multi-chain"
+      ],
+      "status": "current",
+      "date": "2026-03-29",
+      "summary": "ZAO member identity + relationship graph. ZID as canonical anchor. Cross-chain wallet linking (Base/Solana/Flow/Optimism). Data sources mapped: Supabase, Neynar, Fractal Bot, Magnetiq, OREC. What's connected in ZAO OS vs what's missing. 3-phase build plan for graph query and display. AI onboarding agent use case.",
+      "related": [
+        "050",
+        "051",
+        "158",
+        "198",
+        "199",
+        "207",
+        "213"
       ],
       "code_paths": []
     }

@@ -21,3 +21,5 @@
 | [110](../110-community-directory-crm/) | **Community Directory & CRM** | Replace Webflow CRM with native member directory: profiles, social links, on-chain stats |
 | [118](../118-settings-page-redesign/) | **Settings Page Redesign** | Unify 3 overlapping settings sections into one logical layout |
 | [169](../169-ai-education-music-creators-landscape/) | **AI Education for Music Creators** | Learn Vibe Build analysis, landscape gap (no music-specific AI cohorts), ZAO Builders pilot design |
+| [213](../213-zao-stock-planning/) | **ZAO Stock: Festival Planning** | IRL music festival in Maine, October 2026 — venue, ticketing, artist payments, POAP, Magnetiq integration, IRL fractal |
+| [214](../214-zao-knowledge-graph/) | **ZAO Knowledge Graph** | Member identity + relationship graph: ZID-first, cross-chain wallets, IRL meets, fractal co-attendance, social graph edges |

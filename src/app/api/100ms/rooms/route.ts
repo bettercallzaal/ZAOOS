@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { createMSRoom } from '@/lib/social/msRoomsDb';
+import { logger } from '@/lib/logger';
 
 const CreateSchema = z.object({
   title: z.string().min(1).max(100),
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ room });
   } catch (error) {
-    console.error('Create 100ms room error:', error);
+    logger.error('Create 100ms room error:', error);
     return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const BroadcastSchema = z.object({
   title: z.string().min(1).max(100),
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
       }
       const refreshed = await refreshYouTubeToken(platform.refresh_token);
       if (!refreshed.access_token) {
-        console.error('YouTube token refresh failed:', refreshed);
+        logger.error('YouTube token refresh failed:', refreshed);
         return NextResponse.json({ error: 'YouTube token refresh failed — please reconnect' }, { status: 401 });
       }
       accessToken = refreshed.access_token;
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
     const broadcast = await broadcastRes.json();
 
     if (!broadcast.id) {
-      console.error('YouTube create broadcast failed:', broadcast);
+      logger.error('YouTube create broadcast failed:', broadcast);
       return NextResponse.json({ error: 'Failed to create YouTube broadcast' }, { status: 500 });
     }
 
@@ -118,7 +119,7 @@ export async function POST(req: NextRequest) {
     const stream = await streamRes.json();
 
     if (!stream.id) {
-      console.error('YouTube create stream failed:', stream);
+      logger.error('YouTube create stream failed:', stream);
       return NextResponse.json({ error: 'Failed to create YouTube stream' }, { status: 500 });
     }
 
@@ -130,7 +131,7 @@ export async function POST(req: NextRequest) {
     const bindData = await bindRes.json();
 
     if (!bindData.id) {
-      console.error('YouTube bind stream failed:', bindData);
+      logger.error('YouTube bind stream failed:', bindData);
       return NextResponse.json({ error: 'Failed to bind YouTube stream to broadcast' }, { status: 500 });
     }
 
@@ -146,7 +147,7 @@ export async function POST(req: NextRequest) {
       watchUrl: `https://youtube.com/watch?v=${broadcast.id}`,
     });
   } catch (error) {
-    console.error('YouTube broadcast error:', error);
+    logger.error('YouTube broadcast error:', error);
     return NextResponse.json({ error: 'Failed to create broadcast' }, { status: 500 });
   }
 }

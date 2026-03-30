@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getUserByFid, getUserByAddress, searchUsers } from '@/lib/farcaster/neynar';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 const ethAddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/);
 
@@ -93,7 +94,7 @@ export async function GET(req: NextRequest) {
   const { data, error, count } = await query;
 
   if (error) {
-    console.error('Failed to fetch users:', error);
+    logger.error('Failed to fetch users:', error);
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 
@@ -239,7 +240,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ user: data });
   } catch (error) {
-    console.error('Create user error:', error);
+    logger.error('Create user error:', error);
     return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
   }
 }
@@ -266,7 +267,7 @@ export async function PATCH(req: NextRequest) {
       const { error: zidErr } = await supabaseAdmin
         .rpc('assign_next_zid', { target_user_id: id });
       if (zidErr) {
-        console.error('ZID assignment error:', zidErr);
+        logger.error('ZID assignment error:', zidErr);
         return NextResponse.json({ error: 'Failed to assign ZID' }, { status: 500 });
       }
       // Return updated user
@@ -336,7 +337,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ user: data });
   } catch (error) {
-    console.error('Update user error:', error);
+    logger.error('Update user error:', error);
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
 }
@@ -375,7 +376,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Deactivate user error:', error);
+    logger.error('Deactivate user error:', error);
     return NextResponse.json({ error: 'Failed to deactivate user' }, { status: 500 });
   }
 }

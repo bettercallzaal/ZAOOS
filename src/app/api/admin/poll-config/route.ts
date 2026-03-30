@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 const POLL_CONFIG_ID = 'weekly-priority';
 
@@ -45,7 +46,7 @@ export async function GET() {
       updatedByFid: data.updated_by_fid,
     });
   } catch (err) {
-    console.error('[poll-config] GET error:', err);
+    logger.error('[poll-config] GET error:', err);
     return NextResponse.json({ error: 'Failed to fetch poll config' }, { status: 500 });
   }
 }
@@ -90,7 +91,7 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('[poll-config] Upsert error:', error);
+      logger.error('[poll-config] Upsert error:', error);
       return NextResponse.json({ error: 'Failed to save poll config' }, { status: 500 });
     }
 
@@ -104,7 +105,7 @@ export async function PUT(request: NextRequest) {
       updatedByFid: data.updated_by_fid,
     });
   } catch (err) {
-    console.error('[poll-config] PUT error:', err);
+    logger.error('[poll-config] PUT error:', err);
     return NextResponse.json({ error: 'Failed to update poll config' }, { status: 500 });
   }
 }

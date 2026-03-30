@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { resolveENSNames, getENSTextRecords, getENSAvatar } from '@/lib/ens/resolve';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   addresses: z.string().max(500).optional(),
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ error: 'Provide addresses or name param' }, { status: 400 });
   } catch (err) {
-    console.error('[ens] resolution error:', err);
+    logger.error('[ens] resolution error:', err);
     return NextResponse.json({ error: 'ENS resolution failed' }, { status: 500 });
   }
 }

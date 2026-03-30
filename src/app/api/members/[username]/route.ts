@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { resolveENSNames, getENSTextRecords, getENSAvatar, resolveBasenames } from '@/lib/ens/resolve';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/members/[username] — Unified member profile
@@ -359,7 +360,7 @@ export async function GET(
       headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' },
     });
   } catch (err) {
-    console.error('[members/profile] error:', err);
+    logger.error('[members/profile] error:', err);
     return NextResponse.json({ error: 'Failed to load profile' }, { status: 500 });
   }
 }

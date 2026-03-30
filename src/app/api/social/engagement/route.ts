@@ -4,6 +4,7 @@ import {
   getEngagementScores,
   getPersonalizedScores,
 } from '@/lib/openrank/client';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/social/engagement?fids=123,456,789
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
     );
     return response;
   } catch (err) {
-    console.error('Engagement scores error:', err);
+    logger.error('Engagement scores error:', err);
     return NextResponse.json(
       { error: 'Failed to fetch engagement scores' },
       { status: 500 }

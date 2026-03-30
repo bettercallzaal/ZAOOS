@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
 import { proposalCommentSchema } from '@/lib/validation/schemas';
+import { logger } from '@/lib/logger';
 
 /**
  * GET — Get comments for a proposal
@@ -100,13 +101,13 @@ export async function POST(req: NextRequest) {
           actorFid: session.fid,
           actorDisplayName: session.displayName,
           actorPfpUrl: session.pfpUrl,
-        }).catch((err) => console.error('[notify]', err));
+        }).catch((err) => logger.error('[notify]', err));
       }
-    }).catch((err) => console.error('[notify]', err));
+    }).catch((err) => logger.error('[notify]', err));
 
     return NextResponse.json({ comment });
   } catch (err) {
-    console.error('Comment error:', err);
+    logger.error('Comment error:', err);
     return NextResponse.json({ error: 'Failed to add comment' }, { status: 500 });
   }
 }

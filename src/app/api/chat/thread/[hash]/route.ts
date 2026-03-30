@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { getCastThread } from '@/lib/farcaster/neynar';
 import { castHashSchema } from '@/lib/validation/schemas';
 import { Cast } from '@/types';
+import { logger } from '@/lib/logger';
 
 function mapCast(raw: Record<string, unknown>): Cast {
   const author = raw.author as Record<string, unknown>;
@@ -68,7 +69,7 @@ export async function GET(
     const casts = flattenThread(rootCast);
     return NextResponse.json({ casts });
   } catch (error) {
-    console.error('Thread fetch error:', error);
+    logger.error('Thread fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch thread' }, { status: 500 });
   }
 }

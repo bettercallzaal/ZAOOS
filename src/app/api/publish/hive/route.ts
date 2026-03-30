@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { normalizeForHive } from '@/lib/publish/normalize';
 import { decryptPostingKey, publishToHive } from '@/lib/publish/hive';
+import { logger } from '@/lib/logger';
 
 const publishHiveSchema = z.object({
   castHash: z.string().min(1),
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
       platformUrl: result.url,
     });
   } catch (err) {
-    console.error('[publish/hive] Error:', err);
+    logger.error('[publish/hive] Error:', err);
     return NextResponse.json(
       { error: 'Failed to publish to Hive' },
       { status: 500 },

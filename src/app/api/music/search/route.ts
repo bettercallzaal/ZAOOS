@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth/session'
 import { searchAudiusTracks } from '@/lib/music/audius'
 import { searchTidal } from '@/lib/music/tidal'
 import { getSupabaseAdmin } from '@/lib/db/supabase'
+import { logger } from '@/lib/logger';
 
 const SearchSchema = z.object({
   q: z.string().min(1).max(200),
@@ -99,7 +100,7 @@ export async function GET(req: NextRequest) {
     const sources = ['audius', 'library', ...(process.env.TIDAL_CLIENT_ID ? ['tidal'] : [])]
     return NextResponse.json({ results, sources })
   } catch (error) {
-    console.error('Music search error:', error)
+    logger.error('Music search error:', error)
     return NextResponse.json({ error: 'Search failed' }, { status: 500 })
   }
 }

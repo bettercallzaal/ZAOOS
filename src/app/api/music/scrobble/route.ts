@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth/session'
 import { getSupabaseAdmin } from '@/lib/db/supabase'
 import { scrobble, updateNowPlaying } from '@/lib/music/lastfm'
 import { submitListen, submitNowPlaying } from '@/lib/music/listenbrainz'
+import { logger } from '@/lib/logger';
 
 const ScrobbleSchema = z.object({
   artist: z.string().min(1),
@@ -65,13 +66,13 @@ export async function POST(req: NextRequest) {
           });
         }
       } catch (lbError) {
-        console.error('[scrobble] ListenBrainz error:', lbError);
+        logger.error('[scrobble] ListenBrainz error:', lbError);
       }
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Scrobble error:', error)
+    logger.error('Scrobble error:', error)
     return NextResponse.json({ error: 'Scrobble failed' }, { status: 500 })
   }
 }

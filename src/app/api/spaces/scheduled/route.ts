@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const CreateScheduledSchema = z.object({
   title: z.string().min(1).max(100),
@@ -25,7 +26,7 @@ export async function GET() {
     if (error) throw error;
     return NextResponse.json({ rooms: data ?? [] });
   } catch (error) {
-    console.error('Fetch scheduled rooms error:', error);
+    logger.error('Fetch scheduled rooms error:', error);
     return NextResponse.json({ error: 'Failed to fetch scheduled rooms' }, { status: 500 });
   }
 }
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ room: data });
   } catch (error) {
-    console.error('Create scheduled room error:', error);
+    logger.error('Create scheduled room error:', error);
     return NextResponse.json({ error: 'Failed to schedule room' }, { status: 500 });
   }
 }

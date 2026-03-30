@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { sendPushNotification } from '@/lib/push/vapid';
+import { logger } from '@/lib/logger';
 
 const sendSchema = z.object({
   fid: z.number().int().positive(),
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
       .eq('fid', fid);
 
     if (error) {
-      console.error('[push/send] Supabase error:', error);
+      logger.error('[push/send] Supabase error:', error);
       return NextResponse.json({ error: 'Failed to fetch subscriptions' }, { status: 500 });
     }
 
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, sent, total: subscriptions.length });
   } catch (error) {
-    console.error('[push/send] Error:', error);
+    logger.error('[push/send] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

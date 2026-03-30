@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const RecordActivitySchema = z.object({
   activity_type: z.enum(['cast', 'vote', 'comment', 'reaction', 'submission', 'fractal', 'login']),
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
 
     if (activityError) {
-      console.error('Activity log upsert error:', activityError);
+      logger.error('Activity log upsert error:', activityError);
       return NextResponse.json({ error: 'Failed to record activity' }, { status: 500 });
     }
 
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (insertError) {
-        console.error('Streak insert error:', insertError);
+        logger.error('Streak insert error:', insertError);
         return NextResponse.json({ error: 'Failed to create streak' }, { status: 500 });
       }
 
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('Streak update error:', updateError);
+      logger.error('Streak update error:', updateError);
       return NextResponse.json({ error: 'Failed to update streak' }, { status: 500 });
     }
 
@@ -155,7 +156,7 @@ export async function POST(request: NextRequest) {
       recorded: true,
     });
   } catch (err) {
-    console.error('Streak record error:', err);
+    logger.error('Streak record error:', err);
     return NextResponse.json({ error: 'Failed to record activity' }, { status: 500 });
   }
 }

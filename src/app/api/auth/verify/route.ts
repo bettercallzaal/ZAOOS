@@ -9,6 +9,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
 import { communityConfig } from '@/../community.config';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { logger } from '@/lib/logger';
 
 const appClient = createAppClient({
   ethereum: viemConnector(),
@@ -169,18 +170,18 @@ export async function POST(req: NextRequest) {
               actorFid: fid,
               actorDisplayName: user.display_name,
               actorPfpUrl: user.pfp_url,
-            }).catch((err) => console.error('[notify]', err));
+            }).catch((err) => logger.error('[notify]', err));
           }
 
           // Fire-and-forget: auto-cast welcome announcement
           const handle = user.username ? `@${user.username}` : (user.display_name || 'a new member');
           autoCastToZao(
             `Welcome ${handle} to The ZAO! \u{1F3B6}`,
-          ).catch((err) => console.error('[welcome-cast]', err));
+          ).catch((err) => logger.error('[welcome-cast]', err));
         }
       }
     } catch (err) {
-      console.error('[Auth] Failed to upsert user record:', err);
+      logger.error('[Auth] Failed to upsert user record:', err);
     }
 
     return NextResponse.json({
@@ -188,7 +189,7 @@ export async function POST(req: NextRequest) {
       redirect: '/home',
     });
   } catch (error) {
-    console.error('Auth verify error:', error);
+    logger.error('Auth verify error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

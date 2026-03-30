@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   req: NextRequest,
@@ -42,7 +43,7 @@ export async function GET(
 
     return NextResponse.json({ profile, wavewarzStats });
   } catch (err) {
-    console.error('[directory/slug] GET error:', err);
+    logger.error('[directory/slug] GET error:', err);
     return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
   }
 }

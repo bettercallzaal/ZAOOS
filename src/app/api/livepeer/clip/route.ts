@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { Livepeer } from 'livepeer';
+import { logger } from '@/lib/logger';
 
 const ClipSchema = z.object({
   playbackId: z.string().min(1),
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, clip });
   } catch (error) {
-    console.error('Livepeer clip error:', error);
+    logger.error('Livepeer clip error:', error);
     return NextResponse.json({ error: 'Failed to create clip' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const LENS_API = 'https://api.lens.xyz/graphql';
 
@@ -14,7 +15,7 @@ async function checkLensProfile(wallet: string) {
   });
   const data = await res.json();
   if (data?.errors) {
-    console.error('[lens] V3 API errors for', wallet, ':', JSON.stringify(data.errors));
+    logger.error('[lens] V3 API errors for', wallet, ':', JSON.stringify(data.errors));
   }
   const items = data?.data?.accountsAvailable?.items || [];
   // Log what we got to debug missing usernames
@@ -128,7 +129,7 @@ export async function POST(req: NextRequest) {
         : `No Lens profile found on ${walletsToCheck.size} wallet(s). Create one at hey.xyz to cross-post.`,
     });
   } catch (err) {
-    console.error('[lens] Connect error:', err);
+    logger.error('[lens] Connect error:', err);
     return NextResponse.json({ error: 'Failed to check Lens profile' }, { status: 500 });
   }
 }
@@ -147,7 +148,7 @@ export async function DELETE() {
       .eq('fid', session.fid);
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[lens] Disconnect error:', err);
+    logger.error('[lens] Disconnect error:', err);
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

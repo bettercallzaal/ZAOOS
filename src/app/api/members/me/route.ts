@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const updateSchema = z.object({
   bio: z.string().max(500).optional(),
@@ -42,7 +43,7 @@ export async function GET() {
 
     return NextResponse.json(user);
   } catch (err) {
-    console.error('[members/me] GET error:', err);
+    logger.error('[members/me] GET error:', err);
     return NextResponse.json({ error: 'Failed to load profile' }, { status: 500 });
   }
 }
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, updated: Object.keys(updates) });
   } catch (err) {
-    console.error('[members/me] POST error:', err);
+    logger.error('[members/me] POST error:', err);
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
   }
 }

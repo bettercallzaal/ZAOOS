@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { normalizeForX } from '@/lib/publish/normalize';
 import { publishToX, publishThreadToX, getXClient } from '@/lib/publish/x';
+import { logger } from '@/lib/logger';
 
 const publishXSchema = z.object({
   castHash: z.string().min(1),
@@ -129,7 +130,7 @@ export async function POST(req: NextRequest) {
       ...(scheduledAt && { scheduledAt }),
     });
   } catch (err) {
-    console.error('[publish/x] Error:', err);
+    logger.error('[publish/x] Error:', err);
 
     const message =
       err instanceof Error ? err.message : 'Failed to publish to X';

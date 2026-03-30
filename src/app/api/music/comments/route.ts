@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { upsertSong } from '@/lib/music/library';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { logger } from '@/lib/logger';
 
 const commentSchema = z.object({
   url: z.string().url().max(500),
@@ -51,7 +52,7 @@ export async function GET(req: NextRequest) {
       })),
     });
   } catch (err) {
-    console.error('[comments] GET failed:', err);
+    logger.error('[comments] GET failed:', err);
     return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });
   }
 }
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('[comments] POST failed:', err);
+    logger.error('[comments] POST failed:', err);
     return NextResponse.json({ error: 'Failed to add comment' }, { status: 500 });
   }
 }
@@ -159,7 +160,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ deleted: true });
   } catch (err) {
-    console.error('[comments] DELETE failed:', err);
+    logger.error('[comments] DELETE failed:', err);
     return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
   }
 }

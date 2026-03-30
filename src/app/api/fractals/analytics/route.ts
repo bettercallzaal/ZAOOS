@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   const session = await getSessionData();
@@ -119,7 +120,7 @@ export async function GET() {
       recentSessions: recentSessionsResult.data ?? [],
     });
   } catch (err) {
-    console.error('Fractals analytics error:', err);
+    logger.error('Fractals analytics error:', err);
     return NextResponse.json({ error: 'Failed to load analytics' }, { status: 500 });
   }
 }

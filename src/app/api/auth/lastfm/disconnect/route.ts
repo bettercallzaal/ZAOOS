@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function POST() {
   try {
@@ -16,7 +17,7 @@ export async function POST() {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[lastfm/disconnect] Error:', error);
+    logger.error('[lastfm/disconnect] Error:', error);
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

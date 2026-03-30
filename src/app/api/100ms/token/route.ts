@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 const TokenSchema = z.object({
   userId: z.string().min(1),
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     const templateId = process.env.NEXT_PUBLIC_100MS_TEMPLATE_ID || '';
 
     if (!accessKey || !appSecret) {
-      console.error('100ms keys missing');
+      logger.error('100ms keys missing');
       return NextResponse.json({ error: '100ms configuration missing' }, { status: 500 });
     }
 
@@ -117,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ token: appToken, roomId: hmsRoomId });
   } catch (error) {
-    console.error('100ms token error:', error);
+    logger.error('100ms token error:', error);
     return NextResponse.json({ error: 'Failed to generate token' }, { status: 500 });
   }
 }

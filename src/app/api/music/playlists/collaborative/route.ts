@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { logger } from '@/lib/logger';
 
 const createSchema = z.object({
   name: z.string().min(1).max(100),
@@ -72,7 +73,7 @@ export async function GET() {
 
     return NextResponse.json({ playlists: enriched });
   } catch (err) {
-    console.error('[collaborative-playlists] GET error:', err);
+    logger.error('[collaborative-playlists] GET error:', err);
     return NextResponse.json({ error: 'Failed to fetch playlists' }, { status: 500 });
   }
 }
@@ -118,11 +119,11 @@ export async function POST(req: NextRequest) {
     autoCastToZao(
       `\u{1F4DD} New playlist: ${name} \u2014 Join and add tracks: zaoos.com/music`,
       'https://zaoos.com/music',
-    ).catch((err) => console.error('[playlist-cast]', err));
+    ).catch((err) => logger.error('[playlist-cast]', err));
 
     return NextResponse.json({ playlist }, { status: 201 });
   } catch (err) {
-    console.error('[collaborative-playlists] POST error:', err);
+    logger.error('[collaborative-playlists] POST error:', err);
     return NextResponse.json({ error: 'Failed to create playlist' }, { status: 500 });
   }
 }

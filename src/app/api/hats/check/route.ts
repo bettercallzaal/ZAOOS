@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { isWearerOfHat, getWornHats } from '@/lib/hats/client';
 import { HAT_IDS, PROJECT_HAT_IDS, HAT_LABELS } from '@/lib/hats/constants';
+import { logger } from '@/lib/logger';
 
 const CheckSchema = z.object({
   wallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ wallet, roles });
   } catch (err) {
-    console.error('[hats/check] Error:', err);
+    logger.error('[hats/check] Error:', err);
     return NextResponse.json({ error: 'Failed to check hat status' }, { status: 500 });
   }
 }

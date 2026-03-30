@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const digestSchema = z.object({
   period: z.enum(['week', 'month']).default('week'),
@@ -113,7 +114,7 @@ export async function GET(req: NextRequest) {
       { headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=60' } },
     );
   } catch (error) {
-    console.error('Music digest error:', error);
+    logger.error('Music digest error:', error);
     return NextResponse.json({ error: 'Failed to generate digest' }, { status: 500 });
   }
 }

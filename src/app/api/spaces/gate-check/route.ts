@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkTokenGate, type TokenGateConfig } from '@/lib/spaces/tokenGate';
+import { logger } from '@/lib/logger';
 
 const GateCheckSchema = z.object({
   walletAddress: z.string().min(1),
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
       balance: result.balance,
     });
   } catch (err) {
-    console.error('Gate check error:', err);
+    logger.error('Gate check error:', err);
     return NextResponse.json(
       { error: 'Failed to check token gate', allowed: false },
       { status: 500 },

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   filter: z.enum(['all', 'music', 'governance', 'social', 'fractals', 'wavewarz']).default('all'),
@@ -264,7 +265,7 @@ export async function GET(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('[activity/feed] Error:', error);
+    logger.error('[activity/feed] Error:', error);
     return NextResponse.json({ error: 'Failed to load activity' }, { status: 500 });
   }
 }

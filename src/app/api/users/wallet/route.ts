@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getUserByFid } from '@/lib/farcaster/neynar';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   const session = await getSessionData();
@@ -19,7 +20,7 @@ export async function GET() {
       custodyAddress: user.custody_address ?? null,
     });
   } catch (err) {
-    console.error('Wallet fetch error:', err);
+    logger.error('Wallet fetch error:', err);
     return NextResponse.json({ error: 'Failed to fetch wallet' }, { status: 500 });
   }
 }

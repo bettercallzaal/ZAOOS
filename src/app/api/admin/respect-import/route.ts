@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 // Allow up to 60s on Vercel Pro for this heavy sync
 export const maxDuration = 60;
@@ -54,7 +55,7 @@ async function fetchAllRecords(token: string, tableName: string): Promise<Airtab
     const res = await fetch(url.toString(), { headers });
     if (!res.ok) {
       const text = await res.text();
-      console.error(`Airtable ${tableName} error ${res.status}:`, text);
+      logger.error(`Airtable ${tableName} error ${res.status}:`, text);
       throw new Error(`Airtable "${tableName}" failed with status ${res.status}`);
     }
 
@@ -173,7 +174,7 @@ async function importMembers(
     .from('respect_members')
     .upsert(rows, { onConflict: 'name', ignoreDuplicates: false });
 
-  if (error) console.error('[Airtable Sync] Members upsert error:', error.message);
+  if (error) logger.error('[Airtable Sync] Members upsert error:', error.message);
   return rows.length;
 }
 
@@ -255,7 +256,7 @@ async function importSessions(
     .select('id, name');
 
   if (sessErr || !insertedSessions) {
-    console.error('[Airtable Sync] Sessions insert error:', sessErr?.message);
+    logger.error('[Airtable Sync] Sessions insert error:', sessErr?.message);
     return;
   }
 
@@ -300,7 +301,7 @@ async function importSessions(
   for (let i = 0; i < allScoreRows.length; i += 200) {
     const batch = allScoreRows.slice(i, i + 200);
     const { error: scErr } = await supabaseAdmin.from('fractal_scores').insert(batch);
-    if (scErr) console.error(`[Airtable Sync] Scores batch error:`, scErr.message);
+    if (scErr) logger.error(`[Airtable Sync] Scores batch error:`, scErr.message);
   }
   stats.scores = allScoreRows.length;
 
@@ -405,7 +406,7 @@ async function importEvents(
   for (let i = 0; i < eventRows.length; i += 200) {
     const batch = eventRows.slice(i, i + 200);
     const { error } = await supabaseAdmin.from('respect_events').insert(batch);
-    if (error) console.error('[Airtable Sync] Events batch error:', error.message);
+    if (error) logger.error('[Airtable Sync] Events batch error:', error.message);
   }
 }
 
@@ -520,7 +521,7 @@ export async function POST() {
 
   try {
     // Fetch all 6 tables (parallel — each table is independent)
-    console.log('[Airtable Sync] Fetching all tables...');
+    logger.info('[Airtable Sync] Fetching all tables...');
 
     const [walletRecords, summaryRecords, respectRecords, hostRecords, festivalRecords, miscRecords] =
       await Promise.all([
@@ -532,29 +533,29 @@ export async function POST() {
         fetchAllRecords(airtableToken, TABLES.misc).catch(e => { stats.errors.push(`Misc: ${e.message}`); return [] as AirtableRecord[]; }),
       ]);
 
-    console.log(`[Airtable Sync] Fetched: ${walletRecords.length} wallets, ${summaryRecords.length} summary, ${respectRecords.length} respect, ${hostRecords.length} hosts, ${festivalRecords.length} festivals, ${miscRecords.length} misc`);
+    logger.info(`[Airtable Sync] Fetched: ${walletRecords.length} wallets, ${summaryRecords.length} summary, ${respectRecords.length} respect, ${hostRecords.length} hosts, ${festivalRecords.length} festivals, ${miscRecords.length} misc`);
 
     // 1. Build wallet map (pure computation, no DB)
     const walletMap = buildWalletMap(walletRecords, summaryRecords);
     stats.wallets = walletMap.size;
 
     // 2. Upsert members (batch)
-    console.log('[Airtable Sync] Upserting members...');
+    logger.info('[Airtable Sync] Upserting members...');
     stats.members = await importMembers(summaryRecords, walletMap);
 
     // 3. Import sessions + scores (batch)
-    console.log('[Airtable Sync] Importing sessions + scores...');
+    logger.info('[Airtable Sync] Importing sessions + scores...');
     await importSessions(respectRecords, walletMap, stats);
 
     // 4. Import events — hosts, festivals, misc (batch)
-    console.log('[Airtable Sync] Importing events...');
+    logger.info('[Airtable Sync] Importing events...');
     await importEvents(hostRecords, festivalRecords, miscRecords, stats);
 
     // 5. Enrichment — recalculate totals
-    console.log('[Airtable Sync] Enriching...');
+    logger.info('[Airtable Sync] Enriching...');
     await enrichAndReconcile(stats);
 
-    console.log('[Airtable Sync] Complete:', JSON.stringify(stats));
+    logger.info('[Airtable Sync] Complete:', JSON.stringify(stats));
 
     return NextResponse.json({
       success: true,
@@ -567,7 +568,7 @@ export async function POST() {
       errors: stats.errors.length > 0 ? stats.errors : [],
     });
   } catch (err) {
-    console.error('[Airtable Sync] Fatal error:', err);
+    logger.error('[Airtable Sync] Fatal error:', err);
     return NextResponse.json(
       { error: 'Sync failed', details: err instanceof Error ? err.message : 'Unknown error' },
       { status: 500 },

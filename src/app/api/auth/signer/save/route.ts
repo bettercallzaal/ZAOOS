@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession, getSessionData } from '@/lib/auth/session';
 import { getSignerStatus } from '@/lib/farcaster/neynar';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const saveSignerSchema = z.object({
   signerUuid: z.string().min(1),
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Save signer error:', error);
+    logger.error('Save signer error:', error);
     return NextResponse.json({ error: 'Failed to save signer' }, { status: 500 });
   }
 }

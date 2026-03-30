@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -24,7 +25,7 @@ export async function GET() {
       rtmpUrl: data.rtmp_url,
     });
   } catch (error) {
-    console.error('Kick platform GET error:', error);
+    logger.error('Kick platform GET error:', error);
     return NextResponse.json({ error: 'Failed to get Kick info' }, { status: 500 });
   }
 }
@@ -41,13 +42,13 @@ export async function DELETE() {
       .eq('platform', 'kick');
 
     if (error) {
-      console.error('Kick disconnect error:', error);
+      logger.error('Kick disconnect error:', error);
       return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Kick platform DELETE error:', error);
+    logger.error('Kick platform DELETE error:', error);
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

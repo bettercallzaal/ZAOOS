@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { normalizeForTelegram } from '@/lib/publish/normalize';
 import { publishToTelegram } from '@/lib/publish/telegram';
+import { logger } from '@/lib/logger';
 
 const publishTelegramSchema = z.object({
   text: z.string().min(1).max(4096),
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
       messageId: result.messageId,
     });
   } catch (err) {
-    console.error('[publish/telegram] Error:', err);
+    logger.error('[publish/telegram] Error:', err);
 
     const message =
       err instanceof Error ? err.message : 'Failed to publish to Telegram';

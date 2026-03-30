@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getFollowers, getRelevantFollowers } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
@@ -102,7 +103,7 @@ export async function GET(
       next: nextCursor,
     });
   } catch (err) {
-    console.error('Followers error:', err);
+    logger.error('Followers error:', err);
     return NextResponse.json({ error: 'Failed to fetch followers' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/music/playlists — list playlists (community + personal)
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ playlists }, { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30' } });
   } catch (err) {
-    console.error('[playlists] list failed:', err);
+    logger.error('[playlists] list failed:', err);
     return NextResponse.json({ error: 'Failed to load playlists' }, { status: 500 });
   }
 }
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ playlist });
   } catch (err) {
-    console.error('[playlists] create failed:', err);
+    logger.error('[playlists] create failed:', err);
     return NextResponse.json({ error: 'Failed to create playlist' }, { status: 500 });
   }
 }

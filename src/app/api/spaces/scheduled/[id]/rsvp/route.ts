@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function POST(
   _req: NextRequest,
@@ -42,7 +43,7 @@ export async function POST(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('RSVP error:', error);
+    logger.error('RSVP error:', error);
     return NextResponse.json({ error: 'Failed to RSVP' }, { status: 500 });
   }
 }
@@ -83,7 +84,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Cancel RSVP error:', error);
+    logger.error('Cancel RSVP error:', error);
     return NextResponse.json({ error: 'Failed to cancel RSVP' }, { status: 500 });
   }
 }

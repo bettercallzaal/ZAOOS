@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getFollowing } from '@/lib/farcaster/neynar';
+import { logger } from '@/lib/logger';
 
 interface NeynarUser {
   fid: number;
@@ -61,7 +62,7 @@ export async function GET() {
 
     return NextResponse.json({ members, currentFid: session.fid }, { headers: { 'Cache-Control': 'private, max-age=15' } });
   } catch (err) {
-    console.error('Following online error:', err);
+    logger.error('Following online error:', err);
     return NextResponse.json({ error: 'Failed to fetch following' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/cron/daily-digest
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
       stats: { activeMembers, tracksPlayed, roomsHosted },
     });
   } catch (err) {
-    console.error('Daily digest cron error:', err);
+    logger.error('Daily digest cron error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

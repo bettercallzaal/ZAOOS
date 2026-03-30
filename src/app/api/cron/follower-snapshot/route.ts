@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getFollowers, getFollowing, getUsersByFids } from '@/lib/farcaster/neynar';
 import { getEngagementScores } from '@/lib/openrank/client';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/cron/follower-snapshot
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
       .eq('is_active', true);
 
     if (membersError) {
-      console.error('Failed to fetch members:', membersError);
+      logger.error('Failed to fetch members:', membersError);
       return NextResponse.json(
         { error: 'Failed to fetch members' },
         { status: 500 }
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         errors.push(`FID ${fid}: ${msg}`);
-        console.error(`Follower snapshot error for FID ${fid}:`, err);
+        logger.error(`Follower snapshot error for FID ${fid}:`, err);
       }
 
       // 200ms delay between members to stay well under 300 RPM
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
         }
       }
     } catch (err) {
-      console.error('OpenRank scores fetch failed (non-fatal):', err);
+      logger.error('OpenRank scores fetch failed (non-fatal):', err);
     }
 
     return NextResponse.json({
@@ -215,7 +216,7 @@ export async function GET(request: NextRequest) {
             .insert(unfollowRows);
 
           if (unfollowError) {
-            console.error(
+            logger.error(
               `Failed to insert unfollow events for FID ${fid}:`,
               unfollowError
             );
@@ -224,7 +225,7 @@ export async function GET(request: NextRequest) {
       }
     }
   } catch (err) {
-    console.error('Follower snapshot cron error:', err);
+    logger.error('Follower snapshot cron error:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
         });
       }
     } catch (neynarErr) {
-      console.error('[search] Neynar search failed, falling back to DB:', neynarErr);
+      logger.error('[search] Neynar search failed, falling back to DB:', neynarErr);
     }
 
     // ── 2. Also search local DB (catches cached casts Neynar might miss) ────
@@ -136,7 +137,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ results });
   } catch (error) {
-    console.error('[search] error:', error);
+    logger.error('[search] error:', error);
     return NextResponse.json({ error: 'Search failed' }, { status: 500 });
   }
 }

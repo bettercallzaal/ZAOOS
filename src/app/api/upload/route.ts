@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
-      console.error('[upload] Supabase storage error:', uploadError);
+      logger.error('[upload] Supabase storage error:', uploadError);
       return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }
 
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
       filename,
     });
   } catch (error) {
-    console.error('[upload] error:', error);
+    logger.error('[upload] error:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession, getSessionData } from '@/lib/auth/session';
 import { getSignerStatus } from '@/lib/farcaster/neynar';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const sessionData = await getSessionData();
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
       signerUuid: status.signer_uuid,
     });
   } catch (error) {
-    console.error('Signer status error:', error);
+    logger.error('Signer status error:', error);
     return NextResponse.json({ error: 'Failed to check signer status' }, { status: 500 });
   }
 }

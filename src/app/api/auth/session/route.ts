@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -9,7 +10,7 @@ export async function GET() {
     }
     return NextResponse.json({ authenticated: true, ...session });
   } catch (err) {
-    console.error('Session read error:', err);
+    logger.error('Session read error:', err);
     return NextResponse.json({ authenticated: false }, { status: 401 });
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/discord/fractal-live
@@ -17,7 +18,7 @@ export async function GET() {
       .order('started_at', { ascending: false });
 
     if (activeError) {
-      console.error('[fractal-live] Active sessions error:', activeError);
+      logger.error('[fractal-live] Active sessions error:', activeError);
       return NextResponse.json({ error: 'Failed to fetch active sessions' }, { status: 500 });
     }
 
@@ -30,7 +31,7 @@ export async function GET() {
       .limit(5);
 
     if (recentError) {
-      console.error('[fractal-live] Recent sessions error:', recentError);
+      logger.error('[fractal-live] Recent sessions error:', recentError);
       // Non-fatal — still return active sessions
     }
 
@@ -42,7 +43,7 @@ export async function GET() {
       .order('started_at', { ascending: false });
 
     if (pausedError) {
-      console.error('[fractal-live] Paused sessions error:', pausedError);
+      logger.error('[fractal-live] Paused sessions error:', pausedError);
     }
 
     return NextResponse.json({
@@ -52,7 +53,7 @@ export async function GET() {
       has_active: (activeSessions || []).length > 0,
     });
   } catch (err) {
-    console.error('[fractal-live] Error:', err);
+    logger.error('[fractal-live] Error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

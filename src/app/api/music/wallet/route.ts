@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 interface MusicNFT {
   title: string;
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       tracks = await fetchAlchemyNFTs(address, process.env.ALCHEMY_API_KEY);
       source = 'alchemy';
     } catch (err) {
-      console.error('[music/wallet] Alchemy NFT API failed, falling back:', err);
+      logger.error('[music/wallet] Alchemy NFT API failed, falling back:', err);
     }
   }
 
@@ -139,7 +140,7 @@ async function fetchAlchemyNFTs(address: string, apiKey: string): Promise<MusicN
         });
       }
     } catch (err) {
-      console.error(`[alchemy-nft] ${chain.name} failed:`, err);
+      logger.error(`[alchemy-nft] ${chain.name} failed:`, err);
     }
   }
 

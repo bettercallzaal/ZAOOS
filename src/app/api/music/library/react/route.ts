@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { upsertSong } from '@/lib/music/library';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { logger } from '@/lib/logger';
 
 const ALLOWED_EMOJIS = ['\uD83D\uDD25', '\u2764\uFE0F', '\uD83C\uDFB5', '\uD83D\uDC8E', '\uD83D\uDC4F', '\uD83E\uDD2F'] as const;
 
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ reactions: reactionCounts, userReactions });
   } catch (err) {
-    console.error('[react] GET failed:', err);
+    logger.error('[react] GET failed:', err);
     return NextResponse.json({ error: 'Failed to get reactions' }, { status: 500 });
   }
 }
@@ -132,7 +133,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ reacted, reactions });
   } catch (err) {
-    console.error('[react] POST failed:', err);
+    logger.error('[react] POST failed:', err);
     return NextResponse.json({ error: 'Failed to toggle reaction' }, { status: 500 });
   }
 }

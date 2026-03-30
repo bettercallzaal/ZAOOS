@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { querySongs, upsertSong } from '@/lib/music/library';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   search: z.string().max(200).optional(),
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
     const result = await querySongs(queryParams);
     return NextResponse.json(result, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60' } });
   } catch (err) {
-    console.error('[library] query failed:', err);
+    logger.error('[library] query failed:', err);
     return NextResponse.json({ error: 'Failed to load library' }, { status: 500 });
   }
 }
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ song: result, isNew: result.isNew });
   } catch (err) {
-    console.error('[library] add failed:', err);
+    logger.error('[library] add failed:', err);
     return NextResponse.json({ error: 'Failed to add song' }, { status: 500 });
   }
 }

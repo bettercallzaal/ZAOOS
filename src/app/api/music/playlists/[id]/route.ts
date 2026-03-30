@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/music/playlists/[id] — get playlist with tracks
@@ -41,7 +42,7 @@ export async function GET(
 
     return NextResponse.json({ playlist, tracks: songs });
   } catch (err) {
-    console.error('[playlists] get failed:', err);
+    logger.error('[playlists] get failed:', err);
     return NextResponse.json({ error: 'Failed to load playlist' }, { status: 500 });
   }
 }

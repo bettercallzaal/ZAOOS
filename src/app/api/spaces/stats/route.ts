@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -100,7 +101,7 @@ export async function GET() {
       currentStreak,
     });
   } catch (error) {
-    console.error('[spaces/stats] Error:', error);
+    logger.error('[spaces/stats] Error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch stats' },
       { status: 500 }

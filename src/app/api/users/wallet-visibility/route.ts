@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const ALLOWED_WALLET_KEYS = [
   'custody_address',
@@ -37,7 +38,7 @@ export async function GET() {
       hidden_wallets: data?.hidden_wallets ?? [],
     });
   } catch (err) {
-    console.error('[wallet-visibility] GET error:', err);
+    logger.error('[wallet-visibility] GET error:', err);
     return NextResponse.json({ error: 'Failed to load wallet visibility' }, { status: 500 });
   }
 }
@@ -71,7 +72,7 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({ hidden_wallets: parsed.data.hidden_wallets });
   } catch (err) {
-    console.error('[wallet-visibility] PATCH error:', err);
+    logger.error('[wallet-visibility] PATCH error:', err);
     return NextResponse.json({ error: 'Failed to update wallet visibility' }, { status: 500 });
   }
 }

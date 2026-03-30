@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/music/curators — top curators ranked by likes received on their submitted tracks
@@ -86,7 +87,7 @@ export async function GET() {
 
     return NextResponse.json({ curators });
   } catch (err) {
-    console.error('[curators] GET failed:', err);
+    logger.error('[curators] GET failed:', err);
     return NextResponse.json({ error: 'Failed to fetch curators' }, { status: 500 });
   }
 }

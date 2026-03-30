@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkAllowlist } from '@/lib/gates/allowlist';
 import { registerUser, createSigner } from '@/lib/farcaster/neynar';
+import { logger } from '@/lib/logger';
 
 const registerSchema = z.object({
   walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
       signerApprovalUrl: signer.signer_approval_url,
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    logger.error('Registration error:', error);
     return NextResponse.json({ error: 'Registration failed' }, { status: 500 });
   }
 }

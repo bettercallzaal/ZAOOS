@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const paramsSchema = z.object({
   username: z.string().min(1).max(100),
@@ -130,7 +131,7 @@ export async function GET(
       headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=60' },
     });
   } catch (err) {
-    console.error('[artists/username] error:', err);
+    logger.error('[artists/username] error:', err);
     return NextResponse.json({ error: 'Failed to load artist profile' }, { status: 500 });
   }
 }

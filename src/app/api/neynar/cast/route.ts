@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 const CastSchema = z.object({
   text: z.string().min(1).max(1024),
@@ -36,13 +37,13 @@ export async function POST(req: NextRequest) {
 
     const data = await response.json();
     if (!response.ok) {
-      console.error('Neynar cast error:', data);
+      logger.error('Neynar cast error:', data);
       return NextResponse.json({ error: 'Failed to publish cast' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, cast: data.cast });
   } catch (error) {
-    console.error('Cast route error:', error);
+    logger.error('Cast route error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

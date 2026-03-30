@@ -8,6 +8,7 @@ import {
   createSessionReminderProposal,
   getNewSpotlightTier,
 } from '@/lib/wavewarz/proposals';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   // Verify cron secret
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
       // Small delay to avoid rate limiting the Intelligence dashboard
       await new Promise(r => setTimeout(r, 200));
     } catch (err) {
-      console.error(`[wavewarz-sync] Error processing ${wallet}:`, err);
+      logger.error(`[wavewarz-sync] Error processing ${wallet}:`, err);
       results.failed++;
     }
   }

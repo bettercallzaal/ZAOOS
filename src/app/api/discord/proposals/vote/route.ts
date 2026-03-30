@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/discord/proposals/vote — Vote on a Discord proposal from the web app
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (userErr) {
-      console.error('[discord/proposals/vote] user query error:', userErr);
+      logger.error('[discord/proposals/vote] user query error:', userErr);
       return NextResponse.json({ error: 'Failed to look up user' }, { status: 500 });
     }
 
@@ -101,7 +102,7 @@ export async function POST(req: NextRequest) {
       );
 
     if (upsertErr) {
-      console.error('[discord/proposals/vote] upsert error:', upsertErr);
+      logger.error('[discord/proposals/vote] upsert error:', upsertErr);
       return NextResponse.json({ error: 'Failed to record vote' }, { status: 500 });
     }
 
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest) {
       votes: agg,
     });
   } catch (err) {
-    console.error('[discord/proposals/vote] unexpected error:', err);
+    logger.error('[discord/proposals/vote] unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

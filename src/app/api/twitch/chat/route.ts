@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const sendSchema = z.object({
   message: z.string().min(1).max(500),
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       platformUserId: platform?.platform_user_id ?? null,
     });
   } catch (error) {
-    console.error('Twitch chat GET error:', error);
+    logger.error('Twitch chat GET error:', error);
     return NextResponse.json({ error: 'Failed to check Twitch chat' }, { status: 500 });
   }
 }
@@ -118,13 +119,13 @@ export async function POST(req: NextRequest) {
 
     if (!chatRes.ok) {
       const err = await chatRes.json().catch(() => ({}));
-      console.error('Twitch send chat error:', err);
+      logger.error('Twitch send chat error:', err);
       return NextResponse.json({ error: 'Failed to send message to Twitch' }, { status: chatRes.status });
     }
 
     return NextResponse.json({ sent: true });
   } catch (error) {
-    console.error('Twitch chat POST error:', error);
+    logger.error('Twitch chat POST error:', error);
     return NextResponse.json({ error: 'Failed to send chat message' }, { status: 500 });
   }
 }

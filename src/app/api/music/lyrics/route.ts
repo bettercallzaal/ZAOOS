@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 // ─── In-memory LRU-ish cache (max 500 entries) ─────────────────────────────
 const cache = new Map<string, { lyrics: string | null; source: string }>();
@@ -129,7 +130,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result);
   } catch (err) {
-    console.error('[lyrics] Error fetching lyrics:', err);
+    logger.error('[lyrics] Error fetching lyrics:', err);
     return NextResponse.json({ lyrics: null, source: '' }, { status: 500 });
   }
 }

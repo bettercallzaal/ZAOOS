@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest, ctx: RouteContext) {
       user_vote: existingVote?.vote === vote ? 0 : vote,
     });
   } catch (err) {
-    console.error('[collaborative-vote] POST error:', err);
+    logger.error('[collaborative-vote] POST error:', err);
     return NextResponse.json({ error: 'Failed to vote' }, { status: 500 });
   }
 }

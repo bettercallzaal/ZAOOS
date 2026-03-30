@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { followUser, unfollowUser } from '@/lib/farcaster/neynar';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const followSchema = z.object({
   targetFid: z.number().int().positive(),
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     await followUser(session.signerUuid, [parsed.data.targetFid]);
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Follow error:', err);
+    logger.error('Follow error:', err);
     return NextResponse.json({ error: 'Failed to follow' }, { status: 500 });
   }
 }
@@ -44,7 +45,7 @@ export async function DELETE(request: NextRequest) {
     await unfollowUser(session.signerUuid, [parsed.data.targetFid]);
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Unfollow error:', err);
+    logger.error('Unfollow error:', err);
     return NextResponse.json({ error: 'Failed to unfollow' }, { status: 500 });
   }
 }

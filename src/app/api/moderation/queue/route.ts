@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/moderation/queue
@@ -29,7 +30,7 @@ export async function GET() {
       .limit(100);
 
     if (error) {
-      console.error('[moderation/queue] GET error:', error);
+      logger.error('[moderation/queue] GET error:', error);
       return NextResponse.json(
         { error: 'Failed to fetch moderation queue' },
         { status: 500 },
@@ -38,7 +39,7 @@ export async function GET() {
 
     return NextResponse.json({ items: data ?? [] });
   } catch (err) {
-    console.error('[moderation/queue] GET error:', err);
+    logger.error('[moderation/queue] GET error:', err);
     return NextResponse.json(
       { error: 'Failed to fetch moderation queue' },
       { status: 500 },
@@ -102,7 +103,7 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (updateError || !updated) {
-      console.error('[moderation/queue] PATCH update error:', updateError);
+      logger.error('[moderation/queue] PATCH update error:', updateError);
       return NextResponse.json(
         { error: 'Failed to update moderation log' },
         { status: 500 },
@@ -123,14 +124,14 @@ export async function PATCH(req: NextRequest) {
         );
 
       if (hideError) {
-        console.error('[moderation/queue] Hide insert error:', hideError);
+        logger.error('[moderation/queue] Hide insert error:', hideError);
         // Non-fatal: the review was recorded even if hide fails
       }
     }
 
     return NextResponse.json({ ok: true, action: newAction });
   } catch (err) {
-    console.error('[moderation/queue] PATCH error:', err);
+    logger.error('[moderation/queue] PATCH error:', err);
     return NextResponse.json(
       { error: 'Failed to process review' },
       { status: 500 },

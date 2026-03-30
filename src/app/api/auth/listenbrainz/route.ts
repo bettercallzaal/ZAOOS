@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const TokenSchema = z.object({ token: z.string().min(1) });
 
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, username: verifyData.user_name });
   } catch (error) {
-    console.error('[listenbrainz] Error:', error);
+    logger.error('[listenbrainz] Error:', error);
     return NextResponse.json({ error: 'Failed to save token' }, { status: 500 });
   }
 }
@@ -55,7 +56,7 @@ export async function DELETE() {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[listenbrainz/disconnect] Error:', error);
+    logger.error('[listenbrainz/disconnect] Error:', error);
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

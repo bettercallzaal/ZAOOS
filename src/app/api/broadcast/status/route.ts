@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const StatusSchema = z.object({
   roomId: z.string().uuid(),
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
       .eq('user_fid', session.fid);
 
     if (error) {
-      console.error('[broadcast/status] Supabase error:', error.message);
+      logger.error('[broadcast/status] Supabase error:', error.message);
       return NextResponse.json(
         { error: 'Failed to fetch connected platforms' },
         { status: 500 }
@@ -125,7 +126,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ viewerCounts });
   } catch (err) {
-    console.error('[broadcast/status] Unexpected error:', err);
+    logger.error('[broadcast/status] Unexpected error:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

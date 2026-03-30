@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { StreamClient } from '@stream-io/node-sdk';
 import { z } from 'zod';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 const TokenSchema = z.object({
   userId: z.string().min(1),
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     const apiSecret = process.env.STREAM_API_SECRET;
 
     if (!apiKey || !apiSecret) {
-      console.error('Stream.io keys missing');
+      logger.error('Stream.io keys missing');
       return NextResponse.json({ error: 'Stream configuration missing' }, { status: 500 });
     }
 
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ token });
   } catch (error) {
-    console.error('Stream token error:', error);
+    logger.error('Stream token error:', error);
     return NextResponse.json({ error: 'Failed to generate token' }, { status: 500 });
   }
 }

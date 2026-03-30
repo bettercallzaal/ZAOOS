@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/discord/link — Link a Discord identity to a Farcaster identity
@@ -141,7 +142,7 @@ export async function POST(req: NextRequest) {
     }, { status: 404 });
 
   } catch (err) {
-    console.error('[Discord link] POST error:', err);
+    logger.error('[Discord link] POST error:', err);
     return NextResponse.json({ error: 'Link failed' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -28,7 +29,7 @@ export async function GET() {
       pages: (meta.pages as unknown[]) || [],
     });
   } catch (error) {
-    console.error('Facebook platform GET error:', error);
+    logger.error('Facebook platform GET error:', error);
     return NextResponse.json({ error: 'Failed to get Facebook info' }, { status: 500 });
   }
 }
@@ -45,13 +46,13 @@ export async function DELETE() {
       .eq('platform', 'facebook');
 
     if (error) {
-      console.error('Facebook disconnect error:', error);
+      logger.error('Facebook disconnect error:', error);
       return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Facebook platform DELETE error:', error);
+    logger.error('Facebook platform DELETE error:', error);
     return NextResponse.json({ error: 'Failed to disconnect' }, { status: 500 });
   }
 }

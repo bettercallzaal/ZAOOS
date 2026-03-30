@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   _request: NextRequest,
@@ -104,7 +105,7 @@ export async function GET(
       },
     });
   } catch (err) {
-    console.error('User profile error:', err);
+    logger.error('User profile error:', err);
     return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
   }
 }

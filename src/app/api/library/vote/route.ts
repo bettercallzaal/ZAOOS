@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { libraryVoteSchema } from '@/lib/validation/library-schemas';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
       downvote_count: downCount ?? 0,
     });
   } catch (error) {
-    console.error('[library/vote] Error:', error);
+    logger.error('[library/vote] Error:', error);
     return NextResponse.json({ error: 'Failed to process vote' }, { status: 500 });
   }
 }

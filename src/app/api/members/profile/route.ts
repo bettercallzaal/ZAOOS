@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -177,7 +178,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('Member profile enrichment error:', err);
+    logger.error('Member profile enrichment error:', err);
     return NextResponse.json(
       { error: 'Failed to fetch enriched profile' },
       { status: 500 }

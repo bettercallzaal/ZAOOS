@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
+import { logger } from '@/lib/logger';
 
 const postSchema = z.object({
   wallet: z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/, 'Invalid Solana address'),
@@ -32,7 +33,7 @@ export async function GET() {
 
     return NextResponse.json({ solana_wallet: data?.solana_wallet || null });
   } catch (err) {
-    console.error('[users/solana-wallet] GET error:', err);
+    logger.error('[users/solana-wallet] GET error:', err);
     return NextResponse.json({ error: 'Failed to load wallet' }, { status: 500 });
   }
 }
@@ -87,7 +88,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ solana_wallet: wallet });
   } catch (err) {
-    console.error('[users/solana-wallet] POST error:', err);
+    logger.error('[users/solana-wallet] POST error:', err);
     return NextResponse.json({ error: 'Failed to save wallet' }, { status: 500 });
   }
 }
@@ -112,7 +113,7 @@ export async function DELETE() {
 
     return NextResponse.json({ solana_wallet: null });
   } catch (err) {
-    console.error('[users/solana-wallet] DELETE error:', err);
+    logger.error('[users/solana-wallet] DELETE error:', err);
     return NextResponse.json({ error: 'Failed to remove wallet' }, { status: 500 });
   }
 }

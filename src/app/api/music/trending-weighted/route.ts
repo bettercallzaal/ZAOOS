@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { curationWeight } from '@/lib/music/curationWeight';
+import { logger } from '@/lib/logger';
 
 interface LikeRow {
   user_fid: number;
@@ -72,7 +73,7 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (likesErr) {
-      console.error('[trending-weighted] likes query error:', likesErr);
+      logger.error('[trending-weighted] likes query error:', likesErr);
       return NextResponse.json({ error: 'Failed to fetch likes' }, { status: 500 });
     }
 
@@ -87,7 +88,7 @@ export async function GET() {
       .not('fid', 'is', null);
 
     if (respectErr) {
-      console.error('[trending-weighted] respect query error:', respectErr);
+      logger.error('[trending-weighted] respect query error:', respectErr);
       // Fall back gracefully — everyone gets weight 1
     }
 
@@ -163,7 +164,7 @@ export async function GET() {
       headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=30' },
     });
   } catch (err) {
-    console.error('[trending-weighted] unexpected error:', err);
+    logger.error('[trending-weighted] unexpected error:', err);
     return NextResponse.json({ error: 'Failed to load trending tracks' }, { status: 500 });
   }
 }

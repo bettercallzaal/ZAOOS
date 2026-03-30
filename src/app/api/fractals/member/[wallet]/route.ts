@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const MEMBER_FIELDS = 'name, wallet_address, total_respect, fractal_respect, onchain_og, onchain_zor, fractal_count, event_respect, hosting_respect, bonus_respect, first_respect_at';
 
@@ -142,7 +143,7 @@ export async function GET(
       },
     });
   } catch (err) {
-    console.error('Member profile error:', err);
+    logger.error('Member profile error:', err);
     return NextResponse.json({ error: 'Failed to load member profile' }, { status: 500 });
   }
 }

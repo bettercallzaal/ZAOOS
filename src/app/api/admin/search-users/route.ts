@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { searchUsers, getUserByFid, getUsersByFids } from '@/lib/farcaster/neynar';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
+import { logger } from '@/lib/logger';
 
 const ensClient = createPublicClient({
   chain: mainnet,
@@ -120,7 +121,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ users: enriched.filter(Boolean) });
   } catch (error) {
-    console.error('Admin search users error:', error);
+    logger.error('Admin search users error:', error);
     return NextResponse.json({ error: 'Search failed' }, { status: 500 });
   }
 }

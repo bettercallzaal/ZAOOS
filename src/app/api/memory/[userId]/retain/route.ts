@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSession } from '@/lib/auth/session';
 import { getHindsightClient } from '@/lib/hindsight';
+import { logger } from '@/lib/logger';
 
 const RetainBodySchema = z.object({
   content: z.string().min(1).max(10000),
@@ -61,7 +62,7 @@ export async function POST(
       { status: 201 }
     );
   } catch (error) {
-    console.error('Failed to retain memory:', error);
+    logger.error('Failed to retain memory:', error);
     return NextResponse.json(
       { error: 'Failed to retain memory' },
       { status: 500 }

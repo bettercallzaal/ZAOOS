@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/discord/intros — Fetch Discord intro(s)
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
         .maybeSingle();
 
       if (error) {
-        console.error('[Discord intros] Query error:', error);
+        logger.error('[Discord intros] Query error:', error);
         return NextResponse.json({ intro: null });
       }
 
@@ -56,7 +57,7 @@ export async function GET(req: NextRequest) {
       .order('posted_at', { ascending: false });
 
     if (error) {
-      console.error('[Discord intros] Query error:', error);
+      logger.error('[Discord intros] Query error:', error);
       return NextResponse.json({ intros: [], total: 0 });
     }
 
@@ -70,7 +71,7 @@ export async function GET(req: NextRequest) {
       total: data?.length || 0,
     });
   } catch (err) {
-    console.error('[Discord intros] Unexpected error:', err);
+    logger.error('[Discord intros] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

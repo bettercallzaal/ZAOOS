@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/discord/member-stats — Cross-platform Discord activity stats
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
       .eq('author_id', discordId);
 
     if (proposalsErr) {
-      console.error('[discord/member-stats] Proposals query error:', proposalsErr);
+      logger.error('[discord/member-stats] Proposals query error:', proposalsErr);
     }
 
     const proposalsCreated = proposals?.length ?? 0;
@@ -85,7 +86,7 @@ export async function GET(req: NextRequest) {
       .eq('voter_id', discordId);
 
     if (votesErr) {
-      console.error('[discord/member-stats] Votes query error:', votesErr);
+      logger.error('[discord/member-stats] Votes query error:', votesErr);
     }
 
     const votesCast = votes?.length ?? 0;
@@ -104,7 +105,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('[discord/member-stats] Unexpected error:', err);
+    logger.error('[discord/member-stats] Unexpected error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

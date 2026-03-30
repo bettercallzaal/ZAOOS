@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const TWITCH_CLIENT_ID = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID || '';
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET || '';
@@ -114,7 +115,7 @@ export async function POST(req: NextRequest) {
 
     if (!markerRes.ok) {
       const errData = await markerRes.json().catch(() => ({}));
-      console.error('Twitch marker creation failed:', markerRes.status, errData);
+      logger.error('Twitch marker creation failed:', markerRes.status, errData);
       return NextResponse.json(
         { error: errData.message || 'Failed to create marker — stream must be live' },
         { status: markerRes.status },
@@ -134,7 +135,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Twitch marker error:', error);
+    logger.error('Twitch marker error:', error);
     return NextResponse.json({ error: 'Failed to create stream marker' }, { status: 500 });
   }
 }

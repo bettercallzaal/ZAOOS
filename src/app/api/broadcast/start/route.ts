@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const StartSchema = z.object({
   platforms: z.array(z.string()).min(1),
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
             });
           }
         } catch (err) {
-          console.error('YouTube broadcast error:', err);
+          logger.error('YouTube broadcast error:', err);
         }
       } else if (platform === 'facebook') {
         // Create Facebook live video via dedicated route
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
             });
           }
         } catch (err) {
-          console.error('Facebook broadcast error:', err);
+          logger.error('Facebook broadcast error:', err);
         }
       } else {
         // Twitch, Kick — already have stream key saved
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ destinations });
   } catch (error) {
-    console.error('Broadcast start error:', error);
+    logger.error('Broadcast start error:', error);
     return NextResponse.json({ error: 'Failed to start broadcast' }, { status: 500 });
   }
 }

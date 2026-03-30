@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
 
     const tokenData = await tokenRes.json();
     if (!tokenData.access_token) {
-      console.error('YouTube token exchange failed:', tokenData);
+      logger.error('YouTube token exchange failed:', tokenData);
       return NextResponse.redirect(new URL('/settings?error=youtube_token', req.nextUrl.origin));
     }
 
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest) {
     const channel = channelData.items?.[0];
 
     if (!channel) {
-      console.error('YouTube channel fetch failed:', channelData);
+      logger.error('YouTube channel fetch failed:', channelData);
       return NextResponse.redirect(new URL('/settings?error=youtube_channel', req.nextUrl.origin));
     }
 
@@ -77,13 +78,13 @@ export async function GET(req: NextRequest) {
     );
 
     if (dbError) {
-      console.error('YouTube DB upsert error:', dbError);
+      logger.error('YouTube DB upsert error:', dbError);
       return NextResponse.redirect(new URL('/settings?error=youtube_save', req.nextUrl.origin));
     }
 
     return NextResponse.redirect(new URL('/settings?connected=youtube', req.nextUrl.origin));
   } catch (err) {
-    console.error('YouTube callback error:', err);
+    logger.error('YouTube callback error:', err);
     return NextResponse.redirect(new URL('/settings?error=youtube_unknown', req.nextUrl.origin));
   }
 }

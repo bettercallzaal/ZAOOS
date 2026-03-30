@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 // Two webhooks, two signing keys (ZOR ERC-1155 + OG ERC-20)
 const SIGNING_KEYS = [
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (!valid) {
-        console.warn('[alchemy-webhook] Invalid signature — no key matched');
+        logger.warn('[alchemy-webhook] Invalid signature — no key matched');
         return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
       }
     }
@@ -133,7 +134,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error('[alchemy-webhook] Error:', err);
+    logger.error('[alchemy-webhook] Error:', err);
     // Return 200 even on error to prevent Alchemy from retrying forever
     // Log the error for debugging
     return NextResponse.json({ ok: true, error: 'Processed with errors' });

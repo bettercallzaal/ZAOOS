@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const BroadcastSchema = z.object({
   title: z.string().min(1).max(255),
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
     const liveVideoData = await liveVideoRes.json();
 
     if (!liveVideoData.id || !liveVideoData.stream_url) {
-      console.error('Facebook create live video failed:', liveVideoData);
+      logger.error('Facebook create live video failed:', liveVideoData);
       return NextResponse.json(
         { error: 'Failed to create Facebook live video', details: liveVideoData.error?.message },
         { status: 500 }
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
       watchUrl: `https://www.facebook.com/live/producer/${liveVideoData.id}`,
     });
   } catch (error) {
-    console.error('Facebook broadcast error:', error);
+    logger.error('Facebook broadcast error:', error);
     return NextResponse.json({ error: 'Failed to create broadcast' }, { status: 500 });
   }
 }

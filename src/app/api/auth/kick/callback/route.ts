@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -44,7 +45,7 @@ export async function GET(req: NextRequest) {
 
     const tokenData = await tokenRes.json();
     if (!tokenData.access_token) {
-      console.error('Kick token exchange failed:', tokenData);
+      logger.error('Kick token exchange failed:', tokenData);
       return NextResponse.redirect(new URL('/settings?error=kick_token', req.nextUrl.origin));
     }
 
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
     const kickUser = userData?.data ?? userData;
 
     if (!kickUser?.id && !kickUser?.user_id) {
-      console.error('Kick user fetch failed:', userData);
+      logger.error('Kick user fetch failed:', userData);
       return NextResponse.redirect(new URL('/settings?error=kick_user', req.nextUrl.origin));
     }
 
@@ -104,7 +105,7 @@ export async function GET(req: NextRequest) {
     );
 
     if (dbError) {
-      console.error('Kick DB upsert error:', dbError);
+      logger.error('Kick DB upsert error:', dbError);
       return NextResponse.redirect(new URL('/settings?error=kick_save', req.nextUrl.origin));
     }
 
@@ -113,7 +114,7 @@ export async function GET(req: NextRequest) {
     response.cookies.set('kick_pkce_verifier', '', { maxAge: 0, path: '/' });
     return response;
   } catch (err) {
-    console.error('Kick callback error:', err);
+    logger.error('Kick callback error:', err);
     return NextResponse.redirect(new URL('/settings?error=kick_unknown', req.nextUrl.origin));
   }
 }

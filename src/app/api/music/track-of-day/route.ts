@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { isMusicUrl } from '@/lib/music/isMusicUrl';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const nominateSchema = z.object({
   url: z.string().url().max(500),
@@ -84,7 +85,7 @@ export async function GET() {
       headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=30' },
     });
   } catch (error) {
-    console.error('Track of the Day GET error:', error);
+    logger.error('Track of the Day GET error:', error);
     return NextResponse.json({ error: 'Failed to fetch track of the day' }, { status: 500 });
   }
 }
@@ -175,7 +176,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, nomination });
   } catch (error) {
-    console.error('Track of the Day POST error:', error);
+    logger.error('Track of the Day POST error:', error);
     return NextResponse.json({ error: 'Failed to nominate track' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const actionSchema = z.object({
   action: z.enum(['link-fids', 'enrich-profiles', 'import-socials', 'sync-tiers', 'link-profiles', 'backfill-dates', 'all']),
@@ -405,7 +406,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ results });
   } catch (err) {
-    console.error('[member-fix] error:', err);
+    logger.error('[member-fix] error:', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

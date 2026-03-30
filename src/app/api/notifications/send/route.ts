@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/notifications/send
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
       .eq('enabled', true);
 
     if (fetchError) {
-      console.error('[notifications/send] DB fetch error:', fetchError);
+      logger.error('[notifications/send] DB fetch error:', fetchError);
       return NextResponse.json({ error: 'Failed to fetch tokens' }, { status: 500 });
     }
 
@@ -195,7 +196,7 @@ export async function POST(req: NextRequest) {
           .from('notification_log')
           .insert(logEntries)
           .then(({ error }) => {
-            if (error) console.error('[notifications/send] Log insert error:', error);
+            if (error) logger.error('[notifications/send] Log insert error:', error);
           });
       }
     }
@@ -214,7 +215,7 @@ export async function POST(req: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
-    console.error('[notifications/send] Unexpected error:', error);
+    logger.error('[notifications/send] Unexpected error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

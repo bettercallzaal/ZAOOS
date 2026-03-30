@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   wallet: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
@@ -186,7 +187,7 @@ export async function GET(request: NextRequest) {
       ledger,
     });
   } catch (err) {
-    console.error('Respect member error:', err);
+    logger.error('Respect member error:', err);
     return NextResponse.json({ error: 'Failed to load member data' }, { status: 500 });
   }
 }

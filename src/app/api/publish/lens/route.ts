@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { normalizeForLens } from '@/lib/publish/normalize';
 import { publishToLens } from '@/lib/publish/lens';
+import { logger } from '@/lib/logger';
 
 const publishSchema = z.object({
   castHash: z.string().min(1),
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, postId: result.postId, postUrl: result.postUrl });
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : 'Lens publish failed';
-    console.error('[publish/lens] Error:', errorMsg);
+    logger.error('[publish/lens] Error:', errorMsg);
 
     // Log failure
     await supabaseAdmin.from('publish_log').insert({

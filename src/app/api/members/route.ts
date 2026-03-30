@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -95,7 +96,7 @@ export async function GET() {
           .update(updates)
           .eq('id', m.id)
           .then(({ error: backfillError }) => {
-            if (backfillError) console.error('[members] backfill error for id', m.id, backfillError);
+            if (backfillError) logger.error('[members] backfill error for id', m.id, backfillError);
           });
       });
     await Promise.allSettled(backfillPromises);
@@ -149,7 +150,7 @@ export async function GET() {
 
   return NextResponse.json({ members, currentFid: session.fid });
   } catch (err) {
-    console.error('Members fetch error:', err);
+    logger.error('Members fetch error:', err);
     return NextResponse.json({ error: 'Failed to load members' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // ACE-Step via HuggingFace Inference API
 const HF_API_URL =
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[music/generate] HuggingFace API error:', errorText);
+      logger.error('[music/generate] HuggingFace API error:', errorText);
       return NextResponse.json(
         { error: 'AI generation service unavailable' },
         { status: 502 },
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ audioUrl });
   } catch (error) {
-    console.error('[music/generate] error:', error);
+    logger.error('[music/generate] error:', error);
     return NextResponse.json(
       { error: 'Failed to generate audio' },
       { status: 500 },

@@ -4,6 +4,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { postCast } from '@/lib/farcaster/neynar';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 const ALLOWED_CHANNELS: readonly string[] = communityConfig.farcaster.channels;
 
@@ -76,13 +77,13 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error('[schedule] insert error:', error);
+      logger.error('[schedule] insert error:', error);
       return NextResponse.json({ error: 'Failed to schedule' }, { status: 500 });
     }
 
     return NextResponse.json({ scheduled: data });
   } catch (error) {
-    console.error('[schedule] error:', error);
+    logger.error('[schedule] error:', error);
     return NextResponse.json({ error: 'Failed to schedule' }, { status: 500 });
   }
 }
@@ -173,7 +174,7 @@ export async function PATCH() {
 
     return NextResponse.json({ processed });
   } catch (error) {
-    console.error('[schedule] process error:', error);
+    logger.error('[schedule] process error:', error);
     return NextResponse.json({ error: 'Failed to process' }, { status: 500 });
   }
 }

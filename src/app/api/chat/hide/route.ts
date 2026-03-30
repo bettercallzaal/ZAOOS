@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { hideMessageSchema } from '@/lib/validation/schemas';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   const session = await getSessionData();
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Hide message error:', error);
+    logger.error('Hide message error:', error);
     return NextResponse.json({ error: 'Failed to hide message' }, { status: 500 });
   }
 }

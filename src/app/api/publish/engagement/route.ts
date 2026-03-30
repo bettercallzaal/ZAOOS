@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   platform: z.string().optional(),
@@ -76,13 +77,13 @@ export async function GET(req: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error('[publish/engagement] DB error:', error);
+      logger.error('[publish/engagement] DB error:', error);
       return NextResponse.json({ error: 'Failed to fetch engagement metrics' }, { status: 500 });
     }
 
     return NextResponse.json({ metrics: data || [] });
   } catch (err) {
-    console.error('[publish/engagement] Error:', err);
+    logger.error('[publish/engagement] Error:', err);
     return NextResponse.json({ error: 'Failed to fetch engagement metrics' }, { status: 500 });
   }
 }

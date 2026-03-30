@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/music/artists?artist=... — get aggregated data for an artist
@@ -64,7 +65,7 @@ export async function GET(req: NextRequest) {
       tracks: topTracks,
     });
   } catch (err) {
-    console.error('[artists] GET failed:', err);
+    logger.error('[artists] GET failed:', err);
     return NextResponse.json({ error: 'Failed to fetch artist data' }, { status: 500 });
   }
 }

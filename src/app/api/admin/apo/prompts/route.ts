@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth/session';
 import * as fs from 'fs';
 import * as path from 'path';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   const session = await getSession();
@@ -30,7 +31,7 @@ export async function GET() {
 
     return NextResponse.json({ prompts });
   } catch (err) {
-    console.error('[apo/prompts] Error:', err);
+    logger.error('[apo/prompts] Error:', err);
     return NextResponse.json(
       { error: 'Failed to list prompts' },
       { status: 500 },

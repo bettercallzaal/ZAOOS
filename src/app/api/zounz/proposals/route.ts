@@ -4,6 +4,7 @@ import { base } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { ZOUNZ_GOVERNOR, governorAbi } from '@/lib/zounz/contracts';
 import { communityConfig } from '@/../community.config';
+import { logger } from '@/lib/logger';
 
 const client = createPublicClient({
   chain: base,
@@ -48,7 +49,7 @@ export async function GET() {
       proposeUrl: `${communityConfig.zounz.nounsBuilderUrl}/vote`,
     });
   } catch (err) {
-    console.error('[zounz/proposals] Error reading governor contract:', err);
+    logger.error('[zounz/proposals] Error reading governor contract:', err);
     return NextResponse.json(
       { error: 'Failed to read governor contract' },
       { status: 500 }

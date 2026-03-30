@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const postSchema = z.object({
   roomId: z.string().uuid(),
@@ -31,13 +32,13 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('GET hand-raise error:', error);
+      logger.error('GET hand-raise error:', error);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
     return NextResponse.json({ raises: data });
   } catch (err) {
-    console.error('GET /api/spaces/hand-raise error:', err);
+    logger.error('GET /api/spaces/hand-raise error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
         { onConflict: 'room_id,fid' },
       );
       if (error) {
-        console.error('raise error:', error);
+        logger.error('raise error:', error);
         return NextResponse.json({ error: 'Database error' }, { status: 500 });
       }
     } else if (action === 'lower') {
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error('POST /api/spaces/hand-raise error:', err);
+    logger.error('POST /api/spaces/hand-raise error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

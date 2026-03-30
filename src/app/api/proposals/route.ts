@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification, sendNotification } from '@/lib/notifications';
 import { createProposalSchema } from '@/lib/validation/schemas';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 /**
  * GET — List proposals with vote tallies
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
   const { data, error, count: totalCount } = await query;
 
   if (error) {
-    console.error('Proposals fetch error:', error);
+    logger.error('Proposals fetch error:', error);
     return NextResponse.json({ error: 'Failed to fetch proposals' }, { status: 500 });
   }
 
@@ -96,7 +97,7 @@ export async function GET(req: NextRequest) {
   // This handles the case where threshold was reached during the voting period but
   // publishing was deferred until the deadline passed.
   checkExpiredProposalsForPublish(proposals).catch((err) =>
-    console.error('[proposals] expired-publish check failed:', err)
+    logger.error('[proposals] expired-publish check failed:', err)
   );
 
   return NextResponse.json({ proposals, total: totalCount ?? proposals.length, limit, offset }, { headers: { 'Cache-Control': 'no-store' } });
@@ -163,7 +164,7 @@ export async function POST(req: NextRequest) {
           text: escapeMarkdownV2(msgText),
         });
         if (!result.success) {
-          console.error('[proposals] Telegram announce failed:', result.error);
+          logger.error('[proposals] Telegram announce failed:', result.error);
         }
       })(),
       // Discord
@@ -183,10 +184,10 @@ export async function POST(req: NextRequest) {
           username: 'ZAO OS',
         });
         if (!result.success) {
-          console.error('[proposals] Discord announce failed:', result.error);
+          logger.error('[proposals] Discord announce failed:', result.error);
         }
       })(),
-    ]).catch((err) => console.error('[proposals] Cross-post error:', err));
+    ]).catch((err) => logger.error('[proposals] Cross-post error:', err));
 
     // Notify all active members about the new proposal (fire and forget)
     Promise.resolve(
@@ -207,20 +208,20 @@ export async function POST(req: NextRequest) {
           actorFid: session.fid,
           actorDisplayName: session.displayName,
           actorPfpUrl: session.pfpUrl,
-        }).catch((err) => console.error('[notify]', err));
+        }).catch((err) => logger.error('[notify]', err));
         sendNotification(
           'New Proposal',
           `${session.displayName}: ${title.trim().slice(0, 80)}`,
           'https://zaoos.com/governance',
           `proposal-${proposal.id}`,
           session.fid
-        ).catch((err) => console.error('[notify]', err));
+        ).catch((err) => logger.error('[notify]', err));
       }
-    }).catch((err) => console.error('[notify]', err));
+    }).catch((err) => logger.error('[notify]', err));
 
     return NextResponse.json({ proposal });
   } catch (err) {
-    console.error('Create proposal error:', err);
+    logger.error('Create proposal error:', err);
     return NextResponse.json({ error: 'Failed to create proposal' }, { status: 500 });
   }
 }
@@ -286,7 +287,7 @@ export async function PATCH(req: NextRequest) {
       .eq('id', parsed.data.id);
 
     if (error) {
-      console.error('Update proposal status error:', error);
+      logger.error('Update proposal status error:', error);
       return NextResponse.json({ error: 'Failed to update proposal' }, { status: 500 });
     }
 
@@ -301,7 +302,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('PATCH proposal error:', err);
+    logger.error('PATCH proposal error:', err);
     return NextResponse.json({ error: 'Failed to update proposal' }, { status: 500 });
   }
 }
@@ -346,7 +347,7 @@ async function checkExpiredProposalsForPublish(proposals: ProposalSummary[]) {
 
         console.info(`[proposals] Auto-approved proposal ${p.id} — deadline passed, ${forWeight}/${threshold}R threshold met`);
       } catch (err) {
-        console.error(`[proposals] Auto-approve failed for ${p.id}:`, err);
+        logger.error(`[proposals] Auto-approve failed for ${p.id}:`, err);
       }
     }
   }

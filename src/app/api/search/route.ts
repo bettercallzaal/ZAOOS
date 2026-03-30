@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -246,7 +247,7 @@ export async function GET(req: NextRequest) {
     // Log any failures server-side
     for (const result of settled) {
       if (result.status === 'rejected') {
-        console.error('[search] partial failure:', result.reason);
+        logger.error('[search] partial failure:', result.reason);
       }
     }
 
@@ -269,7 +270,7 @@ export async function GET(req: NextRequest) {
     setCache(cacheKey, body);
     return NextResponse.json(body);
   } catch (error) {
-    console.error('[search] error:', error);
+    logger.error('[search] error:', error);
     return NextResponse.json({ error: 'Search failed' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const postSchema = z.object({
   roomId: z.string().uuid(),
@@ -30,13 +31,13 @@ export async function GET(req: NextRequest) {
       .limit(100);
 
     if (error) {
-      console.error('GET chat error:', error);
+      logger.error('GET chat error:', error);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
     return NextResponse.json({ messages: data });
   } catch (err) {
-    console.error('GET /api/spaces/chat error:', err);
+    logger.error('GET /api/spaces/chat error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -70,13 +71,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      console.error('POST chat insert error:', error);
+      logger.error('POST chat insert error:', error);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error('POST /api/spaces/chat error:', err);
+    logger.error('POST /api/spaces/chat error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

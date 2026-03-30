@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { addToPlaylist } from '@/lib/music/library';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const addSchema = z.object({ songId: z.string().uuid() });
 
@@ -43,7 +44,7 @@ export async function POST(
     await addToPlaylist(id, parsed.data.songId, session.fid);
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[playlists] add track failed:', err);
+    logger.error('[playlists] add track failed:', err);
     return NextResponse.json({ error: 'Failed to add track' }, { status: 500 });
   }
 }
@@ -78,7 +79,7 @@ export async function DELETE(
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[playlists] remove track failed:', err);
+    logger.error('[playlists] remove track failed:', err);
     return NextResponse.json({ error: 'Failed to remove track' }, { status: 500 });
   }
 }

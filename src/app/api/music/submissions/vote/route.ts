@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const voteSchema = z.object({
   submissionId: z.string().uuid(),
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ voted, voteCount: count ?? 0 });
   } catch (error) {
-    console.error('Vote error:', error);
+    logger.error('Vote error:', error);
     return NextResponse.json({ error: 'Failed to process vote' }, { status: 500 });
   }
 }

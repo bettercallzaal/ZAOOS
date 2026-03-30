@@ -14,6 +14,7 @@ import { BroadcastModal } from './BroadcastModal';
 import { BroadcastPanel } from './BroadcastPanel';
 import { ContentView } from './ContentView';
 import { SpeakersGrid } from './SpeakersGrid';
+import { TwitchChatPanel } from './TwitchChatPanel';
 
 const MusicSidebar = dynamic(
   () => import('@/components/music/MusicSidebar').then((m) => ({ default: m.MusicSidebar })),
@@ -38,6 +39,8 @@ export function RoomView({
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [broadcastState, setBroadcastState] = useState<BroadcastState | null>(null);
   const [showMusicSidebar, setShowMusicSidebar] = useState(false);
+  const [showTwitchChat, setShowTwitchChat] = useState(false);
+  const [twitchInfo, setTwitchInfo] = useState<{ username: string; canSend: boolean } | null>(null);
   const call = useCall();
   const radio = useRadio();
   const isMobile = useMobile();
@@ -51,6 +54,23 @@ export function RoomView({
   const callCustomData = useCallCustomData();
   const hasScreenShareActive = useHasOngoingScreenShare();
   const roomTitle = (callCustomData as Record<string, string>)?.title || 'Audio Room';
+
+  // Fetch Twitch connection info for the host
+  useEffect(() => {
+    if (!isHost) return;
+    fetch('/api/platforms/twitch')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.connected && d.username) {
+          // Check chat capability via the chat endpoint
+          fetch(`/api/twitch/chat?channel=${encodeURIComponent(d.username)}`)
+            .then((r2) => r2.json())
+            .then((c) => setTwitchInfo({ username: d.username, canSend: c.canSend ?? false }))
+            .catch(() => setTwitchInfo({ username: d.username, canSend: false }));
+        }
+      })
+      .catch(() => {});
+  }, [isHost]);
 
   // Auto-switch to content-first when screen share starts, restore when it stops
   useEffect(() => {
@@ -137,10 +157,23 @@ export function RoomView({
               onMusicToggle={() => setShowMusicSidebar((prev) => !prev)}
               onLayoutToggle={handleToggleLayout}
               layout={layout}
+              twitchUsername={twitchInfo?.username ?? null}
+              onTwitchChat={() => setShowTwitchChat((prev) => !prev)}
             />
           </div>
           {roomId && <RoomMusicPanel roomId={roomId} isHost={isHost} onOpenMusicBrowser={() => setShowMusicSidebar(true)} />}
         </div>
+
+        {/* Desktop Twitch chat sidebar */}
+        {showTwitchChat && twitchInfo && (
+          <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
+            <TwitchChatPanel
+              twitchUsername={twitchInfo.username}
+              canSend={twitchInfo.canSend}
+              onClose={() => setShowTwitchChat(false)}
+            />
+          </div>
+        )}
 
         {/* Desktop music sidebar */}
         {showMusicSidebar && (
@@ -173,6 +206,17 @@ export function RoomView({
           </div>
         )}
       </div>
+
+      {/* Mobile Twitch chat overlay */}
+      {showTwitchChat && twitchInfo && (
+        <div className="md:hidden fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
+          <TwitchChatPanel
+            twitchUsername={twitchInfo.username}
+            canSend={twitchInfo.canSend}
+            onClose={() => setShowTwitchChat(false)}
+          />
+        </div>
+      )}
 
       {/* Mobile music overlay */}
       {showMusicSidebar && (

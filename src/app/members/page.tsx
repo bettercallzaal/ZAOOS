@@ -22,7 +22,7 @@ async function fetchInitialMembers() {
       `)
       .eq('is_active', true)
       .order('zid', { ascending: true, nullsFirst: false })
-      .limit(200);
+      .limit(10);
 
     if (error || !users) return { members: [], filterOptions: { categories: [], locations: [] } };
 

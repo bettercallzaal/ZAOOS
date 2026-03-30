@@ -88,6 +88,12 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filterOptions, setFilterOptions] = useState(initialFilterOptions);
 
+  // Pagination
+  const [pageSize, setPageSize] = useState(10);
+  const [offset, setOffset] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+
   // Debounced search
   const [searchInput, setSearchInput] = useState('');
   useEffect(() => {
@@ -100,7 +106,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
 
   const fetchMembers = useCallback(() => {
     setLoading(true);
-    const params = new URLSearchParams({ sort: filters.sort, limit: '200' });
+    const params = new URLSearchParams({ sort: filters.sort, limit: String(pageSize), offset: String(offset) });
     if (filters.tier !== 'all') params.set('tier', filters.tier);
     if (filters.search) params.set('search', filters.search);
     if (filters.category) params.set('category', filters.category);
@@ -116,12 +122,14 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
       .then(d => {
         setMembers(d.members || []);
         if (d.filterOptions) setFilterOptions(d.filterOptions);
+        if (d.total !== undefined) setTotal(d.total);
+        if (d.pagination) setHasMore(d.pagination.hasMore);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [filters]);
+  }, [filters, pageSize, offset]);
 
-  // Only fetch when filters change away from default
+  // Fetch when filters, page size change, or offset changes
   useEffect(() => {
     if (isDefaultFilters) return;
     fetchMembers();
@@ -405,11 +413,45 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
           </div>
         )}
 
-        {/* Stats */}
-        <div className="flex gap-4 mb-4 text-xs text-gray-500">
-          <span>{respectHolders.length} respect holders</span>
-          <span>{community.length} community</span>
-          {filters.sort !== 'respect' && <span className="text-gray-600">Sorted by {filters.sort}</span>}
+        {/* Stats + Pagination */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex gap-4 text-xs text-gray-500">
+            <span>{respectHolders.length} respect holders</span>
+            <span>{community.length} community</span>
+            {filters.sort !== 'respect' && <span className="text-gray-600">Sorted by {filters.sort}</span>}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-600">Show</span>
+            <select
+              value={pageSize}
+              onChange={e => {
+                setPageSize(Number(e.target.value));
+                setOffset(0);
+              }}
+              className="bg-[#0d1b2a] border border-gray-700/50 rounded px-2 py-1 text-xs text-white"
+            >
+              {[10, 25, 50, 100, 200, 300].map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+            <span className="text-xs text-gray-600">
+              {offset + 1}–{Math.min(offset + pageSize, total)} of {total}
+            </span>
+            <button
+              onClick={() => setOffset(o => Math.max(0, o - pageSize))}
+              disabled={offset === 0}
+              className="px-2 py-1 rounded border border-gray-700/50 text-xs text-gray-400 disabled:opacity-30 hover:border-gray-500 transition-colors"
+            >
+              ‹
+            </button>
+            <button
+              onClick={() => setOffset(o => o + pageSize)}
+              disabled={!hasMore}
+              className="px-2 py-1 rounded border border-gray-700/50 text-xs text-gray-400 disabled:opacity-30 hover:border-gray-500 transition-colors"
+            >
+              ›
+            </button>
+          </div>
         </div>
 
         {/* Member grid */}

@@ -12,8 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "plugins/**/dist/**",
+    "plugins/**",
     "scripts/**",
+    ".claude/**",
+    ".superpowers/**",
   ]),
   {
     // Silence React 19 Compiler rules until migration is complete.

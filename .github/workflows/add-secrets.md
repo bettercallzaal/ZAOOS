@@ -6,8 +6,8 @@ Add these 3 repository secrets:
 
 | Secret Name | Value |
 |------------|-------|
-| `PAPERCLIP_API_KEY` | `pcp_0c68806e62d412ce0173c229c526d7152055732c70484ead` |
-| `PAPERCLIP_COMPANY_ID` | `83f48c75-de79-4e05-bfa2-1631611b5be7` |
-| `PAPERCLIP_API_URL` | `https://saturday-alone-symbols-operation.trycloudflare.com` |
+| `PAPERCLIP_API_KEY` | *(get from Paperclip dashboard — rotate if previously exposed)* |
+| `PAPERCLIP_COMPANY_ID` | *(get from Paperclip dashboard)* |
+| `PAPERCLIP_API_URL` | *(current Cloudflare tunnel URL for Paperclip)* |
 
 **Note:** The `PAPERCLIP_API_URL` changed on 2026-03-29. Update this if Paperclip URL changes.

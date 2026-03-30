@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
     if (entriesError) throw entriesError;
 
     // Extract distinct action values
-    let actions: string[] = [];
+    const actions: string[] = [];
     if (actionsResult.status === 'fulfilled' && !actionsResult.value.error) {
       const seen = new Set<string>();
       for (const row of actionsResult.value.data ?? []) {

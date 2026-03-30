@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       .filter((id): id is string => !!id);
 
     // Fetch respect data in one query
-    let respectMap = new Map<string, { total_respect: number; fractal_count: number }>();
+    const respectMap = new Map<string, { total_respect: number; fractal_count: number }>();
     if (respectIds.length > 0) {
       const { data: respectRows } = await supabaseAdmin
         .from('respect_members')

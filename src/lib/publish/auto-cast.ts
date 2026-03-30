@@ -7,6 +7,7 @@
  */
 
 import { postCast } from '@/lib/farcaster/neynar';
+import { logger } from '@/lib/logger';
 
 const CHANNEL = 'zao';
 const MAX_CAST_LENGTH = 320;
@@ -51,11 +52,11 @@ export async function autoCastToZao(
 
     const hash = result?.cast?.hash ?? null;
     if (hash) {
-      console.info(`[auto-cast] Posted to /zao: ${safeText.slice(0, 60)}...`);
+      logger.info(`[auto-cast] Posted to /zao: ${safeText.slice(0, 60)}...`);
     }
     return hash;
   } catch (err) {
-    console.error('[auto-cast] Failed to post to /zao:', err);
+    logger.error('[auto-cast] Failed to post to /zao:', err);
     return null;
   }
 }

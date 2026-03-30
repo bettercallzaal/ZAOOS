@@ -20,10 +20,12 @@ export default function SpacesTabs({ active, onChange, liveBadge, upcomingBadge 
   };
 
   return (
-    <div className="flex border-b border-gray-800">
+    <div className="flex border-b border-gray-800" role="tablist">
       {TABS.map((tab) => (
         <button
           key={tab.id}
+          role="tab"
+          aria-selected={active === tab.id}
           onClick={() => onChange(tab.id)}
           className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
             active === tab.id

@@ -75,7 +75,7 @@ export function TwitchChatPanel({ twitchUsername, canSend = false, onClose }: Tw
           src={`${popoutUrl}?darkpopout`}
           title="Twitch Chat"
           className="flex-1 w-full border-0"
-          sandbox="allow-scripts allow-same-origin allow-popups"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
         />
 
         {/* Sent messages toast */}

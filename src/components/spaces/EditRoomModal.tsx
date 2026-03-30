@@ -59,9 +59,16 @@ export function EditRoomModal({ roomId, currentTitle, currentDescription, curren
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => e.key === 'Escape' && onClose()}>
       <div className="bg-[#0d1b2a] rounded-2xl border border-gray-800 w-full max-w-md mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()}>
-        <h2 className="text-lg font-bold text-white">Edit Room</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-white">Edit Room</h2>
+          <button onClick={onClose} aria-label="Close" className="p-1.5 text-gray-500 hover:text-white rounded-lg hover:bg-gray-800 transition-colors">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         {error && <p className="text-sm text-red-400 bg-red-400/10 px-3 py-2 rounded-lg">{error}</p>}
 

@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,7 +72,7 @@ async function refreshTwitchToken(
   const clientSecret = process.env.TWITCH_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    console.error('[twitch] Missing TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET for token refresh');
+    logger.error('[twitch] Missing TWITCH_CLIENT_ID or TWITCH_CLIENT_SECRET for token refresh');
     return null;
   }
 
@@ -89,7 +90,7 @@ async function refreshTwitchToken(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[twitch] Token refresh failed:', res.status, errText);
+      logger.error('[twitch] Token refresh failed:', res.status, errText);
       return null;
     }
 
@@ -112,12 +113,12 @@ async function refreshTwitchToken(
       .eq('platform', 'twitch');
 
     if (updateError) {
-      console.error('[twitch] Failed to persist refreshed tokens:', updateError.message);
+      logger.error('[twitch] Failed to persist refreshed tokens:', updateError.message);
     }
 
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   } catch (err) {
-    console.error('[twitch] Token refresh error:', err);
+    logger.error('[twitch] Token refresh error:', err);
     return null;
   }
 }
@@ -137,7 +138,7 @@ export async function updateTwitchChannel(
 ): Promise<boolean> {
   const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
   if (!clientId) {
-    console.error('[twitch] Missing TWITCH_CLIENT_ID');
+    logger.error('[twitch] Missing TWITCH_CLIENT_ID');
     return false;
   }
 
@@ -158,13 +159,13 @@ export async function updateTwitchChannel(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[twitch] Channel update failed:', res.status, errText);
+      logger.error('[twitch] Channel update failed:', res.status, errText);
       return false;
     }
 
     return true;
   } catch (err) {
-    console.error('[twitch] Channel update error:', err);
+    logger.error('[twitch] Channel update error:', err);
     return false;
   }
 }
@@ -196,7 +197,7 @@ export async function getTwitchStreamInfo(
     );
 
     if (!res.ok) {
-      console.error('[twitch] Get stream info failed:', res.status);
+      logger.error('[twitch] Get stream info failed:', res.status);
       return null;
     }
 
@@ -216,7 +217,7 @@ export async function getTwitchStreamInfo(
       isMature: stream.is_mature,
     };
   } catch (err) {
-    console.error('[twitch] Stream info error:', err);
+    logger.error('[twitch] Stream info error:', err);
     return null;
   }
 }
@@ -253,13 +254,13 @@ export async function createTwitchMarker(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[twitch] Create marker failed:', res.status, errText);
+      logger.error('[twitch] Create marker failed:', res.status, errText);
       return false;
     }
 
     return true;
   } catch (err) {
-    console.error('[twitch] Create marker error:', err);
+    logger.error('[twitch] Create marker error:', err);
     return false;
   }
 }
@@ -297,7 +298,7 @@ export async function createTwitchPoll(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[twitch] Create poll failed:', res.status, errText);
+      logger.error('[twitch] Create poll failed:', res.status, errText);
       return null;
     }
 
@@ -305,7 +306,7 @@ export async function createTwitchPoll(
     const poll = data.data?.[0];
     return poll ? { id: poll.id } : null;
   } catch (err) {
-    console.error('[twitch] Create poll error:', err);
+    logger.error('[twitch] Create poll error:', err);
     return null;
   }
 }
@@ -340,12 +341,12 @@ export async function endTwitchPoll(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[twitch] End poll failed:', res.status, errText);
+      logger.error('[twitch] End poll failed:', res.status, errText);
       return false;
     }
     return true;
   } catch (err) {
-    console.error('[twitch] End poll error:', err);
+    logger.error('[twitch] End poll error:', err);
     return false;
   }
 }
@@ -383,7 +384,7 @@ export async function createTwitchPrediction(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[twitch] Create prediction failed:', res.status, errText);
+      logger.error('[twitch] Create prediction failed:', res.status, errText);
       return null;
     }
 
@@ -398,7 +399,7 @@ export async function createTwitchPrediction(
       })),
     };
   } catch (err) {
-    console.error('[twitch] Create prediction error:', err);
+    logger.error('[twitch] Create prediction error:', err);
     return null;
   }
 }
@@ -433,12 +434,12 @@ export async function endTwitchPrediction(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[twitch] End prediction failed:', res.status, errText);
+      logger.error('[twitch] End prediction failed:', res.status, errText);
       return false;
     }
     return true;
   } catch (err) {
-    console.error('[twitch] End prediction error:', err);
+    logger.error('[twitch] End prediction error:', err);
     return false;
   }
 }
@@ -472,7 +473,7 @@ export async function createTwitchClip(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[twitch] Create clip failed:', res.status, errText);
+      logger.error('[twitch] Create clip failed:', res.status, errText);
       return null;
     }
 
@@ -480,7 +481,7 @@ export async function createTwitchClip(
     const clip = data.data?.[0];
     return clip ? { id: clip.id, editUrl: clip.edit_url } : null;
   } catch (err) {
-    console.error('[twitch] Create clip error:', err);
+    logger.error('[twitch] Create clip error:', err);
     return null;
   }
 }

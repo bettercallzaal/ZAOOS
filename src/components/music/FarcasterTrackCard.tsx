@@ -88,14 +88,22 @@ export function FarcasterTrackCard({
 
         {/* Shared by */}
         <div className="flex items-center gap-1.5 mt-1.5">
-          <Image
-            src={track.authorPfp || '/default-avatar.png'}
-            alt={track.authorUsername}
-            width={14}
-            height={14}
-            className="rounded-full"
-            unoptimized
-          />
+          {track.authorPfp ? (
+            <Image
+              src={track.authorPfp}
+              alt={track.authorUsername}
+              width={14}
+              height={14}
+              className="rounded-full"
+              unoptimized
+            />
+          ) : (
+            <svg width={14} height={14} viewBox="0 0 14 14" className="rounded-full flex-shrink-0">
+              <circle cx="7" cy="7" r="7" fill="#374151" />
+              <circle cx="7" cy="5.5" r="2.5" fill="#6B7280" />
+              <path d="M2 12.5a5 5 0 0 1 10 0" fill="#6B7280" />
+            </svg>
+          )}
           <span className="text-[11px] text-gray-500">@{track.authorUsername}</span>
           <span className="text-[11px] text-gray-600">{timeAgo(track.timestamp)}</span>
         </div>

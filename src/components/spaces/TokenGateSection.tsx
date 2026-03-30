@@ -54,6 +54,9 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
         </label>
         <button
           type="button"
+          role="switch"
+          aria-checked={enabled}
+          aria-label="Enable token gate"
           onClick={handleToggle}
           disabled={disabled}
           className={`relative w-9 h-5 rounded-full transition-colors ${

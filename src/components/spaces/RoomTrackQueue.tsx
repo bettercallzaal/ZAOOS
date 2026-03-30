@@ -75,6 +75,7 @@ export function RoomTrackQueue({ isHost }: RoomTrackQueueProps) {
                   onClick={() => handleMoveUp(idx)}
                   className="p-1 text-gray-500 hover:text-white transition-colors"
                   title="Move up"
+                  aria-label={`Move ${track.metadata.trackName} up`}
                 >
                   <ChevronUpIcon />
                 </button>
@@ -82,6 +83,7 @@ export function RoomTrackQueue({ isHost }: RoomTrackQueueProps) {
                   onClick={() => handleMoveDown(idx)}
                   className="p-1 text-gray-500 hover:text-white transition-colors"
                   title="Move down"
+                  aria-label={`Move ${track.metadata.trackName} down`}
                 >
                   <ChevronDownIcon />
                 </button>
@@ -89,6 +91,7 @@ export function RoomTrackQueue({ isHost }: RoomTrackQueueProps) {
                   onClick={() => removeFromQueue(track.id)}
                   className="p-1 text-gray-500 hover:text-red-400 transition-colors"
                   title="Remove"
+                  aria-label={`Remove ${track.metadata.trackName} from queue`}
                 >
                   <XIcon />
                 </button>

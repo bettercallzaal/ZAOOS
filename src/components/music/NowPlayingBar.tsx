@@ -4,6 +4,7 @@ import { useNowPlaying, NowPlayingEntry } from '@/hooks/useNowPlaying';
 import { usePlayer } from '@/providers/audio';
 import { useAuth } from '@/hooks/useAuth';
 import { useOverlaySync } from '@/hooks/useOverlaySync';
+import type { TrackType } from '@/types/music';
 
 /**
  * Horizontal scrolling bar showing members currently listening.
@@ -24,7 +25,7 @@ export function NowPlayingBar() {
     // Build a minimal TrackMetadata to play this track
     player.play({
       id: `np-${entry.fid}-${entry.url}`,
-      type: entry.type as 'spotify' | 'soundcloud' | 'soundxyz' | 'youtube' | 'audio' | 'audius' | 'applemusic' | 'tidal' | 'bandcamp',
+      type: entry.type as TrackType,
       trackName: entry.trackName,
       artistName: entry.artistName,
       artworkUrl: entry.artworkUrl,

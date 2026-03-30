@@ -67,7 +67,7 @@ export function WeeklyDigest() {
       data.topTracks.slice(0, 5).forEach((t, i) => lines.push(`${i + 1}. ${t.title} — ${t.artist || 'Unknown'}`));
     }
     if (data.trackOfDayWinners.length > 0) lines.push(`\nTrack of the Day winners: ${data.trackOfDayWinners.length}`);
-    window.open(`https://warpcast.com/~/compose?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+    window.open(`https://farcaster.xyz/~/compose?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
   };
 
   return (

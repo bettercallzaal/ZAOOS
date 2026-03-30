@@ -83,6 +83,7 @@ export function TipButton({ recipientAddress, recipientName, roomId }: TipButton
               </h3>
               <button
                 onClick={handleClose}
+                aria-label="Close tip modal"
                 className="p-1 text-gray-500 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

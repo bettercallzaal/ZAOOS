@@ -87,7 +87,7 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-gray-800">
         <span className="text-sm font-medium">Room Chat</span>
         {onClose && (
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+          <button onClick={onClose} aria-label="Close chat" className="text-gray-400 hover:text-white transition-colors">
             &#10005;
           </button>
         )}

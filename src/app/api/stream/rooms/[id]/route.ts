@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getRoomById, endRoom, updateRoom } from '@/lib/spaces/roomsDb';
 import { getSessionData } from '@/lib/auth/session';
+import { getValidTwitchToken, updateTwitchChannel } from '@/lib/twitch/client';
 
 export async function GET(
   req: NextRequest,
@@ -83,44 +84,12 @@ export async function PATCH(
 
 /** Sync room title to connected streaming platforms (Twitch, YouTube, etc.) */
 async function syncStreamTitle(fid: number, title: string) {
-  const { supabaseAdmin } = await import('@/lib/db/supabase');
-
-  // Get connected platforms
-  const { data: platforms } = await supabaseAdmin
-    .from('connected_platforms')
-    .select('platform, access_token, platform_user_id')
-    .eq('user_fid', fid);
-
-  if (!platforms?.length) return;
-
-  const results = await Promise.allSettled(
-    platforms.map(async (p) => {
-      if (p.platform === 'twitch' && p.access_token && p.platform_user_id) {
-        const clientId = process.env.NEXT_PUBLIC_TWITCH_CLIENT_ID;
-        if (!clientId) return;
-        const res = await fetch('https://api.twitch.tv/helix/channels', {
-          method: 'PATCH',
-          headers: {
-            Authorization: `Bearer ${p.access_token}`,
-            'Client-Id': clientId,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            broadcaster_id: p.platform_user_id,
-            title,
-          }),
-        });
-        if (!res.ok) {
-          const err = await res.text();
-          console.error('[twitch-sync] Title update failed:', res.status, err);
-        } else {
-          console.info('[twitch-sync] Title updated to:', title);
-        }
-      }
-      // YouTube title sync could go here in the future
-    })
-  );
-
-  const failed = results.filter(r => r.status === 'rejected');
-  if (failed.length) console.warn(`[room-update] ${failed.length} platform sync(s) failed`);
+  const token = await getValidTwitchToken(fid);
+  if (token) {
+    const ok = await updateTwitchChannel(token.accessToken, token.userId, { title });
+    if (ok) {
+      console.info('[twitch-sync] Title updated to:', title);
+    }
+  }
+  // YouTube title sync could go here in the future
 }

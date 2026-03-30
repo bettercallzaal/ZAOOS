@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/daily-digest",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/health-snapshot",
+      "schedule": "0 0 * * 0"
     }
   ]
 }

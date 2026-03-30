@@ -140,7 +140,7 @@ export default function AssistantPage() {
       </div>
 
       {/* Input bar — sits above mobile nav (bottom-14) and flush on desktop */}
-      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 bg-[#0d1b2a] border-t border-gray-800 px-4 py-3">
+      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 bg-[#0d1b2a] border-t border-gray-800 px-4 py-3" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="max-w-3xl mx-auto flex gap-2">
           <textarea
             value={input}

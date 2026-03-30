@@ -3,10 +3,12 @@
   "short_name": "ZAO OS",
   "description": "Where music artists build onchain",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0a1628",
   "theme_color": "#0a1628",
   "orientation": "portrait-primary",
+  "id": "/",
   "icons": [
     {
       "src": "/favicon-32x32.png",
@@ -25,5 +27,9 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["music", "social"]
+  "categories": ["music", "social"],
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
 }

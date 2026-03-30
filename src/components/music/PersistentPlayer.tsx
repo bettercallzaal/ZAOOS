@@ -71,7 +71,7 @@ export function PersistentPlayer({
   // ─── Idle state: entire bar tappable to start radio ────────────────
   if (!hasTrack) {
     return (
-      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80">
+      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <button
           onClick={() => radioLoading ? undefined : onRadioStart?.()}
           disabled={radioLoading}

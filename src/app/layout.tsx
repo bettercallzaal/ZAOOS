@@ -7,6 +7,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
+import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -85,6 +86,7 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <Providers wagmiInitialState={initialState}>{children}</Providers>
+        <ServiceWorkerRegistration />
         <SpeedInsights />
         <Analytics />
       </body>

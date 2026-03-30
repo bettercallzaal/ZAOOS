@@ -195,7 +195,7 @@ export function BottomNav() {
       </nav>
 
       {/* Mobile: bottom tab bar with More menu */}
-      <nav aria-label="Main navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-gray-800">
+      <nav aria-label="Main navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-gray-800" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {/* More menu (slides up from bottom) */}
         {moreOpen && (
           <>
@@ -225,7 +225,7 @@ export function BottomNav() {
           </>
         )}
 
-        <div className="flex items-center justify-around h-14 px-2 safe-area-bottom">
+        <div className="flex items-center justify-around h-14 px-2">
           {PRIMARY_TABS.map((tab) => {
             const isActive = activeTab === tab.id;
             return (

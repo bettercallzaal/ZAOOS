@@ -485,7 +485,7 @@ async function enrichAndReconcile(stats: SyncStats) {
     }
 
     updatePromises.push(
-      supabaseAdmin.from('respect_members').update(updates).eq('id', member.id),
+      supabaseAdmin.from('respect_members').update(updates).eq('id', member.id).then(),
     );
     stats.enriched++;
   }

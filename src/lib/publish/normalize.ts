@@ -161,6 +161,31 @@ export function normalizeForDiscord(input: NormalizeInput): NormalizedContent {
 }
 
 /**
+ * Threads — 500-char limit, conversational tone.
+ * No hashtags. Appends "via ZAO OS" attribution with cast link.
+ */
+export function normalizeForThreads(input: NormalizeInput): NormalizedContent {
+  const url = castUrl(input.castHash);
+  const attribution = 'via ZAO OS';
+  const footer = `\n\n${attribution}\n${url}`;
+
+  const maxTextLen = 500 - footer.length;
+  // Strip hashtags for conversational tone
+  const cleaned = input.text.replace(/#\w+/g, '').replace(/\s{2,}/g, ' ').trim();
+  const truncatedText = truncate(cleaned, maxTextLen);
+  const text = `${truncatedText}${footer}`;
+
+  return {
+    text,
+    images: input.imageUrls ?? [],
+    embeds: input.embedUrls ?? [],
+    attribution,
+    castHash: input.castHash,
+    castUrl: url,
+  };
+}
+
+/**
  * Hive — full markdown, no character limit.
  * Converts images to markdown `![]()` syntax, embeds to `[]()` links,
  * and appends a footer with the original cast link.

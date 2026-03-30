@@ -313,6 +313,8 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     // Publish to X, Telegram, and Discord in parallel (may use castHash from Farcaster)
     let xUrl: string | null = null;
     let xError: string | null = null;
+    let threadsUrl: string | null = null;
+    let threadsError: string | null = null;
     let telegramMessageId: number | null = null;
     let telegramError: string | null = null;
     let discordMessageId: string | null = null;
@@ -381,6 +383,25 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
         }
         return { platform: 'discord' as const, messageId: result.messageId };
       })(),
+
+      // Threads — only attempt if env vars are set
+      (async () => {
+        if (!process.env.THREADS_ACCESS_TOKEN) {
+          return { platform: 'threads' as const, skipped: true };
+        }
+        try {
+          const { normalizeForThreads } = await import('@/lib/publish/normalize');
+          const { publishToThreads } = await import('@/lib/publish/threads');
+          const normalized = normalizeForThreads({
+            text: publishText + attribution,
+            castHash: castHash || 'proposal',
+          });
+          const result = await publishToThreads(normalized);
+          return { platform: 'threads' as const, url: result.postUrl };
+        } catch (e) {
+          return { platform: 'threads' as const, error: e instanceof Error ? e.message : 'Threads publish failed' };
+        }
+      })(),
     ]);
 
     // Process parallel results
@@ -418,6 +439,16 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           discordMessageId = val.messageId ?? null;
           console.info(`[publish-threshold] Published to Discord: ${discordMessageId}`);
         }
+      } else if (val.platform === 'threads') {
+        if ('skipped' in val) {
+          console.info('[publish-threshold] Threads skipped — not configured');
+        } else if ('error' in val) {
+          threadsError = val.error || 'Threads publish failed';
+          console.error('[publish-threshold] Threads publish failed:', threadsError);
+        } else if ('url' in val) {
+          threadsUrl = val.url ?? null;
+          console.info(`[publish-threshold] Published to Threads: ${threadsUrl}`);
+        }
       }
     }
 
@@ -432,12 +463,14 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     if (xUrl) updateData.published_x_url = xUrl;
     if (telegramMessageId) updateData.published_telegram_id = telegramMessageId;
     if (discordMessageId) updateData.published_discord_id = discordMessageId;
+    if (threadsUrl) updateData.published_threads_url = threadsUrl;
     // Store errors for UI display
     if (fcError) updateData.publish_fc_error = fcError;
     if (bskyError) updateData.publish_bsky_error = bskyError;
     if (xError) updateData.publish_x_error = xError;
     if (telegramError) updateData.publish_telegram_error = telegramError;
     if (discordError) updateData.publish_discord_error = discordError;
+    if (threadsError) updateData.publish_threads_error = threadsError;
 
     const { error: updateErr } = await supabaseAdmin
       .from('proposals')

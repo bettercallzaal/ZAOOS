@@ -7,6 +7,7 @@ import { LiveButton } from './LiveButton';
 import { ScreenShareButton } from './ScreenShareButton';
 import { LayoutToggle } from './LayoutToggle';
 import { TwitchInteractivePanel } from './TwitchInteractivePanel';
+import { HandRaiseQueue } from './HandRaiseQueue';
 
 interface ControlsPanelProps {
   isHost: boolean;
@@ -19,6 +20,11 @@ interface ControlsPanelProps {
   layout?: 'content-first' | 'speakers-first';
   twitchUsername?: string | null;
   onTwitchChat?: () => void;
+  roomId?: string;
+  userFid?: number;
+  username?: string;
+  pfpUrl?: string;
+  onRoomChat?: () => void;
 }
 
 export function ControlsPanel({
@@ -32,6 +38,11 @@ export function ControlsPanel({
   layout,
   twitchUsername,
   onTwitchChat,
+  roomId,
+  userFid,
+  username,
+  pfpUrl,
+  onRoomChat,
 }: ControlsPanelProps) {
   const [showTwitchPanel, setShowTwitchPanel] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -40,7 +51,8 @@ export function ControlsPanel({
     (isHost && roomType === 'stage' && layout && onLayoutToggle) ||
     (twitchUsername && onTwitchChat) ||
     (isHost && twitchUsername) ||
-    (!isHost && roomType === 'stage');
+    (!isHost && roomType === 'stage') ||
+    onRoomChat;
 
   return (
     <div className="space-y-0">
@@ -110,14 +122,26 @@ export function ControlsPanel({
               <LayoutToggle layout={layout} onToggle={onLayoutToggle} />
             )}
 
-            {/* Raise hand */}
-            {!isHost && roomType === 'stage' && (
+            {/* Raise hand (listener) */}
+            {!isHost && roomType === 'stage' && roomId && userFid && (
+              <HandRaiseQueue
+                roomId={roomId}
+                fid={userFid}
+                username={username ?? ''}
+                pfpUrl={pfpUrl ?? ''}
+                isHost={false}
+              />
+            )}
+
+            {/* Room Chat */}
+            {onRoomChat && (
               <button
+                onClick={onRoomChat}
                 className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border border-gray-700/50 hover:border-[#f5a623]/40"
-                title="Raise hand"
+                title="Room Chat"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l-.075 5.925m3.075-5.925a1.575 1.575 0 013.15 0v1.5m-3.15-1.5v5.925m3.15-5.925v3.075M16.5 12.75v-3m0 3c0 3.375-2.7 6.75-6 6.75s-6-3.375-6-6.75V7.5m0 0a1.575 1.575 0 013.15 0" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                 </svg>
               </button>
             )}
@@ -184,14 +208,15 @@ export function ControlsPanel({
                       Music
                     </button>
                   )}
-                  {!isHost && roomType === 'stage' && (
+                  {onRoomChat && (
                     <button
+                      onClick={() => { onRoomChat(); setShowMore(false); }}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-[#f5a623] transition-colors"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l-.075 5.925m3.075-5.925a1.575 1.575 0 013.15 0v1.5m-3.15-1.5v5.925m3.15-5.925v3.075M16.5 12.75v-3m0 3c0 3.375-2.7 6.75-6 6.75s-6-3.375-6-6.75V7.5m0 0a1.575 1.575 0 013.15 0" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                       </svg>
-                      Raise hand
+                      Room Chat
                     </button>
                   )}
                   {twitchUsername && onTwitchChat && (

@@ -268,6 +268,9 @@ export default function PublicRoomPage() {
               roomId={room.id}
               roomType={room.room_type}
               hostFid={room.host_fid}
+              userFid={user?.fid}
+              username={user?.username}
+              pfpUrl={user?.pfpUrl}
             />
           </StreamCall>
         </StreamVideo>

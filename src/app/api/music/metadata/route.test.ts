@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
 // ─── Mock getSessionData ───────────────────────────────────────────────────────
-const mockSession = { userId: 'test-user', address: '0x123' };
+const mockGetSessionData = vi.fn();
 vi.mock('@/lib/auth/session', () => ({
-  getSessionData: vi.fn(() => Promise.resolve(mockSession)),
+  getSessionData: mockGetSessionData,
 }));
 
 // ─── Mock fetch ────────────────────────────────────────────────────────────────
@@ -25,23 +25,22 @@ describe('GET /api/music/metadata', async () => {
   // Lazy-import the route handler so mocks are set up first
   const { GET } = await import('./route');
 
+  const validSession = { userId: 'test-user', address: '0x123' };
+
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.restoreAllMocks();
+    // Default: authenticated session
+    mockGetSessionData.mockResolvedValue(validSession);
   });
 
   afterEach(() => {
-    vi.resetAllMocks();
+    vi.restoreAllMocks();
   });
 
   // ─── Auth ─────────────────────────────────────────────────────────────────
   it('returns 401 when no session', async () => {
-    vi.mock('@/lib/auth/session', () => ({
-      getSessionData: vi.fn(() => Promise.resolve(null)),
-    }));
-
-    const { GET: GET2 } = await import('./route');
-    const res = await GET2(makeRequest('https://open.spotify.com/track/abc'));
+    mockGetSessionData.mockResolvedValue(null);
+    const res = await GET(makeRequest('https://open.spotify.com/track/abc'));
     expect(res.status).toBe(401);
   });
 

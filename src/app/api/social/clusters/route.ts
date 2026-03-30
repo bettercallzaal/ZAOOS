@@ -45,13 +45,45 @@ export async function GET() {
       return NextResponse.json({ clusters: [] });
     }
 
-    // Channels to scan: community channels + popular Farcaster channels
+    // Discover channels dynamically: fetch recent casts from ZAO members to find their active channels
     const communityChannels = communityConfig.farcaster.channels;
-    const extraChannels = [
-      'music', 'onchain-music', 'hypersub', 'degen', 'base',
-      'art', 'dev', 'founders', 'nouns', 'ethereum',
-    ];
-    const allChannels = [...new Set([...communityChannels, ...extraChannels])];
+    const discoveredChannels = new Set<string>(communityChannels);
+
+    // Fetch recent casts from a sample of members to discover channels they post in
+    const sampleFids = members.slice(0, 20).map(m => m.fid);
+    const discoveryBatches = [];
+    for (let i = 0; i < sampleFids.length; i += 5) {
+      discoveryBatches.push(sampleFids.slice(i, i + 5));
+    }
+
+    for (const batch of discoveryBatches) {
+      const results = await Promise.allSettled(
+        batch.map(async (fid) => {
+          const res = await fetch(
+            `${NEYNAR_BASE}/feed?feed_type=filter&filter_type=fids&fids=${fid}&limit=25`,
+            { headers: { 'x-api-key': ENV.NEYNAR_API_KEY }, signal: AbortSignal.timeout(5000) }
+          );
+          if (!res.ok) return [];
+          const data = await res.json();
+          return (data.casts || [])
+            .filter((c: { root_parent_url?: string }) => c.root_parent_url?.includes('channel/'))
+            .map((c: { root_parent_url: string }) => {
+              const match = c.root_parent_url.match(/channel\/([^/]+)/);
+              return match?.[1];
+            })
+            .filter(Boolean);
+        })
+      );
+      for (const r of results) {
+        if (r.status === 'fulfilled') {
+          for (const ch of r.value) discoveredChannels.add(ch);
+        }
+      }
+      // Rate limit: brief pause between batches
+      await new Promise(r => setTimeout(r, 200));
+    }
+
+    const allChannels = [...discoveredChannels];
 
     // Build a FID-to-profile map
     const profileMap = new Map(

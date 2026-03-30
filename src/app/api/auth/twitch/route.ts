@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   }
 
   const redirectUri = 'https://zaoos.com/api/auth/twitch/callback';
-  const scopes = 'channel:read:stream_key channel:manage:broadcast chat:read';
+  const scopes = 'channel:read:stream_key channel:manage:broadcast chat:read chat:edit channel:manage:polls channel:manage:predictions clips:edit channel:read:subscriptions moderator:read:followers';
 
   const url = new URL('https://id.twitch.tv/oauth2/authorize');
   url.searchParams.set('client_id', clientId);

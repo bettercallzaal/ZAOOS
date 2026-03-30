@@ -126,7 +126,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             />
           </div>
         ) : (
-          <motion.div layoutId="player-artwork" className={`relative w-full max-w-[320px] aspect-square rounded-2xl overflow-hidden bg-gray-800 shadow-2xl ${
+          <motion.div layoutId="player-artwork" className={`relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-gray-800 shadow-2xl flex-shrink-0 ${
             isPlaying ? 'ring-2 ring-[#f5a623]/20 shadow-[#f5a623]/10' : ''
           }`}>
             <ArtworkImage
@@ -153,12 +153,6 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
                 </div>
               </div>
             )}
-            {/* Swipe hint */}
-            <div className="absolute bottom-2 left-0 right-0 flex justify-center pointer-events-none">
-              <span className="text-[9px] text-white/30 bg-black/20 px-2 py-0.5 rounded-full">
-                Swipe to skip
-              </span>
-            </div>
           </motion.div>
         )}
       </div>

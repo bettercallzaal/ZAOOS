@@ -182,7 +182,7 @@ export function PersistentPlayer({
       </div>
 
       <div
-        className="flex items-center gap-2 px-3 py-1.5"
+        className="flex items-center gap-2 px-4 py-1.5 overflow-visible"
         onTouchStart={onSwipeStart}
         onTouchEnd={onSwipeEnd}
       >

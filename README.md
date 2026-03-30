@@ -11,15 +11,27 @@
 [![XMTP](https://img.shields.io/badge/XMTP-Encrypted_DMs-FC4F37)](https://xmtp.org)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-[Live App](https://zaoos.com) · [Research Library](./research/) · [Report Bug](https://github.com/bettercallzaal/zaoos/issues) · [Discord](https://discord.thezao.com)
+[Live App](https://zaoos.com) · [Fork Guide](./FORK.md) · [Research Library](./research/) · [Report Bug](https://github.com/bettercallzaal/zaoos/issues) · [Discord](https://discord.thezao.com)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bettercallzaal/zaoos&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,SUPABASE_SERVICE_ROLE_KEY,NEYNAR_API_KEY,SESSION_SECRET,APP_FID,APP_SIGNER_PRIVATE_KEY,NEXT_PUBLIC_SIWF_DOMAIN)
 
 </div>
 
 ---
 
-ZAO OS is a gated social platform for **The ZAO** — a decentralized music community where artists keep their revenue, curators earn reputation, and the community governs itself. Built on [Farcaster](https://farcaster.xyz) with encrypted messaging via [XMTP](https://xmtp.org), on-chain governance via [ORDAO](https://zao.frapps.xyz/), and inline music from 8 platforms.
+ZAO OS is a gated social platform for **The ZAO** — a decentralized music community where artists keep their revenue, curators earn reputation, and the community governs itself. Built on [Farcaster](https://farcaster.xyz) with encrypted messaging via [XMTP](https://xmtp.org), on-chain governance via [ORDAO](https://zao.frapps.xyz/), and inline music from 9 platforms.
 
-**Forking?** Everything community-specific lives in [`community.config.ts`](./community.config.ts) — branding, channels, contracts, admin FIDs, nav structure. Change that one file and you have your own gated community.
+### Fork it for your community
+
+Everything community-specific lives in **one file** — [`community.config.ts`](./community.config.ts). Change it and you have your own gated community hub.
+
+| Doc | What It's For |
+|-----|---------------|
+| **[FORK.md](./FORK.md)** | Step-by-step fork guide — clone, configure, deploy in under an hour |
+| **[AGENTS.md](./AGENTS.md)** | AI coding agent context — works with Claude Code, Cursor, Copilot, Windsurf |
+| **[CONTRIBUTING.md](./CONTRIBUTING.md)** | Code conventions, PR process, testing standards |
+| **[community.config.ts](./community.config.ts)** | The one file to change — branding, channels, contracts, admin, nav |
+| **[.env.example](./.env.example)** | All env vars with descriptions, organized by priority |
 
 ---
 
@@ -33,32 +45,13 @@ cp .env.example .env.local    # fill in env vars
 npm run dev                    # starts on localhost:3000
 ```
 
-**Database:** Run SQL scripts from `scripts/` in Supabase SQL Editor. Applied migrations are archived in `scripts/migrations/applied/`. Core setup scripts:
+See **[FORK.md](./FORK.md)** for the complete setup guide including database scripts, app wallet generation, and deployment.
 
-```
-scripts/setup-database.sql
-scripts/create-users-table.sql
-scripts/add-channel-casts-table.sql
-scripts/create-proposals.sql
-scripts/create-notifications.sql
-scripts/create-respect-tables.sql
-scripts/create-streaks-tables.sql
-scripts/create-track-of-day.sql
-```
-
-Additional migrations (all in `scripts/migrations/applied/`): music library, playlists, song likes, song reactions, song comments, collaborative playlists, poll config, respect transfers, member CRM columns, and more.
-
-**App wallet:** Generate a dedicated signing wallet (never use personal keys):
-
-```bash
-npx tsx scripts/generate-wallet.ts
-```
-
-See `.env.example` for all required environment variables. Key services:
+**Key services:**
 - **Supabase** — database (required)
 - **Neynar** — Farcaster API (required)
-- **Alchemy** — ENS resolution, NFT discovery, respect sync webhooks, transfer history (free tier: 30M CU/month)
-- **PostHog** — analytics (optional)
+- **Alchemy** — ENS resolution, NFT discovery, respect sync webhooks (free tier)
+- Everything else is optional — see `.env.example` for the full list
 
 ---
 
@@ -655,12 +648,14 @@ Detailed execution plans live in `docs/superpowers/plans/`. This is the high-lev
 
 ## Contributing
 
-ZAO OS is open source. Fork it, build on it, make it yours.
+ZAO OS is open source (MIT). Fork it, build on it, make it yours.
 
+- **[FORK.md](./FORK.md)** — fork it for your own community
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** — code conventions, PR process, how to contribute
+- **[AGENTS.md](./AGENTS.md)** — AI agent context for Claude Code, Cursor, Copilot, Windsurf
 - [GitHub Issues](https://github.com/bettercallzaal/zaoos/issues) — bugs and feature requests
 - [Research Library](./research/) — 155+ docs of context
 - [QA Test Checklist](./docs/QA-TEST-CHECKLIST.md) — testing procedures
-- [Internal Plans](./docs/superpowers/plans/) — execution plans for upcoming sprints
 
 ---
 

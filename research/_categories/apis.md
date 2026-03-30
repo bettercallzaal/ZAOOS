@@ -15,3 +15,4 @@
 | [136](../136-api-status-verification-march-2026/) | **API Status Verification (March 2026)** | Which APIs are active vs deprecated (Sound.xyz dead, Neynar acquired Farcaster) |
 | [162](../162-open-source-projects-directory/) | **Open Source Projects Directory** | 29 projects from opensourceprojects.dev + GitHub — Audius API, Sonata, Frog/Frames, Umami, Funkwhale |
 | [219](../219-free-apis-zero-cost-integrations/) | **Free APIs & Zero-Cost Integrations** | 30+ free APIs mapped: LRCLIB lyrics, Audius, Odesli, Sentry, Umami, OneSignal push, CoinGecko, Cal.com, Color Thief, Web Audio/Speech |
+| [222](../222-payment-infrastructure-stripe-coinbase/) | **Payment Infrastructure: Stripe, Coinbase, Coinflow, 0xSplits** | Dual-rail payment architecture: Stripe Connect for fiat (memberships, tickets, merch), Coinbase Commerce for crypto, 0xSplits for royalty splits. ZAO Stock ticketing model, 40-hr implementation plan |

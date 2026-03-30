@@ -37,6 +37,10 @@ Use this to quickly find if a topic has already been researched.
 - **AI video generation for music**: Seedance 2.0, Neural Frames, Freebeat, Kling 3.0, Runway Gen-4, Sora 2 — pricing, music-specific features, API status, ZAO integration paths → `209`
 - **Music player UI best practices 2026**: platform comparison, gap analysis (polish not features), quick wins (a11y, animations, glassmorphism), Motion transitions, keyboard shortcuts, WCAG audit, social features → `211`
 
+## Events & IRL
+- ZAO Stock tactical planning (venue, production, tech, artist booking) → `213`
+- **ZAO Stock multi-year vision**: 5-year roadmap, conference models (Network School, Departure, NFC, Ars Electronica), Ellsworth integration, summer camp format, workshop curriculum, virtual pipeline → `224`
+
 ## On-Chain Music Distribution & NFTs
 - Trustware SDK evaluation (crypto payment middleware, too early) → `139`
 - BuilderOSS ecosystem (10 repos, ZOUNZ contracts, builder-template-app, @builderbot) → `140`

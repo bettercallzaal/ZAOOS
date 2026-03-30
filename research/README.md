@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **167+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **168+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
 
 ---
 
@@ -15,7 +15,7 @@
 | [Identity, Governance & Tokens](./_categories/identity-governance.md) | 31 | ZIDs, Hats Protocol, Respect, ORDAO fractals, ZOUNZ DAO, Snapshot, ENS, Basenames |
 | [AI Agent & Intelligence](./_categories/ai-agent.md) | 6 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents, live room AI |
 | [Cross-Platform Publishing](./_categories/cross-platform.md) | 12 | Farcaster, X, Bluesky, Lens, Hive, Mastodon, Threads, Nostr, Reddit |
-| [Technical Infrastructure](./_categories/infrastructure.md) | 10 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming, smart contracts |
+| [Technical Infrastructure](./_categories/infrastructure.md) | 11 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming, smart contracts, forkability |
 | [APIs & External Services](./_categories/apis.md) | 9 | 1,400+ APIs mapped, Alchemy, Coinflow, payment infrastructure (Stripe/Coinbase/0xSplits), 30+ zero-cost integrations |
 | [WaveWarZ Integration](./_categories/wavewarz.md) | 6 | Solana prediction markets, artist pipeline, battle mechanics |
 | [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |
@@ -38,6 +38,7 @@
 | **Auditing code** | [57 Security Audit](./057-codebase-security-audit-march-2026/) + [137 Skills Security](./137-skills-audit-security-practices/) + [66 Testing](./066-backend-testing-strategy/) |
 | **Using Claude Code skills** | [154 Skills Master Reference](./154-skills-commands-master-reference/) + [69 Tips](./069-claude-code-tips-best-practices/) + [54 Superpowers](./054-superpowers-agentic-skills/) |
 | **Understanding the project** | [50 Complete Guide](./050-the-zao-complete-guide/) + [51 Whitepaper](./051-zao-whitepaper-2026/) + [27 Overview](./027-comprehensive-overview/) |
+| **Forking for your community** | [FORK.md](../FORK.md) + [AGENTS.md](../AGENTS.md) + [225 Fork Patterns](./225-fork-friendly-open-source-patterns/) + [community.config.ts](../community.config.ts) |
 
 ---
 

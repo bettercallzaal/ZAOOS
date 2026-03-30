@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { TokenGateSection, type GateConfig } from './TokenGateSection';
 
 export type RoomTheme = 'default' | 'music' | 'podcast' | 'ama' | 'chill';
 
@@ -53,7 +54,7 @@ const THEMES: ThemeOption[] = [
 interface HostRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateRoom: (title: string, description: string, theme: RoomTheme) => Promise<void>;
+  onCreateRoom: (title: string, description: string, theme: RoomTheme, gateConfig?: GateConfig | null) => Promise<void>;
 }
 
 export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalProps) {
@@ -63,6 +64,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [titleTouched, setTitleTouched] = useState(false);
+  const [gateConfig, setGateConfig] = useState<GateConfig | null>(null);
 
   if (!isOpen) return null;
 
@@ -76,11 +78,12 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
     setLoading(true);
     setError(null);
     try {
-      await onCreateRoom(title.trim(), description.trim(), theme);
+      await onCreateRoom(title.trim(), description.trim(), theme, gateConfig);
       setTitle('');
       setDescription('');
       setTheme('default');
       setTitleTouched(false);
+      setGateConfig(null);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create room');
@@ -187,6 +190,9 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
             />
             <div className="text-gray-600 text-xs mt-1 text-right">{description.length}/500</div>
           </div>
+
+          {/* Token Gate */}
+          <TokenGateSection value={gateConfig} onChange={setGateConfig} disabled={loading} />
 
           {/* Broadcast to section */}
           <div className="mb-6">

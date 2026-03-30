@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { StreamCall, StreamVideo, StreamVideoClient, type Call } from '@stream-io/video-react-sdk';
 import '@stream-io/video-react-sdk/dist/css/styles.css';
 import { useAuth } from '@/hooks/useAuth';
+import { useAccount } from 'wagmi';
 import { createStreamUser, createGuestUser } from '@/lib/spaces/streamHelpers';
 import { RoomView } from '@/components/spaces/RoomView';
 import { EditRoomModal } from '@/components/spaces/EditRoomModal';
@@ -37,6 +38,7 @@ export default function PublicRoomPage() {
   const router = useRouter();
   const roomId = params.id as string;
   const { user, loading: authLoading } = useAuth();
+  const { address: walletAddress } = useAccount();
 
   const [client, setClient] = useState<StreamVideoClient | null>(null);
   const [call, setCall] = useState<Call | null>(null);
@@ -44,6 +46,7 @@ export default function PublicRoomPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
+  const [gateBlocked, setGateBlocked] = useState(false);
 
   const isHost = user?.fid === room?.host_fid;
 
@@ -57,6 +60,23 @@ export default function PublicRoomPage() {
         const roomData = await fetchRoom(roomId);
         if (roomData.state === 'ended') throw new Error('This room has ended');
         if (mounted) setRoom(roomData);
+
+        // Check token gate before joining
+        if (roomData.gate_config && walletAddress) {
+          const gateRes = await fetch('/api/spaces/gate-check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ walletAddress, gateConfig: roomData.gate_config }),
+          });
+          const gateData = await gateRes.json();
+          if (!gateData.allowed) {
+            if (mounted) { setGateBlocked(true); setLoading(false); }
+            return;
+          }
+        } else if (roomData.gate_config && !walletAddress) {
+          if (mounted) { setGateBlocked(true); setLoading(false); }
+          return;
+        }
 
         let newClient: StreamVideoClient;
 
@@ -112,7 +132,7 @@ export default function PublicRoomPage() {
     return () => {
       mounted = false;
     };
-  }, [roomId, user, authLoading]);
+  }, [roomId, user, authLoading, walletAddress]);
 
   // End session on browser close / tab close
   useEffect(() => {
@@ -170,6 +190,35 @@ export default function PublicRoomPage() {
         >
           Back to Spaces
         </button>
+      </div>
+    );
+  }
+
+  if (gateBlocked) {
+    const gate = room?.gate_config as { type?: string; contractAddress?: string } | null;
+    return (
+      <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col items-center justify-center gap-4 px-4">
+        <div className="bg-[#0d1b2a] border border-gray-800 rounded-2xl p-6 max-w-sm w-full text-center">
+          <div className="text-4xl mb-3">🔒</div>
+          <h2 className="text-white font-bold text-lg mb-2">Token-Gated Room</h2>
+          <p className="text-gray-400 text-sm mb-1">
+            This room requires a {gate?.type?.toUpperCase() || 'token'} to enter.
+          </p>
+          {gate?.contractAddress && (
+            <p className="text-gray-500 text-xs font-mono mb-4">
+              {gate.contractAddress.slice(0, 6)}...{gate.contractAddress.slice(-4)}
+            </p>
+          )}
+          {!walletAddress && (
+            <p className="text-[#f5a623] text-xs mb-4">Connect your wallet to check eligibility.</p>
+          )}
+          <button
+            onClick={() => router.push('/spaces')}
+            className="px-6 py-2 bg-[#f5a623] text-[#0a1628] rounded-lg font-semibold text-sm"
+          >
+            Back to Spaces
+          </button>
+        </div>
       </div>
     );
   }

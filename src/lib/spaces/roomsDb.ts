@@ -21,6 +21,7 @@ export interface Room {
   layout_preference: 'content-first' | 'speakers-first';
   last_active_at: string;
   recording_url: string | null;
+  gate_config: Record<string, unknown> | null;
 }
 
 export async function createRoom(data: {
@@ -34,6 +35,7 @@ export async function createRoom(data: {
   roomType?: 'voice_channel' | 'stage';
   theme?: string;
   layoutPreference?: 'content-first' | 'speakers-first';
+  gateConfig?: { type: string; contractAddress: string; chainId: number; minBalance?: string; tokenId?: string };
 }): Promise<Room> {
   const { data: room, error } = await supabaseAdmin
     .from('rooms')
@@ -50,6 +52,7 @@ export async function createRoom(data: {
       room_type: data.roomType || 'stage',
       theme: data.theme || 'default',
       layout_preference: data.layoutPreference || 'content-first',
+      gate_config: data.gateConfig || null,
     })
     .select()
     .single();

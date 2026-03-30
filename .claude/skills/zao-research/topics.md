@@ -84,6 +84,7 @@ Use this to quickly find if a topic has already been researched.
 - OpenFang Agent OS (not a fit, but reference architecture) → `46`
 - **Agent harness engineering (LangChain DeepAgents)**: Agent=Model+Harness, virtual filesystems, Ralph Loop, context rot, subagent orchestration, ZAO agent architecture → `161`
 - **Microsoft Agent Lightning**: RL training for agents (APO/GRPO/PPO/SFT), LightningRL hierarchical RL, Python+GPU — SKIP for ZAO now, steal APO evaluate-critique-rewrite pattern → `210`
+- **Agentic workflows 2026**: Vercel AI SDK 6 + Mastra + Claude Agent SDK, 5 ZAO agent designs, DAO governance agents, music AI DJ, cost analysis ($25-50/mo) → `227`
 
 ## Coordination & Incentives
 - Incented protocol: ZABAL campaigns, staking-based task coordination → `64`

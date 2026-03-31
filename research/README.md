@@ -126,6 +126,7 @@
 | Nostr cross-posting | Future | 6 hrs | [097](./097-nostr-cross-posting-integration/) |
 | Cross-chain fractal governance | Future | 20 hrs | [108](./184-superchain-ordao-crosschain-fractal/) |
 | Mobile player optimization | Future | 12 hrs | [127](./189-mobile-player-optimization/), [220](./220-mobile-first-music-ux-patterns/) |
+| **Spaces & streaming full audit** | **Complete** | — | [233](./233-spaces-streaming-full-audit/) |
 | Native community directory | Future | 10 hrs | [110](./110-community-directory-crm/) |
 | External reputation signals | Future | 8 hrs | [134](./134-external-reputation-signals-comprehensive/) |
 | ArNS permanent domain | Future | 2 hrs | [152](./152-arweave-ecosystem-deep-dive/) |

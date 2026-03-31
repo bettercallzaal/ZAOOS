@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { getSupabaseBrowser } from '@/lib/db/supabase';
 import { useQueue } from '@/contexts/QueueContext';
 import type { TrackMetadata } from '@/types/music';
 
@@ -39,12 +40,25 @@ export function SongRequests({ roomId, isHost }: SongRequestsProps) {
     } catch { /* ignore */ }
   }, [roomId]);
 
-  // Poll every 10s
+  // Initial fetch on mount
   useEffect(() => {
     fetchRequests();
-    const interval = setInterval(fetchRequests, 10_000);
-    return () => clearInterval(interval);
   }, [fetchRequests]);
+
+  // Realtime subscription for song request changes
+  useEffect(() => {
+    const supabase = getSupabaseBrowser();
+    const channel = supabase
+      .channel(`song-requests:${roomId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'song_requests', filter: `room_id=eq.${roomId}` },
+        () => fetchRequests(),
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [roomId, fetchRequests]);
 
   const handleSubmit = async () => {
     if (!url.trim()) return;

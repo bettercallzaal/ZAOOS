@@ -91,3 +91,33 @@ ALTER TABLE rooms ADD COLUMN IF NOT EXISTS provider TEXT DEFAULT 'stream' CHECK 
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS gate_config JSONB;
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS thumbnail_url TEXT;
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS recording_url TEXT;
+
+-- Atomic participant count functions (avoid read-then-write race conditions)
+CREATE OR REPLACE FUNCTION increment_participant_count(room_id UUID)
+RETURNS void AS $$
+  UPDATE rooms SET participant_count = participant_count + 1 WHERE id = room_id;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION decrement_participant_count(room_id UUID)
+RETURNS void AS $$
+  UPDATE rooms SET participant_count = GREATEST(participant_count - 1, 0) WHERE id = room_id;
+$$ LANGUAGE sql;
+
+-- Enable realtime for song_requests table
+ALTER PUBLICATION supabase_realtime ADD TABLE song_requests;
+
+-- Function to clean up orphaned sessions (call via cron or API)
+CREATE OR REPLACE FUNCTION cleanup_orphaned_sessions()
+RETURNS integer AS $$
+DECLARE
+  cleaned integer;
+BEGIN
+  UPDATE space_sessions
+  SET left_at = now(),
+      duration_seconds = EXTRACT(EPOCH FROM (now() - joined_at))::integer
+  WHERE left_at IS NULL
+    AND joined_at < now() - INTERVAL '12 hours';
+  GET DIAGNOSTICS cleaned = ROW_COUNT;
+  RETURN cleaned;
+END;
+$$ LANGUAGE plpgsql;

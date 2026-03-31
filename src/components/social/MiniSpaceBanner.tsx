@@ -59,7 +59,7 @@ export function MiniSpaceBanner() {
 
   return (
     <Link
-      href="/calls"
+      href="/spaces"
       className="flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-[#f5a623]/15 to-[#f5a623]/5 border-b border-[#f5a623]/20 hover:from-[#f5a623]/25 hover:to-[#f5a623]/10 transition-colors group"
     >
       {/* Live pulse indicator */}

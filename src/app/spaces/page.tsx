@@ -59,14 +59,19 @@ export default function PublicSpacesPage() {
   ) => {
     if (!user) throw new Error('Not authenticated');
     const streamCallId = generateCallId();
-    const res = await fetch('/api/stream/rooms', {
+
+    const endpoint = provider === '100ms' ? '/api/100ms/rooms' : '/api/stream/rooms';
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, description, streamCallId, theme, room_type: 'stage', gate_config: gateConfig || null, provider }),
     });
     if (!res.ok) throw new Error('Failed to create room');
     const { room } = await res.json();
-    router.push(`/spaces/${room.id}`);
+
+    // Route to correct page based on provider
+    const path = provider === '100ms' ? `/spaces/hms/${room.id}` : `/spaces/${room.id}`;
+    router.push(path);
   };
 
   const handleJoinStage = (room: Room) => { router.push(`/spaces/${room.id}`); };

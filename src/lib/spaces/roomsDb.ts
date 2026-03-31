@@ -99,17 +99,13 @@ export async function endRoom(id: string): Promise<void> {
 }
 
 export async function incrementParticipants(id: string): Promise<void> {
-  const { data } = await supabaseAdmin.from('rooms').select('participant_count').eq('id', id).single();
-  if (data) {
-    await supabaseAdmin.from('rooms').update({ participant_count: data.participant_count + 1 }).eq('id', id);
-  }
+  const { error } = await supabaseAdmin.rpc('increment_participant_count', { room_id: id });
+  if (error) throw new Error(`Failed to increment participants: ${error.message}`);
 }
 
 export async function decrementParticipants(id: string): Promise<void> {
-  const { data } = await supabaseAdmin.from('rooms').select('participant_count').eq('id', id).single();
-  if (data && data.participant_count > 0) {
-    await supabaseAdmin.from('rooms').update({ participant_count: data.participant_count - 1 }).eq('id', id);
-  }
+  const { error } = await supabaseAdmin.rpc('decrement_participant_count', { room_id: id });
+  if (error) throw new Error(`Failed to decrement participants: ${error.message}`);
 }
 
 export async function getVoiceChannels(): Promise<Room[]> {

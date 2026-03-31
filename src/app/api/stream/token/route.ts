@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     }
 
     const client = new StreamClient(apiKey, apiSecret);
-    const token = client.generateUserToken({ user_id: parsed.data.userId });
+    const token = client.generateUserToken({ user_id: parsed.data.userId, validity_in_seconds: 3600 });
 
     // Audit log token generation
     logAuditEvent({

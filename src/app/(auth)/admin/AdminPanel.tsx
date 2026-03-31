@@ -22,8 +22,9 @@ const AuditLog = dynamic(() => import('@/components/admin/AuditLog'), { ssr: fal
 const QuickStats = dynamic(() => import('@/components/admin/QuickStats'), { ssr: false });
 const OnboardingFunnel = dynamic(() => import('@/components/admin/OnboardingFunnel'), { ssr: false });
 const DormantMembers = dynamic(() => import('@/components/admin/DormantMembers').then(m => ({ default: m.DormantMembers })), { ssr: false });
+const SpacesManager = dynamic(() => import('@/components/admin/SpacesManager').then(m => ({ default: m.SpacesManager })), { ssr: false });
 
-type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls' | 'discord' | 'engagement' | 'audit' | 'funnel' | 'dormant';
+type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls' | 'discord' | 'engagement' | 'audit' | 'funnel' | 'dormant' | 'spaces';
 
 export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<Tab>('users');
@@ -50,6 +51,7 @@ export function AdminPanel() {
     { id: 'audit', label: 'Audit', icon: '📋' },
     { id: 'funnel', label: 'Funnel', icon: '📈' },
     { id: 'dormant', label: 'Dormant', icon: '💤' },
+    { id: 'spaces', label: 'Spaces', icon: '🎙' },
   ];
 
   return (
@@ -113,6 +115,7 @@ export function AdminPanel() {
         {activeTab === 'audit' && <AuditLog />}
         {activeTab === 'funnel' && <OnboardingFunnel />}
         {activeTab === 'dormant' && <DormantMembers />}
+        {activeTab === 'spaces' && <SpacesManager />}
       </div>
 
       {/* Broadcast Modal */}

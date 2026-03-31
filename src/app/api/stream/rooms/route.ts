@@ -24,6 +24,8 @@ const CreateRoomSchema = z.object({
   description: z.string().max(500).optional().default(''),
   streamCallId: z.string().min(1),
   gate_config: GateConfigSchema.optional(),
+  theme: z.string().max(50).optional().default('default'),
+  room_type: z.enum(['voice_channel', 'stage']).optional().default('stage'),
   /** Audio provider: 'stream' (default) or '100ms' */
   provider: z.enum(['stream', '100ms']).optional().default('stream'),
 });
@@ -50,6 +52,8 @@ export async function POST(req: NextRequest) {
       hostPfp: session.pfpUrl,
       streamCallId: parsed.data.streamCallId,
       gateConfig: parsed.data.gate_config || undefined,
+      theme: parsed.data.theme,
+      roomType: parsed.data.room_type,
       provider: parsed.data.provider,
     });
 

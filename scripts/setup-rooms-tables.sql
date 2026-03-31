@@ -87,3 +87,7 @@ ALTER TABLE rooms ADD COLUMN IF NOT EXISTS channel_id TEXT;
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS theme TEXT DEFAULT 'default';
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS layout_preference TEXT DEFAULT 'content-first' CHECK (layout_preference IN ('content-first', 'speakers-first'));
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS provider TEXT DEFAULT 'stream' CHECK (provider IN ('stream', '100ms'));
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS gate_config JSONB;
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS thumbnail_url TEXT;
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS recording_url TEXT;

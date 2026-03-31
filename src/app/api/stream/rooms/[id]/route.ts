@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { getRoomById, endRoom, updateRoom, updateRecording } from '@/lib/spaces/roomsDb';
 import { getSessionData } from '@/lib/auth/session';
 import { getValidTwitchToken, updateTwitchChannel } from '@/lib/twitch/client';
+import { communityConfig } from '../../../../../../community.config';
 import { logger } from '@/lib/logger';
 
 export async function GET(
@@ -47,8 +48,10 @@ export async function PATCH(
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
-    if (room.host_fid !== session.fid) {
-      return NextResponse.json({ error: 'Only the host can modify the room' }, { status: 403 });
+    const isHost = room.host_fid === session.fid;
+    const isAdmin = (communityConfig.adminFids as readonly number[]).includes(session.fid);
+    if (!isHost && !isAdmin) {
+      return NextResponse.json({ error: 'Only the host or an admin can modify the room' }, { status: 403 });
     }
 
     const body = await req.json();

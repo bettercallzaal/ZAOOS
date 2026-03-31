@@ -7,7 +7,8 @@ import { StreamCall, StreamVideo, StreamVideoClient, type Call } from '@stream-i
 import '@stream-io/video-react-sdk/dist/css/styles.css';
 import { useAuth } from '@/hooks/useAuth';
 import { useAccount } from 'wagmi';
-import { createStreamUser, createGuestUser } from '@/lib/spaces/streamHelpers';
+import { createStreamUser } from '@/lib/spaces/streamHelpers';
+import { communityConfig } from '../../../../community.config';
 import { RoomView } from '@/components/spaces/RoomView';
 import { EditRoomModal } from '@/components/spaces/EditRoomModal';
 import { TwitchStreamInfo } from '@/components/spaces/TwitchStreamInfo';
@@ -50,11 +51,21 @@ export default function PublicRoomPage() {
   const [gateBlocked, setGateBlocked] = useState(false);
 
   const isHost = user?.fid === room?.host_fid;
+  const isAdmin = user ? (communityConfig.adminFids as readonly number[]).includes(user.fid) : false;
+  const canEndRoom = isHost || isAdmin;
 
   useEffect(() => {
     if (authLoading) return;
+    if (!user) {
+      // Require authentication to join — guests can't get a Stream token
+      setError('Sign in to join this space');
+      setLoading(false);
+      return;
+    }
 
     let mounted = true;
+    let newClient: StreamVideoClient | null = null;
+    let newCall: Call | null = null;
 
     const init = async () => {
       try {
@@ -79,19 +90,12 @@ export default function PublicRoomPage() {
           return;
         }
 
-        let newClient: StreamVideoClient;
+        const streamUser = createStreamUser(user);
+        const token = await fetchStreamToken(streamUser.id);
+        newClient = new StreamVideoClient({ apiKey, user: streamUser, token });
+        newCall = newClient.call('audio_room', roomData.stream_call_id);
 
-        if (user) {
-          const streamUser = createStreamUser(user);
-          const token = await fetchStreamToken(streamUser.id);
-          newClient = new StreamVideoClient({ apiKey, user: streamUser, token });
-        } else {
-          const guestUser = createGuestUser();
-          newClient = new StreamVideoClient({ apiKey, user: guestUser });
-        }
-        const newCall = newClient.call('audio_room', roomData.stream_call_id);
-
-        const userIsHost = user?.fid === roomData.host_fid;
+        const userIsHost = user.fid === roomData.host_fid;
         if (userIsHost) {
           await newCall.join({
             create: true,
@@ -101,21 +105,19 @@ export default function PublicRoomPage() {
             },
           });
         } else {
-          await newCall.join();
+          await newCall.join({ create: false });
         }
 
         // Fire-and-forget session tracking on join
-        if (roomData) {
-          fetch('/api/spaces/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              roomId: roomData.id,
-              roomName: roomData.title,
-              roomType: roomData.room_type ?? 'stage',
-            }),
-          }).catch(() => {});
-        }
+        fetch('/api/spaces/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            roomId: roomData.id,
+            roomName: roomData.title,
+            roomType: roomData.room_type ?? 'stage',
+          }),
+        }).catch(() => {});
 
         if (mounted) {
           setClient(newClient);
@@ -132,6 +134,9 @@ export default function PublicRoomPage() {
 
     return () => {
       mounted = false;
+      // Clean up Stream resources on unmount to prevent stale connections
+      if (newCall) newCall.leave().catch(() => {});
+      if (newClient) newClient.disconnectUser().catch(() => {});
     };
   }, [roomId, user, authLoading, walletAddress]);
 
@@ -163,11 +168,11 @@ export default function PublicRoomPage() {
     }
     if (call) await call.leave().catch(console.error);
     if (client) await client.disconnectUser().catch(console.error);
-    if (isHost && room) {
+    if (canEndRoom && room) {
       await fetch(`/api/stream/rooms/${room.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state: 'ended' }),
+        body: JSON.stringify({ action: 'end' }),
       }).catch(console.error);
     }
     router.push('/spaces');
@@ -182,15 +187,26 @@ export default function PublicRoomPage() {
   }
 
   if (error) {
+    const isAuthError = error === 'Sign in to join this space';
     return (
       <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col items-center justify-center gap-4">
-        <div className="text-red-400 text-lg">{error}</div>
-        <button
-          onClick={() => router.push('/spaces')}
-          className="px-6 py-2 bg-[#f5a623] text-[#0a1628] rounded-lg font-semibold"
-        >
-          Back to Spaces
-        </button>
+        <div className={`text-lg ${isAuthError ? 'text-gray-300' : 'text-red-400'}`}>{error}</div>
+        <div className="flex gap-3">
+          {isAuthError && (
+            <Link
+              href="/"
+              className="px-6 py-2 bg-[#f5a623] text-[#0a1628] rounded-lg font-semibold"
+            >
+              Sign In
+            </Link>
+          )}
+          <button
+            onClick={() => router.push('/spaces')}
+            className={`px-6 py-2 rounded-lg font-semibold ${isAuthError ? 'bg-gray-800 text-gray-300' : 'bg-[#f5a623] text-[#0a1628]'}`}
+          >
+            Back to Spaces
+          </button>
+        </div>
       </div>
     );
   }
@@ -271,7 +287,7 @@ export default function PublicRoomPage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <h1 className="text-white font-bold text-sm sm:text-base truncate">{room.title}</h1>
-                  {isHost && (
+                  {canEndRoom && (
                     <button
                       onClick={() => setShowEdit(true)}
                       className="p-1 text-gray-500 hover:text-[#f5a623] transition-colors flex-shrink-0 rounded-md hover:bg-gray-800"
@@ -302,7 +318,7 @@ export default function PublicRoomPage() {
                 onClick={handleLeave}
                 className="px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-500/20 transition-colors"
               >
-                {isHost ? 'End' : 'Leave'}
+                {canEndRoom ? 'End' : 'Leave'}
               </button>
             </div>
           </div>

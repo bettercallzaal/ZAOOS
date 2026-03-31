@@ -223,6 +223,7 @@ After installing, edit `~/.claude/skills/council/SKILL.md` to add the 3 ZAO-spec
 | Project | Stars | License | Approach | Members | Cross-Provider |
 |---------|-------|---------|----------|---------|---------------|
 | [council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) | 28 | CC0 | Historical thinkers, polarity pairs | 11 | Yes (optional) |
+| [karpathy/llm-council](https://github.com/karpathy/llm-council) | 6.7k+ | MIT | Anonymous model deliberation, chairman synthesis | 3+ | Yes (any LLM) |
 | [adversarial-review](https://github.com/alecnielsen/adversarial-review) | 4 | MIT | Claude + Codex adversarial debate | 2 | Yes (Claude + Codex) |
 | [claude-octopus](https://deepwiki.com/nyldn/claude-octopus/10.1-ai-debate-system) | ~50 | MIT | Claude + Codex + Gemini debate | 3 | Yes (3 providers) |
 | MCP Deliberation Protocol | N/A | N/A | Specialist agents (MCP market) | 3-5 | No |
@@ -230,6 +231,57 @@ After installing, edit `~/.claude/skills/council/SKILL.md` to add the 3 ZAO-spec
 | `/autoresearch:predict` (our installed) | N/A | MIT | Virtual personas, same context | 3-8 | No |
 
 **Winner for ZAO: Council** — most structured, most diverse perspectives (11 vs 2-3), anti-recursion safeguards, CC0 license, and pre-built triads that map to our decision types. The others are good for code review (adversarial-review) or quick analysis (predict) but not for strategic deliberation.
+
+---
+
+## Karpathy's LLM Council vs Nyk's Council of High Intelligence
+
+**Source:** [@itsolelehmann, March 30, 2026](https://x.com/itsolelehmann/status/2038661433626333649) — applying Karpathy's LLM Council method to Claude advice
+**Repo:** [github.com/karpathy/llm-council](https://github.com/karpathy/llm-council) — 6.7k+ stars, MIT license, "99% vibe coded"
+
+Karpathy's LLM Council predates Nyk's and inspired the whole category. The core idea is the same: poll multiple models, have them judge each other, compile a verdict. But the implementations differ in key ways:
+
+| Dimension | Karpathy LLM Council | Nyk Council of High Intelligence |
+|-----------|--------------------|----------------------------------|
+| **Anonymity** | ✅ LLM identities anonymized — can't play favorites when judging | ❌ Agents know each other's identity |
+| **Judging** | Models rank each other on accuracy + insight | Members cross-examine by name |
+| **Chairman** | Single designated chairman compiles final answer | No chairman — consensus or dissent preserved |
+| **Members** | Generic LLMs (can be any model) | Historical thinkers with declared methods + blind spots |
+| **Rounds** | 3-stage: independent → judge → chairman | 3-stage: independent → cross-examine → synthesize |
+| **Dissent** | Implicit in ranking | Explicit via dissent quota + minority report |
+| **Models** | Any LLM (polling multiple) | Claude Code subagents |
+
+### The Key Insight from Karpathy: Anonymity
+
+Karpathy's version anonymizes the LLMs so they can't play favorites when judging. This is the single biggest difference — Nyk's council agents know who they're arguing with, which can introduce bias (authority preference, personality conflicts).
+
+**Should ZAO adopt anonymity?** Consider adding it to our deliberation protocol:
+- Stage 1: Independent analysis (anonymous)
+- Stage 2: Cross-examination (agents see outputs but not names)
+- Stage 3: Synthesis with dissent preserved (names revealed in final verdict)
+
+This would make our custom ZAO triads more objective, especially for governance decisions where personal relationships might bias judgment.
+
+### Ole Lehmann's Use Case
+
+Ole applies LLM Council to "trusting Claude's advice" — helping non-technical people know when to trust AI outputs. This is directly relevant to ZAO OS:
+
+- New members don't know what to trust in an AI-augmented community
+- An "Advice Council" feature could let members submit questions and get multi-model answers
+- Could power a "Should I trust this proposal?" feature using the same deliberation protocol
+
+### Decision: Install Both
+
+Both councils serve different purposes:
+
+| Use Case | Tool |
+|----------|------|
+| Strategic decisions (ZAO direction, governance design) | Nyk's Council (historical thinkers, rich disagreement) |
+| Getting reliable advice on a question | Karpathy's LLM Council (anonymous, any model, chairman compiles) |
+| Code architecture decisions | Nyk's Council triads |
+| "Should I trust this cast/proposal?" | Karpathy's LLM Council (simpler, faster) |
+
+Both are MIT/CC0 licensed. ZAO should install Karpathy's alongside Nyk's and route questions to the right tool.
 
 ---
 
@@ -262,6 +314,8 @@ After installing, edit `~/.claude/skills/council/SKILL.md` to add the 3 ZAO-spec
 
 - [Nyk — "Agreement is a bug"](https://x.com/nyk_builderz/status/2034492549180625316) — March 19, 2026
 - [0xNyk/council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) — CC0, 28 stars, 9 commits
+- [Ole Lehmann — "How to finally trust Claude's advice (Karpathy LLM Council)"](https://x.com/itsolelehmann/status/2038661433626333649) — March 30, 2026
+- [karpathy/llm-council](https://github.com/karpathy/llm-council) — MIT, 6.7k+ stars, 99% vibe coded
 - [alecnielsen/adversarial-review](https://github.com/alecnielsen/adversarial-review) — MIT, 4 stars
 - [nyldn/claude-octopus — AI Debate System](https://deepwiki.com/nyldn/claude-octopus/10.1-ai-debate-system)
 - [MindStudio — Agent Chat Rooms](https://www.mindstudio.ai/blog/agent-chat-rooms-multi-agent-debate-claude-code)

@@ -170,7 +170,9 @@ export function XMTPProvider({ children }: { children: React.ReactNode }) {
         clearTimeout(actionErrorTimerRef.current);
         actionErrorTimerRef.current = null;
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally reading stable refs in cleanup
       convStreamCleanupRef.current?.();
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally reading stable refs in cleanup
       msgStreamCleanupRef.current?.();
       streamsActiveRef.current = false;
       for (const [, wc] of wallets) {

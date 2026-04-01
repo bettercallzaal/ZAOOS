@@ -95,7 +95,6 @@ export async function GET() {
         pfpUrl: m.pfp_url || null,
       }])
     );
-    const memberFids = new Set(members.map((m) => m.fid).filter(Boolean));
 
     // Build clusters from the member channel data we already collected (no extra API calls!)
     const channelMembersMap = new Map<string, Set<number>>();

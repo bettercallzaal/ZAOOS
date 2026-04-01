@@ -58,7 +58,7 @@ export default function ZAOLeaderboardClient({ entries }: Props) {
             {/* Avatar */}
             <div className="flex-shrink-0">
               {entry.pfp_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img
                   src={entry.pfp_url}
                   alt={entry.name}

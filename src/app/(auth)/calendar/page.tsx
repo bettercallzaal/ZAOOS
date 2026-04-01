@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
-import { communityConfig } from '@/../community.config';
 
 export const metadata: Metadata = {
   title: 'Calendar | ZAO OS',

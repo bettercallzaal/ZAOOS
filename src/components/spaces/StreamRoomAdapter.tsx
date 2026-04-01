@@ -26,6 +26,7 @@ interface StreamRoomAdapterProps {
  * Returning null here means the page continues to render Stream.io itself.
  * When we extract Stream room logic, this adapter will return the extracted component.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- stub: params intentionally unused
 export function StreamRoomAdapter({ room, user, onLeave }: StreamRoomAdapterProps) {
   // Returning null means the parent page continues to render Stream.io inline.
   // This is intentional — the Stream logic stays in the page until extracted.

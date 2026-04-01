@@ -30,6 +30,34 @@ export function FarcasterMusicFeed() {
   const observerRef = useRef<HTMLDivElement>(null);
   const player = usePlayer();
 
+  const resolveMetadata = useCallback(async (feedTracks: FeedTrack[]) => {
+    const unique = feedTracks.filter((t) => !metadata[t.musicUrl]);
+    const results = await Promise.allSettled(
+      unique.slice(0, 10).map(async (t) => {
+        const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(t.musicUrl)}`);
+        if (!res.ok) return null;
+        const meta = await res.json();
+        return { url: t.musicUrl, meta };
+      }),
+    );
+
+    const newMeta: Record<string, ResolvedMeta> = {};
+    for (const r of results) {
+      if (r.status === 'fulfilled' && r.value?.meta) {
+        const { url, meta } = r.value;
+        newMeta[url] = {
+          title: meta.trackName || '',
+          artist: meta.artistName || '',
+          artwork: meta.artworkUrl || '',
+          streamUrl: meta.streamUrl,
+        };
+      }
+    }
+    if (Object.keys(newMeta).length > 0) {
+      setMetadata((prev) => ({ ...prev, ...newMeta }));
+    }
+  }, [metadata]);
+
   const fetchFeed = useCallback(async (ch: ChannelId, cur?: string) => {
     const isMore = !!cur;
     if (isMore) setLoadingMore(true);
@@ -57,35 +85,7 @@ export function FarcasterMusicFeed() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, []);
-
-  const resolveMetadata = async (feedTracks: FeedTrack[]) => {
-    const unique = feedTracks.filter((t) => !metadata[t.musicUrl]);
-    const results = await Promise.allSettled(
-      unique.slice(0, 10).map(async (t) => {
-        const res = await fetch(`/api/music/metadata?url=${encodeURIComponent(t.musicUrl)}`);
-        if (!res.ok) return null;
-        const meta = await res.json();
-        return { url: t.musicUrl, meta };
-      }),
-    );
-
-    const newMeta: Record<string, ResolvedMeta> = {};
-    for (const r of results) {
-      if (r.status === 'fulfilled' && r.value?.meta) {
-        const { url, meta } = r.value;
-        newMeta[url] = {
-          title: meta.trackName || '',
-          artist: meta.artistName || '',
-          artwork: meta.artworkUrl || '',
-          streamUrl: meta.streamUrl,
-        };
-      }
-    }
-    if (Object.keys(newMeta).length > 0) {
-      setMetadata((prev) => ({ ...prev, ...newMeta }));
-    }
-  };
+  }, [resolveMetadata]);
 
   useEffect(() => { fetchFeed(channel); }, [channel, fetchFeed]);
 

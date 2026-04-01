@@ -48,7 +48,7 @@ export function DiscoverPanel({ hasSigner }: { hasSigner: boolean }) {
           setUnfollowedMembers(data.unfollowedMembers || []);
         }
       })
-      .catch((err) => {
+      .catch(() => {
         if (!controller.signal.aborted) setError('Failed to load suggestions');
       })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });

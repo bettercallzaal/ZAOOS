@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface Comment {
   id: string;
@@ -21,11 +21,7 @@ export default function EntryComments({ entryId, onCommentAdded }: EntryComments
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState('');
 
-  useEffect(() => {
-    fetchComments();
-  }, [entryId]);
-
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     try {
       const res = await fetch(`/api/library/comments?entry_id=${entryId}`);
       if (res.ok) {
@@ -37,7 +33,11 @@ export default function EntryComments({ entryId, onCommentAdded }: EntryComments
     } finally {
       setLoading(false);
     }
-  };
+  }, [entryId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();

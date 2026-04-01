@@ -21,6 +21,8 @@ import { TwitchEmbed } from './TwitchEmbed';
 import { RoomReactions } from './RoomReactions';
 import { HandRaiseQueue } from './HandRaiseQueue';
 import { RoomChat } from './RoomChat';
+import { ParticipantsPanel } from './ParticipantsPanel';
+import { ClosedCaptions } from './ClosedCaptions';
 
 const MusicSidebar = dynamic(
   () => import('@/components/music/MusicSidebar').then((m) => ({ default: m.MusicSidebar })),
@@ -55,6 +57,7 @@ export function RoomView({
   const [requestCount, setRequestCount] = useState(0);
   const [showTwitchChat, setShowTwitchChat] = useState(false);
   const [showRoomChat, setShowRoomChat] = useState(false);
+  const [showParticipants, setShowParticipants] = useState(false);
   const [twitchInfo, setTwitchInfo] = useState<{ username: string; canSend: boolean } | null>(null);
   const call = useCall();
   const radio = useRadio();
@@ -180,11 +183,16 @@ export function RoomView({
           {isHost && <PermissionRequests />}
 
           {/* Dual layout: content-first or speakers-first */}
-          {layout === 'content-first' ? (
-            <ContentView isHost={isHost} />
-          ) : (
-            <SpeakersGrid hostFid={hostFid} />
-          )}
+          <div className="relative flex-1 min-h-0">
+            {layout === 'content-first' ? (
+              <ContentView isHost={isHost} />
+            ) : (
+              <SpeakersGrid hostFid={hostFid} />
+            )}
+
+            {/* Closed captions overlay */}
+            <ClosedCaptions />
+          </div>
 
           {/* Host: hand raise queue */}
           {isHost && roomId && userFid && (
@@ -230,6 +238,7 @@ export function RoomView({
               username={username}
               pfpUrl={pfpUrl}
               onRoomChat={() => setShowRoomChat((prev) => !prev)}
+              onParticipants={() => setShowParticipants((prev) => !prev)}
             />
           </div>
           {roomId && <RoomMusicPanel roomId={roomId} isHost={isHost} onOpenMusicBrowser={() => setShowMusicSidebar(true)} />}
@@ -244,6 +253,17 @@ export function RoomView({
               username={username ?? ''}
               pfpUrl={pfpUrl ?? ''}
               onClose={() => setShowRoomChat(false)}
+            />
+          </div>
+        )}
+
+        {/* Desktop participants sidebar */}
+        {showParticipants && (
+          <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
+            <ParticipantsPanel
+              isHost={isHost}
+              hostFid={hostFid}
+              onClose={() => setShowParticipants(false)}
             />
           </div>
         )}
@@ -327,6 +347,17 @@ export function RoomView({
             username={username ?? ''}
             pfpUrl={pfpUrl ?? ''}
             onClose={() => setShowRoomChat(false)}
+          />
+        </div>
+      )}
+
+      {/* Mobile participants overlay */}
+      {showParticipants && (
+        <div className="md:hidden fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
+          <ParticipantsPanel
+            isHost={isHost}
+            hostFid={hostFid}
+            onClose={() => setShowParticipants(false)}
           />
         </div>
       )}

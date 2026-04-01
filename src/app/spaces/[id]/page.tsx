@@ -91,8 +91,12 @@ export default function PublicRoomPage() {
         }
 
         const streamUser = createStreamUser(user);
-        const token = await fetchStreamToken(streamUser.id);
-        newClient = new StreamVideoClient({ apiKey, user: streamUser, token });
+        const tokenProvider = async () => {
+          return fetchStreamToken(streamUser.id);
+        };
+        // Fetch initial token for immediate use
+        const initialToken = await tokenProvider();
+        newClient = new StreamVideoClient({ apiKey, user: streamUser, token: initialToken, tokenProvider });
         newCall = newClient.call('audio_room', roomData.stream_call_id);
 
         const userIsHost = user.fid === roomData.host_fid;

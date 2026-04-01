@@ -27,6 +27,7 @@ export default function PastRooms({ category }: PastRoomsProps) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(7);
+  const [playingRoomId, setPlayingRoomId] = useState<string | null>(null);
 
   const fetchRooms = useCallback(async () => {
     setLoading(true);
@@ -105,23 +106,37 @@ export default function PastRooms({ category }: PastRoomsProps) {
                   </div>
                 </div>
                 {room.recording_url ? (
-                  <a
-                    href={room.recording_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => setPlayingRoomId(playingRoomId === room.id ? null : room.id)}
                     className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/30 hover:bg-[#f5a623]/20 transition-colors"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                      {playingRoomId === room.id ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                      )}
                     </svg>
-                    Watch
-                  </a>
+                    {playingRoomId === room.id ? 'Close' : 'Play Recording'}
+                  </button>
                 ) : (
                   <span className="text-[10px] text-gray-600 px-2 py-1 border border-gray-700 rounded-lg">
                     No recording
                   </span>
                 )}
               </div>
+              {playingRoomId === room.id && room.recording_url && (
+                <div className="mt-3 pt-3 border-t border-gray-800">
+                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                  <audio
+                    controls
+                    src={room.recording_url}
+                    className="w-full h-10 rounded-lg"
+                    autoPlay
+                    style={{ colorScheme: 'dark' }}
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>

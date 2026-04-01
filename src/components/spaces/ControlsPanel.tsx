@@ -8,6 +8,8 @@ import { ScreenShareButton } from './ScreenShareButton';
 import { LayoutToggle } from './LayoutToggle';
 import { TwitchInteractivePanel } from './TwitchInteractivePanel';
 import { HandRaiseQueue } from './HandRaiseQueue';
+import { TranscriptionButton } from './TranscriptionButton';
+import { NoiseCancelButton } from './NoiseCancelButton';
 
 interface ControlsPanelProps {
   isHost: boolean;
@@ -25,6 +27,7 @@ interface ControlsPanelProps {
   username?: string;
   pfpUrl?: string;
   onRoomChat?: () => void;
+  onParticipants?: () => void;
 }
 
 export function ControlsPanel({
@@ -43,6 +46,7 @@ export function ControlsPanel({
   username,
   pfpUrl,
   onRoomChat,
+  onParticipants,
 }: ControlsPanelProps) {
   const [showTwitchPanel, setShowTwitchPanel] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -52,7 +56,8 @@ export function ControlsPanel({
     (twitchUsername && onTwitchChat) ||
     (isHost && twitchUsername) ||
     (!isHost && roomType === 'stage') ||
-    onRoomChat;
+    onRoomChat ||
+    onParticipants;
 
   return (
     <div className="space-y-0">
@@ -61,6 +66,7 @@ export function ControlsPanel({
           {/* Group 1: Audio controls */}
           <div className="flex items-center gap-2">
             <MicButton />
+            <NoiseCancelButton />
             <CameraButton />
           </div>
 
@@ -97,6 +103,9 @@ export function ControlsPanel({
                 </button>
               )
             )}
+
+            {/* Transcription / Closed Captions toggle (host only) */}
+            <TranscriptionButton isHost={isHost} />
           </div>
 
           {/* Divider before extras */}
@@ -142,6 +151,19 @@ export function ControlsPanel({
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                </svg>
+              </button>
+            )}
+
+            {/* Participants */}
+            {onParticipants && (
+              <button
+                onClick={onParticipants}
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border border-gray-700/50 hover:border-[#f5a623]/40"
+                title="Participants"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
                 </svg>
               </button>
             )}
@@ -217,6 +239,17 @@ export function ControlsPanel({
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                       </svg>
                       Room Chat
+                    </button>
+                  )}
+                  {onParticipants && (
+                    <button
+                      onClick={() => { onParticipants(); setShowMore(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-800 hover:text-[#f5a623] transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                      </svg>
+                      Participants
                     </button>
                   )}
                   {twitchUsername && onTwitchChat && (

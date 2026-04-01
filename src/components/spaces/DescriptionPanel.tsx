@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useCallStateHooks } from '@stream-io/video-react-sdk';
+import { ConnectionQuality } from './ConnectionQuality';
 
 export function DescriptionPanel() {
   const { useCallCustomData, useParticipantCount } = useCallStateHooks();
@@ -32,6 +33,7 @@ export function DescriptionPanel() {
             </span>
             <span className="text-gray-400 text-xs">{participantCount}</span>
           </div>
+          <ConnectionQuality />
           <button
             onClick={handleShare}
             className="text-gray-400 hover:text-white text-xs px-3 py-1 border border-gray-700 rounded-lg transition-colors"

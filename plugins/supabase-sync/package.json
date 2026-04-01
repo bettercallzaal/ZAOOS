@@ -1,0 +1,26 @@
+{
+  "name": "@zao/plugin-supabase-sync",
+  "version": "0.1.0",
+  "description": "Bidirectional event-driven sync between Paperclip agents and ZAO OS Supabase database",
+  "license": "MIT",
+  "paperclipPlugin": {
+    "manifest": "./dist/manifest.js",
+    "worker": "./dist/worker.js"
+  },
+  "main": "dist/worker.js",
+  "scripts": {
+    "build": "tsc && node scripts/build-manifest.js",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0",
+    "@paperclipai/plugin-sdk": "^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -65,6 +65,7 @@ const RATE_LIMITS: [string, RateLimitConfig][] = [
   ['/api/publish',       { limit: 5,  windowMs: MINUTE }],
   ['/api/platforms',     { limit: 10, windowMs: MINUTE }],
   ['/api/neynar',        { limit: 15, windowMs: MINUTE }],
+  ['/api/stream/webhook', { limit: 100, windowMs: MINUTE }],
   ['/api/stream',        { limit: 20, windowMs: MINUTE }],
   ['/api/100ms',         { limit: 20, windowMs: MINUTE }],
   ['/api/songjam',       { limit: 20, windowMs: MINUTE }],

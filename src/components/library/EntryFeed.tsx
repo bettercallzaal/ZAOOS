@@ -84,7 +84,7 @@ export default function EntryFeed({ refreshKey, isAdmin }: EntryFeedProps) {
   useEffect(() => {
     setLoading(true);
     fetchEntries(true);
-  }, [debouncedSearch, activeTag, sort, refreshKey]);
+  }, [fetchEntries, refreshKey]);
 
   const handleVote = async (entryId: string, voteType: 'up' | 'down') => {
     try {

@@ -127,7 +127,7 @@ export default function PastRooms({ category }: PastRoomsProps) {
               </div>
               {playingRoomId === room.id && room.recording_url && (
                 <div className="mt-3 pt-3 border-t border-gray-800">
-                  {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+                  { }
                   <audio
                     controls
                     src={room.recording_url}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { isMusicUrl } from '@/lib/music/isMusicUrl'
 import { ArtworkImage } from '@/components/music/ArtworkImage'
@@ -82,12 +82,11 @@ export default function MusicOmnibar({ variant = 'full', onPlay, onQueue }: Musi
   })
 
   const isLoading = searchLoading || urlLoading
-  const results =
-    inputType === 'url' && urlResult
-      ? [urlResult]
-      : inputType === 'search'
-        ? (searchResults ?? [])
-        : (browseResults ?? [])
+  const results = useMemo(() => {
+    if (inputType === 'url' && urlResult) return [urlResult];
+    if (inputType === 'search') return searchResults ?? [];
+    return browseResults ?? [];
+  }, [inputType, urlResult, searchResults, browseResults]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {

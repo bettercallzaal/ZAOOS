@@ -102,7 +102,7 @@ export default async function ZAOLeaderboardPage() {
             <div className="flex flex-col items-center gap-1">
               <div className="w-14 h-14 rounded-full bg-[#1a2a3a] border-2 border-gray-600 overflow-hidden flex items-center justify-center text-lg text-gray-400">
                 {entries[1].pfp_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
+                   
                   <img src={entries[1].pfp_url} alt={entries[1].name} className="w-full h-full object-cover" />
                 ) : (
                   (entries[1].name[0] || '?').toUpperCase()
@@ -119,7 +119,7 @@ export default async function ZAOLeaderboardPage() {
             <div className="flex flex-col items-center gap-1">
               <div className="w-20 h-20 rounded-full bg-[#1a2a3a] border-2 border-[#f5a623] overflow-hidden flex items-center justify-center text-2xl text-[#f5a623]">
                 {entries[0].pfp_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
+                   
                   <img src={entries[0].pfp_url} alt={entries[0].name} className="w-full h-full object-cover" />
                 ) : (
                   (entries[0].name[0] || '?').toUpperCase()
@@ -136,7 +136,7 @@ export default async function ZAOLeaderboardPage() {
             <div className="flex flex-col items-center gap-1">
               <div className="w-14 h-14 rounded-full bg-[#1a2a3a] border-2 border-amber-700 overflow-hidden flex items-center justify-center text-lg text-amber-700">
                 {entries[2].pfp_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
+                   
                   <img src={entries[2].pfp_url} alt={entries[2].name} className="w-full h-full object-cover" />
                 ) : (
                   (entries[2].name[0] || '?').toUpperCase()

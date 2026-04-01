@@ -255,7 +255,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   // React to new audio/soundxyz tracks
   useEffect(() => {

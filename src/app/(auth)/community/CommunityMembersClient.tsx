@@ -64,7 +64,7 @@ export default function CommunityMembersClient({ members }: Props) {
             {/* Avatar */}
             <div className="flex-shrink-0">
               {member.pfpUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
+                 
                 <img
                   src={member.pfpUrl}
                   alt={displayName}

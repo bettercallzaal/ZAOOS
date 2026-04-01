@@ -42,7 +42,7 @@ export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
     fetch(`/api/social/taste-match?targetFid=${targetFid}`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (!controller.signal.aborted) setData(d); })
-      .catch((err) => {
+      .catch(() => {
         if (controller.signal.aborted) return;
         setError('Couldn\'t calculate taste match');
       })

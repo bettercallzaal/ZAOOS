@@ -223,6 +223,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         }).catch(() => {});
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally watching specific state slices
   }, [state.position, state.duration, state.metadata, state.status]);
 
   // Media Session API — lock screen controls + background audio keepalive
@@ -374,6 +375,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally watching specific state slices
   }, [state.status, state.metadata?.type, state.position, state.volume, dispatch]);
 
   // Wake Lock — keep screen on during playback

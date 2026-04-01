@@ -97,7 +97,7 @@ export default function ZAOStockPage() {
         <section className="px-6 py-16 flex flex-col items-center text-center max-w-2xl mx-auto">
           <div className="mb-6 rounded-2xl overflow-hidden shadow-2xl shadow-[#f5a623]/10 border border-white/[0.06]">
             <Image
-              src="/images/zao-stock-logo.jpeg"
+              src="/images/festivals/zao-stock-logo.jpeg"
               alt="ZAO Stock"
               width={300}
               height={300}

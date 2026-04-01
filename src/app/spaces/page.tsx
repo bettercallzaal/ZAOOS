@@ -9,7 +9,7 @@ import { PageHeader } from '@/components/navigation/PageHeader';
 import StageCard from '@/components/spaces/StageCard';
 import { HostRoomModal, type RoomTheme } from '@/components/spaces/HostRoomModal';
 import type { GateConfig } from '@/components/spaces/TokenGateSection';
-import { generateCallId } from '@/lib/spaces/streamHelpers';
+import { generateCallId, generateSlug } from '@/lib/spaces/streamHelpers';
 import SpacesTabs from '@/components/spaces/SpacesTabs';
 import CategoryFilter from '@/components/spaces/CategoryFilter';
 import ScheduledRooms from '@/components/spaces/ScheduledRooms';
@@ -59,22 +59,24 @@ export default function PublicSpacesPage() {
   ) => {
     if (!user) throw new Error('Not authenticated');
     const streamCallId = generateCallId();
+    const slug = generateSlug(title);
 
     const endpoint = provider === '100ms' ? '/api/100ms/rooms' : '/api/stream/rooms';
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, streamCallId, theme, room_type: 'stage', gate_config: gateConfig || null, provider }),
+      body: JSON.stringify({ title, description, streamCallId, theme, room_type: 'stage', gate_config: gateConfig || null, provider, slug }),
     });
     if (!res.ok) throw new Error('Failed to create room');
     const { room } = await res.json();
 
-    // Route to correct page based on provider
-    const path = provider === '100ms' ? `/spaces/hms/${room.id}` : `/spaces/${room.id}`;
+    // Use slug for clean URLs, fall back to ID
+    const roomPath = room.slug || room.id;
+    const path = provider === '100ms' ? `/spaces/hms/${roomPath}` : `/spaces/${roomPath}`;
     router.push(path);
   };
 
-  const handleJoinStage = (room: Room) => { router.push(`/spaces/${room.id}`); };
+  const handleJoinStage = (room: Room) => { router.push(`/spaces/${room.slug || room.id}`); };
 
   const filteredStages = useMemo(() => {
     if (category === 'all') return stages;

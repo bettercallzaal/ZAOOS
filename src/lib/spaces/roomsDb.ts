@@ -4,6 +4,7 @@ export type AudioProvider = 'stream' | '100ms';
 
 export interface Room {
   id: string;
+  slug: string | null;
   title: string;
   description: string | null;
   host_fid: number;
@@ -41,11 +42,13 @@ export async function createRoom(data: {
   layoutPreference?: 'content-first' | 'speakers-first';
   gateConfig?: { type: string; contractAddress: string; chainId: number; minBalance?: string; tokenId?: string };
   provider?: AudioProvider;
+  slug?: string;
 }): Promise<Room> {
   const { data: room, error } = await supabaseAdmin
     .from('rooms')
     .insert({
       title: data.title,
+      slug: data.slug || null,
       description: data.description || null,
       host_fid: data.hostFid,
       host_name: data.hostName,
@@ -68,10 +71,12 @@ export async function createRoom(data: {
 }
 
 export async function getRoomById(id: string): Promise<Room | null> {
+  // Try UUID first, then slug
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   const { data, error } = await supabaseAdmin
     .from('rooms')
     .select('*')
-    .eq('id', id)
+    .eq(isUuid ? 'id' : 'slug', id)
     .single();
 
   if (error) return null;

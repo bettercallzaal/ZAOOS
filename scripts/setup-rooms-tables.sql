@@ -91,6 +91,8 @@ ALTER TABLE rooms ADD COLUMN IF NOT EXISTS provider TEXT DEFAULT 'stream' CHECK 
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS gate_config JSONB;
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS thumbnail_url TEXT;
 ALTER TABLE rooms ADD COLUMN IF NOT EXISTS recording_url TEXT;
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS slug TEXT UNIQUE;
+CREATE INDEX IF NOT EXISTS idx_rooms_slug ON rooms (slug) WHERE slug IS NOT NULL;
 
 -- Atomic participant count functions (avoid read-then-write race conditions)
 CREATE OR REPLACE FUNCTION increment_participant_count(room_id UUID)

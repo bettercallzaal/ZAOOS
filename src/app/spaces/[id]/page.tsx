@@ -100,10 +100,12 @@ export default function PublicRoomPage() {
           await newCall.join({
             create: true,
             data: {
-              members: [],
+              members: [{ user_id: streamUser.id, role: 'host' }],
               custom: { title: roomData.title, description: roomData.description || '' },
             },
           });
+          // Enable mic for host — audio_room type starts muted by default
+          await newCall.microphone.enable().catch(() => {});
         } else {
           await newCall.join({ create: false });
         }

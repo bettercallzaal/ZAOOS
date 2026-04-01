@@ -28,6 +28,7 @@ const CreateRoomSchema = z.object({
   room_type: z.enum(['voice_channel', 'stage']).optional().default('stage'),
   /** Audio provider: 'stream' (default) or '100ms' */
   provider: z.enum(['stream', '100ms']).optional().default('stream'),
+  slug: z.string().max(80).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest) {
       theme: parsed.data.theme,
       roomType: parsed.data.room_type,
       provider: parsed.data.provider,
+      slug: parsed.data.slug,
     });
 
     // Fire-and-forget: set Twitch channel title + category

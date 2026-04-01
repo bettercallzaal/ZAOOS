@@ -107,7 +107,10 @@ export default function PublicRoomPage() {
           // Enable mic for host — audio_room type starts muted by default
           await newCall.microphone.enable().catch(() => {});
         } else {
-          await newCall.join({ create: false });
+          await newCall.join({
+            create: false,
+            data: { members: [{ user_id: streamUser.id, role: 'speaker' }] },
+          });
         }
 
         // Fire-and-forget session tracking on join

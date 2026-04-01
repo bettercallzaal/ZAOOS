@@ -69,6 +69,7 @@ supabase/                 # Database config
 - **Cross-platform publishing:** Approved proposals (1000+ Respect) auto-publish to Farcaster + Bluesky + X. Content normalization per platform. Lens + Hive scaffolded but deferred.
 - **AI moderation:** Perspective API for content safety scoring (`src/lib/moderation/moderate.ts`).
 - **Music Player:** Multi-platform (9 providers), crossfade engine (dual audio elements), binaural beats (Web Audio API oscillators), MediaSession API (all 8 actions), Wake Lock, respect-weighted curation.
+- **Spaces (Live Audio/Video):** Stream.io Video SDK (`audio_room` call type) with backstage mode, RTMP multistream broadcast (Twitch/YouTube/Kick/Facebook), screen share, recording, transcription/closed captions, noise cancellation, hand raise queue, song requests, room chat, emoji reactions. Slug-based URLs. Admin can end/delete any room. Webhook for auto participant counts + recording URLs. Token auto-refresh (1-hour expiry). Alternative 100ms provider for fractal meetings.
 - **Governance:** Three-tier system: (1) ZOUNZ Nouns Builder on-chain proposals (NFT voting on Base), (2) Snapshot gasless weekly priority polls via `@snapshot-labs/snapshot.js`, (3) Community proposals (Supabase, Respect-weighted, auto-publishes to Farcaster/Bluesky/X after 7-day voting + 1000R threshold).
 - **Community config:** All branding, channels, admin FIDs, contracts in `community.config.ts`. Change this file to fork for a different community.
 
@@ -89,11 +90,17 @@ supabase/                 # Database config
 - `src/lib/snapshot/client.ts` — Snapshot GraphQL client for reading polls
 - `src/components/governance/CreateWeeklyPoll.tsx` — One-click Snapshot poll creator
 - `src/components/zounz/ZounzProposals.tsx` — On-chain proposals from ZOUNZ Governor
+- `src/app/api/stream/` — Stream.io token generation, room CRUD, webhook handler
+- `src/app/api/admin/spaces/` — Admin list/delete rooms endpoints
+- `src/components/spaces/` — 40+ components: RoomView, controls, participants, chat, reactions, broadcast
+- `src/lib/spaces/roomsDb.ts` — Room database CRUD with slug support
+- `src/lib/spaces/rtmpManager.ts` — RTMP multistream broadcast engine
+- `scripts/configure-stream-grants.ts` — Stream.io call type permission setup
 - `scripts/` — DB setup SQL, wallet generation, webhook registration, data import
 
 ## Research Library
 
-155+ research documents in `research/`. Start with:
+240+ research documents in `research/`. Start with:
 - `research/README.md` — full index organized by topic
 - `research/050-the-zao-complete-guide/` — canonical project reference
 - `research/051-zao-whitepaper-2026/` — whitepaper Draft 4.5
@@ -103,7 +110,7 @@ Use the `/zao-research` skill for conducting new research.
 
 ## Skills & Commands
 
-9 project skills in `.claude/skills/`, 8 autoresearch subcommands, 1 command (minimax), plus ~30 gstack/superpowers skills. See [Doc 154](research/154-skills-commands-master-reference/) for the complete reference.
+11 project skills in `.claude/skills/`, 8 autoresearch subcommands, 1 command (minimax), plus ~30 gstack/superpowers skills. See [Doc 154](research/154-skills-commands-master-reference/) for the complete reference.
 
 **Most-used commands:**
 
@@ -122,6 +129,9 @@ Use the `/zao-research` skill for conducting new research.
 | `/investigate` | Root cause debugging |
 | `/autoresearch goal` | Autonomous iteration toward a measurable goal |
 | `/autoresearch:security` | STRIDE + OWASP security audit |
+| `/vps` | Generate prompts for VPS Claude Code to manage ZOE |
+| `/vps status` | Health check prompt for ZOE on VPS |
+| `/z` | Quick status dashboard — branch, commits, needs attention |
 
 **How to ask for new features:** Describe the outcome you want for users, not the implementation. Let the skill system figure out the workflow. See Doc 154, Part 13.
 

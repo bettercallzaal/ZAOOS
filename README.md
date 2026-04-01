@@ -50,6 +50,7 @@ See **[FORK.md](./FORK.md)** for the complete setup guide including database scr
 **Key services:**
 - **Supabase** — database (required)
 - **Neynar** — Farcaster API (required)
+- **Stream.io** — live audio/video rooms, Spaces (required for `/spaces`)
 - **Alchemy** — ENS resolution, NFT discovery, respect sync webhooks (free tier)
 - Everything else is optional — see `.env.example` for the full list
 
@@ -80,7 +81,7 @@ See **[FORK.md](./FORK.md)** for the complete setup guide including database scr
   - `src/middleware.ts`
 - [x] **Zod validation** — every API route validates input with Zod safeParse
   - `src/lib/validation/schemas.ts`
-- [x] **Admin panel** — 7-tab admin dashboard (users, ZIDs, allowlist, respect, moderation, import, polls)
+- [x] **Admin panel** — 13-tab admin dashboard (users, ZIDs, allowlist, respect, moderation, import, polls, discord, engagement, audit, funnel, dormant, spaces)
   - `src/app/(auth)/admin/`
   - `src/components/admin/` (UsersTable, ZidManager, AllowlistTable, RespectOverview, HiddenMessages, CsvUpload, SyncRespectButton, ImportRespectButton, PollConfigEditor)
 - [x] **Member CRM** — unified directory + data health dashboard at `/admin/members`
@@ -448,7 +449,13 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 - [x] **Listening rooms** — synchronized shared music playback via Supabase Realtime
   - `src/components/calls/ListeningRoom.tsx`
   - `src/hooks/useListeningRoom.ts`
-- [ ] **Live audio rooms** — LiveKit-based live streaming (researched, not in sprint)
+- [x] **Live audio/video rooms (Spaces)** — Stream.io Video SDK with backstage, RTMP multistream (Twitch/YouTube/Kick/Facebook), screen share, recording, transcription/CC, noise cancellation, hand raise, room chat, emoji reactions, slug URLs, admin controls, webhook-driven participant counts
+  - `src/app/spaces/` — room pages with slug routing
+  - `src/components/spaces/` — 40+ components (RoomView, ControlsPanel, BroadcastModal, ParticipantsPanel, ClosedCaptions, ConnectionQuality, etc.)
+  - `src/app/api/stream/` — token, rooms CRUD, webhook handler
+  - `src/app/api/admin/spaces/` — admin list/delete endpoints
+  - `src/lib/spaces/roomsDb.ts` · `src/lib/spaces/rtmpManager.ts`
+  - `scripts/configure-stream-grants.ts` — call type permission setup
 
 #### Other Tools
 

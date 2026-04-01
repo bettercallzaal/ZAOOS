@@ -18,7 +18,7 @@ export async function GET() {
 
     const { data, error } = await supabaseAdmin
       .from('rooms')
-      .select('id, title, host_name, host_username, state, participant_count, provider, theme, created_at, ended_at')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(100);
 

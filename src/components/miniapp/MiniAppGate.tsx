@@ -28,11 +28,20 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
           return;
         }
 
-        // We're in a mini app — call ready() IMMEDIATELY to dismiss splash
+        // Dismiss native splash IMMEDIATELY — docs say to call this as soon as possible
         await sdk.actions.ready();
-        setState('authing');
+        if (cancelled) return;
 
-        // Now authenticate via QuickAuth in the background
+        const path = window.location.pathname;
+
+        // /miniapp has its own full-screen UI — don't gate it
+        if (path === '/miniapp') {
+          setState('web'); // render as normal page
+          return;
+        }
+
+        // Background auth check
+        setState('authing');
         try {
           const response = await sdk.quickAuth.fetch('/api/miniapp/auth');
           if (cancelled) return;
@@ -41,8 +50,7 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
             const data = await response.json();
             if (data.hasAccess) {
               setState('allowed');
-              // Navigate to chat if we're on the landing page
-              if (window.location.pathname === '/') {
+              if (path === '/' || path === '/home') {
                 router.replace('/home');
               }
             } else {
@@ -50,7 +58,6 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
               setState('denied');
             }
           } else {
-            // Auth failed — show as web fallback
             setState('web');
           }
         } catch (err) {
@@ -58,7 +65,6 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
           if (!cancelled) setState('web');
         }
       } catch {
-        // SDK not available — normal web context
         setState('web');
       }
     }
@@ -67,12 +73,14 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
     return () => { cancelled = true; };
   }, [router]);
 
-  // Checking or web — render children (normal flow)
-  if (state === 'checking' || state === 'web' || state === 'allowed') {
+  if (state === 'checking' || state === 'web') {
     return <>{children}</>;
   }
 
-  // Authenticating in mini app — show loading
+  if (state === 'allowed') {
+    return <>{children}</>;
+  }
+
   if (state === 'authing') {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a1628]">
@@ -84,7 +92,6 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
     );
   }
 
-  // Denied
   return <NoAccessScreen username={username} />;
 }
 

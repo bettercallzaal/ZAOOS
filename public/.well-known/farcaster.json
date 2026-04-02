@@ -8,7 +8,7 @@
     "version": "1",
     "name": "ZAO OS",
     "iconUrl": "https://zaoos.com/icon-1024.png",
-    "homeUrl": "https://zaoos.com",
+    "homeUrl": "https://zaoos.com/miniapp",
     "splashImageUrl": "https://zaoos.com/splash.png",
     "splashBackgroundColor": "#0a1628",
     "webhookUrl": "https://zaoos.com/api/miniapp/webhook",

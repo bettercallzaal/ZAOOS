@@ -5,18 +5,20 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'ZAO Stock — October 3, 2026 | Ellsworth, Maine',
   description:
-    'ZAO Stock is the flagship outdoor music festival presented by The ZAO. 10 artists, free entry, livestreamed live from the Franklin Street Parklet in downtown Ellsworth, Maine.',
+    'ZAO Stock is the flagship outdoor music festival presented by The ZAO. 10 artists performing live at the Franklin Street Parklet in downtown Ellsworth, Maine. October 3, 2026.',
   openGraph: {
     title: 'ZAO Stock — October 3, 2026 | Ellsworth, Maine',
     description:
-      'ZAO Stock is the flagship outdoor music festival presented by The ZAO. 10 artists, free entry, livestreamed live from the Franklin Street Parklet in downtown Ellsworth, Maine.',
+      'The ZAO\'s flagship outdoor music festival. 10 artists. Franklin Street Parklet, Downtown Ellsworth, Maine. Art first. Tech invisible.',
     url: 'https://zaoos.com/stock',
+    images: [{ url: '/images/festivals/zao-stock-logo.jpeg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'ZAO Stock — October 3, 2026 | Ellsworth, Maine',
     description:
-      'ZAO Stock is the flagship outdoor music festival presented by The ZAO. 10 artists, free entry, livestreamed live.',
+      'The ZAO\'s flagship outdoor music festival. 10 artists. Art first. Tech invisible.',
+    images: ['/images/festivals/zao-stock-logo.jpeg'],
   },
 };
 
@@ -124,6 +126,26 @@ export default function ZAOStockPage() {
           </div>
         </section>
 
+        {/* What is The ZAO? */}
+        <section className="px-6 py-12 max-w-2xl mx-auto">
+          <h2 className="text-lg font-semibold text-white mb-4">What is The ZAO?</h2>
+          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-6">
+            <p className="text-sm text-gray-300 leading-relaxed mb-3">
+              The ZAO is an impact network focused on bringing the profit margin, data, and IP rights back
+              to independent artists using emerging technology. We build tools, host events, and run a
+              community where artists govern, collaborate, and grow together.
+            </p>
+            <a
+              href="https://thezao.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#f5a623] text-sm font-medium hover:underline"
+            >
+              Learn more at thezao.com &rarr;
+            </a>
+          </div>
+        </section>
+
         {/* About */}
         <section className="px-6 py-12 max-w-2xl mx-auto">
           <h2 className="text-lg font-semibold text-white mb-4">About ZAO Stock</h2>
@@ -138,7 +160,7 @@ export default function ZAOStockPage() {
               ZAO Stock is embedded in the 9th Annual Art of Ellsworth: Maine Craft Weekend — a celebrated
               regional arts event that draws visitors from across the state and beyond. By anchoring ZAO Stock
               within this established cultural moment, we bring live music into the heart of a weekend already
-              dedicated to craft, community, and creativity. Free to attend. Open to all.
+              dedicated to craft, community, and creativity.
             </p>
           </div>
         </section>
@@ -353,6 +375,53 @@ export default function ZAOStockPage() {
           </a>
         </section>
 
+        {/* After-Party */}
+        <section className="px-6 py-12 max-w-2xl mx-auto">
+          <h2 className="text-lg font-semibold text-white mb-4">After-Party</h2>
+          <div className="bg-gradient-to-r from-purple-500/5 to-transparent border border-purple-500/20 rounded-xl p-6">
+            <h3 className="text-white font-semibold text-base mb-1">Black Moon Public House</h3>
+            <p className="text-gray-400 text-xs mb-3">142 Main St, Ellsworth &bull; 30 seconds from the Parklet</p>
+            <p className="text-sm text-gray-300 leading-relaxed mb-4">
+              When the sun sets, walk 30 seconds to Black Moon Public House — a cocktail bar with live music
+              4 nights a week, a restored 1890s bar, and Vinyl Vogue record shop in the same building.
+              Craft cocktails, small plates, and music all evening.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {['Live music', 'Craft cocktails', 'Record shop', 'Historic venue'].map((tag) => (
+                <span key={tag} className="px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs text-purple-300">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Past Events */}
+        <section className="px-6 py-12 max-w-2xl mx-auto">
+          <h2 className="text-lg font-semibold text-white mb-4">Past ZAO Events</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
+              <h3 className="text-white font-semibold text-sm mb-1">ZAO-PALOOZA</h3>
+              <p className="text-[#f5a623] text-xs font-medium mb-2">NYC &bull; NFT NYC 2024</p>
+              <p className="text-gray-400 text-xs leading-relaxed">
+                12 artists (6 new to Web3) performed live. ZAO Cards on Manifold. The community met IRL for the first time.
+              </p>
+            </div>
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
+              <h3 className="text-white font-semibold text-sm mb-1">ZAO-CHELLA</h3>
+              <p className="text-[#f5a623] text-xs font-medium mb-2">Miami &bull; Art Basel 2024</p>
+              <p className="text-gray-400 text-xs leading-relaxed">
+                10 artists with AR art installations, collectible trading cards, and a WaveWarZ LIVE battle in Wynwood.
+              </p>
+            </div>
+          </div>
+          <p className="text-center mt-4">
+            <Link href="/festivals" className="text-[#f5a623] text-sm font-medium hover:underline">
+              See all ZAO festivals &rarr;
+            </Link>
+          </p>
+        </section>
+
         {/* Support ZAO Stock */}
         <section className="px-6 py-12 max-w-2xl mx-auto">
           <h2 className="text-lg font-semibold text-white mb-2">Support ZAO Stock</h2>
@@ -381,6 +450,52 @@ export default function ZAOStockPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
               </svg>
               Donate on GoFundMe
+            </a>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="px-6 py-12 max-w-2xl mx-auto">
+          <h2 className="text-lg font-semibold text-white mb-4">FAQ</h2>
+          <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl divide-y divide-white/[0.04]">
+            <div className="px-6 py-4">
+              <p className="text-white text-sm font-medium mb-1">How do I get involved?</p>
+              <p className="text-gray-400 text-xs">
+                Email{' '}
+                <a href="mailto:zaal@thezao.com" className="text-[#f5a623] hover:underline">
+                  zaal@thezao.com
+                </a>
+                {' '}&mdash; whether you want to perform, sponsor, volunteer, or just say hello.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Follow */}
+        <section className="px-6 py-12 max-w-2xl mx-auto text-center">
+          <h2 className="text-lg font-semibold text-white mb-4">Follow ZAO Festivals</h2>
+          <div className="flex items-center justify-center gap-4">
+            <a
+              href="https://x.com/zaofestivals"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-sm text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              @zaofestivals
+            </a>
+            <a
+              href="https://instagram.com/zaofestivals"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-sm text-gray-300 hover:text-white hover:bg-white/[0.04] transition-colors"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+              </svg>
+              @zaofestivals
             </a>
           </div>
         </section>

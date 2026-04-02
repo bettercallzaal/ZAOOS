@@ -78,7 +78,7 @@ const EVENTS: FestivalEvent[] = [
       "10 artists",
       "Maine Craft Weekend",
       "Livestreamed",
-      "Free entry",
+      "Free music",
     ],
     internalLink: "/stock",
   },

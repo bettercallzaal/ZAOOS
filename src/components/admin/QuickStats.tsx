@@ -16,6 +16,7 @@ interface Stats {
 
 export default function QuickStats() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {
     fetch('/api/admin/quick-stats')
@@ -63,25 +64,44 @@ export default function QuickStats() {
   ];
 
   return (
-    <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-4">
-      {cards.map((card) => (
-        <div
-          key={card.label}
-          className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800/50"
+    <div className="mb-4">
+      <button
+        onClick={() => setExpanded((prev) => !prev)}
+        className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors mb-2"
+      >
+        <svg
+          className={`w-3 h-3 transition-transform ${expanded ? 'rotate-90' : ''}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
         >
-          <div
-            className={`text-lg font-bold ${
-              card.alert ? 'text-red-400' : 'text-white'
-            }`}
-          >
-            {card.value}
-          </div>
-          <div className="text-[10px] text-gray-400">{card.label}</div>
-          {card.sub && (
-            <div className="text-[10px] text-gray-500">{card.sub}</div>
-          )}
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+        Quick Stats
+      </button>
+      {expanded && (
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+          {cards.map((card) => (
+            <div
+              key={card.label}
+              className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800/50"
+            >
+              <div
+                className={`text-lg font-bold ${
+                  card.alert ? 'text-red-400' : 'text-white'
+                }`}
+              >
+                {card.value}
+              </div>
+              <div className="text-[10px] text-gray-400">{card.label}</div>
+              {card.sub && (
+                <div className="text-[10px] text-gray-500">{card.sub}</div>
+              )}
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }

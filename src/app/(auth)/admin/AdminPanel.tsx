@@ -4,9 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { PageHeader } from '@/components/navigation/PageHeader';
-import { SyncRespectButton } from '@/components/admin/SyncRespectButton';
-import { ImportRespectButton } from '@/components/admin/ImportRespectButton';
-
+import { BroadcastModal } from '@/components/admin/BroadcastModal';
 const ExportButton = dynamic(() => import('@/components/admin/ExportButton'), { ssr: false });
 
 const AllowlistTable = dynamic(() => import('@/components/admin/AllowlistTable').then(m => ({ default: m.AllowlistTable })), { ssr: false });
@@ -30,28 +28,41 @@ export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<Tab>('users');
   const tableRef = useRef<{ refetch?: () => void }>(null);
   const [broadcastOpen, setBroadcastOpen] = useState(false);
-  const [broadcastText, setBroadcastText] = useState('');
-  const [broadcasting, setBroadcasting] = useState(false);
 
   const handleUploaded = useCallback(() => {
     setActiveTab('members');
     window.location.reload();
   }, []);
 
-  const tabs: { id: Tab; label: string; icon: string }[] = [
-    { id: 'users', label: 'Users', icon: '👤' },
-    { id: 'zid', label: 'ZIDs', icon: '🏷' },
-    { id: 'members', label: 'Allowlist', icon: '👥' },
-    { id: 'import', label: 'Import', icon: '📄' },
-    { id: 'moderation', label: 'Moderation', icon: '🛡' },
-    { id: 'respect', label: 'Respect', icon: '🏅' },
-    { id: 'polls', label: 'Polls', icon: '🗳' },
-    { id: 'discord', label: 'Discord', icon: '💬' },
-    { id: 'engagement', label: 'Engagement', icon: '📊' },
-    { id: 'audit', label: 'Audit', icon: '📋' },
-    { id: 'funnel', label: 'Funnel', icon: '📈' },
-    { id: 'dormant', label: 'Dormant', icon: '💤' },
-    { id: 'spaces', label: 'Spaces', icon: '🎙' },
+  const tabGroups: { label: string; tabs: { id: Tab; label: string; icon: string }[] }[] = [
+    {
+      label: 'People',
+      tabs: [
+        { id: 'users', label: 'Users', icon: '👤' },
+        { id: 'zid', label: 'ZIDs', icon: '🏷' },
+        { id: 'members', label: 'Allowlist', icon: '👥' },
+        { id: 'import', label: 'Import', icon: '📄' },
+      ],
+    },
+    {
+      label: 'Analytics',
+      tabs: [
+        { id: 'respect', label: 'Respect', icon: '🏅' },
+        { id: 'engagement', label: 'Engagement', icon: '📊' },
+        { id: 'funnel', label: 'Funnel', icon: '📈' },
+        { id: 'dormant', label: 'Dormant', icon: '💤' },
+        { id: 'audit', label: 'Audit', icon: '📋' },
+      ],
+    },
+    {
+      label: 'Config',
+      tabs: [
+        { id: 'moderation', label: 'Moderation', icon: '🛡' },
+        { id: 'polls', label: 'Polls', icon: '🗳' },
+        { id: 'discord', label: 'Discord', icon: '💬' },
+        { id: 'spaces', label: 'Spaces', icon: '🎙' },
+      ],
+    },
   ];
 
   return (
@@ -66,14 +77,12 @@ export function AdminPanel() {
               href="/admin/members"
               className="text-sm text-[#f5a623] hover:text-[#ffd700] bg-[#f5a623]/10 hover:bg-[#f5a623]/20 px-3 py-1.5 rounded-lg transition-colors font-medium"
             >
-              Member CRM
+              CRM
             </Link>
             <button onClick={() => setBroadcastOpen(true)} className="text-sm text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors">
               Broadcast
             </button>
             <ExportButton />
-            <ImportRespectButton />
-            <SyncRespectButton />
           </div>
         }
       />
@@ -81,20 +90,25 @@ export function AdminPanel() {
       {/* Tab Navigation */}
       <div className="border-b border-gray-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <nav className="flex gap-1 -mb-px">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-[#f5a623] text-[#f5a623]'
-                    : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
-                }`}
-              >
-                <span className="mr-1.5">{tab.icon}</span>
-                {tab.label}
-              </button>
+          <nav className="flex -mb-px overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+            {tabGroups.map((group, gi) => (
+              <div key={group.label} className="flex items-center shrink-0">
+                {gi > 0 && <div className="w-px h-5 bg-gray-700 mx-1.5 shrink-0" />}
+                {group.tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-3 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                      activeTab === tab.id
+                        ? 'border-[#f5a623] text-[#f5a623]'
+                        : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
+                    }`}
+                  >
+                    <span className="mr-1">{tab.icon}</span>
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             ))}
           </nav>
         </div>
@@ -118,40 +132,7 @@ export function AdminPanel() {
         {activeTab === 'spaces' && <SpacesManager />}
       </div>
 
-      {/* Broadcast Modal */}
-      {broadcastOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-[#0d1b2a] rounded-xl p-6 w-full max-w-md border border-gray-700">
-            <h3 className="text-sm font-semibold text-white mb-3">Cast to /zao channel</h3>
-            <textarea
-              value={broadcastText}
-              onChange={e => setBroadcastText(e.target.value)}
-              placeholder="Write your announcement..."
-              className="w-full bg-[#0a1628] border border-gray-700 rounded-lg p-3 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none h-32"
-              maxLength={1024}
-            />
-            <p className="text-[10px] text-gray-600 mt-1">{broadcastText.length}/1024</p>
-            <div className="flex gap-2 mt-3">
-              <button onClick={() => { setBroadcastOpen(false); setBroadcastText(''); }} className="flex-1 py-2 text-sm text-gray-400 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">Cancel</button>
-              <button
-                onClick={async () => {
-                  setBroadcasting(true);
-                  try {
-                    await fetch('/api/admin/broadcast', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: broadcastText }) });
-                  } catch { /* ignore */ }
-                  setBroadcasting(false);
-                  setBroadcastOpen(false);
-                  setBroadcastText('');
-                }}
-                disabled={broadcasting || !broadcastText.trim()}
-                className="flex-1 py-2 text-sm text-black bg-[#f5a623] rounded-lg font-medium disabled:opacity-50 hover:bg-[#ffd700] transition-colors"
-              >
-                {broadcasting ? 'Casting...' : 'Cast'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {broadcastOpen && <BroadcastModal onClose={() => setBroadcastOpen(false)} />}
     </div>
   );
 }

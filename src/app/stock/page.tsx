@@ -20,48 +20,34 @@ export const metadata: Metadata = {
   },
 };
 
-const sponsorTiers = [
-  {
-    name: 'Community',
-    amount: '$500',
-    perks: [
-      'Name on event banner',
-      'Social media shoutout',
-      'Listed in event program',
-    ],
-  },
-  {
-    name: 'Stage',
-    amount: '$2,500',
-    perks: [
-      'Logo on stage backdrop',
-      'Verbal recognition during event',
-      'Featured in livestream',
-      'Social media campaign',
-    ],
-  },
-  {
-    name: 'Title',
-    amount: '$5,000',
-    perks: [
-      'Premium logo placement',
-      'Special interview feature',
-      'Dedicated social posts',
-      'Featured in all press',
-      'Custom packages available',
-    ],
-  },
-  {
-    name: 'Founding',
-    amount: '$10,000',
-    perks: [
-      'Everything in Title tier',
-      'Co-presented branding',
-      'Year-round ZAO partnership',
-      'Custom packages available',
-      'Advisory seat at planning table',
-    ],
-  },
+const localPartnerOptions = [
+  'Logo on stage backdrop',
+  'Product sampling table at the parklet',
+  'Verbal shoutout from stage between sets',
+  'Coupon or flyer in attendee welcome bag',
+  '"After-party powered by [You]" at Black Moon',
+  'Food or drink vendor slot (or in-kind product)',
+  'Banner placement on Franklin Street',
+  'Listed as Community Partner on zaoos.com/stock',
+  'Post-event thank-you post with photo',
+  'Logo on printed event program',
+  'Table or booth space at the parklet',
+  'Co-branded merch item (sticker, koozie, etc.)',
+];
+
+const digitalPartnerOptions = [
+  'Special interview feature (video or podcast, 10-15 min)',
+  'Logo on livestream overlay throughout event',
+  'Sponsored segment during livestream',
+  'Dedicated social media campaign (3-5 posts)',
+  'Featured in Farcaster /zao channel announcement',
+  'Logo on POAP / digital attendance token',
+  'Branded digital collectible for attendees',
+  'Co-branded content piece (article or recap video)',
+  'Listed in all press releases',
+  '"Presented by" billing on a specific set or time slot',
+  'Shoutout in ZAO newsletter (400+ editions)',
+  'Logo on zaoos.com/stock with backlink',
 ];
 
 export default function ZAOStockPage() {
@@ -270,42 +256,100 @@ export default function ZAOStockPage() {
 
         {/* Become a Sponsor */}
         <section className="px-6 py-12 max-w-2xl mx-auto">
-          <div className="mb-6">
+          <div className="mb-8">
             <h2 className="text-lg font-semibold text-white mb-2">Become a Sponsor</h2>
-            <p className="text-sm text-gray-400">
-              Support independent music and community-first culture. Four tiers to fit any budget.
+            <p className="text-sm text-gray-400 mb-1">
+              Custom packages available. Pick a track, choose what fits your brand, and we&apos;ll build
+              a package together.
+            </p>
+            <p className="text-xs text-gray-500">
+              Mix and match from either track. In-kind contributions welcome.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-            {sponsorTiers.map((tier) => (
-              <div key={tier.name} className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-white font-semibold text-sm">{tier.name}</h3>
-                  <span className="text-[#f5a623] font-bold text-sm">{tier.amount}</span>
-                </div>
-                <ul className="space-y-1.5">
-                  {tier.perks.map((perk) => (
-                    <li key={perk} className="flex items-start gap-2 text-xs text-gray-400">
-                      <svg className="w-3 h-3 text-[#f5a623]/60 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                      </svg>
-                      {perk}
-                    </li>
-                  ))}
-                </ul>
+          {/* Track 1: Local Partners */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-xs font-medium">
+                Local
+              </span>
+              <h3 className="text-white font-semibold text-sm">Local Partners</h3>
+              <span className="text-gray-500 text-xs">&mdash; Ellsworth businesses &amp; Maine brands</span>
+            </div>
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
+              <ul className="space-y-2">
+                {localPartnerOptions.map((option) => (
+                  <li key={option} className="flex items-start gap-2 text-xs text-gray-400">
+                    <svg className="w-3 h-3 text-green-400/60 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    {option}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Track 2: Digital Partners */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20 text-xs font-medium">
+                Digital
+              </span>
+              <h3 className="text-white font-semibold text-sm">Digital Partners</h3>
+              <span className="text-gray-500 text-xs">&mdash; Web3 brands &amp; online businesses</span>
+            </div>
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
+              <ul className="space-y-2">
+                {digitalPartnerOptions.map((option) => (
+                  <li key={option} className="flex items-start gap-2 text-xs text-gray-400">
+                    <svg className="w-3 h-3 text-[#f5a623]/60 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    {option}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Founding Partner */}
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-[#f5a623]/5 to-transparent border border-[#f5a623]/20 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[#f5a623] font-bold text-sm">Founding Partner</span>
+                <span className="text-gray-500 text-xs">&mdash; $5,000+</span>
               </div>
-            ))}
+              <p className="text-xs text-gray-400 mb-3">
+                Everything from both tracks, plus:
+              </p>
+              <ul className="space-y-1.5">
+                {[
+                  'Co-presented branding ("ZAO Stock presented by [You]")',
+                  'Year-round ZAO partnership beyond the event',
+                  'Advisory seat at the planning table',
+                  'Priority for Year 2 and future ZAO festivals',
+                  'Fully custom package — tell us what you need',
+                ].map((perk) => (
+                  <li key={perk} className="flex items-start gap-2 text-xs text-gray-400">
+                    <svg className="w-3 h-3 text-[#f5a623] mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                    </svg>
+                    {perk}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           <a
-            href="mailto:zaal@thezao.com?subject=ZAO Stock Sponsorship"
+            href="mailto:zaal@thezao.com?subject=ZAO%20Stock%20Sponsorship%20—%20Custom%20Package"
             className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#f5a623]/10 border border-[#f5a623]/20 text-[#f5a623] font-medium text-sm hover:bg-[#f5a623]/15 transition-colors"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
             </svg>
-            Contact for Sponsorship — zaal@thezao.com
+            Build Your Custom Package — zaal@thezao.com
           </a>
         </section>
 

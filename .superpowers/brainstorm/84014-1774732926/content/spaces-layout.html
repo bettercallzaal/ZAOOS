@@ -1,0 +1,87 @@
+<h2>Spaces Page Layout — Phase 1</h2>
+<p style="color:#888;margin-bottom:24px;">How the /spaces page organizes persistent channels vs on-demand stages</p>
+
+<div style="display:flex;gap:24px;flex-wrap:wrap;">
+
+  <!-- Option A -->
+  <div data-option="A" style="flex:1;min-width:320px;background:#0d1b2a;border-radius:12px;padding:20px;border:2px solid #1e3a5f;cursor:pointer;">
+    <h3 style="color:#f5a623;margin:0 0 4px;">A) Two-Section List</h3>
+    <p style="color:#8899aa;font-size:13px;margin:0 0 16px;">Persistent channels on top, on-demand stages below. Clean and simple.</p>
+    <div style="background:#0a1628;border-radius:8px;padding:16px;font-family:monospace;font-size:12px;line-height:2;color:#ccc;">
+      <div style="color:#f5a623;font-weight:bold;margin-bottom:4px;">VOICE CHANNELS</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>🟢 General Hangout</span>
+        <span style="color:#4ade80;font-size:11px;">3 active now</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>⚫ Fractal Call</span>
+        <span style="color:#666;font-size:11px;">last active 2d ago</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>🟢 Music Lounge</span>
+        <span style="color:#4ade80;font-size:11px;">1 listening</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>⚫ Tech Talk</span>
+        <span style="color:#666;font-size:11px;">last active 5h ago</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>⚫ Coworking</span>
+        <span style="color:#666;font-size:11px;">last active 1d ago</span>
+      </div>
+      <div style="border-top:1px solid #1e3a5f;margin:12px 0;"></div>
+      <div style="color:#f5a623;font-weight:bold;margin-bottom:4px;">LIVE STAGES</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>🔴 Dan's Friday DJ Set <span style="color:#ef4444;font-size:10px;">LIVE</span></span>
+        <span style="color:#ccc;font-size:11px;">12 watching</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>🔴 ZAO Weekly AMA <span style="color:#ef4444;font-size:10px;">LIVE</span></span>
+        <span style="color:#ccc;font-size:11px;">8 watching</span>
+      </div>
+      <div style="margin-top:12px;text-align:center;color:#f5a623;border:1px dashed #f5a623;border-radius:6px;padding:8px;">+ Create Stage</div>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div data-option="B" style="flex:1;min-width:320px;background:#0d1b2a;border-radius:12px;padding:20px;border:2px solid #1e3a5f;cursor:pointer;">
+    <h3 style="color:#f5a623;margin:0 0 4px;">B) Discord-Style Sidebar + Main</h3>
+    <p style="color:#8899aa;font-size:13px;margin:0 0 16px;">Persistent channels in a left sidebar, stages in the main area. Desktop-first.</p>
+    <div style="background:#0a1628;border-radius:8px;overflow:hidden;display:flex;height:320px;">
+      <!-- Sidebar -->
+      <div style="width:180px;background:#081420;padding:12px;border-right:1px solid #1e3a5f;font-size:11px;color:#ccc;line-height:2.2;">
+        <div style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:1px;">Voice</div>
+        <div>🟢 General Hangout <span style="color:#4ade80;font-size:9px;">3</span></div>
+        <div>⚫ Fractal Call</div>
+        <div>🟢 Music Lounge <span style="color:#4ade80;font-size:9px;">1</span></div>
+        <div>⚫ Tech Talk</div>
+        <div>⚫ Coworking</div>
+        <div style="margin-top:8px;color:#888;font-size:10px;text-transform:uppercase;letter-spacing:1px;">Your Room</div>
+        <div style="color:#4ade80;">🎧 Music Lounge</div>
+        <div style="font-size:10px;color:#666;">Connected • 3m</div>
+      </div>
+      <!-- Main -->
+      <div style="flex:1;padding:12px;font-size:11px;color:#ccc;">
+        <div style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Live Stages</div>
+        <div style="background:#111d2e;border-radius:6px;padding:10px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-weight:bold;">Dan's Friday DJ Set</span>
+            <span style="color:#ef4444;font-size:10px;">● LIVE</span>
+          </div>
+          <div style="color:#666;font-size:10px;">12 watching • Music</div>
+        </div>
+        <div style="background:#111d2e;border-radius:6px;padding:10px;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-weight:bold;">ZAO Weekly AMA</span>
+            <span style="color:#ef4444;font-size:10px;">● LIVE</span>
+          </div>
+          <div style="color:#666;font-size:10px;">8 watching • AMA</div>
+        </div>
+        <div style="text-align:center;color:#f5a623;border:1px dashed #f5a623;border-radius:6px;padding:10px;margin-top:16px;">+ Create Stage</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="color:#666;margin-top:16px;font-size:13px;">Click the layout you prefer. A is mobile-friendly, B is richer on desktop but needs responsive handling.</p>

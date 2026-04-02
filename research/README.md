@@ -17,9 +17,9 @@
 | [Cross-Platform Publishing](./_categories/cross-platform.md) | 12 | Farcaster, X, Bluesky, Lens, Hive, Mastodon, Threads, Nostr, Reddit |
 | [Technical Infrastructure](./_categories/infrastructure.md) | 11 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming, smart contracts, forkability |
 | [APIs & External Services](./_categories/apis.md) | 9 | 1,400+ APIs mapped, Alchemy, Coinflow, payment infrastructure (Stripe/Coinbase/0xSplits), 30+ zero-cost integrations |
-| [WaveWarZ Integration](./_categories/wavewarz.md) | 6 | Solana prediction markets, artist pipeline, battle mechanics |
+| [WaveWarZ Integration](./_categories/wavewarz.md) | 7 | Solana prediction markets, artist pipeline, battle mechanics, Polymarket analysis |
 | [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |
-| [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 24 | Claude Code skills, Paperclip agents, autoresearch, git branching |
+| [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 25 | Claude Code skills, Paperclip agents, autoresearch, git branching |
 | [Other (Ethereum, Docs, Reference)](./_categories/other.md) | 12 | Whitepaper, GitHub docs, reference repos, Ethereum alignment |
 
 ---

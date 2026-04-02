@@ -1,0 +1,96 @@
+<h2>Universal Song Adding — Entry Point</h2>
+<p class="subtitle">How do users add songs? This needs to handle: paste URL, search, browse, and share intake.</p>
+
+<div class="cards">
+  <div class="card" data-choice="fab" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border-radius: 8px; padding: 20px; font-family: system-ui; color: white; position: relative; min-height: 220px;">
+        <div style="font-size: 12px; color: #667788; margin-bottom: 8px;">Now Playing Bar</div>
+        <div style="display: flex; align-items: center; gap: 12px; background: #111d33; padding: 10px; border-radius: 8px; margin-bottom: 40px;">
+          <div style="width: 36px; height: 36px; background: #f5a623; border-radius: 4px; font-size: 16px; display: flex; align-items: center; justify-content: center;">&#127925;</div>
+          <div style="flex: 1;">
+            <div style="font-size: 12px; font-weight: 600;">Track Name</div>
+            <div style="font-size: 10px; color: #667788;">Artist</div>
+          </div>
+          <span style="font-size: 16px;">&#9654;</span>
+        </div>
+        <div style="position: absolute; bottom: 80px; right: 24px; width: 48px; height: 48px; background: #f5a623; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(245,166,35,0.4); cursor: pointer;">+</div>
+        <div style="font-size: 11px; color: #556677; text-align: center; position: absolute; bottom: 16px; left: 0; right: 0;">Floating + button always accessible</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Floating Action Button (+)</h3>
+      <p>Gold FAB in bottom-right corner. Tap opens a <strong>bottom sheet</strong> with: URL paste field at top, search bar below, then browse tabs (Trending, Genres, Radio). Always one tap away from any screen.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="omnibar" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border-radius: 8px; padding: 20px; font-family: system-ui; color: white;">
+        <div style="font-size: 12px; color: #667788; margin-bottom: 8px;">Music Page Header</div>
+        <div style="background: #111d33; border: 1px solid #2a3a5a; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <span style="color: #667788;">&#128269;</span>
+          <span style="color: #556677; font-size: 14px;">Paste URL or search any song...</span>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+          <div style="background: #f5a623; color: #0a1628; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;">All</div>
+          <div style="background: #1a2a4a; padding: 6px 14px; border-radius: 20px; font-size: 11px; color: #8899aa;">Trending</div>
+          <div style="background: #1a2a4a; padding: 6px 14px; border-radius: 20px; font-size: 11px; color: #8899aa;">Hip-Hop</div>
+          <div style="background: #1a2a4a; padding: 6px 14px; border-radius: 20px; font-size: 11px; color: #8899aa;">Electronic</div>
+          <div style="background: #1a2a4a; padding: 6px 14px; border-radius: 20px; font-size: 11px; color: #8899aa;">Lo-Fi</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 10px; background: #111d33; padding: 10px; border-radius: 8px;">
+            <div style="width: 40px; height: 40px; background: #e8941a; border-radius: 4px; font-size: 16px; display: flex; align-items: center; justify-content: center;">&#127925;</div>
+            <div style="flex: 1;"><div style="font-size: 12px;">Song Result</div><div style="font-size: 10px; color: #667788;">Artist — Audius</div></div>
+            <div style="color: #f5a623; font-size: 20px; cursor: pointer;">+</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; background: #111d33; padding: 10px; border-radius: 8px;">
+            <div style="width: 40px; height: 40px; background: #d4831a; border-radius: 4px; font-size: 16px; display: flex; align-items: center; justify-content: center;">&#127925;</div>
+            <div style="flex: 1;"><div style="font-size: 12px;">Another Song</div><div style="font-size: 10px; color: #667788;">Artist — Spotify</div></div>
+            <div style="color: #f5a623; font-size: 20px; cursor: pointer;">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Smart Omnibar</h3>
+      <p>Single input at top of /music page that <strong>auto-detects</strong>: paste a URL → resolves instantly. Type text → searches across Audius, Spotify, SoundCloud simultaneously. Genre filter chips below. Each result has a <strong>+ button</strong> to add to queue.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="both" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background: linear-gradient(135deg, #0a1628, #1a2a4a); border-radius: 8px; padding: 20px; font-family: system-ui; color: white;">
+        <div style="font-size: 12px; color: #667788; margin-bottom: 8px;">Combined: Omnibar + FAB</div>
+        <div style="background: #111d33; border: 1px solid #2a3a5a; border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="color: #667788; font-size: 14px;">&#128269;</span>
+          <span style="color: #556677; font-size: 13px;">Paste URL or search...</span>
+        </div>
+        <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+          <div style="background: #f5a623; color: #0a1628; padding: 5px 12px; border-radius: 16px; font-size: 10px; font-weight: 600;">All</div>
+          <div style="background: #1a2a4a; padding: 5px 12px; border-radius: 16px; font-size: 10px; color: #8899aa;">Trending</div>
+          <div style="background: #1a2a4a; padding: 5px 12px; border-radius: 16px; font-size: 10px; color: #8899aa;">Hip-Hop</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; background: #111d33; padding: 8px; border-radius: 6px; margin-bottom: 8px;">
+          <div style="width: 32px; height: 32px; background: #e8941a; border-radius: 4px;"></div>
+          <div style="flex: 1;"><div style="font-size: 11px;">Song</div><div style="font-size: 9px; color: #667788;">Artist</div></div>
+          <div style="color: #f5a623; font-size: 16px;">+</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; background: #111d33; padding: 8px; border-radius: 6px;">
+          <div style="width: 32px; height: 32px; background: #d4831a; border-radius: 4px;"></div>
+          <div style="flex: 1;"><div style="font-size: 11px;">Song</div><div style="font-size: 9px; color: #667788;">Artist</div></div>
+          <div style="color: #f5a623; font-size: 16px;">+</div>
+        </div>
+        <div style="position: relative; height: 60px;">
+          <div style="position: absolute; bottom: 0; right: 0; width: 40px; height: 40px; background: #f5a623; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(245,166,35,0.4);">+</div>
+          <div style="font-size: 10px; color: #556677; position: absolute; bottom: 4px; left: 0;">FAB on non-music pages</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Both — Context-Aware</h3>
+      <p><strong>On /music page:</strong> Smart omnibar with search + URL paste + browse. <strong>On every other page:</strong> Gold FAB that opens a compact bottom sheet version of the same omnibar. Best of both worlds — contextual placement.</p>
+    </div>
+  </div>
+</div>

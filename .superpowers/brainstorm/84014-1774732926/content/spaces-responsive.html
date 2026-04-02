@@ -1,0 +1,204 @@
+<h2>Spaces Layout — Responsive with Active Status</h2>
+<p style="color:#888;margin-bottom:24px;">Desktop: sidebar + main. Mobile: channels collapse to a horizontal scroll strip on top.</p>
+
+<div style="display:flex;gap:24px;flex-wrap:wrap;">
+
+  <!-- Desktop View -->
+  <div style="flex:1;min-width:500px;background:#0d1b2a;border-radius:12px;padding:20px;border:2px solid #1e3a5f;">
+    <h3 style="color:#f5a623;margin:0 0 12px;">Desktop View</h3>
+    <div style="background:#0a1628;border-radius:8px;overflow:hidden;display:flex;height:400px;">
+      <!-- Sidebar -->
+      <div style="width:220px;background:#081420;padding:16px;border-right:1px solid #1e3a5f;font-size:12px;color:#ccc;">
+        <div style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Voice Channels</div>
+
+        <!-- Active channel -->
+        <div style="background:#0d2847;border-radius:6px;padding:8px;margin-bottom:6px;border-left:3px solid #4ade80;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:bold;">🎵 Music Lounge</span>
+            <span style="background:#4ade80;color:#000;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:bold;">3 in</span>
+          </div>
+          <div style="display:flex;gap:4px;margin-top:6px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:#2a4a7a;border:1.5px solid #4ade80;"></div>
+            <div style="width:20px;height:20px;border-radius:50%;background:#3a5a8a;border:1.5px solid #4ade80;"></div>
+            <div style="width:20px;height:20px;border-radius:50%;background:#4a6a9a;border:1.5px solid #4ade80;"></div>
+          </div>
+        </div>
+
+        <!-- Active channel -->
+        <div style="background:#0d2847;border-radius:6px;padding:8px;margin-bottom:6px;border-left:3px solid #4ade80;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:bold;">💬 General Hangout</span>
+            <span style="background:#4ade80;color:#000;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:bold;">1 in</span>
+          </div>
+          <div style="display:flex;gap:4px;margin-top:6px;">
+            <div style="width:20px;height:20px;border-radius:50%;background:#2a4a7a;border:1.5px solid #4ade80;"></div>
+          </div>
+        </div>
+
+        <!-- Inactive channels -->
+        <div style="background:transparent;border-radius:6px;padding:8px;margin-bottom:6px;opacity:0.5;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>📞 Fractal Call</span>
+          </div>
+          <div style="color:#555;font-size:10px;margin-top:2px;">Last active 2d ago</div>
+        </div>
+
+        <div style="background:transparent;border-radius:6px;padding:8px;margin-bottom:6px;opacity:0.5;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>💻 Tech Talk</span>
+          </div>
+          <div style="color:#555;font-size:10px;margin-top:2px;">Last active 5h ago</div>
+        </div>
+
+        <div style="background:transparent;border-radius:6px;padding:8px;margin-bottom:6px;opacity:0.5;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>🏢 Coworking</span>
+          </div>
+          <div style="color:#555;font-size:10px;margin-top:2px;">Last active 1d ago</div>
+        </div>
+
+        <!-- Connected status -->
+        <div style="border-top:1px solid #1e3a5f;margin-top:12px;padding-top:12px;">
+          <div style="background:#0f2e1a;border-radius:6px;padding:8px;border:1px solid #22c55e33;">
+            <div style="color:#4ade80;font-size:11px;font-weight:bold;">🎧 Connected</div>
+            <div style="color:#888;font-size:10px;">Music Lounge • 12m</div>
+            <div style="display:flex;gap:8px;margin-top:6px;">
+              <span style="color:#ef4444;font-size:10px;cursor:pointer;">🔇 Mute</span>
+              <span style="color:#ef4444;font-size:10px;cursor:pointer;">📴 Leave</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div style="flex:1;padding:16px;font-size:12px;color:#ccc;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="color:#888;font-size:10px;text-transform:uppercase;letter-spacing:1px;">Live Stages</div>
+          <div style="background:#f5a623;color:#0a1628;font-size:11px;padding:6px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">+ Create Stage</div>
+        </div>
+
+        <!-- Live stage card -->
+        <div style="background:#111d2e;border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid #1e3a5f;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <span style="font-weight:bold;font-size:14px;">Dan's Friday DJ Set</span>
+              <span style="background:#ef4444;color:white;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:8px;animation:pulse 2s infinite;">● LIVE</span>
+            </div>
+            <span style="background:#7c3aed33;color:#a78bfa;font-size:10px;padding:2px 8px;border-radius:4px;">🎵 Music</span>
+          </div>
+          <div style="color:#666;font-size:11px;margin-top:4px;">Hosted by Dan SingJoy • 12 watching • 3 speakers</div>
+          <div style="display:flex;gap:4px;margin-top:8px;">
+            <div style="width:24px;height:24px;border-radius:50%;background:#2a4a7a;"></div>
+            <div style="width:24px;height:24px;border-radius:50%;background:#3a5a8a;"></div>
+            <div style="width:24px;height:24px;border-radius:50%;background:#4a6a9a;"></div>
+            <span style="color:#888;font-size:11px;line-height:24px;margin-left:4px;">+9</span>
+          </div>
+          <div style="margin-top:10px;">
+            <span style="background:#f5a62333;color:#f5a623;font-size:11px;padding:4px 12px;border-radius:4px;cursor:pointer;">Join Stage →</span>
+          </div>
+        </div>
+
+        <!-- Another live stage -->
+        <div style="background:#111d2e;border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid #1e3a5f;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <span style="font-weight:bold;font-size:14px;">ZAO Weekly AMA</span>
+              <span style="background:#ef4444;color:white;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:8px;">● LIVE</span>
+            </div>
+            <span style="background:#eab30833;color:#fbbf24;font-size:10px;padding:2px 8px;border-radius:4px;">❓ AMA</span>
+          </div>
+          <div style="color:#666;font-size:11px;margin-top:4px;">Hosted by Zaal • 8 watching • 2 speakers</div>
+          <div style="margin-top:10px;">
+            <span style="background:#f5a62333;color:#f5a623;font-size:11px;padding:4px 12px;border-radius:4px;cursor:pointer;">Join Stage →</span>
+          </div>
+        </div>
+
+        <!-- Empty state hint -->
+        <div style="text-align:center;color:#555;margin-top:24px;font-size:11px;">
+          No other stages right now. Create one to go live!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile View -->
+  <div style="flex:0 0 320px;background:#0d1b2a;border-radius:12px;padding:20px;border:2px solid #1e3a5f;">
+    <h3 style="color:#f5a623;margin:0 0 12px;">Mobile View</h3>
+    <div style="background:#0a1628;border-radius:8px;overflow:hidden;width:280px;">
+      <!-- Horizontal channel strip -->
+      <div style="display:flex;gap:8px;padding:12px;overflow-x:auto;border-bottom:1px solid #1e3a5f;">
+        <!-- Active pill -->
+        <div style="flex:0 0 auto;background:#0d2847;border:1.5px solid #4ade80;border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:4px;">
+          <span style="color:#4ade80;font-size:9px;">●</span>
+          <span style="font-size:11px;color:#ccc;white-space:nowrap;">🎵 Music Lounge</span>
+          <span style="background:#4ade80;color:#000;font-size:8px;padding:1px 4px;border-radius:8px;font-weight:bold;">3</span>
+        </div>
+        <!-- Active pill -->
+        <div style="flex:0 0 auto;background:#0d2847;border:1.5px solid #4ade80;border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:4px;">
+          <span style="color:#4ade80;font-size:9px;">●</span>
+          <span style="font-size:11px;color:#ccc;white-space:nowrap;">💬 Hangout</span>
+          <span style="background:#4ade80;color:#000;font-size:8px;padding:1px 4px;border-radius:8px;font-weight:bold;">1</span>
+        </div>
+        <!-- Inactive pills -->
+        <div style="flex:0 0 auto;background:transparent;border:1px solid #333;border-radius:20px;padding:4px 12px;opacity:0.4;">
+          <span style="font-size:11px;color:#888;white-space:nowrap;">📞 Fractal</span>
+        </div>
+        <div style="flex:0 0 auto;background:transparent;border:1px solid #333;border-radius:20px;padding:4px 12px;opacity:0.4;">
+          <span style="font-size:11px;color:#888;white-space:nowrap;">💻 Tech</span>
+        </div>
+        <div style="flex:0 0 auto;background:transparent;border:1px solid #333;border-radius:20px;padding:4px 12px;opacity:0.4;">
+          <span style="font-size:11px;color:#888;white-space:nowrap;">🏢 Cowork</span>
+        </div>
+      </div>
+
+      <!-- Connected banner -->
+      <div style="background:#0f2e1a;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #22c55e33;">
+        <div>
+          <span style="color:#4ade80;font-size:11px;">🎧 Music Lounge</span>
+          <span style="color:#666;font-size:10px;"> • 12m</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <span style="color:#ccc;font-size:12px;">🔇</span>
+          <span style="color:#ef4444;font-size:12px;">📴</span>
+        </div>
+      </div>
+
+      <!-- Stages list -->
+      <div style="padding:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="color:#888;font-size:10px;text-transform:uppercase;">Live Stages</span>
+          <span style="color:#f5a623;font-size:11px;font-weight:bold;">+ Create</span>
+        </div>
+
+        <div style="background:#111d2e;border-radius:8px;padding:10px;margin-bottom:8px;border:1px solid #1e3a5f;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-weight:bold;font-size:12px;color:#ccc;">Dan's DJ Set</span>
+            <span style="color:#ef4444;font-size:9px;">● LIVE</span>
+          </div>
+          <div style="color:#666;font-size:10px;">12 watching • 🎵 Music</div>
+        </div>
+
+        <div style="background:#111d2e;border-radius:8px;padding:10px;margin-bottom:8px;border:1px solid #1e3a5f;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-weight:bold;font-size:12px;color:#ccc;">ZAO Weekly AMA</span>
+            <span style="color:#ef4444;font-size:9px;">● LIVE</span>
+          </div>
+          <div style="color:#666;font-size:10px;">8 watching • ❓ AMA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+</style>
+
+<p style="color:#666;margin-top:16px;font-size:13px;">
+  Desktop: sidebar shows channels with avatars of who's in + green border for active, dimmed for inactive with "last active" timestamp. Connected status at bottom.<br>
+  Mobile: channels become a horizontal scrolling pill strip at top. Active pills have green border + count badge, inactive are dimmed. Connected banner below.
+</p>

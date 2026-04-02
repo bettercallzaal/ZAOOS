@@ -21,6 +21,11 @@ Use this to quickly find if a topic has already been researched.
 - Skills audit, cleanup & security best practices → `137`
 - Skills & commands master reference → `154`
 - Claude Code multi-terminal management (claude-squad, ccboard, permission modes, worktrees, tmux) → `165`
+- HowiAI (Gridley): narration workflows, 10x delegation test, AI habit formation, /standup upgrade, /reflect skill → `241`
+- Claude 20 underused features audit: 15/20 solved, voice mode gap, artifacts opportunity, model selection → `242`
+- Claude intermediate guide (@aiedge_): Skills 2.0 evals/A/B testing, Cowork Dispatch, scheduled tasks, reverse prompting → `243`
+- ZOE upgrade playbook: OpenClaw v2026.3.31, Mem0 memory, Neynar webhook relay, auto-dream, Telegram keyboards, competitive monitoring, founder agent patterns → `245`
+- Neynar API 130+ endpoints audit: community radar, auto-curation, channel intel, smart engagement, x402 pay-per-call, 4 agent patterns → `246`
 
 ## Music & Audio
 - Music APIs (Audius, Sound.xyz, Spotify, SoundCloud, YouTube) → `03`
@@ -85,6 +90,23 @@ Use this to quickly find if a topic has already been researched.
 - **Agent harness engineering (LangChain DeepAgents)**: Agent=Model+Harness, virtual filesystems, Ralph Loop, context rot, subagent orchestration, ZAO agent architecture → `161`
 - **Microsoft Agent Lightning**: RL training for agents (APO/GRPO/PPO/SFT), LightningRL hierarchical RL, Python+GPU — SKIP for ZAO now, steal APO evaluate-critique-rewrite pattern → `210`
 - **Agentic workflows 2026**: Vercel AI SDK 6 + Mastra + Claude Agent SDK, 5 ZAO agent designs, DAO governance agents, music AI DJ, cost analysis ($25-50/mo) → `227`
+- **MCP Server development guide**: protocol architecture, 3 primitives, SDK v1.29.0, Streamable HTTP, OAuth 2.1, ZAO MCP audit (8 tools), Resources/Prompts/HTTP roadmap, registries → `232`
+
+## OpenClaw & Agent Infrastructure
+- OpenClaw agent memory & knowledge system (3-layer, QMD, $5/mo VPS) → `197`
+- Multi-agent orchestration: OpenClaw → Paperclip → ElizaOS, $75/mo → `202`
+- OpenClaw setup runbook (VPS, Docker, Telegram, GitHub MCP) → `204`
+- OpenClaw + Paperclip + ElizaOS deployment plan (3-phase) → `205`
+- ZAO VPS agent stack session log (March 28 deploy) → `207`
+- OpenClaw skills & capabilities (52 skills, 82 extensions, 10 channels) → `208`
+- ZAO knowledge graph (KNOWLEDGE.json, 194 docs, tags, relations) → `214`
+- Paperclip + OpenClaw best practices (SOUL.md <200 lines, 4 personas, MCP) → `226`
+- **OpenClaw comprehensive guide (CANONICAL)**: SOUL.md/AGENTS.md/MEMORY.md patterns, knowledge graphs (Cognee/Graphiti/12-Layer), MCP configs, context management, token optimization, multi-agent, cron, 60+ sources → `234`
+- Free web search MCP alternatives: Brave dead, DuckDuckGo MCP + Jina Reader ($0), Tavily (1K free/mo), SearXNG self-hosted → `235`
+- Autonomous OpenClaw operator pattern: 3-layer memory, hourly heartbeat ($1.73/mo), nightly consolidation, "Next 3 Moves", delegation → `236`
+- USV agents + Tasklet + Malleable Software: named agents, "mentions" data model, skills paradigm, Build Something You Want era → `237`
+- Claude tools Top 50 evaluation: Context7 (USE), claude-squad (USE), TDD Guard (USE), Claude SEO (USE), MCPHub (USE) → `238`
+- Agent frameworks & infrastructure: OpenClaw stays, promptfoo for security, n8n/Task Master WATCH → `239`
 
 ## Coordination & Incentives
 - Incented protocol: ZABAL campaigns, staking-based task coordination → `64`
@@ -108,6 +130,8 @@ Use this to quickly find if a topic has already been researched.
 - Prediction market music battles: parimutuel schema, settlement math → `99`
 - Solana PDA reading in Next.js: web3.js, buffer-layout, Helius → `100`
 - **WaveWarZ × ZAO OS Whitepaper (CANONICAL)**: full platform data (647 battles, 43 artists w/ wallets, $38K volume), Artist Discovery Pipeline architecture, governance synergy, 10-day roadmap → `101`
+- **ZOUNZ treasury revenue via Polymarket**: Claude API probability bot for zero-fee geopolitics markets, 12 open-source tools (py-clob-client, polyterm, poly_data), $500 starting capital, 4-phase deployment (backtest→paper→proposal→live), CFTC-regulated, security model → `244`
+- **Polymarket prediction market analysis**: 14K wallet analysis, 12 open-source tools (poly_data, polyterm, poly-maker, Polymarket/agents), Claude API probability estimator, EV/Kelly/Bayes formulas, Quarter Kelly sizing, malware security warning, WaveWarZ analytics relevance → `244`
 
 ## Social Connections & Settings
 - X handle auto-import from Farcaster, settings UI redesign, multi-social connections -> `107`

@@ -1,0 +1,5 @@
+{"type":"server-started","port":55350,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:55350","screen_dir":"/Users/zaalpanthaki/Documents/ZAO OS V1/.superpowers/brainstorm/84014-1774732926/content","state_dir":"/Users/zaalpanthaki/Documents/ZAO OS V1/.superpowers/brainstorm/84014-1774732926/state"}
+{"type":"screen-added","file":"/Users/zaalpanthaki/Documents/ZAO OS V1/.superpowers/brainstorm/84014-1774732926/content/spaces-layout.html"}
+{"type":"screen-added","file":"/Users/zaalpanthaki/Documents/ZAO OS V1/.superpowers/brainstorm/84014-1774732926/content/spaces-responsive.html"}
+{"type":"screen-added","file":"/Users/zaalpanthaki/Documents/ZAO OS V1/.superpowers/brainstorm/84014-1774732926/content/room-layout.html"}
+{"type":"server-stopped","reason":"idle timeout"}

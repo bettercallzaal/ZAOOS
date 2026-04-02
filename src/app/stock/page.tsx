@@ -364,6 +364,26 @@ export default function ZAOStockPage() {
             </div>
           </div>
 
+          {/* Tax-Deductible Notice */}
+          <div className="mb-6 bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 w-8 h-8 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
+                <svg className="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-white text-sm font-medium mb-1">Tax-Deductible Sponsorship</p>
+                <p className="text-gray-400 text-xs leading-relaxed">
+                  ZAO Stock is fiscally sponsored through{' '}
+                  <span className="text-gray-300">New Media Commons</span> in partnership with{' '}
+                  <span className="text-gray-300">Fractured Atlas</span> (501(c)(3)). Contributions
+                  are tax-deductible for corporations and individuals.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <a
             href="mailto:zaal@thezao.com?subject=ZAO%20Stock%20Sponsorship%20—%20Custom%20Package"
             className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#f5a623]/10 border border-[#f5a623]/20 text-[#f5a623] font-medium text-sm hover:bg-[#f5a623]/15 transition-colors"

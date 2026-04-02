@@ -1,32 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { z } from 'zod';
+import { parseWebhookEvent, verifyAppKeyWithNeynar } from '@farcaster/miniapp-node';
 import { logger } from '@/lib/logger';
-
-// Farcaster Mini App webhook events
-// Note: The Mini App spec does not support HMAC signature verification
-// (unlike Neynar webhooks). We mitigate by validating input shape and
-// verifying the FID exists in our allowlist before processing.
-
-const webhookEventSchema = z.object({
-  event: z.enum(['miniapp_added', 'miniapp_removed', 'notifications_disabled', 'notifications_enabled']),
-  fid: z.number().int().positive(),
-  notificationDetails: z.object({
-    token: z.string().min(1),
-    url: z.string().url(),
-  }).optional(),
-});
 
 export async function POST(req: NextRequest) {
   try {
     const raw = await req.json();
-    const parsed = webhookEventSchema.safeParse(raw);
 
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid webhook payload' }, { status: 400 });
-    }
+    // Verify webhook signature using Farcaster's official verification
+    const { fid, event: parsedEvent } = await parseWebhookEvent(raw, verifyAppKeyWithNeynar);
 
-    const { event, fid, notificationDetails } = parsed.data;
+    const event = parsedEvent.event;
+    const notificationDetails = 'notificationDetails' in parsedEvent
+      ? parsedEvent.notificationDetails
+      : undefined;
 
     // Verify the FID exists in our allowlist before processing
     const { data: member } = await supabaseAdmin

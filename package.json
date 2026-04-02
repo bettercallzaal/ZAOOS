@@ -24,6 +24,7 @@
     "@discordjs/rest": "^2.6.0",
     "@farcaster/auth-client": "^0.7.1",
     "@farcaster/auth-kit": "^0.8.2",
+    "@farcaster/miniapp-node": "^0.2.0",
     "@farcaster/miniapp-sdk": "^0.2.3",
     "@farcaster/quick-auth": "^0.0.8",
     "@hatsprotocol/sdk-v1-core": "^0.12.4",

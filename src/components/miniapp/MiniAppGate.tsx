@@ -17,8 +17,6 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
 
   useEffect(() => {
     let cancelled = false;
-    let sdkInstance: Awaited<ReturnType<typeof import('@farcaster/miniapp-sdk').sdk['create']>> | null = null;
-
     async function init() {
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
@@ -28,8 +26,6 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
           setState('web');
           return;
         }
-
-        sdkInstance = sdk;
 
         // Dismiss native splash IMMEDIATELY — docs say to call this as soon as possible
         await sdk.actions.ready();
@@ -74,15 +70,7 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
 
     init();
 
-    // Cleanup: call miniAppOnExit when the user leaves or component unmounts
-    return () => {
-      cancelled = true;
-      if (sdkInstance) {
-        sdkInstance.miniAppOnExit?.().catch(() => {
-          // swallow — cleanup should not throw
-        });
-      }
-    };
+    return () => { cancelled = true; };
   }, [router]);
 
   if (state === 'checking' || state === 'web') {

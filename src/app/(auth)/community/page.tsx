@@ -4,9 +4,22 @@ import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import CommunityMembersClient from './CommunityMembersClient';
 
+const miniAppEmbed = JSON.stringify({
+  version: '1',
+  imageUrl: 'https://zaoos.com/og-community.png',
+  button: {
+    title: 'View Community',
+    action: {
+      type: 'launch_miniapp',
+      url: 'https://zaoos.com/community',
+    },
+  },
+});
+
 export const metadata: Metadata = {
   title: 'Community Members | ZAO OS',
   description: 'Join the ZAO community — artists, producers, and creators taking ownership of their profit margin, data, and IP rights.',
+  other: { 'fc:miniapp': miniAppEmbed },
 };
 
 export const revalidate = 300;

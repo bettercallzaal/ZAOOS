@@ -22,7 +22,7 @@ const miniAppEmbed = JSON.stringify({
     title: 'Open ZAO OS',
     action: {
       type: 'launch_miniapp',
-      url: 'https://zaoos.com',
+      url: 'https://zaoos.com/miniapp',
       name: 'ZAO OS',
       splashImageUrl: 'https://zaoos.com/splash.png',
       splashBackgroundColor: '#0a1628',

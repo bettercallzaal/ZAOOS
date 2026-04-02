@@ -2,9 +2,22 @@ import { Metadata } from 'next';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 
+const miniAppEmbed = JSON.stringify({
+  version: '1',
+  imageUrl: 'https://zaoos.com/og-calendar.png',
+  button: {
+    title: 'View Calendar',
+    action: {
+      type: 'launch_miniapp',
+      url: 'https://zaoos.com/calendar',
+    },
+  },
+});
+
 export const metadata: Metadata = {
   title: 'Calendar | ZAO OS',
   description: 'ZAO community calendar — upcoming events, releases, and community activations.',
+  other: { 'fc:miniapp': miniAppEmbed },
 };
 
 // Weekly fractal session recurring event

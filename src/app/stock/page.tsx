@@ -44,11 +44,11 @@ const sponsorTiers = [
     name: 'Title',
     amount: '$5,000',
     perks: [
-      'Named placement in event title',
       'Premium logo placement',
+      'Special interview feature',
       'Dedicated social posts',
       'Featured in all press',
-      'On-site activation space',
+      'Custom packages available',
     ],
   },
   {
@@ -58,7 +58,7 @@ const sponsorTiers = [
       'Everything in Title tier',
       'Co-presented branding',
       'Year-round ZAO partnership',
-      'Custom activation package',
+      'Custom packages available',
       'Advisory seat at planning table',
     ],
   },
@@ -125,7 +125,7 @@ export default function ZAOStockPage() {
             {[
               { label: '12pm – 6pm', icon: 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z' },
               { label: '10 Artists', icon: 'M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z' },
-              { label: 'Free Entry', icon: 'M16.5 6v.75a3.75 3.75 0 01-7.5 0V6m-4.125 1.5h15.375a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25H4.875A2.25 2.25 0 012.625 18.75v-9a2.25 2.25 0 012.25-2.25z' },
+              { label: 'Free Music', icon: 'M16.5 6v.75a3.75 3.75 0 01-7.5 0V6m-4.125 1.5h15.375a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25H4.875A2.25 2.25 0 012.625 18.75v-9a2.25 2.25 0 012.25-2.25z' },
               { label: 'Livestreamed', icon: 'M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z' },
             ].map(({ label, icon }) => (
               <div key={label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06]">

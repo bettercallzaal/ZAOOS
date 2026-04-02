@@ -5,9 +5,22 @@ import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import ZAOILeaderboardClient from './ZAOLeaderboardClient';
 
+const miniAppEmbed = JSON.stringify({
+  version: '1',
+  imageUrl: 'https://zaoos.com/og-leaderboard.png',
+  button: {
+    title: 'View Leaderboard',
+    action: {
+      type: 'launch_miniapp',
+      url: 'https://zaoos.com/zao-leaderboard',
+    },
+  },
+});
+
 export const metadata: Metadata = {
   title: 'ZAO Leaderboard | ZAO OS',
   description: 'See who is leading the Respect rankings in the ZAO community.',
+  other: { 'fc:miniapp': miniAppEmbed },
 };
 
 export const revalidate = 300;

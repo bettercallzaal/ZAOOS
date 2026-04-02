@@ -14,6 +14,7 @@ Use this to quickly find if a topic has already been researched.
 - All clients compared (18+), notification systems → `34`
 - Farcaster ecosystem 2026 update (Neynar acquisition, Mini Apps, CLANKER) → `73`
 - Hypersnap (incomplete) → `10`
+- **Mini Apps llms-full.txt deep dive (April 2026)**: 15+ SDK actions, haptics API, back navigation, share extensions, EIP-5792 batch txns, webhook signature verification gap, manifest update, capability detection, 17 features vs ZAO OS current → `250`
 
 ## Dev Workflows & Agent Tooling
 - Vercel integrations, Airtable, custom integration console → `212`
@@ -111,6 +112,7 @@ Use this to quickly find if a topic has already been researched.
 ## Coordination & Incentives
 - Incented protocol: ZABAL campaigns, staking-based task coordination → `64`
 - ZABAL partner ecosystem: MAGNETIQ, SongJam, Empire Builder, Clanker → `65`
+- **Incented deep dive + new campaigns + ClawDown**: conviction voting mechanics, 3 new ZABAL campaigns (bug bounty, music curation, research docs), ClawDown.xyz poker challenge for ZOE (144 USDC), program design parameters → `249`
 
 ## Community & Growth
 - Gating (allowlist → NFT → Hats → EAS) → `12`

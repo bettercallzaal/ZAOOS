@@ -44,11 +44,11 @@ const sponsorTiers = [
     name: 'Title',
     amount: '$5,000',
     perks: [
-      'Named placement in event title',
       'Premium logo placement',
+      'Special interview feature',
       'Dedicated social posts',
       'Featured in all press',
-      'On-site activation space',
+      'Custom packages available',
     ],
   },
   {
@@ -58,7 +58,7 @@ const sponsorTiers = [
       'Everything in Title tier',
       'Co-presented branding',
       'Year-round ZAO partnership',
-      'Custom activation package',
+      'Custom packages available',
       'Advisory seat at planning table',
     ],
   },

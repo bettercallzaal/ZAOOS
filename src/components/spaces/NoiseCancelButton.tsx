@@ -20,7 +20,6 @@ export function NoiseCancelButton() {
         setEnabled(false);
       } else {
         // Dynamically import the audio-filters package — may not be installed
-        // @ts-expect-error -- module may not be installed
         const { NoiseCancellation } = await import('@stream-io/audio-filters-web');
         const nc = new NoiseCancellation();
         await call.microphone.enableNoiseCancellation(nc);

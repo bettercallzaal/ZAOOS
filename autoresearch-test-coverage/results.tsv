@@ -1,0 +1,5 @@
+iteration	commit	metric_stmts	metric_funcs	tests	status	description
+0	baseline	4.64	17.34	175	baseline	14 test files, 175 tests, all passing
+1	61a4f93	4.88	18.87	186	keep	+3 test files (logout, random-stat, wallet) — +11 tests
+2	1143cdb	5.23	20.50	205	keep	+4 test files (notifications/status, search/users, snapshot/polls, xmtp-address) — +23 tests
+3	aaf1fb9	5.87	22.16	233	keep	+4 test files (admin/hidden, music/play, streaks, users/follow) — +28 tests

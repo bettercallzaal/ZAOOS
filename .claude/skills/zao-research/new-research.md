@@ -2,7 +2,7 @@
 
 ## Step 1: Pick the Next Number
 
-Check the highest numbered folder in `research/` and use the next number. Current highest: `228`. Next doc should be `229`.
+Check the highest numbered folder in `research/` and use the next number. Current highest: `246`. Next doc should be `247`.
 
 ## Step 2: Create the Folder and README
 

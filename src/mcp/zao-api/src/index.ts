@@ -25,7 +25,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     return { content: [{ type: "text", text: JSON.stringify(result) }] };
   } catch (err: unknown) {
     const { error, code } = handleError(err);
-    return { content: [{ type: "text", text: JSON.stringify({ error, code }) }] };
+    return { content: [{ type: "text", text: JSON.stringify({ error, code }) }], isError: true };
   }
 });
 

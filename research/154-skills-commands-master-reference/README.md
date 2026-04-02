@@ -622,6 +622,8 @@ You don't need to invoke each skill manually. Just describe what you want and th
 | `fix-issue` | SKILL.md | GitHub issue to commit |
 | `check-env` | SKILL.md | Env var validation |
 | `standup` | SKILL.md | Build-in-public notes |
+| `vps` | SKILL.md | VPS/ZOE remote management (status/deploy/zoe) |
+| `z` | SKILL.md | Quick status dashboard |
 
 ### Autoresearch Subcommands
 

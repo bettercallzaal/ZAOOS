@@ -1,0 +1,126 @@
+<h2>Inside a Stage — Room Layout Options</h2>
+<p style="color:#888;margin-bottom:24px;">How should screen share, speakers, music, and controls be arranged inside a live Stage?</p>
+
+<div style="display:flex;gap:20px;flex-wrap:wrap;">
+
+  <!-- Option A: Content-First -->
+  <div data-option="A" style="flex:1;min-width:340px;background:#0d1b2a;border-radius:12px;padding:20px;border:2px solid #1e3a5f;cursor:pointer;">
+    <h3 style="color:#f5a623;margin:0 0 4px;">A) Content-First (Twitch-style)</h3>
+    <p style="color:#8899aa;font-size:12px;margin:0 0 12px;">Big screen share / video up top. Speakers + chat below. Music in a collapsible side panel.</p>
+    <div style="background:#0a1628;border-radius:8px;overflow:hidden;height:360px;display:flex;flex-direction:column;">
+      <!-- Main content area -->
+      <div style="flex:1;background:#000;display:flex;align-items:center;justify-content:center;position:relative;">
+        <span style="color:#444;font-size:24px;">🖥️ Screen Share / Speaker Video</span>
+        <div style="position:absolute;bottom:8px;right:8px;background:#111;border-radius:6px;padding:4px 8px;">
+          <span style="color:#ef4444;font-size:10px;">● LIVE</span>
+          <span style="color:#888;font-size:10px;margin-left:4px;">12 watching</span>
+        </div>
+        <!-- PiP speaker -->
+        <div style="position:absolute;bottom:8px;left:8px;width:80px;height:60px;background:#1a2a4a;border-radius:6px;border:2px solid #f5a623;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:10px;color:#888;">Host</span>
+        </div>
+      </div>
+      <!-- Speaker strip -->
+      <div style="background:#081420;padding:8px 12px;display:flex;gap:12px;align-items:center;border-top:1px solid #1e3a5f;">
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#2a4a7a;border:2px solid #4ade80;margin:0 auto;"></div>
+          <div style="font-size:9px;color:#ccc;margin-top:2px;">Dan 🎤</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#3a5a8a;border:2px solid #4ade80;margin:0 auto;"></div>
+          <div style="font-size:9px;color:#ccc;margin-top:2px;">Zaal 🎤</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:36px;height:36px;border-radius:50%;background:#4a6a9a;border:2px solid #666;margin:0 auto;"></div>
+          <div style="font-size:9px;color:#888;margin-top:2px;">Tadas</div>
+        </div>
+        <div style="flex:1;"></div>
+        <!-- Now Playing mini -->
+        <div style="background:#111d2e;border-radius:6px;padding:4px 8px;display:flex;align-items:center;gap:6px;">
+          <span style="font-size:12px;">🎵</span>
+          <div>
+            <div style="font-size:10px;color:#ccc;">Solar System</div>
+            <div style="font-size:9px;color:#666;">Sub Focus</div>
+          </div>
+        </div>
+      </div>
+      <!-- Controls -->
+      <div style="background:#060e1a;padding:8px;display:flex;justify-content:center;gap:16px;border-top:1px solid #1e3a5f;">
+        <span style="font-size:16px;">🎤</span>
+        <span style="font-size:16px;">📹</span>
+        <span style="font-size:16px;">🖥️</span>
+        <span style="font-size:16px;">🎵</span>
+        <span style="font-size:16px;color:#ef4444;">📡</span>
+        <span style="font-size:16px;color:#ef4444;">📴</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Speakers-First -->
+  <div data-option="B" style="flex:1;min-width:340px;background:#0d1b2a;border-radius:12px;padding:20px;border:2px solid #1e3a5f;cursor:pointer;">
+    <h3 style="color:#f5a623;margin:0 0 4px;">B) Speakers-First (Clubhouse/Twitter Spaces)</h3>
+    <p style="color:#8899aa;font-size:12px;margin:0 0 12px;">Speaker circles dominate. Screen share opens as an overlay. Music bar at bottom. Audio-first.</p>
+    <div style="background:#0a1628;border-radius:8px;overflow:hidden;height:360px;display:flex;flex-direction:column;">
+      <!-- Room header -->
+      <div style="padding:12px;border-bottom:1px solid #1e3a5f;">
+        <div style="display:flex;justify-content:space-between;">
+          <div>
+            <div style="font-size:14px;font-weight:bold;color:#ccc;">Dan's Friday DJ Set</div>
+            <div style="font-size:11px;color:#666;">12 listening • 🎵 Music</div>
+          </div>
+          <span style="color:#ef4444;font-size:11px;">● LIVE</span>
+        </div>
+      </div>
+      <!-- Speakers grid -->
+      <div style="flex:1;padding:20px;display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-content:start;">
+        <div style="text-align:center;width:70px;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#2a4a7a;border:3px solid #f5a623;margin:0 auto;position:relative;">
+            <span style="position:absolute;bottom:-2px;right:-2px;font-size:10px;">👑</span>
+          </div>
+          <div style="font-size:11px;color:#ccc;margin-top:4px;">Dan</div>
+          <div style="font-size:9px;color:#4ade80;">Speaking</div>
+        </div>
+        <div style="text-align:center;width:70px;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#3a5a8a;border:3px solid #4ade80;margin:0 auto;"></div>
+          <div style="font-size:11px;color:#ccc;margin-top:4px;">Zaal</div>
+          <div style="font-size:9px;color:#4ade80;">Speaking</div>
+        </div>
+        <div style="text-align:center;width:70px;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#4a6a9a;border:3px solid #333;margin:0 auto;"></div>
+          <div style="font-size:11px;color:#888;margin-top:4px;">Tadas</div>
+          <div style="font-size:9px;color:#666;">Listening</div>
+        </div>
+        <div style="text-align:center;width:70px;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#5a7aaa;border:3px solid #333;margin:0 auto;"></div>
+          <div style="font-size:11px;color:#888;margin-top:4px;">Sarah</div>
+          <div style="font-size:9px;color:#666;">Listening</div>
+        </div>
+      </div>
+      <!-- Now playing bar -->
+      <div style="background:#111d2e;padding:8px 12px;display:flex;align-items:center;gap:8px;border-top:1px solid #1e3a5f;">
+        <div style="width:32px;height:32px;background:#2a2a4a;border-radius:4px;display:flex;align-items:center;justify-content:center;">🎵</div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:#ccc;">Solar System — Sub Focus</div>
+          <div style="height:3px;background:#333;border-radius:2px;margin-top:4px;"><div style="height:100%;width:40%;background:#f5a623;border-radius:2px;"></div></div>
+        </div>
+        <span style="font-size:14px;color:#ccc;">⏸️</span>
+      </div>
+      <!-- Controls -->
+      <div style="background:#060e1a;padding:8px;display:flex;justify-content:center;gap:16px;border-top:1px solid #1e3a5f;">
+        <span style="font-size:16px;">🎤</span>
+        <span style="font-size:16px;">🖥️</span>
+        <span style="font-size:16px;">🎵</span>
+        <span style="font-size:16px;">✋</span>
+        <span style="font-size:16px;color:#ef4444;">📡</span>
+        <span style="font-size:16px;color:#ef4444;">📴</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="color:#666;margin-top:16px;font-size:13px;">
+  <strong>A:</strong> Best when screen share / video is the focus (demos, watching together, visual content). Broadcast output looks like a stream.<br>
+  <strong>B:</strong> Best for conversation-first rooms (AMAs, hangouts, music listening). Audio-focused, more intimate. Screen share opens as an overlay when activated.<br><br>
+  Click the one that matches ZAO's vibe better — or we can make it context-dependent (voice channels default to B, stages with screen share default to A).
+</p>

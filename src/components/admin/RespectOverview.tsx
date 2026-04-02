@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { SyncRespectButton } from '@/components/admin/SyncRespectButton';
+import { ImportRespectButton } from '@/components/admin/ImportRespectButton';
 
 // ---------- Types ----------
 
@@ -93,6 +95,12 @@ export function RespectOverview() {
 
   return (
     <div>
+      {/* Actions */}
+      <div className="flex items-center gap-2 mb-4">
+        <ImportRespectButton />
+        <SyncRespectButton />
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
         <div className="bg-[#1a2a3a] rounded-xl p-4">

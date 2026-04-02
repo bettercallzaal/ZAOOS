@@ -17,7 +17,6 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
 
   useEffect(() => {
     let cancelled = false;
-
     async function init() {
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
@@ -70,6 +69,7 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
     }
 
     init();
+
     return () => { cancelled = true; };
   }, [router]);
 

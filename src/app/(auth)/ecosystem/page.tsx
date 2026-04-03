@@ -13,11 +13,18 @@ interface SecondaryLink {
   icon: string;
 }
 
+interface SubPage {
+  label: string;
+  url: string;
+  icon: string;
+}
+
 interface EcosystemApp {
   name: string;
   icon: string;
   description: string;
   iframeUrl: string;
+  subPages?: SubPage[];
   secondaryLinks?: SecondaryLink[];
 }
 
@@ -27,10 +34,13 @@ const ECOSYSTEM_APPS: EcosystemApp[] = [
     icon: '\u2694\uFE0F',
     description: 'Music battles — trade SOL on outcomes in a Solana prediction market for music.',
     iframeUrl: 'https://www.wavewarz.com',
+    subPages: [
+      { label: 'WaveWarZ', url: 'https://www.wavewarz.com', icon: '\u2694\uFE0F' },
+      { label: 'Intelligence', url: 'https://wavewarz-intelligence.vercel.app', icon: '\uD83E\uDDE0' },
+      { label: 'Analytics', url: 'https://analytics-wave-warz.vercel.app', icon: '\uD83D\uDCCA' },
+    ],
     secondaryLinks: [
       { label: 'Farcaster Channel', url: 'https://warpcast.com/~/channel/wavewarz', icon: '\uD83D\uDCAC' },
-      { label: 'WaveWarZ Intelligence', url: 'https://wavewarz-intelligence.vercel.app', icon: '\uD83E\uDDE0' },
-      { label: 'Analytics', url: 'https://analytics-wave-warz.vercel.app', icon: '\uD83D\uDCCA' },
     ],
   },
   {
@@ -79,6 +89,13 @@ const ECOSYSTEM_APPS: EcosystemApp[] = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+function getAllUrls(app: EcosystemApp): string[] {
+  if (app.subPages && app.subPages.length > 0) {
+    return app.subPages.map((s) => s.url);
+  }
+  return [app.iframeUrl];
+}
+
 function flattenAllLinks(categories: NexusCategory[]): NexusLink[] {
   const result: NexusLink[] = [];
   for (const cat of categories) {
@@ -92,47 +109,74 @@ function flattenAllLinks(categories: NexusCategory[]): NexusLink[] {
 
 export default function EcosystemPage() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [iframeStatus, setIframeStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
+  const [activeSubPage, setActiveSubPage] = useState(0);
+  // Track iframe status per URL so persisted iframes remember their state
+  const [iframeStatuses, setIframeStatuses] = useState<Record<string, 'loading' | 'loaded' | 'error'>>({});
+  // Track which URLs have been visited (mounted) so we keep them alive
+  const [mountedUrls, setMountedUrls] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [resourceSearch, setResourceSearch] = useState('');
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const iframeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const iframeTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const activeApp = ECOSYSTEM_APPS[activeIndex];
+  const hasSubPages = activeApp.subPages && activeApp.subPages.length > 0;
+  const currentUrl = hasSubPages ? activeApp.subPages![activeSubPage].url : activeApp.iframeUrl;
 
-  // Reset iframe state when switching apps
+  // Mark current URL as mounted and set loading if first visit
   useEffect(() => {
-    setIframeStatus('loading');
-    // If iframe doesn't fire onLoad within 8s, assume it was blocked
-    if (iframeTimerRef.current) clearTimeout(iframeTimerRef.current);
-    iframeTimerRef.current = setTimeout(() => {
-      setIframeStatus((prev) => (prev === 'loading' ? 'error' : prev));
+    setMountedUrls((prev) => {
+      if (prev.has(currentUrl)) return prev;
+      const next = new Set(prev);
+      next.add(currentUrl);
+      return next;
+    });
+
+    setIframeStatuses((prev) => {
+      if (prev[currentUrl]) return prev; // Already tracked, skip
+      return { ...prev, [currentUrl]: 'loading' };
+    });
+
+    // Only start timeout for fresh URLs (loading state)
+    // Use a ref-check to avoid starting timers for already-loaded iframes
+    const url = currentUrl;
+    if (iframeTimersRef.current[url]) clearTimeout(iframeTimersRef.current[url]);
+    iframeTimersRef.current[url] = setTimeout(() => {
+      setIframeStatuses((prev) =>
+        prev[url] === 'loading' ? { ...prev, [url]: 'error' } : prev,
+      );
     }, 8000);
+
     return () => {
-      if (iframeTimerRef.current) clearTimeout(iframeTimerRef.current);
+      if (iframeTimersRef.current[url]) clearTimeout(iframeTimersRef.current[url]);
     };
+  }, [currentUrl]);
+
+  // Reset sub-page and clear mounted URLs when switching apps
+  useEffect(() => {
+    setActiveSubPage(0);
+    setMountedUrls(new Set());
   }, [activeIndex]);
 
-  const handleIframeLoad = useCallback(() => {
-    if (iframeTimerRef.current) clearTimeout(iframeTimerRef.current);
-    setIframeStatus('loaded');
+  const handleIframeLoad = useCallback((url: string) => {
+    if (iframeTimersRef.current[url]) clearTimeout(iframeTimersRef.current[url]);
+    setIframeStatuses((prev) => ({ ...prev, [url]: 'loaded' }));
   }, []);
 
-  const handleIframeError = useCallback(() => {
-    if (iframeTimerRef.current) clearTimeout(iframeTimerRef.current);
-    setIframeStatus('error');
+  const handleIframeError = useCallback((url: string) => {
+    if (iframeTimersRef.current[url]) clearTimeout(iframeTimersRef.current[url]);
+    setIframeStatuses((prev) => ({ ...prev, [url]: 'error' }));
   }, []);
 
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(activeApp.iframeUrl);
+      await navigator.clipboard.writeText(currentUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback for older browsers
       const textarea = document.createElement('textarea');
-      textarea.value = activeApp.iframeUrl;
+      textarea.value = currentUrl;
       document.body.appendChild(textarea);
       textarea.select();
       document.execCommand('copy');
@@ -140,7 +184,7 @@ export default function EcosystemPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  }, [activeApp.iframeUrl]);
+  }, [currentUrl]);
 
   // Nexus links for the resources section
   const allLinks = flattenAllLinks(NEXUS_LINKS);
@@ -195,26 +239,46 @@ export default function EcosystemPage() {
         </div>
       </div>
 
-      {/* App Description */}
-      <div className="px-4 py-2 bg-[#0d1b2a]/50 border-b border-gray-800/50 flex-shrink-0">
-        <p className="text-xs text-gray-400">{activeApp.description}</p>
+      {/* App Description + Sub-page tabs */}
+      <div className="bg-[#0d1b2a]/50 border-b border-gray-800/50 flex-shrink-0">
+        <p className="text-xs text-gray-400 px-4 py-2">{activeApp.description}</p>
+
+        {/* Sub-page tabs — shown when app has sub-pages */}
+        {hasSubPages && (
+          <div className="flex gap-1 px-3 pb-2 overflow-x-auto scrollbar-hide">
+            {activeApp.subPages!.map((sub, i) => (
+              <button
+                key={sub.url}
+                onClick={() => setActiveSubPage(i)}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+                  i === activeSubPage
+                    ? 'bg-[#f5a623]/15 text-[#f5a623] border border-[#f5a623]/30'
+                    : 'text-gray-500 hover:text-gray-300 hover:bg-[#1a2a3a]/50'
+                }`}
+              >
+                <span>{sub.icon}</span>
+                <span>{sub.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Iframe Viewer — fills remaining height */}
+      {/* Iframe Viewer — fills remaining height, keeps visited iframes alive */}
       <div className="flex-1 relative min-h-[60vh]">
-        {/* Loading State */}
-        {iframeStatus === 'loading' && (
+        {/* Loading State — only for current URL */}
+        {iframeStatuses[currentUrl] === 'loading' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a1628] z-10">
             <div className="w-8 h-8 border-2 border-[#f5a623]/30 border-t-[#f5a623] rounded-full animate-spin mb-3" />
             <p className="text-xs text-gray-500">Loading {activeApp.name}...</p>
           </div>
         )}
 
-        {/* Error / Blocked State */}
-        {iframeStatus === 'error' && (
+        {/* Error / Blocked State — only for current URL */}
+        {iframeStatuses[currentUrl] === 'error' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a1628] z-10 px-6">
             <div className="text-4xl mb-4">{activeApp.icon}</div>
-            <h3 className="text-lg font-semibold text-white mb-2">{activeApp.name}</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">{hasSubPages ? activeApp.subPages![activeSubPage].label : activeApp.name}</h3>
             <p className="text-sm text-gray-400 text-center mb-1">
               This app cannot be embedded directly.
             </p>
@@ -222,7 +286,7 @@ export default function EcosystemPage() {
               Some sites restrict iframe embedding for security. You can open it externally instead.
             </p>
             <a
-              href={activeApp.iframeUrl}
+              href={currentUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#f5a623] text-[#0a1628] rounded-lg font-medium text-sm hover:bg-[#ffd700] transition-colors"
@@ -230,23 +294,24 @@ export default function EcosystemPage() {
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
               </svg>
-              Open {activeApp.name} externally
+              Open externally
             </a>
           </div>
         )}
 
-        {/* Iframe */}
-        <iframe
-          ref={iframeRef}
-          key={activeApp.iframeUrl}
-          src={activeApp.iframeUrl}
-          title={activeApp.name}
-          className="w-full h-full absolute inset-0 border-0"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-          allow="clipboard-write"
-          onLoad={handleIframeLoad}
-          onError={handleIframeError}
-        />
+        {/* Persistent iframes — all visited URLs stay mounted, only active one is visible */}
+        {getAllUrls(activeApp).filter((url) => mountedUrls.has(url)).map((url) => (
+          <iframe
+            key={url}
+            src={url}
+            title={`${activeApp.name} - ${url}`}
+            className={`w-full h-full absolute inset-0 border-0 ${url === currentUrl ? '' : 'invisible'}`}
+            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            allow="clipboard-write"
+            onLoad={() => handleIframeLoad(url)}
+            onError={() => handleIframeError(url)}
+          />
+        ))}
       </div>
 
       {/* Action Bar */}
@@ -254,7 +319,7 @@ export default function EcosystemPage() {
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
           {/* Open in new tab */}
           <a
-            href={activeApp.iframeUrl}
+            href={currentUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a2a3a] rounded-lg text-xs text-gray-300 hover:bg-[#1a2a3a]/80 hover:text-white transition-colors flex-shrink-0"

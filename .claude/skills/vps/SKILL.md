@@ -1,39 +1,61 @@
 ---
 name: vps
-description: Generate prompts for VPS Claude Code or ZOE (OpenClaw agent). Two destinations — Hostinger terminal (Claude Code) or Telegram (ZOE direct). Outputs copy-paste-ready prompts.
+description: Manage ZOE (OpenClaw agent) on the VPS via direct SSH, or send messages to ZOE on Telegram. Execute commands directly — no copy-paste needed.
 ---
 
 # VPS — ZOE Remote Management
 
-Generate self-contained prompts for TWO destinations:
-- **Hostinger web terminal** → Claude Code on the VPS (for system changes, config, debugging)
-- **Telegram** → ZOE directly (for task instructions, context updates, questions)
+Two modes of interaction:
+- **SSH direct** → Execute commands on the VPS via `ssh zaal@31.97.148.88 "command"` (for system changes, config, debugging, status checks)
+- **Telegram** → Generate copy-paste messages for ZOE directly (for task instructions, context updates, questions)
 
-You cannot SSH directly — all output is a copy-paste prompt for one of these two destinations.
+You HAVE direct SSH access as `zaal@31.97.148.88`. Use the Bash tool to run commands remotely. For docker commands, SSH in and run them — the zaal user is in the docker group.
 
 ## Usage
 
-- `/vps` — interactive, asks what you need and WHERE to send it
-- `/vps status` — health check prompt (→ Hostinger)
-- `/vps deploy <what to change>` — deploy config/files/upgrades (→ Hostinger)
-- `/vps zoe <instructions>` — send ZOE context + tasks via workspace files (→ Hostinger, generates Telegram message)
-- `/vps tell <message>` — send a direct message to ZOE (→ Telegram)
-- `/vps ask <question>` — ask ZOE a question (→ Telegram)
+- `/vps` — interactive, asks what you need
+- `/vps status` — health check (runs directly via SSH)
+- `/vps deploy <what to change>` — deploy config/files/upgrades (runs directly via SSH)
+- `/vps zoe <instructions>` — update ZOE's workspace files + generate Telegram message (runs directly via SSH)
+- `/vps tell <message>` — send a direct message to ZOE (→ Telegram copy-paste)
+- `/vps ask <question>` — ask ZOE a question (→ Telegram copy-paste)
 
-## Routing: Where Does This Go?
+## Routing: SSH or Telegram?
 
-**Before generating any prompt, determine the destination:**
+| Intent | Method |
+|--------|--------|
+| Check health, logs, container state | SSH direct — run it |
+| Change config, install packages, update files | SSH direct — run it |
+| Update SOUL.md, AGENTS.md, MEMORY.md, TASKS.md | SSH direct — run it |
+| Tell ZOE to build something, start a task | Telegram copy-paste |
+| Ask ZOE a question, give feedback | Telegram copy-paste |
+| Fix a bug ZOE introduced | SSH direct — run it |
 
-| Intent | Destination | Label |
-|--------|-------------|-------|
-| Check health, logs, container state | Hostinger (Claude Code) | `📋 Paste into Claude Code on the VPS:` |
-| Change config, install packages, update files | Hostinger (Claude Code) | `📋 Paste into Claude Code on the VPS:` |
-| Update SOUL.md, AGENTS.md, MEMORY.md, TASKS.md | Hostinger (Claude Code) | `📋 Paste into Claude Code on the VPS:` |
-| Tell ZOE to build something, start a task | **Telegram** (ZOE direct) | `💬 Send to ZOE on Telegram:` |
-| Ask ZOE a question, request status, give feedback | **Telegram** (ZOE direct) | `💬 Send to ZOE on Telegram:` |
-| Fix a bug ZOE introduced | Hostinger (Claude Code) | `📋 Paste into Claude Code on the VPS:` |
+**Rule of thumb:** If it touches the filesystem, Docker, or config → SSH direct. If it's a conversation with ZOE → Telegram.
 
-**Rule of thumb:** If it touches the filesystem, Docker, or config → Hostinger. If it's a conversation with ZOE → Telegram.
+## SSH Patterns
+
+**Single command:**
+```bash
+ssh zaal@31.97.148.88 "docker ps"
+```
+
+**Multi-command:**
+```bash
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/TASKS.md"
+```
+
+**Writing files (heredoc over SSH):**
+```bash
+ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 bash -c "cat > /home/node/openclaw-workspace/file.md << '"'"'EOF'"'"'
+content here
+EOF"'
+```
+
+**Config writes (need root inside container):**
+```bash
+ssh zaal@31.97.148.88 'docker exec -u root openclaw-openclaw-gateway-1 bash -c "..."'
+```
 
 ## Mode: tell (NEW — direct to ZOE on Telegram)
 
@@ -73,7 +95,7 @@ Container: openclaw-openclaw-gateway-1 (Docker, image openclaw:local)
 User inside container: node (uid 1000)
 Config file owner: uid 1001 (use docker exec -u root for openclaw.json edits)
 Workspace: /home/node/openclaw-workspace/
-Repo: /home/node/openclaw-workspace/zaoos/
+Repo: /home/node/openclaw-workspace/ZAOOS/
 Config: /home/node/.openclaw/openclaw.json (OWNED BY 1001 — need root to write)
 Agent identity: ZOE ⚡ — ZAO's orchestration agent
 Telegram bot: @zaoclaw_bot
@@ -101,28 +123,26 @@ These MUST be included as warnings in every generated prompt:
 
 ## Mode: status
 
-Generate a prompt with this exact structure:
+**Run these commands directly via SSH using the Bash tool.** Run multiple SSH commands in parallel for speed.
 
+Commands to run (all read-only):
+```bash
+# Run these in parallel via separate Bash tool calls:
+ssh zaal@31.97.148.88 "docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep openclaw"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'head -5 /home/node/openclaw-workspace/SOUL.md'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'wc -l /home/node/openclaw-workspace/MEMORY.md'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cat /home/node/openclaw-workspace/TASKS.md'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'head -3 /home/node/openclaw-workspace/AGENTS.md 2>/dev/null || echo no AGENTS.md'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'head -3 /home/node/openclaw-workspace/HEARTBEAT.md 2>/dev/null || echo no HEARTBEAT.md'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'ls -la /home/node/openclaw-workspace/memory/ 2>/dev/null || echo no daily notes'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cd /home/node/openclaw-workspace/zaoos && git log --oneline -5'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cd /home/node/openclaw-workspace/zaoos && git status --short | head -10'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'gh pr list --repo bettercallzaal/ZAOOS --limit 5 2>&1'"
+ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'gh issue list --repo bettercallzaal/ZAOOS --limit 5 2>&1'"
+ssh zaal@31.97.148.88 "docker logs openclaw-openclaw-gateway-1 --tail 15 2>&1"
 ```
-You are on the ZAO VPS. Run a health check on ZOE (OpenClaw agent in Docker).
 
-Run ALL of these in parallel — read everything, change nothing:
-
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep openclaw
-docker exec openclaw-openclaw-gateway-1 bash -c 'head -5 /home/node/openclaw-workspace/SOUL.md'
-docker exec openclaw-openclaw-gateway-1 bash -c 'wc -l /home/node/openclaw-workspace/MEMORY.md'
-docker exec openclaw-openclaw-gateway-1 bash -c 'cat /home/node/openclaw-workspace/TASKS.md'
-docker exec openclaw-openclaw-gateway-1 bash -c 'head -3 /home/node/openclaw-workspace/AGENTS.md 2>/dev/null || echo "no AGENTS.md"'
-docker exec openclaw-openclaw-gateway-1 bash -c 'head -3 /home/node/openclaw-workspace/HEARTBEAT.md 2>/dev/null || echo "no HEARTBEAT.md"'
-docker exec openclaw-openclaw-gateway-1 bash -c 'ls -la /home/node/openclaw-workspace/memory/ 2>/dev/null || echo "no daily notes"'
-docker exec openclaw-openclaw-gateway-1 bash -c 'cd /home/node/openclaw-workspace/zaoos && git log --oneline -5'
-docker exec openclaw-openclaw-gateway-1 bash -c 'cd /home/node/openclaw-workspace/zaoos && git status --short | head -10'
-docker exec openclaw-openclaw-gateway-1 bash -c 'gh pr list --repo bettercallzaal/ZAOOS --limit 5 2>&1'
-docker exec openclaw-openclaw-gateway-1 bash -c 'gh issue list --repo bettercallzaal/ZAOOS --limit 5 2>&1'
-docker logs openclaw-openclaw-gateway-1 --tail 15 2>&1
-docker exec openclaw-openclaw-gateway-1 bash -c 'python3 -c "import json; c=json.load(open(\"/home/node/.openclaw/openclaw.json\")); print(\"Model:\", c.get(\"agents\",{}).get(\"defaults\",{}).get(\"model\",\"unknown\")); print(\"MCP servers:\", list(c.get(\"mcpServers\",{}).keys())); print(\"Heartbeat:\", c.get(\"agents\",{}).get(\"defaults\",{}).get(\"heartbeat\",\"not set\"))"'
-
-Report in this format (read-only, change nothing):
+Then present results in this format:
 
 ## ZOE Status Report
 
@@ -130,17 +150,13 @@ Report in this format (read-only, change nothing):
 **Identity:** [SOUL.md first line]
 **Workspace files:** [which exist: AGENTS.md, HEARTBEAT.md, TASKS.md, daily notes]
 **MEMORY.md:** [line count]
-**Config:** [model, MCP servers list, heartbeat setting]
 
 ### Git State
 - Branch: [current]
 - Last 5 commits: [list]
 - Dirty files: [list or "clean"]
 
-### Open PRs
-[list or "none"]
-
-### Open Issues
+### Open PRs / Issues
 [list or "none"]
 
 ### Tasks (from TASKS.md)
@@ -151,55 +167,49 @@ Report in this format (read-only, change nothing):
 
 ### Suggested Actions
 [based on what you see — stale tasks, errors, missing files, etc.]
-```
 
 ## Mode: deploy
 
-1. **Gather local context first.** Before generating the prompt:
+**Execute directly via SSH.** Follow this workflow:
+
+1. **Gather local context first:**
    - Read any files the user references
    - Check recent research docs if relevant
    - Check git status for uncommitted local changes
-   - Read community.config.ts if the deploy touches branding/config
 
-2. **Generate a prompt** with this structure:
+2. **Read current state on VPS** (via SSH, read before write):
+   ```bash
+   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /path/to/file"
+   ```
 
-```
-You are on the ZAO VPS. Your job: [specific task].
+3. **Make changes** (via SSH):
+   ```bash
+   # Workspace files (node can write):
+   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cat > /home/node/openclaw-workspace/file.md << ...'"
+   
+   # Config files (need root):
+   ssh zaal@31.97.148.88 "docker exec -u root openclaw-openclaw-gateway-1 bash -c '...'"
+   ```
 
-## VPS ENVIRONMENT
-[environment block from above]
+4. **Verify** (via SSH):
+   ```bash
+   # After config changes, restart:
+   ssh zaal@31.97.148.88 "docker restart openclaw-openclaw-gateway-1 && sleep 30 && docker logs openclaw-openclaw-gateway-1 --tail 20"
+   ```
 
-## KNOWN GOTCHAS
-- openclaw.json is owned by uid 1001. Use `docker exec -u root` for config writes.
-- pip is not installed. Use npx or uvx for packages.
-- Workspace .md files are writable by node (no root needed).
-- Config changes need container restart. Workspace changes are automatic.
+5. **Generate Telegram message** for ZOE (output as copy-paste text)
 
-## STEP 1: READ CURRENT STATE
-[commands to read ONLY the files being changed — always read before write]
-
-## STEP 2: MAKE CHANGES
-[specific writes with exact content — use the heredoc pattern from gotchas]
-
-## STEP 3: VERIFY
-[check files exist, restart if config changed, check logs]
-
-## STEP 4: REPORT + ZOE TELEGRAM MESSAGE
-List what changed, any errors. Then generate a short Telegram message for me to send to ZOE that tells her what changed and asks for her Next 3 Moves. Print it clearly labeled "TELEGRAM MESSAGE FOR ZOE:" so I can copy-paste it.
-```
-
-3. **Rules for generated deploy prompts:**
-   - ALWAYS start with reading current state
-   - Use `docker exec openclaw-openclaw-gateway-1 bash -c '...'` for container ops
-   - Use `docker exec -u root` for openclaw.json writes and package installs
-   - For config: read first, merge with python3 script, don't overwrite
-   - For workspace files: node user can write directly
-   - After config changes: `docker restart openclaw-openclaw-gateway-1 && sleep 30 && docker logs openclaw-openclaw-gateway-1 --tail 20`
-   - Always end with a Telegram test message if workspace files changed
+**Rules:**
+- ALWAYS read before write
+- Use `docker exec -u root` for openclaw.json writes and package installs
+- For config: read first, merge with python3 script, don't overwrite
+- Workspace .md files writable by node (no root needed)
+- After config changes: restart container + check logs
+- Always generate a Telegram message for ZOE at the end if workspace files changed
 
 ## Mode: zoe
 
-For sending ZOE new context, instructions, or task updates.
+For sending ZOE new context, instructions, or task updates. **Execute directly via SSH.**
 
 1. **Gather context from this conversation** — what does ZOE need to know?
    - New tasks or priority changes
@@ -207,61 +217,38 @@ For sending ZOE new context, instructions, or task updates.
    - Corrections or new patterns for SOUL.md/AGENTS.md
    - Completed work to mark in TASKS.md
 
-2. **Generate a SINGLE prompt for VPS Claude Code** that does everything — file updates AND generates the Telegram message at the end:
+2. **Read current state via SSH:**
+   ```bash
+   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/MEMORY.md"
+   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/TASKS.md"
+   ```
 
-```
-You are on the ZAO VPS. Update ZOE's workspace files with new context, then generate a Telegram message for me to send her.
+3. **Update files via SSH:**
+   ```bash
+   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cat >> /home/node/openclaw-workspace/MEMORY.md << ...'"
+   ```
 
-## KNOWN GOTCHAS
-- openclaw.json owned by uid 1001. Use docker exec -u root for config writes.
-- Workspace .md files writable by node (no root needed).
-- Config changes need restart. Workspace changes are automatic.
+4. **Verify via SSH:**
+   ```bash
+   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/MEMORY.md | tail -5"
+   ```
 
-## STEP 1: READ CURRENT STATE
-docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/MEMORY.md
-docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/TASKS.md
-[add more reads as needed]
-
-## STEP 2: UPDATE FILES
-[exact content to append/replace — use docker exec with heredoc]
-
-## STEP 3: VERIFY
-[check files, restart if needed]
-
-## STEP 4: GENERATE TELEGRAM MESSAGE
-Print a short message (under 280 chars) for me to send ZOE on Telegram. Label it clearly:
-TELEGRAM MESSAGE FOR ZOE:
-[message that tells ZOE what changed, which files to read, and ends with "What are your Next 3 Moves?"]
-```
-
-The user only pastes ONE prompt into VPS Claude Code. The Telegram message comes out as part of the VPS output.
+5. **Generate Telegram message** for ZOE (output as copy-paste text, under 280 chars, ends with "What are your Next 3 Moves?")
 
 ## Mode: interactive (no args)
 
 Ask: "What do you need? I can:
-1. **Check ZOE's status** (`/vps status`) → Hostinger
-2. **Deploy changes** (`/vps deploy ...`) → Hostinger
-3. **Update ZOE's files** (`/vps zoe ...`) → Hostinger
-4. **Tell ZOE to do something** (`/vps tell ...`) → Telegram
-5. **Ask ZOE a question** (`/vps ask ...`) → Telegram"
-
-Then pick the right mode. If ambiguous, ask: "Should this go to Claude Code on the VPS, or directly to ZOE on Telegram?"
+1. **Check ZOE's status** (`/vps status`) — runs directly
+2. **Deploy changes** (`/vps deploy ...`) — runs directly
+3. **Update ZOE's files** (`/vps zoe ...`) — runs directly
+4. **Tell ZOE to do something** (`/vps tell ...`) — Telegram message
+5. **Ask ZOE a question** (`/vps ask ...`) — Telegram message"
 
 ## Output Format
 
-Structure your response as:
+For SSH modes (status, deploy, zoe): **Execute commands directly via Bash tool + SSH.** No copy-paste needed. Report results inline.
 
-1. **Brief explanation** of what the prompt will do (1-2 sentences)
-2. **"Paste this into Claude Code on the VPS:"** header
-3. The prompt in a single fenced code block
-
-**ONE prompt per invocation.** Always label which destination it goes to:
-- `📋 Paste into Claude Code on the VPS:` → for Hostinger terminal prompts
-- `💬 Send to ZOE on Telegram:` → for direct ZOE messages
-
-For Hostinger prompts that change workspace files, the VPS Claude Code generates the ZOE Telegram message as part of its output (in the final STEP). The user copies it from the VPS terminal.
-
-For `/vps tell` and `/vps ask`, you output the Telegram message directly — no VPS Claude Code involved.
+For Telegram modes (tell, ask): Output the message in a fenced code block labeled `Send to ZOE on Telegram:`
 
 ## Prompt Size Rules
 
@@ -276,7 +263,7 @@ For `/vps tell` and `/vps ask`, you output the Telegram message directly — no 
 | Wrong | Right |
 |-------|-------|
 | `~/.openclaw/workspace/` | `/home/node/openclaw-workspace/` |
-| `~/.openclaw/workspace/zaoos/` | `/home/node/openclaw-workspace/zaoos/` |
+| `~/.openclaw/workspace/zaoos/` | `/home/node/openclaw-workspace/ZAOOS/` |
 | MCP filesystem for writes | Terminal: `cat << 'EOF' > path` |
 | PR before code committed | Code → commit → push → PR |
 | `pip install` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` or `npx` |

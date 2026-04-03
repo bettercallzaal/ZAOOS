@@ -36,8 +36,8 @@ const ECOSYSTEM_APPS: EcosystemApp[] = [
     iframeUrl: 'https://www.wavewarz.com',
     subPages: [
       { label: 'WaveWarZ', url: 'https://www.wavewarz.com', icon: '\u2694\uFE0F' },
-      { label: 'Intelligence', url: 'https://wavewarz-intelligence.vercel.app', icon: '\uD83E\uDDE0' },
       { label: 'Analytics', url: 'https://analytics-wave-warz.vercel.app', icon: '\uD83D\uDCCA' },
+      { label: 'Intelligence', url: 'https://wavewarz-intelligence.vercel.app', icon: '\uD83E\uDDE0' },
     ],
     secondaryLinks: [
       { label: 'Farcaster Channel', url: 'https://warpcast.com/~/channel/wavewarz', icon: '\uD83D\uDCAC' },

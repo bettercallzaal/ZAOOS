@@ -20,6 +20,7 @@
 | [WaveWarZ Integration](./_categories/wavewarz.md) | 7 | Solana prediction markets, artist pipeline, battle mechanics, Polymarket analysis |
 | [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |
 | [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 25 | Claude Code skills, Paperclip agents, autoresearch, git branching |
+| [AI Competitions & ClawDown](./_categories/ai-competitions.md) | 1 | ClawDown poker agent, AI vs AI challenges |
 | [Other (Ethereum, Docs, Reference)](./_categories/other.md) | 12 | Whitepaper, GitHub docs, reference repos, Ethereum alignment |
 
 ---

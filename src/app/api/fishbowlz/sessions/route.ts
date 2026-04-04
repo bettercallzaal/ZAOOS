@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     // Check room exists and is active
     const { data: room, error: roomError } = await supabaseAdmin
       .from('fishbowl_rooms')
-      .select('id, state')
+      .select('id, state, total_sessions')
       .eq('id', data.roomId)
       .single();
 
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(session, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.errors }, { status: 400 });
+      return NextResponse.json({ error: err.issues }, { status: 400 });
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

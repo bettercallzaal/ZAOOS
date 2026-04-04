@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const data = EventSchema.parse(body);
 
-    const { id, error } = await supabaseAdmin.rpc('log_fishbowl_event', {
+    const { data: rpcData, error } = await supabaseAdmin.rpc('log_fishbowl_event', {
       p_event_type: data.eventType,
       p_event_data: JSON.stringify(data.eventData),
       p_room_id: data.roomId,
@@ -30,10 +30,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, id }, { status: 201 });
+    return NextResponse.json({ success: true, id: rpcData }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.errors }, { status: 400 });
+      return NextResponse.json({ error: err.issues }, { status: 400 });
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

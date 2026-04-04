@@ -26,7 +26,8 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const [joining, setJoining] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
   const pendingTextRef = useRef('');
 
   const toggleTranscription = useCallback(() => {
@@ -42,19 +43,20 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
       return;
     }
 
-    const SpeechRecognition = (window as unknown as { SpeechRecognition: SpeechRecognition; webkitSpeechRecognition: SpeechRecognition }).SpeechRecognition
-      || (window as unknown as { webkitSpeechRecognition: SpeechRecognition }).webkitSpeechRecognition;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognitionCtor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-    const recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognitionCtor();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
     recognitionRef.current = recognition;
 
-    recognition.onresult = async (event: SpeechRecognitionEvent) => {
-      const results = Array.from(event.results);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = async (event: any) => {
+      const results = Array.from(event.results) as any[];
       for (const result of results) {
-        const transcript = result[0].transcript.trim();
+        const transcript = (result[0] as any).transcript.trim();
         if (!transcript) continue;
         if (result.isFinal) {
           const text = pendingTextRef.current + ' ' + transcript;
@@ -79,7 +81,8 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
       }
     };
 
-    recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (e: any) => {
       if (e.error === 'no-speech') return;
       setTranscribing(false);
       recognitionRef.current = null;

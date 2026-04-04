@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
-import { useHMSStore, selectPeers } from '@100mslive/react-sdk';
-import { supabaseClient } from '@/lib/db/supabase';
 
 /**
  * useLiveTranscript
@@ -14,7 +12,8 @@ import { supabaseClient } from '@/lib/db/supabase';
  * Falls back gracefully if unavailable.
  */
 export function useLiveTranscript(roomId: string, enabled: boolean) {
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
   const lastTranscriptRef = useRef<string>('');
   const transcriptCountRef = useRef(0);
   const pendingTextRef = useRef('');
@@ -52,20 +51,21 @@ export function useLiveTranscript(roomId: string, enabled: boolean) {
       return;
     }
 
-    const SpeechRecognition = (window as unknown as { SpeechRecognition: SpeechRecognition; webkitSpeechRecognition: SpeechRecognition }).SpeechRecognition
-      || (window as unknown as { webkitSpeechRecognition: SpeechRecognition }).webkitSpeechRecognition;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognitionCtor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-    const recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognitionCtor();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
     recognitionRef.current = recognition;
 
-    recognition.onresult = async (event: SpeechRecognitionEvent) => {
-      const results = Array.from(event.results);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = async (event: any) => {
+      const results = Array.from(event.results) as any[];
 
       for (const result of results) {
-        const transcript = result[0].transcript.trim();
+        const transcript = (result[0] as any).transcript.trim();
         if (!transcript) continue;
 
         const isFinal = result.isFinal;
@@ -86,7 +86,8 @@ export function useLiveTranscript(roomId: string, enabled: boolean) {
       }
     };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
       if (event.error === 'no-speech') return;
       console.error('Speech recognition error:', event.error);
     };

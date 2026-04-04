@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { TranscriptInput } from '@/components/spaces/TranscriptInput';
 import dynamic from 'next/dynamic';
 
 const HMSFishbowlRoom = dynamic(
@@ -205,6 +206,18 @@ export default function FishbowlRoomPage() {
                 fishbowlRoomId={room.id}
                 role={isSpeaker ? 'speaker' : 'listener'}
                 onLeave={() => setAudioJoined(false)}
+              />
+            </div>
+          )}
+
+          {/* Transcript Input — for speakers to add what they said */}
+          {isSpeaker && (
+            <div className="mb-6 p-4 bg-[#1a2a4a] rounded-xl border border-white/10">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">📝 Add to transcript</p>
+              <TranscriptInput
+                roomId={room.id}
+                speakerRole={isHost ? 'host' : 'speaker'}
+                onTranscriptAdded={() => fetchTranscripts()}
               />
             </div>
           )}

@@ -12,7 +12,7 @@
 | **Documentation home** | `research/241-q1-2026-big-wins/` with per-win detail files |
 | **Skill** | `/big-win` skill for adding future wins to quarterly docs |
 | **Cadence** | Q2 starts now — add wins as they happen via the skill |
-| **WaveWarZ** | Deserves its own deep-dive session — 720 total battles, 442 SOL volume |
+| **WaveWarZ** | Deserves its own deep-dive session — 734 total battles, 472.67 SOL volume (live April 4) |
 
 ---
 
@@ -37,7 +37,7 @@
 | 15 | Bought Noun #1797 | Mainnet Noun co-purchased with Civil Monkey & Fiona for 0.44 ETH on Jan 29 after 2+ months watching |
 | 16 | WaveWarZ: First YouTube Stream | March — expanded from X Spaces to YouTube Live for nightly quick battles |
 | 17 | WaveWarZ: ATH Volume | Stilo World vs It's Wonderful hit all-time high volume |
-| 18 | WaveWarZ: 500+ Quick Battles + YouTube | Nightly battles transitioned from X Spaces to YouTube Live — biggest platform milestone |
+| 18 | WaveWarZ: 500+ Quick Battles + YouTube | Nightly battles transitioned from X Spaces to YouTube Live — 734 battles, 472 SOL volume |
 | 19 | First PR to SongJam | PR #21: host controls (mute, speaker timers, room settings, co-hosts) — 245 lines, merged by Logesh on Mar 25 |
 | 20 | Incented Campaigns | 6 campaigns totaling $260+ USDC + 485M ZABAL — clips, playlists, merch design, memes, Dappable builder challenge |
 | 21 | Artizen Fund — Carrot Castle Win | Won Boulder Week room via $ART voting on Incented — the domino that started everything |
@@ -61,9 +61,11 @@
 - **What:** Launched the ZABAL token via Clanker ecosystem on January 1, 2026
 - **Launch date:** January 1, 2026
 - **Details:** Community token built with the SongJam ecosystem in mind. Uses the SongJam leaderboard for tracking mentions across X (24-hour rolling cycles). Daily airdrops through Clanker ecosystem continuing for the rest of the year. Evolving into the ZAOndz governance layer.
+- **Total supply:** 100B ZABAL (confirmed on BaseScan)
+- **Holders:** 342 on-chain addresses
 - **Staking formula:** `1 + sqrt(Stake / 250,000)` — minimum stake 250K ZABAL
+- **Note:** Clanker was acquired by Neynar in January 2026 — potential native integration path since ZAO OS already uses Neynar
 - **ZAO OS integration:** `community.config.ts` line 160-164, Clanker partner
-- **NEEDS:** Distribution data from Empire Builder + Incented campaigns (Zaal will provide)
 
 ### 3. Empire Builder Integration
 - **What:** Empire Builder as the rewards mechanism layer for ZABAL
@@ -115,6 +117,7 @@
 - **What:** Launched ZAOndz — a Nouns-style subDAO for ZABAL on Base
 - **When:** March 2026
 - **Details:** 20% of the ZABAL token lives in ZAOndz. People who own the NFTs can make proposals for what to do with that 20%. Launched with support from the IYKYK community / Fractal Nouns Community. Low treasury currently but it's a place to store and share ideas about what to do with the creator amount.
+- **On-chain stats:** 10 NFTs minted, 2 owners, 1 proposal, latest auction ZOUNZ #9 (Mar 28)
 - **Contract:** `0xCB80Ef04DA68667c9a4450013BDD69269842c883` (ERC-721 on Base)
 - **ZAO OS integration:** `community.config.ts` line 166-170, `src/lib/zounz/contracts.ts`
 
@@ -177,11 +180,11 @@
 
 ### 17. WaveWarZ: All-Time High Volume
 - **What:** Hit ATH on volume — Stilo World vs It's Wonderful
-- **Details:** The Stilo World vs It's Wonderful match hit an all-time high on volume. Platform totals as of April 2026: 720 battles, 442.31 SOL ($35,318) total volume. WaveWarZ deep-dive scheduled for separate session — lots of Q1 growth to unpack.
+- **Details:** The Stilo World vs It's Wonderful match hit an all-time high on volume. STILO English has the highest per-battle volume ratio on the entire platform: 14.46 SOL across just 9 battles. Platform totals as of April 4: 734 battles, 472.67 SOL ($37,875). WaveWarZ deep-dive scheduled for separate session.
 
 ### 18. WaveWarZ: 500+ Quick Battles + YouTube Live Transition
 - **What:** Biggest platform milestone — transitioned quick battles from X Spaces to YouTube Live
-- **Details:** Locked in on the quick battle format with nightly battles Mon-Fri 8:30 PM EST. The transition from X Spaces to YouTube Live was the biggest milestone. 720 total battles platform-wide, 442.31 SOL volume, 7.65 SOL in artist payouts. WaveWarZ deep-dive coming.
+- **Details:** Locked in on the quick battle format with nightly battles Mon-Fri 8:30 PM EST. The transition from X Spaces to YouTube Live was the biggest milestone. Platform growing fast: +87 battles and +49.3 SOL volume in just 2 weeks. 43+ artists, 734 total battles, 472.67 SOL volume, 7.96 SOL in artist payouts. 16-artist tournament + AI artist tournament coming.
 
 ### 19. First Production Code Change to Someone Else's Code
 - **What:** PR #21 to SongJam — host controls for live audio rooms
@@ -293,18 +296,38 @@ The story of Q1 2026 is one domino chain:
 
 ---
 
-## WaveWarZ Platform Stats (as of April 2026)
+## WaveWarZ Platform Stats (Growth Snapshot)
 
-| Metric | Value |
-|--------|-------|
-| Total battles | 720 |
-| Total volume | 442.31 SOL ($35,318) |
-| Artist payouts | 7.65 SOL ($610) |
-| Platform revenue | 3.59 SOL ($287) |
-| Quick battle schedule | Mon-Fri, 8:30 PM EST |
-| Community AMA | Mon-Fri, 11:00 AM EST |
-| SOL price (at time) | $79.85 |
+| Metric | Mar 21 (Doc 101) | Apr 3 (Doc 241) | Apr 4 (Live) |
+|--------|------------------|-----------------|--------------|
+| Total battles | 647 | 720 | **734** |
+| Total volume | 423.37 SOL ($38K) | 442.31 SOL ($35K) | **472.67 SOL ($37,875)** |
+| Artist payouts | 7.17 SOL ($644) | 7.65 SOL ($610) | **7.96 SOL ($638)** |
+| Platform revenue | 3.38 SOL ($303) | 3.59 SOL ($287) | **3.75 SOL ($300)** |
+
+**+87 battles, +49.3 SOL volume in ~2 weeks.** Growth is accelerating.
+
+| Schedule | When |
+|----------|------|
+| Quick Battle Trading | Mon-Fri, 8:30 PM EST (YouTube Live) |
+| Community AMA | Mon-Fri, 11:00 AM EST (X Spaces) |
+| Main Events | Sundays |
 | Upcoming | 16-artist tournament + AI artist tournament |
+
+### Top Artists by Volume
+
+| Artist | W-L | Battles | SOL Volume | Win % |
+|--------|-----|---------|------------|-------|
+| LUI | 49-22 | 71 | 29.59 SOL | 69% |
+| STILO English | 4-5 | 9 | 14.46 SOL | 44% |
+| PROF!T | 5-2 | 7 | 13.86 SOL | 71% |
+| ONE | 9-5 | 14 | 12.04 SOL | 64% |
+| Lil Rocky | 10-23 | 33 | 11.96 SOL | 30% |
+| Stormi | 31-44 | 75 | 11.87 SOL | 41% |
+| APORKALYPSE | 22-8 | 30 | 10.97 SOL | 73% |
+| Preshzino Songz | 2-1 | 3 | 9.56 SOL | 67% |
+
+*STILO English has the highest per-battle volume ratio on the platform (14.46 SOL across 9 battles)*
 
 *Deep-dive into WaveWarZ Q1 wins scheduled for separate session*
 
@@ -350,3 +373,6 @@ This doc connects to the codebase through:
 - [Zaal's Carrot Castle Submission](https://incented.co/applications/5cf6d3eb-f998-4c3d-93c5-6e6e6d0bb7cf?org=carrot-castle)
 - [Carrot Castle](https://carrotcastle.xyz)
 - [ZABAL Empire on Empire Builder](https://www.empirebuilder.world/empire/0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07)
+- [ZABAL on BaseScan](https://basescan.org/token/0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07)
+- [ZABAL Update 3 on Paragraph](https://paragraph.com/@thezao/zabal-update-3)
+- [Incented Docs](https://docs.incented.co)

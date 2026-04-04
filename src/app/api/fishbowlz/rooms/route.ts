@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
         audio_source_url: data.audioSourceUrl,
         slug,
         state: 'active',
-        current_speakers: JSON.stringify([{ fid: data.hostFid, username: data.hostUsername, joinedAt: new Date().toISOString() }]),
-        current_listeners: JSON.stringify([]),
+        current_speakers: [{ fid: data.hostFid, username: data.hostUsername, joinedAt: new Date().toISOString() }],
+        current_listeners: [],
       })
       .select()
       .single();

@@ -34,14 +34,14 @@ export async function PATCH(
       const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, hot_seat_count').eq('id', id).single();
       if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
-      const speakers = room.data.current_speakers || [];
+      const speakers = typeof room.data.current_speakers === 'string' ? JSON.parse(room.data.current_speakers) : (room.data.current_speakers || []);
       if (speakers.length >= room.data.hot_seat_count) {
         return NextResponse.json({ error: 'Hot seat is full' }, { status: 409 });
       }
 
       const newSpeakers = [...speakers, { fid, username, joinedAt: new Date().toISOString() }];
       await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: JSON.stringify(newSpeakers),
+        current_speakers: newSpeakers,
         last_active_at: new Date().toISOString(),
       }).eq('id', id);
 
@@ -62,9 +62,10 @@ export async function PATCH(
       const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers').eq('id', id).single();
       if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
-      const speakers = (room.data.current_speakers || []).filter((s: { fid: number }) => s.fid !== fid);
+      const rawSpeakers = typeof room.data.current_speakers === 'string' ? JSON.parse(room.data.current_speakers) : (room.data.current_speakers || []);
+      const speakers = rawSpeakers.filter((s: { fid: number }) => s.fid !== fid);
       await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: JSON.stringify(speakers),
+        current_speakers: speakers,
         last_active_at: new Date().toISOString(),
       }).eq('id', id);
 
@@ -85,10 +86,10 @@ export async function PATCH(
       const room = await supabaseAdmin.from('fishbowl_rooms').select('current_listeners').eq('id', id).single();
       if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
-      const listeners = room.data.current_listeners || [];
+      const listeners = typeof room.data.current_listeners === 'string' ? JSON.parse(room.data.current_listeners) : (room.data.current_listeners || []);
       const newListeners = [...listeners, { fid, username, joinedAt: new Date().toISOString() }];
       await supabaseAdmin.from('fishbowl_rooms').update({
-        current_listeners: JSON.stringify(newListeners),
+        current_listeners: newListeners,
         last_active_at: new Date().toISOString(),
       }).eq('id', id);
 
@@ -110,8 +111,9 @@ export async function PATCH(
       const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, current_listeners, hot_seat_count').eq('id', id).single();
       if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
-      const speakers = room.data.current_speakers || [];
-      const listeners = (room.data.current_listeners || []).filter((l: { fid: number }) => l.fid !== listenerFid);
+      const speakers = typeof room.data.current_speakers === 'string' ? JSON.parse(room.data.current_speakers) : (room.data.current_speakers || []);
+      const rawListeners = typeof room.data.current_listeners === 'string' ? JSON.parse(room.data.current_listeners) : (room.data.current_listeners || []);
+      const listeners = rawListeners.filter((l: { fid: number }) => l.fid !== listenerFid);
 
       if (speakers.length >= room.data.hot_seat_count) {
         // Rotate out the first speaker
@@ -121,8 +123,8 @@ export async function PATCH(
       speakers.push({ fid: listenerFid, username: listenerUsername, joinedAt: new Date().toISOString() });
 
       await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: JSON.stringify(speakers),
-        current_listeners: JSON.stringify(listeners),
+        current_speakers: speakers,
+        current_listeners: listeners,
         last_active_at: new Date().toISOString(),
       }).eq('id', id);
 

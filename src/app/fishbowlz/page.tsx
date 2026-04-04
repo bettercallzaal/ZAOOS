@@ -33,7 +33,14 @@ export default function FishbowlzPage() {
   useEffect(() => {
     fetch('/api/fishbowlz/rooms')
       .then(r => r.json())
-      .then(d => setRooms(d.rooms || []))
+      .then(d => {
+        const rooms = (d.rooms || []).map((r: FishbowlRoom & Record<string, unknown>) => ({
+          ...r,
+          current_speakers: typeof r.current_speakers === 'string' ? JSON.parse(r.current_speakers as string) : (r.current_speakers || []),
+          current_listeners: typeof r.current_listeners === 'string' ? JSON.parse(r.current_listeners as string) : (r.current_listeners || []),
+        }));
+        setRooms(rooms);
+      })
       .catch(() => setRooms([]))
       .finally(() => setLoading(false));
   }, []);

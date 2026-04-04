@@ -65,9 +65,14 @@ export default function FishbowlRoomPage() {
       const res = await fetch(`/api/fishbowlz/rooms/${roomId}`);
       if (!res.ok) throw new Error('Room not found');
       const data = await res.json();
+      // Parse JSONB strings from Supabase
+      if (typeof data.current_speakers === 'string') data.current_speakers = JSON.parse(data.current_speakers);
+      if (typeof data.current_listeners === 'string') data.current_listeners = JSON.parse(data.current_listeners);
       setRoom(data);
     } catch {
       setError('Room not found');
+    } finally {
+      setLoading(false);
     }
   }, [roomId]);
 

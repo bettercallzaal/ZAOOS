@@ -3,6 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import dynamic from 'next/dynamic';
+
+const HMSFishbowlRoom = dynamic(
+  () => import('@/components/spaces/HMSFishbowlRoom').then((m) => m.HMSFishbowlRoom),
+  { ssr: false }
+);
 
 interface Speaker {
   fid: number;
@@ -46,10 +52,11 @@ export default function FishbowlRoomPage() {
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [audioJoined, setAudioJoined] = useState(false);
 
   const isHost = user?.fid === room?.host_fid;
-  const isSpeaker = room?.current_speakers?.some(s => s.fid === user?.fid);
-  const isListener = room?.current_listeners?.some(l => l.fid === user?.fid);
+  const isSpeaker = room?.current_speakers?.some((s) => s.fid === user?.fid);
+  const isListener = room?.current_listeners?.some((l) => l.fid === user?.fid);
   const hotSeatFull = (room?.current_speakers?.length || 0) >= (room?.hot_seat_count || 0);
 
   const fetchRoom = useCallback(async () => {
@@ -82,7 +89,6 @@ export default function FishbowlRoomPage() {
     fetchRoom();
     fetchTranscripts();
 
-    // Poll every 5 seconds for room state
     const interval = setInterval(fetchRoom, 5000);
     const transcriptInterval = setInterval(fetchTranscripts, 10000);
 
@@ -102,6 +108,7 @@ export default function FishbowlRoomPage() {
         body: JSON.stringify({ action: 'join_speaker', fid: user.fid, username: user.username }),
       });
       await fetchRoom();
+      setAudioJoined(true);
     } finally {
       setJoining(false);
     }
@@ -145,6 +152,7 @@ export default function FishbowlRoomPage() {
       body: JSON.stringify({ action: 'leave_speaker', fid: user.fid }),
     });
     await fetchRoom();
+    setAudioJoined(false);
   };
 
   if (loading || authLoading) {
@@ -188,9 +196,20 @@ export default function FishbowlRoomPage() {
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row">
-        {/* Main Stage — Hot Seat */}
+        {/* Main Stage — Hot Seat + Audio */}
         <div className="flex-1 p-6">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Hot Seat</h2>
+          {/* HMS Audio */}
+          {audioJoined && user && (
+            <div className="mb-6 rounded-xl overflow-hidden border border-white/10">
+              <HMSFishbowlRoom
+                fishbowlRoomId={room.id}
+                role={isSpeaker ? 'speaker' : 'listener'}
+                onLeave={() => setAudioJoined(false)}
+              />
+            </div>
+          )}
+
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">🔥 Hot Seat</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {Array.from({ length: room.hot_seat_count }).map((_, i) => {
               const speaker = room.current_speakers?.[i];
@@ -204,15 +223,13 @@ export default function FishbowlRoomPage() {
                   }`}
                 >
                   {speaker ? (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 rounded-full bg-[#f5a623]/20 flex items-center justify-center text-[#f5a623] font-bold text-sm">
-                          {speaker.username[0].toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-sm">{speaker.username}</p>
-                          <p className="text-xs text-gray-400">🔥 Hot seat</p>
-                        </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-[#f5a623]/20 flex items-center justify-center text-[#f5a623] font-bold text-sm">
+                        {speaker.username[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">{speaker.username}</p>
+                        <p className="text-xs text-gray-400">🔥 Hot seat</p>
                       </div>
                     </div>
                   ) : (
@@ -230,34 +247,57 @@ export default function FishbowlRoomPage() {
             {!user ? (
               <p className="text-gray-400 text-sm">Sign in to join</p>
             ) : isSpeaker ? (
-              <button
-                onClick={leave}
-                className="bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors"
-              >
-                Leave hot seat
-              </button>
+              <>
+                {!audioJoined && (
+                  <button
+                    onClick={joinAsSpeaker}
+                    disabled={joining}
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                  >
+                    {joining ? 'Joining...' : 'Join Audio'}
+                  </button>
+                )}
+                <button
+                  onClick={leave}
+                  className="bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors"
+                >
+                  Leave hot seat
+                </button>
+              </>
             ) : isListener ? (
-              hotSeatFull ? (
-                <button
-                  onClick={rotateIn}
-                  disabled={!room.rotation_enabled}
-                  className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
-                >
-                  Rotate in (hot seat full)
-                </button>
-              ) : (
-                <button
-                  onClick={joinAsSpeaker}
-                  className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors"
-                >
-                  Join hot seat
-                </button>
-              )
+              <>
+                {!audioJoined && (
+                  <button
+                    onClick={joinAsListener}
+                    disabled={joining}
+                    className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50"
+                  >
+                    {joining ? 'Joining...' : 'Join Audio (Listener)'}
+                  </button>
+                )}
+                {hotSeatFull ? (
+                  <button
+                    onClick={rotateIn}
+                    disabled={!room.rotation_enabled || joining}
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                  >
+                    Rotate in
+                  </button>
+                ) : (
+                  <button
+                    onClick={joinAsSpeaker}
+                    disabled={hotSeatFull || joining}
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                  >
+                    {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
+                  </button>
+                )}
+              </>
             ) : (
               <>
                 <button
                   onClick={joinAsSpeaker}
-                  disabled={hotSeatFull}
+                  disabled={hotSeatFull || joining}
                   className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
                 >
                   {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
@@ -308,7 +348,7 @@ export default function FishbowlRoomPage() {
               {transcripts.length === 0 ? (
                 <p className="text-gray-500 text-sm text-center py-8">No transcript yet. Start talking!</p>
               ) : (
-                transcripts.map(seg => (
+                transcripts.map((seg) => (
                   <div key={seg.id} className="text-sm">
                     <span className="font-semibold text-[#f5a623]">{seg.speaker_name}</span>
                     <span className="text-gray-500 text-xs ml-2">[{seg.speaker_role}]</span>

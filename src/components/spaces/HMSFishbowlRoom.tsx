@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   HMSRoomProvider,
   useHMSActions,
@@ -15,21 +15,85 @@ import { useAuth } from '@/hooks/useAuth';
 interface HMSFishbowlRoomProps {
   fishbowlRoomId: string;
   role: 'speaker' | 'listener';
+  isHost?: boolean;
   onLeave: () => void;
 }
 
-function HMSFishbowlRoomInner({ fishbowlRoomId, role, onLeave }: HMSFishbowlRoomProps) {
+function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFishbowlRoomProps) {
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peers = useHMSStore(selectPeers);
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const [joining, setJoining] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const pendingTextRef = useRef('');
 
-  const userFid = useHMSStore((store) => {
-    // Get local peer fid from peers
-    const localPeer = peers.find((p) => p.isLocal);
-    return localPeer?.hmsUserId;
-  });
+  const toggleTranscription = useCallback(() => {
+    if (transcribing) {
+      recognitionRef.current?.stop();
+      recognitionRef.current = null;
+      setTranscribing(false);
+      return;
+    }
+
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Speech recognition not supported in this browser. Try Chrome.');
+      return;
+    }
+
+    const SpeechRecognition = (window as unknown as { SpeechRecognition: SpeechRecognition; webkitSpeechRecognition: SpeechRecognition }).SpeechRecognition
+      || (window as unknown as { webkitSpeechRecognition: SpeechRecognition }).webkitSpeechRecognition;
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognitionRef.current = recognition;
+
+    recognition.onresult = async (event: SpeechRecognitionEvent) => {
+      const results = Array.from(event.results);
+      for (const result of results) {
+        const transcript = result[0].transcript.trim();
+        if (!transcript) continue;
+        if (result.isFinal) {
+          const text = pendingTextRef.current + ' ' + transcript;
+          pendingTextRef.current = '';
+          try {
+            await fetch('/api/fishbowlz/transcribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                roomId: fishbowlRoomId,
+                speakerName: 'Speaker',
+                speakerRole: 'speaker',
+                text,
+                startedAt: new Date().toISOString(),
+                source: 'whisper',
+              }),
+            });
+          } catch { /* non-critical */ }
+        } else {
+          pendingTextRef.current = transcript;
+        }
+      }
+    };
+
+    recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
+      if (e.error === 'no-speech') return;
+      setTranscribing(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.start();
+    setTranscribing(true);
+  }, [transcribing, fishbowlRoomId]);
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
 
   useEffect(() => {
     const joinRoom = async () => {
@@ -100,6 +164,19 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, onLeave }: HMSFishbowlRoom
           <span className="text-gray-500 text-xs">{peers.length} in room</span>
         </div>
         <div className="flex gap-2">
+          {(isHost || role === 'speaker') && (
+            <button
+              onClick={toggleTranscription}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                transcribing
+                  ? 'bg-red-600/20 text-red-400 border border-red-600/30'
+                  : 'bg-gray-700 text-gray-400 hover:text-white'
+              }`}
+              title={transcribing ? 'Stop transcription' : 'Start live transcription'}
+            >
+              {transcribing ? '⏹ Live' : '🎤 Transcribe'}
+            </button>
+          )}
           <button
             onClick={toggleMute}
             className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
@@ -168,10 +245,10 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, onLeave }: HMSFishbowlRoom
   );
 }
 
-export function HMSFishbowlRoom({ fishbowlRoomId, role, onLeave }: HMSFishbowlRoomProps) {
+export function HMSFishbowlRoom({ fishbowlRoomId, role, isHost, onLeave }: HMSFishbowlRoomProps) {
   return (
     <HMSRoomProvider>
-      <HMSFishbowlRoomInner fishbowlRoomId={fishbowlRoomId} role={role} onLeave={onLeave} />
+      <HMSFishbowlRoomInner fishbowlRoomId={fishbowlRoomId} role={role} isHost={isHost} onLeave={onLeave} />
     </HMSRoomProvider>
   );
 }

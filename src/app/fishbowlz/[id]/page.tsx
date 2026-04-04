@@ -205,6 +205,7 @@ export default function FishbowlRoomPage() {
               <HMSFishbowlRoom
                 fishbowlRoomId={room.id}
                 role={isSpeaker ? 'speaker' : 'listener'}
+                isHost={isHost}
                 onLeave={() => setAudioJoined(false)}
               />
             </div>

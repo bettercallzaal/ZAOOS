@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 
 const EventSchema = z.object({
   eventType: z.string(),
-  eventData: z.record(z.unknown()),
+  eventData: z.record(z.string(), z.unknown()),
   roomId: z.string().uuid().optional(),
   sessionId: z.string().uuid().optional(),
   actorFid: z.number().int().positive().optional(),

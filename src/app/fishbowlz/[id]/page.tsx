@@ -243,17 +243,17 @@ export default function FishbowlRoomPage() {
   return (
     <div className="min-h-screen bg-[#0a1628] text-white flex flex-col">
       {/* Header */}
-      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button onClick={() => router.push('/fishbowlz')} className="text-gray-400 hover:text-white">
+      <div className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3 min-w-0">
+          <button onClick={() => router.push('/fishbowlz')} className="text-gray-400 hover:text-white shrink-0 p-1">
             ←
           </button>
-          <div>
-            <h1 className="text-xl font-bold">{room.title}</h1>
-            <p className="text-sm text-gray-400">by @{room.host_username}</p>
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold truncate">{room.title}</h1>
+            <p className="text-xs sm:text-sm text-gray-400">by @{room.host_username}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <span className={`text-xs px-2 py-1 rounded-full ${room.state === 'active' ? 'bg-green-600/20 text-green-400' : 'bg-yellow-600/20 text-yellow-400'}`}>
             {room.state}
           </span>
@@ -271,7 +271,7 @@ export default function FishbowlRoomPage() {
 
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Main Stage — Hot Seat + Audio */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 sm:p-6">
           {/* HMS Audio */}
           {audioJoined && user && (
             <div className="mb-6 rounded-xl overflow-hidden border border-white/10">
@@ -333,7 +333,7 @@ export default function FishbowlRoomPage() {
           </div>
 
           {/* Join Controls */}
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-4 sm:mt-6 flex flex-wrap gap-2 sm:gap-3">
             {!user ? (
               <p className="text-gray-400 text-sm">Sign in to join</p>
             ) : isSpeaker ? (
@@ -342,14 +342,14 @@ export default function FishbowlRoomPage() {
                   <button
                     onClick={joinAsSpeaker}
                     disabled={joining}
-                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
                   >
                     {joining ? 'Joining...' : 'Join Audio'}
                   </button>
                 )}
                 <button
                   onClick={leave}
-                  className="bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors"
+                  className="bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors min-h-[44px]"
                 >
                   Leave hot seat
                 </button>
@@ -360,7 +360,7 @@ export default function FishbowlRoomPage() {
                   <button
                     onClick={joinAsListener}
                     disabled={joining}
-                    className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50"
+                    className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50 min-h-[44px]"
                   >
                     {joining ? 'Joining...' : 'Join Audio (Listener)'}
                   </button>
@@ -369,7 +369,7 @@ export default function FishbowlRoomPage() {
                   <button
                     onClick={rotateIn}
                     disabled={!room.rotation_enabled || joining}
-                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
                   >
                     Rotate in
                   </button>
@@ -377,7 +377,7 @@ export default function FishbowlRoomPage() {
                   <button
                     onClick={joinAsSpeaker}
                     disabled={hotSeatFull || joining}
-                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
                   >
                     {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
                   </button>
@@ -388,13 +388,13 @@ export default function FishbowlRoomPage() {
                 <button
                   onClick={joinAsSpeaker}
                   disabled={hotSeatFull || joining}
-                  className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                  className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
                 >
                   {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
                 </button>
                 <button
                   onClick={joinAsListener}
-                  className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors"
+                  className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors min-h-[44px]"
                 >
                   Join as listener
                 </button>
@@ -411,7 +411,7 @@ export default function FishbowlRoomPage() {
         </div>
 
         {/* Sidebar — Listeners + Transcript */}
-        <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col">
+        <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col max-h-[50vh] lg:max-h-none">
           {/* Listeners */}
           <div className="p-4 border-b border-white/10">
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">

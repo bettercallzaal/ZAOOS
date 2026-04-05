@@ -34,10 +34,14 @@ export async function GET(
 ) {
   const { id } = await params;
 
+  // Support lookup by UUID or slug
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  const column = isUuid ? 'id' : 'slug';
+
   const { data: room, error } = await supabaseAdmin
     .from('fishbowl_rooms')
     .select('*')
-    .eq('id', id)
+    .eq(column, id)
     .single();
 
   if (error || !room) {
@@ -76,12 +80,21 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { id: rawId } = await params;
 
   // Auth check
   const session = await getSessionData();
   if (!session?.fid) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Resolve slug to UUID if needed
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawId);
+  let id = rawId;
+  if (!isUuid) {
+    const { data: slugRoom } = await supabaseAdmin.from('fishbowl_rooms').select('id').eq('slug', rawId).single();
+    if (!slugRoom) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+    id = slugRoom.id;
   }
 
   const body = await req.json();

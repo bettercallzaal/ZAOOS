@@ -157,7 +157,7 @@ export default function FishbowlRoomPage() {
   }, [user, roomId, isSpeaker, isListener]);
 
   const copyShareLink = () => {
-    const url = `${window.location.origin}/fishbowlz/${roomId}`;
+    const url = `${window.location.origin}/fishbowlz/${room?.slug || roomId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);

@@ -14,6 +14,7 @@ function parseJsonb<T>(value: unknown, fallback: T): T {
 
 interface FishbowlRoom {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   host_name: string;
@@ -74,7 +75,7 @@ export default function FishbowlzPage() {
 
     if (res.ok) {
       const room = await res.json();
-      router.push(`/fishbowlz/${room.id}`);
+      router.push(`/fishbowlz/${room.slug || room.id}`);
     }
   };
 
@@ -180,7 +181,7 @@ export default function FishbowlzPage() {
         ) : (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map(room => (
-              <Link key={room.id} href={`/fishbowlz/${room.id}`}>
+              <Link key={room.id} href={`/fishbowlz/${room.slug || room.id}`}>
                 <div className="bg-[#1a2a4a] rounded-xl p-5 border border-white/10 hover:border-[#f5a623]/50 transition-colors cursor-pointer">
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-bold text-lg truncate flex-1">{room.title}</h3>

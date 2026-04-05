@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { TranscriptInput } from '@/components/spaces/TranscriptInput';
@@ -12,6 +12,16 @@ function parseJsonb<T>(value: unknown, fallback: T): T {
     try { return JSON.parse(value); } catch { return fallback; }
   }
   return (value as T) ?? fallback;
+}
+
+function timeAgo(dateStr: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 }
 
 const HMSFishbowlRoom = dynamic(
@@ -65,6 +75,7 @@ export default function FishbowlRoomPage() {
   const [audioJoined, setAudioJoined] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [copied, setCopied] = useState(false);
+  const transcriptBottomRef = useRef<HTMLDivElement>(null);
 
   const isHost = user?.fid === room?.host_fid;
   const isSpeaker = room?.current_speakers?.some((s) => s.fid === user?.fid);
@@ -79,18 +90,32 @@ export default function FishbowlRoomPage() {
       // Parse JSONB strings from Supabase
       data.current_speakers = parseJsonb(data.current_speakers, []);
       data.current_listeners = parseJsonb(data.current_listeners, []);
-      setRoom(data);
+
       if (data.state === 'ended') {
         setAudioJoined(false);
-        router.push('/fishbowlz');
+        // Only auto-redirect if the user was actively participating when the room ended.
+        // If navigating directly to an ended room URL, show the transcript archive instead.
+        setRoom((prev) => {
+          if (prev && prev.state === 'active') {
+            const wasParticipating =
+              prev.current_speakers?.some((s) => s.fid === user?.fid) ||
+              prev.current_listeners?.some((l) => l.fid === user?.fid);
+            if (wasParticipating) {
+              router.push('/fishbowlz');
+            }
+          }
+          return data;
+        });
         return;
       }
+
+      setRoom(data);
     } catch {
       setError('Room not found');
     } finally {
       setLoading(false);
     }
-  }, [roomId]);
+  }, [roomId, user?.fid]);
 
   const fetchTranscripts = useCallback(async () => {
     try {
@@ -156,8 +181,13 @@ export default function FishbowlRoomPage() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [user, roomId, isSpeaker, isListener]);
 
+  // Auto-scroll transcript to bottom when new transcripts arrive
+  useEffect(() => {
+    transcriptBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [transcripts]);
+
   const copyShareLink = () => {
-    const url = `${window.location.origin}/fishbowlz/${roomId}`;
+    const url = `${window.location.origin}/fishbowlz/${room?.slug || roomId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -271,7 +301,11 @@ export default function FishbowlRoomPage() {
           >
             {copied ? '✓ Copied' : '🔗 Share'}
           </button>
-          <span className={`text-xs px-2 py-1 rounded-full ${room.state === 'active' ? 'bg-green-600/20 text-green-400' : 'bg-yellow-600/20 text-yellow-400'}`}>
+          <span className={`text-xs px-2 py-1 rounded-full ${
+            room.state === 'active'
+              ? 'bg-green-600/20 text-green-400'
+              : 'bg-gray-600/20 text-gray-400'
+          }`}>
             {room.state}
           </span>
           <span className="text-xs text-gray-500">🔴 {room.hot_seat_count} seats</span>
@@ -289,31 +323,42 @@ export default function FishbowlRoomPage() {
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Main Stage — Hot Seat + Audio */}
         <div className="flex-1 p-4 sm:p-6">
-          {/* HMS Audio */}
-          {audioJoined && user && (
-            <div className="mb-6 rounded-xl overflow-hidden border border-white/10">
-              <HMSFishbowlRoom
-                fishbowlRoomId={room.id}
-                fishbowlSlug={room.slug}
-                userFid={user.fid}
-                userName={user.displayName || user.username || 'Anonymous'}
-                role={isSpeaker ? 'speaker' : 'listener'}
-                isHost={isHost}
-                onLeave={() => setAudioJoined(false)}
-              />
+          {/* Ended banner */}
+          {room.state === 'ended' && (
+            <div className="mb-4 p-3 bg-gray-800/50 rounded-lg border border-gray-700 text-center">
+              <p className="text-gray-400 text-sm">This fishbowl has ended</p>
             </div>
           )}
 
-          {/* Transcript Input — for speakers to add what they said */}
-          {isSpeaker && (
-            <div className="mb-6 p-4 bg-[#1a2a4a] rounded-xl border border-white/10">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">📝 Add to transcript</p>
-              <TranscriptInput
-                roomId={room.id}
-                speakerRole={isHost ? 'host' : 'speaker'}
-                onTranscriptAdded={() => fetchTranscripts()}
-              />
-            </div>
+          {room.state === 'active' && (
+            <>
+              {/* HMS Audio */}
+              {audioJoined && user && (
+                <div className="mb-6 rounded-xl overflow-hidden border border-white/10">
+                  <HMSFishbowlRoom
+                    fishbowlRoomId={room.id}
+                    fishbowlSlug={room.slug}
+                    userFid={user.fid}
+                    userName={user.displayName || user.username || 'Anonymous'}
+                    role={isSpeaker ? 'speaker' : 'listener'}
+                    isHost={isHost}
+                    onLeave={() => setAudioJoined(false)}
+                  />
+                </div>
+              )}
+
+              {/* Transcript Input — for speakers to add what they said */}
+              {isSpeaker && (
+                <div className="mb-6 p-4 bg-[#1a2a4a] rounded-xl border border-white/10">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">📝 Add to transcript</p>
+                  <TranscriptInput
+                    roomId={room.id}
+                    speakerRole={isHost ? 'host' : 'speaker'}
+                    onTranscriptAdded={() => fetchTranscripts()}
+                  />
+                </div>
+              )}
+            </>
           )}
 
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">🔥 Hot Seat</h2>
@@ -349,48 +394,60 @@ export default function FishbowlRoomPage() {
             })}
           </div>
 
-          {/* Join Controls */}
-          <div className="mt-4 sm:mt-6 flex flex-wrap gap-2 sm:gap-3">
-            {!user ? (
-              <p className="text-gray-400 text-sm">Sign in to join</p>
-            ) : isSpeaker ? (
-              <>
-                {!audioJoined && (
+          {/* Join Controls — only shown for active rooms */}
+          {room.state === 'active' && (
+            <div className="mt-4 sm:mt-6 flex flex-wrap gap-2 sm:gap-3">
+              {!user ? (
+                <p className="text-gray-400 text-sm">Sign in to join</p>
+              ) : isSpeaker ? (
+                <>
+                  {!audioJoined && (
+                    <button
+                      onClick={joinAsSpeaker}
+                      disabled={joining}
+                      className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
+                    >
+                      {joining ? 'Joining...' : 'Join Audio'}
+                    </button>
+                  )}
                   <button
-                    onClick={joinAsSpeaker}
-                    disabled={joining}
-                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
+                    onClick={leave}
+                    className="bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors min-h-[44px]"
                   >
-                    {joining ? 'Joining...' : 'Join Audio'}
+                    Leave hot seat
                   </button>
-                )}
-                <button
-                  onClick={leave}
-                  className="bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors min-h-[44px]"
-                >
-                  Leave hot seat
-                </button>
-              </>
-            ) : isListener ? (
-              <>
-                {!audioJoined && (
-                  <button
-                    onClick={joinAsListener}
-                    disabled={joining}
-                    className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50 min-h-[44px]"
-                  >
-                    {joining ? 'Joining...' : 'Join Audio (Listener)'}
-                  </button>
-                )}
-                {hotSeatFull ? (
-                  <button
-                    onClick={rotateIn}
-                    disabled={!room.rotation_enabled || joining}
-                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
-                  >
-                    Rotate in
-                  </button>
-                ) : (
+                </>
+              ) : isListener ? (
+                <>
+                  {!audioJoined && (
+                    <button
+                      onClick={joinAsListener}
+                      disabled={joining}
+                      className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50 min-h-[44px]"
+                    >
+                      {joining ? 'Joining...' : 'Join Audio (Listener)'}
+                    </button>
+                  )}
+                  {hotSeatFull ? (
+                    <button
+                      onClick={rotateIn}
+                      disabled={!room.rotation_enabled || joining}
+                      className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
+                    >
+                      Rotate in
+                    </button>
+                  ) : (
+                    <button
+                      onClick={joinAsSpeaker}
+                      disabled={hotSeatFull || joining}
+                      className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
+                    >
+                      {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
                   <button
                     onClick={joinAsSpeaker}
                     disabled={hotSeatFull || joining}
@@ -398,26 +455,16 @@ export default function FishbowlRoomPage() {
                   >
                     {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
                   </button>
-                )}
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={joinAsSpeaker}
-                  disabled={hotSeatFull || joining}
-                  className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
-                >
-                  {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
-                </button>
-                <button
-                  onClick={joinAsListener}
-                  className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors min-h-[44px]"
-                >
-                  Join as listener
-                </button>
-              </>
-            )}
-          </div>
+                  <button
+                    onClick={joinAsListener}
+                    className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors min-h-[44px]"
+                  >
+                    Join as listener
+                  </button>
+                </>
+              )}
+            </div>
+          )}
 
           {/* Room description */}
           {room.description && (
@@ -449,19 +496,27 @@ export default function FishbowlRoomPage() {
           {/* Live Transcript */}
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">📝 Live Transcript</h3>
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                {room.state === 'ended' ? '📝 Transcript Archive' : '📝 Live Transcript'}
+              </h3>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {transcripts.length === 0 ? (
-                <p className="text-gray-500 text-sm text-center py-8">No transcript yet. Start talking!</p>
+                <p className="text-gray-500 text-sm text-center py-8">
+                  {room.state === 'ended' ? 'No transcript was recorded for this fishbowl.' : 'No transcript yet. Start talking!'}
+                </p>
               ) : (
-                transcripts.map((seg) => (
-                  <div key={seg.id} className="text-sm">
-                    <span className="font-semibold text-[#f5a623]">{seg.speaker_name}</span>
-                    <span className="text-gray-500 text-xs ml-2">[{seg.speaker_role}]</span>
-                    <p className="text-gray-200 mt-1">{seg.text}</p>
-                  </div>
-                ))
+                <>
+                  {transcripts.map((seg) => (
+                    <div key={seg.id} className="text-sm">
+                      <span className="font-semibold text-[#f5a623]">{seg.speaker_name}</span>
+                      <span className="text-gray-500 text-xs ml-2">[{seg.speaker_role}]</span>
+                      <span className="text-gray-600 text-xs ml-2">{timeAgo(seg.started_at)}</span>
+                      <p className="text-gray-200 mt-1">{seg.text}</p>
+                    </div>
+                  ))}
+                  <div ref={transcriptBottomRef} />
+                </>
               )}
             </div>
           </div>
@@ -472,6 +527,46 @@ export default function FishbowlRoomPage() {
           </div>
         </div>
       </div>
+
+      {/* Spacer for sticky mobile bottom bar */}
+      {audioJoined && room?.state === 'active' && (
+        <div className="lg:hidden h-16" />
+      )}
+
+      {/* Sticky mobile audio controls */}
+      {audioJoined && user && room?.state === 'active' && (
+        <div
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#0d1b2a] border-t border-white/10 px-4 py-3 flex items-center justify-between"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+            </span>
+            <span className="text-white text-sm font-medium truncate">{room.title}</span>
+            <span className="text-gray-500 text-xs shrink-0">
+              {(room.current_speakers?.length || 0) + (room.current_listeners?.length || 0)} in room
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              setAudioJoined(false);
+              if (user) {
+                const action = isSpeaker ? 'leave_speaker' : 'leave_listener';
+                fetch(`/api/fishbowlz/rooms/${roomId}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ action, fid: user.fid }),
+                }).catch(() => {});
+              }
+            }}
+            className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs font-semibold min-h-[44px] shrink-0"
+          >
+            Leave
+          </button>
+        </div>
+      )}
 
       {showEndConfirm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">

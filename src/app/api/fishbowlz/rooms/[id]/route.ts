@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
 import { checkGatingEligibility } from '@/lib/fc-identity';
+import { castRoomEnded } from '@/lib/fishbowlz/castRoom';
 
 interface FishbowlSpeaker {
   fid: number;
@@ -34,10 +35,14 @@ export async function GET(
 ) {
   const { id } = await params;
 
+  // Support lookup by UUID or slug
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  const column = isUuid ? 'id' : 'slug';
+
   const { data: room, error } = await supabaseAdmin
     .from('fishbowl_rooms')
     .select('*')
-    .eq('id', id)
+    .eq(column, id)
     .single();
 
   if (error || !room) {
@@ -76,12 +81,21 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { id: rawId } = await params;
 
   // Auth check
   const session = await getSessionData();
   if (!session?.fid) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Resolve slug to UUID if needed
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawId);
+  let id = rawId;
+  if (!isUuid) {
+    const { data: slugRoom } = await supabaseAdmin.from('fishbowl_rooms').select('id').eq('slug', rawId).single();
+    if (!slugRoom) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+    id = slugRoom.id;
   }
 
   const body = await req.json();
@@ -311,6 +325,27 @@ export async function PATCH(
         p_actor_fid: session.fid,
         p_actor_type: 'human',
       });
+
+      // Cast to Farcaster (fire-and-forget)
+      const [roomDetails, transcriptResult] = await Promise.allSettled([
+        supabaseAdmin
+          .from('fishbowl_rooms')
+          .select('title, slug, host_username, total_speakers')
+          .eq('id', id)
+          .single(),
+        supabaseAdmin
+          .from('fishbowl_transcripts')
+          .select('*', { count: 'exact', head: true })
+          .eq('room_id', id),
+      ]);
+
+      if (roomDetails.status === 'fulfilled' && roomDetails.value.data) {
+        const transcriptCount =
+          transcriptResult.status === 'fulfilled'
+            ? (transcriptResult.value.count ?? 0)
+            : 0;
+        castRoomEnded(roomDetails.value.data, transcriptCount).catch(() => {});
+      }
 
       return NextResponse.json({ success: true, state: 'ended' });
     }

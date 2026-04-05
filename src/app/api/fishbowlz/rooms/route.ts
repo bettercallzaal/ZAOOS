@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
+import { castRoomCreated } from '@/lib/fishbowlz/castRoom';
 
 const CreateRoomSchema = z.object({
   title: z.string().min(1).max(100),
@@ -16,6 +17,7 @@ const CreateRoomSchema = z.object({
   audioSourceUrl: z.string().url().optional(),
   gatingEnabled: z.boolean().default(false),
   minQualityScore: z.number().int().min(0).default(0),
+  scheduledAt: z.string().datetime().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -40,6 +42,8 @@ export async function POST(req: NextRequest) {
       .replace(/^-|-$/g, '')
       .slice(0, 50);
 
+    const isScheduled = data.scheduledAt && new Date(data.scheduledAt) > new Date();
+
     const { data: room, error } = await supabaseAdmin
       .from('fishbowl_rooms')
       .insert({
@@ -54,8 +58,9 @@ export async function POST(req: NextRequest) {
         audio_source_type: data.audioSourceType,
         audio_source_url: data.audioSourceUrl,
         slug,
-        state: 'active',
-        current_speakers: [{ fid: data.hostFid, username: data.hostUsername, joinedAt: new Date().toISOString() }],
+        state: isScheduled ? 'scheduled' : 'active',
+        scheduled_at: data.scheduledAt || null,
+        current_speakers: isScheduled ? [] : [{ fid: data.hostFid, username: data.hostUsername, joinedAt: new Date().toISOString() }],
         current_listeners: [],
       })
       .select()
@@ -75,6 +80,14 @@ export async function POST(req: NextRequest) {
       p_actor_type: 'human',
     });
 
+    // Cast to Farcaster (fire-and-forget)
+    castRoomCreated({
+      title: data.title,
+      slug,
+      host_username: data.hostUsername,
+      hot_seat_count: data.hotSeatCount,
+    }).catch(() => {});
+
     return NextResponse.json(room, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -86,15 +99,24 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const state = searchParams.get('state') ?? 'active';
-  const limit = parseInt(searchParams.get('limit') ?? '20', 10);
+  const state = searchParams.get('state');
+  const limit = parseInt(searchParams.get('limit') ?? '50', 10);
 
-  const { data: rooms, error } = await supabaseAdmin
+  let query = supabaseAdmin
     .from('fishbowl_rooms')
     .select('*')
-    .eq('state', state)
     .order('last_active_at', { ascending: false })
     .limit(limit);
+
+  if (state) {
+    // Filter by specific state if provided
+    query = query.eq('state', state);
+  } else {
+    // Default: return scheduled, active, and ended rooms (active first via last_active_at ordering)
+    query = query.in('state', ['scheduled', 'active', 'ended']);
+  }
+
+  const { data: rooms, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

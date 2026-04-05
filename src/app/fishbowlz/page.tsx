@@ -14,18 +14,42 @@ function parseJsonb<T>(value: unknown, fallback: T): T {
 
 interface FishbowlRoom {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   host_name: string;
   host_username: string;
+  host_pfp?: string;
   state: string;
   hot_seat_count: number;
   current_speakers: Array<{ fid: number; username: string; joinedAt: string }>;
   current_listeners: Array<{ fid: number; username: string; joinedAt: string }>;
   total_sessions: number;
   gating_enabled?: boolean;
+  scheduled_at?: string;
   created_at: string;
   last_active_at: string;
+}
+
+function timeAgo(dateStr: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+function timeUntil(dateStr: string): string {
+  const seconds = Math.floor((new Date(dateStr).getTime() - Date.now()) / 1000);
+  if (seconds < 0) return 'starting soon';
+  if (seconds < 60) return 'in less than a minute';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `in ${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `in ${hours}h`;
+  return `in ${Math.floor(hours / 24)}d`;
 }
 
 export default function FishbowlzPage() {
@@ -39,6 +63,8 @@ export default function FishbowlzPage() {
   const [hotSeats, setHotSeats] = useState(5);
   const [gatingEnabled, setGatingEnabled] = useState(false);
   const [minQualityScore, setMinQualityScore] = useState(0);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
 
   useEffect(() => {
     fetch('/api/fishbowlz/rooms')
@@ -58,6 +84,10 @@ export default function FishbowlzPage() {
   const handleCreate = async () => {
     if (!user || !title.trim()) return;
 
+    const scheduledAt = scheduleDate && scheduleTime
+      ? new Date(`${scheduleDate}T${scheduleTime}`).toISOString()
+      : undefined;
+
     const res = await fetch('/api/fishbowlz/rooms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -69,12 +99,13 @@ export default function FishbowlzPage() {
         hostUsername: user.username || 'anon',
         hostPfp: user.pfpUrl,
         hotSeatCount: hotSeats,
+        scheduledAt,
       }),
     });
 
     if (res.ok) {
       const room = await res.json();
-      router.push(`/fishbowlz/${room.id}`);
+      router.push(`/fishbowlz/${room.slug || room.id}`);
     }
   };
 
@@ -149,13 +180,50 @@ export default function FishbowlzPage() {
                 />
               </div>
             )}
+            <div className="mb-4">
+              <label className="flex items-center gap-2 text-sm text-gray-400 mb-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!scheduleDate}
+                  onChange={(e) => {
+                    if (!e.target.checked) {
+                      setScheduleDate('');
+                      setScheduleTime('');
+                    } else {
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      setScheduleDate(tomorrow.toISOString().split('T')[0]);
+                      setScheduleTime('18:00');
+                    }
+                  }}
+                  className="accent-[#f5a623]"
+                />
+                Schedule for later
+              </label>
+              {scheduleDate && (
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    value={scheduleDate}
+                    onChange={(e) => setScheduleDate(e.target.value)}
+                    className="flex-1 bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#f5a623]"
+                  />
+                  <input
+                    type="time"
+                    value={scheduleTime}
+                    onChange={(e) => setScheduleTime(e.target.value)}
+                    className="bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#f5a623]"
+                  />
+                </div>
+              )}
+            </div>
             <div className="flex gap-3">
               <button
                 onClick={handleCreate}
                 disabled={!title.trim() || !user}
                 className="flex-1 bg-[#f5a623] text-[#0a1628] font-semibold py-3 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
               >
-                {user ? 'Create' : 'Sign in first'}
+                {user ? (scheduleDate ? 'Schedule' : 'Create') : 'Sign in first'}
               </button>
               <button
                 onClick={() => setShowCreate(false)}
@@ -174,17 +242,29 @@ export default function FishbowlzPage() {
           <div className="text-center py-20 text-gray-400">Loading rooms...</div>
         ) : rooms.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-gray-400 mb-4">No active fishbowls yet.</p>
+            <p className="text-gray-400 mb-4">No fishbowls yet.</p>
             <p className="text-gray-500 text-sm">Be the first to create one!</p>
           </div>
         ) : (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map(room => (
-              <Link key={room.id} href={`/fishbowlz/${room.id}`}>
-                <div className="bg-[#1a2a4a] rounded-xl p-5 border border-white/10 hover:border-[#f5a623]/50 transition-colors cursor-pointer">
+              <Link key={room.id} href={`/fishbowlz/${room.slug || room.id}`}>
+                <div className={`bg-[#1a2a4a] rounded-xl p-5 border border-white/10 transition-colors cursor-pointer ${
+                  room.state === 'active'
+                    ? 'hover:border-[#f5a623]/50'
+                    : room.state === 'scheduled'
+                    ? 'hover:border-blue-400/50'
+                    : 'hover:border-white/20 opacity-75'
+                }`}>
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-bold text-lg truncate flex-1">{room.title}</h3>
-                    <span className="text-xs bg-[#f5a623]/20 text-[#f5a623] px-2 py-1 rounded-full ml-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ml-2 ${
+                      room.state === 'active'
+                        ? 'bg-[#f5a623]/20 text-[#f5a623]'
+                        : room.state === 'scheduled'
+                        ? 'bg-blue-600/20 text-blue-400'
+                        : 'bg-gray-600/20 text-gray-400'
+                    }`}>
                       {room.state}
                     </span>
                   </div>
@@ -196,13 +276,40 @@ export default function FishbowlzPage() {
                       🔐 FC-gated
                     </span>
                   )}
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>🔥 {room.current_speakers?.length || 0}/{room.hot_seat_count} hot seat</span>
-                    <span>👥 {room.current_listeners?.length || 0} listening</span>
-                  </div>
+                  {room.state === 'ended' ? (
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>📝 View transcript</span>
+                    </div>
+                  ) : room.state === 'scheduled' && room.scheduled_at ? (
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>⏰ Starts {timeUntil(room.scheduled_at)}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>🔥 {room.current_speakers?.length || 0}/{room.hot_seat_count} hot seat</span>
+                      <span>👥 {room.current_listeners?.length || 0} listening</span>
+                    </div>
+                  )}
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-gray-500">
-                    <span>by @{room.host_username}</span>
-                    <span>{room.total_sessions} sessions</span>
+                    <div className="flex items-center gap-1.5">
+                      {room.host_pfp ? (
+                        <img src={room.host_pfp} alt="" className="w-4 h-4 rounded-full" />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full bg-gray-600 flex items-center justify-center text-[8px] text-gray-400">
+                          {room.host_username[0]?.toUpperCase()}
+                        </div>
+                      )}
+                      <span>@{room.host_username}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {room.state === 'active' && (
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                          {(room.current_speakers?.length || 0) + (room.current_listeners?.length || 0)} in room
+                        </span>
+                      )}
+                      <span>{timeAgo(room.last_active_at)}</span>
+                    </div>
                   </div>
                 </div>
               </Link>

@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
     const { data: rpcData, error } = await supabaseAdmin.rpc('log_fishbowl_event', {
       p_event_type: data.eventType,
       p_event_data: JSON.stringify(data.eventData),
-      p_room_id: data.roomId,
-      p_session_id: data.sessionId,
-      p_actor_fid: data.actorFid,
-      p_actor_type: data.actorType,
-    });
+      p_room_id: data.roomId ?? null,
+      p_session_id: data.sessionId ?? null,
+      p_actor_fid: data.actorFid ?? null,
+      p_actor_type: data.actorType ?? null,
+    } as Record<string, unknown>);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

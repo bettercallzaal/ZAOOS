@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
     // Role validation — non-admins cannot request host role unless they're a fishbowl host
     // Fishbowl hosts pass roomName starting with 'fishbowl-' and their role is validated upstream
     const isFishbowlHost = roomName?.startsWith('fishbowl-');
-    if (role === 'host' && !session.isAdmin && !isFishbowlHost) {
-      return NextResponse.json({ error: 'Forbidden: only admins can request host role' }, { status: 403 });
+    if ((role === 'host' || role === 'moderator') && !session.isAdmin && !isFishbowlHost) {
+      return NextResponse.json({ error: 'Forbidden: only admins can request moderator role' }, { status: 403 });
     }
 
     // Generate management token

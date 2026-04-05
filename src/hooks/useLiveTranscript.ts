@@ -60,11 +60,12 @@ export function useLiveTranscript(roomId: string, enabled: boolean) {
     recognition.lang = 'en-US';
     recognitionRef.current = recognition;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = async (event: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const results = Array.from(event.results) as any[];
 
       for (const result of results) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const transcript = (result[0] as any).transcript.trim();
         if (!transcript) continue;
 

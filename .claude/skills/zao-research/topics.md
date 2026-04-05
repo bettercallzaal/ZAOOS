@@ -28,11 +28,13 @@ Use this to quickly find if a topic has already been researched.
 - ZOE upgrade playbook: OpenClaw v2026.3.31, Mem0 memory, Neynar webhook relay, auto-dream, Telegram keyboards, competitive monitoring, founder agent patterns → `245`
 - Neynar API 130+ endpoints audit: community radar, auto-curation, channel intel, smart engagement, x402 pay-per-call, 4 agent patterns → `246`
 - **AutoAgent self-optimizing agents**: meta-agent loop for harness engineering, model empathy, trace-based learning, overfitting guards, 5 emergent behaviors, comparison vs DSPy/Meta-Harness/ADAS → `253`
+- **Farcaster Agentic Bootcamp vs ZAO agent squad**: gap analysis (ERC-8004, x402, mini app, notifications), 7-agent dispatch ahead of bootcamp Session 10, $16 to close all gaps → `278`
 
 ## Music & Audio
 - Music APIs (Audius, Sound.xyz, Spotify, SoundCloud, YouTube) → `03`
 - Audio APIs 2026, music players, displays, EQ, spectrum, reference implementations → `167`
 - Live audio rooms (LiveKit, WebRTC, synchronized listening) → `43`
+- **Audio room competitive landscape 2026**: Clubhouse (async pivot, 36.5M MAU), X Spaces ($45M creator payouts), Discord Stage (10K audio cap), Huddle01 (dRTC), Rally (dormant), Spotify/Amazon post-mortems, provider pricing (Stream/LiveKit/100ms/Daily), FISHBOWLZ next actions → `279`
 - Audio player architecture, waveforms, streaming → `33`, `43`
 - SongJam audio spaces iframe embed, 100ms SDK, /zabal page → `119`
 - SongJam screen share PR, Stream Video SDK, MyScreenShareButton → `122`

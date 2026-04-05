@@ -1,27 +1,28 @@
 # ZAO OS Research Library
 
-> **226+ research documents** covering every aspect of building a decentralized social media platform for music — organized by topic for easy navigation.
+> **202 active research documents** across 13 topic folders (79 superseded docs in `_archive/`) covering every aspect of building a decentralized social media platform for music.
 
 ---
 
-## Browse by Category
+## Browse by Topic
 
-| Category | Docs | Description |
-|----------|------|-------------|
-| [Farcaster Protocol & Ecosystem](./_categories/farcaster.md) | 12 | Protocol architecture, Neynar, Mini Apps, ecosystem landscape |
-| [Music, Curation & Artist Revenue](./_categories/music.md) | 23 | Player, streaming, curation, discovery feeds, gap analysis, play counting |
-| [On-Chain Music Distribution & NFTs](./_categories/onchain-distribution.md) | 18 | Arweave, BazAR, atomic assets, 0xSplits, BuilderOSS, thirdweb, ZOUNZ governance |
-| [Community, Social & Growth](./_categories/community.md) | 14 | Gating, messaging, onboarding, notifications, moderation, community directory |
-| [Identity, Governance & Tokens](./_categories/identity-governance.md) | 31 | ZIDs, Hats Protocol, Respect, ORDAO fractals, ZOUNZ DAO, Snapshot, ENS, Basenames |
-| [AI Agent & Intelligence](./_categories/ai-agent.md) | 6 | ElizaOS, Hindsight memory, pgvector taste profiles, autonomous agents, live room AI |
-| [Cross-Platform Publishing](./_categories/cross-platform.md) | 12 | Farcaster, X, Bluesky, Lens, Hive, Mastodon, Threads, Nostr, Reddit |
-| [Technical Infrastructure](./_categories/infrastructure.md) | 11 | Next.js 16, Supabase, storage, mobile, real-time, Tailwind v4, web3 streaming, smart contracts, forkability |
-| [APIs & External Services](./_categories/apis.md) | 9 | 1,400+ APIs mapped, Alchemy, Coinflow, payment infrastructure (Stripe/Coinbase/0xSplits), 30+ zero-cost integrations |
-| [WaveWarZ Integration](./_categories/wavewarz.md) | 7 | Solana prediction markets, artist pipeline, battle mechanics, Polymarket analysis |
-| [Security & Code Quality](./_categories/security.md) | 6 | Security audits, testing strategy, prompt injection, OWASP |
-| [Dev Workflows & Agent Tooling](./_categories/dev-workflows.md) | 25 | Claude Code skills, Paperclip agents, autoresearch, git branching |
-| [AI Competitions & ClawDown](./_categories/ai-competitions.md) | 1 | ClawDown poker agent, AI vs AI challenges |
-| [Other (Ethereum, Docs, Reference)](./_categories/other.md) | 12 | Whitepaper, GitHub docs, reference repos, Ethereum alignment |
+| Topic | Docs | Description |
+|-------|------|-------------|
+| [Agents](./agents/) | 30 | OpenClaw, ZOE, frameworks, memory, orchestration, self-optimization |
+| [Music](./music/) | 35 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation |
+| [Dev Workflows](./dev-workflows/) | 29 | Skills, Claude Code, testing, autoresearch, git, MCP servers |
+| [Infrastructure](./infrastructure/) | 21 | Next.js 16, Supabase, streaming, mobile, notifications, admin |
+| [Community](./community/) | 19 | ZAO guide, whitepaper, onboarding, member profiles, task forces |
+| [Governance](./governance/) | 17 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
+| [Farcaster](./farcaster/) | 12 | Protocol, Mini Apps, XMTP, ecosystem, social graph |
+| [Cross-Platform](./cross-platform/) | 11 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
+| [Business](./business/) | 10 | Revenue, payments, strategy, Obsidian model, marketplace |
+| [Events](./events/) | 9 | Bootcamp, ZAO Stock, ship logs, big wins, status snapshots |
+| [Identity](./identity/) | 7 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph |
+| [WaveWarZ](./wavewarz/) | 4 | Prediction markets, artist pipeline, Solana PDAs |
+| [Security](./security/) | 3 | Audits, API verification, testing |
+| [Inspiration](./inspiration/) | 5 | Daily "steal like an artist" research — 3 apps analyzed per session, gap analysis |
+| [Archive](./_archive/) | 70 | Superseded docs (preserved for history) |
 
 ---
 
@@ -29,17 +30,17 @@
 
 | If you're... | Start here |
 |-------------|-----------|
-| **Building features** | [41 Next.js 16](./041-nextjs16-react19-deep-dive/) + [42 Supabase](./042-supabase-advanced-patterns/) + [15 MVP Spec](./015-mvp-spec/) |
-| **Working on music** | [128 Player Audit](./190-music-player-complete-audit/) + [130 Next Integrations](./130-next-music-integrations/) + [03 Music Integration](./003-music-integration/) |
-| **Distributing music on-chain** | [155 End-to-End Plan](./155-music-nft-end-to-end-implementation/) + [152 Arweave Deep Dive](./152-arweave-ecosystem-deep-dive/) + [153 BazAR](./153-bazar-arweave-atomic-assets-music/) + [223 Smart Contracts](./223-smart-contract-development-guide/) |
-| **Working on governance** | [133 Governance Audit](./133-governance-system-audit/) + [149 BuilderOSS](./149-buildeross-deep-dive-everything/) + [131 On-Chain](./131-onchain-proposals-governance/) + [223 Smart Contracts](./223-smart-contract-development-guide/) |
-| **Growing the community** | [32 Onboarding](./032-onboarding-growth-moderation/) + [35 Notifications](./035-notifications-complete-guide/) + [110 Directory](./110-community-directory-crm/) |
-| **Cross-posting content** | [28 Cross-Platform](./028-cross-platform-publishing/) + [77 Bluesky](./077-bluesky-cross-posting-integration/) + [121 Lens Verdict](./121-lens-v3-auth-verdict/) |
-| **Building the AI agent** | [24 Agent Plan](./024-zao-ai-agent/) + [83 ElizaOS](./083-elizaos-2026-update/) + [26 Hindsight](./026-hindsight-agent-memory/) |
-| **Auditing code** | [57 Security Audit](./057-codebase-security-audit-march-2026/) + [137 Skills Security](./137-skills-audit-security-practices/) + [66 Testing](./066-backend-testing-strategy/) |
-| **Using Claude Code skills** | [154 Skills Master Reference](./154-skills-commands-master-reference/) + [69 Tips](./069-claude-code-tips-best-practices/) + [54 Superpowers](./054-superpowers-agentic-skills/) |
-| **Understanding the project** | [50 Complete Guide](./050-the-zao-complete-guide/) + [51 Whitepaper](./051-zao-whitepaper-2026/) + [27 Overview](./027-comprehensive-overview/) |
-| **Forking for your community** | [FORK.md](../FORK.md) + [AGENTS.md](../AGENTS.md) + [225 Fork Patterns](./225-fork-friendly-open-source-patterns/) + [community.config.ts](../community.config.ts) |
+| **Building features** | [41 Next.js 16](./infrastructure/041-nextjs16-react19-deep-dive/) + [98 Supabase](./infrastructure/098-supabase-database-optimizations/) |
+| **Working on music** | [190 Player Audit](./music/190-music-player-complete-audit/) + [130 Next Integrations](./music/130-next-music-integrations/) + [167 Audio APIs](./music/167-audio-apis-music-players-displays/) |
+| **Distributing music on-chain** | [155 End-to-End Plan](./music/155-music-nft-end-to-end-implementation/) + [152 Arweave](./music/152-arweave-ecosystem-deep-dive/) + [153 BazAR](./music/153-bazar-arweave-atomic-assets-music/) |
+| **Working on governance** | [133 Governance Audit](./governance/133-governance-system-audit/) + [149 BuilderOSS](./governance/149-buildeross-deep-dive-everything/) + [56 ORDAO](./governance/056-ordao-respect-system/) |
+| **Growing the community** | [94 Onboarding](./community/094-moderation-onboarding-analytics/) + [35 Notifications](./infrastructure/035-notifications-complete-guide/) + [110 Directory](./community/110-community-directory-crm/) |
+| **Cross-posting content** | [96 Cross-Post API](./cross-platform/096-cross-post-api-deep-dive/) + [77 Bluesky](./cross-platform/077-bluesky-cross-posting-integration/) + [121 Lens](./cross-platform/121-lens-v3-auth-verdict/) |
+| **Building the AI agent** | [234 OpenClaw Guide](./agents/234-openclaw-comprehensive-guide/) + [227 Agentic Workflows](./agents/227-agentic-workflows-2026/) + [245 ZOE Upgrade](./agents/245-zoe-upgrade-autonomous-workflow-2026/) |
+| **Auditing code** | [57 Security Audit](./security/057-codebase-security-audit-march-2026/) + [137 Skills Security](./dev-workflows/137-skills-audit-security-practices/) + [66 Testing](./dev-workflows/066-backend-testing-strategy/) |
+| **Using Claude Code skills** | [154 Skills Master Ref](./dev-workflows/154-skills-commands-master-reference/) + [54 Superpowers](./dev-workflows/054-superpowers-agentic-skills/) |
+| **Understanding the project** | [50 Complete Guide](./community/050-the-zao-complete-guide/) + [51 Whitepaper](./community/051-zao-whitepaper-2026/) |
+| **Forking for your community** | [FORK.md](../FORK.md) + [AGENTS.md](../AGENTS.md) + [225 Fork Patterns](./dev-workflows/225-fork-friendly-open-source-patterns/) + [community.config.ts](../community.config.ts) |
 
 ---
 
@@ -106,37 +107,38 @@
 
 | Feature | Priority | Effort | Doc |
 |---------|----------|--------|-----|
-| Arweave music upload | High | 12 hrs | [155](./155-music-nft-end-to-end-implementation/) |
-| Music NFT mint UI | High | 14 hrs | [155](./155-music-nft-end-to-end-implementation/) |
-| Collect/buy button | High | 10 hrs | [155](./155-music-nft-end-to-end-implementation/) |
-| BazAR marketplace | High | 8 hrs | [153](./153-bazar-arweave-atomic-assets-music/) |
-| Last.fm scrobbling | Medium | 3 hrs | [138](./138-play-counting-stream-attribution/) |
-| ListenBrainz scrobbling | Medium | 2 hrs | [138](./138-play-counting-stream-attribution/) |
-| Bluesky publish route | Medium | 2 hrs | [77](./077-bluesky-cross-posting-integration/) |
-| In-app ZOUNZ voting | Medium | 8 hrs | [149](./149-buildeross-deep-dive-everything/) |
-| In-app proposal creation | Medium | 6 hrs | [149](./149-buildeross-deep-dive-everything/) |
-| @builderbot notifications | Medium | 2 hrs | [149](./149-buildeross-deep-dive-everything/) |
-| 0xSplits revenue splits | Medium | 4 hrs | [143](./143-0xsplits-revenue-distribution/) |
-| WaveWarZ battle UI | Medium | 8 hrs | [99](./099-prediction-market-music-battles/) |
-| Synchronized listening rooms | Future | 12 hrs | [100](./100-synchronized-listening-rooms/) |
-| LiveKit audio rooms | Future | 16 hrs | [43](./043-webrtc-audio-rooms-streaming/) |
-| ElizaOS community agent | Future | 20 hrs | [83](./083-elizaos-2026-update/) |
-| AI taste recommendations | Future | 20 hrs | [08](./008-ai-memory/) |
-| Apple Music (MusicKit) | Future | 8 hrs | [138](./138-play-counting-stream-attribution/) |
-| Mastodon cross-posting | Future | 4 hrs | [177](./177-mastodon-threads-cross-posting/) |
-| Nostr cross-posting | Future | 6 hrs | [097](./097-nostr-cross-posting-integration/) |
-| Cross-chain fractal governance | Future | 20 hrs | [108](./184-superchain-ordao-crosschain-fractal/) |
-| Mobile player optimization | Future | 12 hrs | [127](./189-mobile-player-optimization/), [220](./220-mobile-first-music-ux-patterns/) |
-| **Spaces & streaming full audit** | **Complete** | — | [233](./233-spaces-streaming-full-audit/) |
-| Native community directory | Future | 10 hrs | [110](./110-community-directory-crm/) |
-| External reputation signals | Future | 8 hrs | [134](./134-external-reputation-signals-comprehensive/) |
-| ArNS permanent domain | Future | 2 hrs | [152](./152-arweave-ecosystem-deep-dive/) |
+| Arweave music upload | High | 12 hrs | [155](./music/155-music-nft-end-to-end-implementation/) |
+| Music NFT mint UI | High | 14 hrs | [155](./music/155-music-nft-end-to-end-implementation/) |
+| Collect/buy button | High | 10 hrs | [155](./music/155-music-nft-end-to-end-implementation/) |
+| BazAR marketplace | High | 8 hrs | [153](./music/153-bazar-arweave-atomic-assets-music/) |
+| Last.fm scrobbling | Medium | 3 hrs | [138](./music/138-play-counting-stream-attribution/) |
+| ListenBrainz scrobbling | Medium | 2 hrs | [138](./music/138-play-counting-stream-attribution/) |
+| Bluesky publish route | Medium | 2 hrs | [77](./cross-platform/077-bluesky-cross-posting-integration/) |
+| In-app ZOUNZ voting | Medium | 8 hrs | [149](./governance/149-buildeross-deep-dive-everything/) |
+| In-app proposal creation | Medium | 6 hrs | [149](./governance/149-buildeross-deep-dive-everything/) |
+| @builderbot notifications | Medium | 2 hrs | [149](./governance/149-buildeross-deep-dive-everything/) |
+| 0xSplits revenue splits | Medium | 4 hrs | [143](./music/143-0xsplits-revenue-distribution/) |
+| WaveWarZ battle UI | Medium | 8 hrs | [99](./wavewarz/099-prediction-market-music-battles/) |
+| Synchronized listening rooms | Future | 12 hrs | [185](./music/185-synchronized-listening-rooms/) |
+| ElizaOS community agent | Future | 20 hrs | [268](./agents/268-milady-ai-elizaos-evolution/) |
+| AI taste recommendations | Future | 20 hrs | [234](./agents/234-openclaw-comprehensive-guide/) |
+| Apple Music (MusicKit) | Future | 8 hrs | [138](./music/138-play-counting-stream-attribution/) |
+| Mastodon cross-posting | Future | 4 hrs | [177](./cross-platform/177-mastodon-threads-cross-posting/) |
+| Nostr cross-posting | Future | 6 hrs | [97](./cross-platform/097-nostr-cross-posting-integration/) |
+| Cross-chain fractal governance | Future | 20 hrs | [184](./governance/184-superchain-ordao-crosschain-fractal/) |
+| Mobile player optimization | Future | 12 hrs | [189](./music/189-mobile-player-optimization/), [220](./music/220-mobile-first-music-ux-patterns/) |
+| **Spaces & streaming full audit** | **Complete** | — | [233](./infrastructure/233-spaces-streaming-full-audit/) |
+| Native community directory | Future | 10 hrs | [110](./community/110-community-directory-crm/) |
+| External reputation signals | Future | 8 hrs | [134](./identity/134-external-reputation-signals-comprehensive/) |
+| ArNS permanent domain | Future | 2 hrs | [152](./music/152-arweave-ecosystem-deep-dive/) |
 
 ---
 
 ## Research Stats
 
-- **Total documents:** 226+
+- **Active documents:** 202 (across 13 topic folders)
+- **Archived (superseded/merged):** 79 (in `_archive/`)
 - **Total coverage:** ~500,000+ words
-- **Time span:** January — March 2026
-- **Categories:** 13
+- **Time span:** January — April 2026
+- **Topic folders:** agents, music, dev-workflows, infrastructure, governance, community, cross-platform, farcaster, identity, business, wavewarz, security, events
+- **CANONICAL docs:** 42 (living references — see [279 Audit](./279-research-library-audit-reorganization/))

@@ -1,0 +1,36 @@
+# Agents
+
+> AI agent frameworks, orchestration patterns, memory systems, and the ZOE agent stack.
+
+| # | Title | Type | Summary |
+|---|-------|------|---------|
+| 026 | [Hindsight: Agent Memory System](./026-hindsight-agent-memory/) | STANDALONE | Evaluate Hindsight (vectorize-io) as the memory layer for ZAO OS AI agents |
+| 070 | [Sub-agents vs Agent Teams](./070-subagents-vs-agent-teams/) | STANDALONE | Two multi-agent paradigms mapped to ZAO OS Paperclip setup + Claude Architect patterns |
+| 071 | [Paperclip Rate Limits & Multi-Agent API Key Management](./071-paperclip-rate-limits-multi-agent/) | STANDALONE | Solving rate limit hits when running 5 Paperclip agents on one Anthropic API key |
+| 084 | [Farcaster AI Agents Landscape](./084-farcaster-ai-agents-landscape/) | STANDALONE | Survey of the Farcaster AI agent ecosystem as of March 2026 |
+| 085 | [Farcaster Agent Technical Setup](./085-farcaster-agent-technical-setup/) | STANDALONE | Building and deploying a Farcaster AI agent with Neynar |
+| 090 | [AI-Run Community: Agent OS](./090-ai-run-community-agent-os/) | STANDALONE | Design for a self-improving agent system running ZAO community autonomously |
+| 161 | [Agent Harness Engineering (LangChain)](./161-agent-harness-engineering-langchain/) | STANDALONE | LangChain DeepAgents, virtual filesystems, and the Ralph Loop applied to ZAO |
+| 171 | [Council of High Intelligence: Multi-Agent Deliberation](./171-council-high-intelligence-multi-agent-deliberation/) | STANDALONE | Nyk's 11-agent deliberation system evaluated for ZAO-specific triads |
+| 202 | [Multi-Agent Orchestration: OpenClaw + Paperclip](./202-multi-agent-orchestration-openclaw-paperclip/) | STANDALONE | Agent hierarchy where OpenClaw watches Paperclip workers and Zaal acts as Claude Agent |
+| 205 | [OpenClaw + Paperclip + ElizaOS Deployment Plan](./205-openclaw-paperclip-elizaos-deployment-plan/) | STANDALONE | Exact deployment steps for the full three-tier agent stack |
+| 206 | [LobsterAI Agent Architecture](./206-lobsterai-agent-architecture/) | STANDALONE | Evaluate LobsterAI (NetEase Youdao) for patterns transferable to ZAO agent/skill architecture |
+| 208 | [Paperclip Plugins Ecosystem Update](./208-paperclip-plugins-ecosystem-update/) | STANDALONE | Map of 11 community plugins, 4 examples, and ZAO integration plan |
+| 227 | [Agentic Workflows 2026](./227-agentic-workflows-2026/) | STANDALONE | Agentic workflow landscape — frameworks, SDKs, DAO/community patterns, music agent use cases |
+| 234 | [OpenClaw Comprehensive Guide](./234-openclaw-comprehensive-guide/) | CANONICAL | Agent memory, knowledge graphs, MCP servers, and context management for OpenClaw |
+| 235 | [Free Web Search MCP Alternatives](./235-free-web-search-mcp-alternatives/) | STANDALONE | Best free web search options to replace Brave Search MCP on $5/month VPS |
+| 236 | [Autonomous OpenClaw Operator Pattern](./236-autonomous-openclaw-operator-pattern/) | STANDALONE | 3-layer memory, heartbeats, delegation, and nightly consolidation for ZOE |
+| 237 | [USV Agents, Tasklet, Malleable Software](./237-usv-agents-tasklet-malleable-software/) | STANDALONE | USV thesis on agents, tasklets, and the "build something you want" era |
+| 239 | [Agent Frameworks & Infrastructure Evaluation](./239-agent-frameworks-infrastructure-evaluation/) | STANDALONE | Evaluate 16 agent frameworks, security tools, and workflow automation for ZAO OS |
+| 245 | [ZOE Upgrade: Autonomous Workflow 2026](./245-zoe-upgrade-autonomous-workflow-2026/) | STANDALONE | Highest-leverage upgrades to ZOE — autonomous routines, Telegram, Neynar, founder agent playbook |
+| 246 | [Neynar API: Creative Agent Uses](./246-neynar-api-creative-agent-uses/) | STANDALONE | Underused Neynar endpoints and patterns ZOE can leverage for community management |
+| 247 | [Top 50 Local AI Models 2026](./247-top-50-local-ai-models-2026/) | STANDALONE | Top local AI models evaluated for ZAO OS needs (privacy + best outputs) |
+| 251 | [HuggingFace Platform Deep Dive](./251-huggingface-platform-deep-dive/) | STANDALONE | Everything ZAO can do on HuggingFace beyond ACE-Step — orgs, models, Spaces, datasets |
+| 253 | [AutoAgent: Self-Optimizing Agents](./253-autoagent-self-optimizing-agents/) | STANDALONE | AutoAgent's self-optimizing loop and implications for ZOE and autoresearch |
+| 256 | [ZOE Agent Factory Vision](./256-zoe-agent-factory-vision/) | STANDALONE | Architecture for ZOE as an agent factory spawning specialized sub-agents |
+| 259 | [Agent Self-Optimization](./259-agent-self-optimization/) | STANDALONE | AutoAgent + Claude Code hooks for agent self-improvement |
+| 262 | [Virtuals Protocol: Agent Payment Rail](./262-virtuals-protocol-agent-rail/) | STANDALONE | Virtuals Protocol as a payment rail for AI agents |
+| 266 | [Mission Control v2](./266-mission-control-v2/) | STANDALONE | Open-source AI agent orchestration platform evaluation |
+| 267 | [OpenClaw Skills & Capabilities Reference](./267-openclaw-skills-capabilities/) | STANDALONE | All available OpenClaw skills, extensions, and channel integrations |
+| 268 | [Milady AI: ElizaOS Evolution](./268-milady-ai-elizaos-evolution/) | STANDALONE | Milady AI as next-gen ElizaOS distribution for desktop-first agents |
+| 278 | [Agentic Bootcamp vs ZAO Agent Squad](./278-agentic-bootcamp-zao-agent-squad/) | STANDALONE | Gap analysis between bootcamp curriculum and ZAO's 7-agent squad |

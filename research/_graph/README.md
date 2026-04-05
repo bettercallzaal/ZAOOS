@@ -1,6 +1,6 @@
 # Research Knowledge Graph
 
-Machine-readable index for AI agent retrieval. Use these files to find relevant research without scanning all 191 docs.
+Machine-readable index for AI agent retrieval. Use these files to find relevant research without scanning all 277 docs.
 
 ## Files
 
@@ -22,20 +22,24 @@ Machine-readable index for AI agent retrieval. Use these files to find relevant 
 
 ## Categories
 
-| Category | Description |
-|----------|-------------|
-| `farcaster` | Farcaster protocol, hubs, clients, social graph |
-| `music` | Music player, audio rooms, streaming, discovery |
-| `onchain` | NFTs, tokens, smart contracts, wallets, ENS |
-| `community` | ZAO ecosystem, whitepaper, onboarding, members |
-| `governance` | DAOs, fractals, proposals, voting, respect |
-| `ai-agent` | AI agents, Claude Code, ElizaOS, Paperclip |
-| `cross-platform` | Cross-posting to Lens, Bluesky, Nostr, etc. |
-| `infrastructure` | Supabase, Next.js, APIs, notifications, UI |
-| `wavewarz` | WaveWarz music battles and prediction markets |
-| `security` | Security audits, vulnerability assessments |
-| `dev-workflows` | Developer tools, skills, testing, git workflows |
-| `other` | Miscellaneous research |
+Docs are organized into topic folders under `research/`. Archived docs live in `research/_archive/`.
+
+| Category | Folder | Description |
+|----------|--------|-------------|
+| `agents` | `research/agents/` | AI agents, Claude Code, ElizaOS, Paperclip, OpenClaw |
+| `business` | `research/business/` | Revenue, payments, monetization, marketplace |
+| `community` | `research/community/` | ZAO ecosystem, whitepaper, onboarding, members |
+| `cross-platform` | `research/cross-platform/` | Cross-posting to Lens, Bluesky, Nostr, X, etc. |
+| `dev-workflows` | `research/dev-workflows/` | Developer tools, skills, testing, git workflows |
+| `events` | `research/events/` | Ship logs, session logs, bootcamps, ZAO Stock |
+| `farcaster` | `research/farcaster/` | Farcaster protocol, hubs, clients, social graph |
+| `governance` | `research/governance/` | DAOs, fractals, proposals, voting, respect, Hats |
+| `identity` | `research/identity/` | ZIDs, ENS, reputation, profiles, knowledge graph |
+| `infrastructure` | `research/infrastructure/` | Supabase, Next.js, APIs, notifications, UI, streaming |
+| `music` | `research/music/` | Music player, audio rooms, NFTs, discovery, Fishbowlz |
+| `security` | `research/security/` | Security audits, vulnerability assessments |
+| `wavewarz` | `research/wavewarz/` | WaveWarz music battles and prediction markets |
+| `_archive` | `research/_archive/` | Superseded docs kept for historical reference |
 
 ## For AI Agents
 
@@ -55,9 +59,9 @@ Load `KNOWLEDGE.json` at session start. To find relevant docs:
 
 ## Stats
 
-- **191 docs** indexed
+- **277 docs** across topic folders (194 indexed in KNOWLEDGE.json, 83 added after last generation)
 - **59 tags** across all docs
-- **12 categories**
+- **14 categories** (13 topic folders + _archive)
 - **84 code path** references
 - **23 supersession chains** tracking topic evolution
-- Generated: 2026-03-28
+- Generated: 2026-03-28, categories updated: 2026-04-05

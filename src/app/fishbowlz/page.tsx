@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { RoomCardSkeleton } from '@/components/fishbowlz/RoomCardSkeleton';
+import { EmptyState } from '@/components/fishbowlz/EmptyState';
+import { OnboardingModal, useShowOnboarding } from '@/components/fishbowlz/OnboardingModal';
 
 function parseJsonb<T>(value: unknown, fallback: T): T {
   if (typeof value === 'string') {
@@ -58,6 +61,7 @@ export default function FishbowlzPage() {
   const [rooms, setRooms] = useState<FishbowlRoom[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const { show: showOnboarding, dismiss: dismissOnboarding } = useShowOnboarding();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [hotSeats, setHotSeats] = useState(5);
@@ -239,12 +243,13 @@ export default function FishbowlzPage() {
       {/* Room List */}
       <div className="p-4 sm:p-6">
         {loading ? (
-          <div className="text-center py-20 text-gray-400">Loading rooms...</div>
-        ) : rooms.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-400 mb-4">No fishbowls yet.</p>
-            <p className="text-gray-500 text-sm">Be the first to create one!</p>
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <RoomCardSkeleton key={i} />
+            ))}
           </div>
+        ) : rooms.length === 0 ? (
+          <EmptyState onCreateRoom={() => setShowCreate(true)} />
         ) : (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map(room => (
@@ -317,6 +322,7 @@ export default function FishbowlzPage() {
           </div>
         )}
       </div>
+      {showOnboarding && <OnboardingModal onClose={dismissOnboarding} />}
     </div>
   );
 }

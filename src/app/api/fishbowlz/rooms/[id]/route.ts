@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
 import { checkGatingEligibility } from '@/lib/fc-identity';
 import { castRoomEnded } from '@/lib/fishbowlz/castRoom';
+import { generateTranscriptSummary } from '@/lib/fishbowlz/summarize';
 
 interface FishbowlSpeaker {
   fid: number;
@@ -451,6 +452,31 @@ export async function PATCH(
             : 0;
         castRoomEnded(roomDetails.value.data, transcriptCount).catch(() => {});
       }
+
+      // Generate AI summary (fire-and-forget — don't block the response)
+      (async () => {
+        try {
+          const { data: transcripts } = await supabaseAdmin
+            .from('fishbowl_transcripts')
+            .select('speaker_name, speaker_role, text, started_at')
+            .eq('room_id', id)
+            .order('started_at', { ascending: true })
+            .limit(200);
+
+          if (transcripts && transcripts.length > 0) {
+            const roomData = await supabaseAdmin.from('fishbowl_rooms').select('title').eq('id', id).single();
+            const summary = await generateTranscriptSummary(roomData.data?.title || 'Fishbowl', transcripts);
+            if (summary) {
+              await supabaseAdmin.from('fishbowl_rooms').update({
+                ai_summary: summary,
+                ai_summary_generated_at: new Date().toISOString(),
+              }).eq('id', id);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to generate transcript summary:', err);
+        }
+      })();
 
       return NextResponse.json({ success: true, state: 'ended' });
     }

@@ -78,6 +78,22 @@ body {
   animation: slide-in-right 0.2s ease-out;
 }
 
+/* Toast notification animations */
+@keyframes toast-in {
+  from { transform: translateX(110%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(110%); opacity: 0; }
+}
+.animate-toast-in {
+  animation: toast-in 0.2s ease-out forwards;
+}
+.animate-toast-out {
+  animation: toast-out 0.2s ease-in forwards;
+}
+
 /* Music sidebar slide-in from right (desktop) */
 @keyframes slide-in-left {
   from { transform: translateX(100%); opacity: 0; }
@@ -122,6 +138,8 @@ body {
   .animate-slide-up,
   .animate-slide-down,
   .animate-fade-in,
+  .animate-toast-in,
+  .animate-toast-out,
   .animate-spin {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

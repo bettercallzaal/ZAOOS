@@ -73,6 +73,7 @@ interface FishbowlRoom {
   audio_source_type: string | null;
   audio_source_url: string | null;
   created_at: string;
+  ai_summary?: string | null;
 }
 
 interface TranscriptSegment {
@@ -207,6 +208,29 @@ function FishbowlRoomPageInner() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [user, roomId, isSpeaker, isListener]);
+
+  // Auto-rotation timer
+  useEffect(() => {
+    if (!isHost || !room?.rotation_interval_ms || room.state !== 'active') return;
+    if (!room.current_speakers || room.current_speakers.length === 0) return;
+
+    const checkRotation = () => {
+      const oldest = room.current_speakers[0];
+      if (!oldest) return;
+      const seatedMs = Date.now() - new Date(oldest.joinedAt).getTime();
+      if (seatedMs >= room.rotation_interval_ms!) {
+        // Auto-rotate: kick the oldest speaker
+        fetch(`/api/fishbowlz/rooms/${roomId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'kick_speaker', targetFid: oldest.fid }),
+        }).then(() => fetchRoom()).catch(() => {});
+      }
+    };
+
+    const interval = setInterval(checkRotation, 10000); // check every 10s
+    return () => clearInterval(interval);
+  }, [isHost, room?.rotation_interval_ms, room?.state, room?.current_speakers, roomId, fetchRoom]);
 
   // Auto-scroll transcript to bottom when new transcripts arrive
   useEffect(() => {
@@ -349,6 +373,16 @@ function FishbowlRoomPageInner() {
           >
             {copied ? '✓ Copied' : '🔗 Share'}
           </button>
+          {room.state === 'ended' && (
+            <a
+              href={`/api/fishbowlz/export?roomId=${room.id}`}
+              download
+              className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-colors"
+              title="Download transcript"
+            >
+              📥 Export
+            </a>
+          )}
           <span className={`text-xs px-2 py-1 rounded-full ${
             room.state === 'active'
               ? 'bg-green-600/20 text-green-400'
@@ -375,6 +409,13 @@ function FishbowlRoomPageInner() {
           {room.state === 'ended' && (
             <div className="mb-4 p-3 bg-gray-800/50 rounded-lg border border-gray-700 text-center">
               <p className="text-gray-400 text-sm">This fishbowl has ended</p>
+            </div>
+          )}
+
+          {room.state === 'ended' && room.ai_summary && (
+            <div className="mb-4 p-4 bg-[#1a2a4a] rounded-xl border border-white/10">
+              <h3 className="text-xs font-semibold text-[#f5a623] uppercase tracking-wider mb-2">AI Summary</h3>
+              <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-line">{room.ai_summary}</p>
             </div>
           )}
 

@@ -69,6 +69,7 @@ export default function FishbowlzPage() {
   const [minQualityScore, setMinQualityScore] = useState(0);
   const [scheduleDate, setScheduleDate] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
+  const [rotationTimer, setRotationTimer] = useState(0); // 0 = off
 
   useEffect(() => {
     fetch('/api/fishbowlz/rooms')
@@ -104,6 +105,7 @@ export default function FishbowlzPage() {
         hostPfp: user.pfpUrl,
         hotSeatCount: hotSeats,
         scheduledAt,
+        rotationIntervalMs: rotationTimer || undefined,
       }),
     });
 
@@ -158,6 +160,30 @@ export default function FishbowlzPage() {
                 onChange={e => setHotSeats(parseInt(e.target.value))}
                 className="w-full accent-[#f5a623]"
               />
+            </div>
+            <div className="mb-4">
+              <label className="text-sm text-gray-400 mb-2 block">Auto-rotate speakers</label>
+              <div className="flex gap-2">
+                {[
+                  { label: 'Off', value: 0 },
+                  { label: '5 min', value: 300000 },
+                  { label: '10 min', value: 600000 },
+                  { label: '15 min', value: 900000 },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setRotationTimer(opt.value)}
+                    className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${
+                      rotationTimer === opt.value
+                        ? 'bg-[#f5a623] text-[#0a1628]'
+                        : 'bg-[#0a1628] border border-white/20 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="mb-4 flex items-center justify-between">
               <div>

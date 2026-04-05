@@ -17,6 +17,7 @@ const CreateRoomSchema = z.object({
   audioSourceUrl: z.string().url().optional(),
   gatingEnabled: z.boolean().default(false),
   minQualityScore: z.number().int().min(0).default(0),
+  scheduledAt: z.string().datetime().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -41,6 +42,8 @@ export async function POST(req: NextRequest) {
       .replace(/^-|-$/g, '')
       .slice(0, 50);
 
+    const isScheduled = data.scheduledAt && new Date(data.scheduledAt) > new Date();
+
     const { data: room, error } = await supabaseAdmin
       .from('fishbowl_rooms')
       .insert({
@@ -55,8 +58,9 @@ export async function POST(req: NextRequest) {
         audio_source_type: data.audioSourceType,
         audio_source_url: data.audioSourceUrl,
         slug,
-        state: 'active',
-        current_speakers: [{ fid: data.hostFid, username: data.hostUsername, joinedAt: new Date().toISOString() }],
+        state: isScheduled ? 'scheduled' : 'active',
+        scheduled_at: data.scheduledAt || null,
+        current_speakers: isScheduled ? [] : [{ fid: data.hostFid, username: data.hostUsername, joinedAt: new Date().toISOString() }],
         current_listeners: [],
       })
       .select()
@@ -108,8 +112,8 @@ export async function GET(req: NextRequest) {
     // Filter by specific state if provided
     query = query.eq('state', state);
   } else {
-    // Default: return active and ended rooms (active first via last_active_at ordering)
-    query = query.in('state', ['active', 'ended']);
+    // Default: return scheduled, active, and ended rooms (active first via last_active_at ordering)
+    query = query.in('state', ['scheduled', 'active', 'ended']);
   }
 
   const { data: rooms, error } = await query;

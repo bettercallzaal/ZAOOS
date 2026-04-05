@@ -93,6 +93,64 @@ Q2 starts now.
 
 ---
 
+---
+
+## LinkedIn Version
+
+Q1 2026 was 25 wins for The ZAO. Here's the recap.
+
+It started with one campaign win. Artizen Fund sponsored a room at Carrot Castle for ETH Boulder. I applied, the community rallied behind me with $ART votes, and I won a free stay at the web3 builder house.
+
+At Boulder, I installed Claude Code and upgraded a Discord bot I'd been putting off for five months — in 24 hours. That single tool changed everything. The first month was all bot upgrades. Then I started building front ends for our community. That became ZAO OS — my first full coding project.
+
+But the code was one lane. Here's everything else that happened:
+
+ZABAL ECOSYSTEM
+- Launched $ZABAL token on Jan 1 via Clanker (342 holders)
+- Partnered with SongJam (Adam & Logesh) — 1,000+ campaign participants
+- Empire Builder as reward layer — $168 distributed, dual leaderboard, boosts up to 9.2x
+- ZAOndz launched on Base — Nouns-style subDAO, 20% of ZABAL token, 10 NFTs minted
+- 12 ZOLs (ZABAL Opinion Leaders) recognized across 3 monthly cycles
+
+WAVEWARZ
+- 500+ quick battles with nightly format
+- Transitioned from X Spaces to YouTube Live — biggest platform milestone
+- ATH volume on Stilo World vs It's Wonderful
+- Indies vs Classics benefit battle on Valentine's Day — $1,000+ raised for kids in Africa via PolyRaiders
+- 734 total battles, 472 SOL ($37,875) total volume
+
+BUILDING IN PUBLIC
+- Revived dormant Discord bot in 24 hours at ETH Boulder
+- Shipped ZAO OS — first full coding project
+- First PR to someone else's production code: SongJam PR #21 — 4 features, 245 lines, merged
+- Started daily Twitch streaming streak — 2 weeks of build-in-public across coding, music, community
+
+COMMUNITY CAMPAIGNS
+- Won Carrot Castle room via Artizen/Incented ($ART voting on Base)
+- Ran 6 Incented campaigns — $260+ USDC + 485M ZABAL in rewards
+- Created the ZAO Fund for Emerging Culture on Artizen (Season 6) — 33 submissions, 20 curated projects
+
+EVENTS
+- ETH Boulder (Feb 13-15) — Carrot Castle, Claude Code, ZABAL shout out on stage
+- COC Concertz #3 (March 7) — DUO DO, Dope Stilo, Joseph Goats in the metaverse
+- ZAO Stock prep — 3 standups, team reassembled for October 3
+- ZAO Ville announced — July 25, DMV area
+
+CONTENT & COMMUNITY
+- Featured in Crypto Magazine Issue 12 — 2-page spread through the COC community
+- 7 BCZ Yapz episodes (eps 7-13) on YouTube
+- Co-purchased Noun #1797 with community members and friends (0.44 ETH, Jan 29)
+
+The thesis: one Artizen campaign win cascaded into an entire quarter of shipping.
+
+Each of these wins gets its own deep-dive post over the coming weeks.
+
+Q2 starts now.
+
+#web3 #music #buildinpublic #farcaster #ethereum #solana #nouns #community
+
+---
+
 ## Daily Deep-Dive Series Plan (25 days)
 
 | Day | Win | Hook |

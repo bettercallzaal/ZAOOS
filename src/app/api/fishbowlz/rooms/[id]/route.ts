@@ -272,6 +272,35 @@ export async function PATCH(
       return NextResponse.json({ success: true, speakers, listeners });
     }
 
+    if (action === 'end_room') {
+      // Only the host can end the room
+      const hostCheck = await supabaseAdmin.from('fishbowl_rooms').select('host_fid').eq('id', id).single();
+      if (!hostCheck.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+      if (hostCheck.data.host_fid !== session.fid) {
+        return NextResponse.json({ error: 'Only the host can end the room' }, { status: 403 });
+      }
+
+      const now = new Date().toISOString();
+      await supabaseAdmin.from('fishbowl_rooms').update({
+        state: 'ended',
+        current_speakers: [],
+        current_listeners: [],
+        ended_at: now,
+        last_active_at: now,
+      }).eq('id', id);
+
+      await supabaseAdmin.rpc('log_fishbowl_event', {
+        p_event_type: 'room.ended',
+        p_event_data: JSON.stringify({ roomId: id, endedBy: session.fid }),
+        p_room_id: id,
+        p_session_id: null,
+        p_actor_fid: session.fid,
+        p_actor_type: 'human',
+      });
+
+      return NextResponse.json({ success: true, state: 'ended' });
+    }
+
     if (action === 'heartbeat') {
       const { fid } = data;
       if (fid !== session.fid) {

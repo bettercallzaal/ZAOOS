@@ -62,6 +62,7 @@ export default function FishbowlRoomPage() {
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [audioJoined, setAudioJoined] = useState(false);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
 
   const isHost = user?.fid === room?.host_fid;
   const isSpeaker = room?.current_speakers?.some((s) => s.fid === user?.fid);
@@ -77,6 +78,11 @@ export default function FishbowlRoomPage() {
       data.current_speakers = parseJsonb(data.current_speakers, []);
       data.current_listeners = parseJsonb(data.current_listeners, []);
       setRoom(data);
+      if (data.state === 'ended') {
+        setAudioJoined(false);
+        router.push('/fishbowlz');
+        return;
+      }
     } catch {
       setError('Room not found');
     } finally {
@@ -147,6 +153,15 @@ export default function FishbowlRoomPage() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [user, roomId, isSpeaker, isListener]);
+
+  const endRoom = async () => {
+    await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'end_room' }),
+    });
+    router.push('/fishbowlz');
+  };
 
   const joinAsSpeaker = async () => {
     if (!user || joining) return;
@@ -243,6 +258,14 @@ export default function FishbowlRoomPage() {
             {room.state}
           </span>
           <span className="text-xs text-gray-500">🔴 {room.hot_seat_count} seats</span>
+          {isHost && room.state === 'active' && (
+            <button
+              onClick={() => setShowEndConfirm(true)}
+              className="text-xs px-2 py-1 rounded-full bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/30 transition-colors"
+            >
+              End Room
+            </button>
+          )}
         </div>
       </div>
 
@@ -427,6 +450,29 @@ export default function FishbowlRoomPage() {
           </div>
         </div>
       </div>
+
+      {showEndConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1a2a4a] rounded-xl p-6 w-full max-w-sm border border-white/10">
+            <h2 className="text-lg font-bold mb-2">End this fishbowl?</h2>
+            <p className="text-sm text-gray-400 mb-4">This will disconnect all participants and close the room. Transcripts are preserved.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={endRoom}
+                className="flex-1 bg-red-600 text-white font-semibold py-2.5 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                End Room
+              </button>
+              <button
+                onClick={() => setShowEndConfirm(false)}
+                className="flex-1 border border-white/20 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

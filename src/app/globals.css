@@ -188,6 +188,15 @@ body {
   top: 8px;
 }
 
+/* FISHBOWLZ floating emoji reactions (IG Live style) */
+@keyframes float-up {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-250px) scale(1.5); opacity: 0; }
+}
+.animate-float-up {
+  animation: float-up 2s ease-out forwards;
+}
+
 /* Hide SIWF default styling overrides */
 .fc-authkit-signin-button button {
   background: linear-gradient(135deg, #f5a623, #ffd700) !important;

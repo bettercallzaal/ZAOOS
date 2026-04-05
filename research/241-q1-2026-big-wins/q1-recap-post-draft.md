@@ -95,42 +95,40 @@ Q2 starts now.
 
 ---
 
-## LinkedIn Version (v2 — Zaal's voice)
+## LinkedIn Version (v3 — community-first)
 
-I won a free room at a web3 builder house in January. By March I'd shipped my first app.
+91 days. Here's what the ZAO community built together in Q1 2026.
 
-Here's the whole chain.
+THE COMMUNITY SHOWED UP
 
-Artizen Fund put up a room at Carrot Castle for ETH Boulder. I applied through Incented, the community voted with $ART, and I got in. Free stay. Dinners, poker, builders everywhere.
+1,000+ people joined our first ZABAL campaign on SongJam. Every month the top 3 earned ZOL status — 12 ZOLs recognized so far. People like GodFactor, ohnahji, metamu, candytoybox, and others showing up week after week on the leaderboards.
 
-I showed up to Boulder and installed Claude Code on day one. Had a Discord bot I'd been avoiding for five months. Fixed it in 24 hours. Tested it at our Monday fractal meeting. Worked.
+On Valentine's Day, artists from the community came together for a WaveWarZ benefit battle — Indies vs Classics, love songs only. Raised $1,000+ for kids in Africa through PolyRaiders.
 
-That was the domino.
+500+ quick battles. Nightly. The community locked in on that format and it became the heartbeat of WaveWarZ. We moved from X Spaces to YouTube Live together. 734 battles total. 472 SOL through the platform.
 
-First month after Boulder was all bot upgrades. Making our fractal Discord bot what I always wanted it to be. Then I started thinking about front ends for the community. That became ZAO OS — my first real coding project. Shipped it in the last two weeks of March. Few users. That's fine. The quiet work compounds.
+33 people submitted projects to our ZAO Fund for Emerging Culture on Artizen. 20 got curated — by the community, using their ZAO Respect to decide what gets funded.
 
-But code was one lane. Everything else kept moving too.
+WE BUILT IN ALL DIRECTIONS
 
-We launched $ZABAL on January 1st. Partnered with Adam and Logesh at SongJam for the leaderboard — 1,000+ people showed up for the first campaign. Set up Empire Builder as the reward layer. $168 distributed so far, boosts up to 9.2x, and we burned 178 million ZABAL. Then we launched ZAOndz in March — a Nouns-style subDAO on Base where 20% of the token lives and NFT holders decide what happens with it.
+→ Launched $ZABAL on Jan 1 with SongJam (Adam & Logesh) and Empire Builder as the reward layer
+→ ZAOndz went live on Base — a Nouns-style subDAO where NFT holders govern 20% of the token
+→ Shipped ZAO OS — a gated Farcaster client for the community
+→ 6 Incented campaigns — clips, playlists, merch design, memes, a builder challenge
+→ COC Concertz #3 with DUO DO, Dope Stilo, and Joseph Goats in the metaverse
+→ 7 BCZ Yapz interviews on YouTube
+→ Featured in Crypto Magazine Issue 12 through the COC community
+→ Co-purchased Noun #1797 with community members
+→ ZAO Stock team reassembled — 3 standups, October 3rd
+→ ZAO Ville announced for July 25th
 
-WaveWarZ kept growing. 500+ quick battles. Nightly format locked in. We moved from X Spaces to YouTube Live — that was the biggest shift. Stilo World vs It's Wonderful hit an all-time high on volume. On Valentine's Day we ran Indies vs Classics with PolyRaiders and raised $1,000+ for kids in Africa. 734 total battles now. 472 SOL through the platform.
+WHAT I LEARNED
 
-I made my first PR to someone else's production code. SongJam PR #21 — mute controls, speaker timers, room settings, co-host system. 245 lines. Logesh merged it March 25th. That one felt different.
+It started with one thing — winning a room at Carrot Castle for ETH Boulder through an Artizen campaign. The community voted me in. I showed up and found a tool that changed how I build. But the tool didn't matter without the people already building alongside me.
 
-We ran 6 Incented campaigns — clips, playlists, merch design, memes, a builder challenge. $260+ USDC and 485 million ZABAL in rewards. Then I created the ZAO Fund for Emerging Culture on Artizen. 33 submissions came in. 20 got curated by the community using their ZAO Respect. Full circle — went from winning a funded room to creating a fund for others.
+We're tracking these milestones so at the end of the year we can look back and see the full picture. Q1 was the foundation. Going deeper into each of these wins over the coming weeks.
 
-Some other things that happened:
-→ Featured in Crypto Magazine Issue 12 through the COC community — 2-page spread
-→ 7 BCZ Yapz interview episodes on YouTube
-→ Co-purchased Noun #1797 with friends for 0.44 ETH on January 29th
-→ COC Concertz #3 on March 7th — DUO DO, Dope Stilo, Joseph Goats in the metaverse
-→ Started a daily Twitch streaming streak
-→ ZAO Stock team reassembled with 3 standups. October 3rd.
-→ ZAO Ville announced for July 25th in the DMV
-
-One campaign win turned into an entire quarter. I'm still not sure how all of it happened.
-
-Going deeper into each of these over the coming weeks. Q2 starts now.
+Come build with us.
 
 #buildinpublic #web3 #music #farcaster #ethereum #nouns
 

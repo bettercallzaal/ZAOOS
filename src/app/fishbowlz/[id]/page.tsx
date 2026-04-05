@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { TranscriptInput } from '@/components/spaces/TranscriptInput';
 import { FishbowlChat } from '@/components/spaces/FishbowlChat';
+import { Reactions } from '@/components/fishbowlz/Reactions';
+import { useToast, ToastProvider } from '@/components/ui/Toast';
 import dynamic from 'next/dynamic';
 
 function parseJsonb<T>(value: unknown, fallback: T): T {
@@ -48,6 +50,7 @@ interface FishbowlRoom {
   rotation_enabled: boolean;
   current_speakers: Speaker[];
   current_listeners: Speaker[];
+  hand_raises?: Array<{ fid: number; username: string; joinedAt: string }>;
   audio_source_type: string | null;
   audio_source_url: string | null;
   created_at: string;
@@ -61,11 +64,14 @@ interface TranscriptSegment {
   started_at: string;
 }
 
-export default function FishbowlRoomPage() {
+// ─── Inner component (needs ToastProvider above it) ──────────────────────────
+
+function FishbowlRoomPageInner() {
   const params = useParams();
   const router = useRouter();
   const roomId = params.id as string;
   const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
 
   const [room, setRoom] = useState<FishbowlRoom | null>(null);
   const [transcripts, setTranscripts] = useState<TranscriptSegment[]>([]);
@@ -90,6 +96,7 @@ export default function FishbowlRoomPage() {
       // Parse JSONB strings from Supabase
       data.current_speakers = parseJsonb(data.current_speakers, []);
       data.current_listeners = parseJsonb(data.current_listeners, []);
+      data.hand_raises = parseJsonb(data.hand_raises, []);
 
       if (data.state === 'ended') {
         setAudioJoined(false);
@@ -191,16 +198,22 @@ export default function FishbowlRoomPage() {
     const url = `${window.location.origin}/fishbowlz/${room?.slug || roomId}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
+      toast('Room link copied!', 'success');
       setTimeout(() => setCopied(false), 2000);
-    }).catch(() => {});
+    }).catch(() => toast('Failed to copy link', 'error'));
   };
 
   const endRoom = async () => {
-    await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+    const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'end_room' }),
     });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      toast(errData.error || 'Failed to end room', 'error');
+      return;
+    }
     router.push('/fishbowlz');
   };
 
@@ -208,11 +221,16 @@ export default function FishbowlRoomPage() {
     if (!user || joining) return;
     setJoining(true);
     try {
-      await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+      const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'join_speaker', fid: user.fid, username: user.username }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        toast(errData.error || 'Failed to join', 'error');
+        return;
+      }
       await fetchRoom();
       setAudioJoined(true);
     } finally {
@@ -224,11 +242,16 @@ export default function FishbowlRoomPage() {
     if (!user || joining) return;
     setJoining(true);
     try {
-      await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+      const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'join_listener', fid: user.fid, username: user.username }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        toast(errData.error || 'Failed to join', 'error');
+        return;
+      }
       await fetchRoom();
       setAudioJoined(true);
     } finally {
@@ -253,11 +276,16 @@ export default function FishbowlRoomPage() {
 
   const leave = async () => {
     if (!user) return;
-    await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+    const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'leave_speaker', fid: user.fid }),
     });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      toast(errData.error || 'Failed to leave', 'error');
+      return;
+    }
     await fetchRoom();
     setAudioJoined(false);
   };
@@ -383,6 +411,26 @@ export default function FishbowlRoomPage() {
                       <div>
                         <p className="font-semibold text-sm">{speaker.username}</p>
                         <p className="text-xs text-gray-400">🔥 Hot seat</p>
+                        {isHost && speaker.fid !== user?.fid && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ action: 'kick_speaker', targetFid: speaker.fid }),
+                              });
+                              if (res.ok) {
+                                toast(`Moved @${speaker.username} to listeners`, 'info');
+                                await fetchRoom();
+                              }
+                            }}
+                            className="text-[10px] text-red-400 hover:text-red-300 mt-0.5"
+                            title="Move to listeners"
+                          >
+                            kick
+                          </button>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -429,6 +477,29 @@ export default function FishbowlRoomPage() {
                       {joining ? 'Joining...' : 'Join Audio (Listener)'}
                     </button>
                   )}
+                  {/* Raise hand button */}
+                  <button
+                    onClick={async () => {
+                      if (!user) return;
+                      const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'raise_hand', fid: user.fid, username: user.username }),
+                      });
+                      if (res.ok) {
+                        const data = await res.json();
+                        toast(data.raised ? 'Hand raised!' : 'Hand lowered', 'info');
+                        await fetchRoom();
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                      room.hand_raises?.some((r) => r.fid === user?.fid)
+                        ? 'bg-[#f5a623]/20 text-[#f5a623] border border-[#f5a623]/30'
+                        : 'border border-white/20 hover:bg-white/5'
+                    }`}
+                  >
+                    {room.hand_raises?.some((r) => r.fid === user?.fid) ? '✋ Hand Raised' : '✋ Raise Hand'}
+                  </button>
                   {hotSeatFull ? (
                     <button
                       onClick={rotateIn}
@@ -467,6 +538,43 @@ export default function FishbowlRoomPage() {
             </div>
           )}
 
+          {/* Hand raise queue — host only */}
+          {isHost && room.hand_raises && room.hand_raises.length > 0 && (
+            <div className="mt-4 p-3 bg-[#1a2a4a] rounded-xl border border-[#f5a623]/20">
+              <h4 className="text-xs font-semibold text-[#f5a623] uppercase tracking-wider mb-2">
+                ✋ Hand Raises ({room.hand_raises.length})
+              </h4>
+              <div className="space-y-2">
+                {room.hand_raises.map((r) => (
+                  <div key={r.fid} className="flex items-center justify-between">
+                    <span className="text-sm text-white">@{r.username}</span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={async () => {
+                          const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'approve_hand', targetFid: r.fid }),
+                          });
+                          if (res.ok) {
+                            toast(`@${r.username} approved to hot seat`, 'success');
+                            await fetchRoom();
+                          } else {
+                            const err = await res.json().catch(() => ({}));
+                            toast(err.error || 'Failed to approve', 'error');
+                          }
+                        }}
+                        className="text-xs px-2 py-1 bg-green-600/20 text-green-400 rounded hover:bg-green-600/30 transition-colors"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Room description */}
           {room.description && (
             <div className="mt-6 p-4 bg-[#1a2a4a] rounded-xl border border-white/10">
@@ -475,7 +583,7 @@ export default function FishbowlRoomPage() {
           )}
         </div>
 
-        {/* Sidebar — Listeners + Transcript */}
+        {/* Sidebar — Listeners + Transcript + Chat + Reactions */}
         <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col max-h-[50vh] lg:max-h-none">
           {/* Listeners */}
           <div className="p-4 border-b border-white/10">
@@ -526,6 +634,13 @@ export default function FishbowlRoomPage() {
           <div className="flex-1 flex flex-col border-t border-white/10 min-h-[200px]">
             <FishbowlChat roomId={room.id} />
           </div>
+
+          {/* Reactions */}
+          {room.state === 'active' && (
+            <div className="p-3 border-t border-white/10">
+              <Reactions roomId={room.id} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -592,5 +707,15 @@ export default function FishbowlRoomPage() {
         </div>
       )}
     </div>
+  );
+}
+
+// ─── Page export — wraps inner component with ToastProvider ──────────────────
+
+export default function FishbowlRoomPage() {
+  return (
+    <ToastProvider>
+      <FishbowlRoomPageInner />
+    </ToastProvider>
   );
 }

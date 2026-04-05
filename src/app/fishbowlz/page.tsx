@@ -78,23 +78,23 @@ export default function FishbowlzPage() {
   return (
     <div className="min-h-screen bg-[#0a1628] text-white">
       {/* Header */}
-      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
+      <div className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-[#f5a623]">FISHBOWLZ</h1>
-          <p className="text-sm text-gray-400">Persistent async fishbowl audio spaces</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#f5a623]">FISHBOWLZ</h1>
+          <p className="text-xs sm:text-sm text-gray-400">Persistent async fishbowl audio spaces</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors"
+          className="bg-[#f5a623] text-[#0a1628] font-semibold px-3 sm:px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors text-sm sm:text-base min-h-[44px]"
         >
-          + Create Room
+          + Create
         </button>
       </div>
 
       {/* Create Modal */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a2a4a] rounded-xl p-6 w-full max-w-md border border-white/10">
+          <div className="bg-[#1a2a4a] rounded-xl p-5 sm:p-6 w-full max-w-md border border-white/10 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">Create Fishbowl</h2>
             <input
               type="text"
@@ -141,7 +141,7 @@ export default function FishbowlzPage() {
       )}
 
       {/* Room List */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {loading ? (
           <div className="text-center py-20 text-gray-400">Loading rooms...</div>
         ) : rooms.length === 0 ? (
@@ -150,7 +150,7 @@ export default function FishbowlzPage() {
             <p className="text-gray-500 text-sm">Be the first to create one!</p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map(room => (
               <Link key={room.id} href={`/fishbowlz/${room.id}`}>
                 <div className="bg-[#1a2a4a] rounded-xl p-5 border border-white/10 hover:border-[#f5a623]/50 transition-colors cursor-pointer">

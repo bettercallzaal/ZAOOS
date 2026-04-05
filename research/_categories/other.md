@@ -30,3 +30,9 @@
 | [27](../027-comprehensive-overview/) | **Comprehensive Overview** | Master index, gap analysis, vision map, flywheel, 9-layer roadmap |
 | [49](../049-wallet-connect/) | **Wallet Connect** | Wallet connection patterns |
 | [79](../079-songjam-music-player-research/) | **SongJam Music Player Research** | 2026-music-player is Electron torrent streamer (not useful). Borrow: 100ms, leaderboard treemap |
+
+## Business Model & Strategy
+
+| # | Topic | Summary |
+|---|-------|---------|
+| [263](../263-obsidian-lean-team-model/) | **Obsidian Lean Team Model** | $350M valuation, 9 employees, 3 engineers, $25M ARR bootstrapped, $2.8M rev/employee, "file over app" philosophy, plugin ecosystem, ZAO OS parallels, premium tier strategy |

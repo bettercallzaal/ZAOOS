@@ -528,6 +528,46 @@ export default function FishbowlRoomPage() {
         </div>
       </div>
 
+      {/* Spacer for sticky mobile bottom bar */}
+      {audioJoined && room?.state === 'active' && (
+        <div className="lg:hidden h-16" />
+      )}
+
+      {/* Sticky mobile audio controls */}
+      {audioJoined && user && room?.state === 'active' && (
+        <div
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-[#0d1b2a] border-t border-white/10 px-4 py-3 flex items-center justify-between"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+            </span>
+            <span className="text-white text-sm font-medium truncate">{room.title}</span>
+            <span className="text-gray-500 text-xs shrink-0">
+              {(room.current_speakers?.length || 0) + (room.current_listeners?.length || 0)} in room
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              setAudioJoined(false);
+              if (user) {
+                const action = isSpeaker ? 'leave_speaker' : 'leave_listener';
+                fetch(`/api/fishbowlz/rooms/${roomId}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ action, fid: user.fid }),
+                }).catch(() => {});
+              }
+            }}
+            className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs font-semibold min-h-[44px] shrink-0"
+          >
+            Leave
+          </button>
+        </div>
+      )}
+
       {showEndConfirm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-[#1a2a4a] rounded-xl p-6 w-full max-w-sm border border-white/10">

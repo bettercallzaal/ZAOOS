@@ -118,8 +118,9 @@ export default function FishbowlRoomPage() {
   }, [roomId, user?.fid]);
 
   const fetchTranscripts = useCallback(async () => {
+    if (!room?.id) return;
     try {
-      const res = await fetch(`/api/fishbowlz/transcripts?roomId=${roomId}&limit=50`);
+      const res = await fetch(`/api/fishbowlz/transcripts?roomId=${room.id}&limit=50`);
       if (res.ok) {
         const data = await res.json();
         setTranscripts(data.transcripts || []);
@@ -127,7 +128,7 @@ export default function FishbowlRoomPage() {
     } catch {
       // Non-critical
     }
-  }, [roomId]);
+  }, [room?.id]);
 
   useEffect(() => {
     if (authLoading) return;

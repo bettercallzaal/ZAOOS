@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getSessionData } from '@/lib/auth/session';
 
 const CreateSessionSchema = z.object({
   roomId: z.string().uuid(),
@@ -8,6 +9,11 @@ const CreateSessionSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const authSession = await getSessionData();
+    if (!authSession?.fid) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const data = CreateSessionSchema.parse(body);
 
@@ -25,8 +31,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Room is not active' }, { status: 409 });
     }
 
-    // Create session
-    const { data: session, error } = await supabaseAdmin
+    // Create fishbowl session
+    const { data: fishbowlSession, error } = await supabaseAdmin
       .from('fishbowl_sessions')
       .insert({
         room_id: data.roomId,
@@ -52,14 +58,14 @@ export async function POST(req: NextRequest) {
 
     await supabaseAdmin.rpc('log_fishbowl_event', {
       p_event_type: 'session.started',
-      p_event_data: JSON.stringify({ roomId: data.roomId, sessionId: session.id }),
+      p_event_data: JSON.stringify({ roomId: data.roomId, sessionId: fishbowlSession.id }),
       p_room_id: data.roomId,
-      p_session_id: session.id,
-      p_actor_fid: null,
-      p_actor_type: null,
+      p_session_id: fishbowlSession.id,
+      p_actor_fid: authSession.fid,
+      p_actor_type: 'human',
     });
 
-    return NextResponse.json(session, { status: 201 });
+    return NextResponse.json(fishbowlSession, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.issues }, { status: 400 });

@@ -4,7 +4,15 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { TranscriptInput } from '@/components/spaces/TranscriptInput';
+import { FishbowlChat } from '@/components/spaces/FishbowlChat';
 import dynamic from 'next/dynamic';
+
+function parseJsonb<T>(value: unknown, fallback: T): T {
+  if (typeof value === 'string') {
+    try { return JSON.parse(value); } catch { return fallback; }
+  }
+  return (value as T) ?? fallback;
+}
 
 const HMSFishbowlRoom = dynamic(
   () => import('@/components/spaces/HMSFishbowlRoom').then((m) => m.HMSFishbowlRoom),
@@ -19,6 +27,7 @@ interface Speaker {
 
 interface FishbowlRoom {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   host_fid: number;
@@ -54,6 +63,8 @@ export default function FishbowlRoomPage() {
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [audioJoined, setAudioJoined] = useState(false);
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const isHost = user?.fid === room?.host_fid;
   const isSpeaker = room?.current_speakers?.some((s) => s.fid === user?.fid);
@@ -66,9 +77,14 @@ export default function FishbowlRoomPage() {
       if (!res.ok) throw new Error('Room not found');
       const data = await res.json();
       // Parse JSONB strings from Supabase
-      if (typeof data.current_speakers === 'string') data.current_speakers = JSON.parse(data.current_speakers);
-      if (typeof data.current_listeners === 'string') data.current_listeners = JSON.parse(data.current_listeners);
+      data.current_speakers = parseJsonb(data.current_speakers, []);
+      data.current_listeners = parseJsonb(data.current_listeners, []);
       setRoom(data);
+      if (data.state === 'ended') {
+        setAudioJoined(false);
+        router.push('/fishbowlz');
+        return;
+      }
     } catch {
       setError('Room not found');
     } finally {
@@ -104,6 +120,59 @@ export default function FishbowlRoomPage() {
     };
   }, [roomId, authLoading, fetchRoom, fetchTranscripts]);
 
+  // Heartbeat: keep user presence alive (every 45s)
+  useEffect(() => {
+    if (!user || !roomId || (!isSpeaker && !isListener)) return;
+
+    const sendHeartbeat = () => {
+      fetch(`/api/fishbowlz/rooms/${roomId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'heartbeat', fid: user.fid }),
+      }).catch(() => {});
+    };
+
+    sendHeartbeat();
+    const heartbeatInterval = setInterval(sendHeartbeat, 45_000);
+
+    return () => clearInterval(heartbeatInterval);
+  }, [user, roomId, isSpeaker, isListener]);
+
+  // beforeunload: fire a leave request when the tab is closed
+  useEffect(() => {
+    if (!user || !roomId || (!isSpeaker && !isListener)) return;
+
+    const handleBeforeUnload = () => {
+      const action = isSpeaker ? 'leave_speaker' : 'leave_listener';
+      fetch(`/api/fishbowlz/rooms/${roomId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, fid: user.fid }),
+        keepalive: true,
+      }).catch(() => {});
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [user, roomId, isSpeaker, isListener]);
+
+  const copyShareLink = () => {
+    const url = `${window.location.origin}/fishbowlz/${roomId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {});
+  };
+
+  const endRoom = async () => {
+    await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'end_room' }),
+    });
+    router.push('/fishbowlz');
+  };
+
   const joinAsSpeaker = async () => {
     if (!user || joining) return;
     setJoining(true);
@@ -130,6 +199,7 @@ export default function FishbowlRoomPage() {
         body: JSON.stringify({ action: 'join_listener', fid: user.fid, username: user.username }),
       });
       await fetchRoom();
+      setAudioJoined(true);
     } finally {
       setJoining(false);
     }
@@ -183,32 +253,50 @@ export default function FishbowlRoomPage() {
   return (
     <div className="min-h-screen bg-[#0a1628] text-white flex flex-col">
       {/* Header */}
-      <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button onClick={() => router.push('/fishbowlz')} className="text-gray-400 hover:text-white">
+      <div className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3 min-w-0">
+          <button onClick={() => router.push('/fishbowlz')} className="text-gray-400 hover:text-white shrink-0 p-1">
             ←
           </button>
-          <div>
-            <h1 className="text-xl font-bold">{room.title}</h1>
-            <p className="text-sm text-gray-400">by @{room.host_username}</p>
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold truncate">{room.title}</h1>
+            <p className="text-xs sm:text-sm text-gray-400">by @{room.host_username}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={copyShareLink}
+            className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-colors"
+            title="Copy room link"
+          >
+            {copied ? '✓ Copied' : '🔗 Share'}
+          </button>
           <span className={`text-xs px-2 py-1 rounded-full ${room.state === 'active' ? 'bg-green-600/20 text-green-400' : 'bg-yellow-600/20 text-yellow-400'}`}>
             {room.state}
           </span>
           <span className="text-xs text-gray-500">🔴 {room.hot_seat_count} seats</span>
+          {isHost && room.state === 'active' && (
+            <button
+              onClick={() => setShowEndConfirm(true)}
+              className="text-xs px-2 py-1 rounded-full bg-red-600/20 text-red-400 border border-red-600/30 hover:bg-red-600/30 transition-colors"
+            >
+              End Room
+            </button>
+          )}
         </div>
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Main Stage — Hot Seat + Audio */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-4 sm:p-6">
           {/* HMS Audio */}
           {audioJoined && user && (
             <div className="mb-6 rounded-xl overflow-hidden border border-white/10">
               <HMSFishbowlRoom
                 fishbowlRoomId={room.id}
+                fishbowlSlug={room.slug}
+                userFid={user.fid}
+                userName={user.displayName || user.username || 'Anonymous'}
                 role={isSpeaker ? 'speaker' : 'listener'}
                 isHost={isHost}
                 onLeave={() => setAudioJoined(false)}
@@ -262,7 +350,7 @@ export default function FishbowlRoomPage() {
           </div>
 
           {/* Join Controls */}
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-4 sm:mt-6 flex flex-wrap gap-2 sm:gap-3">
             {!user ? (
               <p className="text-gray-400 text-sm">Sign in to join</p>
             ) : isSpeaker ? (
@@ -271,14 +359,14 @@ export default function FishbowlRoomPage() {
                   <button
                     onClick={joinAsSpeaker}
                     disabled={joining}
-                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
                   >
                     {joining ? 'Joining...' : 'Join Audio'}
                   </button>
                 )}
                 <button
                   onClick={leave}
-                  className="bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors"
+                  className="bg-red-600/20 border border-red-600 text-red-400 px-4 py-2 rounded-lg hover:bg-red-600/30 transition-colors min-h-[44px]"
                 >
                   Leave hot seat
                 </button>
@@ -289,7 +377,7 @@ export default function FishbowlRoomPage() {
                   <button
                     onClick={joinAsListener}
                     disabled={joining}
-                    className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50"
+                    className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50 min-h-[44px]"
                   >
                     {joining ? 'Joining...' : 'Join Audio (Listener)'}
                   </button>
@@ -298,7 +386,7 @@ export default function FishbowlRoomPage() {
                   <button
                     onClick={rotateIn}
                     disabled={!room.rotation_enabled || joining}
-                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
                   >
                     Rotate in
                   </button>
@@ -306,7 +394,7 @@ export default function FishbowlRoomPage() {
                   <button
                     onClick={joinAsSpeaker}
                     disabled={hotSeatFull || joining}
-                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                    className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
                   >
                     {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
                   </button>
@@ -317,13 +405,13 @@ export default function FishbowlRoomPage() {
                 <button
                   onClick={joinAsSpeaker}
                   disabled={hotSeatFull || joining}
-                  className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50"
+                  className="bg-[#f5a623] text-[#0a1628] font-semibold px-4 py-2 rounded-lg hover:bg-[#d4941f] transition-colors disabled:opacity-50 min-h-[44px]"
                 >
                   {hotSeatFull ? 'Hot seat full' : 'Join hot seat'}
                 </button>
                 <button
                   onClick={joinAsListener}
-                  className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors"
+                  className="border border-white/20 px-4 py-2 rounded-lg hover:bg-white/5 transition-colors min-h-[44px]"
                 >
                   Join as listener
                 </button>
@@ -340,7 +428,7 @@ export default function FishbowlRoomPage() {
         </div>
 
         {/* Sidebar — Listeners + Transcript */}
-        <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col">
+        <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col max-h-[50vh] lg:max-h-none">
           {/* Listeners */}
           <div className="p-4 border-b border-white/10">
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
@@ -377,8 +465,36 @@ export default function FishbowlRoomPage() {
               )}
             </div>
           </div>
+
+          {/* Room Chat */}
+          <div className="flex-1 flex flex-col border-t border-white/10 min-h-[200px]">
+            <FishbowlChat roomId={room.id} />
+          </div>
         </div>
       </div>
+
+      {showEndConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1a2a4a] rounded-xl p-6 w-full max-w-sm border border-white/10">
+            <h2 className="text-lg font-bold mb-2">End this fishbowl?</h2>
+            <p className="text-sm text-gray-400 mb-4">This will disconnect all participants and close the room. Transcripts are preserved.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={endRoom}
+                className="flex-1 bg-red-600 text-white font-semibold py-2.5 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                End Room
+              </button>
+              <button
+                onClick={() => setShowEndConfirm(false)}
+                className="flex-1 border border-white/20 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

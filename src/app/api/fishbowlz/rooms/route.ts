@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getSessionData } from '@/lib/auth/session';
 
 const CreateRoomSchema = z.object({
   title: z.string().min(1).max(100),
@@ -19,8 +20,18 @@ const CreateRoomSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionData();
+    if (!session?.fid) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const data = CreateRoomSchema.parse(body);
+
+    // Verify the creator is acting as themselves
+    if (data.hostFid !== session.fid) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // Generate slug from title
     const slug = data.title

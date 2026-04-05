@@ -42,7 +42,7 @@
 | 20 | Incented Campaigns | 6 campaigns totaling $260+ USDC + 485M ZABAL — clips, playlists, merch design, memes, Dappable builder challenge |
 | 21 | Artizen Fund — Carrot Castle Win | Won Boulder Week room via $ART voting on Incented — the domino that started everything |
 | 22 | Crypto Magazine Issue 12 | 2-page "People in Crypto" spread: "Rebuilding Ownership for Independent Artists" — pages 160-161 |
-| 23 | BCZ Yapz Episodes 7-14 | 7 interview episodes in Q1, all on YouTube — part of BetterCallZaal content brand |
+| 23 | BCZ Yapz Episodes 7-13 | 7 interviews in Q1: Yerbearserker, diviflyy, SNAX (PIZZA DAO), GIU (Pinetree), Roaring Sensei, Saltorious.eth (Among Traitors), Ali (Inflynce) |
 | 24 | ZAO Fund for Emerging Culture | Created Artizen Season 6 fund — 33+ submissions, 20 curated projects via ZAO Respect voting |
 | 25 | COC Concertz #3 | 3rd metaverse concert on March 7 with DUO DO, JOSEPH GOATS, STILO WORLD — next one planned |
 
@@ -102,7 +102,7 @@
 - **Details:** Campaign ran for about 1 month in December 2025. Still running monthly campaigns. Campaign tracks ZABAL mentions across X Spaces and tweets, with the leaderboard ranking participants.
 
 ### 5. ETH Boulder Trip (Sponsored by Artizen via Incented)
-- **What:** Attended Boulder Week / ETH Boulder, Feb 12-16, 2026 — stayed at Carrot Castle for FREE after winning the Artizen-sponsored Incented campaign
+- **What:** Attended Boulder Week / ETH Boulder, Feb 13-15, 2026 — stayed at Carrot Castle for FREE after winning the Artizen-sponsored Incented campaign
 - **When:** February 12-16, 2026
 - **Details:** Won the Carrot Castle Quest campaign (see #21) to get a free room at the legendary web3 community house. Had to leave early unfortunately — couldn't show the hackathon project. But the trip was transformative: installed Claude Code and within the first 24 hours upgraded the fractal Discord bot that had been dormant for 5+ months. The first month after getting Claude Code was dedicated to making the fractal bot what he wanted it to be. Then started thinking about front ends for the community, which became ZAO OS.
 - **The domino chain:** Artizen campaign → Carrot Castle → ETH Boulder → Claude Code → fractal bot upgrades (1 month) → ZAO OS idea → shipped ZAO OS
@@ -233,11 +233,23 @@
 - **Images:** `research/newfiles/articlepage1.jpeg`, `research/newfiles/articlepage2.jpeg`
 - **Link:** [Crypto Magazine Issue 12](https://cryptomagazine.myshopify.com/products/issue-11-crypto-magazine-copy?_pos=6&_sid=326e63009&_ss=r)
 
-### 23. BCZ Yapz Episodes (7 in Q1)
-- **What:** 7 interview episodes produced in Q1, bringing total to 14
+### 23. BCZ Yapz Episodes (7 in Q1, eps 7-13)
+- **What:** 7 interview episodes produced in Q1, bringing total to 13
 - **Platform:** YouTube
 - **Playlist:** [BCZ Yapz on YouTube](https://www.youtube.com/watch?v=3vUAFwXqdeo&list=PLgkFmQwKv5euNDCQfn-1dYbv8Wvt-rxC3)
-- **NEEDS:** Guest list for Q1 episodes, standout episodes
+- **Q1 Episodes:**
+
+| Ep | Guest | Topic/Project |
+|----|-------|---------------|
+| 7 | Yerbearserker | Empire Builder |
+| 8 | diviflyy | Empire Builder |
+| 9 | SNAX | PIZZA DAO |
+| 10 | GIU | Pinetree |
+| 11 | Roaring Sensei | — |
+| 12 | Saltorious.eth | Among Traitors |
+| 13 | Ali | Inflynce |
+
+- **Notable:** Yerbearserker (#5 Empire Builder leaderboard) and diviflyy (#4) were guests — content and ecosystem feeding each other
 
 ### 24. ZAO Fund for Emerging Culture (Artizen Season 6)
 - **What:** Created a community-owned funding vehicle on Artizen for independent creators
@@ -351,7 +363,6 @@ This doc connects to the codebase through:
 | 3 | Empire Builder | More granular distribution data (Zaal to provide) |
 | 12 | ZOLs | Confirm monthly breakdown (which 3 names go with which month?) |
 | 16-18 | WaveWarZ | Full deep-dive session (scheduled for after this doc) |
-| 23 | BCZ Yapz | Guest list for Q1 episodes (YouTube playlist shared but couldn't scrape — Zaal to list)
 
 ---
 

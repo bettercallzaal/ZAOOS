@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getSessionData } from '@/lib/auth/session';
 import crypto from 'crypto';
 
 const TranscriptSchema = z.object({
@@ -13,7 +14,7 @@ const TranscriptSchema = z.object({
   startedAt: z.string().datetime(),
   endedAt: z.string().datetime().optional(),
   durationMs: z.number().int().positive().optional(),
-  source: z.enum(['audio_capture', 'manual', 'agent_summary']).default('audio_capture'),
+  source: z.enum(['audio_capture', 'manual', 'whisper', 'agent_summary']).default('audio_capture'),
   platform: z.enum(['farcaster', 'twitter_x', 'native']).optional(),
 });
 
@@ -23,6 +24,11 @@ function contentHash(text: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionData();
+    if (!session?.fid) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const data = TranscriptSchema.parse(body);
 

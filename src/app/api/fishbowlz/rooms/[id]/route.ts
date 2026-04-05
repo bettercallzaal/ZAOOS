@@ -6,6 +6,17 @@ interface FishbowlSpeaker {
   fid: number;
   username: string;
   joinedAt: string;
+  lastSeen?: string;
+}
+
+const STALE_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes
+
+function pruneStaleUsers(users: FishbowlSpeaker[]): FishbowlSpeaker[] {
+  const cutoff = Date.now() - STALE_TIMEOUT_MS;
+  return users.filter((u) => {
+    const seen = u.lastSeen ? new Date(u.lastSeen).getTime() : new Date(u.joinedAt).getTime();
+    return seen > cutoff;
+  });
 }
 
 /** Parse JSONB that might come back as a string from Supabase */
@@ -30,6 +41,31 @@ export async function GET(
 
   if (error || !room) {
     return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+  }
+
+  // Prune stale users on read for active rooms
+  if (room.state === 'active') {
+    const speakers: FishbowlSpeaker[] = parseJsonb(room.current_speakers, []);
+    const listeners: FishbowlSpeaker[] = parseJsonb(room.current_listeners, []);
+    const prunedSpeakers = pruneStaleUsers(speakers);
+    const prunedListeners = pruneStaleUsers(listeners);
+
+    const speakersChanged = prunedSpeakers.length !== speakers.length;
+    const listenersChanged = prunedListeners.length !== listeners.length;
+
+    if (speakersChanged || listenersChanged) {
+      await supabaseAdmin.from('fishbowl_rooms').update({
+        current_speakers: prunedSpeakers,
+        current_listeners: prunedListeners,
+        last_active_at: new Date().toISOString(),
+      }).eq('id', id);
+
+      return NextResponse.json({
+        ...room,
+        current_speakers: prunedSpeakers,
+        current_listeners: prunedListeners,
+      });
+    }
   }
 
   return NextResponse.json(room);
@@ -76,7 +112,7 @@ export async function PATCH(
       const listeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
       const updatedListeners = listeners.filter((l) => l.fid !== fid);
 
-      const newSpeakers = [...speakers, { fid, username, joinedAt: new Date().toISOString() }];
+      const newSpeakers = [...speakers, { fid, username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
       await supabaseAdmin.from('fishbowl_rooms').update({
         current_speakers: newSpeakers,
         current_listeners: updatedListeners,
@@ -139,7 +175,7 @@ export async function PATCH(
         return NextResponse.json({ success: true, listeners });
       }
 
-      const newListeners = [...listeners, { fid, username, joinedAt: new Date().toISOString() }];
+      const newListeners = [...listeners, { fid, username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
       await supabaseAdmin.from('fishbowl_rooms').update({
         current_listeners: newListeners,
         last_active_at: new Date().toISOString(),
@@ -176,7 +212,7 @@ export async function PATCH(
       if (speakers.length >= room.data.hot_seat_count) {
         // Rotate out the first (longest-seated) speaker → move them to listeners
         const rotatedOut = speakers.shift()!;
-        listeners.push({ fid: rotatedOut.fid, username: rotatedOut.username, joinedAt: new Date().toISOString() });
+        listeners.push({ fid: rotatedOut.fid, username: rotatedOut.username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() });
 
         await supabaseAdmin.rpc('log_fishbowl_event', {
           p_event_type: 'speaker.rotated_out',
@@ -188,7 +224,7 @@ export async function PATCH(
         });
       }
 
-      speakers.push({ fid: listenerFid, username: listenerUsername, joinedAt: new Date().toISOString() });
+      speakers.push({ fid: listenerFid, username: listenerUsername, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() });
 
       await supabaseAdmin.from('fishbowl_rooms').update({
         current_speakers: speakers,
@@ -206,6 +242,36 @@ export async function PATCH(
       });
 
       return NextResponse.json({ success: true, speakers, listeners });
+    }
+
+    if (action === 'heartbeat') {
+      const { fid } = data;
+      if (fid !== session.fid) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+
+      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, current_listeners').eq('id', id).single();
+      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+
+      const now = new Date().toISOString();
+      let speakers: FishbowlSpeaker[] = parseJsonb(room.data.current_speakers, []);
+      let listeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
+
+      // Update lastSeen for the requesting user (wherever they are)
+      speakers = speakers.map((s) => s.fid === fid ? { ...s, lastSeen: now } : s);
+      listeners = listeners.map((l) => l.fid === fid ? { ...l, lastSeen: now } : l);
+
+      // Prune stale users
+      const prunedSpeakers = pruneStaleUsers(speakers);
+      const prunedListeners = pruneStaleUsers(listeners);
+
+      await supabaseAdmin.from('fishbowl_rooms').update({
+        current_speakers: prunedSpeakers,
+        current_listeners: prunedListeners,
+        last_active_at: now,
+      }).eq('id', id);
+
+      return NextResponse.json({ success: true, speakers: prunedSpeakers, listeners: prunedListeners });
     }
 
     // Generic update — only hosts can update room metadata

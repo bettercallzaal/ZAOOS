@@ -112,6 +112,42 @@ export default function FishbowlRoomPage() {
     };
   }, [roomId, authLoading, fetchRoom, fetchTranscripts]);
 
+  // Heartbeat: keep user presence alive (every 45s)
+  useEffect(() => {
+    if (!user || !roomId || (!isSpeaker && !isListener)) return;
+
+    const sendHeartbeat = () => {
+      fetch(`/api/fishbowlz/rooms/${roomId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'heartbeat', fid: user.fid }),
+      }).catch(() => {});
+    };
+
+    sendHeartbeat();
+    const heartbeatInterval = setInterval(sendHeartbeat, 45_000);
+
+    return () => clearInterval(heartbeatInterval);
+  }, [user, roomId, isSpeaker, isListener]);
+
+  // beforeunload: fire a leave request when the tab is closed
+  useEffect(() => {
+    if (!user || !roomId || (!isSpeaker && !isListener)) return;
+
+    const handleBeforeUnload = () => {
+      const action = isSpeaker ? 'leave_speaker' : 'leave_listener';
+      fetch(`/api/fishbowlz/rooms/${roomId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, fid: user.fid }),
+        keepalive: true,
+      }).catch(() => {});
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [user, roomId, isSpeaker, isListener]);
+
   const joinAsSpeaker = async () => {
     if (!user || joining) return;
     setJoining(true);

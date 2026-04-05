@@ -159,6 +159,34 @@ export async function PATCH(
       return NextResponse.json({ success: true, speakers });
     }
 
+    if (action === 'leave_listener') {
+      const { fid } = data;
+      if (fid !== session.fid) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+
+      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_listeners').eq('id', id).single();
+      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+
+      const rawListeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
+      const listeners = rawListeners.filter((l) => l.fid !== fid);
+      await supabaseAdmin.from('fishbowl_rooms').update({
+        current_listeners: listeners,
+        last_active_at: new Date().toISOString(),
+      }).eq('id', id);
+
+      await supabaseAdmin.rpc('log_fishbowl_event', {
+        p_event_type: 'listener.left',
+        p_event_data: JSON.stringify({ roomId: id, fid }),
+        p_room_id: id,
+        p_session_id: null,
+        p_actor_fid: fid,
+        p_actor_type: 'human',
+      });
+
+      return NextResponse.json({ success: true, listeners });
+    }
+
     if (action === 'join_listener') {
       const { fid, username } = data;
       if (fid !== session.fid) {

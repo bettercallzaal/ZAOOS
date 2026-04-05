@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { checkGatingEligibility } from '@/lib/fc-identity';
 
 export async function GET(
   req: NextRequest,
@@ -30,9 +31,23 @@ export async function PATCH(
 
   try {
     if (action === 'join_speaker') {
-      const { fid, username } = data;
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, hot_seat_count').eq('id', id).single();
+      const { fid, username, address } = data;
+
+      // Check FC gating if enabled
+      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, hot_seat_count, gating_enabled, min_quality_score').eq('id', id).single();
       if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+
+      if (room.data.gating_enabled && address) {
+        const eligibility = await checkGatingEligibility(address, room.data.min_quality_score);
+        if (!eligibility.eligible) {
+          return NextResponse.json({
+            error: 'Gated room — FC quality score too low',
+            reason: eligibility.reason,
+            score: eligibility.score?.toString(),
+            fid: eligibility.fid,
+          }, { status: 403 });
+        }
+      }
 
       const speakers = typeof room.data.current_speakers === 'string' ? JSON.parse(room.data.current_speakers) : (room.data.current_speakers || []);
       if (speakers.length >= room.data.hot_seat_count) {

@@ -22,14 +22,21 @@ interface HMSFishbowlRoomProps {
 }
 
 /** Sub-component to read peer audio state via useHMSStore */
-function PeerAudioIndicator({ peerId }: { peerId: string }) {
+function PeerAudioIndicator({ peerId, initial }: { peerId: string; initial: string }) {
   const isAudioEnabled = useHMSStore(selectIsPeerAudioEnabled(peerId));
   return (
-    <div
-      className={`w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-semibold border-2 ${
-        isAudioEnabled ? 'border-green-400' : 'border-transparent'
-      }`}
-    />
+    <div className="relative">
+      {isAudioEnabled && (
+        <span className="absolute inset-0 rounded-full border-2 border-green-400 animate-ping opacity-30" />
+      )}
+      <div
+        className={`w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-semibold border-2 transition-colors ${
+          isAudioEnabled ? 'border-green-400 shadow-[0_0_12px_rgba(74,222,128,0.4)]' : 'border-transparent'
+        }`}
+      >
+        {initial}
+      </div>
+    </div>
   );
 }
 
@@ -270,12 +277,7 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
           <div className="grid grid-cols-4 gap-3">
             {speakers.map((peer) => (
               <div key={peer.id} className="flex flex-col items-center">
-                <div className="relative">
-                  <PeerAudioIndicator peerId={peer.id} />
-                  <span className="absolute inset-0 flex items-center justify-center text-white font-semibold">
-                    {(peer.name || '?')[0]}
-                  </span>
-                </div>
+                <PeerAudioIndicator peerId={peer.id} initial={(peer.name || '?')[0]} />
                 <span className="text-white text-xs mt-1 truncate max-w-[60px]">
                   {peer.name} {peer.isLocal && '(You)'}
                 </span>

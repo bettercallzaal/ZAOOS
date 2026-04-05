@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { TranscriptInput } from '@/components/spaces/TranscriptInput';
+import { FishbowlChat } from '@/components/spaces/FishbowlChat';
 import dynamic from 'next/dynamic';
 
 function parseJsonb<T>(value: unknown, fallback: T): T {
@@ -463,6 +464,11 @@ export default function FishbowlRoomPage() {
                 ))
               )}
             </div>
+          </div>
+
+          {/* Room Chat */}
+          <div className="flex-1 flex flex-col border-t border-white/10 min-h-[200px]">
+            <FishbowlChat roomId={room.id} />
           </div>
         </div>
       </div>

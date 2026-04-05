@@ -19,14 +19,37 @@ interface FishbowlRoom {
   description: string | null;
   host_name: string;
   host_username: string;
+  host_pfp?: string;
   state: string;
   hot_seat_count: number;
   current_speakers: Array<{ fid: number; username: string; joinedAt: string }>;
   current_listeners: Array<{ fid: number; username: string; joinedAt: string }>;
   total_sessions: number;
   gating_enabled?: boolean;
+  scheduled_at?: string;
   created_at: string;
   last_active_at: string;
+}
+
+function timeAgo(dateStr: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}
+
+function timeUntil(dateStr: string): string {
+  const seconds = Math.floor((new Date(dateStr).getTime() - Date.now()) / 1000);
+  if (seconds < 0) return 'starting soon';
+  if (seconds < 60) return 'in less than a minute';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `in ${minutes}m`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `in ${hours}h`;
+  return `in ${Math.floor(hours / 24)}d`;
 }
 
 export default function FishbowlzPage() {
@@ -40,6 +63,8 @@ export default function FishbowlzPage() {
   const [hotSeats, setHotSeats] = useState(5);
   const [gatingEnabled, setGatingEnabled] = useState(false);
   const [minQualityScore, setMinQualityScore] = useState(0);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
 
   useEffect(() => {
     fetch('/api/fishbowlz/rooms')
@@ -214,8 +239,25 @@ export default function FishbowlzPage() {
                     </div>
                   )}
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-gray-500">
-                    <span>by @{room.host_username}</span>
-                    <span>{room.total_sessions} sessions</span>
+                    <div className="flex items-center gap-1.5">
+                      {room.host_pfp ? (
+                        <img src={room.host_pfp} alt="" className="w-4 h-4 rounded-full" />
+                      ) : (
+                        <div className="w-4 h-4 rounded-full bg-gray-600 flex items-center justify-center text-[8px] text-gray-400">
+                          {room.host_username[0]?.toUpperCase()}
+                        </div>
+                      )}
+                      <span>@{room.host_username}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {room.state === 'active' && (
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                          {(room.current_speakers?.length || 0) + (room.current_listeners?.length || 0)} in room
+                        </span>
+                      )}
+                      <span>{timeAgo(room.last_active_at)}</span>
+                    </div>
                   </div>
                 </div>
               </Link>

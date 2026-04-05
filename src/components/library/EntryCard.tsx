@@ -96,7 +96,7 @@ export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin
   const totalVoters = voters.length;
 
   return (
-    <div className="rounded-xl bg-[#0d1b2a] p-4 ring-1 ring-gray-800">
+    <div className="rounded-xl bg-[#0d1b2a] p-4 border border-white/[0.08]">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2 text-sm text-gray-400">
           <span>FID {entry.fid}</span>
@@ -163,7 +163,7 @@ export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin
         </div>
       )}
 
-      <div className="mb-3 rounded-lg bg-[#0a1628] p-3 ring-1 ring-gray-800">
+      <div className="mb-3 rounded-lg bg-[#0a1628] p-3 border border-white/[0.08]">
         <p className="text-xs font-medium text-[#f5a623] mb-1">AI Analysis</p>
         {entry.ai_status === 'pending' && (
           <p className="text-sm text-gray-400 animate-pulse">Generating summary...</p>

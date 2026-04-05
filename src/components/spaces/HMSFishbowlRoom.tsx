@@ -226,7 +226,7 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-white/[0.08] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#f5a623] opacity-75" />
@@ -242,7 +242,7 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 transcribing
                   ? 'bg-red-600/20 text-red-400 border border-red-600/30'
-                  : 'bg-gray-700 text-gray-400 hover:text-white'
+                  : 'bg-white/5 text-gray-400 hover:text-white'
               }`}
               title={transcribing ? 'Stop transcription' : 'Start live transcription'}
             >

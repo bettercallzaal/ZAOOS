@@ -81,7 +81,7 @@ export default function DeepResearch() {
       ) : (
         <div className="space-y-2">
           {Object.entries(grouped).map(([category, categoryDocs]) => (
-            <div key={category} className="rounded-lg ring-1 ring-gray-800 overflow-hidden">
+            <div key={category} className="rounded-lg border border-white/[0.08] overflow-hidden">
               <button
                 onClick={() => setOpenCategory(openCategory === category ? null : category)}
                 aria-expanded={openCategory === category}

@@ -24,9 +24,9 @@ interface TasteMatchProps {
 }
 
 function matchColor(pct: number): string {
-  if (pct >= 70) return 'text-green-400';
+  if (pct >= 70) return 'text-[#ffd700]';
   if (pct >= 40) return 'text-[#f5a623]';
-  return 'text-gray-400';
+  return 'text-[#a0aec0]';
 }
 
 export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {

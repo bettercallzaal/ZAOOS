@@ -233,7 +233,7 @@ export function SocialPage() {
               className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
                 view === t.key
                   ? 'text-[#f5a623] border-b-2 border-[#f5a623]'
-                  : 'text-gray-500 hover:text-white'
+                  : 'text-[#a0aec0] hover:text-[#ededed]'
               }`}
             >
               {t.label}
@@ -314,7 +314,7 @@ export function SocialPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border transition-colors ${
                   showFilters || activeFilterCount > 0
                     ? 'border-[#f5a623]/50 text-[#f5a623] bg-[#f5a623]/5'
-                    : 'border-gray-700/50 text-gray-400 hover:text-white'
+                    : 'border-white/[0.08] text-gray-400 hover:text-white'
                 }`}
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -338,7 +338,7 @@ export function SocialPage() {
                   className={`px-2.5 py-1 text-[11px] rounded-full border transition-colors ${
                     t.active
                       ? 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/40'
-                      : 'text-gray-500 border-gray-700/50 hover:text-white hover:border-gray-600'
+                      : 'text-gray-500 border-white/[0.08] hover:text-white hover:border-gray-600'
                   }`}
                 >
                   {t.label}
@@ -374,7 +374,7 @@ export function SocialPage() {
                         className={`px-2.5 py-1 text-[11px] rounded-full border transition-colors ${
                           minFollowers === n
                             ? 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/40'
-                            : 'text-gray-500 border-gray-700/50 hover:text-white'
+                            : 'text-gray-500 border-white/[0.08] hover:text-white'
                         }`}
                       >
                         {n === 0 ? 'Any' : n >= 1000 ? `${n / 1000}K+` : `${n}+`}

@@ -112,11 +112,11 @@ export function RespectOverview() {
           <p className="text-xs text-gray-400 mt-1">Fractal Sessions Recorded</p>
         </div>
         <div className="bg-[#1a2a3a] rounded-xl p-4">
-          <p className="text-2xl font-bold text-green-400">{stats?.totalRespect.toLocaleString() ?? 0}</p>
+          <p className="text-2xl font-bold text-[#ffd700]">{stats?.totalRespect.toLocaleString() ?? 0}</p>
           <p className="text-xs text-gray-400 mt-1">Total Respect Distributed</p>
         </div>
         <div className="bg-[#1a2a3a] rounded-xl p-4">
-          <p className="text-2xl font-bold text-purple-400">{membersWithOnchain}</p>
+          <p className="text-2xl font-bold text-[#ededed]">{membersWithOnchain}</p>
           <p className="text-xs text-gray-400 mt-1">On-chain Balances</p>
         </div>
       </div>
@@ -170,8 +170,8 @@ export function RespectOverview() {
                   <tr
                     key={entry.wallet || entry.name}
                     className={`border-b border-gray-800/30 ${
-                      entry.rank <= 3 ? 'bg-[#f5a623]/5' : 'hover:bg-white/5'
-                    } transition-colors`}
+                      entry.rank <= 3 ? 'bg-[#f5a623]/5' : ''
+                    } hover:bg-white/5 transition-colors`}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className={`font-bold ${entry.rank <= 3 ? 'text-[#f5a623]' : 'text-gray-400'}`}>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
+import { castRoomCreated } from '@/lib/fishbowlz/castRoom';
 
 const CreateRoomSchema = z.object({
   title: z.string().min(1).max(100),
@@ -74,6 +75,14 @@ export async function POST(req: NextRequest) {
       p_actor_fid: data.hostFid,
       p_actor_type: 'human',
     });
+
+    // Cast to Farcaster (fire-and-forget)
+    castRoomCreated({
+      title: data.title,
+      slug,
+      host_username: data.hostUsername,
+      hot_seat_count: data.hotSeatCount,
+    }).catch(() => {});
 
     return NextResponse.json(room, { status: 201 });
   } catch (err) {

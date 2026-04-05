@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
 import { checkGatingEligibility } from '@/lib/fc-identity';
+import { castRoomEnded } from '@/lib/fishbowlz/castRoom';
 
 interface FishbowlSpeaker {
   fid: number;
@@ -324,6 +325,27 @@ export async function PATCH(
         p_actor_fid: session.fid,
         p_actor_type: 'human',
       });
+
+      // Cast to Farcaster (fire-and-forget)
+      const [roomDetails, transcriptResult] = await Promise.allSettled([
+        supabaseAdmin
+          .from('fishbowl_rooms')
+          .select('title, slug, host_username, total_speakers')
+          .eq('id', id)
+          .single(),
+        supabaseAdmin
+          .from('fishbowl_transcripts')
+          .select('*', { count: 'exact', head: true })
+          .eq('room_id', id),
+      ]);
+
+      if (roomDetails.status === 'fulfilled' && roomDetails.value.data) {
+        const transcriptCount =
+          transcriptResult.status === 'fulfilled'
+            ? (transcriptResult.value.count ?? 0)
+            : 0;
+        castRoomEnded(roomDetails.value.data, transcriptCount).catch(() => {});
+      }
 
       return NextResponse.json({ success: true, state: 'ended' });
     }

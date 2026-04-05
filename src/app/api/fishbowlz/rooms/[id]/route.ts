@@ -300,6 +300,111 @@ export async function PATCH(
       return NextResponse.json({ success: true, speakers, listeners });
     }
 
+    if (action === 'kick_speaker') {
+      const { targetFid } = data;
+
+      // Only hosts can kick
+      const roomCheck = await supabaseAdmin.from('fishbowl_rooms').select('host_fid, current_speakers, current_listeners').eq('id', id).single();
+      if (!roomCheck.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+      if (roomCheck.data.host_fid !== session.fid) {
+        return NextResponse.json({ error: 'Only the host can kick speakers' }, { status: 403 });
+      }
+
+      const speakers: FishbowlSpeaker[] = parseJsonb(roomCheck.data.current_speakers, []);
+      const listeners: FishbowlSpeaker[] = parseJsonb(roomCheck.data.current_listeners, []);
+
+      const kicked = speakers.find((s) => s.fid === targetFid);
+      if (!kicked) return NextResponse.json({ error: 'Speaker not found' }, { status: 404 });
+
+      const newSpeakers = speakers.filter((s) => s.fid !== targetFid);
+      const newListeners = [...listeners, { fid: kicked.fid, username: kicked.username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
+
+      await supabaseAdmin.from('fishbowl_rooms').update({
+        current_speakers: newSpeakers,
+        current_listeners: newListeners,
+        last_active_at: new Date().toISOString(),
+      }).eq('id', id);
+
+      await supabaseAdmin.rpc('log_fishbowl_event', {
+        p_event_type: 'speaker.kicked',
+        p_event_data: JSON.stringify({ roomId: id, targetFid, kickedBy: session.fid }),
+        p_room_id: id,
+        p_session_id: null,
+        p_actor_fid: session.fid,
+        p_actor_type: 'human',
+      });
+
+      return NextResponse.json({ success: true, speakers: newSpeakers, listeners: newListeners });
+    }
+
+    if (action === 'raise_hand') {
+      const { fid, username } = data;
+      if (fid !== session.fid) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+
+      const room = await supabaseAdmin.from('fishbowl_rooms').select('hand_raises, current_listeners').eq('id', id).single();
+      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+
+      const raises: FishbowlSpeaker[] = parseJsonb(room.data.hand_raises, []);
+
+      // Toggle — raise if not raised, lower if already raised
+      const alreadyRaised = raises.some((r) => r.fid === fid);
+      const newRaises = alreadyRaised
+        ? raises.filter((r) => r.fid !== fid)
+        : [...raises, { fid, username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
+
+      await supabaseAdmin.from('fishbowl_rooms').update({
+        hand_raises: newRaises,
+        last_active_at: new Date().toISOString(),
+      }).eq('id', id);
+
+      return NextResponse.json({ success: true, handRaises: newRaises, raised: !alreadyRaised });
+    }
+
+    if (action === 'approve_hand') {
+      const { targetFid } = data;
+
+      const room = await supabaseAdmin.from('fishbowl_rooms').select('host_fid, current_speakers, current_listeners, hand_raises, hot_seat_count').eq('id', id).single();
+      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+      if (room.data.host_fid !== session.fid) {
+        return NextResponse.json({ error: 'Only the host can approve hand raises' }, { status: 403 });
+      }
+
+      const speakers: FishbowlSpeaker[] = parseJsonb(room.data.current_speakers, []);
+      const listeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
+      const raises: FishbowlSpeaker[] = parseJsonb(room.data.hand_raises, []);
+
+      const approved = raises.find((r) => r.fid === targetFid);
+      if (!approved) return NextResponse.json({ error: 'Hand raise not found' }, { status: 404 });
+
+      if (speakers.length >= room.data.hot_seat_count) {
+        return NextResponse.json({ error: 'Hot seat is full — kick someone first' }, { status: 409 });
+      }
+
+      const newSpeakers = [...speakers, { fid: approved.fid, username: approved.username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
+      const newListeners = listeners.filter((l) => l.fid !== targetFid);
+      const newRaises = raises.filter((r) => r.fid !== targetFid);
+
+      await supabaseAdmin.from('fishbowl_rooms').update({
+        current_speakers: newSpeakers,
+        current_listeners: newListeners,
+        hand_raises: newRaises,
+        last_active_at: new Date().toISOString(),
+      }).eq('id', id);
+
+      await supabaseAdmin.rpc('log_fishbowl_event', {
+        p_event_type: 'speaker.approved',
+        p_event_data: JSON.stringify({ roomId: id, targetFid, approvedBy: session.fid }),
+        p_room_id: id,
+        p_session_id: null,
+        p_actor_fid: targetFid,
+        p_actor_type: 'human',
+      });
+
+      return NextResponse.json({ success: true, speakers: newSpeakers, listeners: newListeners, handRaises: newRaises });
+    }
+
     if (action === 'end_room') {
       // Only the host can end the room
       const hostCheck = await supabaseAdmin.from('fishbowl_rooms').select('host_fid').eq('id', id).single();

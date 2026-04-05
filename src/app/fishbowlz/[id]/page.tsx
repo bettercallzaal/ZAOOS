@@ -26,6 +26,24 @@ function timeAgo(dateStr: string): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
+function SpeakerTime({ joinedAt }: { joinedAt: string }) {
+  const [elapsed, setElapsed] = useState('');
+
+  useEffect(() => {
+    const update = () => {
+      const seconds = Math.floor((Date.now() - new Date(joinedAt).getTime()) / 1000);
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      setElapsed(`${mins}:${secs.toString().padStart(2, '0')}`);
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [joinedAt]);
+
+  return <span className="text-[10px] text-gray-500 font-mono">{elapsed}</span>;
+}
+
 const HMSFishbowlRoom = dynamic(
   () => import('@/components/spaces/HMSFishbowlRoom').then((m) => m.HMSFishbowlRoom),
   { ssr: false }
@@ -48,6 +66,7 @@ interface FishbowlRoom {
   state: string;
   hot_seat_count: number;
   rotation_enabled: boolean;
+  rotation_interval_ms?: number | null;
   current_speakers: Speaker[];
   current_listeners: Speaker[];
   hand_raises?: Array<{ fid: number; username: string; joinedAt: string }>;
@@ -410,7 +429,10 @@ function FishbowlRoomPageInner() {
                       </div>
                       <div>
                         <p className="font-semibold text-sm">{speaker.username}</p>
-                        <p className="text-xs text-gray-400">🔥 Hot seat</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-xs text-gray-400">🔥 Hot seat</p>
+                          <SpeakerTime joinedAt={speaker.joinedAt} />
+                        </div>
                         {isHost && speaker.fid !== user?.fid && (
                           <button
                             onClick={async (e) => {

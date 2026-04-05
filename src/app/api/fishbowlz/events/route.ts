@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getSessionData } from '@/lib/auth/session';
 
 const EventSchema = z.object({
   eventType: z.string(),
@@ -14,6 +15,11 @@ const EventSchema = z.object({
 // Append-only event log — strict JSONL for future tokenomics
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionData();
+    if (!session?.fid) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const data = EventSchema.parse(body);
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getSessionData } from '@/lib/auth/session';
 
 const TranscriptSegmentSchema = z.object({
   roomId: z.string().uuid(),
@@ -11,13 +12,18 @@ const TranscriptSegmentSchema = z.object({
   text: z.string().min(1).max(5000),
   startedAt: z.string().datetime().optional(),
   durationMs: z.number().int().positive().optional(),
-  source: z.enum(['manual', 'whisper', 'agent_summary']).default('whisper'),
+  source: z.enum(['audio_capture', 'manual', 'whisper', 'agent_summary']).default('whisper'),
   platform: z.enum(['farcaster', 'twitter_x', 'native']).optional(),
 });
 
 // POST — receive transcript from Whisper proxy or agent
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionData();
+    if (!session?.fid) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await req.json();
     const data = TranscriptSegmentSchema.parse(body);
 

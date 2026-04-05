@@ -6,6 +6,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { TranscriptInput } from '@/components/spaces/TranscriptInput';
 import dynamic from 'next/dynamic';
 
+function parseJsonb<T>(value: unknown, fallback: T): T {
+  if (typeof value === 'string') {
+    try { return JSON.parse(value); } catch { return fallback; }
+  }
+  return (value as T) ?? fallback;
+}
+
 const HMSFishbowlRoom = dynamic(
   () => import('@/components/spaces/HMSFishbowlRoom').then((m) => m.HMSFishbowlRoom),
   { ssr: false }
@@ -19,6 +26,7 @@ interface Speaker {
 
 interface FishbowlRoom {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   host_fid: number;
@@ -66,8 +74,8 @@ export default function FishbowlRoomPage() {
       if (!res.ok) throw new Error('Room not found');
       const data = await res.json();
       // Parse JSONB strings from Supabase
-      if (typeof data.current_speakers === 'string') data.current_speakers = JSON.parse(data.current_speakers);
-      if (typeof data.current_listeners === 'string') data.current_listeners = JSON.parse(data.current_listeners);
+      data.current_speakers = parseJsonb(data.current_speakers, []);
+      data.current_listeners = parseJsonb(data.current_listeners, []);
       setRoom(data);
     } catch {
       setError('Room not found');
@@ -130,6 +138,7 @@ export default function FishbowlRoomPage() {
         body: JSON.stringify({ action: 'join_listener', fid: user.fid, username: user.username }),
       });
       await fetchRoom();
+      setAudioJoined(true);
     } finally {
       setJoining(false);
     }
@@ -209,6 +218,9 @@ export default function FishbowlRoomPage() {
             <div className="mb-6 rounded-xl overflow-hidden border border-white/10">
               <HMSFishbowlRoom
                 fishbowlRoomId={room.id}
+                fishbowlSlug={room.slug}
+                userFid={user.fid}
+                userName={user.displayName || user.username || 'Anonymous'}
                 role={isSpeaker ? 'speaker' : 'listener'}
                 isHost={isHost}
                 onLeave={() => setAudioJoined(false)}

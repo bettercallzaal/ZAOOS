@@ -10,21 +10,36 @@ import {
   selectIsPeerAudioEnabled,
   selectIsLocalAudioEnabled,
 } from '@100mslive/react-sdk';
-import { useAuth } from '@/hooks/useAuth';
 
 interface HMSFishbowlRoomProps {
   fishbowlRoomId: string;
+  fishbowlSlug?: string;
+  userFid: number;
+  userName: string;
   role: 'speaker' | 'listener';
   isHost?: boolean;
   onLeave: () => void;
 }
 
-function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFishbowlRoomProps) {
+/** Sub-component to read peer audio state via useHMSStore */
+function PeerAudioIndicator({ peerId }: { peerId: string }) {
+  const isAudioEnabled = useHMSStore(selectIsPeerAudioEnabled(peerId));
+  return (
+    <div
+      className={`w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-semibold border-2 ${
+        isAudioEnabled ? 'border-green-400' : 'border-transparent'
+      }`}
+    />
+  );
+}
+
+function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName, role, isHost, onLeave }: HMSFishbowlRoomProps) {
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peers = useHMSStore(selectPeers);
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const [joining, setJoining] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [transcribing, setTranscribing] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
@@ -54,8 +69,10 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = async (event: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const results = Array.from(event.results) as any[];
       for (const result of results) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const transcript = (result[0] as any).transcript.trim();
         if (!transcript) continue;
         if (result.isFinal) {
@@ -67,8 +84,9 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 roomId: fishbowlRoomId,
-                speakerName: 'Speaker',
-                speakerRole: 'speaker',
+                speakerFid: userFid,
+                speakerName: userName,
+                speakerRole: role === 'speaker' && isHost ? 'host' : 'speaker',
                 text,
                 startedAt: new Date().toISOString(),
                 source: 'whisper',
@@ -90,7 +108,7 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
 
     recognition.start();
     setTranscribing(true);
-  }, [transcribing, fishbowlRoomId]);
+  }, [transcribing, fishbowlRoomId, userFid, userName, role, isHost]);
 
   useEffect(() => {
     return () => {
@@ -101,44 +119,80 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
   useEffect(() => {
     const joinRoom = async () => {
       setJoining(true);
+      setError(null);
       try {
+        const hmsRole = isHost ? 'host' : role;
+        const roomName = fishbowlSlug ? `fishbowl-${fishbowlSlug}` : undefined;
         const res = await fetch('/api/100ms/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: String(fishbowlRoomId), role, roomId: fishbowlRoomId }),
+          body: JSON.stringify({ userId: String(userFid), role: hmsRole, roomName }),
         });
-        if (!res.ok) throw new Error('Failed to get token');
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Token request failed (${res.status})`);
+        }
         const { token } = await res.json();
-        await hmsActions.join({ userName: String(fishbowlRoomId), authToken: token });
+        await hmsActions.join({ userName, authToken: token });
       } catch (err) {
         console.error('Failed to join HMS room:', err);
+        setError(err instanceof Error ? err.message : 'Failed to connect to audio');
       } finally {
         setJoining(false);
       }
     };
 
-    if (fishbowlRoomId) {
+    if (fishbowlRoomId && userFid) {
       joinRoom();
     }
 
     return () => {
       hmsActions.leave().catch(() => {});
     };
-  }, [fishbowlRoomId, role]);
+  }, [fishbowlRoomId, userFid, role, isHost, fishbowlSlug, userName, hmsActions]);
 
   const leaveRoom = async () => {
     await hmsActions.leave();
     onLeave();
   };
 
+  const retryJoin = () => {
+    setError(null);
+    setJoining(true);
+    // Re-trigger by toggling state — the useEffect will re-run
+    const hmsRole = isHost ? 'host' : role;
+    const roomName = fishbowlSlug ? `fishbowl-${fishbowlSlug}` : undefined;
+    fetch('/api/100ms/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: String(userFid), role: hmsRole, roomName }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Token request failed (${res.status})`);
+        }
+        return res.json();
+      })
+      .then(({ token }) => hmsActions.join({ userName, authToken: token }))
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to connect'))
+      .finally(() => setJoining(false));
+  };
+
   const toggleMute = async () => {
     await hmsActions.setLocalAudioEnabled(!isLocalAudioEnabled);
   };
 
-  if (!isConnected && !joining) {
+  if (error) {
     return (
-      <div className="flex items-center justify-center py-8 text-gray-400">
-        Connecting to audio...
+      <div className="flex flex-col items-center justify-center py-8 gap-3">
+        <p className="text-red-400 text-sm">{error}</p>
+        <button
+          onClick={retryJoin}
+          className="px-4 py-1.5 bg-[#f5a623] text-[#0a1628] rounded-lg text-xs font-medium hover:bg-[#d4941f] transition-colors"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -147,6 +201,14 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
     return (
       <div className="flex items-center justify-center py-8 text-gray-400">
         Joining audio room...
+      </div>
+    );
+  }
+
+  if (!isConnected) {
+    return (
+      <div className="flex items-center justify-center py-8 text-gray-400">
+        Connecting to audio...
       </div>
     );
   }
@@ -208,12 +270,11 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
           <div className="grid grid-cols-4 gap-3">
             {speakers.map((peer) => (
               <div key={peer.id} className="flex flex-col items-center">
-                <div
-                  className={`w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-semibold border-2 ${
-                    selectIsPeerAudioEnabled(peer.id) ? 'border-green-400' : 'border-transparent'
-                  }`}
-                >
-                  {(peer.name || '?')[0]}
+                <div className="relative">
+                  <PeerAudioIndicator peerId={peer.id} />
+                  <span className="absolute inset-0 flex items-center justify-center text-white font-semibold">
+                    {(peer.name || '?')[0]}
+                  </span>
                 </div>
                 <span className="text-white text-xs mt-1 truncate max-w-[60px]">
                   {peer.name} {peer.isLocal && '(You)'}
@@ -248,10 +309,10 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, role, isHost, onLeave }: HMSFish
   );
 }
 
-export function HMSFishbowlRoom({ fishbowlRoomId, role, isHost, onLeave }: HMSFishbowlRoomProps) {
+export function HMSFishbowlRoom(props: HMSFishbowlRoomProps) {
   return (
     <HMSRoomProvider>
-      <HMSFishbowlRoomInner fishbowlRoomId={fishbowlRoomId} role={role} isHost={isHost} onLeave={onLeave} />
+      <HMSFishbowlRoomInner {...props} />
     </HMSRoomProvider>
   );
 }

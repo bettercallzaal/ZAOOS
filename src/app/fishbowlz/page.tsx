@@ -5,6 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 
+function parseJsonb<T>(value: unknown, fallback: T): T {
+  if (typeof value === 'string') {
+    try { return JSON.parse(value); } catch { return fallback; }
+  }
+  return (value as T) ?? fallback;
+}
+
 interface FishbowlRoom {
   id: string;
   title: string;
@@ -34,12 +41,12 @@ export default function FishbowlzPage() {
     fetch('/api/fishbowlz/rooms')
       .then(r => r.json())
       .then(d => {
-        const rooms = (d.rooms || []).map((r: FishbowlRoom & Record<string, unknown>) => ({
+        const parsed = (d.rooms || []).map((r: FishbowlRoom & Record<string, unknown>) => ({
           ...r,
-          current_speakers: typeof r.current_speakers === 'string' ? JSON.parse(r.current_speakers as string) : (r.current_speakers || []),
-          current_listeners: typeof r.current_listeners === 'string' ? JSON.parse(r.current_listeners as string) : (r.current_listeners || []),
+          current_speakers: parseJsonb(r.current_speakers, []),
+          current_listeners: parseJsonb(r.current_listeners, []),
         }));
-        setRooms(rooms);
+        setRooms(parsed);
       })
       .catch(() => setRooms([]))
       .finally(() => setLoading(false));

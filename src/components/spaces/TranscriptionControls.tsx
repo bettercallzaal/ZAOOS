@@ -1,36 +1,19 @@
 'use client';
 
-import { useState } from 'react';
-import { HMSRoomProvider, useHMSActions, useHMSStore, selectIsPeerAudioEnabled } from '@100mslive/react-sdk';
-
 interface TranscriptionControlsProps {
-  fishbowlRoomId: string;
   enabled: boolean;
   onToggle: (enabled: boolean) => void;
+  loading?: boolean;
 }
 
-function TranscriptionControlsInner({ enabled, onToggle }: TranscriptionControlsProps) {
-  const hmsActions = useHMSActions();
-  const [loading, setLoading] = useState(false);
-
-  const toggle = async () => {
-    setLoading(true);
-    try {
-      if (enabled) {
-        // TODO: stop HMS transcription
-        onToggle(false);
-      } else {
-        // TODO: start HMS transcription
-        onToggle(true);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
+/**
+ * Simple transcription toggle button.
+ * Must be rendered inside an existing HMSRoomProvider context (e.g. HMSFishbowlRoom).
+ */
+export function TranscriptionControls({ enabled, onToggle, loading }: TranscriptionControlsProps) {
   return (
     <button
-      onClick={toggle}
+      onClick={() => onToggle(!enabled)}
       disabled={loading}
       className={`p-2.5 rounded-xl text-sm transition-colors border ${
         enabled
@@ -43,13 +26,5 @@ function TranscriptionControlsInner({ enabled, onToggle }: TranscriptionControls
         <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
       </svg>
     </button>
-  );
-}
-
-export function TranscriptionControls(props: TranscriptionControlsProps) {
-  return (
-    <HMSRoomProvider>
-      <TranscriptionControlsInner {...props} />
-    </HMSRoomProvider>
   );
 }

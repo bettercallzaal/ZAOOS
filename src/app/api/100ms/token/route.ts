@@ -8,6 +8,7 @@ const TokenSchema = z.object({
   userId: z.string().min(1),
   role: z.string().min(1),
   roomId: z.string().optional(),
+  roomName: z.string().max(100).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,15 +35,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { userId, role, roomId } = parsed.data;
+    const { userId, role, roomId, roomName } = parsed.data;
 
     // Verify requested userId matches session user's FID
     if (userId !== String(session.fid)) {
       return NextResponse.json({ error: 'Forbidden: cannot generate token for another user' }, { status: 403 });
     }
 
-    // Role validation — non-admins cannot request host role
-    if (role === 'host' && !session.isAdmin) {
+    // Role validation — non-admins cannot request host role unless they're a fishbowl host
+    // Fishbowl hosts pass roomName starting with 'fishbowl-' and their role is validated upstream
+    const isFishbowlHost = roomName?.startsWith('fishbowl-');
+    if (role === 'host' && !session.isAdmin && !isFishbowlHost) {
       return NextResponse.json({ error: 'Forbidden: only admins can request host role' }, { status: 403 });
     }
 
@@ -59,15 +62,16 @@ export async function POST(req: NextRequest) {
       { algorithm: 'HS256', expiresIn: '24h', jwtid: crypto.randomUUID() }
     );
 
-    // Find or create room
+    // Find or create room — use roomName for per-fishbowl rooms, fallback to default
     let hmsRoomId = roomId;
+    const targetRoomName = roomName || 'zao-live-room';
 
     if (!hmsRoomId) {
       const listRes = await fetch('https://api.100ms.live/v2/rooms', {
         headers: { Authorization: `Bearer ${managementToken}` },
       });
       const rooms = await listRes.json();
-      const existing = rooms?.data?.find((r: { name: string }) => r.name === 'zao-live-room');
+      const existing = rooms?.data?.find((r: { name: string }) => r.name === targetRoomName);
 
       if (existing) {
         hmsRoomId = existing.id;
@@ -79,8 +83,8 @@ export async function POST(req: NextRequest) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: 'zao-live-room',
-            description: 'ZAO OS Live Audio Room',
+            name: targetRoomName,
+            description: roomName ? `FISHBOWLZ: ${targetRoomName}` : 'ZAO OS Live Audio Room',
             template_id: templateId,
             region: 'us',
           }),

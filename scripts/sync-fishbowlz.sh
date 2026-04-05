@@ -27,14 +27,16 @@ cp -r "$SOURCE/src/app/fishbowlz/" "$TARGET/src/app/fishbowlz/"
 
 echo "Copying FISHBOWLZ API routes..."
 cp -r "$SOURCE/src/app/api/fishbowlz/" "$TARGET/src/app/api/fishbowlz/"
-cp -r "$SOURCE/src/app/api/100ms/" "$TARGET/src/app/api/100ms/"
+# Only copy 100ms token route (not rooms — those depend on ZAO-specific modules)
+mkdir -p "$TARGET/src/app/api/100ms/token"
+cp "$SOURCE/src/app/api/100ms/token/route.ts" "$TARGET/src/app/api/100ms/token/"
 
 echo "Copying FISHBOWLZ components..."
 cp "$SOURCE/src/components/spaces/HMSFishbowlRoom.tsx" "$TARGET/src/components/spaces/"
 cp "$SOURCE/src/components/spaces/FishbowlChat.tsx" "$TARGET/src/components/spaces/"
 cp "$SOURCE/src/components/spaces/TranscriptInput.tsx" "$TARGET/src/components/spaces/"
 cp "$SOURCE/src/components/spaces/TranscriptionControls.tsx" "$TARGET/src/components/spaces/"
-cp "$SOURCE/src/components/spaces/TranscriptionButton.tsx" "$TARGET/src/components/spaces/"
+# Skip TranscriptionButton.tsx — depends on @stream-io/video-react-sdk (not used in FISHBOWLZ)
 cp "$SOURCE/src/components/ui/Toast.tsx" "$TARGET/src/components/ui/"
 
 # Copy fishbowlz-specific components

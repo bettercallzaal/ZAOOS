@@ -14,6 +14,8 @@ const CreateRoomSchema = z.object({
   rotationEnabled: z.boolean().default(true),
   audioSourceType: z.enum(['farcaster', 'external_url', 'native']).optional(),
   audioSourceUrl: z.string().url().optional(),
+  gatingEnabled: z.boolean().default(false),
+  minQualityScore: z.number().int().min(0).default(0),
 });
 
 export async function POST(req: NextRequest) {

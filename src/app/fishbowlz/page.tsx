@@ -23,6 +23,7 @@ interface FishbowlRoom {
   current_speakers: Array<{ fid: number; username: string; joinedAt: string }>;
   current_listeners: Array<{ fid: number; username: string; joinedAt: string }>;
   total_sessions: number;
+  gating_enabled?: boolean;
   created_at: string;
   last_active_at: string;
 }
@@ -36,6 +37,8 @@ export default function FishbowlzPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [hotSeats, setHotSeats] = useState(5);
+  const [gatingEnabled, setGatingEnabled] = useState(false);
+  const [minQualityScore, setMinQualityScore] = useState(0);
 
   useEffect(() => {
     fetch('/api/fishbowlz/rooms')
@@ -121,6 +124,31 @@ export default function FishbowlzPage() {
                 className="w-full accent-[#f5a623]"
               />
             </div>
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <label className="text-sm text-gray-300 mb-1 block">🔐 FC Identity Gating</label>
+                <span className="text-xs text-gray-500">Only allow verified FC users with quality score</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={gatingEnabled}
+                onChange={e => setGatingEnabled(e.target.checked)}
+                className="w-5 h-5 accent-[#f5a623]"
+              />
+            </div>
+            {gatingEnabled && (
+              <div className="mb-4">
+                <label className="text-sm text-gray-400 mb-2 block">Minimum quality score: {minQualityScore}</label>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={minQualityScore}
+                  onChange={e => setMinQualityScore(parseInt(e.target.value))}
+                  className="w-full accent-[#f5a623]"
+                />
+              </div>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={handleCreate}
@@ -162,6 +190,11 @@ export default function FishbowlzPage() {
                   </div>
                   {room.description && (
                     <p className="text-gray-400 text-sm mb-3 line-clamp-2">{room.description}</p>
+                  )}
+                  {room.gating_enabled && (
+                    <span className="inline-flex items-center gap-1 text-xs bg-purple-600/20 text-purple-400 px-2 py-0.5 rounded-full mb-2">
+                      🔐 FC-gated
+                    </span>
                   )}
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span>🔥 {room.current_speakers?.length || 0}/{room.hot_seat_count} hot seat</span>

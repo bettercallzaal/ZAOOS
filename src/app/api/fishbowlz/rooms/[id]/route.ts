@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
+import { checkGatingEligibility } from '@/lib/fc-identity';
 
 interface FishbowlSpeaker {
   fid: number;
@@ -88,14 +89,27 @@ export async function PATCH(
 
   try {
     if (action === 'join_speaker') {
-      const { fid, username } = data;
+      const { fid, username, address } = data;
       // Verify the requester is acting as themselves
       if (fid !== session.fid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, current_listeners, hot_seat_count').eq('id', id).single();
+      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, current_listeners, hot_seat_count, gating_enabled, min_quality_score').eq('id', id).single();
       if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+
+      // Check FC gating if enabled
+      if (room.data.gating_enabled && address) {
+        const eligibility = await checkGatingEligibility(address, room.data.min_quality_score);
+        if (!eligibility.eligible) {
+          return NextResponse.json({
+            error: 'Gated room — FC quality score too low',
+            reason: eligibility.reason,
+            score: eligibility.score?.toString(),
+            fid: eligibility.fid,
+          }, { status: 403 });
+        }
+      }
 
       const speakers: FishbowlSpeaker[] = parseJsonb(room.data.current_speakers, []);
 

@@ -175,17 +175,23 @@ export default function FishbowlzPage() {
           <div className="text-center py-20 text-gray-400">Loading rooms...</div>
         ) : rooms.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-gray-400 mb-4">No active fishbowls yet.</p>
+            <p className="text-gray-400 mb-4">No fishbowls yet.</p>
             <p className="text-gray-500 text-sm">Be the first to create one!</p>
           </div>
         ) : (
           <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map(room => (
               <Link key={room.id} href={`/fishbowlz/${room.slug || room.id}`}>
-                <div className="bg-[#1a2a4a] rounded-xl p-5 border border-white/10 hover:border-[#f5a623]/50 transition-colors cursor-pointer">
+                <div className={`bg-[#1a2a4a] rounded-xl p-5 border border-white/10 transition-colors cursor-pointer ${
+                  room.state === 'active' ? 'hover:border-[#f5a623]/50' : 'hover:border-white/20 opacity-75'
+                }`}>
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="font-bold text-lg truncate flex-1">{room.title}</h3>
-                    <span className="text-xs bg-[#f5a623]/20 text-[#f5a623] px-2 py-1 rounded-full ml-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ml-2 ${
+                      room.state === 'active'
+                        ? 'bg-[#f5a623]/20 text-[#f5a623]'
+                        : 'bg-gray-600/20 text-gray-400'
+                    }`}>
                       {room.state}
                     </span>
                   </div>
@@ -197,10 +203,16 @@ export default function FishbowlzPage() {
                       🔐 FC-gated
                     </span>
                   )}
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>🔥 {room.current_speakers?.length || 0}/{room.hot_seat_count} hot seat</span>
-                    <span>👥 {room.current_listeners?.length || 0} listening</span>
-                  </div>
+                  {room.state === 'ended' ? (
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>📝 View transcript</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>🔥 {room.current_speakers?.length || 0}/{room.hot_seat_count} hot seat</span>
+                      <span>👥 {room.current_listeners?.length || 0} listening</span>
+                    </div>
+                  )}
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-gray-500">
                     <span>by @{room.host_username}</span>
                     <span>{room.total_sessions} sessions</span>

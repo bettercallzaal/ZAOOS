@@ -502,7 +502,9 @@ export default function FishbowlRoomPage() {
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {transcripts.length === 0 ? (
-                <p className="text-gray-500 text-sm text-center py-8">No transcript yet. Start talking!</p>
+                <p className="text-gray-500 text-sm text-center py-8">
+                  {room.state === 'ended' ? 'No transcript was recorded for this fishbowl.' : 'No transcript yet. Start talking!'}
+                </p>
               ) : (
                 <>
                   {transcripts.map((seg) => (

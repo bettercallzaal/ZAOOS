@@ -63,6 +63,7 @@ export default function FishbowlRoomPage() {
   const [error, setError] = useState<string | null>(null);
   const [audioJoined, setAudioJoined] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const isHost = user?.fid === room?.host_fid;
   const isSpeaker = room?.current_speakers?.some((s) => s.fid === user?.fid);
@@ -153,6 +154,14 @@ export default function FishbowlRoomPage() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [user, roomId, isSpeaker, isListener]);
+
+  const copyShareLink = () => {
+    const url = `${window.location.origin}/fishbowlz/${roomId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {});
+  };
 
   const endRoom = async () => {
     await fetch(`/api/fishbowlz/rooms/${roomId}`, {
@@ -254,6 +263,13 @@ export default function FishbowlRoomPage() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={copyShareLink}
+            className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-colors"
+            title="Copy room link"
+          >
+            {copied ? '✓ Copied' : '🔗 Share'}
+          </button>
           <span className={`text-xs px-2 py-1 rounded-full ${room.state === 'active' ? 'bg-green-600/20 text-green-400' : 'bg-yellow-600/20 text-yellow-400'}`}>
             {room.state}
           </span>

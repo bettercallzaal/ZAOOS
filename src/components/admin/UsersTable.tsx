@@ -27,9 +27,9 @@ interface User {
 }
 
 const ROLE_COLORS = {
-  beta: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-  member: 'bg-green-500/10 text-green-400 border-green-500/30',
-  admin: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+  beta: 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/30',
+  member: 'bg-[#f5a623]/15 text-[#ffd700] border-[#ffd700]/30',
+  admin: 'bg-[#f5a623]/20 text-[#ffd700] border-[#f5a623]/40',
 };
 
 const ROLE_LABELS = {

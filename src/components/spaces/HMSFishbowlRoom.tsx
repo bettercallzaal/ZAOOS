@@ -27,11 +27,11 @@ function PeerAudioIndicator({ peerId, initial }: { peerId: string; initial: stri
   return (
     <div className="relative">
       {isAudioEnabled && (
-        <span className="absolute inset-0 rounded-full border-2 border-green-400 animate-ping opacity-30" />
+        <span className="absolute inset-0 rounded-full border-2 border-[#f5a623] animate-ping opacity-30" />
       )}
       <div
-        className={`w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white font-semibold border-2 transition-colors ${
-          isAudioEnabled ? 'border-green-400 shadow-[0_0_12px_rgba(74,222,128,0.4)]' : 'border-transparent'
+        className={`w-12 h-12 rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] flex items-center justify-center text-[#ededed] font-semibold border-2 transition-colors ${
+          isAudioEnabled ? 'border-[#f5a623] shadow-[0_0_12px_rgba(245,166,35,0.4)]' : 'border-white/10'
         }`}
       >
         {initial}
@@ -229,8 +229,8 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
       <div className="px-4 py-3 border-b border-gray-800 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#f5a623] opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#f5a623]" />
           </span>
           <span className="text-white text-sm font-medium">Live Audio</span>
           <span className="text-gray-500 text-xs">{peers.length} in room</span>
@@ -253,8 +253,8 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
             onClick={toggleMute}
             className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               isLocalAudioEnabled
-                ? 'bg-green-600/20 text-green-400'
-                : 'bg-gray-700 text-gray-400'
+                ? 'bg-[#f5a623]/20 text-[#f5a623]'
+                : 'bg-white/5 text-[#a0aec0]'
             }`}
           >
             {isLocalAudioEnabled ? 'Mute' : 'Unmute'}

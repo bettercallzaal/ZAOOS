@@ -27,6 +27,7 @@ Use this to quickly find if a topic has already been researched.
 - Claude intermediate guide (@aiedge_): Skills 2.0 evals/A/B testing, Cowork Dispatch, scheduled tasks, reverse prompting → `243`
 - ZOE upgrade playbook: OpenClaw v2026.3.31, Mem0 memory, Neynar webhook relay, auto-dream, Telegram keyboards, competitive monitoring, founder agent patterns → `245`
 - Neynar API 130+ endpoints audit: community radar, auto-curation, channel intel, smart engagement, x402 pay-per-call, 4 agent patterns → `246`
+- **AutoAgent self-optimizing agents**: meta-agent loop for harness engineering, model empathy, trace-based learning, overfitting guards, 5 emergent behaviors, comparison vs DSPy/Meta-Harness/ADAS → `253`
 
 ## Music & Audio
 - Music APIs (Audius, Sound.xyz, Spotify, SoundCloud, YouTube) → `03`
@@ -92,6 +93,7 @@ Use this to quickly find if a topic has already been researched.
 - **Microsoft Agent Lightning**: RL training for agents (APO/GRPO/PPO/SFT), LightningRL hierarchical RL, Python+GPU — SKIP for ZAO now, steal APO evaluate-critique-rewrite pattern → `210`
 - **Agentic workflows 2026**: Vercel AI SDK 6 + Mastra + Claude Agent SDK, 5 ZAO agent designs, DAO governance agents, music AI DJ, cost analysis ($25-50/mo) → `227`
 - **MCP Server development guide**: protocol architecture, 3 primitives, SDK v1.29.0, Streamable HTTP, OAuth 2.1, ZAO MCP audit (8 tools), Resources/Prompts/HTTP roadmap, registries → `232`
+- **HuggingFace platform deep dive**: Write token, thezao org, ACE-Step LoRA training, community music dataset, branded Gradio Space, ZeroGPU (free H200), PRO $9/mo, GPU pricing → `251`
 
 ## OpenClaw & Agent Infrastructure
 - OpenClaw agent memory & knowledge system (3-layer, QMD, $5/mo VPS) → `197`
@@ -175,6 +177,9 @@ Use this to quickly find if a topic has already been researched.
 - March 2026 security audit (all fixes verified) → `57`
 - Backend testing strategy: Vitest + NTARH + MSW, 47-route audit → `66`
 - SECURITY.md in project root
+
+## Business Model & Strategy
+- **Obsidian lean team playbook**: $350M valuation, 9 employees, 3 engineers, $25M ARR bootstrapped, "file over app" philosophy, plugin ecosystem, ZAO OS parallels (protocol-native, community-owned, AI force multiplier), premium tier strategy → `263`
 
 ## Project Documentation
 - The ZAO Complete Guide (CANONICAL) → `50`

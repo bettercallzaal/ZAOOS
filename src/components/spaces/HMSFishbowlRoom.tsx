@@ -167,11 +167,7 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
     setError(null);
     setJoining(true);
     // Re-trigger by toggling state — the useEffect will re-run
-<<<<<<< HEAD
     const hmsRole = isHost ? 'moderator' : role;
-=======
-    const hmsRole = isHost ? 'host' : role;
->>>>>>> origin/main
     const roomName = fishbowlSlug ? `fishbowl-${fishbowlSlug}` : undefined;
     fetch('/api/100ms/token', {
       method: 'POST',

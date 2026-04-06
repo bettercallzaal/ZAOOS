@@ -7,7 +7,6 @@ import { AuthAudioProviders } from './providers';
 import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
 import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
 import PWAInstallPrompt from '@/components/navigation/PWAInstallPrompt';
-import { IssueReporter } from '@/components/feedback/IssueReporter';
 
 export default async function AuthLayout({
   children,
@@ -36,7 +35,6 @@ export default async function AuthLayout({
         <PersistentPlayerWithRadio />
         <BottomNav />
         <PWAInstallPrompt />
-        <IssueReporter />
       </div>
     </AuthAudioProviders>
   );

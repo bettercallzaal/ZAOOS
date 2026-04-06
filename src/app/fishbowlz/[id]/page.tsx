@@ -45,6 +45,33 @@ function SpeakerTime({ joinedAt }: { joinedAt: string }) {
   return <span className="text-[10px] text-gray-500 font-mono">{elapsed}</span>;
 }
 
+function Countdown({ targetDate }: { targetDate: string }) {
+  const [remaining, setRemaining] = useState('');
+
+  useEffect(() => {
+    const update = () => {
+      const diff = new Date(targetDate).getTime() - Date.now();
+      if (diff <= 0) {
+        setRemaining('Starting soon...');
+        return;
+      }
+      const hours = Math.floor(diff / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      if (hours > 0) {
+        setRemaining(`${hours}h ${mins}m ${secs}s`);
+      } else {
+        setRemaining(`${mins}m ${secs}s`);
+      }
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  return <span className="text-2xl font-mono font-bold text-[#f5a623]">{remaining}</span>;
+}
+
 const HMSFishbowlRoom = dynamic(
   () => import('@/components/spaces/HMSFishbowlRoom').then((m) => m.HMSFishbowlRoom),
   { ssr: false }
@@ -74,6 +101,7 @@ interface FishbowlRoom {
   audio_source_type: string | null;
   audio_source_url: string | null;
   created_at: string;
+  scheduled_at?: string | null;
   ai_summary?: string | null;
 }
 
@@ -406,6 +434,40 @@ function FishbowlRoomPageInner() {
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Main Stage — Hot Seat + Audio */}
         <div className="flex-1 p-4 sm:p-6">
+          {/* Scheduled — countdown + start now */}
+          {room.state === 'scheduled' && (
+            <div className="mb-6 p-6 bg-[#1a2a4a] rounded-xl border border-blue-500/20 text-center">
+              <p className="text-xs text-blue-400 uppercase tracking-wider font-semibold mb-2">Scheduled</p>
+              {room.scheduled_at && (
+                <>
+                  <Countdown targetDate={room.scheduled_at} />
+                  <p className="text-sm text-gray-400 mt-2">
+                    {new Date(room.scheduled_at).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at{' '}
+                    {new Date(room.scheduled_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                  </p>
+                </>
+              )}
+              {isHost && (
+                <button
+                  onClick={async () => {
+                    await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ action: 'start_room', username: user?.username }),
+                    });
+                    await fetchRoom();
+                  }}
+                  className="mt-4 bg-[#f5a623] text-[#0a1628] font-bold px-8 py-3 rounded-full hover:bg-[#d4941f] transition-all hover:shadow-[0_0_30px_rgba(245,166,35,0.3)]"
+                >
+                  Start Now
+                </button>
+              )}
+              {!isHost && (
+                <p className="mt-4 text-sm text-gray-500">Waiting for the host to start...</p>
+              )}
+            </div>
+          )}
+
           {/* Ended banner */}
           {room.state === 'ended' && (
             <div className="mb-4 p-3 bg-gray-800/50 rounded-lg border border-white/[0.08] text-center">
@@ -506,7 +568,7 @@ function FishbowlRoomPageInner() {
                     </div>
                   ) : (
                     <div className="text-center text-gray-500 text-sm py-2">
-                      Empty seat
+                      {room.state === 'scheduled' ? 'Starts soon' : 'Empty seat'}
                     </div>
                   )}
                 </div>

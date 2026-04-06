@@ -29,7 +29,7 @@ export default function MintSuccess({ title, artist, txId, coverUrl, bazarUrl, o
           View on BazAR
         </a>
         <a href={arweaveUrl} target="_blank" rel="noopener noreferrer"
-          className="block w-full px-4 py-2.5 rounded-lg border border-gray-700 text-gray-300 text-sm hover:bg-white/5 transition-colors text-center">
+          className="block w-full px-4 py-2.5 rounded-lg border border-white/[0.08] text-gray-300 text-sm hover:bg-white/5 transition-colors text-center">
           View on Arweave
         </a>
         <button onClick={onClose}

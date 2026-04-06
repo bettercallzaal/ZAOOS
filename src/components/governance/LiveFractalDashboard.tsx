@@ -81,7 +81,7 @@ function SessionCard({ session }: { session: LiveSession }) {
 
   return (
     <div className={`bg-[#0d1b2a] rounded-xl border overflow-hidden ${
-      session.status === 'active' ? 'border-green-500/30' : 'border-gray-800'
+      session.status === 'active' ? 'border-green-500/30' : 'border-white/[0.08]'
     }`}>
       <div className="px-4 py-3">
         {/* Header */}
@@ -146,7 +146,7 @@ function SessionCard({ session }: { session: LiveSession }) {
 
         {/* Last vote result */}
         {session.last_vote && session.last_vote.winner && (
-          <div className="mt-3 pt-2 border-t border-gray-800/50">
+          <div className="mt-3 pt-2 border-t border-white/[0.08]">
             <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Last Vote</p>
             <div className="flex items-center gap-2">
               <span className="text-xs text-white font-medium">{session.last_vote.winner}</span>
@@ -173,7 +173,7 @@ function CompletedSessionRow({ session }: { session: LiveSession }) {
   const participants = session.participants || [];
 
   return (
-    <div className="flex items-center gap-3 px-3 py-2 bg-[#0d1b2a] rounded-lg border border-gray-800/50">
+    <div className="flex items-center gap-3 px-3 py-2 bg-[#0d1b2a] rounded-lg border border-white/[0.08]">
       <div className="flex-1 min-w-0">
         <p className="text-xs text-gray-300 font-medium truncate">
           {session.name || session.group_name || 'Session'}

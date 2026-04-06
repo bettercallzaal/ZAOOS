@@ -173,7 +173,7 @@ export function EngagementOverview() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-[#0d1f3c] border border-gray-800 rounded-lg p-3 text-center"
+            className="bg-[#0d1f3c] border border-white/[0.08] rounded-lg p-3 text-center"
           >
             <div className="text-xl font-bold text-[#f5a623]">{stat.value}</div>
             <div className="text-xs text-gray-400 mt-1">{stat.label}</div>
@@ -190,7 +190,7 @@ export function EngagementOverview() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800 text-gray-400 text-left">
+              <tr className="border-b border-white/[0.08] text-gray-400 text-left">
                 <th className="py-2 pr-3">Post</th>
                 <th className="py-2 px-3 text-right">Views</th>
                 <th className="py-2 px-3 text-right">Likes</th>
@@ -204,7 +204,7 @@ export function EngagementOverview() {
               {tableRows.map((row) => (
                 <tr
                   key={row.platform_post_id}
-                  className="border-b border-gray-800/50 hover:bg-[#0d1f3c]/50"
+                  className="border-b border-white/[0.08] hover:bg-[#0d1f3c]/50"
                 >
                   <td className="py-2 pr-3">
                     {row.publish_log?.platform_url ? (

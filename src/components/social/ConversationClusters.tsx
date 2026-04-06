@@ -95,7 +95,7 @@ export function ConversationClusters({ onFilterMembers }: Props) {
             {yourChannels.map((ch) => (
               <span
                 key={ch.channelId}
-                className="px-2.5 py-1 rounded-full text-[11px] bg-[#0d1b2a] border border-gray-800 text-gray-300"
+                className="px-2.5 py-1 rounded-full text-[11px] bg-[#0d1b2a] border border-white/[0.08] text-gray-300"
               >
                 /{ch.channelId}
                 {ch.memberCount > 1 && (
@@ -123,7 +123,7 @@ export function ConversationClusters({ onFilterMembers }: Props) {
               className={`flex-shrink-0 rounded-xl border p-3 text-left transition-all min-w-[140px] max-w-[180px] ${
                 isActive
                   ? 'bg-[#f5a623]/10 border-[#f5a623]/40'
-                  : 'bg-[#0d1b2a] border-gray-800 hover:border-gray-700'
+                  : 'bg-[#0d1b2a] border-white/[0.08] hover:border-white/[0.08]'
               }`}
             >
               <div className="flex items-center justify-between mb-2">

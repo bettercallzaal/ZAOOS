@@ -124,7 +124,7 @@ export function PollConfigEditor() {
 
   if (loading) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800">
+      <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08]">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-gray-700 rounded w-48" />
           <div className="h-10 bg-gray-700 rounded" />
@@ -136,7 +136,7 @@ export function PollConfigEditor() {
   }
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 space-y-5">
+    <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] space-y-5">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -167,7 +167,7 @@ export function PollConfigEditor() {
           value={titleTemplate}
           onChange={(e) => setTitleTemplate(e.target.value)}
           placeholder="ZAO Weekly Priority Vote — Week of {date}"
-          className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
+          className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
         />
         <p className="text-[10px] text-gray-600">Use {'{date}'} as a placeholder for the week date</p>
       </div>
@@ -180,7 +180,7 @@ export function PollConfigEditor() {
           onChange={(e) => setBodyTemplate(e.target.value)}
           placeholder="Custom body text for the poll..."
           rows={3}
-          className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none"
+          className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none"
         />
       </div>
 
@@ -193,7 +193,7 @@ export function PollConfigEditor() {
           max={30}
           value={durationDays}
           onChange={(e) => setDurationDays(Math.max(1, Math.min(30, parseInt(e.target.value) || 7)))}
-          className="w-24 bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none"
+          className="w-24 bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none"
         />
       </div>
 
@@ -209,7 +209,7 @@ export function PollConfigEditor() {
           {choices.map((choice, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 bg-[#0a1628] rounded-lg px-3 py-2 border border-gray-800 group"
+              className="flex items-center gap-2 bg-[#0a1628] rounded-lg px-3 py-2 border border-white/[0.08] group"
             >
               {/* Reorder buttons */}
               <div className="flex flex-col gap-0.5">
@@ -296,7 +296,7 @@ export function PollConfigEditor() {
             onKeyDown={(e) => { if (e.key === 'Enter') addChoice(); }}
             placeholder="Add a new choice..."
             maxLength={200}
-            className="flex-1 bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
+            className="flex-1 bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
           />
           <button
             onClick={addChoice}

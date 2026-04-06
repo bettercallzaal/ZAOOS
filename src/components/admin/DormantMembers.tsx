@@ -75,7 +75,7 @@ export function DormantMembers() {
               className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-colors ${
                 days === opt
                   ? 'bg-[#f5a623] text-[#0a1628]'
-                  : 'bg-[#0d1f3c] text-gray-400 hover:text-white border border-gray-800'
+                  : 'bg-[#0d1f3c] text-gray-400 hover:text-white border border-white/[0.08]'
               }`}
             >
               {opt}d
@@ -90,7 +90,7 @@ export function DormantMembers() {
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="flex items-center gap-3 bg-[#0d1f3c] border border-gray-800 rounded-lg p-3 animate-pulse"
+              className="flex items-center gap-3 bg-[#0d1f3c] border border-white/[0.08] rounded-lg p-3 animate-pulse"
             >
               <div className="w-8 h-8 rounded-full bg-gray-700 shrink-0" />
               <div className="flex-1 space-y-2">
@@ -122,7 +122,7 @@ export function DormantMembers() {
           {data.dormant.map((member) => (
             <div
               key={member.id}
-              className="flex items-center gap-3 bg-[#0d1f3c] border border-gray-800 rounded-lg p-3 hover:border-gray-700 transition-colors"
+              className="flex items-center gap-3 bg-[#0d1f3c] border border-white/[0.08] rounded-lg p-3 hover:border-white/[0.08] transition-colors"
             >
               {/* PFP */}
               <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700 shrink-0 relative">

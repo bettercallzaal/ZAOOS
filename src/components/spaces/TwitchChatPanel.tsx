@@ -43,7 +43,7 @@ export function TwitchChatPanel({ twitchUsername, canSend = false, onClose }: Tw
   return (
     <div className="flex flex-col h-full bg-[#0d1b2a] text-white">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2.5 border-b border-gray-800">
+      <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/[0.08]">
         <div className="flex items-center gap-2">
           <svg viewBox="0 0 24 24" className="w-4 h-4 text-[#9146ff]" fill="currentColor">
             <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
@@ -91,7 +91,7 @@ export function TwitchChatPanel({ twitchUsername, canSend = false, onClose }: Tw
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-800 p-2">
+      <div className="border-t border-white/[0.08] p-2">
         {canSend ? (
           <form
             onSubmit={(e) => { e.preventDefault(); handleSend(); }}
@@ -103,7 +103,7 @@ export function TwitchChatPanel({ twitchUsername, canSend = false, onClose }: Tw
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Send to Twitch chat..."
               maxLength={500}
-              className="flex-1 bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2 border border-gray-700 focus:border-[#9146ff] focus:outline-none placeholder-gray-500"
+              className="flex-1 bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2 border border-white/[0.08] focus:border-[#9146ff] focus:outline-none placeholder-gray-500"
             />
             <button
               type="submit"

@@ -88,7 +88,7 @@ export function RoomReactions({ roomId, fid }: RoomReactionsProps) {
             key={emoji}
             onClick={() => handleReact(emoji)}
             aria-label={`React with ${name}`}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-[#1a2a3a]/60 hover:bg-[#1a2a3a] border border-gray-700/40 hover:border-gray-600 text-lg transition-all active:scale-125"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-[#1a2a3a]/60 hover:bg-[#1a2a3a] border border-white/[0.08]/40 hover:border-gray-600 text-lg transition-all active:scale-125"
           >
             {emoji}
           </button>

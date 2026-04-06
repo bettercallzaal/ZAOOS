@@ -349,7 +349,7 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
             onChange={e => setDescription(e.target.value)}
             rows={3}
             maxLength={2000}
-            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-pink-400/50 focus:outline-none resize-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-pink-400/50 focus:outline-none resize-none"
           />
           {error && <p className="text-xs text-red-400">{error}</p>}
           <button
@@ -364,25 +364,25 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
 
       {/* Proposal Create Form */}
       {showCreate && category !== 'social' && (
-        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-3">
+        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-3">
           <input
             type="text"
             placeholder="Proposal title"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
           />
           <textarea
             placeholder="Describe your proposal..."
             value={description}
             onChange={e => setDescription(e.target.value)}
             rows={4}
-            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none"
           />
           <select
             value={category}
             onChange={e => setCategory(e.target.value)}
-            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none"
           >
             {PROPOSAL_CATEGORIES.filter(c => c !== 'social').map((cat) => (
               <option key={cat} value={cat}>{PROPOSAL_CATEGORY_LABELS[cat]}</option>
@@ -417,7 +417,7 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
               className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors capitalize ${
                 statusFilter === s
                   ? 'bg-[#f5a623]/15 text-[#f5a623] border-[#f5a623]/40'
-                  : 'bg-gray-800/50 text-gray-500 border-gray-700/50 hover:text-gray-300 hover:border-gray-600'
+                  : 'bg-gray-800/50 text-gray-500 border-white/[0.08] hover:text-gray-300 hover:border-gray-600'
               }`}
             >
               {s}
@@ -434,7 +434,7 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
                 className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors capitalize ${
                   categoryFilter === c
                     ? (catColor || 'bg-[#f5a623]/15 text-[#f5a623] border-[#f5a623]/40')
-                    : 'bg-gray-800/50 text-gray-500 border-gray-700/50 hover:text-gray-300 hover:border-gray-600'
+                    : 'bg-gray-800/50 text-gray-500 border-white/[0.08] hover:text-gray-300 hover:border-gray-600'
                 }`}
               >
                 {c === 'all' ? 'All' : (PROPOSAL_CATEGORY_LABELS[c as ProposalCategory] || c)}
@@ -487,7 +487,7 @@ export function ProposalsTab({ isAdmin = false }: { isAdmin?: boolean; currentFi
           href="https://zao.frapps.xyz"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between w-full bg-[#0d1b2a] border border-gray-800 rounded-xl px-4 py-2.5 hover:border-[#f5a623]/30 transition-colors"
+          className="flex items-center justify-between w-full bg-[#0d1b2a] border border-white/[0.08] rounded-xl px-4 py-2.5 hover:border-[#f5a623]/30 transition-colors"
         >
           <div>
             <p className="text-xs font-medium text-white">ORDAO On-Chain Governance</p>
@@ -529,7 +529,7 @@ function AccordionSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
       <button
         onClick={onToggle}
         className="w-full flex items-center gap-2.5 px-4 py-3 text-left hover:bg-white/[0.02] transition-colors"
@@ -605,7 +605,7 @@ function ProposalCard({
     : dotClass;
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden transition-colors hover:border-gray-700">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden transition-colors hover:border-white/[0.08]">
       {/* Collapsed header — always visible, click to expand */}
       <button
         onClick={onToggle}
@@ -701,7 +701,7 @@ function ProposalCard({
 
       {/* ── Expanded section ────────────────────────────── */}
       {isExpanded && (
-        <div className="px-4 pb-4 border-t border-gray-800/50 space-y-3">
+        <div className="px-4 pb-4 border-t border-white/[0.08] space-y-3">
           {/* Description — skip if same as title (social posts) */}
           {p.description !== p.title && (
             <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed mt-3">
@@ -822,7 +822,7 @@ function ProposalCard({
 
           {/* Admin status controls — inline, no header */}
           {isAdmin && onStatusChange && (
-            <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-800/50">
+            <div className="flex flex-wrap gap-1.5 pt-2 border-t border-white/[0.08]">
               {p.status === 'open' && (
                 <>
                   <button onClick={() => onStatusChange(p.id, 'approved')} className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors">Approve</button>
@@ -870,7 +870,7 @@ function VoteButton({
       className={`flex-1 text-xs font-medium py-2 rounded-lg border transition-all ${
         isActive
           ? activeClass
-          : `bg-gray-800/50 text-gray-500 border-gray-700/50 ${disabled ? 'opacity-40 cursor-not-allowed' : hoverClass}`
+          : `bg-gray-800/50 text-gray-500 border-white/[0.08] ${disabled ? 'opacity-40 cursor-not-allowed' : hoverClass}`
       }`}
     >
       {isActive && (

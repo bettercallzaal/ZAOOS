@@ -61,8 +61,8 @@ export function SchedulePanel({ isOpen, onClose, channel }: SchedulePanelProps) 
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
-      <div className="fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-[380px] z-50 flex flex-col bg-[#0d1b2a] border-l border-gray-800 animate-slide-in">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0a1628]">
+      <div className="fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-[380px] z-50 flex flex-col bg-[#0d1b2a] border-l border-white/[0.08] animate-slide-in">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#0a1628]">
           <h3 className="text-sm font-semibold text-gray-300">Scheduled Posts</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-white p-1" aria-label="Close scheduled posts">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,7 +91,7 @@ export function SchedulePanel({ isOpen, onClose, channel }: SchedulePanelProps) 
           )}
 
           {scheduled.map((cast) => (
-            <div key={cast.id} className="px-4 py-3 border-b border-gray-800/50">
+            <div key={cast.id} className="px-4 py-3 border-b border-white/[0.08]">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] font-medium text-[#f5a623]">
                   #{cast.channel_id} &middot; {formatTime(cast.scheduled_for)}

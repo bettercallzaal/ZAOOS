@@ -84,7 +84,7 @@ export function IssueSubmitForm() {
               className={`p-3 rounded-lg border text-left transition-colors ${
                 type === t.value
                   ? 'border-[#f5a623]/50 bg-[#f5a623]/10 text-white'
-                  : 'border-gray-800 bg-[#0d1b2a] text-gray-400 hover:border-gray-700'
+                  : 'border-white/[0.08] bg-[#0d1b2a] text-gray-400 hover:border-white/[0.08]'
               }`}
             >
               <span className="text-lg">{t.icon}</span>
@@ -108,7 +108,7 @@ export function IssueSubmitForm() {
           required
           minLength={5}
           maxLength={200}
-          className="w-full bg-[#0d1b2a] border border-gray-800 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
+          className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
         />
       </div>
 
@@ -126,7 +126,7 @@ export function IssueSubmitForm() {
           minLength={10}
           maxLength={5000}
           rows={5}
-          className="w-full bg-[#0d1b2a] border border-gray-800 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none"
+          className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none"
         />
       </div>
 
@@ -142,7 +142,7 @@ export function IssueSubmitForm() {
               className={`px-4 py-2 rounded-lg border text-xs font-medium transition-colors ${
                 priority === p.value
                   ? 'border-[#f5a623]/50 bg-[#f5a623]/10 text-white'
-                  : 'border-gray-800 bg-[#0d1b2a] text-gray-400 hover:border-gray-700'
+                  : 'border-white/[0.08] bg-[#0d1b2a] text-gray-400 hover:border-white/[0.08]'
               }`}
             >
               <span className={p.color}>{p.label}</span>

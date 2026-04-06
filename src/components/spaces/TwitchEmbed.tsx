@@ -13,7 +13,7 @@ export function TwitchEmbed({ channel, visible }: TwitchEmbedProps) {
   if (!channel || !visible) return null;
 
   return (
-    <div className="border-b border-gray-800 bg-[#0d1b2a]">
+    <div className="border-b border-white/[0.08] bg-[#0d1b2a]">
       <button
         onClick={() => setExpanded((prev) => !prev)}
         className="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"

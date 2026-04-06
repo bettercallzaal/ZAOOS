@@ -22,7 +22,7 @@ export function ContentView({ isHost }: ContentViewProps) {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       {/* Main content area */}
-      <div className="relative flex-1 min-h-[200px] sm:min-h-[300px] bg-black/30 mx-4 mt-3 rounded-xl overflow-hidden border border-gray-800">
+      <div className="relative flex-1 min-h-[200px] sm:min-h-[300px] bg-black/30 mx-4 mt-3 rounded-xl overflow-hidden border border-white/[0.08]">
         {mainParticipant && hasScreenShareActive && screenSharer ? (
           <ParticipantView
             participant={screenSharer}

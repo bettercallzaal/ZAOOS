@@ -63,7 +63,7 @@ interface FidStats {
 
 const SEVERITY_COLORS = {
   high: 'bg-red-500/10 text-red-400 border-red-500/20',
-  medium: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+  medium: 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/20',
   low: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
 };
 
@@ -226,7 +226,7 @@ export default function MemberCRMPage() {
           <button
             onClick={() => setTab('fids')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              tab === 'fids' ? 'bg-purple-500/10 text-purple-400' : 'text-gray-500 hover:text-white'
+              tab === 'fids' ? 'bg-[#f5a623]/10 text-[#f5a623]' : 'text-gray-500 hover:text-white'
             }`}
           >
             Missing FIDs {fidStats ? `(${fidStats.missingFid})` : ''}
@@ -243,12 +243,12 @@ export default function MemberCRMPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search members..."
-                className="flex-1 min-w-[200px] bg-white/5 border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
+                className="flex-1 min-w-[200px] bg-white/5 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
               />
               <select
                 value={tierFilter}
                 onChange={e => setTierFilter(e.target.value as typeof tierFilter)}
-                className="bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                className="bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white"
               >
                 <option value="all">All Tiers</option>
                 <option value="respect_holder">Respect Holders</option>
@@ -257,7 +257,7 @@ export default function MemberCRMPage() {
               <select
                 value={sortBy}
                 onChange={e => setSortBy(e.target.value as typeof sortBy)}
-                className="bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                className="bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white"
               >
                 <option value="respect">Sort: Respect</option>
                 <option value="name">Sort: Name</option>
@@ -274,7 +274,7 @@ export default function MemberCRMPage() {
             ) : (
               <div className="space-y-1">
                 {members.map(m => (
-                  <div key={m.id} className="flex items-center gap-3 px-4 py-3 bg-[#0d1b2a] rounded-xl border border-gray-800/50 hover:border-gray-700 transition-colors">
+                  <div key={m.id} className="flex items-center gap-3 px-4 py-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08] hover:border-white/[0.08] transition-colors">
                     {/* PFP */}
                     <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-800 flex-shrink-0">
                       {m.pfpUrl ? (
@@ -326,7 +326,7 @@ export default function MemberCRMPage() {
 
                     {/* Platforms */}
                     <div className="flex gap-1 flex-shrink-0">
-                      {m.fid && <span className="w-5 h-5 rounded bg-purple-500/10 flex items-center justify-center text-[8px] text-purple-400" title="Farcaster">FC</span>}
+                      {m.fid && <span className="w-5 h-5 rounded bg-[#f5a623]/10 flex items-center justify-center text-[8px] text-[#f5a623]" title="Farcaster">FC</span>}
                       {m.platforms.bluesky && <span className="w-5 h-5 rounded bg-blue-500/10 flex items-center justify-center text-[8px] text-blue-400" title="Bluesky">BS</span>}
                       {m.platforms.discord && <span className="w-5 h-5 rounded bg-indigo-500/10 flex items-center justify-center text-[8px] text-indigo-400" title="Discord">DC</span>}
                       {m.platforms.x && <span className="w-5 h-5 rounded bg-white/10 flex items-center justify-center text-[8px] text-gray-300" title="X">X</span>}
@@ -344,9 +344,9 @@ export default function MemberCRMPage() {
             {/* Stats cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
               <StatCard label="Total Users" value={stats.totalUsers} />
-              <StatCard label="Respect Holders" value={stats.respectHolders} color="text-green-400" />
+              <StatCard label="Respect Holders" value={stats.respectHolders} color="text-[#ffd700]" />
               <StatCard label="Community" value={stats.communityMembers} />
-              <StatCard label="Unlinked Respect" value={stats.unlinkedRespect} color="text-yellow-400" />
+              <StatCard label="Unlinked Respect" value={stats.unlinkedRespect} color="text-[#f5a623]" />
               <StatCard label="Missing ZID" value={stats.missingZid} color="text-red-400" />
               <StatCard label="Missing Discord" value={stats.missingDiscord} />
               <StatCard label="Missing Real Name" value={stats.missingRealName} />
@@ -354,13 +354,13 @@ export default function MemberCRMPage() {
             </div>
 
             {/* Auto-fix actions */}
-            <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800/50 mb-4">
+            <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] mb-4">
               <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Auto-Fix Actions</p>
               <div className="flex flex-wrap gap-2 mb-3">
                 <button
                   onClick={() => runFix('link-fids')}
                   disabled={!!fixing}
-                  className="px-3 py-2 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 disabled:opacity-50 transition-colors"
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20 hover:bg-[#f5a623]/20 disabled:opacity-50 transition-colors"
                 >
                   {fixing === 'link-fids' ? 'Linking...' : 'Link FIDs (wallet → Farcaster)'}
                 </button>
@@ -374,7 +374,7 @@ export default function MemberCRMPage() {
                 <button
                   onClick={() => runFix('sync-tiers')}
                   disabled={!!fixing}
-                  className="px-3 py-2 text-xs font-medium rounded-lg bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 disabled:opacity-50 transition-colors"
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-[#f5a623]/15 text-[#ffd700] border border-[#ffd700]/20 hover:bg-[#f5a623]/20 disabled:opacity-50 transition-colors"
                 >
                   {fixing === 'sync-tiers' ? 'Syncing...' : 'Sync Tiers (respect → holder)'}
                 </button>
@@ -475,7 +475,7 @@ export default function MemberCRMPage() {
                 <div key={i} className={`flex items-start gap-3 px-4 py-2.5 rounded-lg border ${SEVERITY_COLORS[issue.severity]}`}>
                   <span className={`text-[10px] font-bold uppercase mt-0.5 flex-shrink-0 ${
                     issue.severity === 'high' ? 'text-red-400' :
-                    issue.severity === 'medium' ? 'text-yellow-400' : 'text-gray-500'
+                    issue.severity === 'medium' ? 'text-[#f5a623]' : 'text-gray-500'
                   }`}>
                     {issue.severity}
                   </span>
@@ -495,15 +495,15 @@ export default function MemberCRMPage() {
             {/* Stats bar */}
             {fidStats && (
               <div className="flex gap-3 mb-4">
-                <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center border border-gray-800/50">
-                  <p className="text-xl font-bold text-green-400">{fidStats.withFid}</p>
+                <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center border border-white/[0.08]">
+                  <p className="text-xl font-bold text-[#ffd700]">{fidStats.withFid}</p>
                   <p className="text-[10px] text-gray-500">Have FID</p>
                 </div>
-                <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center border border-purple-500/20">
-                  <p className="text-xl font-bold text-purple-400">{fidStats.missingFid}</p>
+                <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center border border-[#f5a623]/20">
+                  <p className="text-xl font-bold text-[#ededed]">{fidStats.missingFid}</p>
                   <p className="text-[10px] text-gray-500">Missing FID</p>
                 </div>
-                <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center border border-gray-800/50">
+                <div className="flex-1 bg-[#0d1b2a] rounded-xl p-3 text-center border border-white/[0.08]">
                   <p className="text-xl font-bold text-white">{fidStats.totalMembers}</p>
                   <p className="text-[10px] text-gray-500">Total</p>
                 </div>
@@ -517,16 +517,16 @@ export default function MemberCRMPage() {
                 value={fidSearch}
                 onChange={e => setFidSearch(e.target.value)}
                 placeholder="Search members..."
-                className="flex-1 bg-white/5 border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
+                className="flex-1 bg-white/5 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
               />
               {fidPendingCount > 0 && (
                 <button
                   onClick={saveFids}
                   disabled={fidSaving}
-                  className="px-4 py-2 rounded-lg text-sm font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 disabled:opacity-50 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg text-sm font-medium bg-[#f5a623]/20 text-[#f5a623] border border-[#f5a623]/30 hover:bg-[#f5a623]/30 disabled:opacity-50 transition-colors flex items-center gap-2"
                 >
                   {fidSaving ? (
-                    <div className="w-3 h-3 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-3 h-3 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
                   ) : null}
                   Save {fidPendingCount} FID{fidPendingCount !== 1 ? 's' : ''}
                 </button>
@@ -537,8 +537,8 @@ export default function MemberCRMPage() {
             {fidSaveResult && (
               <div className={`mb-3 px-3 py-2 rounded-lg text-xs ${
                 fidSaveResult.errors.length > 0
-                  ? 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/20'
-                  : 'bg-green-500/10 text-green-300 border border-green-500/20'
+                  ? 'bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/20'
+                  : 'bg-[#f5a623]/15 text-[#ffd700] border border-[#ffd700]/20'
               }`}>
                 Updated {fidSaveResult.updated} FID{fidSaveResult.updated !== 1 ? 's' : ''}
                 {fidSaveResult.errors.length > 0 && ` (${fidSaveResult.errors.length} errors)`}
@@ -557,7 +557,7 @@ export default function MemberCRMPage() {
                   onClick={() => setFidSection(s.key)}
                   className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors ${
                     fidSection === s.key
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'bg-[#f5a623]/20 text-[#f5a623]'
                       : 'bg-[#0d1b2a] text-gray-500 hover:text-gray-300'
                   }`}
                 >
@@ -630,7 +630,7 @@ function FidMemberList({
           : `https://farcaster.xyz/${searchName}`;
 
         return (
-          <div key={m.id} className="flex items-center gap-2 px-3 py-2 bg-[#0d1b2a] rounded-lg border border-gray-800/50 hover:border-gray-700 transition-colors">
+          <div key={m.id} className="flex items-center gap-2 px-3 py-2 bg-[#0d1b2a] rounded-lg border border-white/[0.08] hover:border-white/[0.08] transition-colors">
             <span className="w-8 text-right text-[10px] text-gray-600">{i + 1}</span>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-white truncate">{m.name}</p>
@@ -648,15 +648,15 @@ function FidMemberList({
               onChange={e => onInputChange(m.id, e.target.value.replace(/\D/g, ''))}
               className={`w-28 bg-[#0a1628] border rounded px-2 py-1 text-xs text-white placeholder-gray-700 focus:outline-none transition-colors ${
                 inputs[m.id]?.trim()
-                  ? 'border-purple-500/50 bg-purple-500/5'
-                  : 'border-gray-800 focus:border-purple-500/50'
+                  ? 'border-[#f5a623]/50 bg-[#f5a623]/5'
+                  : 'border-white/[0.08] focus:border-[#f5a623]/50'
               }`}
             />
             <a
               href={fcLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 hover:bg-purple-500/20 transition-colors flex-shrink-0"
+              className="w-8 h-8 rounded-lg bg-[#f5a623]/10 flex items-center justify-center text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors flex-shrink-0"
               title="Look up on Farcaster"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -672,7 +672,7 @@ function FidMemberList({
 
 function StatCard({ label, value, color = 'text-white' }: { label: string; value: number; color?: string }) {
   return (
-    <div className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800/50">
+    <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08]">
       <p className={`text-lg font-bold ${color}`}>{value}</p>
       <p className="text-[10px] text-gray-500">{label}</p>
     </div>

@@ -203,7 +203,7 @@ export default function ZounzProposals() {
           href={VOTE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 rounded-xl px-3 py-2 bg-[#1a2a3a] border border-gray-700 hover:border-[#f5a623]/30 transition-colors text-sm font-medium text-gray-300 hover:text-[#f5a623] ml-auto"
+          className="flex items-center gap-1.5 rounded-xl px-3 py-2 bg-[#1a2a3a] border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors text-sm font-medium text-gray-300 hover:text-[#f5a623] ml-auto"
         >
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
@@ -223,7 +223,7 @@ export default function ZounzProposals() {
             className={`text-[10px] px-2 py-1 rounded-lg capitalize transition-colors ${
               filter === f
                 ? 'bg-[#f5a623]/20 text-[#f5a623] border border-[#f5a623]/30'
-                : 'bg-[#0a1628] text-gray-500 border border-gray-800 hover:text-gray-300'
+                : 'bg-[#0a1628] text-gray-500 border border-white/[0.08] hover:text-gray-300'
             }`}
           >
             {f} ({countForFilter(f)})
@@ -235,7 +235,7 @@ export default function ZounzProposals() {
       {loadingProposals ? (
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-[#0a1628] rounded-lg border border-gray-800 p-4 animate-pulse">
+            <div key={i} className="bg-[#0a1628] rounded-lg border border-white/[0.08] p-4 animate-pulse">
               <div className="h-4 bg-gray-700 rounded w-3/4 mb-2" />
               <div className="h-2 bg-gray-700 rounded w-1/2" />
             </div>

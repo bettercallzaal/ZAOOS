@@ -219,7 +219,7 @@ export function SocialPage() {
         <MiniSpaceBanner />
 
         {/* Main view tabs */}
-        <div className="flex border-b border-gray-800 bg-[#0d1b2a]">
+        <div className="flex border-b border-white/[0.08] bg-[#0d1b2a]">
           {([
             { key: 'followers' as View, label: 'Followers' },
             { key: 'following' as View, label: 'Following' },
@@ -353,7 +353,7 @@ export function SocialPage() {
 
             {/* Expanded filter panel */}
             {showFilters && (
-              <div className="mx-4 mb-2 p-3 bg-[#0d1b2a] rounded-xl border border-gray-800 space-y-3">
+              <div className="mx-4 mb-2 p-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08] space-y-3">
                 <div className="flex flex-wrap gap-3">
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input type="checkbox" checked={powerBadgeOnly} onChange={(e) => setPowerBadgeOnly(e.target.checked)} className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-800 text-[#f5a623] focus:ring-[#f5a623]/50" />

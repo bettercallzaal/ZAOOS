@@ -69,7 +69,7 @@ export function GeneratePostButton() {
       </button>
 
       {stat && (
-        <div className="mt-3 p-3 bg-[#0d1b2a] rounded-xl border border-gray-800">
+        <div className="mt-3 p-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08]">
           <p className="text-xs text-gray-500 mb-1">Preview:</p>
           <p className="text-sm text-white font-medium mb-1">{stat.title}</p>
           <p className="text-xs text-gray-300 whitespace-pre-wrap">{stat.publish_text}</p>

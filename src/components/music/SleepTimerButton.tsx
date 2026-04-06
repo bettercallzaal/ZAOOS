@@ -166,10 +166,10 @@ export function SleepTimerButton({ compact = false, className = '' }: SleepTimer
       {/* Popover */}
       {open && (
         <div
-          className="absolute bottom-full right-0 mb-2 w-44 bg-[#111827] border border-gray-700 rounded-xl shadow-2xl shadow-black/60 z-50 overflow-hidden"
+          className="absolute bottom-full right-0 mb-2 w-44 bg-[#111827] border border-white/[0.08] rounded-xl shadow-2xl shadow-black/60 z-50 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="px-3 py-2 border-b border-gray-700/50">
+          <div className="px-3 py-2 border-b border-white/[0.08]">
             <p className="text-xs font-semibold text-gray-300">Sleep Timer</p>
           </div>
 
@@ -199,14 +199,14 @@ export function SleepTimerButton({ compact = false, className = '' }: SleepTimer
           </div>
 
           {isActive && activeTimer !== 'endOfTrack' && remainingMs > 0 && (
-            <div className="px-3 py-2 border-t border-gray-700/50">
+            <div className="px-3 py-2 border-t border-white/[0.08]">
               <p className="text-[10px] text-gray-500 text-center">
                 Pausing in {badgeText}
               </p>
             </div>
           )}
           {isActive && activeTimer === 'endOfTrack' && (
-            <div className="px-3 py-2 border-t border-gray-700/50">
+            <div className="px-3 py-2 border-t border-white/[0.08]">
               <p className="text-[10px] text-gray-500 text-center">
                 Pausing after current track
               </p>

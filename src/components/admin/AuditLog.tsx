@@ -104,7 +104,7 @@ export default function AuditLog() {
               setSelectedAction(e.target.value);
               setOffset(0);
             }}
-            className="rounded-lg border border-gray-700 bg-[#0d1b2a] px-3 py-1.5 text-sm text-white focus:border-[#f5a623] focus:outline-none"
+            className="rounded-lg border border-white/[0.08] bg-[#0d1b2a] px-3 py-1.5 text-sm text-white focus:border-[#f5a623] focus:outline-none"
           >
             <option value="">All actions</option>
             {actions.map((a) => (
@@ -127,10 +127,10 @@ export default function AuditLog() {
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-800 bg-[#0d1b2a]">
+      <div className="overflow-x-auto rounded-lg border border-white/[0.08] bg-[#0d1b2a]">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-800 text-xs uppercase tracking-wider text-gray-400">
+            <tr className="border-b border-white/[0.08] text-xs uppercase tracking-wider text-gray-400">
               <th className="px-4 py-3">Time</th>
               <th className="px-4 py-3">Action</th>
               <th className="px-4 py-3">Target</th>
@@ -142,7 +142,7 @@ export default function AuditLog() {
             {loading ? (
               /* Loading skeleton */
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-gray-800/50">
+                <tr key={i} className="border-b border-white/[0.08]">
                   <td colSpan={5} className="px-4 py-3">
                     <div className="h-12 animate-pulse rounded bg-gray-800" />
                   </td>
@@ -158,7 +158,7 @@ export default function AuditLog() {
               entries.map((entry) => (
                 <tr
                   key={entry.id}
-                  className="border-b border-gray-800/50 transition-colors hover:bg-[#0a1628]/50"
+                  className="border-b border-white/[0.08] transition-colors hover:bg-[#0a1628]/50"
                 >
                   <td className="whitespace-nowrap px-4 py-3 text-gray-300">
                     {formatTimestamp(entry.created_at)}
@@ -202,7 +202,7 @@ export default function AuditLog() {
           <button
             onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
             disabled={offset === 0}
-            className="rounded-lg border border-gray-700 bg-[#0d1b2a] px-4 py-2 text-white transition-colors hover:border-[#f5a623] disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg border border-white/[0.08] bg-[#0d1b2a] px-4 py-2 text-white transition-colors hover:border-[#f5a623] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Previous
           </button>
@@ -212,7 +212,7 @@ export default function AuditLog() {
           <button
             onClick={() => setOffset(offset + PAGE_SIZE)}
             disabled={offset + PAGE_SIZE >= total}
-            className="rounded-lg border border-gray-700 bg-[#0d1b2a] px-4 py-2 text-white transition-colors hover:border-[#f5a623] disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg border border-white/[0.08] bg-[#0d1b2a] px-4 py-2 text-white transition-colors hover:border-[#f5a623] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Next
           </button>

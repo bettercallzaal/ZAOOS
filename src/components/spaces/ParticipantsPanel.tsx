@@ -21,7 +21,7 @@ export function ParticipantsPanel({ isHost, hostFid, onClose }: ParticipantsPane
   return (
     <div className="flex flex-col h-full bg-[#0d1b2a]">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
         <h3 className="text-white text-sm font-semibold">
           Participants{' '}
           <span className="text-[#f5a623] ml-1">({participants.length})</span>

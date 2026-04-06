@@ -63,14 +63,14 @@ export function MusicSidebar({
       <>
         <div className="fixed inset-0 bg-black/40 z-50" onClick={onClose} />
 
-        <div className="fixed inset-x-0 bottom-0 z-50 bg-[#0d1b2a] border-t border-gray-800 rounded-t-2xl animate-slide-up max-h-[75vh] flex flex-col pb-[env(safe-area-inset-bottom)]">
+        <div className="fixed inset-x-0 bottom-0 z-50 bg-[#0d1b2a] border-t border-white/[0.08] rounded-t-2xl animate-slide-up max-h-[75vh] flex flex-col pb-[env(safe-area-inset-bottom)]">
           {/* Drag handle */}
           <div className="flex justify-center pt-3 pb-1">
             <div className="w-10 h-1 rounded-full bg-gray-700" />
           </div>
 
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800/50">
+          <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.08]">
             <div className="flex items-center gap-2">
               <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
@@ -130,9 +130,9 @@ export function MusicSidebar({
   return (
     <>
     <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
-    <div className="fixed top-0 right-0 bottom-0 z-50 flex flex-col w-[340px] border-l border-gray-800 bg-[#0d1b2a] shadow-2xl shadow-black/50 animate-slide-in-left overflow-hidden">
+    <div className="fixed top-0 right-0 bottom-0 z-50 flex flex-col w-[340px] border-l border-white/[0.08] bg-[#0d1b2a] shadow-2xl shadow-black/50 animate-slide-in-left overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0a1628] flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#0a1628] flex-shrink-0">
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
@@ -206,7 +206,7 @@ function NowPlayingCard({
   if (!player.metadata) return null;
 
   return (
-    <div className="flex-shrink-0 border-b border-gray-800 bg-gradient-to-b from-[#0a1628] to-[#0d1b2a]">
+    <div className="flex-shrink-0 border-b border-white/[0.08] bg-gradient-to-b from-[#0a1628] to-[#0d1b2a]">
       <div className="px-4 pt-4 pb-3">
         <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-semibold mb-3">Now Playing</p>
 
@@ -353,7 +353,7 @@ function StationPicker({
   onSwitch: (index: number) => void;
 }) {
   return (
-    <div className="flex gap-2 px-4 py-2 overflow-x-auto border-b border-gray-800/50 scrollbar-hide">
+    <div className="flex gap-2 px-4 py-2 overflow-x-auto border-b border-white/[0.08] scrollbar-hide">
       {stations.map((name, i) => (
         <button
           key={name}
@@ -397,7 +397,7 @@ function SidebarTabs({
   return (
     <>
       {/* Tab bar */}
-      <div className="flex border-b border-gray-800 flex-shrink-0">
+      <div className="flex border-b border-white/[0.08] flex-shrink-0">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -507,13 +507,13 @@ function LibraryTab({ player }: { player: ReturnType<typeof usePlayer> }) {
   return (
     <div className="flex flex-col">
       {/* Search + sort */}
-      <div className="px-3 py-2 space-y-2 border-b border-gray-800/50">
+      <div className="px-3 py-2 space-y-2 border-b border-white/[0.08]">
         <input
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Search library..."
-          className="w-full bg-white/5 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
+          className="w-full bg-white/5 border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
         />
         <div className="flex gap-1">
           {(['recent', 'popular', 'played'] as const).map((s) => (
@@ -654,7 +654,7 @@ function UserQueueSection({ player }: { player: ReturnType<typeof usePlayer> }) 
   };
 
   return (
-    <div className="border-b border-gray-800/50">
+    <div className="border-b border-white/[0.08]">
       <div className="flex items-center justify-between px-4 pt-3 pb-1">
         <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-semibold">
           Your Queue
@@ -775,13 +775,13 @@ function QuickAddInput({ player }: { player: ReturnType<typeof usePlayer> }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-800/50">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.08]">
       <input
         type="url"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="Paste a music link..."
-        className="flex-1 bg-white/5 border border-gray-700/50 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50 min-w-0"
+        className="flex-1 bg-white/5 border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50 min-w-0"
       />
       <button
         type="submit"

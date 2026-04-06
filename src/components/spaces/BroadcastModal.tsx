@@ -187,7 +187,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-      <div className="bg-[#0d1b2a] border border-gray-800 rounded-2xl p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto">
+      <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-2xl p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-white text-xl font-bold">Broadcast</h2>
           {isBroadcasting && (
@@ -228,7 +228,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
                         className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all ${
                           platform.enabled
                             ? 'bg-[#f5a623]/10 border-[#f5a623]/40'
-                            : 'bg-[#0a1628] border-gray-700 hover:border-gray-600'
+                            : 'bg-[#0a1628] border-white/[0.08] hover:border-gray-600'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -259,7 +259,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
                   })}
                 </div>
               ) : (
-                <div className="text-center py-4 bg-[#0a1628] rounded-lg border border-gray-800">
+                <div className="text-center py-4 bg-[#0a1628] rounded-lg border border-white/[0.08]">
                   <p className="text-gray-500 text-sm">No platforms connected</p>
                   <p className="text-gray-600 text-xs mt-1">
                     Connect Twitch, YouTube, Kick, or Facebook in Settings
@@ -271,7 +271,7 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
             {/* Custom RTMP Section */}
             <div className="mb-2">
               {customTargets.map((target) => (
-                <div key={target.id} className="bg-[#0a1628] border border-gray-700 rounded-lg p-4 mb-3">
+                <div key={target.id} className="bg-[#0a1628] border border-white/[0.08] rounded-lg p-4 mb-3">
                   <div className="flex items-center justify-between mb-3">
                     <span className="font-medium text-sm text-gray-400">
                       {PLATFORM_META.custom.icon} Custom RTMP
@@ -288,28 +288,28 @@ export function BroadcastModal({ isOpen, onClose, onStartBroadcast, onStopBroadc
                     value={target.name}
                     onChange={(e) => updateCustomTarget(target.id, 'name', e.target.value)}
                     placeholder="Destination name"
-                    className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm mb-2 focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm mb-2 focus:border-[#f5a623] focus:outline-none"
                   />
                   <input
                     type="text"
                     value={target.rtmpUrl}
                     onChange={(e) => updateCustomTarget(target.id, 'rtmpUrl', e.target.value)}
                     placeholder="rtmp://your-server/live"
-                    className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm mb-2 focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm mb-2 focus:border-[#f5a623] focus:outline-none"
                   />
                   <input
                     type="password"
                     value={target.streamKey}
                     onChange={(e) => updateCustomTarget(target.id, 'streamKey', e.target.value)}
                     placeholder="Stream key"
-                    className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
                   />
                 </div>
               ))}
 
               <button
                 onClick={addCustomTarget}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 border border-dashed border-gray-700 rounded-lg text-sm text-gray-500 hover:border-gray-500 hover:text-gray-400 transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 border border-dashed border-white/[0.08] rounded-lg text-sm text-gray-500 hover:border-gray-500 hover:text-gray-400 transition-colors"
               >
                 <span>+</span>
                 <span>Add Custom RTMP</span>

@@ -123,7 +123,7 @@ export default async function ZAOLeaderboardPage() {
               </div>
               <p className="text-xs text-gray-400 font-medium truncate max-w-[70px] text-center">{entries[1].name}</p>
               <p className="text-sm text-gray-500">{entries[1].totalRespect.toLocaleString()}</p>
-              <div className="w-16 h-16 bg-[#1a2a3a] border border-gray-700 rounded-xl flex items-center justify-center text-2xl">
+              <div className="w-16 h-16 bg-[#1a2a3a] border border-white/[0.08] rounded-xl flex items-center justify-center text-2xl">
                 🥈
               </div>
             </div>
@@ -157,7 +157,7 @@ export default async function ZAOLeaderboardPage() {
               </div>
               <p className="text-xs text-gray-400 font-medium truncate max-w-[70px] text-center">{entries[2].name}</p>
               <p className="text-sm text-gray-500">{entries[2].totalRespect.toLocaleString()}</p>
-              <div className="w-16 h-16 bg-[#1a2a3a] border border-gray-700 rounded-xl flex items-center justify-center text-2xl">
+              <div className="w-16 h-16 bg-[#1a2a3a] border border-white/[0.08] rounded-xl flex items-center justify-center text-2xl">
                 🥉
               </div>
             </div>

@@ -89,7 +89,7 @@ export function MentionAutocomplete({ query, onSelect, onClose, position }: Ment
   return (
     <div
       ref={containerRef}
-      className="absolute z-50 bg-[#1a2a3a] border border-gray-700 rounded-xl shadow-2xl overflow-hidden max-h-[240px] w-[280px]"
+      className="absolute z-50 bg-[#1a2a3a] border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden max-h-[240px] w-[280px]"
       style={{ bottom: position.bottom, left: position.left }}
     >
       {loading && users.length === 0 ? (

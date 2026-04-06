@@ -88,13 +88,13 @@ export function MessagesRoom() {
   if (!isConnected) {
     return (
       <div className="flex h-[100dvh] bg-[#0a1628] text-white">
-        <aside className="hidden md:flex w-64 bg-[#0d1b2a] border-r border-gray-800 flex-col">
-          <div className="p-4 border-b border-gray-800">
+        <aside className="hidden md:flex w-64 bg-[#0d1b2a] border-r border-white/[0.08] flex-col">
+          <div className="p-4 border-b border-white/[0.08]">
             <h1 className="text-xl font-bold text-[#f5a623] tracking-wide">THE ZAO</h1>
             <p className="text-xs text-gray-500 mt-1">Private Messages</p>
           </div>
           <div className="flex-1" />
-          <div className="p-4 border-t border-gray-800">
+          <div className="p-4 border-t border-white/[0.08]">
             <a href="/chat" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -128,7 +128,7 @@ export function MessagesRoom() {
       )}
 
       {showList && (
-        <div className={`${isMobile ? 'w-full' : 'w-80 border-r border-gray-800'} bg-[#0d1b2a] flex flex-col`}>
+        <div className={`${isMobile ? 'w-full' : 'w-80 border-r border-white/[0.08]'} bg-[#0d1b2a] flex flex-col`}>
           <div className="px-4 pt-3 pb-1 flex items-center justify-between">
             <a href="/chat" className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -157,7 +157,7 @@ export function MessagesRoom() {
         <div className="flex-1 flex flex-col min-w-0">
           {/* Conversation header */}
           {activeConversation && (
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex-shrink-0">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] flex-shrink-0">
               {/* Back button (mobile) */}
               {isMobile && (
                 <button

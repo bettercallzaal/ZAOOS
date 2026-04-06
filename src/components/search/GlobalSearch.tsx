@@ -247,10 +247,10 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       <div className="fixed inset-x-4 top-[10%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-xl z-50">
         <div
           ref={dialogRef}
-          className="bg-[#0d1b2a] border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
+          className="bg-[#0d1b2a] border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden"
         >
           {/* Search input */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08]">
             <svg
               className="w-4 h-4 text-gray-400 flex-shrink-0"
               viewBox="0 0 24 24"
@@ -272,13 +272,13 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               placeholder="Search everything..."
               className="flex-1 bg-transparent text-white text-base md:text-sm placeholder-gray-500 focus:outline-none"
             />
-            <kbd className="hidden md:inline text-[10px] text-gray-500 border border-gray-700 rounded px-1.5 py-0.5">
+            <kbd className="hidden md:inline text-[10px] text-gray-500 border border-white/[0.08] rounded px-1.5 py-0.5">
               ESC
             </kbd>
           </div>
 
           {/* Type filter tabs */}
-          <div className="flex items-center gap-1 px-4 py-2 border-b border-gray-800/50 overflow-x-auto">
+          <div className="flex items-center gap-1 px-4 py-2 border-b border-white/[0.08] overflow-x-auto">
             {TYPE_FILTERS.map((f) => (
               <button
                 key={f.value}
@@ -381,19 +381,19 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                 </p>
                 <div className="flex items-center justify-center gap-4 text-[10px] text-gray-600">
                   <span>
-                    <kbd className="border border-gray-700 rounded px-1 py-0.5 mr-1">
+                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">
                       ↑↓
                     </kbd>{' '}
                     navigate
                   </span>
                   <span>
-                    <kbd className="border border-gray-700 rounded px-1 py-0.5 mr-1">
+                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">
                       ↵
                     </kbd>{' '}
                     open
                   </span>
                   <span>
-                    <kbd className="border border-gray-700 rounded px-1 py-0.5 mr-1">
+                    <kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">
                       esc
                     </kbd>{' '}
                     close
@@ -433,7 +433,7 @@ function ResultItem({
     <button
       data-selected={isSelected}
       onClick={() => onSelect(result)}
-      className={`w-full text-left px-4 py-3 border-b border-gray-800/50 transition-colors ${
+      className={`w-full text-left px-4 py-3 border-b border-white/[0.08] transition-colors ${
         isSelected ? 'bg-[#f5a623]/10' : 'hover:bg-white/5'
       }`}
     >

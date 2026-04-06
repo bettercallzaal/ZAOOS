@@ -61,7 +61,7 @@ export default function PastRooms({ category }: PastRoomsProps) {
               className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors ${
                 days === d
                   ? 'bg-[#f5a623]/10 text-[#f5a623] border border-[#f5a623]/30'
-                  : 'text-gray-500 border border-gray-700 hover:border-gray-600'
+                  : 'text-gray-500 border border-white/[0.08] hover:border-gray-600'
               }`}
             >
               {d}d
@@ -73,7 +73,7 @@ export default function PastRooms({ category }: PastRoomsProps) {
       {loading ? (
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="bg-[#111d2e] border border-gray-800 rounded-xl p-4 animate-pulse h-20" />
+            <div key={i} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 animate-pulse h-20" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -83,7 +83,7 @@ export default function PastRooms({ category }: PastRoomsProps) {
       ) : (
         <div className="space-y-3">
           {filtered.map((room) => (
-            <div key={room.id} className="bg-[#111d2e] border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+            <div key={room.id} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 hover:border-white/[0.08] transition-colors">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="text-white text-sm font-bold mb-1 line-clamp-1">{room.title}</h4>
@@ -120,13 +120,13 @@ export default function PastRooms({ category }: PastRoomsProps) {
                     {playingRoomId === room.id ? 'Close' : 'Play Recording'}
                   </button>
                 ) : (
-                  <span className="text-[10px] text-gray-600 px-2 py-1 border border-gray-700 rounded-lg">
+                  <span className="text-[10px] text-gray-600 px-2 py-1 border border-white/[0.08] rounded-lg">
                     No recording
                   </span>
                 )}
               </div>
               {playingRoomId === room.id && room.recording_url && (
-                <div className="mt-3 pt-3 border-t border-gray-800">
+                <div className="mt-3 pt-3 border-t border-white/[0.08]">
                   { }
                   <audio
                     controls

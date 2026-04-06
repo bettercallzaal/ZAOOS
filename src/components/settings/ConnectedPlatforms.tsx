@@ -124,7 +124,7 @@ function PlatformCard({
   const isConnected = !!connectedAs;
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
       {/* Card header */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
@@ -182,7 +182,7 @@ function PlatformCard({
 
       {/* Inline connect form */}
       {showForm && !isConnected && connectFields && (
-        <div className="px-4 pb-4 space-y-3 border-t border-gray-800/50 pt-3">
+        <div className="px-4 pb-4 space-y-3 border-t border-white/[0.08] pt-3">
           {connectFields.map((field) => (
             <div key={field.key}>
               <label className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1">
@@ -193,7 +193,7 @@ function PlatformCard({
                 onChange={(e) => setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))}
                 placeholder={field.placeholder}
                 type={field.type || 'text'}
-                className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-700 focus:outline-none focus:ring-1 focus:border-transparent transition-colors"
+                className="w-full bg-[#0a1628] text-white text-base md:text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-white/[0.08] focus:outline-none focus:ring-1 focus:border-transparent transition-colors"
                 style={{ '--tw-ring-color': accentColor } as React.CSSProperties}
               />
               {field.helpText && (

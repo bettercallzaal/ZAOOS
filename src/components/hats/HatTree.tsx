@@ -293,14 +293,14 @@ export default function HatTree() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search roles or addresses..."
-          className="flex-1 bg-[#0d1b2a] text-white text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-gray-800 focus:outline-none focus:border-[#f5a623]/40"
+          className="flex-1 bg-[#0d1b2a] text-white text-xs rounded-lg px-3 py-2 placeholder-gray-600 border border-white/[0.08] focus:outline-none focus:border-[#f5a623]/40"
         />
         <button
           onClick={() => setHideEmpty(!hideEmpty)}
           className={`text-[10px] px-2.5 py-2 rounded-lg border transition-colors flex-shrink-0 ${
             hideEmpty
               ? 'bg-[#f5a623]/10 border-[#f5a623]/30 text-[#f5a623]'
-              : 'bg-[#0d1b2a] border-gray-800 text-gray-500 hover:text-gray-400'
+              : 'bg-[#0d1b2a] border-white/[0.08] text-gray-500 hover:text-gray-400'
           }`}
           title={hideEmpty ? 'Showing active roles only' : 'Show all roles'}
         >
@@ -309,7 +309,7 @@ export default function HatTree() {
       </div>
 
       {/* Tree */}
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 px-3 py-3 overflow-hidden">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] px-3 py-3 overflow-hidden">
         <TreeNode
           node={tree.root}
           hideEmpty={hideEmpty}

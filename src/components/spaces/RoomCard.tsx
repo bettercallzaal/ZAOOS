@@ -38,7 +38,7 @@ export function RoomCard({ room, isOwner, onJoin }: RoomCardProps) {
   const themeStyle = THEME_STYLES[themeKey] ?? THEME_STYLES.default;
 
   return (
-    <div className={`bg-[#0d1b2a] border border-gray-800 rounded-xl p-5 ${themeStyle.border} transition-all duration-200 group`}>
+    <div className={`bg-[#0d1b2a] border border-white/[0.08] rounded-xl p-5 ${themeStyle.border} transition-all duration-200 group`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2.5 w-2.5">

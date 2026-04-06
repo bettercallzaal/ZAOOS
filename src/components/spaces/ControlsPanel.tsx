@@ -61,7 +61,7 @@ export function ControlsPanel({
 
   return (
     <div className="space-y-0">
-      <div className="border-t border-gray-800 bg-[#0d1b2a]/80 backdrop-blur-sm">
+      <div className="border-t border-white/[0.08] bg-[#0d1b2a]/80 backdrop-blur-sm">
         <div className="flex items-center justify-center gap-2 px-4 py-3 max-w-2xl mx-auto">
           {/* Group 1: Audio controls */}
           <div className="flex items-center gap-2">
@@ -94,7 +94,7 @@ export function ControlsPanel({
               ) : (
                 <button
                   onClick={onBroadcast}
-                  className="p-2.5 rounded-xl transition-colors bg-[#1a2a3a] text-gray-400 hover:text-white border border-gray-700/50 hover:border-gray-600"
+                  className="p-2.5 rounded-xl transition-colors bg-[#1a2a3a] text-gray-400 hover:text-white border border-white/[0.08] hover:border-gray-600"
                   title="Broadcast"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -117,7 +117,7 @@ export function ControlsPanel({
             {isAuthenticated && onMusicToggle && (
               <button
                 onClick={onMusicToggle}
-                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-white border border-gray-700/50 hover:border-gray-600"
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-white border border-white/[0.08] hover:border-gray-600"
                 title="Toggle music panel"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -146,7 +146,7 @@ export function ControlsPanel({
             {onRoomChat && (
               <button
                 onClick={onRoomChat}
-                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border border-gray-700/50 hover:border-[#f5a623]/40"
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border border-white/[0.08] hover:border-[#f5a623]/40"
                 title="Room Chat"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -159,7 +159,7 @@ export function ControlsPanel({
             {onParticipants && (
               <button
                 onClick={onParticipants}
-                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border border-gray-700/50 hover:border-[#f5a623]/40"
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border border-white/[0.08] hover:border-[#f5a623]/40"
                 title="Participants"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -172,7 +172,7 @@ export function ControlsPanel({
             {twitchUsername && onTwitchChat && (
               <button
                 onClick={onTwitchChat}
-                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#9146ff] border border-gray-700/50 hover:border-[#9146ff]/40"
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-[#9146ff] border border-white/[0.08] hover:border-[#9146ff]/40"
                 title="Twitch Chat"
               >
                 <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
@@ -188,7 +188,7 @@ export function ControlsPanel({
                 className={`p-2.5 rounded-xl text-sm transition-colors border ${
                   showTwitchPanel
                     ? 'bg-[#9146ff]/15 border-[#9146ff]/30 text-[#9146ff]'
-                    : 'bg-[#1a2a3a] text-gray-400 hover:text-[#9146ff] border-gray-700/50 hover:border-[#9146ff]/40'
+                    : 'bg-[#1a2a3a] text-gray-400 hover:text-[#9146ff] border-white/[0.08] hover:border-[#9146ff]/40'
                 }`}
                 title="Twitch Polls, Predictions & Clips"
               >
@@ -207,7 +207,7 @@ export function ControlsPanel({
                 className={`p-2.5 rounded-xl text-sm transition-colors border ${
                   showMore
                     ? 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/30'
-                    : 'bg-[#1a2a3a] text-gray-400 border-gray-700/50 hover:text-white'
+                    : 'bg-[#1a2a3a] text-gray-400 border-white/[0.08] hover:text-white'
                 }`}
                 title="More options"
               >
@@ -218,7 +218,7 @@ export function ControlsPanel({
 
               {/* Mobile overflow menu */}
               {showMore && (
-                <div className="absolute bottom-full right-0 mb-2 bg-[#111d2e] border border-gray-700 rounded-xl shadow-xl shadow-black/30 py-1.5 min-w-[180px] z-10">
+                <div className="absolute bottom-full right-0 mb-2 bg-[#111d2e] border border-white/[0.08] rounded-xl shadow-xl shadow-black/30 py-1.5 min-w-[180px] z-10">
                   {isAuthenticated && onMusicToggle && (
                     <button
                       onClick={() => { onMusicToggle(); setShowMore(false); }}

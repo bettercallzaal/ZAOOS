@@ -103,7 +103,7 @@ export default function MiniAppPage() {
           </h1>
           <p className="text-gray-400 text-sm mb-6">Community on Farcaster</p>
 
-          <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 mb-6">
+          <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] mb-6">
             <p className="text-white text-sm mb-2">Something went wrong.</p>
             <p className="text-gray-400 text-sm">
               Try opening ZAO OS in your browser, or add it to your mini app list first.
@@ -131,7 +131,7 @@ export default function MiniAppPage() {
         </h1>
         <p className="text-gray-400 text-sm mb-6">Community on Farcaster</p>
 
-        <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 mb-6">
+        <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] mb-6">
           <p className="text-white text-sm mb-1">
             Hey {username || 'there'}!
           </p>

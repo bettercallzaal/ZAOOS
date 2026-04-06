@@ -55,7 +55,7 @@ export function SocialsSection({ profile }: { profile: Profile }) {
         <p className="text-xs text-gray-500 uppercase tracking-wider">Socials</p>
         <span className="text-[10px] text-gray-600">{connectedCount} of {fields.length} linked</span>
       </div>
-      <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-3">
+      <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-3">
         {profile.x_handle && (
           <p className="text-[10px] text-emerald-400">X handle auto-imported from your Farcaster profile</p>
         )}
@@ -76,7 +76,7 @@ export function SocialsSection({ profile }: { profile: Profile }) {
                 value={f.value}
                 onChange={(e) => f.set(e.target.value)}
                 placeholder={f.placeholder}
-                className="flex-1 bg-[#0a1628] text-sm text-white rounded-lg px-3 py-2 border border-gray-700 focus:border-[#f5a623] outline-none placeholder:text-gray-600"
+                className="flex-1 bg-[#0a1628] text-sm text-white rounded-lg px-3 py-2 border border-white/[0.08] focus:border-[#f5a623] outline-none placeholder:text-gray-600"
               />
             </div>
           </div>

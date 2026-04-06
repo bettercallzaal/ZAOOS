@@ -51,7 +51,7 @@ export default function NexusPage() {
             <a
               key={link.href}
               href={link.href}
-              className="flex items-center gap-4 bg-[#0d1b2a] rounded-xl p-5 border border-gray-800 hover:border-[#f5a623]/30 transition-colors group"
+              className="flex items-center gap-4 bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors group"
             >
               <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#1a2a3a] flex items-center justify-center text-[#f5a623] group-hover:bg-[#f5a623]/10 transition-colors">
                 {link.icon}

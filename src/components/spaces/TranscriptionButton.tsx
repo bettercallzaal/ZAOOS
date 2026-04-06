@@ -46,7 +46,7 @@ export function TranscriptionButton({ isHost }: TranscriptionButtonProps) {
       className={`p-2.5 rounded-xl text-sm transition-colors border ${
         isActive
           ? 'bg-[#f5a623]/15 border-[#f5a623]/30 text-[#f5a623]'
-          : 'bg-[#1a2a3a] text-gray-400 hover:text-white border-gray-700/50 hover:border-gray-600'
+          : 'bg-[#1a2a3a] text-gray-400 hover:text-white border-white/[0.08] hover:border-gray-600'
       } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
       title={isActive ? 'Stop captions & transcription' : 'Start captions & transcription'}
     >

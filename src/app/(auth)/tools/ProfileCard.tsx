@@ -15,7 +15,7 @@ interface UserProfile {
 
 export function ProfileCard({ profile }: { profile: UserProfile }) {
   return (
-    <div className="bg-gradient-to-r from-[#0d1b2a] to-[#f5a623]/5 rounded-xl p-6 border border-gray-800">
+    <div className="bg-gradient-to-r from-[#0d1b2a] to-[#f5a623]/5 rounded-xl p-6 border border-white/[0.08]">
       <div className="flex items-center gap-4">
         {profile.pfp_url ? (
           <Image src={profile.pfp_url} alt={`${profile.display_name || 'User'} avatar`} width={64} height={64} className="rounded-full" unoptimized />

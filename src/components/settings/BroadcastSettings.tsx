@@ -78,19 +78,19 @@ export function BroadcastSettings() {
   };
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-6">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-6">
       <h3 className="text-white text-lg font-semibold mb-1">Broadcast Destinations</h3>
       <p className="text-gray-500 text-sm mb-4">Save your stream keys so you can go live with one click</p>
 
       {/* Add new target */}
-      <div className="bg-[#0a1628] border border-gray-700 rounded-lg p-4 mb-4">
+      <div className="bg-[#0a1628] border border-white/[0.08] rounded-lg p-4 mb-4">
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div>
             <label className="text-gray-400 text-xs mb-1 block">Platform</label>
             <select
               value={newPlatform}
               onChange={(e) => setNewPlatform(e.target.value)}
-              className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
+              className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
             >
               {PLATFORMS.map(p => (
                 <option key={p.value} value={p.value}>{p.icon} {p.label}</option>
@@ -104,7 +104,7 @@ export function BroadcastSettings() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="My YouTube Channel"
-              className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
+              className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
             />
           </div>
         </div>
@@ -116,7 +116,7 @@ export function BroadcastSettings() {
               value={newUrl}
               onChange={(e) => setNewUrl(e.target.value)}
               placeholder="rtmp://your-server/live"
-              className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
+              className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
             />
           </div>
         )}
@@ -126,7 +126,7 @@ export function BroadcastSettings() {
             value={newKey}
             onChange={(e) => setNewKey(e.target.value)}
             placeholder="Stream key"
-            className="flex-1 bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
+            className="flex-1 bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
           />
           <button
             onClick={handleAdd}
@@ -150,7 +150,7 @@ export function BroadcastSettings() {
           {targets.map(target => {
             const platform = PLATFORMS.find(p => p.value === target.platform);
             return (
-              <div key={target.id} className="flex items-center justify-between bg-[#0a1628] border border-gray-800 rounded-lg px-4 py-3">
+              <div key={target.id} className="flex items-center justify-between bg-[#0a1628] border border-white/[0.08] rounded-lg px-4 py-3">
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{platform?.icon || '📡'}</span>
                   <div>

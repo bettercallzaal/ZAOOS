@@ -49,7 +49,7 @@ export function MessageCompose({ onSend, disabled, placeholder, streamDisconnect
   const canSend = text.trim().length > 0 && !sending && !disabled;
 
   return (
-    <div className="flex-shrink-0 border-t border-gray-800 bg-[#0d1b2a]">
+    <div className="flex-shrink-0 border-t border-white/[0.08] bg-[#0d1b2a]">
       <div className="p-3">
         <div className="flex items-end gap-2">
           <textarea

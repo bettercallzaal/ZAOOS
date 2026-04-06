@@ -59,15 +59,15 @@ export function SongjamLeaderboard() {
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
           <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Participants</div>
           <div className="text-white text-xl font-bold">{entries.length}</div>
         </div>
-        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
           <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Total Points</div>
           <div className="text-white text-xl font-bold">{Math.round(totalPoints).toLocaleString()}</div>
         </div>
-        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+        <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
           <div className="text-gray-500 text-xs uppercase tracking-wider mb-1">Leader</div>
           <div className="text-[#f5a623] text-xl font-bold truncate">{entries[0]?.name || '—'}</div>
         </div>
@@ -76,16 +76,16 @@ export function SongjamLeaderboard() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="bg-[#0d1b2a] rounded-xl h-16 animate-pulse border border-gray-800" />
+            <div key={i} className="bg-[#0d1b2a] rounded-xl h-16 animate-pulse border border-white/[0.08]" />
           ))}
         </div>
       ) : entries.length === 0 ? (
         <div className="text-center py-12 text-gray-500">No leaderboard data available</div>
       ) : (
-        <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+        <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-[#0d1b2a] border-b border-gray-800">
+              <thead className="sticky top-0 bg-[#0d1b2a] border-b border-white/[0.08]">
                 <tr>
                   <th className="text-left text-gray-500 text-xs uppercase px-4 py-3 w-12">#</th>
                   <th className="text-left text-gray-500 text-xs uppercase px-4 py-3">Singer</th>
@@ -100,7 +100,7 @@ export function SongjamLeaderboard() {
                 {entries.map((entry, i) => {
                   const share = totalPoints > 0 ? (entry.totalPoints / totalPoints) * 100 : 0;
                   return (
-                    <tr key={entry.userId} className="border-b border-gray-800/50 hover:bg-[#1a2a3a]/50 transition-colors">
+                    <tr key={entry.userId} className="border-b border-white/[0.08] hover:bg-[#1a2a3a]/50 transition-colors">
                       <td className="px-4 py-3 text-gray-400 font-mono">{i + 1}</td>
                       <td className="px-4 py-3">
                         <div className="text-white font-medium">{entry.name}</div>

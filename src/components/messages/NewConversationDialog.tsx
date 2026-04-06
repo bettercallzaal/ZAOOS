@@ -232,9 +232,9 @@ export function NewConversationDialog({
     <>
       <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div ref={dialogRef} className="bg-[#0d1b2a] border border-gray-700 rounded-xl w-full max-w-md shadow-xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div ref={dialogRef} className="bg-[#0d1b2a] border border-white/[0.08] rounded-xl w-full max-w-md shadow-xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-800 flex-shrink-0">
+          <div className="flex items-center justify-between p-4 border-b border-white/[0.08] flex-shrink-0">
             <h3 className="text-base font-semibold text-white">
               {type === 'dm' ? 'New Message' : 'New Group'}
             </h3>
@@ -251,7 +251,7 @@ export function NewConversationDialog({
               <>
                 {/* Selected user card */}
                 {selectedUser ? (
-                  <div className="rounded-lg bg-[#1a2a3a] border border-gray-700 p-3">
+                  <div className="rounded-lg bg-[#1a2a3a] border border-white/[0.08] p-3">
                     <div className="flex items-center gap-3">
                       {selectedUser.pfp_url ? (
                         <Image src={selectedUser.pfp_url} alt={`${selectedUser.display_name || selectedUser.username || 'User'} avatar`} width={40} height={40} className="rounded-full flex-shrink-0" />
@@ -285,7 +285,7 @@ export function NewConversationDialog({
                             className={`flex items-center gap-2 w-full px-2.5 py-2 rounded-lg text-left transition-colors ${
                               selectedAddress === addr
                                 ? 'bg-[#f5a623]/10 border border-[#f5a623]/30'
-                                : 'bg-[#0a1628] border border-gray-800 hover:border-gray-700'
+                                : 'bg-[#0a1628] border border-white/[0.08] hover:border-white/[0.08]'
                             }`}
                           >
                             <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
@@ -464,7 +464,7 @@ export function NewConversationDialog({
                       {groupMembers.map((m) => (
                         <span
                           key={m.user.fid}
-                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#1a2a3a] border border-gray-700 text-xs"
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#1a2a3a] border border-white/[0.08] text-xs"
                         >
                           {m.user.pfp_url && (
                             <Image src={m.user.pfp_url} alt={`${m.user.display_name || m.user.username || 'User'} avatar`} width={16} height={16} className="rounded-full" />
@@ -542,7 +542,7 @@ export function NewConversationDialog({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-2 p-4 border-t border-gray-800 flex-shrink-0">
+          <div className="flex items-center justify-end gap-2 p-4 border-t border-white/[0.08] flex-shrink-0">
             <button
               onClick={() => { resetState(); onClose(); }}
               className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"

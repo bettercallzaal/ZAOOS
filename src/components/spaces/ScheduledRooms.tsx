@@ -99,7 +99,7 @@ export default function ScheduledRooms({ category }: ScheduledRoomsProps) {
     return (
       <div className="space-y-3">
         {[1, 2].map((i) => (
-          <div key={i} className="bg-[#111d2e] border border-gray-800 rounded-xl p-4 animate-pulse h-28" />
+          <div key={i} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 animate-pulse h-28" />
         ))}
       </div>
     );
@@ -130,7 +130,7 @@ export default function ScheduledRooms({ category }: ScheduledRoomsProps) {
           {filtered.map((room) => {
             const catColor = CATEGORY_COLORS[room.category] || CATEGORY_COLORS.general;
             return (
-              <div key={room.id} className="bg-[#111d2e] border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+              <div key={room.id} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 hover:border-white/[0.08] transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">

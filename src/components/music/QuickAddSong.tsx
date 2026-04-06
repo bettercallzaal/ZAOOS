@@ -140,14 +140,14 @@ export function QuickAddSong() {
         <>
           <div className="fixed inset-0 bg-black/60 z-50" onClick={() => setIsOpen(false)} />
 
-          <div className="fixed inset-x-0 bottom-0 z-50 bg-[#0d1b2a] border-t border-gray-800 rounded-t-2xl max-h-[70vh] flex flex-col animate-slide-up">
+          <div className="fixed inset-x-0 bottom-0 z-50 bg-[#0d1b2a] border-t border-white/[0.08] rounded-t-2xl max-h-[70vh] flex flex-col animate-slide-up">
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-1">
               <div className="w-10 h-1 rounded-full bg-gray-700" />
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800/50">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.08]">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />

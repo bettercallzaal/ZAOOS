@@ -46,7 +46,7 @@ export default function ZAOLeaderboardClient({ entries }: Props) {
           <Link
             key={entry.wallet || entry.rank}
             href={entry.fid ? `/members/${entry.username}` : '#'}
-            className="flex items-center gap-3 bg-[#0d1b2a] rounded-xl px-3 py-2.5 border border-gray-800 hover:border-[#f5a623]/30 transition-colors group"
+            className="flex items-center gap-3 bg-[#0d1b2a] rounded-xl px-3 py-2.5 border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors group"
           >
             {/* Rank */}
             <div className="w-7 flex-shrink-0 text-center">

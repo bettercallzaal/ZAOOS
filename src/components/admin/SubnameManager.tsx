@@ -225,7 +225,7 @@ export function SubnameManager() {
       )}
 
       {/* Manual Create */}
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
         <p className="text-xs text-gray-400 uppercase tracking-wider mb-3">Create Single Subname</p>
         <div className="flex gap-2">
           <input
@@ -233,9 +233,9 @@ export function SubnameManager() {
             placeholder="FID"
             value={createFid}
             onChange={e => setCreateFid(e.target.value)}
-            className="w-24 px-3 py-2 bg-[#0a1628] border border-gray-700 rounded-lg text-sm text-white placeholder-gray-600 focus:border-[#f5a623] outline-none"
+            className="w-24 px-3 py-2 bg-[#0a1628] border border-white/[0.08] rounded-lg text-sm text-white placeholder-gray-600 focus:border-[#f5a623] outline-none"
           />
-          <div className="flex-1 flex items-center bg-[#0a1628] border border-gray-700 rounded-lg overflow-hidden focus-within:border-[#f5a623]">
+          <div className="flex-1 flex items-center bg-[#0a1628] border border-white/[0.08] rounded-lg overflow-hidden focus-within:border-[#f5a623]">
             <input
               type="text"
               placeholder="name"
@@ -263,11 +263,11 @@ export function SubnameManager() {
           ))}
         </div>
       ) : (
-        <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+        <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800">
+                <tr className="border-b border-white/[0.08]">
                   <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">Member</th>
                   <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">ZID</th>
                   <th className="text-left text-xs text-gray-500 uppercase tracking-wider px-4 py-3">Subname</th>
@@ -276,7 +276,7 @@ export function SubnameManager() {
               </thead>
               <tbody>
                 {members.map(m => (
-                  <tr key={m.fid} className="border-b border-gray-800/50 hover:bg-white/[0.02]">
+                  <tr key={m.fid} className="border-b border-white/[0.08] hover:bg-white/[0.02]">
                     <td className="px-4 py-2.5">
                       <span className="text-white">{m.displayName || m.username || `FID ${m.fid}`}</span>
                       {m.username && (

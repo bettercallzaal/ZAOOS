@@ -83,7 +83,7 @@ export function AboutTab() {
       <div className="bg-[#0d1b2a] rounded-xl p-4 space-y-3">
         <h3 className="text-sm font-semibold text-white">Two Types of Respect</h3>
         <div className="space-y-2">
-          <div className="bg-[#0a1628] rounded-lg p-3 border border-gray-800">
+          <div className="bg-[#0a1628] rounded-lg p-3 border border-white/[0.08]">
             <p className="text-xs font-medium text-white">OG ZAO Respect (ERC-20)</p>
             <p className="text-[10px] text-gray-500 mt-1">One-time distributions for intros, articles, hosting, festivals. 38,484 total supply, 122 holders.</p>
             <a href="https://optimistic.etherscan.io/token/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957" target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#f5a623]/60 hover:text-[#f5a623] mt-1 inline-block">View on Etherscan</a>
@@ -140,7 +140,7 @@ export function AboutTab() {
         <h3 className="text-sm font-semibold text-white mb-3">Fibonacci Scoring</h3>
         <table className="w-full text-xs">
           <thead>
-            <tr className="text-gray-500 border-b border-gray-800">
+            <tr className="text-gray-500 border-b border-white/[0.08]">
               <th className="text-left pb-2">Rank</th>
               <th className="text-right pb-2">1x Era</th>
               <th className="text-right pb-2">2x Era</th>
@@ -148,7 +148,7 @@ export function AboutTab() {
           </thead>
           <tbody>
             {FIBONACCI.map((row) => (
-              <tr key={row.rank} className="border-b border-gray-800/50">
+              <tr key={row.rank} className="border-b border-white/[0.08]">
                 <td className="py-1.5 text-gray-300">{row.rank}</td>
                 <td className="py-1.5 text-right font-mono text-[#f5a623]">{row.x1} R</td>
                 <td className="py-1.5 text-right font-mono text-[#f5a623]">{row.x2} R</td>
@@ -170,7 +170,7 @@ export function AboutTab() {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between bg-[#0d1b2a] rounded-xl px-4 py-3 border border-gray-800 hover:border-[#f5a623]/30 transition-colors"
+            className="flex items-center justify-between bg-[#0d1b2a] rounded-xl px-4 py-3 border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors"
           >
             <div>
               <p className="text-sm text-white">{link.label}</p>

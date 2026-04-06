@@ -385,7 +385,7 @@ function FishbowlRoomPageInner() {
           )}
           <span className={`text-xs px-2 py-1 rounded-full ${
             room.state === 'active'
-              ? 'bg-green-600/20 text-green-400'
+              ? 'bg-[#f5a623]/20 text-[#f5a623]'
               : 'bg-gray-600/20 text-gray-400'
           }`}>
             {room.state}
@@ -407,7 +407,7 @@ function FishbowlRoomPageInner() {
         <div className="flex-1 p-4 sm:p-6">
           {/* Ended banner */}
           {room.state === 'ended' && (
-            <div className="mb-4 p-3 bg-gray-800/50 rounded-lg border border-gray-700 text-center">
+            <div className="mb-4 p-3 bg-gray-800/50 rounded-lg border border-white/[0.08] text-center">
               <p className="text-gray-400 text-sm">This fishbowl has ended</p>
             </div>
           )}
@@ -627,7 +627,7 @@ function FishbowlRoomPageInner() {
                             toast(err.error || 'Failed to approve', 'error');
                           }
                         }}
-                        className="text-xs px-2 py-1 bg-green-600/20 text-green-400 rounded hover:bg-green-600/30 transition-colors"
+                        className="text-xs px-2 py-1 bg-[#f5a623]/15 text-[#ffd700] rounded hover:bg-[#f5a623]/25 transition-colors"
                       >
                         Approve
                       </button>

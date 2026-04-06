@@ -231,7 +231,7 @@ export function ChatRoom() {
         {/* Chat column */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
-          <header className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex-shrink-0">
+          <header className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] flex-shrink-0">
             {isMobile && (
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -382,7 +382,7 @@ export function ChatRoom() {
           ) : (
             <>
               {/* Channel / Trending tab bar */}
-              <div role="tablist" aria-label="Channels" className="flex items-center gap-0.5 px-3 py-1.5 bg-[#0d1b2a] border-b border-gray-800 overflow-x-auto no-scrollbar flex-shrink-0">
+              <div role="tablist" aria-label="Channels" className="flex items-center gap-0.5 px-3 py-1.5 bg-[#0d1b2a] border-b border-white/[0.08] overflow-x-auto no-scrollbar flex-shrink-0">
                 {communityConfig.farcaster.channels.map((ch) => (
                   <button
                     key={ch}

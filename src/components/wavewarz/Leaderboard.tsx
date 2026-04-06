@@ -93,7 +93,7 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-2 animate-pulse">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="h-14 bg-[#0d1b2a] rounded-xl border border-gray-800" />
+        <div key={i} className="h-14 bg-[#0d1b2a] rounded-xl border border-white/[0.08]" />
       ))}
     </div>
   );
@@ -115,7 +115,7 @@ function WinRate({ wins, battles }: { wins: number; battles: number }) {
 function ArtistCard({ artist, rank }: { artist: WaveWarZArtist; rank: number }) {
   const tier = getSpotlightTier(artist);
   return (
-    <div className="p-3 bg-[#0d1b2a] rounded-xl border border-gray-800 flex gap-3 items-start">
+    <div className="p-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08] flex gap-3 items-start">
       <div className="flex-shrink-0 pt-0.5">
         <RankNumber rank={rank} />
       </div>
@@ -233,7 +233,7 @@ export default function WaveWarZLeaderboard() {
           <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wide">
+                <tr className="border-b border-white/[0.08] text-xs text-gray-500 uppercase tracking-wide">
                   <th className="text-left pb-3 pr-4 w-10">#</th>
                   <th className="text-left pb-3 pr-4">Artist</th>
                   <th className="text-right pb-3 pr-4">W</th>

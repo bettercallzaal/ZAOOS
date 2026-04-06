@@ -13,7 +13,7 @@ export default function PageSkeleton({ blocks = 4 }: PageSkeletonProps) {
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       {/* Header bar placeholder */}
-      <header className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
+      <header className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a]">
         <div className="h-8 w-40 bg-gray-800 rounded-lg animate-pulse" />
         <div className="ml-auto h-8 w-8 bg-gray-800 rounded-lg animate-pulse" />
       </header>
@@ -23,7 +23,7 @@ export default function PageSkeleton({ blocks = 4 }: PageSkeletonProps) {
         {Array.from({ length: blocks }, (_, i) => (
           <div
             key={i}
-            className="rounded-lg bg-[#0d1b2a] border border-gray-800 animate-pulse"
+            className="rounded-lg bg-[#0d1b2a] border border-white/[0.08] animate-pulse"
             style={{ height: i === 0 ? '6rem' : i % 2 === 0 ? '5rem' : '4rem' }}
           />
         ))}

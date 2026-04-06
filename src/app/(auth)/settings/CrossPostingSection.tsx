@@ -7,7 +7,7 @@ export function CrossPostingSection() {
         <p className="text-xs text-gray-500 uppercase tracking-wider">Cross-Posting Channels</p>
         <span className="text-[10px] text-gray-600">Community broadcasts</span>
       </div>
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800/50">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800/50">
 
         {/* Telegram */}
         <div className="flex items-center gap-3 px-5 py-4">

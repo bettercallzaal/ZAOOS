@@ -25,7 +25,7 @@ export function CameraButton() {
           }
         }}
         disabled={requesting}
-        className="px-4 py-2.5 bg-[#1a2a3a] text-gray-300 border border-gray-700 rounded-xl text-sm transition-colors hover:text-white disabled:opacity-50"
+        className="px-4 py-2.5 bg-[#1a2a3a] text-gray-300 border border-white/[0.08] rounded-xl text-sm transition-colors hover:text-white disabled:opacity-50"
       >
         {requesting ? 'Requesting...' : 'Camera'}
       </button>

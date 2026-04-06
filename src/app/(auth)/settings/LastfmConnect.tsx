@@ -13,7 +13,7 @@ export function LastfmConnect() {
   if (!status) return null;
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-white">Last.fm</p>

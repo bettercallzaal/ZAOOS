@@ -40,7 +40,7 @@ export function ListenBrainzConnect() {
   };
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-white">ListenBrainz</p>
@@ -64,7 +64,7 @@ export function ListenBrainzConnect() {
             value={token}
             onChange={e => setToken(e.target.value)}
             placeholder="Paste your ListenBrainz user token"
-            className="flex-1 bg-[#0a1628] border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50"
+            className="flex-1 bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50"
           />
           <button
             onClick={handleSave}

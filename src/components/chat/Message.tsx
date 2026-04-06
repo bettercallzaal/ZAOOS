@@ -86,7 +86,7 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
         href={embed.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="block mt-2 rounded-xl border border-gray-800/60 overflow-hidden hover:border-gray-700 transition-colors group/link"
+        className="block mt-2 rounded-xl border border-white/[0.08]/60 overflow-hidden hover:border-white/[0.08] transition-colors group/link"
       >
         {og.ogImage?.[0]?.url && (
           <div className="w-full bg-gray-800/30" style={{ minHeight: '80px' }}>
@@ -124,7 +124,7 @@ function EmbedMedia({ embed, castHash }: { embed: CastEmbed; castHash: string })
 
 function QuotedCastCard({ cast }: { cast: QuotedCastData }) {
   return (
-    <div className="mt-2 flex gap-2.5 px-3 py-2.5 rounded-xl bg-[#0a1628] border border-gray-800/60">
+    <div className="mt-2 flex gap-2.5 px-3 py-2.5 rounded-xl bg-[#0a1628] border border-white/[0.08]/60">
       {cast.author.pfp_url ? (
         <Image
           src={cast.author.pfp_url}
@@ -234,7 +234,7 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
             unoptimized
           />
         ) : (
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] border border-gray-700/50 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] border border-white/[0.08] flex items-center justify-center">
             <span className="text-sm text-gray-400 font-medium">
               {(cast.author.display_name || cast.author.username || '?')[0]?.toUpperCase()}
             </span>
@@ -379,7 +379,7 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
       {isAdmin && showMenu && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setShowMenu(false)} />
-          <div className="absolute right-4 top-2 bg-[#1a2a3a] border border-gray-700 rounded-xl shadow-xl z-40 overflow-hidden min-w-[140px]">
+          <div className="absolute right-4 top-2 bg-[#1a2a3a] border border-white/[0.08] rounded-xl shadow-xl z-40 overflow-hidden min-w-[140px]">
             <button
               onClick={() => {
                 onHide(cast.hash);
@@ -391,7 +391,7 @@ export const Message = memo(function Message({ cast, isAdmin, currentFid, hasSig
             </button>
             <button
               onClick={() => setShowMenu(false)}
-              className="px-4 py-2.5 text-sm text-gray-400 hover:bg-white/5 w-full text-left transition-colors border-t border-gray-800/50"
+              className="px-4 py-2.5 text-sm text-gray-400 hover:bg-white/5 w-full text-left transition-colors border-t border-white/[0.08]"
             >
               Cancel
             </button>

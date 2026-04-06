@@ -55,7 +55,7 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
       <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
       <div className="fixed inset-y-0 right-0 w-full max-w-md bg-[#0a1628] z-50 flex flex-col shadow-xl">
         {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex-shrink-0">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] flex-shrink-0">
           <button onClick={onClose} className="text-gray-400 hover:text-white" aria-label="Close respect panel">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -88,7 +88,7 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
           )}
 
           {data && !myEntry && !loading && (
-            <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800 text-center">
+            <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] text-center">
               <p className="text-sm text-gray-400">
                 Your wallet isn&apos;t linked yet. Ask an admin to add your FID to the allowlist.
               </p>
@@ -97,15 +97,15 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
 
           {data && (
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800 text-center">
+              <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center">
                 <p className="text-xl font-bold text-white">{data.stats.totalMembers}</p>
                 <p className="text-xs text-gray-500 mt-1">Members</p>
               </div>
-              <div className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800 text-center">
+              <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center">
                 <p className="text-xl font-bold text-white">{data.stats.totalOG.toLocaleString()}</p>
                 <p className="text-xs text-gray-500 mt-1">OG Respect</p>
               </div>
-              <div className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800 text-center">
+              <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center">
                 <p className="text-xl font-bold text-white">{data.stats.totalZOR.toLocaleString()}</p>
                 <p className="text-xs text-gray-500 mt-1">ZOR Respect</p>
               </div>
@@ -134,7 +134,7 @@ export function RespectPanel({ isOpen, onClose }: RespectPanelProps) {
                         ? 'bg-[#f5a623]/10 border-[#f5a623]/30'
                         : entry.rank <= 3
                           ? 'bg-[#f5a623]/5 border-[#f5a623]/20'
-                          : 'bg-[#0d1b2a] border-gray-800'
+                          : 'bg-[#0d1b2a] border-white/[0.08]'
                     }`}
                   >
                     <span className="text-lg font-bold w-8 text-center">

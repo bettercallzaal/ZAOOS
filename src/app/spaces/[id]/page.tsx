@@ -224,7 +224,7 @@ export default function PublicRoomPage() {
     const gate = room?.gate_config as { type?: string; contractAddress?: string } | null;
     return (
       <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col items-center justify-center gap-4 px-4">
-        <div className="bg-[#0d1b2a] border border-gray-800 rounded-2xl p-6 max-w-sm w-full text-center">
+        <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-2xl p-6 max-w-sm w-full text-center">
           <div className="text-4xl mb-3">🔒</div>
           <h2 className="text-white font-bold text-lg mb-2">Token-Gated Room</h2>
           <p className="text-gray-400 text-sm mb-1">
@@ -285,7 +285,7 @@ export default function PublicRoomPage() {
           onSaved={(updated) => setRoom(prev => prev ? { ...prev, ...updated } : prev)}
         />
       )}
-      <header className="border-b border-gray-800 bg-[#0d1b2a] relative">
+      <header className="border-b border-white/[0.08] bg-[#0d1b2a] relative">
         {/* Theme accent bar */}
         <div className="absolute top-0 left-0 right-0 h-0.5" style={{ backgroundColor: themeAccent, opacity: 0.5 }} />
 

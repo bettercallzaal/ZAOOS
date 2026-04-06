@@ -45,7 +45,7 @@ export default function StageCard({ room, onJoin, isOwn }: StageCardProps) {
   return (
     <div
       className={`group bg-[#111d2e] rounded-xl p-4 border transition-all duration-200 hover:border-gray-600 hover:shadow-lg hover:shadow-black/20 cursor-pointer ${
-        isOwn ? 'border-[#f5a623]/30 ring-1 ring-[#f5a623]/10' : 'border-gray-800'
+        isOwn ? 'border-[#f5a623]/30 ring-1 ring-[#f5a623]/10' : 'border-white/[0.08]'
       }`}
       onClick={() => onJoin(room)}
       role="button"
@@ -93,7 +93,7 @@ export default function StageCard({ room, onJoin, isOwn }: StageCardProps) {
       )}
 
       {/* Bottom: meta row + join button */}
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-800/60">
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/[0.08]/60">
         <div className="flex items-center gap-3 text-xs text-gray-500">
           {/* Participant count */}
           <span className="flex items-center gap-1">

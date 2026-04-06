@@ -61,7 +61,7 @@ export function NowPlayingHero() {
   if (!isActive) {
     // Idle state: show radio CTA
     return (
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0d1b2a] to-[#1a2a3a] border border-gray-800 p-6">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0d1b2a] to-[#1a2a3a] border border-white/[0.08] p-6">
         {/* Decorative background circles */}
         <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[#f5a623]/5" />
         <div className="absolute -bottom-4 -left-4 w-20 h-20 rounded-full bg-[#f5a623]/3" />
@@ -105,7 +105,7 @@ export function NowPlayingHero() {
 
   // Active state: show current track
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0d1b2a] to-[#1a2a3a] border border-gray-800">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0d1b2a] to-[#1a2a3a] border border-white/[0.08]">
       {/* Blurred background art */}
       {artworkUrl && (
         <div className="absolute inset-0 opacity-20 blur-2xl scale-110">

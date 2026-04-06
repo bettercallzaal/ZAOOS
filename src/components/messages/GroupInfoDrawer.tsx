@@ -28,9 +28,9 @@ export function GroupInfoDrawer({ conversation, members, loading, onClose, onRem
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full max-w-sm bg-[#0d1b2a] border-l border-gray-800 flex flex-col h-full">
+      <div className="relative w-full max-w-sm bg-[#0d1b2a] border-l border-white/[0.08] flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
           <h3 className="text-sm font-semibold text-white">Group Info</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-white" aria-label="Close">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -40,7 +40,7 @@ export function GroupInfoDrawer({ conversation, members, loading, onClose, onRem
         </div>
 
         {/* Group name + description */}
-        <div className="px-4 py-4 border-b border-gray-800">
+        <div className="px-4 py-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg bg-[#f5a623]/15 flex items-center justify-center flex-shrink-0">
               <svg className="w-6 h-6 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
@@ -96,7 +96,7 @@ export function GroupInfoDrawer({ conversation, members, loading, onClose, onRem
         </div>
 
         {/* Leave/Hide */}
-        <div className="px-4 py-4 border-t border-gray-800 space-y-2">
+        <div className="px-4 py-4 border-t border-white/[0.08] space-y-2">
           {confirmLeave ? (
             <div className="space-y-2">
               <p className="text-xs text-gray-400">Leave this group? You&apos;ll need to be re-added by a member.</p>

@@ -24,7 +24,7 @@ export default function LicensePicker({ value, onChange }: LicensePickerProps) {
           className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
             value === preset.id
               ? 'bg-[#f5a623]/10 border-[#f5a623]/40 text-white'
-              : 'bg-[#0a1628] border-gray-800 text-gray-400 hover:border-gray-600'
+              : 'bg-[#0a1628] border-white/[0.08] text-gray-400 hover:border-gray-600'
           }`}
         >
           <div className="flex items-center gap-2">

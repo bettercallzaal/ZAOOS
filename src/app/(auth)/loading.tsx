@@ -2,7 +2,7 @@ export default function AuthLoading() {
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       {/* Header placeholder */}
-      <div className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
+      <div className="px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a]">
         <div className="h-4 w-32 bg-gray-800 rounded animate-pulse" />
       </div>
 
@@ -16,7 +16,7 @@ export default function AuthLoading() {
       </div>
 
       {/* Bottom nav skeleton (mobile) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-gray-800">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-white/[0.08]">
         <div className="flex items-center justify-around h-14 px-2">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex flex-col items-center gap-1">
@@ -28,7 +28,7 @@ export default function AuthLoading() {
       </nav>
 
       {/* Top nav skeleton (desktop) */}
-      <nav className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-[#0d1b2a] border-b border-gray-800">
+      <nav className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-[#0d1b2a] border-b border-white/[0.08]">
         <div className="flex items-center h-10 px-4 max-w-5xl mx-auto gap-4">
           <div className="h-4 w-16 bg-gray-800 rounded animate-pulse" />
           <div className="flex gap-2">

@@ -71,7 +71,7 @@ export function PersistentPlayer({
   // ─── Idle state: entire bar tappable to start radio ────────────────
   if (!hasTrack) {
     return (
-      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-white/[0.08]/80" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <button
           onClick={() => radioLoading ? undefined : onRadioStart?.()}
           disabled={radioLoading}
@@ -152,7 +152,7 @@ export function PersistentPlayer({
       )}
     </AnimatePresence>
 
-    <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80">
+    <div className="fixed bottom-14 md:bottom-0 left-0 right-0 z-30 bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-white/[0.08]/80">
       {/* Seekable progress bar */}
       <div
         role="slider"
@@ -370,7 +370,7 @@ function PersistentVolumeButton() {
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-[#111827] border border-gray-700 rounded-xl shadow-2xl shadow-black/60 p-3 z-50">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-[#111827] border border-white/[0.08] rounded-xl shadow-2xl shadow-black/60 p-3 z-50">
           <div className="flex items-center gap-2 w-40">
             <button
               onClick={() => player.setVolume(player.volume > 0 ? 0 : 1)}

@@ -26,7 +26,7 @@ export function TrackCardSkeleton() {
 export function NowPlayingHeroSkeleton() {
   return (
     <SkeletonTheme baseColor={BASE_COLOR} highlightColor={HIGHLIGHT_COLOR}>
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0d1b2a] to-[#1a2a3a] border border-gray-800">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0d1b2a] to-[#1a2a3a] border border-white/[0.08]">
         <div className="relative flex items-center gap-4 p-4">
           <Skeleton width={80} height={80} borderRadius={12} className="flex-shrink-0" />
           <div className="flex-1 min-w-0">

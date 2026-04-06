@@ -90,7 +90,7 @@ export function RespectTrending() {
     return (
       <div className="mt-8">
         <h2 className="text-lg font-bold text-white mb-4">Trending in ZAO</h2>
-        <div className="text-center py-8 rounded-xl bg-[#0d1b2a] border border-gray-800">
+        <div className="text-center py-8 rounded-xl bg-[#0d1b2a] border border-white/[0.08]">
           <svg
             className="w-8 h-8 text-[#f5a623]/30 mx-auto mb-2"
             viewBox="0 0 24 24"
@@ -145,7 +145,7 @@ export function RespectTrending() {
               {/* Artwork */}
               <div
                 className={`w-12 h-12 rounded-lg border overflow-hidden relative flex-shrink-0 ${
-                  isThisTrack ? 'border-[#f5a623]/40' : 'border-gray-800'
+                  isThisTrack ? 'border-[#f5a623]/40' : 'border-white/[0.08]'
                 }`}
               >
                 <ArtworkImage

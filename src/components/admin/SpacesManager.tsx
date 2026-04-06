@@ -103,7 +103,7 @@ export function SpacesManager() {
       ) : (
         <div className="space-y-2">
           {filtered.map(room => (
-            <div key={room.id} className="flex items-center gap-3 bg-[#0d1b2a] border border-gray-800 rounded-lg px-4 py-3">
+            <div key={room.id} className="flex items-center gap-3 bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-4 py-3">
               {/* Status dot */}
               <span className={`w-2 h-2 rounded-full flex-shrink-0 ${room.state === 'live' ? 'bg-green-500' : 'bg-gray-600'}`} />
 
@@ -137,7 +137,7 @@ export function SpacesManager() {
                 <button
                   onClick={() => handleDelete(room.id)}
                   disabled={deleting === room.id}
-                  className="px-3 py-1 text-xs font-medium text-gray-400 bg-white/5 border border-gray-700 rounded-lg hover:bg-white/10 hover:text-red-400 transition-colors disabled:opacity-50"
+                  className="px-3 py-1 text-xs font-medium text-gray-400 bg-white/5 border border-white/[0.08] rounded-lg hover:bg-white/10 hover:text-red-400 transition-colors disabled:opacity-50"
                 >
                   {deleting === room.id ? 'Deleting...' : 'Delete'}
                 </button>

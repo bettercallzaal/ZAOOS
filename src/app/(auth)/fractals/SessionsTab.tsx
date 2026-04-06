@@ -76,7 +76,7 @@ export function SessionsTab({ isAdmin }: Props) {
         placeholder="Search sessions or participants..."
         value={search}
         onChange={e => setSearch(e.target.value)}
-        className="w-full bg-[#0d1b2a] border border-gray-800 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none mb-2"
+        className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none mb-2"
       />
       <div className="flex gap-1 mb-3">
         {(['all', 'og', 'ordao'] as const).map(era => {
@@ -115,7 +115,7 @@ export function SessionsTab({ isAdmin }: Props) {
         const sorted = [...session.fractal_scores].sort((a, b) => a.rank - b.rank);
 
         return (
-          <div key={session.id} className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+          <div key={session.id} className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
             <button
               onClick={() => setExpanded(isExpanded ? null : session.id)}
               className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-white/5 transition-colors"
@@ -143,7 +143,7 @@ export function SessionsTab({ isAdmin }: Props) {
             </button>
 
             {isExpanded && sorted.length > 0 && (
-              <div className="border-t border-gray-800 px-4 py-3 space-y-2">
+              <div className="border-t border-white/[0.08] px-4 py-3 space-y-2">
                 {sorted.map((score) => (
                   <div key={score.id} className="flex items-center gap-3">
                     <span className={`w-8 text-xs font-bold ${RANK_COLORS[score.rank - 1] ?? 'text-gray-500'}`}>
@@ -154,7 +154,7 @@ export function SessionsTab({ isAdmin }: Props) {
                   </div>
                 ))}
                 {session.notes && (
-                  <p className="text-xs text-gray-600 pt-1 border-t border-gray-800 mt-2">{session.notes}</p>
+                  <p className="text-xs text-gray-600 pt-1 border-t border-white/[0.08] mt-2">{session.notes}</p>
                 )}
               </div>
             )}

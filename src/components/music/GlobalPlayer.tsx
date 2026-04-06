@@ -60,7 +60,7 @@ export function GlobalPlayer({
 
   return (
     <div
-      className="bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-gray-800/80 w-full relative"
+      className="bg-[#0d1b2a]/95 backdrop-blur-xl border-t border-white/[0.08]/80 w-full relative"
       style={{ paddingBottom: safeBottom > 0 ? safeBottom : undefined }}
     >
       {/* Artwork glow effect — subtle color bleed behind the player */}
@@ -429,7 +429,7 @@ function VolumeButton({ player }: { player: ReturnType<typeof usePlayer> }) {
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-[#111827] border border-gray-700 rounded-xl shadow-2xl shadow-black/60 p-3 z-50 w-12 flex flex-col items-center gap-2">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-[#111827] border border-white/[0.08] rounded-xl shadow-2xl shadow-black/60 p-3 z-50 w-12 flex flex-col items-center gap-2">
           <span className="text-[10px] text-gray-400 tabular-nums">
             {Math.round(player.volume * 100)}
           </span>

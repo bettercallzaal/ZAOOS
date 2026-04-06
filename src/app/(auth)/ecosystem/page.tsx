@@ -220,7 +220,7 @@ export default function EcosystemPage() {
       />
 
       {/* App Selector Bar — sticky, horizontal scroll */}
-      <div className="sticky top-0 z-20 bg-[#0d1b2a]/95 backdrop-blur-sm border-b border-gray-800 flex-shrink-0">
+      <div className="sticky top-0 z-20 bg-[#0d1b2a]/95 backdrop-blur-sm border-b border-white/[0.08] flex-shrink-0">
         <div className="flex gap-2 px-3 py-2.5 overflow-x-auto scrollbar-hide">
           {ECOSYSTEM_APPS.map((app, i) => (
             <button
@@ -240,7 +240,7 @@ export default function EcosystemPage() {
       </div>
 
       {/* App Description + Sub-page tabs */}
-      <div className="bg-[#0d1b2a]/50 border-b border-gray-800/50 flex-shrink-0">
+      <div className="bg-[#0d1b2a]/50 border-b border-white/[0.08] flex-shrink-0">
         <p className="text-xs text-gray-400 px-4 py-2">{activeApp.description}</p>
 
         {/* Sub-page tabs — shown when app has sub-pages */}
@@ -315,7 +315,7 @@ export default function EcosystemPage() {
       </div>
 
       {/* Action Bar */}
-      <div className="flex-shrink-0 bg-[#0d1b2a] border-t border-gray-800 px-3 py-2.5">
+      <div className="flex-shrink-0 bg-[#0d1b2a] border-t border-white/[0.08] px-3 py-2.5">
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
           {/* Open in new tab */}
           <a
@@ -387,7 +387,7 @@ export default function EcosystemPage() {
       </div>
 
       {/* More Resources — Collapsible */}
-      <div className="flex-shrink-0 border-t border-gray-800 bg-[#0d1b2a]">
+      <div className="flex-shrink-0 border-t border-white/[0.08] bg-[#0d1b2a]">
         <button
           onClick={() => setResourcesOpen(!resourcesOpen)}
           className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[#1a2a3a]/30 transition-colors"
@@ -416,7 +416,7 @@ export default function EcosystemPage() {
                 value={resourceSearch}
                 onChange={(e) => setResourceSearch(e.target.value)}
                 placeholder="Search resources..."
-                className="w-full pl-9 pr-3 py-2 bg-[#1a2a3a] rounded-lg text-xs text-white placeholder:text-gray-600 border border-gray-700/50 focus:border-[#f5a623]/40 focus:outline-none transition-colors"
+                className="w-full pl-9 pr-3 py-2 bg-[#1a2a3a] rounded-lg text-xs text-white placeholder:text-gray-600 border border-white/[0.08] focus:border-[#f5a623]/40 focus:outline-none transition-colors"
               />
               {resourceSearch && (
                 <button

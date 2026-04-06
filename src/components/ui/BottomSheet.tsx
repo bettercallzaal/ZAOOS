@@ -118,7 +118,7 @@ export function BottomSheet({
         role="dialog"
         aria-modal="true"
         aria-label={title || 'Bottom sheet'}
-        className={`fixed inset-x-0 bottom-0 z-[60] bg-[#0d1b2a] border-t border-gray-700 rounded-t-2xl shadow-xl flex flex-col ${
+        className={`fixed inset-x-0 bottom-0 z-[60] bg-[#0d1b2a] border-t border-white/[0.08] rounded-t-2xl shadow-xl flex flex-col ${
           isClosing ? 'animate-slide-down' : 'animate-slide-up'
         }`}
         style={{
@@ -140,7 +140,7 @@ export function BottomSheet({
 
         {/* Title */}
         {title && (
-          <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-800 flex-shrink-0">
+          <div className="flex items-center justify-between px-4 pb-3 border-b border-white/[0.08] flex-shrink-0">
             <h2 className="text-sm font-semibold text-white">{title}</h2>
             <button
               onClick={handleClose}

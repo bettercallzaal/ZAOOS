@@ -296,7 +296,7 @@ export function ActivityFeed() {
                 )}
                 {/* Type icon badge — bottom-right of avatar */}
                 <div
-                  className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#0a1628] border border-gray-800 flex items-center justify-center ${iconColor(item.type)}`}
+                  className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#0a1628] border border-white/[0.08] flex items-center justify-center ${iconColor(item.type)}`}
                 >
                   <ActivityIcon type={item.type} />
                 </div>

@@ -75,7 +75,7 @@ export function QueueActions({ metadata, compact = false, className = '' }: Queu
       {/* Popover dropdown */}
       {open && (
         <div
-          className="absolute bottom-full right-0 mb-2 w-44 bg-[#111827] border border-gray-700 rounded-xl shadow-2xl shadow-black/60 z-50 overflow-hidden"
+          className="absolute bottom-full right-0 mb-2 w-44 bg-[#111827] border border-white/[0.08] rounded-xl shadow-2xl shadow-black/60 z-50 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -89,7 +89,7 @@ export function QueueActions({ metadata, compact = false, className = '' }: Queu
           </button>
           <button
             onClick={handleAddToQueue}
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 transition-colors text-left border-t border-gray-700/50"
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/5 transition-colors text-left border-t border-white/[0.08]"
           >
             <svg className="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

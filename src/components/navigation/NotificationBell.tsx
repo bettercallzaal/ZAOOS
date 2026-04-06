@@ -165,9 +165,9 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="fixed inset-x-0 top-14 mx-2 max-h-[70vh] sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mx-0 sm:mt-2 sm:w-96 sm:max-h-[28rem] bg-[#0d1b2a] border border-gray-800 rounded-xl shadow-2xl overflow-hidden z-[60]">
+        <div className="fixed inset-x-0 top-14 mx-2 max-h-[70vh] sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mx-0 sm:mt-2 sm:w-96 sm:max-h-[28rem] bg-[#0d1b2a] border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-[60]">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.08]">
             <span className="text-sm font-semibold text-white">
               Notifications
               {unreadCount > 0 && (
@@ -206,7 +206,7 @@ export function NotificationBell() {
                     if (!n.read) markRead(n.id);
                     setOpen(false);
                   }}
-                  className={`flex items-start gap-3 px-4 py-3 border-b border-gray-800/50 hover:bg-white/5 transition-colors ${
+                  className={`flex items-start gap-3 px-4 py-3 border-b border-white/[0.08] hover:bg-white/5 transition-colors ${
                     !n.read ? 'bg-[#f5a623]/[0.04]' : 'opacity-75'
                   }`}
                 >

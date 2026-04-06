@@ -153,7 +153,7 @@ export function FeedFilters({
   );
 
   return (
-    <div className="flex-shrink-0 bg-[#0d1b2a] border-b border-gray-800">
+    <div className="flex-shrink-0 bg-[#0d1b2a] border-b border-white/[0.08]">
       {/* Pills row + sort */}
       <div className="flex items-center gap-2 px-4 py-2">
         {/* Scrollable pills */}
@@ -198,7 +198,7 @@ export function FeedFilters({
           {sortOpen && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setSortOpen(false)} />
-              <div className="absolute right-0 top-full mt-1 z-50 w-36 bg-[#1a2a3a] border border-gray-700 rounded-lg shadow-xl overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 z-50 w-36 bg-[#1a2a3a] border border-white/[0.08] rounded-lg shadow-xl overflow-hidden">
                 {SORT_OPTIONS.map((s) => (
                   <button
                     key={s.id}

@@ -35,7 +35,7 @@ export function NowPlayingBar() {
   };
 
   return (
-    <div className="border-b border-gray-800 bg-[#0d1b2a]/80 backdrop-blur-sm">
+    <div className="border-b border-white/[0.08] bg-[#0d1b2a]/80 backdrop-blur-sm">
       <div className="flex items-center gap-1 px-3 py-1.5 overflow-x-auto scrollbar-hide">
         <span className="text-[10px] text-gray-500 flex-shrink-0 mr-1">
           Listening now

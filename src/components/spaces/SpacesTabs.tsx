@@ -20,7 +20,7 @@ export default function SpacesTabs({ active, onChange, liveBadge, upcomingBadge 
   };
 
   return (
-    <div className="flex border-b border-gray-800" role="tablist">
+    <div className="flex border-b border-white/[0.08]" role="tablist">
       {TABS.map((tab) => (
         <button
           key={tab.id}

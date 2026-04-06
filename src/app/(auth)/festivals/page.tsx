@@ -68,7 +68,7 @@ export default function FestivalsPage() {
                   className={`bg-[#0d1b2a] rounded-xl p-5 border ${
                     event.highlight
                       ? 'border-[#f5a623]/30 bg-gradient-to-r from-[#f5a623]/5 to-transparent'
-                      : 'border-gray-800'
+                      : 'border-white/[0.08]'
                   } ${event.href ? 'hover:border-[#f5a623]/40 transition-colors' : ''}`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -106,7 +106,7 @@ export default function FestivalsPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Past Events</p>
           <div className="space-y-3">
             {PAST.map((event) => (
-              <div key={event.name} className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+              <div key={event.name} className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
                 <div className="flex items-center gap-3">
                   <div>
                     <p className="font-bold text-white">{event.name}</p>

@@ -78,7 +78,7 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
         className={`relative p-2.5 rounded-xl text-sm transition-colors border ${
           myStatus === 'raised'
             ? 'bg-[#f5a623]/15 border-[#f5a623]/40 text-[#f5a623]'
-            : 'bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border-gray-700/50 hover:border-[#f5a623]/40'
+            : 'bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border-white/[0.08] hover:border-[#f5a623]/40'
         }`}
         title={myStatus === 'raised' ? 'Lower hand' : 'Raise hand'}
       >
@@ -96,7 +96,7 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
   if (raisedHands.length === 0) return null;
 
   return (
-    <div className="bg-[#111d2e] border border-gray-700/50 rounded-xl p-3 mx-4 mb-2">
+    <div className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-3 mx-4 mb-2">
       <p className="text-xs font-medium text-gray-400 mb-2">
         Raised Hands ({raisedHands.length})
       </p>

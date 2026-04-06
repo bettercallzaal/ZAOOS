@@ -67,7 +67,7 @@ export default function DiscordIntro({ discordId }: { discordId: string }) {
   });
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         {/* Discord icon */}
@@ -91,7 +91,7 @@ export default function DiscordIntro({ discordId }: { discordId: string }) {
       </div>
 
       {/* Footer with date */}
-      <div className="mt-3 pt-2 border-t border-gray-800/50">
+      <div className="mt-3 pt-2 border-t border-white/[0.08]">
         <p className="text-[10px] text-gray-600">
           Introduced on {postedDate}
         </p>

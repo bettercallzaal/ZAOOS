@@ -303,7 +303,7 @@ export default function FishbowlzPage() {
                     <p className="text-gray-400 text-sm mb-3 line-clamp-2">{room.description}</p>
                   )}
                   {room.gating_enabled && (
-                    <span className="inline-flex items-center gap-1 text-xs bg-purple-600/20 text-purple-400 px-2 py-0.5 rounded-full mb-2">
+                    <span className="inline-flex items-center gap-1 text-xs bg-[#f5a623]/15 text-[#f5a623] px-2 py-0.5 rounded-full mb-2">
                       🔐 FC-gated
                     </span>
                   )}

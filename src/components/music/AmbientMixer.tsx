@@ -216,7 +216,7 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
       {/* Toggle header */}
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-[#0d1b2a] border border-gray-800 hover:border-gray-700 transition-colors"
+        className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-[#0d1b2a] border border-white/[0.08] hover:border-white/[0.08] transition-colors"
       >
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
@@ -255,8 +255,8 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
                   isActive
                     ? 'bg-[#f5a623]/5 border-[#f5a623]/20'
                     : isFile
-                      ? 'bg-[#0d1b2a]/50 border-gray-800/50 opacity-60'
-                      : 'bg-[#0d1b2a] border-gray-800 hover:border-gray-700'
+                      ? 'bg-[#0d1b2a]/50 border-white/[0.08] opacity-60'
+                      : 'bg-[#0d1b2a] border-white/[0.08] hover:border-white/[0.08]'
                 }`}
               >
                 {/* Toggle */}
@@ -313,7 +313,7 @@ export function AmbientMixer({ getAudioCtx }: AmbientMixerProps) {
           })}
 
           {/* Info note */}
-          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-gray-800/30">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.08]/30">
             <svg className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
             </svg>

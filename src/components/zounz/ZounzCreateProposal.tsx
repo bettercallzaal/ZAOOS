@@ -15,7 +15,7 @@ interface Props {
 type ProposalType = 'text' | 'transfer';
 
 const INPUT_CLASS =
-  'w-full bg-[#0a1628] border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50';
+  'w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50';
 
 export default function ZounzCreateProposal({
   onClose,
@@ -168,7 +168,7 @@ export default function ZounzCreateProposal({
                   className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                     proposalType === type
                       ? 'border-[#f5a623] bg-[#f5a623]/10 text-[#f5a623]'
-                      : 'border-gray-700/50 bg-[#0a1628] text-gray-400 hover:border-gray-600 hover:text-gray-300'
+                      : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600 hover:text-gray-300'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {type === 'text' ? 'Text Proposal' : 'Treasury Transfer'}
@@ -179,7 +179,7 @@ export default function ZounzCreateProposal({
 
           {/* Treasury transfer fields */}
           {proposalType === 'transfer' && (
-            <div className="space-y-3 rounded-lg border border-gray-700/40 bg-[#0a1628]/60 p-4">
+            <div className="space-y-3 rounded-lg border border-white/[0.08]/40 bg-[#0a1628]/60 p-4">
               <div>
                 <label className="mb-1 block text-xs font-medium text-gray-400">
                   Recipient Address
@@ -241,7 +241,7 @@ export default function ZounzCreateProposal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-gray-700/50 bg-transparent px-4 py-2 text-sm text-gray-400 hover:border-gray-600 hover:text-gray-300 transition-colors"
+              className="flex-1 rounded-lg border border-white/[0.08] bg-transparent px-4 py-2 text-sm text-gray-400 hover:border-gray-600 hover:text-gray-300 transition-colors"
               disabled={isPending || isConfirming}
             >
               Cancel

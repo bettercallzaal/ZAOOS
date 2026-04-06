@@ -36,7 +36,7 @@ function LibraryContent() {
         <SubmitForm onSubmitted={() => setRefreshKey((k) => k + 1)} />
       </section>
 
-      <div className="flex gap-2 border-b border-gray-800 pb-1" role="tablist">
+      <div className="flex gap-2 border-b border-white/[0.08] pb-1" role="tablist">
         <button
           role="tab"
           aria-selected={activeSection === 'submissions'}

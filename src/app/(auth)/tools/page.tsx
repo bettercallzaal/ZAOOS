@@ -49,7 +49,7 @@ export default async function ToolsPage() {
         {profile ? (
           <ProfileCard profile={profile} />
         ) : (
-          <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 text-center">
+          <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] text-center">
             <p className="text-sm text-gray-400">Log in to see your profile</p>
           </div>
         )}
@@ -75,7 +75,7 @@ export default async function ToolsPage() {
 
           <Link
             href="/calls"
-            className="block bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/30 transition-colors"
+            className="block bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors"
           >
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
@@ -90,7 +90,7 @@ export default async function ToolsPage() {
 
           <Link
             href="/social"
-            className="block bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/30 transition-colors"
+            className="block bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors"
           >
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
@@ -105,7 +105,7 @@ export default async function ToolsPage() {
 
           <a
             href="/chat"
-            className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/30 transition-colors block"
+            className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors block"
           >
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
@@ -124,7 +124,7 @@ export default async function ToolsPage() {
         <div className="space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Coming Soon</p>
 
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-dashed border-gray-700">
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-dashed border-white/[0.08]">
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
@@ -137,7 +137,7 @@ export default async function ToolsPage() {
             </div>
           </div>
 
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-dashed border-gray-700">
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-dashed border-white/[0.08]">
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />

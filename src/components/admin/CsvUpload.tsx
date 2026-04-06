@@ -64,7 +64,7 @@ export function CsvUpload({ onUploaded }: { onUploaded: () => void }) {
           className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
             dragOver
               ? 'border-[#f5a623] bg-[#f5a623]/5'
-              : 'border-gray-700 hover:border-gray-600'
+              : 'border-white/[0.08] hover:border-gray-600'
           }`}
         >
           <svg className="w-8 h-8 text-gray-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

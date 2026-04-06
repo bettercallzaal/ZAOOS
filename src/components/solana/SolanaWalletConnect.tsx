@@ -109,11 +109,11 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
     return (
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-purple-400" />
+          <span className="w-2 h-2 rounded-full bg-[#f5a623]" />
           <span className="text-sm text-white">Solana</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-purple-400 font-mono">{shortAddr(savedWallet)}</span>
+          <span className="text-xs text-[#f5a623] font-mono">{shortAddr(savedWallet)}</span>
           <button
             onClick={handleDisconnect}
             disabled={saving}
@@ -153,7 +153,7 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
             <button
               onClick={handleVerifyAndSave}
               disabled={saving}
-              className="text-[10px] text-purple-400 hover:text-purple-300 transition-colors disabled:opacity-50"
+              className="text-[10px] text-[#f5a623] hover:text-[#ffd700] transition-colors disabled:opacity-50"
             >
               {saving ? 'Verifying...' : 'Verify & Save'}
             </button>
@@ -176,14 +176,14 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
         </div>
         <button
           onClick={() => setShowWalletPicker(!showWalletPicker)}
-          className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+          className="text-xs text-[#f5a623] hover:text-[#ffd700] transition-colors"
         >
           Connect
         </button>
       </div>
 
       {showWalletPicker && (
-        <div className="mt-2 bg-[#0a1628] rounded-lg p-3 border border-gray-700 space-y-2">
+        <div className="mt-2 bg-[#0a1628] rounded-lg p-3 border border-white/[0.08] space-y-2">
           <p className="text-[10px] text-gray-500">Choose a Solana wallet</p>
           {availableWallets.length === 0 ? (
             <div className="space-y-2">
@@ -192,7 +192,7 @@ export function SolanaWalletConnect({ savedWallet, onSaved }: SolanaWalletConnec
                 href="https://phantom.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-[10px] text-purple-400 hover:text-purple-300"
+                className="block text-[10px] text-[#f5a623] hover:text-[#ffd700]"
               >
                 Install Phantom &rarr;
               </a>

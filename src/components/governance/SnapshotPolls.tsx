@@ -81,7 +81,7 @@ export function SnapshotPolls() {
 
   if (allPolls.length === 0 && closedPolls.length === 0) {
     return (
-      <div className="text-center py-6 bg-[#0d1b2a] rounded-xl border border-gray-800">
+      <div className="text-center py-6 bg-[#0d1b2a] rounded-xl border border-white/[0.08]">
         <p className="text-gray-400 text-sm">No Snapshot polls yet.</p>
         <p className="text-xs text-gray-600 mt-1">Polls will appear here once created on Snapshot.</p>
       </div>
@@ -159,7 +159,7 @@ function PollCard({
       className={`bg-[#0d1b2a] rounded-xl overflow-hidden transition-colors ${
         isActive
           ? 'border border-[#f5a623]/30 hover:border-[#f5a623]/50'
-          : 'border border-gray-800 hover:border-gray-700 opacity-80'
+          : 'border border-white/[0.08] hover:border-white/[0.08] opacity-80'
       }`}
     >
       {/* Header — always visible */}
@@ -260,7 +260,7 @@ function PollCard({
               className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
                 isActive
                   ? 'bg-[#f5a623]/15 text-[#f5a623] hover:bg-[#f5a623]/25 border border-[#f5a623]/30'
-                  : 'bg-gray-800 text-gray-400 hover:text-gray-300 border border-gray-700'
+                  : 'bg-gray-800 text-gray-400 hover:text-gray-300 border border-white/[0.08]'
               }`}
             >
               {isActive ? 'Vote on Snapshot' : 'View on Snapshot'}

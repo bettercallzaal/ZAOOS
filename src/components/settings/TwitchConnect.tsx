@@ -79,7 +79,7 @@ export function TwitchConnect() {
 
   if (loading) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 animate-pulse">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 animate-pulse">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gray-800" />
           <div className="space-y-1.5">
@@ -92,7 +92,7 @@ export function TwitchConnect() {
   }
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
       {/* Header row */}
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
@@ -136,14 +136,14 @@ export function TwitchConnect() {
 
       {/* Stream credentials (only when connected) */}
       {connection.connected && (connection.streamKey || connection.rtmpUrl) && (
-        <div className="px-4 pb-4 space-y-2 border-t border-gray-800/50 pt-3">
+        <div className="px-4 pb-4 space-y-2 border-t border-white/[0.08] pt-3">
           <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
             Stream Credentials
           </p>
 
           {/* RTMP URL */}
           {connection.rtmpUrl && (
-            <div className="flex items-center gap-2 bg-[#0a1628] rounded-lg px-3 py-2 border border-gray-800">
+            <div className="flex items-center gap-2 bg-[#0a1628] rounded-lg px-3 py-2 border border-white/[0.08]">
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] text-gray-600 mb-0.5">RTMP URL</p>
                 <p className="text-xs text-gray-300 font-mono truncate">{connection.rtmpUrl}</p>
@@ -164,7 +164,7 @@ export function TwitchConnect() {
 
           {/* Stream Key */}
           {connection.streamKey && (
-            <div className="flex items-center gap-2 bg-[#0a1628] rounded-lg px-3 py-2 border border-gray-800">
+            <div className="flex items-center gap-2 bg-[#0a1628] rounded-lg px-3 py-2 border border-white/[0.08]">
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] text-gray-600 mb-0.5">Stream Key</p>
                 <p className="text-xs text-gray-300 font-mono truncate">

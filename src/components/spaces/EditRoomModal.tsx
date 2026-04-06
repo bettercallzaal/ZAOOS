@@ -60,7 +60,7 @@ export function EditRoomModal({ roomId, currentTitle, currentDescription, curren
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => e.key === 'Escape' && onClose()}>
-      <div className="bg-[#0d1b2a] rounded-2xl border border-gray-800 w-full max-w-md mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()}>
+      <div className="bg-[#0d1b2a] rounded-2xl border border-white/[0.08] w-full max-w-md mx-4 p-6 space-y-4" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-white">Edit Room</h2>
           <button onClick={onClose} aria-label="Close" className="p-1.5 text-gray-500 hover:text-white rounded-lg hover:bg-gray-800 transition-colors">
@@ -81,7 +81,7 @@ export function EditRoomModal({ roomId, currentTitle, currentDescription, curren
                 key={t.id}
                 onClick={() => setTheme(t.id)}
                 className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl border transition-colors ${
-                  theme === t.id ? 'border-[#f5a623] bg-[#f5a623]/5' : 'border-gray-700 hover:border-gray-600'
+                  theme === t.id ? 'border-[#f5a623] bg-[#f5a623]/5' : 'border-white/[0.08] hover:border-gray-600'
                 }`}
               >
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: t.color }} />
@@ -99,7 +99,7 @@ export function EditRoomModal({ roomId, currentTitle, currentDescription, curren
             value={title}
             onChange={e => setTitle(e.target.value)}
             maxLength={100}
-            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none"
           />
           <p className="text-[10px] text-gray-600 text-right mt-1">{title.length}/100</p>
         </div>
@@ -112,7 +112,7 @@ export function EditRoomModal({ roomId, currentTitle, currentDescription, curren
             onChange={e => setDescription(e.target.value)}
             maxLength={500}
             rows={3}
-            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none resize-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none resize-none"
           />
           <p className="text-[10px] text-gray-600 text-right mt-1">{description.length}/500</p>
         </div>

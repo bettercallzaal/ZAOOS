@@ -72,7 +72,7 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
       </div>
 
       {enabled && (
-        <div className="space-y-3 p-3 bg-[#0a1628] border border-gray-700/50 rounded-xl">
+        <div className="space-y-3 p-3 bg-[#0a1628] border border-white/[0.08] rounded-xl">
           <p className="text-gray-500 text-xs">
             Require a token to join this room
           </p>
@@ -88,7 +88,7 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
                 className={`px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
                   value?.type === t.id
                     ? 'bg-[#f5a623]/15 text-[#f5a623] border border-[#f5a623]/30'
-                    : 'bg-[#0d1b2a] text-gray-500 border border-gray-700/50 hover:border-gray-600'
+                    : 'bg-[#0d1b2a] text-gray-500 border border-white/[0.08] hover:border-gray-600'
                 }`}
               >
                 {t.label}
@@ -105,7 +105,7 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
               value={value?.chainId || 8453}
               onChange={(e) => update({ chainId: Number(e.target.value) })}
               disabled={disabled}
-              className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-xs focus:border-[#f5a623] focus:outline-none"
+              className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-xs focus:border-[#f5a623] focus:outline-none"
             >
               {CHAINS.map((c) => (
                 <option key={c.id} value={c.id}>{c.label}</option>
@@ -124,7 +124,7 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
               onChange={(e) => update({ contractAddress: e.target.value })}
               placeholder="0x..."
               disabled={disabled}
-              className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-xs font-mono focus:border-[#f5a623] focus:outline-none"
+              className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-xs font-mono focus:border-[#f5a623] focus:outline-none"
             />
           </div>
 
@@ -140,7 +140,7 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
                 onChange={(e) => update({ minBalance: e.target.value })}
                 placeholder="1000000000000000000"
                 disabled={disabled}
-                className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-xs font-mono focus:border-[#f5a623] focus:outline-none"
+                className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-xs font-mono focus:border-[#f5a623] focus:outline-none"
               />
             </div>
           )}
@@ -157,7 +157,7 @@ export function TokenGateSection({ value, onChange, disabled }: TokenGateSection
                 onChange={(e) => update({ tokenId: e.target.value })}
                 placeholder="1"
                 disabled={disabled}
-                className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-2 text-white text-xs font-mono focus:border-[#f5a623] focus:outline-none"
+                className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-xs font-mono focus:border-[#f5a623] focus:outline-none"
               />
             </div>
           )}

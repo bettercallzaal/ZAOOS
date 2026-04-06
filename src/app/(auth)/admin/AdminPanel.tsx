@@ -88,7 +88,7 @@ export function AdminPanel() {
       />
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-800">
+      <div className="border-b border-white/[0.08]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <nav className="flex -mb-px overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
             {tabGroups.map((group, gi) => (

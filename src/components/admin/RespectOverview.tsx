@@ -149,11 +149,11 @@ export function RespectOverview() {
           {search ? 'No members match your search' : 'No respect data yet'}
         </div>
       ) : (
-        <div className="bg-[#1a2a3a] rounded-xl border border-gray-800/50 overflow-hidden">
+        <div className="bg-[#1a2a3a] rounded-xl border border-white/[0.08] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800">
+                <tr className="border-b border-white/[0.08]">
                   <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">#</th>
                   <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">Name</th>
                   <th className="text-left text-xs text-gray-500 font-medium px-4 py-3 whitespace-nowrap">Wallet</th>
@@ -169,7 +169,7 @@ export function RespectOverview() {
                 {filtered.map((entry) => (
                   <tr
                     key={entry.wallet || entry.name}
-                    className={`border-b border-gray-800/30 ${
+                    className={`border-b border-white/[0.08]/30 ${
                       entry.rank <= 3 ? 'bg-[#f5a623]/5' : ''
                     } hover:bg-white/5 transition-colors`}
                   >

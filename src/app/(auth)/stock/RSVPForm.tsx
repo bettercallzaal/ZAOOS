@@ -70,7 +70,7 @@ export function RSVPForm({ eventSlug }: RSVPFormProps) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="flex-1 bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
+          className="flex-1 bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
         />
         <input
           type="email"
@@ -78,7 +78,7 @@ export function RSVPForm({ eventSlug }: RSVPFormProps) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="flex-1 bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
+          className="flex-1 bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
         />
       </div>
       <button

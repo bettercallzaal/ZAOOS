@@ -91,7 +91,7 @@ export function EventsCalendar() {
             className={`bg-[#0d1b2a] rounded-xl border overflow-hidden transition-colors ${
               evt.is_within_24h
                 ? 'border-[#f5a623]/40 bg-[#f5a623]/5'
-                : 'border-gray-800'
+                : 'border-white/[0.08]'
             }`}
           >
             <div className="px-4 py-3">
@@ -133,7 +133,7 @@ export function EventsCalendar() {
 
               {/* Reminder status markers */}
               {evt.is_within_24h && (
-                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-800/50">
+                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/[0.08]">
                   <div className={`flex items-center gap-1 text-[10px] ${
                     evt.reminders.within24h ? 'text-[#f5a623]' : 'text-gray-700'
                   }`}>

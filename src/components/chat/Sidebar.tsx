@@ -131,14 +131,14 @@ export function Sidebar({
 
       <aside
         className={`
-          fixed top-0 left-0 h-full w-64 bg-[#0d1b2a] border-r border-gray-800 z-50
+          fixed top-0 left-0 h-full w-64 bg-[#0d1b2a] border-r border-white/[0.08] z-50
           flex flex-col transition-transform duration-200 overflow-y-auto overflow-x-hidden
           md:translate-x-0 md:static md:z-auto
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         {/* Logo */}
-        <div className="p-4 border-b border-gray-800 flex-shrink-0">
+        <div className="p-4 border-b border-white/[0.08] flex-shrink-0">
           <h1 className="text-xl font-bold text-[#f5a623] tracking-wide">THE ZAO</h1>
           <p className="text-xs text-gray-500 mt-1">Community on Farcaster</p>
         </div>
@@ -673,7 +673,7 @@ export function Sidebar({
         </div>
 
         {/* ── User footer ──────────────────────────────────────────────── */}
-        <div className="p-3 border-t border-gray-800 flex-shrink-0">
+        <div className="p-3 border-t border-white/[0.08] flex-shrink-0">
           <div className="flex items-center gap-3">
             {user.pfpUrl ? (
               <div className="w-8 h-8 relative flex-shrink-0">

@@ -30,6 +30,8 @@ const GENRES = [
 
 export function AiMusicGenerator() {
   const [prompt, setPrompt] = useState('');
+  const [lyrics, setLyrics] = useState('');
+  const [showLyrics, setShowLyrics] = useState(false);
   const [duration, setDuration] = useState(30);
   const [state, setState] = useState<GenerateState>('idle');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -82,7 +84,11 @@ export function AiMusicGenerator() {
       const res = await fetch('/api/music/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt.trim(), duration }),
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          lyrics: lyrics.trim(),
+          duration,
+        }),
         signal: abortRef.current.signal,
       });
 
@@ -114,7 +120,7 @@ export function AiMusicGenerator() {
         timerRef.current = null;
       }
     }
-  }, [prompt, duration]);
+  }, [prompt, lyrics, duration]);
 
   // Download the generated audio
   const handleDownload = useCallback(() => {
@@ -147,7 +153,7 @@ export function AiMusicGenerator() {
         </div>
         <div>
           <h2 className="text-lg font-bold text-white">AI Music Generator</h2>
-          <p className="text-xs text-gray-500">Powered by ACE-Step</p>
+          <p className="text-xs text-gray-500">Powered by ACE-Step v1.5</p>
         </div>
       </div>
 
@@ -160,11 +166,11 @@ export function AiMusicGenerator() {
           id="ai-prompt"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Describe the music you want to create..."
+          placeholder="e.g. chill lo-fi beat with piano and rain sounds, 90 BPM"
           maxLength={500}
           rows={3}
           disabled={isGenerating}
-          className="w-full bg-white/5 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#f5a623]/50 focus:border-[#f5a623]/50 disabled:opacity-50 transition-all"
+          className="w-full bg-white/5 border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#f5a623]/50 focus:border-[#f5a623]/50 disabled:opacity-50 transition-all"
         />
         <div className="flex justify-between items-center">
           <p className="text-xs text-gray-600">{prompt.length}/500</p>
@@ -195,6 +201,32 @@ export function AiMusicGenerator() {
         </div>
       </div>
 
+      {/* Lyrics Toggle + Input */}
+      <div className="space-y-2">
+        <button
+          onClick={() => setShowLyrics(!showLyrics)}
+          disabled={isGenerating}
+          className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors disabled:opacity-50"
+        >
+          <svg className={`w-4 h-4 transition-transform ${showLyrics ? 'rotate-90' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          Add lyrics <span className="text-gray-600 font-normal">(optional — enables vocals)</span>
+        </button>
+        {showLyrics && (
+          <textarea
+            id="ai-lyrics"
+            value={lyrics}
+            onChange={(e) => setLyrics(e.target.value)}
+            placeholder={"[Verse 1]\nWalking through the city lights tonight\nEvery sound becomes a melody\n\n[Chorus]\nWe are the music makers..."}
+            maxLength={2000}
+            rows={5}
+            disabled={isGenerating}
+            className="w-full bg-white/5 border border-white/[0.08] rounded-xl px-4 py-3 text-white placeholder-gray-500 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#f5a623]/50 focus:border-[#f5a623]/50 disabled:opacity-50 transition-all"
+          />
+        )}
+      </div>
+
       {/* Duration Slider */}
       <div className="space-y-2">
         <div className="flex justify-between items-center">
@@ -206,8 +238,8 @@ export function AiMusicGenerator() {
         <input
           id="ai-duration"
           type="range"
-          min={5}
-          max={60}
+          min={10}
+          max={120}
           step={5}
           value={duration}
           onChange={(e) => setDuration(Number(e.target.value))}
@@ -215,9 +247,9 @@ export function AiMusicGenerator() {
           className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10 accent-[#f5a623] disabled:opacity-50"
         />
         <div className="flex justify-between text-xs text-gray-600">
-          <span>5s</span>
-          <span>30s</span>
+          <span>10s</span>
           <span>60s</span>
+          <span>120s</span>
         </div>
       </div>
 
@@ -235,10 +267,10 @@ export function AiMusicGenerator() {
       {/* Loading State */}
       {state === 'loading' && (
         <div className="space-y-4">
-          <div className="rounded-xl border border-gray-800 bg-white/[0.02] p-6 text-center space-y-4">
+          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 text-center space-y-4">
             {/* Animated spinner */}
             <div className="relative w-16 h-16 mx-auto">
-              <div className="absolute inset-0 rounded-full border-2 border-gray-700" />
+              <div className="absolute inset-0 rounded-full border-2 border-white/[0.08]" />
               <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-[#f5a623] animate-spin" />
               <div className="absolute inset-2 rounded-full border-2 border-transparent border-b-purple-500 animate-spin [animation-direction:reverse] [animation-duration:1.5s]" />
               <div className="absolute inset-0 flex items-center justify-center">
@@ -249,7 +281,7 @@ export function AiMusicGenerator() {
             <div>
               <p className="text-sm font-medium text-white">Generating your track...</p>
               <p className="text-xs text-gray-500 mt-1">
-                This can take up to 2 minutes
+                ACE-Step v1.5 is working — this can take 30s to 2 minutes
               </p>
             </div>
 
@@ -347,8 +379,6 @@ export function AiMusicGenerator() {
           </button>
         </div>
       )}
-
-      {/* Keyframes injected via useEffect below */}
     </div>
   );
 }

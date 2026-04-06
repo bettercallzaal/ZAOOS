@@ -24,7 +24,7 @@ function timeAgo(dateStr: string): string {
 
 function SkeletonCard() {
   return (
-    <div className="bg-[#0a1628] rounded-lg border border-gray-800 p-3 animate-pulse">
+    <div className="bg-[#0a1628] rounded-lg border border-white/[0.08] p-3 animate-pulse">
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 space-y-2">
           <div className="h-3.5 bg-gray-700 rounded w-3/4" />
@@ -49,7 +49,7 @@ function BattleCard({ battle }: { battle: Battle }) {
   const bWon = battle.winner === battle.artist_b;
 
   return (
-    <div className="bg-[#0a1628] rounded-lg border border-gray-800 p-3">
+    <div className="bg-[#0a1628] rounded-lg border border-white/[0.08] p-3">
       {/* Artists row */}
       <div className="flex items-center gap-2">
         {/* Artist A */}
@@ -145,7 +145,7 @@ export default function BattleLog() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search artist…"
-          className="w-full sm:w-48 px-3 py-1.5 text-xs rounded-lg bg-[#0d1b2a] border border-gray-700 text-gray-200 placeholder-gray-600 focus:outline-none focus:border-[#f5a623] transition-colors"
+          className="w-full sm:w-48 px-3 py-1.5 text-xs rounded-lg bg-[#0d1b2a] border border-white/[0.08] text-gray-200 placeholder-gray-600 focus:outline-none focus:border-[#f5a623] transition-colors"
         />
       </div>
 
@@ -159,7 +159,7 @@ export default function BattleLog() {
         {loading ? (
           Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
         ) : battles.length === 0 ? (
-          <div className="bg-[#0a1628] rounded-lg border border-gray-800 p-6 text-center">
+          <div className="bg-[#0a1628] rounded-lg border border-white/[0.08] p-6 text-center">
             <p className="text-sm text-gray-500">No battles recorded yet</p>
           </div>
         ) : (

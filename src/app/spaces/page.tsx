@@ -141,7 +141,7 @@ function LiveTab({ loading, stages, myRooms, otherRooms, user, onHost, onJoin }:
     return (
       <div className="grid gap-4 md:grid-cols-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-[#111d2e] border border-gray-800 rounded-xl p-5 animate-pulse h-44" />
+          <div key={i} className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-5 animate-pulse h-44" />
         ))}
       </div>
     );

@@ -20,7 +20,7 @@ export default function ExportButton() {
     <div className="relative inline-block">
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 rounded-lg border border-gray-700 bg-[#0d1b2a] px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:bg-white/5"
+        className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-[#0d1b2a] px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:bg-white/5"
       >
         <svg
           className="h-4 w-4"
@@ -46,7 +46,7 @@ export default function ExportButton() {
             onClick={() => setOpen(false)}
           />
 
-          <div className="absolute right-0 z-50 mt-2 w-52 rounded-lg border border-gray-700 bg-[#0d1b2a] py-1 shadow-xl">
+          <div className="absolute right-0 z-50 mt-2 w-52 rounded-lg border border-white/[0.08] bg-[#0d1b2a] py-1 shadow-xl">
             <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
               CSV
             </div>
@@ -60,7 +60,7 @@ export default function ExportButton() {
               </button>
             ))}
 
-            <div className="my-1 border-t border-gray-700" />
+            <div className="my-1 border-t border-white/[0.08]" />
 
             <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
               JSON

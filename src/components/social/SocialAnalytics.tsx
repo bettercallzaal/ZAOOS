@@ -55,7 +55,7 @@ function fmt(n: number): string {
 
 function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+    <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
       <p className={`text-xl font-bold ${accent ? 'text-[#f5a623]' : 'text-white'}`}>{value}</p>
       <p className="text-[11px] text-gray-500 mt-1">{label}</p>
     </div>
@@ -203,7 +203,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
         <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Your Network</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {loading ? Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 animate-pulse">
+            <div key={i} className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] animate-pulse">
               <Skel className="h-6 w-16 mb-2" /><Skel className="h-3 w-20" />
             </div>
           )) : stats ? (
@@ -223,11 +223,11 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
       <div>
         <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Network Quality</h3>
         {loading ? (
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 animate-pulse space-y-3">
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] animate-pulse space-y-3">
             <Skel className="h-3 w-32" /><Skel className="h-2 w-full" /><Skel className="h-3 w-28" />
           </div>
         ) : stats ? (
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-4">
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-4">
             <div>
               <div className="flex justify-between items-baseline mb-1.5">
                 <span className="text-xs text-gray-400">Avg Engagement Score</span>
@@ -242,7 +242,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
               </div>
               <ScoreBar score={stats.powerBadgePercent} max={100} />
             </div>
-            <div className="flex justify-between items-baseline pt-1 border-t border-gray-800">
+            <div className="flex justify-between items-baseline pt-1 border-t border-white/[0.08]">
               <span className="text-xs text-gray-400">Follower / Following Ratio</span>
               <span className={`text-sm font-semibold ${stats.ratio >= 1 ? 'text-green-400' : 'text-gray-300'}`}>{stats.ratio}x</span>
             </div>
@@ -256,7 +256,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
         {growthLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 animate-pulse">
+              <div key={i} className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] animate-pulse">
                 <Skel className="h-3 w-20 mb-3" />
                 <Skel className="h-8 w-full mb-2" />
                 <div className="flex justify-between"><Skel className="h-5 w-12" /><Skel className="h-4 w-10" /></div>
@@ -270,7 +270,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
               { label: 'Following', data: growth.following, value: growth.currentFollowing, change: growth.followingChange, color: '#60a5fa' },
               { label: 'Engagement', data: growth.engagement, value: growth.currentEngagement, change: growth.engagementChange, color: '#a78bfa' },
             ] as const).map((metric) => (
-              <div key={metric.label} className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+              <div key={metric.label} className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
                 <p className="text-[11px] text-gray-500 mb-2">{metric.label}</p>
                 <Sparkline data={metric.data} color={metric.color} width={120} height={32} />
                 <div className="flex items-baseline justify-between mt-2">
@@ -285,7 +285,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
             ))}
           </div>
         ) : (
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 px-4 py-8 text-center">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] px-4 py-8 text-center">
             <p className="text-sm text-gray-500">Growth tracking starts tomorrow</p>
             <p className="text-[11px] text-gray-600 mt-1">Daily snapshots will build your trend charts over time</p>
           </div>
@@ -296,7 +296,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
       <div>
         <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Recent Unfollowers</h3>
         {unfollowersLoading ? (
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex items-center gap-3 px-3 py-2.5 animate-pulse">
                 <Skel className="w-8 h-8 rounded-full" />
@@ -305,7 +305,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
             ))}
           </div>
         ) : unfollowers && unfollowers.length > 0 ? (
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800">
             {unfollowers.slice(0, 8).map((u) => (
               <div key={u.fid} className="flex items-center gap-3 px-3 py-2.5">
                 <Avatar src={u.pfp_url} alt={`${u.display_name || u.username} avatar`} />
@@ -320,7 +320,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
             ))}
           </div>
         ) : (
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 px-4 py-8 text-center">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] px-4 py-8 text-center">
             <p className="text-sm text-gray-500">No unfollower data yet</p>
             <p className="text-[11px] text-gray-600 mt-1">Unfollowers are tracked with daily snapshots of your network</p>
           </div>
@@ -331,7 +331,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
       <div>
         <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Top Engaged Followers</h3>
         {loading ? (
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center gap-3 px-3 py-2.5 animate-pulse">
                 <Skel className="w-9 h-9 rounded-full" />
@@ -340,7 +340,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
             ))}
           </div>
         ) : topFollowers.length > 0 ? (
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800">
             {topFollowers.map((user) => {
               const score = user.experimental?.neynar_user_score ?? 0;
               const isFollowed = followingFids.has(user.fid);
@@ -374,7 +374,7 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
             })}
           </div>
         ) : (
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 px-4 py-8 text-center">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] px-4 py-8 text-center">
             <p className="text-sm text-gray-500">No engagement data available yet</p>
             <p className="text-[11px] text-gray-600 mt-1">Scores will appear as followers interact with the network</p>
           </div>
@@ -385,9 +385,9 @@ export function SocialAnalytics({ currentFid }: { currentFid: number }) {
       {channelRanks !== null && (
         <div>
           <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">/thezao Channel Influence</h3>
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 space-y-3">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 space-y-3">
             {userRank && (
-              <div className="flex items-center justify-between pb-3 border-b border-gray-800">
+              <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
                 <span className="text-xs text-gray-400">Your rank</span>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-[#f5a623]">#{userRank}</span>

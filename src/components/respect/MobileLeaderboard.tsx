@@ -35,7 +35,7 @@ function cardBg(rank: number, selected: boolean): string {
   if (selected) return 'bg-[#f5a623]/15 border-[#f5a623]/50';
   if (rank === 1) return 'bg-gradient-to-br from-[#f5a623]/15 to-[#1e3a5f] border-[#f5a623]/40';
   if (rank <= 3) return 'bg-[#1e3a5f]/60 border-[#f5a623]/20';
-  return 'bg-[#0d1b2a] border-gray-800';
+  return 'bg-[#0d1b2a] border-white/[0.08]';
 }
 
 function EntryCard({

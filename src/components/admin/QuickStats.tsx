@@ -85,7 +85,7 @@ export default function QuickStats() {
           {cards.map((card) => (
             <div
               key={card.label}
-              className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800/50"
+              className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08]"
             >
               <div
                 className={`text-lg font-bold ${

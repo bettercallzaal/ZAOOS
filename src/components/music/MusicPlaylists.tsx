@@ -30,7 +30,7 @@ export function PlaylistsSection({ radio }: { radio: ReturnType<typeof useRadio>
               className={`flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${
                 isActive
                   ? 'bg-[#f5a623]/10 border-[#f5a623]/30'
-                  : 'bg-[#0d1b2a] border-gray-800 hover:border-gray-700'
+                  : 'bg-[#0d1b2a] border-white/[0.08] hover:border-white/[0.08]'
               }`}
             >
               {/* Playlist artwork */}

@@ -35,7 +35,7 @@ export function ConversationList({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-4 border-b border-white/[0.08]">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-bold text-white">Messages</h2>
           <div className="flex gap-1">

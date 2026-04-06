@@ -57,7 +57,7 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
   // Loading skeleton
   if (loading) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 animate-pulse">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 animate-pulse">
         <div className="h-3 w-32 bg-[#1a2a3a] rounded mb-3" />
         <div className="flex justify-center gap-2">
           <div className="w-20 h-20 rounded-full bg-[#1a2a3a]" />
@@ -68,7 +68,7 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
   }
 
   if (error) return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
       <p className="text-red-400 text-sm text-center">{error}</p>
     </div>
   );
@@ -79,7 +79,7 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
 
   if (!hasShared) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
         <p className="text-xs text-gray-500 text-center">
           No shared connections found with @{targetUsername}
         </p>
@@ -93,7 +93,7 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
   const rightR = maxR;
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4">
       <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">
         Network Overlap
       </p>

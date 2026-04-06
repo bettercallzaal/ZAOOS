@@ -60,17 +60,17 @@ function CreatePlaylistModal({ onClose, onCreated }: { onClose: () => void; onCr
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="bg-[#0d1b2a] border border-gray-700 rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-lg font-bold text-white mb-4">Create Collaborative Playlist</h3>
         <input
-          className="w-full bg-white/5 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-3 focus:outline-none focus:border-[#f5a623]"
+          className="w-full bg-white/5 border border-white/[0.08] rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-3 focus:outline-none focus:border-[#f5a623]"
           placeholder="Playlist name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           maxLength={100}
         />
         <textarea
-          className="w-full bg-white/5 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-4 resize-none focus:outline-none focus:border-[#f5a623]"
+          className="w-full bg-white/5 border border-white/[0.08] rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-4 resize-none focus:outline-none focus:border-[#f5a623]"
           placeholder="Description (optional)"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -91,7 +91,7 @@ function CreatePlaylistModal({ onClose, onCreated }: { onClose: () => void; onCr
 // ── Playlist Card ──────────────────────────────────────────────────────
 function PlaylistCard({ playlist, onClick }: { playlist: Playlist; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="w-full text-left bg-[#0d1b2a] border border-gray-800/50 rounded-xl p-4 hover:border-[#f5a623]/30 transition-all group">
+    <button onClick={onClick} className="w-full text-left bg-[#0d1b2a] border border-white/[0.08] rounded-xl p-4 hover:border-[#f5a623]/30 transition-all group">
       <div className="flex items-start gap-3">
         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#f5a623]/20 to-[#f5a623]/5 flex items-center justify-center flex-shrink-0">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

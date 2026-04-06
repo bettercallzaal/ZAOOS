@@ -45,7 +45,7 @@ export default function DiscordActivity({ discordId }: { discordId: string | nul
   if (!hasActivity) return null;
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
       <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Discord Activity</p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

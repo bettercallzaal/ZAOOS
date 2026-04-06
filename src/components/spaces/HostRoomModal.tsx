@@ -118,7 +118,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm px-0 sm:px-4">
-      <div className="bg-[#0d1b2a] border border-gray-800 rounded-t-2xl sm:rounded-2xl p-6 w-full max-w-md max-h-[90dvh] overflow-y-auto">
+      <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-t-2xl sm:rounded-2xl p-6 w-full max-w-md max-h-[90dvh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-white text-lg font-bold">Create a Stage</h2>
@@ -159,7 +159,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
                   className={`flex flex-col items-center gap-2 px-1.5 py-3 rounded-xl border text-xs font-medium transition-all ${
                     theme === t.id
                       ? `${t.active} shadow-sm`
-                      : 'bg-[#0a1628] border-gray-700/50 text-gray-500 hover:border-gray-600 hover:text-gray-400'
+                      : 'bg-[#0a1628] border-white/[0.08] text-gray-500 hover:border-gray-600 hover:text-gray-400'
                   }`}
                 >
                   <span className={`w-4 h-4 rounded-full ${t.dot} ${theme === t.id ? 'ring-2 ring-offset-1 ring-offset-[#0a1628] ring-current' : ''}`} />
@@ -184,7 +184,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
               className={`w-full bg-[#0a1628] border rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none transition-colors ${
                 titleError
                   ? 'border-red-500/50 focus:border-red-500'
-                  : 'border-gray-700 focus:border-[#f5a623]'
+                  : 'border-white/[0.08] focus:border-[#f5a623]'
               }`}
               disabled={loading}
             />
@@ -209,7 +209,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
               maxLength={500}
               rows={3}
               placeholder="Tell people what to expect..."
-              className="w-full bg-[#0a1628] border border-gray-700 rounded-xl px-4 py-2.5 text-white text-sm focus:border-[#f5a623] focus:outline-none transition-colors resize-none"
+              className="w-full bg-[#0a1628] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm focus:border-[#f5a623] focus:outline-none transition-colors resize-none"
               disabled={loading}
             />
             <div className="text-gray-600 text-xs mt-1 text-right">{description.length}/500</div>
@@ -233,7 +233,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
                   className={`flex flex-col gap-1 px-3 py-3 rounded-xl border text-left text-sm transition-all ${
                     provider === p.id
                       ? 'border-[#f5a623] bg-[#f5a623]/10 text-white'
-                      : 'border-gray-700/50 bg-[#0a1628] text-gray-400 hover:border-gray-600'
+                      : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600'
                   }`}
                 >
                   <span className="text-base">{p.badge}</span>
@@ -262,7 +262,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-gray-800/50 text-gray-300 rounded-xl text-sm hover:bg-gray-800 transition-colors border border-gray-700/50"
+              className="flex-1 px-4 py-2.5 bg-gray-800/50 text-gray-300 rounded-xl text-sm hover:bg-gray-800 transition-colors border border-white/[0.08]"
               disabled={loading}
             >
               Cancel

@@ -232,13 +232,13 @@ function StreamOverlays({ fid }: { fid: number }) {
   return (
     <section>
       <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Stream Overlays</p>
-      <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-4">
+      <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-4">
         {/* Now Playing */}
         <div>
           <p className="text-sm text-white font-medium">Now Playing Overlay</p>
           <p className="text-xs text-gray-500 mt-0.5">Copy this URL into OBS as a Browser Source to show what you&apos;re playing.</p>
           <div className="flex items-center gap-2 mt-2">
-            <code className="flex-1 text-[11px] text-gray-300 bg-[#0a1628] rounded px-2 py-1.5 truncate border border-gray-700">{overlayUrl}</code>
+            <code className="flex-1 text-[11px] text-gray-300 bg-[#0a1628] rounded px-2 py-1.5 truncate border border-white/[0.08]">{overlayUrl}</code>
             <button onClick={() => copyUrl(overlayUrl, 'np')} className="px-2.5 py-1.5 text-xs rounded bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/20 transition-colors flex-shrink-0">
               {copied === 'np' ? 'Copied!' : 'Copy'}
             </button>
@@ -258,7 +258,7 @@ function StreamOverlays({ fid }: { fid: number }) {
           <button onClick={() => setShowPreview(!showPreview)} className="text-[10px] text-[#f5a623] hover:underline mt-2">
             {showPreview ? 'Hide Preview' : 'Show Preview'}
           </button>
-          {showPreview && <iframe src={overlayUrl} className="w-[300px] h-[200px] rounded border border-gray-700 mt-2" title="Overlay preview" />}
+          {showPreview && <iframe src={overlayUrl} className="w-[300px] h-[200px] rounded border border-white/[0.08] mt-2" title="Overlay preview" />}
         </div>
         {/* Coming Soon overlays */}
         {[
@@ -271,7 +271,7 @@ function StreamOverlays({ fid }: { fid: number }) {
                 <p className="text-sm text-white font-medium">{item.label}</p>
                 <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
               </div>
-              <span className="text-[10px] text-gray-600 border border-gray-700 rounded px-1.5 py-0.5">Coming Soon</span>
+              <span className="text-[10px] text-gray-600 border border-white/[0.08] rounded px-1.5 py-0.5">Coming Soon</span>
             </div>
           </div>
         ))}
@@ -603,7 +603,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             <p className="text-xs text-gray-500 uppercase tracking-wider">Accounts</p>
             <span className="text-[10px] text-gray-600">{accountConnectedCount} of {accountConnections.length} connected</span>
           </div>
-          <div className="bg-[#0d1b2a] rounded-xl px-4 border border-gray-800 divide-y divide-gray-800/50">
+          <div className="bg-[#0d1b2a] rounded-xl px-4 border border-white/[0.08] divide-y divide-gray-800/50">
 
             {/* 1. Wallet — always connected */}
             <AccountRow
@@ -645,7 +645,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
           <div className="flex items-center justify-between px-1 mb-3">
             <p className="text-xs text-gray-500 uppercase tracking-wider">Features</p>
           </div>
-          <div className="bg-[#0d1b2a] rounded-xl px-4 border border-gray-800 divide-y divide-gray-800/50">
+          <div className="bg-[#0d1b2a] rounded-xl px-4 border border-white/[0.08] divide-y divide-gray-800/50">
 
             {/* Messaging (XMTP) */}
             <FeatureRow
@@ -708,7 +708,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         {/* ── Music / Playback ─────────────────────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Music &amp; Playback</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
             <CrossfadeSettings />
           </div>
         </section>
@@ -744,7 +744,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         {/* ── Farcaster Identity (read-only) ─────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Farcaster Identity</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08]">
             <div className="flex items-center gap-4 mb-4">
               {profile.pfp_url ? (
                 <Image src={profile.pfp_url} alt={profile.fc_display_name || 'avatar'} width={56} height={56} className="rounded-full" unoptimized />
@@ -776,7 +776,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             )}
 
             {/* Farcaster Stats */}
-            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-gray-800/50">
+            <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/[0.08]">
               <div className="text-center">
                 <p className="text-lg font-bold text-white">{formatNumber(profile.follower_count)}</p>
                 <p className="text-[10px] text-gray-500 uppercase tracking-wider">Followers</p>
@@ -791,7 +791,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
               </div>
             </div>
 
-            <div className="mt-3 pt-3 border-t border-gray-800/50 flex items-center gap-3 text-xs text-gray-600">
+            <div className="mt-3 pt-3 border-t border-white/[0.08] flex items-center gap-3 text-xs text-gray-600">
               {profile.created_at && (
                 <span>Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
               )}
@@ -807,7 +807,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
             </div>
 
             {/* Share your ZID */}
-            <div className="mt-3 pt-3 border-t border-gray-800/50">
+            <div className="mt-3 pt-3 border-t border-white/[0.08]">
               <ShareToFarcaster
                 template={shareTemplates.profile(profile.zid, profile.fc_display_name || profile.zao_display_name || 'ZAO Member')}
                 variant="button"
@@ -831,7 +831,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
               </button>
             )}
           </div>
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800/50">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800/50">
             {zaoEditing ? (
               <div className="p-5 space-y-4">
                 <div>
@@ -842,7 +842,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     onChange={(e) => setZaoFields((f) => ({ ...f, display_name: e.target.value }))}
                     maxLength={50}
                     placeholder="Override your Farcaster name within ZAO"
-                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
                   />
                 </div>
                 <div>
@@ -853,7 +853,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     maxLength={300}
                     rows={3}
                     placeholder="ZAO-specific bio (supplements your Farcaster bio)"
-                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none resize-none"
+                    className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none resize-none"
                   />
                   <p className="text-[10px] text-gray-600 mt-1">{zaoFields.bio.length}/300</p>
                 </div>
@@ -865,7 +865,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     onChange={(e) => setZaoFields((f) => ({ ...f, ign: e.target.value }))}
                     maxLength={30}
                     placeholder="Community handle"
-                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
                   />
                 </div>
                 <div>
@@ -876,7 +876,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                     onChange={(e) => setZaoFields((f) => ({ ...f, real_name: e.target.value }))}
                     maxLength={80}
                     placeholder="Optional — visible to community members"
-                    className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
+                    className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-base md:text-sm text-white placeholder-gray-600 focus:border-[#f5a623] focus:outline-none"
                   />
                 </div>
                 <div className="flex items-center gap-3 pt-2">
@@ -939,7 +939,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         {/* ── Respect Tokens ──────────────────────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Respect Tokens</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08]">
             {respectLoading ? (
               <div className="flex items-center justify-center py-4">
                 <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
@@ -971,13 +971,13 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                   </div>
                 </div>
                 {respect.member.first_respect_at && (
-                  <div className="mt-3 pt-3 border-t border-gray-800/50">
+                  <div className="mt-3 pt-3 border-t border-white/[0.08]">
                     <p className="text-[10px] text-gray-600">
                       First respect earned {new Date(respect.member.first_respect_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </div>
                 )}
-                <div className="mt-3 pt-3 border-t border-gray-800/50">
+                <div className="mt-3 pt-3 border-t border-white/[0.08]">
                   <Link href="/respect" className="text-xs text-[#f5a623]/60 hover:text-[#f5a623] transition-colors">
                     View full leaderboard
                   </Link>
@@ -995,7 +995,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         {/* ── Messaging Preferences ────────────────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Messaging</p>
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800/50">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800/50">
             {/* Auto-join ZAO group */}
             <div className="flex items-center justify-between px-5 py-4">
               <div className="flex-1 min-w-0 pr-3">
@@ -1047,7 +1047,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         {/* ── Farcaster Signer ─────────────────────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Write Access</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08]">
             <div className="flex items-center gap-3 mb-3">
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${hasSigner ? 'bg-green-500/10' : 'bg-yellow-500/10'}`}>
                 {hasSigner ? (
@@ -1123,7 +1123,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         {/* ── Wallets ──────────────────────────────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Wallets</p>
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800/50">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800/50">
             {/* Primary wallet */}
             <div className="flex items-center gap-3 px-5 py-4">
               <div className="w-8 h-8 rounded-lg bg-[#f5a623]/10 flex items-center justify-center flex-shrink-0">
@@ -1332,7 +1332,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         {/* ── Invite ──────────────────────────────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Spread the Word</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08]">
             <ShareToFarcaster
               template={shareTemplates.invite()}
               variant="button"
@@ -1345,7 +1345,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
         {/* ── Account ──────────────────────────────────────────────── */}
         <section>
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Account</p>
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 divide-y divide-gray-800/50">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] divide-y divide-gray-800/50">
             <div className="flex items-center justify-between px-5 py-4">
               <div>
                 <p className="text-sm text-white">Auth Method</p>

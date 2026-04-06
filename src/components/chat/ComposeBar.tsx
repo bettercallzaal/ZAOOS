@@ -302,7 +302,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
 
   return (
     <div
-      className="border-t border-gray-800 bg-[#0d1b2a] relative"
+      className="border-t border-white/[0.08] bg-[#0d1b2a] relative"
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
@@ -354,7 +354,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
       {/* Quote preview */}
       {quotedCast && (
         <div className="px-3 pt-2">
-          <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[#0a1628] border border-gray-700">
+          <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[#0a1628] border border-white/[0.08]">
             <div className="flex-1 min-w-0">
               <span className="text-xs font-medium text-[#f5a623]">
                 Quoting {quotedCast.author.display_name || quotedCast.author.username}
@@ -382,7 +382,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
             <img
               src={imagePreview.url}
               alt="Upload preview"
-              className="h-20 rounded-lg border border-gray-700 object-cover"
+              className="h-20 rounded-lg border border-white/[0.08] object-cover"
             />
             <button
               onClick={removeImage}
@@ -419,7 +419,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
               value={scheduleTime}
               onChange={(e) => setScheduleTime(e.target.value)}
               min={(() => { const d = new Date(Date.now() + 60_000); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; })()}
-              className="bg-[#1a2a3a] text-white text-xs rounded-lg px-2 py-1.5 border border-gray-700 focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
+              className="bg-[#1a2a3a] text-white text-xs rounded-lg px-2 py-1.5 border border-white/[0.08] focus:outline-none focus:ring-1 focus:ring-[#f5a623]"
             />
             <button
               onClick={handleSchedule}
@@ -450,7 +450,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                 className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
                   crossPostChannels.has(ch.id)
                     ? 'border-[#f5a623] bg-[#f5a623]/10 text-[#f5a623]'
-                    : 'border-gray-700 text-gray-400 hover:border-gray-500'
+                    : 'border-white/[0.08] text-gray-400 hover:border-gray-500'
                 }`}
               >
                 {ch.label}
@@ -474,7 +474,7 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                   setSuggestedHashtags((prev) => prev.filter((t) => t !== tag));
                   textareaRef.current?.focus();
                 }}
-                className="text-[11px] px-2 py-0.5 rounded-full border border-gray-700/50 text-gray-500 hover:text-gray-300 hover:border-gray-600 transition-colors"
+                className="text-[11px] px-2 py-0.5 rounded-full border border-white/[0.08] text-gray-500 hover:text-gray-300 hover:border-gray-600 transition-colors"
               >
                 {tag}
               </button>

@@ -116,7 +116,7 @@ function NoAccessScreen({ username }: { username: string }) {
         </h1>
         <p className="text-gray-400 text-sm mb-6">Community on Farcaster</p>
 
-        <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 mb-6">
+        <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] mb-6">
           <p className="text-white text-sm mb-1">
             Hey {username || 'there'}!
           </p>

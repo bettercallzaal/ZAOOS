@@ -413,7 +413,7 @@ export function CommunityGraph() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search members..."
-            className="w-full bg-[#0d1b2a] border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50 transition-colors"
+            className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50 transition-colors"
           />
           {searchQuery && (
             <button
@@ -432,7 +432,7 @@ export function CommunityGraph() {
       {/* Graph container */}
       <div
         ref={containerRef}
-        className="relative w-full bg-[#0a1628] rounded-xl overflow-hidden border border-gray-800"
+        className="relative w-full bg-[#0a1628] rounded-xl overflow-hidden border border-white/[0.08]"
         style={{ height: 500 }}
       >
         <GraphErrorBoundary
@@ -480,21 +480,21 @@ export function CommunityGraph() {
         <div className="absolute bottom-3 right-3 flex flex-col gap-1 z-40">
           <button
             onClick={() => graphRef.current?.zoom?.(graphRef.current.zoom() * 1.4, 300)}
-            className="w-8 h-8 bg-[#0d1b2a]/90 border border-gray-700 rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-sm font-bold transition-colors"
+            className="w-8 h-8 bg-[#0d1b2a]/90 border border-white/[0.08] rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-sm font-bold transition-colors"
             title="Zoom in"
           >
             +
           </button>
           <button
             onClick={() => graphRef.current?.zoom?.(graphRef.current.zoom() * 0.6, 300)}
-            className="w-8 h-8 bg-[#0d1b2a]/90 border border-gray-700 rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-sm font-bold transition-colors"
+            className="w-8 h-8 bg-[#0d1b2a]/90 border border-white/[0.08] rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-sm font-bold transition-colors"
             title="Zoom out"
           >
             -
           </button>
           <button
             onClick={() => graphRef.current?.zoomToFit?.(400, 40)}
-            className="w-8 h-8 bg-[#0d1b2a]/90 border border-gray-700 rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-xs transition-colors"
+            className="w-8 h-8 bg-[#0d1b2a]/90 border border-white/[0.08] rounded-lg text-gray-300 hover:text-white hover:border-[#f5a623]/50 flex items-center justify-center text-xs transition-colors"
             title="Reset / fit all"
           >
             &#x27F3;

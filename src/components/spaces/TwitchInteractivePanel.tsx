@@ -134,11 +134,11 @@ export function TwitchInteractivePanel() {
     }
   };
 
-  const inputCls = 'w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:border-[#9146ff] focus:outline-none placeholder:text-gray-600';
+  const inputCls = 'w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:border-[#9146ff] focus:outline-none placeholder:text-gray-600';
   const btnPrimary = 'px-4 py-2 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50';
 
   return (
-    <div className="bg-[#0d1b2a] border border-gray-800 rounded-xl p-4">
+    <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-xl p-4">
       {/* Toast */}
       {toast && (
         <div className="mb-3 px-3 py-2 rounded-lg bg-[#9146ff]/15 border border-[#9146ff]/30 text-sm text-purple-300">
@@ -186,7 +186,7 @@ export function TwitchInteractivePanel() {
             )}
             <div className="flex gap-1.5 flex-wrap">
               {DURATION_OPTIONS.map((d) => (
-                <button key={d.value} onClick={() => setPollDuration(d.value)} className={`px-3 py-1 rounded-md text-xs transition-colors ${pollDuration === d.value ? 'bg-[#9146ff] text-white' : 'bg-[#0a1628] text-gray-400 border border-gray-700'}`}>
+                <button key={d.value} onClick={() => setPollDuration(d.value)} className={`px-3 py-1 rounded-md text-xs transition-colors ${pollDuration === d.value ? 'bg-[#9146ff] text-white' : 'bg-[#0a1628] text-gray-400 border border-white/[0.08]'}`}>
                   {d.label}
                 </button>
               ))}
@@ -218,7 +218,7 @@ export function TwitchInteractivePanel() {
             ))}
             <div className="flex gap-1.5 flex-wrap">
               {DURATION_OPTIONS.map((d) => (
-                <button key={d.value} onClick={() => setPredDuration(d.value)} className={`px-3 py-1 rounded-md text-xs transition-colors ${predDuration === d.value ? 'bg-[#9146ff] text-white' : 'bg-[#0a1628] text-gray-400 border border-gray-700'}`}>
+                <button key={d.value} onClick={() => setPredDuration(d.value)} className={`px-3 py-1 rounded-md text-xs transition-colors ${predDuration === d.value ? 'bg-[#9146ff] text-white' : 'bg-[#0a1628] text-gray-400 border border-white/[0.08]'}`}>
                   {d.label}
                 </button>
               ))}
@@ -239,7 +239,7 @@ export function TwitchInteractivePanel() {
           {clips.length > 0 && (
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {clips.map((c) => (
-                <a key={c.id} href={c.editUrl} target="_blank" rel="noopener noreferrer" className="block bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-purple-300 hover:border-[#9146ff]/50 truncate">
+                <a key={c.id} href={c.editUrl} target="_blank" rel="noopener noreferrer" className="block bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-purple-300 hover:border-[#9146ff]/50 truncate">
                   Clip {c.id.slice(0, 12)}... — {new Date(c.createdAt).toLocaleTimeString()}
                 </a>
               ))}

@@ -76,7 +76,7 @@ export function TipButton({ recipientAddress, recipientName, roomId }: TipButton
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#0d1b2a] border border-gray-800 rounded-t-2xl sm:rounded-2xl p-5 w-full max-w-sm">
+          <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-t-2xl sm:rounded-2xl p-5 w-full max-w-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-bold text-sm">
                 Tip {recipientName}
@@ -141,7 +141,7 @@ export function TipButton({ recipientAddress, recipientName, roomId }: TipButton
                       key={p.value}
                       onClick={() => handleSend(p.value)}
                       disabled={isPending || confirming}
-                      className="px-3 py-2.5 bg-[#0a1628] border border-gray-700 rounded-xl text-white text-xs font-medium hover:border-[#f5a623] hover:text-[#f5a623] transition-colors disabled:opacity-40"
+                      className="px-3 py-2.5 bg-[#0a1628] border border-white/[0.08] rounded-xl text-white text-xs font-medium hover:border-[#f5a623] hover:text-[#f5a623] transition-colors disabled:opacity-40"
                     >
                       {p.label}
                     </button>
@@ -164,7 +164,7 @@ export function TipButton({ recipientAddress, recipientName, roomId }: TipButton
                       placeholder="0.00"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="flex-1 bg-[#0a1628] border border-gray-700 rounded-xl px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
+                      className="flex-1 bg-[#0a1628] border border-white/[0.08] rounded-xl px-3 py-2 text-white text-sm focus:border-[#f5a623] focus:outline-none"
                     />
                     <button
                       onClick={() => amount && handleSend(amount)}

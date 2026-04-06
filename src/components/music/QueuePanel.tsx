@@ -39,7 +39,7 @@ export function QueuePanel({ onClose }: QueuePanelProps) {
   return (
     <div className="bg-white/5 rounded-2xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
         <div className="flex items-center gap-2">
           <svg className="w-4 h-4 text-[#f5a623]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
@@ -76,7 +76,7 @@ export function QueuePanel({ onClose }: QueuePanelProps) {
 
       {/* Now Playing */}
       {player.metadata && (
-        <div className="px-4 py-2.5 bg-[#f5a623]/5 border-b border-gray-700/30">
+        <div className="px-4 py-2.5 bg-[#f5a623]/5 border-b border-white/[0.08]/30">
           <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-semibold mb-1.5">
             Now Playing
           </p>

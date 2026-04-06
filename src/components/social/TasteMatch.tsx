@@ -52,21 +52,21 @@ export function TasteMatch({ targetFid, targetUsername }: TasteMatchProps) {
 
   if (loading) {
     return (
-      <div className="p-3 rounded-xl bg-white/5 border border-gray-800 animate-pulse">
+      <div className="p-3 rounded-xl bg-white/5 border border-white/[0.08] animate-pulse">
         <div className="h-4 bg-white/10 rounded w-2/3" />
       </div>
     );
   }
 
   if (error) return (
-    <div className="p-3 rounded-xl bg-white/5 border border-gray-800">
+    <div className="p-3 rounded-xl bg-white/5 border border-white/[0.08]">
       <p className="text-red-400 text-sm">{error}</p>
     </div>
   );
   if (!data || (data.totalYours === 0 && data.totalTheirs === 0)) return null;
 
   return (
-    <div className="p-4 rounded-xl bg-white/5 border border-gray-800">
+    <div className="p-4 rounded-xl bg-white/5 border border-white/[0.08]">
       <div className="flex items-center gap-3 mb-2">
         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10">
           <span className={`text-lg font-bold ${matchColor(data.matchPercent)}`}>

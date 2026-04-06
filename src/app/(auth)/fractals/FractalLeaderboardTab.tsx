@@ -177,7 +177,7 @@ export function FractalLeaderboardTab({ currentFid }: Props) {
         placeholder="Search by name or wallet..."
         value={search}
         onChange={e => setSearch(e.target.value)}
-        className="w-full bg-[#0d1b2a] border border-gray-800 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
+        className="w-full bg-[#0d1b2a] border border-white/[0.08] rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
       />
 
       {/* Sort */}

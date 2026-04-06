@@ -16,7 +16,7 @@ function PlatformPill({ link }: { link: PlatformLink }) {
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium
-        bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors border border-gray-700/50"
+        bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors border border-white/[0.08]"
     >
       <span
         className="w-2 h-2 rounded-full flex-shrink-0"
@@ -71,7 +71,7 @@ export function UniversalLinkCard({ url, castHash }: UniversalLinkCardProps) {
   // Loading skeleton
   if (loading) {
     return (
-      <div className="rounded-xl border border-gray-800 bg-[#0d1b2a] p-4 mt-2 animate-pulse">
+      <div className="rounded-xl border border-white/[0.08] bg-[#0d1b2a] p-4 mt-2 animate-pulse">
         <div className="flex items-center gap-3">
           <div className="w-16 h-16 rounded-lg bg-gray-800 flex-shrink-0" />
           <div className="flex-1 space-y-2">
@@ -91,7 +91,7 @@ export function UniversalLinkCard({ url, castHash }: UniversalLinkCardProps) {
   // Error fallback: simple link with music note icon
   if (error || !card) {
     return (
-      <div className="rounded-xl border border-gray-800 bg-[#0d1b2a] mt-2">
+      <div className="rounded-xl border border-white/[0.08] bg-[#0d1b2a] mt-2">
         <a
           href={url}
           target="_blank"
@@ -126,7 +126,7 @@ export function UniversalLinkCard({ url, castHash }: UniversalLinkCardProps) {
   }
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-[#0d1b2a] p-4 mt-2">
+    <div className="rounded-xl border border-white/[0.08] bg-[#0d1b2a] p-4 mt-2">
       {/* Top row: artwork + title/artist */}
       <div className="flex items-center gap-3">
         {/* Album art */}

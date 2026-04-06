@@ -88,7 +88,7 @@ export function TutorialPanel({ isOpen, onClose }: TutorialPanelProps) {
     <>
       <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-[#0d1b2a] border border-gray-700 rounded-2xl w-full max-w-lg shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-2xl w-full max-w-lg shadow-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
           {/* Progress dots */}
           <div className="flex justify-center gap-1.5 pt-5">
             {TUTORIAL_STEPS.map((_, i) => (
@@ -117,7 +117,7 @@ export function TutorialPanel({ isOpen, onClose }: TutorialPanelProps) {
           </p>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-800">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-white/[0.08]">
             {isFirst ? (
               <button onClick={onClose} className="text-sm text-gray-500 hover:text-white transition-colors">
                 Skip

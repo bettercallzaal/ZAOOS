@@ -129,7 +129,7 @@ export default function HatManager() {
 
   if (!isConnected) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 text-center">
+      <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] text-center">
         <p className="text-sm text-gray-400 mb-2">Connect your wallet to manage hats</p>
         <p className="text-xs text-gray-600">Only Configurator hat wearers can mint and manage hats.</p>
       </div>
@@ -147,7 +147,7 @@ export default function HatManager() {
 
   if (!isAdmin) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 text-center">
+      <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] text-center">
         <p className="text-sm text-gray-400">You don&apos;t have Configurator access</p>
         <p className="text-xs text-gray-600 mt-1">
           Only Top Hat or Configurator wearers can manage hats.
@@ -172,7 +172,7 @@ export default function HatManager() {
       </div>
 
       {/* Mint Hat Form */}
-      <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-3">
+      <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-3">
         <p className="text-xs text-gray-500 uppercase tracking-wider">Mint Hat to Address</p>
 
         <select
@@ -230,7 +230,7 @@ export default function HatManager() {
           {allHats.map((hat) => (
             <div
               key={hat.id}
-              className="flex items-center justify-between px-4 py-3 bg-[#0d1b2a] rounded-xl border border-gray-800"
+              className="flex items-center justify-between px-4 py-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08]"
             >
               <div>
                 <p className="text-sm text-white font-medium">{hat.label}</p>

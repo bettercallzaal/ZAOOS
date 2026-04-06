@@ -135,9 +135,9 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
 
       {/* Dialog */}
       <div className="fixed inset-x-4 top-[15%] md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-lg z-50">
-        <div ref={dialogRef} className="bg-[#0d1b2a] border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
+        <div ref={dialogRef} className="bg-[#0d1b2a] border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden">
           {/* Search input */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-800">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08]">
             <svg className="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
@@ -149,7 +149,7 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
               placeholder={`Search #${channel}...`}
               className="flex-1 bg-transparent text-white text-base md:text-sm placeholder-gray-500 focus:outline-none"
             />
-            <kbd className="hidden md:inline text-[10px] text-gray-500 border border-gray-700 rounded px-1.5 py-0.5">
+            <kbd className="hidden md:inline text-[10px] text-gray-500 border border-white/[0.08] rounded px-1.5 py-0.5">
               ESC
             </kbd>
           </div>
@@ -172,7 +172,7 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
               <button
                 key={result.hash}
                 onClick={() => handleSelect(result.hash)}
-                className={`w-full text-left px-4 py-3 border-b border-gray-800/50 transition-colors ${
+                className={`w-full text-left px-4 py-3 border-b border-white/[0.08] transition-colors ${
                   i === selectedIndex ? 'bg-[#f5a623]/10' : 'hover:bg-white/5'
                 }`}
               >
@@ -203,9 +203,9 @@ export function SearchDialog({ channel, isOpen, onClose, onOpenThread }: SearchD
               <div className="px-4 py-8 text-center">
                 <p className="text-gray-500 text-sm mb-3">Search messages in #{channel}</p>
                 <div className="flex items-center justify-center gap-4 text-[10px] text-gray-600">
-                  <span><kbd className="border border-gray-700 rounded px-1 py-0.5 mr-1">↑↓</kbd> navigate</span>
-                  <span><kbd className="border border-gray-700 rounded px-1 py-0.5 mr-1">↵</kbd> open</span>
-                  <span><kbd className="border border-gray-700 rounded px-1 py-0.5 mr-1">esc</kbd> close</span>
+                  <span><kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">↑↓</kbd> navigate</span>
+                  <span><kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">↵</kbd> open</span>
+                  <span><kbd className="border border-white/[0.08] rounded px-1 py-0.5 mr-1">esc</kbd> close</span>
                 </div>
               </div>
             )}

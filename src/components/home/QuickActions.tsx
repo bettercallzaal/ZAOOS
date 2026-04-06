@@ -78,7 +78,7 @@ function DailyActivityCard() {
   const isAtRisk = streak.isAtRisk && !isActive;
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-gradient-to-br from-[#0d1b2a] to-[#1a2a3a] p-4">
+    <div className="rounded-xl border border-white/[0.08] bg-gradient-to-br from-[#0d1b2a] to-[#1a2a3a] p-4">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between"
@@ -143,7 +143,7 @@ function DailyActivityCard() {
       </button>
 
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-gray-800 space-y-2">
+        <div className="mt-3 pt-3 border-t border-white/[0.08] space-y-2">
           <p className="text-xs text-gray-400">Activities that count toward your streak:</p>
           <div className="flex flex-wrap gap-2">
             <Link
@@ -181,7 +181,7 @@ export function QuickActions() {
             href={action.href}
             className="flex flex-col items-center gap-1.5 group"
           >
-            <div className="w-14 h-14 rounded-full border border-gray-700 flex items-center justify-center text-gray-400 group-hover:border-[#f5a623]/50 group-hover:text-[#f5a623] transition-all">
+            <div className="w-14 h-14 rounded-full border border-white/[0.08] flex items-center justify-center text-gray-400 group-hover:border-[#f5a623]/50 group-hover:text-[#f5a623] transition-all">
               {action.icon}
             </div>
             <span className="text-[10px] text-gray-500 group-hover:text-gray-300 transition-colors">

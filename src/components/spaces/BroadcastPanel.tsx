@@ -128,9 +128,9 @@ export function BroadcastPanel({
 
   // --- Expanded state ---
   return (
-    <div className="bg-[#0d1b2a] border border-gray-800 rounded-xl overflow-hidden w-full max-w-sm">
+    <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-xl overflow-hidden w-full max-w-sm">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
@@ -220,7 +220,7 @@ export function BroadcastPanel({
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-gray-800">
+      <div className="px-4 py-3 border-t border-white/[0.08]">
         <button
           onClick={onStopAll}
           className="w-full px-3 py-2 rounded-lg bg-red-600/15 text-red-400 text-sm font-semibold hover:bg-red-600/25 transition-colors"

@@ -133,7 +133,7 @@ function PlatformPill({
       {/* Tooltip for unconnected platforms */}
       {!connected && (
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block group-focus-within:block z-10 pointer-events-none">
-          <div className="bg-[#1a2a3a] border border-gray-700 rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg">
+          <div className="bg-[#1a2a3a] border border-white/[0.08] rounded-lg px-3 py-2 text-xs whitespace-nowrap shadow-lg">
             <p className="text-gray-400">Connect in <a href="/settings" className="text-[#f5a623] hover:underline pointer-events-auto">Settings</a></p>
           </div>
         </div>

@@ -9,7 +9,7 @@ export default async function RespectPage() {
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-[#0d1b2a]">
+      <header className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a]">
         <Link href="/home" className="text-gray-400 hover:text-white">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

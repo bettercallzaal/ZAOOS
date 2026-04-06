@@ -25,9 +25,9 @@ interface Props {
 const TIER_COLORS: Record<string, string> = {
   founder: 'text-[#f5a623]',
   og: 'text-[#f5a623]',
-  artist: 'text-purple-400',
+  artist: 'text-[#f5a623]',
   musician: 'text-blue-400',
-  producer: 'text-green-400',
+  producer: 'text-[#ffd700]',
   songwriter: 'text-pink-400',
   developer: 'text-cyan-400',
   community: 'text-gray-400',
@@ -59,7 +59,7 @@ export default function CommunityMembersClient({ members }: Props) {
           <Link
             key={member.id}
             href={`/members/${member.username}`}
-            className="flex items-center gap-3 bg-[#0d1b2a] rounded-xl px-4 py-3 border border-gray-800 hover:border-[#f5a623]/30 transition-colors group"
+            className="flex items-center gap-3 bg-[#0d1b2a] rounded-xl px-4 py-3 border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors group"
           >
             {/* Avatar */}
             <div className="flex-shrink-0">

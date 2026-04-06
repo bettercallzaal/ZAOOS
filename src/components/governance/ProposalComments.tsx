@@ -65,7 +65,7 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
   void currentFid;
 
   return (
-    <div className="mt-4 border-t border-gray-800 pt-4">
+    <div className="mt-4 border-t border-white/[0.08] pt-4">
       <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">
         Comments {!loading && `(${comments.length})`}
       </p>
@@ -114,7 +114,7 @@ export function ProposalComments({ proposalId, currentFid }: ProposalCommentsPro
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
           placeholder="Add a comment..."
           maxLength={2000}
-          className="flex-1 bg-[#0d1b2a] border border-gray-800 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
+          className="flex-1 bg-[#0d1b2a] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
         />
         <button
           onClick={handleSubmit}

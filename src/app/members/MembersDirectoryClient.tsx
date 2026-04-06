@@ -193,7 +193,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
             <button
               key={p.label}
               onClick={() => applyPreset(p)}
-              className="whitespace-nowrap px-3 py-1.5 rounded-full text-[11px] border border-gray-700/50 text-gray-400 hover:text-[#f5a623] hover:border-[#f5a623]/30 transition-colors flex-shrink-0"
+              className="whitespace-nowrap px-3 py-1.5 rounded-full text-[11px] border border-white/[0.08] text-gray-400 hover:text-[#f5a623] hover:border-[#f5a623]/30 transition-colors flex-shrink-0"
             >
               {p.label}
             </button>
@@ -210,14 +210,14 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
               setIsDefaultFilters(false);
             }}
             placeholder="Search by name, ENS, username..."
-            className="flex-1 bg-white/5 border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
+            className="flex-1 bg-white/5 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
           />
           <button
             onClick={() => setFiltersOpen(!filtersOpen)}
             className={`px-3 py-2 rounded-lg border text-xs transition-colors flex items-center gap-1.5 ${
               filtersOpen || activeFilterCount > 0
                 ? 'border-[#f5a623]/50 text-[#f5a623] bg-[#f5a623]/5'
-                : 'border-gray-700/50 text-gray-500 hover:text-white'
+                : 'border-white/[0.08] text-gray-500 hover:text-white'
             }`}
           >
             Filters
@@ -231,12 +231,12 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
 
         {/* Filter panel */}
         {filtersOpen && (
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4 space-y-3">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4 space-y-3">
             {/* Row 1: Tier + Sort */}
             <div className="flex gap-3 flex-wrap">
               <div className="flex-1 min-w-[120px]">
                 <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Tier</label>
-                <div className="flex rounded-lg overflow-hidden border border-gray-700/50">
+                <div className="flex rounded-lg overflow-hidden border border-white/[0.08]">
                   {(['all', 'respect_holder', 'community'] as const).map(t => (
                     <button
                       key={t}
@@ -255,7 +255,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 <select
                   value={filters.sort}
                   onChange={e => handleFilterChange(f => ({ ...f, sort: e.target.value as Filters['sort'] }))}
-                  className="w-full bg-[#0a1628] border border-gray-700/50 rounded-lg px-2 py-1.5 text-[11px] text-white"
+                  className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value="respect">Most Respect</option>
                   <option value="name">Name A-Z</option>
@@ -272,7 +272,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 <select
                   value={filters.category}
                   onChange={e => handleFilterChange(f => ({ ...f, category: e.target.value }))}
-                  className="w-full bg-[#0a1628] border border-gray-700/50 rounded-lg px-2 py-1.5 text-[11px] text-white"
+                  className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value="">Any</option>
                   {filterOptions.categories.map(c => (
@@ -285,7 +285,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 <select
                   value={filters.platform}
                   onChange={e => handleFilterChange(f => ({ ...f, platform: e.target.value }))}
-                  className="w-full bg-[#0a1628] border border-gray-700/50 rounded-lg px-2 py-1.5 text-[11px] text-white"
+                  className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value="">Any</option>
                   <option value="audius">Audius</option>
@@ -305,7 +305,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 <select
                   value={filters.active_since}
                   onChange={e => handleFilterChange(f => ({ ...f, active_since: e.target.value as Filters['active_since'] }))}
-                  className="w-full bg-[#0a1628] border border-gray-700/50 rounded-lg px-2 py-1.5 text-[11px] text-white"
+                  className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value="">Anytime</option>
                   <option value="7d">Last 7 days</option>
@@ -318,7 +318,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 <select
                   value={filters.min_respect}
                   onChange={e => handleFilterChange(f => ({ ...f, min_respect: Number(e.target.value) }))}
-                  className="w-full bg-[#0a1628] border border-gray-700/50 rounded-lg px-2 py-1.5 text-[11px] text-white"
+                  className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-2 py-1.5 text-[11px] text-white"
                 >
                   <option value={0}>Any</option>
                   <option value={1}>1+ Respect</option>
@@ -337,7 +337,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                   type="checkbox"
                   checked={filters.has_ens}
                   onChange={e => handleFilterChange(f => ({ ...f, has_ens: e.target.checked }))}
-                  className="rounded border-gray-700 bg-[#0a1628] text-[#f5a623] focus:ring-[#f5a623]"
+                  className="rounded border-white/[0.08] bg-[#0a1628] text-[#f5a623] focus:ring-[#f5a623]"
                 />
                 Has ENS
               </label>
@@ -346,7 +346,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                   type="checkbox"
                   checked={filters.featured}
                   onChange={e => handleFilterChange(f => ({ ...f, featured: e.target.checked }))}
-                  className="rounded border-gray-700 bg-[#0a1628] text-[#f5a623] focus:ring-[#f5a623]"
+                  className="rounded border-white/[0.08] bg-[#0a1628] text-[#f5a623] focus:ring-[#f5a623]"
                 />
                 Featured
               </label>
@@ -372,7 +372,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
               </span>
             )}
             {filters.category && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-[10px] capitalize">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f5a623]/10 text-[#f5a623] text-[10px] capitalize">
                 {filters.category}
                 <button onClick={() => handleFilterChange(f => ({ ...f, category: '' }))} className="hover:text-white">&times;</button>
               </span>
@@ -428,7 +428,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                 setPageSize(Number(e.target.value));
                 setOffset(0);
               }}
-              className="bg-[#0d1b2a] border border-gray-700/50 rounded px-2 py-1 text-xs text-white"
+              className="bg-[#0d1b2a] border border-white/[0.08] rounded px-2 py-1 text-xs text-white"
             >
               {[10, 25, 50, 100, 200, 300].map(s => (
                 <option key={s} value={s}>{s}</option>
@@ -440,14 +440,14 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
             <button
               onClick={() => setOffset(o => Math.max(0, o - pageSize))}
               disabled={offset === 0}
-              className="px-2 py-1 rounded border border-gray-700/50 text-xs text-gray-400 disabled:opacity-30 hover:border-gray-500 transition-colors"
+              className="px-2 py-1 rounded border border-white/[0.08] text-xs text-gray-400 disabled:opacity-30 hover:border-gray-500 transition-colors"
             >
               ‹
             </button>
             <button
               onClick={() => setOffset(o => o + pageSize)}
               disabled={!hasMore}
-              className="px-2 py-1 rounded border border-gray-700/50 text-xs text-gray-400 disabled:opacity-30 hover:border-gray-500 transition-colors"
+              className="px-2 py-1 rounded border border-white/[0.08] text-xs text-gray-400 disabled:opacity-30 hover:border-gray-500 transition-colors"
             >
               ›
             </button>
@@ -472,7 +472,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
               <Link
                 key={m.id}
                 href={`/members/${m.username || m.fid || m.id}`}
-                className="relative flex items-center gap-3 px-4 py-3 bg-[#0d1b2a] rounded-xl border border-gray-800/50 hover:border-[#f5a623]/30 transition-colors overflow-hidden group"
+                className="relative flex items-center gap-3 px-4 py-3 bg-[#0d1b2a] rounded-xl border border-white/[0.08] hover:border-[#f5a623]/30 transition-colors overflow-hidden group"
               >
                 {/* Cover image background */}
                 {m.artistProfile?.coverImageUrl && (
@@ -542,7 +542,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
                       <p className="text-[9px] text-gray-600">{m.respect.fractalCount}f</p>
                     </>
                   ) : m.tier === 'respect_holder' ? (
-                    <span className="text-[9px] text-green-400/60">Respect</span>
+                    <span className="text-[9px] text-[#f5a623]/60">Respect</span>
                   ) : null}
                   {m.lastActiveAt && (
                     <p className="text-[8px] text-gray-700">{timeAgo(m.lastActiveAt)}</p>
@@ -554,7 +554,7 @@ export default function MembersDirectoryClient({ initialMembers, initialFilterOp
         )}
 
         {/* Footer */}
-        <div className="text-center pt-8 border-t border-gray-800/50 mt-8">
+        <div className="text-center pt-8 border-t border-white/[0.08] mt-8">
           <p className="text-[10px] text-gray-600">
             ZAO OS · <Link href="/" className="text-[#f5a623] hover:underline">zaoos.com</Link> · Powered by Farcaster
           </p>

@@ -67,7 +67,7 @@ export default function CalendarPage() {
             {RECURRING_EVENTS.map((event) => (
               <div
                 key={event.id}
-                className={`bg-[#0d1b2a] rounded-xl p-4 border-l-4 ${event.color} border border-gray-800`}
+                className={`bg-[#0d1b2a] rounded-xl p-4 border-l-4 ${event.color} border border-white/[0.08]`}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl flex-shrink-0">{event.emoji}</span>
@@ -88,7 +88,7 @@ export default function CalendarPage() {
             {COMMUNITY_EVENTS.map((event) => (
               <div
                 key={event.id}
-                className={`bg-[#0d1b2a] rounded-xl p-4 border-l-4 ${event.color} border border-gray-800`}
+                className={`bg-[#0d1b2a] rounded-xl p-4 border-l-4 ${event.color} border border-white/[0.08]`}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl flex-shrink-0">{event.emoji}</span>
@@ -113,12 +113,12 @@ export default function CalendarPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">
             Add to Calendar
           </p>
-          <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
             <a
               href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=ZAO+Fractal+Session&details=Weekly+fractal+governance+circle&recurrence=weekly&location=Farcaster"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-3 hover:bg-[#1a2a3a]/50 transition-colors border-b border-gray-800"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-[#1a2a3a]/50 transition-colors border-b border-white/[0.08]"
             >
               <svg className="w-5 h-5 text-[#4285F4]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M21.3333 10.6667H12V8H21.3333C21.3333 5.054 18.946 2.66667 16 2.66667C13.054 2.66667 10.6667 5.054 10.6667 8V10.6667H2.66667C2.66667 13.6127 5.054 16 8 16H10.6667V10.6667H8C5.054 10.6667 2.66667 13.054 2.66667 16C2.66667 18.946 5.054 21.3333 8 21.3333C10.6667 21.3333 12.7373 19.496 13.032 16.888L13.3333 16H16C18.946 16 21.3333 13.6127 21.3333 10.6667Z" />
@@ -157,7 +157,7 @@ export default function CalendarPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">
             Subscribe
           </p>
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
             <p className="text-xs text-gray-400 mb-3">
               Get iCal URL for any calendar app
             </p>

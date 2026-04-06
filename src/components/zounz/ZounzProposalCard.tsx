@@ -81,7 +81,7 @@ export default function ZounzProposalCard({
   };
 
   return (
-    <div className="bg-[#0a1628] rounded-lg border border-gray-800 p-4">
+    <div className="bg-[#0a1628] rounded-lg border border-white/[0.08] p-4">
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">

@@ -59,7 +59,7 @@ export default function CallsPage() {
   if (activeRoom?.mode === 'jitsi') {
     return (
       <div className="fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
-        <header className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] shrink-0">
+        <header className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <h2 className="font-semibold text-sm text-white">{activeRoom.label}</h2>
@@ -118,7 +118,7 @@ export default function CallsPage() {
             <button
               key={room.id}
               onClick={() => joinRoom(room)}
-              className="w-full text-left bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-[#f5a623]/40 transition-colors"
+              className="w-full text-left bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] hover:border-[#f5a623]/40 transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -145,7 +145,7 @@ export default function CallsPage() {
         {/* Custom room */}
         <div className="space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Create a Room</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 space-y-3">
+          <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-3">
             <input
               type="text"
               value={customName}
@@ -153,7 +153,7 @@ export default function CallsPage() {
               onKeyDown={(e) => { if (e.key === 'Enter') joinCustomRoom(); }}
               placeholder="Room name..."
               maxLength={60}
-              className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
+              className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50"
             />
             <button
               onClick={joinCustomRoom}

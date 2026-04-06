@@ -24,7 +24,7 @@ function SkeletonGrid() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="rounded-xl bg-[#0a1628] border border-gray-800 overflow-hidden animate-pulse">
+        <div key={i} className="rounded-xl bg-[#0a1628] border border-white/[0.08] overflow-hidden animate-pulse">
           <div className="aspect-square bg-gray-800" />
           <div className="p-3 space-y-2">
             <div className="h-4 bg-gray-800 rounded w-3/4" />
@@ -65,7 +65,7 @@ function SectionHeader() {
 
 function EmptyState() {
   return (
-    <div className="rounded-2xl border border-gray-800/60 bg-gradient-to-br from-[#0d1b2a] to-[#0a1628] p-8 text-center space-y-5">
+    <div className="rounded-2xl border border-white/[0.08]/60 bg-gradient-to-br from-[#0d1b2a] to-[#0a1628] p-8 text-center space-y-5">
       <div className="w-16 h-16 mx-auto rounded-2xl bg-[#f5a623]/10 flex items-center justify-center">
         <svg className="w-8 h-8 text-[#f5a623]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
@@ -79,15 +79,15 @@ function EmptyState() {
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-md mx-auto pt-2">
-        <div className="rounded-xl bg-white/[0.03] border border-gray-800/50 p-3 space-y-1">
+        <div className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-3 space-y-1">
           <p className="text-[#f5a623] text-xs font-semibold">Permanent</p>
           <p className="text-[11px] text-gray-500">Stored on Arweave forever — no takedowns</p>
         </div>
-        <div className="rounded-xl bg-white/[0.03] border border-gray-800/50 p-3 space-y-1">
+        <div className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-3 space-y-1">
           <p className="text-[#f5a623] text-xs font-semibold">Ownable</p>
           <p className="text-[11px] text-gray-500">Fans can collect and truly own your music</p>
         </div>
-        <div className="rounded-xl bg-white/[0.03] border border-gray-800/50 p-3 space-y-1">
+        <div className="rounded-xl bg-white/[0.03] border border-white/[0.08] p-3 space-y-1">
           <p className="text-[#f5a623] text-xs font-semibold">Licensed</p>
           <p className="text-[11px] text-gray-500">UDL licenses protect your creative rights</p>
         </div>
@@ -171,7 +171,7 @@ export default function PermawebLibrary() {
           placeholder="Search by artist or title..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full max-w-sm px-4 py-2 rounded-lg bg-[#0a1628] border border-gray-800 text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623] transition-colors"
+          className="w-full max-w-sm px-4 py-2 rounded-lg bg-[#0a1628] border border-white/[0.08] text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623] transition-colors"
         />
       )}
 
@@ -186,7 +186,7 @@ export default function PermawebLibrary() {
           {filtered.map(asset => (
             <div
               key={asset.id}
-              className="group rounded-xl bg-[#0a1628] border border-gray-800 overflow-hidden hover:border-[#f5a623]/40 transition-colors"
+              className="group rounded-xl bg-[#0a1628] border border-white/[0.08] overflow-hidden hover:border-[#f5a623]/40 transition-colors"
             >
               <div className="relative">
                 {asset.coverUrl ? (

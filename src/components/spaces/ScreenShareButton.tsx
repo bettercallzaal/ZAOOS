@@ -35,7 +35,7 @@ export function ScreenShareButton({ isHost, isAuthenticated, roomType }: ScreenS
       className={`px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2 ${
         isSharing
           ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30 hover:bg-blue-600/30'
-          : 'bg-[#1a2a3a] text-gray-300 hover:text-white border border-gray-700 hover:border-gray-500'
+          : 'bg-[#1a2a3a] text-gray-300 hover:text-white border border-white/[0.08] hover:border-gray-500'
       }`}
       title={isSharing ? 'Stop sharing screen' : 'Share your screen'}
     >

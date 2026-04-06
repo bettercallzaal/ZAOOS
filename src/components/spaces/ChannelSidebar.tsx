@@ -43,7 +43,7 @@ export default function ChannelSidebar({
   const connectedRoom = channels.find((c) => c.id === connectedRoomId);
 
   return (
-    <div className="hidden md:flex w-[220px] bg-[#081420] border-r border-gray-800 flex-col h-full">
+    <div className="hidden md:flex w-[220px] bg-[#081420] border-r border-white/[0.08] flex-col h-full">
       {/* Header */}
       <div className="px-3 py-3">
         <h3 className="text-[11px] font-semibold uppercase tracking-widest text-gray-500">

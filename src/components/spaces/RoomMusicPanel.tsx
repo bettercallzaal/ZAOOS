@@ -33,7 +33,7 @@ export function RoomMusicPanel({ roomId, isHost, onOpenMusicBrowser }: RoomMusic
 
 function GuestMusicPanel() {
   return (
-    <div className="border-t border-gray-800 bg-[#0d1b2a] px-4 py-3">
+    <div className="border-t border-white/[0.08] bg-[#0d1b2a] px-4 py-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MusicIcon />
@@ -94,7 +94,7 @@ function AuthenticatedMusicPanel({ roomId, onOpenMusicBrowser }: { roomId: strin
   };
 
   return (
-    <div className="border-t border-gray-800 bg-[#0d1b2a]">
+    <div className="border-t border-white/[0.08] bg-[#0d1b2a]">
       {/* Auto-broadcast player state changes to room listeners when DJ.
           This ensures radio track changes (which bypass broadcastPlay) are
           automatically synced to all listeners in the room. */}

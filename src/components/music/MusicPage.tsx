@@ -237,7 +237,7 @@ export function MusicPage() {
       {/* ── Sticky Tab Bar ─────────────────────────────────────────── */}
       <div
         ref={tabBarRef}
-        className="sticky top-0 md:top-10 z-30 bg-[#0a1628]/95 backdrop-blur-md border-b border-gray-800/50"
+        className="sticky top-0 md:top-10 z-30 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/[0.08]"
       >
         <div className="max-w-2xl mx-auto px-4">
           <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide">

@@ -98,7 +98,7 @@ function timeRemaining(createdAt: string): string {
 
 function ProposalSkeleton() {
   return (
-    <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 animate-pulse space-y-3">
+    <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] animate-pulse space-y-3">
       <div className="flex items-center gap-2">
         <div className="h-5 w-16 bg-gray-700 rounded-full" />
         <div className="h-5 w-14 bg-gray-700 rounded-full" />
@@ -267,7 +267,7 @@ function ProposalCard({
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 hover:border-gray-700 transition-colors space-y-3">
+    <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] hover:border-white/[0.08] transition-colors space-y-3">
       {/* Header: badges */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border capitalize ${typeColor}`}>
@@ -453,7 +453,7 @@ export function DiscordProposals() {
               className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${
                 statusFilter === f.id
                   ? 'bg-[#f5a623]/15 text-[#f5a623] border-[#f5a623]/40'
-                  : 'bg-gray-800/50 text-gray-500 border-gray-700/50 hover:text-gray-300 hover:border-gray-600'
+                  : 'bg-gray-800/50 text-gray-500 border-white/[0.08] hover:text-gray-300 hover:border-gray-600'
               }`}
             >
               {f.label}
@@ -461,7 +461,7 @@ export function DiscordProposals() {
           ))}
         </div>
 
-        <div className="h-3 border-l border-gray-700" />
+        <div className="h-3 border-l border-white/[0.08]" />
 
         <div className="flex gap-1.5">
           {SORT_OPTIONS.map(s => (
@@ -471,7 +471,7 @@ export function DiscordProposals() {
               className={`text-[11px] px-2.5 py-1 rounded-full border transition-colors ${
                 sortMode === s.id
                   ? 'bg-indigo-500/15 text-indigo-400 border-indigo-500/40'
-                  : 'bg-gray-800/50 text-gray-500 border-gray-700/50 hover:text-gray-300 hover:border-gray-600'
+                  : 'bg-gray-800/50 text-gray-500 border-white/[0.08] hover:text-gray-300 hover:border-gray-600'
               }`}
             >
               {s.label}
@@ -504,7 +504,7 @@ export function DiscordProposals() {
 
       {/* Empty state */}
       {!loading && !error && sorted.length === 0 && (
-        <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800 text-center">
+        <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08] text-center">
           <p className="text-sm text-gray-500">No Discord proposals found</p>
           <p className="text-[11px] text-gray-600 mt-1">
             Proposals created via the Discord bot will appear here

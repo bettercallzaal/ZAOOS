@@ -20,7 +20,7 @@ const PRICE_OPTIONS = [
 ];
 
 const INPUT_CLASS =
-  'w-full bg-[#0a1628] border border-gray-700/50 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50';
+  'w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/50';
 
 const MAX_AUDIO_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_COVER_SIZE = 5 * 1024 * 1024; // 5MB
@@ -289,7 +289,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
                     className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                       genre === g
                         ? 'border-[#f5a623] bg-[#f5a623]/10 text-[#f5a623]'
-                        : 'border-gray-700/50 text-gray-400 hover:border-gray-600 hover:text-gray-300'
+                        : 'border-white/[0.08] text-gray-400 hover:border-gray-600 hover:text-gray-300'
                     }`}
                   >
                     {g}
@@ -343,7 +343,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
                     className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
                       price === opt.value
                         ? 'border-[#f5a623] bg-[#f5a623]/10 text-[#f5a623]'
-                        : 'border-gray-700/50 bg-[#0a1628] text-gray-400 hover:border-gray-600 hover:text-gray-300'
+                        : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600 hover:text-gray-300'
                     }`}
                   >
                     {opt.label}
@@ -371,7 +371,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
             <div className="flex gap-3 pt-2">
               <button
                 onClick={() => setStep(1)}
-                className="flex-1 rounded-lg border border-gray-700/50 bg-transparent px-4 py-2 text-sm text-gray-400 hover:border-gray-600 hover:text-gray-300 transition-colors"
+                className="flex-1 rounded-lg border border-white/[0.08] bg-transparent px-4 py-2 text-sm text-gray-400 hover:border-gray-600 hover:text-gray-300 transition-colors"
               >
                 Back
               </button>
@@ -391,7 +391,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
             <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide">Confirm &amp; Mint</h3>
 
             {/* Preview */}
-            <div className="rounded-lg border border-gray-700/50 bg-[#0a1628] p-4 space-y-3">
+            <div className="rounded-lg border border-white/[0.08] bg-[#0a1628] p-4 space-y-3">
               <div className="flex items-start gap-4">
                 {/* Cover preview */}
                 {coverFile ? (
@@ -417,10 +417,10 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
               </div>
 
               {description && (
-                <p className="text-xs text-gray-500 border-t border-gray-700/50 pt-2">{description}</p>
+                <p className="text-xs text-gray-500 border-t border-white/[0.08] pt-2">{description}</p>
               )}
 
-              <div className="flex items-center justify-between border-t border-gray-700/50 pt-2 text-xs">
+              <div className="flex items-center justify-between border-t border-white/[0.08] pt-2 text-xs">
                 <span className="text-gray-500">Audio</span>
                 <span className="text-gray-400">
                   {audioFile?.name} ({audioFile ? formatFileSize(audioFile.size) : ''})
@@ -443,7 +443,7 @@ export default function MintTrack({ isOpen, onClose }: MintTrackProps) {
               <button
                 onClick={() => setStep(2)}
                 disabled={minting}
-                className="flex-1 rounded-lg border border-gray-700/50 bg-transparent px-4 py-2 text-sm text-gray-400 hover:border-gray-600 hover:text-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 rounded-lg border border-white/[0.08] bg-transparent px-4 py-2 text-sm text-gray-400 hover:border-gray-600 hover:text-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Back
               </button>

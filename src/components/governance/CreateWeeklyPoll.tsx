@@ -195,7 +195,7 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
           />
 
           {/* Editable body */}
@@ -203,7 +203,7 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
             value={body}
             onChange={e => setBody(e.target.value)}
             rows={3}
-            className="w-full bg-[#0a1628] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:border-[#f5a623]/50 focus:outline-none resize-none"
           />
 
           {/* Choices preview */}
@@ -211,7 +211,7 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
             <p className="text-[10px] text-gray-500 uppercase tracking-wider">Choices ({choices.length})</p>
             <div className="grid gap-1">
               {choices.map((choice, i) => (
-                <div key={i} className="text-xs text-gray-400 bg-[#0a1628] rounded-lg px-3 py-1.5 border border-gray-800">
+                <div key={i} className="text-xs text-gray-400 bg-[#0a1628] rounded-lg px-3 py-1.5 border border-white/[0.08]">
                   {choice}
                 </div>
               ))}
@@ -249,7 +249,7 @@ export function CreateWeeklyPoll({ isAdmin }: { isAdmin: boolean }) {
             )}
             <button
               onClick={handleCopyAndOpen}
-              className="px-4 bg-gray-800 text-gray-300 rounded-lg py-2.5 text-sm hover:text-white transition-colors border border-gray-700"
+              className="px-4 bg-gray-800 text-gray-300 rounded-lg py-2.5 text-sm hover:text-white transition-colors border border-white/[0.08]"
             >
               {copied ? 'Copied!' : 'Copy & Open Snapshot'}
             </button>

@@ -72,7 +72,7 @@ export function MindshareLeaderboard({ entries }: MindshareLeaderboardProps) {
       />
 
       {/* Desktop treemap (hidden on mobile) */}
-      <div className="hidden sm:block bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden p-3">
+      <div className="hidden sm:block bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden p-3">
         <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 px-1">
           Mindshare Map
         </p>
@@ -126,8 +126,8 @@ export function MindshareLeaderboard({ entries }: MindshareLeaderboardProps) {
       )}
 
       {/* Full member table */}
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-800">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/[0.08]">
           <p className="text-xs text-gray-500 uppercase tracking-wider">
             All Members
           </p>

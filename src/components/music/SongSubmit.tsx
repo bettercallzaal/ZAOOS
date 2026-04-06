@@ -181,9 +181,9 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
       <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed inset-x-0 bottom-0 z-50 bg-[#0d1b2a] border-t border-gray-800 rounded-t-2xl max-h-[85vh] flex flex-col sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-[400px] sm:rounded-none sm:border-l sm:border-t-0">
+      <div className="fixed inset-x-0 bottom-0 z-50 bg-[#0d1b2a] border-t border-white/[0.08] rounded-t-2xl max-h-[85vh] flex flex-col sm:inset-auto sm:right-0 sm:top-0 sm:bottom-0 sm:w-[400px] sm:rounded-none sm:border-l sm:border-t-0">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] flex-shrink-0">
           <h2 className="text-sm font-semibold text-[#f5a623]">Submit a Song</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white p-1" aria-label="Close song submit">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -204,7 +204,7 @@ export function SongSubmit({ channel, isOpen, onClose }: SongSubmitProps) {
         )}
 
         {/* Submit form */}
-        <div className="px-4 py-3 border-b border-gray-800 flex-shrink-0">
+        <div className="px-4 py-3 border-b border-white/[0.08] flex-shrink-0">
           <div className="space-y-2.5">
             {/* URL input with validation indicator */}
             <div className="relative">

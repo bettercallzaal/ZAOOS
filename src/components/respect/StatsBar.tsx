@@ -37,7 +37,7 @@ export function StatsBar({
       {stats.map((s) => (
         <div
           key={s.label}
-          className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800 text-center"
+          className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center"
         >
           <p className="text-base sm:text-lg font-bold text-white truncate">
             {s.value}

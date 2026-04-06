@@ -165,7 +165,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
   // Loading skeleton
   if (loading) {
     return (
-      <div className="relative rounded-xl overflow-hidden border border-gray-800 bg-[#0d1b2a] mt-2 animate-pulse">
+      <div className="relative rounded-xl overflow-hidden border border-white/[0.08] bg-[#0d1b2a] mt-2 animate-pulse">
         <div className="flex items-center gap-3 p-3">
           <div className="w-14 h-14 rounded-lg bg-gray-800 flex-shrink-0" />
           <div className="flex-1 space-y-2">
@@ -193,7 +193,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
       : 'Source';
 
     return (
-      <div className="relative rounded-xl overflow-hidden border border-gray-800 bg-[#0d1b2a] mt-2">
+      <div className="relative rounded-xl overflow-hidden border border-white/[0.08] bg-[#0d1b2a] mt-2">
         <span className="absolute top-2 right-2 bg-black/60 text-[10px] text-gray-300 px-2 py-0.5 rounded-full">
           {fallbackPlatform}
         </span>
@@ -227,7 +227,7 @@ export function MusicEmbed({ url, castHash }: MusicEmbedProps) {
       className={`relative rounded-xl overflow-hidden border bg-[#0d1b2a] mt-2 transition-all ${
         isThisTrack
           ? 'border-[#f5a623]/30 bg-[#f5a623]/[0.03] shadow-lg shadow-[#f5a623]/5'
-          : 'border-gray-800 hover:border-gray-600/60'
+          : 'border-white/[0.08] hover:border-gray-600/60'
       }`}
     >
       {/* Provider badge */}

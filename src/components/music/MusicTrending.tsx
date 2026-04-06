@@ -75,7 +75,7 @@ export function TrendingSection() {
           ))}
         </div>
       ) : error || tracks.length === 0 ? (
-        <div className="text-center py-10 rounded-xl bg-[#0d1b2a] border border-gray-800">
+        <div className="text-center py-10 rounded-xl bg-[#0d1b2a] border border-white/[0.08]">
           <MusicIcon className="w-8 h-8 text-[#f5a623]/30 mx-auto mb-2" />
           <p className="text-sm text-gray-400">Trending unavailable</p>
           <p className="text-xs text-gray-600 mt-1">Check back later</p>
@@ -96,7 +96,7 @@ export function TrendingSection() {
                 <div className={`w-[140px] h-[140px] rounded-xl border mb-2 overflow-hidden relative transition-colors ${
                   isThisTrack
                     ? 'border-[#f5a623]/40 shadow-lg shadow-[#f5a623]/10'
-                    : 'border-gray-800 group-hover:border-gray-700'
+                    : 'border-white/[0.08] group-hover:border-white/[0.08]'
                 }`}>
                   <ArtworkImage
                     src={track.artwork?.['480x480'] || track.artwork?.['150x150'] || null}

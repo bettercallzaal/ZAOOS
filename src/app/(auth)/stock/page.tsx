@@ -105,14 +105,14 @@ export default function StockPage() {
         </div>
 
         {/* Countdown */}
-        <div className="bg-[#0d1b2a] rounded-xl p-6 border border-gray-800">
+        <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08]">
           <CountdownTimer targetDate={FESTIVAL_DATE} eventName="ZAO Stock" />
         </div>
 
         {/* About */}
         <section className="space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">About the Festival</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800 space-y-3">
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] space-y-3">
             <p className="text-sm text-gray-300 leading-relaxed">
               ZAO Stock is The ZAO&apos;s flagship IRL music festival &mdash; a full-day outdoor showcase at the
               Franklin Street Parklet in downtown Ellsworth, Maine. Ten independent artists perform equal sets
@@ -133,7 +133,7 @@ export default function StockPage() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 flex flex-col items-center justify-center aspect-square"
+                className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 flex flex-col items-center justify-center aspect-square"
               >
                 <div className="w-12 h-12 rounded-full bg-[#1a2a3a] flex items-center justify-center mb-3">
                   <svg className="w-6 h-6 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
@@ -164,7 +164,7 @@ export default function StockPage() {
         {/* Sponsorship */}
         <section className="space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Sponsorship</p>
-          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800 space-y-2">
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] space-y-2">
             <p className="text-sm text-gray-300 leading-relaxed">
               Sponsorships are tax-deductible through New Media Commons / Fractured Atlas 501(c)(3).
               Two tracks available: Local Partners (Ellsworth businesses) and Digital Partners (Web3 brands).
@@ -175,7 +175,7 @@ export default function StockPage() {
           </div>
           <div className="space-y-3">
             {SPONSORSHIP_TIERS.map((tier) => (
-              <div key={tier.name} className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+              <div key={tier.name} className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
                 <div className={`bg-gradient-to-r ${tier.color} px-4 py-2.5 flex items-center justify-between`}>
                   <span className="font-bold text-sm text-white">{tier.name}</span>
                   <span className="text-sm font-medium text-white/90">{tier.amount}</span>
@@ -198,7 +198,7 @@ export default function StockPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Past Events</p>
           <div className="space-y-3">
             {PAST_EVENTS.map((event) => (
-              <div key={event.name} className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800">
+              <div key={event.name} className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08]">
                 <p className="font-bold text-white">{event.name}</p>
                 <p className="text-sm text-gray-400 mt-1">{event.description}</p>
                 <p className="text-xs text-gray-600 mt-2">Photos coming soon</p>
@@ -211,11 +211,11 @@ export default function StockPage() {
         <section className="space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Support ZAO Stock</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 opacity-60">
+            <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] opacity-60">
               <p className="font-medium text-white text-sm">Giveth Campaign</p>
               <p className="text-xs text-gray-500 mt-1">Coming soon</p>
             </div>
-            <div className="bg-[#0d1b2a] rounded-xl p-4 border border-gray-800 opacity-60">
+            <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] opacity-60">
               <p className="font-medium text-white text-sm">GoFundMe Campaign</p>
               <p className="text-xs text-gray-500 mt-1">Coming soon</p>
             </div>

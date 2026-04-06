@@ -56,7 +56,7 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
 
   if (loading) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
         <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">NFTs</p>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -78,7 +78,7 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
   };
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 mb-4">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs text-gray-500 uppercase tracking-wider">
           NFTs <span className="text-[#f5a623]">({filtered.length})</span>
@@ -89,7 +89,7 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
             className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
               zounzOnly
                 ? 'bg-[#f5a623]/20 text-[#f5a623] border-[#f5a623]/40'
-                : 'bg-transparent text-gray-500 border-gray-700 hover:text-[#f5a623] hover:border-[#f5a623]/30'
+                : 'bg-transparent text-gray-500 border-white/[0.08] hover:text-[#f5a623] hover:border-[#f5a623]/30'
             }`}
           >
             ZOUNZ only
@@ -111,7 +111,7 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
                 className={`text-[10px] px-2 py-1 rounded-lg transition-colors ${
                   chainFilter === chain
                     ? 'bg-[#f5a623]/20 text-[#f5a623] border border-[#f5a623]/30'
-                    : 'bg-[#0a1628] text-gray-500 border border-gray-800 hover:text-gray-300'
+                    : 'bg-[#0a1628] text-gray-500 border border-white/[0.08] hover:text-gray-300'
                 }`}
               >
                 {chain === 'all' ? 'All' : CHAIN_LABELS[chain].label} ({count})
@@ -125,7 +125,7 @@ export default function NFTGallery({ walletAddress }: { walletAddress: string })
           <select
             value={collectionFilter}
             onChange={e => setCollectionFilter(e.target.value)}
-            className="text-[10px] px-2 py-1 rounded-lg bg-[#0a1628] text-gray-400 border border-gray-800 focus:outline-none focus:border-[#f5a623]/30 max-w-[180px] truncate"
+            className="text-[10px] px-2 py-1 rounded-lg bg-[#0a1628] text-gray-400 border border-white/[0.08] focus:outline-none focus:border-[#f5a623]/30 max-w-[180px] truncate"
           >
             <option value="all">All Collections ({collections.length})</option>
             {collections.map(c => (

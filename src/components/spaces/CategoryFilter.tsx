@@ -24,7 +24,7 @@ export default function CategoryFilter({ value, onChange }: CategoryFilterProps)
           className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-colors ${
             value === cat.id
               ? 'bg-[#f5a623]/15 text-[#f5a623] border-[#f5a623]/40'
-              : 'text-gray-500 border-gray-700 hover:border-gray-600 hover:text-gray-400'
+              : 'text-gray-500 border-white/[0.08] hover:border-gray-600 hover:text-gray-400'
           }`}
         >
           {cat.label}

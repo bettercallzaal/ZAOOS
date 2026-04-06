@@ -148,7 +148,7 @@ export function AnalyticsTab() {
       <div className="bg-[#0d1b2a] rounded-xl p-4">
         <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Era Comparison</h3>
         <div className="flex gap-3">
-          <div className="flex-1 bg-[#0a1628] rounded-lg p-3 border border-gray-800">
+          <div className="flex-1 bg-[#0a1628] rounded-lg p-3 border border-white/[0.08]">
             <p className="text-xs text-gray-400">OG Era (1-73)</p>
             <p className="text-lg font-bold text-white">{overview.ogSessions}</p>
             <p className="text-[10px] text-gray-600">sessions, 1x/2x Fibonacci, ERC-20</p>
@@ -182,7 +182,7 @@ export function AnalyticsTab() {
                   } hover:bg-[#ffd700]`}
                   style={{ height: `${height}%` }}
                 />
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-[#0a1628] border border-gray-700 rounded px-2 py-1 text-[10px] text-white whitespace-nowrap z-10">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-[#0a1628] border border-white/[0.08] rounded px-2 py-1 text-[10px] text-white whitespace-nowrap z-10">
                   {entry.name}: {entry.participants} members
                 </div>
               </div>
@@ -254,8 +254,8 @@ export function AnalyticsTab() {
       {/* Member Drill-Down Modal */}
       {selectedMember && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-[#0d1b2a] w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[85vh] overflow-y-auto border border-gray-800">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 sticky top-0 bg-[#0d1b2a] z-10">
+          <div className="bg-[#0d1b2a] w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[85vh] overflow-y-auto border border-white/[0.08]">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] sticky top-0 bg-[#0d1b2a] z-10">
               <h3 className="text-sm font-semibold text-white">{selectedMember}</h3>
               <button
                 onClick={() => { setSelectedMember(null); setMemberProfile(null); }}

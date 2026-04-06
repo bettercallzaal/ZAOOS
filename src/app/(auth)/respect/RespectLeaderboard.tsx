@@ -172,7 +172,7 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
 
       {/* No wallet linked notice */}
       {!myEntry && (
-        <div className="bg-[#0d1b2a] rounded-xl p-5 border border-gray-800 text-center">
+        <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] text-center">
           <p className="text-sm text-gray-400">
             Your wallet isn&apos;t linked yet. Ask an admin to add your FID to the allowlist to see your Respect here.
           </p>
@@ -182,15 +182,15 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
       {/* Community Stats */}
       {stats && (
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800 text-center">
+          <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center">
             <p className="text-xl font-bold text-white">{stats.totalMembers}</p>
             <p className="text-xs text-gray-500 mt-1">Members</p>
           </div>
-          <div className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800 text-center">
+          <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center">
             <p className="text-xl font-bold text-white">{stats.totalRespect.toLocaleString()}</p>
             <p className="text-xs text-gray-500 mt-1">Total Respect</p>
           </div>
-          <div className="bg-[#0d1b2a] rounded-xl p-3 border border-gray-800 text-center">
+          <div className="bg-[#0d1b2a] rounded-xl p-3 border border-white/[0.08] text-center">
             <p className="text-xl font-bold text-white">{stats.holdersWithRespect}</p>
             <p className="text-xs text-gray-500 mt-1">Active</p>
           </div>
@@ -216,7 +216,7 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                         ? 'bg-[#f5a623]/10 border-[#f5a623]/30'
                         : entry.rank <= 3
                           ? 'bg-[#f5a623]/5 border-[#f5a623]/20'
-                          : 'bg-[#0d1b2a] border-gray-800'
+                          : 'bg-[#0d1b2a] border-white/[0.08]'
                   } ${entry.wallet ? 'cursor-pointer hover:bg-[#f5a623]/10' : 'cursor-default'}`}
                 >
                   <span className="text-lg font-bold w-8 text-center flex-shrink-0">
@@ -251,7 +251,7 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
 
                 {/* Member detail panel */}
                 {isSelected && (
-                  <div className="mt-1 mx-2 rounded-lg bg-[#0d1b2a] border border-gray-800 p-4 space-y-3">
+                  <div className="mt-1 mx-2 rounded-lg bg-[#0d1b2a] border border-white/[0.08] p-4 space-y-3">
                     {memberLoading ? (
                       <div className="text-center py-4">
                         <div className="inline-block w-4 h-4 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
@@ -261,30 +261,30 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                       <>
                         {/* Breakdown */}
                         <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="bg-[#0a1628] rounded-lg p-2 border border-gray-800">
+                          <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                             <p className="text-gray-500">Fractal</p>
                             <p className="text-white font-medium">{memberDetail.member.fractal_respect.toLocaleString()}</p>
                           </div>
-                          <div className="bg-[#0a1628] rounded-lg p-2 border border-gray-800">
+                          <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                             <p className="text-gray-500">On-chain OG</p>
                             <p className="text-white font-medium">{memberDetail.member.onchain_og.toLocaleString()}</p>
                           </div>
-                          <div className="bg-[#0a1628] rounded-lg p-2 border border-gray-800">
+                          <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                             <p className="text-gray-500">On-chain ZOR</p>
                             <p className="text-white font-medium">{memberDetail.member.onchain_zor.toLocaleString()}</p>
                           </div>
-                          <div className="bg-[#0a1628] rounded-lg p-2 border border-gray-800">
+                          <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                             <p className="text-gray-500">Fractals</p>
                             <p className="text-white font-medium">{memberDetail.member.fractal_count}</p>
                           </div>
                           {memberDetail.member.hosting_count > 0 && (
-                            <div className="bg-[#0a1628] rounded-lg p-2 border border-gray-800">
+                            <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                               <p className="text-gray-500">Hosted</p>
                               <p className="text-white font-medium">{memberDetail.member.hosting_count}</p>
                             </div>
                           )}
                           {memberDetail.member.first_respect_at && (
-                            <div className="bg-[#0a1628] rounded-lg p-2 border border-gray-800">
+                            <div className="bg-[#0a1628] rounded-lg p-2 border border-white/[0.08]">
                               <p className="text-gray-500">First Respect</p>
                               <p className="text-white font-medium">{memberDetail.member.first_respect_at}</p>
                             </div>
@@ -299,7 +299,7 @@ export function RespectLeaderboard({ currentFid }: { currentFid: number }) {
                               {memberDetail.fractalHistory.map((fh, i) => (
                                 <div
                                   key={`${fh.session_date}-${i}`}
-                                  className="flex items-center justify-between text-xs px-2 py-1.5 rounded bg-[#0a1628] border border-gray-800/50"
+                                  className="flex items-center justify-between text-xs px-2 py-1.5 rounded bg-[#0a1628] border border-white/[0.08]"
                                 >
                                   <div className="flex items-center gap-2 min-w-0">
                                     <span className="text-gray-500 flex-shrink-0">

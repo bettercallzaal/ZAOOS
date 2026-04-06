@@ -173,7 +173,7 @@ export function RoomView({
       <div className="flex flex-1 overflow-hidden">
         {/* Main room content */}
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="border-b border-gray-800 bg-[#0d1b2a]">
+          <div className="border-b border-white/[0.08] bg-[#0d1b2a]">
             <DescriptionPanel />
           </div>
           <TwitchEmbed
@@ -206,7 +206,7 @@ export function RoomView({
           )}
 
           {broadcastState?.isLive && (
-            <div className="flex justify-center px-4 py-2 border-t border-gray-800 bg-[#0d1b2a]">
+            <div className="flex justify-center px-4 py-2 border-t border-white/[0.08] bg-[#0d1b2a]">
               <BroadcastPanel
                 state={broadcastState}
                 onStopTarget={handleStopTarget}
@@ -221,7 +221,7 @@ export function RoomView({
             <RoomReactions roomId={roomId} fid={userFid} />
           )}
 
-          <div className="border-t border-gray-800 bg-[#0d1b2a]">
+          <div className="border-t border-white/[0.08] bg-[#0d1b2a]">
             <ControlsPanel
               isHost={isHost}
               isAuthenticated={isAuthenticated}
@@ -246,7 +246,7 @@ export function RoomView({
 
         {/* Desktop room chat sidebar */}
         {showRoomChat && roomId && userFid && (
-          <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
+          <div className="hidden md:flex flex-col w-[350px] border-l border-white/[0.08] overflow-hidden">
             <RoomChat
               roomId={roomId}
               fid={userFid}
@@ -259,7 +259,7 @@ export function RoomView({
 
         {/* Desktop participants sidebar */}
         {showParticipants && (
-          <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
+          <div className="hidden md:flex flex-col w-[350px] border-l border-white/[0.08] overflow-hidden">
             <ParticipantsPanel
               isHost={isHost}
               hostFid={hostFid}
@@ -270,7 +270,7 @@ export function RoomView({
 
         {/* Desktop Twitch chat sidebar */}
         {showTwitchChat && twitchInfo && (
-          <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
+          <div className="hidden md:flex flex-col w-[350px] border-l border-white/[0.08] overflow-hidden">
             <TwitchChatPanel
               twitchUsername={twitchInfo.username}
               canSend={twitchInfo.canSend}
@@ -281,8 +281,8 @@ export function RoomView({
 
         {/* Desktop music sidebar with tabs: Browse / Queue / Requests */}
         {showMusicSidebar && (
-          <div className="hidden md:flex flex-col w-[350px] border-l border-gray-800 overflow-hidden">
-            <div className="flex items-center justify-between p-3 border-b border-gray-800">
+          <div className="hidden md:flex flex-col w-[350px] border-l border-white/[0.08] overflow-hidden">
+            <div className="flex items-center justify-between p-3 border-b border-white/[0.08]">
               <div className="flex gap-1">
                 {(['browse', 'queue', 'requests'] as const).map((tab) => (
                   <button
@@ -376,7 +376,7 @@ export function RoomView({
       {/* Mobile music overlay with tabs */}
       {showMusicSidebar && (
         <div className="md:hidden fixed inset-0 z-50 bg-[#0a1628] flex flex-col">
-          <div className="flex items-center justify-between p-3 border-b border-gray-800">
+          <div className="flex items-center justify-between p-3 border-b border-white/[0.08]">
             <div className="flex gap-1">
               {(['browse', 'queue', 'requests'] as const).map((tab) => (
                 <button

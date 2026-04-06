@@ -321,7 +321,7 @@ export function DiscordLinkManager() {
       </div>
 
       {/* ── Section D: Bulk Auto-Link ── */}
-      <div className="bg-[#1a2a3a] rounded-xl p-4 mb-4 border border-gray-800/50">
+      <div className="bg-[#1a2a3a] rounded-xl p-4 mb-4 border border-white/[0.08]">
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="text-sm font-medium text-white">Bulk Auto-Link by Wallet</p>
@@ -340,7 +340,7 @@ export function DiscordLinkManager() {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={bulkStep === 'loading-file'}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 border border-gray-700 transition-colors disabled:opacity-50"
+              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 border border-white/[0.08] transition-colors disabled:opacity-50"
             >
               {walletMap ? `${Object.keys(walletMap).length} wallets loaded` : 'Upload wallets.json'}
             </button>
@@ -357,7 +357,7 @@ export function DiscordLinkManager() {
 
         {/* Preview results */}
         {bulkStep === 'previewing' && bulkPreview && (
-          <div className="mt-3 border-t border-gray-800/50 pt-3">
+          <div className="mt-3 border-t border-white/[0.08] pt-3">
             <div className="grid grid-cols-3 gap-2 mb-3">
               <div className="bg-[#0a1628] rounded-lg p-2 text-center">
                 <p className="text-lg font-bold text-green-400">{bulkPreview.matches.length}</p>
@@ -416,7 +416,7 @@ export function DiscordLinkManager() {
 
         {/* Done results */}
         {bulkStep === 'done' && bulkResult && (
-          <div className="mt-3 border-t border-gray-800/50 pt-3">
+          <div className="mt-3 border-t border-white/[0.08] pt-3">
             <div className="grid grid-cols-3 gap-2 mb-3">
               <div className="bg-[#0a1628] rounded-lg p-2 text-center">
                 <p className="text-lg font-bold text-green-400">{bulkResult.linked}</p>
@@ -502,7 +502,7 @@ export function DiscordLinkManager() {
             return (
               <div
                 key={user.id}
-                className="bg-[#1a2a3a] rounded-xl overflow-hidden border border-gray-800/50"
+                className="bg-[#1a2a3a] rounded-xl overflow-hidden border border-white/[0.08]"
               >
                 {/* Main row */}
                 <button
@@ -552,7 +552,7 @@ export function DiscordLinkManager() {
 
                 {/* Expanded Detail */}
                 {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-gray-800/50">
+                  <div className="px-4 pb-4 border-t border-white/[0.08]">
                     <div className="mt-3 space-y-2 text-xs">
                       {/* Wallet */}
                       <div className="flex items-center gap-2">
@@ -592,7 +592,7 @@ export function DiscordLinkManager() {
                     </div>
 
                     {/* ── Section C: Link Actions ── */}
-                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-800/50">
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/[0.08]">
                       {user.discord_id ? (
                         <button
                           onClick={(e) => { e.stopPropagation(); handleUnlink(user.id, name); }}

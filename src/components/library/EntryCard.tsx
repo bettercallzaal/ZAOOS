@@ -237,7 +237,7 @@ export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin
 
       {/* Voter list */}
       {showVoters && totalVoters > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-800">
+        <div className="mt-3 pt-3 border-t border-white/[0.08]">
           <p className="text-xs font-medium text-gray-400 mb-2">Votes</p>
           <div className="flex flex-wrap gap-2">
             {upVoters.map((v) => (
@@ -264,7 +264,7 @@ export default function EntryCard({ entry, userVoteType, voters, onVote, isAdmin
 
       {/* Comments */}
       {showComments && (
-        <div className="mt-3 pt-3 border-t border-gray-800">
+        <div className="mt-3 pt-3 border-t border-white/[0.08]">
           <EntryComments
             entryId={entry.id}
             onCommentAdded={() => setCommentCount((c) => c + 1)}

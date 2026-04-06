@@ -110,10 +110,10 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
         role="dialog"
         aria-modal="true"
         aria-labelledby="thread-drawer-title"
-        className="fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-[420px] z-50 flex flex-col bg-[#0d1b2a] border-l border-gray-800 animate-slide-in"
+        className="fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-[420px] z-50 flex flex-col bg-[#0d1b2a] border-l border-white/[0.08] animate-slide-in"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-[#0a1628]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#0a1628]">
           <h3 id="thread-drawer-title" className="text-sm font-semibold text-gray-300">Thread</h3>
           <button
             onClick={onClose}
@@ -142,7 +142,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
           {!loading && !error && (
             <div className="py-2">
               {parent && (
-                <div className="border-b border-gray-800 pb-2">
+                <div className="border-b border-white/[0.08] pb-2">
                   <Message
                     cast={parent}
                     isAdmin={isAdmin}
@@ -184,7 +184,7 @@ export function ThreadDrawer({ threadHash, isAdmin, hasSigner, currentFid, onHid
         </div>
 
         {/* Reply input */}
-        <div className="border-t border-gray-800 p-3 bg-[#0a1628]">
+        <div className="border-t border-white/[0.08] p-3 bg-[#0a1628]">
           <div className="flex gap-2 items-end">
             <textarea
               value={replyText}

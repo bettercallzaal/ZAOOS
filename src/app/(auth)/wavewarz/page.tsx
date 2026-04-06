@@ -42,12 +42,12 @@ export default function WaveWarzPage() {
       />
 
       {/* Generate WaveWarZ Post */}
-      <div className="px-3 py-2 bg-[#0d1b2a] border-b border-gray-800 flex-shrink-0">
+      <div className="px-3 py-2 bg-[#0d1b2a] border-b border-white/[0.08] flex-shrink-0">
         <GeneratePostButton />
       </div>
 
       {/* Tab switcher */}
-      <div className="flex items-center gap-1 px-3 py-2 bg-[#0d1b2a] border-b border-gray-800 flex-shrink-0">
+      <div className="flex items-center gap-1 px-3 py-2 bg-[#0d1b2a] border-b border-white/[0.08] flex-shrink-0">
         {(['leaderboard', 'battles', 'arena'] as const).map(t => (
           <button
             key={t}
@@ -55,7 +55,7 @@ export default function WaveWarzPage() {
             className={`px-3 py-1.5 rounded-lg text-xs capitalize transition-colors ${
               tab === t
                 ? 'bg-[#f5a623]/20 text-[#f5a623] border border-[#f5a623]/30'
-                : 'bg-[#0a1628] text-gray-500 border border-gray-800 hover:text-gray-300'
+                : 'bg-[#0a1628] text-gray-500 border border-white/[0.08] hover:text-gray-300'
             }`}
           >
             {t}
@@ -68,7 +68,7 @@ export default function WaveWarzPage() {
         {tab === 'leaderboard' && <Leaderboard />}
         {tab === 'battles' && <BattleLog />}
         {tab === 'arena' && (
-          <div className="rounded-xl overflow-hidden border border-gray-800 m-3" style={{ height: 'calc(100vh - 200px)' }}>
+          <div className="rounded-xl overflow-hidden border border-white/[0.08] m-3" style={{ height: 'calc(100vh - 200px)' }}>
             <iframe
               src={wavewarz.mainApp}
               className="w-full h-full border-0"

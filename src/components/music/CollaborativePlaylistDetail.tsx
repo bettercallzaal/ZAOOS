@@ -42,22 +42,22 @@ function AddTrackModal({ playlistId, onClose, onAdded }: { playlistId: string; o
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="bg-[#0d1b2a] border border-gray-700 rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-lg font-bold text-white mb-4">Add Track</h3>
         <input
-          className="w-full bg-white/5 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-3 focus:outline-none focus:border-[#f5a623]"
+          className="w-full bg-white/5 border border-white/[0.08] rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-3 focus:outline-none focus:border-[#f5a623]"
           placeholder="Track URL (Spotify, SoundCloud, etc.)"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
         />
         <input
-          className="w-full bg-white/5 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-3 focus:outline-none focus:border-[#f5a623]"
+          className="w-full bg-white/5 border border-white/[0.08] rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-3 focus:outline-none focus:border-[#f5a623]"
           placeholder="Title (optional)"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <input
-          className="w-full bg-white/5 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-4 focus:outline-none focus:border-[#f5a623]"
+          className="w-full bg-white/5 border border-white/[0.08] rounded-lg px-4 py-3 text-white placeholder-gray-500 mb-4 focus:outline-none focus:border-[#f5a623]"
           placeholder="Artist (optional)"
           value={artist}
           onChange={(e) => setArtist(e.target.value)}

@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
+import { Client } from '@gradio/client';
 
-// ACE-Step via HuggingFace Inference API
-const HF_API_URL =
-  'https://api-inference.huggingface.co/models/ACE-Step/ACE-Step-v1-3.5B';
+// ACE-Step v1.5 via HuggingFace Gradio Space
+const ACESTEP_SPACE = 'ACE-Step/Ace-Step-v1.5';
 
 const GenerateSchema = z.object({
   prompt: z.string().min(1).max(500),
-  duration: z.number().min(5).max(60).default(30),
+  lyrics: z.string().max(2000).default(''),
+  duration: z.number().min(10).max(120).default(30),
 });
 
 // TODO: This is an expensive operation — add per-user rate limiting
@@ -31,11 +32,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { prompt, duration } = parsed.data;
+    const { prompt, lyrics, duration } = parsed.data;
 
     const hfToken = process.env.HF_TOKEN;
     if (!hfToken) {
-      // Return a mock response for development when HF_TOKEN is not configured
       return NextResponse.json({
         audioUrl: null,
         message: 'Set HF_TOKEN env var to enable AI music generation',
@@ -43,41 +43,69 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const response = await fetch(HF_API_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${hfToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: prompt,
-        parameters: {
-          max_new_tokens: duration * 50, // rough token-to-seconds approximation
-        },
-      }),
-      signal: AbortSignal.timeout(120_000), // 2-minute timeout for generation
+    const client = await Client.connect(ACESTEP_SPACE, {
+      token: hfToken as `hf_${string}`,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      logger.error('[music/generate] HuggingFace API error:', errorText);
+    // Call the ACE-Step v1.5 generation endpoint
+    // Parameters: prompt (tags/description), lyrics, duration, and generation settings
+    const result = await client.predict('/generate', {
+      prompt,
+      lyrics: lyrics || '',
+      audio_duration: duration,
+      // Use turbo model for faster generation (8 inference steps)
+      infer_step: 8,
+      guidance_scale: 3.0,
+      scheduler_type: 'euler',
+      cfg_type: 'apg',
+      omega_scale: 10.0,
+    });
+
+    // Gradio returns data with audio file info
+    const data = result.data as unknown[];
+    if (!data || data.length === 0) {
       return NextResponse.json(
-        { error: 'AI generation service unavailable' },
+        { error: 'No audio returned from generator' },
         { status: 502 },
       );
     }
 
-    // HuggingFace returns raw audio bytes
-    const audioBuffer = await response.arrayBuffer();
-    const base64Audio = Buffer.from(audioBuffer).toString('base64');
-    const audioUrl = `data:audio/wav;base64,${base64Audio}`;
+    // The result contains audio file(s) — extract the first one
+    const audioResult = data[0];
+
+    // Gradio file results can be a URL string or an object with a url property
+    let audioUrl: string | null = null;
+    if (typeof audioResult === 'string') {
+      audioUrl = audioResult;
+    } else if (
+      audioResult &&
+      typeof audioResult === 'object' &&
+      'url' in audioResult
+    ) {
+      audioUrl = (audioResult as { url: string }).url;
+    }
+
+    if (!audioUrl) {
+      logger.error(
+        '[music/generate] Unexpected result format:',
+        JSON.stringify(data),
+      );
+      return NextResponse.json(
+        { error: 'Unexpected response from generator' },
+        { status: 502 },
+      );
+    }
 
     return NextResponse.json({ audioUrl });
   } catch (error) {
     logger.error('[music/generate] error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate audio' },
-      { status: 500 },
-    );
+
+    // Provide a clearer message for Gradio Space queue/timeout issues
+    const message =
+      error instanceof Error && error.message.includes('queue')
+        ? 'AI music service is busy — try again in a minute'
+        : 'Failed to generate audio';
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

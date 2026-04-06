@@ -131,7 +131,7 @@ export function AudiusDiscover() {
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="Search Audius tracks..."
-          className="w-full px-4 py-3 pl-10 rounded-xl bg-white/5 border border-gray-700/50 text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50 focus:ring-1 focus:ring-[#f5a623]/30 transition-all"
+          className="w-full px-4 py-3 pl-10 rounded-xl bg-white/5 border border-white/[0.08] text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]/50 focus:ring-1 focus:ring-[#f5a623]/30 transition-all"
         />
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
       </div>

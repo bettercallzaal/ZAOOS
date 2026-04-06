@@ -273,7 +273,7 @@ export function TrendingFeed({
       </div>
 
       {/* Sopha attribution */}
-      <div className="px-4 py-4 border-t border-gray-800/50">
+      <div className="px-4 py-4 border-t border-white/[0.08]">
         <a
           href="https://sopha.social"
           target="_blank"

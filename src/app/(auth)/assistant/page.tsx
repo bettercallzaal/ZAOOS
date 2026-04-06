@@ -70,7 +70,7 @@ export default function AssistantPage() {
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white flex flex-col">
       {/* Header */}
-      <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex items-center gap-3 shrink-0">
+      <header className="px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] flex items-center gap-3 shrink-0">
         <div className="w-8 h-8 rounded-full bg-[#f5a623]/20 flex items-center justify-center shrink-0">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f5a623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2a7 7 0 0 1 7 7c0 4-3 6-3 8H8c0-2-3-4-3-8a7 7 0 0 1 7-7z" />
@@ -100,7 +100,7 @@ export default function AssistantPage() {
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  className="px-3 py-1.5 bg-[#1a2a3a] border border-gray-700 rounded-lg text-xs text-gray-400 hover:text-white hover:border-[#f5a623]/40 transition-colors"
+                  className="px-3 py-1.5 bg-[#1a2a3a] border border-white/[0.08] rounded-lg text-xs text-gray-400 hover:text-white hover:border-[#f5a623]/40 transition-colors"
                 >
                   {q}
                 </button>
@@ -118,7 +118,7 @@ export default function AssistantPage() {
               className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed ${
                 msg.role === 'user'
                   ? 'bg-[#f5a623] text-[#0a1628] rounded-br-md font-medium'
-                  : 'bg-[#1a2a3a] text-gray-200 rounded-bl-md border border-gray-800'
+                  : 'bg-[#1a2a3a] text-gray-200 rounded-bl-md border border-white/[0.08]'
               }`}
             >
               {msg.content}
@@ -128,7 +128,7 @@ export default function AssistantPage() {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-[#1a2a3a] rounded-2xl rounded-bl-md px-4 py-3 border border-gray-800">
+            <div className="bg-[#1a2a3a] rounded-2xl rounded-bl-md px-4 py-3 border border-white/[0.08]">
               <div className="flex gap-1 items-center">
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -140,7 +140,7 @@ export default function AssistantPage() {
       </div>
 
       {/* Input bar — sits above mobile nav (bottom-14) and flush on desktop */}
-      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 bg-[#0d1b2a] border-t border-gray-800 px-4 py-3" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 bg-[#0d1b2a] border-t border-white/[0.08] px-4 py-3" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="max-w-3xl mx-auto flex gap-2">
           <textarea
             value={input}
@@ -148,7 +148,7 @@ export default function AssistantPage() {
             onKeyDown={handleKeyDown}
             placeholder="Ask me anything about ZAO..."
             rows={1}
-            className="flex-1 bg-[#0a1628] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#f5a623] focus:outline-none resize-none"
+            className="flex-1 bg-[#0a1628] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:border-[#f5a623] focus:outline-none resize-none"
             disabled={loading}
           />
           <button

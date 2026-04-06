@@ -144,7 +144,7 @@ export function SubmissionsSection({
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-gray-800 animate-pulse">
+            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[#0d1b2a] border border-white/[0.08] animate-pulse">
               <div className="w-10 h-10 rounded-full bg-gray-800" />
               <div className="w-10 h-10 rounded-lg bg-gray-800" />
               <div className="flex-1 space-y-2">
@@ -155,7 +155,7 @@ export function SubmissionsSection({
           ))}
         </div>
       ) : submissions.length === 0 ? (
-        <div className="text-center py-12 rounded-xl bg-[#0d1b2a] border border-gray-800">
+        <div className="text-center py-12 rounded-xl bg-[#0d1b2a] border border-white/[0.08]">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f5a623]/10 to-[#f5a623]/5 flex items-center justify-center mx-auto mb-3">
             <MusicIcon className="w-7 h-7 text-[#f5a623]/40" />
           </div>
@@ -176,7 +176,7 @@ export function SubmissionsSection({
                 className={`flex items-center gap-2.5 p-3 rounded-xl border transition-colors ${
                   isCurrentTrack
                     ? 'bg-[#0d1b2a] border-[#f5a623]/30'
-                    : 'bg-[#0d1b2a] border-gray-800 hover:border-gray-700'
+                    : 'bg-[#0d1b2a] border-white/[0.08] hover:border-white/[0.08]'
                 }`}
               >
                 {/* Play button */}

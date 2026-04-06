@@ -98,20 +98,20 @@ export function ListeningParties() {
 
       {/* Create form */}
       {showForm && (
-        <div className="mb-4 p-4 rounded-xl bg-white/5 border border-gray-800 space-y-3">
+        <div className="mb-4 p-4 rounded-xl bg-white/5 border border-white/[0.08] space-y-3">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Party title..."
             maxLength={200}
-            className="w-full px-3 py-2 rounded-lg bg-white/10 text-white placeholder-gray-500 text-sm border border-gray-700 focus:border-[#f5a623] focus:outline-none"
+            className="w-full px-3 py-2 rounded-lg bg-white/10 text-white placeholder-gray-500 text-sm border border-white/[0.08] focus:border-[#f5a623] focus:outline-none"
           />
           <textarea
             value={trackInput}
             onChange={(e) => setTrackInput(e.target.value)}
             placeholder="Paste track URLs (one per line)..."
             rows={3}
-            className="w-full px-3 py-2 rounded-lg bg-white/10 text-white placeholder-gray-500 text-sm border border-gray-700 focus:border-[#f5a623] focus:outline-none resize-none"
+            className="w-full px-3 py-2 rounded-lg bg-white/10 text-white placeholder-gray-500 text-sm border border-white/[0.08] focus:border-[#f5a623] focus:outline-none resize-none"
           />
           <button
             onClick={handleCreate}
@@ -166,7 +166,7 @@ export function ListeningParties() {
       {upcoming.map((party) => (
         <div
           key={party.id}
-          className="mb-3 p-4 rounded-xl bg-white/5 border border-gray-800 hover:border-gray-700 transition-colors"
+          className="mb-3 p-4 rounded-xl bg-white/5 border border-white/[0.08] hover:border-white/[0.08] transition-colors"
         >
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-white font-semibold text-sm">{party.title}</h3>

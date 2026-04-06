@@ -285,7 +285,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
 
       {/* ── Farcaster User Search Panel ─────────────────────────────────────── */}
       {showAddPanel && (
-        <div className="bg-[#1a2a3a] rounded-xl p-4 mb-4 border border-gray-700">
+        <div className="bg-[#1a2a3a] rounded-xl p-4 mb-4 border border-white/[0.08]">
           <p className="text-sm font-medium text-gray-300 mb-3">Search Farcaster Users</p>
           <input
             value={fcSearch}
@@ -309,7 +309,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                 return (
                   <div
                     key={user.fid}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-[#0a1628] border border-gray-800"
+                    className="flex items-start gap-3 p-3 rounded-lg bg-[#0a1628] border border-white/[0.08]"
                   >
                     {/* Avatar */}
                     {user.pfp_url ? (
@@ -411,7 +411,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
             return (
               <div
                 key={entry.id}
-                className="bg-[#1a2a3a] rounded-xl overflow-hidden border border-gray-800/50"
+                className="bg-[#1a2a3a] rounded-xl overflow-hidden border border-white/[0.08]"
               >
                 {/* Main row */}
                 <button
@@ -462,7 +462,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
 
                 {/* Expanded detail */}
                 {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-gray-800/50">
+                  <div className="px-4 pb-4 border-t border-white/[0.08]">
                     <div className="mt-3 space-y-2">
                       {/* Farcaster wallet (custody) */}
                       {entry.custody_address && (
@@ -553,7 +553,7 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-800/50">
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/[0.08]">
                       <span className="text-[10px] text-gray-600">
                         Added {new Date(entry.added_at).toLocaleDateString()}
                       </span>

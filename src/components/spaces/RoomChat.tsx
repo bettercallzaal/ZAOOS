@@ -84,7 +84,7 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
   return (
     <div className="flex flex-col h-full bg-[#0d1b2a] text-white">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2.5 border-b border-gray-800">
+      <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/[0.08]">
         <span className="text-sm font-medium">Room Chat</span>
         {onClose && (
           <button onClick={onClose} aria-label="Close chat" className="text-gray-400 hover:text-white transition-colors">
@@ -122,7 +122,7 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
       {/* Input */}
       <form
         onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-        className="border-t border-gray-800 p-2 flex gap-2"
+        className="border-t border-white/[0.08] p-2 flex gap-2"
       >
         <input
           type="text"
@@ -130,7 +130,7 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type a message..."
           maxLength={500}
-          className="flex-1 bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2 border border-gray-700 focus:border-[#f5a623] focus:outline-none placeholder-gray-500"
+          className="flex-1 bg-[#1a2a3a] text-white text-sm rounded-lg px-3 py-2 border border-white/[0.08] focus:border-[#f5a623] focus:outline-none placeholder-gray-500"
         />
         <button
           type="submit"

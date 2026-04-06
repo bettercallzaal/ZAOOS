@@ -36,7 +36,7 @@ export function DescriptionPanel() {
           <ConnectionQuality />
           <button
             onClick={handleShare}
-            className="text-gray-400 hover:text-white text-xs px-3 py-1 border border-gray-700 rounded-lg transition-colors"
+            className="text-gray-400 hover:text-white text-xs px-3 py-1 border border-white/[0.08] rounded-lg transition-colors"
           >
             {copied ? 'Copied!' : 'Share'}
           </button>

@@ -33,7 +33,7 @@ export function PermissionRequests() {
   if (requests.length === 0) return null;
 
   return (
-    <div className="px-4 py-2 border-b border-gray-800">
+    <div className="px-4 py-2 border-b border-white/[0.08]">
       {requests.map((request) => (
         <div key={request.user.id} className="flex items-center justify-between py-1.5">
           <span className="text-gray-300 text-sm">

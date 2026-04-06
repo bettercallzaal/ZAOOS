@@ -58,7 +58,7 @@ export default function EcosystemPanel() {
             <Link
               key={partner.name}
               href={embedUrl}
-              className="block bg-[#0d1b2a] rounded-xl border border-gray-800 p-4 hover:border-[#f5a623]/40 transition-all"
+              className="block bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 hover:border-[#f5a623]/40 transition-all"
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{ICON_MAP[partner.icon] || '\uD83D\uDD17'}</span>
@@ -77,7 +77,7 @@ export default function EcosystemPanel() {
         return (
           <div
             key={partner.name}
-            className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden transition-all"
+            className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden transition-all"
           >
             <button
               onClick={() => setExpanded(isExpanded ? null : partner.name)}
@@ -111,7 +111,7 @@ export default function EcosystemPanel() {
             </button>
 
             {isExpanded && (
-              <div className="border-t border-gray-800">
+              <div className="border-t border-white/[0.08]">
                 <div className="relative w-full bg-[#0a1628]" style={{ height: '70vh', minHeight: '400px' }}>
                   <iframe
                     src={embedUrl}
@@ -122,7 +122,7 @@ export default function EcosystemPanel() {
                     allow="clipboard-write; microphone; camera; autoplay"
                   />
                 </div>
-                <div className="flex items-center justify-between px-4 py-2 bg-[#0d1b2a] border-t border-gray-800">
+                <div className="flex items-center justify-between px-4 py-2 bg-[#0d1b2a] border-t border-white/[0.08]">
                   <p className="text-[10px] text-gray-600 truncate">{embedUrl.replace('https://', '')}</p>
                   <a
                     href={embedUrl}

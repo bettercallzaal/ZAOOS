@@ -73,7 +73,7 @@ export function RespectPageClient({ currentFid }: RespectPageClientProps) {
   return (
     <>
       {/* Tab bar */}
-      <div className="flex gap-1 bg-[#0d1b2a] rounded-xl p-1 border border-gray-800">
+      <div className="flex gap-1 bg-[#0d1b2a] rounded-xl p-1 border border-white/[0.08]">
         {tabs.map((tab) => (
           <button
             key={tab.id}

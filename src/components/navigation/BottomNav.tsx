@@ -87,7 +87,7 @@ export function BottomNav() {
   return (
     <>
       {/* Desktop: top tab bar with all items visible */}
-      <nav aria-label="Main navigation" className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-[#0d1b2a] border-b border-gray-800">
+      <nav aria-label="Main navigation" className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-[#0d1b2a] border-b border-white/[0.08]">
         <div className="flex items-center h-10 px-4 max-w-6xl mx-auto">
           <span
             className="text-sm font-bold mr-6 tracking-wide"
@@ -151,7 +151,7 @@ export function BottomNav() {
               {moreOpen && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setMoreOpen(false)} />
-                  <div className="absolute right-0 top-full mt-1 z-40 bg-[#0d1b2a] border border-gray-700 rounded-xl shadow-xl py-1 min-w-[160px]">
+                  <div className="absolute right-0 top-full mt-1 z-40 bg-[#0d1b2a] border border-white/[0.08] rounded-xl shadow-xl py-1 min-w-[160px]">
                     {MORE_ITEMS.slice(4).map((item) => (
                       <Link
                         key={item.href}
@@ -198,12 +198,12 @@ export function BottomNav() {
       </nav>
 
       {/* Mobile: bottom tab bar with More menu */}
-      <nav aria-label="Main navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-gray-800" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <nav aria-label="Main navigation" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1b2a] border-t border-white/[0.08]" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {/* More menu (slides up from bottom) */}
         {moreOpen && (
           <>
             <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setMoreOpen(false)} />
-            <div className="absolute bottom-full left-0 right-0 z-50 bg-[#0d1b2a] border-t border-gray-700 rounded-t-2xl shadow-xl pb-2 animate-slide-up">
+            <div className="absolute bottom-full left-0 right-0 z-50 bg-[#0d1b2a] border-t border-white/[0.08] rounded-t-2xl shadow-xl pb-2 animate-slide-up">
               <div className="flex justify-center pt-3 pb-2">
                 <div className="w-10 h-1 rounded-full bg-gray-700" />
               </div>

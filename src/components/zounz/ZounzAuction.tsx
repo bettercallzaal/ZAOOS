@@ -172,7 +172,7 @@ export default function ZounzAuction() {
 
   if (loading) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-6 text-center">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-6 text-center">
         <div className="w-6 h-6 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
         <p className="text-sm text-gray-400">Loading ZOUNZ auction...</p>
       </div>
@@ -181,7 +181,7 @@ export default function ZounzAuction() {
 
   if (error) {
     return (
-      <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 p-6 text-center">
+      <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-6 text-center">
         <p className="text-sm text-red-400">{error}</p>
         <a
           href="https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883"
@@ -196,7 +196,7 @@ export default function ZounzAuction() {
   }
 
   return (
-    <div className="bg-[#0d1b2a] rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
       {/* NFT Image */}
       {tokenMeta?.image && (
         <div className="aspect-square bg-[#0a1628] flex items-center justify-center overflow-hidden">
@@ -296,7 +296,7 @@ export default function ZounzAuction() {
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-800">
+        <div className="flex items-center justify-between pt-2 border-t border-white/[0.08]">
           <span className="text-[10px] text-gray-600">ZABAL Nouns DAO on Base</span>
           <div className="flex items-center gap-2">
             <ShareToFarcaster

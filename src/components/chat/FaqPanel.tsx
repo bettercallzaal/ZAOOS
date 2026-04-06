@@ -64,9 +64,9 @@ export function FaqPanel({ isOpen, onClose }: FaqPanelProps) {
   return (
     <>
       <div className="fixed inset-0 bg-black/60 z-50" onClick={onClose} />
-      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-[#0d1b2a] border-l border-gray-800 z-50 flex flex-col shadow-xl">
+      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-[#0d1b2a] border-l border-white/[0.08] z-50 flex flex-col shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-800 flex-shrink-0">
+        <div className="flex items-center justify-between p-4 border-b border-white/[0.08] flex-shrink-0">
           <h2 className="text-lg font-bold text-white">FAQ</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors" aria-label="Close FAQ">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -78,7 +78,7 @@ export function FaqPanel({ isOpen, onClose }: FaqPanelProps) {
         {/* FAQ items */}
         <div className="flex-1 overflow-y-auto">
           {FAQ_ITEMS.map((item, i) => (
-            <div key={i} className="border-b border-gray-800/50">
+            <div key={i} className="border-b border-white/[0.08]">
               <button
                 onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
                 className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-white/[0.02] transition-colors"

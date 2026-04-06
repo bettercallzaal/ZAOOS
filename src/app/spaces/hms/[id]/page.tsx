@@ -90,7 +90,7 @@ export default function HMSRoomPage() {
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col">
-      <header className="px-4 py-3 border-b border-gray-800 bg-[#0d1b2a] flex items-center justify-between">
+      <header className="px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-white font-bold">{room.title}</h1>

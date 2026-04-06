@@ -98,7 +98,7 @@ export function ConnectXMTP({ isConnecting, error, onConnect }: ConnectXMTPProps
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-colors text-left ${
                   effectiveSelected === w.address
                     ? 'border-[#f5a623] bg-[#f5a623]/5'
-                    : 'border-gray-800 bg-[#0d1b2a] hover:border-gray-600'
+                    : 'border-white/[0.08] bg-[#0d1b2a] hover:border-gray-600'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">

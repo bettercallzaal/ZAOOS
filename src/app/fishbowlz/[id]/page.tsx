@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { TranscriptInput } from '@/components/spaces/TranscriptInput';
 import { FishbowlChat } from '@/components/spaces/FishbowlChat';
 import { Reactions } from '@/components/fishbowlz/Reactions';
+import { TipButton } from '@/components/fishbowlz/TipButton';
 import { useToast, ToastProvider } from '@/components/ui/Toast';
 import dynamic from 'next/dynamic';
 
@@ -474,26 +475,33 @@ function FishbowlRoomPageInner() {
                           <p className="text-xs text-gray-400">🔥 Hot seat</p>
                           <SpeakerTime joinedAt={speaker.joinedAt} />
                         </div>
-                        {isHost && speaker.fid !== user?.fid && (
-                          <button
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ action: 'kick_speaker', targetFid: speaker.fid }),
-                              });
-                              if (res.ok) {
-                                toast(`Moved @${speaker.username} to listeners`, 'info');
-                                await fetchRoom();
-                              }
-                            }}
-                            className="text-[10px] text-red-400 hover:text-red-300 mt-0.5"
-                            title="Move to listeners"
-                          >
-                            kick
-                          </button>
-                        )}
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {isHost && speaker.fid !== user?.fid && (
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ action: 'kick_speaker', targetFid: speaker.fid }),
+                                });
+                                if (res.ok) {
+                                  toast(`Moved @${speaker.username} to listeners`, 'info');
+                                  await fetchRoom();
+                                }
+                              }}
+                              className="text-[10px] text-red-400 hover:text-red-300"
+                              title="Move to listeners"
+                            >
+                              kick
+                            </button>
+                          )}
+                          <TipButton
+                            speakerFid={speaker.fid}
+                            speakerUsername={speaker.username}
+                            roomId={room.id}
+                          />
+                        </div>
                       </div>
                     </div>
                   ) : (

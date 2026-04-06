@@ -1,5 +1,9 @@
 # CLAUDE.md — ZAO OS
 
+## Session Start (Do This First)
+
+**Before any work, invoke `/worksession`** to create an isolated branch. Multiple Claude Code terminals may be open simultaneously — each must work on its own `ws/` branch to avoid conflicts. Do not skip this even if the user jumps straight into a task.
+
 ## What This Is
 
 ZAO OS is a gated Farcaster social client for **The ZAO** (ZTalent Artist Organization) — a decentralized music community. Built with Next.js 16 + React 19, Supabase, Neynar, and XMTP.

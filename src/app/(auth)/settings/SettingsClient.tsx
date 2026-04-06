@@ -12,12 +12,12 @@ import { LazySolanaWalletConnect } from '@/components/solana/LazySolanaWalletCon
 import type { SessionData } from '@/types';
 import { ShareToFarcaster, shareTemplates } from '@/components/social/ShareToFarcaster';
 import { useENSNames } from '@/hooks/useENS';
-import { CrossfadeSettings } from '@/components/music/CrossfadeSettings';
-import { LastfmConnect } from './LastfmConnect';
-import { ListenBrainzConnect } from './ListenBrainzConnect';
-import { SocialsSection } from './SocialsSection';
-import { CrossPostingSection } from './CrossPostingSection';
 import dynamic from 'next/dynamic';
+const CrossfadeSettings = dynamic(() => import('@/components/music/CrossfadeSettings').then(m => ({ default: m.CrossfadeSettings })), { ssr: false });
+const LastfmConnect = dynamic(() => import('./LastfmConnect').then(m => ({ default: m.LastfmConnect })), { ssr: false });
+const ListenBrainzConnect = dynamic(() => import('./ListenBrainzConnect').then(m => ({ default: m.ListenBrainzConnect })), { ssr: false });
+const SocialsSection = dynamic(() => import('./SocialsSection').then(m => ({ default: m.SocialsSection })), { ssr: false });
+const CrossPostingSection = dynamic(() => import('./CrossPostingSection').then(m => ({ default: m.CrossPostingSection })), { ssr: false });
 const TwitchConnect = dynamic(() => import('@/components/settings/TwitchConnect'), { ssr: false });
 const KickConnect = dynamic(() => import('@/components/settings/KickConnect'), { ssr: false });
 const FacebookConnect = dynamic(() => import('@/components/settings/FacebookConnect'), { ssr: false });

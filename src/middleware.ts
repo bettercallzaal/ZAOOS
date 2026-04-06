@@ -124,7 +124,20 @@ function addSecurityHeaders(response: NextResponse, nonce?: string, pathname?: s
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Apply rate limiting to API routes
+  // Fast path for page routes — skip rate limiting entirely, just add headers
+  if (!pathname.startsWith('/api/')) {
+    const nonce = generateNonce();
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-nonce', nonce);
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    if (pathname.startsWith('/messages')) {
+      response.headers.set('Cross-Origin-Embedder-Policy', 'credentialless');
+      response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+    }
+    return addSecurityHeaders(response, nonce, pathname);
+  }
+
+  // Apply rate limiting to API routes only
   const config = getRateLimitConfig(pathname);
   if (config) {
     // Vercel strips user-supplied X-Forwarded-For and sets trusted values.
@@ -145,27 +158,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Generate nonce for page routes (not API routes)
-  const isPageRoute = !pathname.startsWith('/api/');
-  const nonce = isPageRoute ? generateNonce() : undefined;
-  const isMessagesRoute = pathname.startsWith('/messages');
-
-  const requestHeaders = new Headers(request.headers);
-  if (nonce) {
-    requestHeaders.set('x-nonce', nonce);
-  }
-
-  const response = NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-
-  // XMTP WASM requires COEP/COOP for SharedArrayBuffer
-  if (isMessagesRoute) {
-    response.headers.set('Cross-Origin-Embedder-Policy', 'credentialless');
-    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
-  }
-
-  return addSecurityHeaders(response, nonce, pathname);
+  // API routes: no nonce, just security headers
+  const response = NextResponse.next();
+  return addSecurityHeaders(response, undefined, pathname);
 }
 
 export const config = {

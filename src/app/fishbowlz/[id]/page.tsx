@@ -9,6 +9,7 @@ import { Reactions } from '@/components/fishbowlz/Reactions';
 import { TipButton } from '@/components/fishbowlz/TipButton';
 import { useToast, ToastProvider } from '@/components/ui/Toast';
 import dynamic from 'next/dynamic';
+import { ShareModal } from '@/components/shared/ShareModal';
 
 function parseJsonb<T>(value: unknown, fallback: T): T {
   if (typeof value === 'string') {
@@ -129,7 +130,7 @@ function FishbowlRoomPageInner() {
   const [error, setError] = useState<string | null>(null);
   const [audioJoined, setAudioJoined] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const [gateError, setGateError] = useState<{ message: string; details?: string } | null>(null);
   const [showEndedOverlay, setShowEndedOverlay] = useState(false);
   const [endedCountdown, setEndedCountdown] = useState(5);
@@ -296,15 +297,6 @@ function FishbowlRoomPageInner() {
     return () => clearTimeout(timer);
   }, [showEndedOverlay, endedCountdown, router]);
 
-  const copyShareLink = () => {
-    const url = `${window.location.origin}/fishbowlz/${room?.slug || roomId}`;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true);
-      toast('Room link copied!', 'success');
-      setTimeout(() => setCopied(false), 2000);
-    }).catch(() => toast('Failed to copy link', 'error'));
-  };
-
   const endRoom = async () => {
     const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
       method: 'PATCH',
@@ -435,11 +427,11 @@ function FishbowlRoomPageInner() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
-            onClick={copyShareLink}
+            onClick={() => setShowShare(true)}
             className="text-xs px-2 py-1 rounded-full bg-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition-colors"
-            title="Copy room link"
+            title="Share room"
           >
-            {copied ? '✓ Copied' : '🔗 Share'}
+            🔗 Share
           </button>
           {room.state === 'ended' && (
             <a
@@ -900,6 +892,16 @@ function FishbowlRoomPageInner() {
             Leave
           </button>
         </div>
+      )}
+
+      {room && (
+        <ShareModal
+          url={typeof window !== 'undefined' ? `${window.location.origin}/fishbowlz/${room.slug || roomId}` : ''}
+          title={`Join "${room.title}" on FISHBOWLZ`}
+          description={room.description || `A live fishbowl hosted by @${room.host_username}`}
+          isOpen={showShare}
+          onClose={() => setShowShare(false)}
+        />
       )}
 
       {showEndedOverlay && (

@@ -130,6 +130,10 @@ function FishbowlRoomPageInner() {
   const [audioJoined, setAudioJoined] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [gateError, setGateError] = useState<{ message: string; details?: string } | null>(null);
+  const [showEndedOverlay, setShowEndedOverlay] = useState(false);
+  const [endedCountdown, setEndedCountdown] = useState(5);
+  const endedRoomRef = useRef<FishbowlRoom | null>(null);
   const transcriptBottomRef = useRef<HTMLDivElement>(null);
 
   const isHost = user?.fid === room?.host_fid;
@@ -149,7 +153,7 @@ function FishbowlRoomPageInner() {
 
       if (data.state === 'ended') {
         setAudioJoined(false);
-        // Only auto-redirect if the user was actively participating when the room ended.
+        // Only show interstitial if the user was actively participating when the room ended.
         // If navigating directly to an ended room URL, show the transcript archive instead.
         setRoom((prev) => {
           if (prev && prev.state === 'active') {
@@ -157,7 +161,8 @@ function FishbowlRoomPageInner() {
               prev.current_speakers?.some((s) => s.fid === user?.fid) ||
               prev.current_listeners?.some((l) => l.fid === user?.fid);
             if (wasParticipating) {
-              router.push('/fishbowlz');
+              endedRoomRef.current = data;
+              setShowEndedOverlay(true);
             }
           }
           return data;
@@ -266,6 +271,17 @@ function FishbowlRoomPageInner() {
     transcriptBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [transcripts]);
 
+  // Countdown for ended room interstitial
+  useEffect(() => {
+    if (!showEndedOverlay) return;
+    if (endedCountdown <= 0) {
+      router.push('/fishbowlz');
+      return;
+    }
+    const timer = setTimeout(() => setEndedCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [showEndedOverlay, endedCountdown, router]);
+
   const copyShareLink = () => {
     const url = `${window.location.origin}/fishbowlz/${room?.slug || roomId}`;
     navigator.clipboard.writeText(url).then(() => {
@@ -292,6 +308,7 @@ function FishbowlRoomPageInner() {
   const joinAsSpeaker = async () => {
     if (!user || joining) return;
     setJoining(true);
+    setGateError(null);
     try {
       const res = await fetch(`/api/fishbowlz/rooms/${roomId}`, {
         method: 'PATCH',
@@ -300,7 +317,15 @@ function FishbowlRoomPageInner() {
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        toast(errData.error || 'Failed to join', 'error');
+        if (res.status === 403 && errData.reason) {
+          const score = errData.score ? ` Your score: ${errData.score}.` : '';
+          setGateError({
+            message: errData.error || 'You don\'t meet the requirements to join.',
+            details: errData.reason + score,
+          });
+        } else {
+          toast(errData.error || 'Failed to join', 'error');
+        }
         return;
       }
       await fetchRoom();
@@ -576,6 +601,26 @@ function FishbowlRoomPageInner() {
             })}
           </div>
 
+          {/* Gate error alert */}
+          {gateError && (
+            <div className="mt-4 p-3 bg-red-900/20 border border-red-600/30 rounded-lg">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm text-red-400 font-medium">{gateError.message}</p>
+                  {gateError.details && (
+                    <p className="text-xs text-red-400/70 mt-1">{gateError.details}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => setGateError(null)}
+                  className="text-red-400/50 hover:text-red-400 text-xs shrink-0"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Join Controls — only shown for active rooms */}
           {room.state === 'active' && (
             <div className="mt-4 sm:mt-6 flex flex-wrap gap-2 sm:gap-3">
@@ -633,6 +678,11 @@ function FishbowlRoomPageInner() {
                   >
                     {room.hand_raises?.some((r) => r.fid === user?.fid) ? '✋ Hand Raised' : '✋ Raise Hand'}
                   </button>
+                  {room.hand_raises?.some((r) => r.fid === user?.fid) && (
+                    <span className="text-xs text-[#f5a623]">
+                      You&apos;re #{(room.hand_raises?.findIndex((r) => r.fid === user?.fid) ?? 0) + 1} in queue
+                    </span>
+                  )}
                   {hotSeatFull ? (
                     <button
                       onClick={rotateIn}
@@ -678,9 +728,15 @@ function FishbowlRoomPageInner() {
                 ✋ Hand Raises ({room.hand_raises.length})
               </h4>
               <div className="space-y-2">
-                {room.hand_raises.map((r) => (
+                {room.hand_raises.map((r, index) => (
                   <div key={r.fid} className="flex items-center justify-between">
-                    <span className="text-sm text-white">@{r.username}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono text-[#f5a623] bg-[#f5a623]/10 w-6 h-6 rounded-full flex items-center justify-center">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm text-white">@{r.username}</span>
+                      <span className="text-[10px] text-gray-500">{timeAgo(r.joinedAt)}</span>
+                    </div>
                     <div className="flex gap-2">
                       <button
                         onClick={async () => {
@@ -814,6 +870,41 @@ function FishbowlRoomPageInner() {
           >
             Leave
           </button>
+        </div>
+      )}
+
+      {showEndedOverlay && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1a2a4a] rounded-xl p-6 w-full max-w-sm border border-white/10 text-center">
+            <div className="text-4xl mb-3">🐟</div>
+            <h2 className="text-lg font-bold mb-1">This fishbowl has ended</h2>
+            <p className="text-sm text-gray-400 mb-1">
+              {endedRoomRef.current?.title || room?.title}
+            </p>
+            <p className="text-xs text-gray-500 mb-4">
+              Hosted by @{endedRoomRef.current?.host_username || room?.host_username}
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => router.push('/fishbowlz')}
+                className="w-full bg-[#f5a623] text-[#0a1628] font-semibold py-2.5 rounded-lg hover:bg-[#d4941f] transition-colors"
+              >
+                Back to Rooms
+              </button>
+              {transcripts.length > 0 && (
+                <button
+                  onClick={() => {
+                    setShowEndedOverlay(false);
+                    setEndedCountdown(0);
+                  }}
+                  className="w-full border border-white/20 py-2.5 rounded-lg hover:bg-white/5 transition-colors text-sm"
+                >
+                  View Transcript
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-3">Redirecting in {endedCountdown}...</p>
+          </div>
         </div>
       )}
 

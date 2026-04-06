@@ -22,8 +22,9 @@ const OnboardingFunnel = dynamic(() => import('@/components/admin/OnboardingFunn
 const DormantMembers = dynamic(() => import('@/components/admin/DormantMembers').then(m => ({ default: m.DormantMembers })), { ssr: false });
 const SpacesManager = dynamic(() => import('@/components/admin/SpacesManager').then(m => ({ default: m.SpacesManager })), { ssr: false });
 const AgentDashboard = dynamic(() => import('@/components/admin/agents/AgentDashboard'), { ssr: false });
+const RolodexDashboard = dynamic(() => import('@/components/admin/rolodex/RolodexDashboard').then(m => ({ default: m.RolodexDashboard })), { ssr: false });
 
-type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls' | 'discord' | 'engagement' | 'audit' | 'funnel' | 'dormant' | 'spaces' | 'agents';
+type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls' | 'discord' | 'engagement' | 'audit' | 'funnel' | 'dormant' | 'spaces' | 'agents' | 'rolodex';
 
 export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<Tab>('users');
@@ -68,6 +69,7 @@ export function AdminPanel() {
       label: 'Agents',
       tabs: [
         { id: 'agents' as Tab, label: '🤖 Squad', icon: '' },
+        { id: 'rolodex' as Tab, label: '📇 Rolodex', icon: '' },
       ],
     },
   ];
@@ -138,6 +140,7 @@ export function AdminPanel() {
         {activeTab === 'dormant' && <DormantMembers />}
         {activeTab === 'spaces' && <SpacesManager />}
         {activeTab === 'agents' && <AgentDashboard />}
+        {activeTab === 'rolodex' && <RolodexDashboard />}
       </div>
 
       {broadcastOpen && <BroadcastModal onClose={() => setBroadcastOpen(false)} />}

@@ -12,7 +12,9 @@ import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
 
 const appClient = createAppClient({
-  ethereum: viemConnector(),
+  ethereum: viemConnector({
+    rpcUrl: 'https://mainnet.optimism.io',
+  }),
 });
 
 const NONCE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -72,14 +74,24 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify SIWF signature
-    const result = await appClient.verifySignInMessage({
-      message,
-      signature: signature as `0x${string}`,
-      nonce,
-      domain,
-    });
+    let result;
+    try {
+      result = await appClient.verifySignInMessage({
+        message,
+        signature: signature as `0x${string}`,
+        nonce,
+        domain,
+      });
+    } catch (verifyError) {
+      logger.error('[Auth] SIWF verification RPC/network error:', verifyError);
+      return NextResponse.json(
+        { error: 'Verification service temporarily unavailable. Please try again.' },
+        { status: 503 }
+      );
+    }
 
-    if (!result.success) {
+    if (result.isError || !result.success) {
+      logger.warn('[Auth] SIWF signature verification failed:', result.error || 'unknown');
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 

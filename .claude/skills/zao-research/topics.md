@@ -125,6 +125,7 @@ Use this to quickly find if a topic has already been researched.
 
 ## Community & Growth
 - Gating (allowlist → NFT → Hats → EAS) → `12`
+- ZAO FAQ + Word Wall: community-driven web3 glossary, Respect-weighted voting, Urban Dictionary-style, peth Roadmapr pattern → `287`
 - Chat messaging (Farcaster channels + XMTP) → `13`
 - XMTP V3 browser SDK, MLS encryption, mainnet fees → `74`
 - MVP specification → `15`

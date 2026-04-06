@@ -23,3 +23,4 @@
 | 231 | [Member Profiles: Tyler/Magnetiq, Candy, Swarthy, DCoop](./231-community-profiles-tyler-candy-swarthy-dcoop/) | STANDALONE | Deep profiles on four ZAO community members including ZAOVille and WaveWarZ ties |
 | 249 | [Incented Deep Dive & ClawDown Challenge](./249-incented-deep-dive-new-campaigns-clawdown/) | STANDALONE | Incented protocol mechanics, new ZABAL campaign ideas, and ClawDown.xyz for ZOE |
 | 272 | [ZAO Task Forces & Team Structure](./272-zao-task-forces-2026/) | STANDALONE | 6-month roadmap for ZAO task forces and team structure |
+| 287 | [ZAO FAQ + Word Wall Glossary](./287-zao-faq-word-wall-glossary/) | STANDALONE | Community-driven web3 glossary (Urban Dictionary-style) with Respect-weighted voting, FAQ upgrade, peth vibecoding patterns, 6.5hr implementation plan |

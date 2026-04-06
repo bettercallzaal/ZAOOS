@@ -1,6 +1,4 @@
 import { Metadata } from 'next';
-import { NotificationBell } from '@/components/navigation/NotificationBell';
-import { PageHeader } from '@/components/navigation/PageHeader';
 import { CountdownTimer } from '@/components/events/CountdownTimer';
 import { RSVPForm } from './RSVPForm';
 
@@ -78,16 +76,22 @@ const PAST_EVENTS = [
 
 export default function StockPage() {
   return (
-    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-36">
-      <PageHeader
-        title="ZAO Stock"
-        subtitle="Community Music Festival"
-        rightAction={
-          <div className="md:hidden">
-            <NotificationBell />
+    <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-12">
+      {/* Simple public header */}
+      <header className="sticky top-0 z-40 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/[0.06]">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-bold text-white">ZAO Stock</h1>
+            <p className="text-xs text-gray-400">Community Music Festival</p>
           </div>
-        }
-      />
+          <a
+            href="/"
+            className="text-sm text-[#f5a623] hover:text-[#ffd700] transition-colors"
+          >
+            The ZAO
+          </a>
+        </div>
+      </header>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
         {/* Hero */}
@@ -95,7 +99,7 @@ export default function StockPage() {
           <div className="inline-block rounded-full bg-[#f5a623]/10 px-4 py-1.5 text-sm text-[#f5a623] font-medium border border-[#f5a623]/30">
             October 3, 2026
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">ZAO Stock</h1>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">ZAO Stock</h2>
           <p className="text-gray-400 text-lg max-w-md mx-auto">
             A community-built outdoor music festival in Ellsworth, Maine. 10 artists. One stage. All day.
           </p>

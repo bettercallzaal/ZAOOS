@@ -29,6 +29,7 @@ interface FishbowlRoom {
   current_listeners: Array<{ fid: number; username: string; joinedAt: string }>;
   total_sessions: number;
   gating_enabled?: boolean;
+  token_gate_address?: string;
   scheduled_at?: string;
   created_at: string;
   last_active_at: string;
@@ -70,6 +71,9 @@ export default function FishbowlzPage() {
   const [scheduleDate, setScheduleDate] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
   const [rotationTimer, setRotationTimer] = useState(0); // 0 = off
+  const [tokenGateEnabled, setTokenGateEnabled] = useState(false);
+  const [tokenGateAddress, setTokenGateAddress] = useState('');
+  const [tokenGateMinBalance, setTokenGateMinBalance] = useState('1');
 
   useEffect(() => {
     fetch('/api/fishbowlz/rooms')
@@ -106,6 +110,8 @@ export default function FishbowlzPage() {
         hotSeatCount: hotSeats,
         scheduledAt,
         rotationIntervalMs: rotationTimer || undefined,
+        tokenGateAddress: tokenGateEnabled ? tokenGateAddress : undefined,
+        tokenGateMinBalance: tokenGateEnabled ? tokenGateMinBalance : undefined,
       }),
     });
 
@@ -247,6 +253,36 @@ export default function FishbowlzPage() {
                 </div>
               )}
             </div>
+            <div className="mb-4">
+              <label className="flex items-center gap-2 text-sm text-gray-400 mb-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={tokenGateEnabled}
+                  onChange={(e) => setTokenGateEnabled(e.target.checked)}
+                  className="accent-[#f5a623]"
+                />
+                🔒 Token gate this room
+              </label>
+              {tokenGateEnabled && (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Token contract address (0x...)"
+                    value={tokenGateAddress}
+                    onChange={(e) => setTokenGateAddress(e.target.value)}
+                    className="w-full bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Minimum balance (e.g. 100)"
+                    value={tokenGateMinBalance}
+                    onChange={(e) => setTokenGateMinBalance(e.target.value)}
+                    className="w-full bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623]"
+                  />
+                  <p className="text-[10px] text-gray-500">Users must hold this token on Base to join</p>
+                </div>
+              )}
+            </div>
             <div className="flex gap-3">
               <button
                 onClick={handleCreate}
@@ -305,6 +341,11 @@ export default function FishbowlzPage() {
                   {room.gating_enabled && (
                     <span className="inline-flex items-center gap-1 text-xs bg-[#f5a623]/15 text-[#f5a623] px-2 py-0.5 rounded-full mb-2">
                       🔐 FC-gated
+                    </span>
+                  )}
+                  {room.token_gate_address && (
+                    <span className="inline-flex items-center gap-1 text-xs bg-amber-600/20 text-amber-400 px-2 py-0.5 rounded-full mb-2">
+                      🔒 Token-gated
                     </span>
                   )}
                   {room.state === 'ended' ? (

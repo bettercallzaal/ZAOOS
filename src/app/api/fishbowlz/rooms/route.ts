@@ -19,6 +19,8 @@ const CreateRoomSchema = z.object({
   gatingEnabled: z.boolean().default(false),
   minQualityScore: z.number().int().min(0).default(0),
   scheduledAt: z.string().datetime().optional(),
+  tokenGateAddress: z.string().startsWith('0x').optional(),
+  tokenGateMinBalance: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -64,6 +66,10 @@ export async function POST(req: NextRequest) {
         scheduled_at: data.scheduledAt || null,
         current_speakers: isScheduled ? [] : [{ fid: data.hostFid, username: data.hostUsername, joinedAt: new Date().toISOString() }],
         current_listeners: [],
+        token_gate_address: data.tokenGateAddress || null,
+        token_gate_min_balance: data.tokenGateMinBalance || '0',
+        token_gate_chain_id: 8453,
+        token_gate_type: data.tokenGateAddress ? 'erc20' : null,
       })
       .select()
       .single();

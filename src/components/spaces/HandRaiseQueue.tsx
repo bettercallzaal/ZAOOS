@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 
 interface HandRaise {
@@ -104,7 +105,7 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
         {raisedHands.map((r) => (
           <div key={r.id} className="flex items-center gap-2">
             {r.pfp_url ? (
-              <img src={r.pfp_url} alt="" className="w-6 h-6 rounded-full" />
+              <Image src={r.pfp_url || '/logo.png'} alt="" width={24} height={24} className="w-6 h-6 rounded-full" unoptimized />
             ) : (
               <div className="w-6 h-6 rounded-full bg-gray-700" />
             )}

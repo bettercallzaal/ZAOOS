@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { usePlayer } from '@/providers/audio';
 import { useAuth } from '@/hooks/useAuth';
 import type { TrackMetadata } from '@/types/music';
@@ -84,7 +85,7 @@ function TrackRow({ track, onVote, onPlay }: {
     <div className="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-white/5 transition-colors group">
       <button onClick={() => onPlay(track)} className="relative w-10 h-10 flex-shrink-0 rounded-md overflow-hidden bg-white/10">
         {track.song_artwork_url ? (
-          <img src={track.song_artwork_url} alt="" className="w-full h-full object-cover" />
+          <Image src={track.song_artwork_url || '/default-track.png'} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-500">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>

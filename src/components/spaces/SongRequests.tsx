@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 import { useQueue } from '@/contexts/QueueContext';
 import type { TrackMetadata } from '@/types/music';
@@ -149,7 +150,7 @@ export function SongRequests({ roomId, isHost }: SongRequestsProps) {
               className="flex items-center gap-2.5 p-2 bg-white/5 rounded-lg border border-transparent"
             >
               {req.song_artwork ? (
-                <img src={req.song_artwork} alt="" className="w-8 h-8 rounded object-cover flex-shrink-0" />
+                <Image src={req.song_artwork || '/default-track.png'} alt="" width={32} height={32} className="w-8 h-8 rounded object-cover flex-shrink-0" unoptimized />
               ) : (
                 <div className="w-8 h-8 rounded bg-[#f5a623]/10 flex items-center justify-center flex-shrink-0">
                   <RequestIcon />

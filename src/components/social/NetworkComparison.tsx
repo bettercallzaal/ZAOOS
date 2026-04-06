@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface SharedUser {
   fid: number;
@@ -169,7 +170,7 @@ export function NetworkComparison({ targetFid, targetUsername }: Props) {
               >
                 <div className="w-5 h-5 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
                   {u.pfpUrl ? (
-                    <img src={u.pfpUrl} alt={u.username} className="w-full h-full object-cover" loading="lazy" />
+                    <Image src={u.pfpUrl || '/logo.png'} alt={u.username} width={20} height={20} className="w-full h-full object-cover" unoptimized />
                   ) : (
                     <div className="w-full h-full bg-gray-600" />
                   )}

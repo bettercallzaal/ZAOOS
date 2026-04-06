@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 interface MintSuccessProps {
   title: string;
   artist: string;
@@ -16,7 +18,7 @@ export default function MintSuccess({ title, artist, txId, coverUrl, bazarUrl, o
     <div className="text-center py-6">
       {coverUrl && (
         <div className="w-32 h-32 mx-auto rounded-xl overflow-hidden mb-4 ring-2 ring-[#f5a623]/40">
-          <img src={coverUrl} alt={title} className="w-full h-full object-cover" />
+          <Image src={coverUrl || '/default-track.png'} alt={title} width={128} height={128} className="w-full h-full object-cover" unoptimized />
         </div>
       )}
       <p className="text-lg font-bold text-green-400 mb-1">Minted to the Permaweb</p>

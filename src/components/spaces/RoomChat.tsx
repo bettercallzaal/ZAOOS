@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Image from 'next/image';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 
 interface ChatMessage {
@@ -101,7 +102,7 @@ export function RoomChat({ roomId, fid, onClose }: RoomChatProps) {
         {messages.map((msg) => (
           <div key={msg.id} className="flex gap-2 group">
             {msg.pfp_url ? (
-              <img src={msg.pfp_url} alt="" className="w-6 h-6 rounded-full flex-shrink-0 mt-0.5" />
+              <Image src={msg.pfp_url || '/logo.png'} alt="" width={24} height={24} className="w-6 h-6 rounded-full flex-shrink-0 mt-0.5" unoptimized />
             ) : (
               <div className="w-6 h-6 rounded-full bg-gray-700 flex-shrink-0 mt-0.5" />
             )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface SpotlightMember {
@@ -60,7 +61,7 @@ export function MemberSpotlight() {
       </div>
       <div className="flex items-center gap-3">
         {member.pfpUrl ? (
-          <img src={member.pfpUrl} alt="" className="w-12 h-12 rounded-full object-cover ring-2 ring-[#f5a623]/30" />
+          <Image src={member.pfpUrl || '/logo.png'} alt="" width={48} height={48} className="w-12 h-12 rounded-full object-cover ring-2 ring-[#f5a623]/30" unoptimized />
         ) : (
           <div className="w-12 h-12 rounded-full bg-[#f5a623]/20 flex items-center justify-center text-[#f5a623] font-bold">
             {member.displayName?.[0] || '?'}

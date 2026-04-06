@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, ReactNode } from 'react';
+import Image from 'next/image';
 
 type Track = { id: string; title: string; artist: string | null; artwork_url: string | null; play_count: number | null };
 type Submission = { id: string; title: string | null; artist: string | null; submitted_by_username: string | null };
@@ -17,7 +18,7 @@ type DigestData = {
 
 function Thumb({ src, fallback }: { src: string | null; fallback: string }) {
   return src ? (
-    <img src={src} alt="" className="w-10 h-10 rounded object-cover" />
+    <Image src={src || '/default-track.png'} alt="" width={40} height={40} className="w-10 h-10 rounded object-cover" unoptimized />
   ) : (
     <div className="w-10 h-10 rounded bg-white/10 flex items-center justify-center text-gray-500 text-xs">{fallback}</div>
   );

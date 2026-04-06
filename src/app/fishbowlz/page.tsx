@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -370,7 +371,7 @@ export default function FishbowlzPage() {
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center gap-1.5">
                       {room.host_pfp ? (
-                        <img src={room.host_pfp} alt="" className="w-4 h-4 rounded-full" />
+                        <Image src={room.host_pfp || '/logo.png'} alt="" width={16} height={16} className="w-4 h-4 rounded-full" unoptimized />
                       ) : (
                         <div className="w-4 h-4 rounded-full bg-gray-600 flex items-center justify-center text-[8px] text-gray-400">
                           {room.host_username[0]?.toUpperCase()}

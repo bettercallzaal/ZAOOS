@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@xmtp/wasm-bindings'],
 
   experimental: {
+    // Cache client-side navigations — instant page transitions on repeat visits
+    staleTimes: {
+      dynamic: 30,   // Cache dynamic pages for 30 seconds
+      static: 180,   // Cache static pages for 3 minutes
+    },
     // Tree-shake barrel exports from heavy libraries
     optimizePackageImports: [
       '@tanstack/react-query',
@@ -27,6 +32,7 @@ const nextConfig: NextConfig = {
       '@solana/wallet-adapter-wallets',
       '@solana/web3.js',
       '@xmtp/browser-sdk',
+      '@stream-io/video-react-sdk',
     ],
   },
 

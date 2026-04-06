@@ -11,9 +11,11 @@ import { communityConfig } from '@/../community.config';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
 
+const OPTIMISM_RPC_URL = process.env.NEXT_PUBLIC_OPTIMISM_RPC_URL || 'https://optimism.llamarpc.com';
+
 const appClient = createAppClient({
   ethereum: viemConnector({
-    rpcUrl: 'https://mainnet.optimism.io',
+    rpcUrl: OPTIMISM_RPC_URL,
   }),
 });
 
@@ -96,9 +98,22 @@ export async function POST(req: NextRequest) {
     }
 
     const fid = result.fid;
+    if (!fid || typeof fid !== 'number') {
+      logger.error('[Auth] SIWF verified but no FID returned:', { fid, success: result.success });
+      return NextResponse.json({ error: 'Verification succeeded but no Farcaster ID found. Please try again.' }, { status: 502 });
+    }
 
     // Get user profile from Neynar
-    const user = await getUserByFid(fid);
+    let user;
+    try {
+      user = await getUserByFid(fid);
+    } catch (neynarErr) {
+      logger.error('[Auth] Neynar getUserByFid failed for FID', fid, neynarErr);
+      return NextResponse.json(
+        { error: 'Could not fetch your Farcaster profile. Please try again.' },
+        { status: 502 }
+      );
+    }
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -108,13 +123,22 @@ export async function POST(req: NextRequest) {
     const verifiedAddresses = user.verified_addresses?.eth_addresses || [];
     const allAddresses = [custodyAddress, ...verifiedAddresses];
 
-    let gateResult = await checkAllowlist(fid);
-    if (!gateResult.allowed) {
-      for (const addr of allAddresses) {
-        if (!addr) continue;
-        gateResult = await checkAllowlist(undefined, addr);
-        if (gateResult.allowed) break;
+    let gateResult;
+    try {
+      gateResult = await checkAllowlist(fid);
+      if (!gateResult.allowed) {
+        for (const addr of allAddresses) {
+          if (!addr) continue;
+          gateResult = await checkAllowlist(undefined, addr);
+          if (gateResult.allowed) break;
+        }
       }
+    } catch (allowlistErr) {
+      logger.error('[Auth] Allowlist check failed for FID', fid, allowlistErr);
+      return NextResponse.json(
+        { error: 'Could not verify membership. Please try again.' },
+        { status: 502 }
+      );
     }
 
     if (!gateResult.allowed) {
@@ -123,15 +147,23 @@ export async function POST(req: NextRequest) {
 
     // Create session — store wallet address from Farcaster profile for consistency
     const primaryWallet = user.custody_address || verifiedAddresses[0] || '';
-    await saveSession({
-      fid,
-      username: user.username,
-      displayName: user.display_name,
-      pfpUrl: user.pfp_url,
-      walletAddress: primaryWallet || undefined,
-      authMethod: 'farcaster',
-      signerUuid: null,
-    });
+    try {
+      await saveSession({
+        fid,
+        username: user.username,
+        displayName: user.display_name,
+        pfpUrl: user.pfp_url,
+        walletAddress: primaryWallet || undefined,
+        authMethod: 'farcaster',
+        signerUuid: null,
+      });
+    } catch (sessionErr) {
+      logger.error('[Auth] Failed to save session for FID', fid, sessionErr);
+      return NextResponse.json(
+        { error: 'Could not create session. Please try again.' },
+        { status: 500 }
+      );
+    }
 
     // Upsert user record — atomic to prevent race conditions on concurrent logins
     try {

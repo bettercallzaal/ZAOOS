@@ -46,6 +46,8 @@ export function LoginButton() {
           helpfulMsg = 'Verification failed — your session may have expired. Please try signing in again.';
         } else if (response.status === 429) {
           helpfulMsg = 'Too many login attempts. Please wait a moment and try again.';
+        } else if (response.status === 502 || response.status === 503) {
+          helpfulMsg = serverMsg || 'A service is temporarily unavailable. Please try again in a moment.';
         } else if (serverMsg) {
           helpfulMsg = serverMsg;
         } else {

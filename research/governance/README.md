@@ -21,3 +21,4 @@
 | 149 | [BuilderOSS Deep Dive: Everything](./149-buildeross-deep-dive-everything/) | STANDALONE | Every package, hook, component, and utility in the BuilderOSS ecosystem |
 | 184 | [Superchain ORDAO & Cross-Chain Fractal](./184-superchain-ordao-crosschain-fractal/) | STANDALONE | Cross-chain Respect, Hats integration, Eden Fractal Epoch 2, Optimism grants |
 | 188 | [ZAO Fractal Bot & Process](./188-zao-fractal-bot-process/) | STANDALONE | Actual ZAO fractal process, Discord bot, and ZAO OS integration opportunities |
+| 285 | [ORDAO & ORFrapps Updated Docs](./285-ordao-orfrapps-updated-docs/) | STANDALONE | Updated ORDAO architecture, orfrapps CLI + config system, deployment walkthrough, ZAO integration map |

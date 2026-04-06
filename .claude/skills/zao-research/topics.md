@@ -29,6 +29,7 @@ Use this to quickly find if a topic has already been researched.
 - Neynar API 130+ endpoints audit: community radar, auto-curation, channel intel, smart engagement, x402 pay-per-call, 4 agent patterns → `246`
 - **AutoAgent self-optimizing agents**: meta-agent loop for harness engineering, model empathy, trace-based learning, overfitting guards, 5 emergent behaviors, comparison vs DSPy/Meta-Harness/ADAS → `253`
 - **Farcaster Agentic Bootcamp vs ZAO agent squad**: gap analysis (ERC-8004, x402, mini app, notifications), 7-agent dispatch ahead of bootcamp Session 10, $16 to close all gaps → `278`
+- **FID registration & x402 deep dive**: fid-forge x402 broken (empty 402 body), direct on-chain IdGateway ($7.30), x402-fetch works for Neynar hub ($0.001/call), 5 contract addresses, full agent identity flow → `280`
 
 ## Music & Audio
 - Music APIs (Audius, Sound.xyz, Spotify, SoundCloud, YouTube) → `03`
@@ -72,6 +73,7 @@ Use this to quickly find if a topic has already been researched.
 ## Respect & Governance
 - Respect tokens (aspirational design — tiers/decay NOT implemented) → `04`
 - ORDAO, OREC governance, Respect1155, Fibonacci scoring → `56`
+- ORDAO + ORFrapps updated docs: CLI, config system, deployment, orclient, ZAO integration → `285`
 - On-chain governance: ZOUNZ Governor, Snapshot, OZ Governor + Respect, hybrid architecture → `131`
 - Snapshot weekly priority polls: one-click creation, approval voting, multi-project templates → `132`
 - **Governance system complete audit (CANONICAL)**: all 3 tiers, 5 API routes, 6 components, Respect-weighted voting, auto-publish, future roadmap → `133`
@@ -85,6 +87,9 @@ Use this to quickly find if a topic has already been researched.
 - Hats Protocol (on-chain role trees, ERC-1155) → `07`
 - Hats Anchor App, DAO tooling landscape → `55`
 - Austin Griffith, ETH Skills, ERC-8004, onchain credentials → `23`
+- **Privy auth for FISHBOWLZ**: `@privy-io/react-auth` v3.18.0, 0–499 MAU free, Farcaster FID via `user.farcaster.fid`, `PrivyClient.verifyAccessToken()` for API routes, PrivyProvider setup, Stripe acquisition, Supercast reference → `282`
+- **Privy embedded wallets + token mechanics on Base**: ETH tips (TipButton.tsx already built), ERC-20 token gate (tokenGate.ts already built), in-app Uniswap V3/V4 swap, fee split (2% treasury), server wallets (`caip2: eip155:8453`), Clanker SDK v4 deployment, gas sponsorship, `@privy-io/wagmi` 1-line config change → `283`
+- **Privy full feature deep-dive for FISHBOWLZ**: embedded wallet tipping (ETH+USDC), Farcaster write signers (free/sponsored), Mini App `loginToMiniApp()`, gas sponsorship (16+ chains), token gating via Viem `readContract`, Privy Earn/DeFi vaults, 12 webhook events + Supabase sync, cross-app global wallets, Privy+Neynar complementary usage, full pricing table → `284`
 
 ## AI Agent
 - ZAO AI agent plan (ElizaOS + Claude + Hindsight) → `24`
@@ -159,6 +164,7 @@ Use this to quickly find if a topic has already been researched.
 ## Technical Infrastructure
 - Next.js 16 + React 19 patterns → `41`
 - Supabase advanced (RLS, Realtime, Edge Functions, pgvector) → `42`
+- Claude Cowork SEO workflow, ZAO OS SEO audit (zero JSON-LD, broken sitemap), music schema.org types, claude-seo skill → `286`
 - Storage (R2/IPFS/Arweave), mobile (PWA/Capacitor), privacy (ZK) → `33`
 - Project structure, file conventions → `14`
 - UI reference, design tokens → `16`

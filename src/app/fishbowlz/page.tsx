@@ -237,19 +237,24 @@ export default function FishbowlzPage() {
                 Schedule for later
               </label>
               {scheduleDate && (
-                <div className="flex gap-2">
+                <div className="space-y-2">
                   <input
-                    type="date"
-                    value={scheduleDate}
-                    onChange={(e) => setScheduleDate(e.target.value)}
-                    className="flex-1 bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#f5a623]"
+                    type="datetime-local"
+                    value={`${scheduleDate}T${scheduleTime}`}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val) {
+                        const [d, t] = val.split('T');
+                        setScheduleDate(d);
+                        setScheduleTime(t);
+                      }
+                    }}
+                    min={new Date().toISOString().slice(0, 16)}
+                    className="w-full bg-[#0a1628] border border-white/20 rounded-lg px-3 py-3 text-sm text-white focus:outline-none focus:border-[#f5a623] min-h-[44px] [color-scheme:dark]"
                   />
-                  <input
-                    type="time"
-                    value={scheduleTime}
-                    onChange={(e) => setScheduleTime(e.target.value)}
-                    className="bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#f5a623]"
-                  />
+                  <p className="text-[10px] text-gray-500">
+                    Room will appear as &quot;scheduled&quot; until this time
+                  </p>
                 </div>
               )}
             </div>

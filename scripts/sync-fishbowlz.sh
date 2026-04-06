@@ -51,14 +51,17 @@ echo "Copying FC identity lib..."
 cp "$SOURCE/src/lib/fc-identity.ts" "$TARGET/src/lib/"
 
 echo "Copying FISHBOWLZ hooks..."
-cp "$SOURCE/src/hooks/useAuth.ts" "$TARGET/src/hooks/" 2>/dev/null || true
+# Skip useAuth.ts — standalone has Privy-based version
+# cp "$SOURCE/src/hooks/useAuth.ts" "$TARGET/src/hooks/" 2>/dev/null || true
 cp "$SOURCE/src/hooks/useLiveTranscript.ts" "$TARGET/src/hooks/" 2>/dev/null || true
 
 # ── Shared dependencies ──
-echo "Copying shared deps (auth, db, farcaster)..."
-cp "$SOURCE/src/lib/auth/session.ts" "$TARGET/src/lib/auth/"
+# Skip shared deps that have standalone versions (Privy auth, env stubs, etc.)
+# Only copy supabase client (shared) and neynar (shared)
+echo "Copying shared deps (db, farcaster)..."
 cp "$SOURCE/src/lib/db/supabase.ts" "$TARGET/src/lib/db/"
 cp "$SOURCE/src/lib/farcaster/neynar.ts" "$TARGET/src/lib/farcaster/" 2>/dev/null || true
+# Skip session.ts — standalone has Privy-based version
 
 # ── Database migrations ──
 echo "Copying migrations..."

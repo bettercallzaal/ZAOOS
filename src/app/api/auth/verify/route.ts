@@ -13,11 +13,19 @@ import { logger } from '@/lib/logger';
 
 const OPTIMISM_RPC_URL = process.env.NEXT_PUBLIC_OPTIMISM_RPC_URL || 'https://optimism-rpc.publicnode.com';
 
-const appClient = createAppClient({
-  ethereum: viemConnector({
-    rpcUrl: OPTIMISM_RPC_URL,
-  }),
-});
+// Lazy-init: defer heavy viem/crypto setup to first request instead of module load.
+// This prevents cold-start timeouts on Vercel Hobby (10s limit).
+let _appClient: ReturnType<typeof createAppClient> | null = null;
+function getAppClient() {
+  if (!_appClient) {
+    _appClient = createAppClient({
+      ethereum: viemConnector({
+        rpcUrl: OPTIMISM_RPC_URL,
+      }),
+    });
+  }
+  return _appClient;
+}
 
 const NONCE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -78,7 +86,7 @@ export async function POST(req: NextRequest) {
     // Verify SIWF signature
     let result;
     try {
-      result = await appClient.verifySignInMessage({
+      result = await getAppClient().verifySignInMessage({
         message,
         signature: signature as `0x${string}`,
         nonce,

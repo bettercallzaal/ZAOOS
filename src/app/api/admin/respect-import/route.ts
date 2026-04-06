@@ -470,6 +470,10 @@ async function enrichAndReconcile(stats: SyncStats) {
     const calculated = fractalRespect + hostingRespect + bonusRespect + eventRespect;
     const onchainOg = Number(member.onchain_og) || 0;
 
+    // total_respect = max(calculated, onchainOg) because OG ERC-20 balances
+    // already include the same respect events tracked in Supabase (they were
+    // minted from the same Airtable data). We take the higher of the two to
+    // avoid double-counting while ensuring on-chain holders aren't under-reported.
     const updates: Record<string, unknown> = {
       total_respect: Math.max(calculated, onchainOg),
       fractal_respect: fractalRespect,

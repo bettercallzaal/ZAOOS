@@ -1,6 +1,35 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+
 export function AboutTab() {
+  const [stats, setStats] = useState<{
+    totalSessions: number;
+    totalMembers: number;
+    ogTotalSupply: number;
+    ogHolders: number;
+  } | null>(null);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const [analyticsRes, leaderboardRes] = await Promise.all([
+          fetch('/api/fractals/analytics'),
+          fetch('/api/respect/leaderboard'),
+        ]);
+        const analytics = analyticsRes.ok ? await analyticsRes.json() : null;
+        const leaderboard = leaderboardRes.ok ? await leaderboardRes.json() : null;
+        setStats({
+          totalSessions: analytics?.overview?.totalSessions ?? 0,
+          totalMembers: analytics?.overview?.totalMembers ?? 0,
+          ogTotalSupply: Math.round(leaderboard?.stats?.ogTotalSupply ?? 0),
+          ogHolders: leaderboard?.leaderboard?.filter((e: { ogRespect: number }) => e.ogRespect > 0).length ?? 0,
+        });
+      } catch { /* non-critical — falls back to null and shows dashes */ }
+    }
+    fetchStats();
+  }, []);
+
   const FIBONACCI = [
     { rank: '1st', x1: 55, x2: 110 },
     { rank: '2nd', x1: 34, x2: 68 },
@@ -85,7 +114,7 @@ export function AboutTab() {
         <div className="space-y-2">
           <div className="bg-[#0a1628] rounded-lg p-3 border border-white/[0.08]">
             <p className="text-xs font-medium text-white">OG ZAO Respect (ERC-20)</p>
-            <p className="text-[10px] text-gray-500 mt-1">One-time distributions for intros, articles, hosting, festivals. 38,484 total supply, 122 holders.</p>
+            <p className="text-[10px] text-gray-500 mt-1">One-time distributions for intros, articles, hosting, festivals. {stats ? `${stats.ogTotalSupply.toLocaleString()} total supply, ${stats.ogHolders} holders` : 'Loading...'}.</p>
             <a href="https://optimistic.etherscan.io/token/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957" target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#f5a623]/60 hover:text-[#f5a623] mt-1 inline-block">View on Etherscan</a>
           </div>
           <div className="bg-[#0a1628] rounded-lg p-3 border border-[#f5a623]/20">
@@ -101,11 +130,11 @@ export function AboutTab() {
         <h3 className="text-sm font-semibold text-white">ZAO Fractal History</h3>
         <div className="grid grid-cols-2 gap-2 text-center">
           <div className="bg-[#0a1628] rounded-lg p-2">
-            <p className="text-lg font-bold text-[#f5a623]">90+</p>
-            <p className="text-[10px] text-gray-500">Weeks Running</p>
+            <p className="text-lg font-bold text-[#f5a623]">{stats ? stats.totalSessions : '—'}</p>
+            <p className="text-[10px] text-gray-500">Sessions</p>
           </div>
           <div className="bg-[#0a1628] rounded-lg p-2">
-            <p className="text-lg font-bold text-white">173</p>
+            <p className="text-lg font-bold text-white">{stats ? stats.totalMembers : '—'}</p>
             <p className="text-[10px] text-gray-500">Total Members</p>
           </div>
         </div>

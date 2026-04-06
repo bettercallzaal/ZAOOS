@@ -88,7 +88,8 @@ export async function POST() {
       const zorRaw = zorResult.status === 'success' ? (zorResult.result as bigint) : BigInt(0);
 
       // OG is ERC-20 with 18 decimals, ZOR is ERC-1155 (whole tokens)
-      const onchainOg = Math.round(Number(formatEther(ogRaw)));
+      // Store full precision — rounding happens at display layer only
+      const onchainOg = Number(formatEther(ogRaw));
       const onchainZor = Number(zorRaw);
 
       return supabaseAdmin

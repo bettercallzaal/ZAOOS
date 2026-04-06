@@ -2,7 +2,7 @@
 
 ## Step 1: Pick the Next Number
 
-Check the highest numbered folder across ALL topic folders in `research/` and use the next number. Current highest: `287`. Next doc should be `288`.
+Check the highest numbered folder across ALL topic folders in `research/` and use the next number. Current highest: `290`. Next doc should be `291`.
 
 ```bash
 # Find the highest number across all topic folders

@@ -11,7 +11,7 @@ import { communityConfig } from '@/../community.config';
 import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
 
-const OPTIMISM_RPC_URL = process.env.NEXT_PUBLIC_OPTIMISM_RPC_URL || 'https://optimism.llamarpc.com';
+const OPTIMISM_RPC_URL = process.env.NEXT_PUBLIC_OPTIMISM_RPC_URL || 'https://optimism-rpc.publicnode.com';
 
 const appClient = createAppClient({
   ethereum: viemConnector({

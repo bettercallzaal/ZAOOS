@@ -24,3 +24,4 @@
 | 249 | [Incented Deep Dive & ClawDown Challenge](./249-incented-deep-dive-new-campaigns-clawdown/) | STANDALONE | Incented protocol mechanics, new ZABAL campaign ideas, and ClawDown.xyz for ZOE |
 | 272 | [ZAO Task Forces & Team Structure](./272-zao-task-forces-2026/) | STANDALONE | 6-month roadmap for ZAO task forces and team structure |
 | 287 | [ZAO FAQ + Word Wall Glossary](./287-zao-faq-word-wall-glossary/) | STANDALONE | Community-driven web3 glossary (Urban Dictionary-style) with Respect-weighted voting, FAQ upgrade, peth vibecoding patterns, 6.5hr implementation plan |
+| 289 | [ZAO Tool Box](./289-zao-tool-box/) | CANONICAL | Complete inventory of 47 usable tools across 8 categories — name, description, usage, file paths for every built feature |

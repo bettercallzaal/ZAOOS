@@ -192,13 +192,16 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-8 gap-3">
-        <p className="text-red-400 text-sm">{error}</p>
+      <div className="flex flex-col items-center justify-center py-8 gap-3 px-4">
+        <p className="text-red-400 text-sm text-center">{error}</p>
+        <p className="text-gray-500 text-xs text-center max-w-xs">
+          Check that your browser has microphone permission enabled. If the problem persists, try refreshing the page.
+        </p>
         <button
           onClick={retryJoin}
           className="px-4 py-1.5 bg-[#f5a623] text-[#0a1628] rounded-lg text-xs font-medium hover:bg-[#d4941f] transition-colors"
         >
-          Retry
+          Retry Connection
         </button>
       </div>
     );

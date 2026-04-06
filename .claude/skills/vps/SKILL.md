@@ -1,6 +1,6 @@
 ---
 name: vps
-description: Manage ZOE (OpenClaw agent) on the VPS via direct SSH, or send messages to ZOE on Telegram. Execute commands directly — no copy-paste needed.
+description: Manage ZOE + agent squad (ZOEY, WALLET) on the VPS via SSH, or send messages via Telegram. Three agents, one dispatcher.
 ---
 
 # VPS — ZOE Remote Management
@@ -97,11 +97,34 @@ Config file owner: uid 1001 (use docker exec -u root for openclaw.json edits)
 Workspace: /home/node/openclaw-workspace/
 Repo: /home/node/openclaw-workspace/ZAOOS/
 Config: /home/node/.openclaw/openclaw.json (OWNED BY 1001 — need root to write)
-Agent identity: ZOE ⚡ — ZAO's orchestration agent
-Telegram bot: @zaoclaw_bot
+Agents:
+  🦞 ZOE (main) — orchestrator/dispatcher, workspace: /home/node/openclaw-workspace/
+  ⚡ ZOEY (zoey) — action agent, workspace: /home/node/openclaw-workspace/zoey/
+  💰 WALLET (wallet) — on-chain ops, workspace: /home/node/openclaw-workspace/zao-wallet/
+Telegram bot: @zaoclaw_bot (all DMs → ZOE, ZOE dispatches to ZOEY/WALLET)
 GitHub: bettercallzaal/ZAOOS (gh CLI installed + authenticated as bettercallzaal)
-LLM: Minimax M2.7 (primary)
-Tools: git, gh, npx, uvx (uv 0.11.2), python3
+LLM: Minimax M2.7 (all agents)
+Tools: git, gh, npx, uvx (uv 0.11.3), python3
+Crons: auto-pull (15m/ZOE), pulse (6h/ZOEY), community voice (8am+8pm/ZOEY), FC scan (6am/ZOEY)
+```
+
+## Agent Management Commands
+
+```bash
+# List all agents
+ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw agents list'
+
+# Dispatch task to ZOEY
+ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw agent --agent zoey --message "task here"'
+
+# Dispatch task to WALLET
+ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw agent --agent wallet --message "task here"'
+
+# List cron jobs
+ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw cron list'
+
+# Add new agent
+ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw agents add <name> --workspace /home/node/openclaw-workspace/<name> --model minimax/MiniMax-M2.7 --non-interactive'
 ```
 
 ## Known Gotchas (learned from real deploys)
@@ -305,13 +328,27 @@ Common Vercel build failures for ZAO OS:
 - Missing "use client" directive on components using hooks
 - TypeScript strict mode errors
 
-## ZOE's Current Workspace Files (as of April 1, 2026)
+## Workspace Layout (as of April 5, 2026)
 
-| File | Status | Purpose |
-|------|--------|---------|
-| SOUL.md | Active | Identity, anti-patterns, expertise domains, GitHub workflow |
-| AGENTS.md | Active | Session protocol, memory protocol, "Next 3 Moves", task workflow, security |
-| HEARTBEAT.md | Active | 60m heartbeat checks, Monday fractal reminder, daily PR check |
-| TASKS.md | Active | Work queue with completed/in-progress/queued sections |
-| MEMORY.md | Active | Tools, config, research docs 234-239, patterns learned |
-| memory/YYYY-MM-DD.md | Auto | Daily notes (created by ZOE per session) |
+```
+openclaw-workspace/
+├── SOUL.md          ZOE identity + dispatch protocol
+├── AGENTS.md        Session protocol, memory protocol, security
+├── HEARTBEAT.md     Health checks, failure handling (6h pulse cadence)
+├── TASKS.md         Work queue (deduplicated, clean)
+├── MEMORY.md        Tools, config, research refs, patterns
+├── ZAOOS/           Git repo (main branch, clean)
+├── memory/          Daily notes + strategy docs
+├── zoey/            ZOEY agent workspace
+│   ├── SOUL.md      ZOEY identity
+│   ├── AGENTS.md    ZOEY procedures
+│   ├── results/     Task output + daily summaries
+│   ├── tasks/       Pending task files
+│   └── failure-log.md
+└── zao-wallet/      WALLET agent workspace
+    ├── SOUL.md      WALLET identity
+    ├── AGENTS.md    WALLET procedures
+    ├── results/     Transaction logs
+    ├── tasks/       Pending ops
+    └── skills/      On-chain operation skills
+```

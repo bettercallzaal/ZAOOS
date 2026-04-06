@@ -13,9 +13,6 @@ const rsvpSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await getSessionData();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const body = await req.json();
     const parsed = rsvpSchema.safeParse(body);
@@ -48,7 +45,7 @@ export async function POST(req: NextRequest) {
       name,
       email,
       event_slug: eventSlug,
-      fid: session.fid,
+      fid: session?.fid || null,
     });
 
     if (insertError) {

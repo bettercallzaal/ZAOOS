@@ -24,16 +24,28 @@ export function LoginButton() {
     setError(null);
     setLoading(true);
     try {
-      const response = await fetch('/api/auth/verify', {
+      const payload = {
+        message: res.message || '',
+        signature: res.signature || '',
+        nonce: res.nonce || '',
+        domain: window.location.host,
+      };
+
+      // Retry once on transient 502/503 (cold start timeout)
+      let response = await fetch('/api/auth/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: res.message || '',
-          signature: res.signature || '',
-          nonce: res.nonce || '',
-          domain: window.location.host,
-        }),
+        body: JSON.stringify(payload),
       });
+
+      if (response.status === 502 || response.status === 503) {
+        await new Promise(r => setTimeout(r, 2000));
+        response = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
 
       const data = await response.json();
 

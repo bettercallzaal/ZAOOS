@@ -12,17 +12,33 @@ import { PermissionRequests } from './PermissionRequests';
 import { RoomMusicPanel } from './RoomMusicPanel';
 import { RoomTrackQueue } from './RoomTrackQueue';
 import { SongRequests } from './SongRequests';
-import { BroadcastModal } from './BroadcastModal';
-import { BroadcastPanel } from './BroadcastPanel';
 import { ContentView } from './ContentView';
 import { SpeakersGrid } from './SpeakersGrid';
-import { TwitchChatPanel } from './TwitchChatPanel';
-import { TwitchEmbed } from './TwitchEmbed';
 import { RoomReactions } from './RoomReactions';
-import { HandRaiseQueue } from './HandRaiseQueue';
 import { RoomChat } from './RoomChat';
 import { ParticipantsPanel } from './ParticipantsPanel';
 import { ClosedCaptions } from './ClosedCaptions';
+
+const BroadcastModal = dynamic(
+  () => import('./BroadcastModal').then((m) => ({ default: m.BroadcastModal })),
+  { ssr: false },
+);
+const BroadcastPanel = dynamic(
+  () => import('./BroadcastPanel').then((m) => ({ default: m.BroadcastPanel })),
+  { ssr: false },
+);
+const TwitchChatPanel = dynamic(
+  () => import('./TwitchChatPanel').then((m) => ({ default: m.TwitchChatPanel })),
+  { ssr: false },
+);
+const TwitchEmbed = dynamic(
+  () => import('./TwitchEmbed').then((m) => ({ default: m.TwitchEmbed })),
+  { ssr: false },
+);
+const HandRaiseQueue = dynamic(
+  () => import('./HandRaiseQueue').then((m) => ({ default: m.HandRaiseQueue })),
+  { ssr: false },
+);
 
 const MusicSidebar = dynamic(
   () => import('@/components/music/MusicSidebar').then((m) => ({ default: m.MusicSidebar })),

@@ -3,17 +3,31 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { StreamCall, StreamVideo, StreamVideoClient, type Call } from '@stream-io/video-react-sdk';
-import '@stream-io/video-react-sdk/dist/css/styles.css';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/useAuth';
 import { useAccount } from 'wagmi';
 import { createStreamUser } from '@/lib/spaces/streamHelpers';
 import { communityConfig } from '../../../../community.config';
-import { RoomView } from '@/components/spaces/RoomView';
-import { EditRoomModal } from '@/components/spaces/EditRoomModal';
-import { TwitchStreamInfo } from '@/components/spaces/TwitchStreamInfo';
 import { AudioRoomAdapter } from '@/components/spaces/AudioRoomAdapter';
 import type { Room } from '@/lib/spaces/roomsDb';
+
+// Lazy-load heavy SDKs — Stream.io is ~150KB, only load when entering a room
+const StreamWrapper = dynamic(
+  () => import('@/components/spaces/StreamWrapper').then((m) => ({ default: m.StreamWrapper })),
+  { ssr: false },
+);
+const RoomView = dynamic(
+  () => import('@/components/spaces/RoomView').then((m) => ({ default: m.RoomView })),
+  { ssr: false },
+);
+const EditRoomModal = dynamic(
+  () => import('@/components/spaces/EditRoomModal').then((m) => ({ default: m.EditRoomModal })),
+  { ssr: false },
+);
+const TwitchStreamInfo = dynamic(
+  () => import('@/components/spaces/TwitchStreamInfo').then((m) => ({ default: m.TwitchStreamInfo })),
+  { ssr: false },
+);
 
 const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY || '';
 
@@ -42,8 +56,10 @@ export default function PublicRoomPage() {
   const { user, loading: authLoading } = useAuth();
   const { address: walletAddress } = useAccount();
 
-  const [client, setClient] = useState<StreamVideoClient | null>(null);
-  const [call, setCall] = useState<Call | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [client, setClient] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [call, setCall] = useState<any>(null);
   const [room, setRoom] = useState<Room | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -64,8 +80,10 @@ export default function PublicRoomPage() {
     }
 
     let mounted = true;
-    let newClient: StreamVideoClient | null = null;
-    let newCall: Call | null = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let newClient: any = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let newCall: any = null;
 
     const init = async () => {
       try {
@@ -96,7 +114,8 @@ export default function PublicRoomPage() {
         };
         // Fetch initial token for immediate use
         const initialToken = await tokenProvider();
-        newClient = new StreamVideoClient({ apiKey, user: streamUser, token: initialToken, tokenProvider });
+        const { StreamVideoClient: SVC } = await import('@stream-io/video-react-sdk');
+        newClient = new SVC({ apiKey, user: streamUser, token: initialToken, tokenProvider });
         newCall = newClient.call('audio_room', roomData.stream_call_id);
 
         const userIsHost = user.fid === roomData.host_fid;
@@ -266,10 +285,10 @@ export default function PublicRoomPage() {
 
   const THEME_ACCENTS: Record<string, string> = {
     default: '#f5a623',
-    music: '#a855f7',
-    podcast: '#f59e0b',
-    ama: '#facc15',
-    chill: '#14b8a6',
+    music: '#ffd700',
+    podcast: '#f5a623',
+    ama: '#ededed',
+    chill: '#a0aec0',
   };
   const themeAccent = THEME_ACCENTS[room.theme] || THEME_ACCENTS.default;
 
@@ -348,8 +367,7 @@ export default function PublicRoomPage() {
         </div>
       </header>
       <div className="flex-1">
-        <StreamVideo client={client}>
-          <StreamCall call={call}>
+        <StreamWrapper client={client} call={call}>
             <RoomView
               isHost={isHost}
               isAuthenticated={!!user}
@@ -360,8 +378,7 @@ export default function PublicRoomPage() {
               username={user?.username}
               pfpUrl={user?.pfpUrl}
             />
-          </StreamCall>
-        </StreamVideo>
+        </StreamWrapper>
       </div>
     </div>
   );

@@ -40,6 +40,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "cd \"$PROJECT_DIR\" && bash .claude/skills/worksession/branch-guard.sh",
+            "statusMessage": "Checking branch safety..."
+          },
+          {
+            "type": "command",
             "command": "cd \"$PROJECT_DIR\" && npm run typecheck 2>&1 | tail -10",
             "statusMessage": "Typechecking before push..."
           }

@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS respect_members (
   name TEXT NOT NULL,
   wallet_address TEXT,
   fid BIGINT,
+  username TEXT,                        -- Farcaster username (synced from users table)
+  zid BIGINT,                           -- ZAO internal ID
 
   -- Totals (sum from fractal_scores + respect_events)
   total_respect DECIMAL DEFAULT 0,

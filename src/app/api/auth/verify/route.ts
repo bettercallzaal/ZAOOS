@@ -71,15 +71,16 @@ export async function POST(req: NextRequest) {
 
     const { message, signature, nonce, domain } = parsed.data;
 
-    // Atomic nonce validation: delete + return in one query (prevents race conditions)
-    const { data: deletedNonces } = await supabaseAdmin
+    // Validate nonce exists but don't delete yet — if the function times out during
+    // SIWF verification, the nonce stays valid so the client can retry.
+    const { data: nonceRow } = await supabaseAdmin
       .from('auth_nonces')
-      .delete()
+      .select('nonce')
       .eq('nonce', nonce)
       .gt('expires_at', new Date().toISOString())
-      .select('nonce');
+      .maybeSingle();
 
-    if (!deletedNonces || deletedNonces.length === 0) {
+    if (!nonceRow) {
       return NextResponse.json({ error: 'Invalid or expired nonce. Please try signing in again.' }, { status: 400 });
     }
 
@@ -111,30 +112,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Verification succeeded but no Farcaster ID found. Please try again.' }, { status: 502 });
     }
 
-    // Get user profile from Neynar
-    let user;
-    try {
-      user = await getUserByFid(fid);
-    } catch (neynarErr) {
-      logger.error('[Auth] Neynar getUserByFid failed for FID', fid, neynarErr);
+    // Consume nonce + fetch user + check allowlist by FID — all in parallel
+    const [, userResult, gateByFidResult] = await Promise.allSettled([
+      supabaseAdmin.from('auth_nonces').delete().eq('nonce', nonce),
+      getUserByFid(fid),
+      checkAllowlist(fid),
+    ]);
+
+    if (userResult.status === 'rejected') {
+      logger.error('[Auth] Neynar getUserByFid failed for FID', fid, userResult.reason);
       return NextResponse.json(
         { error: 'Could not fetch your Farcaster profile. Please try again.' },
         { status: 502 }
       );
     }
+    const user = userResult.value;
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Check allowlist by FID and all addresses
+    // Check allowlist — try FID result first, then fall back to address check
     const custodyAddress = user.custody_address;
     const verifiedAddresses = user.verified_addresses?.eth_addresses || [];
     const allAddresses = [custodyAddress, ...verifiedAddresses];
 
-    let gateResult;
+    let gateResult = gateByFidResult.status === 'fulfilled' ? gateByFidResult.value : null;
     try {
-      gateResult = await checkAllowlist(fid);
-      if (!gateResult.allowed) {
+      if (!gateResult?.allowed) {
         for (const addr of allAddresses) {
           if (!addr) continue;
           gateResult = await checkAllowlist(undefined, addr);
@@ -149,7 +153,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!gateResult.allowed) {
+    if (!gateResult?.allowed) {
       return NextResponse.json({ error: 'Not on allowlist', redirect: '/not-allowed' }, { status: 403 });
     }
 
@@ -173,67 +177,66 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Upsert user record — atomic to prevent race conditions on concurrent logins
-    try {
-      const wallet = (primaryWallet || '').toLowerCase();
-      if (wallet) {
-        // Check by FID first (most reliable), then wallet
-        const { data: existingByFid } = await supabaseAdmin
-          .from('users')
-          .select('last_login_at')
-          .eq('fid', fid)
-          .maybeSingle();
+    // Upsert user record (fire and forget — don't block the login response)
+    const wallet = (primaryWallet || '').toLowerCase();
+    if (wallet) {
+      (async () => {
+        try {
+          const { data: existingByFid } = await supabaseAdmin
+            .from('users')
+            .select('last_login_at')
+            .eq('fid', fid)
+            .maybeSingle();
 
-        const { data: existingByWallet } = !existingByFid ? await supabaseAdmin
-          .from('users')
-          .select('last_login_at')
-          .eq('primary_wallet', wallet)
-          .maybeSingle() : { data: existingByFid };
+          const { data: existingByWallet } = !existingByFid ? await supabaseAdmin
+            .from('users')
+            .select('last_login_at')
+            .eq('primary_wallet', wallet)
+            .maybeSingle() : { data: existingByFid };
 
-        const existingUser = existingByFid || existingByWallet;
-        const isFirstLogin = !existingUser?.last_login_at;
+          const existingUser = existingByFid || existingByWallet;
+          const isFirstLogin = !existingUser?.last_login_at;
 
-        await supabaseAdmin.from('users').upsert(
-          {
-            primary_wallet: wallet,
-            fid,
-            username: user.username,
-            display_name: user.display_name,
-            pfp_url: user.pfp_url,
-            custody_address: custodyAddress,
-            verified_addresses: verifiedAddresses,
-            bio: user.profile?.bio?.text || null,
-            role: 'member',
-            last_login_at: new Date().toISOString(),
-          },
-          { onConflict: 'primary_wallet', ignoreDuplicates: false }
-        );
+          await supabaseAdmin.from('users').upsert(
+            {
+              primary_wallet: wallet,
+              fid,
+              username: user.username,
+              display_name: user.display_name,
+              pfp_url: user.pfp_url,
+              custody_address: custodyAddress,
+              verified_addresses: verifiedAddresses,
+              bio: user.profile?.bio?.text || null,
+              role: 'member',
+              last_login_at: new Date().toISOString(),
+            },
+            { onConflict: 'primary_wallet', ignoreDuplicates: false }
+          );
 
-        // Notify admins on first-time member login (fire and forget)
-        if (isFirstLogin) {
-          const adminFids = communityConfig.adminFids || [];
-          if (adminFids.length > 0) {
-            createInAppNotification({
-              recipientFids: [...adminFids],
-              type: 'member',
-              title: 'New member joined ZAO OS',
-              body: `${user.display_name || user.username || 'A new user'} logged in for the first time`,
-              href: '/admin',
-              actorFid: fid,
-              actorDisplayName: user.display_name,
-              actorPfpUrl: user.pfp_url,
-            }).catch((err) => logger.error('[notify]', err));
+          if (isFirstLogin) {
+            const adminFids = communityConfig.adminFids || [];
+            if (adminFids.length > 0) {
+              createInAppNotification({
+                recipientFids: [...adminFids],
+                type: 'member',
+                title: 'New member joined ZAO OS',
+                body: `${user.display_name || user.username || 'A new user'} logged in for the first time`,
+                href: '/admin',
+                actorFid: fid,
+                actorDisplayName: user.display_name,
+                actorPfpUrl: user.pfp_url,
+              }).catch((err) => logger.error('[notify]', err));
+            }
+
+            const handle = user.username ? `@${user.username}` : (user.display_name || 'a new member');
+            autoCastToZao(
+              `Welcome ${handle} to The ZAO! \u{1F3B6}`,
+            ).catch((err) => logger.error('[welcome-cast]', err));
           }
-
-          // Fire-and-forget: auto-cast welcome announcement
-          const handle = user.username ? `@${user.username}` : (user.display_name || 'a new member');
-          autoCastToZao(
-            `Welcome ${handle} to The ZAO! \u{1F3B6}`,
-          ).catch((err) => logger.error('[welcome-cast]', err));
+        } catch (err) {
+          logger.error('[Auth] Failed to upsert user record:', err);
         }
-      }
-    } catch (err) {
-      logger.error('[Auth] Failed to upsert user record:', err);
+      })();
     }
 
     return NextResponse.json({

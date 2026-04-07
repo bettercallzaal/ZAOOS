@@ -5,7 +5,11 @@ import { getTrendingFeed } from '@/lib/farcaster/neynar';
 import { Cast } from '@/types';
 import { logger } from '@/lib/logger';
 
-const SOPHA_API = 'https://www.sopha.social/api/feed';
+// Must use www. directly — sopha.social (no www) 307-redirects, which strips auth headers
+const SOPHA_API = 'https://www.sopha.social/api/external/feed';
+const SOPHA_AUTH = process.env.SOPHA_API_USERNAME && process.env.SOPHA_API_PASSWORD
+  ? `Basic ${Buffer.from(`${process.env.SOPHA_API_USERNAME}:${process.env.SOPHA_API_PASSWORD}`).toString('base64')}`
+  : null;
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(25),
@@ -89,7 +93,12 @@ export async function GET(req: NextRequest) {
 
     // Fetch both sources in parallel
     const [sophaResult, neynarResult] = await Promise.allSettled([
-      fetch(SOPHA_API, { headers: { 'Accept': 'application/json' } }).then(r => r.ok ? r.json() : null),
+      fetch(SOPHA_API, {
+        headers: {
+          'Accept': 'application/json',
+          ...(SOPHA_AUTH ? { 'Authorization': SOPHA_AUTH } : {}),
+        },
+      }).then(r => r.ok ? r.json() : null),
       getTrendingFeed(30, time_window),
     ]);
 

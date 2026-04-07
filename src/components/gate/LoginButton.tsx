@@ -12,12 +12,13 @@ export function LoginButton() {
   const [loading, setLoading] = useState(false);
   const [serverNonce, setServerNonce] = useState<string | undefined>(undefined);
 
-  // Fetch a server-issued nonce for SIWF replay protection
+  // Fetch a server-issued nonce for SIWF replay protection, refresh every 10 minutes
   useEffect(() => {
-    fetch('/api/auth/verify')
-      .then(r => r.json())
-      .then(d => setServerNonce(d.nonce))
-      .catch(() => {});
+    const fetchNonce = () =>
+      fetch('/api/auth/verify').then(r => r.json()).then(d => setServerNonce(d.nonce)).catch(() => {});
+    fetchNonce();
+    const interval = setInterval(fetchNonce, 10 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleSuccess = useCallback(async (res: StatusAPIResponse) => {

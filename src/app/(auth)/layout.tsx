@@ -25,7 +25,7 @@ export default async function AuthLayout({
       </a>
       <div className="md:pt-10">
         <ErrorBoundary>
-          <main id="main-content">
+          <main id="main-content" className="pb-[120px] md:pb-[64px]">
             {children}
           </main>
         </ErrorBoundary>

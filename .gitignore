@@ -53,3 +53,5 @@ public/bindings_wasm_bg.wasm
 
 # Supabase temp
 supabase/.temp/
+.gitnexus/
+.superpowers/

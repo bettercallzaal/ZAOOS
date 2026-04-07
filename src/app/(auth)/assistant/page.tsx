@@ -139,8 +139,8 @@ export default function AssistantPage() {
         )}
       </div>
 
-      {/* Input bar — sits above mobile nav (bottom-14) and flush on desktop */}
-      <div className="fixed bottom-14 md:bottom-0 left-0 right-0 bg-[#0d1b2a] border-t border-white/[0.08] px-4 py-3" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      {/* Input bar — sits above mobile nav (bottom-14) + player (~60px) */}
+      <div className="fixed bottom-[120px] md:bottom-[64px] left-0 right-0 bg-[#0d1b2a] border-t border-white/[0.08] px-4 py-3 z-20" style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <div className="max-w-3xl mx-auto flex gap-2">
           <textarea
             value={input}

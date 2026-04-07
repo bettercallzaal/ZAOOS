@@ -44,3 +44,12 @@ next-env.d.ts
 public/bindings_wasm_bg.wasm
 .gstack/
 .claude/worktrees/
+
+# Sensitive registration files
+.caster-registration.json
+
+# Binary files / ebooks
+*.pdf
+
+# Supabase temp
+supabase/.temp/

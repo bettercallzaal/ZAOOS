@@ -27,7 +27,7 @@ function getAppClient() {
   return _appClient;
 }
 
-const NONCE_TTL = 5 * 60 * 1000; // 5 minutes
+const NONCE_TTL = 15 * 60 * 1000; // 15 minutes
 
 /**
  * GET — Generate a nonce for SIWF

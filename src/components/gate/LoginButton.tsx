@@ -24,7 +24,7 @@ export function LoginButton() {
     setError(null);
     setLoading(true);
     try {
-      const payload = {
+      const payload: Record<string, string> = {
         message: res.message || '',
         signature: res.signature || '',
         nonce: res.nonce || '',
@@ -44,26 +44,28 @@ export function LoginButton() {
         if (response.status !== 502 && response.status !== 503) break;
       }
 
+      const resp = response!;
+
       // If still 502/503 after retries, the response body is likely HTML — don't try to parse as JSON
-      if (response!.status === 502 || response!.status === 503) {
+      if (resp.status === 502 || resp.status === 503) {
         setError('Server is temporarily unavailable. Please wait a moment and try signing in again.');
         setLoading(false);
         fetch('/api/auth/verify').then(r => r.json()).then(d => setServerNonce(d.nonce)).catch(() => {});
         return;
       }
 
-      const data = await response!.json();
+      const data = await resp.json();
 
-      if (!response.ok || data.error) {
+      if (!resp.ok || data.error) {
         const serverMsg = data.error || '';
         let helpfulMsg: string;
-        if (response.status === 403 || serverMsg.toLowerCase().includes('not on allowlist') || serverMsg.toLowerCase().includes('not allowed')) {
+        if (resp.status === 403 || serverMsg.toLowerCase().includes('not on allowlist') || serverMsg.toLowerCase().includes('not allowed')) {
           helpfulMsg = 'Your account is not on the allowlist. Contact an admin to request access.';
-        } else if (response.status === 401 || serverMsg.toLowerCase().includes('signature') || serverMsg.toLowerCase().includes('nonce')) {
+        } else if (resp.status === 401 || serverMsg.toLowerCase().includes('signature') || serverMsg.toLowerCase().includes('nonce')) {
           helpfulMsg = 'Verification failed — your session may have expired. Please try signing in again.';
-        } else if (response.status === 429) {
+        } else if (resp.status === 429) {
           helpfulMsg = 'Too many login attempts. Please wait a moment and try again.';
-        } else if (response.status === 502 || response.status === 503) {
+        } else if (resp.status === 502 || resp.status === 503) {
           helpfulMsg = serverMsg || 'A service is temporarily unavailable. Please try again in a moment.';
         } else if (serverMsg) {
           helpfulMsg = serverMsg;

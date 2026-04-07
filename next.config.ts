@@ -6,7 +6,17 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['@xmtp/wasm-bindings'],
+  serverExternalPackages: [
+    '@xmtp/wasm-bindings',
+    'twitter-api-v2',
+    'jsonwebtoken',
+    '@gradio/client',
+    'livepeer',
+    '@ardrive/turbo-sdk',
+    '@hiveio/dhive',
+    '@discordjs/rest',
+    'web-push',
+  ],
 
   experimental: {
     // Cache client-side navigations — instant page transitions on repeat visits

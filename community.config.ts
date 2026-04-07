@@ -44,6 +44,24 @@ export const communityConfig = {
   /** Ethereum addresses with admin access — alternative to FID-based admin */
   adminWallets: [],
 
+  // ── Sopha (Curated Feed) ──────────────────────────────────────
+  /** Sopha Social curated feed — provides quality-scored Farcaster casts for the Trending tab.
+   *  Get API credentials from the Sopha team. Set SOPHA_API_USERNAME and SOPHA_API_PASSWORD env vars.
+   *  Must use www. subdomain — non-www 307 redirects strip auth headers. */
+  sopha: {
+    enabled: true,
+    /** External feed API endpoint — must include www. */
+    apiUrl: 'https://www.sopha.social/api/external/feed',
+    /** Attribution text shown in the Trending tab header */
+    attribution: 'Curated by Sopha',
+    /** Link for the attribution */
+    attributionUrl: 'https://sopha.social',
+    /** Minimum quality score (0-100) to include a cast. Sopha scores range 65-85. */
+    minQualityScore: 0,
+    /** Maximum age in days for curated casts */
+    maxAgeDays: 30,
+  },
+
   // ── Spaces ─────────────────────────────────────────────────────
   /** Voice/video room definitions — appear in the Spaces section */
   voiceChannels: [

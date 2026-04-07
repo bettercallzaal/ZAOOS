@@ -12,6 +12,7 @@
 | 081 | [Farcaster Social Graph & Sharing](./081-farcaster-social-graph-sharing/) | STANDALONE | Social graph APIs and social sharing features for Farcaster |
 | 123 | [DFOS: Dark Forest Operating System](./123-dfos-dark-forest-protocol/) | STANDALONE | Evaluate DFOS as a social platform — architecture, protocol, and relevance |
 | 124 | [Sopha: Deep Social on Farcaster](./124-sopha-deep-social-farcaster/) | STANDALONE | Sopha's curation model and what ZAO OS can learn from it |
+| 293 | [Sopha API Integration](./293-sopha-api-integration/) | IMPLEMENTED | External feed API reference, bugs found, cleanup roadmap |
 | 173 | [Farcaster Mini Apps Integration](./173-farcaster-miniapps-integration/) | STANDALONE | Mini apps integration plan for ZAO OS |
 | 199 | [Advanced Social Graph Features](./199-advanced-social-graph-features/) | STANDALONE | Visualization, growth tracking, influence mapping, unfollower detection, clustering |
 | 250 | [Farcaster Mini Apps llms.txt (April 2026)](./250-farcaster-miniapps-llms-txt-2026/) | STANDALONE | Deep dive on official Mini Apps docs, cross-referenced with ZAO's current implementation |

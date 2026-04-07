@@ -75,6 +75,17 @@
         ]
       }
     ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$PROJECT_DIR\" && BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [[ \"$BRANCH\" != ws/* ]]; then echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"SessionStart\\\",\\\"additionalContext\\\":\\\"WARNING: You are on branch [$BRANCH], not a ws/ worksession branch. CLAUDE.md requires running /worksession at session start to create an isolated branch. Invoke /worksession NOW before doing any work.\\\"}}\"; fi",
+            "statusMessage": "Checking worksession branch..."
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "hooks": [

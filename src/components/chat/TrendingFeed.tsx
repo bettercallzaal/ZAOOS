@@ -2,14 +2,22 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Cast, QuotedCastData } from '@/types';
+import { communityConfig } from '../../../community.config';
 import { Message } from './Message';
+
+interface SophaCurator {
+  fid: number;
+  username: string;
+  display_name: string;
+  pfp_url: string;
+}
 
 interface SophaCast extends Cast {
   _qualityScore?: number;
   _category?: string;
   _title?: string;
   _summary?: string;
-  _curatorInfo?: { fid: number; username: string; display_name: string; pfp_url: string };
+  _curators?: SophaCurator[];
 }
 
 interface TrendingFeedProps {
@@ -207,7 +215,7 @@ export function TrendingFeed({
       {/* Header accent bar */}
       <div className="px-4 py-3 bg-gradient-to-r from-amber-500/5 to-transparent border-b border-amber-500/10 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-amber-400 text-sm font-medium">Curated by Sopha</span>
+          <span className="text-amber-400 text-sm font-medium">{communityConfig.sopha.attribution}</span>
           <span className="text-xs text-gray-600">Deep Social on Farcaster</span>
         </div>
         <button
@@ -245,8 +253,13 @@ export function TrendingFeed({
                   {cast._qualityScore && (
                     <span className="text-[10px] text-gray-500">Quality: {cast._qualityScore}/100</span>
                   )}
-                  {cast._curatorInfo && (
-                    <span className="text-[10px] text-gray-600">Curated by @{cast._curatorInfo.username}</span>
+                  {cast._curators && cast._curators.length > 0 && (
+                    <span className="text-[10px] text-gray-600 flex items-center gap-1">
+                      {cast._curators[0].pfp_url && (
+                        <img src={cast._curators[0].pfp_url} alt="" className="w-3 h-3 rounded-full" />
+                      )}
+                      Curated by @{cast._curators[0].username}
+                    </span>
                   )}
                 </div>
                 {cast._summary && (
@@ -275,7 +288,7 @@ export function TrendingFeed({
       {/* Sopha attribution */}
       <div className="px-4 py-4 border-t border-white/[0.08]">
         <a
-          href="https://sopha.social"
+          href={communityConfig.sopha.attributionUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"

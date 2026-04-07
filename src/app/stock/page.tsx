@@ -17,50 +17,27 @@ export const metadata: Metadata = {
 // Festival date — October 3, 2026, 12pm ET
 const FESTIVAL_DATE = '2026-10-03T12:00:00-04:00';
 
-const SPONSORSHIP_TIERS = [
-  {
-    name: 'Founding Partner',
-    amount: '$5,000+',
-    color: 'from-[#f5a623] to-[#ffd700]',
-    perks: [
-      'Co-presented branding across all materials',
-      'Everything from both local & digital tracks',
-      'Year-round partnership & advisory seat',
-      'Priority placement for Year 2',
-    ],
-  },
-  {
-    name: 'Gold',
-    amount: '$2,500',
-    color: 'from-[#f5a623]/80 to-[#f5a623]/40',
-    perks: [
-      'Logo on stage & livestream overlay',
-      'Sponsored segment + interview feature',
-      'Social media campaign & Farcaster announcement',
-      'Booth space at festival',
-    ],
-  },
-  {
-    name: 'Silver',
-    amount: '$1,000',
-    color: 'from-gray-400/60 to-gray-500/30',
-    perks: [
-      'Logo on festival website & signage',
-      'Verbal shoutouts during event',
-      'Newsletter shoutout (400+ editions)',
-      'Welcome bag insert',
-    ],
-  },
-  {
-    name: 'Bronze',
-    amount: '$500',
-    color: 'from-amber-700/60 to-amber-800/30',
-    perks: [
-      'Community Partner listing',
-      'Post-event thank-you feature',
-      'Website logo with backlink',
-    ],
-  },
+const SPONSOR_OFFERINGS = [
+  { category: 'On-Site', items: [
+    'Logo on stage banner & signage',
+    'Booth / table space at festival',
+    'Welcome bag inserts',
+    'Verbal shoutouts during event',
+    'Co-presented branding across all materials',
+  ]},
+  { category: 'Digital', items: [
+    'Logo on festival website with backlink',
+    'Livestream overlay branding',
+    'Sponsored segment + interview feature',
+    'Social media campaign & Farcaster announcement',
+    'Newsletter shoutout (400+ editions)',
+  ]},
+  { category: 'Partnership', items: [
+    'Post-event thank-you feature & recap',
+    'Year-round partnership & advisory seat',
+    'Priority placement for Year 2',
+    'Tax-deductible via Fractured Atlas 501(c)(3)',
+  ]},
 ];
 
 const PAST_EVENTS = [
@@ -170,25 +147,25 @@ export default function StockPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Sponsorship</p>
           <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] space-y-2">
             <p className="text-sm text-gray-300 leading-relaxed">
-              Sponsorships are tax-deductible through New Media Commons / Fractured Atlas 501(c)(3).
               Two tracks available: Local Partners (Ellsworth businesses) and Digital Partners (Web3 brands).
+              All sponsorships are tax-deductible through Fractured Atlas 501(c)(3). Packages are flexible
+              - let&apos;s build something that works for you.
             </p>
             <p className="text-xs text-gray-500">
               Sponsorship deck coming soon &middot; Contact us for early partnership opportunities
             </p>
           </div>
           <div className="space-y-3">
-            {SPONSORSHIP_TIERS.map((tier) => (
-              <div key={tier.name} className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
-                <div className={`bg-gradient-to-r ${tier.color} px-4 py-2.5 flex items-center justify-between`}>
-                  <span className="font-bold text-sm text-white">{tier.name}</span>
-                  <span className="text-sm font-medium text-white/90">{tier.amount}</span>
+            {SPONSOR_OFFERINGS.map((group) => (
+              <div key={group.category} className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
+                <div className="bg-gradient-to-r from-[#f5a623]/20 to-transparent px-4 py-2.5">
+                  <span className="font-bold text-sm text-[#f5a623]">{group.category}</span>
                 </div>
                 <ul className="px-4 py-3 space-y-1.5">
-                  {tier.perks.map((perk) => (
-                    <li key={perk} className="text-xs text-gray-400 flex items-start gap-2">
+                  {group.items.map((item) => (
+                    <li key={item} className="text-xs text-gray-400 flex items-start gap-2">
                       <span className="text-[#f5a623] mt-0.5">&#8226;</span>
-                      {perk}
+                      {item}
                     </li>
                   ))}
                 </ul>

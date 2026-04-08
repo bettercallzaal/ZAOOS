@@ -10,6 +10,7 @@ import { TipButton } from '@/components/fishbowlz/TipButton';
 import { useToast, ToastProvider } from '@/components/ui/Toast';
 import dynamic from 'next/dynamic';
 import { ShareModal } from '@/components/shared/ShareModal';
+import { getSupabaseBrowser } from '@/lib/db/supabase';
 
 function parseJsonb<T>(value: unknown, fallback: T): T {
   if (typeof value === 'string') {
@@ -43,7 +44,7 @@ function SpeakerTime({ joinedAt }: { joinedAt: string }) {
     return () => clearInterval(interval);
   }, [joinedAt]);
 
-  return <span className="text-[10px] text-gray-500 font-mono">{elapsed}</span>;
+  return <span className="text-xs text-gray-500 font-mono">{elapsed}</span>;
 }
 
 function Countdown({ targetDate }: { targetDate: string }) {
@@ -199,21 +200,126 @@ function FishbowlRoomPageInner() {
     }
   }, [room?.id]);
 
+  // Initial fetch + Realtime subscription for room changes
   useEffect(() => {
     if (authLoading) return;
     if (!roomId) return;
 
+    // Initial fetch
     fetchRoom();
-    fetchTranscripts();
 
-    const interval = setInterval(fetchRoom, 5000);
-    const transcriptInterval = setInterval(fetchTranscripts, 10000);
+    const supabase = getSupabaseBrowser();
+
+    // Subscribe to room changes via Realtime.
+    // roomId from URL params may be a slug, so we filter on both id and slug columns.
+    // Supabase Realtime only supports one filter per subscription, so we use two channels.
+    const channelById = supabase
+      .channel(`fishbowl-room-id-${roomId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'fishbowl_rooms',
+        filter: `id=eq.${roomId}`,
+      }, (payload) => {
+        if (payload.new) {
+          const data = payload.new as Record<string, unknown>;
+          data.current_speakers = parseJsonb(data.current_speakers, []);
+          data.current_listeners = parseJsonb(data.current_listeners, []);
+          data.hand_raises = parseJsonb(data.hand_raises, []);
+          if (data.state === 'ended') {
+            setAudioJoined(false);
+            setRoom((prev) => {
+              if (prev && prev.state === 'active') {
+                const wasParticipating =
+                  prev.current_speakers?.some((s) => s.fid === user?.fid) ||
+                  prev.current_listeners?.some((l) => l.fid === user?.fid);
+                if (wasParticipating) {
+                  endedRoomRef.current = data as unknown as FishbowlRoom;
+                  setShowEndedOverlay(true);
+                }
+              }
+              return data as unknown as FishbowlRoom;
+            });
+          } else {
+            setRoom(data as unknown as FishbowlRoom);
+          }
+        }
+      })
+      .subscribe();
+
+    const channelBySlug = supabase
+      .channel(`fishbowl-room-slug-${roomId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'fishbowl_rooms',
+        filter: `slug=eq.${roomId}`,
+      }, (payload) => {
+        if (payload.new) {
+          const data = payload.new as Record<string, unknown>;
+          data.current_speakers = parseJsonb(data.current_speakers, []);
+          data.current_listeners = parseJsonb(data.current_listeners, []);
+          data.hand_raises = parseJsonb(data.hand_raises, []);
+          if (data.state === 'ended') {
+            setAudioJoined(false);
+            setRoom((prev) => {
+              if (prev && prev.state === 'active') {
+                const wasParticipating =
+                  prev.current_speakers?.some((s) => s.fid === user?.fid) ||
+                  prev.current_listeners?.some((l) => l.fid === user?.fid);
+                if (wasParticipating) {
+                  endedRoomRef.current = data as unknown as FishbowlRoom;
+                  setShowEndedOverlay(true);
+                }
+              }
+              return data as unknown as FishbowlRoom;
+            });
+          } else {
+            setRoom(data as unknown as FishbowlRoom);
+          }
+        }
+      })
+      .subscribe();
+
+    // Fallback poll every 30s in case realtime misses something
+    const fallback = setInterval(fetchRoom, 30000);
 
     return () => {
-      clearInterval(interval);
-      clearInterval(transcriptInterval);
+      supabase.removeChannel(channelById);
+      supabase.removeChannel(channelBySlug);
+      clearInterval(fallback);
     };
-  }, [roomId, authLoading, fetchRoom, fetchTranscripts]);
+  }, [roomId, authLoading, fetchRoom, user?.fid]);
+
+  // Realtime subscription for transcript inserts
+  useEffect(() => {
+    if (authLoading) return;
+    if (!room?.id) return;
+    if (room.state === 'ended') return;
+
+    // Initial fetch
+    fetchTranscripts();
+
+    const supabase = getSupabaseBrowser();
+
+    const channel = supabase
+      .channel(`fishbowl-transcripts-${room.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'fishbowl_transcripts',
+        filter: `room_id=eq.${room.id}`,
+      }, (payload) => {
+        if (payload.new) {
+          setTranscripts(prev => [...prev, payload.new as TranscriptSegment]);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [room?.id, room?.state, authLoading, fetchTranscripts]);
 
   // Heartbeat: keep user presence alive (every 45s)
   useEffect(() => {
@@ -417,11 +523,11 @@ function FishbowlRoomPageInner() {
       {/* Header */}
       <div className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
-          <button onClick={() => router.push('/fishbowlz')} className="text-gray-400 hover:text-white shrink-0 p-1">
+          <button onClick={() => router.push('/fishbowlz')} className="text-gray-400 hover:text-white shrink-0 p-1" aria-label="Back to rooms">
             ←
           </button>
           <div className="min-w-0">
-            <h1 className="text-lg sm:text-xl font-bold truncate">{room.title}</h1>
+            <h1 className="text-lg sm:text-xl font-bold truncate" title={room.title}>{room.title}</h1>
             <p className="text-xs sm:text-sm text-gray-400">by @{room.host_username}</p>
           </div>
         </div>
@@ -569,7 +675,7 @@ function FishbowlRoomPageInner() {
                   className={`rounded-xl p-4 border-2 transition-colors ${
                     speaker
                       ? 'bg-[#1a2a4a] border-[#f5a623]'
-                      : 'bg-[#0f1d35] border-dashed border-white/20'
+                      : 'bg-[#1a2a4a] border-dashed border-white/20'
                   }`}
                 >
                   {speaker ? (
@@ -755,7 +861,7 @@ function FishbowlRoomPageInner() {
                       <span className="text-xs font-mono text-[#f5a623] bg-[#f5a623]/10 w-6 h-6 rounded-full flex items-center justify-center">
                         {index + 1}
                       </span>
-                      <span className="text-sm text-white">@{r.username}</span>
+                      <span className="text-sm text-white truncate max-w-[120px]">@{r.username}</span>
                       <span className="text-[10px] text-gray-500">{timeAgo(r.joinedAt)}</span>
                     </div>
                     <div className="flex gap-2">
@@ -794,7 +900,7 @@ function FishbowlRoomPageInner() {
         </div>
 
         {/* Sidebar — Listeners + Transcript + Chat + Reactions */}
-        <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col max-h-[50vh] lg:max-h-none">
+        <div className="lg:w-80 border-t lg:border-t-0 lg:border-l border-white/10 flex flex-col max-h-[60vh] lg:max-h-none">
           {/* Listeners */}
           <div className="p-4 border-b border-white/10">
             <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
@@ -856,7 +962,7 @@ function FishbowlRoomPageInner() {
 
       {/* Spacer for sticky mobile bottom bar */}
       {audioJoined && room?.state === 'active' && (
-        <div className="lg:hidden h-16" />
+        <div className="lg:hidden h-20" />
       )}
 
       {/* Sticky mobile audio controls */}
@@ -905,7 +1011,7 @@ function FishbowlRoomPageInner() {
       )}
 
       {showEndedOverlay && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
           <div className="bg-[#1a2a4a] rounded-xl p-6 w-full max-w-sm border border-white/10 text-center">
             <div className="text-4xl mb-3">🐟</div>
             <h2 className="text-lg font-bold mb-1">This fishbowl has ended</h2>

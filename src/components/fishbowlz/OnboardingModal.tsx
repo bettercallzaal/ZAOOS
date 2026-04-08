@@ -37,8 +37,8 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
   const isLast = step === steps.length - 1;
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1e3148] rounded-2xl p-8 w-full max-w-md border border-white/[0.08] text-center">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" aria-hidden="true">
+      <div className="bg-[#1a2a4a] rounded-2xl p-8 w-full max-w-md border border-white/[0.08] text-center" role="dialog" aria-modal="true">
         {/* Step indicator */}
         <div className="flex justify-center gap-1.5 mb-6">
           {steps.map((_, i) => (
@@ -72,7 +72,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
           )}
           <button
             onClick={isLast ? finish : () => setStep(step + 1)}
-            className="flex-1 bg-[#f5a623] text-[#0a1628] font-semibold py-2.5 rounded-lg text-sm hover:bg-[#ffd700] transition-colors"
+            className="flex-1 bg-[#f5a623] text-[#0a1628] font-semibold py-2.5 rounded-lg text-sm hover:bg-[#d4941f] transition-colors"
           >
             {isLast ? 'Get Started' : 'Next'}
           </button>

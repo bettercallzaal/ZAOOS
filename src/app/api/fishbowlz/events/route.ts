@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       p_event_data: JSON.stringify(data.eventData),
       p_room_id: data.roomId ?? null,
       p_session_id: data.sessionId ?? null,
-      p_actor_fid: data.actorFid ?? null,
+      p_actor_fid: session.fid,
       p_actor_type: data.actorType ?? null,
     } as Record<string, unknown>);
 

@@ -5,7 +5,7 @@ import crypto from 'crypto';
 const PRIVY_WEBHOOK_SECRET = process.env.PRIVY_WEBHOOK_SECRET || '';
 
 function verifySignature(payload: string, signature: string): boolean {
-  if (!PRIVY_WEBHOOK_SECRET) return true; // Skip verification if no secret set (dev mode)
+  if (!PRIVY_WEBHOOK_SECRET) return false;
   const hmac = crypto.createHmac('sha256', PRIVY_WEBHOOK_SECRET);
   hmac.update(payload);
   const expected = hmac.digest('hex');

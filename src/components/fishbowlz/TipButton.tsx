@@ -59,11 +59,12 @@ export function TipButton({ speakerFid, speakerUsername, roomId }: TipButtonProp
     <div className="relative">
       <button
         onClick={() => setShowAmounts(!showAmounts)}
-        className={`text-[10px] px-1.5 py-0.5 rounded transition-colors ${
+        className={`text-xs px-2 py-1 min-h-[32px] rounded transition-colors ${
           tipped
             ? 'text-green-400'
             : 'text-gray-500 hover:text-[#f5a623]'
         }`}
+        aria-label={tipped ? `Tipped ${speakerUsername}` : `Tip ${speakerUsername}`}
         title={`Tip @${speakerUsername}`}
       >
         {tipped ? '✓ Tipped' : '💰 Tip'}

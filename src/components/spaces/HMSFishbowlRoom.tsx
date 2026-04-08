@@ -142,7 +142,6 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
         const { token } = await res.json();
         await hmsActions.join({ userName, authToken: token });
       } catch (err) {
-        console.error('Failed to join HMS room:', err);
         setError(err instanceof Error ? err.message : 'Failed to connect to audio');
       } finally {
         setJoining(false);
@@ -277,11 +276,11 @@ function HMSFishbowlRoomInner({ fishbowlRoomId, fishbowlSlug, userFid, userName,
           <h4 className="text-gray-500 text-xs uppercase tracking-wider mb-3">
             🔥 Hot Seat ({speakers.length})
           </h4>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
             {speakers.map((peer) => (
               <div key={peer.id} className="flex flex-col items-center">
                 <PeerAudioIndicator peerId={peer.id} initial={(peer.name || '?')[0]} />
-                <span className="text-white text-xs mt-1 truncate max-w-[60px]">
+                <span className="text-white text-xs mt-1 truncate max-w-[48px] sm:max-w-[60px]">
                   {peer.name} {peer.isLocal && '(You)'}
                 </span>
               </div>

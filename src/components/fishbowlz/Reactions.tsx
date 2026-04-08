@@ -43,7 +43,7 @@ export function Reactions({ roomId }: ReactionsProps) {
   return (
     <>
       {/* Floating reactions container */}
-      <div className="fixed bottom-24 right-4 w-16 h-64 pointer-events-none z-40 overflow-hidden">
+      <div className="fixed bottom-32 right-4 lg:bottom-24 w-16 h-64 pointer-events-none z-40 overflow-hidden">
         {reactions.map((r) => (
           <div
             key={r.id}
@@ -62,6 +62,7 @@ export function Reactions({ roomId }: ReactionsProps) {
             key={emoji}
             onClick={() => addReaction(emoji)}
             className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/10 active:scale-90 transition-all text-lg"
+            aria-label={`React with ${emoji}`}
             title={`React with ${emoji}`}
           >
             {emoji}

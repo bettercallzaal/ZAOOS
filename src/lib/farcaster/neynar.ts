@@ -465,3 +465,50 @@ export async function getCastConversationSummary(castHash: string) {
   }
   return res.json();
 }
+
+export async function getPopularCasts(fid: number) {
+  const res = await fetchWithFailover(`/feed/user/popular?fid=${fid}`, {
+    headers: readHeaders(),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Neynar popular casts error: ${res.status}`);
+  return res.json();
+}
+
+export async function getBestFriends(fid: number, limit = 10) {
+  const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
+  const res = await fetchWithFailover(`/user/best-friends?${params}`, {
+    headers: readHeaders(),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Neynar best friends error: ${res.status}`);
+  return res.json();
+}
+
+export async function getTrendingTopics(limit = 10) {
+  const params = new URLSearchParams({ limit: String(limit) });
+  const res = await fetchWithFailover(`/trending/topics?${params}`, {
+    headers: readHeaders(),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Neynar trending topics error: ${res.status}`);
+  return res.json();
+}
+
+export async function getAccountVerifications(fid: number) {
+  const res = await fetch(`https://api.farcaster.xyz/fc/account-verifications?fid=${fid}`, {
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Farcaster verifications error: ${res.status}`);
+  return res.json();
+}
+
+export async function getFollowSuggestions(fid: number, limit = 20) {
+  const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
+  const res = await fetchWithFailover(`/user/suggestions?${params}`, {
+    headers: readHeaders(),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Neynar follow suggestions error: ${res.status}`);
+  return res.json();
+}

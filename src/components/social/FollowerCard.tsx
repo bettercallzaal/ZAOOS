@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { OGBadge } from '@/components/badges/OGBadge';
+import { muteUserAction, blockUserAction } from '@/lib/farcaster/neynarActions';
 
 export interface FollowerUser {
   fid: number;
@@ -41,6 +42,47 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
   const isMe = user.fid === currentFid;
   const [isFollowing, setIsFollowing] = useState(user.viewer_context?.following ?? false);
   const [loading, setLoading] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [muteState, setMuteState] = useState<'idle' | 'loading' | 'done'>('idle');
+  const [blockState, setBlockState] = useState<'idle' | 'loading' | 'done'>('idle');
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
+
+  const handleMute = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (muteState !== 'idle') return;
+    setMuteState('loading');
+    try {
+      await muteUserAction(user.fid);
+      setMuteState('done');
+    } catch (err) {
+      console.error('[FollowerCard] mute failed:', err);
+      setMuteState('idle');
+    }
+  };
+
+  const handleBlock = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (blockState !== 'idle') return;
+    setBlockState('loading');
+    try {
+      await blockUserAction(user.fid);
+      setBlockState('done');
+    } catch (err) {
+      console.error('[FollowerCard] block failed:', err);
+      setBlockState('idle');
+    }
+  };
 
   const isMutual = isFollowing && user.viewer_context?.followed_by;
   const followsYou = !isMe && user.viewer_context?.followed_by && !isFollowing;
@@ -130,19 +172,72 @@ export function FollowerCard({ user, hasSigner, currentFid }: FollowerCardProps)
         </div>
       </div>
 
-      {/* Follow button */}
-      {!isMe && hasSigner && (
-        <button
-          onClick={handleToggleFollow}
-          disabled={loading}
-          className={`flex-shrink-0 px-4 py-1.5 text-xs font-medium rounded-lg transition-colors mt-1 ${
-            isFollowing
-              ? 'bg-gray-800 text-gray-300 hover:bg-red-900/30 hover:text-red-400'
-              : 'bg-[#f5a623] text-black hover:bg-[#ffd700]'
-          } disabled:opacity-50`}
-        >
-          {loading ? '...' : isFollowing ? 'Following' : 'Follow'}
-        </button>
+      {/* Action buttons */}
+      {!isMe && (
+        <div className="flex items-center gap-1 flex-shrink-0 mt-1">
+          {/* Direct Cast intent link */}
+          <a
+            href={`https://farcaster.xyz/~/inbox/create/${user.fid}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="p-1.5 text-gray-500 hover:text-[#f5a623] transition-colors rounded-lg hover:bg-white/[0.05]"
+            title="Direct Cast"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          </a>
+
+          {/* Follow button */}
+          {hasSigner && (
+            <button
+              onClick={handleToggleFollow}
+              disabled={loading}
+              className={`px-4 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                isFollowing
+                  ? 'bg-gray-800 text-gray-300 hover:bg-red-900/30 hover:text-red-400'
+                  : 'bg-[#f5a623] text-black hover:bg-[#ffd700]'
+              } disabled:opacity-50`}
+            >
+              {loading ? '...' : isFollowing ? 'Following' : 'Follow'}
+            </button>
+          )}
+
+          {/* Three-dot menu */}
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
+              className="p-1.5 text-gray-500 hover:text-gray-300 transition-colors rounded-lg hover:bg-white/[0.05]"
+              title="More options"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="5" cy="12" r="1.5" />
+                <circle cx="12" cy="12" r="1.5" />
+                <circle cx="19" cy="12" r="1.5" />
+              </svg>
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-1 z-50 min-w-[120px] bg-[#0f1e35] border border-white/10 rounded-lg shadow-xl overflow-hidden">
+                <button
+                  onClick={handleMute}
+                  disabled={muteState !== 'idle'}
+                  className="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-white/[0.06] transition-colors disabled:opacity-60"
+                >
+                  {muteState === 'loading' ? 'Muting...' : muteState === 'done' ? 'Muted' : 'Mute'}
+                </button>
+                <button
+                  onClick={handleBlock}
+                  disabled={blockState !== 'idle'}
+                  className="w-full text-left px-3 py-2 text-xs text-red-400 hover:bg-red-900/20 transition-colors disabled:opacity-60"
+                >
+                  {blockState === 'loading' ? 'Blocking...' : blockState === 'done' ? 'Blocked' : 'Block'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

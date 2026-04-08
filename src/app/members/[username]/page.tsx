@@ -261,6 +261,11 @@ export default function MemberProfilePage() {
   const [editing, setEditing] = useState(false);
   const { user } = useAuth();
 
+  const [verifications, setVerifications] = useState<{ platform: string; username?: string }[]>([]);
+  const [popularCasts, setPopularCasts] = useState<{ hash: string; text: string; likes: number; recasts: number }[]>([]);
+  const [bestFriends, setBestFriends] = useState<{ fid: number; username: string; displayName: string; pfpUrl: string | null }[]>([]);
+  const [castsOpen, setCastsOpen] = useState(true);
+
   const fetchProfile = () => {
     setLoading(true);
     fetch(`/api/members/${encodeURIComponent(username)}`)
@@ -274,6 +279,40 @@ export default function MemberProfilePage() {
   };
 
   useEffect(() => { fetchProfile(); }, [username]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!profile?.fid) return;
+    fetch(`/api/social/verifications?fid=${profile.fid}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.result?.verifications) {
+          setVerifications(data.result.verifications);
+        }
+      })
+      .catch(() => {});
+  }, [profile?.fid]);
+
+  useEffect(() => {
+    if (!username) return;
+    fetch(`/api/members/${encodeURIComponent(username)}/popular`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (Array.isArray(data)) setPopularCasts(data);
+        else if (Array.isArray(data?.casts)) setPopularCasts(data.casts);
+      })
+      .catch(() => {});
+  }, [username]);
+
+  useEffect(() => {
+    if (!username) return;
+    fetch(`/api/members/${encodeURIComponent(username)}/friends`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (Array.isArray(data)) setBestFriends(data);
+        else if (Array.isArray(data?.friends)) setBestFriends(data.friends);
+      })
+      .catch(() => {});
+  }, [username]);
 
   const isOwnProfile = !!(user && profile && user.fid === profile.fid);
 
@@ -461,6 +500,37 @@ export default function MemberProfilePage() {
           </div>
         )}
 
+        {/* Account Verifications */}
+        {verifications.length > 0 && (
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Verifications</p>
+            <div className="flex flex-wrap gap-2">
+              {verifications.map((v, i) => (
+                <span
+                  key={i}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                    v.platform === 'x' || v.platform === 'twitter'
+                      ? 'bg-white/5 text-gray-300 border-white/10'
+                      : v.platform === 'github'
+                      ? 'bg-gray-500/10 text-gray-300 border-gray-500/20'
+                      : v.platform === 'discord'
+                      ? 'bg-[#5865F2]/10 text-[#818cf8] border-[#5865F2]/20'
+                      : 'bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/20'
+                  }`}
+                >
+                  {v.platform === 'x' || v.platform === 'twitter'
+                    ? `X${v.username ? `: @${v.username}` : ' Verified'}`
+                    : v.platform === 'github'
+                    ? `GitHub${v.username ? `: ${v.username}` : ''}`
+                    : v.platform === 'discord'
+                    ? `Discord${v.username ? `: ${v.username}` : ''}`
+                    : `${v.platform.charAt(0).toUpperCase() + v.platform.slice(1)}${v.username ? `: ${v.username}` : ' Verified'}`}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Respect stats — full breakdown */}
         {p.respect && (
           <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
@@ -561,6 +631,83 @@ export default function MemberProfilePage() {
                   Website
                 </a>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Popular Casts */}
+        {popularCasts.length > 0 && (
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
+            <button
+              onClick={() => setCastsOpen(o => !o)}
+              className="w-full flex items-center justify-between text-left"
+            >
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Best Casts</p>
+              <svg
+                width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                className={`text-gray-500 transition-transform ${castsOpen ? 'rotate-180' : ''}`}
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            {castsOpen && (
+              <div className="space-y-2 mt-3">
+                {popularCasts.slice(0, 5).map((cast) => (
+                  <a
+                    key={cast.hash}
+                    href={`https://farcaster.xyz/~/conversations/${cast.hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block bg-[#0a1628] rounded-lg p-3 hover:bg-white/5 transition-colors"
+                  >
+                    <p className="text-sm text-gray-300 leading-snug mb-2">
+                      {cast.text.length > 100 ? cast.text.slice(0, 100) + '…' : cast.text}
+                    </p>
+                    <div className="flex items-center gap-3 text-[10px] text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                        {cast.likes.toLocaleString()}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M17 1l4 4-4 4" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                          <path d="M7 23l-4-4 4-4" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                        </svg>
+                        {cast.recasts.toLocaleString()}
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Best Friends */}
+        {bestFriends.length > 0 && (
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 mb-4">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Close Friends on Farcaster</p>
+            <div className="flex flex-wrap gap-2">
+              {bestFriends.slice(0, 5).map((friend) => (
+                <Link
+                  key={friend.fid}
+                  href={`/members/${friend.username}`}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0a1628] border border-white/[0.06] hover:border-[#f5a623]/30 hover:bg-[#f5a623]/5 transition-colors"
+                >
+                  <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
+                    {friend.pfpUrl ? (
+                      <Image src={friend.pfpUrl} alt="" fill className="object-cover" sizes="20px" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[9px] font-bold text-gray-400">
+                        {(friend.displayName || friend.username || '?')[0]?.toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-300">@{friend.username}</span>
+                </Link>
+              ))}
             </div>
           </div>
         )}

@@ -110,7 +110,7 @@ export function FishbowlChat({ roomId }: FishbowlChatProps) {
             placeholder="Message..."
             maxLength={500}
             disabled={sending}
-            className="flex-1 bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623] min-h-[36px]"
+            className="flex-1 bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623] min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <button
             type="submit"

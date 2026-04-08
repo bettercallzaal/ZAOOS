@@ -322,15 +322,15 @@ export default function FishbowlzPage() {
           <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map(room => (
               <Link key={room.id} href={`/fishbowlz/${room.slug || room.id}`}>
-                <div className={`bg-[#1a2a4a] rounded-xl p-5 border border-white/10 transition-colors cursor-pointer ${
+                <div className={`bg-[#1a2a4a] rounded-xl p-3 sm:p-5 border border-white/10 transition-colors cursor-pointer ${
                   room.state === 'active'
                     ? 'hover:border-[#f5a623]/50'
                     : room.state === 'scheduled'
-                    ? 'hover:border-blue-400/50'
+                    ? 'hover:border-[#f5a623]/50'
                     : 'hover:border-white/20 opacity-75'
                 }`}>
                   <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-bold text-lg truncate flex-1">{room.title}</h3>
+                    <h3 className="font-bold text-base sm:text-lg truncate flex-1">{room.title}</h3>
                     <span className={`text-xs px-2 py-1 rounded-full ml-2 ${
                       room.state === 'active'
                         ? 'bg-[#f5a623]/20 text-[#f5a623]'
@@ -371,7 +371,7 @@ export default function FishbowlzPage() {
                   <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center gap-1.5">
                       {room.host_pfp ? (
-                        <Image src={room.host_pfp || '/logo.png'} alt="" width={16} height={16} className="w-4 h-4 rounded-full" unoptimized />
+                        <Image src={room.host_pfp || '/logo.png'} alt="" width={16} height={16} className="w-4 h-4 sm:w-5 sm:h-5 rounded-full" unoptimized />
                       ) : (
                         <div className="w-4 h-4 rounded-full bg-gray-600 flex items-center justify-center text-[8px] text-gray-400">
                           {room.host_username[0]?.toUpperCase()}

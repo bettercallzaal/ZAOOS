@@ -1,259 +1,298 @@
-# 30-Day AI Tool Mastery Curriculum
+# ZAO OS Daily Learning Curriculum
 
-ZOE delivers one tip per day via Telegram at 9 AM ET. Each tip takes 5 minutes max.
+ZOE delivers one task per day at 7 AM ET via scheduled trigger. Each task is specific to ZAO OS - features to test, code to understand, tools to try, integrations to verify. Not generic AI tips.
 
----
-
-## Week 1: Claude Code Power User
-
-### Day 1: /compact saves tokens
-**Try this:**
-1. Start a normal session, work for 15-20 messages
-2. Type `/compact`
-3. Notice the conversation compresses but Claude still remembers context
-
-**Why:** Message 30 costs 31x more tokens than message 1. Compacting resets the cost curve.
-
-### Day 2: Model switching
-**Try this:**
-1. Type `/model sonnet` before doing a simple file read or grep
-2. Do the task - notice it works fine
-3. Switch back to Opus with `/model opus` for architecture decisions
-
-**Why:** Sonnet handles 70%+ of tasks at ~50% fewer tokens. Save Opus for the hard stuff.
-
-### Day 3: Edit prompts, don't follow up
-**Try this:**
-1. Next time Claude gets something wrong, DON'T send a correction
-2. Instead, click Edit on your original message and rewrite it
-3. Compare: the old exchange is replaced, not stacked
-
-**Why:** Follow-ups stack on the history. Edits replace. Saves 50% per correction.
-
-### Day 4: Batch questions
-**Try this:**
-1. Think of 3 things you need to know about the codebase
-2. Send them all in ONE message: "1) ... 2) ... 3) ..."
-3. Compare the result vs 3 separate messages
-
-**Why:** 3 separate prompts = 3 context reloads. 1 prompt with 3 tasks = 1 context reload.
-
-### Day 5: Background agents
-**Try this:**
-1. Ask Claude to do 2 independent things in one message
-2. Watch it dispatch parallel agents
-3. Notice both complete simultaneously
-
-**Why:** Parallel agents = same wall-clock time, more throughput.
-
-### Day 6: /z for quick status
-**Try this:**
-1. Start your session with `/z`
-2. Read: branch state, recent commits, what needs attention
-3. This replaces 5 minutes of manual git log / git status
-
-**Why:** 10 seconds to orient. Every session should start here.
-
-### Day 7: Peak hours awareness
-**Try this:**
-1. Note what time you start heavy Opus work today
-2. Is it 5-11 AM PT (8 AM-2 PM ET)? That's peak - tokens cost more
-3. Try scheduling complex architecture work for afternoon/evening
-
-**Why:** Same weekly limit, but peak hours burn it 20-30% faster.
+**Format:** Read the task, try it during downtime (waiting for agents, waiting for builds), report back what you found.
 
 ---
 
-## Week 2: Knowledge Infrastructure
+## Week 1: Know Your Codebase
 
-### Day 8: Install Graphify
+### Day 1: The Activity Feed - 7 data sources in one route
+**Explore:** `src/app/api/activity/feed/route.ts`
 **Try this:**
-1. Run: `pip install graphifyy && graphify install`
-2. In Claude Code: `/graphify ./research`
-3. Open `graphify-out/graph.html` in a browser - browse the knowledge graph
+1. Read the route - it aggregates casts, songs, votes, proposals, members, fractals, and battles into one feed
+2. Hit it locally: `curl http://localhost:3000/api/activity/feed` (with auth)
+3. Count how many Supabase tables it queries. Are any of those queries slow?
 
-**Why:** 338 research docs take thousands of tokens to search. Graphify = 71.5x fewer tokens.
+**Why:** This is the heartbeat of ZAO OS. If this route is slow, the whole app feels slow. 0 tests exist for it.
 
-### Day 9: Query the graph
+### Day 2: community.config.ts - the fork file
+**Explore:** `community.config.ts` (~282 lines)
 **Try this:**
-1. `/graphify query "What research covers XMTP?"`
-2. Compare speed vs manually grepping `research/*/README.md`
-3. Try: `/graphify query "What connects the music player to governance?"`
+1. Read the entire file - every feature, contract, channel, and admin FID lives here
+2. Find the `sopha` config - it's set to `minQualityScore: 0` (disabled). What would it do if enabled?
+3. Find the `arweave` config - max audio size is 50MB. Is that enforced in `/api/upload/`?
 
-**Why:** Graph queries find non-obvious connections between concepts.
+**Why:** If someone forks ZAO OS, this is the ONLY file they change. You should know every line.
 
-### Day 10: Install wiki-skills
+### Day 3: The 19 hooks - what's wired, what's dormant
+**Explore:** `src/hooks/`
 **Try this:**
-1. In Claude Code: `/plugin marketplace add kfchou/wiki-skills`
-2. Then: `/plugin install wiki-skills@kfchou/wiki-skills`
-3. Test: `/wiki-init` pointed at a test directory
+1. List all 19 hooks: `ls src/hooks/`
+2. Pick 3 you haven't used recently: `useLensAuth`, `useAutoStreamMarker`, `useLiveTranscript`
+3. Grep for their imports: `grep -r "useLensAuth" src/` - are they actually imported anywhere?
 
-**Why:** Turns research docs into a queryable, compounding wiki (Karpathy pattern).
+**Why:** Dormant hooks are either dead code to remove or features waiting to be activated.
 
-### Day 11: Wiki ingest
+### Day 4: Keyboard shortcuts nobody knows about
+**Explore:** `src/hooks/useKeyboardShortcuts.ts`
 **Try this:**
-1. Pick 1 important research doc (try doc 050 - ZAO Complete Guide)
-2. Run `/wiki-ingest` and point it at that doc
-3. Watch how it creates summary + concept pages + cross-links
+1. Read the hook - what shortcuts are registered?
+2. Open ZAO OS locally and try each one: Cmd+K (search), / (compose), Esc (close panels)
+3. Are there shortcuts that should exist but don't? (e.g., Cmd+/ for keyboard shortcut help)
 
-**Why:** Each ingest makes future queries smarter. Knowledge compounds.
+**Why:** Keyboard shortcuts make power users happy. But only if they know they exist.
 
-### Day 12: Install last30days
+### Day 5: The music player architecture - 30+ components
+**Explore:** `src/components/music/`
 **Try this:**
-1. `/plugin marketplace add mvanhorn/last30days-skill`
-2. Research: "Farcaster music communities 2026"
-3. Check the auto-saved briefing at `~/Documents/Last30Days/`
+1. Count the components: `ls src/components/music/ | wc -l`
+2. Read `src/providers/audio/PlayerProvider.tsx` - this is the brain
+3. Find these specific features and check if they're accessible in the UI:
+   - `SleepTimer.tsx` - can users set a sleep timer?
+   - `AudioFiltersPanel.tsx` - can users adjust EQ?
+   - `BinauralBeats.tsx` - can users access binaural beats?
 
-**Why:** Real-time social intelligence from Reddit, HN, Polymarket. Grounds content in data.
+**Why:** 30+ music components exist. Some might be built but not wired into the UI.
 
-### Day 13: Nia Docs for API lookups
+### Day 6: Respect tokens - what the code says vs what research says
+**Explore:** `src/lib/respect/` and `community.config.ts` respect section
 **Try this:**
-1. Run: `npx nia-docs https://docs.neynar.com -c "tree"`
-2. Browse the Neynar docs as a filesystem
-3. Try: `npx nia-docs https://docs.neynar.com -c "grep -rl 'webhook' ."`
+1. Read the Respect config: OG contract + ZOR contract addresses
+2. Read Doc 4 (research) - it describes "tiers and decay"
+3. Check the actual code: does it implement tiers? Decay? (Spoiler: NO)
+4. Note the discrepancy - research is aspirational, code is truth
 
-**Why:** Agents read docs as files - no more manually browsing API docs.
+**Why:** Known discrepancy. Understanding where research != code prevents building on wrong assumptions.
 
-### Day 14: Oh-My-Mermaid
+### Day 7: The 260 untested API routes
+**Explore:** `src/app/api/`
 **Try this:**
-1. Run: `npm install -g oh-my-mermaid && omm setup`
-2. In Claude Code: `/omm-scan`
-3. Open `.omm/` and view the architecture diagrams
+1. Count routes with tests: `find src/app/api -name "__tests__" -type d | wc -l` (answer: ~14)
+2. Count total route files: `find src/app/api -name "route.ts" | wc -l` (answer: ~274)
+3. Pick ONE untested route you use frequently and read it end-to-end
+4. Ask yourself: what would break if the Neynar API changed its response format?
 
-**Why:** Automatic architecture documentation. Shows how modules connect.
+**Why:** 95% of routes have no tests. This is the biggest risk in the codebase.
 
 ---
 
-## Week 3: Content & Communication
+## Week 2: Integrations You Built But May Have Forgotten
 
-### Day 15: Brand voice test
+### Day 8: Twitch integration - 6 untested routes
+**Explore:** `src/app/api/twitch/`
 **Try this:**
-1. Write a 3-sentence update about today's coding work
-2. Ask Claude to rewrite it using the brand-voice skill
-3. Compare: which sounds more like your published posts?
+1. List all Twitch routes: clip, chat, marker, poll, prediction, stream-info
+2. Read `src/app/api/twitch/poll/route.ts` - how does it create a Twitch poll?
+3. Check: is the Twitch OAuth token still valid? When does it expire?
 
-**Why:** Consistency across all content. The skill has your real voice patterns.
+**Why:** 6 routes, 0 tests. If Twitch changes their API, you won't know until users complain.
 
-### Day 16: Quote-cast pattern
+### Day 9: Bluesky cross-posting - does it still work?
+**Explore:** `src/app/api/bluesky/` and `src/lib/publish/`
 **Try this:**
-1. Open Farcaster, find a trending cast in music/web3
-2. Draft a response that adds tactical value (not just "great cast")
-3. Format: bold claim + numbered breakdown + specific example
+1. Read the Bluesky feed sync route
+2. Check `scripts/publish-bluesky-feed.ts` - when was it last run?
+3. Test: does the Bluesky member sync still match FIDs to Bluesky handles?
 
-**Why:** Quote-casts borrow someone's audience while adding original value. High leverage.
+**Why:** Cross-platform publishing is a key feature. If Bluesky broke silently, you'd never know.
 
-### Day 17: Research-first content
+### Day 10: ZOUNZ DAO - on-chain governance
+**Explore:** `src/app/api/zounz/proposals/` and `src/components/zounz/`
 **Try this:**
-1. Before writing anything today, run `/last30days [your topic]`
-2. Read the briefing - what's actually trending?
-3. Write content based on what people care about, not what you assume
+1. Read `src/lib/zounz/contracts.ts` - what contracts are configured?
+2. Read `ZounzProposals.tsx` - how does it fetch proposals from the Governor contract?
+3. Check: when was the last ZOUNZ proposal? Is this feature actively used?
 
-**Why:** Content grounded in real data gets more engagement than gut-feeling content.
+**Why:** On-chain governance is a pillar of ZAO OS. Understanding the contract integration matters.
 
-### Day 18: /socials with research
+### Day 11: Snapshot weekly polls
+**Explore:** `src/app/api/snapshot/` and `src/components/governance/CreateWeeklyPoll.tsx`
 **Try this:**
-1. Run last30days on a music/web3 topic
-2. Feed the results into `/socials`
-3. Compare the output vs running /socials without research context
+1. Read the Snapshot config in `community.config.ts` - 10 poll choices configured
+2. Read `src/lib/snapshot/client.ts` - how does it talk to Snapshot's GraphQL API?
+3. Check: is the `zaal.eth` Snapshot space still active?
 
-**Why:** Research-informed social posts are more specific, more relevant, more bookmarkable.
+**Why:** Gasless voting for 188 members. One of the most accessible governance features.
 
-### Day 19: Build-in-public post
+### Day 12: Hats Protocol - role management
+**Explore:** `src/app/api/hats/` and `scripts/read-hats-tree.ts`
 **Try this:**
-1. Take a screenshot of something you built or fixed today
-2. Write a 3-5 sentence build update with the screenshot
-3. Include a specific number (files changed, time saved, feature count)
+1. Run the script: `npx tsx scripts/read-hats-tree.ts` - what roles exist?
+2. Read `src/components/hats/HatBadge.tsx` - how are role badges displayed?
+3. Check: tree ID 226 on Optimism - is this the right tree?
 
-**Why:** Build-in-public posts outperform announcements because they show real work.
+**Why:** Hats controls who can do what. If the tree is misconfigured, permissions break.
 
-### Day 20: Newsletter with voice check
+### Day 13: 100ms vs Stream.io - two audio providers
+**Explore:** `src/app/api/100ms/` and `src/app/api/stream/`
 **Try this:**
-1. Draft a newsletter with `/newsletter`
-2. Check it against `.claude/skills/zao-os/brand-voice.md` rules
-3. Fix anything that sounds corporate or vague
+1. Check `community.config.ts` - which audio provider is active? (answer: stream)
+2. Read both token generation routes - how do they differ?
+3. Does any code path still use 100ms? Or is it fully dormant?
 
-**Why:** Every newsletter should sound like Zaal, not like AI.
+**Why:** Two providers configured, one active. Dead code paths create confusion.
 
-### Day 21: Review your best cast
+### Day 14: The broadcast system - RTMP multistream
+**Explore:** `src/app/api/broadcast/` and `src/lib/spaces/rtmpManager.ts`
 **Try this:**
-1. Find your best-performing Farcaster cast from the past month
-2. What made it work? Numbers? Specificity? Build update? Question?
-3. Write that pattern down in your skills journal
+1. Read the RTMP manager - it can stream to Twitch, YouTube, Kick, Facebook
+2. Read `src/app/api/broadcast/start/route.ts` - what does it actually do?
+3. Check: are the platform OAuth connections still working?
 
-**Why:** Your own data tells you what works better than any guide.
+**Why:** Broadcasting to 4 platforms simultaneously is a killer feature - if it works.
 
 ---
 
-## Week 4: Codebase & Agent Mastery
+## Week 3: Hidden Features & Unused Components
 
-### Day 22: Auto-memory review
+### Day 15: Farcaster Mini App SDK
+**Explore:** `src/hooks/useMiniApp.ts` and research doc 250
 **Try this:**
-1. Read `~/.claude/projects/.../memory/MEMORY.md`
-2. Is everything in there still accurate? Update stale entries.
-3. Check: are there memories you wish were there but aren't?
+1. Read the hook - it's extensive, hooks into `/api/miniapp/*`
+2. Read Doc 250's gap analysis - 11 features NOT YET implemented
+3. Pick the easiest gap (haptic feedback) - could you add it to the music player?
 
-**Why:** Stale memory causes Claude to make wrong assumptions. Clean memory = better output.
+**Why:** Mini apps are Farcaster's future. ZAO OS has the hooks but gaps in implementation.
 
-### Day 23: MemPalace search
+### Day 16: WaveWarZ music battles
+**Explore:** `src/app/api/wavewarz/` and `community.config.ts` wavewarz section
 **Try this:**
-1. If MemPalace is installed: ask "What did I decide about XMTP?"
-2. Test cross-session recall: ask about a decision from a previous session
-3. Notice what it remembers vs what it misses
+1. Read all 4 routes: artists, battles, sync, random-stat
+2. Check the external URLs in config - do they still resolve?
+3. Read the WaveWarZ research docs (wavewarz/ folder)
 
-**Why:** Cross-session memory across 15+ repos means never re-explaining context.
+**Why:** Prediction markets for music. 4 routes, 0 tests. Is this feature alive or abandoned?
 
-### Day 24: /investigate vs guessing
+### Day 17: Arweave / Permaweb music library
+**Explore:** `src/components/music/PermawebLibrary.tsx` and the arweave config
 **Try this:**
-1. Next bug you encounter, DON'T guess the fix
-2. Run `/investigate` and follow the 4-phase process
-3. Compare: did the root cause match your initial guess?
+1. Read the component - how does it browse Arweave music?
+2. Check `/api/upload/route.ts` - does it enforce the 50MB audio limit from config?
+3. Is the Arweave gateway (`arweave.net`) responding?
 
-**Why:** Root cause analysis prevents fix-then-break cycles. Iron law: no fixes without root cause.
+**Why:** Permanent music storage on Arweave is a differentiator. But only if the upload path works.
 
-### Day 25: /review before shipping
+### Day 18: Collaborative playlists & listening parties
+**Explore:** `src/components/music/CollaborativePlaylists.tsx` and `ListeningParties.tsx`
 **Try this:**
-1. Before your next PR, run `/review`
-2. Read everything it flags
-3. How many issues would you have caught manually?
+1. Read both components - what UI do they render?
+2. Grep for their imports - are they used anywhere in the app?
+3. If unused: are they complete enough to wire in? Or just stubs?
 
-**Why:** Code review catches SQL safety, trust boundary violations, conditional side effects.
+**Why:** Social music features that could drive engagement. May be complete but unwired.
 
-### Day 26: /autoresearch on a goal
+### Day 19: XMTP private messaging
+**Explore:** `src/hooks/useWalletXMTP.ts` and `src/components/messages/`
 **Try this:**
-1. Pick a measurable goal: "reduce homepage load time by 200ms"
+1. Read the hook - how does it initialize XMTP?
+2. Read `MessagesRoom.tsx` - what's the E2E encrypted chat UI?
+3. Check: does XMTP still use the WASM binary in `public/`?
+
+**Why:** Private messaging is Phase 2. Understanding the current state helps plan the launch.
+
+### Day 20: ENS subnames - code complete, needs on-chain setup
+**Explore:** `src/hooks/useENS.ts` and `scripts/generate-ens-operator.ts`
+**Try this:**
+1. Read the hook - how does it resolve ENS names?
+2. Read the operator script - what does it generate?
+3. Check memory: "ENS subnames: code complete, needs focused on-chain setup session"
+
+**Why:** This has been "almost done" for a while. Understanding the gap helps you finish it.
+
+### Day 21: The admin panel - 30+ untested routes
+**Explore:** `src/app/api/admin/`
+**Try this:**
+1. List all admin routes - member health, backfill, export, contacts, dormant detection
+2. Pick one you've never used and read it
+3. Ask: could any of these be automated by ZOE?
+
+**Why:** Admin routes are your operational backbone. If they break, you fly blind.
+
+---
+
+## Week 4: Skills, Agents & Your Workflow
+
+### Day 22: Audit your 20 skills - which earn daily use?
+**Explore:** `.claude/skills/`
+**Try this:**
+1. List all skills and their descriptions
+2. Rank them: daily use / weekly use / never used / forgot it existed
+3. For "never used" skills: are they still relevant? Should they be updated or removed?
+
+**Why:** Doc 276 noted "audit which skills earn daily use vs which are aspirational."
+
+### Day 23: The /zao-research skill - 300+ lines of methodology
+**Explore:** `.claude/skills/zao-research/SKILL.md`
+**Try this:**
+1. Read the full skill - it has 6 mandatory steps, banned phrases, quality checks
+2. Run it on a topic: `/zao-research [something you're curious about]`
+3. Check: does the output pass all 6 hard requirements?
+
+**Why:** This is your most complex skill. Understanding it makes every research session better.
+
+### Day 24: Your agent squad - ZOE, SCOUT, CASTER, ROLO, STOCK
+**Explore:** Via `/vps status`
+**Try this:**
+1. Check what each agent did in the last 24 hours
+2. Send SCOUT a research task via ZOE dispatch
+3. Check zoe.zaoos.com - is the dashboard showing real data?
+
+**Why:** 5 agents running 24/7. You should know what they produce and whether it's useful.
+
+### Day 25: GitNexus knowledge graph - 17,627 nodes
+**Explore:** Use GitNexus MCP tools
+**Try this:**
+1. Query: "What are the most connected files in ZAO OS?"
+2. Query: "What would break if I changed src/lib/auth/session.ts?"
+3. Query: "Show the dependency graph for the music player"
+
+**Why:** Impact analysis before making changes. The graph knows connections you don't.
+
+### Day 26: Test one untested route - write the test
+**Explore:** Pick any route from the 260 untested ones
+**Try this:**
+1. Pick a route you care about (suggestion: `/api/activity/feed`)
+2. Read `src/app/api/__tests__/` for examples of how existing tests work
+3. Write ONE test for the happy path using `vi.mock()` + Vitest patterns
+4. Run it: `npx vitest run src/app/api/activity/__tests__/feed.test.ts`
+
+**Why:** Going from 0 to 1 test on a route is the hardest step. The second test is easy.
+
+### Day 27: The middleware - rate limiting & CORS
+**Explore:** `src/middleware.ts`
+**Try this:**
+1. Read the middleware - how does rate limiting work?
+2. What are the per-IP limits? Are they appropriate for 188 members?
+3. Check: are there routes that should be rate-limited but aren't?
+
+**Why:** Middleware runs on EVERY request. A bug here affects everything.
+
+### Day 28: Run /autoresearch on a real goal
+**Explore:** Any measurable goal
+**Try this:**
+1. Pick something concrete: "reduce the number of Supabase queries in /api/activity/feed from N to N-2"
 2. Run `/autoresearch` with that goal
-3. Watch it iterate: modify, verify, keep/discard, repeat
+3. Watch it iterate: modify, verify, keep/discard
 
-**Why:** Autonomous iteration toward measurable goals. Let the agent drive.
+**Why:** Autonomous iteration on real codebase goals. See what it finds that you wouldn't.
 
-### Day 27: Check your agent squad
+### Day 29: The cross-platform publish pipeline
+**Explore:** `src/lib/publish/`
 **Try this:**
-1. Run `/vps status` - see what ZOE, SCOUT, CASTER, ROLO, STOCK are doing
-2. Send ZOE a task via Telegram: "brief me on today's agent activity"
-3. Check zoe.zaoos.com dashboard
+1. Read every file in the publish directory
+2. Trace the flow: proposal approved -> 1000+ Respect -> auto-publish to Farcaster + Bluesky + X
+3. Check: are Lens and Hive still "scaffolded but deferred"?
 
-**Why:** 5 agents running 24/7. You should know what they're producing.
+**Why:** Cross-platform publishing is core to governance output. The pipeline has 3 active + 2 deferred platforms.
 
-### Day 28: Custom skill creation
+### Day 30: Write a custom skill for something you repeat
+**Explore:** Your own workflow
 **Try this:**
-1. Think of one repetitive task you do every session
-2. Write a 20-line skill for it: name, description, steps
-3. Save to `.claude/skills/` and test it
+1. Think about what you do every session that's repetitive
+2. Look at `.claude/skills/new-route/SKILL.md` as a template (it's simple)
+3. Write a 20-line skill and save it to `.claude/skills/`
+4. Test it
 
-**Why:** Every repetitive task is a skill waiting to be written. 20 lines saves hours over time.
-
-### Day 29: GitNexus exploration
-**Try this:**
-1. Use GitNexus MCP tools to query the codebase knowledge graph
-2. Try: "What are the most connected files in ZAO OS?"
-3. Try: "What would break if I changed session.ts?"
-
-**Why:** 17,627 nodes + 23,151 edges indexed. Impact analysis before making changes.
-
-### Day 30: Reflection
-**Try this:**
-1. Run `/reflect`
-2. What tools stuck? What changed your workflow?
-3. What do you want to learn in the next 30 days?
-
-**Why:** Learning compounds like code. Track what works, drop what doesn't.
+**Why:** Every repetitive task is a skill waiting to be written. You have 20 skills - make it 21.

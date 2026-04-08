@@ -5,22 +5,5 @@
       "maxDuration": 10
     }
   },
-  "crons": [
-    {
-      "path": "/api/wavewarz/sync",
-      "schedule": "0 23 * * *"
-    },
-    {
-      "path": "/api/cron/follower-snapshot",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/daily-digest",
-      "schedule": "0 2 * * *"
-    },
-    {
-      "path": "/api/cron/health-snapshot",
-      "schedule": "0 0 * * 0"
-    }
-  ]
+  "crons": []
 }

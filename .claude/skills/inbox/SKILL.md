@@ -51,9 +51,14 @@ ZOE INBOX (N unread)
    curl -s "https://api.agentmail.to/v0/inboxes/zoe-zao@agentmail.to/messages/{message_id}" \
      -H "Authorization: Bearer $AGENTMAIL_API_KEY"
    ```
-2. Extract URLs from the body text
-3. If it contains a URL: fetch it and run /zao-research on the topic
-4. If it's plain text: treat as a research topic, run /zao-research
+2. Extract URLs from the body text (look for https:// patterns)
+3. If it contains a URL: fetch it via Jina Reader to get clean content:
+   ```bash
+   curl -s "https://r.jina.ai/{URL}"
+   ```
+   This works on X/Twitter posts, articles, GitHub repos, any URL. Returns clean markdown.
+   Then run /zao-research on the extracted content.
+4. If it's plain text: treat as a research topic, run /zao-research directly
 5. Mark as read by removing the 'unread' label:
    ```bash
    curl -s -X PATCH "https://api.agentmail.to/v0/inboxes/zoe-zao@agentmail.to/messages/{message_id}" \

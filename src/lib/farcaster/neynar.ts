@@ -512,3 +512,34 @@ export async function getFollowSuggestions(fid: number, limit = 20) {
   if (!res.ok) throw new Error(`Neynar follow suggestions error: ${res.status}`);
   return res.json();
 }
+
+export async function getFrameCatalog(limit = 20, cursor?: string) {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (cursor) params.set('cursor', cursor);
+  const res = await fetchWithFailover(`/frame/catalog?${params}`, {
+    headers: readHeaders(),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Neynar frame catalog error: ${res.status}`);
+  return res.json();
+}
+
+export async function searchFrames(query: string, limit = 20) {
+  const params = new URLSearchParams({ q: query, limit: String(limit) });
+  const res = await fetchWithFailover(`/frame/search?${params}`, {
+    headers: readHeaders(),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Neynar frame search error: ${res.status}`);
+  return res.json();
+}
+
+export async function getRelevantFrames(fid: number, limit = 20) {
+  const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
+  const res = await fetchWithFailover(`/frame/relevant?${params}`, {
+    headers: readHeaders(),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`Neynar relevant frames error: ${res.status}`);
+  return res.json();
+}

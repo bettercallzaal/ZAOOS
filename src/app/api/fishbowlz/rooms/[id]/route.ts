@@ -1,9 +1,84 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getSessionData } from '@/lib/auth/session';
 import { checkGatingEligibility } from '@/lib/fc-identity';
 import { castRoomEnded } from '@/lib/fishbowlz/castRoom';
 import { generateTranscriptSummary } from '@/lib/fishbowlz/summarize';
+
+// --- Zod schemas for PATCH body validation ---
+
+const JoinSpeakerSchema = z.object({
+  action: z.literal('join_speaker'),
+  fid: z.number(),
+  username: z.string().max(50),
+  address: z.string().optional(),
+});
+
+const LeaveSpeakerSchema = z.object({
+  action: z.literal('leave_speaker'),
+  fid: z.number(),
+});
+
+const JoinListenerSchema = z.object({
+  action: z.literal('join_listener'),
+  fid: z.number(),
+  username: z.string().max(50),
+});
+
+const LeaveListenerSchema = z.object({
+  action: z.literal('leave_listener'),
+  fid: z.number(),
+});
+
+const KickSpeakerSchema = z.object({
+  action: z.literal('kick_speaker'),
+  targetFid: z.number(),
+});
+
+const RotateInSchema = z.object({
+  action: z.literal('rotate_in'),
+  listenerFid: z.number(),
+  listenerUsername: z.string().max(50),
+});
+
+const ApproveHandSchema = z.object({
+  action: z.literal('approve_hand'),
+  targetFid: z.number(),
+});
+
+const HeartbeatSchema = z.object({
+  action: z.literal('heartbeat'),
+  fid: z.number(),
+});
+
+const RaiseHandSchema = z.object({
+  action: z.literal('raise_hand'),
+  fid: z.number(),
+  username: z.string().max(50),
+});
+
+const StartRoomSchema = z.object({
+  action: z.literal('start_room'),
+  username: z.string().max(50).optional(),
+});
+
+const EndRoomSchema = z.object({
+  action: z.literal('end_room'),
+});
+
+const UpdateRoomSchema = z.object({
+  action: z.literal('update_room'),
+  title: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+  state: z.string().optional(),
+});
+
+const PatchBodySchema = z.discriminatedUnion('action', [
+  JoinSpeakerSchema, LeaveSpeakerSchema, JoinListenerSchema, LeaveListenerSchema,
+  KickSpeakerSchema, RotateInSchema, ApproveHandSchema, HeartbeatSchema,
+  RaiseHandSchema, StartRoomSchema, EndRoomSchema, UpdateRoomSchema,
+]);
 
 interface FishbowlSpeaker {
   fid: number;
@@ -99,247 +174,135 @@ export async function PATCH(
     id = slugRoom.id;
   }
 
-  const body = await req.json();
-  const { action, ...data } = body;
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  const parsed = PatchBodySchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid request', details: parsed.error.flatten() }, { status: 400 });
+  }
+  const validatedBody = parsed.data;
 
   try {
-    if (action === 'join_speaker') {
-      const { fid, username, address } = data;
+    if (validatedBody.action === 'join_speaker') {
+      const { fid, username, address } = validatedBody;
       // Verify the requester is acting as themselves
       if (fid !== session.fid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, current_listeners, hot_seat_count, gating_enabled, min_quality_score').eq('id', id).single();
-      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+      // Check FC gating if enabled (need room data for gating check)
+      if (address) {
+        const room = await supabaseAdmin.from('fishbowl_rooms').select('gating_enabled, min_quality_score').eq('id', id).single();
+        if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
-      // Check FC gating if enabled
-      if (room.data.gating_enabled && address) {
-        const eligibility = await checkGatingEligibility(address, room.data.min_quality_score);
-        if (!eligibility.eligible) {
-          return NextResponse.json({
-            error: 'Gated room — FC quality score too low',
-            reason: eligibility.reason,
-            score: eligibility.score?.toString(),
-            fid: eligibility.fid,
-          }, { status: 403 });
+        if (room.data.gating_enabled) {
+          const eligibility = await checkGatingEligibility(address as `0x${string}`, room.data.min_quality_score);
+          if (!eligibility.eligible) {
+            return NextResponse.json({
+              error: 'Gated room - FC quality score too low',
+              reason: eligibility.reason,
+              score: eligibility.score?.toString(),
+              fid: eligibility.fid,
+            }, { status: 403 });
+          }
         }
       }
 
-      const speakers: FishbowlSpeaker[] = parseJsonb(room.data.current_speakers, []);
-
-      // Prevent duplicate join
-      if (speakers.some((s) => s.fid === fid)) {
-        return NextResponse.json({ success: true, speakers });
-      }
-
-      if (speakers.length >= room.data.hot_seat_count) {
-        return NextResponse.json({ error: 'Hot seat is full' }, { status: 409 });
-      }
-
-      // Remove from listeners if they were listening
-      const listeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
-      const updatedListeners = listeners.filter((l) => l.fid !== fid);
-
-      const newSpeakers = [...speakers, { fid, username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
-      await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: newSpeakers,
-        current_listeners: updatedListeners,
-        last_active_at: new Date().toISOString(),
-      }).eq('id', id);
-
-      await supabaseAdmin.rpc('log_fishbowl_event', {
-        p_event_type: 'speaker.joined',
-        p_event_data: JSON.stringify({ roomId: id, fid, username }),
+      const { data: rpcResult, error } = await supabaseAdmin.rpc('fishbowl_join_speaker', {
         p_room_id: id,
-        p_session_id: null,
-        p_actor_fid: fid,
-        p_actor_type: 'human',
+        p_fid: fid,
+        p_username: username,
+        p_address: address || null,
       });
+      if (error) return NextResponse.json({ error: error.message }, { status: 409 });
 
-      return NextResponse.json({ success: true, speakers: newSpeakers });
+      return NextResponse.json({ success: true, ...rpcResult });
     }
 
-    if (action === 'leave_speaker') {
-      const { fid } = data;
+    if (validatedBody.action === 'leave_speaker') {
+      const { fid } = validatedBody;
       if (fid !== session.fid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers').eq('id', id).single();
-      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
-
-      const rawSpeakers: FishbowlSpeaker[] = parseJsonb(room.data.current_speakers, []);
-      const speakers = rawSpeakers.filter((s) => s.fid !== fid);
-      await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: speakers,
-        last_active_at: new Date().toISOString(),
-      }).eq('id', id);
-
-      await supabaseAdmin.rpc('log_fishbowl_event', {
-        p_event_type: 'speaker.left',
-        p_event_data: JSON.stringify({ roomId: id, fid }),
+      const { data: rpcResult, error } = await supabaseAdmin.rpc('fishbowl_leave_speaker', {
         p_room_id: id,
-        p_session_id: null,
-        p_actor_fid: fid,
-        p_actor_type: 'human',
+        p_fid: fid,
       });
+      if (error) return NextResponse.json({ error: error.message }, { status: 409 });
 
-      return NextResponse.json({ success: true, speakers });
+      return NextResponse.json({ success: true, ...rpcResult });
     }
 
-    if (action === 'leave_listener') {
-      const { fid } = data;
+    if (validatedBody.action === 'leave_listener') {
+      const { fid } = validatedBody;
       if (fid !== session.fid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_listeners').eq('id', id).single();
-      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
-
-      const rawListeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
-      const listeners = rawListeners.filter((l) => l.fid !== fid);
-      await supabaseAdmin.from('fishbowl_rooms').update({
-        current_listeners: listeners,
-        last_active_at: new Date().toISOString(),
-      }).eq('id', id);
-
-      await supabaseAdmin.rpc('log_fishbowl_event', {
-        p_event_type: 'listener.left',
-        p_event_data: JSON.stringify({ roomId: id, fid }),
+      const { data: rpcResult, error } = await supabaseAdmin.rpc('fishbowl_leave_listener', {
         p_room_id: id,
-        p_session_id: null,
-        p_actor_fid: fid,
-        p_actor_type: 'human',
+        p_fid: fid,
       });
+      if (error) return NextResponse.json({ error: error.message }, { status: 409 });
 
-      return NextResponse.json({ success: true, listeners });
+      return NextResponse.json({ success: true, ...rpcResult });
     }
 
-    if (action === 'join_listener') {
-      const { fid, username } = data;
+    if (validatedBody.action === 'join_listener') {
+      const { fid, username } = validatedBody;
       if (fid !== session.fid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_listeners').eq('id', id).single();
-      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
-
-      const listeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
-
-      // Prevent duplicate join
-      if (listeners.some((l) => l.fid === fid)) {
-        return NextResponse.json({ success: true, listeners });
-      }
-
-      const newListeners = [...listeners, { fid, username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
-      await supabaseAdmin.from('fishbowl_rooms').update({
-        current_listeners: newListeners,
-        last_active_at: new Date().toISOString(),
-      }).eq('id', id);
-
-      await supabaseAdmin.rpc('log_fishbowl_event', {
-        p_event_type: 'listener.joined',
-        p_event_data: JSON.stringify({ roomId: id, fid, username }),
+      const { data: rpcResult, error } = await supabaseAdmin.rpc('fishbowl_join_listener', {
         p_room_id: id,
-        p_session_id: null,
-        p_actor_fid: fid,
-        p_actor_type: 'human',
+        p_fid: fid,
+        p_username: username,
       });
+      if (error) return NextResponse.json({ error: error.message }, { status: 409 });
 
-      return NextResponse.json({ success: true, listeners: newListeners });
+      return NextResponse.json({ success: true, ...rpcResult });
     }
 
-    if (action === 'rotate_in') {
-      const { listenerFid, listenerUsername } = data;
+    if (validatedBody.action === 'rotate_in') {
+      const { listenerFid, listenerUsername } = validatedBody;
       if (listenerFid !== session.fid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, current_listeners, hot_seat_count, rotation_enabled').eq('id', id).single();
-      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
-      if (!room.data.rotation_enabled) {
-        return NextResponse.json({ error: 'Rotation is disabled for this room' }, { status: 409 });
-      }
-
-      const speakers: FishbowlSpeaker[] = parseJsonb(room.data.current_speakers, []);
-      const rawListeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
-      const listeners = rawListeners.filter((l) => l.fid !== listenerFid);
-
-      if (speakers.length >= room.data.hot_seat_count) {
-        // Rotate out the first (longest-seated) speaker → move them to listeners
-        const rotatedOut = speakers.shift()!;
-        listeners.push({ fid: rotatedOut.fid, username: rotatedOut.username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() });
-
-        await supabaseAdmin.rpc('log_fishbowl_event', {
-          p_event_type: 'speaker.rotated_out',
-          p_event_data: JSON.stringify({ roomId: id, fid: rotatedOut.fid, username: rotatedOut.username }),
-          p_room_id: id,
-          p_session_id: null,
-          p_actor_fid: rotatedOut.fid,
-          p_actor_type: 'human',
-        });
-      }
-
-      speakers.push({ fid: listenerFid, username: listenerUsername, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() });
-
-      await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: speakers,
-        current_listeners: listeners,
-        last_active_at: new Date().toISOString(),
-      }).eq('id', id);
-
-      await supabaseAdmin.rpc('log_fishbowl_event', {
-        p_event_type: 'speaker.rotated_in',
-        p_event_data: JSON.stringify({ roomId: id, fid: listenerFid, username: listenerUsername }),
+      const { data: rpcResult, error } = await supabaseAdmin.rpc('fishbowl_rotate_speaker', {
         p_room_id: id,
-        p_session_id: null,
-        p_actor_fid: listenerFid,
-        p_actor_type: 'human',
+        p_new_fid: listenerFid,
+        p_new_username: listenerUsername,
+        p_old_fid: 0, // RPC determines oldest speaker to rotate out
+        p_host_fid: session.fid,
       });
+      if (error) return NextResponse.json({ error: error.message }, { status: 409 });
 
-      return NextResponse.json({ success: true, speakers, listeners });
+      return NextResponse.json({ success: true, ...rpcResult });
     }
 
-    if (action === 'kick_speaker') {
-      const { targetFid } = data;
+    if (validatedBody.action === 'kick_speaker') {
+      const { targetFid } = validatedBody;
 
-      // Only hosts can kick
-      const roomCheck = await supabaseAdmin.from('fishbowl_rooms').select('host_fid, current_speakers, current_listeners').eq('id', id).single();
-      if (!roomCheck.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
-      if (roomCheck.data.host_fid !== session.fid) {
-        return NextResponse.json({ error: 'Only the host can kick speakers' }, { status: 403 });
-      }
-
-      const speakers: FishbowlSpeaker[] = parseJsonb(roomCheck.data.current_speakers, []);
-      const listeners: FishbowlSpeaker[] = parseJsonb(roomCheck.data.current_listeners, []);
-
-      const kicked = speakers.find((s) => s.fid === targetFid);
-      if (!kicked) return NextResponse.json({ error: 'Speaker not found' }, { status: 404 });
-
-      const newSpeakers = speakers.filter((s) => s.fid !== targetFid);
-      const newListeners = [...listeners, { fid: kicked.fid, username: kicked.username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
-
-      await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: newSpeakers,
-        current_listeners: newListeners,
-        last_active_at: new Date().toISOString(),
-      }).eq('id', id);
-
-      await supabaseAdmin.rpc('log_fishbowl_event', {
-        p_event_type: 'speaker.kicked',
-        p_event_data: JSON.stringify({ roomId: id, targetFid, kickedBy: session.fid }),
+      const { data: rpcResult, error } = await supabaseAdmin.rpc('fishbowl_kick_speaker', {
         p_room_id: id,
-        p_session_id: null,
-        p_actor_fid: session.fid,
-        p_actor_type: 'human',
+        p_speaker_fid: targetFid,
+        p_host_fid: session.fid,
       });
+      if (error) return NextResponse.json({ error: error.message }, { status: 409 });
 
-      return NextResponse.json({ success: true, speakers: newSpeakers, listeners: newListeners });
+      return NextResponse.json({ success: true, ...rpcResult });
     }
 
-    if (action === 'raise_hand') {
-      const { fid, username } = data;
+    if (validatedBody.action === 'raise_hand') {
+      const { fid, username } = validatedBody;
       if (fid !== session.fid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
@@ -363,50 +326,28 @@ export async function PATCH(
       return NextResponse.json({ success: true, handRaises: newRaises, raised: !alreadyRaised });
     }
 
-    if (action === 'approve_hand') {
-      const { targetFid } = data;
+    if (validatedBody.action === 'approve_hand') {
+      const { targetFid } = validatedBody;
 
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('host_fid, current_speakers, current_listeners, hand_raises, hot_seat_count').eq('id', id).single();
+      // Look up the username from hand_raises for the RPC call
+      const room = await supabaseAdmin.from('fishbowl_rooms').select('hand_raises').eq('id', id).single();
       if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
-      if (room.data.host_fid !== session.fid) {
-        return NextResponse.json({ error: 'Only the host can approve hand raises' }, { status: 403 });
-      }
-
-      const speakers: FishbowlSpeaker[] = parseJsonb(room.data.current_speakers, []);
-      const listeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
       const raises: FishbowlSpeaker[] = parseJsonb(room.data.hand_raises, []);
-
       const approved = raises.find((r) => r.fid === targetFid);
       if (!approved) return NextResponse.json({ error: 'Hand raise not found' }, { status: 404 });
 
-      if (speakers.length >= room.data.hot_seat_count) {
-        return NextResponse.json({ error: 'Hot seat is full — kick someone first' }, { status: 409 });
-      }
-
-      const newSpeakers = [...speakers, { fid: approved.fid, username: approved.username, joinedAt: new Date().toISOString(), lastSeen: new Date().toISOString() }];
-      const newListeners = listeners.filter((l) => l.fid !== targetFid);
-      const newRaises = raises.filter((r) => r.fid !== targetFid);
-
-      await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: newSpeakers,
-        current_listeners: newListeners,
-        hand_raises: newRaises,
-        last_active_at: new Date().toISOString(),
-      }).eq('id', id);
-
-      await supabaseAdmin.rpc('log_fishbowl_event', {
-        p_event_type: 'speaker.approved',
-        p_event_data: JSON.stringify({ roomId: id, targetFid, approvedBy: session.fid }),
+      const { data: rpcResult, error } = await supabaseAdmin.rpc('fishbowl_approve_hand', {
         p_room_id: id,
-        p_session_id: null,
-        p_actor_fid: targetFid,
-        p_actor_type: 'human',
+        p_fid: targetFid,
+        p_username: approved.username,
+        p_host_fid: session.fid,
       });
+      if (error) return NextResponse.json({ error: error.message }, { status: 409 });
 
-      return NextResponse.json({ success: true, speakers: newSpeakers, listeners: newListeners, handRaises: newRaises });
+      return NextResponse.json({ success: true, ...rpcResult });
     }
 
-    if (action === 'start_room') {
+    if (validatedBody.action === 'start_room') {
       const roomCheck = await supabaseAdmin.from('fishbowl_rooms').select('host_fid, state').eq('id', id).single();
       if (!roomCheck.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
       if (roomCheck.data.host_fid !== session.fid) {
@@ -419,7 +360,7 @@ export async function PATCH(
       const now = new Date().toISOString();
       await supabaseAdmin.from('fishbowl_rooms').update({
         state: 'active',
-        current_speakers: [{ fid: session.fid, username: data.username || 'host', joinedAt: now, lastSeen: now }],
+        current_speakers: [{ fid: session.fid, username: validatedBody.username || 'host', joinedAt: now, lastSeen: now }],
         last_active_at: now,
       }).eq('id', id);
 
@@ -435,7 +376,7 @@ export async function PATCH(
       return NextResponse.json({ success: true, state: 'active' });
     }
 
-    if (action === 'end_room') {
+    if (validatedBody.action === 'end_room') {
       // Only the host can end the room
       const hostCheck = await supabaseAdmin.from('fishbowl_rooms').select('host_fid').eq('id', id).single();
       if (!hostCheck.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
@@ -510,56 +451,45 @@ export async function PATCH(
       return NextResponse.json({ success: true, state: 'ended' });
     }
 
-    if (action === 'heartbeat') {
-      const { fid } = data;
+    if (validatedBody.action === 'heartbeat') {
+      const { fid } = validatedBody;
       if (fid !== session.fid) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
-      const room = await supabaseAdmin.from('fishbowl_rooms').select('current_speakers, current_listeners').eq('id', id).single();
-      if (!room.data) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+      const { data: rpcResult, error } = await supabaseAdmin.rpc('fishbowl_heartbeat', {
+        p_room_id: id,
+        p_fid: fid,
+      });
+      if (error) return NextResponse.json({ error: error.message }, { status: 409 });
 
-      const now = new Date().toISOString();
-      let speakers: FishbowlSpeaker[] = parseJsonb(room.data.current_speakers, []);
-      let listeners: FishbowlSpeaker[] = parseJsonb(room.data.current_listeners, []);
-
-      // Update lastSeen for the requesting user (wherever they are)
-      speakers = speakers.map((s) => s.fid === fid ? { ...s, lastSeen: now } : s);
-      listeners = listeners.map((l) => l.fid === fid ? { ...l, lastSeen: now } : l);
-
-      // Prune stale users
-      const prunedSpeakers = pruneStaleUsers(speakers);
-      const prunedListeners = pruneStaleUsers(listeners);
-
-      await supabaseAdmin.from('fishbowl_rooms').update({
-        current_speakers: prunedSpeakers,
-        current_listeners: prunedListeners,
-        last_active_at: now,
-      }).eq('id', id);
-
-      return NextResponse.json({ success: true, speakers: prunedSpeakers, listeners: prunedListeners });
+      return NextResponse.json({ success: true, ...rpcResult });
     }
 
-    // Generic update — only hosts can update room metadata
-    const roomCheck = await supabaseAdmin.from('fishbowl_rooms').select('host_fid').eq('id', id).single();
-    if (!roomCheck.data || roomCheck.data.host_fid !== session.fid) {
-      return NextResponse.json({ error: 'Only the host can update room settings' }, { status: 403 });
+    if (validatedBody.action === 'update_room') {
+      // Only hosts can update room metadata
+      const roomCheck = await supabaseAdmin.from('fishbowl_rooms').select('host_fid').eq('id', id).single();
+      if (!roomCheck.data || roomCheck.data.host_fid !== session.fid) {
+        return NextResponse.json({ error: 'Only the host can update room settings' }, { status: 403 });
+      }
+
+      const updates: Record<string, unknown> = { last_active_at: new Date().toISOString() };
+      if (validatedBody.title) updates.title = validatedBody.title;
+      if (validatedBody.description !== undefined) updates.description = validatedBody.description;
+      if (validatedBody.state) updates.state = validatedBody.state;
+
+      const { data: updated, error } = await supabaseAdmin
+        .from('fishbowl_rooms')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(updated);
     }
 
-    const updates: Record<string, unknown> = { last_active_at: new Date().toISOString() };
-    if (data.title) updates.title = data.title;
-    if (data.description !== undefined) updates.description = data.description;
-    if (data.state) updates.state = data.state;
-
-    const { data: updated, error } = await supabaseAdmin
-      .from('fishbowl_rooms')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json(updated);
+    return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

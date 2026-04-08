@@ -139,6 +139,30 @@ Use the `/zao-research` skill for conducting new research.
 
 **How to ask for new features:** Describe the outcome you want for users, not the implementation. Let the skill system figure out the workflow. See Doc 154, Part 13.
 
+## Context Budget (Token Optimization)
+
+To reduce token consumption, follow these rules:
+
+**DO NOT pre-read these directories** unless the task specifically involves them:
+- `src/components/spaces/` (40+ files) — only for Spaces/live audio work
+- `src/components/music/` (30+ files) — only for music player work
+- `src/components/governance/` — only for governance/voting work
+- `src/components/zounz/` — only for ZOUNZ DAO work
+- `research/` — use `/graphify` or targeted grep, not bulk file reads
+
+**Session hygiene:**
+- Use `/compact` every 15-20 messages to compress conversation history
+- Use `/model sonnet` for simple tasks (file reads, grep, formatting, simple edits)
+- Switch to Opus for architecture decisions, complex refactors, brainstorming, security reviews
+- Batch related questions into single messages instead of separate prompts
+- Edit prompts instead of sending corrections as follow-ups
+- Schedule Opus-heavy work outside peak hours (5:00-11:00 AM PT weekdays)
+
+**Research queries:**
+- If Graphify is installed, use `/graphify query "question"` instead of reading raw research files
+- For targeted lookups, use `grep` across `research/*/README.md` — don't read entire docs unless needed
+- Cross-reference at most 2-3 docs per query, not the entire library
+
 ## Style Preferences
 
 - Mobile-first design, desktop as enhancement

@@ -10,13 +10,13 @@
 |-------|------|-------------|
 | [Agents](./agents/) | 30 | OpenClaw, ZOE, frameworks, memory, orchestration, self-optimization |
 | [Music](./music/) | 35 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation |
-| [Dev Workflows](./dev-workflows/) | 29 | Skills, Claude Code, testing, autoresearch, git, MCP servers |
+| [Dev Workflows](./dev-workflows/) | 36 | Skills, Claude Code, testing, autoresearch, git, MCP servers |
 | [Infrastructure](./infrastructure/) | 21 | Next.js 16, Supabase, streaming, mobile, notifications, admin |
 | [Community](./community/) | 19 | ZAO guide, whitepaper, onboarding, member profiles, task forces |
 | [Governance](./governance/) | 17 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
 | [Farcaster](./farcaster/) | 12 | Protocol, Mini Apps, XMTP, ecosystem, social graph |
 | [Cross-Platform](./cross-platform/) | 11 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
-| [Business](./business/) | 10 | Revenue, payments, strategy, Obsidian model, marketplace |
+| [Business](./business/) | 11 | Revenue, payments, strategy, Obsidian model, marketplace, FISHBOWLZ tokenization |
 | [Events](./events/) | 9 | Bootcamp, ZAO Stock, ship logs, big wins, status snapshots |
 | [Identity](./identity/) | 7 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph |
 | [WaveWarZ](./wavewarz/) | 4 | Prediction markets, artist pipeline, Solana PDAs |

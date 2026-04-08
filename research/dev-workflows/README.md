@@ -33,3 +33,10 @@
 | 243 | [Claude Intermediate Guide: Cowork, Skills 2.0](./243-claude-intermediate-guide-aiedge-cowork-skills2/) | STANDALONE | Actionable insights from AI Edge's intermediate Claude guide for ZAO workflows |
 | 248 | [Network Tab Debugging Guide](./248-network-tab-debugging-guide/) | STANDALONE | Practical guide for Network tab debugging across ZAO OS's 247 API routes |
 | 276 | [HowiAI: Gridley AI Habit Workflows](./276-howiai-gridley-ai-habit-workflows/) | STANDALONE | Hilary Gridley's "How I AI" framework applied to ZAO OS daily workflows |
+| 297 | [Graphify: Knowledge Graph for Codebases](./297-graphify-knowledge-graph-codebase/) | STANDALONE | Graphify tool evaluation - 71.5x token reduction, Obsidian vault, codebase + research graph |
+| 298 | [Claude Token Optimization Strategies](./298-claude-token-optimization-strategies/) | STANDALONE | Token limit strategies - /compact, model switching, peak hours, context budgets |
+| 299 | [LLM Knowledge Bases & Wiki Systems](./299-llm-knowledge-bases-wiki-systems/) | STANDALONE | Karpathy pattern, wiki-skills plugin, Obsidian evaluation, brain-ingest, knowledge compounding |
+| 300 | [AI Memory & Agent Infrastructure](./300-ai-memory-agent-infrastructure/) | STANDALONE | MemPalace (96.6% recall), Archivist OSS (fleet memory), Oh-My-Mermaid (architecture diagrams) |
+| 301 | [Developer Tooling Roundup 2026](./301-developer-tooling-roundup-2026/) | STANDALONE | last30days, Nia Docs, OpenClaw content engine, AI Employee pattern, tool evaluations |
+| 302 | [AI Content Engine & Automation](./302-ai-content-engine-automation-patterns/) | STANDALONE | Brand voice skill, SEO cherry-picks, content workflow enhancement, quote-cast pattern |
+| 303 | [Daily AI Skill Building Curriculum](./303-daily-ai-skill-building-curriculum/) | STANDALONE | 30-day learning plan, ZOE daily tips, codebase improvements, tool mastery |

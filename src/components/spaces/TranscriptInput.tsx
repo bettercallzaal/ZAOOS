@@ -52,7 +52,7 @@ export function TranscriptInput({ roomId, speakerRole = 'speaker', onTranscriptA
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder="Type what you said (for the transcript)..."
-        className="w-full bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623] resize-none"
+        className="w-full bg-[#0a1628] border border-white/20 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#f5a623] resize-none disabled:opacity-50 disabled:cursor-not-allowed"
         rows={2}
         maxLength={2000}
         disabled={submitting}

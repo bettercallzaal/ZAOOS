@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
 const TokenSchema = z.object({
@@ -42,9 +43,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden: cannot generate token for another user' }, { status: 403 });
     }
 
-    // Role validation — non-admins cannot request host role unless they're a fishbowl host
-    // Fishbowl hosts pass roomName starting with 'fishbowl-' and their role is validated upstream
-    const isFishbowlHost = roomName?.startsWith('fishbowl-');
+    // Role validation — non-admins cannot request host role unless they're a verified fishbowl host
+    let isFishbowlHost = false;
+    if (roomName?.startsWith('fishbowl-') && (role === 'host' || role === 'moderator')) {
+      const { data: fishbowlRoom } = await supabaseAdmin
+        .from('fishbowl_rooms')
+        .select('host_fid')
+        .or(`slug.eq.${roomName.replace('fishbowl-', '')},id.eq.${roomId}`)
+        .single();
+
+      isFishbowlHost = fishbowlRoom?.host_fid === session.fid;
+    }
     if ((role === 'host' || role === 'moderator') && !session.isAdmin && !isFishbowlHost) {
       return NextResponse.json({ error: 'Forbidden: only admins can request moderator role' }, { status: 403 });
     }

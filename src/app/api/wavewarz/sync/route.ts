@@ -19,6 +19,10 @@ export async function POST(req: NextRequest) {
 
   const results = { scraped: 0, failed: 0, proposals: 0 };
 
+  // Calculate day of week upfront (before async work that could cross midnight)
+  const estNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const dayOfWeek = estNow.getDay(); // 0=Sun, 6=Sat
+
   // Get a system user ID to author proposals (first admin)
   const { data: systemUser } = await supabaseAdmin
     .from('users')
@@ -49,7 +53,7 @@ export async function POST(req: NextRequest) {
         .maybeSingle();
 
       // Upsert artist
-      await supabaseAdmin
+      const { error: upsertError } = await supabaseAdmin
         .from('wavewarz_artists')
         .upsert({
           solana_wallet: wallet,
@@ -61,6 +65,12 @@ export async function POST(req: NextRequest) {
           career_earnings_sol: stats.careerEarningsSol,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'solana_wallet' });
+
+      if (upsertError) {
+        logger.error(`[wavewarz-sync] Upsert failed for ${fallbackName}:`, upsertError);
+        results.failed++;
+        continue;
+      }
 
       results.scraped++;
 
@@ -92,11 +102,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Check day of week for leaderboard + session reminders
-  const now = new Date();
-  const estDate = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-  const dayOfWeek = estDate.getDay(); // 0=Sun, 6=Sat
-
+  // Check day of week for leaderboard + session reminders (calculated at start)
   // Sunday: create weekly leaderboard proposal
   if (dayOfWeek === 0) {
     const id = await createLeaderboardProposal(authorId);

@@ -24,9 +24,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const today = new Date().toISOString().slice(0, 10);
-    const todayStart = `${today}T00:00:00.000Z`;
-    const todayEnd = `${today}T23:59:59.999Z`;
+    // Cron runs at 2 AM UTC = 9 PM EST. Query the EST day that just ended.
+    const estDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const today = estDate.toISOString().slice(0, 10);
+    // EST day boundaries in UTC: midnight EST = 05:00 UTC, next midnight = next day 05:00 UTC
+    const todayStart = `${today}T05:00:00.000Z`;
+    const nextDay = new Date(estDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const todayEnd = `${nextDay.toISOString().slice(0, 10)}T04:59:59.999Z`;
 
     // Query stats in parallel
     const [activeUsersResult, playCountResult, roomsResult] = await Promise.allSettled([

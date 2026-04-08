@@ -1,7 +1,11 @@
 {
+  "fluid": true,
   "functions": {
     "src/app/api/auth/verify/route.ts": {
       "memory": 1024,
+      "maxDuration": 10
+    },
+    "src/app/api/**/*": {
       "maxDuration": 10
     }
   },

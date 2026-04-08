@@ -336,6 +336,17 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
   const [respect, setRespect] = useState<RespectData>({ member: null });
   const [respectLoading, setRespectLoading] = useState(true);
 
+  // Farcaster storage data
+  interface StorageUsage {
+    casts: { used: number; capacity: number };
+    reactions: { used: number; capacity: number };
+    links: { used: number; capacity: number };
+    verifications: { used: number; capacity: number };
+  }
+  const [storage, setStorage] = useState<StorageUsage | null>(null);
+  const [storageLoading, setStorageLoading] = useState(true);
+  const [storageError, setStorageError] = useState(false);
+
   // Initialize ZAO fields from profile
   useEffect(() => {
     if (profile) {
@@ -376,6 +387,19 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
       .then((data) => setRespect(data))
       .catch(() => {})
       .finally(() => setRespectLoading(false));
+  }, [session?.fid]);
+
+  // Fetch Farcaster storage
+  useEffect(() => {
+    if (!session?.fid) return;
+    fetch('/api/users/storage')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.user) setStorage(data.user);
+        else setStorageError(true);
+      })
+      .catch(() => setStorageError(true))
+      .finally(() => setStorageLoading(false));
   }, [session?.fid]);
 
   const togglePref = useCallback(async (key: keyof MessagingPrefs) => {
@@ -1326,6 +1350,54 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 Toggle the eye icon to show or hide each wallet on your public profile. Hidden wallets are still visible to you here.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* ── Farcaster Storage ────────────────────────────────────── */}
+        <section>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1 mb-3">Farcaster Storage</p>
+          <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08]">
+            {storageLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <div className="w-5 h-5 border-2 border-[#f5a623] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : storageError || !storage ? (
+              <p className="text-sm text-gray-500 text-center py-2">Unable to load storage data</p>
+            ) : (
+              <div className="space-y-4">
+                {(
+                  [
+                    { label: 'Casts', data: storage.casts },
+                    { label: 'Reactions', data: storage.reactions },
+                    { label: 'Links', data: storage.links },
+                    { label: 'Verifications', data: storage.verifications },
+                  ] as const
+                ).map(({ label, data }) => {
+                  const pct = data.capacity > 0 ? Math.round((data.used / data.capacity) * 100) : 0;
+                  const isWarning = pct >= 80;
+                  return (
+                    <div key={label}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-sm text-white">{label}</span>
+                        <span className={`text-xs font-mono ${isWarning ? 'text-[#f5a623]' : 'text-gray-500'}`}>
+                          {data.used.toLocaleString()} / {data.capacity.toLocaleString()}
+                          {isWarning && <span className="ml-1.5 text-[#f5a623]">({pct}% full)</span>}
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-white/[0.08] overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${isWarning ? 'bg-[#f5a623]' : 'bg-purple-500'}`}
+                          style={{ width: `${Math.min(pct, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+                <p className="text-[10px] text-gray-600 pt-1">
+                  Storage units are allocated per Farcaster account. Each unit holds data for one of your actions.
+                </p>
+              </div>
+            )}
           </div>
         </section>
 

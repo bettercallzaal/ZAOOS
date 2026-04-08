@@ -1,29 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/cron/health-snapshot
  *
  * Weekly cron (Sunday midnight UTC) that snapshots community health metrics.
- * Vercel cron — no auth check needed (Vercel handles cron authentication).
- *
- * Required table (run in Supabase SQL Editor):
- *
- * CREATE TABLE IF NOT EXISTS health_snapshots (
- *   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
- *   snapshot_date DATE NOT NULL,
- *   total_members INTEGER DEFAULT 0,
- *   active_members INTEGER DEFAULT 0,
- *   with_fid INTEGER DEFAULT 0,
- *   total_sessions INTEGER DEFAULT 0,
- *   total_respect DECIMAL DEFAULT 0,
- *   created_at TIMESTAMPTZ DEFAULT NOW()
- * );
- * CREATE INDEX IF NOT EXISTS idx_health_snapshots_date ON health_snapshots(snapshot_date DESC);
- * ALTER TABLE health_snapshots ENABLE ROW LEVEL SECURITY;
+ * Auth: Bearer CRON_SECRET
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Auth check
+    const cronSecret = process.env.CRON_SECRET;
+    if (!cronSecret) {
+      return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+    }
+    const authHeader = request.headers.get('authorization');
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const [
       totalMembersResult,
       activeMembersResult,
@@ -31,32 +27,27 @@ export async function GET() {
       totalSessionsResult,
       totalRespectResult,
     ] = await Promise.all([
-      // 1. Total respect_members count
       supabaseAdmin
         .from('respect_members')
         .select('*', { count: 'exact', head: true }),
 
-      // 2. Active members (fractal_count > 0)
       supabaseAdmin
         .from('respect_members')
         .select('*', { count: 'exact', head: true })
         .gt('fractal_count', 0),
 
-      // 3. Members with FID (fid is not null)
       supabaseAdmin
         .from('respect_members')
         .select('*', { count: 'exact', head: true })
         .not('fid', 'is', null),
 
-      // 4. Total fractal_sessions count
       supabaseAdmin
         .from('fractal_sessions')
         .select('*', { count: 'exact', head: true }),
 
-      // 5. Sum of total_respect from respect_members
+      // Use RPC for server-side SUM instead of fetching all rows
       supabaseAdmin
-        .from('respect_members')
-        .select('total_respect'),
+        .rpc('sum_total_respect'),
     ]);
 
     const totalMembers = totalMembersResult.count ?? 0;
@@ -64,36 +55,33 @@ export async function GET() {
     const withFid = withFidResult.count ?? 0;
     const totalSessions = totalSessionsResult.count ?? 0;
 
-    // Sum total_respect manually since Supabase JS doesn't support .sum()
-    const totalRespect = (totalRespectResult.data ?? []).reduce(
-      (sum, row) => sum + (Number(row.total_respect) || 0),
-      0
-    );
+    // RPC returns single value; fall back to 0
+    const totalRespect = totalRespectResult.data ?? 0;
 
     const snapshotDate = new Date().toISOString().split('T')[0];
 
     const { error: insertError } = await supabaseAdmin
       .from('health_snapshots')
-      .insert({
+      .upsert({
         snapshot_date: snapshotDate,
         total_members: totalMembers,
         active_members: activeMembers,
         with_fid: withFid,
         total_sessions: totalSessions,
         total_respect: totalRespect,
-      });
+      }, { onConflict: 'snapshot_date' });
 
     if (insertError) {
-      console.error('Health snapshot insert failed:', insertError);
+      logger.error('Health snapshot insert failed:', insertError);
       return NextResponse.json(
-        { error: 'Failed to insert health snapshot' },
+        { error: `Failed to insert health snapshot: ${insertError.message}` },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Health snapshot cron error:', err);
+    logger.error('Health snapshot cron error:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

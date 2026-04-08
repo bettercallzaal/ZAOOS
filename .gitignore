@@ -55,3 +55,9 @@ public/bindings_wasm_bg.wasm
 supabase/.temp/
 .gitnexus/
 .superpowers/
+
+# Knowledge tools
+graphify-out/
+research-wiki/
+.mempalace/
+.omm/

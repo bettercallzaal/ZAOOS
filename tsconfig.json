@@ -30,5 +30,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "scripts", "tests", "plugins", "vitest.config.ts", "playwright.config.ts", "**/*.test.ts", "**/*.test.tsx", "src/test-utils", "mcp", "src/mcp"]
+  "exclude": ["node_modules", "scripts", "tests", "plugins", "vitest.config.ts", "playwright.config.ts", "**/*.test.ts", "**/*.test.tsx", "src/test-utils", "mcp", "src/mcp", "zabal-snap", "duodo-snap", "nouns-snap"]
 }

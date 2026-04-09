@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { getFollowers, getFollowing, getUsersByFids } from '@/lib/farcaster/neynar';
+import { getFollowers, getUsersByFids } from '@/lib/farcaster/neynar';
 import { getEngagementScores } from '@/lib/openrank/client';
 import { logger } from '@/lib/logger';
 
@@ -98,27 +98,15 @@ export async function GET(request: NextRequest) {
       // Fetch all followers by paginating through Neynar API
       const allFollowerFids = await fetchAllFollowerFids(fid);
 
-      // Fetch following count (first page only, we just need the count)
-      let followingCount = 0;
-      try {
-        const followingData = await getFollowing(fid, undefined, 'desc_chron', undefined, 1);
-        // Neynar returns a total in the response for following; approximate from users array + next cursor
-        // The users array length on limit=1 won't give total, so we use the user profile approach
-        // For simplicity, count from the user object if available
-        followingCount = followingData.users?.length ?? 0;
-        // Better: fetch user profile which has following_count
-      } catch {
-        // Non-fatal: following count is supplementary
-      }
-
       // Get user profile for accurate following_count
+      let followingCount = 0;
       try {
         const users = await getUsersByFids([fid]);
         if (users[0]) {
-          followingCount = users[0].following_count ?? followingCount;
+          followingCount = users[0].following_count ?? 0;
         }
       } catch {
-        // Non-fatal
+        // Non-fatal: following count is supplementary
       }
 
       const today = new Date().toISOString().split('T')[0];
@@ -179,26 +167,30 @@ export async function GET(request: NextRequest) {
         if (unfollowerFids.length > 0) {
           totalUnfollows += unfollowerFids.length;
 
-          // Fetch unfollower user details in batches of 100
+          // Fetch unfollower user details in parallel batches of 100
           const unfollowerDetails = new Map<
             number,
             { username: string; displayName: string }
           >();
 
+          const batches: number[][] = [];
           for (let i = 0; i < unfollowerFids.length; i += 100) {
-            const batch = unfollowerFids.slice(i, i + 100);
-            try {
-              const users = await getUsersByFids(batch);
-              for (const user of users) {
+            batches.push(unfollowerFids.slice(i, i + 100));
+          }
+
+          const batchResults = await Promise.allSettled(
+            batches.map(batch => getUsersByFids(batch))
+          );
+
+          for (const result of batchResults) {
+            if (result.status === 'fulfilled') {
+              for (const user of result.value) {
                 unfollowerDetails.set(user.fid, {
                   username: user.username || '',
                   displayName: user.display_name || '',
                 });
               }
-            } catch {
-              // Non-fatal: we still record the unfollow without username
             }
-            if (i + 100 < unfollowerFids.length) await delay(200);
           }
 
           // Insert unfollow events

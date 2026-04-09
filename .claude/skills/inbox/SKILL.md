@@ -1,102 +1,84 @@
 ---
 name: inbox
-description: Process ZOE's email inbox - links, research topics, and notes forwarded to zoe@zaoos.com. View queued items, research them, mark as done.
+description: Process ZOE's email inbox. Links, ideas, and research topics forwarded to zoe-zao@agentmail.to. View queued items, research them, mark as done.
 ---
 
 # ZOE Inbox
 
-Email links and research topics to **zoe@zaoos.com**. They queue up in Supabase. Process them here.
+Email links and research topics to **zoe-zao@agentmail.to** from your phone. Process them here.
 
 ## Commands
 
-- `/inbox` - show all unprocessed items
-- `/inbox research` - research the top item and mark it done
-- `/inbox clear` - mark all items as processed
-- `/inbox count` - how many items are waiting
+- `/inbox` - show all unread items
+- `/inbox research` - research the top unread item via /zao-research, then mark read
+- `/inbox clear` - mark all items as read
+- `/inbox count` - how many unread items
 
 ## How It Works
 
-1. You email a link or topic to zoe@zaoos.com (or forward from your phone)
-2. Cloudflare Email Worker parses it and inserts into Supabase `zoe_inbox` table
-3. From Claude Code, run `/inbox` to see what's queued
-4. Run `/inbox research` to research the top item using `/zao-research`
+1. You email a link, forward a thread, or jot an idea to zoe-zao@agentmail.to
+2. From Claude Code, run `/inbox` to see what's queued
+3. Run `/inbox research` to research the top item
 
-## Implementation
+## Reading the Inbox
 
-### Show Inbox
+Use the AgentMail API to list unread messages:
 
 ```bash
-# Query unprocessed items
-curl -s "https://efsxtoxvigqowjhgcbiz.supabase.co/rest/v1/zoe_inbox?status=eq.pending&order=created_at.desc&limit=20" \
-  -H "apikey: $NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-  -H "Authorization: Bearer $NEXT_PUBLIC_SUPABASE_ANON_KEY"
+source .env.local 2>/dev/null
+export $(grep AGENTMAIL_API_KEY .env.local | tr -d ' ')
+curl -s "https://api.agentmail.to/v0/inboxes/zoe-zao@agentmail.to/messages?label=unread&limit=20" \
+  -H "Authorization: Bearer $AGENTMAIL_API_KEY"
 ```
 
 Display as a numbered list:
 ```
-ZOE INBOX (N items pending)
+ZOE INBOX (N unread)
 
-1. [Apr 8] Graphify knowledge graph tool
-   URL: https://github.com/safishamsi/graphify
-   Notes: "check this out for research library"
+1. [Subject line]
+   From: sender@email.com
+   Preview: first 100 chars of body...
+   URLs found: https://...
 
-2. [Apr 8] Farcaster Snaps protocol
-   URL: https://x.com/...
-   Notes: (forwarded from email)
+2. [Subject line]
+   ...
 ```
 
-### Research Top Item
+## Processing an Item
 
-1. Read the top pending item from `zoe_inbox`
-2. Fetch the URL content if it's a link
-3. Run `/zao-research` on the topic
-4. Mark the item as `status: 'done'` in Supabase
-5. Move to the next item or report "inbox zero"
+1. Read the full message via API:
+   ```bash
+   curl -s "https://api.agentmail.to/v0/inboxes/zoe-zao@agentmail.to/messages/{message_id}" \
+     -H "Authorization: Bearer $AGENTMAIL_API_KEY"
+   ```
+2. Extract URLs from the body text (look for https:// patterns)
+3. If it contains a URL: fetch it via Jina Reader to get clean content:
+   ```bash
+   curl -s "https://r.jina.ai/{URL}"
+   ```
+   This works on X/Twitter posts, articles, GitHub repos, any URL. Returns clean markdown.
+   Then run /zao-research on the extracted content.
+4. If it's plain text: treat as a research topic, run /zao-research directly
+5. Mark as read by removing the 'unread' label:
+   ```bash
+   curl -s -X PATCH "https://api.agentmail.to/v0/inboxes/zoe-zao@agentmail.to/messages/{message_id}" \
+     -H "Authorization: Bearer $AGENTMAIL_API_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"remove_labels": ["unread"]}'
+   ```
 
-### Mark Done
+## Custom Domain (Future)
 
+When AgentMail paid plan is activated, add zaoos.com as custom domain
+to get zoe@zaoos.com. For now, zoe-zao@agentmail.to works.
+
+## Quick Test
+
+Send yourself a test:
 ```bash
-# Update status to done
-curl -s -X PATCH "https://efsxtoxvigqowjhgcbiz.supabase.co/rest/v1/zoe_inbox?id=eq.{ID}" \
-  -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-  -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+source .env.local && export $(grep AGENTMAIL_API_KEY .env.local | tr -d ' ')
+curl -s -X POST "https://api.agentmail.to/v0/inboxes/zoe-zao@agentmail.to/messages/send" \
+  -H "Authorization: Bearer $AGENTMAIL_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"status": "done"}'
+  -d '{"to": "zoe-zao@agentmail.to", "subject": "Test inbox", "text": "Testing the inbox pipeline"}'
 ```
-
-## Supabase Table Schema
-
-Run this in Supabase SQL Editor:
-
-```sql
-CREATE TABLE IF NOT EXISTS zoe_inbox (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender text,
-  subject text,
-  body text,
-  urls text[] DEFAULT '{}',
-  notes text,
-  status text DEFAULT 'pending' CHECK (status IN ('pending', 'researching', 'done', 'skipped')),
-  source text DEFAULT 'email',
-  created_at timestamptz DEFAULT now(),
-  processed_at timestamptz
-);
-
-CREATE INDEX idx_zoe_inbox_status ON zoe_inbox(status);
-CREATE INDEX idx_zoe_inbox_created ON zoe_inbox(created_at DESC);
-
-ALTER TABLE zoe_inbox ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can read inbox" ON zoe_inbox FOR SELECT USING (true);
-CREATE POLICY "Service role can insert" ON zoe_inbox FOR INSERT WITH CHECK (true);
-CREATE POLICY "Service role can update" ON zoe_inbox FOR UPDATE USING (true);
-```
-
-## Email Format
-
-When emailing zoe@zaoos.com, any format works:
-- Just a URL in the body
-- A URL with notes in the subject line
-- Forward an entire article
-- Multiple URLs (one per line)
-
-The Cloudflare worker extracts URLs and stores everything.

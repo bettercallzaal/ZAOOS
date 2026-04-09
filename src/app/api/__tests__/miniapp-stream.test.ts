@@ -32,6 +32,13 @@ vi.mock('@stream-io/node-sdk', () => ({
   })),
 }));
 
+// Mock @farcaster/miniapp-node for webhook route
+const { mockParseWebhookEvent } = vi.hoisted(() => ({ mockParseWebhookEvent: vi.fn() }));
+vi.mock('@farcaster/miniapp-node', () => ({
+  parseWebhookEvent: mockParseWebhookEvent,
+  verifyAppKeyWithNeynar: vi.fn(),
+}));
+
 // ── Route imports ────────────────────────────────────────────────────────────
 import { GET as miniAppAuthGET } from '@/app/api/miniapp/auth/route';
 import { POST as miniAppWebhookPOST } from '@/app/api/miniapp/webhook/route';
@@ -84,28 +91,34 @@ describe('POST /api/miniapp/webhook', () => {
       maybeSingle: vi.fn().mockResolvedValue({ data: { id: '1' } }),
     }));
   });
-  it('400 for empty body', async () => {
+  it('500 when parseWebhookEvent throws (bad payload)', async () => {
+    mockParseWebhookEvent.mockRejectedValue(new Error('Invalid webhook'));
     const res = await miniAppWebhookPOST(req('/api/miniapp/webhook', { method: 'POST', body: '{}' }));
-    expect(res.status).toBe(400);
-    expect((await res.json()).error).toBe('Invalid webhook payload');
+    expect(res.status).toBe(500);
   });
-  it('400 for invalid event type', async () => {
+  it('500 when parseWebhookEvent throws (invalid event)', async () => {
+    mockParseWebhookEvent.mockRejectedValue(new Error('Unknown event type'));
     const res = await miniAppWebhookPOST(req('/api/miniapp/webhook', { method: 'POST', body: JSON.stringify({ event: 'bad', fid: 1 }) }));
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(500);
   });
   it('200 silently when FID not in allowlist', async () => {
+    mockParseWebhookEvent.mockResolvedValue({ fid: 99999, event: { event: 'miniapp_added' } });
     mockFrom.mockReturnValue(makeSupabaseChain({ maybeSingle: vi.fn().mockResolvedValue({ data: null }) }));
     const res = await miniAppWebhookPOST(req('/api/miniapp/webhook', { method: 'POST', body: JSON.stringify({ event: 'miniapp_added', fid: 99999 }) }));
     expect(res.status).toBe(200);
     expect((await res.json()).success).toBe(true);
   });
   it('upserts notification token on miniapp_added', async () => {
+    mockParseWebhookEvent.mockResolvedValue({
+      fid: 1,
+      event: { event: 'miniapp_added', notificationDetails: { token: 'tok', url: 'https://x' } },
+    });
     let called = false;
     mockFrom.mockReturnValue(makeSupabaseChain({
       maybeSingle: vi.fn().mockResolvedValue({ data: { id: '1' } }),
       upsert: vi.fn().mockImplementation(() => { called = true; return Promise.resolve({ error: null }); }),
     }));
-    const res = await miniAppWebhookPOST(req('/api/miniapp/webhook', { method: 'POST', body: JSON.stringify({ event: 'miniapp_added', fid: 1, notificationDetails: { token: 'tok', url: 'https://x' } }) }));
+    const res = await miniAppWebhookPOST(req('/api/miniapp/webhook', { method: 'POST', body: JSON.stringify({ event: 'miniapp_added', fid: 1 }) }));
     expect(res.status).toBe(200);
     expect(called).toBe(true);
   });

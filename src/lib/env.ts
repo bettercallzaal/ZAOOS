@@ -68,6 +68,9 @@ export const ENV = {
   THREADS_ACCESS_TOKEN: optionalEnv('THREADS_ACCESS_TOKEN'),
   THREADS_USER_ID: optionalEnv('THREADS_USER_ID'),
 
+  // Farcaster read API proxy (e.g., Hypersnap free Neynar proxy)
+  FARCASTER_READ_API_BASE: optionalEnv('FARCASTER_READ_API_BASE'),
+
   // ENS NameWrapper — dedicated operator wallet (NOT the thezao.eth owner)
   // Generate with: npx tsx scripts/generate-ens-operator.ts
   // Then approve as operator on app.ens.domains

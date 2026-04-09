@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   other: { 'fc:miniapp': miniAppEmbed },
 };
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
 async function fetchCommunityMembers() {

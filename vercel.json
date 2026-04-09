@@ -5,6 +5,12 @@
       "memory": 1024,
       "maxDuration": 10
     },
+    "src/app/api/cron/**/*": {
+      "maxDuration": 60
+    },
+    "src/app/api/wavewarz/sync/route.ts": {
+      "maxDuration": 120
+    },
     "src/app/api/**/*": {
       "maxDuration": 10
     }

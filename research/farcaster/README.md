@@ -17,3 +17,8 @@
 | 199 | [Advanced Social Graph Features](./199-advanced-social-graph-features/) | STANDALONE | Visualization, growth tracking, influence mapping, unfollower detection, clustering |
 | 250 | [Farcaster Mini Apps llms.txt (April 2026)](./250-farcaster-miniapps-llms-txt-2026/) | STANDALONE | Deep dive on official Mini Apps docs, cross-referenced with ZAO's current implementation |
 | 260 | [Neynar Acquires Farcaster](./260-neynar-acquires-farcaster/) | STANDALONE | Breaking: Neynar acquires Farcaster (April 3, 2026) and ecosystem implications |
+| 295 | [Farcaster Snaps Deep Dive](./295-farcaster-snaps/) | STANDALONE | Snaps protocol, SDK, JFS auth, 16 components, 9 actions, state, deployment, ZAO integration |
+| 304 | [Quilibrium, Hypersnap & Free Neynar API](./304-quilibrium-hypersnap-free-neynar-api/) | STANDALONE | Cassie Heart's Quilibrium, Hypersnap nodes, free Neynar v2 API at haatz.quilibrium.com, farcasterorg governance, ZAO OS dual-provider integration |
+| 305 | [Channel Moderation & Community Management](./305-channel-moderation-community-management/) | STANDALONE | Farcaster Client API moderation: ban/hide/pin/invite/block, Ed25519 auth, 3-phase build plan |
+| 306 | [Protocol Features Gap Analysis](./306-farcaster-protocol-features-gap-analysis/) | CANONICAL | 200+ Neynar endpoints mapped, 22 used vs 47 unused, 4-phase build plan, creator rewards, subscriptions, notifications, mute/block |
+| 309 | [Snapchain vs Hypersnap Protocol Deep Dive](./309-snapchain-hypersnap-protocol-deep-dive/) | CANONICAL | Snapchain architecture (Malachite BFT, 11 validators, 10K TPS, 780ms finality, account sharding), Hypersnap fork (Tantivy search, Neynar API), Quilibrium privacy (oblivious transfer, MPC), on-chain contracts, data flow |

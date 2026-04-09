@@ -15,6 +15,10 @@ Use this to quickly find if a topic has already been researched.
 - Farcaster ecosystem 2026 update (Neynar acquisition, Mini Apps, CLANKER) → `73`
 - Hypersnap (incomplete) → `10`
 - **Mini Apps llms-full.txt deep dive (April 2026)**: 15+ SDK actions, haptics API, back navigation, share extensions, EIP-5792 batch txns, webhook signature verification gap, manifest update, capability detection, 17 features vs ZAO OS current → `250`
+- **Quilibrium, Hypersnap & free Neynar API (haatz.quilibrium.com)**: farcasterorg, Neynar acquisition, Hypersnap node specs, verified free endpoints, dual-provider integration plan → `304`
+- **Channel moderation & community management**: Farcaster Client API (18 endpoints), ban/hide/pin/invite/block, Ed25519 auth, 3-phase build plan → `305`
+- **Protocol features gap analysis (CANONICAL)**: 200+ Neynar endpoints mapped, 22 used/47 unused, notifications/mute/block/rewards/subscriptions/AI summaries, Farcaster Pro $120/yr → `306`
+- **Snapchain vs Hypersnap protocol deep dive (CANONICAL)**: Malachite BFT, 11 validators, 10K TPS, 780ms finality, account sharding, Hypersnap fork (Tantivy search + Neynar API), Quilibrium privacy (oblivious transfer, MPC), on-chain contracts → `309`
 
 ## Dev Workflows & Agent Tooling
 - Vercel integrations, Airtable, custom integration console → `212`

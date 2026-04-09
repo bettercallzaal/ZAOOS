@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { CountdownTimer } from '@/components/events/CountdownTimer';
 import { RSVPForm } from './RSVPForm';
 
@@ -61,12 +62,12 @@ export default function StockPage() {
             <h1 className="text-lg font-bold text-white">ZAO Stock</h1>
             <p className="text-xs text-gray-400">Community Music Festival</p>
           </div>
-          <a
+          <Link
             href="/"
             className="text-sm text-[#f5a623] hover:text-[#ffd700] transition-colors"
           >
             The ZAO
-          </a>
+          </Link>
         </div>
       </header>
 

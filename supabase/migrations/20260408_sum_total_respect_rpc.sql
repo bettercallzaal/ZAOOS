@@ -7,3 +7,7 @@ SECURITY DEFINER
 AS $$
   SELECT COALESCE(SUM(total_respect), 0) FROM respect_members;
 $$;
+
+-- Add unique constraint on snapshot_date for upsert onConflict support
+ALTER TABLE health_snapshots
+  ADD CONSTRAINT health_snapshots_snapshot_date_key UNIQUE (snapshot_date);

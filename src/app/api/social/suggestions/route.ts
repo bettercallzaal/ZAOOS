@@ -3,6 +3,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
+import { getFollowSuggestions } from '@/lib/farcaster/neynar';
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
@@ -69,6 +70,48 @@ export async function GET() {
       if (a.isZaoMember !== b.isZaoMember) return a.isZaoMember ? -1 : 1;
       return b.followerCount - a.followerCount;
     });
+
+    // Supplement with Neynar algorithmic suggestions if fewer than 10 results
+    if (enriched.length < 10) {
+      try {
+        const neynarData = await getFollowSuggestions(session.fid, 15);
+        const neynarUsers: typeof enriched = (neynarData.users || []).map((u: {
+          fid: number;
+          username: string;
+          display_name: string;
+          pfp_url: string;
+          follower_count: number;
+          following_count: number;
+          power_badge: boolean;
+          profile?: { bio?: { text?: string } };
+          viewer_context?: { following: boolean; followed_by: boolean };
+        }) => ({
+          fid: u.fid,
+          username: u.username,
+          displayName: u.display_name,
+          pfpUrl: u.pfp_url,
+          bio: u.profile?.bio?.text || null,
+          followerCount: u.follower_count || 0,
+          followingCount: u.following_count || 0,
+          powerBadge: u.power_badge || false,
+          isZaoMember: memberFids.has(u.fid),
+          followsYou: u.viewer_context?.followed_by || false,
+        }));
+
+        // Deduplicate by FID — existing suggestions take priority
+        const existingFids = new Set(enriched.map((s) => s.fid));
+        const supplemental = neynarUsers.filter((u) => !existingFids.has(u.fid));
+        enriched.push(...supplemental);
+
+        // Re-sort after supplementing
+        enriched.sort((a, b) => {
+          if (a.isZaoMember !== b.isZaoMember) return a.isZaoMember ? -1 : 1;
+          return b.followerCount - a.followerCount;
+        });
+      } catch (supplementErr) {
+        logger.warn('Failed to fetch supplemental Neynar suggestions:', supplementErr);
+      }
+    }
 
     // Also get community members that the user doesn't follow yet
     // Fetch viewer context for all community members

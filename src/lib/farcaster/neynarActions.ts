@@ -37,3 +37,63 @@ export async function followUser(targetFid: number) {
   if (!res.ok) throw new Error('Failed to follow user');
   return res.json();
 }
+
+export async function muteUserAction(targetFid: number) {
+  const res = await fetch('/api/users/mute', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ targetFid }),
+  });
+  if (!res.ok) throw new Error('Failed to mute user');
+  return res.json();
+}
+
+export async function unmuteUserAction(targetFid: number) {
+  const res = await fetch('/api/users/mute', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ targetFid }),
+  });
+  if (!res.ok) throw new Error('Failed to unmute user');
+  return res.json();
+}
+
+export async function blockUserAction(targetFid: number) {
+  const res = await fetch('/api/users/block', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ targetFid }),
+  });
+  if (!res.ok) throw new Error('Failed to block user');
+  return res.json();
+}
+
+export async function unblockUserAction(targetFid: number) {
+  const res = await fetch('/api/users/block', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ targetFid }),
+  });
+  if (!res.ok) throw new Error('Failed to unblock user');
+  return res.json();
+}
+
+export async function deleteCastAction(castHash: string) {
+  const res = await fetch('/api/casts/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ castHash }),
+  });
+  if (!res.ok) throw new Error('Failed to delete cast');
+  return res.json();
+}
+
+export async function getCastSummary(castHash: string) {
+  const res = await fetch('/api/casts/summary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ castHash }),
+  });
+  if (!res.ok) throw new Error('Failed to get summary');
+  return res.json();
+}

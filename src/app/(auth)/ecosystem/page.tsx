@@ -5,6 +5,16 @@ import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import { NEXUS_LINKS, type NexusCategory, type NexusLink } from '@/lib/nexus/links';
 
+// ── Mini App Discovery Types ───────────────────────────────────────────────────
+
+interface MiniApp {
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  url: string;
+  author?: { fid: number; username: string; displayName: string };
+}
+
 // ── Ecosystem App Definitions ─────────────────────────────────────────────────
 
 interface SecondaryLink {
@@ -119,6 +129,68 @@ export default function EcosystemPage() {
   const [resourceSearch, setResourceSearch] = useState('');
   const iframeTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
+  // ── Discover state ────────────────────────────────────────────────────────
+  const [showDiscover, setShowDiscover] = useState(false);
+  const [discoverSearch, setDiscoverSearch] = useState('');
+  const [searchResults, setSearchResults] = useState<MiniApp[]>([]);
+  const [catalogApps, setCatalogApps] = useState<MiniApp[]>([]);
+  const [relevantApps, setRelevantApps] = useState<MiniApp[]>([]);
+  const [discoverLoading, setDiscoverLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Fetch catalog + relevant when Discover view opens
+  useEffect(() => {
+    if (!showDiscover) return;
+    if (catalogApps.length > 0) return; // Already fetched
+
+    setDiscoverLoading(true);
+    Promise.allSettled([
+      fetch('/api/miniapp/discover?mode=catalog&limit=12').then((r) => r.json()),
+      fetch('/api/miniapp/discover?mode=relevant&limit=8').then((r) => r.json()),
+    ]).then(([catalogRes, relevantRes]) => {
+      if (catalogRes.status === 'fulfilled') {
+        const data = catalogRes.value;
+        const items: MiniApp[] = data?.frames ?? data?.mini_apps ?? data?.apps ?? [];
+        setCatalogApps(items);
+      }
+      if (relevantRes.status === 'fulfilled') {
+        const data = relevantRes.value;
+        const items: MiniApp[] = data?.frames ?? data?.mini_apps ?? data?.apps ?? [];
+        setRelevantApps(items);
+      }
+    }).finally(() => setDiscoverLoading(false));
+  }, [showDiscover, catalogApps.length]);
+
+  // Debounced search
+  useEffect(() => {
+    if (!showDiscover) return;
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+
+    if (!discoverSearch.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    searchTimerRef.current = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const res = await fetch(`/api/miniapp/search?q=${encodeURIComponent(discoverSearch.trim())}`);
+        const data = await res.json();
+        const items: MiniApp[] = data?.frames ?? data?.mini_apps ?? data?.apps ?? data?.results ?? [];
+        setSearchResults(items);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 400);
+
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    };
+  }, [discoverSearch, showDiscover]);
+
   const activeApp = ECOSYSTEM_APPS[activeIndex];
   const hasSubPages = activeApp.subPages && activeApp.subPages.length > 0;
   const currentUrl = hasSubPages ? activeApp.subPages![activeSubPage].url : activeApp.iframeUrl;
@@ -225,9 +297,9 @@ export default function EcosystemPage() {
           {ECOSYSTEM_APPS.map((app, i) => (
             <button
               key={app.name}
-              onClick={() => setActiveIndex(i)}
+              onClick={() => { setActiveIndex(i); setShowDiscover(false); }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                i === activeIndex
+                !showDiscover && i === activeIndex
                   ? 'bg-[#f5a623] text-[#0a1628] shadow-lg shadow-[#f5a623]/20'
                   : 'bg-[#1a2a3a] text-gray-400 hover:bg-[#1a2a3a]/80 hover:text-gray-200'
               }`}
@@ -236,137 +308,259 @@ export default function EcosystemPage() {
               <span>{app.name}</span>
             </button>
           ))}
+
+          {/* Discover button — visually distinct with a compass icon */}
+          <button
+            onClick={() => setShowDiscover(true)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+              showDiscover
+                ? 'bg-[#1a3a5c] text-[#60b4ff] border border-[#60b4ff]/40 shadow-lg shadow-[#60b4ff]/10'
+                : 'bg-[#0e2033] text-[#60b4ff]/70 border border-[#60b4ff]/20 hover:bg-[#1a3a5c]/60 hover:text-[#60b4ff]'
+            }`}
+          >
+            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="12" cy="12" r="10" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" />
+            </svg>
+            <span>Discover</span>
+          </button>
         </div>
       </div>
 
-      {/* App Description + Sub-page tabs */}
-      <div className="bg-[#0d1b2a]/50 border-b border-white/[0.08] flex-shrink-0">
-        <p className="text-xs text-gray-400 px-4 py-2">{activeApp.description}</p>
+      {/* App Description + Sub-page tabs — hidden in Discover mode */}
+      {!showDiscover && (
+        <div className="bg-[#0d1b2a]/50 border-b border-white/[0.08] flex-shrink-0">
+          <p className="text-xs text-gray-400 px-4 py-2">{activeApp.description}</p>
 
-        {/* Sub-page tabs — shown when app has sub-pages */}
-        {hasSubPages && (
-          <div className="flex gap-1 px-3 pb-2 overflow-x-auto scrollbar-hide">
-            {activeApp.subPages!.map((sub, i) => (
-              <button
-                key={sub.url}
-                onClick={() => setActiveSubPage(i)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                  i === activeSubPage
-                    ? 'bg-[#f5a623]/15 text-[#f5a623] border border-[#f5a623]/30'
-                    : 'text-gray-500 hover:text-gray-300 hover:bg-[#1a2a3a]/50'
-                }`}
+          {/* Sub-page tabs — shown when app has sub-pages */}
+          {hasSubPages && (
+            <div className="flex gap-1 px-3 pb-2 overflow-x-auto scrollbar-hide">
+              {activeApp.subPages!.map((sub, i) => (
+                <button
+                  key={sub.url}
+                  onClick={() => setActiveSubPage(i)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium whitespace-nowrap transition-all flex-shrink-0 ${
+                    i === activeSubPage
+                      ? 'bg-[#f5a623]/15 text-[#f5a623] border border-[#f5a623]/30'
+                      : 'text-gray-500 hover:text-gray-300 hover:bg-[#1a2a3a]/50'
+                  }`}
+                >
+                  <span>{sub.icon}</span>
+                  <span>{sub.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Discover View ────────────────────────────────────────────────────── */}
+      {showDiscover ? (
+        <div className="flex-1 overflow-y-auto bg-[#0a1628]">
+          <div className="px-4 pt-4 pb-28 space-y-6">
+
+            {/* Search bar */}
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <input
+                type="text"
+                value={discoverSearch}
+                onChange={(e) => setDiscoverSearch(e.target.value)}
+                placeholder="Search Farcaster mini apps..."
+                className="w-full pl-10 pr-9 py-2.5 bg-[#0e2033] border border-[#60b4ff]/20 rounded-xl text-sm text-white placeholder:text-gray-600 focus:border-[#60b4ff]/50 focus:outline-none transition-colors"
+              />
+              {discoverSearch && (
+                <button
+                  onClick={() => setDiscoverSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+              {searchLoading && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#60b4ff]/30 border-t-[#60b4ff] rounded-full animate-spin" />
+              )}
+            </div>
+
+            {/* Search results */}
+            {discoverSearch.trim() && (
+              <div>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Search Results</h3>
+                {searchLoading ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <MiniAppCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : searchResults.length === 0 ? (
+                  <p className="text-sm text-gray-600 py-6 text-center">No results for &ldquo;{discoverSearch}&rdquo;</p>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {searchResults.map((app, i) => (
+                      <MiniAppCard key={`search-${app.url}-${i}`} app={app} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Featured (catalog) */}
+            {!discoverSearch.trim() && (
+              <>
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Featured Mini Apps</h3>
+                  {discoverLoading ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <MiniAppCardSkeleton key={i} />
+                      ))}
+                    </div>
+                  ) : catalogApps.length === 0 ? (
+                    <p className="text-sm text-gray-600 py-4 text-center">No featured apps available</p>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {catalogApps.map((app, i) => (
+                        <MiniAppCard key={`catalog-${app.url}-${i}`} app={app} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* For You */}
+                {(discoverLoading || relevantApps.length > 0) && (
+                  <div>
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">For You</h3>
+                    {discoverLoading ? (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <MiniAppCardSkeleton key={i} />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {relevantApps.map((app, i) => (
+                          <MiniAppCard key={`relevant-${app.url}-${i}`} app={app} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+      ) : (
+        /* ── Iframe Viewer — fills remaining height, keeps visited iframes alive */
+        <div className="flex-1 relative min-h-[60vh]">
+          {/* Loading State — only for current URL */}
+          {iframeStatuses[currentUrl] === 'loading' && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a1628] z-10">
+              <div className="w-8 h-8 border-2 border-[#f5a623]/30 border-t-[#f5a623] rounded-full animate-spin mb-3" />
+              <p className="text-xs text-gray-500">Loading {activeApp.name}...</p>
+            </div>
+          )}
+
+          {/* Error / Blocked State — only for current URL */}
+          {iframeStatuses[currentUrl] === 'error' && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a1628] z-10 px-6">
+              <div className="text-4xl mb-4">{activeApp.icon}</div>
+              <h3 className="text-lg font-semibold text-white mb-2">{hasSubPages ? activeApp.subPages![activeSubPage].label : activeApp.name}</h3>
+              <p className="text-sm text-gray-400 text-center mb-1">
+                This app cannot be embedded directly.
+              </p>
+              <p className="text-xs text-gray-600 text-center mb-6 max-w-xs">
+                Some sites restrict iframe embedding for security. You can open it externally instead.
+              </p>
+              <a
+                href={currentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#f5a623] text-[#0a1628] rounded-lg font-medium text-sm hover:bg-[#ffd700] transition-colors"
               >
-                <span>{sub.icon}</span>
-                <span>{sub.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                </svg>
+                Open externally
+              </a>
+            </div>
+          )}
 
-      {/* Iframe Viewer — fills remaining height, keeps visited iframes alive */}
-      <div className="flex-1 relative min-h-[60vh]">
-        {/* Loading State — only for current URL */}
-        {iframeStatuses[currentUrl] === 'loading' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a1628] z-10">
-            <div className="w-8 h-8 border-2 border-[#f5a623]/30 border-t-[#f5a623] rounded-full animate-spin mb-3" />
-            <p className="text-xs text-gray-500">Loading {activeApp.name}...</p>
-          </div>
-        )}
+          {/* Persistent iframes — all visited URLs stay mounted, only active one is visible */}
+          {getAllUrls(activeApp).filter((url) => mountedUrls.has(url)).map((url) => (
+            <iframe
+              key={url}
+              src={url}
+              title={`${activeApp.name} - ${url}`}
+              className={`w-full h-full absolute inset-0 border-0 ${url === currentUrl ? '' : 'invisible'}`}
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+              allow="clipboard-write"
+              onLoad={() => handleIframeLoad(url)}
+              onError={() => handleIframeError(url)}
+            />
+          ))}
+        </div>
+      )}
 
-        {/* Error / Blocked State — only for current URL */}
-        {iframeStatuses[currentUrl] === 'error' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a1628] z-10 px-6">
-            <div className="text-4xl mb-4">{activeApp.icon}</div>
-            <h3 className="text-lg font-semibold text-white mb-2">{hasSubPages ? activeApp.subPages![activeSubPage].label : activeApp.name}</h3>
-            <p className="text-sm text-gray-400 text-center mb-1">
-              This app cannot be embedded directly.
-            </p>
-            <p className="text-xs text-gray-600 text-center mb-6 max-w-xs">
-              Some sites restrict iframe embedding for security. You can open it externally instead.
-            </p>
+      {/* Action Bar — hidden in Discover mode */}
+      {!showDiscover && (
+        <div className="flex-shrink-0 bg-[#0d1b2a] border-t border-white/[0.08] px-3 py-2.5">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+            {/* Open in new tab */}
             <a
               href={currentUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#f5a623] text-[#0a1628] rounded-lg font-medium text-sm hover:bg-[#ffd700] transition-colors"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-              </svg>
-              Open externally
-            </a>
-          </div>
-        )}
-
-        {/* Persistent iframes — all visited URLs stay mounted, only active one is visible */}
-        {getAllUrls(activeApp).filter((url) => mountedUrls.has(url)).map((url) => (
-          <iframe
-            key={url}
-            src={url}
-            title={`${activeApp.name} - ${url}`}
-            className={`w-full h-full absolute inset-0 border-0 ${url === currentUrl ? '' : 'invisible'}`}
-            sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-            allow="clipboard-write"
-            onLoad={() => handleIframeLoad(url)}
-            onError={() => handleIframeError(url)}
-          />
-        ))}
-      </div>
-
-      {/* Action Bar */}
-      <div className="flex-shrink-0 bg-[#0d1b2a] border-t border-white/[0.08] px-3 py-2.5">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-          {/* Open in new tab */}
-          <a
-            href={currentUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a2a3a] rounded-lg text-xs text-gray-300 hover:bg-[#1a2a3a]/80 hover:text-white transition-colors flex-shrink-0"
-          >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-            </svg>
-            Open in new tab
-          </a>
-
-          {/* Copy link */}
-          <button
-            onClick={handleCopy}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a2a3a] rounded-lg text-xs text-gray-300 hover:bg-[#1a2a3a]/80 hover:text-white transition-colors flex-shrink-0"
-          >
-            {copied ? (
-              <>
-                <svg className="w-3.5 h-3.5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-                <span className="text-green-400">Copied!</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
-                </svg>
-                Copy link
-              </>
-            )}
-          </button>
-
-          {/* Secondary links */}
-          {activeApp.secondaryLinks?.map((link) => (
-            <a
-              key={link.url}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a2a3a] rounded-lg text-xs text-gray-300 hover:bg-[#1a2a3a]/80 hover:text-white transition-colors flex-shrink-0"
             >
-              <span>{link.icon}</span>
-              {link.label}
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+              Open in new tab
             </a>
-          ))}
+
+            {/* Copy link */}
+            <button
+              onClick={handleCopy}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a2a3a] rounded-lg text-xs text-gray-300 hover:bg-[#1a2a3a]/80 hover:text-white transition-colors flex-shrink-0"
+            >
+              {copied ? (
+                <>
+                  <svg className="w-3.5 h-3.5 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  <span className="text-green-400">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                  </svg>
+                  Copy link
+                </>
+              )}
+            </button>
+
+            {/* Secondary links */}
+            {activeApp.secondaryLinks?.map((link) => (
+              <a
+                key={link.url}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a2a3a] rounded-lg text-xs text-gray-300 hover:bg-[#1a2a3a]/80 hover:text-white transition-colors flex-shrink-0"
+              >
+                <span>{link.icon}</span>
+                {link.label}
+              </a>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* $ZABAL Token Banner */}
       <div className="flex-shrink-0 bg-gradient-to-r from-[#f5a623]/10 to-[#ffd700]/5 border-t border-[#f5a623]/20 px-4 py-2.5">
@@ -451,6 +645,76 @@ export default function EcosystemPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ── Mini App Sub-components ───────────────────────────────────────────────────
+
+function MiniAppCard({ app }: { app: MiniApp }) {
+  return (
+    <div className="flex flex-col bg-[#0e2033] border border-[#60b4ff]/10 rounded-xl p-3 gap-2 hover:border-[#60b4ff]/30 transition-colors">
+      {/* Icon / image */}
+      <div className="flex items-start gap-2">
+        {app.imageUrl ? (
+          <img
+            src={app.imageUrl}
+            alt={app.name}
+            className="w-9 h-9 rounded-lg object-cover flex-shrink-0 bg-[#1a3a5c]"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-lg bg-[#1a3a5c] flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-[#60b4ff]/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9h6M9 12h6M9 15h4" />
+            </svg>
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold text-white truncate">{app.name}</p>
+          {app.author && (
+            <p className="text-[10px] text-gray-600 truncate">by {app.author.displayName || app.author.username}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Description */}
+      {app.description && (
+        <p className="text-[10px] text-gray-500 line-clamp-2 leading-relaxed">{app.description}</p>
+      )}
+
+      {/* Open button */}
+      <a
+        href={app.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-auto inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-[#60b4ff]/10 hover:bg-[#60b4ff]/20 text-[#60b4ff] rounded-lg text-[10px] font-medium transition-colors"
+      >
+        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+        </svg>
+        Open
+      </a>
+    </div>
+  );
+}
+
+function MiniAppCardSkeleton() {
+  return (
+    <div className="flex flex-col bg-[#0e2033] border border-[#60b4ff]/10 rounded-xl p-3 gap-2 animate-pulse">
+      <div className="flex items-start gap-2">
+        <div className="w-9 h-9 rounded-lg bg-[#1a3a5c] flex-shrink-0" />
+        <div className="flex-1 space-y-1.5 pt-0.5">
+          <div className="h-2.5 bg-[#1a3a5c] rounded w-3/4" />
+          <div className="h-2 bg-[#1a3a5c] rounded w-1/2" />
+        </div>
+      </div>
+      <div className="space-y-1">
+        <div className="h-2 bg-[#1a3a5c] rounded w-full" />
+        <div className="h-2 bg-[#1a3a5c] rounded w-4/5" />
+      </div>
+      <div className="h-6 bg-[#1a3a5c] rounded-lg w-full mt-auto" />
     </div>
   );
 }

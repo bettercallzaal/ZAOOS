@@ -378,9 +378,21 @@ export const AllowlistTable = forwardRef(function AllowlistTable(_props, ref) {
           )}
 
           {!fcLoading && fcSearch.length >= 1 && fcResults.length === 0 && (
-            <p className={`text-sm text-center py-4 ${fcError ? 'text-red-400' : 'text-gray-500'}`}>
-              {fcError || 'No users found'}
-            </p>
+            <div className="text-center py-4">
+              <p className={`text-sm ${fcError ? 'text-red-400' : 'text-gray-500'}`}>
+                {fcError || `No Farcaster users found for "${fcSearch}"`}
+              </p>
+              {fcError && (
+                <p className="text-xs text-gray-600 mt-1">
+                  Try again in a moment - the Farcaster API may be temporarily unavailable
+                </p>
+              )}
+              {!fcError && (
+                <p className="text-xs text-gray-600 mt-1">
+                  Try the full username (e.g. &quot;dwr.eth&quot; not &quot;Dan&quot;) or search by FID
+                </p>
+              )}
+            </div>
           )}
 
           {!fcLoading && fcSearch.length < 1 && (

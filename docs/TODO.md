@@ -179,13 +179,15 @@ Purpose: Zaal's personal assistant on Telegram. Morning briefs, voice memos, con
 
 Site: cocconcertz.com | Repo: /Users/zaalpanthaki/Documents/COCConcertZ | Firebase + Cloudinary + Next.js
 
-- [ ] **P0** Prep for COC Concertz #5 this weekend (Luma RSVP already live)
+- [ ] **P0** COC Concertz #4 is THIS WEEKEND - stream TOMORROW (Friday) to promote it
+- [ ] **P0** Friday stream: promo stream for COC #4 - hype the lineup, show the venue, get RSVPs
 - [ ] **P0** Check artist profiles are updated (portal passcodes: Joseph Goats, Stilo, Tom Fellenz)
-- [ ] **P0** Test GO LIVE / END SHOW flow in admin dashboard
+- [ ] **P0** Test GO LIVE / END SHOW flow in admin dashboard before the show
 - [ ] **P0** Prep setlist in admin for "Now Playing" bar during show
-- [ ] **P1** Stream on Twitch (bettercallzaal channel) + embed in Spatial.io venue
+- [ ] **P0** Stream on Twitch (bettercallzaal channel) + embed in Spatial.io venue
+- [ ] **P0** Draft Farcaster cast promoting COC #4 this weekend (post tonight or tomorrow AM)
 - [ ] **P1** Use live chat feature during show for engagement
-- [ ] **P1** Generate post-show recap card (one-click in admin)
+- [ ] **P1** Generate post-show recap card (one-click in admin after show)
 - [ ] **P1** Share recap + highlights to Farcaster as build-in-public content
 - [ ] **P2** Add COC Concertz to BetterCallZaal portfolio (proof of event production capability)
 - [ ] **P2** Record video highlights for "BEST MOMENTS" grid on site

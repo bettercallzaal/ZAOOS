@@ -111,24 +111,10 @@ export default function StockPage() {
         {/* Lineup */}
         <section className="space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Lineup</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-4 flex flex-col items-center justify-center aspect-square"
-              >
-                <div className="w-12 h-12 rounded-full bg-[#1a2a3a] flex items-center justify-center mb-3">
-                  <svg className="w-6 h-6 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
-                  </svg>
-                </div>
-                <p className="text-sm text-gray-500 font-medium">Coming Soon</p>
-              </div>
-            ))}
+          <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] p-5 text-center">
+            <p className="text-sm text-gray-300">Full lineup coming soon</p>
+            <p className="text-xs text-gray-500 mt-1">Artists performing equal sets with DJs between</p>
           </div>
-          <p className="text-xs text-gray-500 text-center">
-            10 artists performing equal sets &middot; DJs between sets &middot; Full lineup TBA
-          </p>
         </section>
 
         {/* RSVP */}

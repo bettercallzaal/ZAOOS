@@ -24,18 +24,40 @@
 
 ## ZAO STOCK (Oct 3 - Franklin St Parklet)
 
-- [ ] **P0** Write internal ecosystem document (branding, structure, funding, relationships)
-- [ ] **P0** Create sponsorship package document (bronze/silver/gold tiers + past event photos)
-- [ ] **P0** Define team structure: Finance (Dr. Tricky), AV, Design/Branding, Operations (Zaal)
-- [ ] **P0** Write basic agenda template for Tuesday standups
-- [ ] **P0** Create team list with roles and responsibilities
-- [ ] **P1** Formalize Tuesday standup format (5 min overall + 10 min per team)
-- [ ] **P1** Invite Bar Harbor Chamber event managers to Tuesday meeting (wait ~1 month)
+### Structure (from FailOften framework)
+- [ ] **P0** Finalize 3-entity model: ZAO (talent/programming) + New Media Commons (funding/fiscal sponsorship via Fractured Atlas) + ENTERACT (technical build)
+- [ ] **P0** Document how BCZ Strategies fits (Zaal's LLC, the entity that contracts/invoices/gets paid)
+- [ ] **P0** Write internal ecosystem document (branding, structure, funding lanes, relationships)
+- [ ] **P1** Define the 3 funding lanes: Paid (direct contract), Sponsored (ZAO brings sponsors), Funded (grants via NMC/Fractured Atlas, tax-deductible)
+
+### Team + Standups
+- [ ] **P0** Define team structure: Finance (Dr. Tricky/Cole), AV, Design/Branding, Operations (Zaal)
+- [ ] **P0** Write basic agenda template for Tuesday standups (5 min overall + 10 min per team)
+- [ ] **P0** Message each team member 1-on-1 to assign roles
+- [ ] **P0** Merge PR #141 (team dashboard) and run Supabase migration
+- [ ] **P0** Run seed script to create team member passwords
+- [ ] **P0** Share passwords with team via DM (FailOften, AttaBotty/Cole, Dr. Tricky, etc.)
+- [ ] **P1** Invite Bar Harbor Chamber event managers to Tuesday meeting (wait ~1 month to formalize)
+
+### Sponsorship + Funding
+- [ ] **P0** Create sponsorship package document (bronze/silver/gold tiers + past event photos showing sponsor visibility)
+- [ ] **P0** Ask FailOften: how does NMC/Fractured Atlas fiscal sponsorship activate? What's the process?
+- [ ] **P1** Identify 2-3 grant/funding paths (FailOften to lead, Q3/Q4 grant cycles open $10K-$100K doors)
+- [ ] **P1** Source past event photos for sponsorship deck (show the tiers - small logos at bottom = bronze, readable names = silver, "presented by" = gold)
+- [ ] **P1** Define what contracts look like for team members (FailOften to draft)
+
+### Production + Logistics
+- [ ] **P0** Pitch Steve Peer on co-curating the music lineup
+- [ ] **P1** Get Wallace Events tent rental quote (weather backup)
+- [ ] **P1** Sound/PA vendor research (Ellsworth/Bangor area)
 - [ ] **P1** Build timeline with deadlines (work backward from Oct 3)
-- [ ] **P1** Identify existing events to co-produce (offer AV/lighting/streaming)
-- [ ] **P1** Source past event photos for sponsorship deck
-- [ ] **P2** Create brand kit (language, visuals, how to talk about ZAO)
-- [ ] **P2** Build Claude Code skill for ZAO Stock promotion (auto-generates pitch content)
+- [ ] **P1** Identify existing local events to co-produce (offer AV/lighting/streaming they don't have)
+- [ ] **P1** Cole (AttaBotty) to connect with Alliance Events model for sponsorship approach
+
+### Brand + Content
+- [ ] **P1** Create brand kit (language, visuals, how to talk about ZAO - "safe language" from FailOften doc)
+- [ ] **P1** Build Claude Code skill for ZAO Stock promotion (auto-generates pitch content)
+- [ ] **P2** Sunday livestream of band at bar owner's house = first content piece for ZAO Stock portfolio
 
 ---
 
@@ -54,15 +76,27 @@
 
 ## CLIENT PIPELINE (BetterCallZaal Strategies)
 
-- [ ] **P0** Cold pitch local Bar Harbor businesses (April-May window before tourists)
-- [ ] **P0** Find businesses with low Google/Yelp rankings to pitch website/marketing help
-- [ ] **P1** Create consulting services one-pager (digital marketing, web, video, events)
-- [ ] **P1** Sunday: livestream band at bar owner's house (iPhone, start content portfolio)
+### Local (Bar Harbor - April/May is the window before tourist season)
+- [ ] **P0** Cold pitch local businesses (April-May window before Memorial Day - after May you can't reach business owners)
+- [ ] **P0** Find businesses with low Google/Yelp rankings to pitch website/marketing help (agent can scrape this)
+- [ ] **P0** Position as "digital marketer for musicians" - people jump at this, it's the entry point
 - [ ] **P1** Follow up with bar owner on bartending gig + consulting relationship
-- [ ] **P1** Draft cold email templates: web3 projects + web2 local businesses
-- [ ] **P1** Build case studies from ZAO, WaveWarZ, FISHBOWLZ
+- [ ] **P1** Sunday: livestream band at bar owner's house (iPhone for now, start content portfolio)
+- [ ] **P1** Co-produce existing events (provide AV/lighting/streaming they don't have) instead of creating new ones
 - [ ] **P2** Get proper camera for video/photography services
+- [ ] **P2** FAA Part 107 drone test (someone already asking for drone shots)
+
+### Web3 + Remote
+- [ ] **P1** Draft cold email/DM templates: web3 projects needing marketing/dev/agents
+- [ ] **P1** Build case studies from ZAO (1000+ users, zero exploits), WaveWarZ ($50K volume), FISHBOWLZ
+- [ ] **P1** Create consulting services one-pager (digital marketing, web dev, video, events, AI agents)
 - [ ] **P2** Build portfolio page on bettercallzaal.com
+
+### Revenue Strategy (from FailOften meeting)
+- [ ] **P1** Don't create events from scratch - co-produce existing ones (BCZ gets paid to produce)
+- [ ] **P1** Take in sponsorship money (not spend money to sponsor) - BCZ handles production, sponsors pay
+- [ ] **P1** Set minimum parameters for every opportunity (financial, structural, or reputational return) - don't say yes to everything
+- [ ] **P2** Agency model: Zaal does comms, ZAO community members do the work, everyone gets paid from project budget
 
 ---
 
@@ -78,7 +112,8 @@
 
 ## ZAO OS (Code)
 
-- [ ] **P1** Run Supabase migration for business dev tables (`supabase db push`)
+- [ ] **P0** Merge PR #141 (ZAO Stock team dashboard) + run migration + seed script
+- [ ] **P1** Run Supabase migration for business dev tables (job_applications, client_pipeline, engagement_queue, content_drafts)
 - [ ] **P1** Merge ws/zoe-v2-foundation branch to main
 - [ ] **P2** Continue feature development (based on open issues)
 - [ ] **P2** Update research index with docs 313 (token optimization)
@@ -109,3 +144,7 @@
 - [x] 2026-04-10: Research Agent Zero, pi.dev, agent memory systems
 - [x] 2026-04-10: ZOE v2 design spec + Phase 1 plan
 - [x] 2026-04-10: Research doc 313 (agent token optimization)
+- [x] 2026-04-10: Built ZAO Stock team dashboard (PR #141) - 3 tables, password auth, goals/todos/roles
+- [x] 2026-04-10: Created meeting agenda HTML for FailOften sync
+- [x] 2026-04-10: Processed meeting transcript + FailOften framework doc into action items
+- [x] 2026-04-10: Updated public /stock page (removed placeholder artist grid)

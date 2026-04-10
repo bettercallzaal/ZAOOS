@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZAO Stock - Sync w/ FailOften</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --navy: #0a1628;
+    --navy-light: #0f1f38;
+    --gold: #f5a623;
+    --gold-dim: rgba(245, 166, 35, 0.1);
+    --green: #34d399;
+    --green-dim: rgba(52, 211, 153, 0.12);
+    --red: #f87171;
+    --red-dim: rgba(248, 113, 113, 0.1);
+    --yellow: #fbbf24;
+    --yellow-dim: rgba(251, 191, 36, 0.1);
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
+    --border: rgba(255,255,255,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.65;
+    padding: 48px 64px 120px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .header p {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: 40px;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .section-head h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .section-head .time {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* Diagram */
+  .diagram {
+    display: flex;
+    gap: 16px;
+    margin: 16px 0 20px;
+  }
+  .entity {
+    flex: 1;
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .entity h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .entity .sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .entity ul {
+    list-style: none;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .entity ul li { padding: 2px 0; }
+  .entity ul li::before {
+    content: '-';
+    margin-right: 8px;
+    color: var(--text-muted);
+  }
+  .e-zao h3 { color: var(--gold); }
+  .e-nmc h3 { color: var(--green); }
+  .e-ent h3 { color: #60a5fa; }
+
+  .connector {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .oneliner {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: var(--gold-dim);
+    border-radius: 8px;
+    border-left: 3px solid var(--gold);
+  }
+
+  /* Lanes */
+  .lanes {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .lane {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .lane strong { display: block; margin-bottom: 2px; font-size: 13px; }
+  .lane-1 { background: var(--green-dim); }
+  .lane-1 strong { color: var(--green); }
+  .lane-2 { background: var(--yellow-dim); }
+  .lane-2 strong { color: var(--yellow); }
+  .lane-3 { background: rgba(96,165,250,0.1); }
+  .lane-3 strong { color: #60a5fa; }
+  .lane p { color: var(--text-dim); }
+
+  /* Questions */
+  .questions {
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+  }
+  .questions li {
+    font-size: 14px;
+    color: var(--text-dim);
+    padding: 4px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+  .questions li::before {
+    content: '?';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  /* Status rows */
+  .status-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .status-row:last-child { border-bottom: none; }
+  .status-label {
+    width: 140px;
+    color: #fff;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .status-badge {
+    width: 100px;
+    flex-shrink: 0;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+  .b-yes { background: var(--green-dim); color: var(--green); }
+  .b-wip { background: var(--yellow-dim); color: var(--yellow); }
+  .b-no { background: var(--red-dim); color: var(--red); }
+  .status-detail { color: var(--text-dim); }
+
+  /* Gaps */
+  .gaps {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .gap {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 10px 14px;
+    background: var(--red-dim);
+    border-radius: 8px;
+  }
+  .gap strong { color: var(--red); }
+
+  /* Quote */
+  .quote {
+    border-left: 3px solid var(--text-muted);
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    font-style: italic;
+    background: var(--navy-light);
+    border-radius: 0 8px 8px 0;
+  }
+  .quote-by {
+    font-style: normal;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  /* Landing points */
+  .points {
+    list-style: none;
+    counter-reset: pts;
+    margin: 12px 0;
+  }
+  .points li {
+    counter-increment: pts;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .points li::before {
+    content: counter(pts);
+    background: var(--gold-dim);
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 12px;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .points li strong { color: #fff; }
+
+  /* Role rows */
+  .role-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    gap: 12px;
+  }
+  .role-row:last-child { border-bottom: none; }
+  .role-name {
+    width: 160px;
+    color: var(--gold);
+    font-weight: 600;
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+  .role-who {
+    width: 180px;
+    color: #fff;
+    font-weight: 500;
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+  .role-what {
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  /* Action items */
+  .action {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    font-size: 14px;
+  }
+  .action:last-child { border-bottom: none; }
+  .check {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--text-muted);
+    border-radius: 5px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .check:hover { border-color: var(--gold); }
+  .check.on { background: var(--gold); border-color: var(--gold); }
+  .check.on::after { content: '\2713'; color: var(--navy); font-weight: 700; font-size: 12px; }
+  .action-text { color: var(--text-dim); flex: 1; }
+  .action-text.done { text-decoration: line-through; opacity: 0.4; }
+  .action-who {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    background: var(--gold-dim);
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+
+  /* Parking lot */
+  .parking {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0;
+  }
+  .parking span {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--navy-light);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  /* Divider */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* Prep section */
+  .prep {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 2px dashed rgba(245,166,35,0.2);
+  }
+  .prep h2 {
+    font-size: 16px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .prep-item {
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    background: var(--navy-light);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .prep-item h4 {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .prep-item p {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>ZAO Stock sync</h1>
+  <p>April 10, 2026 &middot; Zaal + FailOften &middot; ~30 min</p>
+</div>
+
+<!-- 1. Structure -->
+<div class="section">
+  <div class="section-head">
+    <h2>1. The structure</h2>
+    <span class="time">~5 min</span>
+  </div>
+
+  <div class="diagram">
+    <div class="entity e-zao">
+      <h3>ZAO</h3>
+      <div class="sub">talent + programming</div>
+      <ul>
+        <li>Artists</li>
+        <li>Community</li>
+        <li>Events</li>
+        <li>Sponsorship relationships</li>
+      </ul>
+    </div>
+    <div class="connector">&times;</div>
+    <div class="entity e-nmc">
+      <h3>New Media Commons</h3>
+      <div class="sub">funding structure</div>
+      <ul>
+        <li>Grant pathway</li>
+        <li>Tax-deductible layer</li>
+        <li>Institutional money</li>
+        <li>Legitimacy</li>
+      </ul>
+    </div>
+    <div class="connector">&times;</div>
+    <div class="entity e-ent">
+      <h3>ENTERACT</h3>
+      <div class="sub">technical build</div>
+      <ul>
+        <li>Installations</li>
+        <li>Systems</li>
+        <li>Production tech</li>
+        <li>Delivery</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="oneliner">
+    ZAO brings the project. New Media Commons makes it fundable. ENTERACT handles the technical side. One project budget pays everyone.
+  </div>
+
+  <div class="lanes">
+    <div class="lane lane-1"><strong>Paid</strong><p>Client has budget, direct contract</p></div>
+    <div class="lane lane-2"><strong>Sponsored</strong><p>No budget yet, ZAO brings sponsors</p></div>
+    <div class="lane lane-3"><strong>Funded</strong><p>Grants, tax-deductible, institutional</p></div>
+  </div>
+
+  <ul class="questions">
+    <li>Are we aligned on this 3-entity model?</li>
+    <li>Where does BCZ Strategies fit - Zaal's lane within ZAO, or separate?</li>
+    <li>What exactly is New Media Commons - FailOften's org? Fiscal sponsor?</li>
+  </ul>
+</div>
+
+<hr>
+
+<!-- 2. Where things stand -->
+<div class="section">
+  <div class="section-head">
+    <h2>2. Where things stand</h2>
+    <span class="time">~5 min</span>
+  </div>
+
+  <div style="margin-bottom: 16px;">
+    <div class="status-row">
+      <div class="status-label">Date</div>
+      <div class="status-badge"><span class="badge b-yes">LOCKED</span></div>
+      <div class="status-detail">October 3, 2026</div>
+    </div>
+    <div class="status-row">
+      <div class="status-label">Venue</div>
+      <div class="status-badge"><span class="badge b-wip">WIP</span></div>
+      <div class="status-detail">Franklin St Parklet, via Heart of Ellsworth</div>
+    </div>
+    <div class="status-row">
+      <div class="status-label">Official status</div>
+      <div class="status-badge"><span class="badge b-yes">LOCKED</span></div>
+      <div class="status-detail">Part of Art of Ellsworth: Maine Craft Weekend (9th year)</div>
+    </div>
+    <div class="status-row">
+      <div class="status-label">Weather backup</div>
+      <div class="status-badge"><span class="badge b-no">TBD</span></div>
+      <div class="status-detail">Wallace Events tent rental - not yet contacted</div>
+    </div>
+    <div class="status-row">
+      <div class="status-label">Artists</div>
+      <div class="status-badge"><span class="badge b-wip">4 IN</span></div>
+      <div class="status-detail">AttaBotty, Jango, Hurric4n3Ike, DCoop</div>
+    </div>
+    <div class="status-row">
+      <div class="status-label">Steve Peer</div>
+      <div class="status-badge"><span class="badge b-no">TBD</span></div>
+      <div class="status-detail">Local music anchor, not yet pitched</div>
+    </div>
+  </div>
+
+  <div class="gaps">
+    <div class="gap"><strong>Funding:</strong> nothing in place yet</div>
+    <div class="gap"><strong>Budget:</strong> $5K min / $25K goal, no money committed</div>
+    <div class="gap"><strong>Compensation:</strong> no real currency plan</div>
+    <div class="gap"><strong>Sound/staging:</strong> need local vendor, no quotes</div>
+    <div class="gap"><strong>Contracts:</strong> none exist</div>
+  </div>
+</div>
+
+<hr>
+
+<!-- 3. Compensation -->
+<div class="section">
+  <div class="section-head">
+    <h2>3. Compensation</h2>
+    <span class="time">~10 min</span>
+  </div>
+
+  <div class="quote">
+    "For this to be viable and to actually respect the artists involved, people need to be paid in real currency. Systems like that can sit alongside it, but they can't replace it."
+    <div class="quote-by">- FailOften, 4/7</div>
+  </div>
+
+  <p style="font-size: 14px; color: var(--text-dim); margin: 12px 0;">We agree. The fractal/respect system is for <strong style="color:#fff">tracking</strong>, not replacing pay. Here's where we want to land:</p>
+
+  <ol class="points">
+    <li><strong>Respect tracks contribution</strong> - who did what, transparent ledger</li>
+    <li><strong>Real money pays people</strong> - from sponsors, grants, ticket sales</li>
+    <li><strong>Respect informs allocation</strong> - when money comes in, scores help determine fair splits</li>
+    <li><strong>No one works for tokens</strong> - respect is recognition, not compensation</li>
+  </ol>
+
+  <ul class="questions">
+    <li>How does the NMC / ENTERACT structure actually bring money into ZAO Stock?</li>
+    <li>What's the realistic funding path + timeline?</li>
+  </ul>
+</div>
+
+<hr>
+
+<!-- 4. Roles -->
+<div class="section">
+  <div class="section-head">
+    <h2>4. Roles</h2>
+    <span class="time">~5 min</span>
+  </div>
+
+  <div>
+    <div class="role-row">
+      <div class="role-name">Curation</div>
+      <div class="role-who">Zaal + Steve Peer (TBD)</div>
+      <div class="role-what">Lineup, set times, event shape</div>
+    </div>
+    <div class="role-row">
+      <div class="role-name">Community</div>
+      <div class="role-who">Zaal + ZAO members</div>
+      <div class="role-what">Promo, virtual ramp-up Apr-Sept</div>
+    </div>
+    <div class="role-row">
+      <div class="role-name">Technical build</div>
+      <div class="role-who">FailOften / ENTERACT</div>
+      <div class="role-what">Installations, visuals, production tech</div>
+    </div>
+    <div class="role-row">
+      <div class="role-name">Production</div>
+      <div class="role-who">AttaBotty</div>
+      <div class="role-what">On-site staging, sound coordination</div>
+    </div>
+    <div class="role-row">
+      <div class="role-name">Funding</div>
+      <div class="role-who">FailOften + Zaal</div>
+      <div class="role-what">Grants, sponsors, budget</div>
+    </div>
+    <div class="role-row">
+      <div class="role-name">Local logistics</div>
+      <div class="role-who">Zaal</div>
+      <div class="role-what">Venue, permits, vendors, HoE relationship</div>
+    </div>
+  </div>
+
+  <ul class="questions">
+    <li>Does FailOften want to own the funding lane or advise on it?</li>
+    <li>Is ENTERACT involved as an org, or is it just him for this?</li>
+    <li>Capacity - he's in KC, how much on-site time?</li>
+  </ul>
+</div>
+
+<hr>
+
+<!-- 5. Next steps -->
+<div class="section">
+  <div class="section-head">
+    <h2>5. Next steps</h2>
+    <span class="time">~5 min</span>
+  </div>
+
+  <div>
+    <div class="action">
+      <div class="check" onclick="this.classList.toggle('on'); this.nextElementSibling.classList.toggle('done');"></div>
+      <div class="action-text">Draft simple budget (min viable + stretch)</div>
+      <div class="action-who">Both</div>
+    </div>
+    <div class="action">
+      <div class="check" onclick="this.classList.toggle('on'); this.nextElementSibling.classList.toggle('done');"></div>
+      <div class="action-text">Identify 2-3 grant / funding paths</div>
+      <div class="action-who">FailOften</div>
+    </div>
+    <div class="action">
+      <div class="check" onclick="this.classList.toggle('on'); this.nextElementSibling.classList.toggle('done');"></div>
+      <div class="action-text">Pitch Steve Peer on co-curating</div>
+      <div class="action-who">Zaal</div>
+    </div>
+    <div class="action">
+      <div class="check" onclick="this.classList.toggle('on'); this.nextElementSibling.classList.toggle('done');"></div>
+      <div class="action-text">Wallace Events tent quote</div>
+      <div class="action-who">Zaal</div>
+    </div>
+    <div class="action">
+      <div class="check" onclick="this.classList.toggle('on'); this.nextElementSibling.classList.toggle('done');"></div>
+      <div class="action-text">Define what contracts look like for team</div>
+      <div class="action-who">FailOften</div>
+    </div>
+    <div class="action">
+      <div class="check" onclick="this.classList.toggle('on'); this.nextElementSibling.classList.toggle('done');"></div>
+      <div class="action-text">Sound / PA vendor research (Ellsworth area)</div>
+      <div class="action-who">Zaal</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Parking lot</p>
+    <div class="parking">
+      <span>ZAOVille / DCoop coordination</span>
+      <span>Thursday summer concerts</span>
+      <span>ZAO OS event page</span>
+      <span>Livestream strategy</span>
+    </div>
+  </div>
+</div>
+
+<!-- Prep notes - scroll past the fold -->
+<div class="prep">
+  <h2>Notes for Zaal (don't scroll here on screen share)</h2>
+  <div class="prep-item">
+    <h4>On funding</h4>
+    <p>"We have no funding in place yet. Goal is $25K, min viable $5K. I want your help figuring out how to get there - that's where the NMC structure you laid out could be the answer."</p>
+  </div>
+  <div class="prep-item">
+    <h4>On compensation</h4>
+    <p>"The fractal system is for tracking, not replacing pay. I agree people need real money. The question is where it comes from, and that's what we need to figure out together."</p>
+  </div>
+  <div class="prep-item">
+    <h4>On roles</h4>
+    <p>"I see you as both the tech/installations lead AND the person who understands how to structure funding. That's why this conversation matters."</p>
+  </div>
+  <div class="prep-item">
+    <h4>General</h4>
+    <p>Be transparent about what's not figured out. He respects that. "Just getting the fundamentals down will be key."</p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -19,7 +19,9 @@ Use this to quickly find if a topic has already been researched.
 - **Channel moderation & community management**: Farcaster Client API (18 endpoints), ban/hide/pin/invite/block, Ed25519 auth, 3-phase build plan → `305`
 - **Protocol features gap analysis (CANONICAL)**: 200+ Neynar endpoints mapped, 22 used/47 unused, notifications/mute/block/rewards/subscriptions/AI summaries, Farcaster Pro $120/yr → `306`
 - **Snapchain vs Hypersnap protocol deep dive (CANONICAL)**: Malachite BFT, 11 validators, 10K TPS, 780ms finality, account sharding, Hypersnap fork (Tantivy search + Neynar API), Quilibrium privacy (oblivious transfer, MPC), on-chain contracts → `309`
-- **Agentic Bootcamp Week 2 (CANONICAL)**: Coinbase AgentKit ($0), x402 micro-payments, SIWA agent identity, miniapp notifications, Quilibrium multi-agent coordination, $6-16/mo full agent stack → `316`
+- **Agentic Bootcamp Week 1 (CANONICAL)**: Sessions 1-6 full transcripts. Building blocks, miniapps, agents 101 (Clanker), memory/context (45% rule), Privy wallets, hands-on build → `317`
+- **Agentic Bootcamp Week 2 (CANONICAL)**: Sessions 7-9. x402/MPP commerce, Emerge viral loop, ERC-8004 identity/reputation (100K+ agents) → `316`
+- **Cassie Heart multi-agent coordination (CANONICAL)**: Session 10. Persona engineering, softmax selection, humanization, Quilibrium free stack → `318`
 
 ## Dev Workflows & Agent Tooling
 - Vercel integrations, Airtable, custom integration console → `212`

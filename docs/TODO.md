@@ -5,20 +5,45 @@
 
 ---
 
-## AGENT (ZOE on Agent Zero)
+## AGENT (ZOE - Architecture Decision Pending)
 
-- [ ] **P0** Upgrade VPS from 2GB to 4GB ($12-18/month) - needed for Agent Zero
-- [ ] **P0** Deploy Agent Zero on VPS (`docker run` one-liner)
-- [ ] **P0** Configure Agent Zero: Minimax M2.7 primary + Anthropic API fallback
-- [ ] **P0** Build Telegram bridge for Agent Zero (relay script)
-- [ ] **P0** Migrate SOUL.md + USER.md + AGENTS.md + MEMORY.md into Agent Zero memory
-- [ ] **P1** Set up Agent Zero scheduled tasks: morning brief (4:30am), lunch prep (11:25am), evening prep (3:15pm)
-- [ ] **P1** Set up Friday retro scheduled task
-- [ ] **P1** Test agent-to-agent communication with collaborator's Agent Zero
-- [ ] **P1** Configure Agent Zero profiles: work mode, building mode, consulting mode
-- [ ] **P2** Integrate Agent Zero with Supabase for job tracking / client pipeline
-- [ ] **P2** Build job board scraping task in Agent Zero (RemoteOK, HN, web3.career, WWR)
-- [ ] **P2** Set up Agent Zero browser automation for job research
+### Option A: Agent Zero (full framework)
+- [ ] **P1** Upgrade VPS from 2GB to 4GB ($12-18/month)
+- [ ] **P1** Deploy Agent Zero on VPS (`docker run` one-liner)
+- [ ] **P1** Configure: Minimax M2.7 primary + Anthropic API fallback
+- [ ] **P1** Build Telegram bridge (relay script)
+- [ ] **P1** Migrate SOUL.md + USER.md + AGENTS.md + MEMORY.md into Agent Zero memory
+- [ ] **P1** Test agent-to-agent communication with FailOften's Agent Zero
+- [ ] **P2** Configure profiles: work mode, building mode, consulting mode
+
+### Option B: Vercel Serverless (bootcamp approach - cheaper)
+- [ ] **P0** Fork bootcamp agent repo, set up Privy wallet for ZOE (Session 6)
+- [ ] **P0** Deploy ZOE webhook + cron to Vercel (free tier, only runs when triggered)
+- [ ] **P0** Register ZOE on ERC-8004 via 8004scan (Session 9 - 100K+ agents already registered)
+- [ ] **P1** Wire SIWA auth for agent-to-agent interactions (`@buildersgarden/siwa`)
+- [ ] **P1** Add x402 pay-per-call for Neynar writes (~$0.001/call vs $99/mo API key)
+- [ ] **P1** Implement Emerge-style viral loop - ZOE replies in /zao timeline (Session 8)
+
+### Shared (works with either approach)
+- [ ] **P0** Set up scheduled tasks: morning brief (4:30am), lunch prep (11:25am), evening prep (3:15pm)
+- [ ] **P0** Set up Friday retro task
+- [ ] **P1** Build job board scraping (RemoteOK, HN, web3.career, WWR)
+- [ ] **P2** Evaluate MPP (Machine Payment Protocol) for streaming payments - Tempo sessions = 1 sig for many txns (Session 7)
+- [ ] **P2** Browser automation for job research
+- [ ] **P3** Multi-agent coordination on Quilibrium (await Session 10 transcript from Cassie)
+
+---
+
+## BOOTCAMP (Farcaster Agentic Bootcamp - Feed Full Transcripts)
+
+- [ ] **P0** Feed Session 6 full transcript to Claude Code (urbe eth - Build a Farcaster Agent)
+- [ ] **P0** Feed Session 7 full transcript (Samuel Zeller - Embedded Capital, x402, MPP)
+- [ ] **P0** Feed Session 8 full transcript (ATown/Emerge - Going Viral, viral loop mechanics)
+- [ ] **P0** Feed Session 9 full transcript (Vittorio/EF - ERC-8004 Identity & Reputation)
+- [ ] **P0** Feed Session 10 full transcript (Cassie Heart/Quilibrium - Multi-Agent Coordination)
+- [ ] **P1** Research doc for each session with specific code patterns and implementation steps
+- [ ] **P1** Update doc 316 with full transcript insights for each session
+- [ ] **P2** Enter FarHack Online 2026 with ZOE as submission
 
 ---
 
@@ -117,6 +142,16 @@
 - [ ] **P1** Merge ws/zoe-v2-foundation branch to main
 - [ ] **P2** Continue feature development (based on open issues)
 - [ ] **P2** Update research index with docs 313 (token optimization)
+
+---
+
+## QUILIBRIUM (Budget Dev Infrastructure)
+
+- [ ] **P1** Monitor quilibrium-js-sdk-channels repo for TypeScript SDK stability
+- [ ] **P2** Test Q Storage (5GB free) for decentralized media backup
+- [ ] **P2** Evaluate Quorum messenger as XMTP alternative for ZAO E2EE messaging
+- [ ] **P3** Explore Klearu (E2EE ML) for private LLM inference
+- [ ] **P3** Explore running a Q node for QUIL earnings ($0.013/token, generational emissions)
 
 ---
 

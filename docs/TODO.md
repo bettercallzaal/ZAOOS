@@ -5,32 +5,52 @@
 
 ---
 
-## AGENT (ZOE - Architecture Decision Pending)
+## BCZ AGENT (Agent Zero on VPS - Business Operations)
 
-### Option A: Agent Zero (full framework)
-- [ ] **P1** Upgrade VPS from 2GB to 4GB ($12-18/month)
-- [ ] **P1** Deploy Agent Zero on VPS (`docker run` one-liner)
-- [ ] **P1** Configure: Minimax M2.7 primary + Anthropic API fallback
-- [ ] **P1** Build Telegram bridge (relay script)
-- [ ] **P1** Migrate SOUL.md + USER.md + AGENTS.md + MEMORY.md into Agent Zero memory
-- [ ] **P1** Test agent-to-agent communication with FailOften's Agent Zero
-- [ ] **P2** Configure profiles: work mode, building mode, consulting mode
+Purpose: BetterCallZaal Strategies business machine. Handles client pipeline, job hunting, ZAO Stock coordination, sponsorship outreach, team management, cold outreach automation.
 
-### Option B: Vercel Serverless (bootcamp approach - cheaper)
+### Setup
+- [ ] **P0** Upgrade VPS from 2GB to 4GB ($12-18/month)
+- [ ] **P0** Deploy Agent Zero on VPS (`docker run` one-liner)
+- [ ] **P0** Configure: Minimax M2.7 primary + Anthropic API fallback
+- [ ] **P0** Build Telegram bridge (relay script - separate bot from ZOE)
+- [ ] **P0** Load business context: BCZ services, resume versions, target companies, client pipeline, ZAO Stock status
+- [ ] **P1** Configure profiles: client-outreach mode, job-hunt mode, event-planning mode
+
+### Business Automation
+- [ ] **P1** Job board scraping task (RemoteOK, HN, web3.career, WWR, LinkedIn)
+- [ ] **P1** Browser automation for job research + applications
+- [ ] **P1** Cold outreach drafting: web3 projects + Bar Harbor local businesses
+- [ ] **P1** Find businesses with low Google/Yelp rankings (automated scraping)
+- [ ] **P1** Resume tailoring per role type (5 versions auto-generated)
+- [ ] **P1** Application pipeline tracking in Supabase
+- [ ] **P2** Sponsorship outreach automation for ZAO Stock
+- [ ] **P2** Test agent-to-agent communication with FailOften's Agent Zero
+
+---
+
+## ZOE (Vercel Serverless - Personal Daily Driver)
+
+Purpose: Zaal's personal assistant on Telegram. Morning briefs, voice memos, content drafts, Farcaster engagement, calendar awareness. Lightweight, free, always responsive.
+
+### Setup
 - [ ] **P0** Fork bootcamp agent repo, set up Privy wallet for ZOE (Session 6)
 - [ ] **P0** Deploy ZOE webhook + cron to Vercel (free tier, only runs when triggered)
-- [ ] **P0** Register ZOE on ERC-8004 via 8004scan (Session 9 - 100K+ agents already registered)
-- [ ] **P1** Wire SIWA auth for agent-to-agent interactions (`@buildersgarden/siwa`)
-- [ ] **P1** Add x402 pay-per-call for Neynar writes (~$0.001/call vs $99/mo API key)
-- [ ] **P1** Implement Emerge-style viral loop - ZOE replies in /zao timeline (Session 8)
+- [ ] **P0** Register ZOE on ERC-8004 via 8004scan (100K+ agents already there)
+- [ ] **P0** Connect to existing @zaoclaw_bot Telegram
+- [ ] **P0** Load personal context: USER.md, SOUL.md, AGENTS.md, schedule
 
-### Shared (works with either approach)
-- [ ] **P0** Set up scheduled tasks: morning brief (4:30am), lunch prep (11:25am), evening prep (3:15pm)
-- [ ] **P0** Set up Friday retro task
-- [ ] **P1** Build job board scraping (RemoteOK, HN, web3.career, WWR)
-- [ ] **P2** Evaluate MPP (Machine Payment Protocol) for streaming payments - Tempo sessions = 1 sig for many txns (Session 7)
-- [ ] **P2** Browser automation for job research
-- [ ] **P3** Multi-agent coordination on Quilibrium (await Session 10 transcript from Cassie)
+### Daily Features
+- [ ] **P0** Morning brief at 4:30 AM (projects, calendar, top 3 priorities)
+- [ ] **P0** DND-aware schedule (quiet during work hours, active in windows)
+- [ ] **P1** Voice memo transcription -> content drafts (Farcaster, X, LinkedIn, Newsletter)
+- [ ] **P1** One-at-a-time Farcaster engagement opportunities with draft replies
+- [ ] **P1** x402 pay-per-call for Neynar writes (~$0.001/call vs $99/mo)
+- [ ] **P1** Emerge-style viral loop - ZOE replies in /zao timeline (Session 8)
+- [ ] **P1** Wire SIWA auth for agent-to-agent interactions
+- [ ] **P2** Google Calendar MCP integration
+- [ ] **P2** Evaluate MPP for streaming payments (fractal meetings, live rooms)
+- [ ] **P3** Multi-agent coordination via Quilibrium (await Session 10 transcript)
 
 ---
 

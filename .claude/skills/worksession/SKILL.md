@@ -18,9 +18,11 @@ Run these steps in order:
    git branch --show-current
    ```
 
-2. **Determine if already in a session:**
-   - If already on a `ws/` branch: you're in a session, skip to work
-   - If in a worktree (check `git rev-parse --show-toplevel` differs from main repo): skip to work
+2. **CRITICAL: Check if another session is already on a ws/ branch:**
+   - If already on a `ws/` branch that THIS terminal created: continue working
+   - If on a `ws/` branch that ANOTHER terminal created: **DO NOT use it.** Switch to main first.
+   - If on `main`: proceed to create a new session
+   - Run `git branch` to see all local branches. If there are stale `ws/` branches, delete them.
 
 3. **Ask the user** (one question):
    > "What are you working on? (short description for the branch name)"
@@ -50,7 +52,7 @@ Run these steps in order:
    npm install --prefer-offline
    ```
 
-   **Fallback** — if worktree creation fails (e.g. disk space, permissions), fall back to branch-only:
+   **Fallback** - if worktree creation fails (e.g. disk space, permissions), fall back to branch-only:
    ```bash
    git checkout -b "$BRANCH"
    ```
@@ -58,6 +60,7 @@ Run these steps in order:
    - Format: `ws/fractal-fixes-0406-1423`
    - Always branch from latest `main`
    - Prefix `ws/` makes session branches identifiable
+   - **NEVER reuse another session's branch.** Always create a fresh one.
 
 5. **Confirm:**
    > "Session `ws/<name>` created at `../worktrees/<name>/`. Ready to work."
@@ -65,38 +68,57 @@ Run these steps in order:
    Or if fallback:
    > "Session branch `ws/<name>` created (same directory, worktree unavailable). Ready to work."
 
-## End of Session
+## End of Session (PR Workflow)
 
 When the user says "ship", "done", "pr", "wrap up", or work is complete:
 
 1. Stage and commit any remaining changes
-2. Push the session branch: `git push -u origin ws/<name>`
-3. Create PR to `main` using `gh pr create`
-4. Report the PR URL
-5. **Clean up worktree** (only after PR is merged or if user confirms):
+2. **Merge main into your branch before pushing** (prevents CI failures from stale base):
    ```bash
-   # From the main repo directory:
-   cd "../ZAO OS V1"
-   git worktree remove "../worktrees/<name>"
+   git fetch origin main
+   git merge origin/main --no-edit
+   # If conflicts, resolve them before pushing
    ```
-   Do NOT auto-remove — the user merges PRs themselves. Just remind them:
-   > "PR created. After you merge, clean up with: `git worktree remove ../worktrees/<name>`"
+3. Push the session branch: `git push -u origin ws/<name>`
+4. Create PR to `main` using `gh pr create`
+5. Report the PR URL
+6. **Clean up after merge:**
+   - Delete the remote branch after PR is merged: `git push origin --delete ws/<name>`
+   - Delete the local branch: `git branch -D ws/<name>`
+   - Remove the worktree: `git worktree remove "../worktrees/<name>"`
+   
+   Do NOT auto-delete - the user merges PRs themselves. Just remind them:
+   > "PR created. After you merge, I'll clean up the branch."
 
 ## Rules
 
+- **NEVER reuse another terminal's branch.** Each session gets a FRESH branch from main.
 - **Never commit directly to `main`** from a work session
-- **Never push to someone else's branch** — always your own `ws/` branch
-- **Always pull main before branching** — stale bases cause merge conflicts
+- **Never push to someone else's branch** - always your own `ws/` branch
+- **Always pull main before branching** - stale bases cause merge conflicts
+- **Always merge main before creating PRs** - prevents CI failures from being behind
 - If the branch already exists on remote, append a counter: `ws/fix-0406-1423-2`
-- **Always create a PR** as the finishing step — Zaal merges himself
+- **Always create a PR** as the finishing step - Zaal merges himself
+- **Always clean up** stale local and remote branches at start/end of sessions
 - Keep worktree count to 3-5 max (each needs ~1.2GB for node_modules)
 - Use `git worktree list` to see active worktrees
+
+## Branch Hygiene (Run Periodically)
+
+When starting a session, clean up stale branches:
+```bash
+# Delete local branches that are already merged to main
+git branch --merged main | grep -v main | xargs git branch -d
+
+# Check for remote branches with no unmerged work
+git fetch --prune
+```
 
 ## When NOT to Use
 
 - Quick one-line fixes where the user says "just push to main"
 - When the user explicitly says to work on an existing branch
-- Research-only sessions (no code changes — no isolation needed)
+- Research-only sessions (no code changes - no isolation needed)
 
 ## Worktree Directory Layout
 

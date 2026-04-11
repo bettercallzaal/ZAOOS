@@ -26,3 +26,4 @@
 | 233 | [Spaces & Streaming Full Audit](./233-spaces-streaming-full-audit/) | CANONICAL | Comprehensive audit of 43 components, 11 API routes, 2 audio providers, broadcast system |
 | 275 | [Stream Video SDK Dashboard Configuration](./275-stream-video-sdk-dashboard-configuration/) | STANDALONE | Stream.io Video SDK dashboard setup and configuration reference |
 | 286 | [Claude Cowork SEO Workflow & ZAO OS SEO Audit](./286-claude-cowork-seo-workflow/) | STANDALONE | @bloggersarvesh Cowork SEO workflow analysis, ZAO OS SEO audit (zero JSON-LD, 1-URL sitemap), music schema.org types, claude-seo skill, implementation plan |
+| 319 | [Lightweight 3D Portal Hub](./319-lightweight-3d-portal-hub/) | STANDALONE | CSS 3D + model-viewer (0-180 KB) portal hub, 18+ domains as clickable doors, AI concierge routing, token-gated VIP, works on worst Androids, supersedes Doc 313's heavy R3F stack, 1-week build plan |

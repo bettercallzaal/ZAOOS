@@ -11,7 +11,7 @@
 | [Agents](./agents/) | 30 | OpenClaw, ZOE, frameworks, memory, orchestration, self-optimization |
 | [Music](./music/) | 37 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation |
 | [Dev Workflows](./dev-workflows/) | 37 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
-| [Infrastructure](./infrastructure/) | 21 | Next.js 16, Supabase, streaming, mobile, notifications, admin |
+| [Infrastructure](./infrastructure/) | 24 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
 | [Community](./community/) | 19 | ZAO guide, whitepaper, onboarding, member profiles, task forces |
 | [Governance](./governance/) | 17 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
 | [Farcaster](./farcaster/) | 12 | Protocol, Mini Apps, XMTP, ecosystem, social graph |

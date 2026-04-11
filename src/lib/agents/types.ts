@@ -63,3 +63,26 @@ export const VAULT_SCHEDULE: Record<number, AgentAction> = {
   5: 'buy_content',  // Friday
   6: 'add_lp',       // Saturday
 };
+
+export const BURN_ADDRESS = '0x000000000000000000000000000000000000dEaD';
+export const BURN_PCT = 0.01; // 1% of every buy
+
+export const BANKER_SCHEDULE: Record<number, AgentAction> = {
+  0: 'report',
+  1: 'buy_zabal',
+  2: 'buy_content',
+  3: 'buy_zabal',
+  4: 'buy_content',
+  5: 'buy_zabal',
+  6: 'buy_sang',
+};
+
+export const DEALER_SCHEDULE: Record<number, AgentAction> = {
+  0: 'report',
+  1: 'buy_content',
+  2: 'buy_zabal',
+  3: 'buy_content',
+  4: 'buy_sang',
+  5: 'buy_zabal',
+  6: 'buy_zabal',
+};

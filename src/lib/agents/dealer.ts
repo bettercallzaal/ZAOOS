@@ -4,22 +4,22 @@ import { getSwapQuote, getZabalPrice } from './swap';
 import { executeSwap } from './wallet';
 import { burnZabal } from './burn';
 import { postTradeUpdate } from './cast';
-import { TOKENS, VAULT_SCHEDULE, type AgentAction } from './types';
+import { TOKENS, DEALER_SCHEDULE, type AgentAction } from './types';
 import { logger } from '@/lib/logger';
 
 /**
- * VAULT agent daily routine.
- * Called by Vercel cron at 6 AM UTC.
+ * DEALER agent daily routine.
+ * Called by Vercel cron at 10 PM UTC.
  * Determines today's action, checks budget, executes.
  */
-export async function runVault(): Promise<{
+export async function runDealer(): Promise<{
   action: AgentAction;
   status: 'success' | 'failed' | 'skipped';
   details: string;
 }> {
-  const config = await getAgentConfig('VAULT');
+  const config = await getAgentConfig('DEALER');
   if (!config) {
-    return { action: 'report', status: 'failed', details: 'No config found for VAULT' };
+    return { action: 'report', status: 'failed', details: 'No config found for DEALER' };
   }
 
   if (!config.trading_enabled) {
@@ -32,13 +32,13 @@ export async function runVault(): Promise<{
 
   // Determine today's action
   const dayOfWeek = new Date().getUTCDay();
-  const action = VAULT_SCHEDULE[dayOfWeek] || 'report';
+  const action = DEALER_SCHEDULE[dayOfWeek] || 'report';
 
   // Check daily budget
-  const spent = await getDailySpend('VAULT');
+  const spent = await getDailySpend('DEALER');
   if (spent >= config.max_daily_spend_usd) {
     await logAgentEvent({
-      agent_name: 'VAULT',
+      agent_name: 'DEALER',
       action,
       status: 'failed',
       error_message: `Daily budget exceeded: $${spent.toFixed(2)} / $${config.max_daily_spend_usd}`,
@@ -58,7 +58,7 @@ export async function runVault(): Promise<{
 
         if (zabalPrice > config.buy_price_ceiling) {
           await logAgentEvent({
-            agent_name: 'VAULT',
+            agent_name: 'DEALER',
             action: 'buy_zabal',
             status: 'failed',
             error_message: `Price $${zabalPrice} above ceiling $${config.buy_price_ceiling}`,
@@ -74,11 +74,11 @@ export async function runVault(): Promise<{
           takerAddress: config.wallet_address,
         });
 
-        const hash = await executeSwap('VAULT', quote);
-        await burnZabal('VAULT', BigInt(quote.buyAmount));
+        const hash = await executeSwap('DEALER', quote);
+        await burnZabal('DEALER', BigInt(quote.buyAmount));
 
         await logAgentEvent({
-          agent_name: 'VAULT',
+          agent_name: 'DEALER',
           action: 'buy_zabal',
           token_in: 'WETH',
           token_out: 'ZABAL',
@@ -89,11 +89,11 @@ export async function runVault(): Promise<{
           status: 'success',
         });
 
-        const buyZabalDetails = `Bought ${quote.buyAmount} ZABAL for ~$${tradeUsd.toFixed(2)}`;
-        await postTradeUpdate({ agentName: 'VAULT', action: 'buy_zabal', details: buyZabalDetails, txHash: hash });
+        const details = `Bought ${quote.buyAmount} ZABAL for ~$${tradeUsd.toFixed(2)}`;
+        await postTradeUpdate({ agentName: 'DEALER', action: 'buy_zabal', details, txHash: hash });
 
-        logger.info(`[VAULT] buy_zabal: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} ZABAL`);
-        return { action, status: 'success', details: buyZabalDetails };
+        logger.info(`[DEALER] buy_zabal: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} ZABAL`);
+        return { action, status: 'success', details };
       }
 
       case 'buy_sang': {
@@ -105,30 +105,30 @@ export async function runVault(): Promise<{
           takerAddress: config.wallet_address,
         });
 
-        const sangHash = await executeSwap('VAULT', quote);
+        const hash = await executeSwap('DEALER', quote);
 
         await logAgentEvent({
-          agent_name: 'VAULT',
+          agent_name: 'DEALER',
           action: 'buy_sang',
           token_in: 'WETH',
           token_out: 'SANG',
           amount_in: ethAmount / 1e18,
           amount_out: parseFloat(quote.buyAmount) / 1e18,
           usd_value: tradeUsd,
-          tx_hash: sangHash,
+          tx_hash: hash,
           status: 'success',
         });
 
-        const buySangDetails = `Bought ${quote.buyAmount} SANG for ~$${tradeUsd.toFixed(2)}`;
-        await postTradeUpdate({ agentName: 'VAULT', action: 'buy_sang', details: buySangDetails, txHash: sangHash });
+        const details = `Bought ${quote.buyAmount} SANG for ~$${tradeUsd.toFixed(2)}`;
+        await postTradeUpdate({ agentName: 'DEALER', action: 'buy_sang', details, txHash: hash });
 
-        logger.info(`[VAULT] buy_sang: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} SANG`);
-        return { action, status: 'success', details: buySangDetails };
+        logger.info(`[DEALER] buy_sang: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} SANG`);
+        return { action, status: 'success', details };
       }
 
       case 'buy_content': {
         await logAgentEvent({
-          agent_name: 'VAULT',
+          agent_name: 'DEALER',
           action: 'buy_content',
           usd_value: 0,
           status: 'success',
@@ -139,13 +139,13 @@ export async function runVault(): Promise<{
 
       case 'report': {
         await logAgentEvent({
-          agent_name: 'VAULT',
+          agent_name: 'DEALER',
           action: 'report',
           status: 'success',
         });
-        const reportDetails = 'Weekly report';
-        await postTradeUpdate({ agentName: 'VAULT', action: 'report', details: reportDetails });
-        return { action, status: 'success', details: reportDetails };
+        const details = 'Weekly report';
+        await postTradeUpdate({ agentName: 'DEALER', action: 'report', details });
+        return { action, status: 'success', details };
       }
 
       default: {
@@ -155,12 +155,12 @@ export async function runVault(): Promise<{
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     await logAgentEvent({
-      agent_name: 'VAULT',
+      agent_name: 'DEALER',
       action,
       status: 'failed',
       error_message: message,
     });
-    logger.error(`[VAULT] ${action} failed:`, message);
+    logger.error(`[DEALER] ${action} failed:`, message);
     return { action, status: 'failed', details: message };
   }
 }

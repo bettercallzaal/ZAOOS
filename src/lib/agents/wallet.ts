@@ -56,7 +56,7 @@ function getWalletId(agentName: AgentName): string {
  */
 export async function executeSwap(
   agentName: AgentName,
-  quoteData: { to: string; data: string; value: string; gas: string }
+  quoteData: { to: string; data: string; value: string; gas?: string }
 ): Promise<string> {
   const privy = getPrivy();
   const walletId = getWalletId(agentName);
@@ -70,7 +70,6 @@ export async function executeSwap(
         to: quoteData.to,
         data: quoteData.data,
         value: quoteData.value,
-        gas: quoteData.gas,
         chain_id: 8453,
       },
     },

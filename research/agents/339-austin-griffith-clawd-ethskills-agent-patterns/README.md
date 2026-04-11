@@ -199,3 +199,108 @@ CLAWD has deployed 12+ dApps autonomously. The three documented:
 - [Doc 023 - Austin Griffith Overview](../../community/023-austin-griffith-eth-skills/)
 - [Doc 324 - ZABAL Tokenomics](../../business/324-zabal-sang-wallet-agent-tokenomics/)
 - [Doc 325 - Agent Swarm Economy](../325-zabal-agent-swarm-economy/)
+
+---
+
+## ADDENDUM: Deep Dive (April 11, 2026 - Round 2)
+
+### CLAWD Full dApp Inventory (15 Live + 52 Prototype Contracts)
+
+| dApp | What It Does | Steal for ZABAL? |
+|------|-------------|------------------|
+| **LarvAI** (larv.ai) | Stake CLAWD, get personal AI agent (larva), governance via conviction voting. 2.35B staked, 420M conviction generated | **YES** -- conviction governance for ZABAL. Promoters stake ZABAL, get AI agent that votes on their behalf |
+| **DenARai** | Natural language wallet: "swap 0.1 ETH to USDC" and it executes. Uses LiFi + Zerion + Claude | **YES** -- "Talk to VAULT" interface. Community members tell agent what to do in plain English |
+| **ClawFomo** | Fomo3D-style game, 38+ rounds, $18K+ paid out | SKIP -- gambling, not our brand |
+| **PFP Marketplace** | Prediction market for CLAWD's avatar, bonding curve + stake-to-vote | SKIP -- fun but not relevant |
+| **Incinerator** | Public burn: anyone calls it every 8 hours, burns 10M tokens, earns 10K reward | **YES** -- public ZABAL burn. Anyone can trigger, creates community ritual |
+| **Liquidity Vesting** | Uniswap V3 concentrated LP, 3/6 multisig, earns swap fees | **YES** -- VAULT manages ZABAL/ETH LP position |
+| **Token Hub** | Dashboard: price, cap, buy, send. IPFS-hosted | **YES** -- ZABAL dashboard for community |
+| **Token Vesting** | Linear token drip, no admin keys | Useful for team ZABAL allocation |
+| **Leftclaw Services** | AI builder marketplace, pays in CLAWD/USDC, burns tokens | **YES** -- agent-to-agent job market using ZABAL |
+| **Agent Bounty Board** | Dutch auction job market for ERC-8004 agents | **YES -- CRITICAL** -- VAULT/BANKER/DEALER can post and claim bounties |
+| **Sponsored 8004** | Gasless ERC-8004 registration via EIP-7702 | **YES** -- register all 3 agents for free |
+| **CLAWDlabs** | Research proposals + voting, costs 10 CLAWD to submit | **YES** -- ZAO research proposals funded by ZABAL |
+| **Telegram Token Gate** | Hold CLAWD for private TG group, SIWE verification | **YES** -- ZABAL-gated Telegram group |
+| **clawd-larvae** | Ephemeral Docker agents: spawn, task, kill, work persists | **YES** -- spawn temporary agents for specific tasks |
+
+### LarvAI Architecture (Most Stealable Pattern)
+
+**How conviction governance works:**
+
+```
+1. User stakes ZABAL on Base
+2. Conviction = amount_staked x seconds_staked (continuously accrues)
+3. User answers 10 training questions about values/priorities
+4. Claude Haiku synthesizes answers into ~200-token identity brief
+5. Personal AI "larva" created with user's identity injected into system prompt
+6. When governance proposals appear, larva auto-votes based on user's values
+7. User can override larva's vote at any time
+8. Aggregation endpoint synthesizes all larva opinions into hive-mind summary
+```
+
+**Contract:** `ClawdVictionStaking @ 0xC9E377FB98a1aA6Ecf4B553cE1b57940121213bf` (Base)
+
+**Stack:** Next.js App Router + RainbowKit/Wagmi + Neon PostgreSQL + Anthropic Haiku + Venice AI + Vercel crons
+
+**Cost model:**
+- Chat: 10K CV minimum (need 1M CV balance)
+- Forum post: 500K CV
+- Forum reply: 200K CV
+- Labs idea: 1M CV
+
+**Why this matters for ZABAL:** COC promoters stake ZABAL, earn conviction, get a personal AI assistant that knows their preferences. The assistant helps them create content and votes on behalf in community decisions. This is the bridge between the agent swarm and community governance.
+
+### Agent Bounty Board (Dutch Auction Job Market)
+
+**How it works:**
+
+```
+1. Anyone posts a job with min/max price in CLAWD, escrows maxPrice
+2. Price starts at minPrice, rises linearly to maxPrice over auctionDuration
+3. ERC-8004 registered agents browse and claim jobs at current price
+4. Agent submits work (IPFS URI), poster approves/disputes
+5. On approval: agent gets paid + rating. On dispute: poster gets refund
+6. Agent reputation accumulates on-chain (ratings, completed jobs, stats)
+```
+
+**For ZABAL agents:** VAULT/BANKER/DEALER register on ERC-8004, then claim bounties from the community or other agents. A promoter posts "write a show recap for COC Concertz #5" with 50K ZABAL bounty. BANKER claims it, generates the recap, submits, gets paid. Creates real economic activity.
+
+### clawd-larvae (Ephemeral Agent Swarm)
+
+**How it works:**
+- Each larva = isolated Docker container running OpenClaw (~200MB)
+- Spawn with `larvae.sh spawn <name> <model>`
+- Talk with `larvae.sh talk <name> "do this task"`
+- Kill with `larvae.sh kill <name>`
+- Work persists in `shared-workspace/<name>/` after container death
+- ETHSkills auto-injected at init -- every larva knows Ethereum
+
+**For ZABAL:** ZOE (the factory) can spawn temporary agents for specific tasks: "Research this artist," "Generate a promo kit," "Analyze this token pair." Each runs in isolation, delivers work, gets killed. Work persists in Supabase.
+
+### EIP-7702 for Gasless Agent Registration
+
+CLAWD's "Sponsored 8004" uses EIP-7702 (live since Pectra upgrade, May 2025) to:
+1. Delegate EOA execution to a smart contract
+2. Paymaster sponsors the gas
+3. Agent gets ERC-8004 registered for FREE
+
+**For ZABAL agents:** Register VAULT/BANKER/DEALER on ERC-8004 at zero cost using this pattern. All 3 agents become discoverable by 100K+ other registered agents.
+
+### 168 Repositories on clawdbotatg GitHub
+
+CLAWD's GitHub has 168 repos. Notable beyond the 15 dApps:
+- `bot-wallet-guide` -- "Why Crypto, Why Bots, and the Future of Agentic Commerce"
+- `clawd-larvae` -- ephemeral Docker agent swarm
+- `clawdviction` -- conviction governance staking
+- `agent-bounty-board` -- Dutch auction agent job market
+- `clawd-talk-to-your-wallet` -- natural language onchain execution
+
+### Updated Sources
+
+- [LarvAI](https://larv.ai/)
+- [ClawdViction GitHub](https://github.com/clawdbotatg/clawdviction)
+- [Agent Bounty Board GitHub](https://github.com/clawdbotatg/agent-bounty-board)
+- [clawd-larvae GitHub](https://github.com/clawdbotatg/clawd-larvae)
+- [Talk to Your Wallet GitHub](https://github.com/clawdbotatg/clawd-talk-to-your-wallet)
+- [CLAWD Full Site](https://clawdbotatg.eth.link/)
+- [clawdbotatg GitHub (168 repos)](https://github.com/clawdbotatg)

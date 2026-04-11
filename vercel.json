@@ -15,5 +15,10 @@
       "maxDuration": 10
     }
   },
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/agents/vault",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }

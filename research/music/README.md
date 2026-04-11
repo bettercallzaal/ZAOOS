@@ -41,3 +41,4 @@
 | 280 | [FISHBOWLZ MVP to SaaS Roadmap](./280-fishbowlz-mvp-to-saas-roadmap/) | STANDALONE | Path from working MVP to polished, demo-ready product for investors |
 | 319 | [AI Music Creation Platforms: Multi-Output](./319-ai-music-creation-platforms-multi-output/) | STANDALONE | Compare AI music platforms (Suno, Udio, ACE-Step, ElevenMusic, AIVA, Soundraw) for multi-version song production |
 | 320 | [Anatomy of a Viral Summer Song](./320-anatomy-viral-summer-songs/) | STANDALONE | Science of summer bangers: BPM, hooks, earworms, psychology, TikTok virality + "Summer of 26" blueprint |
+| 323 | [ElevenLabs API: Full Capabilities](./323-elevenlabs-api-full-capabilities/) | STANDALONE | All 7 ElevenLabs API endpoints mapped: Music, TTS, Voice Changer, Dubbing, STT, Audio Isolation, Agents - what we can build with Zaal's PVC |

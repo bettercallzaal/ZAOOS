@@ -9,7 +9,7 @@
 | Topic | Docs | Description |
 |-------|------|-------------|
 | [Agents](./agents/) | 30 | OpenClaw, ZOE, frameworks, memory, orchestration, self-optimization |
-| [Music](./music/) | 38 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs |
+| [Music](./music/) | 40 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
 | [Dev Workflows](./dev-workflows/) | 37 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
 | [Infrastructure](./infrastructure/) | 24 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
 | [Community](./community/) | 19 | ZAO guide, whitepaper, onboarding, member profiles, task forces |
@@ -33,6 +33,7 @@
 | **Building features** | [41 Next.js 16](./infrastructure/041-nextjs16-react19-deep-dive/) + [98 Supabase](./infrastructure/098-supabase-database-optimizations/) |
 | **Working on music** | [190 Player Audit](./music/190-music-player-complete-audit/) + [130 Next Integrations](./music/130-next-music-integrations/) + [167 Audio APIs](./music/167-audio-apis-music-players-displays/) |
 | **Distributing music on-chain** | [155 End-to-End Plan](./music/155-music-nft-end-to-end-implementation/) + [152 Arweave](./music/152-arweave-ecosystem-deep-dive/) + [153 BazAR](./music/153-bazar-arweave-atomic-assets-music/) |
+| **AI music metadata & distribution** | [314 Metadata/ISRC/AI Distribution](./music/314-music-metadata-isrc-ai-distribution/) |
 | **Working on governance** | [133 Governance Audit](./governance/133-governance-system-audit/) + [149 BuilderOSS](./governance/149-buildeross-deep-dive-everything/) + [56 ORDAO](./governance/056-ordao-respect-system/) |
 | **Growing the community** | [94 Onboarding](./community/094-moderation-onboarding-analytics/) + [35 Notifications](./infrastructure/035-notifications-complete-guide/) + [110 Directory](./community/110-community-directory-crm/) |
 | **Cross-posting content** | [96 Cross-Post API](./cross-platform/096-cross-post-api-deep-dive/) + [77 Bluesky](./cross-platform/077-bluesky-cross-posting-integration/) + [121 Lens](./cross-platform/121-lens-v3-auth-verdict/) |

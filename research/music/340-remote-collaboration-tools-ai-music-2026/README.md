@@ -1,4 +1,4 @@
-# Doc 336 - Remote Collaboration Tools for AI Music Production (2026)
+# Doc 340 - Remote Collaboration Tools for AI Music Production (2026)
 
 **Created:** 2026-04-11
 **Category:** Music / Collaboration / AI Tools

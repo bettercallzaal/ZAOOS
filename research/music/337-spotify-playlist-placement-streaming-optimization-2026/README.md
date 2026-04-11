@@ -1,4 +1,4 @@
-# Doc 336: Spotify Playlist Placement & Streaming Optimization for AI-Generated Music (2026)
+# Doc 337: Spotify Playlist Placement & Streaming Optimization for AI-Generated Music (2026)
 
 **Date:** 2026-04-11
 **Topic:** Deep dive on getting AI-generated music placed on Spotify playlists and optimizing for streaming platform algorithms

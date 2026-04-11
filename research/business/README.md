@@ -14,3 +14,4 @@
 | 258 | [ZABAL + SANG + FISHBOWLZ Buyback](./258-zabal-sang-buyback/) | STANDALONE | ZABAL and SANG token research plus FISHBOWLZ buyback mechanics |
 | 263 | [Obsidian Lean Team Model](./263-obsidian-lean-team-model/) | STANDALONE | Lessons from Obsidian's $350M valuation with 9 employees and 3 engineers |
 | 264 | [LinkedIn Build-in-Public Playbook](./264-linkedin-build-in-public-playbook/) | STANDALONE | Content strategy playbook for web3 builders on LinkedIn |
+| 322 | [Paragraph + Publish.new: Newsletter & Agent Commerce](./322-paragraph-publishnew-newsletter-agent-commerce/) | CANONICAL | Full Paragraph platform (API/SDK/MCP/coins), publish.new marketplace, x402/MPP agent payments, ZABAL promoter incentives, COC Concertz newsletter builder integration |

@@ -23,8 +23,9 @@ const DormantMembers = dynamic(() => import('@/components/admin/DormantMembers')
 const SpacesManager = dynamic(() => import('@/components/admin/SpacesManager').then(m => ({ default: m.SpacesManager })), { ssr: false });
 const AgentDashboard = dynamic(() => import('@/components/admin/agents/AgentDashboard'), { ssr: false });
 const RolodexDashboard = dynamic(() => import('@/components/admin/rolodex/RolodexDashboard').then(m => ({ default: m.RolodexDashboard })), { ssr: false });
+const NexusLinksManager = dynamic(() => import('@/components/admin/NexusLinksManager').then(m => ({ default: m.NexusLinksManager })), { ssr: false });
 
-type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls' | 'discord' | 'engagement' | 'audit' | 'funnel' | 'dormant' | 'spaces' | 'agents' | 'rolodex';
+type Tab = 'users' | 'zid' | 'members' | 'import' | 'moderation' | 'respect' | 'polls' | 'discord' | 'engagement' | 'audit' | 'funnel' | 'dormant' | 'spaces' | 'agents' | 'rolodex' | 'nexus';
 
 export function AdminPanel() {
   const [activeTab, setActiveTab] = useState<Tab>('users');
@@ -63,6 +64,7 @@ export function AdminPanel() {
         { id: 'polls', label: 'Polls', icon: '🗳' },
         { id: 'discord', label: 'Discord', icon: '💬' },
         { id: 'spaces', label: 'Spaces', icon: '🎙' },
+        { id: 'nexus' as Tab, label: 'Nexus', icon: '🔗' },
       ],
     },
     {
@@ -139,6 +141,7 @@ export function AdminPanel() {
         {activeTab === 'funnel' && <OnboardingFunnel />}
         {activeTab === 'dormant' && <DormantMembers />}
         {activeTab === 'spaces' && <SpacesManager />}
+        {activeTab === 'nexus' && <NexusLinksManager />}
         {activeTab === 'agents' && <AgentDashboard />}
         {activeTab === 'rolodex' && <RolodexDashboard />}
       </div>

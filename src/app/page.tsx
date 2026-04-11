@@ -77,6 +77,22 @@ export default async function LandingPage() {
         </div>
       </div>
 
+      {/* Portal link */}
+      <div className="px-6 pb-4 relative z-10">
+        <div className="max-w-sm mx-auto">
+          <a
+            href="/portal"
+            className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#f5a623]/5 border border-[#f5a623]/15 text-sm text-[#f5a623] font-medium hover:bg-[#f5a623]/10 hover:border-[#f5a623]/25 transition-all group"
+          >
+            <span className="text-lg group-hover:scale-110 transition-transform">🌐</span>
+            Explore the Portal
+            <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
       {/* Footer — path to membership */}
       <div className="px-6 pb-8 relative z-10">
         <div className="max-w-sm mx-auto">

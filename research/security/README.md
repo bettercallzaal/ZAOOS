@@ -7,3 +7,4 @@
 | 040 | [Codebase Audit Guide](./040-codebase-audit-guide/) | CANONICAL | Step-by-step guide to audit ZAO OS for security, quality, performance, and accessibility |
 | 057 | [Codebase Security Audit (March 2026)](./057-codebase-security-audit-march-2026/) | CANONICAL | Full audit via 4 parallel agents covering auth, chat/music, governance/respect, admin/social/XMTP |
 | 136 | [API Status Verification (March 2026)](./136-api-status-verification-march-2026/) | EVENT/LOG | Confirm which APIs are active vs deprecated before integrating |
+| 343 | [Agent Wallet Security: ZABAL Swarm](./343-agent-wallet-security-zabal-swarm/) | CANONICAL | 3-phase security upgrade: Privy TEE (replace env var keys), Safe 2/3 multisig treasury, OWASP agentic controls. Policy engine, key quorums, circuit breakers, kill switches, behavioral monitoring |

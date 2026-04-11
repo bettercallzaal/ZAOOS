@@ -2,8 +2,8 @@
 -- Run this in the Supabase SQL Editor after creating the nexus_links table
 -- Generated from NexusV2/app/data/links.ts + community.config.ts partners
 
--- Clear existing data (safe to re-run)
-TRUNCATE nexus_links;
+-- Safe to run: uses INSERT ON CONFLICT DO NOTHING so existing links are preserved.
+-- To fully re-seed, manually run TRUNCATE nexus_links; first.
 
 -- ============================================================
 -- 1. ZAO Onchain > ZAO Tokens

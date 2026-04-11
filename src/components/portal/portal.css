@@ -1,0 +1,296 @@
+/* Portal Hub - Immersive CSS 3D Room */
+/* Creates a spatial "room" feel with perspective, depth, and dramatic lighting */
+
+/* ── The Room ── */
+.portal-room {
+  perspective: 1200px;
+  perspective-origin: 50% 60%;
+  min-height: 100dvh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floor plane - gives depth and ground */
+.portal-floor {
+  position: absolute;
+  bottom: 0;
+  left: -20%;
+  right: -20%;
+  height: 60%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(245, 166, 35, 0.015) 30%,
+    rgba(245, 166, 35, 0.04) 100%
+  );
+  transform: rotateX(60deg);
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+
+/* Grid lines on the floor for depth */
+.portal-floor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(245, 166, 35, 0.03) 0px,
+      rgba(245, 166, 35, 0.03) 1px,
+      transparent 1px,
+      transparent 120px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(245, 166, 35, 0.03) 0px,
+      rgba(245, 166, 35, 0.03) 1px,
+      transparent 1px,
+      transparent 120px
+    );
+}
+
+/* Back wall gradient */
+.portal-wall {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 100%,
+    rgba(245, 166, 35, 0.04) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ── Door Grid with 3D Perspective ── */
+.portal-grid {
+  transform-style: preserve-3d;
+  transform: rotateX(4deg) translateY(10px);
+}
+
+/* ── Individual Door ── */
+.portal-door {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 0.6s ease;
+  will-change: transform;
+}
+
+/* Each door tilts slightly differently for depth variety */
+.portal-door:nth-child(1) { transform: rotateY(-2deg) rotateX(1deg); }
+.portal-door:nth-child(2) { transform: rotateY(0deg) rotateX(0.5deg); }
+.portal-door:nth-child(3) { transform: rotateY(2deg) rotateX(1deg); }
+.portal-door:nth-child(4) { transform: rotateY(-1.5deg) rotateX(0.5deg); }
+.portal-door:nth-child(5) { transform: rotateY(0.5deg) rotateX(0.5deg); }
+.portal-door:nth-child(6) { transform: rotateY(1.5deg) rotateX(1deg); }
+
+.portal-door:hover {
+  transform: rotateY(0deg) rotateX(0deg) translateZ(30px) scale(1.04);
+  z-index: 10;
+}
+
+.portal-door:active {
+  transform: rotateY(0deg) rotateX(0deg) translateZ(15px) scale(0.98);
+}
+
+/* ── Portal Inner Glow (the "doorway" effect) ── */
+.portal-inner-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Top edge light beam */
+.portal-inner-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: var(--glow-color, #f5a623);
+  opacity: 0.6;
+  box-shadow: 0 0 15px 3px var(--glow-color, #f5a623);
+  transition: opacity 0.4s ease;
+}
+
+/* Bottom reflection */
+.portal-inner-glow::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 40%;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--glow-color, #f5a623) 8%, transparent),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.portal-door:hover .portal-inner-glow::before {
+  opacity: 1;
+  box-shadow: 0 0 25px 8px var(--glow-color, #f5a623);
+}
+
+.portal-door:hover .portal-inner-glow::after {
+  opacity: 1;
+}
+
+/* ── Door "depth" shadow (makes it look like it sits on the floor) ── */
+.portal-door-shadow {
+  position: absolute;
+  bottom: -8px;
+  left: 10%;
+  right: 10%;
+  height: 16px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.4) 0%,
+    transparent 70%
+  );
+  filter: blur(4px);
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.portal-door:hover .portal-door-shadow {
+  opacity: 0.6;
+  bottom: -12px;
+}
+
+/* ── Arch shape at top of door ── */
+.portal-arch {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  height: 6px;
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--glow-color, #f5a623),
+    transparent
+  );
+  opacity: 0.4;
+  transition: opacity 0.4s ease;
+}
+
+.portal-door:hover .portal-arch {
+  opacity: 0.8;
+}
+
+/* ── Locked state ── */
+.portal-door.locked {
+  filter: brightness(0.65) saturate(0.5);
+}
+
+.portal-door.locked:hover {
+  filter: brightness(0.8) saturate(0.7);
+}
+
+.lock-pulse {
+  animation: lockPulse 2s ease-in-out infinite;
+}
+
+@keyframes lockPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* ── Destination list ── */
+.portal-destinations {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+              opacity 0.3s ease;
+  opacity: 0;
+}
+
+.portal-destinations.visible {
+  max-height: 400px;
+  opacity: 1;
+}
+
+.portal-dest-link {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.portal-dest-link:hover {
+  transform: translateX(4px);
+}
+
+/* ── Floating particles ── */
+.portal-particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(245, 166, 35, 0.4);
+  animation: float var(--duration, 8s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(var(--dx, 20px), var(--dy, -40px));
+    opacity: 0.6;
+  }
+}
+
+/* ── Vertical light beam (center of room) ── */
+.portal-light-beam {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(245, 166, 35, 0.1),
+    rgba(245, 166, 35, 0.02) 40%,
+    transparent 60%
+  );
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* ── Concierge ── */
+.concierge-bubble {
+  animation: bubbleIn 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes bubbleIn {
+  0% { transform: scale(0.8) translateY(10px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .portal-door { transition-duration: 0.01ms !important; }
+  .portal-particle, .lock-pulse { animation: none !important; }
+  .portal-grid { transform: none; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .portal-room { perspective: 800px; }
+  .portal-grid { transform: rotateX(2deg); }
+  .portal-floor { height: 40%; }
+  .portal-door:nth-child(n) { transform: rotateY(0deg) rotateX(0.5deg); }
+  .portal-door:active {
+    transform: translateZ(10px) scale(0.97);
+  }
+}

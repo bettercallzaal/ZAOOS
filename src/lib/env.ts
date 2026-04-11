@@ -75,4 +75,8 @@ export const ENV = {
   // Generate with: npx tsx scripts/generate-ens-operator.ts
   // Then approve as operator on app.ens.domains
   ENS_OPERATOR_PRIVATE_KEY: optionalEnv('ENS_OPERATOR_PRIVATE_KEY'),
+
+  // Agent Swarm (VAULT/BANKER/DEALER)
+  ZX_API_KEY: optionalEnv('ZX_API_KEY'),
+  VAULT_WALLET_PRIVATE_KEY: optionalEnv('VAULT_WALLET_PRIVATE_KEY'),
 } as const;

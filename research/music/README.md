@@ -39,3 +39,5 @@
 | 277 | [FISHBOWLZ Audio Providers](./277-fishbowlz-audio-providers/) | STANDALONE | Audio provider evaluation for persistent fishbowl rooms |
 | 279 | [Audio Room Competitive Landscape](./279-audio-room-competitive-landscape/) | STANDALONE | What worked, what died, and what FISHBOWLZ can learn from each competitor |
 | 280 | [FISHBOWLZ MVP to SaaS Roadmap](./280-fishbowlz-mvp-to-saas-roadmap/) | STANDALONE | Path from working MVP to polished, demo-ready product for investors |
+| 319 | [AI Music Creation Platforms: Multi-Output](./319-ai-music-creation-platforms-multi-output/) | STANDALONE | Compare AI music platforms (Suno, Udio, ACE-Step, ElevenMusic, AIVA, Soundraw) for multi-version song production |
+| 320 | [Anatomy of a Viral Summer Song](./320-anatomy-viral-summer-songs/) | STANDALONE | Science of summer bangers: BPM, hooks, earworms, psychology, TikTok virality + "Summer of 26" blueprint |

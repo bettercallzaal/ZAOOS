@@ -9,7 +9,7 @@
 | Topic | Docs | Description |
 |-------|------|-------------|
 | [Agents](./agents/) | 30 | OpenClaw, ZOE, frameworks, memory, orchestration, self-optimization |
-| [Music](./music/) | 35 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation |
+| [Music](./music/) | 37 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation |
 | [Dev Workflows](./dev-workflows/) | 36 | Skills, Claude Code, testing, autoresearch, git, MCP servers |
 | [Infrastructure](./infrastructure/) | 21 | Next.js 16, Supabase, streaming, mobile, notifications, admin |
 | [Community](./community/) | 19 | ZAO guide, whitepaper, onboarding, member profiles, task forces |

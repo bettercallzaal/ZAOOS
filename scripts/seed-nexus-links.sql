@@ -27,10 +27,10 @@ INSERT INTO nexus_links (title, url, description, category, subcategory, portal_
 -- ============================================================
 INSERT INTO nexus_links (title, url, description, category, subcategory, portal_group, sort_order, tags, is_featured) VALUES
 ('ZAO Website', 'https://thezao.com', 'Visit the official ZAO website for all the latest news and resources.', 'ZAO Links', 'ZAO Platforms', 'SOCIAL', 1, ARRAY['official', 'website'], true),
-('ZOR DAO', 'http://zao.frapps.xyz/', 'Access ZOR DAO - the decentralized governance hub for The ZAO.', 'ZAO Links', 'ZAO Platforms', 'GOVERN', 2, ARRAY['dao', 'governance']),
-('ZAO ORG CHART (Hats Tree)', 'https://hats.thezao.com', 'Dive into the ZAO ORG CHART to see our team and projects.', 'ZAO Links', 'ZAO Platforms', 'GOVERN', 3, ARRAY['org-chart', 'hats']),
-('ZAO YouTube', 'https://www.youtube.com/@thezaodao', 'Official ZAO YouTube channel.', 'ZAO Links', 'ZAO Platforms', 'SOCIAL', 4, ARRAY['youtube', 'video']),
-('ZAO Paragraph', 'https://paragraph.com/@thezao', 'ZAO writing and updates on Paragraph.', 'ZAO Links', 'ZAO Platforms', 'SOCIAL', 5, ARRAY['newsletter', 'writing']);
+('ZOR DAO', 'http://zao.frapps.xyz/', 'Access ZOR DAO - the decentralized governance hub for The ZAO.', 'ZAO Links', 'ZAO Platforms', 'GOVERN', 2, ARRAY['dao', 'governance'], false),
+('ZAO ORG CHART (Hats Tree)', 'https://hats.thezao.com', 'Dive into the ZAO ORG CHART to see our team and projects.', 'ZAO Links', 'ZAO Platforms', 'GOVERN', 3, ARRAY['org-chart', 'hats'], false),
+('ZAO YouTube', 'https://www.youtube.com/@thezaodao', 'Official ZAO YouTube channel.', 'ZAO Links', 'ZAO Platforms', 'SOCIAL', 4, ARRAY['youtube', 'video'], false),
+('ZAO Paragraph', 'https://paragraph.com/@thezao', 'ZAO writing and updates on Paragraph.', 'ZAO Links', 'ZAO Platforms', 'SOCIAL', 5, ARRAY['newsletter', 'writing'], false);
 
 -- ============================================================
 -- 2. ZAO Links > Calendars
@@ -67,9 +67,9 @@ INSERT INTO nexus_links (title, url, description, category, subcategory, portal_
 -- ============================================================
 INSERT INTO nexus_links (title, url, description, category, subcategory, portal_group, sort_order, tags, is_featured) VALUES
 ('WaveWarZ Homepage - FLIX.fun', 'https://flix.fun', 'Live-traded music battles streaming 24/7 on FLIX.fun.', 'ZAO Projects', 'WaveWarZ', 'MUSIC', 1, ARRAY['wavewarz', 'streaming', 'battles'], true),
-('WaveWarZ Website', 'https://wavewarz.com', 'Official WaveWarZ site for live-traded music battles.', 'ZAO Projects', 'WaveWarZ', 'MUSIC', 2, ARRAY['wavewarz', 'official']),
-('WaveWarZ Docs', 'https://www.wavewarz.com/docs', 'Developer and participant documentation for WaveWarZ.', 'ZAO Projects', 'WaveWarZ', 'BUILD', 3, ARRAY['wavewarz', 'docs']),
-('WaveWarZ Whitepaper Draft', 'https://hackmd.io/@R2firT46QtyhbpzPCBL7gw/rkq_NaYagx', 'Read the WaveWarZ whitepaper draft on HackMD.', 'ZAO Projects', 'WaveWarZ', 'BUILD', 4, ARRAY['wavewarz', 'whitepaper']);
+('WaveWarZ Website', 'https://wavewarz.com', 'Official WaveWarZ site for live-traded music battles.', 'ZAO Projects', 'WaveWarZ', 'MUSIC', 2, ARRAY['wavewarz', 'official'], false),
+('WaveWarZ Docs', 'https://www.wavewarz.com/docs', 'Developer and participant documentation for WaveWarZ.', 'ZAO Projects', 'WaveWarZ', 'BUILD', 3, ARRAY['wavewarz', 'docs'], false),
+('WaveWarZ Whitepaper Draft', 'https://hackmd.io/@R2firT46QtyhbpzPCBL7gw/rkq_NaYagx', 'Read the WaveWarZ whitepaper draft on HackMD.', 'ZAO Projects', 'WaveWarZ', 'BUILD', 4, ARRAY['wavewarz', 'whitepaper'], false);
 
 INSERT INTO nexus_links (title, url, description, category, subcategory, portal_group, sort_order, tags) VALUES
 ('WaveWarZ X (Twitter)', 'https://x.com/WaveWarZ', 'Follow WaveWarZ on X for battle updates and highlights.', 'ZAO Projects', 'WaveWarZ Socials', 'SOCIAL', 1, ARRAY['wavewarz', 'twitter']),
@@ -123,10 +123,10 @@ INSERT INTO nexus_links (title, url, description, category, subcategory, portal_
 -- ============================================================
 INSERT INTO nexus_links (title, url, description, category, subcategory, portal_group, sort_order, tags, is_featured) VALUES
 ('ZABAL on Songjam', 'https://songjam.space/zabal', 'ZABAL hub on Songjam.', 'ZAO Projects', 'ZABAL', 'EARN', 1, ARRAY['zabal', 'songjam'], true),
-('ZABAL Website', 'https://zabal.art', 'Official ZABAL website.', 'ZAO Projects', 'ZABAL', 'EARN', 2, ARRAY['zabal', 'official']),
-('ZABAL Incented', 'https://incented.zabal.art', 'ZABAL quests and incentives via Incented.', 'ZAO Projects', 'ZABAL', 'EARN', 3, ARRAY['zabal', 'incented', 'quests']),
-('ZABAL Update #7', 'https://paragraph.com/@thezao/zabal-update-7', 'ZABAL progress update on Paragraph.', 'ZAO Projects', 'ZABAL', 'EARN', 4, ARRAY['zabal', 'update']),
-('ZABAL Connector', 'https://zabal.lol', 'Get the ZABAL connector.', 'ZAO Projects', 'ZABAL', 'EARN', 5, ARRAY['zabal', 'tool']);
+('ZABAL Website', 'https://zabal.art', 'Official ZABAL website.', 'ZAO Projects', 'ZABAL', 'EARN', 2, ARRAY['zabal', 'official'], false),
+('ZABAL Incented', 'https://incented.zabal.art', 'ZABAL quests and incentives via Incented.', 'ZAO Projects', 'ZABAL', 'EARN', 3, ARRAY['zabal', 'incented', 'quests'], false),
+('ZABAL Update #7', 'https://paragraph.com/@thezao/zabal-update-7', 'ZABAL progress update on Paragraph.', 'ZAO Projects', 'ZABAL', 'EARN', 4, ARRAY['zabal', 'update'], false),
+('ZABAL Connector', 'https://zabal.lol', 'Get the ZABAL connector.', 'ZAO Projects', 'ZABAL', 'EARN', 5, ARRAY['zabal', 'tool'], false);
 
 -- ============================================================
 -- 3. ZAO Projects > ZAO Festivals
@@ -198,8 +198,8 @@ INSERT INTO nexus_links (title, url, description, category, subcategory, portal_
 -- ============================================================
 INSERT INTO nexus_links (title, url, description, category, subcategory, portal_group, sort_order, tags, is_featured) VALUES
 ('BetterCallZaal Linktree', 'https://linktr.ee/bettercallzaal', 'Access all BetterCallZaal links and resources on Linktree.', 'ZAO Members', 'BetterCallZaal', 'SOCIAL', 1, ARRAY['founder', 'zaal'], true),
-('Personal Meeting Room (Huddle01)', 'https://huddle01.app/room/zfp-tzyh-anm', 'Enter your personal meeting room.', 'ZAO Members', 'BetterCallZaal', 'SOCIAL', 2, ARRAY['founder', 'zaal', 'meeting']),
-('Meet with Zaal (Calendly)', 'https://calendly.com/zaalp99/30minmeeting', 'Schedule a meeting with Zaal.', 'ZAO Members', 'BetterCallZaal', 'SOCIAL', 3, ARRAY['founder', 'zaal', 'meeting']);
+('Personal Meeting Room (Huddle01)', 'https://huddle01.app/room/zfp-tzyh-anm', 'Enter your personal meeting room.', 'ZAO Members', 'BetterCallZaal', 'SOCIAL', 2, ARRAY['founder', 'zaal', 'meeting'], false),
+('Meet with Zaal (Calendly)', 'https://calendly.com/zaalp99/30minmeeting', 'Schedule a meeting with Zaal.', 'ZAO Members', 'BetterCallZaal', 'SOCIAL', 3, ARRAY['founder', 'zaal', 'meeting'], false);
 
 -- BetterCallZaal Interviews
 INSERT INTO nexus_links (title, url, description, category, subcategory, portal_group, sort_order, tags) VALUES
@@ -253,10 +253,10 @@ INSERT INTO nexus_links (title, url, description, category, subcategory, portal_
 -- ============================================================
 INSERT INTO nexus_links (title, url, description, category, subcategory, portal_group, sort_order, tags, is_gated) VALUES
 ('ZAO OS App', 'https://zaoos.com', 'Main ZAO community app - chat, music, governance, and more.', 'ZAO Platforms', 'ZAO OS', 'VIP', 1, ARRAY['zaoos', 'app', 'official'], true),
-('ZOE Dashboard', 'https://zoe.zaoos.com', 'Agent dashboard - manage ZOE and the agent squad.', 'ZAO Platforms', 'ZAO OS', 'BUILD', 2, ARRAY['zaoos', 'agents', 'zoe']),
-('Pixel Agents', 'https://pixels.zaoos.com', 'Pixel agent office - visualize your agent squad.', 'ZAO Platforms', 'ZAO OS', 'BUILD', 3, ARRAY['zaoos', 'agents', 'pixels']),
-('FISHBOWLZ', 'https://fishbowlz.com', 'Music battles and NFT jukebox.', 'ZAO Platforms', 'ZAO OS', 'MUSIC', 4, ARRAY['zaoos', 'fishbowlz', 'music']),
-('Paperclip', 'https://paperclip.zaoos.com', 'Paperclip agent interface.', 'ZAO Platforms', 'ZAO OS', 'BUILD', 5, ARRAY['zaoos', 'agents', 'paperclip']);
+('ZOE Dashboard', 'https://zoe.zaoos.com', 'Agent dashboard - manage ZOE and the agent squad.', 'ZAO Platforms', 'ZAO OS', 'BUILD', 2, ARRAY['zaoos', 'agents', 'zoe'], false),
+('Pixel Agents', 'https://pixels.zaoos.com', 'Pixel agent office - visualize your agent squad.', 'ZAO Platforms', 'ZAO OS', 'BUILD', 3, ARRAY['zaoos', 'agents', 'pixels'], false),
+('FISHBOWLZ', 'https://fishbowlz.com', 'Music battles and NFT jukebox.', 'ZAO Platforms', 'ZAO OS', 'MUSIC', 4, ARRAY['zaoos', 'fishbowlz', 'music'], false),
+('Paperclip', 'https://paperclip.zaoos.com', 'Paperclip agent interface.', 'ZAO Platforms', 'ZAO OS', 'BUILD', 5, ARRAY['zaoos', 'agents', 'paperclip'], false);
 
 -- ============================================================
 -- NOTE: Placeholder links REMOVED (not migrated)

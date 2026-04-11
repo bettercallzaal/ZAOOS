@@ -77,6 +77,12 @@ export const ENV = {
   ENS_OPERATOR_PRIVATE_KEY: optionalEnv('ENS_OPERATOR_PRIVATE_KEY'),
 
   // Agent Swarm (VAULT/BANKER/DEALER)
+  // Privy -- TEE-secured wallet signing (replaces raw private keys)
+  PRIVY_APP_ID: optionalEnv('PRIVY_APP_ID'),
+  PRIVY_APP_SECRET: optionalEnv('PRIVY_APP_SECRET'),
+  VAULT_WALLET_ID: optionalEnv('VAULT_WALLET_ID'),
+  BANKER_WALLET_ID: optionalEnv('BANKER_WALLET_ID'),
+  DEALER_WALLET_ID: optionalEnv('DEALER_WALLET_ID'),
+  // 0x Swap API -- swap routing on Base
   ZX_API_KEY: optionalEnv('ZX_API_KEY'),
-  VAULT_WALLET_PRIVATE_KEY: optionalEnv('VAULT_WALLET_PRIVATE_KEY'),
 } as const;

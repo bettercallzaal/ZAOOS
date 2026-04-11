@@ -36,6 +36,7 @@
     "@neynar/nodejs-sdk": "^3.137.0",
     "@neynar/react": "^1.2.22",
     "@octokit/rest": "^22.0.1",
+    "@privy-io/node": "^0.14.0",
     "@rainbow-me/rainbowkit": "^2.2.10",
     "@sentry/nextjs": "^10.45.0",
     "@snapshot-labs/snapshot.js": "^0.14.20",

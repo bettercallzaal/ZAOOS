@@ -76,12 +76,13 @@ Purpose: Zaal's personal assistant on Telegram. Morning briefs, voice memos, con
 - [ ] **P1** Define the 3 funding lanes: Paid (direct contract), Sponsored (ZAO brings sponsors), Funded (grants via NMC/Fractured Atlas, tax-deductible)
 
 ### Team + Standups
-- [ ] **P0** Define team structure: Finance (Dr. Tricky/Cole), AV, Design/Branding, Operations (Zaal)
+Teams: Finance (DFresh + Tricky Buddha), AV (AttaBotty), Design (Nici), Promotions (Thy Rev), Ops (Zaal), ENTERACT/Funding (FailOften). Steve Peer = local support + event management.
 - [ ] **P0** Write basic agenda template for Tuesday standups (5 min overall + 10 min per team)
-- [ ] **P0** Message each team member 1-on-1 to assign roles
+- [ ] **P0** Message each team member 1-on-1 to confirm roles (DFresh, AttaBotty, Tricky Buddha, Nici, Thy Rev, FailOften)
 - [ ] **P0** Merge PR #141 (team dashboard) and run Supabase migration
-- [ ] **P0** Run seed script to create team member passwords
-- [ ] **P0** Share passwords with team via DM (FailOften, AttaBotty/Cole, Dr. Tricky, etc.)
+- [ ] **P0** Run seed script - update with correct names: Zaal, FailOften, AttaBotty, DFresh, Tricky Buddha, Nici, Thy Rev
+- [ ] **P0** Share passwords with team via DM
+- [ ] **P0** Pitch Steve Peer on local support + event management role (NOT music curation)
 - [ ] **P1** Invite Bar Harbor Chamber event managers to Tuesday meeting (wait ~1 month to formalize)
 
 ### Sponsorship + Funding
@@ -92,7 +93,7 @@ Purpose: Zaal's personal assistant on Telegram. Morning briefs, voice memos, con
 - [ ] **P1** Define what contracts look like for team members (FailOften to draft)
 
 ### Production + Logistics
-- [ ] **P0** Pitch Steve Peer on co-curating the music lineup
+- [ ] **P0** Pitch Steve Peer on local support + event management (local connections, 37 years in Ellsworth music scene)
 - [ ] **P1** Get Wallace Events tent rental quote (weather backup)
 - [ ] **P1** Sound/PA vendor research (Ellsworth/Bangor area)
 - [ ] **P1** Build timeline with deadlines (work backward from Oct 3)

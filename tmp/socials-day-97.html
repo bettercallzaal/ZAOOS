@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socials - Day 97</title>
+  <style>
+    body {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      color: #1a1a1a;
+    }
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    h2 { font-size: 14px; color: #666; font-weight: normal; margin-top: 0; margin-bottom: 32px; }
+    .platform {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+    .platform h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #888;
+      margin: 0 0 10px 0;
+    }
+    .post {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 14px;
+      cursor: pointer;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      transition: background 0.15s;
+    }
+    .post:hover { background: #f0f0f0; }
+    .post:active { background: #e8e8e8; }
+    .meta {
+      font-size: 12px;
+      color: #999;
+      margin-top: 6px;
+    }
+    .copied { color: #22c55e; font-weight: bold; }
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #bbb;
+      margin: 28px 0 12px 0;
+      border-top: 1px solid #eee;
+      padding-top: 16px;
+    }
+    .channel-label {
+      font-size: 12px;
+      color: #666;
+      font-style: italic;
+      margin: 10px 0 4px 0;
+    }
+  </style>
+  <script>
+    function copyPost(el, metaId) {
+      navigator.clipboard.writeText(el.innerText).then(() => {
+        const meta = document.getElementById(metaId);
+        const orig = meta.innerHTML;
+        meta.innerHTML = '<span class="copied">Copied!</span>';
+        setTimeout(() => meta.innerHTML = orig, 1500);
+      });
+    }
+  </script>
+</head>
+<body>
+
+<h1>Day 97 - Social Posts</h1>
+<h2>March ZOLs from the Songjam Leaderboard | Season 2 Ep. 3</h2>
+
+<!-- ==================== X ==================== -->
+<div class="section-label">X (Twitter)</div>
+
+<div class="platform">
+  <h3>X - Main Post</h3>
+  <div class="post" onclick="copyPost(this, 'meta-x-main')">ZM march ZOLs locked in. ohnahji gold. candytoybox silver. jason alder bronze. two repeats and a first-timer. going live on the leaderboard at 11:30 AM EST.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-x-main">Click to copy - 232/280 chars</div>
+</div>
+
+<div class="platform">
+  <h3>X - Group Chat</h3>
+  <div class="post" onclick="copyPost(this, 'meta-x-gc')">ZM march ZOLs dropped. ohnahji back on top, jason alder back again, and candy finally on the board. she's been one of the biggest ZOE supporters since day one so seeing her earn it feels right. going live at 11:30 if you want to pull up on the leaderboard.</div>
+  <div class="meta" id="meta-x-gc">Click to copy</div>
+</div>
+
+<!-- ==================== Farcaster ==================== -->
+<div class="section-label">Farcaster</div>
+
+<div class="platform">
+  <h3>Farcaster - /zao Channel</h3>
+  <div class="post" onclick="copyPost(this, 'meta-fc-zao')">ZM march ZOLs from the Songjam Leaderboard are locked in. Season 2 Ep. 3.
+
+gold - ohnahji. second time on the podium. day 1 fractal participant, LTAE co-host, ranked 8 on the all-time Respect leaderboard with 1,581 Respect. consistency personified.
+
+silver - candytoybox. WaveWarZ co-founder and one of the earliest believers in ZOE. this one was a long time coming.
+
+bronze - jason alder. back again from Season 1. two-time ZOL energy.
+
+two repeats and one new face who earned it the hard way. going live on the leaderboard today at 11:30 AM EST. pull up and congratulate your ZOLs.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-fc-zao">Click to copy</div>
+</div>
+
+<div class="platform">
+  <h3>Farcaster - General</h3>
+  <div class="post" onclick="copyPost(this, 'meta-fc-gen')">ZM every month we recognize the top 3 on our community leaderboard as ZABAL Opinion Leaders - it's how we track who's showing up consistently across spaces and conversations.
+
+march ZOLs just dropped. two repeat winners and one new face who's been supporting the ecosystem behind the scenes for months. the people who show up eventually rise to the top.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-fc-gen">Click to copy</div>
+</div>
+
+<div class="platform">
+  <h3>Farcaster - Other Communities</h3>
+
+  <div class="channel-label">/songjam - leaderboard results from the ZABAL campaign</div>
+  <div class="post" onclick="copyPost(this, 'meta-fc-songjam')">ZM march leaderboard results are in. ohnahji gold, candytoybox silver, jason alder bronze. Season 2 Ep. 3 ZOLs. two repeats and a new face. going live at 11:30 AM EST today.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-fc-songjam">Click to copy</div>
+
+  <div class="channel-label">/music - recognizing people who show up for music community</div>
+  <div class="post" onclick="copyPost(this, 'meta-fc-music'" style="margin-top: 12px;">ZM we run a monthly leaderboard for our music community. march winners just dropped - an educator, a platform co-founder, and a consistent contributor. the people who show up for the culture always rise.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-fc-music">Click to copy</div>
+
+  <div class="channel-label">/base - ZABAL community recognition on Base</div>
+  <div class="post" onclick="copyPost(this, 'meta-fc-base')" style="margin-top: 12px;">ZM ZABAL Opinion Leaders for march are locked in. monthly recognition for the most active contributors on the Songjam Leaderboard. consistency wins every time.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-fc-base">Click to copy</div>
+
+  <div class="channel-label">/founders - community recognition as a retention tool</div>
+  <div class="post" onclick="copyPost(this, 'meta-fc-founders')" style="margin-top: 12px;">ZM been running a monthly recognition program for 4 months now. top 3 on our community leaderboard each month earn ZOL status. two of this month's winners are repeats - that's the signal that it's working. people want to come back.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-fc-founders">Click to copy</div>
+
+  <div class="channel-label">/nouns - ZAOndz connection, Nouns-style community governance</div>
+  <div class="post" onclick="copyPost(this, 'meta-fc-nouns')" style="margin-top: 12px;">ZM march ZOLs from the ZAO community. three people recognized for showing up across the ecosystem all month. repeat winners proving the program has staying power.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-fc-nouns">Click to copy</div>
+</div>
+
+<!-- ==================== Messaging ==================== -->
+<div class="section-label">Messaging</div>
+
+<div class="platform">
+  <h3>Telegram</h3>
+  <div class="post" onclick="copyPost(this, 'meta-tg')">ZM march ZOLs are official. ohnahji gold, candy silver, jason alder bronze. going live on the leaderboard at 11:30 AM EST today.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-tg">Click to copy</div>
+</div>
+
+<div class="platform">
+  <h3>Discord</h3>
+  <div class="post" onclick="copyPost(this, 'meta-dc')">ZM march ZOLs just announced. ohnahji back on top for gold, candy finally on the podium for silver, and jason alder repeating for bronze. two repeat ZOLs and one of the biggest ZOE supporters earning her spot. going live on the leaderboard at 11:30 AM EST - come through and show some love.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-dc">Click to copy</div>
+</div>
+
+<!-- ==================== Professional ==================== -->
+<div class="section-label">Professional / Personal</div>
+
+<div class="platform">
+  <h3>LinkedIn</h3>
+  <div class="post" onclick="copyPost(this, 'meta-li')">ZM every month we recognize the top contributors in our community through the ZABAL Opinion Leader program. the ZAO is a decentralized music community - and the leaderboard tracks who's showing up consistently across live spaces, conversations, and the ecosystem.
+
+march ZOLs just dropped. two repeat winners and one new face who's been supporting our AI agent project since before most people understood what it was. 4 months into this program and the same people keep earning it. that's the signal.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-li">Click to copy</div>
+</div>
+
+<div class="platform">
+  <h3>Facebook</h3>
+  <div class="post" onclick="copyPost(this, 'meta-fb')">ZM march community awards are in. every month we recognize the top 3 contributors in our music community - people who show up consistently to live conversations, support other members, and help build the culture.
+
+this month we had two repeat winners and someone new who's been quietly supporting us behind the scenes for months. really cool to see the people who put in the work get recognized.
+
+going live on the leaderboard today at 11:30 AM EST if anyone wants to tune in.
+
+paragraph.com/@thezao/year-of-the-zabal-day-97</div>
+  <div class="meta" id="meta-fb">Click to copy</div>
+</div>
+
+</body>
+</html>

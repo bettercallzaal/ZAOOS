@@ -27,7 +27,7 @@ export function buildLeaderboardPage(holders: HolderEntry[], baseUrl: string) {
   };
 
   const holderItems = holders.slice(0, 5).map((_h, i) => `holder_${i}`);
-  const holderElements: Record<string, any> = {};
+  const holderElements: Record<string, unknown> = {};
 
   holders.slice(0, 5).forEach((h, i) => {
     holderElements[`holder_${i}`] = {

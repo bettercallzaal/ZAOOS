@@ -15,3 +15,4 @@
 | 263 | [Obsidian Lean Team Model](./263-obsidian-lean-team-model/) | STANDALONE | Lessons from Obsidian's $350M valuation with 9 employees and 3 engineers |
 | 264 | [LinkedIn Build-in-Public Playbook](./264-linkedin-build-in-public-playbook/) | STANDALONE | Content strategy playbook for web3 builders on LinkedIn |
 | 322 | [Paragraph + Publish.new: Newsletter & Agent Commerce](./322-paragraph-publishnew-newsletter-agent-commerce/) | CANONICAL | Full Paragraph platform (API/SDK/MCP/coins), publish.new marketplace, x402/MPP agent payments, ZABAL promoter incentives, COC Concertz newsletter builder integration |
+| 324 | [ZABAL/SANG Wallet Agent & Tokenomics](./324-zabal-sang-wallet-agent-tokenomics/) | CANONICAL | Autonomous wallet agent system: 0x Swap API for ZABAL<>SANG trades, Privy agentic wallets, Base paymaster ($15K free gas), promoter reward schedule (50K ZABAL/newsletter), x402 agent commerce, 4-phase roadmap |

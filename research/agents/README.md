@@ -34,3 +34,6 @@
 | 267 | [OpenClaw Skills & Capabilities Reference](./267-openclaw-skills-capabilities/) | STANDALONE | All available OpenClaw skills, extensions, and channel integrations |
 | 268 | [Milady AI: ElizaOS Evolution](./268-milady-ai-elizaos-evolution/) | STANDALONE | Milady AI as next-gen ElizaOS distribution for desktop-first agents |
 | 278 | [Agentic Bootcamp vs ZAO Agent Squad](./278-agentic-bootcamp-zao-agent-squad/) | STANDALONE | Gap analysis between bootcamp curriculum and ZAO's 7-agent squad |
+| 290 | [FISHBOWLZ Agentic Participants](./290-fishbowlz-agentic-participants/) | STANDALONE | AI agents as persistent room participants in FISHBOWLZ audio spaces |
+| 318 | [Cassie Heart Multi-Agent Coordination](./318-cassie-multi-agent-coordination-bootcamp/) | STANDALONE | Bootcamp Session 10: persona engineering, softmax selection, Quilibrium free stack |
+| 325 | [ZABAL Agent Swarm Economy](./325-zabal-agent-swarm-economy/) | CANONICAL | 3 brand agents (ZOE/HERALD/FLIPPER) with Privy wallets, autonomous ZABAL trading via 0x API, x402 content commerce on publish.new, Vercel cron schedules, community governance, $45 seed to 5x volume |

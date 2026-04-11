@@ -13,3 +13,6 @@
 | 265 | [ClawDown Poker Agent (ZOE)](./265-clawdown-poker-agent/) | EVENT/LOG | ZOE competing live in the ClawDown poker agent challenge |
 | 270 | [ZAO Stock Planning](./270-zao-stock-planning/) | EVENT/LOG | ZAO Stock festival planning and knowledge base (October 2026) |
 | 274 | [ZAO Stock Team Deep Profiles](./274-zao-stock-team-deep-profiles/) | EVENT/LOG | Comprehensive profiles of every ZAO Stock team member |
+| 316 | [Agentic Bootcamp Week 2 Deep Dive](./316-farcaster-agentic-bootcamp-week2-deep-dive/) | CANONICAL | Sessions 6-9 full transcripts: Privy wallets, x402/MPP commerce, Emerge viral loop, ERC-8004 identity |
+| 317 | [Agentic Bootcamp Week 1 Transcripts](./317-farcaster-agentic-bootcamp-week1-transcripts/) | CANONICAL | Sessions 1-6 full transcripts: building blocks, miniapps, agents 101, memory/context, wallets, deploy |
+| 326 | [Agentic Bootcamp Complete Session Guide](./326-agentic-bootcamp-complete-session-guide/) | CANONICAL | All 10 sessions inventoried, cross-referenced across 6 docs, every technique extracted for ZABAL agent swarm |

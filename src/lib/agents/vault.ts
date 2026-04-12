@@ -4,6 +4,7 @@ import { getSwapQuote, getZabalPrice } from './swap';
 import { executeSwap } from './wallet';
 import { burnZabal } from './burn';
 import { postTradeUpdate } from './cast';
+import { maybeAutoStake } from './autostake';
 import { TOKENS, VAULT_SCHEDULE, type AgentAction } from './types';
 import { logger } from '@/lib/logger';
 
@@ -152,6 +153,9 @@ export async function runVault(): Promise<{
         return { action, status: 'skipped', details: `Unknown action: ${action}` };
       }
     }
+
+    // Check auto-stake every run (will only execute if 14+ days since last)
+    await maybeAutoStake('VAULT');
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     await logAgentEvent({

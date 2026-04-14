@@ -28,6 +28,8 @@
 | **2nd** | Candy | Milk Road/Impact3 sponsorship pipeline ($10-25K/send), grant knowledge |
 | Member | Tyler Stambaugh | JPMorgan + Accenture finance, Magnetiq COO, grant writing |
 | Member | Ohnahji B | Community fundraising, 5K NFTs minted, education-track funding |
+| Member | DFresh | |
+| Member | Craig G | |
 
 ### Design
 | Role | Person | Strengths |
@@ -86,6 +88,8 @@
 | Ohnahji B | | |
 | Swarthy Hatter | | |
 | DCoop | | |
+| DFresh | | |
+| Craig G | | |
 
 ---
 

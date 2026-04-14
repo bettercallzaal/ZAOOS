@@ -10,12 +10,12 @@ export async function GET() {
   try {
     const supabase = getSupabaseAdmin();
 
-    // Fetch active sessions
+    // Fetch active sessions (created by webhook with status = 'active')
     const { data: activeSessions, error: activeError } = await supabase
-      .from('fractal_live_sessions')
+      .from('fractal_sessions')
       .select('*')
       .eq('status', 'active')
-      .order('started_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (activeError) {
       logger.error('[fractal-live] Active sessions error:', activeError);
@@ -24,10 +24,11 @@ export async function GET() {
 
     // Fetch recent completed sessions (last 5)
     const { data: recentSessions, error: recentError } = await supabase
-      .from('fractal_live_sessions')
+      .from('fractal_sessions')
       .select('*')
       .eq('status', 'completed')
-      .order('completed_at', { ascending: false })
+      .not('discord_thread_id', 'is', null)
+      .order('created_at', { ascending: false })
       .limit(5);
 
     if (recentError) {
@@ -37,10 +38,10 @@ export async function GET() {
 
     // Fetch paused sessions too
     const { data: pausedSessions, error: pausedError } = await supabase
-      .from('fractal_live_sessions')
+      .from('fractal_sessions')
       .select('*')
       .eq('status', 'paused')
-      .order('started_at', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (pausedError) {
       logger.error('[fractal-live] Paused sessions error:', pausedError);

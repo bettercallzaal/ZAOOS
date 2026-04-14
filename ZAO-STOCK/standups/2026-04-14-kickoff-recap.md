@@ -5,7 +5,7 @@
 
 ## Attendance
 
-**Present:** Zaal, DCoop, Candy, Sean, FailOften
+**Present:** Zaal, DCoop, Candy, Shawn, FailOften
 **Absent:** DaNici (excused, will get recap), DFresh, Craig G, AttaBotty, Hurric4n3Ike, Ohnahji B, Tyler Stambaugh, Swarthy Hatter
 
 ---
@@ -48,7 +48,7 @@
 - **Lead:** DaNici
 - **2nd:** Candy
 - FailOften
-- Sean
+- Shawn
 
 #### Music (NEW - added during meeting)
 - **Lead:** Zaal (or DCoop - to be decided)
@@ -64,7 +64,7 @@
 - FailOften stays as member on Ops (not 2nd lead) due to busy schedule
 - 4th team (Music) created for artists, AV, event partnerships
 - Maceo added to Finance (media side)
-- Sean added to Design
+- Shawn added to Design
 
 ### 3. Venue Update (NEW INFO)
 
@@ -111,7 +111,7 @@
 
 ### 7. AI + Tooling Discussion
 
-- Zaal creating markdown files for FailOften and Sean to share with their AIs
+- Zaal creating markdown files for FailOften and Shawn to share with their AIs
 - Want to explore AI-to-AI communication between team members' agents
 - FailOften has ideas on this - needs a separate brainstorm session
 - Goal: context in one place, Discord bot that can answer questions about ZAO Stock
@@ -119,9 +119,9 @@
 ### 8. Design Priorities
 
 - **Brand kit for ZAO Festivals** - needed so all team members are aligned on visual identity
-- **T-shirt:** Sean to design a simple ZAO Stock t-shirt for print-on-demand, Zaal can start wearing it to promote
+- **T-shirt:** Shawn to design a simple ZAO Stock t-shirt for print-on-demand, Zaal can start wearing it to promote
 - **DCoop logo:** DCoop to create ZAOVille logo concepts, potential melded logo with ZAO Stock
-- **Design meeting:** Zaal + Sean + DaNici tomorrow afternoon
+- **Design meeting:** Zaal + Shawn + DaNici tomorrow afternoon
 
 ---
 
@@ -138,7 +138,7 @@
 - [ ] Build editable profile pages for team members (COC model - longer term)
 - [ ] Reply to Heart of Ellsworth venue contact to schedule in-person meeting
 - [ ] Change Discord standup to open stage format
-- [ ] Create markdown context files for FailOften and Sean's AIs
+- [ ] Create markdown context files for FailOften and Shawn's AIs
 - [ ] Merge PR #161 to push teams/partners to live site
 
 ### Zaal + FailOften
@@ -146,7 +146,7 @@
 - [ ] Discuss how to word Fractured Atlas fiscal partnership for sponsors
 - [ ] Bangor Savings Bank - prepare $1,000 sponsor application
 
-### Sean
+### Shawn
 - [ ] Design simple ZAO Stock t-shirt (logo on front) for print-on-demand
 - [ ] Send bio to Zaal
 
@@ -160,7 +160,7 @@
 - [ ] Brand kit for ZAO Festivals (design team to-do, not urgent)
 
 ### DaNici (absent - for recap)
-- [ ] Design meeting with Zaal + Sean tomorrow afternoon (April 15)
+- [ ] Design meeting with Zaal + Shawn tomorrow afternoon (April 15)
 
 ### FailOften
 - [ ] Send bio to Zaal

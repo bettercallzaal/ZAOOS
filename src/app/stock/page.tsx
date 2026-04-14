@@ -69,13 +69,13 @@ const TEAMS = [
     name: 'Design',
     lead: 'DaNici',
     second: 'Candy',
-    members: ['FailOften', 'Sean'],
+    members: ['FailOften', 'Shawn'],
   },
   {
     name: 'Music',
     lead: 'Zaal',
     second: 'DCoop',
-    members: ['AttaBotty'],
+    members: ['AttaBotty', 'Shawn'],
   },
 ];
 

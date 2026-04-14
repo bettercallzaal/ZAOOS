@@ -39,7 +39,7 @@
 | **Lead** | DaNici | Blender, animation, digital painting, festival visual identity |
 | **2nd** | Candy | ZAO #2, WaveWarZ branding, dApp design, 557 GitHub contributions |
 | Member | FailOften | Processing/TouchDesigner/Resolume for live visuals, Times Square projections |
-| Member | Sean | |
+| Member | Shawn | |
 
 ### Music (Added April 14)
 | Role | Person | Strengths |
@@ -47,6 +47,7 @@
 | **Lead** | Zaal (or DCoop - TBD) | |
 | **2nd** | DCoop (or Zaal) | Hip-hop artist, ZAOVille organizer, WaveWarZ participant |
 | Member | AttaBotty | 20+ years production, electronic musician, NFTNYC/Art Basel, AV |
+| Member | Shawn | |
 
 *Also handles: partnerships with other events, promo at NFTNYC etc., musician outreach. Reusable across future events (ZAOVille, WaveWarZ live, etc.)*
 
@@ -91,7 +92,7 @@
 
 ### April 14, 2026 - Kickoff Meeting
 
-**Present:** Zaal, DCoop, Candy, Sean, FailOften
+**Present:** Zaal, DCoop, Candy, Shawn, FailOften
 **Absent:** DaNici (excused), DFresh, Craig G, AttaBotty, Hurric4n3Ike, Ohnahji B, Tyler Stambaugh, Swarthy Hatter
 
 **Key Decisions:**
@@ -112,9 +113,9 @@
 - [ ] Zaal + FailOften: Brainstorm AI-to-AI communication for team coordination
 - [ ] Zaal + FailOften: Discuss Fractured Atlas wording for sponsors
 - [ ] Zaal + FailOften: Prepare Bangor Savings Bank sponsor application
-- [ ] Sean: Design simple ZAO Stock t-shirt for print-on-demand
+- [ ] Shawn: Design simple ZAO Stock t-shirt for print-on-demand
 - [ ] DCoop: Create ZAOVille logo concepts + explore melded logo
-- [ ] DaNici + Sean + Zaal: Design meeting tomorrow (April 15) afternoon
+- [ ] DaNici + Shawn + Zaal: Design meeting tomorrow (April 15) afternoon
 - [ ] Candy: Brand kit for ZAO Festivals (not urgent)
 
 **Full recap:** [2026-04-14-kickoff-recap.md](2026-04-14-kickoff-recap.md)

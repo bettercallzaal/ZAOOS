@@ -56,25 +56,32 @@ const TEAMS = [
   {
     name: 'Operations',
     lead: 'Zaal',
-    second: 'AttaBotty',
-    members: ['FailOften', 'Hurric4n3Ike', 'Swarthy Hatter', 'DCoop'],
+    second: 'Candy',
+    members: ['FailOften', 'Hurric4n3Ike', 'Swarthy Hatter'],
   },
   {
     name: 'Finance',
     lead: 'Zaal',
-    second: 'Candy',
-    members: ['Tyler Stambaugh', 'Ohnahji B'],
+    second: '',
+    members: ['Tyler Stambaugh', 'Ohnahji B', 'DFresh', 'Craig G', 'Maceo'],
   },
   {
     name: 'Design',
     lead: 'DaNici',
     second: 'Candy',
-    members: ['FailOften', 'AttaBotty'],
+    members: ['FailOften', 'Sean'],
+  },
+  {
+    name: 'Music',
+    lead: 'Zaal',
+    second: 'DCoop',
+    members: ['AttaBotty'],
   },
 ];
 
 const PARTNERS = [
   { name: 'Heart of Ellsworth', role: 'Venue + MCW statewide promotion', confirmed: true },
+  { name: 'Town of Ellsworth', role: 'Parklet venue', confirmed: true },
   { name: 'Fractured Atlas', role: '501(c)(3) fiscal sponsor', confirmed: true },
   { name: 'Black Moon Public House', role: 'After-party venue', confirmed: false },
   { name: 'Wallace Events', role: 'Tent rental + weather backup', confirmed: false },
@@ -160,10 +167,12 @@ export default function StockPage() {
                       {team.lead}
                       <span className="text-[10px] text-[#f5a623]/60">Lead</span>
                     </span>
+                    {team.second && (
                     <span className="inline-flex items-center gap-1 text-xs bg-white/[0.04] text-gray-300 border border-white/[0.08] rounded-full px-2.5 py-1">
                       {team.second}
                       <span className="text-[10px] text-gray-500">2nd</span>
                     </span>
+                    )}
                     {team.members.map((m) => (
                       <span key={m} className="text-xs bg-white/[0.04] text-gray-400 border border-white/[0.06] rounded-full px-2.5 py-1">
                         {m}

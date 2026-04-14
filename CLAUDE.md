@@ -158,6 +158,9 @@ To reduce token consumption, follow these rules:
 - Edit prompts instead of sending corrections as follow-ups
 - Schedule Opus-heavy work outside peak hours (5:00-11:00 AM PT weekdays)
 
+**Compact instructions:**
+When compacting, preserve: modified file paths, test commands, architecture decisions, API contracts. Drop: exploration output, grep results, file contents already committed.
+
 **Research queries:**
 - If Graphify is installed, use `/graphify query "question"` instead of reading raw research files
 - For targeted lookups, use `grep` across `research/*/README.md` — don't read entire docs unless needed

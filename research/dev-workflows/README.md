@@ -40,3 +40,9 @@
 | 301 | [Developer Tooling Roundup 2026](./301-developer-tooling-roundup-2026/) | STANDALONE | last30days, Nia Docs, OpenClaw content engine, AI Employee pattern, tool evaluations |
 | 302 | [AI Content Engine & Automation](./302-ai-content-engine-automation-patterns/) | STANDALONE | Brand voice skill, SEO cherry-picks, content workflow enhancement, quote-cast pattern |
 | 303 | [Daily AI Skill Building Curriculum](./303-daily-ai-skill-building-curriculum/) | STANDALONE | 30-day learning plan, ZOE daily tips, codebase improvements, tool mastery |
+| 306 | [Web Scraping & AI Agents](./306-web-scraping-ai-agents/) | STANDALONE | Web scraping tools for AI agents |
+| 319 | [X/Twitter Scraping Tools 2026](./319-x-twitter-scraping-tools-2026/) | STANDALONE | Twitter scraping tools evaluation |
+| 321 | [WorktreeHQ Git Branching Strategy](./321-worktreehq-git-branching-strategy/) | STANDALONE | Git worktree-based branching for parallel Claude Code sessions |
+| 353 | [Claude Code Token Optimization v2](./353-claude-code-token-optimization-v2/) | STANDALONE | Updated token strategy - .claudeignore, thinking cap, subagent routing, caveman |
+| 354 | [Local LLM Coding Alternatives (Hermes)](./354-local-llm-coding-alternatives-hermes/) | STANDALONE | Local LLM alternatives for coding when Claude limits are hit |
+| 357 | [Caveman: Token Compression Skill](./357-caveman-token-compression-skill/) | STANDALONE | Caveman plugin - 65-75% output token savings, full optimization stack status |

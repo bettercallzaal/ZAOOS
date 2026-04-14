@@ -181,9 +181,10 @@ When compacting, preserve: modified file paths, test commands, architecture deci
 
 | Technique | Token Savings | Already Done? | Effort |
 |-----------|--------------|---------------|--------|
-| MAX_THINKING_TOKENS=10000 | 30-50% per complex response | No | 1 min |
-| .claudeignore | 10-20% per session (indexing) | No | 2 min |
-| Subagent model=haiku | 60-80% per subagent call | No | 1 min |
+| MAX_THINKING_TOKENS=10000 | 30-50% per complex response | YES (Apr 13) | 1 min |
+| .claudeignore | 10-20% per session (indexing) | YES (Apr 13) | 2 min |
+| Subagent model=haiku | 60-80% per subagent call | YES (Apr 13) | 1 min |
+| Caveman plugin | 65-75% output tokens | YES (Apr 14) - see Doc 357 | 1 min |
 | /compact every 15 msgs | 60-70% context reduction | Partial (advice exists, not habit) | Habit |
 | /effort low for simple tasks | 20-40% per simple task | No | Habit |
 | Test output filter hook | 10K+ tokens per test run | No | 5 min |

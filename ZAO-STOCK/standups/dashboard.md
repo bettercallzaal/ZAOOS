@@ -28,6 +28,8 @@
 | **2nd** | Candy | Milk Road/Impact3 sponsorship pipeline ($10-25K/send), grant knowledge |
 | Member | Tyler Stambaugh | JPMorgan + Accenture finance, Magnetiq COO, grant writing |
 | Member | Ohnahji B | Community fundraising, 5K NFTs minted, education-track funding |
+| Member | DFresh | |
+| Member | Craig G | |
 
 ### Design
 | Role | Person | Strengths |
@@ -68,24 +70,6 @@
 | 0xSplits | Transparent artist payment splits |
 | ZAO OS livestream | Built-in, non-negotiable for the event |
 | POAP | Attendance tokens for attendees |
-
----
-
-## Attendance Log
-
-### April 14, 2026 - Kickoff
-| Name | Present | Notes |
-|------|---------|-------|
-| Zaal | | |
-| AttaBotty | | |
-| DaNici | | |
-| FailOften | | |
-| Hurric4n3Ike | | |
-| Candy | | |
-| Tyler Stambaugh | | |
-| Ohnahji B | | |
-| Swarthy Hatter | | |
-| DCoop | | |
 
 ---
 

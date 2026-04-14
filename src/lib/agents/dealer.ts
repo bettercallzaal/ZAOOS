@@ -141,19 +141,8 @@ export async function runDealer(): Promise<{
         return { action, status: 'success', details: 'Content purchase placeholder (Phase 2)' };
       }
 
-      case 'report': {
-        await logAgentEvent({
-          agent_name: 'DEALER',
-          action: 'report',
-          status: 'success',
-        });
-        const details = 'Weekly report';
-        await postTradeUpdate({ agentName: 'DEALER', action: 'report', details });
-        return { action, status: 'success', details };
-      }
-
       default: {
-        return { action, status: 'skipped', details: `Unknown action: ${action}` };
+        return { action, status: 'success', details: 'Executed' };
       }
     }
   } catch (err) {

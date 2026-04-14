@@ -73,26 +73,6 @@
 
 ---
 
-## Attendance Log
-
-### April 14, 2026 - Kickoff
-| Name | Present | Notes |
-|------|---------|-------|
-| Zaal | | |
-| AttaBotty | | |
-| DaNici | | |
-| FailOften | | |
-| Hurric4n3Ike | | |
-| Candy | | |
-| Tyler Stambaugh | | |
-| Ohnahji B | | |
-| Swarthy Hatter | | |
-| DCoop | | |
-| DFresh | | |
-| Craig G | | |
-
----
-
 ## Weekly Notes
 
 ### April 14, 2026 - Kickoff Meeting

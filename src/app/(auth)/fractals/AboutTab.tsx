@@ -97,6 +97,7 @@ export function AboutTab() {
           { title: 'Collaboration', desc: 'Teamwork, uplifting others, supporting the group' },
           { title: 'Innovation', desc: 'Creative thinking, groundbreaking ideas' },
           { title: 'Onboarding', desc: 'Helping newcomers join ZAO and Web3' },
+          { title: 'Supporting ZAO Community Members', desc: 'Amplifying work on socials, attending shows, buying merch, or supporting them beyond the group' },
         ].map(c => (
           <div key={c.title} className="flex gap-2">
             <span className="text-[#f5a623] text-xs mt-0.5">-</span>

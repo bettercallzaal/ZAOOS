@@ -22,3 +22,5 @@
 | 184 | [Superchain ORDAO & Cross-Chain Fractal](./184-superchain-ordao-crosschain-fractal/) | STANDALONE | Cross-chain Respect, Hats integration, Eden Fractal Epoch 2, Optimism grants |
 | 188 | [ZAO Fractal Bot & Process](./188-zao-fractal-bot-process/) | STANDALONE | Actual ZAO fractal process, Discord bot, and ZAO OS integration opportunities |
 | 285 | [ORDAO & ORFrapps Updated Docs](./285-ordao-orfrapps-updated-docs/) | STANDALONE | Updated ORDAO architecture, orfrapps CLI + config system, deployment walkthrough, ZAO integration map |
+| 355 | [ZAO Fractal Presentation (April 2026)](./355-zao-fractal-presentation-april-2026/) | STANDALONE | Updated 9-slide onboarding deck: token definitions, voting criteria, Discord bot timer + consensus flow |
+| 356 | [ZAO Fractal TODOs & Status](./356-zao-fractal-todos-status/) | CANONICAL | Full audit: 7 tabs built, 12 API routes, 32 TODOs prioritized P0-P5, webhook connected |

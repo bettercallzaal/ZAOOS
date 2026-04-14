@@ -97,7 +97,7 @@ export async function runVault(): Promise<{
         await postTradeUpdate({ agentName: 'VAULT', action: 'buy_zabal', details: buyZabalDetails, txHash: hash });
 
         logger.info(`[VAULT] buy_zabal: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} ZABAL`);
-        return { action, status: 'success', details: buyZabalDetails };
+        break;
       }
 
       case 'buy_sang': {
@@ -127,7 +127,7 @@ export async function runVault(): Promise<{
         await postTradeUpdate({ agentName: 'VAULT', action: 'buy_sang', details: buySangDetails, txHash: sangHash });
 
         logger.info(`[VAULT] buy_sang: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} SANG`);
-        return { action, status: 'success', details: buySangDetails };
+        break;
       }
 
       case 'buy_content': {
@@ -138,24 +138,15 @@ export async function runVault(): Promise<{
           status: 'success',
           error_message: 'Content purchases not yet wired (Phase 2)',
         });
-        return { action, status: 'success', details: 'Content purchase placeholder (Phase 2)' };
-      }
-
-      case 'report': {
-        await logAgentEvent({
-          agent_name: 'VAULT',
-          action: 'report',
-          status: 'success',
-        });
-        const reportDetails = 'Weekly report';
-        await postTradeUpdate({ agentName: 'VAULT', action: 'report', details: reportDetails });
-        return { action, status: 'success', details: reportDetails };
+        break;
       }
 
       default: {
-        return { action, status: 'skipped', details: `Unknown action: ${action}` };
+        break;
       }
     }
+
+    return { action, status: 'success', details: 'Cron run complete' };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     await logAgentEvent({

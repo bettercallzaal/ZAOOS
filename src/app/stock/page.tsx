@@ -97,12 +97,20 @@ export default function StockPage() {
             <h1 className="text-lg font-bold text-white">ZAO Stock</h1>
             <p className="text-xs text-gray-400">Community Music Festival</p>
           </div>
-          <Link
-            href="/"
-            className="text-sm text-[#f5a623] hover:text-[#ffd700] transition-colors"
+          <div className="flex items-center gap-3">
+            <Link
+              href="/stock/team"
+              className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
+            >
+              Team Login
+            </Link>
+            <Link
+              href="/"
+              className="text-sm text-[#f5a623] hover:text-[#ffd700] transition-colors"
           >
             The ZAO
           </Link>
+          </div>
         </div>
       </header>
 

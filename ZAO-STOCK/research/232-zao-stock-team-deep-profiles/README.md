@@ -495,13 +495,18 @@ Team profiles reference these codebase components:
 - **16 repos** — wavewarz-intelligence, analytics, homepage redesign, merch shop, Base L2 contracts
 - **wavewarz-base:** Deployed Solidity smart contracts on Base (8/8 tests, A+ audit)
 
+### Updated Bio (April 2026 - from Candy directly)
+
+Samantha "Candy" Kinney is a Web3 operator, product tester, and AI-powered builder. Background in hospitality, branding, and business operations. Known for jumping into early-stage products, pushing them to their limits, uncovering where things break, then translating that into clear improvements, content, and growth. Co-founder of The ZAO and WaveWarz. Behind ZAO Festival experiences like ZAO-Chella and ZAO-Palooza. Early adopter of AI coding tools and agentic systems - built 200+ apps while testing platforms like Ohara, Replit, and emerging AI builders. Hosts daily X Spaces and leads vibe coding sessions.
+
 ### ZAO Stock Role
-**Design Lead + Marketing/Branding + Dev + Sponsorship Knowledge**
+**Design Lead + Marketing/Branding + Dev + Sponsorship Knowledge + AI Builder**
 - Designs all festival branding, materials, digital assets
 - Builds the ZAO Stock web presence / event page
 - Past Milk Road/Impact3 experience = knows how sponsorship pipelines work at scale ($10-25K/send)
 - Can deploy onchain tooling (attendance tokens, payment splits on Base)
-- CC0 artist = public domain graphics for ZAO/WaveWarZ branding
+- 200+ apps built with AI tools - can rapidly prototype and test festival tooling
+- Product testing mindset - finds where things break before users do
 
 ---
 

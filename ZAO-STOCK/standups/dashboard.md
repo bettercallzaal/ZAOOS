@@ -12,7 +12,7 @@
 | Role | Person | Strengths |
 |------|--------|-----------|
 | **Lead** | Zaal | ZAO founder, project vision, tech, partnerships |
-| **2nd** | Candy | Milk Road/Impact3 ops experience, ZAO #2, ships code |
+| **2nd** | Candy | ZAO co-founder, 200+ AI-built apps, product testing, sponsorship ops (Milk Road/Impact3) |
 | Member | FailOften | NEA/Warhol-funded installations, KCAI professor, Processing/TouchDesigner |
 | Member | Hurric4n3Ike | Live entertainment, WaveWarZ (647 battles), performing artist |
 | Member | Swarthy Hatter | Media/content capture, cross-fractal community bridging |
@@ -37,7 +37,7 @@
 | Role | Person | Strengths |
 |------|--------|-----------|
 | **Lead** | DaNici | Blender, animation, digital painting, festival visual identity |
-| **2nd** | Candy | ZAO #2, WaveWarZ branding, dApp design, 557 GitHub contributions |
+| **2nd** | Candy | ZAO co-founder, WaveWarZ branding, 200+ AI-built apps, rapid prototyping |
 | Member | FailOften | Processing/TouchDesigner/Resolume for live visuals, Times Square projections |
 | Member | Shawn | |
 

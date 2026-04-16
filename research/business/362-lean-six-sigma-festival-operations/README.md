@@ -152,10 +152,124 @@ A skill that can be invoked on any process to identify waste and suggest improve
 
 ---
 
+---
+
+## Deep Dive: Value Stream Maps Per Team
+
+Each team has a distinct value stream. Map it once, reference every week.
+
+### Operations Value Stream
+```
+Input: Task/decision needed
+  > Identify owner (dashboard)
+  > Owner reviews (48hr SLA)
+  > Execute or delegate
+  > Update dashboard status
+  > Report at standup
+Output: Task done, dashboard updated
+```
+**Key waste risk:** Waiting (Zaal is bottleneck on too many decisions). Fix: delegate authority to team leads for anything under $500 and non-venue decisions.
+
+### Finance Value Stream
+```
+Input: Funding need identified
+  > Research source (Giveth/GoFundMe/sponsor/grant)
+  > Draft pitch/application
+  > Submit/send
+  > Follow up (7-day cycle)
+  > Close or move to next target
+Output: Money in or clear "no"
+```
+**Key waste risk:** Over-processing (perfecting pitch decks before sending anything). Fix: send the first version within 48 hours, iterate based on responses.
+
+### Design Value Stream
+```
+Input: Visual asset needed
+  > Brief from requesting team (1 sentence + reference)
+  > First draft (72hr)
+  > One round of feedback
+  > Final version
+Output: Asset delivered + stored in shared folder
+```
+**Key waste risk:** Defects (verbal briefs leading to mismatched expectations). Fix: written brief template - what, where it's used, size, deadline.
+
+### Music Value Stream
+```
+Input: Artist identified
+  > Research (profile, travel, availability)
+  > Outreach (DM/email)
+  > Confirm interest
+  > Lock travel logistics
+  > Add to lineup
+Output: Artist confirmed with travel booked
+```
+**Key waste risk:** Inventory (huge wishlist with no outreach). Fix: max 3 artists in outreach at a time, don't add more until current batch responds.
+
+---
+
+## Deep Dive: Kaizen Sprints for ZAO Stock
+
+A Kaizen sprint is a 3-5 day focused push where a small team solves one specific problem. Not the weekly grind - a concentrated burst.
+
+### When to use a Kaizen sprint:
+- A critical path item is stuck for 2+ weeks
+- A handoff between teams keeps failing
+- The same problem keeps appearing at standups
+
+### ZAO Stock Kaizen sprint format (adapted for volunteers):
+
+| Day | Focus | Output |
+|-----|-------|--------|
+| **Day 1** (2 hrs) | Define the problem. Map current state. | Problem statement + current state diagram |
+| **Day 2** (2 hrs) | Root cause analysis. 5 Whys on each bottleneck. | Root causes identified |
+| **Day 3** (2 hrs) | Design future state. Propose changes. | Future state map + action list |
+| **Day 4** (execute) | Implement changes. Ship immediately. | Changes live |
+| **Day 5** (1 hr) | Review. Did it work? Keep or revert. | Decision + lessons logged |
+
+**Key adaptation:** Manufacturing does 8hr/day for 5 days. Volunteers can't do that. 2-hour blocks over a week work for ZAO. Run it in a dedicated Discord thread so async participation works.
+
+### Suggested first Kaizen sprint: Sponsorship Outreach
+- **Problem:** 0 sponsors contacted after 2 weeks
+- **Root cause:** No pitch deck, unclear Fractured Atlas wording, no clear ask
+- **Sprint goal:** Send first 3 sponsor pitches by end of sprint
+
+---
+
+## Deep Dive: Lean Metrics Dashboard
+
+The `/stock/team` dashboard already has todos. Add these lean-specific views:
+
+### Cycle Time Tracking
+How long does a task take from creation to done?
+- **Target:** < 7 days for standard tasks, < 3 days for urgent
+- **Measure:** `created_at` to `updated_at` when status = 'done'
+- **Action:** Any task open > 14 days gets reviewed at standup - is it too big? Blocked? Dead?
+
+### Work In Progress (WIP) Limits
+- **Operations:** Max 5 active (in_progress) todos
+- **Finance:** Max 3 active todos
+- **Design:** Max 3 active todos
+- **Music:** Max 3 active todos
+- **Action:** If a team hits WIP limit, finish something before starting anything new
+
+### Throughput
+Tasks completed per week per team. Track over time to see if velocity is improving.
+
+| Week | Ops | Finance | Design | Music | Total |
+|------|-----|---------|--------|-------|-------|
+| Apr 14 | - | - | - | - | Baseline |
+| Apr 22 | | | | | |
+| Apr 29 | | | | | |
+
+---
+
 ## Sources
 
 - [EventOPS: How to Run a Lean Event Using Six Sigma](https://eventops.com/resources/2019/1/21/how-to-run-a-lean-event-using-six-sigma)
 - [ISSSP: Lean Six Sigma in Meeting Effectiveness and Event Management](https://isssp.org/lean-six-sigma-in-meeting-effectiveness-and-event-management/)
 - [GoLeanSixSigma: DMAIC Five Basic Phases](https://goleansixsigma.com/dmaic-five-basic-phases-of-lean-six-sigma/)
 - [ASQ: Six Sigma Definition](https://asq.org/quality-resources/six-sigma)
+- [ASQ: Value Stream Mapping Tutorial](https://asq.org/quality-resources/value-stream-mapping)
+- [KaiNexus: What is a Kaizen Event](https://blog.kainexus.com/improvement-disciplines/kaizen/kaizen-events/what-is-a-kaizen-event-your-complete-guide-rapid-improvement)
+- [Kaizen.com: Rapid Improvement Event](https://kaizen.com/insights/rapid-improvement-event-continuous-improvement/)
 - Doc 263: Obsidian's Lean Team Model (internal research)

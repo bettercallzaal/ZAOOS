@@ -438,3 +438,12 @@ No other festival combines:
 - [Giveth](https://giveth.io/)
 - Doc 362: Lean Six Sigma for Festival Operations
 - Doc 363: People + Brands Profile Index
+- [Ellsworth Chamber of Commerce](https://www.ellsworthchamber.org/)
+- [WERU Community Radio](https://weru.org/)
+- [One Love Art DAO](https://onelovedao.org/)
+- [Audius](https://audius.org/)
+- [Base Onchain Summer](https://www.coinbase.com/blog/onchain-summer-is-here)
+- [Fogtown Brewing](https://www.fogtownbrewing.com/)
+- [Black Moon Public House](https://www.blackmoonpublichouse.com/)
+- [Maine Arts Commission Grants](https://mainearts.maine.gov/Pages/Funding/Grants-Home)
+- [NEFA Grant Programs](https://www.nefa.org/grants-programs/grant-programs)

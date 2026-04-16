@@ -63,7 +63,11 @@ export async function getZabalPrice(): Promise<number> {
     headers: { '0x-api-key': apiKey },
   });
 
-  if (!res.ok) return 0.0000001429; // fallback to last known price
+  if (!res.ok) {
+    // Price API unavailable -- throw instead of using stale fallback.
+    // Caller should skip trade when price is unknown.
+    throw new Error('ZABAL price unavailable (0x API down). Trade skipped.');
+  }
   const data = await res.json();
   // price = USDC received per 1M ZABAL
   return parseFloat(data.price) / 1_000_000;

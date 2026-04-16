@@ -1,4 +1,5 @@
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import type { AgentName, AgentAction } from './types';
 
 export async function logAgentEvent(params: {
@@ -17,7 +18,7 @@ export async function logAgentEvent(params: {
   const db = getSupabaseAdmin();
   const { error } = await db.from('agent_events').insert(params);
   if (error) {
-    console.error(`[${params.agent_name}] Failed to log event:`, error.message);
+    logger.error(`[${params.agent_name}] Failed to log event: ${error.message}`);
   }
 }
 

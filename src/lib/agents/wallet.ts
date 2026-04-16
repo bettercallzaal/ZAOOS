@@ -36,6 +36,11 @@ function getPrivy(): PrivyClient {
   return _privy;
 }
 
+/** Reset cached Privy client on auth errors so next call creates fresh one */
+function resetPrivy(): void {
+  _privy = null;
+}
+
 const WALLET_ID_MAP: Record<AgentName, string> = {
   VAULT: 'VAULT_WALLET_ID',
   BANKER: 'BANKER_WALLET_ID',
@@ -63,20 +68,29 @@ export async function executeSwap(
 
   logger.info(`[${agentName}] Sending swap tx to ${quoteData.to} via Privy`);
 
-  const response = await privy.wallets().ethereum().sendTransaction(walletId, {
-    caip2: BASE_CAIP2,
-    params: {
-      transaction: {
-        to: quoteData.to,
-        data: quoteData.data,
-        value: quoteData.value,
-        chain_id: 8453,
+  try {
+    const response = await privy.wallets().ethereum().sendTransaction(walletId, {
+      caip2: BASE_CAIP2,
+      params: {
+        transaction: {
+          to: quoteData.to,
+          data: quoteData.data,
+          value: quoteData.value,
+          chain_id: 8453,
+        },
       },
-    },
-  });
+    });
 
-  logger.info(`[${agentName}] TX submitted: ${response.hash}`);
-  return response.hash;
+    logger.info(`[${agentName}] TX submitted: ${response.hash}`);
+    return response.hash;
+  } catch (err) {
+    // Reset cached client on auth errors so next call retries fresh
+    if (err instanceof Error && (err.message.includes('401') || err.message.includes('auth') || err.message.includes('Unauthorized'))) {
+      resetPrivy();
+      logger.error(`[${agentName}] Privy auth error, resetting client: ${err.message}`);
+    }
+    throw err;
+  }
 }
 
 /**
@@ -97,18 +111,26 @@ export async function sendToken(
 
   logger.info(`[${agentName}] Token transfer to ${to} via Privy`);
 
-  const response = await privy.wallets().ethereum().sendTransaction(walletId, {
-    caip2: BASE_CAIP2,
-    params: {
-      transaction: {
-        to: tokenAddress,
-        data,
-        value: '0x0',
-        chain_id: 8453,
+  try {
+    const response = await privy.wallets().ethereum().sendTransaction(walletId, {
+      caip2: BASE_CAIP2,
+      params: {
+        transaction: {
+          to: tokenAddress,
+          data,
+          value: '0x0',
+          chain_id: 8453,
+        },
       },
-    },
-  });
+    });
 
-  logger.info(`[${agentName}] Token transfer: ${response.hash}`);
-  return response.hash;
+    logger.info(`[${agentName}] Token transfer: ${response.hash}`);
+    return response.hash;
+  } catch (err) {
+    if (err instanceof Error && (err.message.includes('401') || err.message.includes('auth') || err.message.includes('Unauthorized'))) {
+      resetPrivy();
+      logger.error(`[${agentName}] Privy auth error, resetting client: ${err.message}`);
+    }
+    throw err;
+  }
 }

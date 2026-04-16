@@ -67,15 +67,20 @@
 | **Socials** | Twitter, LinkedIn, Instagram, TikTok, YouTube, Discord (via Web3 Metal) |
 | **ZAO Stock Role** | Design + Music team member. Designing ZAO Stock t-shirt. |
 
-### New Profile: DFresh (Doug)
+### New Profile: DFresh / DFreshmaker (Doug)
 
 | Field | Detail |
 |-------|--------|
-| **Name** | Doug (goes by DFresh) |
-| **Title** | Maker |
-| **Background** | Festival experience (details TBD from him) |
+| **Name** | Doug (DFreshmaker, DFreshmaker.eth) |
+| **X** | [@TheDFreshmaker](https://x.com/TheDFreshmaker) |
+| **Medium** | [@TheDfreshmaker](https://medium.com/@TheDfreshmaker) - 11+ articles, 19 followers |
+| **Title** | Founder, Freshmaker Industries Web3 Music |
+| **Other role** | VP of Strategic Partnerships at NftFrost (Jack Frost's project) |
+| **Background** | Financial services background - understands blockchain's intersection with musicians' careers |
+| **What he does** | Music NFT curator/tastemaker. Created "Superf3st x DFresh Selects" weekly mixtape series (11+ volumes). Non-gatekeeping Web3 music curation. |
+| **Web3 music** | Hosted first-ever artist listening party + NFT drop on Club Space (Lens Protocol). Tested Lens tech with NftFrost. Active music NFT collector. |
+| **Key value** | Knows Web3 music NFT space deeply, has partnerships experience (VP role), financial services background useful for festival finance |
 | **ZAO Stock Role** | Finance team member |
-| **Status** | Need full bio, links, and specific background from him directly |
 
 ### New Profile: Craig G (Craig Gonzalez)
 

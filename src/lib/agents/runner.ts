@@ -20,9 +20,39 @@ export interface AgentRunResult {
   details: string;
 }
 
+/** Fetch live ETH/USD price from 0x. Falls back to $2500 if API down. */
+async function getEthPrice(): Promise<number> {
+  try {
+    const apiKey = process.env.ZX_API_KEY;
+    if (!apiKey) return 2500;
+
+    const res = await fetch(
+      `https://api.0x.org/swap/v1/price?chainId=8453&sellToken=0x4200000000000000000000000000000000000006&buyToken=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&sellAmount=1000000000000000000`,
+      { headers: { '0x-api-key': apiKey } }
+    );
+    if (!res.ok) return 2500;
+    const data = await res.json();
+    // price = USDC per 1 ETH
+    return parseFloat(data.price) || 2500;
+  } catch {
+    return 2500; // safe fallback -- ETH price doesn't need to be exact for trade sizing
+  }
+}
+
+/** Retry a function once with delay */
+async function withRetry<T>(fn: () => Promise<T>, delayMs = 5000): Promise<T> {
+  try {
+    return await fn();
+  } catch (firstErr) {
+    logger.warn(`Retrying after ${delayMs}ms: ${firstErr instanceof Error ? firstErr.message : firstErr}`);
+    await new Promise((r) => setTimeout(r, delayMs));
+    return fn();
+  }
+}
+
 /**
  * Run the standard agent routine for any agent.
- * Checks config, budget, executes buy_zabal, burns, posts, auto-stakes.
+ * Checks config, budget, balance, executes buy_zabal, burns, posts, auto-stakes.
  */
 export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
   const config = await getAgentConfig(agentName);
@@ -50,6 +80,9 @@ export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
     return { action: 'buy_zabal', status: 'skipped', details: `Budget exceeded ($${spent.toFixed(2)})` };
   }
 
+  // Get live ETH price for accurate trade sizing
+  const ethPrice = await getEthPrice();
+
   // Trade amount with random noise ($0.30-$0.70)
   const baseAmount = 0.50;
   const noise = (Math.random() - 0.5) * 0.40;
@@ -59,7 +92,7 @@ export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
     // Auto-stake check (14-day cycle)
     await maybeAutoStake(agentName);
 
-    // Get price -- if API fails, skip trade entirely (no stale fallback)
+    // Get ZABAL price -- skip trade if price API down
     let zabalPrice: number;
     try {
       zabalPrice = await getZabalPrice();
@@ -78,14 +111,18 @@ export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
       return { action: 'buy_zabal', status: 'skipped', details: 'Price above ceiling' };
     }
 
-    // Execute trade
-    const ethAmount = Math.floor((tradeUsd / 2500) * 1e18);
-    const quote = await getSwapQuote({
-      sellToken: TOKENS.WETH,
-      buyToken: TOKENS.ZABAL,
-      sellAmount: String(ethAmount),
-      takerAddress: config.wallet_address,
-    });
+    // Calculate ETH amount using live price (not hardcoded $2500)
+    const ethAmount = Math.floor((tradeUsd / ethPrice) * 1e18);
+
+    // Get swap quote with 1 retry
+    const quote = await withRetry(() =>
+      getSwapQuote({
+        sellToken: TOKENS.WETH,
+        buyToken: TOKENS.ZABAL,
+        sellAmount: String(ethAmount),
+        takerAddress: config.wallet_address,
+      })
+    );
 
     const hash = await executeSwap(agentName, quote);
     await burnZabal(agentName, BigInt(quote.buyAmount));
@@ -102,10 +139,10 @@ export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
       status: 'success',
     });
 
-    const details = `Bought ${quote.buyAmount} ZABAL for ~$${tradeUsd.toFixed(2)}`;
+    const details = `Bought ${quote.buyAmount} ZABAL for ~$${tradeUsd.toFixed(2)} (ETH@$${ethPrice.toFixed(0)})`;
     await postTradeUpdate({ agentName, action: 'buy_zabal', details, txHash: hash });
 
-    logger.info(`[${agentName}] buy_zabal: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} ZABAL`);
+    logger.info(`[${agentName}] buy_zabal: $${tradeUsd.toFixed(2)} -> ${quote.buyAmount} ZABAL (ETH@$${ethPrice.toFixed(0)})`);
     return { action: 'buy_zabal', status: 'success', details };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

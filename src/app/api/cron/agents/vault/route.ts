@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runVault } from '@/lib/agents/vault';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/cron/agents/vault
@@ -18,11 +19,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const result = await runVault();
+  try {
+    const result = await runVault();
 
-  return NextResponse.json({
-    agent: 'VAULT',
-    ...result,
-    timestamp: new Date().toISOString(),
-  });
+    return NextResponse.json({
+      agent: 'VAULT',
+      ...result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error(`[VAULT cron] Unhandled error: ${message}`);
+    return NextResponse.json({
+      agent: 'VAULT',
+      action: 'buy_zabal',
+      status: 'failed',
+      details: `Unhandled: ${message}`,
+      timestamp: new Date().toISOString(),
+    }, { status: 500 });
+  }
 }

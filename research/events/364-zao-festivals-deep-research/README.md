@@ -326,6 +326,43 @@ No other festival combines:
 
 ---
 
+<<<<<<< HEAD
+## Artist Travel Costs (Flights to Bangor)
+
+| Route | Roundtrip Range | Notes |
+|-------|----------------|-------|
+| NYC to Bangor | $150-$300 | American direct, Delta from NYC |
+| Houston to Bangor | $300-$400 | October cheapest month |
+| Florida to Bangor | $120-$250 | Allegiant/Breeze direct from Tampa/Orlando |
+| General avg | $200-$400 | Book 28 days ahead |
+
+Budget: 5-8 artists x $200-$400 = $1,000-$3,200 total flights
+
+---
+
+## Additional Grant Opportunities
+
+| Grant | Amount | Requirements |
+|-------|--------|-------------|
+| Maine Arts Commission - Creative Communities | Up to $7,000 | 1:1 match, community-based, open to public |
+| Maine Community Foundation - Expansion Arts | Varies | Rural communities, BIPOC-led arts |
+| NEFA - NEST (New England States Touring) | Varies | Nonprofit presenting artists |
+| Levitt Foundation | $40K/year x 3 years | Apply Jan 2027 after Year 1 proof |
+| Bangor Savings Bank | $1,000 | Monthly review, apply NOW |
+
+Realistic Year 1 grant target: $1,000-$7,000
+
+---
+
+## DAO Treasury Model
+
+Hybrid model unique to ZAO Stock:
+1. 0xSplits for artists - auto-distribute tips/donations
+2. ZOUNZ treasury - community votes on budget via governance
+3. Onchain transparency - all income/expenses visible
+4. Fractured Atlas for tax-deductible traditional finance
+5. Year 2+: community votes on lineup, budget, vendors
+=======
 ---
 
 ## OUTREACH LIST: People + Organizations to Connect With
@@ -401,11 +438,21 @@ No other festival combines:
 | **Maine Community Foundation** | Varies | Already funded HoE | Via Cara Romano |
 | **Bangor Savings Bank** | $1,000 | Monthly review, logo visibility | Apply NOW |
 | **Fractured Atlas emergency funds** | Small | Fiscal sponsor benefits | Check eligibility |
+>>>>>>> main
 
 ---
 
 ## Next Research Targets
 
+<<<<<<< HEAD
+- Maine Craft Weekend statewide attendance (ask Cara Romano)
+- ZAO-Chella Instagram metrics (need screenshots from Zaal)
+- Wallace Events tent quote (call 207-667-6000)
+- Ellsworth Business Development Corporation support
+- Bar Harbor Chamber tourism angle
+- Maine Brewers Guild via Fogtown for beer partnership
+- OnChain Music licensing for live performance recordings
+=======
 - Maine Craft Weekend statewide attendance data (ask Cara Romano directly)
 - ZAO-Chella Instagram engagement metrics (need screenshots from Zaal)
 - Specific Airbnb pricing for October 2026 in Ellsworth
@@ -417,6 +464,7 @@ No other festival combines:
 - Bar Harbor Chamber of Commerce - tourism angle
 - Maine Brewers Guild - Fogtown connection for beer partner
 - OnChain Music licensing terms for live performance recordings
+>>>>>>> main
 
 ---
 
@@ -447,3 +495,78 @@ No other festival combines:
 - [Black Moon Public House](https://www.blackmoonpublichouse.com/)
 - [Maine Arts Commission Grants](https://mainearts.maine.gov/Pages/Funding/Grants-Home)
 - [NEFA Grant Programs](https://www.nefa.org/grants-programs/grant-programs)
+- [Sunrise County Economic Council](https://sunrisecounty.org/)
+- [Vinyl Vogue](https://vinylvogue.com/)
+- [Clejan](https://clejan.com/)
+- [Stilo World](https://www.stilo.world/)
+- [Steve Peer - BDN Profile](https://profilesmaine.bdnblogs.com/2013/01/03/hancock-county/house-concert-impresario-steve-peer-the-coolest-guy-we-know/)
+- [Cara Romano - LinkedIn](https://www.linkedin.com/in/cara-romano-a50588340/)
+
+---
+
+## DEEP DIVE: Ellsworth Music Ecosystem
+
+### Existing Concert Series (ZAO Stock fits into this calendar)
+- **Friday Waterfront Concerts** - Harbor Park, 6pm, free, City + The Grand sponsored
+- **Wednesday Concert Band** - Harbor Park, 7-7:40pm, free
+- **Thursday Parklet Concerts** - Franklin Street Parklet, 7-9pm, free (THIS IS OUR VENUE)
+
+**Key insight:** The Parklet already hosts weekly concerts. ZAO Stock plugs into existing cultural infrastructure.
+
+### Steve Peer Deep Dive
+- 430 Bayside Road house concert venue, running since May 2009
+- Crown Vics rockabilly band (Drew Myers, Jennifer Myers, Frank Schwartz, Gordon Fellis, Steve Peer)
+- Album "Hell Yeah!" recorded at 430 Bayside in one weekend
+- Former Director of Special Education, School Union 93
+- Specializes in Atlantic Canada/Celtic tradition artists
+- BDN called him "the coolest guy we know"
+
+### Vinyl Vogue / Matt Manry
+- Newberry Exchange building, Main St + Franklin St intersection (RIGHT NEXT TO PARKLET)
+- Vinyl records, guitars, HiFi, rare Beatles memorabilia
+- 10% of profits donated to local music education
+- Building antique radio museum in basement
+- Partnership angle: record shop literally at the Parklet. Cross-promo is a no-brainer.
+
+### Cara Romano (Heart of Ellsworth)
+- Executive Director since 2016, former Maine Crafts Association President (2011-2015)
+- Studio jeweler since 2005, transitioned to arts administration
+- Champions: Sculpture Trail, Art of Ellsworth, MCW, downtown revitalization
+- She is the gatekeeper to Ellsworth's cultural infrastructure
+
+---
+
+## DEEP DIVE: Downeast Maine National Heritage Area
+
+- Designated 2023 by Congress (first in Maine)
+- Covers all of Hancock + Washington Counties
+- Managed by Sunrise County Economic Council
+- **Dollar-for-dollar federal match, up to $1 million/year for 10 years**
+- Eligible: municipalities, nonprofits, schools
+- Projects: downtown revitalization, cultural preservation, outdoor recreation
+- ZAO Stock angle: festival celebrating music + culture in a National Heritage Area town with newly designated National Historic Register downtown
+
+---
+
+## DEEP DIVE: Artist Profiles
+
+### Clejan (Zac Clejan)
+- Trap Violin: rapper + classically trained violinist (started age 3)
+- Atlanta native, based in LA, dual degree marketing + international business (UGA)
+- Left 9-5 to pursue music. First EP "The Way That I Fiddle" (July 2020)
+- Sold out music NFT mints. Web3 advocate.
+- Socials: @clejanmusic (X), @thetrapviolinist (TikTok), clejan.com
+- ZAO Stock fit: high-energy live performer, visual spectacle, Web3-aligned
+
+### Stilo World / Dope Stilo
+- DJ + metaverse venue host. 150+ consecutive weekly VR concerts (Super Wednesdays)
+- Spatial + Web3, mobile/desktop/VR accessible
+- NFTs on Rarible with exclusive tracks + wearable digital fashion
+- Website: stilo.world
+- ZAO Stock fit: DJ between sets, bring virtual audience via livestream, proven reliability
+
+### Joseph Goats
+- Venezuelan singer-songwriter, Spanish + English, based in Caracas
+- COC Concertz #4: 3 songs (No Winters Land, Calma, Compass/Brujula)
+- Supports Huottoja indigenous community via Giveth
+- ZAO Stock fit: international artist, social impact, Giveth cross-promo

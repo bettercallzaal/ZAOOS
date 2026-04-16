@@ -79,10 +79,25 @@ When the user says "ship", "done", "pr", "wrap up", or work is complete:
    git merge origin/main --no-edit
    # If conflicts, resolve them before pushing
    ```
-3. Push the session branch: `git push -u origin ws/<name>`
-4. Create PR to `main` using `gh pr create`
-5. Report the PR URL
-6. **Clean up after merge:**
+3. **CRITICAL: Check if branch already has a merged PR before pushing:**
+   ```bash
+   MERGED=$(gh pr list --state merged --head "ws/<name>" --json number --jq '.[0].number' 2>/dev/null)
+   if [ -n "$MERGED" ] && [ "$MERGED" != "null" ]; then
+     echo "WARNING: PR #$MERGED already merged for this branch!"
+     echo "Creating new branch instead..."
+     # Cherry-pick commits to a new branch from latest main
+     git checkout main && git pull origin main
+     NEW_BRANCH="ws/<name>-2"
+     git checkout -b "$NEW_BRANCH"
+     git cherry-pick <commits>
+     git push -u origin "$NEW_BRANCH"
+     gh pr create  # new PR
+   fi
+   ```
+4. Push the session branch: `git push -u origin ws/<name>`
+5. Create PR to `main` using `gh pr create`
+6. Report the PR URL
+7. **Clean up after merge:**
    - Delete the remote branch after PR is merged: `git push origin --delete ws/<name>`
    - Delete the local branch: `git branch -D ws/<name>`
    - Remove the worktree: `git worktree remove "../worktrees/<name>"`

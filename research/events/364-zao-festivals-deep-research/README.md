@@ -326,16 +326,97 @@ No other festival combines:
 
 ---
 
-## Next Research Targets (Still to Explore)
+---
 
-- Maine Craft Weekend statewide attendance data (contact Cara Romano directly)
-- ZAO-Chella Instagram engagement metrics (need screenshots)
+## OUTREACH LIST: People + Organizations to Connect With
+
+### Local Ellsworth (Sponsors + Partners)
+
+| Who | What | Contact | Why | Priority |
+|-----|------|---------|-----|----------|
+| **Cara Romano** | Heart of Ellsworth Executive Director | info@heartofellsworth.org, (207) 812-4164 | Venue partner, MCW coordinator, volunteer network, $391K in grants | ACTIVE |
+| **Heather Seavey** | Ellsworth Chamber of Commerce Executive Director | (207) 667-5584, ellsworthchamber.org | Business community access, local sponsor intros | HIGH |
+| **Charlie Pearce** | Ellsworth City Manager | City Hall | Parklet permissions, city support, $1.79B tax base context | HIGH |
+| **Bangor Savings Bank** | Corporate giving contact (identified) | Apply monthly | $1,000 grant, logo on COC Concerts + event | HIGH |
+| **Jon Stein** | Fogtown Brewing, 25 Pine St | fogtownbrewing.com | Beer partner, venue for secondary events, community hub since 2017 | MEDIUM |
+| **Steve Peer + Katina Stanwood** | Black Moon Public House, 142 Main St | In person | After-party venue, live music 4 nights/week, local music network | HIGH |
+| **Precipice Coffee** | Zero-emissions roaster, 56 Deane St | precipicecoffee.com | Morning coffee sponsor, sustainability angle | MEDIUM |
+| **Matt Manry** | Vinyl Vogue / Newberry Exchange | In person | Record shop at Black Moon, music culture partner | LOW |
+| **Linda Perrin** | Atlantic Art Glass | In person | Art partner, saw 300% MCW boost | MEDIUM |
+| **Franklin Savings Bank** | Already funds Heart of Ellsworth | Via HoE | Existing community funder | MEDIUM |
+| **Maine Community Foundation** | Funded HoE Asset Mapping study | Via HoE | Grant potential | MEDIUM |
+| **Wallace Events** | Tent rental, 36 Commerce Park | (207) 667-6000 | Weather backup, potential in-kind sponsor | MEDIUM |
+| **WERU Community Radio** | 89.9 FM, East Orland | info@weru.org, (207) 469-6600 | Radio promotion, operates at Ellsworth Community Music Institute | HIGH |
+| **Ellsworth Community Music Institute** | 125 State St, Ellsworth | Via WERU | Workshop partner, education tie-in | MEDIUM |
+| **Acadia 876 Bar and Grill** | New Jamaican-fusion restaurant, 191 Main St | In person | Food partner, cultural diversity angle | LOW |
+
+### Web3 / Digital Partners
+
+| Who | What | Contact | Why | Priority |
+|-----|------|---------|-----|----------|
+| **Jenifer Pepen (SirenAi)** | One Love Art DAO President/Co-Founder | linkedin.com/in/sirenai, onelovedao.org | 300+ global artists, artist residency program, FailOften connection | HIGH |
+| **OnChain Music** | Web3 licensing + distribution, 90% artist revenue | onchainmusic.com | AttaBotty collaborator, could license ZAO Stock performances | MEDIUM |
+| **Audius** | Decentralized streaming, 250M+ streams | audius.org | Livestream distribution partner, $AUDIO rewards for artists | MEDIUM |
+| **Base / Coinbase** | Onchain Summer grants (600+ ETH / $2M), AttaBotty on Base Onchain Registry | base.org | Onchain Summer sponsorship, grant application, AttaBotty is already recognized | HIGH |
+| **Giveth** | Zero-fee crypto crowdfunding | giveth.io | Launch crowdfunding campaign for ZAO Stock | HIGH |
+| **Whop** | $1.6B creator platform, Craig Gonzalez on partnerships team | Via Craig G | Creator economy sponsor, digital product platform | HIGH (via Craig) |
+| **Sound.xyz** | Onchain music drops | sound.xyz | Artist NFT drops at event, Shawn/Web3 Metal connection | MEDIUM |
+| **Zora** | Onchain minting, creator tools | zora.co | Mint event collectibles, onchain ticket/POAP alternative | MEDIUM |
+
+### Press / Media
+
+| Who | What | Contact | When to Pitch |
+|-----|------|---------|---------------|
+| **Ellsworth American** | Local newspaper, Hancock County | news@ellsworthamerican.com, (207) 667-2576 | August (8 weeks out) |
+| **Bangor Daily News** | Statewide Maine | news@bangordailynews.com, 207.990.8175 | August (8 weeks out) |
+| **WERU 89.9 FM** | Community radio | info@weru.org | July (for interview + event listing) |
+| **News Center Maine (WCSH/WLBZ)** | TV news | newscentermaine.com | September (2-3 weeks out) |
+| **MDI Islander** | Mount Desert Island / Bar Harbor area | Contact TBD | August |
+| **Maine Biz** | Maine business news | mainebiz.biz | August (angle: Web3 meets small-town Maine) |
+| **Visit Maine** | Tourism marketing | Via Maine Craft Weekend listing | Automatic via MCW |
+| **Farcaster /music, /base, /nouns** | Web3 social channels | Post directly | Ongoing |
+
+### Potential Artist Connections
+
+| Who | Genre | Connection | Status |
+|-----|-------|-----------|--------|
+| **AttaBotty** | Electronic | ZAO co-founder, team member | ON TEAM |
+| **Hurric4n3Ike** | Hip-hop, 432 Hz | ZAO #3, WaveWarZ founder | ON TEAM |
+| **DCoop / Coop D'Ville** | Hip-hop | ZAO member, ZAOVille | ON TEAM |
+| **Joseph Goats** | Venezuelan singer-songwriter | COC Concertz #4 performer | WARM |
+| **Clejan** | Rapper/violinist | COC Concertz performer | WARM |
+| **Tom Fellenz** | Soundtrack/guitar | COC Concertz, advisory board | ON TEAM |
+| **Stilo World** | DJ | 150+ consecutive weekly VR concerts, COC host | WARM |
+| **Duo Do Musica** | Latin | COC Concertz performer | WARM |
+| **Steve Peer's network** | Rock, Ellsworth local | 37 years, 430 house concerts, Crown Vics | VIA STEVE |
+| **KCAI students** | Creative tech/installations | FailOften's students | VIA FAILOFTEN |
+| **One Love Art DAO artists** | Various, 300+ global | FailOften connection | VIA FAILOFTEN + SIRENAI |
+
+### Grant / Funding Organizations
+
+| Who | Amount | Requirements | Timing |
+|-----|--------|-------------|--------|
+| **Levitt Foundation** | $40K/year x 3 years | 501(c)(3) or fiscal sponsor, 1:1 match, track record | Apply January 2027 (after Year 1) |
+| **Maine Arts Commission** | Varies | State arts grants | Research eligibility |
+| **Maine Community Foundation** | Varies | Already funded HoE | Via Cara Romano |
+| **Bangor Savings Bank** | $1,000 | Monthly review, logo visibility | Apply NOW |
+| **Fractured Atlas emergency funds** | Small | Fiscal sponsor benefits | Check eligibility |
+
+---
+
+## Next Research Targets
+
+- Maine Craft Weekend statewide attendance data (ask Cara Romano directly)
+- ZAO-Chella Instagram engagement metrics (need screenshots from Zaal)
 - Specific Airbnb pricing for October 2026 in Ellsworth
 - Wallace Events tent quote (call 207-667-6000)
-- Maine Arts Commission grant eligibility check
-- Local radio stations (WERU Community Radio) for promotion
-- Bangor International Airport flight pricing for artist travel
-- Vinyl Vogue / Newberry Exchange record shop partnership
+- Maine Arts Commission grant eligibility via Fractured Atlas
+- Bangor International Airport flight pricing (Boston/NYC to Bangor)
+- Vinyl Vogue / Newberry Exchange partnership potential
+- Ellsworth Business Development Corporation (EBDC) - potential support
+- Bar Harbor Chamber of Commerce - tourism angle
+- Maine Brewers Guild - Fogtown connection for beer partner
+- OnChain Music licensing terms for live performance recordings
 
 ---
 

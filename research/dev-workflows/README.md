@@ -49,3 +49,4 @@
 | 362 | [Caveman Token Savings Analysis](./362-caveman-token-savings-analysis/) | STANDALONE | Deep analysis: caveman claims 75% but delivers 4-5% real savings; /compact & model switching > caveman ROI |
 | 365 | [Recoupable Monorepo & Best Practices](./365-recoupable-monorepo-best-practices/) | CANONICAL | Sweetman's monorepo architecture: git submodules, AGENTS.md, PROGRESS.md, DESIGN.md, indexer-per-event pattern, ZAO migration plan (~6 hrs) |
 | 366 | [AGENTS.md & AI Monorepo Best Practices 2026](./366-agents-md-monorepo-best-practices-2026/) | CANONICAL | GitHub 2500-repo analysis, Uniswap AI Toolkit, three-tier boundaries, file-scoped commands, scaffolding, 7 projects to study |
+| 367 | [Biome, Microservices, Keyboard UX & Shared UI](./367-biome-microservices-keyboard-shared-ui/) | CANONICAL | Biome migration (32-68x faster), Nook decomposition, Herocast cmdk palette, @zao/ui component extraction |

@@ -2,13 +2,13 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Sponsor ZAO Stock | Community Music Festival',
+  title: 'Sponsor ZAOstock | Community Music Festival',
   description:
-    'Partner with ZAO Stock — a community-built outdoor music festival in Ellsworth, Maine. October 3, 2026. Tax-deductible via Fractured Atlas 501(c)(3).',
+    'Partner with ZAOstock — a community-built outdoor music festival in Ellsworth, Maine. October 3, 2026. Tax-deductible via Fractured Atlas 501(c)(3).',
   openGraph: {
-    title: 'Sponsor ZAO Stock | Community Music Festival',
+    title: 'Sponsor ZAOstock | Community Music Festival',
     description:
-      'Partner with ZAO Stock — October 3, 2026, Ellsworth, Maine. Tax-deductible sponsorships available.',
+      'Partner with ZAOstock — October 3, 2026, Ellsworth, Maine. Tax-deductible sponsorships available.',
     images: ['/images/festivals/zao-stock-logo.jpeg'],
   },
 };
@@ -56,7 +56,7 @@ const SPONSOR_TRACKS = [
     subtitle: 'Year-round ZAO Festivals partnership (Stock, Ville, WaveWarZ, COC)',
     color: '#f5a623',
     benefits: [
-      'Branding across ALL ZAO Festival events (not just ZAO Stock)',
+      'Branding across ALL ZAO Festival events (not just ZAOstock)',
       'Logo in COC Concertz monthly metaverse concerts',
       'Sponsor visibility in WaveWarZ music battles (795+ battles, growing)',
       'Priority placement at ZAOVille (DMV) and future city expansions',
@@ -102,7 +102,7 @@ export default function SponsorPage() {
       <header className="sticky top-0 z-40 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/[0.06]">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-white">ZAO Stock</h1>
+            <h1 className="text-lg font-bold text-white">ZAOstock</h1>
             <p className="text-xs text-gray-400">Sponsor Deck</p>
           </div>
           <div className="flex items-center gap-3">
@@ -129,7 +129,7 @@ export default function SponsorPage() {
             October 3, 2026 - Ellsworth, Maine
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
-            Partner with ZAO Stock
+            Partner with ZAOstock
           </h2>
           <p className="text-gray-400 text-lg leading-relaxed">
             A community-built outdoor music festival at the gateway to Acadia National Park.
@@ -152,7 +152,7 @@ export default function SponsorPage() {
               car heading to Acadia passes through here - 4 million visitors last year.
             </p>
             <p className="text-sm text-gray-300 leading-relaxed">
-              ZAO Stock is part of the 9th Annual Art of Ellsworth during Maine Craft Weekend - a
+              ZAOstock is part of the 9th Annual Art of Ellsworth during Maine Craft Weekend - a
               statewide event that drives traffic to every participating town. We&apos;re not
               starting from zero. We&apos;re plugging into existing infrastructure.
             </p>
@@ -219,8 +219,8 @@ export default function SponsorPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Tax-Deductible</p>
           <div className="bg-gradient-to-r from-[#f5a623]/10 to-[#ffd700]/5 rounded-xl p-5 border border-[#f5a623]/30">
             <p className="text-sm text-gray-300 leading-relaxed">
-              ZAO Stock is a fiscally sponsored project of Fractured Atlas, a 501(c)(3) public
-              charity. Contributions for the purposes of ZAO Stock are tax-deductible to the extent
+              ZAOstock is a fiscally sponsored project of Fractured Atlas, a 501(c)(3) public
+              charity. Contributions for the purposes of ZAOstock are tax-deductible to the extent
               permitted by law.
             </p>
           </div>

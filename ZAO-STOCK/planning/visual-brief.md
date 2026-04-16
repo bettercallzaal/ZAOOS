@@ -1,4 +1,4 @@
-# ZAO Stock 2026 - Visual Design Brief
+# ZAOstock 2026 - Visual Design Brief
 
 ## For: DaNici (Design Lead) + Candy (Design 2nd) + Shawn
 
@@ -10,7 +10,7 @@
 |---------|-------|
 | **Primary colors** | Navy #0a1628 (ZAO dark), Gold #f5a623 (ZAO accent) |
 | **Festival accent** | Consider an earthy/autumn palette alongside the ZAO colors - October in Maine |
-| **Logo** | ZAO Stock logo exists at `ZAO-STOCK/assets/zao-stock-logo.jpeg` |
+| **Logo** | ZAOstock logo exists at `ZAO-STOCK/assets/zao-stock-logo.jpeg` |
 | **Fonts** | TBD - needs a display font for headings + a clean sans for body |
 | **Mood** | Outdoor, grounded, community, indie, real. Not corporate. Not neon. Not EDM. |
 
@@ -21,18 +21,18 @@
 The Franklin Street Parklet is one short block between Main Street and Store Street. Picnic tables, greenery, city Wi-Fi. It's already a community gathering spot. We're enhancing it, not transforming it.
 
 ### Stage Area
-- Stage backdrop/banner with ZAO Stock logo + sponsor logos
+- Stage backdrop/banner with ZAOstock logo + sponsor logos
 - Keep it simple - one banner behind the performer, visible from the audience and livestream camera
 - No elaborate staging. The Parklet is intimate. Let the music be the focus.
 
 ### Entrance
 - Check-in table with QR code sign (for digital collectible)
-- Welcome banner or A-frame sign: "ZAO Stock - October 3, 2026"
+- Welcome banner or A-frame sign: "ZAOstock - October 3, 2026"
 - Program/lineup printed on a single card people can take
 
 ### Merch Table
 - T-shirts (Shawn's design), tote bags, posters
-- Clean display. Not cluttered. ZAO Stock branding.
+- Clean display. Not cluttered. ZAOstock branding.
 - Payment: cash + Venmo/CashApp QR code visible
 
 ### Signage Needed
@@ -46,7 +46,7 @@ The Franklin Street Parklet is one short block between Main Street and Store Str
 
 ### Photo Spot
 - Designated area where people take photos and share on social media
-- Could be: the stage backdrop with good lighting, a branded frame, or just the Parklet itself with a "ZAO Stock" sign
+- Could be: the stage backdrop with good lighting, a branded frame, or just the Parklet itself with a "ZAOstock" sign
 - Make sure it's visible in photos so every share is free promotion
 
 ---
@@ -73,7 +73,7 @@ The Franklin Street Parklet is one short block between Main Street and Store Str
 - [ ] Sponsor tier graphics (for pitch page)
 - [ ] Event day stories templates
 - [ ] Post-event recap graphic template
-- [ ] Email header for newsletters referencing ZAO Stock
+- [ ] Email header for newsletters referencing ZAOstock
 - [ ] zaoos.com/stock page header image (if updating)
 
 ---

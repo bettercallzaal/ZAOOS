@@ -1,4 +1,4 @@
-# ZAO Stock 2026 — Vendor Tracker
+# ZAOstock 2026 — Vendor Tracker
 
 ## Tent / Weather Backup
 

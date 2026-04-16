@@ -1,24 +1,24 @@
-# ZAO Stock & ZAO Festivals — Website Pages Spec
+# ZAOstock & ZAO Festivals — Website Pages Spec
 
 ## Confirmed Requirements
 - **Public pages** (no auth required)
-- **ZAO Stock logo:** `ZAO-STOCK/assets/zao-stock-logo.jpeg` (black bg, cream text, lightning + music notes + mountains)
+- **ZAOstock logo:** `ZAO-STOCK/assets/zao-stock-logo.jpeg` (black bg, cream text, lightning + music notes + mountains)
 - **Color scheme:** Black/cream from logo + ZAO navy #0a1628 + gold #f5a623
 - **Mobile-first**, dark theme
 
 ---
 
-## Page 1: ZAO Stock Landing (`/stock`)
+## Page 1: ZAOstock Landing (`/stock`)
 
 ### Hero Section
-- ZAO Stock logo (large, centered)
+- ZAOstock logo (large, centered)
 - "October 3, 2026"
 - "Franklin Street Parklet, Downtown Ellsworth, Maine"
 - "Part of Art of Ellsworth: Maine Craft Weekend"
 - CTA button: "RSVP Free" (links to simple form or external, TBD)
 
 ### About Section
-- Short description: what ZAO Stock is, art first / tech invisible
+- Short description: what ZAOstock is, art first / tech invisible
 - "A 1-day outdoor music showcase during Maine Craft Weekend. 10 artists. 12pm-6pm. Free entry."
 
 ### Lineup Section
@@ -42,7 +42,7 @@
 ### Virtual Section
 - "Can't make it in person? We're livestreaming the entire event on ZAO OS"
 - Link to ZAO OS Spaces (day-of)
-- "Leading up to ZAO Stock: virtual events April-September" — link to /festivals
+- "Leading up to ZAOstock: virtual events April-September" — link to /festivals
 
 ### Sponsors Section
 - "Become a Sponsor" CTA
@@ -52,7 +52,7 @@
 ### Support Section
 - Giveth donation link
 - GoFundMe link
-- "Help us bring ZAO Stock to life"
+- "Help us bring ZAOstock to life"
 
 ### Footer
 - "Presented by The ZAO | Part of Art of Ellsworth: Maine Craft Weekend"
@@ -91,7 +91,7 @@
   - Hosted by The ZAO + Community of Communities
   - Link: cocconcertz.com
 
-- **ZAO Stock** — Ellsworth, Maine, October 3, 2026
+- **ZAOstock** — Ellsworth, Maine, October 3, 2026
   - Flagship outdoor music festival
   - Part of Maine Craft Weekend
   - Link to /stock page
@@ -111,7 +111,7 @@
 
 ### Route Structure
 ```
-src/app/stock/page.tsx          ← Public ZAO Stock page (NO auth group)
+src/app/stock/page.tsx          ← Public ZAOstock page (NO auth group)
 src/app/festivals/page.tsx      ← Public ZAO Festivals page (NO auth group)
 ```
 

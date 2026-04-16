@@ -1,4 +1,4 @@
-# ZAO Stock - Team Dashboard
+# ZAOstock - Team Dashboard
 
 > **Standup:** Tuesdays, 10:00 AM EST
 > **Format:** 15 min team reports + 15 min open brainstorm. Open stage - community can listen, reporters speak first half.
@@ -123,7 +123,7 @@
 - [ ] Zaal + FailOften: Brainstorm AI-to-AI communication for team coordination
 - [ ] Zaal + FailOften: Discuss Fractured Atlas wording for sponsors
 - [ ] Zaal + FailOften: Prepare Bangor Savings Bank sponsor application
-- [ ] Shawn: Design simple ZAO Stock t-shirt for print-on-demand
+- [ ] Shawn: Design simple ZAOstock t-shirt for print-on-demand
 - [ ] DCoop: Create ZAOVille logo concepts + explore melded logo
 - [ ] DaNici + Shawn + Zaal: Design meeting tomorrow (April 15) afternoon
 - [ ] Candy: Brand kit for ZAO Festivals (not urgent)

@@ -1,9 +1,9 @@
-# 232 — ZAO Stock Team: Deep Profiles
+# 232 — ZAOstock Team: Deep Profiles
 
 > **Status:** Research complete
 > **Date:** March 31, 2026
-> **Goal:** Comprehensive profiles of every ZAO Stock team member — backgrounds, capabilities, web presence, achievements, platforms
-> **Companion to:** [Doc 224 — ZAO Stock Multi-Year Vision](../224-zao-stock-multi-year-vision/)
+> **Goal:** Comprehensive profiles of every ZAOstock team member — backgrounds, capabilities, web presence, achievements, platforms
+> **Companion to:** [Doc 224 — ZAOstock Multi-Year Vision](../224-zao-stock-multi-year-vision/)
 
 ---
 
@@ -84,7 +84,7 @@
 - Compiled performances at events hosted by **Paris Hilton**, Club NFT VIP, NFT.NYC
 - Connection to **Creatress Art** community
 
-### ZAO Stock Role
+### ZAOstock Role
 **Production Lead + Day-of Stage Manager + Style & Culture Curators (with DaNici)**
 - Has expressed interest in doing a **flute performance** at a ZAO event (Eden Fractal mention)
 - Both attend ZAO Fractal governance meetings
@@ -157,7 +157,7 @@
 - **Grant:** $6,000 from Charlotte Street + Spencer Museum (Warhol Foundation funded)
 - **Team:** Haley Kostas (lead), Sarah Magill, Conner Giles, Johnny Dawbarn, David Overholt, Teresa Leggard
 - **What:** Cross-disciplinary performance platform merging music, movement, and visual arts. Rearrangeable to space, theme, and content with rotating talent pool. Bridges gap between performers and spectators
-- **This is the ZAO Stock workshop/performance model in miniature**
+- **This is the ZAOstock workshop/performance model in miniature**
 
 ### Fortune 100 Clients
 Children's Hospital, Cutler-Hammer, EATON Corporation, **General Electric**, **Kyocera**, **Mitsubishi Electric**, National University, NYU, **Nokia**, **Pfizer**, **Qualcomm**, **Siemens Mobile**, Tony Robbins, WAXIE, **YouTube**
@@ -187,12 +187,12 @@ Children's Hospital, Cutler-Hammer, EATON Corporation, **General Electric**, **K
 - Active on: fxhash, OBJKT, Foundation, One Love DAO, Cardano, Ombrujah, Unfold Gallery
 - **One Love Art DAO** — participating artist (co-founded by SirenAi/Jenifer Pepen Aquino)
 
-### ZAO Stock Role
+### ZAOstock Role
 **Organization + Structural Support + Installations + Workshop Curriculum**
-- ProdoLAB format (pairing musicians with visual artists for one-night showcases) = ZAO Stock performance model
-- RubiX project (cross-disciplinary performance merging music/movement/visuals) = ZAO Stock workshop model
+- ProdoLAB format (pairing musicians with visual artists for one-night showcases) = ZAOstock performance model
+- RubiX project (cross-disciplinary performance merging music/movement/visuals) = ZAOstock workshop model
 - Fortune 100 consulting experience = professional event production standards
-- 47 GitHub repos of creative tech = can build custom installations for ZAO Stock
+- 47 GitHub repos of creative tech = can build custom installations for ZAOstock
 - Processing + TouchDesigner + Resolume = live visual projections during performances
 
 ---
@@ -405,7 +405,7 @@ Team profiles reference these codebase components:
 
 ### Internal
 - [Doc 50 — ZAO Complete Guide](../050-the-zao-complete-guide/) — member profiles, artist roster
-- [Doc 224 — ZAO Stock Vision](../224-zao-stock-multi-year-vision/) — strategic context
+- [Doc 224 — ZAOstock Vision](../224-zao-stock-multi-year-vision/) — strategic context
 
 ---
 
@@ -499,10 +499,10 @@ Team profiles reference these codebase components:
 
 Samantha "Candy" Kinney is a Web3 operator, product tester, and AI-powered builder. Background in hospitality, branding, and business operations. Known for jumping into early-stage products, pushing them to their limits, uncovering where things break, then translating that into clear improvements, content, and growth. Co-founder of The ZAO and WaveWarz. Behind ZAO Festival experiences like ZAO-Chella and ZAO-Palooza. Early adopter of AI coding tools and agentic systems - built 200+ apps while testing platforms like Ohara, Replit, and emerging AI builders. Hosts daily X Spaces and leads vibe coding sessions.
 
-### ZAO Stock Role
+### ZAOstock Role
 **Design Lead + Marketing/Branding + Dev + Sponsorship Knowledge + AI Builder**
 - Designs all festival branding, materials, digital assets
-- Builds the ZAO Stock web presence / event page
+- Builds the ZAOstock web presence / event page
 - Past Milk Road/Impact3 experience = knows how sponsorship pipelines work at scale ($10-25K/send)
 - Can deploy onchain tooling (attendance tokens, payment splits on Base)
 - 200+ apps built with AI tools - can rapidly prototype and test festival tooling
@@ -550,7 +550,7 @@ Samantha "Candy" Kinney is a Web3 operator, product tester, and AI-powered build
 - **Pivoted:** Away from Flow blockchain NFT memberships to broader brand community SaaS with Shopify integration
 - **Note:** magnetiq.io (luxury event management for Valentino, Bulgari, Saint Laurent) is a **completely separate company**
 
-### ZAO Stock Role
+### ZAOstock Role
 **IRL Connection Layer — but needs reassessment**
 - Original concept: QR-based Proof of Meet on Flow blockchain
 - Current reality: Magnetiq has pivoted to web2-focused community engagement SaaS
@@ -580,10 +580,10 @@ Samantha "Candy" Kinney is a Web3 operator, product tester, and AI-powered build
 - **Thin public footprint** — single confirmed forum post, no indexed Farcaster profile, no GitHub, no Medium, no project deployments found
 - Likely more active in private channels (Discord, Farcaster DMs, fractal call participation)
 
-### ZAO Stock Role
+### ZAOstock Role
 **Media + Production Support + Cross-Fractal Community Ambassador**
 - Day-of documentation, content capture, social media
-- Value is in community bridging (connecting fractal governance communities to ZAO Stock)
+- Value is in community bridging (connecting fractal governance communities to ZAOstock)
 
 ---
 
@@ -617,9 +617,9 @@ Samantha "Candy" Kinney is a Web3 operator, product tester, and AI-powered build
 ### ZAOVille Status
 - **No public web presence found** — in development/concept phase
 - Targeting **DMV area** (Maryland/DC/Virginia) as a parallel ZAO festival
-- Separate from ZAO Stock (Ellsworth) — same brand, different city
+- Separate from ZAOstock (Ellsworth) — same brand, different city
 
-### ZAO Stock Role
+### ZAOstock Role
 **Performing Artist + Parallel Event Organizer + Production Support (with AttaBotty)**
 - WaveWarZ active participant
 - ZAOVille creates the multi-city ZAO festival model when it launches
@@ -712,7 +712,7 @@ Samantha "Candy" Kinney is a Web3 operator, product tester, and AI-powered build
 - No confirmed Crown Vics or Steve Peer performance at Fogtown found in indexed sources
 - Both in Ellsworth — connection plausible but unconfirmed
 
-### ZAO Stock Role
+### ZAOstock Role
 **Local Music Director — credibility is even deeper than first assessed:**
 - Toured UK with Bill Nelson's Red Noise (1979)
 - TV Toy opened for Talking Heads at CBGB

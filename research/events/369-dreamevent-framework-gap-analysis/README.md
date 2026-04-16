@@ -1,8 +1,8 @@
-# 369 - DreamEvent.ai Framework: What ZAO Stock Is Missing
+# 369 - DreamEvent.ai Framework: What ZAOstock Is Missing
 
 > **Status:** Research complete
 > **Date:** 2026-04-16
-> **Goal:** Reverse-engineer DreamEvent.ai's event planning framework to find gaps in ZAO Stock planning
+> **Goal:** Reverse-engineer DreamEvent.ai's event planning framework to find gaps in ZAOstock planning
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Decision | Recommendation |
 |----------|----------------|
-| **Narrative arc** | CREATE a guest experience narrative for ZAO Stock - arrival to departure, emotional journey, not just a schedule |
+| **Narrative arc** | CREATE a guest experience narrative for ZAOstock - arrival to departure, emotional journey, not just a schedule |
 | **Visual design system** | CREATE a color palette, typography, decor direction doc BEFORE the brand kit. DaNici needs this as a brief. |
 | **Food/bev plan** | DEFINE the food experience - not just "food trucks." What's the vibe? What fits the festival? |
 | **Run-of-show** | BUILD a minute-by-minute run of show, not just "12pm-6pm with DJs between." Who does what when. |
@@ -20,11 +20,11 @@
 
 ---
 
-## Framework Comparison: DreamEvent vs. ZAO Stock
+## Framework Comparison: DreamEvent vs. ZAOstock
 
 ### 1. NARRATIVE & THEME
 
-| Dimension | DreamEvent Covers | ZAO Stock Has | Gap |
+| Dimension | DreamEvent Covers | ZAOstock Has | Gap |
 |-----------|------------------|---------------|-----|
 | Event theme/concept | Full theme generation with narrative arc | "Community-built outdoor music festival" | PARTIAL - have the tagline, missing the narrative arc (the emotional journey from arrival to departure) |
 | Story/why | Baked into concept | "Zaal bought a house here" + "annual ZAO meeting" | PARTIAL - have the personal story, need it written as a pitch narrative |
@@ -37,7 +37,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ### 2. PROGRAMMING / RUN OF SHOW
 
-| Dimension | DreamEvent Covers | ZAO Stock Has | Gap |
+| Dimension | DreamEvent Covers | ZAOstock Has | Gap |
 |-----------|------------------|---------------|-----|
 | Minute-by-minute schedule | Full run-of-show with activity sequences | "10 artists, equal sets, DJs between, 12pm-6pm" | GAP - no actual run-of-show with time blocks |
 | Transitions | How you move between segments | Not documented | GAP |
@@ -62,7 +62,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ### 3. FOOD & BEVERAGE
 
-| Dimension | DreamEvent Covers | ZAO Stock Has | Gap |
+| Dimension | DreamEvent Covers | ZAOstock Has | Gap |
 |-----------|------------------|---------------|-----|
 | Menu concept | Full F&B plan with visual previews | "Food trucks, Fogtown pizza nearby" | GAP - no defined food experience |
 | Beverage plan | Drink options, bar setup | "Black Moon has craft beer" | GAP - is there a bar at the Parklet? Just water? |
@@ -77,7 +77,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ### 4. VISUAL DESIGN
 
-| Dimension | DreamEvent Covers | ZAO Stock Has | Gap |
+| Dimension | DreamEvent Covers | ZAOstock Has | Gap |
 |-----------|------------------|---------------|-----|
 | Color palette | Generated with theme | ZAO navy/gold exists, no festival-specific palette | PARTIAL |
 | Typography | Font selections | Not documented for festival | GAP |
@@ -90,7 +90,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ### 5. GUEST MANAGEMENT
 
-| Dimension | DreamEvent Covers | ZAO Stock Has | Gap |
+| Dimension | DreamEvent Covers | ZAOstock Has | Gap |
 |-----------|------------------|---------------|-----|
 | RSVP/ticketing | Invitation + RSVP tracking | RSVP form on /stock page (Supabase) | COVERED |
 | Arrival experience | How guests enter, first impression | Not documented | GAP |
@@ -112,7 +112,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ### 6. BUDGET MANAGEMENT
 
-| Dimension | DreamEvent Covers | ZAO Stock Has | Gap |
+| Dimension | DreamEvent Covers | ZAOstock Has | Gap |
 |-----------|------------------|---------------|-----|
 | Budget by category | Auto-generated breakdown | budget.md with categories | COVERED |
 | Targets vs. actuals | Tracking actual spend | Not tracked yet (nothing spent) | FUTURE |
@@ -120,7 +120,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ### 7. STAFFING & OPERATIONS
 
-| Dimension | DreamEvent Covers | ZAO Stock Has | Gap |
+| Dimension | DreamEvent Covers | ZAOstock Has | Gap |
 |-----------|------------------|---------------|-----|
 | Staff assignments by time block | Who does what, when | Teams defined, no time-block assignments | GAP |
 | Volunteer roles | Specific job descriptions | "15-20 volunteers" but no role definitions | GAP |
@@ -129,7 +129,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ### 8. VENDOR COORDINATION
 
-| Dimension | DreamEvent Covers | ZAO Stock Has | Gap |
+| Dimension | DreamEvent Covers | ZAOstock Has | Gap |
 |-----------|------------------|---------------|-----|
 | Vendor list with status | Tracked by category | vendors.md exists | COVERED |
 | Vendor contracts | Agreements, terms | Not documented | GAP |
@@ -137,7 +137,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ### 9. POST-EVENT (DreamEvent doesn't cover this well either)
 
-| Dimension | ZAO Stock Needs | Status |
+| Dimension | ZAOstock Needs | Status |
 |-----------|----------------|--------|
 | Content push (photos, video, recap) within 48 hours | Mentioned in press timeline | PARTIAL |
 | Thank-you messages to sponsors, artists, volunteers | Not documented | GAP |
@@ -147,7 +147,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ---
 
-## The 10 Things ZAO Stock Should Build Next (From This Analysis)
+## The 10 Things ZAOstock Should Build Next (From This Analysis)
 
 1. **Guest Experience Narrative** - the emotional arc of the day, written as a story
 2. **Minute-by-Minute Run of Show** - every time block, every person, every transition
@@ -174,7 +174,7 @@ This is what turns a "day of music" into an experience people remember and tell 
 
 ## Comparison: Event Planning Completeness
 
-| Dimension | DreamEvent | ZAO Stock | Notion (if added) |
+| Dimension | DreamEvent | ZAOstock | Notion (if added) |
 |-----------|-----------|-----------|-------------------|
 | Theme/narrative | 10/10 | 4/10 | 6/10 (manual) |
 | Run of show | 9/10 | 2/10 | 7/10 (timeline view) |
@@ -189,8 +189,8 @@ This is what turns a "day of music" into an experience people remember and tell 
 | Web3/onchain | 0/10 | 8/10 | 0/10 |
 | Community governance | 0/10 | 9/10 | 0/10 |
 
-**ZAO Stock's biggest gaps: narrative (4/10), run-of-show (2/10), food (2/10), visual design (3/10)**
-**ZAO Stock's biggest strengths: Web3 (8/10), governance (9/10), RSVP (7/10)**
+**ZAOstock's biggest gaps: narrative (4/10), run-of-show (2/10), food (2/10), visual design (3/10)**
+**ZAOstock's biggest strengths: Web3 (8/10), governance (9/10), RSVP (7/10)**
 
 ---
 
@@ -210,4 +210,4 @@ This is what turns a "day of music" into an experience people remember and tell 
 - [DreamEvent.ai](https://dreamevent.ai/)
 - [AI Event Planning Tools 2026 - Unite.AI](https://www.unite.ai/best-ai-tools-for-event-planning/)
 - [How to Use AI for Event Planning - Whova](https://whova.com/blog/ai-event-planning/)
-- Existing ZAO Stock planning docs: `ZAO-STOCK/planning/`, `ZAO-STOCK/standups/dashboard.md`
+- Existing ZAOstock planning docs: `ZAO-STOCK/planning/`, `ZAO-STOCK/standups/dashboard.md`

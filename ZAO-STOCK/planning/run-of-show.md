@@ -1,4 +1,4 @@
-# ZAO Stock 2026 - Run of Show
+# ZAOstock 2026 - Run of Show
 
 ## October 3, 2026 | Franklin Street Parklet, Ellsworth, Maine
 

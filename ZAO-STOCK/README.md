@@ -6,7 +6,7 @@
 
 ---
 
-## What Is ZAO Stock?
+## What Is ZAOstock?
 
 A 1-day outdoor music festival during Maine Craft Weekend. Art first. Tech invisible. 10 artists performing 12pm-6pm at the Franklin Street Parklet, followed by an after-party at Black Moon Public House (Steve Peer & Katina Stanwood's bar, 30 seconds walk from the Parklet).
 
@@ -78,7 +78,7 @@ ZAO-STOCK/
 | Hotel group rates | NOT YET | Call Hampton Inn, Comfort Inn, Colonial Inn |
 | Crowdfunding launch | NOT YET | Set up Giveth project + GoFundMe |
 | Sponsorship outreach | NOT YET | Build pitch deck, target local + web3 brands |
-| ZAO Stock website page | NOT YET | Build on zaoos.com |
+| ZAOstock website page | NOT YET | Build on zaoos.com |
 | ZAO Festivals page | NOT YET | Build on zaoos.com |
 | Food partners | NOT YET | Pitch local restaurants/vendors |
 | Artist travel logistics | NOT YET | Confirm who's coming, book flights |

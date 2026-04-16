@@ -40,7 +40,7 @@ export function LoginForm() {
     <div className="min-h-[100dvh] bg-[#0a1628] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white">ZAO Stock Team</h1>
+          <h1 className="text-2xl font-bold text-white">ZAOstock Team</h1>
           <p className="text-sm text-gray-400 mt-1">Sign in to access the dashboard</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">

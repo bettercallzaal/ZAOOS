@@ -2,7 +2,7 @@
 
 > **Status:** Research complete
 > **Date:** 2026-04-15
-> **Goal:** Comprehensive research for ZAO Stock sponsor pitch, festival operations, comparable events, funding sources, and local context
+> **Goal:** Comprehensive research for ZAOstock sponsor pitch, festival operations, comparable events, funding sources, and local context
 
 ---
 
@@ -12,7 +12,7 @@
 |----------|----------------|
 | **Grant funding** | APPLY to Levitt Foundation - up to $40K/year for 3 years ($120K total) for free outdoor concerts. ZAO qualifies via Fractured Atlas fiscal sponsorship. Deadline is January annually. |
 | **Insurance** | BUY event liability via The Event Helper or K&K Insurance - $150-$300 for 100-500 attendees, 1-day event. Budget $300. |
-| **Fractured Atlas wording** | USE: "Donations to ZAO Stock are tax-deductible to the extent allowed by law. ZAO Stock is a fiscally sponsored project of Fractured Atlas, a 501(c)(3) public charity." |
+| **Fractured Atlas wording** | USE: "Donations to ZAOstock are tax-deductible to the extent allowed by law. ZAOstock is a fiscally sponsored project of Fractured Atlas, a 501(c)(3) public charity." |
 | **Sponsor pitch model** | USE data-driven 2026 framework: measurable ROI, interactive activations, values alignment, year-round partnership potential |
 | **Comparable festival** | MODEL after community-first free festivals (Folklife, Kala Ghoda). Free entry + volunteer labor + sponsor/donation revenue. |
 | **Ellsworth pitch angle** | LEAD with: "Gateway to Acadia" (4M visitors/year), National Historic Register designation (April 2026), Heart of Ellsworth partnership |
@@ -47,7 +47,7 @@
 - Every car heading to Acadia passes through Ellsworth
 
 ### The Pitch Line
-"ZAO Stock is part of Art of Ellsworth during Maine Craft Weekend. Ellsworth is the gateway to Acadia National Park - 4 million visitors passed through last year. Downtown Ellsworth just received National Historic Register designation. Heart of Ellsworth facilitated 28 events in 2025 with $391K in grants and 50+ sponsors."
+"ZAOstock is part of Art of Ellsworth during Maine Craft Weekend. Ellsworth is the gateway to Acadia National Park - 4 million visitors passed through last year. Downtown Ellsworth just received National Historic Register designation. Heart of Ellsworth facilitated 28 events in 2025 with $391K in grants and 50+ sponsors."
 
 ---
 
@@ -55,16 +55,16 @@
 
 ### How It Works
 Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
-- Donations to ZAO Stock go to Fractured Atlas earmarked for the project
+- Donations to ZAOstock go to Fractured Atlas earmarked for the project
 - Fractured Atlas holds funds in a restricted account
 - Funds are re-granted to cover project expenses
 - Donors receive a tax deduction for charitable contributions
 
 ### Language to Use on Pitch Page
-> "ZAO Stock is a fiscally sponsored project of Fractured Atlas, a 501(c)(3) public charity. Contributions for the purposes of ZAO Stock are tax-deductible to the extent permitted by law."
+> "ZAOstock is a fiscally sponsored project of Fractured Atlas, a 501(c)(3) public charity. Contributions for the purposes of ZAOstock are tax-deductible to the extent permitted by law."
 
 ### Language for Sponsor Conversations
-> "Your sponsorship is tax-deductible. We're fiscally sponsored by Fractured Atlas, a national arts nonprofit. They handle the financial administration - your donation goes through them earmarked for ZAO Stock."
+> "Your sponsorship is tax-deductible. We're fiscally sponsored by Fractured Atlas, a national arts nonprofit. They handle the financial administration - your donation goes through them earmarked for ZAOstock."
 
 ### What to Know
 - Fractured Atlas takes an 8% administrative fee on donations (standard for fiscal sponsors)
@@ -82,7 +82,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 | With liquor liability (if selling alcohol) | $300-$500 | Same providers |
 | Multi-day (if expanding) | $300-$600 | Same providers |
 
-**For ZAO Stock Year 1:** Budget $300 for single-day general liability. If Black Moon handles alcohol at the after-party (their own venue, their own license), ZAO Stock may not need liquor liability.
+**For ZAOstock Year 1:** Budget $300 for single-day general liability. If Black Moon handles alcohol at the after-party (their own venue, their own license), ZAOstock may not need liquor liability.
 
 **Action:** Get quote from [theeventhelper.com](https://www.theeventhelper.com/festival-insurance) - can purchase online, coverage starts same day.
 
@@ -96,7 +96,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 - **Eligibility:** U.S.-based 501(c)(3) or fiscal sponsor (Fractured Atlas qualifies)
 - **Application:** Online at [levitt.org](https://levitt.org/music-series-grants/apply/)
 - **Deadline:** January 30, 2027 for 2027 grants (missed 2026 cycle)
-- **Note:** Requires proven track record of producing festivals. After ZAO Stock Year 1, this becomes viable for Year 2+.
+- **Note:** Requires proven track record of producing festivals. After ZAOstock Year 1, this becomes viable for Year 2+.
 
 ### Giveth (Crypto Crowdfunding)
 - Zero-fee crypto donations
@@ -111,7 +111,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 
 ### Mirror (Onchain)
 - Onchain writing + crowdfunding
-- Mint a "ZAO Stock Founding Supporter" post
+- Mint a "ZAOstock Founding Supporter" post
 - Web3-native audience
 - Action: Write the founding story as a Mirror post
 
@@ -138,7 +138,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 | Generic package | Customized to sponsor's business goals |
 | "Thanks for sponsoring" | Post-event report with data |
 
-### ZAO Stock Pitch Deck Sections (for /stock/sponsor page)
+### ZAOstock Pitch Deck Sections (for /stock/sponsor page)
 
 1. **The Story** - Zaal bought a house in Ellsworth. This is his town. Year 1 of a multi-year commitment.
 2. **The Opportunity** - Gateway to Acadia (4M visitors), Maine Craft Weekend (statewide), National Historic Register town
@@ -149,7 +149,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 7. **Tax-Deductible** - Via Fractured Atlas 501(c)(3)
 8. **Multi-Year** - Year 1 is the proof. Year 2+ scales with sponsors getting priority placement.
 
-### Metrics ZAO Stock Can Offer Sponsors
+### Metrics ZAOstock Can Offer Sponsors
 - Livestream viewer count (built into ZAO OS)
 - Social media reach (Farcaster + X + newsletter)
 - On-site foot traffic (manual count or QR scan)
@@ -170,7 +170,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 | **RaveDAO** | Web3, community-governed | $RAVE token funded | 100K+ target by 2026 | DAO governance for festival decisions |
 | **DCentralize (UK)** | Web3 music, tokenized | Tokenized ownership | Medium | Community votes on lineups and decisions |
 
-### ZAO Stock's Unique Position
+### ZAOstock's Unique Position
 No other festival combines:
 1. **Decentralized governance** (90+ weeks of fractal governance, Respect-weighted)
 2. **Onchain infrastructure** (WaveWarZ, 0xSplits, POAP/Magnetiq)
@@ -238,7 +238,7 @@ No other festival combines:
 | Revenue share | 5-10% of sales | Fair for both sides, common |
 | In-kind | Free food for team/artists | Budget-friendly exchange |
 
-**Recommendation for ZAO Stock Year 1:** Invite 2-3 food trucks with NO fee. They benefit from foot traffic, you benefit from having food. Possible in-kind deal: free meals for artists in exchange for social media promotion.
+**Recommendation for ZAOstock Year 1:** Invite 2-3 food trucks with NO fee. They benefit from foot traffic, you benefit from having food. Possible in-kind deal: free meals for artists in exchange for social media promotion.
 
 **Local options:** Fogtown Brewing (25 Pine St, craft beer + pizza), Black Moon Public House (142 Main St, after-party venue)
 
@@ -267,7 +267,7 @@ No other festival combines:
 - Set percentages per artist (equal sets = equal split)
 - All tips/donations sent to the Split address auto-distribute
 - $40M+ distributed to 10,000+ creators across 11 chains
-- **Action:** Set up a ZAO Stock Split with all 10 artists after lineup confirmed
+- **Action:** Set up a ZAOstock Split with all 10 artists after lineup confirmed
 
 ---
 
@@ -356,7 +356,7 @@ Realistic Year 1 grant target: $1,000-$7,000
 
 ## DAO Treasury Model
 
-Hybrid model unique to ZAO Stock:
+Hybrid model unique to ZAOstock:
 1. 0xSplits for artists - auto-distribute tips/donations
 2. ZOUNZ treasury - community votes on budget via governance
 3. Onchain transparency - all income/expenses visible
@@ -392,10 +392,10 @@ Hybrid model unique to ZAO Stock:
 | Who | What | Contact | Why | Priority |
 |-----|------|---------|-----|----------|
 | **Jenifer Pepen (SirenAi)** | One Love Art DAO President/Co-Founder | linkedin.com/in/sirenai, onelovedao.org | 300+ global artists, artist residency program, FailOften connection | HIGH |
-| **OnChain Music** | Web3 licensing + distribution, 90% artist revenue | onchainmusic.com | AttaBotty collaborator, could license ZAO Stock performances | MEDIUM |
+| **OnChain Music** | Web3 licensing + distribution, 90% artist revenue | onchainmusic.com | AttaBotty collaborator, could license ZAOstock performances | MEDIUM |
 | **Audius** | Decentralized streaming, 250M+ streams | audius.org | Livestream distribution partner, $AUDIO rewards for artists | MEDIUM |
 | **Base / Coinbase** | Onchain Summer grants (600+ ETH / $2M), AttaBotty on Base Onchain Registry | base.org | Onchain Summer sponsorship, grant application, AttaBotty is already recognized | HIGH |
-| **Giveth** | Zero-fee crypto crowdfunding | giveth.io | Launch crowdfunding campaign for ZAO Stock | HIGH |
+| **Giveth** | Zero-fee crypto crowdfunding | giveth.io | Launch crowdfunding campaign for ZAOstock | HIGH |
 | **Whop** | $1.6B creator platform, Craig Gonzalez on partnerships team | Via Craig G | Creator economy sponsor, digital product platform | HIGH (via Craig) |
 | **Sound.xyz** | Onchain music drops | sound.xyz | Artist NFT drops at event, Shawn/Web3 Metal connection | MEDIUM |
 | **Zora** | Onchain minting, creator tools | zora.co | Mint event collectibles, onchain ticket/POAP alternative | MEDIUM |
@@ -506,12 +506,12 @@ Hybrid model unique to ZAO Stock:
 
 ## DEEP DIVE: Ellsworth Music Ecosystem
 
-### Existing Concert Series (ZAO Stock fits into this calendar)
+### Existing Concert Series (ZAOstock fits into this calendar)
 - **Friday Waterfront Concerts** - Harbor Park, 6pm, free, City + The Grand sponsored
 - **Wednesday Concert Band** - Harbor Park, 7-7:40pm, free
 - **Thursday Parklet Concerts** - Franklin Street Parklet, 7-9pm, free (THIS IS OUR VENUE)
 
-**Key insight:** The Parklet already hosts weekly concerts. ZAO Stock plugs into existing cultural infrastructure.
+**Key insight:** The Parklet already hosts weekly concerts. ZAOstock plugs into existing cultural infrastructure.
 
 ### Steve Peer Deep Dive
 - 430 Bayside Road house concert venue, running since May 2009
@@ -544,7 +544,7 @@ Hybrid model unique to ZAO Stock:
 - **Dollar-for-dollar federal match, up to $1 million/year for 10 years**
 - Eligible: municipalities, nonprofits, schools
 - Projects: downtown revitalization, cultural preservation, outdoor recreation
-- ZAO Stock angle: festival celebrating music + culture in a National Heritage Area town with newly designated National Historic Register downtown
+- ZAOstock angle: festival celebrating music + culture in a National Heritage Area town with newly designated National Historic Register downtown
 
 ---
 
@@ -556,17 +556,17 @@ Hybrid model unique to ZAO Stock:
 - Left 9-5 to pursue music. First EP "The Way That I Fiddle" (July 2020)
 - Sold out music NFT mints. Web3 advocate.
 - Socials: @clejanmusic (X), @thetrapviolinist (TikTok), clejan.com
-- ZAO Stock fit: high-energy live performer, visual spectacle, Web3-aligned
+- ZAOstock fit: high-energy live performer, visual spectacle, Web3-aligned
 
 ### Stilo World / Dope Stilo
 - DJ + metaverse venue host. 150+ consecutive weekly VR concerts (Super Wednesdays)
 - Spatial + Web3, mobile/desktop/VR accessible
 - NFTs on Rarible with exclusive tracks + wearable digital fashion
 - Website: stilo.world
-- ZAO Stock fit: DJ between sets, bring virtual audience via livestream, proven reliability
+- ZAOstock fit: DJ between sets, bring virtual audience via livestream, proven reliability
 
 ### Joseph Goats
 - Venezuelan singer-songwriter, Spanish + English, based in Caracas
 - COC Concertz #4: 3 songs (No Winters Land, Calma, Compass/Brujula)
 - Supports Huottoja indigenous community via Giveth
-- ZAO Stock fit: international artist, social impact, Giveth cross-promo
+- ZAOstock fit: international artist, social impact, Giveth cross-promo

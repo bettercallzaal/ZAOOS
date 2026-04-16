@@ -177,7 +177,7 @@ From the ZAO Complete Guide (Doc 050) and Task Forces (Doc 215):
 |------|---------|
 | **ZAO Co-Founder** | One of three co-founders alongside Zaal Panthaki and Candy (Samantha Denton-Kinney) |
 | **Festivals & Production** | Primary role within ZAO |
-| **ZAO Stock Production Lead** | Production lead + day-of stage manager for ZAO Stock festival (October 2026, Ellsworth, Maine) — sound, staging, artist management, set transitions |
+| **ZAOstock Production Lead** | Production lead + day-of stage manager for ZAOstock festival (October 2026, Ellsworth, Maine) — sound, staging, artist management, set transitions |
 | **Artist Relations** | Handles artist relations alongside Zaal |
 | **Event Production** | Leads event production for ZAO events |
 | **Governance & Identity** | Co-owner of TF-03 (Governance & Identity task force) with Zaal |
@@ -194,15 +194,15 @@ AttaBotty + DaNici produced **ZAO-Chella** — a fusion of digital innovation an
 
 The event was organized under the [@zaofestivals](https://www.instagram.com/zaofestivals/) brand, with a website at [zaofestivals.com](https://zaofestivals.com/).
 
-### ZAO Stock Festival
+### ZAOstock Festival
 
-Per Doc 224 (ZAO Stock Multi-Year Vision):
+Per Doc 224 (ZAOstock Multi-Year Vision):
 
-| Person | ZAO Stock Role |
+| Person | ZAOstock Role |
 |--------|---------------|
 | **AttaBotty** | Production Lead + Day-of Stage Manager — sound, staging, artist management, set transitions. Professional production experience across multiple Art Basel / NFTNYC events. "Knows how to run a show." |
 | **DaNici** | Visual Design + Animation — festival branding, signage, digital assets, stage visuals. Creates original content for X/YouTube/Instagram. Multimedia production partner to AttaBotty. |
-| **AttaBotty + DaNici together** | Style & Culture Curators — define the aesthetic, vibe, cultural programming of ZAO Stock. "They've done Miami Art Week, NFTNYC — they know how to create an atmosphere. They set the tone." |
+| **AttaBotty + DaNici together** | Style & Culture Curators — define the aesthetic, vibe, cultural programming of ZAOstock. "They've done Miami Art Week, NFTNYC — they know how to create an atmosphere. They set the tone." |
 
 ---
 
@@ -219,7 +219,7 @@ Per Doc 224 (ZAO Stock Multi-Year Vision):
 
 ### ZAO Ecosystem Collaborators
 
-- **FailOften** (David Steele Overholt) — Creative tech/installations partner for ZAO Stock
+- **FailOften** (David Steele Overholt) — Creative tech/installations partner for ZAOstock
 - **Enteract Studios** — Creative tech for ZAO events
 - **Zaal Panthaki** — ZAO founder, co-founder partner
 - **Candy** (Samantha Denton-Kinney) — ZAO co-founder, design/marketing
@@ -233,7 +233,7 @@ Per Doc 224 (ZAO Stock Multi-Year Vision):
 | **NFTNYC 2024** | 2024 | Featured artist |
 | **Miami Art Week 2024** (Art Basel) | 2024 | Featured artist, ZAO-Chella organizer |
 | **ZAO-Chella** | 2024 | Organizer/producer (Wynwood, Miami) |
-| **ZAO Stock** | 2026 (planned) | Production Lead + Stage Manager (Ellsworth, Maine) |
+| **ZAOstock** | 2026 (planned) | Production Lead + Stage Manager (Ellsworth, Maine) |
 | **ZAOVille** | 2026 (planned) | Production support (Virginia, collaboration with DCOOP) |
 
 ---
@@ -300,5 +300,5 @@ Per Doc 224 (ZAO Stock Multi-Year Vision):
 - [Third Planet Studio](https://thirdplanet.studio/)
 - [On-Chain Records on X](https://twitter.com/onchainrecords)
 - [SAN Sound Whitepaper](https://medium.com/@sansound/new-san-sound-whitepaper-ee6102ce151f)
-- ZAO OS internal: Doc 050 (Complete Guide), Doc 215 (Task Forces), Doc 224 (ZAO Stock Vision)
+- ZAO OS internal: Doc 050 (Complete Guide), Doc 215 (Task Forces), Doc 224 (ZAOstock Vision)
 - ZAO OS internal: `csv import/Misc-Grid view.csv` (Respect points data)

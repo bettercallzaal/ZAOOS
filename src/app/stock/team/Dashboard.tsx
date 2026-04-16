@@ -26,7 +26,7 @@ export function Dashboard({ memberName, memberId, goals, todos, members }: Props
       <header className="sticky top-0 z-40 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/[0.06]">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-white">ZAO Stock Team</h1>
+            <h1 className="text-lg font-bold text-white">ZAOstock Team</h1>
             <p className="text-xs text-gray-400">October 3, 2026 - Ellsworth, ME</p>
           </div>
           <div className="flex items-center gap-3">

@@ -1,4 +1,4 @@
-# ZAO Stock 2026 - Staffing Grid
+# ZAOstock 2026 - Staffing Grid
 
 ## Day-Of Team Assignments
 

@@ -1,4 +1,4 @@
-# ZAO Stock Standup - Kickoff Recap
+# ZAOstock Standup - Kickoff Recap
 ## April 14, 2026 | 10:00 AM EST
 
 ---
@@ -68,7 +68,7 @@
 
 ### 3. Venue Update (NEW INFO)
 
-- **Heart of Ellsworth / Parklet:** They were planning to remove the parklet structure on October 1. They've offered to keep it through the October 3 weekend if ZAO Stock helps offset the additional expense of keeping it up a few extra days. Otherwise, the space itself is at no cost.
+- **Heart of Ellsworth / Parklet:** They were planning to remove the parklet structure on October 1. They've offered to keep it through the October 3 weekend if ZAOstock helps offset the additional expense of keeping it up a few extra days. Otherwise, the space itself is at no cost.
 - **Town of Ellsworth** should be added as a partner (for the venue portion)
 - Zaal sent a follow-up email to schedule an in-person meeting
 
@@ -99,7 +99,7 @@
 
 ### 5. Awareness Goal
 
-- **Target:** 5,000 of Ellsworth's 9,000 residents should have heard of ZAO Stock by October
+- **Target:** 5,000 of Ellsworth's 9,000 residents should have heard of ZAOstock by October
 - Strategy: local band digital marketing, ZAO Festivals X account posting + tagging, local business relationships
 
 ### 6. Website (/stock page)
@@ -114,13 +114,13 @@
 - Zaal creating markdown files for FailOften and Shawn to share with their AIs
 - Want to explore AI-to-AI communication between team members' agents
 - FailOften has ideas on this - needs a separate brainstorm session
-- Goal: context in one place, Discord bot that can answer questions about ZAO Stock
+- Goal: context in one place, Discord bot that can answer questions about ZAOstock
 
 ### 8. Design Priorities
 
 - **Brand kit for ZAO Festivals** - needed so all team members are aligned on visual identity
-- **T-shirt:** Shawn to design a simple ZAO Stock t-shirt for print-on-demand, Zaal can start wearing it to promote
-- **DCoop logo:** DCoop to create ZAOVille logo concepts, potential melded logo with ZAO Stock
+- **T-shirt:** Shawn to design a simple ZAOstock t-shirt for print-on-demand, Zaal can start wearing it to promote
+- **DCoop logo:** DCoop to create ZAOVille logo concepts, potential melded logo with ZAOstock
 - **Design meeting:** Zaal + Shawn + DaNici tomorrow afternoon
 
 ---
@@ -147,12 +147,12 @@
 - [ ] Bangor Savings Bank - prepare $1,000 sponsor application
 
 ### Shawn
-- [ ] Design simple ZAO Stock t-shirt (logo on front) for print-on-demand
+- [ ] Design simple ZAOstock t-shirt (logo on front) for print-on-demand
 - [ ] Send bio to Zaal
 
 ### DCoop
 - [ ] Create ZAOVille logo concepts
-- [ ] Explore melded ZAO Stock + ZAOVille logo
+- [ ] Explore melded ZAOstock + ZAOVille logo
 - [ ] Send bio to Zaal
 
 ### Candy (absent - for recap)

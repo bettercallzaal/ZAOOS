@@ -1,8 +1,8 @@
-# ZAO Stock 2026 — Planning Timeline
+# ZAOstock 2026 — Planning Timeline
 
 ## April 2026 (6 months out)
 - [ ] Confirm MCW 2026 dates with Cara Romano / Heart of Ellsworth
-- [ ] Pitch Steve Peer on ZAO Stock (his bar benefits directly)
+- [ ] Pitch Steve Peer on ZAOstock (his bar benefits directly)
 - [ ] Launch Giveth crowdfunding page
 - [ ] Launch GoFundMe as secondary
 - [ ] First virtual event (WaveWarZ or Spaces talk)
@@ -12,7 +12,7 @@
 - [ ] Call Wallace Events for tent quote — (207) 667-6000
 - [ ] Contact sound vendors (DRD Audio/Visual, Bronson AV Bangor)
 - [ ] Confirm 5-6 artists minimum
-- [ ] Set up ZAO Stock page on zaoos.com
+- [ ] Set up ZAOstock page on zaoos.com
 - [ ] Second virtual event
 - [ ] Begin sponsorship outreach (local Ellsworth businesses)
 
@@ -25,7 +25,7 @@
 - [ ] ZAO Cypher posted for awareness
 
 ## July 2026 (3 months out)
-- [ ] ZAO Stock page live on zaoos.com
+- [ ] ZAOstock page live on zaoos.com
 - [ ] Co-present at Thursday Ellsworth Summer Concert
 - [ ] Announce lineup on Farcaster / socials
 - [ ] Local press outreach (Ellsworth American, BDN)

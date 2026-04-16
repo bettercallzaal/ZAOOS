@@ -2,7 +2,7 @@
 
 > **Status:** Research complete
 > **Date:** 2026-04-15
-> **Goal:** Apply Lean Six Sigma (DMAIC + 7 wastes + SIPOC) to ZAO Stock festival planning with 4 teams, 14 people, 172 days
+> **Goal:** Apply Lean Six Sigma (DMAIC + 7 wastes + SIPOC) to ZAOstock festival planning with 4 teams, 14 people, 172 days
 
 ---
 
@@ -20,7 +20,7 @@
 
 ---
 
-## DMAIC Applied to ZAO Stock (172-Day Build)
+## DMAIC Applied to ZAOstock (172-Day Build)
 
 ### Define (Weeks 1-2, DONE)
 - Event: October 3, 2026, Franklin Street Parklet, Ellsworth ME
@@ -66,7 +66,7 @@ Lock processes, stop changing things, execute the plan:
 
 ## 7 Wastes (Muda) Adapted for Festival Production
 
-| Waste | Manufacturing | ZAO Stock Equivalent | Fix |
+| Waste | Manufacturing | ZAOstock Equivalent | Fix |
 |-------|-------------|---------------------|-----|
 | **Transport** | Moving materials | Sending people to meetings they don't need to be in | Only relevant team members at sub-meetings |
 | **Inventory** | Excess stock | Too many ideas/features not being acted on | Kill ideas older than 2 weeks with no action |
@@ -78,7 +78,7 @@ Lock processes, stop changing things, execute the plan:
 
 ---
 
-## SIPOC for ZAO Stock
+## SIPOC for ZAOstock
 
 | Element | Details |
 |---------|---------|
@@ -94,7 +94,7 @@ Lock processes, stop changing things, execute the plan:
 
 Apply to every Tuesday 10am standup:
 
-| P | What | ZAO Stock Implementation |
+| P | What | ZAOstock Implementation |
 |---|------|--------------------------|
 | **Purpose** | Why are we meeting? | Team reports + unblock tasks + weekly priorities |
 | **Participants** | Who needs to be there? | Team leads required, members optional (open stage) |
@@ -207,7 +207,7 @@ Output: Artist confirmed with travel booked
 
 ---
 
-## Deep Dive: Kaizen Sprints for ZAO Stock
+## Deep Dive: Kaizen Sprints for ZAOstock
 
 A Kaizen sprint is a 3-5 day focused push where a small team solves one specific problem. Not the weekly grind - a concentrated burst.
 
@@ -216,7 +216,7 @@ A Kaizen sprint is a 3-5 day focused push where a small team solves one specific
 - A handoff between teams keeps failing
 - The same problem keeps appearing at standups
 
-### ZAO Stock Kaizen sprint format (adapted for volunteers):
+### ZAOstock Kaizen sprint format (adapted for volunteers):
 
 | Day | Focus | Output |
 |-----|-------|--------|

@@ -124,8 +124,8 @@ Magnetiq uses **QR codes** (not NFC) as the primary interaction mechanism:
 | **Proof of Meet (POM)** | The ZABAL-specific use case: IRL connection tokens for people who met Zaal at events |
 | **How POM works** | Attendee scans QR -> gets a digital badge on Flow -> becomes part of the ZABAL CRM |
 | **Previous ZAO events** | Tyler has "done this at previous ZAO events" (per Doc 224) |
-| **ZAO Stock role** | Tyler is assigned as the **IRL Connection Layer** for ZAO Stock (Oct 2026) — Magnetiq Proof of Meet tokens, ZABAL integration, community networking |
-| **Task Force TF-04** | "Magnetiq IRL meet token integration confirmed" is a deliverable for ZAO Stock |
+| **ZAOstock role** | Tyler is assigned as the **IRL Connection Layer** for ZAOstock (Oct 2026) — Magnetiq Proof of Meet tokens, ZABAL integration, community networking |
+| **Task Force TF-04** | "Magnetiq IRL meet token integration confirmed" is a deliverable for ZAOstock |
 
 **Zaal's quote on POM:** "Proof of Meet isn't just a digital badge. It's an intentional acknowledgement of the magic we experience when we interact with others in person."
 
@@ -168,7 +168,7 @@ Magnetiq is on **Flow blockchain**; ZAO OS is on **Ethereum/Base/Optimism**. No 
 | **ZID 2** | Second ZAO member ever — ZID 1 = Zaal, ZID 2 = Candy |
 | **Fractal Day 1** | Ranked 2nd on the very first ZAO Fractal Respect Game |
 | **Student $LOANZ** | Creator of the $LOANZ token on Base (launched Feb 2025 on Flaunch.gg, sponsored ZAO-Chella) |
-| **ZAO Stock role** | Design + Backup Support: visual design, materials, branding, sponsorship outreach |
+| **ZAOstock role** | Design + Backup Support: visual design, materials, branding, sponsorship outreach |
 
 ### CandyToyBox on GitHub — 16 Repositories (All WaveWarZ)
 
@@ -218,7 +218,7 @@ Candy creates **CC0 graphics** for the ZAO and WaveWarZ ecosystems. CC0 means "C
 - WaveWarZ branding and marketing materials
 - ZAO event visual design (ZAO-Chella, ZAO-Palooza materials)
 - Print + digital design for community materials
-- ZAO Stock design materials (assigned role in Doc 224)
+- ZAOstock design materials (assigned role in Doc 224)
 
 ### Medium Articles (Published)
 
@@ -243,7 +243,7 @@ Per Devfolio: 1 project built, 1 hackathon attended, 0 prizes won. The project l
 
 - **ZAO-Palooza (April 2024):** Trading card design, event branding
 - **ZAO-Chella (Dec 2024):** Event materials, AR art display coordination, trading cards
-- **ZAO Stock (Oct 2026 planned):** Assigned to Design + Backup Support team alongside DaNici
+- **ZAOstock (Oct 2026 planned):** Assigned to Design + Backup Support team alongside DaNici
 
 ---
 
@@ -299,11 +299,11 @@ Swarthy bridges these communities — meaning he participates across multiple fr
 
 ### Media and Production Work
 
-Swarthy Hatter has **media + production skills** and is assigned to the ZAO Stock festival team:
+Swarthy Hatter has **media + production skills** and is assigned to the ZAOstock festival team:
 
 | Role | Detail |
 |------|--------|
-| **ZAO Stock assignment** | Media + Production Support — video, photography, content capture, social media |
+| **ZAOstock assignment** | Media + Production Support — video, photography, content capture, social media |
 | **Responsibility** | Day-of documentation, build-in-public content pipeline |
 | **Team** | Works alongside Ohnahji B and Maceo on the Media + Documentation team |
 | **Coverage** | 3-person media team covers livestreaming, podcast production, photography, videography, social media |
@@ -313,7 +313,7 @@ Swarthy Hatter has **media + production skills** and is assigned to the ZAO Stoc
 | Context | Role |
 |---------|------|
 | **Doc 50 (Complete Guide)** | Listed in Fractal Community Network table: "Bridges fractal communities" |
-| **Doc 224 (ZAO Stock)** | Media & Tech team member for ZAO Stock festival |
+| **Doc 224 (ZAOstock)** | Media & Tech team member for ZAOstock festival |
 | **Doc 78 (Nouns Builder)** | Profiled as SwarthyHatter/SKTH — governance tools interest |
 | **Optimism Fractal** | Honored as a builder |
 | **ZAO Fractal** | Active participant bridging fractal networks |
@@ -381,15 +381,15 @@ Doc 101 (WaveWarZ research) notes:
 | **Where** | Virginia (specific venue TBD) |
 | **Organizer** | DCoop |
 | **Concept** | Multi-city ZAO festival model inspired by Afropunk (which runs festivals in multiple cities under one brand) |
-| **Relationship** | ZAO Stock = Ellsworth, Maine (October 2026). ZAOVille = DMV area (July 2026). Same brand, two locations, two organizers |
+| **Relationship** | ZAOstock = Ellsworth, Maine (October 2026). ZAOVille = DMV area (July 2026). Same brand, two locations, two organizers |
 
-**From Doc 224 (ZAO Stock Multi-Year Vision):**
+**From Doc 224 (ZAOstock Multi-Year Vision):**
 
-> "ZAOVille — DCoop artist. Virginia-based. Running his own ZAO festival event in the DMV (Maryland/DC/Virginia area). Creates the **multi-city ZAO festival model** (Afropunk pattern). ZAO Stock = Ellsworth, ZAOVille event = DMV. Same brand, two locations."
+> "ZAOVille — DCoop artist. Virginia-based. Running his own ZAO festival event in the DMV (Maryland/DC/Virginia area). Creates the **multi-city ZAO festival model** (Afropunk pattern). ZAOstock = Ellsworth, ZAOVille event = DMV. Same brand, two locations."
 
-DCoop's ZAO Stock role is **Performing Artist + Parallel Event Organizer** — he would both perform at ZAO Stock and coordinate the DMV satellite event (ZAOVille).
+DCoop's ZAOstock role is **Performing Artist + Parallel Event Organizer** — he would both perform at ZAOstock and coordinate the DMV satellite event (ZAOVille).
 
-He is also listed as **production support** alongside AttaBotty for ZAO Stock staging.
+He is also listed as **production support** alongside AttaBotty for ZAOstock staging.
 
 ### ZAO Ecosystem Timeline
 
@@ -398,7 +398,7 @@ He is also listed as **production support** alongside AttaBotty for ZAO Stock st
 | 2023+ | DCoop active on WaveWarZ as DCoopOfficial |
 | Mar 2026 | Featured in Doc 101 battle data (1.039 SOL battle vs Kata7yst) |
 | Jul 2026 | **ZAOVille** planned (Virginia, organized by DCoop) |
-| Oct 2026 | ZAO Stock planned (Maine) — DCoop as performer + production support |
+| Oct 2026 | ZAOstock planned (Maine) — DCoop as performer + production support |
 
 ### Social Media Presence
 
@@ -429,21 +429,21 @@ ZAO Core
 │
 ├── Tyler / Magnetiq (ZABAL Connector)
 │   ├── ETH Boulder POM (Feb 2026)
-│   ├── ZAO Stock IRL tokens (Oct 2026)
+│   ├── ZAOstock IRL tokens (Oct 2026)
 │   └── Flow blockchain (cross-chain gap)
 │
 ├── Swarthy Hatter (Fractal Bridge)
 │   ├── Eden Fractal ←→ Optimism Fractal ←→ ZAO Fractal
 │   ├── Nouns Builder (City Nouns, governance tools)
-│   └── ZAO Stock media team
+│   └── ZAOstock media team
 │
 └── DCoop / ZAOVille (DMV Expansion)
     ├── WaveWarZ battles (DCoopOfficial)
     ├── ZAOVille (July 2026, Virginia)
-    └── ZAO Stock performer + production
+    └── ZAOstock performer + production
 ```
 
-### ZAO Stock Festival Team Assignments
+### ZAOstock Festival Team Assignments
 
 | Capability | Person | Status |
 |-----------|--------|--------|
@@ -500,4 +500,4 @@ ZAO Core
 - [Doc 78 — Nouns Builder Integration](../078-nouns-builder-integration/)
 - [Doc 101 — WaveWarZ + ZAO Whitepaper](../101-wavewarz-zao-whitepaper/)
 - [Doc 215 — ZAO Task Forces 2026](../215-zao-task-forces-2026/)
-- [Doc 224 — ZAO Stock Multi-Year Vision](../224-zao-stock-multi-year-vision/)
+- [Doc 224 — ZAOstock Multi-Year Vision](../224-zao-stock-multi-year-vision/)

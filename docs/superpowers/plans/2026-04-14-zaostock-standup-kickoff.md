@@ -1,8 +1,8 @@
-# ZAO Stock Standup Kickoff Implementation Plan
+# ZAOstock Standup Kickoff Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Create the living dashboard doc for ZAO Stock standups and add a public Teams section to zaoos.com/stock.
+**Goal:** Create the living dashboard doc for ZAOstock standups and add a public Teams section to zaoos.com/stock.
 
 **Architecture:** Two deliverables - (1) a markdown dashboard at `ZAO-STOCK/standups/dashboard.md` with team rosters, resources, attendance log, and today's agenda, (2) update `src/app/stock/page.tsx` with static team data arrays and new sections for Teams and Partners. No new components needed - the page is a server component with static data.
 
@@ -27,7 +27,7 @@
 - [ ] **Step 1: Create the standups directory and dashboard file**
 
 ```markdown
-# ZAO Stock - Team Dashboard
+# ZAOstock - Team Dashboard
 
 > **Standup:** Tuesdays, 10:00 AM EST
 > **Format:** Each team reports what they did + what they need support on
@@ -123,7 +123,7 @@
 ### April 14, 2026 - Kickoff Meeting
 
 **Agenda:**
-1. Welcome + what ZAO Stock standup is (2 min)
+1. Welcome + what ZAOstock standup is (2 min)
 2. Team structure explanation + roster reveal (5 min)
 3. Resources landscape - who and what is available (5 min)
 4. Open discussion + team assignment shuffling (10 min)
@@ -166,7 +166,7 @@ _Template for future weeks:_
 
 ```bash
 git add ZAO-STOCK/standups/dashboard.md
-git commit -m "docs: ZAO Stock standup dashboard - kickoff April 14"
+git commit -m "docs: ZAOstock standup dashboard - kickoff April 14"
 ```
 
 ---

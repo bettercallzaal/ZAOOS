@@ -1,27 +1,27 @@
-# 213 — ZAO Stock: Planning & Knowledge Base
+# 213 — ZAOstock: Planning & Knowledge Base
 
 > **Status:** Planning / Research
 > **Date:** March 29, 2026
 > **Tags:** `#zao-stock` `#festival` `#irl-events` `#music` `#maine` `#community`
-> **Supersedes:** Doc 051 (whitepaper ZAO Stock section)
+> **Supersedes:** Doc 051 (whitepaper ZAOstock section)
 
 ---
 
 ## tl;dr
 
-**ZAO Stock** is ZAO's flagship IRL music festival — a multi-day event in Maine (October 2026) bridging local arts culture with the global onchain music movement. First edition. Community-built. Technology is invisible underlayer, not the point.
+**ZAOstock** is ZAO's flagship IRL music festival — a multi-day event in Maine (October 2026) bridging local arts culture with the global onchain music movement. First edition. Community-built. Technology is invisible underlayer, not the point.
 
 **Goal:** 500–1,000 attendees. Zero blockchain knowledge required to enjoy the festival. Onchain tools power logistics, payments, and memorabilia — but the experience comes first.
 
 ---
 
-## What ZAO Stock Is
+## What ZAOstock Is
 
 ### The Vision (from the whitepaper)
 
 > "Anyone should be able to attend and enjoy the experience without knowing anything about blockchain. The technology enhances the experience — it doesn't interrupt it."
 
-ZAO Stock is ZAO's answer to "web3 events are conferences, not festivals." Every other onchain event is a hackathon or a summit. ZAO Stock is a **music festival first** — one where the community shows up in person, artists perform, and the onchain infrastructure handles:
+ZAOstock is ZAO's answer to "web3 events are conferences, not festivals." Every other onchain event is a hackathon or a summit. ZAOstock is a **music festival first** — one where the community shows up in person, artists perform, and the onchain infrastructure handles:
 - Transparent artist payments
 - Attendance NFTs / proof-of-attendance tokens
 - Onchain memorabilia (limited edition art drops)
@@ -29,18 +29,18 @@ ZAO Stock is ZAO's answer to "web3 events are conferences, not festivals." Every
 
 ### Positioning
 
-| Type | What | ZAO Stock comparison |
+| Type | What | ZAOstock comparison |
 |------|------|----------------------|
 | NFT NYC | NFT conference | No music focus, mostly collectors |
 | Art Basel Miami | Art festival | No onchain infrastructure |
 | ETH Denver | Conference | Developer-focused, no music |
 | ZAO-CHELLA | Festival activation | 10 artists, one night, AR art |
-| **ZAO Stock** | **Music festival** | **Full production, 2-3 days, Maine arts culture + onchain** |
+| **ZAOstock** | **Music festival** | **Full production, 2-3 days, Maine arts culture + onchain** |
 
 ### Why Maine
 
 From the whitepaper:
-> "After joining local organizations, volunteering, and collaborating with a musician who has been working to build a thriving local music scene since the late 1980s, the plan for ZAO Stock took shape."
+> "After joining local organizations, volunteering, and collaborating with a musician who has been working to build a thriving local music scene since the late 1980s, the plan for ZAOstock took shape."
 
 Maine has:
 - Strong local arts culture with decades of community
@@ -84,7 +84,7 @@ Maine has:
 
 ---
 
-## ZAO Stock: What We Know
+## ZAOstock: What We Know
 
 ### When
 - **Target:** October 2026
@@ -136,7 +136,7 @@ These are **tools under the hood**, not marketing points:
 | NFT attendance tokens (POAP-style) | TBD | Engineer |
 | 0xSplits for artist payments | TBD | Engineer |
 | Magnetiq integration for IRL meet tokens | TBD | Engineer |
-| ZAO Stock page on ZAO OS (event info + ticketing) | TBD | Engineer |
+| ZAOstock page on ZAO OS (event info + ticketing) | TBD | Engineer |
 | On-chain vs off-chain ticketing decision | TBD | CEO |
 | Live set streaming (YouTube/Twitch) | TBD | Community |
 | IRL fractal meeting at festival | TBD | CEO |
@@ -160,13 +160,13 @@ These are **tools under the hood**, not marketing points:
 4. **Festival vs conference** — Is this purely music, or are there talks/workshops too?
 5. **Scale** — 500 vs 1,000 — bigger = more impact but harder to organize with volunteer team
 6. **Livestream** — Do we stream? YouTube, Twitch, or both? Who runs it?
-7. **ZAOOS feature** — Does ZAO OS need a dedicated "ZAO Stock" section before the event?
+7. **ZAOOS feature** — Does ZAO OS need a dedicated "ZAOstock" section before the event?
 
 ---
 
 ## References
 
-- [ZAO Whitepaper 2026 — Doc 051](./051-zao-whitepaper-2026/) — ZAO Stock context and full vision
+- [ZAO Whitepaper 2026 — Doc 051](./051-zao-whitepaper-2026/) — ZAOstock context and full vision
 - [ZAO-PALOOZA Card on Manifold](https://app.manifold.xyz/c/zao-card-jango-uu-zaopalooza)
 - [ZAO-CHELLA Instagram](https://www.instagram.com/reel/DDa-oPBJ7G7/)
 - [Magnetiq — Proof of Meet](https://www.magnetiq.xyz/)
@@ -177,7 +177,7 @@ These are **tools under the hood**, not marketing points:
 
 ## Related Docs
 
-- [051 — ZAO Whitepaper 2026](./051-zao-whitepaper-2026/) — ZAO Stock vision
+- [051 — ZAO Whitepaper 2026](./051-zao-whitepaper-2026/) — ZAOstock vision
 - [064 — Incented + ZABAL Campaigns](./064-incented-zabal-campaigns/) — campaign ideas for festival
 - [102 — Fractals + ORDAO](./102-fractals-frapps-ordao-page/) — fractal meeting format
 - [198 — Social Graph Analytics](./198-social-graph-analytics-discovery/) — community relationship tracking

@@ -1,4 +1,4 @@
-# 363 - ZAO Stock People + Brands: Comprehensive Profile Index
+# 363 - ZAOstock People + Brands: Comprehensive Profile Index
 
 > **Status:** In progress (autoresearch overnight)
 > **Date:** 2026-04-15
@@ -22,7 +22,7 @@
 
 ### Fully Researched (Deep Profiles in Docs 229-232)
 
-| Person | Doc | Key Stat | ZAO Stock Role |
+| Person | Doc | Key Stat | ZAOstock Role |
 |--------|-----|----------|----------------|
 | AttaBotty (William Carreras) | 232 | 20+ years, 10K+ NFTs, Base Onchain Registry | Music team member, AV |
 | DaNici (Denis Carreras) | 232 | 5+ years Blender, Paris Hilton events | Design lead |
@@ -52,7 +52,7 @@
 | **Web3 Role** | Deep in virtual/remote music performance + blockchain-based distribution |
 | **Skills** | Show MC, interviewer, streaming operator, recording engineer |
 | **COC Concertz** | Featured artist at COC Concertz events |
-| **ZAO Stock Role** | Ops member. Suggested advisory board structure. |
+| **ZAOstock Role** | Ops member. Suggested advisory board structure. |
 
 ### New Profile: Shawn Porter (Web3 Metal)
 
@@ -65,7 +65,7 @@
 | **Activities** | Cyber Metal Radio (weekly fan-curated countdowns), Suno AI music contests, Collab Club, NFT drops via Sound.xyz + Gala Music |
 | **Other** | Co-founder of OCG Esports Club (Canadian esports org, est. 2019) |
 | **Socials** | Twitter, LinkedIn, Instagram, TikTok, YouTube, Discord (via Web3 Metal) |
-| **ZAO Stock Role** | Design + Music team member. Designing ZAO Stock t-shirt. |
+| **ZAOstock Role** | Design + Music team member. Designing ZAOstock t-shirt. |
 
 ### New Profile: DFresh / DFreshmaker (Doug)
 
@@ -80,7 +80,7 @@
 | **What he does** | Music NFT curator/tastemaker. Created "Superf3st x DFresh Selects" weekly mixtape series (11+ volumes). Non-gatekeeping Web3 music curation. |
 | **Web3 music** | Hosted first-ever artist listening party + NFT drop on Club Space (Lens Protocol). Tested Lens tech with NftFrost. Active music NFT collector. |
 | **Key value** | Knows Web3 music NFT space deeply, has partnerships experience (VP role), financial services background useful for festival finance |
-| **ZAO Stock Role** | Finance team member |
+| **ZAOstock Role** | Finance team member |
 
 ### New Profile: Craig G (Craig Gonzalez)
 
@@ -90,8 +90,8 @@
 | **Title** | Partnerships at Whop |
 | **Company** | [Whop](https://whop.com) - creator commerce platform, $1.6B valuation (Feb 2026), raised $200M from Tether |
 | **Whop context** | 18-person partnerships team. Whop powers digital product sales for creators. Tether investment embedding wallet infrastructure into Whop, expanding to LATAM/Europe/APAC |
-| **Value to ZAO Stock** | Partnerships expertise at a $1.6B creator platform. Warm intros to creator economy brands. Understands sponsorship/partnership deal structure at scale. |
-| **ZAO Stock Role** | Advisory board |
+| **Value to ZAOstock** | Partnerships expertise at a $1.6B creator platform. Warm intros to creator economy brands. Understands sponsorship/partnership deal structure at scale. |
+| **ZAOstock Role** | Advisory board |
 | **Status** | Need bio + links from him directly. His Whop connection is high-value for sponsor pipeline. |
 
 ---
@@ -126,7 +126,7 @@
 | **Smart contracts** | Base L2 (Candy's wavewarz-base, 8/8 tests, A+ audit) |
 | **Key stat for sponsors** | 795 battles, real money flowing, real artists getting paid |
 
-### ZAO Stock
+### ZAOstock
 
 | Field | Detail |
 |-------|--------|
@@ -176,7 +176,7 @@
 | **What** | DMV-area (Maryland/DC/Virginia) satellite ZAO festival |
 | **Lead** | DCoop |
 | **Status** | Concept/development phase, no public web presence |
-| **Relationship** | Same brand as ZAO Stock, different city - creates multi-city festival model |
+| **Relationship** | Same brand as ZAOstock, different city - creates multi-city festival model |
 
 ### FISHBOWLZ
 

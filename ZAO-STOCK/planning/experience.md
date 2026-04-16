@@ -1,4 +1,4 @@
-# ZAO Stock 2026 - Guest Experience Narrative
+# ZAOstock 2026 - Guest Experience Narrative
 
 ## The Day (as a story)
 
@@ -14,7 +14,7 @@ The first artist takes the stage at 12:30. Twenty-five minutes of original music
 
 By the third artist you've met someone new. You're sitting at a picnic table with people from three different states. One of them found this through Farcaster. One lives two blocks away. One drove from Bar Harbor after seeing a flyer at Vinyl Vogue - the record shop literally next to the Parklet.
 
-There's a merch table. ZAO Stock t-shirts. The logo is clean. You buy one because you want to remember this.
+There's a merch table. ZAOstock t-shirts. The logo is clean. You buy one because you want to remember this.
 
 The artists are real. You can talk to them between sets. They're standing right there, drinking the same coffee you are. No VIP section. No barriers. This isn't a festival that separates performers from people.
 
@@ -41,7 +41,7 @@ On your drive home you check your phone. There's a livestream replay already pos
 
 ---
 
-## What Makes ZAO Stock Different (for the pitch)
+## What Makes ZAOstock Different (for the pitch)
 
 1. **No barriers between artists and audience.** Artists hang out at the same picnic tables.
 2. **Built by the community, not a promoter.** 14 team members, 4 teams, weekly standups for 6 months.

@@ -66,7 +66,7 @@ Tom Fellenz, Steve Peer, Tyler Stambaugh, Craig Gonzalez (Whop), Adam Place (Son
 
 ## The Pitch (one paragraph)
 
-ZAO Stock is a community-built outdoor music festival happening October 3, 2026 at the Franklin Street Parklet in downtown Ellsworth, Maine - the gateway to Acadia National Park (4 million visitors in 2025). Part of the 9th Annual Art of Ellsworth during Maine Craft Weekend, it's 10 independent artists performing equal sets from noon to 6pm, followed by an after-party at Black Moon Public House. Built by The ZAO - a decentralized music community with 90+ consecutive weeks of governance, 400+ daily newsletters, and 795 music battles on WaveWarZ. Year 1 of a multi-year commitment by a founder who bought a house in Ellsworth. All sponsorships are tax-deductible through Fractured Atlas 501(c)(3).
+ZAOstock is a community-built outdoor music festival happening October 3, 2026 at the Franklin Street Parklet in downtown Ellsworth, Maine - the gateway to Acadia National Park (4 million visitors in 2025). Part of the 9th Annual Art of Ellsworth during Maine Craft Weekend, it's 10 independent artists performing equal sets from noon to 6pm, followed by an after-party at Black Moon Public House. Built by The ZAO - a decentralized music community with 90+ consecutive weeks of governance, 400+ daily newsletters, and 795 music battles on WaveWarZ. Year 1 of a multi-year commitment by a founder who bought a house in Ellsworth. All sponsorships are tax-deductible through Fractured Atlas 501(c)(3).
 
 ---
 

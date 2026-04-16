@@ -171,4 +171,4 @@ From the April 14 standup transcript, Zaal's spoken patterns:
 - [BetterCallZaal Farcaster profile](https://farcaster.xyz/bettercallzaal)
 - `.claude/skills/newsletter/voice-reference.md` - 13 analyzed posts
 - `.claude/skills/zao-os/brand-voice.md` - existing voice profile
-- ZAO Stock standup transcript - April 14, 2026 (raw spoken voice)
+- ZAOstock standup transcript - April 14, 2026 (raw spoken voice)

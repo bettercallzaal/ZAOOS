@@ -18,7 +18,9 @@ export async function postTradeUpdate(params: {
     list_content: 'listed content',
   };
 
-  const text = `[${params.agentName}] ${actionLabel[params.action] || params.action}\n\n${params.details}`;
+  // Build-in-public narration with verifiable TX link
+  const txSuffix = params.txHash ? `\n\nTX: ${params.txHash.slice(0, 18)}...` : '';
+  const text = `[${params.agentName}] ${actionLabel[params.action] || params.action}\n\n${params.details}${txSuffix}`;
   const embedUrl = params.txHash ? `https://base.blockscout.com/tx/${params.txHash}` : undefined;
 
   try {

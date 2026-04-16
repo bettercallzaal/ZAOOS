@@ -20,7 +20,7 @@ export default async function StockTeamPage() {
 
   const supabase = getSupabaseAdmin();
 
-  const [goalsRes, todosRes, membersRes] = await Promise.allSettled([
+  const [goalsRes, todosRes, membersRes, sponsorsRes] = await Promise.allSettled([
     supabase.from('stock_goals').select('*').order('sort_order'),
     supabase
       .from('stock_todos')
@@ -28,11 +28,18 @@ export default async function StockTeamPage() {
       .order('status')
       .order('created_at', { ascending: false }),
     supabase.from('stock_team_members').select('id, name, role, scope').order('created_at'),
+    supabase
+      .from('stock_sponsors')
+      .select('*, owner:stock_team_members!owner_id(id, name)')
+      .order('track')
+      .order('status')
+      .order('created_at', { ascending: false }),
   ]);
 
   const goals = goalsRes.status === 'fulfilled' ? goalsRes.value.data || [] : [];
   const todos = todosRes.status === 'fulfilled' ? todosRes.value.data || [] : [];
   const members = membersRes.status === 'fulfilled' ? membersRes.value.data || [] : [];
+  const sponsors = sponsorsRes.status === 'fulfilled' ? sponsorsRes.value.data || [] : [];
 
   return (
     <Dashboard
@@ -41,6 +48,7 @@ export default async function StockTeamPage() {
       goals={goals}
       todos={todos}
       members={members}
+      sponsors={sponsors}
     />
   );
 }

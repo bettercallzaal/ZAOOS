@@ -54,3 +54,4 @@
 | 409 | [Claude Skills: Anthropic Engineers Guide](./409-claude-skills-anthropic-engineers-guide/) | STANDALONE | Barry & Mahesh explain skills = folders with markdown. ZAO already follows this pattern with 11+ skills. |
 | 411 | [AI-Native Engineering Team: CREAO 99% AI Code](./411-ai-native-eng-team-creao-99pct-ai-code/) | STANDALONE | 25 people = 100+ output, 3-8 daily deploys, harness engineering, junior > senior for AI adoption, validates ZAO lean model |
 | 412 | [AI Dev Tools: Conductor, Replicas, AO Agents](./412-ai-dev-tools-roundup-conductor-replicas-aoagents/) | STANDALONE | Conductor (parallel Claude Code, YC S24, $2.8M), Replicas (background agents from GitHub/Slack), AO Agents (Arweave compute) |
+| 414 | [AI-Native Documentation Patterns](./414-ai-native-documentation-patterns/) | CANONICAL | llms.txt (60K+), AGENTS.md (60K+), per-package CLAUDE.md, ETH Zurich warning, dual-purpose onboarding, 3-phase implementation |

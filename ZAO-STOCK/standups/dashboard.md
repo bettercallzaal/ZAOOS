@@ -16,19 +16,15 @@
 | Member | FailOften | NEA/Warhol-funded installations, KCAI professor, Processing/TouchDesigner |
 | Member | Hurric4n3Ike | Live entertainment, WaveWarZ (647 battles), performing artist |
 | Member | Swarthy Hatter | Media/content capture, cross-fractal community bridging |
-| Member | Steve Peer* | 37 years Ellsworth music, Black Moon Public House, local network |
-
-*Not yet pitched
+| Member | Tom Fellenz | |
 
 ### Finance
 | Role | Person | Strengths |
 |------|--------|-----------|
 | **Lead** | Zaal | Budget oversight, crowdfunding strategy, partnerships |
 | **2nd** | TBD | |
-| Member | Tyler Stambaugh | JPMorgan + Accenture finance, Magnetiq COO, grant writing |
 | Member | Ohnahji B | Community fundraising, 5K NFTs minted, education-track funding |
 | Member | DFresh | Festival experience |
-| Member | Craig G | |
 | Member | Maceo | Media side |
 
 *Sales & marketing falls under Finance for now - will split when scope grows*
@@ -50,6 +46,19 @@
 | Member | Shawn | |
 
 *Also handles: partnerships with other events, promo at NFTNYC etc., musician outreach. Reusable across future events (ZAOVille, WaveWarZ live, etc.)*
+
+---
+
+## Advisory Board
+
+| Name | Expertise | Connection |
+|------|-----------|------------|
+| Tom Fellenz | | Suggested advisory board structure |
+| Steve Peer | 37 years Ellsworth music, Black Moon Public House, local network | Not yet pitched |
+| Tyler Stambaugh | JPMorgan + Accenture finance, Magnetiq COO | ZAO community |
+| Craig G | | ZAO community |
+
+*Advisors provide strategic guidance, intros, and domain expertise. Not expected to attend weekly standups or take active tasks.*
 
 ---
 
@@ -122,7 +131,7 @@
 
 ---
 
-_Template for future weeks:_
+_Template for future weeks (Lean 5 Ps: Purpose, Participants, Process, Product, Preparation):_
 
 <!--
 ### [Date] - Week N
@@ -131,20 +140,26 @@ _Template for future weeks:_
 **Absent:**
 
 **Operations Report:**
-- Did:
+- Shipped:
+- Blocked:
 - Need:
 
 **Finance Report:**
-- Did:
+- Shipped:
+- Blocked:
 - Need:
 
 **Design Report:**
-- Did:
+- Shipped:
+- Blocked:
 - Need:
 
 **Music Report:**
-- Did:
+- Shipped:
+- Blocked:
 - Need:
+
+**Waste Check:** (anything we're doing that isn't moving the needle?)
 
 **Action Items:**
 - [ ]

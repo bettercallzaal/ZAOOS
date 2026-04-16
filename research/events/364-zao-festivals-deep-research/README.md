@@ -326,16 +326,53 @@ No other festival combines:
 
 ---
 
-## Next Research Targets (Still to Explore)
+## Artist Travel Costs (Flights to Bangor)
 
-- Maine Craft Weekend statewide attendance data (contact Cara Romano directly)
-- ZAO-Chella Instagram engagement metrics (need screenshots)
-- Specific Airbnb pricing for October 2026 in Ellsworth
+| Route | Roundtrip Range | Notes |
+|-------|----------------|-------|
+| NYC to Bangor | $150-$300 | American direct, Delta from NYC |
+| Houston to Bangor | $300-$400 | October cheapest month |
+| Florida to Bangor | $120-$250 | Allegiant/Breeze direct from Tampa/Orlando |
+| General avg | $200-$400 | Book 28 days ahead |
+
+Budget: 5-8 artists x $200-$400 = $1,000-$3,200 total flights
+
+---
+
+## Additional Grant Opportunities
+
+| Grant | Amount | Requirements |
+|-------|--------|-------------|
+| Maine Arts Commission - Creative Communities | Up to $7,000 | 1:1 match, community-based, open to public |
+| Maine Community Foundation - Expansion Arts | Varies | Rural communities, BIPOC-led arts |
+| NEFA - NEST (New England States Touring) | Varies | Nonprofit presenting artists |
+| Levitt Foundation | $40K/year x 3 years | Apply Jan 2027 after Year 1 proof |
+| Bangor Savings Bank | $1,000 | Monthly review, apply NOW |
+
+Realistic Year 1 grant target: $1,000-$7,000
+
+---
+
+## DAO Treasury Model
+
+Hybrid model unique to ZAO Stock:
+1. 0xSplits for artists - auto-distribute tips/donations
+2. ZOUNZ treasury - community votes on budget via governance
+3. Onchain transparency - all income/expenses visible
+4. Fractured Atlas for tax-deductible traditional finance
+5. Year 2+: community votes on lineup, budget, vendors
+
+---
+
+## Next Research Targets
+
+- Maine Craft Weekend statewide attendance (ask Cara Romano)
+- ZAO-Chella Instagram metrics (need screenshots from Zaal)
 - Wallace Events tent quote (call 207-667-6000)
-- Maine Arts Commission grant eligibility check
-- Local radio stations (WERU Community Radio) for promotion
-- Bangor International Airport flight pricing for artist travel
-- Vinyl Vogue / Newberry Exchange record shop partnership
+- Ellsworth Business Development Corporation support
+- Bar Harbor Chamber tourism angle
+- Maine Brewers Guild via Fogtown for beer partnership
+- OnChain Music licensing for live performance recordings
 
 ---
 

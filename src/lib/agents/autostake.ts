@@ -2,8 +2,7 @@
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { executeSwap } from './wallet';
 import { logAgentEvent } from './events';
-import { TOKENS, type AgentName } from './types';
-import { ZABAL_STAKING_CONTRACT } from '@/lib/staking/contract';
+import { TOKENS, ZABAL_STAKING_CONTRACT, type AgentName } from './types';
 import { logger } from '@/lib/logger';
 
 const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;

@@ -57,6 +57,7 @@
 | Steve Peer | 37 years Ellsworth music, Black Moon Public House, local network | Not yet pitched |
 | Tyler Stambaugh | JPMorgan + Accenture finance, Magnetiq COO | ZAO community |
 | Craig Gonzalez | Partnerships at Whop ($1.6B creator platform), deal structure at scale | ZAO community |
+| Adam Place | Founder & CEO of Songjam, ZABAL leaderboard, voice-first Web3 platform | Powers ZAO engagement infrastructure |
 
 *Advisors provide strategic guidance, intros, and domain expertise. Not expected to attend weekly standups or take active tasks.*
 

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Command } from 'cmdk';
-import { communityConfig } from '@/community.config';
+import { communityConfig } from '@/../community.config';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface CommandPaletteProps {
@@ -121,7 +121,6 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
           className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-white/50 [&_[cmdk-group]]:overflow-hidden [&_[cmdk-group]]:px-1.5 [&_[cmdk-group]]:py-1.5"
           value={value}
           onValueChange={setValue}
-          onSelectValue={handleSelect}
         >
           <div className="flex items-center border-b border-white/[0.08] px-3 py-2">
             <svg
@@ -158,6 +157,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   <Command.Item
                     key={cmd.key}
                     value={cmd.key}
+                    onSelect={() => handleSelect(cmd.key)}
                     className="flex cursor-pointer items-center rounded px-2 py-1.5 text-sm text-white aria-selected:bg-[#f5a623] aria-selected:text-[#0d1b2a]"
                   >
                     <span>{cmd.label}</span>

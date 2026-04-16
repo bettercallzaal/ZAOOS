@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     '@hiveio/dhive',
     '@discordjs/rest',
     'web-push',
+    '@vectorize-io/hindsight-client',
   ],
 
   experimental: {

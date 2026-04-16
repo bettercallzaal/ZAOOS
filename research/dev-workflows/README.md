@@ -46,3 +46,4 @@
 | 353 | [Claude Code Token Optimization v2](./353-claude-code-token-optimization-v2/) | STANDALONE | Updated token strategy - .claudeignore, thinking cap, subagent routing, caveman |
 | 354 | [Local LLM Coding Alternatives (Hermes)](./354-local-llm-coding-alternatives-hermes/) | STANDALONE | Local LLM alternatives for coding when Claude limits are hit |
 | 357 | [Caveman: Token Compression Skill](./357-caveman-token-compression-skill/) | STANDALONE | Caveman plugin - 65-75% output token savings, full optimization stack status |
+| 362 | [Caveman Token Savings Analysis](./362-caveman-token-savings-analysis/) | STANDALONE | Deep analysis: caveman claims 75% but delivers 4-5% real savings; /compact & model switching > caveman ROI |

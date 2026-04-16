@@ -195,18 +195,147 @@ No other festival combines:
 
 ---
 
+---
+
+## Sound / PA Rental (Maine)
+
+| Package | Price/Day | Best For |
+|---------|-----------|----------|
+| Basic (solo/duo/trio) | $225 | Not enough for festival |
+| Enhanced (with monitors) | $500 | Minimum for 10-artist outdoor show |
+| Premier | $1,100 | Solid for outdoor festival |
+| Pro Concert PA | $1,600 | Full professional setup |
+
+**Providers:**
+- Maine Audio Visual (maineaudiovisual.com) - delivers, sets up, picks up
+- Greg Young (djgregyoung.com) - 20+ years, Maine-based, DIY or full service
+- Budget recommendation: $500-$1,100 depending on artist count and Parklet size
+
+**Note:** Delivery/setup/pickup fees extra. Get quotes from both.
+
+---
+
+## Lodging for Team
+
+| Option | Price Range | For |
+|--------|-----------|-----|
+| Hotels (Hampton Inn, Comfort Inn, Colonial Inn) | $70-$120/night | Individual rooms |
+| Group Airbnb house (Ellsworth/Bucksport area) | $200-$400/night whole house | 6-10 people sharing |
+| Homestays with locals | Free (community hosting) | Budget option, builds relationships |
+
+**Budget recommendation:** One large Airbnb for 2-3 nights = $600-$1,200 total. Way cheaper than 6-10 hotel rooms.
+
+**Tip:** Schedule artist arrivals 1-2 days before performance. Small extra lodging cost absorbs flight delays.
+
+---
+
+## Food Vendor Model
+
+| Model | Fee | Best For |
+|-------|-----|----------|
+| No fee (trucks come for free) | $0 | When trucks ARE the attraction, small events |
+| Flat fee | $50-$200/day | Simple, predictable revenue |
+| Revenue share | 5-10% of sales | Fair for both sides, common |
+| In-kind | Free food for team/artists | Budget-friendly exchange |
+
+**Recommendation for ZAO Stock Year 1:** Invite 2-3 food trucks with NO fee. They benefit from foot traffic, you benefit from having food. Possible in-kind deal: free meals for artists in exchange for social media promotion.
+
+**Local options:** Fogtown Brewing (25 Pine St, craft beer + pizza), Black Moon Public House (142 Main St, after-party venue)
+
+---
+
+## Merch / Print-on-Demand Economics
+
+| Item | Cost | Sell Price | Margin |
+|------|------|-----------|--------|
+| T-shirt (Printify) | $7-$12 | $25-$30 | 60-75% |
+| T-shirt (Printful) | $12-$18 | $30-$35 | 45-55% |
+| Tote bag | $5-$8 | $15-$20 | 60-75% |
+| Poster | $3-$5 | $10-$15 | 65-80% |
+
+**Recommendation:** Start with Printify for better margins. Order 20-30 t-shirts for crew + early promoters. Sell rest at event and online.
+
+**Action:** Shawn designing the first t-shirt. Get it on a print-on-demand store within 2 weeks so Zaal can start wearing it.
+
+---
+
+## 0xSplits for Artist Payments
+
+- **Free, no protocol fees**
+- Deploy on Base, Optimism, Ethereum, or others
+- Create at [split.new](https://splits.org/)
+- Set percentages per artist (equal sets = equal split)
+- All tips/donations sent to the Split address auto-distribute
+- $40M+ distributed to 10,000+ creators across 11 chains
+- **Action:** Set up a ZAO Stock Split with all 10 artists after lineup confirmed
+
+---
+
+## Local Businesses Deep Dive
+
+### Black Moon Public House (After-Party Venue)
+- **Address:** 142 Main St, Ellsworth
+- **Owners:** Steve Peer + Katina Stanwood
+- **Features:** Live music 4 nights/week, craft beer on tap, cocktails, food menu (flatbreads, sandwiches, mezze)
+- **Hours:** Tue-Sat 12pm-9/10pm, Sun 12-7pm
+- **Key:** 30 seconds walk from the Parklet. Natural after-party venue.
+- **Maine Craft Weekend:** Already hosted live music during MCW
+- **Bandsintown:** Has a concert listing page
+
+### Fogtown Brewing Company
+- **Address:** 25 Pine St, Ellsworth
+- **Founded:** 2017
+- **Features:** Small-batch craft beer, wood-fired pizza, beer garden with live music
+- **Ingredients:** 80% Maine-sourced grains
+- **Events:** Live music, art shows, fundraisers, community events year-round
+- **Potential:** Beer partner/sponsor, food vendor at Parklet, post-show venue
+
+### Precipice Coffee
+- **Address:** 56 Deane St, Ellsworth
+- **Claim:** Maine's first zero-emissions coffee roaster (all-electric Bellwether, solar-powered)
+- **Menu:** Espresso, drip, cold brew, bakery items, wine + beer to go
+- **Potential:** Morning coffee sponsor, sustainability angle for pitch
+
+### Acadia 876 Bar and Grill (NEW - opened Jan 2026)
+- **Address:** 191 Main St, Ellsworth
+- **Cuisine:** American + Caribbean/Jamaican fusion
+- **Potential:** Food partner, represents downtown's growing diversity
+
+---
+
+## Press / Media Contacts
+
+### Ellsworth American
+- **Address:** 1 Printing House Square, Ellsworth
+- **Phone:** (207) 667-2576
+- **News email:** news@ellsworthamerican.com
+- **Reporters:** Emily Niedermeyer (eniedermeyer@ellsworthamerican.com), Sarah Halberstadt (Ellsworth Reporter)
+- **Action:** Email 8 weeks before event (August) with press release
+
+### Bangor Daily News
+- **Address:** 1 Merchants Plaza, Bangor
+- **Newsroom:** 207.990.8175 / news@bangordailynews.com
+- **Already covered:** Downtown Ellsworth National Historic Register (April 7, 2026), Acadia 876 opening
+- **Action:** Email 6-8 weeks before event with press release + photos
+
+### Press Timeline
+- **August:** First press release to local papers (announcement)
+- **September:** Follow-up with lineup details + photos
+- **Week of event:** Day-of media invite, press passes
+- **Post-event:** Send recap + photos within 48 hours
+
+---
+
 ## Next Research Targets (Still to Explore)
 
-- Maine Craft Weekend statewide attendance data (contact Cara Romano)
-- ZAO-Chella Instagram engagement metrics (screenshots needed)
-- Comparable Year 1 festival budgets with detailed line items
-- Sound equipment rental pricing in Bangor/Ellsworth area
-- Hotel group rate quotes for team lodging
-- Food vendor partnership models for small festivals
-- Print-on-demand merch economics (margins, minimum orders)
-- POAP/Magnetiq integration costs and setup
-- 0xSplits configuration for artist payments
-- Local press outreach templates for small-town festivals
+- Maine Craft Weekend statewide attendance data (contact Cara Romano directly)
+- ZAO-Chella Instagram engagement metrics (need screenshots)
+- Specific Airbnb pricing for October 2026 in Ellsworth
+- Wallace Events tent quote (call 207-667-6000)
+- Maine Arts Commission grant eligibility check
+- Local radio stations (WERU Community Radio) for promotion
+- Bangor International Airport flight pricing for artist travel
+- Vinyl Vogue / Newberry Exchange record shop partnership
 
 ---
 

@@ -1,4 +1,4 @@
-# ZAO Stock 2026 — Venue & Logistics Details
+# ZAOstock 2026 — Venue & Logistics Details
 
 ## Franklin Street Parklet (Main Stage)
 
@@ -24,7 +24,7 @@
 
 ### Permit Requirements
 - **Events sponsored by/under City of Ellsworth supervision = EXEMPT from mass gathering ordinance**
-- Since Heart of Ellsworth partners with the city on parklet events, ZAO Stock coordinated through HoE likely falls under this exemption
+- Since Heart of Ellsworth partners with the city on parklet events, ZAOstock coordinated through HoE likely falls under this exemption
 - Non-city-sponsored events: application to Police Chief **45 days before** + corporate bond for cleanup/damages (City of Ellsworth Chapter 14)
 - Maine state law (Title 28-A, Section 1054): separate permit needed for music/entertainment at licensed liquor establishments (applies to Black Moon, not the Parklet)
 
@@ -50,7 +50,7 @@
 | **Press** | BDN, MaineBiz, Ellsworth American, WABI TV, Maine Famous |
 | **Women-owned** | Part of women-owned business cluster thriving on Ellsworth Main Street |
 
-### Why Black Moon is Perfect for ZAO Stock After-Party
+### Why Black Moon is Perfect for ZAOstock After-Party
 1. **Steve Peer owns it** — he's the local music anchor we're pitching
 2. **30 seconds walk** from the Parklet (corner of Main + Franklin = the Parklet IS on Franklin)
 3. **Already a Maine Craft Weekend venue** — live music during MCW is already their thing
@@ -137,7 +137,7 @@
           ├── ZAO table: POAPs, Magnetiq POM, merch
           └── Parklet seating for audience, standing room
 
-6:00 PM   SUN SETS. ZAO Stock outdoor portion ends.
+6:00 PM   SUN SETS. ZAOstock outdoor portion ends.
 
 6:00 PM   Walk 30 seconds → BLACK MOON PUBLIC HOUSE
           ├── After-party with Steve Peer + Katina's live music

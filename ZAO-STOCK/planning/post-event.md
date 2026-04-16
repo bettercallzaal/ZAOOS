@@ -1,4 +1,4 @@
-# ZAO Stock 2026 - Post-Event Playbook
+# ZAOstock 2026 - Post-Event Playbook
 
 ## Within 24 Hours
 

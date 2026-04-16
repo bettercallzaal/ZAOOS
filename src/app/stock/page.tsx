@@ -4,13 +4,13 @@ import { CountdownTimer } from '@/components/events/CountdownTimer';
 import { RSVPForm } from './RSVPForm';
 
 export const metadata: Metadata = {
-  title: 'ZAO Stock | Community Music Festival',
+  title: 'ZAOstock | Community Music Festival',
   description:
-    'ZAO Stock — a community-built outdoor music festival in Ellsworth, Maine. October 3, 2026 at the Franklin Street Parklet.',
+    'ZAOstock — a community-built outdoor music festival in Ellsworth, Maine. October 3, 2026 at the Franklin Street Parklet.',
   openGraph: {
-    title: 'ZAO Stock | Community Music Festival',
+    title: 'ZAOstock | Community Music Festival',
     description:
-      'ZAO Stock — a community-built outdoor music festival in Ellsworth, Maine. October 3, 2026.',
+      'ZAOstock — a community-built outdoor music festival in Ellsworth, Maine. October 3, 2026.',
     images: ['/images/festivals/zao-stock-logo.jpeg'],
   },
 };
@@ -94,7 +94,7 @@ export default function StockPage() {
       <header className="sticky top-0 z-40 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/[0.06]">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-white">ZAO Stock</h1>
+            <h1 className="text-lg font-bold text-white">ZAOstock</h1>
             <p className="text-xs text-gray-400">Community Music Festival</p>
           </div>
           <div className="flex items-center gap-3">
@@ -126,7 +126,7 @@ export default function StockPage() {
           <div className="inline-block rounded-full bg-[#f5a623]/10 px-4 py-1.5 text-sm text-[#f5a623] font-medium border border-[#f5a623]/30">
             October 3, 2026
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">ZAO Stock</h2>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">ZAOstock</h2>
           <p className="text-gray-400 text-lg max-w-md mx-auto">
             A community-built outdoor music festival in Ellsworth, Maine. 10 artists. One stage. All day.
           </p>
@@ -137,7 +137,7 @@ export default function StockPage() {
 
         {/* Countdown */}
         <div className="bg-[#0d1b2a] rounded-xl p-6 border border-white/[0.08]">
-          <CountdownTimer targetDate={FESTIVAL_DATE} eventName="ZAO Stock" />
+          <CountdownTimer targetDate={FESTIVAL_DATE} eventName="ZAOstock" />
         </div>
 
         {/* About */}
@@ -145,12 +145,12 @@ export default function StockPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">About the Festival</p>
           <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] space-y-3">
             <p className="text-sm text-gray-300 leading-relaxed">
-              ZAO Stock is The ZAO&apos;s flagship IRL music festival &mdash; a full-day outdoor showcase at the
+              ZAOstock is The ZAO&apos;s flagship IRL music festival &mdash; a full-day outdoor showcase at the
               Franklin Street Parklet in downtown Ellsworth, Maine. Ten independent artists perform equal sets
               with DJs between, followed by an after-party at Black Moon Public House (30 seconds away).
             </p>
             <p className="text-sm text-gray-300 leading-relaxed">
-              Part of the 9th Annual Art of Ellsworth during Maine Craft Weekend, ZAO Stock brings the
+              Part of the 9th Annual Art of Ellsworth during Maine Craft Weekend, ZAOstock brings the
               decentralized music community together in the &ldquo;Crossroads of Downeast&rdquo; &mdash; where
               every car heading to Acadia National Park passes through.
             </p>
@@ -277,7 +277,7 @@ export default function StockPage() {
 
         {/* Fundraising Links */}
         <section className="space-y-3">
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Support ZAO Stock</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Support ZAOstock</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] opacity-60">
               <p className="font-medium text-white text-sm">Giveth Campaign</p>

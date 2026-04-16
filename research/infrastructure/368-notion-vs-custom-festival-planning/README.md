@@ -1,8 +1,8 @@
-# 368 - Notion vs. Custom Dashboard for ZAO Stock Festival Planning
+# 368 - Notion vs. Custom Dashboard for ZAOstock Festival Planning
 
 > **Status:** Research complete
 > **Date:** 2026-04-16
-> **Goal:** Evaluate whether Notion should replace or complement the existing ZAO Stock planning setup (markdown docs + Supabase dashboard)
+> **Goal:** Evaluate whether Notion should replace or complement the existing ZAOstock planning setup (markdown docs + Supabase dashboard)
 
 ---
 
@@ -51,7 +51,7 @@ The current setup works for Zaal + Claude Code but creates friction for the rest
 
 ---
 
-## Notion Pricing for ZAO Stock
+## Notion Pricing for ZAOstock
 
 | Plan | Price | Guests | Good For |
 |------|-------|--------|----------|
@@ -66,7 +66,7 @@ The current setup works for Zaal + Claude Code but creates friction for the rest
 
 ## Comparison: Planning Tools for Small Festival Teams
 
-| Tool | Cost | Collaboration | Non-Technical Friendly | Event-Specific Features | ZAO Stock Fit |
+| Tool | Cost | Collaboration | Non-Technical Friendly | Event-Specific Features | ZAOstock Fit |
 |------|------|--------------|----------------------|------------------------|---------------|
 | **Notion** | Free-$12/user | Excellent - real-time, comments, mentions | Yes - drag-and-drop, visual | Templates for volunteers, sponsors, budgets | USE - best fit for team collaboration |
 | **GitHub Markdown** | Free | Poor for non-devs | No - requires git knowledge | None | KEEP for research + specs only |

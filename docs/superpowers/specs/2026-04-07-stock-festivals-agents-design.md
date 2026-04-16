@@ -8,7 +8,7 @@
 
 Two new agents in the ZOE squad on the VPS (OpenClaw):
 
-- **STOCK** `🎪` - ZAO Stock 2026 coordinator (Oct 3, Ellsworth ME)
+- **STOCK** `🎪` - ZAOstock 2026 coordinator (Oct 3, Ellsworth ME)
 - **FESTIVALS** `🎶` - All ZAO events manager (virtual, satellite, new proposals)
 
 Both are full agents dispatched through ZOE, visible in the dashboard, accessible to Zaal + core team.
@@ -27,7 +27,7 @@ Both are full agents dispatched through ZOE, visible in the dashboard, accessibl
 | Reports to | ZOE |
 
 **Capabilities (v1):**
-1. Answer questions about ZAO Stock (venue, budget, team, timeline, weather, vendors)
+1. Answer questions about ZAOstock (venue, budget, team, timeline, weather, vendors)
 2. Update planning docs (check off timeline items, change vendor/outreach status)
 3. Draft outreach (sponsor pitches, press pitches, artist invites, vendor inquiries)
 4. Track budget (log expenses/revenue, calculate remaining, flag overages)
@@ -105,7 +105,7 @@ Both are full agents dispatched through ZOE, visible in the dashboard, accessibl
 Add both agents to `/tmp/zoe-dashboard/src/lib/config.ts` AGENTS array:
 
 ```typescript
-{ id: 'stock', name: 'STOCK', emoji: '🎪', color: '#E11D48', role: 'ZAO Stock' },
+{ id: 'stock', name: 'STOCK', emoji: '🎪', color: '#E11D48', role: 'ZAOstock' },
 { id: 'festivals', name: 'FESTIVALS', emoji: '🎶', color: '#7C3AED', role: 'Events' },
 ```
 

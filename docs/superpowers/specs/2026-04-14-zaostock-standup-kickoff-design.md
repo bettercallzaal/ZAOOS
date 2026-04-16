@@ -1,4 +1,4 @@
-# ZAO Stock Standup Kickoff - Design Spec
+# ZAOstock Standup Kickoff - Design Spec
 
 > **Date:** 2026-04-14
 > **Status:** Approved
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Create the ZAO Stock weekly standup system: a living dashboard markdown doc for internal team management, and a public-facing teams section on zaoos.com/stock. Today (April 14) is the kickoff meeting.
+Create the ZAOstock weekly standup system: a living dashboard markdown doc for internal team management, and a public-facing teams section on zaoos.com/stock. Today (April 14) is the kickoff meeting.
 
 ## Standup Structure
 

@@ -1,4 +1,4 @@
-# ZAO Stock 2026 — Budget
+# ZAOstock 2026 — Budget
 
 ## Budget Range: $5,000 (minimum) — $25,000 (goal)
 

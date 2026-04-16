@@ -1,4 +1,4 @@
-# ZAO Stock 2026 - Food & Beverage Plan
+# ZAOstock 2026 - Food & Beverage Plan
 
 ## The Experience
 

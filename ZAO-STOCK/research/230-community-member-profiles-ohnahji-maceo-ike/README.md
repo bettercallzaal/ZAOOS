@@ -173,7 +173,7 @@ Ohnahji University models itself after Historically Black Colleges and Universit
 | **B&Z Builds / B&Z Streams** | Collaborative working sessions and live discussions between Zaal and Ohnahji |
 | **Twitch Multistream** | Streams simultaneously on twitch.tv/bettercallzaal, twitch.tv/ohnahji, twitch.tv/ezincrypto |
 | **ZAO Fractal** | Day 1 participant (5th place). Fractal host (120 points). Ongoing weekly fractal member |
-| **ZAO Stock** | Assigned to Media + Tech + Education role. Livestreaming, tech workshops, educational content |
+| **ZAOstock** | Assigned to Media + Tech + Education role. Livestreaming, tech workshops, educational content |
 
 ---
 
@@ -194,7 +194,7 @@ Maceo is identified in ZAO documentation as a core member of the media and strea
 
 1. **Doc 50 (The ZAO Complete Guide):** Lists Maceo as co-host of "Let's Talk About Ethereum" alongside BetterCallZaal and Ohnahji B (line 490 of the document).
 
-2. **Doc 224 (ZAO Stock Multi-Year Vision):** Lists Maceo in two team capability areas:
+2. **Doc 224 (ZAOstock Multi-Year Vision):** Lists Maceo in two team capability areas:
    - **Media + Documentation** team (alongside Swarthy Hatter and Ohnahji)
    - **Livestream + Tech** team (alongside Ohnahji and Zaal)
    - Background described as: "Podcast co-host. Media production. Twitch streaming (platforms: bettercallzaal, ohnahji, ezincrypto)"
@@ -227,7 +227,7 @@ EZ is listed as a podcast co-host in ZAO data. The LTAW3 podcast streamed simult
 - **Farcaster presence** -- no Farcaster account found
 - **ZAO Respect score** -- no separate "Maceo" entry in the leaderboard CSV (which would suggest Maceo either uses a different handle in the Respect system, or is EZ under a different name, or is newer than the CSV snapshot)
 
-### 2.5 ZAO Stock Festival Role
+### 2.5 ZAOstock Festival Role
 
 | Capability | Maceo's Role |
 |-----------|-------------|
@@ -443,7 +443,7 @@ His label **Hurric4n3Soundz** is credited on all 15 singles, confirming he self-
 | **Fractal Host** | 0 -- has not hosted fractals |
 | **ZAO Festivals** | 0 -- has not participated in ZAO festival point system |
 | **ZAO-Chella** | Performed at ZAO-CHELLA Miami (Dec 2024) -- WaveWarZ LIVE Rematch vs JANGO UU |
-| **ZAO Stock** | Assigned as Performing Artist + WaveWarZ LIVE demonstrator. Proven live performer |
+| **ZAOstock** | Assigned as Performing Artist + WaveWarZ LIVE demonstrator. Proven live performer |
 | **LTAW3 Ep. 16** | Guest on the podcast (Sep 17, 2025) -- "w/Ohnahji & EZinCrypto & BetterCallZaal & HURRIC4N3IKE" |
 
 ### 3.11 ZoundZ Project
@@ -526,5 +526,5 @@ Hurric4n3Ike's GitHub includes a **zoundz** repo described as "ZoundZ 1/1 market
 - [Doc 50 -- The ZAO Complete Guide](../050-the-zao-complete-guide/)
 - [Doc 101 -- WaveWarZ x ZAO Integration Whitepaper](../101-wavewarz-zao-whitepaper/)
 - [Doc 178 -- WaveWarZ Deep Dive](../178-wavewarz-deep-dive-integration/)
-- [Doc 224 -- ZAO Stock Multi-Year Vision](../224-zao-stock-multi-year-vision/)
+- [Doc 224 -- ZAOstock Multi-Year Vision](../224-zao-stock-multi-year-vision/)
 - ZAO Leaderboard CSV (csv import/Summary-Grid view.csv)

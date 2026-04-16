@@ -5,7 +5,7 @@ import { LoginForm } from './LoginForm';
 import { Dashboard } from './Dashboard';
 
 export const metadata: Metadata = {
-  title: 'ZAO Stock Team Dashboard',
+  title: 'ZAOstock Team Dashboard',
   robots: { index: false, follow: false },
 };
 

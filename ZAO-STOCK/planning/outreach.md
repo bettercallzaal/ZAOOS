@@ -1,4 +1,4 @@
-# ZAO Stock 2026 — Outreach & Sponsorship Tracker
+# ZAOstock 2026 — Outreach & Sponsorship Tracker
 
 ## Sponsorship Tiers
 

@@ -8,6 +8,7 @@ interface ShortcutHandlers {
   onClosePanels?: () => void;
   onToggleSidebar?: () => void;
   onToggleMusic?: () => void;
+  onShowHelp?: () => void;
 }
 
 export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
@@ -51,6 +52,13 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
       if (e.key === 'm') {
         e.preventDefault();
         handlers.onToggleMusic?.();
+        return;
+      }
+
+      // ? → show help/shortcuts
+      if (e.key === '?') {
+        e.preventDefault();
+        handlers.onShowHelp?.();
         return;
       }
     };

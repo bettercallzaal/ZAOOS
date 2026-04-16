@@ -6,6 +6,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthAudioProviders } from './providers';
 import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWithRadio';
 import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
+import { CommandPaletteProvider } from '@/components/navigation/CommandPaletteProvider';
 import PWAInstallPrompt from '@/components/navigation/PWAInstallPrompt';
 
 export default async function AuthLayout({
@@ -32,6 +33,7 @@ export default async function AuthLayout({
         <Suspense fallback={null}>
           <LazyGlobalSearch />
         </Suspense>
+        <CommandPaletteProvider />
         <PersistentPlayerWithRadio />
         <BottomNav />
         <PWAInstallPrompt />

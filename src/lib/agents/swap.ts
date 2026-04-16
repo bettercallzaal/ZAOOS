@@ -34,16 +34,24 @@ export async function getSwapQuote(params: {
   url.searchParams.set('sellAmount', params.sellAmount);
   url.searchParams.set('takerAddress', params.takerAddress);
 
-  const res = await fetch(url.toString(), {
-    headers: { '0x-api-key': apiKey },
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000);
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`0x quote failed (${res.status}): ${body}`);
+  try {
+    const res = await fetch(url.toString(), {
+      headers: { '0x-api-key': apiKey },
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`0x quote failed (${res.status}): ${body}`);
+    }
+
+    return res.json();
+  } finally {
+    clearTimeout(timer);
   }
-
-  return res.json();
 }
 
 /**
@@ -59,13 +67,20 @@ export async function getZabalPrice(): Promise<number> {
   url.searchParams.set('buyToken', '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'); // USDC
   url.searchParams.set('sellAmount', '1000000000000000000000000'); // 1M ZABAL
 
-  const res = await fetch(url.toString(), {
-    headers: { '0x-api-key': apiKey },
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000);
+
+  let res: Response;
+  try {
+    res = await fetch(url.toString(), {
+      headers: { '0x-api-key': apiKey },
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!res.ok) {
-    // Price API unavailable -- throw instead of using stale fallback.
-    // Caller should skip trade when price is unknown.
     throw new Error('ZABAL price unavailable (0x API down). Trade skipped.');
   }
   const data = await res.json();

@@ -30,12 +30,15 @@ async function getEthPrice(): Promise<number> {
       `https://api.0x.org/swap/v1/price?chainId=8453&sellToken=0x4200000000000000000000000000000000000006&buyToken=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&sellAmount=1000000000000000000`,
       { headers: { '0x-api-key': apiKey } }
     );
-    if (!res.ok) return 2500;
+    if (!res.ok) {
+      logger.warn('[getEthPrice] 0x API non-OK, using $2500 fallback');
+      return 2500;
+    }
     const data = await res.json();
-    // price = USDC per 1 ETH
     return parseFloat(data.price) || 2500;
-  } catch {
-    return 2500; // safe fallback -- ETH price doesn't need to be exact for trade sizing
+  } catch (err) {
+    logger.warn(`[getEthPrice] Failed, using $2500 fallback: ${err instanceof Error ? err.message : err}`);
+    return 2500;
   }
 }
 

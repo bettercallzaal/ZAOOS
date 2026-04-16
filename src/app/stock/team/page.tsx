@@ -20,7 +20,7 @@ export default async function StockTeamPage() {
 
   const supabase = getSupabaseAdmin();
 
-  const [goalsRes, todosRes, membersRes, sponsorsRes] = await Promise.allSettled([
+  const [goalsRes, todosRes, membersRes, sponsorsRes, artistsRes, timelineRes] = await Promise.allSettled([
     supabase.from('stock_goals').select('*').order('sort_order'),
     supabase
       .from('stock_todos')
@@ -34,12 +34,24 @@ export default async function StockTeamPage() {
       .order('track')
       .order('status')
       .order('created_at', { ascending: false }),
+    supabase
+      .from('stock_artists')
+      .select('*, outreach:stock_team_members!outreach_by(id, name)')
+      .order('status')
+      .order('set_order', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('stock_timeline')
+      .select('*, owner:stock_team_members!owner_id(id, name)')
+      .order('due_date', { ascending: true }),
   ]);
 
   const goals = goalsRes.status === 'fulfilled' ? goalsRes.value.data || [] : [];
   const todos = todosRes.status === 'fulfilled' ? todosRes.value.data || [] : [];
   const members = membersRes.status === 'fulfilled' ? membersRes.value.data || [] : [];
   const sponsors = sponsorsRes.status === 'fulfilled' ? sponsorsRes.value.data || [] : [];
+  const artists = artistsRes.status === 'fulfilled' ? artistsRes.value.data || [] : [];
+  const milestones = timelineRes.status === 'fulfilled' ? timelineRes.value.data || [] : [];
 
   return (
     <Dashboard
@@ -49,6 +61,8 @@ export default async function StockTeamPage() {
       todos={todos}
       members={members}
       sponsors={sponsors}
+      artists={artists}
+      milestones={milestones}
     />
   );
 }

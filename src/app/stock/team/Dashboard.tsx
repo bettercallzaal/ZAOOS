@@ -5,9 +5,11 @@ import { GoalsBoard } from './GoalsBoard';
 import { TodoList } from './TodoList';
 import { TeamRoles } from './TeamRoles';
 import { SponsorCRM } from './SponsorCRM';
+import { ArtistPipeline } from './ArtistPipeline';
+import { Timeline } from './Timeline';
 import { useRouter } from 'next/navigation';
 
-type Tab = 'overview' | 'sponsors' | 'team';
+type Tab = 'overview' | 'sponsors' | 'artists' | 'timeline' | 'team';
 
 interface Sponsor {
   id: string;
@@ -26,6 +28,36 @@ interface Sponsor {
   created_at: string;
 }
 
+interface Artist {
+  id: string;
+  name: string;
+  genre: string;
+  city: string;
+  status: 'wishlist' | 'contacted' | 'interested' | 'confirmed' | 'declined' | 'travel_booked';
+  socials: string;
+  travel_from: string;
+  needs_travel: boolean;
+  set_time_minutes: number;
+  set_order: number | null;
+  fee: number;
+  rider: string;
+  notes: string;
+  outreach: { id: string; name: string } | null;
+  created_at: string;
+}
+
+interface Milestone {
+  id: string;
+  title: string;
+  description: string;
+  due_date: string;
+  status: 'pending' | 'in_progress' | 'done' | 'blocked';
+  category: string;
+  notes: string;
+  owner: { id: string; name: string } | null;
+  created_at: string;
+}
+
 interface Props {
   memberName: string;
   memberId: string;
@@ -33,9 +65,11 @@ interface Props {
   todos: Array<{ id: string; title: string; status: 'todo' | 'in_progress' | 'done'; notes: string; owner: { id: string; name: string } | null; creator: { id: string; name: string } | null; created_at: string }>;
   members: Array<{ id: string; name: string; role: string; scope: string }>;
   sponsors: Sponsor[];
+  artists: Artist[];
+  milestones: Milestone[];
 }
 
-export function Dashboard({ memberName, memberId, goals, todos, members, sponsors }: Props) {
+export function Dashboard({ memberName, memberId, goals, todos, members, sponsors, artists, milestones }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('overview');
 
@@ -43,6 +77,8 @@ export function Dashboard({ memberName, memberId, goals, todos, members, sponsor
     await fetch('/api/stock/team/logout', { method: 'POST' });
     router.refresh();
   }
+
+  const memberList = members.map((m) => ({ id: m.id, name: m.name }));
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white">
@@ -64,8 +100,13 @@ export function Dashboard({ memberName, memberId, goals, todos, members, sponsor
             Overview
           </TabButton>
           <TabButton active={tab === 'sponsors'} onClick={() => setTab('sponsors')}>
-            Sponsors
-            <span className="ml-1 text-[10px] text-gray-500">{sponsors.length}</span>
+            Sponsors <span className="ml-1 text-[10px] text-gray-500">{sponsors.length}</span>
+          </TabButton>
+          <TabButton active={tab === 'artists'} onClick={() => setTab('artists')}>
+            Artists <span className="ml-1 text-[10px] text-gray-500">{artists.length}</span>
+          </TabButton>
+          <TabButton active={tab === 'timeline'} onClick={() => setTab('timeline')}>
+            Timeline <span className="ml-1 text-[10px] text-gray-500">{milestones.length}</span>
           </TabButton>
           <TabButton active={tab === 'team'} onClick={() => setTab('team')}>
             Team
@@ -78,16 +119,12 @@ export function Dashboard({ memberName, memberId, goals, todos, members, sponsor
           <>
             <GoalsBoard goals={goals} />
             <hr className="border-white/[0.06]" />
-            <TodoList
-              todos={todos}
-              members={members.map((m) => ({ id: m.id, name: m.name }))}
-              currentMemberId={memberId}
-            />
+            <TodoList todos={todos} members={memberList} currentMemberId={memberId} />
           </>
         )}
-        {tab === 'sponsors' && (
-          <SponsorCRM sponsors={sponsors} members={members.map((m) => ({ id: m.id, name: m.name }))} />
-        )}
+        {tab === 'sponsors' && <SponsorCRM sponsors={sponsors} members={memberList} />}
+        {tab === 'artists' && <ArtistPipeline artists={artists} members={memberList} />}
+        {tab === 'timeline' && <Timeline milestones={milestones} members={memberList} />}
         {tab === 'team' && <TeamRoles members={members} />}
       </div>
     </div>

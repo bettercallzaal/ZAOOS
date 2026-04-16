@@ -22,43 +22,48 @@ const CREDIBILITY_STATS = [
   { number: '19', label: 'Team Members + Advisors' },
 ];
 
-const SPONSOR_BENEFITS = [
+const SPONSOR_TRACKS = [
   {
-    category: 'Visibility',
-    items: [
-      'Logo on stage banner visible in all livestream footage',
-      'Logo on zaoos.com/stock (permanent, not just event day)',
-      'Mentioned in 400+ edition daily newsletter',
-      'Social media campaign across Farcaster, X, LinkedIn',
-      'Featured in COC Concertz monthly virtual events (4+ months of pre-event exposure)',
-    ],
-  },
-  {
-    category: 'On-Site',
-    items: [
+    track: 'Local Partners',
+    subtitle: 'Ellsworth + Downeast Maine businesses',
+    color: '#22c55e',
+    benefits: [
+      'Logo on stage banner + printed lineup cards (200+)',
       'Booth or table space at the festival',
-      'Welcome bag inserts for attendees',
       'Verbal shoutouts during performances',
-      'Logo on printed lineup cards (200+)',
+      'Logo on zaoos.com/stock (permanent)',
+      'Featured in local press outreach (Ellsworth American, BDN)',
       'Wayfinding signage with your branding',
-    ],
-  },
-  {
-    category: 'Digital + Onchain',
-    items: [
-      'Livestream overlay branding (YouTube, Twitch, ZAO OS)',
-      'Sponsored segment in post-event highlight reel',
-      'Logo in digital attendance collectible (claimed by every attendee)',
-      'Post-event metrics report: livestream views, social reach, attendance, content views',
-    ],
-  },
-  {
-    category: 'Partnership',
-    items: [
       'Tax-deductible via Fractured Atlas 501(c)(3)',
-      'Priority placement for Year 2 (multi-year partners get first pick)',
-      'Advisory board seat for founding sponsors',
-      'Year-round partnership, not just one day',
+    ],
+  },
+  {
+    track: 'Virtual Partners',
+    subtitle: 'Web3 brands, DAOs, digital-native companies',
+    color: '#818cf8',
+    benefits: [
+      'Livestream overlay branding (YouTube, Twitch, ZAO OS)',
+      'Logo in digital attendance collectible (claimed by every attendee)',
+      'Sponsored segment in post-event highlight reel',
+      'Social media campaign across Farcaster, X, LinkedIn',
+      'Featured in COC Concertz monthly virtual events (4+ months pre-event exposure)',
+      'Mentioned in 400+ edition daily newsletter (Year of the ZABAL)',
+      'Post-event metrics report: livestream views, social reach, content views',
+    ],
+  },
+  {
+    track: 'Ecosystem Partners',
+    subtitle: 'Year-round ZAO Festivals partnership (Stock, Ville, WaveWarZ, COC)',
+    color: '#f5a623',
+    benefits: [
+      'Branding across ALL ZAO Festival events (not just ZAO Stock)',
+      'Logo in COC Concertz monthly metaverse concerts',
+      'Sponsor visibility in WaveWarZ music battles (795+ battles, growing)',
+      'Priority placement at ZAOVille (DMV) and future city expansions',
+      'Advisory board seat for founding ecosystem partners',
+      'Year-round partnership with quarterly reports',
+      'Tax-deductible via Fractured Atlas 501(c)(3)',
+      'Multi-year commitment with first-pick renewal',
     ],
   },
 ];
@@ -183,19 +188,20 @@ export default function SponsorPage() {
           </div>
         </section>
 
-        {/* What Sponsors Get */}
+        {/* Sponsor Tracks */}
         <section className="space-y-3">
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">What You Get</p>
-          <div className="space-y-3">
-            {SPONSOR_BENEFITS.map((group) => (
-              <div key={group.category} className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
-                <div className="bg-gradient-to-r from-[#f5a623]/20 to-transparent px-4 py-2.5">
-                  <span className="font-bold text-sm text-[#f5a623]">{group.category}</span>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Three Ways to Partner</p>
+          <div className="space-y-4">
+            {SPONSOR_TRACKS.map((track) => (
+              <div key={track.track} className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">
+                <div className="px-4 py-3 border-b border-white/[0.06]" style={{ borderLeftWidth: 3, borderLeftColor: track.color }}>
+                  <span className="font-bold text-sm text-white">{track.track}</span>
+                  <p className="text-[11px] text-gray-500 mt-0.5">{track.subtitle}</p>
                 </div>
                 <ul className="px-4 py-3 space-y-1.5">
-                  {group.items.map((item) => (
+                  {track.benefits.map((item) => (
                     <li key={item} className="text-xs text-gray-400 flex items-start gap-2">
-                      <span className="text-[#f5a623] mt-0.5">&#8226;</span>
+                      <span style={{ color: track.color }} className="mt-0.5">&#8226;</span>
                       {item}
                     </li>
                   ))}
@@ -203,6 +209,9 @@ export default function SponsorPage() {
               </div>
             ))}
           </div>
+          <p className="text-xs text-gray-500 text-center px-4">
+            All tracks are flexible. We build packages around what works for you, not rigid tiers.
+          </p>
         </section>
 
         {/* Tax Deductible */}

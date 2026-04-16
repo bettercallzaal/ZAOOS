@@ -65,11 +65,31 @@ export const communityConfig = {
   // ── Spaces ─────────────────────────────────────────────────────
   /** Voice/video room definitions — appear in the Spaces section */
   voiceChannels: [
-    { id: 'general-hangout', name: 'General Hangout', emoji: '💬', description: 'Casual conversation' },
-    { id: 'fractal-call', name: 'Fractal Call', emoji: '📞', description: 'Monday 6pm EST weekly fractal' },
-    { id: 'music-lounge', name: 'Music Lounge', emoji: '🎵', description: 'Always-on listening room' },
+    {
+      id: 'general-hangout',
+      name: 'General Hangout',
+      emoji: '💬',
+      description: 'Casual conversation',
+    },
+    {
+      id: 'fractal-call',
+      name: 'Fractal Call',
+      emoji: '📞',
+      description: 'Monday 6pm EST weekly fractal',
+    },
+    {
+      id: 'music-lounge',
+      name: 'Music Lounge',
+      emoji: '🎵',
+      description: 'Always-on listening room',
+    },
     { id: 'tech-talk', name: 'Tech Talk', emoji: '💻', description: 'Technical discussions' },
-    { id: 'coworking', name: 'Coworking', emoji: '🏢', description: 'Silent cowork with ambient presence' },
+    {
+      id: 'coworking',
+      name: 'Coworking',
+      emoji: '🏢',
+      description: 'Silent cowork with ambient presence',
+    },
   ],
 
   // ── Audio Provider ───────────────────────────────────────────
@@ -272,7 +292,14 @@ export const communityConfig = {
     /** Max cover image size in bytes (default: 5MB) */
     maxCoverSize: 5 * 1024 * 1024,
     /** Allowed audio MIME types for upload */
-    allowedAudioTypes: ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/flac', 'audio/ogg', 'audio/aac'],
+    allowedAudioTypes: [
+      'audio/mpeg',
+      'audio/mp4',
+      'audio/wav',
+      'audio/flac',
+      'audio/ogg',
+      'audio/aac',
+    ],
     /** Allowed image MIME types for upload */
     allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
   },

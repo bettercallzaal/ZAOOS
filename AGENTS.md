@@ -1,135 +1,112 @@
-# AGENTS.md — ZAO OS
+# AGENTS.md - ZAO OS
 
-> **For AI coding agents:** This file gives you the context you need to work on this codebase.
-> Works with Claude Code, Cursor, Copilot, Windsurf, Gemini, or any LLM-powered coding tool.
-> For fork/setup instructions, read [FORK.md](./FORK.md) first.
+> Universal agent config for AI coding tools (Claude Code, Cursor, Copilot, Gemini, Codex).
+> For Claude Code specifics, see [CLAUDE.md](./CLAUDE.md).
 
-## What This Is
+## Commands
 
-ZAO OS is a **gated, music-first Farcaster social client** — a community hub where members chat on Farcaster channels, send encrypted DMs via XMTP, listen to music together, govern via on-chain proposals, and earn reputation. Built with Next.js 16 + React 19, Supabase, Neynar, and XMTP.
+```bash
+npm install          # postinstall: patch-package + XMTP WASM
+npm run dev          # next dev (Turbopack)
+npm run build        # next build
+npm run typecheck    # tsc --noEmit
+npm run test         # vitest run
+npm run test:watch   # vitest (watch mode)
+npm run lint:biome   # biome check .
+npm run lint:fix     # biome check --write .
+npm run format       # biome format --write .
+```
 
-**The single customization file is [`community.config.ts`](./community.config.ts)** — all branding, channels, contracts, admin access, and navigation live there.
+## Testing
 
-## Tech Stack
+- **Framework:** Vitest (`describe`, `it`, `expect` - not Jest globals)
+- **Mocking:** `vi.mock()` + `vi.hoisted()` - never MSW or raw `fetch` mocks
+- **Helpers:** `src/test-utils/api-helpers.ts` (session mocks, request builders, Supabase chain mocks)
+- **Location:** Co-located: `src/app/api/foo/__tests__/route.test.ts`
+- **Auth guards:** Table-driven tests with `describe.each` across routes
+- **Database:** Never connect to real databases in tests. Mocks only.
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| UI | React 19, Tailwind CSS v4 |
-| Auth | iron-session (encrypted httpOnly cookies) |
-| Social | Neynar SDK (Farcaster) |
-| Messaging | XMTP Browser SDK (MLS, E2E encrypted) |
-| Database | Supabase PostgreSQL + RLS + Realtime |
-| Blockchain | Wagmi + Viem (Optimism, Base) |
-| State | React Query (@tanstack/react-query) |
-| Validation | Zod on every API route |
-| Music | 9 platform providers + Web Audio API |
-| Testing | Vitest |
-| Deployment | Vercel |
+### Per-file test commands
+
+```bash
+npx vitest run src/app/api/auth       # test specific API route
+npx vitest run src/components/chat    # test specific component
+npx vitest run src/lib/agents         # test specific lib module
+npm run typecheck                     # typecheck everything
+npx biome check src/lib/agents        # lint specific module
+```
 
 ## Project Structure
 
 ```
-src/
-├── app/                  # Next.js App Router
-│   ├── (auth)/           # Protected routes (chat, messages, governance, admin, etc.)
-│   ├── api/              # 121 route handlers: /api/[feature]/[action]/route.ts
-│   └── page.tsx          # Landing / login
-├── components/           # React components organized by feature
-├── hooks/                # Custom hooks: useAuth, useChat, useRadio, usePlayerQueue, etc.
-├── contexts/             # React contexts (XMTPContext, QueueContext)
-├── providers/            # Provider wrappers (9 audio providers, PostHog)
-├── lib/                  # Utilities by domain: auth, db, farcaster, gates, music, xmtp, etc.
-└── types/                # TypeScript type definitions
-community.config.ts       # All community branding, channels, contracts — THE fork point
-scripts/                  # Database setup, wallet generation, data import
-research/                 # 155+ research docs
+src/app/api/         # 301 route handlers: /api/[feature]/[action]/route.ts
+src/components/      # 279 components organized by feature
+src/hooks/           # 19 custom hooks (useAuth, useChat, useRadio, etc.)
+src/lib/             # Utilities by domain (auth, db, farcaster, music, publish, agents)
+src/providers/       # React providers (audio player, contexts)
+src/types/           # TypeScript type definitions
+community.config.ts  # Branding, channels, contracts, nav - THE fork point
+research/            # 240+ research docs
+scripts/             # SQL migrations, wallet generation, webhooks
+contracts/           # Solidity (staking, bounty board)
 ```
 
-## Code Conventions
+## Code Style
 
-### Components
-- PascalCase `.tsx` files with `"use client"` directive for interactive components
-- Mobile-first design using Tailwind responsive prefixes (`sm:`, `md:`, `lg:`)
-- Dark theme: navy `#0a1628` background, gold `#f5a623` primary
-- Use `next/dynamic` with `{ ssr: false }` for heavy components
+- **Imports:** `@/` path alias (maps to `src/`)
+- **Components:** PascalCase `.tsx`, `"use client"` for interactive
+- **API routes:** `/api/[feature]/[action]/route.ts` - Zod validation, session check, `NextResponse.json`
+- **Utilities:** camelCase `.ts` in `src/lib/[domain]/`
+- **Hooks:** `use*` prefix in `src/hooks/`
+- **Styling:** Tailwind CSS v4. Dark theme: navy `#0a1628`, gold `#f5a623`. Mobile-first.
+- **State:** React hooks + `@tanstack/react-query`. No Redux/Zustand.
+- **Code splitting:** `next/dynamic` with `{ ssr: false }` for heavy components
+- **Error handling:** try/catch with Zod `safeParse`. `Promise.allSettled` for parallel ops.
+
+## Git Workflow
+
+- **Branch:** `ws/<description>-MMDD-HHMM` from latest `main`
+- **PRs:** Always to `main`. Never push directly.
+- **Commits:** Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
+
+## Boundaries
+
+### Always Do
+
+- Validate ALL user input with Zod `safeParse` before processing
+- Check session with `getSession()` before authenticated operations
+- Return `NextResponse.json(...)` from API routes
+- Wrap API handler body in try/catch, log errors server-side
 - Use `@/` import alias for all project imports
+- Design mobile-first with Tailwind responsive prefixes
 
-### API Routes
-- Path: `/api/[feature]/[action]/route.ts`
-- Validate ALL input with Zod `safeParse` — return 400 on failure
-- Check session with `getSession()` — return 401 if missing
-- Always return `NextResponse.json(...)` — never plain Response
-- Wrap body in try/catch, log errors server-side, return sanitized 500
-- Use `Promise.allSettled` for parallel fault-tolerant operations
+### Ask First
 
-### Hooks & State
-- `use*` prefix, in `src/hooks/`
-- React Query for server state — no Redux/Zustand
-- Tailwind CSS v4 — no inline styles or CSS modules
+- Database migrations or schema changes
+- Adding new npm dependencies
+- Changing environment variables
+- Modifying `community.config.ts`
+- Changing agent trading parameters or wallet configs
 
-### Testing
-- Vitest: `describe`, `it`, `expect` — not Jest globals
-- Mock with `vi.mock()` + `vi.hoisted()` — not MSW or raw fetch mocks
-- Co-locate tests: `src/app/api/foo/__tests__/route.test.ts`
-- Cover success and error paths
+### Never Do
 
-## Security Rules (Non-Negotiable)
-
-- **NEVER** store, log, or access user wallet private keys
-- **NEVER** use `dangerouslySetInnerHTML`
-- **NEVER** expose server-only env vars to the browser:
-  - `SUPABASE_SERVICE_ROLE_KEY`, `NEYNAR_API_KEY`, `SESSION_SECRET`, `APP_SIGNER_PRIVATE_KEY`
-- All user input validated with Zod before processing
-- Supabase RLS enabled on all tables — use service role only server-side
-- XMTP keys are app-specific burner keys, never personal wallet keys
+- Expose server env vars: `SUPABASE_SERVICE_ROLE_KEY`, `NEYNAR_API_KEY`, `SESSION_SECRET`, `APP_SIGNER_PRIVATE_KEY`
+- Use `dangerouslySetInnerHTML`
+- Ask for, store, or access user wallet private keys
+- Commit `.env` files or secrets
+- Use CSS modules, inline styles, or non-Tailwind styling
+- Skip Zod validation on any API route
+- Connect to production/staging databases in tests
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `community.config.ts` | All branding, channels, contracts, admin FIDs, nav — **change this to fork** |
-| `src/middleware.ts` | Rate limiting + CORS headers |
+| `community.config.ts` | All branding, channels, contracts, nav - change this to fork |
+| `src/middleware.ts` | Rate limiting + CORS |
 | `src/lib/auth/session.ts` | iron-session config |
 | `src/lib/db/supabase.ts` | Supabase client (service role + anon) |
 | `src/lib/farcaster/neynar.ts` | Neynar SDK wrapper |
-| `src/lib/validation/schemas.ts` | All Zod schemas |
+| `src/lib/agents/runner.ts` | Shared agent trading logic (VAULT/BANKER/DEALER) |
 | `src/providers/audio/PlayerProvider.tsx` | Player state, MediaSession, Wake Lock |
-| `src/providers/audio/HTMLAudioProvider.tsx` | Dual audio element crossfade engine |
-
-## Common Tasks
-
-### Add a new API route
-```bash
-# Create: src/app/api/{feature}/{action}/route.ts
-# Pattern: Zod validate → getSession() → try/catch → NextResponse.json
-```
-
-### Add a new component
-```bash
-# Create: src/components/{feature}/{Name}.tsx
-# Add "use client" if interactive, use Tailwind dark theme classes
-```
-
-### Add a new Farcaster channel
-Edit `community.config.ts` → `farcaster.channels` array. It appears as a chat room automatically.
-
-### Run tests
-```bash
-npm run test           # vitest run
-npm run test:watch     # vitest watch mode
-npm run lint           # eslint
-npm run typecheck      # tsc --noEmit
-```
-
-### Database changes
-Write SQL migration → run in Supabase SQL Editor → save to `scripts/migrations/applied/`.
-
-## Architecture Decisions
-
-- **Auth:** Two methods — Sign In With Farcaster (Neynar managed signers) + Sign In With Ethereum (SIWE). Both create iron-session cookies.
-- **Database:** No ORM — direct `@supabase/supabase-js` queries with RLS.
-- **Messaging:** Public (Farcaster casts cached in Supabase) + Private (XMTP E2E encrypted).
-- **Music:** 9 platform providers, crossfade via dual `<audio>` elements, binaural beats via Web Audio API oscillators.
-- **Governance:** Three tiers: (1) On-chain Nouns Builder Governor, (2) Snapshot gasless polls, (3) Supabase community proposals with respect-weighted voting.
-- **Cross-posting:** Approved proposals auto-publish to Farcaster + Bluesky + X with per-platform content normalization.
+| `SECURITY.md` | Full security policy |

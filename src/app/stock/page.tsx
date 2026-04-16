@@ -99,10 +99,16 @@ export default function StockPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link
+              href="/stock/sponsor"
+              className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
+            >
+              Sponsors
+            </Link>
+            <Link
               href="/stock/team"
               className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
             >
-              Team Login
+              Team
             </Link>
             <Link
               href="/"

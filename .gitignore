@@ -61,4 +61,10 @@ graphify-out/
 research-wiki/
 .mempalace/
 .omm/
-apps/zabal-snap/node_modules/
+
+# Removed from repo -- keep locally only
+duodo-snap/
+nouns-snap/
+ellsworth info/
+*.mp3
+*.pdf

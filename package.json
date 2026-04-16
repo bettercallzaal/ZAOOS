@@ -7,13 +7,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "analyze": "ANALYZE=true next build",
-    "import:fractals": "npx tsx scripts/import-fractal-history.ts"
+    "import:fractals": "npx tsx scripts/import-fractal-history.ts",
+    "lint:biome": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "ci:lint": "biome ci ."
   },
   "dependencies": {
     "@100mslive/hms-video-store": "^0.13.2",

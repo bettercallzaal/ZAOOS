@@ -9,6 +9,10 @@ export async function burnZabal(
 ): Promise<string | null> {
   const burnAmount = (totalAmount * BigInt(Math.floor(BURN_PCT * 10000))) / BigInt(10000);
   if (burnAmount === BigInt(0)) return null;
+  if (totalAmount <= BigInt(0)) {
+    logger.warn(`[${agentName}] Burn skipped: no ZABAL to burn (amount=${totalAmount})`);
+    return null;
+  }
 
   try {
     const hash = await sendToken(agentName, TOKENS.ZABAL, BURN_ADDRESS, burnAmount);

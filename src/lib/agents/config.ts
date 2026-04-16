@@ -1,4 +1,5 @@
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 import type { AgentConfig, AgentName } from './types';
 
 export async function getAgentConfig(name: AgentName): Promise<AgentConfig | null> {
@@ -9,7 +10,14 @@ export async function getAgentConfig(name: AgentName): Promise<AgentConfig | nul
     .eq('name', name)
     .single();
 
-  if (error || !data) return null;
+  if (error) {
+    logger.error(`[${name}] Failed to load config: ${error.message}`);
+    return null;
+  }
+  if (!data) {
+    logger.warn(`[${name}] No config row found. Run seed-agent-config.sql`);
+    return null;
+  }
   return data as AgentConfig;
 }
 

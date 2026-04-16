@@ -35,7 +35,7 @@
 | **Lead** | DaNici | Blender, animation, digital painting, festival visual identity |
 | **2nd** | Candy | ZAO co-founder, WaveWarZ branding, 200+ AI-built apps, rapid prototyping |
 | Member | FailOften | Processing/TouchDesigner/Resolume for live visuals, Times Square projections |
-| Member | Shawn | |
+| Member | Shawn Porter | Web3 Metal founder, AI music + blockchain metal, esports (OCG), design |
 
 ### Music (Added April 14)
 | Role | Person | Strengths |
@@ -43,7 +43,7 @@
 | **Lead** | Zaal (or DCoop - TBD) | |
 | **2nd** | DCoop (or Zaal) | Hip-hop artist, ZAOVille organizer, WaveWarZ participant |
 | Member | AttaBotty | 20+ years production, electronic musician, NFTNYC/Art Basel, AV |
-| Member | Shawn | |
+| Member | Shawn Porter | Web3 Metal, AI music creation, Suno contests |
 
 *Also handles: partnerships with other events, promo at NFTNYC etc., musician outreach. Reusable across future events (ZAOVille, WaveWarZ live, etc.)*
 
@@ -53,10 +53,10 @@
 
 | Name | Expertise | Connection |
 |------|-----------|------------|
-| Tom Fellenz | | Suggested advisory board structure |
+| Tom Fellenz | NFT Music Hall (40+ musicians hosted), soundtrack composer, virtual world streaming | Suggested advisory board structure |
 | Steve Peer | 37 years Ellsworth music, Black Moon Public House, local network | Not yet pitched |
 | Tyler Stambaugh | JPMorgan + Accenture finance, Magnetiq COO | ZAO community |
-| Craig G | | ZAO community |
+| Craig Gonzalez | Partnerships at Whop ($1.6B creator platform), deal structure at scale | ZAO community |
 
 *Advisors provide strategic guidance, intros, and domain expertise. Not expected to attend weekly standups or take active tasks.*
 

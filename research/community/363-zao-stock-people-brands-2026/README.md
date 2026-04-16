@@ -54,13 +54,40 @@
 | **COC Concertz** | Featured artist at COC Concertz events |
 | **ZAO Stock Role** | Ops member. Suggested advisory board structure. |
 
-### Profiles Needing Input (No Public Data Found)
+### New Profile: Shawn Porter (Web3 Metal)
 
-| Person | What We Know | What We Need |
-|--------|-------------|--------------|
-| **Shawn** | Present at kickoff, assigned to Design + Music teams, designing ZAO Stock t-shirt | Bio, links, IRL photo, full name, background |
-| **DFresh** | Finance team member, festival experience | Bio, links, what "festival experience" means specifically |
-| **Craig G** | Advisory board | Bio, links, connection to ZAO, expertise area |
+| Field | Detail |
+|-------|--------|
+| **Name** | Shawn Porter |
+| **Project** | Web3 Metal - "Where AI & Blockchain Metal Music LIVES" |
+| **Newsletter** | [web3metal.beehiiv.com](https://web3metal.beehiiv.com/) |
+| **Focus** | AI-generated metal music (Suno), NFTs, fan engagement, blockchain distribution |
+| **Activities** | Cyber Metal Radio (weekly fan-curated countdowns), Suno AI music contests, Collab Club, NFT drops via Sound.xyz + Gala Music |
+| **Other** | Co-founder of OCG Esports Club (Canadian esports org, est. 2019) |
+| **Socials** | Twitter, LinkedIn, Instagram, TikTok, YouTube, Discord (via Web3 Metal) |
+| **ZAO Stock Role** | Design + Music team member. Designing ZAO Stock t-shirt. |
+
+### New Profile: DFresh (Doug)
+
+| Field | Detail |
+|-------|--------|
+| **Name** | Doug (goes by DFresh) |
+| **Title** | Maker |
+| **Background** | Festival experience (details TBD from him) |
+| **ZAO Stock Role** | Finance team member |
+| **Status** | Need full bio, links, and specific background from him directly |
+
+### New Profile: Craig G (Craig Gonzalez)
+
+| Field | Detail |
+|-------|--------|
+| **Name** | Craig Gonzalez |
+| **Title** | Partnerships at Whop |
+| **Company** | [Whop](https://whop.com) - creator commerce platform, $1.6B valuation (Feb 2026), raised $200M from Tether |
+| **Whop context** | 18-person partnerships team. Whop powers digital product sales for creators. Tether investment embedding wallet infrastructure into Whop, expanding to LATAM/Europe/APAC |
+| **Value to ZAO Stock** | Partnerships expertise at a $1.6B creator platform. Warm intros to creator economy brands. Understands sponsorship/partnership deal structure at scale. |
+| **ZAO Stock Role** | Advisory board |
+| **Status** | Need bio + links from him directly. His Whop connection is high-value for sponsor pipeline. |
 
 ---
 

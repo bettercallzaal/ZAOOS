@@ -19,24 +19,24 @@ export const metadata: Metadata = {
 const FESTIVAL_DATE = '2026-10-03T12:00:00-04:00';
 
 const SPONSOR_OFFERINGS = [
-  { category: 'On-Site', items: [
-    'Logo on stage banner & signage',
-    'Booth / table space at festival',
-    'Welcome bag inserts',
-    'Verbal shoutouts during event',
-    'Co-presented branding across all materials',
+  { category: 'Main Stage Partner', items: [
+    'Named credit on stage banner and signage',
+    'Booth or table space on-site',
+    'Welcome bag inclusion',
+    'Live verbal credit during the event',
+    'Co-presented in all printed materials',
   ]},
-  { category: 'Digital', items: [
-    'Logo on festival website with backlink',
-    'Livestream overlay branding',
-    'Sponsored segment + interview feature',
-    'Social media campaign & Farcaster announcement',
-    'Newsletter shoutout (400+ editions)',
+  { category: 'Broadcast Partner', items: [
+    'Named credit on festival website with backlink',
+    'Livestream overlay credit',
+    'Sponsored segment plus interview feature',
+    'Social campaign across Farcaster, X, and Bluesky',
+    'Newsletter credit (400+ editions)',
   ]},
-  { category: 'Partnership', items: [
-    'Post-event thank-you feature & recap',
-    'Year-round partnership & advisory seat',
-    'Priority placement for Year 2',
+  { category: 'Year-Round Partner', items: [
+    'Post-event thank-you feature and recap',
+    'Advisory seat for Year 2 planning',
+    'Priority placement in 2027',
     'Tax-deductible via Fractured Atlas 501(c)(3)',
   ]},
 ];
@@ -98,6 +98,12 @@ export default function StockPage() {
             <p className="text-xs text-gray-400">Community Music Festival</p>
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/stock/program"
+              className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
+            >
+              Program
+            </Link>
             <Link
               href="/stock/sponsor"
               className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
@@ -162,36 +168,15 @@ export default function StockPage() {
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">How We Run It</p>
           <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] space-y-3">
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1 text-gray-300">BYOB welcome</span>
-              <span className="text-xs bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1 text-gray-300">Dog &amp; kid friendly</span>
               <span className="text-xs bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1 text-gray-300">Operates at break-even</span>
               <span className="text-xs bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1 text-gray-300">Volunteer opportunities</span>
               <span className="text-xs bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1 text-gray-300">Fair artist pay</span>
+              <span className="text-xs bg-white/[0.04] border border-white/[0.08] rounded-full px-3 py-1 text-gray-300">Community-built</span>
             </div>
             <p className="text-xs text-gray-500 leading-relaxed">
-              ZAOstock is built by the community for the community. Every dollar raised goes to artists, production, and keeping tickets affordable. No margin, no extraction.
+              ZAOstock is built by the community for the community. Every dollar raised goes to artists, production, and keeping the festival accessible. No margin, no extraction.
             </p>
           </div>
-        </section>
-
-        {/* Tickets / Sliding Scale */}
-        <section className="space-y-3">
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Tickets</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08]">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Community</p>
-              <p className="text-2xl font-bold text-white">$0 – $25</p>
-              <p className="text-xs text-gray-400 mt-2">Sliding scale. Pay what you can. All day access.</p>
-            </div>
-            <div className="bg-[#0d1b2a] rounded-xl p-5 border border-[#f5a623]/30">
-              <p className="text-xs text-[#f5a623] uppercase tracking-wider mb-1">Supporter</p>
-              <p className="text-2xl font-bold text-white">$50 – $75</p>
-              <p className="text-xs text-gray-400 mt-2">Supports artist pay and production. Helps fund community tickets.</p>
-            </div>
-          </div>
-          <p className="text-[11px] text-gray-600 px-1 italic">
-            Ticket sales open summer 2026 via RSVP list.
-          </p>
         </section>
 
         {/* Lineup */}
@@ -268,15 +253,13 @@ export default function StockPage() {
 
         {/* Sponsorship */}
         <section className="space-y-3">
-          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Sponsorship</p>
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Partner With Us</p>
           <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] space-y-2">
             <p className="text-sm text-gray-300 leading-relaxed">
-              Two tracks available: Local Partners (Ellsworth businesses) and Digital Partners (Web3 brands).
-              All sponsorships are tax-deductible through Fractured Atlas 501(c)(3). Packages are flexible
-              - let&apos;s build something that works for you.
+              No Gold / Silver / Bronze. Partners get named credit for the role they play: Main Stage Partner, Broadcast Partner, or Year-Round Partner. Three paths, plus flexible custom packages for Local Ellsworth businesses, web3 brands, and ecosystem partners. All contributions tax-deductible via Fractured Atlas 501(c)(3).
             </p>
             <p className="text-xs text-gray-500">
-              Sponsorship deck coming soon &middot; Contact us for early partnership opportunities
+              Full deck on request &middot; Reach out to start the conversation
             </p>
           </div>
           <div className="space-y-3">

@@ -54,8 +54,10 @@ export default async function OnePagerPage() {
         <section className="mb-6">
           <h2 className="text-xl font-bold mb-2">Welcome to the team.</h2>
           <p className="text-sm leading-relaxed">
-            You&apos;re officially on the ZAOstock crew. This sheet has your login code + the 4 things to do on first login.
-            Keep it safe until Tuesday&apos;s meeting, then let&apos;s go build.
+            You are officially on the ZAOstock crew. This sheet has your login code and the 4 things to do on first login.
+          </p>
+          <p className="text-sm leading-relaxed mt-2">
+            <strong>Next meeting:</strong> Tuesday April 21, 10:00am EST. Location confirms in team channel.
           </p>
         </section>
 
@@ -104,10 +106,10 @@ export default async function OnePagerPage() {
         <section className="mb-6 bg-black text-white p-4 rounded">
           <p className="text-xs uppercase tracking-wider font-bold mb-2">Keep These In Mind</p>
           <ul className="text-sm space-y-1">
-            <li>· ZAOstock operates at <strong>break-even</strong>. Every dollar goes to artists + production.</li>
-            <li>· Event is <strong>BYOB, dog &amp; kid friendly</strong>. Community first.</li>
-            <li>· 10 artists · 1 stage · all day · Franklin Street Parklet.</li>
-            <li>· Part of the 9th Annual Art of Ellsworth.</li>
+            <li>- ZAOstock operates at <strong>break-even</strong>. Every dollar goes to artists + production.</li>
+            <li>- Community-built. Fair artist pay. No margin, no extraction.</li>
+            <li>- 10 artists, 1 stage, all day, Franklin Street Parklet.</li>
+            <li>- Part of the 9th Annual Art of Ellsworth.</li>
           </ul>
         </section>
 

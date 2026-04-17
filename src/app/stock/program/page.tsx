@@ -105,7 +105,6 @@ export default function ProgramPage() {
         <div className="bg-[#0d1b2a] rounded-xl p-5 border border-white/[0.08] space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">Things to know</p>
           <ul className="text-sm text-gray-300 space-y-1.5">
-            <li>- BYOB welcome. Dog and kid friendly.</li>
             <li>- Full lineup announces August 2026.</li>
             <li>- Weather: tent coverage via Wallace Events, rain or shine.</li>
             <li>- Afterparty at Black Moon Public House, 30 seconds from the stage.</li>

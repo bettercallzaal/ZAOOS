@@ -106,7 +106,7 @@ interface Props {
   memberId: string;
   goals: Array<{ id: string; title: string; status: 'locked' | 'wip' | 'tbd'; details: string; category: string; sort_order: number }>;
   todos: Array<{ id: string; title: string; status: 'todo' | 'in_progress' | 'done'; notes: string; owner: { id: string; name: string } | null; creator: { id: string; name: string } | null; created_at: string }>;
-  members: Array<{ id: string; name: string; role: string; scope: string }>;
+  members: Array<{ id: string; name: string; role: string; scope: string; bio?: string; links?: string }>;
   sponsors: Sponsor[];
   artists: Artist[];
   milestones: Milestone[];

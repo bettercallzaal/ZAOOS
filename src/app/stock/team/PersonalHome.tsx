@@ -4,10 +4,11 @@ import { useMemo } from 'react';
 import { ResearchLinks } from './ResearchLinks';
 import { FestivalProgress } from './FestivalProgress';
 import { QuickAdd } from './QuickAdd';
+import { BioEditor } from './BioEditor';
 
 const FESTIVAL_DATE = new Date('2026-10-03T12:00:00-04:00');
 
-interface Member { id: string; name: string; role: string; scope: string; }
+interface Member { id: string; name: string; role: string; scope: string; bio?: string; links?: string; }
 
 interface Todo {
   id: string;
@@ -135,6 +136,9 @@ export function PersonalHome({ member, allMembers, todos, sponsors, artists, mil
 
       {/* Quick add */}
       <QuickAdd currentMemberId={member.id} />
+
+      {/* Bio editor */}
+      <BioEditor memberName={member.name} initialBio={member.bio || ''} initialLinks={member.links || ''} />
 
       {/* Welcome banner */}
       <div className="bg-gradient-to-br from-[#f5a623]/20 via-[#f5a623]/5 to-transparent rounded-xl p-5 border border-[#f5a623]/30">

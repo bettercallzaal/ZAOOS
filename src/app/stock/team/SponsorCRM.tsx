@@ -76,6 +76,15 @@ const STATUS_STRIPE: Record<Sponsor['status'], string> = {
   declined: 'bg-red-500',
 };
 
+const STATUS_STRIPE_BORDER: Record<Sponsor['status'], string> = {
+  lead: 'border-l-gray-600',
+  contacted: 'border-l-blue-500',
+  in_talks: 'border-l-amber-500',
+  committed: 'border-l-emerald-500',
+  paid: 'border-l-emerald-400',
+  declined: 'border-l-red-500',
+};
+
 const KANBAN_COLUMNS: KanbanColumn<Sponsor['status']>[] = [
   { key: 'lead', label: 'Lead', accent: 'border-gray-600 text-gray-400' },
   { key: 'contacted', label: 'Contacted', accent: 'border-blue-500/40 bg-blue-500/10 text-blue-400' },
@@ -232,7 +241,7 @@ export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]
       {view === 'list' ? (
         <div className="space-y-2">
           {filtered.map((sponsor) => (
-            <div key={sponsor.id} className="bg-[#0d1b2a] rounded-lg border border-white/[0.06] overflow-hidden">
+            <div key={sponsor.id} className={`bg-[#0d1b2a] rounded-lg border border-white/[0.06] border-l-4 ${STATUS_STRIPE_BORDER[sponsor.status]} overflow-hidden`}>
               <div className="p-3 flex items-start gap-3">
                 <button
                   onClick={() => cycleStatus(sponsor)}

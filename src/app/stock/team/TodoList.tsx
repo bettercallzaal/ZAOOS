@@ -34,6 +34,12 @@ const STATUS_STRIPE: Record<Todo['status'], string> = {
   done: 'bg-emerald-500',
 };
 
+const STATUS_STRIPE_BORDER: Record<Todo['status'], string> = {
+  todo: 'border-l-gray-600',
+  in_progress: 'border-l-amber-500',
+  done: 'border-l-emerald-500',
+};
+
 export function TodoList({ todos: initialTodos, members, currentMemberId }: {
   todos: Todo[];
   members: Member[];
@@ -176,7 +182,7 @@ export function TodoList({ todos: initialTodos, members, currentMemberId }: {
       {view === 'list' ? (
         <div className="space-y-2">
           {filtered.map((todo) => (
-            <div key={todo.id} className="bg-[#0d1b2a] rounded-lg border border-white/[0.06] p-3">
+            <div key={todo.id} className={`bg-[#0d1b2a] rounded-lg border border-white/[0.06] border-l-4 ${STATUS_STRIPE_BORDER[todo.status]} p-3`}>
               <div className="flex items-start gap-3">
                 <button
                   onClick={() => cycleStatus(todo)}

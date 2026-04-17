@@ -11,6 +11,7 @@ import { VolunteerRoster } from './VolunteerRoster';
 import { BudgetTracker } from './BudgetTracker';
 import { MeetingNotes } from './MeetingNotes';
 import { PersonalHome } from './PersonalHome';
+import { OnboardingModal } from './OnboardingModal';
 import { useRouter } from 'next/navigation';
 
 type Tab = 'home' | 'overview' | 'sponsors' | 'artists' | 'timeline' | 'volunteers' | 'budget' | 'notes' | 'team';
@@ -139,6 +140,7 @@ export function Dashboard({
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white">
+      <OnboardingModal memberName={memberName} />
       <header className="sticky top-0 z-40 bg-[#0a1628]/95 backdrop-blur-md border-b border-white/[0.06]">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
@@ -199,7 +201,7 @@ export function Dashboard({
         {tab === 'timeline' && <Timeline milestones={milestones} members={memberList} />}
         {tab === 'volunteers' && <VolunteerRoster volunteers={volunteers} />}
         {tab === 'budget' && <BudgetTracker entries={budget} />}
-        {tab === 'notes' && <MeetingNotes notes={meetingNotes} />}
+        {tab === 'notes' && <MeetingNotes notes={meetingNotes} members={memberList} />}
         {tab === 'team' && <TeamRoles members={members} />}
       </div>
     </div>

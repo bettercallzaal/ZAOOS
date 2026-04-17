@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { TeamReportsCollector } from './TeamReportsCollector';
+
+interface Member { id: string; name: string; }
 
 interface Note {
   id: string;
@@ -13,7 +16,7 @@ interface Note {
   created_at: string;
 }
 
-export function MeetingNotes({ notes: initial }: { notes: Note[] }) {
+export function MeetingNotes({ notes: initial, members = [] }: { notes: Note[]; members?: Member[] }) {
   const [notes, setNotes] = useState(initial);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -132,12 +135,20 @@ export function MeetingNotes({ notes: initial }: { notes: Note[] }) {
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Notes</p>
                   <textarea
+                    key={`notes-${note.id}-${note.notes.length}`}
                     defaultValue={note.notes}
                     onBlur={(e) => e.target.value !== note.notes && updateNote(note.id, { notes: e.target.value })}
                     rows={6}
                     className="w-full bg-[#0d1b2a] border border-white/[0.06] rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#f5a623]/30 resize-none"
                   />
                 </div>
+                {members.length > 0 && (
+                  <TeamReportsCollector
+                    members={members}
+                    currentNotes={note.notes}
+                    onAppend={(newNotes) => updateNote(note.id, { notes: newNotes })}
+                  />
+                )}
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Action Items</p>
                   <textarea

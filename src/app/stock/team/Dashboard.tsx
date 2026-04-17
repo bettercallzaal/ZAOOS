@@ -7,9 +7,12 @@ import { TeamRoles } from './TeamRoles';
 import { SponsorCRM } from './SponsorCRM';
 import { ArtistPipeline } from './ArtistPipeline';
 import { Timeline } from './Timeline';
+import { VolunteerRoster } from './VolunteerRoster';
+import { BudgetTracker } from './BudgetTracker';
+import { MeetingNotes } from './MeetingNotes';
 import { useRouter } from 'next/navigation';
 
-type Tab = 'overview' | 'sponsors' | 'artists' | 'timeline' | 'team';
+type Tab = 'overview' | 'sponsors' | 'artists' | 'timeline' | 'volunteers' | 'budget' | 'notes' | 'team';
 
 interface Sponsor {
   id: string;
@@ -58,6 +61,43 @@ interface Milestone {
   created_at: string;
 }
 
+interface Volunteer {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: 'setup' | 'checkin' | 'water' | 'safety' | 'teardown' | 'floater' | 'content' | 'unassigned';
+  shift: 'early' | 'block1' | 'block2' | 'teardown' | 'allday';
+  confirmed: boolean;
+  notes: string;
+  recruited_by_member: { id: string; name: string } | null;
+  created_at: string;
+}
+
+interface BudgetEntry {
+  id: string;
+  type: 'income' | 'expense';
+  category: string;
+  description: string;
+  amount: number;
+  status: 'projected' | 'committed' | 'actual';
+  date: string | null;
+  notes: string;
+  related_sponsor: { id: string; name: string } | null;
+  created_at: string;
+}
+
+interface Note {
+  id: string;
+  meeting_date: string;
+  title: string;
+  attendees: string[];
+  notes: string;
+  action_items: string;
+  creator: { id: string; name: string } | null;
+  created_at: string;
+}
+
 interface Props {
   memberName: string;
   memberId: string;
@@ -67,9 +107,24 @@ interface Props {
   sponsors: Sponsor[];
   artists: Artist[];
   milestones: Milestone[];
+  volunteers: Volunteer[];
+  budget: BudgetEntry[];
+  meetingNotes: Note[];
 }
 
-export function Dashboard({ memberName, memberId, goals, todos, members, sponsors, artists, milestones }: Props) {
+export function Dashboard({
+  memberName,
+  memberId,
+  goals,
+  todos,
+  members,
+  sponsors,
+  artists,
+  milestones,
+  volunteers,
+  budget,
+  meetingNotes,
+}: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('overview');
 
@@ -96,9 +151,7 @@ export function Dashboard({ memberName, memberId, goals, todos, members, sponsor
           </div>
         </div>
         <div className="max-w-2xl mx-auto px-4 pb-2 flex gap-1 overflow-x-auto">
-          <TabButton active={tab === 'overview'} onClick={() => setTab('overview')}>
-            Overview
-          </TabButton>
+          <TabButton active={tab === 'overview'} onClick={() => setTab('overview')}>Overview</TabButton>
           <TabButton active={tab === 'sponsors'} onClick={() => setTab('sponsors')}>
             Sponsors <span className="ml-1 text-[10px] text-gray-500">{sponsors.length}</span>
           </TabButton>
@@ -108,9 +161,14 @@ export function Dashboard({ memberName, memberId, goals, todos, members, sponsor
           <TabButton active={tab === 'timeline'} onClick={() => setTab('timeline')}>
             Timeline <span className="ml-1 text-[10px] text-gray-500">{milestones.length}</span>
           </TabButton>
-          <TabButton active={tab === 'team'} onClick={() => setTab('team')}>
-            Team
+          <TabButton active={tab === 'volunteers'} onClick={() => setTab('volunteers')}>
+            Volunteers <span className="ml-1 text-[10px] text-gray-500">{volunteers.length}</span>
           </TabButton>
+          <TabButton active={tab === 'budget'} onClick={() => setTab('budget')}>Budget</TabButton>
+          <TabButton active={tab === 'notes'} onClick={() => setTab('notes')}>
+            Notes <span className="ml-1 text-[10px] text-gray-500">{meetingNotes.length}</span>
+          </TabButton>
+          <TabButton active={tab === 'team'} onClick={() => setTab('team')}>Team</TabButton>
         </div>
       </header>
 
@@ -125,6 +183,9 @@ export function Dashboard({ memberName, memberId, goals, todos, members, sponsor
         {tab === 'sponsors' && <SponsorCRM sponsors={sponsors} members={memberList} />}
         {tab === 'artists' && <ArtistPipeline artists={artists} members={memberList} />}
         {tab === 'timeline' && <Timeline milestones={milestones} members={memberList} />}
+        {tab === 'volunteers' && <VolunteerRoster volunteers={volunteers} />}
+        {tab === 'budget' && <BudgetTracker entries={budget} />}
+        {tab === 'notes' && <MeetingNotes notes={meetingNotes} />}
         {tab === 'team' && <TeamRoles members={members} />}
       </div>
     </div>

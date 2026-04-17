@@ -20,7 +20,17 @@ export default async function StockTeamPage() {
 
   const supabase = getSupabaseAdmin();
 
-  const [goalsRes, todosRes, membersRes, sponsorsRes, artistsRes, timelineRes] = await Promise.allSettled([
+  const [
+    goalsRes,
+    todosRes,
+    membersRes,
+    sponsorsRes,
+    artistsRes,
+    timelineRes,
+    volunteersRes,
+    budgetRes,
+    notesRes,
+  ] = await Promise.allSettled([
     supabase.from('stock_goals').select('*').order('sort_order'),
     supabase
       .from('stock_todos')
@@ -44,6 +54,21 @@ export default async function StockTeamPage() {
       .from('stock_timeline')
       .select('*, owner:stock_team_members!owner_id(id, name)')
       .order('due_date', { ascending: true }),
+    supabase
+      .from('stock_volunteers')
+      .select('*, recruited_by_member:stock_team_members!recruited_by(id, name)')
+      .order('confirmed', { ascending: false })
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('stock_budget_entries')
+      .select('*, related_sponsor:stock_sponsors!related_sponsor_id(id, name)')
+      .order('type')
+      .order('category')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('stock_meeting_notes')
+      .select('*, creator:stock_team_members!created_by(id, name)')
+      .order('meeting_date', { ascending: false }),
   ]);
 
   const goals = goalsRes.status === 'fulfilled' ? goalsRes.value.data || [] : [];
@@ -52,6 +77,9 @@ export default async function StockTeamPage() {
   const sponsors = sponsorsRes.status === 'fulfilled' ? sponsorsRes.value.data || [] : [];
   const artists = artistsRes.status === 'fulfilled' ? artistsRes.value.data || [] : [];
   const milestones = timelineRes.status === 'fulfilled' ? timelineRes.value.data || [] : [];
+  const volunteers = volunteersRes.status === 'fulfilled' ? volunteersRes.value.data || [] : [];
+  const budget = budgetRes.status === 'fulfilled' ? budgetRes.value.data || [] : [];
+  const meetingNotes = notesRes.status === 'fulfilled' ? notesRes.value.data || [] : [];
 
   return (
     <Dashboard
@@ -63,6 +91,9 @@ export default async function StockTeamPage() {
       sponsors={sponsors}
       artists={artists}
       milestones={milestones}
+      volunteers={volunteers}
+      budget={budget}
+      meetingNotes={meetingNotes}
     />
   );
 }

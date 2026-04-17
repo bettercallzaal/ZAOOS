@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
@@ -106,4 +107,13 @@ const nextConfig: NextConfig = {
   turbopack: {},
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+  // Upload source maps for readable stack traces in Sentry
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+  // Suppress Sentry CLI logs during build
+  silent: !process.env.CI,
+  // Disable Sentry telemetry
+  telemetry: false,
+});

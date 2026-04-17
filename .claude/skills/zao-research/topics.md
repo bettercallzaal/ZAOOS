@@ -32,6 +32,7 @@ Use this to quickly find if a topic has already been researched.
 - `241` — HowiAI (Gridley): narration workflows, 10x delegation test, AI habit formation, /standup upgrade, /reflect skill
 - `242` — Claude 20 underused features audit: 15/20 solved, voice mode gap, artifacts opportunity, model selection
 - `243` — Claude intermediate guide (@aiedge_): Skills 2.0 evals/A/B testing, Cowork Dispatch, scheduled tasks, reverse prompting
+- `429` — **Claude Code Skills Deep Dive**: Complete SKILL.md spec (15 frontmatter fields), progressive disclosure (82% token savings), context:fork subagents, allowed-tools, string substitutions, shell injection, ZAO OS 25-skill audit + optimization plan
 - `245` — ZOE upgrade playbook: OpenClaw v2026.3.31, Mem0 memory, Neynar webhook relay, auto-dream, Telegram keyboards, competitive monitoring, founder agent patterns
 - `246` — Neynar API 130+ endpoints audit: community radar, auto-curation, channel intel, smart engagement, x402 pay-per-call, 4 agent patterns
 - `253` — **AutoAgent self-optimizing agents**: meta-agent loop for harness engineering, model empathy, trace-based learning, overfitting guards, 5 emergent behaviors, comparison vs DSPy/Meta-Harness/ADAS

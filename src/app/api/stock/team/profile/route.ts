@@ -6,6 +6,14 @@ import { getSupabaseAdmin } from '@/lib/db/supabase';
 const patchSchema = z.object({
   bio: z.string().max(2000).optional(),
   links: z.string().max(500).optional(),
+  photo_url: z
+    .string()
+    .max(500)
+    .optional()
+    .refine(
+      (v) => !v || v === '' || /^https:\/\//i.test(v),
+      { message: 'Photo URL must start with https://' },
+    ),
 });
 
 export async function PATCH(request: NextRequest) {
@@ -24,6 +32,7 @@ export async function PATCH(request: NextRequest) {
     const updates: Record<string, string> = {};
     if (parsed.data.bio !== undefined) updates.bio = parsed.data.bio;
     if (parsed.data.links !== undefined) updates.links = parsed.data.links;
+    if (parsed.data.photo_url !== undefined) updates.photo_url = parsed.data.photo_url;
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });
@@ -34,7 +43,7 @@ export async function PATCH(request: NextRequest) {
       .from('stock_team_members')
       .update(updates)
       .eq('id', session.memberId)
-      .select('id, name, bio, links')
+      .select('id, name, bio, links, photo_url')
       .single();
 
     if (error || !data) {

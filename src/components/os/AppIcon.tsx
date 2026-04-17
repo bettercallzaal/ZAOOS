@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { AppManifest } from '@/lib/os/types';
 
 interface AppIconProps {
@@ -14,7 +14,7 @@ interface AppIconProps {
 export function AppIcon({ app, isPinned, onOpen, onPin, onUnpin }: AppIconProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [pressing, setPressing] = useState(false);
-  const longPressRef = { current: null as ReturnType<typeof setTimeout> | null };
+  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function handlePressStart() {
     setPressing(true);
@@ -42,13 +42,15 @@ export function AppIcon({ app, isPinned, onOpen, onPin, onUnpin }: AppIconProps)
     <div className="relative flex flex-col items-center gap-1">
       <button
         type="button"
+        aria-label={`Open ${app.name}`}
         onClick={handleTap}
+        onContextMenu={(e) => { e.preventDefault(); setShowMenu(true); }}
         onMouseDown={handlePressStart}
         onMouseUp={handlePressEnd}
         onMouseLeave={handlePressEnd}
         onTouchStart={handlePressStart}
         onTouchEnd={handlePressEnd}
-        className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-2xl transition-transform active:scale-90 sm:h-16 sm:w-16 sm:text-3xl ${
+        className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-2xl transition-transform focus-visible:ring-2 focus-visible:ring-[#f5a623] active:scale-90 sm:h-16 sm:w-16 sm:text-3xl ${
           pressing ? 'scale-95 ring-2 ring-[#f5a623]/50' : ''
         }`}
       >

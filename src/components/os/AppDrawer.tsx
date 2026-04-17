@@ -50,8 +50,9 @@ export function AppDrawer({ pinnedApps, onOpen, onPin, onUnpin, onClose }: AppDr
         <h2 className="text-lg font-semibold text-white">Apps</h2>
         <button
           type="button"
+          aria-label="Close app drawer"
           onClick={onClose}
-          className="rounded-full p-2 text-white/60 hover:bg-white/10"
+          className="rounded-full p-2 text-white/60 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#f5a623]"
         >
           ✕
         </button>

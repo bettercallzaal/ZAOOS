@@ -129,7 +129,7 @@ export function LoginButton() {
           <p className="text-sm text-gray-400 mt-2">Verifying access...</p>
         )}
         {error && (
-          <p className="text-xs text-red-400 text-center mt-2">{error}</p>
+          <p role="alert" className="text-xs text-red-400 text-center mt-2">{error}</p>
         )}
       </div>
 

@@ -58,9 +58,9 @@ export function PhoneShell({
       <div className="flex items-center justify-between px-4 pt-6 pb-1">
         <button
           type="button"
+          aria-label="Change shell layout"
           onClick={() => setShowShellPicker(true)}
-          className="rounded-lg p-2 text-xs text-white/30 transition-colors hover:bg-white/5 hover:text-white/50"
-          title="Change shell layout"
+          className="rounded-lg p-2 text-xs text-white/60 transition-colors hover:bg-white/5 hover:text-white/80 focus-visible:ring-2 focus-visible:ring-[#f5a623]"
         >
           📱 Shell
         </button>
@@ -70,8 +70,9 @@ export function PhoneShell({
         </div>
         <button
           type="button"
+          aria-label="Settings"
           onClick={() => router.push('/settings')}
-          className="rounded-lg p-2 text-xs text-white/30 transition-colors hover:bg-white/5 hover:text-white/50"
+          className="rounded-lg p-2 text-xs text-white/60 transition-colors hover:bg-white/5 hover:text-white/80 focus-visible:ring-2 focus-visible:ring-[#f5a623]"
         >
           ⚙️
         </button>

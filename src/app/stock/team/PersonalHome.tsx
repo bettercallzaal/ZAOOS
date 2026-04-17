@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { ResearchLinks } from './ResearchLinks';
 
 const FESTIVAL_DATE = new Date('2026-10-03T12:00:00-04:00');
 
@@ -298,6 +299,9 @@ export function PersonalHome({ member, allMembers, todos, sponsors, artists, mil
           </div>
         </Section>
       )}
+
+      {/* Research library */}
+      <ResearchLinks scope={member.scope} />
     </div>
   );
 }

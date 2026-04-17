@@ -25,3 +25,4 @@
 | 272 | [ZAO Task Forces & Team Structure](./272-zao-task-forces-2026/) | STANDALONE | 6-month roadmap for ZAO task forces and team structure |
 | 287 | [ZAO FAQ + Word Wall Glossary](./287-zao-faq-word-wall-glossary/) | STANDALONE | Community-driven web3 glossary (Urban Dictionary-style) with Respect-weighted voting, FAQ upgrade, peth vibecoding patterns, 6.5hr implementation plan |
 | 289 | [ZAO Tool Box](./289-zao-tool-box/) | CANONICAL | Complete inventory of 47 usable tools across 8 categories — name, description, usage, file paths for every built feature |
+| 415 | [POIDH Bounties for ZAO + WaveWarZ](./415-poidh-bounties-zao-wavewarz/) | STANDALONE | POIDH mechanics deep dive (solo vs open, 48hr voting, 2.5% fee, V3 contracts on Base/Arbitrum/Degen) + 11 ready-to-post bounty templates for ZAO Stock, WaveWarZ raids, artist docs |

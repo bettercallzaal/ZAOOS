@@ -211,9 +211,10 @@ export function useMessages(
       return;
     }
 
+    let msgId: string | undefined;
     try {
       // Step 1: Store locally (optimistic) — returns message ID
-      const msgId = await conv.sendText(trimmed, true);
+      msgId = await conv.sendText(trimmed, true);
 
       // Show optimistic message in UI immediately
       const optimisticMsg: XMTPMessage = {
@@ -246,7 +247,10 @@ export function useMessages(
       // Step 2: Publish to network
       await conv.publishMessages();
     } catch (err) {
-      console.error('[XMTP] Failed to send message:', err);
+      // Mark the optimistic message as failed so UI can show retry indicator
+      setMessages((prev) =>
+        prev.map((m) => (m.id === msgId ? { ...m, sendFailed: true } : m)),
+      );
       setError('Failed to send message. Please try again.');
     }
   }, [

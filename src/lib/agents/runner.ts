@@ -4,7 +4,7 @@
  * Individual agents just pass their name and any custom overrides.
  */
 
-import { getAgentConfig, getDailySpend } from './config';
+import { getAgentConfig, getDailySpend, claimBudget } from './config';
 import { logAgentEvent } from './events';
 import { getSwapQuote, getZabalPrice } from './swap';
 import { executeSwap } from './wallet';
@@ -71,25 +71,22 @@ export async function runAgent(agentName: AgentName): Promise<AgentRunResult> {
     return { action: 'report', status: 'skipped', details: 'No wallet configured' };
   }
 
-  // Check daily budget
-  const spent = await getDailySpend(agentName);
-  if (spent >= config.max_daily_spend_usd) {
-    await logAgentEvent({
-      agent_name: agentName,
-      action: 'buy_zabal',
-      status: 'failed',
-      error_message: `Daily budget exceeded: $${spent.toFixed(2)} / $${config.max_daily_spend_usd}`,
-    });
-    return { action: 'buy_zabal', status: 'skipped', details: `Budget exceeded ($${spent.toFixed(2)})` };
-  }
-
   // Get live ETH price for accurate trade sizing
   const ethPrice = await getEthPrice();
+  if (ethPrice === 2500) {
+    logger.warn(`[${agentName}] Using $2500 ETH fallback price - 0x API may be down`);
+  }
 
   // Trade amount with random noise ($0.30-$0.70)
   const baseAmount = 0.50;
   const noise = (Math.random() - 0.5) * 0.40;
   const tradeUsd = Math.min(baseAmount + noise, config.max_single_trade_usd);
+
+  // Atomic budget claim - prevents race condition with concurrent cron runs
+  const budgetClaimed = await claimBudget(agentName, tradeUsd, config.max_daily_spend_usd);
+  if (!budgetClaimed) {
+    return { action: 'buy_zabal', status: 'skipped', details: 'Budget exceeded or claim failed' };
+  }
 
   try {
     // Auto-stake check (14-day cycle)

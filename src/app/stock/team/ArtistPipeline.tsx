@@ -1,6 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { KanbanBoard, KanbanColumn } from './KanbanBoard';
+import { AttentionCard } from './AttentionCard';
+
+function daysSince(iso: string | null): number {
+  if (!iso) return Infinity;
+  return Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
+}
 
 interface Member { id: string; name: string; }
 
@@ -49,8 +56,36 @@ const STATUS_COLOR: Record<Artist['status'], string> = {
   declined: 'border-red-500/40 bg-red-500/10 text-red-400',
 };
 
+const STATUS_STRIPE: Record<Artist['status'], string> = {
+  wishlist: 'bg-gray-600',
+  contacted: 'bg-blue-500',
+  interested: 'bg-amber-500',
+  confirmed: 'bg-emerald-500',
+  travel_booked: 'bg-emerald-400',
+  declined: 'bg-red-500',
+};
+
+const STATUS_STRIPE_BORDER: Record<Artist['status'], string> = {
+  wishlist: 'border-l-gray-600',
+  contacted: 'border-l-blue-500',
+  interested: 'border-l-amber-500',
+  confirmed: 'border-l-emerald-500',
+  travel_booked: 'border-l-emerald-400',
+  declined: 'border-l-red-500',
+};
+
+const KANBAN_COLUMNS: KanbanColumn<Artist['status']>[] = [
+  { key: 'wishlist', label: 'Wishlist', accent: 'border-gray-600 text-gray-400' },
+  { key: 'contacted', label: 'Contacted', accent: 'border-blue-500/40 bg-blue-500/10 text-blue-400' },
+  { key: 'interested', label: 'Interested', accent: 'border-amber-500/40 bg-amber-500/10 text-amber-400' },
+  { key: 'confirmed', label: 'Confirmed', accent: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400', wipSoftCap: 10 },
+  { key: 'travel_booked', label: 'Booked', accent: 'border-emerald-500 bg-emerald-500/20 text-emerald-300' },
+  { key: 'declined', label: 'Declined', accent: 'border-red-500/40 bg-red-500/10 text-red-400', defaultCollapsed: true },
+];
+
 export function ArtistPipeline({ artists: initial, members }: { artists: Artist[]; members: Member[] }) {
   const [artists, setArtists] = useState(initial);
+  const [view, setView] = useState<'list' | 'board'>('list');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newGenre, setNewGenre] = useState('');
@@ -62,6 +97,20 @@ export function ArtistPipeline({ artists: initial, members }: { artists: Artist[
     contacted: artists.filter((a) => a.status === 'contacted' || a.status === 'interested').length,
     confirmed: artists.filter((a) => a.status === 'confirmed' || a.status === 'travel_booked').length,
   };
+
+  const attention = useMemo(() => {
+    const flagged: Array<{ id: string; title: string; reason: string; score: number }> = [];
+    for (const a of artists) {
+      if (a.status === 'contacted' && daysSince(a.created_at) > 10) {
+        flagged.push({ id: a.id, title: a.name, reason: `Contacted ${daysSince(a.created_at)}d ago — nudge`, score: 3 });
+      } else if (a.status === 'interested' && !a.notes) {
+        flagged.push({ id: a.id, title: a.name, reason: 'Interested but no notes — log next step', score: 2 });
+      } else if (a.status === 'confirmed' && a.needs_travel && !a.travel_from) {
+        flagged.push({ id: a.id, title: a.name, reason: 'Confirmed, needs travel, no origin set', score: 1 });
+      }
+    }
+    return flagged.sort((a, b) => b.score - a.score).slice(0, 3);
+  }, [artists]);
 
   async function createArtist(e: React.FormEvent) {
     e.preventDefault();
@@ -104,7 +153,29 @@ export function ArtistPipeline({ artists: initial, members }: { artists: Artist[
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-white">Artists</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-lg font-bold text-white">Artists</h2>
+        <div className="flex rounded border border-white/[0.08] overflow-hidden">
+          <button
+            onClick={() => setView('list')}
+            className={`text-[10px] font-bold px-2 py-1 transition-colors ${
+              view === 'list' ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            List
+          </button>
+          <button
+            onClick={() => setView('board')}
+            className={`text-[10px] font-bold px-2 py-1 transition-colors border-l border-white/[0.08] ${
+              view === 'board' ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            Board
+          </button>
+        </div>
+      </div>
+
+      <AttentionCard items={attention} />
 
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-[#0d1b2a] rounded-lg p-3 border border-white/[0.06] text-center">
@@ -150,9 +221,37 @@ export function ArtistPipeline({ artists: initial, members }: { artists: Artist[
         </div>
       </form>
 
+      {view === 'board' ? (
+        <KanbanBoard
+          items={artists}
+          columns={KANBAN_COLUMNS}
+          onStatusChange={(id, status) => updateArtist(id, { status })}
+          getStripeColor={(a) => STATUS_STRIPE[a.status]}
+          renderCard={(artist) => (
+            <div className="p-3">
+              <p className="text-sm font-medium text-white">{artist.name}</p>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {artist.genre && <span className="text-[10px] text-gray-500">{artist.genre}</span>}
+                {artist.city && <span className="text-[10px] text-gray-500">{artist.city}</span>}
+                {artist.needs_travel && artist.status !== 'declined' && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 uppercase">Travel</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {artist.outreach && (
+                  <span className="text-[10px] text-[#f5a623] bg-[#f5a623]/10 px-1.5 py-0.5 rounded-full">{artist.outreach.name}</span>
+                )}
+                {artist.set_order !== null && (
+                  <span className="text-[10px] text-gray-400">Slot {artist.set_order}</span>
+                )}
+              </div>
+            </div>
+          )}
+        />
+      ) : (
       <div className="space-y-2">
         {sorted.map((artist) => (
-          <div key={artist.id} className="bg-[#0d1b2a] rounded-lg border border-white/[0.06] overflow-hidden">
+          <div key={artist.id} className={`bg-[#0d1b2a] rounded-lg border border-white/[0.06] border-l-4 ${STATUS_STRIPE_BORDER[artist.status]} overflow-hidden`}>
             <div className="p-3 flex items-start gap-3">
               <button
                 onClick={() => cycleStatus(artist)}
@@ -202,6 +301,7 @@ export function ArtistPipeline({ artists: initial, members }: { artists: Artist[
           <p className="text-sm text-gray-500 text-center py-4">No artists yet. Add one above.</p>
         )}
       </div>
+      )}
     </div>
   );
 }

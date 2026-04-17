@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { scryptSync } from 'crypto';
+import { scryptSync, timingSafeEqual } from 'crypto';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { saveStockTeamSession } from '@/lib/auth/stock-team-session';
 
 const loginSchema = z.object({
-  name: z.string().min(1),
-  password: z.string().min(1),
+  password: z.string().min(1).max(64),
 });
 
 function verifyPassword(password: string, stored: string): boolean {
+  if (!stored) return false;
   const [salt, hash] = stored.split(':');
-  const result = scryptSync(password, salt, 64).toString('hex');
-  return result === hash;
+  if (!salt || !hash) return false;
+  const result = scryptSync(password, salt, 64);
+  const expected = Buffer.from(hash, 'hex');
+  if (result.length !== expected.length) return false;
+  return timingSafeEqual(result, expected);
 }
 
 export async function POST(request: NextRequest) {
@@ -20,26 +23,28 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Name and password required' }, { status: 400 });
+      return NextResponse.json({ error: 'Password required' }, { status: 400 });
     }
+
+    const normalized = parsed.data.password.trim().toUpperCase();
 
     const supabase = getSupabaseAdmin();
-    const { data: member, error } = await supabase
+    const { data: members, error } = await supabase
       .from('stock_team_members')
-      .select('id, name, password_hash')
-      .ilike('name', parsed.data.name)
-      .single();
+      .select('id, name, password_hash');
 
-    if (error || !member) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    if (error || !members) {
+      return NextResponse.json({ error: 'Login failed' }, { status: 500 });
     }
 
-    if (!verifyPassword(parsed.data.password, member.password_hash)) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    const match = members.find((m) => m.password_hash && verifyPassword(normalized, m.password_hash));
+
+    if (!match) {
+      return NextResponse.json({ error: 'Invalid code' }, { status: 401 });
     }
 
-    await saveStockTeamSession(member.id, member.name);
-    return NextResponse.json({ success: true, name: member.name });
+    await saveStockTeamSession(match.id, match.name);
+    return NextResponse.json({ success: true, name: match.name });
   } catch {
     return NextResponse.json({ error: 'Login failed' }, { status: 500 });
   }

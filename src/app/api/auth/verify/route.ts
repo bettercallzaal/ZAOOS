@@ -71,13 +71,14 @@ export async function POST(req: NextRequest) {
 
     const { message, signature, nonce, domain } = parsed.data;
 
-    // Validate nonce exists but don't delete yet — if the function times out during
-    // SIWF verification, the nonce stays valid so the client can retry.
+    // Atomic nonce consumption: delete + return in one query.
+    // Prevents race condition where concurrent requests both pass validation.
     const { data: nonceRow } = await supabaseAdmin
       .from('auth_nonces')
-      .select('nonce')
+      .delete()
       .eq('nonce', nonce)
       .gt('expires_at', new Date().toISOString())
+      .select('nonce')
       .maybeSingle();
 
     if (!nonceRow) {
@@ -112,9 +113,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Verification succeeded but no Farcaster ID found. Please try again.' }, { status: 502 });
     }
 
-    // Consume nonce + fetch user + check allowlist by FID — all in parallel
-    const [, userResult, gateByFidResult] = await Promise.allSettled([
-      supabaseAdmin.from('auth_nonces').delete().eq('nonce', nonce),
+    // Nonce already consumed atomically above. Fetch user + check allowlist in parallel.
+    const [userResult, gateByFidResult] = await Promise.allSettled([
       getUserByFid(fid),
       checkAllowlist(fid),
     ]);

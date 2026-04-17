@@ -1,6 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { KanbanBoard, KanbanColumn } from './KanbanBoard';
+import { AttentionCard } from './AttentionCard';
+
+function daysSince(iso: string | null): number {
+  if (!iso) return Infinity;
+  return Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
+}
 
 interface Member { id: string; name: string; }
 
@@ -60,9 +67,37 @@ const TRACK_LABEL: Record<Sponsor['track'], string> = {
   ecosystem: 'Ecosystem',
 };
 
+const STATUS_STRIPE: Record<Sponsor['status'], string> = {
+  lead: 'bg-gray-600',
+  contacted: 'bg-blue-500',
+  in_talks: 'bg-amber-500',
+  committed: 'bg-emerald-500',
+  paid: 'bg-emerald-400',
+  declined: 'bg-red-500',
+};
+
+const STATUS_STRIPE_BORDER: Record<Sponsor['status'], string> = {
+  lead: 'border-l-gray-600',
+  contacted: 'border-l-blue-500',
+  in_talks: 'border-l-amber-500',
+  committed: 'border-l-emerald-500',
+  paid: 'border-l-emerald-400',
+  declined: 'border-l-red-500',
+};
+
+const KANBAN_COLUMNS: KanbanColumn<Sponsor['status']>[] = [
+  { key: 'lead', label: 'Lead', accent: 'border-gray-600 text-gray-400' },
+  { key: 'contacted', label: 'Contacted', accent: 'border-blue-500/40 bg-blue-500/10 text-blue-400' },
+  { key: 'in_talks', label: 'In Talks', accent: 'border-amber-500/40 bg-amber-500/10 text-amber-400', wipSoftCap: 8 },
+  { key: 'committed', label: 'Committed', accent: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400' },
+  { key: 'paid', label: 'Paid', accent: 'border-emerald-500 bg-emerald-500/20 text-emerald-300' },
+  { key: 'declined', label: 'Declined', accent: 'border-red-500/40 bg-red-500/10 text-red-400', defaultCollapsed: true },
+];
+
 export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]; members: Member[] }) {
   const [sponsors, setSponsors] = useState(initial);
   const [track, setTrack] = useState<'all' | Sponsor['track']>('all');
+  const [view, setView] = useState<'list' | 'board'>('list');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newTrack, setNewTrack] = useState<Sponsor['track']>('local');
@@ -74,6 +109,20 @@ export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]
   const totalCommitted = sponsors.reduce((sum, s) => sum + Number(s.amount_committed || 0), 0);
   const totalPaid = sponsors.reduce((sum, s) => sum + Number(s.amount_paid || 0), 0);
   const committedCount = sponsors.filter((s) => s.status === 'committed' || s.status === 'paid').length;
+
+  const attention = useMemo(() => {
+    const flagged: Array<{ id: string; title: string; reason: string; score: number }> = [];
+    for (const s of sponsors) {
+      if (s.status === 'contacted' && daysSince(s.last_contacted_at) > 14) {
+        flagged.push({ id: s.id, title: s.name, reason: `Contacted ${daysSince(s.last_contacted_at)}d ago — no reply`, score: 3 });
+      } else if (s.status === 'in_talks' && daysSince(s.last_contacted_at) > 7) {
+        flagged.push({ id: s.id, title: s.name, reason: `In talks, silent ${daysSince(s.last_contacted_at)}d — follow up`, score: 2 });
+      } else if (s.status === 'committed' && Number(s.amount_paid) < Number(s.amount_committed) && daysSince(s.created_at) > 30) {
+        flagged.push({ id: s.id, title: s.name, reason: `Committed $${Number(s.amount_committed).toLocaleString()} not paid yet`, score: 1 });
+      }
+    }
+    return flagged.sort((a, b) => b.score - a.score).slice(0, 3);
+  }, [sponsors]);
 
   async function createSponsor(e: React.FormEvent) {
     e.preventDefault();
@@ -114,19 +163,41 @@ export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h2 className="text-lg font-bold text-white">Sponsors</h2>
-        <select
-          value={track}
-          onChange={(e) => setTrack(e.target.value as 'all' | Sponsor['track'])}
-          className="bg-[#0a1628] border border-white/[0.08] rounded text-xs text-gray-400 px-2 py-1 focus:outline-none"
-        >
-          <option value="all">All Tracks</option>
-          <option value="local">Local</option>
-          <option value="virtual">Virtual</option>
-          <option value="ecosystem">Ecosystem</option>
-        </select>
+        <div className="flex items-center gap-2">
+          <div className="flex rounded border border-white/[0.08] overflow-hidden">
+            <button
+              onClick={() => setView('list')}
+              className={`text-[10px] font-bold px-2 py-1 transition-colors ${
+                view === 'list' ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              List
+            </button>
+            <button
+              onClick={() => setView('board')}
+              className={`text-[10px] font-bold px-2 py-1 transition-colors border-l border-white/[0.08] ${
+                view === 'board' ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              Board
+            </button>
+          </div>
+          <select
+            value={track}
+            onChange={(e) => setTrack(e.target.value as 'all' | Sponsor['track'])}
+            className="bg-[#0a1628] border border-white/[0.08] rounded text-xs text-gray-400 px-2 py-1 focus:outline-none"
+          >
+            <option value="all">All Tracks</option>
+            <option value="local">Local</option>
+            <option value="virtual">Virtual</option>
+            <option value="ecosystem">Ecosystem</option>
+          </select>
+        </div>
       </div>
+
+      <AttentionCard items={attention} />
 
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-[#0d1b2a] rounded-lg p-3 border border-white/[0.06] text-center">
@@ -167,57 +238,96 @@ export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]
         </button>
       </form>
 
-      <div className="space-y-2">
-        {filtered.map((sponsor) => (
-          <div key={sponsor.id} className="bg-[#0d1b2a] rounded-lg border border-white/[0.06] overflow-hidden">
-            <div className="p-3 flex items-start gap-3">
-              <button
-                onClick={() => cycleStatus(sponsor)}
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 mt-0.5 ${STATUS_COLOR[sponsor.status]}`}
-                title="Click to advance status"
-              >
-                {STATUS_LABEL[sponsor.status]}
-              </button>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-medium text-white">{sponsor.name}</p>
-                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${TRACK_COLOR[sponsor.track]}`}>
-                    {TRACK_LABEL[sponsor.track]}
-                  </span>
-                  {Number(sponsor.amount_committed) > 0 && (
-                    <span className="text-[10px] text-amber-400">${Number(sponsor.amount_committed).toLocaleString()}</span>
-                  )}
-                </div>
-                {sponsor.why_them && <p className="text-xs text-gray-500 mt-1 line-clamp-1">{sponsor.why_them}</p>}
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  {sponsor.contact_name && (
-                    <span className="text-[10px] text-gray-400">{sponsor.contact_name}</span>
-                  )}
-                  {sponsor.owner && (
-                    <span className="text-[10px] text-[#f5a623] bg-[#f5a623]/10 px-1.5 py-0.5 rounded-full">
-                      {sponsor.owner.name}
+      {view === 'list' ? (
+        <div className="space-y-2">
+          {filtered.map((sponsor) => (
+            <div key={sponsor.id} className={`bg-[#0d1b2a] rounded-lg border border-white/[0.06] border-l-4 ${STATUS_STRIPE_BORDER[sponsor.status]} overflow-hidden`}>
+              <div className="p-3 flex items-start gap-3">
+                <button
+                  onClick={() => cycleStatus(sponsor)}
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 mt-0.5 ${STATUS_COLOR[sponsor.status]}`}
+                  title="Click to advance status"
+                >
+                  {STATUS_LABEL[sponsor.status]}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-medium text-white">{sponsor.name}</p>
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${TRACK_COLOR[sponsor.track]}`}>
+                      {TRACK_LABEL[sponsor.track]}
                     </span>
-                  )}
-                  <button
-                    onClick={() => setExpandedId(expandedId === sponsor.id ? null : sponsor.id)}
-                    className="text-[10px] text-gray-500 hover:text-gray-400"
-                  >
-                    {expandedId === sponsor.id ? 'collapse' : 'edit'}
-                  </button>
+                    {Number(sponsor.amount_committed) > 0 && (
+                      <span className="text-[10px] text-amber-400">${Number(sponsor.amount_committed).toLocaleString()}</span>
+                    )}
+                  </div>
+                  {sponsor.why_them && <p className="text-xs text-gray-500 mt-1 line-clamp-1">{sponsor.why_them}</p>}
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    {sponsor.contact_name && (
+                      <span className="text-[10px] text-gray-400">{sponsor.contact_name}</span>
+                    )}
+                    {sponsor.owner && (
+                      <span className="text-[10px] text-[#f5a623] bg-[#f5a623]/10 px-1.5 py-0.5 rounded-full">
+                        {sponsor.owner.name}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => setExpandedId(expandedId === sponsor.id ? null : sponsor.id)}
+                      className="text-[10px] text-gray-500 hover:text-gray-400"
+                    >
+                      {expandedId === sponsor.id ? 'collapse' : 'edit'}
+                    </button>
+                  </div>
                 </div>
+              </div>
+              {expandedId === sponsor.id && (
+                <div className="border-t border-white/[0.06] p-3 space-y-2 bg-[#0a1628]">
+                  <EditRow sponsor={sponsor} members={members} onUpdate={updateSponsor} />
+                </div>
+              )}
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <p className="text-sm text-gray-500 text-center py-4">No sponsors in this track yet</p>
+          )}
+        </div>
+      ) : (
+        <KanbanBoard
+          items={filtered}
+          columns={KANBAN_COLUMNS}
+          onStatusChange={(id, status) => {
+            const s = sponsors.find((x) => x.id === id);
+            const update: Record<string, unknown> = { status };
+            if (s && status !== 'lead' && !s.last_contacted_at) {
+              update.last_contacted_at = new Date().toISOString();
+            }
+            updateSponsor(id, update);
+          }}
+          getStripeColor={(s) => STATUS_STRIPE[s.status]}
+          renderCard={(sponsor) => (
+            <div className="p-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-medium text-white">{sponsor.name}</p>
+                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${TRACK_COLOR[sponsor.track]}`}>
+                  {TRACK_LABEL[sponsor.track]}
+                </span>
+              </div>
+              {Number(sponsor.amount_committed) > 0 && (
+                <p className="text-[11px] text-amber-400 mt-1">${Number(sponsor.amount_committed).toLocaleString()}</p>
+              )}
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {sponsor.contact_name && (
+                  <span className="text-[10px] text-gray-400">{sponsor.contact_name}</span>
+                )}
+                {sponsor.owner && (
+                  <span className="text-[10px] text-[#f5a623] bg-[#f5a623]/10 px-1.5 py-0.5 rounded-full">
+                    {sponsor.owner.name}
+                  </span>
+                )}
               </div>
             </div>
-            {expandedId === sponsor.id && (
-              <div className="border-t border-white/[0.06] p-3 space-y-2 bg-[#0a1628]">
-                <EditRow sponsor={sponsor} members={members} onUpdate={updateSponsor} />
-              </div>
-            )}
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <p className="text-sm text-gray-500 text-center py-4">No sponsors in this track yet</p>
-        )}
-      </div>
+          )}
+        />
+      )}
     </div>
   );
 }

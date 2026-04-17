@@ -1,8 +1,8 @@
 # 428 — ZAOstock Run-of-Show Program (Oct 3, 2026)
 
-> **Status:** Draft v1 — needs team feedback Tuesday Apr 21
+> **Status:** Draft v2 — needs team feedback Tuesday Apr 21
 > **Date:** 2026-04-17
-> **Goal:** Design the day-of program for ZAOstock using 15-min block structure, WaveWarZ bracket for multi-set performances, short (5-10 min) talks interspersed, and built-in contingency for real-world slippage.
+> **Goal:** Design the day-of program for ZAOstock with fluid pacing — ~15-min content blocks separated by 5-10 min transition buffers, WaveWarZ bracket for multi-set performances, short (5-10 min) talks interspersed, and built-in contingency for real-world slippage.
 
 ---
 
@@ -10,66 +10,70 @@
 
 | Decision | Choice |
 |----------|--------|
-| Base block | 15 min — aligns with festival-scheduling best practice for small events, fits 24 blocks in the 12pm-6pm window |
-| Total runtime | 6 hours (12pm-6pm) as currently advertised on `/stock` |
-| Musician format | Hybrid: 6 traditional sets (15-20 min each) + 4 WaveWarZ bracket artists who appear 2-3 times |
-| Talk format | 5 slots × 10 min each, between sets, topic-specific |
-| Breaks | 1 mid-day 15-min official break (14:25-14:40) + implicit breaks via DJ transitions |
-| Contingency | Every slot tagged swappable. DJ fills any gap. Talk slots first to cut if running over. |
-| Voting / WaveWarZ | Live QR-code vote after each round (use existing WaveWarZ infra — reference docs 099, 101, 180) |
+| Base content block | ~15 min (music set), ~10 min (talk), ~5 min (WaveWarZ round segment) |
+| Transition buffer | 5-10 min between every block — DJ crossfade, artist swap, catch-your-breath |
+| Total runtime | 12pm-6pm window with fluid timing, not a rigid grid |
+| Musician format | Hybrid: 5-6 traditional sets + 4-artist WaveWarZ bracket with 3 rounds |
+| Talk format | 5 slots x 5-10 min, between sets, topic-specific |
+| Breaks | 1 explicit 15-min mid-day break. Transition buffers serve as mini-breaks throughout. |
+| Contingency | Every block swappable. Talks cut first. DJ fills any gap. Weather moves under tent with zero schedule change. |
+| WaveWarZ voting | Live QR code vote after each round. Uses existing WaveWarZ infra (reference docs 099, 101, 180). |
 
-## Proposed Schedule — 24 × 15-min blocks
+## Proposed Schedule — fluid blocks with 5-10 min flex between
 
-Legend: 🎵 music · 🎤 talk · 🥊 WaveWarZ · 🎧 DJ/transition · ☕ break
+Times below are **approximate targets** not hard clocks. Each row assumes a 5-10 min transition before the next starts. MC watches the clock and keeps the flow moving but never cuts a set mid-song.
 
-| Time | Block | Content | Owner | Cut order |
-|------|-------|---------|-------|-----------|
-| 12:00-12:15 | 1 | 🎧 Doors + welcome DJ | DJ | — |
-| 12:15-12:45 | 2-3 | 🎵 Artist #1 — full 30-min opener | (TBD confirmed) | 8 |
-| 12:45-12:55 | 4a | 🎧 DJ changeover | DJ | — |
-| 12:55-13:05 | 4b | 🎤 Talk #1: "Welcome to ZAOstock — what this is" | Zaal | **1 (cut first)** |
-| 13:05-13:20 | 5 | 🎵 Artist #2 (15 min) | (TBD) | 7 |
-| 13:20-13:30 | 6a | 🎧 DJ transition | DJ | — |
-| 13:30-13:40 | 6b | 🎤 Talk #2: "Web3 music 101 — why this matters" | DCoop | **2** |
-| 13:40-13:55 | 7 | 🎵 Artist #3 (15 min) | (TBD) | 6 |
-| 13:55-14:10 | 8 | 🎧 DJ + mini-break | DJ | — |
-| 14:10-14:25 | 9 | 🎵 Artist #4 (15 min) | (TBD) | 5 |
-| 14:25-14:40 | 10 | ☕ **Official break** (food, bathroom, mingle) | — | — |
-| 14:40-14:50 | 11a | 🎤 Talk #3: "An artist's perspective" | (WaveWarZ finalist) | **3** |
-| 14:50-15:20 | 11b-12 | 🥊 **WaveWarZ Round 1** — 4 artists × 5 min | Hurric4n3 hosts | — |
-| 15:20-15:30 | 13a | 🎧 DJ + audience voting (QR code) | DJ + WW tech | — |
-| 15:30-15:50 | 13b-14 | 🥊 **WaveWarZ Semi-final** — top 2 × 7-8 min | Hurric4n3 | — |
-| 15:50-16:00 | 15a | 🎤 Talk #4: "The ZAO — how to get involved" | Candy / FailOften | **4** |
-| 16:00-16:15 | 15b-16 | 🎵 Artist #5 (15 min) | (TBD) | 9 (keep) |
-| 16:15-16:30 | 17 | 🎵 Artist #6 (15 min, quick DJ xfer) | (TBD) | 10 (keep) |
-| 16:30-16:40 | 18a | 🎤 Talk #5: "Partners + year 2 preview" | Zaal | **5** |
-| 16:40-17:00 | 18b-19 | 🥊 **WaveWarZ Final** — winner battle (20 min total) | Hurric4n3 | — |
-| 17:00-17:10 | 20 | 🎧 DJ + final voting | DJ | — |
-| 17:10-17:40 | 21-22 | 🎵 **Closing set** — WaveWarZ winner OR headliner | Winner | — |
-| 17:40-18:00 | 23-24 | 🎧 Closing DJ + afterparty call to Black Moon | DJ | — |
+Legend in text: [MUSIC] = artist set, [TALK] = 5-10 min talk, [BATTLE] = WaveWarZ round, [DJ] = DJ fill / transition, [BREAK] = explicit break.
 
-**Total music slots:** 6 traditional artist sets + 4 WaveWarZ artists (who appear 2-3 times each) + 1 closing set = **11 artist performances across ~7 unique artists** (the 4 WaveWarZ crew repeat).
+| Target start | Block | Duration | Flex after |
+|--------------|-------|----------|-----------|
+| 12:00 | [DJ] Doors open + welcome DJ | 15 min | — |
+| 12:15 | [MUSIC] Artist 1 — opening set | 25-30 min | 5-10 min |
+| ~12:50 | [TALK] Welcome to ZAOstock — what this is (Zaal) | 5-10 min | 5 min |
+| ~13:05 | [MUSIC] Artist 2 | 15-20 min | 5-10 min |
+| ~13:35 | [TALK] Web3 music 101 — why this matters (DCoop / Hurric4n3) | 5-10 min | 5 min |
+| ~13:50 | [MUSIC] Artist 3 | 15-20 min | 5-10 min |
+| ~14:20 | [BREAK] Official break — food, bathroom, mingle | 15 min | — |
+| ~14:35 | [TALK] An artist's perspective (WaveWarZ contestant) | 5-10 min | 5 min |
+| ~14:50 | [BATTLE] WaveWarZ Round 1 — 4 artists x 5 min | ~25 min (with transitions between artists) | 5-10 min |
+| ~15:25 | [DJ] Voting break + audience QR vote | 5-10 min | — |
+| ~15:35 | [BATTLE] WaveWarZ Semi-Final — top 2 x 7-8 min | ~20 min | 5-10 min |
+| ~16:00 | [TALK] The ZAO — how to get involved (Candy / FailOften) | 5-10 min | 5 min |
+| ~16:15 | [MUSIC] Artist 4 | 15 min | 5-10 min |
+| ~16:35 | [TALK] Partners + Year 2 preview (Zaal) | 5-10 min | 5 min |
+| ~16:50 | [BATTLE] WaveWarZ Final — 2 artists x 10 min | ~25 min | 5-10 min |
+| ~17:20 | [DJ] Final voting + winner announce | 5 min | — |
+| ~17:25 | [MUSIC] Closing set — WaveWarZ winner OR special guest | 25-30 min | — |
+| ~17:55 | [DJ] Closing DJ + afterparty call to Black Moon | until 18:00 | — |
+
+**Total content:** 5 music sets + 3 WaveWarZ rounds + 5 talks + 1 closing set. Four WaveWarZ artists each perform 2-3 times depending on bracket advancement. Net unique artist appearances: 10 (5 traditional + 4 WaveWarZ repeat + 1 closing winner).
+
+## Why fluid pacing (not rigid 15-min grid)
+
+1. **Musicians run over.** A rigid grid punishes the crowd and the artist when a great set wants 2 more minutes. Fluid lets it breathe.
+2. **Transitions take longer in reality.** Swapping a band's gear takes 10-12 min, not 3. Building flex in prevents the whole afternoon from collapsing by 4pm.
+3. **Talks slide into available gaps.** If a transition is fast, talk goes long. If slow, talk shortens or cuts.
+4. **Crowd energy can be read.** Hot crowd = extend. Cold crowd = tighten up, skip a talk, get to the next music.
+5. **WaveWarZ voting is variable.** First round might take 3 min, final round might take 8. Flex absorbs it.
 
 ## WaveWarZ Bracket Mechanics
 
-**4 artists enter → 1 wins.** 3 rounds:
+4 artists compete. 3 rounds. Multi-set performance for bracket artists.
 
-1. **Round 1 (14:50-15:20, 30 min)** — All 4 artists perform 5 min each. Audience votes (QR → onchain, reference WaveWarZ prediction market docs).
-2. **Semi-final (15:30-15:50, 20 min)** — Top 2 vote-getters each get 7-8 min. Audience votes again.
-3. **Final (16:40-17:00, 20 min)** — Top artist gets the closing 30-min set slot (17:10-17:40).
+**Round 1** (target ~14:50) — All 4 artists perform 5 min each. Audience votes via QR code. Takes ~25 min including 5-min transitions between artists.
 
-**Why this works:**
-- Multiple-set performance for those artists (2-3 appearances = more time paid)
-- Audience investment (they voted → they stick around)
-- Natural escalation and finale
-- Showcases the WaveWarZ product to potential sponsors/attendees
-- Uses existing infrastructure (doc 178, 099, 101)
+**Semi-Final** (target ~15:35) — Top 2 vote-getters each get 7-8 min. Audience votes again. ~20 min total.
 
-**Fee structure for WaveWarZ artists:** base fee + winner bonus. Budget as: 4 × $300 base + $500 winner bonus = $1,700 total (vs 4 × $400 single-set = $1,600). Nearly break-even, way more engagement.
+**Final** (target ~16:50) — 2 finalists. Last chance. 10 min each. Winner gets the 25-30 min closing set slot (~17:25).
 
-## Talk Slot Specs
+**Fee structure for WaveWarZ artists:**
+- Base fee: $300 per artist (all 4)
+- Winner bonus: $500 for the closing set
+- Total: 4 x $300 + $500 = $1,700 (vs 4 x $400 single set = $1,600). Nearly break-even for way more audience engagement and showcase time.
 
-Each talk is **exactly 5-10 min**. Hard timed. Moderator (Candy) holds a 2-min sign → 30-sec sign → red STOP.
+## Talk Slot Spec
+
+Each talk is **5-10 min, hard-timed by moderator (Candy).** 2-min sign, 30-sec sign, stop sign. Standalone value if kept or cut.
 
 | # | Title | Speaker | Purpose |
 |---|-------|---------|---------|
@@ -79,51 +83,54 @@ Each talk is **exactly 5-10 min**. Hard timed. Moderator (Candy) holds a 2-min s
 | 4 | The ZAO — how to get involved | Candy or FailOften | Community acquisition pitch |
 | 5 | Partners + Year 2 preview | Zaal | Sponsor thank-you + tease 2027 |
 
-Talks are the **first to cut** if running over. All have standalone value if kept or skipped.
+**Cut order:** talks are first to cut if running late. Order 1 through 5 = which gets cut first when time is tight. The welcome talk (1) is actually cut-first because the music itself is the welcome.
 
 ## Contingency / Movability
 
-Plan for entropy. Every 15-min block is atomic and swappable:
+Plan for entropy. Every block is atomic and swappable.
 
 | Scenario | Move |
 |----------|------|
-| Artist cancels day-of | Slot → DJ set, bump talks up one slot |
-| Artist runs 5 min over | Skip next DJ transition, compress |
-| Artist runs 10+ min over | Cut next talk slot |
-| Talk speaker no-shows | DJ fills, announce "program change" |
-| Rain / weather | Move under Wallace Events tent — no schedule change |
-| WaveWarZ voting fails (tech) | Moderator picks based on crowd volume clap |
-| Audience thin | Cut final talk + closing DJ, end on WaveWarZ Final + closing set |
-| Audience hot | Extend closing set, push afterparty call to 18:00 |
+| Artist cancels day-of | Slot becomes extended DJ + bump next block up |
+| Artist runs 5 min over | Compress next transition; stay on schedule |
+| Artist runs 10+ min over | Cut next talk; keep music flow |
+| Talk speaker no-shows | DJ fills; announce "program change" |
+| Rain / weather | Move under Wallace Events tent — zero schedule change |
+| WaveWarZ voting tech fails | Moderator picks winner by crowd volume (clap-off) |
+| Audience thin / tired | Cut last talk + closing DJ, end on WaveWarZ Final + closing set |
+| Audience hot | Extend closing set, slide afterparty call to 18:00 |
+| Sound issue mid-set | DJ jumps in, troubleshoot 2-3 min, resume |
 
 **Rule of thumb:** protect music, cut talks. Music is what they came for.
 
-## Tech / Production Notes per Slot Type
+## Tech / Production Notes per Block Type
 
-| Slot type | Setup needed | Changeover time |
-|-----------|-------------|-----------------|
-| Solo artist + laptop/DJ | 1 mic, 1 line in | 2-3 min |
-| Band with instruments | Full stage reset, line check | 10-15 min |
-| WaveWarZ round | Pre-set artists on stage, QR screen live | 5 min to reset between rounds |
-| Talk | 1 mic, no backing | 1 min (walk-up) |
+| Block type | Setup needed | Transition time |
+|-----------|-------------|----------------|
+| Solo artist + laptop/DJ | 1 mic, 1 line in | 3-5 min |
+| Band with instruments | Full stage reset, line check | 10-12 min |
+| WaveWarZ round | Artists pre-staged, QR screen on, clean swap | 3-5 min between artists |
+| Talk | 1 mic, no backing | 1-2 min (walk-up) |
 | DJ transition | Pre-loaded, crossfade | 0 min (continuous) |
 
-**Implication:** avoid booking 2 full bands back-to-back without a DJ buffer. Already reflected in schedule.
+**Implication:** avoid two full bands back-to-back without DJ buffer. Already reflected in the schedule.
 
 ## Tracking This in the Dashboard
 
-Suggested data model additions (for Year 1 or Year 2):
+Two options for data model:
 
-**Option A — lightweight (Year 1 ship):**
-Add `day_of_start_time` (TIME) + `day_of_end_time` (TIME) columns to `stock_artists` table. Sort by time. Timeline tab already handles this well.
+**Option A (Year 1 ship, recommended):**
+Add `day_of_start_time` (TIME) + `day_of_duration_min` (INT) columns to `stock_artists`. Use the existing Timeline tab for a day-of view. Zero new tables.
 
-**Option B — full program table (Year 2):**
-New `stock_program` table:
+**Option B (Year 2):**
+Dedicated `stock_program` table with slot_type enum, ownership, cut order, and flex buffer fields:
+
 ```sql
 CREATE TABLE stock_program (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  block_start TIME NOT NULL,
-  block_end TIME NOT NULL,
+  target_start TIME NOT NULL,
+  duration_min INT NOT NULL,
+  flex_after_min INT DEFAULT 5,
   slot_type TEXT CHECK (slot_type IN ('music','talk','wavewarz','dj','break')),
   title TEXT,
   owner_id UUID REFERENCES stock_team_members(id),
@@ -134,30 +141,29 @@ CREATE TABLE stock_program (
 );
 ```
 
-Recommend Option A for now — zero new table, reuses Timeline UX for day-of view.
+Recommend Option A for Year 1.
 
 ## ZAO Ecosystem Integration
 
-**Files to touch (if we decide to build this):**
+**Files that would touch if we build this:**
+- `src/app/stock/page.tsx` — update public lineup section with "music sets + WaveWarZ + talks" framing
+- `scripts/stock-team-setup.sql` — add `day_of_start_time` + `day_of_duration_min` if picking Option A
+- New `/stock/program` public page — public day-of schedule (locks in Sept 2026)
+- Timeline tab in `/stock/team` — filter toggle for "day-of program" view
 
-- `src/app/stock/page.tsx` — update the public lineup section with "10 sets + WaveWarZ + talks" framing
-- `scripts/stock-team-setup.sql` — add `day_of_start_time` columns if choosing Option A
-- New `/stock/program` public page — public-facing schedule (after lineup locks)
-- Timeline tab in `/stock/team` — already shows dated items, could add a day-of view filter
-
-**Links to existing WaveWarZ research:**
+**WaveWarZ research to reference:**
 - [099 — Prediction market music battles](../../wavewarz/099-prediction-market-music-battles/)
 - [101 — WaveWarZ ZAO whitepaper](../../wavewarz/101-wavewarz-zao-whitepaper/)
 - [180 — WaveWarZ integration blueprints](../../wavewarz/180-wavewarz-integration-blueprints/)
-- [406 — Coinflow ISV deep dive (WaveWarZ × ZAO)](../../business/406-coinflow-isv-deep-dive-wavewarz-zao/)
+- [406 — Coinflow ISV deep dive (WaveWarZ x ZAO)](../../business/406-coinflow-isv-deep-dive-wavewarz-zao/)
 
 ## Next Actions
 
-1. **Tuesday Apr 21 meeting** — bring this draft schedule. Get team vote on format (traditional vs WaveWarZ hybrid).
-2. **DCoop + Hurric4n3** — review WaveWarZ bracket mechanics; confirm tech feasibility with existing WaveWarZ infra.
-3. **After approval** — add `day_of_start_time` columns, seed the 11 program slots into `stock_artists` + expand Timeline tab with day-of view.
-4. **June 2026** — start locking artists to specific slots. Before that, artists stay in pipeline without time assignment.
-5. **Sept 2026** — finalize run-of-show, print physical schedule cards for attendees.
+1. **Tuesday Apr 21 meeting** — bring this draft schedule. Team votes on format (traditional vs WaveWarZ hybrid).
+2. **DCoop + Hurric4n3** — confirm WaveWarZ tech feasibility with existing infra.
+3. **Post-approval** — add `day_of_start_time` + `day_of_duration_min` columns to `stock_artists`. Seed the ~15 program slots. Timeline tab gets a day-of filter.
+4. **June 2026** — start locking specific artists to time slots (wait until confirmed count is higher).
+5. **Sept 2026** — finalize run-of-show, print physical schedule cards for attendees with approximate times marked clearly.
 
 ## Sources
 

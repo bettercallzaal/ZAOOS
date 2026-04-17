@@ -10,9 +10,10 @@ import { Timeline } from './Timeline';
 import { VolunteerRoster } from './VolunteerRoster';
 import { BudgetTracker } from './BudgetTracker';
 import { MeetingNotes } from './MeetingNotes';
+import { PersonalHome } from './PersonalHome';
 import { useRouter } from 'next/navigation';
 
-type Tab = 'overview' | 'sponsors' | 'artists' | 'timeline' | 'volunteers' | 'budget' | 'notes' | 'team';
+type Tab = 'home' | 'overview' | 'sponsors' | 'artists' | 'timeline' | 'volunteers' | 'budget' | 'notes' | 'team';
 
 interface Sponsor {
   id: string;
@@ -126,7 +127,7 @@ export function Dashboard({
   meetingNotes,
 }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<Tab>('home');
 
   async function handleLogout() {
     await fetch('/api/stock/team/logout', { method: 'POST' });
@@ -134,6 +135,7 @@ export function Dashboard({
   }
 
   const memberList = members.map((m) => ({ id: m.id, name: m.name }));
+  const currentMember = members.find((m) => m.id === memberId) || { id: memberId, name: memberName, role: 'member', scope: 'ops' };
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white">
@@ -151,6 +153,7 @@ export function Dashboard({
           </div>
         </div>
         <div className="max-w-2xl mx-auto px-4 pb-2 flex gap-1 overflow-x-auto">
+          <TabButton active={tab === 'home'} onClick={() => setTab('home')}>Home</TabButton>
           <TabButton active={tab === 'overview'} onClick={() => setTab('overview')}>Overview</TabButton>
           <TabButton active={tab === 'sponsors'} onClick={() => setTab('sponsors')}>
             Sponsors <span className="ml-1 text-[10px] text-gray-500">{sponsors.length}</span>
@@ -173,6 +176,17 @@ export function Dashboard({
       </header>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-8 pb-16">
+        {tab === 'home' && (
+          <PersonalHome
+            member={currentMember}
+            allMembers={members}
+            todos={todos}
+            sponsors={sponsors}
+            artists={artists}
+            milestones={milestones}
+            onNavigate={(t) => setTab(t)}
+          />
+        )}
         {tab === 'overview' && (
           <>
             <GoalsBoard goals={goals} />

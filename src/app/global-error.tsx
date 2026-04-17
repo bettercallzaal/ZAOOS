@@ -1,5 +1,8 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
+import { useEffect } from 'react';
+
 export default function GlobalError({
   error,
   reset,
@@ -7,6 +10,9 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
   return (
     <html lang="en">
       <body style={{ backgroundColor: '#0a1628', margin: 0 }}>
@@ -40,7 +46,7 @@ export default function GlobalError({
               Try again
             </button>
             <a
-              href="/home"
+              href="/os"
               style={{
                 color: '#9ca3af',
                 fontSize: '0.875rem',

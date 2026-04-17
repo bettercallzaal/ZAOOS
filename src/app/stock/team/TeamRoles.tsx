@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 interface Member {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ interface Member {
   scope: string;
   bio?: string;
   links?: string;
+  photo_url?: string;
 }
 
 const SCOPE_LABEL: Record<string, string> = {
@@ -34,27 +37,57 @@ export function TeamRoles({ members }: { members: Member[] }) {
     <div className="space-y-3">
       <h2 className="text-lg font-bold text-white">Team</h2>
       <p className="text-xs text-gray-500">
-        Each teammate edits their own profile from the Home tab. If yours is blank, login and add a bio.
+        Each teammate edits their own profile from the Home tab. If yours is blank, login and add a bio + photo.
       </p>
       <div className="space-y-2">
         {members.map((m) => (
-          <div key={m.id} className="bg-[#0d1b2a] rounded-lg border border-white/[0.06] p-3 space-y-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-medium text-white">{m.name}</span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${SCOPE_COLOR[m.scope] || SCOPE_COLOR.ops}`}>
-                {SCOPE_LABEL[m.scope] || m.scope} - {ROLE_LABEL[m.role] || m.role}
-              </span>
-            </div>
-            {m.bio && m.bio.trim() ? (
-              <p className="text-xs text-gray-300 whitespace-pre-wrap leading-relaxed">{m.bio}</p>
-            ) : (
-              <p className="text-[11px] text-gray-600 italic">No bio yet.</p>
-            )}
-            {m.links && m.links.trim() && (
-              <p className="text-[10px] text-gray-500">{m.links}</p>
-            )}
-          </div>
+          <MemberCard key={m.id} member={m} />
         ))}
+      </div>
+    </div>
+  );
+}
+
+function MemberCard({ member: m }: { member: Member }) {
+  const [photoBroken, setPhotoBroken] = useState(false);
+  const showPhoto = m.photo_url && m.photo_url.trim() && !photoBroken;
+  const initials = m.name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <div className="bg-[#0d1b2a] rounded-lg border border-white/[0.06] p-3 flex items-start gap-3">
+      {showPhoto ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={m.photo_url}
+          alt={m.name}
+          onError={() => setPhotoBroken(true)}
+          className="w-12 h-12 rounded-full object-cover border border-white/[0.08] flex-shrink-0"
+        />
+      ) : (
+        <div className="w-12 h-12 rounded-full bg-[#0a1628] border border-white/[0.08] flex-shrink-0 flex items-center justify-center">
+          <span className="text-xs font-bold text-gray-500">{initials}</span>
+        </div>
+      )}
+      <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-medium text-white">{m.name}</span>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${SCOPE_COLOR[m.scope] || SCOPE_COLOR.ops}`}>
+            {SCOPE_LABEL[m.scope] || m.scope} - {ROLE_LABEL[m.role] || m.role}
+          </span>
+        </div>
+        {m.bio && m.bio.trim() ? (
+          <p className="text-xs text-gray-300 whitespace-pre-wrap leading-relaxed">{m.bio}</p>
+        ) : (
+          <p className="text-[11px] text-gray-600 italic">No bio yet.</p>
+        )}
+        {m.links && m.links.trim() && (
+          <p className="text-[10px] text-gray-500">{m.links}</p>
+        )}
       </div>
     </div>
   );

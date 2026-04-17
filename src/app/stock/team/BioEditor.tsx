@@ -6,14 +6,17 @@ interface Props {
   memberName: string;
   initialBio: string;
   initialLinks: string;
+  initialPhotoUrl: string;
 }
 
-export function BioEditor({ memberName, initialBio, initialLinks }: Props) {
+export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUrl }: Props) {
   const [bio, setBio] = useState(initialBio);
   const [links, setLinks] = useState(initialLinks);
+  const [photoUrl, setPhotoUrl] = useState(initialPhotoUrl);
   const [editing, setEditing] = useState(initialBio.trim().length === 0);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [photoBroken, setPhotoBroken] = useState(false);
 
   async function save() {
     setBusy(true);
@@ -22,13 +25,14 @@ export function BioEditor({ memberName, initialBio, initialLinks }: Props) {
       const res = await fetch('/api/stock/team/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bio, links }),
+        body: JSON.stringify({ bio, links, photo_url: photoUrl }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         setMsg(data.error || 'Save failed');
       } else {
         setEditing(false);
+        setPhotoBroken(false);
         setMsg('Saved');
         setTimeout(() => setMsg(null), 1500);
       }
@@ -40,6 +44,7 @@ export function BioEditor({ memberName, initialBio, initialLinks }: Props) {
   }
 
   const hasBio = bio.trim().length > 0;
+  const showPhoto = photoUrl.trim() && !photoBroken;
 
   return (
     <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-3">
@@ -56,11 +61,22 @@ export function BioEditor({ memberName, initialBio, initialLinks }: Props) {
       </div>
 
       {!editing && hasBio && (
-        <div className="space-y-2">
-          <p className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">{bio}</p>
-          {links.trim() && (
-            <p className="text-[11px] text-gray-500">{links}</p>
+        <div className="flex items-start gap-3">
+          {showPhoto && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={photoUrl}
+              alt={`${memberName} profile`}
+              onError={() => setPhotoBroken(true)}
+              className="w-16 h-16 rounded-full object-cover border border-white/[0.08] flex-shrink-0"
+            />
           )}
+          <div className="flex-1 min-w-0 space-y-1">
+            <p className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">{bio}</p>
+            {links.trim() && (
+              <p className="text-[11px] text-gray-500">{links}</p>
+            )}
+          </div>
         </div>
       )}
 
@@ -68,13 +84,35 @@ export function BioEditor({ memberName, initialBio, initialLinks }: Props) {
         <div className="space-y-2">
           <p className="text-xs text-gray-400">
             {hasBio
-              ? `Editing ${memberName}'s bio.`
+              ? `Editing ${memberName}'s profile.`
               : `Hey ${memberName}, drop a quick bio so the team knows who you are.`}
           </p>
+
+          {showPhoto && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={photoUrl}
+              alt="Preview"
+              onError={() => setPhotoBroken(true)}
+              className="w-20 h-20 rounded-full object-cover border border-[#f5a623]/30"
+            />
+          )}
+
+          <input
+            value={photoUrl}
+            onChange={(e) => { setPhotoUrl(e.target.value); setPhotoBroken(false); }}
+            placeholder="Photo URL (https://...) - paste your X/Farcaster/Imgur pfp link"
+            maxLength={500}
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
+          />
+          {photoBroken && photoUrl.trim() && (
+            <p className="text-[10px] text-amber-400">That image URL did not load. Try another link.</p>
+          )}
+
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            placeholder="Who you are, what you bring to ZAOstock, what you're working on, anything you want the team and public to know..."
+            placeholder="Who you are, what you bring to ZAOstock, what you're working on, anything you want the team to know..."
             rows={5}
             maxLength={2000}
             className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30 resize-none"
@@ -105,6 +143,9 @@ export function BioEditor({ memberName, initialBio, initialLinks }: Props) {
             )}
             {msg && <p className="text-[10px] text-emerald-400 ml-auto">{msg}</p>}
           </div>
+          <p className="text-[10px] text-gray-600 italic">
+            For the photo: right-click your X or Farcaster profile pic, Copy Image Address, paste above. Or use any image URL that starts with https://.
+          </p>
         </div>
       )}
     </div>

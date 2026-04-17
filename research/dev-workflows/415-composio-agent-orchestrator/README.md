@@ -117,10 +117,10 @@ power:
 ## ZAO OS Integration
 
 ### Repos AO could manage
-- `zao-os` (this repo, 301 API routes, 279 components)
-- `fishbowlz` (standalone, `project_fishbowlz_status.md`)
-- `bettercallzaal` (static + mini app)
-- `coc-concertz`
+- `bettercallzaal` (static + Farcaster Mini App) — **PILOT TARGET**, smallest blast radius
+- `coc-concertz` (Next.js 16 + Firebase) — second if pilot green
+- `zao-os` (this repo, 301 API routes, 279 components) — last, after trust established
+- ~~`fishbowlz`~~ — DEPRECATED 2026-04-16, partnering with Juke (nickysap) Farcaster audio client instead
 
 ### Plug into existing infra
 - **OpenClaw notifier** — AO has a built-in OpenClaw notifier. ZAO already runs OpenClaw VPS at `31.97.148.88` (`project_openclaw_setup.md`). Wire AO events → agent squad dashboard (`project_agent_squad_dashboard.md`).
@@ -143,10 +143,10 @@ power:
 ## Pilot Plan
 
 1. Install: `npm install -g @aoagents/ao`
-2. Point at FISHBOWLZ first (smaller surface area than zao-os)
+2. Point at **bettercallzaal** first (smallest surface — static site + Mini App)
 3. Config: tmux + claude-code + worktree + github + desktop notifier
 4. Test on 2-3 trivial GitHub issues (lint fixes, typo PRs)
-5. Validate CI auto-fix loop works against ZAO's `npm run typecheck` + `npm run lint:biome`
+5. Validate CI auto-fix loop works against bettercallzaal's CI
 6. If green after 1 week → roll to zao-os
 7. If OpenClaw notifier stable → wire into agent squad dashboard
 

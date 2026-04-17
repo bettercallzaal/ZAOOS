@@ -13,6 +13,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
   const activeAudioRef = useRef<'A' | 'B'>('A');
   const activeUrlRef = useRef<string | null>(null);
   const crossfadeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const crossfadeTriggeredRef = useRef(false);
   // Refs to avoid stale closures in the main useEffect
   const crossfadeRef = useRef(state.crossfade);
   const volumeRef = useRef(state.volume);
@@ -80,7 +81,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
     const onEnded = (e: Event) => {
       if (!isActive(e)) return;
       // If crossfade already handled the transition, skip
-      if (crossfadeTimerRef.current) return;
+      if (crossfadeTimerRef.current || crossfadeTriggeredRef.current) return;
       if (onEndedRef.current) {
         onEndedRef.current();
       } else {
@@ -196,8 +197,9 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
   // ─── Crossfade helpers ──────────────────────────────────────────────
 
   function startCrossfade() {
-    if (crossfadeTimerRef.current) return; // already crossfading
-    // Trigger next track via onEnded callback — the load() will handle the crossfade
+    if (crossfadeTimerRef.current || crossfadeTriggeredRef.current) return;
+    // Set flag BEFORE calling onEnded to prevent natural onEnded from double-firing
+    crossfadeTriggeredRef.current = true;
     if (onEndedRef.current) {
       onEndedRef.current();
     }
@@ -236,6 +238,7 @@ export function HTMLAudioProvider({ children }: { children: ReactNode }) {
       clearInterval(crossfadeTimerRef.current);
       crossfadeTimerRef.current = null;
     }
+    crossfadeTriggeredRef.current = false;
   }
 
   // Resume AudioContext and audio playback when returning from background

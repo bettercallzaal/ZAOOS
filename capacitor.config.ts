@@ -1,15 +1,23 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
+// Server URL mode: native shell loads zaoos.com in a WebView.
+// All API routes, SSR, middleware work as-is. Web updates deploy instantly
+// without App Store review. Native shell adds: background audio, push, App Store presence.
+//
+// For local development, set CAP_SERVER_URL to your local IP:
+//   CAP_SERVER_URL=http://192.168.1.X:3000 npx cap sync
+
+const serverUrl = process.env.CAP_SERVER_URL || 'https://zaoos.com';
+const isDev = !!process.env.CAP_SERVER_URL;
+
 const config: CapacitorConfig = {
   appId: 'com.zaoos.app',
   appName: 'ZAO OS',
-  webDir: 'out',
+  webDir: 'public', // fallback for assets only, main content comes from server URL
 
   server: {
-    // Production: use static export in 'out' directory
-    // Development: uncomment below to point at local dev server
-    // url: 'http://192.168.1.X:3000',
-    // cleartext: true,
+    url: serverUrl,
+    cleartext: isDev, // allow HTTP for local dev only
     androidScheme: 'https',
   },
 

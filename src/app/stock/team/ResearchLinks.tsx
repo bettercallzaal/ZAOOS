@@ -1,6 +1,8 @@
 'use client';
 
-const REPO_BASE = 'https://github.com/bettercallzaal/ZAOOS/tree/main/research';
+import Link from 'next/link';
+
+const INTERNAL_BASE = '/research';
 
 interface Link {
   num: string;
@@ -89,12 +91,12 @@ export function ResearchLinks({ scope }: { scope: string }) {
       <div className="flex items-center justify-between px-1">
         <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Dig Deeper — Research Library</h3>
         <a
-          href={`${REPO_BASE}`}
+          href="https://github.com/bettercallzaal/ZAOOS/tree/main/research"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[10px] text-[#f5a623] hover:text-[#ffd700]"
         >
-          All docs →
+          All docs ↗
         </a>
       </div>
 
@@ -119,7 +121,7 @@ export function ResearchLinks({ scope }: { scope: string }) {
       )}
 
       <p className="text-[10px] text-gray-600 px-1 italic">
-        Links open the full markdown on GitHub. 400+ research docs total — ask Zaal if you need something specific.
+        400+ research docs total — ask Zaal if you need something specific.
       </p>
     </div>
   );
@@ -127,10 +129,8 @@ export function ResearchLinks({ scope }: { scope: string }) {
 
 function ResearchRow({ link }: { link: Link }) {
   return (
-    <a
-      href={`${REPO_BASE}/${link.folder}/${link.slug}`}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={`${INTERNAL_BASE}/${link.folder}/${link.slug}`}
       className="block bg-[#0d1b2a] rounded-lg border border-white/[0.06] hover:border-[#f5a623]/30 transition-colors p-3"
     >
       <div className="flex items-start gap-3">
@@ -141,8 +141,8 @@ function ResearchRow({ link }: { link: Link }) {
           <p className="text-sm text-white font-medium">{link.title}</p>
           <p className="text-[11px] text-gray-500 mt-0.5">{link.hook}</p>
         </div>
-        <span className="text-gray-600 text-sm flex-shrink-0">↗</span>
+        <span className="text-gray-600 text-sm flex-shrink-0">→</span>
       </div>
-    </a>
+    </Link>
   );
 }

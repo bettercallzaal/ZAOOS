@@ -7,15 +7,40 @@
 
 ---
 
+## 4-letter login codes (one per teammate)
+
+| Teammate | Code |
+|----------|------|
+| Zaal | ZAAL |
+| Candy | CAND |
+| FailOften | FAIL |
+| Hurric4n3Ike | HURR |
+| Swarthy Hatter | SWAR |
+| DaNici | DANI |
+| Shawn | SHAW |
+| DCoop | DCOO |
+| AttaBotty | ATTA |
+| Tyler Stambaugh | TYLE |
+| Ohnahji B | OHNA |
+| DFresh | DFRE |
+| Craig G | CRAI |
+| Maceo | MACE |
+
+Codes are case-insensitive. Login at **zaoos.com/stock/team**.
+
+---
+
 ## All leads — opening context (same across DMs)
 
 > Hey — we're locking the ZAOstock dashboard for Tuesday's team meeting where I'll hand out login codes and walk everyone through their Home tab. Before then I need a short status report from you covering your team's area.
 >
-> Takes 10 min max. Reply in DM or drop it in the dashboard Meeting Notes tab (I'll send your login code Monday).
+> Takes 10 min max. Reply in DM or drop it in the dashboard Meeting Notes tab. **Your login code: [CODE from table above]** — go to zaoos.com/stock/team.
 
 ---
 
 ## Message: DaNici (Design Lead)
+
+**Your code: `DANI`** — zaoos.com/stock/team
 
 > Hey DaNici — need your **Design team** status for Tuesday's meeting:
 >
@@ -37,6 +62,8 @@
 ---
 
 ## Message: DCoop (Music Team 2nd — acting lead)
+
+**Your code: `DCOO`** — zaoos.com/stock/team
 
 > Hey DCoop — need your **Music team** status for Tuesday:
 >
@@ -60,6 +87,8 @@
 
 ## Message: Tyler Stambaugh (Finance — de facto lead)
 
+**Your code: `TYLE`** — zaoos.com/stock/team
+
 > Hey Tyler — need your **Finance team** status for Tuesday:
 >
 > **1. Budget reconciliation (Sun milestone)**
@@ -82,6 +111,8 @@
 
 ## Message: Candy (Ops 2nd — my right hand)
 
+**Your code: `CAND`** — zaoos.com/stock/team
+
 > Hey Candy — need your **Ops** take for Tuesday:
 >
 > **1. Venue / permits**
@@ -100,44 +131,46 @@
 
 ---
 
-## Optional: Ops members (FailOften, Hurric4n3Ike, Swarthy Hatter)
+## Ops members — 3-bullet short ask
 
-Shorter version since no lead role:
+**FailOften** (code `FAIL`)
+> Hey FailOften — Tuesday ZAOstock meeting. Your login code is `FAIL` — zaoos.com/stock/team. Drop 3 bullets in the dashboard Meeting Notes tab before then: (1) what you moved forward, (2) blockers, (3) top ask for the group. 5 min. Thx.
 
-> Hey [name] — Tuesday ZAOstock meeting. Can you drop 3 bullets in the dashboard Meeting Notes tab before then?
-> 1. What you moved forward this week
-> 2. Blockers
-> 3. Top ask for the group
->
-> Login code comes Monday. Takes 5 min. Thx.
+**Hurric4n3Ike** (code `HURR`)
+> Hey Hurric4n3 — Tuesday ZAOstock meeting. Your login code is `HURR` — zaoos.com/stock/team. Drop 3 bullets in the dashboard Meeting Notes tab: (1) what you moved forward, (2) blockers, (3) top ask for the group. 5 min.
 
----
-
-## Finance team members (Ohnahji B, DFresh, Craig G, Maceo)
-
-Same as above — 3-bullet ask, short version.
+**Swarthy Hatter** (code `SWAR`)
+> Hey Swarthy — Tuesday ZAOstock meeting. Your login code is `SWAR` — zaoos.com/stock/team. Drop 3 bullets in the dashboard Meeting Notes tab: (1) moved forward, (2) blockers, (3) top ask. 5 min.
 
 ---
 
-## Design team members (Shawn)
+## Finance members — 3-bullet short ask
 
-> Hey Shawn — Tuesday ZAOstock meeting. Quick ask:
-> 1. T-shirt concept status — any mockups?
-> 2. Any other design bits in progress?
-> 3. Blockers / what you need from me
->
-> Login code Monday. 5 min. Thx.
+**Ohnahji B** (code `OHNA`)
+> Hey Ohnahji — Tuesday ZAOstock meeting. Your code is `OHNA` — zaoos.com/stock/team. Drop 3 bullets in the Meeting Notes tab: (1) moved forward, (2) blockers, (3) top ask. 5 min.
+
+**DFresh** (code `DFRE`)
+> Hey DFresh — Tuesday ZAOstock meeting. Your code is `DFRE` — zaoos.com/stock/team. Drop 3 bullets in the Meeting Notes tab: (1) moved forward, (2) blockers, (3) top ask. 5 min.
+
+**Craig G** (code `CRAI`)
+> Hey Craig — Tuesday ZAOstock meeting. Your code is `CRAI` — zaoos.com/stock/team. Drop 3 bullets in the Meeting Notes tab: (1) moved forward, (2) blockers, (3) top ask. 5 min.
+
+**Maceo** (code `MACE`)
+> Hey Maceo — Tuesday ZAOstock meeting. Your code is `MACE` — zaoos.com/stock/team. Drop 3 bullets in the Meeting Notes tab: (1) moved forward, (2) blockers, (3) top ask. 5 min.
 
 ---
 
-## Music team members (AttaBotty)
+## Design members — 3-bullet short ask
 
-> Hey Atta — Tuesday ZAOstock meeting. Quick ask:
-> 1. Production / staging thoughts
-> 2. Sponsor outreach you've done
-> 3. Blockers / what you need from me
->
-> Login code Monday. 5 min. Thx.
+**Shawn** (code `SHAW`)
+> Hey Shawn — Tuesday ZAOstock meeting. Your code is `SHAW` — zaoos.com/stock/team. Quick ask: (1) t-shirt concept status — any mockups? (2) any other design bits in progress? (3) blockers. 5 min.
+
+---
+
+## Music members — 3-bullet short ask
+
+**AttaBotty** (code `ATTA`)
+> Hey Atta — Tuesday ZAOstock meeting. Your code is `ATTA` — zaoos.com/stock/team. Quick ask: (1) production / staging thoughts, (2) sponsor outreach you've done, (3) blockers. 5 min.
 
 ---
 

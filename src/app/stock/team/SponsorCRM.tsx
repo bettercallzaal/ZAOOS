@@ -1,7 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { KanbanBoard, KanbanColumn } from './KanbanBoard';
+import { AttentionCard } from './AttentionCard';
+
+function daysSince(iso: string | null): number {
+  if (!iso) return Infinity;
+  return Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
+}
 
 interface Member { id: string; name: string; }
 
@@ -95,6 +101,20 @@ export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]
   const totalPaid = sponsors.reduce((sum, s) => sum + Number(s.amount_paid || 0), 0);
   const committedCount = sponsors.filter((s) => s.status === 'committed' || s.status === 'paid').length;
 
+  const attention = useMemo(() => {
+    const flagged: Array<{ id: string; title: string; reason: string; score: number }> = [];
+    for (const s of sponsors) {
+      if (s.status === 'contacted' && daysSince(s.last_contacted_at) > 14) {
+        flagged.push({ id: s.id, title: s.name, reason: `Contacted ${daysSince(s.last_contacted_at)}d ago — no reply`, score: 3 });
+      } else if (s.status === 'in_talks' && daysSince(s.last_contacted_at) > 7) {
+        flagged.push({ id: s.id, title: s.name, reason: `In talks, silent ${daysSince(s.last_contacted_at)}d — follow up`, score: 2 });
+      } else if (s.status === 'committed' && Number(s.amount_paid) < Number(s.amount_committed) && daysSince(s.created_at) > 30) {
+        flagged.push({ id: s.id, title: s.name, reason: `Committed $${Number(s.amount_committed).toLocaleString()} not paid yet`, score: 1 });
+      }
+    }
+    return flagged.sort((a, b) => b.score - a.score).slice(0, 3);
+  }, [sponsors]);
+
   async function createSponsor(e: React.FormEvent) {
     e.preventDefault();
     if (!newName.trim()) return;
@@ -167,6 +187,8 @@ export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]
           </select>
         </div>
       </div>
+
+      <AttentionCard items={attention} />
 
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-[#0d1b2a] rounded-lg p-3 border border-white/[0.06] text-center">

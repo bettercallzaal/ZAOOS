@@ -23,20 +23,22 @@ export function Dock({ onOpenDrawer }: DockProps) {
           <button
             key={item.id}
             type="button"
+            aria-label={`Open ${item.label}`}
             onClick={() => router.push(item.route)}
-            className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors active:bg-white/10"
+            className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#f5a623] active:bg-white/10"
           >
-            <span className="text-xl">{item.icon}</span>
-            <span className="text-[10px] text-white/50">{item.label}</span>
+            <span className="text-xl" aria-hidden="true">{item.icon}</span>
+            <span className="text-[10px] text-white/60">{item.label}</span>
           </button>
         ))}
         <button
           type="button"
+          aria-label="Open app drawer"
           onClick={onOpenDrawer}
-          className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors active:bg-white/10"
+          className="flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#f5a623] active:bg-white/10"
         >
-          <span className="text-xl">⊞</span>
-          <span className="text-[10px] text-white/50">Apps</span>
+          <span className="text-xl" aria-hidden="true">⊞</span>
+          <span className="text-[10px] text-white/60">Apps</span>
         </button>
       </div>
       {/* Home indicator */}

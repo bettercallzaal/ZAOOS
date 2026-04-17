@@ -21,15 +21,3 @@ export async function logAgentEvent(params: {
     logger.error(`[${params.agent_name}] Failed to log event: ${error.message}`);
   }
 }
-
-export async function getRecentEvents(name: AgentName, limit = 20) {
-  const db = getSupabaseAdmin();
-  const { data } = await db
-    .from('agent_events')
-    .select('*')
-    .eq('agent_name', name)
-    .order('created_at', { ascending: false })
-    .limit(limit);
-
-  return data || [];
-}

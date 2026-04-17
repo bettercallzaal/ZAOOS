@@ -303,6 +303,23 @@ export const communityConfig = {
     /** Allowed image MIME types for upload */
     allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
   },
+  // ── ZAO OS Settings ────────────────────────────────────────────
+  /** Operating system shell and app defaults */
+  os: {
+    /** Default shell for new users: 'phone' | 'desktop' | 'dashboard' | 'feed' */
+    defaultShell: 'phone' as const,
+    /** Apps pinned to home screen by default for new users */
+    defaultPinnedApps: ['chat', 'messages', 'music'],
+    /** Available shells (disable any to hide from settings) */
+    availableShells: ['phone', 'desktop', 'dashboard', 'feed'] as const,
+    /** External agent dashboards */
+    agentDashboards: {
+      zoe: 'https://zoe.zaoos.com',
+      pixels: 'https://pixels.zaoos.com',
+      paperclip: 'https://paperclip.zaoos.com',
+      ao: 'https://ao.zaoos.com',
+    },
+  },
 } as const;
 
 export type CommunityConfig = typeof communityConfig;

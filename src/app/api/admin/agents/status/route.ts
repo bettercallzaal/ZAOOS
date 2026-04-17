@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { AGENTS } from '@/components/admin/agents/constants';
 import type { AgentEvent, AgentStatus } from '@/components/admin/agents/constants';
 import { deriveStatus } from '@/components/admin/agents/constants';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   const session = await getSessionData();
@@ -76,13 +77,13 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await query;
     if (error) {
-      console.error('Agent events query error:', error);
+      logger.error('Agent events query error:', error);
       return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
     }
 
     return NextResponse.json({ events: data || [] });
   } catch (err) {
-    console.error('Agent status error:', err);
+    logger.error('Agent status error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const RecapSchema = z.object({
   roomId: z.string().uuid(),
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
       .order('started_at', { ascending: true });
 
     if (txError) {
-      console.error('Recap transcript fetch error:', txError);
+      logger.error('Recap transcript fetch error:', txError);
       return NextResponse.json({ error: 'Failed to fetch transcripts' }, { status: 500 });
     }
 
@@ -144,7 +145,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ recap, transcriptCount: transcripts.length });
   } catch (err) {
-    console.error('Recap error:', err);
+    logger.error('Recap error:', err);
     return NextResponse.json({ error: 'Failed to generate recap' }, { status: 500 });
   }
 }

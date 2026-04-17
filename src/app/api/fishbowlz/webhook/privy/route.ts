@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import crypto from 'crypto';
+import { logger } from '@/lib/logger';
 
 const PRIVY_WEBHOOK_SECRET = process.env.PRIVY_WEBHOOK_SECRET || '';
 
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
     // Acknowledge other event types
     return NextResponse.json({ success: true, event: type, action: 'ignored' });
   } catch (err) {
-    console.error('Privy webhook error:', err);
+    logger.error('Privy webhook error:', err);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }

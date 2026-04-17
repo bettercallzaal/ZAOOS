@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
+import { logger } from '@/lib/logger';
 
 const broadcastSchema = z.object({
   text: z.string().min(1).max(1024),
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     if (!res.ok) {
       const errorBody = await res.text();
-      console.error('[broadcast] Neynar error:', res.status, errorBody);
+      logger.error('[broadcast] Neynar error:', res.status, errorBody);
       return NextResponse.json(
         { error: 'Failed to broadcast cast' },
         { status: 500 }
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, hash: data.cast?.hash });
   } catch (error) {
-    console.error('[broadcast] Unexpected error:', error);
+    logger.error('[broadcast] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

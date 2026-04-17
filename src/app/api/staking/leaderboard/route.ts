@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getConvictionBatch } from '@/lib/staking/conviction';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/staking/leaderboard
@@ -54,7 +55,7 @@ export async function GET() {
 
     return NextResponse.json(result);
   } catch (err) {
-    console.error('Staking leaderboard error:', err);
+    logger.error('Staking leaderboard error:', err);
     return NextResponse.json([], { status: 500 });
   }
 }

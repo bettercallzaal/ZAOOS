@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(500).default(100),
@@ -92,7 +93,7 @@ export async function GET(req: NextRequest) {
       actions,
     });
   } catch (err) {
-    console.error('[admin/audit-log] Error fetching audit log:', err);
+    logger.error('[admin/audit-log] Error fetching audit log:', err);
     return NextResponse.json(
       { error: 'Failed to fetch audit log' },
       { status: 500 },

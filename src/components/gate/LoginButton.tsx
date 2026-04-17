@@ -21,6 +21,30 @@ export function LoginButton() {
     return () => clearInterval(interval);
   }, []);
 
+  // Mobile fix: when returning from Farcaster app, the page may have been killed.
+  // On visibility change (user returns to browser), check if session was created.
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState !== 'visible') return;
+      // Small delay to let any in-flight auth complete
+      setTimeout(async () => {
+        try {
+          const res = await fetch('/api/auth/session');
+          if (res.ok) {
+            const data = await res.json();
+            if (data.fid) {
+              router.push('/home');
+            }
+          }
+        } catch {
+          // ignore - not authenticated yet
+        }
+      }, 500);
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [router]);
+
   const handleSuccess = useCallback(async (res: StatusAPIResponse) => {
     setError(null);
     setLoading(true);
@@ -84,7 +108,7 @@ export function LoginButton() {
         router.push(data.redirect);
       }
     } catch (err) {
-      console.error('Login failed:', err);
+      // Login error - don't use logger here (client component)
       setError('Connection error — check your internet and try again. If this persists, contact an admin.');
       setLoading(false);
     }

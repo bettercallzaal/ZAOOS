@@ -39,7 +39,7 @@
 | **Cross-posting content** | [96 Cross-Post API](./cross-platform/096-cross-post-api-deep-dive/) + [77 Bluesky](./cross-platform/077-bluesky-cross-posting-integration/) + [121 Lens](./cross-platform/121-lens-v3-auth-verdict/) |
 | **Building the AI agent** | [234 OpenClaw Guide](./agents/234-openclaw-comprehensive-guide/) + [227 Agentic Workflows](./agents/227-agentic-workflows-2026/) + [245 ZOE Upgrade](./agents/245-zoe-upgrade-autonomous-workflow-2026/) |
 | **Auditing code** | [57 Security Audit](./security/057-codebase-security-audit-march-2026/) + [137 Skills Security](./dev-workflows/137-skills-audit-security-practices/) + [66 Testing](./dev-workflows/066-backend-testing-strategy/) |
-| **Using Claude Code skills** | [154 Skills Master Ref](./dev-workflows/154-skills-commands-master-reference/) + [54 Superpowers](./dev-workflows/054-superpowers-agentic-skills/) |
+| **Using Claude Code skills** | [429 Skills Deep Dive](./dev-workflows/429-claude-code-skills-deep-dive/) + [154 Skills Master Ref](./dev-workflows/154-skills-commands-master-reference/) + [54 Superpowers](./dev-workflows/054-superpowers-agentic-skills/) |
 | **Understanding the project** | [50 Complete Guide](./community/050-the-zao-complete-guide/) + [51 Whitepaper](./community/051-zao-whitepaper-2026/) |
 | **Forking for your community** | [FORK.md](../FORK.md) + [AGENTS.md](../AGENTS.md) + [225 Fork Patterns](./dev-workflows/225-fork-friendly-open-source-patterns/) + [community.config.ts](../community.config.ts) |
 

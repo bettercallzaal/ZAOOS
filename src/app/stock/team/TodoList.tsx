@@ -1,6 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { KanbanBoard, KanbanColumn } from './KanbanBoard';
+import { AttentionCard } from './AttentionCard';
+
+function daysSince(iso: string | null): number {
+  if (!iso) return Infinity;
+  return Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
+}
 
 interface Member { id: string; name: string; }
 interface Todo {
@@ -15,6 +22,18 @@ interface Todo {
 
 const STATUS_ORDER = { todo: 0, in_progress: 1, done: 2 };
 
+const KANBAN_COLUMNS: KanbanColumn<Todo['status']>[] = [
+  { key: 'todo', label: 'To Do', accent: 'border-gray-600 text-gray-400' },
+  { key: 'in_progress', label: 'In Progress', accent: 'border-amber-500/40 bg-amber-500/10 text-amber-400', wipSoftCap: 5 },
+  { key: 'done', label: 'Done', accent: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400', defaultCollapsed: true },
+];
+
+const STATUS_STRIPE: Record<Todo['status'], string> = {
+  todo: 'bg-gray-600',
+  in_progress: 'bg-amber-500',
+  done: 'bg-emerald-500',
+};
+
 export function TodoList({ todos: initialTodos, members, currentMemberId }: {
   todos: Todo[];
   members: Member[];
@@ -24,6 +43,7 @@ export function TodoList({ todos: initialTodos, members, currentMemberId }: {
     [...initialTodos].sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status])
   );
   const [filter, setFilter] = useState<'all' | 'mine' | string>('all');
+  const [view, setView] = useState<'list' | 'board'>('list');
   const [newTitle, setNewTitle] = useState('');
   const [newOwner, setNewOwner] = useState<string>('');
   const [editNotesId, setEditNotesId] = useState<string | null>(null);
@@ -34,6 +54,21 @@ export function TodoList({ todos: initialTodos, members, currentMemberId }: {
     if (filter === 'mine') return t.owner?.id === currentMemberId;
     return t.owner?.id === filter;
   });
+
+  const attention = useMemo(() => {
+    const flagged: Array<{ id: string; title: string; reason: string; score: number }> = [];
+    for (const t of todos) {
+      if (t.status === 'done') continue;
+      if (t.status === 'in_progress' && daysSince(t.created_at) > 7) {
+        flagged.push({ id: t.id, title: t.title, reason: `In progress ${daysSince(t.created_at)}d — stalled?`, score: 3 });
+      } else if (t.status === 'todo' && !t.owner) {
+        flagged.push({ id: t.id, title: t.title, reason: 'Unassigned', score: 2 });
+      } else if (t.status === 'todo' && t.creator && t.owner && t.creator.id !== t.owner.id && daysSince(t.created_at) > 14) {
+        flagged.push({ id: t.id, title: t.title, reason: `Assigned ${daysSince(t.created_at)}d ago — forgotten?`, score: 1 });
+      }
+    }
+    return flagged.sort((a, b) => b.score - a.score).slice(0, 3);
+  }, [todos]);
 
   async function createTodo(e: React.FormEvent) {
     e.preventDefault();
@@ -79,20 +114,42 @@ export function TodoList({ todos: initialTodos, members, currentMemberId }: {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h2 className="text-lg font-bold text-white">Todos</h2>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="bg-[#0a1628] border border-white/[0.08] rounded text-xs text-gray-400 px-2 py-1 focus:outline-none"
-        >
-          <option value="all">All</option>
-          <option value="mine">Mine</option>
-          {members.map((m) => (
-            <option key={m.id} value={m.id}>{m.name}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          <div className="flex rounded border border-white/[0.08] overflow-hidden">
+            <button
+              onClick={() => setView('list')}
+              className={`text-[10px] font-bold px-2 py-1 transition-colors ${
+                view === 'list' ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              List
+            </button>
+            <button
+              onClick={() => setView('board')}
+              className={`text-[10px] font-bold px-2 py-1 transition-colors border-l border-white/[0.08] ${
+                view === 'board' ? 'bg-[#f5a623]/15 text-[#f5a623]' : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              Board
+            </button>
+          </div>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="bg-[#0a1628] border border-white/[0.08] rounded text-xs text-gray-400 px-2 py-1 focus:outline-none"
+          >
+            <option value="all">All</option>
+            <option value="mine">Mine</option>
+            {members.map((m) => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
+
+      <AttentionCard items={attention} />
 
       <form onSubmit={createTodo} className="flex gap-2">
         <input
@@ -116,58 +173,82 @@ export function TodoList({ todos: initialTodos, members, currentMemberId }: {
         </button>
       </form>
 
-      <div className="space-y-2">
-        {filtered.map((todo) => (
-          <div key={todo.id} className="bg-[#0d1b2a] rounded-lg border border-white/[0.06] p-3">
-            <div className="flex items-start gap-3">
-              <button
-                onClick={() => cycleStatus(todo)}
-                className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 ${statusColor[todo.status]}`}
-                title={`Status: ${todo.status}. Click to cycle.`}
-              >
-                {statusIcon[todo.status]}
-              </button>
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm ${todo.status === 'done' ? 'text-gray-500 line-through' : 'text-white'}`}>
-                  {todo.title}
-                </p>
-                <div className="flex items-center gap-2 mt-1">
-                  {todo.owner && (
-                    <span className="text-[10px] font-medium text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full">
-                      {todo.owner.name}
-                    </span>
-                  )}
-                  <button
-                    onClick={() => { setEditNotesId(editNotesId === todo.id ? null : todo.id); setEditNotesVal(todo.notes || ''); }}
-                    className="text-[10px] text-gray-500 hover:text-gray-400"
-                  >
-                    {todo.notes ? 'notes' : '+ note'}
-                  </button>
-                </div>
-                {editNotesId === todo.id && (
-                  <div className="mt-2 flex gap-2">
-                    <input
-                      value={editNotesVal}
-                      onChange={(e) => setEditNotesVal(e.target.value)}
-                      placeholder="Add a note..."
-                      className="flex-1 bg-[#0a1628] border border-white/[0.1] rounded px-2 py-1 text-xs text-gray-300 focus:outline-none focus:border-[#f5a623]/50"
-                      onKeyDown={(e) => { if (e.key === 'Enter') { updateTodo(todo.id, { notes: editNotesVal }); setEditNotesId(null); } }}
-                      autoFocus
-                    />
-                    <button onClick={() => { updateTodo(todo.id, { notes: editNotesVal }); setEditNotesId(null); }} className="text-xs text-[#f5a623]">Save</button>
+      {view === 'list' ? (
+        <div className="space-y-2">
+          {filtered.map((todo) => (
+            <div key={todo.id} className="bg-[#0d1b2a] rounded-lg border border-white/[0.06] p-3">
+              <div className="flex items-start gap-3">
+                <button
+                  onClick={() => cycleStatus(todo)}
+                  className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 ${statusColor[todo.status]}`}
+                  title={`Status: ${todo.status}. Click to cycle.`}
+                >
+                  {statusIcon[todo.status]}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm ${todo.status === 'done' ? 'text-gray-500 line-through' : 'text-white'}`}>
+                    {todo.title}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {todo.owner && (
+                      <span className="text-[10px] font-medium text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full">
+                        {todo.owner.name}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => { setEditNotesId(editNotesId === todo.id ? null : todo.id); setEditNotesVal(todo.notes || ''); }}
+                      className="text-[10px] text-gray-500 hover:text-gray-400"
+                    >
+                      {todo.notes ? 'notes' : '+ note'}
+                    </button>
                   </div>
-                )}
-                {editNotesId !== todo.id && todo.notes && (
-                  <p className="text-xs text-gray-500 mt-1 italic">{todo.notes}</p>
-                )}
+                  {editNotesId === todo.id && (
+                    <div className="mt-2 flex gap-2">
+                      <input
+                        value={editNotesVal}
+                        onChange={(e) => setEditNotesVal(e.target.value)}
+                        placeholder="Add a note..."
+                        className="flex-1 bg-[#0a1628] border border-white/[0.1] rounded px-2 py-1 text-xs text-gray-300 focus:outline-none focus:border-[#f5a623]/50"
+                        onKeyDown={(e) => { if (e.key === 'Enter') { updateTodo(todo.id, { notes: editNotesVal }); setEditNotesId(null); } }}
+                        autoFocus
+                      />
+                      <button onClick={() => { updateTodo(todo.id, { notes: editNotesVal }); setEditNotesId(null); }} className="text-xs text-[#f5a623]">Save</button>
+                    </div>
+                  )}
+                  {editNotesId !== todo.id && todo.notes && (
+                    <p className="text-xs text-gray-500 mt-1 italic">{todo.notes}</p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <p className="text-sm text-gray-500 text-center py-4">No todos yet</p>
-        )}
-      </div>
+          ))}
+          {filtered.length === 0 && (
+            <p className="text-sm text-gray-500 text-center py-4">No todos yet</p>
+          )}
+        </div>
+      ) : (
+        <KanbanBoard
+          items={filtered}
+          columns={KANBAN_COLUMNS}
+          onStatusChange={(id, status) => updateTodo(id, { status })}
+          getStripeColor={(t) => STATUS_STRIPE[t.status]}
+          renderCard={(todo) => (
+            <div className="p-3">
+              <p className={`text-sm ${todo.status === 'done' ? 'text-gray-500 line-through' : 'text-white'}`}>
+                {todo.title}
+              </p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                {todo.owner && (
+                  <span className="text-[10px] font-medium text-[#f5a623] bg-[#f5a623]/10 px-2 py-0.5 rounded-full">
+                    {todo.owner.name}
+                  </span>
+                )}
+                {todo.notes && <span className="text-[10px] text-gray-500 italic line-clamp-1">{todo.notes}</span>}
+              </div>
+            </div>
+          )}
+        />
+      )}
     </div>
   );
 }

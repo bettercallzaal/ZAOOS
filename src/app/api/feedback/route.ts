@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { z } from 'zod';
 import { Octokit } from '@octokit/rest';
+import { logger } from '@/lib/logger';
 
 const feedbackSchema = z.object({
   type: z.enum(['bug', 'feature', 'feedback']),
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     const githubToken = process.env.GITHUB_TOKEN;
     const repo = process.env.GITHUB_FEEDBACK_REPO || 'zaalpanthaki/zao-os';
     if (!githubToken) {
-      console.error('GITHUB_TOKEN not configured');
+      logger.error('GITHUB_TOKEN not configured');
       return NextResponse.json({ error: 'Feedback system not configured' }, { status: 503 });
     }
 
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, issueUrl: issue.html_url, issueNumber: issue.number });
   } catch (err) {
-    console.error('Feedback submission error:', err);
+    logger.error('Feedback submission error:', err);
     return NextResponse.json({ error: 'Failed to submit feedback' }, { status: 500 });
   }
 }

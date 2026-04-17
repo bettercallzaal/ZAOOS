@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/admin/quick-stats — Pulse stats for admin dashboard home card
@@ -93,7 +94,7 @@ export async function GET() {
       dormantUsers: dormantUsers.count || 0,
     });
   } catch (err) {
-    console.error('[quick-stats] error:', err);
+    logger.error('[quick-stats] error:', err);
     return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
   }
 }

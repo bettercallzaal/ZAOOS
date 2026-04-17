@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   type: z.enum(['members', 'respect', 'sessions']),
@@ -111,7 +112,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('[admin/export] Error:', err);
+    logger.error('[admin/export] Error:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

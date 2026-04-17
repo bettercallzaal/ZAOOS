@@ -5,6 +5,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { checkGatingEligibility } from '@/lib/fc-identity';
 import { castRoomEnded } from '@/lib/fishbowlz/castRoom';
 import { generateTranscriptSummary } from '@/lib/fishbowlz/summarize';
+import { logger } from '@/lib/logger';
 
 // --- Zod schemas for PATCH body validation ---
 
@@ -444,7 +445,7 @@ export async function PATCH(
             }
           }
         } catch (err) {
-          console.error('Failed to generate transcript summary:', err);
+          logger.error('Failed to generate transcript summary:', err);
         }
       })();
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -90,7 +91,7 @@ export async function GET() {
 
     return NextResponse.json({ stages });
   } catch (error) {
-    console.error('[onboarding-funnel] Error:', error);
+    logger.error('[onboarding-funnel] Error:', error);
     return NextResponse.json(
       { error: 'Failed to load onboarding funnel data' },
       { status: 500 }

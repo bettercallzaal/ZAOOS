@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const querySchema = z.object({
   days: z.coerce.number().int().min(7).max(365).default(30),
@@ -105,7 +106,7 @@ export async function GET(request: NextRequest) {
       cutoffDays: days,
     });
   } catch (err) {
-    console.error('[admin/dormant] error:', err);
+    logger.error('[admin/dormant] error:', err);
     return NextResponse.json({ error: 'Failed to fetch dormant members' }, { status: 500 });
   }
 }

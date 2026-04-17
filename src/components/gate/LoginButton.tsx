@@ -33,7 +33,7 @@ export function LoginButton() {
           if (res.ok) {
             const data = await res.json();
             if (data.fid) {
-              router.push('/home');
+              router.push('/os');
             }
           }
         } catch {

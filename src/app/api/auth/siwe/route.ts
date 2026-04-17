@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      redirect: '/home',
+      redirect: '/os',
       hasFarcaster: !!fid,
     });
   } catch (error) {

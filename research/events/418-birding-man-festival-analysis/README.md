@@ -6,17 +6,35 @@
 
 ---
 
-## Key Decisions / Recommendations
+## Key Decisions — Year 1 Only (2026)
 
-| Decision | Recommendation |
-|----------|----------------|
-| **Ticket pricing model** | USE sliding scale tiers ($20-$40, $40-$60, $70-$140) because Birding Man proves it works at comparable community-festival scale and signals inclusion. |
-| **Add workshop track** | ADD 4-6 concurrent afternoon workshops (music production, web3, farcaster, songwriting) because music-only festivals leave sponsor dollars and daytime programming gaps on the table. |
-| **Named "expert" anchor** | RECRUIT one named keynote (bestselling author / respected name) because Birding Man uses Ethan Tapper (Audubon-endorsed bestseller) as Friday evening anchor — pulls press and serious attendees. |
-| **Operational honesty** | STATE "operates at break-even" + "volunteer opportunities" publicly because it matches ZAOstock's community ethos and attracts volunteers + sponsors who back mission, not margin. |
-| **Two-day format** | SKIP for 2026 — stay one day (Oct 3) since you already committed. REVISIT for 2027 with Friday evening kickoff (storytelling / sponsor cocktail) + Saturday main event. |
-| **BYOB + kid/dog friendly** | USE exact same messaging — matches Ellsworth community vibe and Birding Man proves it scales. |
-| **Sponsor framing** | FRAME Wallace Events, Art of Ellsworth, Heart of Ellsworth as "partner orgs" not "sponsors" — Birding Man frames Propagate as "operating partner" not "sponsor" which raises perceived credibility. |
+First year = execute clean, don't over-scope. Only adopt the cheap / high-leverage ideas.
+
+| Decision | Year 1 Recommendation |
+|----------|----------------------|
+| **Partner framing** | USE — replace Gold/Silver/Bronze sponsor tiers with role-named credits ("Broadcast Partner · Whop", "Official Host · Art of Ellsworth"). Pure copy change, zero cost, big credibility lift. |
+| **Public break-even + volunteer language** | USE — add one line to `/stock` pitch page: "ZAOstock operates at break-even. Volunteer opportunities available." Signals mission, attracts right backers. |
+| **BYOB + kid/dog friendly** | USE — add to public page copy. Matches Ellsworth vibe, zero operational cost. |
+| **Sliding-scale tickets (simplified)** | USE a SIMPLE 2-tier: Community $0-25 sliding + Supporter $50-75. Skip the $140 VIP. Keep math easy for year one. |
+| **Workshop track** | SKIP for 2026. Execute music-only flawlessly first. Park as Year 2 idea. |
+| **Named non-music keynote** | SKIP for 2026 unless a ZAO-community name (Steve Peer intro, a friendly author, etc.) falls into your lap. Don't force it. |
+| **Two-day format** | SKIP. Already committed to Oct 3 single day. |
+| **Peer call with Harry Greene** | OPTIONAL — 15 min phone call if you have bandwidth, purely intel gathering. Low cost, could yield lessons. |
+
+## Year 2+ Ideas (2027 and beyond — filed away)
+
+Save these for when you have more team bandwidth, a track record, and bigger venue ambitions:
+
+- **Full workshop track** (4-6 concurrent morning sessions: music production, Farcaster 101, songwriting, DAW clinics, mic'ing, ZAO token economics)
+- **Two-day format** (Friday evening sponsor cocktail + storytelling + Saturday main event)
+- **Third ticket tier** — VIP at $80-120 (reserved seating, artist meet-and-greet, merch bundle)
+- **Named keynote/author** — pull a bestseller or respected non-music figure for a 30-min talk
+- **Included lunch** (bundle into $50-75 tier with local food truck partnership)
+- **Overnight lodging partnership** — partner with local Airbnbs or hotels for attendee packages
+- **Post-event afterparty at partner venue** — Steve Peer's Black Moon or similar
+- **Multi-stage** (main stage + acoustic corner + DJ booth)
+- **Farm-like parallel activity** — walking tours, workshops, parklet garden build-day
+- **Sponsor naming rights on stages/workshops** ("The Bangor Savings Main Stage")
 
 ## Comparison: Birding Man vs ZAOstock (as currently planned) vs Suggested ZAOstock 2026
 
@@ -100,13 +118,13 @@ No "Gold / Silver / Bronze" sponsor language. Everyone is a named partner. Reduc
 | Sliding scale as high as $140 | Ellsworth median income is ~$55K — cap VIP at ~$80-$120 |
 | Audubon-style partnership | ZAO doesn't have an obvious Audubon-equivalent — find local equivalent (Acadia Audubon? MDI Bio Lab?) |
 
-## Next Actions
+## Next Actions — Year 1 Scope
 
-1. **Today (Fri 4/17)** — Add todo to ZAOstock dashboard: "Design sliding-scale pricing tiers + workshop track lineup"
-2. **Sat 4/18** — Include 3-tier pricing in finalized sponsor pitch deck copy
-3. **Sun 4/19** — Add "workshop track leads" to artist outreach list (outreach by DCoop)
-4. **Mon 4/20** — Consider emailing Harry Greene (978-501-3888) for a peer comparison call
-5. **May 2026** — Watch Birding Man happen. Post-event, fetch any recaps or attendee numbers for benchmark data.
+1. **Sat 4/18** — When finalizing sponsor pitch copy, swap "sponsor tiers" language for "partner credits" framing.
+2. **Sat 4/18** — Add one line to `/stock` page: break-even + volunteer + BYOB + kid/dog friendly.
+3. **Sat 4/18** — Design 2-tier ticket structure (Community $0-25 sliding, Supporter $50-75). No VIP.
+4. **May 2026** — Watch Birding Man happen (after May 2). Post-event, fetch their recap / attendee numbers for benchmark data. Inform Year 2 planning.
+5. **Sept 2026** — Before ZAOstock, revisit this doc's Year 2+ list. Pick 2-3 to test in 2027.
 
 ## Sources
 

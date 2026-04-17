@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, lazy, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { getApp, getDefaultPinnedApps } from '@/lib/os/app-manifest';
 import { AppIcon } from './AppIcon';
 import { AppDrawer } from './AppDrawer';
 import type { AppManifest } from '@/lib/os/types';
+import NowPlayingWidget from './widgets/NowPlayingWidget';
+import UnreadWidget from './widgets/UnreadWidget';
+import AgentStatusWidget from './widgets/AgentStatusWidget';
 
 interface PhoneShellProps {
   pinnedApps: string[];
@@ -50,12 +53,18 @@ export function PhoneShell({ pinnedApps, onPin, onUnpin, userName }: PhoneShellP
         </div>
       </div>
 
-      {/* Widget area (placeholder for Phase 4) */}
-      <div className="px-4 py-4">
-        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
-          <div className="text-center text-xs text-white/30">
-            Long-press an app to add widgets here
-          </div>
+      {/* Widget area */}
+      <div className="flex flex-col gap-3 px-4 py-4">
+        <Suspense fallback={<div className="h-16 animate-pulse rounded-2xl bg-white/5" />}>
+          <NowPlayingWidget size="medium" onExpand={() => router.push('/music')} />
+        </Suspense>
+        <div className="grid grid-cols-2 gap-3">
+          <Suspense fallback={<div className="h-16 animate-pulse rounded-2xl bg-white/5" />}>
+            <UnreadWidget size="small" onExpand={() => router.push('/messages')} />
+          </Suspense>
+          <Suspense fallback={<div className="h-16 animate-pulse rounded-2xl bg-white/5" />}>
+            <AgentStatusWidget size="small" onExpand={() => router.push('/admin')} />
+          </Suspense>
         </div>
       </div>
 

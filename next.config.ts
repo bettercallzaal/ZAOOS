@@ -5,7 +5,15 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+// Capacitor builds need static export (no SSR, no API routes in bundle)
+// The native app calls zaoos.com/api/* for all server operations
+const isCapacitorBuild = process.env.CAPACITOR_BUILD === 'true';
+
 const nextConfig: NextConfig = {
+  ...(isCapacitorBuild && {
+    output: 'export',
+    images: { unoptimized: true },
+  }),
   serverExternalPackages: [
     '@xmtp/wasm-bindings',
     'twitter-api-v2',

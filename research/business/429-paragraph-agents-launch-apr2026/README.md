@@ -203,6 +203,49 @@ Memory refs:
 
 ---
 
+## First Live Test: One Post Today (2026-04-17)
+
+Goal: ship a single Paragraph post manually via UI to learn the surface before automating. Low stakes dry-run before wiring ZOE.
+
+### Thumbnail / Cover Image
+
+REST field is `imageUrl` (string, URI). Not a file upload endpoint - the API only accepts a URL to an already-hosted image.
+
+| Size | Use | Notes |
+|------|-----|-------|
+| 1200 x 630 | Cover image (standard OG) | Matches Farcaster, X, LinkedIn, Bluesky link previews. Safe default |
+| 1600 x 900 | Hi-res cover | For retina displays |
+| Square 1080 x 1080 | Alt for IG-style sharing | Not recommended as primary, crops poorly in feeds |
+
+### Three Paths to Generate the Thumbnail
+
+| Path | Tool | When |
+|------|------|------|
+| **UI drag-drop** | Paragraph editor | Fastest, manual image already in hand |
+| **Reuse ZAO brand asset** | Cloudinary (already in COC Concertz stack) | Consistent brand, no new generation |
+| **AI generation** | Ideogram, Midjourney, fal.ai FLUX, Recraft | New cover matched to post topic |
+
+### Today's Test Plan (Manual, Not Automated Yet)
+
+1. Pick topic (Year of the ZABAL daily, ZAO Stock update, Matteo Italy bridge recap, or meta Paragraph-agents-launch post)
+2. Claude drafts post markdown in preview HTML (via existing `/newsletter` skill pattern)
+3. Zaal copy-pastes to `paragraph.com/@thezao` new post
+4. Generate cover: Ideogram with ZAO navy + gold palette, 1200 x 630
+5. Drag cover into Paragraph editor, set title + subtitle, publish
+6. Run `/socials` to generate Firefly cast + LinkedIn + GC distribution
+7. Note what friction remains - that is the ZOE `/newsletter` upgrade backlog
+
+### After Today's Test
+
+Upgrades to stage once manual flow confirmed:
+- Install `npx skills add paragraph-xyz/skill` in ZOE VPS repo
+- Swap clipboard output in `/newsletter` for direct Paragraph publish via skill
+- Auto-generate cover via fal.ai FLUX in skill, upload to Cloudinary, pass `imageUrl` to Paragraph REST
+- Chain `/socials` skill automatically after successful publish
+- Telegram-native: Zaal messages ZOE -> post lands on Paragraph + distribution fires
+
+---
+
 ## Open Questions
 
 | Question | Where To Find Out |

@@ -16,7 +16,6 @@ const chat: AppManifest = {
   type: 'full-app',
   description: 'Farcaster channel chat rooms',
   route: '/chat',
-  component: () => import('@/app/(auth)/chat/page'),
   requiresAuth: true,
   defaultPinned: true,
 };
@@ -29,7 +28,6 @@ const messages: AppManifest = {
   type: 'full-app',
   description: 'Encrypted XMTP direct messages',
   route: '/messages',
-  component: () => import('@/app/(auth)/messages/page'),
   requiresAuth: true,
   defaultPinned: true,
 };
@@ -42,7 +40,6 @@ const music: AppManifest = {
   type: 'full-app',
   description: 'Multi-platform music player with crossfade',
   route: '/music',
-  component: () => import('@/app/(auth)/music/page'),
   requiresAuth: true,
   defaultPinned: true,
 };
@@ -55,7 +52,6 @@ const spaces: AppManifest = {
   type: 'full-app',
   description: 'Live audio/video rooms with broadcast',
   route: '/calls',
-  component: () => import('@/app/(auth)/calls/page'),
   requiresAuth: true,
 };
 
@@ -67,7 +63,6 @@ const governance: AppManifest = {
   type: 'full-app',
   description: 'Proposals, polls, and community voting',
   route: '/governance',
-  component: () => import('@/app/(auth)/governance/page'),
   requiresAuth: true,
 };
 
@@ -79,7 +74,6 @@ const directory: AppManifest = {
   type: 'full-app',
   description: 'Community member directory',
   route: '/directory',
-  component: () => import('@/app/(auth)/directory/page'),
   requiresAuth: true,
 };
 
@@ -91,7 +85,6 @@ const respect: AppManifest = {
   type: 'full-app',
   description: 'Respect scores and fractal rankings',
   route: '/respect',
-  component: () => import('@/app/(auth)/respect/page'),
   requiresAuth: true,
 };
 
@@ -103,7 +96,6 @@ const library: AppManifest = {
   type: 'full-app',
   description: 'Your music library and playlists',
   route: '/library',
-  component: () => import('@/app/(auth)/library/page'),
   requiresAuth: true,
 };
 
@@ -115,7 +107,6 @@ const wavewarz: AppManifest = {
   type: 'full-app',
   description: 'Music prediction battles',
   route: '/wavewarz',
-  component: () => import('@/app/(auth)/wavewarz/page'),
   requiresAuth: true,
 };
 
@@ -127,7 +118,6 @@ const social: AppManifest = {
   type: 'full-app',
   description: 'Social feed, analytics, and connections',
   route: '/social',
-  component: () => import('@/app/(auth)/social/page'),
   requiresAuth: true,
 };
 
@@ -139,7 +129,6 @@ const admin: AppManifest = {
   type: 'full-app',
   description: 'Community administration panel',
   route: '/admin',
-  component: () => import('@/app/(auth)/admin/page'),
   requiresAuth: true,
   requiresGate: 'allowlist',
 };

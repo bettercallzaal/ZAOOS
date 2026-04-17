@@ -5,7 +5,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { createClient } from '@/lib/db/supabase';
+import { getSupabaseBrowser } from '@/lib/db/supabase';
 import { getDefaultPinnedApps } from './app-manifest';
 import { DEFAULT_SHELL } from './shells';
 import type { ShellId, UserAppConfig, WidgetLayoutItem } from './types';
@@ -29,7 +29,7 @@ export function useAppConfig(userId: string | undefined) {
     }
 
     async function loadConfig() {
-      const supabase = createClient();
+      const supabase = getSupabaseBrowser();
       const { data, error } = await supabase
         .from('user_app_config')
         .select('*')
@@ -62,7 +62,7 @@ export function useAppConfig(userId: string | undefined) {
       const newConfig = { ...config, ...updates };
       setConfig(newConfig);
 
-      const supabase = createClient();
+      const supabase = getSupabaseBrowser();
       await supabase.from('user_app_config').upsert({
         user_id: userId,
         shell: newConfig.shell,

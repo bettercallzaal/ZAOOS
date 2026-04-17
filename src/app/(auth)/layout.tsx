@@ -8,13 +8,20 @@ import { PersistentPlayerWithRadio } from '@/components/music/PersistentPlayerWi
 import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
 import { CommandPaletteProvider } from '@/components/navigation/CommandPaletteProvider';
 import PWAInstallPrompt from '@/components/navigation/PWAInstallPrompt';
+import { OSBackButton } from '@/components/os/OSBackButton';
 
 export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSessionData();
+  let session;
+  try {
+    session = await getSessionData();
+  } catch {
+    // Supabase or session service down - redirect to landing with error hint
+    redirect('/?error=unavailable');
+  }
   if (!session) {
     redirect('/');
   }
@@ -36,6 +43,7 @@ export default async function AuthLayout({
         <CommandPaletteProvider />
         <PersistentPlayerWithRadio />
         <BottomNav />
+        <OSBackButton />
         <PWAInstallPrompt />
       </div>
     </AuthAudioProviders>

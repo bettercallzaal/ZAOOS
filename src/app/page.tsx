@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default async function LandingPage() {
   const session = await getSessionData();
   if (session) {
-    redirect('/home');
+    redirect('/os');
   }
 
   return (

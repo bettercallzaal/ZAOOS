@@ -20,7 +20,7 @@ See [FORK.md](./FORK.md) for full setup instructions including database and app 
 2. **Make your changes** following the conventions below
 3. **Run checks** before submitting:
    ```bash
-   npm run lint         # ESLint
+   npx biome check .    # Lint (Biome)
    npm run typecheck    # TypeScript
    npm run test         # Vitest
    npm run build        # Next.js build

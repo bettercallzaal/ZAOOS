@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { ResearchLinks } from './ResearchLinks';
 import { FestivalProgress } from './FestivalProgress';
+import { QuickAdd } from './QuickAdd';
 
 const FESTIVAL_DATE = new Date('2026-10-03T12:00:00-04:00');
 
@@ -131,6 +132,9 @@ export function PersonalHome({ member, allMembers, todos, sponsors, artists, mil
     <div className="space-y-6">
       {/* Festival-wide progress */}
       <FestivalProgress sponsors={sponsors} artists={artists} milestones={milestones} />
+
+      {/* Quick add */}
+      <QuickAdd currentMemberId={member.id} />
 
       {/* Welcome banner */}
       <div className="bg-gradient-to-br from-[#f5a623]/20 via-[#f5a623]/5 to-transparent rounded-xl p-5 border border-[#f5a623]/30">

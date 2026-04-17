@@ -12,6 +12,7 @@ import { BudgetTracker } from './BudgetTracker';
 import { MeetingNotes } from './MeetingNotes';
 import { PersonalHome } from './PersonalHome';
 import { OnboardingModal } from './OnboardingModal';
+import { SnapshotButton } from './SnapshotButton';
 import { useRouter } from 'next/navigation';
 
 type Tab = 'home' | 'overview' | 'sponsors' | 'artists' | 'timeline' | 'volunteers' | 'budget' | 'notes' | 'team';
@@ -179,15 +180,21 @@ export function Dashboard({
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-8 pb-16">
         {tab === 'home' && (
-          <PersonalHome
-            member={currentMember}
-            allMembers={members}
-            todos={todos}
-            sponsors={sponsors}
-            artists={artists}
-            milestones={milestones}
-            onNavigate={(t) => setTab(t)}
-          />
+          <>
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Snapshot</p>
+              <SnapshotButton sponsors={sponsors} artists={artists} milestones={milestones} budget={budget} />
+            </div>
+            <PersonalHome
+              member={currentMember}
+              allMembers={members}
+              todos={todos}
+              sponsors={sponsors}
+              artists={artists}
+              milestones={milestones}
+              onNavigate={(t) => setTab(t)}
+            />
+          </>
         )}
         {tab === 'overview' && (
           <>

@@ -16,3 +16,4 @@
 | 316 | [Agentic Bootcamp Week 2 Deep Dive](./316-farcaster-agentic-bootcamp-week2-deep-dive/) | CANONICAL | Sessions 6-9 full transcripts: Privy wallets, x402/MPP commerce, Emerge viral loop, ERC-8004 identity |
 | 317 | [Agentic Bootcamp Week 1 Transcripts](./317-farcaster-agentic-bootcamp-week1-transcripts/) | CANONICAL | Sessions 1-6 full transcripts: building blocks, miniapps, agents 101, memory/context, wallets, deploy |
 | 326 | [Agentic Bootcamp Complete Session Guide](./326-agentic-bootcamp-complete-session-guide/) | CANONICAL | All 10 sessions inventoried, cross-referenced across 6 docs, every technique extracted for ZABAL agent swarm |
+| 418 | [Birding Man Festival Analysis](./418-birding-man-festival-analysis/) | STANDALONE | Propagate/Ramble On Farm festival as reference model for ZAOstock — sliding-scale pricing, workshop tracks, partner framing |

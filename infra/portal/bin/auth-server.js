@@ -1,14 +1,18 @@
-// Cookie-based auth for *.zaoos.com. Served on :3005.
-// Caddy forward_auth queries /check. Login form POSTs /login.
+// Cookie-based auth for *.zaoos.com. Reads PORTAL_PASSWORD from env (no hardcoded).
 const http = require("http");
 const { readFileSync } = require("fs");
 const { URL } = require("url");
 const path = require("path");
 
-const PASSWORD = "qwerty1";  // TODO: pull from env; rotate via CF Access later
+const PASSWORD = process.env.PORTAL_PASSWORD || "";
 const TOKEN_FILE = path.join(process.env.HOME, ".auth-token");
 const TOKEN = readFileSync(TOKEN_FILE, "utf8").trim();
-const COOKIE_MAX_AGE = 30 * 24 * 3600;  // 30 days
+const COOKIE_MAX_AGE = 30 * 24 * 3600;
+
+if (!PASSWORD) {
+  console.error("FATAL: PORTAL_PASSWORD env var not set. Source ~/.env.portal before launching.");
+  process.exit(1);
+}
 
 function parseCookies(h) {
   const out = {};
@@ -35,7 +39,7 @@ function loginPage(err, next) {
     .err{color:#f87171;font-size:.85rem;margin-top:.4rem;min-height:1em}
   </style></head><body><div class="box">
     <h1>ZAO Portal</h1>
-    <p class="sub">Sign in once. Stays for 30 days on this device.</p>
+    <p class="sub">Sign in once. Stays 30 days on this device.</p>
     <form method="POST" action="/login">
       <input type="hidden" name="next" value="${String(next || "/").replace(/"/g, "&quot;")}">
       <input type="password" name="password" placeholder="password" autocomplete="current-password" autofocus required>
@@ -57,22 +61,15 @@ http.createServer((req, res) => {
   const fwdUri = req.headers["x-forwarded-uri"] || "/";
   const fwdHost = req.headers["x-forwarded-host"] || req.headers.host || "portal.zaoos.com";
 
-  // Forward-auth check: Caddy calls this before serving protected routes.
   if (u.pathname === "/check") {
-    if (cookies.zao_auth === TOKEN) {
-      res.writeHead(204); return res.end();
-    }
+    if (cookies.zao_auth === TOKEN) { res.writeHead(204); return res.end(); }
     res.writeHead(401); return res.end();
   }
-
-  // Login page (GET)
   if (u.pathname === "/login" && req.method === "GET") {
     const next = u.searchParams.get("next") || `https://${fwdHost}${fwdUri}`;
     res.writeHead(200, {"Content-Type":"text/html; charset=utf-8"});
     return res.end(loginPage(null, next));
   }
-
-  // Login form POST
   if (u.pathname === "/login" && req.method === "POST") {
     let body = "";
     req.on("data", c => body += c);
@@ -89,15 +86,11 @@ http.createServer((req, res) => {
     });
     return;
   }
-
-  // Logout
   if (u.pathname === "/logout") {
     res.setHeader("Set-Cookie", "zao_auth=; Max-Age=0; Domain=.zaoos.com; Path=/; HttpOnly; Secure; SameSite=Lax");
     res.writeHead(302, {Location: "https://portal.zaoos.com/login"});
     return res.end();
   }
-
-  // Anything else: show login page (Caddy sent us here because 401)
   res.writeHead(200, {"Content-Type":"text/html; charset=utf-8"});
   res.end(loginPage(null, `https://${fwdHost}${fwdUri}`));
 }).listen(3005, "127.0.0.1", () => console.log("auth-server on 127.0.0.1:3005"));

@@ -24,7 +24,7 @@ Top 5 ship-next to make the stack even more phone-useful:
 
 | Surface | Status | Evidence |
 |---------|--------|----------|
-| portal.zaoos.com | **200** | curl -u zaal:qwerty1 |
+| portal.zaoos.com | **200** | curl with cookie |
 | ao.zaoos.com | **200** | live |
 | claude.zaoos.com | **200** | live |
 | paperclip.zaoos.com | **200** | live |

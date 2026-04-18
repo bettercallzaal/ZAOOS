@@ -173,11 +173,23 @@ function handleSpawn(req, res) {
     const prompt = (payload.prompt || "").trim();
     if (!project || !prompt) return json(res, 400, { error: "project and prompt required" });
     const cwd = path.join(PROJECT_ROOT, project);
-    const ao = spawn(AO_BIN, ["spawn", "--prompt", prompt], {
-      cwd,
-      env: { ...process.env, PATH: `${process.env.HOME}/.local/bin:${process.env.PATH}` },
-      detached: true,
-      stdio: ["ignore", "pipe", "pipe"],
+    if (!existsSync(cwd)) {
+      return json(res, 400, { error: `project directory not found: ~/code/${project} (clone it first or pick an existing project)` });
+    }
+    let ao;
+    try {
+      ao = spawn(AO_BIN, ["spawn", "--prompt", prompt], {
+        cwd,
+        env: { ...process.env, PATH: `${process.env.HOME}/.local/bin:${process.env.PATH}` },
+        detached: true,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+    } catch (e) {
+      return json(res, 500, { error: "failed to spawn ao: " + (e.message || String(e)).slice(0, 200) });
+    }
+    ao.on("error", err => {
+      if (res.writableEnded) return;
+      json(res, 500, { error: "ao process error: " + (err.message || String(err)).slice(0, 200) });
     });
     let stdout = "", stderr = "";
     ao.stdout.on("data", c => stdout += c);

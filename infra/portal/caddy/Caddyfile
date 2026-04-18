@@ -17,11 +17,17 @@
 # ao.zaoos.com -> :3002 -> wrapper at /, /app/* proxies to AO :3001
 :3002 {
   import protected
-  @app path /app/*
-  reverse_proxy @app localhost:3001
-  root * /home/zaal/caddy/ao
-  try_files {path} /index.html
-  file_server
+  handle_path /app/* {
+    reverse_proxy localhost:3000
+  }
+  handle_path /app {
+    reverse_proxy localhost:3000
+  }
+  handle {
+    root * /home/zaal/caddy/ao
+    try_files {path} /index.html
+    file_server
+  }
 }
 
 # portal.zaoos.com -> :3003 -> static portal, /todos UI, backend API

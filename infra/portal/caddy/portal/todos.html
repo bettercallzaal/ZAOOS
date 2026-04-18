@@ -28,6 +28,8 @@
   button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
   button.ghost:active{border-color:var(--gold);color:var(--gold)}
   .hint{color:var(--muted);font-size:.7rem;margin-top:.3rem}
+  .tag-sugg{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted);font-size:.7rem;padding:.25rem .5rem;border-radius:999px;cursor:pointer;-webkit-appearance:none}
+  .tag-sugg:active{background:rgba(245,166,35,.12);color:var(--gold);border-color:var(--gold)}
 
   .filters{margin:1.2rem 0 .8rem 0;padding:.7rem;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.015)}
   .filters h2{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.5rem;font-weight:600}
@@ -83,17 +85,40 @@
         <option value="P3">P3</option>
       </select>
       <select id="project">
-        <option value="">no project</option>
-        <option value="ZAOOS">ZAOOS</option>
-        <option value="BetterCallZaal">BCZ</option>
-        <option value="COC">COC</option>
-        <option value="WaveWarZ">WaveWarZ</option>
-        <option value="ZAOstock">ZAOstock</option>
+        <optgroup label="work">
+          <option value="">no project</option>
+          <option value="ZAOOS">ZAOOS</option>
+          <option value="BetterCallZaal">BCZ</option>
+          <option value="COC">COC</option>
+          <option value="WaveWarZ">WaveWarZ</option>
+          <option value="ZAOstock">ZAOstock</option>
+        </optgroup>
+        <optgroup label="life">
+          <option value="Personal">Personal</option>
+          <option value="Health">Health</option>
+          <option value="Family">Family</option>
+          <option value="Finance">Finance</option>
+          <option value="Learning">Learning</option>
+          <option value="Errands">Errands</option>
+          <option value="Home">Home</option>
+        </optgroup>
       </select>
       <input id="tags" placeholder="#tags comma,separated">
       <button type="submit">Add</button>
     </div>
-    <div class="hint">Tip: enter = add + stay on form. shift+enter = newline.</div>
+    <div class="tag-suggest" style="display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.5rem">
+      <button type="button" class="tag-sugg" data-t="call">#call</button>
+      <button type="button" class="tag-sugg" data-t="errand">#errand</button>
+      <button type="button" class="tag-sugg" data-t="health">#health</button>
+      <button type="button" class="tag-sugg" data-t="bill">#bill</button>
+      <button type="button" class="tag-sugg" data-t="read">#read</button>
+      <button type="button" class="tag-sugg" data-t="buy">#buy</button>
+      <button type="button" class="tag-sugg" data-t="message">#message</button>
+      <button type="button" class="tag-sugg" data-t="bug">#bug</button>
+      <button type="button" class="tag-sugg" data-t="idea">#idea</button>
+      <button type="button" class="tag-sugg" data-t="book">#book</button>
+    </div>
+    <div class="hint">Tip: enter = add + stay on form. shift+enter = newline. tap a #tag to append.</div>
   </form>
 
   <details class="spam">
@@ -309,6 +334,15 @@ document.getElementById("addForm").addEventListener("submit", async (e) => {
   load();
 });
 
+document.querySelectorAll(".tag-sugg").forEach(el => {
+  el.addEventListener("click", () => {
+    const input = document.getElementById("tags");
+    const t = el.dataset.t;
+    const cur = input.value.split(/[,\s]+/).map(x => x.trim().replace(/^#/, "")).filter(Boolean);
+    if (!cur.includes(t)) cur.push(t);
+    input.value = cur.map(x => "#" + x).join(" ");
+  });
+});
 document.getElementById("text").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();

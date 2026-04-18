@@ -1,5 +1,43 @@
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 
+export interface StockCounts {
+  volunteers: number;
+  rsvps: number;
+  sponsorsCommitted: number;
+  sponsorsCommittedAmount: number;
+}
+
+export async function getStockCounts(): Promise<StockCounts> {
+  const supabase = getSupabaseAdmin();
+
+  const [vRes, rRes, sRes] = await Promise.allSettled([
+    supabase.from('stock_volunteers').select('id', { count: 'exact', head: true }),
+    supabase
+      .from('event_rsvps')
+      .select('id', { count: 'exact', head: true })
+      .eq('event_slug', 'zao-stock-2026'),
+    supabase
+      .from('stock_sponsors')
+      .select('amount_committed, status')
+      .in('status', ['committed', 'paid']),
+  ]);
+
+  const volunteers = vRes.status === 'fulfilled' ? vRes.value.count || 0 : 0;
+  const rsvps = rRes.status === 'fulfilled' ? rRes.value.count || 0 : 0;
+
+  let sponsorsCommitted = 0;
+  let sponsorsCommittedAmount = 0;
+  if (sRes.status === 'fulfilled' && sRes.value.data) {
+    sponsorsCommitted = sRes.value.data.length;
+    sponsorsCommittedAmount = sRes.value.data.reduce(
+      (sum, s) => sum + Number(s.amount_committed || 0),
+      0,
+    );
+  }
+
+  return { volunteers, rsvps, sponsorsCommitted, sponsorsCommittedAmount };
+}
+
 export interface PublicMember {
   id: string;
   name: string;

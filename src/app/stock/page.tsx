@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { CountdownTimer } from '@/components/events/CountdownTimer';
 import { RSVPForm } from './RSVPForm';
-import { getPublicMembers, type PublicMember } from '@/lib/stock/members';
+import { getPublicMembers, getStockCounts, type PublicMember } from '@/lib/stock/members';
 import { PublicTeamGrid } from './PublicTeamGrid';
 
 export const dynamic = 'force-dynamic';
@@ -65,7 +65,11 @@ const PARTNERS = [
 ];
 
 export default async function StockPage() {
-  const publicMembers: PublicMember[] = await getPublicMembers();
+  const [publicMembers, counts] = await Promise.all([
+    getPublicMembers(),
+    getStockCounts(),
+  ]);
+  const typedMembers: PublicMember[] = publicMembers;
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-12">
@@ -96,7 +100,7 @@ export default async function StockPage() {
               Sponsors
             </Link>
             <Link
-              href="/stock/team"
+              href="/stock#team"
               className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
             >
               Team
@@ -174,9 +178,9 @@ export default async function StockPage() {
         </section>
 
         {/* Team */}
-        <section className="space-y-3">
+        <section id="team" className="space-y-3 scroll-mt-20">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">The Team</p>
-          <PublicTeamGrid members={publicMembers} />
+          <PublicTeamGrid members={typedMembers} />
           <p className="text-[11px] text-gray-600 italic px-1">
             Tap any name for their full bio and links.
           </p>
@@ -204,13 +208,23 @@ export default async function StockPage() {
         <section className="space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Join The Crew</p>
           <div className="bg-gradient-to-br from-[#f5a623]/15 via-[#f5a623]/5 to-transparent rounded-xl p-5 border border-[#f5a623]/30">
-            <p className="text-lg font-bold text-white">Volunteer at ZAOstock</p>
-            <p className="text-sm text-gray-300 mt-1 mb-4">
-              Festival built by the community. If you want in on setup, check-in, stage crew, content, teardown, or anything in between, sign up below.
-            </p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-bold text-white">Volunteer at ZAOstock</p>
+                <p className="text-sm text-gray-300 mt-1">
+                  Festival built by the community. Setup, check-in, stage crew, content, teardown, or anything in between - sign up below.
+                </p>
+              </div>
+              {counts.volunteers > 0 && (
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-2xl font-bold text-[#f5a623]">{counts.volunteers}</p>
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">signed up</p>
+                </div>
+              )}
+            </div>
             <Link
               href="/stock/apply"
-              className="inline-block bg-[#f5a623] hover:bg-[#ffd700] text-black font-bold rounded-lg px-4 py-2.5 text-sm transition-colors"
+              className="inline-block bg-[#f5a623] hover:bg-[#ffd700] text-black font-bold rounded-lg px-4 py-2.5 text-sm transition-colors mt-4"
             >
               Sign up to volunteer -&gt;
             </Link>
@@ -221,10 +235,20 @@ export default async function StockPage() {
         <section className="space-y-3">
           <p className="text-xs text-gray-500 uppercase tracking-wider px-1">RSVP</p>
           <div className="bg-gradient-to-r from-[#f5a623]/10 to-[#ffd700]/5 rounded-xl p-5 border border-[#f5a623]/30">
-            <p className="text-lg font-bold text-white">Get Notified</p>
-            <p className="text-sm text-gray-400 mt-1 mb-4">
-              Be the first to know when tickets drop, the lineup is announced, and more.
-            </p>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-lg font-bold text-white">Get Notified</p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Be the first to know when tickets drop, the lineup is announced, and more.
+                </p>
+              </div>
+              {counts.rsvps > 0 && (
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-2xl font-bold text-[#f5a623]">{counts.rsvps}</p>
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">on the list</p>
+                </div>
+              )}
+            </div>
             <RSVPForm eventSlug="zao-stock-2026" />
           </div>
         </section>
@@ -287,6 +311,14 @@ export default async function StockPage() {
             </div>
           </div>
         </section>
+
+        {/* Footer: team login */}
+        <footer className="pt-4 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-gray-600">
+          <span>ZAOstock &middot; Oct 3, 2026 &middot; Ellsworth ME</span>
+          <Link href="/stock/team" className="hover:text-[#f5a623] transition-colors">
+            Team dashboard login -&gt;
+          </Link>
+        </footer>
       </div>
     </div>
   );

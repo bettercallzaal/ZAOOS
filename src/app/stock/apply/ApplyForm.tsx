@@ -64,10 +64,10 @@ export function ApplyForm({ roles, shifts }: { roles: RoleOption[]; shifts: Shif
         <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold">You are in</p>
         <h2 className="text-xl font-bold text-white">Thanks, {name || 'friend'}.</h2>
         <p className="text-sm text-gray-300">
-          We got your application. Someone from the ZAOstock crew will follow up in the next few days with shift details and a crew kickoff message.
+          Your signup landed in the ZAOstock team dashboard. A team lead will reach out within a few days with shift details and a crew kickoff message.
         </p>
         <p className="text-xs text-gray-500">
-          Questions in the meantime? Reply to the confirmation email or DM on Farcaster.
+          Questions before then? DM Zaal on Farcaster.
         </p>
       </div>
     );

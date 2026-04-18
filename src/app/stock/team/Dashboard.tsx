@@ -13,9 +13,10 @@ import { MeetingNotes } from './MeetingNotes';
 import { PersonalHome } from './PersonalHome';
 import { OnboardingModal } from './OnboardingModal';
 import { SnapshotButton } from './SnapshotButton';
+import { RsvpList } from './RsvpList';
 import { useRouter } from 'next/navigation';
 
-type Tab = 'home' | 'overview' | 'sponsors' | 'artists' | 'timeline' | 'volunteers' | 'budget' | 'notes' | 'team';
+type Tab = 'home' | 'overview' | 'sponsors' | 'artists' | 'timeline' | 'volunteers' | 'rsvps' | 'budget' | 'notes' | 'team';
 
 interface Sponsor {
   id: string;
@@ -101,6 +102,13 @@ interface Note {
   created_at: string;
 }
 
+interface Rsvp {
+  id: string;
+  name: string;
+  email: string;
+  created_at: string;
+}
+
 interface Props {
   memberName: string;
   memberId: string;
@@ -111,6 +119,7 @@ interface Props {
   artists: Artist[];
   milestones: Milestone[];
   volunteers: Volunteer[];
+  rsvps: Rsvp[];
   budget: BudgetEntry[];
   meetingNotes: Note[];
 }
@@ -125,11 +134,18 @@ export function Dashboard({
   artists,
   milestones,
   volunteers,
+  rsvps,
   budget,
   meetingNotes,
 }: Props) {
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>('home');
+  const [tab, setTabRaw] = useState<Tab>('home');
+  const [showMore, setShowMore] = useState(false);
+
+  function setTab(t: Tab) {
+    setTabRaw(t);
+    if (t !== 'home') setShowMore(true);
+  }
 
   async function handleLogout() {
     await fetch('/api/stock/team/logout', { method: 'POST' });
@@ -155,26 +171,48 @@ export function Dashboard({
             </button>
           </div>
         </div>
-        <div className="max-w-2xl mx-auto px-4 pb-2 flex gap-1 overflow-x-auto">
+        <div className="max-w-2xl mx-auto px-4 pb-2 flex gap-1 overflow-x-auto items-center">
           <TabButton active={tab === 'home'} onClick={() => setTab('home')}>Home</TabButton>
-          <TabButton active={tab === 'overview'} onClick={() => setTab('overview')}>Overview</TabButton>
-          <TabButton active={tab === 'sponsors'} onClick={() => setTab('sponsors')}>
-            Sponsors <span className="ml-1 text-[10px] text-gray-500">{sponsors.length}</span>
-          </TabButton>
-          <TabButton active={tab === 'artists'} onClick={() => setTab('artists')}>
-            Artists <span className="ml-1 text-[10px] text-gray-500">{artists.length}</span>
-          </TabButton>
-          <TabButton active={tab === 'timeline'} onClick={() => setTab('timeline')}>
-            Timeline <span className="ml-1 text-[10px] text-gray-500">{milestones.length}</span>
-          </TabButton>
-          <TabButton active={tab === 'volunteers'} onClick={() => setTab('volunteers')}>
-            Volunteers <span className="ml-1 text-[10px] text-gray-500">{volunteers.length}</span>
-          </TabButton>
-          <TabButton active={tab === 'budget'} onClick={() => setTab('budget')}>Budget</TabButton>
-          <TabButton active={tab === 'notes'} onClick={() => setTab('notes')}>
-            Notes <span className="ml-1 text-[10px] text-gray-500">{meetingNotes.length}</span>
-          </TabButton>
-          <TabButton active={tab === 'team'} onClick={() => setTab('team')}>Team</TabButton>
+          {!showMore && (
+            <button
+              onClick={() => setShowMore(true)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 border border-transparent hover:text-white hover:bg-white/[0.04] whitespace-nowrap"
+            >
+              More details -&gt;
+            </button>
+          )}
+          {showMore && (
+            <>
+              <TabButton active={tab === 'overview'} onClick={() => setTab('overview')}>Overview</TabButton>
+              <TabButton active={tab === 'sponsors'} onClick={() => setTab('sponsors')}>
+                Sponsors <span className="ml-1 text-[10px] text-gray-500">{sponsors.length}</span>
+              </TabButton>
+              <TabButton active={tab === 'artists'} onClick={() => setTab('artists')}>
+                Artists <span className="ml-1 text-[10px] text-gray-500">{artists.length}</span>
+              </TabButton>
+              <TabButton active={tab === 'timeline'} onClick={() => setTab('timeline')}>
+                Timeline <span className="ml-1 text-[10px] text-gray-500">{milestones.length}</span>
+              </TabButton>
+              <TabButton active={tab === 'volunteers'} onClick={() => setTab('volunteers')}>
+                Volunteers <span className="ml-1 text-[10px] text-gray-500">{volunteers.length}</span>
+              </TabButton>
+              <TabButton active={tab === 'rsvps'} onClick={() => setTab('rsvps')}>
+                RSVPs <span className="ml-1 text-[10px] text-gray-500">{rsvps.length}</span>
+              </TabButton>
+              <TabButton active={tab === 'budget'} onClick={() => setTab('budget')}>Budget</TabButton>
+              <TabButton active={tab === 'notes'} onClick={() => setTab('notes')}>
+                Notes <span className="ml-1 text-[10px] text-gray-500">{meetingNotes.length}</span>
+              </TabButton>
+              <TabButton active={tab === 'team'} onClick={() => setTab('team')}>Team</TabButton>
+              <button
+                onClick={() => { setShowMore(false); setTab('home'); }}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-500 border border-transparent hover:text-gray-300 whitespace-nowrap"
+                title="Collapse extra tabs"
+              >
+                &lt;- Less
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -206,7 +244,24 @@ export function Dashboard({
         {tab === 'sponsors' && <SponsorCRM sponsors={sponsors} members={memberList} />}
         {tab === 'artists' && <ArtistPipeline artists={artists} members={memberList} />}
         {tab === 'timeline' && <Timeline milestones={milestones} members={memberList} />}
-        {tab === 'volunteers' && <VolunteerRoster volunteers={volunteers} />}
+        {tab === 'volunteers' && (
+          <>
+            <CalloutBanner
+              title="Where do these come from?"
+              body="Every row here is someone who submitted the form at /stock/apply. New rows land as unconfirmed. Confirm or reassign a row as shifts firm up."
+            />
+            <VolunteerRoster volunteers={volunteers} />
+          </>
+        )}
+        {tab === 'rsvps' && (
+          <>
+            <CalloutBanner
+              title="Where do these come from?"
+              body="Every row is someone who submitted the RSVP form on the /stock landing page. This is your marketing list. Notify them when tickets drop and when the lineup is announced."
+            />
+            <RsvpList rsvps={rsvps} />
+          </>
+        )}
         {tab === 'budget' && <BudgetTracker entries={budget} />}
         {tab === 'notes' && <MeetingNotes notes={meetingNotes} members={memberList} />}
         {tab === 'team' && <TeamRoles members={members} />}
@@ -227,5 +282,14 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
     >
       {children}
     </button>
+  );
+}
+
+function CalloutBanner({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="bg-[#f5a623]/10 border border-[#f5a623]/30 rounded-lg p-3 mb-4">
+      <p className="text-[10px] text-[#f5a623] uppercase tracking-wider font-bold">{title}</p>
+      <p className="text-xs text-gray-300 mt-1 leading-relaxed">{body}</p>
+    </div>
   );
 }

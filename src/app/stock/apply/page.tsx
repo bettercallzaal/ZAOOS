@@ -54,7 +54,6 @@ export default function ApplyPage() {
           <ul className="text-sm text-gray-300 space-y-1.5">
             <li>- Free entry to the festival for the day</li>
             <li>- A ZAOstock crew shirt</li>
-            <li>- Food and water covered during your shift</li>
             <li>- First look at next year and standing invite to future ZAO events</li>
             <li>- The satisfaction of building something local from scratch</li>
           </ul>

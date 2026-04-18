@@ -53,7 +53,7 @@ export function PhoneShell({
   const dateStr = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
 
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-[#0a1628] pb-20">
+    <div className="flex min-h-[100dvh] flex-col bg-[#0a1628] pb-[calc(5rem+env(safe-area-inset-bottom,0px))]">
       {/* Status bar */}
       <div className="mx-auto w-full max-w-4xl">
         <div className="flex items-center justify-between px-4 pt-6 pb-1 sm:px-8">
@@ -61,7 +61,7 @@ export function PhoneShell({
             type="button"
             aria-label="Change shell layout"
             onClick={() => setShowShellPicker(true)}
-            className="rounded-lg p-2 text-xs text-white/60 transition-colors hover:bg-white/5 hover:text-white/80 focus-visible:ring-2 focus-visible:ring-[#f5a623]"
+            className="rounded-lg p-3 text-xs min-h-[44px] min-w-[44px] text-white/60 transition-colors hover:bg-white/5 hover:text-white/80 focus-visible:ring-2 focus-visible:ring-[#f5a623]"
           >
             📱 Shell
           </button>
@@ -73,7 +73,7 @@ export function PhoneShell({
             type="button"
             aria-label="Settings"
             onClick={() => router.push('/settings')}
-            className="rounded-lg p-2 text-xs text-white/60 transition-colors hover:bg-white/5 hover:text-white/80 focus-visible:ring-2 focus-visible:ring-[#f5a623]"
+            className="rounded-lg p-3 text-xs min-h-[44px] min-w-[44px] text-white/60 transition-colors hover:bg-white/5 hover:text-white/80 focus-visible:ring-2 focus-visible:ring-[#f5a623]"
           >
             ⚙️
           </button>
@@ -113,7 +113,7 @@ export function PhoneShell({
             </button>
           </div>
           {resolvedApps.length > 0 ? (
-            <div className="grid grid-cols-4 gap-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
               {resolvedApps.map((app) => (
                 <AppIcon
                   key={app.id}

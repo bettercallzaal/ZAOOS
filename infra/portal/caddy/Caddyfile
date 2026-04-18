@@ -1,0 +1,61 @@
+{
+  auto_https off
+}
+
+# Shared cookie-auth via forward_auth -> auth-server :3005.
+(protected) {
+  forward_auth localhost:3005 {
+    uri /check
+    copy_headers Cookie
+    @401 status 401
+    handle_response @401 {
+      reverse_proxy localhost:3005
+    }
+  }
+}
+
+# ao.zaoos.com -> :3002 -> wrapper at /, /app/* proxies to AO :3001
+:3002 {
+  import protected
+  @app path /app/*
+  reverse_proxy @app localhost:3001
+  root * /home/zaal/caddy/ao
+  try_files {path} /index.html
+  file_server
+}
+
+# portal.zaoos.com -> :3003 -> static portal, /todos UI, backend API
+:3003 {
+  import protected
+
+  @backend path /spawn-action /api/spawn /test-checklist /test-done /api/todos /api/todos/*
+  reverse_proxy @backend localhost:3004
+
+  @todosPage path /todos
+  handle @todosPage {
+    rewrite * /todos.html
+    root * /home/zaal/caddy/portal
+    file_server
+  }
+
+  root * /home/zaal/caddy/portal
+  file_server
+}
+
+# claude.zaoos.com -> :7682 -> wrapper at /, /terminal/* proxies to ttyd :7681
+:7682 {
+  import protected
+  @term path /terminal/* /terminal
+  handle @term {
+    uri strip_prefix /terminal
+    reverse_proxy localhost:7681
+  }
+  root * /home/zaal/caddy/claude
+  try_files {path} /index.html
+  file_server
+}
+
+# Auth endpoints (login page, /check, /logout) always accessible
+:3006 {
+  reverse_proxy localhost:3005
+}

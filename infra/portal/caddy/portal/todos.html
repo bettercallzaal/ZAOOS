@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1628">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Todos">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="apple-touch-icon" href="/icon.svg">
+<title>Todos - ZAO</title>
+<style>
+  :root{--bg:#0a1628;--panel:#0f1f36;--ink:#f5f4ed;--muted:#94a3b8;--gold:#f5a623;--line:rgba(255,255,255,.1);--green:#4ade80;--red:#f87171;--blue:#60a5fa;--violet:#a78bfa}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:1rem;padding-top:max(1rem,env(safe-area-inset-top));padding-bottom:calc(max(1rem,env(safe-area-inset-bottom)) + 64px)}
+  header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.8rem}
+  h1{font-size:1.4rem;font-weight:600}
+  .count{color:var(--muted);font-size:.8rem}
+  textarea{width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:.7rem;font:inherit;font-size:.95rem;min-height:70px;resize:vertical}
+  textarea:focus{outline:none;border-color:var(--gold)}
+  .add-row{display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap;align-items:center}
+  .add-row select,.add-row input{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.5rem;font:inherit;font-size:.85rem}
+  .add-row input{flex:1 1 150px}
+  .add-row select{flex:0 0 auto}
+  button{background:var(--gold);color:var(--bg);border:0;border-radius:6px;padding:.55rem .9rem;font-weight:600;font-size:.9rem;-webkit-appearance:none;cursor:pointer}
+  button:active{background:#d38b11}
+  button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+  button.ghost:active{border-color:var(--gold);color:var(--gold)}
+  .hint{color:var(--muted);font-size:.7rem;margin-top:.3rem}
+
+  .filters{margin:1.2rem 0 .8rem 0;padding:.7rem;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.015)}
+  .filters h2{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.5rem;font-weight:600}
+  .filter-group{display:flex;gap:.3rem;overflow-x:auto;padding-bottom:.3rem;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin-bottom:.4rem}
+  .filter-group::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;padding:.3rem .65rem;font-size:.72rem;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;-webkit-appearance:none;white-space:nowrap}
+  .chip.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+  .chip.active.p0{background:var(--red);border-color:var(--red);color:#fff}
+  .chip.active.p1{background:var(--gold);border-color:var(--gold)}
+  .chip.active.p2{background:var(--blue);border-color:var(--blue);color:#fff}
+  .chip.active.p3{background:var(--violet);border-color:var(--violet);color:#fff}
+  .search{width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.5rem;font:inherit;font-size:.9rem}
+  .clear-filters{color:var(--muted);font-size:.7rem;background:none;border:0;text-decoration:underline;padding:0;cursor:pointer}
+
+  ul.todos{list-style:none;margin-top:.5rem}
+  ul.todos li{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;margin-bottom:.4rem;display:flex;gap:.55rem;align-items:flex-start}
+  ul.todos li.done{opacity:.55}
+  ul.todos li.done .text{text-decoration:line-through}
+  .check{flex:0 0 auto;width:22px;height:22px;border:2px solid var(--line);border-radius:5px;cursor:pointer;margin-top:.1rem;display:flex;align-items:center;justify-content:center;background:transparent;-webkit-appearance:none}
+  .check.checked{background:var(--green);border-color:var(--green)}
+  .body{flex:1 1 auto;min-width:0}
+  .text{color:var(--ink);font-size:.92rem;line-height:1.35;word-break:break-word}
+  .meta{color:var(--muted);font-size:.7rem;margin-top:.2rem;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+  .pri{font-weight:700;letter-spacing:.05em}
+  .pri-P0{color:var(--red)}.pri-P1{color:var(--gold)}.pri-P2{color:var(--blue)}.pri-P3{color:var(--violet)}
+  .tag{background:rgba(245,166,35,.1);color:var(--gold);padding:.05rem .35rem;border-radius:3px;font-size:.65rem}
+  .row-actions{flex:0 0 auto;display:flex;gap:.3rem}
+  .row-actions button{background:transparent;border:1px solid var(--line);color:var(--muted);padding:.25rem .5rem;font-size:.7rem;border-radius:5px}
+  .row-actions button:active{color:var(--gold);border-color:var(--gold)}
+  .row-actions .del:active{color:var(--red);border-color:var(--red)}
+
+  .empty{color:var(--muted);text-align:center;padding:2rem 0;font-size:.9rem}
+
+  details.spam{margin-top:.8rem;background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:.6rem .8rem}
+  details.spam summary{cursor:pointer;color:var(--gold);font-size:.85rem;font-weight:600}
+  details.spam textarea{margin-top:.5rem;min-height:130px}
+  details.spam .spam-hint{font-size:.7rem;color:var(--muted);margin-top:.3rem}
+</style>
+</head>
+<body>
+  <header>
+    <h1>Todos</h1>
+    <span class="count" id="count"></span>
+  </header>
+
+  <form id="addForm">
+    <textarea id="text" placeholder="brain dump one todo..." required></textarea>
+    <div class="add-row">
+      <select id="priority">
+        <option value="P0">P0</option>
+        <option value="P1">P1</option>
+        <option value="P2" selected>P2</option>
+        <option value="P3">P3</option>
+      </select>
+      <select id="project">
+        <option value="">no project</option>
+        <option value="ZAOOS">ZAOOS</option>
+        <option value="BetterCallZaal">BCZ</option>
+        <option value="COC">COC</option>
+        <option value="WaveWarZ">WaveWarZ</option>
+        <option value="ZAOstock">ZAOstock</option>
+      </select>
+      <input id="tags" placeholder="#tags comma,separated">
+      <button type="submit">Add</button>
+    </div>
+    <div class="hint">Tip: enter = add + stay on form. shift+enter = newline.</div>
+  </form>
+
+  <details class="spam">
+    <summary>Bulk add (one per line)</summary>
+    <textarea id="spam" placeholder="line 1&#10;line 2&#10;line 3"></textarea>
+    <div class="add-row">
+      <select id="spamPriority">
+        <option value="P0">P0</option>
+        <option value="P1">P1</option>
+        <option value="P2" selected>P2</option>
+        <option value="P3">P3</option>
+      </select>
+      <input id="spamTags" placeholder="#tags apply to all">
+      <button id="spamBtn" type="button">Add all</button>
+    </div>
+    <div class="spam-hint">One todo per line. Blank lines skipped.</div>
+  </details>
+
+  <div class="filters">
+    <h2>Status</h2>
+    <div class="filter-group" id="statusChips">
+      <button class="chip active" data-k="status" data-v="open">Open</button>
+      <button class="chip" data-k="status" data-v="doing">Doing</button>
+      <button class="chip" data-k="status" data-v="done">Done</button>
+      <button class="chip" data-k="status" data-v="archived">Archived</button>
+    </div>
+    <h2>Priority</h2>
+    <div class="filter-group" id="priorityChips">
+      <button class="chip p0" data-k="priority" data-v="P0">P0</button>
+      <button class="chip p1" data-k="priority" data-v="P1">P1</button>
+      <button class="chip p2" data-k="priority" data-v="P2">P2</button>
+      <button class="chip p3" data-k="priority" data-v="P3">P3</button>
+    </div>
+    <h2>Tags</h2>
+    <div class="filter-group" id="tagChips"></div>
+    <h2>Search</h2>
+    <input class="search" id="search" placeholder="search text, notes, tags...">
+    <div style="margin-top:.5rem;display:flex;justify-content:space-between;align-items:center">
+      <button type="button" class="clear-filters" id="clearFilters">clear filters</button>
+      <select id="order" style="background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.35rem;font-size:.75rem">
+        <option value="priority">By priority</option>
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+      </select>
+    </div>
+  </div>
+
+  <ul class="todos" id="list"></ul>
+  <div class="empty" id="empty" style="display:none">No todos match these filters.</div>
+
+<script>
+const filters = { status: ["open"], priority: [], tag: null, q: "", order: "priority" };
+let allTags = [];
+let total = 0;
+
+function buildQuery() {
+  const p = new URLSearchParams();
+  for (const s of filters.status) p.append("status", s);
+  for (const pr of filters.priority) p.append("priority", pr);
+  if (filters.tag) p.set("tag", filters.tag);
+  if (filters.q) p.set("q", filters.q);
+  p.set("order", filters.order);
+  return p.toString();
+}
+
+async function fetchTodos() {
+  const res = await fetch("/api/todos?" + buildQuery(), { headers: { "Accept": "application/json" } });
+  if (!res.ok) throw new Error("fetch failed " + res.status);
+  return res.json();
+}
+
+function priClass(p) { return "pri pri-" + (p || "P2"); }
+
+function render(data) {
+  const list = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  list.innerHTML = "";
+  total = data.total;
+  document.getElementById("count").textContent = data.todos.length + " of " + total;
+  if (!data.todos.length) { empty.style.display = ""; } else { empty.style.display = "none"; }
+  for (const t of data.todos) {
+    const li = document.createElement("li");
+    if (t.status === "done" || t.status === "archived") li.classList.add("done");
+    const check = document.createElement("button");
+    check.type = "button";
+    check.className = "check" + (t.status === "done" ? " checked" : "");
+    check.title = "mark " + (t.status === "done" ? "open" : "done");
+    check.textContent = t.status === "done" ? "\u2713" : "";
+    check.style.color = "#0a1628";
+    check.addEventListener("click", async () => {
+      await fetch("/api/todos/" + t.id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: t.status === "done" ? "open" : "done" }) });
+      load();
+    });
+    li.appendChild(check);
+
+    const body = document.createElement("div");
+    body.className = "body";
+    const text = document.createElement("div");
+    text.className = "text";
+    text.textContent = t.text;
+    body.appendChild(text);
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const pri = document.createElement("span"); pri.className = priClass(t.priority); pri.textContent = t.priority || "P2"; meta.appendChild(pri);
+    if (t.project) { const pr = document.createElement("span"); pr.textContent = t.project; meta.appendChild(pr); }
+    for (const tg of (t.tags || [])) { const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = "#" + tg; meta.appendChild(tag); }
+    const when = document.createElement("span"); when.textContent = relTime(t.created_at); meta.appendChild(when);
+    body.appendChild(meta);
+    li.appendChild(body);
+
+    const actions = document.createElement("div");
+    actions.className = "row-actions";
+    const bump = document.createElement("button"); bump.textContent = "bump"; bump.title = "raise priority";
+    bump.addEventListener("click", async () => {
+      const next = t.priority === "P3" ? "P2" : t.priority === "P2" ? "P1" : t.priority === "P1" ? "P0" : "P0";
+      await fetch("/api/todos/" + t.id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ priority: next }) });
+      load();
+    });
+    const spawn = document.createElement("button"); spawn.textContent = "spawn"; spawn.title = "open portal spawn with this text";
+    spawn.addEventListener("click", () => {
+      const u = new URL("https://portal.zaoos.com/");
+      u.searchParams.set("prefill", t.text);
+      u.searchParams.set("project", t.project || "ZAOOS");
+      window.location.href = u.toString();
+    });
+    const del = document.createElement("button"); del.className = "del"; del.textContent = "x"; del.title = "delete";
+    del.addEventListener("click", async () => {
+      if (!confirm("delete this todo?")) return;
+      await fetch("/api/todos/" + t.id, { method: "DELETE" });
+      load();
+    });
+    actions.appendChild(bump); actions.appendChild(spawn); actions.appendChild(del);
+    li.appendChild(actions);
+    list.appendChild(li);
+  }
+  renderTagChips(data.tags);
+}
+
+function renderTagChips(tags) {
+  allTags = tags || [];
+  const container = document.getElementById("tagChips");
+  const current = filters.tag;
+  container.innerHTML = "";
+  const all = document.createElement("button");
+  all.className = "chip" + (!current ? " active" : "");
+  all.textContent = "all";
+  all.addEventListener("click", () => { filters.tag = null; load(); });
+  container.appendChild(all);
+  for (const t of allTags) {
+    const b = document.createElement("button");
+    b.className = "chip" + (current === t ? " active" : "");
+    b.textContent = "#" + t;
+    b.addEventListener("click", () => { filters.tag = current === t ? null : t; load(); });
+    container.appendChild(b);
+  }
+}
+
+function relTime(iso) {
+  if (!iso) return "";
+  const ms = Date.now() - new Date(iso).getTime();
+  const s = Math.floor(ms / 1000);
+  if (s < 60) return s + "s";
+  const m = Math.floor(s / 60);
+  if (m < 60) return m + "m";
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + "h";
+  return Math.floor(h / 24) + "d";
+}
+
+async function load() {
+  try { const data = await fetchTodos(); render(data); }
+  catch (e) { document.getElementById("empty").textContent = "Error: " + e.message; document.getElementById("empty").style.display = ""; }
+}
+
+document.querySelectorAll("#statusChips .chip, #priorityChips .chip").forEach(el => {
+  el.addEventListener("click", () => {
+    const k = el.dataset.k; const v = el.dataset.v;
+    const arr = filters[k];
+    const i = arr.indexOf(v);
+    if (i >= 0) arr.splice(i, 1); else arr.push(v);
+    el.classList.toggle("active");
+    load();
+  });
+});
+
+document.getElementById("clearFilters").addEventListener("click", () => {
+  filters.status = ["open"]; filters.priority = []; filters.tag = null; filters.q = ""; filters.order = "priority";
+  document.getElementById("search").value = "";
+  document.querySelectorAll("#statusChips .chip").forEach(el => el.classList.toggle("active", el.dataset.v === "open"));
+  document.querySelectorAll("#priorityChips .chip").forEach(el => el.classList.remove("active"));
+  document.getElementById("order").value = "priority";
+  load();
+});
+
+let searchTimer;
+document.getElementById("search").addEventListener("input", (e) => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { filters.q = e.target.value; load(); }, 250);
+});
+document.getElementById("order").addEventListener("change", (e) => { filters.order = e.target.value; load(); });
+
+document.getElementById("addForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const text = document.getElementById("text").value.trim();
+  if (!text) return;
+  const priority = document.getElementById("priority").value;
+  const project = document.getElementById("project").value;
+  const tags = document.getElementById("tags").value;
+  await fetch("/api/todos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, priority, project, tags }) });
+  document.getElementById("text").value = "";
+  document.getElementById("tags").value = "";
+  document.getElementById("text").focus();
+  load();
+});
+
+document.getElementById("text").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    document.getElementById("addForm").dispatchEvent(new Event("submit"));
+  }
+});
+
+document.getElementById("spamBtn").addEventListener("click", async () => {
+  const lines = document.getElementById("spam").value.split("\n").map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return;
+  const priority = document.getElementById("spamPriority").value;
+  const tags = document.getElementById("spamTags").value;
+  const items = lines.map(text => ({ text, priority, tags }));
+  await fetch("/api/todos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items }) });
+  document.getElementById("spam").value = "";
+  load();
+});
+
+load();
+setInterval(load, 30000);
+</script>
+<script src="/dock.js" defer></script>
+</body>
+</html>

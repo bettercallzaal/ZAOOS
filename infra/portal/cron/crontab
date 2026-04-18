@@ -1,0 +1,13 @@
+
+# ZAO OS cron jobs (moved from Vercel to save Fluid Compute CPU)
+*/15 * * * * /home/zaal/.claude/git-sync.sh
+0 0 * * 0 /home/zaal/zaoos-crons.sh health-snapshot >> /tmp/zaoos-cron.log 2>&1
+0 13 11 4 * /home/zaal/zoe-bot/send-coc4.sh >> /tmp/coc4-send.log 2>&1
+0 2 * * * /home/zaal/zaoos-crons.sh daily-digest >> /tmp/zaoos-cron.log 2>&1
+0 23 * * * /home/zaal/zaoos-crons.sh wavewarz-sync >> /tmp/zaoos-cron.log 2>&1
+0 6 * * * /home/zaal/zaoos-crons.sh follower-snapshot >> /tmp/zaoos-cron.log 2>&1
+0 8 * * * /home/zaal/nightly-research.sh >> /home/zaal/hermes-workspace/reports/cron.log 2>&1
+@reboot /home/zaal/pixel-startup.sh >> /tmp/pixel-startup.log 2>&1
+@reboot /home/zaal/bin/start-agents.sh
+* * * * * /home/zaal/bin/watchdog.sh
+*/15 * * * * /home/zaal/bin/test-checklist-ping.sh >> /home/zaal/test-checklist/cron.log 2>&1

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a1628">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ZAO">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="apple-touch-icon" href="/icon.svg">
+<title>ZAO Agent Portal</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;background:#0a1628;color:#f5f4ed;min-height:100vh;padding:1.25rem;padding-top:max(1.25rem,env(safe-area-inset-top));padding-bottom:calc(max(1.25rem,env(safe-area-inset-bottom)) + 64px);padding-left:max(1.25rem,env(safe-area-inset-left));padding-right:max(1.25rem,env(safe-area-inset-right))}
+  h1{font-size:1.6rem;margin-bottom:.2rem;font-weight:600}
+  p.sub{color:#94a3b8;margin-bottom:1.25rem;font-size:.85rem}
+  section{margin-bottom:1.5rem}
+  h2{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:.6rem;font-weight:600}
+  form.spawn{border:1px solid rgba(245,166,35,.35);border-radius:8px;padding:1rem;background:rgba(245,166,35,.03)}
+  form.spawn textarea{width:100%;min-height:70px;background:#0f1f36;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:.65rem;color:#f5f4ed;font-family:inherit;font-size:.95rem;resize:vertical}
+  form.spawn textarea:focus{outline:none;border-color:#f5a623}
+  form.spawn .row{display:flex;gap:.5rem;margin-top:.6rem;align-items:center;flex-wrap:wrap}
+  form.spawn select{flex:0 0 auto;background:#0f1f36;color:#f5f4ed;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:.5rem;font-size:.85rem}
+  form.spawn button{flex:1;min-width:100px;background:#f5a623;color:#0a1628;border:0;border-radius:6px;padding:.65rem;font-weight:600;font-size:.95rem;-webkit-appearance:none}
+  form.spawn button:active{background:#d38b11}
+  form.spawn button:disabled{opacity:.6}
+  form.spawn .result{margin-top:.6rem;font-size:.8rem;color:#94a3b8;min-height:1em;white-space:pre-wrap;word-break:break-word}
+  .grid{display:grid;grid-template-columns:1fr;gap:.6rem}
+  @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+  a.tile{display:block;padding:.9rem 1rem;border:1px solid rgba(255,255,255,.1);border-radius:8px;text-decoration:none;color:inherit;-webkit-tap-highlight-color:transparent}
+  a.tile:active{border-color:#f5a623}
+  .name{color:#f5a623;font-weight:600;font-size:.95rem;margin-bottom:.15rem}
+  .desc{color:rgba(255,255,255,.65);font-size:.78rem;line-height:1.35}
+  .tag{display:inline-block;font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;padding:.08rem .35rem;border-radius:3px;margin-left:.35rem;vertical-align:middle;font-weight:600}
+  .tag.auth{background:rgba(245,166,35,.15);color:#f5a623}
+  .tag.open{background:rgba(255,255,255,.05);color:#94a3b8}
+  .history-list{list-style:none;padding:0}
+  .history-list li{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.6rem .8rem;margin-bottom:.4rem;font-size:.8rem;display:flex;gap:.4rem;align-items:flex-start}
+  .history-list .when{color:#64748b;font-size:.7rem;flex:0 0 auto;min-width:46px}
+  .history-list .prompt{flex:1 1 auto;color:#cbd5e1;line-height:1.3;word-break:break-word}
+  .history-list button{background:transparent;border:1px solid rgba(245,166,35,.35);color:#f5a623;border-radius:5px;padding:.25rem .55rem;font-size:.7rem;font-weight:600;flex:0 0 auto;-webkit-appearance:none;cursor:pointer}
+  .history-list button:active{background:rgba(245,166,35,.1)}
+  .clear{background:transparent;border:0;color:#64748b;font-size:.7rem;text-decoration:underline;cursor:pointer;margin-top:.3rem;-webkit-appearance:none;padding:0}
+  .tmpl-row{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.4rem;margin-bottom:.4rem;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .tmpl-row::-webkit-scrollbar{display:none}
+  .tmpl{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:.3rem .7rem;font-size:.7rem;color:#cbd5e1;cursor:pointer;white-space:nowrap;flex:0 0 auto;-webkit-appearance:none}
+  .tmpl:active{background:rgba(245,166,35,.15)}
+  footer{margin-top:2rem;font-size:.7rem;color:#475569;text-align:center}
+</style>
+</head>
+<body>
+  <h1>ZAO Agent Portal</h1>
+  <p class="sub">Every agent surface, one tap.</p>
+
+  <section>
+    <h2>Quick Spawn</h2>
+    <form class="spawn" id="spawnForm">
+      <div class="tmpl-row" id="tmplRow">
+        <button type="button" class="tmpl" data-p="fix any lint or typecheck errors in the current branch and push the fix">fix lint</button>
+        <button type="button" class="tmpl" data-p="add a test for the most recently changed file">add test</button>
+        <button type="button" class="tmpl" data-p="bump all minor dependencies and open a PR with the changes">bump deps</button>
+        <button type="button" class="tmpl" data-p="run QA against the staging deploy and report bugs with screenshots">run QA</button>
+        <button type="button" class="tmpl" data-p="triage the oldest open issue: understand it, comment with a plan, assign a label">triage issue</button>
+      </div>
+      <textarea name="prompt" id="promptInput" placeholder="what should the agent do?" required></textarea>
+      <div class="row">
+        <select name="project" id="projectSelect">
+          <option value="ZAOOS">ZAOOS</option>
+        </select>
+        <button type="submit" id="spawnBtn">Spawn</button>
+      </div>
+      <div class="result" id="spawnResult"></div>
+    </form>
+  </section>
+
+  <section id="historySection" style="display:none">
+    <h2>Recent Spawns</h2>
+    <ul class="history-list" id="historyList"></ul>
+    <button type="button" class="clear" id="clearHistory">clear history</button>
+  </section>
+
+  <section>
+    <h2>Surfaces</h2>
+    <nav class="grid">
+      <a class="tile" href="https://ao.zaoos.com"><div class="name">AO Dashboard <span class="tag auth">auth</span></div><div class="desc">Parallel Claude Code sessions</div></a>
+      <a class="tile" href="https://claude.zaoos.com"><div class="name">Claude Code TUI <span class="tag auth">auth</span></div><div class="desc">Live coding in your browser, tmux-persisted</div></a>
+      <a class="tile" href="https://paperclip.zaoos.com"><div class="name">Paperclip <span class="tag open">open</span></div><div class="desc">Agent task board &amp; issue routing</div></a>
+      <a class="tile" href="https://zoe.zaoos.com"><div class="name">ZOE <span class="tag open">open</span></div><div class="desc">Chat dashboard &amp; pixel office</div></a>
+      <a class="tile" href="https://pixels.zaoos.com"><div class="name">Pixel Agents <span class="tag open">open</span></div><div class="desc">Pixel office &amp; spatial UI</div></a>
+      <a class="tile" href="https://agents.zaoos.com"><div class="name">OpenClaw <span class="tag open">open</span></div><div class="desc">Gateway + 7-agent squad</div></a>
+      <a class="tile" href="https://zaoos.com/admin/agents"><div class="name">Agent Squad Monitor <span class="tag auth">session</span></div><div class="desc">Supabase event stream, 7 agents live</div></a>
+      <a class="tile" href="/todos"><div class="name">Todos <span class="tag auth">brain</span></div><div class="desc">Prioritize, filter, brain-dump. Spawn from any item.</div></a>
+      <a class="tile" href="/test-checklist"><div class="name">Test Checklist <span class="tag auth">5</span></div><div class="desc">Portal stack test plan + progress</div></a>
+      <a class="tile" href="https://t.me/zaoclaw_bot"><div class="name">Telegram @zaoclaw_bot</div><div class="desc">ZOE dispatch, anywhere, any device</div></a>
+    </nav>
+  </section>
+
+  <footer>The ZAO - agent portal - rotate qwerty1 soon</footer>
+
+<script>
+const HISTORY_KEY = "zao_spawn_history_v1";
+const MAX_HISTORY = 10;
+function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||"[]")}catch{return[]}}
+function saveHistory(i){localStorage.setItem(HISTORY_KEY,JSON.stringify(i.slice(0,MAX_HISTORY)))}
+function addToHistory(p,pr){const i=loadHistory();i.unshift({prompt:p,project:pr,at:new Date().toISOString()});saveHistory(i);renderHistory()}
+function relTime(iso){const ms=Date.now()-new Date(iso).getTime();const s=Math.floor(ms/1000);if(s<60)return s+"s";const m=Math.floor(s/60);if(m<60)return m+"m";const h=Math.floor(m/60);if(h<24)return h+"h";return Math.floor(h/24)+"d"}
+function renderHistory(){const items=loadHistory();const section=document.getElementById("historySection");const list=document.getElementById("historyList");if(!items.length){section.style.display="none";return}section.style.display="";list.innerHTML="";for(const it of items){const li=document.createElement("li");const when=document.createElement("span");when.className="when";when.textContent=relTime(it.at);li.appendChild(when);const prompt=document.createElement("span");prompt.className="prompt";prompt.textContent=it.prompt;li.appendChild(prompt);const btn=document.createElement("button");btn.type="button";btn.textContent="re-spawn";btn.addEventListener("click",()=>{document.getElementById("promptInput").value=it.prompt;document.getElementById("projectSelect").value=it.project||"ZAOOS";document.getElementById("promptInput").scrollIntoView({behavior:"smooth",block:"center"})});li.appendChild(btn);list.appendChild(li)}}
+document.getElementById("clearHistory").addEventListener("click",()=>{if(confirm("clear local spawn history?")){localStorage.removeItem(HISTORY_KEY);renderHistory()}});
+document.querySelectorAll(".tmpl").forEach(el=>{el.addEventListener("click",()=>{document.getElementById("promptInput").value=el.dataset.p;document.getElementById("promptInput").focus()})});
+document.getElementById("spawnForm").addEventListener("submit",async(e)=>{e.preventDefault();const form=e.target;const result=document.getElementById("spawnResult");const btn=document.getElementById("spawnBtn");const prompt=form.prompt.value.trim();const project=form.project.value;btn.disabled=true;btn.textContent="Spawning...";result.textContent="";try{const res=await fetch("/spawn-action",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({project,prompt})});const data=await res.json();if(!res.ok)throw new Error(data.error||res.statusText);addToHistory(prompt,project);result.textContent="Spawned. "+(data.sessionId?"Session: "+data.sessionId:"Running in background");form.prompt.value="";setTimeout(()=>{window.location.href="https://ao.zaoos.com"},1800)}catch(err){result.textContent="Error: "+err.message}finally{btn.disabled=false;btn.textContent="Spawn"}});
+renderHistory();setInterval(renderHistory,60000);
+// Prefill support for todos -> spawn hop
+(function(){const u=new URL(window.location.href);const p=u.searchParams.get("prefill");const pr=u.searchParams.get("project");if(p){document.getElementById("promptInput").value=p;document.getElementById("promptInput").scrollIntoView({behavior:"smooth",block:"center"})}if(pr){const sel=document.getElementById("projectSelect");if(![...sel.options].some(o=>o.value===pr)){const opt=document.createElement("option");opt.value=pr;opt.textContent=pr;sel.appendChild(opt)}sel.value=pr}})();
+</script>
+<script src="/dock.js" defer></script>
+</body>
+</html>

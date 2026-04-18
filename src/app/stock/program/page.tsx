@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 interface Block {
   target: string;
   label: string;
-  type: 'MUSIC' | 'TALK' | 'BATTLE' | 'DJ' | 'BREAK';
+  type: 'MUSIC' | 'TALK' | 'BATTLE' | 'DJ' | 'BREAK' | 'CYPHER';
   detail: string;
 }
 
@@ -21,16 +21,16 @@ const PROGRAM: Block[] = [
   { target: '~13:35', type: 'TALK', label: 'Web3 music 101', detail: '5-10 minutes. Why onchain music matters, pitched for IRL audience.' },
   { target: '~13:50', type: 'MUSIC', label: 'Artist 3', detail: '15-20 minute set.' },
   { target: '~14:20', type: 'BREAK', label: 'Mid-day break', detail: '15 minutes. Food trucks, bathrooms, mingle.' },
-  { target: '~14:35', type: 'TALK', label: 'An artist\'s perspective', detail: '5-10 minutes from a WaveWarZ contestant.' },
-  { target: '~14:50', type: 'BATTLE', label: 'WaveWarZ Round 1', detail: 'Four artists, five minutes each. Audience votes live via QR code.' },
-  { target: '~15:25', type: 'DJ', label: 'Vote break', detail: 'Votes tally, DJ bridges.' },
-  { target: '~15:35', type: 'BATTLE', label: 'WaveWarZ Semi-Final', detail: 'Top two from Round 1, 7-8 minutes each.' },
-  { target: '~16:00', type: 'TALK', label: 'The ZAO community', detail: '5-10 minutes. How to join, what ZAO is.' },
-  { target: '~16:15', type: 'MUSIC', label: 'Artist 4', detail: '15 minute set.' },
-  { target: '~16:35', type: 'TALK', label: 'Partners and Year 2', detail: '5-10 minutes. Thank-you and preview of 2027.' },
-  { target: '~16:50', type: 'BATTLE', label: 'WaveWarZ Final', detail: 'Two finalists, 10 minutes each.' },
-  { target: '~17:20', type: 'DJ', label: 'Final voting', detail: 'Winner announced.' },
-  { target: '~17:25', type: 'MUSIC', label: 'Closing set', detail: 'WaveWarZ winner (or special guest), 25-30 minutes.' },
+  { target: '~14:35', type: 'CYPHER', label: 'The ZAOstock Cypher', detail: '30 minutes. Multi-artist collaborative track built live on stage. Vocalists, producers, instrumentalists all contribute. Recorded and released as onchain music after the festival. Sign up at zaoos.com/stock/cypher to be in it.' },
+  { target: '~15:10', type: 'BATTLE', label: 'WaveWarZ Round 1', detail: 'Four artists, five minutes each. Audience votes live via QR code.' },
+  { target: '~15:45', type: 'DJ', label: 'Vote break', detail: 'Votes tally, DJ bridges.' },
+  { target: '~15:55', type: 'BATTLE', label: 'WaveWarZ Semi-Final', detail: 'Top two from Round 1, 7-8 minutes each.' },
+  { target: '~16:15', type: 'TALK', label: 'The ZAO community', detail: '5-10 minutes. How to join, what ZAO is.' },
+  { target: '~16:25', type: 'MUSIC', label: 'Artist 4', detail: '15 minute set.' },
+  { target: '~16:45', type: 'TALK', label: 'Partners and Year 2', detail: '5-10 minutes. Thank-you and preview of 2027.' },
+  { target: '~16:55', type: 'BATTLE', label: 'WaveWarZ Final', detail: 'Two finalists, 10 minutes each.' },
+  { target: '~17:25', type: 'DJ', label: 'Final voting', detail: 'Winner announced.' },
+  { target: '~17:30', type: 'MUSIC', label: 'Closing set', detail: 'WaveWarZ winner (or special guest), 25-30 minutes.' },
   { target: '~17:55', type: 'DJ', label: 'Afterparty call', detail: 'Wind down. Head to Black Moon Public House next door.' },
 ];
 
@@ -38,6 +38,7 @@ const TYPE_COLOR: Record<Block['type'], string> = {
   MUSIC: 'border-purple-500/40 bg-purple-500/10 text-purple-400',
   TALK: 'border-blue-500/40 bg-blue-500/10 text-blue-400',
   BATTLE: 'border-rose-500/40 bg-rose-500/10 text-rose-400',
+  CYPHER: 'border-amber-500/40 bg-amber-500/10 text-amber-400',
   DJ: 'border-gray-500/40 bg-gray-500/10 text-gray-400',
   BREAK: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400',
 };
@@ -65,8 +66,8 @@ export default function ProgramPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-5 gap-1.5 text-[10px]">
-          {(['MUSIC', 'TALK', 'BATTLE', 'DJ', 'BREAK'] as const).map((t) => (
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-[10px]">
+          {(['MUSIC', 'CYPHER', 'BATTLE', 'TALK', 'DJ', 'BREAK'] as const).map((t) => (
             <div key={t} className={`text-center font-bold px-2 py-1 rounded border ${TYPE_COLOR[t]}`}>
               {t}
             </div>

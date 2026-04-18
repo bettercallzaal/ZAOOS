@@ -88,16 +88,22 @@ export default async function StockPage() {
               Program
             </Link>
             <Link
+              href="/stock/cypher"
+              className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
+            >
+              Cypher
+            </Link>
+            <Link
               href="/stock/apply"
               className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
             >
               Volunteer
             </Link>
             <Link
-              href="/stock/sponsor"
+              href="/stock/sponsor/deck"
               className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
             >
-              Sponsors
+              Partner
             </Link>
             <Link
               href="/stock#team"
@@ -201,6 +207,23 @@ export default async function StockPage() {
                 <p className="text-xs text-gray-400 mt-1">{partner.role}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Cypher CTA */}
+        <section className="space-y-3">
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">The Cypher</p>
+          <div className="bg-gradient-to-br from-rose-500/10 via-purple-500/5 to-transparent rounded-xl p-5 border border-rose-500/30">
+            <p className="text-lg font-bold text-white">The ZAOstock Cypher</p>
+            <p className="text-sm text-gray-300 mt-1">
+              Multi-artist collaborative track, created live on-site. Vocalists trade verses, producers cook beats, instrumentalists add texture. Released as onchain music after the festival with full credits and share.
+            </p>
+            <Link
+              href="/stock/cypher"
+              className="inline-block mt-3 bg-[#f5a623] hover:bg-[#ffd700] text-black font-bold rounded-lg px-4 py-2.5 text-sm transition-colors"
+            >
+              Sign up to be in the cypher -&gt;
+            </Link>
           </div>
         </section>
 

@@ -30,6 +30,7 @@ export default async function StockTeamPage() {
     volunteersRes,
     budgetRes,
     notesRes,
+    rsvpsRes,
   ] = await Promise.allSettled([
     supabase.from('stock_goals').select('*').order('sort_order'),
     supabase
@@ -69,6 +70,11 @@ export default async function StockTeamPage() {
       .from('stock_meeting_notes')
       .select('*, creator:stock_team_members!created_by(id, name)')
       .order('meeting_date', { ascending: false }),
+    supabase
+      .from('event_rsvps')
+      .select('id, name, email, created_at')
+      .eq('event_slug', 'zao-stock-2026')
+      .order('created_at', { ascending: false }),
   ]);
 
   const goals = goalsRes.status === 'fulfilled' ? goalsRes.value.data || [] : [];
@@ -80,6 +86,7 @@ export default async function StockTeamPage() {
   const volunteers = volunteersRes.status === 'fulfilled' ? volunteersRes.value.data || [] : [];
   const budget = budgetRes.status === 'fulfilled' ? budgetRes.value.data || [] : [];
   const meetingNotes = notesRes.status === 'fulfilled' ? notesRes.value.data || [] : [];
+  const rsvps = rsvpsRes.status === 'fulfilled' ? rsvpsRes.value.data || [] : [];
 
   return (
     <Dashboard
@@ -92,6 +99,7 @@ export default async function StockTeamPage() {
       artists={artists}
       milestones={milestones}
       volunteers={volunteers}
+      rsvps={rsvps}
       budget={budget}
       meetingNotes={meetingNotes}
     />

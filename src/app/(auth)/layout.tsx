@@ -9,6 +9,7 @@ import { LazyGlobalSearch } from '@/components/search/LazyGlobalSearch';
 import { CommandPaletteProvider } from '@/components/navigation/CommandPaletteProvider';
 import PWAInstallPrompt from '@/components/navigation/PWAInstallPrompt';
 import { OSBackButton } from '@/components/os/OSBackButton';
+import { HideOnOS } from '@/components/os/HideOnOS';
 
 export default async function AuthLayout({
   children,
@@ -31,20 +32,25 @@ export default async function AuthLayout({
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      <div className="md:pt-10">
+      <div>
+        <HideOnOS>
+          <div className="md:pt-10" />
+        </HideOnOS>
         <ErrorBoundary>
-          <main id="main-content" className="pb-[120px] md:pb-[64px]">
+          <main id="main-content">
             {children}
           </main>
         </ErrorBoundary>
-        <Suspense fallback={null}>
-          <LazyGlobalSearch />
-        </Suspense>
-        <CommandPaletteProvider />
-        <PersistentPlayerWithRadio />
-        <BottomNav />
+        <HideOnOS>
+          <Suspense fallback={null}>
+            <LazyGlobalSearch />
+          </Suspense>
+          <CommandPaletteProvider />
+          <PersistentPlayerWithRadio />
+          <BottomNav />
+          <PWAInstallPrompt />
+        </HideOnOS>
         <OSBackButton />
-        <PWAInstallPrompt />
       </div>
     </AuthAudioProviders>
   );

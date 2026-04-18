@@ -53,6 +53,7 @@ const spaces: AppManifest = {
   description: 'Live audio/video rooms with broadcast',
   route: '/calls',
   requiresAuth: true,
+  defaultPinned: true,
 };
 
 const governance: AppManifest = {
@@ -64,6 +65,7 @@ const governance: AppManifest = {
   description: 'Proposals, polls, and community voting',
   route: '/governance',
   requiresAuth: true,
+  defaultPinned: true,
 };
 
 const directory: AppManifest = {
@@ -75,6 +77,7 @@ const directory: AppManifest = {
   description: 'Community member directory',
   route: '/directory',
   requiresAuth: true,
+  defaultPinned: true,
 };
 
 const respect: AppManifest = {
@@ -86,6 +89,7 @@ const respect: AppManifest = {
   description: 'Respect scores and fractal rankings',
   route: '/respect',
   requiresAuth: true,
+  defaultPinned: true,
 };
 
 const library: AppManifest = {
@@ -119,6 +123,7 @@ const social: AppManifest = {
   description: 'Social feed, analytics, and connections',
   route: '/social',
   requiresAuth: true,
+  defaultPinned: true,
 };
 
 const admin: AppManifest = {

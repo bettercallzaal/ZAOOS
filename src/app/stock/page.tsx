@@ -84,6 +84,12 @@ export default async function StockPage() {
               Program
             </Link>
             <Link
+              href="/stock/apply"
+              className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
+            >
+              Volunteer
+            </Link>
+            <Link
               href="/stock/sponsor"
               className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
             >
@@ -191,6 +197,23 @@ export default async function StockPage() {
                 <p className="text-xs text-gray-400 mt-1">{partner.role}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Volunteer CTA */}
+        <section className="space-y-3">
+          <p className="text-xs text-gray-500 uppercase tracking-wider px-1">Join The Crew</p>
+          <div className="bg-gradient-to-br from-[#f5a623]/15 via-[#f5a623]/5 to-transparent rounded-xl p-5 border border-[#f5a623]/30">
+            <p className="text-lg font-bold text-white">Volunteer at ZAOstock</p>
+            <p className="text-sm text-gray-300 mt-1 mb-4">
+              Festival built by the community. If you want in on setup, check-in, stage crew, content, teardown, or anything in between, sign up below.
+            </p>
+            <Link
+              href="/stock/apply"
+              className="inline-block bg-[#f5a623] hover:bg-[#ffd700] text-black font-bold rounded-lg px-4 py-2.5 text-sm transition-colors"
+            >
+              Sign up to volunteer -&gt;
+            </Link>
           </div>
         </section>
 

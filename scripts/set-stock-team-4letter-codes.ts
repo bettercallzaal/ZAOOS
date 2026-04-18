@@ -9,21 +9,24 @@
 
 import { scryptSync, randomBytes } from 'crypto';
 
-const TEAM = [
-  'Zaal',
-  'Candy',
-  'FailOften',
-  'Hurric4n3Ike',
-  'Swarthy Hatter',
-  'DaNici',
-  'Shawn',
-  'DCoop',
-  'AttaBotty',
-  'Tyler Stambaugh',
-  'Ohnahji B',
-  'DFresh',
-  'Craig G',
-  'Maceo',
+// role/scope for new members (existing members won't be re-roled by this script;
+// the upsert only sets password_hash, role, and scope on INSERT)
+const TEAM: Array<{ name: string; role: string; scope: string }> = [
+  { name: 'Zaal', role: 'lead', scope: 'ops' },
+  { name: 'Candy', role: '2nd', scope: 'ops' },
+  { name: 'FailOften', role: 'member', scope: 'ops' },
+  { name: 'Hurric4n3Ike', role: 'member', scope: 'ops' },
+  { name: 'Swarthy Hatter', role: 'member', scope: 'ops' },
+  { name: 'DaNici', role: 'lead', scope: 'design' },
+  { name: 'Shawn', role: 'member', scope: 'design' },
+  { name: 'DCoop', role: '2nd', scope: 'music' },
+  { name: 'AttaBotty', role: 'member', scope: 'music' },
+  { name: 'Tyler Stambaugh', role: 'member', scope: 'finance' },
+  { name: 'Ohnahji B', role: 'member', scope: 'finance' },
+  { name: 'DFresh', role: 'member', scope: 'finance' },
+  { name: 'Craig G', role: 'member', scope: 'finance' },
+  { name: 'Maceo', role: 'member', scope: 'finance' },
+  { name: 'Jango', role: 'member', scope: 'ops' },
 ];
 
 function code(name: string): string {
@@ -36,28 +39,35 @@ function hashPassword(password: string): string {
   return `${salt}:${hash}`;
 }
 
-const codes = TEAM.map((name) => ({ name, code: code(name) }));
+const entries = TEAM.map((m) => ({ ...m, code: code(m.name) }));
 
 // Verify uniqueness
-const codeSet = new Set(codes.map((c) => c.code));
-if (codeSet.size !== codes.length) {
+const codeSet = new Set(entries.map((c) => c.code));
+if (codeSet.size !== entries.length) {
   console.error('COLLISION: two members share a 4-letter code. Resolve before running.');
   process.exit(1);
 }
 
-console.log('-- ZAOstock Team: 4-letter password codes');
+console.log('-- ZAOstock Team: 4-letter password codes + member upsert');
 console.log('-- Paste this into Supabase SQL Editor and run.');
 console.log('-- Distribute each teammate their code via DM.\n');
 
-console.log('-- Codes (plaintext — share these, not the hashes below):');
-for (const { name, code: c } of codes) {
-  console.log(`--   ${name.padEnd(20)} → ${c}`);
+console.log('-- Codes (plaintext - share these, not the hashes below):');
+for (const { name, code: c } of entries) {
+  console.log(`--   ${name.padEnd(20)} -> ${c}`);
 }
 console.log('');
 
 console.log('BEGIN;');
-for (const { name, code: c } of codes) {
+for (const { name, code: c, role, scope } of entries) {
   const hash = hashPassword(c);
-  console.log(`UPDATE stock_team_members SET password_hash = '${hash}' WHERE name = '${name.replace(/'/g, "''")}';`);
+  const safeName = name.replace(/'/g, "''");
+  // Upsert: creates new members, updates password_hash for existing ones.
+  // Role/scope only set on INSERT - does not overwrite existing role/scope.
+  console.log(
+    `INSERT INTO stock_team_members (name, role, scope, password_hash) ` +
+    `VALUES ('${safeName}', '${role}', '${scope}', '${hash}') ` +
+    `ON CONFLICT (name) DO UPDATE SET password_hash = EXCLUDED.password_hash;`,
+  );
 }
 console.log('COMMIT;');

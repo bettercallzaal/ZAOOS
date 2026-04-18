@@ -27,6 +27,10 @@ interface Artist {
   notes: string;
   outreach: Member | null;
   created_at: string;
+  cypher_interested?: boolean;
+  cypher_role?: string;
+  day_of_start_time?: string | null;
+  day_of_duration_min?: number | null;
 }
 
 const STATUS_ORDER: Record<Artist['status'], number> = {
@@ -321,6 +325,10 @@ function ArtistEditRow({
   const [fee, setFee] = useState(String(artist.fee || ''));
   const [setOrder, setSetOrder] = useState(artist.set_order !== null ? String(artist.set_order) : '');
   const [needsTravel, setNeedsTravel] = useState(artist.needs_travel);
+  const [dayOfStart, setDayOfStart] = useState((artist.day_of_start_time || '').slice(0, 5));
+  const [dayOfDuration, setDayOfDuration] = useState(artist.day_of_duration_min ? String(artist.day_of_duration_min) : '');
+  const [cypherInterested, setCypherInterested] = useState(Boolean(artist.cypher_interested));
+  const [cypherRole, setCypherRole] = useState(artist.cypher_role || '');
 
   function save() {
     onUpdate(artist.id, {
@@ -330,6 +338,10 @@ function ArtistEditRow({
       fee: Number(fee) || 0,
       set_order: setOrder === '' ? null : Number(setOrder),
       needs_travel: needsTravel,
+      day_of_start_time: dayOfStart ? `${dayOfStart}:00` : null,
+      day_of_duration_min: dayOfDuration === '' ? null : Number(dayOfDuration),
+      cypher_interested: cypherInterested,
+      cypher_role: cypherRole,
     });
   }
 
@@ -365,6 +377,50 @@ function ArtistEditRow({
           className="bg-[#0d1b2a] border border-white/[0.06] rounded px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
         />
       </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1">
+          <label className="text-[10px] text-gray-500 uppercase tracking-wider">Day-of start time</label>
+          <input
+            type="time"
+            value={dayOfStart}
+            onChange={(e) => setDayOfStart(e.target.value)}
+            className="w-full bg-[#0d1b2a] border border-white/[0.06] rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#f5a623]/30"
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[10px] text-gray-500 uppercase tracking-wider">Duration (min)</label>
+          <input
+            type="number"
+            min="0"
+            max="180"
+            value={dayOfDuration}
+            onChange={(e) => setDayOfDuration(e.target.value)}
+            placeholder="15"
+            className="w-full bg-[#0d1b2a] border border-white/[0.06] rounded px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
+          />
+        </div>
+      </div>
+
+      <div className="bg-rose-500/5 border border-rose-500/20 rounded-lg p-2 space-y-1.5">
+        <label className="flex items-center gap-1.5 text-xs text-rose-400">
+          <input
+            type="checkbox"
+            checked={cypherInterested}
+            onChange={(e) => setCypherInterested(e.target.checked)}
+            className="accent-rose-400"
+          />
+          In the Oct 3 Cypher
+        </label>
+        {cypherInterested && (
+          <input
+            value={cypherRole}
+            onChange={(e) => setCypherRole(e.target.value)}
+            placeholder="What they bring (vocals, production, guitar, etc)"
+            className="w-full bg-[#0d1b2a] border border-white/[0.06] rounded px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-rose-500/30"
+          />
+        )}
+      </div>
+
       <textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}

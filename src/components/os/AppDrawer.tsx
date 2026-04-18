@@ -65,7 +65,7 @@ export function AppDrawer({ pinnedApps, onOpen, onPin, onUnpin, onClose }: AppDr
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search apps..."
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none focus:border-[#f5a623]/50"
+          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none focus:border-[#f5a623]/50 focus-visible:ring-2 focus-visible:ring-[#f5a623]"
         />
       </div>
 
@@ -94,7 +94,7 @@ export function AppDrawer({ pinnedApps, onOpen, onPin, onUnpin, onClose }: AppDr
             <h3 className="pb-3 text-xs font-medium uppercase tracking-wider text-white/40">
               Apps
             </h3>
-            <div className="grid grid-cols-4 gap-4 sm:grid-cols-5 md:grid-cols-6">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
               {fullApps.map((app) => (
                 <AppIcon
                   key={app.id}
@@ -114,7 +114,7 @@ export function AppDrawer({ pinnedApps, onOpen, onPin, onUnpin, onClose }: AppDr
             <h3 className="pb-3 text-xs font-medium uppercase tracking-wider text-white/40">
               Micro-Apps
             </h3>
-            <div className="grid grid-cols-4 gap-4 sm:grid-cols-5 md:grid-cols-6">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
               {microApps.map((app) => (
                 <AppIcon
                   key={app.id}

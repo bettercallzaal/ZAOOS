@@ -42,7 +42,7 @@ export function Dock({ onOpenDrawer }: DockProps) {
         </button>
       </div>
       {/* Home indicator */}
-      <div className="flex justify-center pb-1">
+      <div className="flex justify-center pb-[calc(0.25rem+env(safe-area-inset-bottom,0px))]">
         <div className="h-1 w-28 rounded-full bg-white/15" />
       </div>
     </div>

@@ -7,9 +7,10 @@ export default function UnreadWidget({ size, onExpand }: WidgetProps) {
     <button
       type="button"
       onClick={onExpand}
-      className="flex w-full items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-left transition-colors hover:bg-white/[0.06]"
+      aria-label="Open messages"
+      className="flex w-full items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.03] p-4 text-left transition-colors hover:bg-white/[0.06] focus-visible:ring-2 focus-visible:ring-[#f5a623]"
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-xl">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f5a623]/10 text-xl">
         ✉️
       </div>
       <div className="min-w-0 flex-1">

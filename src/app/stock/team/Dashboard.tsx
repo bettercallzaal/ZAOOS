@@ -14,6 +14,8 @@ import { PersonalHome } from './PersonalHome';
 import { OnboardingModal } from './OnboardingModal';
 import { SnapshotButton } from './SnapshotButton';
 import { RsvpList } from './RsvpList';
+import { CollapsibleDetail } from './CollapsibleDetail';
+import { SponsorSummary, ArtistSummary, TimelineSummary } from './TabSummaries';
 import { useRouter } from 'next/navigation';
 
 type Tab = 'home' | 'overview' | 'sponsors' | 'artists' | 'timeline' | 'volunteers' | 'rsvps' | 'budget' | 'notes' | 'team';
@@ -51,6 +53,10 @@ interface Artist {
   notes: string;
   outreach: { id: string; name: string } | null;
   created_at: string;
+  cypher_interested?: boolean;
+  cypher_role?: string;
+  day_of_start_time?: string | null;
+  day_of_duration_min?: number | null;
 }
 
 interface Milestone {
@@ -241,9 +247,30 @@ export function Dashboard({
             <TodoList todos={todos} members={memberList} currentMemberId={memberId} />
           </>
         )}
-        {tab === 'sponsors' && <SponsorCRM sponsors={sponsors} members={memberList} />}
-        {tab === 'artists' && <ArtistPipeline artists={artists} members={memberList} />}
-        {tab === 'timeline' && <Timeline milestones={milestones} members={memberList} />}
+        {tab === 'sponsors' && (
+          <CollapsibleDetail
+            title="Sponsors"
+            summary={<SponsorSummary sponsors={sponsors} />}
+          >
+            <SponsorCRM sponsors={sponsors} members={memberList} />
+          </CollapsibleDetail>
+        )}
+        {tab === 'artists' && (
+          <CollapsibleDetail
+            title="Artists"
+            summary={<ArtistSummary artists={artists} />}
+          >
+            <ArtistPipeline artists={artists} members={memberList} />
+          </CollapsibleDetail>
+        )}
+        {tab === 'timeline' && (
+          <CollapsibleDetail
+            title="Timeline"
+            summary={<TimelineSummary milestones={milestones} />}
+          >
+            <Timeline milestones={milestones} members={memberList} />
+          </CollapsibleDetail>
+        )}
         {tab === 'volunteers' && (
           <>
             <CalloutBanner

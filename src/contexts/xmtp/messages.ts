@@ -56,12 +56,12 @@ export function useMessages(
       convStreamCleanupRef.current = () => { void convStream.end(); };
 
       // Stream ALL messages across ALL conversations
-      const [{ getMemberProfiles, getPeerProfiles }, { ConsentState }] = await Promise.all([
+      const [{ getMemberProfiles, getPeerProfiles }, xmtpSdk] = await Promise.all([
         import('@/lib/xmtp/client'),
         import('@xmtp/browser-sdk'),
       ]);
       const msgStream = await client.conversations.streamAllMessages({
-        consentStates: [ConsentState.Allowed],
+        consentStates: [xmtpSdk.ConsentState.Allowed],
         onValue: (msg: DecodedMessage) => {
           // Reset reconnect counter on successful message receipt
           reconnectAttemptsRef.current = 0;
@@ -246,7 +246,7 @@ export function useMessages(
 
       // Step 2: Publish to network
       await conv.publishMessages();
-    } catch (err) {
+    } catch {
       // Mark the optimistic message as failed so UI can show retry indicator
       setMessages((prev) =>
         prev.map((m) => (m.id === msgId ? { ...m, sendFailed: true } : m)),

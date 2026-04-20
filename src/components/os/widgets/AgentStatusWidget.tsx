@@ -2,7 +2,7 @@
 
 import type { WidgetProps } from '@/lib/os/types';
 
-export default function AgentStatusWidget({ size, onExpand }: WidgetProps) {
+export default function AgentStatusWidget({ onExpand }: WidgetProps) {
   const agents = [
     { name: 'VAULT', icon: '🏦', status: 'idle' },
     { name: 'BANKER', icon: '💰', status: 'idle' },

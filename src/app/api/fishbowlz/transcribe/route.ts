@@ -100,13 +100,13 @@ export async function GET(req: NextRequest) {
     });
 
     if (!whisperRes.ok) {
-      const err = await whisperRes.text();
-      return NextResponse.json({ error: `Whisper error: ${err}` }, { status: 502 });
+      await whisperRes.text();
+      return NextResponse.json({ error: 'Whisper error occurred' }, { status: 502 });
     }
 
     const result = await whisperRes.json();
     return NextResponse.json({ text: result.text, model });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Transcription failed' }, { status: 500 });
   }
 }

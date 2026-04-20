@@ -58,7 +58,6 @@ function timeUntil(dateStr: string): string {
 }
 
 export default function FishbowlzPage() {
-  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [rooms, setRooms] = useState<FishbowlRoom[]>([]);
   const [loading, setLoading] = useState(true);

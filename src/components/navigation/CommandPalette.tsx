@@ -40,7 +40,6 @@ const COMMAND_GROUPS = {
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
   const [value, setValue] = useState('');
-  const dialogRef = useState<HTMLDivElement | null>(null)[1];
 
   useFocusTrap(
     { current: document.querySelector('[role="dialog"]') },

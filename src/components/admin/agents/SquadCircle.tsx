@@ -1,6 +1,5 @@
 'use client';
 
-import { AGENTS } from './constants';
 import AgentCard from './AgentCard';
 import type { AgentStatus, AgentEvent } from './constants';
 

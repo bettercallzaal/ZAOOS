@@ -159,8 +159,8 @@ export function IssueReporter() {
               />
               {screenshot ? (
                 <div className="relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={screenshot} alt="Screenshot" className="w-full h-32 object-cover rounded-lg border border-white/10" />
+                  {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
+                  <img src={screenshot} className="w-full h-32 object-cover rounded-lg border border-white/10" />
                   <button
                     onClick={() => setScreenshot(null)}
                     className="absolute top-1 right-1 bg-black/60 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center"

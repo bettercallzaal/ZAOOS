@@ -2,7 +2,7 @@
 
 import type { WidgetProps } from '@/lib/os/types';
 
-export default function UnreadWidget({ size, onExpand }: WidgetProps) {
+export default function UnreadWidget({ onExpand }: WidgetProps) {
   return (
     <button
       type="button"

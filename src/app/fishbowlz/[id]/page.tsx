@@ -714,7 +714,6 @@ function FishbowlRoomPageInner() {
             const emptyCount = room.hot_seat_count - occupiedSeats.length;
             const maxEmptyShown = occupiedSeats.length > 0 ? 2 : 0;
             const emptyToShow = Math.min(emptyCount, maxEmptyShown);
-            const remainingEmpty = emptyCount - emptyToShow;
 
             // No speakers at all - show compact placeholder
             if (occupiedSeats.length === 0) {

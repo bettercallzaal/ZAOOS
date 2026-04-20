@@ -4,9 +4,9 @@
  * Individual agents just pass their name and any custom overrides.
  */
 
-import { getAgentConfig, getDailySpend, claimBudget } from './config';
+import { getAgentConfig, claimBudget } from './config';
 import { logAgentEvent } from './events';
-import { getSwapQuote, getZabalPrice } from './swap';
+import { getSwapQuote } from './swap';
 import { executeSwap } from './wallet';
 import { burnZabal } from './burn';
 import { postTradeUpdate } from './cast';

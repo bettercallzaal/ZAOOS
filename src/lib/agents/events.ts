@@ -18,6 +18,15 @@ export async function logAgentEvent(params: {
   const db = getSupabaseAdmin();
   const { error } = await db.from('agent_events').insert(params);
   if (error) {
-    logger.error(`[${params.agent_name}] Failed to log event: ${error.message}`);
+    // Escalated visibility: CRITICAL prefix + structured payload so log scrapers can alert on
+    // audit-trail drops. Still swallowing here because many callers live inside outer
+    // catch blocks (runner.ts:149) — throwing would cascade into unhandled rejection.
+    // TODO(doc-457): wire a dead-letter queue (Redis list or filesystem fallback) so we
+    // don't permanently lose audit events when Supabase is down or RLS rejects an insert.
+    logger.error(
+      `[${params.agent_name}] CRITICAL audit-trail drop: failed to persist agent_events row. ` +
+        `action=${params.action} status=${params.status} ` +
+        `tx_hash=${params.tx_hash ?? '<none>'} db_error="${error.message}"`,
+    );
   }
 }

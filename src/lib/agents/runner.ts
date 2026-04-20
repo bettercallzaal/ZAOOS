@@ -6,7 +6,7 @@
 
 import { getAgentConfig, claimBudget } from './config';
 import { logAgentEvent } from './events';
-import { getSwapQuote } from './swap';
+import { getSwapQuote, getZabalPrice } from './swap';
 import { executeSwap } from './wallet';
 import { burnZabal } from './burn';
 import { postTradeUpdate } from './cast';

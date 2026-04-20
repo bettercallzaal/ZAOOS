@@ -58,16 +58,18 @@ export function LoginButton() {
 
       // Retry up to 2 times on transient 502/503 (Vercel cold start timeout).
       // Nonce is preserved server-side until verification succeeds, so retries are safe.
-      let resp: Response | null = null;
+      let response: Response | null = null;
       for (let attempt = 0; attempt < 3; attempt++) {
         if (attempt > 0) await new Promise(r => setTimeout(r, 2000));
-        resp = await fetch('/api/auth/verify', {
+        response = await fetch('/api/auth/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (resp.status !== 502 && resp.status !== 503) break;
+        if (response.status !== 502 && response.status !== 503) break;
       }
+
+      const resp = response!;
 
       // If still 502/503 after retries, the response body is likely HTML — don't try to parse as JSON
       if (resp.status === 502 || resp.status === 503) {

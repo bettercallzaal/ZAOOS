@@ -33,13 +33,15 @@
 ## 2026-04-20 — ZAO Stock — Steve Peer onboarded?
 
 - **Source A (Tier 3, 2026-03-31):** `project_zao_stock_confirmed.md`: "Steve Peer: NOT yet onboard — still needs to be pitched."
-- **Source B:** No more recent source confirms or denies pitch happened.
-- **STATUS:** UNRESOLVED. Default to A (most recent confirmed state).
-- **NEXT:** Zaal to confirm in next session — pitched yet? If yes, update `project_zao_stock_confirmed.md` + bump `last_confirmed_at` in BRAIN.
+- **Source B (Tier 2, 2026-04-20, Zaal-confirmed in session):** "Partially pitched."
+- **WINNER:** Source B. Newer + Zaal-direct confirmation.
+- **RESOLVED 2026-04-20.** Updated `BRAIN/projects/zao-stock-2026-10-03.md` Team section: Steve Peer status = "PARTIALLY PITCHED — conversation started, not closed."
+- **NEXT:** Zaal to close the pitch loop; bump to "ONBOARDED" or "DECLINED" when known.
 
 ## 2026-04-20 — ZAO Stock — Wallace Events tents booked?
 
 - **Source A (Tier 3, 2026-03-31):** `project_zao_stock_confirmed.md`: "Wallace Events tent rental (not yet onboarded)."
-- **Source B:** No more recent source confirms.
-- **STATUS:** UNRESOLVED. Default to A.
-- **NEXT:** Zaal to confirm.
+- **Source B (Tier 2, 2026-04-20, Zaal-confirmed in session):** "Not talked to at all."
+- **WINNER:** Source B. Newer + more specific — confirms NO contact has happened (vs A which was just "not onboarded").
+- **RESOLVED 2026-04-20.** Updated `BRAIN/projects/zao-stock-2026-10-03.md` Status table: Wallace Events = "NOT CONTACTED YET — bad-weather backup plan unexecuted."
+- **NEXT:** Outreach TBD. April-May window is the sponsor-outreach critical period (per Apr 10 meeting); Wallace contact should slot into that.

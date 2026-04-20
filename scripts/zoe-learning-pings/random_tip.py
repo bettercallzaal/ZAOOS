@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
 """
-ZOE random learning pings.
+ZOE random learning pings (no-LLM mode).
 
-Picks a random doc from the ZAO OS research library + ADRs, extracts a
-1-line actionable tip via Claude Haiku, sends to Zaal via Telegram bot.
+Picks a random doc from the ZAO OS research library + ADRs + BRAIN/,
+extracts the title + opening summary, sends to Zaal via Telegram.
 
 Designed to run every 30 minutes via cron during waking hours (9am-9pm ET).
 
 Environment variables required:
-  - ANTHROPIC_API_KEY: Claude API key (Haiku tier is sufficient + cheap)
-  - TELEGRAM_BOT_TOKEN: ZOE's existing bot token
-  - TELEGRAM_CHAT_ID: Zaal's user/chat ID
+  - TELEGRAM_BOT_TOKEN: ZOE's Telegram bot token (auto-wired from ~/.env.portal)
+  - TELEGRAM_CHAT_ID: Zaal's user/chat ID (default: 1447437687)
   - ZAO_OS_REPO: path to the ZAO OS V1 git checkout on the host
-                 (default: /opt/zao-os)
-  - QUIET_HOURS_START: hour to skip starting from (default: 21 = 9pm ET)
-  - QUIET_HOURS_END: hour to resume (default: 9 = 9am ET)
+                 (default: /home/zaal/zao-os)
+
+Optional:
+  - ANTHROPIC_API_KEY: if set, uses Claude Haiku to synthesize a 1-line tip
+                       instead of the doc's opening summary. Costs ~$3-4/mo.
+                       Default off — shipped as no-LLM to start (doc 462 plan).
+  - QUIET_HOURS_START: hour to skip starting from (default: 21 = 9pm)
+  - QUIET_HOURS_END: hour to resume (default: 9 = 9am)
 
 State file: ~/.cache/zoe-learning-pings/sent.json
-  Tracks last 7 days of sent doc paths so we don't repeat the same tip.
+  Tracks last 7 days of sent doc paths so we don't repeat.
 """
 
 from __future__ import annotations
@@ -25,30 +29,30 @@ from __future__ import annotations
 import json
 import os
 import random
+import re
 import sys
-import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Iterable
 from urllib import request as urllib_request
 from urllib import error as urllib_error
 
 # -----------------------------------------------------------------------------
 # Config
 # -----------------------------------------------------------------------------
-ZAO_OS_REPO = Path(os.environ.get("ZAO_OS_REPO", "/opt/zao-os"))
+ZAO_OS_REPO = Path(os.environ.get("ZAO_OS_REPO", "/home/zaal/zao-os"))
 STATE_FILE = Path(os.environ.get(
     "ZOE_PINGS_STATE",
     str(Path.home() / ".cache" / "zoe-learning-pings" / "sent.json"),
 ))
 QUIET_START = int(os.environ.get("QUIET_HOURS_START", "21"))
 QUIET_END = int(os.environ.get("QUIET_HOURS_END", "9"))
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 HAIKU_MODEL = os.environ.get("ZOE_TIP_MODEL", "claude-haiku-4-5-20251001")
-MAX_DOC_CHARS = 3500
+MAX_DOC_CHARS_FOR_LLM = 3500
 MAX_TIP_CHARS = 240
+MAX_SUMMARY_CHARS = 420
 COOLDOWN_DAYS = 7
 
 DOC_GLOBS = [
@@ -60,18 +64,22 @@ DOC_GLOBS = [
     "research/farcaster/*/README.md",
     "research/identity/*/README.md",
     "docs/adr/*.md",
+    "BRAIN/projects/*.md",
+    "BRAIN/people/*.md",
 ]
+
+# Placeholders in env file that mean "not yet configured"
+PLACEHOLDER_PREFIXES = ("PASTE_", "YOUR_", "TBD", "REPLACE_")
 
 
 # -----------------------------------------------------------------------------
 # Helpers
 # -----------------------------------------------------------------------------
 def in_quiet_hours(now_local: datetime) -> bool:
-    """Return True if the current ET hour is inside the quiet window."""
     h = now_local.hour
-    if QUIET_START < QUIET_END:  # e.g. 9..21 = active 9-21
+    if QUIET_START < QUIET_END:
         return not (QUIET_START <= h < QUIET_END)
-    return QUIET_START <= h or h < QUIET_END  # default 21..9 = quiet 9pm-9am
+    return QUIET_START <= h or h < QUIET_END
 
 
 def load_state() -> dict:
@@ -113,10 +121,58 @@ def pick_doc(state: dict) -> Path | None:
     return random.choice(pool)
 
 
-def extract_tip(doc_text: str, doc_title: str) -> str | None:
-    """Call Claude Haiku to extract 1 actionable tip. Returns None on failure."""
-    if not ANTHROPIC_API_KEY:
-        print("ANTHROPIC_API_KEY not set; cannot extract tip", file=sys.stderr)
+def doc_title_from(path: Path, text: str) -> str:
+    """Extract the first heading (# or ###) as the title."""
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            return stripped.lstrip("# ").strip().strip(">").strip()
+    return path.stem
+
+
+def doc_summary_from(text: str, max_chars: int = MAX_SUMMARY_CHARS) -> str:
+    """
+    Extract an opening summary. Strips frontmatter + title, then keeps
+    everything else up to max_chars, cleaning whitespace. Forgiving — if the
+    doc starts with tables or subheadings, those get included.
+    """
+    lines = text.splitlines()
+    # Strip YAML frontmatter block
+    if lines and lines[0].strip() == "---":
+        try:
+            end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
+            lines = lines[end + 1 :]
+        except StopIteration:
+            pass
+
+    # Skip until we're past the title
+    past_title = False
+    content_lines: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if not past_title:
+            if stripped.startswith("#"):
+                past_title = True
+            continue
+        # Skip horizontal rules; they contribute nothing
+        if stripped == "---":
+            continue
+        content_lines.append(stripped)
+
+    # Join, collapse whitespace, clip
+    summary = " ".join(ln for ln in content_lines if ln).strip()
+    summary = re.sub(r"\s+", " ", summary)
+    # Strip markdown artifacts that read weird in Telegram
+    summary = re.sub(r"\*\*([^*]+)\*\*", r"\1", summary)  # **bold** -> bold
+    summary = re.sub(r"`([^`]+)`", r"\1", summary)         # `code` -> code
+    if len(summary) > max_chars:
+        summary = summary[: max_chars - 1].rsplit(" ", 1)[0] + "…"
+    return summary
+
+
+def extract_tip_via_claude(doc_text: str, doc_title: str) -> str | None:
+    """Call Claude Haiku for a 1-line synthesis. Only runs if ANTHROPIC_API_KEY set."""
+    if not ANTHROPIC_API_KEY or ANTHROPIC_API_KEY.upper().startswith(PLACEHOLDER_PREFIXES):
         return None
 
     prompt = (
@@ -129,7 +185,7 @@ def extract_tip(doc_text: str, doc_title: str) -> str | None:
         "- Speak directly to Zaal in second person.\n"
         "- No preamble, no quotes, no markdown — just the tip text.\n"
         "- If the doc has no actionable tip (pure history/log), respond with exactly: SKIP\n\n"
-        f"--- DOC START ---\n{doc_text[:MAX_DOC_CHARS]}\n--- DOC END ---"
+        f"--- DOC START ---\n{doc_text[:MAX_DOC_CHARS_FOR_LLM]}\n--- DOC END ---"
     )
 
     body = json.dumps({
@@ -175,6 +231,11 @@ def send_telegram(text: str) -> bool:
               file=sys.stderr)
         print(text)
         return False
+    if TELEGRAM_BOT_TOKEN.upper().startswith(PLACEHOLDER_PREFIXES):
+        print("TELEGRAM_BOT_TOKEN is still a placeholder; printing instead",
+              file=sys.stderr)
+        print(text)
+        return False
 
     body = json.dumps({
         "chat_id": TELEGRAM_CHAT_ID,
@@ -198,24 +259,11 @@ def send_telegram(text: str) -> bool:
         return False
 
 
-def doc_title_from(path: Path) -> str:
-    """Pull the first H1 (or H3 for ADR style) from the doc as a title."""
-    try:
-        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-            stripped = line.strip()
-            if stripped.startswith("#"):
-                return stripped.lstrip("# ").strip()
-    except Exception:
-        pass
-    return path.stem
-
-
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
 def main() -> int:
-    # ZOE pings respect Eastern Time waking hours.
-    now_local = datetime.now()  # Host TZ (set host TZ to America/New_York or use TZ env)
+    now_local = datetime.now()
     if in_quiet_hours(now_local):
         print(f"Quiet hours ({QUIET_START}-{QUIET_END}); skipping.", file=sys.stderr)
         return 0
@@ -226,23 +274,36 @@ def main() -> int:
         print(f"No candidate docs found under {ZAO_OS_REPO}", file=sys.stderr)
         return 1
 
-    title = doc_title_from(doc)
     rel = doc.relative_to(ZAO_OS_REPO)
     text_body = doc.read_text(encoding="utf-8", errors="replace")
-    tip = extract_tip(text_body, title)
+    title = doc_title_from(doc, text_body)
+
+    # Prefer Claude Haiku synthesis IF a real key is configured, else fall back
+    # to a plain summary extracted from the doc itself (no-LLM mode, $0 cost).
+    tip = extract_tip_via_claude(text_body, title)
+    mode = "llm"
+    if not tip:
+        tip = doc_summary_from(text_body)
+        mode = "summary"
+
     if not tip:
         print(f"No tip extractable from {rel}", file=sys.stderr)
-        return 0  # silent miss; try again in 30 min
+        return 0
 
-    msg = f"[ZOE TIP] {title}\n\n{tip}\n\n>> {rel}"
+    # GitHub URL for tap-to-open (assumes public main branch of the ZAOOS repo).
+    github_url = f"https://github.com/bettercallzaal/ZAOOS/blob/main/{rel}"
+    msg_parts = [f"[ZOE TIP] {title}", "", tip, "", github_url]
+    msg = "\n".join(msg_parts)
+
     if send_telegram(msg):
         state["sent"].append({
             "path": str(rel),
             "title": title,
+            "mode": mode,
             "at": datetime.now(timezone.utc).isoformat(),
         })
         save_state(state)
-        print(f"Sent: {rel}")
+        print(f"Sent ({mode}): {rel}")
         return 0
     else:
         print("Telegram send failed; not recording in state", file=sys.stderr)

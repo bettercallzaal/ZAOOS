@@ -269,39 +269,48 @@ Phases 2, 3, 4, 5 can run in parallel after Phase 1. Sequence 6 → 7 → 8.
 
 **2026-04-19 — Phase 1 + partial Phase 2 + partial Phase 3 executed.**
 
-See `AUDIT.md` for discovery findings and `MANIFEST.md` for installed artifacts.
+Pinned ECC SHA `8bdf88e5ad8877bcd00a4aba7ccbfb50f235f10f`. Installed initial 5 skills + 2 commands + `CLAUDE_CODE_SUBAGENT_MODEL=haiku` env var. Backup at `~/.claude/settings.json.pre-ecc-2026-04-19`.
 
-Completed this session:
-- Pinned ECC SHA `8bdf88e5ad8877bcd00a4aba7ccbfb50f235f10f`
-- Installed 5 skills (ecc-verification-loop, ecc-security-review, ecc-eval-harness, ecc-strategic-compact, ecc-content-hash-cache)
-- Installed 2 commands (ecc-learn, ecc-skill-create)
-- Added `CLAUDE_CODE_SUBAGENT_MODEL=haiku` to `~/.claude/settings.json`
-- Backup saved at `~/.claude/settings.json.pre-ecc-2026-04-19`
+Discovered ECC hooks + `continuous-learning-v2` + instinct commands are tightly coupled to plugin bootstrap. Path A (cherry-pick) vs Path B (full plugin install) fork.
 
-Discovered constraints that shift strategy:
-- ECC hooks are a single `hooks.json` coupled to plugin bootstrap. Can't cherry-pick cleanly.
-- `continuous-learning-v2` has `agents/hooks/scripts/` subdirs referencing ECC root scripts. Can't cherry-pick cleanly.
-- Commands like `/checkpoint`, `/verify`, `/instinct-*` depend on CL-v2 backend. Can't install in isolation.
-- Original 7-skill target reduced to 5 (CL-v2 deferred pending Path B decision).
+**2026-04-20 — Doc 442 ranking + Tier 1 completion.**
 
-## Deferred — Awaiting Zaal Decision
+Evaluated all 310 ECC artifacts. Ranked top 10 by daily-use probability for ZAO OS. Installed 6 new skills + 1 agent + 4 hookify commands. Dropped `ecc-strategic-compact` (dup of `/compact` + caveman). Final state:
 
-| # | Decision point | Options |
-|---|----------------|---------|
-| D1 | Hooks + CL-v2 + instinct commands | A) Full plugin install via `/plugin install ecc@ecc` + disable unwanted skills. B) Skip entirely, keep current 5 cherry-picks. |
-| D2 | AgentShield | A) `npx ecc-agentshield scan` in ZAO OS. B) Skip. |
-| D3 | MCPs (Supabase/Playwright/Context7) | A) Install with provided creds. B) Skip. C) Only one (which). |
-| D4 | Tkinter dashboard | A) `pip install -r` + `python ecc_dashboard.py`. B) Skip. |
-| D5 | Rules merge | A) Diff ECC `rules/typescript/` against existing project rules, merge additive. B) Skip. |
-| D6 | Agents (harness-optimizer, etc.) | A) Cherry-pick ones without script deps. B) Skip. |
+- 10 skills: ecc-verification-loop, ecc-security-review, ecc-eval-harness, ecc-content-hash-cache, ecc-nextjs-turbopack, ecc-postgres-patterns, ecc-database-migrations, ecc-hookify-rules, ecc-agent-introspection, ecc-skill-stocktake
+- 1 agent: ecc-silent-failure-hunter
+- 6 commands: ecc-learn, ecc-skill-create, ecc-hookify, ecc-hookify-configure, ecc-hookify-help, ecc-hookify-list
+- 1 env var: CLAUDE_CODE_SUBAGENT_MODEL=haiku
+
+All ecc-prefixed, provenance preserved. See `MANIFEST.md` for SHA + source-mapping.
+
+See `AUDIT.md` for discovery findings and doc 442 for full ranking methodology.
+
+## Decisions D1-D6 Resolved (via doc 442 ranking)
+
+| # | Decision | Resolution | Status |
+|---|----------|------------|--------|
+| D1 | Hooks + CL-v2 + instinct commands | SKIP full plugin install. Use `ecc-hookify-rules` skill for hook creation instead (lighter, no bootstrap dep). CL-v2 deferred to honorable H1. | DONE (skip) |
+| D2 | AgentShield | INSTALL separately on pre-ship. `npx ecc-agentshield scan --opus --stream` before `/ship`. Warn week 1, block week 2+. | PENDING EXEC |
+| D3 | MCPs | Context7 + Playwright only. SKIP Supabase MCP until read-only mode verified. | PENDING EXEC |
+| D4 | Tkinter dashboard | SKIP. Terminal-native workflow. | DONE (skip) |
+| D5 | Rules merge (`rules/typescript/`) | Diff-and-merge additive lines into `.claude/rules/api-routes.md` + `components.md` + `tests.md`. | PENDING EXEC |
+| D6 | Agents | INSTALLED `ecc-silent-failure-hunter`. `pr-test-analyzer` on honorable list. | DONE (partial) |
 
 ## Validation Window
 
-7-day window starting 2026-04-19:
-- Invoke each `ecc-*` skill at least once on real work.
-- Track which get used vs which sit dormant.
-- Re-evaluate at 2026-04-26.
+7-day window starting 2026-04-20:
+- Invoke each of top-10 ecc-* skills at least once on real work.
+- Track which get used vs sit dormant via `ecc-skill-stocktake` after week.
+- Run `ecc-silent-failure-hunter` against `src/lib/agents/` + 3 recent API routes.
+- Create ≥ 1 `ecc-hookify` rule from conversation patterns.
+- Re-evaluate at 2026-04-27 per doc 442 success metrics.
 
 ## Next Action
 
-Zaal reviews decision points D1-D6. Plan Phase 2 follow-up based on answers.
+Three remaining pending items from D2/D3/D5:
+1. `npx ecc-agentshield scan` baseline run (D2)
+2. Context7 + Playwright MCP install (D3)
+3. Rules diff-merge (D5)
+
+These need Zaal's OK because each involves network/npm/new env var.

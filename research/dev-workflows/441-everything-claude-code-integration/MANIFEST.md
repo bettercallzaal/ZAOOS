@@ -3,39 +3,72 @@
 > Source: `affaan-m/everything-claude-code`
 > Pinned SHA: `8bdf88e5ad8877bcd00a4aba7ccbfb50f235f10f`
 > Pinned date: 2026-04-19
+> Last updated: 2026-04-20 (after doc 442 top-picks ranking)
 
 ---
 
-## Installed (Path A — safe cherry-pick)
+## Installed — Skills (10)
 
-| Artifact | Type | Path | Source | Added | Status |
-|----------|------|------|--------|-------|--------|
-| ecc-verification-loop | skill | `~/.claude/skills/ecc-verification-loop/SKILL.md` | `skills/verification-loop/SKILL.md` | 2026-04-19 | ACTIVE |
-| ecc-security-review | skill | `~/.claude/skills/ecc-security-review/` (SKILL.md + cloud-infrastructure-security.md) | `skills/security-review/` | 2026-04-19 | ACTIVE |
-| ecc-eval-harness | skill | `~/.claude/skills/ecc-eval-harness/SKILL.md` | `skills/eval-harness/SKILL.md` | 2026-04-19 | ACTIVE |
-| ecc-strategic-compact | skill | `~/.claude/skills/ecc-strategic-compact/` (SKILL.md + suggest-compact.sh) | `skills/strategic-compact/` | 2026-04-19 | ACTIVE |
-| ecc-content-hash-cache | skill | `~/.claude/skills/ecc-content-hash-cache/SKILL.md` | `skills/content-hash-cache-pattern/SKILL.md` | 2026-04-19 | ACTIVE |
-| ecc-learn | command | `~/.claude/commands/ecc-learn.md` | `commands/learn.md` | 2026-04-19 | ACTIVE |
-| ecc-skill-create | command | `~/.claude/commands/ecc-skill-create.md` | `commands/skill-create.md` | 2026-04-19 | ACTIVE |
-| env.CLAUDE_CODE_SUBAGENT_MODEL | setting | `~/.claude/settings.json` | ECC README | 2026-04-19 | ACTIVE (haiku) |
+| Artifact | Path | Source | Added | Tier |
+|----------|------|--------|-------|------|
+| ecc-verification-loop | `~/.claude/skills/ecc-verification-loop/SKILL.md` | `skills/verification-loop/` | 2026-04-19 | 1 |
+| ecc-security-review | `~/.claude/skills/ecc-security-review/` (SKILL.md + cloud-infrastructure-security.md) | `skills/security-review/` | 2026-04-19 | 1 |
+| ecc-eval-harness | `~/.claude/skills/ecc-eval-harness/SKILL.md` | `skills/eval-harness/` | 2026-04-19 | 1 |
+| ecc-content-hash-cache | `~/.claude/skills/ecc-content-hash-cache/SKILL.md` | `skills/content-hash-cache-pattern/` | 2026-04-19 | Honorable (demoted) |
+| ecc-nextjs-turbopack | `~/.claude/skills/ecc-nextjs-turbopack/` | `skills/nextjs-turbopack/` | 2026-04-20 | 1 |
+| ecc-postgres-patterns | `~/.claude/skills/ecc-postgres-patterns/` | `skills/postgres-patterns/` | 2026-04-20 | 1 |
+| ecc-database-migrations | `~/.claude/skills/ecc-database-migrations/` | `skills/database-migrations/` | 2026-04-20 | 1 |
+| ecc-hookify-rules | `~/.claude/skills/ecc-hookify-rules/` | `skills/hookify-rules/` | 2026-04-20 | 1 |
+| ecc-agent-introspection | `~/.claude/skills/ecc-agent-introspection/` | `skills/agent-introspection-debugging/` | 2026-04-20 | 1 |
+| ecc-skill-stocktake | `~/.claude/skills/ecc-skill-stocktake/` | `skills/skill-stocktake/` | 2026-04-20 | 1 |
+
+## Installed — Agents (1)
+
+| Artifact | Path | Source | Added |
+|----------|------|--------|-------|
+| ecc-silent-failure-hunter | `~/.claude/agents/ecc-silent-failure-hunter.md` | `agents/silent-failure-hunter.md` | 2026-04-20 |
+
+## Installed — Commands (6)
+
+| Artifact | Path | Source | Added |
+|----------|------|--------|-------|
+| ecc-learn | `~/.claude/commands/ecc-learn.md` | `commands/learn.md` | 2026-04-19 |
+| ecc-skill-create | `~/.claude/commands/ecc-skill-create.md` | `commands/skill-create.md` | 2026-04-19 |
+| ecc-hookify | `~/.claude/commands/ecc-hookify.md` | `commands/hookify.md` | 2026-04-20 |
+| ecc-hookify-configure | `~/.claude/commands/ecc-hookify-configure.md` | `commands/hookify-configure.md` | 2026-04-20 |
+| ecc-hookify-help | `~/.claude/commands/ecc-hookify-help.md` | `commands/hookify-help.md` | 2026-04-20 |
+| ecc-hookify-list | `~/.claude/commands/ecc-hookify-list.md` | `commands/hookify-list.md` | 2026-04-20 |
+
+## Installed — Settings
+
+| Key | Value | Added |
+|-----|-------|-------|
+| `env.CLAUDE_CODE_SUBAGENT_MODEL` | `haiku` | 2026-04-19 |
 
 Backup: `~/.claude/settings.json.pre-ecc-2026-04-19`
 
 ---
 
-## Deferred (Path B — require explicit decision)
+## Removed (2026-04-20)
 
 | Artifact | Reason |
 |----------|--------|
-| ECC hooks (`hooks/hooks.json`) | Tightly coupled to ECC plugin bootstrap (`scripts/hooks/plugin-hook-bootstrap.js` + `scripts/lib/utils.js`). Can't cherry-pick cleanly. Requires full plugin install. |
-| `continuous-learning-v2` skill + instinct system | Has `agents/`, `hooks/`, `scripts/` subdirs that reference ECC root scripts. Requires full plugin install OR heavy manual port. |
-| `/checkpoint`, `/verify`, `/instinct-*`, `/prune`, `/evolve`, `/learn-eval` commands | Depend on continuous-learning-v2 backend. Install only after CL-v2 works. |
-| `/harness-audit` command | Needs `scripts/harness-audit.js` at ECC root. |
-| AgentShield (`npx ecc-agentshield`) | Third-party npm package. Needs Zaal OK to install + run. |
-| MCP servers (Supabase, Playwright, Context7) | Need API keys + per-server config. Needs Zaal OK + creds. |
-| Tkinter dashboard (`ecc_dashboard.py`) | Python + tk dep. Needs Zaal OK. |
-| Rules (`rules/typescript/`) | Diff-merge pass needed into `.claude/rules/` (project-local). |
-| Agents (`harness-optimizer`, etc.) | Some depend on scripts. Diff per-agent. |
+| ecc-strategic-compact | Duplicates `/compact` + caveman compression. Doc 442 ranking. |
+
+---
+
+## Still Deferred (Path B — require explicit decision)
+
+| Artifact | Reason |
+|----------|--------|
+| ECC hooks (`hooks/hooks.json`) | Coupled to plugin bootstrap. Use `ecc-hookify-rules` skill instead for per-rule hooks. |
+| `continuous-learning-v2` full skill + instinct commands | Requires plugin install. Doc 442 ranks as Honorable H1. |
+| `/checkpoint`, `/verify`, `/instinct-*`, `/prune`, `/evolve`, `/learn-eval` | Depend on CL-v2. |
+| AgentShield (`npx ecc-agentshield`) | D2 pending. Install separately if chosen. |
+| MCP servers (Supabase / Playwright / Context7) | D3 pending. Doc 442 picks Context7 + Playwright only. |
+| Tkinter dashboard | D4 decided SKIP. |
+| Rules (`rules/typescript/`) | D5 pending. 10-min diff-merge pass. |
+| Other agents (`pr-test-analyzer`, etc.) | Honorable list only. |
 
 ---
 
@@ -44,31 +77,16 @@ Backup: `~/.claude/settings.json.pre-ecc-2026-04-19`
 Full uninstall of Path A artifacts:
 
 ```bash
-rm -rf \
-  ~/.claude/skills/ecc-verification-loop \
-  ~/.claude/skills/ecc-security-review \
-  ~/.claude/skills/ecc-eval-harness \
-  ~/.claude/skills/ecc-strategic-compact \
-  ~/.claude/skills/ecc-content-hash-cache \
-  ~/.claude/commands/ecc-learn.md \
-  ~/.claude/commands/ecc-skill-create.md
+rm -rf ~/.claude/skills/ecc-* \
+       ~/.claude/agents/ecc-* \
+       ~/.claude/commands/ecc-*
 cp ~/.claude/settings.json.pre-ecc-2026-04-19 ~/.claude/settings.json
 ```
 
-Partial uninstall: delete single artifact + leave others.
+Per-artifact uninstall: delete the single file/folder.
 
 ---
 
-## Verification
+## Next Step
 
-After install, Claude Code listed these skills in available-skills:
-
-- `ecc-verification-loop: A comprehensive verification system for Claude Code sessions.`
-- `ecc-security-review: Use this skill when adding authentication, handling user input...`
-- `ecc-eval-harness: Formal evaluation framework...`
-- `ecc-strategic-compact: Suggests manual context compaction...`
-- `ecc-content-hash-cache: Cache expensive file processing results...`
-- `ecc-learn: /learn - Extract Reusable Patterns`
-- `ecc-skill-create: Analyze local git history to extract coding patterns...`
-
-settings.json valid JSON after edit: confirmed.
+7-day validation window starts 2026-04-20. Re-evaluate top-10 at 2026-04-27 per doc 442 success metrics.

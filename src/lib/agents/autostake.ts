@@ -71,6 +71,16 @@ export async function maybeAutoStake(agentName: AgentName): Promise<void> {
     logger.info(`[${agentName}] Auto-staked 100M ZABAL for conviction. TX: ${hash}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    await logAgentEvent({
+      agent_name: agentName,
+      action: 'add_lp',
+      token_in: 'ZABAL',
+      token_out: 'CONVICTION',
+      amount_in: 100_000_000,
+      usd_value: 0,
+      status: 'failed',
+      error_message: msg,
+    });
     logger.error(`[${agentName}] Auto-stake failed: ${msg}`);
   }
 }

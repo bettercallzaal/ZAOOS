@@ -30,6 +30,16 @@ export async function burnZabal(
     return hash;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    await logAgentEvent({
+      agent_name: agentName,
+      action: 'buy_zabal',
+      token_in: 'ZABAL',
+      token_out: 'BURN',
+      amount_in: Number(burnAmount) / 1e18,
+      usd_value: 0,
+      status: 'failed',
+      error_message: msg,
+    });
     logger.error(`[${agentName}] Burn failed: ${msg}`);
     return null;
   }

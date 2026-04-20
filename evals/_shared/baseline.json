@@ -1,0 +1,10 @@
+{
+  "captured_at": "2026-04-20",
+  "note": "Baseline scores will be populated after first real eval run. This file exists so regression comparisons have a target.",
+  "scores": {
+    "vault": { "pass_rate": null, "avg_confidence": null },
+    "banker": { "pass_rate": null, "avg_latency_ms": null, "avg_slippage_bps": null },
+    "dealer": { "pass_rate": null, "avg_spread_bps": null, "inventory_drift_pct": null },
+    "zoe": { "pass_rate": null, "triage_accuracy": null }
+  }
+}

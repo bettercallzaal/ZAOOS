@@ -1,0 +1,15 @@
+Harness Audit (repo, consumer): 25/29
+Root: /Users/zaalpanthaki/Documents/ZAO OS V1
+
+- Tool Coverage: 10/10 (7/7 pts)
+- Context Efficiency: 10/10 (5/5 pts)
+- Quality Gates: 10/10 (7/7 pts)
+- Memory Persistence: 0/10 (0/2 pts)
+- Eval Coverage: 0/10 (0/2 pts)
+- Security Guardrails: 10/10 (6/6 pts)
+
+Checks: 11 total, 2 failing
+
+Top 3 Actions:
+1) [Memory Persistence] Add durable project memory such as .claude/memory.md or ADRs under docs/adr/. (.claude/memory.md)
+2) [Eval Coverage] Add eval fixtures or at least a few focused automated tests for critical flows. (evals/)

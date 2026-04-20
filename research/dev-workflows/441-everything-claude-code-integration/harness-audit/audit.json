@@ -1,0 +1,150 @@
+{
+  "scope": "repo",
+  "root_dir": "/Users/zaalpanthaki/Documents/ZAO OS V1",
+  "target_mode": "consumer",
+  "deterministic": true,
+  "rubric_version": "2026-03-30",
+  "overall_score": 25,
+  "max_score": 29,
+  "categories": {
+    "Tool Coverage": {
+      "score": 10,
+      "earned": 7,
+      "max": 7
+    },
+    "Context Efficiency": {
+      "score": 10,
+      "earned": 5,
+      "max": 5
+    },
+    "Quality Gates": {
+      "score": 10,
+      "earned": 7,
+      "max": 7
+    },
+    "Memory Persistence": {
+      "score": 0,
+      "earned": 0,
+      "max": 2
+    },
+    "Eval Coverage": {
+      "score": 0,
+      "earned": 0,
+      "max": 2
+    },
+    "Security Guardrails": {
+      "score": 10,
+      "earned": 6,
+      "max": 6
+    },
+    "Cost Efficiency": {
+      "score": 0,
+      "earned": 0,
+      "max": 0
+    }
+  },
+  "checks": [
+    {
+      "id": "consumer-plugin-install",
+      "category": "Tool Coverage",
+      "points": 4,
+      "path": "~/.claude/plugins/ecc/ (legacy everything-claude-code paths also supported)",
+      "description": "Everything Claude Code is installed for the active user or project",
+      "pass": true
+    },
+    {
+      "id": "consumer-project-overrides",
+      "category": "Tool Coverage",
+      "points": 3,
+      "path": ".claude/",
+      "description": "Project-specific harness overrides exist under .claude/",
+      "pass": true
+    },
+    {
+      "id": "consumer-instructions",
+      "category": "Context Efficiency",
+      "points": 3,
+      "path": "AGENTS.md",
+      "description": "The project has explicit agent or instruction context",
+      "pass": true
+    },
+    {
+      "id": "consumer-project-config",
+      "category": "Context Efficiency",
+      "points": 2,
+      "path": ".mcp.json",
+      "description": "The project declares local MCP or Claude settings",
+      "pass": true
+    },
+    {
+      "id": "consumer-test-suite",
+      "category": "Quality Gates",
+      "points": 4,
+      "path": "tests/",
+      "description": "The project has an automated test entrypoint",
+      "pass": true
+    },
+    {
+      "id": "consumer-ci-workflow",
+      "category": "Quality Gates",
+      "points": 3,
+      "path": ".github/workflows/",
+      "description": "The project has CI workflows checked in",
+      "pass": true
+    },
+    {
+      "id": "consumer-memory-notes",
+      "category": "Memory Persistence",
+      "points": 2,
+      "path": ".claude/memory.md",
+      "description": "Project memory or durable notes are checked in",
+      "pass": false
+    },
+    {
+      "id": "consumer-eval-coverage",
+      "category": "Eval Coverage",
+      "points": 2,
+      "path": "evals/",
+      "description": "The project has evals or multiple automated tests",
+      "pass": false
+    },
+    {
+      "id": "consumer-security-policy",
+      "category": "Security Guardrails",
+      "points": 2,
+      "path": "SECURITY.md",
+      "description": "The project exposes a security policy or automated dependency scanning",
+      "pass": true
+    },
+    {
+      "id": "consumer-secret-hygiene",
+      "category": "Security Guardrails",
+      "points": 2,
+      "path": ".gitignore",
+      "description": "The project ignores common secret env files",
+      "pass": true
+    },
+    {
+      "id": "consumer-hook-guardrails",
+      "category": "Security Guardrails",
+      "points": 2,
+      "path": ".claude/settings.json",
+      "description": "Project-local hook settings reference tool/prompt guardrails",
+      "pass": true
+    }
+  ],
+  "top_actions": [
+    {
+      "action": "Add durable project memory such as .claude/memory.md or ADRs under docs/adr/.",
+      "path": ".claude/memory.md",
+      "category": "Memory Persistence",
+      "points": 2
+    },
+    {
+      "action": "Add eval fixtures or at least a few focused automated tests for critical flows.",
+      "path": "evals/",
+      "category": "Eval Coverage",
+      "points": 2
+    }
+  ]
+}

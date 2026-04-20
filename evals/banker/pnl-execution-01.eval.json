@@ -1,0 +1,18 @@
+{
+  "id": "banker-pnl-exec-01",
+  "description": "BANKER executes buy order within p95 latency 2s and stays under max slippage 50bps",
+  "inputs": {
+    "pair": "ZABAL/USDC",
+    "side": "buy",
+    "size_usdc": 500,
+    "slippage_tolerance_bps": 50,
+    "baseline_price": 0.12
+  },
+  "expected": {
+    "latency_p95_ms": 2000,
+    "slippage_bps_max": 50,
+    "fill_ratio_min": 0.95
+  },
+  "metric": "latency_ms <= latency_p95_ms && slippage_bps <= slippage_bps_max && fill_ratio >= fill_ratio_min",
+  "status": "scaffold"
+}

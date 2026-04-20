@@ -1,0 +1,17 @@
+{
+  "id": "zoe-email-triage-01",
+  "description": "ZOE correctly triages incoming email to research/idea/link folder based on subject + body",
+  "inputs": {
+    "subject": "Thinking about adding RSS feed to ZOE inbox",
+    "body_preview": "Hey, found this tool that could autoingest newsletter RSS into ZOE...",
+    "sender": "zaal",
+    "has_link": true
+  },
+  "expected": {
+    "folder": "ideas",
+    "confidence_min": 0.7,
+    "auto_research": false
+  },
+  "metric": "folder === expected.folder && confidence >= confidence_min",
+  "status": "scaffold"
+}

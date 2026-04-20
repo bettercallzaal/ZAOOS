@@ -1,0 +1,18 @@
+{
+  "id": "vault-hold-decision-01",
+  "description": "VAULT should hold when token drops >15% in 1hr (dip buying opportunity, not panic)",
+  "inputs": {
+    "token": "ZABAL",
+    "price_drop_1hr_pct": 18,
+    "volume_24hr": 50000,
+    "current_balance": 1000,
+    "liquidity_depth": 125000
+  },
+  "expected": {
+    "action": "HOLD",
+    "min_confidence": 0.75,
+    "max_slippage_bps": 50
+  },
+  "metric": "action === expected.action && confidence >= min_confidence",
+  "status": "scaffold"
+}

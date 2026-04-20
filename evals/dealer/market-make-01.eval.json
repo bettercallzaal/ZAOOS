@@ -1,0 +1,18 @@
+{
+  "id": "dealer-market-make-01",
+  "description": "DEALER maintains spread within 30bps of mid-price across 5-min window",
+  "inputs": {
+    "pair": "ZABAL/USDC",
+    "window_minutes": 5,
+    "mid_price_usd": 0.12,
+    "target_spread_bps": 30,
+    "capital_usdc": 2000
+  },
+  "expected": {
+    "avg_spread_bps": 30,
+    "max_spread_bps": 60,
+    "inventory_drift_pct_max": 10
+  },
+  "metric": "avg_spread_bps <= target_spread_bps && inventory_drift_pct <= max_drift_pct",
+  "status": "scaffold"
+}

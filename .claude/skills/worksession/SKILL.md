@@ -52,10 +52,13 @@ Run these steps in order:
    npm install --prefer-offline
    ```
 
-   **Fallback** - if worktree creation fails (e.g. disk space, permissions), fall back to branch-only:
-   ```bash
-   git checkout -b "$BRANCH"
-   ```
+   **NO FALLBACK.** Per doc 459 + ADR-001 + `feedback_workspace_worktrees.md`, the worktree IS the only valid path. If `git worktree add` fails:
+   - Diagnose the cause (disk space, permissions, locked branch, missing parent dir)
+   - Fix it
+   - Retry the worktree command
+   - Do NOT fall back to a branch in the shared checkout — branch-only sessions caused multiple wrong-branch incidents (2026-04-19 push to main, 2026-04-20 mid-session branch flips). Doc 459.
+
+   **Better path:** the user should launch new Claude Code sessions via the `zsesh` shell alias (`~/.zshrc`) which runs `claude --worktree ws/<desc>-<stamp>` automatically. Use this skill only when the user is ALREADY inside a Claude session and needs to spin up another worktree from there.
 
    - Format: `ws/fractal-fixes-0406-1423`
    - Always branch from latest `main`
@@ -64,9 +67,6 @@ Run these steps in order:
 
 5. **Confirm:**
    > "Session `ws/<name>` created at `../worktrees/<name>/`. Ready to work."
-   
-   Or if fallback:
-   > "Session branch `ws/<name>` created (same directory, worktree unavailable). Ready to work."
 
 ## End of Session (PR Workflow)
 

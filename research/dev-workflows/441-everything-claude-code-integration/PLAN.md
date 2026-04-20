@@ -252,17 +252,56 @@ Phases 2, 3, 4, 5 can run in parallel after Phase 1. Sequence 6 → 7 → 8.
 
 ---
 
-## Open Questions (brainstorm with Zaal before Phase 1)
+## Decisions (locked 2026-04-19)
 
-1. Scope: global install (`~/.claude/`) vs ZAO-OS-project-only (`.claude/`)? Default: global for skills + agents, project-local for auto-generated ones.
-2. `ecc-` prefix: keep forever, or drop after Phase 8? Default: drop on kept artifacts.
-3. AgentShield in `/ship`: warning-only vs blocking? Default: warning-only for week 1, blocking after.
-4. Instinct store namespacing: separate from memory/, or merge? Default: separate.
-5. Should we also install the Tkinter dashboard (`npm run dashboard`)? Default: SKIP.
-6. Rules: copy `ecc/rules/typescript/` to `.claude/rules/` (project) or `~/.claude/rules/` (global)? Default: diff first, then merge additive rules into project-local `.claude/rules/api-routes.md` + `components.md` + `tests.md`.
+| # | Question | Decision | Rationale |
+|---|----------|----------|-----------|
+| 1 | Scope: global `~/.claude/` or project `.claude/`? | **GLOBAL** for ECC skills/agents. Project-local for skill-creator outputs only. | Reusable across ZAO OS, COC, FISHBOWLZ, BCZ. |
+| 2 | `ecc-` prefix: drop after Phase 8 or keep forever? | **KEEP FOREVER** | Provenance. Folder name tells you upstream origin when ECC updates or breaks. MANIFEST.md tracks SHAs. |
+| 3 | AgentShield in `/ship`: warning-only or blocking? | **Warn week 1, block week 2+** | False-positive triage window. `.agentshield-ignore` populated, then gate. |
+| 4 | Instinct store: separate from auto-memory or merge? | **SEPARATE** | Different shapes: instincts = code patterns, memory = user/feedback/project/reference. Separate files, separate lifecycles. |
+| 5 | Tkinter dashboard (`npm run dashboard`)? | **INSTALL + EVALUATE** | Try it in Phase 1. If GUI useful → keep. If bloat → rip out. |
+| 6 | ECC `rules/typescript/` merge strategy? | **Diff-then-merge (additive only)** | 10-min read, cherry-pick missing rules into `.claude/rules/api-routes.md` / `components.md` / `tests.md`. Preserve ZAO tuning. |
 
 ---
 
+## Execution Log
+
+**2026-04-19 — Phase 1 + partial Phase 2 + partial Phase 3 executed.**
+
+See `AUDIT.md` for discovery findings and `MANIFEST.md` for installed artifacts.
+
+Completed this session:
+- Pinned ECC SHA `8bdf88e5ad8877bcd00a4aba7ccbfb50f235f10f`
+- Installed 5 skills (ecc-verification-loop, ecc-security-review, ecc-eval-harness, ecc-strategic-compact, ecc-content-hash-cache)
+- Installed 2 commands (ecc-learn, ecc-skill-create)
+- Added `CLAUDE_CODE_SUBAGENT_MODEL=haiku` to `~/.claude/settings.json`
+- Backup saved at `~/.claude/settings.json.pre-ecc-2026-04-19`
+
+Discovered constraints that shift strategy:
+- ECC hooks are a single `hooks.json` coupled to plugin bootstrap. Can't cherry-pick cleanly.
+- `continuous-learning-v2` has `agents/hooks/scripts/` subdirs referencing ECC root scripts. Can't cherry-pick cleanly.
+- Commands like `/checkpoint`, `/verify`, `/instinct-*` depend on CL-v2 backend. Can't install in isolation.
+- Original 7-skill target reduced to 5 (CL-v2 deferred pending Path B decision).
+
+## Deferred — Awaiting Zaal Decision
+
+| # | Decision point | Options |
+|---|----------------|---------|
+| D1 | Hooks + CL-v2 + instinct commands | A) Full plugin install via `/plugin install ecc@ecc` + disable unwanted skills. B) Skip entirely, keep current 5 cherry-picks. |
+| D2 | AgentShield | A) `npx ecc-agentshield scan` in ZAO OS. B) Skip. |
+| D3 | MCPs (Supabase/Playwright/Context7) | A) Install with provided creds. B) Skip. C) Only one (which). |
+| D4 | Tkinter dashboard | A) `pip install -r` + `python ecc_dashboard.py`. B) Skip. |
+| D5 | Rules merge | A) Diff ECC `rules/typescript/` against existing project rules, merge additive. B) Skip. |
+| D6 | Agents (harness-optimizer, etc.) | A) Cherry-pick ones without script deps. B) Skip. |
+
+## Validation Window
+
+7-day window starting 2026-04-19:
+- Invoke each `ecc-*` skill at least once on real work.
+- Track which get used vs which sit dormant.
+- Re-evaluate at 2026-04-26.
+
 ## Next Action
 
-Confirm scope + open questions with Zaal, then kick Phase 1 in a fresh `ws/` worktree branch.
+Zaal reviews decision points D1-D6. Plan Phase 2 follow-up based on answers.

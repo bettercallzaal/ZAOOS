@@ -14,9 +14,7 @@ export async function GET() {
   // 1. Privy configured?
   checks.privy = {
     ok: !!(process.env.PRIVY_APP_ID && process.env.PRIVY_APP_SECRET),
-    detail: process.env.PRIVY_APP_ID
-      ? `App ID: ${process.env.PRIVY_APP_ID.slice(0, 8)}...`
-      : 'PRIVY_APP_ID missing',
+    detail: process.env.PRIVY_APP_ID ? 'configured' : 'PRIVY_APP_ID missing',
   };
 
   // 2. Wallet IDs set?
@@ -26,16 +24,14 @@ export async function GET() {
     const val = process.env[key];
     checks[`wallet_${name.toLowerCase()}`] = {
       ok: !!val,
-      detail: val ? `${val.slice(0, 8)}...` : `${key} missing`,
+      detail: val ? 'configured' : `${key} missing`,
     };
   }
 
   // 3. 0x API key?
   checks.zx_api = {
     ok: !!process.env.ZX_API_KEY,
-    detail: process.env.ZX_API_KEY
-      ? `Key: ${process.env.ZX_API_KEY.slice(0, 8)}...`
-      : 'ZX_API_KEY missing',
+    detail: process.env.ZX_API_KEY ? 'configured' : 'ZX_API_KEY missing',
   };
 
   // 4. Supabase agent_config table exists + has rows?

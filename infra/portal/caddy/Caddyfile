@@ -17,9 +17,18 @@
 # ao.zaoos.com -> :3002 -> wrapper at /, /app/* proxies to AO :3001
 :3002 {
   import protected
-  # AO internal paths reverse_proxy directly (Next.js uses absolute URLs for its own assets)
+
+  # Terminal mux WebSocket - Next.js server on :3000 handles /ao-terminal-mux upgrade
+  @aoWebsocket path /ao-terminal-mux /ao-terminal-mux/*
+  handle @aoWebsocket {
+    reverse_proxy localhost:3000
+  }
+
+  # AO internal paths (Next.js uses absolute URLs for its own assets)
   @aoAssets path /_next/* /api/* /sessions/* /ws /socket.io/* /__next/*
-  reverse_proxy @aoAssets localhost:3000
+  handle @aoAssets {
+    reverse_proxy localhost:3000
+  }
 
   handle_path /app/* {
     reverse_proxy localhost:3000

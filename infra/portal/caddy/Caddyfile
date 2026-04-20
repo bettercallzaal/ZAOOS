@@ -57,6 +57,13 @@
     file_server
   }
 
+  @agentsPage path /agents
+  handle @agentsPage {
+    rewrite * /agents.html
+    root * /home/zaal/caddy/portal
+    file_server
+  }
+
   root * /home/zaal/caddy/portal
   file_server
 }

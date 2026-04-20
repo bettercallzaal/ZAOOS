@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Agents" />
+<meta name="theme-color" content="#0a1628" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<title>Agents - ZAO</title>
+<style>
+  :root{--navy:#0a1628;--ink:#f5f4ed;--gold:#f5a623;--dim:#a0a9b8;--panel:rgba(255,255,255,.03);--line:rgba(255,255,255,.06)}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--navy);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",sans-serif;min-height:100vh}
+  main{max-width:720px;margin:0 auto;padding:16px 14px 80px}
+  h1{font-size:20px;font-weight:600;letter-spacing:.2px;margin:6px 0 2px}
+  .subtitle{color:var(--dim);font-size:12px;margin:0 0 18px}
+  .layer{margin:18px 0 10px;font-size:10.5px;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase;font-weight:600}
+  .grid{display:flex;flex-direction:column;gap:6px}
+  .row{display:grid;grid-template-columns:1fr auto;gap:6px 14px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;align-items:center}
+  .row .name{font-size:13px;font-weight:600;color:var(--ink)}
+  .row .where{font-size:11px;color:var(--dim);grid-column:1/-1;margin-top:2px}
+  .row .status{font-size:10px;padding:3px 7px;border-radius:999px;border:1px solid var(--line);color:var(--dim);justify-self:end;white-space:nowrap}
+  .status.live{color:var(--gold);border-color:rgba(245,166,35,.35)}
+  .status.dormant{color:var(--dim)}
+  .note{color:var(--dim);font-size:11px;margin-top:18px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:8px;line-height:1.5}
+  .note a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>Agents</h1>
+  <p class="subtitle">Who runs where. 4 layers, 8 agents. Tap a layer to see details.</p>
+
+  <div class="layer">Edge — code authoring</div>
+  <div class="grid">
+    <div class="row">
+      <div class="name">Claude Code</div>
+      <div class="status live">live</div>
+      <div class="where">Mac work rig + Windows home rig. Per-session git worktrees via <code>zsesh</code>.</div>
+    </div>
+  </div>
+
+  <div class="layer">Concierge — dispatcher</div>
+  <div class="grid">
+    <div class="row">
+      <div class="name">ZOE</div>
+      <div class="status live">live</div>
+      <div class="where">VPS 1 (Hostinger) • Docker: openclaw-openclaw-gateway-1 • Telegram <a href="https://t.me/zaoclaw_bot">@zaoclaw_bot</a></div>
+    </div>
+  </div>
+
+  <div class="layer">Specialists — VPS 1</div>
+  <div class="grid">
+    <div class="row">
+      <div class="name">ZOEY</div>
+      <div class="status live">live</div>
+      <div class="where">openclaw-workspace/zoey/ • action agent, dispatched by ZOE</div>
+    </div>
+    <div class="row">
+      <div class="name">WALLET</div>
+      <div class="status live">live</div>
+      <div class="where">openclaw-workspace/zao-wallet/ • on-chain ops</div>
+    </div>
+    <div class="row">
+      <div class="name">ROLO</div>
+      <div class="status live">live</div>
+      <div class="where">openclaw-workspace/ • CRM / rolodex, relationship manager</div>
+    </div>
+  </div>
+
+  <div class="layer">In-app — Vercel cron</div>
+  <div class="grid">
+    <div class="row">
+      <div class="name">VAULT</div>
+      <div class="status live">live</div>
+      <div class="where">src/lib/agents/vault.ts • safe-hold strategy</div>
+    </div>
+    <div class="row">
+      <div class="name">BANKER</div>
+      <div class="status live">live</div>
+      <div class="where">src/lib/agents/banker.ts • PnL + trade execution</div>
+    </div>
+    <div class="row">
+      <div class="name">DEALER</div>
+      <div class="status live">live</div>
+      <div class="where">src/lib/agents/dealer.ts • market-making, liquidity</div>
+    </div>
+  </div>
+
+  <div class="layer">Cron — VPS 1 host</div>
+  <div class="grid">
+    <div class="row">
+      <div class="name">ZOE learning pings</div>
+      <div class="status dormant">staged</div>
+      <div class="where">/home/zaal/zoe-learning-pings/ • every 30 min during 9am-9pm ET (awaits activation)</div>
+    </div>
+  </div>
+
+  <div class="note">
+    Full stack design: <a href="https://github.com/bettercallzaal/ZAOOS/blob/main/research/agents/460-zao-agentic-stack-end-to-end-design/README.md">doc 460</a>.<br>
+    Company context (BRAIN synthesis): <a href="https://github.com/bettercallzaal/ZAOOS/blob/main/BRAIN/README.md">BRAIN/</a>.<br>
+    Tap <b>ZOE</b> in the nav to message her on Telegram.
+  </div>
+</main>
+<script src="/dock/dock.js" defer></script>
+</body>
+</html>

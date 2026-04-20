@@ -263,6 +263,34 @@ Phases 2, 3, 4, 5 can run in parallel after Phase 1. Sequence 6 → 7 → 8.
 
 ---
 
-## Next Action
+## Execution Log
 
-Confirm scope + open questions with Zaal, then kick Phase 1 in a fresh `ws/` worktree branch.
+**2026-04-19** — Audit + Path A cherry-pick start (see AUDIT.md). 5 skills + 2 cmds + haiku env installed.
+
+**2026-04-20 AM** — Doc 442 top-picks ranking. Extended Path A to 10 skills + 1 agent + 6 cmds. Dropped `ecc-strategic-compact`. Added Context7 + Playwright MCPs via `claude mcp add`. AgentShield baselines captured (project B/83, global D/55 with 1 critical `Bash(*)`). TS hygiene rule merged.
+
+**2026-04-20 PM — SWITCHED TO PATH B (full plugin install).**
+
+All Path A cherry-picks REMOVED. ECC plugin installed via settings.json:
+- `extraKnownMarketplaces["everything-claude-code"]` → github source
+- `enabledPlugins["everything-claude-code@everything-claude-code"]: true`
+- `skillOverrides` — 163 skills set to `"off"`, 20 kept enabled
+
+**Why Path B:** Unlocks `continuous-learning-v2` (instinct system), `/checkpoint`, `/verify`, `/learn`, `/harness-audit`, `/evolve`, `/prune`, `/instinct-*` commands, full hook suite (coupled to plugin bootstrap). Cherry-pick overhead eliminated.
+
+**Cost:** 48 agents + 79 commands load without filter (no agent/command override mechanism). Accepted.
+
+Backup: `~/.claude/settings.json.pre-path-b-2026-04-20`.
+
+See `MANIFEST.md` for active-20 skill list + rollback. See `AUDIT.md` for discovery findings. See doc 442 for ranking methodology. See doc 448 for per-artifact teaching guide.
+
+---
+
+## Next Action (post-restart)
+
+1. Restart Claude Code → plugin install from marketplace.
+2. Verify 20 ECC skills visible as `everything-claude-code:<name>`.
+3. Test `/learn` + `/checkpoint` + `/verify` + `/harness-audit` commands.
+4. Run `/harness-audit` once — save report under `441-.../harness-audit-report.md`.
+5. 7-day window (thru 2026-04-27): invoke `/learn` at end of each work session.
+6. 2026-04-27: `/instinct-status` check + decide keep/drop per skill.

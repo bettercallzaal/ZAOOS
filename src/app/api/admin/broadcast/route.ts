@@ -62,13 +62,21 @@ export async function POST(req: NextRequest) {
 
     const data = await res.json();
 
-    await logAuditEvent({
+    // Fire-and-forget audit log: a logAuditEvent rejection must never surface
+    // as a failed response when the cast already shipped. Log the drop instead
+    // so external scrapers can alert on missing audit rows.
+    logAuditEvent({
       actorFid: session.fid,
       action: 'broadcast',
       targetType: 'channel',
       targetId: channel,
       details: { text: text.slice(0, 100), castHash: data.cast?.hash },
       ipAddress: getClientIp(req),
+    }).catch((err) => {
+      logger.error(
+        `[broadcast] CRITICAL audit-trail drop: cast shipped but audit event failed. ` +
+          `castHash=${data.cast?.hash ?? '<none>'} actor_fid=${session.fid} error=${err instanceof Error ? err.message : String(err)}`,
+      );
     });
 
     return NextResponse.json({ success: true, hash: data.cast?.hash });

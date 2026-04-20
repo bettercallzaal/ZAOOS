@@ -75,7 +75,6 @@ function MemberTile({ member }: { member: PublicMember }) {
       className={`flex items-center gap-3 p-3 rounded-lg bg-[#0a1628] border ${SCOPE_COLOR[member.scope] || 'border-white/[0.08]'} hover:bg-[#0a1628]/80 transition-colors`}
     >
       {showPhoto ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={member.photo_url}
           alt={member.name}

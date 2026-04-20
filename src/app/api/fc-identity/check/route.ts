@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { checkGatingEligibility, resolveEthToFid, getFcQualityScoreByFid } from '@/lib/fc-identity';
-
-const CheckSchema = z.object({
-  address: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
-  minScore: z.number().int().min(0).optional().default(0),
-});
+import { checkGatingEligibility, getFcQualityScoreByFid } from '@/lib/fc-identity';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

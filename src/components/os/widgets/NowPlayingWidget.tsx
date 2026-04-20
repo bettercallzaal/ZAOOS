@@ -3,7 +3,7 @@
 import { usePlayerContext } from '@/providers/audio/PlayerProvider';
 import type { WidgetProps } from '@/lib/os/types';
 
-export default function NowPlayingWidget({ size, onExpand }: WidgetProps) {
+export default function NowPlayingWidget({ onExpand }: WidgetProps) {
   const { state } = usePlayerContext();
   const { status, metadata } = state;
   const isPlaying = status === 'playing';

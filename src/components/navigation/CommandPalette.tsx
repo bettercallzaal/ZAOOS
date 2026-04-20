@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Command } from 'cmdk';
-import { communityConfig } from '@/../community.config';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface CommandPaletteProps {
@@ -40,7 +39,6 @@ const COMMAND_GROUPS = {
 export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const router = useRouter();
   const [value, setValue] = useState('');
-  const dialogRef = useState<HTMLDivElement | null>(null)[1];
 
   useFocusTrap(
     { current: document.querySelector('[role="dialog"]') },

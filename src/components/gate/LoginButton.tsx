@@ -107,7 +107,7 @@ export function LoginButton() {
       if (data.redirect) {
         router.push(data.redirect);
       }
-    } catch (err) {
+    } catch {
       // Login error - don't use logger here (client component)
       setError('Connection error — check your internet and try again. If this persists, contact an admin.');
       setLoading(false);

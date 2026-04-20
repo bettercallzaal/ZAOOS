@@ -185,6 +185,7 @@ export function SocialPage() {
   const activeFilterCount = [powerBadgeOnly, hideSpam, minFollowers > 0, zaoOnly, mutualOnly, hasBio].filter(Boolean).length;
 
   // Virtual scrolling
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: filtered.length + (cursor ? 1 : 0),
     getScrollElement: () => parentRef.current,

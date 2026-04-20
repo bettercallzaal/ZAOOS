@@ -1,0 +1,8 @@
+{"level":"info","phase":"init","message":"Scanning /Users/zaalpanthaki/Documents/ZAO OS V1/.claude","timestamp":"2026-04-20T08:43:18.126Z"}
+{"level":"info","phase":"static","message":"Running static analysis","timestamp":"2026-04-20T08:43:18.126Z"}
+{"level":"info","phase":"static","message":"Static analysis complete: 14 findings","data":{"grade":"B","score":83},"timestamp":"2026-04-20T08:43:18.162Z"}
+{"level":"info","phase":"done","message":"Scan complete","timestamp":"2026-04-20T08:43:18.163Z"}
+{"level":"info","phase":"init","message":"Scanning /Users/zaalpanthaki/Documents/ZAO OS V1/.claude","timestamp":"2026-04-20T08:44:32.223Z"}
+{"level":"info","phase":"static","message":"Running static analysis","timestamp":"2026-04-20T08:44:32.224Z"}
+{"level":"info","phase":"static","message":"Static analysis complete: 14 findings","data":{"grade":"B","score":83},"timestamp":"2026-04-20T08:44:32.261Z"}
+{"level":"info","phase":"done","message":"Scan complete","timestamp":"2026-04-20T08:44:32.262Z"}

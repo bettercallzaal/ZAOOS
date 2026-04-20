@@ -36,10 +36,29 @@ export async function GET() {
       .limit(50),
   ]);
 
-  const configs = configResult.status === 'fulfilled' ? (configResult.value.data ?? []) : [];
-  const events = eventsResult.status === 'fulfilled' ? (eventsResult.value.data ?? []) : [];
+  // Don't silently hide DB failures as empty arrays — admin can't distinguish
+  // "no agents configured" from "DB down" otherwise. Surface the error.
+  if (configResult.status === 'rejected') {
+    logger.error('GET /api/admin/agents: agent_config query failed:', configResult.reason);
+    return NextResponse.json({ error: 'Failed to fetch agent configs' }, { status: 500 });
+  }
+  if (eventsResult.status === 'rejected') {
+    logger.error('GET /api/admin/agents: agent_events query failed:', eventsResult.reason);
+    return NextResponse.json({ error: 'Failed to fetch agent events' }, { status: 500 });
+  }
+  if (configResult.value.error) {
+    logger.error('GET /api/admin/agents: agent_config returned error:', configResult.value.error);
+    return NextResponse.json({ error: 'Failed to fetch agent configs' }, { status: 500 });
+  }
+  if (eventsResult.value.error) {
+    logger.error('GET /api/admin/agents: agent_events returned error:', eventsResult.value.error);
+    return NextResponse.json({ error: 'Failed to fetch agent events' }, { status: 500 });
+  }
 
-  return NextResponse.json({ agents: configs, recentEvents: events });
+  return NextResponse.json({
+    agents: configResult.value.data ?? [],
+    recentEvents: eventsResult.value.data ?? [],
+  });
 }
 
 /**

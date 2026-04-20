@@ -47,7 +47,7 @@
 :3003 {
   import protected
 
-  @backend path /spawn-action /api/spawn /test-checklist /test-done /api/todos /api/todos/*
+  @backend path /spawn-action /api/spawn /api/spawn-agent /test-checklist /test-done /api/todos /api/todos/*
   reverse_proxy @backend localhost:3004
 
   @todosPage path /todos
@@ -60,6 +60,13 @@
   @agentsPage path /agents
   handle @agentsPage {
     rewrite * /agents.html
+    root * /home/zaal/caddy/portal
+    file_server
+  }
+
+  @actPage path /act
+  handle @actPage {
+    rewrite * /act.html
     root * /home/zaal/caddy/portal
     file_server
   }

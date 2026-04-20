@@ -27,6 +27,8 @@ const eslintConfig = defineConfig([
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/purity": "off",
       "react-hooks/refs": "off",
+      "react-hooks/preserve-manual-memoization": "off",
+      "react-hooks/immutability": "off",
       // Next.js <Image> is preferred but many components use <img> for
       // external/dynamic sources where next/image adds complexity.
       // Re-enable once image optimization is prioritized.

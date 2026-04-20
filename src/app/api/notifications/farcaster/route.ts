@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   const session = await getSessionData();
   if (!session?.signerUuid) {
     return NextResponse.json({ error: 'Signer required' }, { status: 401 });

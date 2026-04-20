@@ -19,7 +19,7 @@ export async function checkAllowlistGate(): Promise<boolean> {
   }
 }
 
-export async function checkTokenGate(_contractAddress: string, _chainId: number): Promise<boolean> {
+export async function checkTokenGate(): Promise<boolean> {
   try {
     const res = await fetch('/api/auth/session');
     if (!res.ok) return false;

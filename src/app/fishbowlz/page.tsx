@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { RoomCardSkeleton } from '@/components/fishbowlz/RoomCardSkeleton';
 import { EmptyState } from '@/components/fishbowlz/EmptyState';
@@ -58,7 +57,7 @@ function timeUntil(dateStr: string): string {
 }
 
 export default function FishbowlzPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [rooms, setRooms] = useState<FishbowlRoom[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);

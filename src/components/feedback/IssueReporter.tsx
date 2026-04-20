@@ -159,7 +159,7 @@ export function IssueReporter() {
               />
               {screenshot ? (
                 <div className="relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
+                  {/* eslint-disable-next-line jsx-a11y/alt-text */}
                   <img src={screenshot} className="w-full h-32 object-cover rounded-lg border border-white/10" />
                   <button
                     onClick={() => setScreenshot(null)}

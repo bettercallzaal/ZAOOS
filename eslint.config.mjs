@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "plugins/**",
     "scripts/**",
+    "infra/**",
     ".claude/**",
     ".superpowers/**",
   ]),

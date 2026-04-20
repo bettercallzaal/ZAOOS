@@ -63,7 +63,6 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
       {!editing && hasBio && (
         <div className="flex items-start gap-3">
           {showPhoto && (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={photoUrl}
               alt={`${memberName} profile`}
@@ -89,7 +88,6 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
           </p>
 
           {showPhoto && (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={photoUrl}
               alt="Preview"

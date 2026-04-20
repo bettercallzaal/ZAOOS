@@ -732,7 +732,7 @@ function FishbowlRoomPageInner() {
             return (
               <>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {occupiedSeats.map((speaker, i) => (
+                  {occupiedSeats.map((speaker) => (
                     <div
                       key={`speaker-${speaker.fid}`}
                       className="rounded-xl p-4 border-2 transition-colors bg-[#1a2a4a] border-[#f5a623]"

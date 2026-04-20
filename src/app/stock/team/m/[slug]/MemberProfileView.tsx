@@ -30,7 +30,6 @@ export function MemberProfileView({ member, scopeLabel, roleLabel }: Props) {
     <section className="bg-gradient-to-br from-[#f5a623]/10 via-transparent to-transparent rounded-2xl p-6 border border-white/[0.08] space-y-4">
       <div className="flex items-start gap-4">
         {showPhoto ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={member.photo_url}
             alt={member.name}

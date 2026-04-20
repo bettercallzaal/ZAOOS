@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Command } from 'cmdk';
-import { communityConfig } from '@/../community.config';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface CommandPaletteProps {

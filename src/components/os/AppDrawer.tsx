@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { getFullApps, getMicroApps } from '@/lib/os/app-manifest';
 import { AppIcon } from './AppIcon';
 import type { AppCategory, AppManifest } from '@/lib/os/types';
 

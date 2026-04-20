@@ -290,9 +290,26 @@ def main() -> int:
         print(f"No tip extractable from {rel}", file=sys.stderr)
         return 0
 
-    # GitHub URL for tap-to-open (assumes public main branch of the ZAOOS repo).
+    # GitHub URL for tap-to-open.
     github_url = f"https://github.com/bettercallzaal/ZAOOS/blob/main/{rel}"
-    msg_parts = [f"[ZOE TIP] {title}", "", tip, "", github_url]
+
+    # Act URL: one-tap portal page that spawns an AO agent to work on THIS doc.
+    # Portal hosts act.html + POSTs to /api/spawn-agent (spawn-server.js).
+    from urllib.parse import quote
+    act_url = (
+        "https://portal.zaoos.com/act"
+        f"?doc={quote(str(rel), safe='/')}"
+        f"&title={quote(title[:80])}"
+    )
+
+    msg_parts = [
+        f"[ZOE TIP] {title}",
+        "",
+        tip,
+        "",
+        f"Read: {github_url}",
+        f"Act:  {act_url}",
+    ]
     msg = "\n".join(msg_parts)
 
     if send_telegram(msg):

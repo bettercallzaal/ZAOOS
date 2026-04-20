@@ -162,6 +162,69 @@ function handleTodoById(req, res, u, id) {
   return json(res, 405, { error: "method not allowed" });
 }
 
+// --------- spawn-agent (from ZOE tip Act button) ---------
+// Thin wrapper around /api/spawn. Builds an agent prompt from {doc, title,
+// intent, extra} and delegates to handleSpawn with project=ZAOOS.
+function handleSpawnAgent(req, res) {
+  let body = "";
+  req.on("data", c => body += c);
+  req.on("end", () => {
+    let payload;
+    try { payload = JSON.parse(body); } catch { return json(res, 400, { error: "invalid JSON" }); }
+    const doc = (payload.doc || "").trim();
+    const title = (payload.title || "").trim().slice(0, 120);
+    const intent = (payload.intent || "review").trim();
+    const extra = (payload.extra || "").trim().slice(0, 600);
+    if (!doc) return json(res, 400, { error: "doc path required" });
+    if (doc.includes("..") || doc.startsWith("/") || doc.startsWith("~")) {
+      return json(res, 400, { error: "invalid doc path" });
+    }
+    const validIntents = ["review", "expand", "update", "custom"];
+    if (!validIntents.includes(intent)) return json(res, 400, { error: "invalid intent" });
+
+    const intentPrompts = {
+      review: "Review the doc, find stale info / unclear sections / broken links / outdated recommendations. Make small targeted fixes.",
+      expand: "Deepen coverage of the weakest or most outdated section of the doc. Add concrete details, examples, or links.",
+      update: "Reconcile this doc against newer ADRs (docs/adr/), research docs, and BRAIN/ entries. Update stale claims.",
+      custom: "Follow the user's extra context exactly.",
+    };
+
+    const slug = doc.replace(/[^a-z0-9]/gi, "-").slice(0, 40).toLowerCase();
+    const agentPrompt = [
+      "You are a ZAO OS doc-improvement agent.",
+      "Doc: " + doc,
+      "Title: " + title,
+      "",
+      "Task: " + intentPrompts[intent],
+      extra ? "User extra context: " + extra : "",
+      "",
+      "Workflow:",
+      "1. Read the doc at the path above.",
+      "2. If relevant, also read: BRAIN/_meta/conflicts.md, docs/adr/, and obviously related research/ docs.",
+      "3. Create a fresh branch: ws/act-" + slug + "-$(date +%m%d-%H%M).",
+      "4. Make minimal targeted edits. Do not rewrite the whole doc.",
+      "5. Commit with a clear one-line message referring to this act session.",
+      "6. Push the branch.",
+      "7. Open a PR to main with a short summary of what changed and why.",
+      "8. Stop. Do not merge.",
+      "",
+      "Constraints:",
+      "- Never push to main directly (safe-git-push hook will block this anyway).",
+      "- Keep edits small and atomic. If the request is too big for a single PR, describe the split in the PR body and stop.",
+    ].filter(Boolean).join("\n");
+
+    // Delegate via a synthetic request that carries the built prompt.
+    const inner = JSON.stringify({ project: "ZAOOS", prompt: agentPrompt });
+    const fakeReq = Object.assign(Object.create(req), {
+      on(evt, cb) {
+        if (evt === "data") cb(inner);
+        else if (evt === "end") cb();
+      },
+    });
+    handleSpawn(fakeReq, res);
+  });
+}
+
 // --------- spawn ---------
 function handleSpawn(req, res) {
   let body = "";
@@ -215,6 +278,7 @@ function handleSpawn(req, res) {
 const server = http.createServer((req, res) => {
   const u = new URL(req.url, "http://localhost");
   if (req.method === "POST" && (u.pathname === "/spawn-action" || u.pathname === "/api/spawn")) return handleSpawn(req, res);
+  if (req.method === "POST" && u.pathname === "/api/spawn-agent") return handleSpawnAgent(req, res);
   if (req.method === "GET" && u.pathname === "/test-checklist") {
     const state = readJSON(CHECKLIST_FILE, null);
     if (!state) return html(res, 404, "<h1>no checklist</h1>");

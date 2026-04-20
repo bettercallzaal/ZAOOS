@@ -24,3 +24,4 @@
 | 285 | [ORDAO & ORFrapps Updated Docs](./285-ordao-orfrapps-updated-docs/) | STANDALONE | Updated ORDAO architecture, orfrapps CLI + config system, deployment walkthrough, ZAO integration map |
 | 355 | [ZAO Fractal Presentation (April 2026)](./355-zao-fractal-presentation-april-2026/) | STANDALONE | Updated 9-slide onboarding deck: token definitions, voting criteria, Discord bot timer + consensus flow |
 | 356 | [ZAO Fractal TODOs & Status](./356-zao-fractal-todos-status/) | CANONICAL | Full audit: 7 tabs built, 12 API routes, 32 TODOs prioritized P0-P5, webhook connected |
+| 444 | [Fractal Submission: April 20, 2026](./444-fractal-submission-apr20-2026/) | STANDALONE | Weekly contribution summary — 132 commits, 34 PRs, ZAOstock + OS shell + agent hardening |

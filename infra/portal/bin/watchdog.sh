@@ -33,7 +33,10 @@ respawn ao            "cd $HOME/code/ZAOOS && ao start 2>&1 | tee $HOME/ao.log" 
 respawn caddy         "$HOME/.local/bin/caddy run --config $HOME/caddy/Caddyfile --adapter caddyfile" "caddy run"
 respawn claude-zaoos  "cd $HOME/code/ZAOOS && claude"  ""
 respawn ttyd          "$HOME/.local/bin/ttyd -i lo -p 7681 -W -t fontSize=15 -t scrollback=10000 -t disableLeaveAlert=true -t cursorBlink=true tmux attach -t claude-zaoos" "ttyd -i lo -p 7681"
-respawn cloudflared   "cloudflared tunnel run zao-agents" "cloudflared tunnel run"
+# cloudflared is supervised by user-systemd (~/.config/systemd/user/cloudflared.service)
+# so watchdog no longer manages it. Running both systemd and tmux simultaneously
+# caused duplicate tunnel connections and ~19s TTFB on every request (2026-04-20).
+# respawn cloudflared   "cloudflared tunnel run zao-agents" "cloudflared tunnel run"
 respawn spawn-server  "bash -c \"$ENV_SOURCE; node \$HOME/bin/spawn-server.js 2>&1 | tee \$HOME/spawn-server.log\"" "node.*spawn-server.js"
 respawn auth-server   "bash -c \"$ENV_SOURCE; node \$HOME/bin/auth-server.js 2>&1 | tee \$HOME/auth-server.log\"" "node.*auth-server.js"
 # Bot source of truth = repo-synced symlink at $HOME/bin/bot.mjs (per install.sh).

@@ -42,7 +42,7 @@ if [ -d "$AO_WEB_SERVER" ]; then
     cp "$chunk" "$chunk.bak-$(date +%s)"
     sed -i 's|"--dangerously-skip-permissions"|"--permission-mode","acceptEdits"|g' "$chunk"
     echo "patch1b applied: $chunk"
-  done < <(grep -rl '"--dangerously-skip-permissions"' "$AO_WEB_SERVER" 2>/dev/null)
+  done < <(grep -rl --include='*.js' '"--dangerously-skip-permissions"' "$AO_WEB_SERVER" 2>/dev/null)
 fi
 
 # Patch 2: inject CLAUDE_AUTOUPDATER_DISABLE
@@ -51,6 +51,44 @@ if grep -q 'CLAUDE_AUTOUPDATER_DISABLE' "$PLUGIN"; then
 else
   sed -i 's|env\["CLAUDECODE"\] = "";|env["CLAUDE_AUTOUPDATER_DISABLE"] = "1"; env["CLAUDECODE"] = "";|' "$PLUGIN"
   echo "patch2 applied (auto-updater disable)"
+fi
+
+# Patch 3 (doc 466): Kill button gives no visible feedback on success. Force
+# a page reload 400ms after a successful kill so the user sees state change
+# instead of wondering if the click did anything. Patches the ao-web client
+# chunk that contains the Kill handler (filename has a content hash, so we
+# grep by signature string).
+AO_WEB_CHUNKS="${AO_WEB_CHUNKS:-$HOME/.local/lib/node_modules/@aoagents/ao/node_modules/@aoagents/ao-web/.next/static/chunks}"
+if [ -d "$AO_WEB_CHUNKS" ]; then
+  while IFS= read -r chunk; do
+    if grep -q 'setTimeout.*reload' "$chunk"; then
+      echo "patch3 already applied: $chunk"
+      continue
+    fi
+    cp "$chunk" "$chunk.bak-$(date +%s)"
+    sed -i 's|el("Session terminated","success")|el("Session terminated","success"),setTimeout(()=>window.location.reload(),400)|g' "$chunk"
+    echo "patch3 applied: $chunk"
+  done < <(grep -rl --include='*.js' 'el("Session terminated","success")' "$AO_WEB_CHUNKS" 2>/dev/null)
+fi
+
+# Patch 4 (doc 466): ship a stub sw.js into the Caddy static root so the
+# browser's service-worker registration does not fail with a MIME-type error.
+# Upstream AO compiles a sw.js but does not copy it to the npm public/ dir.
+CADDY_AO_ROOT="${CADDY_AO_ROOT:-$HOME/caddy/ao}"
+if [ -d "$CADDY_AO_ROOT" ]; then
+  if [ ! -f "$CADDY_AO_ROOT/sw.js" ]; then
+    cat > "$CADDY_AO_ROOT/sw.js" << 'SW_EOF'
+// Minimal no-op service worker. Stops the console MIME-type registration error.
+// Real SW from upstream AO is not shipped in the npm build; this placeholder
+// keeps the browser happy until AO ships sw.js or we clone source.
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
+self.addEventListener("fetch", () => {});
+SW_EOF
+    echo "patch4 applied (sw.js stub written to $CADDY_AO_ROOT)"
+  else
+    echo "patch4 already applied"
+  fi
 fi
 
 echo "done"

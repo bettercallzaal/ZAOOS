@@ -80,6 +80,23 @@
   .bulk-bar button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
   .bulk-bar button.danger{background:var(--red);color:#fff}
 
+  /* Stats strip */
+  .stats{display:flex;gap:.6rem;margin:.3rem 0 .8rem;color:var(--muted);font-size:.72rem;flex-wrap:wrap}
+  .stats b{color:var(--ink);font-weight:600}
+  .stats .good{color:var(--green)}
+
+  /* Inline edit */
+  .text.editing{outline:1px solid var(--gold);outline-offset:2px;border-radius:4px;padding:.1rem .3rem;background:rgba(245,166,35,.06)}
+
+  /* Undo toast */
+  .undo-toast{position:fixed;left:50%;transform:translateX(-50%) translateY(120%);bottom:calc(max(0px,env(safe-area-inset-bottom)) + 80px);background:var(--panel);border:1px solid var(--gold);border-radius:999px;padding:.5rem 1rem;display:flex;gap:.8rem;align-items:center;font-size:.82rem;color:var(--ink);z-index:60;transition:transform .2s ease;max-width:92vw}
+  .undo-toast.show{transform:translateX(-50%) translateY(0)}
+  .undo-toast button{background:var(--gold);color:var(--bg);border:0;padding:.3rem .7rem;font-size:.78rem;border-radius:999px;font-weight:600}
+
+  /* Chip count badge */
+  .chip .n{opacity:.65;margin-left:.25rem;font-weight:500;font-size:.68rem}
+  .chip.active .n{opacity:1}
+
   details.spam{margin-top:.8rem;background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:.6rem .8rem}
   details.spam summary{cursor:pointer;color:var(--gold);font-size:.85rem;font-weight:600}
   details.spam textarea{margin-top:.5rem;min-height:130px}
@@ -94,6 +111,8 @@
       <button type="button" class="select-toggle" id="selectToggle">Select</button>
     </div>
   </header>
+
+  <div class="stats" id="stats"></div>
 
   <form id="addForm">
     <textarea id="text" placeholder="brain dump one todo..." required></textarea>
@@ -150,6 +169,8 @@
       <button class="chip p2" data-k="priority" data-v="P2">P2</button>
       <button class="chip p3" data-k="priority" data-v="P3">P3</button>
     </div>
+    <h2>Project</h2>
+    <div class="filter-group" id="projectChips"></div>
     <h2>Tags</h2>
     <div class="filter-group" id="tagChips"></div>
     <h2>Search</h2>
@@ -167,6 +188,11 @@
   <ul class="todos" id="list"></ul>
   <div class="empty" id="empty" style="display:none">No todos match these filters.</div>
 
+  <div class="undo-toast" id="undoToast">
+    <span id="undoMsg">Done</span>
+    <button type="button" id="undoBtn">Undo</button>
+  </div>
+
   <div class="bulk-bar" id="bulkBar">
     <span class="bulk-count" id="bulkCount">0 selected</span>
     <div class="bulk-actions">
@@ -179,20 +205,131 @@
   </div>
 
 <script>
-const filters = { status: ["open"], priority: [], tag: null, q: "", order: "priority" };
+const filters = { status: ["open"], priority: [], project: null, tag: null, q: "", order: "priority" };
 let allTags = [];
 let total = 0;
 let selectMode = false;
 const selected = new Set();
+let lastSnapshot = null;
+let undoTimer = null;
+const KNOWN_PROJECTS = ["ZAOOS", "BetterCallZaal", "COC", "WaveWarZ", "ZAOstock"];
 
 function buildQuery() {
   const p = new URLSearchParams();
   for (const s of filters.status) p.append("status", s);
   for (const pr of filters.priority) p.append("priority", pr);
+  if (filters.project) p.set("project", filters.project);
   if (filters.tag) p.set("tag", filters.tag);
   if (filters.q) p.set("q", filters.q);
   p.set("order", filters.order);
   return p.toString();
+}
+
+async function fetchAllForStats() {
+  // Lightweight: fetch every status to compute counts + today/week done
+  const res = await fetch("/api/todos?status=open&status=doing&status=done&status=archived", { headers: { "Accept": "application/json" } });
+  if (!res.ok) return { todos: [] };
+  return res.json();
+}
+
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+function updateStats(all) {
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const counts = { open: 0, doing: 0, done: 0, archived: 0, p0: 0, doneToday: 0, doneWeek: 0 };
+  for (const t of all) {
+    counts[t.status] = (counts[t.status] || 0) + 1;
+    if (t.status === "open" && t.priority === "P0") counts.p0++;
+    if (t.status === "done" && t.updated_at) {
+      const u = new Date(t.updated_at);
+      if (isSameDay(u, now)) counts.doneToday++;
+      if (u > weekAgo) counts.doneWeek++;
+    }
+  }
+  const stats = document.getElementById("stats");
+  stats.innerHTML = `<span><b class="${counts.p0 ? 'good' : ''}">${counts.p0}</b> P0 open</span>` +
+    `<span><b>${counts.open}</b> open total</span>` +
+    `<span>Done <b class="good">${counts.doneToday}</b> today</span>` +
+    `<span><b class="good">${counts.doneWeek}</b> this week</span>`;
+  // Write chip counts
+  const setCount = (selector, n) => {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    const existing = el.querySelector(".n");
+    if (existing) existing.remove();
+    const span = document.createElement("span");
+    span.className = "n";
+    span.textContent = n;
+    el.appendChild(span);
+  };
+  setCount("#statusChips .chip[data-v='open']", counts.open);
+  setCount("#statusChips .chip[data-v='doing']", counts.doing);
+  setCount("#statusChips .chip[data-v='done']", counts.done);
+  setCount("#statusChips .chip[data-v='archived']", counts.archived);
+  // Priority counts (only for open)
+  const priCounts = { P0: 0, P1: 0, P2: 0, P3: 0 };
+  for (const t of all) if (t.status === "open") priCounts[t.priority || "P2"]++;
+  setCount("#priorityChips .chip[data-v='P0']", priCounts.P0);
+  setCount("#priorityChips .chip[data-v='P1']", priCounts.P1);
+  setCount("#priorityChips .chip[data-v='P2']", priCounts.P2);
+  setCount("#priorityChips .chip[data-v='P3']", priCounts.P3);
+  // Project chips from real data (union of known + seen)
+  const seenProjects = new Set(KNOWN_PROJECTS);
+  for (const t of all) if (t.project) seenProjects.add(t.project);
+  renderProjectChips(Array.from(seenProjects).sort(), all);
+}
+
+function renderProjectChips(projects, all) {
+  const container = document.getElementById("projectChips");
+  if (!container) return;
+  container.innerHTML = "";
+  const all0 = document.createElement("button");
+  all0.className = "chip" + (!filters.project ? " active" : "");
+  all0.textContent = "all";
+  all0.addEventListener("click", () => { filters.project = null; renderProjectChips(projects, all); load(); });
+  container.appendChild(all0);
+  for (const p of projects) {
+    const openCount = all.filter(t => t.project === p && t.status === "open").length;
+    const btn = document.createElement("button");
+    btn.className = "chip" + (filters.project === p ? " active" : "");
+    btn.innerHTML = p + `<span class="n">${openCount}</span>`;
+    btn.addEventListener("click", () => { filters.project = filters.project === p ? null : p; renderProjectChips(projects, all); load(); });
+    container.appendChild(btn);
+  }
+}
+
+function showUndo(msg, prevStates) {
+  const toast = document.getElementById("undoToast");
+  const msgEl = document.getElementById("undoMsg");
+  msgEl.textContent = msg;
+  lastSnapshot = prevStates;
+  toast.classList.add("show");
+  if (undoTimer) clearTimeout(undoTimer);
+  undoTimer = setTimeout(() => { toast.classList.remove("show"); lastSnapshot = null; }, 5000);
+}
+
+async function undoLastAction() {
+  if (!lastSnapshot) return;
+  const snap = lastSnapshot;
+  lastSnapshot = null;
+  document.getElementById("undoToast").classList.remove("show");
+  if (undoTimer) clearTimeout(undoTimer);
+  // Restore each item's previous fields; deleted items cannot be undone (backend removed)
+  await Promise.all(snap.filter(s => !s.deleted).map(s =>
+    fetch("/api/todos/" + s.id, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: s.status, priority: s.priority })
+    })
+  ));
+  const deletedCount = snap.filter(s => s.deleted).length;
+  if (deletedCount > 0) {
+    alert(`${deletedCount} deleted todo(s) cannot be restored (permanent delete).`);
+  }
+  load();
 }
 
 async function fetchTodos() {
@@ -271,6 +408,46 @@ function render(data) {
     const text = document.createElement("div");
     text.className = "text";
     text.textContent = t.text;
+    // Inline edit on double-tap (desktop dblclick + mobile-equivalent)
+    if (!selectMode) {
+      let tapTimer = null;
+      const enterEdit = () => {
+        if (text.isContentEditable) return;
+        const orig = t.text;
+        text.contentEditable = "true";
+        text.classList.add("editing");
+        text.focus();
+        // place cursor at end
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        range.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        const commit = async () => {
+          text.contentEditable = "false";
+          text.classList.remove("editing");
+          const newText = text.textContent.trim();
+          if (!newText || newText === orig) { text.textContent = orig; return; }
+          await fetch("/api/todos/" + t.id, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: newText })
+          });
+          load();
+        };
+        text.addEventListener("blur", commit, { once: true });
+        text.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") { e.preventDefault(); text.blur(); }
+          if (e.key === "Escape") { text.textContent = orig; text.blur(); }
+        });
+      };
+      text.addEventListener("dblclick", (e) => { e.stopPropagation(); enterEdit(); });
+      text.addEventListener("touchend", (e) => {
+        if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; e.preventDefault(); enterEdit(); return; }
+        tapTimer = setTimeout(() => { tapTimer = null; }, 320);
+      });
+    }
     body.appendChild(text);
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -341,7 +518,11 @@ function relTime(iso) {
 }
 
 async function load() {
-  try { const data = await fetchTodos(); render(data); }
+  try {
+    const [data, statsData] = await Promise.all([fetchTodos(), fetchAllForStats()]);
+    render(data);
+    updateStats(statsData.todos || []);
+  }
   catch (e) { document.getElementById("empty").textContent = "Error: " + e.message; document.getElementById("empty").style.display = ""; }
 }
 
@@ -360,6 +541,9 @@ function updateBulkBar() {
 async function bulkPatch(statusValue) {
   const ids = Array.from(selected);
   if (!ids.length) return;
+  // Snapshot current state so we can undo
+  const all = await fetchAllForStats();
+  const snap = (all.todos || []).filter(t => ids.includes(t.id)).map(t => ({ id: t.id, status: t.status, priority: t.priority }));
   await Promise.all(ids.map(id => fetch("/api/todos/" + id, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -367,6 +551,7 @@ async function bulkPatch(statusValue) {
   })));
   selected.clear();
   updateBulkBar();
+  showUndo(`${ids.length} todo(s) -> ${statusValue}`, snap);
   load();
 }
 
@@ -377,6 +562,8 @@ async function bulkDelete() {
   await Promise.all(ids.map(id => fetch("/api/todos/" + id, { method: "DELETE" })));
   selected.clear();
   updateBulkBar();
+  // Delete cannot be undone through the API; the toast is informational only
+  showUndo(`${ids.length} todo(s) deleted (permanent)`, ids.map(id => ({ id, deleted: true })));
   load();
 }
 
@@ -402,6 +589,7 @@ document.getElementById("statusAll").addEventListener("click", () => {
   document.querySelectorAll("#statusChips .chip[data-v]").forEach(el => el.classList.add("active"));
   load();
 });
+document.getElementById("undoBtn").addEventListener("click", undoLastAction);
 
 document.querySelectorAll("#statusChips .chip, #priorityChips .chip").forEach(el => {
   el.addEventListener("click", () => {

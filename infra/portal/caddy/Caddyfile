@@ -22,10 +22,11 @@
     max_size 5MB
   }
 
-  # Terminal mux WebSocket - Next.js server on :3000 handles /ao-terminal-mux upgrade
+  # Terminal mux WebSocket - direct-terminal-ws.js listens on :14801 at path /mux
   @aoWebsocket path /ao-terminal-mux /ao-terminal-mux/*
   handle @aoWebsocket {
-    reverse_proxy localhost:3000
+    rewrite * /mux
+    reverse_proxy localhost:14801
   }
 
   # AO internal paths (Next.js uses absolute URLs for its own assets)

@@ -26,6 +26,9 @@ export function CypherForm() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<'idle' | 'sent' | 'error'>('idle');
   const [errMsg, setErrMsg] = useState('');
+  const [editUrl, setEditUrl] = useState('');
+  const [publicUrl, setPublicUrl] = useState('');
+  const [copied, setCopied] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -50,6 +53,9 @@ export function CypherForm() {
         setStatus('error');
         setErrMsg(d.error || 'Submission failed');
       } else {
+        const d = await res.json();
+        if (d.editUrl) setEditUrl(d.editUrl);
+        if (d.publicUrl) setPublicUrl(d.publicUrl);
         setStatus('sent');
       }
     } catch {
@@ -60,16 +66,56 @@ export function CypherForm() {
     }
   }
 
+  function copyEdit() {
+    const abs = typeof window !== 'undefined' ? `${window.location.origin}${editUrl}` : editUrl;
+    navigator.clipboard.writeText(abs).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+
   if (status === 'sent') {
     return (
-      <div className="bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-transparent rounded-xl p-6 border border-emerald-500/30 space-y-3 text-center">
-        <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold">You are in</p>
-        <h2 className="text-xl font-bold text-white">Thanks, {name || 'friend'}.</h2>
-        <p className="text-sm text-gray-300">
-          Your cypher signup landed in the ZAOstock music team dashboard. DCoop or someone from the music crew will reach out with logistics and the pre-event coordination thread.
-        </p>
-        <p className="text-xs text-gray-500">
-          Questions in the meantime? DM Zaal on Farcaster.
+      <div className="bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-transparent rounded-xl p-6 border border-emerald-500/30 space-y-4">
+        <div className="text-center">
+          <p className="text-xs uppercase tracking-wider text-emerald-400 font-bold">You are in</p>
+          <h2 className="text-xl font-bold text-white mt-1">Thanks, {name || 'friend'}.</h2>
+          <p className="text-sm text-gray-300 mt-2">
+            Your cypher signup landed in the ZAOstock music team dashboard. DCoop or someone from the music crew will reach out with logistics.
+          </p>
+        </div>
+
+        {editUrl && (
+          <div className="bg-[#0a1628] border border-[#f5a623]/30 rounded-lg p-4 space-y-3">
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-wider text-[#f5a623] font-bold">Next step: earn your first ZAOfestivals Point</p>
+              <p className="text-xs text-gray-300 mt-1">
+                Claim your artist profile, add a bio, earn 1 point. Complete the contributor path to be eligible to work the event on Oct 3.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <a
+                href={editUrl}
+                className="bg-[#f5a623] hover:bg-[#ffd700] text-black font-bold rounded-lg px-4 py-2.5 text-sm transition-colors text-center"
+              >
+                Claim + edit my profile -&gt;
+              </a>
+              <button
+                onClick={copyEdit}
+                className="text-xs text-gray-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] rounded px-3 py-2 transition-colors"
+              >
+                {copied ? 'Copied!' : 'Copy the private edit link'}
+              </button>
+            </div>
+            <p className="text-[10px] text-gray-500 text-center">
+              Save this link. Anyone with it can edit your page. Your public page is{' '}
+              {publicUrl && <a href={publicUrl} className="text-[#f5a623] hover:text-[#ffd700]">{publicUrl}</a>}
+            </p>
+          </div>
+        )}
+
+        <p className="text-[11px] text-gray-500 text-center">
+          Questions? DM Zaal on Farcaster.
         </p>
       </div>
     );

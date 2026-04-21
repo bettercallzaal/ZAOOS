@@ -94,8 +94,17 @@
   <div class="grid">
     <div class="row">
       <div class="name">ZOE learning pings</div>
-      <div class="status dormant">staged</div>
-      <div class="where">/home/zaal/zoe-learning-pings/ • every 30 min during 9am-9pm ET (awaits activation)</div>
+      <div class="status live">live</div>
+      <div class="where">/home/zaal/zoe-learning-pings/ • every 30 min during 9am-9pm ET</div>
+    </div>
+  </div>
+
+  <div class="layer">Live AO sessions</div>
+  <div class="grid" id="sessions-grid">
+    <div class="row">
+      <div class="name" id="sessions-status">loading...</div>
+      <div class="status dormant" id="sessions-count">-</div>
+      <div class="where" id="sessions-hint">polling /api/sessions every 15s</div>
     </div>
   </div>
 
@@ -106,5 +115,44 @@
   </div>
 </main>
 <script src="/dock/dock.js" defer></script>
+<script>
+(function(){
+  const grid = document.getElementById('sessions-grid');
+  function fmtAge(secs){
+    if (secs < 60) return secs + 's ago';
+    if (secs < 3600) return Math.floor(secs/60) + 'm ago';
+    if (secs < 86400) return Math.floor(secs/3600) + 'h ago';
+    return Math.floor(secs/86400) + 'd ago';
+  }
+  function render(sessions){
+    if (!sessions || sessions.length === 0){
+      grid.innerHTML = '<div class="row"><div class="name">no sessions</div><div class="status dormant">0</div><div class="where">nothing running in ~/.agent-orchestrator/ZAOOS/sessions/</div></div>';
+      return;
+    }
+    const live = sessions.slice(0, 5);
+    grid.innerHTML = live.map(s => {
+      const isRecent = s.ageSecs < 900; // <15 min = considered running
+      const statusClass = isRecent ? 'live' : 'dormant';
+      const statusText = isRecent ? 'running' : 'idle';
+      return '<div class="row"><div class="name">' + escapeHTML(s.id.slice(0, 40)) + '</div><div class="status ' + statusClass + '">' + statusText + '</div><div class="where">' + fmtAge(s.ageSecs) + '</div></div>';
+    }).join('');
+  }
+  function escapeHTML(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  async function poll(){
+    try {
+      const r = await fetch('/api/sessions', {credentials:'same-origin'});
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const data = await r.json();
+      render(data.sessions || []);
+    } catch (e) {
+      grid.innerHTML = '<div class="row"><div class="name">error</div><div class="status dormant">-</div><div class="where">' + escapeHTML(e.message) + '</div></div>';
+    }
+  }
+  poll();
+  setInterval(poll, 15000);
+})();
+</script>
 </body>
 </html>

@@ -1,9 +1,21 @@
 import { execSync } from "child_process";
 import { readFileSync, readdirSync, existsSync, appendFileSync, mkdirSync, writeFileSync, unlinkSync } from "fs";
+import { emit, traceId, startTimer } from "./events.mjs";
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const ALLOWED_USER = "1447437687";
-const WORKSPACE = "/home/zaal/openclaw-workspace";
+// Multi-user ready: ALLOWED_USERS env var takes precedence, falls back to
+// legacy single-user constant. Values are Telegram user IDs, comma-separated.
+// Always retains Zaal (1447437687) as a default floor so a mistyped env var
+// doesn't lock the bot out.
+const ALLOWED_USERS = (process.env.ALLOWED_USERS || "1447437687")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+if (!ALLOWED_USERS.includes("1447437687")) ALLOWED_USERS.push("1447437687");
+function isAllowed(userId) {
+  return ALLOWED_USERS.includes(String(userId));
+}
+const WORKSPACE = process.env.WORKSPACE || "/home/zaal/openclaw-workspace";
 const REPO = WORKSPACE + "/ZAOOS";
 const API = "https://api.telegram.org/bot" + BOT_TOKEN;
 const TODOS_FILE = "/home/zaal/portal-state/todos.json";
@@ -447,6 +459,42 @@ function loadSystemPrompt(chatId) {
   return prompt;
 }
 
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+// Wraps Telegram sendMessage with exponential backoff + Retry-After handling.
+// Drops the message only on unrecoverable 4xx (except 408 request timeout).
+// Every failure path emits a structured event so silent drops become visible
+// in events.jsonl — the bug that let "Poll error: fetch failed" hide for a
+// full day in bot.log on 2026-04-20.
+async function sendMessageChunk(chatId, chunk, { maxRetries = 3, baseDelay = 200 } = {}) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const res = await fetch(API + "/sendMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text: chunk }),
+      });
+      if (res.ok) return true;
+      if (res.status === 429) {
+        const ra = parseInt(res.headers.get("retry-after") || "1", 10) || 1;
+        emit({ source: "bot", event: "send_rate_limited", status: 429, retry_after: ra, attempt });
+        await sleep(ra * 1000);
+        continue;
+      }
+      if (res.status >= 400 && res.status < 500 && res.status !== 408) {
+        emit({ source: "bot", event: "send_fail_perm", status: res.status, attempt });
+        return false;
+      }
+      emit({ source: "bot", event: "send_fail_transient", status: res.status, attempt });
+    } catch (e) {
+      emit({ source: "bot", event: "send_fail_transient", err: String(e.message || e).slice(0, 200), attempt });
+    }
+    await sleep(baseDelay * Math.pow(2, attempt));
+  }
+  emit({ source: "bot", event: "send_fail_exhausted", chat_id: chatId, chunk_bytes: chunk.length });
+  return false;
+}
+
 async function sendMessage(chatId, text) {
   const chunks = [];
   let remaining = text;
@@ -457,15 +505,13 @@ async function sendMessage(chatId, text) {
     chunks.push(remaining.substring(0, splitAt));
     remaining = remaining.substring(splitAt);
   }
+  let allOk = true;
   for (const chunk of chunks) {
-    try {
-      await fetch(API + "/sendMessage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text: chunk }),
-      });
-    } catch (e) { console.error("Send error:", e.message); }
+    const ok = await sendMessageChunk(chatId, chunk);
+    if (!ok) allOk = false;
   }
+  emit({ source: "bot", event: "outbound", chat_id: chatId, bytes: text.length, chunks: chunks.length, ok: allOk });
+  return allOk;
 }
 
 async function sendTyping(chatId) {
@@ -531,7 +577,8 @@ async function handleCallback(update) {
   const cq = update.callback_query;
   if (!cq || !cq.data) return;
   const userId = String(cq.from.id);
-  if (userId !== ALLOWED_USER) {
+  if (!isAllowed(userId)) {
+    emit({ source: "bot", event: "callback_auth_reject", user: userId, data: String(cq.data).slice(0, 80) });
     await answerCallback(cq.id, "Not authorized.");
     return;
   }
@@ -623,28 +670,44 @@ async function handleCallback(update) {
   }
 }
 
+// Poll-loop error counter for exponential backoff on getUpdates failures.
+// Without this the loop hammers Telegram every 100ms during an outage.
+let pollErrorCount = 0;
+
 async function poll(offset) {
   offset = offset || 0;
+  let nextDelay = 100;
   try {
     const res = await fetch(API + "/getUpdates?offset=" + offset + "&timeout=30&allowed_updates=%5B%22message%22%2C%22callback_query%22%5D");
     const data = await res.json();
+    pollErrorCount = 0;
     if (data.ok && data.result.length > 0) {
       for (const update of data.result) {
         offset = update.update_id + 1;
         if (update.callback_query) {
           try { await handleCallback(update); }
-          catch (e) { console.error("Callback handler error:", e.message); }
+          catch (e) {
+            emit({ source: "bot", event: "callback_error", err: String(e.message || e).slice(0, 200) });
+            console.error("Callback handler error:", e.message);
+          }
           continue;
         }
         const msg = update.message;
         if (!msg || !msg.text) continue;
         const userId = String(msg.from.id);
         const chatId = msg.chat.id;
-        if (userId !== ALLOWED_USER) { await sendMessage(chatId, "Not authorized."); continue; }
-        console.log("[" + new Date().toISOString() + "] Zaal: " + msg.text.substring(0, 80));
+        const trace_id = traceId();
+        if (!isAllowed(userId)) {
+          emit({ source: "bot", event: "auth_reject", user: userId, chat: chatId, trace_id });
+          await sendMessage(chatId, "Not authorized.");
+          continue;
+        }
+        emit({ source: "bot", event: "inbound", user: userId, chat: chatId, bytes: msg.text.length, trace_id, text_preview: msg.text.slice(0, 80) });
+        console.log("[" + new Date().toISOString() + "] " + userId + ": " + msg.text.substring(0, 80));
         // Portal todos slash commands - intercept before Claude
         const slashReply = await handleTodoCommand(msg.text);
         if (slashReply !== null) {
+          emit({ source: "bot", event: "slash_handled", user: userId, chat: chatId, trace_id, bytes: slashReply.length });
           await sendMessage(chatId, slashReply);
           logConversation(msg.text, slashReply);
           appendConversation(chatId, msg.text, slashReply);
@@ -653,20 +716,32 @@ async function poll(offset) {
         }
         await sendTyping(chatId);
         const systemPrompt = loadSystemPrompt(chatId);
+        const t = startTimer();
         const reply = callClaude(msg.text, systemPrompt);
+        emit({ source: "bot", event: "claude_call", user: userId, chat: chatId, trace_id, duration_ms: t.ms(), reply_bytes: reply.length });
         await sendMessage(chatId, reply);
         logConversation(msg.text, reply);
         appendConversation(chatId, msg.text, reply);
         console.log("[" + new Date().toISOString() + "] ZOE: " + reply.substring(0, 80) + "...");
       }
     }
-  } catch (err) { console.error("Poll error:", err.message); }
-  setTimeout(function() { poll(offset); }, 100);
+  } catch (err) {
+    pollErrorCount += 1;
+    const errMsg = String(err.message || err).slice(0, 200);
+    emit({ source: "bot", event: "poll_fail", err: errMsg, error_count: pollErrorCount });
+    console.error("Poll error:", errMsg, "(count=" + pollErrorCount + ")");
+    // Exponential backoff: 500ms, 1s, 2s, 4s, 8s, ... capped at 30s.
+    // Protects Telegram API from a tight loop during outages.
+    nextDelay = Math.min(500 * Math.pow(2, Math.min(pollErrorCount - 1, 6)), 30000);
+  }
+  setTimeout(function() { poll(offset); }, nextDelay);
 }
 
 console.log("ZOE v2 Telegram Bot (Opus via Max plan)");
 console.log("Workspace: " + WORKSPACE);
 console.log("Repo: " + REPO);
+console.log("Allowed users: " + ALLOWED_USERS.join(","));
+emit({ source: "bot", event: "boot", workspace: WORKSPACE, repo: REPO, allowed_user_count: ALLOWED_USERS.length });
 await fetch(API + "/deleteWebhook");
 console.log("Webhook cleared. Publishing commands menu...");
 await publishCommands();

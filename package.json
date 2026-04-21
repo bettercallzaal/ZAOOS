@@ -12,6 +12,7 @@
     "turbo:build": "turbo build",
     "turbo:lint": "turbo lint",
     "typecheck": "tsc --noEmit",
+    "brain:digest": "node scripts/brain-to-digest.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",

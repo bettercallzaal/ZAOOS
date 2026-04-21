@@ -25,10 +25,11 @@ BRAIN/
 
 ## Reading rules (for agents + humans)
 
-1. **Open the entity file directly** for the question you have. Don't search. The answer is structured, sourced, current.
-2. **Check the frontmatter `last_confirmed_at`** — if older than 30 days, treat as stale.
-3. **For conflicts, see `_meta/conflicts.md`** — every unresolved conflict is logged with sources + chosen winner + reasoning.
-4. **Source authority lives in `_meta/source_authority.md`** — when sources disagree, higher tier wins. Always.
+1. **Start with [`_meta/DIGEST.md`](./_meta/DIGEST.md)** — auto-generated 1-page synthesis. Gives agents current state without walking the whole tree. Regenerated via `npm run brain:digest`.
+2. **Open the entity file directly** for the question you have. Don't search. The answer is structured, sourced, current.
+3. **Check the frontmatter `last_confirmed_at`** — if older than 30 days, treat as stale.
+4. **For conflicts, see `_meta/conflicts.md`** — every unresolved conflict is logged with sources + chosen winner + reasoning.
+5. **Source authority lives in `_meta/source_authority.md`** — when sources disagree, higher tier wins. Always.
 
 ## Writing rules (for the synthesis Routine + humans)
 

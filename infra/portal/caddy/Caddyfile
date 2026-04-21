@@ -17,6 +17,10 @@
 # ao.zaoos.com -> :3002 -> wrapper at /, /app/* proxies to AO :3001
 :3002 {
   import protected
+  # Body-size cap: AO app proxies uploads; keep generous but bounded (doc 463 finding 5).
+  request_body {
+    max_size 5MB
+  }
 
   # Terminal mux WebSocket - Next.js server on :3000 handles /ao-terminal-mux upgrade
   @aoWebsocket path /ao-terminal-mux /ao-terminal-mux/*
@@ -46,8 +50,12 @@
 # portal.zaoos.com -> :3003 -> static portal, /todos UI, backend API
 :3003 {
   import protected
+  # Body-size cap: portal APIs are small JSON (todos, spawn-agent) — tight cap (doc 463 finding 5).
+  request_body {
+    max_size 256KB
+  }
 
-  @backend path /spawn-action /api/spawn /api/spawn-agent /test-checklist /test-done /api/todos /api/todos/*
+  @backend path /spawn-action /api/spawn /api/spawn-agent /api/sessions /test-checklist /test-done /api/todos /api/todos/*
   reverse_proxy @backend localhost:3004
 
   @todosPage path /todos

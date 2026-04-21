@@ -225,7 +225,18 @@ def extract_tip_via_claude(doc_text: str, doc_title: str) -> str | None:
     return tip[:MAX_TIP_CHARS]
 
 
-def send_telegram(text: str) -> bool:
+def extract_doc_number(rel_path: str) -> str | None:
+    """
+    Pull the leading numeric id from a research doc path like
+    'research/dev-workflows/157-cross-project-asset-audit/README.md'
+    -> '157'. Returns None if no number found (e.g. ADRs, BRAIN entries).
+    Kept short so Telegram callback_data (64-byte cap) has room.
+    """
+    m = re.search(r"/(\d+)-[^/]+/README\.md$", rel_path)
+    return m.group(1) if m else None
+
+
+def send_telegram(text: str, reply_markup: dict | None = None) -> bool:
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set; printing instead",
               file=sys.stderr)
@@ -237,11 +248,14 @@ def send_telegram(text: str) -> bool:
         print(text)
         return False
 
-    body = json.dumps({
+    payload: dict = {
         "chat_id": TELEGRAM_CHAT_ID,
         "text": text,
         "disable_web_page_preview": True,
-    }).encode("utf-8")
+    }
+    if reply_markup is not None:
+        payload["reply_markup"] = reply_markup
+    body = json.dumps(payload).encode("utf-8")
 
     req = urllib_request.Request(
         f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
@@ -312,7 +326,27 @@ def main() -> int:
     ]
     msg = "\n".join(msg_parts)
 
-    if send_telegram(msg):
+    # Inline keyboard: SHIP FIX triggers the Telegram -> bot.mjs -> spawn-server
+    # -> AO -> Claude Code -> PR loop. MUTE parks this doc number in a snooze
+    # file so it skips future random picks for N days. Callback data is capped
+    # at 64 bytes, so we identify the doc by its numeric id.
+    doc_num = extract_doc_number(str(rel))
+    reply_markup: dict | None = None
+    if doc_num:
+        reply_markup = {
+            "inline_keyboard": [
+                [
+                    {"text": "SHIP FIX", "callback_data": f"ship:{doc_num}"},
+                    {"text": "Read", "url": github_url},
+                ],
+                [
+                    {"text": "Not now", "callback_data": f"snooze:{doc_num}"},
+                    {"text": "Mute 7d", "callback_data": f"mute:{doc_num}"},
+                ],
+            ]
+        }
+
+    if send_telegram(msg, reply_markup=reply_markup):
         state["sent"].append({
             "path": str(rel),
             "title": title,

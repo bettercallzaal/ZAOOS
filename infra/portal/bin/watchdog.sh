@@ -36,4 +36,7 @@ respawn ttyd          "$HOME/.local/bin/ttyd -i lo -p 7681 -W -t fontSize=15 -t 
 respawn cloudflared   "cloudflared tunnel run zao-agents" "cloudflared tunnel run"
 respawn spawn-server  "bash -c \"$ENV_SOURCE; node \$HOME/bin/spawn-server.js 2>&1 | tee \$HOME/spawn-server.log\"" "node.*spawn-server.js"
 respawn auth-server   "bash -c \"$ENV_SOURCE; node \$HOME/bin/auth-server.js 2>&1 | tee \$HOME/auth-server.log\"" "node.*auth-server.js"
-respawn zoe-bot       "bash -c \"$ENV_SOURCE; cd \$HOME/zoe-bot; node bot.mjs 2>&1 | tee bot.log\"" "node bot.mjs"
+# Bot source of truth = repo-synced symlink at $HOME/bin/bot.mjs (per install.sh).
+# cwd stays at $HOME/zoe-bot so existing logs (bot.log, api.log, commands.log)
+# and auxiliary scripts (send-coc4.sh) keep their home.
+respawn zoe-bot       "bash -c \"$ENV_SOURCE; mkdir -p \$HOME/zoe-bot; cd \$HOME/zoe-bot; node \$HOME/bin/bot.mjs 2>&1 | tee bot.log\"" "node.*bot.mjs"

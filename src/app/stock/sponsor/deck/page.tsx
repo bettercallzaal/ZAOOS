@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const TRACKS = [
   {
     name: 'Main Stage Partner',
-    range: '$500 - $2,500',
+    range: '$500+',
     fit: 'Local Ellsworth and Maine businesses who want to be credited at the stage and on-site.',
     credits: [
       'Named credit on stage banner and signage',
@@ -28,7 +28,7 @@ const TRACKS = [
   },
   {
     name: 'Broadcast Partner',
-    range: '$1,000 - $5,000',
+    range: '$1,000+',
     fit: 'Web3 brands, tools, and ecosystem partners who want reach across Farcaster + streaming.',
     credits: [
       'Named credit on festival website with backlink',

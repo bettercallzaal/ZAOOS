@@ -42,4 +42,15 @@ respawn auth-server   "bash -c \"$ENV_SOURCE; node \$HOME/bin/auth-server.js 2>&
 # Bot source of truth = repo-synced symlink at $HOME/bin/bot.mjs (per install.sh).
 # cwd stays at $HOME/zoe-bot so existing logs (bot.log, api.log, commands.log)
 # and auxiliary scripts (send-coc4.sh) keep their home.
-respawn zoe-bot       "bash -c \"$ENV_SOURCE; mkdir -p \$HOME/zoe-bot; cd \$HOME/zoe-bot; node \$HOME/bin/bot.mjs 2>&1 | tee bot.log\"" "node.*bot.mjs"
+# zoe-bot pattern is the bare `bin/bot.mjs` path — distinct from devz-bot whose
+# entry file is named devz-bot.mjs so the two never collide under pgrep.
+respawn zoe-bot       "bash -c \"$ENV_SOURCE; mkdir -p \$HOME/zoe-bot; cd \$HOME/zoe-bot; node \$HOME/bin/bot.mjs 2>&1 | tee bot.log\"" "bin/bot\\.mjs"
+
+# ZAO Devz bot. Only spawns if ~/zoe-devz/.env exists (so the bot stays dormant
+# until Zaal creates @zaodevz_bot via @BotFather + installs the token).
+# Token + allowlist live in ~/zoe-devz/.env (600, not committed). Code is the
+# repo-synced devz-bot.mjs symlink at $HOME/bin/devz-bot.mjs.
+if [ -f "$HOME/zoe-devz/.env" ]; then
+  DEVZ_ENV_SOURCE='set -a; . $HOME/zoe-devz/.env; set +a'
+  respawn zoe-devz-bot  "bash -c \"$DEVZ_ENV_SOURCE; cd \$HOME/zoe-devz; node \$HOME/bin/devz-bot.mjs 2>&1 | tee bot.log\"" "devz-bot\\.mjs"
+fi

@@ -25,7 +25,7 @@ ln -sfn "$REPO_DIR/caddy/portal"            "$HOME_DIR/caddy/portal"
 ln -sfn "$REPO_DIR/caddy/dock"              "$HOME_DIR/caddy/dock"
 ln -sfn "$REPO_DIR/caddy/claude"            "$HOME_DIR/caddy/claude"
 ln -sfn "$REPO_DIR/caddy/ao"                "$HOME_DIR/caddy/ao"
-for f in auth-server.js spawn-server.js watchdog.sh start-agents.sh fix-node-pty.sh test-checklist-ping.sh; do
+for f in auth-server.js spawn-server.js watchdog.sh start-agents.sh fix-node-pty.sh test-checklist-ping.sh bot.mjs session-watcher.mjs; do
   ln -sfn "$REPO_DIR/bin/$f" "$HOME_DIR/bin/$f"
   chmod +x "$HOME_DIR/bin/$f" 2>/dev/null || true
 done
@@ -62,12 +62,15 @@ echo "== ensure todos state =="
 [ -f "$HOME_DIR/portal-state/todos.json" ] || echo '{"todos":[]}' > "$HOME_DIR/portal-state/todos.json"
 
 echo "== install crontab entries =="
-CRON=$(crontab -l 2>/dev/null | grep -v -E "start-agents\.sh|watchdog\.sh|test-checklist-ping\.sh" || true)
+CRON=$(crontab -l 2>/dev/null | grep -v -E "start-agents\.sh|watchdog\.sh|test-checklist-ping\.sh|session-watcher\.mjs" || true)
 {
   echo "$CRON"
   echo "@reboot $HOME_DIR/bin/start-agents.sh"
   echo "* * * * * $HOME_DIR/bin/watchdog.sh"
   echo "*/15 * * * * $HOME_DIR/bin/test-checklist-ping.sh >> $HOME_DIR/test-checklist/cron.log 2>&1"
+  # ZOE ship-fix session watcher: polls watched-sessions.json for matured AO
+  # sessions and posts PR links back to Telegram. See doc 464 Part 3 / Patch 6.
+  echo "*/2 * * * * . \$HOME/.env.portal 2>/dev/null; $HOME_DIR/bin/session-watcher.mjs >> $HOME_DIR/.cache/zoe-telegram/session-watcher.log 2>&1"
 } | crontab -
 
 echo "== fix node-pty (use homebridge prebuilt multiarch) =="

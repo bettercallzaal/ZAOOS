@@ -13,8 +13,13 @@ const CHECKLIST_FILE = "/home/zaal/test-checklist/state.json";
 // doc doesn't exist. Root cause of the 2026-04-20 bug logged in doc 464.
 const SENT_TIPS_FILE = process.env.HOME + "/.cache/zoe-learning-pings/sent.json";
 const CONV_DIR = process.env.HOME + "/.cache/zoe-telegram";
+const SHIP_RATE_FILE = CONV_DIR + "/ship-rate.json";
+const MUTE_FILE = CONV_DIR + "/muted-docs.json";
+const WATCH_FILE = CONV_DIR + "/watched-sessions.json";
 const CONV_TURN_LIMIT = 20;
 const TIP_CONTEXT_DAYS = 7;
+const SHIP_RATE_LIMIT_PER_HOUR = 3;
+const SPAWN_SERVER_URL = process.env.SPAWN_SERVER_URL || "http://127.0.0.1:3004";
 
 function readTodos() {
   try { return JSON.parse(readFileSync(TODOS_FILE, "utf-8")); }
@@ -53,6 +58,115 @@ function appendConversation(chatId, userMsg, botReply) {
   }]).slice(-CONV_TURN_LIMIT);
   try { writeFileSync(f, JSON.stringify({ turns }, null, 2)); }
   catch (e) { console.error("Conv write error:", e.message); }
+}
+
+function checkShipRateLimit() {
+  try {
+    const s = JSON.parse(readFileSync(SHIP_RATE_FILE, "utf-8"));
+    const cutoff = Date.now() - 3600_000;
+    const recent = (s.events || []).filter((e) => e.at > cutoff);
+    return { allowed: recent.length < SHIP_RATE_LIMIT_PER_HOUR, used: recent.length };
+  } catch { return { allowed: true, used: 0 }; }
+}
+
+function recordShipAttempt() {
+  try { mkdirSync(CONV_DIR, { recursive: true }); } catch {}
+  let s = { events: [] };
+  try { s = JSON.parse(readFileSync(SHIP_RATE_FILE, "utf-8")); } catch {}
+  const cutoff = Date.now() - 3600_000;
+  s.events = (s.events || []).filter((e) => e.at > cutoff);
+  s.events.push({ at: Date.now() });
+  try { writeFileSync(SHIP_RATE_FILE, JSON.stringify(s)); } catch {}
+}
+
+function loadMutedDocs() {
+  try { return JSON.parse(readFileSync(MUTE_FILE, "utf-8")); }
+  catch { return { muted: {} }; }
+}
+
+function muteDoc(docNum, days) {
+  try { mkdirSync(CONV_DIR, { recursive: true }); } catch {}
+  const s = loadMutedDocs();
+  s.muted = s.muted || {};
+  s.muted[String(docNum)] = { until: Date.now() + days * 86400000 };
+  try { writeFileSync(MUTE_FILE, JSON.stringify(s, null, 2)); } catch {}
+}
+
+function recordWatchedSession(sessionId, meta) {
+  if (!sessionId) return;
+  try { mkdirSync(CONV_DIR, { recursive: true }); } catch {}
+  let s = { sessions: {} };
+  try { s = JSON.parse(readFileSync(WATCH_FILE, "utf-8")); } catch {}
+  s.sessions = s.sessions || {};
+  s.sessions[sessionId] = { ...meta, started_at: Date.now(), notified: false };
+  try { writeFileSync(WATCH_FILE, JSON.stringify(s, null, 2)); } catch {}
+}
+
+async function postSpawnAgent({ doc, title, intent = "review", extra = "" }) {
+  const body = JSON.stringify({ doc, title, intent, extra });
+  const res = await fetch(SPAWN_SERVER_URL + "/api/spawn-agent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body,
+  });
+  const text = await res.text();
+  let payload = {};
+  try { payload = JSON.parse(text); } catch {}
+  return { status: res.status, payload, rawText: text.slice(0, 500) };
+}
+
+async function editMessageText(chatId, messageId, newText) {
+  try {
+    await fetch(API + "/editMessageText", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        message_id: messageId,
+        text: newText,
+        disable_web_page_preview: true,
+      }),
+    });
+  } catch (e) { console.error("editMessageText error:", e.message); }
+}
+
+async function answerCallback(callbackId, text) {
+  try {
+    await fetch(API + "/answerCallbackQuery", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        callback_query_id: callbackId,
+        text: String(text || "").slice(0, 200),
+        show_alert: false,
+      }),
+    });
+  } catch (e) { console.error("answerCallback error:", e.message); }
+}
+
+// Publish the slash-command list so Telegram's blue "menu" button surfaces
+// every command without Zaal typing /help. Idempotent — safe to call on boot.
+async function publishCommands() {
+  const commands = [
+    { command: "todo", description: "Add todo: /todo <text> [P0-P3] [+Project] [#tag]" },
+    { command: "done", description: "Mark todo done: /done <id-prefix|text>" },
+    { command: "list", description: "Top 12 open todos by priority" },
+    { command: "p0", description: "Show only P0 open todos" },
+    { command: "p1", description: "Show P0 + P1 open todos" },
+    { command: "note", description: "Append note to todo: /note <id> <text>" },
+    { command: "recap", description: "Recap last 14 days of shipped work" },
+    { command: "summarize", description: "Project status: /summarize <project>" },
+    { command: "focus", description: "Mute nudges for N min: /focus 60" },
+    { command: "tip", description: "Resolve a ZOE tip: /tip 157" },
+    { command: "help", description: "Command reference" },
+  ];
+  try {
+    await fetch(API + "/setMyCommands", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ commands }),
+    });
+  } catch (e) { console.error("setMyCommands error:", e.message); }
 }
 
 // Local fallback when sent.json hasn't caught this tip yet (e.g. Zaal asks
@@ -413,14 +527,115 @@ function logConversation(userMsg, botReply) {
   try { appendFileSync(logFile, entry); } catch (e) { console.error("Log error:", e.message); }
 }
 
+async function handleCallback(update) {
+  const cq = update.callback_query;
+  if (!cq || !cq.data) return;
+  const userId = String(cq.from.id);
+  if (userId !== ALLOWED_USER) {
+    await answerCallback(cq.id, "Not authorized.");
+    return;
+  }
+  const chatId = cq.message && cq.message.chat && cq.message.chat.id;
+  const messageId = cq.message && cq.message.message_id;
+  const originalText = (cq.message && cq.message.text) || "";
+  // callback_data is `ship:<num>` | `snooze:<num>` | `mute:<num>`. <num> is the
+  // research doc's leading integer id. Cheap to validate.
+  const m = cq.data.match(/^(ship|snooze|mute):(\d+)$/);
+  if (!m) { await answerCallback(cq.id, "Unknown action"); return; }
+  const action = m[1];
+  const docNum = m[2];
+
+  if (action === "snooze") {
+    await answerCallback(cq.id, "Noted. Will re-surface soon.");
+    if (chatId && messageId) {
+      await editMessageText(chatId, messageId, originalText + "\n\n[SNOOZED]");
+    }
+    return;
+  }
+
+  if (action === "mute") {
+    muteDoc(docNum, 7);
+    await answerCallback(cq.id, "Muted for 7 days.");
+    if (chatId && messageId) {
+      await editMessageText(chatId, messageId, originalText + "\n\n[MUTED 7d]");
+    }
+    return;
+  }
+
+  // action === "ship": locate doc + spawn AO agent via spawn-server.
+  const rate = checkShipRateLimit();
+  if (!rate.allowed) {
+    await answerCallback(cq.id, "Rate limit: " + SHIP_RATE_LIMIT_PER_HOUR + "/hour");
+    if (chatId) {
+      await sendMessage(chatId, "[SHIP FIX] rate-limited (" + rate.used + "/" + SHIP_RATE_LIMIT_PER_HOUR + " this hour). Try again in 1hr.");
+    }
+    return;
+  }
+
+  const docPath = findDocByNumber(docNum);
+  if (!docPath) {
+    await answerCallback(cq.id, "Doc " + docNum + " not found in research/");
+    return;
+  }
+  // Re-validate against handleSpawnAgent's allowlist to fail fast if we
+  // somehow built a bad path. Mirrors spawn-server.js:213.
+  if (!/^[a-z0-9][a-z0-9/_.-]*\.md$/i.test(docPath)) {
+    await answerCallback(cq.id, "Invalid doc path");
+    return;
+  }
+
+  // Try to pull the tip's title from sent.json so the PR title reads nicely.
+  const tips = loadRecentTips(30);
+  const hit = tips.find((t) => (t.path || "").includes("/" + docNum + "-"));
+  const title = (hit && hit.title) || ("Doc " + docNum);
+
+  await answerCallback(cq.id, "Spawning fix agent...");
+  if (chatId && messageId) {
+    await editMessageText(chatId, messageId, originalText + "\n\n[SHIPPING] spawning Claude Code...");
+  }
+
+  recordShipAttempt();
+  let result;
+  try {
+    result = await postSpawnAgent({ doc: docPath, title, intent: "review" });
+  } catch (e) {
+    if (chatId) await sendMessage(chatId, "[SHIP FIX] spawn error: " + e.message.slice(0, 200));
+    return;
+  }
+
+  if (result.status >= 400) {
+    if (chatId) await sendMessage(chatId, "[SHIP FIX] spawn-server " + result.status + ": " + (result.payload.error || result.rawText));
+    return;
+  }
+
+  const sessionId = result.payload && result.payload.sessionId;
+  recordWatchedSession(sessionId, { docNum, docPath, title, chatId, messageId });
+
+  if (chatId) {
+    const lines = ["[SHIPPING] doc " + docNum + " -> " + docPath];
+    if (sessionId) {
+      lines.push("Session: " + sessionId);
+    } else {
+      lines.push("Session: spawning in background (status " + result.status + ")");
+    }
+    lines.push("Watcher will reply with PR link when ready.");
+    await sendMessage(chatId, lines.join("\n"));
+  }
+}
+
 async function poll(offset) {
   offset = offset || 0;
   try {
-    const res = await fetch(API + "/getUpdates?offset=" + offset + "&timeout=30");
+    const res = await fetch(API + "/getUpdates?offset=" + offset + "&timeout=30&allowed_updates=%5B%22message%22%2C%22callback_query%22%5D");
     const data = await res.json();
     if (data.ok && data.result.length > 0) {
       for (const update of data.result) {
         offset = update.update_id + 1;
+        if (update.callback_query) {
+          try { await handleCallback(update); }
+          catch (e) { console.error("Callback handler error:", e.message); }
+          continue;
+        }
         const msg = update.message;
         if (!msg || !msg.text) continue;
         const userId = String(msg.from.id);
@@ -453,5 +668,7 @@ console.log("ZOE v2 Telegram Bot (Opus via Max plan)");
 console.log("Workspace: " + WORKSPACE);
 console.log("Repo: " + REPO);
 await fetch(API + "/deleteWebhook");
-console.log("Webhook cleared. Polling...");
+console.log("Webhook cleared. Publishing commands menu...");
+await publishCommands();
+console.log("Polling...");
 poll();

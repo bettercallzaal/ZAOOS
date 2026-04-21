@@ -28,6 +28,18 @@ log() { echo "$(TS) $*" >> "$LOG"; }
 pull_clone() {
   local dir=$1
   [ -d "$dir/.git" ] || return 0
+  # Skip clones that aren't on `main` with a clean tree. Dev work copies
+  # (Zaal's ~/code/ZAOOS sits on a feature branch with uncommitted changes)
+  # always fail ff-only pull and were flooding the log every tick. Silent
+  # skip respects user workflow.
+  local branch
+  branch=$(git -C "$dir" symbolic-ref --short HEAD 2>/dev/null || echo "")
+  if [ "$branch" != "main" ]; then
+    return 0
+  fi
+  if [ -n "$(git -C "$dir" status --porcelain 2>/dev/null)" ]; then
+    return 0
+  fi
   local before after
   before=$(git -C "$dir" rev-parse HEAD 2>/dev/null || echo "")
   git -C "$dir" pull --ff-only origin main >/dev/null 2>&1 || {

@@ -495,7 +495,9 @@ async function sendMessageChunk(chatId, chunk, { maxRetries = 3, baseDelay = 200
   return false;
 }
 
-async function sendMessage(chatId, text) {
+// trace_id is optional but strongly preferred — lets /activity digest + debugger
+// stitch the full inbound -> claude_call -> outbound chain into one request.
+async function sendMessage(chatId, text, trace_id) {
   const chunks = [];
   let remaining = text;
   while (remaining.length > 0) {
@@ -510,7 +512,7 @@ async function sendMessage(chatId, text) {
     const ok = await sendMessageChunk(chatId, chunk);
     if (!ok) allOk = false;
   }
-  emit({ source: "bot", event: "outbound", chat_id: chatId, bytes: text.length, chunks: chunks.length, ok: allOk });
+  emit({ source: "bot", event: "outbound", chat_id: chatId, bytes: text.length, chunks: chunks.length, ok: allOk, trace_id });
   return allOk;
 }
 
@@ -699,7 +701,7 @@ async function poll(offset) {
         const trace_id = traceId();
         if (!isAllowed(userId)) {
           emit({ source: "bot", event: "auth_reject", user: userId, chat: chatId, trace_id });
-          await sendMessage(chatId, "Not authorized.");
+          await sendMessage(chatId, "Not authorized.", trace_id);
           continue;
         }
         emit({ source: "bot", event: "inbound", user: userId, chat: chatId, bytes: msg.text.length, trace_id, text_preview: msg.text.slice(0, 80) });
@@ -708,7 +710,7 @@ async function poll(offset) {
         const slashReply = await handleTodoCommand(msg.text);
         if (slashReply !== null) {
           emit({ source: "bot", event: "slash_handled", user: userId, chat: chatId, trace_id, bytes: slashReply.length });
-          await sendMessage(chatId, slashReply);
+          await sendMessage(chatId, slashReply, trace_id);
           logConversation(msg.text, slashReply);
           appendConversation(chatId, msg.text, slashReply);
           console.log("[" + new Date().toISOString() + "] ZOE(todo): " + slashReply.substring(0, 80));
@@ -719,7 +721,7 @@ async function poll(offset) {
         const t = startTimer();
         const reply = callClaude(msg.text, systemPrompt);
         emit({ source: "bot", event: "claude_call", user: userId, chat: chatId, trace_id, duration_ms: t.ms(), reply_bytes: reply.length });
-        await sendMessage(chatId, reply);
+        await sendMessage(chatId, reply, trace_id);
         logConversation(msg.text, reply);
         appendConversation(chatId, msg.text, reply);
         console.log("[" + new Date().toISOString() + "] ZOE: " + reply.substring(0, 80) + "...");

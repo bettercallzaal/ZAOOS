@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { readFileSync, existsSync, appendFileSync, mkdirSync, writeFileSync, unlinkSync } from "fs";
+import { readFileSync, readdirSync, existsSync, appendFileSync, mkdirSync, writeFileSync, unlinkSync } from "fs";
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ALLOWED_USER = "1447437687";
@@ -8,10 +8,76 @@ const REPO = WORKSPACE + "/ZAOOS";
 const API = "https://api.telegram.org/bot" + BOT_TOKEN;
 const TODOS_FILE = "/home/zaal/portal-state/todos.json";
 const CHECKLIST_FILE = "/home/zaal/test-checklist/state.json";
+// ZOE's own recent outbound tips (written by scripts/zoe-learning-pings/random_tip.py).
+// Reading this lets ZOE answer "zoe tip 157 can u see that" without claiming the
+// doc doesn't exist. Root cause of the 2026-04-20 bug logged in doc 464.
+const SENT_TIPS_FILE = process.env.HOME + "/.cache/zoe-learning-pings/sent.json";
+const CONV_DIR = process.env.HOME + "/.cache/zoe-telegram";
+const CONV_TURN_LIMIT = 20;
+const TIP_CONTEXT_DAYS = 7;
 
 function readTodos() {
   try { return JSON.parse(readFileSync(TODOS_FILE, "utf-8")); }
   catch { return { todos: [] }; }
+}
+
+function loadRecentTips(days = TIP_CONTEXT_DAYS) {
+  try {
+    const s = JSON.parse(readFileSync(SENT_TIPS_FILE, "utf-8"));
+    const cutoffMs = Date.now() - days * 86400000;
+    return (s.sent || [])
+      .filter((t) => {
+        const at = new Date(t.at || 0).getTime();
+        return Number.isFinite(at) && at >= cutoffMs;
+      })
+      .slice(-30);
+  } catch { return []; }
+}
+
+function loadConversation(chatId) {
+  try {
+    const f = CONV_DIR + "/conv-" + chatId + ".json";
+    const parsed = JSON.parse(readFileSync(f, "utf-8"));
+    return Array.isArray(parsed.turns) ? parsed.turns : [];
+  } catch { return []; }
+}
+
+function appendConversation(chatId, userMsg, botReply) {
+  try { mkdirSync(CONV_DIR, { recursive: true }); } catch {}
+  const f = CONV_DIR + "/conv-" + chatId + ".json";
+  const prior = loadConversation(chatId);
+  const turns = prior.concat([{
+    t: new Date().toISOString(),
+    user: String(userMsg || "").slice(0, 2000),
+    bot: String(botReply || "").slice(0, 800),
+  }]).slice(-CONV_TURN_LIMIT);
+  try { writeFileSync(f, JSON.stringify({ turns }, null, 2)); }
+  catch (e) { console.error("Conv write error:", e.message); }
+}
+
+// Local fallback when sent.json hasn't caught this tip yet (e.g. Zaal asks
+// about tip 292 hours after it arrived and cache was pruned). Scans the repo
+// for a folder matching `<n>-*` under research/.
+function findDocByNumber(n) {
+  const num = String(n).replace(/[^0-9]/g, "");
+  if (!num) return null;
+  const base = REPO + "/research";
+  try {
+    for (const topic of readdirSync(base, { withFileTypes: true })) {
+      if (!topic.isDirectory()) continue;
+      const topicPath = base + "/" + topic.name;
+      let entries;
+      try { entries = readdirSync(topicPath, { withFileTypes: true }); }
+      catch { continue; }
+      for (const e of entries) {
+        if (!e.isDirectory()) continue;
+        if (e.name.startsWith(num + "-") || e.name === num) {
+          return "research/" + topic.name + "/" + e.name + "/README.md";
+        }
+      }
+    }
+  } catch {}
+  return null;
 }
 function writeTodos(s) {
   try { mkdirSync("/home/zaal/portal-state", { recursive: true }); } catch {}
@@ -105,9 +171,43 @@ async function handleTodoCommand(text) {
       "/recap [N days] - last 2 weeks by default: commits, PRs, new research, todo deltas",
       "/summarize <project> - quick status of ZAOOS/BCZ/etc",
       "/focus <mins> - mute nudges for N minutes (max 480)",
+      "/tip <number> - resolve a ZOE tip by doc number (e.g. /tip 157)",
       "/help - this message",
       "Portal UI: portal.zaoos.com/todos"
     ].join("\n");
+  }
+  // /tip <n> - resolve a ZOE tip by doc number. Checks sent.json first,
+  // then falls back to scanning research/ for `<n>-*`. Short-circuits Claude
+  // so /tip 157 costs ~0 tokens and returns instantly.
+  const tipM = trim.match(/^\/tip\s+(\d+)/i);
+  if (tipM) {
+    const n = tipM[1];
+    const sent = loadRecentTips(30);
+    const hit = sent.find((t) => {
+      const title = t.title || "";
+      const path = t.path || "";
+      return title.startsWith(n + " ") || title.startsWith(n + "—") ||
+        title.includes(" " + n + " ") || path.includes("/" + n + "-");
+    });
+    if (hit) {
+      const github = "https://github.com/bettercallzaal/ZAOOS/blob/main/" + (hit.path || "");
+      return [
+        "[TIP " + n + "] " + (hit.title || "(no title)"),
+        "",
+        "Path: " + (hit.path || "(unknown)"),
+        "Sent: " + (hit.at || "(unknown)"),
+        "Read: " + github,
+      ].join("\n");
+    }
+    const local = findDocByNumber(n);
+    if (local) {
+      return [
+        "[TIP " + n + "] not in recent sent.json cache but the doc exists:",
+        "Path: " + local,
+        "Read: https://github.com/bettercallzaal/ZAOOS/blob/main/" + local,
+      ].join("\n");
+    }
+    return "No tip or doc matching '" + n + "' found in sent.json or research/.";
   }
   // /recap [N] - last N days (default 14) of shipped work
   const recapM = trim.match(/^\/(?:recap|rewind|past)(?:\s+(\d+))?/i);
@@ -192,7 +292,7 @@ async function handleTodoCommand(text) {
   return null;  // not a todo command, fall through to Claude
 }
 
-function loadSystemPrompt() {
+function loadSystemPrompt(chatId) {
   const files = ["SOUL.md", "USER.md", "AGENTS.md", "MEMORY.md"];
   let prompt = "";
   for (const file of files) {
@@ -203,6 +303,33 @@ function loadSystemPrompt() {
   }
   const now = new Date();
   prompt += "Today is " + now.toISOString().split("T")[0] + ". Current time: " + now.toLocaleTimeString("en-US", { timeZone: "America/New_York" }) + " Eastern.\n";
+
+  // Inject recent outbound tips so ZOE knows what she herself sent earlier today.
+  // Without this, questions like "zoe tip 157 can u see that" fail because the
+  // random_tip.py cron runs in a separate process and leaves no trace in memory.
+  const tips = loadRecentTips();
+  if (tips.length) {
+    const lines = tips.map((t) => {
+      const when = (t.at || "").slice(0, 16).replace("T", " ");
+      return "- [" + when + "] " + (t.title || "(untitled)") + " -> " + (t.path || "(no path)");
+    });
+    prompt += "\n---\n\nRECENT TIPS YOU (ZOE) SENT TO ZAAL (last " + TIP_CONTEXT_DAYS + " days):\n"
+      + lines.join("\n")
+      + "\n\nIf Zaal asks about one of these (e.g. 'tip 157'), treat it as your own prior message. The doc IS in the repo at the path shown.\n";
+  }
+
+  // Short-term conversation buffer so ZOE can reference what was said a few
+  // turns ago. Kept per chat in ~/.cache/zoe-telegram/conv-<chatId>.json.
+  if (chatId) {
+    const conv = loadConversation(chatId);
+    if (conv.length) {
+      const lines = conv.map((t) => "Zaal: " + (t.user || "") + "\nZOE: " + (t.bot || ""));
+      prompt += "\n---\n\nRECENT CONVERSATION (last " + conv.length + " turns in this chat):\n"
+        + lines.join("\n\n")
+        + "\n\nThe message below is the NEW inbound from Zaal. Respond in context.\n";
+    }
+  }
+
   return prompt;
 }
 
@@ -305,14 +432,16 @@ async function poll(offset) {
         if (slashReply !== null) {
           await sendMessage(chatId, slashReply);
           logConversation(msg.text, slashReply);
+          appendConversation(chatId, msg.text, slashReply);
           console.log("[" + new Date().toISOString() + "] ZOE(todo): " + slashReply.substring(0, 80));
           continue;
         }
         await sendTyping(chatId);
-        const systemPrompt = loadSystemPrompt();
+        const systemPrompt = loadSystemPrompt(chatId);
         const reply = callClaude(msg.text, systemPrompt);
         await sendMessage(chatId, reply);
         logConversation(msg.text, reply);
+        appendConversation(chatId, msg.text, reply);
         console.log("[" + new Date().toISOString() + "] ZOE: " + reply.substring(0, 80) + "...");
       }
     }

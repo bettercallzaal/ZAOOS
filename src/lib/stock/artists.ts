@@ -12,6 +12,7 @@ export interface PublicArtist {
   bio: string;
   photo_url: string;
   logo_url: string;
+  social_post_url: string;
   cypher_interested: boolean;
   cypher_role: string;
   points_earned: number;
@@ -34,7 +35,7 @@ export async function getPublicArtists(): Promise<PublicArtist[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('stock_artists')
-    .select('id, name, genre, city, status, socials, bio, photo_url, logo_url, cypher_interested, cypher_role, points_earned, volunteer_eligible')
+    .select('id, name, genre, city, status, socials, bio, photo_url, logo_url, social_post_url, cypher_interested, cypher_role, points_earned, volunteer_eligible')
     .neq('status', 'declined')
     .order('status')
     .order('name');
@@ -52,6 +53,7 @@ export async function getPublicArtists(): Promise<PublicArtist[]> {
     bio: a.bio || '',
     photo_url: a.photo_url || '',
     logo_url: a.logo_url || '',
+    social_post_url: a.social_post_url || '',
     cypher_interested: Boolean(a.cypher_interested),
     cypher_role: a.cypher_role || '',
     points_earned: a.points_earned || 0,

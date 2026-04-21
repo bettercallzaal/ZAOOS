@@ -12,6 +12,7 @@ ALTER TABLE stock_artists
   ADD COLUMN IF NOT EXISTS bio TEXT DEFAULT '',
   ADD COLUMN IF NOT EXISTS photo_url TEXT DEFAULT '',
   ADD COLUMN IF NOT EXISTS logo_url TEXT DEFAULT '',
+  ADD COLUMN IF NOT EXISTS social_post_url TEXT DEFAULT '',
   ADD COLUMN IF NOT EXISTS claim_token TEXT,
   ADD COLUMN IF NOT EXISTS points_earned INT DEFAULT 0,
   ADD COLUMN IF NOT EXISTS volunteer_eligible BOOLEAN DEFAULT false;
@@ -31,6 +32,8 @@ COMMENT ON COLUMN stock_artists.photo_url IS
   'Artist profile image URL (https only). Artist can paste their X/Farcaster pfp.';
 COMMENT ON COLUMN stock_artists.logo_url IS
   'Artist brand logo URL (https only). Used on posters, stage visuals, broadcast overlay. Earning step 2.';
+COMMENT ON COLUMN stock_artists.social_post_url IS
+  'URL to the contributor promo post they made on Farcaster, X, LinkedIn, etc. Step 3 of the contributor path. Earns 1 point.';
 COMMENT ON COLUMN stock_artists.claim_token IS
   '16-char opaque token. Artist visits /stock/artist/<slug>?token=<claim_token> to edit.';
 COMMENT ON COLUMN stock_artists.points_earned IS

@@ -18,6 +18,7 @@ const patchSchema = z.object({
   bio: z.string().max(2000).optional(),
   photo_url: httpsOnly('Photo URL'),
   logo_url: httpsOnly('Logo URL'),
+  social_post_url: httpsOnly('Post URL'),
   socials: z.string().max(500).optional(),
   genre: z.string().max(100).optional(),
   city: z.string().max(100).optional(),
@@ -25,7 +26,8 @@ const patchSchema = z.object({
 
 const REWARD_BIO = 1;
 const REWARD_LOGO = 1;
-const ELIGIBLE_THRESHOLD = 2;
+const REWARD_POST = 1;
+const ELIGIBLE_THRESHOLD = 3;
 
 export async function PATCH(request: NextRequest) {
   try {
@@ -47,7 +49,7 @@ export async function PATCH(request: NextRequest) {
 
     const { data: current } = await supabase
       .from('stock_artists')
-      .select('id, bio, logo_url, points_earned, volunteer_eligible')
+      .select('id, bio, logo_url, social_post_url, points_earned, volunteer_eligible')
       .eq('id', artistId)
       .single();
 
@@ -55,6 +57,7 @@ export async function PATCH(request: NextRequest) {
     if (parsed.data.bio !== undefined) updates.bio = parsed.data.bio;
     if (parsed.data.photo_url !== undefined) updates.photo_url = parsed.data.photo_url;
     if (parsed.data.logo_url !== undefined) updates.logo_url = parsed.data.logo_url;
+    if (parsed.data.social_post_url !== undefined) updates.social_post_url = parsed.data.social_post_url;
     if (parsed.data.socials !== undefined) updates.socials = parsed.data.socials;
     if (parsed.data.genre !== undefined) updates.genre = parsed.data.genre;
     if (parsed.data.city !== undefined) updates.city = parsed.data.city;
@@ -68,6 +71,12 @@ export async function PATCH(request: NextRequest) {
     const logoWasEmpty = !current?.logo_url || current.logo_url.trim().length === 0;
     const logoNowHas = (parsed.data.logo_url || '').trim().length > 0;
     if (logoWasEmpty && logoNowHas) earnedThisCall += REWARD_LOGO;
+
+    type CurrentRow = { social_post_url?: string | null };
+    const currentRow = current as CurrentRow | null;
+    const postWasEmpty = !currentRow?.social_post_url || (currentRow.social_post_url || '').trim().length === 0;
+    const postNowHas = (parsed.data.social_post_url || '').trim().length > 0;
+    if (postWasEmpty && postNowHas) earnedThisCall += REWARD_POST;
 
     let newPoints = current?.points_earned || 0;
     if (earnedThisCall > 0) {

@@ -61,6 +61,25 @@
 
   .empty{color:var(--muted);text-align:center;padding:2rem 0;font-size:.9rem}
 
+  /* Section headers for date grouping */
+  .group-hdr{color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin:1rem 0 .4rem 0;padding:0 .2rem}
+  .group-hdr:first-child{margin-top:.4rem}
+
+  /* Select mode + bulk action bar */
+  .select-toggle{background:transparent;color:var(--muted);border:1px solid var(--line);padding:.3rem .6rem;font-size:.75rem;border-radius:6px;font-weight:500}
+  .select-toggle.on{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+  ul.todos.select-mode li{cursor:pointer;padding-right:.5rem}
+  ul.todos.select-mode li.selected{background:rgba(245,166,35,.12);border-color:var(--gold)}
+  ul.todos.select-mode .row-actions{display:none}
+  ul.todos.select-mode .check{pointer-events:none}
+  .bulk-bar{position:fixed;left:0;right:0;bottom:calc(max(0px,env(safe-area-inset-bottom)) + 60px);background:var(--panel);border-top:1px solid var(--line);padding:.7rem 1rem;display:flex;gap:.4rem;align-items:center;justify-content:space-between;transform:translateY(120%);transition:transform .18s ease;z-index:50;flex-wrap:wrap}
+  .bulk-bar.show{transform:translateY(0)}
+  .bulk-bar .bulk-count{color:var(--gold);font-weight:600;font-size:.85rem;flex:0 0 auto}
+  .bulk-bar .bulk-actions{display:flex;gap:.35rem;flex-wrap:wrap}
+  .bulk-bar button{padding:.45rem .75rem;font-size:.8rem}
+  .bulk-bar button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:500}
+  .bulk-bar button.danger{background:var(--red);color:#fff}
+
   details.spam{margin-top:.8rem;background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:.6rem .8rem}
   details.spam summary{cursor:pointer;color:var(--gold);font-size:.85rem;font-weight:600}
   details.spam textarea{margin-top:.5rem;min-height:130px}
@@ -70,7 +89,10 @@
 <body>
   <header>
     <h1>Todos</h1>
-    <span class="count" id="count"></span>
+    <div style="display:flex;gap:.5rem;align-items:center">
+      <span class="count" id="count"></span>
+      <button type="button" class="select-toggle" id="selectToggle">Select</button>
+    </div>
   </header>
 
   <form id="addForm">
@@ -119,6 +141,7 @@
       <button class="chip" data-k="status" data-v="doing">Doing</button>
       <button class="chip" data-k="status" data-v="done">Done</button>
       <button class="chip" data-k="status" data-v="archived">Archived</button>
+      <button class="chip" id="statusAll" type="button">All</button>
     </div>
     <h2>Priority</h2>
     <div class="filter-group" id="priorityChips">
@@ -144,10 +167,23 @@
   <ul class="todos" id="list"></ul>
   <div class="empty" id="empty" style="display:none">No todos match these filters.</div>
 
+  <div class="bulk-bar" id="bulkBar">
+    <span class="bulk-count" id="bulkCount">0 selected</span>
+    <div class="bulk-actions">
+      <button type="button" id="bulkDone">Mark done</button>
+      <button type="button" class="ghost" id="bulkReopen">Reopen</button>
+      <button type="button" class="ghost" id="bulkArchive">Archive</button>
+      <button type="button" class="danger" id="bulkDelete">Delete</button>
+      <button type="button" class="ghost" id="bulkClear">Cancel</button>
+    </div>
+  </div>
+
 <script>
 const filters = { status: ["open"], priority: [], tag: null, q: "", order: "priority" };
 let allTags = [];
 let total = 0;
+let selectMode = false;
+const selected = new Set();
 
 function buildQuery() {
   const p = new URLSearchParams();
@@ -167,23 +203,64 @@ async function fetchTodos() {
 
 function priClass(p) { return "pri pri-" + (p || "P2"); }
 
+function groupLabel(iso) {
+  if (!iso) return "Undated";
+  const d = new Date(iso);
+  const now = new Date();
+  const oneDay = 24*60*60*1000;
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const days = Math.floor((startOfToday - d.getTime()) / oneDay);
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 7) return "This week";
+  if (days < 14) return "Last week";
+  if (days < 30) return "This month";
+  if (days < 90) return "Last 3 months";
+  return "Older";
+}
+
 function render(data) {
   const list = document.getElementById("list");
   const empty = document.getElementById("empty");
   list.innerHTML = "";
+  list.classList.toggle("select-mode", selectMode);
   total = data.total;
   document.getElementById("count").textContent = data.todos.length + " of " + total;
   if (!data.todos.length) { empty.style.display = ""; } else { empty.style.display = "none"; }
+  // Group by date label, but only when sorting by newest/oldest to keep priority view clean
+  const showGroups = filters.order === "newest" || filters.order === "oldest";
+  let lastGroup = null;
   for (const t of data.todos) {
+    if (showGroups) {
+      const g = groupLabel(t.created_at);
+      if (g !== lastGroup) {
+        const hdr = document.createElement("div");
+        hdr.className = "group-hdr";
+        hdr.textContent = g;
+        list.appendChild(hdr);
+        lastGroup = g;
+      }
+    }
     const li = document.createElement("li");
     if (t.status === "done" || t.status === "archived") li.classList.add("done");
+    if (selected.has(t.id)) li.classList.add("selected");
+    if (selectMode) {
+      li.addEventListener("click", (e) => {
+        if (e.target.closest(".row-actions")) return;
+        if (selected.has(t.id)) selected.delete(t.id); else selected.add(t.id);
+        li.classList.toggle("selected");
+        updateBulkBar();
+      });
+    }
     const check = document.createElement("button");
     check.type = "button";
-    check.className = "check" + (t.status === "done" ? " checked" : "");
+    check.className = "check" + (t.status === "done" || selected.has(t.id) ? " checked" : "");
     check.title = "mark " + (t.status === "done" ? "open" : "done");
-    check.textContent = t.status === "done" ? "\u2713" : "";
+    check.textContent = (t.status === "done" || selected.has(t.id)) ? "\u2713" : "";
     check.style.color = "#0a1628";
-    check.addEventListener("click", async () => {
+    check.addEventListener("click", async (e) => {
+      if (selectMode) return;
+      e.stopPropagation();
       await fetch("/api/todos/" + t.id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: t.status === "done" ? "open" : "done" }) });
       load();
     });
@@ -267,6 +344,64 @@ async function load() {
   try { const data = await fetchTodos(); render(data); }
   catch (e) { document.getElementById("empty").textContent = "Error: " + e.message; document.getElementById("empty").style.display = ""; }
 }
+
+function updateBulkBar() {
+  const bar = document.getElementById("bulkBar");
+  const cnt = document.getElementById("bulkCount");
+  if (!selectMode || selected.size === 0) {
+    bar.classList.remove("show");
+    cnt.textContent = "0 selected";
+    return;
+  }
+  bar.classList.add("show");
+  cnt.textContent = selected.size + " selected";
+}
+
+async function bulkPatch(statusValue) {
+  const ids = Array.from(selected);
+  if (!ids.length) return;
+  await Promise.all(ids.map(id => fetch("/api/todos/" + id, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status: statusValue })
+  })));
+  selected.clear();
+  updateBulkBar();
+  load();
+}
+
+async function bulkDelete() {
+  const ids = Array.from(selected);
+  if (!ids.length) return;
+  if (!confirm("Delete " + ids.length + " todos? This cannot be undone.")) return;
+  await Promise.all(ids.map(id => fetch("/api/todos/" + id, { method: "DELETE" })));
+  selected.clear();
+  updateBulkBar();
+  load();
+}
+
+document.getElementById("selectToggle").addEventListener("click", () => {
+  selectMode = !selectMode;
+  document.getElementById("selectToggle").classList.toggle("on", selectMode);
+  document.getElementById("selectToggle").textContent = selectMode ? "Done" : "Select";
+  if (!selectMode) { selected.clear(); }
+  updateBulkBar();
+  load();
+});
+document.getElementById("bulkDone").addEventListener("click", () => bulkPatch("done"));
+document.getElementById("bulkReopen").addEventListener("click", () => bulkPatch("open"));
+document.getElementById("bulkArchive").addEventListener("click", () => bulkPatch("archived"));
+document.getElementById("bulkDelete").addEventListener("click", bulkDelete);
+document.getElementById("bulkClear").addEventListener("click", () => {
+  selected.clear();
+  updateBulkBar();
+  load();
+});
+document.getElementById("statusAll").addEventListener("click", () => {
+  filters.status = ["open", "doing", "done", "archived"];
+  document.querySelectorAll("#statusChips .chip[data-v]").forEach(el => el.classList.add("active"));
+  load();
+});
 
 document.querySelectorAll("#statusChips .chip, #priorityChips .chip").forEach(el => {
   el.addEventListener("click", () => {

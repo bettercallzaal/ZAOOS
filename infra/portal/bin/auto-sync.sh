@@ -119,10 +119,15 @@ bounce_if_changed() {
 }
 
 # Hot files. bot.mjs pulls in events.mjs — bounce bot on either change.
-bounce_if_changed "zoe-bot" "$HOME/zao-os/infra/portal/bin/bot.mjs" "node.*bot.mjs"
-bounce_if_changed "zoe-bot" "$HOME/zao-os/infra/portal/bin/events.mjs" "node.*bot.mjs"
-bounce_if_changed "spawn-server" "$HOME/zao-os/infra/portal/bin/spawn-server.js" "node.*spawn-server.js"
-bounce_if_changed "auth-server" "$HOME/zao-os/infra/portal/bin/auth-server.js" "node.*auth-server.js"
+bounce_if_changed "zoe-bot"      "$HOME/zao-os/infra/portal/bin/bot.mjs"                       "bin/bot\\.mjs"
+bounce_if_changed "zoe-bot"      "$HOME/zao-os/infra/portal/bin/events.mjs"                    "bin/bot\\.mjs"
+bounce_if_changed "spawn-server" "$HOME/zao-os/infra/portal/bin/spawn-server.js"               "node.*spawn-server.js"
+bounce_if_changed "auth-server"  "$HOME/zao-os/infra/portal/bin/auth-server.js"                "node.*auth-server.js"
+# ZAO Devz bot + shared bot-core. Both bounce zoe-devz-bot when content
+# changes. Watchdog respawn is gated on ~/zoe-devz/.env existing, so these
+# no-op safely until Zaal installs the bot token.
+bounce_if_changed "zoe-devz-bot" "$HOME/zao-os/infra/portal/bin/bots/zao-devz/bot.mjs"         "devz-bot\\.mjs"
+bounce_if_changed "zoe-devz-bot" "$HOME/zao-os/infra/portal/bin/bots/_shared/bot-core.mjs"     "devz-bot\\.mjs"
 
 # Trim log to last 2000 lines.
 tail -n 2000 "$LOG" > "$LOG.tmp" 2>/dev/null && mv "$LOG.tmp" "$LOG" || true

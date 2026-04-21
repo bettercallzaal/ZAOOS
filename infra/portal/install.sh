@@ -29,6 +29,12 @@ for f in auth-server.js spawn-server.js watchdog.sh start-agents.sh fix-node-pty
   ln -sfn "$REPO_DIR/bin/$f" "$HOME_DIR/bin/$f"
   chmod +x "$HOME_DIR/bin/$f" 2>/dev/null || true
 done
+# Branded bots — symlinked with a unique filename at $HOME/bin so watchdog's
+# pgrep patterns can discriminate between them. Each bot's actual code lives
+# at infra/portal/bin/bots/<name>/bot.mjs in the repo. ~/zoe-<name>/.env gates
+# whether watchdog boots it (prevents flapping when token not yet installed).
+ln -sfn "$REPO_DIR/bin/bots/zao-devz/bot.mjs" "$HOME_DIR/bin/devz-bot.mjs"
+chmod +x "$HOME_DIR/bin/devz-bot.mjs" 2>/dev/null || true
 # Cloudflared config lives in ~/.cloudflared (not symlinked so CF creds file is separate)
 mkdir -p "$HOME_DIR/.cloudflared"
 cp -f "$REPO_DIR/cloudflared/config.yml" "$HOME_DIR/.cloudflared/config.yml"

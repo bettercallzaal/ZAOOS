@@ -1,0 +1,41 @@
+# ZAO Devz bot triggers + rate limits. Read on boot by bot.mjs.
+
+reactive:
+  mention:
+    # Fires when @zaodevz is mentioned in an allowed group
+    pattern: "@zaodevz\\s+spawn\\s+(.+)"
+    action: spawn_agent
+    rate_per_user_per_day: 3
+    rate_per_group_per_day: 10
+    budget_usd_per_pr: 5
+  slash_spawn:
+    # Fires on /spawn <task>
+    pattern: "^/spawn\\s+(.+)"
+    action: spawn_agent
+    rate_per_user_per_day: 3
+    rate_per_group_per_day: 10
+  slash_approve:
+    # Fires on /approve <pr_number> — owner-only
+    pattern: "^/approve\\s+(\\d+)"
+    action: merge_pr
+    owner_only: true
+  slash_status:
+    pattern: "^/status$"
+    action: status_digest
+  slash_help:
+    pattern: "^/help$"
+    action: help_message
+
+scheduled:
+  # Deferred. Once bot is live + proven, consider:
+  # daily-digest: 09:00 ET each weekday, posts open PR count + overnight merges.
+
+external:
+  # Deferred. Hook for GitHub webhooks later — e.g. post [MERGED] into the group
+  # when a PR with `devz:dispatched` label lands.
+
+safety:
+  allowed_users_env: ALLOWED_USERS        # comma-sep Telegram IDs
+  allowed_groups_env: ALLOWED_GROUPS      # comma-sep chat IDs (negative for groups)
+  owner_user_id_env: OWNER_USER_ID        # single ID that can merge
+  callback_data_regex: "^(spawn|approve|cancel):[a-z0-9/_.\\-]+$"

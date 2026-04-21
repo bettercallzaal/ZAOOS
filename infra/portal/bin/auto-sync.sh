@@ -85,7 +85,12 @@ bounce_if_changed() {
   local new old
   new=$(file_hash "$file")
   [ -z "$new" ] && return 0
-  local hf="$HASH_DIR/${tmux_name}.hash"
+  # Hash key is per-FILE (basename), not per-tmux session. Prior version used
+  # ${tmux_name}.hash which caused every watched file that shared a tmux name
+  # (bot.mjs + events.mjs both bounce zoe-bot) to overwrite the same hash
+  # file on each pass, producing a bounce-every-tick loop observed at
+  # 2026-04-21T11:35:03 in ~/.claude/auto-sync.log.
+  local hf="$HASH_DIR/$(basename "$file").hash"
   old=""
   [ -f "$hf" ] && old=$(cat "$hf")
   if [ "$new" != "$old" ]; then
@@ -96,7 +101,7 @@ bounce_if_changed() {
       [ -n "$procpat" ] && pkill -f "$procpat" 2>/dev/null || true
       log "bounced $tmux_name (file=$file)"
     else
-      log "seeded $tmux_name hash (no bounce)"
+      log "seeded $(basename "$file") hash (no bounce)"
     fi
   fi
 }

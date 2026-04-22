@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getStockTeamMember } from '@/lib/auth/stock-team-session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logger } from '@/lib/logger';
 
 const patchSchema = z.object({
   bio: z.string().max(2000).optional(),
@@ -20,13 +21,17 @@ export async function PATCH(request: NextRequest) {
   try {
     const session = await getStockTeamMember();
     if (!session) {
-      return NextResponse.json({ error: 'Not signed in' }, { status: 401 });
+      return NextResponse.json({ error: 'Not signed in. Log out and back in.' }, { status: 401 });
     }
 
     const body = await request.json();
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
+      const firstMsg = parsed.error.issues[0]?.message || 'Invalid input';
+      return NextResponse.json(
+        { error: firstMsg, details: parsed.error.flatten() },
+        { status: 400 },
+      );
     }
 
     const updates: Record<string, string> = {};
@@ -46,12 +51,23 @@ export async function PATCH(request: NextRequest) {
       .select('id, name, bio, links, photo_url')
       .single();
 
-    if (error || !data) {
-      return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+    if (error) {
+      logger.error({ error, memberId: session.memberId }, 'stock-team profile update failed');
+      const dbMsg = error.message || 'Update failed';
+      const hint = /column .* does not exist/i.test(dbMsg)
+        ? ' The bio/links/photo_url columns are missing. Run scripts/stock-schema.sql in Supabase.'
+        : '';
+      return NextResponse.json({ error: `Update failed: ${dbMsg}${hint}` }, { status: 500 });
+    }
+
+    if (!data) {
+      return NextResponse.json({ error: 'Update applied but no row returned' }, { status: 500 });
     }
 
     return NextResponse.json({ member: data });
-  } catch {
-    return NextResponse.json({ error: 'Profile update failed' }, { status: 500 });
+  } catch (err) {
+    logger.error({ err }, 'stock-team profile update threw');
+    const msg = err instanceof Error ? err.message : 'unknown error';
+    return NextResponse.json({ error: `Profile update failed: ${msg}` }, { status: 500 });
   }
 }

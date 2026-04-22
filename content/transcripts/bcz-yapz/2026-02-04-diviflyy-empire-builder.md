@@ -5,7 +5,7 @@ episode: 7
 guest: "Diviflyy"
 guest_org: "Empire Builder"
 host: "Zaal"
-date: null                            # TODO: enrich with actual recording date
+date: 2026-02-04
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags
@@ -17,7 +17,7 @@ source:
   docx: "Movies/bcz stream/BCZyapz/transcripts/BCZ YapZ ep. 7 w_Diviflyy from Empire Builder.docx"
 summary: ""                           # TODO: one-sentence summary"
 action_items: []
-status: "raw-undated"                # needs: date, topics, entities, summary
+status: "raw"
 ---
 
 ## Transcript

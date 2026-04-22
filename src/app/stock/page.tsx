@@ -94,6 +94,12 @@ export default async function StockPage() {
               Cypher
             </Link>
             <Link
+              href="/stock/suggest"
+              className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
+            >
+              Suggest
+            </Link>
+            <Link
               href="/stock/apply"
               className="text-xs text-gray-400 hover:text-[#f5a623] transition-colors"
             >

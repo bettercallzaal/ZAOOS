@@ -3,6 +3,10 @@
 import { useState, useMemo } from 'react';
 import { KanbanBoard, KanbanColumn } from './KanbanBoard';
 import { AttentionCard } from './AttentionCard';
+import { AttachmentPanel } from './AttachmentPanel';
+import { ContactLogPanel } from './ContactLogPanel';
+import { CommentThread } from './CommentThread';
+import { ActivityRail } from './ActivityRail';
 
 function daysSince(iso: string | null): number {
   if (!iso) return Infinity;
@@ -280,8 +284,9 @@ export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]
                 </div>
               </div>
               {expandedId === sponsor.id && (
-                <div className="border-t border-white/[0.06] p-3 space-y-2 bg-[#0a1628]">
+                <div className="border-t border-white/[0.06] p-3 space-y-4 bg-[#0a1628]">
                   <EditRow sponsor={sponsor} members={members} onUpdate={updateSponsor} />
+                  <SponsorDetailPanels sponsorId={sponsor.id} />
                 </div>
               )}
             </div>
@@ -328,6 +333,41 @@ export function SponsorCRM({ sponsors: initial, members }: { sponsors: Sponsor[]
           )}
         />
       )}
+    </div>
+  );
+}
+
+function SponsorDetailPanels({ sponsorId }: { sponsorId: string }) {
+  const [tab, setTab] = useState<'contact' | 'files' | 'comments' | 'activity'>('contact');
+  const tabs: Array<[typeof tab, string]> = [
+    ['contact', 'Contact log'],
+    ['files', 'Files'],
+    ['comments', 'Comments'],
+    ['activity', 'Activity'],
+  ];
+  return (
+    <div className="space-y-3 border-t border-white/[0.04] pt-3">
+      <div className="flex gap-1">
+        {tabs.map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`text-xs px-2.5 py-1 rounded border transition-colors ${
+              tab === key
+                ? 'border-[#f5a623]/50 text-[#f5a623] bg-[#f5a623]/10'
+                : 'border-white/10 text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {tab === 'contact' && <ContactLogPanel entityType="sponsor" entityId={sponsorId} />}
+      {tab === 'files' && (
+        <AttachmentPanel entityType="sponsor" entityId={sponsorId} defaultKind="deck" />
+      )}
+      {tab === 'comments' && <CommentThread entityType="sponsor" entityId={sponsorId} />}
+      {tab === 'activity' && <ActivityRail entityType="sponsor" entityId={sponsorId} />}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getStockTeamMember } from '@/lib/auth/stock-team-session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logActivity, logFieldChanges } from '@/lib/stock/log-activity';
 
 export async function GET() {
   const member = await getStockTeamMember();
@@ -43,6 +44,13 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: 'Failed to create milestone' }, { status: 500 });
+  await logActivity({
+    actorId: member.memberId,
+    entityType: 'timeline',
+    entityId: data.id,
+    action: 'create',
+    newValue: { title: data.title, due_date: data.due_date },
+  });
   return NextResponse.json({ milestone: data }, { status: 201 });
 }
 
@@ -73,12 +81,21 @@ export async function PATCH(request: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
+  const { data: before } = await supabase
+    .from('stock_timeline')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from('stock_timeline')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', id);
 
   if (error) return NextResponse.json({ error: 'Failed to update milestone' }, { status: 500 });
+  if (before) {
+    await logFieldChanges(member.memberId, 'timeline', id, before, updates);
+  }
   return NextResponse.json({ success: true });
 }
 
@@ -93,7 +110,20 @@ export async function DELETE(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
   const supabase = getSupabaseAdmin();
+  const { data: before } = await supabase
+    .from('stock_timeline')
+    .select('title, due_date')
+    .eq('id', parsed.data.id)
+    .maybeSingle();
+
   const { error } = await supabase.from('stock_timeline').delete().eq('id', parsed.data.id);
   if (error) return NextResponse.json({ error: 'Failed to delete milestone' }, { status: 500 });
+  await logActivity({
+    actorId: member.memberId,
+    entityType: 'timeline',
+    entityId: parsed.data.id,
+    action: 'delete',
+    oldValue: before ?? null,
+  });
   return NextResponse.json({ success: true });
 }

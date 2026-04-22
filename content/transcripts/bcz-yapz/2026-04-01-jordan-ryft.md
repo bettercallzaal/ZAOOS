@@ -1,9 +1,13 @@
 ---
-title: "BCZ YapZ w/Jordan"
+title: "BCZ YapZ w/Jordan (Ryft)"
 show: "BCZ YapZ"
+episode: 14
 guest: "Jordan"
+guest_org: "Ryft"
 host: "Zaal"
-date: 2026-03-24
+date: 2026-04-01
+youtube_url: "https://youtu.be/IbhHxFR4yxE"
+youtube_title: "BCZ YapZ – Episode 14 w/Jordan from Ryft"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

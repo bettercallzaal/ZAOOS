@@ -1,9 +1,13 @@
 ---
-title: "BCZ YapZ w/Sven"
+title: "BCZ Yaps w/Sven (Incented)"
 show: "BCZ YapZ"
+episode: 6
 guest: "Sven"
+guest_org: "Incented"
 host: "Zaal"
-date: null                            # TODO: enrich with actual recording date
+date: 2025-12-16
+youtube_url: "https://youtu.be/O7-1weR0Qog"
+youtube_title: "BCZ Yaps – Episode 6: Incented with Sven"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

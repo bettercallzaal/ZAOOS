@@ -1,11 +1,13 @@
 ---
 title: "BCZ YapZ w/Diviflyy"
 show: "BCZ YapZ"
-episode: 7
+episode: 8
 guest: "Diviflyy"
 guest_org: "Empire Builder"
 host: "Zaal"
-date: 2026-02-04
+date: 2026-02-11
+youtube_url: "https://youtu.be/0tyVpLGVxkA"
+youtube_title: "BCZ YapZ – Episode 8: Empire Builder w/diviflyy"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

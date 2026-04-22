@@ -1,10 +1,13 @@
 ---
-title: "BCZ YapZ w/Daya (Flix Fun)"
+title: "BCZ Yaps w/Daya (Flix.Fun)"
 show: "BCZ YapZ"
+episode: 5
 guest: "Daya"
-guest_alias: "Flix Fun"
+guest_org: "Flix.Fun"
 host: "Zaal"
-date: 2025-12-04
+date: 2025-12-11
+youtube_url: "https://youtu.be/9ePU4qEc67Y"
+youtube_title: "BCZ Yaps – Episode 5: Flix.Fun with Daya"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

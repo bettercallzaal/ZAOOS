@@ -1,9 +1,13 @@
 ---
-title: "BCZ YapZ w/Ali"
+title: "BCZ YapZ w/Ali (Inflynce)"
 show: "BCZ YapZ"
+episode: 13
 guest: "Ali"
+guest_org: "Inflynce"
 host: "Zaal"
-date: 2026-03-18
+date: 2026-03-25
+youtube_url: "https://youtu.be/WTyafqHKQqM"
+youtube_title: "BCZ YapZ – Episode 13 w/Ali from Inflynce"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

@@ -131,37 +131,37 @@ grep -hR "^date:" content/transcripts/bcz-yapz/
 
 ## Current inventory
 
-### BCZ YapZ (15 transcripts, 1 undated, 1 mp4-only pending)
+### BCZ YapZ / BCZ Yaps (16 transcripts, 1 pending)
 
-Dated (from Canva publish calendar + Zaal's Google Calendar):
+Canonical dates are **YouTube publish dates** from `@bettercallzaal` channel (verified via `yt-dlp` on 2026-04-22). Recording dates may differ by a few days to weeks.
 
-| Date | Guest | Org / Notes |
-|------|-------|-------------|
-| 2025-08-15 | Deepa | GrantOrb (ep1) |
-| 2025-08-27 | Rich Bartuc | (ep2) |
-| 2025-10-15 | Yoni | - |
-| 2025-11-19 | Rockopera | meeting labeled "11.13" - recording-date vs meeting-date ambiguous; verify |
-| 2025-12-04 | Daya | file originally named "flix-fun" - Daya is primary, Flix Fun alias |
-| 2026-01-04 | Yerbearzerker | originally "yerb" - same person, renamed |
-| 2026-02-04 | Diviflyy | Empire Builder (ep7) |
-| 2026-02-11 | Snax.eth | - |
-| 2026-03-03 | Roaring Sensei | - |
-| 2026-03-10 | Saltorius | - |
-| 2026-03-18 | Ali | - |
-| 2026-03-24 | Jordan | - |
-| 2026-04-14 | Nikoline | Hubs Network |
-| 2026-04-21 | Dish (Jack Dishman) | Clanker |
-| 2026-04-21 | Hannah | Farm Drop |
+| Ep | Publish | Guest | Org | YouTube |
+|----|---------|-------|-----|---------|
+| 1 | 2025-08-22 | Deepa | GrantOrb | [3vUAFwXqdeo](https://youtu.be/3vUAFwXqdeo) |
+| 2 | 2025-10-14 | Rich Bartuc | PowerPacks Diamondhands Club | [AOcp8Jpyw3k](https://youtu.be/AOcp8Jpyw3k) |
+| 3 | 2025-10-19 | Yoni Dubz | - | [HopaeW7POis](https://youtu.be/HopaeW7POis) |
+| 4 | 2025-11-30 | Rock Opera | - | [43GPWLE6W5Q](https://youtu.be/43GPWLE6W5Q) |
+| 5 | 2025-12-11 | Daya | Flix.Fun | [9ePU4qEc67Y](https://youtu.be/9ePU4qEc67Y) |
+| 6 | 2025-12-16 | Sven | Incented | [O7-1weR0Qog](https://youtu.be/O7-1weR0Qog) |
+| 7 | 2026-01-05 | Yerbearserker | Empire Builder | [EH-FWD7ySKk](https://youtu.be/EH-FWD7ySKk) |
+| 8 | 2026-02-11 | Diviflyy | Empire Builder | [0tyVpLGVxkA](https://youtu.be/0tyVpLGVxkA) |
+| 9 | 2026-02-23 | SNAX (snax.eth) | Pizza DAO | [4CpblYpIO8Q](https://youtu.be/4CpblYpIO8Q) |
+| 10 | 2026-02-23 | GIU | Pinetree | [loSOniPcJx0](https://youtu.be/loSOniPcJx0) - **transcript pending** |
+| 11 | 2026-03-18 | Roaring Sensei | - | [DIeav3o8t9M](https://youtu.be/DIeav3o8t9M) |
+| 12 | 2026-03-18 | Saltorious.eth | Among Traitors | [0Tevgpr5TUQ](https://youtu.be/0Tevgpr5TUQ) |
+| 13 | 2026-03-25 | Ali | Inflynce | [WTyafqHKQqM](https://youtu.be/WTyafqHKQqM) |
+| 14 | 2026-04-01 | Jordan | Ryft | [IbhHxFR4yxE](https://youtu.be/IbhHxFR4yxE) |
+| ? | 2026-04-14 | Nikoline | Hubs Network | not yet published |
+| ? | 2026-04-21 | Dish (Jack Dishman) | Clanker | not yet published |
+| ? | 2026-04-21 | Hannah | Farm Drop | not yet published |
 
-Still undated:
-- Sven (no calendar entry found yet)
+Pending:
+- Ep 10 GIU - transcript file not yet ingested (only `bcz yapz w_giu.mp4` source; Zaal to share transcript or re-run Deepgram)
 
-Pending transcript capture:
-- 2026-02-19 - Gui - source is `bcz yapz w_giu.mp4`; transcript not yet delivered (user to share or re-run Deepgram)
-- EyeTeaJohnny - episode was postponed, not recorded
+Not recorded:
+- EyeTeaJohnny 2026-03-24 - episode was postponed
 
-Notes on interpretation:
-- Rockopera meeting was labeled "11.13" (likely Nov 13 recording) but the calendar entry is Nov 19 5:00-5:30 - probably the 11.13 recording + a 11.19 follow-up meeting. Using 2025-11-19 per the calendar entry; flag to swap to 2025-11-13 if the 11.13 recording is the canonical one.
+Ground truth source: `yt-dlp "https://www.youtube.com/watch?v=<ID>" --print "%(upload_date)s | %(title)s"` - re-run to refresh when new episodes publish.
 
 ## Roadmap
 

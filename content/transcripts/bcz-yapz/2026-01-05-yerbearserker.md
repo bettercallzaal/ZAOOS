@@ -1,10 +1,13 @@
 ---
-title: "BCZ YapZ w/Yerbearzerker"
+title: "BCZ YapZ w/Yerbearserker"
 show: "BCZ YapZ"
 episode: 7
-guest: "Yerbearzerker"
+guest: "Yerbearserker"
+guest_org: "Empire Builder"
 host: "Zaal"
-date: 2026-01-04
+date: 2026-01-05
+youtube_url: "https://youtu.be/EH-FWD7ySKk"
+youtube_title: "BCZ YapZ – Episode 7: Empire Builder w/Yerbearserker"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

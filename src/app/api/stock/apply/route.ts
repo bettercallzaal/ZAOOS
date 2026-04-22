@@ -13,6 +13,7 @@ const applySchema = z.object({
     .enum(['early', 'block1', 'block2', 'teardown', 'allday'])
     .optional(),
   message: z.string().trim().max(1000).optional(),
+  brief_optin: z.boolean().optional().default(true),
   hp: z.string().optional(),
 });
 
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
     const notes = [
       parsed.data.email ? `email: ${parsed.data.email}` : null,
       parsed.data.message ? `message: ${parsed.data.message}` : null,
+      `brief_optin: ${parsed.data.brief_optin ? 'yes' : 'no'}`,
       'submitted via /stock/apply',
     ]
       .filter(Boolean)

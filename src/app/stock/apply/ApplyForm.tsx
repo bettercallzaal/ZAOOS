@@ -20,6 +20,7 @@ export function ApplyForm({ roles, shifts }: { roles: RoleOption[]; shifts: Shif
   const [roleInterest, setRoleInterest] = useState('unassigned');
   const [shiftInterest, setShiftInterest] = useState('allday');
   const [message, setMessage] = useState('');
+  const [briefOptIn, setBriefOptIn] = useState(true);
   const [hp, setHp] = useState('');
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<'idle' | 'sent' | 'error'>('idle');
@@ -40,6 +41,7 @@ export function ApplyForm({ roles, shifts }: { roles: RoleOption[]; shifts: Shif
           role_interest: roleInterest,
           shift_interest: shiftInterest,
           message: message || undefined,
+          brief_optin: briefOptIn,
           hp,
         }),
       });
@@ -163,6 +165,19 @@ export function ApplyForm({ roles, shifts }: { roles: RoleOption[]; shifts: Shif
           className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30 resize-none"
         />
       </div>
+
+      <label className="flex items-start gap-2.5 bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2.5 cursor-pointer hover:border-[#f5a623]/30 transition-colors">
+        <input
+          type="checkbox"
+          checked={briefOptIn}
+          onChange={(e) => setBriefOptIn(e.target.checked)}
+          className="mt-0.5 accent-[#f5a623]"
+        />
+        <span className="text-xs text-gray-300">
+          Send me the weekly ZAOstock build log - what moved, what needs hands, one thing you can help with.
+          <span className="block text-[10px] text-gray-500 mt-0.5">Uncheck to skip. One email a week, cancel anytime.</span>
+        </span>
+      </label>
 
       <button
         type="submit"

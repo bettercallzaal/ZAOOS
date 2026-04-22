@@ -1,6 +1,7 @@
 ---
-title: "BCZ YapZ w/Nikoline"
+title: "BCZ YapZ w/Nikoline (Hubs Network)"
 show: "BCZ YapZ"
+episode: 15
 guest: "Nikoline"
 guest_org: "Hubs Network"
 guest_links:

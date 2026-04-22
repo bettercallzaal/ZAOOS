@@ -131,12 +131,17 @@ grep -hR "^date:" content/transcripts/bcz-yapz/
 
 ## Current inventory
 
-### BCZ YapZ (16 transcripts + 2 mp4-only)
+### BCZ YapZ (16 transcripts + 2 mp4-only + known gaps)
 
-Dated (dates confirmed from BCZ Yaps Canva publish calendar 2026-04-22):
+Dated (from Canva publish calendar + Zaal's Google Calendar):
 
-| Date | Guest | Org |
-|------|-------|-----|
+| Date | Guest | Org / Notes |
+|------|-------|-------------|
+| 2025-08-15 | Deepa | GrantOrb (ep1) |
+| 2025-10-15 | Rich Bartuc | (ep2) |
+| 2025-11-13 | Yoni | - |
+| 2025-11-19 | Rockopera | - |
+| 2026-01-04 | Yerbearzerker | (yerb, ep7) |
 | 2026-02-04 | Diviflyy | Empire Builder (ep7) |
 | 2026-02-11 | Snax.eth | - |
 | 2026-03-03 | Roaring Sensei | - |
@@ -147,17 +152,17 @@ Dated (dates confirmed from BCZ Yaps Canva publish calendar 2026-04-22):
 | 2026-04-21 | Dish (Jack Dishman) | Clanker |
 | 2026-04-21 | Hannah | Farm Drop |
 
-Undated (need date enrichment — not in Canva calendar screenshot):
-- Deepa / GrantOrb (ep1)
-- Rich (ep2)
-- Yerb (ep7 - possibly same episode as Diviflyy; filename conflict)
-- Flix Fun, Rockopera, Sven, Yoni
+Still undated (not in Canva calendar or cal ref so far):
+- Flix Fun
+- Sven
 
-No transcript captured (mp4 only, needs Deepgram pass):
-- 2026-03-24 - EyeTeaJohnny
-- 2026-02-19 - Gui
+No transcript captured yet (mp4 only, needs Deepgram pass):
+- 2026-02-19 - Gui (`bcz yapz w_giu.mp4`)
+- 2026-03-24 - EyeTeaJohnny (no source file ingested)
 
-7 undated transcripts sit in `content/transcripts/bcz-yapz/undated-*.md`. Rename to `YYYY-MM-DD-<slug>.md` after date is known.
+Known calendar entries without a matched transcript:
+- 2025-08-27 - unknown guest (possibly rescheduled Deepa or another ep)
+- 2025-12-04 - Daya (transcript not yet ingested)
 
 ## Roadmap
 

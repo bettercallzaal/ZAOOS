@@ -1,6 +1,7 @@
 ---
-title: "BCZ YapZ w/Hannah"
+title: "BCZ YapZ w/Hannah (Farm Drop)"
 show: "BCZ YapZ"
+episode: 17
 guest: "Hannah"
 guest_org: "Farm Drop"
 guest_links:

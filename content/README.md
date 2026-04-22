@@ -132,17 +132,14 @@ Canonical dates are **YouTube publish dates** from `@bettercallzaal` channel (ve
 | 7 | 2026-01-05 | Yerbearserker | Empire Builder | [EH-FWD7ySKk](https://youtu.be/EH-FWD7ySKk) |
 | 8 | 2026-02-11 | Diviflyy | Empire Builder | [0tyVpLGVxkA](https://youtu.be/0tyVpLGVxkA) |
 | 9 | 2026-02-23 | SNAX (snax.eth) | Pizza DAO | [4CpblYpIO8Q](https://youtu.be/4CpblYpIO8Q) |
-| 10 | 2026-02-23 | GIU | Pinetree | [loSOniPcJx0](https://youtu.be/loSOniPcJx0) - **transcript pending** |
+| 10 | 2026-02-23 | GIU (Juliano) | Pinetree | [loSOniPcJx0](https://youtu.be/loSOniPcJx0) |
 | 11 | 2026-03-18 | Roaring Sensei | - | [DIeav3o8t9M](https://youtu.be/DIeav3o8t9M) |
 | 12 | 2026-03-18 | Saltorious.eth | Among Traitors | [0Tevgpr5TUQ](https://youtu.be/0Tevgpr5TUQ) |
 | 13 | 2026-03-25 | Ali | Inflynce | [WTyafqHKQqM](https://youtu.be/WTyafqHKQqM) |
 | 14 | 2026-04-01 | Jordan | Ryft | [IbhHxFR4yxE](https://youtu.be/IbhHxFR4yxE) |
-| ? | 2026-04-14 | Nikoline | Hubs Network | not yet published |
-| ? | 2026-04-21 | Dish (Jack Dishman) | Clanker | not yet published |
-| ? | 2026-04-21 | Hannah | Farm Drop | not yet published |
-
-Pending:
-- Ep 10 GIU - transcript file not yet ingested (only `bcz yapz w_giu.mp4` source; Zaal to share transcript or re-run Deepgram)
+| 15 | 2026-04-22 | Nikoline | Hubs Network | publishing 2026-04-22 |
+| 16 | 2026-04-22 | Dish (Jack Dishman) | Clanker | publishing 2026-04-22 |
+| 17 | 2026-04-22 | Hannah | Farm Drop | publishing 2026-04-22 |
 
 Not recorded:
 - EyeTeaJohnny 2026-03-24 - episode was postponed

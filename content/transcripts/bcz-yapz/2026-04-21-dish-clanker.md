@@ -1,6 +1,7 @@
 ---
-title: "BCZ YapZ w/Dish"
+title: "BCZ YapZ w/Dish (Clanker)"
 show: "BCZ YapZ"
+episode: 16
 guest: "Jack Dishman"
 guest_alias: "Dish"
 guest_org: "Clanker"

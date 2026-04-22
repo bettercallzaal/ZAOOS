@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getStockTeamMember } from '@/lib/auth/stock-team-session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logActivity, logFieldChanges } from '@/lib/stock/log-activity';
 
 export async function GET() {
   const member = await getStockTeamMember();
@@ -45,6 +46,13 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: 'Failed to create volunteer' }, { status: 500 });
+  await logActivity({
+    actorId: member.memberId,
+    entityType: 'volunteer',
+    entityId: data.id,
+    action: 'create',
+    newValue: { name: data.name, role: data.role, shift: data.shift },
+  });
   return NextResponse.json({ volunteer: data }, { status: 201 });
 }
 
@@ -75,12 +83,21 @@ export async function PATCH(request: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
+  const { data: before } = await supabase
+    .from('stock_volunteers')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from('stock_volunteers')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', id);
 
   if (error) return NextResponse.json({ error: 'Failed to update volunteer' }, { status: 500 });
+  if (before) {
+    await logFieldChanges(member.memberId, 'volunteer', id, before, updates);
+  }
   return NextResponse.json({ success: true });
 }
 
@@ -95,7 +112,20 @@ export async function DELETE(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
 
   const supabase = getSupabaseAdmin();
+  const { data: before } = await supabase
+    .from('stock_volunteers')
+    .select('name, role, shift')
+    .eq('id', parsed.data.id)
+    .maybeSingle();
+
   const { error } = await supabase.from('stock_volunteers').delete().eq('id', parsed.data.id);
   if (error) return NextResponse.json({ error: 'Failed to delete volunteer' }, { status: 500 });
+  await logActivity({
+    actorId: member.memberId,
+    entityType: 'volunteer',
+    entityId: parsed.data.id,
+    action: 'delete',
+    oldValue: before ?? null,
+  });
   return NextResponse.json({ success: true });
 }

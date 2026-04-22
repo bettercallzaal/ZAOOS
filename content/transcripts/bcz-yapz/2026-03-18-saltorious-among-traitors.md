@@ -1,9 +1,13 @@
 ---
-title: "BCZ YapZ w/Saltorius"
+title: "BCZ YapZ w/Saltorious.eth (Among Traitors)"
 show: "BCZ YapZ"
-guest: "Saltorius"
+episode: 12
+guest: "Saltorious.eth"
+guest_org: "Among Traitors"
 host: "Zaal"
-date: 2026-03-10
+date: 2026-03-18
+youtube_url: "https://youtu.be/0Tevgpr5TUQ"
+youtube_title: "BCZ YapZ – Episode 12 w/Saltorious.eth from Among Traitors"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

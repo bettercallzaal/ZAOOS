@@ -1,9 +1,14 @@
 ---
-title: "BCZ YapZ w/Snax.eth"
+title: "BCZ YapZ w/SNAX (Pizza DAO)"
 show: "BCZ YapZ"
-guest: "Snax.eth"
+episode: 9
+guest: "SNAX"
+guest_handle: "snax.eth"
+guest_org: "Pizza DAO"
 host: "Zaal"
-date: 2026-02-11
+date: 2026-02-23
+youtube_url: "https://youtu.be/4CpblYpIO8Q"
+youtube_title: "BCZ YapZ – Episode 9 w/SNAX from PIZZA DAO"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

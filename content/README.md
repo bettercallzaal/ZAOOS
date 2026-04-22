@@ -131,17 +131,18 @@ grep -hR "^date:" content/transcripts/bcz-yapz/
 
 ## Current inventory
 
-### BCZ YapZ (16 transcripts + 2 mp4-only + known gaps)
+### BCZ YapZ (15 transcripts, 1 undated, 1 mp4-only pending)
 
 Dated (from Canva publish calendar + Zaal's Google Calendar):
 
 | Date | Guest | Org / Notes |
 |------|-------|-------------|
 | 2025-08-15 | Deepa | GrantOrb (ep1) |
-| 2025-10-15 | Rich Bartuc | (ep2) |
-| 2025-11-13 | Yoni | - |
-| 2025-11-19 | Rockopera | - |
-| 2026-01-04 | Yerbearzerker | (yerb, ep7) |
+| 2025-08-27 | Rich Bartuc | (ep2) |
+| 2025-10-15 | Yoni | - |
+| 2025-11-19 | Rockopera | meeting labeled "11.13" - recording-date vs meeting-date ambiguous; verify |
+| 2025-12-04 | Daya | file originally named "flix-fun" - Daya is primary, Flix Fun alias |
+| 2026-01-04 | Yerbearzerker | originally "yerb" - same person, renamed |
 | 2026-02-04 | Diviflyy | Empire Builder (ep7) |
 | 2026-02-11 | Snax.eth | - |
 | 2026-03-03 | Roaring Sensei | - |
@@ -152,17 +153,15 @@ Dated (from Canva publish calendar + Zaal's Google Calendar):
 | 2026-04-21 | Dish (Jack Dishman) | Clanker |
 | 2026-04-21 | Hannah | Farm Drop |
 
-Still undated (not in Canva calendar or cal ref so far):
-- Flix Fun
-- Sven
+Still undated:
+- Sven (no calendar entry found yet)
 
-No transcript captured yet (mp4 only, needs Deepgram pass):
-- 2026-02-19 - Gui (`bcz yapz w_giu.mp4`)
-- 2026-03-24 - EyeTeaJohnny (no source file ingested)
+Pending transcript capture:
+- 2026-02-19 - Gui - source is `bcz yapz w_giu.mp4`; transcript not yet delivered (user to share or re-run Deepgram)
+- EyeTeaJohnny - episode was postponed, not recorded
 
-Known calendar entries without a matched transcript:
-- 2025-08-27 - unknown guest (possibly rescheduled Deepa or another ep)
-- 2025-12-04 - Daya (transcript not yet ingested)
+Notes on interpretation:
+- Rockopera meeting was labeled "11.13" (likely Nov 13 recording) but the calendar entry is Nov 19 5:00-5:30 - probably the 11.13 recording + a 11.19 follow-up meeting. Using 2025-11-19 per the calendar entry; flag to swap to 2025-11-13 if the 11.13 recording is the canonical one.
 
 ## Roadmap
 

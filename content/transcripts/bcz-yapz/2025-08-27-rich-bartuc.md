@@ -4,7 +4,7 @@ show: "BCZ YapZ"
 episode: 2
 guest: "Rich Bartuc"
 host: "Zaal"
-date: 2025-10-15
+date: 2025-08-27
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags

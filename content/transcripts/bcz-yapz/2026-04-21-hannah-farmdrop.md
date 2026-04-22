@@ -6,7 +6,7 @@ guest_org: "Farm Drop"
 guest_links:
   - "web: farmdrop.us"
 host: "Zaal"
-date: 2026-04-22
+date: 2026-04-21
 duration_min: 30
 format: "video-podcast"
 language: "en"

@@ -9,7 +9,7 @@ guest_links:
   - "x: @jackdishman"
   - "project: clanker.world"
 host: "Zaal"
-date: 2026-04-22
+date: 2026-04-21
 duration_min: 29
 format: "video-podcast"
 language: "en"

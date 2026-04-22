@@ -117,21 +117,33 @@ grep -hR "^date:" content/transcripts/bcz-yapz/
 
 ## Current inventory
 
-### BCZ YapZ (16 episodes)
+### BCZ YapZ (16 transcripts + 2 mp4-only)
 
-Dated:
-- 2026-04-14 - Nikoline / Hubs Network
-- 2026-04-22 - Dish (Jack Dishman) / Clanker
-- 2026-04-22 - Hannah / Farm Drop
+Dated (dates confirmed from BCZ Yaps Canva publish calendar 2026-04-22):
 
-Undated (need date + topic enrichment pass):
+| Date | Guest | Org |
+|------|-------|-----|
+| 2026-02-04 | Diviflyy | Empire Builder (ep7) |
+| 2026-02-11 | Snax.eth | - |
+| 2026-03-03 | Roaring Sensei | - |
+| 2026-03-10 | Saltorius | - |
+| 2026-03-18 | Ali | - |
+| 2026-03-24 | Jordan | - |
+| 2026-04-14 | Nikoline | Hubs Network |
+| 2026-04-21 | Dish (Jack Dishman) | Clanker |
+| 2026-04-21 | Hannah | Farm Drop |
+
+Undated (need date enrichment — not in Canva calendar screenshot):
 - Deepa / GrantOrb (ep1)
 - Rich (ep2)
-- Diviflyy / Empire Builder (ep7)
-- Yerb (ep7 - possibly misnumbered, two ep7s on file)
-- Ali, Flix Fun, Jordan, Rockopera, Roaring Sensai, Saltorius, Snax, Sven, Yoni
+- Yerb (ep7 - possibly same episode as Diviflyy; filename conflict)
+- Flix Fun, Rockopera, Sven, Yoni
 
-13 undated transcripts sit in `content/transcripts/bcz-yapz/undated-*.md`. Rename to `YYYY-MM-DD-<slug>.md` after date is known. Only canonical filename convention is the dated one.
+No transcript captured (mp4 only, needs Deepgram pass):
+- 2026-03-24 - EyeTeaJohnny
+- 2026-02-19 - Gui
+
+7 undated transcripts sit in `content/transcripts/bcz-yapz/undated-*.md`. Rename to `YYYY-MM-DD-<slug>.md` after date is known.
 
 ## Roadmap
 

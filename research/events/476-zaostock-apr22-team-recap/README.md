@@ -48,10 +48,10 @@ Each step earns 1 ZAOfestivals Point (paid post-event). Complete all 3 = volunte
 
 ### 2. Team post flow
 
-1. We curate a post on @ZAOfestivals introducing each teammate (Zaal drives, team reviews)
-2. The teammate approves before publish
-3. Once live: ZAO recasts, teammate recasts from personal, every other teammate recasts
-4. Each week after, the original post gets a quote-cast update showing what the teammate contributed that week - 8 weeks of trackable chronicle
+1. You drop your bio on your profile. We take your bio and turn it into an intro post on @ZAOfestivals about you (your words, your vibe, shaped into a post format)
+2. You approve the post before it goes live
+3. Once live: ZAO recasts, you recast from your personal, every other teammate recasts
+4. Each week after, the original post gets a quote-cast update showing what you contributed that week - 8 weeks of trackable chronicle
 
 ### 3. Artist lockin
 

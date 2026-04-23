@@ -1,0 +1,36 @@
+{
+  "_notes": "Map of entity_name -> canonical_url for BCZ YapZ description rendering. Keys are lowercase, trimmed. Skill normalizes input the same way. Add new entries as they appear. If an entity has no URL yet, omit it here; the skill will route it to bcz-yapz-link-map.gaps.md.",
+  "_schema_version": 1,
+  "orgs": {
+    "the zao": "https://thezao.com",
+    "zao": "https://thezao.com",
+    "clanker": "https://clanker.world",
+    "farcaster": "https://farcaster.xyz",
+    "coinbase": "https://coinbase.com",
+    "base": "https://base.org",
+    "coinbase / base": "https://base.org",
+    "hubs network": "https://hubsnetwork.org",
+    "akasha foundation": "https://akasha.org",
+    "akasha hub": "https://akasha.org",
+    "radical exchange": "https://radicalxchange.org",
+    "web3 privacy now": "https://web3privacy.info",
+    "logos": "https://logos.co",
+    "farm drop": "https://farmdrop.co",
+    "bettercallzaal": "https://bettercallzaal.com",
+    "bettercallzaal strategies": "https://bettercallzaal.com"
+  },
+  "projects": {
+    "clanker": "https://clanker.world",
+    "empire builder": "https://empirebuilder.world",
+    "plural events": "https://pluralevents.org",
+    "agora citizen": "https://agoracitizen.network",
+    "polis": "https://pol.is",
+    "farm drop": "https://farmdrop.co"
+  },
+  "people": {
+    "jack dishman (dish)": "https://farcaster.xyz/dish",
+    "dish": "https://farcaster.xyz/dish",
+    "nikoline": "https://farcaster.xyz/nikoline",
+    "audrey tang": "https://audreyt.org"
+  }
+}

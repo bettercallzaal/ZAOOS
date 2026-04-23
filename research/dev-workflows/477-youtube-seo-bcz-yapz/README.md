@@ -1,6 +1,6 @@
 # 477 - BCZ YapZ YouTube Description + Timestamp Template
 
-> **Status:** Design complete, Phase 1 templates shipped
+> **Status:** Phase 1 templates + Phase 2 /bcz-yapz-description skill shipped (smoke-tested on undated Deepa episode 2026-04-23)
 > **Date:** 2026-04-22
 > **Goal:** Standardize BCZ YapZ YouTube descriptions for archive-first RAG ingestion, long-tail SEO discovery, and guest amplification. Ship a fill-in template today, follow with a `/bcz-yapz-description` skill that auto-renders descriptions from transcript files.
 
@@ -144,21 +144,34 @@ Files written in this pass:
 
 Fill the templates manually per episode for now. Phase 2 automates this.
 
-## Phase 2 - `/bcz-yapz-description` Skill Spec
+## Phase 2 - `/bcz-yapz-description` Skill (shipped)
 
-**Location:** `~/.claude/skills/bcz-yapz-description/skill.md`
+**Skill file:** `~/.claude/skills/bcz-yapz-description/SKILL.md`
+**Invocation:** `/bcz-yapz-description <transcript-slug>` (e.g. `2026-04-22-dish-clanker` or `undated-deepa-grantorb`).
 
-**Invocation:** `/bcz-yapz-description 2026-04-22-dish-clanker`
+The skill reads the transcript, resolves entities via the link-map, extracts
+10-15 chapters from inline `[HH:MM:SS]` markers, generates 3 Zaal-voice
+paragraphs, renders the template, runs 12 validators, writes the output to
+`content/youtube-descriptions/bcz-yapz/`, and copies the body to the macOS
+clipboard via `pbcopy`.
 
-**Steps:**
-1. Read `content/transcripts/bcz-yapz/{arg}.md`. Parse frontmatter + body.
-2. Pull `guest`, `guest_alias`, `guest_org`, `guest_links`, `topics`, `keywords`, `entities`, `summary`, `action_items` directly from frontmatter (no AI needed).
-3. Scan body for `[HH:MM:SS]` markers. Apply chapter-extraction heuristic above. AI picks 10-15 boundaries + names them using named-project / topic-shift signals from 200 chars of surrounding context.
-4. AI writes the 3 Zaal-voice paragraphs, grounded to transcript content only. Uses `summary` as P1 seed.
-5. Resolve project/org URLs via `content/templates/bcz-yapz-link-map.json` (new file - ZAO-known entity URLs; flags unknown ones in a `gaps.md` sidecar).
-6. Render template. Validate: char budget, 10-15 chapters, first chapter 0:00, tags <=500 chars, handle correctness.
-7. Output: description + tags written to `content/youtube-descriptions/bcz-yapz/{date}-{guest-slug}.md` + copied to clipboard via `/clipboard` skill.
-8. Queue a note for BCZ 101 bot ingestion (hook to be defined in doc 474).
+Explicit fallbacks handle missing frontmatter (empty entities blocks, empty
+summary, missing date, missing `guest_links`) so undated transcripts work
+without blocking.
+
+**Repo assets:**
+- `content/templates/bcz-yapz-link-map.json` - entity URL lookup (14 orgs, 6 projects, 4 people seeded).
+- `content/templates/bcz-yapz-link-map.gaps.md` - unresolved entities, appended per run.
+- `content/youtube-descriptions/bcz-yapz/` - generated output per episode.
+- `research/dev-workflows/477-youtube-seo-bcz-yapz/validation/` - reference outputs for regression testing (populated once YouTube URLs for posted episodes are captured).
+
+**Implementation plan:** `research/dev-workflows/477-youtube-seo-bcz-yapz/PLAN.md` (15 tasks; 1-8 + 13 shipped; 9-12 deferred pending YT URLs; 14-15 = this doc + PR).
+
+**Smoke-test baseline (2026-04-23):**
+Running `/bcz-yapz-description undated-deepa-grantorb` -> 12/12 validators
+pass, 2,372 char body, 11 chapters, 156 char tags, 5 new gaps appended
+(Gitcoin, Canada Council of Arts, Mural Festival, Polygon, Clanker).
+Output at `content/youtube-descriptions/bcz-yapz/undated-deepa-grantorb.md`.
 
 ## Phase 3 - Backlog Plan (13 undated transcripts)
 

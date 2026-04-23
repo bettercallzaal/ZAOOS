@@ -61,7 +61,8 @@ export async function getPublicMembers(): Promise<PublicMember[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('stock_team_members')
-    .select('id, name, role, scope, bio, links, photo_url')
+    .select('id, name, role, scope, bio, links, photo_url, active')
+    .neq('active', false)
     .order('created_at');
 
   if (error || !data) return [];

@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin();
     const { data: members, error } = await supabase
       .from('stock_team_members')
-      .select('id, name, password_hash');
+      .select('id, name, password_hash, active')
+      .neq('active', false);
 
     if (error || !members) {
       return NextResponse.json({ error: 'Login failed' }, { status: 500 });

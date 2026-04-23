@@ -38,7 +38,7 @@ export default async function StockTeamPage() {
       .select('*, owner:stock_team_members!owner_id(id, name), creator:stock_team_members!created_by(id, name)')
       .order('status')
       .order('created_at', { ascending: false }),
-    supabase.from('stock_team_members').select('id, name, role, scope, bio, links, photo_url').order('created_at'),
+    supabase.from('stock_team_members').select('id, name, role, scope, bio, links, photo_url').neq('active', false).order('created_at'),
     supabase
       .from('stock_sponsors')
       .select('*, owner:stock_team_members!owner_id(id, name)')

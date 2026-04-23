@@ -76,3 +76,7 @@ nouns-snap/
 ellsworth info/
 *.mp3
 *.pdf
+
+# ZAOstock plaintext codes - never commit (secrets)
+scripts/.stock-codes-*.txt
+scripts/.stock-codes-iman-*.txt

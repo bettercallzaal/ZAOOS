@@ -43,10 +43,15 @@ export function MemberProfileView({ member, scopeLabel, roleLabel }: Props) {
         )}
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold text-white">{member.name}</h1>
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap gap-1.5">
             <span className={`text-[10px] font-bold px-2 py-1 rounded-full border uppercase ${SCOPE_COLOR[member.scope] || SCOPE_COLOR.ops}`}>
               {scopeLabel} - {roleLabel}
             </span>
+            {member.secondary_scope && member.secondary_scope.trim() && (
+              <span className={`text-[10px] font-bold px-2 py-1 rounded-full border uppercase ${SCOPE_COLOR[member.secondary_scope] || SCOPE_COLOR.ops}`}>
+                Also {member.secondary_scope}
+              </span>
+            )}
           </div>
         </div>
       </div>

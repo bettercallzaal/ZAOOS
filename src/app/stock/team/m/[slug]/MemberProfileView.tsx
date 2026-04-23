@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { PublicMember } from '@/lib/stock/members';
+import { parseLinks, type PublicMember } from '@/lib/stock/members';
 
 const SCOPE_COLOR: Record<string, string> = {
   ops: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
@@ -65,7 +65,20 @@ export function MemberProfileView({ member, scopeLabel, roleLabel }: Props) {
       {member.links && member.links.trim() && (
         <div>
           <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Links</p>
-          <p className="text-xs text-gray-400">{member.links}</p>
+          <ul className="space-y-1">
+            {parseLinks(member.links).map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-[#f5a623] hover:text-[#ffd700] underline break-all"
+                >
+                  {l.display}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </section>

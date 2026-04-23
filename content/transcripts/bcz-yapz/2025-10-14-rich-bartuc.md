@@ -1,10 +1,13 @@
 ---
-title: "BCZ YapZ w/Rich"
+title: "BCZ YapZ w/Rich Bartuc"
 show: "BCZ YapZ"
 episode: 2
-guest: "Rich"
+guest: "Rich Bartuc"
+guest_org: "PowerPacks Diamondhands Club"
 host: "Zaal"
-date: null                            # TODO: enrich with actual recording date
+date: 2025-10-14
+youtube_url: "https://youtu.be/AOcp8Jpyw3k"
+youtube_title: "BCZ Yaps – Episode 2: Rich Bartuc & the PowerPacks Diamondhands Club"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags
@@ -16,7 +19,7 @@ source:
   docx: "Movies/bcz stream/BCZyapz/transcripts/bczyapz2w_rich.docx"
 summary: ""                           # TODO: one-sentence summary"
 action_items: []
-status: "raw-undated"                # needs: date, topics, entities, summary
+status: "raw"
 ---
 
 ## Transcript

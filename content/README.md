@@ -131,21 +131,34 @@ grep -hR "^date:" content/transcripts/bcz-yapz/
 
 ## Current inventory
 
-### BCZ YapZ (16 episodes)
+### BCZ YapZ / BCZ Yaps (16 transcripts, 1 pending)
 
-Dated:
-- 2026-04-14 - Nikoline / Hubs Network
-- 2026-04-22 - Dish (Jack Dishman) / Clanker
-- 2026-04-22 - Hannah / Farm Drop
+Canonical dates are **YouTube publish dates** from `@bettercallzaal` channel (verified via `yt-dlp` on 2026-04-22). Recording dates may differ by a few days to weeks.
 
-Undated (need date + topic enrichment pass):
-- Deepa / GrantOrb (ep1)
-- Rich (ep2)
-- Diviflyy / Empire Builder (ep7)
-- Yerb (ep7 - possibly misnumbered, two ep7s on file)
-- Ali, Flix Fun, Jordan, Rockopera, Roaring Sensai, Saltorius, Snax, Sven, Yoni
+| Ep | Publish | Guest | Org | YouTube |
+|----|---------|-------|-----|---------|
+| 1 | 2025-08-22 | Deepa | GrantOrb | [3vUAFwXqdeo](https://youtu.be/3vUAFwXqdeo) |
+| 2 | 2025-10-14 | Rich Bartuc | PowerPacks Diamondhands Club | [AOcp8Jpyw3k](https://youtu.be/AOcp8Jpyw3k) |
+| 3 | 2025-10-19 | Yoni Dubz | - | [HopaeW7POis](https://youtu.be/HopaeW7POis) |
+| 4 | 2025-11-30 | Rock Opera | - | [43GPWLE6W5Q](https://youtu.be/43GPWLE6W5Q) |
+| 5 | 2025-12-11 | Daya | Flix.Fun | [9ePU4qEc67Y](https://youtu.be/9ePU4qEc67Y) |
+| 6 | 2025-12-16 | Sven | Incented | [O7-1weR0Qog](https://youtu.be/O7-1weR0Qog) |
+| 7 | 2026-01-05 | Yerbearserker | Empire Builder | [EH-FWD7ySKk](https://youtu.be/EH-FWD7ySKk) |
+| 8 | 2026-02-11 | Diviflyy | Empire Builder | [0tyVpLGVxkA](https://youtu.be/0tyVpLGVxkA) |
+| 9 | 2026-02-23 | SNAX (snax.eth) | Pizza DAO | [4CpblYpIO8Q](https://youtu.be/4CpblYpIO8Q) |
+| 10 | 2026-02-23 | GIU (Juliano) | Pinetree | [loSOniPcJx0](https://youtu.be/loSOniPcJx0) |
+| 11 | 2026-03-18 | Roaring Sensei | - | [DIeav3o8t9M](https://youtu.be/DIeav3o8t9M) |
+| 12 | 2026-03-18 | Saltorious.eth | Among Traitors | [0Tevgpr5TUQ](https://youtu.be/0Tevgpr5TUQ) |
+| 13 | 2026-03-25 | Ali | Inflynce | [WTyafqHKQqM](https://youtu.be/WTyafqHKQqM) |
+| 14 | 2026-04-01 | Jordan | Ryft | [IbhHxFR4yxE](https://youtu.be/IbhHxFR4yxE) |
+| 15 | 2026-04-22 | Nikoline | Hubs Network | publishing 2026-04-22 |
+| 16 | 2026-04-22 | Dish (Jack Dishman) | Clanker | publishing 2026-04-22 |
+| 17 | 2026-04-22 | Hannah | Farm Drop | publishing 2026-04-22 |
 
-13 undated transcripts sit in `content/transcripts/bcz-yapz/undated-*.md`. Rename to `YYYY-MM-DD-<slug>.md` after date is known. Only canonical filename convention is the dated one.
+Not recorded:
+- EyeTeaJohnny 2026-03-24 - episode was postponed
+
+Ground truth source: `yt-dlp "https://www.youtube.com/watch?v=<ID>" --print "%(upload_date)s | %(title)s"` - re-run to refresh when new episodes publish.
 
 ## Roadmap
 

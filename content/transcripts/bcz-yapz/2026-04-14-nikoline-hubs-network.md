@@ -1,12 +1,25 @@
 ---
-title: "BCZ YapZ w/Nikoline"
+title: "BCZ YapZ w/Nikoline (Hubs Network)"
 show: "BCZ YapZ"
-guest: "Nikoline"
+episode: 15
+guest: "Nikoline Arns"
+guest_alias: "Nikoline"
 guest_org: "Hubs Network"
 guest_links:
-  - "web: hubsnetwork.org"
+  - "x: https://x.com/nikoline_nik"
+  - "linkedin: https://linkedin.com/in/nikoline-nik"
+  - "paragraph: https://paragraph.xyz/@nikoline"
+  - "telegram: https://t.me/nikoline_nik"
+  - "personal: https://nikoline.github.io/arns/"
+  - "web: https://hubsnetwork.org"
+  - "substack: https://hubsnetwork.substack.com"
+  - "farcaster-channel: /hubs-network"
   - "partners: Akasha Hub, Radical Exchange, Web3 Privacy Now, Logos"
 host: "Zaal"
+host_handles:
+  - "farcaster: @zaal"
+  - "x: @bettercallzaal"
+  - "youtube: @bettercallzaal"
 date: 2026-04-14
 duration_min: 27
 format: "video-podcast"

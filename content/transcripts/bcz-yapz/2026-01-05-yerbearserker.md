@@ -1,10 +1,13 @@
 ---
-title: "BCZ YapZ w/Yerb"
+title: "BCZ YapZ w/Yerbearserker"
 show: "BCZ YapZ"
 episode: 7
-guest: "Yerb"
+guest: "Yerbearserker"
+guest_org: "Empire Builder"
 host: "Zaal"
-date: null                            # TODO: enrich with actual recording date
+date: 2026-01-05
+youtube_url: "https://youtu.be/EH-FWD7ySKk"
+youtube_title: "BCZ YapZ – Episode 7: Empire Builder w/Yerbearserker"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags
@@ -16,7 +19,7 @@ source:
   docx: "Movies/bcz stream/BCZyapz/transcripts/BCZYapZ ep7 w_yerb.docx"
 summary: ""                           # TODO: one-sentence summary"
 action_items: []
-status: "raw-undated"                # needs: date, topics, entities, summary
+status: "raw"
 ---
 
 ## Transcript

@@ -1,9 +1,14 @@
 ---
-title: "BCZ YapZ w/Snax"
+title: "BCZ YapZ w/SNAX (Pizza DAO)"
 show: "BCZ YapZ"
-guest: "Snax"
+episode: 9
+guest: "SNAX"
+guest_handle: "snax.eth"
+guest_org: "Pizza DAO"
 host: "Zaal"
-date: null                            # TODO: enrich with actual recording date
+date: 2026-02-23
+youtube_url: "https://youtu.be/4CpblYpIO8Q"
+youtube_title: "BCZ YapZ – Episode 9 w/SNAX from PIZZA DAO"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags
@@ -15,7 +20,7 @@ source:
   docx: "Movies/bcz stream/BCZyapz/transcripts/bczyapzw_snax.docx"
 summary: ""                           # TODO: one-sentence summary"
 action_items: []
-status: "raw-undated"                # needs: date, topics, entities, summary
+status: "raw"
 ---
 
 ## Transcript

@@ -5,7 +5,9 @@ episode: 1
 guest: "Deepa"
 guest_org: "GrantOrb"
 host: "Zaal"
-date: null                            # TODO: enrich with actual recording date
+date: 2025-08-22
+youtube_url: "https://youtu.be/3vUAFwXqdeo"
+youtube_title: "BCZ Yaps – Episode 1: Deepa from GrantOrb on AI Grants and the Future of Funding"
 format: "video-podcast"
 language: "en"
 topics: []                            # TODO: extract 3-8 tags
@@ -17,7 +19,7 @@ source:
   docx: "Movies/bcz stream/BCZyapz/transcripts/BCZ Yaps #1 W_ Deepa from GrantOrb.docx"
 summary: ""                           # TODO: one-sentence summary"
 action_items: []
-status: "raw-undated"                # needs: date, topics, entities, summary
+status: "raw"
 ---
 
 ## Transcript

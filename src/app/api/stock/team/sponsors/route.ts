@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getStockTeamMember } from '@/lib/auth/stock-team-session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logActivity, logFieldChanges } from '@/lib/stock/log-activity';
 
 export async function GET() {
   const member = await getStockTeamMember();
@@ -48,6 +49,13 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: 'Failed to create sponsor' }, { status: 500 });
+  await logActivity({
+    actorId: member.memberId,
+    entityType: 'sponsor',
+    entityId: data.id,
+    action: 'create',
+    newValue: { name: data.name, track: data.track, status: data.status },
+  });
   return NextResponse.json({ sponsor: data }, { status: 201 });
 }
 
@@ -83,12 +91,21 @@ export async function PATCH(request: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
+  const { data: before } = await supabase
+    .from('stock_sponsors')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from('stock_sponsors')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', id);
 
   if (error) return NextResponse.json({ error: 'Failed to update sponsor' }, { status: 500 });
+  if (before) {
+    await logFieldChanges(member.memberId, 'sponsor', id, before, updates);
+  }
   return NextResponse.json({ success: true });
 }
 
@@ -105,8 +122,21 @@ export async function DELETE(request: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
+  const { data: before } = await supabase
+    .from('stock_sponsors')
+    .select('name, track, status')
+    .eq('id', parsed.data.id)
+    .maybeSingle();
+
   const { error } = await supabase.from('stock_sponsors').delete().eq('id', parsed.data.id);
 
   if (error) return NextResponse.json({ error: 'Failed to delete sponsor' }, { status: 500 });
+  await logActivity({
+    actorId: member.memberId,
+    entityType: 'sponsor',
+    entityId: parsed.data.id,
+    action: 'delete',
+    oldValue: before ?? null,
+  });
   return NextResponse.json({ success: true });
 }

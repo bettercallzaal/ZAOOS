@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getStockTeamMember } from '@/lib/auth/stock-team-session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { logActivity, logFieldChanges } from '@/lib/stock/log-activity';
 
 export async function GET(request: NextRequest) {
   const member = await getStockTeamMember();
@@ -53,6 +54,13 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: 'Failed to create todo' }, { status: 500 });
+  await logActivity({
+    actorId: member.memberId,
+    entityType: 'todo',
+    entityId: data.id,
+    action: 'create',
+    newValue: { title: data.title, owner_id: data.owner_id },
+  });
   return NextResponse.json({ todo: data }, { status: 201 });
 }
 
@@ -79,11 +87,20 @@ export async function PATCH(request: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
+  const { data: before } = await supabase
+    .from('stock_todos')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from('stock_todos')
     .update({ ...updates, updated_at: new Date().toISOString() })
     .eq('id', id);
 
   if (error) return NextResponse.json({ error: 'Failed to update todo' }, { status: 500 });
+  if (before) {
+    await logFieldChanges(member.memberId, 'todo', id, before, updates);
+  }
   return NextResponse.json({ success: true });
 }

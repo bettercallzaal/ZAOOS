@@ -29,6 +29,8 @@ const TEAM: Array<{ name: string; role: string; scope: string }> = [
   { name: 'Craig G', role: 'member', scope: 'finance' },
   { name: 'Maceo', role: 'member', scope: 'finance' },
   { name: 'Jango', role: 'member', scope: 'ops' },
+  { name: 'Jake', role: 'member', scope: 'ops' },
+  { name: 'Geek', role: 'member', scope: 'ops' },
 ];
 
 // Unambiguous alphabet - no 0, O, 1, I, L

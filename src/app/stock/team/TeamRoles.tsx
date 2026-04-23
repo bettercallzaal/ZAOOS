@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { slugify } from '@/lib/stock/members';
+import { slugify, parseLinks } from '@/lib/stock/members';
 
 interface Member {
   id: string;
@@ -93,7 +93,19 @@ function MemberCard({ member: m }: { member: Member }) {
           <p className="text-[11px] text-gray-600 italic">No bio yet.</p>
         )}
         {m.links && m.links.trim() && (
-          <p className="text-[10px] text-gray-500">{m.links}</p>
+          <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+            {parseLinks(m.links).map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-[#f5a623] hover:text-[#ffd700] underline break-all"
+              >
+                {l.display}
+              </a>
+            ))}
+          </div>
         )}
         <Link
           href={`/stock/team/m/${slug}`}

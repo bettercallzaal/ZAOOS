@@ -57,11 +57,37 @@ export function slugify(name: string): string {
     .replace(/\s+/g, '-');
 }
 
+export interface ParsedLink {
+  href: string;
+  display: string;
+}
+
+export function parseLinks(raw: string): ParsedLink[] {
+  return raw
+    .split(/[\s,;]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .map((token) => {
+      const hasProtocol = /^https?:\/\//i.test(token);
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(token);
+      const isHandle = token.startsWith('@');
+      if (isEmail) {
+        return { href: `mailto:${token}`, display: token };
+      }
+      if (isHandle) {
+        return { href: `https://x.com/${token.slice(1)}`, display: token };
+      }
+      const href = hasProtocol ? token : `https://${token}`;
+      return { href, display: token };
+    });
+}
+
 export async function getPublicMembers(): Promise<PublicMember[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('stock_team_members')
-    .select('id, name, role, scope, bio, links, photo_url')
+    .select('id, name, role, scope, bio, links, photo_url, active')
+    .neq('active', false)
     .order('created_at');
 
   if (error || !data) return [];

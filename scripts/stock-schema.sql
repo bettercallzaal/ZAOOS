@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS stock_team_members (
 ALTER TABLE stock_team_members
   ADD COLUMN IF NOT EXISTS bio TEXT DEFAULT '',
   ADD COLUMN IF NOT EXISTS links TEXT DEFAULT '',
-  ADD COLUMN IF NOT EXISTS photo_url TEXT DEFAULT '';
+  ADD COLUMN IF NOT EXISTS photo_url TEXT DEFAULT '',
+  ADD COLUMN IF NOT EXISTS active BOOLEAN DEFAULT true;
 
 CREATE TABLE IF NOT EXISTS stock_goals (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -182,6 +183,94 @@ CREATE TABLE IF NOT EXISTS stock_suggestions (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- ============================================================================
+-- Phase 1: Notion-replacement tables (doc 477)
+-- ============================================================================
+
+-- Polymorphic attachments across sponsor/artist/timeline/note/volunteer
+CREATE TABLE IF NOT EXISTS stock_attachments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  entity_type TEXT NOT NULL CHECK (entity_type IN ('sponsor','artist','timeline','note','volunteer')),
+  entity_id UUID NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'other' CHECK (kind IN ('deck','rider','contract','invoice','photo','other')),
+  filename TEXT NOT NULL,
+  storage_path TEXT NOT NULL,
+  mime_type TEXT NOT NULL DEFAULT 'application/octet-stream',
+  size_bytes BIGINT NOT NULL DEFAULT 0,
+  uploaded_by UUID REFERENCES stock_team_members(id),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS stock_attachments_entity_idx
+  ON stock_attachments(entity_type, entity_id, created_at DESC);
+
+-- Audit trail. Written from src/lib/stock/log-activity.ts on every mutation.
+CREATE TABLE IF NOT EXISTS stock_activity_log (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  actor_id UUID REFERENCES stock_team_members(id),
+  entity_type TEXT NOT NULL,
+  entity_id UUID NOT NULL,
+  action TEXT NOT NULL,
+  field_changed TEXT,
+  old_value TEXT,
+  new_value TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS stock_activity_entity_idx
+  ON stock_activity_log(entity_type, entity_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS stock_activity_actor_idx
+  ON stock_activity_log(actor_id, created_at DESC);
+
+-- Threaded comments on any entity
+CREATE TABLE IF NOT EXISTS stock_comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  entity_type TEXT NOT NULL CHECK (entity_type IN ('sponsor','artist','timeline','todo','note','volunteer','budget')),
+  entity_id UUID NOT NULL,
+  author_id UUID NOT NULL REFERENCES stock_team_members(id),
+  body TEXT NOT NULL,
+  mentions UUID[] DEFAULT '{}',
+  parent_id UUID REFERENCES stock_comments(id),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS stock_comments_entity_idx
+  ON stock_comments(entity_type, entity_id, created_at);
+
+-- Outreach history thread; replaces single last_contacted_at with a log.
+CREATE TABLE IF NOT EXISTS stock_contact_log (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  entity_type TEXT NOT NULL CHECK (entity_type IN ('sponsor','artist')),
+  entity_id UUID NOT NULL,
+  channel TEXT NOT NULL CHECK (channel IN ('email','call','sms','dm_farcaster','dm_x','dm_tg','in_person','other')),
+  direction TEXT NOT NULL CHECK (direction IN ('outbound','inbound')),
+  summary TEXT NOT NULL,
+  contacted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  contacted_by UUID NOT NULL REFERENCES stock_team_members(id),
+  next_action TEXT DEFAULT '',
+  next_action_at DATE,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS stock_contact_log_entity_idx
+  ON stock_contact_log(entity_type, entity_id, contacted_at DESC);
+
+-- Bump sponsor.last_contacted_at from newest log entry so attention cards stay accurate.
+CREATE OR REPLACE FUNCTION stock_contact_log_bump_sponsor()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.entity_type = 'sponsor' THEN
+    UPDATE stock_sponsors
+      SET last_contacted_at = NEW.contacted_at,
+          updated_at = now()
+      WHERE id = NEW.entity_id
+        AND (last_contacted_at IS NULL OR last_contacted_at < NEW.contacted_at);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS stock_contact_log_sponsor_trigger ON stock_contact_log;
+CREATE TRIGGER stock_contact_log_sponsor_trigger
+  AFTER INSERT ON stock_contact_log
+  FOR EACH ROW EXECUTE FUNCTION stock_contact_log_bump_sponsor();
+
 -- RLS
 ALTER TABLE stock_team_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stock_goals ENABLE ROW LEVEL SECURITY;
@@ -193,6 +282,10 @@ ALTER TABLE stock_volunteers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stock_budget_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stock_meeting_notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stock_suggestions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE stock_attachments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE stock_activity_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE stock_comments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE stock_contact_log ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Service role full access" ON stock_team_members;
 CREATE POLICY "Service role full access" ON stock_team_members FOR ALL USING (true) WITH CHECK (true);
@@ -214,10 +307,18 @@ DROP POLICY IF EXISTS "Service role full access" ON stock_meeting_notes;
 CREATE POLICY "Service role full access" ON stock_meeting_notes FOR ALL USING (true) WITH CHECK (true);
 DROP POLICY IF EXISTS "Service role full access" ON stock_suggestions;
 CREATE POLICY "Service role full access" ON stock_suggestions FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Service role full access" ON stock_attachments;
+CREATE POLICY "Service role full access" ON stock_attachments FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Service role full access" ON stock_activity_log;
+CREATE POLICY "Service role full access" ON stock_activity_log FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Service role full access" ON stock_comments;
+CREATE POLICY "Service role full access" ON stock_comments FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Service role full access" ON stock_contact_log;
+CREATE POLICY "Service role full access" ON stock_contact_log FOR ALL USING (true) WITH CHECK (true);
 
 COMMIT;
 
--- Verify: expect 10 tables
+-- Verify: expect 14 tables
 SELECT table_name FROM information_schema.tables
   WHERE table_name LIKE 'stock\_%' ESCAPE '\'
   ORDER BY table_name;

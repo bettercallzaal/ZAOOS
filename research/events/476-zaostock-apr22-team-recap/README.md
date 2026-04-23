@@ -38,13 +38,13 @@ Zaal, DCoop, Shawn, Tyler Stambaugh. 30 minutes on Discord.
 
 ## Locked decisions
 
-### 1. Contributor path = 3 steps
+### 1. Contributor path = 3 starter moves
 
-Each step earns 1 ZAOfestivals Point (paid post-event). Complete all 3 = volunteer eligible for Oct 3.
+Each move earns 1 ZAOfestivals Point. Points track who's following through on what they said they'd do - a contribution log, not a gated reward. Final recognition/rewards are undetermined and will be figured out closer to the event.
 
-- **Step 1:** Submit your bio on your profile
-- **Step 2:** Share your brand logo URL
-- **Step 3:** Team post on @ZAOfestivals (see flow below)
+- **Move 1:** Submit your bio on your profile
+- **Move 2:** Share your brand logo URL
+- **Move 3:** Team post on @ZAOfestivals (see flow below)
 
 ### 2. Team post flow
 

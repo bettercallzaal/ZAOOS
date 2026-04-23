@@ -1,7 +1,7 @@
-# 476 - ZAOstock Apr 22 Team Recap (Broadcast + Full Detail)
+# 476 - ZAOstock Apr 22 Team Recap (Internal)
 
 > **Status:** Internal doc - not publicly posted. Shared via direct DM to teammates only.
-> **Date:** 2026-04-22 (updated 2026-04-23 with roster changes + corrections)
+> **Date:** 2026-04-22 (updated 2026-04-23 with roster changes + scope policy)
 > **Source of truth:** Link shared 1:1 with each teammate via DM alongside their login code.
 
 ---
@@ -12,26 +12,29 @@ Zaal, DCoop, Shawn, Tyler Stambaugh. 30 minutes on Discord.
 
 ## Team size
 
-16 active teammates (added Jake + Geek + Iman Afrikah; DaNici + AttaBotty stepped back for bandwidth, can rejoin later). Current roster:
+17 active teammates. New scope policy: max 1 scope per person, people pick their own team (ops / music / design) when they log in. "Finance" is no longer a scope — those decisions happen across the roster. Advisory-role folks don't pick a scope.
+
+Current roster:
 
 | Name | Scope | Role |
 |------|-------|------|
 | Zaal | Ops | Lead |
-| Candy (candytoybox) | Ops + Design | 2nd, driving design |
+| Candy (candytoybox) | picks | 2nd |
 | FailOften | Ops | Member |
 | Hurric4n3Ike | Ops | Member |
 | Swarthy Hatter | Ops | Member |
 | Jango | Ops | Member |
 | Jake | Ops | Member (new) |
 | Geek | Ops | Member (new) |
-| Shawn | Design | Member |
+| Tom Fellenz | - | Advisory (new) |
+| Shawn | Music | Member |
 | DCoop | Music | 2nd |
-| Iman Afrikah | Ops + Music | Member (new) |
-| Tyler Stambaugh | Finance | Advisory (Magnetic) |
-| Ohnahji B | Finance | Member |
-| DFresh (dfreshmaker) | Finance | Member |
-| Craig G | Finance | Member |
-| Maceo | Finance | Member |
+| Iman Afrikah | picks | Member (new) |
+| Tyler Stambaugh | - | Advisory (Magnetic) |
+| Craig G | - | Advisory |
+| Ohnahji B | picks | Member |
+| DFresh (dfreshmaker) | picks | Member |
+| Maceo | picks | Member |
 
 **Stepped back (bandwidth - can rejoin later):** DaNici (was Design Lead), AttaBotty (was Music Member).
 
@@ -49,10 +52,10 @@ Each move earns 1 ZAOfestivals Point. Points track who's following through on wh
 
 ### 2. Team post flow
 
-1. You drop your bio on your profile. We take your bio and turn it into an intro post on @ZAOfestivals about you (your words, your vibe, shaped into a post format)
-2. You approve the post before it goes live
-3. Once live: ZAO recasts, you recast from your personal, every other teammate recasts
-4. Each week after, the original post gets a quote-cast update showing what you contributed that week - 8 weeks of trackable chronicle
+1. We curate a post on @ZAOfestivals introducing each teammate (Zaal drives, team reviews)
+2. The teammate approves before publish
+3. Once live: ZAO recasts, teammate recasts from personal, every other teammate recasts
+4. Each week after, the original post gets a quote-cast update showing what the teammate contributed that week - 8 weeks of trackable chronicle
 
 ### 3. Artist lockin
 
@@ -76,23 +79,18 @@ Tyler Stambaugh officially joins the crew. Advisory role, bringing Magnetic inte
 
 ### Shirts
 
-Design direction + vendor selection + production timeline. Bringing to the whole crew next Tuesday. Candy (candytoybox) drives design with Shawn. Finance team scopes budget.
-
-### Bangor Savings Bank sponsor application
-
-Submit the application by **end of day Friday April 24** so we can say we have it submitted. Local Maine bank, strong fit for Local track. Zaal owns the submission.
+Design direction + vendor selection + production timeline. Bringing to the whole crew next Tuesday. DaNici drives design. Finance team scopes budget.
 
 ---
 
 ## Brainstormed (not locked)
 
 - **Brand packs** instead of one mega-cipher: groups of 3 artists per track, genre-flexible, people can be on multiple teams
-- **Road to ZAOstock** Magnetic portal: weekly drip content leading up to Oct 3 (Tyler spec at [research/events/473](../473-road-to-zaostock-magnetic-portal/)) - now actively planning
+- **Road to ZAOstock** Magnetic portal: weekly drip content leading up to Oct 3 (Tyler spec at [research/events/473](../473-road-to-zaostock-magnetic-portal/))
 - **Day-of scavenger hunt** via Magnetic: collect 5+ QR drops during the festival = post-event merch unlock
 - **Cross-event magnet** with other Maine Craft Weekend events: shared QR + email collection
 - **Weekly quote-cast recap chain** per teammate intro
 - **Wave Wars playlists per quick battle** for morning recap listens (Shawn + Hurric4n3 to coordinate with Catalyst)
-- **Cypher at the festival** - shelved as an "if we have time" idea for now. `/stock/cypher` signup form exists but won't be promoted publicly.
 
 ---
 
@@ -108,7 +106,8 @@ Submit the application by **end of day Friday April 24** so we can say we have i
 | Page | URL | Purpose |
 |------|-----|---------|
 | Festival landing | zaoos.com/stock | Hero, countdown, team, partners, CTAs |
-| Day-of program | zaoos.com/stock/program | Draft schedule (WaveWarZ + talks + sets) |
+| Day-of program | zaoos.com/stock/program | Draft schedule including cypher + WaveWarZ |
+| Cypher signup | zaoos.com/stock/cypher | Any artist can sign up to be in the cypher |
 | Partner deck | zaoos.com/stock/sponsor/deck | Linkable pitch for sponsor outreach |
 | Volunteer signup | zaoos.com/stock/apply | Public form, rows land in Volunteers tab |
 | Suggestion box | zaoos.com/stock/suggest | Anyone drops ideas, we credit contributors |
@@ -122,7 +121,7 @@ Submit the application by **end of day Friday April 24** so we can say we have i
 
 1. Check your DM for your personal 4-letter login code + your public profile URL
 2. Login at zaoos.com/stock/team, Home tab, drop your bio + photo URL (X or Farcaster pfp works)
-3. Share your brand logo URL - then we take your bio and turn it into your @ZAOfestivals intro post, you approve, we all recast
+3. Share your brand logo URL - then I curate your @ZAOfestivals intro post, you approve, we all recast
 
 ---
 
@@ -132,14 +131,10 @@ Submit the application by **end of day Friday April 24** so we can say we have i
 
 ### Next meeting agenda preview
 
-- **Platform walkthrough** - how to use zaoos.com/stock/team dashboard (kanban boards, file uploads, contact log, comments, activity feed)
 - Vote on sponsor finders split (finance team - all 4 members)
-- Bangor Savings Bank application status (due Friday Apr 24)
-- Shirts direction + budget (Candy/candytoybox drives design with Shawn)
+- Shirts direction + budget
 - Run-of-show format approval
-- Media capture pipeline owner - Zaal holds it for now
-- Artist outreach pipeline status (DCoop + Shawn own outreach)
-- Magnetic portal / Road to ZAOstock - actively planning now
+- Media capture pipeline owner (research doc 433)
 - Each team commits to 1 deliverable through May 5
 
 ---

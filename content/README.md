@@ -19,9 +19,23 @@ content/
     zoes/                  # Future: ZOE'S show
     spaces/                # Future: X Spaces / Farcaster spaces
     cyphers/               # Future: cypher sessions
+  templates/               # Fill-in templates for downstream artifacts
+    bcz-yapz-youtube-description.md
+    bcz-yapz-youtube-tags.txt
   writing/                 # Future: essays, newsletter archives, longform
   media-refs/              # Future: pointers to video/audio in Movies/cloud
 ```
+
+## Templates
+
+Ready-to-fill templates for downstream artifacts per episode:
+
+| Template | Purpose | Spec |
+|----------|---------|------|
+| `templates/bcz-yapz-youtube-description.md` | YouTube description body (copy-paste into YT description field) | [Doc 477](../research/dev-workflows/477-youtube-seo-bcz-yapz/) |
+| `templates/bcz-yapz-youtube-tags.txt` | YouTube tags (copy-paste into YT tags field, 500 char budget) | [Doc 477](../research/dev-workflows/477-youtube-seo-bcz-yapz/) |
+
+Placeholders use `{{dot.notation}}` matching transcript frontmatter. See each template's header comment for the full placeholder map + filling rules.
 
 One transcript = one file. Filename convention: `YYYY-MM-DD-<guest-slug>-<org-slug>.md`.
 

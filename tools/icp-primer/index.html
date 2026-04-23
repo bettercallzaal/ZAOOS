@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ICP Primer</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">ZAO - ICP Primer</div>
+  <button id="ii-login" class="btn btn-gold">Login with Internet Identity</button>
+</header>
+
+<div id="offline-banner" class="banner banner-error" hidden>
+  Can't reach ICP mainnet. Widgets disabled.
+  <button id="offline-retry" class="btn btn-sm">Retry</button>
+</div>
+
+<main class="lessons">
+
+  <section class="lesson" id="lesson-1">
+    <div class="label">Lesson 1</div>
+    <h2>What ICP actually is</h2>
+    <ul class="hooks">
+      <li>Cloud that's also a blockchain.</li>
+      <li>Reverse gas: the app pays cycles, the user pays nothing.</li>
+      <li>Frontend + backend + database all live in one canister on-chain.</li>
+    </ul>
+    <table class="compare">
+      <thead><tr><th></th><th>Ethereum / Base</th><th>Internet Computer</th></tr></thead>
+      <tbody>
+        <tr><td>Identity</td><td>Wallet address</td><td>Principal</td></tr>
+        <tr><td>Program</td><td>Smart contract</td><td>Canister (contract + server + db)</td></tr>
+        <tr><td>Gas</td><td>User pays per tx</td><td>App prepays cycles</td></tr>
+        <tr><td>Auth</td><td>MetaMask / seed phrase</td><td>Internet Identity (passkey)</td></tr>
+        <tr><td>Hosting</td><td>Separate (Vercel, etc.)</td><td>Included in canister</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="lesson" id="lesson-2">
+    <div class="label">Lesson 2</div>
+    <h2>Canisters 101</h2>
+    <ul class="hooks">
+      <li>Canister = WASM module with its own state.</li>
+      <li>Upgradeable, can hold terabytes, serves HTTP.</li>
+    </ul>
+    <div class="widget" id="widget-ping">
+      <button class="btn btn-gold" id="ping-btn">Ping the ICP Ledger canister</button>
+      <div class="widget-output" id="ping-output"></div>
+    </div>
+  </section>
+
+  <section class="lesson" id="lesson-3">
+    <div class="label">Lesson 3</div>
+    <h2>Internet Identity live</h2>
+    <ul class="hooks">
+      <li>Passkey / Face ID. No seed phrase.</li>
+      <li>Principal = your identity, scoped per app.</li>
+    </ul>
+    <div class="widget" id="widget-ii">
+      <div class="widget-output" id="ii-output">Click "Login with Internet Identity" above to see your principal.</div>
+    </div>
+  </section>
+
+  <section class="lesson" id="lesson-4">
+    <div class="label">Lesson 4</div>
+    <h2>ICRC-7 NFTs live</h2>
+    <ul class="hooks">
+      <li>ICRC-7 is the ICP equivalent of ERC-721.</li>
+      <li>Every NFT lives inside a canister, queryable by anyone.</li>
+    </ul>
+    <div class="widget" id="widget-icrc7">
+      <label for="icrc7-select">Pick a mainnet collection:</label>
+      <select id="icrc7-select"></select>
+      <button class="btn btn-gold" id="icrc7-btn">Read it</button>
+      <div class="widget-output" id="icrc7-output"></div>
+    </div>
+  </section>
+
+  <section class="lesson" id="lesson-5">
+    <div class="label">Lesson 5</div>
+    <h2>Pay-to-mint pattern</h2>
+    <ul class="hooks">
+      <li>ICRC-7 has no purchase primitive. You add one.</li>
+      <li>Canister receives ICP via the ledger, verifies the block, then mints.</li>
+    </ul>
+    <div class="widget" id="widget-flow">
+      <button class="btn btn-gold" id="flow-play">Play the flow</button>
+      <svg id="flow-svg" viewBox="0 0 600 200" aria-hidden="true"></svg>
+      <div class="widget-output" id="flow-caption">Press play to walk through the 4 steps.</div>
+    </div>
+    <p class="callout">This is what Caffeine.ai will scaffold when you prompt it for the ZAO Stock NFT sale.</p>
+  </section>
+
+</main>
+
+<footer class="footer">
+  Built 2026-04-23. Spec: <code>docs/superpowers/specs/2026-04-23-icp-primer-localhost-design.md</code>.
+</footer>
+
+<script type="module" src="primer.js"></script>
+</body>
+</html>

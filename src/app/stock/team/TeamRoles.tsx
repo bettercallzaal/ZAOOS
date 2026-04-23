@@ -9,6 +9,7 @@ interface Member {
   name: string;
   role: string;
   scope: string;
+  secondary_scope?: string;
   bio?: string;
   links?: string;
   photo_url?: string;
@@ -86,6 +87,11 @@ function MemberCard({ member: m }: { member: Member }) {
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${SCOPE_COLOR[m.scope] || SCOPE_COLOR.ops}`}>
             {SCOPE_LABEL[m.scope] || m.scope} - {ROLE_LABEL[m.role] || m.role}
           </span>
+          {m.secondary_scope && m.secondary_scope.trim() && (
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${SCOPE_COLOR[m.secondary_scope] || SCOPE_COLOR.ops}`}>
+              +{SCOPE_LABEL[m.secondary_scope] || m.secondary_scope}
+            </span>
+          )}
         </div>
         {m.bio && m.bio.trim() ? (
           <p className="text-xs text-gray-300 whitespace-pre-wrap leading-relaxed">{m.bio}</p>

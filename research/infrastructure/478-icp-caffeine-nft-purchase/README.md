@@ -104,6 +104,17 @@ Caffeine will scaffold frontend + Motoko canister. Zaal reviews Motoko output fo
 
 Total difficulty: ~4/10 weekend build if Caffeine does most of the lifting.
 
+## Warm-up: Local ICP Primer
+
+Before prompting Caffeine, run the local primer at `tools/icp-primer/`:
+
+```bash
+cd tools/icp-primer && python3 -m http.server 8765
+# open http://localhost:8765
+```
+
+5 lessons in ~10 minutes: what ICP is, canisters, live Internet Identity login, live ICRC-7 NFT read, pay-to-mint walkthrough. Spec at `docs/superpowers/specs/2026-04-23-icp-primer-localhost-design.md`. Plan at `docs/superpowers/plans/2026-04-23-icp-primer-localhost.md`.
+
 ## Sources
 
 - [Caffeine.ai official](https://caffeine.ai/)

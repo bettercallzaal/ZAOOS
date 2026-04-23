@@ -12,7 +12,7 @@ Zaal, DCoop, Shawn, Tyler Stambaugh. 30 minutes on Discord.
 
 ## Team size
 
-16 active teammates (added Jake + Geek + Iman Afrikah; DaNici + AttaBotty stepped back for bandwidth, can rejoin later). Current roster:
+17 active teammates (added Jake + Geek + Iman Afrikah + Tom Fellenz; DaNici + AttaBotty stepped back for bandwidth, can rejoin later). Current roster:
 
 | Name | Scope | Role |
 |------|-------|------|
@@ -24,14 +24,15 @@ Zaal, DCoop, Shawn, Tyler Stambaugh. 30 minutes on Discord.
 | Jango | Ops | Member |
 | Jake | Ops | Member (new) |
 | Geek | Ops | Member (new) |
-| Shawn | Design | Member |
+| Tom Fellenz | Ops | Advisory (new) |
+| Shawn | Music | Member |
 | DCoop | Music | 2nd |
 | Iman Afrikah | Ops + Music | Member (new) |
 | Tyler Stambaugh | Finance | Advisory (Magnetic) |
-| Ohnahji B | Finance | Member |
-| DFresh (dfreshmaker) | Finance | Member |
-| Craig G | Finance | Member |
-| Maceo | Finance | Member |
+| Craig G | Finance | Advisory |
+| Ohnahji B | Finance + Ops | Member |
+| DFresh (dfreshmaker) | Finance + Ops | Member |
+| Maceo | Finance + Ops | Member |
 
 **Stepped back (bandwidth - can rejoin later):** DaNici (was Design Lead), AttaBotty (was Music Member).
 
@@ -76,7 +77,7 @@ Tyler Stambaugh officially joins the crew. Advisory role, bringing Magnetic inte
 
 ### Shirts
 
-Design direction + vendor selection + production timeline. Bringing to the whole crew next Tuesday. Candy (candytoybox) drives design with Shawn. Finance team scopes budget.
+Design direction + vendor selection + production timeline. Bringing to the whole crew next Tuesday. Candy (candytoybox) drives design. Finance team scopes budget.
 
 ### Bangor Savings Bank sponsor application
 

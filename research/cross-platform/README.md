@@ -15,3 +15,4 @@
 | 183 | [Social Connections & X Integration](./183-social-connections-x-integration/) | STANDALONE | X/Twitter connections, pulling X handles from Farcaster via Neynar, multi-social settings UI |
 | 214 | [Twitch API Deep Integration](./214-twitch-api-deep-integration/) | STANDALONE | Every Twitch Helix API capability mapped to ZAO OS features |
 | 228 | [Meta Developer Platform](./228-meta-developer-platform/) | STANDALONE | All Meta/Facebook APIs and models evaluated for a gated music community |
+| 486 | [Reddit ZAO Reply Bot + JustMakingMusic Vertical](./486-reddit-zao-reply-bot-justmakingmusic-vertical/) | STANDALONE | Draft-to-Telegram assist, human sends. 10 music subs watchlist. 6 safeguards (disclosure, rate limit, account age >30d, karma >100, helpful-first). Mirrors JustMakingMusic cross-post map. |

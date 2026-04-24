@@ -1,0 +1,23 @@
+{
+  "name": "zaostock-team-bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ZAOstock Team Telegram bot (v1) - talks to the /stock/team dashboard via Supabase",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^17.0.0",
+    "grammy": "^1.29.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

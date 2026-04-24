@@ -1,0 +1,17 @@
+[Unit]
+Description=ZAOstock Team Telegram Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/zaostock-bot
+EnvironmentFile=%h/zaostock-bot/.env
+ExecStart=/usr/bin/env npm run start
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

@@ -1,25 +1,26 @@
 ---
-title: "BCZ YapZ w/Saltorious.eth (Among Traitors)"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Saltorious.eth (Among Traitors)
+show: BCZ YapZ
 episode: 12
-guest: "Saltorious.eth"
-guest_org: "Among Traitors"
-host: "Zaal"
-date: 2026-03-18
-youtube_url: "https://youtu.be/0Tevgpr5TUQ"
-youtube_title: "BCZ YapZ – Episode 12 w/Saltorious.eth from Among Traitors"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Saltorious.eth
+guest_org: Among Traitors
+host: Zaal
+date: 2026-03-18T00:00:00.000Z
+youtube_url: 'https://youtu.be/0Tevgpr5TUQ'
+youtube_title: BCZ YapZ – Episode 12 w/Saltorious.eth from Among Traitors
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/bcz yapz with saltorius.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: Movies/bcz stream/BCZyapz/transcripts/bcz yapz with saltorius.docx
+summary: ''
 action_items: []
-status: "raw"
+status: raw
+youtube_video_id: 0Tevgpr5TUQ
 ---
 
 ## Transcript

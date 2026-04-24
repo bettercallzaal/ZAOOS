@@ -1,24 +1,25 @@
 ---
-title: "BCZ YapZ w/Roaring Sensei"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Roaring Sensei
+show: BCZ YapZ
 episode: 11
-guest: "Roaring Sensei"
-host: "Zaal"
-date: 2026-03-18
-youtube_url: "https://youtu.be/DIeav3o8t9M"
-youtube_title: "BCZ YapZ – Episode 11 w/Roaring Sensei"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Roaring Sensei
+host: Zaal
+date: 2026-03-18T00:00:00.000Z
+youtube_url: 'https://youtu.be/DIeav3o8t9M'
+youtube_title: BCZ YapZ – Episode 11 w/Roaring Sensei
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/bczyapz w_roaring sensai.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: Movies/bcz stream/BCZyapz/transcripts/bczyapz w_roaring sensai.docx
+summary: ''
 action_items: []
-status: "raw"
+status: raw
+youtube_video_id: DIeav3o8t9M
 ---
 
 ## Transcript

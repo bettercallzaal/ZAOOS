@@ -1,25 +1,26 @@
 ---
-title: "BCZ YapZ w/Yerbearserker"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Yerbearserker
+show: BCZ YapZ
 episode: 7
-guest: "Yerbearserker"
-guest_org: "Empire Builder"
-host: "Zaal"
-date: 2026-01-05
-youtube_url: "https://youtu.be/EH-FWD7ySKk"
-youtube_title: "BCZ YapZ – Episode 7: Empire Builder w/Yerbearserker"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Yerbearserker
+guest_org: Empire Builder
+host: Zaal
+date: 2026-01-05T00:00:00.000Z
+youtube_url: 'https://youtu.be/EH-FWD7ySKk'
+youtube_title: 'BCZ YapZ – Episode 7: Empire Builder w/Yerbearserker'
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/BCZYapZ ep7 w_yerb.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: Movies/bcz stream/BCZyapz/transcripts/BCZYapZ ep7 w_yerb.docx
+summary: ''
 action_items: []
-status: "raw"
+status: raw
+youtube_video_id: EH-FWD7ySKk
 ---
 
 ## Transcript

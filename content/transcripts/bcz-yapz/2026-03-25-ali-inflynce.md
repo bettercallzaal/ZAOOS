@@ -1,25 +1,26 @@
 ---
-title: "BCZ YapZ w/Ali (Inflynce)"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Ali (Inflynce)
+show: BCZ YapZ
 episode: 13
-guest: "Ali"
-guest_org: "Inflynce"
-host: "Zaal"
-date: 2026-03-25
-youtube_url: "https://youtu.be/WTyafqHKQqM"
-youtube_title: "BCZ YapZ – Episode 13 w/Ali from Inflynce"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Ali
+guest_org: Inflynce
+host: Zaal
+date: 2026-03-25T00:00:00.000Z
+youtube_url: 'https://youtu.be/WTyafqHKQqM'
+youtube_title: BCZ YapZ – Episode 13 w/Ali from Inflynce
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/bczyapz w:ali.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: 'Movies/bcz stream/BCZyapz/transcripts/bczyapz w:ali.docx'
+summary: ''
 action_items: []
-status: "raw"
+status: raw
+youtube_video_id: WTyafqHKQqM
 ---
 
 ## Transcript

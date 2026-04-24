@@ -83,6 +83,7 @@
     "bs58": "^6.0.0",
     "cmdk": "^1.1.1",
     "discord-api-types": "^0.38.42",
+    "gray-matter": "^4.0.3",
     "iron-session": "^8.0.4",
     "jsonwebtoken": "^9.0.3",
     "livepeer": "^3.5.0",

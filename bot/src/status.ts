@@ -1,5 +1,5 @@
-import { db } from './supabase.ts';
-import type { TeamMember } from './auth.ts';
+import { db } from './supabase';
+import type { TeamMember } from './auth';
 
 function daysSince(iso: string | null): number {
   if (!iso) return Infinity;

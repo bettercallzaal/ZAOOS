@@ -55,14 +55,15 @@ These are the canonical planning docs. This hub does NOT duplicate them — it c
 | 19 | [Safety + emergency prep](19-safety-ai.md) | done |
 | 20 | [Post-event follow-up + next-year retention](20-followup-ai.md) | done |
 
-Synthesis (single source of truth for Oct 3 success):
-- **[170-day-ai-timeline.md](170-day-ai-timeline.md)** — MASTER TIMELINE. Read this to know WHAT to build, WHEN to build it, and WHICH 10 WIRES are critical. 8 phases (Apr-Oct), 163 days, weekly milestones, cost breakdown. Start here.
-- [tools-matrix.md](tools-matrix.md) — Master inventory of 50 AI + SaaS tools across all 20 dimensions. Includes PARETO buy list ($200-400 minimum, $1,200-1,400 full stack), free/open-source alternatives, skip list with ROI reasoning, and 6-month spend roadmap. Top 3 must-haves: Clay ($200/mo sponsor enrichment), SignUp.com ($99 volunteer scheduling), Deepgram ($38 meeting transcription). Everything else free or defer to Year 2. Break-even: 4 weeks.
-- [zoe-integration.md](zoe-integration.md) — ZOE's ops dispatch role: 5 daily crons + 5 Telegram commands + day-of incident triage. Runs 20 dimensions via Supabase + Claude API + SMS alerts.
+Synthesis (read in this order):
+- **[minimal-budget-stack.md](minimal-budget-stack.md)** — THE ACTUAL BUY LIST. Under $25 total for the whole festival. Overrides the paid SaaS recommendations scattered across dimension docs. Zaal's call: come in under budget. Start here.
+- **[170-day-ai-timeline.md](170-day-ai-timeline.md)** — MASTER TIMELINE. What to build, when to build it, which 10 wires are critical. 8 phases (Apr-Oct), 163 days, weekly milestones.
+- [zoe-integration.md](zoe-integration.md) — ZOE's dispatch role: 5 daily crons + 5 Telegram commands + day-of incident triage.
+- [tools-matrix.md](tools-matrix.md) — Full reference of every tool mentioned (if you want to see what we skipped and why).
 - [results.tsv](results.tsv) — iteration log
 
 ## How to use this hub
 
 If you're a teammate: pick your dimension, read the doc, see the "This week" action, do it.
-If you're Zaal: `tools-matrix.md` is the buy-list; `170-day-ai-timeline.md` is the order of operations.
+If you're Zaal: `minimal-budget-stack.md` is the actual buy-list; `170-day-ai-timeline.md` is the order of operations. Ignore paid SaaS names in the individual dimension docs unless flagged in minimal-budget-stack.
 If you're an AI agent reading this later: `zoe-integration.md` + each dimension's "Integration point" section is your brief.

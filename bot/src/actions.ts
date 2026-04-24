@@ -147,7 +147,7 @@ async function logDelegation(args: {
 async function findMemberByName(name: string): Promise<TeamMember | null> {
   const { data } = await db()
     .from('stock_team_members')
-    .select('id, name, scope, role, telegram_id, active')
+    .select('id, name, scope, role, telegram_id, telegram_username, active')
     .ilike('name', name)
     .neq('active', false)
     .maybeSingle();

@@ -1,8 +1,13 @@
 import { config as loadEnv } from 'dotenv';
 loadEnv();
 
-import { Bot, Context, session, SessionFlavor } from 'grammy';
-import { findMemberByTelegramId, linkTelegramId, type TeamMember } from './auth';
+import { Bot, Context } from 'grammy';
+import {
+  resolveMember,
+  linkUsernameToMember,
+  unlinkUsername,
+  type TeamMember,
+} from './auth';
 import { buildStatus, buildMyTodos, buildMyContributions } from './status';
 import { addGemba, addIdea, addNote } from './capture';
 import { executeFromText } from './actions';
@@ -11,12 +16,6 @@ import { ensureChatRegistered, getChatRow, setChatMode, setPostDigests } from '.
 import { scheduleAll } from './schedule';
 import { alertDevops, buildHealthReport } from './ops';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
-
-interface SessionData {
-  awaitingCode: boolean;
-}
-
-type MyContext = Context & SessionFlavor<SessionData>;
 
 const token = process.env.ZAOSTOCK_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
@@ -29,9 +28,7 @@ const ADMIN_IDS = (process.env.BOT_ADMIN_TELEGRAM_IDS ?? '')
   .map((s) => Number(s.trim()))
   .filter((n) => Number.isFinite(n) && n > 0);
 
-const bot = new Bot<MyContext>(token);
-
-bot.use(session({ initial: (): SessionData => ({ awaitingCode: false }) }));
+const bot = new Bot<Context>(token);
 
 // Register every chat we see (on first message).
 bot.use(async (ctx, next) => {
@@ -50,22 +47,21 @@ bot.use(async (ctx, next) => {
   await next();
 });
 
-async function requireMember(ctx: MyContext): Promise<TeamMember | null> {
-  const tgId = ctx.from?.id;
-  if (!tgId) {
-    await ctx.reply('Could not read your Telegram id.');
-    return null;
-  }
-  const member = await findMemberByTelegramId(tgId);
-  if (!member) {
-    ctx.session.awaitingCode = true;
-    await ctx.reply('I need to verify you first. DM me (not in the group) and send your 4-letter ZAOstock code.');
-    return null;
-  }
-  return member;
+async function currentMember(ctx: Context): Promise<TeamMember | null> {
+  return resolveMember(ctx.from?.id, ctx.from?.username);
 }
 
-function isAdmin(ctx: MyContext): boolean {
+async function requireMember(ctx: Context): Promise<TeamMember | null> {
+  const member = await currentMember(ctx);
+  if (member) return member;
+  const u = ctx.from?.username ? `@${ctx.from.username}` : 'your Telegram account';
+  await ctx.reply(
+    `You're not on the ZAOstock team roster yet.\nAsk Zaal to link ${u} to your name, then try again.`,
+  );
+  return null;
+}
+
+function isAdmin(ctx: Context): boolean {
   const id = ctx.from?.id;
   if (!id) return false;
   return ADMIN_IDS.includes(id);
@@ -74,16 +70,14 @@ function isAdmin(ctx: MyContext): boolean {
 // ---- Commands ---------------------------------------------------------------
 
 bot.command('start', async (ctx) => {
-  const tgId = ctx.from?.id;
-  if (!tgId) return;
-  const member = await findMemberByTelegramId(tgId);
+  const member = await currentMember(ctx);
   if (member) {
-    await ctx.reply(`You're already linked, ${member.name}. Try /help to see what I can do.`);
+    await ctx.reply(`Hey ${member.name}. Type /help to see what I can do.`);
     return;
   }
-  ctx.session.awaitingCode = true;
+  const u = ctx.from?.username ? `@${ctx.from.username}` : 'your Telegram account';
   await ctx.reply(
-    'Hey! Send your 4-letter ZAOstock login code to link this Telegram to your teammate profile. (Same code you use on zaoos.com/stock/team.)',
+    `Hey! I'm the ZAOstock Team Bot.\n\nI don't recognize ${u} on the roster yet. Ping Zaal to link you. Once linked you'll get:\n  /mytodos - your open tasks\n  /do <text> - natural-language actions\n  /digest - festival snapshots\n\nPublic commands work for anyone: /status /help /ask`,
   );
 });
 
@@ -98,28 +92,27 @@ bot.command('help', async (ctx) => {
       '  /mytodos - your open todos',
       '  /mycontributions - your last 7 days',
       '',
-      'Act (I do stuff via LLM parse):',
-      '  /do <text> - natural language -> DB action',
+      'Act (LLM parses to DB writes):',
+      '  /do <text> - natural language -> action',
       '  /ask <text> - ask me anything (no DB write)',
       '',
       'Capture:',
       '  /gemba <text> - quick standup log',
       '  /idea <text> - drop a suggestion',
-      '  /note <text> - add to next meeting notes',
+      '  /note <text> - meeting note',
       '',
       'Ops:',
-      '  /chatinfo - show chat + topic ids (for setup)',
-      '  /health - bot health (admin only)',
-      '  /digest morning|evening|week|retro - preview a digest on demand',
-      isGroup ? '\n@mention me in a group to act. I respond only when tagged.' : '\nIn DM I auto-parse plain text as an action.',
+      '  /chatinfo - chat + topic ids',
+      '  /digest morning|evening|week|retro - preview on demand',
+      isGroup
+        ? '\n@mention me in a group to act. I respond only when tagged.'
+        : '\nIn DM I auto-parse plain text as an action.',
       'Dashboard: https://zaoos.com/stock/team',
     ].join('\n'),
   );
 });
 
 bot.command('status', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
   await ctx.reply(await buildStatus());
 });
 
@@ -154,8 +147,6 @@ bot.command('note', async (ctx) => {
 });
 
 bot.command('ask', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
   const text = ctx.match?.trim();
   if (!text) {
     await ctx.reply('Usage: /ask <question>');
@@ -177,7 +168,9 @@ bot.command('do', async (ctx) => {
   if (!member) return;
   const text = ctx.match?.trim();
   if (!text) {
-    await ctx.reply('Usage: /do <natural language>. Examples:\n  /do add todo call Bangor Savings by Friday\n  /do mark Bangor Savings as contacted\n  /do add milestone merch order 2026-09-01');
+    await ctx.reply(
+      'Usage: /do <natural language>. Examples:\n  /do add todo call Bangor Savings by Friday\n  /do mark Bangor Savings as contacted\n  /do add milestone merch order 2026-09-01',
+    );
     return;
   }
   await ctx.reply('Working on it...');
@@ -197,15 +190,17 @@ bot.command('chatinfo', async (ctx) => {
       `  type: ${chat.type}`,
       `  title: ${'title' in chat ? chat.title ?? '(DM)' : '(DM)'}`,
       `  forum: ${'is_forum' in chat ? Boolean(chat.is_forum) : false}`,
-      threadId != null ? `  message_thread_id: ${threadId}` : '  (no thread_id - posted in General or non-forum chat)',
+      threadId != null
+        ? `  message_thread_id: ${threadId}`
+        : '  (no thread_id - posted in General or non-forum chat)',
       '',
       `  mode: ${row?.mode ?? 'unknown'}`,
       `  post_digests: ${row?.post_digests ?? false}`,
-      '',
-      'Admin: DM me /setmode <chat_id> <team|devops|staging> and /setdigests <chat_id> on|off',
     ].join('\n'),
   );
 });
+
+// ---- Admin commands ---------------------------------------------------------
 
 bot.command('setmode', async (ctx) => {
   if (!isAdmin(ctx)) {
@@ -243,6 +238,60 @@ bot.command('setdigests', async (ctx) => {
   await ctx.reply(`Set chat ${chatId} post_digests to ${on}.`);
 });
 
+bot.command('link', async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply('Admin only.');
+    return;
+  }
+  const raw = (ctx.match ?? '').trim();
+  const m = raw.match(/^(@?\S+)\s+(.+)$/);
+  if (!m) {
+    await ctx.reply('Usage: /link @username Member Name\nExample: /link @dfreshmaker DFresh');
+    return;
+  }
+  const [, username, memberName] = m;
+  const res = await linkUsernameToMember(username, memberName);
+  if (!res.ok) {
+    await ctx.reply(`Link failed: ${res.reason}`);
+    return;
+  }
+  await ctx.reply(
+    `Linked @${res.member.telegram_username} -> ${res.member.name} (${res.member.role}${
+      res.member.scope ? ` / ${res.member.scope}` : ''
+    }).`,
+  );
+});
+
+bot.command('unlink', async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply('Admin only.');
+    return;
+  }
+  const raw = (ctx.match ?? '').trim();
+  if (!raw) {
+    await ctx.reply('Usage: /unlink @username');
+    return;
+  }
+  const res = await unlinkUsername(raw);
+  if (!res.ok) {
+    await ctx.reply(res.reason);
+    return;
+  }
+  await ctx.reply(`Unlinked @${raw.replace(/^@/, '').toLowerCase()} (was ${res.name}).`);
+});
+
+bot.command('whoami', async (ctx) => {
+  const member = await currentMember(ctx);
+  if (!member) {
+    const u = ctx.from?.username ? `@${ctx.from.username}` : '(no username)';
+    await ctx.reply(`Not linked. Your Telegram: id=${ctx.from?.id ?? '?'}, ${u}`);
+    return;
+  }
+  await ctx.reply(
+    `${member.name} (${member.role}${member.scope ? ` / ${member.scope}` : ''}) - linked via @${member.telegram_username ?? '(id only)'}.`,
+  );
+});
+
 bot.command('health', async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply('Admin only.');
@@ -252,8 +301,6 @@ bot.command('health', async (ctx) => {
 });
 
 bot.command('digest', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
   const which = (ctx.match ?? '').trim().toLowerCase();
   let text: string;
   try {
@@ -278,31 +325,13 @@ async function ensureUsername(): Promise<string> {
 }
 
 bot.on('message:text', async (ctx) => {
-  const tgId = ctx.from?.id;
-  if (!tgId) return;
   const text = ctx.message.text.trim();
+  if (text.startsWith('/')) return; // commands handled above
   const chatType = ctx.chat?.type ?? 'private';
 
-  // Awaiting code flow (DM only)
-  if (chatType === 'private' && ctx.session.awaitingCode && text.length <= 8) {
-    const res = await linkTelegramId(text, tgId);
-    if (res.ok) {
-      ctx.session.awaitingCode = false;
-      await ctx.reply(`Linked! You're signed in as ${res.member.name}. Try /help.`);
-    } else {
-      await ctx.reply(`${res.reason}. Try again, or /start to restart.`);
-    }
-    return;
-  }
-
-  const member = await findMemberByTelegramId(tgId);
-
   if (chatType === 'private') {
-    if (!member) {
-      ctx.session.awaitingCode = true;
-      await ctx.reply('Send your 4-letter ZAOstock code first.');
-      return;
-    }
+    const member = await requireMember(ctx);
+    if (!member) return;
     await ctx.reply('Working on it...');
     const result = await executeFromText(member, text);
     await ctx.reply(result.reply);
@@ -314,10 +343,8 @@ bot.on('message:text', async (ctx) => {
   const mentioned = username && text.toLowerCase().includes(`@${username}`);
   if (!mentioned) return;
 
-  if (!member) {
-    await ctx.reply('I see you, but you need to link first. DM me and send your 4-letter code.');
-    return;
-  }
+  const member = await requireMember(ctx);
+  if (!member) return;
 
   const cleaned = text.replace(new RegExp(`@${username}`, 'gi'), '').trim();
   if (!cleaned) {
@@ -345,7 +372,9 @@ bot.start({
     cachedUsername = info.username.toLowerCase();
     scheduleAll(bot, (err, label) => {
       console.error(`[schedule] ${label} failed:`, err);
-      alertDevops(bot, `${label} digest failed: ${err instanceof Error ? err.message : 'unknown'}`).catch(() => undefined);
+      alertDevops(bot, `${label} digest failed: ${err instanceof Error ? err.message : 'unknown'}`).catch(
+        () => undefined,
+      );
     });
     alertDevops(bot, `bot started · @${info.username} · ${new Date().toISOString()}`).catch(() => undefined);
   },

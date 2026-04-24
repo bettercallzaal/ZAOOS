@@ -1,18 +1,18 @@
 ---
-title: "BCZ YapZ w/GIU (Pinetree)"
-show: "BCZ YapZ"
+title: BCZ YapZ w/GIU (Pinetree)
+show: BCZ YapZ
 episode: 10
-guest: "Juliano"
-guest_alias: "GIU"
-guest_origin: "Brazil"
-guest_org: "Pinetree"
-host: "Zaal"
-date: 2026-02-23
-youtube_url: "https://youtu.be/loSOniPcJx0"
-youtube_title: "BCZ YapZ – Episode 10 w/GIU from Pinetree"
+guest: Juliano
+guest_alias: GIU
+guest_origin: Brazil
+guest_org: Pinetree
+host: Zaal
+date: 2026-02-23T00:00:00.000Z
+youtube_url: 'https://youtu.be/loSOniPcJx0'
+youtube_title: BCZ YapZ – Episode 10 w/GIU from Pinetree
 duration_min: 25
-format: "video-podcast"
-language: "en"
+format: video-podcast
+language: en
 topics:
   - ai
   - crypto
@@ -33,29 +33,34 @@ keywords:
   - paul-graham-founders
 entities:
   orgs:
-    - "Pinetree"
-    - "MIT"
-    - "Transcend"
-    - "Anthropic"
-    - "OpenAI"
-    - "DeepMind"
-    - "Coinbase"
+    - Pinetree
+    - MIT
+    - Transcend
+    - Anthropic
+    - OpenAI
+    - DeepMind
+    - Coinbase
   people:
-    - "Juliano (GIU)"
-    - "Marvin Minsky"
-    - "Patrick Winston"
-    - "Android16 (co-founder)"
+    - Juliano (GIU)
+    - Marvin Minsky
+    - Patrick Winston
+    - Android16 (co-founder)
   projects:
-    - "Pinetree"
-    - "Making Things Think (book)"
+    - Pinetree
+    - Making Things Think (book)
 source:
-  video: "Movies/bcz stream/BCZyapz/transcripts/bcz yapz w_giu.mp4"
-  docx: "Movies/bcz stream/BCZyapz/transcripts/bcz yapz w_giu.docx"
-summary: "Juliano (GIU) from Pinetree on his path from Brazilian Math Olympiads to MIT AI Lab (Minsky, Winston), writing a viral GPT-2 explainer, Transcend director of engineering, and building Pinetree - an on-chain platform for video creators with creator-owned monetization and distribution."
+  video: Movies/bcz stream/BCZyapz/transcripts/bcz yapz w_giu.mp4
+  docx: Movies/bcz stream/BCZyapz/transcripts/bcz yapz w_giu.docx
+summary: >-
+  Juliano (GIU) from Pinetree on his path from Brazilian Math Olympiads to MIT
+  AI Lab (Minsky, Winston), writing a viral GPT-2 explainer, Transcend director
+  of engineering, and building Pinetree - an on-chain platform for video
+  creators with creator-owned monetization and distribution.
 action_items:
-  - "Check out Pinetree for on-chain video creator tooling"
-  - "Read Juliano's book: Making Things Think"
-status: "raw"
+  - Check out Pinetree for on-chain video creator tooling
+  - 'Read Juliano''s book: Making Things Think'
+status: raw
+youtube_video_id: loSOniPcJx0
 ---
 
 ## Transcript

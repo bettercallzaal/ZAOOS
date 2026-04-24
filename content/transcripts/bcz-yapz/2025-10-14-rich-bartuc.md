@@ -1,25 +1,26 @@
 ---
-title: "BCZ YapZ w/Rich Bartuc"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Rich Bartuc
+show: BCZ YapZ
 episode: 2
-guest: "Rich Bartuc"
-guest_org: "PowerPacks Diamondhands Club"
-host: "Zaal"
-date: 2025-10-14
-youtube_url: "https://youtu.be/AOcp8Jpyw3k"
-youtube_title: "BCZ Yaps – Episode 2: Rich Bartuc & the PowerPacks Diamondhands Club"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Rich Bartuc
+guest_org: PowerPacks Diamondhands Club
+host: Zaal
+date: 2025-10-14T00:00:00.000Z
+youtube_url: 'https://youtu.be/AOcp8Jpyw3k'
+youtube_title: 'BCZ Yaps – Episode 2: Rich Bartuc & the PowerPacks Diamondhands Club'
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/bczyapz2w_rich.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: Movies/bcz stream/BCZyapz/transcripts/bczyapz2w_rich.docx
+summary: ''
 action_items: []
-status: "raw"
+status: raw
+youtube_video_id: AOcp8Jpyw3k
 ---
 
 ## Transcript

@@ -1,24 +1,27 @@
 ---
-title: "BCZ YapZ w/Rock Opera"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Rock Opera
+show: BCZ YapZ
 episode: 4
-guest: "Rock Opera"
-host: "Zaal"
-date: 2025-11-30
-youtube_url: "https://youtu.be/43GPWLE6W5Q"
-youtube_title: "BCZ Yaps – Episode 4: Rock Opera on On-Chain Art, Color Theory, and Building for Ownership"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Rock Opera
+host: Zaal
+date: 2025-11-30T00:00:00.000Z
+youtube_url: 'https://youtu.be/43GPWLE6W5Q'
+youtube_title: >-
+  BCZ Yaps – Episode 4: Rock Opera on On-Chain Art, Color Theory, and Building
+  for Ownership
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/bczyapz w_w rockopera.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: Movies/bcz stream/BCZyapz/transcripts/bczyapz w_w rockopera.docx
+summary: ''
 action_items: []
-status: "raw"
+status: raw
+youtube_video_id: 43GPWLE6W5Q
 ---
 
 ## Transcript

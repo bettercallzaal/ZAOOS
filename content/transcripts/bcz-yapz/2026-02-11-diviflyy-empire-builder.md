@@ -1,25 +1,28 @@
 ---
-title: "BCZ YapZ w/Diviflyy"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Diviflyy
+show: BCZ YapZ
 episode: 8
-guest: "Diviflyy"
-guest_org: "Empire Builder"
-host: "Zaal"
-date: 2026-02-11
-youtube_url: "https://youtu.be/0tyVpLGVxkA"
-youtube_title: "BCZ YapZ – Episode 8: Empire Builder w/diviflyy"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Diviflyy
+guest_org: Empire Builder
+host: Zaal
+date: 2026-02-11T00:00:00.000Z
+youtube_url: 'https://youtu.be/0tyVpLGVxkA'
+youtube_title: 'BCZ YapZ – Episode 8: Empire Builder w/diviflyy'
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/BCZ YapZ ep. 7 w_Diviflyy from Empire Builder.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: >-
+    Movies/bcz stream/BCZyapz/transcripts/BCZ YapZ ep. 7 w_Diviflyy from Empire
+    Builder.docx
+summary: ''
 action_items: []
-status: "raw"
+status: raw
+youtube_video_id: 0tyVpLGVxkA
 ---
 
 ## Transcript

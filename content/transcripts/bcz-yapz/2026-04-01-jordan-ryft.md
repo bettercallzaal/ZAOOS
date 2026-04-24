@@ -1,25 +1,26 @@
 ---
-title: "BCZ YapZ w/Jordan (Ryft)"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Jordan (Ryft)
+show: BCZ YapZ
 episode: 14
-guest: "Jordan"
-guest_org: "Ryft"
-host: "Zaal"
-date: 2026-04-01
-youtube_url: "https://youtu.be/IbhHxFR4yxE"
-youtube_title: "BCZ YapZ – Episode 14 w/Jordan from Ryft"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Jordan
+guest_org: Ryft
+host: Zaal
+date: 2026-04-01T00:00:00.000Z
+youtube_url: 'https://youtu.be/IbhHxFR4yxE'
+youtube_title: BCZ YapZ – Episode 14 w/Jordan from Ryft
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/BCZ YapZ w_ Jordan.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: Movies/bcz stream/BCZyapz/transcripts/BCZ YapZ w_ Jordan.docx
+summary: ''
 action_items: []
-status: "raw"
+status: raw
+youtube_video_id: IbhHxFR4yxE
 ---
 
 ## Transcript

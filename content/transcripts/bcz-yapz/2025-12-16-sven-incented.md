@@ -1,25 +1,26 @@
 ---
-title: "BCZ Yaps w/Sven (Incented)"
-show: "BCZ YapZ"
+title: BCZ Yaps w/Sven (Incented)
+show: BCZ YapZ
 episode: 6
-guest: "Sven"
-guest_org: "Incented"
-host: "Zaal"
-date: 2025-12-16
-youtube_url: "https://youtu.be/O7-1weR0Qog"
-youtube_title: "BCZ Yaps – Episode 6: Incented with Sven"
-format: "video-podcast"
-language: "en"
-topics: []                            # TODO: extract 3-8 tags
+guest: Sven
+guest_org: Incented
+host: Zaal
+date: 2025-12-16T00:00:00.000Z
+youtube_url: 'https://youtu.be/O7-1weR0Qog'
+youtube_title: 'BCZ Yaps – Episode 6: Incented with Sven'
+format: video-podcast
+language: en
+topics: []
 entities:
   orgs: []
   people: []
   projects: []
 source:
-  docx: "Movies/bcz stream/BCZyapz/transcripts/bczyapz w_sven.docx"
-summary: ""                           # TODO: one-sentence summary"
+  docx: Movies/bcz stream/BCZyapz/transcripts/bczyapz w_sven.docx
+summary: ''
 action_items: []
-status: "raw-undated"                # needs: date, topics, entities, summary
+status: raw-undated
+youtube_video_id: O7-1weR0Qog
 ---
 
 ## Transcript

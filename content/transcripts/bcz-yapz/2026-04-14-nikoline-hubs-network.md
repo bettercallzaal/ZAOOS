@@ -1,29 +1,29 @@
 ---
-title: "BCZ YapZ w/Nikoline (Hubs Network)"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Nikoline (Hubs Network)
+show: BCZ YapZ
 episode: 15
-guest: "Nikoline Arns"
-guest_alias: "Nikoline"
-guest_org: "Hubs Network"
+guest: Nikoline Arns
+guest_alias: Nikoline
+guest_org: Hubs Network
 guest_links:
-  - "x: https://x.com/nikoline_nik"
-  - "linkedin: https://linkedin.com/in/nikoline-nik"
-  - "paragraph: https://paragraph.xyz/@nikoline"
-  - "telegram: https://t.me/nikoline_nik"
-  - "personal: https://nikoline.github.io/arns/"
-  - "web: https://hubsnetwork.org"
-  - "substack: https://hubsnetwork.substack.com"
-  - "farcaster-channel: /hubs-network"
-  - "partners: Akasha Hub, Radical Exchange, Web3 Privacy Now, Logos"
-host: "Zaal"
+  - 'x: https://x.com/nikoline_nik'
+  - 'linkedin: https://linkedin.com/in/nikoline-nik'
+  - 'paragraph: https://paragraph.xyz/@nikoline'
+  - 'telegram: https://t.me/nikoline_nik'
+  - 'personal: https://nikoline.github.io/arns/'
+  - 'web: https://hubsnetwork.org'
+  - 'substack: https://hubsnetwork.substack.com'
+  - 'farcaster-channel: /hubs-network'
+  - 'partners: Akasha Hub, Radical Exchange, Web3 Privacy Now, Logos'
+host: Zaal
 host_handles:
-  - "farcaster: @zaal"
-  - "x: @bettercallzaal"
-  - "youtube: @bettercallzaal"
-date: 2026-04-14
+  - 'farcaster: @zaal'
+  - 'x: @bettercallzaal'
+  - 'youtube: @bettercallzaal'
+date: 2026-04-14T00:00:00.000Z
 duration_min: 27
-format: "video-podcast"
-language: "en"
+format: video-podcast
+language: en
 topics:
   - governance
   - sociocracy
@@ -45,36 +45,43 @@ keywords:
   - networked-hubs
 entities:
   orgs:
-    - "Hubs Network"
-    - "Akasha Foundation"
-    - "Akasha Hub"
-    - "Nasha Hub"
-    - "Radical Exchange"
-    - "Web3 Privacy Now"
-    - "Logos"
-    - "Liminal Village"
-    - "Commons Hub"
+    - Hubs Network
+    - Akasha Foundation
+    - Akasha Hub
+    - Nasha Hub
+    - Radical Exchange
+    - Web3 Privacy Now
+    - Logos
+    - Liminal Village
+    - Commons Hub
   people:
-    - "Lorenzo (Nasha Hub)"
-    - "Roberto (Liminal Village)"
-    - "Charles (Radical Exchange Zurich)"
-    - "Malik (Radical Exchange Foundation)"
-    - "Audrey Tang"
+    - Lorenzo (Nasha Hub)
+    - Roberto (Liminal Village)
+    - Charles (Radical Exchange Zurich)
+    - Malik (Radical Exchange Foundation)
+    - Audrey Tang
   projects:
-    - "Plural Events"
-    - "Agora Citizen"
-    - "Polis"
-    - "Context Engine"
+    - Plural Events
+    - Agora Citizen
+    - Polis
+    - Context Engine
 source:
-  video: "Movies/bcz stream/BCZyapz/nik/bcz yapz w_nikoline.mp4"
-  docx: "Movies/bcz stream/BCZyapz/nik/bcz yapz w_nikoline.docx"
-summary: "Nikoline of Hubs Network on connecting physical web3/coordination hubs worldwide, sociocracy as a fractal governance tool, and the Plural Events format that runs the same conversation simultaneously across 12+ cities."
+  video: Movies/bcz stream/BCZyapz/nik/bcz yapz w_nikoline.mp4
+  docx: Movies/bcz stream/BCZyapz/nik/bcz yapz w_nikoline.docx
+summary: >-
+  Nikoline of Hubs Network on connecting physical web3/coordination hubs
+  worldwide, sociocracy as a fractal governance tool, and the Plural Events
+  format that runs the same conversation simultaneously across 12+ cities.
 action_items:
-  - "Plural Event on 2026-05-14 - local hosts wanted (even 15 people in a bar counts)"
-  - "Visit hubsnetwork.org + subscribe to substack newsletter"
-  - "Web3 Privacy Now summit in Berlin mid-June - Hubs Network on panel"
-  - "Zaal to explore starting a Maine hub"
-status: "raw"
+  - >-
+    Plural Event on 2026-05-14 - local hosts wanted (even 15 people in a bar
+    counts)
+  - Visit hubsnetwork.org + subscribe to substack newsletter
+  - Web3 Privacy Now summit in Berlin mid-June - Hubs Network on panel
+  - Zaal to explore starting a Maine hub
+status: raw
+youtube_url: 'https://youtu.be/RuYxRBfLGCc'
+youtube_video_id: RuYxRBfLGCc
 ---
 
 ## Transcript

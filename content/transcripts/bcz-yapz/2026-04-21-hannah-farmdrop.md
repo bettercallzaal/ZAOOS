@@ -1,16 +1,16 @@
 ---
-title: "BCZ YapZ w/Hannah (Farm Drop)"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Hannah (Farm Drop)
+show: BCZ YapZ
 episode: 17
-guest: "Hannah"
-guest_org: "Farm Drop"
+guest: Hannah
+guest_org: Farm Drop
 guest_links:
-  - "web: farmdrop.us"
-host: "Zaal"
-date: 2026-04-21
+  - 'web: farmdrop.us'
+host: Zaal
+date: 2026-04-21T00:00:00.000Z
 duration_min: 30
-format: "video-podcast"
-language: "en"
+format: video-podcast
+language: en
 topics:
   - food-systems
   - csa
@@ -32,31 +32,38 @@ keywords:
   - food-pantry
 entities:
   orgs:
-    - "Farm Drop"
-    - "College of the Atlantic"
-    - "Acadia Action"
-    - "Reversing Falls Sanctuary"
-    - "Down East Food Systems Partnership"
-    - "Sassafras Cafe"
-    - "Soul Vendors (band)"
+    - Farm Drop
+    - College of the Atlantic
+    - Acadia Action
+    - Reversing Falls Sanctuary
+    - Down East Food Systems Partnership
+    - Sassafras Cafe
+    - Soul Vendors (band)
   people:
-    - "Hannah (Farm Drop lead)"
+    - Hannah (Farm Drop lead)
   projects:
-    - "Food for Health"
-    - "Reaccion (event series)"
-    - "Grocery List documentary"
+    - Food for Health
+    - Reaccion (event series)
+    - Grocery List documentary
 source:
-  video: "Movies/bcz stream/BCZyapz/hannah/bcz yapz w_hannah.mp4"
-  docx: "Movies/bcz stream/BCZyapz/hannah/bcz yapz w_hannah.docx"
-summary: "Hannah of Farm Drop on building a volunteer-driven local food network across Downeast Maine since 2011, the Food for Health mutual-aid program, and an upcoming slate of community solution events."
+  video: Movies/bcz stream/BCZyapz/hannah/bcz yapz w_hannah.mp4
+  docx: Movies/bcz stream/BCZyapz/hannah/bcz yapz w_hannah.docx
+summary: >-
+  Hannah of Farm Drop on building a volunteer-driven local food network across
+  Downeast Maine since 2011, the Food for Health mutual-aid program, and an
+  upcoming slate of community solution events.
 action_items:
-  - "Visit farmdrop.us"
-  - "2026-05-09 - community solutions conversation at Reversing Falls Sanctuary, Brooksville"
-  - "2026-05-20 - Grocery List documentary screening at Ellsworth Library"
-  - "2026-05-24 - Soul Vendors fundraiser for Food for Health"
-  - "2026-08-06 - Farm Drop supporter event at Sassafras Cafe"
-  - "Explore Farm Drop x ZAO Stock alignment (Ellsworth local food presence)"
-status: "raw"
+  - Visit farmdrop.us
+  - >-
+    2026-05-09 - community solutions conversation at Reversing Falls Sanctuary,
+    Brooksville
+  - 2026-05-20 - Grocery List documentary screening at Ellsworth Library
+  - 2026-05-24 - Soul Vendors fundraiser for Food for Health
+  - 2026-08-06 - Farm Drop supporter event at Sassafras Cafe
+  - Explore Farm Drop x ZAO Stock alignment (Ellsworth local food presence)
+status: raw
+youtube_url: 'https://youtu.be/hw-6IHaziV0'
+youtube_video_id: hw-6IHaziV0
 ---
 
 ## Transcript

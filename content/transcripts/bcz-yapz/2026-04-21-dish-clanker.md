@@ -1,19 +1,19 @@
 ---
-title: "BCZ YapZ w/Dish (Clanker)"
-show: "BCZ YapZ"
+title: BCZ YapZ w/Dish (Clanker)
+show: BCZ YapZ
 episode: 16
-guest: "Jack Dishman"
-guest_alias: "Dish"
-guest_org: "Clanker"
+guest: Jack Dishman
+guest_alias: Dish
+guest_org: Clanker
 guest_links:
-  - "farcaster: @dish"
-  - "x: @jackdishman"
-  - "project: clanker.world"
-host: "Zaal"
-date: 2026-04-21
+  - 'farcaster: @dish'
+  - 'x: @jackdishman'
+  - 'project: clanker.world'
+host: Zaal
+date: 2026-04-21T00:00:00.000Z
 duration_min: 29
-format: "video-podcast"
-language: "en"
+format: video-podcast
+language: en
 topics:
   - farcaster
   - clanker
@@ -36,29 +36,34 @@ keywords:
   - dev-shop
 entities:
   orgs:
-    - "Clanker"
-    - "Farcaster"
-    - "Coinbase / Base"
-    - "GameStop NFT"
-    - "Wizards of the Coast / D&D Beyond"
-    - "Empire Builder"
+    - Clanker
+    - Farcaster
+    - Coinbase / Base
+    - GameStop NFT
+    - Wizards of the Coast / D&D Beyond
+    - Empire Builder
   people:
-    - "Jack Dishman (Dish)"
-    - "Proxy Studio (Clanker team)"
+    - Jack Dishman (Dish)
+    - Proxy Studio (Clanker team)
   projects:
-    - "Clanker"
-    - "Empire Builder"
-    - "CrustyKeno"
-    - "Eliza (AI agent framework)"
+    - Clanker
+    - Empire Builder
+    - CrustyKeno
+    - Eliza (AI agent framework)
 source:
-  video: "Movies/bcz stream/BCZyapz/jack/bcz yapz w_dish.mp4"
-  docx: "Movies/bcz stream/BCZyapz/jack/bcz yapz w_dish.docx"
-summary: "Jack Dishman (Dish) on building Clanker - the Farcaster-native ERC20 token launcher - how an in-feed AI agent became a launchpad, the evolution from chat-bot to flagship + alt-clients, and why in-feed experiences win."
+  video: Movies/bcz stream/BCZyapz/jack/bcz yapz w_dish.mp4
+  docx: Movies/bcz stream/BCZyapz/jack/bcz yapz w_dish.docx
+summary: >-
+  Jack Dishman (Dish) on building Clanker - the Farcaster-native ERC20 token
+  launcher - how an in-feed AI agent became a launchpad, the evolution from
+  chat-bot to flagship + alt-clients, and why in-feed experiences win.
 action_items:
-  - "Follow Dish on Farcaster (@dish) and X (@jackdishman)"
-  - "Try Clanker in-feed on Farcaster to launch a token"
-  - "Dish to visit Maine for ZAO Stock October event"
-status: "raw"
+  - Follow Dish on Farcaster (@dish) and X (@jackdishman)
+  - Try Clanker in-feed on Farcaster to launch a token
+  - Dish to visit Maine for ZAO Stock October event
+status: raw
+youtube_url: 'https://youtu.be/gHbktZC6HbA'
+youtube_video_id: gHbktZC6HbA
 ---
 
 ## Transcript

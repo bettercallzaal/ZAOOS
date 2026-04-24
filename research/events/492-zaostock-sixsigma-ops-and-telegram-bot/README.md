@@ -32,7 +32,7 @@ Two parts:
 | 5-Whys + A3 template | USE — stored template in `stock_incidents` table. When incident marked red, prompt asks for 5-whys walk. Root cause saved. | Eng | $0 |
 | Gemba walks (async) | USE — daily 10am EST prompt to all users: "What moved? What's blocked?" Replies go to `stock_activity_log`. Zaal reads async digest 8am EST. | Telegram bot (Part 2) | $0 |
 | Control charts (weekly sparklines) | USE — 5 metrics: sponsor commits/week, artist pipeline velocity, volunteer signups/week, $ variance, todo burndown %. Render on Home tab. | Eng | $0 |
-| Takt time targets | USE — 10 artists by Sep 3 (132 days) = 1 artist / 13 days. $15K target / 162 days = $92/day pace. 20 volunteers / 162 days = 1 / 8 days. Show actual vs target on Home tab. | Zaal | $0 |
+| Takt time targets | **SKIP** — Zaal's call 2026-04-24: no arbitrary pace targets. Flagging things as "behind" based on total÷days math creates false urgency. Use REAL thresholds instead (see Andon section: "not contacted in 21 days" is a real cold-lead signal; "Sep 3 artist lockin" is a real deadline). |
 | Heijunka (load leveling) | USE — max WIP per role: Zaal 8, Candy/DCoop 5, Advisors 3, members 3, new members 1. Enforce via UI warning + weekly check. | Dashboard | $0 |
 | Standardized Work (7 checklists) | USE — checkboxes in meeting notes + task templates. Onboarding, weekly meeting, close sponsor, book artist, day-of runbook, incident 5-whys, post-event follow-up. | Zaal | $0 |
 | Kaizen loops (weekly retro) | USE — Thu 6pm EST async retro via Telegram bot. 3 prompts: worked, blocked, 1 experiment next week. Zaal reviews Fri AM. | Telegram bot (Part 2) | $0 |
@@ -499,9 +499,9 @@ WHAT'S BLOCKED:
 - Volunteers: 1 critical shift (Setup 6-8am) still uncovered
 
 KEY SIGNALS:
-- Sponsor pace: 1.5 commits/week (target 1; ahead of takt!)
-- Artist velocity: 2 confirmed/week (target 1; ahead; Sep 3 looks solid)
-- Volunteer gap: 20 confirmed, need 5 more for 100% coverage
+- Sponsors: 3 committed ($9K), 4 in talks, 0 overdue follow-ups
+- Artists: 7 confirmed, 3 more targeted; Sep 3 lockin deadline in 131 days
+- Volunteers: 20 confirmed, 1 shift (Setup 6-8am) still uncovered
 ```
 
 **Dashboard integration:** "Activity Log" tab auto-displays gemba replies + aggregated digest. Searchable by week.
@@ -512,21 +512,21 @@ KEY SIGNALS:
 
 ---
 
-### 8. Control Charts (Weekly Sparklines)
+### 8. Control Charts (Weekly Sparklines) — Reality-Based Signals
 
-5 mechanical metrics displayed as mini line charts on Home tab. Track pace vs target.
+5 mechanical signals as sparklines on Home tab. **No arbitrary pace targets** (Zaal 2026-04-24). Each signal reflects a real constraint or actual delta.
 
-| Metric | Target | Formula | Frequency | Alert if |
-|---|---|---|---|---|
-| **Sponsor $ Committed (weekly)** | $92/day sustained = $644/week | SUM(amount_committed) WHERE updated_at in [last 7d] | Weekly Fri | <$500 two weeks running |
-| **Artist Pipeline Velocity** | 1 artist/13d = 0.077/day | (wishlist→contacted count) / 7 days | Weekly Fri | <0.05/day (falling behind) |
-| **Volunteer Signups (weekly)** | 1 signup/8d = 0.125/day | COUNT(volunteers WHERE created_at in [last 7d]) | Weekly Fri | <0.1/day (pace dropping) |
-| **Budget Line Variance (%)** | <10% overall | SUM(abs(actual-projected)) / SUM(projected) | Weekly Fri | >15% (slipping) |
-| **Todo Burndown (%)** | >80% done rate | COUNT(todos WHERE status='done') / COUNT(todos total) | Weekly Fri | <70% (overload) |
+| Metric | What it reflects | Alert trigger |
+|---|---|---|
+| **Sponsor $ Committed (cumulative)** | Running total of committed $, plotted vs cumulative sponsor goal posted by Zaal (not computed) | None auto — Zaal scans weekly |
+| **Overdue Sponsor Follow-ups** | Count of sponsors in `contacted` or `in_talks` with `last_contacted_at` >21 days ago | Any row = yellow, 3+ = red |
+| **Artists Missing Riders** | Count of artists in `confirmed`/`travel_booked` without rider attachment | Any row in Aug or later = red |
+| **Uncovered Volunteer Shifts (within 30d of event)** | Count of shifts with 0 confirmed volunteers inside the 30-day window | Starts alerting Sep 3 onward |
+| **Budget Line Variance (%)** | SUM(abs(actual-projected)) / SUM(projected) | >20% = red (real spending delta, not pace) |
 
-**Chart style:** Sparkline (tiny 100px × 30px line chart) + current week value in big number. Green if on track, Yellow if approaching threshold, Red if below.
+**Chart style:** Sparkline for trend + current value. Green/yellow/red based on thresholds above.
 
-**Dashboard integration:** 5 sparklines side-by-side on Home tab, updated auto-Fri 5pm EST.
+**Dashboard integration:** 5 sparklines on Home tab, updated auto-Fri 5pm EST.
 
 **Cadence:** Weekly (Fri); Zaal reviews Sat AM before week planning.
 
@@ -534,29 +534,16 @@ KEY SIGNALS:
 
 ---
 
-### 9. Takt Time Targets
+### 9. Takt Time Targets — SKIPPED
 
-**Takt = "beat" — the pace at which work must flow to meet deadline.**
+**Zaal's call 2026-04-24:** no arbitrary pace targets. Dividing "10 artists by Sep 3" into "1 artist every 13 days" creates a fake deadline that makes things look late when in reality the work ebbs and flows.
 
-**ZAOstock Takt Rates (based on 162 days → Oct 3):**
+**What we do instead:** the Andon cord (section 5) uses REAL signals:
+- Hard deadlines from the outside world (Sep 3 artist lockin from doc 472; Friday EOD Bangor Savings app)
+- Concrete gaps (artist confirmed without rider; volunteer shift uncovered within 30 days of event)
+- Stale-contact thresholds (sponsor not contacted in 21+ days = universally about to go cold, not a made-up cadence)
 
-| Workstream | Target | Formula | Current Pace | Status (as of Apr 24) |
-|---|---|---|---|---|
-| **Sponsors** | $15K by Sep 1 (131 days) | $15K / 131 = $114/day | $0 (day 1) | STARTING |
-| | **$ / week sustained** | $114 × 7 = $798/week | Target |  |
-| **Artists** | 10 confirmed by Sep 3 (132 days) | 10 / 132 = 0.076/day = 1/13d | 0 (day 1) | STARTING |
-| | **# artists/week** | ~0.76/week | 0 (first week is discovery) |  |
-| **Volunteers** | 20 confirmed by Sep 28 (157 days) | 20 / 157 = 0.127/day = 1/8d | 0 (form not live yet) | STARTING |
-| | **# volunteers/week** | ~0.9/week | TBD next week |  |
-| **Budget Items** | All contractors + vendors committed by Aug 25 (124 days) | ~3 vendors/week | TBD (sponsor funding unlocks this) | DEPENDENT |
-
-**How to use:** Plot actual vs takt on control chart (metric #3 above). If actual < takt for 2 weeks, escalate to Zaal.
-
-**Dashboard integration:** Home tab shows "Takt vs Actual" comparison for each workstream. Green = on pace, Yellow = slipping, Red = urgent.
-
-**Cadence:** Weekly tracking (Fri).
-
-**Owner:** Zaal (reads); responsible lead (responds if slipping).
+No "you need to close X sponsors per week" metric. If a real hard deadline is approaching and we haven't landed enough yet, Andon goes red on that deadline — not on a synthetic pace.
 
 ---
 
@@ -1267,7 +1254,7 @@ The Telegram bot **powers** several Six Sigma tools:
 ### Week of Apr 24-28 (This Week)
 
 **Zaal's Three Six Sigma Habits (Immediate, Tomorrow):**
-1. **Review Takt targets** (5 min) — understand that $114/day sponsor pace + 0.076 artists/day + 0.127 volunteers/day are the "heartbeats" of the operation
+1. **Review Andon cord triggers** (5 min) — these are real signals, not made-up paces: sponsor not contacted in 21+ days, artist confirmed without rider, volunteer shift uncovered inside 30 days of event, budget line >20% over, timeline milestone blocked. Don't add a "X per week" metric.
 2. **Set up Andon cord** (10 min) — ask Engineer to add the red-light card to Home tab; commit to checking it 8am + 6pm daily
 3. **Run first Gemba walk** (10 min) — Telegram bot sends prompt Thu AM; Zaal replies what moved + what's blocked
 
@@ -1284,30 +1271,60 @@ The Telegram bot **powers** several Six Sigma tools:
 - Natural language: one sponsor contact-log entry (end-to-end test)
 - Auth: 4-char code verification flow
 
-**Decision for Zaal before we code:**
-> **Question: For the natural language parsing (e.g., "I just called Bangor Savings"), should we route to Hermes (local, fast, cheaper) or Claude Haiku (reliable but API calls)?**
+**Model routing (updated per Zaal 2026-04-24):**
+
+> Use Zaal's **Claude Max subscription** via Claude Code CLI, not the Anthropic API.
 >
-> - **Hermes route:** Fast local inference (~1-2 sec), zero API cost, but hallucinates (says "in_talks" when user said "not interested")
-> - **Claude Haiku route:** Reliable, but ~$0.003 per message, latency ~2-3 sec (Anthropic API round-trip)
+> **Pattern:** bot receives a Telegram message → spawns `claude` CLI on the VPS (same auth as `claude login` uses) → passes prompt + relevant tool allowlist → parses stdout → writes to Supabase.
 >
-> **Recommendation:** Hermes for structured extraction (contact name, action, notes), Claude Haiku for ambiguity resolution (user said "they want money" — is that committed or budget?). Hybrid approach.
+> **Why:** Zaal already pays for Max. Running Claude Code on VPS with his auth = zero incremental cost. Same pattern QuadWork already uses for agents. No Anthropic API billing on top.
+>
+> **Hermes-local role:** Keep Hermes on VPS for privacy-sensitive routine parsing (voice-note transcription pre-processing, rate-limited summaries). But the default reasoning model is Claude via Max.
+>
+> **Prereq:** `claude login` completed on VPS as Zaal, auth persists across bot restarts. Document in VPS runbook.
 
 ---
 
 ## Part 1 & 2 Integration: The Complete System
 
 **Zaal's dashboard shows:**
-1. **Home tab** (Six Sigma tools): Andon cord + takt + control charts + WIP + next priorities + kaizen this week
+1. **Home tab** (Six Sigma tools): Andon cord + reality-based signals + WIP + next priorities + kaizen this week
 2. **Activity tab** (from bot): gemba replies + bot writes + team contributions
 3. **Incidents & Learnings tab** (from Part 1): all red-light situations + root causes + systemic fixes
 4. **Checklists tab** (from Part 1): runbooks for onboarding, weekly meeting, closing sponsor, booking artist, day-of, incident 5-whys, post-event
 5. **Team tab** (from Part 1): heijunka load leveling (WIP per person), meeting agenda
 
 **Zaal's Telegram bot provides:**
-- Daily standup prompts (gemba, kaizen)
-- Morning alerts (Andon red, metrics slipping)
-- Natural language intake (contact logs, todos, notes)
-- Evening digest (what moved this week, pace vs takt, next week priorities)
+- Daily standup prompts (gemba, kaizen) — optional, opt-out by default
+- Morning alerts (Andon red — real signals only, not pace drift)
+- Natural language intake (context, ideas, contact logs, notes)
+- **Collaborative builder mode** (see below)
+- Evening digest (what moved this week + what needs attention)
+
+### Collaborative builder mode (the real unlock)
+
+Zaal 2026-04-24: "i want it to be a natural language way for the team to help work on the project whether that's just context or actual coding and ideas to the web pages."
+
+**What it means:** the bot isn't only for logging — it's a way any teammate can CONTRIBUTE ideas or code changes without having to know how to open a terminal.
+
+**Three contribution modes:**
+
+1. **Context drop** — teammate sends a voice note or text: "Hey, Ellsworth Chamber of Commerce told me they'd co-promote if we give them a table." Bot saves it as a `stock_suggestion` with their name + timestamp. Zaal sees it in the suggestion box on the dashboard. No code change, just captured context.
+
+2. **Idea for a page change** — teammate sends: "On the public festival landing page, the countdown should also show what day of the week Oct 3 is (Saturday)." Bot routes it to a Claude Code session (via `claude` CLI, uses Zaal's Max sub). Claude Code opens the repo, makes the change on a fresh `ws/<teammate>-<idea-slug>` branch, opens a PR, replies back with the PR URL. Zaal merges when ready. Teammate credited in commit co-author.
+
+3. **Straight-up coding ideas** — same as above but for dashboard changes, bug fixes, anything. The teammate writes the intent in plain English; Claude Code interprets + scaffolds + opens a PR. If it's ambiguous, Claude Code asks clarifying questions back through the bot.
+
+**Safety:**
+- Branch prefix: `ws/bot-<teammate>-<slug>` so branches from the bot are identifiable
+- All changes go to PRs, never to `main` directly
+- Claude Code runs in a sandboxed clone of the repo on the VPS (not the dev tree)
+- Teammate's telegram_id logged as the originator; Zaal's auth is what actually runs the tools
+- Rate limit: 3 collaborative-builder prompts per teammate per day to prevent runaway costs
+
+**Cost:** Zero incremental — runs on Zaal's existing Max subscription. If a teammate sends 100 prompts, that's quota-bounded by Max, not billed separately.
+
+**Rollout:** Start with Zaal sending his own "idea" prompts as a test. Then Candy + DCoop as v2. Full team by Jun 1 after we've seen how Claude Code handles the messy input.
 
 **Result:** Async, lean, low-friction team operations. Zaal never alone. Team always in the loop. No daily standups eating time.
 
@@ -1395,8 +1412,12 @@ CREATE TABLE IF NOT EXISTS bot_rate_limits (
 ```bash
 TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
 TELEGRAM_BOT_WEBHOOK_URL=https://zaoos.com/api/stock/team/bot-webhook  (or leave empty for polling)
-HERMES_LOCAL_URL=http://localhost:11434/api/generate  (Ollama or llama.cpp endpoint)
+CLAUDE_CLI_PATH=/usr/local/bin/claude  (uses Zaal's Max subscription auth from `claude login`)
+CLAUDE_CLI_WORKSPACE=/srv/zaostock-bot-workspace  (sandbox repo clone for collaborative builder mode)
+HERMES_LOCAL_URL=http://localhost:11434/api/generate  (optional — Ollama/llama.cpp for privacy-sensitive routine parsing only)
 ```
+
+**Auth prerequisite:** `claude login` must be completed on the VPS as the same user the bot runs as. Auth persists across bot restarts. Do NOT set ANTHROPIC_API_KEY — we're using the Max subscription, not the API.
 
 ---
 
@@ -1446,7 +1467,7 @@ HERMES_LOCAL_URL=http://localhost:11434/api/generate  (Ollama or llama.cpp endpo
 
 ### Part 1 (Six Sigma) Success:
 - [ ] Andon cord never stays RED for >1 business day (Zaal acts on alerts)
-- [ ] Sponsor velocity stays ≥ takt ($114/day) through Aug 31
+- [ ] Zero sponsors stalled (21+ day no-contact) going into Sep
 - [ ] Artist pipeline hits 10 confirmed by Sep 3 (hard deadline)
 - [ ] Zero timeline items blocked (or blocked <48h before resolution)
 - [ ] Team WIP stays within heijunka limits (no one overloaded)
@@ -1468,7 +1489,7 @@ HERMES_LOCAL_URL=http://localhost:11434/api/generate  (Ollama or llama.cpp endpo
 
 | Week | Part 1 (Six Sigma) | Part 2 (Bot) | Deliverables |
 |---|---|---|---|
-| **Week 1 (Apr 24-28)** | Andon cord live, Takt targets published, gemba 1st run | Bot V1 to Zaal only (/status, /mytodos, /gemba, natural-lang stub) | Home tab + Telegram bot MVP |
+| **Week 1 (Apr 24-28)** | Andon cord live, real-signal sparklines on Home tab, first gemba run | Bot V1 to Zaal only (`/status`, `/mytodos`, `/gemba`, natural-lang stub); Claude Code CLI wired to Zaal's Max auth on VPS | Home tab + Telegram bot MVP with Claude Max routing |
 | **Week 2-3 (May 1-12)** | Sponsor CTQ + Value Stream Maps documented, control charts auto-calc | Phase 2: onboard Candy+DCoop+Tyler, test contact-log natural-lang | Value Stream doc + 3-user bot test |
 | **Week 4-6 (May 13-Jun 2)** | Kanban WIP limits enforced, Heijunka load tracking live, Kaizen loop stable | Phase 3: all 17 teammates onboarded, voice note stub ready | 5 out of 7 checklists live |
 | **Jun-Aug** | All 12 Six Sigma tools humming, Incidents logged + root causes captured, Kaizen experiments landing weekly | Bot running steady, whisper.cpp for voice transcription, Telegram daily prompts automated | Institutional learning accumulating |

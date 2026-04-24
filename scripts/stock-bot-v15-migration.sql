@@ -5,8 +5,11 @@ BEGIN;
 
 -- 1. Register the bot as a team member so it appears in the roster and can be referenced.
 -- Name "ZAOstock Bot" is stable. We look it up by name at bot startup.
-INSERT INTO stock_team_members (name, role, scope, active)
-VALUES ('ZAOstock Bot', 'bot', '', true)
+-- password_hash is NOT NULL on this table. Bot never logs in via the web
+-- dashboard, so we stamp a sentinel that no scrypt(4-letter-code) can ever
+-- match. Safe: login route does scrypt compare, sentinel fails by length.
+INSERT INTO stock_team_members (name, role, scope, password_hash, active)
+VALUES ('ZAOstock Bot', 'bot', '', 'BOT_NO_LOGIN:never_a_valid_scrypt_hash', true)
 ON CONFLICT (name) DO UPDATE SET role = 'bot', active = true;
 
 -- 2. Chat registry (forum supergroups + groups + DMs).

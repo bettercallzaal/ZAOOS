@@ -3,20 +3,14 @@
 import { useState } from 'react';
 import { parseLinks, type PublicMember } from '@/lib/stock/members';
 
-const SCOPE_COLOR: Record<string, string> = {
-  ops: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-  finance: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-  design: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30',
-  music: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
-};
-
 interface Props {
   member: PublicMember;
-  scopeLabel: string;
-  roleLabel: string;
 }
 
-export function MemberProfileView({ member, scopeLabel, roleLabel }: Props) {
+export function MemberProfileView({ member }: Props) {
+  const publicLabel = member.role === 'lead' ? 'Team lead'
+    : member.role === 'advisory' ? 'Advisor'
+    : 'Team member';
   const [photoBroken, setPhotoBroken] = useState(false);
   const showPhoto = member.photo_url && !photoBroken;
   const initials = member.name
@@ -43,15 +37,10 @@ export function MemberProfileView({ member, scopeLabel, roleLabel }: Props) {
         )}
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold text-white">{member.name}</h1>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            <span className={`text-[10px] font-bold px-2 py-1 rounded-full border uppercase ${SCOPE_COLOR[member.scope] || SCOPE_COLOR.ops}`}>
-              {scopeLabel} - {roleLabel}
+          <div className="mt-2">
+            <span className="text-[10px] font-bold px-2 py-1 rounded-full border uppercase bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/30">
+              {publicLabel}
             </span>
-            {member.secondary_scope && member.secondary_scope.trim() && (
-              <span className={`text-[10px] font-bold px-2 py-1 rounded-full border uppercase ${SCOPE_COLOR[member.secondary_scope] || SCOPE_COLOR.ops}`}>
-                Also {member.secondary_scope}
-              </span>
-            )}
           </div>
         </div>
       </div>

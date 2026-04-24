@@ -84,14 +84,14 @@ function MemberCard({ member: m }: { member: Member }) {
           >
             {m.name}
           </Link>
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${SCOPE_COLOR[m.scope] || SCOPE_COLOR.ops}`}>
-            {SCOPE_LABEL[m.scope] || m.scope} - {ROLE_LABEL[m.role] || m.role}
-          </span>
-          {m.secondary_scope && m.secondary_scope.trim() && (
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${SCOPE_COLOR[m.secondary_scope] || SCOPE_COLOR.ops}`}>
-              +{SCOPE_LABEL[m.secondary_scope] || m.secondary_scope}
+          {m.scope && m.scope.trim() && (
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase ${SCOPE_COLOR[m.scope] || 'border-gray-600 text-gray-400'}`}>
+              {SCOPE_LABEL[m.scope] || m.scope}
             </span>
           )}
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase bg-[#f5a623]/10 text-[#f5a623] border-[#f5a623]/30">
+            {ROLE_LABEL[m.role] || m.role}
+          </span>
         </div>
         {m.bio && m.bio.trim() ? (
           <p className="text-xs text-gray-300 whitespace-pre-wrap leading-relaxed">{m.bio}</p>

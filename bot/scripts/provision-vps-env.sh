@@ -37,9 +37,9 @@ fi
 echo "Found Supabase URL + service role key in local .env.local"
 echo "Will write to $VPS_HOST:~/$VPS_PATH"
 echo ""
-echo "Paste the NEW Telegram bot token from @BotFather (after /revoke) and press Enter."
+echo "Paste the NEW @ZAOstockTeamBot token from @BotFather (after /revoke) and press Enter."
 echo "Input is hidden. It will NOT appear on screen, in history, or in any log."
-printf "TELEGRAM_BOT_TOKEN: "
+printf "ZAOSTOCK_BOT_TOKEN: "
 
 # -s silent (no echo). stty keeps cursor behavior sane.
 stty -echo
@@ -59,7 +59,7 @@ if ! [[ "$BOT_TOKEN" =~ ^[0-9]+:[A-Za-z0-9_-]{20,}$ ]]; then
 fi
 
 # Build the env file in-memory and stream it over SSH — never written to local disk.
-ENV_CONTENT="TELEGRAM_BOT_TOKEN=${BOT_TOKEN}
+ENV_CONTENT="ZAOSTOCK_BOT_TOKEN=${BOT_TOKEN}
 SUPABASE_URL=${SUPA_URL}
 SUPABASE_SERVICE_ROLE_KEY=${SUPA_KEY}
 "

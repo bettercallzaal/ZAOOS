@@ -12,9 +12,9 @@ interface SessionData {
 
 type MyContext = Context & SessionFlavor<SessionData>;
 
-const token = process.env.TELEGRAM_BOT_TOKEN;
+const token = process.env.ZAOSTOCK_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
-  console.error('Missing TELEGRAM_BOT_TOKEN');
+  console.error('Missing ZAOSTOCK_BOT_TOKEN');
   process.exit(1);
 }
 

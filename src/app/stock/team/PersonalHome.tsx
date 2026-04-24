@@ -143,6 +143,8 @@ export function PersonalHome({ member, allMembers, todos, sponsors, artists, mil
         initialBio={member.bio || ''}
         initialLinks={member.links || ''}
         initialPhotoUrl={member.photo_url || ''}
+        initialScope={member.scope || ''}
+        initialRole={member.role || 'member'}
       />
 
       {/* Welcome banner */}

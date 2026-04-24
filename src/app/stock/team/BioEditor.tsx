@@ -2,21 +2,33 @@
 
 import { useState } from 'react';
 
+const SCOPE_OPTIONS: Array<{ value: string; label: string; hint: string }> = [
+  { value: '', label: 'Not picked yet', hint: 'decide later' },
+  { value: 'ops', label: 'Operations', hint: 'logistics, partnerships, run-of-show' },
+  { value: 'music', label: 'Music', hint: 'artist outreach, lineup, sound' },
+  { value: 'design', label: 'Design', hint: 'shirts, signage, brand' },
+];
+
 interface Props {
   memberName: string;
   initialBio: string;
   initialLinks: string;
   initialPhotoUrl: string;
+  initialScope: string;
+  initialRole: string;
 }
 
-export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUrl }: Props) {
+export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUrl, initialScope, initialRole }: Props) {
   const [bio, setBio] = useState(initialBio);
   const [links, setLinks] = useState(initialLinks);
   const [photoUrl, setPhotoUrl] = useState(initialPhotoUrl);
+  const [scope, setScope] = useState(initialScope);
   const [editing, setEditing] = useState(initialBio.trim().length === 0);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [photoBroken, setPhotoBroken] = useState(false);
+
+  const isAdvisor = initialRole === 'advisory';
 
   async function save() {
     setBusy(true);
@@ -25,7 +37,7 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
       const res = await fetch('/api/stock/team/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bio, links, photo_url: photoUrl }),
+        body: JSON.stringify({ bio, links, photo_url: photoUrl, scope }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -122,6 +134,35 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             maxLength={500}
             className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
           />
+
+          {!isAdvisor && (
+            <div className="space-y-1.5">
+              <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">
+                Your team (internal - controls which todos you see)
+              </p>
+              <div className="grid grid-cols-2 gap-1.5">
+                {SCOPE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setScope(opt.value)}
+                    className={`text-left px-3 py-2 rounded border text-xs transition-colors ${
+                      scope === opt.value
+                        ? 'border-[#f5a623] bg-[#f5a623]/10 text-[#f5a623]'
+                        : 'border-white/[0.08] bg-[#0a1628] text-gray-300 hover:border-white/20'
+                    }`}
+                  >
+                    <div className="font-medium">{opt.label}</div>
+                    <div className="text-[10px] text-gray-500 mt-0.5">{opt.hint}</div>
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-gray-600 italic">
+                You can switch any time. Publicly you just show as "Team member".
+              </p>
+            </div>
+          )}
+
           <div className="flex items-center gap-2">
             <button
               onClick={save}

@@ -15,6 +15,7 @@ const patchSchema = z.object({
       (v) => !v || v === '' || /^https:\/\//i.test(v),
       { message: 'Photo URL must start with https://' },
     ),
+  scope: z.enum(['', 'ops', 'music', 'design']).optional(),
 });
 
 export async function PATCH(request: NextRequest) {
@@ -38,6 +39,7 @@ export async function PATCH(request: NextRequest) {
     if (parsed.data.bio !== undefined) updates.bio = parsed.data.bio;
     if (parsed.data.links !== undefined) updates.links = parsed.data.links;
     if (parsed.data.photo_url !== undefined) updates.photo_url = parsed.data.photo_url;
+    if (parsed.data.scope !== undefined) updates.scope = parsed.data.scope;
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });

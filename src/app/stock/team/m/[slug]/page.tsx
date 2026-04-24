@@ -10,19 +10,6 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-const SCOPE_LABEL: Record<string, string> = {
-  ops: 'Operations',
-  finance: 'Finance',
-  design: 'Design',
-  music: 'Music',
-};
-
-const ROLE_LABEL: Record<string, string> = {
-  lead: 'Lead',
-  '2nd': '2nd',
-  member: 'Member',
-};
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const member = await getMemberBySlug(slug);
@@ -33,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: member.bio.slice(0, 160) || `${member.name} on the ZAOstock team.`,
     openGraph: {
       title: `${member.name} | ZAOstock Team`,
-      description: member.bio.slice(0, 160) || `${member.name} - ${SCOPE_LABEL[member.scope] || member.scope}`,
+      description: member.bio.slice(0, 160) || `${member.name} - ZAOstock team`,
       images: member.photo_url ? [member.photo_url] : [],
     },
   };
@@ -45,9 +32,7 @@ export default async function MemberProfilePage({ params }: Props) {
   if (!member) notFound();
 
   const all = await getPublicMembers();
-  const teammates = all
-    .filter((m) => m.scope === member.scope && m.id !== member.id)
-    .slice(0, 6);
+  const teammates = all.filter((m) => m.id !== member.id).slice(0, 8);
 
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] text-white pb-12">
@@ -61,16 +46,12 @@ export default async function MemberProfilePage({ params }: Props) {
       </header>
 
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-        <MemberProfileView
-          member={member}
-          scopeLabel={SCOPE_LABEL[member.scope] || member.scope}
-          roleLabel={ROLE_LABEL[member.role] || member.role}
-        />
+        <MemberProfileView member={member} />
 
         {teammates.length > 0 && (
           <section className="space-y-3">
             <p className="text-xs text-gray-500 uppercase tracking-wider px-1">
-              Also on {SCOPE_LABEL[member.scope] || member.scope}
+              More of the crew
             </p>
             <div className="flex flex-wrap gap-2">
               {teammates.map((t) => (

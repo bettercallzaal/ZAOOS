@@ -85,11 +85,14 @@ action_items:                       # optional: calls-to-action from episode
   - "Visit hubsnetwork.org"
   - "Attend May 14 plural event"
 status: "raw"                       # raw-undated | raw | cleaned | annotated
+youtube_url: "https://www.youtube.com/watch?v=XXXXXX"  # required when status != "raw-undated"
+youtube_video_id: "XXXXXX"                            # required when status != "raw-undated"
+thumbnail_override: null                              # optional - custom thumbnail path
 ---
 ```
 
 Status enum:
-- `raw-undated` - converted from source but date/topics/entities not yet enriched (filename-only metadata)
+- `raw-undated` - converted from source but date/topics/entities not yet enriched (filename-only metadata). `youtube_url`, `youtube_video_id`, and `published` may be omitted.
 - `raw` - dated + guest + org filled; topics auto-tagged
 - `cleaned` - human edited (fix typos, speaker labels, remove filler)
 - `annotated` - LLM pass extracted entities, action_items, summary confirmed

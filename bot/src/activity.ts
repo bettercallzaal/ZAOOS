@@ -1,4 +1,4 @@
-import { db } from './supabase.ts';
+import { db } from './supabase';
 
 type EntityType = 'member' | 'todo' | 'sponsor' | 'artist' | 'timeline' | 'note' | 'volunteer' | 'budget' | 'goal';
 

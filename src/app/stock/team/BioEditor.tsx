@@ -158,7 +158,7 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
                 ))}
               </div>
               <p className="text-[10px] text-gray-600 italic">
-                You can switch any time. Publicly you just show as "Team member".
+                You can switch any time. Publicly you just show as &ldquo;Team member&rdquo;.
               </p>
             </div>
           )}

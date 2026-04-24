@@ -2,9 +2,9 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context, session, SessionFlavor } from 'grammy';
-import { findMemberByTelegramId, linkTelegramId, type TeamMember } from './auth.ts';
-import { buildStatus, buildMyTodos, buildMyContributions } from './status.ts';
-import { addGemba, addIdea, addNote } from './capture.ts';
+import { findMemberByTelegramId, linkTelegramId, type TeamMember } from './auth';
+import { buildStatus, buildMyTodos, buildMyContributions } from './status';
+import { addGemba, addIdea, addNote } from './capture';
 
 interface SessionData {
   awaitingCode: boolean;

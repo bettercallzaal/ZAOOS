@@ -1,6 +1,6 @@
-import { db } from './supabase.ts';
-import { logBotActivity } from './activity.ts';
-import type { TeamMember } from './auth.ts';
+import { db } from './supabase';
+import { logBotActivity } from './activity';
+import type { TeamMember } from './auth';
 
 export async function addGemba(member: TeamMember, text: string): Promise<string> {
   if (!text.trim()) return 'Say something after /gemba — what moved or got blocked?';

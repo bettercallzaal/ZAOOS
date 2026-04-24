@@ -1,5 +1,5 @@
 import { scryptSync, timingSafeEqual } from 'crypto';
-import { db } from './supabase.ts';
+import { db } from './supabase';
 
 export interface TeamMember {
   id: string;

@@ -1,80 +1,118 @@
 import { config as loadEnv } from 'dotenv';
 loadEnv();
 
-import { Bot, Context, session, SessionFlavor } from 'grammy';
-import { findMemberByTelegramId, linkTelegramId, type TeamMember } from './auth';
+import { Bot, Context } from 'grammy';
+import {
+  resolveMember,
+  linkUsernameToMember,
+  unlinkUsername,
+  type TeamMember,
+} from './auth';
 import { buildStatus, buildMyTodos, buildMyContributions } from './status';
 import { addGemba, addIdea, addNote } from './capture';
+import { executeFromText } from './actions';
+import { ask } from './llm';
+import { ensureChatRegistered, getChatRow, setChatMode, setPostDigests } from './group';
+import { scheduleAll } from './schedule';
+import { alertDevops, buildHealthReport } from './ops';
+import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
 
-interface SessionData {
-  awaitingCode: boolean;
-}
-
-type MyContext = Context & SessionFlavor<SessionData>;
-
-const token = process.env.TELEGRAM_BOT_TOKEN;
+const token = process.env.ZAOSTOCK_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
-  console.error('Missing TELEGRAM_BOT_TOKEN');
+  console.error('Missing ZAOSTOCK_BOT_TOKEN');
   process.exit(1);
 }
 
-const bot = new Bot<MyContext>(token);
+const ADMIN_IDS = (process.env.BOT_ADMIN_TELEGRAM_IDS ?? '')
+  .split(',')
+  .map((s) => Number(s.trim()))
+  .filter((n) => Number.isFinite(n) && n > 0);
 
-bot.use(session({ initial: (): SessionData => ({ awaitingCode: false }) }));
+const bot = new Bot<Context>(token);
 
-async function requireMember(ctx: MyContext): Promise<TeamMember | null> {
-  const tgId = ctx.from?.id;
-  if (!tgId) {
-    await ctx.reply('Could not read your Telegram id.');
-    return null;
+// Register every chat we see (on first message).
+bot.use(async (ctx, next) => {
+  if (ctx.chat) {
+    try {
+      await ensureChatRegistered({
+        chat_id: ctx.chat.id,
+        chat_type: ctx.chat.type,
+        title: 'title' in ctx.chat ? (ctx.chat.title ?? '') : '',
+        forum_enabled: 'is_forum' in ctx.chat ? Boolean(ctx.chat.is_forum) : false,
+      });
+    } catch {
+      /* ignore */
+    }
   }
-  const member = await findMemberByTelegramId(tgId);
-  if (!member) {
-    ctx.session.awaitingCode = true;
-    await ctx.reply(
-      'Welcome to the ZAOstock Team Bot. Send your 4-letter login code (same one you use on zaoos.com/stock/team) to link this Telegram account.',
-    );
-    return null;
-  }
-  return member;
+  await next();
+});
+
+async function currentMember(ctx: Context): Promise<TeamMember | null> {
+  return resolveMember(ctx.from?.id, ctx.from?.username);
 }
 
+async function requireMember(ctx: Context): Promise<TeamMember | null> {
+  const member = await currentMember(ctx);
+  if (member) return member;
+  const u = ctx.from?.username ? `@${ctx.from.username}` : 'your Telegram account';
+  await ctx.reply(
+    `You're not on the ZAOstock team roster yet.\nAsk Zaal to link ${u} to your name, then try again.`,
+  );
+  return null;
+}
+
+function isAdmin(ctx: Context): boolean {
+  const id = ctx.from?.id;
+  if (!id) return false;
+  return ADMIN_IDS.includes(id);
+}
+
+// ---- Commands ---------------------------------------------------------------
+
 bot.command('start', async (ctx) => {
-  const tgId = ctx.from?.id;
-  if (!tgId) return;
-  const member = await findMemberByTelegramId(tgId);
+  const member = await currentMember(ctx);
   if (member) {
-    await ctx.reply(`You're already linked, ${member.name}. Try /help to see what I can do.`);
+    await ctx.reply(`Hey ${member.name}. Type /help to see what I can do.`);
     return;
   }
-  ctx.session.awaitingCode = true;
+  const u = ctx.from?.username ? `@${ctx.from.username}` : 'your Telegram account';
   await ctx.reply(
-    'Hey! Send your 4-letter ZAOstock login code to link this Telegram to your teammate profile. (Same code you use on zaoos.com/stock/team.)',
+    `Hey! I'm the ZAOstock Team Bot.\n\nI don't recognize ${u} on the roster yet. Ping Zaal to link you. Once linked you'll get:\n  /mytodos - your open tasks\n  /do <text> - natural-language actions\n  /digest - festival snapshots\n\nPublic commands work for anyone: /status /help /ask`,
   );
 });
 
 bot.command('help', async (ctx) => {
+  const isGroup = ctx.chat?.type !== 'private';
   await ctx.reply(
     [
-      'ZAOstock Team Bot — v1',
+      'ZAOstock Team Bot - v1.5',
       '',
-      '/status — festival snapshot (sponsors, artists, volunteers, overdue)',
-      '/mytodos — your open todos',
-      '/mycontributions — what you logged in the last 7 days',
-      '/gemba <text> — quick standup log ("finished x, blocked on y")',
-      '/idea <text> — drop a suggestion into the box',
-      '/note <text> — add a line to the next upcoming meeting notes',
-      '/help — this list',
+      'Read:',
+      '  /status - festival snapshot',
+      '  /mytodos - your open todos',
+      '  /mycontributions - your last 7 days',
       '',
-      'You can also just DM natural language (v1.1).',
+      'Act (LLM parses to DB writes):',
+      '  /do <text> - natural language -> action',
+      '  /ask <text> - ask me anything (no DB write)',
+      '',
+      'Capture:',
+      '  /gemba <text> - quick standup log',
+      '  /idea <text> - drop a suggestion',
+      '  /note <text> - meeting note',
+      '',
+      'Ops:',
+      '  /chatinfo - chat + topic ids',
+      '  /digest morning|evening|week|retro - preview on demand',
+      isGroup
+        ? '\n@mention me in a group to act. I respond only when tagged.'
+        : '\nIn DM I auto-parse plain text as an action.',
       'Dashboard: https://zaoos.com/stock/team',
     ].join('\n'),
   );
 });
 
 bot.command('status', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
   await ctx.reply(await buildStatus());
 });
 
@@ -108,53 +146,245 @@ bot.command('note', async (ctx) => {
   await ctx.reply(await addNote(member, ctx.match));
 });
 
-bot.on('message:text', async (ctx) => {
-  const tgId = ctx.from?.id;
-  if (!tgId) return;
-  const text = ctx.message.text.trim();
+bot.command('ask', async (ctx) => {
+  const text = ctx.match?.trim();
+  if (!text) {
+    await ctx.reply('Usage: /ask <question>');
+    return;
+  }
+  try {
+    const reply = await ask(
+      text,
+      `You are the ZAOstock Team Bot advisor. Answer briefly (under 300 words). If the user is asking about festival state, tell them to use /status or /mytodos.`,
+    );
+    await ctx.reply(reply.text);
+  } catch (err) {
+    await ctx.reply(`Couldn't reach LLM: ${err instanceof Error ? err.message : 'unknown'}`);
+  }
+});
 
-  // If we are awaiting their code, try to link.
-  if (ctx.session.awaitingCode && text.length <= 8) {
-    const res = await linkTelegramId(text, tgId);
-    if (res.ok) {
-      ctx.session.awaitingCode = false;
-      await ctx.reply(
-        `Linked! You're signed in as ${res.member.name}. Try /help to see commands.`,
-      );
-    } else {
-      await ctx.reply(`${res.reason}. Try again, or type /start to restart.`);
-    }
+bot.command('do', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  const text = ctx.match?.trim();
+  if (!text) {
+    await ctx.reply(
+      'Usage: /do <natural language>. Examples:\n  /do add todo call Bangor Savings by Friday\n  /do mark Bangor Savings as contacted\n  /do add milestone merch order 2026-09-01',
+    );
     return;
   }
+  await ctx.reply('Working on it...');
+  const result = await executeFromText(member, text);
+  await ctx.reply(result.reply);
+});
 
-  const member = await findMemberByTelegramId(tgId);
-  if (!member) {
-    ctx.session.awaitingCode = true;
-    await ctx.reply('Send your 4-letter ZAOstock code first so I know who you are.');
-    return;
-  }
-
-  // v1: fall back to treating any raw text as a gemba-style note.
-  if (text.toLowerCase().startsWith('idea:') || text.toLowerCase().startsWith('💡')) {
-    await ctx.reply(await addIdea(member, text.replace(/^idea:\s*/i, '').replace(/^💡\s*/, '')));
-    return;
-  }
-  if (text.toLowerCase().startsWith('note:')) {
-    await ctx.reply(await addNote(member, text.replace(/^note:\s*/i, '')));
-    return;
-  }
+bot.command('chatinfo', async (ctx) => {
+  const chat = ctx.chat;
+  if (!chat) return;
+  const threadId = ctx.message?.message_thread_id;
+  const row = await getChatRow(chat.id);
   await ctx.reply(
-    `Got it, ${member.name}. For now, use /gemba, /idea, /note, /status, /mytodos, /mycontributions. Natural-language parsing ships next.`,
+    [
+      'Chat info:',
+      `  chat_id: ${chat.id}`,
+      `  type: ${chat.type}`,
+      `  title: ${'title' in chat ? chat.title ?? '(DM)' : '(DM)'}`,
+      `  forum: ${'is_forum' in chat ? Boolean(chat.is_forum) : false}`,
+      threadId != null
+        ? `  message_thread_id: ${threadId}`
+        : '  (no thread_id - posted in General or non-forum chat)',
+      '',
+      `  mode: ${row?.mode ?? 'unknown'}`,
+      `  post_digests: ${row?.post_digests ?? false}`,
+    ].join('\n'),
   );
 });
 
+// ---- Admin commands ---------------------------------------------------------
+
+bot.command('setmode', async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply('Admin only.');
+    return;
+  }
+  const parts = (ctx.match ?? '').trim().split(/\s+/);
+  if (parts.length !== 2) {
+    await ctx.reply('Usage: /setmode <chat_id> <team|devops|staging>');
+    return;
+  }
+  const chatId = Number(parts[0]);
+  const mode = parts[1] as 'team' | 'devops' | 'staging';
+  if (!['team', 'devops', 'staging'].includes(mode)) {
+    await ctx.reply('mode must be team | devops | staging');
+    return;
+  }
+  await setChatMode(chatId, mode);
+  await ctx.reply(`Set chat ${chatId} mode to ${mode}.`);
+});
+
+bot.command('setdigests', async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply('Admin only.');
+    return;
+  }
+  const parts = (ctx.match ?? '').trim().split(/\s+/);
+  if (parts.length !== 2) {
+    await ctx.reply('Usage: /setdigests <chat_id> on|off');
+    return;
+  }
+  const chatId = Number(parts[0]);
+  const on = parts[1] === 'on';
+  await setPostDigests(chatId, on);
+  await ctx.reply(`Set chat ${chatId} post_digests to ${on}.`);
+});
+
+bot.command('link', async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply('Admin only.');
+    return;
+  }
+  const raw = (ctx.match ?? '').trim();
+  const m = raw.match(/^(@?\S+)\s+(.+)$/);
+  if (!m) {
+    await ctx.reply('Usage: /link @username Member Name\nExample: /link @dfreshmaker DFresh');
+    return;
+  }
+  const [, username, memberName] = m;
+  const res = await linkUsernameToMember(username, memberName);
+  if (!res.ok) {
+    await ctx.reply(`Link failed: ${res.reason}`);
+    return;
+  }
+  await ctx.reply(
+    `Linked @${res.member.telegram_username} -> ${res.member.name} (${res.member.role}${
+      res.member.scope ? ` / ${res.member.scope}` : ''
+    }).`,
+  );
+});
+
+bot.command('unlink', async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply('Admin only.');
+    return;
+  }
+  const raw = (ctx.match ?? '').trim();
+  if (!raw) {
+    await ctx.reply('Usage: /unlink @username');
+    return;
+  }
+  const res = await unlinkUsername(raw);
+  if (!res.ok) {
+    await ctx.reply(res.reason);
+    return;
+  }
+  await ctx.reply(`Unlinked @${raw.replace(/^@/, '').toLowerCase()} (was ${res.name}).`);
+});
+
+bot.command('whoami', async (ctx) => {
+  const member = await currentMember(ctx);
+  if (!member) {
+    const u = ctx.from?.username ? `@${ctx.from.username}` : '(no username)';
+    await ctx.reply(`Not linked. Your Telegram: id=${ctx.from?.id ?? '?'}, ${u}`);
+    return;
+  }
+  await ctx.reply(
+    `${member.name} (${member.role}${member.scope ? ` / ${member.scope}` : ''}) - linked via @${member.telegram_username ?? '(id only)'}.`,
+  );
+});
+
+bot.command('health', async (ctx) => {
+  if (!isAdmin(ctx)) {
+    await ctx.reply('Admin only.');
+    return;
+  }
+  await ctx.reply(await buildHealthReport());
+});
+
+bot.command('digest', async (ctx) => {
+  const which = (ctx.match ?? '').trim().toLowerCase();
+  let text: string;
+  try {
+    if (which === 'evening') text = await eveningRecap();
+    else if (which === 'week') text = await weekAheadDigest();
+    else if (which === 'retro') text = await fridayRetro();
+    else text = await morningDigest();
+  } catch (err) {
+    text = `Digest failed: ${err instanceof Error ? err.message : 'unknown'}`;
+  }
+  await ctx.reply(text);
+});
+
+// ---- Free-text + @mention handler ------------------------------------------
+
+let cachedUsername: string | null = null;
+async function ensureUsername(): Promise<string> {
+  if (cachedUsername) return cachedUsername;
+  const me = await bot.api.getMe();
+  cachedUsername = me.username?.toLowerCase() ?? '';
+  return cachedUsername;
+}
+
+bot.on('message:text', async (ctx) => {
+  const text = ctx.message.text.trim();
+  if (text.startsWith('/')) return; // commands handled above
+  const chatType = ctx.chat?.type ?? 'private';
+
+  if (chatType === 'private') {
+    const member = await requireMember(ctx);
+    if (!member) return;
+    await ctx.reply('Working on it...');
+    const result = await executeFromText(member, text);
+    await ctx.reply(result.reply);
+    return;
+  }
+
+  // Group / supergroup: respond ONLY when @mentioned
+  const username = await ensureUsername();
+  const mentioned = username && text.toLowerCase().includes(`@${username}`);
+  if (!mentioned) return;
+
+  const member = await requireMember(ctx);
+  if (!member) return;
+
+  const cleaned = text.replace(new RegExp(`@${username}`, 'gi'), '').trim();
+  if (!cleaned) {
+    await ctx.reply(`Hi ${member.name}. Tag me with something like "@${username} add todo X" or ask a question.`);
+    return;
+  }
+  await ctx.reply('Working on it...');
+  const result = await executeFromText(member, cleaned);
+  await ctx.reply(result.reply);
+});
+
+// ---- Error hook -------------------------------------------------------------
+
 bot.catch((err) => {
   console.error('[zaostock-bot] error:', err);
+  alertDevops(bot, `error: ${err?.message ?? String(err)}`).catch(() => undefined);
 });
+
+// ---- Startup ---------------------------------------------------------------
 
 console.log('[zaostock-bot] starting...');
 bot.start({
-  onStart: (info) => {
+  onStart: async (info) => {
     console.log(`[zaostock-bot] running as @${info.username}`);
+    cachedUsername = info.username.toLowerCase();
+    scheduleAll(bot, (err, label) => {
+      console.error(`[schedule] ${label} failed:`, err);
+      alertDevops(bot, `${label} digest failed: ${err instanceof Error ? err.message : 'unknown'}`).catch(
+        () => undefined,
+      );
+    });
+    alertDevops(bot, `bot started · @${info.username} · ${new Date().toISOString()}`).catch(() => undefined);
   },
+});
+
+process.on('SIGTERM', () => {
+  alertDevops(bot, 'bot stopping (SIGTERM)').catch(() => undefined);
+  bot.stop();
+});
+process.on('SIGINT', () => {
+  alertDevops(bot, 'bot stopping (SIGINT)').catch(() => undefined);
+  bot.stop();
 });

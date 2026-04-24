@@ -58,6 +58,7 @@ These are the canonical planning docs. This hub does NOT duplicate them — it c
 Synthesis (read in this order):
 - **[minimal-budget-stack.md](minimal-budget-stack.md)** — THE ACTUAL BUY LIST. Under $25 total for the whole festival. Overrides the paid SaaS recommendations scattered across dimension docs. Zaal's call: come in under budget. Start here.
 - **[170-day-ai-timeline.md](170-day-ai-timeline.md)** — MASTER TIMELINE. What to build, when to build it, which 10 wires are critical. 8 phases (Apr-Oct), 163 days, weekly milestones.
+- **[492 — Six Sigma ops + Team Telegram bot](../492-zaostock-sixsigma-ops-and-telegram-bot/)** — HOW TO RUN 162 DAYS with lean discipline. Part 1: 12 concrete Six Sigma tools for the dashboard (Andon, takt, WIP limits, CTQ trees, kaizen loops, 5-whys, Gemba walks). Part 2: Telegram bot spec (Hermes + Qwen locally on VPS) for async team comms, $0 incremental cost. Read this before asking "how do we keep 17 people coordinated?"
 - [zoe-integration.md](zoe-integration.md) — ZOE's dispatch role: 5 daily crons + 5 Telegram commands + day-of incident triage.
 - [tools-matrix.md](tools-matrix.md) — Full reference of every tool mentioned (if you want to see what we skipped and why).
 - [results.tsv](results.tsv) — iteration log

@@ -26,3 +26,4 @@
 | 473 | [Road to ZAOstock Magnetic Portal](./473-road-to-zaostock-magnetic-portal/) | STANDALONE | Tyler Stambaugh spec: weekly Magnetic drip content series leading up to Oct 3 |
 | 476 | [ZAOstock Apr 22 Team Recap](./476-zaostock-apr22-team-recap/) | BROADCAST | Full team recap of Apr 21 meeting: 17 teammates, contributor path locked, hybrid meetings start Apr 28 |
 | 477 | [ZAOstock Dashboard Notion Replacement (170-Day Build)](./477-zaostock-dashboard-notion-replacement/) | STANDALONE | Audit of built-vs-missing on /stock/team, 4 new tables, 5-phase MVP spec to fully retire Notion by Oct 3 |
+| 492 | [Six Sigma Ops Framework + ZAOstock Team Telegram Bot](./492-zaostock-sixsigma-ops-and-telegram-bot/) | CANONICAL | 12 concrete Lean/Six Sigma tools for 162-day operations (Andon, takt, WIP limits, CTQ, kaizen, Gemba, control charts) + Hermes-powered Telegram bot for async team coordination ($0 incremental) |

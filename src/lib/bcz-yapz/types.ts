@@ -1,15 +1,28 @@
 import { z } from 'zod'
 
+function parseDate(value: unknown): string | null {
+  if (!value) return null
+  if (typeof value === 'string') return value
+  if (typeof value === 'number') {
+    const s = String(value)
+    return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`
+  }
+  if (value instanceof Date) {
+    return value.toISOString().split('T')[0]
+  }
+  return null
+}
+
 export const EpisodeFrontmatterSchema = z.object({
   title: z.string(),
   show: z.literal('BCZ YapZ'),
   episode: z.number().int().positive().optional(),
   guest: z.string(),
   guest_alias: z.string().optional(),
-  guest_org: z.string(),
+  guest_org: z.string().optional(),
   guest_links: z.array(z.string()).optional().default([]),
   host: z.string(),
-  date: z.union([z.string(), z.null()]).optional(),
+  date: z.unknown().transform(parseDate).optional(),
   published: z.string().optional(),
   duration_min: z.number().int().positive().optional(),
   format: z.string().optional(),

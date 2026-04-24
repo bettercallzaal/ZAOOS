@@ -179,6 +179,13 @@ export function Dashboard({
         </div>
         <div className="max-w-2xl mx-auto px-4 pb-2 flex gap-1 overflow-x-auto items-center">
           <TabButton active={tab === 'home'} onClick={() => setTab('home')}>Home</TabButton>
+          <a
+            href="/stock/circles"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium text-amber-300 border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 whitespace-nowrap"
+            title="Pick which circles you want to work on"
+          >
+            Circles -&gt;
+          </a>
           {!showMore && (
             <button
               onClick={() => setShowMore(true)}

@@ -13,7 +13,7 @@ const SELECT = 'id, name, scope, role, telegram_id, telegram_username, active';
 
 function normalizeUsername(u: string | undefined | null): string | null {
   if (!u) return null;
-  return u.trim().replace(/^@/, '').toLowerCase();
+  return u.trim().replace(/^@+/, '').toLowerCase();
 }
 
 export async function findMemberByTelegramId(telegramId: number): Promise<TeamMember | null> {

@@ -16,6 +16,19 @@ import { ensureChatRegistered, getChatRow, setChatMode, setPostDigests } from '.
 import { scheduleAll } from './schedule';
 import { alertDevops, buildHealthReport } from './ops';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
+import {
+  cmdCircles,
+  cmdJoin,
+  cmdLeave,
+  cmdMyCircles,
+  cmdCoordinators,
+  cmdPropose,
+  cmdProposals,
+  cmdObject,
+  cmdConsent,
+  cmdBuddy,
+  cmdRespect,
+} from './circles';
 
 const token = process.env.ZAOSTOCK_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
@@ -85,7 +98,7 @@ bot.command('help', async (ctx) => {
   const isGroup = ctx.chat?.type !== 'private';
   await ctx.reply(
     [
-      'ZAOstock Team Bot - v1.5',
+      'ZAOstock Team Bot - v1.6',
       '',
       'Read:',
       '  /status - festival snapshot',
@@ -100,6 +113,12 @@ bot.command('help', async (ctx) => {
       '  /gemba <text> - quick standup log',
       '  /idea <text> - drop a suggestion',
       '  /note <text> - meeting note',
+      '',
+      'Circles:',
+      '  /circles - list all circles + who coordinates',
+      '  /join <circle> - jump into a circle (e.g. /join music)',
+      '  /leave <circle> - step out',
+      '  /mycircles - what you are in',
       '',
       'Ops:',
       '  /chatinfo - chat + topic ids',
@@ -312,6 +331,95 @@ bot.command('digest', async (ctx) => {
     text = `Digest failed: ${err instanceof Error ? err.message : 'unknown'}`;
   }
   await ctx.reply(text);
+});
+
+// ---- Circles governance commands -------------------------------------------
+
+bot.command('circles', async (ctx) => {
+  await cmdCircles(ctx);
+});
+
+bot.command('join', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  const slug = (ctx.match ?? '').trim().toLowerCase();
+  if (!slug) {
+    await ctx.reply('Usage: /join <circle-slug>\nExample: /join music');
+    return;
+  }
+  await cmdJoin(ctx, member, slug);
+});
+
+bot.command('leave', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  const slug = (ctx.match ?? '').trim().toLowerCase();
+  if (!slug) {
+    await ctx.reply('Usage: /leave <circle-slug>');
+    return;
+  }
+  await cmdLeave(ctx, member, slug);
+});
+
+bot.command('mycircles', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  await cmdMyCircles(ctx, member);
+});
+
+bot.command('coordinators', async (ctx) => {
+  await cmdCoordinators(ctx);
+});
+
+bot.command('propose', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  const args = (ctx.match ?? '').trim();
+  if (!args) {
+    await ctx.reply('Usage: /propose <circle-slug> <title> | <body>');
+    return;
+  }
+  await cmdPropose(ctx, member, args);
+});
+
+bot.command('proposals', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  await cmdProposals(ctx, member);
+});
+
+bot.command('object', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  const args = (ctx.match ?? '').trim();
+  if (!args) {
+    await ctx.reply('Usage: /object <proposal-id> <reason>');
+    return;
+  }
+  await cmdObject(ctx, member, args);
+});
+
+bot.command('consent', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  const proposalId = (ctx.match ?? '').trim();
+  if (!proposalId) {
+    await ctx.reply('Usage: /consent <proposal-id>');
+    return;
+  }
+  await cmdConsent(ctx, member, proposalId);
+});
+
+bot.command('buddy', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  await cmdBuddy(ctx, member);
+});
+
+bot.command('respect', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  await cmdRespect(ctx, member);
 });
 
 // ---- Free-text + @mention handler ------------------------------------------

@@ -107,6 +107,53 @@ export async function buildMyTodos(member: TeamMember): Promise<string> {
   return lines.join('\n');
 }
 
+export async function buildAllOpenTodos(): Promise<string> {
+  const { data } = await db()
+    .from('stock_todos')
+    .select('title, status, owner_id, created_at')
+    .neq('status', 'done')
+    .order('created_at', { ascending: false })
+    .limit(40);
+
+  const todos = (data ?? []) as Array<{ title: string; status: string; owner_id: string | null; created_at: string }>;
+  if (todos.length === 0) return 'No open todos. Nice.';
+
+  const ownerIds = Array.from(new Set(todos.map((t) => t.owner_id).filter((v): v is string => Boolean(v))));
+  const nameById = new Map<string, string>();
+  if (ownerIds.length > 0) {
+    const { data: owners } = await db()
+      .from('stock_team_members')
+      .select('id, name')
+      .in('id', ownerIds);
+    for (const o of (owners as Array<{ id: string; name: string }> | null) ?? []) {
+      nameById.set(o.id, o.name);
+    }
+  }
+
+  const unclaimed = todos.filter((t) => !t.owner_id);
+  const claimed = todos.filter((t) => t.owner_id);
+
+  const lines: string[] = [`${todos.length} open todo${todos.length === 1 ? '' : 's'}:`];
+  if (unclaimed.length > 0) {
+    lines.push('', `Unclaimed (${unclaimed.length}) - grab via /do "I am taking <title>":`);
+    for (const t of unclaimed.slice(0, 15)) {
+      const mark = t.status === 'in_progress' ? '▶' : '·';
+      lines.push(`${mark} ${t.title}`);
+    }
+    if (unclaimed.length > 15) lines.push(`  ... and ${unclaimed.length - 15} more.`);
+  }
+  if (claimed.length > 0) {
+    lines.push('', `Claimed (${claimed.length}):`);
+    for (const t of claimed.slice(0, 15)) {
+      const mark = t.status === 'in_progress' ? '▶' : '·';
+      const owner = t.owner_id ? nameById.get(t.owner_id) ?? '?' : '?';
+      lines.push(`${mark} ${t.title} - ${owner}`);
+    }
+    if (claimed.length > 15) lines.push(`  ... and ${claimed.length - 15} more.`);
+  }
+  return lines.join('\n');
+}
+
 export async function buildMyContributions(member: TeamMember): Promise<string> {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data } = await db()

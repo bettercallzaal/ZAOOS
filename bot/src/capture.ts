@@ -38,7 +38,7 @@ export async function addIdea(member: TeamMember, text: string): Promise<string>
     action: 'suggestion_add',
     newValue: text.trim().slice(0, 200),
   });
-  return `Saved your idea (id ${data.id.slice(0, 8)}). Zaal will see it in the suggestion box.`;
+  return `Idea logged. Zaal sees this daily. You're in the pool.`;
 }
 
 export async function addNote(member: TeamMember, text: string): Promise<string> {

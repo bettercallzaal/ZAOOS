@@ -186,13 +186,6 @@ export function Dashboard({
           >
             Circles -&gt;
           </a>
-          <a
-            href="/stock/onepagers"
-            className="px-3 py-1.5 rounded-lg text-xs font-medium text-amber-300 border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 whitespace-nowrap"
-            title="Briefing docs for sponsors, partners, venues"
-          >
-            One-pagers -&gt;
-          </a>
           {!showMore && (
             <button
               onClick={() => setShowMore(true)}

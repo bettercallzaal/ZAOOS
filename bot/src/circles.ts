@@ -244,26 +244,37 @@ export async function cmdCoordinators(ctx: Context): Promise<void> {
   try {
     const { data: circles, error } = await db()
       .from('stock_circles')
-      .select(`
-        slug,
-        name,
-        coordinator:stock_team_members(name)
-      `)
+      .select('slug, name, coordinator_member_id')
       .order('slug');
 
     if (error || !circles) {
-      await ctx.reply('Could not fetch coordinators.');
+      await ctx.reply(`Could not fetch coordinators${error ? `: ${error.message}` : ''}`);
       return;
     }
 
-    const lines = (circles as unknown as Array<{ name: string; coordinator: { name: string } | null }>).map((c) => {
-      const coord = c.coordinator?.name ?? '(unassigned)';
-      return `• ${c.name}: **${coord}**`;
+    type Row = { slug: string; name: string; coordinator_member_id: string | null };
+    const rows = (circles as Row[]) ?? [];
+
+    const ids = rows.map((c) => c.coordinator_member_id).filter((v): v is string => Boolean(v));
+    const nameById = new Map<string, string>();
+    if (ids.length > 0) {
+      const { data: members } = await db()
+        .from('stock_team_members')
+        .select('id, name')
+        .in('id', ids);
+      for (const m of (members as Array<{ id: string; name: string }> | null) ?? []) {
+        nameById.set(m.id, m.name);
+      }
+    }
+
+    const lines = rows.map((c) => {
+      const coord = c.coordinator_member_id ? nameById.get(c.coordinator_member_id) ?? '(unknown)' : '(unassigned)';
+      return `• ${c.name} (/${c.slug}): ${coord}`;
     });
 
-    await ctx.reply(['**Circle coordinators**', '', ...lines].join('\n'));
+    await ctx.reply(['Circle coordinators:', '', ...lines].join('\n'));
   } catch (err) {
-    await ctx.reply(`Error: ${err instanceof Error ? err.message : 'unknown'}`);
+    await ctx.reply(`Could not fetch coordinators: ${err instanceof Error ? err.message : 'unknown'}`);
   }
 }
 
@@ -350,14 +361,7 @@ export async function cmdProposals(ctx: Context, member: TeamMember): Promise<vo
 
     const { data: proposals } = await db()
       .from('stock_proposals')
-      .select(`
-        id,
-        circle:stock_circles(slug, name),
-        proposer:stock_team_members(name),
-        title,
-        status,
-        created_at
-      `)
+      .select('id, circle_id, proposer_member_id, title, status, created_at')
       .in('circle_id', circleIds)
       .eq('status', 'open')
       .order('created_at', { ascending: false });
@@ -367,16 +371,38 @@ export async function cmdProposals(ctx: Context, member: TeamMember): Promise<vo
       return;
     }
 
-    const lines = proposals.map((p: any) => {
-      const circle = p.circle as { slug: CircleSlug; name: string } | null;
-      return `• [${circle?.slug}] **${p.title}** by ${p.proposer?.name} - \`${p.id}\``;
+    type ProposalRow = { id: string; circle_id: string; proposer_member_id: string; title: string; status: string };
+    const rows = (proposals as ProposalRow[]) ?? [];
+
+    // Batch lookups
+    const cIds = Array.from(new Set(rows.map((p) => p.circle_id)));
+    const pIds = Array.from(new Set(rows.map((p) => p.proposer_member_id)));
+
+    const [{ data: circleRows }, { data: memberRows }] = await Promise.all([
+      db().from('stock_circles').select('id, slug, name').in('id', cIds),
+      db().from('stock_team_members').select('id, name').in('id', pIds),
+    ]);
+
+    const circleById = new Map<string, { slug: string; name: string }>();
+    for (const c of (circleRows as Array<{ id: string; slug: string; name: string }> | null) ?? []) {
+      circleById.set(c.id, { slug: c.slug, name: c.name });
+    }
+    const memberById = new Map<string, string>();
+    for (const m of (memberRows as Array<{ id: string; name: string }> | null) ?? []) {
+      memberById.set(m.id, m.name);
+    }
+
+    const lines = rows.map((p) => {
+      const circle = circleById.get(p.circle_id);
+      const proposer = memberById.get(p.proposer_member_id) ?? '(unknown)';
+      return `• [${circle?.slug ?? '?'}] ${p.title} by ${proposer} - id:${p.id.slice(0, 8)}`;
     });
 
     await ctx.reply(
-      ['**Open proposals**', '', ...lines.slice(0, 10), lines.length > 10 ? `... and ${lines.length - 10} more.` : ''].filter(Boolean).join('\n'),
+      ['Open proposals:', '', ...lines.slice(0, 10), lines.length > 10 ? `... and ${lines.length - 10} more.` : ''].filter(Boolean).join('\n'),
     );
   } catch (err) {
-    await ctx.reply(`Error: ${err instanceof Error ? err.message : 'unknown'}`);
+    await ctx.reply(`Could not fetch proposals: ${err instanceof Error ? err.message : 'unknown'}`);
   }
 }
 
@@ -497,67 +523,72 @@ export async function cmdBuddy(ctx: Context, member: TeamMember): Promise<void> 
   try {
     const { data: existing } = await db()
       .from('stock_buddy_pairings')
-      .select('buddy:stock_team_members(name, telegram_username)')
+      .select('buddy_member_id')
       .eq('new_member_id', member.id)
       .is('ended_at', null)
       .maybeSingle();
 
-    if (existing) {
-      const buddy = existing as unknown as { buddy: { name: string; telegram_username: string | null } | null };
-      if (buddy.buddy) {
-        const tgHandle = buddy.buddy.telegram_username ? `@${buddy.buddy.telegram_username}` : buddy.buddy.name;
-        await ctx.reply(`Your buddy: **${buddy.buddy.name}** (${tgHandle})`);
+    if (existing && (existing as { buddy_member_id: string }).buddy_member_id) {
+      const buddyId = (existing as { buddy_member_id: string }).buddy_member_id;
+      const { data: buddy } = await db()
+        .from('stock_team_members')
+        .select('name, telegram_username')
+        .eq('id', buddyId)
+        .maybeSingle();
+      if (buddy) {
+        const b = buddy as { name: string; telegram_username: string | null };
+        const tgHandle = b.telegram_username ? `@${b.telegram_username}` : b.name;
+        await ctx.reply(`Your buddy: ${b.name} (${tgHandle})`);
         return;
       }
     }
 
-    // Get member's circles
     const circles = await getMemberCircles(member.id);
     if (circles.length === 0) {
       await ctx.reply('You must be in at least one circle first. Use /join <circle>.');
       return;
     }
 
-    // Find active members in their circles
-    const { data: circleIds } = await db()
+    const { data: circleRows } = await db()
       .from('stock_circles')
       .select('id')
       .in('slug', circles);
 
-    if (!circleIds || circleIds.length === 0) {
+    if (!circleRows || circleRows.length === 0) {
       await ctx.reply('No active circles found.');
       return;
     }
+    const circleIds = (circleRows as Array<{ id: string }>).map((c) => c.id);
 
-    const { data: potentialBuddies } = await db()
+    const { data: peerRows } = await db()
       .from('stock_circle_members')
-      .select('member:stock_team_members(id, name, telegram_username)')
-      .in('circle_id', circleIds.map((c: { id: string }) => c.id))
+      .select('member_id')
+      .in('circle_id', circleIds)
       .neq('member_id', member.id);
 
-    if (!potentialBuddies || potentialBuddies.length === 0) {
+    if (!peerRows || peerRows.length === 0) {
       await ctx.reply('No other members in your circles yet.');
       return;
     }
+    const peerIds = Array.from(new Set((peerRows as Array<{ member_id: string }>).map((p) => p.member_id)));
 
-    // Pick random
-    const typed = potentialBuddies as unknown as Array<{
-      member: { id: string; name: string; telegram_username: string | null } | null;
-    }>;
-    const buddyData = typed[Math.floor(Math.random() * typed.length)];
-    const buddy = buddyData.member;
+    const { data: peers } = await db()
+      .from('stock_team_members')
+      .select('id, name, telegram_username, active')
+      .in('id', peerIds)
+      .neq('active', false);
 
-    if (!buddy) {
-      await ctx.reply('Could not find buddy.');
+    const candidates = (peers as Array<{ id: string; name: string; telegram_username: string | null }> | null) ?? [];
+    if (candidates.length === 0) {
+      await ctx.reply('No active peers in your circles.');
       return;
     }
 
+    const buddy = candidates[Math.floor(Math.random() * candidates.length)];
+
     const { error } = await db()
       .from('stock_buddy_pairings')
-      .insert({
-        new_member_id: member.id,
-        buddy_member_id: buddy.id,
-      });
+      .insert({ new_member_id: member.id, buddy_member_id: buddy.id });
 
     if (error) {
       await ctx.reply(`Could not pair buddy: ${error.message}`);
@@ -565,9 +596,9 @@ export async function cmdBuddy(ctx: Context, member: TeamMember): Promise<void> 
     }
 
     const tgHandle = buddy.telegram_username ? `@${buddy.telegram_username}` : buddy.name;
-    await ctx.reply(`Buddy paired: **${buddy.name}** (${tgHandle}). Reach out and introduce yourself!`);
+    await ctx.reply(`Buddy paired: ${buddy.name} (${tgHandle}). Reach out and introduce yourself.`);
   } catch (err) {
-    await ctx.reply(`Error: ${err instanceof Error ? err.message : 'unknown'}`);
+    await ctx.reply(`Could not pair buddy: ${err instanceof Error ? err.message : 'unknown'}`);
   }
 }
 

@@ -317,14 +317,30 @@ export async function executeFromText(
       }
       case 'log_contact': {
         const table = action.entity_type === 'sponsor' ? 'stock_sponsors' : 'stock_artists';
-        const { data: match } = await db()
+        let { data: match } = await db()
           .from(table)
           .select('id, name')
           .ilike('name', `%${action.name_query}%`)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
-        if (!match) return { ok: false, reply: `No ${action.entity_type} matched "${action.name_query}".` };
+        // Auto-create the entity if not found - "log contact" implies a real touchpoint,
+        // shouldn't require pre-existing row. Creates a stub the dashboard can enrich.
+        if (!match) {
+          const insertPayload =
+            action.entity_type === 'sponsor'
+              ? { name: action.name_query, status: 'contacted', track: 'local', why_them: 'auto-created via /do log_contact' }
+              : { name: action.name_query, status: 'contacted' };
+          const { data: created, error: createErr } = await db()
+            .from(table)
+            .insert(insertPayload)
+            .select('id, name')
+            .single();
+          if (createErr || !created) {
+            return { ok: false, reply: `No ${action.entity_type} matched "${action.name_query}" and couldn't auto-create: ${createErr?.message ?? 'unknown'}` };
+          }
+          match = created as { id: string; name: string };
+        }
         const { data: contact, error } = await db()
           .from('stock_contact_log')
           .insert({

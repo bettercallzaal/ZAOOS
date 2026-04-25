@@ -343,32 +343,40 @@ export async function executeFromText(
         return { ok: true, reply: `Logged ${action.direction} ${action.channel} with ${match.name}: "${action.summary.slice(0, 80)}${action.summary.length > 80 ? '...' : ''}". via bot @ ${usedPersona}` };
       }
       case 'add_idea': {
-        const ideaBody = [action.body, action.category ? `(category: ${action.category})` : null]
-          .filter(Boolean)
-          .join('\n\n') || action.title;
+        const suggestion = [
+          action.title,
+          action.body ?? '',
+          action.category ? `(category: ${action.category})` : '',
+        ].filter(Boolean).join('\n\n');
         const { data, error } = await db()
-          .from('stock_activity_log')
+          .from('stock_suggestions')
           .insert({
+            name: requester.name,
+            contact: `tg:${requester.id}`,
+            suggestion,
+          })
+          .select('id')
+          .single();
+        if (error || !data) return { ok: false, reply: `Couldn't log idea: ${error?.message ?? 'unknown'}` };
+        // Best-effort attribution. Silent if stock_activity_log doesn't exist.
+        try {
+          await db().from('stock_activity_log').insert({
             actor_id: requester.id,
-            entity_type: 'idea',
-            entity_id: null,
+            entity_type: 'suggestion',
+            entity_id: data.id,
             action: 'bot_add_idea',
             new_value: JSON.stringify({
               via: 'bot',
               persona: usedPersona,
               requested_by: requester.name,
-              requested_by_id: requester.id,
               kind: 'add_idea',
               title: action.title,
-              body: ideaBody,
               category: action.category ?? null,
-              original_text: userText.slice(0, 1000),
+              original_text: userText.slice(0, 500),
             }),
-          })
-          .select('id')
-          .single();
-        if (error || !data) return { ok: false, reply: `Couldn't log idea: ${error?.message ?? 'unknown'}` };
-        return { ok: true, reply: `Idea logged: "${action.title}". via bot @ ${usedPersona}` };
+          });
+        } catch {/* log is best-effort */}
+        return { ok: true, reply: `Idea logged: "${action.title}". Zaal sees this daily. via bot @ ${usedPersona}` };
       }
       case 'add_note': {
         const { data, error } = await db()
@@ -384,25 +392,12 @@ export async function executeFromText(
           .select('id, title')
           .single();
         if (error || !data) {
-          // Fallback to activity log if meeting_notes shape doesn't match
-          await db().from('stock_activity_log').insert({
-            actor_id: requester.id,
-            entity_type: 'note',
-            entity_id: null,
-            action: 'bot_add_note',
-            new_value: JSON.stringify({
-              via: 'bot',
-              persona: usedPersona,
-              requested_by: requester.name,
-              kind: 'add_note',
-              title: action.title,
-              body: action.body,
-              original_text: userText.slice(0, 1000),
-            }),
-          });
-          return { ok: true, reply: `Note logged (fallback): "${action.title}". via bot @ ${usedPersona}` };
+          return { ok: false, reply: `Couldn't add note: ${error?.message ?? 'unknown'}. Try /note <text> instead.` };
         }
-        await logDelegation({ requester, action, originalText: userText, persona: usedPersona, entityType: 'note', entityId: data.id, actionName: 'bot_add_note' });
+        // Best-effort attribution
+        try {
+          await logDelegation({ requester, action, originalText: userText, persona: usedPersona, entityType: 'note', entityId: data.id, actionName: 'bot_add_note' });
+        } catch {/* log is best-effort */}
         return { ok: true, reply: `Note added: "${data.title}". via bot @ ${usedPersona}` };
       }
     }

@@ -8,7 +8,7 @@ import {
   unlinkUsername,
   type TeamMember,
 } from './auth';
-import { buildStatus, buildMyTodos, buildMyContributions } from './status';
+import { buildStatus, buildMyTodos, buildMyContributions, buildAllOpenTodos } from './status';
 import { addGemba, addIdea, addNote } from './capture';
 import { executeFromText } from './actions';
 import { ask } from './llm';
@@ -68,10 +68,8 @@ async function currentMember(ctx: Context): Promise<TeamMember | null> {
 async function requireMember(ctx: Context): Promise<TeamMember | null> {
   const member = await currentMember(ctx);
   if (member) return member;
-  const u = ctx.from?.username ? `@${ctx.from.username}` : 'your Telegram account';
-  await ctx.reply(
-    `You're not on the ZAOstock team roster yet.\nAsk Zaal to link ${u} to your name, then try again.`,
-  );
+  const u = ctx.from?.username ? `@${ctx.from.username}` : 'your account';
+  await ctx.reply(`Not on the roster yet. Ping Zaal to link ${u}.`);
   return null;
 }
 
@@ -86,12 +84,32 @@ function isAdmin(ctx: Context): boolean {
 bot.command('start', async (ctx) => {
   const member = await currentMember(ctx);
   if (member) {
-    await ctx.reply(`Hey ${member.name}. Type /help to see what I can do.`);
+    await ctx.reply(
+      [
+        `Hey ${member.name}. Dashboard is your hub: https://zaoos.com/stock/team`,
+        '',
+        'Bot is backup. Useful for:',
+        '  /mytodos - what you are owning',
+        '  /do <text> - tell me what happened, I update the board',
+        '  /circles - the 8 circles, /join <slug> to grab one',
+        '  /op - 1-pagers (sponsor / partner / venue briefings)',
+        '  /digest morning - daily brief',
+        '  /ask - ask me anything',
+        '  /help - full list',
+      ].join('\n'),
+    );
     return;
   }
-  const u = ctx.from?.username ? `@${ctx.from.username}` : 'your Telegram account';
+  const u = ctx.from?.username ? `@${ctx.from.username}` : 'your account';
   await ctx.reply(
-    `Hey! I'm the ZAOstock Team Bot.\n\nI don't recognize ${u} on the roster yet. Ping Zaal to link you. Once linked you'll get:\n  /mytodos - your open tasks\n  /do <text> - natural-language actions\n  /digest - festival snapshots\n\nPublic commands work for anyone: /status /help /ask`,
+    [
+      `Hey - I'm the ZAOstock Team Bot. ZAO Festivals presents ZAOstock, Oct 3 in Ellsworth.`,
+      '',
+      `Don't recognize ${u} on the roster yet. Ping Zaal to link you.`,
+      '',
+      'Open to anyone: /status /help /ask /press',
+      'Dashboard: https://zaoos.com/stock/team',
+    ].join('\n'),
   );
 });
 
@@ -99,43 +117,48 @@ bot.command('help', async (ctx) => {
   const isGroup = ctx.chat?.type !== 'private';
   await ctx.reply(
     [
-      'ZAOstock Team Bot - v1.6',
+      'ZAOstock Team Bot - I save you typing. Dashboard has the context.',
       '',
       'Read:',
-      '  /status - festival snapshot',
-      '  /mytodos - your open todos',
+      '  /status - festival snapshot, top blockers',
+      '  /mytodos - what you are owning',
+      '  /mytodos_all - everything open across the team (claimable)',
       '  /mycontributions - your last 7 days',
+      '  /digest morning|evening|week|retro - the brief I post automatically',
       '',
-      'Act (LLM parses to DB writes):',
-      '  /do <text> - natural language -> action',
-      '  /ask <text> - ask me anything (no DB write)',
-      '',
-      'Capture:',
+      'Tell me what happened:',
+      '  /do <text> - I parse + update the board',
+      '  /idea <text> - drop into the pool, Zaal sees daily',
+      '  /note <text> - meeting note, goes to dashboard',
       '  /gemba <text> - quick standup log',
-      '  /idea <text> - drop a suggestion',
-      '  /note <text> - meeting note',
       '',
-      'One-pagers:',
-      '  /op - list briefings (sponsor / partner / venue)',
-      '  /op <slug> - read one',
-      '  /op <slug> status <draft|review|final|sent|archived> - flip status',
-      '  /op <slug> note <text> - log activity note',
-      '  /op <slug> share <recipient> - log a share',
-      '  /op <slug> append <text> - append to body',
+      'Ask me anything:',
+      '  /ask <question> - LLM reply, no DB write',
+      '  /whoami - confirm who I think you are',
       '',
       'Circles:',
-      '  /circles - list all circles + who coordinates',
-      '  /join <circle> - jump into a circle (e.g. /join music)',
-      '  /leave <circle> - step out',
+      '  /circles - all 8 + who coordinates',
+      '  /join <slug> - grab one (music, ops, partners, finance, merch, marketing, media, host)',
+      '  /leave <slug> - step out',
       '  /mycircles - what you are in',
+      '',
+      '1-pagers (sponsor / partner / venue briefings):',
+      '  /op - list',
+      '  /op <slug> - read one',
+      '  /op <slug> status <draft|review|final|sent|archived>',
+      '  /op <slug> note <text> - log activity',
+      '  /op <slug> share <recipient> - log a send',
+      '  /op <slug> append <text> - extend the body',
+      '',
+      'External (anyone, no link needed):',
+      '  /press - press kit + contact info',
       '',
       'Ops:',
       '  /chatinfo - chat + topic ids',
-      '  /digest morning|evening|week|retro - preview on demand',
       isGroup
         ? '\n@mention me in a group to act. I respond only when tagged.'
-        : '\nIn DM I auto-parse plain text as an action.',
-      'Dashboard: https://zaoos.com/stock/team',
+        : '\nIn DM I auto-parse plain text. Just type what happened.',
+      'Dashboard is your hub: https://zaoos.com/stock/team',
     ].join('\n'),
   );
 });
@@ -150,10 +173,33 @@ bot.command('mytodos', async (ctx) => {
   await ctx.reply(await buildMyTodos(member));
 });
 
+bot.command('mytodos_all', async (ctx) => {
+  await ctx.reply(await buildAllOpenTodos());
+});
+
 bot.command('mycontributions', async (ctx) => {
   const member = await requireMember(ctx);
   if (!member) return;
   await ctx.reply(await buildMyContributions(member));
+});
+
+bot.command('press', async (ctx) => {
+  await ctx.reply(
+    [
+      'ZAO Festivals presents ZAOstock - Year 1, Oct 3 2026, Ellsworth Maine.',
+      '',
+      'Press kit + 1-pagers: https://zaoos.com/stock/onepagers',
+      'Public overview: https://zaoos.com/stock/onepagers/overview',
+      'Landing page: https://zaoos.com/stock',
+      '',
+      'Run by The ZAO (ZTalent Artist Organization). Music first.',
+      '',
+      'For interviews, photo passes, sponsor inquiries, partnership:',
+      '  zaal@thezao.com',
+      '',
+      'Newsletter: https://paragraph.com/@thezao',
+    ].join('\n'),
+  );
 });
 
 bot.command('gemba', async (ctx) => {

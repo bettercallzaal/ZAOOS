@@ -16,6 +16,7 @@ import { ensureChatRegistered, getChatRow, setChatMode, setPostDigests } from '.
 import { scheduleAll } from './schedule';
 import { alertDevops, buildHealthReport } from './ops';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
+import { cmdOp } from './onepagers';
 import {
   cmdCircles,
   cmdJoin,
@@ -113,6 +114,14 @@ bot.command('help', async (ctx) => {
       '  /gemba <text> - quick standup log',
       '  /idea <text> - drop a suggestion',
       '  /note <text> - meeting note',
+      '',
+      'One-pagers:',
+      '  /op - list briefings (sponsor / partner / venue)',
+      '  /op <slug> - read one',
+      '  /op <slug> status <draft|review|final|sent|archived> - flip status',
+      '  /op <slug> note <text> - log activity note',
+      '  /op <slug> share <recipient> - log a share',
+      '  /op <slug> append <text> - append to body',
       '',
       'Circles:',
       '  /circles - list all circles + who coordinates',
@@ -331,6 +340,13 @@ bot.command('digest', async (ctx) => {
     text = `Digest failed: ${err instanceof Error ? err.message : 'unknown'}`;
   }
   await ctx.reply(text);
+});
+
+// ---- One-pagers (sponsor/partner/venue briefings) --------------------------
+
+bot.command('op', async (ctx) => {
+  const member = await currentMember(ctx);
+  await cmdOp(ctx, member);
 });
 
 // ---- Circles governance commands -------------------------------------------

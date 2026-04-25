@@ -6,7 +6,7 @@ import type { TeamMember } from './auth';
 import { db } from './supabase';
 import { alertDevops } from './ops';
 
-const CIRCLE_SLUGS = ['music', 'ops', 'partners', 'merch', 'marketing', 'host'] as const;
+const CIRCLE_SLUGS = ['music', 'ops', 'partners', 'finance', 'merch', 'marketing', 'media', 'host'] as const;
 type CircleSlug = (typeof CIRCLE_SLUGS)[number];
 
 interface Circle {
@@ -39,45 +39,56 @@ function validateCircleSlug(slug: string): slug is CircleSlug {
 async function getCircle(slug: CircleSlug): Promise<Circle | null> {
   const { data, error } = await db()
     .from('stock_circles')
-    .select(`
-      id,
-      slug,
-      name,
-      coordinator_member_id,
-      coordinator:stock_team_members(name)
-    `)
+    .select('id, slug, name, coordinator_member_id')
     .eq('slug', slug)
     .maybeSingle();
 
   if (error || !data) return null;
 
-  const { data: countData } = await db()
-    .from('stock_circle_members')
-    .select('id')
-    .eq('circle_id', (data as unknown as { id: string }).id);
+  const row = data as { id: string; slug: CircleSlug; name: string; coordinator_member_id: string | null };
 
-  const coordinator = ((data as unknown as { coordinator: { name: string } | null }).coordinator);
+  const { data: members } = await db()
+    .from('stock_circle_members')
+    .select('member_id')
+    .eq('circle_id', row.id);
+
+  let coordinator_name: string | null = null;
+  if (row.coordinator_member_id) {
+    const { data: coord } = await db()
+      .from('stock_team_members')
+      .select('name')
+      .eq('id', row.coordinator_member_id)
+      .maybeSingle();
+    coordinator_name = (coord as { name: string } | null)?.name ?? null;
+  }
 
   return {
-    id: (data as unknown as { id: string }).id,
-    slug: (data as unknown as { slug: CircleSlug }).slug,
-    name: (data as unknown as { name: string }).name,
-    member_count: countData?.length ?? 0,
-    coordinator_id: (data as unknown as { coordinator_member_id: string | null }).coordinator_member_id,
-    coordinator_name: coordinator?.name ?? null,
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    member_count: members?.length ?? 0,
+    coordinator_id: row.coordinator_member_id,
+    coordinator_name,
   };
 }
 
 async function getMemberCircles(memberId: string): Promise<CircleSlug[]> {
-  const { data } = await db()
+  const { data: rows } = await db()
     .from('stock_circle_members')
-    .select('circle:stock_circles(slug)')
+    .select('circle_id')
     .eq('member_id', memberId);
 
-  if (!data) return [];
-  return (data as unknown as Array<{ circle: { slug: CircleSlug } | null }>)
-    .map((row) => row.circle?.slug)
-    .filter((slug): slug is CircleSlug => Boolean(slug));
+  if (!rows || rows.length === 0) return [];
+  const circleIds = (rows as Array<{ circle_id: string }>).map((r) => r.circle_id);
+
+  const { data: circles } = await db()
+    .from('stock_circles')
+    .select('slug')
+    .in('id', circleIds);
+
+  return ((circles as Array<{ slug: string }> | null) ?? [])
+    .map((c) => c.slug.toLowerCase())
+    .filter((slug): slug is CircleSlug => CIRCLE_SLUGS.includes(slug as CircleSlug));
 }
 
 // ---- Commands ----
@@ -86,30 +97,49 @@ export async function cmdCircles(ctx: Context): Promise<void> {
   try {
     const { data: circles, error } = await db()
       .from('stock_circles')
-      .select(`
-        id,
-        slug,
-        name,
-        coordinator_member_id,
-        coordinator:stock_team_members(name)
-      `)
+      .select('id, slug, name, coordinator_member_id')
       .order('slug');
 
     if (error || !circles) {
-      await ctx.reply('Could not fetch circles.');
+      await ctx.reply(`Could not fetch circles${error ? `: ${error.message}` : ''}`);
       return;
     }
 
-    const lines = (circles as unknown as Array<{ name: string; slug: CircleSlug; coordinator: { name: string } | null }>).map(
-      (c) => {
-        const coord = c.coordinator?.name ?? '(unassigned)';
-        return `• **${c.name}** (\`${c.slug}\`) - coordinator: ${coord}`;
-      },
-    );
+    type CircleRow = { id: string; slug: string; name: string; coordinator_member_id: string | null };
+    const rows = (circles as CircleRow[]) ?? [];
 
-    await ctx.reply(['**Circles**', '', ...lines].join('\n'));
+    // Batch lookup coordinator names
+    const coordIds = rows.map((c) => c.coordinator_member_id).filter((v): v is string => Boolean(v));
+    const coordMap = new Map<string, string>();
+    if (coordIds.length > 0) {
+      const { data: coords } = await db()
+        .from('stock_team_members')
+        .select('id, name')
+        .in('id', coordIds);
+      for (const c of (coords as Array<{ id: string; name: string }> | null) ?? []) {
+        coordMap.set(c.id, c.name);
+      }
+    }
+
+    // Batch member counts
+    const { data: allMembers } = await db()
+      .from('stock_circle_members')
+      .select('circle_id');
+    const counts = new Map<string, number>();
+    for (const m of (allMembers as Array<{ circle_id: string }> | null) ?? []) {
+      counts.set(m.circle_id, (counts.get(m.circle_id) ?? 0) + 1);
+    }
+
+    const lines = rows.map((c) => {
+      const coord = c.coordinator_member_id ? coordMap.get(c.coordinator_member_id) ?? '(unknown)' : '(unassigned)';
+      const count = counts.get(c.id) ?? 0;
+      return `• ${c.name} (/${c.slug}) - ${count} member${count === 1 ? '' : 's'} - coordinator: ${coord}`;
+    });
+
+    const out = ['Circles:', '', ...lines, '', 'Join: /join <slug> · Leave: /leave <slug> · Mine: /mycircles'].join('\n');
+    await ctx.reply(out);
   } catch (err) {
-    await ctx.reply(`Error: ${err instanceof Error ? err.message : 'unknown'}`);
+    await ctx.reply(`Could not fetch circles: ${err instanceof Error ? err.message : 'unknown'}`);
   }
 }
 

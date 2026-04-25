@@ -17,6 +17,7 @@ import { scheduleAll } from './schedule';
 import { alertDevops, buildHealthReport } from './ops';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
 import { cmdOp } from './onepagers';
+import { cmdFix, cmdFixStatus } from './hermes/commands';
 import {
   cmdCircles,
   cmdJoin,
@@ -153,6 +154,10 @@ bot.command('help', async (ctx) => {
       'External (anyone, no link needed):',
       '  /press - press kit + contact info',
       '',
+      'Hermes (admin only):',
+      '  /fix <issue> - Coder writes diff, Critic grades, you get a PR if score >=70',
+      '  /fix_status [run_id] - check open Hermes runs',
+      '',
       'Ops:',
       '  /chatinfo - chat + topic ids',
       isGroup
@@ -181,6 +186,15 @@ bot.command('mycontributions', async (ctx) => {
   const member = await requireMember(ctx);
   if (!member) return;
   await ctx.reply(await buildMyContributions(member));
+});
+
+bot.command('fix', async (ctx) => {
+  const member = await resolveMember(ctx.from?.id, ctx.from?.username);
+  await cmdFix(ctx, member);
+});
+
+bot.command('fix_status', async (ctx) => {
+  await cmdFixStatus(ctx);
 });
 
 bot.command('press', async (ctx) => {

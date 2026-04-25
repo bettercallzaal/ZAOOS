@@ -1,11 +1,11 @@
 ---
 name: onepager
-description: Create a new ZAOstock one-pager (sponsor / partner / venue / city briefing). Asks for audience + purpose, drafts the markdown with frontmatter, saves to ZAO-STOCK/onepagers/, and surfaces the dashboard URL. Use when prepping a meeting, sponsor pitch, or partner briefing.
+description: Draft a new ZAOstock one-pager (sponsor / partner / venue / city briefing) and insert it into Supabase stock_onepagers. Renders at zaoos.com/stock/onepagers/<slug>. Bot can edit via /op once inserted.
 ---
 
-# /onepager - ZAOstock One-Pager Creator
+# /onepager - ZAOstock One-Pager Drafter
 
-Creates a new one-page briefing doc for sponsors, partners, venues, city contacts, or any external stakeholder. Saves as markdown to `ZAO-STOCK/onepagers/<slug>.md`. Renders at `/stock/onepagers/<slug>` on the dashboard.
+Drafts a new one-page briefing doc and inserts it into Supabase (`stock_onepagers` table). Renders at `/stock/onepagers/<slug>` on the dashboard. Bot can edit it via `/op` commands once it's there. Single source = DB.
 
 ## When to use
 
@@ -25,20 +25,24 @@ If the user typed args (e.g. `/onepager Bangor Savings sponsor pitch`), use them
 4. **Visibility** - `internal` (default, requires login) or `public` (shareable URL no login)
 5. **Reviewers** (optional) - who should review before sending? Default: just Zaal.
 
-Skip questions the user already answered in the args.
+Skip questions the user already answered.
 
-## Step 2: Read the template
+## Step 2: Reference the seed pager
 
-Reference doc: `ZAO-STOCK/onepagers/roddy-parks-rec.md`. Mirror that structure:
+The first 1-pager is `roddy-parks-rec`. Read its body via:
+```
+SELECT body FROM stock_onepagers WHERE slug = 'roddy-parks-rec';
+```
+Mirror its structure:
 - H1 title (event + date)
 - Blockquote: title line, contact, date, audience
-- Section: **What it is** (1 paragraph + format + anchor partners line)
-- Section: **Why this audience / venue** (1 paragraph - personal + relevant)
-- Section: **Expected scale** (table or bullets - attendance, hours, format)
-- Section: **What we bring** (bullets - production, insurance, crew, build-in-public)
-- Section: **What we'd ask** (numbered list - the actual ask)
-- Section: **What success looks like** (1 paragraph)
-- Section: **Why now** (1 paragraph)
+- **What it is** (1 paragraph + format + anchor partners)
+- **Why this audience / venue** (1 paragraph - personal + relevant)
+- **Expected scale** (table: attendance, hours, format)
+- **What we bring** (bullets - production, insurance, crew, build-in-public)
+- **What we'd ask** (numbered list - the actual ask)
+- **What success looks like** (1 paragraph)
+- **Why now** (1 paragraph)
 - Closer: "One ask above all: [the most important thing]"
 
 Tighten for the audience. Sponsor pitch -> emphasize value to sponsor. Venue ask -> emphasize logistics. Artist booking -> emphasize lineup quality + payment terms.
@@ -50,82 +54,74 @@ From audience + purpose: lowercase, hyphens, max 40 chars. Examples:
 - "Bangor Savings" + "sponsor pitch" -> `bangor-savings-sponsor`
 - "Wallace Events" + "tent partnership" -> `wallace-events-tents`
 
-Check if slug already exists in `ZAO-STOCK/onepagers/`. If yes, append `-v2` or version suffix.
+Check uniqueness: `SELECT 1 FROM stock_onepagers WHERE slug = '<slug>'`. If exists, append `-v2`.
 
-## Step 4: Build the frontmatter
+## Step 4: Draft the body
 
-```yaml
----
-title: ZAOstock 2026 - <short title>
-audience: <full audience line>
-purpose: <one-sentence purpose>
-meeting_date: <YYYY-MM-DD or omit>
-meeting_location: <where, or omit>
-date: <today YYYY-MM-DD>
-status: draft
-visibility: internal
-version: 1
-authors: Zaal
-reviewers: <who reviews, or "Zaal" alone>
----
-```
-
-Status values: `draft` | `review` | `final` | `sent` | `archived`. Always start at `draft`.
-
-## Step 5: Draft the body
-
-Use ZAO + ZAOstock context from memory:
-- Oct 3 2026, Franklin St Parklet, Ellsworth Maine
+ZAOstock context to use:
+- Oct 3 2026, Franklin St Parklet, Ellsworth Maine + Aug 15 dry-run
 - The ZAO = ZTalent Artist Organization, music community, 188 members, 4 years building
 - Anchor partners: Wallace Events (production), Heart of Ellsworth (community/Cara Romano), Art of Ellsworth (umbrella)
 - 19-person volunteer crew across 8 circles (music/ops/partners/finance/merch/marketing/media/host)
-- Aug 15 dry-run also planned ($900 budget, 50 invited)
-- Build-in-public ethos
-- Free admission, donations + sponsor support
+- Build-in-public ethos. Free admission, donations + sponsor support.
 
 Tone:
 - Direct, grounded, no hype
 - No emojis, no em dashes (hyphens only)
 - No "thrilled" / "excited" / "amazing" filler
-- Lowercase casual mixed with professional - match BetterCallZaal voice
+- Match BetterCallZaal voice
 
-## Step 6: Save the file
+## Step 5: Insert into DB
 
-Write to `ZAO-STOCK/onepagers/<slug>.md`. Confirm success.
+Output the SQL for user to paste into Supabase SQL Editor:
 
-## Step 7: Report back
+```sql
+INSERT INTO stock_onepagers (
+  slug, title, audience, purpose, body, status, visibility,
+  meeting_date, meeting_location, authors, reviewers, version
+) VALUES (
+  '<slug>',
+  '<title>',
+  '<audience>',
+  '<purpose>',
+  E'<body>',
+  'draft',
+  'internal',
+  '<YYYY-MM-DD or NULL>',
+  '<location or NULL>',
+  'Zaal',
+  '<reviewers or NULL>',
+  1
+) ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO stock_onepager_activity (onepager_id, member_id, type, content)
+SELECT id, (SELECT id FROM stock_team_members WHERE name = 'Zaal' LIMIT 1), 'created', 'Created via /onepager skill'
+FROM stock_onepagers WHERE slug = '<slug>';
+```
+
+Use `E'...'` so `\n` becomes a newline. Escape single quotes by doubling: `'` -> `''`.
+
+Use the /clipboard skill (or write to /tmp/clipboard.html) to put the SQL in a one-click-copy page.
+
+## Step 6: Confirm + suggest next steps
 
 Tell user:
-- File path saved
-- URL on dashboard: `/stock/onepagers/<slug>` (will work after PR merge + deploy)
-- Suggested next steps: review draft, ping reviewers, edit before sending
-
-If reviewers were specified, optionally generate a copy-pastable Telegram DM asking them for feedback (similar to the Shawn ask in the Roddy 1-pager flow).
+- Slug + title
+- View at `https://zaoos.com/stock/onepagers/<slug>` (after Vercel deploy)
+- Edit later via dashboard inline editor or bot `/op <slug>`
+- If reviewers were specified, generate a Telegram DM asking them for feedback
 
 ## Anti-patterns
 
 - Don't write a 3-page doc. One page printed = ~600 words tops.
 - Don't include sponsor amounts unless user explicitly says them.
-- Don't fabricate attendance numbers - use range estimates and flag as "estimate" if unsure.
-- Don't promise things that need legal review (insurance, indemnity language) - say "TBD" instead.
-- Don't add status tracking columns or kanban-y stuff. This is a one-page narrative document.
+- Don't fabricate attendance numbers - use range estimates and flag as "estimate".
+- Don't promise things that need legal review - say "TBD" instead.
+- Don't write to `ZAO-STOCK/onepagers/*.md` - deprecated, single source = DB.
 
-## Examples
+## Editing existing 1-pagers
 
-**Quick invocation:**
-```
-/onepager Bangor Savings, $5K sponsor pitch
-```
--> ask remaining questions (meeting date? visibility?), draft, save to `bangor-savings-sponsor.md`.
-
-**Full invocation:**
-```
-/onepager
-```
--> ask all 5 questions, then draft + save.
-
-**Args-rich invocation:**
-```
-/onepager Steve Peer, ZAOstock co-curator pitch, in-person Apr 30 at 430 Bayside, internal
-```
--> save directly without asking.
+The skill creates new 1-pagers only. To edit existing ones:
+- Dashboard: `/stock/onepagers/<slug>` -> Open the editor
+- Bot: `/op <slug> append <text>` · `/op <slug> status sent` · `/op <slug> note "..."`
+- Or update DB row directly

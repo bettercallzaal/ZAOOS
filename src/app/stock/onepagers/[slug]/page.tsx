@@ -7,6 +7,9 @@ import { getStockTeamMember } from '@/lib/auth/stock-team-session';
 import { getOnePager } from '@/lib/stock/onepagers';
 import { CopyButton } from './CopyButton';
 import { PrintButton } from './PrintButton';
+import { OnePagerEditor } from './OnePagerEditor';
+import { ActivityFeed } from './ActivityFeed';
+import { listActivity } from '@/lib/stock/onepagers';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,15 +19,16 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const p = getOnePager(slug);
+  const p = await getOnePager(slug);
   if (!p) return { title: 'Not found' };
   return { title: p.title, description: p.purpose };
 }
 
 export default async function OnePagerDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const pager = getOnePager(slug);
+  const pager = await getOnePager(slug);
   if (!pager) notFound();
+  const activity = await listActivity(slug, 30);
 
   const session = await getStockTeamMember();
   if (pager.visibility !== 'public' && !session) {
@@ -58,7 +62,7 @@ export default async function OnePagerDetailPage({ params }: PageProps) {
             {pager.status}
           </span>
           <span>v{pager.version}</span>
-          {pager.date && <span>updated {pager.date}</span>}
+          {pager.updated_at && <span>updated {pager.updated_at.slice(0, 10)}</span>}
           {pager.visibility === 'public' && (
             <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-emerald-300">
               public link
@@ -81,6 +85,18 @@ export default async function OnePagerDetailPage({ params }: PageProps) {
       <article className="onepager-body text-sm leading-relaxed text-slate-200 print:text-slate-900 print:text-base">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{pager.body}</ReactMarkdown>
       </article>
+
+      {session && (
+        <section className="mt-10 print:hidden">
+          <OnePagerEditor pager={pager} />
+        </section>
+      )}
+
+      {session && activity.length > 0 && (
+        <section className="mt-10 print:hidden">
+          <ActivityFeed events={activity} />
+        </section>
+      )}
 
       <style>{`
         .onepager-body h1 { font-size: 1.5rem; font-weight: 800; color: #f5a623; margin-top: 1.5rem; margin-bottom: 0.75rem; }

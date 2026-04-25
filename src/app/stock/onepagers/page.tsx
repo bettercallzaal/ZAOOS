@@ -20,7 +20,7 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default async function OnePagersPage() {
   const session = await getStockTeamMember();
-  const all = listOnePagers();
+  const all = await listOnePagers();
   const visible = all.filter((p) => p.visibility === 'public' || session !== null);
 
   return (
@@ -28,7 +28,7 @@ export default async function OnePagersPage() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-amber-400">One-Pagers</h1>
         <p className="mt-2 max-w-2xl text-sm text-slate-400">
-          Briefing docs for sponsors, partners, venues, and city contacts. Each is a single page meant to be printed, emailed, or shared. Edit the markdown source in <code className="rounded bg-slate-900 px-1 py-0.5 text-xs">ZAO-STOCK/onepagers/</code>.
+          Briefing docs for sponsors, partners, venues, and city contacts. Each is a single page meant to be printed, emailed, or shared. Drafted via Claude <code className="rounded bg-slate-900 px-1 py-0.5 text-xs">/onepager</code> skill or DM the team bot. Edited inline below.
         </p>
       </header>
 
@@ -40,7 +40,7 @@ export default async function OnePagersPage() {
 
       {visible.length === 0 ? (
         <div className="rounded-xl border border-white/10 bg-slate-900/40 p-8 text-center text-sm text-slate-400">
-          No one-pagers yet. Add a markdown file to <code className="rounded bg-slate-800 px-1 py-0.5 text-xs">ZAO-STOCK/onepagers/your-slug.md</code> with frontmatter (title, audience, purpose, status, visibility) and it'll show up here.
+          No one-pagers yet. Run the migration <code className="rounded bg-slate-800 px-1 py-0.5 text-xs">scripts/stock-onepagers-migration.sql</code> in Supabase, then drafts will appear here.
         </div>
       ) : (
         <div className="space-y-3">

@@ -59,6 +59,17 @@ const ActionSchema = z.discriminatedUnion('kind', [
     direction: z.enum(['outbound', 'inbound']).default('outbound'),
   }),
   z.object({
+    kind: z.literal('add_idea'),
+    title: z.string().min(1).max(300),
+    body: z.string().max(4000).optional(),
+    category: z.string().max(100).optional(),
+  }),
+  z.object({
+    kind: z.literal('add_note'),
+    title: z.string().min(1).max(300),
+    body: z.string().min(1).max(8000),
+  }),
+  z.object({
     kind: z.literal('unknown'),
     reason: z.string(),
   }),
@@ -80,6 +91,8 @@ Allowed actions:
 - { "kind": "update_artist_status", "name_query": "substring match", "status": "wishlist|contacted|interested|confirmed|declined|travel_booked" }
 - { "kind": "add_milestone", "title": "...", "due_date": "YYYY-MM-DD", "category": "sponsors|artists|ops|marketing|event|logistics|post|...?" }
 - { "kind": "log_contact", "entity_type": "sponsor|artist", "name_query": "substring match", "summary": "brief what was said", "channel": "email|call|sms|dm_farcaster|dm_x|dm_tg|in_person|other?", "direction": "outbound|inbound?" }
+- { "kind": "add_idea", "title": "...", "body": "...?", "category": "music|ops|merch|marketing|...?" }
+- { "kind": "add_note", "title": "...", "body": "..." }
 - { "kind": "unknown", "reason": "what's missing or ambiguous" }
 
 Rules:
@@ -91,7 +104,16 @@ Rules:
 
 function stripCodeFences(text: string): string {
   let s = text.trim();
+  // Minimax M2.7 + other reasoning models wrap output in <think>...</think>.
+  // Strip every think block so JSON parsing can find the actual payload.
+  s = s.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
   if (s.startsWith('```')) s = s.replace(/^```(?:json)?\s*/, '').replace(/```$/, '').trim();
+  // If model still emitted prose around JSON, slice to the first/last brace.
+  const firstBrace = s.indexOf('{');
+  const lastBrace = s.lastIndexOf('}');
+  if (firstBrace > 0 && lastBrace > firstBrace) {
+    s = s.slice(firstBrace, lastBrace + 1);
+  }
   return s;
 }
 
@@ -319,6 +341,69 @@ export async function executeFromText(
         if (error) return { ok: false, reply: `Couldn't log contact: ${error.message}` };
         await logDelegation({ requester, action, originalText: userText, persona: usedPersona, entityType: action.entity_type, entityId: match.id, actionName: 'bot_log_contact' });
         return { ok: true, reply: `Logged ${action.direction} ${action.channel} with ${match.name}: "${action.summary.slice(0, 80)}${action.summary.length > 80 ? '...' : ''}". via bot @ ${usedPersona}` };
+      }
+      case 'add_idea': {
+        const ideaBody = [action.body, action.category ? `(category: ${action.category})` : null]
+          .filter(Boolean)
+          .join('\n\n') || action.title;
+        const { data, error } = await db()
+          .from('stock_activity_log')
+          .insert({
+            actor_id: requester.id,
+            entity_type: 'idea',
+            entity_id: null,
+            action: 'bot_add_idea',
+            new_value: JSON.stringify({
+              via: 'bot',
+              persona: usedPersona,
+              requested_by: requester.name,
+              requested_by_id: requester.id,
+              kind: 'add_idea',
+              title: action.title,
+              body: ideaBody,
+              category: action.category ?? null,
+              original_text: userText.slice(0, 1000),
+            }),
+          })
+          .select('id')
+          .single();
+        if (error || !data) return { ok: false, reply: `Couldn't log idea: ${error?.message ?? 'unknown'}` };
+        return { ok: true, reply: `Idea logged: "${action.title}". via bot @ ${usedPersona}` };
+      }
+      case 'add_note': {
+        const { data, error } = await db()
+          .from('stock_meeting_notes')
+          .insert({
+            title: action.title,
+            notes: action.body,
+            meeting_date: new Date().toISOString().slice(0, 10),
+            attendees: [requester.name],
+            action_items: '',
+            creator_id: requester.id,
+          })
+          .select('id, title')
+          .single();
+        if (error || !data) {
+          // Fallback to activity log if meeting_notes shape doesn't match
+          await db().from('stock_activity_log').insert({
+            actor_id: requester.id,
+            entity_type: 'note',
+            entity_id: null,
+            action: 'bot_add_note',
+            new_value: JSON.stringify({
+              via: 'bot',
+              persona: usedPersona,
+              requested_by: requester.name,
+              kind: 'add_note',
+              title: action.title,
+              body: action.body,
+              original_text: userText.slice(0, 1000),
+            }),
+          });
+          return { ok: true, reply: `Note logged (fallback): "${action.title}". via bot @ ${usedPersona}` };
+        }
+        await logDelegation({ requester, action, originalText: userText, persona: usedPersona, entityType: 'note', entityId: data.id, actionName: 'bot_add_note' });
+        return { ok: true, reply: `Note added: "${data.title}". via bot @ ${usedPersona}` };
       }
     }
   } catch (err) {

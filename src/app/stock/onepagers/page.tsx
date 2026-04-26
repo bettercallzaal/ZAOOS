@@ -21,7 +21,10 @@ const STATUS_COLOR: Record<string, string> = {
 export default async function OnePagersPage() {
   const session = await getStockTeamMember();
   const all = await listOnePagers();
-  const visible = all.filter((p) => p.visibility === 'public' || session !== null);
+  // Public guests see only the rich overview onepager. Internal teammates see all.
+  const visible = session
+    ? all
+    : all.filter((p) => p.visibility === 'public' && p.slug === 'overview');
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 text-slate-100">

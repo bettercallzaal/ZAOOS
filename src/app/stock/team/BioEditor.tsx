@@ -2,6 +2,26 @@
 
 import { useState } from 'react';
 
+// Try to coerce common share-link formats into a direct image URL the
+// browser can render in an <img> tag. Returns the original on no-op.
+function normalizePhotoUrl(input: string): string {
+  const url = input.trim();
+  if (!url) return url;
+
+  // Already an obvious direct image
+  if (/\.(png|jpe?g|webp|gif|avif)(\?|#|$)/i.test(url)) return url;
+
+  // Imgur single-image page: imgur.com/abc123 -> i.imgur.com/abc123.jpg
+  const imgurSingle = url.match(/^https?:\/\/(?:www\.)?imgur\.com\/([A-Za-z0-9]{5,})(?:[?#].*)?$/);
+  if (imgurSingle) return `https://i.imgur.com/${imgurSingle[1]}.jpg`;
+
+  // i.imgur.com without extension
+  const iImgur = url.match(/^https?:\/\/i\.imgur\.com\/([A-Za-z0-9]{5,})(?:[?#].*)?$/);
+  if (iImgur) return `https://i.imgur.com/${iImgur[1]}.jpg`;
+
+  return url;
+}
+
 const SCOPE_OPTIONS: Array<{ value: string; label: string; hint: string }> = [
   { value: '', label: 'Not picked yet', hint: 'decide later' },
   { value: 'ops', label: 'Operations', hint: 'logistics, partnerships, run-of-show' },
@@ -111,12 +131,24 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
           <input
             value={photoUrl}
             onChange={(e) => { setPhotoUrl(e.target.value); setPhotoBroken(false); }}
+            onBlur={(e) => {
+              const normalized = normalizePhotoUrl(e.target.value);
+              if (normalized !== e.target.value) { setPhotoUrl(normalized); setPhotoBroken(false); }
+            }}
             placeholder="Photo URL (https://...) - paste your X/Farcaster/Imgur pfp link"
             maxLength={500}
             className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
           />
           {photoBroken && photoUrl.trim() && (
-            <p className="text-[10px] text-amber-400">That image URL did not load. Try another link.</p>
+            <div className="text-[10px] text-amber-400 space-y-0.5">
+              <p>That URL didn&rsquo;t load as an image. A few quick fixes:</p>
+              <ul className="ml-3 list-disc space-y-0.5 text-amber-300/80">
+                <li>Imgur album (<code>imgur.com/a/...</code>): open the album, right-click the image, &ldquo;Copy image address&rdquo;.</li>
+                <li>X profile pic: open your profile, right-click your avatar, &ldquo;Copy image address&rdquo;.</li>
+                <li>Or upload to <a href="https://postimages.org" target="_blank" rel="noreferrer" className="underline">postimages.org</a> and use the &ldquo;Direct link&rdquo;.</li>
+              </ul>
+              <p>The URL must end in .jpg / .png / .webp.</p>
+            </div>
           )}
 
           <textarea

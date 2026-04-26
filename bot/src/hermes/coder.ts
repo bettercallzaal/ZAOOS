@@ -144,15 +144,27 @@ export async function runFixer(input: FixerInput): Promise<FixerOutput> {
 }
 
 function parseJsonStrict<T>(text: string): T {
-  const cleaned = text
+  // Strip code fences if present
+  let cleaned = text
     .replace(/^\s*```(?:json)?\s*/i, '')
     .replace(/\s*```\s*$/i, '')
     .trim();
+
+  // Coder occasionally writes prose before/after the JSON object.
+  // Extract the largest balanced { ... } block and try parsing that.
+  if (!cleaned.startsWith('{')) {
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+    }
+  }
+
   try {
     return JSON.parse(cleaned) as T;
   } catch (err) {
     throw new Error(
-      `Stock-Coder returned non-JSON. First 200 chars: ${cleaned.slice(0, 200)}. Parse error: ${err instanceof Error ? err.message : String(err)}`,
+      `Stock-Coder returned non-JSON. First 300 chars: ${text.slice(0, 300)}. Parse error: ${err instanceof Error ? err.message : String(err)}`,
     );
   }
 }

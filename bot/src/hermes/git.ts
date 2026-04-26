@@ -76,6 +76,23 @@ export async function cloneAndBranch(
   if (checkout.exitCode !== 0) {
     throw new Error(`git checkout -b failed: ${checkout.stderr.slice(0, 400)}`);
   }
+  // Install pre-commit hook to reject any commit that contains conflict markers.
+  // Standard practice (AWS samples, AutoGPT #12469). Fresh /tmp clone has no
+  // hooks by default; we bake one in.
+  const hookPath = `${workdir}/.git/hooks/pre-commit`;
+  const hookBody = `#!/usr/bin/env bash
+# Hermes pre-commit guard - reject conflict markers
+if git diff --cached -U0 | grep -E "^\\+(<<<<<<< |=======|>>>>>>> )" >/dev/null; then
+  echo "[hermes/pre-commit] BLOCKED: commit contains unresolved conflict markers" >&2
+  exit 1
+fi
+exit 0
+`;
+  try {
+    await fs.writeFile(hookPath, hookBody, { mode: 0o755 });
+  } catch (err) {
+    console.error(`[hermes/git] pre-commit hook install failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }
 
 export async function commitAndPush(
@@ -97,6 +114,23 @@ export async function commitAndPush(
 
   const commit = await runCmd('git', ['commit', '-m', message], workdir);
   if (commit.exitCode !== 0) throw new Error(`git commit failed: ${commit.stderr.slice(0, 400)}`);
+
+  // Re-fetch + rebase against latest main BEFORE push. Catches mid-run
+  // divergence where another PR landed while Coder was working. Branch is
+  // brand-new with our single commit, so rebase is safe.
+  const fetch = await runCmd('git', ['fetch', 'origin', 'main'], workdir);
+  if (fetch.exitCode !== 0) {
+    console.error(`[hermes/git] pre-push fetch warning: ${fetch.stderr.slice(0, 200)}`);
+  } else {
+    const rebase = await runCmd('git', ['rebase', 'origin/main'], workdir);
+    if (rebase.exitCode !== 0) {
+      // Abort the rebase to leave the branch in a consistent state, then fail loud.
+      await runCmd('git', ['rebase', '--abort'], workdir);
+      throw new Error(
+        `git rebase origin/main failed: ${rebase.stderr.slice(0, 400) || rebase.stdout.slice(0, 400)}. Likely a real conflict between this run's diff and a recently-landed PR.`,
+      );
+    }
+  }
 
   const push = await runCmd('git', ['push', '-u', 'origin', branchName], workdir);
   if (push.exitCode !== 0) throw new Error(`git push failed: ${push.stderr.slice(0, 400)}`);

@@ -2,6 +2,8 @@ import { runFixer } from './coder';
 import { runCritic } from './critic';
 import { cleanupWorkdir, cloneAndBranch, commitAndPush, makeWorkdir } from './git';
 import { openPullRequest } from './pr';
+import { runPreFlightGate } from './preflight';
+import { watchPullRequest } from './pr-watcher';
 import { createRun, updateRun } from './db';
 import {
   HERMES_DEFAULT_MAX_ATTEMPTS,
@@ -134,6 +136,25 @@ export async function dispatchHermesRun(
 
       await narrator?.onCoderDone?.(created.id, attempt, fixerOut.filesChanged);
 
+      // Pre-flight quality gate: run typecheck + lint + scoped tests BEFORE
+      // Critic. Catches the failure mode where Coder writes locally-clean code
+      // but the workspace still fails CI from unrelated drift (PR #321 was
+      // exactly this - Hermes /healthcheck was clean, but stock/* lint errors
+      // blocked the merge for 13 hours). $0 tokens, ~10-15s typical.
+      const preFlight = await runPreFlightGate({
+        workTreePath: workdir,
+        filesChanged: fixerOut.filesChanged,
+      });
+      if (!preFlight.ok) {
+        lastFeedback = preFlight.error ?? 'pre-flight gate failed';
+        await updateRun(created.id, {
+          critic_feedback: `pre-flight: ${preFlight.error?.slice(0, 800) ?? ''}`,
+        });
+        await narrator?.onRetry?.(created.id, attempt + 1, `Pre-flight gate failed: ${(preFlight.error ?? '').slice(0, 200)}`);
+        await resetToMain(workdir);
+        continue;
+      }
+
       await updateRun(created.id, { status: 'critiquing' });
       await narrator?.onCriticStart?.(created.id);
 
@@ -157,6 +178,14 @@ export async function dispatchHermesRun(
           body: `${fixerOut.prBody}\n\n**Critic score:** ${critique.score}/100\n**Critic feedback:** ${critique.feedback}`,
         });
         await narrator?.onPrOpened?.(created.id, pr.number, pr.url, critique.score);
+        // Fire-and-forget PR watcher: alerts Telegram if the PR turns DIRTY
+        // or any CI check fails in the next 5 minutes. Doesn't block the run.
+        void watchPullRequest({
+          prNumber: pr.number,
+          runId: created.id,
+          branchName,
+          narrator,
+        });
         await updateRun(created.id, {
           status: 'ready',
           branch: branchName,

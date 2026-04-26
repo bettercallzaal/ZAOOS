@@ -706,6 +706,29 @@ async function poll(offset) {
         }
         emit({ source: "bot", event: "inbound", user: userId, chat: chatId, bytes: msg.text.length, trace_id, text_preview: msg.text.slice(0, 80) });
         console.log("[" + new Date().toISOString() + "] " + userId + ": " + msg.text.substring(0, 80));
+        // Multi-bot coordination guard: ignore messages targeted at other bots, and
+        // ignore unknown slash commands (fall-through to Claude was producing
+        // "Unknown skill: <name>" noise when other bots in the chat owned the command).
+        const slashHead = msg.text.match(/^\/([\w]+)(?:@([\w]+))?\b/);
+        if (slashHead) {
+          const cmdName = slashHead[1].toLowerCase();
+          const targetBot = slashHead[2] ? slashHead[2].toLowerCase() : null;
+          // If a @BotName suffix is present and it isn't ZOE, drop entirely.
+          if (targetBot && targetBot !== "zoebot" && targetBot !== "zoe" && !/zoe/.test(targetBot)) {
+            emit({ source: "bot", event: "skip_other_bot", target: targetBot, user: userId, chat: chatId, trace_id });
+            continue;
+          }
+          // If command isn't one ZOE owns, drop silently. Other bots in chat will respond.
+          const ZOE_KNOWN_COMMANDS = new Set([
+            "todo","add","done","list","todos","p0","p1","p2","p3",
+            "note","help","tip","recap","rewind","past",
+            "summarize","sum","status","focus","start","whoami",
+          ]);
+          if (!ZOE_KNOWN_COMMANDS.has(cmdName)) {
+            emit({ source: "bot", event: "skip_unknown_slash", cmd: cmdName, user: userId, chat: chatId, trace_id });
+            continue;
+          }
+        }
         // Portal todos slash commands - intercept before Claude
         const slashReply = await handleTodoCommand(msg.text);
         if (slashReply !== null) {

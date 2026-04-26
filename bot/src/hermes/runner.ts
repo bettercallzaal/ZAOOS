@@ -24,6 +24,29 @@ function estimateNotionalCost(fixerIn: number, fixerOut: number, criticIn: numbe
   return Number((fixer + critic).toFixed(4));
 }
 
+// Fleet daily ceiling: in-process counter that resets at UTC midnight.
+// Auto-pauses new /fix dispatches if today's notional spend exceeds the cap.
+// Default $20/day per doc 527 cost calibration (well under Max plan flat).
+const FLEET_DAILY_USD_CAP = Number(process.env.HERMES_FLEET_DAILY_USD_CAP ?? '20');
+let _todayUsdSpent = 0;
+let _todayDateUtc = new Date().toISOString().slice(0, 10);
+
+function fleetDailyGuard(notionalUsd: number): { ok: boolean; reason?: string } {
+  const todayUtc = new Date().toISOString().slice(0, 10);
+  if (todayUtc !== _todayDateUtc) {
+    _todayDateUtc = todayUtc;
+    _todayUsdSpent = 0;
+  }
+  if (_todayUsdSpent + notionalUsd > FLEET_DAILY_USD_CAP) {
+    return {
+      ok: false,
+      reason: `fleet daily cap $${FLEET_DAILY_USD_CAP} would be exceeded (current $${_todayUsdSpent.toFixed(2)} + this run notional $${notionalUsd.toFixed(2)})`,
+    };
+  }
+  _todayUsdSpent += notionalUsd;
+  return { ok: true };
+}
+
 export interface DispatchInput {
   triggered_by_telegram_id: number;
   triggered_in_chat_id: number;
@@ -59,6 +82,21 @@ export async function dispatchHermesRun(
   input: DispatchInput,
   narrator?: HermesNarrator,
 ): Promise<DispatchResult> {
+  // Pre-flight: refuse if fleet daily cap already hit. Use a typical-run estimate
+  // of $0.50 to gate; actual cost gets added after the run completes.
+  const guard = fleetDailyGuard(0.5);
+  if (!guard.ok) {
+    const created = await createRun(input);
+    await updateRun(created.id, {
+      status: 'failed',
+      error_message: `fleet-daily-cap-hit: ${guard.reason}`,
+      completed_at: new Date().toISOString(),
+    });
+    await narrator?.onFailed?.(created.id, guard.reason ?? 'fleet daily cap');
+    const final = (await reloadRun(created.id)) ?? created;
+    return { kind: 'failed', run: final, reason: guard.reason ?? 'fleet daily cap' };
+  }
+
   const created = await createRun(input);
   await updateRun(created.id, { status: 'fixing', started_at: new Date().toISOString() });
 

@@ -53,8 +53,42 @@ const ADMIN_IDS = (process.env.BOT_ADMIN_TELEGRAM_IDS ?? '')
 
 const ZAAL_TG_ID = Number(process.env.ZAAL_TELEGRAM_ID ?? '0') || null;
 
+// ---- Bot-name filter (must be declared before bots so it can be `use()`d
+//      before any command handlers register).
+interface UsernameHolder {
+  value: string | null;
+}
+
+const devzUsernameHolder: UsernameHolder = { value: null };
+const hermesUsernameHolder: UsernameHolder = { value: null };
+
+function buildBotNameFilter(holder: UsernameHolder) {
+  return async (ctx: Context, next: () => Promise<void>): Promise<void> => {
+    if (!holder.value) {
+      await next();
+      return;
+    }
+    const me = holder.value.toLowerCase();
+    const text = ctx.message?.text ?? '';
+    const m = text.match(/^\/[\w]+@([\w]+)\b/);
+    if (m) {
+      const target = m[1].toLowerCase();
+      if (target !== me) {
+        // Tagged for a different bot - drop silently.
+        return;
+      }
+    }
+    await next();
+  };
+}
+
 const devz = new Bot<Context>(devzToken);
 const hermes = new Bot<Context>(hermesToken);
+
+// Wire the filter middleware FIRST so it runs before any command handlers
+// that get registered below. Holders are populated in boot() via getMe().
+devz.use(buildBotNameFilter(devzUsernameHolder));
+hermes.use(buildBotNameFilter(hermesUsernameHolder));
 
 function isAdmin(ctx: Context): boolean {
   const id = ctx.from?.id;
@@ -316,6 +350,11 @@ async function boot(): Promise<void> {
   const devzInfo = await devz.api.getMe();
   const hermesInfo = await hermes.api.getMe();
   _hermesUsername = hermesInfo.username ?? 'HermesBot';
+
+  // Populate the username holders so the bot-name filter (already wired at
+  // module top) can start dropping messages tagged for other bots.
+  devzUsernameHolder.value = devzInfo.username ?? 'ZAODevZBot';
+  hermesUsernameHolder.value = hermesInfo.username ?? 'HermesBot';
   console.log(`[devz] ZAODevzBot=@${devzInfo.username} HermesBot=@${hermesInfo.username} chat=${devzChatId}`);
 
   await Promise.all([

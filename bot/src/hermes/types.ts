@@ -67,10 +67,28 @@ export const HERMES_PASS_THRESHOLD = 70;
 export const HERMES_DEFAULT_MAX_ATTEMPTS = 3;
 
 // Paths Hermes refuses to touch, ever.
+// Includes: self-modification (would let agent rewrite its own safety),
+// secrets (.env*), git/npm hooks (postinstall is the #1 supply-chain vector
+// per Shai-Hulud worm + Axios compromise 2025-2026), build configs (silent
+// behavior changes), and project-level instruction files.
 export const HERMES_FORBIDDEN_PATHS = [
   'bot/src/hermes',
   'bot/migrations/hermes_runs.sql',
   '.env',
   '.env.local',
   '.env.production',
+  '.env.development',
+  '.git/hooks',
+  '.husky',
+  'package.json',
+  'package-lock.json',
+  'pnpm-lock.yaml',
+  'yarn.lock',
+  '.npmrc',
+  'tsconfig.json',
+  'tsconfig.base.json',
+  'CLAUDE.md',
+  '.claude/rules',
+  '.claude/settings.json',
+  '.claude/settings.local.json',
 ];

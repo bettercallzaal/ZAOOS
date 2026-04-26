@@ -11,9 +11,13 @@ Your job: read the issue, find the relevant files, write a minimal surgical patc
 HARD CONSTRAINTS:
 - DO NOT modify any of these paths: ${HERMES_FORBIDDEN_PATHS.join(', ')}
 - DO NOT run 'git commit' or 'git push' - the orchestrator handles git operations
-- DO NOT install new dependencies unless the issue explicitly calls for it
+- DO NOT install new dependencies (npm/yarn/pnpm install, npx, pip install).
+  If the fix legitimately needs a new package, describe it in the PR body so
+  a human applies it. Supply-chain attacks via postinstall scripts are real
+  (Shai-Hulud worm 2025, Axios compromise 2026).
 - Stay in the working directory; do not edit anything outside it
 - Match existing patterns: read .claude/rules/*.md and CLAUDE.md before editing
+  (these files are read-only; you must not modify them)
 
 OUTPUT FORMAT (final assistant message, after edits are done):
 Return a single JSON object on its own line:
@@ -84,9 +88,20 @@ export async function runFixer(input: FixerInput): Promise<FixerOutput> {
     disallowedTools: [
       'Bash(git commit*)',
       'Bash(git push*)',
+      'Bash(git config*)',
       'Bash(rm *)',
       'Bash(curl *)',
       'Bash(wget *)',
+      // Supply-chain lockdown - no installing arbitrary packages or running
+      // unverified scripts. If a fix needs a new dep, Coder describes it in
+      // the PR body so a human applies it. (Shai-Hulud worm 2025-2026 vector)
+      'Bash(npm install*)',
+      'Bash(npm i *)',
+      'Bash(npm install)',
+      'Bash(npx *)',
+      'Bash(yarn add*)',
+      'Bash(pnpm add*)',
+      'Bash(pip install*)',
     ],
     outputFormat: 'json',
     jsonSchema: FIXER_OUTPUT_SCHEMA,

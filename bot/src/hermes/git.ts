@@ -76,6 +76,29 @@ export async function cloneAndBranch(
   if (checkout.exitCode !== 0) {
     throw new Error(`git checkout -b failed: ${checkout.stderr.slice(0, 400)}`);
   }
+
+  // Install deps so pre-flight typecheck + lint can run (tsc/biome live in
+  // node_modules/.bin). --ignore-scripts blocks postinstall supply-chain
+  // attacks (Shai-Hulud/Axios pattern). Use npm ci if package-lock exists,
+  // npm install otherwise. ~30-60s but only once per /fix run.
+  const lockExists = await fs
+    .access(`${workdir}/package-lock.json`)
+    .then(() => true)
+    .catch(() => false);
+  const installCmd = lockExists ? 'ci' : 'install';
+  const install = await runCmd(
+    'npm',
+    [installCmd, '--ignore-scripts', '--no-audit', '--no-fund', '--prefer-offline'],
+    workdir,
+  );
+  if (install.exitCode !== 0) {
+    // Don't hard-fail; pre-flight will surface specific errors. Some hermes runs
+    // might not need typecheck (e.g. doc-only changes). Log + continue.
+    console.error(
+      `[hermes/git] npm ${installCmd} returned exit ${install.exitCode}. Pre-flight may fail. stderr: ${install.stderr.slice(0, 300)}`,
+    );
+  }
+
   // Install pre-commit hook to reject any commit that contains conflict markers.
   // Standard practice (AWS samples, AutoGPT #12469). Fresh /tmp clone has no
   // hooks by default; we bake one in.

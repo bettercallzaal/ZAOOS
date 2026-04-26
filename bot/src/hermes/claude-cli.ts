@@ -60,9 +60,13 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     if (opts.permissionMode) {
       args.push('--permission-mode', opts.permissionMode);
     }
-    if (opts.jsonSchema) {
-      args.push('--json-schema', JSON.stringify(opts.jsonSchema));
-    }
+    // NOTE: intentionally NOT forwarding `opts.jsonSchema` to the CLI.
+    // `--json-schema` enforces strict structured output, which prevents the
+    // model from running tool calls (Read/Edit/Write/etc) before producing
+    // the final JSON. We need both. The system prompt asks for JSON in the
+    // final assistant message; the orchestrator parses it. Schema is kept on
+    // the type only as a contract reference.
+    void opts.jsonSchema; // eslint-disable-line @typescript-eslint/no-unused-vars
     if (opts.maxBudgetUsd !== undefined) {
       args.push('--max-budget-usd', String(opts.maxBudgetUsd));
     }
@@ -97,6 +101,13 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
         return;
       }
 
+      // Empty stdout means Claude exited silently - log everything we have.
+      if (!stdout.trim()) {
+        console.error('[hermes/claude-cli] empty stdout. exit_code=', code, 'stderr=', stderr.slice(0, 800), 'args=', JSON.stringify(args).slice(0, 800));
+        reject(new Error(`claude CLI returned empty stdout. exit=${code}. stderr: ${stderr.slice(0, 400) || '(empty)'}`));
+        return;
+      }
+
       try {
         if (outputFormat === 'json') {
           const parsed = JSON.parse(stdout) as {
@@ -111,6 +122,16 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
             usage?: { input_tokens?: number; output_tokens?: number };
             modelUsage?: Record<string, { inputTokens: number; outputTokens: number; costUSD: number }>;
           };
+          if (parsed.is_error) {
+            console.error('[hermes/claude-cli] is_error=true full payload:', JSON.stringify(parsed).slice(0, 1200));
+            reject(new Error(`claude CLI reported is_error=true: ${(parsed.result ?? '').slice(0, 400) || '(no result body)'}`));
+            return;
+          }
+          if (!parsed.result || !parsed.result.trim()) {
+            console.error('[hermes/claude-cli] empty result. full payload:', JSON.stringify(parsed).slice(0, 1200));
+            reject(new Error(`claude CLI returned empty result. duration=${parsed.duration_ms}ms turns=${parsed.num_turns}. session=${parsed.session_id}`));
+            return;
+          }
           const usage = parsed.usage ?? { input_tokens: 0, output_tokens: 0 };
           resolve({
             text: parsed.result ?? '',

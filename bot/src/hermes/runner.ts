@@ -9,12 +9,15 @@ import {
   type HermesRun,
 } from './types';
 
+// Notional API-rate cost (Hermes runs under Max plan auth via Claude Code CLI;
+// actual marginal cost is ~$0 because the Max sub absorbs it). Kept as a "would-have-cost"
+// signal for spend awareness.
 const COST_PER_MTOK_OPUS_IN = 15.0;
 const COST_PER_MTOK_OPUS_OUT = 75.0;
 const COST_PER_MTOK_SONNET_IN = 3.0;
 const COST_PER_MTOK_SONNET_OUT = 15.0;
 
-function estimateCost(fixerIn: number, fixerOut: number, criticIn: number, criticOut: number): number {
+function estimateNotionalCost(fixerIn: number, fixerOut: number, criticIn: number, criticOut: number): number {
   const fixer = (fixerIn / 1_000_000) * COST_PER_MTOK_OPUS_IN + (fixerOut / 1_000_000) * COST_PER_MTOK_OPUS_OUT;
   const critic =
     (criticIn / 1_000_000) * COST_PER_MTOK_SONNET_IN + (criticOut / 1_000_000) * COST_PER_MTOK_SONNET_OUT;
@@ -94,13 +97,13 @@ export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchR
           pr_url: pr.url,
           critic_score: critique.score,
           critic_feedback: critique.feedback,
-          fixer_provider: 'anthropic',
-          fixer_model: 'claude-opus-4-7',
-          critic_provider: 'anthropic',
-          critic_model: 'claude-sonnet-4-6',
+          fixer_provider: 'claude-code-cli',
+          fixer_model: process.env.HERMES_FIXER_MODEL ?? 'opus',
+          critic_provider: 'claude-code-cli',
+          critic_model: process.env.HERMES_CRITIC_MODEL ?? 'sonnet',
           total_input_tokens: totalIn,
           total_output_tokens: totalOut,
-          estimated_cost_usd: estimateCost(
+          estimated_cost_usd: estimateNotionalCost(
             totalIn - critique.inputTokens,
             totalOut - critique.outputTokens,
             critique.inputTokens,

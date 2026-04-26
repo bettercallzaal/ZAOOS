@@ -8,7 +8,7 @@ import {
   unlinkUsername,
   type TeamMember,
 } from './auth';
-import { buildStatus, buildMyTodos, buildMyContributions, buildAllOpenTodos } from './status';
+import { buildStatus, buildMyTodos, buildMyContributions, buildAllOpenTodos, buildTeamRoster } from './status';
 import { addGemba, addIdea, addNote } from './capture';
 import { executeFromText } from './actions';
 import { ask } from './llm';
@@ -411,6 +411,10 @@ bot.command('digest', async (ctx) => {
 bot.command('op', async (ctx) => {
   const member = await currentMember(ctx);
   await cmdOp(ctx, member);
+});
+
+bot.command('team', async (ctx) => {
+  await ctx.reply(await buildTeamRoster());
 });
 
 // ---- Circles governance commands -------------------------------------------

@@ -80,16 +80,48 @@ export async function linkUsernameToMember(
   if (!username) return { ok: false, reason: 'Username required' };
   if (!memberName.trim()) return { ok: false, reason: 'Member name required' };
 
-  const { data: matches, error } = await db()
+  const trimmed = memberName.trim();
+
+  // 1. Exact (case-insensitive) match first
+  const { data: exact, error } = await db()
     .from('stock_team_members')
     .select(SELECT)
-    .ilike('name', memberName.trim())
+    .ilike('name', trimmed)
     .neq('active', false);
   if (error) return { ok: false, reason: `DB error: ${error.message}` };
-  if (!matches || matches.length === 0) return { ok: false, reason: `No active member named "${memberName}"` };
-  if (matches.length > 1) return { ok: false, reason: `Multiple members match "${memberName}" - use full name` };
 
-  const target = matches[0];
+  let candidates = (exact ?? []) as TeamMember[];
+
+  // 2. Substring fallback ("thy rev" -> "Thy Revolution")
+  if (candidates.length === 0) {
+    const { data: subs } = await db()
+      .from('stock_team_members')
+      .select(SELECT)
+      .ilike('name', `%${trimmed}%`)
+      .neq('active', false);
+    candidates = (subs ?? []) as TeamMember[];
+  }
+
+  // 3. First-token match ("thy" -> "Thy Revolution") last resort
+  if (candidates.length === 0) {
+    const firstToken = trimmed.split(/\s+/)[0];
+    if (firstToken && firstToken.length >= 3) {
+      const { data: tok } = await db()
+        .from('stock_team_members')
+        .select(SELECT)
+        .ilike('name', `${firstToken}%`)
+        .neq('active', false);
+      candidates = (tok ?? []) as TeamMember[];
+    }
+  }
+
+  if (candidates.length === 0) return { ok: false, reason: `No active member named "${memberName}"` };
+  if (candidates.length > 1) {
+    const names = candidates.map((c) => c.name).join(', ');
+    return { ok: false, reason: `Multiple matches for "${memberName}": ${names}. Use full name.` };
+  }
+
+  const target = candidates[0];
 
   const { error: updateErr } = await db()
     .from('stock_team_members')

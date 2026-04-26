@@ -190,13 +190,14 @@ devz.command('help', async (ctx) => {
       'ZAO Devz - Coder half',
       '',
       'Admin only:',
-      '  /fix <issue> - dispatch Hermes loop',
+      '  Just @mention me with a description: "@ZAODevZBot add a /healthcheck command"',
+      '  /fix <issue> - same thing, more formal',
       '  /fix_status [run_id_8chars] - check open runs',
       '',
       'Open:',
       '  /whoami - confirm chat + sender ids',
       '',
-      'Pair: HermesBot reviews everything I write.',
+      'Pair: HermesBot reviews everything I write before any PR opens.',
     ].join('\n'),
   );
 });
@@ -205,22 +206,26 @@ devz.command('whoami', async (ctx) => {
   await ctx.reply(`chat_id=${ctx.chat?.id}\nfrom_id=${ctx.from?.id}\nusername=${ctx.from?.username ?? 'none'}`);
 });
 
-devz.command('fix', async (ctx) => {
+/**
+ * Shared kickoff: validates admin + chat + claude CLI, then fires the Hermes
+ * dispatch loop. Used by both `/fix` and the natural-language @mention handler.
+ */
+async function kickOffFix(ctx: Context, issueText: string): Promise<void> {
   if (!isAdmin(ctx)) {
-    await ctx.reply('Hermes /fix is admin-only. Add yourself to BOT_ADMIN_TELEGRAM_IDS.');
+    await ctx.reply('Hermes is admin-only. Add yourself to BOT_ADMIN_TELEGRAM_IDS.');
     return;
   }
   if (ctx.chat?.id !== devzChatId) {
-    await ctx.reply(`This bot only runs /fix from the ZAO Devz chat (id ${devzChatId}). You're in ${ctx.chat?.id}.`);
+    await ctx.reply(`This bot only runs from the ZAO Devz chat (id ${devzChatId}). You're in ${ctx.chat?.id}.`);
     return;
   }
   if (!existsSync(process.env.HERMES_CLAUDE_BIN ?? '/dev/null') && !(await checkClaudeOnPath())) {
     await ctx.reply("Can't find 'claude' CLI on PATH. Install Claude Code on the bot host (Max plan).");
     return;
   }
-  const text = (ctx.message?.text ?? '').replace(/^\/fix(@\w+)?\s*/, '').trim();
+  const text = issueText.trim();
   if (!text || text.length < 10) {
-    await ctx.reply('Usage: /fix <issue> - describe the bug or feature in 1-3 sentences (10+ chars).');
+    await ctx.reply('Need at least 10 characters describing what to build / fix.');
     return;
   }
   const fromId = ctx.from?.id;
@@ -237,6 +242,36 @@ devz.command('fix', async (ctx) => {
     triggered_in_chat_id: devzChatId,
     issue_text: text,
   });
+}
+
+devz.command('fix', async (ctx) => {
+  const text = (ctx.message?.text ?? '').replace(/^\/fix(@\w+)?\s*/, '').trim();
+  if (!text || text.length < 10) {
+    await ctx.reply('Usage: /fix <issue> - or just @mention me with a description in plain English. Min 10 chars.');
+    return;
+  }
+  await kickOffFix(ctx, text);
+});
+
+/**
+ * Natural-language trigger: any message that @mentions this bot and isn't
+ * already a slash command gets treated as a Hermes issue. Lets users skip
+ * `/fix` and just say `@ZAODevZBot add a healthcheck command`.
+ */
+devz.on('message:text', async (ctx) => {
+  const text = ctx.message?.text ?? '';
+  if (text.startsWith('/')) return; // already handled by command handlers
+  const myUsername = devzUsernameHolder.value;
+  if (!myUsername) return; // boot still in progress
+  const mention = new RegExp(`@${myUsername}\\b`, 'i');
+  if (!mention.test(text)) return; // not addressed to us
+  // Strip the @mention itself so the issue text is clean
+  const issue = text.replace(mention, '').trim();
+  if (issue.length < 10) {
+    await ctx.reply('Hi - mention me with a description (10+ chars) of what to build or fix and I will run the Coder + Critic loop.');
+    return;
+  }
+  await kickOffFix(ctx, issue);
 });
 
 devz.command('fix_status', async (ctx) => {

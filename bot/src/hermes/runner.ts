@@ -118,13 +118,25 @@ export async function dispatchHermesRun(
       await updateRun(created.id, { fixer_attempts: attempt, status: 'fixing' });
       await narrator?.onCoderStart?.(created.id, attempt, HERMES_DEFAULT_MAX_ATTEMPTS, input.issue_text);
 
-      const fixerOut = await runFixer({
-        issueText: input.issue_text,
-        workTreePath: workdir,
-        branchName,
-        attemptNumber: attempt,
-        previousCriticFeedback: lastFeedback,
-      });
+      let fixerOut;
+      try {
+        fixerOut = await runFixer({
+          issueText: input.issue_text,
+          workTreePath: workdir,
+          branchName,
+          attemptNumber: attempt,
+          previousCriticFeedback: lastFeedback,
+        });
+      } catch (err) {
+        // Coder's individual call failed (non-JSON output, CLI crash, etc).
+        // Treat as a soft failure - loop back rather than crashing the whole run.
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error(`[hermes/runner] fixer attempt ${attempt} threw: ${msg.slice(0, 300)}`);
+        lastFeedback = `Your previous response was not valid JSON. Output ONLY the JSON object per the system prompt - no prose before or after. Original error: ${msg.slice(0, 300)}`;
+        await narrator?.onRetry?.(created.id, attempt + 1, 'Coder returned non-JSON; retrying with stricter format reminder');
+        await resetToMain(workdir);
+        continue;
+      }
       totalIn += fixerOut.inputTokens;
       totalOut += fixerOut.outputTokens;
 

@@ -92,11 +92,35 @@ export async function cloneAndBranch(
     workdir,
   );
   if (install.exitCode !== 0) {
-    // Don't hard-fail; pre-flight will surface specific errors. Some hermes runs
-    // might not need typecheck (e.g. doc-only changes). Log + continue.
     console.error(
       `[hermes/git] npm ${installCmd} returned exit ${install.exitCode}. Pre-flight may fail. stderr: ${install.stderr.slice(0, 300)}`,
     );
+  }
+
+  // ALSO install bot/ deps. ZAO is not a real workspace (no pnpm-workspace
+  // entry for bot, has own package-lock.json) so root install doesn't pull
+  // grammy/supabase-js into bot/node_modules. Without this the bot-side
+  // typecheck fails with "Cannot find module 'grammy'".
+  const botLockExists = await fs
+    .access(`${workdir}/bot/package-lock.json`)
+    .then(() => true)
+    .catch(() => false);
+  const botPkgExists = await fs
+    .access(`${workdir}/bot/package.json`)
+    .then(() => true)
+    .catch(() => false);
+  if (botPkgExists) {
+    const botInstallCmd = botLockExists ? 'ci' : 'install';
+    const botInstall = await runCmd(
+      'npm',
+      [botInstallCmd, '--ignore-scripts', '--no-audit', '--no-fund', '--prefer-offline'],
+      `${workdir}/bot`,
+    );
+    if (botInstall.exitCode !== 0) {
+      console.error(
+        `[hermes/git] bot npm ${botInstallCmd} returned exit ${botInstall.exitCode}. Pre-flight may fail. stderr: ${botInstall.stderr.slice(0, 300)}`,
+      );
+    }
   }
 
   // Install pre-commit hook to reject any commit that contains conflict markers.

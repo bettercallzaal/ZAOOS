@@ -152,6 +152,7 @@ export async function dispatchHermesRun(
         await commitAndPush(workdir, branchName, fixerOut.commitMessage);
         const pr = await openPullRequest({
           workdir,
+          branchName,
           title: fixerOut.prTitle,
           body: `${fixerOut.prBody}\n\n**Critic score:** ${critique.score}/100\n**Critic feedback:** ${critique.feedback}`,
         });

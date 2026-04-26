@@ -36,6 +36,39 @@ function validateCircleSlug(slug: string): slug is CircleSlug {
   return CIRCLE_SLUGS.includes(slug.toLowerCase() as CircleSlug);
 }
 
+// Levenshtein for "did you mean" suggestions
+function distance(a: string, b: string): number {
+  const m = a.length;
+  const n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+    }
+  }
+  return dp[m][n];
+}
+
+function suggestSlug(input: string): CircleSlug | null {
+  const lower = input.toLowerCase().trim();
+  if (!lower) return null;
+  // substring match first (e.g. "med" -> "media")
+  const sub = CIRCLE_SLUGS.find((s) => s.startsWith(lower) || lower.startsWith(s));
+  if (sub) return sub;
+  // edit distance <= 2
+  let best: { slug: CircleSlug; d: number } | null = null;
+  for (const s of CIRCLE_SLUGS) {
+    const d = distance(lower, s);
+    if (d <= 2 && (!best || d < best.d)) best = { slug: s, d };
+  }
+  return best?.slug ?? null;
+}
+
 async function getCircle(slug: CircleSlug): Promise<Circle | null> {
   const { data, error } = await db()
     .from('stock_circles')
@@ -144,22 +177,28 @@ export async function cmdCircles(ctx: Context): Promise<void> {
 }
 
 export async function cmdJoin(ctx: Context, member: TeamMember, slug: string): Promise<void> {
-  if (!validateCircleSlug(slug)) {
-    await ctx.reply(`Unknown circle: ${slug}. Valid: ${CIRCLE_SLUGS.join(', ')}.`);
+  const lower = slug.toLowerCase().trim();
+  if (!validateCircleSlug(lower)) {
+    const suggest = suggestSlug(lower);
+    if (suggest) {
+      await ctx.reply(`Unknown circle: ${slug}. Did you mean /${suggest}? Reply /join ${suggest} to confirm.`);
+    } else {
+      await ctx.reply(`Unknown circle: ${slug}. Valid: ${CIRCLE_SLUGS.join(', ')}.`);
+    }
     return;
   }
 
   try {
-    const circle = await getCircle(slug);
+    const circle = await getCircle(lower);
     if (!circle) {
-      await ctx.reply(`Circle not found: ${slug}.`);
+      await ctx.reply(`Circle not found: ${lower}.`);
       return;
     }
 
-    // Check if already member
+    // Pre-check (composite PK is (member_id, circle_id), so select an actual column)
     const { data: existing } = await db()
       .from('stock_circle_members')
-      .select('id')
+      .select('member_id')
       .eq('circle_id', circle.id)
       .eq('member_id', member.id)
       .maybeSingle();
@@ -178,24 +217,35 @@ export async function cmdJoin(ctx: Context, member: TeamMember, slug: string): P
       });
 
     if (error) {
+      // Belt-and-suspenders: race or pre-check miss -> friendly message
+      if (error.code === '23505' || /duplicate key/i.test(error.message)) {
+        await ctx.reply(`You're already in ${circle.name}.`);
+        return;
+      }
       await ctx.reply(`Could not join: ${error.message}`);
       return;
     }
 
-    await ctx.reply(`Joined **${circle.name}** (${slug}).`);
+    await ctx.reply(`Joined ${circle.name} (${lower}).`);
   } catch (err) {
     await ctx.reply(`Error: ${err instanceof Error ? err.message : 'unknown'}`);
   }
 }
 
 export async function cmdLeave(ctx: Context, member: TeamMember, slug: string): Promise<void> {
-  if (!validateCircleSlug(slug)) {
-    await ctx.reply(`Unknown circle: ${slug}.`);
+  const lower = slug.toLowerCase().trim();
+  if (!validateCircleSlug(lower)) {
+    const suggest = suggestSlug(lower);
+    if (suggest) {
+      await ctx.reply(`Unknown circle: ${slug}. Did you mean /leave ${suggest}?`);
+    } else {
+      await ctx.reply(`Unknown circle: ${slug}. Valid: ${CIRCLE_SLUGS.join(', ')}.`);
+    }
     return;
   }
 
   try {
-    const circle = await getCircle(slug);
+    const circle = await getCircle(lower);
     if (!circle) {
       await ctx.reply(`Circle not found: ${slug}.`);
       return;

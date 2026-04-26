@@ -380,6 +380,10 @@ bot.command('whoami', async (ctx) => {
   );
 });
 
+bot.command('version', async (ctx) => {
+  await ctx.reply('v1.6 hermes loop');
+});
+
 bot.command('health', async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply('Admin only.');

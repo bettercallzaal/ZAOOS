@@ -154,6 +154,48 @@ export async function buildAllOpenTodos(): Promise<string> {
   return lines.join('\n');
 }
 
+export async function buildTeamRoster(): Promise<string> {
+  const { data, error } = await db()
+    .from('stock_team_members')
+    .select('name, scope, role, telegram_id, telegram_username, active')
+    .neq('active', false)
+    .order('name');
+
+  if (error) return `Could not fetch team: ${error.message}`;
+
+  type Row = { name: string; scope: string | null; role: string | null; telegram_id: number | null; telegram_username: string | null };
+  const rows = (data as Row[]) ?? [];
+  if (rows.length === 0) return 'No active team members.';
+
+  const byScope = new Map<string, Row[]>();
+  for (const r of rows) {
+    const k = r.scope ?? 'unscoped';
+    if (!byScope.has(k)) byScope.set(k, []);
+    byScope.get(k)!.push(r);
+  }
+
+  let linked = 0;
+  let unlinked = 0;
+  for (const r of rows) {
+    if (r.telegram_id) linked++;
+    else unlinked++;
+  }
+
+  const lines: string[] = [`ZAOstock team (${rows.length} active - ${linked} linked, ${unlinked} not yet)`, ''];
+  const scopes = Array.from(byScope.keys()).sort();
+  for (const scope of scopes) {
+    lines.push(`[${scope}]`);
+    for (const r of byScope.get(scope)!) {
+      const tag = r.telegram_id ? (r.telegram_username ? `@${r.telegram_username}` : 'linked') : 'NOT LINKED';
+      const role = r.role && r.role !== 'member' ? ` (${r.role})` : '';
+      lines.push(`  - ${r.name}${role} - ${tag}`);
+    }
+    lines.push('');
+  }
+  lines.push('Link someone: /link @handle <name>');
+  return lines.join('\n').trim();
+}
+
 export async function buildMyContributions(member: TeamMember): Promise<string> {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data } = await db()

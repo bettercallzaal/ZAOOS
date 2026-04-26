@@ -30,6 +30,22 @@ export interface DispatchInput {
   issue_text: string;
 }
 
+/**
+ * Narrator hooks let two Telegram bots (ZAO Devz + Hermes) post phase
+ * updates as distinct identities into the same chat. All hooks are optional;
+ * if absent, the runner is silent and the caller surfaces the final result.
+ */
+export interface HermesNarrator {
+  onCoderStart?: (runId: string, attempt: number, max: number, issue: string) => Promise<void>;
+  onCoderDone?: (runId: string, attempt: number, filesChanged: string[]) => Promise<void>;
+  onCriticStart?: (runId: string) => Promise<void>;
+  onCriticDone?: (runId: string, score: number, feedback: string) => Promise<void>;
+  onPrOpened?: (runId: string, prNumber: number, prUrl: string, score: number) => Promise<void>;
+  onRetry?: (runId: string, nextAttempt: number, feedback: string) => Promise<void>;
+  onEscalated?: (runId: string, reason: string) => Promise<void>;
+  onFailed?: (runId: string, reason: string) => Promise<void>;
+}
+
 export type DispatchResult =
   | { kind: 'ready'; run: HermesRun }
   | { kind: 'failed'; run: HermesRun; reason: string }
@@ -39,7 +55,10 @@ export type DispatchResult =
  * Run the full Coder -> Critic loop. Returns a result describing the outcome.
  * Caller (Telegram handler) decides how to surface it.
  */
-export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchResult> {
+export async function dispatchHermesRun(
+  input: DispatchInput,
+  narrator?: HermesNarrator,
+): Promise<DispatchResult> {
   const created = await createRun(input);
   await updateRun(created.id, { status: 'fixing', started_at: new Date().toISOString() });
 
@@ -57,6 +76,7 @@ export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchR
     while (attempt < HERMES_DEFAULT_MAX_ATTEMPTS) {
       attempt += 1;
       await updateRun(created.id, { fixer_attempts: attempt, status: 'fixing' });
+      await narrator?.onCoderStart?.(created.id, attempt, HERMES_DEFAULT_MAX_ATTEMPTS, input.issue_text);
 
       const fixerOut = await runFixer({
         issueText: input.issue_text,
@@ -70,10 +90,15 @@ export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchR
 
       if (fixerOut.filesChanged.length === 0) {
         lastFeedback = 'fixer produced no file changes; revise and try again';
+        await narrator?.onRetry?.(created.id, attempt + 1, lastFeedback);
         continue;
       }
 
+      await narrator?.onCoderDone?.(created.id, attempt, fixerOut.filesChanged);
+
       await updateRun(created.id, { status: 'critiquing' });
+      await narrator?.onCriticStart?.(created.id);
+
       const critique = await runCritic({
         workTreePath: workdir,
         branchName,
@@ -83,6 +108,8 @@ export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchR
       totalIn += critique.inputTokens;
       totalOut += critique.outputTokens;
 
+      await narrator?.onCriticDone?.(created.id, critique.score, critique.feedback);
+
       if (critique.score >= HERMES_PASS_THRESHOLD) {
         await commitAndPush(workdir, branchName, fixerOut.commitMessage);
         const pr = await openPullRequest({
@@ -90,6 +117,7 @@ export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchR
           title: fixerOut.prTitle,
           body: `${fixerOut.prBody}\n\n**Critic score:** ${critique.score}/100\n**Critic feedback:** ${critique.feedback}`,
         });
+        await narrator?.onPrOpened?.(created.id, pr.number, pr.url, critique.score);
         await updateRun(created.id, {
           status: 'ready',
           branch: branchName,
@@ -120,6 +148,9 @@ export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchR
         critic_score: critique.score,
         critic_feedback: critique.feedback,
       });
+      if (attempt < HERMES_DEFAULT_MAX_ATTEMPTS) {
+        await narrator?.onRetry?.(created.id, attempt + 1, critique.feedback);
+      }
 
       // reset workdir for next attempt (drop in-flight changes, keep branch)
       await resetToMain(workdir);
@@ -133,6 +164,7 @@ export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchR
       error_message: `exceeded ${HERMES_DEFAULT_MAX_ATTEMPTS} attempts; last critic feedback: ${lastFeedback ?? 'n/a'}`,
     });
     const final = (await reloadRun(created.id)) ?? created;
+    await narrator?.onEscalated?.(created.id, lastFeedback ?? 'no feedback recorded');
     return { kind: 'escalated', run: final, reason: lastFeedback ?? 'no feedback recorded' };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -144,6 +176,7 @@ export async function dispatchHermesRun(input: DispatchInput): Promise<DispatchR
       completed_at: new Date().toISOString(),
     });
     const final = (await reloadRun(created.id)) ?? created;
+    await narrator?.onFailed?.(created.id, message);
     return { kind: 'failed', run: final, reason: message };
   } finally {
     await cleanupWorkdir(workdir);

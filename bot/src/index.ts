@@ -380,6 +380,10 @@ bot.command('whoami', async (ctx) => {
   );
 });
 
+bot.command('healthcheck', async (ctx) => {
+  await ctx.reply('OK - hermes alive');
+});
+
 bot.command('health', async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply('Admin only.');

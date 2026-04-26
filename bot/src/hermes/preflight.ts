@@ -5,6 +5,7 @@ export interface PreFlightResult {
   ok: boolean;
   error?: string;
   durationMs: number;
+  scope: 'bot-only' | 'app-only' | 'mixed' | 'docs-only';
   checks: {
     forbiddenPaths: 'pass' | 'fail';
     typecheck: 'pass' | 'fail' | 'skipped';
@@ -14,17 +15,17 @@ export interface PreFlightResult {
 }
 
 /**
- * Run all CI-equivalent checks BEFORE Critic sees the diff. Catches the failure
- * mode where Coder writes locally-clean code but the workspace still fails CI
- * because of unrelated drift (e.g. PR #321: Hermes /healthcheck was clean, but
- * stock/* react/no-unescaped-entities errors blocked the merge).
+ * Pre-flight quality gate. Runs CI-equivalent checks BEFORE Critic sees diff.
  *
- * Auto-loops back to Coder on fail with the verbatim error as feedback.
+ * Scope detection: ZAO OS root is huge (301 API routes + 279 components) so
+ * `tsc --noEmit` on the whole tree OOMs at default 2GB heap. We scope checks
+ * to the smallest project that contains all changed files:
+ *   - Only bot/* changed -> `cd bot && npm run typecheck` + biome on bot/
+ *   - Only src/* changed -> root typecheck (with NODE_OPTIONS=4GB)
+ *   - Mixed -> both
+ *   - Only docs/research changed -> skip type/lint entirely
  *
- * Cost: 0 tokens (all local). Time: ~10-15s typical, +30s if tests touched.
- *
- * Each check exits FAST on first failure - we don't run all checks for
- * fingerprinting; we want quickest possible loop-back to Coder.
+ * Auto-loops back to Coder on fail. Cost: 0 tokens. Time: 5-30s typical.
  */
 export async function runPreFlightGate(input: {
   workTreePath: string;
@@ -37,54 +38,86 @@ export async function runPreFlightGate(input: {
     lint: 'skipped',
     tests: 'skipped',
   };
+  const scope = detectScope(input.filesChanged);
 
   // Check 0: forbidden paths (cheapest, fail fast).
-  // HERMES_FORBIDDEN_PATHS includes self-modification, secrets, hooks, lockfiles.
   for (const f of input.filesChanged) {
     if (HERMES_FORBIDDEN_PATHS.some((p) => f === p || f.startsWith(`${p}/`))) {
       checks.forbiddenPaths = 'fail';
       return {
         ok: false,
-        error: `Coder wrote forbidden path: ${f}. This is a safety violation; revert the file and try again.`,
+        error: `Coder wrote forbidden path: ${f}. Revert the file and try again.`,
         durationMs: Date.now() - start,
+        scope,
         checks,
       };
     }
   }
 
-  // Check 1: TypeScript typecheck on root workspace.
-  // Catches: any, missing returns, wrong types, broken imports.
-  const tc = await runCmd('npm', ['run', '--silent', 'typecheck'], input.workTreePath);
-  if (tc.exitCode !== 0) {
-    checks.typecheck = 'fail';
-    const out = (tc.stderr + '\n' + tc.stdout).slice(0, 1500);
-    return {
-      ok: false,
-      error: `TypeScript errors block the merge. Fix these before retrying:\n\n${out}`,
-      durationMs: Date.now() - start,
-      checks,
-    };
+  // Docs-only? Skip type/lint - nothing they'd catch.
+  if (scope === 'docs-only') {
+    return { ok: true, durationMs: Date.now() - start, scope, checks };
+  }
+
+  // Generous heap for tsc on root workspace (default 2GB OOMs on 301 routes).
+  const heapEnv: NodeJS.ProcessEnv = {
+    ...process.env,
+    NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --max-old-space-size=4096`.trim(),
+  };
+
+  // Bot-side typecheck (small, fast). Run when scope is bot-only or mixed.
+  if (scope === 'bot-only' || scope === 'mixed') {
+    const tc = await runCmd('npm', ['run', '--silent', 'typecheck'], `${input.workTreePath}/bot`, heapEnv);
+    if (tc.exitCode !== 0) {
+      checks.typecheck = 'fail';
+      const out = (tc.stdout + '\n' + tc.stderr).slice(0, 1500);
+      return {
+        ok: false,
+        error: `Bot typecheck failed. Fix these before retrying:\n\n${out}`,
+        durationMs: Date.now() - start,
+        scope,
+        checks,
+      };
+    }
+  }
+
+  // App-side typecheck (heavy). Run when scope is app-only or mixed.
+  if (scope === 'app-only' || scope === 'mixed') {
+    const tc = await runCmd('npm', ['run', '--silent', 'typecheck'], input.workTreePath, heapEnv);
+    if (tc.exitCode !== 0) {
+      checks.typecheck = 'fail';
+      const out = (tc.stdout + '\n' + tc.stderr).slice(0, 1500);
+      return {
+        ok: false,
+        error: `App typecheck failed. Fix these before retrying:\n\n${out}`,
+        durationMs: Date.now() - start,
+        scope,
+        checks,
+      };
+    }
   }
   checks.typecheck = 'pass';
 
-  // Check 2: Biome lint on root workspace.
-  // Catches: react/no-unescaped-entities, no-html-link-for-pages, dangerouslySetInnerHTML, etc.
-  // This is the exact check GitHub Actions runs in "Lint & Typecheck".
-  const lint = await runCmd('npm', ['run', '--silent', 'lint:biome'], input.workTreePath);
-  if (lint.exitCode !== 0) {
-    checks.lint = 'fail';
-    const out = (lint.stderr + '\n' + lint.stdout).slice(0, 1500);
-    return {
-      ok: false,
-      error: `Lint errors block the merge. Fix these before retrying. Tip: try \`npx biome check --write\` to auto-fix style issues:\n\n${out}`,
-      durationMs: Date.now() - start,
-      checks,
-    };
+  // Biome lint - scope to changed paths only (root command lints everything,
+  // can over-report on unrelated drift like PR #321).
+  const lintTargets = lintScopeFor(scope, input.filesChanged);
+  if (lintTargets.length > 0) {
+    const lint = await runCmd('npx', ['biome', 'check', ...lintTargets], input.workTreePath, heapEnv);
+    if (lint.exitCode !== 0) {
+      checks.lint = 'fail';
+      const out = (lint.stdout + '\n' + lint.stderr).slice(0, 1500);
+      return {
+        ok: false,
+        error: `Lint errors block the merge. Fix these before retrying. Tip: \`npx biome check --write ${lintTargets.join(' ')}\` auto-fixes style:\n\n${out}`,
+        durationMs: Date.now() - start,
+        scope,
+        checks,
+      };
+    }
+    checks.lint = 'pass';
   }
-  checks.lint = 'pass';
 
-  // Check 3: Vitest, only if Coder modified test files.
-  // Skipped otherwise so we don't pay 30-60s on every run.
+  // Tests, only if Coder modified test files.
   const touchedTests = input.filesChanged.some(
     (f) => f.includes('__tests__') || f.endsWith('.test.ts') || f.endsWith('.test.tsx'),
   );
@@ -93,23 +126,59 @@ export async function runPreFlightGate(input: {
       'npx',
       ['vitest', 'run', '--reporter=verbose', '--no-coverage'],
       input.workTreePath,
+      heapEnv,
     );
     if (test.exitCode !== 0) {
       checks.tests = 'fail';
       const out = (test.stdout + '\n' + test.stderr).slice(-1500);
       return {
         ok: false,
-        error: `Tests failed. Fix the failing tests OR fix the code that broke them:\n\n${out}`,
+        error: `Tests failed. Fix the failing tests OR the code that broke them:\n\n${out}`,
         durationMs: Date.now() - start,
+        scope,
         checks,
       };
     }
     checks.tests = 'pass';
   }
 
-  return {
-    ok: true,
-    durationMs: Date.now() - start,
-    checks,
-  };
+  return { ok: true, durationMs: Date.now() - start, scope, checks };
+}
+
+function detectScope(files: string[]): PreFlightResult['scope'] {
+  let bot = false;
+  let app = false;
+  let docs = false;
+  for (const f of files) {
+    if (f.startsWith('bot/')) bot = true;
+    else if (
+      f.startsWith('src/') ||
+      f.startsWith('contracts/') ||
+      f.startsWith('scripts/') ||
+      f === 'community.config.ts' ||
+      f === 'next.config.ts'
+    )
+      app = true;
+    else if (f.startsWith('research/') || f.startsWith('docs/') || f.endsWith('.md')) docs = true;
+    else app = true; // unknown -> treat as app to be safe
+  }
+  if (bot && app) return 'mixed';
+  if (bot) return 'bot-only';
+  if (app) return 'app-only';
+  if (docs) return 'docs-only';
+  return 'docs-only';
+}
+
+function lintScopeFor(scope: PreFlightResult['scope'], filesChanged: string[]): string[] {
+  if (scope === 'bot-only') return ['bot/'];
+  if (scope === 'app-only' || scope === 'mixed') {
+    // Lint only top-level dirs containing changed files (avoids OOM on full repo).
+    const dirs = new Set<string>();
+    for (const f of filesChanged) {
+      const top = f.split('/')[0];
+      if (top && !top.endsWith('.md')) dirs.add(`${top}/`);
+    }
+    return Array.from(dirs);
+  }
+  return [];
 }

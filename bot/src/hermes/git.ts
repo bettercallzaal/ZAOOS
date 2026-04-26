@@ -10,8 +10,18 @@ export interface GitRunResult {
 }
 
 export function runCmd(cmd: string, args: string[], cwd?: string, env?: NodeJS.ProcessEnv): Promise<GitRunResult> {
+  // Augment PATH so binaries installed under ~/.local/bin (gh, claude, uv,
+  // serena, etc.) resolve when this process runs under systemd which strips
+  // user-specific shell PATH augmentations.
+  const augmentedEnv: NodeJS.ProcessEnv = { ...(env ?? process.env) };
+  const home = augmentedEnv.HOME ?? process.env.HOME ?? '/home/zaal';
+  const localBin = `${home}/.local/bin`;
+  if (!augmentedEnv.PATH || !augmentedEnv.PATH.split(':').includes(localBin)) {
+    augmentedEnv.PATH = `${localBin}:${augmentedEnv.PATH ?? '/usr/local/bin:/usr/bin:/bin'}`;
+  }
+
   return new Promise((resolve) => {
-    const child = spawn(cmd, args, { cwd, env: env ?? process.env });
+    const child = spawn(cmd, args, { cwd, env: augmentedEnv });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', (d) => {
@@ -19,6 +29,14 @@ export function runCmd(cmd: string, args: string[], cwd?: string, env?: NodeJS.P
     });
     child.stderr.on('data', (d) => {
       stderr += d.toString();
+    });
+    // Critical: spawn emits 'error' on ENOENT (binary not found). Without a
+    // handler the event throws and crashes the parent process - we saw this
+    // happen on the first /fix run (gh missing from systemd PATH took the
+    // whole zao-devz-stack process down).
+    child.on('error', (err) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      resolve({ stdout, stderr: stderr + `\n[spawn-error] ${msg}`, exitCode: -1 });
     });
     child.on('close', (code) => {
       resolve({ stdout, stderr, exitCode: code ?? -1 });

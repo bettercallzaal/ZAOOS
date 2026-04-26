@@ -75,9 +75,17 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     }
     args.push('--add-dir', opts.cwd);
 
-    const child = spawn('claude', args, {
+    // Augment PATH so claude resolves under systemd (strips user PATH).
+    const augmentedEnv: NodeJS.ProcessEnv = { ...process.env };
+    const home = augmentedEnv.HOME ?? '/home/zaal';
+    const localBin = `${home}/.local/bin`;
+    if (!augmentedEnv.PATH || !augmentedEnv.PATH.split(':').includes(localBin)) {
+      augmentedEnv.PATH = `${localBin}:${augmentedEnv.PATH ?? '/usr/local/bin:/usr/bin:/bin'}`;
+    }
+
+    const child = spawn(process.env.HERMES_CLAUDE_BIN || 'claude', args, {
       cwd: opts.cwd,
-      env: process.env,
+      env: augmentedEnv,
     });
 
     let stdout = '';
@@ -87,6 +95,13 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
       setTimeout(() => child.kill('SIGKILL'), 2000);
       reject(new Error(`claude CLI timed out after ${opts.timeoutMs ?? DEFAULT_TIMEOUT_MS}ms`));
     }, opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+
+    child.on('error', (err) => {
+      clearTimeout(timeout);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[hermes/claude-cli] spawn error:', msg);
+      reject(new Error(`Failed to spawn claude CLI: ${msg}. Is 'claude' in PATH? args=${JSON.stringify(args).slice(0, 200)}`));
+    });
 
     child.stdout.on('data', (d) => {
       stdout += d.toString();
@@ -164,10 +179,6 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
           ),
         );
       }
-    });
-    child.on('error', (err) => {
-      clearTimeout(timeout);
-      reject(new Error(`Failed to spawn claude CLI: ${err.message}. Is 'claude' in PATH?`));
     });
   });
 }

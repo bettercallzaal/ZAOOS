@@ -1,10 +1,10 @@
-import { callAnthropic, HERMES_CRITIC_MODEL } from './anthropic';
+import { callClaudeCli, HERMES_CRITIC_MODEL } from './claude-cli';
 import { runCmd } from './git';
 import type { CritiqueInput, CritiqueOutput } from './types';
 
-const CRITIC_SYSTEM = `You are Hermes-Stock, the Critic for ZAO OS code fixes.
+const CRITIC_SYSTEM = `You are Hermes-Stock, the Critic half of the Hermes pair for ZAO OS code fixes.
 
-You receive a diff + the original issue. You run nothing - you only judge what's in front of you.
+You have Read + Grep + Bash(git diff*) tools. Use them sparingly to verify the diff is what it claims.
 
 Score 0-100:
 - 100 = ships as-is, no concerns
@@ -15,14 +15,24 @@ Score 0-100:
 Score MUST drop below 70 if any of:
 - diff doesn't address the stated issue
 - diff introduces a security regression (eval, dangerouslySetInnerHTML, leaked secret, missing Zod validation on user input)
-- diff breaks an existing pattern (api-routes.md, components.md, typescript-hygiene.md)
+- diff breaks an existing pattern (.claude/rules/api-routes.md, components.md, typescript-hygiene.md)
 - diff adds a dependency without obvious need
 - diff modifies files outside the issue's scope
+- diff touches bot/src/hermes/, .env, .env.local, or .env.production
 
-Output ONLY a JSON object:
+Output ONLY a JSON object on the final line:
 { "score": <0-100>, "feedback": "<concrete, actionable, 200 chars max>" }
 
 No prose, no code fences.`;
+
+const CRITIC_OUTPUT_SCHEMA = {
+  type: 'object',
+  required: ['score', 'feedback'],
+  properties: {
+    score: { type: 'number', minimum: 0, maximum: 100 },
+    feedback: { type: 'string', minLength: 5, maxLength: 250 },
+  },
+} as const;
 
 export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
   const diffOutput = await runCmd('git', ['diff', 'origin/main'], input.workTreePath);
@@ -31,27 +41,56 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
   }
   const diff = diffOutput.stdout;
   if (!diff.trim()) {
-    return { score: 0, feedback: 'no diff produced - fixer did not write any files', inputTokens: 0, outputTokens: 0 };
+    return {
+      score: 0,
+      feedback: 'no diff produced - fixer did not write any files',
+      inputTokens: 0,
+      outputTokens: 0,
+    };
   }
 
-  const userMsg = [
+  const userPrompt = [
     `# Original Issue`,
     input.issueText,
     '',
-    `# Files Changed`,
+    `# Files Changed (${input.filesChanged.length})`,
     input.filesChanged.join('\n'),
     '',
-    `# Diff (truncated to 12k chars)`,
-    diff.slice(0, 12000),
+    `# Diff (already truncated to 16k)`,
+    diff.slice(0, 16000),
+    '',
+    'Score this diff. Output JSON only.',
   ].join('\n');
 
-  const result = await callAnthropic({
+  const result = await callClaudeCli({
     model: HERMES_CRITIC_MODEL,
-    system: CRITIC_SYSTEM,
-    messages: [{ role: 'user', content: userMsg }],
-    maxTokens: 600,
-    temperature: 0.0,
+    prompt: userPrompt,
+    cwd: input.workTreePath,
+    appendSystemPrompt: CRITIC_SYSTEM,
+    permissionMode: 'bypassPermissions',
+    allowedTools: ['Read', 'Grep', 'Glob', 'Bash(git diff*)', 'Bash(cat *)', 'Bash(ls*)'],
+    disallowedTools: [
+      'Edit',
+      'Write',
+      'Bash(git commit*)',
+      'Bash(git push*)',
+      'Bash(rm *)',
+      'Bash(curl *)',
+    ],
+    outputFormat: 'json',
+    jsonSchema: CRITIC_OUTPUT_SCHEMA,
+    timeoutMs: 4 * 60 * 1000,
+    maxBudgetUsd: Number(process.env.HERMES_CRITIC_BUDGET_USD ?? '1'),
   });
+
+  if (result.isError) {
+    return {
+      score: 0,
+      feedback: `Critic CLI error: ${result.text.slice(0, 200)}`,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+    };
+  }
 
   const parsed = parseJsonStrict<{ score: number; feedback: string }>(result.text);
   return {

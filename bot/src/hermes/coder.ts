@@ -1,103 +1,134 @@
-import { promises as fs } from 'node:fs';
-import { join, relative } from 'node:path';
-import { callAnthropic, HERMES_FIXER_MODEL } from './anthropic';
-import { diffAgainstMain, listChangedFiles, runCmd } from './git';
+import { callClaudeCli, HERMES_FIXER_MODEL } from './claude-cli';
+import { listChangedFiles, runCmd } from './git';
 import { HERMES_FORBIDDEN_PATHS, type FixerInput, type FixerOutput } from './types';
 
-const FIXER_SYSTEM = `You are Stock-Coder, an autonomous code-fixer for the ZAO OS repo.
+const FIXER_SYSTEM = `You are Stock-Coder, the autonomous code-fixer half of the Hermes pair for the ZAO OS repo.
 
-You write minimal, surgical patches. You read existing code via the supplied tools and produce a JSON plan. The orchestrator (not you) writes the files.
+You have full Read/Edit/Write/Glob/Grep/Bash tool access in the working directory. Use them.
 
-You MUST NOT touch any of these paths: ${HERMES_FORBIDDEN_PATHS.join(', ')}.
+Your job: read the issue, find the relevant files, write a minimal surgical patch, then return a short summary.
 
-Output ONLY a JSON object matching this schema:
+HARD CONSTRAINTS:
+- DO NOT modify any of these paths: ${HERMES_FORBIDDEN_PATHS.join(', ')}
+- DO NOT run 'git commit' or 'git push' - the orchestrator handles git operations
+- DO NOT install new dependencies unless the issue explicitly calls for it
+- Stay in the working directory; do not edit anything outside it
+- Match existing patterns: read .claude/rules/*.md and CLAUDE.md before editing
+
+OUTPUT FORMAT (final assistant message, after edits are done):
+Return a single JSON object on its own line:
 {
-  "rationale": "1-2 sentence explanation of root cause",
-  "files": [
-    { "path": "relative/path.ts", "action": "create|replace", "contents": "full file contents" }
-  ],
-  "commitMessage": "short imperative line",
-  "prTitle": "short PR title",
-  "prBody": "markdown PR body explaining what + why"
+  "rationale": "1-2 sentence root cause + chosen fix",
+  "filesChanged": ["relative/path1.ts", "relative/path2.ts"],
+  "commitMessage": "short imperative commit subject (under 72 chars)",
+  "prTitle": "concise PR title (under 80 chars)",
+  "prBody": "markdown PR body explaining what + why + any follow-ups"
 }
 
 No prose outside the JSON. No code fences around the JSON.`;
 
-interface FixerPlan {
+interface FixerSummary {
   rationale: string;
-  files: Array<{ path: string; action: 'create' | 'replace'; contents: string }>;
+  filesChanged: string[];
   commitMessage: string;
   prTitle: string;
   prBody: string;
 }
 
+const FIXER_OUTPUT_SCHEMA = {
+  type: 'object',
+  required: ['rationale', 'filesChanged', 'commitMessage', 'prTitle', 'prBody'],
+  properties: {
+    rationale: { type: 'string', minLength: 5 },
+    filesChanged: { type: 'array', items: { type: 'string' } },
+    commitMessage: { type: 'string', minLength: 5 },
+    prTitle: { type: 'string', minLength: 5 },
+    prBody: { type: 'string', minLength: 5 },
+  },
+} as const;
+
 export async function runFixer(input: FixerInput): Promise<FixerOutput> {
-  const repoMap = await buildRepoSnippet(input.workTreePath);
-  const userMsg = [
-    `# Issue`,
+  const userPrompt = [
+    `# Issue (attempt ${input.attemptNumber} of 3)`,
     input.issueText,
     '',
-    `# Attempt ${input.attemptNumber} of 3`,
-    input.previousCriticFeedback ? `# Previous Critic Feedback\n${input.previousCriticFeedback}` : '',
+    input.previousCriticFeedback
+      ? `# Previous Critic Feedback (score < 70 - address this)\n${input.previousCriticFeedback}\n`
+      : '',
+    `# Working Directory`,
+    `${input.workTreePath} (fresh clone of main, branch '${input.branchName}' already checked out)`,
     '',
-    '# Repo Snapshot',
-    repoMap,
+    `# Task`,
+    'Read the relevant files. Make a minimal surgical fix. Then output the JSON summary as instructed.',
   ]
     .filter(Boolean)
     .join('\n');
 
-  const result = await callAnthropic({
+  const result = await callClaudeCli({
     model: HERMES_FIXER_MODEL,
-    system: FIXER_SYSTEM,
-    messages: [{ role: 'user', content: userMsg }],
-    maxTokens: 8000,
-    temperature: 0.1,
+    prompt: userPrompt,
+    cwd: input.workTreePath,
+    appendSystemPrompt: FIXER_SYSTEM,
+    permissionMode: 'bypassPermissions',
+    allowedTools: [
+      'Read',
+      'Edit',
+      'Write',
+      'Glob',
+      'Grep',
+      'Bash(git diff*)',
+      'Bash(ls*)',
+      'Bash(cat *)',
+      'Bash(npm run *)',
+    ],
+    disallowedTools: [
+      'Bash(git commit*)',
+      'Bash(git push*)',
+      'Bash(rm *)',
+      'Bash(curl *)',
+      'Bash(wget *)',
+    ],
+    outputFormat: 'json',
+    jsonSchema: FIXER_OUTPUT_SCHEMA,
+    timeoutMs: 12 * 60 * 1000,
+    maxBudgetUsd: Number(process.env.HERMES_FIXER_BUDGET_USD ?? '5'),
   });
 
-  const plan = parseJsonStrict<FixerPlan>(result.text);
-
-  for (const f of plan.files) {
-    if (HERMES_FORBIDDEN_PATHS.some((p) => f.path === p || f.path.startsWith(`${p}/`))) {
-      throw new Error(`Fixer attempted to write forbidden path: ${f.path}`);
-    }
-    const target = join(input.workTreePath, f.path);
-    await fs.mkdir(join(target, '..'), { recursive: true });
-    await fs.writeFile(target, f.contents, 'utf8');
+  if (result.isError) {
+    throw new Error(`Stock-Coder reported error in result: ${result.text.slice(0, 400)}`);
   }
 
-  const changed = await listChangedFiles(input.workTreePath);
+  const summary = parseJsonStrict<FixerSummary>(result.text);
+
+  for (const f of summary.filesChanged) {
+    if (HERMES_FORBIDDEN_PATHS.some((p) => f === p || f.startsWith(`${p}/`))) {
+      throw new Error(`Stock-Coder modified forbidden path: ${f}`);
+    }
+  }
+
+  // Verify the diff actually matches what Coder claims (defense in depth)
+  const actualChanged = await listChangedFiles(input.workTreePath);
+  if (actualChanged.length === 0) {
+    throw new Error('Stock-Coder claimed changes but git diff shows none');
+  }
+  for (const f of actualChanged) {
+    if (HERMES_FORBIDDEN_PATHS.some((p) => f === p || f.startsWith(`${p}/`))) {
+      await runCmd('git', ['checkout', '--', f], input.workTreePath);
+      throw new Error(`Stock-Coder wrote to forbidden path despite system prompt: ${f}`);
+    }
+  }
 
   return {
-    filesChanged: changed,
-    commitMessage: plan.commitMessage,
-    prTitle: plan.prTitle,
-    prBody: `${plan.prBody}\n\n---\n_Generated by Hermes Stock-Coder (${HERMES_FIXER_MODEL}). Verified by Hermes-Stock Critic before this PR opened._`,
+    filesChanged: actualChanged,
+    commitMessage: summary.commitMessage,
+    prTitle: summary.prTitle,
+    prBody: `${summary.prBody}\n\n---\n_Generated by Hermes Stock-Coder via Claude Code CLI (Max plan auth, model: ${HERMES_FIXER_MODEL}). Verified by Hermes-Stock Critic before this PR opened._\n\n_Rationale:_ ${summary.rationale}`,
     inputTokens: result.inputTokens,
     outputTokens: result.outputTokens,
   };
 }
 
-async function buildRepoSnippet(workdir: string): Promise<string> {
-  // Cheap repo orientation: top-level dirs + key config files contents.
-  const ls = await runCmd('ls', ['-la'], workdir);
-  const tree = await runCmd('find', ['.', '-maxdepth', '3', '-type', 'd', '-not', '-path', '*/node_modules*', '-not', '-path', '*/.git*'], workdir);
-
-  const keyFiles = ['CLAUDE.md', 'package.json', 'community.config.ts'];
-  const contents: string[] = [];
-  for (const f of keyFiles) {
-    try {
-      const c = await fs.readFile(join(workdir, f), 'utf8');
-      contents.push(`### ${f}\n\`\`\`\n${c.slice(0, 2000)}\n\`\`\``);
-    } catch {
-      // skip missing
-    }
-  }
-
-  return [`## ls\n${ls.stdout.slice(0, 1000)}`, `## tree\n${tree.stdout.slice(0, 2000)}`, ...contents].join('\n\n');
-}
-
 function parseJsonStrict<T>(text: string): T {
-  // Strip code fences if model added them despite instructions
   const cleaned = text
     .replace(/^\s*```(?:json)?\s*/i, '')
     .replace(/\s*```\s*$/i, '')
@@ -106,10 +137,7 @@ function parseJsonStrict<T>(text: string): T {
     return JSON.parse(cleaned) as T;
   } catch (err) {
     throw new Error(
-      `Fixer returned non-JSON output. First 200 chars: ${cleaned.slice(0, 200)}. Parse error: ${err instanceof Error ? err.message : String(err)}`,
+      `Stock-Coder returned non-JSON. First 200 chars: ${cleaned.slice(0, 200)}. Parse error: ${err instanceof Error ? err.message : String(err)}`,
     );
   }
 }
-
-// re-export for callers that compose; relative kept for diff helpers
-export { relative };

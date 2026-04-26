@@ -154,7 +154,7 @@ bot.command('help', async (ctx) => {
       'External (anyone, no link needed):',
       '  /press - press kit + contact info',
       '',
-      'Hermes (admin only):',
+      'Hermes (admin only, runs via Claude Code CLI on Max plan):',
       '  /fix <issue> - Coder writes diff, Critic grades, you get a PR if score >=70',
       '  /fix_status [run_id] - check open Hermes runs',
       '',

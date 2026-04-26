@@ -1,0 +1,155 @@
+import { spawn } from 'node:child_process';
+
+export interface ClaudeCliResult {
+  text: string;
+  inputTokens: number;
+  outputTokens: number;
+  totalCostUsd: number;
+  model: string;
+  durationMs: number;
+  numTurns: number;
+  isError: boolean;
+  sessionId: string;
+}
+
+export interface ClaudeCliOptions {
+  model: string;                                  // 'opus' | 'sonnet' | 'haiku' | full id
+  prompt: string;
+  cwd: string;                                    // working dir Claude operates in
+  appendSystemPrompt?: string;
+  allowedTools?: string[];                        // e.g. ['Read','Edit','Write','Glob','Grep','Bash(git diff*)']
+  disallowedTools?: string[];                     // e.g. ['Bash(git push*)','Bash(git commit*)']
+  outputFormat?: 'text' | 'json';                 // default 'json'
+  permissionMode?: 'acceptEdits' | 'bypassPermissions' | 'default' | 'dontAsk' | 'plan' | 'auto';
+  jsonSchema?: object;                            // for structured output validation
+  maxBudgetUsd?: number;                          // hard cap per invocation
+  timeoutMs?: number;                             // wall clock kill
+  bare?: boolean;                                 // skip hooks/CLAUDE.md auto-discovery
+}
+
+const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000; // 10 min
+
+/**
+ * Spawn Claude Code CLI in headless mode using Max-plan auth (~/.claude/auth.json).
+ * No ANTHROPIC_API_KEY required - inherits user OAuth from CLAUDE_CODE state.
+ *
+ * Returns the assistant's final text result + usage stats (parsed from --output-format json).
+ */
+export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> {
+  return new Promise((resolve, reject) => {
+    const outputFormat = opts.outputFormat ?? 'json';
+    const args: string[] = [
+      '-p',
+      opts.prompt,
+      '--model',
+      opts.model,
+      '--output-format',
+      outputFormat,
+      '--no-session-persistence',
+    ];
+
+    if (opts.appendSystemPrompt) {
+      args.push('--append-system-prompt', opts.appendSystemPrompt);
+    }
+    if (opts.allowedTools && opts.allowedTools.length > 0) {
+      args.push('--allowedTools', ...opts.allowedTools);
+    }
+    if (opts.disallowedTools && opts.disallowedTools.length > 0) {
+      args.push('--disallowedTools', ...opts.disallowedTools);
+    }
+    if (opts.permissionMode) {
+      args.push('--permission-mode', opts.permissionMode);
+    }
+    if (opts.jsonSchema) {
+      args.push('--json-schema', JSON.stringify(opts.jsonSchema));
+    }
+    if (opts.maxBudgetUsd !== undefined) {
+      args.push('--max-budget-usd', String(opts.maxBudgetUsd));
+    }
+    if (opts.bare) {
+      args.push('--bare');
+    }
+    args.push('--add-dir', opts.cwd);
+
+    const child = spawn('claude', args, {
+      cwd: opts.cwd,
+      env: process.env,
+    });
+
+    let stdout = '';
+    let stderr = '';
+    const timeout = setTimeout(() => {
+      child.kill('SIGTERM');
+      setTimeout(() => child.kill('SIGKILL'), 2000);
+      reject(new Error(`claude CLI timed out after ${opts.timeoutMs ?? DEFAULT_TIMEOUT_MS}ms`));
+    }, opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+
+    child.stdout.on('data', (d) => {
+      stdout += d.toString();
+    });
+    child.stderr.on('data', (d) => {
+      stderr += d.toString();
+    });
+    child.on('close', (code) => {
+      clearTimeout(timeout);
+      if (code !== 0) {
+        reject(new Error(`claude CLI exited ${code}. stderr: ${stderr.slice(0, 800)}`));
+        return;
+      }
+
+      try {
+        if (outputFormat === 'json') {
+          const parsed = JSON.parse(stdout) as {
+            type?: string;
+            subtype?: string;
+            is_error?: boolean;
+            duration_ms?: number;
+            num_turns?: number;
+            result?: string;
+            session_id?: string;
+            total_cost_usd?: number;
+            usage?: { input_tokens?: number; output_tokens?: number };
+            modelUsage?: Record<string, { inputTokens: number; outputTokens: number; costUSD: number }>;
+          };
+          const usage = parsed.usage ?? { input_tokens: 0, output_tokens: 0 };
+          resolve({
+            text: parsed.result ?? '',
+            inputTokens: usage.input_tokens ?? 0,
+            outputTokens: usage.output_tokens ?? 0,
+            totalCostUsd: parsed.total_cost_usd ?? 0,
+            model: opts.model,
+            durationMs: parsed.duration_ms ?? 0,
+            numTurns: parsed.num_turns ?? 0,
+            isError: Boolean(parsed.is_error),
+            sessionId: parsed.session_id ?? '',
+          });
+        } else {
+          resolve({
+            text: stdout.trim(),
+            inputTokens: 0,
+            outputTokens: 0,
+            totalCostUsd: 0,
+            model: opts.model,
+            durationMs: 0,
+            numTurns: 0,
+            isError: false,
+            sessionId: '',
+          });
+        }
+      } catch (err) {
+        reject(
+          new Error(
+            `Failed to parse claude CLI output. First 400 chars: ${stdout.slice(0, 400)}. Parse error: ${err instanceof Error ? err.message : String(err)}`,
+          ),
+        );
+      }
+    });
+    child.on('error', (err) => {
+      clearTimeout(timeout);
+      reject(new Error(`Failed to spawn claude CLI: ${err.message}. Is 'claude' in PATH?`));
+    });
+  });
+}
+
+export const HERMES_FIXER_MODEL = process.env.HERMES_FIXER_MODEL ?? 'opus';
+export const HERMES_CRITIC_MODEL = process.env.HERMES_CRITIC_MODEL ?? 'sonnet';

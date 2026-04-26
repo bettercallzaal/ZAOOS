@@ -27,8 +27,18 @@ export async function cmdFix(ctx: Context, member: TeamMember | null): Promise<v
     return;
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    await ctx.reply('Hermes needs ANTHROPIC_API_KEY on the bot host. Not configured yet.');
+  // Hermes uses Claude Code CLI on the bot host (Max plan auth, no API key needed).
+  // Verify the binary is on PATH before starting.
+  const { existsSync } = await import('node:fs');
+  const claudePath = process.env.HERMES_CLAUDE_BIN ?? '';
+  const claudeOnPath =
+    claudePath && existsSync(claudePath)
+      ? true
+      : await checkOnPath('claude');
+  if (!claudeOnPath) {
+    await ctx.reply(
+      "Hermes can't find the 'claude' CLI on PATH. Install Claude Code on the bot host (Max plan), or set HERMES_CLAUDE_BIN.",
+    );
     return;
   }
 
@@ -98,6 +108,15 @@ export async function cmdFixStatus(ctx: Context): Promise<void> {
     return;
   }
   await ctx.reply(open.map(formatRun).join('\n\n'));
+}
+
+async function checkOnPath(bin: string): Promise<boolean> {
+  const { spawn } = await import('node:child_process');
+  return new Promise((resolve) => {
+    const child = spawn('which', [bin]);
+    child.on('close', (code) => resolve(code === 0));
+    child.on('error', () => resolve(false));
+  });
 }
 
 function formatRun(r: { id: string; status: string; fixer_attempts: number; critic_score: number | null; pr_url: string | null; issue_text: string }): string {

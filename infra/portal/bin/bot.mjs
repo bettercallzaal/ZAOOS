@@ -729,6 +729,19 @@ async function poll(offset) {
             continue;
           }
         }
+        // Natural-language guard: if the message @mentions a Telegram bot
+        // that isn't ZOE, stay out of it. Stops ZOE from hallucinating
+        // confident answers on @ZAODevZBot / @HermesZAOdevzbot mentions.
+        // Pattern: any @username ending in "bot"/"Bot" that doesn't contain "zoe".
+        const mentionedBots = (msg.text.match(/@\w+[Bb]ot\b/g) || []).map(s => s.toLowerCase());
+        if (mentionedBots.length > 0) {
+          const zoeMentioned = mentionedBots.some(m => m.includes("zoe"));
+          const otherBotMentioned = mentionedBots.some(m => !m.includes("zoe"));
+          if (otherBotMentioned && !zoeMentioned) {
+            emit({ source: "bot", event: "skip_other_bot_mention", mentions: mentionedBots, user: userId, chat: chatId, trace_id });
+            continue;
+          }
+        }
         // Portal todos slash commands - intercept before Claude
         const slashReply = await handleTodoCommand(msg.text);
         if (slashReply !== null) {

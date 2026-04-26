@@ -76,6 +76,46 @@ export async function cloneAndBranch(
   if (checkout.exitCode !== 0) {
     throw new Error(`git checkout -b failed: ${checkout.stderr.slice(0, 400)}`);
   }
+
+  // Install deps so pre-flight typecheck + lint can run (tsc/biome live in
+  // node_modules/.bin). --ignore-scripts blocks postinstall supply-chain
+  // attacks (Shai-Hulud/Axios pattern). Use npm ci if package-lock exists,
+  // npm install otherwise. ~30-60s but only once per /fix run.
+  const lockExists = await fs
+    .access(`${workdir}/package-lock.json`)
+    .then(() => true)
+    .catch(() => false);
+  const installCmd = lockExists ? 'ci' : 'install';
+  const install = await runCmd(
+    'npm',
+    [installCmd, '--ignore-scripts', '--no-audit', '--no-fund', '--prefer-offline'],
+    workdir,
+  );
+  if (install.exitCode !== 0) {
+    // Don't hard-fail; pre-flight will surface specific errors. Some hermes runs
+    // might not need typecheck (e.g. doc-only changes). Log + continue.
+    console.error(
+      `[hermes/git] npm ${installCmd} returned exit ${install.exitCode}. Pre-flight may fail. stderr: ${install.stderr.slice(0, 300)}`,
+    );
+  }
+
+  // Install pre-commit hook to reject any commit that contains conflict markers.
+  // Standard practice (AWS samples, AutoGPT #12469). Fresh /tmp clone has no
+  // hooks by default; we bake one in.
+  const hookPath = `${workdir}/.git/hooks/pre-commit`;
+  const hookBody = `#!/usr/bin/env bash
+# Hermes pre-commit guard - reject conflict markers
+if git diff --cached -U0 | grep -E "^\\+(<<<<<<< |=======|>>>>>>> )" >/dev/null; then
+  echo "[hermes/pre-commit] BLOCKED: commit contains unresolved conflict markers" >&2
+  exit 1
+fi
+exit 0
+`;
+  try {
+    await fs.writeFile(hookPath, hookBody, { mode: 0o755 });
+  } catch (err) {
+    console.error(`[hermes/git] pre-commit hook install failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }
 
 export async function commitAndPush(
@@ -97,6 +137,22 @@ export async function commitAndPush(
 
   const commit = await runCmd('git', ['commit', '-m', message], workdir);
   if (commit.exitCode !== 0) throw new Error(`git commit failed: ${commit.stderr.slice(0, 400)}`);
+
+  // Re-fetch + rebase against latest main BEFORE push. Catches mid-run
+  // divergence where another PR landed while Coder was working. Branch is
+  // brand-new with our single commit so rebase is safe; on conflict we abort
+  // and surface a real error so the run fails loud rather than pushing a
+  // stale-base branch.
+  const fetch = await runCmd('git', ['fetch', 'origin', 'main'], workdir);
+  if (fetch.exitCode === 0) {
+    const rebase = await runCmd('git', ['rebase', 'origin/main'], workdir);
+    if (rebase.exitCode !== 0) {
+      await runCmd('git', ['rebase', '--abort'], workdir);
+      throw new Error(
+        `git rebase origin/main failed: ${(rebase.stderr || rebase.stdout).slice(0, 400)}. Likely a real conflict between this run's diff and a recently-landed PR.`,
+      );
+    }
+  }
 
   const push = await runCmd('git', ['push', '-u', 'origin', branchName], workdir);
   if (push.exitCode !== 0) throw new Error(`git push failed: ${push.stderr.slice(0, 400)}`);

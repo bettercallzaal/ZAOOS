@@ -385,7 +385,8 @@ bot.command('ping', async (ctx) => {
 });
 
 bot.command('version', async (ctx) => {
-  await ctx.reply('v1.6 hermes loop');
+  const buildDate = new Date().toISOString().slice(0, 10);
+  await ctx.reply(`v1.6 hermes loop (build: ${buildDate})`);
 });
 
 bot.command('uptime', async (ctx) => {

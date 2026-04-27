@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { RichBioEditor } from './RichBioEditor';
 
 // Try to coerce common share-link formats into a direct image URL the
 // browser can render in an <img> tag. Returns the original on no-op.
@@ -49,9 +50,7 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [photoBroken, setPhotoBroken] = useState(false);
-  const [previewMode, setPreviewMode] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const isAdvisor = initialRole === 'advisory';
 
@@ -65,67 +64,6 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
     if (links.trim().length > 0) pct += 10;
     return pct;
   })();
-
-  // ----- Markdown formatting helpers -----------------------------------------
-  function applyToSelection(transform: (selected: string, before: string, after: string) => { text: string; cursorOffset?: number }) {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const before = bio.slice(0, start);
-    const selected = bio.slice(start, end);
-    const after = bio.slice(end);
-    const result = transform(selected, before, after);
-    setBio(result.text);
-    requestAnimationFrame(() => {
-      ta.focus();
-      const cursor = result.cursorOffset ?? start + (result.text.length - bio.length);
-      ta.setSelectionRange(cursor, cursor);
-    });
-  }
-
-  function wrap(open: string, close: string = open, placeholder: string = '') {
-    applyToSelection((sel, before, after) => {
-      const inner = sel || placeholder;
-      const text = before + open + inner + close + after;
-      const cursorOffset = sel
-        ? before.length + open.length + sel.length + close.length
-        : before.length + open.length;
-      return { text, cursorOffset };
-    });
-  }
-
-  function prefixLines(prefix: string, placeholder: string = '') {
-    applyToSelection((sel, before, after) => {
-      const lineStart = before.lastIndexOf('\n') + 1;
-      const beforeLine = bio.slice(0, lineStart);
-      const restOfLine = bio.slice(lineStart, before.length) + sel;
-      const inner = restOfLine.trim().length === 0 ? placeholder : restOfLine;
-      const lines = inner.split('\n').map((l) => (l.trim().length ? `${prefix}${l}` : l)).join('\n');
-      const text = beforeLine + lines + after;
-      return { text };
-    });
-  }
-
-  function insertText(snippet: string, placeholderLen: number = 0) {
-    applyToSelection((_sel, before, after) => {
-      const text = before + snippet + after;
-      const cursorOffset = before.length + snippet.length - placeholderLen;
-      return { text, cursorOffset };
-    });
-  }
-
-  const TOOLBAR: Array<{ key: string; label: string; title: string; action: () => void }> = [
-    { key: 'b', label: 'B', title: 'Bold (wraps selection in **)', action: () => wrap('**', '**', 'bold text') },
-    { key: 'i', label: 'I', title: 'Italic', action: () => wrap('*', '*', 'italic text') },
-    { key: 'h2', label: 'H', title: 'Heading', action: () => prefixLines('## ', 'Section title') },
-    { key: 'ul', label: '• List', title: 'Bullet list', action: () => prefixLines('- ', 'item') },
-    { key: 'ol', label: '1. List', title: 'Numbered list', action: () => prefixLines('1. ', 'item') },
-    { key: 'quote', label: '" Quote', title: 'Blockquote', action: () => prefixLines('> ', 'a quote') },
-    { key: 'link', label: 'Link', title: 'Link', action: () => wrap('[', '](https://)', 'link text') },
-    { key: 'hr', label: '— Divider', title: 'Horizontal rule', action: () => insertText('\n\n---\n\n') },
-    { key: 'para', label: '¶ Para', title: 'New paragraph', action: () => insertText('\n\n') },
-  ];
 
   async function save() {
     setBusy(true);
@@ -249,86 +187,13 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             </div>
           )}
 
-          {/* Bio editor: tabs + toolbar + textarea/preview */}
-          <div className="border border-white/[0.08] rounded overflow-hidden">
-            {/* Tab strip */}
-            <div className="flex bg-[#0a1628] border-b border-white/[0.08]">
-              <button
-                type="button"
-                onClick={() => setPreviewMode(false)}
-                className={`px-3 py-1.5 text-[11px] font-semibold transition-colors ${!previewMode ? 'text-[#f5a623] bg-[#0d1b2a]' : 'text-gray-500 hover:text-gray-300'}`}
-              >
-                Write
-              </button>
-              <button
-                type="button"
-                onClick={() => setPreviewMode(true)}
-                className={`px-3 py-1.5 text-[11px] font-semibold transition-colors ${previewMode ? 'text-[#f5a623] bg-[#0d1b2a]' : 'text-gray-500 hover:text-gray-300'}`}
-              >
-                Preview
-              </button>
-              <div className="ml-auto px-3 py-1.5 text-[10px] text-gray-600 self-center">
-                {bio.length}/2000
-              </div>
-            </div>
-
-            {!previewMode && (
-              <>
-                {/* Toolbar */}
-                <div className="flex flex-wrap gap-1 bg-[#0a1628] border-b border-white/[0.08] px-2 py-1.5">
-                  {TOOLBAR.map((t) => (
-                    <button
-                      key={t.key}
-                      type="button"
-                      title={t.title}
-                      onClick={t.action}
-                      className="text-[11px] px-2 py-1 rounded text-gray-300 hover:bg-[#f5a623]/10 hover:text-[#f5a623] transition-colors font-mono"
-                    >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-
-                <textarea
-                  ref={textareaRef}
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder={`Who you are, what you bring to ZAOstock, what you're working on, anything you want the team to know.\n\nHit Enter twice for a new paragraph. Use the toolbar above for bold/italic/lists/links.`}
-                  rows={10}
-                  maxLength={2000}
-                  className="w-full bg-[#0a1628] px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none resize-y font-mono leading-relaxed border-0"
-                />
-              </>
-            )}
-
-            {previewMode && (
-              <div className="bg-[#0a1628] px-4 py-3 min-h-[260px]">
-                {bio.trim().length === 0 ? (
-                  <p className="text-xs text-gray-600 italic">Nothing to preview yet. Switch back to Write.</p>
-                ) : (
-                  <div className="bio-rendered text-sm text-gray-200 leading-relaxed">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{bio}</ReactMarkdown>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <details className="text-[10px] text-gray-500">
-            <summary className="cursor-pointer hover:text-gray-400">Formatting cheat sheet</summary>
-            <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 leading-relaxed pl-2">
-              <span><code className="text-gray-300">**bold**</code> &rarr; <strong className="text-white">bold</strong></span>
-              <span><code className="text-gray-300">*italic*</code> &rarr; <em className="text-amber-400">italic</em></span>
-              <span><code className="text-gray-300">## Heading</code></span>
-              <span><code className="text-gray-300">### Subheading</code></span>
-              <span><code className="text-gray-300">- bullet</code> for a list</span>
-              <span><code className="text-gray-300">1. item</code> numbered</span>
-              <span><code className="text-gray-300">[label](https://url)</code></span>
-              <span><code className="text-gray-300">&gt; quote</code> blockquote</span>
-              <span><code className="text-gray-300">---</code> horizontal divider</span>
-              <span><strong className="text-gray-400">Blank line</strong> &rarr; new paragraph</span>
-            </div>
-          </details>
+          {/* Rich text bio editor (Tiptap) - WYSIWYG with markdown storage */}
+          <RichBioEditor
+            value={bio}
+            onChange={setBio}
+            placeholder={`Who you are, what you bring to ZAOstock, what you're working on. Hit Enter for new paragraphs. Use the toolbar above for bold, italic, headings, lists, links.`}
+            maxLength={2000}
+          />
           <input
             value={links}
             onChange={(e) => setLinks(e.target.value)}

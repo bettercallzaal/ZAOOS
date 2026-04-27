@@ -380,6 +380,10 @@ bot.command('whoami', async (ctx) => {
   );
 });
 
+bot.command('ping', async (ctx) => {
+  await ctx.reply(`pong ${Date.now()}`);
+});
+
 bot.command('version', async (ctx) => {
   await ctx.reply('v1.6 hermes loop');
 });

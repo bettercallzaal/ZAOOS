@@ -50,9 +50,21 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
   const [msg, setMsg] = useState<string | null>(null);
   const [photoBroken, setPhotoBroken] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const isAdvisor = initialRole === 'advisory';
+
+  // Profile completeness across the four fields the team page shows
+  const completeness = (() => {
+    let pct = 0;
+    if (bio.trim().length >= 30) pct += 40;
+    else if (bio.trim().length > 0) pct += 20;
+    if (photoUrl.trim().length > 0) pct += 30;
+    if (scope.trim().length > 0 || isAdvisor) pct += 20;
+    if (links.trim().length > 0) pct += 10;
+    return pct;
+  })();
 
   // ----- Markdown formatting helpers -----------------------------------------
   function applyToSelection(transform: (selected: string, before: string, after: string) => { text: string; cursorOffset?: number }) {
@@ -118,6 +130,7 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
   async function save() {
     setBusy(true);
     setMsg(null);
+    setSaveError(null);
     try {
       const res = await fetch('/api/stock/team/profile', {
         method: 'PATCH',
@@ -125,16 +138,22 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
         body: JSON.stringify({ bio, links, photo_url: photoUrl, scope }),
       });
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setMsg(data.error || 'Save failed');
+        const data = await res.json().catch(() => null);
+        const fallback = res.status === 401
+          ? 'Session expired. Refresh the page and log in again.'
+          : res.status === 413
+            ? 'Bio is too long - keep it under 2000 characters.'
+            : `Save failed (HTTP ${res.status})`;
+        setSaveError(data?.error || fallback);
       } else {
         setEditing(false);
         setPhotoBroken(false);
-        setMsg('Saved');
-        setTimeout(() => setMsg(null), 1500);
+        setMsg('Profile saved');
+        setTimeout(() => setMsg(null), 2500);
       }
-    } catch {
-      setMsg('Network error');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown';
+      setSaveError(`Network error - ${message}. Check your connection and try again.`);
     } finally {
       setBusy(false);
     }
@@ -145,8 +164,14 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
 
   return (
     <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-wider text-[#f5a623] font-bold">Your Profile</p>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <p className="text-[10px] uppercase tracking-wider text-[#f5a623] font-bold">Your Profile</p>
+          <span className="text-[10px] text-gray-600">·</span>
+          <span className={`text-[10px] font-bold ${completeness === 100 ? 'text-emerald-400' : completeness >= 60 ? 'text-amber-300' : 'text-gray-500'}`}>
+            {completeness}% complete
+          </span>
+        </div>
         {!editing && hasBio && (
           <button
             onClick={() => setEditing(true)}
@@ -155,6 +180,12 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             Edit
           </button>
         )}
+      </div>
+      <div className="h-0.5 w-full bg-[#0a1628] rounded-full overflow-hidden -mt-2">
+        <div
+          className={`h-full transition-all duration-500 ${completeness === 100 ? 'bg-emerald-400' : 'bg-[#f5a623]'}`}
+          style={{ width: `${completeness}%` }}
+        />
       </div>
 
       {!editing && hasBio && (
@@ -334,24 +365,35 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             </div>
           )}
 
-          <div className="flex items-center gap-2">
+          {saveError && (
+            <div className="bg-red-500/10 border border-red-500/40 rounded-lg px-3 py-2.5 text-[12px] text-red-300 leading-relaxed">
+              <strong className="text-red-200">Couldn&rsquo;t save.</strong> {saveError}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3 flex-wrap">
             <button
               onClick={save}
               disabled={busy}
-              className="bg-[#f5a623] hover:bg-[#ffd700] disabled:opacity-50 text-black font-bold rounded px-3 py-1.5 text-xs transition-colors"
+              className="bg-[#f5a623] hover:bg-[#ffd700] disabled:opacity-50 text-black font-bold rounded px-4 py-2 text-sm transition-colors min-w-[88px]"
             >
               {busy ? 'Saving...' : 'Save'}
             </button>
             {hasBio && (
               <button
-                onClick={() => setEditing(false)}
+                onClick={() => { setEditing(false); setSaveError(null); }}
                 disabled={busy}
-                className="text-xs text-gray-500 hover:text-gray-300"
+                className="text-xs text-gray-500 hover:text-gray-300 px-2 py-1"
               >
                 Cancel
               </button>
             )}
-            {msg && <p className="text-[10px] text-emerald-400 ml-auto">{msg}</p>}
+            {msg && (
+              <div className="flex items-center gap-1.5 ml-auto bg-emerald-500/10 border border-emerald-500/40 rounded-full px-3 py-1">
+                <span className="text-emerald-400 text-xs" aria-hidden>&#10003;</span>
+                <span className="text-[11px] text-emerald-300 font-medium">{msg}</span>
+              </div>
+            )}
           </div>
           <p className="text-[10px] text-gray-600 italic">
             For the photo: right-click your X or Farcaster profile pic, Copy Image Address, paste above. Or use any image URL that starts with https://.

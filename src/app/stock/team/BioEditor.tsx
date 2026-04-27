@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Try to coerce common share-link formats into a direct image URL the
 // browser can render in an <img> tag. Returns the original on no-op.
@@ -103,7 +105,9 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             />
           )}
           <div className="flex-1 min-w-0 space-y-1">
-            <p className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">{bio}</p>
+            <div className="bio-rendered text-sm text-gray-200 leading-relaxed">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{bio}</ReactMarkdown>
+            </div>
             {links.trim() && (
               <p className="text-[11px] text-gray-500">{links}</p>
             )}
@@ -155,10 +159,18 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="Who you are, what you bring to ZAOstock, what you're working on, anything you want the team to know..."
-            rows={5}
+            rows={8}
             maxLength={2000}
-            className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30 resize-none"
+            className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30 resize-y font-mono"
           />
+          <p className="text-[10px] text-gray-500 leading-relaxed">
+            <strong className="text-gray-400">Formatting:</strong> blank line = new paragraph ·
+            {' '}<code className="text-gray-300">**bold**</code> ·
+            {' '}<code className="text-gray-300">*italic*</code> ·
+            {' '}<code className="text-gray-300">- bullet</code> ·
+            {' '}<code className="text-gray-300">[link](https://...)</code> ·
+            {' '}<code className="text-gray-300">## heading</code>
+          </p>
           <input
             value={links}
             onChange={(e) => setLinks(e.target.value)}
@@ -219,6 +231,36 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
           </p>
         </div>
       )}
+      <style>{`
+        .bio-rendered p { margin-bottom: 0.65rem; }
+        .bio-rendered p:last-child { margin-bottom: 0; }
+        .bio-rendered h1, .bio-rendered h2, .bio-rendered h3 {
+          color: #f5a623; font-weight: 700; margin: 0.75rem 0 0.4rem;
+        }
+        .bio-rendered h1 { font-size: 1.05rem; }
+        .bio-rendered h2 { font-size: 0.95rem; }
+        .bio-rendered h3 { font-size: 0.875rem; }
+        .bio-rendered ul, .bio-rendered ol { margin: 0.4rem 0 0.65rem 1.25rem; }
+        .bio-rendered ul { list-style: disc; }
+        .bio-rendered ol { list-style: decimal; }
+        .bio-rendered li { margin-bottom: 0.2rem; }
+        .bio-rendered strong { color: #fff; font-weight: 700; }
+        .bio-rendered em { color: #fbbf24; font-style: italic; }
+        .bio-rendered a { color: #f5a623; text-decoration: underline; }
+        .bio-rendered code {
+          background: #0a1628; padding: 1px 5px; border-radius: 3px;
+          font-size: 0.85em; color: #c7d2fe;
+        }
+        .bio-rendered blockquote {
+          border-left: 2px solid rgba(245, 166, 35, 0.5);
+          padding-left: 0.75rem; margin: 0.5rem 0;
+          color: #cbd5e1; font-style: italic;
+        }
+        .bio-rendered hr {
+          border: 0; border-top: 1px solid rgba(255,255,255,0.1);
+          margin: 0.75rem 0;
+        }
+      `}</style>
     </div>
   );
 }

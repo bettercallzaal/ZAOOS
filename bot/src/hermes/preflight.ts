@@ -9,23 +9,27 @@ export interface PreFlightResult {
   checks: {
     forbiddenPaths: 'pass' | 'fail';
     typecheck: 'pass' | 'fail' | 'skipped';
-    lint: 'pass' | 'fail' | 'skipped';
     tests: 'pass' | 'fail' | 'skipped';
   };
 }
 
 /**
- * Pre-flight quality gate. Runs CI-equivalent checks BEFORE Critic sees diff.
+ * Pre-flight quality gate. Per doc 531 audit: SIMPLIFIED to typecheck + tests.
  *
- * Scope detection: ZAO OS root is huge (301 API routes + 279 components) so
- * `tsc --noEmit` on the whole tree OOMs at default 2GB heap. We scope checks
- * to the smallest project that contains all changed files:
- *   - Only bot/* changed -> `cd bot && npm run typecheck` + biome on bot/
- *   - Only src/* changed -> root typecheck (with NODE_OPTIONS=4GB)
- *   - Mixed -> both
- *   - Only docs/research changed -> skip type/lint entirely
+ * Why no lint anymore: each "hardening" feature added to this gate has
+ * introduced new failure modes (biome ignored bot/, biome heap OOM, scope
+ * detection edge cases). 3 of last 4 escalations were lint-config issues.
+ * Lint catches STYLE; CI catches it 30s after PR opens. Critic-on-CI-failure
+ * loop (pr-watcher.ts) handles the feedback. Don't recreate CI.
  *
- * Auto-loops back to Coder on fail. Cost: 0 tokens. Time: 5-30s typical.
+ * What we still gate on:
+ *   - Forbidden paths (security, free)
+ *   - TypeScript typecheck (catches real bugs - missing types, broken imports)
+ *   - Tests (only if Coder touched test files)
+ *
+ * Scope-aware: bot-only diffs run only `cd bot && npm run typecheck` (~5s).
+ * App-only diffs use NODE_OPTIONS heap=4GB to avoid OOM on 301-route tree.
+ * Docs-only diffs (research/, *.md) skip everything.
  */
 export async function runPreFlightGate(input: {
   workTreePath: string;
@@ -35,7 +39,6 @@ export async function runPreFlightGate(input: {
   const checks: PreFlightResult['checks'] = {
     forbiddenPaths: 'pass',
     typecheck: 'skipped',
-    lint: 'skipped',
     tests: 'skipped',
   };
   const scope = detectScope(input.filesChanged);
@@ -54,20 +57,25 @@ export async function runPreFlightGate(input: {
     }
   }
 
-  // Docs-only? Skip type/lint - nothing they'd catch.
+  // Docs-only? Skip everything.
   if (scope === 'docs-only') {
     return { ok: true, durationMs: Date.now() - start, scope, checks };
   }
 
-  // Generous heap for tsc on root workspace (default 2GB OOMs on 301 routes).
+  // Generous heap for app-side tsc (root has 301 routes + 279 components).
   const heapEnv: NodeJS.ProcessEnv = {
     ...process.env,
     NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --max-old-space-size=4096`.trim(),
   };
 
-  // Bot-side typecheck (small, fast). Run when scope is bot-only or mixed.
+  // Typecheck smallest scope possible.
   if (scope === 'bot-only' || scope === 'mixed') {
-    const tc = await runCmd('npm', ['run', '--silent', 'typecheck'], `${input.workTreePath}/bot`, heapEnv);
+    const tc = await runCmd(
+      'npm',
+      ['run', '--silent', 'typecheck'],
+      `${input.workTreePath}/bot`,
+      heapEnv,
+    );
     if (tc.exitCode !== 0) {
       checks.typecheck = 'fail';
       const out = (tc.stdout + '\n' + tc.stderr).slice(0, 1500);
@@ -80,8 +88,6 @@ export async function runPreFlightGate(input: {
       };
     }
   }
-
-  // App-side typecheck (heavy). Run when scope is app-only or mixed.
   if (scope === 'app-only' || scope === 'mixed') {
     const tc = await runCmd('npm', ['run', '--silent', 'typecheck'], input.workTreePath, heapEnv);
     if (tc.exitCode !== 0) {
@@ -98,26 +104,7 @@ export async function runPreFlightGate(input: {
   }
   checks.typecheck = 'pass';
 
-  // Biome lint - scope to changed paths only (root command lints everything,
-  // can over-report on unrelated drift like PR #321).
-  const lintTargets = lintScopeFor(scope, input.filesChanged);
-  if (lintTargets.length > 0) {
-    const lint = await runCmd('npx', ['biome', 'check', ...lintTargets], input.workTreePath, heapEnv);
-    if (lint.exitCode !== 0) {
-      checks.lint = 'fail';
-      const out = (lint.stdout + '\n' + lint.stderr).slice(0, 1500);
-      return {
-        ok: false,
-        error: `Lint errors block the merge. Fix these before retrying. Tip: \`npx biome check --write ${lintTargets.join(' ')}\` auto-fixes style:\n\n${out}`,
-        durationMs: Date.now() - start,
-        scope,
-        checks,
-      };
-    }
-    checks.lint = 'pass';
-  }
-
-  // Tests, only if Coder modified test files.
+  // Tests only if Coder touched test files.
   const touchedTests = input.filesChanged.some(
     (f) => f.includes('__tests__') || f.endsWith('.test.ts') || f.endsWith('.test.tsx'),
   );
@@ -160,25 +147,11 @@ function detectScope(files: string[]): PreFlightResult['scope'] {
     )
       app = true;
     else if (f.startsWith('research/') || f.startsWith('docs/') || f.endsWith('.md')) docs = true;
-    else app = true; // unknown -> treat as app to be safe
+    else app = true;
   }
   if (bot && app) return 'mixed';
   if (bot) return 'bot-only';
   if (app) return 'app-only';
   if (docs) return 'docs-only';
   return 'docs-only';
-}
-
-function lintScopeFor(scope: PreFlightResult['scope'], filesChanged: string[]): string[] {
-  if (scope === 'bot-only') return ['bot/'];
-  if (scope === 'app-only' || scope === 'mixed') {
-    // Lint only top-level dirs containing changed files (avoids OOM on full repo).
-    const dirs = new Set<string>();
-    for (const f of filesChanged) {
-      const top = f.split('/')[0];
-      if (top && !top.endsWith('.md')) dirs.add(`${top}/`);
-    }
-    return Array.from(dirs);
-  }
-  return [];
 }

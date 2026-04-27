@@ -384,6 +384,11 @@ bot.command('version', async (ctx) => {
   await ctx.reply('v1.6 hermes loop');
 });
 
+bot.command('uptime', async (ctx) => {
+  const seconds = Math.floor(process.uptime());
+  await ctx.reply(`Bot has been alive for ${seconds} seconds`);
+});
+
 bot.command('health', async (ctx) => {
   if (!isAdmin(ctx)) {
     await ctx.reply('Admin only.');

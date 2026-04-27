@@ -1,7 +1,7 @@
 ---
 topic: community
 type: decision
-status: research-complete
+status: shipped
 last-validated: 2026-04-27
 related-docs: 415, 468, 477, 490
 tier: STANDARD
@@ -9,7 +9,79 @@ tier: STANDARD
 
 # 533 — POIDH Clip-Up Bounty: BCZ YapZ Ep 17 (Hannah / Farm Drop)
 
-> **Goal:** Ship a copy-paste-ready POIDH bounty that pays community members to clip + repost the best 30-90s moment from BCZ YapZ Ep 17 (Hannah / Farm Drop, `youtu.be/hw-6IHaziV0`). Establish the format as a recurring weekly competition called "ZAO Clip-Up" so every BCZ YapZ episode (and future ZAO content) drops with a paid clip pot attached.
+> **Status:** LIVE 2026-04-27. Bounty 1151 on Base — https://poidh.xyz/base/bounty/1151
+>
+> **Goal:** Ship a copy-paste-ready POIDH bounty that pays community members to clip + repost the best 30-90s moment from BCZ YapZ Ep 17 (Hannah / Farm Drop, `youtu.be/hw-6IHaziV0`). First run of an audition-format clip bounty (Kenny / We Them Media style). Establish recurring 1-week cadence so every BCZ YapZ episode (and future ZAO content) drops with a paid clip pot attached.
+
+---
+
+## Live Bounty (Final Wording)
+
+**URL:** https://poidh.xyz/base/bounty/1151
+**Chain:** Base
+**Deadline:** 11:59 pm PST May 4, 2026
+**Judge:** Zaal (single-judge, not 48hr open vote)
+**Reviewed by:** Kenny (POIDH founder) before launch
+
+### Title (as posted)
+
+```
+Find your favorite clip from BCZ YapZ Ep 17 (Hannah / Farm Drop) and post it
+to either X, Instagram, or YouTube with a written comment about what it says
+to you.
+```
+
+### Description (as posted)
+
+```
+Find your favorite clip from BCZ YapZ Ep 17 with Hannah from Farm Drop and post
+it to either X, Instagram, or YouTube with a written comment about what it says
+to you.
+
+Watch here: https://youtu.be/hw-6IHaziV0
+
+This is not about hype. Think about what BetterCallZaal is trying to represent
+through these conversations. What are we doing well? What are we missing? What
+do you wish we would do? Honest reflection wins here - praise, critique, or both.
+
+The reward: One winner takes the full pot - and the pot grows in real time as
+others contribute. Track it live on poidh.
+
+How to enter:
+  1. Find a clip from https://youtu.be/hw-6IHaziV0
+  2. Post it to either X, Instagram, or YouTube with your honest thoughts
+  3. Tag @bettercallzaal so we can find it
+
+This bounty runs for one week. Deadline to enter 11:59 pm PST May 4, 2026. One
+winner. Chosen by me. Thoughtfulness is the only metric.
+```
+
+### Format Pivots from Original Research
+
+The original draft (preserved below in "Key Decisions") used POIDH's mechanical primitives — multi-rule claim spec, "this is for the ZAO" intro phrase, 48hr weighted open-bounty voting. After reviewing Kenny's `wethemmedia` bounty pattern and his direct feedback, format pivoted to:
+
+| Element | Original Draft | What Actually Shipped |
+|---------|---------------|----------------------|
+| Voice | Mechanical rule spec | Reflective audition framing (We Them Media style) |
+| Intro phrase | Required: "this is for the ZAO" first 3s | Dropped — felt forced for reflection-style bounty |
+| Platform | X / IG / Farcaster (FC tag in /thezao channel) | X / Instagram / **YouTube** (FC dropped, YouTube added) |
+| Tag | @thezao + @zaomusic + /thezao | @bettercallzaal only (Zaal's personal handle, since BCZ YapZ is his show) |
+| Winner picker | 48hr contributor-weighted open vote | Single judge (Zaal). Pot still open for top-ups |
+| Deadline phrasing | "Runs for one week" | Explicit: "Deadline 11:59 pm PST May 4, 2026" (Kenny: "helpful to have a clear exact time vs forcing people to do the math") |
+| "poidh" capitalization | "Poidh" / "POIDH" | All lowercase: "poidh" (Kenny: "we use all lowercase all the time") |
+| Multi-platform clarity | "Post it to X, Instagram, or YouTube" | "Post it to **either** X, Instagram, or YouTube" (Kenny: "make sure people don't think they need to post to ALL those platforms") |
+| Rule list | 5 hard rules (intro phrase, subtitles, post, screenshot, claim format) | 3 simple steps (find clip, post, tag) |
+
+### Lessons (apply to next bounty)
+
+1. **Voice > rules.** Reflection-format bounties win on tone, not enforcement. Drop legalistic language.
+2. **One judge.** Single-judge cleaner than weighted votes for audition-style pots. Open vote stays a tool for community-driven decisions.
+3. **Explicit deadline > relative.** Always say "11:59 pm PST {date}" not "one week."
+4. **Lowercase "poidh".** House style.
+5. **"Either" disambiguates.** Multi-platform asks need "either" or people parse as "all of these."
+6. **Run draft past Kenny.** Founder review caught 4 issues in <30 min. Cheap insurance.
+
+---
 
 ---
 
@@ -163,17 +235,17 @@ Want to top up the pot? Hit "Add funds" — anyone can.
 
 ## Action Bridge / Next Actions
 
-| Action | Owner | Type | By When |
-|--------|-------|------|---------|
-| Confirm ETH balance on Base for deploying wallet | @Zaal | Infra check | Before week-1 launch |
-| Create `poidh.xyz/a/thezao` album by posting first bounty | @Zaal | POIDH UI action | Week 1 launch day |
-| Post the bounty (paste from "The Bounty" section above) | @Zaal | POIDH | Week 1 launch day |
-| DM Hannah with link to winning clip post-vote | @Zaal | Outreach | Week 2 |
-| Auto-cast bounty to /thezao Farcaster channel | ZOE / cron | Bot task | Tied to weekly cadence |
-| Add "Clip-Up Pot" badge to `/bcz-yapz` page per episode | Claude | PR to ZAO OS | After 3 successful weeks |
-| Wire `src/lib/bounties/poidh.ts` helper (per doc 415 sketch) | Claude | PR | Before 4-week mark |
-| Decide week-2 source: Ep 16, oldest ep, or strongest replay-value ep | @Zaal | Editorial | End of week 1 |
-| Add `poidhAlbumUrl` to `community.config.ts` | Claude | PR | After album exists |
+| Action | Owner | Status | Notes |
+|--------|-------|--------|-------|
+| Confirm ETH balance on Base for deploying wallet | @Zaal | DONE | Posted bounty 1151 |
+| Post the bounty | @Zaal | DONE 2026-04-27 | https://poidh.xyz/base/bounty/1151 |
+| Promo bounty + add funds | @Zaal + Kenny | IN PROGRESS | Kenny: "will add funds + promo once live" |
+| Pick winner Mon May 4 11:59pm PST | @Zaal | PENDING | Mark calendar |
+| DM Hannah with link to winning clip | @Zaal | PENDING | After winner picked |
+| Decide Ep 18+ source + cadence | @Zaal | PENDING | After week 1 results |
+| Auto-cast bounty 1151 link to /thezao FC channel | ZOE / cron | OPTIONAL | Distribution boost |
+| Wire `src/lib/bounties/poidh.ts` helper (doc 415 sketch) | Claude | DEFERRED | After 3+ successful runs validate format |
+| Add "Clip-Up Pot" badge to `/bcz-yapz` page per episode | Claude | DEFERRED | After 3+ successful runs |
 
 ---
 
@@ -188,12 +260,12 @@ Want to top up the pot? Hit "Add funds" — anyone can.
 
 ## Sources
 
+- **LIVE BOUNTY:** [poidh.xyz/base/bounty/1151](https://poidh.xyz/base/bounty/1151) — first ZAO clip-up bounty, posted 2026-04-27
 - [POIDH homepage](https://poidh.xyz/)
-- [We Them Media album (reference)](https://poidh.xyz/a/wethemmedia)
+- [We Them Media album (reference / format inspiration)](https://poidh.xyz/a/wethemmedia)
 - [Bounty base/1096 — Preach POIDH & We Them Media](https://poidh.xyz/base/bounty/1096)
-- [Bounty base/522 — Bounce the ball like Tiger (intro phrase pattern)](https://poidh.xyz/base/bounty/522)
-- [Bounty base/544 — split the G (intro phrase pattern)](https://poidh.xyz/base/bounty/544)
-- [Bounty base/404 — proof of football skill ("this is for farcaster" variant)](https://poidh.xyz/base/bounty/404)
+- [Bounty base/522 — Bounce the ball like Tiger (original intro-phrase pattern, ultimately not used)](https://poidh.xyz/base/bounty/522)
+- [Bounty base/544 — split the G (original intro-phrase pattern, ultimately not used)](https://poidh.xyz/base/bounty/544)
 - [Open multiplayer bounties explained (poidh blog)](https://words.poidh.xyz/poidh-open-multiplayer-bounties-explained)
 - [POIDH FAQ](https://info.poidh.xyz)
 - [BCZ YapZ Ep 17 — Hannah / Farm Drop (YouTube)](https://youtu.be/hw-6IHaziV0)

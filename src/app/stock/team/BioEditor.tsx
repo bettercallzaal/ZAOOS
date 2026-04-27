@@ -1,9 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { RichBioEditor } from './RichBioEditor';
+
+function splitLinks(raw: string): string[] {
+  return raw
+    .split(/[\s,;]+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
+function joinLinks(rows: string[]): string {
+  return rows
+    .map((r) => r.trim())
+    .filter((r) => r.length > 0)
+    .join(', ');
+}
+
+function describeLink(token: string): string {
+  if (!token.trim()) return '';
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(token)) return 'Email';
+  if (token.startsWith('@')) return 'X handle';
+  if (/farcaster\.xyz|warpcast/i.test(token)) return 'Farcaster';
+  if (/x\.com|twitter\.com/i.test(token)) return 'X';
+  if (/instagram\.com/i.test(token)) return 'Instagram';
+  if (/youtube\.com|youtu\.be/i.test(token)) return 'YouTube';
+  if (/spotify\.com/i.test(token)) return 'Spotify';
+  if (/soundcloud\.com/i.test(token)) return 'SoundCloud';
+  if (/github\.com/i.test(token)) return 'GitHub';
+  if (/linkedin\.com/i.test(token)) return 'LinkedIn';
+  if (/tiktok\.com/i.test(token)) return 'TikTok';
+  if (/lens\.xyz|hey\.xyz/i.test(token)) return 'Lens';
+  if (/bsky\.app|bluesky/i.test(token)) return 'Bluesky';
+  if (/^https?:\/\//i.test(token) || /\.\w{2,}/.test(token)) return 'Website';
+  return 'Link';
+}
 
 // Try to coerce common share-link formats into a direct image URL the
 // browser can render in an <img> tag. Returns the original on no-op.
@@ -43,7 +76,11 @@ interface Props {
 
 export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUrl, initialScope, initialRole }: Props) {
   const [bio, setBio] = useState(initialBio);
-  const [links, setLinks] = useState(initialLinks);
+  const [linkRows, setLinkRows] = useState<string[]>(() => {
+    const initial = splitLinks(initialLinks);
+    return initial.length > 0 ? initial : [''];
+  });
+  const links = useMemo(() => joinLinks(linkRows), [linkRows]);
   const [photoUrl, setPhotoUrl] = useState(initialPhotoUrl);
   const [scope, setScope] = useState(initialScope);
   const [editing, setEditing] = useState(initialBio.trim().length === 0);
@@ -140,8 +177,20 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             <div className="bio-rendered text-sm text-gray-200 leading-relaxed">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{bio}</ReactMarkdown>
             </div>
-            {links.trim() && (
-              <p className="text-[11px] text-gray-500">{links}</p>
+            {linkRows.some((r) => r.trim()) && (
+              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                {linkRows.filter((r) => r.trim()).map((row, i) => (
+                  <span
+                    key={i}
+                    className="text-[10px] bg-[#0a1628] border border-white/[0.08] rounded-full px-2 py-0.5 text-gray-400"
+                    title={row}
+                  >
+                    <span className="text-[#f5a623]">{describeLink(row)}</span>
+                    <span className="text-gray-600"> · </span>
+                    <span>{row.length > 40 ? row.slice(0, 40) + '...' : row}</span>
+                  </span>
+                ))}
+              </div>
             )}
           </div>
         </div>
@@ -194,13 +243,61 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             placeholder={`Who you are, what you bring to ZAOstock, what you're working on. Hit Enter for new paragraphs. Use the toolbar above for bold, italic, headings, lists, links.`}
             maxLength={2000}
           />
-          <input
-            value={links}
-            onChange={(e) => setLinks(e.target.value)}
-            placeholder="Links (optional) - e.g. x.com/zaal, farcaster.xyz/zaal"
-            maxLength={500}
-            className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
-          />
+          <div className="space-y-1.5">
+            <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">
+              Links <span className="text-gray-700 font-normal normal-case">(optional)</span>
+            </p>
+            <div className="space-y-1.5">
+              {linkRows.map((row, i) => {
+                const tag = describeLink(row);
+                return (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <input
+                      value={row}
+                      onChange={(e) => {
+                        const next = [...linkRows];
+                        next[i] = e.target.value;
+                        setLinkRows(next);
+                      }}
+                      placeholder={i === 0 ? 'x.com/zaal · farcaster.xyz/zaal · @handle · email · any URL' : 'Another link'}
+                      maxLength={500}
+                      className="flex-1 bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
+                    />
+                    {row.trim() && (
+                      <span className="text-[10px] text-gray-500 px-1 hidden sm:inline w-16 text-right truncate" title={tag}>
+                        {tag}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (linkRows.length === 1) {
+                          setLinkRows(['']);
+                        } else {
+                          setLinkRows(linkRows.filter((_, idx) => idx !== i));
+                        }
+                      }}
+                      title="Remove this link"
+                      aria-label="Remove this link"
+                      className="text-gray-600 hover:text-red-400 px-2 py-1 text-base transition-colors flex-shrink-0"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              onClick={() => setLinkRows([...linkRows, ''])}
+              className="text-[11px] text-[#f5a623] hover:text-[#ffd700] flex items-center gap-1 mt-1"
+            >
+              <span aria-hidden>+</span> Add another link
+            </button>
+            <p className="text-[10px] text-gray-600 italic">
+              Drop your X / Farcaster / website / SoundCloud / anything. We&rsquo;ll auto-detect what each is.
+            </p>
+          </div>
 
           {!isAdvisor && (
             <div className="space-y-1.5">

@@ -9,7 +9,7 @@ import { OnboardingChecklist } from './OnboardingChecklist';
 
 const FESTIVAL_DATE = new Date('2026-10-03T12:00:00-04:00');
 
-interface Member { id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; }
+interface Member { id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; status_text?: string; }
 
 interface Todo {
   id: string;
@@ -145,17 +145,22 @@ export function PersonalHome({ member, allMembers, todos, sponsors, artists, mil
       <FestivalProgress sponsors={sponsors} artists={artists} milestones={milestones} />
 
       {/* Quick add */}
-      <QuickAdd currentMemberId={member.id} />
+      <div id="quick-add-anchor" className="scroll-mt-24">
+        <QuickAdd currentMemberId={member.id} />
+      </div>
 
       {/* Bio editor */}
-      <BioEditor
-        memberName={member.name}
-        initialBio={member.bio || ''}
-        initialLinks={member.links || ''}
-        initialPhotoUrl={member.photo_url || ''}
-        initialScope={member.scope || ''}
-        initialRole={member.role || 'member'}
-      />
+      <div id="profile-anchor" className="scroll-mt-24">
+        <BioEditor
+          memberName={member.name}
+          initialBio={member.bio || ''}
+          initialLinks={member.links || ''}
+          initialPhotoUrl={member.photo_url || ''}
+          initialScope={member.scope || ''}
+          initialRole={member.role || 'member'}
+          initialStatusText={member.status_text || ''}
+        />
+      </div>
 
       {/* Welcome banner */}
       <div className="bg-gradient-to-br from-[#f5a623]/20 via-[#f5a623]/5 to-transparent rounded-xl p-5 border border-[#f5a623]/30">

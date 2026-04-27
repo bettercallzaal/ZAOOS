@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { RichBioEditor } from './RichBioEditor';
+import { HelpIcon } from './HelpIcon';
 
 function splitLinks(raw: string): string[] {
   return raw
@@ -72,15 +73,17 @@ interface Props {
   initialPhotoUrl: string;
   initialScope: string;
   initialRole: string;
+  initialStatusText?: string;
 }
 
-export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUrl, initialScope, initialRole }: Props) {
+export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUrl, initialScope, initialRole, initialStatusText }: Props) {
   const [bio, setBio] = useState(initialBio);
   const [linkRows, setLinkRows] = useState<string[]>(() => {
     const initial = splitLinks(initialLinks);
     return initial.length > 0 ? initial : [''];
   });
   const links = useMemo(() => joinLinks(linkRows), [linkRows]);
+  const [statusText, setStatusText] = useState(initialStatusText ?? '');
   const [photoUrl, setPhotoUrl] = useState(initialPhotoUrl);
   const [scope, setScope] = useState(initialScope);
   const [editing, setEditing] = useState(initialBio.trim().length === 0);
@@ -110,7 +113,7 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
       const res = await fetch('/api/stock/team/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bio, links, photo_url: photoUrl, scope }),
+        body: JSON.stringify({ bio, links, photo_url: photoUrl, scope, status_text: statusText }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -141,7 +144,10 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
     <div className="bg-[#0d1b2a] rounded-xl p-4 border border-white/[0.08] space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <p className="text-[10px] uppercase tracking-wider text-[#f5a623] font-bold">Your Profile</p>
+          <p className="text-[10px] uppercase tracking-wider text-[#f5a623] font-bold flex items-center gap-1">
+            Your Profile
+            <HelpIcon section="profile" />
+          </p>
           <span className="text-[10px] text-gray-600">·</span>
           <span className={`text-[10px] font-bold ${completeness === 100 ? 'text-emerald-400' : completeness >= 60 ? 'text-amber-300' : 'text-gray-500'}`}>
             {completeness}% complete
@@ -174,6 +180,12 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             />
           )}
           <div className="flex-1 min-w-0 space-y-1">
+            {statusText.trim() && (
+              <div className="flex items-center gap-1.5 text-[11px] text-emerald-300 mb-1">
+                <span aria-hidden className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+                <span className="truncate">{statusText}</span>
+              </div>
+            )}
             <div className="bio-rendered text-sm text-gray-200 leading-relaxed">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{bio}</ReactMarkdown>
             </div>
@@ -212,6 +224,24 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
               className="w-20 h-20 rounded-full object-cover border border-[#f5a623]/30"
             />
           )}
+
+          <div className="space-y-1">
+            <label className="text-[10px] uppercase tracking-wider text-gray-500 font-bold flex items-center gap-1">
+              Status
+              <HelpIcon section="profile" />
+              <span className="text-gray-700 font-normal normal-case">(what you&rsquo;re working on right now)</span>
+            </label>
+            <div className="relative">
+              <span aria-hidden className="absolute left-2.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <input
+                value={statusText}
+                onChange={(e) => setStatusText(e.target.value)}
+                placeholder="e.g. drafting Roddy follow-up · prepping Cypher set · in flight"
+                maxLength={140}
+                className="w-full bg-[#0a1628] border border-white/[0.08] rounded pl-6 pr-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
+              />
+            </div>
+          </div>
 
           <input
             value={photoUrl}

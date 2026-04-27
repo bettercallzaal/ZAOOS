@@ -47,6 +47,7 @@ export interface PublicMember {
   bio: string;
   links: string;
   photo_url: string;
+  status_text: string;
   slug: string;
 }
 
@@ -87,7 +88,7 @@ export async function getPublicMembers(): Promise<PublicMember[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('stock_team_members')
-    .select('id, name, role, scope, secondary_scope, bio, links, photo_url, active')
+    .select('id, name, role, scope, secondary_scope, bio, links, photo_url, status_text, active')
     .neq('active', false)
     .order('created_at');
 
@@ -102,6 +103,7 @@ export async function getPublicMembers(): Promise<PublicMember[]> {
     bio: m.bio || '',
     links: m.links || '',
     photo_url: m.photo_url || '',
+    status_text: m.status_text || '',
     slug: slugify(m.name),
   }));
 }

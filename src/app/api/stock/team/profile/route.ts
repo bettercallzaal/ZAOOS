@@ -16,6 +16,7 @@ const patchSchema = z.object({
       { message: 'Photo URL must start with https://' },
     ),
   scope: z.enum(['', 'ops', 'music', 'design']).optional(),
+  status_text: z.string().max(140).optional(),
 });
 
 export async function PATCH(request: NextRequest) {
@@ -40,6 +41,7 @@ export async function PATCH(request: NextRequest) {
     if (parsed.data.links !== undefined) updates.links = parsed.data.links;
     if (parsed.data.photo_url !== undefined) updates.photo_url = parsed.data.photo_url;
     if (parsed.data.scope !== undefined) updates.scope = parsed.data.scope;
+    if (parsed.data.status_text !== undefined) updates.status_text = parsed.data.status_text;
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });
@@ -50,7 +52,7 @@ export async function PATCH(request: NextRequest) {
       .from('stock_team_members')
       .update(updates)
       .eq('id', session.memberId)
-      .select('id, name, bio, links, photo_url')
+      .select('id, name, bio, links, photo_url, status_text')
       .single();
 
     if (error) {

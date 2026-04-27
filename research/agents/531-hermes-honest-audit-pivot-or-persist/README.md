@@ -3,7 +3,7 @@ topic: agents
 type: audit
 status: research-complete
 last-validated: 2026-04-27
-related-docs: 461, 506, 507, 523, 524, 527, 529
+related-docs: 461, 506, 507, 523, 524, 527, 528, 529
 tier: DISPATCH
 ---
 
@@ -112,7 +112,7 @@ Defer all. Ship the simplification, prove 3 clean /fix runs back-to-back, then r
 - github.com/Aider-AI/aider - 43K stars, 6yr mature
 - github.com/All-Hands-AI/OpenHands - 70K stars, $18.8M Series A, 53% SWE-bench
 - github.com/anthropics/claude-code-action - official, would need Telegram bridge
-- Doc 521-529 prior Hermes design
+- Doc 523, 524, 527, 528, 529 prior Hermes design
 
 ## Staleness + Verification
 
@@ -123,7 +123,7 @@ Defer all. Ship the simplification, prove 3 clean /fix runs back-to-back, then r
 
 | # | Action | Owner | Type | By |
 |---|--------|-------|------|-----|
-| 1 | Ship simplification PR: remove biome from preflight.ts, simplify scope routing | Claude | Code | Today |
+| 1 | Ship simplification PR: remove biome from preflight.ts, simplify scope routing | Claude | Code | DONE - PR #334 merged 2026-04-27 09:52 UTC |
 | 2 | Pull on VPS + restart zao-devz-stack | Claude | SSH | Today |
 | 3 | Test 3 /fix runs back-to-back, all task types | Zaal | Manual | After step 2 |
 | 4 | If 3/3 succeed: declare foundation locked, move to next features | Zaal+Claude | Decision | After step 3 |

@@ -31,6 +31,8 @@ export default async function StockTeamPage() {
     budgetRes,
     notesRes,
     rsvpsRes,
+    myCirclesRes,
+    myActivityRes,
   ] = await Promise.allSettled([
     supabase.from('stock_goals').select('*').order('sort_order'),
     supabase
@@ -75,6 +77,14 @@ export default async function StockTeamPage() {
       .select('id, name, email, created_at')
       .eq('event_slug', 'zao-stock-2026')
       .order('created_at', { ascending: false }),
+    supabase
+      .from('stock_circle_members')
+      .select('circle_id', { count: 'exact', head: true })
+      .eq('member_id', member.memberId),
+    supabase
+      .from('stock_activity_log')
+      .select('id', { count: 'exact', head: true })
+      .eq('actor_id', member.memberId),
   ]);
 
   const goals = goalsRes.status === 'fulfilled' ? goalsRes.value.data || [] : [];
@@ -87,6 +97,8 @@ export default async function StockTeamPage() {
   const budget = budgetRes.status === 'fulfilled' ? budgetRes.value.data || [] : [];
   const meetingNotes = notesRes.status === 'fulfilled' ? notesRes.value.data || [] : [];
   const rsvps = rsvpsRes.status === 'fulfilled' ? rsvpsRes.value.data || [] : [];
+  const myCirclesCount = myCirclesRes.status === 'fulfilled' ? myCirclesRes.value.count ?? 0 : 0;
+  const myActivityCount = myActivityRes.status === 'fulfilled' ? myActivityRes.value.count ?? 0 : 0;
 
   return (
     <Dashboard
@@ -102,6 +114,8 @@ export default async function StockTeamPage() {
       rsvps={rsvps}
       budget={budget}
       meetingNotes={meetingNotes}
+      myCirclesCount={myCirclesCount}
+      myActivityCount={myActivityCount}
     />
   );
 }

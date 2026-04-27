@@ -128,6 +128,8 @@ interface Props {
   rsvps: Rsvp[];
   budget: BudgetEntry[];
   meetingNotes: Note[];
+  myCirclesCount?: number;
+  myActivityCount?: number;
 }
 
 export function Dashboard({
@@ -143,6 +145,8 @@ export function Dashboard({
   rsvps,
   budget,
   meetingNotes,
+  myCirclesCount = 0,
+  myActivityCount = 0,
 }: Props) {
   const router = useRouter();
   const [tab, setTabRaw] = useState<Tab>('home');
@@ -251,6 +255,8 @@ export function Dashboard({
               artists={artists}
               milestones={milestones}
               onNavigate={(t) => setTab(t)}
+              inAnyCircle={myCirclesCount > 0}
+              hasFirstActivity={myActivityCount > 0}
             />
           </>
         )}

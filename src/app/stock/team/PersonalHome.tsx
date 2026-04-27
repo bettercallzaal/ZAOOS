@@ -5,6 +5,7 @@ import { ResearchLinks } from './ResearchLinks';
 import { FestivalProgress } from './FestivalProgress';
 import { QuickAdd } from './QuickAdd';
 import { BioEditor } from './BioEditor';
+import { OnboardingChecklist } from './OnboardingChecklist';
 
 const FESTIVAL_DATE = new Date('2026-10-03T12:00:00-04:00');
 
@@ -55,6 +56,8 @@ interface Props {
   artists: Artist[];
   milestones: Milestone[];
   onNavigate: (tab: 'sponsors' | 'artists' | 'timeline' | 'overview') => void;
+  inAnyCircle?: boolean;
+  hasFirstActivity?: boolean;
 }
 
 const TEAM_LABEL: Record<string, string> = {
@@ -89,7 +92,7 @@ function daysToDue(date: string): number {
   return Math.ceil((new Date(date + 'T00:00:00').getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export function PersonalHome({ member, allMembers, todos, sponsors, artists, milestones, onNavigate }: Props) {
+export function PersonalHome({ member, allMembers, todos, sponsors, artists, milestones, onNavigate, inAnyCircle = false, hasFirstActivity = false }: Props) {
   const daysToFest = daysUntil(FESTIVAL_DATE);
 
   const myTodos = useMemo(() => todos.filter((t) => t.owner?.id === member.id), [todos, member.id]);
@@ -131,6 +134,13 @@ export function PersonalHome({ member, allMembers, todos, sponsors, artists, mil
 
   return (
     <div className="space-y-6">
+      {/* Onboarding checklist - hides itself once complete */}
+      <OnboardingChecklist
+        member={member}
+        inAnyCircle={inAnyCircle}
+        hasFirstActivity={hasFirstActivity}
+      />
+
       {/* Festival-wide progress */}
       <FestivalProgress sponsors={sponsors} artists={artists} milestones={milestones} />
 

@@ -23,6 +23,7 @@ import { dispatchHermesRun, type HermesNarrator } from '../hermes/runner';
 import { listOpenRuns, getRun } from '../hermes/db';
 import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
+import * as http from 'node:http';
 
 const devzToken = process.env.ZAO_DEVZ_BOT_TOKEN;
 const hermesToken = process.env.HERMES_BOT_TOKEN;
@@ -398,7 +399,6 @@ function startHermesHttpListener(): void {
     console.warn('[devz] HERMES_DISPATCH_SECRET not set - HTTP dispatch listener disabled');
     return;
   }
-  const http = require('node:http') as typeof import('node:http');
   http
     .createServer(async (req, res) => {
       if (req.method !== 'POST' || req.url !== '/hermes-dispatch') {

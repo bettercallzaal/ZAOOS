@@ -3,22 +3,32 @@
 ZOE random learning pings (no-LLM mode).
 
 Picks a random doc from the ZAO OS research library + ADRs + BRAIN/,
-extracts the title + opening summary, sends to Zaal via Telegram.
+extracts the title + opening summary, sends to Telegram.
 
-Designed to run every 30 minutes via cron during waking hours (9am-9pm ET).
+Designed to run every hour via cron during waking hours (9am-9pm ET).
 
 Environment variables required:
-  - TELEGRAM_BOT_TOKEN: ZOE's Telegram bot token (auto-wired from ~/.env.portal)
-  - TELEGRAM_CHAT_ID: Zaal's user/chat ID (default: 1447437687)
-  - ZAO_OS_REPO: path to the ZAO OS V1 git checkout on the host
-                 (default: /home/zaal/zao-os)
+  - TELEGRAM_BOT_TOKEN: default Telegram bot token (auto-wired from ~/.env.portal)
+  - TELEGRAM_CHAT_ID:   default chat ID (Zaal's DM: 1447437687)
+  - ZAO_OS_REPO:        path to the ZAO OS V1 git checkout on the host
+                        (default: /home/zaal/zao-os)
 
-Optional:
-  - ANTHROPIC_API_KEY: if set, uses Claude Haiku to synthesize a 1-line tip
-                       instead of the doc's opening summary. Costs ~$3-4/mo.
-                       Default off — shipped as no-LLM to start (doc 462 plan).
-  - QUIET_HOURS_START: hour to skip starting from (default: 21 = 9pm)
-  - QUIET_HOURS_END: hour to resume (default: 9 = 9am)
+Optional destination overrides (route tips into ZAO Devz / a forum topic
+without disturbing other tools that still expect TELEGRAM_BOT_TOKEN to point
+at ZOE bot in DM):
+  - ZOE_TIP_BOT_TOKEN:  bot that has post permission in the destination chat
+                        (typically ZAO_DEVZ_BOT_TOKEN)
+  - ZOE_TIP_CHAT_ID:    destination chat (typically ZAO_DEVZ_CHAT_ID)
+  - ZOE_TIP_THREAD_ID:  forum topic id (message_thread_id) for "General"
+
+Optional Claude:
+  - ANTHROPIC_API_KEY:  if set, uses Claude Haiku to synthesize a 1-line tip
+                        instead of the doc's opening summary. Costs ~$3-4/mo.
+                        Default off — shipped as no-LLM to start (doc 462 plan).
+
+Quiet hours:
+  - QUIET_HOURS_START:  hour to skip starting from (default: 21 = 9pm)
+  - QUIET_HOURS_END:    hour to resume (default: 9 = 9am)
 
 State file: ~/.cache/zoe-learning-pings/sent.json
   Tracks last 7 days of sent doc paths so we don't repeat.
@@ -47,8 +57,12 @@ STATE_FILE = Path(os.environ.get(
 QUIET_START = int(os.environ.get("QUIET_HOURS_START", "21"))
 QUIET_END = int(os.environ.get("QUIET_HOURS_END", "9"))
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "").strip()
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
+# Destination overrides win over the legacy TELEGRAM_* defaults so we can
+# route tips into ZAO Devz / a forum topic without disturbing other tools
+# that still expect TELEGRAM_BOT_TOKEN to point at ZOE bot in DM.
+TELEGRAM_BOT_TOKEN = os.environ.get("ZOE_TIP_BOT_TOKEN") or os.environ.get("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.environ.get("ZOE_TIP_CHAT_ID") or os.environ.get("TELEGRAM_CHAT_ID")
+TELEGRAM_THREAD_ID = os.environ.get("ZOE_TIP_THREAD_ID")
 HAIKU_MODEL = os.environ.get("ZOE_TIP_MODEL", "claude-haiku-4-5-20251001")
 MAX_DOC_CHARS_FOR_LLM = 3500
 MAX_TIP_CHARS = 240
@@ -253,6 +267,11 @@ def send_telegram(text: str, reply_markup: dict | None = None) -> bool:
         "text": text,
         "disable_web_page_preview": True,
     }
+    if TELEGRAM_THREAD_ID:
+        try:
+            payload["message_thread_id"] = int(TELEGRAM_THREAD_ID)
+        except ValueError:
+            print(f"ZOE_TIP_THREAD_ID is not numeric: {TELEGRAM_THREAD_ID}", file=sys.stderr)
     if reply_markup is not None:
         payload["reply_markup"] = reply_markup
     body = json.dumps(payload).encode("utf-8")

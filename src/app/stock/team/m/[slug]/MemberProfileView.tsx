@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { parseLinks, type PublicMember } from '@/lib/stock/members';
 
 interface Props {
@@ -48,7 +50,9 @@ export function MemberProfileView({ member }: Props) {
       {member.bio && member.bio.trim() ? (
         <div>
           <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Bio</p>
-          <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">{member.bio}</p>
+          <div className="bio-rendered text-sm text-gray-200 leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{member.bio}</ReactMarkdown>
+          </div>
         </div>
       ) : (
         <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-lg p-4">
@@ -75,6 +79,36 @@ export function MemberProfileView({ member }: Props) {
           </ul>
         </div>
       )}
+      <style>{`
+        .bio-rendered p { margin-bottom: 0.75rem; }
+        .bio-rendered p:last-child { margin-bottom: 0; }
+        .bio-rendered h1, .bio-rendered h2, .bio-rendered h3 {
+          color: #f5a623; font-weight: 700; margin: 1rem 0 0.5rem;
+        }
+        .bio-rendered h1 { font-size: 1.15rem; }
+        .bio-rendered h2 { font-size: 1rem; }
+        .bio-rendered h3 { font-size: 0.9rem; }
+        .bio-rendered ul, .bio-rendered ol { margin: 0.5rem 0 0.75rem 1.4rem; }
+        .bio-rendered ul { list-style: disc; }
+        .bio-rendered ol { list-style: decimal; }
+        .bio-rendered li { margin-bottom: 0.25rem; }
+        .bio-rendered strong { color: #fff; font-weight: 700; }
+        .bio-rendered em { color: #fbbf24; font-style: italic; }
+        .bio-rendered a { color: #f5a623; text-decoration: underline; }
+        .bio-rendered code {
+          background: #0a1628; padding: 1px 5px; border-radius: 3px;
+          font-size: 0.85em; color: #c7d2fe;
+        }
+        .bio-rendered blockquote {
+          border-left: 2px solid rgba(245, 166, 35, 0.5);
+          padding-left: 0.75rem; margin: 0.5rem 0;
+          color: #cbd5e1; font-style: italic;
+        }
+        .bio-rendered hr {
+          border: 0; border-top: 1px solid rgba(255,255,255,0.1);
+          margin: 1rem 0;
+        }
+      `}</style>
     </section>
   );
 }

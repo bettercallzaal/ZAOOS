@@ -117,7 +117,7 @@ const ENTRIES: HelpEntry[] = [
       <>
         <p>The home tab shows what&rsquo;s assigned to you. Open the Overview tab for a full kanban board.</p>
         <ul className="list-disc pl-5 space-y-1">
-          <li><strong>Quick add</strong> on home: type "Did X" or "Going to do Y" and the system parses it.</li>
+          <li><strong>Quick add</strong> on home: type &ldquo;Did X&rdquo; or &ldquo;Going to do Y&rdquo; and the system parses it.</li>
           <li><strong>Bot shortcuts</strong> in DM: <code className="bg-[#0a1628] px-1 rounded text-[#c7d2fe]">/do &lt;text&gt;</code> to log work, <code className="bg-[#0a1628] px-1 rounded text-[#c7d2fe]">/mytodos</code> to see what you own, <code className="bg-[#0a1628] px-1 rounded text-[#c7d2fe]">/mytodos_all</code> to see everything open.</li>
           <li><strong>Status</strong> moves todo -&gt; in_progress -&gt; done. Click to update.</li>
         </ul>

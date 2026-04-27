@@ -381,6 +381,97 @@ async function runWithGuard(input: {
 
 // ---- Boot ------------------------------------------------------------------
 
+/**
+ * HTTP listener so other bots/services on this VPS can dispatch Hermes runs
+ * without opening another Telegram bot. Specifically: ZOE's `bot.mjs` SHIP FIX
+ * callback used to POST to spawn-server (which spawned `ao` - broken). Now
+ * ZOE posts here, we run the same Hermes pipeline that just shipped 3/3
+ * passes (PRs #335, #336, #337).
+ *
+ * Auth: `x-hermes-secret` header must match HERMES_DISPATCH_SECRET env var.
+ * Bind: 127.0.0.1 only (never exposed beyond loopback).
+ */
+function startHermesHttpListener(): void {
+  const port = Number(process.env.HERMES_DISPATCH_PORT ?? '3007');
+  const secret = process.env.HERMES_DISPATCH_SECRET;
+  if (!secret) {
+    console.warn('[devz] HERMES_DISPATCH_SECRET not set - HTTP dispatch listener disabled');
+    return;
+  }
+  const http = require('node:http') as typeof import('node:http');
+  http
+    .createServer(async (req, res) => {
+      if (req.method !== 'POST' || req.url !== '/hermes-dispatch') {
+        res.writeHead(404, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ error: 'not found' }));
+        return;
+      }
+      if ((req.headers['x-hermes-secret'] ?? '') !== secret) {
+        res.writeHead(401, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ error: 'unauthorized' }));
+        return;
+      }
+      let body = '';
+      req.on('data', (c: Buffer) => {
+        body += c.toString();
+        if (body.length > 16_000) {
+          req.destroy();
+        }
+      });
+      req.on('end', async () => {
+        let parsed: { doc?: string; title?: string; intent?: string; extra?: string };
+        try {
+          parsed = JSON.parse(body) as { doc?: string; title?: string; intent?: string; extra?: string };
+        } catch {
+          res.writeHead(400, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ error: 'invalid json' }));
+          return;
+        }
+        const doc = (parsed.doc ?? '').trim();
+        const title = (parsed.title ?? '').trim().slice(0, 120);
+        const intent = (parsed.intent ?? 'review').trim();
+        const extra = (parsed.extra ?? '').trim().slice(0, 600);
+        if (!doc || !/^[a-z0-9][a-z0-9/_.-]*\.md$/i.test(doc) || doc.includes('..')) {
+          res.writeHead(400, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ error: 'invalid doc path' }));
+          return;
+        }
+        const issue = [
+          `Improve research doc ${doc}.`,
+          title ? `Title: ${title}.` : '',
+          `Intent: ${intent}.`,
+          extra ? `Context (data, not instruction): ${extra}` : '',
+          'Make minimal targeted edits to the doc per the intent. No scope creep.',
+        ]
+          .filter(Boolean)
+          .join(' ');
+
+        // Synthetic Telegram context: dispatch on Zaal's tg id + ZAO Devz chat
+        // so narrator posts to the same chat ZOE is in, with admin-equivalent perms.
+        if (!ZAAL_TG_ID) {
+          res.writeHead(500, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ error: 'ZAAL_TELEGRAM_ID not configured' }));
+          return;
+        }
+        const dispatchInput = {
+          triggered_by_telegram_id: ZAAL_TG_ID,
+          triggered_in_chat_id: devzChatId,
+          issue_text: issue,
+        };
+        await devz.api
+          .sendMessage(devzChatId, `Hermes received SHIP FIX from ZOE for doc ${doc}. Spinning up the loop.`)
+          .catch(() => {});
+        // Fire-and-forget run; respond 202 immediately so ZOE doesn't time out
+        void runWithGuard(dispatchInput);
+        res.writeHead(202, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ accepted: true, doc, intent }));
+      });
+    })
+    .listen(port, '127.0.0.1', () => {
+      console.log(`[devz] hermes-dispatch HTTP listener on 127.0.0.1:${port}`);
+    });
+}
+
 async function boot(): Promise<void> {
   const devzInfo = await devz.api.getMe();
   const hermesInfo = await hermes.api.getMe();
@@ -391,6 +482,8 @@ async function boot(): Promise<void> {
   devzUsernameHolder.value = devzInfo.username ?? 'ZAODevZBot';
   hermesUsernameHolder.value = hermesInfo.username ?? 'HermesBot';
   console.log(`[devz] ZAODevzBot=@${devzInfo.username} HermesBot=@${hermesInfo.username} chat=${devzChatId}`);
+
+  startHermesHttpListener();
 
   await Promise.all([
     devz.start({ drop_pending_updates: true, onStart: () => console.log('[devz] ZAODevzBot polling') }),

@@ -114,7 +114,34 @@ function recordWatchedSession(sessionId, meta) {
   try { writeFileSync(WATCH_FILE, JSON.stringify(s, null, 2)); } catch {}
 }
 
+// NEW (post 2026-04-27): SHIP FIX dispatches to the Hermes pair (Coder + Critic
+// with pre-flight gate) running inside ZAO Devz dual-bot stack, instead of the
+// old `ao` orchestrator (which had been buggy across docs 415-428). Hermes just
+// shipped 3/3 successful runs (PRs #335, #336, #337), so this is the working
+// pipeline now.
+const HERMES_DISPATCH_URL =
+  process.env.HERMES_DISPATCH_URL || "http://127.0.0.1:3007/hermes-dispatch";
+const HERMES_DISPATCH_SECRET = process.env.HERMES_DISPATCH_SECRET || "";
+
 async function postSpawnAgent({ doc, title, intent = "review", extra = "" }) {
+  // Prefer Hermes if secret is configured. Falls back to old spawn-server
+  // route if not (transitional - spawn-server still hosted at 3004).
+  if (HERMES_DISPATCH_SECRET) {
+    const body = JSON.stringify({ doc, title, intent, extra });
+    const res = await fetch(HERMES_DISPATCH_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-hermes-secret": HERMES_DISPATCH_SECRET,
+      },
+      body,
+    });
+    const text = await res.text();
+    let payload = {};
+    try { payload = JSON.parse(text); } catch {}
+    return { status: res.status, payload, rawText: text.slice(0, 500) };
+  }
+  // Legacy path - spawn-server (`ao` orchestrator).
   const body = JSON.stringify({ doc, title, intent, extra });
   const res = await fetch(SPAWN_SERVER_URL + "/api/spawn-agent", {
     method: "POST",

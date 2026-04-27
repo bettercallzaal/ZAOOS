@@ -25,7 +25,7 @@ tier: DISPATCH
 | Bug surface rate | **1 new mechanical bug per 8.4 min of agent runtime** |
 | Trajectory | **Diverging, not converging** |
 
-**The 1 successful run shipped BEFORE pre-flight gate existed.** Every test since pre-flight (#325 Apr 26 5:40 PM UTC) has either failed or escalated. Hermes worked better without the safety net we added to make it safer.
+**The 1 successful run shipped BEFORE pre-flight gate existed.** Every test since pre-flight (#325 Apr 26 17:40 UTC) has either failed or escalated. Hermes worked better without the safety net we added to make it safer.
 
 ## Mechanical Bugs Surfaced In Order
 
@@ -107,7 +107,7 @@ Defer all. Ship the simplification, prove 3 clean /fix runs back-to-back, then r
 - Agent 1 architecture audit: pre-flight as fragility source, drop biome, add Docker
 - Agent 2 alternatives comparison: stick with custom Hermes, migration not worth it
 - Agent 3 production timeline: 1 success / 8 failure rate, 8.4 min between bugs, diverging trajectory
-- arxiv 2604.03551 - AgenticFlict 27.67% conflict rate baseline
+- arxiv.org/abs/2604.03551 - AgenticFlict dataset, 27.67% conflict rate baseline
 - decodingai.com/p/ralph-loops - Boris Cherny Claude Code creator: verification signal 2-3x quality
 - github.com/Aider-AI/aider - 43K stars, 6yr mature
 - github.com/All-Hands-AI/OpenHands - 70K stars, $18.8M Series A, 53% SWE-bench

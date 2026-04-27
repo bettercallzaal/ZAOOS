@@ -33,6 +33,7 @@ export default async function StockTeamPage() {
     rsvpsRes,
     myCirclesRes,
     myActivityRes,
+    feedRes,
   ] = await Promise.allSettled([
     supabase.from('stock_goals').select('*').order('sort_order'),
     supabase
@@ -40,7 +41,7 @@ export default async function StockTeamPage() {
       .select('*, owner:stock_team_members!owner_id(id, name), creator:stock_team_members!created_by(id, name)')
       .order('status')
       .order('created_at', { ascending: false }),
-    supabase.from('stock_team_members').select('id, name, role, scope, secondary_scope, bio, links, photo_url, status_text').neq('active', false).order('created_at'),
+    supabase.from('stock_team_members').select('id, name, role, scope, secondary_scope, bio, links, photo_url, status_text, skills').neq('active', false).order('created_at'),
     supabase
       .from('stock_sponsors')
       .select('*, owner:stock_team_members!owner_id(id, name)')
@@ -85,6 +86,11 @@ export default async function StockTeamPage() {
       .from('stock_activity_log')
       .select('id', { count: 'exact', head: true })
       .eq('actor_id', member.memberId),
+    supabase
+      .from('stock_activity_log')
+      .select('id, actor_id, entity_type, action, field_changed, new_value, created_at, actor:stock_team_members!actor_id(id, name)')
+      .order('created_at', { ascending: false })
+      .limit(15),
   ]);
 
   const goals = goalsRes.status === 'fulfilled' ? goalsRes.value.data || [] : [];
@@ -99,6 +105,31 @@ export default async function StockTeamPage() {
   const rsvps = rsvpsRes.status === 'fulfilled' ? rsvpsRes.value.data || [] : [];
   const myCirclesCount = myCirclesRes.status === 'fulfilled' ? myCirclesRes.value.count ?? 0 : 0;
   const myActivityCount = myActivityRes.status === 'fulfilled' ? myActivityRes.value.count ?? 0 : 0;
+
+  type FeedRow = {
+    id: string;
+    actor_id: string | null;
+    entity_type: string;
+    action: string;
+    field_changed: string | null;
+    new_value: string | null;
+    created_at: string;
+    actor: { id: string; name: string } | { id: string; name: string }[] | null;
+  };
+  const feedRows = (feedRes.status === 'fulfilled' ? feedRes.value.data || [] : []) as unknown as FeedRow[];
+  const feed = feedRows.map((row) => {
+    const actor = Array.isArray(row.actor) ? row.actor[0] : row.actor;
+    return {
+      id: row.id,
+      actorName: actor?.name ?? null,
+      actorId: row.actor_id,
+      entityType: row.entity_type,
+      action: row.action,
+      fieldChanged: row.field_changed,
+      newValue: row.new_value,
+      createdAt: row.created_at,
+    };
+  });
 
   return (
     <Dashboard
@@ -116,6 +147,7 @@ export default async function StockTeamPage() {
       meetingNotes={meetingNotes}
       myCirclesCount={myCirclesCount}
       myActivityCount={myActivityCount}
+      feed={feed}
     />
   );
 }

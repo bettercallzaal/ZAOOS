@@ -125,6 +125,39 @@ const ENTRIES: HelpEntry[] = [
     ),
   },
   {
+    id: 'updates-feed',
+    title: 'Recent activity feed',
+    body: (
+      <>
+        <p>The home tab shows what other teammates have been doing - bio updates, todos closed, ideas dropped, contacts logged. Last 15 events.</p>
+        <p>Click a name to jump to their public profile.</p>
+        <p>If your name shows up here, your work is being noticed. If it never does, log contributions through the bot or Quick Add - try <code className="bg-[#0a1628] px-1 rounded text-[#c7d2fe]">/idea</code> or <code className="bg-[#0a1628] px-1 rounded text-[#c7d2fe]">/do</code>.</p>
+      </>
+    ),
+  },
+  {
+    id: 'leaderboard',
+    title: 'Most-complete profiles',
+    body: (
+      <>
+        <p>Top 5 most-complete profiles plus your own rank. Light social pressure, no actual stakes - just makes it easy to see who&rsquo;s set up and who isn&rsquo;t.</p>
+        <p>Scoring: bio 40 (full = 40, partial = 20), photo 30, scope 20, links 10. Total = 100.</p>
+        <p>Click anyone&rsquo;s name to open their public profile.</p>
+      </>
+    ),
+  },
+  {
+    id: 'skills',
+    title: 'Skills (what you offer)',
+    body: (
+      <>
+        <p>One free-text comma-separated list. Examples: &ldquo;video, sound, sponsorship outreach, photography, music production&rdquo;.</p>
+        <p>Renders as gold pill tags on your profile and in the Team directory. Searchable - if someone needs a videographer, typing &ldquo;video&rdquo; in the team search filters to people who listed it.</p>
+        <p>Used for matching teammates to work that needs done. The more specific, the better.</p>
+      </>
+    ),
+  },
+  {
     id: 'whats-changing',
     title: 'What if something looks wrong?',
     body: (

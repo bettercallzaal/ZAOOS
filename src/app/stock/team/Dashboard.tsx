@@ -120,7 +120,7 @@ interface Props {
   memberId: string;
   goals: Array<{ id: string; title: string; status: 'locked' | 'wip' | 'tbd'; details: string; category: string; sort_order: number }>;
   todos: Array<{ id: string; title: string; status: 'todo' | 'in_progress' | 'done'; notes: string; owner: { id: string; name: string } | null; creator: { id: string; name: string } | null; created_at: string }>;
-  members: Array<{ id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; status_text?: string }>;
+  members: Array<{ id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; status_text?: string; skills?: string }>;
   sponsors: Sponsor[];
   artists: Artist[];
   milestones: Milestone[];
@@ -130,6 +130,16 @@ interface Props {
   meetingNotes: Note[];
   myCirclesCount?: number;
   myActivityCount?: number;
+  feed?: Array<{
+    id: string;
+    actorName: string | null;
+    actorId: string | null;
+    entityType: string;
+    action: string;
+    fieldChanged: string | null;
+    newValue: string | null;
+    createdAt: string;
+  }>;
 }
 
 export function Dashboard({
@@ -147,6 +157,7 @@ export function Dashboard({
   meetingNotes,
   myCirclesCount = 0,
   myActivityCount = 0,
+  feed = [],
 }: Props) {
   const router = useRouter();
   const [tab, setTabRaw] = useState<Tab>('home');
@@ -264,6 +275,7 @@ export function Dashboard({
               onNavigate={(t) => setTab(t)}
               inAnyCircle={myCirclesCount > 0}
               hasFirstActivity={myActivityCount > 0}
+              feed={feed}
             />
           </>
         )}

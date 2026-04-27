@@ -50,6 +50,18 @@ export function MemberProfileView({ member }: Props) {
               <span>{member.status_text}</span>
             </div>
           )}
+          {member.skills && member.skills.trim() && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {member.skills.split(/[,;]+/).map((s) => s.trim()).filter(Boolean).slice(0, 16).map((s, i) => (
+                <span
+                  key={i}
+                  className="text-[11px] bg-[#f5a623]/10 border border-[#f5a623]/20 rounded-full px-2.5 py-0.5 text-[#fbbf24]"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

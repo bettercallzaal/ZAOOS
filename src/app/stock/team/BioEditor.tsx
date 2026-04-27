@@ -74,9 +74,10 @@ interface Props {
   initialScope: string;
   initialRole: string;
   initialStatusText?: string;
+  initialSkills?: string;
 }
 
-export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUrl, initialScope, initialRole, initialStatusText }: Props) {
+export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUrl, initialScope, initialRole, initialStatusText, initialSkills }: Props) {
   const [bio, setBio] = useState(initialBio);
   const [linkRows, setLinkRows] = useState<string[]>(() => {
     const initial = splitLinks(initialLinks);
@@ -84,6 +85,7 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
   });
   const links = useMemo(() => joinLinks(linkRows), [linkRows]);
   const [statusText, setStatusText] = useState(initialStatusText ?? '');
+  const [skills, setSkills] = useState(initialSkills ?? '');
   const [photoUrl, setPhotoUrl] = useState(initialPhotoUrl);
   const [scope, setScope] = useState(initialScope);
   const [editing, setEditing] = useState(initialBio.trim().length === 0);
@@ -113,7 +115,7 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
       const res = await fetch('/api/stock/team/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bio, links, photo_url: photoUrl, scope, status_text: statusText }),
+        body: JSON.stringify({ bio, links, photo_url: photoUrl, scope, status_text: statusText, skills }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -200,6 +202,18 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
                     <span className="text-[#f5a623]">{describeLink(row)}</span>
                     <span className="text-gray-600"> · </span>
                     <span>{row.length > 40 ? row.slice(0, 40) + '...' : row}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+            {skills.trim() && (
+              <div className="flex flex-wrap gap-1 pt-0.5">
+                {skills.split(/[,;]+/).map((s) => s.trim()).filter(Boolean).slice(0, 12).map((s, i) => (
+                  <span
+                    key={i}
+                    className="text-[10px] bg-[#f5a623]/10 border border-[#f5a623]/20 rounded-full px-2 py-0.5 text-[#fbbf24]"
+                  >
+                    {s}
                   </span>
                 ))}
               </div>
@@ -326,6 +340,23 @@ export function BioEditor({ memberName, initialBio, initialLinks, initialPhotoUr
             </button>
             <p className="text-[10px] text-gray-600 italic">
               Drop your X / Farcaster / website / SoundCloud / anything. We&rsquo;ll auto-detect what each is.
+            </p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] uppercase tracking-wider text-gray-500 font-bold flex items-center gap-1">
+              Skills <HelpIcon section="skills" />
+              <span className="text-gray-700 font-normal normal-case">(comma-separated)</span>
+            </label>
+            <input
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
+              placeholder="video, sound, sponsorship outreach, photography, music production..."
+              maxLength={500}
+              className="w-full bg-[#0a1628] border border-white/[0.08] rounded px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-[#f5a623]/30"
+            />
+            <p className="text-[10px] text-gray-600 italic">
+              What you can offer the team. Up to 500 chars. Used to match you to work that needs done.
             </p>
           </div>
 

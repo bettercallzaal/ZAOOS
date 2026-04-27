@@ -6,10 +6,12 @@ import { FestivalProgress } from './FestivalProgress';
 import { QuickAdd } from './QuickAdd';
 import { BioEditor } from './BioEditor';
 import { OnboardingChecklist } from './OnboardingChecklist';
+import { UpdatesFeed, type FeedEntry } from './UpdatesFeed';
+import { CompletenessLeaderboard } from './CompletenessLeaderboard';
 
 const FESTIVAL_DATE = new Date('2026-10-03T12:00:00-04:00');
 
-interface Member { id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; status_text?: string; }
+interface Member { id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; status_text?: string; skills?: string; }
 
 interface Todo {
   id: string;
@@ -58,6 +60,7 @@ interface Props {
   onNavigate: (tab: 'sponsors' | 'artists' | 'timeline' | 'overview') => void;
   inAnyCircle?: boolean;
   hasFirstActivity?: boolean;
+  feed?: FeedEntry[];
 }
 
 const TEAM_LABEL: Record<string, string> = {
@@ -92,7 +95,7 @@ function daysToDue(date: string): number {
   return Math.ceil((new Date(date + 'T00:00:00').getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export function PersonalHome({ member, allMembers, todos, sponsors, artists, milestones, onNavigate, inAnyCircle = false, hasFirstActivity = false }: Props) {
+export function PersonalHome({ member, allMembers, todos, sponsors, artists, milestones, onNavigate, inAnyCircle = false, hasFirstActivity = false, feed = [] }: Props) {
   const daysToFest = daysUntil(FESTIVAL_DATE);
 
   const myTodos = useMemo(() => todos.filter((t) => t.owner?.id === member.id), [todos, member.id]);
@@ -159,8 +162,15 @@ export function PersonalHome({ member, allMembers, todos, sponsors, artists, mil
           initialScope={member.scope || ''}
           initialRole={member.role || 'member'}
           initialStatusText={member.status_text || ''}
+          initialSkills={member.skills || ''}
         />
       </div>
+
+      {/* Recent activity */}
+      <UpdatesFeed entries={feed} currentMemberId={member.id} />
+
+      {/* Profile completeness leaderboard */}
+      <CompletenessLeaderboard members={allMembers} currentMemberId={member.id} />
 
       {/* Welcome banner */}
       <div className="bg-gradient-to-br from-[#f5a623]/20 via-[#f5a623]/5 to-transparent rounded-xl p-5 border border-[#f5a623]/30">

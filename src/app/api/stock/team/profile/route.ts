@@ -17,6 +17,7 @@ const patchSchema = z.object({
     ),
   scope: z.enum(['', 'ops', 'music', 'design']).optional(),
   status_text: z.string().max(140).optional(),
+  skills: z.string().max(500).optional(),
 });
 
 export async function PATCH(request: NextRequest) {
@@ -42,6 +43,7 @@ export async function PATCH(request: NextRequest) {
     if (parsed.data.photo_url !== undefined) updates.photo_url = parsed.data.photo_url;
     if (parsed.data.scope !== undefined) updates.scope = parsed.data.scope;
     if (parsed.data.status_text !== undefined) updates.status_text = parsed.data.status_text;
+    if (parsed.data.skills !== undefined) updates.skills = parsed.data.skills;
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: 'Nothing to update' }, { status: 400 });
@@ -52,7 +54,7 @@ export async function PATCH(request: NextRequest) {
       .from('stock_team_members')
       .update(updates)
       .eq('id', session.memberId)
-      .select('id, name, bio, links, photo_url, status_text')
+      .select('id, name, bio, links, photo_url, status_text, skills')
       .single();
 
     if (error) {

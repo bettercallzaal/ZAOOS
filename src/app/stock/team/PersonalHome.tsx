@@ -9,7 +9,7 @@ import { OnboardingChecklist } from './OnboardingChecklist';
 
 const FESTIVAL_DATE = new Date('2026-10-03T12:00:00-04:00');
 
-interface Member { id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; }
+interface Member { id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; status_text?: string; }
 
 interface Todo {
   id: string;
@@ -155,6 +155,7 @@ export function PersonalHome({ member, allMembers, todos, sponsors, artists, mil
         initialPhotoUrl={member.photo_url || ''}
         initialScope={member.scope || ''}
         initialRole={member.role || 'member'}
+        initialStatusText={member.status_text || ''}
       />
 
       {/* Welcome banner */}

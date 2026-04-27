@@ -120,7 +120,7 @@ interface Props {
   memberId: string;
   goals: Array<{ id: string; title: string; status: 'locked' | 'wip' | 'tbd'; details: string; category: string; sort_order: number }>;
   todos: Array<{ id: string; title: string; status: 'todo' | 'in_progress' | 'done'; notes: string; owner: { id: string; name: string } | null; creator: { id: string; name: string } | null; created_at: string }>;
-  members: Array<{ id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string }>;
+  members: Array<{ id: string; name: string; role: string; scope: string; bio?: string; links?: string; photo_url?: string; status_text?: string }>;
   sponsors: Sponsor[];
   artists: Artist[];
   milestones: Milestone[];
@@ -176,6 +176,13 @@ export function Dashboard({
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-[#f5a623] font-medium">{memberName}</span>
+            <a
+              href="/stock/team/help"
+              className="text-xs text-gray-500 hover:text-[#f5a623]"
+              title="How to use the dashboard"
+            >
+              Help
+            </a>
             <button onClick={handleLogout} className="text-xs text-gray-500 hover:text-gray-300">
               Logout
             </button>

@@ -44,6 +44,12 @@ export function MemberProfileView({ member }: Props) {
               {publicLabel}
             </span>
           </div>
+          {member.status_text && member.status_text.trim() && (
+            <div className="mt-3 flex items-center gap-2 text-sm text-emerald-300">
+              <span aria-hidden className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
+              <span>{member.status_text}</span>
+            </div>
+          )}
         </div>
       </div>
 

@@ -71,6 +71,15 @@ Env vars: see `.env.example`. App wallet: `npx tsx scripts/generate-wallet.ts`.
 - Use CSS modules or inline styles (Tailwind only)
 - Pre-read large directories (spaces/ music/ governance/ zounz/) unless task requires it
 
+## Workflow Orchestration
+
+1. **Plan first.** For any task with 3+ steps or architectural decisions, enter plan mode (or use `/plan-eng-review` / `/plan-ceo-review`). Never start a non-trivial task without a plan visible to Zaal.
+2. **Subagents over inline work.** Offload research, code search, and multi-file analysis to Task/Agent tools. Keep main context for synthesis + decisions.
+3. **Self-improvement loop.** When Zaal corrects an approach, save the pattern to `~/.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/feedback_*.md`. Re-read relevant feedback memories at session start.
+4. **Verification before "done".** Never mark a task complete without proof: tests pass, build green, screenshot of UI, or explicit Zaal approval. Run `/qa` for UI features, `npm run typecheck` for code.
+5. **Elegance check on non-trivial changes.** Before committing, ask: "is there a simpler way?" Skip for trivial fixes.
+6. **Autonomous bug fixing.** Given a bug report, fix it without asking permission for each step. Use `/investigate` for root cause; only escalate if blocked.
+
 ## Per-File Commands
 
 | File Pattern | Test | Lint |

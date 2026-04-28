@@ -83,7 +83,7 @@ export function CirclesView() {
     return (
       <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-6 text-sm text-rose-300">
         {error || 'No circles available yet.'}
-        <p className="mt-2 text-xs text-slate-500">If circles tables don't exist, run scripts/stock-circles-v1-migration.sql in Supabase.</p>
+        <p className="mt-2 text-xs text-slate-500">If circles tables don&apos;t exist, run scripts/stock-circles-v1-migration.sql in Supabase.</p>
       </div>
     );
   }
@@ -94,7 +94,7 @@ export function CirclesView() {
     <div className="space-y-4">
       {!isLoggedIn && (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-          You're viewing as a guest. Sign in at <a href="/stock/team" className="underline">/stock/team</a> to join circles.
+          You&apos;re viewing as a guest. Sign in at <a href="/stock/team" className="underline">/stock/team</a> to join circles.
         </div>
       )}
       {error && (
@@ -141,7 +141,7 @@ export function CirclesView() {
                   </span>
                 )}
                 {c.is_coordinator && (
-                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-300">that's you</span>
+                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-300">that&apos;s you</span>
                 )}
               </div>
               {c.members.length > 0 && (

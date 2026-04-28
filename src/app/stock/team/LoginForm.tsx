@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export function LoginForm() {
@@ -84,7 +85,7 @@ export function LoginForm() {
         <div className="space-y-2 text-[11px] text-gray-500 text-center">
           <p><strong className="text-gray-400">No code yet?</strong> DM <a href="https://x.com/bettercallzaal" target="_blank" rel="noreferrer" className="text-[#f5a623] hover:underline">@bettercallzaal</a> on X or Telegram.</p>
           <p>
-            <a href="/stock/onepagers/overview" className="text-[#f5a623] hover:underline">What is ZAOstock?</a>
+            <Link href="/stock/onepagers/overview" className="text-[#f5a623] hover:underline">What is ZAOstock?</Link>
             {' · '}
             <a href="/stock" className="text-[#f5a623] hover:underline">Public site</a>
           </p>

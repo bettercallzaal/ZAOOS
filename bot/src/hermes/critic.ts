@@ -1,6 +1,27 @@
-import { callClaudeCli, HERMES_CRITIC_MODEL } from './claude-cli';
+import {
+  callClaudeCli,
+  HERMES_CRITIC_FAST_MODEL,
+  HERMES_CRITIC_MODEL,
+  HERMES_ROUTING_ENABLED,
+} from './claude-cli';
 import { runCmd } from './git';
-import type { CritiqueInput, CritiqueOutput } from './types';
+import { classifyDiffComplexity, type CritiqueInput, type CritiqueOutput } from './types';
+
+/**
+ * Sprint 1 cost-routing (per doc 541): when HERMES_ROUTING=on, classify
+ * the diff. 'simple' diffs (docs-only, small low-risk code edits) get
+ * reviewed by HERMES_CRITIC_FAST_MODEL (haiku, ~3-4x cheaper than sonnet).
+ * 'complex' diffs stay on HERMES_CRITIC_MODEL (sonnet) - we never route
+ * a logic-touching diff to Haiku because false-approving a security
+ * regression costs more than ten Sonnet runs.
+ *
+ * When HERMES_ROUTING=off, always uses HERMES_CRITIC_MODEL (no-op).
+ */
+function selectCriticModel(diff: string, filesChanged: string[]): string {
+  if (!HERMES_ROUTING_ENABLED) return HERMES_CRITIC_MODEL;
+  const complexity = classifyDiffComplexity({ diff, filesChanged });
+  return complexity === 'simple' ? HERMES_CRITIC_FAST_MODEL : HERMES_CRITIC_MODEL;
+}
 
 const CRITIC_SYSTEM = `You are Hermes-Stock, the Critic half of the Hermes pair for ZAO OS code fixes.
 
@@ -76,8 +97,9 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
     'Score this diff per your system prompt rules. Output JSON only.',
   ].join('\n');
 
+  const criticModel = selectCriticModel(diff, input.filesChanged);
   const result = await callClaudeCli({
-    model: HERMES_CRITIC_MODEL,
+    model: criticModel,
     prompt: userPrompt,
     cwd: input.workTreePath,
     appendSystemPrompt: CRITIC_SYSTEM,
@@ -103,6 +125,7 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
       feedback: `Critic CLI error: ${result.text.slice(0, 200)}`,
       inputTokens: result.inputTokens,
       outputTokens: result.outputTokens,
+      modelUsed: criticModel,
     };
   }
 
@@ -112,6 +135,7 @@ export async function runCritic(input: CritiqueInput): Promise<CritiqueOutput> {
     feedback: parsed.feedback,
     inputTokens: result.inputTokens,
     outputTokens: result.outputTokens,
+    modelUsed: criticModel,
   };
 }
 

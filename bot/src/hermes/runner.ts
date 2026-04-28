@@ -206,9 +206,11 @@ export async function dispatchHermesRun(
           critic_score: critique.score,
           critic_feedback: critique.feedback,
           fixer_provider: 'claude-code-cli',
-          fixer_model: process.env.HERMES_FIXER_MODEL ?? 'opus',
+          // Record the actual model used (may differ from env default when
+          // HERMES_ROUTING=on - e.g. attempt 1 routes to sonnet not opus).
+          fixer_model: fixerOut.modelUsed ?? process.env.HERMES_FIXER_MODEL ?? 'opus',
           critic_provider: 'claude-code-cli',
-          critic_model: process.env.HERMES_CRITIC_MODEL ?? 'sonnet',
+          critic_model: critique.modelUsed ?? process.env.HERMES_CRITIC_MODEL ?? 'sonnet',
           total_input_tokens: totalIn,
           total_output_tokens: totalOut,
           estimated_cost_usd: estimateNotionalCost(

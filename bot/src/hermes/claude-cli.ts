@@ -183,5 +183,24 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
   });
 }
 
+// Models for the legacy single-model path (HERMES_ROUTING != 'on').
+// Defaults match the pre-Sprint-1 behavior so this change is a no-op when
+// routing is disabled.
 export const HERMES_FIXER_MODEL = process.env.HERMES_FIXER_MODEL ?? 'opus';
 export const HERMES_CRITIC_MODEL = process.env.HERMES_CRITIC_MODEL ?? 'sonnet';
+
+// Sprint 1 cost-routing models (per doc 541). Used only when HERMES_ROUTING=on.
+//
+//   Coder: attempt 1 uses FIXER_FAST_MODEL (sonnet, ~5x cheaper than opus).
+//          Attempts 2+ escalate to FIXER_MODEL (opus) since the Critic
+//          rejected the cheap model and we now have specific feedback to
+//          act on, which usually needs the bigger model.
+//
+//   Critic: simple diffs (docs-only, formatting, single-file imports, < 30
+//           added LOC) use CRITIC_FAST_MODEL (haiku). Complex diffs stay
+//           on CRITIC_MODEL (sonnet). See classifyDiffComplexity in types.ts.
+//
+// Default off until validated for ~24h in production.
+export const HERMES_FIXER_FAST_MODEL = process.env.HERMES_FIXER_FAST_MODEL ?? 'sonnet';
+export const HERMES_CRITIC_FAST_MODEL = process.env.HERMES_CRITIC_FAST_MODEL ?? 'haiku';
+export const HERMES_ROUTING_ENABLED = process.env.HERMES_ROUTING === 'on';

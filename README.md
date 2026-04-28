@@ -1,8 +1,8 @@
 <div align="center">
 
-# ZAO OS
+# ZAOOS
 
-**A gated, music-first Farcaster social client. Fork it, make it yours.**
+**The ZAO ecosystem lab. Where new things get prototyped before earning their own home.**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://typescriptlang.org)
@@ -19,7 +19,39 @@
 
 ---
 
-ZAO OS is a gated social platform for **The ZAO** — a decentralized music community where artists keep their revenue, curators earn reputation, and the community governs itself. Built on [Farcaster](https://farcaster.xyz) with encrypted messaging via [XMTP](https://xmtp.org), on-chain governance via [ORDAO](https://zao.frapps.xyz/), and inline music from 9 platforms.
+## What ZAOOS is
+
+ZAOOS is the lab. The repo started as a gated Farcaster social client for **The ZAO** (a decentralized music community of 188 members on Base) and grew into a monorepo where many ZAO experiments live side-by-side. Today it&rsquo;s the place where new ZAO-ecosystem things get prototyped before they earn their own home.
+
+The pattern: **Monorepo as Lab.**
+
+- A thing graduates when it&rsquo;s ready for production + ready to share publicly + ready to attract new users.
+- On graduation: own repo, own DB, own domain. The code is then **deleted** from ZAOOS so there&rsquo;s no drift. Routes redirect.
+- Sharing model: clone, no deps. Each graduate stands alone.
+- Research stays in ZAOOS forever — it&rsquo;s the institutional memory across every product.
+
+### What&rsquo;s in the lab right now
+
+| Thing | Status |
+|---|---|
+| Gated Farcaster client for The ZAO ([live at zaoos.com](https://zaoos.com)) | In production, also still being iterated |
+| ZAOstock 2026 dashboard + Telegram bot | **Graduating to its own repo + zaostock.com (Wed 2026-04-29)** |
+| Agent stack (ZOE, Hermes, others) | In R&D until one is solid + worth its own brand |
+| Music player components (Sonata-pattern, etc) | In R&D |
+| Research library (540+ docs across 13 topic areas) | Always stays here |
+
+### What&rsquo;s already graduated
+
+- **COC Concertz** — own repo, virtual concert community
+- **FISHBOWLZ** — was its own thing, paused 2026-04-16 (partnership with Juke). Code stays in ZAOOS as-is.
+
+---
+
+## The original product still lives here: a gated Farcaster client
+
+ZAOOS was born as a gated social platform for **The ZAO** — a decentralized music community where artists keep their revenue, curators earn reputation, and the community governs itself. Built on [Farcaster](https://farcaster.xyz) with encrypted messaging via [XMTP](https://xmtp.org), on-chain governance via [ORDAO](https://zao.frapps.xyz/), and inline music from 9 platforms.
+
+That client is still live, still iterated, still forkable.
 
 ### Fork it for your community
 

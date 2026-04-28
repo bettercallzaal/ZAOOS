@@ -1,6 +1,18 @@
 import { runCmd } from './git';
 import type { HermesNarrator } from './runner';
 
+/**
+ * gh CLI defaults to reading remote info from the cwd's .git config. The
+ * systemd runtime dir (~/zaostock-bot) is NOT a git checkout, so every
+ * unscoped gh call there fails with "fatal: not a git repository". Always
+ * pass --repo <owner/name> so we never rely on cwd.
+ */
+function repoSlug(): string {
+  const url = process.env.HERMES_REPO_URL ?? 'https://github.com/bettercallzaal/ZAOOS.git';
+  const m = url.match(/github\.com[:/]([^/]+)\/([^/.]+)(?:\.git)?$/);
+  return m ? `${m[1]}/${m[2]}` : 'bettercallzaal/ZAOOS';
+}
+
 export interface WatchPullRequestInput {
   prNumber: number;
   runId: string;
@@ -85,6 +97,8 @@ async function fetchPrStatus(prNumber: number): Promise<PrStatus | null> {
       'pr',
       'view',
       String(prNumber),
+      '--repo',
+      repoSlug(),
       '--json',
       'mergeable,mergeStateStatus,statusCheckRollup',
     ],

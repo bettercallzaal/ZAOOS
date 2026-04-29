@@ -124,6 +124,16 @@ function addSecurityHeaders(response: NextResponse, nonce?: string, pathname?: s
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ZAOstock spinout: redirect /stock/* and /api/stock/* to zaostock.com
+  // Project graduated 2026-04-29. Live at https://zaostock.com.
+  if (pathname === '/stock' || pathname.startsWith('/stock/') || pathname.startsWith('/api/stock/')) {
+    const newPath = pathname
+      .replace(/^\/api\/stock/, '/api')
+      .replace(/^\/stock/, '');
+    const target = `https://zaostock.com${newPath || '/'}${request.nextUrl.search}`;
+    return NextResponse.redirect(target, 301);
+  }
+
   // Fast path for page routes — skip rate limiting entirely, just add headers
   if (!pathname.startsWith('/api/')) {
     const nonce = generateNonce();

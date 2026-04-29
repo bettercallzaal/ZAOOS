@@ -1,8 +1,18 @@
+---
+topic: agents
+type: decision
+status: research-complete
+last-validated: 2026-04-29
+related-docs: 235, 415, 428, 496, 546, 565, 567
+tier: DEEP
+---
+
 # Doc 568: Aware Brain - Local-First Knowledge Graph Chat for ZAO
 
-**Status:** DEEP-tier synthesis (2 parallel forks: KG-native systems + local PKM chat apps)  
+**Status:** DEEP-tier synthesis  
 **Published:** 2026-04-29  
-**Tier:** DEEP (25+ sources, 5+ HN + Reddit threads, 8+ real user quotes)
+**Tier:** DEEP (25+ sources, HN + Reddit threads, real user quotes)
+**Follow-up to:** Doc 567 (HF surfaces + base local stack). 567 picked the runtime; 568 picks the brain on top.
 
 ---
 
@@ -297,8 +307,150 @@ Current state:
 
 ---
 
+## Memory Framework Layer (NOT Just the UI)
+
+Reor / Khoj handle UI + per-app memory. For CROSS-tool / cross-session memory the brain needs an explicit framework. Add these:
+
+| Framework | Stars | License | Storage | Auto-Extract | KG | MCP | Verdict |
+|---|---|---|---|---|---|---|---|
+| **Memory MCP server** (modelcontextprotocol/servers) | mono ~30K | MIT | JSON file | No | Simple | YES native | **PICK 1** for Claude Code |
+| **mem0** | ~30K | Apache 2.0 | Qdrant/Postgres + vec | YES | Optional | Wrapper | **PICK 2** for Reor / Open WebUI |
+| **Letta** (MemGPT) | ~14K | Apache 2.0 | Postgres + pgvector | YES | No | REST | Skip v1 (heavy) |
+| **Zep + Graphiti** | ~5K + ~3K | Apache 2.0 | Postgres + Neo4j | YES + temporal | YES | REST | USE Graphiti as temporal layer |
+| **Cognee** | ~3K | Apache 2.0 | Configurable (Neo4j ok) | YES | YES | Python | Alternative to /graphify (later) |
+| **LangChain / LlamaIndex Memory** | n/a | MIT | various | No (manual) | No | Python | Skip - too generic |
+| **Anthropic memory tool** | n/a | proprietary | Files API | Yes via prompt | No | Native API | Use INSIDE Claude Code only |
+
+**The pattern:** simple memory in JSON for things YOU control (Memory MCP), auto-extraction via mem0 for things you want the brain to notice WITHOUT you telling it. Graphiti adds the temporal "what did Zaal believe last month" dimension.
+
+```
+You say: "we decided ZAOstock is Oct 3 2026 at Franklin St Parklet"
+  -> mem0 extracts: {entity: ZAOstock, date: 2026-10-03, venue: Franklin St Parklet}
+  -> Memory MCP stores in JSON graph
+  -> /graphify or Graphiti adds nodes + edges to Neo4j
+  -> Next session, brain knows it
+```
+
+---
+
+## The "Couple of Models" - Pick 3 (NOT coding focused)
+
+Optimizing for: long context, instruction-following, conversational coherence, low hallucination on memory recall, MCP/tool-use ability.
+
+| Model | Quant | RAM | Context | Tool-Use | License | Verdict |
+|---|---|---|---|---|---|---|
+| **Qwen 2.5 14B Instruct** | MLX-4bit | ~9.5 GB | 128K | 8/10 | Apache 2.0 | **DAILY CHAT** |
+| **Qwen 2.5 32B Instruct** | MLX-4bit | ~19 GB | 128K | 8/10 | Apache 2.0 | **HEAVY REASONING** (32GB+ Mac) |
+| **Gemma 3 12B Instruct** | MLX-4bit | ~7 GB | 128K | 7/10 | Gemma terms | **ALT VOICE / multilingual** |
+| Llama 3.3 70B Instruct | Q3_K_M | ~32 GB | 128K | 7/10 | Llama 3 community | Skip unless 64GB Mac |
+| Phi-4 14B | Q4_K_M | ~9 GB | 16K only | 7/10 | MIT | SKIP - 16K context kills memory recall |
+| GLM-4 9B Chat | MLX-4bit | ~6 GB | 1M | 7/10 | Apache 2.0 | INTERESTING for huge context (test it) |
+| Mistral Small 24B | MLX-4bit | ~14 GB | 32K | 7/10 | Apache 2.0 | Worth alt to Qwen if you want variety |
+
+**Recommended stable for Zaal (16GB Mac):** Qwen 2.5 7B (reflex) + Qwen 2.5 14B (daily) + Gemma 3 12B (alt voice).
+
+**Recommended stable (32GB Mac):** Qwen 2.5 14B (daily) + Qwen 2.5 32B (heavy) + GLM-4 9B (1M context experiment).
+
+---
+
+## DON'T Run on VPS 1
+
+Per Doc 567 - VPS 1 (Hostinger KVM 2, 31.97.148.88) has no GPU + ~8GB RAM. CPU inference at ~15 tok/s is unusable for chat. Run brain on Mac. VPS 1 stays focused on what it's already doing (OpenClaw, paperclip, ZOEY/WALLET).
+
+---
+
+## Concrete Install Path (Phase 3 of Doc 567)
+
+Pre-req: Phases 1-2 of Doc 567 done (LM Studio + Ollama + Open WebUI installed).
+
+```bash
+# 1. Reor desktop app
+brew install --cask reor               # ~5 min
+# Open Reor, point at Ollama (already running on :11434)
+# Set vault to ~/zao-brain (NEW folder, NOT inside ZAO OS V1 repo)
+
+# 2. Memory MCP server (for Claude Code session memory)
+# Add to ~/.claude/settings.json:
+#   "mcpServers": {
+#     "memory": {
+#       "command": "npx",
+#       "args": ["-y", "@modelcontextprotocol/server-memory"]
+#     }
+#   }
+
+# 3. mem0 (optional, for richer auto-extraction)
+pip install mem0ai
+# Wire into Reor or Open WebUI via OpenAI-compat endpoint trick
+# Docs: github.com/mem0ai/mem0
+
+# 4. Neo4j (already used by /graphify --neo4j)
+docker run -d --name neo4j -p 7474:7474 -p 7687:7687 \
+  -e NEO4J_AUTH=neo4j/CHANGE_ME -v neo4j-data:/data neo4j:latest
+
+# 5. Run /graphify on existing research folder
+cd ~/Documents/ZAO\ OS\ V1
+/graphify research --update --neo4j-push bolt://localhost:7687
+
+# 6. Pull the brain models in LM Studio
+# Search + download in LM Studio UI:
+#   - Qwen2.5-14B-Instruct-MLX-4bit  (~6 GB)
+#   - Qwen2.5-32B-Instruct-MLX-4bit  (~16 GB - skip if 16GB Mac)
+#   - Gemma-3-12B-Instruct-MLX-4bit  (~7 GB)
+# Click Server. Both Reor and Open WebUI now see them on :1234.
+
+# 7. Optional: Graphiti for temporal conversation graphs
+pip install graphiti-core
+# Quick start at github.com/getzep/graphiti/blob/main/README.md
+```
+
+Total time: ~90 min if you have 50+ Mbps. Most of it = model downloads.
+
+---
+
+## Daily Habits to Make This Pay Off
+
+| Habit | Why |
+|---|---|
+| ALL ideas -> Reor vault, never sticky notes / random Apple Notes | Vault stays canonical, brain stays accurate |
+| End-of-day: `/graphify --update` to refresh the graph | Keeps Neo4j in sync with new files |
+| Weekly: ask Qwen 32B "what beliefs of mine changed this week" | Surfaces drift, forces explicit decisions |
+| Tag conversations w/ project (ZAOstock, BCZ, ZAO Music) | mem0 + Graphiti retrieve by tag faster |
+| Don't paste secrets (member emails, API keys) into chat | Local LLM is private but vault gets backed up |
+
+---
+
+## Pitfalls to Watch
+
+| Pitfall | Detail |
+|---|---|
+| Reor vault drift | If you also edit notes in Obsidian, lock formatting (no Templater plugin in same vault) - confuses Reor's similarity engine. |
+| Memory MCP file size | JSON file grows unbounded. Rotate/archive monthly or it slows down. |
+| mem0 hallucinated facts | Auto-extraction WILL invent things. Review extracted facts weekly. |
+| Neo4j auth | Set strong password (NOT `CHANGE_ME` from snippet). Bind to localhost only. |
+| Local LLM amnesia | Models without memory framework forget after context window. Memory layer non-optional. |
+| Graphiti version churn | Active dev, breaking changes possible. Pin version on install. |
+| 16GB Mac headroom | Reor + Ollama + LM Studio all running = ~12GB used. Don't run 32B model concurrent with 14B. |
+
+---
+
+## Validation / Honesty Notes
+
+This doc was synthesized partly from Claude's training-cutoff knowledge of these tools, partly from automated research forks. Star counts in tables may be slightly stale - verify with `gh repo view <repo>` before quoting publicly. Specifically:
+- Reor stars (~7K-20K range across sources - check live)
+- mem0 cloud vs OSS feature parity (cloud has extras)
+- Open WebUI memories feature - confirm version (0.4+ added it)
+- Graphiti API stability (was actively breaking in late 2025)
+- Qwen 3 release status (if shipped, may displace Qwen 2.5)
+
+---
+
 ## Related Docs
 
-- **Doc 567:** Hugging Face local models + web UI + LM Studio + Ollama setup
-- **Doc 565:** /ask-gpt skill (Claude Code context bridge to ChatGPT)
+- **Doc 567:** Hugging Face local models + web UI + LM Studio + Ollama setup (prereq)
+- **Doc 565:** /ask-gpt skill (Claude Code context bridge to ChatGPT) - mirror for /ask-local
+- **Doc 235:** MCP server pattern
+- **Doc 415:** External skill bridge pattern (composio AO)
+- **Doc 496:** ElizaOS alt agent harness
+- **Doc 546:** hefty.bot (closed-source) - similar concept, why we're building OSS
 - **/graphify skill:** Python knowledge-graph builder, Neo4j export, MCP server mode
+- Memory: `project_research_567_hf_local_models`, `project_ask_gpt_loop_live`

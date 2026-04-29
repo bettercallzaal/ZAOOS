@@ -124,16 +124,62 @@ Pair with the Ronin pattern from Doc 563. Files commit-trackable, MCP-readable.
 
 **Action:** Zaal pastes article body (or installs full last30days X session) to unlock final answer. Until then, the doc above is the pre-read.
 
-## Open Loop with GPT-5 (Pass 2 In Flight)
+## Pass 2 GPT-5 Corrections (Folded In 2026-04-29)
 
-Posed Pass 2 challenges to GPT-5 via `/ask-gpt nouns-zao --resume`:
-1. Are $NOUNS L2 mechanics shipped or stuck?
-2. Treasury ETH balance + total prop count (April 2026)?
-3. Prop House active or spun out? Spinout entity?
-4. Did Prop 955 (Dusk's reserve price) pass?
-5. Three specific 2025-2026 music-funding props with numbers + outcome
+GPT-5 came back via `/ask-gpt nouns-zao --resume` with material updates that change the doc:
 
-Pass 2 was still grinding when this doc shipped — full log at `~/.zao/gpt-loop/nouns-zao.log`. Wake-up scheduled to fold answers in.
+### 1. $NOUNS L2 fractionalisation **DID ship**
+
+My earlier "stuck after failed audit prop" framing was outdated. Audit prop was **Prop 536** (failed), but the token shipped anyway. Live now:
+- **Mainnet $NOUNS:** `0x5c1760c98be951A4067DF234695c8014D8e7619C`
+- **Base $NOUNS:** `0x0a93a7BE7e7e426fC046e204C44d6b03A302b631`
+- Mechanics: `1 Noun = 1,000,000 $NOUNS`, redeemable
+- **Important:** contracts are **unaudited**. Nouns.com explicitly says it is NOT affiliated with $NOUNS — only an interface layer.
+- Convert UI: `nouns.com/convert`
+
+**ZAO read:** instructive on what NOT to do. Token shipped despite parent DAO failing the audit prop, parent now disavows the L2 contracts. Don't replicate this pattern with ZABAL.
+
+### 2. Treasury balance + prop count (verified 2026-04-29)
+
+- **Treasury: ~3,181.8 ETH** per `nouns.com/stats/treasury`
+- **Highest verified prop: Prop 955** (so practical governance count = 955 numbered proposals)
+
+### 3. Prop House is no longer the main funding layer
+
+Prop House was funded via Props **23, 62, 105**, expanded under **Prop 469: Prop House 2024** (`$63k/mo × 12`). But 2026 Nouns funding evolution stack is:
+- Direct proposals (always)
+- Prop House (2022-2024)
+- **Flows.wtf** (2024-2025+) — the current frontier
+- **Nouns.gg Rounds** — current "rounds" surface, not classic Prop House
+
+**ZAO read:** if we want Nounish funding patterns, **Flows.wtf is the place to look now** — not Prop House. Adds a sub-doc target (Doc 568 candidate).
+
+### 4. Prop 955 PASSED. The 2.8 ETH reserve is binding now.
+
+- Approved **April 22, 2026** per Bankless
+- Set auction reserve to **2.8 ETH minimum**
+- Live auction transition visible in `nouns.sh`:
+  - **Noun 1884** (Apr 23): cleared at 1.02 ETH (pre-execution)
+  - **Noun 1885** (Apr 24-25): cleared at **2.80 ETH** (post-execution)
+  - **Noun 1886** (Apr 25): bid 0 — no sub-reserve clearing bid
+
+**ZAO read:** Dusk's tweet is in the **immediate aftermath** of his coalition pushing Prop 955 through. The article at `x.com/i/article/2040067263320244224` (Apr 3, 2026 — pre-vote) was likely the campaign / case for the reserve change.
+
+### 5. 2025-2026 music-funding props: GPT said "don't know"
+
+Verified earlier music-adjacent props only:
+- **Prop 258** — W3BSTOCK NYC, **10 ETH**, 2023
+- **Prop 573** — Nouns at FWB Fest 2024, **84,000 USDC**
+- **Prop 495** — ETHDenver 2024, **34 ETH** (included Nouns Funds Creators at Youth on Record music venue)
+
+**ZAO action:** these are a tiny menu. ZAO has higher bandwidth on indie music than Nouns has shown — opportunity to be **the** Nounish-style music-funding lane Nouns hasn't filled, without trying to "be Nouns."
+
+## Updated ZAO Reads From Pass 2
+
+- **Watch Prop 955 + Dusk's playbook closely.** A small coalition of active members (anonymous + named) just pushed a major economic change through. Nouns governance is more pliable to organised effort than the cap table suggests. Lesson for ZAO: small but coherent council can move things.
+- **Treasury ~3,182 ETH (~$10M+) is real but auction-rate dependent.** New 2.8 ETH reserve = ~$8K/day floor revenue (1 Noun/day @ 2.8 ETH) IF auctions clear. Many days won't clear at all post-955 — Noun 1886 is already a no-bid. Treasury growth will slow.
+- **Flows.wtf is where the current Nouns funding action is.** If ZAO wants to seek Nounish funding for music or the festival, this is the frontier — not Prop House. Open a sub-doc.
+- **$NOUNS unaudited + parent disavowed** is a cautionary tale on tokenisation. Do not let ZABAL ever reach a state where the official ZAO surface disclaims affiliation with the token.
 
 ## Action Bridge
 

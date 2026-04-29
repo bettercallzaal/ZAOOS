@@ -1,4 +1,4 @@
-# CLAUDE.md - ZAO OS
+# CLAUDE.md - ZAOOS
 
 ## Session Start
 
@@ -6,7 +6,18 @@
 
 ## What This Is
 
-ZAO OS is a gated Farcaster social client for **The ZAO** (ZTalent Artist Organization) - a decentralized music community on Base chain. 301 API routes, 279 components, 19 hooks, 240+ research docs.
+**ZAOOS is the lab.** Where new ZAO-ecosystem things get prototyped before they earn their own home.
+
+The repo started as a gated Farcaster social client for **The ZAO** (188 members on Base) and grew into a monorepo where many ZAO experiments live side-by-side. Some have already graduated to their own repos (COC Concertz). Some are graduating now (ZAOstock 2026, Wed 2026-04-29). Some are paused (FISHBOWLZ). The rest are still being figured out.
+
+The pattern: **Monorepo as Lab.**
+
+- A thing graduates when it's ready for production + ready to share publicly + ready to attract new users.
+- On graduation: own repo, own DB, own domain. Code is **deleted** from ZAOOS so there's no drift. Routes redirect.
+- Sharing model: clone, no deps. Each graduate stands alone.
+- Research stays in ZAOOS forever - it's the institutional memory across every product.
+
+**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (graduating Wed), agent stack (ZOE, Hermes), music player components, 540+ research docs. 301 API routes, 279 components, 19 hooks.
 
 **Stack:** Next.js 16, React 19, Supabase (RLS), Neynar, XMTP, Stream.io, Wagmi/Viem, Tailwind v4, iron-session.
 

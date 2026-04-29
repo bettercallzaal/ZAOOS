@@ -51,18 +51,32 @@ Modern "aware brain" stacks split into **two layers:**
 
 ## Top 10 Systems Evaluated
 
-| System | License | Local LLM | Graph Backend | Mac App | Polish | For Zaal? |
-|--------|---------|-----------|---------------|---------|--------|-----------|
-| **Reor** | MIT | Yes (any) | Vector + Neo4j | Electron | 8/10 | STRONG YES |
-| **Khoj** | AGPL | Yes (local/online) | SQLite + semantic | Web/Desktop | 7/10 | YES |
-| **RecurseChat** | Proprietary | Yes | File-based | Native | 9/10 | Maybe (closed) |
-| **Microsoft GraphRAG** | Apache 2.0 | Optional | In-memory | None | 5/10 | No (complex) |
-| **LightRAG** | MIT | No | In-memory | None | 4/10 | No (early) |
-| **Cognee** | MIT | No | Neo4j | None | 3/10 | No (dev-only) |
-| **Graphiti** | MIT | No | Neo4j + vector | None | 2/10 | No (agent-only) |
-| **AnythingLLM** | MIT | Yes | Vector + RAG | Docker/Desktop | 7/10 | Possible |
-| **Open WebUI** | MIT | Yes | In-memory | Docker/Web | 6/10 | Fallback |
-| **Obsidian + Copilot** | Proprietary | Yes | Obsidian vault | Obsidian | 8/10 | If already in Obsidian |
+**Star counts verified 2026-04-29 via `gh repo view`. Older estimates retired.**
+
+| System | Stars | License | Local LLM | Graph Backend | Mac App | Polish | For Zaal? |
+|--------|------:|---------|-----------|---------------|---------|--------|-----------|
+| **Reor** | 8.5K | AGPL-3.0 | Yes (any) | Vector + Neo4j | Electron | 8/10 | STRONG YES |
+| **Khoj** | 34.3K | AGPL-3.0 | Yes (local/online) | SQLite + semantic | Web/Desktop/Obsidian | 7/10 | STRONG YES |
+| **RecurseChat** | n/a (closed) | Proprietary | Yes | File-based | Native | 9/10 | Maybe (closed) |
+| **Microsoft GraphRAG** | 32.6K | MIT | Optional | In-memory | None | 5/10 | No (slow + $$$) |
+| **LightRAG** | 34.6K | MIT | Yes | In-memory | None | 6/10 | Worth a look (matured) |
+| **Cognee** | 16.9K | MIT | Yes | Neo4j | None | 5/10 | Alt to /graphify |
+| **Graphiti** (Zep) | 25.5K | Apache 2.0 | No | Neo4j + vector | None | 6/10 | Use as temporal layer |
+| **mem0** | 54.4K | Apache 2.0 | Yes | Qdrant/PG + vec | None | 7/10 | Memory layer pick |
+| **Letta** (MemGPT) | 22.4K | Apache 2.0 | Yes | Postgres+pgvector | None | 6/10 | Heavy, agent-grade |
+| **AnythingLLM** | 59.2K | MIT | Yes | Vector + RAG | Docker/Desktop | 7/10 | Possible |
+| **Open WebUI** | 134.8K | Custom+MIT | Yes | SQLite | Docker/Web | 8/10 | Already installed (Doc 567) |
+| **Cherry Studio** | 44.8K | Apache 2.0 | Yes | SQLite | Native Mac/Win | 8/10 | Strong CN community |
+| **Memory MCP** (mono) | 84.8K | MIT | n/a | JSON file | n/a | n/a | PICK 1 (Claude Code) |
+| **Obsidian + Copilot** | Plugin | Proprietary | Yes | Obsidian vault | Obsidian | 8/10 | If already in Obsidian |
+
+**Key shifts since fork-based estimates:**
+- **Khoj** at 34K stars (not 11-25K) — much more momentum. Co-PICK with Reor, not "secondary."
+- **mem0** at 54K — clear winner for auto-extract memory layer.
+- **Graphiti** at 25K (not 3K) — mature enough to actually use.
+- **LightRAG** at 34K — out of "early" status, viable GraphRAG alternative.
+- **Cognee** at 17K — could legitimately replace /graphify if you want.
+- **Reor** has AGPL-3.0 license, NOT MIT (correction).
 
 ---
 
@@ -435,12 +449,16 @@ Total time: ~90 min if you have 50+ Mbps. Most of it = model downloads.
 
 ## Validation / Honesty Notes
 
-This doc was synthesized partly from Claude's training-cutoff knowledge of these tools, partly from automated research forks. Star counts in tables may be slightly stale - verify with `gh repo view <repo>` before quoting publicly. Specifically:
-- Reor stars (~7K-20K range across sources - check live)
-- mem0 cloud vs OSS feature parity (cloud has extras)
-- Open WebUI memories feature - confirm version (0.4+ added it)
-- Graphiti API stability (was actively breaking in late 2025)
-- Qwen 3 release status (if shipped, may displace Qwen 2.5)
+**Star counts verified 2026-04-29 via `gh repo view`** — corrected from earlier fork estimates. Comparison table now reflects real numbers.
+
+Still worth spot-checking before public quote:
+- **mem0 cloud vs OSS feature parity** — cloud product has extras the OSS lib doesn't
+- **Open WebUI memories feature** — confirm version (0.4+ added it)
+- **Graphiti API stability** — was actively breaking in late 2025; pin a version
+- **Qwen 3 release status** — if shipped by your install date, may displace Qwen 2.5
+- **Reor license** — confirmed AGPL-3.0 via gh, not MIT as initially synthesized
+
+The original fork-based draft also undersold several tools by 5-10x stars. Trust verified numbers in tables, not the original synthesis prose. Where the doc still says "small" or "early" about a >20K-star repo, that's stale framing.
 
 ---
 

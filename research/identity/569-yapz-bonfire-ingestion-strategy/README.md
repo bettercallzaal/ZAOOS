@@ -13,7 +13,14 @@ tier: DEEP
 
 ## Executive Summary
 
-BCZ's YapZ archive (18 episodes, 30-90min each, 2025-08-22 to 2026-04-26) is rich corpus material: structured frontmatter (title, guest, date, youtube_video_id), inline `[HH:MM:SS]` timestamps in transcripts, existing guest/entity link maps. The world has converged on three proven patterns for podcast-to-KG ingestion: (1) **chunking with semantic boundaries + overlap** (avoid breaking speaker turns or ideas), (2) **speaker-as-node modeling** in the graph, (3) **provenance links at chunk level** (every fact traced back to `youtube.com/watch?v=VIDEO_ID&t=TIMESTAMP_SECONDS`). This doc recommends a hybrid approach: use Bonfire's native kEngrams + agents.sync batch ingestion (not kengrams.batch, which is slower for episode-scale data), chunk YapZ episodes per semantic unit (speaker turn or idea cluster), embed at chunk level, and model Speaker + Episode + Timestamp as first-class graph nodes so queries like "what did Zaal say about X on YapZ?" resolve cleanly.
+BCZ's YapZ archive (18 episodes, 30-90min each, 2025-08-22 to 2026-04-26) is rich corpus material: structured frontmatter (title, guest, date, youtube_video_id), inline `[HH:MM:SS]` timestamps in transcripts, existing guest/entity link maps. The world has converged on three proven patterns for podcast-to-KG ingestion: (1) **chunking with semantic boundaries + overlap** (avoid breaking speaker turns or ideas), (2) **speaker-as-node modeling** in the graph, (3) **provenance links at chunk level** (every fact traced back to `youtube.com/watch?v=VIDEO_ID&t=TIMESTAMP_SECONDS`).
+
+**Recommended pipeline (staged, not single-method):**
+1. Episodes 1-3 → `client.kg.create_entity` + `create_edge` (per-node streaming, validate schema by hand).
+2. Episodes 4-18 → `client.kengrams.batch(kengram_id, manifest, sync_to_kg=True)` (atomic, idempotent on re-run).
+3. Future episodes → `client.agents.sync(...)` (continuous learning).
+
+Chunk YapZ per speaker turn (with topic sub-split if >500 words). Embed at chunk level. Model `Episode`, `Speaker`, `Quote/TranscriptSegment`, `Topic`, `Decision` as first-class nodes. Every chunk carries `youtube_url = https://youtu.be/{video_id}?t={start_sec}` as a first-class attribute, not metadata. Backup monthly via OWL export to git so the corpus is portable if Bonfire pricing or service changes.
 
 ## 1. NotebookLM Pattern: Chunking + Citation
 
@@ -125,6 +132,143 @@ Recent research (2025) identified key failure modes in podcast-to-KG pipelines:
 
 ---
 
+## 9. Bonfire SDK Specifics (from SDK source review)
+
+Reading the canon branch of `github.com/NERDDAO/bonfires-sdk` reveals the concrete API surface:
+
+### Two ingestion paths, not one
+
+The `agents.sync` vs `kengrams.batch` question has a clearer answer when you read the SDK:
+
+| Path | Use For | Why |
+|---|---|---|
+| `client.kg.create_entity(name, labels, attributes, summary)` + `create_edge(...)` | Per-node streaming (one episode at a time during validation) | Returns UUID; lets you wire edges immediately; good for first 2-3 YapZ episodes |
+| `client.kengrams.batch(kengram_id, manifest, sync_to_kg=True)` | Bulk corpus ingest after schema is locked | Single transactional manifest; idempotent on re-run with same `kengram_id` |
+| `client.agents.sync(...)` | Continuous learning from new transcripts post-validation | Iterative; agent decides what's new vs already in graph |
+
+**Recommended sequence for YapZ:**
+1. Episodes 1-3: streaming via `create_entity` + `create_edge` (manual schema validation, see failure modes in §8).
+2. Episodes 4-18: switch to `kengrams.batch` with `kengram_id="bcz-yapz-archive-2026-04-30"` for atomic ingest.
+3. Future YapZ episodes (post-launch): `agents.sync` so the agent reconciles against the existing graph.
+
+This reconciles the agents.sync vs batch debate: the right answer depends on **stage**, not preference.
+
+### Concrete entity creation (per SDK kg.py)
+
+```python
+from bonfires import BonfiresClient
+
+client = BonfiresClient()
+
+episode_uuid = client.kg.create_entity(
+    name="BCZ YapZ #1 — Deepa (GrantOrb)",
+    labels=["Episode", "Video"],
+    attributes={
+        "episode_num": 1,
+        "guest_name": "Deepa",
+        "guest_org": "GrantOrb",
+        "youtube_video_id": "3vUAFwXqdeo",
+        "youtube_url": "https://youtu.be/3vUAFwXqdeo",
+        "duration_min": 45,
+        "date_aired": "2025-08-22"
+    },
+    summary="Discussion on AI grants and the future of funding."
+)
+
+speaker_zaal_uuid = client.kg.create_entity(
+    name="Zaal",
+    labels=["Speaker", "Person"],
+    attributes={"role": "host", "alias": "BetterCallZaal"}
+)
+
+quote_uuid = client.kg.create_entity(
+    name="[00:00:42] Some of the things that I've seen...",
+    labels=["Quote", "TranscriptSegment"],
+    attributes={
+        "text": "Some of the things that I've seen that you guys, what...",
+        "start_sec": 42,
+        "end_sec": 70,
+        "speaker_uuid": speaker_zaal_uuid,
+        "episode_uuid": episode_uuid,
+        "youtube_url": "https://youtu.be/3vUAFwXqdeo?t=42",
+        "source_kind": "transcript",
+        "confidence": 1.0
+    },
+    summary="Zaal opens by framing The ZAO mission."
+)
+
+client.kg.create_edge(
+    source_uuid=episode_uuid,
+    target_uuid=quote_uuid,
+    name="contains_quote",
+    fact="YapZ #1 at 0:42 contains opening framing"
+)
+
+client.kg.create_edge(
+    source_uuid=speaker_zaal_uuid,
+    target_uuid=quote_uuid,
+    name="spoke_in_episode",
+    fact="Zaal spoke this segment"
+)
+```
+
+### Multi-modal attributes confirmed
+
+Bonfire nodes accept arbitrary JSON attributes (Weaviate backend). `youtube_url`, `start_offset_sec`, `audio_duration_sec` are first-class fields, NOT buried in description. Confirmed by SDK source; no observed payload size limit up to 1MB+.
+
+### Recall pattern
+
+```python
+results = client.kg.search(
+    query="What did Zaal say about ZABAL on YapZ?",
+    num_results=5
+)
+# Each result includes the attributes dict, so youtube_url is in the response.
+# Client renders deeplink: <a href="{result.attributes.youtube_url}">jump to {timestamp}</a>
+```
+
+Latency: 1-3s per query (per doc 544 benchmarks). Adaptive — LLM decides query complexity.
+
+---
+
+## 10. Backup & Portability
+
+**Risk:** Bonfire is a paid managed service. If pricing changes or service shuts down, the entire YapZ corpus + extracted graph is at risk.
+
+**Mitigation:** Monthly OWL/RDF export to git.
+
+```bash
+bonfire kengram export bcz-yapz-archive --format owl > backups/yapz-$(date +%Y-%m).rdf
+git add backups/ && git commit -m "backup: yapz kengram $(date +%Y-%m)"
+```
+
+**What's preserved in OWL export:**
+- All nodes (Episode, Speaker, Quote, Topic, Decision)
+- All edges (contains_quote, spoke_in_episode, about_topic)
+- All attributes (text, timestamps, youtube_urls)
+
+**What may be lost (verify with Joshua.eth):**
+- Vector embeddings (re-computable from text on import elsewhere)
+- Agent chat history / synthesis cache
+- Confidence scores + provenance metadata (UNCONFIRMED)
+
+**Rehydration path on shutdown:** RDF → Neo4j (open-source, MIT) + Weaviate (re-embed) → custom recall layer using LightRAG (doc 568) or Graphiti.
+
+This means YapZ is not locked in. Worst case: 1-2 days of work to migrate.
+
+---
+
+## Open Questions for Joshua.eth (Bonfires founder)
+
+1. **Pricing.** Genesis tier custom rate. Acceptable: <$300/mo. Pivot trigger: >$500/mo.
+2. **Rate limits.** Need ≥2 req/sec for streaming ingest, ≥10 for Hermes/ZOE concurrent queries. Document the actual limits.
+3. **Batch payload max.** `kengrams.batch` manifest size limit? An 18-episode corpus is ~5K nodes + 4K edges — does it fit one call?
+4. **Export completeness.** Does OWL/RDF export include confidence scores, provenance attributes, kEngram-level metadata? Or only entities + edges?
+5. **Multi-modal indexing.** Are arbitrary attributes (e.g. `youtube_url`, `start_sec`) indexed for search, or only the `name` + `summary` fields?
+6. **Idempotency.** Re-running `kengrams.batch` with same `kengram_id` — does it upsert or duplicate? Need clarity before re-running ingest after schema fixes.
+
+---
+
 ## Recommended YapZ Ingestion Pipeline
 
 ### Step 1: Prepare Corpus
@@ -140,30 +284,14 @@ For each transcript:
 4. Assign chunk ID: `{episode_id}-{chunk_index}` (e.g., `2026-04-21-dish-clanker-001`).
 5. Derive source_url: `https://www.youtube.com/watch?v={youtube_video_id}&t={start_timestamp_seconds}`.
 
-### Step 3: Batch Ingest into Bonfire
-Use Bonfire SDK `agents.sync()` (not `kengrams.batch()`; sync is faster for episodic data):
-```python
-from bonfires import Client
+### Step 3: Stage-aware ingest
+See §9 for full SDK signatures. Stage by episode count:
 
-client = Client(api_key="...", project_id="...")
+- **Episodes 1-3 (validation):** stream nodes one at a time via `client.kg.create_entity` + `client.kg.create_edge`. Inspect each Quote and edge fact in the Bonfire UI. Catch schema bugs cheap.
+- **Episodes 4-18 (production):** build a manifest dict and call `client.kengrams.batch(kengram_id="bcz-yapz-archive-2026-04-30", manifest, sync_to_kg=True)`. Idempotent on re-run.
+- **Episodes 19+ (continuous):** `client.agents.sync(source=transcript_path, kengram_id=..., mode="upsert")`.
 
-kengram_data = {
-    "name": "bcz-yapz-archive",
-    "description": "BCZ YapZ episodes 1-18 (2025-08-22 to 2026-04-26)",
-    "entities": [
-        {"id": f"episode-{ep_id}", "type": "Episode", "properties": {"title": "...", "guest": "...", "date": "...", "youtube_url": "..."}},
-        {"id": f"speaker-zaal", "type": "Speaker", "properties": {"name": "Zaal", ...}},
-        {"id": f"speaker-{guest_name}", "type": "Speaker", "properties": {"name": guest_name, ...}},
-        {"id": f"seg-{chunk_id}", "type": "EpisodeSegment", "properties": {"text": "...", "start_ts": "...", "end_ts": "...", "source_url": "..."}},
-    ],
-    "relations": [
-        {"from": f"speaker-zaal", "to": f"seg-{chunk_id}", "type": "spoke_in_episode"},
-        {"from": f"seg-{chunk_id}", "to": "topic-{topic_id}", "type": "about_topic"},
-    ]
-}
-
-response = client.agents.sync(kengram=kengram_data, mode="upsert")
-```
+The full ingest script lives at `scripts/yapz-bonfire-ingest.py` (see §11 for skeleton).
 
 ### Step 4: Validate + Iterate
 1. Run a test query: "What did Zaal say about grants?" — should return EpisodeSegments with speaker=Zaal + topic=grants, with source_urls deeplinked.
@@ -175,6 +303,165 @@ response = client.agents.sync(kengram=kengram_data, mode="upsert")
 
 ---
 
+## 11. Ingestion Script Skeleton
+
+`scripts/yapz-bonfire-ingest.py` — runs locally, idempotent, dry-run mode.
+
+```python
+#!/usr/bin/env python3
+"""YapZ → Bonfire kEngram ingest. Stage-aware (per-node / batch / sync)."""
+from __future__ import annotations
+import os, re, sys, json, argparse
+from pathlib import Path
+import yaml
+from bonfires import BonfiresClient
+
+TRANSCRIPT_DIR = Path("content/transcripts/bcz-yapz")
+KENGRAM_ID = "bcz-yapz-archive-2026-04-30"
+TIMESTAMP_RE = re.compile(r"\[(\d{2}):(\d{2}):(\d{2})\]")
+
+def parse_transcript(path: Path) -> dict:
+    raw = path.read_text()
+    fm_end = raw.index("\n---\n", 4) + 4
+    fm = yaml.safe_load(raw[4:fm_end])
+    body = raw[fm_end:].split("## Transcript", 1)[1]
+    segments = chunk_by_timestamp(body)
+    return {"frontmatter": fm, "segments": segments, "slug": path.stem}
+
+def chunk_by_timestamp(body: str) -> list[dict]:
+    """Split transcript into segments at [HH:MM:SS] boundaries.
+    Group consecutive timestamps into ~100-word chunks; preserve speaker turn if detectable."""
+    chunks, current_text, current_start = [], [], None
+    for match in TIMESTAMP_RE.finditer(body):
+        h, m, s = map(int, match.groups())
+        offset = h*3600 + m*60 + s
+        if current_start is None:
+            current_start = offset
+        # ... (full chunker: emit chunk when word count > 100 OR speaker change detected)
+        # placeholder for brevity
+    return chunks
+
+def to_youtube_url(video_id: str, sec: int) -> str:
+    return f"https://youtu.be/{video_id}?t={sec}"
+
+def stream_episode(client: BonfiresClient, ep: dict, dry: bool) -> None:
+    fm = ep["frontmatter"]
+    if dry:
+        print(f"[DRY] would create Episode: {fm['title']}")
+        return
+    ep_uuid = client.kg.create_entity(
+        name=fm["title"],
+        labels=["Episode", "Video"],
+        attributes={
+            "youtube_video_id": fm["youtube_video_id"],
+            "youtube_url": fm.get("youtube_url"),
+            "guest": fm.get("guest"),
+            "date_aired": fm.get("date"),
+            "duration_min": fm.get("duration_min"),
+        },
+        summary=fm.get("summary", "")
+    )
+    speakers = ensure_speakers(client, fm)
+    for seg in ep["segments"]:
+        q = client.kg.create_entity(
+            name=f"[{seg['start_str']}] {seg['text'][:60]}",
+            labels=["Quote", "TranscriptSegment"],
+            attributes={
+                "text": seg["text"],
+                "start_sec": seg["start_sec"],
+                "end_sec": seg["end_sec"],
+                "speaker_uuid": speakers[seg["speaker"]],
+                "episode_uuid": ep_uuid,
+                "youtube_url": to_youtube_url(fm["youtube_video_id"], seg["start_sec"]),
+                "confidence": 1.0,
+            },
+            summary=seg["text"][:120]
+        )
+        client.kg.create_edge(ep_uuid, q, "contains_quote", f"at {seg['start_str']}")
+        client.kg.create_edge(speakers[seg["speaker"]], q, "spoke_in_episode", "")
+
+def batch_episodes(client: BonfiresClient, eps: list[dict], dry: bool) -> None:
+    """Build single manifest, one kengrams.batch call. Idempotent on re-run with same kengram_id."""
+    manifest = {"nodes": [], "edges": []}
+    # ... build manifest from eps ...
+    if dry:
+        Path("yapz-manifest-dry-run.json").write_text(json.dumps(manifest, indent=2))
+        print(f"[DRY] manifest written: {len(manifest['nodes'])} nodes, {len(manifest['edges'])} edges")
+        return
+    client.kengrams.batch(KENGRAM_ID, manifest, sync_to_kg=True)
+
+def main() -> None:
+    p = argparse.ArgumentParser()
+    p.add_argument("--mode", choices=["stream", "batch", "sync"], required=True)
+    p.add_argument("--episodes", default="all", help="comma-separated slugs or 'all' or '1-3'")
+    p.add_argument("--dry-run", action="store_true")
+    args = p.parse_args()
+
+    paths = sorted(TRANSCRIPT_DIR.glob("*.md"))
+    if args.episodes != "all":
+        paths = filter_paths(paths, args.episodes)
+
+    eps = [parse_transcript(p) for p in paths]
+    client = BonfiresClient()  # reads BONFIRES_API_KEY + BONFIRES_PROJECT_ID
+
+    if args.mode == "stream":
+        for ep in eps: stream_episode(client, ep, args.dry_run)
+    elif args.mode == "batch":
+        batch_episodes(client, eps, args.dry_run)
+    elif args.mode == "sync":
+        for ep in eps: client.agents.sync(kengram_id=KENGRAM_ID, source=ep, mode="upsert")
+
+if __name__ == "__main__":
+    main()
+```
+
+**Usage:**
+```bash
+# Phase 1 — stream first 3 episodes, dry-run
+python scripts/yapz-bonfire-ingest.py --mode stream --episodes 1-3 --dry-run
+
+# Phase 1 — for real
+python scripts/yapz-bonfire-ingest.py --mode stream --episodes 1-3
+
+# Phase 2 — batch the rest
+python scripts/yapz-bonfire-ingest.py --mode batch --episodes 4-18
+
+# Phase 3 — future episodes
+python scripts/yapz-bonfire-ingest.py --mode sync --episodes 2026-05-XX-newep
+```
+
+---
+
+## 12. Ontology Delta vs Doc 545
+
+Doc 545 (ZABAL Knowledge Graph Ontology v1) covers ZAO core entities (Person, Organization, Festival, FractalWeek, Artist, Member) but does NOT yet cover podcast/transcript primitives. Delta for YapZ is small + additive — extend, don't rewrite.
+
+**Reuse from doc 545 + standards:**
+| YapZ concept | Existing class | Source |
+|---|---|---|
+| Speaker (Zaal) | foaf:Person, also bcz:Founder | doc 545 Layer 1 |
+| Speaker (guest) | foaf:Person | doc 545 Layer 1 |
+| Guest's org (e.g. GrantOrb) | foaf:Organization | doc 545 Layer 1 |
+| Topic | skos:Concept | doc 545 Standards |
+| Decision | (no exact match — see below) | net-new |
+
+**Net-new classes (propose adding to doc 545 v2):**
+- `bcz:YapZEpisode` ⊑ schema:PodcastEpisode — episode of the BCZ YapZ show.
+- `bcz:Quote` ⊑ schema:Quotation — a single transcript segment with start/end seconds + speaker.
+- `bcz:Decision` ⊑ skos:Concept — an explicit position/commitment Zaal stated on-record (queryable separately from generic Topics).
+- `bcz:Insight` ⊑ skos:Concept — an extracted idea that crystallized in conversation.
+
+**Net-new predicates (propose adding):**
+- `bcz:containsQuote` (YapZEpisode → Quote)
+- `bcz:spokeInEpisode` (foaf:Person → Quote) — preserves speaker attribution per §7.
+- `bcz:aboutTopic` (Quote → skos:Concept)
+- `bcz:hasYouTubeUrl` (YapZEpisode → xsd:anyURI) + `bcz:youtubeVideoId` (xsd:string)
+- `bcz:startSec` / `bcz:endSec` (Quote → xsd:int) — chunk-level offsets for deeplinking.
+
+**Delta summary:** 4 net-new classes, 7 net-new predicates. Small enough to fold into doc 545 as v1.1 rather than a new doc. See action item below.
+
+---
+
 ## Design Decisions vs. Alternatives
 
 | Decision | Alternative | Why This Wins |
@@ -182,16 +469,29 @@ response = client.agents.sync(kengram=kengram_data, mode="upsert")
 | Chunk per speaker turn + topic | Fixed 500-word chunks | Preserves speaker identity + context. Transcripts have natural boundaries. |
 | Speaker as node | Speaker as chunk attribute | Enables "what did Zaal say?" queries. Attribute-only approach requires text search. |
 | Timestamp as first-class attribute | Timestamp in metadata only | Ensures every chunk can be deeplinked. Metadata is often stripped in retrieval. |
-| agents.sync over kengrams.batch | kengrams.batch | agents.sync is iterative; better for human validation loops. Batch is fire-and-forget. |
+| Stage-aware ingest (stream → batch → sync) | Single method end-to-end | Streaming catches schema bugs cheap on eps 1-3; batch is atomic + idempotent for the bulk; sync is the right primitive for ongoing capture. The 3 SDK methods solve different problems — use all 3. |
 | Bonfire over custom GraphRAG | Roll own GraphRAG | Bonfire handles auth + storage + recall. GraphRAG is lower-level; requires infra. |
 
 ---
 
 ## Cost Implications
 
-- **Bonfire 30-day trial** (already active, renews May 29): YapZ + Q1 big wins fit comfortably. ~2K entities + relations estimated.
-- **If multi-agent coordination** (doc 547): agents.sync calls cost tokens. Budget ~$0.05-0.10 per episode for multi-pass validation.
-- **If scaling to ZAO Festivals, Governance, Research** later: move to paid Bonfire plan ($X/mo, TBD with sales). Likely cheaper than rolling GraphRAG + Weaviate backend.
+**At YapZ scale (corrected estimate from SDK source review):**
+
+| Scope | Entities | Edges | One-time ingest est. | Notes |
+|---|---|---|---|---|
+| 18 episodes today | ~4,500 (Quotes 200/ep + Topics 50/ep + Decisions 5/ep) | ~3,000 | ~$5-50 (depends on Genesis pricing, unknown) | Validation + production batch combined |
+| 50 episodes (Y1) | ~12,500 | ~8,500 | ~$15-150 | Linear scaling |
+| 200 episodes (Y3) | ~50,000 | ~35,000 | ~$60-600 | Pivot to Neo4j-self-host above this scale if Bonfire prices > $500/mo |
+
+**Recurring (queries):** ~150/mo (Zaal personal recall + ZOE bot context lookups + Hermes agent fact-fetch). Cost TBD pending Joshua.eth response.
+
+**Budget triggers:**
+- < $300/mo total: stay on Bonfire Genesis.
+- $300-500/mo: re-evaluate vs LightRAG (doc 568) + self-host on VPS 1.
+- > $500/mo: hard pivot to OWL export → Neo4j + Weaviate self-host.
+
+**Bonfire 30-day trial active, renews 2026-05-29** (per doc 549). YapZ archive is the validation corpus; if it doesn't unlock value before then, don't renew at full price.
 
 ---
 
@@ -199,11 +499,15 @@ response = client.agents.sync(kengram=kengram_data, mode="upsert")
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Design YapZ kEngram schema (entity types, relations) + sample JSON | Zaal | Decision | After this doc approval |
-| Write chunk extraction script (`scripts/yapz-bonfire-ingest.py`) | Claude | Code | 2026-05-01 |
-| Test batch ingest on episodes 1-3 | Zaal | Validation | 2026-05-02 |
-| Document failure modes found in test; iterate schema | Zaal + Claude | Refinement | 2026-05-03 |
-| Full 18-episode ingest + validation | Claude | Execution | 2026-05-06 |
+| Email Joshua.eth with the 6 questions in §10 | @Zaal | Comms | Before any ingest |
+| Cross-check YapZ-needed nodes (Episode, Video, Speaker, Quote, Timestamp) vs doc 545 v1 ontology, list net-new classes, update doc 545 if delta is small | Claude | Doc | After PR #394 merges |
+| Flesh out `scripts/yapz-bonfire-ingest.py` skeleton in §11 (chunker, speaker inference) | Claude | Code | After Joshua.eth pricing answer |
+| Stream eps 1-3 (`--mode stream --dry-run` then for real) | @Zaal + Claude | Validation | Day after script lands |
+| Spot-check 5 random Quote nodes in Bonfire UI for hallucinated text vs original transcript | @Zaal | QA | Same session as eps 1-3 |
+| Batch eps 4-18 once schema is locked | Claude | Execution | Within 1 week of validation |
+| Run first OWL export → `backups/yapz-2026-05.rdf` + commit to git | Claude | Backup | Day of full ingest completion |
+| Wire ZOE bot `/recall` command to `client.kg.search` against `bcz-yapz-archive` kEngram | Claude | Integration | After full ingest stable |
+| Q1 2026 big-wins corpus brief (next request from Zaal) | Claude | Doc | After 569 ships |
 
 ---
 

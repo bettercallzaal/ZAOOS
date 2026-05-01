@@ -87,6 +87,7 @@ interface SidebarProps {
   onOpenFaq?: () => void;
   onOpenTutorial?: () => void;
   onOpenRespect?: () => void;
+  onOpenEmpire?: () => void;
   xmtpConnected: boolean;
   xmtpConnecting: boolean;
   xmtpError?: string | null;
@@ -107,7 +108,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({
-  user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, isTrending, onTrendingSelect, onOpenFaq, onOpenTutorial, onOpenRespect,
+  user, isOpen, onClose, onLogout, activeChannel, onChannelSelect, isTrending, onTrendingSelect, onOpenFaq, onOpenTutorial, onOpenRespect, onOpenEmpire,
   xmtpConnected, xmtpConnecting, xmtpError, xmtpConversations, activeConversationId,
   onXmtpConnect, onConversationSelect, onNewDm, onNewGroup,
   zaoMembers, loadingMembers, onStartDmWithMember, onGroupInfo, onRemoveConversation, onRefreshMembers, onResetXmtp,
@@ -634,6 +635,24 @@ export function Sidebar({
               </svg>
               Respect
             </button>
+            {onOpenEmpire && (
+              <button
+                onClick={() => { onOpenEmpire(); onClose(); }}
+                className={`flex items-center gap-2 w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
+                  activeChannel === 'zabal'
+                    ? 'bg-[#f5a623]/10 text-[#f5a623] hover:bg-[#f5a623]/15'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 21V8.25l9-5.25 9 5.25V21M9 21V12h6v9M3 21h18" />
+                </svg>
+                ZABAL Empire
+                {activeChannel === 'zabal' && (
+                  <span className="ml-auto text-[9px] uppercase tracking-wider text-[#f5a623]/70">live</span>
+                )}
+              </button>
+            )}
             {user.isAdmin && (
               <a
                 href="/admin"

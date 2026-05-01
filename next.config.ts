@@ -49,6 +49,8 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    // Serve AVIF first, WebP second; falls back to original for unsupported clients.
+    formats: ['image/avif', 'image/webp'],
     // Farcaster PFPs + music artwork — allow known CDN hostnames only (SSRF mitigation).
     // User-controlled PFP images use the `unoptimized` prop on <Image> to bypass the proxy.
     remotePatterns: [

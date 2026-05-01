@@ -2,15 +2,6 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const miniAppEmbed = JSON.stringify({
-  version: '1',
-  imageUrl: 'https://zaoos.com/og-sopha.png',
-  button: {
-    title: 'See the Trending feed',
-    action: { type: 'launch_miniapp', url: 'https://zaoos.com/sopha' },
-  },
-});
-
 export const metadata: Metadata = {
   title: 'Sopha x ZAO OS — Curated Farcaster, inside the music DAO',
   description:
@@ -26,7 +17,6 @@ export const metadata: Metadata = {
     title: 'Sopha x ZAO OS — Curated Farcaster',
     description: 'Deep Social meets the Music DAO. Sopha curates, ZAO governs.',
   },
-  other: { 'fc:miniapp': miniAppEmbed },
 };
 
 const STATS: { label: string; value: string }[] = [

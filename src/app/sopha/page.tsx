@@ -198,38 +198,6 @@ export default function SophaPage() {
 
         <section className="mb-14">
           <h2 className="text-xl font-semibold text-white mb-4">
-            Where this is going
-          </h2>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 sm:p-6 space-y-3 text-sm text-gray-300 leading-relaxed">
-            <p>
-              <span className="text-[#f5a623] font-medium">Music as a Sopha category.</span>{' '}
-              Sopha&apos;s curation graph already covers philosophy and art —
-              the next logical fold-in is music criticism and artist-context
-              writing, where the Music DAO has the most to add.
-            </p>
-            <p>
-              <span className="text-[#f5a623] font-medium">Mutual mini app surfaces.</span>{' '}
-              ZAO OS already runs as a Farcaster Mini App. A Sopha mini app
-              that surfaces ZAO music submissions, and a ZAO mini app that
-              surfaces Sopha categories, both compound distribution.
-            </p>
-            <p>
-              <span className="text-[#f5a623] font-medium">Curator-as-role.</span>{' '}
-              Sopha credits curators today. ZAO uses Hats and Respect-weighted
-              governance. Layering Sopha curators onto Hats makes contribution
-              legible across both communities.
-            </p>
-            <p>
-              <span className="text-[#f5a623] font-medium">Cross-client read receipts.</span>{' '}
-              Casts that get pulled from Sopha into ZAO already show curator
-              attribution. The next step is pushing back: surfacing inside
-              Sopha when a cast is being talked about by a verified music DAO.
-            </p>
-          </div>
-        </section>
-
-        <section className="mb-14">
-          <h2 className="text-xl font-semibold text-white mb-4">
             Try it
           </h2>
           <div className="grid sm:grid-cols-2 gap-3">

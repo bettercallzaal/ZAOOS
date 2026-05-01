@@ -96,8 +96,11 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  // Load Spotify IFrame API
+  // Load Spotify IFrame API — deferred until the first Spotify track plays.
+  // Saves ~30KB JS + a TLS handshake to open.spotify.com on every authed
+  // page for users who never play a Spotify track.
   useEffect(() => {
+    if (state.metadata?.type !== 'spotify') return;
     if (document.getElementById('spotify-iframe-api')) {
       if (window.SpotifyIframeApi) apiRef.current = window.SpotifyIframeApi;
       return;
@@ -121,7 +124,7 @@ export function SpotifyProvider({ children }: { children: ReactNode }) {
     return () => {
       window.onSpotifyIframeApiReady = undefined;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [state.metadata?.type]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Register controller
   useEffect(() => {

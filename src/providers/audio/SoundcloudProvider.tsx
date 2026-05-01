@@ -46,24 +46,57 @@ function ensureIframe(): HTMLIFrameElement {
   return scIframe;
 }
 
+const SC_LOAD_OPTS = {
+  auto_play: true,
+  hide_related: true,
+  show_comments: false,
+  show_user: false,
+};
+
 export function SoundcloudProvider({ children }: { children: ReactNode }) {
   const { state, dispatch, registerController, onEndedRef } = usePlayerContext();
   const widgetRef = useRef<SCWidget | null>(null);
   const widgetReadyRef = useRef(false);
   const pendingUrlRef = useRef<string | null>(null);
+  const sdkLoadStartedRef = useRef(false);
 
-  // Load SC Widget API and initialize widget
+  // Register controller eagerly so PlayerProvider can dispatch the moment
+  // a SoundCloud track is queued — the widget itself is initialized lazily
+  // when the SDK finishes loading (see deferred effect below). All four
+  // entry points are widget-aware: optional-chained for the hot path,
+  // queued via pendingUrlRef for load.
   useEffect(() => {
-    const loadApi = () => {
-      if (document.getElementById('sc-widget-api')) return;
+    registerController('soundcloud', {
+      play: () => widgetRef.current?.play(),
+      pause: () => widgetRef.current?.pause(),
+      seek: (ms) => widgetRef.current?.seekTo(ms),
+      setVolume: (v) =>
+        (widgetRef.current as unknown as { setVolume?: (v: number) => void } | null)?.setVolume?.(v * 100),
+      load: (url) => {
+        if (!widgetReadyRef.current || !widgetRef.current) {
+          pendingUrlRef.current = url;
+          return;
+        }
+        widgetRef.current.load(url, SC_LOAD_OPTS);
+      },
+    });
+  }, [registerController]);
+
+  // Load SC Widget API + initialize widget — deferred until the first
+  // SoundCloud track plays. Skips ~15KB JS + a TLS handshake to
+  // soundcloud.com on every authed page for users who never play SC.
+  useEffect(() => {
+    if (state.metadata?.type !== 'soundcloud') return;
+    if (sdkLoadStartedRef.current) return;
+    sdkLoadStartedRef.current = true;
+
+    if (!document.getElementById('sc-widget-api')) {
       const script = document.createElement('script');
       script.id = 'sc-widget-api';
       script.src = 'https://w.soundcloud.com/player/api.js';
       document.head.appendChild(script);
-    };
-    loadApi();
+    }
 
-    // Poll until SC global and iframe are ready (timeout after 30s)
     let pollCount = 0;
     const MAX_POLLS = 150; // 150 × 200ms = 30s
     const interval = setInterval(() => {
@@ -82,12 +115,7 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
       widget.bind(window.SC.Widget.Events.READY, () => {
         widgetReadyRef.current = true;
         if (pendingUrlRef.current) {
-          widget.load(pendingUrlRef.current, {
-            auto_play: true,
-            hide_related: true,
-            show_comments: false,
-            show_user: false,
-          });
+          widget.load(pendingUrlRef.current, SC_LOAD_OPTS);
           pendingUrlRef.current = null;
         }
       });
@@ -110,30 +138,11 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
         }
       });
 
-      registerController('soundcloud', {
-        play: () => widget.play(),
-        pause: () => widget.pause(),
-        seek: (ms) => widget.seekTo(ms),
-        setVolume: (v) => (widget as unknown as { setVolume(v: number): void }).setVolume(v * 100),
-        load: (url) => {
-          if (!widgetReadyRef.current) {
-            pendingUrlRef.current = url;
-            return;
-          }
-          widget.load(url, {
-            auto_play: true,
-            hide_related: true,
-            show_comments: false,
-            show_user: false,
-          });
-        },
-      });
-
       clearInterval(interval);
     }, 200);
 
     return () => clearInterval(interval);
-  }, [dispatch, registerController]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [state.metadata?.type, dispatch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // React to new SoundCloud tracks
   useEffect(() => {
@@ -147,19 +156,9 @@ export function SoundcloudProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    widget.load(metadata.url, {
-      auto_play: true,
-      hide_related: true,
-      show_comments: false,
-      show_user: false,
-    });
+    widget.load(metadata.url, SC_LOAD_OPTS);
     // LOADED dispatched via PLAY event handler above
   }, [state.metadata?.url, state.status, state.metadata?.type]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Ensure iframe exists on mount
-  useEffect(() => {
-    ensureIframe();
-  }, []);
 
   return <>{children}</>;
 }

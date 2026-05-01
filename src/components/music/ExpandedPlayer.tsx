@@ -9,7 +9,6 @@ import { Scrubber } from '@/components/music/Scrubber';
 import { WaveformComments } from '@/components/music/WaveformComments';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
-import { AudioFiltersPanel } from '@/components/music/AudioFiltersPanel';
 import { SleepTimer } from '@/components/music/SleepTimer';
 
 // Panels only render when their corresponding `activePanel` is selected.
@@ -35,6 +34,10 @@ const SpectrumVisualizer = dynamic(
   { ssr: false }
 );
 const EqualizerPanel = dynamic(() => import('@/components/music/EqualizerPanel'), { ssr: false });
+const AudioFiltersPanel = dynamic(
+  () => import('@/components/music/AudioFiltersPanel').then((m) => ({ default: m.AudioFiltersPanel })),
+  { ssr: false },
+);
 
 interface ExpandedPlayerProps {
   metadata: TrackMetadata;

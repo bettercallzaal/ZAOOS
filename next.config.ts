@@ -102,6 +102,17 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      // Long-lived static assets in /public — Lighthouse "efficient cache lifetimes".
+      // 30d fresh + 7d SWR. Bust by renaming the file (no fingerprinting on /public).
+      {
+        source: '/:path*\\.(png|jpg|jpeg|webp|avif|gif|svg|ico|woff2|woff|ttf|otf)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000, stale-while-revalidate=604800',
+          },
+        ],
+      },
     ];
   },
 

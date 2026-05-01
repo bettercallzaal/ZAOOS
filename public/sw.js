@@ -2,14 +2,15 @@
 const CACHE_NAME = 'zaoos-v1';
 const OFFLINE_URL = '/offline';
 
-// Static assets to pre-cache on install
+// Static assets to pre-cache on install.
+// Note: icon-1024.png and logo.png are byte-identical; the OS fetches
+// icon-1024.png at PWA install time, so we only precache logo.png here.
 const PRECACHE_ASSETS = [
   '/',
   '/offline',
   '/manifest.json',
   '/favicon.ico',
   '/apple-touch-icon.png',
-  '/icon-1024.png',
   '/logo.png',
 ];
 

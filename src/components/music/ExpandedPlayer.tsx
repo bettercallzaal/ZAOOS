@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import dynamic from 'next/dynamic';
 import { usePlayer } from '@/providers/audio';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
@@ -126,7 +126,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             />
           </div>
         ) : (
-          <motion.div layoutId="player-artwork" className={`relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-gray-800 shadow-2xl flex-shrink-0 ${
+          <m.div layoutId="player-artwork" className={`relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-gray-800 shadow-2xl flex-shrink-0 ${
             isPlaying ? 'ring-2 ring-[#f5a623]/20 shadow-[#f5a623]/10' : ''
           }`}>
             <ArtworkImage
@@ -153,7 +153,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
                 </div>
               </div>
             )}
-          </motion.div>
+          </m.div>
         )}
       </div>
 

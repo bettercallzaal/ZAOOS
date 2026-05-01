@@ -27,8 +27,11 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
           return;
         }
 
-        // Dismiss native splash IMMEDIATELY — docs say to call this as soon as possible
-        await sdk.actions.ready();
+        // Belt-and-suspenders: <MiniAppReady> in the root layout already
+        // called ready(). Calling it again is idempotent and protects against
+        // the lazy-providers race where this gate mounts after RainbowKit +
+        // AuthKit hydrate.
+        await sdk.actions.ready().catch(() => {});
         if (cancelled) return;
 
         const path = window.location.pathname;
@@ -39,10 +42,22 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
           return;
         }
 
-        // Background auth check
+        // Public marketing routes inside the mini app should render directly
+        // — no allowlist check, no redirect.
+        if (path === '/sopha' || path.startsWith('/sopha/')) {
+          setState('web');
+          return;
+        }
+
+        // Background auth check with a hard timeout so we never trap the user
+        // in 'authing' if the API hangs.
         setState('authing');
         try {
-          const response = await sdk.quickAuth.fetch('/api/miniapp/auth');
+          const authPromise = sdk.quickAuth.fetch('/api/miniapp/auth');
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('quickauth-timeout')), 5000),
+          );
+          const response = await Promise.race([authPromise, timeoutPromise]);
           if (cancelled) return;
 
           if (response.ok) {

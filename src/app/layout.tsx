@@ -8,6 +8,7 @@ import { Providers } from './providers';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration';
+import { MiniAppReady } from '@/components/miniapp/MiniAppReady';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -85,6 +86,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://auth.farcaster.xyz" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <MiniAppReady />
         <Providers wagmiInitialState={initialState}>{children}</Providers>
         <ServiceWorkerRegistration />
         <SpeedInsights />

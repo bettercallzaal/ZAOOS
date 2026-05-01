@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface CircleMember {
   id: string;
@@ -94,7 +95,7 @@ export function CirclesView() {
     <div className="space-y-4">
       {!isLoggedIn && (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-          You&apos;re viewing as a guest. Sign in at <a href="/stock/team" className="underline">/stock/team</a> to join circles.
+          You&apos;re viewing as a guest. Sign in at <Link href="/stock/team" className="underline">/stock/team</Link> to join circles.
         </div>
       )}
       {error && (

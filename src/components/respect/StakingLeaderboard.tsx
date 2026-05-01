@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface StakingEntry {
   address: string;
@@ -55,9 +56,9 @@ export function StakingLeaderboard() {
       ) : entries.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
           <p className="text-sm">No stakers yet.</p>
-          <a href="/stake" className="text-[#f5a623] text-sm mt-2 inline-block">
+          <Link href="/stake" className="text-[#f5a623] text-sm mt-2 inline-block">
             Be the first to stake ZABAL
-          </a>
+          </Link>
         </div>
       ) : (
         <div className="bg-[#0d1b2a] rounded-xl border border-white/[0.08] overflow-hidden">

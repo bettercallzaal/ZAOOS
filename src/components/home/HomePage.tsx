@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,7 +9,12 @@ import { communityConfig } from '@/../community.config';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import StreakBadge from '@/components/streaks/StreakBadge';
 import { NowPlayingHero } from '@/components/home/NowPlayingHero';
-import { ActivityFeed } from '@/components/home/ActivityFeed';
+
+// Below-the-fold and only mounted on user toggle — defer the chunk.
+const ActivityFeed = dynamic(
+  () => import('@/components/home/ActivityFeed').then((m) => ({ default: m.ActivityFeed })),
+  { ssr: false, loading: () => <div className="h-48 rounded-xl bg-white/[0.02] animate-pulse" /> },
+);
 
 /* ── Navigation Data ─────────────────────────────────────────────── */
 

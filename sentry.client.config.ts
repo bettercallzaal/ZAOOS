@@ -7,10 +7,7 @@ Sentry.init({
   // Performance: sample 10% in prod, 100% in dev
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
-  // Session Replay: 1% of sessions, 100% of sessions with errors
-  integrations: [
-    Sentry.replayIntegration(),
-  ],
+  // Session Replay sample rates — applied when the lazy integration loads below.
   replaysSessionSampleRate: 0.01,
   replaysOnErrorSampleRate: 1.0,
 
@@ -25,3 +22,23 @@ Sentry.init({
     'Failed to fetch',
   ],
 });
+
+// Defer Session Replay off the critical path. Replay is the heaviest
+// part of the Sentry SDK (~50KB gzip + DOM serialization runtime); loading
+// it after `requestIdleCallback` keeps initial bundle slim while still
+// capturing replays for sessions that error after first idle.
+if (typeof window !== 'undefined' && !!process.env.NEXT_PUBLIC_SENTRY_DSN) {
+  const loadReplay = async () => {
+    try {
+      const replay = await Sentry.lazyLoadIntegration('replayIntegration');
+      Sentry.addIntegration(replay());
+    } catch {
+      // Network-level failures shouldn't break the page; Sentry errors still capture.
+    }
+  };
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(loadReplay, { timeout: 5000 });
+  } else {
+    setTimeout(loadReplay, 2000);
+  }
+}

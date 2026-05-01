@@ -46,6 +46,15 @@ export interface QuotedCastData {
   text: string;
   timestamp: string;
   embeds?: { url?: string }[];
+  /** Origin of the cast inside ZAO OS — used to credit external curators on outgoing quote-casts. */
+  _source?: 'sopha' | 'neynar';
+  /** Curator attribution carried from the source feed. */
+  _curators?: {
+    fid?: number;
+    username: string;
+    display_name?: string;
+    pfp_url?: string;
+  }[];
 }
 
 export interface CastEmbed {

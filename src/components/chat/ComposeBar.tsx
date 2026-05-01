@@ -8,6 +8,14 @@ import { generateHashtags } from '@/lib/ai/textAnalysis';
 
 const ALL_CHANNELS = communityConfig.farcaster.channels.map((id) => ({ id, label: `#${id}` }));
 
+function buildSophaAttribution(quotedCast: QuotedCastData): string {
+  const curator = quotedCast._curators?.[0]?.username;
+  if (curator) {
+    return `\n\n— Curated by @${curator} on @sopha_social, shared via ZAOOS`;
+  }
+  return `\n\n— Curated by @sopha_social, shared via ZAOOS`;
+}
+
 export interface ReplyContext {
   hash: string;
   authorName: string;
@@ -131,8 +139,12 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
 
         const crossPost = crossPostChannels.size > 0 ? [...crossPostChannels] : undefined;
         const parentHash = replyTo?.hash || undefined;
+        const baseText = msg || ' ';
+        const outgoing = quotedCast?._source === 'sopha'
+          ? `${baseText}${buildSophaAttribution(quotedCast)}`
+          : baseText;
         await onSend(
-          msg || ' ',
+          outgoing,
           parentHash,
           quotedCast?.hash,
           crossPost,
@@ -360,6 +372,11 @@ export const ComposeBar = forwardRef<ComposeBarHandle, ComposeBarProps>(function
                 Quoting {quotedCast.author.display_name || quotedCast.author.username}
               </span>
               <p className="text-xs text-gray-400 mt-0.5 line-clamp-2">{quotedCast.text}</p>
+              {quotedCast._source === 'sopha' && (
+                <p className="text-[10px] text-[#B8966F] mt-1">
+                  Will append: {buildSophaAttribution(quotedCast).trim()}
+                </p>
+              )}
             </div>
             <button
               onClick={onClearQuote}

@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
     // Tree-shake barrel exports from heavy libraries
     optimizePackageImports: [
       '@tanstack/react-query',
+      '@tanstack/react-virtual',
       '@rainbow-me/rainbowkit',
       '@farcaster/auth-kit',
       '@farcaster/auth-client',
@@ -45,6 +46,12 @@ const nextConfig: NextConfig = {
       '@solana/web3.js',
       '@xmtp/browser-sdk',
       '@stream-io/video-react-sdk',
+      '@dnd-kit/core',
+      '@dnd-kit/sortable',
+      '@dnd-kit/utilities',
+      'cmdk',
+      '@tiptap/react',
+      '@tiptap/starter-kit',
     ],
   },
 

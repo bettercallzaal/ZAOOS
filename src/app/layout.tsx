@@ -18,7 +18,7 @@ const inter = Inter({
 
 const miniAppEmbed = JSON.stringify({
   version: '1',
-  imageUrl: 'https://zaoos.com/og.png',
+  imageUrl: 'https://zaoos.com/og',
   button: {
     title: 'Open ZAO OS',
     action: {

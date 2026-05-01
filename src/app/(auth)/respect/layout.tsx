@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description:
       'View the Respect leaderboard and track peer-ranked contributions across The ZAO community.',
     url: 'https://zaoos.com/respect',
-    images: [{ url: 'https://zaoos.com/og.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://zaoos.com/og', width: 1200, height: 630 }],
   },
 };
 

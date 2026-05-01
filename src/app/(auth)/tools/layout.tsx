@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description:
       'Access artist tools for music submissions, profile cards, and creative utilities inside ZAO OS.',
     url: 'https://zaoos.com/tools',
-    images: [{ url: 'https://zaoos.com/og.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://zaoos.com/og', width: 1200, height: 630 }],
   },
 };
 

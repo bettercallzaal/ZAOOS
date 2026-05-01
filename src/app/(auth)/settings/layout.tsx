@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description:
       'Manage your ZAO OS account settings, notifications, and connected services.',
     url: 'https://zaoos.com/settings',
-    images: [{ url: 'https://zaoos.com/og.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://zaoos.com/og', width: 1200, height: 630 }],
   },
 };
 

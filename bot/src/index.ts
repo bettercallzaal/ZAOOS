@@ -18,7 +18,7 @@ import { scheduleAll } from './schedule';
 import { alertDevops, buildHealthReport } from './ops';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
 import { cmdOp } from './onepagers';
-import { cmdFix, cmdFixStatus } from './hermes/commands';
+import { cmdFix, cmdFixStatus, cmdZsEdit } from './hermes/commands';
 import {
   cmdCircles,
   cmdJoin,
@@ -132,6 +132,7 @@ bot.command('help', async (ctx) => {
       '  /do <text> - I parse + update the board',
       '  /idea <text> - drop into the pool, Zaal sees daily',
       '  /zsfb <text> - feedback on the /test ZAOstock site (auto-tagged by section)',
+      '  /zsedit <text> - actually ship the edit to /test (Hermes opens a PR; capped per day)',
       '  /note <text> - meeting note, goes to dashboard',
       '  /gemba <text> - quick standup log',
       '',
@@ -197,6 +198,14 @@ bot.command('fix', async (ctx) => {
 
 bot.command('fix_status', async (ctx) => {
   await cmdFixStatus(ctx);
+});
+
+// /zsedit - team-facing direct edit of bettercallzaal/zaostock /test site.
+// Open to all team members, target locked to zaostock, per-member daily cap,
+// kill switch via ZSEDIT_DISABLED env. See bot/src/hermes/commands.ts.
+bot.command('zsedit', async (ctx) => {
+  const member = await resolveMember(ctx.from?.id, ctx.from?.username);
+  await cmdZsEdit(ctx, member);
 });
 
 bot.command('press', async (ctx) => {

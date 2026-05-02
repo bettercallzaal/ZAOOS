@@ -98,7 +98,10 @@ const nextConfig: NextConfig = {
   async headers() {
     const securityHeaders = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
-      { key: 'X-Frame-Options', value: 'DENY' },
+      // X-Frame-Options intentionally omitted. The Farcaster miniapp is
+      // embedded in client iframes (Warpcast, Base App, third-party readers).
+      // Frame embedding policy is controlled via CSP `frame-ancestors *`
+      // set in src/middleware.ts.
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
       { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
       { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },

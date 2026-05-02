@@ -45,7 +45,7 @@ function isAdmin(ctx: Context, member: TeamMember | null): boolean {
  */
 export async function cmdFix(ctx: Context, member: TeamMember | null): Promise<void> {
   if (!isAdmin(ctx, member)) {
-    await ctx.reply('Hermes /fix is admin-only for v1. Ask Zaal to add you to BOT_ADMIN_TELEGRAM_IDS.');
+    await ctx.reply('/fix is admin-only - it can target any repo. Team can use /zsedit (locked to zaostock, daily-capped) instead. Ping Zaal if you need /fix scope.');
     return;
   }
 
@@ -59,7 +59,7 @@ export async function cmdFix(ctx: Context, member: TeamMember | null): Promise<v
       : await checkOnPath('claude');
   if (!claudeOnPath) {
     await ctx.reply(
-      "Hermes can't find the 'claude' CLI on PATH. Install Claude Code on the bot host (Max plan), or set HERMES_CLAUDE_BIN.",
+      "I can't find the 'claude' CLI on the bot host - my Coder loop runs through it. Install Claude Code on the host (Max plan) or set HERMES_CLAUDE_BIN. Pinging Zaal.",
     );
     return;
   }
@@ -77,7 +77,7 @@ export async function cmdFix(ctx: Context, member: TeamMember | null): Promise<v
     return;
   }
 
-  await ctx.reply(`Hermes starting against ${target}. Coder writes diff, Critic grades, you get a PR link if score >=70. Max 3 attempts.`);
+  await ctx.reply(`On it. Cloning ${target}, Coder will read + write a diff, Critic grades. You get a PR link if score >=70. Max 3 attempts.`);
 
   // Fire-and-forget: long-running, will report back via Telegram.
   void runAndReport(ctx, { triggered_by_telegram_id: fromId, triggered_in_chat_id: chatId, issue_text: text, target_repo: target });
@@ -94,22 +94,22 @@ async function runAndReport(
       const pingZaal = ZAAL_TG_ID && ZAAL_TG_ID !== input.triggered_by_telegram_id ? `\n\ncc @${ZAAL_TG_ID}` : '';
       await ctx.api.sendMessage(
         input.triggered_in_chat_id,
-        `Hermes READY. PR ${r.pr_url}\nCritic score: ${r.critic_score}/100\nAttempts: ${r.fixer_attempts}\nCost: $${r.estimated_cost_usd ?? 'n/a'}${pingZaal}\n\nPush when good.`,
+        `READY. PR open: ${r.pr_url}\nCritic: ${r.critic_score}/100 in ${r.fixer_attempts} attempt(s). Cost $${r.estimated_cost_usd ?? 'n/a'}.${pingZaal}\n\nReview + merge when good.`,
       );
     } else if (result.kind === 'escalated') {
       await ctx.api.sendMessage(
         input.triggered_in_chat_id,
-        `Hermes ESCALATED. Hit max ${r.fixer_max_attempts} attempts. Last feedback: ${result.reason}\nRun ID: ${r.id}`,
+        `ESCALATED after ${r.fixer_max_attempts} attempts. Last critic feedback: ${result.reason}\nRun ID: ${r.id}\n\nThis one needs a human. Either rephrase + retry or take it manually.`,
       );
     } else {
       await ctx.api.sendMessage(
         input.triggered_in_chat_id,
-        `Hermes FAILED. ${result.reason}\nRun ID: ${r.id}`,
+        `FAILED. ${result.reason}\nRun ID: ${r.id}`,
       );
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    await ctx.api.sendMessage(input.triggered_in_chat_id, `Hermes crashed outside the loop: ${msg}`);
+    await ctx.api.sendMessage(input.triggered_in_chat_id, `Coder loop crashed outside the run: ${msg}`);
   }
 }
 
@@ -169,12 +169,12 @@ function formatRun(r: { id: string; status: string; fixer_attempts: number; crit
  */
 export async function cmdZsEdit(ctx: Context, member: TeamMember | null): Promise<void> {
   if (!member) {
-    await ctx.reply('You need to be a registered team member to use /zsedit. Run /whoami to confirm or DM Zaal to get added.');
+    await ctx.reply('I only ship edits for registered team. Run /whoami to confirm, or DM Zaal to get added to the roster.');
     return;
   }
 
   if (process.env.ZSEDIT_DISABLED === '1') {
-    await ctx.reply('Team /zsedit is paused right now. /zsfb still works for logging feedback. Ping Zaal if it is urgent.');
+    await ctx.reply('Paused. /zsedit is off temporarily. /zsfb still works to log it for later. Ping Zaal if urgent.');
     return;
   }
 
@@ -182,14 +182,12 @@ export async function cmdZsEdit(ctx: Context, member: TeamMember | null): Promis
   if (!text || text.length < 10) {
     await ctx.reply(
       [
-        'Usage: /zsedit <change you want on the /test ZAOstock site>',
+        'Tell me what to change on /test. I clone bettercallzaal/zaostock, write the diff, run a critic, open a PR if it scores >=70.',
         '',
         'Examples:',
         '  /zsedit drop the lineup TBA placeholders, keep the section header',
         '  /zsedit hero copy too long - cut the second sentence',
         '  /zsedit add a "lineup drops Aug 2026" pill near the top',
-        '',
-        'I clone bettercallzaal/zaostock, write the diff, run a critic, and open a PR if it passes 70/100. Max 3 attempts.',
       ].join('\n'),
     );
     return;
@@ -216,7 +214,7 @@ export async function cmdZsEdit(ctx: Context, member: TeamMember | null): Promis
   }
   if (usedToday >= dailyCap) {
     await ctx.reply(
-      `Daily /zsedit cap reached (${usedToday}/${dailyCap}). Resets at UTC midnight. Use /zsfb to log feedback for tomorrow's batch, or ping Zaal if it is urgent.`,
+      `Hit your daily ship cap (${usedToday}/${dailyCap}). Resets at UTC midnight. Drop it in /zsfb so I batch it tomorrow, or ping Zaal if urgent.`,
     );
     return;
   }
@@ -226,14 +224,14 @@ export async function cmdZsEdit(ctx: Context, member: TeamMember | null): Promis
   const claudePath = process.env.HERMES_CLAUDE_BIN ?? '';
   const claudeOnPath = claudePath && existsSync(claudePath) ? true : await checkOnPath('claude');
   if (!claudeOnPath) {
-    await ctx.reply("Hermes can't find the 'claude' CLI on the bot host. Ping Zaal.");
+    await ctx.reply("Can't find the 'claude' CLI on my host - the Coder loop runs through it. Ping Zaal.");
     return;
   }
 
   await ctx.reply(
     [
-      `Hermes editing zaostock for ${member.name}. (${usedToday + 1}/${dailyCap} today.)`,
-      'Coder writes diff, Critic grades, you get a PR link if score >=70. Max 3 attempts.',
+      `On it, ${member.name}. Editing /test. (${usedToday + 1}/${dailyCap} today.)`,
+      'Coder writes the diff, Critic grades, you get a PR if score >=70. Max 3 attempts.',
     ].join('\n'),
   );
 

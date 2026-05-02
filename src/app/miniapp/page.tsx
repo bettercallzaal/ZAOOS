@@ -27,14 +27,15 @@ export default function MiniAppPage() {
     let cancelled = false;
 
     async function init() {
-      let sdk: typeof import('@farcaster/miniapp-sdk').sdk | undefined;
+      let sdkModule: typeof import('@farcaster/miniapp-sdk');
       try {
-        ({ sdk } = await import('@farcaster/miniapp-sdk'));
+        sdkModule = await import('@farcaster/miniapp-sdk');
       } catch {
         // SDK package failed to load — only happens off-Farcaster
         window.location.href = '/';
         return;
       }
+      const { sdk } = sdkModule;
 
       // Dismiss native splash IMMEDIATELY, before anything else can fail.
       sdk.actions.ready().catch(() => {});

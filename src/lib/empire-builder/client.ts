@@ -162,9 +162,15 @@ interface ZabalSnapshot {
   };
 }
 
+// API inconsistency: empire-rewards summary returns amounts as "$12.6" strings,
+// while empire-rewards/<id>/distribute returns numeric `total_amount`. Strip
+// any non-numeric prefix before parsing.
 function toNumber(value: string | number | undefined): number {
-  if (value === undefined) return 0;
-  const n = typeof value === 'number' ? value : Number(value);
+  if (value === undefined || value === null) return 0;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  const cleaned = value.replace(/[^0-9.\-]/g, '');
+  if (!cleaned) return 0;
+  const n = Number(cleaned);
   return Number.isFinite(n) ? n : 0;
 }
 
@@ -190,13 +196,19 @@ export async function getZabalSnapshot(): Promise<ZabalSnapshot> {
   }
 
   const distributedItems = summary?.empire_rewards ?? [];
-  const burnedItems = summary?.burned ?? [];
+  const burnedItems = summary?.burned_rewards ?? summary?.burned ?? [];
 
-  const lifetimeDistributedUsd = distributedItems.reduce(
-    (acc, item) => acc + toNumber(item.amount_usd ?? item.amount),
-    0,
-  );
-  const lifetimeBurned = burnedItems.reduce((acc, item) => acc + toNumber(item.amount), 0);
+  // Empire endpoint has canonical lifetime totals; summary endpoint only
+  // returns the 3 most recent of each kind. Prefer empire-level when present.
+  const lifetimeDistributedUsd =
+    toNumber(empireData?.total_distributed) ||
+    distributedItems.reduce(
+      (acc, item) => acc + toNumber(item.amount_usd ?? item.amount ?? item.total_amount),
+      0,
+    );
+  const lifetimeBurned =
+    toNumber(empireData?.total_burned) ||
+    burnedItems.reduce((acc, item) => acc + toNumber(item.amount ?? item.total_amount), 0);
 
   return {
     empire: empireData,

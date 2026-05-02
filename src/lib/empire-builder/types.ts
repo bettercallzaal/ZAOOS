@@ -52,10 +52,10 @@ export type EmpireSummary = z.infer<typeof empireSummarySchema>;
 export const leaderboardSlotSchema = z
   .object({
     id: z.string(),
-    empire_address: z.string().optional(),
-    leaderboard_type: z.string().optional(),
-    name: z.string().optional(),
-    leaderboard_number: z.number().optional(),
+    empire_address: z.string().nullable().optional(),
+    leaderboard_type: z.string().nullable().optional(),
+    name: z.string().nullable().optional(),
+    leaderboard_number: z.number().nullable().optional(),
   })
   .passthrough();
 export type LeaderboardSlot = z.infer<typeof leaderboardSlotSchema>;
@@ -124,11 +124,16 @@ export const rewardItemSchema = z
   .passthrough();
 export type RewardItem = z.infer<typeof rewardItemSchema>;
 
+// API field-name drift: live API returns `burned_rewards` and `airdrop_rewards`
+// (with `_rewards` suffix) while V3 docs say `burned` and `airdrops`. Accept
+// both shapes.
 export const rewardsSummaryResponseSchema = z
   .object({
     empire_rewards: z.array(rewardItemSchema).optional(),
     burned: z.array(rewardItemSchema).optional(),
+    burned_rewards: z.array(rewardItemSchema).optional(),
     airdrops: z.array(rewardItemSchema).optional(),
+    airdrop_rewards: z.array(rewardItemSchema).optional(),
   })
   .passthrough();
 export type RewardsSummaryResponse = z.infer<typeof rewardsSummaryResponseSchema>;

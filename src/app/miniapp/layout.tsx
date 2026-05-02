@@ -23,6 +23,12 @@ export const metadata: Metadata = {
   },
 };
 
+// Never cache the miniapp entry HTML — Farcaster client + SW were serving
+// stale builds where sdk.actions.ready() never fired, leaving users stuck on
+// the native splash screen.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function MiniAppLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

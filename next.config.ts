@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
     // Tree-shake barrel exports from heavy libraries
     optimizePackageImports: [
       '@tanstack/react-query',
+      '@tanstack/react-virtual',
       '@rainbow-me/rainbowkit',
       '@farcaster/auth-kit',
       '@farcaster/auth-client',
@@ -45,10 +46,18 @@ const nextConfig: NextConfig = {
       '@solana/web3.js',
       '@xmtp/browser-sdk',
       '@stream-io/video-react-sdk',
+      '@dnd-kit/core',
+      '@dnd-kit/sortable',
+      '@dnd-kit/utilities',
+      'cmdk',
+      '@tiptap/react',
+      '@tiptap/starter-kit',
     ],
   },
 
   images: {
+    // Serve AVIF first, WebP second; falls back to original for unsupported clients.
+    formats: ['image/avif', 'image/webp'],
     // Farcaster PFPs + music artwork — allow known CDN hostnames only (SSRF mitigation).
     // User-controlled PFP images use the `unoptimized` prop on <Image> to bypass the proxy.
     remotePatterns: [
@@ -99,6 +108,17 @@ const nextConfig: NextConfig = {
       {
         source: '/(.*)',
         headers: securityHeaders,
+      },
+      // Long-lived static assets in /public — Lighthouse "efficient cache lifetimes".
+      // 30d fresh + 7d SWR. Bust by renaming the file (no fingerprinting on /public).
+      {
+        source: '/:path*\\.(png|jpg|jpeg|webp|avif|gif|svg|ico|woff2|woff|ttf|otf)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000, stale-while-revalidate=604800',
+          },
+        ],
       },
     ];
   },

@@ -87,7 +87,7 @@ export function LoginForm() {
           <p>
             <Link href="/stock/onepagers/overview" className="text-[#f5a623] hover:underline">What is ZAOstock?</Link>
             {' · '}
-            <a href="/stock" className="text-[#f5a623] hover:underline">Public site</a>
+            <Link href="/stock" className="text-[#f5a623] hover:underline">Public site</Link>
           </p>
         </div>
       </div>

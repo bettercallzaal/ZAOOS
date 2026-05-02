@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { m } from 'motion/react';
 import dynamic from 'next/dynamic';
 import { usePlayer } from '@/providers/audio';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
@@ -9,11 +9,22 @@ import { Scrubber } from '@/components/music/Scrubber';
 import { WaveformComments } from '@/components/music/WaveformComments';
 import { LikeButton } from '@/components/music/LikeButton';
 import { AddToPlaylistButton } from '@/components/music/AddToPlaylistButton';
-import { LyricsPanel } from '@/components/music/LyricsPanel';
-import { AudioFiltersPanel } from '@/components/music/AudioFiltersPanel';
 import { SleepTimer } from '@/components/music/SleepTimer';
-import { ShareMenu } from '@/components/music/ShareMenu';
-import { QueuePanel } from '@/components/music/QueuePanel';
+
+// Panels only render when their corresponding `activePanel` is selected.
+// Defer them so the initial expanded-player chunk stays slim.
+const LyricsPanel = dynamic(
+  () => import('@/components/music/LyricsPanel').then((m) => ({ default: m.LyricsPanel })),
+  { ssr: false, loading: () => <div className="flex-1 min-h-0 flex items-center justify-center text-xs text-gray-500">Loading lyrics…</div> },
+);
+const QueuePanel = dynamic(
+  () => import('@/components/music/QueuePanel').then((m) => ({ default: m.QueuePanel })),
+  { ssr: false },
+);
+const ShareMenu = dynamic(
+  () => import('@/components/music/ShareMenu').then((m) => ({ default: m.ShareMenu })),
+  { ssr: false },
+);
 import { useQueue } from '@/contexts/QueueContext';
 import { extractDominantColor } from '@/lib/music/colorExtractor';
 import type { TrackMetadata } from '@/types/music';
@@ -23,6 +34,10 @@ const SpectrumVisualizer = dynamic(
   { ssr: false }
 );
 const EqualizerPanel = dynamic(() => import('@/components/music/EqualizerPanel'), { ssr: false });
+const AudioFiltersPanel = dynamic(
+  () => import('@/components/music/AudioFiltersPanel').then((m) => ({ default: m.AudioFiltersPanel })),
+  { ssr: false },
+);
 
 interface ExpandedPlayerProps {
   metadata: TrackMetadata;
@@ -126,7 +141,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
             />
           </div>
         ) : (
-          <motion.div layoutId="player-artwork" className={`relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-gray-800 shadow-2xl flex-shrink-0 ${
+          <m.div layoutId="player-artwork" className={`relative w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden bg-gray-800 shadow-2xl flex-shrink-0 ${
             isPlaying ? 'ring-2 ring-[#f5a623]/20 shadow-[#f5a623]/10' : ''
           }`}>
             <ArtworkImage
@@ -153,7 +168,7 @@ export function ExpandedPlayer({ metadata, onClose, onPrev, onNext }: ExpandedPl
                 </div>
               </div>
             )}
-          </motion.div>
+          </m.div>
         )}
       </div>
 

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description:
       'Explore the ZABAL ecosystem of partners, collaborators, and aligned communities building alongside The ZAO.',
     url: 'https://zaoos.com/ecosystem',
-    images: [{ url: 'https://zaoos.com/og.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://zaoos.com/og', width: 1200, height: 630 }],
   },
 };
 

@@ -2,8 +2,11 @@
 
 import { useCallback, useState, useRef } from 'react';
 import { AUDIO_FILTERS, FILTER_CATEGORIES, type AudioFilterPreset } from '@/lib/music/audioFilters';
+import { getActiveFilterKey as readSharedKey, setActiveFilterKey } from '@/lib/music/audioFilterState';
 
-let sharedActiveFilterKey: string | null = null;
+// Re-export for any legacy callers that imported the helper from here.
+// New code should import directly from '@/lib/music/audioFilterState'.
+export { getActiveFilterKey } from '@/lib/music/audioFilterState';
 
 const SPEED_PRESETS = [
   { label: '0.5x', value: 0.5 },
@@ -13,10 +16,6 @@ const SPEED_PRESETS = [
   { label: '1.5x', value: 1.5 },
   { label: '2.0x', value: 2.0 },
 ] as const;
-
-export function getActiveFilterKey(): string | null {
-  return sharedActiveFilterKey;
-}
 
 function getAudioElement(): HTMLAudioElement | null {
   const a = (globalThis as Record<string, unknown>).__zao_audio_a as HTMLAudioElement | undefined;
@@ -33,7 +32,7 @@ interface AudioFiltersPanelProps {
 }
 
 export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
-  const [activeKey, setActiveKey] = useState<string | null>(sharedActiveFilterKey);
+  const [activeKey, setActiveKey] = useState<string | null>(readSharedKey());
   const [activeCategory, setActiveCategory] = useState(0);
   const [customSpeed, setCustomSpeed] = useState(1.0);
   const sliderRef = useRef<HTMLInputElement>(null);
@@ -42,9 +41,9 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
     const audioEl = getAudioElement();
     if (!audioEl) return;
 
-    if (sharedActiveFilterKey === key) {
+    if (readSharedKey() === key) {
       audioEl.playbackRate = 1.0;
-      sharedActiveFilterKey = null;
+      setActiveFilterKey(null);
       setActiveKey(null);
       setCustomSpeed(1.0);
       return;
@@ -52,7 +51,7 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
 
     const rate = preset.playbackRate ?? 1.0;
     audioEl.playbackRate = rate;
-    sharedActiveFilterKey = key;
+    setActiveFilterKey(key);
     setActiveKey(key);
     setCustomSpeed(rate);
   }, []);
@@ -60,7 +59,7 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
   const clearFilter = useCallback(() => {
     const audioEl = getAudioElement();
     if (audioEl) audioEl.playbackRate = 1.0;
-    sharedActiveFilterKey = null;
+    setActiveFilterKey(null);
     setActiveKey(null);
     setCustomSpeed(1.0);
   }, []);
@@ -69,7 +68,7 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
     const audioEl = getAudioElement();
     if (audioEl) audioEl.playbackRate = speed;
     setCustomSpeed(speed);
-    sharedActiveFilterKey = 'custom';
+    setActiveFilterKey('custom');
     setActiveKey('custom');
   }, []);
 
@@ -77,7 +76,7 @@ export function AudioFiltersPanel({ visible }: AudioFiltersPanelProps) {
     const audioEl = getAudioElement();
     if (audioEl) audioEl.playbackRate = 1.0;
     setCustomSpeed(1.0);
-    sharedActiveFilterKey = null;
+    setActiveFilterKey(null);
     setActiveKey(null);
   }, []);
 

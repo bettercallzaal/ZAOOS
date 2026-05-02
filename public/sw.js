@@ -2,14 +2,31 @@
 const CACHE_NAME = 'zaoos-v1';
 const OFFLINE_URL = '/offline';
 
-// Static assets to pre-cache on install
+// Cap on cached page navigations + dynamically-cached assets so the SW
+// cache can't grow unboundedly and trip the browser quota. Evicts oldest
+// entries (insertion order ≈ LRU) once the limit is exceeded.
+const PAGE_CACHE_MAX_ENTRIES = 50;
+const ASSET_CACHE_MAX_ENTRIES = 100;
+
+async function trimCache(cacheName, maxEntries) {
+  const cache = await caches.open(cacheName);
+  const keys = await cache.keys();
+  if (keys.length <= maxEntries) return;
+  const excess = keys.length - maxEntries;
+  for (let i = 0; i < excess; i++) {
+    await cache.delete(keys[i]);
+  }
+}
+
+// Static assets to pre-cache on install.
+// Note: icon-1024.png and logo.png are byte-identical; the OS fetches
+// icon-1024.png at PWA install time, so we only precache logo.png here.
 const PRECACHE_ASSETS = [
   '/',
   '/offline',
   '/manifest.json',
   '/favicon.ico',
   '/apple-touch-icon.png',
-  '/icon-1024.png',
   '/logo.png',
 ];
 
@@ -97,10 +114,14 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          // Cache successful page loads
+          // Cache successful page loads, then trim oldest if over cap
           if (response.ok) {
             const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, clone).then(() =>
+                trimCache(CACHE_NAME, PAGE_CACHE_MAX_ENTRIES + ASSET_CACHE_MAX_ENTRIES)
+              );
+            });
           }
           return response;
         })
@@ -118,10 +139,14 @@ self.addEventListener('fetch', (event) => {
     caches.match(request).then((cached) => {
       if (cached) return cached;
       return fetch(request).then((response) => {
-        // Cache successful static asset responses
+        // Cache successful static asset responses, then trim oldest if over cap
         if (response.ok && response.type === 'basic') {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, clone).then(() =>
+              trimCache(CACHE_NAME, PAGE_CACHE_MAX_ENTRIES + ASSET_CACHE_MAX_ENTRIES)
+            );
+          });
         }
         return response;
       });

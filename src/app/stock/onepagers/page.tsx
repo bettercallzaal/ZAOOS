@@ -37,7 +37,7 @@ export default async function OnePagersPage() {
 
       {!session && (
         <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200">
-          You&apos;re viewing as a guest - only public one-pagers are listed. <a href="/stock/team" className="underline">Sign in</a> to see internal drafts.
+          You&apos;re viewing as a guest - only public one-pagers are listed. <Link href="/stock/team" className="underline">Sign in</Link> to see internal drafts.
         </div>
       )}
 

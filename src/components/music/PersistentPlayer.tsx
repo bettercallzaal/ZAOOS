@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { AnimatePresence, motion, LayoutGroup } from 'motion/react';
+import { AnimatePresence, LayoutGroup, LazyMotion, m } from 'motion/react';
+
+// Defer Motion's animation feature pack into its own chunk; only loads
+// when this player mounts (every authed page) and runs after first paint.
+const loadMotionFeatures = () => import('motion/react').then((mod) => mod.domMax);
 import { usePlayer } from '@/providers/audio';
 import { formatDuration } from '@/lib/music/formatDuration';
 import { ArtworkImage } from '@/components/music/ArtworkImage';
@@ -125,6 +129,7 @@ export function PersistentPlayer({
   };
 
   return (
+    <LazyMotion features={loadMotionFeatures} strict>
     <LayoutGroup>
     {/* Screen reader announcement for track changes */}
     <div aria-live="polite" aria-atomic="true" className="sr-only">
@@ -134,7 +139,7 @@ export function PersistentPlayer({
     {/* Expanded full-screen player — animated overlay */}
     <AnimatePresence>
       {expanded && metadata && (
-        <motion.div
+        <m.div
           key="expanded-player"
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
@@ -148,7 +153,7 @@ export function PersistentPlayer({
             onPrev={onPrev}
             onNext={onNext}
           />
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
 
@@ -192,14 +197,14 @@ export function PersistentPlayer({
           className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-visible bg-gray-800"
           aria-label="Expand player"
         >
-          <motion.div layoutId="player-artwork" className="w-10 h-10 rounded-lg overflow-hidden">
+          <m.div layoutId="player-artwork" className="w-10 h-10 rounded-lg overflow-hidden">
             <ArtworkImage
               src={metadata.artworkUrl}
               alt={metadata.trackName}
               fill
               className="object-cover"
             />
-          </motion.div>
+          </m.div>
           {/* Progress ring — circle around artwork */}
           {duration > 0 && (
             <svg className="absolute -inset-1 w-[48px] h-[48px] -rotate-90 pointer-events-none z-10" viewBox="0 0 48 48">
@@ -328,6 +333,7 @@ export function PersistentPlayer({
       </div>
     </div>
     </LayoutGroup>
+    </LazyMotion>
   );
 }
 

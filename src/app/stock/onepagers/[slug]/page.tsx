@@ -37,7 +37,7 @@ export default async function OnePagerDetailPage({ params }: PageProps) {
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 text-center">
           <h2 className="text-lg font-bold text-amber-300">Sign in required</h2>
           <p className="mt-2 text-sm text-slate-300">
-            This one-pager is internal. <a href="/stock/team" className="underline">Sign in</a> to view.
+            This one-pager is internal. <Link href="/stock/team" className="underline">Sign in</Link> to view.
           </p>
         </div>
       </main>

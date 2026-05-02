@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description:
       'Propose and vote on ZAO governance decisions using Fractal Respect. Shape the future of the decentralized music community.',
     url: 'https://zaoos.com/governance',
-    images: [{ url: 'https://zaoos.com/og.png', width: 1200, height: 630 }],
+    images: [{ url: 'https://zaoos.com/og', width: 1200, height: 630 }],
   },
 };
 

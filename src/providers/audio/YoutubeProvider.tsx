@@ -97,8 +97,11 @@ export function YoutubeProvider({ children }: { children: ReactNode }) {
     }, 500);
   };
 
-  // Load YT IFrame API
+  // Load YouTube IFrame API — deferred until the first YouTube track plays.
+  // Skips ~50KB of JS + a TLS handshake to youtube.com on every authed
+  // page for users who never play a YouTube source.
   useEffect(() => {
+    if (state.metadata?.type !== 'youtube') return;
     if (document.getElementById('yt-iframe-api')) {
       if (window.YT?.Player) apiReadyRef.current = true;
       return;
@@ -116,7 +119,7 @@ export function YoutubeProvider({ children }: { children: ReactNode }) {
     return () => {
       window.onYouTubeIframeAPIReady = undefined;
     };
-  }, []);
+  }, [state.metadata?.type]);
 
   // Register controller
   useEffect(() => {

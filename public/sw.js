@@ -1,5 +1,5 @@
 // ZAO OS Service Worker — offline support + caching
-const CACHE_NAME = 'zaoos-v1';
+const CACHE_NAME = 'zaoos-v2';
 const OFFLINE_URL = '/offline';
 
 // Cap on cached page navigations + dynamically-cached assets so the SW
@@ -111,11 +111,14 @@ self.addEventListener('fetch', (event) => {
 
   // Page navigations — network first, offline fallback
   if (request.mode === 'navigate') {
+    // Never cache the miniapp entry — stale HTML here means users get stuck
+    // on the native Farcaster splash because ready() lives in the new bundle.
+    const isMiniAppEntry = url.pathname === '/miniapp' || url.pathname.startsWith('/miniapp/');
+
     event.respondWith(
       fetch(request)
         .then((response) => {
-          // Cache successful page loads, then trim oldest if over cap
-          if (response.ok) {
+          if (response.ok && !isMiniAppEntry) {
             const clone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(request, clone).then(() =>
@@ -126,6 +129,7 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => {
+          if (isMiniAppEntry) return caches.match(OFFLINE_URL);
           return caches.match(request).then((cached) => {
             return cached || caches.match(OFFLINE_URL);
           });

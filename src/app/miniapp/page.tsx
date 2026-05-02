@@ -29,16 +29,18 @@ export default function MiniAppPage() {
     async function init() {
       try {
         const { sdk } = await import('@farcaster/miniapp-sdk');
+
+        // Dismiss native splash IMMEDIATELY, before anything else can fail.
+        // If the splash hangs because ready() was blocked behind isInMiniApp /
+        // context / auth, the user just sees the Farcaster icon forever.
+        sdk.actions.ready().catch(() => {});
+
         const inMiniApp = await sdk.isInMiniApp();
 
         if (!inMiniApp) {
-          // Not in a mini app context — redirect to web landing
           window.location.href = '/';
           return;
         }
-
-        // Immediately dismiss the native splash screen
-        await sdk.actions.ready();
         if (cancelled) return;
 
         // Silent auth: read FID from miniapp context (no SIWF signature prompt).

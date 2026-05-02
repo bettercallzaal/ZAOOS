@@ -27,58 +27,68 @@ export default function MiniAppPage() {
     let cancelled = false;
 
     async function init() {
+      let sdk: typeof import('@farcaster/miniapp-sdk').sdk | undefined;
       try {
-        const { sdk } = await import('@farcaster/miniapp-sdk');
+        ({ sdk } = await import('@farcaster/miniapp-sdk'));
+      } catch {
+        // SDK package failed to load — only happens off-Farcaster
+        window.location.href = '/';
+        return;
+      }
 
-        // Dismiss native splash IMMEDIATELY, before anything else can fail.
-        // If the splash hangs because ready() was blocked behind isInMiniApp /
-        // context / auth, the user just sees the Farcaster icon forever.
-        sdk.actions.ready().catch(() => {});
+      // Dismiss native splash IMMEDIATELY, before anything else can fail.
+      sdk.actions.ready().catch(() => {});
 
-        const inMiniApp = await sdk.isInMiniApp();
+      // Try to read context FID. Don't gate on isInMiniApp() — some clients
+      // (Mac, older SDK builds) under-report it even when context is valid.
+      // If we get a FID, we're in a miniapp regardless.
+      let ctxFid: number | undefined;
+      try {
+        const ctx = await Promise.race([
+          sdk.context,
+          new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 1500)),
+        ]);
+        ctxFid = ctx?.user?.fid;
+      } catch {
+        ctxFid = undefined;
+      }
+      if (cancelled) return;
 
-        if (!inMiniApp) {
-          window.location.href = '/';
-          return;
+      try {
+        let response: Response | undefined;
+
+        if (ctxFid) {
+          response = await fetch('/api/miniapp/auth-context', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fid: ctxFid }),
+          });
+        } else {
+          // No context FID — try QuickAuth (will SIWF-prompt on first run).
+          // If that also fails, fall back to web landing.
+          try {
+            response = await sdk.quickAuth.fetch('/api/miniapp/auth');
+          } catch {
+            window.location.href = '/';
+            return;
+          }
         }
         if (cancelled) return;
 
-        // Silent auth: read FID from miniapp context (no SIWF signature prompt).
-        // Falls back to QuickAuth if context FID is missing.
-        try {
-          const ctx = await sdk.context;
-          const ctxFid = ctx?.user?.fid;
-
-          let response: Response;
-          if (ctxFid) {
-            response = await fetch('/api/miniapp/auth-context', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ fid: ctxFid }),
-            });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hasAccess) {
+            setAuthState('allowed');
+            window.location.href = '/home';
           } else {
-            response = await sdk.quickAuth.fetch('/api/miniapp/auth');
+            setUsername(data.username || '');
+            setAuthState('denied');
           }
-          if (cancelled) return;
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.hasAccess) {
-              setAuthState('allowed');
-              window.location.href = '/home';
-            } else {
-              setUsername(data.username || '');
-              setAuthState('denied');
-            }
-          } else {
-            setAuthState('error');
-          }
-        } catch {
+        } else {
           setAuthState('error');
         }
       } catch {
-        // SDK not available — treat as web
-        window.location.href = '/';
+        setAuthState('error');
       }
     }
 

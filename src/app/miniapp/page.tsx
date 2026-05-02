@@ -41,16 +41,28 @@ export default function MiniAppPage() {
         await sdk.actions.ready();
         if (cancelled) return;
 
-        // Check allowlist via QuickAuth
+        // Silent auth: read FID from miniapp context (no SIWF signature prompt).
+        // Falls back to QuickAuth if context FID is missing.
         try {
-          const response = await sdk.quickAuth.fetch('/api/miniapp/auth');
+          const ctx = await sdk.context;
+          const ctxFid = ctx?.user?.fid;
+
+          let response: Response;
+          if (ctxFid) {
+            response = await fetch('/api/miniapp/auth-context', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fid: ctxFid }),
+            });
+          } else {
+            response = await sdk.quickAuth.fetch('/api/miniapp/auth');
+          }
           if (cancelled) return;
 
           if (response.ok) {
             const data = await response.json();
             if (data.hasAccess) {
               setAuthState('allowed');
-              // Redirect to main app
               window.location.href = '/home';
             } else {
               setUsername(data.username || '');

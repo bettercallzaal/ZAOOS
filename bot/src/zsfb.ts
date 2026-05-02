@@ -76,7 +76,7 @@ export async function addZsFb(member: TeamMember, text: string): Promise<string>
   });
 
   return [
-    `Logged (${section}). id ${data.id.slice(0, 8)}.`,
-    `Zaal sees the daily digest. He'll trigger Hermes if it's a clear ship.`,
+    `Got it - logged under ${section}. id ${data.id.slice(0, 8)}.`,
+    `I'll surface it in the daily digest. Want it shipped now? Run /zsedit with the same text.`,
   ].join('\n');
 }

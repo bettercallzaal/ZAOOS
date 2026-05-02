@@ -1,6 +1,6 @@
 import type { Context } from 'grammy';
 import { dispatchHermesRun } from './runner';
-import { getRun, listOpenRuns } from './db';
+import { countRunsByTelegramIdToday, getRun, listOpenRuns } from './db';
 import type { HermesRepoTarget } from './types';
 import type { TeamMember } from '../auth';
 
@@ -150,4 +150,97 @@ function formatRun(r: { id: string; status: string; fixer_attempts: number; crit
   ]
     .filter(Boolean)
     .join('\n');
+}
+
+/**
+ * /zsedit <issue> - team-facing direct website edit on bettercallzaal/zaostock.
+ *
+ * How it differs from /fix:
+ *   - target_repo is HARDCODED to 'zaostock' (cannot be tricked into editing ZAO OS)
+ *   - Open to any active team member (no admin gate)
+ *   - Per-member daily cap (default 2/day, override via ZSEDIT_DAILY_PER_MEMBER)
+ *   - Kill switch: set ZSEDIT_DISABLED=1 to pause all team edits without redeploying
+ *
+ * Why a separate command vs opening /fix to all:
+ *   /fix can target any repo profile and is the admin's catch-all. /zsedit is
+ *   the safe, scoped, rate-limited surface for the team. If costs spike or
+ *   the team needs lockdown, flip ZSEDIT_DISABLED and /fix still works for
+ *   admins.
+ */
+export async function cmdZsEdit(ctx: Context, member: TeamMember | null): Promise<void> {
+  if (!member) {
+    await ctx.reply('You need to be a registered team member to use /zsedit. Run /whoami to confirm or DM Zaal to get added.');
+    return;
+  }
+
+  if (process.env.ZSEDIT_DISABLED === '1') {
+    await ctx.reply('Team /zsedit is paused right now. /zsfb still works for logging feedback. Ping Zaal if it is urgent.');
+    return;
+  }
+
+  const text = (ctx.message?.text ?? '').replace(/^\/zsedit(@\w+)?\s*/, '').trim();
+  if (!text || text.length < 10) {
+    await ctx.reply(
+      [
+        'Usage: /zsedit <change you want on the /test ZAOstock site>',
+        '',
+        'Examples:',
+        '  /zsedit drop the lineup TBA placeholders, keep the section header',
+        '  /zsedit hero copy too long - cut the second sentence',
+        '  /zsedit add a "lineup drops Aug 2026" pill near the top',
+        '',
+        'I clone bettercallzaal/zaostock, write the diff, run a critic, and open a PR if it passes 70/100. Max 3 attempts.',
+      ].join('\n'),
+    );
+    return;
+  }
+
+  const fromId = ctx.from?.id;
+  const chatId = ctx.chat?.id;
+  if (!fromId || !chatId) {
+    await ctx.reply('Cannot identify sender or chat.');
+    return;
+  }
+
+  // Per-member daily cap. Counts ALL runs by this telegram id today (including
+  // failed/escalated) so spend pressure is honored even on retries.
+  const dailyCap = Number(process.env.ZSEDIT_DAILY_PER_MEMBER ?? '2');
+  let usedToday = 0;
+  try {
+    usedToday = await countRunsByTelegramIdToday(fromId);
+  } catch (err) {
+    console.error('[zsedit] daily cap query failed', err);
+    // fail-open: if the count query breaks, still allow the run rather than
+    // hard-blocking the team. Spend is still gated by the fleet daily cap in
+    // runner.ts.
+  }
+  if (usedToday >= dailyCap) {
+    await ctx.reply(
+      `Daily /zsedit cap reached (${usedToday}/${dailyCap}). Resets at UTC midnight. Use /zsfb to log feedback for tomorrow's batch, or ping Zaal if it is urgent.`,
+    );
+    return;
+  }
+
+  // Reuse the same Claude CLI presence check /fix uses.
+  const { existsSync } = await import('node:fs');
+  const claudePath = process.env.HERMES_CLAUDE_BIN ?? '';
+  const claudeOnPath = claudePath && existsSync(claudePath) ? true : await checkOnPath('claude');
+  if (!claudeOnPath) {
+    await ctx.reply("Hermes can't find the 'claude' CLI on the bot host. Ping Zaal.");
+    return;
+  }
+
+  await ctx.reply(
+    [
+      `Hermes editing zaostock for ${member.name}. (${usedToday + 1}/${dailyCap} today.)`,
+      'Coder writes diff, Critic grades, you get a PR link if score >=70. Max 3 attempts.',
+    ].join('\n'),
+  );
+
+  void runAndReport(ctx, {
+    triggered_by_telegram_id: fromId,
+    triggered_in_chat_id: chatId,
+    issue_text: text,
+    target_repo: 'zaostock',
+  });
 }

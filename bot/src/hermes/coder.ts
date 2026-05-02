@@ -5,7 +5,33 @@ import {
   HERMES_ROUTING_ENABLED,
 } from './claude-cli';
 import { listChangedFiles, runCmd } from './git';
-import { HERMES_FORBIDDEN_PATHS, type FixerInput, type FixerOutput } from './types';
+import { HERMES_FORBIDDEN_PATHS, type FixerInput, type FixerOutput, type HermesRepoTarget } from './types';
+
+/**
+ * Per-target system-prompt addendum. Surfaced as a small block inside the user
+ * prompt so the same FIXER_SYSTEM works across repos and we just inject the
+ * right repo-specific context. Add new targets here.
+ */
+function repoContextBlock(target: HermesRepoTarget): string {
+  if (target === 'zaostock') {
+    return [
+      '# Repo Context: zaostock',
+      'You are working on the standalone bettercallzaal/zaostock Next.js festival site.',
+      'Stack: Next.js 16 App Router, React 19, Tailwind v4, Supabase, iron-session.',
+      'Primary route: src/app/test/page.tsx (the staging /test landing the team is iterating on).',
+      'Live homepage: src/app/page.tsx. /donate, /sponsor, /apply, /team are also live.',
+      'Voice rules to keep: lowercase sentence starts, brand caps stay (ZAO, ZAOstock, FarHack, WaveWarZ).',
+      'No emojis, no em dashes - use hyphens. No "no margin / no extraction" or operator-margin language.',
+      'No specific member counts (use "100+"). No crypto/web3/onchain in body copy. Sponsors pay money, partners give time.',
+    ].join('\n');
+  }
+  return [
+    '# Repo Context: ZAO OS',
+    'You are working on the bettercallzaal/ZAOOS monorepo (Farcaster-native social platform + bot).',
+    'Stack: Next.js 16 App Router, React 19, Tailwind, Supabase, Neynar, iron-session, grammy bot.',
+    'Treat bot/ as its own subproject with its own package.json + lockfile.',
+  ].join('\n');
+}
 
 /**
  * Sprint 1 cost-routing (per doc 541): when HERMES_ROUTING=on, attempt 1
@@ -72,9 +98,12 @@ const FIXER_OUTPUT_SCHEMA = {
 } as const;
 
 export async function runFixer(input: FixerInput): Promise<FixerOutput> {
+  const target: HermesRepoTarget = input.targetRepo ?? 'zaoos';
   const userPrompt = [
     `# Issue (attempt ${input.attemptNumber} of 3)`,
     input.issueText,
+    '',
+    repoContextBlock(target),
     '',
     input.previousCriticFeedback
       ? `# Previous Critic Feedback (score < 70 - address this)\n${input.previousCriticFeedback}\n`

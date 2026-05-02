@@ -19,13 +19,20 @@ export interface SessionPayload {
   isAdmin?: boolean;
 }
 
+// SameSite=None is REQUIRED for the session cookie to be sent in third-party
+// iframe contexts — Farcaster client embeds zaoos.com in an iframe, and
+// SameSite=Lax cookies are dropped on cross-site iframe navigations. Without
+// None, /api/miniapp/auth-context sets a cookie that the browser then
+// refuses to send on the /home redirect, and the server sees no session.
+// SameSite=None requires Secure=true, so dev (http://localhost) keeps Lax.
+const isProd = process.env.NODE_ENV === 'production';
 const sessionOptions = {
   password: ENV.SESSION_SECRET,
   cookieName: 'zaoos_session',
   cookieOptions: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProd,
     httpOnly: true,
-    sameSite: 'lax' as const,
+    sameSite: (isProd ? 'none' : 'lax') as 'none' | 'lax',
     maxAge: 7 * 24 * 60 * 60, // 7 days
   },
 };

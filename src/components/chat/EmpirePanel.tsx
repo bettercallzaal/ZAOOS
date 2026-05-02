@@ -9,6 +9,8 @@ import type {
   LeaderboardResponse,
   LeaderboardSlot,
 } from '@/lib/empire-builder/types';
+import { LEADERBOARD_TYPE_LABELS } from '@/lib/empire-builder/types';
+import { ZABAL_OWNER } from '@/lib/empire-builder/config';
 
 type Tab = 'leaderboard' | 'you' | 'boosters';
 
@@ -160,19 +162,27 @@ export function EmpirePanel({ isOpen, onClose }: EmpirePanelProps) {
         {/* Slot selector */}
         {slots.length > 1 && (
           <div className="flex gap-1 px-3 py-2 border-b border-white/[0.08] bg-[#0d1b2a] flex-shrink-0 overflow-x-auto">
-            {slots.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setActiveSlot(s.index)}
-                className={`flex-shrink-0 px-3 py-1 rounded-full text-[10px] font-medium transition-colors whitespace-nowrap ${
-                  s.index === activeSlot
-                    ? 'bg-[#f5a623]/15 text-[#f5a623] border border-[#f5a623]/30'
-                    : 'bg-[#1a2a3a] text-gray-400 hover:text-white'
-                }`}
-              >
-                {s.name ?? s.type ?? `Slot ${s.index + 1}`}
-              </button>
-            ))}
+            {slots.map((s) => {
+              const typeLabel = s.type ? LEADERBOARD_TYPE_LABELS[s.type] ?? s.type : null;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setActiveSlot(s.index)}
+                  className={`flex-shrink-0 px-3 py-1 rounded-full text-[10px] font-medium transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+                    s.index === activeSlot
+                      ? 'bg-[#f5a623]/15 text-[#f5a623] border border-[#f5a623]/30'
+                      : 'bg-[#1a2a3a] text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <span>{s.name ?? s.type ?? `Slot ${s.index + 1}`}</span>
+                  {typeLabel && (
+                    <span className="text-[8px] opacity-60 uppercase tracking-wider">
+                      {typeLabel}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
 
@@ -240,6 +250,7 @@ function LeaderboardTab({
     <div className="space-y-2">
       {entries.slice(0, 50).map((entry) => {
         const isMe = myAddr && entry.address.toLowerCase() === myAddr;
+        const isOwner = entry.address.toLowerCase() === ZABAL_OWNER.toLowerCase();
         return (
           <div
             key={entry.address}
@@ -262,6 +273,11 @@ function LeaderboardTab({
                   ? `@${entry.farcaster_username}`
                   : shortAddress(entry.address)}
                 {isMe && ' (you)'}
+                {isOwner && (
+                  <span className="ml-1.5 text-[8px] uppercase tracking-wider text-[#f5a623]/70 align-middle">
+                    owner
+                  </span>
+                )}
               </p>
               <p className="text-[10px] text-gray-500 truncate">{shortAddress(entry.address)}</p>
             </div>

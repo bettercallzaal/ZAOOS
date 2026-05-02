@@ -53,9 +53,19 @@ export function MiniAppGate({ children }: MiniAppGateProps) {
         // in 'authing' if the API hangs.
         setState('authing');
         try {
-          const authPromise = sdk.quickAuth.fetch('/api/miniapp/auth');
+          // Silent auth via miniapp context FID (no SIWF prompt).
+          // Falls back to QuickAuth if context FID missing.
+          const ctx = await sdk.context;
+          const ctxFid = ctx?.user?.fid;
+          const authPromise: Promise<Response> = ctxFid
+            ? fetch('/api/miniapp/auth-context', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fid: ctxFid }),
+              })
+            : sdk.quickAuth.fetch('/api/miniapp/auth');
           const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('quickauth-timeout')), 5000),
+            setTimeout(() => reject(new Error('miniapp-auth-timeout')), 5000),
           );
           const response = await Promise.race([authPromise, timeoutPromise]);
           if (cancelled) return;

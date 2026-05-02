@@ -30,6 +30,7 @@ const SchedulePanel = dynamic(() => import('./SchedulePanel').then(m => ({ defau
 const FaqPanel = dynamic(() => import('./FaqPanel').then(m => ({ default: m.FaqPanel })), { ssr: false });
 const TutorialPanel = dynamic(() => import('./TutorialPanel').then(m => ({ default: m.TutorialPanel })), { ssr: false });
 const RespectPanel = dynamic(() => import('./RespectPanel').then(m => ({ default: m.RespectPanel })), { ssr: false });
+const EmpirePanel = dynamic(() => import('./EmpirePanel').then(m => ({ default: m.EmpirePanel })), { ssr: false });
 const ProfileDrawer = dynamic(() => import('./ProfileDrawer').then(m => ({ default: m.ProfileDrawer })), { ssr: false });
 
 export function ChatRoom() {
@@ -48,6 +49,7 @@ export function ChatRoom() {
   const [faqOpen, setFaqOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [respectOpen, setRespectOpen] = useState(false);
+  const [empireOpen, setEmpireOpen] = useState(false);
   const [profileFid, setProfileFid] = useState<number | null>(null);
   const [dmDialogType, setDmDialogType] = useState<'dm' | 'group' | null>(null);
   const [groupInfoId, setGroupInfoId] = useState<string | null>(null);
@@ -191,6 +193,7 @@ export function ChatRoom() {
         onOpenFaq={() => { setFaqOpen(true); setSidebarOpen(false); }}
         onOpenTutorial={() => { setTutorialOpen(true); setSidebarOpen(false); }}
         onOpenRespect={() => { setRespectOpen(true); setSidebarOpen(false); }}
+        onOpenEmpire={() => { setEmpireOpen(true); setSidebarOpen(false); }}
         xmtpConnected={xmtp.isConnected}
         xmtpConnecting={xmtp.isConnecting}
         xmtpError={xmtp.error}
@@ -552,6 +555,7 @@ export function ChatRoom() {
       {/* FAQ Panel */}
       <FaqPanel isOpen={faqOpen} onClose={() => setFaqOpen(false)} />
       <RespectPanel isOpen={respectOpen} onClose={() => setRespectOpen(false)} />
+      <EmpirePanel isOpen={empireOpen} onClose={() => setEmpireOpen(false)} />
 
       {/* Tutorial Panel */}
       <TutorialPanel isOpen={tutorialOpen} onClose={() => setTutorialOpen(false)} />

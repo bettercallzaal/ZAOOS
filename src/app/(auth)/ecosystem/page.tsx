@@ -1,9 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { NotificationBell } from '@/components/navigation/NotificationBell';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import { NEXUS_LINKS, type NexusCategory, type NexusLink } from '@/lib/nexus/links';
+
+const EmpireZabalHero = dynamic(
+  () => import('@/components/ecosystem/EmpireZabalHero').then((m) => ({ default: m.EmpireZabalHero })),
+  { ssr: false },
+);
 
 // ── Mini App Discovery Types ───────────────────────────────────────────────────
 
@@ -351,6 +357,8 @@ export default function EcosystemPage() {
         /* ── Partner Apps View ──────────────────────────────────────────────── */
         <div className="flex-1 overflow-y-auto">
           <div className="px-4 pt-4 pb-28 space-y-4">
+            <EmpireZabalHero />
+
             {/* Partner app cards */}
             <div className="space-y-3">
               {externalApps.map((app) => (

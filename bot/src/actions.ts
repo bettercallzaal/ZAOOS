@@ -5,6 +5,13 @@ import { z } from 'zod';
 import { db } from './supabase';
 import { ask, type PersonaName } from './llm';
 import type { TeamMember } from './auth';
+import {
+  buildAllOpenTodos,
+  buildMyContributions,
+  buildMyTodos,
+  buildStatus,
+  buildTeamRoster,
+} from './status';
 
 const ActionSchema = z.discriminatedUnion('kind', [
   z.object({
@@ -69,6 +76,13 @@ const ActionSchema = z.discriminatedUnion('kind', [
     title: z.string().min(1).max(300),
     body: z.string().min(1).max(8000),
   }),
+  // Read-side queries - "ask the bot what's going on" without typing slash commands.
+  // Each maps to an existing builder in status.ts; no DB writes happen.
+  z.object({ kind: z.literal('query_my_todos') }),
+  z.object({ kind: z.literal('query_all_open_todos') }),
+  z.object({ kind: z.literal('query_status') }),
+  z.object({ kind: z.literal('query_my_contributions') }),
+  z.object({ kind: z.literal('query_team_roster') }),
   z.object({
     kind: z.literal('unknown'),
     reason: z.string(),
@@ -93,10 +107,17 @@ Allowed actions:
 - { "kind": "log_contact", "entity_type": "sponsor|artist", "name_query": "substring match", "summary": "brief what was said", "channel": "email|call|sms|dm_farcaster|dm_x|dm_tg|in_person|other?", "direction": "outbound|inbound?" }
 - { "kind": "add_idea", "title": "...", "body": "...?", "category": "music|ops|merch|marketing|...?" }
 - { "kind": "add_note", "title": "...", "body": "..." }
+- { "kind": "query_my_todos" }                  // "what's on my plate", "what am I owning", "my todos"
+- { "kind": "query_all_open_todos" }            // "what's open", "what does the team have to do", "what's left", "all todos", "open work"
+- { "kind": "query_status" }                    // "where are we", "festival status", "snapshot", "blockers"
+- { "kind": "query_my_contributions" }          // "what have I done lately", "my last week", "my contributions"
+- { "kind": "query_team_roster" }               // "who's on the team", "team roster", "list members"
 - { "kind": "unknown", "reason": "what's missing or ambiguous" }
 
 Rules:
-- If user is asking a question (not doing), return { "kind": "unknown", "reason": "this is a question, not an action" }.
+- If the user is QUERYING state (asking what's there, what's open, what's on their plate, what's the status), pick the matching query_* kind. These are read-only and free.
+- If the user is delegating a write (add/update/log), pick the matching write action. Never invent fields.
+- If the user is having a free-form conversation that isn't a query or a write (small talk, opinions, vague ideas), return { "kind": "unknown", "reason": "free-form chat" } - the bot will reply conversationally.
 - Dates relative to today: "Friday" -> next Friday ISO; "tomorrow" -> ${today} + 1 day; "Sep 3" -> closest Sep 3.
 - Never invent data. If owner not specified, omit owner_name.
 - Return ONLY the JSON object, nothing else.`;
@@ -194,6 +215,25 @@ export async function executeFromText(
     // right slash command if they're describing a website edit (cost-gated)
     // or a feedback log (free).
     return await hermesChatReply(requester, userText, persona);
+  }
+
+  // Read-side queries are free + side-effect-free; route them before the
+  // write-action try/catch so a transient DB error in one query doesn't
+  // get conflated with a write failure.
+  if (action.kind === 'query_my_todos') {
+    return { ok: true, reply: await buildMyTodos(requester) };
+  }
+  if (action.kind === 'query_all_open_todos') {
+    return { ok: true, reply: await buildAllOpenTodos() };
+  }
+  if (action.kind === 'query_status') {
+    return { ok: true, reply: await buildStatus() };
+  }
+  if (action.kind === 'query_my_contributions') {
+    return { ok: true, reply: await buildMyContributions(requester) };
+  }
+  if (action.kind === 'query_team_roster') {
+    return { ok: true, reply: await buildTeamRoster() };
   }
 
   try {

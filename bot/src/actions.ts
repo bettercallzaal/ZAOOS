@@ -189,7 +189,11 @@ export async function executeFromText(
   const { action, persona: usedPersona } = await parseAction(userText, persona);
 
   if (action.kind === 'unknown') {
-    return { ok: false, reply: `I can't act on that yet. Reason: ${action.reason}\n\nTry /ask for a Q&A reply, or give me something concrete like "add a todo to call Bangor by Friday".` };
+    // No discrete action - this is conversation. Hermes replies in voice
+    // instead of bailing out. The LLM also gets to nudge the user toward the
+    // right slash command if they're describing a website edit (cost-gated)
+    // or a feedback log (free).
+    return await hermesChatReply(requester, userText, persona);
   }
 
   try {
@@ -424,5 +428,50 @@ export async function executeFromText(
     }
   } catch (err) {
     return { ok: false, reply: `Action failed: ${err instanceof Error ? err.message : 'unknown error'}` };
+  }
+}
+
+/**
+ * Free-form Hermes chat. Used when the user types something that isn't a
+ * discrete action - so the bot stays conversational rather than refusing.
+ *
+ * The system prompt explicitly tells Hermes:
+ *   - identify as Hermes (the ZAOstock team bot that ships code edits)
+ *   - if the message is /test feedback that should be logged: suggest /zsfb
+ *   - if it's an edit the user wants shipped: suggest /zsedit
+ *   - otherwise just chat (under 200 words)
+ *
+ * Cost: one LLM call per chat reply, same as /ask. No DB writes here - the
+ * /zsfb and /zsedit commands handle persistence when the user opts in.
+ */
+async function hermesChatReply(
+  requester: TeamMember,
+  userText: string,
+  persona: PersonaName,
+): Promise<ExecuteResult> {
+  const system = [
+    "You are Hermes, the ZAOstock team's Telegram bot.",
+    'You handle two jobs: team ops + shipping code edits to the ZAOstock /test landing page.',
+    `You are talking to ${requester.name} (role: ${requester.role}, scope: ${requester.scope}).`,
+    'Reply in under 200 words. No emojis. No em dashes - use hyphens. Lowercase sentence starts are fine.',
+    '',
+    'Routing rules:',
+    '- If the user is describing a change they want made to the /test ZAOstock site, end your reply with: "Want me to ship it? Reply with /zsedit <your edit>." Do NOT call any tool yourself; users opt in via /zsedit.',
+    '- If the user is describing /test feedback they want logged but not shipped, suggest: "Reply /zsfb <text> to log it for the daily digest."',
+    '- If they want a discrete action (add todo, log a sponsor, mark a milestone), tell them to phrase it as a direct command (e.g., "add a todo to call Bangor by Friday") and you will parse it.',
+    '- For festival state questions (status, blockers, your todos), point them at /status, /mytodos, /digest.',
+    '- Otherwise just chat conversationally. Be useful, be brief.',
+    '',
+    'Voice: brand caps stay (ZAO, ZAOstock, FarHack, WaveWarZ). No "no margin / no extraction" copy. No specific member counts (use 100+).',
+  ].join('\n');
+
+  try {
+    const reply = await ask(userText, system, persona);
+    return { ok: true, reply: reply.text.trim() };
+  } catch (err) {
+    return {
+      ok: false,
+      reply: `LLM unreachable: ${err instanceof Error ? err.message : 'unknown'}. Try /ask, /zsfb, or /zsedit directly.`,
+    };
   }
 }

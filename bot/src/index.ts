@@ -18,7 +18,7 @@ import { scheduleAll } from './schedule';
 import { alertDevops, buildHealthReport } from './ops';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
 import { cmdOp } from './onepagers';
-import { cmdFix, cmdFixStatus } from './hermes/commands';
+import { cmdFix, cmdFixStatus, cmdZsEdit } from './hermes/commands';
 import {
   cmdCircles,
   cmdJoin,
@@ -88,16 +88,14 @@ bot.command('start', async (ctx) => {
   if (member) {
     await ctx.reply(
       [
-        `Hey ${member.name}. Dashboard is your hub: https://zaoos.com/stock/team`,
+        `Hey ${member.name}. Hermes here - I read, I write, I ship.`,
         '',
-        'Bot is backup. Useful for:',
-        '  /mytodos - what you are owning',
-        '  /do <text> - tell me what happened, I update the board',
-        '  /circles - the 8 circles, /join <slug> to grab one',
-        '  /op - 1-pagers (sponsor / partner / venue briefings)',
-        '  /digest morning - daily brief',
-        '  /ask - ask me anything',
-        '  /help - full list',
+        'I do two jobs:',
+        '  1) save you typing on team ops (/mytodos /do /idea /circles /op /digest)',
+        '  2) edit the ZAOstock site for you (/zsfb to log, /zsedit to actually ship a PR)',
+        '',
+        'Dashboard for full context: https://zaoos.com/stock/team',
+        'Type /help for the full surface.',
       ].join('\n'),
     );
     return;
@@ -105,7 +103,8 @@ bot.command('start', async (ctx) => {
   const u = ctx.from?.username ? `@${ctx.from.username}` : 'your account';
   await ctx.reply(
     [
-      `Hey - I'm the ZAOstock Team Bot. ZAO Festivals presents ZAOstock, Oct 3 in Ellsworth.`,
+      `Hey - Hermes here. I run the ZAOstock team ops + ship code edits to the site.`,
+      `ZAO Festivals presents ZAOstock, Oct 3 in Ellsworth.`,
       '',
       `Don't recognize ${u} on the roster yet. Ping Zaal to link you.`,
       '',
@@ -119,9 +118,15 @@ bot.command('help', async (ctx) => {
   const isGroup = ctx.chat?.type !== 'private';
   await ctx.reply(
     [
-      'ZAOstock Team Bot - I save you typing. Dashboard has the context.',
+      'Hermes - team ops + code edits. Dashboard has the full state.',
       '',
-      'Read:',
+      'Edit the ZAOstock site:',
+      '  /zsfb <text> - log feedback on /test, no PR (auto-tagged by section)',
+      '  /zsedit <text> - ship the edit. I clone, write, critique, open a PR. Capped per day.',
+      '  /fix [zaostock|zaoos] <issue> - admin: same loop, broader scope',
+      '  /fix_status [run_id] - check open code runs',
+      '',
+      'Read team state:',
       '  /status - festival snapshot, top blockers',
       '  /mytodos - what you are owning',
       '  /mytodos_all - everything open across the team (claimable)',
@@ -131,7 +136,6 @@ bot.command('help', async (ctx) => {
       'Tell me what happened:',
       '  /do <text> - I parse + update the board',
       '  /idea <text> - drop into the pool, Zaal sees daily',
-      '  /zsfb <text> - feedback on the /test ZAOstock site (auto-tagged by section)',
       '  /note <text> - meeting note, goes to dashboard',
       '  /gemba <text> - quick standup log',
       '',
@@ -155,10 +159,6 @@ bot.command('help', async (ctx) => {
       '',
       'External (anyone, no link needed):',
       '  /press - press kit + contact info',
-      '',
-      'Hermes (admin only, runs via Claude Code CLI on Max plan):',
-      '  /fix <issue> - Coder writes diff, Critic grades, you get a PR if score >=70',
-      '  /fix_status [run_id] - check open Hermes runs',
       '',
       'Ops:',
       '  /chatinfo - chat + topic ids',
@@ -197,6 +197,14 @@ bot.command('fix', async (ctx) => {
 
 bot.command('fix_status', async (ctx) => {
   await cmdFixStatus(ctx);
+});
+
+// /zsedit - team-facing direct edit of bettercallzaal/zaostock /test site.
+// Open to all team members, target locked to zaostock, per-member daily cap,
+// kill switch via ZSEDIT_DISABLED env. See bot/src/hermes/commands.ts.
+bot.command('zsedit', async (ctx) => {
+  const member = await resolveMember(ctx.from?.id, ctx.from?.username);
+  await cmdZsEdit(ctx, member);
 });
 
 bot.command('press', async (ctx) => {
@@ -254,7 +262,7 @@ bot.command('ask', async (ctx) => {
   try {
     const reply = await ask(
       text,
-      `You are the ZAOstock Team Bot advisor. Answer briefly (under 300 words). If the user is asking about festival state, tell them to use /status or /mytodos.`,
+      `You are Hermes, the ZAOstock team bot. You handle team ops + ship code edits to the ZAOstock site. Answer briefly (under 300 words). If the user is asking about festival state, tell them to use /status or /mytodos. If they want to change the site, tell them /zsfb (log) or /zsedit (ship).`,
     );
     await ctx.reply(reply.text);
   } catch (err) {

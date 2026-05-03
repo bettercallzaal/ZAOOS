@@ -41,3 +41,21 @@ export async function listOpenRuns(limit = 20): Promise<HermesRun[]> {
   if (error) throw new Error(`listOpenRuns failed: ${error.message}`);
   return (data as HermesRun[]) ?? [];
 }
+
+/**
+ * How many Hermes runs has this telegram_id triggered since UTC midnight?
+ * Used by /zsedit to enforce per-member daily caps. Counts every run regardless
+ * of final status (so a failed/escalated run still counts toward the cap -
+ * spend was incurred either way).
+ */
+export async function countRunsByTelegramIdToday(telegramId: number): Promise<number> {
+  const todayUtcStart = new Date();
+  todayUtcStart.setUTCHours(0, 0, 0, 0);
+  const { count, error } = await db()
+    .from('hermes_runs')
+    .select('id', { count: 'exact', head: true })
+    .eq('triggered_by_telegram_id', telegramId)
+    .gte('created_at', todayUtcStart.toISOString());
+  if (error) throw new Error(`countRunsByTelegramIdToday failed: ${error.message}`);
+  return count ?? 0;
+}

@@ -19,6 +19,7 @@ import { alertDevops, buildHealthReport } from './ops';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
 import { cmdOp } from './onepagers';
 import { cmdFix, cmdFixStatus, cmdZsEdit } from './hermes/commands';
+import { cmdRegenSelf, cmdRegenForName } from './regen';
 import {
   cmdCircles,
   cmdJoin,
@@ -142,6 +143,7 @@ bot.command('help', async (ctx) => {
       'Ask me anything:',
       '  /ask <question> - LLM reply, no DB write',
       '  /whoami - confirm who I think you are',
+      '  /regen - DM me to get a fresh dashboard login code (1/day; admin /regen <Name> to regen for someone else)',
       '',
       'Circles:',
       '  /circles - all 8 + who coordinates',
@@ -251,6 +253,19 @@ bot.command('zsfb', async (ctx) => {
   const member = await requireMember(ctx);
   if (!member) return;
   await ctx.reply(await addZsFb(member, ctx.match ?? ''));
+});
+
+// /regen - mint a new dashboard login code.
+// No arg + DM -> regen own code (any team member, daily-capped).
+// With <Name> arg -> admin-only regen for someone else (DMs target if linked).
+bot.command('regen', async (ctx) => {
+  const member = await resolveMember(ctx.from?.id, ctx.from?.username);
+  const arg = (ctx.match ?? '').toString().trim();
+  if (arg) {
+    await cmdRegenForName(ctx, member);
+  } else {
+    await cmdRegenSelf(ctx, member);
+  }
 });
 
 bot.command('ask', async (ctx) => {

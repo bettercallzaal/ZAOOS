@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIP Live Activity — Explorable Explainer</title>
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-2: #0f2240;
+    --navy-3: #14304a;
+    --gold: #f5a623;
+    --gold-dim: #b67910;
+    --green: #4ade80;
+    --red: #ef4444;
+    --gray: #94a3b8;
+    --gray-dim: #475569;
+    --white: #f1f5f9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.55;
+    padding: 24px 16px 80px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    background: linear-gradient(120deg, var(--gold), #fbcc6f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  h2 {
+    font-size: clamp(20px, 3.5vw, 26px);
+    color: var(--gold);
+    margin: 48px 0 12px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  h3 { color: var(--white); font-size: 18px; margin: 20px 0 8px; font-weight: 600; }
+  p, li { color: var(--gray); margin-bottom: 10px; font-size: 15px; }
+  strong { color: var(--white); font-weight: 600; }
+  code {
+    background: var(--navy-3);
+    color: var(--gold);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+  }
+  ul { margin-left: 20px; }
+  .lede { color: var(--gray); font-size: 17px; margin-bottom: 24px; }
+  .panel {
+    background: var(--navy-2);
+    border: 1px solid var(--navy-3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0 24px;
+  }
+  .panel.gold-border { border-color: var(--gold-dim); }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .col { flex: 1; min-width: 240px; }
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0 4px 4px 0;
+  }
+  .pill.green { background: rgba(74,222,128,0.15); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+  .pill.red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .pill.gold { background: rgba(245,166,35,0.15); color: var(--gold); border: 1px solid var(--gold-dim); }
+  .pill.gray { background: rgba(148,163,184,0.1); color: var(--gray); border: 1px solid var(--gray-dim); }
+  button {
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+    transition: transform 0.1s, background 0.15s;
+  }
+  button:hover { background: #fbcc6f; transform: translateY(-1px); }
+  button:active { transform: translateY(0); }
+  button.ghost { background: transparent; color: var(--gold); border: 1px solid var(--gold-dim); }
+  button.ghost:hover { background: rgba(245,166,35,0.1); }
+  button.danger { background: var(--red); color: var(--white); }
+
+  /* Visualizations */
+  .heartbeat-viz {
+    background: var(--navy);
+    border: 1px solid var(--navy-3);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+  }
+  .slot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--navy-3);
+    border-radius: 6px;
+    margin: 6px 0;
+    transition: all 0.3s;
+  }
+  .slot.fresh { border-left: 3px solid var(--green); }
+  .slot.stale { border-left: 3px solid var(--gray-dim); opacity: 0.5; }
+  .slot.empty { border-left: 3px solid var(--navy-3); opacity: 0.3; }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gray-dim);
+    flex-shrink: 0;
+  }
+  .dot.live { background: var(--green); animation: pulse 1s infinite; box-shadow: 0 0 8px var(--green); }
+  .dot.fading { background: var(--gold); }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .label { flex: 1; }
+  .timestamp { color: var(--gray); font-size: 12px; min-width: 60px; text-align: right; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .clock {
+    text-align: center;
+    font-family: ui-monospace, monospace;
+    font-size: 28px;
+    color: var(--gold);
+    margin: 12px 0;
+    font-weight: 700;
+  }
+  .clock-label { font-size: 12px; color: var(--gray); display: block; margin-bottom: 4px; }
+  .ascii {
+    background: var(--navy);
+    border: 1px solid var(--navy-3);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+    color: var(--gray);
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.5;
+  }
+  .ascii .highlight { color: var(--gold); }
+  .ascii .green { color: var(--green); }
+  .ascii .red { color: var(--red); }
+  .nav {
+    position: sticky;
+    top: 0;
+    background: rgba(10,22,40,0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 12px 0;
+    margin-bottom: 24px;
+    z-index: 10;
+    border-bottom: 1px solid var(--navy-3);
+  }
+  .nav ul { display: flex; gap: 6px; flex-wrap: wrap; list-style: none; margin: 0; }
+  .nav a {
+    color: var(--gray);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+  .nav a:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+  .stage {
+    background: var(--navy);
+    border: 1px solid var(--navy-3);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+    min-height: 120px;
+    position: relative;
+  }
+  .actor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--navy-2);
+    border-radius: 6px;
+    margin: 4px 0;
+    font-size: 13px;
+    transition: all 0.4s;
+  }
+  .actor.zao { border-left: 3px solid var(--gold); }
+  .actor.juke { border-left: 3px solid #6366f1; }
+  .actor.stalker { border-left: 3px solid var(--red); }
+  .actor.muted { opacity: 0.4; }
+  .arrow {
+    text-align: center;
+    color: var(--gray-dim);
+    margin: 4px 0;
+    font-family: monospace;
+  }
+  details {
+    background: var(--navy-2);
+    border: 1px solid var(--navy-3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 8px 0;
+  }
+  summary { cursor: pointer; font-weight: 600; color: var(--gold); }
+  details[open] summary { margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--navy-3); font-size: 13px; }
+  th { color: var(--gold); font-weight: 600; }
+  td { color: var(--gray); }
+  td strong { color: var(--white); }
+  .small { font-size: 12px; color: var(--gray-dim); }
+  .footer { margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--navy-3); color: var(--gray-dim); font-size: 13px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="nav">
+  <ul>
+    <li><a href="#what">What</a></li>
+    <li><a href="#heartbeat">Heartbeat</a></li>
+    <li><a href="#freshness">Freshness</a></li>
+    <li><a href="#stalker">Stalker</a></li>
+    <li><a href="#coop">Cooperation</a></li>
+    <li><a href="#jfs">JFS</a></li>
+    <li><a href="#ot">OT</a></li>
+    <li><a href="#stack">Stack</a></li>
+  </ul>
+</nav>
+
+<h1>FIP Live Activity</h1>
+<p class="lede">A weekend explorable explainer for what @rish dropped on 2026-05-03 and how ZAO plugs in. Click around. Nothing breaks.</p>
+
+<section id="what">
+<h2>1. What problem does this solve?</h2>
+<div class="panel">
+<p>Right now, if you're in an audio space on Farcaster (say, Juke), <strong>only people inside Juke can see you're live</strong>. Warpcast doesn't know. Coinbase Wallet doesn't know. ZAO doesn't know. Each app has to build its own presence integration.</p>
+<p>FIP #268 fixes this by adding <strong>one slot per user</strong> on the Farcaster protocol that says <em>"I'm currently at this URL right now."</em> Every Farcaster client reads it. One protocol primitive, every client renders it.</p>
+<p class="small">Think of it like a Slack status. But cross-app. And on a decentralized protocol.</p>
+</div>
+</section>
+
+<section id="heartbeat">
+<h2>2. The heartbeat — keeping the slot fresh</h2>
+<div class="panel">
+<p>The slot is just a URL string. Empty string means "not live." But a server-stored URL is forever — how does the network know you've LEFT the space and aren't there anymore?</p>
+<p><strong>Answer: heartbeat.</strong> Your app re-writes the same URL <em>every 1 second</em>. Each rewrite advances the message timestamp. If the timestamp is older than 5 seconds, readers treat the slot as "stale" — even if the URL is still there.</p>
+<p>It's like leaving a "Be Right Back" sticky note. The note doesn't go away — but if you don't touch it every second, everyone assumes you actually left.</p>
+
+<div class="heartbeat-viz">
+  <span class="clock-label">SIMULATED CLOCK (seconds)</span>
+  <div class="clock" id="hb-clock">0</div>
+  <div id="hb-slot"></div>
+  <div class="controls">
+    <button onclick="hb.start()">Start heartbeat</button>
+    <button class="ghost" onclick="hb.stop()">Stop heartbeat (leave space)</button>
+    <button class="ghost" onclick="hb.reset()">Reset</button>
+  </div>
+  <p class="small" style="margin-top: 12px;">Watch what happens 5 seconds after you stop the heartbeat. The URL stays — but readers ignore it.</p>
+</div>
+</div>
+</section>
+
+<section id="freshness">
+<h2>3. Why "5 seconds"? The freshness window</h2>
+<div class="panel">
+<p>Two competing pressures:</p>
+<ul>
+  <li><strong>Faster freshness</strong> = better UX. If you leave a space, your friends see your green dot disappear in 1 sec instead of 30 sec.</li>
+  <li><strong>Slower freshness</strong> = less network load. 1-second heartbeats × millions of users = Snapchain melts.</li>
+</ul>
+<p>FIP #268 picked <strong>1-second writer + 5-second reader</strong>. That gives you 4 seconds of redundancy: a writer who misses 4 heartbeats in a row still appears live. Five misses = stale.</p>
+<details>
+<summary>The math: why this is borderline</summary>
+<p>If 5,000 users go live concurrently (Discord Stage hits this at peak), that's 5,000 writes/sec just for LIVE_AT. Snapchain's current sustained throughput target is ~1,000 writes/sec. 5x over.</p>
+<p>This is in our FIP feedback comment. ZAO is the only voice raising it.</p>
+</details>
+</div>
+</section>
+
+<section id="stalker">
+<h2>4. The stalker problem</h2>
+<div class="panel">
+<p>Here's the dark side. The slot is <strong>public by design</strong> — anyone can subscribe and see where you are right now. That's the whole point: cross-client discoverability.</p>
+<p>But it also means an adversary can subscribe to your slot and follow you in real time. Worse: if a small space publishes its <code>fc:live:speakerFids</code> meta tag, an adversary cross-references "Alice is at URL X" with "URL X has speakers [Alice, Bob, Carol]" and now knows Alice is hanging out with Bob and Carol.</p>
+
+<div class="heartbeat-viz">
+  <span class="clock-label">YOU vs. THE STALKER</span>
+  <div class="stage" id="stalker-stage"></div>
+  <div class="controls">
+    <button onclick="stalker.next()">Step forward</button>
+    <button class="ghost" onclick="stalker.reset()">Reset</button>
+  </div>
+</div>
+
+<details>
+<summary>Three things ZAO can do at the app layer</summary>
+<ul>
+  <li><strong>Opaque room IDs.</strong> Use <code>/spaces/abc-uuid</code> not <code>/spaces/zounz-private-therapy-group</code>. URL leaks no category info.</li>
+  <li><strong>Gate <code>speakerFids</code> for private rooms.</strong> Only serve speaker list to authenticated participants, not in public meta tags.</li>
+  <li><strong>Defer recording URL.</strong> Don't publish <code>fc:live:recordingUrl</code> during the live window — even pointing at an access-checked page leaks "this was recorded."</li>
+</ul>
+<p>Plus: Quilibrium's Oblivious Transfer can mitigate the read side (see section 7).</p>
+</details>
+</div>
+</section>
+
+<section id="coop">
+<h2>5. The cooperative writer dance</h2>
+<div class="panel">
+<p>Multiple apps can write to your LIVE_AT slot. Juke. ZAO. Maybe a future "presence-only" app like Recaster. They'd clobber each other every second if they all wrote unconditionally.</p>
+<p>FIP #268 specifies a politeness convention:</p>
+<ol style="color: var(--gray); margin-left: 20px;">
+  <li>Read the current slot before writing</li>
+  <li>If empty or stale (>5s old): write your URL</li>
+  <li>If fresh and you wrote it: keep heartbeating</li>
+  <li>If fresh and someone ELSE wrote it:
+    <ul>
+      <li><strong>Activity URL</strong> (one with <code>fc:live=1</code> meta tag) MAY overwrite a presence-only URL</li>
+      <li><strong>Presence-only URL</strong> SHOULD yield to a fresh non-self URL</li>
+    </ul>
+  </li>
+</ol>
+
+<div class="heartbeat-viz">
+  <div class="stage" id="coop-stage"></div>
+  <div class="controls">
+    <button onclick="coop.juke()">Juke writes activity URL</button>
+    <button class="ghost" onclick="coop.zao()">ZAO writes presence URL</button>
+    <button class="ghost" onclick="coop.reset()">Reset</button>
+  </div>
+</div>
+
+<p class="small" style="margin-top: 12px;">Try: ZAO writes presence first → Juke writes activity (overwrites). Or: Juke first → ZAO yields. The protocol enforces nothing. It's pure social pressure + the freshness rule.</p>
+</div>
+</section>
+
+<section id="jfs">
+<h2>6. JFS — proving you're really the host</h2>
+<div class="panel">
+<p>Anyone can put <code>&lt;meta property="fc:live:hostFid" content="123"&gt;</code> on their webpage. So how does a Farcaster client trust that the URL is really hosted by FID 123?</p>
+<p>Answer: <strong>JSON Farcaster Signature (JFS)</strong>. A small signed envelope at a manifest endpoint linked from the URL. The host signs <em>"I claim this URL"</em> with their app key. Any client can verify it.</p>
+
+<div class="ascii">
+<span class="highlight">┌─────────────────────────────────────────────────────────┐</span>
+<span class="highlight">│  JFS ENVELOPE (3 base64url-encoded fields)              │</span>
+<span class="highlight">└─────────────────────────────────────────────────────────┘</span>
+
+   <span class="green">header</span>     = base64url(<span class="green">{ fid, type:"app_key", key }</span>)
+   <span class="green">payload</span>    = base64url(<span class="green">{ url:"https://zaoos.com/spaces/abc" }</span>)
+   <span class="green">signature</span>  = ed25519.sign(<span class="green">"${header}.${payload}"</span>, privKey)
+
+<span class="highlight">┌─────────────────────────────────────────────────────────┐</span>
+<span class="highlight">│  VERIFICATION (5 steps)                                 │</span>
+<span class="highlight">└─────────────────────────────────────────────────────────┘</span>
+
+   1. base64url-decode header + parse JSON
+   2. base64url-decode payload + parse JSON
+   3. base64url-decode signature → 64 bytes
+   4. ed25519.verify(sig, "${header}.${payload}", header.key)
+   5. Snapchain query: is header.key in active key set for header.fid?
+
+   ✓ All pass → trusted live activity by FID
+   ✗ Any fail → render as plain link, no host claim
+</div>
+
+<p class="small">FIP #269 reuses the same envelope shape that Mini Apps already use for <code>accountAssociation</code>. Devs already know it. Code is open at <code>farcasterxyz/miniapps/packages/miniapp-node/src/jfs.ts</code> — ZAO lifts ~100 lines.</p>
+
+<details>
+<summary>Spec inconsistency we caught</summary>
+<p>FIP #269 spec text says verify <code>header.type === "auth"</code>. The actual reference implementation in <code>jfs.ts:91</code> uses literal <code>'app_key'</code>. One of the two has to change. Flagged in our FIP feedback comment.</p>
+</details>
+</div>
+</section>
+
+<section id="ot">
+<h2>7. Quilibrium Oblivious Transfer — the privacy magic trick</h2>
+<div class="panel">
+<p>Cassie Heart's Quilibrium has a primitive called <strong>Oblivious Transfer</strong> that lets you read data from a server <em>without the server learning what you read</em>.</p>
+<p>Imagine you walk into a library. You want book #3. Normally you ask the librarian "give me book #3" and they hand it to you — they know you read book #3.</p>
+<p>With OT: you whisper a randomized request, they hand you 10 books, and you can only open book #3. They never learn which one you opened.</p>
+
+<div class="ascii">
+<span class="red">WITHOUT OT (current FIP #268)</span>
+
+   Stalker → Snapchain: <span class="red">"give me LIVE_AT for FID 188"</span>
+   Snapchain → Stalker: <span class="red">"https://zaoos.com/spaces/abc"</span>
+   Stalker now knows: <span class="red">FID 188 is in space abc, in real time</span>
+
+<span class="green">WITH OT (Quilibrium-bridged read)</span>
+
+   Stalker → OT layer:  <span class="green">obfuscated query (random seed)</span>
+   OT layer → Stalker:  <span class="green">encrypted blob</span>
+   Stalker decrypts:    <span class="green">"https://zaoos.com/spaces/abc"</span>
+   Network never learned: <span class="green">"who queried for whom"</span>
+</div>
+
+<p>This is production today. Quilibrium shipped Ferret-based OT in Q1 2025, 200x faster than basic OT.</p>
+<p>Cost: ~50-200ms extra latency per query. Acceptable for "render presence in feed." Maybe too slow for instant green-dot UI.</p>
+<p class="small">ZAO's strategic angle: install Hypersnap, then add an OT bridge for ZAO-gated room reads. Nobody else in the FIP convo can credibly do this. Cassie engages via code, so the play is: Hypersnap PR review + Tantivy docs + cast about the bridge → tag her.</p>
+</div>
+</section>
+
+<section id="stack">
+<h2>8. The full stack — top to bottom</h2>
+<div class="panel">
+<p>How a single ZAO Space announcement becomes a green dot in someone else's Farcaster feed.</p>
+<div class="ascii">
+<span class="highlight">USER ACTION</span>: @zaal joins ZAO Space at /spaces/hms/abc
+
+  ↓
+
+<span class="highlight">ZAO BACKEND</span>:
+  • Server signs USER_DATA_ADD message with ZAO's app key
+  • value = "https://zaoos.com/spaces/abc"
+  • POSTs via Neynar managed signer to Snapchain
+  • Repeats every 1 sec (with 0-1000ms jitter)
+
+  ↓
+
+<span class="highlight">SNAPCHAIN</span>:
+  • Validates message timestamp + signature
+  • Stores in user's UserData slot, type=10 (LIVE_AT)
+  • Last-write-wins: only newest write retained
+
+  ↓
+
+<span class="highlight">ANY CLIENT (Warpcast, Recaster, Coinbase Wallet, ZAO)</span>:
+  • Reads UserDataType.LIVE_AT for FIDs in feed
+  • Sees timestamp &lt; 5 sec old → renders presence dot
+  • Optionally fetches the URL → reads meta tags
+  • Optionally fetches manifest endpoint → verifies JFS
+  • Shows: "@zaal is live in ZAO Space" + cover image
+
+  ↓
+
+<span class="highlight">CHAT</span>:
+  • The cast that announced the space (already broadcast by ZAO today)
+  • is the chat anchor (per fc:cast meta tag)
+  • Replies = chat. No separate chat backend.
+
+  ↓
+
+<span class="highlight">USER LEAVES</span>: ZAO writes value="" to clear slot.
+</div>
+
+<h3>What ZAO ships in 6 PRs</h3>
+<table>
+<thead><tr><th>PR</th><th>What</th><th>Snapchain dep?</th></tr></thead>
+<tbody>
+<tr><td><span class="pill green">PR #1</span></td><td>Meta tags on space layouts (with privacy mitigations)</td><td>No — ship now</td></tr>
+<tr><td><span class="pill green">PR #2</span></td><td>JFS manifest endpoint (~100 lines lifted from miniapps repo)</td><td>No — ship now</td></tr>
+<tr><td><span class="pill green">PR #5</span></td><td><code>fc:cast</code> linkage to existing live-notification cast</td><td>No — ship now</td></tr>
+<tr><td><span class="pill gold">PR #3</span></td><td>LIVE_AT writer + heartbeat + jitter</td><td>YES — wait for enum bump</td></tr>
+<tr><td><span class="pill gold">PR #4</span></td><td>Reader: render others' LIVE_AT in ZAO feed</td><td>YES</td></tr>
+<tr><td><span class="pill gold">PR #6</span></td><td>Hypersnap + OT bridge for gated rooms</td><td>YES</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section id="coalition">
+<h2>9. The 5-app coalition</h2>
+<div class="panel">
+<p>If FIP #268 ships and only Juke implements it, "cross-client" is theater. Coalition matters.</p>
+<table>
+<thead><tr><th>App</th><th>Founder</th><th>Stack</th><th>OSS?</th><th>Coalition tier</th></tr></thead>
+<tbody>
+<tr><td><strong>Juke</strong></td><td>@nickysap</td><td>LiveKit</td><td>No (may OSS)</td><td><span class="pill gold">T1</span></td></tr>
+<tr><td><strong>Streamly</strong></td><td>@oyingrace</td><td>Zego (video)</td><td>YES</td><td><span class="pill gold">T1</span></td></tr>
+<tr><td><strong>Livecaster</strong></td><td>@sayangel</td><td>Reply tree (chat-only)</td><td>?</td><td><span class="pill gold">T1</span></td></tr>
+<tr><td><strong>FarHouse</strong></td><td>opaque</td><td>Native iOS+Android</td><td>No</td><td><span class="pill gray">T2</span></td></tr>
+<tr><td><strong>Fireside</strong></td><td>opaque</td><td>Base App mini-app</td><td>No</td><td><span class="pill gray">T2</span></td></tr>
+<tr><td><strong>ZAO</strong></td><td>@zaal</td><td>HMS + Livepeer</td><td>YES</td><td><span class="pill gold">T1</span></td></tr>
+</tbody>
+</table>
+<p class="small" style="margin-top: 12px;">ZAO + Juke + Streamly + Livecaster aligning on the cooperative writer convention before FIP #268 finalizes = the FIP ships with real-world testing.</p>
+</div>
+</section>
+
+<section>
+<h2>10. What's actually next this weekend</h2>
+<div class="panel gold-border">
+<ul>
+  <li><span class="pill green">Now</span> Buy Hetzner AX42 ($50/mo)</li>
+  <li><span class="pill green">Tonight</span> Run Hypersnap bootstrap + sync overnight</li>
+  <li><span class="pill green">Sun morning</span> Set <code>FARCASTER_READ_API_BASE</code> env var, redeploy ZAO</li>
+  <li><span class="pill green">Sun</span> Pull stephancill PR #17, draft + post review comment</li>
+  <li><span class="pill gold">Sun before 09:00 UTC Mon</span> Post FIP #268 + #269 feedback comments (drafts in Doc 595)</li>
+  <li><span class="pill gold">Mon</span> Cast: "Hypersnap node up, PR #17 review posted, Quilibrium privacy bridge sketch — @cassie any read? @rish thoughts?"</li>
+</ul>
+</div>
+</section>
+
+<div class="footer">
+<p>ZAO Research Doc 598 · 2026-05-03 · Open this file in your browser to play with the heartbeat + freshness + cooperative writer demos.</p>
+</div>
+
+</div>
+
+<script>
+// HEARTBEAT DEMO
+const hb = (() => {
+  let clock = 0;
+  let lastWrite = -Infinity;
+  let writeUrl = '';
+  let interval = null;
+  let tickInterval = null;
+  const FRESH_WINDOW = 5;
+
+  const slotEl = () => document.getElementById('hb-slot');
+  const clockEl = () => document.getElementById('hb-clock');
+
+  function render() {
+    clockEl().textContent = clock + 's';
+    const age = clock - lastWrite;
+    const fresh = age < FRESH_WINDOW && writeUrl;
+    let dotClass = 'dot';
+    if (fresh) dotClass += ' live';
+    else if (writeUrl && age < FRESH_WINDOW + 5) dotClass += ' fading';
+    let slotClass = 'slot ';
+    if (!writeUrl) slotClass += 'empty';
+    else if (fresh) slotClass += 'fresh';
+    else slotClass += 'stale';
+
+    slotEl().innerHTML = `
+      <div class="${slotClass}">
+        <div class="${dotClass}"></div>
+        <div class="label">@zaal — LIVE_AT slot</div>
+        <div class="timestamp">${writeUrl || '(empty)'}</div>
+      </div>
+      <div class="small" style="margin-top:8px;color:${fresh ? 'var(--green)' : 'var(--gray-dim)'}">
+        ${!writeUrl ? 'No URL written yet' : fresh ? `FRESH — last write ${age}s ago, within 5s window` : `STALE — last write ${age}s ago, > 5s window`}
+      </div>`;
+  }
+
+  return {
+    start() {
+      this.stop();
+      writeUrl = 'https://zaoos.com/spaces/hms/abc';
+      lastWrite = clock;
+      render();
+      interval = setInterval(() => {
+        lastWrite = clock;
+        render();
+      }, 1000);
+      tickInterval = setInterval(() => { clock++; render(); }, 1000);
+    },
+    stop() {
+      if (interval) clearInterval(interval);
+      interval = null;
+      if (!tickInterval) tickInterval = setInterval(() => { clock++; render(); }, 1000);
+      render();
+    },
+    reset() {
+      this.stop();
+      if (tickInterval) clearInterval(tickInterval);
+      tickInterval = null;
+      clock = 0; lastWrite = -Infinity; writeUrl = '';
+      render();
+    },
+  };
+})();
+hb.reset();
+
+// STALKER DEMO
+const stalker = (() => {
+  let step = 0;
+  const stage = () => document.getElementById('stalker-stage');
+  const steps = [
+    `<div class="actor zao"><span>@zaal joins ZAO Space at /spaces/zounz-private-jam</span></div>
+     <p class="small" style="margin-top:8px">No one else knows yet.</p>`,
+    `<div class="actor zao"><span>ZAO writes LIVE_AT = https://zaoos.com/spaces/zounz-private-jam</span></div>
+     <div class="arrow">↓ broadcast to Snapchain</div>
+     <div class="actor"><span>Slot is now public on the protocol</span></div>`,
+    `<div class="actor zao"><span>@zaal is live in private jam</span></div>
+     <div class="actor stalker"><span>Stalker subscribes to LIVE_AT updates for FID @zaal</span></div>
+     <div class="arrow">↓ Snapchain returns the URL</div>
+     <div class="actor stalker"><span>Stalker now knows: zaal is at /spaces/zounz-private-jam RIGHT NOW</span></div>`,
+    `<div class="actor zao"><span>@zaal in space</span></div>
+     <div class="actor stalker"><span>Stalker fetches the URL → reads meta tags</span></div>
+     <div class="actor stalker"><span>fc:live:speakerFids = [188, 212, 467]</span></div>
+     <p class="small" style="margin-top:8px;color:var(--red)">Stalker now knows: zaal + Cassie + DCoop are co-located in a private jam.</p>`,
+    `<p style="color:var(--white);margin-bottom:12px"><strong>Mitigations ZAO applies:</strong></p>
+     <div class="actor zao"><span>1. Opaque room ID: /spaces/abc-uuid (no "zounz-private-jam")</span></div>
+     <div class="actor zao"><span>2. speakerFids gated to authenticated participants</span></div>
+     <div class="actor zao"><span>3. Quilibrium OT for ZAO-gated reads (next section)</span></div>`,
+  ];
+  return {
+    next() { step = Math.min(step + 1, steps.length - 1); stage().innerHTML = steps[step]; },
+    reset() { step = 0; stage().innerHTML = steps[0]; },
+  };
+})();
+stalker.reset();
+
+// COOPERATIVE WRITER DEMO
+const coop = (() => {
+  let slot = { writer: null, url: null, fresh: false, type: null };
+  const stage = () => document.getElementById('coop-stage');
+  function render() {
+    let html = '';
+    if (!slot.writer) {
+      html = `<div class="actor"><span class="dot"></span><span>LIVE_AT slot is empty</span></div>`;
+    } else {
+      const cls = slot.writer === 'juke' ? 'juke' : 'zao';
+      html = `<div class="actor ${cls}"><span class="dot live"></span><span><strong>${slot.writer.toUpperCase()}</strong> wrote: ${slot.url} (type: ${slot.type})</span></div>`;
+    }
+    stage().innerHTML = html;
+  }
+  return {
+    juke() {
+      // Activity write — preempts presence
+      if (slot.writer === 'zao' && slot.type === 'presence') {
+        // ZAO presence yields to Juke activity
+        slot = { writer: 'juke', url: 'https://juke.audio/space/xyz', fresh: true, type: 'activity' };
+        render();
+        setTimeout(() => alert('Juke wrote an ACTIVITY URL (fc:live=1). ZAO\'s presence-only write is preempted. Per FIP convention, this is correct — activity beats presence.'), 100);
+      } else {
+        slot = { writer: 'juke', url: 'https://juke.audio/space/xyz', fresh: true, type: 'activity' };
+        render();
+      }
+    },
+    zao() {
+      // Presence write — yields to fresh activity
+      if (slot.writer === 'juke' && slot.fresh) {
+        render();
+        setTimeout(() => alert('Juke\'s slot is fresh and is an activity URL. ZAO\'s presence-only write SHOULD yield. Slot stays as Juke\'s.'), 100);
+      } else {
+        slot = { writer: 'zao', url: 'https://zaoos.com/active', fresh: true, type: 'presence' };
+        render();
+      }
+    },
+    reset() { slot = { writer: null, url: null, fresh: false, type: null }; render(); },
+  };
+})();
+coop.reset();
+</script>
+</body>
+</html>

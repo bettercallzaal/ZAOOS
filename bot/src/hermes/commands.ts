@@ -1,7 +1,29 @@
 import type { Context } from 'grammy';
 import { dispatchHermesRun } from './runner';
 import { getRun, listOpenRuns } from './db';
+import type { HermesRepoTarget } from './types';
 import type { TeamMember } from '../auth';
+
+/**
+ * Parse `/fix [<target>] <issue text>` where <target> is an optional repo
+ * profile name. Returns the resolved target + the trimmed issue text.
+ *
+ * Examples:
+ *   /fix tighten the hero copy           -> { target: 'zaoos', text: 'tighten the hero copy' }
+ *   /fix zaostock drop the lineup TBA    -> { target: 'zaostock', text: 'drop the lineup TBA' }
+ *   /fix zaoos rename auth helper        -> { target: 'zaoos', text: 'rename auth helper' }
+ */
+function parseFixCommand(rawText: string): { target: HermesRepoTarget; text: string } {
+  const stripped = rawText.replace(/^\/fix(@\w+)?\s*/, '').trim();
+  const firstWord = stripped.split(/\s+/)[0]?.toLowerCase() ?? '';
+  if (firstWord === 'zaostock') {
+    return { target: 'zaostock', text: stripped.slice(firstWord.length).trim() };
+  }
+  if (firstWord === 'zaoos') {
+    return { target: 'zaoos', text: stripped.slice(firstWord.length).trim() };
+  }
+  return { target: 'zaoos', text: stripped };
+}
 
 const ZAAL_TG_ID = Number(process.env.ZAAL_TELEGRAM_ID ?? '0') || null;
 
@@ -42,9 +64,9 @@ export async function cmdFix(ctx: Context, member: TeamMember | null): Promise<v
     return;
   }
 
-  const text = (ctx.message?.text ?? '').replace(/^\/fix(@\w+)?\s*/, '').trim();
+  const { target, text } = parseFixCommand(ctx.message?.text ?? '');
   if (!text || text.length < 10) {
-    await ctx.reply('Usage: /fix <issue> - describe the bug or feature in 1-3 sentences.');
+    await ctx.reply('Usage: /fix [zaostock|zaoos] <issue> - describe the bug or feature in 1-3 sentences. Default target is zaoos.');
     return;
   }
 
@@ -55,15 +77,15 @@ export async function cmdFix(ctx: Context, member: TeamMember | null): Promise<v
     return;
   }
 
-  await ctx.reply('Hermes starting. Coder writes diff, Critic grades, you get a PR link if score >=70. Max 3 attempts.');
+  await ctx.reply(`Hermes starting against ${target}. Coder writes diff, Critic grades, you get a PR link if score >=70. Max 3 attempts.`);
 
   // Fire-and-forget: long-running, will report back via Telegram.
-  void runAndReport(ctx, { triggered_by_telegram_id: fromId, triggered_in_chat_id: chatId, issue_text: text });
+  void runAndReport(ctx, { triggered_by_telegram_id: fromId, triggered_in_chat_id: chatId, issue_text: text, target_repo: target });
 }
 
 async function runAndReport(
   ctx: Context,
-  input: { triggered_by_telegram_id: number; triggered_in_chat_id: number; issue_text: string },
+  input: { triggered_by_telegram_id: number; triggered_in_chat_id: number; issue_text: string; target_repo?: HermesRepoTarget },
 ): Promise<void> {
   try {
     const result = await dispatchHermesRun(input);

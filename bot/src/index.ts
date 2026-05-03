@@ -10,6 +10,7 @@ import {
 } from './auth';
 import { buildStatus, buildMyTodos, buildMyContributions, buildAllOpenTodos, buildTeamRoster } from './status';
 import { addGemba, addIdea, addNote } from './capture';
+import { addZsFb } from './zsfb';
 import { executeFromText } from './actions';
 import { ask } from './llm';
 import { ensureChatRegistered, getChatRow, setChatMode, setPostDigests } from './group';
@@ -130,6 +131,7 @@ bot.command('help', async (ctx) => {
       'Tell me what happened:',
       '  /do <text> - I parse + update the board',
       '  /idea <text> - drop into the pool, Zaal sees daily',
+      '  /zsfb <text> - feedback on the /test ZAOstock site (auto-tagged by section)',
       '  /note <text> - meeting note, goes to dashboard',
       '  /gemba <text> - quick standup log',
       '',
@@ -232,6 +234,15 @@ bot.command('note', async (ctx) => {
   const member = await requireMember(ctx);
   if (!member) return;
   await ctx.reply(await addNote(member, ctx.match));
+});
+
+// /zsfb <comment> - low-friction ZAOstock /test feedback (open to all team).
+// Saves to stock_suggestions with [zsfb:<section>] prefix for downstream
+// Hermes triage. Distinct from /idea so the /test backlog stays scoped.
+bot.command('zsfb', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  await ctx.reply(await addZsFb(member, ctx.match ?? ''));
 });
 
 bot.command('ask', async (ctx) => {

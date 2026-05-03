@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import type { HermesRepoTarget } from './types';
 
 export interface GitRunResult {
   stdout: string;
@@ -59,18 +60,57 @@ export async function cleanupWorkdir(workdir: string): Promise<void> {
 }
 
 /**
- * Clone the ZAO OS repo into workdir as a fresh checkout from origin/main.
- * Uses HERMES_REPO_URL env (or falls back to bettercallzaal/ZAOOS over https).
+ * Repo profile = the configuration we need to clone, install, and pre-flight a
+ * given repo target. Adding a new target means adding a profile entry below
+ * (and a matching system-prompt context block in coder.ts).
+ *
+ * `installSubdirs`: extra directories that need their own `npm ci/install`
+ * after the root install. ZAO OS has bot/ with its own lockfile; zaostock has
+ * none today (single root package).
+ */
+export interface RepoProfile {
+  target: HermesRepoTarget;
+  url: string;
+  defaultBranch: string;
+  installSubdirs: string[];
+}
+
+const HERMES_REPO_PROFILES: Record<HermesRepoTarget, RepoProfile> = {
+  zaoos: {
+    target: 'zaoos',
+    url: process.env.HERMES_REPO_URL ?? 'https://github.com/bettercallzaal/ZAOOS.git',
+    defaultBranch: 'main',
+    installSubdirs: ['bot'],
+  },
+  zaostock: {
+    target: 'zaostock',
+    url: process.env.HERMES_ZAOSTOCK_REPO_URL ?? 'https://github.com/bettercallzaal/zaostock.git',
+    defaultBranch: 'main',
+    installSubdirs: [],
+  },
+};
+
+export function getRepoProfile(target: HermesRepoTarget): RepoProfile {
+  return HERMES_REPO_PROFILES[target];
+}
+
+/**
+ * Clone the target repo into workdir as a fresh checkout from origin/main.
+ * Default target is 'zaoos' (ZAO OS monorepo). Pass 'zaostock' to target the
+ * standalone festival site - same pre-flight + safety guarantees.
+ *
  * Authentication: relies on system git credentials (gh auth or SSH key).
+ * The same gh auth must have push access to whichever repo is targeted.
  */
 export async function cloneAndBranch(
   workdir: string,
   branchName: string,
+  target: HermesRepoTarget = 'zaoos',
 ): Promise<void> {
-  const repoUrl = process.env.HERMES_REPO_URL ?? 'https://github.com/bettercallzaal/ZAOOS.git';
-  const clone = await runCmd('git', ['clone', '--depth', '50', '--branch', 'main', repoUrl, workdir]);
+  const profile = getRepoProfile(target);
+  const clone = await runCmd('git', ['clone', '--depth', '50', '--branch', profile.defaultBranch, profile.url, workdir]);
   if (clone.exitCode !== 0) {
-    throw new Error(`git clone failed: ${clone.stderr.slice(0, 400)}`);
+    throw new Error(`git clone failed (${target}): ${clone.stderr.slice(0, 400)}`);
   }
   const checkout = await runCmd('git', ['checkout', '-b', branchName], workdir);
   if (checkout.exitCode !== 0) {
@@ -97,28 +137,21 @@ export async function cloneAndBranch(
     );
   }
 
-  // ALSO install bot/ deps. ZAO is not a real workspace (no pnpm-workspace
-  // entry for bot, has own package-lock.json) so root install doesn't pull
-  // grammy/supabase-js into bot/node_modules. Without this the bot-side
-  // typecheck fails with "Cannot find module 'grammy'".
-  const botLockExists = await fs
-    .access(`${workdir}/bot/package-lock.json`)
-    .then(() => true)
-    .catch(() => false);
-  const botPkgExists = await fs
-    .access(`${workdir}/bot/package.json`)
-    .then(() => true)
-    .catch(() => false);
-  if (botPkgExists) {
-    const botInstallCmd = botLockExists ? 'ci' : 'install';
-    const botInstall = await runCmd(
+  // Install deps in any extra subdirs the profile declares (e.g. ZAO OS bot/).
+  for (const subdir of profile.installSubdirs) {
+    const subPath = `${workdir}/${subdir}`;
+    const subLockExists = await fs.access(`${subPath}/package-lock.json`).then(() => true).catch(() => false);
+    const subPkgExists = await fs.access(`${subPath}/package.json`).then(() => true).catch(() => false);
+    if (!subPkgExists) continue;
+    const subCmd = subLockExists ? 'ci' : 'install';
+    const subInstall = await runCmd(
       'npm',
-      [botInstallCmd, '--ignore-scripts', '--no-audit', '--no-fund', '--prefer-offline'],
-      `${workdir}/bot`,
+      [subCmd, '--ignore-scripts', '--no-audit', '--no-fund', '--prefer-offline'],
+      subPath,
     );
-    if (botInstall.exitCode !== 0) {
+    if (subInstall.exitCode !== 0) {
       console.error(
-        `[hermes/git] bot npm ${botInstallCmd} returned exit ${botInstall.exitCode}. Pre-flight may fail. stderr: ${botInstall.stderr.slice(0, 300)}`,
+        `[hermes/git] ${subdir} npm ${subCmd} returned exit ${subInstall.exitCode}. Pre-flight may fail. stderr: ${subInstall.stderr.slice(0, 300)}`,
       );
     }
   }

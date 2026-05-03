@@ -8,6 +8,7 @@ import { createRun, updateRun } from './db';
 import {
   HERMES_DEFAULT_MAX_ATTEMPTS,
   HERMES_PASS_THRESHOLD,
+  type HermesRepoTarget,
   type HermesRun,
 } from './types';
 
@@ -53,6 +54,8 @@ export interface DispatchInput {
   triggered_by_telegram_id: number;
   triggered_in_chat_id: number;
   issue_text: string;
+  /** Which repo to clone + open the PR against. Default 'zaoos'. */
+  target_repo?: HermesRepoTarget;
 }
 
 /**
@@ -109,8 +112,10 @@ export async function dispatchHermesRun(
   let totalOut = 0;
   let lastFeedback: string | undefined;
 
+  const targetRepo: HermesRepoTarget = input.target_repo ?? 'zaoos';
+
   try {
-    await cloneAndBranch(workdir, branchName);
+    await cloneAndBranch(workdir, branchName, targetRepo);
 
     let attempt = 0;
     while (attempt < HERMES_DEFAULT_MAX_ATTEMPTS) {
@@ -126,6 +131,7 @@ export async function dispatchHermesRun(
           branchName,
           attemptNumber: attempt,
           previousCriticFeedback: lastFeedback,
+          targetRepo,
         });
       } catch (err) {
         // Coder's individual call failed (non-JSON output, CLI crash, etc).

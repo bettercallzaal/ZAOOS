@@ -32,12 +32,27 @@ export interface HermesRun {
   completed_at: string | null;
 }
 
+/**
+ * Which repo Hermes is targeting. 'zaoos' is the default (the original ZAO OS
+ * monorepo where Hermes was built). 'zaostock' targets the standalone
+ * bettercallzaal/zaostock Next.js festival site so the team can drive /test
+ * iterations through the Telegram bot.
+ *
+ * Adding more targets: extend HERMES_REPO_PROFILES in git.ts and update the
+ * per-target system-prompt context in coder.ts.
+ */
+export type HermesRepoTarget = 'zaoos' | 'zaostock';
+
+export const HERMES_DEFAULT_TARGET: HermesRepoTarget = 'zaoos';
+
 export interface FixerInput {
   issueText: string;
   workTreePath: string;
   branchName: string;
   attemptNumber: number;
   previousCriticFeedback?: string;
+  /** Which repo profile to apply (system-prompt context, forbidden paths, etc). */
+  targetRepo?: HermesRepoTarget;
 }
 
 export interface FixerOutput {

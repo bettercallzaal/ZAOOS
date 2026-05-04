@@ -7,7 +7,7 @@ related-docs: 461, 529, 547, 600, 601
 tier: STANDARD
 ---
 
-# 602 — TradingAgents Multi-Agent Pattern → Adapt for ZAO Social + Project Management (NOT Trading)
+# 603 — TradingAgents Multi-Agent Pattern → Adapt for ZAO Social + Project Management (NOT Trading)
 
 > **Goal:** Document the TradingAgents (Tauric Research) multi-agent debate architecture. Identify which patterns transfer to ZOE's concierge brain (per doc 601 Option D) for two specific use cases: **social media posting decisions** and **project management decisions**. Explicitly NOT for trading — Zaal's call. Save for later use, don't implement now.
 

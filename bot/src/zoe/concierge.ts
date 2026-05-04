@@ -134,7 +134,9 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     ],
     permissionMode: 'auto',
     outputFormat: 'json',
-    bare: true,
+    // bare: true REMOVED 2026-05-04 - --bare strictly skips OAuth+keychain,
+    // breaking Max-plan auth on the VPS. Zaal uses Max plan via `claude /login`,
+    // not ANTHROPIC_API_KEY. With --bare gone, claude reads OAuth normally.
   });
 
   // Parse JSON block (if present) at end of reply

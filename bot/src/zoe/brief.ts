@@ -106,7 +106,7 @@ Output the brief now in the exact format from your system prompt.`;
     cwd: opts.repoDir,
     appendSystemPrompt: BRIEF_SYSTEM_PROMPT,
     permissionMode: 'auto',
-    bare: true,
+    // bare REMOVED - blocks Max-plan OAuth, see concierge.ts
   });
 
   return guardEmpty(result.text);

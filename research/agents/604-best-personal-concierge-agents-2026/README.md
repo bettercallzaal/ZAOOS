@@ -216,15 +216,22 @@ For v1: defer auto-RECALL entirely. ZOE asks Zaal in DM "should I check Bonfire 
 3. Token billing model post-30-day-trial?
 4. Cross-bonfire search — relevant for ZOE if/when ZAO grows multiple bonfires?
 
-## Open Questions for Zaal (need answers before Phase 1 implementation)
+## Zaal's Answers (locked 2026-05-04)
 
-1. **Voice — confirm:** Year-of-the-ZABAL Paragraph style (clear, simple, spartan, active voice, no marketing). Same as draft #2 in this doc?
-2. **Proactive nudge times:** 5am morning brief + 9pm evening reflection. OK or different?
-3. **Quiet hours:** 9pm-9am EST. OK or different?
-4. **Inline keyboard for nudges:** [Skip] [Later] [Shelve]. OK or different options?
-5. **Should ZOE post in groups (not just DM)?** Doc 599 said bridge group is passive ingest only. Same for ZOE?
-6. **Self-improving memory loop (Letta-style):** worth Phase 2? Or skip permanently?
-7. **TradingAgents debate (doc 603):** apply to social-post + ship/wait decisions in Phase 2? Or skip?
+1. **Voice:** Year-of-the-ZABAL — CONFIRMED. Clear, simple, spartan, active voice. No marketing. No emojis. No em dashes.
+2. **Proactive nudge times:** 5am morning brief + 9pm evening reflection — CONFIRMED.
+3. **Quiet hours:** NONE. Zaal prefers being pinged over ignored. **IMPORTANT: no 9pm-9am quiet window.** Ping whenever appropriate.
+4. **Inline keyboard:** `[Now] [Later] [Shelve]` — 3 options. Now = handle it, Later = remind later same day, Shelve = file for indefinite. CONFIRMED.
+5. **Group posting:** DM ONLY for now. No group posting. Doc 599 bridge group stays passive ingest.
+6. **Self-improving memory (Letta-style):** YES, Phase 2 — ZOE updates its own `human` block when Zaal corrects facts.
+7. **TradingAgents debate (doc 603):** SKIP. Keep researching efficiency patterns instead — make ZOE faster + leaner.
+
+### Implications of "no quiet hours"
+
+- Default cron-based proactive nudges (5am brief, 9pm reflection) anchored to Zaal's schedule.
+- BUT: ZOE can also nudge ad-hoc (e.g., "PR #456 review came in", "calendar conflict tomorrow at 10am") at any hour.
+- Mitigation: rely on Telegram's built-in mute (Zaal can mute the chat himself if he wants) instead of agent-side hour-gating.
+- Dismiss-tracking still applies — if a category gets [Skip]'d 3+ times, auto-reduce.
 
 ## Migration Path
 

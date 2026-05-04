@@ -20,6 +20,7 @@ import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { buildMemoryBlocks, ensureZoeHome, pushRecent, ZOE_PATHS } from './memory';
 import { startScheduler } from './scheduler';
+import { disableTips, enableTips, tipsEnabled } from './tips';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
@@ -107,6 +108,22 @@ bot.on('message:text', async (ctx) => {
 
   // Skip messages NOT from Zaal's DM (groups handled separately if needed)
   if (ctx.chat.type !== 'private') return;
+
+  // Hourly tip toggle: "stop tips" / "start tips" disables/enables the cron.
+  const tipToggle = /^(stop|pause|disable)\s+tips?$/i.exec(text.trim()) ? 'off'
+    : /^(start|resume|enable)\s+tips?$/i.exec(text.trim()) ? 'on'
+    : null;
+  if (tipToggle === 'off') {
+    await disableTips();
+    await ctx.reply('Hourly tips paused. Send "start tips" to resume.');
+    return;
+  }
+  if (tipToggle === 'on') {
+    await enableTips();
+    const status = await tipsEnabled();
+    await ctx.reply(status ? 'Hourly tips on.' : 'Tips toggle failed - check logs.');
+    return;
+  }
 
   // Note: capture path - prefix `note:` / `cc:` / `claude:` lands in claude-code-notes.md
   // No concierge turn fires. Picked up next Claude Code session via "what feedback did I leave for you?"

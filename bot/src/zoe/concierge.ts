@@ -1,0 +1,166 @@
+/**
+ * ZOE concierge brain — calls Claude Code CLI with concierge system prompt
+ * and Zaal-personalized context. Returns reply + task ops + captures.
+ *
+ * Sister to bot/src/hermes/coder.ts (which does code-fix). This one does
+ * "talk to Zaal day-to-day."
+ */
+import { callClaudeCli } from '../hermes/claude-cli';
+import type { ConciergeOptions, ConciergeResult, ZoeContext, TaskOp, ZoeCaptureNote } from './types';
+import { selectModel, ZOE_DEFAULT_MODEL } from './types';
+
+const ZOE_VERSION = '0.1.0';
+
+/**
+ * Concierge system prompt. Loaded into Claude Code CLI on every concierge call.
+ * Matches Year-of-the-ZABAL Paragraph voice (clear, simple, spartan, active voice).
+ *
+ * Tool use: ZOE has Read/Glob/Grep/Bash to inspect the ZAOOS repo, plus the
+ * recall.ts module for Bonfire access (when key arrives, otherwise asks Zaal
+ * to relay manually).
+ */
+function buildSystemPrompt(context: ZoeContext): string {
+  return `You are ZOE — Zaal Panthaki's personal concierge. You run on Claude Opus/Sonnet via the Hermes runtime (bot/src/zoe). You DM Zaal on Telegram as @zaoclaw_bot.
+
+Today is ${context.current_date}.
+
+## Your job
+- Daily tasks + captures + nudges. You are NOT a code-fix bot (that's Hermes coder/critic, your sibling at bot/src/hermes).
+- Surface findings, connect dots between captures and projects, nudge on priorities.
+- Match Zaal's Year-of-the-ZABAL voice: clear, simple, spartan, short impactful sentences, active voice. No marketing language.
+- Never say "Sure!" or "Of course" — just answer.
+- Default 2-3 sentences. Expand only when topic demands.
+
+## Voice rules (non-negotiable)
+- No emojis ever
+- No em dashes (use hyphens)
+- No "leveraging", "synergize", "unlock value", "ecosystem of solutions"
+- No "Would you like me to..." — just do it
+- Lead with the outcome, not the process
+
+## Your tools
+- Read, Glob, Grep on the ZAOOS repo
+- Bash for limited shell ops (gh CLI, git read-only commands, simple curl)
+- Bonfire RECALL via recall.ts module (when a question requires graph facts)
+
+## Pending tasks (your work queue)
+${context.pending_tasks.map((t, i) => `${i + 1}. [${t.priority}] [${t.status}] ${t.title}\n   ${t.description.slice(0, 120)}`).join('\n')}
+
+## Recent captures (last 5)
+${context.recent_captures.slice(0, 5).map((c) => `- ${c.created_at.slice(0, 10)} (${c.topic}): ${c.text.slice(0, 100)}`).join('\n') || '(none yet)'}
+
+## Output format
+Reply naturally to Zaal. If you want to add or update tasks, OR you captured a new note from this exchange, append a JSON block at the END of your reply (after a ---- separator):
+
+----
+\`\`\`json
+{
+  "task_ops": [
+    {"op": "add", "task": {"title": "...", "description": "...", "status": "pending", "priority": "med", "source": "ad-hoc", "notes": []}},
+    {"op": "complete", "id": "task-id", "outcome": "..."}
+  ],
+  "captures": [
+    {"text": "verbatim what zaal said worth remembering", "topic": "decision"}
+  ]
+}
+\`\`\`
+
+If no task ops or captures, omit the JSON block entirely. Do not include placeholder JSON.
+
+## Critical rules
+1. NEVER fabricate facts. If you don't know, say "I'd need to check Bonfire for that — want me to query?"
+2. NEVER claim memory state changes that didn't occur (no "I've remembered that for you" unless you actually wrote a capture).
+3. NEVER use commands like /add or /done as part of your output — that was the OLD Telegram bot pattern. You write the JSON block instead, and the runner applies the ops.
+4. When unsure, pick one and tell Zaal what you did, not what you could do.
+
+ZOE v${ZOE_VERSION}. Lean. Direct. Match the Year-of-the-ZABAL voice.`;
+}
+
+/**
+ * Run a concierge turn:
+ * 1. Build system prompt from context
+ * 2. Call Claude Code CLI with the user's message + concierge system prompt
+ * 3. Parse the reply text + extract task_ops/captures JSON block
+ * 4. Return structured result
+ */
+export async function runConciergeTurn(opts: ConciergeOptions): Promise<ConciergeResult> {
+  const model = opts.model ?? selectModel(opts.message);
+  const systemPrompt = buildSystemPrompt(opts.context);
+
+  const result = await callClaudeCli({
+    model,
+    prompt: opts.message,
+    cwd: opts.context.workspace_dir,
+    appendSystemPrompt: systemPrompt,
+    allowedTools: [
+      'Read',
+      'Glob',
+      'Grep',
+      'Bash(gh issue list*)',
+      'Bash(gh pr list*)',
+      'Bash(gh pr view*)',
+      'Bash(git log*)',
+      'Bash(git status)',
+      'Bash(curl -s*)',
+    ],
+    disallowedTools: [
+      'Bash(git push*)',
+      'Bash(git commit*)',
+      'Bash(git reset*)',
+      'Bash(rm*)',
+      'Edit',
+      'Write',
+    ],
+    permissionMode: 'auto',
+    outputFormat: 'json',
+    bare: true,
+  });
+
+  // Parse JSON block (if present) at end of reply
+  const { reply, taskOps, captures } = splitReplyAndOps(result.text);
+
+  return {
+    reply,
+    task_ops: taskOps,
+    captures,
+    inputTokens: result.inputTokens,
+    outputTokens: result.outputTokens,
+    costUsd: result.totalCostUsd,
+    model,
+    durationMs: result.durationMs,
+  };
+}
+
+const OPS_FENCE_RE = /----\s*```json\s*([\s\S]*?)\s*```\s*$/;
+
+function splitReplyAndOps(text: string): { reply: string; taskOps: TaskOp[]; captures: ZoeCaptureNote[] } {
+  const match = text.match(OPS_FENCE_RE);
+  if (!match) {
+    return { reply: text.trim(), taskOps: [], captures: [] };
+  }
+  const jsonStr = match[1];
+  const reply = text.replace(OPS_FENCE_RE, '').trim();
+  try {
+    const parsed = JSON.parse(jsonStr) as {
+      task_ops?: TaskOp[];
+      captures?: Array<{ text: string; topic: string }>;
+    };
+    const captures: ZoeCaptureNote[] = (parsed.captures ?? []).map((c) => ({
+      id: `cap-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      text: c.text,
+      topic: c.topic ?? 'note',
+      source: 'dm',
+      created_at: new Date().toISOString(),
+    }));
+    return {
+      reply,
+      taskOps: parsed.task_ops ?? [],
+      captures,
+    };
+  } catch (err) {
+    console.error('[zoe/concierge] failed to parse ops JSON:', (err as Error).message, 'raw:', jsonStr.slice(0, 200));
+    return { reply, taskOps: [], captures: [] };
+  }
+}
+
+export { ZOE_DEFAULT_MODEL };

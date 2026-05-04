@@ -86,6 +86,11 @@ bot.command('seed', async (ctx) => {
   await ctx.reply(result.seeded > 0 ? `Seeded ${result.seeded} tasks from doc 601.` : 'Task queue already has entries - skipped seed.');
 });
 
+bot.command(['agents', 'help'], async (ctx) => {
+  if (!(await isAllowed(ctx))) return;
+  await ctx.reply(`Agents available:\n\n${listAgents()}\n\nFree-form text routes to general concierge. Slash commands: /start /tasks /seed /notes /agents.`);
+});
+
 bot.command('notes', async (ctx) => {
   if (!(await isAllowed(ctx))) return;
   try {
@@ -126,12 +131,10 @@ bot.on('message:text', async (ctx) => {
     return;
   }
 
-  // Agent route: @recall / @research / @newsletter / @zaostock / @help etc.
+  // Agent route: @recall / @research / @newsletter / @zaostock etc.
   // Fast path - skip the LLM if a prefix matches a registered agent.
-  if (text.trim() === '/agents' || text.trim() === '@help') {
-    await ctx.reply(`Agents available:\n\n${listAgents()}\n\nFree-form text routes to general concierge.`);
-    return;
-  }
+  // /agents and /help are handled as bot.command above (Telegram strips them
+  // before this text handler ever sees them).
   const agentResult = await tryRouteAgent(text, {
     bot,
     zaalTgId: zaalId,

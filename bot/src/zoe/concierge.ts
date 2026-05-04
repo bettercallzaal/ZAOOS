@@ -102,6 +102,19 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
       'Bash(git log*)',
       'Bash(git status)',
       'Bash(curl -s*)',
+      // Doc 605 Phase 1 unlock: Playwright MCP for browse-DOM-grounded tasks
+      // (read-only by allowed-list shape; browser_click/type/select still gated by user gesture in MCP)
+      'mcp__playwright__browser_snapshot',
+      'mcp__playwright__browser_navigate',
+      'mcp__playwright__browser_take_screenshot',
+      'mcp__playwright__browser_evaluate',
+      'mcp__playwright__browser_console_messages',
+      'mcp__playwright__browser_network_requests',
+      'mcp__playwright__browser_click',
+      'mcp__playwright__browser_type',
+      'mcp__playwright__browser_press_key',
+      'mcp__playwright__browser_wait_for',
+      'mcp__playwright__browser_close',
     ],
     disallowedTools: [
       'Bash(git push*)',

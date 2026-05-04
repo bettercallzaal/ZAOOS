@@ -21,6 +21,7 @@ import { applyTaskOps, seedInitialTasks } from './tasks';
 import { buildMemoryBlocks, ensureZoeHome, pushRecent, ZOE_PATHS } from './memory';
 import { startScheduler } from './scheduler';
 import { disableTips, enableTips, tipsEnabled } from './tips';
+import { tryRouteAgent, listAgents } from './agents';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
@@ -122,6 +123,25 @@ bot.on('message:text', async (ctx) => {
     await enableTips();
     const status = await tipsEnabled();
     await ctx.reply(status ? 'Hourly tips on.' : 'Tips toggle failed - check logs.');
+    return;
+  }
+
+  // Agent route: @recall / @research / @newsletter / @zaostock / @help etc.
+  // Fast path - skip the LLM if a prefix matches a registered agent.
+  if (text.trim() === '/agents' || text.trim() === '@help') {
+    await ctx.reply(`Agents available:\n\n${listAgents()}\n\nFree-form text routes to general concierge.`);
+    return;
+  }
+  const agentResult = await tryRouteAgent(text, {
+    bot,
+    zaalTgId: zaalId,
+    repoDir,
+    rawText: text,
+  });
+  if (agentResult) {
+    const reply = agentResult.reply.trim() || `(${agentResult.agentName} agent returned empty)`;
+    await ctx.reply(reply.slice(0, 4000));
+    console.log(`[zoe/index] agent route - ${agentResult.agentName} - reply ${reply.length}b`);
     return;
   }
 

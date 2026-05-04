@@ -14,10 +14,31 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
+import { promises as fs } from 'node:fs';
+import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
-import { buildMemoryBlocks, ensureZoeHome, pushRecent } from './memory';
+import { buildMemoryBlocks, ensureZoeHome, pushRecent, ZOE_PATHS } from './memory';
 import { startScheduler } from './scheduler';
+import { disableTips, enableTips, tipsEnabled } from './tips';
+
+const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
+const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
+
+async function appendClaudeNote(body: string): Promise<number> {
+  await fs.mkdir(ZOE_PATHS.home, { recursive: true });
+  const ts = new Date().toISOString();
+  const block = `\n## ${ts}\n\n${body.trim()}\n`;
+  await fs.appendFile(CLAUDE_NOTES_FILE, block, 'utf8');
+  let count = 0;
+  try {
+    const raw = await fs.readFile(CLAUDE_NOTES_FILE, 'utf8');
+    count = (raw.match(/^## /gm) ?? []).length;
+  } catch {
+    count = 1;
+  }
+  return count;
+}
 
 const token = process.env.ZOE_BOT_TOKEN ?? process.env.TELEGRAM_BOT_TOKEN;
 const zaalIdRaw = process.env.ZAAL_TELEGRAM_ID;
@@ -61,7 +82,23 @@ bot.command('tasks', async (ctx) => {
 bot.command('seed', async (ctx) => {
   if (!(await isAllowed(ctx))) return;
   const result = await seedInitialTasks();
-  await ctx.reply(result.seeded > 0 ? `Seeded ${result.seeded} tasks from doc 601.` : 'Task queue already has entries — skipped seed.');
+  await ctx.reply(result.seeded > 0 ? `Seeded ${result.seeded} tasks from doc 601.` : 'Task queue already has entries - skipped seed.');
+});
+
+bot.command('notes', async (ctx) => {
+  if (!(await isAllowed(ctx))) return;
+  try {
+    const raw = await fs.readFile(CLAUDE_NOTES_FILE, 'utf8');
+    const blocks = raw.split(/^## /m).filter((b) => b.trim()).map((b) => '## ' + b.trim());
+    if (blocks.length === 0) {
+      await ctx.reply('No notes pending. Drop one with `note: <feedback>`.');
+      return;
+    }
+    const recent = blocks.slice(-5).join('\n\n');
+    await ctx.reply(`${blocks.length} note${blocks.length === 1 ? '' : 's'} pending (showing last 5):\n\n${recent.slice(0, 3500)}`);
+  } catch {
+    await ctx.reply('No notes pending. Drop one with `note: <feedback>`.');
+  }
 });
 
 bot.on('message:text', async (ctx) => {
@@ -71,6 +108,38 @@ bot.on('message:text', async (ctx) => {
 
   // Skip messages NOT from Zaal's DM (groups handled separately if needed)
   if (ctx.chat.type !== 'private') return;
+
+  // Hourly tip toggle: "stop tips" / "start tips" disables/enables the cron.
+  const tipToggle = /^(stop|pause|disable)\s+tips?$/i.exec(text.trim()) ? 'off'
+    : /^(start|resume|enable)\s+tips?$/i.exec(text.trim()) ? 'on'
+    : null;
+  if (tipToggle === 'off') {
+    await disableTips();
+    await ctx.reply('Hourly tips paused. Send "start tips" to resume.');
+    return;
+  }
+  if (tipToggle === 'on') {
+    await enableTips();
+    const status = await tipsEnabled();
+    await ctx.reply(status ? 'Hourly tips on.' : 'Tips toggle failed - check logs.');
+    return;
+  }
+
+  // Note: capture path - prefix `note:` / `cc:` / `claude:` lands in claude-code-notes.md
+  // No concierge turn fires. Picked up next Claude Code session via "what feedback did I leave for you?"
+  const noteMatch = NOTE_PREFIX.exec(text);
+  if (noteMatch) {
+    try {
+      const count = await appendClaudeNote(noteMatch[2]);
+      await ctx.reply(`Saved. ${count} note${count === 1 ? '' : 's'} pending for next Claude Code session.`);
+      console.log(`[zoe/index] note saved (#${count}): ${noteMatch[2].slice(0, 80)}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[zoe/index] note save failed:', msg);
+      await ctx.reply(`(note save failed - ${msg.slice(0, 200)})`);
+    }
+    return;
+  }
 
   await ctx.api.sendChatAction(ctx.chat.id, 'typing').catch(() => {});
 

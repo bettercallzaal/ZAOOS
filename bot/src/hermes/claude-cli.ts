@@ -86,6 +86,10 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     const child = spawn(process.env.HERMES_CLAUDE_BIN || 'claude', args, {
       cwd: opts.cwd,
       env: augmentedEnv,
+      // CRITICAL: claude CLI waits 3s for stdin if not explicitly closed,
+      // then exits 1 with "no stdin data received in 3s" warning when running
+      // under systemd. Prompt is passed via -p flag; stdin is unused.
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
 
     let stdout = '';

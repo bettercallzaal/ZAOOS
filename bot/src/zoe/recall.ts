@@ -49,12 +49,12 @@ export function formatManualRelay(req: RecallRequest): string {
 export async function recallViaSdk(req: RecallRequest): Promise<RecallResult> {
   const apiKey = process.env.BONFIRE_API_KEY;
   const bonfireId = process.env.BONFIRE_ID;
-  const agentId = process.env.BONFIRE_AGENT_ID;
-  const apiUrl = process.env.BONFIRE_API_URL ?? 'https://tnt-v2.api.bonfires.ai';
 
   if (!apiKey || !bonfireId) {
     return { kind: 'manual_relay_needed', query: req.query };
   }
+
+  // Future: process.env.BONFIRE_AGENT_ID + BONFIRE_API_URL used here.
 
   // Future implementation when key is provisioned (per doc 569 §9 SDK pattern):
   //

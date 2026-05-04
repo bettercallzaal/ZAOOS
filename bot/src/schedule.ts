@@ -1,7 +1,5 @@
 // Scheduled digests via node-cron. Times in America/New_York so "6am EST" stays 6am after DST.
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error: node-cron has no types bundled
 import cron from 'node-cron';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
 import { getDigestChats } from './group';

@@ -13,7 +13,7 @@
 import { config as loadEnv } from 'dotenv';
 loadEnv();
 
-import { Bot, Context, InlineKeyboard } from 'grammy';
+import { Bot, Context } from 'grammy';
 import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { buildMemoryBlocks, ensureZoeHome, pushRecent } from './memory';
@@ -45,10 +45,7 @@ async function isAllowed(ctx: Context): Promise<boolean> {
   return fromId === zaalId;
 }
 
-const NUDGE_KEYBOARD = new InlineKeyboard()
-  .text('Now', 'nudge:now')
-  .text('Later', 'nudge:later')
-  .text('Shelve', 'nudge:shelve');
+// Nudge keyboard ([Now][Later][Shelve]) wired in scheduler.ts when sending proactive nudges.
 
 bot.command('start', async (ctx) => {
   if (!(await isAllowed(ctx))) return;
@@ -78,7 +75,6 @@ bot.on('message:text', async (ctx) => {
   await ctx.api.sendChatAction(ctx.chat.id, 'typing').catch(() => {});
 
   try {
-    const blocks = await buildMemoryBlocks();
     await pushRecent({ from: 'zaal', text });
 
     const result = await runConciergeTurn({
@@ -160,6 +156,3 @@ async function main(): Promise<void> {
 }
 
 void main();
-
-// Ensure we don't double-print warning on grammy Bot type unused in scope
-void Context;

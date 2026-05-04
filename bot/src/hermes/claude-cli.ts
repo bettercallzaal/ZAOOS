@@ -66,7 +66,7 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     // the final JSON. We need both. The system prompt asks for JSON in the
     // final assistant message; the orchestrator parses it. Schema is kept on
     // the type only as a contract reference.
-    void opts.jsonSchema; // eslint-disable-line @typescript-eslint/no-unused-vars
+    void opts.jsonSchema;  
     if (opts.maxBudgetUsd !== undefined) {
       args.push('--max-budget-usd', String(opts.maxBudgetUsd));
     }

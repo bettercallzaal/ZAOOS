@@ -65,7 +65,7 @@ export function RichBioEditor({ value, onChange, placeholder, maxLength = 2000 }
     if (current !== value) {
       editor.commands.setContent(value || '', { emitUpdate: false });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [value, editor]);
 
   if (!editor) {

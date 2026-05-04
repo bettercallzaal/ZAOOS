@@ -123,7 +123,7 @@ export function ArtistProfileView({ artist, canEdit, token }: Props) {
 
       <div className="flex items-start gap-4">
         {showPhoto ? (
-          // eslint-disable-next-line @next/next/no-img-element
+           
           <img
             src={photoUrl}
             alt={artist.name}
@@ -187,7 +187,7 @@ export function ArtistProfileView({ artist, canEdit, token }: Props) {
           {showLogo && (
             <div>
               <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-2">Brand logo</p>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img
                 src={logoUrl}
                 alt={`${artist.name} logo`}

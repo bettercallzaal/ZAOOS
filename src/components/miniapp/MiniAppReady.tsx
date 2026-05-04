@@ -34,11 +34,11 @@ export function MiniAppReady() {
         const { sdk } = await import('@farcaster/miniapp-sdk');
         await sdk.actions.ready();
         if (reason === 'fallback') {
-          // eslint-disable-next-line no-console
+           
           console.warn('[miniapp-ready] dismissed via fallback timer');
         }
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.warn('[miniapp-ready] sdk.actions.ready() failed', err);
       }
     };

@@ -11,18 +11,34 @@ tier: DEEP
 
 > **Goal:** Stop the bot proliferation. Pick the smallest viable agent stack that actually serves Zaal day-to-day, and kill the rest. Replaces the implicit "add another bot" pattern with a written decision.
 
-## Recommendation (no preamble — direct call)
+## Recommendation (locked 2026-05-04 — Option D: Hermes-as-ZOE-brain)
 
-**Collapse to 3 surfaces. Kill 5+ pieces of overhead.**
+**Keep ZOE the concept. Kill the openclaw brain. Reuse Hermes runtime.**
+
+ZOE openclaw was the right idea with the wrong brain (Minimax M2.7 + 60+ extension plugins + sqlite-for-embeddings = weak + brittle). Hermes already runs the right brain (Claude Code CLI subprocess via Max plan, no API billing, with proper tool access). Make ZOE's backend mirror Hermes — same `bot/src/*` runtime pattern, different system prompt for the concierge personality vs the coder/critic personality.
 
 ```
-PRIMARY (3 surfaces Zaal touches daily):
-  1. Claude Code CLI    — code, research, writing, planning
-  2. Bonfire DM bot     — capture, recall, decisions, daily reflection
+PRIMARY (4 surfaces Zaal touches daily):
+  1. Claude Code CLI    — code, research, writing, planning (Mac terminal)
+  2. Bonfire DM bot     — memory layer (capture, recall, source of truth)
   3. ZAOstock Team Bot  — team-only, scoped, untouched
+  4. ZOE Telegram bot   — concierge (NEW: Hermes-style brain at bot/src/zoe/)
+                          - Same @zaoclaw_bot Telegram identity (keeps token)
+                          - Backend rewritten as bot/src/zoe/ module mirroring bot/src/hermes/
+                          - Claude Code CLI subprocess, Max plan auth
+                          - Reads Bonfire via DM relay (or SDK once Joshua.eth provisions)
+                          - Sprint 1 cost routing applies: Sonnet for chitchat, Opus for hard recall
+
+BACKGROUND (2 specialists, same runtime as ZOE):
+  5. Hermes coder/critic — code-fix only, triggered by /SHIP FIX or PR webhook
+  6. VAULT/BANKER/DEALER trading agents — autonomous within parameters
+
+SHARED RUNTIME: bot/src/* on VPS (TS + grammy + Claude CLI subprocess + systemd user unit)
+SHARED MEMORY:  Bonfire (graph) via DM relay or SDK
 
 KILL OR DEPRECATE:
-  - ZOE openclaw container (@zaoclaw_bot)  → kill, replace with Bonfire-as-ZOE
+  - ZOE openclaw container (Minimax brain)  → kill, replace with bot/src/zoe/ (Claude brain)
+                                              Identity stays. Brain swaps.
   - ZAO Devz bot                           → fold /SHIP FIX into Hermes webhook, drop Telegram-side
   - ZOE learning pings cron                → kill, Bonfire's task scheduling can do this
   - Bot-to-bot bridge group                → kill, autonomous coordination is fantasy until SDK lands
@@ -104,7 +120,7 @@ Keep all current bots. Build the recall relay. Add another bot to fix the script
 
 **Verdict: ❌ this is what got us here.**
 
-### Option B — BONFIRE-AS-ZOE (recommended)
+### Option B — BONFIRE-AS-ZOE (initial draft, superseded by Option D)
 
 Bonfire becomes the personal concierge. ZOE openclaw container goes away. Daily flow:
 
@@ -124,7 +140,7 @@ Bonfire becomes the personal concierge. ZOE openclaw container goes away. Daily 
 
 **Maintenance gain:** massive. Stop managing openclaw extensions, telegram channel toggles, Minimax dependency, scout.sqlite, AGENTS.md/SOUL.md drift.
 
-**Verdict: ✅ ship this.**
+**Verdict: ⚠️ superseded by Option D — Bonfire is great as memory, but conversational concierge wants its own brain. Bonfire's Bonfires.ai-hosted runtime is fine for graph queries but not for "tell me what to focus on this morning" type answers that need context Claude has.**
 
 ### Option C — KILL ALL BOTS, ONLY CLAUDE CODE (too austere)
 
@@ -132,38 +148,58 @@ Just Claude Code CLI + Bonfire as a database (no Bonfire bot). Mobile = Notes ap
 
 **Verdict: ❌ loses mobile capture which is real (45 min/day per audit). Bonfire bot already works fine on mobile, no reason to kill it.**
 
-## Concrete Migration Plan (Option B)
+### Option D — HERMES-AS-ZOE-BRAIN (LOCKED 2026-05-04)
 
-### Phase 1 — verify Bonfire can replace ZOE (today, 30 min)
+ZOE survives. Brain swaps. Reuse Hermes runtime infrastructure.
 
-1. Open Bonfire bot Platform tab → ensure Task Scheduling feature toggle is ON (was on per Personality screenshot)
-2. Add 3 new personality traits to Bonfire to cover ZOE's voice:
-   - `daily_reflection` — at 9pm EST DM Zaal "what shipped today, what's stuck, what's tomorrow's first task" — 3 questions, capture answers as graph nodes
-   - `task_tracker` — when Zaal says "task: X" or "todo: X" or "/add X", commit as Task node with status: open. When Zaal says "done X", flip to status: shipped
-   - `proactive_nudge` — if no fact ingested in 12+ hours, ping Zaal "anything to capture from the last half-day?"
-3. Test: tomorrow morning, do entire day's work via Claude Code + Bonfire bot only. No DMs to @zaoclaw_bot.
+Hermes already proved: Claude Code CLI subprocess + Max plan auth + grammy bot framework + systemd user unit = a fast, capable, cheap (no API billing) AI brain on the VPS. The runtime pattern is in `bot/src/hermes/` — coder.ts + critic.ts + claude-cli.ts + runner.ts + etc. Sprint 1 cost routing already shipped (Sonnet for cheap/simple, Opus for hard).
 
-### Phase 2 — kill openclaw (this week, 1 hour)
+Mirror that pattern at `bot/src/zoe/` for the concierge personality:
+- `zoe/index.ts` — Telegram polling for @zaoclaw_bot
+- `zoe/concierge.ts` — system prompt + personality, mirrors hermes/coder.ts shape
+- `zoe/claude-cli.ts` — shared with hermes (already exists, supports cost routing)
+- `zoe/recall.ts` — bridges to Bonfire DM (or direct SDK once Joshua.eth provisions)
+- `zoe/scheduler.ts` — cron-style proactive nudges (replaces zoe-learning-pings cron)
 
-1. `ssh zaal@31.97.148.88 'docker stop openclaw-openclaw-gateway-1 && docker update --restart=no openclaw-openclaw-gateway-1'`
-2. Disable any cron jobs that still reference `~/zoe-bot/` or `~/.openclaw/`
-3. Disable openclaw watchdog respawn rule
-4. Keep the container around for 30 days as backup, then `docker rm` after grace period
-5. Reclaim VPS resources (~600MB RAM, some CPU)
+Bonfire stays as memory layer. ZOE-Hermes-brain queries Bonfire on demand when it needs facts.
 
-### Phase 3 — fold Devz bot into Hermes (this week, 1 hour)
+**Migration cost:** ~1 day of bot/src/zoe/ module work + cutover to swap Telegram token from openclaw to bot/src/zoe.
+
+**Maintenance gain:** delete openclaw container entirely (~600MB RAM + the whole Minimax dependency + the extension hell). Daily ZOE quality goes from "Hi Zaal, what's up?" to "[paragraph that demonstrates actual contextual awareness]".
+
+**Verdict: ✅ this is the locked answer.** Doc 601 updated 2026-05-04.
+
+## Concrete Migration Plan (Option D)
+
+### Phase 1 — scaffold bot/src/zoe/ module (today, ~3 hours difficulty 6)
+
+1. Create `bot/src/zoe/` directory mirroring `bot/src/hermes/` structure
+2. Implement `zoe/index.ts` — Telegram polling, listens to @zaoclaw_bot DMs, dispatches to concierge handler
+3. Implement `zoe/concierge.ts` — system prompt for concierge personality (different from hermes/coder.ts but shares claude-cli.ts runtime + Sprint 1 cost routing)
+4. Implement `zoe/recall.ts` — when ZOE needs graph facts, DM @zabal_bonfire with RECALL: + read reply asynchronously (or skip until SDK lands and ZOE asks Zaal directly to RECALL)
+5. Reuse existing `bot/src/hermes/claude-cli.ts` for Claude subprocess invocation
+6. Add systemd user unit OR add to existing zao-devz-stack.service so ZOE module starts/stops with the rest of bot/
+
+### Phase 2 — cutover Telegram token (this week, ~1 hour difficulty 3)
+
+1. Stop openclaw container: `docker stop openclaw-openclaw-gateway-1 && docker update --restart=no openclaw-openclaw-gateway-1`
+2. Move TELEGRAM_BOT_TOKEN env var from openclaw config → bot/.env or systemd service env (bot/src/zoe will pick up the same token, take over @zaoclaw_bot identity)
+3. Test: DM @zaoclaw_bot from phone — should get ZOE's new Hermes-brain response, not openclaw's
+4. Keep openclaw container around for 30 days as backup, then `docker rm` after grace period
+
+### Phase 3 — fold Devz bot into Hermes (this week, ~1 hour difficulty 5)
 
 1. /SHIP FIX in ZAO Devz channel currently: ZAO Devz bot receives → forwards to Hermes via HTTP
 2. Better: GitHub PR webhook → Hermes directly. Devz channel just gets a "Hermes is fixing PR X" notification posted by Hermes (one-way, not interactive)
 3. Stop running ZAO Devz bot module on VPS
 4. Update Hermes to post status updates to ZAO Devz channel as a one-way notifier
 
-### Phase 4 — kill ZOE learning pings (this week, 30 min)
+### Phase 4 — replace learning pings cron with bot/src/zoe scheduler (this week, ~1 hour difficulty 4)
 
-1. Bonfire generates the same tips natively (LLM + graph context)
-2. Schedule via Bonfire's task scheduling: hourly "post a ZAO learning tip in @ZAODevzCommunity General"
-3. Configure Bonfire's "Allowed groups" to include the ZAO Devz general topic
-4. Stop the python cron at `~/zoe-learning-pings/run.sh`
+1. Implement `bot/src/zoe/scheduler.ts` — node-cron or systemd timer triggers hourly
+2. Hourly tip: ZOE-Hermes-brain generates a tip + posts to ZAO Devz General topic
+3. Stop the python cron at `~/zoe-learning-pings/run.sh`
+4. Same cadence (hourly), same target (Devz General), better quality output (Claude vs hand-crafted Python tip pool)
 
 ### Phase 5 — mark Composio AO + 10-bot fleet permanent defer (this week, doc only)
 
@@ -178,13 +214,13 @@ Update `CLAUDE.md` "Workflow Orchestration" section:
 - Background: Hermes (PR-triggered), trading agents (parameter-driven)
 - No new bots without a written /zao-research justification doc explaining why Bonfire can't do it
 
-## Kill List (formally deprecated)
+## Kill List (formally deprecated, Option D revised)
 
 | Item | Action | When |
 |---|---|---|
-| ZOE @zaoclaw_bot openclaw container | Stop + disable restart, keep 30d as backup | Phase 2 |
+| ZOE openclaw container (Minimax brain) | Stop + disable restart, keep 30d as backup. ZOE identity (@zaoclaw_bot) survives, brain swaps to Hermes-style. | Phase 2 |
 | ZAO Devz bot module | Replace with Hermes one-way notifier | Phase 3 |
-| ZOE learning pings cron | Replace with Bonfire scheduled task | Phase 4 |
+| ZOE learning pings python cron | Replace with bot/src/zoe/scheduler.ts | Phase 4 |
 | Bot-to-bot bridge group | Leave group alive as passive ingest only, never wire autonomy | Now |
 | ZAO Recall Relay Bot (proposed today) | Don't create | Now |
 | OpenClaw ZOEY + WALLET sub-agents | Decommission with the parent container | Phase 2 |

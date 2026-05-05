@@ -1,14 +1,14 @@
 // /zsfb <comment> - low-friction ZAOstock /test feedback intake
 //
 // Open to all team members (not admin-gated like /fix). Saves to
-// stock_suggestions with a [zsfb:<section>] prefix so the dashboard + Hermes
+// suggestions with a [zsfb:<section>] prefix so the dashboard + Hermes
 // can filter for /test feedback specifically.
 //
 // Section auto-detected from keywords. If none match, tagged 'general'. The
 // section keyword is a hint for downstream triage, not a hard label - Hermes
 // always reads the full text.
 //
-// Why prefix vs new column: stock_suggestions schema is shared with /idea +
+// Why prefix vs new column: suggestions schema is shared with /idea +
 // public submissions. Adding a column would require a migration and would
 // fragment the suggestion pool. Prefix is reversible, dashboard-friendly, and
 // keeps everything in one bucket.
@@ -56,7 +56,7 @@ export async function addZsFb(member: TeamMember, text: string): Promise<string>
   const tagged = `[zsfb:${section}] ${trimmed}`;
 
   const { data, error } = await db()
-    .from('stock_suggestions')
+    .from('suggestions')
     .insert({
       name: member.name,
       contact: `tg:${member.id}`,

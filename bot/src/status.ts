@@ -9,11 +9,11 @@ function daysSince(iso: string | null): number {
 export async function buildStatus(): Promise<string> {
   const s = db();
   const [sponsorsR, artistsR, volunteersR, todosR, milestonesR] = await Promise.all([
-    s.from('stock_sponsors').select('status, amount_committed, last_contacted_at, name'),
-    s.from('stock_artists').select('status, name'),
-    s.from('stock_volunteers').select('confirmed, role, shift'),
-    s.from('stock_todos').select('status'),
-    s.from('stock_timeline').select('status, title, due_date'),
+    s.from('sponsors').select('status, amount_committed, last_contacted_at, name'),
+    s.from('artists').select('status, name'),
+    s.from('volunteers').select('confirmed, role, shift'),
+    s.from('todos').select('status'),
+    s.from('timeline').select('status, title, due_date'),
   ]);
 
   const sponsors = sponsorsR.data || [];
@@ -89,7 +89,7 @@ export async function buildStatus(): Promise<string> {
 
 export async function buildMyTodos(member: TeamMember): Promise<string> {
   const { data } = await db()
-    .from('stock_todos')
+    .from('todos')
     .select('title, status, created_at')
     .eq('owner_id', member.id)
     .neq('status', 'done')
@@ -109,7 +109,7 @@ export async function buildMyTodos(member: TeamMember): Promise<string> {
 
 export async function buildAllOpenTodos(): Promise<string> {
   const { data } = await db()
-    .from('stock_todos')
+    .from('todos')
     .select('title, status, owner_id, created_at')
     .neq('status', 'done')
     .order('created_at', { ascending: false })
@@ -122,7 +122,7 @@ export async function buildAllOpenTodos(): Promise<string> {
   const nameById = new Map<string, string>();
   if (ownerIds.length > 0) {
     const { data: owners } = await db()
-      .from('stock_team_members')
+      .from('team_members')
       .select('id, name')
       .in('id', ownerIds);
     for (const o of (owners as Array<{ id: string; name: string }> | null) ?? []) {
@@ -156,7 +156,7 @@ export async function buildAllOpenTodos(): Promise<string> {
 
 export async function buildTeamRoster(): Promise<string> {
   const { data, error } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .select('name, scope, role, telegram_id, telegram_username, active')
     .neq('active', false)
     .order('name');
@@ -199,7 +199,7 @@ export async function buildTeamRoster(): Promise<string> {
 export async function buildMyContributions(member: TeamMember): Promise<string> {
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data } = await db()
-    .from('stock_activity_log')
+    .from('activity_log')
     .select('action, entity_type, new_value, created_at')
     .eq('actor_id', member.id)
     .gte('created_at', since)

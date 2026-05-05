@@ -18,7 +18,9 @@
 
 const OLLAMA_HOST = process.env.OLLAMA_HOST ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.1:8b';
-const OLLAMA_TIMEOUT_MS = 15_000;
+// 90s default to absorb cold-start (first inference ~30s on 2-core CPU).
+// Override with OLLAMA_TIMEOUT_MS env if you swap to a smaller model.
+const OLLAMA_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS) || 90_000;
 
 export interface OllamaResult {
   text: string;
@@ -109,7 +111,7 @@ export async function ollamaClassify(
   const prompt = `Text:\n"""\n${text.slice(0, 2000)}\n"""\n\nLabel:`;
 
   try {
-    const result = await ollamaChat(prompt, system, { temperature: 0, maxTokens: 16 });
+    const result = await ollamaChat(prompt, system, { temperature: 0, maxTokens: 6 });
     const cleaned = result.text.toLowerCase().replace(/[^a-z0-9_-]/g, ' ').trim().split(/\s+/)[0];
     if (cleaned && labels.includes(cleaned)) return cleaned;
     return fallback;

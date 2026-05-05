@@ -42,6 +42,23 @@ const ADMIN_IDS = (process.env.BOT_ADMIN_TELEGRAM_IDS ?? '')
 
 const bot = new Bot<Context>(token);
 
+// Routing policy: bot must NEVER post in the ZAO Festivals General topic.
+// Anything that lacks an explicit message_thread_id when targeting that
+// supergroup gets redirected to the Operations topic. Set OPS_TOPIC_ID via
+// .env if it ever changes; default 2 matches current ZAO Festivals layout.
+const ZAO_FESTIVALS_CHAT_ID = -1003960864140;
+const OPS_TOPIC_ID = Number(process.env.OPS_TOPIC_ID ?? 2);
+bot.api.config.use(async (prev, method, payload) => {
+  if (method === 'sendMessage' || method === 'sendPhoto' || method === 'sendDocument' || method === 'sendVideo' || method === 'sendAnimation') {
+    const p = payload as { chat_id?: number | string; message_thread_id?: number };
+    const chatId = typeof p.chat_id === 'number' ? p.chat_id : Number(p.chat_id);
+    if (chatId === ZAO_FESTIVALS_CHAT_ID && (p.message_thread_id == null || Number.isNaN(p.message_thread_id))) {
+      p.message_thread_id = OPS_TOPIC_ID;
+    }
+  }
+  return prev(method, payload);
+});
+
 // Register every chat we see (on first message).
 bot.use(async (ctx, next) => {
   if (ctx.chat) {
@@ -523,15 +540,26 @@ bot.on('message:text', async (ctx) => {
     return;
   }
 
-  // Group / supergroup: respond ONLY when @mentioned
+  // Group / supergroup: respond ONLY when @-mentioned conversationally.
+  // Substring match was too eager (broadcasts that mention the bot in body
+  // text trigger replies). Now we require:
+  //   1. A mention entity (Telegram-tagged, not just text)
+  //   2. The mention is at offset 0 (first token) — i.e. directed at the bot
   const username = await ensureUsername();
-  const mentioned = username && text.toLowerCase().includes(`@${username}`);
-  if (!mentioned) return;
+  if (!username) return;
+  const entities = ctx.message.entities ?? [];
+  const directlyAddressed = entities.some(
+    (e) =>
+      e.offset === 0 &&
+      (e.type === 'mention' || e.type === 'text_mention') &&
+      text.slice(0, e.length).toLowerCase() === `@${username}`,
+  );
+  if (!directlyAddressed) return;
 
   const member = await requireMember(ctx);
   if (!member) return;
 
-  const cleaned = text.replace(new RegExp(`@${username}`, 'gi'), '').trim();
+  const cleaned = text.replace(new RegExp(`^@${username}\\s*`, 'i'), '').trim();
   if (!cleaned) {
     await ctx.reply(`Hi ${member.name}. Tag me with something like "@${username} add todo X" or ask a question.`);
     return;

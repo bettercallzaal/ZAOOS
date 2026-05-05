@@ -1,17 +1,21 @@
 /**
- * @newsletter - draft a Year of the ZABAL daily newsletter entry.
+ * @newsletter - daily Year of the ZABAL entry.
  *
- * Two-source assembly:
- *   1. ZOE side - today's commits, open PRs, recent captures, recent task ops
- *      (gives the "what actually happened today" first paragraph)
- *   2. Bonfire side - @recall query for surrounding context (people, decisions,
- *      ongoing projects connected to the topic). Read-only.
+ * Two modes:
+ *   - Draft: @newsletter <text>  - assembles day snapshot + Bonfire context, writes new entry
+ *   - Edit:  @newsletter edit <addition>  - reads today's prior draft, re-rolls including the addition
  *
- * Zaal sends a SHORT input ("Tuesday meeting prep + Bonfire wired up" or just
- * "today"). Agent assembles the day-snapshot from both sources and drafts.
+ * Voice locked to BetterCallZaal Year-of-the-ZABAL. Voice + anti-pattern rules
+ * synthesized in research doc 610 (built on docs 558 / 562 / 563).
  *
- * Voice locked to BetterCallZaal Year-of-the-ZABAL system prompt. No emojis,
- * no em dashes, no preachy. Day first, mindful moment second, signature.
+ * Source assembly:
+ *   - ZOE side: today's commits (18h), PRs touched today via gh, captures from
+ *     ~/.zao/zoe/captures/<date>.json
+ *   - Bonfire side: recall() query keyed on user input, returns synthesized
+ *     KG context (gracefully no-ops if BONFIRE_API_KEY missing)
+ *
+ * Persistence: every successful draft writes to ~/.zao/zoe/newsletters/<date>.md
+ * so edit mode can read it back.
  */
 import type { Agent } from './index';
 import { callClaudeCli } from '../../hermes/claude-cli';
@@ -21,55 +25,60 @@ import { join } from 'node:path';
 import { execSync } from 'node:child_process';
 import { ZOE_PATHS } from '../memory';
 
-const NEWSLETTER_SYSTEM = `You are a creative content generator for Year of the ZABAL - a daily 2026 chronicle documenting momentum, discipline, creativity, and personal leadership as ZABAL comes to life.
+const NEWSLETTER_SYSTEM = `You are the daily-entry writer for Year of the ZABAL, a 2026 personal chronicle by Zaal Panthaki ("BetterCallZaal"). Each entry pairs a real moment from the day with a grounded mindful takeaway. Writing must feel lived-in, specific, and honest. Never preachy, never aphoristic.
 
-Each entry pairs a real moment from the day with a mindful takeaway inspired by the You Are a Badass calendar/book. The writing should feel lived-in, grounded, and honest. Never preachy, never performative.
+Voice: calm confidence, self-trust, clarity. Encouraging without corny. Direct without harsh. Sounds like a real person who slept and then sat down to write.
 
-Voice sounds like BetterCallZaal: calm confidence, cultural awareness, self-trust, and clarity. Encouraging without being corny. Direct without being harsh.
-
-1. Auto Metadata (always included)
-
-Detect today's date from the user prompt and format the header EXACTLY like this on the first line:
+1. Header (always exactly this shape, first thing in output)
 
 Year of the ZABAL - Day {{DAY_OF_YEAR}} ({{Day, Month D, Year}})
-{{Short subtitle - grounded and reflective, not a slogan}}
+{{Subtitle - short, grounded, no slogan}}
 
 ___
 
-2. Body Structure (strict order)
+2. Body order (strict)
 
 (a) The Day - what actually happened
-- Write first about the day itself
-- Describe what moved forward, launched, shipped, clarified
-- Any friction, resistance, uncertainty
-- Overall energy
-- Personal-journal voice shared with builders and collaborators
-- Begin naturally, no label
+- Lead each paragraph with a specific named thing (person, place, project, time)
+- Describe what moved forward, launched, shipped, clarified, or hit friction
+- One number, name, place, or quote per paragraph minimum if any exist in the input
+- Personal-journal voice
+- Begin naturally with no label
 
-(b) Mindful Moment - You Are a Badass reflection
-- After the day's reflection, introduce a mindful moment inspired by You Are a Badass
-- If the user supplied a quote or theme, use it
+(b) Mindful Moment - one paragraph
+- Anchor a quote, idea, or sense to a thing Zaal actually saw or did today
+- If user supplied a calendar quote or theme, use it; otherwise pick a fitting reflection drawn from the day's actual content
 - Treat as perspective or permission, never instruction
-- Mirror or reframe what already happened that day
-- Do not explain the book. Let the idea land
+- Do not explain the book. Let the idea land in one paragraph
 
-(c) Closing line - one short, thoughtful line. Reminder, invitation, quiet challenge. No hype, no CTA labels
+(c) Closing line - one sentence about now or next, NOT a universal truth
+- "Recording at 2. Bounty live by 5." beats "Keep getting in the rooms."
+- "I sleep early tonight." beats "Trust the process."
+- Concrete > philosophical
 
-3. Signature (always)
-
-End every entry with:
+3. Signature (always exactly this, last line)
 
 - BetterCallZaal on behalf of the ZABAL Team
 
-4. Format rules
-- No emojis
-- No hashtags
-- No em dashes (use hyphens)
-- No extra headers beyond the title/subtitle block
-- Short paragraphs, readable aloud
-- Clean, simple, human
+4. Anti-patterns (never use)
+- Aphoristic closes ("Some things announce themselves quietly", "Trust the timing")
+- "There is a thing that happens when..." constructions
+- "The machine," "the work," "the system" as brand-coded singulars - name the actual thing
+- Parallel-structure 3-beat closes ("X. Y. Then Z.") - one per entry max, not at the close
+- Cliche transitions: "small pieces clicking into place," "puzzle pieces," "the rhythm is set," "in motion"
+- Universal-second-person preachy "you" ("You do not become ready") - reserve "you" for rare direct reader address
+- "Loop is clean," "rooms worth being in," "show up" as philosophical turns
+- Em dashes (use hyphens with spaces around them)
+- Emojis, hashtags, marketing language, headers beyond the title block
 
-5. If a calendar quote or photo theme is provided, use it as secondary emotional texture, not the focus. Day first, mindful moment second.`;
+5. DO rules
+- Lead with the specific. "Kenny from POIDH at 2pm" beats "today's recording"
+- Spell out conferences, places, dates ("Rome", "Mondays 11:30am EST in Discord", "Day 125")
+- Sentence-length variety: if 3+ consecutive sentences are within 2 words of each other, rewrite one short and one long
+- One concrete fact per paragraph if any exist
+- If user mid-stream adds a fact (like "we got mentioned in Rome"), that fact lands in a paragraph; do not bury it in the close
+
+6. If user supplied a Badass quote or calendar photo theme on a separate line, use it as the Mindful Moment anchor. Day always comes first.`;
 
 interface DaySnapshot {
   isoDate: string;
@@ -78,7 +87,6 @@ interface DaySnapshot {
   commits: string[];
   prs: Array<{ number: number; title: string; merged: boolean }>;
   captures: string[];
-  bonfire: string;
 }
 
 function dayOfYear(date: Date): number {
@@ -87,7 +95,7 @@ function dayOfYear(date: Date): number {
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
-function loadDaySnapshot(repoDir: string, todayCaptures: string[]): Omit<DaySnapshot, 'bonfire'> {
+function loadDaySnapshot(repoDir: string, todayCaptures: string[]): DaySnapshot {
   const now = new Date();
   let commits: string[] = [];
   try {
@@ -102,8 +110,9 @@ function loadDaySnapshot(repoDir: string, todayCaptures: string[]): Omit<DaySnap
 
   let prs: Array<{ number: number; title: string; merged: boolean }> = [];
   try {
+    const today = now.toISOString().slice(0, 10);
     const json = execSync(
-      "gh pr list --repo bettercallzaal/ZAOOS --state all --limit 8 --search 'updated:>=2026-05-04' --json number,title,state",
+      `gh pr list --repo bettercallzaal/ZAOOS --state all --limit 8 --search 'updated:>=${today}' --json number,title,state`,
       { encoding: 'utf8', timeout: 6000 },
     );
     const parsed = JSON.parse(json) as Array<{ number: number; title: string; state: string }>;
@@ -157,9 +166,29 @@ async function loadBonfireContext(topic: string): Promise<string> {
   }
 }
 
+const EDIT_VERBS = /^(edit|add|also|more|update|append|include)\s+(.+)/is;
+const NEWSLETTER_DIR = join(ZOE_PATHS.home, 'newsletters');
+
+async function readLatestDraft(): Promise<string | null> {
+  const today = new Date().toISOString().slice(0, 10);
+  const path = join(NEWSLETTER_DIR, `${today}.md`);
+  try {
+    return await fs.readFile(path, 'utf8');
+  } catch {
+    return null;
+  }
+}
+
+async function saveDraft(text: string): Promise<void> {
+  const today = new Date().toISOString().slice(0, 10);
+  await fs.mkdir(NEWSLETTER_DIR, { recursive: true });
+  const path = join(NEWSLETTER_DIR, `${today}.md`);
+  await fs.writeFile(path, text + '\n', 'utf8');
+}
+
 export const agent: Agent = {
   name: 'newsletter',
-  description: 'Year of the ZABAL daily entry. Auto-pulls day snapshot + Bonfire context, you supply 1-2 lines.',
+  description: "Year of the ZABAL daily entry. @newsletter <text> drafts. @newsletter edit <addition> re-rolls today's draft with the addition.",
   triggers: [
     /^@newsletter\s+(.+)/is,
     /^\/newsletter\s+(.+)/is,
@@ -167,22 +196,54 @@ export const agent: Agent = {
   handle: async (match, ctx): Promise<string> => {
     const userInput = match[1].trim();
     if (!userInput) {
-      return 'Usage: @newsletter <short angle or just "today">. Optional: paste a You Are a Badass quote on a new line.';
+      return 'Usage: @newsletter <short angle or just "today">. To revise today\'s draft: @newsletter edit <addition>. Optional: paste a Badass quote on a new line.';
+    }
+
+    // Edit / iterate mode: rewrite today's draft including the addition
+    const editMatch = EDIT_VERBS.exec(userInput);
+    let priorDraft: string | null = null;
+    let workingInput = userInput;
+    if (editMatch) {
+      priorDraft = await readLatestDraft();
+      if (priorDraft) {
+        workingInput = editMatch[2].trim();
+      }
     }
 
     const captures = await loadTodayCaptures();
     const snapshot = loadDaySnapshot(ctx.repoDir, captures);
-    const bonfire = await loadBonfireContext(userInput);
+    const bonfire = await loadBonfireContext(workingInput);
 
-    const promptParts = [
+    const promptParts: string[] = [
       `Today's metadata:`,
       `- ISO date: ${snapshot.isoDate}`,
       `- Human: ${snapshot.human}`,
       `- Day of year: ${snapshot.dayOfYear}`,
       ``,
-      `Zaal's input (use as the angle for The Day section):`,
-      userInput,
-      ``,
+    ];
+
+    if (priorDraft) {
+      promptParts.push(
+        `EDIT MODE - There is an existing draft for today. Rewrite the FULL entry incorporating the addition below. Preserve good content from the prior draft, but apply all anti-pattern + DO rules from the system prompt to the rewrite. Output the new full entry, not just a diff.`,
+        ``,
+        `Prior draft:`,
+        '"""',
+        priorDraft.trim(),
+        '"""',
+        ``,
+        `Addition to incorporate:`,
+        workingInput,
+        ``,
+      );
+    } else {
+      promptParts.push(
+        `Zaal's input (use as the angle for The Day section):`,
+        userInput,
+        ``,
+      );
+    }
+
+    promptParts.push(
       `What ZOE saw today (last 18 hours from the repo + captures):`,
       `Commits: ${snapshot.commits.length ? snapshot.commits.map((c) => '- ' + c).join('\n') : '(none)'}`,
       ``,
@@ -190,11 +251,11 @@ export const agent: Agent = {
       ``,
       `Captures Zaal logged today: ${snapshot.captures.length ? snapshot.captures.map((c) => '- ' + c).join('\n') : '(none)'}`,
       ``,
-      `Bonfire context (synthesized from the ZABAL bonfire KG, may be sparse if not yet seeded):`,
+      `Bonfire context (from the ZABAL bonfire KG, may be sparse if not yet seeded):`,
       bonfire,
       ``,
-      `Now write the Year of the ZABAL entry per the system-prompt structure. Use the day metadata in the header. Pull "The Day" content from the commits + PRs + captures + Zaal's input. If a quote or theme appears in Zaal's input, use it for the Mindful Moment section, otherwise pick a fitting reflection. End with the signature line. No emojis, no em dashes, no headers beyond the title block.`,
-    ];
+      `Write the FULL Year of the ZABAL entry per the system-prompt structure. Header first. Then "The Day" paragraphs leading with named specifics. Then ONE Mindful Moment paragraph anchored to a today-specific. Then ONE concrete closing line about now or next. Then the signature line. Apply every anti-pattern check and every DO rule.`,
+    );
 
     const result = await callClaudeCli({
       model: 'sonnet',
@@ -206,6 +267,15 @@ export const agent: Agent = {
       outputFormat: 'json',
     });
 
-    return result.text.trim() || '(newsletter subagent returned empty)';
+    const text = result.text.trim();
+    if (!text) return '(newsletter subagent returned empty)';
+
+    try {
+      await saveDraft(text);
+    } catch (err) {
+      console.error('[zoe/agents/newsletter] saveDraft failed:', err instanceof Error ? err.message : err);
+    }
+
+    return text;
   },
 };

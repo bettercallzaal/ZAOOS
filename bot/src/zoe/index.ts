@@ -148,15 +148,32 @@ bot.on('message:text', async (ctx) => {
     return;
   }
 
+  // Telegram-native reply detection: if Zaal hits "reply" on a ZOE message that
+  // looks like a newsletter draft, treat his text as a newsletter edit. Saves
+  // him from having to type "@newsletter edit" - just reply with context.
+  // Detection: reply_to is from the bot itself AND text starts with the
+  // Year of the ZABAL header. Other ZOE messages (briefs, tips) are ignored.
+  const replyTo = ctx.message.reply_to_message;
+  let resolvedText = text;
+  if (replyTo && 'from' in replyTo && replyTo.from?.is_bot && 'text' in replyTo) {
+    const repliedText = (replyTo as { text?: string }).text ?? '';
+    const isNewsletter = /^Year of the ZABAL\b/m.test(repliedText);
+    const alreadyAgentPrefixed = /^@\w+\s/.test(text) || /^\/\w+/.test(text);
+    if (isNewsletter && !alreadyAgentPrefixed) {
+      resolvedText = `@newsletter edit ${text}`;
+      console.log(`[zoe/index] reply-to-newsletter detected, rerouting to: ${resolvedText.slice(0, 80)}`);
+    }
+  }
+
   // Agent route: @recall / @research / @newsletter / @zaostock etc.
   // Fast path - skip the LLM if a prefix matches a registered agent.
   // /agents and /help are handled as bot.command above (Telegram strips them
   // before this text handler ever sees them).
-  const agentResult = await tryRouteAgent(text, {
+  const agentResult = await tryRouteAgent(resolvedText, {
     bot,
     zaalTgId: zaalId,
     repoDir,
-    rawText: text,
+    rawText: resolvedText,
   });
   if (agentResult) {
     const reply = agentResult.reply.trim() || `(${agentResult.agentName} agent returned empty)`;

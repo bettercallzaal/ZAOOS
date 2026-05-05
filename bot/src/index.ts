@@ -26,12 +26,7 @@ import {
   cmdLeave,
   cmdMyCircles,
   cmdCoordinators,
-  cmdPropose,
-  cmdProposals,
-  cmdObject,
-  cmdConsent,
-  cmdBuddy,
-  cmdRespect,
+  cmdCharter,
 } from './circles';
 
 const token = process.env.ZAOSTOCK_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
@@ -247,7 +242,7 @@ bot.command('note', async (ctx) => {
 });
 
 // /zsfb <comment> - low-friction ZAOstock /test feedback (open to all team).
-// Saves to stock_suggestions with [zsfb:<section>] prefix for downstream
+// Saves to suggestions with [zsfb:<section>] prefix for downstream
 // Hermes triage. Distinct from /idea so the /test backlog stays scoped.
 bot.command('zsfb', async (ctx) => {
   const member = await requireMember(ctx);
@@ -499,55 +494,9 @@ bot.command('coordinators', async (ctx) => {
   await cmdCoordinators(ctx);
 });
 
-bot.command('propose', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  const args = (ctx.match ?? '').trim();
-  if (!args) {
-    await ctx.reply('Usage: /propose <circle-slug> <title> | <body>');
-    return;
-  }
-  await cmdPropose(ctx, member, args);
-});
-
-bot.command('proposals', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  await cmdProposals(ctx, member);
-});
-
-bot.command('object', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  const args = (ctx.match ?? '').trim();
-  if (!args) {
-    await ctx.reply('Usage: /object <proposal-id> <reason>');
-    return;
-  }
-  await cmdObject(ctx, member, args);
-});
-
-bot.command('consent', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  const proposalId = (ctx.match ?? '').trim();
-  if (!proposalId) {
-    await ctx.reply('Usage: /consent <proposal-id>');
-    return;
-  }
-  await cmdConsent(ctx, member, proposalId);
-});
-
-bot.command('buddy', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  await cmdBuddy(ctx, member);
-});
-
-bot.command('respect', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  await cmdRespect(ctx, member);
+bot.command('charter', async (ctx) => {
+  const slug = (ctx.match ?? '').trim();
+  await cmdCharter(ctx, slug || undefined);
 });
 
 // ---- Free-text + @mention handler ------------------------------------------

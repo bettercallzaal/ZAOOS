@@ -21,7 +21,7 @@ const STATUSES = ['draft', 'review', 'final', 'sent', 'archived'] as const;
 
 async function listAll(): Promise<OnePagerRow[]> {
   const { data, error } = await db()
-    .from('stock_onepagers')
+    .from('onepagers')
     .select('id, slug, title, audience, purpose, body, status, visibility, meeting_date, meeting_location, version, updated_at')
     .order('updated_at', { ascending: false });
   if (error) throw error;
@@ -30,7 +30,7 @@ async function listAll(): Promise<OnePagerRow[]> {
 
 async function getBySlug(slug: string): Promise<OnePagerRow | null> {
   const { data, error } = await db()
-    .from('stock_onepagers')
+    .from('onepagers')
     .select('id, slug, title, audience, purpose, body, status, visibility, meeting_date, meeting_location, version, updated_at')
     .eq('slug', slug)
     .maybeSingle();
@@ -45,7 +45,7 @@ async function logActivity(
   content: string,
   metadata: Record<string, unknown> = {},
 ): Promise<void> {
-  await db().from('stock_onepager_activity').insert({ onepager_id, member_id, type, content, metadata });
+  await db().from('onepager_activity').insert({ onepager_id, member_id, type, content, metadata });
 }
 
 function formatList(rows: OnePagerRow[]): string {
@@ -141,7 +141,7 @@ export async function cmdOp(ctx: CommandContext<Context>, member: TeamMember | n
       }
       const previous = pager.status;
       const { error } = await db()
-        .from('stock_onepagers')
+        .from('onepagers')
         .update({ status: target, last_edited_by: member.id })
         .eq('id', pager.id);
       if (error) throw error;
@@ -184,7 +184,7 @@ export async function cmdOp(ctx: CommandContext<Context>, member: TeamMember | n
       const sep = pager.body.endsWith('\n') ? '\n' : '\n\n';
       const newBody = `${pager.body}${sep}${text}\n`;
       const { error } = await db()
-        .from('stock_onepagers')
+        .from('onepagers')
         .update({ body: newBody, version: pager.version + 1, last_edited_by: member.id })
         .eq('id', pager.id);
       if (error) throw error;

@@ -1,118 +1,192 @@
-# ZOE userguide (May 4 2026)
+# ZOE userguide (May 5 2026)
 
-Open Telegram. Find `@zaoclaw_bot`. That is ZOE.
-
-ZOE is your concierge. One bot, one relationship. Runs on VPS 1 as `zoe-bot.service`. Auth-locked to your Telegram ID — anyone else who DMs gets ignored.
+Open Telegram. DM `@zaoclaw_bot`. That is ZOE. One bot, one relationship. Auth-locked to your Telegram ID; anyone else gets ignored.
 
 ---
 
-## What you can do today
+## Quick start - the 5 things to try first
 
-### Free-form chat
-Send any message. ZOE replies in 5-10 seconds.
+```
+/agents                                            see what helpers are available
+@research is Granola free tier good enough         get a sourced answer in ~10s
+@newsletter today - busy week, BCZ YapZ today      draft today's Year-of-the-ZABAL entry
+note: rename the bot to ZOE in BotFather           save feedback for next Claude Code session
+what should I focus on this morning                free-form concierge turn
+```
 
-- Short factual question → routed to Haiku (fastest, cheap)
-- Default → routed to Sonnet
-- Strategic / "should I" / "trade-off" → auto-escalates to Opus
+If those four work, the rest of the guide is just more depth.
 
-Examples:
-- `what should I focus on this morning`
-- `should I push ZAOstock spinout this week or wait for the city council vote`
-- `summarize my open PRs`
+---
 
-### Slash commands
+## Slash commands
 
 | Command | What it does |
 |---------|--------------|
 | `/start` | Wakes ZOE, confirms identity |
-| `/tasks` | Lists open tasks from `~/.zao/zoe/tasks.json` |
-| `/seed` | Re-seeds the 8 doc-601 starter tasks if your queue is empty |
+| `/agents` | Lists 4 helpers + what each does |
+| `/help` | Same as `/agents` (alias) |
+| `/tasks` | Shows your open tasks from `~/.zao/zoe/tasks.json` |
+| `/seed` | Seeds 8 starter tasks if queue is empty (safe to run multiple times) |
+| `/notes` | Shows pending feedback notes (last 5 with timestamps) |
 
-### Note prefix — the feedback loop
+---
 
-Anything you start with `note:` (or `cc:` or `claude:`) is captured to a notes file ZOE keeps for the next Claude Code session.
+## The 4 helpers (`@<name> <text>`)
+
+### 1. `@recall` - query Bonfire memory
+
+```
+@recall what did Roddy say about Aug 28
+@recall who runs livestream for ZAOstock
+```
+
+Replies with what the Zabal Bonfire knows. Today the bonfire is mostly empty - you'll get generic answers until we run the bootstrap pass (doc 614). To seed it now: DM @zabal_bonfire directly with facts you want recalled later.
+
+When SDK key arrives + bootstrap runs, `@recall` returns Zaal-specific synthesized answers like @zabal_bonfire DM does. Same wiring, no code change.
+
+### 2. `@research` - sub-300-word sourced answer
+
+```
+@research what's actually new in Granola free tier
+@research is Khoj or Bonfire better for personal KGs
+@research what is Songchain Ram is building
+```
+
+~10 sec reply. Sourced. Decision-led format. NOT a full /zao-research run (that's still a Claude Code session task). Use this for one-screen answers in your daily flow.
+
+### 3. `@newsletter` - Year of the ZABAL daily entry
+
+Two modes:
+
+**Draft mode** - one paragraph or compact list of what mattered today:
+```
+@newsletter Day-after-birthday recap. Won Farcaster hackathon track. Cut all my hair. Hosted Fractal Sunday. ZAOstock cobuilds Mondays 11:30am EST regular slot. Today: BCZ YapZ ep with Kenny POIDH plus second bounty after.
+```
+
+**Edit mode** - revise today's draft with an addition:
+```
+@newsletter edit add the Rome conference - 2 main stage ZABAL mentions now
+@newsletter add quote "you are loved by the universe"
+@newsletter also include the Granola free tier signup
+```
+
+Voice locked to BetterCallZaal Year-of-the-ZABAL per doc 610. Auto-fills date + day-of-year + day-name in header. Pulls today's commits + PRs + captures into "The Day" section automatically. Anti-patterns blocked: aphoristic closes, "the machine" cliches, "there is a thing that happens" constructions, parallel-structure 3-beat closes.
+
+Output saves to `~/.zao/zoe/newsletters/<date>.md` so edit mode finds it.
+
+### 4. `@zaostock` - cross-bot relay
+
+```
+@zaostock test - confirming relay works
+@zaostock reminder Mon 11:30am cobuild starts in 15
+@zaostock new partner: Web3Metal via Shawn
+```
+
+Posts the message AS @ZAOstockTeamBot. Right now goes to your DM (since `ZAOSTOCK_TEAM_CHAT_ID` env not set). When you set the team group ID, it posts to the team chat instead.
+
+---
+
+## The `note:` prefix - feedback loop
+
+Anything you send starting with `note:`, `cc:`, or `claude:` is captured to a notes file ZOE keeps for the next Claude Code session.
 
 ```
 note: morning brief was too long, cut to 3 bullets
 note: dispatcher should also support @hermes
-note: when I say "ship it" without context, default to the last open PR
-cc: rename the bot to ZOE in BotFather
+note: when I say "ship it" without context, default to last open PR
+cc: rename bot to ZOE in BotFather
+claude: research <X> next session
 ```
 
-ZOE replies with a thumbs-up emoji and the count of pending notes. No concierge turn runs. The note is appended to `/home/zaal/.zao/zoe/claude-code-notes.md` on VPS 1 with timestamp.
+ZOE replies with the count of pending notes. NO concierge turn fires. The note appends to `/home/zaal/.zao/zoe/claude-code-notes.md` on VPS with timestamp.
 
-When you open Claude Code next, just say: **"what feedback did I leave for you?"** Claude pulls the file via SSH, processes everything, and clears the file.
+When you next open Claude Code, just say: **"what feedback did I leave for you?"** Claude pulls the file via SSH, processes everything, clears it.
 
----
-
-## What runs automatically
-
-### 5:00 AM EST — morning brief
-ZOE pulls last 24h commits + open PRs + your top 5 open tasks and DMs you a 6-line brief. Idempotent (sentinel file, no double-fire if scheduler restarts).
-
-### 9:00 PM EST — evening reflection
-3 questions:
-1. What shipped today?
-2. What's stuck?
-3. Tomorrow's first task?
-
-Plus (per doc 606) a "Captures from today" block listing meeting transcripts + voice notes + tagged DMs that should land in Bonfire. Tap each: `Now (push to Bonfire)` / `Later` / `Shelve`.
-
-Today the captures file is empty so you'll just see the 3 questions. Once Granola is wired (your Phase 1 task), captures appear here.
+`/notes` shows the last 5 pending notes from your phone.
 
 ---
 
-## What's coming next
+## Free-form chat (no @ prefix, no slash)
 
-### Phase 1 (this week, doc 605)
-- Playwright MCP unlock — ZOE can browse the web (Farcaster, X, blogs, research links)
-- Langfuse traces — observability for every concierge turn (catches silent failures)
-- Promptfoo CI gate — regression-test ZOE replies on PRs
+Any plain text routes to the concierge. Auto-routes by intent:
+- Short factual ("what time is", "summarize my open PRs") → Haiku, fastest
+- Default → Sonnet
+- Strategic ("should I", "trade-off", "is it worth") → Opus
 
-### Phase 2 (doc 607)
-- `@zaostock <cmd>` — relay from your ZOE DM to ZAOstock bot
-- `@bonfire <query>` — relay to Bonfire knowledge graph
-- `@hermes <task>` — relay to Hermes coder/critic
-
-### Brand-assistant slash commands (doc 607)
-- `/firefly <url> [context]` — 3 Firefly drafts (FC + X)
-- `/youtube <url> [transcript]` — YouTube description with chapters
-- `/cast <url>` — Farcaster long-form
-- `/thread <topic>` — X thread
-- `/onepager <topic>` — pitch one-pager
-- `/announcement <topic>` (in ZAOstock bot) — festival broadcast
-
-### Phase 3+
-- Bonfire SDK recall (when Joshua.eth ships the API key)
-- Voice mode via LiveKit Agents + Cartesia (post-ZAOstock spinout)
-- Limitless Pendant ambient capture (after $199 budget)
+Voice rules locked: short paragraphs, max 2 sentences each, blank lines between, default 3-6 lines per reply, phone-readable.
 
 ---
 
-## Memory layout
+## Tip cron - hourly userguide reminders
 
-What ZOE remembers, where:
+Top of every hour ZOE auto-fires a tip from a 25-tip pool covering everything in this guide. Cycles round-robin (you'll eventually see each one). Skips the 9am UTC and 1am UTC slots so it never overlaps morning brief or evening reflection.
 
-| File | What | Touched by |
-|------|------|-----------|
-| `~/.zao/zoe/persona.md` | ZOE identity + Year-of-the-ZABAL voice rules | versioned in repo, copied on first boot |
-| `~/.zao/zoe/human.md` | Your facts (ENS, schedule, projects, relationships) | refreshed daily by ZOE |
-| `~/.zao/zoe/recent.json` | last 5 turns (FIFO ring buffer) | every concierge turn |
-| `~/.zao/zoe/tasks.json` | open task queue | `/tasks`, `/seed`, task ops in concierge replies |
-| `~/.zao/zoe/captures/<YYYY-MM-DD>.json` | today's meeting/voice/dm captures | written by Granola hook (TBD) + voice handler (TBD) |
-| `~/.zao/zoe/sentinels/<trigger>-<date>.flag` | idempotency flags for scheduler | brief / reflect cron |
-| `~/.zao/zoe/claude-code-notes.md` | your `note:` prefix messages | ZOE on note: prefix; cleared by Claude Code on read |
+If too noisy:
+```
+stop tips
+```
+DM that to silence the cron. Resume with:
+```
+start tips
+```
 
 ---
 
-## Anti-patterns ZOE will NOT do
+## Auto cron jobs
 
-(per doc 604 / openclaw lessons)
+| When | What |
+|------|------|
+| 5:00 AM EST (9:00 UTC) | Morning brief - last 24h commits, open PRs, top 5 tasks |
+| 9:00 PM EST (1:00 UTC) | Evening reflection - 3 questions + captures-from-today gate |
+| Top of every hour (UTC) | One tip from the 25-tip pool (skip brief/reflect slots) |
 
-- **Empty replies.** Every reply > 5 chars or it gets blocked + logged. No more "·" pings.
-- **"Would you like me to..."** ZOE just does it.
-- **Memory state lies.** ZOE never claims a task was completed if the JSON didn't change. (Doc 581 lesson.)
-- **Quiet hours.** None. You explicitly said "rather get pinged than ignored." So 5am brief + 9pm reflection always fire.
+All idempotent (sentinel files prevent double-fires on scheduler restart).
+
+---
+
+## Memory layout (what ZOE remembers)
+
+```
+~/.zao/zoe/
+├─ persona.md              ZOE identity + voice rules (loaded into every concierge call)
+├─ human.md                Your facts (schedule, projects, relationships)
+├─ brand.md                Year-of-the-ZABAL voice + 5 example posts
+├─ recent.json             last 5 turns (FIFO ring buffer)
+├─ tasks.json              open task queue
+├─ captures/<date>.json    today's meeting/voice/dm captures
+├─ newsletters/<date>.md   today's @newsletter draft (so edit mode reads it)
+├─ sentinels/              idempotency flags for scheduler
+├─ claude-code-notes.md    your note: prefix messages
+└─ tip-pointer.txt         hourly tip round-robin index
+```
+
+Everything's flat-file JSON or markdown. Inspect anything via SSH.
+
+---
+
+## What's NOT live yet (coming)
+
+| When | What |
+|------|------|
+| This week | Inbox autonomy - ZOE polls `zoe-zao@agentmail.to` every 30 min, auto-categorizes, files. (Doc 611 Phase 1 + doc 612.) |
+| This week | Audit log - every autonomous action logged to `~/.zao/zoe/audit.log` |
+| Next week | Bonfire pipeline - daily proposed-adds review with Now/Later/Shelve buttons. (Doc 611 Phase 2 + doc 614 ontology.) |
+| Week 3 | `@research --deep`, `@audit`, `@summarize` subagents (budget-capped, Langfuse-traced). (Doc 611 Phase 3.) |
+| Week 3 | Self-improvement loop - ZOE classifies your `note:` corrections, weekly Sunday retro proposes prompt edits. (Doc 611 Phase 4.) |
+| When budget clears | Voice mode via LiveKit + Cartesia. Limitless Pendant ambient capture. |
+
+---
+
+## Anti-patterns - what ZOE WILL NEVER DO
+
+- **Empty replies.** Every reply > 5 chars or blocked + logged. No "·" pings.
+- **"Would you like me to..."** ZOE just does the thing.
+- **Memory state lies.** ZOE never claims a task changed if the JSON didn't change.
+- **Quiet hours.** None - you said "rather get pinged than ignored."
+- **Public posts without you.** ZOE drafts; you ship.
+- **Team broadcasts without you.** `@zaostock` previews to your DM today; team group needs explicit env switch.
+- **Wallet ops, on-chain transactions, money moves.** Hard wall.
+- **File deletes / git pushes / git resets.** disallowedTools blocks them.
 
 ---
 
@@ -120,21 +194,22 @@ What ZOE remembers, where:
 
 **ZOE not replying:**
 ```bash
-ssh zaal@31.97.148.88 "systemctl --user status zoe-bot.service"
-```
-If `inactive (dead)`:
-```bash
-ssh zaal@31.97.148.88 "systemctl --user restart zoe-bot.service"
+ssh zaal@31.97.148.88 "systemctl --user status zoe-bot.service | head -3"
 ```
 
-**Want to see logs:**
+**Want live logs:**
 ```bash
 ssh zaal@31.97.148.88 "journalctl --user -u zoe-bot.service -f"
 ```
 
-**Reset tasks:** DM `/seed` — re-seeds the 8 starter tasks (only if queue is empty; safe to run multiple times).
+**Restart bot (after env change):**
+```bash
+ssh zaal@31.97.148.88 "systemctl --user restart zoe-bot.service"
+```
 
-**Bot says wrong thing:** DM `note: <what was wrong + what should have happened>` — fixes get triaged in next Claude Code session.
+**Reset tasks:** DM `/seed` (only seeds if empty; safe to run repeatedly).
+
+**Bot got something wrong:** DM `note: <what was wrong + what you wanted>`. Fixes get processed in next Claude Code session.
 
 ---
 
@@ -143,17 +218,36 @@ ssh zaal@31.97.148.88 "journalctl --user -u zoe-bot.service -f"
 ```
 @zaoclaw_bot
 
-/start         wake ZOE
-/tasks         show open tasks
-/seed          seed initial tasks
+SLASH:    /agents /tasks /seed /notes /start /help
+HELPERS:  @recall  @research  @newsletter  @zaostock
+SAVE:     note: <feedback>
+TIPS:     stop tips / start tips
+EDIT:     @newsletter edit <addition>
 
-note: <feedback>    save for Claude Code
-free text          concierge reply
-
-5am EST  - morning brief
-9pm EST  - evening reflection
+5am EST  morning brief
+9pm EST  evening reflection
+hourly   userguide tip
 ```
 
 ---
 
-Authored 2026-05-04. Updated when ZOE ships new commands.
+## How to test today (your starter checklist)
+
+Try these in order. Each one tests a different surface.
+
+1. `/start` - confirms ZOE up.
+2. `/agents` - see the helper menu.
+3. `what should I focus on this morning` - free-form concierge.
+4. `@research is Granola free tier good enough` - sourced answer subagent.
+5. `@newsletter today - testing the ZABAL voice on a Tuesday` - daily entry draft.
+6. `@newsletter edit also won a hackathon track this week` - edit mode (requires step 5 first).
+7. `@zaostock test - confirming cross-bot relay works` - watch a SECOND bot identity post in your DM.
+8. `note: this is great, ship more agents` - feedback capture.
+9. `/notes` - confirm the note got captured.
+10. `stop tips` then `start tips` - test the cron-toggle commands.
+
+If any of these feels off, `note: <step N> did <wrong thing>` and Claude fixes it in the next session.
+
+---
+
+Authored 2026-05-05. Updated when ZOE ships new commands.

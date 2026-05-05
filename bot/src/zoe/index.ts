@@ -22,6 +22,7 @@ import { buildMemoryBlocks, ensureZoeHome, pushRecent, ZOE_PATHS } from './memor
 import { startScheduler } from './scheduler';
 import { disableTips, enableTips, tipsEnabled } from './tips';
 import { tryRouteAgent, listAgents } from './agents';
+import { FACTS_PREFIX, appendFact, listFactsCount, readFacts } from './facts';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
@@ -88,7 +89,23 @@ bot.command('seed', async (ctx) => {
 
 bot.command(['agents', 'help'], async (ctx) => {
   if (!(await isAllowed(ctx))) return;
-  await ctx.reply(`Agents available:\n\n${listAgents()}\n\nFree-form text routes to general concierge. Slash commands: /start /tasks /seed /notes /agents.`);
+  await ctx.reply(`Agents available:\n\n${listAgents()}\n\nFree-form text routes to general concierge. Slash commands: /start /tasks /seed /notes /facts /agents.`);
+});
+
+bot.command('facts', async (ctx) => {
+  if (!(await isAllowed(ctx))) return;
+  try {
+    const raw = await readFacts();
+    if (!raw) {
+      await ctx.reply('No facts on file yet. Drop one with "remember: <fact>" or "fyi: <fact>" or "always <fact>". They load into every future ZOE call.');
+      return;
+    }
+    const count = await listFactsCount();
+    await ctx.reply(`${count} fact${count === 1 ? '' : 's'} on file:\n\n${raw.slice(-3500)}`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    await ctx.reply(`(facts read failed - ${msg.slice(0, 200)})`);
+  }
 });
 
 bot.command('notes', async (ctx) => {
@@ -145,6 +162,23 @@ bot.on('message:text', async (ctx) => {
     const reply = agentResult.reply.trim() || `(${agentResult.agentName} agent returned empty)`;
     await ctx.reply(reply.slice(0, 4000));
     console.log(`[zoe/index] agent route - ${agentResult.agentName} - reply ${reply.length}b`);
+    return;
+  }
+
+  // Facts capture - prefix `remember:` / `fact:` / `fyi:` / `actually` / `always` / `never` / `btw:`
+  // Lands in ~/.zao/zoe/facts.md and gets loaded into EVERY future ZOE call as persistent context.
+  // This is what powers "the more you tell me, the better I get" - facts persist across sessions.
+  const factsMatch = FACTS_PREFIX.exec(text);
+  if (factsMatch) {
+    try {
+      const count = await appendFact(factsMatch[2]);
+      await ctx.reply(`Got it. ${count} fact${count === 1 ? '' : 's'} on file. Future replies and drafts will know.`);
+      console.log(`[zoe/index] fact saved (#${count}): ${factsMatch[2].slice(0, 80)}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[zoe/index] fact save failed:', msg);
+      await ctx.reply(`(fact save failed - ${msg.slice(0, 200)})`);
+    }
     return;
   }
 

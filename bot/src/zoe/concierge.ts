@@ -8,6 +8,10 @@
 import { callClaudeCli } from '../hermes/claude-cli';
 import type { ConciergeOptions, ConciergeResult, ZoeContext, TaskOp, ZoeCaptureNote } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
+import { buildFactsBlock } from './facts';
+import { promises as fsAsync } from 'node:fs';
+import { join as pathJoin } from 'node:path';
+import { ZOE_PATHS } from './memory';
 
 const ZOE_VERSION = '0.1.0';
 
@@ -91,9 +95,29 @@ ZOE v${ZOE_VERSION}. Lean. Direct. Match the Year-of-the-ZABAL voice.`;
  * 3. Parse the reply text + extract task_ops/captures JSON block
  * 4. Return structured result
  */
+// Read today's newsletter draft if it exists - lets concierge recognize replies
+// to the newsletter as feedback (e.g. "its always fractal monday").
+async function readTodaysNewsletter(): Promise<string> {
+  const today = new Date().toISOString().slice(0, 10);
+  const path = pathJoin(ZOE_PATHS.home, 'newsletters', `${today}.md`);
+  try {
+    return await fsAsync.readFile(path, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
 export async function runConciergeTurn(opts: ConciergeOptions): Promise<ConciergeResult> {
   const model = opts.model ?? selectModel(opts.message);
-  const systemPrompt = buildSystemPrompt(opts.context);
+  const baseSystemPrompt = buildSystemPrompt(opts.context);
+  const factsBlock = await buildFactsBlock();
+  const todaysNewsletter = await readTodaysNewsletter();
+
+  const newsletterContext = todaysNewsletter
+    ? `\n\n## Today's newsletter draft (in scope - if Zaal replies with a correction, addition, or context, treat it as feedback. Suggest the exact "@newsletter edit <addition>" command rather than ignoring or giving generic philosophical replies)\n\n"""\n${todaysNewsletter.slice(0, 2500)}\n"""\n`
+    : '';
+
+  const systemPrompt = baseSystemPrompt + factsBlock + newsletterContext;
 
   const result = await callClaudeCli({
     model,

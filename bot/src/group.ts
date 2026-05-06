@@ -20,7 +20,7 @@ export async function ensureChatRegistered(args: {
   forum_enabled?: boolean;
 }): Promise<ChatRow> {
   const { data: existing } = await db()
-    .from('stock_bot_chats')
+    .from('bot_chats')
     .select('chat_id, chat_type, title, mode, forum_enabled, post_digests')
     .eq('chat_id', args.chat_id)
     .maybeSingle();
@@ -28,7 +28,7 @@ export async function ensureChatRegistered(args: {
 
   const mode: ChatMode = args.chat_type === 'private' ? 'private' : 'staging';
   const { data } = await db()
-    .from('stock_bot_chats')
+    .from('bot_chats')
     .insert({
       chat_id: args.chat_id,
       chat_type: args.chat_type,
@@ -43,7 +43,7 @@ export async function ensureChatRegistered(args: {
 
 export async function getChatRow(chat_id: number): Promise<ChatRow | null> {
   const { data } = await db()
-    .from('stock_bot_chats')
+    .from('bot_chats')
     .select('chat_id, chat_type, title, mode, forum_enabled, post_digests')
     .eq('chat_id', chat_id)
     .maybeSingle();
@@ -51,16 +51,16 @@ export async function getChatRow(chat_id: number): Promise<ChatRow | null> {
 }
 
 export async function setChatMode(chat_id: number, mode: ChatMode): Promise<void> {
-  await db().from('stock_bot_chats').update({ mode }).eq('chat_id', chat_id);
+  await db().from('bot_chats').update({ mode }).eq('chat_id', chat_id);
 }
 
 export async function setPostDigests(chat_id: number, on: boolean): Promise<void> {
-  await db().from('stock_bot_chats').update({ post_digests: on }).eq('chat_id', chat_id);
+  await db().from('bot_chats').update({ post_digests: on }).eq('chat_id', chat_id);
 }
 
 export async function getDigestChats(): Promise<ChatRow[]> {
   const { data } = await db()
-    .from('stock_bot_chats')
+    .from('bot_chats')
     .select('chat_id, chat_type, title, mode, forum_enabled, post_digests')
     .eq('post_digests', true)
     .eq('mode', 'team');
@@ -69,7 +69,7 @@ export async function getDigestChats(): Promise<ChatRow[]> {
 
 export async function getDevopsChats(): Promise<ChatRow[]> {
   const { data } = await db()
-    .from('stock_bot_chats')
+    .from('bot_chats')
     .select('chat_id, chat_type, title, mode, forum_enabled, post_digests')
     .eq('mode', 'devops');
   return (data as ChatRow[]) ?? [];

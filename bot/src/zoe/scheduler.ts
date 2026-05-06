@@ -21,6 +21,7 @@ import type { Bot } from 'grammy';
 import { generateMorningBrief } from './brief';
 import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
+import { nextTip, tipsEnabled } from './tips';
 
 const SENTINEL_DIR = join(ZOE_PATHS.home, 'sentinels');
 
@@ -92,16 +93,38 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     ),
   );
 
-  // Hourly Devz tip (Phase 4 cutover from python cron).
-  // Skip if devzChatId not configured (so this scaffold is harmless without env).
+  // Hourly userguide tip - rotating reminder so Zaal habituates to interacting via Telegram.
+  // Skips the 09:00 UTC and 01:00 UTC slots so we never overlap morning brief / evening reflect.
+  // Self-disables if Zaal sends "stop tips" (handled in index.ts).
+  tasks.push(
+    cron.schedule(
+      '0 * * * *',
+      async () => {
+        const hour = new Date().getUTCHours();
+        if (hour === 9 || hour === 1) return; // dodge brief + reflect collisions
+        try {
+          if (!(await tipsEnabled())) {
+            return;
+          }
+          const tip = await nextTip();
+          await opts.bot.api.sendMessage(opts.zaalTgId, tip);
+          console.log(`[zoe/scheduler] hourly tip sent (hour=${hour}): ${tip.slice(0, 60)}`);
+        } catch (err) {
+          console.error('[zoe/scheduler] hourly tip failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Phase 4 - hourly Devz tip cron (group target). Stays gated on devzChatId.
   if (opts.devzChatId) {
     tasks.push(
       cron.schedule(
-        '0 * * * *',
+        '15 * * * *',
         async () => {
-          // TODO Phase 4 — generate tip via Claude CLI similar to brief.ts but tip-flavored
-          // For now: noop until Zaal explicitly cuts over from python cron.
-          console.log('[zoe/scheduler] hourly tip cron fired (Phase 4 — implementation pending)');
+          // TODO Phase 4 - generate tip via Claude CLI similar to brief.ts but tip-flavored
+          console.log('[zoe/scheduler] devz tip cron fired (Phase 4 - implementation pending)');
         },
         { timezone: 'UTC' },
       ),

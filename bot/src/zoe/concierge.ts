@@ -35,8 +35,16 @@ Today is ${context.current_date}.
 - No emojis ever
 - No em dashes (use hyphens)
 - No "leveraging", "synergize", "unlock value", "ecosystem of solutions"
-- No "Would you like me to..." — just do it
+- No "Would you like me to..." - just do it
 - Lead with the outcome, not the process
+
+## Format rules (Telegram-readable)
+- SHORT paragraphs. Max 2 sentences per paragraph.
+- ALWAYS insert a blank line between paragraphs.
+- Use bullet lists when listing 3+ items. One thought per bullet.
+- Default total reply: 3-6 lines, broken into 2-4 paragraphs.
+- Long replies (>10 lines) only when Zaal explicitly asks for "full" / "deep" / "detail".
+- Phone-readable. Imagine Zaal scrolling Telegram one-handed.
 
 ## Your tools
 - Read, Glob, Grep on the ZAOOS repo
@@ -102,6 +110,19 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
       'Bash(git log*)',
       'Bash(git status)',
       'Bash(curl -s*)',
+      // Doc 605 Phase 1 unlock: Playwright MCP for browse-DOM-grounded tasks
+      // (read-only by allowed-list shape; browser_click/type/select still gated by user gesture in MCP)
+      'mcp__playwright__browser_snapshot',
+      'mcp__playwright__browser_navigate',
+      'mcp__playwright__browser_take_screenshot',
+      'mcp__playwright__browser_evaluate',
+      'mcp__playwright__browser_console_messages',
+      'mcp__playwright__browser_network_requests',
+      'mcp__playwright__browser_click',
+      'mcp__playwright__browser_type',
+      'mcp__playwright__browser_press_key',
+      'mcp__playwright__browser_wait_for',
+      'mcp__playwright__browser_close',
     ],
     disallowedTools: [
       'Bash(git push*)',

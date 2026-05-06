@@ -217,3 +217,61 @@ export async function buildMyContributions(member: TeamMember): Promise<string> 
   }
   return lines.join('\n');
 }
+
+// /timeline-done <id_prefix_or_title_substring>
+// Marks a timeline entry done. Accepts:
+//  - 8-char UUID prefix (matches first segment)
+//  - Substring of the title (case-insensitive, only if it matches exactly one entry)
+export async function markTimelineDone(query: string, member: TeamMember): Promise<string> {
+  const q = query.trim();
+  if (!q) return 'Usage: /timeline-done <id-prefix or unique title fragment>';
+
+  const s = db();
+  // Try UUID prefix first (8 chars common, but accept anything 4+)
+  const isUuidLike = /^[0-9a-f]{4,}/i.test(q.replace(/-/g, ''));
+
+  let target: { id: string; title: string; status: string } | null = null;
+
+  if (isUuidLike && q.length >= 4) {
+    const { data } = await s
+      .from('timeline')
+      .select('id, title, status')
+      .ilike('id', `${q}%`)
+      .limit(2);
+    if (data && data.length === 1) target = data[0] as { id: string; title: string; status: string };
+    if (data && data.length > 1) {
+      return `Multiple timeline entries match "${q}". Try a longer prefix.`;
+    }
+  }
+
+  if (!target) {
+    const { data } = await s
+      .from('timeline')
+      .select('id, title, status')
+      .ilike('title', `%${q}%`)
+      .limit(3);
+    if (!data || data.length === 0) {
+      return `No timeline entry matches "${q}".`;
+    }
+    if (data.length > 1) {
+      return `Multiple timeline entries match "${q}":\n${data.map((d) => `  - ${d.title}`).join('\n')}\nUse a more specific fragment or pass an id prefix.`;
+    }
+    target = data[0] as { id: string; title: string; status: string };
+  }
+
+  if (target!.status === 'done') {
+    return `"${target!.title}" is already marked done.`;
+  }
+
+  const { error } = await s
+    .from('timeline')
+    .update({
+      status: 'done',
+      notes: `[done by ${member.name} via /timeline-done ${new Date().toISOString().slice(0, 10)}]`,
+    })
+    .eq('id', target!.id);
+
+  if (error) return `Could not update: ${error.message}`;
+
+  return `Marked "${target!.title}" done.`;
+}

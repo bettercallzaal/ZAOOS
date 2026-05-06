@@ -8,7 +8,7 @@ import {
   unlinkUsername,
   type TeamMember,
 } from './auth';
-import { buildStatus, buildMyTodos, buildMyContributions, buildAllOpenTodos, buildTeamRoster } from './status';
+import { buildStatus, buildMyTodos, buildMyContributions, buildAllOpenTodos, buildTeamRoster, markTimelineDone } from './status';
 import { addGemba, addIdea, addNote } from './capture';
 import { addZsFb } from './zsfb';
 import { executeFromText } from './actions';
@@ -202,6 +202,17 @@ bot.command('mycontributions', async (ctx) => {
   const member = await requireMember(ctx);
   if (!member) return;
   await ctx.reply(await buildMyContributions(member));
+});
+
+// /timeline-done <id-prefix or unique title fragment> - close out a stuck
+// timeline entry without leaving Telegram. Was a 60-pending entry problem
+// because the dashboard had no easy "mark done" UX. Now anyone in the team
+// can clear them from chat.
+bot.command('timeline_done', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  const arg = (ctx.match ?? '').trim();
+  await ctx.reply(await markTimelineDone(arg, member));
 });
 
 bot.command('fix', async (ctx) => {

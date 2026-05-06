@@ -135,14 +135,14 @@ Scope = the subsystem touched (`zoe`, `hermes`, `api`, `music`, `agents`, `publi
 
 ## Specialized Agent Personas
 
-System-prompt files for spawned subagents (NOT project-level AGENTS.md spec - same filename, different role):
+System-prompt files for spawned subagents. Renamed `AGENTS.md` -> `PERSONA.md` (2026-05-06) so coding tools that walk subtrees don't mistake them for project-level config.
 
 | Path | Role |
 |------|------|
-| [`agents/founding-engineer/AGENTS.md`](./agents/founding-engineer/AGENTS.md) | Lead engineering decisions, architecture |
-| [`agents/ceo/AGENTS.md`](./agents/ceo/AGENTS.md) | Strategy + product cuts |
-| [`agents/security-auditor/AGENTS.md`](./agents/security-auditor/AGENTS.md) | Security audits, threat modeling |
-| [`agents/researcher/AGENTS.md`](./agents/researcher/AGENTS.md) | Research doc generation per `/zao-research` skill |
+| [`agents/founding-engineer/PERSONA.md`](./agents/founding-engineer/PERSONA.md) | Lead engineering decisions, architecture |
+| [`agents/ceo/PERSONA.md`](./agents/ceo/PERSONA.md) | Strategy + product cuts |
+| [`agents/security-auditor/PERSONA.md`](./agents/security-auditor/PERSONA.md) | Security audits, threat modeling |
+| [`agents/researcher/PERSONA.md`](./agents/researcher/PERSONA.md) | Research doc generation per `/zao-research` skill |
 
 ## Bot Subtree (`bot/`)
 

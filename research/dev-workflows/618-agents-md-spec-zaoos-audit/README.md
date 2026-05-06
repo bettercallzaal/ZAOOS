@@ -19,7 +19,7 @@ tier: STANDARD
 | Add per-package AGENTS.md mirror where CLAUDE.md exists | YES, future-low-priority. We have `packages/{config,agents,publish,db}/CLAUDE.md` but no AGENTS.md siblings. If we ever want Cursor/Codex friendly contributions per-package, mirror them. |
 | Cleanup: dedupe Boundaries section between the two files | YES, this session. Keep mechanical "ask first / never do" in AGENTS.md, keep workflow-orchestration in CLAUDE.md. |
 | Add cross-link from root AGENTS.md to `/agents/<role>/AGENTS.md` persona files | YES, this session. Currently not discoverable. |
-| Rename `/agents/<role>/AGENTS.md` (persona files) to avoid spec collision | NO this session. They serve a different purpose (system prompts for spawned subagents) but technically use the same filename. Document the divergence rather than rename. |
+| Rename `/agents/<role>/AGENTS.md` (persona files) to avoid spec collision | DONE 2026-05-06. Renamed to `PERSONA.md` for the 4 roles (ceo, founding-engineer, researcher, security-auditor). Root AGENTS.md links updated. |
 | Adopt the AGENTS.md badge / discoverable presence | NO. Repo is private. Not relevant to the 60k public count. |
 
 ## What AGENTS.md actually is
@@ -110,10 +110,14 @@ These are 30 min total. All on root AGENTS.md.
 4. Add `## Boundaries are mirrored in CLAUDE.md` note in CLAUDE.md - source of truth = AGENTS.md.
 5. Add commit message example block in AGENTS.md (`feat(zoe): X` format).
 
+## Done in follow-up commit (same PR)
+
+- Renamed `agents/<role>/AGENTS.md` -> `PERSONA.md` (4 files) to remove spec collision.
+- Added `bot/AGENTS.md` covering Hermes pattern, memory blocks, voice/brand split, secrets, key files. Closes the orientation gap for any agent landing in the `bot/` subtree.
+
 ## Future cleanup (not this session)
 
-- Mirror per-package CLAUDE.md → AGENTS.md so non-Claude agents work in `packages/*` too.
-- Consider renaming `/agents/<role>/AGENTS.md` to `PERSONA.md` to avoid spec collision when crawling tools (low risk today, real risk if a tool starts walking subtrees).
+- Mirror per-package CLAUDE.md -> AGENTS.md for `packages/{config,agents,publish,db}` so non-Claude agents work in those subtrees too. Lower priority than `bot/` since most live work is in `bot/`.
 - Add `.cursorrules` symlink to AGENTS.md for Cursor users (most modern Cursor versions read AGENTS.md natively but legacy users still expect `.cursorrules`).
 
 ## What this confirms about the agentic system

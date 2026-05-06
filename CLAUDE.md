@@ -61,6 +61,8 @@ Env vars: see `.env.example`. App wallet: `npx tsx scripts/generate-wallet.ts`.
 
 ## Boundaries
 
+> Mirrors [AGENTS.md](./AGENTS.md) Boundaries. **AGENTS.md is the source of truth** - if these drift, update AGENTS.md first then sync here.
+
 **Always do:**
 - Validate inputs with Zod, check session, return `NextResponse.json`
 - Use `@/` import alias

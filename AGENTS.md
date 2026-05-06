@@ -67,9 +67,31 @@ contracts/           # Solidity (staking, bounty board)
 
 - **Branch:** `ws/<description>-MMDD-HHMM` from latest `main`
 - **PRs:** Always to `main`. Never push directly.
-- **Commits:** Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
+- **Commits:** Conventional commits with optional scope.
+
+```
+feat(zoe): add facts memory layer
+fix(api): zod parse on /api/cast/publish
+docs: research doc 618 agents.md audit
+chore(deps): bump grammy 1.31 -> 1.32
+```
+
+Scope = the subsystem touched (`zoe`, `hermes`, `api`, `music`, `agents`, `publish`). Skip scope for repo-wide changes.
+
+## Security
+
+- **Never expose server-only env vars** (`SUPABASE_SERVICE_ROLE_KEY`, `NEYNAR_API_KEY`, `SESSION_SECRET`, `APP_SIGNER_PRIVATE_KEY`) to the browser or in API responses.
+- **Never use `dangerouslySetInnerHTML`** anywhere.
+- **Never ask for or store user wallet private keys.** Generate app-scoped wallets via `npx tsx scripts/generate-wallet.ts`.
+- **All user input** flows through Zod `safeParse` at the route boundary.
+- **Supabase RLS** on every table. Service role = server only.
+- **XMTP keys** are app-specific burner keys, never personal.
+- **Secrets in agent pipelines** follow `.claude/rules/secret-hygiene.md` (5 guards: stub keys on disk, pre-commit diff scan, post-edit HEAD scan, pre-complete repo scan, prompt-level redaction).
+- See [SECURITY.md](./SECURITY.md) for the full policy.
 
 ## Boundaries
+
+> **Source of truth.** [CLAUDE.md](./CLAUDE.md) mirrors this section for Claude Code orchestration; if they drift, this file wins.
 
 ### Always Do
 
@@ -110,3 +132,32 @@ contracts/           # Solidity (staking, bounty board)
 | `src/lib/agents/runner.ts` | Shared agent trading logic (VAULT/BANKER/DEALER) |
 | `src/providers/audio/PlayerProvider.tsx` | Player state, MediaSession, Wake Lock |
 | `SECURITY.md` | Full security policy |
+
+## Specialized Agent Personas
+
+System-prompt files for spawned subagents (NOT project-level AGENTS.md spec - same filename, different role):
+
+| Path | Role |
+|------|------|
+| [`agents/founding-engineer/AGENTS.md`](./agents/founding-engineer/AGENTS.md) | Lead engineering decisions, architecture |
+| [`agents/ceo/AGENTS.md`](./agents/ceo/AGENTS.md) | Strategy + product cuts |
+| [`agents/security-auditor/AGENTS.md`](./agents/security-auditor/AGENTS.md) | Security audits, threat modeling |
+| [`agents/researcher/AGENTS.md`](./agents/researcher/AGENTS.md) | Research doc generation per `/zao-research` skill |
+
+## Bot Subtree (`bot/`)
+
+The `bot/` tree houses Telegram bots running on VPS 1 (Hostinger KVM 2). Hermes canonical pattern: each bot is a grammy long-poll process that delegates LLM work to Claude CLI subprocesses (uses Max plan, $0 marginal cost).
+
+| Bot | Source | Purpose |
+|-----|--------|---------|
+| ZOE (`@zaoclaw_bot`) | `bot/src/zoe/` | Single concierge: tasks, captures, brief/reflect, recall, newsletter, social drafts |
+| Hermes (`@zoe_hermes_bot`) | `bot/src/hermes/` | Autonomous fix-PR pipeline (coder + critic + auto-PR) |
+| ZAO Devz (`@zaodevz_bot`) | `bot/src/devz/` | Group dispatch + hourly learning tip cron |
+| ZAOstock (`@ZAOstockTeamBot`) | `bot/` (root, separate) | Festival team coordination - graduates with ZAOstock spinout |
+
+Conventions inside `bot/`:
+- Letta-style memory blocks at `~/.zao/zoe/` (persona, human, recent, tasks, captures, facts, newsletters)
+- Brand voice rules at `bot/src/zoe/brand.md` (Year of the ZABAL: no emojis, no em dashes, fact-only)
+- Persona at `bot/src/zoe/persona.md` (deployed to VPS at `~/.zao/zoe/persona.md`)
+- Hermes pattern documented in [research doc 613](./research/agents/613-hermes-canonical-agent-framework/)
+- No new bots without a numbered research doc + Zaal sign-off (CLAUDE.md "Primary Surfaces")

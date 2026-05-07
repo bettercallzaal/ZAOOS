@@ -1,0 +1,429 @@
+﻿From 6953c90f836655db9050f232decd194f85f25978 Mon Sep 17 00:00:00 2001
+From: Zaal <zfp7547@rit.edu>
+Date: Sun, 6 Jul 2025 20:54:46 -0400
+Subject: [PATCH 1/2] Fix AI tagging service and link API issues
+
+---
+ .env                               |   4 +-
+ src/app/api/generate-tags/route.ts | 153 +++++++++++++++++++++++++++++
+ src/app/api/links/route.ts         |   5 +
+ src/app/test-link-form/page.tsx    |  40 ++++++++
+ src/services/ai-tagging-service.ts | 111 +++------------------
+ 5 files changed, 213 insertions(+), 100 deletions(-)
+ create mode 100644 src/app/api/generate-tags/route.ts
+ create mode 100644 src/app/test-link-form/page.tsx
+
+diff --git a/.env b/.env
+index a17a952..d43d54d 100644
+--- a/.env
++++ b/.env
+@@ -7,5 +7,5 @@ NEXT_PUBLIC_OPTIMISM_RPC=https://opt-mainnet.g.alchemy.com/v2/LkItjJ7_5DDMRV2-xZ
+ NEXT_PUBLIC_BASE_RPC=https://base-mainnet.g.alchemy.com/v2/LkItjJ7_5DDMRV2-xZuYIEdqYxBuC-K-
+ 
+ # OpenAI API key for AI auto-tagging feature
+-OPENAI_API_KEY=sk-your-openai-api-key
+-NEXT_PUBLIC_PRIVY_APP_ID=cmccalkjy005njm0mtv7ilk5i
+\ No newline at end of file
++NEXT_PUBLIC_PRIVY_APP_ID=cmccalkjy005njm0mtv7ilk5i
++OPENAI_API_KEY=<REDACTED-OPENAI-KEY-rotated-2026-05-07>
+diff --git a/src/app/api/generate-tags/route.ts b/src/app/api/generate-tags/route.ts
+new file mode 100644
+index 0000000..979b462
+--- /dev/null
++++ b/src/app/api/generate-tags/route.ts
+@@ -0,0 +1,153 @@
++import { NextResponse } from 'next/server';
++import { OpenAI } from 'openai';
++import { TaggingRequest, TaggingResponse } from '@/services/ai-tagging-service';
++
++// Initialize OpenAI client
++const openai = new OpenAI({
++  apiKey: process.env.OPENAI_API_KEY,
++});
++
++/**
++ * Create a prompt for the AI to generate tags
++ */
++function createTaggingPrompt(request: TaggingRequest): string {
++  const { title, description, url, existingTags } = request;
++  
++  let prompt = `Generate relevant tags for the following link:\n\nTitle: ${title}\n`;
++  
++  if (description) {
++    prompt += `Description: ${description}\n`;
++  }
++  
++  if (url) {
++    prompt += `URL: ${url}\n`;
++  }
++  
++  if (existingTags && existingTags.length > 0) {
++    prompt += `Existing tags: ${existingTags.join(', ')}\n`;
++  }
++  
++  prompt += `\nRespond with a JSON object containing:
++1. An array of suggested tags (5-10 tags)
++2. A confidence score between 0 and 1
++3. An array of suggested categories
++
++Example response format:
++{
++  "tags": ["tag1", "tag2", "tag3"],
++  "confidence": 0.85,
++  "categories": ["category1", "category2"]
++}`;
++  
++  return prompt;
++}
++
++/**
++ * Generate tags locally without using the OpenAI API
++ * This is a fallback method when the API is not available or fails
++ */
++function generateTagsLocally(request: TaggingRequest): TaggingResponse {
++  const { title, description } = request;
++  const combinedText = `${title} ${description || ''}`.toLowerCase();
++  
++  // Define some common keywords and their associated tags
++  const keywordToTags: Record<string, string[]> = {
++    'discord': ['social', 'community', 'chat'],
++    'twitter': ['social', 'news', 'updates'],
++    'x.com': ['social', 'news', 'updates'],
++    'chart': ['data', 'analytics', 'visualization'],
++    'calendar': ['events', 'schedule', 'planning'],
++    'website': ['official', 'information'],
++    'dao': ['governance', 'community', 'blockchain'],
++    'zao': ['official', 'zao'],
++    'music': ['entertainment', 'audio'],
++    'event': ['schedule', 'community'],
++    'org': ['organization', 'structure'],
++    'google': ['tools', 'productivity'],
++  };
++  
++  // Extract tags based on keywords in the title and description
++  const suggestedTags = new Set<string>();
++  
++  Object.entries(keywordToTags).forEach(([keyword, tags]) => {
++    if (combinedText.includes(keyword)) {
++      tags.forEach(tag => suggestedTags.add(tag));
++    }
++  });
++  
++  return {
++    suggestedTags: Array.from(suggestedTags),
++    confidence: 0.6,
++    categories: []
++  };
++}
++
++export async function POST(request: Request) {
++  try {
++    // Parse the request body
++    const requestData: TaggingRequest = await request.json();
++    
++    if (!requestData.title) {
++      return NextResponse.json(
++        { error: 'Title is required' },
++        { status: 400 }
++      );
++    }
++    
++    // Check if OpenAI API key is available
++    if (!process.env.OPENAI_API_KEY) {
++      console.warn('OpenAI API key not found, using local tag generation');
++      const localResponse = generateTagsLocally(requestData);
++      return NextResponse.json(localResponse);
++    }
++    
++    try {
++      // Create a prompt for the AI to generate tags
++      const prompt = createTaggingPrompt(requestData);
++      
++      // Call OpenAI API to generate tags
++      const response = await openai.chat.completions.create({
++        model: "gpt-3.5-turbo",
++        messages: [
++          {
++            role: "system",
++            content: "You are a helpful assistant that generates relevant tags for web links. Respond with JSON only."
++          },
++          {
++            role: "user",
++            content: prompt
++          }
++        ],
++        temperature: 0.3,
++        response_format: { type: "json_object" }
++      });
++
++      // Parse the response
++      const content = response.choices[0].message.content;
++      if (!content) {
++        throw new Error('Empty response from OpenAI API');
++      }
++
++      const parsedResponse = JSON.parse(content);
++      
++      const taggingResponse: TaggingResponse = {
++        suggestedTags: parsedResponse.tags || [],
++        confidence: parsedResponse.confidence || 0.7,
++        categories: parsedResponse.categories || []
++      };
++      
++      return NextResponse.json(taggingResponse);
++    } catch (error) {
++      console.error('Error calling OpenAI API:', error);
++      // Fallback to local tag generation if API fails
++      const localResponse = generateTagsLocally(requestData);
++      return NextResponse.json(localResponse);
++    }
++  } catch (error) {
++    console.error('Error processing tag generation request:', error);
++    return NextResponse.json(
++      { error: 'Failed to process request' },
++      { status: 500 }
++    );
++  }
++}
+diff --git a/src/app/api/links/route.ts b/src/app/api/links/route.ts
+index ab4e891..077c07c 100644
+--- a/src/app/api/links/route.ts
++++ b/src/app/api/links/route.ts
+@@ -27,6 +27,11 @@ async function loadLinksData(dataset = 'default'): Promise<Data> {
+     linksData = JSON.parse(fileContent);
+   }
+   
++  // Ensure links array exists
++  if (!linksData.links) {
++    linksData.links = [];
++  }
++  
+   return linksData;
+ }
+ 
+diff --git a/src/app/test-link-form/page.tsx b/src/app/test-link-form/page.tsx
+new file mode 100644
+index 0000000..afbe2e3
+--- /dev/null
++++ b/src/app/test-link-form/page.tsx
+@@ -0,0 +1,40 @@
++import React from 'react';
++import AddLinkForm from '@/components/links/add-link-form';
++import { LinkService } from '@/services/link-service';
++import { toast } from 'sonner';
++import { useRouter } from 'next/navigation';
++
++export default function TestLinkFormPage() {
++  const handleAddLink = async (formData: any) => {
++    try {
++      console.log('Submitting link data:', formData);
++      const result = await LinkService.addLink(formData);
++      console.log('Link added successfully:', result);
++      toast.success('Link added successfully!');
++      return true;
++    } catch (error) {
++      console.error('Error adding link:', error);
++      toast.error(`Failed to add link: ${error instanceof Error ? error.message : 'Unknown error'}`);
++      return false;
++    }
++  };
++
++  return (
++    <div className="container mx-auto p-4">
++      <h1 className="text-2xl font-bold mb-6">Test Link Form</h1>
++      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
++        <AddLinkForm onSubmit={handleAddLink} />
++      </div>
++      
++      <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
++        <h2 className="text-xl font-semibold mb-4">Debug Information</h2>
++        <p className="mb-2">Check the browser console for detailed logs.</p>
++        <p className="mb-2">API Endpoints:</p>
++        <ul className="list-disc pl-6">
++          <li>POST /api/links - For adding new links</li>
++          <li>POST /api/generate-tags - For AI tag suggestions</li>
++        </ul>
++      </div>
++    </div>
++  );
++}
+diff --git a/src/services/ai-tagging-service.ts b/src/services/ai-tagging-service.ts
+index 0efbecd..56904b3 100644
+--- a/src/services/ai-tagging-service.ts
++++ b/src/services/ai-tagging-service.ts
+@@ -5,8 +5,6 @@
+  * It analyzes link content and suggests relevant tags based on the title, description, and URL.
+  */
+ 
+-import { OpenAI } from 'openai';
+-
+ // Define the response structure from the AI tagging service
+ export interface TaggingResponse {
+   suggestedTags: string[];
+@@ -23,74 +21,26 @@ export interface TaggingRequest {
+ }
+ 
+ export class AITaggingService {
+-  private openai: OpenAI | null = null;
+-  private apiKey: string | null = null;
+-
+-  constructor(apiKey?: string) {
+-    if (apiKey) {
+-      this.initialize(apiKey);
+-    }
+-  }
+-
+-  /**
+-   * Initialize the OpenAI client with an API key
+-   */
+-  public initialize(apiKey: string): void {
+-    this.apiKey = apiKey;
+-    this.openai = new OpenAI({
+-      apiKey: this.apiKey,
+-    });
+-  }
+-
+-  /**
+-   * Check if the service is initialized with an API key
+-   */
+-  public isInitialized(): boolean {
+-    return !!this.openai;
+-  }
+-
+   /**
+    * Generate tags for a link based on its content
+    */
+   public async generateTags(request: TaggingRequest): Promise<TaggingResponse> {
+-    if (!this.openai) {
+-      throw new Error('AI Tagging Service is not initialized. Please provide an OpenAI API key.');
+-    }
+-
+     try {
+-      // Create a prompt for the AI to generate tags
+-      const prompt = this.createTaggingPrompt(request);
+-      
+-      // Call OpenAI API to generate tags
+-      const response = await this.openai.chat.completions.create({
+-        model: "gpt-3.5-turbo",
+-        messages: [
+-          {
+-            role: "system",
+-            content: "You are a helpful assistant that generates relevant tags for web links. Respond with JSON only."
+-          },
+-          {
+-            role: "user",
+-            content: prompt
+-          }
+-        ],
+-        temperature: 0.3,
+-        response_format: { type: "json_object" }
++      // Use API endpoint instead of direct OpenAI call
++      const response = await fetch('/api/generate-tags', {
++        method: 'POST',
++        headers: {
++          'Content-Type': 'application/json',
++        },
++        body: JSON.stringify(request),
+       });
+-
+-      // Parse the response
+-      const content = response.choices[0].message.content;
+-      if (!content) {
+-        throw new Error('Empty response from OpenAI API');
++      
++      if (!response.ok) {
++        throw new Error(`Failed to generate tags: ${response.status}`);
+       }
+-
+-      const parsedResponse = JSON.parse(content);
+       
+-      return {
+-        suggestedTags: parsedResponse.tags || [],
+-        confidence: parsedResponse.confidence || 0.7,
+-        categories: parsedResponse.categories || []
+-      };
++      const data = await response.json();
++      return data;
+     } catch (error) {
+       console.error('Error generating tags:', error);
+       
+@@ -99,41 +49,6 @@ export class AITaggingService {
+     }
+   }
+ 
+-  /**
+-   * Create a prompt for the AI to generate tags
+-   */
+-  private createTaggingPrompt(request: TaggingRequest): string {
+-    const { title, description, url, existingTags } = request;
+-    
+-    let prompt = `Generate relevant tags for the following link:\n\nTitle: ${title}\n`;
+-    
+-    if (description) {
+-      prompt += `Description: ${description}\n`;
+-    }
+-    
+-    if (url) {
+-      prompt += `URL: ${url}\n`;
+-    }
+-    
+-    if (existingTags && existingTags.length > 0) {
+-      prompt += `Existing tags: ${existingTags.join(', ')}\n`;
+-    }
+-    
+-    prompt += `\nRespond with a JSON object containing:
+-1. An array of suggested tags (5-10 tags)
+-2. A confidence score between 0 and 1
+-3. An array of suggested categories
+-
+-Example response format:
+-{
+-  "tags": ["tag1", "tag2", "tag3"],
+-  "confidence": 0.85,
+-  "categories": ["category1", "category2"]
+-}`;
+-    
+-    return prompt;
+-  }
+-
+   /**
+    * Generate tags locally without using the OpenAI API
+    * This is a fallback method when the API is not available or fails
+@@ -176,4 +91,4 @@ Example response format:
+ }
+ 
+ // Create a singleton instance
+-export const aiTaggingService = new AITaggingService(process.env.OPENAI_API_KEY);
++export const aiTaggingService = new AITaggingService();
+-- 
+2.40.1.windows.1
+
+
+From 23c45e92a617d34e82e33390e3ebb7ad15d787c9 Mon Sep 17 00:00:00 2001
+From: Zaal <zfp7547@rit.edu>
+Date: Sun, 6 Jul 2025 20:59:09 -0400
+Subject: [PATCH 2/2] Fix test-link-form page component
+
+---
+ src/app/test-link-form/page.tsx | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/app/test-link-form/page.tsx b/src/app/test-link-form/page.tsx
+index afbe2e3..8d22fa6 100644
+--- a/src/app/test-link-form/page.tsx
++++ b/src/app/test-link-form/page.tsx
+@@ -1,8 +1,9 @@
++'use client';
++
+ import React from 'react';
+-import AddLinkForm from '@/components/links/add-link-form';
++import { AddLinkForm } from '@/components/links/add-link-form';
+ import { LinkService } from '@/services/link-service';
+ import { toast } from 'sonner';
+-import { useRouter } from 'next/navigation';
+ 
+ export default function TestLinkFormPage() {
+   const handleAddLink = async (formData: any) => {
+-- 
+2.40.1.windows.1
+

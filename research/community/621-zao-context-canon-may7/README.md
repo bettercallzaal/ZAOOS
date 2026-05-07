@@ -200,6 +200,83 @@ These are real gaps. Don't ask them again from cold — they're parked here for 
 14. Education (university, degree).
 15. Personal context: family / health relevant to bio (only as Zaal wants to share).
 
+## Brand + legal architecture (added 2026-05-07 late session)
+
+**Two-group model (locked):**
+
+```
+BetterCallZaal (BCZ) = ZABAL = "everything Zaal is working on"
+                                |
+                                +-- BCZ Strategies LLC (legal entity, consulting hub)
+                                +-- ZABAL Projects (Zaal solo): Empire Builder, Bonfire integration, POIDH, BCZ YapZ
+                                +-- The ZAO (impact network entity, NO legal entity yet)
+                                          |
+                                          +-- ZAO Projects (7 + mindmap additions below)
+                                          +-- ZAO Festivals (needs legal entity)
+                                          +-- WaveWarZ (becoming WaveWarZ LabZ LLC in Texas)
+```
+
+**Legal entity status (May 2026):**
+
+| Entity | Status |
+|---|---|
+| BetterCallZaal Strategies LLC | LIVE legal entity. Where Zaal consults from. The legal hub. |
+| The ZAO | NO legal entity. DUNA was evaluated and didn't fit. No treasury. Waiting for a framework that maps the impact-network shape (likely Hats Protocol-aligned). |
+| WaveWarZ | Forming "soon" as WaveWarZ LabZ LLC in Texas. |
+| ZAO Festivals | Needs legal entity. Open: 501(c)(3)? LLC? Fiscal sponsorship via Fractured Atlas (NMC, doc on file)? |
+| Everything else | Still forming. Per-project. |
+
+**Branding rules:**
+- "BetterCallZaal" / "BCZ" / "ZABAL" = umbrella for everything Zaal does. ZABAL is both the ERC20 token AND the brand wrapper.
+- "The ZAO" = the impact network organization. One thing under BCZ umbrella, but distinct.
+- Outside-facing copy should make the 2-tier visible: "Zaal builds across BCZ (his founder track) and The ZAO (the impact network he founded)."
+
+**The ZAO = impact network (Ehrlichman framework, doc 622):**
+- Modeled on David Ehrlichman's "Impact Networks" book (2021).
+- Ehrlichman is co-founder of Hats Protocol (with Spencer Graham + Nick Naraghi). Confirmed via doc 622 research.
+- 5 principles: trust not control, humility not brand, node not hub, mission not org, generous collaboration.
+- 5 cyclical stages: clarify purpose, convene right people, cultivate trust, coordinate actions, collaborate generously.
+- ZAO scored 2.4/5 on impact-network readiness today (doc 622). Has DNA, lacks structural maturity (federation, charter, formal trust infra).
+- 12-week action sprint mapped in doc 622.
+
+## Mindmap projects added (2026-05-07 whiteboard)
+
+Beyond the 7 ZAO Projects + 4 ZABAL Projects, Zaal's whiteboard mindmap shows additional surfaces:
+
+**Inside The ZAO orbit:**
+- **WaveWarZ** (already known)
+- **ZAO Fractals** (already known) — sub-fractals: Eden Fractal, Bad Fractal, Fractal Hours, OP Fractal
+- **ZAO Festivals** (already known) — sub-events: ZAO-Palooza, ZAO-Chella, ZAO-Stock
+- **The ZAO Newsletter** (= ZABAL Newsletter) — sub-newsletters: Mindful Moments (with Iain), ZABAL Recaps, Zaal Random Research
+- **ZAO Cards** — sub-products: ZAO-Palooza Cards, WaveWarZ Cards
+- **LTAW3** — sub-seasons: Spaces Season 1, Livestream Season 2-3, Season 4 Revamp (with Maru). Acronym TBD.
+- **ZAO Calendar** — TBD (internal tool? public product?)
+- **Student $LoanZ** — TBD
+- **Midi-ZAO-NZ** — TBD (music + initials?)
+
+**Outward arrows from The ZAO (separate orbits):**
+- **thyrev** = Thy Revolution (Zaal's band, separate from ZAO)
+- **prizem** — separate orbit, content TBD
+- **Zabal** = ZABAL token/brand
+
+**External / sibling brand:**
+- **CoC Concertz** = COC Concertz (graduated, ally for streaming)
+
+## Article goal (locked 2026-05-07)
+
+Build toward a public-facing article explaining the BCZ / ZABAL / The ZAO architecture so outside readers understand "everything Zaal is doing." Format TBD (whitepaper, Substack, ZAO website explainer page). Flagged as a deliverable.
+
+## Open questions added by this turn
+
+- LTAW3 acronym + season relationship + who is Maru
+- prizem (what is it, why outward arrow)
+- Midi-ZAO-NZ (real project? music? "NZ" = New Zealand or initials?)
+- ZAO Cards (NFT collectibles? playing cards?)
+- Student $LoanZ (joke / real / punny ZAO Card?)
+- Mindful Moments — who is Iain, last name + handle
+- Eden / Bad / Fractal Hours / OP Fractal — ZAO Fractals is the ZAO-hosted Monday meeting; the others are external/peer fractals?
+- Public-explainer article format + publishing surface
+
 ## Codebase touchpoints
 
 - `bot/src/zoe/recall.ts` (live Bonfire SDK call, on VPS at `31.97.148.88`)

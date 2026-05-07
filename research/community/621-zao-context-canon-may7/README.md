@@ -266,6 +266,29 @@ Beyond the 7 ZAO Projects + 4 ZABAL Projects, Zaal's whiteboard mindmap shows ad
 
 Build toward a public-facing article explaining the BCZ / ZABAL / The ZAO architecture so outside readers understand "everything Zaal is doing." Format TBD (whitepaper, Substack, ZAO website explainer page). Flagged as a deliverable.
 
+## Live ecosystem artifact: nexus.html
+
+Parallel BCZ session 2026-05-07 shipped [`bettercallzaal.com/nexus.html`](https://bettercallzaal.com/nexus.html) - the canonical human-facing ecosystem directory. 14 brand sections (The ZAO, ZAO OS, ZAO Festivals, ZAO Stock, COC Concertz, FISHBOWLZ, WaveWarZ, SongJam/$SANG, BetterCallZaal, BCZ YapZ, Let's Talk About Ethereum, ZOE, $ZABAL, Artists/sub-brands), sticky TOC, 648 lines.
+
+This doc (621) is the structured/internal architecture; nexus.html is the human-facing render. Cross-reference, don't duplicate. When drafting `bonfire-corpus/org/architecture.md` or the public-explainer article, reuse nexus.html as the source of truth for handles + URLs.
+
+Pending: ~30 URLs in nexus.html need live 200 verification. Likely failures: bczyapz paths, Telegram bot link, farcaster.xyz channel URL, paragraph.com handle, wavewarzapp.vercel.app, ZAO OS subdomains, Manifold long URL, x.com handle drift, claude/chat.zaoos.com (auth-gated).
+
+## Legal entity address (canonical, BCZ Strategies LLC)
+
+```
+BetterCallZaal Strategies LLC
+131 Continental Drive, Suite 305
+Newark, New Castle County, Delaware 19713
+United States
+```
+
+This is the registered-agent address used in BCZ legal pages (terms, privacy, refund) live at bettercallzaal.com. ZAO has NO legal entity yet (per brand+legal architecture above). When ZAO needs to name an entity in a doc, BCZ Strategies LLC may stand in temporarily as Zaal's umbrella, or the doc holds until the ZAO entity forms.
+
+**On-chain ZABAL canon:**
+- $ZABAL token (Base ERC-20): `0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07`
+- Empire V3 address: `0xe0faa499d6711870211505bd9ae2105206af1462`
+
 ## Open questions added by this turn
 
 - LTAW3 acronym + season relationship + who is Maru

@@ -15,6 +15,10 @@ tier: STANDARD
 
 > **Architecture confirmed 2026-05-09 (mid-session correction):** Direction is REVERSED from initial draft. Empire Builder pulls FROM BCZ (not BCZ pushes TO Empire Builder). Mechanism = **API-sourced Leaderboard** via `POST /api/leaderboards/apiLeaderboards` with `apiEndpoint` pointing to a public BCZ JSON URL returning `[{address, score}]`. Empire Builder refreshes the leaderboard, applies ZABAL boosters, distributes. BCZ does not need an Empire Builder API key. Zaal hands Empire Builder team the BCZ URL and they configure the leaderboard from their side. SHIPPED 2026-05-09: `bettercallzaal.com/poidh.html` (UI) + `bettercallzaal.com/poidh-leaderboard.json` (feed). "Haatz" clarified = free Neynar API for Farcaster wallet -> handle resolution, not Hats Protocol.
 
+> **2026-05-09 ownership correction:** $ZABAL Empire is NOT owned by Adam. Co-creators are **yerbearserker** (Jordan Oram, Empire Builder co-founder) + **Adrian** (Farcaster handle "divifly" per Zaal - did not resolve via warpcast username lookup; verify FID with yerbearserker). Adrian is the lead engineer behind Empire Builder. Earlier reference to "Adam / SongJam" in this doc was incorrect for ZABAL Empire ownership context (Adam owns SANG; he is a stakeholder in ZABAL but not the empire's guardian wallet here).
+
+> **"Empire Builder v3" status:** Zaal references "v3" but the public GitBook does NOT document a v3 vs v1/v2. Likely sources of the v3 label: (a) yerbearserker's internal version naming for current production build, (b) confusion with POIDH v3 (which IS publicly tagged v3), (c) an upcoming roadmap milestone not yet in docs. Treat the current `empirebuilder.world` production as the integration target unless yerbearserker confirms different endpoints.
+
 ## Architecture (Confirmed - REVERSE of initial draft)
 
 ```
@@ -428,6 +432,97 @@ Verified URLs 2026-05-09: empirebuilder.world HTTP 200, empire-builder.gitbook.i
 
 ---
 
+## Part 7 - All Five Leaderboard Types (Confirmed 2026-05-09)
+
+The `Add New Leaderboard` modal has 5 type options; only API-Sourced applies for our POIDH integration. Listed for reference:
+
+| Type | Endpoint | Use case |
+|------|----------|----------|
+| **Token Holders** | `POST /api/leaderboards/tokenHoldersLeaderboards` | Rank by ERC-20 balance of any token on Base/Arb |
+| **Stakers** | `POST /api/leaderboards/stakersLeaderboards` | Rank by on-chain stake in immutable StakingLocker (Base 8453, Arb 42161). Adds STAKING boosters (capped +5x) |
+| **NFT Holders** | `POST /api/leaderboards/nftLeaderboards` | Rank by ERC-721 or ERC-1155 holdings; supports specific tokenId for 1155 |
+| **API-Sourced** (USE THIS) | `POST /api/leaderboards/apiLeaderboards` | Pulls `[{address, score}]` from external URL; refreshable on demand |
+| **CSV Upload** | `POST /api/leaderboards/csvLeaderboards` (multipart/form-data) | One-shot CSV with addresses + scores; doesn't auto-refresh |
+
+## Part 8 - Add New Leaderboard Modal Field Mapping (UI Screenshot 2026-05-09)
+
+| Modal field | API field | Limit / format | POIDH submission value |
+|-------------|-----------|----------------|------------------------|
+| Leaderboard Name | `name` | Max 20 chars | `POIDH Submitters` (16 chars) |
+| Description | `description` | Max 80 chars | `Submit to ZAO POIDH bounties to climb. ZABAL distributed by score.` (66 chars) |
+| Upload Icon (Optional) | `icon` | URL to PNG/JPG/GIF, max 1MB | `https://bettercallzaal.com/assets/icon.png` |
+| API Endpoint URL | `apiEndpoint` | HTTPS URL returning `[{address, score}]` | `https://bettercallzaal.com/poidh-leaderboard.json` |
+| Token Boosters toggle | `applyBoosters` | Boolean (default ON in modal) | `true` - lets ZABAL/SANG/ZORO holders earn extra |
+| Reputation Boosters toggle | `apply_reputation_boosters` | Boolean (default ON in modal) | `true` - lets high-rep submitters earn extra |
+
+## Part 9 - Booster Type Reference (Confirmed via EB docs ?ask=)
+
+| Type | Trigger | Multiplier source | Stacks with others? |
+|------|---------|-------------------|---------------------|
+| **Token Boosters** | Wallet holds configured ERC-20 OR NFT | Multiplies leaderboard points (raw score unchanged) | YES - additive with other token + reputation boosters |
+| **Reputation Boosters** | Wallet meets configured reputation threshold | Multiplies points based on reputation tier | YES - additive |
+| **Staking Boosters** (auto, only on stakers leaderboard) | Wallet has on-chain stake in StakingLocker | Adds capped +5x for the staking portion | YES - capped at +5x for staking portion |
+
+For the POIDH apiLeaderboard, both Token + Reputation toggle ON in modal = strongest. POIDH submitters who also hold ZABAL/SANG/ZORO get bigger ZABAL distributions; high-reputation submitters (Talent Protocol, etc) get extra on top.
+
+## Part 10 - Prepared Submission Package (Hand This to yerbearserker / Adrian)
+
+### Method 1: Have yerbearserker / Adrian fill the modal
+
+```
+Leaderboard Name:    POIDH Submitters
+Description:         Submit to ZAO POIDH bounties to climb. ZABAL distributed by score.
+Upload Icon:         https://bettercallzaal.com/assets/icon.png
+API Endpoint URL:    https://bettercallzaal.com/poidh-leaderboard.json
+Token Boosters:      ON
+Reputation Boosters: ON
+```
+
+### Method 2: API call (if they prefer scripted)
+
+```bash
+curl -X POST "https://www.empirebuilder.world/api/leaderboards/apiLeaderboards" \
+  -H "x-api-key: <THEIR_API_KEY>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tokenAddress": "<ZABAL_EMPIRE_TOKEN_ADDRESS>",
+    "apiEndpoint": "https://bettercallzaal.com/poidh-leaderboard.json",
+    "name": "POIDH Submitters",
+    "description": "Submit to ZAO POIDH bounties to climb. ZABAL distributed by score.",
+    "applyBoosters": true,
+    "apply_reputation_boosters": true,
+    "icon": "https://bettercallzaal.com/assets/icon.png",
+    "signature": "<GUARDIAN_SIGNATURE>",
+    "message": "Create API leaderboard for <ZABAL_EMPIRE_TOKEN_ADDRESS>",
+    "signerAddress": "<GUARDIAN_WALLET>"
+  }'
+```
+
+Refresh: `PATCH /api/leaderboards/refresh/apiLeaderboards` with same auth.
+
+### DM template (Farcaster / Telegram)
+
+```
+Hey @yerbearserker (cc Adrian) - shipped a POIDH submitter leaderboard
+on bettercallzaal.com/poidh.html. Public JSON feed ready for ZABAL Empire
+apiLeaderboard:
+
+  https://bettercallzaal.com/poidh-leaderboard.json
+
+Format: [{address, score}] - matches Empire Builder spec exactly.
+Phase 1 = manual updates as bounties land winners; Phase 2 = on-chain
+PoidhV3 event scrape via CF Worker.
+
+Suggested config:
+  Name:        POIDH Submitters
+  Description: Submit to ZAO POIDH bounties to climb. ZABAL distributed by score.
+  Token + Reputation Boosters: both ON
+  Icon: bettercallzaal.com/assets/icon.png
+
+Add it to $ZABAL Empire and we're live. Bounty 1151 has 2 submitters seeded;
+new POIDH bounties will land more. ZAO Stock Oct 3 will be the bigger pulse.
+```
+
 ## Implementation Status (2026-05-09)
 
 | Task | Status | Notes |
@@ -443,8 +538,9 @@ Verified URLs 2026-05-09: empirebuilder.world HTTP 200, empire-builder.gitbook.i
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Send `https://bettercallzaal.com/poidh-leaderboard.json` URL to Empire Builder team / $ZABAL Empire guardian (Adam) for apiLeaderboards configuration | @Zaal -> @Adam / @glankerempire | DM | Today |
-| Confirm $ZABAL Empire token address + leaderboard ID once apiLeaderboard is created | @Zaal | DM | This week |
+| Send DM template (Part 10) + `https://bettercallzaal.com/poidh-leaderboard.json` to **yerbearserker** + **Adrian (divifly)** for apiLeaderboards setup on $ZABAL Empire | @Zaal -> @yerbearserker + Adrian | Farcaster DM | Today |
+| Confirm Adrian's verified Farcaster FID (handle "divifly" did not resolve via warpcast username lookup; possibly different handle or unverified FID) | @Zaal | Verify | Today |
+| Confirm $ZABAL Empire `tokenAddress` (the empire_id) + which guardian wallet will sign the create-leaderboard tx | @Zaal | DM | This week |
 | Update `poidh-leaderboard.json` as new POIDH bounties land submitters (or build automation) | @Zaal | File edit / Phase 2 | Ongoing |
 | Phase 2 - replace static JSON with PoidhV3 event indexer (Cloudflare Worker reads Base RPC, returns live JSON) | @Zaal | New CF Worker | Next 2-3 weeks |
 | Phase 2.5 - resolve submitter wallets to Farcaster handles via Neynar free tier and embed in JSON feed | @Zaal | Worker addition | Phase 2 |

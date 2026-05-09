@@ -9,9 +9,11 @@ tier: STANDARD
 
 # 630 - ZABAL Games v0: Claude Code Hackathon (8 Players, 24h Build + 24h Promote)
 
-> **Goal:** Define the inaugural ZABAL Games - an 8-player Claude Code hackathon where every participant gets the same prompt at the same time, builds in public on Twitch for 24 hours, then promotes for 24 hours. Winners take USDC + ZABAL + on-chain artifacts. The Games dogfood the ZAO streaming flywheel (Doc 629), the Web3 streaming bridge (Doc 628), and put 8 new builders on the Empire Builder leaderboard simultaneously.
+> **Goal:** Define the inaugural ZABAL Games - an 8-player Claude Code hackathon where every participant gets the same prompt at the same time, builds in public on Twitch for 24 hours, then promotes for 24 hours. **Real challenge = submitting at all** - every player who finishes splits the $500 USDC pool equally. Top 3 win scaled ZABAL bags + on-chain artifacts (Hats Champion NFT + Empire Booster ID). The Games dogfood the ZAO streaming flywheel (Doc 629), the Web3 streaming bridge (Doc 628), and put 8 new builders on the Empire Builder leaderboard simultaneously.
 
-> **Status:** DRAFT - Zaal locked in format (24h+24h), prize (Treasury USDC + ZABAL), prompt scope (3-5 ideas), and timing (late June 2026) on 2026-05-09. Open: idea-option finalization, sponsorship sourcing, judge panel, application form copy.
+> **Status:** DRAFT - Zaal locked in format (24h+24h), prize ($500 USDC pool split among ALL submitters + scaled ZABAL + on-chain artifacts), Claude Pro subsidy, prompt scope (3-5 ideas), and timing (late June 2026) on 2026-05-09. Open: idea-option finalization, sponsorship sourcing, judge panel, application form copy.
+
+> **Prize philosophy (updated 2026-05-09 per Zaal):** Lower the bar to entry, raise the bar to *ship*. The real challenge is submitting at all - so every player who finishes gets equal slice of the $500 USDC pool. The competitive gradient lives in the ZABAL bag + on-chain artifacts (Hats Champion NFT + Empire Booster ID). No goose eggs.
 
 ---
 
@@ -20,7 +22,8 @@ tier: STANDARD
 | Decision | Locked Choice |
 |----------|--------------|
 | **Format** | 24h build + 24h promote (48h total) |
-| **Prize structure** | Treasury USDC + ZABAL bag + on-chain artifacts (booster ID + Hats role for winner) |
+| **Prize structure** | $500 USDC pool split equally among ALL submitters + scaled ZABAL bag by placement + Hats Champion NFT + Empire Booster ID for top 3 |
+| **Claude Pro support** | Accepted players without Claude Pro ($20/mo) get one month covered by ZAO so cost is not a blocker |
 | **Prompt scope** | 3-5 idea options inside the prompt, players pick or remix |
 | **Date window** | 2026-06-27 Sat 12:00 PT -> 2026-06-29 Mon 12:00 PT (7 weeks out) |
 | **Player count** | 8 players + waitlist |
@@ -149,15 +152,24 @@ Each player receives identical materials at T+0:
 
 90-minute call. Must attend OR forfeit. Walks through:
 
-1. Rules (5 min)
-2. Stream setup help - Twitch + StreamElements + OBS (15 min) - reuse Doc 627
-3. Wallet linkage - connect Farcaster verified address to Twitch handle (10 min)
-4. Empire Builder wallet eligibility check (5 min)
-5. Coinflow tip page setup (10 min)
-6. Live judging walkthrough (10 min)
-7. Q&A (35 min)
+1. Rules + prize structure (5 min)
+2. **Claude Pro check** - confirm each player has Claude Pro active. ZAO covers 1 month ($20) for any accepted player who needs it - sent via Anthropic gift link 24 hours before T+0 (5 min)
+3. Stream setup help - Twitch + StreamElements + OBS (15 min) - reuse Doc 627
+4. Wallet linkage - connect Farcaster verified address to Twitch handle (10 min)
+5. Empire Builder wallet eligibility check (5 min)
+6. Coinflow tip page setup (10 min)
+7. Live judging walkthrough (10 min)
+8. Q&A (30 min)
 
 Recorded for waitlist replacements + future v1 reference.
+
+### Application Form Asks (T-7 weeks)
+
+To gauge Claude Pro coverage cost in advance, the application form includes:
+- **"Do you have Claude Pro active?"** [Yes / No / Not sure]
+- If No or Not sure: "If accepted, would you like ZAO to cover your $20 Claude Pro for the Games month?" [Yes / No]
+
+Worst case = 8 x $20 = $160 in Claude Pro subsidies. Budget includes this.
 
 ---
 
@@ -235,32 +247,79 @@ Player can propose their own build at T-3 onboarding call, must integrate at lea
 
 ## Part 6 - Prize Structure
 
-### Locked-in: Treasury USDC + ZABAL + On-Chain Artifacts
+### Philosophy (Locked 2026-05-09)
 
-| Place | USDC | ZABAL | On-chain artifacts |
-|-------|------|-------|-------------------|
-| **1st** | $1,000 | 50,000,000 | Hats "ZABAL Games Champion v0" NFT + custom Empire Booster ID named after them + COC Concertz featured stream slot + permanent /zabalgames hall-of-fame entry |
-| **2nd** | $500 | 25,000,000 | Custom Empire Booster ID + hall-of-fame entry |
-| **3rd** | $250 | 10,000,000 | Hall-of-fame entry |
-| **4th-8th (participation)** | n/a | 5,000,000 each | Optional Hats "ZABAL Games Finisher v0" NFT |
+**Real challenge is submitting at all.** Lower bar to entry, raise bar to ship. The $500 USDC pool splits equally among everyone who finishes - no goose eggs. The competitive gradient lives in the scaled ZABAL bag and the on-chain artifacts (Hats Champion NFT + Empire Booster ID for top 3).
 
-### Total Pool
+### USDC Pool: $500 Equal-Split Among Submitters
 
-- **USDC:** $1,750 from ZAO treasury (or sponsor pool if secured)
-- **ZABAL:** 110M total across podium + 25M participation = 135M ZABAL
-  - At current $0.0000001429 / ZABAL = ~$19 USD value today
-  - Bet: ZABAL appreciates over time = retroactively bigger prize
+```
+USDC per finisher = $500 / N    where N = number of submitters at T+48h
+```
 
-### Distribution
+| Submitters | $/finisher |
+|-----------|-----------|
+| 8 (full field) | $62.50 |
+| 7 | $71.43 |
+| 6 | $83.33 |
+| 5 | $100.00 |
+| 4 | $125.00 |
+| 3 | $166.67 |
 
-- USDC routed via 0xSplits contract on Base for transparency
+Floor encouragement: minimum $50/finisher even if N >= 10 (overflow waitlist case). If pool is undersubscribed (e.g. 3 finishers), the dollars-per-person grow - rewards persistence.
+
+**Submission requirements (must hit ALL by T+48h):**
+1. Live deployed URL (working, not 404)
+2. Public GitHub repo link (open source)
+3. 60-second demo video link (Loom, YouTube, or self-hosted)
+4. Tweet/cast on /zabalgames channel announcing ship
+
+Miss any one = no submission = no USDC. Hard line keeps the bar real.
+
+### ZABAL Bag: Scaled by Placement (Competitive Gradient)
+
+| Place | ZABAL |
+|-------|-------|
+| **1st** | 50,000,000 |
+| **2nd** | 25,000,000 |
+| **3rd** | 10,000,000 |
+| **4th-8th (finishers)** | 5,000,000 each |
+
+Total: 110M podium + 25M finishers = **135M ZABAL**.
+
+At current $0.0000001429 / ZABAL = ~$19 USD value today. Long-term: bet on appreciation. Symbolic + economic alignment with the ecosystem the players just built into.
+
+### On-Chain Artifacts (Top 3 only)
+
+| Place | Artifact |
+|-------|----------|
+| **1st** | Hats Protocol "ZABAL Games Champion v0" NFT (permanent on Base) + custom Empire Booster ID named after winner + COC Concertz featured stream slot + hall-of-fame entry on `/zabalgames` page |
+| **2nd** | Custom Empire Booster ID + hall-of-fame entry |
+| **3rd** | Hall-of-fame entry |
+| **All finishers (1st-Nth)** | Optional Hats "ZABAL Games Finisher v0" NFT (claimable, not auto-minted) |
+
+The Hats Champion NFT is the actual flex - permanent on-chain badge, recognizable across all ZAO surfaces forever.
+
+### Total Pool Cost
+
+| Component | Cost |
+|-----------|------|
+| USDC pool | $500 |
+| Claude Pro subsidies (up to 8 x $20) | up to $160 |
+| ZABAL distribution (135M tokens) | ~$19 at current price (negligible USD cost) |
+| Hats NFT minting gas (top 3 + finishers) | ~$5 on Base |
+| Empire Booster ID setup (top 2) | $0 (config only, no cost) |
+| **Total ZAO outlay** | **~$685 max** |
+
+Affordable for a v0. Scales up with sponsor tracks in v1.
+
+### Distribution Mechanics
+
+- USDC pool via single 0xSplits contract on Base, recipients = list of Farcaster verified addresses of finishers, weights equal
 - ZABAL via Empire Builder distribute API (per Doc 361 / 626)
-- Hats NFT minted on Base to verified Farcaster address
-- Empire Booster ID configured by yerbearserker post-judging
-
-### Participation Floor
-
-Every player who finishes (ships SOMETHING by T+48h) gets the 5M ZABAL participation bag. No-show = no bag. Encourages finishing over giving up.
+- Hats NFT minted on Base to verified Farcaster addresses
+- Empire Booster ID configured by yerbearserker / Adrian post-judging
+- All distribution happens within 48 hours of judging (target: by 2026-07-01)
 
 ---
 
@@ -270,6 +329,7 @@ Every player who finishes (ships SOMETHING by T+48h) gets the 5M ZABAL participa
 
 | Resource | Provided | Notes |
 |----------|----------|-------|
+| **Claude Pro subscription ($20)** | **YES (if needed)** | Accepted players who don't already have Claude Pro get 1 month covered by ZAO. Asked at application time. Hard requirement: Claude Code is the build tool, no Pro = can't compete |
 | Pre-funded Privy agent wallet | YES | $5 ETH on Base for gas |
 | Empire Builder API key | YES (read-only) | Personal-stats + leaderboard endpoints |
 | Supabase sandbox project | YES | Shared, namespaced per player |
@@ -347,7 +407,7 @@ Every player who finishes (ships SOMETHING by T+48h) gets the 5M ZABAL participa
 | One player dominates with massive existing audience | Distribution score caps growth at 25 pts; total weighted by 4 axes prevents single-axis sweep |
 | Empire Builder API rate-limit during 8 simultaneous polls | Coordinate with Adrian; throttle to 1 poll/min per player |
 | StreamElements WebSocket flood | If event volume > 1k/min, batch via Cloudflare Queues |
-| ZAO treasury USDC liquidity | Secure $1750 USDC in dedicated wallet 7 days prior |
+| ZAO treasury USDC liquidity | Secure $500 USDC + up to $160 Claude Pro reserve = $660 in dedicated wallet 7 days prior |
 | Judges dispute / no-show | Pre-record judge availability; redundant 5 panel = 3-of-5 quorum needed |
 | Bot tip farming | Tip score requires verified Farcaster address ($25 hold + linked X/phone/GH) |
 | Player builds something unethical | Code-of-conduct in onboarding; right to disqualify |
@@ -392,7 +452,10 @@ After ZABAL Games v0 ships and a retro is run (Doc 631 placeholder):
 |--------|-------|------|---------|
 | DM Adrian + yerbearserker - confirm Empire Builder support + judge willingness | @Zaal | DM | 2026-05-12 |
 | Refine final 5 idea options (Part 4) - get input from Adam (SongJam) on Option D ZOE-skill scope | @Zaal | Doc edit | 2026-05-16 |
-| Confirm $1750 USDC ZAO treasury allocation OR secure sponsor pool | @Zaal | Treasury | 2026-05-16 |
+| Confirm $660 ZAO treasury allocation ($500 USDC pool + $160 Claude Pro reserve) | @Zaal | Treasury | 2026-05-16 |
+| Add Claude Pro question to application form (yes/no/needs subsidy) | @Zaal | Form copy | 2026-05-16 |
+| Coordinate with Anthropic for Claude Pro gift links (or buy gift codes in advance) | @Zaal | Procurement | 2026-06-13 |
+| Send Claude Pro gift link to needing players 24h before T+0 | @Zaal | Email | 2026-06-26 |
 | Build `bettercallzaal.com/zabalgames` landing page (static, applications form) | @Zaal | PR (BCZ) | 2026-05-23 |
 | Open public applications via Farcaster/X/LinkedIn announcement | @Zaal | Cast/post | 2026-05-23 |
 | Reach 16+ applications (over-subscribe to filter) | @Zaal | Outreach | 2026-06-06 |

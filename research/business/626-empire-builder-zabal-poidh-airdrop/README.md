@@ -17,7 +17,7 @@ tier: STANDARD
 
 > **2026-05-09 ownership correction:** $ZABAL Empire is NOT owned by Adam. Co-creators are **yerbearserker** (Jordan Oram, Empire Builder co-founder) + **Adrian** (Farcaster handle "divifly" per Zaal - did not resolve via warpcast username lookup; verify FID with yerbearserker). Adrian is the lead engineer behind Empire Builder. Earlier reference to "Adam / SongJam" in this doc was incorrect for ZABAL Empire ownership context (Adam owns SANG; he is a stakeholder in ZABAL but not the empire's guardian wallet here).
 
-> **"Empire Builder v3" status:** Zaal references "v3" but the public GitBook does NOT document a v3 vs v1/v2. Likely sources of the v3 label: (a) yerbearserker's internal version naming for current production build, (b) confusion with POIDH v3 (which IS publicly tagged v3), (c) an upcoming roadmap milestone not yet in docs. Treat the current `empirebuilder.world` production as the integration target unless yerbearserker confirms different endpoints.
+> **"Empire Builder v3" status (UPDATED 2026-05-09 LATER SAME DAY):** **CONFIRMED LIVE** via yerbearserker DM. Soft launch on `empirebuilder.world` 2026-05-09; official announcement Sunday 2026-05-11. Public API docs reorganized under `/api/public/` with read endpoints redesigned (GET by UUID + list-by-empire). **CRITICAL:** the inbound apiEndpoint schema is UNCHANGED - still `[{address, score}]` - so our `poidh-leaderboard.json` works as-is. The submission package below remains valid for v3.
 
 ## Architecture (Confirmed - REVERSE of initial draft)
 
@@ -522,6 +522,57 @@ Suggested config:
 Add it to $ZABAL Empire and we're live. Bounty 1151 has 2 submitters seeded;
 new POIDH bounties will land more. ZAO Stock Oct 3 will be the bigger pulse.
 ```
+
+## Part 11 - Empire Builder v3 New Read Endpoints (Confirmed 2026-05-09)
+
+After yerbearserker shipped v3, the read API was reorganized. These are the new public endpoints we can use on `poidh.html` Phase 2 to display live ZABAL Empire stats per submitter:
+
+### List leaderboards for an empire
+
+```
+GET https://www.empirebuilder.world/api/leaderboards?tokenAddress=<ZABAL_EMPIRE_ID>
+```
+
+Returns slots 1-20 (was 50 in v2). Pinned leaderboards appear first. Use this to discover the UUID of the POIDH Submitters leaderboard once Adrian creates it.
+
+### Get a single leaderboard's entries
+
+```
+GET https://www.empirebuilder.world/api/leaderboards/<leaderboard_uuid>
+```
+
+Response includes per-entry:
+
+| Field | Meaning |
+|-------|---------|
+| `address` | Wallet |
+| `rank` | Position (1 = top) |
+| `score` | Raw metric (our POIDH submission count, NOT boost-adjusted) |
+| `points` | Boost-adjusted score used for weighted distribution |
+| `farcaster_username` | Resolved FC handle (free, no Neynar key needed on our side) |
+| `totalRewards` | Lifetime USD received from this empire's distributions |
+
+Blocked addresses auto-excluded.
+
+### Other v3 public endpoints
+
+- `GET /api/public/get-distribution-records` - cumulative ZABAL per recipient
+- `GET /api/public/get-empire-rewards` - reward history (distributions, burns, airdrops)
+- `GET /api/public/get-boosters-by-empire` - list boosters configured for an empire
+- `GET /api/public/get-leaderboard-stats-for-single-address-within-empire` - per-address stats
+- `GET /api/public/get-empires` + `get-top-empires` - empire discovery
+
+### Phase 2 implementation idea
+
+Once Adrian creates the apiLeaderboard, swap `bettercallzaal.com/poidh.html` to fetch:
+
+```js
+const r = await fetch(`https://www.empirebuilder.world/api/leaderboards/${POIDH_LB_UUID}`);
+const { entries } = await r.json();
+// entries[i] has: address, rank, score, points, farcaster_username, totalRewards
+```
+
+This replaces our manual Neynar lookup + lets us show real ZABAL distribution amounts, real points (boost-adjusted), and pulled-from-EB Farcaster handles. Ships in 30 lines.
 
 ## Implementation Status (2026-05-09)
 

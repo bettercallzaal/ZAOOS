@@ -574,6 +574,59 @@ const { entries } = await r.json();
 
 This replaces our manual Neynar lookup + lets us show real ZABAL distribution amounts, real points (boost-adjusted), and pulled-from-EB Farcaster handles. Ships in 30 lines.
 
+## Part 12 - POIDH Data Source: tRPC over poidh-app (Confirmed 2026-05-09)
+
+The poidh-app repo (`github.com/picsoritdidnthappen/poidh-app`, prod branch, last push 2026-05-02) is a Next.js + tRPC + Prisma + Postgres stack. tRPC procedures are exposed publicly at `https://poidh.xyz/api/trpc/<router>.<procedure>`. No API key required for reads.
+
+### Procedures used by `scripts/refresh-poidh-leaderboard.py`
+
+| Procedure | Input | Returns |
+|-----------|-------|---------|
+| `bounties.fetchByAlbum` | `{album, status, limit, cursor?}` | Items list with bounty `id`, `chainId`, `title`, `issuer`, `amount`, `extra.album`, etc. Statuses: `open`, `progress` (voting), `past` (closed). Album match is case-insensitive on the `BountiesExtra.album` column. |
+| `claims.fetchBountyClaims` | `{bountyId, chainId, limit, cursor?}` | Items list with claim `id`, `issuer`, `title`, `isAccepted`, image url. Issuer here = the wallet that submitted the claim, NOT the bounty owner. |
+| `bounties.fetch` | `{id, chainId}` | Single bounty with `extra.album` (canonical album name), `amount` (wei string), participants, claim count. |
+
+### Two key gotchas verified
+
+1. **Album for ZAO bounties is `wethemmedia`, NOT `thezao`.** Verified via `bounties.fetch({id:1151,chainId:8453}).extra.album = "wethemmedia"`. The `poidh.xyz/a/thezao` URL exists in the OG meta but resolves to an empty album in the DB. Probably an old or aspirational link.
+2. **OG image `participants[]` query param is misleading.** It contains funders + voters of open bounties (joined-bounty contributors), NOT claim submitters. Real submitter list comes from `claims.fetchBountyClaims`. For bounty 1151 the OG showed 2 addresses but there were actually 11 claims from 10 unique wallets, plus the issuer Zaal as a "participant" because the bounty is multiplayer/joined.
+
+### Real numbers (2026-05-09 first scrape)
+
+| Metric | Value |
+|--------|-------|
+| Album | wethemmedia |
+| Bounties (total) | 12 |
+| Bounties (open) | 6 |
+| Bounties (voting) | 1 |
+| Bounties (past) | 5 |
+| Chain split | 10 Arbitrum, 2 Base |
+| Claims (total) | 68 |
+| Unique submitters | 37 |
+| Top scorer | `0x849e...6421` with 7 submissions |
+| Total ETH in escrow | 0.3232 ETH (~$750) |
+| Issuers | Zaal `0x7234...e9af`, We The Media `0x7cccff60...`, `0x4200...a5b4` |
+
+### Phase 2 worker pattern
+
+Drop the script into a Cloudflare Worker on a 5-min cron:
+
+```js
+// poidh-leaderboard-worker.js
+export default {
+  async scheduled(event, env, ctx) {
+    const json = await fetchLeaderboard("wethemmedia");
+    await env.LB_KV.put("poidh-leaderboard.json", JSON.stringify(json), { expirationTtl: 600 });
+  },
+  async fetch(req, env) {
+    const cached = await env.LB_KV.get("poidh-leaderboard.json", "json");
+    return new Response(JSON.stringify(cached), { headers: { "content-type": "application/json", "access-control-allow-origin": "*" } });
+  }
+};
+```
+
+Edge cache + cron = always-fresh feed, $0/month on Cloudflare free tier.
+
 ## Implementation Status (2026-05-09)
 
 | Task | Status | Notes |

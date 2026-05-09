@@ -13,12 +13,47 @@ tier: STANDARD
 
 > **Trigger:** 2026-05-09 ask from Zaal: "make a basic webpage for POIDH submissions, connect Farcaster wallet via Hats, give each submitter a 1, send everyone who submitted some ZABAL". Bounty 1151 (BCZ YapZ Ep 17 clip task, 0.0105 ETH on Base, 2 participants so far) is the seed dataset.
 
+> **Architecture confirmed 2026-05-09 (mid-session correction):** Direction is REVERSED from initial draft. Empire Builder pulls FROM BCZ (not BCZ pushes TO Empire Builder). Mechanism = **API-sourced Leaderboard** via `POST /api/leaderboards/apiLeaderboards` with `apiEndpoint` pointing to a public BCZ JSON URL returning `[{address, score}]`. Empire Builder refreshes the leaderboard, applies ZABAL boosters, distributes. BCZ does not need an Empire Builder API key. Zaal hands Empire Builder team the BCZ URL and they configure the leaderboard from their side. SHIPPED 2026-05-09: `bettercallzaal.com/poidh.html` (UI) + `bettercallzaal.com/poidh-leaderboard.json` (feed). "Haatz" clarified = free Neynar API for Farcaster wallet -> handle resolution, not Hats Protocol.
+
+## Architecture (Confirmed - REVERSE of initial draft)
+
+```
+                         POIDH submitters
+                                |
+                                v
+                  PoidhV3 contract on Base + UI
+                                |
+                                v
+                    BCZ scrape / curate manually
+                                |
+                                v
+       bettercallzaal.com/poidh-leaderboard.json   <-- public feed
+           [ {address, score}, ... ]                   (no auth needed)
+                                |
+                                v   (Empire Builder refresh polls this URL)
+                                |
+                  Empire Builder apiLeaderboards
+                                |
+                                v
+                $ZABAL Empire on Base (Adam owns)
+                                |
+                                v   apply boosters, refresh leaderboard
+                                v   bulk-distribute ZABAL on schedule
+                                |
+                                v
+                       Submitter wallets receive ZABAL
+```
+
+Zaal does NOT call Empire Builder API. Zaal hands the BCZ URL to Empire Builder team (or to Adam who configures the apiLeaderboard on the $ZABAL Empire). EB pulls the JSON on every refresh.
+
 ## Key Decisions / Recommendations
 
 | Decision | Recommendation |
 |----------|----------------|
+| **Integration direction** | REVERSED from typical webhook patterns: Empire Builder PULLS from BCZ via apiLeaderboards. Use `POST /api/leaderboards/apiLeaderboards` with body `{tokenAddress, apiEndpoint, name, description, applyBoosters: true, signature, message, signerAddress}`. The `apiEndpoint` field = `https://bettercallzaal.com/poidh-leaderboard.json`. Refresh via `PATCH /api/leaderboards/refresh/apiLeaderboards`. Empire Builder team / $ZABAL Empire guardian configures this once; ongoing cost = zero for BCZ. |
 | **Empire to use** | USE existing $ZABAL Empire (deployed via Empire Builder, leaderboard at `songjam.space/zabal`). Adam/SongJam owns it. DO NOT deploy a duplicate Empire for ZAO/BCZ - it splits liquidity + brand. |
-| **API surface** | USE `https://www.empirebuilder.world/api/...` REST endpoints with `X-API-Key` header. Confirmed live endpoint pattern: `POST /api/personal-stats/EMPIRE_TOKEN_ADDRESS` returns `{balance, boostedBalance, boost, rank, activeBoosterIds[]}`. Bulk-send endpoint exists per docs (verify path before coding). |
+| **JSON feed format (CONFIRMED)** | Empire Builder expects `[{ "address": "0x...", "score": <number> }, ...]`. Address = wallet, score = numeric. EB applies boosters on top during refresh if `applyBoosters: true`. Sample feed shipped at `bettercallzaal.com/poidh-leaderboard.json`. |
+| **API surface (BCZ does NOT call this)** | Empire Builder REST endpoints documented at `https://www.empirebuilder.world/api/...` with `X-API-Key`. Read endpoints (`/api/personal-stats/`, `/api/leaderboard/`) returned `{balance, boostedBalance, boost, rank, activeBoosterIds[]}`. Bulk-send via `/api/distribute/...`. Useful only if BCZ later wants to display ZABAL stats per submitter inline. Phase 1 ships without this. |
 | **POIDH data source** | SCRAPE on-chain. POIDH v3 contract emits events for bounty claims; index via Base RPC (Alchemy/Ankr/free public RPC). NO documented POIDH REST API as of 2026-05-09 - the website itself is Next.js client-rendered fetching from internal endpoints. Reverse-engineer via DevTools Network tab OR read PoidhV3 contract events directly. |
 | **Submitter "1" semantics** | TWO interpretations to confirm with Zaal: (a) "1 Hat" via Hats Protocol = role NFT each submitter holds (heavy infra, ~2-day build); (b) "1 booster" via Empire Builder = a custom booster ID applied to each submitter address that multiplies their leaderboard score. (b) is lighter, native to Empire Builder, ships in hours. RECOMMEND (b) unless Zaal wants the cross-platform-portable Hats role. |
 | **Wallet connect surface** | USE `@farcaster/miniapp-sdk` (already loaded in BCZ index.html for the Farcaster mini app context) to get the Farcaster user's verified address inside the mini app. OUTSIDE the mini app, fall back to wagmi + Coinbase Smart Wallet for browser users. |
@@ -393,16 +428,25 @@ Verified URLs 2026-05-09: empirebuilder.world HTTP 200, empire-builder.gitbook.i
 
 ---
 
+## Implementation Status (2026-05-09)
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Phase 1 `poidh.html` shipped on bettercallzaal.com | DONE | Dark theme matching nexus.html, stats row, featured bounty 1151, leaderboard table, how-it-works section, API hook documentation w/ copy button |
+| `poidh-leaderboard.json` shipped at root | DONE | Compatible with Empire Builder apiLeaderboards format |
+| nexus.html updated with leaderboard link | DONE | Listed under "The ZAO" alongside POIDH album |
+| BCZ git push -> auto-deploy via main | DONE | Live at bettercallzaal.com/poidh.html |
+| "Haatz" clarification | RESOLVED | = free Neynar API. Page links submitter wallet to Farcaster profile via farcaster.xyz/~/profile?address=... query (no key needed for the public profile route). |
+| Hats Protocol integration | DROPPED | Was not what Zaal meant; Phase 3 of original plan deleted. |
+
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| **CONFIRM**: "give them each a 1" = Empire Builder booster (recommended) OR Hats Protocol role NFT (heavier) | @Zaal | Decision | Before Phase 1 build |
-| **CONFIRM**: Adam adds Zaal as co-guardian on $ZABAL Empire, OR Adam triggers airdrops on Zaal's behalf | @Zaal -> @Adam | Coordination | Before Phase 2 |
-| Request X-API-Key from Empire Builder team (`@glankerempire`) | @Zaal | DM/cast | Today |
-| Get $ZABAL Empire token contract address from Adam | @Zaal | DM | Today |
-| Build Phase 1 `poidh.html` with hardcoded bounty 1151 data + Neynar handle resolver | @Zaal | New file in BCZ repo | This week |
-| Add `/poidh.html` link to nexus.html "ZAO Ecosystem" section | @Zaal | Edit nexus.html | This week |
-| Phase 2 - Cloudflare Worker + on-chain submitter scrape via PoidhV3 events | @Zaal | Worker + page update | Next 2 weeks |
-| Phase 3 (only if Hats confirmed) - deploy ZAO Top Hat tree on Base + POIDH Submitter Hat | @Zaal | Hats SDK | Month 2 |
-| Re-validate Empire Builder API surface in 30 days (the API is in active development) | @Zaal | Doc update | 2026-06-09 |
+| Send `https://bettercallzaal.com/poidh-leaderboard.json` URL to Empire Builder team / $ZABAL Empire guardian (Adam) for apiLeaderboards configuration | @Zaal -> @Adam / @glankerempire | DM | Today |
+| Confirm $ZABAL Empire token address + leaderboard ID once apiLeaderboard is created | @Zaal | DM | This week |
+| Update `poidh-leaderboard.json` as new POIDH bounties land submitters (or build automation) | @Zaal | File edit / Phase 2 | Ongoing |
+| Phase 2 - replace static JSON with PoidhV3 event indexer (Cloudflare Worker reads Base RPC, returns live JSON) | @Zaal | New CF Worker | Next 2-3 weeks |
+| Phase 2.5 - resolve submitter wallets to Farcaster handles via Neynar free tier and embed in JSON feed | @Zaal | Worker addition | Phase 2 |
+| Phase 3 - Sybil protection: only count addresses with verified PoidhClaimNFT for ZAO album bounties | @Zaal | Worker addition | After Phase 2 |
+| Re-validate Empire Builder apiLeaderboards endpoint in 30 days | @Zaal | Doc update | 2026-06-09 |

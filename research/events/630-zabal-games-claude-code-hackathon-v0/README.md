@@ -9,7 +9,9 @@ tier: STANDARD
 
 # 630 - ZABAL Games v0: Claude Code Hackathon (8 Players, 24h Build + 24h Promote)
 
-> **Goal:** Define the inaugural ZABAL Games - an 8-player Claude Code hackathon where every participant gets the same prompt at the same time, builds in public on Twitch for 24 hours, then promotes for 24 hours. Top 3 take a tiered share of a **$500 USDC pool**. All finishers receive a **participation collectible**. Winners chosen by **ZABAL token holders voting onchain** - no human panel. The Games dogfood the ZAO streaming flywheel (Doc 629) and Web3 streaming bridge (Doc 628), and put 8 new builders into ZAO ecosystem rails simultaneously.
+> **Goal:** Define the inaugural ZABAL Games - a **Farcaster build-in-public challenge** for **8 Farcaster digital creators** (devs, designers, writers, video editors, musicians, streamers, podcasters - anyone who already ships in public). Every participant gets the same Claude Code prompt at the same time, builds in public on Twitch for 24 hours, promotes for 24 hours. Top 3 take a tiered share of a **$500 USDC pool**. All finishers receive a **participation collectible**. Winners chosen by **ZABAL token holders voting onchain** - no human panel. The Games dogfood the ZAO streaming flywheel (Doc 629) and Web3 streaming bridge (Doc 628), put 8 new ecosystem-aligned builds on the leaderboard, and most importantly **give 8 Farcaster creators a distribution boost they couldn't get alone**.
+
+> **Positioning (revised 2026-05-10):** This is NOT a generic hackathon. It's a Farcaster-native challenge built on a win-win-win premise: **players get distribution + cash + portfolio**, **ZAO gets builders + content engine fuel**, **ZABAL holders get voting power + drama to watch**. Every prompt option ties to ZAO ecosystem rails so whatever ships becomes real infra.
 
 > **Status:** DRAFT - Zaal locked in format (24h+24h), prize ($500 USDC tiered top-heavy + participation collectible only), Claude Pro subsidy, ZABAL-holder onchain voting (no human judge panel), prompt scope (3-5 ideas), and timing (late June 2026) on 2026-05-09 + revised 2026-05-10. Open: idea-option finalization, application form copy, voting mechanism (snapshot weighted vs 1-token-1-vote vs quadratic), participation-collectible spec.
 
@@ -32,7 +34,9 @@ Sections marked DRAFT or "needs Zaal input" are still in flux. Everything in the
 
 ## Part 0 - TL;DR (60 seconds)
 
-**What:** 8-player hackathon. Claude Code is the build tool. Twitch is the build stage. ZAO is the playground. Same prompt drops to all 8 simultaneously. 24 hours to build, 24 hours to promote.
+**What:** A Farcaster build-in-public challenge. **8 Farcaster digital creators** (devs, designers, writers, video editors, musicians, streamers, podcasters - anyone shipping in public). Claude Code is the build tool. Twitch is the build stage. ZAO is the playground + the distribution boost. Same prompt drops to all 8 simultaneously. 24 hours to build, 24 hours to promote.
+
+**Who it's for:** Active Farcasters who already ship in public and want a focused weekend to build something real with Claude Code while ZAO accounts amplify their work. You don't need to be a senior engineer - Claude Code closes a lot of skill gaps. You DO need to be comfortable streaming yourself building.
 
 **When:** 2026-06-27 Sat 12:00 PT to 2026-06-29 Mon 12:00 PT (build + promote). Voting 2026-06-29 to 2026-06-30. Results-reveal stream 2026-06-30.
 
@@ -46,9 +50,23 @@ Sections marked DRAFT or "needs Zaal input" are still in flux. Everything in the
 
 ---
 
-## Part 1 - Why ZABAL Games (Stakeholder Benefits)
+## Part 1 - Why ZABAL Games (Win-Win-Win)
 
-This event is structured to create wins for every party touching it. If any one stakeholder doesn't get value, the format is broken.
+**This is a Farcaster challenge, not a generic hackathon.** The target audience is 8 active Farcaster digital creators - devs, designers, writers, video editors, musicians, streamers, podcasters - anyone who already ships in public and wants a focused weekend to build something real with Claude Code while ZAO accounts amplify their work.
+
+The format is structured around three reinforcing wins:
+
+| Stakeholder | What they get out of the weekend |
+|-------------|----------------------------------|
+| **The 8 Farcaster creators** | Distribution boost (ZAO accounts amplify all 8 streams + casts), $50-$250 USDC if top 3, participation collectible (permanent onchain), GitHub repo as portfolio piece, 24h Claude Code live-coding footage to repurpose forever, audience growth even if you don't place |
+| **The ZAO ecosystem** | 8 new ecosystem-aligned builds shipped in 48 hours, 8 new active builders engaged with rails (Empire, Farcaster, Hats, Bonfire, EAS, Coinflow), 30+ hours of live build content -> 150+ short clips via Doc 629 streaming flywheel, brand position as "ZAO is where Farcaster builders ship in public" |
+| **ZABAL holders + viewers** | Onchain vote that decides outcomes (real token utility), 24h of multi-stream build drama, tippers earn ZABAL via Doc 628 stream-leaderboard rails, voting itself becomes a community engagement event |
+
+If any one of these three wins doesn't land, the format is broken. The detailed stakeholder breakdown below extends each.
+
+---
+
+### Detailed Stakeholder Benefits
 
 ### For ZAO Ecosystem
 
@@ -96,16 +114,18 @@ This event is structured to create wins for every party touching it. If any one 
 | Permanent on-chain artifact (Zaal as v0 host) | Hats Protocol can issue a "ZABAL Games Host" role to Zaal too - on-chain provenance |
 | Connection capital | 8 new builders + every voting ZABAL holder engaging = wide net of new connections |
 
-### For Each Player
+### For Each Farcaster Creator
 
 | Benefit | Why it matters |
 |---------|---------------|
+| **Distribution boost from ZAO accounts** | BCZ Farcaster + /zao channel + COC Concertz + ZAO OS amplify all 8 of your streams + casts during promote window. Your audience grows whether you place or not - this is the biggest non-cash win |
+| **24h of Claude Code live-coding footage** | Becomes your personal content asset forever - cut into demo reels, blog posts, YouTube videos, conference talks. Industry novelty (AI-augmented engineering) makes the footage durable |
+| **Streaming flywheel auto-clips your build** | Doc 629 pipeline turns 24h of stream into ~20 short-form clips (TikTok/Reels/YouTube/Farcaster). You keep them all - free content for your channels |
 | USDC for top 3 ($250 / $150 / $100) | Real cash for the podium - rewards excellence |
 | Participation collectible (every finisher) | Permanent onchain proof you shipped at the inaugural Games - recurring artifact across future v1, v2 etc |
 | GitHub portfolio piece | Public repo with 24-hour build = job application differentiator, especially for AI-native engineering roles |
-| Claude Code real-world demo footage | 24h of live coding with Claude Code = personal content asset (compile into demo reel, blog post, conference talk) |
-| Distribution practice | The promote window forces players to learn cross-posting, audience building, and live demo - skills most engineers under-invest in |
-| New audience | Players cross-pollinate each other's audiences across the 8 streams |
+| Distribution practice | The promote window forces you to learn cross-posting, audience building, and live demo - skills most creators under-invest in |
+| New audience | Players cross-pollinate each other's audiences across the 8 streams. ZABAL holder voters discover you. Tippers find your work |
 | Voting eligibility for v1+ | Finishers may get bonus voting weight in subsequent Games (v1 design call) - alumni network forms |
 | Optional ongoing connection | Winners often become ecosystem contributors - the Games is a tryout. No promised role though |
 | Possible upside (not promised) | A sponsor adds extra prizes mid-Games. Empire Builder team likes a build and mints a booster organically. COC invites a winner to perform. None guaranteed - all possible |
@@ -176,8 +196,8 @@ After 4 quarterly Games (1 year), ZAO has shipped: 32 new builds + 32 collectibl
 | **Voting window** | 24h post-promote-window? 48h? Concurrent with promote phase to drive viewer engagement? Recommend post-promote 24h for v0 |
 | **Voting eligibility floor** | Min ZABAL balance to vote? (e.g. 1M ZABAL) - prevents bot accounts but excludes new wallets. Or zero floor + sybil-protection via Farcaster verified address requirement |
 | **Participation collectible spec** | NFT (Hats role NFT, generic ERC-721, Zora content coin)? Onchain attestation (EAS)? Frame-claimable Mini App? Recommend Hats role NFT for ecosystem fit |
-| Application gate | Open public, ZAO-member-only, or invite + apply? |
-| Stream cadence requirement | Must stream 100% of build, 50%, or just before-and-after demos? |
+| Application gate | **Farcaster digital creators** (active Farcaster handle + verified address required). Bonus weight if you have ZAO Respect / member status. Hybrid: open to any active Farcaster, prioritized to creators who already ship in public |
+| Stream cadence requirement | Must stream the bulk of the build (recommendation: stream most of it, breaks for sleep/eat OK). Spot-checks via stream review verify nothing was pre-built |
 | Solo only or teams of 2 allowed? | Solo recommended for v0; teams in v1 |
 | Voting reveal stream | Yes (post-vote-close 1hr live results stream on Twitch) or async + announce? Recommend yes - reveal stream is content |
 

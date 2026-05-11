@@ -1,0 +1,18 @@
+[Unit]
+Description=ZAO team bots (Magnetiq + AttaBotty)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/zaostock-bot
+EnvironmentFile=%h/zaostock-bot/.env
+Environment=TZ=America/New_York
+ExecStart=%h/zaostock-bot/node_modules/.bin/tsx %h/zaostock-bot/src/teams/index.ts
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

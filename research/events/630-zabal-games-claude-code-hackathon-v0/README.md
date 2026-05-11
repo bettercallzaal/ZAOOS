@@ -176,8 +176,9 @@ After 4 quarterly Games (1 year), ZAO has shipped: 32 new builds + 32 collectibl
 | Decision | Locked Choice |
 |----------|--------------|
 | **Format** | 24h build + 24h promote (48h total active player window) + 24h voting + 1h reveal stream |
-| **Prize structure** | $500 USDC pool, tiered top-heavy: 1st $250 / 2nd $150 / 3rd $100. Plus participation collectible for every finisher. NO other prizes promised upfront |
-| **Judging** | ZABAL token holders vote onchain - no human judge panel. Mechanism (snapshot weighted vs 1-token-1-vote vs quadratic) is the open call |
+| **Prize structure** | $500 USDC pool, tiered with floor: 1st $150 / 2nd $100 / 3rd $75 / 4th-8th $35 each. **Every selected player who hits the submission bar gets paid.** Plus participation collectible for every finisher. NO other prizes promised upfront |
+| **Judging** | ZAO DAO members who have earned their vote over the past 3 years vote onchain. Curated voter set (long-tenure ZAO contributors), NOT open ZABAL holder voting. Mechanism still snapshot-based |
+| **Privacy** | v0 is invite-only, private cohort. Landing page is `noindex,nofollow`. No public promotion until invited cohort is locked |
 | **Tooling** | Tool-agnostic - players use any vibe-coding harness (Claude Code, Cursor, Windsurf, Aider, Cline, Bolt, v0, Lovable, custom). "Show your work" is the constraint, not the tool |
 | **Visibility requirement** | Pick at least 1 of 4 primary modes (live Twitch stream / recorded screen sessions / public prompt logs / frequent build casts) + ongoing /zabalgames casts throughout the build |
 | **Tooling subsidy** | Up to $20/mo covered by ZAO for accepted players who need help affording their tool of choice (Claude Pro, Cursor Pro, Windsurf Pro, etc.) |
@@ -465,28 +466,46 @@ Faking is hard if you've committed to a primary mode. The empty starter repo at 
 
 ---
 
-## Part 6 - Judging (ZABAL Token Holders Vote Onchain)
+## Part 6 - Judging (ZAO DAO Members With 3-Year Earned Vote)
 
-**No human judge panel.** ZABAL token holders are the entire judging body. The community whose ecosystem the builds plug into picks the winners.
+**No human judge panel. Not open ZABAL-holder voting either.** The judging body is a curated voter set: **ZAO DAO members who have earned their vote in the DAO over the past 3 years**. Long-tenure contributors with Respect + history in the ecosystem. The people who actually built ZAO over 3 years pick what's worth building next.
 
-### Why ZABAL-Holder Voting (Not Human Panel)
+### Why Curated DAO Voter Set (Not Open Token Holder Voting)
 
 | Reason | Detail |
 |--------|--------|
-| **Aligned incentives** | The people deciding "best build" are the same people whose token economy benefits from those builds. They want to pick winners that ACTUALLY help the ecosystem |
+| **Earned not bought** | Open ZABAL holder voting = whoever has the most tokens wins. Whale risk. Buying-influence risk. 3-year DAO membership = earned reputation, not purchased token weight |
+| **Ecosystem-aware judges** | DAO members who've been here 3 years know what builds the ecosystem actually needs vs what flashy demos show. Their taste IS the curatorial signal |
+| **Aligned incentives** | Long-tenure DAO members hold ZABAL + have Respect + have shipped contributions themselves. They pick builds they would actually use |
 | **No bottleneck** | No scheduling 3-5 humans to be available T+72h. Vote opens, vote closes, results onchain |
 | **Transparent provenance** | Every vote is onchain. Disputes resolvable by reading the chain. No "the judge didn't like my project" gripes |
-| **Recurring narrative** | Each Games drives ZABAL holder engagement. Voting is content. Winners can credit "the community picked me" |
-| **Sybil-resistant by token weight** | Token holdings can't be faked cheaply - existing holders have skin in the game |
+| **Limited scope, big signal** | A smaller curated voter set (probably ~30-80 DAO members) produces a meaningful vote rather than diluting across thousands of token holders |
+| **Sybil-resistant by tenure** | 3-year DAO membership can't be faked - on-chain provenance + Respect history are verifiable |
 
-### Voting Mechanism (Open Call - Recommend Snapshot Weighted)
+### Eligibility Definition (Still Open Call)
+
+"Earned their vote in the DAO over the past 3 years" needs precise definition before T+0. Candidate criteria (pick one OR combine):
+
+| Criterion | What it means | Pros | Cons |
+|-----------|---------------|------|------|
+| **Respect score threshold** | Min Respect score earned in ZAO OS (e.g. > 1000 Respect cumulative) | Reflects actual contribution, already tracked in ZAO OS | Excludes ZAO members who contribute outside the Respect-scored channels |
+| **Tenure threshold** | Min N years of continuous ZAO membership (e.g. joined > 2024) | Simple, verifiable via member roster | Doesn't distinguish active from passive members |
+| **Combo: Respect + tenure** | Min Respect AND min tenure | Most rigorous, hardest to game | Most exclusive - might shrink voter set below useful size |
+| **Hats Protocol DAO member role** | Hold the "ZAO DAO Member" Hat NFT | Onchain, snapshot-friendly | Requires that Hat to be issued to eligible members first |
+| **Curated list at T+0** | Zaal + 2-3 trusted ZAO seniors lock the voter list manually | Maximum control, fastest to execute | Less "trustless," reads as more centralized |
+
+Recommend: **Hats Protocol DAO member role + min 1000 Respect** for v0. Onchain verifiable, mechanically clean, both criteria already exist as data.
+
+### Voting Mechanism (Open Call - Recommend One-Person-One-Vote for DAO Set)
+
+Since voting is now restricted to DAO members with earned reputation (not open ZABAL holder voting), mechanism choice changes:
 
 | Mechanism | Pros | Cons | Recommendation |
 |-----------|------|------|----------------|
-| **Snapshot weighted by holdings** | Simplest, free, well-known UX, plutocratic but matches token-economy norms | Whales can dominate (large ZABAL holders sway result) | **Recommended for v0** |
-| **1-token-1-vote with min-balance gate** | Filters bots via balance threshold | Still plutocratic above the gate, more friction | Consider for v1 |
-| **Quadratic (sqrt of holdings)** | Balances whales against many small holders, fairer | More complex UX, requires custom contract or Snapshot strategy plugin | Save for v1+ |
-| **Conviction voting (time-weighted)** | Rewards thoughtful evaluation over snap reactions | Slower, hard to time-box for 24h voting window | Skip for v0 |
+| **One-DAO-member-one-vote (1-person-1-vote)** | Treats every earned voter equally regardless of token holdings - aligns with "earned not bought" thesis | Requires verified per-member identity (Hats role NFT or curated list) | **Recommended for v0** |
+| **Respect-weighted vote** | Members with more Respect (more contribution) get more vote weight - rewards historical contribution | More complex to compute + display | Consider for v1 |
+| **Snapshot weighted by ZABAL holdings (DAO members only)** | Still uses token economy gradient, filtered to DAO members | Reintroduces whale risk inside the DAO | Skip - defeats the curatorial design |
+| **Quadratic (sqrt of Respect)** | Balances whale-Respect vs many-medium-Respect members | Complex, premature for v0 | Save for v1+ |
 
 ### Voting Window (Open Call)
 
@@ -500,21 +519,22 @@ Three options on the table:
 
 Recommend: **Post-promote 24h** for v0. Clean, manageable, pairs with a 1-hour live results-reveal stream at T+72h.
 
-### Voting Eligibility (Open Call)
+### Voting Eligibility (Locked Direction - Specifics Open)
 
-| Option | Detail |
-|--------|--------|
-| **Zero floor + Farcaster verified address required** | Anyone with ZABAL + verified Farcaster account can vote. Sybil-resistance via Farcaster's verification (linked X/phone/GH + $25 hold) |
-| **Min 1M ZABAL** | Filters dust accounts but excludes new wallets that joined for the Games |
-| **Snapshot from T+0 (start of Games)** | Locks the eligible voter set at game start - prevents flash-buying ZABAL just to vote |
+**Eligible voters = ZAO DAO members who have earned their vote over the past 3 years.** Snapshot taken at T+0 so the voter set is locked before Games begin.
 
-Recommend: **Zero floor + Farcaster verified address + Snapshot from T+0**. Maximizes legitimate participation, prevents vote-buying via flash purchase.
+Specifics still need locking (see Eligibility Definition table above). Recommended path:
+- **Hats Protocol "ZAO DAO Member" Hat NFT** + min 1000 Respect score
+- Snapshot at T+0 (2026-06-27 12:00 PT) - no late-joiners count
+- Voters need a verified Farcaster address (standard sybil-resistance)
 
-### What ZABAL Holders Are Voting On
+This produces a voter set of roughly 30-80 long-tenure ZAO members. Big enough to feel like a vote, small enough that each voice matters and feels accountable.
 
-Voters allocate their ZABAL weight across the N submitted builds (e.g. ranked-choice OR vote-for-1 OR distribute-100-points-across-builds).
+### What DAO Members Are Voting On
 
-Recommend: **Vote-for-1** for v0. Simplest UX. Top 3 by total ZABAL weight = winners.
+Each DAO voter picks their favorite build via vote-for-1. Top placements determined by total vote count (1-person-1-vote mechanism).
+
+Recommend: **Vote-for-1** for v0. Simplest UX. Placements 1-8 by total vote count - 1st (most votes) gets $150, all the way down to 8th who still gets the $35 floor + collectible.
 
 Voter info packet (auto-generated):
 - All N submitted builds listed with: live URL, GitHub link, 60-sec demo embed
@@ -533,19 +553,19 @@ Live results-reveal stream at T+72h. Top 3 announced. USDC + collectibles distri
 
 **Tiered top-heavy USDC + a participation collectible. That's it.** No promised auxiliary perks. Don't over-promise. Anything else (extra ZABAL bag from sponsors, Empire Booster from Adrian, COC slot from a winner's vibe-fit with COC) emerges organically and is upside, not commitment.
 
-### USDC Pool: $500 Tiered Top-Heavy
+### USDC Pool: $500 Tiered with Floor (Everyone Selected Gets Paid)
 
 | Place | USDC |
 |-------|------|
-| **1st** | $250 |
-| **2nd** | $150 |
-| **3rd** | $100 |
-| **4th-8th** | $0 USDC (collectible only) |
+| **1st** | $150 |
+| **2nd** | $100 |
+| **3rd** | $75 |
+| **4th-8th** | $35 each (5 x $35 = $175) |
 | **Total pool** | **$500** |
 
-Why tiered top-heavy not equal split: rewards excellence + makes voting meaningful. ZABAL holders can pick a clear 1st with confidence the prize gradient backs that signal.
+Why tiered-with-floor: rewards excellence (1st takes 30% of pool, 3-4x more than baseline) AND ensures no one walks away empty-handed if they shipped. The 8 selected players are the cohort - if they hit the submission bar, they get paid. The competitive layer is which placement they earn.
 
-Why no USDC for 4th-8th: keeps the pool small + signal-rich. The participation collectible is the reward for shipping. Cash gradient says "win" not "show up."
+Why no goose eggs: ZABAL Games v0 is invite-only with 8 carefully selected creators. We're not running a 100-person open hackathon where elimination is the model. These are 8 specific people whose work we want to invest in - all of them get something concrete for shipping.
 
 ### Submission Requirements (must hit ALL by T+48h)
 

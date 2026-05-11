@@ -577,7 +577,7 @@ You won't have direct filesystem access to these during the Games (the repo is p
 
 ## Part 8 - What "Good" Looks Like (Voting Rubric Reminder)
 
-ZABAL token holders vote at T+48h through T+72h on a single question: **"Which build is the best?"**
+ZAO DAO members who have earned their vote over the past 3 years vote at T+48h through T+72h on a single question: **"Which build is the best?"** This is a curated voter set (roughly 30-80 long-tenure DAO members), NOT open ZABAL holder voting. 1-person-1-vote, vote-for-1 mechanism.
 
 Voters will see, per submission:
 - Live deployed URL
@@ -735,14 +735,16 @@ T+24h:  2026-06-28 12:00 PT  -  Ship deadline
 T+48h:  2026-06-29 12:00 PT  -  Voting opens (Snapshot)
 T+72h:  2026-06-30 12:00 PT  -  Reveal stream + USDC + collectibles
 
-Prize pool:  $500 USDC tiered (1st $250 / 2nd $150 / 3rd $100)
+Prize pool:  $500 USDC tiered with floor (everyone selected gets paid)
+            1st $150 / 2nd $100 / 3rd $75 / 4th-8th $35 each
             + Participation collectible (every finisher)
-            + $20 Claude Pro covered for accepted players who need it
+            + Up to $20/mo covered for your vibe-coding tool of choice
+              (Claude Pro / Cursor Pro / Windsurf Pro / etc.)
 
-Voting:      ZABAL token holders, weighted by holdings,
-            Snapshot at T+0 (no flash-buying),
-            Verified Farcaster address required,
-            Vote-for-1 mechanism
+Voting:      ZAO DAO members with 3-year earned vote
+            (Hats DAO Hat + Respect threshold, snapshot at T+0)
+            1-person-1-vote, vote-for-1 mechanism
+            NOT open ZABAL holder voting - this is a curated voter set
 
 Stream:      Twitch primary, ZAO restreams all 8 to /zabalgames
 

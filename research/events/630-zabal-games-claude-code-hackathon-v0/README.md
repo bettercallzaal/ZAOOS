@@ -7,13 +7,15 @@ related-docs: 627, 628, 629, 626, 625, 361, 324, 322, 354, 311
 tier: STANDARD
 ---
 
-# 630 - ZABAL Games v0: Claude Code Hackathon (8 Players, 24h Build + 24h Promote)
+# 630 - ZABAL Games v0: Farcaster Vibe-Coding Challenge (8 Players, 24h Build + 24h Promote)
 
-> **Goal:** Define the inaugural ZABAL Games - a **Farcaster build-in-public challenge** for **8 Farcaster digital creators** (devs, designers, writers, video editors, musicians, streamers, podcasters - anyone who already ships in public). Every participant gets the same Claude Code prompt at the same time, builds in public on Twitch for 24 hours, promotes for 24 hours. Top 3 take a tiered share of a **$500 USDC pool**. All finishers receive a **participation collectible**. Winners chosen by **ZABAL token holders voting onchain** - no human panel. The Games dogfood the ZAO streaming flywheel (Doc 629) and Web3 streaming bridge (Doc 628), put 8 new ecosystem-aligned builds on the leaderboard, and most importantly **give 8 Farcaster creators a distribution boost they couldn't get alone**.
+> **Goal:** Define the inaugural ZABAL Games - a **Farcaster vibe-coding challenge** for **8 Farcaster digital creators** (devs, designers, writers, video editors, musicians, streamers, podcasters - anyone who already ships in public). Every participant gets the same prompt at the same time, builds in public for 24 hours using **whatever vibe-coding harness they prefer** (Claude Code, Cursor, Windsurf, Aider, Cline, Bolt, v0, Lovable, etc.), then promotes for 24 hours. **Required:** show your work via at least one primary visibility mode + ongoing casts. Top 3 take a tiered share of a **$500 USDC pool**. All finishers receive a **participation collectible**. Winners chosen by **ZABAL token holders voting onchain** - no human panel. The Games dogfood the ZAO streaming flywheel (Doc 629) and Web3 streaming bridge (Doc 628), put 8 new ecosystem-aligned builds on the leaderboard, and most importantly **give 8 Farcaster creators a distribution boost they couldn't get alone**.
+
+> **Tooling philosophy (revised 2026-05-11):** Tool-agnostic + visibility-mandatory. We don't lock players into Claude Code. We DO require they show their work - because the build-in-public spectacle IS the format. 4 visibility modes available (live Twitch stream, recorded screen sessions, public AI prompt logs, frequent build casts). Pick at least one primary mode plus ongoing /zabalgames casts. Vibe-coding subsidy reframed: ZAO covers up to $20/mo for the tool of your choice if cost is a blocker.
 
 > **Positioning (revised 2026-05-10):** This is NOT a generic hackathon. It's a Farcaster-native challenge built on a win-win-win premise: **players get distribution + cash + portfolio**, **ZAO gets builders + content engine fuel**, **ZABAL holders get voting power + drama to watch**. Every prompt option ties to ZAO ecosystem rails so whatever ships becomes real infra.
 
-> **Status:** DRAFT - Zaal locked in format (24h+24h), prize ($500 USDC tiered top-heavy + participation collectible only), Claude Pro subsidy, ZABAL-holder onchain voting (no human judge panel), prompt scope (3-5 ideas), and timing (late June 2026) on 2026-05-09 + revised 2026-05-10. Open: idea-option finalization, application form copy, voting mechanism (snapshot weighted vs 1-token-1-vote vs quadratic), participation-collectible spec.
+> **Status:** DRAFT - Zaal locked in format (24h+24h), prize ($500 USDC tiered top-heavy + participation collectible only), tool-agnostic + visibility mandatory, $20 tooling subsidy, ZABAL-holder onchain voting (no human judge panel), prompt scope (3-5 ideas), and timing (late June 2026) on 2026-05-09 + revised 2026-05-10 + 2026-05-11. Open: idea-option finalization, application form copy, voting mechanism (snapshot weighted vs 1-token-1-vote vs quadratic), participation-collectible spec.
 
 > **Prize philosophy (revised 2026-05-10):** Tiered top-heavy USDC + collectible for everyone who ships. No promised auxiliary perks (no slot guarantees, no Empire Booster guarantees, no extra ZABAL bag promised upfront). The collectible is the only thing every finisher receives beyond the cash. Real prize for the field = the experience + the open-source GitHub repo + the Hall of Fame entry. Any extra perks that emerge organically (a sponsor adds something, COC happens to invite a winner to perform, Empire Builder happens to mint a booster) are upside, not commitments.
 
@@ -34,25 +36,25 @@ Sections marked DRAFT or "needs Zaal input" are still in flux. Everything in the
 
 ## Part 0 - TL;DR (60 seconds)
 
-**What:** A Farcaster build-in-public challenge. **8 Farcaster digital creators** (devs, designers, writers, video editors, musicians, streamers, podcasters - anyone shipping in public). Claude Code is the build tool. Twitch is the build stage. ZAO is the playground + the distribution boost. Same prompt drops to all 8 simultaneously. 24 hours to build, 24 hours to promote.
+**What:** A Farcaster vibe-coding challenge. **8 Farcaster digital creators** (devs, designers, writers, video editors, musicians, streamers, podcasters - anyone shipping in public). Use **whatever vibe-coding harness you prefer** (Claude Code, Cursor, Windsurf, Aider, Bolt, v0, Lovable - your call). The constraint isn't the tool, it's **show your work in public**. Same prompt drops to all 8 simultaneously. 24 hours to build, 24 hours to promote. ZAO is the playground + the distribution boost.
 
-**Who it's for:** Active Farcasters who already ship in public and want a focused weekend to build something real with Claude Code while ZAO accounts amplify their work. You don't need to be a senior engineer - Claude Code closes a lot of skill gaps. You DO need to be comfortable streaming yourself building.
+**Who it's for:** Active Farcasters who already ship in public and want a focused weekend to build something real with vibe-coding tools while ZAO accounts amplify their work. You don't need to be a senior engineer - modern AI coding harnesses close a lot of skill gaps. You DO need to be comfortable building in public via one of 4 visibility modes (Twitch stream / recorded screen sessions / public prompt logs / frequent build casts).
 
 **When:** 2026-06-27 Sat 12:00 PT to 2026-06-29 Mon 12:00 PT (build + promote). Voting 2026-06-29 to 2026-06-30. Results-reveal stream 2026-06-30.
 
-**What players get:** Top 3 take a tiered share of a $500 USDC pool (1st $250 / 2nd $150 / 3rd $100). All finishers (1st through Nth) receive a participation collectible. All accepted players who don't already have Claude Pro get a free month from ZAO ($20).
+**What players get:** Top 3 take a tiered share of a $500 USDC pool (1st $250 / 2nd $150 / 3rd $100). All finishers (1st through Nth) receive a participation collectible. Accepted players who need help affording their vibe-coding tool of choice (Claude Pro, Cursor Pro, Windsurf Pro, etc.) get up to $20/mo covered by ZAO.
 
 **Who decides the winners:** ZABAL token holders. Onchain vote weighted by holdings. The community whose ecosystem the builds plug into picks which builds win - no human judge panel.
 
 **What ZAO gets:** 8 new builders shipping into ZAO ecosystem rails simultaneously. 48 hours of live build content fed into the streaming flywheel (Doc 629). Real-world stress test of Empire Builder v3 + Coinflow + Hypersub + EAS at scale. Public proof that ZAO is *the* place builders go to ship in public.
 
-**What it costs ZAO:** ~$685 max ($500 USDC pool + $160 Claude Pro reserve + ~$25 gas/collectible mints). Sub-$1k for 8 new ecosystem-aligned builds and ~30 cross-platform pieces of content.
+**What it costs ZAO:** ~$685 max ($500 USDC pool + $160 tooling subsidy reserve + ~$25 gas/collectible mints). Sub-$1k for 8 new ecosystem-aligned builds and ~30 cross-platform pieces of content.
 
 ---
 
 ## Part 1 - Why ZABAL Games (Win-Win-Win)
 
-**This is a Farcaster challenge, not a generic hackathon.** The target audience is 8 active Farcaster digital creators - devs, designers, writers, video editors, musicians, streamers, podcasters - anyone who already ships in public and wants a focused weekend to build something real with Claude Code while ZAO accounts amplify their work.
+**This is a Farcaster vibe-coding challenge, not a generic hackathon.** The target audience is 8 active Farcaster digital creators - devs, designers, writers, video editors, musicians, streamers, podcasters - anyone who already ships in public and wants a focused weekend to build something real with vibe-coding tools (their choice) while ZAO accounts amplify their work.
 
 The format is structured around three reinforcing wins:
 
@@ -119,7 +121,7 @@ If any one of these three wins doesn't land, the format is broken. The detailed 
 | Benefit | Why it matters |
 |---------|---------------|
 | **Distribution boost from ZAO accounts** | BCZ Farcaster + /zao channel + COC Concertz + ZAO OS amplify all 8 of your streams + casts during promote window. Your audience grows whether you place or not - this is the biggest non-cash win |
-| **24h of Claude Code live-coding footage** | Becomes your personal content asset forever - cut into demo reels, blog posts, YouTube videos, conference talks. Industry novelty (AI-augmented engineering) makes the footage durable |
+| **24h of vibe-coding session footage** | Becomes your personal content asset forever - cut into demo reels, blog posts, YouTube videos, conference talks. Industry novelty (AI-augmented engineering with your tool of choice) makes the footage durable |
 | **Streaming flywheel auto-clips your build** | Doc 629 pipeline turns 24h of stream into ~20 short-form clips (TikTok/Reels/YouTube/Farcaster). You keep them all - free content for your channels |
 | USDC for top 3 ($250 / $150 / $100) | Real cash for the podium - rewards excellence |
 | Participation collectible (every finisher) | Permanent onchain proof you shipped at the inaugural Games - recurring artifact across future v1, v2 etc |
@@ -176,7 +178,9 @@ After 4 quarterly Games (1 year), ZAO has shipped: 32 new builds + 32 collectibl
 | **Format** | 24h build + 24h promote (48h total active player window) + 24h voting + 1h reveal stream |
 | **Prize structure** | $500 USDC pool, tiered top-heavy: 1st $250 / 2nd $150 / 3rd $100. Plus participation collectible for every finisher. NO other prizes promised upfront |
 | **Judging** | ZABAL token holders vote onchain - no human judge panel. Mechanism (snapshot weighted vs 1-token-1-vote vs quadratic) is the open call |
-| **Claude Pro support** | Accepted players without Claude Pro ($20/mo) get one month covered by ZAO so cost is not a blocker |
+| **Tooling** | Tool-agnostic - players use any vibe-coding harness (Claude Code, Cursor, Windsurf, Aider, Cline, Bolt, v0, Lovable, custom). "Show your work" is the constraint, not the tool |
+| **Visibility requirement** | Pick at least 1 of 4 primary modes (live Twitch stream / recorded screen sessions / public prompt logs / frequent build casts) + ongoing /zabalgames casts throughout the build |
+| **Tooling subsidy** | Up to $20/mo covered by ZAO for accepted players who need help affording their tool of choice (Claude Pro, Cursor Pro, Windsurf Pro, etc.) |
 | **Prompt scope** | 3-5 idea options inside the prompt, players pick or remix |
 | **Date window** | 2026-06-27 Sat 12:00 PT -> 2026-06-30 Tue 13:00 PT (build + promote + vote + reveal) |
 | **Player count** | 8 players + waitlist 4 |
@@ -228,7 +232,8 @@ T+0 -> T+24h            BUILD WINDOW (Sat 12:00 PT -> Sun 12:00 PT)
                         Empire Builder live leaderboard scores stream events
                         StreamElements alerts trigger ZABAL drops to viewers (per Doc 628)
                         Streaming flywheel auto-clips highlights to YouTube + shorts
-                        Coding happens in Claude Code, build in public (open repos)
+                        Coding happens in whatever vibe-coding harness you picked (Claude Code, Cursor, Windsurf, Aider, etc.)
+                        Build in public via your declared visibility mode (open repos)
 
 T+24h    (2026-06-28 12:00 PT Sun)
                         SHIP DEADLINE
@@ -295,11 +300,12 @@ Each player receives identical materials at T+0:
    - Tech stack baseline (Next.js, Supabase, Farcaster mini apps, Base)
    - Links to docs: this doc (630), 628 (web3 streaming), 626 (Empire Builder), 627 (streaming infra)
 
-2. **CLAUDE.md** - Repo-level Claude Code instructions
+2. **CLAUDE.md / .cursorrules / AGENTS.md** - Repo-level AI-tool instructions (player picks whichever fits their harness)
    - Brand naming rules (WaveWarZ not Wave Wars, etc per BCZ CLAUDE.md)
    - Build conventions (no emojis, no em dashes, mobile-first)
    - Brand colors (ZAO orange/cyan/gold, dark bg)
    - Tooling baseline
+   - Same content, different filename depending on which harness you use
 
 3. **OPTIONS.md** - The 5 build options (see Part 5)
 
@@ -330,8 +336,9 @@ Each player receives identical materials at T+0:
 90-minute call. Must attend OR forfeit. Walks through:
 
 1. Rules + prize structure (5 min)
-2. **Claude Pro check** - confirm each player has Claude Pro active. ZAO covers 1 month ($20) for any accepted player who needs it - sent via Anthropic gift link 24 hours before T+0 (5 min)
-3. Stream setup help - Twitch + StreamElements + OBS (15 min) - reuse Doc 627
+2. **Tooling subsidy check** - confirm each player has their vibe-coding tool subscription active. ZAO covers up to $20/mo for any accepted player who needs it (Claude Pro, Cursor Pro, Windsurf Pro, etc.) - tool-specific gift link or reimbursement sent 24 hours before T+0 (5 min)
+3. **Visibility mode lock-in** - confirm each player's declared "show your work" primary mode (live stream / recorded sessions / public prompt logs / frequent casts). Set up the relevant infra (10 min)
+4. Stream setup help - Twitch + StreamElements + OBS, if applicable (15 min) - reuse Doc 627
 4. Wallet linkage - connect Farcaster verified address to Twitch handle (10 min)
 5. Empire Builder wallet eligibility check (5 min)
 6. Coinflow tip page setup (10 min)
@@ -342,11 +349,12 @@ Recorded for waitlist replacements + future v1 reference.
 
 ### Application Form Asks (T-7 weeks)
 
-To gauge Claude Pro coverage cost in advance, the application form includes:
-- **"Do you have Claude Pro active?"** [Yes / No / Not sure]
-- If No or Not sure: "If accepted, would you like ZAO to cover your $20 Claude Pro for the Games month?" [Yes / No]
+To gauge tooling subsidy cost in advance, the application form includes:
+- **"Which vibe-coding harness will you use?"** [Claude Code / Cursor / Windsurf / Aider / Cline / Bolt / v0 / Lovable / Mix / Other / Not sure]
+- **"Vibe-coding tool subsidy"** [I have my subscription active / I need ZAO to cover up to $20/mo / Not sure yet]
+- **"Primary visibility mode"** [Twitch stream / Recorded screen sessions / Public prompt logs / Frequent build casts / Combination]
 
-Worst case = 8 x $20 = $160 in Claude Pro subsidies. Budget includes this.
+Worst case = 8 x $20 = $160 in tooling subsidies. Budget includes this.
 
 ---
 
@@ -400,6 +408,60 @@ Connect Bonfire reputation graph (or Hats Protocol) to a ZAO surface:
 
 ### Option F (Wildcard) - Build Your Own
 Player can propose their own build at T-3 onboarding call, must integrate at least 2 of: ZABAL Empire, Farcaster verified address, Hats Protocol, Bonfire, EAS attestations, Hypersub, Coinflow.
+
+---
+
+## Part 5b - Show Your Work (Visibility Modes)
+
+ZABAL Games is tool-agnostic. Players use whatever vibe-coding harness fits their style - Claude Code, Cursor, Windsurf, Aider, Cline, Bolt, v0, Lovable, or hand-roll their own pipeline. **The constraint isn't the tool, it's the visibility.**
+
+Each player picks at least ONE primary visibility mode, then supplements with ongoing /zabalgames casts throughout the build. Different modes fit different personalities - the goal is build-in-public spectacle, not a single recipe.
+
+### Mode 1 - Live Twitch Stream
+
+Stream the bulk of the build live on Twitch. The default - what most v0 players will probably pick. ZAO restreams all 8 to a single hub page so viewers can switch between players. Twitch chat is the running commentary.
+
+- Pros: maximum drama, viewer tipping, ZAO content engine auto-clips, anti-cheat is built in
+- Cons: highest pressure, hardest on introverts, technical setup overhead
+- Setup: per Doc 627 (Twitch + StreamElements + OBS)
+
+### Mode 2 - Recorded Screen Sessions
+
+Screen-record your build sessions and upload to YouTube/Loom within 1h of each session ending. Cast the link to /zabalgames as you go. Less drama than live, easier on shy builders.
+
+- Pros: no live-streaming overhead, edit out bathroom breaks, async-friendly across timezones
+- Cons: lower viewer engagement, no live-tipping integration, requires self-discipline to upload promptly
+- Setup: OBS local recording / Loom / Riverside
+
+### Mode 3 - Public AI Prompt Logs
+
+Share your AI conversation logs publicly as you go. Cursor + Windsurf composer history, Claude Code transcript dumps, Aider session logs, whatever your tool exports. Post snippets every 1-2 hours.
+
+- Pros: lowest infra overhead, ideal for tool-fanatics who want to show their craft, contributes to public corpus of "how do creators actually use AI tools"
+- Cons: no live viewers, no visual interest beyond text, harder to anti-cheat-verify
+- Setup: GitHub Gist / personal blog / Farcaster long-form casts
+
+### Mode 4 - Frequent Build Casts
+
+Cast progress on Farcaster every 1-2 hours with screenshots, snippets, and what you're prompting. Lower bar than streaming, higher cadence required. Tag /zabalgames + @bettercallzaal.
+
+- Pros: native Farcaster-first, highest signal-to-noise for ZABAL holders who'll vote, no separate platform needed
+- Cons: requires steady cadence, easier to fake (need ZAO to spot-check casts vs git commit times), less engagement spectacle than streams
+- Setup: just Farcaster
+
+### Combination Mode
+
+Most engaged players will probably mix - e.g., stream the first 6 hours, take a sleep break, screen-record sessions 7-16, then cast snapshots through the final stretch. Combination is welcome and probably optimal.
+
+### What gets verified
+
+Voters need to trust you actually built it in 24h with AI tools. The visibility mode is the verification mechanism. ZAO spot-checks:
+- Stream archive vs git commit timestamps
+- Screen recording upload timing vs git commit timestamps
+- AI prompt log timestamps vs commits
+- Cast cadence vs commit cadence
+
+Faking is hard if you've committed to a primary mode. The empty starter repo at T+0 + the mandatory visibility mode = anti-cheat backbone.
 
 ---
 
@@ -520,14 +582,14 @@ These were in earlier drafts but are intentionally pulled to avoid over-promisin
 | COC Concertz featured stream slot | Requires winner's vibe to fit COC. Mention as possibility, not guarantee |
 | Future paid roles in ZAO | Players are not contractors. Any future hiring is separate |
 
-This means ZAO's commitment is just: $500 USDC + collectibles + Claude Pro subsidies + infra access. Clean.
+This means ZAO's commitment is just: $500 USDC + collectibles + up-to-$20 tooling subsidies + infra access. Clean.
 
 ### Total Pool Cost
 
 | Component | Cost |
 |-----------|------|
 | USDC pool | $500 |
-| Claude Pro subsidies (up to 8 x $20) | up to $160 |
+| Tooling subsidies (up to 8 x $20 - Claude Pro / Cursor Pro / Windsurf / etc.) | up to $160 |
 | Participation collectible mints (8 x ~$1 gas on Base) | ~$8 |
 | Voting infra (Snapshot is free) | $0 |
 | Hosting + infra | covered by existing ZAO stack |
@@ -550,7 +612,7 @@ Sub-$700 for the entire v0. Affordable, repeatable.
 
 | Resource | Provided | Notes |
 |----------|----------|-------|
-| **Claude Pro subscription ($20)** | **YES (if needed)** | Accepted players who don't already have Claude Pro get 1 month covered by ZAO. Asked at application time. Hard requirement: Claude Code is the build tool, no Pro = can't compete |
+| **Vibe-coding tool subsidy (up to $20)** | **YES (if needed)** | Accepted players who need help affording their AI coding tool of choice (Claude Pro, Cursor Pro $20/mo, Windsurf Pro $15/mo, etc.) get up to $20/mo covered by ZAO. Asked at application time. Players pick their own tool |
 | Pre-funded Privy agent wallet | YES | $5 ETH on Base for gas |
 | Empire Builder API key | YES (read-only) | Personal-stats + leaderboard endpoints |
 | Supabase sandbox project | YES | Shared, namespaced per player |
@@ -633,7 +695,7 @@ Sub-$700 for the entire v0. Affordable, repeatable.
 | One player dominates voting via huge existing audience | Mitigated by ZABAL-holder weighting (audience must convince ZABAL holders, not just count viewers). Quadratic voting in v1 if whale dominance becomes a problem |
 | Empire Builder API rate-limit during 8 simultaneous polls | Coordinate with Adrian; throttle to 1 poll/min per player |
 | StreamElements WebSocket flood | If event volume > 1k/min, batch via Cloudflare Queues |
-| ZAO treasury USDC liquidity | Secure $500 USDC + up to $160 Claude Pro reserve = $660 in dedicated wallet 7 days prior |
+| ZAO treasury USDC liquidity | Secure $500 USDC + up to $160 tooling subsidy reserve = $660 in dedicated wallet 7 days prior |
 | **ZABAL whale single-handedly decides outcome** | v0 risk if 1-2 whales hold majority of supply. Mitigation: snapshot eligible voters at T+0 (no flash-buy), publish vote distribution transparently, plan quadratic voting for v1 |
 | **Low ZABAL voter turnout** | If <10% of eligible holders vote, signal is weak. Mitigation: voter incentive (free participation collectible for voters too?), heavy promotion of voting window, results-reveal stream as the payoff |
 | **Vote-buying / collusion** | A player could give ZABAL to friends to vote for them. Hard to prevent in any token-vote system. Mitigation: snapshot at T+0 prevents flash-distribution; transparency of holdings makes blatant collusion visible |
@@ -661,7 +723,7 @@ The Risks table (Part 10) covers operational risk. This section covers the broad
 |----------|----------------|
 | Does $500 read as humble or cheap? | Among hackathon norms ($10k-100k typical), $500 reads small. Frame intentionally: "v0, intentionally constrained, ships > prizes." The collectible + GitHub repo + community-pick legitimacy ARE the real flex |
 | Does the tiered model align with the rest of the format? | Yes - ZABAL holders need a meaningful gradient to vote on. Tiered USDC reinforces that 1st > 2nd > 3rd matters |
-| Does Claude Pro subsidy feel like welfare or like infrastructure? | Frame as "ZAO removes infra friction so the only barrier is your idea." Same energy as ETHGlobal handing out Optimism credits. Not charity, just plumbing |
+| Does the tooling subsidy feel like welfare or like infrastructure? | Frame as "ZAO removes infra friction so the only barrier is your idea - pick your tool, we cover it." Same energy as ETHGlobal handing out Optimism credits. Not charity, just plumbing |
 
 ### Diversity + Geography
 
@@ -703,7 +765,7 @@ The Risks table (Part 10) covers operational risk. This section covers the broad
 | Question | Why it matters |
 |----------|----------------|
 | Should we disclose that Claude is the build tool, or hide it? | Disclose loudly - this is the entire point. Differentiates ZABAL Games from hackathons that ban AI. Frames as "AI-augmented engineering is the new normal, here's what it looks like at peak" |
-| Does this position ZAO as an Anthropic shill? | No - Claude Code is the tool, not the sponsor. ZAO doesn't take Anthropic money for v0. Could be opt-in for v1 if value-aligned |
+| Does this position ZAO as an Anthropic / any-vendor shill? | No - players pick their own vibe-coding harness (Claude Code, Cursor, Windsurf, Aider, etc.). ZAO doesn't take money from any vendor for v0. Tool-agnostic positioning protects ZAO from being seen as captured by one vendor |
 | Will some viewers complain "this isn't real coding"? | Yes, some will. Counter-narrative: "this is the most real coding - shipping in 24 hours under public pressure with real users watching." Lean into it |
 
 ### Anti-Cheat / Submission Verification
@@ -730,7 +792,7 @@ The Risks table (Part 10) covers operational risk. This section covers the broad
 | What happens to the build streams (recordings)? | Players own their streams. ZAO archives clips for content engine but credits each player. Players can request deletion at any point |
 | What happens to onboarding call recordings? | Same as above - players own. ZAO uses snippets for v1 promotion only with written permission |
 | Do players' wallet addresses become public? | Yes - via the leaderboard JSON feed (per Doc 626 pattern). Players know this when they accept |
-| GDPR / CCPA implications | Data minimization: only collect Farcaster handle + Twitch handle + verified address + Claude Pro yes/no. Standard rights apply. Low risk for 8 players |
+| GDPR / CCPA implications | Data minimization: only collect Farcaster handle + Twitch handle + verified address + tooling subsidy yes/no + creator type. Standard rights apply. Low risk for 8 players |
 
 ### Brand Compounding
 
@@ -782,11 +844,11 @@ After ZABAL Games v0 ships and a retro is run (Doc 631 placeholder):
 |--------|-------|------|---------|
 | Share Doc 630 with Adrian + yerbearserker for input + amplification (no judge ask) | @Zaal | DM | 2026-05-12 |
 | Refine final 5 idea options (Part 5) - get input from Adam (SongJam) on Option D ZOE-skill scope | @Zaal | Doc edit | 2026-05-16 |
-| Confirm $660 ZAO treasury allocation ($500 USDC pool + $160 Claude Pro reserve) | @Zaal | Treasury | 2026-05-16 |
+| Confirm $660 ZAO treasury allocation ($500 USDC pool + $160 tooling subsidy reserve) | @Zaal | Treasury | 2026-05-16 |
 | **Lock voting mechanism** (snapshot weighted vs 1-token-1-vote vs quadratic) | @Zaal | Decision | 2026-05-16 |
 | **Lock participation collectible spec** (Hats role / ERC-721 / Zora coin / EAS) | @Zaal | Decision | 2026-05-16 |
-| Add Claude Pro question to application form (yes/no/needs subsidy) | @Zaal | Form copy | 2026-05-16 |
-| Coordinate with Anthropic for Claude Pro gift links (or buy gift codes in advance) | @Zaal | Procurement | 2026-06-13 |
+| Add vibe-coding harness question + tooling subsidy + visibility mode to application form | @Zaal | Form copy | 2026-05-16 |
+| Coordinate procurement: gift codes / reimbursement flow for multiple AI coding tool vendors | @Zaal | Procurement | 2026-06-13 |
 | Send Claude Pro gift link to needing players 24h before T+0 | @Zaal | Email | 2026-06-26 |
 | Build `bettercallzaal.com/zabalgames` landing page (static, applications form, voter info) | @Zaal | PR (BCZ) | 2026-05-23 |
 | **Set up Snapshot.org space for $ZABAL token** (or confirm existing space) | @Zaal | Snapshot | 2026-05-23 |

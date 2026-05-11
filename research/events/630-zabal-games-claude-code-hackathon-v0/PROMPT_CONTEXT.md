@@ -1,17 +1,25 @@
 # ZABAL Games v0 - Player Context Bundle
 
-> **You received this because you got accepted to ZABAL Games v0.** This file is the comprehensive context primer for the ZAO ecosystem. Read it once cover to cover, then save it as `CLAUDE.md` (or part of one) in your Claude Code project so the AI has full context throughout your 24-hour build.
+> **You received this because you got accepted to ZABAL Games v0.** This file is the comprehensive context primer for the ZAO ecosystem. Read it once cover to cover, then load it into your AI coding tool's context (Claude Code uses `CLAUDE.md`, Cursor uses `.cursorrules`, Windsurf uses `.windsurfrules`, Aider supports conventions files, etc.).
 
 > **Status:** Draft v0 (last updated 2026-05-11). Will be locked + sealed in the prompt drop bundle at T+0 on 2026-06-27.
 
+> **Tool-agnostic:** This Game is harness-agnostic. Use Claude Code, Cursor, Windsurf, Aider, Cline, Bolt, v0, Lovable, or hand-roll your own pipeline - whatever fits your style. The constraint isn't the tool, it's **show your work in public** via at least one primary visibility mode (live Twitch / recorded screen sessions / public AI prompt logs / frequent build casts).
+
 ---
 
-## How to Use This File With Claude Code
+## How to Use This File With Your Vibe-Coding Harness
 
 1. Clone the starter kit ZAO provides at T+0
-2. Save THIS file as `CLAUDE.md` at your repo root (or rename your existing CLAUDE.md to merge content)
-3. Reference it in your Claude Code session: `read CLAUDE.md` or just trust Claude to autoload it
-4. Treat sections as menu items - when building Option A (Empire Booster Workshop), Claude needs the Empire Builder section more than the WaveWarZ section. Tell Claude what you're building so it focuses
+2. Load THIS file into your AI tool's context. Naming convention by tool:
+   - **Claude Code:** save as `CLAUDE.md` at repo root
+   - **Cursor:** save as `.cursorrules` at repo root, OR as `CLAUDE.md` plus reference in `.cursor/rules/` directory
+   - **Windsurf:** save as `.windsurfrules` at repo root
+   - **Aider:** save as `CONVENTIONS.md` and pass with `--read CONVENTIONS.md` flag
+   - **Cline / Continue:** add to `.cline/instructions/` or via continue.dev config
+   - **Other harnesses:** check your tool's docs for project-level context file
+3. Reference it actively - if your tool autoloads project context, great. If not, paste relevant sections when prompting
+4. Treat sections as menu items - when building Option A (Empire Booster Workshop), your tool needs the Empire Builder section more than the WaveWarZ section. Tell it what you're building so it focuses
 
 **The single most important thing:** every prompt option in `OPTIONS.md` ties to existing ZAO rails. Use the SDKs, APIs, and patterns documented here. Don't reinvent. Composability is the point.
 
@@ -602,7 +610,13 @@ By T+48h (Sun 2026-06-28 12:00 PT), you must have all four:
 3. **60-second demo video link** (Loom, YouTube, or self-hosted). Show the thing working.
 4. **Tweet/cast on /zabalgames channel** announcing your ship. Tag `@bettercallzaal` so we see it.
 
-Miss any one = no submission = no USDC, no collectible, no Hall of Fame.
+PLUS during the 24h build, your declared **show-your-work visibility mode** must be active:
+- Mode 1 (Live Twitch stream): stream archive available afterward
+- Mode 2 (Recorded screen sessions): YouTube/Loom uploads landed within 1h of each session ending
+- Mode 3 (Public AI prompt logs): logs published every 1-2 hours throughout build
+- Mode 4 (Frequent build casts): casts every 1-2 hours throughout build
+
+Miss the submission bar OR fail the visibility mode = no submission = no USDC, no collectible, no Hall of Fame.
 
 ---
 
@@ -610,7 +624,8 @@ Miss any one = no submission = no USDC, no collectible, no Hall of Fame.
 
 - No pre-built code. Empty git log at T+0 verified by spot-check.
 - Open source mandatory (MIT or similar permissive).
-- Stream the bulk of your build. Random 5-min stream chunks reviewed.
+- **Maintain your declared visibility mode throughout the build** (live stream archive OR session uploads within 1h OR prompt logs every 1-2h OR build casts every 1-2h). Spot-checks compare visibility timestamps vs git commit times.
+- **Use vibe-coding tools.** This is an AI-assisted build challenge. Pure manual coding is fine but you should be using AI tools as your primary leverage - that's the point.
 - Respect fellow players. No sabotage, no harassment.
 - Accept the ZABAL holder vote as final. No appeals.
 - Hate content, harassment, plagiarism = disqualification.
@@ -670,13 +685,15 @@ Hour 23-24 (11:00-12:00 PT)
 | Trying to build "the whole thing" | 24h is short. Ship one feature deep, not five features shallow |
 | Skipping the brand palette | "ZAO-native" voters can spot a generic-looking build instantly. Use the colors + fonts |
 | Ignoring mobile | Most voters will check your build on phone. 424px viewport = test at minimum |
-| Writing code without Claude Code | Defeats the point. Use Claude actively, narrate to your stream what you're prompting |
+| Coding without AI assistance | Defeats the point. This is a vibe-coding challenge. Use your tool actively, narrate to your audience what you're prompting |
+| Skipping your declared visibility mode | If you said "live stream" and you go dark for 12h, your visibility mode fails and submission gets rejected |
 | Pre-built code (even tiny bits) | Empty git log at T+0 is verified. Don't risk DQ |
 | Building something Solana-only | ZAO is Base-native. Solana is fine for WaveWarZ reads but core should be Base or Farcaster |
 | Reinventing identity | Use Farcaster verified address. Don't roll your own auth |
 | Not casting your ship | If voters don't see it, they don't vote for it. Cast loudly |
 | Sleeping zero hours | Builds get worse after hour 16. Sleep 4-6, code better afterwards |
 | Forgetting open-source license | MIT in your repo or risk DQ |
+| Mismatched tool + visibility mode | If you picked Cursor + "public prompt logs" but Cursor's composer history isn't easily exportable for you, switch modes early - don't get caught at T+48h without verifiable visibility |
 
 ---
 

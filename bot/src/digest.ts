@@ -79,7 +79,11 @@ export async function morningDigest(): Promise<string> {
   return lines.join('\n');
 }
 
-export async function eveningRecap(): Promise<string> {
+// Evening recap. Returns null if there is nothing worth posting -
+// no activity AND no closed todos. The schedule caller skips the post
+// when null is returned (don't spam the team with empty "no activity"
+// pings).
+export async function eveningRecap(): Promise<string | null> {
   const s = db();
   const since = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
   const [activityR, todosClosedR] = await Promise.all([
@@ -95,6 +99,11 @@ export async function eveningRecap(): Promise<string> {
   const activity = activityR.data ?? [];
   const closed = todosClosedR.data ?? [];
 
+  // Skip the post entirely when there is no real activity to recap.
+  if (activity.length === 0 && closed.length === 0) {
+    return null;
+  }
+
   const byActor: Record<string, number> = {};
   for (const a of activity) {
     // @ts-expect-error supabase inferred
@@ -108,13 +117,11 @@ export async function eveningRecap(): Promise<string> {
   const lines: string[] = [];
   lines.push(`Evening recap · ${new Date().toISOString().slice(0, 10)} · ${festivalDaysOut()} days to Oct 3`);
   lines.push('');
-  lines.push(`Moves today (${activity.length} activity entries)`);
-  if (actors.length > 0) {
+  if (activity.length > 0) {
+    lines.push(`Moves today (${activity.length} activity entries)`);
     for (const [name, count] of actors) lines.push(`  · ${name}: ${count}`);
-  } else {
-    lines.push('  (no activity logged)');
+    lines.push('');
   }
-  lines.push('');
   if (closed.length > 0) {
     lines.push(`Todos closed (${closed.length})`);
     for (const t of closed.slice(0, 5)) {

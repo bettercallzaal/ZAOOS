@@ -38,11 +38,16 @@ export function scheduleAll(bot: MinimalBot, onError: (err: unknown, label: stri
   );
 
   // Evening: every day 6:00pm America/New_York
+  // Skip if eveningRecap returns null (no activity + no closed todos)
   cron.schedule(
     '0 18 * * *',
     async () => {
       try {
         const text = await eveningRecap();
+        if (text === null) {
+          console.log('[schedule] evening skipped - no activity to recap');
+          return;
+        }
         await postToAllDigestChats(bot, text);
         console.log('[schedule] evening posted');
       } catch (err) {

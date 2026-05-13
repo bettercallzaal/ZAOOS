@@ -31,16 +31,18 @@ export interface ZoeCaptureNote {
 export interface ZoeContext {
   zaal_tg_id: number;
   workspace_dir: string;
-  pending_tasks: ZoeTask[];
-  recent_captures: ZoeCaptureNote[];
   current_date: string;
 }
 
 export interface ConciergeOptions {
   /** User message text */
   message: string;
-  /** Loaded ZOE context for system prompt */
+  /** Memory blocks (persona/human/working/tasks) loaded for this turn */
+  blocks: import('./memory').MemoryBlocks;
+  /** Loaded ZOE runtime context (date, workspace, zaal id) */
   context: ZoeContext;
+  /** Label for who's speaking — 'Zaal' for DMs, first-name or username for group members */
+  senderLabel?: string;
   /** Override model: 'sonnet' | 'opus' | 'haiku'. Default: sonnet (cheap), escalate to opus on hard reasoning */
   model?: string;
 }

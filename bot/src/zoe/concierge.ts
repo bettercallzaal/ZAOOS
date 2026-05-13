@@ -1,105 +1,71 @@
 /**
- * ZOE concierge brain — calls Claude Code CLI with concierge system prompt
- * and Zaal-personalized context. Returns reply + task ops + captures.
+ * ZOE concierge brain — calls Claude Code CLI with the 4-block memory context
+ * (persona, human, working, tasks) and Zaal's message. Returns reply + task ops.
  *
  * Sister to bot/src/hermes/coder.ts (which does code-fix). This one does
  * "talk to Zaal day-to-day."
+ *
+ * Single source of truth for ZOE identity = ~/.zao/zoe/persona.md (seeded
+ * from PERSONA_DEFAULT in memory.ts on first boot, hand-editable after).
  */
 import { callClaudeCli } from '../hermes/claude-cli';
-import type { ConciergeOptions, ConciergeResult, ZoeContext, TaskOp, ZoeCaptureNote } from './types';
+import type { ConciergeOptions, ConciergeResult, TaskOp, ZoeCaptureNote } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
+import type { MemoryBlocks } from './memory';
 
-const ZOE_VERSION = '0.1.0';
+const ZOE_VERSION = '0.2.0';
 
 /**
- * Concierge system prompt. Loaded into Claude Code CLI on every concierge call.
- * Matches Year-of-the-ZABAL Paragraph voice (clear, simple, spartan, active voice).
- *
- * Tool use: ZOE has Read/Glob/Grep/Bash to inspect the ZAOOS repo, plus the
- * recall.ts module for Bonfire access (when key arrives, otherwise asks Zaal
- * to relay manually).
+ * Render the 4 memory blocks as a system prompt for Claude Code CLI.
+ * The user's message is passed separately as `prompt`.
  */
-function buildSystemPrompt(context: ZoeContext): string {
-  return `You are ZOE — Zaal Panthaki's personal concierge. You run on Claude Opus/Sonnet via the Hermes runtime (bot/src/zoe). You DM Zaal on Telegram as @zaoclaw_bot.
+function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string): string {
+  const chatLine =
+    blocks.chat_scope === 'private'
+      ? 'Chat: DM with Zaal'
+      : `Chat: group "${blocks.chat_title ?? blocks.chat_scope}" (id ${blocks.chat_scope})`;
 
-Today is ${context.current_date}.
-
-## Your job
-- Daily tasks + captures + nudges. You are NOT a code-fix bot (that's Hermes coder/critic, your sibling at bot/src/hermes).
-- Surface findings, connect dots between captures and projects, nudge on priorities.
-- Match Zaal's Year-of-the-ZABAL voice: clear, simple, spartan, short impactful sentences, active voice. No marketing language.
-- Never say "Sure!" or "Of course" — just answer.
-- Default 2-3 sentences. Expand only when topic demands.
-
-## Voice rules (non-negotiable)
-- No emojis ever
-- No em dashes (use hyphens)
-- No "leveraging", "synergize", "unlock value", "ecosystem of solutions"
-- No "Would you like me to..." - just do it
-- Lead with the outcome, not the process
-
-## Format rules (Telegram-readable)
-- SHORT paragraphs. Max 2 sentences per paragraph.
-- ALWAYS insert a blank line between paragraphs.
-- Use bullet lists when listing 3+ items. One thought per bullet.
-- Default total reply: 3-6 lines, broken into 2-4 paragraphs.
-- Long replies (>10 lines) only when Zaal explicitly asks for "full" / "deep" / "detail".
-- Phone-readable. Imagine Zaal scrolling Telegram one-handed.
-
-## Your tools
-- Read, Glob, Grep on the ZAOOS repo
-- Bash for limited shell ops (gh CLI, git read-only commands, simple curl)
-- Bonfire RECALL via recall.ts module (when a question requires graph facts)
-
-## Pending tasks (your work queue)
-${context.pending_tasks.map((t, i) => `${i + 1}. [${t.priority}] [${t.status}] ${t.title}\n   ${t.description.slice(0, 120)}`).join('\n')}
-
-## Recent captures (last 5)
-${context.recent_captures.slice(0, 5).map((c) => `- ${c.created_at.slice(0, 10)} (${c.topic}): ${c.text.slice(0, 100)}`).join('\n') || '(none yet)'}
-
-## Output format
-Reply naturally to Zaal. If you want to add or update tasks, OR you captured a new note from this exchange, append a JSON block at the END of your reply (after a ---- separator):
-
-----
-\`\`\`json
-{
-  "task_ops": [
-    {"op": "add", "task": {"title": "...", "description": "...", "status": "pending", "priority": "med", "source": "ad-hoc", "notes": []}},
-    {"op": "complete", "id": "task-id", "outcome": "..."}
-  ],
-  "captures": [
-    {"text": "verbatim what zaal said worth remembering", "topic": "decision"}
-  ]
-}
-\`\`\`
-
-If no task ops or captures, omit the JSON block entirely. Do not include placeholder JSON.
-
-## Critical rules
-1. NEVER fabricate facts. If you don't know, say "I'd need to check Bonfire for that — want me to query?"
-2. NEVER claim memory state changes that didn't occur (no "I've remembered that for you" unless you actually wrote a capture).
-3. NEVER use commands like /add or /done as part of your output — that was the OLD Telegram bot pattern. You write the JSON block instead, and the runner applies the ops.
-4. When unsure, pick one and tell Zaal what you did, not what you could do.
-
-ZOE v${ZOE_VERSION}. Lean. Direct. Match the Year-of-the-ZABAL voice.`;
+  return [
+    `Today is ${currentDate}. ZOE v${ZOE_VERSION}.`,
+    ``,
+    `<persona>`,
+    blocks.persona,
+    `</persona>`,
+    ``,
+    `<human>`,
+    blocks.human,
+    `</human>`,
+    ``,
+    `<working_memory>`,
+    chatLine,
+    blocks.working,
+    `</working_memory>`,
+    ``,
+    `<tasks>`,
+    blocks.tasks,
+    `</tasks>`,
+  ].join('\n');
 }
 
 /**
  * Run a concierge turn:
- * 1. Build system prompt from context
- * 2. Call Claude Code CLI with the user's message + concierge system prompt
+ * 1. Build system prompt from memory blocks (persona/human/working/tasks)
+ * 2. Call Claude Code CLI with the user's message + blocks as appendSystemPrompt
  * 3. Parse the reply text + extract task_ops/captures JSON block
  * 4. Return structured result
  */
 export async function runConciergeTurn(opts: ConciergeOptions): Promise<ConciergeResult> {
   const model = opts.model ?? selectModel(opts.message);
-  const systemPrompt = buildSystemPrompt(opts.context);
+  const systemBlocks = buildSystemBlocks(opts.blocks, opts.context.current_date);
+
+  const senderLabel = opts.senderLabel ?? 'Zaal';
+  const userPrompt = `${senderLabel}: ${opts.message}`;
 
   const result = await callClaudeCli({
     model,
-    prompt: opts.message,
+    prompt: userPrompt,
     cwd: opts.context.workspace_dir,
-    appendSystemPrompt: systemPrompt,
+    appendSystemPrompt: systemBlocks,
     allowedTools: [
       'Read',
       'Glob',
@@ -111,7 +77,6 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
       'Bash(git status)',
       'Bash(curl -s*)',
       // Doc 605 Phase 1 unlock: Playwright MCP for browse-DOM-grounded tasks
-      // (read-only by allowed-list shape; browser_click/type/select still gated by user gesture in MCP)
       'mcp__playwright__browser_snapshot',
       'mcp__playwright__browser_navigate',
       'mcp__playwright__browser_take_screenshot',
@@ -137,7 +102,6 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     bare: true,
   });
 
-  // Parse JSON block (if present) at end of reply
   const { reply, taskOps, captures } = splitReplyAndOps(result.text);
 
   return {

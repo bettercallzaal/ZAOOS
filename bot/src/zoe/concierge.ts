@@ -99,7 +99,13 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     ],
     permissionMode: 'auto',
     outputFormat: 'json',
-    bare: true,
+    // bare: false on purpose. Claude Code CLI 2.1.140+ explicitly disables
+    // OAuth credential reads under --bare ("Anthropic auth is strictly
+    // ANTHROPIC_API_KEY or apiKeyHelper"). ZOE uses Max-plan OAuth, so we
+    // run without --bare. Cost is ~$0.10 per cold turn for CLAUDE.md auto-
+    // discovery (~26K input tokens) but prompt-cache amortizes that across
+    // a session.
+    bare: false,
   });
 
   const { reply, taskOps, captures } = splitReplyAndOps(result.text);

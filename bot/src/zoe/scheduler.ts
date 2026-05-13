@@ -107,7 +107,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             return;
           }
           const tip = await nextTip();
-          await opts.bot.api.sendMessage(opts.zaalTgId, tip);
+          const dest = opts.devzChatId ?? opts.zaalTgId; await opts.bot.api.sendMessage(dest, tip);
           console.log(`[zoe/scheduler] hourly tip sent (hour=${hour}): ${tip.slice(0, 60)}`);
         } catch (err) {
           console.error('[zoe/scheduler] hourly tip failed:', (err as Error).message);

@@ -46,6 +46,54 @@ const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
 
+// Telegram rejects messages over 4096 chars. Leave headroom for the
+// "(n/m) " chunk prefix and any markdown.
+const TELEGRAM_MAX = 3900;
+
+/**
+ * Split a long string into Telegram-sized chunks, preferring paragraph then
+ * line then word boundaries. Falls back to a hard cut only if no boundary is
+ * found in the back half of the window.
+ */
+function chunkMessage(text: string, max = TELEGRAM_MAX): string[] {
+  if (text.length <= max) return [text];
+  const chunks: string[] = [];
+  let remaining = text;
+  while (remaining.length > max) {
+    let cut = remaining.lastIndexOf('\n\n', max);
+    if (cut < max * 0.5) cut = remaining.lastIndexOf('\n', max);
+    if (cut < max * 0.5) cut = remaining.lastIndexOf(' ', max);
+    if (cut < max * 0.5) cut = max;
+    chunks.push(remaining.slice(0, cut).trimEnd());
+    remaining = remaining.slice(cut).trimStart();
+  }
+  if (remaining.length > 0) chunks.push(remaining);
+  return chunks;
+}
+
+/**
+ * Send a possibly-long reply as one or more Telegram messages. The "reply to"
+ * link (reply_parameters) is applied only to the first chunk. Without this,
+ * any reply over 4096 chars throws "Bad Request: message is too long" and the
+ * user gets nothing.
+ */
+async function replyChunked(
+  ctx: Context,
+  text: string,
+  opts: { replyToMessageId?: number } = {},
+): Promise<void> {
+  const chunks = chunkMessage(text);
+  for (let i = 0; i < chunks.length; i++) {
+    const prefix = chunks.length > 1 ? `(${i + 1}/${chunks.length}) ` : '';
+    await ctx.reply(prefix + chunks[i], {
+      reply_parameters:
+        i === 0 && opts.replyToMessageId
+          ? { message_id: opts.replyToMessageId }
+          : undefined,
+    });
+  }
+}
+
 async function appendClaudeNote(body: string): Promise<number> {
   await fs.mkdir(ZOE_PATHS.home, { recursive: true });
   const ts = new Date().toISOString();
@@ -112,7 +160,7 @@ bot.command('start', async (ctx) => {
 bot.command('tasks', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const blocks = await buildMemoryBlocks('private');
-  await ctx.reply(`Open tasks:\n\n${blocks.tasks}`);
+  await replyChunked(ctx, `Open tasks:\n\n${blocks.tasks}`);
 });
 
 bot.command('seed', async (ctx) => {
@@ -138,11 +186,9 @@ bot.command('notes', async (ctx) => {
       return;
     }
     const recent = blocks.slice(-5).join('\n\n');
-    await ctx.reply(
-      `${blocks.length} note${blocks.length === 1 ? '' : 's'} pending (showing last 5):\n\n${recent.slice(
-        0,
-        3500,
-      )}`,
+    await replyChunked(
+      ctx,
+      `${blocks.length} note${blocks.length === 1 ? '' : 's'} pending (showing last 5):\n\n${recent}`,
     );
   } catch {
     await ctx.reply('No notes pending. Drop one with `note: <feedback>`.');
@@ -428,9 +474,8 @@ async function dispatchConcierge(
       return;
     }
 
-    await ctx.reply(safeReply, {
-      reply_parameters:
-        scope === 'private' ? undefined : { message_id: ctx.message?.message_id ?? 0 },
+    await replyChunked(ctx, safeReply, {
+      replyToMessageId: scope === 'private' ? undefined : ctx.message?.message_id,
     });
 
     console.log(

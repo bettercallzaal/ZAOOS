@@ -29,12 +29,27 @@ This is the comprehensive profile. Doc 427 is the narrow brand brief for the UVR
 
 ---
 
+## Corrections & Second-Wave Findings (2026-05-14 deep pass)
+
+A second wave of 5 research agents (Twitch detail, on-chain forensics, full biography, the music itself, web3-scene context) surfaced material that corrects parts of the first pass and doc 427:
+
+- **Sound.xyz has shut down.** It entered maintenance mode May 2025 and shut down January 16, 2026. The team pivoted to "Vault" (a direct-to-fan platform, partnered with James Blake). Every "Sound.xyz drop" referenced below is now a historical artifact, not a live storefront. This reframes UVR's entire music-distribution layer.
+- **Birthplace is New Jersey, not Virginia.** doc 427.02 said "Manassas, Virginia." Apple Music lists Somerset, NJ; interviews repeatedly say "central New Jersey" (he describes driving two hours to NYC to meet musicians). Treat NJ as correct; Virginia was an error.
+- **Born March 26, 2001** — he is 25, not "~25-26."
+- **The "365-day Twitch challenge" is unverified branding, not a documented streak.** TwitchTracker shows "no streams for selected period" across 7d / 30d / 3m as of May 2026. Streams may have paused after the TwitchCon show (Oct 2025) and the LA shipping-container move (Nov 2025). The durable fact is "daily streaming Jan-late 2025"; current status is unclear/possibly paused.
+- **Violet Token contract is verified on-chain:** `0x6d27462859df2aa5ecccbd14d68b9742ff48da91` (Ethereum mainnet, ERC-721). The Raver Realm contract address still could not be verified — do not cite one.
+- **UVR's honest trajectory: plateau / managed decline.** Raver Realm stalled at ~38% minted, the rave series has been dormant since ~late 2023, no new music NFT drops since Oct 2023, the "Violet" album never shipped, and the founder pivoted to Twitch. UVR launched Raver Realm (Oct 2023) directly into the music-NFT winter and could not move inventory. This does not erase the playbook lessons — it sharpens the cautionary half of them.
+
+Full detail on each is in the sub-docs. The biography material is consolidated in **[02-biography-source-material.md](02-biography-source-material.md)**.
+
+---
+
 ## Profile: Jadyn Violet
 
 | Field | Value | Source / Note |
 |-------|-------|---------------|
-| Identity | First-generation Indian American, from Manassas, Virginia | doc 427.02; Culture3 interview |
-| Age | ~25-26 in May 2026 (23 at early-2023 press) | Word To Your Mama Ep 167 |
+| Identity | First-generation Indian American, raised in central New Jersey (Somerset / Franklin area). doc 427.02's "Manassas, Virginia" is unverified and likely wrong — Apple Music and every interview point to NJ. | Apple Music; Culture3; NOISE DAO |
+| Born / age | March 26, 2001 — age 25 as of May 2026 | Apple Music (ARCHIV3 called him "23" in Jan 2024, consistent) |
 | Prior path | Rutgers business school, near-perfect SAT, dropped out 3rd semester | doc 427.02; Culture3 |
 | Craft | Alternative hip-hop (blends pop, rap, electronic); also a hand-drawing NFT illustrator (Paint.NET + Wacom) | Medium bio |
 | Production credits | OADEVOUR, brace, Kronothethird, Jadyn Violet | Patrol Crypto; Raver Realm |
@@ -180,6 +195,7 @@ The detailed extraction — 7 concrete mechanics ZAO should steal or adapt, each
 - [Doc 050](../050-the-zao-complete-guide/) — The ZAO complete guide (UVR in the communities table)
 - [Doc 051](../051-zao-whitepaper-2026/) — ZAO whitepaper (Jadyn as roster artist, UVR as associated community)
 - [01-zao-playbook.md](01-zao-playbook.md) — the 7-mechanic extraction for ZAO
+- [02-biography-source-material.md](02-biography-source-material.md) — biography dossier: chronological life narrative, career timeline, 30-quote bank, themes, the entrepreneurial thread, open questions for a biographer
 
 ## Next Actions
 

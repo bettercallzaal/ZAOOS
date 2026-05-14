@@ -141,3 +141,31 @@ test('recomputeActive: a pinned quest is always active even with a low score', a
   assert.equal(status.b, 'active');
   assert.equal(status.c, 'parked');
 });
+
+test('recomputeActive: alignment 0 is scored (active) - null is not', async () => {
+  const { recomputeActive } = await import('../sidequests.ts');
+  const pool = [
+    mkQuest({ id: 'a', alignment: 5 }),
+    mkQuest({ id: 'b', alignment: 0 }),
+    mkQuest({ id: 'c', alignment: null }),
+  ];
+  const out = recomputeActive(pool);
+  const status = Object.fromEntries(out.map((q) => [q.id, q.status]));
+  assert.equal(status.a, 'active');
+  assert.equal(status.b, 'active'); // 0 is a real score, not null
+  assert.equal(status.c, 'parked'); // null is never active
+});
+
+test('recomputeActive: more than ACTIVE_LIMIT pinned still yields only 3 active', async () => {
+  const { recomputeActive } = await import('../sidequests.ts');
+  const pool = [
+    mkQuest({ id: 'a', alignment: 1, pinned: true }),
+    mkQuest({ id: 'b', alignment: 1, pinned: true }),
+    mkQuest({ id: 'c', alignment: 1, pinned: true }),
+    mkQuest({ id: 'd', alignment: 1, pinned: true }),
+    mkQuest({ id: 'e', alignment: 9 }),
+  ];
+  const out = recomputeActive(pool);
+  const active = out.filter((q) => q.status === 'active');
+  assert.equal(active.length, 3); // capped at ACTIVE_LIMIT even with 4 pinned
+});

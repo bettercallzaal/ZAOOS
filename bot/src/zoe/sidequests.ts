@@ -63,7 +63,7 @@ export async function writeSideQuests(quests: SideQuest[]): Promise<void> {
  * Recompute the active set. Pure — returns a new array, mutates nothing.
  *
  * - done/dropped quests are terminal: status untouched, never active.
- * - pinned quests are always active.
+ * - pinned quests are always active, but never more than ACTIVE_LIMIT total.
  * - remaining slots (ACTIVE_LIMIT minus pinned count) fill from the
  *   highest-alignment SCORED quests.
  * - every other rankable quest (scored-but-bumped, or unscored) -> parked.
@@ -72,7 +72,8 @@ export function recomputeActive(quests: SideQuest[]): SideQuest[] {
   const result = quests.map((q) => ({ ...q }));
   const rankable = result.filter((q) => q.status !== 'done' && q.status !== 'dropped');
 
-  const pinned = rankable.filter((q) => q.pinned);
+  // Pinned quests are always active, but never more than ACTIVE_LIMIT total.
+  const pinned = rankable.filter((q) => q.pinned).slice(0, ACTIVE_LIMIT);
   const unpinned = rankable.filter((q) => !q.pinned);
   // highest alignment first; unscored (null) sinks to the bottom
   unpinned.sort((a, b) => (b.alignment ?? -1) - (a.alignment ?? -1));

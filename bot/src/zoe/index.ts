@@ -8,7 +8,7 @@
  * concierge handler with a per-chat memory scope, gated by group mode +
  * sender allowlist. See groups.ts.
  *
- * Also boots the scheduler (morning brief, evening reflection, hourly tips).
+ * Also boots the scheduler (morning brief, evening reflection, hourly nudge).
  *
  * Run via:
  *   pnpm tsx src/zoe/index.ts
@@ -30,7 +30,7 @@ import {
   type ChatScope,
 } from './memory';
 import { startScheduler } from './scheduler';
-import { disableTips, enableTips, tipsEnabled } from './tips';
+import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -370,21 +370,21 @@ bot.on('message:text', async (ctx) => {
 });
 
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
-  // Hourly tip toggle
-  const tipToggle = /^(stop|pause|disable)\s+tips?$/i.exec(text.trim())
+  // Hourly nudge toggle. Accepts "nudges" and the legacy "tips" phrasing.
+  const nudgeToggle = /^(stop|pause|disable)\s+(nudges?|tips?)$/i.exec(text.trim())
     ? 'off'
-    : /^(start|resume|enable)\s+tips?$/i.exec(text.trim())
+    : /^(start|resume|enable)\s+(nudges?|tips?)$/i.exec(text.trim())
       ? 'on'
       : null;
-  if (tipToggle === 'off') {
-    await disableTips();
-    await ctx.reply('Hourly tips paused. Send "start tips" to resume.');
+  if (nudgeToggle === 'off') {
+    await disableNudges();
+    await ctx.reply('Hourly nudges paused. Send "start nudges" to resume.');
     return;
   }
-  if (tipToggle === 'on') {
-    await enableTips();
-    const status = await tipsEnabled();
-    await ctx.reply(status ? 'Hourly tips on.' : 'Tips toggle failed - check logs.');
+  if (nudgeToggle === 'on') {
+    await enableNudges();
+    const status = await nudgesEnabled();
+    await ctx.reply(status ? 'Hourly nudges on.' : 'Nudge toggle failed - check logs.');
     return;
   }
 
@@ -431,6 +431,13 @@ async function handleGroupMessage(
   await dispatchConcierge(ctx, text, scope, label);
 }
 
+// A concierge turn can take 60s+ on Opus. Telegram clears the typing
+// indicator after ~5s, so without this the user stares at silence and
+// assumes the bot is dead. We refresh the typing action every 4s and, if
+// the turn crosses ACK_THRESHOLD_MS, send one "still working" text ping.
+const ACK_THRESHOLD_MS = 6000;
+const TYPING_REFRESH_MS = 4000;
+
 async function dispatchConcierge(
   ctx: Context,
   text: string,
@@ -438,7 +445,15 @@ async function dispatchConcierge(
   label: string,
 ): Promise<void> {
   if (!ctx.chat) return;
-  await ctx.api.sendChatAction(ctx.chat.id, 'typing').catch(() => {});
+  const chatId = ctx.chat.id;
+  await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+
+  const typingInterval = setInterval(() => {
+    ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  }, TYPING_REFRESH_MS);
+  const ackTimeout = setTimeout(() => {
+    ctx.reply('Got it. Working on this one - reply incoming.').catch(() => {});
+  }, ACK_THRESHOLD_MS);
 
   try {
     const chatTitle =
@@ -487,6 +502,9 @@ async function dispatchConcierge(
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[zoe/index] concierge turn failed:', msg);
     await ctx.reply(`(concierge error - ${msg.slice(0, 200)})`);
+  } finally {
+    clearInterval(typingInterval);
+    clearTimeout(ackTimeout);
   }
 }
 

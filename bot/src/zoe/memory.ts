@@ -18,7 +18,7 @@
  */
 import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import type { ZoeTask } from './types';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
@@ -26,6 +26,7 @@ const PERSONA_PATH = join(ZOE_HOME, 'persona.md');
 const HUMAN_PATH = join(ZOE_HOME, 'human.md');
 const RECENT_DIR = join(ZOE_HOME, 'recent');
 const LEGACY_RECENT_PATH = join(ZOE_HOME, 'recent.json');
+const ARCHIVE_DIR = join(ZOE_HOME, 'archive');
 const TASKS_PATH = join(ZOE_HOME, 'tasks.json');
 const BOOTLOADER_PATH = join(ZOE_HOME, 'bootloader-template.md');
 
@@ -290,9 +291,23 @@ function recentPathFor(scope: ChatScope): string {
   return join(RECENT_DIR, `${scope}.json`);
 }
 
-export async function readRecent(
-  scope: ChatScope = 'private',
-): Promise<Array<{ from: 'zaal' | 'zoe' | 'other'; text: string; ts: string; sender?: string }>> {
+/**
+ * Archive path for a chat, partitioned by month so files stay scannable.
+ * ~/.zao/zoe/archive/<scope>/<yyyy-mm>.jsonl
+ */
+function archivePathFor(scope: ChatScope, when: Date): string {
+  const month = when.toISOString().slice(0, 7); // yyyy-mm
+  return join(ARCHIVE_DIR, String(scope), `${month}.jsonl`);
+}
+
+export interface RecentTurn {
+  from: 'zaal' | 'zoe' | 'other';
+  text: string;
+  ts: string;
+  sender?: string;
+}
+
+export async function readRecent(scope: ChatScope = 'private'): Promise<RecentTurn[]> {
   await ensureZoeHome();
   const path = recentPathFor(scope);
   try {
@@ -303,13 +318,63 @@ export async function readRecent(
   }
 }
 
+/**
+ * Append-only conversation log. Never truncated - this is ZOE's long-term
+ * memory of every turn, the source for soul exports and future retrieval.
+ * The recent.json ring buffer (RECENT_MAX turns) is just the prompt window;
+ * this archive is the permanent record.
+ */
+export async function appendArchive(turn: RecentTurn, scope: ChatScope = 'private'): Promise<void> {
+  const path = archivePathFor(scope, new Date(turn.ts));
+  await fs.mkdir(dirname(path), { recursive: true });
+  await fs.appendFile(path, JSON.stringify(turn) + '\n', 'utf8');
+}
+
+/**
+ * Read archived turns for a chat. Without `month`, concatenates every month
+ * file for the scope in chronological order.
+ */
+export async function readArchive(
+  scope: ChatScope = 'private',
+  month?: string,
+): Promise<RecentTurn[]> {
+  const dir = join(ARCHIVE_DIR, String(scope));
+  let files: string[];
+  try {
+    files = (await fs.readdir(dir)).filter((f) => f.endsWith('.jsonl')).sort();
+  } catch {
+    return [];
+  }
+  if (month) files = files.filter((f) => f === `${month}.jsonl`);
+  const turns: RecentTurn[] = [];
+  for (const file of files) {
+    const raw = await fs.readFile(join(dir, file), 'utf8');
+    for (const line of raw.split('\n')) {
+      if (!line.trim()) continue;
+      try {
+        turns.push(JSON.parse(line) as RecentTurn);
+      } catch {
+        // skip a corrupt line rather than fail the whole read
+      }
+    }
+  }
+  return turns;
+}
+
 export async function pushRecent(
   turn: { from: 'zaal' | 'zoe' | 'other'; text: string; sender?: string },
   scope: ChatScope = 'private',
 ): Promise<void> {
   await ensureZoeHome();
+  const stamped: RecentTurn = { ...turn, ts: new Date().toISOString() };
+
+  // Permanent append-only archive first - this must not be lost even if the
+  // ring-buffer write below fails.
+  await appendArchive(stamped, scope);
+
+  // Ring buffer: last RECENT_MAX turns, the prompt window.
   const recent = await readRecent(scope);
-  recent.push({ ...turn, ts: new Date().toISOString() });
+  recent.push(stamped);
   while (recent.length > RECENT_MAX) recent.shift();
   await fs.writeFile(recentPathFor(scope), JSON.stringify(recent, null, 2), 'utf8');
 }
@@ -389,6 +454,7 @@ export const ZOE_PATHS = {
   persona: PERSONA_PATH,
   human: HUMAN_PATH,
   recent_dir: RECENT_DIR,
+  archive_dir: ARCHIVE_DIR,
   tasks: TASKS_PATH,
   bootloader: BOOTLOADER_PATH,
 };

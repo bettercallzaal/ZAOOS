@@ -8,7 +8,7 @@
  * concierge handler with a per-chat memory scope, gated by group mode +
  * sender allowlist. See groups.ts.
  *
- * Also boots the scheduler (morning brief, evening reflection, hourly tips).
+ * Also boots the scheduler (morning brief, evening reflection, hourly nudge).
  *
  * Run via:
  *   pnpm tsx src/zoe/index.ts
@@ -30,7 +30,7 @@ import {
   type ChatScope,
 } from './memory';
 import { startScheduler } from './scheduler';
-import { disableTips, enableTips, tipsEnabled } from './tips';
+import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -370,21 +370,21 @@ bot.on('message:text', async (ctx) => {
 });
 
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
-  // Hourly tip toggle
-  const tipToggle = /^(stop|pause|disable)\s+tips?$/i.exec(text.trim())
+  // Hourly nudge toggle. Accepts "nudges" and the legacy "tips" phrasing.
+  const nudgeToggle = /^(stop|pause|disable)\s+(nudges?|tips?)$/i.exec(text.trim())
     ? 'off'
-    : /^(start|resume|enable)\s+tips?$/i.exec(text.trim())
+    : /^(start|resume|enable)\s+(nudges?|tips?)$/i.exec(text.trim())
       ? 'on'
       : null;
-  if (tipToggle === 'off') {
-    await disableTips();
-    await ctx.reply('Hourly tips paused. Send "start tips" to resume.');
+  if (nudgeToggle === 'off') {
+    await disableNudges();
+    await ctx.reply('Hourly nudges paused. Send "start nudges" to resume.');
     return;
   }
-  if (tipToggle === 'on') {
-    await enableTips();
-    const status = await tipsEnabled();
-    await ctx.reply(status ? 'Hourly tips on.' : 'Tips toggle failed - check logs.');
+  if (nudgeToggle === 'on') {
+    await enableNudges();
+    const status = await nudgesEnabled();
+    await ctx.reply(status ? 'Hourly nudges on.' : 'Nudge toggle failed - check logs.');
     return;
   }
 

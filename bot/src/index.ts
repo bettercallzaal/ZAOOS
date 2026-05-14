@@ -463,8 +463,10 @@ bot.command('digest', async (ctx) => {
   const which = (ctx.match ?? '').trim().toLowerCase();
   let text: string;
   try {
-    if (which === 'evening') text = await eveningRecap();
-    else if (which === 'week') text = await weekAheadDigest();
+    if (which === 'evening') {
+      const r = await eveningRecap();
+      text = r ?? 'No activity to recap today. Evening digest is silent when the board is quiet.';
+    } else if (which === 'week') text = await weekAheadDigest();
     else if (which === 'retro') text = await fridayRetro();
     else text = await morningDigest();
   } catch (err) {

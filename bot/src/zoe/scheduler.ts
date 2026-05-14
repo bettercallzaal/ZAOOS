@@ -6,7 +6,7 @@
  * Triggers:
  *   05:00 EST (09:00 UTC daily)  — morning brief
  *   21:00 EST (01:00 UTC daily)  — evening reflection
- *   hourly                        — ZAO Devz General topic learning tip (Phase 4 cutover from python cron)
+ *   hourly                        — forward nudge: the real next move from the task queue
  *
  * Posting target: Zaal's DM via @zaoclaw_bot (chat_id from ZAAL_TELEGRAM_ID env).
  *
@@ -21,7 +21,7 @@ import type { Bot } from 'grammy';
 import { generateMorningBrief } from './brief';
 import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
-import { nextTip, tipsEnabled } from './tips';
+import { nextNudge, nudgesEnabled } from './nudges';
 
 const SENTINEL_DIR = join(ZOE_PATHS.home, 'sentinels');
 
@@ -93,9 +93,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     ),
   );
 
-  // Hourly userguide tip - rotating reminder so Zaal habituates to interacting via Telegram.
-  // Skips the 09:00 UTC and 01:00 UTC slots so we never overlap morning brief / evening reflect.
-  // Self-disables if Zaal sends "stop tips" (handled in index.ts).
+  // Hourly forward nudge - surfaces the real next move from the task queue.
+  // Per doc 648: a generic "be productive" cron does not work; the nudge has
+  // to name the actual next thing. Skips the 09:00 / 01:00 UTC slots so it
+  // never overlaps morning brief / evening reflect. Self-disables if Zaal
+  // sends "stop nudges" (handled in index.ts). Sends nothing on an empty
+  // queue - an empty ping is worse than no ping.
   tasks.push(
     cron.schedule(
       '0 * * * *',
@@ -103,14 +106,15 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         const hour = new Date().getUTCHours();
         if (hour === 9 || hour === 1) return; // dodge brief + reflect collisions
         try {
-          if (!(await tipsEnabled())) {
+          if (!(await nudgesEnabled())) {
             return;
           }
-          const tip = await nextTip();
-          await opts.bot.api.sendMessage(opts.zaalTgId, tip);
-          console.log(`[zoe/scheduler] hourly tip sent (hour=${hour}): ${tip.slice(0, 60)}`);
+          const nudge = await nextNudge();
+          if (!nudge) return; // empty queue - skip
+          await opts.bot.api.sendMessage(opts.zaalTgId, nudge);
+          console.log(`[zoe/scheduler] hourly nudge sent (hour=${hour})`);
         } catch (err) {
-          console.error('[zoe/scheduler] hourly tip failed:', (err as Error).message);
+          console.error('[zoe/scheduler] hourly nudge failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

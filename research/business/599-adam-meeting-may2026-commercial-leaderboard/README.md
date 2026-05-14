@@ -29,25 +29,25 @@ tier: QUICK
 
 ## Participants + Context
 
-- **Zaal** - ZAOstock lead, building the pitch + Luma, running point on partnerships.
+- **Zaal** - ZAOstock lead, building the pitch + Luma, running point on partnerships. Taking on a new paid software-build side gig (see Section 1).
 - **Adam** - long-standing technical/commercial collaborator. Built the leaderboard tooling with Legash (engineer). Now building an agentic payment system as his main focus.
 
 This was a voice-transcribed casual call, mid-May 2026. ZAOstock is October 3, 2026 - roughly 4.5 months out at the time of the call.
 
 ---
 
-## 1. Adam's Bandwidth Change
+## 1. Zaal's Bandwidth Change
 
-Adam is taking on a paid hourly software-build side gig for a Bar Harbor landscaping company.
+Zaal is taking on a paid hourly software-build side gig for a Bar Harbor landscaping company.
 
 - **Structure:** on the company's payroll, paid hourly, consulting-style - building their software from scratch.
 - **Keeps his current job** for the benefits; the side gig stacks on top.
-- **Near-term cost:** a 1-2 month ramp where Adam steps back from some ZAO work while he gets situated.
-- **Long-term gain:** lets Adam pay off the debt he owes his retirement fund and financially situate himself - explicitly framed as getting himself "as good as I can be for October's event."
-- **Local upside:** the landscaping owner is another Bar Harbor business owner - can open local connections, already lined up a second potential consulting gig for Adam. Owner is flexible and fine with Adam posting about the company on social + continuing open-source coding.
-- **Coverage plan:** Adam estimates 10-20 hrs/week capacity, and Iman can work ZAO tasks alongside Adam while Adam is at his full-time gig - part of why Adam has been ramping Iman up.
+- **Near-term cost:** a 1-2 month ramp where Zaal steps back from some ZAO work while he gets situated.
+- **Long-term gain:** lets Zaal pay off the debt he owes his retirement fund and financially situate himself - explicitly framed as getting himself "as good as I can be for October's event."
+- **Local upside:** the landscaping owner is another Bar Harbor business owner - can open local connections, already lined up a second potential consulting gig for Zaal. Owner is flexible and fine with Zaal posting about the company on social + continuing open-source coding.
+- **Coverage plan:** Zaal can do 10-20 hrs/week on the side gig, and Iman can work ZAO tasks alongside Zaal while Zaal is at his full-time job - part of why Zaal has been ramping Iman up.
 
-**Implication for ZAOstock:** Adam stays involved but is bandwidth-constrained for ~1-2 months. His highest-leverage contribution shifts to the commercial-model thinking (Section 3), not hands-on build.
+**Implication for ZAOstock:** Zaal stays the lead but is bandwidth-constrained for ~1-2 months. Mitigation: Iman covers more execution, and Adam's highest-leverage contribution shifts to the commercial-model thinking (Section 3), not hands-on build.
 
 ---
 

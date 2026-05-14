@@ -259,3 +259,20 @@ test('applyQuestOps: unknown id on score is skipped, not thrown', async () => {
     assert.deepEqual(res.scored, []);
   });
 });
+
+test('applyQuestOps: add then score the same quest works across batches', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, readSideQuests } = await import('../sidequests.ts');
+    const add = await applyQuestOps([{ op: 'add', quest: { title: 'Q', description: 'd' } }]);
+    const id = add.added[0].id;
+    const res = await applyQuestOps([
+      { op: 'add', quest: { title: 'Q2', description: 'd2' } },
+      { op: 'score', id, alignment: 8, reason: 'evolved' },
+    ]);
+    assert.equal(res.scored.length, 1);
+    const stored = await readSideQuests();
+    const scored = stored.find((q) => q.id === id);
+    assert.equal(scored?.alignment, 8);
+    assert.equal(scored?.status, 'active');
+  });
+});

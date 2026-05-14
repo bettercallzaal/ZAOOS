@@ -169,3 +169,93 @@ test('recomputeActive: more than ACTIVE_LIMIT pinned still yields only 3 active'
   const active = out.filter((q) => q.status === 'active');
   assert.equal(active.length, 3); // capped at ACTIVE_LIMIT even with 4 pinned
 });
+
+test('applyQuestOps: set_main writes the main quest', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, readMainQuest } = await import('../sidequests.ts');
+    const res = await applyQuestOps([{ op: 'set_main', text: 'Ship the ZAO' }]);
+    assert.equal(res.main_quest_set, true);
+    assert.equal(await readMainQuest(), 'Ship the ZAO');
+  });
+});
+
+test('applyQuestOps: add with alignment scores immediately and can go active', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, readSideQuests } = await import('../sidequests.ts');
+    const res = await applyQuestOps([
+      { op: 'add', quest: { title: 'WaveWarZ Africa', description: 'launch', alignment: 8, alignment_reason: 'direct' } },
+    ]);
+    assert.equal(res.added.length, 1);
+    const stored = await readSideQuests();
+    assert.equal(stored.length, 1);
+    assert.equal(stored[0].alignment, 8);
+    assert.equal(stored[0].status, 'active');
+    assert.notEqual(stored[0].scored_at, null);
+  });
+});
+
+test('applyQuestOps: add without alignment stays unscored and parked', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, readSideQuests } = await import('../sidequests.ts');
+    await applyQuestOps([{ op: 'add', quest: { title: 'Someday thing', description: 'd' } }]);
+    const stored = await readSideQuests();
+    assert.equal(stored[0].alignment, null);
+    assert.equal(stored[0].status, 'parked');
+    assert.equal(stored[0].scored_at, null);
+  });
+});
+
+test('applyQuestOps: score updates an existing quest and recomputes active', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, readSideQuests } = await import('../sidequests.ts');
+    const add = await applyQuestOps([{ op: 'add', quest: { title: 'Q', description: 'd' } }]);
+    const id = add.added[0].id;
+    const res = await applyQuestOps([{ op: 'score', id, alignment: 9, reason: 'core' }]);
+    assert.deepEqual(res.scored, [id]);
+    const stored = await readSideQuests();
+    assert.equal(stored[0].alignment, 9);
+    assert.equal(stored[0].alignment_reason, 'core');
+    assert.equal(stored[0].status, 'active');
+  });
+});
+
+test('applyQuestOps: complete and drop are terminal', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, readSideQuests } = await import('../sidequests.ts');
+    const add = await applyQuestOps([
+      { op: 'add', quest: { title: 'A', description: 'd', alignment: 5, alignment_reason: 'r' } },
+      { op: 'add', quest: { title: 'B', description: 'd', alignment: 6, alignment_reason: 'r' } },
+    ]);
+    const [idA, idB] = add.added.map((q) => q.id);
+    await applyQuestOps([{ op: 'complete', id: idA }, { op: 'drop', id: idB }]);
+    const stored = await readSideQuests();
+    const byId = Object.fromEntries(stored.map((q) => [q.id, q.status]));
+    assert.equal(byId[idA], 'done');
+    assert.equal(byId[idB], 'dropped');
+  });
+});
+
+test('applyQuestOps: pin forces a quest active across recompute', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, readSideQuests } = await import('../sidequests.ts');
+    const add = await applyQuestOps([
+      { op: 'add', quest: { title: 'A', description: 'd', alignment: 9, alignment_reason: 'r' } },
+      { op: 'add', quest: { title: 'B', description: 'd', alignment: 8, alignment_reason: 'r' } },
+      { op: 'add', quest: { title: 'C', description: 'd', alignment: 7, alignment_reason: 'r' } },
+      { op: 'add', quest: { title: 'D', description: 'd', alignment: 1, alignment_reason: 'r' } },
+    ]);
+    const idD = add.added[3].id;
+    await applyQuestOps([{ op: 'pin', id: idD }]);
+    const stored = await readSideQuests();
+    const byId = Object.fromEntries(stored.map((q) => [q.id, q.status]));
+    assert.equal(byId[idD], 'active');
+  });
+});
+
+test('applyQuestOps: unknown id on score is skipped, not thrown', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps } = await import('../sidequests.ts');
+    const res = await applyQuestOps([{ op: 'score', id: 'sq-nope', alignment: 5, reason: 'r' }]);
+    assert.deepEqual(res.scored, []);
+  });
+});

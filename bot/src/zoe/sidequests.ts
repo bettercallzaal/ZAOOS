@@ -87,3 +87,105 @@ export function recomputeActive(quests: SideQuest[]): SideQuest[] {
   }
   return result;
 }
+
+/**
+ * Apply a batch of QuestOps. set_main writes main-quest.md; the rest mutate
+ * the side-quest pool. After every batch the active set is recomputed and the
+ * pool is persisted. Unknown ids are skipped with a console.warn (mirrors
+ * applyTaskOps in tasks.ts) - never throws on a bad id.
+ */
+export async function applyQuestOps(ops: QuestOp[]): Promise<QuestOpResult> {
+  const existing = await readSideQuests();
+  const byId = new Map(existing.map((q) => [q.id, q]));
+  const res: QuestOpResult = {
+    main_quest_set: false,
+    added: [],
+    scored: [],
+    completed: [],
+    dropped: [],
+    pinned: [],
+    active: [],
+  };
+
+  for (const op of ops) {
+    switch (op.op) {
+      case 'set_main': {
+        await writeMainQuest(op.text);
+        res.main_quest_set = true;
+        break;
+      }
+      case 'add': {
+        const ts = nowIso();
+        const scored = op.quest.alignment != null;
+        const q: SideQuest = {
+          id: newQuestId(),
+          title: op.quest.title,
+          description: op.quest.description,
+          alignment: op.quest.alignment ?? null,
+          alignment_reason: op.quest.alignment_reason ?? '',
+          status: 'parked',
+          pinned: false,
+          created_at: ts,
+          updated_at: ts,
+          scored_at: scored ? ts : null,
+        };
+        byId.set(q.id, q);
+        res.added.push(q);
+        break;
+      }
+      case 'score': {
+        const q = byId.get(op.id);
+        if (!q) {
+          console.warn(`[zoe/sidequests] score skipped - id not found: ${op.id}`);
+          break;
+        }
+        q.alignment = op.alignment;
+        q.alignment_reason = op.reason;
+        q.scored_at = nowIso();
+        q.updated_at = nowIso();
+        res.scored.push(q.id);
+        break;
+      }
+      case 'complete': {
+        const q = byId.get(op.id);
+        if (!q) {
+          console.warn(`[zoe/sidequests] complete skipped - id not found: ${op.id}`);
+          break;
+        }
+        q.status = 'done';
+        q.pinned = false;
+        q.updated_at = nowIso();
+        res.completed.push(q.id);
+        break;
+      }
+      case 'drop': {
+        const q = byId.get(op.id);
+        if (!q) {
+          console.warn(`[zoe/sidequests] drop skipped - id not found: ${op.id}`);
+          break;
+        }
+        q.status = 'dropped';
+        q.pinned = false;
+        q.updated_at = nowIso();
+        res.dropped.push(q.id);
+        break;
+      }
+      case 'pin': {
+        const q = byId.get(op.id);
+        if (!q) {
+          console.warn(`[zoe/sidequests] pin skipped - id not found: ${op.id}`);
+          break;
+        }
+        q.pinned = true;
+        q.updated_at = nowIso();
+        res.pinned.push(q.id);
+        break;
+      }
+    }
+  }
+
+  const recomputed = recomputeActive(Array.from(byId.values()));
+  await writeSideQuests(recomputed);
+  res.active = recomputed.filter((q) => q.status === 'active');
+  return res;
+}

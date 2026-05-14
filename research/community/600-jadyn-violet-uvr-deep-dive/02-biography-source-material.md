@@ -60,7 +60,7 @@ In late 2021 he discovers on-chain music and music NFTs, right as the technology
 
 ### Chapter 5 — Building UVR (2021 -> 2023)
 
-It starts as a daily Twitter Space — "Violet Rave," soon "Underground Violet Rave." Originally a 10pm-5am marathon, later moved to 11am EST for reach. Not transactional: panels, music-NFT talk, philosophy, "literally anything," POAP "Orbs" for showing up. He hosts it every single day. Someone in the community suggests he throw an in-person rave; he thinks it is "absolutely crazy" and does it anyway. The first UVR — Brooklyn, NFT NYC, September 2022 — draws 250+ people from around the world, the same people who had been voices in the Space. That is the realization: "This is the community that I've always wanted to build, and it's happening right in front of my eyes." He goes "all out": raves in Virginia, Cincinnati, Miami (500+ at Art Basel), Denver, LA, NYC. By late 2023: 300+ Spaces, 7+ raves across 6 cities. In parallel he ships music NFTs (Violet Token April 2022; "Good Always Turns Evil" sells out for 1.75 ETH).
+It starts as a daily Twitter Space — "Violet Rave," soon "Underground Violet Rave." Originally a 10pm-5am marathon, later moved to 11am EST for reach. Not transactional: panels, music-NFT talk, philosophy, "literally anything," POAP "Orbs" for showing up. He hosts it every single day. Someone in the community suggests he throw an in-person rave; he thinks it is "absolutely crazy" and does it anyway. The first UVR — Gold Sounds Bar, Brooklyn, during NFT NYC in June 2022 — draws 250+ people from around the world, the same people who had been voices in the Space. That is the realization: "This is the community that I've always wanted to build, and it's happening right in front of my eyes." He goes "all out": raves in Virginia, Cincinnati, Miami (500+ at Art Basel), Denver, LA, NYC. By late 2023: 300+ Spaces, 7+ raves across 6 cities. In parallel he ships music NFTs (Violet Token April 2022; "Good Always Turns Evil" sells out for 1.75 ETH).
 
 ### Chapter 6 — Raver Realm and the bet (October 2023)
 
@@ -193,7 +193,7 @@ The entrepreneurial verdict from the research: **musician-first, entrepreneur-by
 
 | Issue | The conflict | Best current read |
 |-------|--------------|-------------------|
-| Birthplace | doc 427.02: "Manassas, Virginia." Apple Music: Somerset, NJ. Interviews: "central New Jersey." | New Jersey. Virginia appears to be an error. Confirm the exact town with Jadyn. |
+| Birthplace | doc 427.02: "Manassas, Virginia." Apple Music: Somerset, NJ. Interviews: "central New Jersey." | RESOLVED: Somerset, NJ. The "Manassas, Virginia" was a Viberate data error — discard it. |
 | Years making music | "6 years" (Medium, ~2024) vs "three to four years" (Culture3, 2023) | He started casually ~2018, intensified 2019-2020. Both can be true depending on the start line. |
 | When daily Twitch began | doc 427.02: Jan 2025. IG growth post: "zero to 2K in under 4 months" by June 2025. | January 2025 is consistent. |
 | The "365-day challenge" | Branded as a daily streak; TwitchTracker shows no recent streams (May 2026). | Treat as aspirational branding, not a verified unbroken streak. |
@@ -206,7 +206,7 @@ The entrepreneurial verdict from the research: **musician-first, entrepreneur-by
 
 A biography needs primary-source interviews. The research leaves these genuinely open:
 
-1. **Why Twitch, and why then?** No public statement explains the January 2025 pivot. Burnout on Spaces? Money? Discovery? This is the pivotal unexplained decision.
+1. **Why Twitch — now ANSWERED, in his own words.** A later research pass found the explanation on the Steve Reynoso podcast (July 2025). Jadyn: "I'm a musician first and foremost, and I was making music every single day... it got to the point where I was not being inspired by my own music... I needed new experiences... if your experiences are stale, [everything] is going to be stale." And: "I decided that it's only going to work for me to rebuild the entire Underground Violet Rave UVR community from ground zero, day one — it was only going to work if I really committed to streaming. And I decided to open up my Twitch account January 1st, 2025." So the pivot was a deliberate creative reset (he had gone stale on his own music) plus a decision to rebuild UVR from scratch through daily streaming discipline — not a retreat from web3. Still open: whether the rebuild worked, and what he thinks now. See [03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md) and [07-timeline-criticism-sources.md](07-timeline-criticism-sources.md).
 2. **What happened to the "Violet" album?** Promised June 2023, never shipped as an album. Abandoned, deferred, or redefined?
 3. **What did the dark years actually look like day to day?** The narrative is told in summary ("dark and scary"). The texture is missing.
 4. **Where is the family now?** The arc opens with family conflict. Did the relationship heal? Has the bet been vindicated in their eyes?

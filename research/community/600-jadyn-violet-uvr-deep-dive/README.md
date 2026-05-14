@@ -40,7 +40,9 @@ A second wave of 5 research agents (Twitch detail, on-chain forensics, full biog
 - **Violet Token contract is verified on-chain:** `0x6d27462859df2aa5ecccbd14d68b9742ff48da91` (Ethereum mainnet, ERC-721). The Raver Realm contract address still could not be verified — do not cite one.
 - **UVR's honest trajectory: plateau / managed decline.** Raver Realm stalled at ~38% minted, the rave series has been dormant since ~late 2023, no new music NFT drops since Oct 2023, the "Violet" album never shipped, and the founder pivoted to Twitch. UVR launched Raver Realm (Oct 2023) directly into the music-NFT winter and could not move inventory. This does not erase the playbook lessons — it sharpens the cautionary half of them.
 
-Full detail is in the sub-docs: biography material in **[02-biography-source-material.md](02-biography-source-material.md)**, the Jan 2025-May 2026 Twitch chapter in **[03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md)**, the Twitch-era business analysis in **[04-twitch-era-business-model.md](04-twitch-era-business-model.md)**.
+- **The "why" of the Twitch pivot is now ANSWERED.** An earlier pass said no public statement explained it. The Steve Reynoso podcast (July 2025) has Jadyn stating it directly: he had gone stale on his own music ("I was not being inspired by my own music... I needed new experiences"), and committed to daily streaming to "rebuild the entire Underground Violet Rave UVR community from ground zero." Not a retreat from web3 — a deliberate creative reset. Detail in [03](03-twitch-era-deep-dive.md) and [07](07-timeline-criticism-sources.md).
+
+Full detail is in the sub-docs: biography material in **[02-biography-source-material.md](02-biography-source-material.md)**, the Jan 2025-May 2026 Twitch chapter in **[03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md)**, the Twitch-era business analysis in **[04-twitch-era-business-model.md](04-twitch-era-business-model.md)**, the supporting cast in **[05-supporting-cast.md](05-supporting-cast.md)**, the music and visual art in **[06-the-art.md](06-the-art.md)**, and the reconciled timeline + critical lens + press archive in **[07-timeline-criticism-sources.md](07-timeline-criticism-sources.md)**.
 
 ---
 
@@ -202,6 +204,9 @@ The detailed extraction — 7 concrete mechanics ZAO should steal or adapt, each
 - [02-biography-source-material.md](02-biography-source-material.md) — biography dossier: chronological life narrative, career timeline, 30-quote bank, themes, the entrepreneurial thread, open questions for a biographer
 - [03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md) — the Jan 2025-May 2026 Twitch chapter in depth: metrics, the 365 challenge + documentary, content, community, network, life events, cross-channel social, the "why," current status
 - [04-twitch-era-business-model.md](04-twitch-era-business-model.md) — Twitch-era revenue, costs, runway, and sustainability analysis
+- [05-supporting-cast.md](05-supporting-cast.md) — the people: family, the early UVR inner circle, the music collaborators, the Twitch network, web3 peers, the ZAO connection
+- [06-the-art.md](06-the-art.md) — the work itself: sound evolution, lyrical themes, song-by-song, the 9 Ravers, and the hand-drawn visual identity
+- [07-timeline-criticism-sources.md](07-timeline-criticism-sources.md) — the reconciled master timeline, contradiction resolutions, the honest critical lens, and the complete press/interview archive
 
 ## Next Actions
 

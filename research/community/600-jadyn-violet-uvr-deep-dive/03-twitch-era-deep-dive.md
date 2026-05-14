@@ -144,16 +144,19 @@ All revenue figures are labeled estimates; exact income (ads, bits, tier mix, an
 
 ---
 
-## 9. The "Why" — and the Absence of One
+## 9. The "Why" — ANSWERED (corrects an earlier draft)
 
-**There is still no public statement from Jadyn explaining why he pivoted to Twitch.** This is itself a finding. In the web3 era (2022-2024) he was reflective and interview-heavy; the pivot got no "I'm leaving web3 because X" narration.
+An earlier version of this doc said there was "no public statement" explaining the pivot. **A later research pass found it.** On the Steve Reynoso podcast (July 23, 2025), Jadyn states the why directly, in two parts:
 
-What exists instead is *framing*, not *reasoning*:
-- IG language: "a new era" — a clean-slate framing, notably **not** "the next chapter of UVR."
-- The Steve Reynoso podcast (July 2025) and "The 365 Documentary" (Jan 2026) frame it as a **personal discipline / reinvention** story — willpower, consistency, pain-to-purpose — not a strategic platform decision.
-- He never explicitly *rejects* web3. UVR and Raver Realm are left intact-but-dormant, not repudiated. Twitch was positioned as an addition that quietly became the priority.
+**Part one — he had gone creatively stale:**
+> "I'm a musician first and foremost, and I was making music every single day... it got to the point where I was not being inspired by my own music, you know?... if I'm not inspired by my own music, I know for a fact other people aren't... I needed new experiences... if your experiences are stale, [everything] is going to be stale, and then nothing's going to happen."
 
-The honest read for a biographer: the pivot was most plausibly driven by the web3/NFT model stalling (Raver Realm at 38%, Spaces faded, the album unshipped) plus Twitch offering direct monetization and a fresh discovery surface — but Jadyn chose to narrate it as a hero's-discipline story rather than a strategic retreat. **Do not invent a stated reason; the absence is the truth.**
+**Part two — Twitch as the tool to rebuild UVR from scratch:**
+> "So I had to go searching, bro... and I decided that it's only going to work for me to rebuild the entire Underground Violet Rave UVR community from ground zero, day one — it was only going to work if I really committed to streaming. And I decided to open up my Twitch account January 1st, 2025. I told myself I'm going to stream every single day this year."
+
+So the pivot was **not** a retreat from web3 and **not** unexplained. It was a deliberate creative reset by an artist who had run dry, paired with a decision to rebuild the UVR community "from ground zero" through the discipline of a 365-day daily-streaming commitment. He frames it — consistently, in the podcast and the documentary — as a discipline-and-reinvention story.
+
+What the framing still *omits*: the harder strategic reality underneath it — Raver Realm stalled at ~38%, the Spaces had faded, the album never shipped, the NFT market had collapsed. He narrates the pivot as a hero's-discipline choice; a biographer can hold both the stated why (real, in his words) and the unstated context (the web3 model had stalled) at once. Neither is invented; both are true.
 
 ---
 

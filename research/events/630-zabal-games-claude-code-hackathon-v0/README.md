@@ -2,523 +2,222 @@
 topic: events
 type: guide
 status: draft
-last-validated: 2026-05-09
-related-docs: 627, 628, 629, 626, 625, 361, 324, 322, 354, 311
+last-validated: 2026-05-14
+related-docs: 646, 629, 628, 627, 626, 584, 361, 324, 322, 311
 tier: STANDARD
 ---
 
-# 630 - ZABAL Games v0: Claude Code Hackathon (8 Players, 24h Build + 24h Promote)
+# 630 - ZABAL Games Season 1: Farcaster Vibe-Coding Challenge
 
-> **Goal:** Define the inaugural ZABAL Games - an 8-player Claude Code hackathon where every participant gets the same prompt at the same time, builds in public on Twitch for 24 hours, then promotes for 24 hours. **Real challenge = submitting at all** - every player who finishes splits the $500 USDC pool equally. Top 3 win scaled ZABAL bags + on-chain artifacts (Hats Champion NFT + Empire Booster ID). The Games dogfood the ZAO streaming flywheel (Doc 629), the Web3 streaming bridge (Doc 628), and put 8 new builders on the Empire Builder leaderboard simultaneously.
+> **Goal:** Define ZABAL Games Season 1 - a Farcaster-creator onboarding event for the ZAO ecosystem. Two phases: an open build-a-thon (anyone applies by shipping), then a Finals (8 builders curated by 8 ZAO mentors, each mentor embedded as a teammate). The competition is in getting selected; the Finals are a collaboration. All 8 Finalists win.
 
-> **Status:** DRAFT - Zaal locked in format (24h+24h), prize ($500 USDC pool split among ALL submitters + scaled ZABAL + on-chain artifacts), Claude Pro subsidy, prompt scope (3-5 ideas), and timing (late June 2026) on 2026-05-09. Open: idea-option finalization, sponsorship sourcing, judge panel, application form copy.
+> **Status:** DRAFT - working spec, designed in the open. Heavily iterated 2026-05-08 through 2026-05-14. The shareable public summary lives at `bettercallzaal.com/zabalgames.html` (with live Supabase-backed submission tech). This doc is the source-of-truth working spec + decision log.
 
-> **Prize philosophy (updated 2026-05-09 per Zaal):** Lower the bar to entry, raise the bar to *ship*. The real challenge is submitting at all - so every player who finishes gets equal slice of the $500 USDC pool. The competitive gradient lives in the ZABAL bag + on-chain artifacts (Hats Champion NFT + Empire Booster ID). No goose eggs.
-
----
-
-## How to Read This Doc
-
-This is the working spec for ZABAL Games v0 (the inaugural run). It is meant to be:
-1. **A pitch** - read Parts 0 + 1 + 6 to grok the idea in 5 minutes
-2. **An implementation plan** - Parts 3 through 9 cover format, infra, runbook, and risks
-3. **A discussion document** - Open Calls + Strategic Considerations sections invite input
-
-Sections marked DRAFT or "needs Zaal input" are still in flux. Everything in the **Key Decisions** table is locked.
+> **Naming note:** Earlier drafts called this "v0" and "Claude Code Hackathon." Current framing: "Season 1" + "Farcaster Vibe-Coding Challenge" (tool-agnostic). Earlier drafts also referenced a person as "Aiman" - that was a phonetic misspelling of Iman, mentor #5, already on the roster.
 
 ---
 
-## Part 0 - TL;DR (60 seconds)
+## Part 0 - TL;DR
 
-**What:** 8-player hackathon. Claude Code is the build tool. Twitch is the build stage. ZAO is the playground. Same prompt drops to all 8 simultaneously. 24 hours to build, 24 hours to promote.
+**What:** A Farcaster-creator onboarding event for the ZAO. Bring hungry, Farcaster-active vibe-coders into ZAO by having them build something real, in public, with a ZAO mentor in their corner.
 
-**When:** 2026-06-27 Sat 12:00 PT to 2026-06-29 Mon 12:00 PT (48 hours total).
+**Two phases:**
+- **Phase 1 - Open Build-a-Thon:** Anyone applies by building something with the ZAO context prompt + shipping it publicly (live URL + open-source repo + 60s demo + /zabalgames cast). Use any vibe-coding harness.
+- **Phase 2 - The Finals:** 8 builders curated from Phase 1, each paired with a ZAO mentor as embedded teammate. 24h build + 24h promote + 24h ZAO governance vote + reveal stream.
 
-**What players get:** Equal slice of $500 USDC pool (real challenge = ship at all, not win). Top 3 also get scaled ZABAL bags + permanent on-chain artifacts (Hats Champion NFT + custom Empire Booster ID). All accepted players who don't already have Claude Pro get a free month from ZAO ($20).
+**Who decides:** Mentors pick their champions from Phase 1 (first-come-first-served, rolling). Then the ZAO DAO (Respect-earning members, 1-person-1-vote) votes on Finals builds.
 
-**What ZAO gets:** 8 new builders shipping into ZAO ecosystem rails simultaneously. 48 hours of live build content fed into the streaming flywheel (Doc 629). Real-world stress test of Empire Builder v3 + Coinflow + Hypersub + EAS at scale. Public proof that ZAO is *the* place builders go to ship in public.
+**Prize:** $500 USDC pool, tiered. But all 8 Finalists win - tiering is recognition, not placement. Every Finalist gets paid + a participation collectible + Respect earned during the event.
 
-**What it costs ZAO:** ~$685 max (USDC pool + Claude Pro reserve + minor gas). Sub-$1k for 8 new ecosystem-aligned builds and ~30 cross-platform pieces of content.
+**Cost to ZAO:** ~$525 (USDC pool + minor gas). Tooling subsidy dropped. Submission tech is free (Supabase).
 
----
-
-## Part 1 - Why ZABAL Games (Stakeholder Benefits)
-
-This event is structured to create wins for every party touching it. If any one stakeholder doesn't get value, the format is broken.
-
-### For ZAO Ecosystem
-
-| Benefit | Why it matters |
-|---------|---------------|
-| 8 new ecosystem-aligned builds in 48 hours | Every prompt option ties to existing rails (Empire, Farcaster, Hats, Bonfire, EAS, Hypersub, Coinflow). Whatever ships becomes ZAO infra |
-| 8 new active builders on Empire Builder leaderboard | Each player's wallet ends the weekend with ZABAL + booster eligibility - real users, not just airdrop dust |
-| Brand narrative: "ZAO is where builders ship in public" | Differentiates from gating-focused web3 communities. Position as production-output community |
-| Reusable annual format | Hats Champion NFT v0 implies v1, v2... = recurring tradition, recurring narrative reset |
-| Content engine validation | Doc 629 streaming flywheel processes 8 simultaneous build streams - if it works here, it works for COC + BCZ scale |
-
-### For ZABAL Token
-
-| Benefit | Why it matters |
-|---------|---------------|
-| 8+ new wallets holding ZABAL with stake | Wider holder base improves token health metrics |
-| Story attached to each holder | Each finisher has a ZABAL story to tell ("won at the Games") - organic distribution narrative |
-| Booster system gets real-world test under 8-stream load | Validates Empire Builder v3 apiLeaderboards at production volume |
-| Increased liquidity events | Some winners will swap, some hold - both create trading activity in a thin pool ($552 TVL today per Doc 324) |
-
-### For Empire Builder (Adrian + yerbearserker)
-
-| Benefit | Why it matters |
-|---------|---------------|
-| 8-stream apiLeaderboard stress test | Real production load on v3 endpoints |
-| 8 named Empire Booster IDs minted | Each top-3 winner = permanent named booster = case study material |
-| Co-judge visibility | Adrian + yerbearserker as judges = direct exposure to ZAO + 8 new builders' followings |
-| Empire Builder featured in player builds | Option B (stream leaderboard feed) is literally an Empire Builder integration build - free dev work |
-
-### For COC Concertz
-
-| Benefit | Why it matters |
-|---------|---------------|
-| 1st place winner gets featured stream slot | Inbound traffic from winner's audience to COC channel |
-| Game itself becomes a COC content episode | "ZABAL Games Live" coverage stream feeds COC YouTube + Farcaster |
-| Validates concert-streaming pipeline at peak load | If COC infra handles 8 simultaneous restreams, it handles any concert |
-
-### For BetterCallZaal (Zaal personally)
-
-| Benefit | Why it matters |
-|---------|---------------|
-| Positions Zaal as a builder-event host | New brand layer beyond consulting - "the builder community gathering organizer" |
-| Personal Twitch channel sees Game traffic | Multi-day spike in BCZ Twitch followers + viewers |
-| Permanent on-chain artifact (Zaal as v0 host) | Hats Protocol can issue a "ZABAL Games Host" role to Zaal too - on-chain provenance |
-| Connection capital | 8 new builders + 3-5 judges = 12+ new strong-tie connections in one weekend |
-
-### For Each Player
-
-| Benefit | Why it matters |
-|---------|---------------|
-| Real USDC ($50-166 depending on field) | Compensation for time, not life-changing but covers a weekend's coffee + a flight upgrade |
-| ZABAL bag (5M-50M scaled by placement) | On-chain holding in a real ecosystem token, growth optionality |
-| GitHub portfolio piece | Public repo with 24-hour build = job application differentiator, especially for AI-native engineering roles |
-| Claude Code real-world demo footage | 24h of live coding with Claude Code = personal content asset (compile into demo reel, blog post, conference talk) |
-| Distribution practice | The promote window forces players to learn cross-posting, audience building, and live demo - skills most engineers under-invest in |
-| New audience | Players cross-pollinate each other's audiences across the 8 streams |
-| Empire Booster ID (top 3 only) | Permanent named multiplier in $ZABAL Empire = unique on-chain badge |
-| Hats Champion NFT (1st only) | Permanent on-chain credential, recognizable across all ZAO surfaces forever |
-| Optional ongoing connection | Winners often become ecosystem contributors - the Games is a tryout |
-
-### For Farcaster Ecosystem
-
-| Benefit | Why it matters |
-|---------|---------------|
-| 8 new Farcaster Mini Apps / surfaces shipped in 48 hours | Concentrated supply of new mini-app content for the ecosystem |
-| `/zabalgames` channel becomes live demo of channel-anchored events | Pattern reusable for other Farcaster-native hackathons |
-| Cast volume + engagement spike | 8 builders + their audiences + ZAO amplifying = high-engagement weekend on /zao + /zabalgames |
-
-### For Anthropic / Claude Brand
-
-| Benefit | Why it matters |
-|---------|---------------|
-| Real-world creative use case | Claude Code in a hackathon context = differentiated from typical "fix bug" demos |
-| Shareable footage | 8 simultaneous live-coding streams = endless clips for Claude marketing if they choose to use them |
-| Community-led showcase | No Anthropic resources needed - ZAO funds and runs it - pure community signal |
-
-### For Viewers
-
-| Benefit | Why it matters |
-|---------|---------------|
-| 24h of multi-stream live coding | Pick a player, switch between, compare approaches |
-| 24h of promote-window content | Demos, casts, reactions - second narrative arc |
-| Tippers earn ZABAL via Doc 628 stream-leaderboard rails | Watching = earning, not just consuming |
-| Hall-of-fame entry | Notable tippers can get on-chain attestation of being early supporters |
-
-### Compounding Network Effect
-
-Each ZABAL Games run creates:
-- ~8 new Hats Finisher NFT holders + 1 Champion NFT
-- ~8 new active ZABAL Empire participants
-- ~8 GitHub repos (open-source by submission requirement)
-- ~30 hours of live stream content -> ~150 short-form clips via Doc 629 flywheel
-- ~24 hours of promote-window social posts
-
-After 4 quarterly Games (1 year), ZAO has shipped: 32 new builds + 4 Champions + 32 ecosystem-aligned builders + ~600 short clips + ~120 hours of long-form. All anchored to a single recurring brand event.
+**Date:** TBD - locks once the cohort + mentor availability are known.
 
 ---
 
-## Key Decisions (Locked 2026-05-09)
+## Part 1 - The Thesis
 
-| Decision | Locked Choice |
-|----------|--------------|
-| **Format** | 24h build + 24h promote (48h total) |
-| **Prize structure** | $500 USDC pool split equally among ALL submitters + scaled ZABAL bag by placement + Hats Champion NFT + Empire Booster ID for top 3 |
-| **Claude Pro support** | Accepted players without Claude Pro ($20/mo) get one month covered by ZAO so cost is not a blocker |
-| **Prompt scope** | 3-5 idea options inside the prompt, players pick or remix |
-| **Date window** | 2026-06-27 Sat 12:00 PT -> 2026-06-29 Mon 12:00 PT (7 weeks out) |
-| **Player count** | 8 players + waitlist |
-| **Public on-chain rail** | Empire Builder apiLeaderboard scores stream activity in real time (per Doc 628) |
-| **Stream platform** | Twitch primary, ZAO restream to /zabalgames hub on ZAO OS + YouTube via Doc 629 flywheel |
+ZABAL Games is **not a generic hackathon**. It is a Farcaster-creator onboarding event.
+
+The thesis: bring talented Farcaster builders together, give them deep context on everything the ZAO is building, let them create something that helps the community with a ZAO mentor as embedded teammate, and have them earn governance in the community during the event itself. If they keep building with ZAO after - great. If not, they still walked away with a real artifact, a real relationship, and a real onchain credential.
+
+**Focused on the creator, not the thing they create.** The builds matter, but the people matter more. This is about who you are as a builder, how you work in public, how you collaborate with a mentor. That is why the application is itself a build (Phase 1) - we want to see how you actually ship.
+
+**What success looks like:** 8 new builders who understand ZAO from the inside. 8+ real artifacts shipped for the ecosystem. A recurring format (this is Season 1) that compounds the builder network + body of work each Season.
 
 ---
 
-## Open Calls (Need Zaal Input)
+## Part 2 - Format
 
-| Question | Options |
-|----------|---------|
-| Final 5 idea options in the prompt (Part 4 below) | Refine list - which 5 ship? |
-| USDC prize pool size | $500 locked for v0. Scale up via sponsor tracks in v1? |
-| Sponsors for v0 (optional) | Empire Builder, SongJam, COC Concertz, external? Each sponsor adds prize money + judge seat |
-| Judges | 3-5 person panel - candidates: Zaal, Adrian (Empire Builder), yerbearserker, Adam (SongJam), 1 community pick |
-| Application gate | Open public, ZAO-member-only, or invite + apply? |
-| Stream cadence requirement | Must stream 100% of build, 50%, or just before-and-after demos? |
-| Solo only or teams of 2 allowed? | Solo recommended for v0; teams in v1 |
-| Live judging stream | Yes (post-promote-window 1hr live judging on Twitch) or async + announce? |
+### Two-Phase Model
 
----
+| Phase | What |
+|-------|------|
+| **Phase 1 - Open Build-a-Thon** | Anyone can apply by building. Vibe-code something with the ZAO context prompt, ship it publicly. The build IS the application. Open to everyone with the chops to ship. |
+| **Curation Window** | As Phase 1 builds ship, the 8 ZAO mentors watch rolling. Each mentor claims one champion - first-come-first-served per mentor. 8 mentor-player pairs lock the Finals roster. |
+| **Phase 2 - The Finals** | Same Finals prompt for all 8. 24h build with your mentor embedded as teammate. 24h promote. ZAO governance vote (24h). Reveal stream. |
 
-## Part 1 - Format Spec
-
-### Timeline
+### Phase 2 Finals Timeline (relative - absolute dates TBD)
 
 ```
-T-7 days (2026-06-20)   Applications close. Final 8 selected. Waitlist confirmed.
-T-3 days (2026-06-24)   Onboarding call (90 min): rules, infra, Empire wallet setup,
-                        wallet linkage to Twitch handle, Coinflow tip page setup
-T-1 day  (2026-06-26)   Final tech check. Each player tests Twitch stream key,
-                        Empire booster eligibility, Coinflow checkout link
-
-T+0      (2026-06-27 12:00 PT Sat)
-                        PROMPT DROPS simultaneously to all 8
-                        Same prompt PDF + GitHub gist with 5 idea options
-                        Build window opens. Streams must start within 30 min
-
-T+0 -> T+24h            BUILD WINDOW (Sat 12:00 PT -> Sun 12:00 PT)
-                        Player streams on Twitch
-                        ZAO restreams all 8 to /zabalgames hub page on ZAO OS
-                        Empire Builder live leaderboard scores stream events
-                        StreamElements alerts trigger ZABAL drops to viewers (per Doc 628)
-                        Streaming flywheel auto-clips highlights to YouTube + shorts
-                        Coding happens in Claude Code, build in public (open repos)
-
-T+24h    (2026-06-28 12:00 PT Sun)
-                        SHIP DEADLINE
-                        Required submissions:
-                          - Live deployed URL
-                          - GitHub repo link (public)
-                          - 60-second demo video link
-                          - Tweet/cast announcing ship
-
-T+24h -> T+48h          PROMOTE WINDOW (Sun 12:00 PT -> Mon 12:00 PT)
-                        Players promote on all surfaces
-                        Tips during this window count via 0xSplits + Coinflow
-                        ZAO accounts amplify all 8 (we want all of them to win)
-                        Empire Builder scores: cast engagement + tips received
-
-T+48h    (2026-06-29 12:00 PT Mon)
-                        Submission window closes
-                        Live judging stream on Twitch (1 hour)
-                        Winners announced
-                        On-chain prize distribution starts:
-                          - USDC via 0xSplits to winner wallets
-                          - ZABAL via Empire Builder distribute API
-                          - Hats Protocol Champion NFT minted to 1st place
-                          - Empire booster ID configured for top 3
+T-3 days   Onboarding call (90 min): rules, infra, wallet linkage,
+           visibility-mode lock-in, voting-mechanism walkthrough
+T+0        Prompt drops to all 8 simultaneously. Build window opens.
+           Voter eligibility snapshotted now.
+T+0->T+24h BUILD WINDOW. Mentor embedded as teammate (Discord/Meet,
+           live with the player). Build in public via declared
+           visibility mode. Open repos.
+T+24h      Ship deadline: live URL + open-source repo + 60s demo +
+           ship cast on /zabalgames
+T+24h->48h PROMOTE WINDOW. Cast it, demo it. ZAO accounts amplify all 8.
+T+48h->72h ZAO GOVERNANCE VOTING WINDOW. Respect-earning members cast
+           1-person-1-vote ballots onchain. Live tally.
+T+72h      Live results-reveal stream. Recognition order announced.
+           USDC + collectibles distributed onchain live.
 ```
 
-### Why 24+24 (not single 24h)
+### Why Two Phases (not single-stage application)
 
-- "Single 24h ship+promote" rewards shallow output - whoever ships fastest gets max promote time
-- "24+24" forces TWO disciplines (build AND distribute), maps to real-world product reality
-- Splits viewer attention into two narrative arcs: drama (build) + payoff (promote)
-- Lets ZAO content engine (Doc 629) clip the build for the promote window
+- "Apply with a paragraph + a vibe" sets a low bar that filters for confidence, not capability
+- "Apply by building" sets a high bar that filters for real shipping ability + makes the application itself valuable
+- Phase 1 is genuinely open - anyone can enter. Curation happens on demonstrated work, not bios.
+- Resolves the low-bar-to-apply / high-bar-to-accept tension: ship a thing to apply.
 
----
+### Why "All 8 Win"
 
-## Part 2 - The Prompt (What Players Get)
-
-### Prompt Bundle
-
-Each player receives identical materials at T+0:
-
-1. **CONTEXT.md** - ZAO ecosystem primer
-   - What ZAO is (188 members, Farcaster music community)
-   - What ZABAL Empire is (token + Empire Builder leaderboard)
-   - Existing ecosystem brands (BCZ, COC Concertz, FISHBOWLZ, WaveWarZ)
-   - Tech stack baseline (Next.js, Supabase, Farcaster mini apps, Base)
-   - Links to docs: this doc (630), 628 (web3 streaming), 626 (Empire Builder), 627 (streaming infra)
-
-2. **CLAUDE.md** - Repo-level Claude Code instructions
-   - Brand naming rules (WaveWarZ not Wave Wars, etc per BCZ CLAUDE.md)
-   - Build conventions (no emojis, no em dashes, mobile-first)
-   - Brand colors (ZAO orange/cyan/gold, dark bg)
-   - Tooling baseline
-
-3. **OPTIONS.md** - The 5 build options (see Part 4)
-
-4. **STARTER_KIT/** - Bootstrap repo
-   - Next.js 16 starter with Tailwind v4 + Farcaster mini-app SDK
-   - `.env.example` with named placeholder for Empire Builder, Neynar, Supabase
-   - Sample API route hitting Empire Builder personal-stats endpoint
-   - Pre-wired wagmi + Coinbase Smart Wallet
-
-5. **JUDGING.md** - 4-axis rubric (Part 5)
-
-6. **INFRA.md** - Provided rails
-   - Each player gets pre-funded Privy agent wallet (gas-free build)
-   - Empire Builder API key for read access
-   - Supabase project shared (sandbox)
-   - Coinflow merchant account for tip page
-
-### Drop Mechanism
-
-- 8 sealed tweets scheduled simultaneously at 12:00 PT 2026-06-27 from `@bettercallzaal` tagging each player's Farcaster handle
-- Each tweet contains a magic link to the prompt bundle (token-gated to player's verified Farcaster wallet)
-- Single Farcaster channel `/zabalgames` for cross-player community
+The competition is in Phase 1 (getting selected). Once you are a Finalist, the Finals are a collaboration among the 8 - not a competition between them. All 8 get paid + collectible + Respect. The DAO vote orders recognition; it does not pick winners-vs-losers.
 
 ---
 
-## Part 3 - Onboarding (T-3 days)
+## Part 3 - The Mentors
 
-90-minute call. Must attend OR forfeit. Walks through:
+8 ZAO mentors, curated by Zaal from the ZAO inner circle. Each mentor:
+- Defines their own search style (the kind of builder they want) before applications open
+- Reviews Phase 1 builds rolling, claims one champion (first-come-first-served)
+- Is embedded as that player's teammate during the Finals - live in Discord/Meet, in DMs, on-call. Can share screen if the player is hardware-limited. Helps with project management, ZAO connections, distribution while the player codes.
+- The mentor is as important as the player. They are the connection point that lets the player stay locked in.
 
-1. Rules + prize structure (5 min)
-2. **Claude Pro check** - confirm each player has Claude Pro active. ZAO covers 1 month ($20) for any accepted player who needs it - sent via Anthropic gift link 24 hours before T+0 (5 min)
-3. Stream setup help - Twitch + StreamElements + OBS (15 min) - reuse Doc 627
-4. Wallet linkage - connect Farcaster verified address to Twitch handle (10 min)
-5. Empire Builder wallet eligibility check (5 min)
-6. Coinflow tip page setup (10 min)
-7. Live judging walkthrough (10 min)
-8. Q&A (30 min)
+### Roster (locked 2026-05-13)
 
-Recorded for waitlist replacements + future v1 reference.
+1. ohnahji
+2. candytoybox
+3. eduard - confirmed
+4. freezetheverse - likely streamer-focused category
+5. Iman - ZAO Music team
+6. Thy Revolution
+7. Tom Fellenz - ZAO Music DBA, likely smart-contract / hard-coder category
+8. Adam SongJam - SongJam founder, ZABAL co-creator
 
-### Application Form Asks (T-7 weeks)
+### Mentor Incentive - "On the Team"
 
-To gauge Claude Pro coverage cost in advance, the application form includes:
-- **"Do you have Claude Pro active?"** [Yes / No / Not sure]
-- If No or Not sure: "If accepted, would you like ZAO to cover your $20 Claude Pro for the Games month?" [Yes / No]
+Mentors get: a Hats Protocol "ZAO Mentor S1" NFT (permanent onchain role), a private mentor channel, public cast credit on launch + reveal, ongoing ZAO ops-conversation involvement, auto-eligibility for future Seasons. No cash - this is team membership + status + recognition. Being a ZAO Mentor is a real, persistent org role.
 
-Worst case = 8 x $20 = $160 in Claude Pro subsidies. Budget includes this.
+### Per-Mentor Categories (TBD - each mentor drafts their own)
 
----
-
-## Part 4 - The 5 Idea Options (DRAFT - Need Zaal Refinement)
-
-Each option ties to existing ZAO ecosystem rails. All shippable in 24h.
-
-### Option A - ZABAL Empire Booster Workshop
-Build a web tool that lets any ZAO member propose, simulate, and submit a custom booster rule for the $ZABAL Empire. Workflow:
-- Connect Farcaster wallet
-- Define rule (e.g., "+2x boost if holds POIDH claim NFT + Hypersub creator-pass")
-- Simulate against current leaderboard (visualize the score delta)
-- Generate ready-to-deploy booster config JSON
-- Submit to Empire Builder via apiLeaderboards (read or hand off)
-**Stack hint:** Next.js + viem + Empire Builder API (Doc 626)
-
-### Option B - Twitch -> Empire Stream Leaderboard Feed
-Implement Doc 628 Phase 2 in 24h. StreamElements WebSocket subscriber that scores tip/follow/sub/cheer/raid events, mirrors to a public JSON feed Empire Builder can pull. Demo with player's own Twitch channel.
-**Stack hint:** Cloudflare Worker + Socket.IO client + KV store (or Supabase) + JSON feed endpoint
-**Reference:** Doc 628 Part 1 (the pipeline diagram)
-
-### Option C - ZAO Farcaster Mini App (Pick a Surface)
-Build any one of these mini apps (player picks the surface):
-- Stream-tracker: who in ZAO is live across Twitch/YouTube/Kick right now
-- Member directory with ZABAL holdings + Bonfire score
-- Music polling app: vote on weekly ZAO music drops
-- ZABAL portfolio dashboard
-- Governance vote UI for next Empire booster rule
-
-**Stack hint:** Next.js + `@farcaster/miniapp-sdk` + Neynar API
-
-### Option D - New ZOE Skill
-A new Claude skill (`~/.claude/skills/`) doing one job for ZAO. Examples:
-- Auto-summarize a Twitch VOD into a Farcaster cast thread
-- Schedule + send weekly ZAO digest from Bonfire signal
-- Generate per-platform captions from a transcript (per Doc 629)
-- Track ZABAL Empire leaderboard moves and cast notable changes
-
-**Deliverable:** SKILL.md + working scripts + README explaining trigger and outputs.
-
-### Option E - Bonfire / Hats Role Automation
-Connect Bonfire reputation graph (or Hats Protocol) to a ZAO surface:
-- Auto-mint Hats role NFT when a Bonfire signal threshold is hit
-- Auto-revoke role when conditions change
-- Or: Bonfire-powered "co-sign" widget where ZAO members can attest to other members' contributions
-
-**Stack hint:** Hats SDK on Base + Bonfire SDK (Doc 544)
-
-### Option F (Wildcard) - Build Your Own
-Player can propose their own build at T-3 onboarding call, must integrate at least 2 of: ZABAL Empire, Farcaster verified address, Hats Protocol, Bonfire, EAS attestations, Hypersub, Coinflow.
+Each mentor defines a search style so applicants can self-select. Examples discussed: a streamer-mentor looking for "a streamer with little vibe-coding experience"; a builder-mentor looking for "a smart-contract / hard-coder developer." Surfaces builder archetype diversity in the cohort. Each mentor's 1-liner is collected before the open call.
 
 ---
 
-## Part 5 - Judging (4-Axis Rubric, 100 Points Total)
+## Part 4 - Tooling + Visibility
 
-| Axis | Weight | Criteria |
-|------|--------|----------|
-| **Works** | 25 pts | Deployed and demoable. Doesn't crash on judge laptop. Core feature functions end-to-end. |
-| **ZAO-native** | 25 pts | Actually uses ZABAL, Empire, Farcaster verified address, Bonfire, Hats, EAS, Hypersub, or Coinflow. The more rails wired, the higher the score. Surface-level "we used the brand" doesn't count. |
-| **Stream presence** | 25 pts | Build stream watchable + entertaining. Demo crisp. Clip-worthy moments. (Streaming flywheel from Doc 629 ingests these clips for the promote phase regardless of judge score) |
-| **Distribution** | 25 pts | Promote-window traction: cast engagement + tips received via Coinflow + viewers during promote stream + GitHub stars |
+### Tool-Agnostic
 
-### Tiebreaker
-**ZAO community vote** - 24h Snapshot vote among ZABAL holders during the judging window. Adds up to 10 bonus points (110 max possible).
+Players use whatever vibe-coding harness fits them - Claude Code, Cursor, Windsurf, Aider, Cline, Bolt, v0, Lovable, or a hand-rolled pipeline. The constraint is not the tool, it is **show your work in public**.
 
-### Judge Panel
-3-5 person panel. Candidates (TBD):
-- @Zaal (BCZ)
-- Adrian (Empire Builder co-founder)
-- yerbearserker (Empire Builder co-creator + ZABAL co-creator)
-- Adam (SongJam)
-- 1 community-elected judge (ZABAL holders nominate + vote 7 days prior)
+### 4 Visibility Modes
+
+Each player picks at least one primary mode + supplements with ongoing /zabalgames casts:
+
+1. **Live Twitch stream** - the default. ZAO restreams all 8 to one hub.
+2. **Recorded screen sessions** - upload to YouTube/Loom within 1h of each session.
+3. **Public AI prompt logs** - share conversation/composer history every 1-2h.
+4. **Frequent build casts** - screenshots + prompts every 1-2h on Farcaster.
+
+Anti-cheat: empty starter repo at T+0 (verified empty git log) + the visibility mode timestamps cross-checked against git commit times.
 
 ---
 
-## Part 6 - Prize Structure
+## Part 5 - Prize Structure
 
-### Philosophy (Locked 2026-05-09)
+$500 USDC pool, tiered with floor. **Every Finalist who ships gets paid** - tiering is recognition of standout work, not win/lose.
 
-**Real challenge is submitting at all.** Lower bar to entry, raise bar to ship. The $500 USDC pool splits equally among everyone who finishes - no goose eggs. The competitive gradient lives in the scaled ZABAL bag and the on-chain artifacts (Hats Champion NFT + Empire Booster ID for top 3).
+| Place | USDC |
+|-------|------|
+| 1st | $150 |
+| 2nd | $100 |
+| 3rd | $75 |
+| 4th-8th | $35 each (5 x $35 = $175) |
+| **Total** | **$500** |
 
-### USDC Pool: $500 Equal-Split Among Submitters
+Plus every Finalist gets:
+- A participation collectible (likely a Hats Protocol role NFT - spec TBD)
+- Respect earned in ZAO governance during the event itself
+- Distribution boost from ZAO accounts during the promote window
+- An open-source GitHub repo as a portfolio piece
+- Their vibe-coding session footage as a content asset
 
-```
-USDC per finisher = $500 / N    where N = number of submitters at T+48h
-```
+### Tooling Subsidy - DROPPED
 
-| Submitters | $/finisher |
-|-----------|-----------|
-| 8 (full field) | $62.50 |
-| 7 | $71.43 |
-| 6 | $83.33 |
-| 5 | $100.00 |
-| 4 | $125.00 |
-| 3 | $166.67 |
+Earlier drafts offered up to $20/mo for the player's vibe-coding tool. Dropped 2026-05-11 - simplifies the offer, cohort self-selects for people who can already afford their tool.
 
-Floor encouragement: minimum $50/finisher even if N >= 10 (overflow waitlist case). If pool is undersubscribed (e.g. 3 finishers), the dollars-per-person grow - rewards persistence.
-
-**Submission requirements (must hit ALL by T+48h):**
-1. Live deployed URL (working, not 404)
-2. Public GitHub repo link (open source)
-3. 60-second demo video link (Loom, YouTube, or self-hosted)
-4. Tweet/cast on /zabalgames channel announcing ship
-
-Miss any one = no submission = no USDC. Hard line keeps the bar real.
-
-### ZABAL Bag: Scaled by Placement (Competitive Gradient)
-
-| Place | ZABAL |
-|-------|-------|
-| **1st** | 50,000,000 |
-| **2nd** | 25,000,000 |
-| **3rd** | 10,000,000 |
-| **4th-8th (finishers)** | 5,000,000 each |
-
-Total: 110M podium + 25M finishers = **135M ZABAL**.
-
-At current $0.0000001429 / ZABAL = ~$19 USD value today. Long-term: bet on appreciation. Symbolic + economic alignment with the ecosystem the players just built into.
-
-### On-Chain Artifacts (Top 3 only)
-
-| Place | Artifact |
-|-------|----------|
-| **1st** | Hats Protocol "ZABAL Games Champion v0" NFT (permanent on Base) + custom Empire Booster ID named after winner + COC Concertz featured stream slot + hall-of-fame entry on `/zabalgames` page |
-| **2nd** | Custom Empire Booster ID + hall-of-fame entry |
-| **3rd** | Hall-of-fame entry |
-| **All finishers (1st-Nth)** | Optional Hats "ZABAL Games Finisher v0" NFT (claimable, not auto-minted) |
-
-The Hats Champion NFT is the actual flex - permanent on-chain badge, recognizable across all ZAO surfaces forever.
-
-### Total Pool Cost
+### Total ZAO Cost
 
 | Component | Cost |
 |-----------|------|
 | USDC pool | $500 |
-| Claude Pro subsidies (up to 8 x $20) | up to $160 |
-| ZABAL distribution (135M tokens) | ~$19 at current price (negligible USD cost) |
-| Hats NFT minting gas (top 3 + finishers) | ~$5 on Base |
-| Empire Booster ID setup (top 2) | $0 (config only, no cost) |
-| **Total ZAO outlay** | **~$685 max** |
-
-Affordable for a v0. Scales up with sponsor tracks in v1.
-
-### Distribution Mechanics
-
-- USDC pool via single 0xSplits contract on Base, recipients = list of Farcaster verified addresses of finishers, weights equal
-- ZABAL via Empire Builder distribute API (per Doc 361 / 626)
-- Hats NFT minted on Base to verified Farcaster addresses
-- Empire Booster ID configured by yerbearserker / Adrian post-judging
-- All distribution happens within 48 hours of judging (target: by 2026-07-01)
+| Participation collectible mints (Hats, on Base) | ~$10 |
+| Submission tech (Supabase free tier) | $0 |
+| Voting infra (Snapshot or onchain) | $0 |
+| **Total** | **~$510-525** |
 
 ---
 
-## Part 7 - Infrastructure (What ZAO Provides)
+## Part 6 - Judging: ZAO Governance Vote
 
-### For Players
+**No human judge panel. Not open token-holder voting either.** The judging body is ZAO members who have earned Respect.
 
-| Resource | Provided | Notes |
-|----------|----------|-------|
-| **Claude Pro subscription ($20)** | **YES (if needed)** | Accepted players who don't already have Claude Pro get 1 month covered by ZAO. Asked at application time. Hard requirement: Claude Code is the build tool, no Pro = can't compete |
-| Pre-funded Privy agent wallet | YES | $5 ETH on Base for gas |
-| Empire Builder API key | YES (read-only) | Personal-stats + leaderboard endpoints |
-| Supabase sandbox project | YES | Shared, namespaced per player |
-| Cloudflare Workers free tier | YES | If they want a backend |
-| Twitch developer app shared | NO | Player creates own (covered in onboarding) |
-| StreamElements account | NO | Player creates own (free) |
-| Coinflow merchant link | YES | One per player for tip-during-build collection |
-| Vercel free deployment | NO | Player creates own |
-| Domain `<player>.zabalgames.dev` | YES | Auto-provisioned subdomain |
+Respect is ZAO's soulbound, peer-validated reputation - earned in weekly fractal sessions over time. The eligible voter set is members with Respect above a threshold N (N TBD - set against the actual Respect distribution). Respect is inherently tenure-correlated, so this naturally skews toward long-tenure contributors without a separate tenure rule.
 
-### For ZAO (the host)
-
-| Surface | What |
-|---------|------|
-| `/zabalgames` Farcaster channel | Single hub for all 8 players + viewers |
-| `bettercallzaal.com/zabalgames` (or `zaoos.com/zabalgames`) | Public landing page with live leaderboard, all 8 stream embeds, prize pool, schedule |
-| ZAO OS dashboard widget | "ZABAL Games Live" panel for ZAO members |
-| Twitch restream account | `@zabalgames` aggregating all 8 player streams via Restream multi-cam |
-| Empire Builder apiLeaderboard | `zabalgames-v0` leaderboard pulling player score JSON every 15 min |
-| Streaming flywheel | Doc 629 pipeline auto-clips top moments from each player's stream |
+- **Mechanism:** 1-person-1-vote. NOT token-weighted. A whale holding lots of ZABAL has no extra power - this is governance by earned contribution.
+- **Eligibility snapshot:** taken at T+0 so the voter set is locked before the Finals begin.
+- **What they vote on:** which Finals build best serves the ecosystem. Vote-for-1.
+- **Output:** orders the recognition tiers. Does not pick winners-vs-losers - all 8 already won by being Finalists.
 
 ---
 
-## Part 8 - Promotion Plan (Pre-Event)
+## Part 7 - The Prompt
 
-### T-7 Weeks (Today, 2026-05-09)
+### Sealed Until T+0
 
-- Doc 630 published (this doc)
-- Initial Farcaster cast in /zao announcing ZABAL Games coming
-- DM Adrian + yerbearserker to confirm Empire Builder support + judge participation
+The exact prompt - including any build options or starter framing - stays sealed until it drops to all players simultaneously at T+0. Keeps every player on equal context footing.
 
-### T-6 Weeks (2026-05-16)
+### What the Prompt Bundle Contains
 
-- Public application form on `bettercallzaal.com/zabalgames`
-- Twitter/X + Farcaster + LinkedIn announcement thread
-- Confirm sponsor outreach (Empire Builder, SongJam, others)
+- **Brand context guide** - the full identity + build surface of every ZAO brand (ZAO OS, $ZABAL + Empire Builder, WaveWarZ, ZAO Festivals, ZAO Music, COC Concertz, Respect + Fractals). Lives at `BetterCallZaal/zabalgames-brand-context.md`, feeds the bundle.
+- **Open-ended build directive** - "build anything that helps the ZAO community with this context" + non-binding suggestion sparks for builders who want starting points
+- **Tech stack baseline** - Next.js, Supabase, Base, Farcaster mini apps, the SDKs + APIs
+- **Brand guidelines** - naming glossary, no emojis / no em dashes, color palette, fonts, tone
+- **Rules + submission bar + visibility-mode requirements**
 
-### T-4 Weeks (2026-05-30)
+Phase 1 builders get a lighter version (umbrella context + build surfaces). Finalists get the full bundle.
 
-- Applications close (or rolling)
-- Final 8 announced via Farcaster cast
-- "Meet the players" stream on BCZ Twitch (8x 5-min intros)
+### Starter Projects
 
-### T-3 Weeks (2026-06-06)
+Zaal seeds forkable GitHub starting-point repos. Building on a starter is as valid as building from scratch. Lowers the Phase 1 barrier. Surfaced on the website's Starter Projects board.
 
-- Tech infra dry-run: dummy player runs the full pipeline solo
-- Fix bugs surfaced by dry-run
+---
 
-### T-1 Week (2026-06-20)
+## Part 8 - The Submission Tech (Built)
 
-- Final logistics confirmed
-- Onboarding call calendar invite
-- Hype campaign (1 cast/day on /zabalgames channel)
+The website (`bettercallzaal.com/zabalgames.html`) has real submission infrastructure:
 
-### T-3 Days (2026-06-24)
+- **Supabase-backed submission form** - posts Phase 1 builds to a `zabalgames_submissions` table
+- **Public submissions board** - renders every submission as cards (build/repo/demo/cast links + status badges). Applications are public by default.
+- **Starter Projects board** - Zaal-seeded forkable starting points
+- **Schema** - `BetterCallZaal/zabalgames-schema.sql` - table + RLS (anon insert, anon read, no anon update)
+- **Mentor claims** - v0 approach: mentor DMs Zaal, Zaal updates `status` + `claimed_by` in the Supabase dashboard. No claim UI for Season 1.
 
-- 90-min onboarding call (per Part 3)
-- Recorded + posted
-
-### T-0 (2026-06-27)
-
-- 12:00 PT prompt drop
-- Live host stream on BCZ Twitch narrating start
+Blocking step: Zaal creates the Supabase project, runs the schema, pastes the URL + anon key into the config block. Then the form writes + board reads, fully live.
 
 ---
 
@@ -526,192 +225,92 @@ Affordable for a v0. Scales up with sponsor tracks in v1.
 
 | Risk | Mitigation |
 |------|------------|
-| <8 applicants | Open public; offer 1M ZABAL bonus to first 16 applicants |
-| Player drops mid-build | Waitlist 4 deep, auto-promote at T-1d if confirmed dropout |
-| Twitch ToS issue (third-party tipping) | Coinflow tip happens off-stream via posted link; not in violation |
-| Cheating (pre-built code) | Mandate empty starter repo at T+0 + verified empty git log; spot-check via stream review |
-| One player dominates with massive existing audience | Distribution score caps growth at 25 pts; total weighted by 4 axes prevents single-axis sweep |
-| Empire Builder API rate-limit during 8 simultaneous polls | Coordinate with Adrian; throttle to 1 poll/min per player |
-| StreamElements WebSocket flood | If event volume > 1k/min, batch via Cloudflare Queues |
-| ZAO treasury USDC liquidity | Secure $500 USDC + up to $160 Claude Pro reserve = $660 in dedicated wallet 7 days prior |
-| Judges dispute / no-show | Pre-record judge availability; redundant 5 panel = 3-of-5 quorum needed |
-| Bot tip farming | Tip score requires verified Farcaster address ($25 hold + linked X/phone/GH) |
-| Player builds something unethical | Code-of-conduct in onboarding; right to disqualify |
+| Too few Phase 1 submissions | Open call promoted across Farcaster early; starter projects lower the barrier; mentor categories give people a clear lane |
+| Pick conflicts (2+ mentors want same builder) | First-come-first-served per mentor, rolling. Build early gets you seen earlier |
+| First-come rewards hot-takes over thoughtful picks | Acceptable for Season 1; revisit if it produces bad pairings |
+| Cheating (pre-built code) | Empty starter repo at T+0 + verified empty git log + visibility-mode timestamp cross-check |
+| Player builds something off-brand / unethical | Code of conduct in onboarding; right to disqualify pre-vote |
+| ZAO treasury USDC liquidity | Secure $500 USDC in a dedicated wallet ahead of the Finals |
+| Low voter turnout | Reveal stream as the payoff; promote the voting window; consider a voter collectible |
+| Whale tries to sway the vote | Mechanism is 1-person-1-vote NOT token-weighted - holdings give no power |
+| Mentor flakes mid-Finals | Mentor pool curated + confirmed ahead; backup mentor on standby |
+| Date drift | Date locks once cohort + mentor availability known - the forcing function is mentor confirmations + open call |
 
 ---
 
-## Part 10 - Strategic Considerations (Things to Think About Beyond Operations)
+## Part 10 - The Bigger Picture
 
-The Risks table (Part 9) covers operational risk. This section covers the broader strategic questions that shape whether ZABAL Games becomes a tradition or a one-off.
-
-### Cultural Fit
-
-| Question | Why it matters |
-|----------|----------------|
-| Does the existing ZAO community embrace builders, or do they feel alienated? | ZAO's identity is music-community-first. Bringing in 8 engineers may feel like a brand shift. Mitigation: position as "ZAO members get to choose their builders" via community vote on judge panel + applicant pool. Frame as "ZAO commissioning new tools" not "tech bros taking over" |
-| Is the music community invited to participate beyond watching? | Yes - viewers earn ZABAL via stream-leaderboard tipping. Community vote on judging is a real input. Some prompt options (Option C: ZAO Farcaster Mini App with music polling surface) are explicitly music-adjacent |
-| Does Spanglish/multilingual ZAO segment feel included? | Onboarding call should be available in EN + ES if demand exists. Application form opens in both languages. Not a blocker for v0 but worth tracking |
-
-### Optics Around Prize Size
-
-| Question | Why it matters |
-|----------|----------------|
-| Does $500 read as humble or cheap? | Among hackathon norms ($10k-100k typical), $500 reads small. Frame intentionally: "v0, intentionally constrained, ships > prizes." Lean on the on-chain artifacts (Hats NFT, Empire Booster) as the actual flex |
-| Does the equal-split model devalue winning? | Maybe - top performer might feel under-rewarded. Mitigation: ZABAL bag still scales 10x between 1st and finishers. Hats Champion NFT is unique. Real differentiation is on-chain, not USDC |
-| Does Claude Pro subsidy feel like welfare or like infrastructure? | Frame as "ZAO removes infra friction so the only barrier is your idea." Same energy as ETHGlobal handing out Optimism credits. Not charity, just plumbing |
-
-### Diversity + Geography
-
-| Question | Why it matters |
-|----------|----------------|
-| Does a PT-anchored event exclude EU/Asia builders? | Yes - EU player would be coding through their night. Mitigation v0: accept this constraint, track applicant geographies. Mitigation v1: split into 3 regional Games per quarter with global championship |
-| Application gate: open public vs ZAO-member-only vs invite | Open public maximizes diversity but loses ecosystem context. ZAO-member-only fragments to existing community. Hybrid: open to anyone but bonus credit for ZAO Respect / member status. Recommend hybrid for v0 |
-| Gender / experience-level mix | Don't quota for v0. Track data. If first cohort skews homogenous, adjust v1 outreach (post in r/girlsgonewired, r/learnprogramming, etc.) |
-
-### IP + Code Ownership
-
-| Question | Why it matters |
-|----------|----------------|
-| Who owns the code each player ships? | Each player owns their code. Open-source mandate (MIT or similar permissive license) is a submission requirement - keeps ZAO from claiming IP it didn't fund development on |
-| Can ZAO use winning builds in production? | Per MIT license, yes. Doesn't transfer ownership. ZAO can fork + extend |
-| Does ZAO incubate winners? | Optional ongoing relationship - no obligation. Some winners may become ecosystem contributors organically |
-| What if a player's code uses a Claude-generated solution that's also in someone else's training data? | Standard hackathon risk. Open-source license = transparent. Players agree code is their own work product |
-
-### Brand + Partner Risk
-
-| Question | Why it matters |
-|----------|----------------|
-| What if Empire Builder team backs out of judging or support? | Mitigation: confirm in writing (DM by 2026-05-12) before announcing. Backup judge: SongJam / Adam |
-| What if a sponsor signs on and then pulls out? | v0 has no sponsors yet. Set hard 4-week-prior cutoff for sponsor commitments. Don't market sponsor names until USDC is wired |
-| What if a player builds something offensive / off-brand? | Code of conduct in onboarding. Right to disqualify on grounds of harassment, plagiarism, or hate content. Public-facing builds vetted by judges before final showcase |
-| What if a winner refuses the on-chain artifact (privacy)? | Hats NFT can be assigned to ENS only or held in escrow until claimed. ZABAL can be held in distribution contract until winner claims |
-
-### Twitch ToS + Streaming Platform Risk
-
-| Question | Why it matters |
-|----------|----------------|
-| Is third-party tipping (Coinflow) on Twitch streams a ToS issue? | Twitch tolerates off-platform tips (link in description). Risk = chargeback liability lives with creator. Coinflow is fiat-on-ramp not a payment processor on Twitch's side - so this is a gray area, not a violation |
-| What if Twitch changes their stance mid-Games? | Backup: switch to YouTube Live primary, Twitch becomes secondary. Doc 629 flywheel works with both |
-| What if a player streams something against Twitch ToS (DMCA music, etc) | Standard streamer risk. Players sign disclaimer in onboarding. ZAO not liable for individual stream content |
-
-### AI-Assistance Disclosure
-
-| Question | Why it matters |
-|----------|----------------|
-| Should we disclose that Claude is the build tool, or hide it? | Disclose loudly - this is the entire point. Differentiates ZABAL Games from hackathons that ban AI. Frames as "AI-augmented engineering is the new normal, here's what it looks like at peak" |
-| Does this position ZAO as an Anthropic shill? | No - Claude Code is the tool, not the sponsor. ZAO doesn't take Anthropic money for v0. Could be opt-in for v1 if value-aligned |
-| Will some viewers complain "this isn't real coding"? | Yes, some will. Counter-narrative: "this is the most real coding - shipping in 24 hours under public pressure with real users watching." Lean into it |
-
-### Anti-Cheat / Submission Verification
-
-| Question | Why it matters |
-|----------|----------------|
-| How do we know a player actually built it in 24h vs pre-built? | Mandate empty starter repo at T+0. Verify empty git log on submission. Spot-check via stream review (random 5-min chunks from each player's build stream). Players know they're being checked |
-| How do we know AI-generated code doesn't violate someone's IP? | Standard AI-coding-tool disclaimer - players are responsible for their code's IP. Open-source license = transparent provenance |
-| Multi-account cheating (one player runs 2 entries) | Application requires verified Farcaster + Twitch + GitHub - high friction to maintain dual identity convincingly. Not a v0 problem |
-
-### Post-Event Trajectory
-
-| Question | Why it matters |
-|----------|----------------|
-| What happens to the 8 builds after the weekend? | All open-source on GitHub. ZAO maintains a `/zabalgames` hall-of-fame page linking each. Some will die, some get incubated, some get integrated into ZAO OS - that's healthy |
-| Do winners stay engaged with ZAO? | Optional. Some will, some won't. Mitigation: invite winners to /zabalgames Telegram for ongoing contact + first-look at v1 |
-| Does ZABAL Games become quarterly, monthly, or one-off? | Decision deferred to post-v0 retrospective (Doc 631 placeholder). Probably quarterly is the sweet spot - enough cadence to compound brand, not so much it burns out the audience |
-| Is there a championship across multiple Games? | v1+ feature. Top finishers across N Games qualify for an annual ZABAL Games Cup with bigger prize + IRL component |
-
-### Data + Privacy
-
-| Question | Why it matters |
-|----------|----------------|
-| What happens to the build streams (recordings)? | Players own their streams. ZAO archives clips for content engine but credits each player. Players can request deletion at any point |
-| What happens to onboarding call recordings? | Same as above - players own. ZAO uses snippets for v1 promotion only with written permission |
-| Do players' wallet addresses become public? | Yes - via the leaderboard JSON feed (per Doc 626 pattern). Players know this when they accept |
-| GDPR / CCPA implications | Data minimization: only collect Farcaster handle + Twitch handle + verified address + Claude Pro yes/no. Standard rights apply. Low risk for 8 players |
-
-### Brand Compounding
-
-| Question | Why it matters |
-|----------|----------------|
-| Does v0 success automatically mean v1 happens? | No - need 70%+ submission rate AND positive community sentiment AND zero critical incidents. If any fails, retro before committing v1 |
-| Can other ZAO ecosystem brands run their own Games? | Yes - COC Concertz Games (concert-promotion-themed), FISHBOWLZ Games (audio-room-themed), WaveWarZ Games (prediction-market-themed). All ride the same template. Builds the "Games" sub-brand under ZAO umbrella |
-| Does this become an external brand (like ETHGlobal)? | Long-term possibility. v0 is internal-facing. v3+ could spin out as standalone with multi-token ecosystem support |
+- **Season framing:** This is Season 1. Format repeats. Mentors carry across Seasons. Alumni become eligible to mentor or compete again. Each Season compounds the builder network + body of shipped work.
+- **Tokenization (future layer):** A player who wants it can launch a Clanker token tied to their build + stream. Viewers back builds financially, trade volume = parallel signal next to the DAO vote. Optional, player-driven, NOT a Season 1 requirement - design space documented in Doc 646.
+- **The team:** Being a ZAO Mentor is a real, persistent role. The Games are how ZAO grows its core builder + mentor tier over time.
+- **Sub-brand Games (v2+):** COC Concertz Games, WaveWarZ Games, ZAOstock Games - the template rides under the ZAO umbrella.
 
 ---
 
-## Part 11 - v1 Iteration Ideas (Post-v0 Retrospective)
+## Part 11 - Locked vs TBD
 
-After ZABAL Games v0 ships and a retro is run (Doc 631 placeholder):
+### Locked
 
-| v1 Idea | Why |
-|---------|-----|
-| Teams of 2 allowed | Doubles output, surfaces collab vibes |
-| Global timezone variants | Run parallel ZABAL Games in EU/Asia weekend, single global winner |
-| Sponsor tracks | Each sponsor (Empire Builder, SongJam, COC) sponsors a track with their own prize on top |
-| Ongoing weekly mini-games | Smaller 12-hour events between full Games |
-| Open tournament | Top 8 finishers across multiple Games qualify for an annual ZABAL Games Cup |
-| AI-judge augment | Claude reviews code + UX, contributes 10% of score (kept under human judge oversight) |
-| IRL components | Final demo at COC Concertz live show / Farcon |
-| Build-your-own-prompt option | Players propose prompts in advance; community votes which 5 ship |
+- Two-phase model (open build-a-thon -> 8-Finalist event)
+- 8 ZAO mentors, each picks one champion, embedded as teammate
+- Mentor picks: first-come-first-served, rolling
+- Tool-agnostic; 4 visibility modes, pick at least one
+- $500 USDC tiered pool; all 8 Finalists get paid + collectible
+- ZAO governance vote: Respect-earning members, 1-person-1-vote, not token-weighted
+- Applications public by default
+- Submission bar: live URL + open-source repo + 60s demo + /zabalgames cast
+- Season 1 framing - recurring format
+- Tooling subsidy dropped
+- Submission tech built (Supabase form + public board + starter projects)
+- "All 8 win" - competition is in selection, Finals are collaboration
+
+### TBD
+
+- Dates - lock once cohort + mentor availability known
+- Phase 1 prompt content - Zaal writing the full ZAO context bundle
+- Phase 1 duration - how long the open build-a-thon window runs
+- Per-mentor categories - each mentor's 1-liner search style
+- Mentor confirmations - Eduard confirmed, 7 others in progress
+- Participation collectible spec - likely a Hats Protocol role NFT
+- Governance earned during event - exact Respect amount + when
+- Start time - balancing US-centric with global participation
+- Respect threshold N for voter eligibility
+- Tokenization layer - opt-in Clanker tokens, design space open (Doc 646)
+- Telegram group + brand-context [TBD-Zaal] voice/visual fields
 
 ---
 
 ## Also See
 
-- [Doc 627 - Twitch + StreamElements](../../cross-platform/627-twitch-streaming-streamelements-integration/) - Streaming infra players use
-- [Doc 628 - Web3 Streaming + ZABAL Empire Bridge](../../business/628-web3-streaming-zabal-empire-bridge/) - Score feed pattern, Coinflow tip flow, Hypersub, EAS
-- [Doc 629 - Streaming as Main Media Source](../../infrastructure/629-streaming-as-main-media-source-flywheel/) - Auto-clip from build streams to shorts
-- [Doc 626 - Empire Builder + ZABAL POIDH airdrop](../../business/626-empire-builder-zabal-poidh-airdrop/) - apiLeaderboards pattern for player score feed
-- [Doc 625 - POIDH x ZAO bounty playbook](../../community/625-poidh-x-zao-bounty-playbook/) - On-chain submission rail (could pair with Games entry)
-- [Doc 361 - Empire Builder v3](../../business/361-empire-builder-deep-dive-v3-integration/) - Distribute API for prize ZABAL
-- [Doc 324 - ZABAL Wallet Agent Tokenomics](../../business/324-zabal-sang-wallet-agent-tokenomics/) - Privy agent wallets for player gas
-- [Doc 322 - Paragraph publish.new](../../business/322-paragraph-publishnew-newsletter-agent-commerce/) - Post-Games recap newsletter
-- [Doc 354 - Cross-Posting Infra](../../cross-platform/354-cross-posting-infrastructure-audit/) - Promote-window distribution
-- [Doc 311 - Vibe-coded apps marketing playbook](../../311-vibe-coded-apps-marketing-playbook/) - Marketing patterns
+- [Doc 646 - Clanker + Empire Builder for ZABAL Games promote window](../../business/646-clanker-empire-builder-zabal-games-promote/) - the optional tokenization layer
+- [Doc 629 - Streaming as main media source](../../infrastructure/629-streaming-as-main-media-source-flywheel/) - the content flywheel that processes Games streams
+- [Doc 628 - Web3 streaming + ZABAL Empire bridge](../../business/628-web3-streaming-zabal-empire-bridge/)
+- [Doc 627 - Twitch + StreamElements](../../cross-platform/627-twitch-streaming-streamelements-integration/) - streaming infra
+- [Doc 626 - Empire Builder + ZABAL POIDH airdrop](../../business/626-empire-builder-zabal-poidh-airdrop/) - apiLeaderboards pattern
+- [Doc 584 - Empire Builder Farcaster Creator Playbooks](../../business/584-empire-builder-farcaster-creator-playbooks/)
+- `BetterCallZaal/zabalgames.html` - the public shareable summary + live submission tech
+- `BetterCallZaal/zabalgames-brand-context.md` - the brand identity guide for the prompt bundle
+- `BetterCallZaal/zabalgames-schema.sql` - Supabase schema for the submission tech
+- PROMPT_CONTEXT.md (this folder) - the player context bundle
 
 ---
 
 ## Next Actions
 
-| Action | Owner | Type | By When |
-|--------|-------|------|---------|
-| DM Adrian + yerbearserker - confirm Empire Builder support + judge willingness | @Zaal | DM | 2026-05-12 |
-| Refine final 5 idea options (Part 4) - get input from Adam (SongJam) on Option D ZOE-skill scope | @Zaal | Doc edit | 2026-05-16 |
-| Confirm $660 ZAO treasury allocation ($500 USDC pool + $160 Claude Pro reserve) | @Zaal | Treasury | 2026-05-16 |
-| Add Claude Pro question to application form (yes/no/needs subsidy) | @Zaal | Form copy | 2026-05-16 |
-| Coordinate with Anthropic for Claude Pro gift links (or buy gift codes in advance) | @Zaal | Procurement | 2026-06-13 |
-| Send Claude Pro gift link to needing players 24h before T+0 | @Zaal | Email | 2026-06-26 |
-| Build `bettercallzaal.com/zabalgames` landing page (static, applications form) | @Zaal | PR (BCZ) | 2026-05-23 |
-| Open public applications via Farcaster/X/LinkedIn announcement | @Zaal | Cast/post | 2026-05-23 |
-| Reach 16+ applications (over-subscribe to filter) | @Zaal | Outreach | 2026-06-06 |
-| Final 8 selection + waitlist 4 | @Zaal | Decision | 2026-06-13 |
-| Tech dry-run with dummy player | @Zaal | Test | 2026-06-13 |
-| Fix dry-run bugs in pipeline | @Zaal | PR | 2026-06-20 |
-| Onboarding call (90 min) | @Zaal + 8 players | Calendar | 2026-06-24 |
-| Pre-fund 8 Privy agent wallets ($5 ETH each on Base) | @Zaal | Wallet | 2026-06-26 |
-| Schedule 8 sealed prompt-drop tweets for 2026-06-27 12:00 PT | @Zaal | Schedule | 2026-06-26 |
-| Run ZABAL Games v0 (2026-06-27 -> 2026-06-29) | @Zaal + 8 players + judges | Event | 2026-06-27 |
-| Post-event retrospective doc (Doc 631 placeholder) | @Zaal | Doc | 2026-07-06 |
-| Distribute prizes (USDC via 0xSplits, ZABAL via Empire Builder, Hats NFT mint) | @Zaal | On-chain | 2026-06-29 (live) + 2026-07-01 cleanup |
-| Decide v1 - quarterly cadence or one-off? | @Zaal | Decision | 2026-07-13 |
+| Action | Owner | By When |
+|--------|-------|---------|
+| Create Supabase project + run schema + paste config into zabalgames.html | @Zaal | ASAP - blocks live submissions |
+| Draft per-mentor category 1-liners | @Zaal | Before open call |
+| DM remaining 7 mentors with updated pitch + category ask | @Zaal | Before open call |
+| Fill brand-context.md [TBD-Zaal] voice + visual fields | @Zaal | Before prompt bundle finalizes |
+| Write the Phase 1 + Phase 2 prompt content | @Zaal | Before open call |
+| Set up Telegram group (Zaal + Eduard + Iman, then Freeze + ohnahji) | @Zaal | This week |
+| Seed starter-project repos on the board | @Zaal | After Supabase live |
+| Lock Phase 1 duration + open-call date | @Zaal | After mentors confirmed |
 
 ---
 
 ## Sources
 
-### Internal (cross-doc)
-
-- ZAO research library docs cross-linked above
-- BCZ POIDH leaderboard pattern at `bettercallzaal.com/poidh-leaderboard.json`
-- Existing publish modules at `src/lib/publish/` (per Doc 354)
-
-### External / Industry Reference
-
-- [Empire Builder docs](https://www.empirebuilder.world/) - apiLeaderboards + distribute API for player score + prize. Verified 2026-05-09
-- [Hats Protocol](https://docs.hatsprotocol.xyz/) - Champion NFT mint mechanics on Base
-- [Coinflow Checkout](https://coinflow.cash/) - Tip rail during promote window
-- [0xSplits](https://0xsplits.mirror.xyz/) - USDC prize distribution contract
-- [Farcaster Mini Apps docs](https://miniapps.farcaster.xyz/) - Player Option C reference
-- [StreamElements docs](https://docs.streamelements.com/) - Streaming infra reference
-- [Buildspace cohort model](https://buildspace.so/) - Prior art for cohort-based hackathon format
-- [ETHGlobal hackathons](https://ethglobal.com/) - Multi-track judging, prize distribution model
-- [Farcon hackathon track](https://farcon.com/) - Farcaster-native hackathon precedent
+- Internal: this folder's PROMPT_CONTEXT.md, the BCZ zabalgames.html + brand-context.md + schema.sql, ZAO research docs cross-linked above
+- Decision log: iterated in conversation 2026-05-08 through 2026-05-14, plus the 2026-05-13 recorded call (Zaal + Eduard + Iman) that introduced the two-phase model + mentor-pick mechanism

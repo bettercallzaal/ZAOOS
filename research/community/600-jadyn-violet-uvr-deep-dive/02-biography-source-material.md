@@ -68,7 +68,9 @@ The centerpiece: Raver Realm, "The Music Collectors PFP." 1,800 hand-drawn chara
 
 ### Chapter 7 — The winter and the pivot (2024 -> 2026)
 
-The bet does not pay the way the model needed. Raver Realm stalls around 38% minted (~679 of 1,800). The rave series goes dormant after late 2023. No new music NFT drops follow. The "Violet" album — promised for "early June 2023" — never ships as an album, though the 9 songs trickle out as DSP singles through 2024-2025. In January 2025 he pivots: daily Twitch streaming, "Just Chatting" — community hangs, song-battle games, co-streams — not music production. He grows fast (zero to ~2,000 followers in under four months), then plateaus (~616 subs by late 2025). In October 2025 he throws a UVR show at TwitchCon San Diego (438 attendees) — the 9th UVR event and the first tied to the Twitch era. In November 2025 he moves into a shipping-container studio in LA, "The Great Upgrade." By May 2026 his distribution platform Sound.xyz has shut down entirely, and his Twitch tracker shows no recent streams. The story is open-ended: a real builder, mid-reinvention, the next chapter unwritten.
+The bet does not pay the way the model needed. Raver Realm stalls around 38% minted (~679 of 1,800). The rave series goes dormant after late 2023. No new music NFT drops follow. The "Violet" album — promised for "early June 2023" — never ships as an album, though the 9 songs trickle out as DSP singles through 2024-2025. In January 2025 he pivots: daily Twitch streaming, "Just Chatting" — community hangs, song-battle games, co-streams — not music production. He leaves New Jersey and moves to Los Angeles "with no money." He commits to a 365-day streak and completes it — then releases "The 365 Documentary: One Year Can Change Your Life" (YouTube, Jan 30, 2026) about it. He grows fast (zero to ~2,000 followers in under four months), peaks at 7,472 concurrent viewers (July 2025), plateaus around ~9,700 followers / ~616 subs. In October 2025 he throws a UVR show at TwitchCon San Diego (~438 attendees) — the 9th UVR event and the first tied to the Twitch era. In November 2025 he moves into a shipping-container studio in LA, "The Great Upgrade." By May 2026 his distribution platform Sound.xyz has shut down entirely, and the daily Twitch cadence appears to have broken (trackers disagree). The story is open-ended: a real builder, mid-reinvention, the next chapter unwritten.
+
+> The full Twitch-era chapter — verified metrics, the 365 challenge and documentary, the LA move, the father short film, the business and sustainability picture — is reconstructed in [03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md).
 
 ---
 
@@ -234,6 +236,11 @@ Consolidated from both research waves. Verified 2026-05-14 unless noted.
 **Jadyn's own writing**
 - [Medium — "Violet Token & Launch Details"](https://medium.com/@Jadynviolet/violet-token-launch-details-e10b0634d30) (Mar 2022)
 - [Medium — About](https://medium.com/@Jadynviolet/about) (updated Apr 2025)
+
+**Twitch-era artifacts (2025-2026)**
+- ["The 365 Documentary: One Year Can Change Your Life" — YouTube](https://www.youtube.com/watch?v=E2QjecW34DE) (Jan 30, 2026) — his own film on the 365-day streak
+- [Steve Reynoso Podcast — Jadyn Violet — YouTube](https://www.youtube.com/watch?v=C83wsI1Wg4Q) (Jul 23, 2025) — the main interview of the Twitch era
+- [SullyGnome — jadynviolet](https://sullygnome.com/channel/jadynviolet) — Twitch lifetime metrics
 
 **Profiles / data**
 - [Apple Music — Jadyn Violet](https://music.apple.com/us/artist/jadyn-violet/1488149647) — birthdate, origin, discography

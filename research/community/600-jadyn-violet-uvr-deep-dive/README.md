@@ -36,11 +36,11 @@ A second wave of 5 research agents (Twitch detail, on-chain forensics, full biog
 - **Sound.xyz has shut down.** It entered maintenance mode May 2025 and shut down January 16, 2026. The team pivoted to "Vault" (a direct-to-fan platform, partnered with James Blake). Every "Sound.xyz drop" referenced below is now a historical artifact, not a live storefront. This reframes UVR's entire music-distribution layer.
 - **Birthplace is New Jersey, not Virginia.** doc 427.02 said "Manassas, Virginia." Apple Music lists Somerset, NJ; interviews repeatedly say "central New Jersey" (he describes driving two hours to NYC to meet musicians). Treat NJ as correct; Virginia was an error.
 - **Born March 26, 2001** — he is 25, not "~25-26."
-- **The "365-day Twitch challenge" is unverified branding, not a documented streak.** TwitchTracker shows "no streams for selected period" across 7d / 30d / 3m as of May 2026. Streams may have paused after the TwitchCon show (Oct 2025) and the LA shipping-container move (Nov 2025). The durable fact is "daily streaming Jan-late 2025"; current status is unclear/possibly paused.
+- **The 365-day Twitch challenge is REAL — corrected.** An earlier draft of this doc called it "unverified branding." A third research wave confirmed it: "The 365 Documentary: One Year Can Change Your Life" (released on YouTube Jan 30, 2026) documents him streaming every single day of 2025. What is unverified is whether the daily cadence continued into 2026 — trackers disagree, and the streak looks like a bounded, completed project rather than a permanent mode. Full Twitch-era detail is in [03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md).
 - **Violet Token contract is verified on-chain:** `0x6d27462859df2aa5ecccbd14d68b9742ff48da91` (Ethereum mainnet, ERC-721). The Raver Realm contract address still could not be verified — do not cite one.
 - **UVR's honest trajectory: plateau / managed decline.** Raver Realm stalled at ~38% minted, the rave series has been dormant since ~late 2023, no new music NFT drops since Oct 2023, the "Violet" album never shipped, and the founder pivoted to Twitch. UVR launched Raver Realm (Oct 2023) directly into the music-NFT winter and could not move inventory. This does not erase the playbook lessons — it sharpens the cautionary half of them.
 
-Full detail on each is in the sub-docs. The biography material is consolidated in **[02-biography-source-material.md](02-biography-source-material.md)**.
+Full detail is in the sub-docs: biography material in **[02-biography-source-material.md](02-biography-source-material.md)**, the Jan 2025-May 2026 Twitch chapter in **[03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md)**, the Twitch-era business analysis in **[04-twitch-era-business-model.md](04-twitch-era-business-model.md)**.
 
 ---
 
@@ -100,12 +100,16 @@ The takeaway for ZAO (Recommendation 4): a daily stream is a powerful top-of-fun
 
 | Metric | Value | Note |
 |--------|-------|------|
+| Total followers | ~9,700 | SullyGnome, May 2026 |
+| Lifetime streamed | ~1,610 hrs / ~406 streams / ~85,733 hrs watched | SullyGnome |
+| Lifetime peak viewers | 7,472 (July 12, 2025) | SullyGnome |
 | Global channel rank | ~30,279 (Top ~0.43%) | TwitchTracker, May 2026 |
-| English rank | ~13,743 | TwitchTracker |
-| Active subscribers | 616 (505 gifted; 715 all-time high) | TwitchTracker |
-| Avg / peak viewers (7-day) | ~191 / ~391 | TwitchTracker snapshot |
-| Schedule | Daily, ~4pm (PST per recent IG; doc 427.02 logged varying EST times) | time has drifted — state "daily," not an hour |
+| Active subscribers | 616 (~505 gifted, ~111 paid; 715 all-time high) | TwitchTracker |
+| Status | Affiliate (not Partner) | TwitchTracker |
+| Schedule | Daily through 2025 (the 365 streak); 2026 cadence unclear | trackers disagree on May 2026 — see [03](03-twitch-era-deep-dive.md) |
 | Category | Just Chatting (not Music) | TwitchStats clips |
+
+Deep Twitch-era reconstruction (metrics, 365 challenge, content, community, network, life events, business, the "why," current status) is in **[03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md)**.
 
 **Contradiction flagged:** doc 427.02 (Apr 2026) recorded "top 0.69% globally"; this scan (May 2026) found "top 0.43%." Either Twitch recalculated, or the rank genuinely moved. Treat the exact percentile as soft; the durable fact is "top ~0.5%, daily, ~200 avg viewers."
 
@@ -196,6 +200,8 @@ The detailed extraction — 7 concrete mechanics ZAO should steal or adapt, each
 - [Doc 051](../051-zao-whitepaper-2026/) — ZAO whitepaper (Jadyn as roster artist, UVR as associated community)
 - [01-zao-playbook.md](01-zao-playbook.md) — the 7-mechanic extraction for ZAO
 - [02-biography-source-material.md](02-biography-source-material.md) — biography dossier: chronological life narrative, career timeline, 30-quote bank, themes, the entrepreneurial thread, open questions for a biographer
+- [03-twitch-era-deep-dive.md](03-twitch-era-deep-dive.md) — the Jan 2025-May 2026 Twitch chapter in depth: metrics, the 365 challenge + documentary, content, community, network, life events, cross-channel social, the "why," current status
+- [04-twitch-era-business-model.md](04-twitch-era-business-model.md) — Twitch-era revenue, costs, runway, and sustainability analysis
 
 ## Next Actions
 

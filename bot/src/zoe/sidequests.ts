@@ -189,3 +189,77 @@ export async function applyQuestOps(ops: QuestOp[]): Promise<QuestOpResult> {
   res.active = recomputed.filter((q) => q.status === 'active');
   return res;
 }
+
+function scoreLabel(alignment: number | null): string {
+  return alignment !== null ? `${alignment}/10` : 'unscored';
+}
+
+/**
+ * The compact <quests> memory block injected into every concierge turn:
+ * main quest + the active 3 (with ids + reasons) + a one-line parked summary.
+ * Defensively recomputes active status for display even if sidequests.json
+ * was hand-edited.
+ */
+export async function buildQuestsBlock(): Promise<string> {
+  const [main, quests] = await Promise.all([readMainQuest(), readSideQuests()]);
+  const ranked = recomputeActive(quests);
+  const active = ranked
+    .filter((q) => q.status === 'active')
+    .sort((a, b) => (b.alignment ?? -1) - (a.alignment ?? -1));
+  const parked = ranked.filter((q) => q.status === 'parked');
+
+  const lines: string[] = [];
+  lines.push(`Main quest: ${main || '(not set)'}`);
+  lines.push('');
+  if (active.length === 0) {
+    lines.push('Active side quests: (none yet)');
+  } else {
+    lines.push('Active side quests (top 3 by alignment):');
+    active.forEach((q, i) => {
+      lines.push(`${i + 1}. [${scoreLabel(q.alignment)}] (${q.id}) ${q.title} - ${q.alignment_reason || 'no reason on file'}`);
+    });
+  }
+  if (parked.length > 0) {
+    lines.push('');
+    const summary = parked
+      .map((q) => `(${q.id}) ${q.title} [${scoreLabel(q.alignment)}]`)
+      .join(', ');
+    lines.push(`Parked (${parked.length}): ${summary}`);
+  }
+  return lines.join('\n');
+}
+
+/**
+ * The fuller /quests view: main quest, active 3 with reasons, every parked
+ * quest with its score, and a done/dropped tally.
+ */
+export async function formatQuestList(): Promise<string> {
+  const [main, quests] = await Promise.all([readMainQuest(), readSideQuests()]);
+  const ranked = recomputeActive(quests);
+  const active = ranked
+    .filter((q) => q.status === 'active')
+    .sort((a, b) => (b.alignment ?? -1) - (a.alignment ?? -1));
+  const parked = ranked
+    .filter((q) => q.status === 'parked')
+    .sort((a, b) => (b.alignment ?? -1) - (a.alignment ?? -1));
+  const terminalCount = ranked.filter((q) => q.status === 'done' || q.status === 'dropped').length;
+
+  const lines: string[] = [];
+  lines.push(`Main quest: ${main || '(not set)'}`);
+  lines.push('');
+  lines.push(`Active (${active.length}):`);
+  if (active.length === 0) lines.push('  (none yet)');
+  for (const q of active) {
+    lines.push(`  [${scoreLabel(q.alignment)}] (${q.id}) ${q.title}`);
+    lines.push(`     ${q.alignment_reason || 'no reason on file'}`);
+  }
+  lines.push('');
+  lines.push(`Parked (${parked.length}):`);
+  if (parked.length === 0) lines.push('  (none)');
+  for (const q of parked) {
+    lines.push(`  [${scoreLabel(q.alignment)}] (${q.id}) ${q.title}`);
+  }
+  lines.push('');
+  lines.push(`Done/dropped: ${terminalCount}`);
+  return lines.join('\n');
+}

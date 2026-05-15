@@ -276,3 +276,44 @@ test('applyQuestOps: add then score the same quest works across batches', async 
     assert.equal(scored?.status, 'active');
   });
 });
+
+test('buildQuestsBlock: no main quest, no side quests', async () => {
+  await withTempHome(async () => {
+    const { buildQuestsBlock } = await import('../sidequests.ts');
+    const block = await buildQuestsBlock();
+    assert.match(block, /Main quest: \(not set\)/);
+    assert.match(block, /Active side quests: \(none yet\)/);
+  });
+});
+
+test('buildQuestsBlock: shows main quest, active ids, and parked count', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, buildQuestsBlock } = await import('../sidequests.ts');
+    await applyQuestOps([
+      { op: 'set_main', text: 'Ship the ZAO' },
+      { op: 'add', quest: { title: 'A', description: 'd', alignment: 9, alignment_reason: 'core' } },
+      { op: 'add', quest: { title: 'B', description: 'd', alignment: 7, alignment_reason: 'near' } },
+      { op: 'add', quest: { title: 'C', description: 'd', alignment: 5, alignment_reason: 'some' } },
+      { op: 'add', quest: { title: 'D', description: 'd', alignment: 2, alignment_reason: 'weak' } },
+    ]);
+    const block = await buildQuestsBlock();
+    assert.match(block, /Main quest: Ship the ZAO/);
+    assert.match(block, /Active side quests \(top 3 by alignment\)/);
+    assert.match(block, /\[9\/10\] \(sq-.*\) A - core/);
+    assert.match(block, /Parked \(1\):/);
+  });
+});
+
+test('formatQuestList: includes parked and a done/dropped count', async () => {
+  await withTempHome(async () => {
+    const { applyQuestOps, formatQuestList } = await import('../sidequests.ts');
+    const add = await applyQuestOps([
+      { op: 'add', quest: { title: 'A', description: 'd', alignment: 9, alignment_reason: 'r' } },
+      { op: 'add', quest: { title: 'B', description: 'd' } },
+    ]);
+    await applyQuestOps([{ op: 'complete', id: add.added[0].id }]);
+    const out = await formatQuestList();
+    assert.match(out, /B/);
+    assert.match(out, /Done\/dropped: 1/);
+  });
+});

@@ -9,7 +9,7 @@
  * from PERSONA_DEFAULT in memory.ts on first boot, hand-editable after).
  */
 import { callClaudeCli } from '../hermes/claude-cli';
-import type { ConciergeOptions, ConciergeResult, TaskOp, ZoeCaptureNote } from './types';
+import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
 import type { MemoryBlocks } from './memory';
 
@@ -44,6 +44,10 @@ function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string): string {
     `<tasks>`,
     blocks.tasks,
     `</tasks>`,
+    ``,
+    `<quests>`,
+    blocks.quests,
+    `</quests>`,
   ].join('\n');
 }
 
@@ -108,11 +112,12 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     bare: false,
   });
 
-  const { reply, taskOps, captures } = splitReplyAndOps(result.text);
+  const { reply, taskOps, questOps, captures } = splitReplyAndOps(result.text);
 
   return {
     reply,
     task_ops: taskOps,
+    quest_ops: questOps,
     captures,
     inputTokens: result.inputTokens,
     outputTokens: result.outputTokens,
@@ -124,16 +129,22 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
 
 const OPS_FENCE_RE = /----\s*```json\s*([\s\S]*?)\s*```\s*$/;
 
-function splitReplyAndOps(text: string): { reply: string; taskOps: TaskOp[]; captures: ZoeCaptureNote[] } {
+function splitReplyAndOps(text: string): {
+  reply: string;
+  taskOps: TaskOp[];
+  questOps: QuestOp[];
+  captures: ZoeCaptureNote[];
+} {
   const match = text.match(OPS_FENCE_RE);
   if (!match) {
-    return { reply: text.trim(), taskOps: [], captures: [] };
+    return { reply: text.trim(), taskOps: [], questOps: [], captures: [] };
   }
   const jsonStr = match[1];
   const reply = text.replace(OPS_FENCE_RE, '').trim();
   try {
     const parsed = JSON.parse(jsonStr) as {
       task_ops?: TaskOp[];
+      quest_ops?: QuestOp[];
       captures?: Array<{ text: string; topic: string }>;
     };
     const captures: ZoeCaptureNote[] = (parsed.captures ?? []).map((c) => ({
@@ -146,11 +157,12 @@ function splitReplyAndOps(text: string): { reply: string; taskOps: TaskOp[]; cap
     return {
       reply,
       taskOps: parsed.task_ops ?? [],
+      questOps: parsed.quest_ops ?? [],
       captures,
     };
   } catch (err) {
     console.error('[zoe/concierge] failed to parse ops JSON:', (err as Error).message, 'raw:', jsonStr.slice(0, 200));
-    return { reply, taskOps: [], captures: [] };
+    return { reply, taskOps: [], questOps: [], captures: [] };
   }
 }
 

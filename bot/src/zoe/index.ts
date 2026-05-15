@@ -22,6 +22,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
+import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import {
   buildMemoryBlocks,
   ensureZoeHome,
@@ -171,6 +172,18 @@ bot.command('seed', async (ctx) => {
       ? `Seeded ${result.seeded} tasks from doc 601.`
       : 'Task queue already has entries - skipped seed.',
   );
+});
+
+bot.command('quest', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const block = await buildQuestsBlock();
+  await replyChunked(ctx, block);
+});
+
+bot.command('quests', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const list = await formatQuestList();
+  await replyChunked(ctx, list);
 });
 
 bot.command('notes', async (ctx) => {
@@ -475,6 +488,10 @@ async function dispatchConcierge(
 
     if (result.task_ops.length > 0) {
       await applyTaskOps(result.task_ops);
+    }
+
+    if (result.quest_ops.length > 0) {
+      await applyQuestOps(result.quest_ops);
     }
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);

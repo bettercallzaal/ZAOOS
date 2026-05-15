@@ -52,6 +52,8 @@ export interface ConciergeResult {
   reply: string;
   /** Tasks the assistant wants to add or update */
   task_ops: TaskOp[];
+  /** Side-quest ops the assistant wants to apply (SIDEQUESTZ) */
+  quest_ops: QuestOp[];
   /** Captures to log */
   captures: ZoeCaptureNote[];
   /** Cost stats from Claude CLI call */
@@ -90,4 +92,37 @@ export function selectModel(message: string): string {
     return ZOE_QUICK_MODEL;
   }
   return ZOE_DEFAULT_MODEL;
+}
+
+// --- SIDEQUESTZ (doc 648 / spec 2026-05-14) -----------------------------------
+
+export interface SideQuest {
+  id: string;                  // sq-<timestamp>-<rand>
+  title: string;
+  description: string;
+  alignment: number | null;    // 0-10, null = not yet scored
+  alignment_reason: string;    // ZOE's one-line "why this score" ('' if unscored)
+  status: 'active' | 'parked' | 'done' | 'dropped';
+  pinned: boolean;             // true = forced active regardless of score
+  created_at: string;          // ISO 8601
+  updated_at: string;
+  scored_at: string | null;
+}
+
+export type QuestOp =
+  | { op: 'set_main'; text: string }
+  | { op: 'add'; quest: { title: string; description: string; alignment?: number; alignment_reason?: string } }
+  | { op: 'score'; id: string; alignment: number; reason: string }
+  | { op: 'complete'; id: string }
+  | { op: 'drop'; id: string }
+  | { op: 'pin'; id: string };
+
+export interface QuestOpResult {
+  main_quest_set: boolean;
+  added: SideQuest[];
+  scored: string[];
+  completed: string[];
+  dropped: string[];
+  pinned: string[];
+  active: SideQuest[];   // the resulting active set after recompute
 }

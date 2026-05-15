@@ -20,6 +20,7 @@ import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import type { ZoeTask } from './types';
+import { buildQuestsBlock } from './sidequests';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const PERSONA_PATH = join(ZOE_HOME, 'persona.md');
@@ -82,6 +83,14 @@ Reply naturally to Zaal. If you want to add/update tasks OR captured a note, app
     {"op": "add", "task": {"title": "...", "description": "...", "status": "pending", "priority": "med", "source": "ad-hoc", "notes": []}},
     {"op": "complete", "id": "task-id", "outcome": "..."}
   ],
+  "quest_ops": [
+    {"op": "set_main", "text": "the worthy ideal in Zaal's words"},
+    {"op": "add", "quest": {"title": "...", "description": "...", "alignment": 7, "alignment_reason": "one line: how this advances the main quest"}},
+    {"op": "score", "id": "sq-id", "alignment": 9, "reason": "..."},
+    {"op": "complete", "id": "sq-id"},
+    {"op": "drop", "id": "sq-id"},
+    {"op": "pin", "id": "sq-id"}
+  ],
   "captures": [
     {"text": "verbatim what zaal said worth remembering", "topic": "decision"}
   ],
@@ -92,6 +101,20 @@ Reply naturally to Zaal. If you want to add/update tasks OR captured a note, app
 Set "escalate": true ONLY if your current model (Sonnet) cannot answer well and the response should be re-run on Opus. Include "reason" when escalating.
 
 If no ops/captures and no escalation: omit the JSON block entirely.
+
+## SIDEQUESTZ
+
+The <quests> block carries Zaal's main quest (his worthy ideal) and his active side quests. Use it - reason with the main quest loaded on every turn.
+
+When Zaal sets or changes his main quest: emit a "set_main" quest_op. Then emit a "score" quest_op for EVERY existing side quest you can see ids for in the <quests> block - the whole pool re-scores against the new main quest.
+
+When Zaal adds a side quest: emit an "add" quest_op. Include "alignment" (0-10) and "alignment_reason" in the same op - score it immediately using the test below. Tell Zaal the score and whether it landed active or parked.
+
+Alignment test (Earl Nightingale, "The Strangest Secret"): success is the progressive realization of a worthy ideal. A side quest scores HIGH if it directly advances the main quest, LOW if it pulls focus away from it. The score is your honest judgment - explain it in one line. Never fake a number.
+
+ZOE auto-keeps the top 3 by alignment "active", parks the rest. Zaal can override with "pin". Use "complete" when a side quest is done, "drop" when he abandons it.
+
+If no main quest is set yet: still emit "add" ops for side quests, but leave "alignment" off - they stay unscored until the main quest exists.
 
 ## ELDER + LINEAGE
 
@@ -238,6 +261,7 @@ export interface MemoryBlocks {
   human: string;
   working: string;
   tasks: string;
+  quests: string;
   chat_scope: ChatScope;
   chat_title?: string;
 }
@@ -402,11 +426,12 @@ export async function buildMemoryBlocks(
   scope: ChatScope = 'private',
   chatTitle?: string,
 ): Promise<MemoryBlocks> {
-  const [persona, human, recentTurns, tasks] = await Promise.all([
+  const [persona, human, recentTurns, tasks, quests] = await Promise.all([
     readPersona(),
     readHuman(),
     readRecent(scope),
     readTasks(),
+    buildQuestsBlock(),
   ]);
 
   const working =
@@ -428,7 +453,7 @@ export async function buildMemoryBlocks(
           .map((t, i) => `${i + 1}. [${t.priority}] [${t.status}] ${t.title}\n   ${t.description.slice(0, 100)}`)
           .join('\n');
 
-  return { persona, human, working, tasks: tasksBlock, chat_scope: scope, chat_title: chatTitle };
+  return { persona, human, working, tasks: tasksBlock, quests, chat_scope: scope, chat_title: chatTitle };
 }
 
 /**
@@ -457,4 +482,6 @@ export const ZOE_PATHS = {
   archive_dir: ARCHIVE_DIR,
   tasks: TASKS_PATH,
   bootloader: BOOTLOADER_PATH,
+  main_quest: join(ZOE_HOME, 'main-quest.md'),
+  sidequests: join(ZOE_HOME, 'sidequests.json'),
 };

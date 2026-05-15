@@ -11,6 +11,13 @@ tier: STANDARD
 
 > **Goal:** Audit what's already in `songchaindao-dot/cowork-zaodevz` (it's mature — most of the agent is already specified). Design the imanagent as Iman's first ground-up Telegram bot on a fresh VPS. Write the walkthrough Zaal runs through with Iman.
 
+## Locked decisions (2026-05-15)
+
+- **Standalone, not folded under ZAO/ZAO Festivals.** cowork-zaodevz stays under `songchaindao-dot`. It's its own thing.
+- **Iman owns it operationally.** He drives the agent build, deploys it, runs the VPS, and is the day-to-day maintainer. Zaal is co-lead on the data but Iman is the primary builder/operator.
+- **Universal action tracker — every brand, every todo.** Not just "the 4 cowork users' personal todos." This is THE board where work across every ZAO-adjacent brand lives: COC Concertz (Thy Revolution), WaveWarZ (Samantha, plus Zambia ops), Magnetiq, Attabotty, ZAOstock, BCZ Strategies, ZAO Devz. One place. One audit log.
+- **Categories likely need to expand** to cover the full brand surface (see "Category expansion needed" below). Iman + Zaal decide the final list before the agent build, so the bot's `/list <category>` filter matches reality.
+
 ## Key Decisions (act on these)
 
 | # | Decision | Why |
@@ -38,6 +45,22 @@ The repo is **not empty** and **not a fresh app to design** — it's a working N
 | Process docs | `SIX-SIGMA.md` — DMAIC, 5S, TIMWOODS, weekly review. The discipline that keeps the tracker honest. |
 
 **Currently `data/actions.json` has 3 example items** (item 1 done by iman, item 2 done by iman, item 3 TODO/Both). Real data is flowing.
+
+## Category expansion needed
+
+The repo currently has 14 categories (see `src/lib/types.ts`):
+> ZAO Devz, Site / Tech, Ops, Bounty, Other, WaveWarZ Zambia, Recording, Distribution, Release, Artist Onboarding, Social, Brand, Content, Campaigns
+
+Per the "universal action tracker" decision, **add the missing brand categories** before the agent build so `/list <category>` returns sensible results from day one. Candidate additions Zaal + Iman should agree on:
+
+- **COC Concertz** — Thy Revolution's brand
+- **Magnetiq** — the brand bot project
+- **Attabotty** — the brand bot project
+- **ZAOstock** — the Oct 3 festival (currently lives in ZAO OS repo; may graduate here)
+- **BCZ Strategies** — Zaal's agency work (clients like Riverside)
+- **The ZAO** (catch-all for org-level work that isn't Devz / WaveWarZ / a specific brand)
+
+Same single PR as the "add Samantha" change — edit `Owner` + `Category` together, ship once.
 
 ## What changes for 4-user cowork mode
 
@@ -538,7 +561,8 @@ Common issues:
 | Iman gets repo collaborator access on `songchaindao-dot/cowork-zaodevz` | @Zaal | GitHub setting | Before Step 5 |
 | Run through Steps 1-11 with Iman in person or on a call | @Zaal + @Iman | session | Within 1 week |
 | After v1 works: open a PR adding `agent/` to the repo (with the index.ts + storage.ts from Step 9) | @Iman | PR | Right after the walkthrough |
-| Decide whether to fold cowork-zaodevz under ZAO Festivals / The ZAO brand or keep it standalone | @Zaal | Decision | Soon — affects how it's pitched to Samantha + ThyRev |
+| Agree the final category list (existing 14 + COC Concertz + Magnetiq + Attabotty + ZAOstock + BCZ Strategies + The ZAO?) and ship in the same PR as the Samantha-add | @Zaal + @Iman | small PR | Before the agent build |
+| Brief candytoybox + ThyRev that cowork-zaodevz is now their shared workplace, walk them through login | @Iman | comms + onboarding session | After the 4-user PR ships |
 | v2 add Claude CLI for natural-language todo capture ("todo: ship X" -> `/add` flow) | @Iman | PR | After v1 stabilizes |
 | v2 swap GitHub Contents API for Supabase (BACKLOG Phase 2 + 3) | @Zaal + @Iman | PR sequence | After v1 is stable |
 

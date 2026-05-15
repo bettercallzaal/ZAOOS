@@ -21,6 +21,38 @@ Jadyn Violet's recurring half-joke in interviews — most explicitly on Word To 
 
 ---
 
+## Where the lore comes from — UVR research
+
+Every reference in this song is real Jadyn Violet / UVR biography pulled from the verified research dossier: **[Doc 600 — Jadyn Violet & UVR Deep Dive](../../community/600-jadyn-violet-uvr-deep-dive/)**. That folder has the full chronological story, the supporting cast, the music + visual identity, the Twitch-era timeline, the press archive, and cleaned transcripts of "The 365 Documentary" and the Steve Reynoso podcast. The annotations below trace every line in this song back to a specific source in that dossier.
+
+The "where to put what" tactical Suno guide for this song's production is the parent doc: **[601 README](README.md)**. The two A/B cover art prompts are in **[03-cover-art-prompts.md](03-cover-art-prompts.md)**.
+
+---
+
+## The recipe (Suno v5.5) — for anyone who wants to remix
+
+Want to make your own version, swap your own bars, run a different vocal? Here's the full recipe.
+
+**Suno settings:** v5.5, Custom Mode, Weirdness 55%, Style Influence 75%.
+
+**Style Description** (paste into Suno's Style box, ~540 chars):
+
+```
+melodic trap, hyperpop elements, dark and euphoric, breathy auto-tuned male vocals, deep 808s with slides, rolling hi-hats, glitchy textures, dark synths, shimmering ethereal pads, sidechained euphoric drop on chorus, 140 BPM, violet underground rave aesthetic, polished mix, vulnerable yet braggadocio
+```
+
+**Exclude Styles** (Advanced field):
+
+```
+no orchestral strings, no acoustic guitar, no spoken word in chorus, no female vocals, no radio polish, no lo-fi warmth
+```
+
+**Pronunciation note:** Taco Bell's tagline "Live Más" is sung **"liv mahss"** — *Live* rhymes with *give*, not *alive*. Suno's TTS defaults to the wrong "alive" pronunciation if you write it standard, so the lyric block respells it phonetically as **Liv Más** in every sung position. The song title and prose stay "Live Más."
+
+**Full lyrics block** — copy from the appendix at the bottom of this doc, or grab it from the [601 README primary variant](README.md#primary---sponsor-me-live-más---melodic-trap--hyperpop).
+
+---
+
 ## INTRO
 
 ```
@@ -252,6 +284,109 @@ Taco Bell, I'll see you eventually.
 | "I'll see you eventually" | "I'm in it for the next 20, 30 years" | Steve Reynoso Podcast |
 | "Violet" / "violet TV" / "violet frequency" / "violet screen" | UVR brand color | Doc 600 / raverrealm.xyz |
 | "Underground Violet Rave at the drive-thru beep" | UVR self-identification at the TB drive-thru | Doc 600 |
+
+---
+
+## Appendix — full lyrics (paste-ready block)
+
+For Suno's Lyrics box, or just to read straight through. Bracket tags on their own line above the lyrics they govern. "Liv Más" is the phonetic respelling of "Live Más" (sung as "liv mahss").
+
+```
+[Intro]
+[Spoken Word] [Male Vocal]
+(violet synth pad, glitch sweep)
+This one's for Tac' Bell.
+Why not me.
+
+[Verse 1]
+[Auto-Tuned] [Melodic Rap]
+Indian kid out the Jersey state
+Trap from a bedroom, ten years late
+Lost the wallet, lost the rave
+Bought a shipping container on the Skid Row pave
+Three months in, half a viewer deep
+Now the violet hits like Diablo on the cheek
+Why not me, bro? Why not now?
+365 days, take a bow
+
+[Pre-Chorus]
+[Build]
+Three AM on the 101
+Hollywood sign in the rearview gun
+All I want is one franchise
+Got the dream and the receipts, son
+
+[Chorus]
+[Belted] [Auto-Tuned] [Ad-libs] [Layered Vocals]
+(808 drop, sidechained synths, euphoric)
+Sponsor me, Taco Bell, sponsor me
+I'll put the Crunchwrap on the violet TV
+Cheesy Gordita Crunch, my city, my keys
+Liv Más, baby, liv Más with me
+Sponsor me, Suno, you already did
+Now it's Tac' Bell's turn, yeah I'm not a kid
+I'm the Underground Violet Rave at the drive-thru beep
+Doritos Locos, fire sauce, eternal sleep
+
+[Verse 2]
+[Auto-Tuned] [Melodic Rap]
+Mama on the phone like you sleeping in the whip
+Yeah ma but the dream's on a steady drip
+365 in a Skid Row tin
+Container singing, gunshots ringing in
+Lacy raid, seven thousand strong
+Comeback Kid but the comeback long
+Got a Suno deal, got a song machine
+Now I need that Cinnamon Twist on the violet screen
+
+[Pre-Chorus]
+[Build]
+Baja Blast in the studio
+Crunchwrap on the keyboard
+Got a fire sauce dream from a bedroom door
+Indian rockstar, Tac' Bell tour
+
+[Chorus]
+[Belted] [Auto-Tuned] [Ad-libs] [Layered Vocals]
+(808 drop, sidechained synths, euphoric)
+Sponsor me, Taco Bell, sponsor me
+I'll put the Crunchwrap on the violet TV
+Cheesy Gordita Crunch, my city, my keys
+Liv Más, baby, liv Más with me
+Sponsor me, Suno, you already did
+Now it's Tac' Bell's turn, yeah I'm not a kid
+I'm the Underground Violet Rave at the drive-thru beep
+Doritos Locos, fire sauce, eternal sleep
+
+[Bridge]
+[Breakdown] [Whispered] [Half-Time]
+(strip drums, just pads and vocal)
+One franchise. One franchise.
+Bell tower glowing in the LA night
+One franchise. One franchise.
+Slumdog Billionaire gonna make it right
+[Build]
+Rockstar Shit but I'll trade it for a Liv Más day
+Tac' Bell, hear me out, call my line
+You sponsor the rave, I sponsor the sign
+
+[Chorus]
+[Belted] [Auto-Tuned] [Ad-libs] [Layered Vocals]
+(808 drop, sidechained synths, euphoric)
+Sponsor me, Taco Bell, sponsor me
+I'll put the Crunchwrap on the violet TV
+Cheesy Gordita Crunch, my city, my keys
+Liv Más, baby, liv Más with me
+
+[Outro]
+[Whispered] [Fade Out]
+Why not me. Why not me. Why not me.
+Liv Más on the violet frequency.
+Why not me. Why not me. Why not me.
+Taco Bell, I'll see you eventually.
+
+[End]
+```
 
 ---
 

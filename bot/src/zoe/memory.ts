@@ -20,6 +20,7 @@ import { promises as fs } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import type { ZoeTask } from './types';
+import { buildQuestsBlock } from './sidequests';
 
 const ZOE_HOME = process.env.ZOE_HOME ?? join(homedir(), '.zao', 'zoe');
 const PERSONA_PATH = join(ZOE_HOME, 'persona.md');
@@ -238,6 +239,7 @@ export interface MemoryBlocks {
   human: string;
   working: string;
   tasks: string;
+  quests: string;
   chat_scope: ChatScope;
   chat_title?: string;
 }
@@ -402,11 +404,12 @@ export async function buildMemoryBlocks(
   scope: ChatScope = 'private',
   chatTitle?: string,
 ): Promise<MemoryBlocks> {
-  const [persona, human, recentTurns, tasks] = await Promise.all([
+  const [persona, human, recentTurns, tasks, quests] = await Promise.all([
     readPersona(),
     readHuman(),
     readRecent(scope),
     readTasks(),
+    buildQuestsBlock(),
   ]);
 
   const working =
@@ -428,7 +431,7 @@ export async function buildMemoryBlocks(
           .map((t, i) => `${i + 1}. [${t.priority}] [${t.status}] ${t.title}\n   ${t.description.slice(0, 100)}`)
           .join('\n');
 
-  return { persona, human, working, tasks: tasksBlock, chat_scope: scope, chat_title: chatTitle };
+  return { persona, human, working, tasks: tasksBlock, quests, chat_scope: scope, chat_title: chatTitle };
 }
 
 /**
@@ -457,4 +460,6 @@ export const ZOE_PATHS = {
   archive_dir: ARCHIVE_DIR,
   tasks: TASKS_PATH,
   bootloader: BOOTLOADER_PATH,
+  main_quest: join(ZOE_HOME, 'main-quest.md'),
+  sidequests: join(ZOE_HOME, 'sidequests.json'),
 };

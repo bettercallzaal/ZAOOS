@@ -13,8 +13,9 @@ Start the day with clarity. Check status, review what's waiting, set one intenti
 2. **Check daily brief** — read latest file in `docs/daily-briefs/` (if the scheduled agent has run)
 3. **Check inspiration** — read latest file in `research/inspiration/` (if available)
 4. **Open issues** — run `gh issue list --state open --limit 5`
-5. **Open PRs** — run `gh pr list --state open`
-6. **Yesterday's reflection** — read latest file in `docs/reflections/` (if available)
+5. **Open PRs** — run `gh pr list --state open`. Watch for `claude/inbox-digest-YYYY-MM-DD` (overnight ZOE digest, see Doc 652).
+6. **ZOE inbox check** — run `/inbox count`. If unread > 0, surface count in the brief and offer `/inbox research all` (require Zaal "yes" before firing — each item can become a research doc + PR, blast radius is real).
+7. **Yesterday's reflection** — read latest file in `docs/reflections/` (if available)
 
 ## Present to User
 
@@ -25,9 +26,10 @@ After gathering everything, present a concise morning brief:
 
 **Branch:** [current branch] | **Uncommitted:** [yes/no]
 **Last commit:** [message] ([time ago])
+**ZOE inbox:** [N unread] · [overnight digest: PR #M | none]
 
 ### Waiting for you
-- [Open PRs needing review]
+- [Open PRs needing review - call out claude/inbox-digest-* PRs first]
 - [Open issues, sorted by priority]
 
 ### Yesterday's note to today

@@ -1,0 +1,100 @@
+// Post slate v1 - data gathering per category.
+// Each source is best-effort. Empty arrays mean "skip the category for this fire."
+
+import { execSync } from 'node:child_process';
+import { promises as fs } from 'node:fs';
+import { join } from 'node:path';
+import { ZOE_PATHS } from '../memory';
+import type { PostSourceSnapshot } from './types';
+
+const VOICE_MEMOS_DIR = join(ZOE_PATHS.home, 'voice-memos');
+
+export async function gatherBuildSignals(repoDir: string): Promise<PostSourceSnapshot['build']> {
+  let recentCommits: string[] = [];
+  try {
+    const log = execSync(
+      `git -C ${JSON.stringify(repoDir)} log --since="24 hours ago" --no-merges --pretty=format:"%s" 2>/dev/null`,
+      { encoding: 'utf8', timeout: 5000 },
+    );
+    recentCommits = log.split('\n').filter((l) => l.trim()).slice(0, 10);
+  } catch {
+    recentCommits = [];
+  }
+
+  let openPrs: Array<{ number: number; title: string }> = [];
+  try {
+    const json = execSync(
+      'gh pr list --repo bettercallzaal/ZAOOS --state open --limit 8 --json number,title',
+      { encoding: 'utf8', timeout: 8000 },
+    );
+    openPrs = JSON.parse(json) as Array<{ number: number; title: string }>;
+  } catch {
+    openPrs = [];
+  }
+
+  return { recentCommits, openPrs };
+}
+
+export async function gatherEcosystemSignals(repoDir: string): Promise<PostSourceSnapshot['ecosystem']> {
+  // v1: proxy ecosystem activity via recent commits to ZAOOS lab repo (community activity
+  // shows up as new research docs, doc 422 patterns). v2: add Farcaster /thezao channel pulls,
+  // ZABAL contract events via Base RPC, member roster diffs.
+  let repoActivity: string[] = [];
+  try {
+    const log = execSync(
+      `git -C ${JSON.stringify(repoDir)} log --since="7 days ago" --no-merges --pretty=format:"%s" 2>/dev/null`,
+      { encoding: 'utf8', timeout: 5000 },
+    );
+    repoActivity = log.split('\n').filter((l) => l.trim()).slice(0, 15);
+  } catch {
+    repoActivity = [];
+  }
+  return { repoActivity };
+}
+
+export async function gatherEventSignals(): Promise<PostSourceSnapshot['event']> {
+  // v1 stub: drop a file at ~/.zao/zoe/events/today.txt + tomorrow.txt with one event per
+  // line. Cron or manual seeding writes it. v2: wire Google Calendar MCP via Claude CLI
+  // subprocess (Hermes pattern) once the MCP is authenticated on VPS.
+  const eventsDir = join(ZOE_PATHS.home, 'events');
+  let todaysEvents: string[] = [];
+  let tomorrowsEvents: string[] = [];
+  try {
+    const today = await fs.readFile(join(eventsDir, 'today.txt'), 'utf8');
+    todaysEvents = today.split('\n').map((l) => l.trim()).filter(Boolean);
+  } catch {
+    todaysEvents = [];
+  }
+  try {
+    const tomorrow = await fs.readFile(join(eventsDir, 'tomorrow.txt'), 'utf8');
+    tomorrowsEvents = tomorrow.split('\n').map((l) => l.trim()).filter(Boolean);
+  } catch {
+    tomorrowsEvents = [];
+  }
+  return { todaysEvents, tomorrowsEvents };
+}
+
+export async function gatherPersonalSignals(): Promise<PostSourceSnapshot['personal']> {
+  // Voice memos: per-day file under ~/.zao/zoe/voice-memos/YYYY-MM-DD.md (append-mode).
+  // Drafter reads the last 2 days. v2: also pull last lunch-stream transcript via zao-transcribe.
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400_000).toISOString().slice(0, 10);
+  const voiceMemos: string[] = [];
+  for (const date of [today, yesterday]) {
+    try {
+      const raw = await fs.readFile(join(VOICE_MEMOS_DIR, `${date}.md`), 'utf8');
+      voiceMemos.push(...raw.split('\n').filter((l) => l.trim()));
+    } catch {
+      // file might not exist - normal
+    }
+  }
+  return { voiceMemos, recentZaalMessages: [] };
+}
+
+export async function appendVoiceMemo(text: string): Promise<void> {
+  await fs.mkdir(VOICE_MEMOS_DIR, { recursive: true });
+  const today = new Date().toISOString().slice(0, 10);
+  const stamp = new Date().toISOString();
+  const file = join(VOICE_MEMOS_DIR, `${today}.md`);
+  await fs.appendFile(file, `\n[${stamp}] ${text}\n`, 'utf8');
+}

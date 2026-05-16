@@ -138,6 +138,8 @@ This is "Sponsor Me (Live Más)" — the UVR-flavor Taco Bell sponsorship pitch.
 
 ### PRIMARY — "Sponsor Me (Live Más)" — melodic trap × hyperpop
 
+> **Pronunciation note:** Taco Bell's tagline is "Live Más" pronounced **"liv mahss"** — *Live* rhymes with *give*, not with *alive*. Suno's TTS will default to the wrong "alive" pronunciation if you write it standard. The lyric block below uses the phonetic spelling **"Liv Más"** in sung positions to force the right pronunciation. The song title and prose still use "Live Más" — only the sung lyric is respelled. See [02-sponsor-me-liner-notes.md](02-sponsor-me-liner-notes.md) for the full annotated lyric breakdown — every reference, every callback, every TB item explained.
+
 **Style** (paste into Suno's Style Description box, 540 chars):
 ```
 melodic trap, hyperpop elements, dark and euphoric, breathy auto-tuned male vocals, deep 808s with slides, rolling hi-hats, glitchy textures, dark synths, shimmering ethereal pads, sidechained euphoric drop on chorus, 140 BPM, violet underground rave aesthetic, polished mix, vulnerable yet braggadocio
@@ -180,7 +182,7 @@ Got the dream and the receipts, son
 Sponsor me, Taco Bell, sponsor me
 I'll put the Crunchwrap on the violet TV
 Cheesy Gordita Crunch, my city, my keys
-Live Más, baby, live Más with me
+Liv Más, baby, liv Más with me
 Sponsor me, Suno, you already did
 Now it's Tac' Bell's turn, yeah I'm not a kid
 I'm the Underground Violet Rave at the drive-thru beep
@@ -210,7 +212,7 @@ Indian rockstar, Tac' Bell tour
 Sponsor me, Taco Bell, sponsor me
 I'll put the Crunchwrap on the violet TV
 Cheesy Gordita Crunch, my city, my keys
-Live Más, baby, live Más with me
+Liv Más, baby, liv Más with me
 Sponsor me, Suno, you already did
 Now it's Tac' Bell's turn, yeah I'm not a kid
 I'm the Underground Violet Rave at the drive-thru beep
@@ -224,7 +226,7 @@ Bell tower glowing in the LA night
 One franchise. One franchise.
 Slumdog Billionaire gonna make it right
 [Build]
-Rockstar Shit but I'll trade it for a Live Más day
+Rockstar Shit but I'll trade it for a Liv Más day
 Tac' Bell, hear me out, call my line
 You sponsor the rave, I sponsor the sign
 
@@ -234,12 +236,12 @@ You sponsor the rave, I sponsor the sign
 Sponsor me, Taco Bell, sponsor me
 I'll put the Crunchwrap on the violet TV
 Cheesy Gordita Crunch, my city, my keys
-Live Más, baby, live Más with me
+Liv Más, baby, liv Más with me
 
 [Outro]
 [Whispered] [Fade Out]
 Why not me. Why not me. Why not me.
-Live Más on the violet frequency.
+Liv Más on the violet frequency.
 Why not me. Why not me. Why not me.
 Taco Bell, I'll see you eventually.
 

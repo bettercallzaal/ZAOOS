@@ -166,9 +166,12 @@ async function fireOneDraft(bot: Bot, zaalTgId: number, repoDir: string): Promis
     await appendLog({ event: 'skip', category, reason: 'empty-or-skip-marker' });
     return;
   }
-  const message = `Post draft (${category}):\n\n${draft.text}\n\n— copy + paste into Firefly when ready`;
+  // Send as TWO messages so Zaal can long-press the post body alone and
+  // tap-copy the whole thing. The header bubble explains category; the body
+  // bubble is the bare post text with no decoration.
   try {
-    await bot.api.sendMessage(zaalTgId, message);
+    await bot.api.sendMessage(zaalTgId, `ZOE post draft (${category}) - copy the next message`);
+    await bot.api.sendMessage(zaalTgId, draft.text);
     await appendLog({ event: 'sent', category, charCount: draft.text.length });
   } catch (err) {
     await appendLog({ event: 'send-error', category, error: (err as Error).message });
@@ -207,6 +210,8 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
       const now = Date.now();
       const LATE_THRESHOLD_MS = 30 * 60_000; // 30 min - any older = treat as missed, don't fire late
       let changed = false;
+      let firedThisTick = false; // Hard cap: ONE ping per tick. Prevents burst even
+                                  // if two entries collide on the same minute.
       for (const entry of schedule.entries) {
         if (entry.fired) continue;
         const due = new Date(entry.fireAt).getTime();
@@ -219,8 +224,15 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
           await appendLog({ event: 'skip-late', fireAt: entry.fireAt, lagSec: Math.round((now - due) / 1000) });
           continue;
         }
+        if (firedThisTick) {
+          // Already sent one this tick. Leave this entry unfired; next tick picks
+          // it up. With 20 min MIN_GAP between scheduled slots this is rare, but
+          // a backstop against ever spamming Zaal with two pings in one minute.
+          continue;
+        }
         entry.fired = true;
         changed = true;
+        firedThisTick = true;
         fireOneDraft(opts.bot, opts.zaalTgId, opts.repoDir).catch((err) => {
           console.error('[zoe/posts] fire failed:', (err as Error).message);
         });

@@ -63,9 +63,25 @@ function pickWeightedCategory(): PostCategory {
   return CATEGORY_WEIGHTS[0][0];
 }
 
+function pad2(n: number): string {
+  return n.toString().padStart(2, '0');
+}
+
+function etOffset(date: string): string {
+  // EDT = UTC-4 (Mar second Sunday - Nov first Sunday), EST = UTC-5 otherwise.
+  // Cheap heuristic: months 3-10 inclusive are EDT in most US years. The 2-3 days
+  // a year this is off don't matter for a post scheduler.
+  const month = Number(date.slice(5, 7));
+  return month >= 3 && month <= 10 ? '-04:00' : '-05:00';
+}
+
 function rollDailySchedule(date: string, pings: number): DailySchedule {
   // Build a list of candidate slot-minutes (one per minute in the window), shuffle, take N
   // with min-gap enforcement.
+  //
+  // If this roll happens mid-day (real wall-clock is past the window-start), drop any
+  // slot whose ET time is already in the past. Prevents the "deployed at 7pm, fire 7
+  // backfilled pings instantly" bug seen on 2026-05-16 deploy.
   const slotsPerDay = (WINDOW_END_HOUR_ET - WINDOW_START_HOUR_ET) * 60;
   const indices = Array.from({ length: slotsPerDay }, (_, i) => i);
   // Fisher-Yates
@@ -82,14 +98,22 @@ function rollDailySchedule(date: string, pings: number): DailySchedule {
   }
   picked.sort((a, b) => a - b);
 
-  const entries: ScheduleEntry[] = picked.map((minuteOffset) => {
-    const hour = WINDOW_START_HOUR_ET + Math.floor(minuteOffset / 60);
-    const minute = minuteOffset % 60;
-    // Build an ISO timestamp at hour:minute ET for `date`.
-    const local = new Date(`${date}T00:00:00-04:00`); // EDT default; cron tz handles DST elsewhere
-    local.setHours(hour, minute, 0, 0);
-    return { fireAt: local.toISOString(), fired: false };
-  });
+  const offset = etOffset(date);
+  const now = Date.now();
+  const entries: ScheduleEntry[] = picked
+    .map((minuteOffset) => {
+      const hour = WINDOW_START_HOUR_ET + Math.floor(minuteOffset / 60);
+      const minute = minuteOffset % 60;
+      // Build an explicit ISO timestamp at hour:minute ET for `date`.
+      // Avoids setHours(), which interprets in the system's local timezone
+      // (UTC on VPS) and skews the schedule by 4-5 hours.
+      const fireAt = new Date(`${date}T${pad2(hour)}:${pad2(minute)}:00${offset}`);
+      return { fireAt: fireAt.toISOString(), fired: false };
+    })
+    // Drop slots already in the past at roll-time. The midnight cron rolls before
+    // any of today's slots, so this normally drops nothing. Only filters when the
+    // scheduler boots mid-day (deploy, crash recovery).
+    .filter((entry) => new Date(entry.fireAt).getTime() > now);
 
   return { date, entries };
 }
@@ -142,9 +166,12 @@ async function fireOneDraft(bot: Bot, zaalTgId: number, repoDir: string): Promis
     await appendLog({ event: 'skip', category, reason: 'empty-or-skip-marker' });
     return;
   }
-  const message = `Post draft (${category}):\n\n${draft.text}\n\n— copy + paste into Firefly when ready`;
+  // Send as TWO messages so Zaal can long-press the post body alone and
+  // tap-copy the whole thing. The header bubble explains category; the body
+  // bubble is the bare post text with no decoration.
   try {
-    await bot.api.sendMessage(zaalTgId, message);
+    await bot.api.sendMessage(zaalTgId, `ZOE post draft (${category}) - copy the next message`);
+    await bot.api.sendMessage(zaalTgId, draft.text);
     await appendLog({ event: 'sent', category, charCount: draft.text.length });
   } catch (err) {
     await appendLog({ event: 'send-error', category, error: (err as Error).message });
@@ -181,16 +208,34 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
     async () => {
       const schedule = await loadOrRollSchedule(pings);
       const now = Date.now();
+      const LATE_THRESHOLD_MS = 30 * 60_000; // 30 min - any older = treat as missed, don't fire late
       let changed = false;
+      let firedThisTick = false; // Hard cap: ONE ping per tick. Prevents burst even
+                                  // if two entries collide on the same minute.
       for (const entry of schedule.entries) {
         if (entry.fired) continue;
-        if (new Date(entry.fireAt).getTime() <= now) {
+        const due = new Date(entry.fireAt).getTime();
+        if (due > now) continue;
+        if (now - due > LATE_THRESHOLD_MS) {
+          // Skip rather than fire late - prevents blast of stale pings if zoe-bot
+          // boots after a long downtime (2026-05-16 incident).
           entry.fired = true;
           changed = true;
-          fireOneDraft(opts.bot, opts.zaalTgId, opts.repoDir).catch((err) => {
-            console.error('[zoe/posts] fire failed:', (err as Error).message);
-          });
+          await appendLog({ event: 'skip-late', fireAt: entry.fireAt, lagSec: Math.round((now - due) / 1000) });
+          continue;
         }
+        if (firedThisTick) {
+          // Already sent one this tick. Leave this entry unfired; next tick picks
+          // it up. With 20 min MIN_GAP between scheduled slots this is rare, but
+          // a backstop against ever spamming Zaal with two pings in one minute.
+          continue;
+        }
+        entry.fired = true;
+        changed = true;
+        firedThisTick = true;
+        fireOneDraft(opts.bot, opts.zaalTgId, opts.repoDir).catch((err) => {
+          console.error('[zoe/posts] fire failed:', (err as Error).message);
+        });
       }
       if (changed) await saveSchedule(schedule);
     },

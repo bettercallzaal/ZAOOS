@@ -22,6 +22,7 @@ import { generateMorningBrief } from './brief';
 import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled } from './nudges';
+import { startPostsScheduler } from './posts';
 
 const SENTINEL_DIR = join(ZOE_PATHS.home, 'sentinels');
 
@@ -135,13 +136,22 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     );
   }
 
-  console.log(`[zoe/scheduler] started ${tasks.length} cron tasks (no quiet hours per Zaal feedback)`);
+  // Post slate v1 - random 7 pings/day of social-post drafts (build / ecosystem /
+  // event / personal). Owns its own state at ~/.zao/zoe/posts/. See posts/README.md.
+  const postsScheduler = startPostsScheduler({
+    bot: opts.bot,
+    zaalTgId: opts.zaalTgId,
+    repoDir: opts.repoDir,
+  });
+
+  console.log(`[zoe/scheduler] started ${tasks.length} cron tasks + posts scheduler (no quiet hours per Zaal feedback)`);
 
   return {
     stop: () => {
       for (const task of tasks) {
         task.stop();
       }
+      postsScheduler.stop();
     },
   };
 }

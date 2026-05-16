@@ -42,6 +42,7 @@ import {
   readGroups,
   type GroupMode,
 } from './groups';
+import { handleVoiceMemo } from './posts';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
@@ -184,6 +185,12 @@ bot.command('quests', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const list = await formatQuestList();
   await replyChunked(ctx, list);
+});
+
+// Post slate v1 - voice memo capture. /voicememo <text> or /vm <text>.
+// Appends to ~/.zao/zoe/voice-memos/YYYY-MM-DD.md for the personal-post drafter.
+bot.command(['voicememo', 'vm'], async (ctx) => {
+  await handleVoiceMemo(ctx, isFromZaal(ctx));
 });
 
 bot.command('notes', async (ctx) => {

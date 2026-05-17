@@ -7,7 +7,7 @@ related-docs: 562, 656, 658
 tier: DEEP
 ---
 
-# 659 — X Content Extraction v2 (No-Login Sustainable Chain)
+# 660 — X Content Extraction v2 (No-Login Sustainable Chain)
 
 > **Goal:** Make X (Twitter) content extraction reliably good without ever asking Zaal for X credentials, Keychain access, or burner accounts. Outcome: every tweet AND every X Article either yields verbatim body OR gives a clear "premium-content, body unreachable" flag with the preview + author context preserved.
 
@@ -117,8 +117,8 @@ The Aroussi case is the proof that the chain works. The Takemiya case is the pro
 | File | Change |
 |---|---|
 | `~/bin/zao-fetch-x.sh` | v2: article detection from syndication `article` object, `--mirrors` flag emits 8 candidate URLs, accepts 15-20 digit IDs (was strict 19-digit), better error messages, exit-code discipline |
-| `~/.claude/skills/fetch/SKILL.md` | Added "Step 3b - X Article branch" section with mirror discovery + snippet harvest instructions. Added doc-659 cross-ref. Added explicit "do NOT request login credentials" guardrail. |
-| `~/.claude/skills/zao-research/SKILL.md` | (planned amendment in next iteration) Should reference doc 659 + reflect the article-detection branch when /zao-research sees an X Article URL in its input |
+| `~/.claude/skills/fetch/SKILL.md` | Added "Step 3b - X Article branch" section with mirror discovery + snippet harvest instructions. Added doc-660 cross-ref. Added explicit "do NOT request login credentials" guardrail. |
+| `~/.claude/skills/zao-research/SKILL.md` | (planned amendment in next iteration) Should reference doc 660 + reflect the article-detection branch when /zao-research sees an X Article URL in its input |
 
 ## How An Agent Should Use This Chain
 
@@ -163,7 +163,7 @@ The key is **never claim verbatim from a reconstruction**. The result has a `ver
 ## Re-validation Of Prior Docs
 
 - **Doc 656** (Aroussi law-firm-model) — was created from preview + LinkedIn-snippet inference. After v2 chain: full verbatim body available. Doc updated 2026-05-17 to include verbatim quotes; "Premium-content limitation" note removed.
-- **Doc 658** (Takemiya monetary-substrate) — was created from preview + author public record. After v2 chain: body still unreachable (no mirror exists). Doc updated 2026-05-17 with cross-link to this doc 659 + reason-it-can't-be-recovered explainer.
+- **Doc 658** (Takemiya monetary-substrate) — was created from preview + author public record. After v2 chain: body still unreachable (no mirror exists). Doc updated 2026-05-17 with cross-link to this doc 660 + reason-it-can't-be-recovered explainer.
 
 ## Hard Numbers
 
@@ -192,7 +192,7 @@ Re-validate this doc + the chain by 2026-08-17 (90 days).
 | Action | Owner | Type | By When |
 |---|---|---|---|
 | Update doc 656 with verbatim body from LinkedIn mirror; remove premium-content caveat | @Zaal (this PR) | Doc update | This session |
-| Update doc 658 with cross-link to 659; keep premium-content caveat (no mirror found) | @Zaal (this PR) | Doc update | This session |
+| Update doc 658 with cross-link to 660; keep premium-content caveat (no mirror found) | @Zaal (this PR) | Doc update | This session |
 | Re-validate chain every 90 days | @Zaal | Recurring check | 2026-08-17 |
 | Decide if /zao-research SKILL.md should be amended to reflect the article-detection branch | @Zaal | Decision | Next time /zao-research is touched |
 | If Zaal ever does want auth-based scraping (e.g. for retrieval at scale > 1k/day), revisit this doc + pick a path | @Zaal | Optional | Trigger on demand |

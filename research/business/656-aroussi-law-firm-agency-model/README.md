@@ -3,7 +3,7 @@ topic: business
 type: comparison
 status: research-complete
 last-validated: 2026-05-17
-related-docs: 475, 547, 650, 659
+related-docs: 475, 547, 650, 660
 tier: STANDARD
 ---
 
@@ -11,7 +11,7 @@ tier: STANDARD
 
 > **Goal:** Map Ran Aroussi's "law firm partnership" agency model to BCZ Strategies LLC + ZAO Music + the ZAO incubator pattern. Decide which pieces are worth copying now vs later.
 >
-> **Body source:** Full verbatim text retrieved via the v2 no-login extraction chain documented in [Doc 659](../../dev-workflows/659-x-content-extraction-v2/) — Tier 3 mirror discovery via LinkedIn Pulse. Original X Article body was paywalled (HTTP 402); LinkedIn cross-post is the canonical readable source. All quoted text below is verbatim from that mirror.
+> **Body source:** Full verbatim text retrieved via the v2 no-login extraction chain documented in [Doc 660](../../dev-workflows/660-x-content-extraction-v2/) — Tier 3 mirror discovery via LinkedIn Pulse. Original X Article body was paywalled (HTTP 402); LinkedIn cross-post is the canonical readable source. All quoted text below is verbatim from that mirror.
 
 ## Key Decisions
 
@@ -154,7 +154,7 @@ The structure Aroussi describes is the structure ZAO already runs. The doc helps
 - [Doc 475](../475-zao-music-entity/) — ZAO Music DBA under BCZ Strategies
 - [Doc 547](../../community/547-zaostock-master-strategy/) — Cassie validation: ZAOstock infrastructure IS the product
 - [Doc 650](../../agents/650-cowork-zaodevz-imanagent/) — Iman as universal team action tracker (Delivery Manager prototype)
-- [Doc 659](../../dev-workflows/659-x-content-extraction-v2/) — How the full verbatim body for this doc was retrieved (no-login)
+- [Doc 660](../../dev-workflows/660-x-content-extraction-v2/) — How the full verbatim body for this doc was retrieved (no-login)
 - [user_zaal_builder_patterns.md] — 7 patterns from 84-repo survey; "builds for handoff" overlaps with Aroussi's pod-separability point
 
 ## Next Actions
@@ -171,7 +171,7 @@ The structure Aroussi describes is the structure ZAO already runs. The doc helps
 ## Sources
 
 - [LinkedIn Pulse mirror — full verbatim body](https://www.linkedin.com/pulse/law-firm-model-software-developers-agencies-ran-aroussi-wlxae) — canonical readable source
-- [Ran Aroussi on X — original article tweet](https://x.com/aroussi/status/2033893670949179594) — X Article body paywalled (HTTP 402); see [Doc 659](../../dev-workflows/659-x-content-extraction-v2/) for the no-login chain that recovered the body
+- [Ran Aroussi on X — original article tweet](https://x.com/aroussi/status/2033893670949179594) — X Article body paywalled (HTTP 402); see [Doc 660](../../dev-workflows/660-x-content-extraction-v2/) for the no-login chain that recovered the body
 - [Ran Aroussi / About](https://aroussi.com/about) — author bio + Automaze positioning
 - [Automaze](https://automaze.io/) — CTO-as-a-Service the model is built around
 - [aroussi.com/post/spec-driven-ai-development](https://aroussi.com/post/spec-driven-ai-development) — related Aroussi piece on spec-first AI dev

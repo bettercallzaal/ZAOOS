@@ -42,7 +42,7 @@ import {
   readGroups,
   type GroupMode,
 } from './groups';
-import { handleVoiceMemo } from './posts';
+import { handleVoiceMemo, handlePostCallback } from './posts';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
@@ -191,6 +191,15 @@ bot.command('quests', async (ctx) => {
 // Appends to ~/.zao/zoe/voice-memos/YYYY-MM-DD.md for the personal-post drafter.
 bot.command(['voicememo', 'vm'], async (ctx) => {
   await handleVoiceMemo(ctx, isFromZaal(ctx));
+});
+
+// Post slate v2 - callback handler for POST/REGEN/SKIP buttons under draft messages.
+bot.callbackQuery(/^post-(approve|regen|skip):/, async (ctx) => {
+  if (ctx.from?.id !== zaalId) {
+    await ctx.answerCallbackQuery('not authorized');
+    return;
+  }
+  await handlePostCallback({ ctx, repoDir, zaalTgId: zaalId });
 });
 
 bot.command('notes', async (ctx) => {

@@ -2,14 +2,16 @@
 topic: business
 type: market-research
 status: research-complete
-last-validated: 2026-05-16
-related-docs: 037, 222, 258, 050, 051, 657
+last-validated: 2026-05-17
+related-docs: 037, 222, 258, 050, 051, 657, 659
 tier: STANDARD
 ---
 
 # 658 — Takemiya: Blockchain as the Geopolitical Monetary Substrate
 
 > **Goal:** Map Makoto Takemiya (SORA / Soramitsu) "blockchain as the geopolitical monetary substrate" article to ZAO's $ZABAL + Empire V3 positioning. The thesis matters because Takemiya is one of the few people who has actually shipped a sovereign CBDC (Bakong, Cambodia, 2019) — his framing of blockchain-as-monetary-infrastructure is grounded, not theoretical.
+>
+> **Body source — confirmed unreachable:** The v2 no-login extraction chain ([Doc 659](../../dev-workflows/659-x-content-extraction-v2/)) was run against this article on 2026-05-17. Result: title + preview retrieved via syndication, but **no author mirror exists** (Takemiya has no LinkedIn Pulse / Medium / Substack / Paragraph / Mirror.xyz cross-post for this piece, and his Soramitsu blog hosts only company-level posts, not personal essays). The article is published ONLY on X Premium. Body recovery would require an X-authenticated session, which Zaal opted out of (2026-05-17). This doc is therefore built from preview + extensive verified Takemiya/Soramitsu public record + the article's explicit reference to "yesterday's piece on stealth building" — NOT from verbatim body. Treat the reconstructed-thesis section as informed inference, not direct quotation.
 
 ## Key Decisions
 
@@ -26,12 +28,12 @@ tier: STANDARD
 **Title:** BLOCKCHAIN AS THE GEOPOLITICAL MONETARY SUBSTRATE
 **Author:** Makoto Takemiya (武宮誠, M4K070), CEO + Co-Founder of Soramitsu.
 
-**Premium-content limitation:** the canonical X Article body is paywalled (HTTP 402) and not retrievable via wayback. Reconstruction is built from:
-1. The article preview (first ~500 characters, available via X syndication).
-2. Takemiya's well-documented prior public positions + published Soramitsu work.
-3. The author's referenced "yesterday's piece" on stealth building.
+**Premium-content limitation — confirmed unreachable after v2 chain run:** The canonical X Article body is paywalled (HTTP 402) and not retrievable via wayback, archive.ph, X guest-token GraphQL, syndication, nitter, or any of the 8 author-mirror patterns checked by [Doc 659](../../dev-workflows/659-x-content-extraction-v2/) Tier 3. Takemiya does not maintain a personal cross-post channel for X Articles — Soramitsu's blog is company-level only, his Medium has no posts in 2026, no Substack / Paragraph / Mirror.xyz mirror exists. Reconstruction is built from:
+1. The article preview (first ~500 characters, available via X syndication — that's the only verbatim text we have).
+2. Takemiya's well-documented prior public positions + published Soramitsu work (CBDC deployments, IEEE paper, Tokyo FinTech interview, Calcalist interview, GLEAC blog, sora.org content).
+3. The author's referenced "yesterday's piece" on stealth building, which constrains the topic space.
 
-If Zaal has X Premium and can paste the full body, re-validate this doc against it.
+If Zaal at any point wants the verbatim body, the only remaining route is auth-based (X Premium subscription or session cookie). Zaal explicitly opted out of all auth-based routes on 2026-05-17. This doc is therefore permanently flagged as "informed inference" unless that decision changes.
 
 ## What The Preview Says
 

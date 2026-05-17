@@ -74,9 +74,48 @@ export async function gatherEventSignals(): Promise<PostSourceSnapshot['event']>
   return { todaysEvents, tomorrowsEvents };
 }
 
+/**
+ * Pull recent commits across ALL Zaal's GitHub repos (any org, any visibility the
+ * gh CLI has access to). This is the primary signal for personal-category posts -
+ * his builder narrative emerges from what he shipped, not from voice memos he has
+ * to remember to record.
+ *
+ * Uses `gh search commits --author=bettercallzaal --sort=author-date` which spans
+ * bettercallzaal/*, songchaindao-dot/*, clawdbotatg/*, anywhere his email/github
+ * account commits. Last 7 days.
+ */
+async function gatherGithubActivity(): Promise<string[]> {
+  try {
+    const out = execSync(
+      `gh search commits --author=bettercallzaal --sort=author-date -L 40 --json repository,commit 2>/dev/null`,
+      { encoding: 'utf8', timeout: 15000 },
+    );
+    interface SearchCommit {
+      repository?: { fullName?: string };
+      commit?: { message?: string; author?: { date?: string } };
+    }
+    const items = JSON.parse(out) as SearchCommit[];
+    const cutoff = Date.now() - 7 * 86400_000;
+    return items
+      .filter((i) => {
+        const d = i.commit?.author?.date;
+        return d ? new Date(d).getTime() > cutoff : false;
+      })
+      .map((i) => {
+        const repo = i.repository?.fullName ?? '(unknown)';
+        const headline = (i.commit?.message ?? '').split('\n')[0].slice(0, 80);
+        return `${repo}: ${headline}`;
+      })
+      .slice(0, 25);
+  } catch {
+    return [];
+  }
+}
+
 export async function gatherPersonalSignals(): Promise<PostSourceSnapshot['personal']> {
   // Voice memos: per-day file under ~/.zao/zoe/voice-memos/YYYY-MM-DD.md (append-mode).
-  // Drafter reads the last 2 days. v2: also pull last lunch-stream transcript via zao-transcribe.
+  // Drafter reads the last 2 days. Optional secondary signal - if Zaal drops a /vm
+  // thought it weights into the draft.
   const today = new Date().toISOString().slice(0, 10);
   const yesterday = new Date(Date.now() - 86400_000).toISOString().slice(0, 10);
   const voiceMemos: string[] = [];
@@ -88,7 +127,8 @@ export async function gatherPersonalSignals(): Promise<PostSourceSnapshot['perso
       // file might not exist - normal
     }
   }
-  return { voiceMemos, recentZaalMessages: [] };
+  const githubActivity = await gatherGithubActivity();
+  return { githubActivity, voiceMemos };
 }
 
 export async function appendVoiceMemo(text: string): Promise<void> {

@@ -15,7 +15,9 @@ import cron from 'node-cron';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from '../memory';
+import { sendDraftWithKeyboard } from './buttons';
 import { draftPost } from './drafters';
+import { clearPending, isExpired, loadPending, shouldResend } from './pending';
 import {
   gatherBuildSignals,
   gatherEcosystemSignals,
@@ -166,16 +168,16 @@ async function fireOneDraft(bot: Bot, zaalTgId: number, repoDir: string): Promis
     await appendLog({ event: 'skip', category, reason: 'empty-or-skip-marker' });
     return;
   }
-  // Send as TWO messages so Zaal can long-press the post body alone and
-  // tap-copy the whole thing. The header bubble explains category; the body
-  // bubble is the bare post text with no decoration.
-  try {
-    await bot.api.sendMessage(zaalTgId, `ZOE post draft (${category}) - copy the next message`);
-    await bot.api.sendMessage(zaalTgId, draft.text);
-    await appendLog({ event: 'sent', category, charCount: draft.text.length });
-  } catch (err) {
-    await appendLog({ event: 'send-error', category, error: (err as Error).message });
-  }
+  // v2: send with inline keyboard [POST] [REGEN] [SKIP]. Persists as the
+  // single pending draft - scheduler will not fire a new one until this is
+  // dispositioned.
+  await sendDraftWithKeyboard({
+    bot: bot.api,
+    zaalTgId,
+    category,
+    text: draft.text,
+    isResend: false,
+  });
 }
 
 export interface PostsSchedulerOptions {
@@ -206,6 +208,29 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
   const tickTask = cron.schedule(
     '* * * * *',
     async () => {
+      // v2: single in-flight draft. If pending exists and not expired, handle it:
+      // - shouldResend (30 min since lastSentAt, max 3 resends) -> resend same text
+      // - expired (4h) -> clear, log expired, allow new draft next tick
+      // - otherwise -> wait, do not fire new
+      const pending = await loadPending();
+      if (pending && pending.state === 'pending') {
+        if (isExpired(pending)) {
+          await appendLog({ event: 'expired', category: pending.category, id: pending.id });
+          await clearPending();
+        } else if (shouldResend(pending)) {
+          await sendDraftWithKeyboard({
+            bot: opts.bot.api,
+            zaalTgId: opts.zaalTgId,
+            category: pending.category,
+            text: pending.text,
+            isResend: true,
+          });
+          return;
+        } else {
+          // waiting - do not fire new
+          return;
+        }
+      }
       const schedule = await loadOrRollSchedule(pings);
       const now = Date.now();
       const LATE_THRESHOLD_MS = 30 * 60_000; // 30 min - any older = treat as missed, don't fire late

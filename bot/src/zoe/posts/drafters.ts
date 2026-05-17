@@ -102,17 +102,19 @@ INSTRUCTIONS:
 - Lead with the event name + place/link. Skip the work-day time entirely.
 - End with how to join.
 - If sources are empty, output "(skip)".`,
-  personal: `Draft a personal/voice post pulled from Zaal's recent voice memos.
+  personal: `Draft a personal/voice post pulled from Zaal's recent cross-repo GitHub activity (his actual builder narrative across all brands - ZAOOS, songchainnxyz, cowork-zaodevz, bcz-yapz, and 80+ other repos).
 
-SOURCE DATA (recent voice memos, newest last):
+SOURCE DATA (last 7 days commits across ALL repos, plus any recent /vm voice memos as override channel):
 {SOURCE}
 
 ${PERSONAL_EXAMPLES}
 
 INSTRUCTIONS:
-- Pull ONE thread from the memos. Expand to 1-3 lines using Zaal's exact phrasings.
-- If no voice memos in source, output "(skip)". Do not synthesize personal posts from generic context.
-- Voice memos are first-person Zaal thoughts - keep them in his voice, do not editorialize.`,
+- Pick ONE thread that shows what Zaal is actually building this week. Cross-brand patterns are gold ("shipped X on ZAOOS + Y on songchainnxyz = same playbook landing in 2 places").
+- Lead with the verb. First person. "I built X" beats "X was built".
+- If voice memos exist, prefer them (they are direct Zaal phrasing). Use github commits as backup when memos are empty.
+- Frame as builder narrative, not feature changelog. "spent the week wiring zoe to know what i shipped" beats "added GitHub activity source to drafters".
+- If BOTH github activity AND voice memos are empty, output "(skip)".`,
 };
 
 export async function draftPost(
@@ -172,10 +174,15 @@ function formatSourceBlock(category: PostCategory, s: PostSourceSnapshot): strin
       const combined = [today, tomorrow].filter(Boolean).join('\n');
       return combined || '(no events seeded)';
     }
-    case 'personal':
-      return s.personal.voiceMemos.length
-        ? s.personal.voiceMemos.slice(-8).join('\n')
-        : '(no voice memos)';
+    case 'personal': {
+      const gh = s.personal.githubActivity.length
+        ? `GITHUB ACTIVITY (last 7d, all repos):\n${s.personal.githubActivity.map((c) => `- ${c}`).join('\n')}`
+        : '(no github activity in 7 days)';
+      const memos = s.personal.voiceMemos.length
+        ? `\n\nVOICE MEMOS (newest last):\n${s.personal.voiceMemos.slice(-8).join('\n')}`
+        : '';
+      return gh + memos;
+    }
   }
 }
 
@@ -191,6 +198,9 @@ function extractSourceLabels(category: PostCategory, s: PostSourceSnapshot): str
         `tomorrow=${s.event.tomorrowsEvents.length}`,
       ];
     case 'personal':
-      return [`voice-memos=${s.personal.voiceMemos.length}`];
+      return [
+        `gh-activity=${s.personal.githubActivity.length}`,
+        `voice-memos=${s.personal.voiceMemos.length}`,
+      ];
   }
 }

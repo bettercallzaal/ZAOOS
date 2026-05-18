@@ -173,6 +173,21 @@ export async function getUsersByFids(fids: number[]) {
   return data.users || [];
 }
 
+/** Fetch recent casts for a FID. Used by ZABAL vote-power calc (counts /zao channel casts). */
+export async function getUserCasts(fid: number, limit = 100) {
+  const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
+  const res = await fetchWithFailover(`/feed/user/casts?${params}`, {
+    headers: readHeaders(),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Neynar user casts error ${res.status}: ${body.slice(0, 200)}`);
+  }
+  const data = await res.json();
+  return data.casts || [];
+}
+
 export async function getUserByAddress(address: string) {
   const res = await fetchWithFailover(`/user/bulk-by-address?addresses=${address}`, {
     headers: readHeaders(),

@@ -71,6 +71,15 @@ const RATE_LIMITS: [string, RateLimitConfig][] = [
   ['/api/songjam',       { limit: 20, windowMs: MINUTE }],
   ['/api/livepeer',      { limit: 10, windowMs: MINUTE }],
   ['/api/broadcast',     { limit: 15, windowMs: MINUTE }],
+
+  // ZABAL Live Hub (rolled in from zabal.art - public route group)
+  ['/api/zabal/vote',                  { limit: 10, windowMs: MINUTE }],
+  ['/api/zabal/calculate-vote-power',  { limit: 30, windowMs: MINUTE }],
+  ['/api/zabal/spotlight/nominate',    { limit: 10, windowMs: MINUTE }],
+  ['/api/zabal/spotlight/vote',        { limit: 10, windowMs: MINUTE }],
+  ['/api/zabal/empire-leaderboard',    { limit: 60, windowMs: MINUTE }],
+  ['/api/zabal/spotlight-empire-leaderboard', { limit: 60, windowMs: MINUTE }],
+  ['/api/zabal',                       { limit: 60, windowMs: MINUTE }],
 ];
 
 function getRateLimitConfig(pathname: string): RateLimitConfig | null {

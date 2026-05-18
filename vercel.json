@@ -21,6 +21,7 @@
       "schedule": "0 6 * * *"
     },
     { "path": "/api/cron/agents/banker", "schedule": "0 14 * * *" },
-    { "path": "/api/cron/agents/dealer", "schedule": "0 22 * * *" }
+    { "path": "/api/cron/agents/dealer", "schedule": "0 22 * * *" },
+    { "path": "/api/cron/zabal-spotlight-winner", "schedule": "0 5 * * 1" }
   ]
 }

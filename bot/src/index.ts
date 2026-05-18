@@ -8,7 +8,7 @@ import {
   unlinkUsername,
   type TeamMember,
 } from './auth';
-import { buildStatus, buildMyTodos, buildMyContributions, buildAllOpenTodos, buildTeamRoster } from './status';
+import { buildStatus, buildMyTodos, buildMyContributions, buildAllOpenTodos, buildTeamRoster, markTimelineDone } from './status';
 import { addGemba, addIdea, addNote } from './capture';
 import { addZsFb } from './zsfb';
 import { executeFromText } from './actions';
@@ -26,12 +26,7 @@ import {
   cmdLeave,
   cmdMyCircles,
   cmdCoordinators,
-  cmdPropose,
-  cmdProposals,
-  cmdObject,
-  cmdConsent,
-  cmdBuddy,
-  cmdRespect,
+  cmdCharter,
 } from './circles';
 
 const token = process.env.ZAOSTOCK_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
@@ -46,6 +41,23 @@ const ADMIN_IDS = (process.env.BOT_ADMIN_TELEGRAM_IDS ?? '')
   .filter((n) => Number.isFinite(n) && n > 0);
 
 const bot = new Bot<Context>(token);
+
+// Routing policy: bot must NEVER post in the ZAO Festivals General topic.
+// Anything that lacks an explicit message_thread_id when targeting that
+// supergroup gets redirected to the Operations topic. Set OPS_TOPIC_ID via
+// .env if it ever changes; default 2 matches current ZAO Festivals layout.
+const ZAO_FESTIVALS_CHAT_ID = -1003960864140;
+const OPS_TOPIC_ID = Number(process.env.OPS_TOPIC_ID ?? 2);
+bot.api.config.use(async (prev, method, payload) => {
+  if (method === 'sendMessage' || method === 'sendPhoto' || method === 'sendDocument' || method === 'sendVideo' || method === 'sendAnimation') {
+    const p = payload as { chat_id?: number | string; message_thread_id?: number };
+    const chatId = typeof p.chat_id === 'number' ? p.chat_id : Number(p.chat_id);
+    if (chatId === ZAO_FESTIVALS_CHAT_ID && (p.message_thread_id == null || Number.isNaN(p.message_thread_id))) {
+      p.message_thread_id = OPS_TOPIC_ID;
+    }
+  }
+  return prev(method, payload);
+});
 
 // Register every chat we see (on first message).
 bot.use(async (ctx, next) => {
@@ -192,6 +204,17 @@ bot.command('mycontributions', async (ctx) => {
   await ctx.reply(await buildMyContributions(member));
 });
 
+// /timeline-done <id-prefix or unique title fragment> - close out a stuck
+// timeline entry without leaving Telegram. Was a 60-pending entry problem
+// because the dashboard had no easy "mark done" UX. Now anyone in the team
+// can clear them from chat.
+bot.command('timeline_done', async (ctx) => {
+  const member = await requireMember(ctx);
+  if (!member) return;
+  const arg = (ctx.match ?? '').trim();
+  await ctx.reply(await markTimelineDone(arg, member));
+});
+
 bot.command('fix', async (ctx) => {
   const member = await resolveMember(ctx.from?.id, ctx.from?.username);
   await cmdFix(ctx, member);
@@ -247,7 +270,7 @@ bot.command('note', async (ctx) => {
 });
 
 // /zsfb <comment> - low-friction ZAOstock /test feedback (open to all team).
-// Saves to stock_suggestions with [zsfb:<section>] prefix for downstream
+// Saves to suggestions with [zsfb:<section>] prefix for downstream
 // Hermes triage. Distinct from /idea so the /test backlog stays scoped.
 bot.command('zsfb', async (ctx) => {
   const member = await requireMember(ctx);
@@ -440,8 +463,10 @@ bot.command('digest', async (ctx) => {
   const which = (ctx.match ?? '').trim().toLowerCase();
   let text: string;
   try {
-    if (which === 'evening') text = await eveningRecap();
-    else if (which === 'week') text = await weekAheadDigest();
+    if (which === 'evening') {
+      const r = await eveningRecap();
+      text = r ?? 'No activity to recap today. Evening digest is silent when the board is quiet.';
+    } else if (which === 'week') text = await weekAheadDigest();
     else if (which === 'retro') text = await fridayRetro();
     else text = await morningDigest();
   } catch (err) {
@@ -499,55 +524,9 @@ bot.command('coordinators', async (ctx) => {
   await cmdCoordinators(ctx);
 });
 
-bot.command('propose', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  const args = (ctx.match ?? '').trim();
-  if (!args) {
-    await ctx.reply('Usage: /propose <circle-slug> <title> | <body>');
-    return;
-  }
-  await cmdPropose(ctx, member, args);
-});
-
-bot.command('proposals', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  await cmdProposals(ctx, member);
-});
-
-bot.command('object', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  const args = (ctx.match ?? '').trim();
-  if (!args) {
-    await ctx.reply('Usage: /object <proposal-id> <reason>');
-    return;
-  }
-  await cmdObject(ctx, member, args);
-});
-
-bot.command('consent', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  const proposalId = (ctx.match ?? '').trim();
-  if (!proposalId) {
-    await ctx.reply('Usage: /consent <proposal-id>');
-    return;
-  }
-  await cmdConsent(ctx, member, proposalId);
-});
-
-bot.command('buddy', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  await cmdBuddy(ctx, member);
-});
-
-bot.command('respect', async (ctx) => {
-  const member = await requireMember(ctx);
-  if (!member) return;
-  await cmdRespect(ctx, member);
+bot.command('charter', async (ctx) => {
+  const slug = (ctx.match ?? '').trim();
+  await cmdCharter(ctx, slug || undefined);
 });
 
 // ---- Free-text + @mention handler ------------------------------------------
@@ -574,15 +553,26 @@ bot.on('message:text', async (ctx) => {
     return;
   }
 
-  // Group / supergroup: respond ONLY when @mentioned
+  // Group / supergroup: respond ONLY when @-mentioned conversationally.
+  // Substring match was too eager (broadcasts that mention the bot in body
+  // text trigger replies). Now we require:
+  //   1. A mention entity (Telegram-tagged, not just text)
+  //   2. The mention is at offset 0 (first token) — i.e. directed at the bot
   const username = await ensureUsername();
-  const mentioned = username && text.toLowerCase().includes(`@${username}`);
-  if (!mentioned) return;
+  if (!username) return;
+  const entities = ctx.message.entities ?? [];
+  const directlyAddressed = entities.some(
+    (e) =>
+      e.offset === 0 &&
+      (e.type === 'mention' || e.type === 'text_mention') &&
+      text.slice(0, e.length).toLowerCase() === `@${username}`,
+  );
+  if (!directlyAddressed) return;
 
   const member = await requireMember(ctx);
   if (!member) return;
 
-  const cleaned = text.replace(new RegExp(`@${username}`, 'gi'), '').trim();
+  const cleaned = text.replace(new RegExp(`^@${username}\\s*`, 'i'), '').trim();
   if (!cleaned) {
     await ctx.reply(`Hi ${member.name}. Tag me with something like "@${username} add todo X" or ask a question.`);
     return;

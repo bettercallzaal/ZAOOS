@@ -13,7 +13,7 @@
 //     bottleneck and team members can self-service.
 //   - Two tables in the same Supabase project hold member rows:
 //       team_members        - what the dashboard login route reads
-//       stock_team_members  - what the bot's auth + roster commands read
+//       team_members  - what the bot's auth + roster commands read
 //     Out-of-band sync exists between them (name as the join key). /regen
 //     writes the new password_hash to BOTH so login + roster stay coherent.
 //
@@ -21,7 +21,7 @@
 //   - DM-only for self-regen (codes leak risk in groups)
 //   - Daily cap (REGEN_DAILY_PER_MEMBER, default 1/day) prevents abuse
 //   - Admin override checks BOT_ADMIN_TELEGRAM_IDS env (same gate as /fix)
-//   - All regens log to stock_activity_log for audit
+//   - All regens log to activity_log for audit
 
 import type { Context } from 'grammy';
 import { scryptSync, randomBytes } from 'node:crypto';
@@ -61,7 +61,7 @@ async function countRegensForMemberToday(memberId: string): Promise<number> {
   const todayUtcStart = new Date();
   todayUtcStart.setUTCHours(0, 0, 0, 0);
   const { count, error } = await db()
-    .from('stock_activity_log')
+    .from('activity_log')
     .select('id', { count: 'exact', head: true })
     .eq('actor_id', memberId)
     .eq('action', 'code_regen')
@@ -75,7 +75,7 @@ async function countRegensForMemberToday(memberId: string): Promise<number> {
 
 /**
  * Mint a new code for `member`, write to both team_members (dashboard login)
- * and stock_team_members (bot roster), log the activity.
+ * and team_members (bot roster), log the activity.
  *
  * Returns the plaintext code so the caller can DM it to the right person.
  * NEVER write the plaintext anywhere persistent - only the salt:hash.
@@ -85,7 +85,7 @@ async function mintAndWrite(member: TeamMember): Promise<{ ok: true; code: strin
   const passwordHash = hashPassword(code);
 
   // Dashboard login table (read by /api/team/login in zaostock). Match by
-  // name since stock_team_members and team_members share name as join key.
+  // name since team_members and team_members share name as join key.
   const dash = await db()
     .from('team_members')
     .update({ password_hash: passwordHash, active: true })
@@ -94,7 +94,7 @@ async function mintAndWrite(member: TeamMember): Promise<{ ok: true; code: strin
   // Bot roster table - keep the hash in sync so any future bot reader sees
   // the same value. ID match is exact for this table (we resolved from it).
   const bot = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .update({ password_hash: passwordHash })
     .eq('id', member.id);
 
@@ -110,7 +110,7 @@ async function mintAndWrite(member: TeamMember): Promise<{ ok: true; code: strin
   }
   // bot.error alone is fine - dashboard is the user-visible one.
   if (bot.error) {
-    console.error(`[regen] stock_team_members update warning: ${bot.error.message}`);
+    console.error(`[regen] team_members update warning: ${bot.error.message}`);
   }
 
   await logBotActivity({
@@ -182,9 +182,9 @@ export async function cmdRegenForName(ctx: Context, callerMember: TeamMember | n
     return;
   }
 
-  // Find target by name. Try normalized lookups against stock_team_members.
+  // Find target by name. Try normalized lookups against team_members.
   const { data: target } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .select('id, name, scope, role, telegram_id, telegram_username, active')
     .ilike('name', text)
     .neq('active', false)

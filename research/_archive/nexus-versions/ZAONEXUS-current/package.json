@@ -1,0 +1,32 @@
+{
+  "name": "zao-nexus",
+  "version": "1.1.0",
+  "description": "A modern link directory for the ZAO community with 200+ curated resources",
+  "author": "BetterCallZaal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bettercallzaal/ZAONEXUS"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "^14.0.0",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.3.0"
+  }
+}

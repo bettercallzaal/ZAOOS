@@ -66,7 +66,7 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     // the final JSON. We need both. The system prompt asks for JSON in the
     // final assistant message; the orchestrator parses it. Schema is kept on
     // the type only as a contract reference.
-    void opts.jsonSchema; // eslint-disable-line @typescript-eslint/no-unused-vars
+    void opts.jsonSchema;  
     if (opts.maxBudgetUsd !== undefined) {
       args.push('--max-budget-usd', String(opts.maxBudgetUsd));
     }
@@ -86,6 +86,10 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     const child = spawn(process.env.HERMES_CLAUDE_BIN || 'claude', args, {
       cwd: opts.cwd,
       env: augmentedEnv,
+      // CRITICAL: claude CLI waits 3s for stdin if not explicitly closed,
+      // then exits 1 with "no stdin data received in 3s" warning when running
+      // under systemd. Prompt is passed via -p flag; stdin is unused.
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
 
     let stdout = '';

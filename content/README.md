@@ -9,33 +9,30 @@ Transcripts, long-form writing, and raw content artifacts captured from ZAO-ecos
 - Content for bots (BCZ 101 bot, ZOE knowledge) needs clean, structured text with metadata.
 - Single canonical location means tooling (grep, RAG indexers, newsletter drafts, socials skill) always knows where to look.
 
+## BCZ YapZ graduated 2026-05-06
+
+The BCZ YapZ archive (`/bcz-yapz` page, 18 transcripts, ingest scripts, YouTube description templates, link map, gaps sidecar) graduated to its own repo on 2026-05-06: `github.com/bettercallzaal/bcz-yapz`. Live at https://bczyapz.com.
+
+Code, content, and templates were deleted from this repo per the monorepo-as-lab graduation pattern. The `/bcz-yapz` route now 301-redirects to bczyapz.com (see `next.config.ts`). The global skill `bcz-yapz-description` was repointed to the new repo path.
+
+Research docs about the show stay here as institutional memory:
+- [Doc 477 YouTube SEO](../research/dev-workflows/477-youtube-seo-bcz-yapz/)
+- [Doc 490 Archive page](../research/dev-workflows/490-bcz-yapz-archive-page/)
+- [Doc 533 POIDH bounty](../research/community/533-poidh-clipup-bounty-bcz-yapz-hannah/)
+- [Doc 569 Bonfire ingest](../research/identity/569-yapz-bonfire-ingestion-strategy/)
+
 ## Layout
 
 ```
 content/
   transcripts/
-    bcz-yapz/              # Better Call Zaal YapZ podcast
-      YYYY-MM-DD-<guest>-<org>.md
     zoes/                  # Future: ZOE'S show
     spaces/                # Future: X Spaces / Farcaster spaces
     cyphers/               # Future: cypher sessions
   templates/               # Fill-in templates for downstream artifacts
-    bcz-yapz-youtube-description.md
-    bcz-yapz-youtube-tags.txt
   writing/                 # Future: essays, newsletter archives, longform
   media-refs/              # Future: pointers to video/audio in Movies/cloud
 ```
-
-## Templates
-
-Ready-to-fill templates for downstream artifacts per episode:
-
-| Template | Purpose | Spec |
-|----------|---------|------|
-| `templates/bcz-yapz-youtube-description.md` | YouTube description body (copy-paste into YT description field) | [Doc 477](../research/dev-workflows/477-youtube-seo-bcz-yapz/) |
-| `templates/bcz-yapz-youtube-tags.txt` | YouTube tags (copy-paste into YT tags field, 500 char budget) | [Doc 477](../research/dev-workflows/477-youtube-seo-bcz-yapz/) |
-
-Placeholders use `{{dot.notation}}` matching transcript frontmatter. See each template's header comment for the full placeholder map + filling rules.
 
 One transcript = one file. Filename convention: `YYYY-MM-DD-<guest-slug>-<org-slug>.md`.
 
@@ -113,8 +110,8 @@ grep -R "Farm Drop" content/transcripts/
 
 ### List guests by date
 ```bash
-grep -hR "^guest:" content/transcripts/bcz-yapz/
-grep -hR "^date:" content/transcripts/bcz-yapz/
+grep -hR "^guest:" content/transcripts/
+grep -hR "^date:" content/transcripts/
 ```
 
 ### Load into RAG (future - BCZ 101 bot)
@@ -134,34 +131,7 @@ grep -hR "^date:" content/transcripts/bcz-yapz/
 
 ## Current inventory
 
-### BCZ YapZ / BCZ Yaps (16 transcripts, 1 pending)
-
-Canonical dates are **YouTube publish dates** from `@bettercallzaal` channel (verified via `yt-dlp` on 2026-04-22). Recording dates may differ by a few days to weeks.
-
-| Ep | Publish | Guest | Org | YouTube |
-|----|---------|-------|-----|---------|
-| 1 | 2025-08-22 | Deepa | GrantOrb | [3vUAFwXqdeo](https://youtu.be/3vUAFwXqdeo) |
-| 2 | 2025-10-14 | Rich Bartuc | PowerPacks Diamondhands Club | [AOcp8Jpyw3k](https://youtu.be/AOcp8Jpyw3k) |
-| 3 | 2025-10-19 | Yoni Dubz | - | [HopaeW7POis](https://youtu.be/HopaeW7POis) |
-| 4 | 2025-11-30 | Rock Opera | - | [43GPWLE6W5Q](https://youtu.be/43GPWLE6W5Q) |
-| 5 | 2025-12-11 | Daya | Flix.Fun | [9ePU4qEc67Y](https://youtu.be/9ePU4qEc67Y) |
-| 6 | 2025-12-16 | Sven | Incented | [O7-1weR0Qog](https://youtu.be/O7-1weR0Qog) |
-| 7 | 2026-01-05 | Yerbearserker | Empire Builder | [EH-FWD7ySKk](https://youtu.be/EH-FWD7ySKk) |
-| 8 | 2026-02-11 | Diviflyy | Empire Builder | [0tyVpLGVxkA](https://youtu.be/0tyVpLGVxkA) |
-| 9 | 2026-02-23 | SNAX (snax.eth) | Pizza DAO | [4CpblYpIO8Q](https://youtu.be/4CpblYpIO8Q) |
-| 10 | 2026-02-23 | GIU (Juliano) | Pinetree | [loSOniPcJx0](https://youtu.be/loSOniPcJx0) |
-| 11 | 2026-03-18 | Roaring Sensei | - | [DIeav3o8t9M](https://youtu.be/DIeav3o8t9M) |
-| 12 | 2026-03-18 | Saltorious.eth | Among Traitors | [0Tevgpr5TUQ](https://youtu.be/0Tevgpr5TUQ) |
-| 13 | 2026-03-25 | Ali | Inflynce | [WTyafqHKQqM](https://youtu.be/WTyafqHKQqM) |
-| 14 | 2026-04-01 | Jordan | Ryft | [IbhHxFR4yxE](https://youtu.be/IbhHxFR4yxE) |
-| 15 | 2026-04-22 | Nikoline | Hubs Network | publishing 2026-04-22 |
-| 16 | 2026-04-22 | Dish (Jack Dishman) | Clanker | publishing 2026-04-22 |
-| 17 | 2026-04-22 | Hannah | Farm Drop | publishing 2026-04-22 |
-
-Not recorded:
-- EyeTeaJohnny 2026-03-24 - episode was postponed
-
-Ground truth source: `yt-dlp "https://www.youtube.com/watch?v=<ID>" --print "%(upload_date)s | %(title)s"` - re-run to refresh when new episodes publish.
+BCZ YapZ inventory moved to https://github.com/bettercallzaal/bcz-yapz (see `content/transcripts/` in that repo). Other shows TBD.
 
 ## Roadmap
 

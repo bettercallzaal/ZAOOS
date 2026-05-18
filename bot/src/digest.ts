@@ -23,9 +23,9 @@ export async function morningDigest(): Promise<string> {
   const s = db();
   const today = new Date().toISOString().slice(0, 10);
   const [todosR, timelineR, sponsorsR] = await Promise.all([
-    s.from('stock_todos').select('title, status, owner:stock_team_members!owner_id(name)').neq('status', 'done').limit(50),
-    s.from('stock_timeline').select('title, due_date, status').neq('status', 'done').order('due_date').limit(20),
-    s.from('stock_sponsors').select('name, status, last_contacted_at').in('status', ['contacted', 'in_talks']),
+    s.from('todos').select('title, status, owner:team_members!owner_id(name)').neq('status', 'done').limit(50),
+    s.from('timeline').select('title, due_date, status').neq('status', 'done').order('due_date').limit(20),
+    s.from('sponsors').select('name, status, last_contacted_at').in('status', ['contacted', 'in_talks']),
   ]);
 
   const todos = todosR.data ?? [];
@@ -79,21 +79,30 @@ export async function morningDigest(): Promise<string> {
   return lines.join('\n');
 }
 
-export async function eveningRecap(): Promise<string> {
+// Evening recap. Returns null if there is nothing worth posting -
+// no activity AND no closed todos. The schedule caller skips the post
+// when null is returned (don't spam the team with empty "no activity"
+// pings).
+export async function eveningRecap(): Promise<string | null> {
   const s = db();
   const since = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
   const [activityR, todosClosedR] = await Promise.all([
     s
-      .from('stock_activity_log')
-      .select('action, entity_type, actor:stock_team_members!actor_id(name)')
+      .from('activity_log')
+      .select('action, entity_type, actor:team_members!actor_id(name)')
       .gte('created_at', since)
       .order('created_at', { ascending: false })
       .limit(100),
-    s.from('stock_todos').select('title, updated_at, owner:stock_team_members!owner_id(name)').eq('status', 'done').gte('updated_at', since).limit(20),
+    s.from('todos').select('title, updated_at, owner:team_members!owner_id(name)').eq('status', 'done').gte('updated_at', since).limit(20),
   ]);
 
   const activity = activityR.data ?? [];
   const closed = todosClosedR.data ?? [];
+
+  // Skip the post entirely when there is no real activity to recap.
+  if (activity.length === 0 && closed.length === 0) {
+    return null;
+  }
 
   const byActor: Record<string, number> = {};
   for (const a of activity) {
@@ -108,13 +117,11 @@ export async function eveningRecap(): Promise<string> {
   const lines: string[] = [];
   lines.push(`Evening recap · ${new Date().toISOString().slice(0, 10)} · ${festivalDaysOut()} days to Oct 3`);
   lines.push('');
-  lines.push(`Moves today (${activity.length} activity entries)`);
-  if (actors.length > 0) {
+  if (activity.length > 0) {
+    lines.push(`Moves today (${activity.length} activity entries)`);
     for (const [name, count] of actors) lines.push(`  · ${name}: ${count}`);
-  } else {
-    lines.push('  (no activity logged)');
+    lines.push('');
   }
-  lines.push('');
   if (closed.length > 0) {
     lines.push(`Todos closed (${closed.length})`);
     for (const t of closed.slice(0, 5)) {
@@ -134,14 +141,14 @@ export async function weekAheadDigest(): Promise<string> {
   const weekOut = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const [timelineR, sponsorsR, artistsR] = await Promise.all([
     s
-      .from('stock_timeline')
-      .select('title, due_date, status, category, owner:stock_team_members!owner_id(name)')
+      .from('timeline')
+      .select('title, due_date, status, category, owner:team_members!owner_id(name)')
       .neq('status', 'done')
       .lte('due_date', weekOut)
       .order('due_date')
       .limit(30),
-    s.from('stock_sponsors').select('status, amount_committed'),
-    s.from('stock_artists').select('status'),
+    s.from('sponsors').select('status, amount_committed'),
+    s.from('artists').select('status'),
   ]);
 
   const milestones = timelineR.data ?? [];
@@ -178,8 +185,8 @@ export async function fridayRetro(): Promise<string> {
   const s = db();
   const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const [actR, commitR] = await Promise.all([
-    s.from('stock_activity_log').select('action, actor:stock_team_members!actor_id(name)').gte('created_at', since).limit(500),
-    s.from('stock_sponsors').select('status, amount_committed').in('status', ['committed', 'paid']),
+    s.from('activity_log').select('action, actor:team_members!actor_id(name)').gte('created_at', since).limit(500),
+    s.from('sponsors').select('status, amount_committed').in('status', ['committed', 'paid']),
   ]);
   const act = actR.data ?? [];
   const commits = commitR.data ?? [];

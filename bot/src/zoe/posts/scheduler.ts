@@ -1,0 +1,278 @@
+// Post slate v1 - randomized scheduler.
+// At UTC midnight (and on boot), re-rolls a fresh list of random post times for the
+// remainder of today. Each time fires once: picks a category, drafts, DMs Zaal.
+//
+// v1 defaults:
+//   - 7 pings/day target, distributed random across 5am-10pm America/New_York
+//   - 20 min minimum gap between pings
+//   - category weights: build=3, ecosystem=2, event=1, personal=1 (calibrate after week 1)
+//   - empty drafts ("(skip)") are silently dropped, do not count against the day's quota
+//
+// No quiet hours per Zaal feedback (project memory: feedback_no_flow_state_gate).
+
+import type { Bot } from 'grammy';
+import cron from 'node-cron';
+import { promises as fs } from 'node:fs';
+import { join } from 'node:path';
+import { ZOE_PATHS } from '../memory';
+import { sendDraftWithKeyboard } from './buttons';
+import { draftPost } from './drafters';
+import { clearPending, isExpired, loadPending, shouldResend } from './pending';
+import {
+  gatherBuildSignals,
+  gatherEcosystemSignals,
+  gatherEventSignals,
+  gatherPersonalSignals,
+} from './sources';
+import type { PostCategory, PostSourceSnapshot } from './types';
+
+const PINGS_PER_DAY_DEFAULT = 7;
+const MIN_GAP_MINUTES = 20;
+const WINDOW_START_HOUR_ET = 5;
+const WINDOW_END_HOUR_ET = 22; // 10pm
+const CATEGORY_WEIGHTS: Array<[PostCategory, number]> = [
+  ['build', 3],
+  ['ecosystem', 2],
+  ['event', 1],
+  ['personal', 1],
+];
+
+const POSTS_STATE_DIR = join(ZOE_PATHS.home, 'posts');
+const SCHEDULE_FILE = join(POSTS_STATE_DIR, 'schedule.json');
+const LOG_FILE = join(POSTS_STATE_DIR, 'log.jsonl');
+
+interface ScheduleEntry {
+  fireAt: string; // ISO
+  fired: boolean;
+}
+
+interface DailySchedule {
+  date: string; // YYYY-MM-DD (ET)
+  entries: ScheduleEntry[];
+}
+
+function todayET(): string {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+}
+
+function pickWeightedCategory(): PostCategory {
+  const total = CATEGORY_WEIGHTS.reduce((s, [, w]) => s + w, 0);
+  let n = Math.random() * total;
+  for (const [cat, w] of CATEGORY_WEIGHTS) {
+    n -= w;
+    if (n <= 0) return cat;
+  }
+  return CATEGORY_WEIGHTS[0][0];
+}
+
+function pad2(n: number): string {
+  return n.toString().padStart(2, '0');
+}
+
+function etOffset(date: string): string {
+  // EDT = UTC-4 (Mar second Sunday - Nov first Sunday), EST = UTC-5 otherwise.
+  // Cheap heuristic: months 3-10 inclusive are EDT in most US years. The 2-3 days
+  // a year this is off don't matter for a post scheduler.
+  const month = Number(date.slice(5, 7));
+  return month >= 3 && month <= 10 ? '-04:00' : '-05:00';
+}
+
+function rollDailySchedule(date: string, pings: number): DailySchedule {
+  // Build a list of candidate slot-minutes (one per minute in the window), shuffle, take N
+  // with min-gap enforcement.
+  //
+  // If this roll happens mid-day (real wall-clock is past the window-start), drop any
+  // slot whose ET time is already in the past. Prevents the "deployed at 7pm, fire 7
+  // backfilled pings instantly" bug seen on 2026-05-16 deploy.
+  const slotsPerDay = (WINDOW_END_HOUR_ET - WINDOW_START_HOUR_ET) * 60;
+  const indices = Array.from({ length: slotsPerDay }, (_, i) => i);
+  // Fisher-Yates
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  const picked: number[] = [];
+  for (const idx of indices) {
+    if (picked.length === pings) break;
+    if (picked.every((p) => Math.abs(p - idx) >= MIN_GAP_MINUTES)) {
+      picked.push(idx);
+    }
+  }
+  picked.sort((a, b) => a - b);
+
+  const offset = etOffset(date);
+  const now = Date.now();
+  const entries: ScheduleEntry[] = picked
+    .map((minuteOffset) => {
+      const hour = WINDOW_START_HOUR_ET + Math.floor(minuteOffset / 60);
+      const minute = minuteOffset % 60;
+      // Build an explicit ISO timestamp at hour:minute ET for `date`.
+      // Avoids setHours(), which interprets in the system's local timezone
+      // (UTC on VPS) and skews the schedule by 4-5 hours.
+      const fireAt = new Date(`${date}T${pad2(hour)}:${pad2(minute)}:00${offset}`);
+      return { fireAt: fireAt.toISOString(), fired: false };
+    })
+    // Drop slots already in the past at roll-time. The midnight cron rolls before
+    // any of today's slots, so this normally drops nothing. Only filters when the
+    // scheduler boots mid-day (deploy, crash recovery).
+    .filter((entry) => new Date(entry.fireAt).getTime() > now);
+
+  return { date, entries };
+}
+
+async function loadOrRollSchedule(pings: number): Promise<DailySchedule> {
+  const today = todayET();
+  try {
+    const raw = await fs.readFile(SCHEDULE_FILE, 'utf8');
+    const parsed = JSON.parse(raw) as DailySchedule;
+    if (parsed.date === today) return parsed;
+  } catch {
+    // missing file - normal first run
+  }
+  const fresh = rollDailySchedule(today, pings);
+  await fs.mkdir(POSTS_STATE_DIR, { recursive: true });
+  await fs.writeFile(SCHEDULE_FILE, JSON.stringify(fresh, null, 2), 'utf8');
+  return fresh;
+}
+
+async function saveSchedule(schedule: DailySchedule): Promise<void> {
+  await fs.writeFile(SCHEDULE_FILE, JSON.stringify(schedule, null, 2), 'utf8');
+}
+
+async function appendLog(line: Record<string, unknown>): Promise<void> {
+  await fs.mkdir(POSTS_STATE_DIR, { recursive: true });
+  await fs.appendFile(LOG_FILE, `${JSON.stringify({ ts: new Date().toISOString(), ...line })}\n`, 'utf8');
+}
+
+async function gatherAll(repoDir: string): Promise<PostSourceSnapshot> {
+  const [build, ecosystem, event, personal] = await Promise.all([
+    gatherBuildSignals(repoDir),
+    gatherEcosystemSignals(repoDir),
+    gatherEventSignals(),
+    gatherPersonalSignals(),
+  ]);
+  return { build, ecosystem, event, personal };
+}
+
+async function fireOneDraft(bot: Bot, zaalTgId: number, repoDir: string): Promise<void> {
+  const category = pickWeightedCategory();
+  const snapshot = await gatherAll(repoDir);
+  let draft;
+  try {
+    draft = await draftPost(category, snapshot, { cwd: repoDir });
+  } catch (err) {
+    await appendLog({ event: 'draft-error', category, error: (err as Error).message });
+    return;
+  }
+  if (!draft.text || /^\(skip\)/i.test(draft.text)) {
+    await appendLog({ event: 'skip', category, reason: 'empty-or-skip-marker' });
+    return;
+  }
+  // v2: send with inline keyboard [POST] [REGEN] [SKIP]. Persists as the
+  // single pending draft - scheduler will not fire a new one until this is
+  // dispositioned.
+  await sendDraftWithKeyboard({
+    bot: bot.api,
+    zaalTgId,
+    category,
+    text: draft.text,
+    isResend: false,
+  });
+}
+
+export interface PostsSchedulerOptions {
+  bot: Bot;
+  zaalTgId: number;
+  repoDir: string;
+  pingsPerDay?: number;
+}
+
+export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => void } {
+  const pings = opts.pingsPerDay ?? PINGS_PER_DAY_DEFAULT;
+
+  // Re-roll the schedule at midnight America/New_York.
+  const midnightTask = cron.schedule(
+    '0 0 * * *',
+    async () => {
+      const today = todayET();
+      const fresh = rollDailySchedule(today, pings);
+      await fs.mkdir(POSTS_STATE_DIR, { recursive: true });
+      await saveSchedule(fresh);
+      await appendLog({ event: 'rolled-schedule', date: today, entries: fresh.entries.length });
+      console.log(`[zoe/posts] rolled schedule for ${today}: ${fresh.entries.length} pings`);
+    },
+    { timezone: 'America/New_York' },
+  );
+
+  // Tick every minute, fire any due entries.
+  const tickTask = cron.schedule(
+    '* * * * *',
+    async () => {
+      // v2: single in-flight draft. If pending exists and not expired, handle it:
+      // - shouldResend (30 min since lastSentAt, max 3 resends) -> resend same text
+      // - expired (4h) -> clear, log expired, allow new draft next tick
+      // - otherwise -> wait, do not fire new
+      const pending = await loadPending();
+      if (pending && pending.state === 'pending') {
+        if (isExpired(pending)) {
+          await appendLog({ event: 'expired', category: pending.category, id: pending.id });
+          await clearPending();
+        } else if (shouldResend(pending)) {
+          await sendDraftWithKeyboard({
+            bot: opts.bot.api,
+            zaalTgId: opts.zaalTgId,
+            category: pending.category,
+            text: pending.text,
+            isResend: true,
+          });
+          return;
+        } else {
+          // waiting - do not fire new
+          return;
+        }
+      }
+      const schedule = await loadOrRollSchedule(pings);
+      const now = Date.now();
+      const LATE_THRESHOLD_MS = 30 * 60_000; // 30 min - any older = treat as missed, don't fire late
+      let changed = false;
+      let firedThisTick = false; // Hard cap: ONE ping per tick. Prevents burst even
+                                  // if two entries collide on the same minute.
+      for (const entry of schedule.entries) {
+        if (entry.fired) continue;
+        const due = new Date(entry.fireAt).getTime();
+        if (due > now) continue;
+        if (now - due > LATE_THRESHOLD_MS) {
+          // Skip rather than fire late - prevents blast of stale pings if zoe-bot
+          // boots after a long downtime (2026-05-16 incident).
+          entry.fired = true;
+          changed = true;
+          await appendLog({ event: 'skip-late', fireAt: entry.fireAt, lagSec: Math.round((now - due) / 1000) });
+          continue;
+        }
+        if (firedThisTick) {
+          // Already sent one this tick. Leave this entry unfired; next tick picks
+          // it up. With 20 min MIN_GAP between scheduled slots this is rare, but
+          // a backstop against ever spamming Zaal with two pings in one minute.
+          continue;
+        }
+        entry.fired = true;
+        changed = true;
+        firedThisTick = true;
+        fireOneDraft(opts.bot, opts.zaalTgId, opts.repoDir).catch((err) => {
+          console.error('[zoe/posts] fire failed:', (err as Error).message);
+        });
+      }
+      if (changed) await saveSchedule(schedule);
+    },
+    { timezone: 'America/New_York' },
+  );
+
+  console.log(`[zoe/posts] scheduler started (target ${pings} pings/day, window ${WINDOW_START_HOUR_ET}am-${WINDOW_END_HOUR_ET - 12}pm ET)`);
+
+  return {
+    stop: () => {
+      midnightTask.stop();
+      tickTask.stop();
+    },
+  };
+}

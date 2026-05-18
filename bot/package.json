@@ -9,6 +9,8 @@
     "start": "tsx src/index.ts",
     "dev:devz": "tsx watch src/devz/index.ts",
     "start:devz": "tsx src/devz/index.ts",
+    "dev:teams": "tsx watch src/teams/index.ts",
+    "start:teams": "tsx src/teams/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

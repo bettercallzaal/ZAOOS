@@ -1,0 +1,2075 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-07-14T02:07:39.355Z",
+  "categories": [
+    {
+      "name": "ZAO Onchain",
+      "description": "Official ZAO onchain resources and tokens",
+      "icon": "globe",
+      "color": "#e74c3c",
+      "subcategories": [
+        {
+          "name": "ZAO Tokens",
+          "description": "ZAO token resources and minting options",
+          "icon": "link",
+          "color": "#e74c3c",
+          "links": [
+            {
+              "id": "link_ytthj4gvpwcjgjysnvvb",
+              "title": "Mint ZAO-CHELLA Vibez Track on Zora",
+              "url": "https://song.thezao.com",
+              "description": "Own a piece of the ZAO-CHELLA experience by minting the Vibez track.",
+              "tags": [
+                "zao",
+                "zao-onchain",
+                "zao-tokens"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-onchai",
+                "zao-tokens"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.351Z",
+              "updatedAt": "2025-07-14T02:07:39.354Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://song.thezao.com/favicon.ico",
+              "category": "ZAO Onchain",
+              "subcategory": "ZAO Tokens"
+            },
+            {
+              "id": "link_srnarjn4mjjsdendud",
+              "title": "Mint Attabotty ZAO-PALOOZA Card",
+              "url": "https://attabotty.zao.cards",
+              "description": "Collect the limited-edition Attabotty artist card from ZAO-PALOOZA.",
+              "tags": [
+                "zao",
+                "zao-onchain",
+                "zao-tokens"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-onchai",
+                "zao-tokens"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.354Z",
+              "updatedAt": "2025-07-14T02:07:39.354Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://attabotty.zao.cards/favicon.ico",
+              "category": "ZAO Onchain",
+              "subcategory": "ZAO Tokens"
+            },
+            {
+              "id": "link_3w3sjmegdgcepodi",
+              "title": "Mint Zalora – the ZAO Mascot (MidiVerse)",
+              "url": "https://zalora.thezao.com",
+              "description": "Bring Zalora into your wallet – the on-chain mascot of the ZAO.",
+              "tags": [
+                "zao",
+                "zao-onchain",
+                "zao-tokens"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-onchai",
+                "zao-tokens"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://zalora.thezao.com/favicon.ico",
+              "category": "ZAO Onchain",
+              "subcategory": "ZAO Tokens"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Tracks",
+          "description": "ZAO music tracks and collections",
+          "icon": "music",
+          "color": "#3498db",
+          "links": [
+            {
+              "id": "link_kfrgmu4bxf7dyipfss",
+              "title": "ZAO song #1: ZAO-CHELLA VIBEZ",
+              "url": "https://zora.co/collect/base:0x1458f7d12c1fe1747e13793d99dcb6da6f9d6123/1?referrer=0xa46b072e6607d37413000220653d3bca5be32513",
+              "description": "Vibe to the first official ZAO track from ZAO-CHELLA.",
+              "tags": [
+                "zao",
+                "zao-onchain",
+                "zao-tracks"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-onchai",
+                "zao-tracks"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://zora.co/favicon.ico",
+              "category": "ZAO Onchain",
+              "subcategory": "ZAO Tracks"
+            },
+            {
+              "id": "link_zyzb7wmguhz7okjnkt9f",
+              "title": "ZAO song #2: ZAO-CHELLA CYPHER",
+              "url": "https://www.thezao.com/zao-cypher",
+              "description": "Listen to the multi-artist Cypher track from ZAO-CHELLA.",
+              "tags": [
+                "zao",
+                "zao-onchain",
+                "zao-tracks"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-onchai",
+                "zao-tracks"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.thezao.com/favicon.ico",
+              "category": "ZAO Onchain",
+              "subcategory": "ZAO Tracks"
+            },
+            {
+              "id": "link_3cqkuurrvprcglvqq40l",
+              "title": "ZAO song #3: Side by Side (ZAO Side)",
+              "url": "https://ima.midipunkz.com/midivaderz/side-by-side-thezao",
+              "description": "Watch the Side-by-Side collab in MidiVaderZ – ZAO's side.",
+              "tags": [
+                "zao",
+                "zao-onchain",
+                "zao-tracks"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-onchai",
+                "zao-tracks"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://ima.midipunkz.com/favicon.ico",
+              "category": "ZAO Onchain",
+              "subcategory": "ZAO Tracks"
+            },
+            {
+              "id": "link_4lch2jowxfolimhydk7w",
+              "title": "ZAO song #3.1: Side by Side (MidiPunkz Side)",
+              "url": "https://ima.midipunkz.com/midivaderz/side-by-side-midipunkz",
+              "description": "Watch the Side-by-Side collab in MidiVaderZ – MidiPunkz's side.",
+              "tags": [
+                "zao",
+                "zao-onchain",
+                "zao-tracks"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-onchai",
+                "zao-tracks"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://ima.midipunkz.com/favicon.ico",
+              "category": "ZAO Onchain",
+              "subcategory": "ZAO Tracks"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ZAO Links",
+      "description": "Official ZAO platforms and resources",
+      "icon": "link",
+      "color": "#2ecc71",
+      "subcategories": [
+        {
+          "name": "ZAO Platforms",
+          "description": "Official ZAO websites and platforms",
+          "icon": "globe",
+          "color": "#2ecc71",
+          "links": [
+            {
+              "id": "link_cdl3rk367o5lztd2woje",
+              "title": "ZAO Website",
+              "url": "https://thezao.com",
+              "description": "Visit the official ZAO website for all the latest news and resources.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "zao-platforms"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "zao-platfo"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://thezao.com/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "ZAO Platforms"
+            },
+            {
+              "id": "link_qnn3wybfbrlsmwe0sqcv",
+              "title": "ZVerse (ZAO Hivemind)",
+              "url": "https://thezao.xyz",
+              "description": "Explore the ZVerse, where the ZAO Hivemind connects ideas and innovations.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "zao-platforms"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "zao-platfo"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://thezao.xyz/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "ZAO Platforms"
+            },
+            {
+              "id": "link_z0ne0rfwxpnpzveqa0y4",
+              "title": "ZAO ORG CHART (Hats Tree)",
+              "url": "https://hats.thezao.com",
+              "description": "Dive into the ZAO ORG CHART to see our team and projects.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "zao-platforms"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "zao-platfo"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://hats.thezao.com/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "ZAO Platforms"
+            }
+          ]
+        },
+        {
+          "name": "Calendars",
+          "description": "ZAO event calendars and schedules",
+          "icon": "calendar",
+          "color": "#9b59b6",
+          "links": [
+            {
+              "id": "link_2qse2beifxaseimgjkl0",
+              "title": "ZAO Google Calendar",
+              "url": "https://calendar.google.com/calendar/u/0?cid=MmY3YTQ4YTY2MWIyNzVlMmFkZTgxYzlhYjJkMGFhM2E1YTBmNThiNTA3MDVhOTYxZGE2NWNmNTE0MTZjZGU3NUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t",
+              "description": "Stay up to date with ZAO events on Google Calendar.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "calendars"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "calendars"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://calendar.google.com/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "Calendars"
+            },
+            {
+              "id": "link_xkhvuowlywwawoafcps",
+              "title": "ZAO Calendar",
+              "url": "https://lu.ma/zao",
+              "description": "Browse upcoming ZAO events and activities on Luma.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "calendars"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "calendars"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://lu.ma/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "Calendars"
+            },
+            {
+              "id": "link_nbyk5fuu6c2ju2saio",
+              "title": "ZAO Music Events Calendar",
+              "url": "https://lu.ma/zao-m",
+              "description": "Explore ZAO music-related events and gigs on Luma.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "calendars"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "calendars"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://lu.ma/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "Calendars"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Social Media Chats",
+          "description": "ZAO social media and community channels",
+          "icon": "message-circle",
+          "color": "#f39c12",
+          "links": [
+            {
+              "id": "link_tx4bdmztlswwi402dinb",
+              "title": "Discord",
+              "url": "https://discord.gg/ACJyYQH3BE",
+              "description": "Join our ZAO Discord for real-time group chats.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "zao-social-media-chats"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "zao-social"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://discord.gg/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "ZAO Social Media Chats"
+            },
+            {
+              "id": "link_0vtv8ctani2lxscc0hcu",
+              "title": "Telegram",
+              "url": "https://t.me/+iMH5Y_t2Mks1NmVh",
+              "description": "Connect with us on Telegram for updates and discussions.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "zao-social-media-chats"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "zao-social"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://t.me/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "ZAO Social Media Chats"
+            }
+          ]
+        },
+        {
+          "name": "ZAO WHITEPAPER",
+          "description": "ZAO whitepaper and documentation",
+          "icon": "file-text",
+          "color": "#34495e",
+          "links": [
+            {
+              "id": "link_b3uhsqkzaqwvmudec7m",
+              "title": "ZAO Whitepaper Draft",
+              "url": "https://app.charmverse.io/the-zao/the-zao-whitepaper-draft-2-6565388910657037",
+              "description": "Dive into the ZAO Whitepaper for a deeper understanding of the ecosystem.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "zao-whitepaper"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "zao-whitep"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://app.charmverse.io/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "ZAO WHITEPAPER"
+            }
+          ]
+        },
+        {
+          "name": "Daily Newsletter Articles",
+          "description": "ZAO daily newsletter and articles",
+          "icon": "mail",
+          "color": "#1abc9c",
+          "links": [
+            {
+              "id": "link_zwgxygj5ndbo26x3qq2",
+              "title": "Daily Newsletter Articles",
+              "url": "https://paragraph.xyz/@thezao",
+              "description": "Read daily newsletter articles.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "daily-newsletter-articles"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "daily-news"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "Daily Newsletter Articles"
+            },
+            {
+              "id": "link_exo1v84c9gsvjj5jrz",
+              "title": "Subscribe to the newsletter",
+              "url": "https://paragraph.xyz/@thezao/subscribe",
+              "description": "Subscribe for daily updates.",
+              "tags": [
+                "zao",
+                "zao-links",
+                "daily-newsletter-articles"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-links",
+                "daily-news"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Links",
+              "subcategory": "Daily Newsletter Articles"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ZAO Projects Links",
+      "description": "ZAO projects and initiatives",
+      "icon": "briefcase",
+      "color": "#9b59b6",
+      "subcategories": [
+        {
+          "name": "WaveWarZ",
+          "description": "WaveWarZ project resources",
+          "icon": "zap",
+          "color": "#e67e22",
+          "links": [
+            {
+              "id": "link_ekrk2j157x1f195hrpsc",
+              "title": "WaveWarZ Twitter",
+              "url": "https://x.com/WaveWarZ",
+              "description": "Check out the latest updates on WaveWarZ Twitter.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "wavewarz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "wavewarz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://x.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "WaveWarZ"
+            },
+            {
+              "id": "link_sjatuek6lts9ye4tubdp",
+              "title": "WaveWarZ V1 SOL Testnet",
+              "url": "https://www.wavewarz.com",
+              "description": "Access the WaveWarZ DAPP on the SOL Testnet (V1).",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "wavewarz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "wavewarz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.wavewarz.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "WaveWarZ"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Festivals",
+          "description": "ZAO Festivals resources",
+          "icon": "music",
+          "color": "#d35400",
+          "links": [
+            {
+              "id": "link_16g8u0nq2bbipzuqfgpj",
+              "title": "ZAO Festivals Website",
+              "url": "https://zaofestivals.com/",
+              "description": "Visit the official ZAO Festivals website.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://zaofestivals.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals"
+            },
+            {
+              "id": "link_wi17n8bmm7mdab9rtak",
+              "title": "Merch",
+              "url": "https://merch.zaofestivals.com",
+              "description": "Shop for ZAO Festivals merchandise.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://merch.zaofestivals.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals"
+            },
+            {
+              "id": "link_m5ovyrvel3ksvd2lcxmr",
+              "title": "Donate",
+              "url": "https://giveth.io/project/sustaining-zao-festivals-creativity-technology?tab=donations",
+              "description": "Donate to support ZAO Festivals.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://giveth.io/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals"
+            },
+            {
+              "id": "link_wzyqb6swylgqsi0f5ed9",
+              "title": "ZAO PALOOZA Artist Cards",
+              "url": "https://zao.cards",
+              "description": "View ZAO PALOOZA Artist Cards.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://zao.cards/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Festivals Socials",
+          "description": "ZAO Festivals social media",
+          "icon": "share-2",
+          "color": "#c0392b",
+          "links": [
+            {
+              "id": "link_s4nl5im6fx8bowetbj",
+              "title": "Twitter",
+              "url": "https://x.com/zaofestivals?lang=en",
+              "description": "Follow ZAO Festivals on Twitter.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals-socials"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://x.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals Socials"
+            },
+            {
+              "id": "link_9k59zjkvoltffwv502w",
+              "title": "Instagram",
+              "url": "https://www.instagram.com/zaofestivals/",
+              "description": "Follow ZAO Festivals on Instagram.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals-socials"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.instagram.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals Socials"
+            },
+            {
+              "id": "link_ipfkiqytgxfb3yw1r3oh",
+              "title": "Facebook",
+              "url": "https://www.facebook.com/ZAOFestivals",
+              "description": "Like ZAO Festivals on Facebook.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals-socials"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.facebook.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals Socials"
+            },
+            {
+              "id": "link_jnnxdr4yhpxwsquugk3g",
+              "title": "LinkedIn",
+              "url": "https://www.linkedin.com/company/zaofestivals",
+              "description": "Connect with ZAO Festivals on LinkedIn.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals-socials"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.linkedin.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals Socials"
+            },
+            {
+              "id": "link_jca4a7nbolhccij2yl8",
+              "title": "YouTube",
+              "url": "https://www.youtube.com/@zaofestivals",
+              "description": "Watch ZAO Festivals videos on YouTube.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-festivals-socials"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-festiv"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.youtube.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Festivals Socials"
+            }
+          ]
+        },
+        {
+          "name": "$Loanz",
+          "description": "$Loanz project resources",
+          "icon": "dollar-sign",
+          "color": "#27ae60",
+          "links": [
+            {
+              "id": "link_uvg59lhffnhsus9kkbx",
+              "title": "$Loanz OG Whitepaper",
+              "url": "https://paragraph.xyz/@thezao/student-loanz-whitepaper",
+              "description": "Dive into the original $Loanz Whitepaper for in-depth info on Student Loanz.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "$loanz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "$loanz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "$Loanz"
+            },
+            {
+              "id": "link_zkm87h0pn4uyqxletsep",
+              "title": "$Loanz website",
+              "url": "https://studentloanz.xyz/",
+              "description": "Visit the official $Loanz website to explore student loan solutions.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "$loanz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "$loanz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://studentloanz.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "$Loanz"
+            },
+            {
+              "id": "link_hguqdws3gk97h0k6xq3l",
+              "title": "$Loanz memebook",
+              "url": "https://zao.lol",
+              "description": "Make your own $loanz memes.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "$loanz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "$loanz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://zao.lol/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "$Loanz"
+            },
+            {
+              "id": "link_ippfdp3khboey9zj4lwp",
+              "title": "Loanz Daily Spaces",
+              "url": "https://x.com/loanzonbase",
+              "description": "Loanz Daily Spaces.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "$loanz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "$loanz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://x.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "$Loanz"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Playlists",
+          "description": "ZAO music playlists",
+          "icon": "music",
+          "color": "#8e44ad",
+          "links": [
+            {
+              "id": "link_cfkiasw6svbxakwunugu",
+              "title": "ZAO Spotify 2024",
+              "url": "https://open.spotify.com/playlist/2IIl13a4YNxQTLNJhDKr32?si=1bb3ef92068143cf",
+              "description": "Listen to ZAO Spotify 2024 playlist.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-playlists"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-playli"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://open.spotify.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Playlists"
+            },
+            {
+              "id": "link_9b2wskn5hbdpmuw2j0ej",
+              "title": "ZAO Spotify 2025",
+              "url": "https://open.spotify.com/playlist/7MCDgGzyqbnsyKSNuMUUpM?si=2652032d60de4b93",
+              "description": "Listen to ZAO Spotify 2025 playlist.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-playlists"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-playli"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://open.spotify.com/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Playlists"
+            },
+            {
+              "id": "link_80oanve7cq7wjf54hzq",
+              "title": "ZAO SOUND.XYZ Playlist",
+              "url": "https://www.sound.xyz/playlist/1e1ab680-2f45-4232-9c34-b6ba9dc1a1d3",
+              "description": "Listen to the ZAO SOUND.XYZ Playlist.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-playlists"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-playli"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.sound.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO Playlists"
+            }
+          ]
+        },
+        {
+          "name": "ZAO CMOTM Interviews",
+          "description": "ZAO community member interviews",
+          "icon": "mic",
+          "color": "#2980b9",
+          "links": [
+            {
+              "id": "link_oveet1bghzsbh0crlulp",
+              "title": "Daniel Obute Interview",
+              "url": "https://paragraph.xyz/@thezao/ztalentnewsletter12",
+              "description": "Daniel Obute Interview.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-cmotm-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-cmotm-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO CMOTM Interviews"
+            },
+            {
+              "id": "link_xdnam7foffcr9kv6yqeh",
+              "title": "Davyd Interview",
+              "url": "https://paragraph.xyz/@thezao/ztalent-interview-1-davyd",
+              "description": "Davyd Interview.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-cmotm-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-cmotm-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO CMOTM Interviews"
+            },
+            {
+              "id": "link_tunpgv4ifcsv7xdeenyw",
+              "title": "Tej Interview",
+              "url": "https://paragraph.xyz/@thezao/ztalent-interview-2",
+              "description": "Tej Interview.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-cmotm-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-cmotm-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO CMOTM Interviews"
+            },
+            {
+              "id": "link_zmnglqz7htnkvkabfbb",
+              "title": "Ohnahji B Interview",
+              "url": "https://paragraph.xyz/@thezao/ztalent-interview-3",
+              "description": "Ohnahji B Interview.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-cmotm-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-cmotm-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO CMOTM Interviews"
+            },
+            {
+              "id": "link_p4jrpng4nyryjuchp7w",
+              "title": "CandyToyBox Interview",
+              "url": "https://paragraph.xyz/@thezao/ztalent-interview-4",
+              "description": "CandyToyBox Interview.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-cmotm-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-cmotm-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO CMOTM Interviews"
+            },
+            {
+              "id": "link_pn4ukoba48hu74lchde",
+              "title": "Hurric4n3Ike Interview",
+              "url": "https://paragraph.xyz/@thezao/ztalent-interview-5-hurric4n3ike",
+              "description": "Hurric4n3Ike Interview.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-cmotm-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-cmotm-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO CMOTM Interviews"
+            },
+            {
+              "id": "link_zjhxeljronnbrozyomrv",
+              "title": "Heather Interview",
+              "url": "https://paragraph.xyz/@thezao/ztalent-interview-6",
+              "description": "Heather Interview.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-cmotm-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-cmotm-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO CMOTM Interviews"
+            },
+            {
+              "id": "link_tnoihlpypismjjzukbw",
+              "title": "Attabotty Interview",
+              "url": "https://paragraph.xyz/@thezao/ztalent-interview-7-attabotty",
+              "description": "Attabotty Interview.",
+              "tags": [
+                "zao",
+                "zao-projects-links",
+                "zao-cmotm-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-projec",
+                "zao-cmotm-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://paragraph.xyz/favicon.ico",
+              "category": "ZAO Projects Links",
+              "subcategory": "ZAO CMOTM Interviews"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ZAO Community Links",
+      "description": "ZAO community resources",
+      "icon": "users",
+      "color": "#f1c40f",
+      "subcategories": [
+        {
+          "name": "Defi Space Donkeys",
+          "description": "Defi Space Donkeys resources",
+          "icon": "trending-up",
+          "color": "#16a085",
+          "links": [
+            {
+              "id": "link_dtlvi0b8diarmoaoeyld",
+              "title": "Coming Soon",
+              "url": "#",
+              "description": "Links for Defi Space Donkeys will appear here.",
+              "tags": [
+                "zao",
+                "zao-community-links",
+                "defi-space-donkeys"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "defi-space"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": null,
+              "category": "ZAO Community Links",
+              "subcategory": "Defi Space Donkeys"
+            }
+          ]
+        },
+        {
+          "name": "Impact Concerts",
+          "description": "Impact Concerts resources",
+          "icon": "music",
+          "color": "#f39c12",
+          "links": [
+            {
+              "id": "link_dtlvi0b8diarmoaoeyld",
+              "title": "Coming Soon",
+              "url": "#",
+              "description": "Links for Impact Concerts will appear here.",
+              "tags": [
+                "zao",
+                "zao-community-links",
+                "impact-concerts"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "impact-con"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": null,
+              "category": "ZAO Community Links",
+              "subcategory": "Impact Concerts"
+            }
+          ]
+        },
+        {
+          "name": "MidiPunkZ",
+          "description": "MidiPunkZ resources",
+          "icon": "headphones",
+          "color": "#d35400",
+          "links": [
+            {
+              "id": "link_blqbkh2zqbwatyuqali",
+              "title": "Main website",
+              "url": "https://midipunkz.com/",
+              "description": "The official MidiPunkZ website.",
+              "tags": [
+                "zao",
+                "zao-community-links",
+                "midipunkz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "midipunkz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://midipunkz.com/favicon.ico",
+              "category": "ZAO Community Links",
+              "subcategory": "MidiPunkZ"
+            },
+            {
+              "id": "link_ddbwsjbwxldltttpk",
+              "title": "MidiVaderz game",
+              "url": "https://midipunkz.com/games",
+              "description": "Play MidiVaderz on the MidiPunkZ website.",
+              "tags": [
+                "zao",
+                "zao-community-links",
+                "midipunkz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "midipunkz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://midipunkz.com/favicon.ico",
+              "category": "ZAO Community Links",
+              "subcategory": "MidiPunkZ"
+            },
+            {
+              "id": "link_5gav4njioc7fuftavirc",
+              "title": "MidiPunkz Community",
+              "url": "https://ima.midipunkz.com/communities/midipunkz",
+              "description": "Join the MidiPunkZ community on IMA.",
+              "tags": [
+                "zao",
+                "zao-community-links",
+                "midipunkz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "midipunkz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://ima.midipunkz.com/favicon.ico",
+              "category": "ZAO Community Links",
+              "subcategory": "MidiPunkZ"
+            },
+            {
+              "id": "link_tbla7u77hdmpty93m1ud",
+              "title": "MiDi FeatherFrogs Community",
+              "url": "https://ima.midipunkz.com/communities/featherfrogs",
+              "description": "Explore the FeatherFrogs community on IMA.",
+              "tags": [
+                "zao",
+                "zao-community-links",
+                "midipunkz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "midipunkz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://ima.midipunkz.com/favicon.ico",
+              "category": "ZAO Community Links",
+              "subcategory": "MidiPunkZ"
+            },
+            {
+              "id": "link_60ffymt2mkre27e4mpvu",
+              "title": "Midi Avatars",
+              "url": "https://midipunkz.com/midiezz",
+              "description": "Browse and collect MidiPunkZ avatars.",
+              "tags": [
+                "zao",
+                "zao-community-links",
+                "midipunkz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "midipunkz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://midipunkz.com/favicon.ico",
+              "category": "ZAO Community Links",
+              "subcategory": "MidiPunkZ"
+            },
+            {
+              "id": "link_llgwgizx04mgjqzham9x",
+              "title": "ZAO Community Page",
+              "url": "https://ima.midipunkz.com/communities/the-zao",
+              "description": "Check out the ZAO's dedicated community space on midipunkz.com.",
+              "tags": [
+                "zao",
+                "zao-community-links",
+                "midipunkz"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "midipunkz"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://ima.midipunkz.com/favicon.ico",
+              "category": "ZAO Community Links",
+              "subcategory": "MidiPunkZ"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ZAO Community Members",
+      "description": "ZAO community member resources",
+      "icon": "user",
+      "color": "#3498db",
+      "subcategories": [
+        {
+          "name": "ZAO Founder BetterCallZaal Links",
+          "description": "BetterCallZaal resources",
+          "icon": "user",
+          "color": "#2980b9",
+          "links": [
+            {
+              "id": "link_ztn8fhdkoutqkv06uwol",
+              "title": "BetterCallZaal Linktree",
+              "url": "https://linktr.ee/bettercallzaal",
+              "description": "Access all BetterCallZaal links and resources on Linktree.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-founder-bettercallzaal-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-founde"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://linktr.ee/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Founder BetterCallZaal Links"
+            },
+            {
+              "id": "link_rvbfgxhqulyd9jbrdc",
+              "title": "Personal Meeting Room (Huddle01)",
+              "url": "https://huddle01.app/room/zfp-tzyh-anm",
+              "description": "Enter your personal meeting room.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-founder-bettercallzaal-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-founde"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://huddle01.app/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Founder BetterCallZaal Links"
+            },
+            {
+              "id": "link_rhembzu7mccybwcy44nn",
+              "title": "Meet with Zaal (Calendly)",
+              "url": "https://calendly.com/zaalp99/30minmeeting",
+              "description": "Schedule a meeting with Zaal.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-founder-bettercallzaal-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-founde"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://calendly.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Founder BetterCallZaal Links"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Founder BetterCallZaal Interviews",
+          "description": "BetterCallZaal interviews",
+          "icon": "mic",
+          "color": "#8e44ad",
+          "links": [
+            {
+              "id": "link_xcn2gu0l4vt8pkshrmmb",
+              "title": "Interview #0 (3/28/24): Blitzscaling w/Bayo",
+              "url": "https://youtu.be/FKyIS-h3fNY",
+              "description": "Interview #0: Blitzscaling a Startup w/Bayo.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-founder-bettercallzaal-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-founde"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://youtu.be/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Founder BetterCallZaal Interviews"
+            },
+            {
+              "id": "link_3hroizyxvqewsxm2e6ru",
+              "title": "Interview #1 (11/14/24): ZAO Fractal w/NovaCrypto",
+              "url": "https://www.youtube.com/watch?v=0_WvwzBvs90&ab_channel=NovaCryptoLTD",
+              "description": "Interview #1: ZAO Fractal w/NovaCrypto.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-founder-bettercallzaal-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-founde"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.youtube.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Founder BetterCallZaal Interviews"
+            },
+            {
+              "id": "link_d4qdyyk7dxreacodbhk",
+              "title": "Interview #2 (4/1/25): ZAO w/Lindsey",
+              "url": "https://www.youtube.com/watch?v=SXmdO6l4Rfg&ab_channel=TokenForYourThoughtsPodcast",
+              "description": "Interview #2: ZAO w/Lindsey.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-founder-bettercallzaal-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-founde"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.youtube.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Founder BetterCallZaal Interviews"
+            },
+            {
+              "id": "link_4o2e136q85xofyyhifyb",
+              "title": "Interview #3 (4/10/25): THE ZAO w/Will T",
+              "url": "https://www.youtube.com/watch?v=oVp0d1BBmko&ab_channel=ReFiDAO",
+              "description": "Interview #3: THE ZAO w/Will T.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-founder-bettercallzaal-interviews"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-founde"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.youtube.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Founder BetterCallZaal Interviews"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Co-Founder CandyToyBox Links",
+          "description": "CandyToyBox resources",
+          "icon": "user",
+          "color": "#e74c3c",
+          "links": [
+            {
+              "id": "link_proacsgqu0a8gydi3gk3",
+              "title": "CandyToyBox Test Link",
+              "url": "https://thezao.com",
+              "description": "Test link for ZAO Co-Founder CandyToyBox.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-co-founder-candytoybox-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-co-fou"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://thezao.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Co-Founder CandyToyBox Links"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Co-Founder Attabotty Links",
+          "description": "Attabotty resources",
+          "icon": "user",
+          "color": "#c0392b",
+          "links": [
+            {
+              "id": "link_wvzhd06kkv2k4vfbp0",
+              "title": "Attabotty Test Link",
+              "url": "https://thezao.com",
+              "description": "Test link for ZAO Co-Founder Attabotty.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-co-founder-attabotty-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-co-fou"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://thezao.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Co-Founder Attabotty Links"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Co-Founder HURRIC4N3IKE Links",
+          "description": "HURRIC4N3IKE resources",
+          "icon": "user",
+          "color": "#d35400",
+          "links": [
+            {
+              "id": "link_ed9ukfcrgms547wa8aij",
+              "title": "HURRIC4N3IKE Test Link",
+              "url": "https://thezao.com",
+              "description": "Test link for ZAO Co-Founder HURRIC4N3IKE.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-co-founder-hurric4n3ike-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-co-fou"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://thezao.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Co-Founder HURRIC4N3IKE Links"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Co-Founder Jango UU Links",
+          "description": "Jango UU resources",
+          "icon": "user",
+          "color": "#e67e22",
+          "links": [
+            {
+              "id": "link_f5ls5t9ejeexd5nf5au",
+              "title": "Instagram",
+              "url": "https://www.instagram.com/jangouuforever?igsh=MTl4bTRodXl2bDU4Mw%3D%3D&utm_source=qr",
+              "description": "Follow Jango UU on Instagram.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-co-founder-jango-uu-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-co-fou"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://www.instagram.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Co-Founder Jango UU Links"
+            },
+            {
+              "id": "link_kh2rr5o2i4abdilfgw3z",
+              "title": "X (Twitter)",
+              "url": "https://x.com/jangouuforever?s=11&t=lwnZlcNedjeVZeQDTcNEwQ",
+              "description": "Follow Jango UU on X (Twitter).",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-co-founder-jango-uu-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-co-fou"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://x.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Co-Founder Jango UU Links"
+            },
+            {
+              "id": "link_zcgju1bj4yqhg5wfc",
+              "title": "Spotify",
+              "url": "https://open.spotify.com/artist/5nc2dgefoPLfvsrJVx3PNz?si=Xhzfg5n1Q3uHVJHHawp8KA",
+              "description": "Listen to Jango UU on Spotify.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-co-founder-jango-uu-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-co-fou"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://open.spotify.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Co-Founder Jango UU Links"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Staff EZinCrypto Links",
+          "description": "EZinCrypto resources",
+          "icon": "user",
+          "color": "#f39c12",
+          "links": [
+            {
+              "id": "link_j7ubop5avylkabeah4pt",
+              "title": "EZinCrypto Test Link",
+              "url": "https://thezao.com",
+              "description": "Test link for ZAO Staff EZinCrypto.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-staff-ezincrypto-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-staff-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://thezao.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Staff EZinCrypto Links"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Staff Ohnahji B Links",
+          "description": "Ohnahji B resources",
+          "icon": "user",
+          "color": "#f1c40f",
+          "links": [
+            {
+              "id": "link_jmqrw8xi3fuefsgdcrln",
+              "title": "Ohnahji Linktree",
+              "url": "https://linktr.ee/ohnahji",
+              "description": "Linktree for Ohnahji B.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-staff-ohnahji-b-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-staff-"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://linktr.ee/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Staff Ohnahji B Links"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Community Member Jed XO Links",
+          "description": "Jed XO resources",
+          "icon": "user",
+          "color": "#2ecc71",
+          "links": [
+            {
+              "id": "link_xl6ppsauq3ksnlpdppi",
+              "title": "Jed XO Test Link",
+              "url": "https://thezao.com",
+              "description": "Test link for ZAO Community Member Jed XO.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-community-member-jed-xo-links"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-commun"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://thezao.com/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Community Member Jed XO Links"
+            }
+          ]
+        },
+        {
+          "name": "ZAO Musician GodCloud",
+          "description": "GodCloud resources",
+          "icon": "music",
+          "color": "#1abc9c",
+          "links": [
+            {
+              "id": "link_b5uwpdu5ciwdo6pk25cs",
+              "title": "GodCloud Website",
+              "url": "https://godcloud.org",
+              "description": "Website for GodCloud.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-musician-godcloud"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-musici"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://godcloud.org/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Musician GodCloud"
+            },
+            {
+              "id": "link_1kopjjoduhljciz0i1fl",
+              "title": "GodCloud Drip.haus",
+              "url": "https://drip.haus/godcloud",
+              "description": "Collect GodCloud tracks.",
+              "tags": [
+                "zao",
+                "zao-community-members",
+                "zao-musician-godcloud"
+              ],
+              "displayTags": [
+                "zao",
+                "zao-commun",
+                "zao-musici"
+              ],
+              "isNew": true,
+              "isOfficial": true,
+              "isPopular": false,
+              "createdAt": "2025-07-14T02:07:39.355Z",
+              "updatedAt": "2025-07-14T02:07:39.355Z",
+              "clicks": 0,
+              "popularity": 0,
+              "favicon": "https://drip.haus/favicon.ico",
+              "category": "ZAO Community Members",
+              "subcategory": "ZAO Musician GodCloud"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "tags": {}
+}

@@ -7,6 +7,21 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/bcz-yapz',
+        destination: 'https://bczyapz.com',
+        permanent: true,
+      },
+      {
+        source: '/bcz-yapz/:path*',
+        destination: 'https://bczyapz.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
+
   serverExternalPackages: [
     '@xmtp/wasm-bindings',
     'twitter-api-v2',

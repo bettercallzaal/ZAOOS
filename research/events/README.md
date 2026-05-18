@@ -26,3 +26,4 @@
 | 473 | [Road to ZAOstock Magnetic Portal](./473-road-to-zaostock-magnetic-portal/) | STANDALONE | Tyler Stambaugh spec: weekly Magnetic drip content series leading up to Oct 3 |
 | 476 | [ZAOstock Apr 22 Team Recap](./476-zaostock-apr22-team-recap/) | BROADCAST | Full team recap of Apr 21 meeting: 17 teammates, contributor path locked, hybrid meetings start Apr 28 |
 | 477 | [ZAOstock Dashboard Notion Replacement (170-Day Build)](./477-zaostock-dashboard-notion-replacement/) | STANDALONE | Audit of built-vs-missing on /stock/team, 4 new tables, 5-phase MVP spec to fully retire Notion by Oct 3 |
+| 599 | [Inbox Digest 2026-05-03](./599-inbox-digest-2026-05-03/) | BROADCAST | 8-message inbox processed. Reddit `.json` scrape pattern confirmed. Sub-docs: 599a (music distribution AI block), 599b (GMFC101 + Word-A-Day), 599c (Hermes Agent prior art), 599d (DFOS update). |

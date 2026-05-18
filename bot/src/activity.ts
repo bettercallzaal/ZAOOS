@@ -12,7 +12,7 @@ export async function logBotActivity(args: {
   fieldChanged?: string;
 }) {
   try {
-    await db().from('stock_activity_log').insert({
+    await db().from('activity_log').insert({
       actor_id: args.actorId,
       entity_type: args.entityType,
       entity_id: args.entityId,

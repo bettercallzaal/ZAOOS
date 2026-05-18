@@ -1,0 +1,229 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-07-13T21:33:31-04:00",
+  "categories": [
+    {
+      "name": "ZAO Onchain",
+      "description": "Official ZAO onchain resources and tokens",
+      "icon": "globe",
+      "color": "#e74c3c",
+      "subcategories": [
+        {
+          "name": "ZAO Tokens",
+          "description": "ZAO token resources and minting options",
+          "icon": "link",
+          "color": "#e74c3c",
+          "links": []
+        },
+        {
+          "name": "ZAO Tracks",
+          "description": "ZAO music tracks and collections",
+          "icon": "music",
+          "color": "#3498db",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "ZAO Links",
+      "description": "Official ZAO platforms and resources",
+      "icon": "link",
+      "color": "#2ecc71",
+      "subcategories": [
+        {
+          "name": "ZAO Platforms",
+          "description": "Official ZAO websites and platforms",
+          "icon": "globe",
+          "color": "#2ecc71",
+          "links": []
+        },
+        {
+          "name": "Calendars",
+          "description": "ZAO event calendars and schedules",
+          "icon": "calendar",
+          "color": "#9b59b6",
+          "links": []
+        },
+        {
+          "name": "ZAO Social Media Chats",
+          "description": "ZAO social media and community channels",
+          "icon": "message-circle",
+          "color": "#f39c12",
+          "links": []
+        },
+        {
+          "name": "ZAO WHITEPAPER",
+          "description": "ZAO whitepaper and documentation",
+          "icon": "file-text",
+          "color": "#34495e",
+          "links": []
+        },
+        {
+          "name": "Daily Newsletter Articles",
+          "description": "ZAO daily newsletter and articles",
+          "icon": "mail",
+          "color": "#1abc9c",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "ZAO Projects Links",
+      "description": "ZAO projects and initiatives",
+      "icon": "briefcase",
+      "color": "#9b59b6",
+      "subcategories": [
+        {
+          "name": "WaveWarZ",
+          "description": "WaveWarZ project resources",
+          "icon": "zap",
+          "color": "#e67e22",
+          "links": []
+        },
+        {
+          "name": "ZAO Festivals",
+          "description": "ZAO Festivals resources",
+          "icon": "music",
+          "color": "#d35400",
+          "links": []
+        },
+        {
+          "name": "ZAO Festivals Socials",
+          "description": "ZAO Festivals social media",
+          "icon": "share-2",
+          "color": "#c0392b",
+          "links": []
+        },
+        {
+          "name": "$Loanz",
+          "description": "$Loanz project resources",
+          "icon": "dollar-sign",
+          "color": "#27ae60",
+          "links": []
+        },
+        {
+          "name": "ZAO Playlists",
+          "description": "ZAO music playlists",
+          "icon": "music",
+          "color": "#8e44ad",
+          "links": []
+        },
+        {
+          "name": "ZAO CMOTM Interviews",
+          "description": "ZAO community member interviews",
+          "icon": "mic",
+          "color": "#2980b9",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "ZAO Community Links",
+      "description": "ZAO community resources",
+      "icon": "users",
+      "color": "#f1c40f",
+      "subcategories": [
+        {
+          "name": "Defi Space Donkeys",
+          "description": "Defi Space Donkeys resources",
+          "icon": "trending-up",
+          "color": "#16a085",
+          "links": []
+        },
+        {
+          "name": "Impact Concerts",
+          "description": "Impact Concerts resources",
+          "icon": "music",
+          "color": "#f39c12",
+          "links": []
+        },
+        {
+          "name": "MidiPunkZ",
+          "description": "MidiPunkZ resources",
+          "icon": "headphones",
+          "color": "#d35400",
+          "links": []
+        }
+      ]
+    },
+    {
+      "name": "ZAO Community Members",
+      "description": "ZAO community member resources",
+      "icon": "user",
+      "color": "#3498db",
+      "subcategories": [
+        {
+          "name": "ZAO Founder BetterCallZaal Links",
+          "description": "BetterCallZaal resources",
+          "icon": "user",
+          "color": "#2980b9",
+          "links": []
+        },
+        {
+          "name": "ZAO Founder BetterCallZaal Interviews",
+          "description": "BetterCallZaal interviews",
+          "icon": "mic",
+          "color": "#8e44ad",
+          "links": []
+        },
+        {
+          "name": "ZAO Co-Founder CandyToyBox Links",
+          "description": "CandyToyBox resources",
+          "icon": "user",
+          "color": "#e74c3c",
+          "links": []
+        },
+        {
+          "name": "ZAO Co-Founder Attabotty Links",
+          "description": "Attabotty resources",
+          "icon": "user",
+          "color": "#c0392b",
+          "links": []
+        },
+        {
+          "name": "ZAO Co-Founder HURRIC4N3IKE Links",
+          "description": "HURRIC4N3IKE resources",
+          "icon": "user",
+          "color": "#d35400",
+          "links": []
+        },
+        {
+          "name": "ZAO Co-Founder Jango UU Links",
+          "description": "Jango UU resources",
+          "icon": "user",
+          "color": "#e67e22",
+          "links": []
+        },
+        {
+          "name": "ZAO Staff EZinCrypto Links",
+          "description": "EZinCrypto resources",
+          "icon": "user",
+          "color": "#f39c12",
+          "links": []
+        },
+        {
+          "name": "ZAO Staff Ohnahji B Links",
+          "description": "Ohnahji B resources",
+          "icon": "user",
+          "color": "#f1c40f",
+          "links": []
+        },
+        {
+          "name": "ZAO Community Member Jed XO Links",
+          "description": "Jed XO resources",
+          "icon": "user",
+          "color": "#2ecc71",
+          "links": []
+        },
+        {
+          "name": "ZAO Musician GodCloud",
+          "description": "GodCloud resources",
+          "icon": "music",
+          "color": "#1abc9c",
+          "links": []
+        }
+      ]
+    }
+  ],
+  "tags": {}
+}

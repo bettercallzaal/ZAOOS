@@ -5,7 +5,7 @@ import type { TeamMember } from './auth';
 export async function addGemba(member: TeamMember, text: string): Promise<string> {
   if (!text.trim()) return 'Say something after /gemba — what moved or got blocked?';
   const { data, error } = await db()
-    .from('stock_activity_log')
+    .from('activity_log')
     .insert({
       actor_id: member.id,
       entity_type: 'member',
@@ -22,7 +22,7 @@ export async function addGemba(member: TeamMember, text: string): Promise<string
 export async function addIdea(member: TeamMember, text: string): Promise<string> {
   if (!text.trim()) return 'Say something after /idea — what should we try?';
   const { data, error } = await db()
-    .from('stock_suggestions')
+    .from('suggestions')
     .insert({
       name: member.name,
       contact: `tg:${member.id}`,
@@ -46,7 +46,7 @@ export async function addNote(member: TeamMember, text: string): Promise<string>
   const today = new Date().toISOString().slice(0, 10);
   // Find the most recent upcoming meeting note, else create one for today.
   const { data: recent } = await db()
-    .from('stock_meeting_notes')
+    .from('meeting_notes')
     .select('id, notes, meeting_date')
     .gte('meeting_date', today)
     .order('meeting_date', { ascending: true })
@@ -59,14 +59,14 @@ export async function addNote(member: TeamMember, text: string): Promise<string>
   if (recent) {
     const newBody = recent.notes ? `${recent.notes}\n\n${stamp}` : stamp;
     const { error } = await db()
-      .from('stock_meeting_notes')
+      .from('meeting_notes')
       .update({ notes: newBody })
       .eq('id', recent.id);
     if (error) return `Could not append: ${error.message}`;
     noteId = recent.id;
   } else {
     const { data, error } = await db()
-      .from('stock_meeting_notes')
+      .from('meeting_notes')
       .insert({
         title: 'Async notes (bot-created)',
         meeting_date: today,

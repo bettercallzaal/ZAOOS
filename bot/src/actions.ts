@@ -1,5 +1,5 @@
 // Natural-language -> structured action -> Supabase write, with full attribution.
-// Every write logs {via_bot, requested_by, original_text, persona} in stock_activity_log.new_value.
+// Every write logs {via_bot, requested_by, original_text, persona} in activity_log.new_value.
 
 import { z } from 'zod';
 import { db } from './supabase';
@@ -168,7 +168,7 @@ async function logDelegation(args: {
   actionName: string;
 }): Promise<void> {
   try {
-    await db().from('stock_activity_log').insert({
+    await db().from('activity_log').insert({
       actor_id: args.requester.id,
       entity_type: args.entityType,
       entity_id: args.entityId,
@@ -189,7 +189,7 @@ async function logDelegation(args: {
 
 async function findMemberByName(name: string): Promise<TeamMember | null> {
   const { data } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .select('id, name, scope, role, telegram_id, telegram_username, active')
     .ilike('name', name)
     .neq('active', false)
@@ -245,7 +245,7 @@ export async function executeFromText(
           if (m) ownerId = m.id;
         }
         const { data, error } = await db()
-          .from('stock_todos')
+          .from('todos')
           .insert({
             title: action.title,
             owner_id: ownerId,
@@ -268,21 +268,21 @@ export async function executeFromText(
       }
       case 'update_todo_status': {
         const { data: match } = await db()
-          .from('stock_todos')
+          .from('todos')
           .select('id, title')
           .ilike('title', `%${action.title_query}%`)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
         if (!match) return { ok: false, reply: `No todo matched "${action.title_query}".` };
-        const { error } = await db().from('stock_todos').update({ status: action.status, updated_at: new Date().toISOString() }).eq('id', match.id);
+        const { error } = await db().from('todos').update({ status: action.status, updated_at: new Date().toISOString() }).eq('id', match.id);
         if (error) return { ok: false, reply: `Update failed: ${error.message}` };
         await logDelegation({ requester, action, originalText: userText, persona: usedPersona, entityType: 'todo', entityId: match.id, actionName: 'bot_update_todo_status' });
         return { ok: true, reply: `Set "${match.title}" to ${action.status}. via bot @ ${usedPersona}` };
       }
       case 'add_sponsor': {
         const { data, error } = await db()
-          .from('stock_sponsors')
+          .from('sponsors')
           .insert({
             name: action.name,
             track: action.track ?? 'local',
@@ -299,7 +299,7 @@ export async function executeFromText(
       }
       case 'update_sponsor_status': {
         const { data: match } = await db()
-          .from('stock_sponsors')
+          .from('sponsors')
           .select('id, name')
           .ilike('name', `%${action.name_query}%`)
           .order('created_at', { ascending: false })
@@ -309,14 +309,14 @@ export async function executeFromText(
         const updates: Record<string, unknown> = { status: action.status, updated_at: new Date().toISOString() };
         if (action.status === 'contacted' || action.status === 'in_talks') updates.last_contacted_at = new Date().toISOString();
         if (action.amount_committed !== undefined) updates.amount_committed = action.amount_committed;
-        const { error } = await db().from('stock_sponsors').update(updates).eq('id', match.id);
+        const { error } = await db().from('sponsors').update(updates).eq('id', match.id);
         if (error) return { ok: false, reply: `Update failed: ${error.message}` };
         await logDelegation({ requester, action, originalText: userText, persona: usedPersona, entityType: 'sponsor', entityId: match.id, actionName: 'bot_update_sponsor_status' });
         return { ok: true, reply: `Set ${match.name} to ${action.status}${action.amount_committed ? ` @ $${action.amount_committed}` : ''}. via bot @ ${usedPersona}` };
       }
       case 'add_artist': {
         const { data, error } = await db()
-          .from('stock_artists')
+          .from('artists')
           .insert({
             name: action.name,
             genre: action.genre ?? '',
@@ -332,21 +332,21 @@ export async function executeFromText(
       }
       case 'update_artist_status': {
         const { data: match } = await db()
-          .from('stock_artists')
+          .from('artists')
           .select('id, name')
           .ilike('name', `%${action.name_query}%`)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
         if (!match) return { ok: false, reply: `No artist matched "${action.name_query}".` };
-        const { error } = await db().from('stock_artists').update({ status: action.status, updated_at: new Date().toISOString() }).eq('id', match.id);
+        const { error } = await db().from('artists').update({ status: action.status, updated_at: new Date().toISOString() }).eq('id', match.id);
         if (error) return { ok: false, reply: `Update failed: ${error.message}` };
         await logDelegation({ requester, action, originalText: userText, persona: usedPersona, entityType: 'artist', entityId: match.id, actionName: 'bot_update_artist_status' });
         return { ok: true, reply: `Set ${match.name} to ${action.status}. via bot @ ${usedPersona}` };
       }
       case 'add_milestone': {
         const { data, error } = await db()
-          .from('stock_timeline')
+          .from('timeline')
           .insert({
             title: action.title,
             due_date: action.due_date,
@@ -360,7 +360,7 @@ export async function executeFromText(
         return { ok: true, reply: `Added milestone: "${data.title}" due ${data.due_date}. via bot @ ${usedPersona}` };
       }
       case 'log_contact': {
-        const table = action.entity_type === 'sponsor' ? 'stock_sponsors' : 'stock_artists';
+        const table = action.entity_type === 'sponsor' ? 'sponsors' : 'artists';
         let { data: match } = await db()
           .from(table)
           .select('id, name')
@@ -386,7 +386,7 @@ export async function executeFromText(
           match = created as { id: string; name: string };
         }
         const { data: contact, error } = await db()
-          .from('stock_contact_log')
+          .from('contact_log')
           .insert({
             entity_type: action.entity_type,
             entity_id: match.id,
@@ -407,7 +407,7 @@ export async function executeFromText(
           .filter(Boolean)
           .join('\n\n') || action.title;
         const { data, error } = await db()
-          .from('stock_activity_log')
+          .from('activity_log')
           .insert({
             actor_id: requester.id,
             entity_type: 'idea',
@@ -432,7 +432,7 @@ export async function executeFromText(
       }
       case 'add_note': {
         const { data, error } = await db()
-          .from('stock_meeting_notes')
+          .from('meeting_notes')
           .insert({
             title: action.title,
             notes: action.body,
@@ -445,7 +445,7 @@ export async function executeFromText(
           .single();
         if (error || !data) {
           // Fallback to activity log if meeting_notes shape doesn't match
-          await db().from('stock_activity_log').insert({
+          await db().from('activity_log').insert({
             actor_id: requester.id,
             entity_type: 'note',
             entity_id: null,

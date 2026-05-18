@@ -18,7 +18,7 @@ function normalizeUsername(u: string | undefined | null): string | null {
 
 export async function findMemberByTelegramId(telegramId: number): Promise<TeamMember | null> {
   const { data } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .select(SELECT)
     .eq('telegram_id', telegramId)
     .neq('active', false)
@@ -31,7 +31,7 @@ export async function findMemberByUsername(username: string): Promise<TeamMember
   const n = normalizeUsername(username);
   if (!n) return null;
   const { data } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .select(SELECT)
     .eq('telegram_username', n)
     .neq('active', false)
@@ -61,7 +61,7 @@ export async function resolveMember(
   // auto-link telegram_id so next lookup is the fast path
   if (byUsername.telegram_id !== telegramId) {
     await db()
-      .from('stock_team_members')
+      .from('team_members')
       .update({ telegram_id: telegramId })
       .eq('id', byUsername.id);
   }
@@ -84,7 +84,7 @@ export async function linkUsernameToMember(
 
   // 1. Exact (case-insensitive) match first
   const { data: exact, error } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .select(SELECT)
     .ilike('name', trimmed)
     .neq('active', false);
@@ -95,7 +95,7 @@ export async function linkUsernameToMember(
   // 2. Substring fallback ("thy rev" -> "Thy Revolution")
   if (candidates.length === 0) {
     const { data: subs } = await db()
-      .from('stock_team_members')
+      .from('team_members')
       .select(SELECT)
       .ilike('name', `%${trimmed}%`)
       .neq('active', false);
@@ -107,7 +107,7 @@ export async function linkUsernameToMember(
     const firstToken = trimmed.split(/\s+/)[0];
     if (firstToken && firstToken.length >= 3) {
       const { data: tok } = await db()
-        .from('stock_team_members')
+        .from('team_members')
         .select(SELECT)
         .ilike('name', `${firstToken}%`)
         .neq('active', false);
@@ -124,7 +124,7 @@ export async function linkUsernameToMember(
   const target = candidates[0];
 
   const { error: updateErr } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .update({ telegram_username: username })
     .eq('id', target.id);
   if (updateErr) return { ok: false, reason: `Link failed: ${updateErr.message}` };
@@ -139,7 +139,7 @@ export async function unlinkUsername(
   if (!username) return { ok: false, reason: 'Username required' };
 
   const { data, error } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .select(SELECT)
     .eq('telegram_username', username)
     .maybeSingle();
@@ -147,7 +147,7 @@ export async function unlinkUsername(
   if (!data) return { ok: false, reason: `@${username} not linked to anyone` };
 
   const { error: updateErr } = await db()
-    .from('stock_team_members')
+    .from('team_members')
     .update({ telegram_username: null, telegram_id: null })
     .eq('id', data.id);
   if (updateErr) return { ok: false, reason: `Unlink failed: ${updateErr.message}` };

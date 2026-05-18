@@ -1,30 +1,44 @@
 ---
 topic: agents
 type: spec
-status: research-complete
+status: decisions-locked
 last-validated: 2026-05-18
 related-docs: 247, 464, 474, 605d, 670, 671, 672
 tier: STANDARD
 ---
 
-# 673 - ZAO Craig Spec (live audio -> todo bot)
+# 673 - ZAOscribe Spec (live audio -> todo bot)
 
-> **Goal:** Replace the current 5-step voice-memo flow (record - download - upload - transcribe - paste) with a one-step live-capture bot. User sends a voice message or starts a live recording, ZAO Craig transcribes, extracts action items, and writes them to the cowork-zaodevz action tracker. Doc 670 seeded this; doc 671 Phase 3 informs the architecture; doc 672 P3.5 unblocks the integration.
+> **Goal:** Replace the 5-step voice-memo flow (record - download - upload - transcribe - paste) with a one-step Telegram bot. User sends a voice message, ZAOscribe transcribes, extracts action items via LLM, and writes them to the existing cowork-zaodevz tracker. Doc 670 seeded this; doc 671 Phase 3 informs the architecture; doc 672 P3.5 is the optional integration path (not required).
 
-## Key Decisions
+> **Naming note:** Originally drafted as "ZAO Craig" (after the Discord recording bot pattern). Renamed to **ZAOscribe** per Zaal 2026-05-18 - ZAO-native, no upstream-OSS confusion. The Telegram username is **@ZAOscribeBot**.
 
-| # | Decision | Rationale |
-|---|----------|-----------|
-| 1 | **Standalone bot @ZAOcraigBot, not a feature of @ZAOcoworkingBot** | Separation of concerns - Craig is a transcription pipeline, coworking is a task tracker. Different deps (audio libs), different update cadence, can graduate to own repo cleanly per [[project_zaoos_monorepo_as_lab]]. |
-| 2 | **Input modes (priority order)** | v1.0: forwarded Telegram voice messages (easiest, grammy has built-in support). v1.1: macOS Shortcut + iOS Shortcuts upload (5-second push from any audio source). v2.0 (DEFERRED): live Telegram voice chat audio - requires TDLib/MTProto, not Bot API. |
-| 3 | **Transcription: Whisper.cpp local on VPS for short clips, OpenAI Whisper API fallback for long-form** | Whisper.cpp on the existing VPS is $0/turn for clips under ~2 min (which is 95% of voice memos). Whisper API costs $0.006/min - cheap enough for the 5% edge case (30-min calls). Cost ceiling ~$2/month even with daily use. |
-| 4 | **Owner detection v1: LLM-guess from transcript context** | Most captures are 1-2 voices Zaal already knows (himself + Iman). LLM-as-classifier is good enough for 2-speaker. Upgrade to pyannote.audio diarization in v2 only if Zaal hits multi-speaker confusion. |
-| 5 | **Action emission: direct Anthropic API with `tool_choice: {type: "any"}`** | Builds on doc 671 Phase 3 architecture. Forces the LLM to emit ONLY tool calls (no narrated preamble), which is what we want from a transcription pipeline. Single `create_action_item` tool with strict schema. |
-| 6 | **Writes go to cowork-zaodevz via HTTP API, not direct Octokit** | Per [[doc 672]] P3.5 - the cowork-zaodevz tracker is the single source of truth. Multiple bots (Craig, Hermes, ZOE) should write through a thin REST surface, NOT each maintain their own Octokit credentials + SHA dance. **This is a prerequisite for ZAO Craig.** |
-| 7 | **Privacy: explicit "recording captured" prefix + 24h auto-delete of raw audio** | When Craig receives a voice, reply within 2 seconds: `[CAPTURED] transcribing 0:32 audio from <user>...`. After processing, the raw audio is deleted from disk (transcript kept). No always-on listening, no background capture. |
-| 8 | **Consent model: 1-time per allowlisted user, persistent** | First voice message from a roster member gets `consent prompt - reply "yes I consent" to enable audio capture going forward`. Stored as `consented_at` in user prefs. Aligns with the team's existing roster (Zaal/Iman/ThyRev/Samantha) - no new opt-in needed beyond that. |
+## Locked Decisions (Zaal, 2026-05-18)
 
-## Architecture
+| # | Decision | Status |
+|---|----------|--------|
+| A | **Standalone backend, no shared REST API** - the bot is its own thing, fresh codebase, fresh identity | LOCKED |
+| B | **Telegram username: @ZAOscribeBot** | LOCKED |
+| C | **New repo: `bettercallzaal/zaoscribe`** (not inside cowork-zaodevz, not inside ZAOOS) | LOCKED |
+| D | **Raw audio kept 24h, then auto-deleted** by a cron sweep | LOCKED |
+| E | **LLM provider for action extraction: CASCADE (Haiku 4.5 -> Opus 4.7) with `tool_choice` schema enforcement** | LOCKED via sub-agent research |
+| F | **Auto-write items with confidence >0.8**, queue low-confidence for one-tap confirm | LOCKED |
+| G | **Transcripts stored in git** at `bettercallzaal/zaoscribe/data/transcripts/<date>-<sender>-<captureId>.md` (frontmatter + body) | LOCKED |
+| H | **Multilingual auto-detect from day one** (Whisper.cpp medium / large-v3 multilingual model) | LOCKED |
+
+## Architecture (v1)
+
+### Write path - NO new REST API needed
+
+Since Decision A locked "standalone, fresh own backend," ZAOscribe does NOT depend on a new `/api/v1/items` endpoint on cowork-zaodevz (the doc 672 P3.5 idea). Instead, **ZAOscribe writes directly to `cowork-zaodevz/data/actions.json` via Octokit + SHA-dance** - the same pattern the cowork-zaodevz bot uses today (see `cowork-zaodevz/agent/src/actions-store.ts`).
+
+Two GitHub credentials live on the same VPS:
+- `cowork-zaodevz/agent/.env` has GITHUB_TOKEN with write to its repo (already configured).
+- `zaoscribe/agent/.env` gets its own GITHUB_TOKEN with write to `cowork-zaodevz/data/actions.json` ONLY (fine-grained PAT scoped to that file path - addresses doc 672 SEC.1).
+
+Trade-off: two writers on the same JSON file means SHA conflicts under concurrent edits. The 409-retry loop already handles this (`mutateActions` in `actions-store.ts`). At 4 users + 10 captures/day there will be ~0 real conflicts.
+
+Future option: if conflicts become a real problem OR Hermes/ZOE also want to write, revisit and build the REST API (doc 672 P3.5). For now: direct Octokit, simpler.
 
 ### High-Level Flow
 
@@ -32,51 +46,61 @@ tier: STANDARD
 [user] ---voice message---> [Telegram]
                                  |
                                  v
-                       [@ZAOcraigBot grammy poll]
+                       [@ZAOscribeBot grammy poll]
                                  |
                                  v
-              ┌──────────────────┴──────────────────┐
-              |  1. Download audio file (TG API)    |
-              |  2. Transcribe (Whisper local/API)  |
-              |  3. Extract actions (Anthropic API  |
-              |     with tool_choice: any)          |
-              |  4. POST each action to cowork API  |
-              |  5. Reply summary + item IDs        |
-              |  6. Delete raw audio file           |
-              └─────────────────────────────────────┘
+              ┌──────────────────┴─────────────────────┐
+              |  1. Download audio file (TG API)       |
+              |  2. Transcribe (Whisper.cpp multi-lang)|
+              |  3. Extract actions (LLM, pattern TBD  |
+              |     per E - sub-agent in flight)       |
+              |  4. Confidence-gate (>0.8 auto-write,  |
+              |     lower = DM with confirm button)    |
+              |  5. Octokit write to cowork actions    |
+              |  6. Commit transcript .md to own repo  |
+              |  7. Reply with summary + item IDs      |
+              |  8. Queue raw audio for 24h cleanup    |
+              └────────────────────────────────────────┘
                                  |
-                                 v
-                     [cowork-zaodevz /api/v1/items]
-                                 |
-                                 v
-                       [data/actions.json on GitHub]
+              ┌──────────────────┴─────────────────────┐
+              |    cowork-zaodevz/data/actions.json    |
+              |    (existing, shared with cowork bot)  |
+              └────────────────────────────────────────┘
 ```
 
 ### Components
 
-- **@ZAOcraigBot** - separate Telegram bot, separate repo (`bettercallzaal/zao-craig` or stays in `songchaindao-dot/cowork-zaodevz` as a sibling to `agent/` - decision needed)
-- **Whisper.cpp** - compiled locally on VPS 1. Already battle-tested, ~5x realtime on the box's CPU. Models: `ggml-base.en.bin` (74 MB, fast) for English, `ggml-small.en.bin` (244 MB) if accuracy lags
-- **Anthropic SDK** - direct API, paid via Zaal's key (NOT Claude Max CLI subprocess - per doc 671 Phase 3 rationale: tool_choice + zero-tool-leak surface)
-- **cowork-zaodevz REST API** - new addition required FIRST. Bearer-auth `/api/v1/items` POST endpoint
-- **systemd user unit** - `zao-craig.service`, mirrors `zaocoworking-bot.service` layout on VPS
+- **@ZAOscribeBot** - Telegram bot, grammy framework. Allowlist = same roster as cowork-zaodevz (Zaal, Iman, ThyRev, Samantha).
+- **Whisper.cpp** - compiled on VPS 1. Model: `ggml-medium.bin` (1.5 GB, multilingual, good accuracy/speed). Fallback to `ggml-large-v3` if accuracy issues.
+- **LLM extractor** - pattern + provider TBD per Decision E sub-agent. Will land before P1 codes.
+- **Octokit cowork client** - shared logic re-implemented in zaoscribe (small enough to copy; ~50 lines of SHA-dance).
+- **systemd user unit** - `zaoscribe.service` on VPS 1, sibling to `zaocoworking-bot.service`.
 
-### File Layout (proposed)
+### Repo Layout
 
 ```
-zao-craig/
+bettercallzaal/zaoscribe/
+├── README.md
+├── CLAUDE.md
+├── .env.example
 ├── agent/
-│   ├── package.json
+│   ├── package.json                  # zaoscribe-agent v0.1.0
 │   ├── tsconfig.json
-│   ├── .env.example
 │   └── src/
-│       ├── index.ts                 # grammy entry
-│       ├── audio.ts                 # download + Whisper wrapper
-│       ├── transcribe.ts            # local-vs-API routing
-│       ├── extract.ts               # Anthropic API + tool_choice
-│       ├── cowork-client.ts         # HTTP wrapper for cowork API
-│       ├── consent.ts               # one-time consent storage
+│       ├── index.ts                  # grammy entry + bot.on('message:voice')
+│       ├── audio.ts                  # download + ffmpeg normalize
+│       ├── transcribe.ts             # Whisper.cpp wrapper
+│       ├── extract.ts                # LLM extraction (pattern from E)
+│       ├── cowork-write.ts           # Octokit SHA-dance to cowork-zaodevz
+│       ├── transcript-store.ts       # commit transcript .md to own repo
+│       ├── consent.ts                # one-time consent + storage
+│       ├── cleanup.ts                # 24h audio file sweep
 │       └── types.ts
-└── README.md
+├── data/
+│   └── transcripts/                  # markdown frontmatter + body, git-tracked
+│       └── 2026-05/                  # bucket by month
+└── scripts/
+    └── install-whisper.sh            # compile whisper.cpp + download model
 ```
 
 ## Pipeline (Detailed)
@@ -87,26 +111,40 @@ zao-craig/
 bot.on('message:voice', async (ctx) => {
   if (!(await isAllowedSender(ctx))) return;
   if (!(await hasConsented(ctx.from.id))) return askForConsent(ctx);
-  await ctx.reply(`[CAPTURED] transcribing ${ctx.message.voice.duration}s audio...`);
-  const fileId = ctx.message.voice.file_id;
-  // ... download + process
+  const dur = ctx.message.voice.duration;
+  const capId = await ctx.reply(`[CAPTURED] transcribing ${dur}s audio...`);
+  await processVoice(ctx, ctx.message.voice.file_id, capId.message_id);
 });
 ```
 
 ### Step 2 - Transcribe
 
-Route by duration:
-- Under 120 seconds: `whisper.cpp` local. Spawn subprocess, ~5-15s for 1min audio.
-- 120 seconds and up: OpenAI Whisper API (`whisper-1`). Faster for long files, $0.006/min.
+```typescript
+async function transcribe(audioPath: string, duration: number): Promise<{ text: string; language: string }> {
+  // v1 path: always Whisper.cpp local (per Decision H multilingual)
+  // Fallback to OpenAI Whisper API if local fails OR duration > 300s
+  const args = [
+    '-m', '/opt/whisper.cpp/models/ggml-medium.bin',
+    '-l', 'auto',            // auto language detect
+    '-f', audioPath,
+    '-otxt',
+    '--print-progress', 'false',
+  ];
+  // ... spawn whisper.cpp, parse output
+}
+```
 
-Output: plain text transcript + (optional) word-level timestamps.
+### Step 3 - Extract (CASCADE pattern, per Decision E sub-agent)
 
-### Step 3 - Extract actions
+Sub-agent research finding (2026-05-18): Production meeting assistants (Granola, Fireflies, Otter) do NOT use multi-model voting ensembles. They ship single-model with confidence scoring + downstream validation. Multi-model voting adds 3x latency + flaky dedup logic for marginal (~2-5%) recall gains.
+
+The pattern that DOES match Zaal's "compare with another LLM" instinct is CASCADE: cheap model first, expensive model as fallback when confidence is low. The escalation gives you the multi-model signal without paying 3x always.
 
 ```typescript
-const tools: Anthropic.Tool[] = [{
-  name: 'create_action_items',
-  description: 'Emit zero or more action items extracted from the transcript.',
+// Both calls use the SAME tool schema for direct comparability.
+const TOOL: Anthropic.Tool = {
+  name: 'extract_action_items',
+  description: 'Extract zero or more action items from the transcript.',
   input_schema: {
     type: 'object',
     properties: {
@@ -115,159 +153,250 @@ const tools: Anthropic.Tool[] = [{
         items: {
           type: 'object',
           properties: {
-            title: { type: 'string', description: 'Action verb + object, e.g. "ship v2.13 to VPS"' },
-            owner: { type: 'string', enum: ['Zaal','Iman','ThyRev','Samantha','Both','Open'] },
-            due: { type: 'string', description: 'YYYY-MM-DD or empty' },
-            notes: { type: 'string', description: 'context from the transcript' },
+            title:      { type: 'string' },
+            owner:      { type: 'string', enum: ['Zaal','Iman','ThyRev','Samantha','Both','Open'] },
+            due:        { type: 'string', description: 'YYYY-MM-DD or empty' },
+            notes:      { type: 'string' },
             confidence: { type: 'number', minimum: 0, maximum: 1 },
           },
           required: ['title','owner','confidence'],
-        }
-      }
+        },
+      },
     },
-    required: ['items']
-  }
-}];
+    required: ['items'],
+  },
+};
 
-const resp = await anthropic.messages.create({
-  model: 'claude-opus-4-7',
-  max_tokens: 2048,
-  system: PERSONA,
-  messages: [{ role: 'user', content: `Transcript from ${speakerLabel}:\n\n${transcript}` }],
-  tools,
-  tool_choice: { type: 'tool', name: 'create_action_items' },
-});
+async function extractItems(transcript: string, senderHint: string): Promise<ExtractedItem[]> {
+  // Tier 1: Haiku 4.5 (cheap, fast)
+  const haiku = await anthropic.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 2048,
+    system: EXTRACTOR_PERSONA,
+    tools: [TOOL],
+    tool_choice: { type: 'tool', name: 'extract_action_items' },
+    messages: [{ role: 'user', content: `Sender hint: ${senderHint}\n\nTranscript:\n${transcript}` }],
+  });
+  const haikuItems = readToolInput(haiku);
+
+  // Quality gate: escalate to Opus if Haiku is shaky.
+  const allConfident = haikuItems.every((i) => i.confidence >= 0.75);
+  const hasMalformed = !validateAll(haikuItems);
+  const hasRelativeDate = haikuItems.some((i) => i.due && !/^\d{4}-\d{2}-\d{2}$/.test(i.due));
+  if (allConfident && !hasMalformed && !hasRelativeDate) {
+    return haikuItems;
+  }
+
+  // Tier 2: Opus 4.7 (slower, smarter, handles pronouns + relative dates + ambiguity)
+  const opus = await anthropic.messages.create({
+    model: 'claude-opus-4-7',
+    max_tokens: 2048,
+    system: EXTRACTOR_PERSONA + '\n\nThe cheaper model returned low-confidence or malformed output on this transcript. Be especially careful with relative dates ("next Thursday" -> resolve to ISO) and pronouns.',
+    tools: [TOOL],
+    tool_choice: { type: 'tool', name: 'extract_action_items' },
+    messages: [{ role: 'user', content: `Sender hint: ${senderHint}\n\nTranscript:\n${transcript}` }],
+  });
+  return readToolInput(opus);
+}
 ```
 
-The `tool_choice: {type: 'tool', name: ...}` is a STRONGER constraint than `{type: 'any'}` - forces this exact tool. Per doc 671 verification, the model cannot emit prose before/after the tool call.
+**Why this wins:**
+- 60-70% of captures land at Haiku (~$0.001 each). Opus only fires when needed.
+- `tool_choice: {type: 'tool', name: ...}` is the STRONGEST constraint - the model literally cannot emit text outside the tool call. Doc 671's hallucination class is structurally impossible here.
+- Both tiers use the SAME schema, so escalation is a swap, not a rewrite.
+- v2 path (deferred): A/B log Haiku + Opus in parallel for 2 weeks, measure recall delta empirically, decide if a TRUE ensemble or judge pattern is worth adding.
 
-### Step 4 - Write to cowork-zaodevz
+**Cost at 10 captures/day, ~90s avg transcript (~2k tokens):**
+- 100% Haiku: ~$0.30/mo
+- 100% Opus: ~$3/mo
+- Cascade (70/30 split): ~$1/mo
+
+**Latency:**
+- Haiku alone: ~1-2s median
+- Cascade worst-case (Haiku + Opus): ~5-7s
+- All within Telegram's "typing..." indicator UX
+
+### Step 4 - Confidence gate (Decision F)
 
 ```typescript
-for (const item of suggestedItems) {
-  if (item.confidence < 0.5) {
-    queueForReview(item); // low-confidence -> ask user before writing
-    continue;
+for (const item of extractedItems) {
+  if (item.confidence >= 0.8) {
+    await coworkWrite.createItem(item);   // auto-write
+    confirmedIds.push(coworkWrite.lastId);
+  } else {
+    queuedForConfirm.push(item);          // DM with confirm button
   }
-  await coworkClient.createItem({
-    title: item.title,
-    owner: item.owner,
-    due: item.due,
-    notes: `[ZAO Craig ${captureId}] ${item.notes}`,
-    createdBy: senderDisplayName,
+}
+```
+
+### Step 5 - Write to cowork-zaodevz
+
+```typescript
+// cowork-write.ts - mirrors cowork-zaodevz/agent/src/actions-store.ts pattern
+const OWNER = 'songchaindao-dot';
+const REPO = 'cowork-zaodevz';
+const PATH = 'data/actions.json';
+
+async function createItem(item: ExtractedItem): Promise<string> {
+  // SHA dance with up to 3 retries on 409 (concurrent writes from cowork bot)
+  return mutateActions(async (data) => {
+    const newItem = makeActionItem({
+      title: item.title,
+      owner: item.owner,
+      createdBy: `zaoscribe (${item.captureSender})`,
+      notes: `[ZAOscribe ${item.captureId}] ${item.notes}`,
+      due: item.due || undefined,
+    }, data.items);
+    data.items.push(newItem);
+    return {
+      data,
+      commitMessage: `zaoscribe: extract #${newItem.id} (${newItem.owner}) ${newItem.title}`,
+      result: newItem.id,
+    };
   });
 }
 ```
 
-### Step 5 - Reply
+### Step 6 - Transcript audit trail
+
+```typescript
+const transcriptMd = `---
+captureId: ${captureId}
+sender: ${senderName}
+duration: ${duration}s
+language: ${detectedLang}
+extractedIds: [${confirmedIds.join(',')}]
+queuedIds: [${queuedForConfirm.length}]
+---
+
+${rawTranscript}
+`;
+await octokit.repos.createOrUpdateFileContents({
+  owner: 'bettercallzaal',
+  repo: 'zaoscribe',
+  path: `data/transcripts/${monthBucket}/${captureId}.md`,
+  message: `zaoscribe: capture ${captureId} from ${senderName}`,
+  content: Buffer.from(transcriptMd).toString('base64'),
+});
+```
+
+### Step 7 - Reply
 
 ```
-[CAPTURED] 1:23 audio from Zaal
+[CAPTURED] 1:23 audio from Zaal (lang=en)
 transcribed (12 lines)
 
-added 3 items:
-  #26 (Iman) review the RSVPizza repo
+added 3 items to cowork:
+  #26 (Iman) review the RSVPizza repo - due 2026-05-22
   #27 (Zaal) ship Craig v1 spec to VPS
   #28 (Both) cohost ZABAL Games drop Wednesday
 
-flagged 1 low-confidence (reply "yes" to add):
-  ?? (?)  "...maybe we should also do that flyer thing"
+flagged 1 low-confidence (tap to confirm):
+  [confirm "?? (?) maybe also do that flyer thing"]
 
-transcript: <link to git-tracked transcript file>
+transcript: github.com/bettercallzaal/zaoscribe/blob/main/data/transcripts/2026-05/cap-2026-05-18-1430-zaal.md
 ```
 
-### Step 6 - Cleanup
+### Step 8 - Cleanup
 
-Raw audio file deleted from VPS disk. Transcript pushed to `cowork-zaodevz/data/transcripts/<date>-<sender>-<captureId>.md` via Octokit (audit trail + searchable via grep). Optional: also embed for future RAG per doc 474 patterns.
+```typescript
+// cleanup.ts - cron every hour
+const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+for (const file of audioFiles()) {
+  if (file.mtime < cutoff) await fs.unlink(file.path);
+}
+```
 
 ## Build Phases
 
+P0 (REST API) is REMOVED - Decision A killed it. Direct Octokit write means no backend prereq.
+
 | Phase | Effort | Output | Blockers |
 |-------|--------|--------|----------|
-| **P0 - cowork-zaodevz REST API** | 4-6 hr | `POST /api/v1/items` + bearer auth via `HERMES_API_KEY` env. Webhook out optional. | None - prerequisite for Craig + Hermes integration per doc 672 P3.5. |
-| **P1 - Craig v1.0 (TG voice forward)** | 6-8 hr | @ZAOcraigBot live on VPS. Whisper local, Anthropic API extract, posts to cowork API. | P0. Anthropic API key (Zaal's existing). |
-| **P2 - macOS / iOS Shortcut** | 2-3 hr | Native share-sheet target on Mac + iPhone. Tap "share to Craig" from any voice memo, recording, or call. | P1. |
-| **P3 - low-confidence review flow** | 2 hr | Items below threshold get queued, bot DMs Zaal a button to confirm/reject. | P1. |
-| **P4 - diarization (multi-speaker)** | 6-10 hr | pyannote.audio adds speaker labels to transcripts. Useful when more than 2 voices. | P1. Models hit ~2GB disk. |
-| **P5 - live TG voice chat capture** | 15-20 hr | TDLib client (not Bot API) joins a voice chat, records, processes in 30-second windows. | P4. Major scope - decide if Zaal actually wants it before building. |
+| **P0 - Repo + skeleton** | 2 hr | `bettercallzaal/zaoscribe` created, agent skeleton committed, `.env.example` documented, Whisper install script | None |
+| **P1 - Core capture loop** | 6-8 hr | @ZAOscribeBot live on VPS. TG voice receive, Whisper local transcribe, LLM extract (per E), direct Octokit write to cowork actions, transcript commit, summary reply | P0 + Decision E resolved + new GH PAT for the cross-repo write |
+| **P2 - Confidence-gate UI** | 2-3 hr | Inline-keyboard confirm buttons for low-confidence items (matches cowork v2.13 callback pattern) | P1 |
+| **P3 - Mac / iOS Shortcut** | 2-3 hr | Native share-sheet target on Mac + iPhone. Tap "share to ZAOscribe" from any audio source | P1 |
+| **P4 - Multilingual edge cases** | 2-3 hr | Handle ffmpeg-normalize step before Whisper for .oga/.ogg variants from non-Telegram sources; per-language model swap if needed | P3 |
+| **P5 - Diarization (multi-speaker)** | 6-10 hr | pyannote.audio adds speaker labels. Useful for multi-voice meetings. Models ~2GB disk. | P1. Defer until clear need. |
+| **P6 - Live TG voice chat capture** | 15-20 hr | TDLib client (NOT Bot API) joins voice chats, records, processes in 30-sec windows | P5. Major scope. Defer until clear need. |
 
-P0 + P1 + P2 = realistically ~12-15 hours total. Single sprint.
-
-## Open Decisions (Block These Before Coding)
-
-| # | Decision | Options | Default |
-|---|----------|---------|---------|
-| A | **REST API on cowork-zaodevz first, or stub backend for Craig?** | (a) Build /api/v1/items first (P0), then Craig integrates. (b) Craig writes Octokit directly, refactor later. | **(a) - clean architecture; doc 672 P3.5 already flags the API gap. Hermes will use it too.** |
-| B | **Bot username** | `@ZAOcraigBot`, `@zao_craig_bot`, `@zaocraig`. | `@ZAOcraigBot` - matches `@ZAOcoworkingBot` casing. Verify availability on BotFather. |
-| C | **Repo location** | (a) New `bettercallzaal/zao-craig` repo. (b) Add to `songchaindao-dot/cowork-zaodevz` as sibling to agent/. (c) Add as a sibling in ZAOOS `bot/` directory. | **(a) - matches the per-bot-per-repo pattern; clean graduation per ZAOOS lab model.** |
-| D | **Raw audio retention** | (a) Delete immediately after transcript. (b) Keep 24h then delete. (c) Keep indefinitely on encrypted disk. | **(b) - 24h window for debug if something goes wrong, then delete.** |
-| E | **Anthropic key vs Claude Max CLI** | Doc 671 Phase 3 said API direct. But CLI is $0 marginal cost. | **API direct - the `tool_choice: tool` guarantee is THE feature here. Cost at ~10 captures/day, Opus = ~$3/month. Within budget.** |
-| F | **Bot OWNS the suggestion or always confirms?** | (a) High-confidence (>0.8) writes directly, low-confidence asks. (b) Always asks the user to confirm. | **(a) - matches /autoconfirm pattern already shipped; reduces friction.** |
-| G | **Where transcripts live (long-term)** | (a) `cowork-zaodevz/data/transcripts/*.md` (git audit). (b) Supabase. (c) Local VPS disk only. | **(a) - aligns with the project's existing "everything in git" pattern; cheap, searchable, audit-trail-friendly.** |
-| H | **Multi-language support** | English only v1? Or `--language auto`? | **English-only v1 (matches Zaal+Iman's working language). Auto in P4+.** |
+**P0 + P1 + P2 = ~10-13 hours = one sprint.** P3 is fast-follow.
 
 ## Cost Model
 
-| Volume | Whisper (local) | Anthropic Opus extract | Total/month |
-|--------|----------------|------------------------|-------------|
-| 10 captures/day, avg 90s each | $0 (CPU only) | ~$3 ($0.01/extract) | $3 |
-| 30 captures/day, avg 90s | $0 | ~$9 | $9 |
-| 100 captures/day, avg 90s | ~$2 (occasional API fallback for long ones) | ~$30 | $32 |
+| Volume | Whisper.cpp local | LLM extract (TBD provider) | Total/month |
+|--------|------------------|----------------------------|-------------|
+| 10/day x 90s | $0 | ~$1/mo (cascade 70/30) | ~$1/mo |
+| 30/day x 90s | $0 | ~$3/mo (cascade 70/30) | ~$3/mo |
 
-Cap below Zaal's existing Anthropic API budget. The 4-person team is unlikely to exceed 30/day in practice.
+Multilingual model is heavier than English-only (`ggml-medium.bin` 1.5 GB vs `ggml-base.en.bin` 74 MB), so VPS RAM + disk cost is the bigger constraint than transcription dollars. CPU time for 90s audio: ~10-15 sec on Hostinger KVM 2 with medium model. Acceptable.
 
 ## Risk Register
 
 | Risk | Probability | Mitigation |
 |------|-------------|------------|
-| Whisper local accuracy issues with accents / poor mic | Medium | Fallback to OpenAI Whisper API on user-flag. Or upgrade base model -> small.en. |
-| LLM extracts noise as actions ("uh let me think about that" -> action item) | Medium | Confidence threshold + low-confidence review queue (P3). Persona examples teach the LLM to skip filler. |
-| Owner-detection wrong | Medium | Item is still created; user can /assign correctly. The cost of a wrong owner is low (one /assign). |
-| Voice messages contain sensitive content (BCZ client calls, finance) | Medium | 24h raw-audio retention + opt-in consent. Don't ingest unallowlisted senders. |
-| Anthropic API outage | Low | Queue locally, retry. If down >30 min, alert Zaal via cowork-zaodevz bot. |
-| Whisper.cpp crashes on edge file formats (.oga, .ogg variants) | Medium | ffmpeg normalize step before whisper call. |
+| SHA conflicts between zaoscribe + cowork writing to same actions.json | Low (4 users, low rate) | 3x retry in mutateActions already; revisit if real |
+| LLM extracts noise as actions ("um let me think") | Medium | Confidence gate + low-confidence review queue (P2). Persona examples teach skip-filler. |
+| Owner-detection wrong | Medium | Item is still created; user /assign correctly. Single-tap fix cost. |
+| Voice contains sensitive content (BCZ client calls, finance) | Medium | 24h raw retention + opt-in consent + roster gating. Don't ingest unallowlisted senders. |
+| LLM provider outage | Low | Queue locally, retry. If E lands as ensemble, partial output from healthy providers still ships. |
+| Whisper.cpp crashes on weird audio format | Medium | ffmpeg normalize step before whisper call (P4) |
+| New GitHub PAT needed for cross-repo write | Cert | Just generate one scoped to `cowork-zaodevz/data/actions.json` only. Doc the procedure in zaoscribe README. |
 
 ## Integration Touchpoints
 
-- **cowork-zaodevz**: needs the new `/api/v1/items` endpoint (P0). Bearer token `HERMES_API_KEY`. POST schema mirrors the json-suggest shape that the bot already understands.
-- **Hermes**: same API key, same endpoint. When Hermes ships a PR fix, it can POST a `done` item with the PR URL in notes.
-- **ZOE**: future. When ZOE handles a tip-to-PR flow, it can also POST status items.
-- **ZAOOS doc 670 action 12** ("send Iman the transcript"): Craig pattern is the long-term solution - just send him voice messages, get transcripts auto-piped.
+- **cowork-zaodevz**: ZAOscribe writes new items directly to its `data/actions.json` via Octokit. ZAOscribe items show in `/mine` for the assigned owner just like manual ones. No coordination required beyond agreeing not to break the JSON schema (which is enforced by `actions-store.ts` types).
+- **Bonfire** ([[project_zoe_soul_architecture]] + ZABAL knowledge graph): future. Transcripts in `bettercallzaal/zaoscribe/data/transcripts/` are ingestion-ready for the Bonfire pipeline. Each transcript has `extractedIds` in frontmatter for cross-graph linking.
+- **Hermes**: complementary, not coupled. Hermes ships PR fixes; ZAOscribe captures intent + decisions from voice.
+- **ZOE**: ZOE drafts content / does recall. ZAOscribe captures voice. If ZOE wants to "summarize this week's voice captures" later, point her at the transcripts dir.
+
+## Cross-Repo Findings
+
+`grep.app` + `searchGitHub bettercallzaal`:
+- No prior audio-capture bot in the ZAO ecosystem. ZAOscribe is the first.
+- The cowork-zaodevz `actions-store.ts` SHA-dance pattern is the template to mirror.
+- ZOE has voice-output research (doc 605d) but not voice-input. Different problem.
 
 ## Next Actions
 
 | # | Action | Owner | Effort | By When |
 |---|--------|-------|--------|---------|
-| 1 | Lock the 8 open decisions A-H above. Most have defaults - just confirm. | Zaal | 1/10 | Before coding starts |
-| 2 | Register `@ZAOcraigBot` on BotFather + grab the token | Zaal | 1/10 | Before P1 |
-| 3 | Ship P0: `POST /api/v1/items` on cowork-zaodevz with `HERMES_API_KEY` bearer auth | Zaal | 4/10 | Before P1 |
-| 4 | Create `bettercallzaal/zao-craig` repo (assuming Decision C = option a) | Zaal | 1/10 | Before P1 |
-| 5 | Ship P1: Craig v1.0 (TG voice forward + Whisper local + Anthropic extract + cowork POST) | Zaal | 7/10 | This week if decisions lock today |
-| 6 | Ship P2: macOS/iOS Shortcuts upload | Zaal | 3/10 | Next sprint |
-| 7 | Test with Iman: send a 30-second voice memo containing 2-3 actions, verify they land in /mine | Zaal + Iman | 1/10 | After P1 |
-| 8 | Update memory `project_zaocoworkingbot.md` to add Craig as a sibling bot in the ZAO operating-surface taxonomy | Zaal | 1/10 | After P1 ships |
-| 9 | Decommission the current 5-step voice-memo flow from Zaal's habits (delete Mac Shortcut, retrain reflex) | Zaal | 1/10 | After P1 stable for a week |
+| 1 | ~~Sub-agent: research multi-LLM ensemble vs single-provider extraction patterns~~ DONE - locked Cascade (Haiku -> Opus) | Claude | done | 2026-05-18 |
+| 2 | Register `@ZAOscribeBot` on BotFather + grab token | Zaal | 1/10 | Before P0 |
+| 3 | Generate fine-grained GH PAT scoped to `songchaindao-dot/cowork-zaodevz/data/actions.json` write only | Zaal | 1/10 | Before P1 |
+| 4 | Create `bettercallzaal/zaoscribe` GitHub repo + push the skeleton | Zaal | 2/10 | This week |
+| 5 | Compile Whisper.cpp + download multilingual medium model on VPS (~1.5 GB disk + ~5 min build) | Zaal | 2/10 | Before P1 |
+| 6 | Ship P0 (skeleton) + P1 (core capture loop) + P2 (confidence UI) | Zaal | 9/10 | One sprint |
+| 7 | Test with Iman: send 30-sec voice memo with 2-3 actions, verify they land in `/mine` on the cowork bot | Zaal + Iman | 1/10 | After P1 |
+| 8 | Update `project_zaocoworkingbot.md` memory: add ZAOscribe as a sibling bot in the ZAO bot taxonomy | Claude | 1/10 | After P1 ships |
+| 9 | Update [[feedback_prefer_claude_max_subscription]] memory based on final E decision (CLI vs API) | Claude | 1/10 | After E resolves |
+| 10 | Decom Zaal's manual 5-step voice-memo flow after P1 stable for 1 week | Zaal | 1/10 | Week+1 |
 
 ## Also See
 
-- [Doc 670](../../events/670-iman-call-may18-craig-pizzadao/) - **SEED** for ZAO Craig (Iman call, thread 1)
-- [Doc 671](../671-llm-fictional-permission-hallucination-fixes/) - Phase 3 architecture (direct Anthropic API + `tool_choice`) directly used in this spec
-- [Doc 672](../672-zaocoworking-bot-audit-postv213/) - P3.5 (REST API) is the prerequisite this spec depends on
-- [Doc 605d](../605-agentic-tooling-may-2026/605d-voice-agents/) - voice-agents survey; complementary (ZOE voice REPLY, not Craig voice CAPTURE)
-- [Doc 474](../474-bcz101-bot-transcript-rag/) - transcript storage + RAG patterns; future tie-in for searching past Craig captures
-- [Doc 464](../464-zoe-telegram-reply-context-ship-pr/) - grammy Telegram patterns (consent, conversation buffer)
-- [Doc 247](../247-top-50-local-ai-models-2026/) - local model survey; informs Whisper.cpp choice
-- [Doc 661](../661-zaocoworkingbot-go-live/) - sibling bot deployment patterns
+- [Doc 670](../../events/670-iman-call-may18-craig-pizzadao/) - **SEED** for this bot (Iman call, thread 1)
+- [Doc 671](../671-llm-fictional-permission-hallucination-fixes/) - Phase 3 architecture (direct LLM API + `tool_choice`) informs Decision E
+- [Doc 672](../672-zaocoworking-bot-audit-postv213/) - P3.5 was the REST API path; Decision A skipped it for now. SEC.1 (PAT scoping) applies to the new ZAOscribe write PAT.
+- [Doc 605d](../605-agentic-tooling-may-2026/605d-voice-agents/) - voice agents survey (ZOE voice REPLY, not ZAOscribe voice CAPTURE - complementary)
+- [Doc 474](../474-bcz101-bot-transcript-rag/) - transcript storage patterns, future RAG tie-in
+- [Doc 464](../464-zoe-telegram-reply-context-ship-pr/) - grammy + Telegram patterns
+- [Doc 247](../247-top-50-local-ai-models-2026/) - local model survey, informs Whisper.cpp choice
 - [project_zaocoworkingbot](../../../../../.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/project_zaocoworkingbot.md) - VPS + roster context
-- [project_hermes_canonical](../../../../../.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/project_hermes_canonical.md) - the framework pattern Craig should mirror
+- [project_hermes_canonical](../../../../../.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/project_hermes_canonical.md) - the framework pattern this bot mirrors
 
 ## Sources
 
-- doc 670 (2026-05-18 Iman call transcript - Craig idea was raised verbatim)
-- doc 671 (3-dispatch research, recommended Anthropic API direct + `tool_choice` for hallucination-free tool calls)
-- doc 672 (P3.5 REST API gap surfaced as a prereq)
+- doc 670 (2026-05-18 Iman call transcript - audio bot idea verbatim)
+- doc 671 (3-dispatch research, recommended Anthropic API direct + `tool_choice` to remove hallucination surface)
+- doc 672 (cowork-zaodevz audit, post-v2.13)
 - [Whisper.cpp GitHub](https://github.com/ggerganov/whisper.cpp) - local transcription, MIT
 - [OpenAI Whisper API pricing](https://openai.com/api/pricing/) - $0.006/min as of 2026
 - [pyannote-audio](https://github.com/pyannote/pyannote-audio) - speaker diarization, MIT
-- [Anthropic tool_choice docs](https://platform.claude.com/docs/agents-and-tools/tool-use/define-tools) - `tool_choice` semantics for forced tool calls
 - [grammy voice handling](https://grammy.dev/guide/messages-and-media) - bot.on('message:voice') pattern
+
+## Changelog
+
+- 2026-05-18 first draft as "ZAO Craig" with 8 open decisions
+- 2026-05-18 renamed to "ZAOscribe" per Zaal; A,B,C,D,F,G,H locked; E pending sub-agent
+- 2026-05-18 E locked: Cascade (Haiku 4.5 -> Opus 4.7) + `tool_choice` schema enforcement, per sub-agent research citing Granola / Fireflies / Otter production patterns. ALL 8 DECISIONS NOW LOCKED.

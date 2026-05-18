@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getUsersByFids } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
@@ -14,7 +14,7 @@ import { logger } from '@/lib/logger';
  *
  * Public read. CORS enabled for Empire Builder origin.
  */
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     const { data: voters, error } = await supabaseAdmin
       .from('zabal_leaderboard_scores')

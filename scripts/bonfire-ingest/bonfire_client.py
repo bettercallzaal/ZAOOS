@@ -30,6 +30,7 @@ import os
 import time
 import urllib.error
 import urllib.request
+import uuid as _uuid
 
 import secret_scan
 
@@ -83,6 +84,17 @@ class IngestPipeline:
                 if h["severity"] in ("MED", "LOW"):
                     print(f"  [{h['severity']}] {name}: {h['pattern']} {h['excerpt']}")
 
+        # v0.2 - generate a client-side UUID per episode + supply via the
+        # `uuid` field on CreateEpisodeDirectRequest. The Bonfires API accepts
+        # pre-assigned UUIDs (per OpenAPI). Capturing it in the manifest lets
+        # us verify episodes later via /knowledge_graph/episode/{uuid} once
+        # the API surface stabilises. NOTE as of 2026-05-18: GET by UUID
+        # still returns 404 even seconds-to-minutes after POST - Bonfires
+        # may store under an internal-only UUID that differs from the
+        # supplied one. We capture the UUID anyway because it's the only
+        # stable handle we have + future API maturity may make it queryable.
+        episode_uuid = str(_uuid.uuid4())
+
         # Build the request
         req = {
             "bonfire_id": self.bonfire_id,
@@ -91,11 +103,12 @@ class IngestPipeline:
             "source": source,
             "source_description": source_description,
             "reference_time": reference_time or self.now,
+            "uuid": episode_uuid,
         }
 
         if self.dry_run:
-            print(f"  [DRY-RUN] would POST {name} ({len(body)}c)")
-            return {"status": "dry-run"}
+            print(f"  [DRY-RUN] would POST {name} ({len(body)}c) uuid={episode_uuid[:8]}...")
+            return {"status": "dry-run", "uuid": episode_uuid}
 
         # POST
         url = f"{self.api_url.rstrip('/')}/knowledge_graph/episode/create"
@@ -115,24 +128,29 @@ class IngestPipeline:
             ok = resp.status == 200 and resp_json.get("success") is True
             task = resp_json.get("task_id") if ok else None
             if ok:
-                self.results["sent"].append({"name": name, "task": task})
-                print(f"  [OK] {name} -> task={task}")
-                return {"status": "sent", "task_id": task}
+                self.results["sent"].append({
+                    "name": name,
+                    "uuid": episode_uuid,
+                    "task": task,
+                    "source_description": source_description,
+                })
+                print(f"  [OK] {name} -> uuid={episode_uuid[:8]}... task={task}")
+                return {"status": "sent", "uuid": episode_uuid, "task_id": task}
             else:
                 err = str(resp_json)[:200]
-                self.results["failed"].append({"name": name, "error": err})
+                self.results["failed"].append({"name": name, "uuid": episode_uuid, "error": err})
                 print(f"  [FAIL] {name}: {err}")
-                return {"status": "failed", "error": err}
+                return {"status": "failed", "uuid": episode_uuid, "error": err}
         except urllib.error.HTTPError as e:
             err = f"HTTP {e.code}: {e.read().decode('utf-8')[:200]}"
-            self.results["failed"].append({"name": name, "error": err})
+            self.results["failed"].append({"name": name, "uuid": episode_uuid, "error": err})
             print(f"  [FAIL] {name}: {err}")
-            return {"status": "failed", "error": err}
+            return {"status": "failed", "uuid": episode_uuid, "error": err}
         except Exception as e:
             err = str(e)
-            self.results["failed"].append({"name": name, "error": err})
+            self.results["failed"].append({"name": name, "uuid": episode_uuid, "error": err})
             print(f"  [FAIL] {name}: {err}")
-            return {"status": "failed", "error": err}
+            return {"status": "failed", "uuid": episode_uuid, "error": err}
 
     def report(self, manifest_path=None):
         """Print summary + write manifest."""

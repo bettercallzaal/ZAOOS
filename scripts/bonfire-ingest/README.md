@@ -10,9 +10,12 @@ mandatory secret-scan gate. Built 2026-05-18 after the Phase 1 deploy
 | File | Role |
 |---|---|
 | `secret_scan.py` | Sensitive-info detector. Distinguishes template placeholders from real secrets. Exports `scan_text`, `sanitize_text`, `preflight`. |
-| `bonfire_client.py` | `IngestPipeline` class. Calls preflight before every POST; HIGH severity hits block by default. Writes a manifest per run. |
+| `bonfire_client.py` | `IngestPipeline` class. v0.2: generates client-side UUID per episode, supplies via `uuid` field, captures in manifest. Calls preflight before every POST; HIGH severity hits block by default. Writes a manifest per run. |
 | `ingest_brand_kit.py` | Pipes `bettercallzaal.com/brands.json` (31 brands) into bonfire, one episode per brand. |
 | `ingest_github_readmes.py` | Pipes README files for every `bettercallzaal/*` repo (80 active). Public via raw.githubusercontent.com, private via GitHub API + `GITHUB_TOKEN`. |
+| `ingest_research_library.py` | Pipes every `research/<topic>/<NNN>-<slug>/README.md` from ZAOOS (~670 active docs). Skips `_archive`, `_graph`, `_handoffs`. |
+| `verify_manifest.py` | Walks a manifest and tries GET / expand for each episode UUID. Forward-compatible: GETs currently return 404 even for confirmed-by-dashboard episodes (Bonfires storage uses internal UUIDs that differ from supplied ones as of 2026-05-18); script will start working once the API surface matures. |
+| `trigger_labeling.py` | Triggers `/labeling/hybrid` to populate the vector store so `/vector_store/search` becomes usable. Default = dry-run. Pass `--really` only after asking Joshua about cost / idempotency / runtime. |
 
 ## Secret-scan policy
 

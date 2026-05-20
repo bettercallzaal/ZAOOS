@@ -21,12 +21,16 @@ When forwarded from Gmail, the original `From:` will be the upstream sender (e.g
 ## Commands
 
 - `/inbox` - show all unread items (from whitelisted sender only)
+- `/inbox next` - research the top unread item via /zao-research, then file it
 - `/inbox research` - research the top unread item via /zao-research, then file it
-- `/inbox research all` - research all unread items sequentially
+- `/inbox research all` - research all unread items sequentially (one doc per item - avoid for large backlogs, use `cluster` instead)
+- `/inbox cluster` - drain the WHOLE backlog: group unread items by theme, write one synthesis doc per cluster (not one-per-item), file everything
 - `/inbox clear` - mark all unread items as processed
 - `/inbox count` - how many unread items
 - `/inbox folder <name>` - show all items in a folder (e.g. `/inbox folder x-posts`)
 - `/inbox folders` - list all folders and their counts
+
+> **When the backlog is large (8+ unread), use `/inbox cluster`, not `/inbox research all`.** One-doc-per-item produces many thin docs and misses the cross-cutting pattern. Clustering produces fewer, stronger synthesis docs.
 
 ## Folders (Label-Based)
 
@@ -126,6 +130,27 @@ Fetch all messages then filter client-side for messages that have the folder lab
      -H "Content-Type: application/json" \
      -d '{"add_labels": ["<folder>", "processed"], "remove_labels": ["unread"]}'
    ```
+
+### Cluster Mode (`/inbox cluster`)
+
+For draining a large backlog. Forwarded items pile up faster than `/inbox next` clears them, and processing each as its own doc produces many thin docs that miss the cross-cutting pattern. Cluster mode fixes both.
+
+**Workflow:**
+
+1. **Inventory.** Fetch all unread (whitelisted sender only). Resolve opaque short links so each item's real content is known - reddit `/s/` links resolve with `curl -sL -o /dev/null -w '%{url_effective}'`; strip query strings.
+
+2. **Triage.** Sort every item into one of three buckets:
+   - **Research** - has a topic worth a doc.
+   - **Action-item** - needs Zaal to do something (account setup, a reply, a follow-up). Label `action-items` + `processed`, no doc.
+   - **Noise** - bounce-backs, delivery failures, dead ends. Label `processed` only, no doc.
+
+3. **Cluster the research bucket by theme.** Group items that share a subject (e.g. "Claude Code workflows", "agent memory", "vibecoding economics"). A cluster = 3+ related items. Leftover singletons go in a "standalone roundup" cluster.
+
+4. **One synthesis doc per cluster.** Run `/zao-research` logic per cluster: fetch every item in the cluster, then write ONE doc that finds the cross-cutting pattern - not a summary per item. For 4+ clusters, dispatch one research subagent per cluster in parallel. Each doc follows the zao-research v2 format (frontmatter, Key Decisions table, Source Items list, Findings, ZAO Application, Sources, Next Actions).
+
+5. **File every message.** Apply `research`/`action-items` + `processed`, remove `unread`. Inbox ends at 0 unread.
+
+6. **Report.** Tell Zaal: N items drained into M docs, plus any action-items and noise filed. Surface anything that was filed but NOT given a doc so he can override.
 
 ### Listing All Folders
 

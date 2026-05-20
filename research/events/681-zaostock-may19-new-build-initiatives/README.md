@@ -10,7 +10,7 @@ tier: STANDARD
 
 # 681 — ZAOstock 5/19 Standup: New Build Initiatives Research
 
-> **Goal:** Ground the four net-new buildables surfaced in the May 19 ZAOstock standup (Z of All Games, NFC pro tickets / digital twins, ZAO Cards, ZAO Scribe) plus the AI DAO voting agent against external practice, so each gets a build-vs-buy call before time is spent.
+> **Goal:** Ground the four net-new buildables surfaced in the May 19 ZAOstock standup (ZABAL Games, NFC pro tickets / digital twins, ZAO Cards, ZAO Scribe) plus the AI DAO voting agent against external practice, so each gets a build-vs-buy call before time is spent.
 
 ## Key Decisions (recommendations first)
 
@@ -19,12 +19,12 @@ tier: STANDARD
 | ZAO Scribe | BUILD as thin glue, not from scratch. Craig bot records, Whisper transcribes, existing `/meeting` skill extracts. `-join` triggers the chain. | Recording + extraction already solved. Whisper is free, self-hosted, 99+ languages - also answers Jose's Spanish-summary ask. Do NOT rebuild meeting extraction. |
 | NFC pro tickets / digital twins | BUILD self-hosted profile pages on zaostock.com; buy blank NTAG cards in bulk. SKIP Popl/Linq subscriptions. | Popl/Linq charge per-user monthly. The card only encodes a URL - the profile page is the asset, and ZAOstock already has profile-page infrastructure. Blank NTAG215 cards run ~$0.50-2 each at volume. |
 | Wall of Pros | BUILD as a public page; physical wall mirrors it for IRL + livestream. | Gives retail/virtual supporters visible credit (ties to Pro Ticket recognition). Trey livestreaming the physical wall is free reach. |
-| Z of All Games | RUN the 3-month structure as planned. Publish judging rubric day one. Cap teams at 3-4. | Matches industry build-a-thons (MS JS Build-a-thon = learn+hack phases; Aurora = multi-stage elimination). Every source: rubric-first produces better submissions. |
+| ZABAL Games | RUN the 3-month structure as planned. Publish judging rubric day one. Cap teams at 3-4. | Matches industry build-a-thons (MS JS Build-a-thon = learn+hack phases; Aurora = multi-stage elimination). Every source: rubric-first produces better submissions. |
 | AI DAO voting agent | BUILD a proposal-summarizer + suggested-vote assistant. Do NOT build autonomous voting yet. | Space is crowded (Kryon, GovPilot, Quoracle, Governa). Summarize-only matches SocialBlock's lower-risk "agents generate metadata, don't vote" model. Autonomous delegation is a later, riskier step. |
 
 ## Context: What the standup surfaced
 
-Standup 2026-05-19, 5 attendees (Zaal, Jose, DFresh, FailOften, Philanz). Agenda doc built by Iman. Timeline anchors: 138 days to ZAOstock (event ~Oct 3 2026), 87 days to the DCoop event, Aug 15 suggested test/dry-run day, 1K committed by sponsors but not yet received via Limonae.
+Standup 2026-05-19, attendees Zaal, Jose, DFresh, Fellenz. Agenda doc built by Iman (not present). Timeline anchors: 138 days to ZAOstock (event ~Oct 3 2026), 87 days to the DCoop event, Aug 15 suggested test/dry-run day, 1K committed by sponsors but not yet received via Limonae.
 
 ## Findings
 
@@ -53,7 +53,7 @@ Goal: every ticket buyer (virtual or IRL) gets an NFC networking card. IRL atten
 - Build as a public zaostock.com page listing every Pro Ticket / supporter profile. The physical wall is a printout/mount that mirrors it.
 - Trey (or any community streamer) livestreaming the physical wall turns supporter recognition into shareable content for free.
 
-### 4. Z of All Games (build-a-thon)
+### 4. ZABAL Games (build-a-thon)
 
 Stated structure: June = workshops (30-min volunteer-led sessions), July = open build month, August = 8 ZAO mentors guide 8 finalists to streamed final submissions, "ZABAL Games winner" end of August. Brands offered as build prompts: ZAOstock, ZABAL, WaveWarZ, The ZAO.
 
@@ -87,8 +87,8 @@ Goal: synthesize proposals, pull a member's Farcaster cast history into a prefer
 | Spec ZAO Scribe as Craig -> Whisper -> `/meeting` glue; reuse fishbowlz transcribe route shape | @Zaal | Todo | Before next standup |
 | Price blank NTAG215 cards in bulk; confirm zaostock.com profile-page URL scheme | @Zaal / @Canon | Todo | Before Aug 15 dry run |
 | Add Wall of Pros page to zaostock.com (profiles for Pro Ticket buyers + supporters) | @Zaal | PR | After ticket flow stable |
-| Publish Z of All Games judging rubric (5 criteria, max 25 pts) before June workshops open | @Zaal | Doc | End of May 2026 |
-| Set Z of All Games backup submission channel; announce at June kickoff | @Zaal / @Iman | Todo | Before June 1 |
+| Publish ZABAL Games judging rubric (5 criteria, max 25 pts) before June workshops open | @Zaal | Doc | End of May 2026 |
+| Set ZABAL Games backup submission channel; announce at June kickoff | @Zaal / @Iman | Todo | Before June 1 |
 | Build AI DAO voting agent v1 as summarize-and-recommend only (no autonomous voting) | @Zaal | Todo | After ZAOstock event |
 
 ## Sources

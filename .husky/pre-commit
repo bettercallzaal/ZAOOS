@@ -4,3 +4,6 @@
 # 1. Block new doc-number collisions in research/.
 #    From the 2026-05-18 session that hit 4 collisions in one day.
 bash "$(git rev-parse --show-toplevel)/scripts/check-research-doc-collisions.sh" || exit 1
+
+# 2. Block secrets in the staged diff (.claude/rules/secret-hygiene.md, doc 683).
+bash "$(git rev-parse --show-toplevel)/scripts/git-secret-scan.sh" || exit 1

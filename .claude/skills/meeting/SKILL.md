@@ -34,17 +34,15 @@ Undertriggering is the bigger risk. Fire on weak signal; ask one clarifier befor
 
 ## Input detection
 
-Detect mode from `$ARGUMENTS`:
+Look at what the user supplied (the slash-command argument, a pasted block, or just chat context) and pick the mode:
 
-| If `$ARGUMENTS` matches | Mode |
-|---|---|
-| starts with `https://craig.horse/` | craig_url |
-| starts with `https://fathom.video/` | fathom_url |
-| ends with `.m4a`, `.mp3`, `.wav`, `.mp4`, `.opus` and file exists | local_audio |
-| empty (no args) AND last user message is >200 chars of text | paste |
-| anything else | ask user to clarify |
+- **craig_url** - the input is a URL starting `https://craig.horse/`
+- **fathom_url** - the input is a URL starting `https://fathom.video/`
+- **local_audio** - the input is a path ending `.m4a` / `.mp3` / `.wav` / `.mp4` / `.opus` and the file exists
+- **paste** - the input (or the last user message) is a block of transcript / meeting-notes text, roughly 200+ chars. Also covers the user narrating the meeting in chat ("Iman said X, then Zaal said Y...") - use the conversation context as the transcript.
+- **unclear** - none of the above. Ask the user one question: paste the transcript, give a file path, or give a Craig/Fathom URL.
 
-If user just talks about the meeting in chat ("Iman said X then Zaal said Y..."), treat as paste mode using the conversation context as transcript.
+Do not echo the raw argument back into a table - just classify it and proceed.
 
 ## Phase 0 - Project routing
 

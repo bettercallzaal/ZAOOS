@@ -104,14 +104,20 @@ Both ZAO and Edge City run the same underlying play - convene people, prototype 
 - [Doc 547](../../events/547-zaostock-master-strategy-cassie-debrief/) - ZAOstock = infra-as-product framing; mirrors Esmeralda popup-as-prototype
 - [Doc 475](../../business/475-zao-music-entity-formation/) - ZAO Music entity formation - context for fund/financial conversations
 
+## All 28 Accepted Projects (ZAO Fund S6)
+
+Zaal asked for a welcome email to every accepted Season 6 project. All 28 are drafted - see [emails-all-grantees.md](./emails-all-grantees.md). 26 standard welcome emails + 1 bespoke Telamon email (covers his 2 projects: Edge Esmeralda 2026 #2, Edge City Fellowship #4) = 27 sends across 28 projects.
+
+Leaderboard at time of drafting (2026-05-20): #1 InfiniteZero Network, #2 Edge Esmeralda 2026, #3 Voices of the Land, #4 Edge City Fellowship, #5 Gaian Temple, #6 Memethology, #7 HERITAGE COLLECTION, #8 HOPE, #9 ToGather Project, #10 ENTERTAINMENT EVOLVED, #11 Cinemetropolis, #12 Sonic Sanctuary, #13 International Artists Project, #14 THE NEW VANGUARD, #15 The Owl's Nest, #16 DeSci Asia, #17 CHAINWARS, #18 Regen Reef, #19 Participatory Spatial Music Show, #20 HuRya Empowerment Foundation, #21 The Creator Block, #22 THE ART FACTORY, #23 The MOTHERland Project, #24 Ear of Dionysus, #25 America 250, #26 Thread of Hope, #27 ANFT, #28 The Impact Concerts.
+
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Send the welcome + collaboration email to Telamon | @Zaal | Outreach | 2026-05-20 |
+| Send 27 welcome emails to all S6 grantees via the Artizen Emails tool | @Zaal | Outreach | 2026-05-21 |
+| Send the bespoke collaboration email to Telamon | @Zaal | Outreach | 2026-05-21 |
 | If Telamon replies, schedule 30-min call via Cal.com / Lu.ma | @Zaal | Calendar | Within 48hr of reply |
 | Prep a collaboration 1-pager from Doc 432 + Doc 547 + this doc's overlap section | @Claude | PR | After call confirmed |
 | Capture call outcomes - decide on a standing ZAO <-> Edge City channel | @Zaal | Decision | After 1:1 |
-| Decide whether Edge Esmeralda gets featured / cross-promoted to ZAO's 188 members | @Zaal | Decision | After 1:1 |
 
-See [email-to-telamon.md](./email-to-telamon.md) for the ready-to-send draft.
+See [email-to-telamon.md](./email-to-telamon.md) for the Telamon draft and [emails-all-grantees.md](./emails-all-grantees.md) for all 28.

@@ -2,7 +2,7 @@
 
 **To:** Telamon Ardavanis (Co-founder, Edge City)
 **From:** Zaal Panthaki (Founder, The ZAO; owner, ZAO Fund for Emerging Culture)
-**Context:** Telamon's Edge Esmeralda 2026 was accepted into the ZAO Fund for Emerging Culture (Artizen S6). This is fund owner -> accepted grantee.
+**Context:** Telamon has TWO projects accepted into the ZAO Fund for Emerging Culture (Artizen S6) - Edge Esmeralda 2026 (#2) and Edge City Fellowship (#4). This is fund owner -> accepted grantee.
 **Purpose:** Welcome him in + open a collaboration conversation between ZAO and Edge City / Esmeralda.
 **Date drafted:** 2026-05-19
 **Channel:** Email (Zaal has Telamon's contact via the Artizen application) -> X DM (@TelamonArdavani) as backup
@@ -23,7 +23,7 @@
 
 Hi Telamon,
 
-Congratulations - Edge Esmeralda 2026 has been accepted into the ZAO Fund for Emerging Culture. Glad to have it in the season.
+Congratulations - both Edge Esmeralda 2026 and the Edge City Fellowship have been accepted into the ZAO Fund for Emerging Culture. Glad to have them in the season.
 
 Quick intro on my end: I'm Zaal, founder of The ZAO and the person behind the fund. The ZAO is a decentralized music and culture network - four years in, 188 members on Base, and we incubate artist-led projects the way Edge City incubates society experiments. We're also throwing our own festival in Ellsworth, Maine this October (ZAOstock 2026). The ZAO Fund is how we back emerging culture work beyond our own walls.
 
@@ -43,7 +43,7 @@ zaal@thezao.com | x.com/bettercallzaal | thezao.com
 
 ## Version B: X DM (shorter, if email bounces or for a nudge)
 
-> Telamon - Zaal here, founder of The ZAO and the person behind the ZAO Fund for Emerging Culture. Congrats, Edge Esmeralda 2026 is accepted into the fund. I backed it because the popup-village model and what we build at The ZAO are cousins - prototype culture in a container, then let it graduate. Want to grab 30 min to go past the grant and talk collaboration? [INSERT LINK]
+> Telamon - Zaal here, founder of The ZAO and the person behind the ZAO Fund for Emerging Culture. Congrats, both Edge Esmeralda 2026 and the Edge City Fellowship are accepted into the fund. I backed them because the popup-village model and what we build at The ZAO are cousins - prototype culture in a container, then let it graduate. Want to grab 30 min to go past the grant and talk collaboration? [INSERT LINK]
 
 ---
 

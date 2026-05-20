@@ -32,6 +32,7 @@ import {
 } from './memory';
 import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
+import { mirrorTurn } from './recall';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -509,6 +510,21 @@ async function dispatchConcierge(
     if (result.quest_ops.length > 0) {
       await applyQuestOps(result.quest_ops);
     }
+
+    // Bonfire: mirror this turn's captures + task/quest changes into the
+    // ZABAL knowledge graph. Best-effort, fire-and-forget — never blocks the
+    // reply, never throws. No-op if BONFIRE_API_KEY/BONFIRE_ID are unset.
+    mirrorTurn({
+      captures: result.captures,
+      task_ops: result.task_ops as unknown as Array<Record<string, unknown>>,
+      quest_ops: result.quest_ops as unknown as Array<Record<string, unknown>>,
+    })
+      .then((m) => {
+        if (m.mirrored > 0) {
+          console.log(`[zoe/index] bonfire mirror — ${m.mirrored} episode(s), ${m.skipped} skipped`);
+        }
+      })
+      .catch((e) => console.error('[zoe/index] bonfire mirror failed:', e));
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 

@@ -156,7 +156,7 @@ async function loadBonfireContext(topic: string): Promise<string> {
       reason: 'newsletter context grounding',
       expected_kind: 'mixed',
     });
-    if (result.kind === 'sdk_response' || result.kind === 'mcp_response') {
+    if (result.kind === 'sdk_response') {
       return (result.text ?? '').slice(0, 1500) || '(empty Bonfire reply)';
     }
     return '(manual relay path - Bonfire not auto-queryable)';

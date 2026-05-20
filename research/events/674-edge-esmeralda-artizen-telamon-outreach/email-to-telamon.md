@@ -1,66 +1,56 @@
 # Outreach to Telamon Ardavanis
 
 **To:** Telamon Ardavanis (Co-founder, Edge City)
-**Re:** Artizen "ZAO Fund for Emerging Culture" + Edge Esmeralda 2026
-**From:** Zaal Panthaki (Founder, The ZAO)
-**Date drafted:** 2026-05-18
-**Channel priority:** X DM first (@TelamonArdavani) -> Substack reply -> email if/when Zaal obtains it
+**From:** Zaal Panthaki (Founder, The ZAO; owner, ZAO Fund for Emerging Culture)
+**Context:** Telamon's Edge Esmeralda 2026 was accepted into the ZAO Fund for Emerging Culture (Artizen S6). This is fund owner -> accepted grantee.
+**Purpose:** Welcome him in + open a collaboration conversation between ZAO and Edge City / Esmeralda.
+**Date drafted:** 2026-05-19
+**Channel:** Email (Zaal has Telamon's contact via the Artizen application) -> X DM (@TelamonArdavani) as backup
 
 ---
 
-## Assumptions flagged before sending
+## Before sending
 
-1. Telamon is the curator/originator of the Artizen "ZAO Fund for Emerging Culture" Season 6. UNCONFIRMED in public docs. If wrong, the naming-overlap hook still works as a culture conversation but the "your fund" framing needs to change to "the ZAO Fund on Artizen."
-2. No public email surfaced. Send via X DM. If Zaal has a back-channel email, the long-form version below drops in as-is.
-3. Edge Esmeralda 2026 dates: May 30 - June 27 (Healdsburg, CA). Confirmed.
-
----
-
-## Version A: X DM (~280 chars-friendly, can go in 1-2 messages)
-
-> Telamon - Zaal here, founder of The ZAO (4-year music + culture network, 188 members on Base, festival in Maine this October). Caught the "ZAO Fund for Emerging Culture" on Artizen and laughed out loud at the name overlap. Curious where the name came from on your side. Open to a 30-min call?
-
-If he replies positively, follow with:
-
-> Appreciate it. Here's a Cal link: [INSERT CAL/LU.MA LINK]. Happy to make it work around Edge Esmeralda prep if late May/early June is heads-down for you.
+1. Drop your Cal / Lu.ma link into `[INSERT LINK]` in both versions.
+2. Confirm Telamon's email from the Artizen application backend.
+3. Do not add a ZAOstock sponsorship ask - this email opens the door, the call walks through it.
 
 ---
 
-## Version B: Email (long-form, use if Zaal has Telamon's address)
+## Version A: Email
 
-**Subject:** The other ZAO - quick intro from Maine
+**Subject:** Edge Esmeralda is in - let's connect, founder to founder
 
 Hi Telamon,
 
-I'm Zaal Panthaki, founder of The ZAO. We're a 4-year-old decentralized music and culture network - 188 members on Base, incubating artist-led projects, throwing our own festival in Ellsworth, Maine this October (ZAOstock 2026).
+Congratulations - Edge Esmeralda 2026 has been accepted into the ZAO Fund for Emerging Culture. Glad to have it in the season.
 
-I came across the "ZAO Fund for Emerging Culture" on Artizen Season 6 and the naming overlap stopped me. Whether it's Greek root convergence, shared influences, or pure coincidence, the missions line up almost suspiciously well: yours funds emerging culture, ours incubates it. I'd love to hear the story behind your naming.
+Quick intro on my end: I'm Zaal, founder of The ZAO and the person behind the fund. The ZAO is a decentralized music and culture network - four years in, 188 members on Base, and we incubate artist-led projects the way Edge City incubates society experiments. We're also throwing our own festival in Ellsworth, Maine this October (ZAOstock 2026). The ZAO Fund is how we back emerging culture work beyond our own walls.
 
-Beyond curiosity, I think there's a real conversation worth having. Edge City's popup-village pattern and what we're building with ZAOstock (and the longer-arc Ellsworth music infrastructure) feel like cousins. Different surface, same underlying bet that culture needs new vessels.
+I backed Edge Esmeralda because the popup-village model and what we're building are cousins - a bounded container to prototype culture, then let it graduate. Yours graduates into a permanent town; ours graduates into longer-arc music infrastructure. Same bet underneath.
 
-Could I grab 30 minutes with you? No pitch deck, no ask - just a builder-to-builder call. I'll work around Edge Esmeralda prep; happy to do it before May 30 or after June 27 if late May / June is locked.
+That overlap is why I wanted to reach out personally instead of just processing the grant. I'd love 30 minutes with you to go past the funding and talk collaboration - where The ZAO and Edge City / Esmeralda might actually work together. No deck, no ask, just two founders comparing notes.
 
-Cal link: [INSERT LINK]
+Here's a link to grab a time that works: [INSERT LINK]. Happy to schedule around Edge Esmeralda prep - before May 30 or after June 27 if the village month is locked.
 
-Looking forward,
+Looking forward to it,
+
 Zaal
-Founder, The ZAO
+Founder, The ZAO | ZAO Fund for Emerging Culture
 zaal@thezao.com | x.com/bettercallzaal | thezao.com
 
 ---
 
-## What to verify before hitting send
+## Version B: X DM (shorter, if email bounces or for a nudge)
 
-- Artizen S6 deadline + grant pool size (browser-render artizen.fund/index/mf/zao-fund-for-emerging-culture?season=6)
-- Telamon's preferred channel (skim @TelamonArdavani latest tweets for any "DM open" / "email me at..." signals)
-- Pick the Cal / Lu.ma / Calendly link Zaal wants pasted in
-- Replace `[INSERT LINK]` placeholder in both versions
+> Telamon - Zaal here, founder of The ZAO and the person behind the ZAO Fund for Emerging Culture. Congrats, Edge Esmeralda 2026 is accepted into the fund. I backed it because the popup-village model and what we build at The ZAO are cousins - prototype culture in a container, then let it graduate. Want to grab 30 min to go past the grant and talk collaboration? [INSERT LINK]
+
+---
 
 ## What NOT to put in v1
 
 - ZAOstock sponsorship ask
-- Artizen grant application intent
-- ZAO Music entity / DBA backstory
-- Any mention of mutual contacts unless Zaal verifies one
+- Specific partnership terms
+- Match-funding mechanics walkthrough (Telamon already applied; he knows the fund)
 
-These are all V2 conversation moves. First email = single ask: the 30-min call.
+All of that is for the call.

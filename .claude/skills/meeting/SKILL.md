@@ -1,7 +1,7 @@
 ---
 name: meeting
 description: Capture meeting transcripts (voice memo, Craig recording, Fathom URL, paste-in-chat) and distribute extracted decisions, action items, and key quotes to the right ZAO surfaces - cowork-zaodevz actions.json, a research/events/NNN-* recap doc, Bonfire ingest queue, Telegram copy-paste block, memory, and calendar. Use when the user just finished a meeting, shares a recording or transcript, says "process this call", "extract todos from this", "recap that meeting", or types "/meeting <path-or-url>". Always fires on meeting context - undertriggering wastes the capture.
-allowed-tools: Read Write Edit Bash WebFetch
+allowed-tools: Read Write Edit Bash WebFetch Skill AskUserQuestion
 ---
 
 # /meeting - ZAO Meeting Capture

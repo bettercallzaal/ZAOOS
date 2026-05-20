@@ -163,3 +163,49 @@ Iman raised: should ZAO have a formal "drop a proposal" system for sponsored act
 - [PizzaDAO/rsv-pizza GitHub](https://github.com/PizzaDAO/rsv-pizza) - open source dashboard + page tooling, action item 3 target
 - [CraigChat/craig GitHub](https://github.com/CraigChat/craig) - Discord audio recording reference for ZAO Craig naming + pattern (MIT)
 - Doc 611 README - prior RSVPizza analysis
+
+## Recap Messages (copy-paste ready)
+
+### To Iman
+
+```
+yo recap from the call:
+
+1. ZAO Craig bot is locked in - live audio in, todos out. spec doc done at research/agents/673-zao-craig-spec-live-audio-todo. no more record-download-upload-transcribe-paste
+
+2. PizzaDAO Zambia Fri 5/23 - $150 pre + ~$570 post from PizzaDAO (pizza-only per their rules). drinks ~$120 unfunded. plan: ZAO Devz fronts if needed, but better play is you pitch PizzaDAO HQ for drinks add-on using the WaveWarZ Zambia angle ("$100 more for Zambia is high-leverage vs the $2-3k they spend on bigger cities")
+
+3. RSVPizza homework - spend an hour+ in github.com/PizzaDAO/rsv-pizza, feed it to Claude as "teach me this", and start building PizzaDAO Zambia / Kingston brand on top. open source so we clone the patterns for our own brands too. front-end AND code, both angles
+
+4. ZAO flyer for PizzaDAO Zambia - ship today, "the ZAO is part of this"
+
+5. ZABAL Games drop Wed 5/20 - signup form + group chat live by then. friday becomes live activation moment, not separate launch
+
+6. workshops series through June - sign up workshop leaders from community projects + ZABAL brands
+
+7. on the "formal sponsorship proposal" thing - parked till after your RSVPizza dive. they probably already have the pattern
+
+also intro-ing Cannon (WaveWarZ physical artist) - he could plug into the Zambia angle if you want. up to you on timing
+
+full transcript + action list: research/events/670-iman-call-may18-craig-pizzadao
+```
+
+### To Cannon (intro)
+
+```
+yo Cannon - want to loop you in on what's happening on the ZAO Devz / WaveWarZ Zambia side
+
+Iman runs ZAO Devz out of Zambia - he's hosting a PizzaDAO event Friday 5/23 for 40 people, sponsored by PizzaDAO HQ. we're using it as a launch moment for ZABAL Games (Wed 5/20 drop) + a workshop series running through June
+
+where you could come in:
+
+- physical art for the WaveWarZ Zambia / PizzaDAO Zambia brand if there's appetite - flyers, merch, anything tactile that travels well in pics
+- workshops in June - if you want to lead one on physical art + web3 music brands, the slot is open
+- bigger picture: the pieces you've made for ZABAL / WaveWarZ are exactly the kind of thing that gives these events a real identity vs everyone else's generic crypto meetup
+
+no pressure on timing - just wanted you in the loop because the Zambia activation lines up with what you're already building physically for our brands
+
+Iman is the guy to coordinate with on Zambia stuff directly. I'll connect you two.
+
+context doc: research/events/670-iman-call-may18-craig-pizzadao
+```

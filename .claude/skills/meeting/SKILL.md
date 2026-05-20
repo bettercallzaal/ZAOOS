@@ -248,16 +248,20 @@ Use `mcp__claude_ai_Google_Calendar__list_events` to find an event matching `mee
 
 ## Phase 5 - Report
 
-Print to user a one-line per-target summary:
+Print to user a one-line per-target summary. `[OK]` = done, `[--]` = skipped. One line per target that exists this run:
 
 ```
-[OK] actions.json - 7 items appended (commit abc1234)
-[OK] research/events/674-iman-call-may18 - draft written, review before commit
+[OK] Actions - <N> items -> <tracker> (cowork-zaodevz commit <sha> | ZAOstock paste-block)
+[OK] Recap doc - research/events/<NNN>-<slug>/README.md - draft written, review before commit
+[OK] Transcript - research/events/<NNN>-<slug>/transcript.md
 [--] Bonfire - skipped
 [OK] Telegram - block printed above
-[OK] Memory - 1 entry written (project_zao_craig.md)
+[OK] Memory - <N> entries (<slugs>)
 [--] Calendar - no matching event
+[OK] Clipboard - next-actions page opened
 ```
+
+Use the real values from this run. Do not copy the placeholders. The recap-doc number must be the one actually used (collision-safe pick, not a guess).
 
 Then suggest the natural next step: "Review research doc at <path>. Commit + PR when ready, or want me to ship it as a PR off ws/<branch> now?"
 

@@ -86,14 +86,17 @@ Files written to `~/.claude/projects/.../memory/`:
 
 ## Transcript
 
-<details>
-<summary>Full transcript ({duration_min} min)</summary>
+Full transcript: [transcript.md](transcript.md)
+```
 
-\`\`\`
-{full transcript text - paste from Whisper output or original paste}
-\`\`\`
+The raw transcript is written to a sibling file `transcript.md` in the same folder - NOT inline in the README. The README stays lean (decisions + actions + quotes are the signal); the transcript is one click away for anyone who needs the raw record.
 
-</details>
+`transcript.md` format:
+
+```markdown
+# Transcript - {Meeting Title} ({date})
+
+{full transcript text - Whisper output or original paste, verbatim}
 ```
 
 ## Style notes

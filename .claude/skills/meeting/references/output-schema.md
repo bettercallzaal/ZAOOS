@@ -13,12 +13,14 @@ Single JSON object. All fields required except where noted optional.
     "attendees": ["Zaal", "Iman"],
     "platform": "Telegram voice"
   },
+  "project": "zao-devz | zaostock | zao-os | other",
   "decisions": [
     {
       "id": 1,
       "text": "Build ZAO Craig bot - live audio + Whisper + auto-extract todos",
       "owner": "Zaal",
-      "status": "TODO"
+      "status": "TODO",
+      "confidence": "high"
     }
   ],
   "actions": [
@@ -26,7 +28,8 @@ Single JSON object. All fields required except where noted optional.
       "title": "Iman to study RSVPizza repo + build PizzaDAO Zambia brand on top",
       "owner": "Iman",
       "due": "2026-05-22",
-      "category": "WaveWarZ Zambia"
+      "category": "WaveWarZ Zambia",
+      "confidence": "high"
     }
   ],
   "quotes": [
@@ -49,6 +52,19 @@ Single JSON object. All fields required except where noted optional.
 ```
 
 ## Enums
+
+### `project` (top-level - routes the action tracker, see SKILL.md Phase 0)
+- `zao-devz` - default. Actions -> cowork-zaodevz `data/actions.json`.
+- `zaostock` - actions -> @ZAOstockTeamBot paste-block (ZAOstock Supabase, not GitHub).
+- `zao-os` - actions stay in the recap doc table only.
+- `other` - BCZ / WaveWarZ / misc. Recap doc table only.
+
+The recap doc ALWAYS goes to ZAOOS `research/events/` regardless of project.
+
+### `confidence` (every decision + action)
+- `high` - explicit in transcript, clear owner, clear intent.
+- `medium` - implied, or owner/scope slightly fuzzy.
+- `low` - inferred, ambiguous owner, or garbled transcript span. Surfaced in the Phase 3 VERIFY block; never auto-written.
 
 ### `owner` (decisions + actions)
 - `Zaal`
@@ -86,6 +102,7 @@ Free text. Examples: `Telegram voice`, `Google Meet`, `Zoom`, `Discord/Craig`, `
 | `meeting.title` | 5-80 chars. Format: `<who> - <topic 1> + <topic 2>`. Use doc 670 as template. |
 | `meeting.attendees` | Array of canonical first-names. `Zaal`, `Iman`, `Cassie`, `Hannah`, etc. Match existing memory slugs where possible. |
 | `decisions[].text` | Verbatim where possible. No paraphrasing. Past tense for things decided in the call. |
+| `decisions[].confidence` / `actions[].confidence` | `high` / `medium` / `low`. Required on every item. `low` -> Phase 3 VERIFY block, never auto-written. |
 | `actions[].title` | Imperative verb-first. "Iman to X" or just "X". 10-120 chars. |
 | `actions[].due` | YYYY-MM-DD or empty string. Never invent. If transcript says "by Thursday", convert to absolute date using meeting.date as anchor. |
 | `quotes[].text` | Verbatim. 5-200 chars. Pick the load-bearing 3-8 quotes total. |

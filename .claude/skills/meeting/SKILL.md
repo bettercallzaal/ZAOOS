@@ -1,18 +1,20 @@
 ---
 name: meeting
 description: Capture meeting transcripts (voice memo, Craig recording, Fathom URL, paste-in-chat) and distribute extracted decisions, action items, and key quotes to the right ZAO surfaces - cowork-zaodevz actions.json, a research/events/NNN-* recap doc, Bonfire ingest queue, Telegram copy-paste block, memory, and calendar. Use when the user just finished a meeting, shares a recording or transcript, says "process this call", "extract todos from this", "recap that meeting", or types "/meeting <path-or-url>". Always fires on meeting context - undertriggering wastes the capture.
-allowed-tools: Read Write Edit Bash WebFetch
+allowed-tools: Read Write Edit Bash WebFetch Skill AskUserQuestion
 ---
 
 # /meeting - ZAO Meeting Capture
 
 Turn any meeting recording or transcript into:
-- Action items in [cowork-zaodevz `actions.json`](https://github.com/songchaindao-dot/cowork-zaodevz/blob/main/data/actions.json)
-- A research recap doc in `research/events/NNN-<slug>/README.md` (always, per doc 673 decision)
+- Action items in the right project's tracker (cowork-zaodevz `actions.json`, ZAOstock bot - routed in Phase 0)
+- A research recap doc in `research/events/NNN-<slug>/README.md` (always ZAOOS, per doc 673)
+- A row in `research/events/_meetings-index.md` - the one canonical list of every past meeting
 - A copy-paste Telegram bubble for sharing
+- A next-actions clipboard page the moment the meeting ends (Phase 6)
 - Optional Bonfire ingest, memory write, calendar update
 
-One command, six inputs, six output targets. User-gated per run.
+One command, multiple inputs, project-routed output targets. User-gated per run.
 
 Doc 673 has full design + decisions. Read it if context is needed beyond this file.
 
@@ -25,19 +27,38 @@ Doc 673 has full design + decisions. Read it if context is needed beyond this fi
 
 Undertriggering is the bigger risk. Fire on weak signal; ask one clarifier before doing destructive writes.
 
+## When NOT to fire
+
+- Live audio capture / real-time transcription = the ZAO Craig bot (doc 670), a separate runtime. This skill is post-meeting only.
+- ZAOstock `/gemba /idea /note` quick-notes = `bot/src/capture.ts`, different DB. Not this skill.
+- A general "summarize this article/doc" request with no meeting context.
+
 ## Input detection
 
-Detect mode from `$ARGUMENTS`:
+Look at what the user supplied (the slash-command argument, a pasted block, or just chat context) and pick the mode:
 
-| If `$ARGUMENTS` matches | Mode |
-|---|---|
-| starts with `https://craig.horse/` | craig_url |
-| starts with `https://fathom.video/` | fathom_url |
-| ends with `.m4a`, `.mp3`, `.wav`, `.mp4`, `.opus` and file exists | local_audio |
-| empty (no args) AND last user message is >200 chars of text | paste |
-| anything else | ask user to clarify |
+- **craig_url** - the input is a URL starting `https://craig.horse/`
+- **fathom_url** - the input is a URL starting `https://fathom.video/`
+- **local_audio** - the input is a path ending `.m4a` / `.mp3` / `.wav` / `.mp4` / `.opus` and the file exists
+- **paste** - the input (or the last user message) is a block of transcript / meeting-notes text, roughly 200+ chars. Also covers the user narrating the meeting in chat ("Iman said X, then Zaal said Y...") - use the conversation context as the transcript.
+- **unclear** - none of the above. Ask the user one question: paste the transcript, give a file path, or give a Craig/Fathom URL.
 
-If user just talks about the meeting in chat ("Iman said X then Zaal said Y..."), treat as paste mode using the conversation context as transcript.
+Do not echo the raw argument back into a table - just classify it and proceed.
+
+## Phase 0 - Project routing
+
+A meeting belongs to a project. The project decides WHERE actions + the Telegram summary go. Ask Zaal in Phase 3 if not obvious; infer from attendees + topic if it is.
+
+| Project | Action target | Telegram target | Recap doc |
+|---|---|---|---|
+| **ZAO Devz / general** (default) | cowork-zaodevz `data/actions.json` (GitHub PUT) | @ZAOcoworkingBot DM | ZAOOS `research/events/` |
+| **ZAOstock** | paste-block for @ZAOstockTeamBot (its tasks live in ZAOstock Supabase, not GitHub) | @ZAOstockTeamBot group | ZAOOS `research/events/` + cross-link in `research/events/_zaostock-hub/` |
+| **ZAO OS dev** | recap doc action table only (no external tracker) | none | ZAOOS `research/events/` |
+| **BCZ / WaveWarZ / other** | recap doc action table only | none | ZAOOS `research/events/` |
+
+**Rule that does NOT change per project: the recap doc ALWAYS lands in ZAOOS `research/events/`.** Research is permanent institutional memory and never graduates out of ZAOOS (CLAUDE.md monorepo-as-lab). One repo = one searchable archive of every meeting, across every project. Do not scatter recaps into graduated repos.
+
+What DOES route per project is the **action tracker** and the **Telegram destination**. A ZAOstock meeting's todos belong in the ZAOstock tracker, not the cowork-zaodevz tracker.
 
 ## Phase 1 - Acquire transcript
 
@@ -71,7 +92,15 @@ Use WebFetch on the share URL to extract transcript JSON from the page. Fathom s
 
 ## Phase 2 - Extract structure
 
-Read the transcript. Output JSON matching the schema in [references/output-schema.md](references/output-schema.md):
+Multi-pass extraction, NOT one monolithic prompt (doc 676 - monolithic extraction hallucinates). Run these passes in order, each over the same transcript:
+
+1. **Pass A - meeting metadata.** date, duration, title, attendees, platform. Date never invented - from transcript, file mtime, or ask.
+2. **Pass B - decisions.** Things explicitly decided/agreed in the call. Verbatim-anchored.
+3. **Pass C - actions.** Concrete follow-ups with an owner. One owner each.
+4. **Pass D - quotes.** 3-8 load-bearing verbatim quotes.
+5. **Pass E - research seeds + memory updates.** New topics / new entities only. Before deciding `memory_updates`, run an entity cross-check (see below) - a name already documented gets LINKED, not re-created.
+
+Output one JSON object matching the schema in [references/output-schema.md](references/output-schema.md):
 
 ```json
 {
@@ -83,10 +112,10 @@ Read the transcript. Output JSON matching the schema in [references/output-schem
     "platform": "Telegram voice | Google Meet | Zoom | in-person | Discord/Craig | Fathom"
   },
   "decisions": [
-    {"id": 1, "text": "...", "owner": "Zaal|Iman|Both|ThyRev|Samantha", "status": "TODO"}
+    {"id": 1, "text": "...", "owner": "Zaal|Iman|Both|ThyRev|Samantha", "status": "TODO", "confidence": "high|medium|low"}
   ],
   "actions": [
-    {"title": "...", "owner": "...", "due": "YYYY-MM-DD or empty", "category": "Site / Tech|Ops|WaveWarZ Zambia|ZAO Devz|Bounty|Social|Other"}
+    {"title": "...", "owner": "...", "due": "YYYY-MM-DD or empty", "category": "Site / Tech|Ops|WaveWarZ Zambia|ZAO Devz|Bounty|Social|Other", "confidence": "high|medium|low"}
   ],
   "quotes": [
     {"speaker": "...", "text": "..."}
@@ -98,43 +127,119 @@ Read the transcript. Output JSON matching the schema in [references/output-schem
 
 **Rules for extraction:**
 - Verbatim where possible for quotes. No paraphrasing of decisions.
-- If owner is ambiguous, set `owner: "Both"` and surface in the user-confirm step.
-- If due date is ambiguous, leave empty. Never invent.
+- Every decision + action carries a `confidence` field:
+  - `high` - explicit in transcript, clear owner, clear intent.
+  - `medium` - implied or owner/scope slightly fuzzy.
+  - `low` - inferred, ambiguous owner, or transcript span was garbled.
+- If owner is ambiguous, set `owner: "Both"` + `confidence: "low"` and surface it in Phase 3. Never guess a specific owner.
+- If due date is ambiguous, leave empty + `confidence: "medium"` or lower. Never invent. Relative dates ("by Thursday") -> absolute, anchored to `meeting.date`.
 - Category must come from the enum above (matches actions.json schema).
 - 3-8 quotes max - pick load-bearing ones (decisions, commitments, surprising info).
 - `memory_updates` only if a NEW person, project, or strategy decision appeared (not for things already in `~/.claude/projects/.../memory/MEMORY.md`).
+- Never silently drop an uncertain item. A `low`-confidence item still goes in the JSON - Phase 3 surfaces it for Zaal.
+
+### Entity cross-check (Pass E)
+
+For EVERY attendee and every referenced person/project name, before deciding it is "new":
+
+```bash
+grep -ril "<name>" "/Users/zaalpanthaki/Documents/ZAO OS V1/research/" 2>/dev/null | head -3
+grep -i "<name>" ~/.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/MEMORY.md
+```
+
+- **Hit in research/** - the entity exists. Link the doc number in the recap (e.g. "Tyler Stambaugh, doc 473"). Do NOT create a memory.
+- **Hit in MEMORY.md** - the entity has a memory. Link `[[slug]]`. Do NOT create a duplicate.
+- **No hit anywhere** - genuinely new. Add a `memory_updates` entry.
+
+This stops the skill re-introducing known people as if they were new (test run 1 missed Tyler Stambaugh = doc 473).
+
+## Phase 2.5 - Clarify gaps
+
+Before the Phase 3 confirm, scan the extraction for genuine gaps and ask Zaal about them in ONE batched question round. Ask only when the answer changes the doc - not for things you can infer.
+
+Ask about:
+- A referenced person with zero context AND no hit in the Pass E cross-check (who are they, what role).
+- A decision/action where the owner is genuinely unknown (not just "Both").
+- A name that could be a mis-transcription (surface both spellings).
+- A project-routing call that is not obvious from attendees + topic.
+
+If the extraction is clean and nothing is genuinely ambiguous, skip Phase 2.5 and go straight to Phase 3. Do not invent questions to fill the phase. Zaal has said he is fine with the skill asking questions when they are real - so ask the real ones here, before the confirm, not after.
 
 ## Phase 3 - Present + confirm
 
-Show the extracted JSON inline as a markdown table for each section. Ask Zaal:
+Show the extracted JSON inline as a markdown table for each section (decisions, actions, quotes).
 
-> "Extracted N decisions, M actions, K quotes. Edits? If clean, which targets fire?"
+**Before the confirm prompt, render a VERIFY block** listing every `confidence: low` (and optionally `medium`) decision + action:
+
+```
+VERIFY - low-confidence extractions, confirm or correct each:
+- [action] "<title>" - owner unclear, transcript said "..."
+- [decision] "<text>" - inferred, not explicit
+```
+
+If the VERIFY block is non-empty, Zaal must resolve those items before any actions.json write. Do not write low-confidence items unedited.
+
+Then ask Zaal:
+
+> "Extracted N decisions, M actions, K quotes (J flagged to verify above).
+> Project: <inferred project> - correct? (ZAO Devz / ZAOstock / ZAO OS / other)
+> Edits? If clean, which targets fire?"
 >
-> Targets:
-> - [x] actions.json bulk append (default ON)
-> - [x] research/events/NNN-<slug>/README.md (default ON, every meeting per doc 673)
+> Targets (action target depends on project - see Phase 0):
+> - [x] Action tracker for `<project>` (default ON)
+> - [x] research/events/NNN-<slug>/README.md (default ON, every meeting, always ZAOOS)
 > - [ ] Bonfire ingest queue (opt-in)
 > - [ ] Telegram copy-paste block (opt-in, default OFF - print only on request)
 > - [ ] Memory writes (opt-in, confirm each)
 > - [ ] Calendar event update (opt-in if title matches a Google Cal event)
 
-Wait for Zaal's reply before any destructive write.
+Wait for Zaal's reply before any destructive write. Confirm the project before touching any tracker - a ZAOstock meeting must not write into the cowork-zaodevz tracker.
 
 ## Phase 4 - Distribute
 
 For each enabled target, follow the playbook in [references/distribution-targets.md](references/distribution-targets.md). Summary:
 
-### actions.json (cowork-zaodevz)
+### Action tracker (routed by project - Phase 0)
+
+**Project = ZAO Devz / general:** write to cowork-zaodevz `data/actions.json`.
 ```bash
 bash ${CLAUDE_SKILL_DIR}/scripts/append-actions.sh /tmp/extracted-actions.json
 ```
 Script reads the actions array, fetches current `data/actions.json` from GitHub, appends new items starting at `max(existing.id) + 1`, PUTs back via `gh api` with sha. One commit per meeting.
 
+**Project = ZAOstock:** do NOT write to cowork-zaodevz. ZAOstock tasks live in the ZAOstock Supabase behind @ZAOstockTeamBot. v1: print a paste-block of the action items for Zaal to drop into @ZAOstockTeamBot (`/note` or task command). Also note them in the recap doc's action table. (v2: a `zaostock-actions.sh` that inserts into ZAOstock Supabase via service-role key - deferred until the ZAOstock task schema is confirmed.)
+
+**Project = ZAO OS / BCZ / WaveWarZ / other:** no external tracker. Actions live only in the recap doc's action table.
+
 ### research/events/NNN-<slug>/README.md
 - Find next number: `find research -maxdepth 3 -type d -name '[0-9]*' | grep -oE '/[0-9]+' | tr -d '/' | sort -n | tail -1`
 - Slug from meeting title: lowercase, hyphens, no special chars, max 50 chars.
 - Use the template at [references/meeting-recap-template.md](references/meeting-recap-template.md). Doc 670 is the gold-standard worked example.
-- Write file, do NOT commit yet - leave for Zaal review in current `ws/` branch.
+- **Raw transcript goes in a SEPARATE file**, not inline in the README. Write the full transcript to `research/events/NNN-<slug>/transcript.md`. The README's "Transcript" section is a one-line link: `Full transcript: [transcript.md](transcript.md)`. Keeps the recap README lean and grep-friendly; a 10k-word transcript inline buries the signal.
+- Write both files, do NOT commit yet - leave for Zaal review in current `ws/` branch.
+
+### Meeting index (always - every run)
+
+Prepend a row to `research/events/_meetings-index.md` so there is ONE canonical list of every meeting ever captured. This is the answer to "show me all past meetings" - a single grep-free file, newest first.
+
+If `research/events/_meetings-index.md` does not exist, create it with this header:
+
+```markdown
+# Meetings Index
+
+Every meeting processed by /meeting, newest first. Maintained automatically by the skill.
+
+| Date | Title | Project | Attendees | Doc | Actions |
+|------|-------|---------|-----------|-----|---------|
+```
+
+Then insert the new meeting as the first data row:
+
+```
+| 2026-05-19 | ZAOstock advisor call | ZAOstock | Zaal, failoften | [678](678-zaostock-advisor-call-may19/) | 12 |
+```
+
+This is not optional and not project-routed - every meeting, every project, one index. Commit it alongside the recap doc.
 
 ### Bonfire ingest queue
 - Write transcript + recap to `content/bonfire-ingest/meeting-YYYY-MM-DD-<slug>.md`.
@@ -167,18 +272,51 @@ Use `mcp__claude_ai_Google_Calendar__list_events` to find an event matching `mee
 
 ## Phase 5 - Report
 
-Print to user a one-line per-target summary:
+Print to user a one-line per-target summary. `[OK]` = done, `[--]` = skipped. One line per target that exists this run:
 
 ```
-[OK] actions.json - 7 items appended (commit abc1234)
-[OK] research/events/674-iman-call-may18 - draft written, review before commit
+[OK] Actions - <N> items -> <tracker> (cowork-zaodevz commit <sha> | ZAOstock paste-block)
+[OK] Recap doc - research/events/<NNN>-<slug>/README.md - draft written, review before commit
+[OK] Transcript - research/events/<NNN>-<slug>/transcript.md
 [--] Bonfire - skipped
 [OK] Telegram - block printed above
-[OK] Memory - 1 entry written (project_zao_craig.md)
+[OK] Memory - <N> entries (<slugs>)
 [--] Calendar - no matching event
+[OK] Clipboard - next-actions page opened
 ```
 
+Use the real values from this run. Do not copy the placeholders. The recap-doc number must be the one actually used (collision-safe pick, not a guess).
+
 Then suggest the natural next step: "Review research doc at <path>. Commit + PR when ready, or want me to ship it as a PR off ws/<branch> now?"
+
+## Phase 6 - Next-actions clipboard (default ON)
+
+After the report, auto-hand-off the next-actions to the `/clipboard` skill so Zaal has a clean copyable page the moment the meeting ends. This is the "what do I do now" surface - distinct from the Telegram block (which is for sharing the recap).
+
+Build a plain next-actions list - owner-grouped, due-sorted:
+
+```
+Next actions - <meeting title> (<date>)
+
+ZAAL
+- <action> (due <date>)
+- <action>
+
+IMAN
+- <action> (due <date>)
+
+BOTH
+- <action>
+```
+
+Then invoke the `/clipboard` skill with that list as the content. `/clipboard` opens a local browser page with the text ready to copy in one click (or copies to the macOS clipboard via pbcopy).
+
+Rules:
+- Default ON. Skip only if Zaal says "no clipboard" or there are zero actions.
+- Next-actions list = the `actions[]` array only. Not decisions, not quotes - this is the do-now list.
+- Owner-grouped so Zaal can paste each person's slice into their DM/GC directly.
+- If a single owner (e.g. all Zaal), skip the grouping headers - just the flat list.
+- This runs AFTER the tracker write, so the clipboard list and the tracker agree.
 
 ## Hard guardrails
 
@@ -197,6 +335,10 @@ Then suggest the natural next step: "Review research doc at <path>. Commit + PR 
 - Do NOT use emojis in any output (per global `feedback_no_emojis`).
 - Do NOT use em dashes (per global `feedback_no_em_dashes`).
 
+## Doc numbering (collision-safe)
+
+When creating the recap doc, parallel Claude sessions may race for the same number. Pick the next number defensively: `git fetch origin` first, scan `research/` for the max, and if the chosen folder already exists, increment again. Per doc 663 collision-tolerance, a small gap in numbering is fine - a collision is not.
+
 ## References
 
 - [output-schema.md](references/output-schema.md) - JSON schema + worked example from doc 670
@@ -207,4 +349,12 @@ Then suggest the natural next step: "Review research doc at <path>. Commit + PR 
 
 - `scripts/transcribe.sh` - SCP to VPS, run Whisper, SCP back
 - `scripts/fetch-craig.sh` - curl Craig recording URL, extract audio
-- `scripts/append-actions.sh` - `gh api` PUT for `data/actions.json` bulk append
+- `scripts/append-actions.sh` - `gh api` PUT for `data/actions.json` bulk append (ZAO Devz project only)
+
+## Evals
+
+- `evals/README.md` - regression fixtures (doc 670 + doc 675 transcripts). Run after editing this skill.
+
+## Engineering basis
+
+Skill structure follows doc 676 (skill-engineering best practices): multi-pass extraction, confidence thresholding, human-review fallback, progressive disclosure. Read doc 676 before refactoring this skill.

@@ -2,7 +2,17 @@
 
 How each target gets the extracted output. Skill reads this when Phase 3 confirm flips a target ON.
 
-## 1. actions.json (cowork-zaodevz)
+## 1. Action tracker (routed by project - SKILL.md Phase 0)
+
+The action target depends on the meeting's project:
+
+| Project | Action target | See |
+|---|---|---|
+| ZAO Devz / general | cowork-zaodevz `data/actions.json` (GitHub PUT) | 1a below |
+| ZAOstock | paste-block for @ZAOstockTeamBot | 1b below |
+| ZAO OS / BCZ / WaveWarZ / other | recap doc action table only - no external tracker | n/a |
+
+### 1a. cowork-zaodevz actions.json (project = ZAO Devz / general)
 
 **Target:** `data/actions.json` on `main` of `songchaindao-dot/cowork-zaodevz`.
 **Method:** GitHub Contents API PUT via `gh api`. Bulk append in one commit.
@@ -46,6 +56,21 @@ chore(actions): meeting recap YYYY-MM-DD <title slug> (+N items)
 
 Source: research/events/NNN-<slug>/README.md
 ```
+
+### 1b. ZAOstock paste-block (project = ZAOstock)
+
+Do NOT write to cowork-zaodevz. ZAOstock tasks live in the ZAOstock Supabase behind @ZAOstockTeamBot.
+
+v1: print a single fenced paste-block of the action items for Zaal to drop into @ZAOstockTeamBot. Format:
+
+```
+ZAOstock meeting YYYY-MM-DD - action items
+
+1. <action> (owner)
+2. <action> (owner)
+```
+
+Also keep the actions in the recap doc's action table. v2 (deferred): a `zaostock-actions.sh` inserting into ZAOstock Supabase via service-role key, once the ZAOstock task schema is confirmed.
 
 ## 2. Research doc (research/events/NNN-<slug>/README.md)
 

@@ -9,6 +9,7 @@ allowed-tools: Read Write Edit Bash WebFetch Skill AskUserQuestion
 Turn any meeting recording or transcript into:
 - Action items in the right project's tracker (cowork-zaodevz `actions.json`, ZAOstock bot - routed in Phase 0)
 - A research recap doc in `research/events/NNN-<slug>/README.md` (always ZAOOS, per doc 673)
+- A row in `research/events/_meetings-index.md` - the one canonical list of every past meeting
 - A copy-paste Telegram bubble for sharing
 - A next-actions clipboard page the moment the meeting ends (Phase 6)
 - Optional Bonfire ingest, memory write, calendar update
@@ -216,6 +217,29 @@ Script reads the actions array, fetches current `data/actions.json` from GitHub,
 - Use the template at [references/meeting-recap-template.md](references/meeting-recap-template.md). Doc 670 is the gold-standard worked example.
 - **Raw transcript goes in a SEPARATE file**, not inline in the README. Write the full transcript to `research/events/NNN-<slug>/transcript.md`. The README's "Transcript" section is a one-line link: `Full transcript: [transcript.md](transcript.md)`. Keeps the recap README lean and grep-friendly; a 10k-word transcript inline buries the signal.
 - Write both files, do NOT commit yet - leave for Zaal review in current `ws/` branch.
+
+### Meeting index (always - every run)
+
+Prepend a row to `research/events/_meetings-index.md` so there is ONE canonical list of every meeting ever captured. This is the answer to "show me all past meetings" - a single grep-free file, newest first.
+
+If `research/events/_meetings-index.md` does not exist, create it with this header:
+
+```markdown
+# Meetings Index
+
+Every meeting processed by /meeting, newest first. Maintained automatically by the skill.
+
+| Date | Title | Project | Attendees | Doc | Actions |
+|------|-------|---------|-----------|-----|---------|
+```
+
+Then insert the new meeting as the first data row:
+
+```
+| 2026-05-19 | ZAOstock advisor call | ZAOstock | Zaal, failoften | [678](678-zaostock-advisor-call-may19/) | 12 |
+```
+
+This is not optional and not project-routed - every meeting, every project, one index. Commit it alongside the recap doc.
 
 ### Bonfire ingest queue
 - Write transcript + recap to `content/bonfire-ingest/meeting-YYYY-MM-DD-<slug>.md`.

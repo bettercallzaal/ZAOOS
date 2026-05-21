@@ -2,7 +2,7 @@
 topic: business
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Analyze Lunar's Polymarket bot architecture 4 open-source repos + Claude API consensus voting strategy from X post (reconstructed)
 tier: STANDARD
 ---

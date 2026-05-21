@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: archive
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: ["255", "258", "283", "222"]
 original-query: "How should FISHBOWLZ token economy work? Token deployment, fees, buyback mechanism? (reconstructed)"
 tier: STANDARD

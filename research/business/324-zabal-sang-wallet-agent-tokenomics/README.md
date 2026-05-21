@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: ["282", "283", "284"]
 original-query: "How should an agent wallet system work for ZABAL/SANG swaps, promoter rewards, and x402 payments? (reconstructed)"
 tier: STANDARD

@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: []
 original-query: "What are Discord/Telegram bridges, competitors in decentralized music, and monetization strategies at small scale? (reconstructed)"
 tier: STANDARD

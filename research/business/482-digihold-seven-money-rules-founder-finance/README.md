@@ -2,7 +2,7 @@
 topic: business
 type: operations
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Adapt Nicolas DigiHold 7 personal-finance rules into BetterCallZaal Strategies LLC operating procedure + ZAO Music entity cash flow (reconstructed)
 tier: STANDARD
 ---

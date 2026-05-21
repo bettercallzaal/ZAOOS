@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [029-artist-revenue-ip-rights, 143-0xsplits-revenue-distribution, 322-ai-music-distribution]
 original-query: "Can a community of musicians profitably license AI-assisted music for sync placements, and what's the legal+economic framework for a web3 AI music label? (reconstructed)"
 tier: STANDARD

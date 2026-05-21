@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: ["255", "280", "281", "290", "298"]
 original-query: "What are best practices for audio rooms? How do Clubhouse, X Spaces, Discord work? (reconstructed)"
 tier: STANDARD

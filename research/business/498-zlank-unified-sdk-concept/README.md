@@ -2,7 +2,7 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Decide if Zlank is worth building scope the MVP identify what ZAO OS already has map the ask to Adrian Orajo Diviflyy (reconstructed)
 related-docs: 281, 361, 475, 497
 tier: DISPATCH

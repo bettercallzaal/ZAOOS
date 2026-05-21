@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: []
 original-query: "How do artists make money on different platforms? What IP rights and revenue models should ZAO OS adopt? (reconstructed)"
 tier: STANDARD

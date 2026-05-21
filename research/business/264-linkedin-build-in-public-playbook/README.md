@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: []
 original-query: "What are the exact LinkedIn post structures, character counts, and formatting rules that maximize engagement for web3 builders and founders publishing in 2026? (reconstructed)"
 tier: STANDARD

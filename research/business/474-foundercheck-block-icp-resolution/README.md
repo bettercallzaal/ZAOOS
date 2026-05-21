@@ -2,7 +2,7 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Resolve the 3-in-one customer problem education-vs-distribution mismatch and redesign the validation experiment against ZAO canonical ICP (reconstructed)
 tier: STANDARD
 ---

@@ -2,7 +2,7 @@
 topic: business
 type: integration
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Deep dive on Coinflow ISV program Launchpad accelerator supported chains tokens and implementation plan for WaveWarZ merchant and ZAO ISV (reconstructed)
 tier: STANDARD
 ---
@@ -275,17 +275,17 @@ See Doc 222 for full payment infrastructure file plan (Stripe + Coinbase Commerc
 
 ## Sources
 
-- [Coinflow Launchpad ISV Program](https://coinflow.cash/launchpad/)
-- [Coinflow Embedded Payments Blog](https://coinflow.cash/blog/what-are-embedded-payments/)
-- [Coinflow February 2026 Updates](https://coinflow.cash/blog/new-at-coinflow-february-2026/)
-- [Coinflow Supported Tokens & Chains](https://docs.coinflow.cash/guides/checkout/payment-methods/payment-methods/crypto-payments/supported-tokens-and-chains)
-- [Coinflow Marketplace Overview](https://docs.coinflow.cash/guides/marketplaces/marketplace-overview)
-- [Coinflow Implementation Guide](https://docs.coinflow.cash/guides/checkout/implementation-overview/getting-started-with-implmentation)
-- [Coinflow $25M Series A - Fortune](https://fortune.com/crypto/2025/10/08/stablecoin-coinflow-startup-funding-round-pantera-stripe-payments/)
-- [Coinflow $25M Series A - CoinDesk](https://www.coindesk.com/business/2025/10/08/coinflow-raises-usd25m-to-scale-stablecoin-payments-backed-by-pantera-and-coinbase/)
-- [Coinflow Documentation](https://docs.coinflow.cash/)
-- [Doc 125 - Coinflow SDK Integration](../125-coinflow-fiat-checkout/)
-- [Doc 222 - Payment Infrastructure](../222-payment-infrastructure-stripe-coinbase/)
+- [Coinflow Launchpad ISV Program](https://coinflow.cash/launchpad/) [FULL - verified 2026-05-21]
+- [Coinflow Embedded Payments Blog](https://coinflow.cash/blog/what-are-embedded-payments/) [PARTIAL]
+- [Coinflow February 2026 Updates](https://coinflow.cash/blog/new-at-coinflow-february-2026/) [PARTIAL]
+- [Coinflow Supported Tokens & Chains](https://docs.coinflow.cash/guides/checkout/payment-methods/payment-methods/crypto-payments/supported-tokens-and-chains) [PARTIAL]
+- [Coinflow Marketplace Overview](https://docs.coinflow.cash/guides/marketplaces/marketplace-overview) [PARTIAL]
+- [Coinflow Implementation Guide](https://docs.coinflow.cash/guides/checkout/implementation-overview/getting-started-with-implmentation) [FULL - verified 2026-05-21]
+- [Coinflow $25M Series A - Fortune](https://fortune.com/crypto/2025/10/08/stablecoin-coinflow-startup-funding-round-pantera-stripe-payments/) [FULL]
+- [Coinflow $25M Series A - CoinDesk](https://www.coindesk.com/business/2025/10/08/coinflow-raises-usd25m-to-scale-stablecoin-payments-backed-by-pantera-and-coinbase/) [FULL]
+- [Coinflow Documentation](https://docs.coinflow.cash/) [FULL - verified 2026-05-21]
+- [Doc 125 - Coinflow SDK Integration](../125-coinflow-fiat-checkout/) [INTERNAL]
+- [Doc 222 - Payment Infrastructure](../222-payment-infrastructure-stripe-coinbase/) [INTERNAL]
 
 ---
 

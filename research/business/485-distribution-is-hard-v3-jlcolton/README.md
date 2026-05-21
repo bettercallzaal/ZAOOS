@@ -2,7 +2,7 @@
 topic: business
 type: playbook
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Extract the operating principles from jlcolton V3 rewrite and translate into distribution playbook for ZAO OS ZAO Music BCZ Strategies and portal bot fleet (reconstructed)
 tier: STANDARD
 ---

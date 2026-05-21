@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: ["244", "264"]
 original-query: "What engagement mechanics make viral posts work? How to extract lessons for honest ZAO content? (reconstructed)"
 tier: STANDARD

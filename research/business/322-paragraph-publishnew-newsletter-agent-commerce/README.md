@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: []
 original-query: "How do Paragraph, Publish.new, and agent commerce work? How to integrate COC Concertz? (reconstructed)"
 tier: STANDARD

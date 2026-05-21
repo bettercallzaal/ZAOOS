@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [344-bankr-bot-agent-trading-skills, 322-paragraph-publishnew-newsletter]
 original-query: "How can agents (VAULT/BANKER/DEALER) publish content to Paragraph, monetize via x402 HTTP payment protocol, and automatically convert USDC earnings to ZABAL buybacks? (reconstructed)"
 tier: STANDARD

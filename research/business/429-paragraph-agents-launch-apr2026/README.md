@@ -2,7 +2,7 @@
 topic: business
 type: launch
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Capture what shipped in Paragraph's Apr 17 2026 agent-native launch and map it to ZOE ROLO VAULT BANKER DEALER and ZAO newsletter workflow (reconstructed)
 tier: STANDARD
 ---

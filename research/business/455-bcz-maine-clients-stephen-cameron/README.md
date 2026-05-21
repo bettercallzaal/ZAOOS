@@ -2,7 +2,7 @@
 topic: business
 type: prospect-profile
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Profile two new BetterCallZaal Maine leads one hotel group ZAO Stock room block target one landscape design firm website + logo refresh client both on Mount Desert Island (reconstructed)
 tier: STANDARD
 ---

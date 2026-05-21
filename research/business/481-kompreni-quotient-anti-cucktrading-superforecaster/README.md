@@ -2,7 +2,7 @@
 topic: business
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Evaluate kompreni Quotient AI superforecaster as reference for ZAO thesis-based trading governance-signal tooling and copy-trade no KOL alpha framing for ZABAL SANG markets (reconstructed)
 tier: STANDARD
 ---

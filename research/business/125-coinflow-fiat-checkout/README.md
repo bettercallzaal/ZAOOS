@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: []
 original-query: "How does Coinflow work? Should ZAO OS use it for fiat-to-crypto checkout? (reconstructed)"
 tier: STANDARD
@@ -18,10 +18,10 @@ tier: STANDARD
 
 | Decision | Recommendation |
 |----------|----------------|
-| **Use Coinflow?** | YES — fiat on-ramp with card/ACH/Apple Pay that settles directly to USDC on EVM chains (Base, Arbitrum). Perfect for ZAO's non-crypto-native artists |
+| **Use Coinflow?** | YES — Series A funded ($25M, Oct 2025), 23x revenue growth since seed. Fiat on-ramp with card/ACH/Apple Pay that settles directly to USDC on EVM chains (Base, Arbitrum). Perfect for ZAO's non-crypto-native artists |
 | **Settlement** | Use **EVM contract settlement** on Base (ZAO's primary chain) — Coinflow sends USDC directly to your smart contract |
 | **Integration method** | `@coinflow/react` npm package — `CoinflowPurchase` React component, works with wagmi/viem |
-| **Payment methods** | Cards (Visa/MC/Amex/Discover), ACH, Apple Pay, Google Pay, PIX — covers global artist community |
+| **Payment methods** | Cards (Visa/MC/Amex/Discover), ACH, Apple Pay, Google Pay, PIX — covers 170+ countries (post-Series A expansion) |
 | **Credits system** | Consider Coinflow Credits for in-app currency (pre-loaded USD wallet, non-withdrawable, no expiration) — good for WaveWarZ battles or music tips |
 | **Webhooks** | 24+ event types with HMAC signature verification — use for confirming purchases in Supabase |
 | **Not yet in codebase** | Zero Coinflow references in `src/`. This is net-new integration work |

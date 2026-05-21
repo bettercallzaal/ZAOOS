@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: []
 original-query: "What is Trustware SDK? Should ZAO OS use it for crypto payments? (reconstructed)"
 tier: STANDARD

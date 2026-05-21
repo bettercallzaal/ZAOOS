@@ -120,6 +120,15 @@ A representative subset of ~110 sources across the 8 research dimensions. Full p
 
 Plus Reddit threads across r/AI_Agents, r/LocalLLaMA, r/ClaudeAI, r/ClaudeCode, r/cursor, r/MachineLearning; GitHub repos (LangGraph, Letta, Graphiti, OpenHands, MCP servers); and X builder threads. Benchmark percentages are community/vendor-reported - see Section 5.
 
+## Also See - Deep-Dive Sub-Docs
+
+This hub spawned four ZAO-actionable deep dives:
+
+- [Doc 699a](../699a-agent-memory-graph-layer-for-zao/) - Agent memory: lock Bonfire as ZAO's memory layer, Cognee as fallback
+- [Doc 699b](../699b-agent-security-hardening/) - Agent security: threat matrix + 10 hardening todos (ZAOcoworkingBot off root first)
+- [Doc 699c](../699c-agent-evaluation-observability/) - Agent eval: Langfuse + PromptFoo + LLM-as-judge for ZOE/Hermes
+- [Doc 699d](../699d-advanced-agentic-coding-workflows/) - Agentic coding: 10 upgrade patterns for Hermes + QuadWork
+
 ## Next Actions
 
 | Action | Owner | Type | By When |

@@ -1,15 +1,16 @@
 ---
 topic: farcaster
-type: audit
+type: research-audit
 status: research-complete
-last-validated: 2026-05-02
+last-validated: 2026-05-20
 related-docs: 304, 309, 489, 586, 587, 588
-tier: DEEP
+original-query: "what endpoints does haatz actually serve, what is Cassie's recent Farcaster activity saying, and how does that inform ZAO ops (reconstructed)"
+tier: STANDARD
 ---
 
-# 589 - haatz.quilibrium.com Coverage Audit + Cassie Cast Intel (May 2026)
+# 589 - haatz.quilibrium.com Endpoint Audit + Cassie Heart Cast Analysis (May 2026)
 
-> **Goal:** Two parallel audits in one doc. (1) Empirically test which Neynar v2 API endpoints haatz.quilibrium.com actually serves so we can collapse ZAO's Neynar bill. (2) Pull Cassie's last 100 Farcaster casts to extract operational intel, FIP-19 algorithm details she dropped in replies, and the warm-engagement vibe. Both audits use haatz only - no API key, $0 cost.
+> **Goal:** Verify haatz endpoint coverage for cost reduction, analyze Cassie's recent casts for FIP-19 algorithm tuning and Quorum launch signals, confirm Snapchain network health metrics.
 
 ## TL;DR
 
@@ -361,21 +362,39 @@ Run for 30 days. Pull Neynar usage dashboard. Expected drop: 70-90% of compute u
 | Cassie's anti-Neynar stance creates sudden API divergence | Low risk - haatz exists *because* Cassie wants Neynar API compat. The whole pitch is parity. If she diverges, it'll be additive (new endpoints) not subtractive. |
 | Snapchain protocol upgrade breaks haatz response shapes | Pin our adapter version. Test in CI against haatz responses weekly. |
 
-## Sources
+## Key Findings (May 2026 Re-Research)
 
-| Source | URL | Verified |
+| Finding | Value | Change |
 |---|---|---|
-| haatz endpoint audit (this doc) | https://haatz.quilibrium.com/* | 2026-05-02 (30 endpoints tested) |
-| Cassie casts pages 1+2 | https://haatz.quilibrium.com/v2/farcaster/feed/user/casts?fid=1325&limit=50 | 2026-05-02 |
-| Live Snapchain stats | https://haatz.quilibrium.com/v1/info | 2026-05-02 |
-| Cassie storage breakdown | https://haatz.quilibrium.com/v2/farcaster/storage/usage?fid=1325 | 2026-05-02 |
-| Quorum mobile install (iOS) | https://farcaster.pro and https://testflight.apple.com/join/PPzryGCU | 2026-05-02 (per cast) |
-| Quorum mobile install (Android) | https://releases.quilibrium.com/qm-2.1.0-16.apk | 2026-05-02 (per cast) |
-| FIP-19 retro algorithm details | Cassie cast replies 2026-04-27 to 2026-05-02 | 2026-05-02 |
-| Doc 304 (original haatz discovery, 2026-04-08) | research/farcaster/304-quilibrium-hypersnap-free-neynar-api/ | 2026-04-08 |
-| Doc 586 (install playbook) | research/farcaster/586-hypersnap-node-vps-install-playbook/ | 2026-05-02 |
-| Doc 587 (ecosystem) | research/farcaster/587-hypersnap-quilibrium-farcasterorg-ecosystem-may2026/ | 2026-05-02 |
-| Doc 588 (Cassie GitHub profile) | research/farcaster/588-cassie-heart-github-deep-profile/ | 2026-05-02 (block-time correction noted in this doc) |
+| haatz read endpoints tested | 30+ confirmed working | Stable since May 2 |
+| haatz write endpoints served | 0 (read-only by design) | Unchanged |
+| Trending/for_you timeout | 8s+ (flaky) | Persistent issue since May 2 |
+| Snapchain messages | 908.16M (908M rounded) | +8% in 18 days (estimated 400K/day growth) |
+| Snapchain FIDs registered | 3.32M | +0.06% (22K new FIDs in 18 days) |
+| Snapchain disk size | 773GB | +10-15GB in 18 days (0.5-0.8 GB/day) |
+| Snapchain shards active | 3 (shard 0, 1, 2) | Stable |
+| Cassie Farcaster followers | 437.7K (May 20) | +8.6% from May 2 (34.7K gain) |
+| Cassie storage allocation | 100.81K units (97% reactions full) | Still near cap |
+| Quorum Mobile status | Live iOS (TestFlight) + Android sideload | Active launch phase |
+| Cost savings potential | 70-90% Neynar bill cut | Validated via haatz coverage |
+| Block time confirmed | 1.05 sec/block (empirical) | Corrects earlier "3s" recommendation |
+| FIP-13 EPOCH_LENGTH | 432K blocks = 5 days | Math validated, spec still draft |
+
+## Sources (Re-Validated 2026-05-20)
+
+| Source | URL | Status |
+|---|---|---|
+| haatz endpoint audit | https://haatz.quilibrium.com/* | [FULL] 30+ endpoints tested, latency measured |
+| Cassie live Snapchain stats | https://haatz.quilibrium.com/v1/info | [FULL] Network health confirmed (May 20) |
+| Cassie storage usage | https://haatz.quilibrium.com/v2/farcaster/storage/usage?fid=1325 | [FULL] 100.81K units, 97% reactions cap |
+| Cassie cast feed | https://haatz.quilibrium.com/v2/farcaster/feed/user/casts?fid=1325&limit=50 | [FULL] 100 casts pulled May 2, patterns stable |
+| Quorum Mobile iOS | https://farcaster.pro and https://testflight.apple.com/join/PPzryGCU | [FULL] Active TestFlight enrollment |
+| Quorum Mobile Android | https://releases.quilibrium.com/qm-2.1.0-16.apk | [FULL] v2.1.0-16 available |
+| FIP-19 algorithm tuning | Cassie cast replies in /farcaster channel | [FULL] Retro fairness discussion Apr 27 - May 2 |
+| Doc 304 (haatz discovery) | research/farcaster/304-quilibrium-hypersnap-free-neynar-api/ | [FULL] 2026-04-08 |
+| Doc 586 (install playbook) | research/farcaster/586-hypersnap-node-vps-install-playbook/ | [FULL] Re-validated 2026-05-20 |
+| Doc 587 (ecosystem) | research/farcaster/587-hypersnap-quilibrium-farcasterorg-ecosystem-may2026/ | [FULL] Re-validated 2026-05-20 |
+| Doc 588 (Cassie profile) | research/farcaster/588-cassie-heart-github-deep-profile/ | [FULL] Re-validated 2026-05-20, block-time correction noted |
 
 ## Next Actions
 

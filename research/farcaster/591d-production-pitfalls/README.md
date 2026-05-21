@@ -1,13 +1,16 @@
 ---
 topic: farcaster
-type: incident-postmortem
+type: guide
 status: research-complete
-last-validated: 2026-05-02
+last-validated: 2026-05-20
 related-docs: 591, 591a, 591b, 591c, 591e
 tier: STANDARD
+original-query: "Farcaster miniapp production pitfalls, failure modes diagnosis, fixes for stuck splash, sign-in loops, cache horrors, cold-start races, auth replay, mobile quirks (iOS WKWebView, Android custom tabs), disable/uninstall flows, CI checks. (reconstructed)"
 ---
 
 # 591d - Farcaster Mini App Production Pitfalls
+
+> **Goal:** Catalogue 8 production failure modes with root causes, diagnostics, and fixes. Coverage: stuck splash (X-Frame-Options, ready() timing, manifest fetch, bundle hash), sign-in loops (SameSite=Lax, session save race), "couldn't load" (cache-control, SSR bailout, CSP nonce mismatch), cold-start races (context timing, hydration order), cache invalidation (service worker, CDN, ISR revalidation), auth replay, mobile quirks (iOS ITP, WKWebView cookies, Android custom tabs), disable/uninstall cleanup.
 
 ## TL;DR Pre-Flight Checklist
 

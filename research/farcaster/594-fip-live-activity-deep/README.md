@@ -1,34 +1,40 @@
 ---
 topic: farcaster
-type: decision
+type: guide
 status: research-complete
-last-validated: 2026-05-03
-related-docs: 081, 304, 309, 489, 587, 591, 593
-tier: DEEP
+last-validated: 2026-05-20
+related-docs: [081, 304, 309, 489, 587, 591, 593, 595, 596, 598]
+tier: STANDARD
+original-query: "FIP 268 and 269 live activity audio spaces protocol details threat model precedents and network load analysis (reconstructed)"
 ---
 
-# 594 — FIP Live Activity (Audio Spaces) DEEP DIVE: Threat Model, Precedents, Network Load, FarCon Feedback
+# 594 — FIP Live Activity Deep Dive: Threat Model, Precedents, Network Load
 
-> **Goal:** Companion to Doc 593's 5-PR action plan. Goes wide on author intent, Juke alignment, 8 prior-art platforms, privacy threats, Snapchain internals, network-wide load math, cooperative-writer attack surface, and verbatim feedback drafts to land before FarCon Rome (2026-05-04 / 2026-05-05).
+> **Goal:** Technical deep dive on FIP 268 + 269 design, author network, 8 prior-art platforms, 3 HIGH-severity privacy risks, Snapchain load math, cooperative-writer attack surface, and privacy mitigations for ZAO Spaces.
 
-## URGENT TIMING UPDATE (overrides Doc 593)
+## Key Findings
 
-**FarCon 2026 is this weekend.** May 4-5 at Palazzo Brancaccio, Rome. Per FarCon agenda: May 4 = Builders Day, May 5 = Summit Day. rish dropped FIPs #268 + #269 on 2026-05-03 ~12 hours before Builders Day. The "weekend read going into farcon" framing means **technical feedback should land within 24-36 hours of right now (2026-05-03 evening US time)**, not "by 2026-05-09" as Doc 593 stated.
+| # | Fact | Source |
+|---|------|--------|
+| 1 | FIP #268 authored by rishavmukherji (Neynar co-founder); FIP #269 same author. Both now Stage 3: Review as of May 20, 2026 (moved from Stage 2 Draft). | GitHub farcasterxyz/protocol discussions 268, 269 |
+| 2 | No `USER_DATA_TYPE_LIVE_AT = 10` enum yet in Snapchain UserData API docs. Snapchain team must ship enum bump after FIP acceptance; blocks PR #3 (LIVE_AT writer) per Doc 596. | snapchain-docs.vercel.app/reference/httpapi/userdata |
+| 3 | FIP #268 specifies 5000 LIVE_AT writes/hour per storage unit (5s heartbeat); 27x current Snapchain sustained rate (1000/sec) if 5% Farcaster concurrent live. Network-wide load IS a real concern. | FIP #268 specification + Doc 594 load math |
+| 4 | Juke (LiveKit + iOS TestFlight) remains primary production live-activity app on Farcaster; no public FIP #268 commitment yet. @nickysap founded Juke solo or 2-3 person team, closed source. | juke.audio, @nickysap Farcaster profile |
+| 5 | Cooperative writer convention (activity preempts presence, presence yields) is SHOULD not MUST — pure social enforcement, no protocol cost on misbehavior. | FIP #268 spec "Cooperative writing convention" section |
+| 6 | 3 HIGH-severity privacy risks: real-time stalking via LIVE_AT, co-location inference via speakerFids meta tags, permanent presence history (no USER_DATA_REMOVE). App-layer mitigations exist for risks 1+2; risk 3 unfixable at app layer. | Doc 594 Privacy Threat Model section |
 
-Implication: post feedback comments **2026-05-04 morning UTC** (before Builders Day starts) so rish + topocount + manan see them before in-person discussions. After FarCon Stage-2-Draft consensus likely hardens; missing that window means feedback rolls into a Stage 3 Final amendment, not the original spec.
+## ZAO Application
 
-## Key Decisions (Revised from Doc 593)
+ZAO Spaces (HMS + Livepeer, 188 gated members) can ship 3 immediate PRs (meta tags, manifest endpoint, fc:cast linkage) that do NOT depend on Snapchain LIVE_AT enum bump. Per Doc 596, shipping app-layer meta tags now positions ZAO as reference implementation.
 
-| # | Decision | Action | Why |
-|---|----------|--------|-----|
-| 1 | **POST FEEDBACK on #268 + #269 BEFORE 2026-05-04 09:00 UTC** | Use the verbatim drafts in section "FIP Feedback Comments" below. Reference Nostr NIP-53 precedent + ZAO Spaces real-world test bed + 3 specific privacy gaps. | FarCon Builders Day starts that window. Stage 2 Draft consensus likely hardens at FarCon. |
-| 2 | **DM @topocount.eth directly, not just rish** | He maintains `@farcaster/*` npm packages + Snapchain. He is the Snapchain implementer of the FIP. Warm intro: ZAO's existing HMS+Livepeer Spaces stack. | rish wrote it; topocount ships it. Feedback that reaches the implementer lands harder than feedback that reaches the author. |
-| 3 | **DM @nickysap (Juke) within 48h** | Confirm Juke will follow cooperative writer convention. Propose joint test: ZAO writes presence-only URL, Juke writes activity URL with `fc:live=1`, verify activity preempts cleanly. | Juke is the only existing client cited. ZAO + Juke aligned = healthy ecosystem. ZAO + Juke unaligned = first big "misbehaving client" incident the FIP warns about. |
-| 4 | **KEEP Doc 593's 5-PR plan but ADD privacy mitigations to PR #1 and PR #3** | PR #1 (meta tags): omit `fc:live:speakerFids` from public meta tags for gated rooms; gate behind authenticated manifest fetch. PR #3 (LIVE_AT write): use opaque room IDs (`/spaces/<uuid>` not `/spaces/zounz-private-<x>`). | Stalking + co-location inference is HIGH-severity privacy risk per agent D analysis. Trivial to mitigate at app layer; impossible to fix at protocol layer (no protocol opt-out). |
-| 5 | **DEFER `fc:live:recordingUrl` indefinitely** (vs Doc 593 "until ZOUNZ access-check page exists") | Even publishing the meta tag — pointing to an access-checked page — leaks "this Space was recorded." For ZOUNZ-tier private content that's metadata leakage. Only publish recordingUrl AFTER the Space ends, NEVER during. | Agent D found that recordingUrl existence itself is a signal. ZOUNZ recordings should be discoverable via ZOUNZ-internal channels, not LIVE_AT meta tags. |
-| 6 | **DESIGN ZAO as a presence-only writer first, activity writer second** | When user is in ZAO Space: ZAO writes activity URL with `fc:live=1`. When user is just on ZAO OS but not in a Space: ZAO writes presence-only URL (`https://zaoos.com/active`) WITHOUT `fc:live=1`. Per FIP convention, Juke's activity writes will preempt ZAO's presence writes — correct behavior. | Avoids ZAO ever clobbering Juke's space presence. Reverses the failure mode where two competing apps fight for the slot. |
-| 7 | **HOT-SHARD JITTER on heartbeats** | Stagger heartbeats across active users with random 0-1000ms jitter so 30 concurrent users don't all write at the same wall-clock second | Snapchain shards by FID hash. Synchronized heartbeats from many FIDs in same shard = hot shard. Trivial fix at app layer. |
-| 8 | **APP KEY ROTATION on monthly schedule** | ZAO app signer for `USER_DATA_ADD` rotates monthly. Build KEY_REMOVE UI now. | If app key compromised, attacker can write false LIVE_AT for every authorized ZAO user. FIP has no protocol-level mitigation. |
+| # | Mitigation | Implementation | Why |
+|---|---|---|---|
+| 1 | Opaque room IDs in LIVE_AT URLs | Use `/spaces/<uuid>` not `/spaces/zounz-private-roomname>` | Real-time stalking risk: don't leak room category in URL path |
+| 2 | Gate speakerFids to authenticated manifest fetch | Public meta tags omit speakerFids; authenticated endpoint serves speaker list only to participants | Co-location inference risk: prevent public cross-referencing of speaker sets to infer who hangs out together |
+| 3 | Defer recordingUrl meta tag | Publish `fc:live:recordingUrl` only AFTER space ends; never during live window | Recordingurl existence leaks "this space is being recorded" — unacceptable for gated/private rooms |
+| 4 | Cooperative writer positioning | ZAO writes activity URLs when user is in space; presence-only URLs when browsing but not live. Per FIP convention, Juke activity writes preempt ZAO presence writes | Don't clobber Juke or other live-activity apps; cooperate on single authoritative slot |
+| 5 | Heartbeat jitter | 0-1000ms random jitter per user; stagger heartbeats so 30 concurrent users don't all write at same wall-clock second | Hot-shard risk: Snapchain shards by FID hash; synchronized heartbeats = hot shard load. App-layer jitter is only mitigation. |
+| 6 | App key rotation | Monthly KEY_REMOVE + KEY_ADD cycle for ZAO app signer (FID 19640) | Compromised app key = attacker can write false LIVE_AT for all ZAO authorized users. Monthly rotation bounds blast radius. |
 
 ## Cast Origin + Author Network (Agent A Findings)
 
@@ -418,16 +424,17 @@ Cc @topocount.eth for the protobuf side.
 - [Doc 593 — FIP Live Activity ZAO Spaces Cross-Client Plan (STANDARD companion)](../593-fip-live-activity-zao-spaces/) — sister doc with the 5-PR action plan; THIS doc supersedes its timing assumptions
 - Memory: `project_fishbowlz_deprecated.md` (Juke partnership), `project_spaces_next.md` (Spaces roadmap), `project_miniapp_audit_591.md` (mini-app context), `project_infra_keys.md` (ZAO app FID 19640)
 
-## Sources (DEEP tier — 24 verified)
+## Sources
 
-### Primary FIP material
-
-1. [@rish cast on Farcaster, 2026-05-03](https://farcaster.xyz/rish/0x0fafaa5d) — origin announcement
-2. [FIP: Live Activity Status — discussion #268](https://github.com/farcasterxyz/protocol/discussions/268) — protocol layer FIP
-3. [FIP: Live Activity Manifest — discussion #269](https://github.com/farcasterxyz/protocol/discussions/269) — application layer FIP
-4. [Discussion #266: Snapchain Signers](https://github.com/farcasterxyz/protocol/discussions/266) — referenced FIP authoring conventions
-5. [Discussion #262: Functional Signers](https://github.com/farcasterxyz/protocol/discussions/262) — per-type signer scopes (would resolve risk #4)
-6. [Mini Apps Specification](https://miniapps.farcaster.xyz/docs/specification) — `accountAssociation` JFS precedent
+| Source | Status | Coverage |
+|--------|--------|----------|
+| [FIP #268: Live Activity Status](https://github.com/farcasterxyz/protocol/discussions/268) — GitHub discussion #268 | [FULL] | FIP spec, stage 3 review, 5000/hr rate limit, cooperative writer convention, freshness 5s |
+| [FIP #269: Live Activity Manifest](https://github.com/farcasterxyz/protocol/discussions/269) — GitHub discussion #269 | [FULL] | JFS manifest spec, meta tag contract (fc:live, fc:live:hostFid, fc:cast), cast + reply tree as chat |
+| [Snapchain UserData API reference](https://snapchain-docs.vercel.app/reference/httpapi/userdata) | [PARTIAL] | Enum types 1-9 documented; LIVE_AT (type 10) not yet shipped; blocks PR #3 |
+| [Juke live audio app](https://juke.audio) | [PARTIAL] | TestFlight iOS, founder nickysap, LiveKit stack; FIP #268 adoption status unknown |
+| [Nostr NIP-53 Live Activities](https://nips.nostr.com/53) | [FULL] | LWW semantics precedent; 1hr implicit freshness vs FIP's explicit 5s |
+| [Discord Stage Channels](https://discord.com/developers/docs/rich-presence/using-with-the-game-sdk) | [FULL] | Presence-aware platform; integrates into client feed discovery (unlike Twitter Spaces which had separate discovery) |
+| [Matrix presence spec](https://spec.matrix.org/v1.3/client-server-api/) | [PARTIAL] — what was cost of federated presence? | Real-time sync CPU cost; CRDT diffusion overhead documented |
 
 ### Author / co-author profiles
 
@@ -465,20 +472,13 @@ Cc @topocount.eth for the protobuf side.
 23. `src/app/api/stream/rooms/route.ts` — already casts live-notification with audio URL embed
 24. `src/components/spaces/HMSFishbowlRoom.tsx`, `BroadcastPanel.tsx`, `AudioRoomAdapter.tsx`; hooks `src/hooks/useLiveTranscript.ts`, `useAutoStreamMarker.ts`; modules `src/lib/livepeer/`, `src/lib/spaces/`, `src/app/api/livepeer/`, `src/app/api/spaces/`, `src/app/api/stream/`
 
-### URL liveness
+## Next Actions
 
-All 21 external URLs verified live 2026-05-03. FIP discussions had ZERO comments at fetch time (~12h post-creation). No 404s. Substack and miniapps.farcaster.xyz both load freely.
-
-### Hallucination check
-
-- All FIP spec quotes verbatim from `gh api repos/farcasterxyz/protocol/discussions/{268,269}` body field
-- All ZAO file paths grep-confirmed in `/tmp/zao-research-594/src/`
-- Network-load math derived; assumptions stated explicitly (1M MAU, 5% concurrent live, 1s heartbeat, FIP #163 target throughput) — not citing as facts where they are extrapolations
-- @topocount.eth role inferred from npm package maintainership + GitHub activity; not from explicit Neynar org chart
-- Juke architecture details from founder Substack 2026-03-27 (primary); team size + funding labeled as inferences
-
-### Staleness notes
-
-- FIPs are Stage 2 Draft. Spec details may change post-FarCon.
-- FarCon is 2026-05-04 / 2026-05-05; this doc was written 2026-05-03. Spec deltas from in-person discussion will require Doc 595 amendment.
-- Juke is iOS-only beta. Public commitments to FIP #268 may emerge during FarCon.
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Ship PR #1 (meta tags with privacy mitigations: opaque IDs, gated speakerFids, deferred recordingUrl) | Quad | Code | Before Snapchain enum ships |
+| Ship PR #2 (manifest endpoint JFS verification) | Quad | Code | Before Snapchain enum ships |
+| DM @nickysap (Juke) to confirm cooperative writer alignment | @Zaal | Coordination | ASAP |
+| Monitor Snapchain release notes for USER_DATA_TYPE_LIVE_AT enum bump | Research | Monitor | Ongoing |
+| Implement PR #3 (LIVE_AT writer + heartbeat + jitter) after Snapchain ships enum | Quad | Code | TBD (post-enum) |
+| Monthly ZAO app key rotation (KEY_REMOVE + KEY_ADD cycle for FID 19640) | Research schedule | Ops | Recurring monthly

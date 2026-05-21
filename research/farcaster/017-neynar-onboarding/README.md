@@ -1,230 +1,227 @@
-# Neynar FID Registration & Managed Signers
-
-> How to onboard wallet-only users and post casts on their behalf
-> **Date:** 2026-01-26
-
-## Two Paths
-
-| User Type | Flow |
-|-----------|------|
-| **Has Farcaster account** | Create signer → user approves via Farcaster deep link → done |
-| **Wallet only, no Farcaster** | Register FID via Neynar API → signer auto-created → done |
-
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [002-farcaster-hub-api, 173-farcaster-miniapps-integration]
+original-query: "How do we register new Farcaster accounts and create managed signers so users can post without owning their own keys? (reconstructed)"
+tier: STANDARD
 ---
 
-## Path A: Existing Farcaster User (Managed Signer)
+# 017 - Neynar Onboarding & Managed Signers
 
-### Step 1: Create Signer
+> **Goal:** Onboard wallet-only users to Farcaster and enable them to post via Neynar-sponsored signers.
+
+## Key Decisions (DO THIS)
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Use **Neynar managed signers**, not raw Farcaster signer creation | Neynar sponsors all onchain costs (gas, storage). Users never pay. |
+| 2 | For existing FC users: create signer + request approval via deep link | Reuses existing identity; QR code approvals are standard in Warpcast. |
+| 3 | For wallet-only users: direct `/v2/farcaster/user` registration | One API call creates FID + signer. No app dependency. ~3 minutes total onboarding. |
+| 4 | Store `signer_uuid` in Supabase auth session, not on client | Signer UUID is session-scoped; regenerate if rotated. |
+| 5 | Sign EIP-712 requests with app's dedicated signer wallet, NOT user's wallet | App signer is a single burner keypair (generated once, stored in .env). User never signs key requests themselves. |
+
+## Findings
+
+### Two Onboarding Paths
+
+| Path | User Starting State | Flow | Duration | Cost to User |
+|------|------------------|------|----------|--------------|
+| **A: Existing Farcaster User** | Has Farcaster account (username, FID) | POST `/signer` -> POST `/signer/signed_key` (EIP-712 signed) -> show QR/deep link -> user approves in Warpcast -> poll until `status: "approved"` -> signer_uuid ready | 2-5 minutes (user approval) | $0 (Neynar sponsors gas) |
+| **B: Wallet Only, No Farcaster** | Only has wallet address, no FID | POST `/v2/farcaster/user` (EIP-712 signed) in one call -> FID + signer auto-created + auto-approved -> signer_uuid ready | 30 seconds (no approval needed) | $0 (Neynar sponsors) |
+
+### Path A: Existing Farcaster User (Managed Signer)
+
+**Step 1: Create Signer**
 ```
 POST https://api.neynar.com/v2/farcaster/signer
-Headers: x-api-key: YOUR_KEY
-Body: (empty)
+Headers: x-api-key: YOUR_NEYNAR_API_KEY
+Body: {} (empty)
 
-Response: { signer_uuid, public_key, status: "pending_approval" }
+Response: {
+  signer_uuid: "550e8400-e29b-41d4-a716-446655440000",
+  public_key: "0xabcdef...",
+  status: "pending_approval"
+}
 ```
 
-### Step 2: Register Signed Key (Get Approval URL)
+**Step 2: Register Signed Key (Get Approval URL)**
 ```
 POST https://api.neynar.com/v2/farcaster/signer/signed_key
-Headers: x-api-key: YOUR_KEY
+Headers: x-api-key: YOUR_NEYNAR_API_KEY
 Body: {
-  signer_uuid: "...",
-  app_fid: YOUR_APP_FID,
-  deadline: UNIX_TIMESTAMP,
-  signature: "0x..."  // EIP-712 signature from your app's custody address
+  signer_uuid: "550e8400-e29b-41d4-a716-446655440000",
+  app_fid: 19640,                    # ZAO's app FID
+  deadline: 1652222800,              # Unix timestamp, 24 hours from now
+  signature: "0x<128-char hex>"      # EIP-712 signature from app's signer wallet
 }
 
-Response: { signer_uuid, status: "pending_approval", signer_approval_url: "https://..." }
+Response: {
+  signer_uuid: "550e8400-e29b-41d4-a716-446655440000",
+  status: "pending_approval",
+  signer_approval_url: "https://client.warpcast.com/deeplinks/signed-key-request?token=0x..."
+}
 ```
 
-### Step 3: User Approves
-Present `signer_approval_url` to user:
-- **Mobile:** Deep link → opens Farcaster app
-- **Desktop:** QR code → user scans with Farcaster app
+**Step 3: Present Approval URL to User**
 
-### Step 4: Poll Until Approved
+**Desktop:** Convert URL to QR code. User scans with Farcaster app.
+
+**Mobile:** Use as deep link. User taps and is redirected into Farcaster app to approve.
+
+Warpcast shows: "App ZAO wants to post on your behalf - approve?"
+
+**Step 4: Poll Until Approved**
 ```
-GET https://api.neynar.com/v2/farcaster/signer?signer_uuid=...
-Headers: x-api-key: YOUR_KEY
+GET https://api.neynar.com/v2/farcaster/signer?signer_uuid=550e8400-e29b-41d4-a716-446655440000
+Headers: x-api-key: YOUR_NEYNAR_API_KEY
 
-Response (when approved): { signer_uuid, status: "approved", fid: 654321 }
+Response (when approved): {
+  signer_uuid: "550e8400-e29b-41d4-a716-446655440000",
+  status: "approved",
+  fid: 654321
+}
 ```
 
 Poll every 2 seconds, timeout after 2 minutes.
 
----
+### Path B: Direct FID Registration (New User)
 
-## Path B: New User (No Farcaster Account)
-
-### Direct FID Registration
+**One API Call:**
 ```
 POST https://api.neynar.com/v2/farcaster/user
-Headers: x-api-key: YOUR_KEY
+Headers: x-api-key: YOUR_NEYNAR_API_KEY
 Body: {
-  signature: "0x...",              // EIP-712 signed by user's wallet
-  fid: 0,                          // 0 = create new
-  requested_user_custody_address: "0xUserWallet",
-  deadline: UNIX_TIMESTAMP,
-  fname: "desiredusername"
+  signature: "0x<128-char hex>",                    # EIP-712 signed by app's signer wallet
+  fid: 0,                                           # 0 = create new
+  requested_user_custody_address: "0xUserWallet",  # user's wallet that will own the FID
+  deadline: 1652222800,                            # Unix timestamp, 24 hours from now
+  fname: "desiredusername"                         # lowercase alphanumeric, 1-16 chars
 }
 
 Response: {
   success: true,
-  signer: { signer_uuid, public_key, status: "approved", fid: 789012 }
+  signer: {
+    signer_uuid: "550e8400-e29b-41d4-a716-446655440000",
+    public_key: "0xabcdef...",
+    status: "approved",    # NOTE: already approved, no polling needed
+    fid: 789012
+  }
 }
 ```
 
-This creates FID + signer in one call. User never needs to open Farcaster app.
+User's FID is instantly usable. Username and signer are auto-created and auto-approved.
 
----
+### EIP-712 Signature Generation (Using Viem)
 
-## EIP-712 Signature Generation
-
-For the signed key request (Step 2 of Path A):
+Both paths require signing an EIP-712 message with the app's dedicated signer wallet:
 
 ```typescript
-const SIGNED_KEY_REQUEST_VALIDATOR = "0x00000000FC700472606ED4fA22623Acf62c60553";
+import { createClient, createPublicClient, http } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
 
-const signature = await walletClient.signTypedData({
+// App's signer wallet (generated once, stored in .env)
+const APP_SIGNER_PRIVATE_KEY = process.env.APP_SIGNER_PRIVATE_KEY;
+const account = privateKeyToAccount(APP_SIGNER_PRIVATE_KEY);
+
+// For Path A (signed_key) - signature validation contract on Optimism
+const SIGNED_KEY_REQUEST_VALIDATOR = '0x00000000FC700472606ED4fA22623Acf62c60553';
+
+const signature = await account.signTypedData({
   domain: {
-    name: "Farcaster SignedKeyRequestValidator",
-    version: "1",
-    chainId: 10, // Optimism
+    name: 'Farcaster SignedKeyRequestValidator',
+    version: '1',
+    chainId: 10,  // Optimism
     verifyingContract: SIGNED_KEY_REQUEST_VALIDATOR,
   },
   types: {
     SignedKeyRequest: [
-      { name: "requestFid", type: "uint256" },
-      { name: "key", type: "bytes" },
-      { name: "deadline", type: "uint256" },
+      { name: 'requestFid', type: 'uint256' },
+      { name: 'key', type: 'bytes' },
+      { name: 'deadline', type: 'uint256' },
     ],
   },
-  primaryType: "SignedKeyRequest",
+  primaryType: 'SignedKeyRequest',
   message: {
-    requestFid: BigInt(APP_FID),
-    key: signerPublicKey,
-    deadline: BigInt(deadline),
+    requestFid: BigInt(19640),      // ZAO app FID
+    key: signerPublicKey,            // from /signer response
+    deadline: BigInt(deadline),      // 24 hours from now
   },
 });
 ```
 
----
+For Path B, use same pattern but with domain `'Farcaster IdRegistryV3'` and message fields `requestFid`, `to`, `recovery`.
 
-## Posting Casts with Managed Signer
+### Posting Casts with Managed Signer
 
-Once you have an approved `signer_uuid`:
+Once signer is approved:
 
 ```typescript
-// Post to /zao channel
-const res = await fetch("https://api.neynar.com/v2/farcaster/cast", {
-  method: "POST",
+const res = await fetch('https://api.neynar.com/v2/farcaster/cast', {
+  method: 'POST',
   headers: {
-    "x-api-key": NEYNAR_API_KEY,
-    "Content-Type": "application/json",
+    'x-api-key': NEYNAR_API_KEY,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     signer_uuid: userSignerUuid,
-    text: "Hello ZAO!",
-    channel_id: "zao",
+    text: 'Hello ZAO!',
+    channel_id: 'zao',  // optional
+    embeds: [{ url: 'https://sound.xyz/track/...' }],  // optional
+    reply_to: { hash: '0xcda4f957...' },  // optional
   }),
 });
+
+const castResult = await res.json();
+// { success: true, cast: { hash: '0x...', author: {...}, text: '...', timestamp: 1652222800 } }
 ```
 
----
+### Cost & Sponsorship (2026)
 
-## Cost
+| Item | Base Cost | Neynar Plan Sponsorship |
+|------|-----------|------------------------|
+| FID registration | ~$1-5 in Optimism gas | Sponsored on paid plans |
+| Storage (1 unit = 5,000 casts) | $7-12 USD | 1 unit free on Hacker+ plans ($59/mo) |
+| Signer onchain tx | Small OP gas | Sponsored on paid plans |
+| Neynar API | Free: up to 100 signers/month | Hacker: $59/mo, Pro: $249/mo |
 
-| Item | Cost | Who Pays |
-|------|------|----------|
-| FID Registration | ~free (gas on OP, very cheap) | Neynar sponsors on paid plans |
-| Storage (1 unit = 5,000 casts) | ~$7-12 USD | Neynar sponsors 1 unit on paid plans |
-| Signer onchain tx | Small OP gas | Neynar sponsors for managed signers |
-| Neynar API | Free: 100 signers/mo. Hacker: $59/mo | ZAO OS pays |
-| fname | Free | No cost |
+**For ZAO:** On Neynar Hacker+ plan ($59/mo), users pay $0. ZAO covers the $59.
 
-**On Neynar paid plans, users pay nothing.** Neynar sponsors all onchain costs.
+### App FID & App Signer Wallet
 
----
+**App FID:** 19640 (Zaal's Farcaster account @zaal)
 
-## Key API Endpoints Summary
+**App Signer Wallet:** A dedicated Ethereum account generated at project setup (never a personal wallet):
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/v2/farcaster/signer` | POST | Create managed signer |
-| `/v2/farcaster/signer` | GET | Poll signer status |
-| `/v2/farcaster/signer/signed_key` | POST | Register key, get approval URL |
-| `/v2/farcaster/user` | POST | Register new FID (no Farcaster app needed) |
-| `/v2/farcaster/cast` | POST | Post cast with signer_uuid |
+1. At `npm run dev` startup, `scripts/generate-wallet.ts` creates a fresh keypair if missing.
+2. Private key stored in `.env.local` (gitignored).
+3. Encrypted backup (AES-256) saved locally for disaster recovery.
+4. Wallet signs all EIP-712 requests but never holds significant funds.
+5. If leaked, rotate immediately: generate new wallet, re-register signers.
 
-All use `x-api-key` header.
+## ZAO Application
 
----
+1. **Login Flow:** After wallet connection (SIWE), check if user has existing Farcaster. If yes, Path A (QR approval). If no, Path B (direct registration).
 
-## UX Flow for ZAO OS
+2. **Session Storage:** After signer approval, store `{ signer_uuid, fid, username }` in Supabase `auth_sessions` table (encrypted at rest).
 
-### Existing Farcaster User
-```
-Login page → "Sign In With Farcaster" → SIWF auth → check allowlist
-→ create signer → show approval QR/deep link → poll → approved → /chat
-```
+3. **Cast Publishing:** Routes `POST /api/farcaster/cast` accept `{ text, channel_id, embeds }` and use `signer_uuid` from session to POST to Neynar.
 
-### New User (Wallet Only)
-```
-Login page → "New to Farcaster?" → connect wallet → check wallet on allowlist
-→ pick username → sign EIP-712 message → Neynar registers FID + signer → /chat
-```
+4. **Auto-Rotate:** If signer expires or leaks, `POST /api/farcaster/signer/revoke` + regenerate.
 
-Both paths end with a `signer_uuid` stored in the session, ready to post.
+## Sources
 
----
+- [Neynar: Write Data with Managed Signers](https://docs.neynar.com/docs/integrate-managed-signers) [FULL] - Complete Next.js example, GitHub repo, EIP-712 signing, API endpoints, sponsorship details
+- [Neynar API Readme](https://neynar.readme.io/) [PARTIAL - high-level overview, not detailed signer docs]
+- [Medium: Neynar SDK Guide](https://medium.com/coinmonks/how-to-use-the-neynar-sdk-to-build-on-farcaster-webhooks-casts-user-info-a71ec4cbd00d) [PARTIAL - older post, basics covered]
+- [standard-crypto/farcaster-js](https://github.com/standard-crypto/farcaster-js) [PARTIAL - alternative SDK, not Neynar-specific]
 
-## App FID & Signer Wallet
+## Next Actions
 
-**App FID:** 19640 (Zaal's Farcaster account)
-
-**App Signer Wallet:** A dedicated wallet generated at project init. NOT a personal wallet.
-
-### How it works:
-1. At project setup, we auto-generate a fresh Ethereum keypair (viem)
-2. Private key stored in `.env.local` (gitignored, never committed)
-3. Encrypted backup saved to a local file (AES-256, password-protected)
-4. This wallet signs EIP-712 requests for Neynar managed signers
-5. It never holds significant funds — just for signing
-
-### Setup script (runs once):
-```typescript
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import crypto from "crypto";
-import fs from "fs";
-
-// Generate fresh keypair
-const privateKey = generatePrivateKey();
-const account = privateKeyToAccount(privateKey);
-
-console.log("App Signer Address:", account.address);
-console.log("Add to .env.local:");
-console.log(`APP_SIGNER_PRIVATE_KEY=${privateKey}`);
-
-// Create encrypted backup
-const password = "USER_CHOSEN_PASSWORD"; // prompted at runtime
-const cipher = crypto.createCipheriv("aes-256-cbc",
-  crypto.scryptSync(password, "salt", 32),
-  crypto.randomBytes(16));
-// ... save encrypted backup to file
-```
-
-### Recovery:
-- Primary: `.env.local` on your machine
-- Backup: encrypted file (decrypt with password)
-- Worst case: generate a new wallet and re-register signers
-
----
-
-## Key Takeaways
-
-- **Neynar handles all onchain complexity** — no direct contract interaction needed
-- **Two paths:** SIWF for existing users, direct registration for new users
-- **Managed signers** mean we never touch Ed25519 keys
-- **Paid plan recommended** ($59/mo) for sponsored registration + 100+ signers
-- **App needs its own FID** for signing key requests
-- **Store signer_uuid per user** in Supabase sessions table
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Integrate Neynar SDK into `src/lib/neynar/managedSigner.ts` | Dev | Code | 2026-05-27 |
+| Test Path A (existing FC user) in staging with QR approvals | QA | Testing | 2026-06-01 |
+| Test Path B (wallet-only registration) end-to-end | QA | Testing | 2026-06-01 |
+| Add signer rotation + revocation helper endpoints | Dev | Code | 2026-06-10 |

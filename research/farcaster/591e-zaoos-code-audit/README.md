@@ -2,16 +2,15 @@
 topic: farcaster
 type: audit
 status: research-complete
-last-validated: 2026-05-02
-related-docs: 591a, 591b, 591c, 591d
+last-validated: 2026-05-20
+related-docs: 591, 591a, 591b, 591c, 591d
 tier: STANDARD
+original-query: "ZAO OS Farcaster miniapp codebase audit - manifest, meta tags, sdk.ready(), auth flow (context-FID + Neynar + allowlist + session), QuickAuth fallback, iframe headers, cookie config, CSP nonce, service worker caching, error UX, type safety, CSRF posture, webhook signature verification, allowlist freshness, CI coverage, file:line references for PRs #436-445. (reconstructed)"
 ---
 
-# ZAO OS Farcaster Miniapp Production Audit
+# 591e - ZAO OS Farcaster Miniapp Code Audit
 
-## Overview
-
-This audit reviews the shipped Farcaster miniapp implementation in ZAO OS against Farcaster SDK best practices, security standards, and production-readiness criteria. The code has passed integration testing with six PRs merged (436-445) and typecheck is clean.
+> **Goal:** Complete file:line audit of ZAO OS miniapp implementation against Farcaster SDK best practices and security standards. Coverage: manifest validity (accountAssociation domain binding), fc:miniapp meta tags, sdk.actions.ready() timing + fallback, auth flow correctness (context-FID -> Neynar verification -> allowlist check -> session save), QuickAuth fallback path, iframe security headers (CSP frame-ancestors *, no X-Frame-Options), session cookie attributes (SameSite=None prod, SameSite=Lax dev, HttpOnly, maxAge=7d), CSP nonce per-request generation, service worker caching discipline (skip /miniapp), error state UX, type safety (no any, explicit interfaces), CSRF threat model documentation, webhook signature verification (@farcaster/miniapp-node), allowlist freshness (is_active=true), CI test coverage (WARN: MiniAppGate + /api/miniapp/auth-context need unit tests). All 6 PRs (#436-445) verified as landed correctly.
 
 ## Executive Summary
 

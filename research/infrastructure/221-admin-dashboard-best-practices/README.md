@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: What admin dashboard features are missing in ZAO OS? (reconstructed)
+tier: FULL
+---
+
 # 221 — Admin Dashboard Best Practices for Web3 Community Apps
 
 > **Status:** Research complete

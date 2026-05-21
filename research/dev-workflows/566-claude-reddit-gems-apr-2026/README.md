@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: market-research
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
+original-query: "Scrape r/ClaudeAI + r/ClaudeCode top posts via /fetch skill. Surface highest-leverage finds for ZAO, propose pickups. Test Reddit pipeline post-fix. (reconstructed)"
 related-docs: 506, 507, 549, 552, 555, 562, 563, 564, 565
 tier: STANDARD
 ---
@@ -160,6 +161,17 @@ Then write content targeting those specific gaps. Article structure they suggest
 - [Storybloq Mac App Store](https://apps.apple.com/us/app/storybloq/id6761348691)
 - [Vibeyard repo](https://github.com/elirantutia/vibeyard) - skip per analysis above
 - [VibeKanban shutdown notice](https://vibekanban.com/blog/shutdown) - referenced in top reply
+
+## Findings (2026-05-21 Re-research)
+
+Reddit gems methodology + tool evaluations remain current. 2026-05-21 status:
+1. r/ClaudeAI + r/ClaudeCode subreddits live, top-all-time posts stable (churn weekly, churn weekly for top-week)
+2. GitHub repos live: shanraisshan/claude-code-best-practice (11-system comparison) active
+3. Storybloq Mac App confirmed on App Store (id6761348691)
+4. Vibeyard repo confirmed (skip recommendation in doc remains valid)
+5. VibeKanban shutdown confirmed, historical context preserved
+
+No material changes to gem collection approach. Top posts churn weekly per source doc - re-run r/ClaudeAI top-week + r/ClaudeCode top-week monthly via /fetch skill. Doc 566 provides stable baseline; monthly refresh recommended for current trends.
 
 ## Staleness
 

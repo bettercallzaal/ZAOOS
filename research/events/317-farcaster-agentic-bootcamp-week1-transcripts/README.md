@@ -1,6 +1,11 @@
 # 317 - Farcaster Agentic Bootcamp Week 1: Session Transcripts & Extracted Insights
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** bootcamp-sessions-transcript-analysis
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** What are the key patterns and technical insights from Sessions 1-6 of the Farcaster Agentic Bootcamp (March 30-April 6 2026)? (reconstructed)
+> **tier:** primary
 > **Date:** April 9, 2026
 > **Source:** Sessions 1-6 of the Builders Garden Farcaster Agentic Bootcamp (March 30 - April 6, 2026)
 > **Goal:** Extract actionable patterns from 238-participant bootcamp covering Farcaster building blocks, mini apps, agent architecture, context engineering, agentic wallets, and hands-on agent deployment. All insights mapped to ZAO OS integration points.

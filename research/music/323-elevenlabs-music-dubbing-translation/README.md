@@ -1,3 +1,12 @@
+---
+topic: music
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "How to use ElevenLabs for translating and dubbing songs into multiple languages while preserving the original artist's voice?"
+tier: production
+---
+
 # Doc 323 - ElevenLabs Music Dubbing & Song Translation (2026)
 
 **Date:** 2026-04-11

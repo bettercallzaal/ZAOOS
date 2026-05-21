@@ -1,3 +1,12 @@
+---
+topic: governance
+type: research
+status: research-complete
+last-validated: 2026-05-21
+tier: STANDARD
+original-query: "Document ORDAO smart contract architecture, Respect Game mechanics, and orclient SDK for ZAO OS integration (reconstructed)"
+---
+
 # ORDAO & Respect Game System -- Research
 
 > The Optimistic Respect-based DAO (ORDAO) governance system, the Respect Game, and how The ZAO uses fractal scoring for on-chain reputation.
@@ -240,17 +249,17 @@ This "semi-automated" flow means no administrator needs to manually distribute t
 
 ---
 
-## The Optimism Fractal Council
+## The Optimism Fractal Council & Status
 
-The **Sages Council** is a governance body formed from Respect Game results:
+The **Sages Council** was a governance body formed from Respect Game results:
 
-- Consists of up to **6 members** with the most accumulated Respect
-- Members must opt in by registering in a poll each period
-- Ensures that only actively contributing members govern
-- Uses **Hats Protocol** for on-chain role management (programmable roles as ERC-1155 tokens)
+- Consisted of up to **6 members** with the most accumulated Respect
+- Members opted in by registering in a poll each period
+- Ensured that only actively contributing members governed
+- Used **Hats Protocol** for on-chain role management (programmable roles as ERC-1155 tokens)
 - Optimism Fractal won a **Hats Protocol Hatathon** for their integration
 
-The council can pass proposals, manage community resources, and make decisions between weekly Respect Game sessions. Respect-weighted voting ensures governance power reflects actual contribution history.
+STATUS [CRITICAL UPDATE - 2026-05-21]: **Optimism Fractal has entered an indefinite pause as of 2026.** The Optimism Fractal Council approved consolidation of efforts into **Eden Fractal**, the foundational community implementing fractal decision-making at scale. The rich history of Optimism Fractal (2+ years, biweekly governance events, 70+ videos) is archived on OptimismFractal.com. All ongoing Respect Game and fractal governance work continues under **Eden Fractal** (EdenFractal.com), which launched Epoch 2 in June 2025 with ORDAO deployment on Base and active biweekly events.
 
 ---
 

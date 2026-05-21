@@ -1,8 +1,176 @@
-# Doc 340 - Remote Collaboration Tools for AI Music Production (2026)
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Remote collaboration AI music production tools 2026 BandLab Splice Endlesss (reconstructed)"
+related-docs: 334, 321, 313, 261
+tier: STANDARD
+---
 
-**Created:** 2026-04-11
-**Category:** Music / Collaboration / AI Tools
-**Use Case:** 188-member decentralized music community (The ZAO) collaborating on AI-generated music across the US
+# 340 — Remote Collaboration Tools for AI Music (2026)
+
+> **Goal:** Platform comparison and workflow templates for 188-member decentralized community collaborating asynchronously on AI-generated music. 90% of remote music production is async file exchange, not real-time jamming. Features BandLab (100M+ users, 7 AI tools: SongStarter, Splitter, AutoMix), async relay workflow (2-4 weeks Concept → Production → Vocals → Mixing → Master), and 0xSplits integration for onchain instant revenue distribution.
+
+## Key Decisions
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | **Primary collab hub: BandLab (free).** Not Splice, not Soundtrap. | 100M+ users, browser-based, real-time collab, 7 AI tools included, free tier covers community needs. Splice shut down collaboration 2023. |
+| 2 | **Async relay workflow is default, not real-time jamming.** | 90% of remote music is async. Real-time: ~500 mile radius (JamKazam), ~70 mile radius (Jamulus). Endlesss (loop stacking) = unlimited distance. |
+| 3 | **Stem naming convention:** `[song-slug]_[stem-type]_[version]_[bpm]_[key].wav` | Standardize file naming so members know what they're grabbing. No "final_REAL_v3_actually_final.wav" chaos. |
+| 4 | **Revenue split: Artist 80% / Treasury 10% / Curator 10%.** Use 0xSplits (onchain, instant) + DistroKid Splits (streaming, 30-45 day lag). | 0xSplits = no protocol fees, instant, transparent. DistroKid = automatic streaming distribution. Both needed for full transparency. |
+| 5 | **Async relay bottleneck: vocals.** Budget 3-7 days for recording/scratch vocals. That's where the slowdown is. | Concept 1-3 days → Production 3-7 days → VOCALS 3-7 days → Mixing 3-5 → Master 1-2 = 14-28 days. Vocal recording is the hold-up. |
+| 6 | **Project management: Notion (not Trello).** Linked databases connect songs to collaborators to wallets to releases. | Trello: visual but flat. Notion: relational data (song → contributors → wallet → splits → release date). One source of truth. |
+
+## Findings
+
+### Async vs. Real-Time Collaboration
+
+| Dimension | Real-Time (JamKazam/Jamulus) | Async (BandLab/File Exchange) |
+|-----------|------------------------------|------|
+| Distance limit | ~500 miles (JamKazam), ~70 miles (Jamulus) | Unlimited (Endlesss for loops, Drive for stems) |
+| Latency requirement | <45ms usable | N/A |
+| Equipment | Wired ethernet, audio interface | Browser or phone |
+| Skill barrier | Medium-high (network setup) | Low (upload/download files) |
+| Member participation | 3-5 people per session | Unlimited async (100+ contributors) |
+| Time investment | 1-4 hour commitment | Flexible, members work on own schedule |
+| Audio quality | 48kHz lossless possible | WAV 24-bit 48kHz standard |
+| **Best for ZAO** | Occasional brainstorms (1x/month) | **Daily pipeline** (primary workflow) |
+
+### BandLab Updates (March 2026)
+
+New "Palette" AI loop-matching tool (launched March 12 2026):
+- Intelligently matches complementary loops to your key, BPM, genre
+- Filters through 250,000 royalty-free samples
+- Generates up to 5 stacked loops in one click
+- Available on Pro/Max tier ($15.99/mo or $149/yr)
+
+Membership restructured (March 24 2026):
+- **Free tier:** Core collaboration + basic mastering
+- **Pro tier:** $15.99/mo or $179.88/yr — 50+ AI tools, Splitter, Voice Cleaner, Voice Changer (15 voices), Palette
+- **Max tier:** $99/mo or $999/yr equivalent — Everything in Pro + Mastering EQ (coming soon), Manual Pitch Correction (coming soon), $50/mo in Boost credits
+
+### The Relay Race Model (90% of Real Remote Production)
+
+```
+Phase 1: CONCEPT (1-3 days)
+  - Songwriter writes lyrics + melody sketch
+  - Upload to shared workspace or voice memo
+  - Share brief: mood, key, BPM, references
+  
+Phase 2: PRODUCTION (3-7 days)
+  - Producer/beatmaker generates beat (Suno, Logic, etc.)
+  - Arrange: intro, verse, chorus, bridge, outro
+  - Export stems: drums, bass, harmony, melody
+  - Upload with naming convention
+  
+Phase 3: VOCALS (3-7 days) **BOTTLENECK**
+  - Vocalist downloads stems
+  - Record vocals (home studio or phone)
+  - Option: AI voice clone (ElevenLabs Suno) for demo
+  - Upload dry + wet vocals
+  
+Phase 4: MIXING (3-5 days)
+  - Engineer downloads all stems
+  - Mix in DAW or AI mastering (LANDR, Boombox)
+  - Upload rough mix for feedback
+  
+Phase 5: MASTER & RELEASE (1-2 days)
+  - Final master
+  - Set up 0xSplits contract
+  - Distribute via DistroKid
+  - Cross-post to Farcaster/X/ZAO OS player
+  
+TOTAL: 2-4 weeks per track
+```
+
+### Platform Comparison Matrix
+
+| Tool | Type | Price | Real-Time | AI Tools | Best For ZAO? |
+|------|------|-------|-----------|----------|--------------|
+| **BandLab** | Cloud DAW | Free | Yes (multi-user) | 7 (SongStarter, Splitter, AutoMix, Voice Cleaner, FX Preset Gen) | **YES — primary hub** |
+| **Muse** | Stem feedback | Freemium | No (async) | No | Feedback/review phase |
+| **Boombox.io** | Stem sharing + mastering | Freemium | No (async) | Yes (stem sep, mastering) | All-in-one backup |
+| **Endlesss** | Loop jamming | Free | Yes (async loops) | No | Community jam nights |
+| **Notion** | Project management | Free | No | No | Song pipeline tracking |
+| **0xSplits** | Revenue distribution | Free (gas only) | Yes (onchain) | No | Instant member payouts |
+| **DistroKid** | DSP distribution | $22.99/yr | No | No | Streaming royalty splits |
+
+### Vocal Recording as Bottleneck
+
+Real timeline for community track:
+
+| Phase | Days | Risk |
+|-------|------|------|
+| Concept | 1-3 | Low (songwriter decides) |
+| Production | 3-7 | Low (producer owns DAW) |
+| **Vocals** | **3-7** | **HIGH (depends on vocalist availability, recording quality, home studio setup)** |
+| Mixing | 3-5 | Low (engineer has full stems) |
+| Master | 1-2 | Low (automated via LANDR) |
+
+**Solution for ZAO:**
+1. Generate AI voice clone in ElevenLabs during Phase 2 (3-min demo)
+2. Circulate demo in Phase 3 for 24-hour feedback
+3. Vocalist records real vocals when ready (no deadline pressure)
+4. Replace AI vocals with real; push to next release cycle if not ready
+
+This unblocks the pipeline and keeps songs shipping.
+
+### BandLab: Why It's the Right Primary Hub
+
+| Feature | What It Does | Why for ZAO |
+|---------|-------------|-----------|
+| Free tier | Full collab features (16 tracks, real-time editing) | 188 members, no friction to entry |
+| AI tools | SongStarter (generate beats), Splitter (separate stems) | Members can generate within the DAW |
+| Mobile + desktop | iOS, Android, web browser | ZAO members on phones everywhere |
+| Social feed | Share tracks, reactions, remixes | Discovery + engagement |
+| Unlimited cloud storage | No limits on projects (free) | Archives don't disappear |
+| Real-time multi-user | 3-5 people simultaneous on same project | Brainstorm sessions |
+| Export | WAV/MP3 + MIDI stems | DAW-friendly handoff |
+| **Limitation:** 16 tracks max (32 on $14.95/mo) | Fine for 80% of community tracks | Pros move to Logic/Ableton when they need >32 |
+
+## ZAO Application
+
+**Implementation roadmap:**
+
+**Week 1-2:** Launch BandLab community workspace; onboard 50 power users
+**Week 3-4:** Document async relay workflow in ZAO OS help center
+**Month 2:** Add Notion dashboard (song pipeline, collaborators, wallets, release calendar)
+**Month 3:** Integrate 0xSplits contract + configure DistroKid account
+**Month 4+:** Extend with Endlesss for monthly jam nights; Arweave archival for permanent storage
+
+**Budget for 188 members:**
+- BandLab: Free
+- Notion: Free tier
+- Suno/ElevenLabs: $10-22/mo per power user (their cost)
+- DistroKid: $22.99/yr (ZAO treasury)
+- 0xSplits: Gas cost ~$0.50 per release
+- **ZAO total: ~$25-30/year**
+
+## Sources
+
+- [BandLab 2026 Features](https://www.bandlab.com/press) — FULL
+- [BandLab AI Tools Review](https://www.makingascene.org/from-daw-to-gaw-how-bandlab-studio-is-using-ai-to-redefine-music-production/) — FULL
+- [Endlesss App](https://www.endlesss.fm/) — FULL
+- [Jamulus Open Source Latency Guide](https://github.com/jamulussoftware/jamulus) — FULL
+- [JamKazam Distance Limits](https://forum.jamkazam.com/showthread.php?tid=963) — FULL
+- [Muse Sessions Feedback](https://www.musesessions.co/) — FULL
+- [Boombox.io All-in-One](https://boombox.io/) — FULL
+- [0xSplits Docs](https://docs.splits.org/) — FULL
+- [DistroKid Splits Guide](https://support.distrokid.com/hc/en-us/articles/360013534394) — FULL
+- [Remote Music Production Workflow 2026](https://www.makeasong.co/remote-music-production-workflow-tips/) — FULL
+- [Notion Music Templates](https://super.so/templates/notion-music-templates) — FULL
+
+## Next Actions
+
+| Action | Owner | Status | By |
+|--------|-------|--------|-----|
+| Create BandLab community workspace; invite 50 ZAO members | @Zaal | Pending | May 25 |
+| Document "Async Relay Workflow for ZAO" (5-min read) | @Zaal | Pending | May 28 |
+| Set up Notion music pipeline template | @Zaal | Pending | June 1 |
+| Configure 0xSplits + DistroKid for 1 test release | @Zaal | Pending | June 8 |
+| Run "First Community Collab Challenge" (24-hour BandLab jam) | @Zaal | Pending | June 15 |
 
 ---
 

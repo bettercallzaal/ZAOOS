@@ -1,3 +1,12 @@
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+tier: STANDARD
+original-query: "Optimystics production tools: Respect.Games, Cignals, orclient SDK, frapps deployment platform for ZAO ORDAO integration (reconstructed)"
+---
+
 # Research 109: Optimystics Tooling Ecosystem — ZAO OS Integration Guide
 
 **Date:** 2026-03-22

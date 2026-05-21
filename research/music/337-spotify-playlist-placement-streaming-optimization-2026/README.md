@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Spotify playlist placement AI music streaming optimization editorial pitching (reconstructed)"
+related-docs: 322, 314, 321, 313
+tier: STANDARD
+---
+
 # Doc 337: Spotify Playlist Placement & Streaming Optimization for AI-Generated Music (2026)
 
 **Date:** 2026-04-11
@@ -93,7 +103,7 @@ The algorithm now weights **saves and repeat-listen ratio roughly 3x higher** th
 |--------|--------|----------------|
 | Save rate | 3-5%+ | Primary algorithmic signal in 2026 |
 | Stream-to-listener ratio | 1.5-2.0+ (2.5+ is exceptional) | Shows replay value |
-| Discover Weekly threshold | ~20,000 total streams + 3%+ save rate | Entry requirement up from 10-15K |
+| Discover Weekly threshold | ~20,000 total streams + 3%+ save rate | Entry requirement increased 2026; was 10-15K in 2024 |
 | First 30 seconds | Must hook listener | Early skips trigger severe algorithmic suppression |
 | Release cadence | Every 6-8 weeks | 3x more algorithmic placements vs. sporadic releases |
 

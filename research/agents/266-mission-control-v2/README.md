@@ -1,8 +1,12 @@
 # 266 — Mission Control v2: Open-Source AI Agent Orchestration
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** March 29, 2026
-> **Author:** ZOE ⚡
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-21
+> **Original-query:** Mission Control v2 open-source agent orchestration dashboard for observability across OpenClaw, CrewAI, LangGraph, AutoGen
+> **Tier:** reference
 > **Tags:** `#infrastructure` `#agent-ops` `#open-source` `#orchestration`
 
 ---

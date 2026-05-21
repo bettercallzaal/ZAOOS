@@ -1,4 +1,13 @@
-# 113 — ZAO Fractal Bot + Process Deep Dive (March 2026)
+---
+topic: governance
+type: research
+status: research-complete
+last-validated: 2026-05-21
+tier: CRITICAL
+original-query: "ZAO fractal bot deep dive: Discord bot (v1.6), 90-week running history, 6-step process, 52 slash commands, on-chain submission flow, Zaal founder interview (reconstructed)"
+---
+
+# 188 — ZAO Fractal Bot + Process Deep Dive (March 2026)
 
 > **Status:** Research complete — ground truth from founder + code analysis
 > **Date:** 2026-03-22

@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Catalog open source projects and APIs from opensourceprojects.dev and similar directories that ZAO OS can integrate or learn from (reconstructed)
+tier: primary
+---
+
 # 162 — Open Source Projects Directory for ZAO OS
 
 > **Status:** Research complete

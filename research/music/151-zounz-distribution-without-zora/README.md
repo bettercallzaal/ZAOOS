@@ -1,7 +1,12 @@
 # 151 — ZOUNZ Music Distribution Without Zora: Arweave + Thirdweb + 0xSplits
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** March 26, 2026
+> **Topic:** music
+> **Type:** alternative-architecture
+> **Original-Query:** What if ZAO used Arweave + thirdweb instead of Zora? How would that change minting, storage, and revenue flows? (reconstructed)
+> **Last-Validated:** 2026-05-21
+> **Tier:** 3-major-feature
 > **Goal:** Redesign ZAO's on-chain music distribution replacing Zora with Arweave for storage and thirdweb/Manifold for minting — fully open, DAO-governed
 
 ## Key Decisions / Recommendations

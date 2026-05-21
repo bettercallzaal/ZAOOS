@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-21
+original-query: Lock architecture for ZAOcoworkingBot v2 memory + transcripts + actions.json and v3 Hermes-pattern code-on-repo via PR generation (reconstructed)
 related-docs: 461, 547, 650, 651, 659
 tier: DEEP
 ---

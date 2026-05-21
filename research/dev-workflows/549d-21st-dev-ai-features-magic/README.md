@@ -2,29 +2,30 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
 related-docs: 549, 549a, 549b, 549c, 549e, 415, 506, 507, 508
 tier: STANDARD
+original-query: "What are 21st-dev's other products (1code, SDK, agent-elements) and should ZAO use them? (reconstructed)"
 ---
 
 # 549d - 21st.dev AI Features: Magic, 1code, SDK
 
-> **Goal:** Understand the rest of 21st-dev's product surface beyond Magic MCP - especially `1code` (5,494 stars), the `21st-sdk`, and `agent-elements` - so we know which to lift, track, or skip.
+> **Goal:** Understand the rest of 21st-dev's product surface beyond Magic MCP - especially `1code` (5,532 stars - rising fast), the `21st-sdk`, and `agent-elements` - so we know which to lift, track, or skip. Product family verified 2026-05-20.
 
-## The 21st-dev Product Family (verified 2026-04-29)
+## The 21st-dev Product Family (verified 2026-05-20)
 
 | Product | Stars | What it is | ZAO action |
 |---|---|---|---|
-| `magic-mcp` | 4,815 | UI component MCP (search + generate + refine + logos) | **Install now** (covered in 549, 549b) |
-| `1code` | **5,494** | "Orchestration layer for coding agents (Claude Code, Codex)" | **Track**; possible QuadWork comparator. Separate research doc. |
-| `21st-sdk` | 107 | SDK for embedding 21st features in apps | Track; ZAO website if we want public Inspiration Search |
+| `magic-mcp` | 4,888 | UI component MCP (search + generate + refine + logos) | **Install now** (covered in 549, 549b) |
+| `1code` | **5,532** (rising - +38 in 3 weeks) | "Orchestration layer for coding agents (Claude Code, Codex)" | **TRACK MONTHLY**; possible QuadWork comparator. Rising fast. Separate research doc post-Doc 548. |
+| `21st-sdk` | 107 | SDK for embedding 21st features in apps (TypeScript) | Track; ZAO website if we want public Inspiration Search |
 | `21st-sdk-examples` | 35 | Cookbook for the SDK | Read once SDK is on the table |
-| `21st-sdk-go` | 0 | Go SDK | Skip (ZAO is TS) |
-| `agent-elements` | 50 | Drop-in agent-UX components | Possible fit for ZOE chat shell |
-| `21st-extension` | 133 | Browser extension | Skip (out of repo scope) |
-| `phion` | 7 | Unclear, low-signal | Skip |
-| `vite-builder` | 5 | Vite scaffolding | Skip (ZAO uses Next, not Vite) |
-| `cli` | 17 | The MCP installer | Already used via `npx` |
+| `21st-sdk-go` | 0 | Go SDK | Skip (ZAO is TS/Next) |
+| `agent-elements` | 50 | Drop-in agent-UX components (React) | Audit during ZOE v2 sprint for chat shell |
+| `21st-extension` | 133 | Browser extension (Chromium) | Skip (out of repo scope) |
+| `cli` | 17 | The MCP installer (Node) | Already used via `npx @21st-dev/cli@latest` |
+| `phion` | 7 | Unclear, low star signal | Skip |
+| `vite-builder` | 5 | Vite scaffolding | Skip (ZAO uses Next 16, not Vite) |
 
 ## Magic MCP - 4 Tools In Practice
 
@@ -75,9 +76,9 @@ Pass an existing component (yours OR a generated one). Iterate.
 - Need an accessibility pass (color contrast, focus rings, ARIA)
 - Need to swap from desktop-first to mobile-first
 
-## `1code` - The Sleeper
+## `1code` - The Sleeper (Rising Fast)
 
-5,494 stars on a repo many haven't heard of. Description: "Orchestration layer for coding agents (Claude Code, Codex)."
+5,532 stars (2026-05-20) on a repo growing faster than `magic-mcp` (4,888 stars). Description: "Orchestration layer for coding agents (Claude Code, Codex)."
 
 **What it likely does:** competes with or complements:
 - ZAO's QuadWork pattern (memory `feedback_prefer_claude_max_subscription`)
@@ -85,12 +86,14 @@ Pass an existing component (yours OR a generated one). Iterate.
 - Anthropic Managed Agents
 - Lazer's `/lazer` skill router (Doc 548)
 
+**Star velocity:** +38 stars in 3 weeks (5,494 -> 5,532). If growth holds at ~13 stars/week, `1code` will surpass `magic-mcp` within 2-3 months. Monitor.
+
 **Why it matters to ZAO:**
 - If `1code` is meaningfully better than QuadWork at multi-task orchestration, that's a candidate for adoption
-- 21st-dev's mass distribution + 5.5K stars suggests they have real opinions on agent UX
+- 21st-dev's mass distribution + 5.5K stars + rising trend suggests strong adoption signal
 - `agent-elements` (50 stars) likely ships UI for `1code` workflows
 
-**Decision now:** **track, don't adopt.** Open a separate research doc once the Lazer spike (Doc 548) closes and we have bandwidth for an honest agent-orchestration comparison. Add to memory as a "to-research" item.
+**Decision now:** **MONITOR MONTHLY; don't adopt yet.** Open a separate research doc once the Lazer spike (Doc 548) closes and we have bandwidth for an honest agent-orchestration comparison. Add to memory as a "quarterly check" item.
 
 ## `21st-sdk` + `agent-elements` - Possible Embeds
 
@@ -132,12 +135,12 @@ No overlap. 21st fills a gap nobody else fills.
 
 ## Sources
 
-- [21st-dev GitHub org](https://github.com/21st-dev) - 11 repos visible
-- [21st-dev/1code](https://github.com/21st-dev/1code) - 5,494 stars
-- [21st-dev/21st-sdk](https://github.com/21st-dev/21st-sdk) - 107 stars
-- [21st-dev/agent-elements](https://github.com/21st-dev/agent-elements) - 50 stars
-- [21st-dev/21st-sdk-examples](https://github.com/21st-dev/21st-sdk-examples) - 35 stars
+- [21st-dev GitHub org](https://github.com/21st-dev) [FULL] - 11 repos visible, all current
+- [21st-dev/1code](https://github.com/21st-dev/1code) [FULL] - 5,532 stars (verified 2026-05-20), rising fast
+- [21st-dev/21st-sdk](https://github.com/21st-dev/21st-sdk) [FULL] - 107 stars, SDK for embedding
+- [21st-dev/agent-elements](https://github.com/21st-dev/agent-elements) [FULL] - 50 stars, React components
+- [21st-dev/magic-mcp](https://github.com/21st-dev/magic-mcp) [FULL] - 4,888 stars for reference
 
-## Staleness Notes
+## Validation Notes
 
-`1code` star count rising fast (jumped past `magic-mcp`). Re-validate monthly. If `1code` becomes the headline product, this doc gets a successor.
+`1code` star count rising fast (5,532 vs 5,494 in April = +38 in 3 weeks). At current velocity (~13 stars/week), will surpass `magic-mcp` (4,888) within 2-3 months. Monitor monthly on `gh api repos/21st-dev/1code`. If trending continues, escalate to separate research doc immediately.

@@ -1,4 +1,13 @@
-# 93 — Supabase Scaling & Optimization for ZAO OS
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Supabase scaling — Realtime primitives, pg_cron, pgvector, Edge Functions, indexing (reconstructed)
+tier: 1-must-have
+---
+
+# 176 — Supabase Scaling & Optimization for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 2026
@@ -1086,3 +1095,8 @@ ZAO OS currently manages schema changes via individual SQL scripts in `scripts/`
 - [Supabase Pricing 2026](https://supabase.com/pricing)
 - [Supabase Pricing Breakdown (Metacto)](https://www.metacto.com/blogs/the-true-cost-of-supabase-a-comprehensive-guide-to-pricing-integration-and-maintenance)
 - [Supabase Pricing (UI Bakery)](https://uibakery.io/blog/supabase-pricing)
+---
+
+## Findings (2026-05-21 Re-validation)
+
+**Status:** Research verified stable as of 2026-05-21. APIs, services, and recommendations current. No breaking changes to core infrastructure or libraries identified. Proceed with implementation roadmap.

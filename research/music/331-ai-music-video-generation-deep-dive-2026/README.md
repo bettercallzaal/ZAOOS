@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "AI music video generation tools 2026, beat-synced visuals, TikTok YouTube live performance, Neural Frames Runway (reconstructed)"
+related-docs: 324, 332, 335
+tier: STANDARD
+---
+
 # 331 - AI Music Video Generation Tools Deep Dive (April 2026)
 
 > **Status:** Research complete

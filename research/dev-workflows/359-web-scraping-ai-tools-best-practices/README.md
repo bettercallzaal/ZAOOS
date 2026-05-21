@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 15, 2026
 > **Goal:** Solve fetch failures (402/403/ECONNREFUSED) when Claude Code tries to read X posts, Linktree, artist pages. Define reliable, cheap pipeline for /inbox and content tools.
+> **Original-Query:** What's the cheapest, most reliable way to scrape X posts, artist pages, and arbitrary websites for /inbox and content tools without failures? (reconstructed)
 
 ---
 

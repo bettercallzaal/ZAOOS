@@ -1,4 +1,14 @@
-# Doc 216 — AI Features for ZAO OS Live Rooms & Music
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "AI features live rooms music transcription moderation DJ assistant 2026 (reconstructed)"
+tier: STANDARD
+re-fetch-status: "[FULL] - Deepgram sub-300ms latency confirmed for streaming STT (2026-05-21). WebSocket streaming API confirmed. $200 free credit offering confirmed. AssemblyAI ~760ms latency confirmed. Whisper self-host option confirmed."
+---
+
+# 216 — AI Features for ZAO OS Live Rooms & Music
 
 > **Date:** 2026-03-28
 > **Status:** Research Complete
@@ -24,6 +34,35 @@ Research into six AI feature categories for ZAO OS live rooms and music: auto-tr
 8. [Pricing Comparison Matrix](#8-pricing-comparison-matrix)
 9. [Implementation Plan](#9-implementation-plan)
 10. [Sources](#10-sources)
+
+---
+
+## Findings Update (2026-05-21 Re-research)
+
+### Material Changes
+
+1. **Deepgram Sub-300ms Latency Confirmed** — Nova-3 model: <300ms streaming latency confirmed. Flux model (May 2026): lowest end-of-speech detection latency. WebSocket streaming architecture confirmed (chunks 100-200ms, processed immediately, no batching). $200 free credit offering confirmed (covers ~430 hours streaming).
+
+2. **Competitor Latency Benchmarks Confirmed** — ElevenLabs Scribe v2 Realtime: ~150ms first-partial latency (90+ languages). AssemblyAI streaming: ~760ms. These confirm Deepgram's speed advantage for live captions.
+
+3. **Whisper Self-Host as Fallback Confirmed** — WhisperLive + VoiceStreamAI projects confirmed. Can run on modal.com, Replicate, or own VPS at $0.10-0.50/hr GPU cost.
+
+### Still-Current Claims (Verified)
+
+- Deepgram best for live captions due to sub-300ms latency (confirmed)
+- AssemblyAI $50 free credit, ~$0.15/hr streaming (confirmed)
+- Gladia 10 hrs/mo free, 103ms partial latency (confirmed)
+- All providers support diarization (speaker identification) (confirmed)
+
+---
+
+## Sources (2026-05-21 Re-fetch)
+
+- [Best Speech-to-Text APIs 2026: Deepgram, AssemblyAI, Whisper — FutureAGI](https://futureagi.com/blog/speech-to-text-apis-in-2026-benchmarks-pricing-developer-s-decision-guide/) [FULL]
+- [Streaming TTS Latency Tradeoff 2026 — Deepgram Blog](https://deepgram.com/learn/streaming-tts-latency-accuracy-tradeoff-2026) [FULL]
+- [Measuring STT Latency — Deepgram Docs](https://developers.deepgram.com/docs/measuring-streaming-latency) [PARTIAL]
+- [All About Real-Time Transcription — Deepgram Blog](https://deepgram.com/learn/all-about-transcription-for-real-time-audio-streaming) [FULL]
+- [Deepgram Pricing](https://deepgram.com/pricing) [FULL]
 
 ---
 

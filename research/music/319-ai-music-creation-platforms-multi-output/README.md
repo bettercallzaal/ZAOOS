@@ -1,3 +1,12 @@
+---
+topic: music
+type: comparative-analysis
+status: research-complete
+last-validated: 2026-05-21
+original-query: "What AI music creation platforms allow independent artists to produce multiple customizable song outputs for upload to ZAO?"
+tier: production
+---
+
 # 319 - AI Music Creation Platforms: Multi-Output Song Production
 
 > **Status:** Research complete

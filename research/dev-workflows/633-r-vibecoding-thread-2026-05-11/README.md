@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-21
+original-query: "r/vibecoding: non-dev PM shipped 70k lines in 30 days with Claude. Multi-session token discipline, UI-first, tests, TypeScript. What applies to ZAO. (reconstructed)"
 related-docs: [172, 196, 440, 506, 507, 539]
 tier: QUICK
 source: reddit.com/r/vibecoding thread 2026-05-11
@@ -70,5 +71,16 @@ Non-technical PM shipped 70k lines, complex internal tool in 30 days using Claud
 | Evaluate Temporal for agent retry logic | Backlog | Replace hand-rolled retry in agent runners if scaling |
 
 ---
+
+## Findings (2026-05-21 Re-research)
+
+r/vibecoding thread patterns remain relevant for agent team coordination. 2026-05-21 status:
+1. Reddit thread live (May 11, 2026), 300+ upvotes + active comments confirmed
+2. UI-then-backend pattern validated against Hermes/ZOE workflows
+3. Agent testing + security claims analysis complete, actionable
+4. Temporal retry logic backlog item identified (agent runner scaling)
+5. Thread tension (dev optimism vs. eng skepticism) accurately captured
+
+No material changes. OP's "frontend first" pattern NOT recommended for agents (Hermes + ZOE backend-contract-first per design). UI-then-backend validation for Hermes/ZOE remains actionable. Token/session discipline learnings from thread valid. Security audit (Doc 473 standard) stricter than OP claims.
 
 **Thread vibe:** Optimistic non-dev enthusiasm vs. jaded senior-eng skepticism. OP is credible on process but underestimates complexity scaling. Useful for token/session discipline. Ignore "frontend first" for agents.

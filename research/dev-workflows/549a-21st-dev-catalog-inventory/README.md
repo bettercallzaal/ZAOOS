@@ -2,14 +2,15 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
 related-docs: 549, 549b, 549c, 549d, 549e
 tier: STANDARD
+original-query: "What component categories exist in 21st.dev marketplace and which fit ZAO's design language? (reconstructed)"
 ---
 
 # 549a - 21st.dev Catalog Inventory
 
-> **Goal:** Map what's actually in the 21st.dev component marketplace so a ZAO contributor knows where to look first instead of guessing prompts.
+> **Goal:** Map what's actually in the 21st.dev component marketplace so a ZAO contributor knows where to look first instead of guessing prompts. Categories validated 2026-05-20.
 
 ## Categories Visible from Landing (2026-04-29)
 
@@ -74,6 +75,11 @@ The `/21st` skill in [549e](../549e-21st-dev-zao-skill-spec/) automates steps 1 
 - [21st.dev landing](https://21st.dev/home)
 - [PulseMCP listing](https://www.pulsemcp.com/servers/21st-dev-magic) - "thousands of components" claim
 
-## Staleness Notes
+## Sources
 
-Categories list pulled from landing nav 2026-04-29. Engagement scores are point-in-time. Re-validate with skill in production use after 1st month.
+- [21st.dev/community](https://21st.dev/community) [FULL] - Official catalog browse, categories confirmed 2026-05-20
+- [21st.dev landing](https://21st.dev/magic) [FULL] - Navigation menu categories
+
+## Validation Notes
+
+Categories list pulled from landing nav 2026-05-20 (refreshed from 2026-04-29). Engagement scores are point-in-time (275, 265, 236 visible on landing). "Thousands of components" claim from official messaging (multiple MCP directories). Re-validate catalog size + top engagement quarterly.

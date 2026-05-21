@@ -1,8 +1,12 @@
 # 289 — ZAO Tool Box
 
-> **Status:** Research complete
+> **topic:** community
+> **type:** research-guide
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** Catalog every usable product, feature, and tool in ZAO OS with clear documentation (reconstructed)
+> **tier:** solid
 > **Date:** April 6, 2026
-> **Goal:** Catalog every usable product, feature, and tool in ZAO OS with clear documentation for each
 
 ---
 

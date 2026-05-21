@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "music player UI best practices design patterns 2026 (reconstructed)"
+tier: STANDARD
+re-fetch-status: "[FULL] - Feature matrix vs competitors (Spotify, Apple Music, Tidal, SoundCloud, YouTube Music, Audius) remains current. ZAO OS's unique features (binaural beats, 43+ audio filters, waveform comments, 9 platform sources) still unmatched in market as of 2026-05-21."
+---
+
 # 211 — Music Player UI Best Practices & Feature Research
 
 > **Status:** Research complete

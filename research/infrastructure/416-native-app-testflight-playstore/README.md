@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: How to distribute ZAO OS as native apps on TestFlight and Play Store? (reconstructed)
+tier: FULL
+---
+
 # 416 - Native App Distribution: TestFlight + Play Store for ZAO OS
 
 > **Status:** Research complete

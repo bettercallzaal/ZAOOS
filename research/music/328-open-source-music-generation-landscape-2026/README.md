@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Open source music generation landscape 2026, alternatives to Suno/ElevenLabs, quality rankings, licensing, feature comparison (reconstructed)"
+related-docs: 319, 324, 334
+tier: STANDARD
+---
+
 # 328 - Open Source Music Generation Landscape 2026: Complete Model Directory
 
 > **Status:** Research complete

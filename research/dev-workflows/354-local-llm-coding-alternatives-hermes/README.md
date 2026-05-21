@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 13, 2026
 > **Goal:** Find local/alternative models that can handle simple coding tasks to reduce Claude Code weekly token burn. Hermes models, Ollama, and CLI alternatives evaluated.
+> **Original-Query:** Can Hermes, Ollama, or local LLMs reduce token burn on simple coding tasks while maintaining quality? (reconstructed)
 
 ---
 

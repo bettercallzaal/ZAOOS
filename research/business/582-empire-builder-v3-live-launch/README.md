@@ -2,7 +2,8 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-01
+last-validated: 2026-05-21
+original-query: Capture what shipped in Empire Builder V3 on 2026-05-01 soft launch from Adrian document new public API surface especially leaderboard endpoints give ZAO OS concrete plan to wire new endpoints (reconstructed)
 related-docs: 361, 165
 tier: STANDARD
 ---
@@ -219,15 +220,15 @@ Tagline: "The complete journey infrastructure for creators, builders, and founde
 
 ## Sources
 
-- [Empire Builder public API index](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public)
-- [Get Leaderboard By Empire](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-leaderboard-by-empire)
-- [Get Leaderboard Stats for Single Address](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-leaderboard-stats-for-single-address-within-empire)
-- [Get Empires](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-empires)
-- [Get Top Empires](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-top-empires)
-- [Get Boosters By Empire](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-boosters-by-empire)
-- [Get Empire Rewards](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-empire-rewards)
-- [Get Distribution Records](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-distribution-records)
-- [Empire Builder home](https://www.empirebuilder.world/)
+- [Empire Builder public API index](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public) [FULL - verified 2026-05-21]
+- [Get Leaderboard By Empire](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-leaderboard-by-empire) [FULL - verified 2026-05-21]
+- [Get Leaderboard Stats for Single Address](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-leaderboard-stats-for-single-address-within-empire) [FULL - verified 2026-05-21]
+- [Get Empires](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-empires) [FULL - verified 2026-05-21]
+- [Get Top Empires](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-top-empires) [FULL - verified 2026-05-21]
+- [Get Boosters By Empire](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-boosters-by-empire) [FULL - verified 2026-05-21]
+- [Get Empire Rewards](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-empire-rewards) [FULL - verified 2026-05-21]
+- [Get Distribution Records](https://empire-builder.gitbook.io/empire-builder-docs/empire-builder-docs/api/public/get-distribution-records) [FULL - verified 2026-05-21]
+- [Empire Builder home](https://www.empirebuilder.world/) [FULL - verified 2026-05-21]
 - Internal: `research/business/361-empire-builder-deep-dive-v3-integration/README.md`
 - Internal: `src/app/(auth)/ecosystem/page.tsx`, `src/components/respect/SongjamLeaderboard.tsx`, `src/lib/portal/destinations.ts`
 

@@ -1,8 +1,13 @@
-# AO Sidebar Counter Filter Fix
+# 452 - AO Sidebar Counter Filter Fix
 
-Date: 2026-04-20  
-Status: Research Only  
-Task: Investigate Composio AO's sidebar counter behavior and propose fixes
+**Topic:** agents  
+**Type:** Debugging & UX  
+**Date:** 2026-04-20  
+**Last-Validated:** 2026-05-21  
+**Original-Query:** Why does AO sidebar counter show stale session count vs active? (reconstructed)  
+**Tier:** archive-candidate  
+**Status:** Research complete - historical debugging report  
+**Task:** Investigate Composio AO's sidebar counter behavior and propose fixes
 
 ## Problem Statement
 

@@ -1,6 +1,14 @@
+---
+topic: business
+type: operations
+status: research-complete
+last-validated: 2026-05-21
+original-query: Apply Lean Six Sigma DMAIC + 7 wastes + SIPOC to ZAOstock festival planning with 4 teams 14 people 172 days (reconstructed)
+tier: STANDARD
+---
+
 # 362 - Lean Six Sigma for ZAO Festival Operations
 
-> **Status:** Research complete
 > **Date:** 2026-04-15
 > **Goal:** Apply Lean Six Sigma (DMAIC + 7 wastes + SIPOC) to ZAOstock festival planning with 4 teams, 14 people, 172 days
 
@@ -265,11 +273,13 @@ Tasks completed per week per team. Track over time to see if velocity is improvi
 
 ## Sources
 
-- [EventOPS: How to Run a Lean Event Using Six Sigma](https://eventops.com/resources/2019/1/21/how-to-run-a-lean-event-using-six-sigma)
-- [ISSSP: Lean Six Sigma in Meeting Effectiveness and Event Management](https://isssp.org/lean-six-sigma-in-meeting-effectiveness-and-event-management/)
-- [GoLeanSixSigma: DMAIC Five Basic Phases](https://goleansixsigma.com/dmaic-five-basic-phases-of-lean-six-sigma/)
-- [ASQ: Six Sigma Definition](https://asq.org/quality-resources/six-sigma)
-- [ASQ: Value Stream Mapping Tutorial](https://asq.org/quality-resources/value-stream-mapping)
-- [KaiNexus: What is a Kaizen Event](https://blog.kainexus.com/improvement-disciplines/kaizen/kaizen-events/what-is-a-kaizen-event-your-complete-guide-rapid-improvement)
-- [Kaizen.com: Rapid Improvement Event](https://kaizen.com/insights/rapid-improvement-event-continuous-improvement/)
+- [EventOPS: How to Run a Lean Event Using Six Sigma](https://eventops.com/resources/2019/1/21/how-to-run-a-lean-event-using-six-sigma) [FULL]
+- [Lean 6 Sigma Hub: Event Management Problem Recognition (Mar 2026)](https://lean6sigmahub.com/event-management-recognizing-and-solving-problems-in-planning-and-execution-workflows/) [FULL]
+- [LSPM: Certified Professional in Lean Six Sigma for Events](https://www.lspm.co.uk/Course/Details/70504) [FULL]
+- [ISSSP: Lean Six Sigma in Meeting Effectiveness and Event Management](https://isssp.org/lean-six-sigma-in-meeting-effectiveness-and-event-management/) [PARTIAL]
+- [GoLeanSixSigma: DMAIC Five Basic Phases](https://goleansixsigma.com/dmaic-five-basic-phases-of-lean-six-sigma/) [PARTIAL]
+- [ASQ: Six Sigma Definition](https://asq.org/quality-resources/six-sigma) [PARTIAL]
+- [ASQ: Value Stream Mapping Tutorial](https://asq.org/quality-resources/value-stream-mapping) [PARTIAL]
+- [KaiNexus: What is a Kaizen Event](https://blog.kainexus.com/improvement-disciplines/kaizen/kaizen-events/what-is-a-kaizen-event-your-complete-guide-rapid-improvement) [PARTIAL]
+- [Kaizen.com: Rapid Improvement Event](https://kaizen.com/insights/rapid-improvement-event-continuous-improvement/) [PARTIAL]
 - Doc 263: Obsidian's Lean Team Model (internal research)

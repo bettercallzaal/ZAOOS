@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
+original-query: "Pick the gasless stack for ZAOstock RSVP, ZABAL first-stake, Cipher mint. Coinbase Smart Wallet vs Privy vs Pimlico. Who pays, quota, fallback. (reconstructed)"
 related-docs: 548, 549, 551, 557
 tier: STANDARD
 ---
@@ -177,13 +178,24 @@ Free credits ($15K + 0.25 ETH) cover this 100x over. Run unlimited gasless for Z
 
 ## Sources
 
-- [Base docs - Sponsor Gas](https://docs.base.org/use-cases/go-gasless) - 5-step setup, 0.25 ETH free
-- [Base Gasless Campaign Smart Wallet](https://www.smartwallet.dev/base-gasless-campaign/) - $15K credits
-- [Coinbase Paymaster product page](https://www.coinbase.com/developer-platform/products/paymaster) - 15M+ tx, 50+ apps, ERC-20 gas
-- [Pimlico pricing](https://docs.pimlico.io/pricing) - 10% surcharge on actual gas
-- [Stackup paymaster intro](https://www.stackup.sh/blog/introducing-stackups-paymaster) - USD-billed monthly
-- [ZeroDev ERC-20 paymaster](https://docs.zerodev.app/sdk/core-api/pay-gas-with-erc20s) - USDC-paid gas
+- [Base docs - Sponsor Gas](https://docs.base.org/use-cases/go-gasless) [FULL] - 5-step setup, 0.25 ETH free, wallet_sendCalls RPC standard confirmed 2026-05-21
+- [Base Gasless Campaign Smart Wallet](https://www.smartwallet.dev/base-gasless-campaign/) [FULL] - $15K credits confirmed, 1-week delivery, no KYC signup
+- [Coinbase Paymaster product page](https://www.coinbase.com/developer-platform/products/paymaster) [FAILED] - page fetch failed 2026-05-21; relying on Base docs for details
+- [Pimlico pricing](https://docs.pimlico.io/pricing) [FULL] - 10% surcharge verified, pay-as-you-go $1/100K credits, Mainnets available
+- [Stackup paymaster intro](https://www.stackup.sh/blog/introducing-stackups-paymaster) [FAILED] - fetch failed 2026-05-21; defer to Pimlico details
+- [ZeroDev ERC-20 paymaster](https://docs.zerodev.app/sdk/core-api/pay-gas-with-erc20s) [FULL] - 6M+ smart accounts, 50+ networks, ERC-20 paymaster available
 - Doc 548 - Lazer's bundled Privy gas-sponsorship feature
+
+## Findings (2026-05-21 Re-research)
+
+Base Paymaster + Coinbase Smart Wallet stack remains production-ready. 2026-05-21 re-fetch verified:
+1. Base docs current: wallet_sendCalls with paymasterService capability is live, contract/function allowlisting works
+2. Gasless Campaign: $15K Base credits + 0.25 ETH confirmed, no KYC needed (email + phone only), 1-week delivery
+3. Pimlico pricing page current: 10% surcharge model confirmed, no changes since 2026-04-29
+4. ZeroDev ERC-20 paymaster live with 6M+ accounts (up from 200+ teams reference in guide)
+5. Stackup + Coinbase product pages unreachable 2026-05-21, but Base/Pimlico/ZeroDev sources sufficient for decision
+
+No material changes to strategy. Recommendation (Coinbase Smart Wallet primary, Pimlico secondary at 10% surcharge) remains valid. Budget estimate ($160 across 3 surfaces) unchanged.
 
 ## Staleness Notes
 

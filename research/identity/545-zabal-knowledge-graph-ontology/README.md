@@ -2,9 +2,10 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-04-28
-related-docs: 432, 542, 543, 544
+last-validated: 2026-05-21
+original-query: "Unified RDF ontology for all ZABAL ecosystem projects without contradiction (reconstructed)"
 tier: DEEP
+related-docs: [432, 542, 543, 544]
 ---
 
 # 545 - ZABAL Knowledge-Graph Ontology v1
@@ -100,18 +101,18 @@ Create via Bonfire web UI (2-3 hours): The ZAO, Zaal, ZAOstock 2026, Roddy, Frac
 
 ---
 
-## Standards Used
+## Standards Used [RE-VERIFIED MAY 21 2026]
 
-- **Schema.org** (Person, Organization, Event, MusicGroup) - 45M domains, verified 2026-04-28
-- **FOAF** (Friend of a Friend) - Social graphs, verified https://xmlns.com/foaf/spec/
-- **Music Ontology** (mo:MusicArtist, mo:Track, mo:Release) - Music data, verified https://github.com/motools/musicontology
-- **Event Ontology** (LODE) - Events, verified https://linkedevents.org/ontology/
-- **SKOS** (Simple Knowledge Organization System) - Taxonomies, verified https://www.w3.org/2004/02/skos/
-- **Dublin Core** (dc:creator, dc:created) - Attribution, verified https://www.dublincore.org/
-- **Wikidata** (instance_of, subclass_of pattern) - Ontology design, verified https://www.wikidata.org/wiki/Wikidata:Data_model
-- **DBpedia** (MusicalArtist, Album, Song) - Music ontology alignment, verified https://dbpedia.org/ontology/MusicalArtist
-- **ERC-4824** (DAO interfaces) - Reference only, not used directly
-- **ERC-8004** (Trustless Agents) - Identity/Reputation pattern inspiration, verified https://eips.ethereum.org/EIPS/eip-8004
+- **Schema.org** (Person, Organization, Event, MusicGroup) - 45M+ domains, standard maintained by Google/Microsoft/Yahoo [FULL] https://schema.org/
+- **FOAF** (Friend of a Friend) - Social graphs, maintained W3C [FULL] https://xmlns.com/foaf/spec/
+- **Music Ontology** (mo:MusicArtist, mo:Track, mo:Release) - PURL stable [FULL] http://purl.org/ontology/mo/ (GitHub: https://github.com/motools/musicontology maintained)
+- **Event Ontology** (LODE) - Linked Events, W3C [FULL] https://linkedevents.org/ontology/
+- **SKOS** (Simple Knowledge Organization System) - W3C standard [FULL] https://www.w3.org/2004/02/skos/
+- **Dublin Core** (dc:creator, dc:created) - DCMI [FULL] https://www.dublincore.org/
+- **Wikidata** (instance_of, subclass_of pattern) - Wikimedia Foundation, 100M+ entities [FULL] https://www.wikidata.org/wiki/Wikidata:Data_model
+- **DBpedia** (MusicalArtist, Album, Song) - Linked Data extraction from Wikipedia [FULL] https://dbpedia.org/ontology/MusicalArtist (last updated May 2026)
+- **ERC-4824** (DAO interfaces) - Ethereum standard reference only, not used directly
+- **ERC-8004** (Trustless Agents) - EIP standard [FULL] https://eips.ethereum.org/EIPS/eip-8004
 
 ---
 

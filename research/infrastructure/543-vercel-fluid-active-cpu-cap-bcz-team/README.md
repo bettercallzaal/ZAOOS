@@ -2,7 +2,8 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-21
+original-query: What should BCZ do about Vercel Fluid Active CPU usage at 75% cap (reconstructed)
 related-docs: 283, 459
 tier: STANDARD
 ---

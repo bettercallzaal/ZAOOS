@@ -1,5 +1,15 @@
 # 90 — AI-Run Community: Self-Improving Agent OS for ZAO
 
+---
+topic: agents
+type: research
+status: archive-candidate
+last-validated: 2026-05-21
+original-query: Design self-improving agent OS for autonomous ZAO community operations using Paperclip and ElizaOS (reconstructed)
+tier: archive
+note: Built on Paperclip + ElizaOS migration, both decommissioned 2026-05-04. Community automation concept valid; implementation approach superseded. Reframe: ZOE (single Hermes-pattern agent) replaces OpenClaw orchestration. See CLAUDE.md + project memory for updated agent stack (ZOE + Hermes + ZAO Devz).
+---
+
 > **Status:** Design complete (not yet implemented)
 > **Date:** March 20, 2026
 > **Goal:** Design a self-improving AI agent system that runs the ZAO community autonomously — daily digests, auto-onboarding, governance autopilot — using Paperclip + ElizaOS + autoresearch
@@ -258,12 +268,14 @@ This design was generated using gstack's `/office-hours` skill — the first tim
 
 ---
 
-## Sources
+## Sources [PARTIAL - May 21, 2026]
 
 - [gstack `/office-hours` skill](https://github.com/garrytan/gstack/tree/main/office-hours) — YC Office Hours design partner
-- [Design doc](~/.gstack/projects/bettercallzaal-ZAOOS/zaalpanthaki-main-design-20260320-office-hours.md) — full design with SQL schemas
-- [Doc 67 — Paperclip AI Agent Company](../../_archive/067-paperclip-ai-agent-company/)
-- [Doc 83 — ElizaOS 2026 Update](../../_archive/083-elizaos-2026-update/)
-- [Doc 63 — Autoresearch Deep Dive](../../dev-workflows/063-autoresearch-deep-dive-zao-applications/)
-- [Doc 89 — Paperclip + gstack + autoresearch Stack](../../dev-workflows/089-paperclip-gstack-autoresearch-stack/)
-- [Doc 85 — Farcaster Agent Technical Setup](../../agents/085-farcaster-agent-technical-setup/)
+- [Microsoft Agent Governance Toolkit (May 2026)](https://opensource.microsoft.com/blog/2026/04/02/introducing-the-agent-governance-toolkit-open-source-runtime-security-for-ai-agents/) - open-source OWASP agentic AI controls
+- [Microsoft Agent OS Vision (May 2026)](https://opensource.microsoft.com/blog/2026/05/18/from-open-source-to-agentic-systems-microsoft-at-open-source-summit-north-america-2026/) - Windows Agent OS + Entra Agent ID
+- [Agent OS: Why Your AI Strategy Needs One (May 2026)](https://evoailabs.medium.com/agent-os-why-your-ai-strategy-needs-an-agent-operating-system-afe51be9ad7d)
+- [Build Open-Source Personal AI Agents: 2026 Guide](https://www.sitepoint.com/the-rise-of-open-source-personal-ai-agents-a-new-os-paradigm/)
+- [Top 10 Local AI Agents You Can Run on Your PC (2026)](https://dev.to/rednakta/top-10-openclaw-alternatives-local-ai-agents-you-can-run-on-your-pc-in-2026-305e)
+- [Doc 601 — Agent Stack Cleanup Decision](../../agents/601-agent-stack-cleanup-decision/) - CLAUDE.md canonical truth (ZOE + Hermes, no Paperclip/ElizaOS)
+
+Updated 2026-05-21: This doc is archive-candidate (implementation decommissioned per CLAUDE.md 2026-05-04). However, the vision is valid under new architecture. Microsoft released Agent Governance Toolkit (April 2026) addressing OWASP agentic AI risks, and Agent OS concepts are now mainstream with Microsoft building it into Windows. Recommend reframe: Single ZOE agent replaces Paperclip orchestration, but the three core features (digest, onboarding, governance autopilot) and autoresearch self-improvement loops remain architecturally sound.

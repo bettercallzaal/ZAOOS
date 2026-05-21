@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Live AI music performance festival guide, real-time generation DJing AI tracks, Ableton visuals, ZAO Stock setup (reconstructed)"
+related-docs: 331, 324, 332
+tier: STANDARD
+---
+
 # Doc 335: Live AI Music Performance & Festival Guide (2026)
 
 > Deep dive on performing AI-generated music live at festivals and events.

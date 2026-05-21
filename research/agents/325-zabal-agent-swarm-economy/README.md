@@ -1,3 +1,13 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Design a 3-agent swarm (ZOE, COC Agent, FISH Agent) that autonomously trades ZABAL, buys each other's content via x402, and creates real on-chain volume - funded with $10-25 starting capital each, fully autonomous with community direction (reconstructed)
+tier: high
+notes: Core ZABAL swarm economy research. Feed into doc 345 (master blueprint).
+---
+
 # 325 -- ZABAL Agent Swarm Economy: 3 Brand Agents Trading, Buying & Building Volume
 
 > **Status:** Research complete

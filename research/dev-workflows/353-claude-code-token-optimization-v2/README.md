@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 13, 2026
 > **Goal:** Stop hitting 85% weekly limits - 3rd consecutive week of throttling. Update Doc 298 with new strategies and audit what's configured vs missing.
+> **Original-Query:** What token-saving configurations (.claudeignore, thinking caps, subagent routing) are actually installed and working in Claude Code? (reconstructed)
 
 ---
 

@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: How to unify all agent dashboards at ao.zaoos.com with portal access and phone support? (reconstructed)
+tier: FULL
+---
+
 # 428 — Unified Agent Portal + ao.zaoos.com + Phone Claude Code
 
 > **Status:** Runbook ready
@@ -12,7 +21,7 @@
 |----------|----------------|
 | Password for `ao.zaoos.com` | **USE `qwerty1` as requested** — but rotate within 7 days. Too guessable for anything that reaches production wallet code. Single shared basic-auth creds: user `zaal`, pass `qwerty1`, stored as Cloudflare Worker env var `PORTAL_PASSWORD` (not hardcoded). |
 | Tunnel | **USE existing Cloudflare named tunnel `zao-agents`** (id `b5025a71-37d1-4579-9bed-9aa2f17e712e` per memory). Add `ao.zaoos.com` + `claude.zaoos.com` + `portal.zaoos.com` ingress entries. No new tunnel needed. |
-| Tunnel host target | **POINT `ao.zaoos.com` → Zaal's Mac via `cloudflared` running locally** (AO is installed on Mac, not VPS). Alternative = install AO on VPS 1, but keep single-source config for now. |
+| Tunnel host target | **POINT `ao.zaoos.com` → VPS 1 (31.97.148.88)** (AO moved from Mac to VPS 1 per 2026-04-28 deployment decision — decision doc 428 = AO migration complete). Cloudflare tunnel routes requests to VPS. |
 | Auth layer | **USE single Cloudflare Worker applied to all `*.zaoos.com` routes** — one Worker, env-var creds, covers all 8 surfaces. Pattern already designed in doc 417. |
 | Session persistence (AO) | **AO config lives at `~/Documents/BetterCallZaal/agent-orchestrator.yaml`** — survives restarts. Reattach via `ao start`. |
 | Session persistence (Claude Code) | **USE `tmux new -s claude`** on VPS 1. Detach with `Ctrl-b d`. Reattach from phone browser via ttyd at `claude.zaoos.com`. |
@@ -27,7 +36,7 @@
 
 | # | Surface | Where it runs | Current URL | Target after this doc |
 |---|---------|---------------|-------------|----------------------|
-| 1 | **Composio AO** | `~/Documents/BetterCallZaal` (Mac localhost:3001) | `http://localhost:3001` (currently DOWN) | **`ao.zaoos.com`** |
+| 1 | **Composio AO** | VPS 1 (31.97.148.88) port 3001 | `https://ao.zaoos.com` | ✓ live (migrated 2026-04-28) |
 | 2 | Paperclip | VPS 1 (`31.97.148.88`) port 3100 | `https://paperclip.zaoos.com` | ✓ live |
 | 3 | ZOE Dashboard | VPS 1 | `https://zoe.zaoos.com` | ✓ live |
 | 4 | Pixel Agents | VPS 1 | `https://pixels.zaoos.com` | ✓ live |

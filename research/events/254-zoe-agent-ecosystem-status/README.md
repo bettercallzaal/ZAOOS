@@ -1,9 +1,13 @@
 # 254 — ZOE Agent Ecosystem Status (Apr 3 2026)
 
-**Category:** AI/Agents
-**Status:** Living document
+> **topic:** events
+> **type:** agent-architecture-snapshot
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** What is the current status and architecture of the ZOE agent ecosystem (ZOE, ZOEY, FISHBOWLZ) as of April 3 2026? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-03
-**Source:** VPS workspace dump + Telegram conversation logs
+> **Source:** VPS workspace dump + Telegram conversation logs
 
 ---
 

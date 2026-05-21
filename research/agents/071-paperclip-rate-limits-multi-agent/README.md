@@ -1,5 +1,15 @@
 # Research 71: Paperclip AI Rate Limiting & Multi-Agent API Key Management
 
+---
+topic: agents
+type: research
+status: archive-candidate
+last-validated: 2026-05-21
+original-query: Analyze rate limiting strategies for multi-agent systems using Paperclip (reconstructed)
+tier: archive
+note: Paperclip framework decommissioned 2026-05-04. Doc retained as historical reference; patterns may apply to other orchestration tools.
+---
+
 **Date:** 2026-03-18
 **Status:** Research complete
 **Problem:** Running 5 Paperclip agents (CEO, Founding Engineer, Security Auditor, Research Agent, +1) on ONE Anthropic API key causes persistent rate limit hits.

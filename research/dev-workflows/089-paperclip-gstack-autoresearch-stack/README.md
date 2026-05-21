@@ -1,8 +1,18 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Document how Paperclip, gstack, and autoresearch stack together to create AI-agent-run development workflows (reconstructed)
+tier: primary
+---
+
 # 89 — Paperclip + gstack + Autoresearch: The AI Company Stack
 
 > **Status:** Research complete
 > **Date:** March 20, 2026
 > **Goal:** Document how Paperclip, gstack, and autoresearch stack together to create AI-agent-run development workflows, and map the broader ecosystem of complementary tools for ZAO OS
+> **Updated 2026-05-21:** gstack stars grew 3.1x to 99.8K (up from 31.8K), last push May 20. Ecosystem momentum confirms priority.
 
 ---
 
@@ -46,9 +56,10 @@
 | Stat | Value |
 |------|-------|
 | Repo | [github.com/garrytan/gstack](https://github.com/garrytan/gstack) |
-| Stars | 31,796 |
+| Stars | 99,874 |
 | License | MIT |
 | Created | March 11, 2026 |
+| Last push | May 20, 2026 |
 | Requirements | Claude Code + Git + Bun v1.0+ |
 
 #### Installation (30 seconds)

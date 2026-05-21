@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: evaluation
 status: research-complete
-last-validated: 2026-04-27
+last-validated: 2026-05-21
+original-query: Evaluate whether mattpocock's "Grill Me" Claude skill (29K stars) offers a reusable pattern for Hermes Coder spec extraction and ZAO planning discipline (reconstructed)
 related-docs: 506, 507, 508, 523, 528
 tier: STANDARD
 ---

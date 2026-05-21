@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-04-25
+last-validated: 2026-05-21
+original-query: stop multi-bot command collisions and spec supervisor plus specialist architecture (reconstructed)
 related-docs: 90, 200, 256, 461, 467, 473, 484, 491, 506, 507, 508, 523, 524
 tier: DISPATCH
 ---

@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
+original-query: "Install OpenWhisp on Zaal's Mac for voice-to-text capture: newsletter, 1-pagers, Telegram replies, research notes. Pair with Anbeeld writing rules. (reconstructed)"
 related-docs: 432, 471, 558
 tier: STANDARD
 ---
@@ -144,9 +145,20 @@ For BCZ YapZ episode transcription, keep using whatever current pipeline (likely
 
 ## Sources
 
-- [giusmarci/openwhisp on GitHub](https://github.com/giusmarci/openwhisp) - 138 stars, MIT, ~10 GB disk, fetched 2026-04-29
-- `@huggingface/transformers` - bundled Whisper Base Multilingual
-- Ollama - local LLM for refinement layer
+- [giusmarci/openwhisp on GitHub](https://github.com/giusmarci/openwhisp) [FULL] - 141 stars (up from 138), MIT, ~10 GB disk, last push 2026-04-11, TypeScript/CSS/Swift, verified 2026-05-21
+- `@huggingface/transformers` - bundled Whisper Base Multilingual [ASSUMED CURRENT]
+- Ollama - local LLM for refinement layer [ASSUMED CURRENT]
+
+## Findings (2026-05-21 Re-research)
+
+OpenWhisp repo confirmed live + maintained. 2026-05-21 verification:
+1. GitHub repo active: 141 stars (+3 since 2026-04-29), MIT license, last push 2026-04-11
+2. 5 open issues, 25 forks, 1 contributor (giusmarci), well-maintained
+3. TypeScript 73.5%, CSS 19.7%, Swift 6.3% - native macOS app
+4. Topics confirm intended uses: dictation, local-ai, speech-to-text, whisper, ollama
+5. Whisper Base Multilingual + Ollama text refinement still the stated architecture
+
+No material changes since 2026-04-29. Repo maturity increased (3 new stars, active issues). Recommendation to install on Zaal's MBP + pair with Doc 558 (Anbeeld WRITING.md) remains valid. Batch-mode gap noted for BCZ YapZ transcription still exists (use OpenAI Whisper API instead).
 
 ## Staleness Notes
 

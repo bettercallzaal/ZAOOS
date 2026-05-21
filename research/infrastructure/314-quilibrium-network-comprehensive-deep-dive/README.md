@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: What is Quilibrium network and how could it integrate with ZAO OS? (reconstructed)
+tier: FULL
+---
+
 # 314 - Quilibrium Network: Comprehensive Deep Dive
 
 > **Status:** Research complete

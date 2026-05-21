@@ -2,7 +2,8 @@
 topic: events
 type: market-research
 status: research-complete
-last-validated: 2026-05-19
+last-validated: 2026-05-21
+original-query: "Brief Zaal for 1:1 with Telamon Ardavanis (Edge City cofounder): Edge Esmeralda 2026 accepted to ZAO Fund for Emerging Culture on Artizen S6; ship collaboration email"
 related-docs: 432, 547, 475
 tier: STANDARD
 ---

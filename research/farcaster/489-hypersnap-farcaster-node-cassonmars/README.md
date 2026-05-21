@@ -1,10 +1,16 @@
-# 489 — Hypersnap + Cass on Mars — Run a Farcaster Snapchain Node
-
-> **Status:** Research complete
-> **Date:** 2026-04-23
-> **Goal:** Evaluate running a Farcaster Hypersnap (Snapchain-era replacement for Hubble) node on VPS infrastructure, plus a short research note on Cassie Heart (CassOnMars).
-
 ---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: [309-snapchain-hypersnap-protocol-deep-dive, 304-quilibrium-hypersnap-free-neynar-api]
+original-query: "Should ZAO OS run a Hypersnap node on VPS? What does Cassie Heart (CassOnMars) offer in terms of governance and infrastructure? (reconstructed)"
+tier: STANDARD
+---
+
+# 489 - Hypersnap + Cass on Mars: Run a Farcaster Snapchain Node
+
+> **Goal:** Evaluate running a Farcaster Hypersnap node on VPS infrastructure. Understand Cassie Heart's role in Farcaster governance and protocol maintenance.
 
 ## Key Decisions / Recommendations
 

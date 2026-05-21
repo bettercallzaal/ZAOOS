@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Microphone recording setup ElevenLabs voice cloning hardware budget guide (reconstructed)"
+related-docs: 323, 313, 336
+tier: STANDARD
+---
+
 # Doc 337: Microphone & Recording Setup for AI Voice Cloning + Music Production
 
 > **Date:** 2026-04-11

@@ -1,7 +1,12 @@
 # 267 — OpenClaw Skills & Capabilities Reference
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** March 29, 2026
+> **Topic:** agents
+> **Type:** infrastructure-reference
+> **Last-validated:** 2026-05-21
+> **Original-query:** OpenClaw skills capabilities reference - 52 installed skills, 10 channel integrations (Telegram, Discord, Nostr), MCP servers, development automation
+> **Tier:** reference
 > **Goal:** Document all available OpenClaw skills, extensions, and channel integrations for ZAO OS agent operations
 
 ## Current Setup

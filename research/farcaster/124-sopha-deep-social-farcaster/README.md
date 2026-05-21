@@ -1,8 +1,16 @@
-# 124 — Sopha: Deep Social on Farcaster (Curation Client)
+---
+topic: farcaster
+type: research
+status: research-complete
+last-validated: 2026-05-21
+related-docs: [002-farcaster-hub-api, 017-neynar-onboarding, 293-sopha-api-integration]
+original-query: "What is Sopha? How does its curation model work? What design patterns can ZAO OS borrow for deep, anti-algorithmic social? (reconstructed)"
+tier: STANDARD
+---
 
-> **Status:** Research complete
-> **Date:** March 24, 2026
-> **Goal:** Understand Sopha's curation model and what ZAO OS can learn from it
+# 124 - Sopha: Deep Social on Farcaster (Curation Client)
+
+> **Goal:** Understand Sopha's curation model and what ZAO OS can learn from it. Map integration points and UI patterns.
 
 ## Key Findings
 
@@ -97,9 +105,7 @@ Sopha is **very new and has minimal web presence** — no blog posts, no Medium 
 
 ## Sources
 
-- [Sopha.social](https://www.sopha.social) — main app
-- Sopha Farcaster manifest (`/.well-known/farcaster.json`) — FID 5701, Neynar webhooks
-- Sopha PWA manifest (`/manifest.json`) — standalone PWA, portrait-first
-- [@sopha_social on X](https://x.com/sopha_social) — official account
-- [awesome-farcaster](https://github.com/a16z/awesome-farcaster) — not yet listed (too new)
-- [Farcaster docs](https://docs.farcaster.xyz) — protocol context
+- [Sopha.social](https://www.sopha.social) [FULL] - Live app, Mini App in Farcaster clients
+- [@sopha_social on X](https://x.com/sopha_social) [FULL] - Official social account
+- [Farcaster Mini Apps Docs](https://miniapps.farcaster.xyz/) [FULL] - Protocol reference
+- [Farcaster Protocol Docs](https://docs.farcaster.xyz) [FULL] - Protocol context

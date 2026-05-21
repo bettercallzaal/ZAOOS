@@ -1,6 +1,11 @@
 # 425 — ZAOstock Dashboard UI: Six Sigma + Modern PM Tool Patterns
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** ui-design-pattern-research
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** What visual management patterns from Six Sigma/Lean and modern PM tools (Linear, Notion, Plane) should inform the ZAOstock team dashboard redesign? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-17
 > **Goal:** Inspire the ZAOstock `/stock/team` dashboard redesign with battle-tested patterns from Six Sigma / Lean visual management (Kanban origin, Andon, Gemba, 5S, Pareto) and modern PM tools (Linear, Notion, Plane, Monday, Airtable). Land on a Year-1 Kanban-first redesign that stays simple.
 

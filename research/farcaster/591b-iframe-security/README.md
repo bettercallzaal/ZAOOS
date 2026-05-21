@@ -3,13 +3,14 @@ topic: farcaster
 type: guide
 status: research-complete
 tier: STANDARD
-last-validated: 2026-05-02
-related-docs: 173, 250, 308, 591a, 591c
+last-validated: 2026-05-21
+related-docs: 173, 250, 308, 591, 591a, 591c, 591d
+original-query: "Farcaster miniapp HTTP headers + cookie security for iframe embedding - X-Frame-Options vs CSP frame-ancestors, SameSite=None, HttpOnly, Partitioned (CHIPS), COOP/COEP, Permissions-Policy. (reconstructed)"
 ---
 
-# Farcaster Miniapp Production Audit: HTTP Headers + Cookie Attributes for iframe Security
+# 591b - Farcaster Miniapp Security Headers + Cookie Attributes
 
-**Sub-Agent B for Doc 591.** Covers the concrete HTTP headers + cookie attributes that decide whether a Farcaster miniapp actually renders and holds a session in an iframe context.
+> **Goal:** Production checklist for HTTP headers and cookie attributes that enable Farcaster miniapp embedding and cross-iframe session persistence. Covers modern CSP frame-ancestors (replacing legacy X-Frame-Options), SameSite=None third-party cookies, Partitioned (CHIPS) for privacy-preserving scope, and browser compatibility matrix (Chrome 40+, Firefox 31+, Safari 9.1+).
 
 ---
 

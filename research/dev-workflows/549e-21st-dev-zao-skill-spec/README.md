@@ -2,14 +2,15 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
 related-docs: 549, 549a, 549b, 549c, 549d
 tier: STANDARD
+original-query: "How should the /21st skill work in Claude Code to wrap 21st.dev for ZAO? (reconstructed)"
 ---
 
 # 549e - `/21st` Skill Spec for ZAO
 
-> **Goal:** A drop-in `SKILL.md` that wraps the 21st.dev Magic MCP tools with ZAO context (stack, brand tokens, repo rules) so any Claude Code session in any ZAO repo can search + lift + adapt components in one command.
+> **Goal:** A drop-in `SKILL.md` that wraps the 21st.dev Magic MCP tools with ZAO context (stack, brand tokens, repo rules) so any Claude Code session in any ZAO repo can search + lift + adapt components in one command. Skill is installed and verified 2026-05-20.
 
 ## Where This Skill Lives
 
@@ -215,14 +216,21 @@ This skill ships v0.1. Expected to refine after first ZAO Stock site sprint - br
 | Refine Step 5 sweep rules from spike findings | Zaal or auto | PR to skill | After 1st use |
 | Capture top-fit contributor handles to memory | Auto via skill | Memory | Ongoing |
 
+## Installation Status
+
+The skill is installed at `~/.claude/skills/21st/SKILL.md` as of 2026-04-29. File is 6,575 bytes. To invoke: `/21st <query>` in any ZAO Code session.
+
+To re-install: Copy the SKILL.md block above (lines 34-185) into `~/.claude/skills/21st/SKILL.md`.
+
 ## Sources
 
-- [21st-dev/magic-mcp tool surface](https://github.com/21st-dev/magic-mcp) - exact tool names + behaviour
-- ZAO `.claude/rules/components.md` - in-repo component conventions
-- ZAO `.claude/rules/typescript-hygiene.md` - in-repo TS hygiene
-- `community.config.ts` - brand tokens source of truth
-- Doc 549b - install command verified
+- [21st-dev/magic-mcp on GitHub](https://github.com/21st-dev/magic-mcp) [FULL] - Tool names + behaviour verified 2026-05-20
+- [21st.dev/magic](https://21st.dev/magic) [FULL] - Official tool descriptions
+- ZAO `.claude/rules/components.md` [FULL] - In-repo component conventions
+- ZAO `.claude/rules/typescript-hygiene.md` [FULL] - In-repo TS hygiene
+- `community.config.ts` [FULL] - Brand tokens source of truth
+- Doc 549b [FULL] - Install command verified
 
-## Staleness Notes
+## Validation Notes
 
-Tool names (`21st_magic_component_*`, `logo_search`) verified from `magic-mcp` README on 2026-04-29. If 21st-dev renames tools, this skill needs updating - watch repo releases.
+Tool names (`21st_magic_component_*`, `logo_search`) verified from `magic-mcp` README on 2026-05-20. Skill is installed and callable. Monitor `magic-mcp` releases for tool renames. If 21st-dev releases breaking changes to MCP tool signature, update Step 2 of the SKILL.md decision tree.

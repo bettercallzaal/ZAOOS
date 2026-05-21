@@ -2,9 +2,10 @@
 topic: music
 type: market-research
 status: research-complete
-last-validated: 2026-05-03
+last-validated: 2026-05-21
 related-docs: 148, 261, 314, 475, 599
 tier: STANDARD
+original-query: How does Believe/TuneCore's new AI-detection policy (April 30, 2026) affect ZAO Music and the Cipher release? (reconstructed)
 ---
 
 # 599a - Believe + TuneCore Auto-Block Unlicensed AI Music (Suno)

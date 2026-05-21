@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 8, 2026
 > **Goal:** Evaluate the Karpathy LLM Knowledge Base pattern and tools for ZAO OS's 338 research docs + codebase knowledge
+> **Original-Query:** Should ZAO OS adopt wiki-skills, Obsidian, or other knowledge base tools to make the 338 research docs more queryable? (reconstructed)
 
 ---
 

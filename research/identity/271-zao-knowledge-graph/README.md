@@ -1,9 +1,63 @@
+---
+topic: identity
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: [005, 198, 199, 207, 050, 051, 158]
+original-query: "ZAO knowledge graph for member identity and relationship mapping across on-chain activity, chat, fractals, and IRL events (reconstructed)"
+tier: STANDARD
+---
+
 # 271 — ZAO Knowledge Graph: Member Identity & Relationship Mapping
 
-> **Status:** Research + Planning
-> **Date:** March 29, 2026
-> **Tags:** `#knowledge-graph` `#identity` `#social-graph` `#zid` `#magnetiq` `#farcaster`
-> **Supersedes:** Partial — Doc 198 (social graph analytics), Doc 158 (member naming/ENS)
+> **Goal:** Design a unified knowledge graph connecting member identities (ZID, FID, ENS, wallets), relationships (IRL meets, fractal co-attendance, cast interactions, projects), and infra (Neynar, Supabase, Magnetiq, OREC, POAP) as single source of truth for reputation and discovery.
+
+## Key Decisions
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | ZID as canonical identity anchor (primary key) | Resolves multi-chain identity fragmentation; all edges anchor to ZID |
+| 2 | Hybrid pgvector + graph edges (not pure vector-only) | GraphRAG patterns show 88-92% recall + 72-89% precision; vector-only 75-85% recall; grounding cuts hallucination 15-20% to <2% |
+| 3 | Relationship edges from 6 sources: Magnetiq, Fractal history, Neynar cast replies, POAP/NFT attendance, project membership, follow graph | Captures IRL + online trust signals; supports discovery + governance weighting |
+| 4 | EAS attestations for on-chain Respect, artist status, role verification | Enables Hats Protocol integration; verifiable on-chain |
+
+## Findings
+
+| Finding | Source | Evidence |
+|---------|--------|----------|
+| GraphRAG (Microsoft Research) shows 3.4x accuracy, 80% vs 50% on complex reasoning vs vanilla RAG | [Microsoft Research](https://www.microsoft.com/en-us/research/project/graphrag/) + [GraphRAG-Bench ICLR'26](https://arxiv.org/pdf/2506.02404) | Hierarchical community detection + multi-hop reasoning; LazyGraphRAG reduces cost 1.4-2.1x |
+| But: GraphRAG frequently underperforms vanilla RAG on real-world retrieval tasks; context-dependent | [ICLR'26 benchmark analysis](https://arxiv.org/pdf/2506.05690) | Suggest hybrid: vector entry-point + graph for depth |
+| pgvector under 5M vectors: single-digit millisecond HNSW queries; 90% of RAG use cases covered | [Calmops 2026 Guide](https://calmops.com/database/postgresql/postgresql-vector-search-pgvector-complete-guide-2026/) + [Neon Guides](https://neon.com/guides/ai-embeddings-postgres-search) | IVFFlat (faster build, ~100ms) vs HNSW (slower build, <5ms); ACID + transactional consistency |
+| Magnetiq IRL meet tokens (Flow chain) can be indexed as graph edges; cross-chain identity via Flow | Current ZAO usage | ZAO members attending ZAO Stock 2026 will get meet tokens; importable as relationship edge |
+| Neynar data oracle post-acquisition (Jan 2026) brings FID quality signals into onchain policies | [Neynar Docs](https://docs.neynar.com/docs/integrate-managed-signers) + [Newton Protocol integration](https://blog.newt.foundation/newton-protocol-integrates-neynar-data-to-power-onchain-farcaster-identity-guardrails/) | FID score, follower count, verified addresses, power badge = governance guardrails |
+
+## ZAO Application
+
+1. **Near-term (Q2-Q3 2026):** Build ZID-anchored member profile in Supabase. Ingest 6 relationship edge types into graph table. Wire pgvector on top of Respect + bio text for semantic member discovery ("artists who share your genres").
+2. **Medium-term (Q4 2026):** Add GraphRAG local search (vector entry-point) + graph traversal (multi-hop) for queries like "Members you might know (co-attended fractal + IRL meet)". Integrate Magnetiq meet events into edges.
+3. **Long-term (2027+):** Consider Neo4j or GraphQL API if edges exceed ~10K nodes; pgvector + Postgres JSON edges sufficient until then. Build agent recall layer (ZOE/Hermes) against graph; wait until 500+ nodes per case study findings.
+4. **Respect attribution:** Track which fractal meeting, event, or contribution earned points. Query "Your Respect breakdown: 347 fractal, 89 event, 45 artist curation."
+
+## Sources
+
+- [Microsoft Project GraphRAG](https://www.microsoft.com/en-us/research/project/graphrag/) [FULL]
+- [GraphRAG-Bench: Domain-Specific Reasoning](https://arxiv.org/pdf/2506.02404) [FULL]
+- [When to use Graphs in RAG: Comprehensive Analysis](https://arxiv.org/pdf/2506.05690) [FULL]
+- [PostgreSQL Vector Search Guide 2026](https://calmops.com/database/postgresql/postgresql-vector-search-pgvector-complete-guide-2026/) [FULL]
+- [Neon: AI Embeddings with pgvector](https://neon.com/guides/ai-embeddings-postgres-search) [FULL]
+- [Neynar Managed Signers Documentation](https://docs.neynar.com/docs/integrate-managed-signers) [FULL]
+- [Newton Protocol: Neynar Data Oracle Integration](https://blog.newt.foundation/newton-protocol-integrates-neynar-data-to-power-onchain-farcaster-identity-guardrails/) [FULL]
+
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Ingest 188 member ZIDs + FID links into graph anchors | Backend | CODE | 2026-06-30 |
+| Model 6 edge types (Magnetiq, Fractal, Neynar cast replies, POAP, project, follow) | Product | DESIGN | 2026-06-15 |
+| Build pgvector index on member bio + music genres; test semantic discovery | Backend | CODE | 2026-07-15 |
+| Wire GraphRAG local search for "members you might know" query | Backend | RESEARCH | 2026-08-15 |
+| Integrate Magnetiq meet imports (Flow chain) as graph edges | Infra | INTEGRATION | 2026-07-30 |
+| Hook Neynar quality score into governance thresholds (proposal voting, etc.) | Product | INTEGRATION | 2026-08-30 |
 
 ---
 
@@ -213,6 +267,25 @@ The ZAO OS research library (213+ docs) is itself a knowledge graph — but it's
 3. **Restore OREC node** or find alternative — on-chain fractal vote verification
 4. **Fractal co-attendance graph** — import `data/history.json` into Supabase as graph edges
 5. **Cross-chain wallet linking** — signed attestation flow for Base + Solana
+
+## Implementation Status (ZAOOS Codebase)
+
+**Currently implemented:**
+- Supabase users table with FID, wallets, display name, bio
+- Supabase respect_members table: Respect ledger (fractal + on-chain)
+- Neynar API integration for cast history + reactions (cached in channel_casts)
+- Fractal Bot history on VPS (data/history.json) — not yet imported to graph
+
+**Not yet implemented:**
+- ZID as primary anchor in schema (FID currently primary)
+- Relationship edge tables (IRL meet, fractal co-attendance, cast reply chains, POAP attendance, project membership, follow graph)
+- pgvector indexes on member bio + music genres for semantic discovery
+- GraphRAG local/global search queries
+- Magnetiq meet token imports (Flow) as edges
+- EAS attestations for Respect verification
+- Neynar Data Oracle integration for quality-score gating
+
+**Scale limits today:** ~188 ZAO members + 500 most-cited research docs; below threshold for agent integration per case-study patterns
 
 ---
 

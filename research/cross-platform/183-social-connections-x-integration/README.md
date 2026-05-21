@@ -1,17 +1,25 @@
-# 107 — Social Connections & X Integration for ZAO OS
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Add X/Twitter and other social platform connections to ZAO OS settings with Neynar handle discovery and UI refactor (reconstructed)
+tier: STANDARD
+related-docs: 96, 354
+---
+
+# 183 — Social Connections & X Integration for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 22, 2026
 > **Goal:** Add X/Twitter + other social platform connections to ZAO OS settings, pull X handles directly from Farcaster profiles via Neynar API, clean up the multi-social settings UI
-
----
 
 ## Key Decisions / Recommendations
 
 | Decision | Recommendation |
 |----------|----------------|
 | **X handle source** | Pull from Neynar `verified_accounts` field — already available in `/user/bulk` response. No X API needed just to display handles. |
-| **X cross-posting** | Use X API free tier (500 posts/mo, $0) or pay-per-use ($0.01/post). FC2X (open source) is reference implementation. |
+| **X cross-posting** | X API v2 is pay-per-use only (no free tier as of 2026). Cost varies by endpoint. Monthly cap 2M Post reads. Enterprise for higher volume. Consider Neynar as alternative (rate-limited but free). |
 | **Settings redesign** | Restructure into 4 sections: Identity, Wallets, Socials, Preferences. Currently all in one "Connections" blob. |
 | **Social platforms** | X (auto from Farcaster), Bluesky (already built), Instagram, SoundCloud, Spotify, Audius (manual input for now) |
 | **DB columns** | Add `x_handle`, `instagram_handle`, `soundcloud_url`, `spotify_url`, `audius_handle` to users table |

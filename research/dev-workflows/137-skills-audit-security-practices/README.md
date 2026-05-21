@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Audit all Claude Code skills/commands and document security best practices for prompt injection prevention (reconstructed)
+tier: primary
+---
+
 # 137 — Skills Audit, Cleanup & Security Best Practices
 
 > **Status:** Research complete

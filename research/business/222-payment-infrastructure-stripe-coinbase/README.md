@@ -1,11 +1,19 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: ["125", "143", "213", "216"]
+original-query: "What payment infrastructure should ZAO OS use for memberships, ticketing, merch, and royalty splits? (reconstructed)"
+tier: STANDARD
+---
+
 # 222 — Payment Infrastructure: Stripe, Coinbase Commerce, Coinflow, 0xSplits
 
 > **Status:** Research complete
 > **Date:** March 30, 2026
 > **Goal:** Evaluate and recommend payment infrastructure for ZAO OS — covering membership purchases, event ticketing (ZAO Stock, October 2026), merch sales, and music royalty splits
 > **Updates:** Doc 125 (Coinflow), Doc 143 (0xSplits), Doc 213 (ZAO Stock), Doc 216 (tipping/tickets)
-
----
 
 ## Key Decisions / Recommendations
 

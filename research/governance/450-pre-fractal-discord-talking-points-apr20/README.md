@@ -1,6 +1,15 @@
+---
+topic: governance
+type: meeting-notes
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Pre-fractal meeting talking points for ZAO Discord, Apr 20 2026 (reconstructed)"
+tier: STANDARD
+---
+
 # 450 - Pre-Fractal Discord Talking Points: Apr 20 2026 5pm EST
 
-> **Status:** Ready for Zaal
+> **Status:** Complete (historical)
 > **Date:** 2026-04-20
 > **Meeting:** ZAO Discord, 5:00pm EST Mon Apr 20 (1 hour before 6pm EST Fractal)
 > **Duration:** Plan for 45 min max - respect pre-fractal energy

@@ -1,3 +1,12 @@
+---
+topic: music
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "How to use Kits.AI for singing voice conversion and voice cloning compared to ElevenLabs?"
+tier: production
+---
+
 # Doc 322: Kits.AI - Singing Voice Conversion Platform
 
 **Date:** 2026-04-11

@@ -2,7 +2,8 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-21
+original-query: Should ZAO run its own Hypersnap node, cost vs benefit analysis (reconstructed)
 related-docs: 309, 489, 597
 tier: STANDARD
 source: zaal-forwarded-url-2026-05-11
@@ -97,8 +98,8 @@ Hypersnap exists in political tension: **Neynar (centralized efficiency) vs farc
 
 ## Sources
 
-- [Hypersnap "Run a Node" official page](https://hypersnap.org/run-a-node) - verified live May 11, 2026
-- [Hypersnap homepage](https://hypersnap.org) - verified live May 11, 2026
+- [Hypersnap "Run a Node" official page](https://hypersnap.org/run-a-node) [PARTIAL] - returns CRAWLER_SERVICE_ERROR on 2026-05-21 (JS-heavy site). Last human-verified May 11, 2026
+- [Hypersnap homepage](https://hypersnap.org) [PARTIAL] - returns CRAWLER_SERVICE_ERROR on 2026-05-21 (JS-heavy site). Last human-verified May 11, 2026
 - [SNAP token launch announcement (X/Twitter)](https://x.com/mirza_sarmin/status/2051258129111974235) - May 4, 2026 post
 - [farcasterorg governance (GitHub)](https://github.com/farcasterorg/hypersnap) - active repo, latest commits within 48h
 - [Doc 309 - Snapchain vs Hypersnap Protocol Deep Dive](../309-snapchain-hypersnap-protocol-deep-dive/) - technical context

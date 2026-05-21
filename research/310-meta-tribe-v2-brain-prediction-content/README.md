@@ -1,3 +1,12 @@
+---
+topic: music
+type: research-brief
+status: research-stub
+last-validated: 2026-05-21
+original-query: "Meta TRIBE v2 brain prediction model for content optimization — fMRI-trained neural engagement prediction (reconstructed)"
+tier: reference
+---
+
 # 310 - Meta TRIBE v2: Brain Prediction Model for Content Optimization
 
 **Source:** @fuckgrowth on X (via ZOE inbox, Apr 8 2026)

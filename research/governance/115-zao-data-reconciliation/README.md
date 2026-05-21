@@ -1,3 +1,12 @@
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+tier: STANDARD
+original-query: "Two-era Respect reconciliation: OG ERC-20 (Airtable), ORDAO ERC-1155 (awards.csv), transition point Fractal 73.2, import strategy (reconstructed)"
+---
+
 # 115 — ZAO Respect Data Reconciliation Plan (March 2026)
 
 > **Status:** Research complete — ready to build import

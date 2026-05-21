@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-14
+last-validated: 2026-05-21
+original-query: Ryan Kagy sync - ZOE lineage reboot, Option A vs B partnership fork, soul of all games, Tailscale agent comms (reconstructed)
 related-docs: 460, 483, 523, 547, 647
 tier: STANDARD
 ---

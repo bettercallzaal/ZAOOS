@@ -1,6 +1,11 @@
 # 428 — ZAOstock Run-of-Show Program (Oct 3, 2026)
 
-> **Status:** Draft v2 — needs team feedback Tuesday Apr 21
+> **topic:** events
+> **type:** event-runsheet-program
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** What is the day-of run-of-show program for ZAOstock (Oct 3 2026) balancing music sets, talks, WaveWarZ bracket, transitions, and contingency? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-17
 > **Goal:** Design the day-of program for ZAOstock with fluid pacing — ~15-min content blocks separated by 5-10 min transition buffers, WaveWarZ bracket for multi-set performances, short (5-10 min) talks interspersed, and built-in contingency for real-world slippage.
 

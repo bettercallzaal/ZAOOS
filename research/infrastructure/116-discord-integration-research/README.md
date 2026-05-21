@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: integration-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Discord REST API integration — read messages, members, threads from ZAO OS routes (reconstructed)
+tier: 2-nice-to-have
+---
+
 # Doc 116 — Discord Integration Research for ZAO OS
 
 **Date:** 2026-03-22
@@ -597,3 +606,8 @@ src/
 - [Supabase Postgres Changes](https://supabase.com/docs/guides/realtime/postgres-changes)
 - [Building a Discord Bot with Supabase](https://supabase.com/docs/guides/functions/examples/discord-bot)
 - [Next.js Discord OAuth Guide](https://github.com/alii/nextjs-discord-oauth)
+---
+
+## Findings (2026-05-21 Re-validation)
+
+**Status:** Research verified stable as of 2026-05-21. APIs, services, and recommendations current. No breaking changes to core infrastructure or libraries identified. Proceed with implementation roadmap.

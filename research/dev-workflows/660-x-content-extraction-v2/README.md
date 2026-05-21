@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-21
+original-query: Make X Twitter content extraction reliably good without ever asking Zaal for credentials - no-login sustainable chain for tweets and articles (reconstructed)
 related-docs: 562, 656, 658
 tier: DEEP
 ---
@@ -197,10 +198,24 @@ Re-validate this doc + the chain by 2026-08-17 (90 days).
 | Decide if /zao-research SKILL.md should be amended to reflect the article-detection branch | @Zaal | Decision | Next time /zao-research is touched |
 | If Zaal ever does want auth-based scraping (e.g. for retrieval at scale > 1k/day), revisit this doc + pick a path | @Zaal | Optional | Trigger on demand |
 
+## Re-Validation (2026-05-21)
+
+Chain tier order and rejection reasons remain CURRENT. Tested:
+- Tier 0 syndication endpoint (`cdn.syndication.twimg.com`) — still operational
+- Tier 1 nitter.net — still operational
+- Tier 2 wayback — still operational
+- Tier 3 mirror patterns — LinkedIn Pulse slug pattern verified current
+- No credential-based auth required — confirmed zero-login architecture holds
+
+**Maintenance trigger:** Re-validate by 2026-08-17 per original plan.
+
 ## Sources
 
-- [Scrapfly: How to Scrape X.com (Twitter) in 2026](https://scrapfly.io/blog/posts/how-to-scrape-twitter)
-- [GitHub: vladkens/twscrape](https://github.com/vladkens/twscrape) — rejected (requires login)
+- [Scrapfly: How to Scrape X.com (Twitter) in 2026](https://scrapfly.io/blog/posts/how-to-scrape-twitter) [checked via exa 2026-05-21, article current]
+- [GitHub: vladkens/twscrape](https://github.com/vladkens/twscrape) — rejected (requires login) [VERIFIED rejected status]
+- cdn.syndication.twimg.com endpoint — [VERIFIED operational 2026-05-21]
+- nitter.net mirror — [VERIFIED operational 2026-05-21]
+- web.archive.org — [VERIFIED operational 2026-05-21]
 - [GitHub: d60/twikit](https://github.com/d60/twikit) — rejected (requires login)
 - [GitHub: Altimis/Scweet](https://github.com/Altimis/Scweet) — rejected (multi-account model)
 - [GitHub: trevorhobenshield/twitter-api-client](https://github.com/trevorhobenshield/twitter-api-client) — interesting GraphQL approach, still needs auth for articles

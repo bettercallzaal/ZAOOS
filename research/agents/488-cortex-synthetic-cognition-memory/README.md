@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** 2026-04-23
 > **Goal:** Evaluate CORTEX (v2.4, Apache-2.0) as the memory layer for ZAO's agent squad — compare against Matricula's Supabase+Cohere, our current "no memory" state, and the CyrilXBT filesystem vault approach.
+> **Original-Query:** Should ZAO's agent squad (ZOE, ROLO, Hermes) use CORTEX for persistent memory with dream consolidation and belief updates? (reconstructed)
 
 ---
 

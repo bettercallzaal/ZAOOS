@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-19
+last-validated: 2026-05-21
 related-docs: 665, 669, 676
 tier: STANDARD
 parent-doc: 676

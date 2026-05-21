@@ -2,9 +2,10 @@
 topic: identity
 type: audit
 status: research-complete
-last-validated: 2026-05-14
-related-docs: 432, 570, 647, 648
+last-validated: 2026-05-21
+original-query: "Survey 84 GitHub repos + ZAOOS history to build Zaal's builder profile and ecosystem fit for ZOE human.md (reconstructed)"
 tier: DISPATCH
+related-docs: [432, 570, 647, 648]
 ---
 
 # 649 — Zaal Build Profile + ZAO Ecosystem Survey

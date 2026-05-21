@@ -1,7 +1,12 @@
 # 353 -- Autonomous Agent Trading: Beyond Fixed Schedules
 
 > **Status:** Research complete
+> **Topic:** agents
+> **Type:** Architecture & Design
 > **Date:** April 13, 2026
+> **Last-Validated:** 2026-05-21
+> **Original-Query:** How should VAULT/BANKER/DEALER agents make autonomous trading decisions instead of following fixed schedules? (reconstructed)
+> **Tier:** v2-ready
 > **Goal:** Replace fixed day-of-week schedules with intelligent, autonomous trading triggers for VAULT/BANKER/DEALER
 
 ---

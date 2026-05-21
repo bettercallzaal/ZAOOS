@@ -1,13 +1,30 @@
-# 20 — Followers / Following Feed (Sortable, Filterable)
-
-> **Status:** Research complete
-> **Date:** 2026-01-28
-> **Goal:** Build the best followers/following experience in any Farcaster client — sortable, filterable, enriched with ZAO context
-> **Gap:** No existing Farcaster client (Warpcast, Herocast, Supercast) offers sorting or filtering on followers/following lists. This is a genuine differentiator.
-
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: [002-farcaster-hub-api, 017-neynar-onboarding, 173-farcaster-miniapps-integration]
+original-query: "Build the best followers/following experience in any Farcaster client with sorting, filtering, and ZAO enrichment. What APIs and UX patterns enable this? (reconstructed)"
+tier: STANDARD
 ---
 
-## Neynar API Endpoints
+# 020 - Followers/Following Feed (Sortable, Filterable)
+
+> **Goal:** Build the best followers/following experience in any Farcaster client - sortable, filterable, enriched with ZAO context.
+> **Gap:** No existing Farcaster client (Warpcast, Herocast, Supercast) offers sorting or filtering on followers/following lists. This is a genuine differentiator.
+
+## Key Decisions (DO THIS)
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Use **Neynar v2 `/farcaster/followers` + `/farcaster/following` endpoints** with `viewer_fid` context | Handles pagination, relationship context (mutual/blocked), and two native sorts. No competing clients expose this richly. |
+| 2 | Implement client-side sorts for Popular (by follower_count), Mutual (bidirectional), ZAO (allowlist cross-ref) | API only supports `desc_chron` and `algorithmic`. Advanced sorts via post-fetch filtering or Supabase cache. |
+| 3 | Use **`@tanstack/react-virtual` + infinite scroll with Intersection Observer** for large follower lists | Handles variable-height bios, 3KB footprint, works with any scroll container. Skip react-window. |
+| 4 | ZAO member enrichment via **Supabase batch query** (`SELECT fid FROM allowlist WHERE fid = ANY($1)`) | Single roundtrip, avoids N+1, shows gold badge on member cards. |
+
+## Findings
+
+### Neynar API Endpoints
 
 ### GET `/v2/farcaster/followers`
 
@@ -277,12 +294,19 @@ This feature alone makes ZAO OS the best place to manage your Farcaster social g
 
 ## Sources
 
-- [Neynar Followers API](https://docs.neynar.com/reference/fetch-user-followers)
-- [Neynar Following API](https://docs.neynar.com/reference/fetch-user-following)
-- [Neynar Relevant Followers](https://docs.neynar.com/reference/fetch-relevant-followers)
-- [Neynar Mutual Follows Guide](https://docs.neynar.com/docs/how-to-fetch-mutual-followfollowers-in-farcaster)
-- [Neynar User Score](https://docs.neynar.com/docs/neynar-user-quality-score)
-- [Neynar Bulk Users](https://docs.neynar.com/reference/fetch-bulk-users)
-- [Airstack FarScores](https://docs.airstack.xyz/airstack-docs-and-faqs/moxie/farscores-and-farboosts)
-- [TanStack Virtual](https://tanstack.com/virtual/latest)
-- [TanStack React Query](https://tanstack.com/query/latest)
+- [Neynar Followers API](https://docs.neynar.com/reference/fetch-user-followers) [FULL] - Current v2 endpoint, active as of May 2026
+- [Neynar Following API](https://docs.neynar.com/reference/fetch-user-following-1) [FULL] - v1 Link API, also v2 endpoint available
+- [Neynar Node SDK Follow APIs](https://docs.neynar.com/nodejs-sdk/follow-apis/fetchUserFollowers) [FULL] - TypeScript SDK docs
+- [Neynar Bulk Users](https://docs.neynar.com/reference/fetch-bulk-users) [FULL] - Batch FID lookups
+- [Neynar User Quality Score](https://docs.neynar.com/docs/neynar-user-quality-score) [PARTIAL] - Spam filtering metric
+- [Airstack FarScores](https://docs.airstack.xyz/airstack-docs-and-faqs/moxie/farscores-and-farboosts) [PARTIAL] - Optional Phase 2 enrichment
+- [TanStack Virtual](https://tanstack.com/virtual/latest) [FULL] - Virtual scrolling library
+- [TanStack React Query](https://tanstack.com/query/latest) [FULL] - Data fetching + caching
+
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Implement followers page component with Neynar API proxy | Dev | Code | 2026-06-15 |
+| Test virtual scrolling with 5K+ follower lists on mobile | QA | Performance | 2026-06-15 |
+| Integrate Supabase allowlist batch query for ZAO badges | Dev | Code | 2026-06-15 |

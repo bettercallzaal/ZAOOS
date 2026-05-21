@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: What framework and architecture should we use to build a 3D metaverse for ZAO OS? (reconstructed)
+tier: FULL
+---
+
 # 313 - Metaverse & 3D Virtual World for ZAO OS
 
 > **Status:** Research complete

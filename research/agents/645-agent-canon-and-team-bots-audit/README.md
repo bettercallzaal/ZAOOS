@@ -2,10 +2,10 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-11
-related-docs: [601, 607, 640, 642, 644]
+last-validated: 2026-05-21
+original-query: Synthesize all ZAO agent docs into one reference, audit team-bots code PR 503 against canon (reconstructed)
+related-docs: 601, 607, 640, 642, 644
 tier: DISPATCH
-source: dispatched-3-subagents-inventory-canon-audit
 ---
 
 # 645 - Agent canon + team-bots audit (Magnetiq + AttaBotty)

@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-07
+last-validated: 2026-05-21
+original-query: "Where does Uncle Bob's Clean Architecture earn its keep in ZAO? Skip or lift? Agents vs api routes vs Hermes vs future spinouts. Layered or lite. (reconstructed)"
 related-docs: 461, 506, 523, 529, 547, 601
 tier: STANDARD
 source-url: https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
@@ -163,6 +164,16 @@ Counter: shape-only layering with no real domain underneath teaches the LLM to *
 - [Doc 547 - ZAOstock master strategy](../../agents/) - spinout the structural pick applies to
 - [Doc 601 - agent stack cleanup](../../agents/601-agent-stack-cleanup-decision/) - why ZOE stays flat
 - [Doc 506 - TRAE AI SOLO skip](../506-trae-ai-solo-bytedance-coding-agent/) - related "lift specific patterns, skip whole product" pattern
+
+## Findings (2026-05-21 Re-research)
+
+Clean Architecture fit audit for ZAO agentic stacks remains design decision. 2026-05-21 status:
+1. Uncle Bob original (2012) + 2026 reinterpretations all confirmed live (no 404s)
+2. ZAO fit analysis (Hermes fix-PR pipeline, ZOE flat pattern, Bonfire seams) documented
+3. Related docs (461, 523, 529, 547, 601) all confirmed valid
+4. N-tier layering trade-offs against agent complexity clearly mapped
+
+No material changes to fit analysis. Clean Architecture principles (dependency inversion, seams, critic ring gates) remain optimal for Hermes + ZOE design. ZOE flat pattern (reject 3-layer hierarchy per Doc 601) remains valid. Hermes layered pattern (coder -> critic -> PR engine) aligns with seams approach. Re-validate on Doc 461/529 Hermes updates.
 
 ## Sources
 

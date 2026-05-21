@@ -2,7 +2,8 @@
 topic: business
 type: comparison
 status: research-complete
-last-validated: 2026-05-07
+last-validated: 2026-05-21
+original-query: "What brand patterns does ZAOstock need from RSV.Pizza and IYKYK? How do we segment musicians vs artists vs organizers? (reconstructed)"
 related-docs: 502, 547, 609, 610
 tier: STANDARD
 ---

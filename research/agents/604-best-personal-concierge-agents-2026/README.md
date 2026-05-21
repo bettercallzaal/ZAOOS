@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-04
+last-validated: 2026-05-21
+original-query: Best personal concierge AI agent architectures shipping 2026 - survey Letta, Mem0, Graphiti, Cognee patterns for ZOE (reconstructed)
 related-docs: 461, 529, 547, 568, 570, 581, 590, 599, 600, 601, 603
 tier: STANDARD
 ---

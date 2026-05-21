@@ -1,6 +1,11 @@
 # 433 - ZAO Media Capture Pipeline Spec
 
-> **Status:** Research + spec, no code yet
+> **topic:** events
+> **type:** infrastructure-spec-media-capture
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** How should ZAOstock and future ZAO events capture, store, tag, and monetize media (video, photos) from attendees? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-18
 > **Goal:** Design a structured media capture pipeline for ZAOstock and every future The ZAO event. Addresses one of the top gaps from doc 432 (Tricky Buddha master context): "Media loss - valuable content not captured, no structured ingestion pipeline."
 

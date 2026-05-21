@@ -1,9 +1,16 @@
-### 463 — Portal + Agent Orchestrator Audit (10-Agent Batch)
+---
+topic: security
+type: audit-results
+status: research-complete
+last-validated: 2026-05-21
+original-query: "10-parallel-agent audit: portal + AO orchestrator security, observability gaps, BRAIN integration - April 20 2026 (reconstructed)"
+tier: CRITICAL
+---
 
-> **Status:** Audit complete, fixes in progress
-> **Date:** 2026-04-20
-> **Goal:** Preserve the findings from 10 parallel subagent audits (5 on the portal, 5 on AO + cross-system connections). Drives the follow-up PR A/B/C security + observability + BRAIN-bridge work.
-> **Method:** Two batches of 5 `general-purpose` subagents dispatched in parallel, each with tight read-only scope. Total ~830K tokens consumed. Took ~5 min wall clock.
+# 463 - Portal + Agent Orchestrator Audit (10-Agent Batch)
+
+> **Goal:** Preserve findings from 10-parallel subagent audits (5 portal, 5 AO + cross-system). Drives PR A/B/C fixes for security, observability, BRAIN-bridge.
+> **Method:** Two batches of 5 subagents dispatched in parallel, tight read-only scope, ~830K tokens, ~5 min wall clock
 
 ---
 
@@ -204,8 +211,10 @@ Closes finding 8:
 
 ## Sources
 
-- Batch 1 audit reports (inline in Claude Code session 2026-04-20, agentIds afbdf..., afbcd..., a6118..., a2a24..., a1e5d...)
-- Batch 2 audit reports (agentIds a0c27..., a1396..., a6750..., ad536..., ad49f...)
-- Doc 460: ZAO agentic stack end-to-end design
-- Doc 461: push-to-merged-PR failure fix (safe-git-push hook)
-- Doc 462: BRAIN company-context pattern
+- 10-agent parallel audit (April 20, 2026) [INTERNAL] - reconstructed from Claude Code session logs
+- Doc 460: ZAO agentic stack end-to-end design [INTERNAL]
+- Doc 461: push-to-merged-PR failure fix (safe-git-push hook) [INTERNAL]
+- Doc 462: BRAIN company-context pattern [INTERNAL]
+- VPS 1 (Hostinger KVM 2, 31.97.148.88) infrastructure assumed live per `project_infra_keys.md`
+
+**Note:** Portal + AO running on VPS 1. Critical findings (7 CRITICALs + 10 HIGHs) have likely been addressed by PR A/B/C per action plan. Code review at portal source recommended before assuming fixes are deployed.

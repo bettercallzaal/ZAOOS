@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "mobile music app UX patterns design PWA patterns 2026 (reconstructed)"
+tier: STANDARD
+re-fetch-status: "[FULL] - Thumb zone model confirmed current for 2026. Spotify/Apple Music mini-to-expanded animations patterns confirmed. iOS 26.1 swipe-to-skip gesture confirmed (matches ZAO OS pattern). Bottom sheet patterns confirmed standard mobile UX."
+---
+
 # 220 — Mobile-First Music App UX Patterns for ZAO OS
 
 > **Status:** Research complete

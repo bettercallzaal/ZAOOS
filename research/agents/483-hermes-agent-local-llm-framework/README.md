@@ -1,3 +1,12 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Nous Research Hermes local models + Qwen3.6-27B for VPS per-brand bots, deterministic tool gating, honcho memory layer, Hermes vs ZOE frontier composition (reconstructed)"
+tier: STANDARD
+---
+
 # 483 — r/hermesagent — Nous Research Hermes as a Local-First Agent Framework
 
 > **Status:** Research complete

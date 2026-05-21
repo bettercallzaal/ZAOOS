@@ -1,3 +1,12 @@
+---
+topic: governance
+type: research
+status: research-complete
+last-validated: 2026-05-21
+tier: CRITICAL
+original-query: "Fibonacci scoring math, on-chain OG/ZOR token state, ORDAO integration for Respect activation (reconstructed)"
+---
+
 # 58 — Respect System Deep Dive: Scoring Math, On-Chain State & ORDAO Integration
 
 > **Status:** Research complete

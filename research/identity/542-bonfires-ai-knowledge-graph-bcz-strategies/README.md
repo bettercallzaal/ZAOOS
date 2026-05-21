@@ -2,9 +2,10 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-04-28
-related-docs: 271, 523, 524, 527, 529, 531, 539, 541
+last-validated: 2026-05-21
+original-query: "How to use Bonfire knowledge graph for BCZ Strategies + ZAO ecosystem integration with Hermes and ZOE (reconstructed)"
 tier: DEEP
+related-docs: [271, 523, 524, 527, 529, 531, 539, 541]
 ---
 
 # 542 - Bonfires.ai Knowledge Graph for BCZ Strategies + ZAO Ecosystem

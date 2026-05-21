@@ -2,7 +2,8 @@
 topic: agents
 type: comparison
 status: research-complete
-last-validated: 2026-04-27
+last-validated: 2026-05-21
+original-query: identify gaps between Hermes pair and industry best practices (OpenHands/Aider/claude-code-action) (reconstructed)
 related-docs: 506, 523, 524, 527, 528, 529, 531, 539
 tier: DEEP
 ---

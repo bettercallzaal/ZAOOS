@@ -2,7 +2,8 @@
 topic: infrastructure
 type: incident-postmortem
 status: research-complete
-last-validated: 2026-05-05
+last-validated: 2026-05-21
+original-query: Document ZAOstock database consolidation from two Supabase projects to one, May 4-5 decisions (reconstructed)
 related-docs: 502, 547, 564, 609
 tier: DEEP
 ---

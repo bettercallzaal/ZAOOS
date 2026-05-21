@@ -1,7 +1,66 @@
-# ZIDs — ZAO Decentralized Identity
+---
+topic: identity
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "ZAO decentralized identity layer wrapping Farcaster FIDs with music profile and community context (reconstructed)"
+tier: STANDARD
+related-docs: [271, 051, 158]
+---
 
-> A new identity layer wrapping Farcaster FIDs for the ZAO community
-> **Date:** 2026-01-18
+# 005 - ZIDs — ZAO Decentralized Identity
+
+> **Goal:** Design a ZAO-specific identity layer (ZID) that wraps Farcaster FID with music profile, Respect reputation, and community roles, backed by EAS attestations and Hats Protocol for governance.
+
+## Key Decisions
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | ZID as FID wrapper + music profile + Respect + roles | Single identity source for community reputation tracking across chains |
+| 2 | PostgreSQL + EAS attestations (near-term) vs Quilibrium (long-term) | Postgres gives immediate scalability; EAS provides on-chain attestability; Quilibrium adds privacy layer when ready |
+| 3 | Hats Protocol for role-based access control | ERC-1155 standard, revocable, integrates with governance; 15+ automations available |
+| 4 | Sequential ZID minting (ZID #1 = Zaal, #2 = Candy, etc.) | Canonical ordering, on-chain resolvable via Base contract |
+
+## Findings
+
+| Finding | Source | Evidence |
+|---------|--------|----------|
+| EAS live production standard for attestations across 15+ chains (Base, OP, Eth, Polygon, Arbitrum, Gnosis, Linea, zkSync, Celo, Soneium, Unichain + testnets) | [EAS Docs](https://docs.attest.org/) + [EAS Deployments](https://github.com/ethereum-attestation-service/eas-contracts/) | EAS supports schema registration + resolver contracts; 2-contract minimum; EAS core: permissionless, token-free, open-source; 8.7M+ attestations live as of May 2026 |
+| Neynar acquired Farcaster Jan 21 2026 (CONFIRMED); Merkle returns $180M to investors; Farcaster continues under Neynar operations | [Neynar Blog](https://neynar.com/blog/neynar-is-acquiring-farcaster) + [CoinDesk](https://www.coindesk.com/business/2026/01/21/farcaster-founders-step-back-as-neynar-acquires-struggling-crypto-social-app) + [Neynar Docs](https://docs.neynar.com/docs/integrate-managed-signers) | Managed signers sponsor on-chain fees by default; Neynar Data Oracle brings FID metadata (score, followers, verified addresses, badges) into onchain policies; 250K MAU + 100K funded wallets as of Dec 2025 |
+| Hats Protocol tree structure enables hierarchical roles with accountability edges | [Hats Docs](https://docs.hatsprotocol.xyz/) + [MCP Server available](https://www.pulsemcp.com/servers/hats-protocol) | ERC-1155 hat tokens; 15+ pre-built automations; supports Base, Optimism, Arbitrum, Polygon; role composition (admin, accountability) for org accountability |
+| Quilibrium privacy layer designed for oblivious hypergraph (node operators can't see stored data); Mainnet v2.1 LIVE (as of Nov 2025) | [Quilibrium Docs](https://docs.quilibrium.com/docs/discover/q-story/) + [Quilibrium FAQs](https://docs.quilibrium.com/docs/discover/FAQ/) + [BSC News](https://bsc.news/post/quilibrium-crypto-guide-analysis) | Q v2.1 live mainnet with Proof of Meaningful Work; QNS + Quorum Messenger deployed; E1 2026 final stealth mode + full multi-sharding; Equinox/Event Horizon roadmap (ETA TBD) for AI training + streaming; 4 active regions + 60K+ node operators as of Nov 2025 |
+
+## ZAO Application
+
+1. **Near-term (Q2-Q3 2026):** Deploy PostgreSQL ZID table linked to FID via SIWF (Sign In With Farcaster). Mint sequential ZIDs on Base contract. Integrate Hats Protocol for in-app role verification (moderator, curator, artist hats).
+2. **Medium-term (Q4 2026):** Add EAS attestation layer — music profile + Respect score attestable on-chain. Test Neynar Data Oracle for bringing FID quality scores into governance thresholds.
+3. **Long-term (2027+):** Evaluate Quilibrium migration path for privacy-preserving ZID state. Do NOT block near-term on Quilibrium readiness; migrate when stable.
+4. **Hats integration:** Map ZAO roles (Founder, Moderator, Artist, Curator) to Hat tree structure. Automate role granting via Respect thresholds or Fractal attendance (Doc 207 history.json).
+
+## Sources
+
+- [EAS — Ethereum Attestation Service](https://attest.org/) [FULL]
+- [Welcome to EAS Documentation](https://docs.attest.org/) [FULL]
+- [Ethereum Attestation Service & Smart Contracts](https://www.quicknode.com/guides/ethereum-development/smart-contracts/what-is-ethereum-attestation-service-and-how-to-use-it) [FULL]
+- [Neynar acquires Farcaster, January 2026](https://www.coindesk.com/business/2026/01/21/farcaster-founders-step-back-as-neynar-acquires-struggling-crypto-social-app) [FULL]
+- [Neynar Managed Signers Documentation](https://docs.neynar.com/docs/integrate-managed-signers) [FULL]
+- [Hats Protocol Documentation](https://docs.hatsprotocol.xyz/) [FULL]
+- [Hats Protocol: Roles & Permissions](https://www.hatsprotocol.xyz/) [FULL]
+- [Hats Protocol MCP Server](https://www.pulsemcp.com/servers/hats-protocol) [FULL]
+- [Quilibrium: Peer-to-Peer MPC Platform](https://quilibrium.com/quilibrium.pdf) [FULL]
+- [Quilibrium: Internet Nobody Owns](https://bsc.news/post/quilibrium-crypto-guide-analysis) [FULL]
+
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Implement sequential ZID minting on Base (contract + Supabase table) | ZAO Backend | CODE | 2026-06-30 |
+| Wire Hats Protocol tree to ZAO roles; test on testnet | ZAO Backend | CODE | 2026-07-15 |
+| Design EAS schema for ZID attestations (music profile, Respect score) | ZAO Backend | DESIGN | 2026-06-15 |
+| Test Neynar Data Oracle integration for quality score gating | Product | RESEARCH | 2026-07-01 |
+| Evaluate Quilibrium privacy layer feasibility; set 2027+ roadmap | Security | RESEARCH | 2026-12-01 |
+
+---
 
 ## Concept
 
@@ -164,10 +223,25 @@ See `research/07-hats-protocol/` for implementation details.
 
 ---
 
+## Implementation Status (ZAOOS Codebase)
+
+**Currently implemented:**
+- Farcaster identity (SIWF) in `src/lib/fc-identity.ts`
+- Hats Protocol integration: `src/app/api/hats/check/route.ts` (read FID's worn hats)
+- Supabase users table with FID + wallet linking
+
+**Not yet implemented:**
+- Sequential ZID minting contract (Base)
+- ZID as primary identity in DB (currently FID primary)
+- EAS schema registration + attestation queries
+- Hats automation for Respect-based role granting
+- Quilibrium privacy layer
+
 ## Key Takeaways for ZAO OS
 
 - ZID = FID wrapper with music + reputation + roles
 - Start with PostgreSQL, attest on-chain via EAS
-- Hats Protocol for role-based access control
+- Hats Protocol for role-based access control; 15+ pre-built automations available
 - ZID creation is part of onboarding — seamless SIWF flow
-- Design for Quilibrium migration but don't block on it
+- Design for Quilibrium migration (privacy-preserving hypergraph) but don't block on it; focus on EAS attestability now
+- Neynar Data Oracle (post-acquisition, Jan 2026) can gate membership by FID quality score

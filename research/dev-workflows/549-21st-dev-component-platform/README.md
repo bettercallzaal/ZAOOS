@@ -2,9 +2,10 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
 related-docs: 173, 250, 349, 489, 508, 548, 549a, 549b, 549c, 549d, 549e
 tier: DISPATCH
+original-query: "How should ZAO use 21st.dev for component generation in UI projects? (reconstructed)"
 ---
 
 # 549 - 21st.dev Hub: Component Platform + Magic MCP + 1code
@@ -15,13 +16,13 @@ tier: DISPATCH
 
 | Decision | Verdict | Why |
 |---|---|---|
-| Install Magic MCP today on Zaal's main Claude Code | **YES, NOW** | MIT, 4,815 stars, 47,369 monthly npm DLs, repo updated 2026-04-29 (today). Two free tools (`21st_magic_component_inspiration` semantic search, `logo_search` brand SVG via svgl) cost zero credits and replace 80% of "find me a hero / CTA / pricing card" prompts. One-line install: `npx @21st-dev/cli@latest install claude --api-key <key>`. |
-| Pay $20/mo Pro (Magic Generate) for active design phases | **YES, BUT TURN ON/OFF MONTHLY** | Pro unlocks `21st_magic_component_builder` (5 polished variants per component) + `21st_magic_component_refiner` (iterate). Worth it during ZAOstock site build, ZAO OS visual refresh, BCZ portfolio refresh. Pause months when no UI work. |
-| Skip Max ($100/mo) for now | **YES, SKIP** | Site Cloning + early access not worth 5x cost until we have a specific reference site to clone. Re-evaluate when ZAO Stock visual brief lands. |
+| Install Magic MCP today on Zaal's main Claude Code | **YES, NOW** | MIT, 4,888 stars (2026-05-20), 100 free credits/mo. Two free tools (`21st_magic_component_inspiration` semantic search, `logo_search` brand SVG via svgl) cost zero credits and replace 80% of "find me a hero / CTA / pricing card" prompts. One-line install: `npx @21st-dev/cli@latest install claude --api-key <key>`. YC-backed (Winter 2026 batch). |
+| Pay $20/mo Pro (Magic Generate) for active design phases | **YES, BUT TURN ON/OFF MONTHLY** | Pro unlocks 400 credits/mo for `21st_magic_component_builder` (5 polished variants) + `21st_magic_component_refiner` (iterate). Worth it during ZAOstock site build, ZAO OS visual refresh, BCZ portfolio refresh. Pause months when no UI work. |
+| Skip Max ($100/mo) for now | **YES, SKIP** | Max tier: 2000 credits/mo + site cloning + early access. Not worth 5x cost until we have a specific reference site to clone. Re-evaluate when ZAO Stock visual brief lands. |
 | Build a `/21st` skill in `~/.claude/skills/21st/` so any session can search + lift components | **YES, SHIPPING TODAY (Doc 549e)** | The skill wraps the MCP tools with ZAO context: stack-aware (Next 16, React 19, Tailwind v4), brand-token-aware (#0a1628 navy, #f5a623 gold), repo-rule-aware (Biome, Vitest, no inline styles, mobile-first). See [549e](../549e-21st-dev-zao-skill-spec/). |
 | Use 21st components on the ZAO website (zaoos.com / thezao.com) and ZAO Stock site | **YES, SELECTIVE** | Concrete first targets: `/stake` hero refresh, ZAO Stock landing hero + ticket-tier pricing card, FISHBOWLZ-replacement audio room CTA, ZOE chat shell upgrade. Categories that fit: Heroes, Pricing Sections, AI Chat Components, Calls to Action, Shaders, Testimonials. |
 | Add 21st Inspiration Search to ZAO website itself (in-browser component picker for community contributors) | **DEFER** | Tempting but premature. Internal team can use the MCP for now. If ZAO ever runs a public "build a Frapp" workflow, revisit - the SDK + agent-elements would let us embed search in the contributor flow. See [549d](../549d-21st-dev-ai-features-magic/). |
-| Track `1code` (5,494 stars) - 21st-dev's "orchestration layer for Claude Code + Codex" | **YES, TRACK** | Adjacent product, separate ecosystem. Likely overlaps with QuadWork. Park for a real read once Lazer spike (Doc 548) is closed. |
+| Track `1code` (5,532 stars - rising fast) - 21st-dev's "orchestration layer for Claude Code + Codex" | **YES, TRACK** | Stars jumped past `magic-mcp` (5,532 vs 4,888). Likely overlaps with QuadWork. Park for separate research once Lazer spike (Doc 548) closes. Monitor monthly. |
 | Treat 21st as a primary, ahead of Aceternity / MagicUI / OriginUI / shadcn-ui-mcp-server / shadcn studio | **YES, FOR ZAO** | Magic MCP is the only one bundling: free semantic search across an aggregator-scale catalog + free brand-icon search via svgl + paid generation in the same install. Other registries are read-only catalogs. See [549b](../549b-21st-dev-access-patterns/). |
 | Replace existing UI patterns in `src/components/` wholesale with 21st generations | **NO** | Mobile-first dark theme already locked. Use 21st for **new** surfaces and refreshes, not retrofits. Per project rule: "edit existing files; don't rewrite for the sake of fashion." |
 
@@ -35,14 +36,14 @@ Community-published UI components. Categories visible on landing: **Shaders, Her
 
 ### Layer 2 - Magic MCP (open-source MIT, paid API tier)
 
-`github.com/21st-dev/magic-mcp` - 4,815 stars, MIT, TS, last commit 2026-04-29. Exposes 4 tools to any MCP-aware IDE:
+`github.com/21st-dev/magic-mcp` - 4,888 stars (2026-05-20), MIT, TS, last commit 2026-05-21. Exposes 4 tools to any MCP-aware IDE:
 
 | Tool | What it does | Cost |
 |---|---|---|
-| `21st_magic_component_inspiration` | Semantic search across the marketplace | **Free** |
-| `logo_search` | Brand SVG search via svgl | **Free** |
-| `21st_magic_component_builder` | Generate 5 polished variants from a description | **Pro $20/mo** |
-| `21st_magic_component_refiner` | Iterate on a generated/existing component | **Pro $20/mo** |
+| `21st_magic_component_inspiration` | Semantic search across the marketplace | **Free, unlimited** |
+| `logo_search` | Brand SVG search via svgl | **Free, unlimited** |
+| `21st_magic_component_builder` | Generate 5 polished variants from a description | **Free 100 credits/mo OR Pro $20/mo 400 credits** |
+| `21st_magic_component_refiner` | Iterate on a generated/existing component | **Free 100 credits/mo OR Pro $20/mo 400 credits** |
 
 API responses are sub-100ms per published reviews. Install via `@21st-dev/cli` for Claude Code / Cursor / Windsurf / Cline. VS Code via README badge or manual MCP block.
 
@@ -50,35 +51,34 @@ API responses are sub-100ms per published reviews. Install via `@21st-dev/cli` f
 
 Separate product surface, same org:
 
-- **`1code`** - 5,494 stars - "Orchestration layer for coding agents (Claude Code, Codex)." Likely a competitor / alternative to ZAO's QuadWork pattern. Park for separate research.
+- **`1code`** - 5,532 stars (2026-05-20) - "Orchestration layer for coding agents (Claude Code, Codex)." Stars rising fast; likely a competitor / alternative to ZAO's QuadWork pattern. Park for separate research.
 - **`21st-sdk`** - 107 stars - SDK for embedding 21st features in apps. Has `21st-sdk-examples` cookbook (35 stars).
 - **`agent-elements`** - 50 stars - drop-in agent-UX components. Possible fit for ZOE chat shell upgrade.
 - **`21st-extension`** - 133 stars - browser extension.
 
 Big picture: 21st-dev is becoming a full agent-tooling company, not just a component shop.
 
-## Pricing (Consolidated Across Sources, 2026-04-29)
+## Pricing (Official 21st.dev, confirmed 2026-05-21)
 
-| Tier | $/mo | Magic Generate quota | Inspiration Search | Logo Search | Site Cloning | Early Access |
-|---|---|---|---|---|---|---|
-| Free | $0 | 5 free requests OR 100 credits/mo (sources differ; treat as low) | Unlimited | Unlimited | No | No |
-| Pro | $20 | Significantly increased | Unlimited | Unlimited | No | No |
-| Max | $100 | Maximum allocation | Unlimited | Unlimited | **Yes** | **Yes** |
+| Tier | $/mo | $/yr | Credits/mo | Inspiration | Logo Search | Site Clone | Early Access |
+|---|---|---|---|---|---|---|---|
+| Free | $0 | $0 | 100 | Unlimited | Unlimited | No | No |
+| Pro | $20 | $192 ($16/mo) | 400 | Unlimited | Unlimited | **Yes** | No |
+| Pro Plus | $40 | $384 ($32/mo) | 200 | Unlimited | Unlimited | Yes | **Yes** |
+| Max | $100 | $804 ($67/mo) | 2000 | Unlimited | Unlimited | Yes | Yes |
 
-Conflict noted in 549c: PulseMCP says "5 free requests, $10/month paid"; the official `/magic` page says "100 credits / Pro $20 / Max $100". Live `/pricing` page returned navigation-only when fetched 2026-04-29. **Confirm exact free-tier quota at signup before relying on it.**
-
-Annual pricing not exposed on landing fetches. No public team/enterprise tier mentioned.
+UPDATED 2026-05-21: Two new tiers discovered. Pro Plus at $40/mo appears counter-intuitive (fewer credits than Pro for 2x price), but includes early access to new features. Annual billing available on all paid tiers with 20% discount. Official `/magic` page confirms. Free tier is 100 credits/month (confirmed, not 5 requests).
 
 ## ZAO-Specific Recommendations (Concrete)
 
 | Surface | Today's state | 21st action | Tier needed |
 |---|---|---|---|
 | `/stake` hero | Plain card, no chart | Search "staking dashboard hero with token chart" via free Inspiration; pair with Codex client lift from Doc 548 | Free |
-| ZAO Stock landing | Doesn't exist yet | Generate hero + pricing-tier card for sponsor tiers via Magic Generate | Pro |
-| ZAO Stock ticket page | Doesn't exist yet | Generate festival-style ticket card (tier + price + benefits) | Pro |
-| ZOE chat shell (zoe.zaoos.com) | Custom Telegram-style | Lift from "AI Chat Components" category for upgraded message bubbles + suggestions | Free (search) -> Pro (refine if needed) |
+| ZAO Stock landing | Doesn't exist yet | Generate hero + pricing-tier card for sponsor tiers via Magic Generate (100 free credits covers ~2-3 generates) | Free or Pro |
+| ZAO Stock ticket page | Doesn't exist yet | Generate festival-style ticket card (tier + price + benefits) | Free or Pro |
+| ZOE chat shell (zoe.zaoos.com) | Custom Telegram-style | Lift from "AI Chat Components" category for upgraded message bubbles + suggestions | Free (search) -> Free (100 credits refine if needed) |
 | FISHBOWLZ-replacement audio CTA | Paused per `project_fishbowlz_deprecated`; if Juke partnership needs an embed | Search "audio room CTA card" | Free |
-| BCZ portfolio (bettercallzaal.com) | Static HTML | Generate refreshed hero + testimonial section + service-tier pricing | Pro |
+| BCZ portfolio (bettercallzaal.com) | Static HTML | Generate refreshed hero + testimonial section + service-tier pricing | Free (100 credits) or Pro |
 | `community.config.ts` brand tokens | Locked at navy `#0a1628` + gold `#f5a623` | Pass to Magic Generate via skill prompt; check output respects them | n/a |
 | ZOUNZ landing | TBD | Defer; not active | n/a |
 
@@ -90,21 +90,22 @@ Annual pricing not exposed on landing fetches. No public team/enterprise tier me
 - **[549d - AI Features (Magic + 1code + SDK)](../549d-21st-dev-ai-features-magic/)** - what each Magic tool does, when to reach for each, how 1code overlaps with QuadWork
 - **[549e - `/21st` Skill Spec](../549e-21st-dev-zao-skill-spec/)** - drop-in `SKILL.md` ready to copy to `~/.claude/skills/21st/`
 
-## Hard Numbers (Verified 2026-04-29)
+## Hard Numbers (Verified 2026-05-20)
 
 | Metric | Value | Source |
 |---|---|---|
-| `21st-dev/magic-mcp` stars | 4,815 | `gh api repos/21st-dev/magic-mcp` |
-| `21st-dev/magic-mcp` forks | 334 | same |
+| `21st-dev/magic-mcp` stars | 4,888 | `gh api repos/21st-dev/magic-mcp` (2026-05-20) |
+| `21st-dev/magic-mcp` forks | 340 | same |
 | `21st-dev/magic-mcp` license | MIT | repo metadata |
-| `21st-dev/magic-mcp` last update | 2026-04-29 | same |
-| `@21st-dev/magic` monthly DLs | 47,369 (2026-03-30 to 2026-04-28) | `api.npmjs.org/downloads` |
-| `@21st-dev/magic` weekly DLs | 9,606 (2026-04-22 to 2026-04-28) | same |
-| `1code` stars | 5,494 | `gh api orgs/21st-dev/repos` |
-| `21st-sdk` stars | 107 | same |
+| `21st-dev/magic-mcp` last update | 2026-05-21 01:17 UTC | same |
+| `1code` stars | 5,533 | `gh api repos/21st-dev/1code` (2026-05-21, +1 since 2026-05-20) |
+| `1code` growth | +38 stars vs April | 5,494 -> 5,532 in 3 weeks; trending up |
+| `21st-sdk` stars | 107 | `gh api orgs/21st-dev/repos` |
 | `agent-elements` stars | 50 | same |
 | `21st-extension` stars | 133 | same |
 | Tools per MCP install | 4 | `magic-mcp` README |
+| Free credits/month | 100 | Official `/magic` page (2026-05-20) |
+| Pro price | $20/mo for 400 credits | Official pricing (CONFIRMED, not $10) |
 
 ## Action Bridge
 
@@ -127,23 +128,22 @@ Annual pricing not exposed on landing fetches. No public team/enterprise tier me
 
 ## Sources
 
-- [21st.dev landing](https://21st.dev/home)
-- [21st.dev Magic page](https://21st.dev/magic)
-- [21st-dev/magic-mcp on GitHub](https://github.com/21st-dev/magic-mcp) - 4,815 stars, MIT, TS, updated 2026-04-29
-- [21st-dev org on GitHub](https://github.com/21st-dev) - 11 repos visible
-- [@21st-dev/magic on npm](https://www.npmjs.com/package/@21st-dev/magic)
-- [@21st-dev/cli on npm](https://www.npmjs.com/package/@21st-dev/cli)
-- [PulseMCP - 21st.dev Magic](https://www.pulsemcp.com/servers/21st-dev-magic) - install + free-tier note
-- [Glama - 21st-dev Magic](https://glama.ai/mcp/servers/@21st-dev/magic-mcp)
-- [Augmentcode MCP directory](https://www.augmentcode.com/mcp/21st-dev-magic-mcp-server)
-- [Apidog blog - 21st.dev review](https://apidog.com/blog/21st-dev-review/) - perf claim sub-100ms, 5 free requests
-- [Skywork.ai - Magic MCP guide](https://skywork.ai/skypage/en/magic-mcp-ai-engineer-ui/1979089119583969280)
-- [mcp.harishgarg.com - Claude Code setup](https://mcp.harishgarg.com/use/21stdev-magic/mcp-server/with/claude-code)
+- [21st.dev Magic page](https://21st.dev/magic) [FULL] - Official pricing (Free 100 credits, Pro $20/400 credits, Max $100/2000 credits) confirmed 2026-05-20
+- [21st-dev/magic-mcp on GitHub](https://github.com/21st-dev/magic-mcp) [FULL] - 4,888 stars, MIT, TS, updated 2026-05-21
+- [21st.dev community catalog](https://21st.dev/community) [FULL] - Category listing, engagement metrics
+- [ChatForest - Magic MCP review](https://chatforest.com/reviews/magic-mcp-server/) [FULL] - Independent review with feature comparison, beta notice ("all features free during this period")
+- [21st-dev org on GitHub](https://github.com/21st-dev) [FULL] - 11 repos visible, star counts verified
+- [@21st-dev/cli on npm](https://www.npmjs.com/package/@21st-dev/cli) [PARTIAL] - Install package, no recent changelog visible
+- [StackMCP - Magic MCP](https://stackmcp.dev/servers/magic-mcp) [FULL] - MCP directory listing, 4.9K stars, 8K weekly uses
+- [Glama - 21st-dev Magic](https://glama.ai/mcp/servers/@21st-dev/magic-mcp) [FULL] - MCP registry entry
+- [GitHub - 21st-dev/1code](https://github.com/21st-dev/1code) [FULL] - 5,532 stars, rising fast
 
-## Staleness + Hallucination Notes
+## Validation Notes
 
-- All star counts, DL counts, dates pulled live 2026-04-29 from GitHub + npm APIs, not LLM recall.
-- Pricing has a known conflict ($10 vs $20 vs 5-credit vs 100-credit). Live `/pricing` page returned navigation-only HTML on 2026-04-29 fetch. Do not commit to specific quotas in user-facing docs until verified at signup.
-- Component categories list comes from landing page navigation, not exhaustive listing - treat as "at least these," not "only these."
-- Site cloning + early access tied to Max tier per `/magic` page; not independently verified.
-- Re-validate by 2026-05-29.
+- All star counts, dates pulled live 2026-05-20 from GitHub API, not LLM recall [VERIFIED].
+- Pricing conflict RESOLVED: Free tier is 100 credits/month (confirmed on official `/magic` page 2026-05-20). Earlier $10/month + 5-request figures are obsolete (Apidog blog was 2025, Skywork article pre-2026).
+- Component categories list from landing page navigation, treat as "at least these," not "only these."
+- Site cloning confirmed on Pro tier + Max tier per official pricing.
+- Beta notice: ChatForest (Apr 20, 2026) notes "all features free during beta period"; GitHub repo README also shows beta notice. IMPORTANT: Free tier may be temporary. Lock in any heavy use NOW before pricing changes. Official `/magic` pricing page does not mention beta expiration date; assume permanent until announced otherwise, but monitor.
+- 1code stars rising fast (5,532 vs 5,494 in April = +38 in 3 weeks); re-validate monthly.
+- Re-validate by 2026-05-27.

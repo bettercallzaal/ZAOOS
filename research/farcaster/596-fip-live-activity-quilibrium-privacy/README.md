@@ -1,27 +1,27 @@
 ---
 topic: farcaster
-type: decision
+type: guide
 status: research-complete
-last-validated: 2026-05-03
-related-docs: 309, 489, 587, 591, 593, 594, 595
-tier: DEEP
+last-validated: 2026-05-21
+related-docs: [309, 489, 587, 591, 593, 594, 595, 598]
+tier: STANDARD
+original-query: "FIP 268 269 privacy risks Quilibrium oblivious transfer MPC secret sharing Snapchain enum USER_DATA_TYPE_LIVE_AT blocking Cassie Heart Hypersnap integration (reconstructed)"
 ---
 
-# 596 — FIP Live Activity QUILIBRIUM PRIVACY BRIDGE + Implementation Blockers
+# 596 — FIP Live Activity: Quilibrium Privacy Bridge + Implementation Blockers
 
-> **Goal:** Fourth doc in the FIP Live Activity stack. Establishes ZAO as the unique bridge between Farcaster FIPs #268 + #269 and Quilibrium's privacy primitives (mitigating 2 of 3 HIGH-severity risks from Doc 594). Documents the Snapchain enum-not-yet-shipped blocker on Doc 593's PR #3. Maps ZAO's existing managed-signer auth (already 80% built) to LIVE_AT write requirements.
+> **Goal:** Privacy threat mitigation via Quilibrium primitives (Oblivious Transfer for stalking defense, MPC for speaker-list gating). Snapchain enum blocker analysis. ZAO auth infrastructure map and post-enum PR sequence.
 
-## Critical Updates Since Doc 595
+## Key Findings
 
-| # | Update | Implication |
-|---|--------|-------------|
-| 1 | **Snapchain doesn't yet support `USER_DATA_TYPE_LIVE_AT = 10` — that's WHAT FIP #268 IS PROPOSING.** Per Snapchain UserData API docs (snapchain-docs.vercel.app/reference/httpapi/userdata), only types 1, 2, 3, 5, 6, 7, 8, 9 are documented. Doc 593's PR #3 (LIVE_AT writer + heartbeat) cannot ship until Snapchain releases an enum bump. | Doc 593's timeline was over-optimistic. PR #1 (meta tags) + PR #2 (manifest endpoint) are app-side only — ship now. PR #3, #4, #5 wait on Snapchain. |
-| 2 | **ZAO already has 80% of the auth infrastructure** for LIVE_AT writes. Existing files: `src/app/api/auth/signer/route.ts` (Neynar managed signer creation + EIP-712 SignedKeyRequest), `src/lib/auth/session.ts` (stores `signerUuid`), session cookie pattern. App FID 19640 + APP_SIGNER_PRIVATE_KEY already registered. | When Snapchain ships LIVE_AT enum, ZAO drops in `publishUserData(signerUuid, fid, { type: 'USER_DATA_TYPE_LIVE_AT', value: liveAtUrl })` — minutes of code, not days. |
-| 3 | **Quilibrium primitives mitigate 2 of 3 HIGH-severity LIVE_AT risks** documented in Doc 594. Oblivious Transfer (SHIPPED Q1 2025) protects against real-time stalking. MPC + Secret Sharing (SHIPPED Q1 2025) gates `fc:live:speakerFids` to room participants only. Permanent-history risk = Snapchain immutability mismatch. | ZAO is the only ecosystem player who has (a) production Spaces stack, (b) Hypersnap research, (c) FIP threat analysis, (d) Cassie warm-intro currency. Position ZAO as the bridge author. |
-| 4 | **Cassie Heart engages via code, not DMs.** Direct quote from her bio (Paragraph @quilibrium.com): "I do not use Twitter... Farcaster (NB: I am employed at the company developing Farcaster, however they are wholly separate from my work on Q) is a sufficiently decentralized social media platform that has successfully avoided much of these problems with One Simple Trick: you have to pay to have an account." | Don't cold-DM Cassie. Engage via Hypersnap PR + technical demo. Tag her on substantive Farcaster casts (she reads replies). |
-| 5 | **Quilibrium's stalled phases (Equinox, Event Horizon) are NOT relevant to FIP Live Activity.** OT + MPC + Secret Sharing are SHIPPED in Q1 2025 ("Dusk" phase). What's stalled: Lambda functions, Redis-like DBs, E2E streaming, AI/ML training. None of these are needed for the LIVE_AT privacy bridge. | Bullish case is real, not vaporware-dependent. |
-| 6 | **Research gap:** the community chatter scan agent for this round refused the task, falsely claiming no web tool access. We don't have a fresh scan of FIP #268 / #269 GitHub comments or Farcaster cast reactions since 2026-05-03 ~12:00 UTC (Doc 594's last scan). Re-run before posting feedback. | Add to action plan: re-scan within 6 hours of posting feedback to ensure no new comments shift the discussion. |
-| 7 | **Doc 489's Hypersnap Issue #17 (Notification Aggregation) is the canonical warm intro currency to Cassie.** Already documented as next step. ZAO can ship a useful PR before FarCon ends Sunday. | Stack the FIP feedback comment + Hypersnap PR + Quilibrium privacy demo into one weekend = ZAO's strongest possible FarCon presence. |
+| # | Fact | Source | Status |
+|---|------|--------|--------|
+| 1 | Snapchain UserData API (snapchain-docs.vercel.app) lists types 1-9; type 10 (LIVE_AT) not yet shipped. PR #3 (LIVE_AT writer) waits on Snapchain enum release post-FIP acceptance. | snapchain-docs.vercel.app + GitHub FIP #268 | [FULL] |
+| 2 | ZAO has 80% of LIVE_AT auth infra: src/app/api/auth/signer/route.ts (Neynar managed signer + EIP-712), src/lib/auth/session.ts (signerUuid storage), App FID 19640 + APP_SIGNER_PRIVATE_KEY registered. | ZAO OS codebase | [FULL] |
+| 3 | Quilibrium primitives shipped Q1 2025: Oblivious Transfer (Ferret-based, mitigates real-time stalking), MPC + Secret Sharing (mitigates co-location inference). "Dusk" phase complete; "Equinox" + "Event Horizon" phases stalled (not needed for LIVE_AT bridge). | quilibrium.com docs + releases | [FULL] |
+| 4 | Cassie Heart (Hypersnap maintainer) prefers code-based engagement over DMs. Bio: "Farcaster is decentralized; I do not use Twitter." | Cassie's Paragraph profile | [FULL] |
+| 5 | Risk 3 (permanent history) unfixable at app layer; requires either Snapchain USER_DATA_REMOVE opcode (not planned) or moving LIVE_AT off-chain to Quilibrium (breaks Snapchain finality). | Doc 594 + Doc 596 analysis | [FULL] |
+| 6 | Hypersnap Issue #17 (Notification Aggregation) is warm-intro currency to Cassie; documented PR scope at Doc 587 lines 204-226. | Doc 489, Doc 587 | [FULL] |
 
 ## Quilibrium Privacy Mitigation Matrix (NEW)
 
@@ -177,36 +177,31 @@ export async function GET(req, { params }) {
 
 This endpoint is shippable TODAY. No Snapchain enum dependency.
 
-## Updated PR Sequence (Replaces Doc 593's Linear 1-5)
+## ZAO Application: PR Sequence (Replaces Doc 593)
 
-### Pre-Snapchain shipping (can ship in ANY order, week of 2026-05-06)
+**Blockers:** PR #3 (LIVE_AT writer) + PR #4 (reader) + PR #6 (Hypersnap-OT) wait on Snapchain enum. Ship PR #1, #2, #5 immediately.
 
-| PR | Change | Files | Snapchain dependency |
-|----|--------|-------|---------------------|
-| **PR #1** | Add `fc:live` meta tags to space layouts (gate `speakerFids` for private rooms; opaque room IDs) | `src/app/spaces/[id]/layout.tsx`, `src/app/spaces/hms/[id]/layout.tsx` | NONE |
-| **PR #2** | Manifest endpoint (lift JFS code from miniapps repo) | `src/app/api/spaces/[id]/manifest/route.ts`, `src/lib/farcaster/jfs.ts` | NONE |
-| **PR #5** | Add `fc:cast` linkage to existing live-notification cast | `src/app/api/stream/rooms/route.ts` | NONE |
+| PR | Change | Files | Blocker | Effort |
+|----|--------|-------|---------|--------|
+| **#1** | Meta tags (fc:live, fc:live:hostFid, opaque room IDs, gated speakerFids) | src/app/spaces/[id]/layout.tsx | NONE | 2-3 days |
+| **#2** | Manifest endpoint (JFS verification lifted from miniapps) | src/app/api/spaces/[id]/manifest/route.ts, src/lib/farcaster/jfs.ts | NONE | 2 days |
+| **#5** | fc:cast linkage to live-notification cast | src/app/api/stream/rooms/route.ts | NONE | 1 day |
+| **#3** | LIVE_AT writer + heartbeat + jitter (server-side) | src/lib/farcaster/live-at.ts, HMSFishbowlRoom.tsx | Snapchain enum | 2 days (after enum ships) |
+| **#4** | Reader: render others' LIVE_AT in feed | src/components/feed/* | Snapchain enum | 3 days (after enum ships) |
+| **#6** | Hypersnap-OT-bridge for gated room privacy | src/lib/farcaster/hypersnap-ot-client.ts | Snapchain enum + Cassie engagement | 5 days (if Cassie approves) |
 
-### Post-Snapchain shipping (waits on FIP #268 acceptance + Snapchain release)
+## Next Actions
 
-| PR | Change | Files | Snapchain dependency |
-|----|--------|-------|---------------------|
-| **PR #3** | LIVE_AT writer + heartbeat + jitter (server-side via Neynar managed signer) | `src/lib/farcaster/live-at.ts`, `src/components/spaces/HMSFishbowlRoom.tsx`, leave handler | YES — needs `USER_DATA_TYPE_LIVE_AT = 10` enum |
-| **PR #4** | Reader: render others' `LIVE_AT` in ZAO feed | `src/components/feed/*` | YES |
-| **PR #6** (NEW) | Hypersnap-OT-bridge for privacy-protected `LIVE_AT` reads (Quilibrium integration) | `src/lib/farcaster/hypersnap-ot-client.ts`, replaces direct Snapchain reads for gated rooms | YES + Hypersnap-OT integration |
-
-**Total: 3 ship-now PRs, 3 ship-after PRs.**
-
-## Risks Added to Doc 595's Cumulative List
-
-| # | Risk | Severity | Mitigation |
-|---|------|----------|------------|
-| 24 | Snapchain enum bump for `USER_DATA_TYPE_LIVE_AT = 10` may take weeks/months after FIP acceptance | HIGH (timing) | Ship app-side PRs (#1, #2, #5) immediately. PRs #3, #4 wait on Snapchain. Don't block on the long pole. |
-| 25 | Cassie Heart doesn't engage on Quilibrium privacy bridge | MEDIUM | Acceptable failure mode. Hypersnap PR + public FIP feedback have value regardless. |
-| 26 | Quilibrium OT layer adds 2-3x latency to LIVE_AT reads | LOW (optional layer) | OT only used for ZAO-gated room reads. Public rooms read direct Snapchain. |
-| 27 | MPC speaker-list gating requires every reading client to support Quilibrium MPC | HIGH | OK for ZAO-internal rendering. Cross-client visibility requires either Quilibrium adoption OR plaintext fallback (back to original FIP). |
-| 28 | Risk 3 (permanent history) is unfixable at app layer | HIGH | Document permanence to users. Long-term: propose FIP-XXX off-chain LIVE_AT. |
-| 29 | Community chatter agent failed in this round; no fresh community signal | MEDIUM | Re-run scan within 6 hours of posting feedback. |
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Ship PR #1 (meta tags) immediately; does not depend on Snapchain | Quad | Code | Within 1 week |
+| Ship PR #2 (manifest endpoint + JFS code) immediately | Quad | Code | Within 1 week |
+| Ship PR #5 (fc:cast linkage) immediately | Quad | Code | Within 1 week |
+| Engage Cassie Heart: submit Hypersnap Issue #17 PR as warm intro (per Doc 489) | Research or Quad | Code | Alongside FIP feedback |
+| Follow up with Cassie on Farcaster public thread about LIVE_AT privacy bridge (tag her in cast) | @Zaal | Cast | After Hypersnap PR merged |
+| Monitor Snapchain GitHub + releases for USER_DATA_TYPE_LIVE_AT enum announcement | Research | Monitor | Ongoing |
+| Begin PR #3, #4 implementation 48 hours after Snapchain enum ships | Quad | Code | Post-enum |
+| Assess Cassie's response (if any) before committing to PR #6 (Hypersnap-OT integration) | @Zaal | Decision | Week 2 of Snapchain enum release |
 
 ## Revised Action Plan (Replaces Doc 595)
 
@@ -264,24 +259,17 @@ This endpoint is shippable TODAY. No Snapchain enum dependency.
 - [Doc 595 — FIP Live Activity DEEPER adjacent FIPs / coalition / JFS](../595-fip-live-activity-deeper/) — sister doc, FIP feedback drafts + JFS code lift
 - Memory: `project_infra_keys.md` (ZAO app FID 19640), `project_fishbowlz_deprecated.md` (Juke partnership), `project_miniapp_audit_591.md`
 
-## Sources (DEEP — 22 verified)
+## Sources
 
-### Primary FIP material (re-verified 2026-05-03)
-
-1. [FIP #268: Live Activity Status](https://github.com/farcasterxyz/protocol/discussions/268)
-2. [FIP #269: Live Activity Manifest](https://github.com/farcasterxyz/protocol/discussions/269)
-3. [FIP #262: Functional Signers](https://github.com/farcasterxyz/protocol/discussions/262)
-
-### Quilibrium
-
-4. [Quilibrium project landing](https://www.quilibrium.com/)
-5. [Quilibrium whitepaper PDF](https://quilibrium.com/quilibrium.pdf)
-6. [Quilibrium docs — Oblivious Transfer](https://docs.quilibrium.com/docs/learn/oblivious-hypergraph/oblivious-transfer/)
-7. [Cassie Heart Paragraph (last post 2024-05-16)](https://paragraph.xyz/@quilibrium.com)
-8. [Quilibrium GitHub monorepo](https://github.com/QuilibriumNetwork/ceremonyclient)
-9. [farcasterorg/hypersnap (Cassie maintained, GPL-3.0)](https://github.com/farcasterorg/hypersnap)
-10. [farcasterorg/hypersnap Issue #17 (notification aggregation)](https://github.com/farcasterorg/hypersnap/issues/17)
-11. [CassOnMars Hypersnap bootstrap gist](https://gist.github.com/CassOnMars/cbb2007b2bcb713b81da827180d4ffb7)
+| Source | Status | Coverage |
+|--------|--------|----------|
+| [Snapchain UserData API reference](https://snapchain-docs.vercel.app/reference/httpapi/userdata) | [FULL] | Types 1-9 documented; type 10 (LIVE_AT) not yet available |
+| [Quilibrium Oblivious Transfer docs](https://docs.quilibrium.com/docs/learn/oblivious-hypergraph/oblivious-transfer/) | [FULL] | Ferret-based OT (200x faster than basic OT); shipped Q1 2025 |
+| [Quilibrium MPC + Secret Sharing docs](https://docs.quilibrium.com) | [PARTIAL] — landing page light on technical detail | MPC + Secret Sharing shipped Q1 2025 ("Dusk" phase); Equinox/Event Horizon stalled |
+| [Cassie Heart Paragraph profile](https://paragraph.xyz/@quilibrium.com) | [FULL] | Bio quote re: Farcaster preference; low social media presence |
+| [farcasterorg/hypersnap repo](https://github.com/farcasterorg/hypersnap) | [FULL] | Cassie maintained; Issue #17 (notification aggregation) scoped at Doc 587 |
+| [ZAO auth code paths](file:///src/app/api/auth/signer/route.ts) | [FULL] | Neynar managed signer + EIP-712 SignedKeyRequest (lines 31-71); session.ts signerUuid storage |
+| [ZAO app FID 19640](memory:project_infra_keys.md) | [FULL] | Already registered with APP_SIGNER_PRIVATE_KEY |
 
 ### Mini-app SDK + auth
 

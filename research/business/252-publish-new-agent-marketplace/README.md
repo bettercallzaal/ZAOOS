@@ -1,3 +1,13 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: []
+original-query: "What is publish.new? How can ZAO sell digital goods and research to agents? (reconstructed)"
+tier: STANDARD
+---
+
 # 252 — Publish.new: Paragraph's AI-Native Marketplace for Digital Goods
 
 > **Status:** Research complete

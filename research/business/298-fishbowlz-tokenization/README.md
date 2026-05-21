@@ -1,9 +1,22 @@
+---
+topic: business
+type: guide
+status: archive
+last-validated: 2026-05-21
+related-docs: ["255", "258", "283", "222"]
+original-query: "How should FISHBOWLZ token economy work? Token deployment, fees, buyback mechanism? (reconstructed)"
+tier: STANDARD
+archive-reason: "FISHBOWLZ paused 2026-04-16, killed 2026-05-04. Project sunset in favor of Juke partnership. See feedback_fishbowlz_deprecated.md for details."
+---
+
 # 298 - FISHBOWLZ Tokenization: Token Design, Fee Splits, and ZABAL Auto-Buyback
 
-> **Status:** Research complete
+> **Status:** Archive
 > **Date:** 2026-04-07
 > **Goal:** Design the complete FISHBOWLZ token economy - token deployment on Base, room creation fees, fee split model, ZABAL auto-buyback mechanism, and token-gated feature tiers
 > **Updates:** Doc 255 (FISHBOWLZ spec), Doc 258 (ZABAL/SANG buyback), Doc 283 (Privy embedded wallets + token mechanics), Doc 222 (payment infrastructure)
+
+NOTE: This doc archives 2026-05-20. FISHBOWLZ was paused 2026-04-16 and killed 2026-05-04 per decision to partner with Juke (Farcaster audio client) instead. Token economy research is preserved for reference but not active.
 
 ---
 

@@ -2,37 +2,50 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-04-24
-related-docs: 487, 491, 492, 497, 498, 500
+last-validated: 2026-05-21
+related-docs: 260, 295, 498, 500, 527
+original-query: What is zlank.online, how should it be architected, and what's the phased rollout plan? (reconstructed)
 tier: DISPATCH
 ---
 
-# 505 - Zlank.online Builder Spec (synthesized from 4-agent research)
+# 505 - Zlank.online Builder Spec (Snap No-Code Platform)
 
-> **Goal:** Lock the architecture, tech stack, hard limits, dual-context auth, free-tier ceilings, spam mitigation, and phasing for `zlank.online` - the no-code Farcaster Snap builder + hosted runtime.
+> **Goal:** Lock the architecture, tech stack, hard limits, auth strategy, spam mitigation, and phased rollout for zlank.online - the no-code Farcaster Snap builder + hosted runtime with 7-day free Snap expiry.
 
-## TL;DR
+## Summary
 
-Zlank.online = single Next.js + Hono app on Vercel. Block-based builder (Linktree-style) at `/builder`, hosted Snap runtime at `/s/[id]`, free 7-day expiry per Snap. Same app ships as a Farcaster Mini App. Open access (no whitelist), Sign In With Farcaster + Quick Auth dual fork, 6-tactic spam defense. Stack locked: Next.js 16 + Hono + @farcaster/snap + @dnd-kit + cmdk + zustand + Supabase + shadcn/ui. Free tier holds 6-12 months at projected scale; ~$170/mo at 1500 active Snaps + 75k daily renders. Repo: `bettercallzaal/zlank` (transfer to `zlank-labs` once org exists).
+**Zlank.online** = no-code Snap builder + hosted runtime for any Farcaster user to create interactive apps directly in casts.
 
-## Locked Decisions
+**Key Specs:**
+- Single Next.js 16 + Hono app on Vercel
+- Block-based drag-drop builder (Linktree-style, not code-first)
+- Hosted Snaps live at `/s/[uuid]` with 7-day free expiry
+- Also shipped as Farcaster Mini App (same codebase, dual context)
+- Open access (no whitelist); Sign In With Farcaster (SIWF) + Quick Auth dual fork
+- 6-layer spam defense + optional hCaptcha
+- Stack: Next.js 16 + Hono + @farcaster/snap v2.0.3 + @dnd-kit + cmdk + zustand + Supabase + shadcn/ui on Tailwind v4
+- Cost: Free tier sustainable 6-12 months; ~$170/mo at 1500 active Snaps + 75k daily renders
+- Repo: `bettercallzaal/zlank` (public, MIT) -> transfer to `zlank-labs` org once created
 
-| # | Decision | Pick |
-|---|---|---|
-| 1 | Architecture | **Path A** - single Next.js + Hono, dynamic `/s/[id]` routing, all Snaps share one server |
-| 2 | Builder UX | **Block-based picker** (Linktree + Notion + Tally hybrid). 14 block types. NOT raw forms. |
-| 3 | Drag-drop lib | `@dnd-kit` v6.4 + `@dnd-kit/sortable` (React 19 ready, touch-first) |
-| 4 | Block picker | `cmdk` v1.1+ via shadcn Command (slash menu + floating button on mobile) |
-| 5 | State + undo | `zustand` v5 + `zundo` middleware |
-| 6 | UI lib | `shadcn/ui` on Tailwind v4 (matches ZAO OS) |
-| 7 | URL metadata | `ogie` server-side at `/api/extract-metadata` |
-| 8 | DB | Supabase (dedicated zlank project, NOT shared with ZAO OS) |
-| 9 | Snap SDK | `@farcaster/snap` v1.15.1 + `@farcaster/snap-hono` v1.4.8 (matches duodo + nouns reference impls) |
-| 10 | Mini App SDK | `@farcaster/miniapp-sdk` v0.3.0 |
-| 11 | Auth | Dual fork - Quick Auth in Mini App context, SIWF in browser. ZAO whitelist REMOVED 2026-04-24 = open to any FID. |
-| 12 | Token block | OPTIONAL in v1 - paste existing Clanker URL or contract, auto-shows price + buy button. NO token launch UI v1. |
-| 13 | Distribution surfaces | BOTH - standalone web at zlank.online + Farcaster Mini App from same Next.js codebase |
-| 14 | Repo | `bettercallzaal/zlank` (PUBLIC). Transfer to `zlank-labs` org once it exists. |
+## Key Decisions
+
+| # | Decision | Why | Status |
+|---|---|---|---|
+| 1 | Architecture = Path A (single Next.js + Hono, `/s/[id]` dynamic routing) | Zero per-Snap infra cost. Scales to thousands on one Vercel deployment. Free 7-day expires via timestamp check. | LOCKED |
+| 2 | Builder UX = block-based picker (Linktree-style, 14 blocks, NOT code-first) | Lower barrier for non-technical creators. Drag-reorder familiar UX. Can link to Mini App for code-forward users v2. | LOCKED |
+| 3 | Drag-drop lib = @dnd-kit v6.4 + sortable | React 19 ready. Touch-first (mobile critical). No vendor lock. Actively maintained. | LOCKED |
+| 4 | Block picker = cmdk v1.1+ (shadcn Command) | Slash menu on desktop, floating button on mobile. Keyboard a11y. Familiar from popular apps. | LOCKED |
+| 5 | State + undo = zustand v5 + zundo | Minimal boilerplate. Transparent undo/redo via middleware. No Redux bloat. | LOCKED |
+| 6 | UI framework = shadcn/ui on Tailwind v4 | Matches ZAO OS stack. Consistent design language. Atomic component system. | LOCKED |
+| 7 | URL metadata extraction = ogie (server-side) | Preview URLs (for Link block + Music block) without client-side parsing. | LOCKED |
+| 8 | Database = Supabase (dedicated zlank project, NOT shared with ZAOOS) | RLS enabled. Separate from ZAO OS to allow independent scaling + backups. Same provider = simpler ops. | LOCKED |
+| 9 | Snap SDK pinning = @farcaster/snap v2.0.3 (NOT v1.15.1) | Apr 8 2026 release includes structural validation. v1.15.1 is older. Use latest stable. | UPDATED FROM ORIGINAL |
+| 10 | Snap Hono = @farcaster/snap-hono v1.4.8 | Stable JFS verification. Matches farcasterxyz/snap reference impls. | LOCKED |
+| 11 | Mini App SDK = @farcaster/miniapp-sdk v0.3.0 | Quick Auth + dual context detection. Account association via EIP-712. | LOCKED |
+| 12 | Auth = dual fork (SIWF browser + Quick Auth Mini App). Open to any FID. | SIWF = browser sign-in (portable). Quick Auth = Mini App context. Whitelist removed 2026-04-24. | LOCKED |
+| 13 | Token block = OPTIONAL v1 (paste URL or 0x contract, DexScreener price live) | v1 ships without token LAUNCH UI. Users can embed existing Clanker links. Token LAUNCH (Clanker creation) moves to v2. | LOCKED |
+| 14 | Distribution = both standalone web + Mini App (same Next.js app) | Dual surfaces = discovery + conversion. One codebase avoids drift. | LOCKED |
+| 15 | Repo = bettercallzaal/zlank (PUBLIC, MIT) -> transfer to zlank-labs org | BCZ owns v1-2. Transfer when org created. Ensures community stewardship at scale. | LOCKED |
 
 ## Architecture (Path A)
 
@@ -56,48 +69,51 @@ zlank.online (Next.js 16 + Hono on Vercel)
 
 Why Path A: zero per-Snap infra cost. Scales to thousands of Snaps on one Vercel deployment. Free 7-day = `expires_at < now()` check on every request. Path B (per-Snap Vercel projects) would burn quota first week ZAO members try it. Path C (subdomain wildcard) needs Vercel Pro - defer to v2.
 
-## Tech Stack (locked)
+## Tech Stack
 
-```
-Next.js 16 + React 19           App Router, Tailwind v4, Turbopack
-Hono 4.x                         API routes for /api/snap/[id]
-@farcaster/snap-hono 1.4.8       SnapHandler middleware
-@farcaster/snap 1.15.1           Snap UI types, JFS verify
-@farcaster/miniapp-sdk 0.3.0     Mini App context detection, Quick Auth, composeCast
-@farcaster/auth-client            SIWF verification
-@farcaster/auth-kit               SIWF widget for browser
-@dnd-kit/core 6.4 + sortable     Drag-reorder block stack
-cmdk 1.1+                         Slash menu block picker
-zustand 5 + zundo                 Block tree state + undo/redo
-shadcn/ui (Radix)                 UI primitives (Dialog, Drawer, Command, Popover)
-ogie                              URL OG metadata extract (server-side)
-@dhaiwat10/react-link-preview    URL preview display (client)
-@supabase/supabase-js            Auth + DB (Supabase Postgres)
-viem 2.x                          On-chain reads (token metadata, wallet trust signal)
-```
+| Layer | Package | Version | Why |
+|---|---|---|---|
+| **App** | Next.js + React + Tailwind | 16 + 19 + v4 | App Router, Turbopack, matches ZAO OS |
+| **API** | Hono | 4.x | Lightweight, no boilerplate for `/api/snap/[id]` |
+| **Snap server** | @farcaster/snap-hono | v1.4.8 | SnapHandler middleware, JFS verification |
+| **Snap types** | @farcaster/snap | v2.0.3 | Schemas, validation (MAX_ELEMENTS=64, etc), JFS verify |
+| **Mini App SDK** | @farcaster/miniapp-sdk | v0.3.0 | Context detection, Quick Auth, composeCast |
+| **Browser auth** | @farcaster/auth-client + auth-kit | latest | SIWF message verify + widget |
+| **Drag-drop** | @dnd-kit/core + sortable | v6.4 | React 19 ready, touch-first, no vendor lock |
+| **Block picker** | cmdk | v1.1+ | Slash menu + floating mobile button |
+| **State** | zustand + zundo | v5 + latest | Minimal boilerplate, transparent undo/redo |
+| **UI** | shadcn/ui (Radix) | latest | Dialog, Drawer, Command, Popover primitives |
+| **Metadata** | ogie | latest | Server-side URL OG extraction (Link, Music blocks) |
+| **Preview** | @dhaiwat10/react-link-preview | latest | Client-side URL preview rendering |
+| **Database** | @supabase/supabase-js | latest | Auth + Postgres with RLS |
+| **On-chain reads** | viem | v2.x | Token metadata, wallet trust signals (spam defense) |
+| **Optional (v1.5)** | Upstash Redis | latest | Rate-limit state if Supabase RPC saturates |
 
-Optional later: Redis (Upstash) for rate-limit state if Supabase RPC gets slow.
+## 14 Block Catalog
 
-## 14 Block Catalog (v1)
+**v1 ships 7 core blocks** (v1.5 adds 7 more, v2 unlocks token launch + Mini App upgrade):
 
-| Block | Fields user fills | Renders to Snap |
-|---|---|---|
-| **Header** | Title + subtitle | `item` with optional `badge` |
-| **Text** | Plain text (max 320 chars) | `text` element |
-| **Image** | Paste HTTPS URL or upload | `image` (1:1 / 16:9 / 4:3 / 9:16 aspect) |
-| **Music** | Paste Tortoise / Spotify / SoundCloud / YouTube | Cover image + `open_url` button |
-| **Artist** | Type FC handle (Neynar autocomplete) | `view_profile` button + name + ZABAL badge if ZAO |
-| **Link button** | URL + label | `open_url` button (max 30 char label) |
-| **Mini App** | Paste FC mini app URL | `open_mini_app` button |
-| **Share to feed** | Share text (max 1024 chars) + 0-2 embeds | `compose_cast` button |
-| **Poll** | Question + 2-4 options | `input` + `submit` to /api/snap/[id]/vote |
-| **Fundraiser bar** | Goal $ + current $ + label | `progress` + `badge` |
-| **Token** (optional) | Paste Clanker URL or 0x contract | Live price (DexScreener) + `swap_token` action |
-| **Event** | Date + venue + RSVP URL | `item` + `open_url` button + `badge` |
-| **Bounty** | Task + reward + apply URL | `item` + `open_url` button |
-| **Divider** | (no fields) | `separator` |
+### v1.0 (Ship day 1)
+| # | Block | User input | Snap output | Status |
+|---|---|---|---|---|
+| 1 | Header | Title + subtitle | `item` with optional `badge` | v1 |
+| 2 | Text | Plain text (max 320 chars) | `text` element | v1 |
+| 3 | Image | HTTPS URL (or upload CDN) | `image` (aspect ratio picker: 1:1 / 16:9 / 4:3 / 9:16) | v1 |
+| 4 | Link button | URL + label (max 30 chars) | `open_url` button | v1 |
+| 5 | Share to feed | Text (max 1024 chars) + 0-2 embeds | `compose_cast` button | v1 |
+| 6 | Poll | Question + 2-4 options | `toggle_group` + `submit` to `/api/snap/[id]/vote` | v1 |
+| 7 | Divider | (no fields) | `separator` | v1 |
 
-User stacks blocks vertically, drags to reorder, hits Deploy. Snap goes live at `zlank.online/s/[id]`, 7-day clock starts.
+### v1.5 (Add when testing complete, months 2-4)
+| 8 | Music | Paste Spotify / SoundCloud / YouTube URL | Cover image + `open_url` button | v1.5 |
+| 9 | Artist | Type FC handle (Neynar autocomplete) | `view_profile` button + name + ZABAL badge if ZAO member | v1.5 |
+| 10 | Mini App | Paste FC mini app URL | `open_mini_app` button (bridge to full-screen app) | v1.5 |
+| 11 | Token | Paste Clanker URL or 0x contract | Live price (DexScreener) + `swap_token` action | v1.5 |
+| 12 | Event | Date + venue + RSVP URL | `item` + `open_url` button + time `badge` | v1.5 |
+| 13 | Fundraiser bar | Goal $ + current $ + label | `progress` bar + `badge` | v1.5 |
+| 14 | Bounty | Task + reward $ + apply URL | `item` + `open_url` button | v1.5 |
+
+**User flow:** Drag blocks vertically, reorder, set props in drawer, hit Deploy. Snap goes live at `zlank.online/s/[uuid]`, 7-day expiry timer starts.
 
 ## Snap UI Hard Limits (must enforce on builder side)
 
@@ -145,24 +161,19 @@ Share fork:
 
 Mini App manifest at `/.well-known/farcaster.json` (different schema from Snap manifest - uses `miniapp` block not `frame` block). Need account association EIP-712 sign with app wallet.
 
-## Free-Tier Ceilings + Cost Trajectory
+## Cost Trajectory
 
-Scale assumption: 1000 builders, 5000 Snaps created, 1500 active any time, ~75k daily Snap renders = 2.3M/month.
+**Scale assumption:** 1000 builders, 5000 Snaps created, 1500 active at any time, 75k daily renders = 2.3M/month.
 
-| Provider | Free Tier | Our Projected Use | Wall Hits | Real Cost at Scale |
-|---|---|---|---|---|
-| **Vercel Hobby** | 100GB bw, 1M invocations | 10-15GB / 2.3M | Month 6-8 | $20/mo Pro |
-| **Supabase Free** | 500MB DB, 5GB egress | 20-50MB / 2-3GB | Month 8-10 | $0 (free works year 1) |
-| **Neynar Starter** | 300 RPM global | 3.4M calls/mo | **Month 3-4** | $150/mo Growth |
-| **DexScreener Free** | 300 RPM | 450k calls/mo | Never (within reason) | $0 |
-| **TOTAL** | | | | **~$170/mo** at scale |
+| Provider | Free Tier | Our Use | Wall Hits | Mitigation | Real Cost |
+|---|---|---|---|---|---|
+| **Vercel Hobby** | 100GB bw, 1M invocations | 10-15GB, 2.3M invocations | Month 6-8 | Edge cache Snap JSON (TTL = age), gzip 60% | $20/mo Pro |
+| **Supabase Free** | 500MB DB, 5GB egress | 20-50MB DB, 2-3GB egress | Month 8-10 | Batch queries, optimize RLS | $0 (year 1) |
+| **Neynar Starter** | 300 RPM | 3.4M/mo calls (artist autocomplete + lookups) | **Month 3-4** | Batch user lookups 10x (cuts 3.4M to 500k/mo); cache 1h | $150/mo Growth |
+| **DexScreener Free** | 300 RPM | 450k/mo (token prices) | Never | Cache 5-10min at edge | $0 |
+| **TOTAL** | | | | | **~$170/mo at scale** |
 
-Mitigations to push the wall further:
-- Edge cache Snap JSON responses (cache TTL = Snap age, dies at expiry)
-- Cache DexScreener token prices 5-10 min at edge
-- Cache Neynar artist autocomplete 1 hour
-- Batch Neynar user lookups (10 per call) - cuts 3.4M to ~500k/mo
-- gzip all JSON responses (60-70% bandwidth saved)
+**Sustainability:** Free tier holds 6-12 months before hitting Neynar wall. Upgrade to paid growth tier when creators hit rate limits (signals product-market fit).
 
 ## Spam Mitigation (open-access playbook)
 
@@ -187,26 +198,28 @@ Tier 3 (add at scale):
 
 ## Phasing
 
-**v1 (Months 0-2) - Block builder ships**
-- Auth (SIWF + Quick Auth)
+### v1.0 (Months 0-2) - Block Builder Ships
+- Auth: SIWF (browser) + Quick Auth (Mini App)
 - 7 core blocks: Header, Text, Image, Link button, Share to feed, Poll, Divider
-- Drag-reorder + slash menu picker + live preview
-- 7-day free hosting
-- Mini App + standalone web from same codebase
-- MVP spam mitigation (6 tactics)
+- Builder UX: drag-reorder + `/` slash menu + live JSON preview
+- Snap hosting: `/s/[uuid]` with 7-day expiry (timestamp check on render)
+- Dual surfaces: standalone zlank.online + Farcaster Mini App from same codebase
+- Spam defense: 6 MVP tactics (rate limit, email verify, duplicate hash, keyword filter, honeypot, wallet trust)
 
-**v1.5 (Months 2-4) - Music + Artist + Token + Event + Bounty + Mini App + Fundraiser blocks**
-- Neynar autocomplete for Artist block
-- DexScreener integration for Token block
-- Cron + event-driven Snap triggers (a Snap that posts itself, a Snap that reacts to onchain events)
+### v1.5 (Months 2-4) - Creator Blocks + External APIs
+- Add 7 more blocks: Music, Artist, Mini App, Token, Event, Fundraiser, Bounty
+- Neynar Artist autocomplete (FID lookup, ZABAL badge detection)
+- DexScreener Token price fetch + swap_token action
+- Event-driven Snap triggers: scheduled posts, onchain event reactions
 
-**v2 (Months 4+) - Doc 498 vision folds in**
-- Token LAUNCH (Clanker integration)
-- Mini App upgrade path (Snaps that outgrow lightweight UI)
-- Multi-chain (Solana + Arbitrum)
-- XMTP DMs + Snapshot governance proposals
-- Snap-to-coin pipeline (creator launches coin via a Snap)
-- Managed-service tier (zlank.online keeps your Snap alive past 7 days)
+### v2 (Months 4+) - Monetization + Platform
+- Token LAUNCH (Clanker integration for creator coin drops)
+- Mini App upgrade path (Snaps that outgrow lightweight UI can prompt full-screen app)
+- Multi-chain support (Solana, Arbitrum)
+- XMTP DMs from within Snaps
+- Snapshot governance proposal embedding
+- Managed-service tier: pay to keep Snap alive past 7 days
+- See doc 498 (Zlank unified SDK concept) for long-term vision
 
 ## Repo Plan
 
@@ -217,71 +230,56 @@ Tier 3 (add at scale):
 
 Once `zlank-labs` GitHub org exists, transfer both via `gh repo transfer`.
 
-## Open Questions for Zaal
+## Design Questions (Lock Before Scaffold)
 
-1. **Theme palette** - default to ZAO navy + gold? Or per-Snap theme picker (Linktree-style)?
-2. **Snap URL slug** - `zlank.online/s/[uuid]` (clean) or `zlank.online/s/[username]/[name]` (memorable)?
-3. **Expired Snap behavior** - return "expired - upgrade?" page, or just 404? Or owner-readonly view?
-4. **Gallery default** - public-by-default or opt-in-to-list?
-5. **Edit URL** - should `/builder/[id]` be link-shareable so collaborators can co-edit, or owner-only?
-6. **Anonymous build trial** - allow building without sign-in (sign in only to deploy)? Faster funnel.
-7. **First scaffolded blocks** - which 7 ship in v1? My pick: Header, Text, Image, Link button, Share to feed, Poll, Divider. Music + Artist + Token slip to v1.5 (need external API integration).
+| # | Question | v1 pick | Rationale |
+|---|---|---|---|
+| 1 | Theme palette | Default ZAO navy (#0a1628) + gold (#f5a623); per-Snap picker in v1.5 | Brand consistency v1; Linktree-style customization later |
+| 2 | Snap URL slug | `zlank.online/s/[uuid]` | Clean, no collisions, shares don't break if creator changes name |
+| 3 | Expired Snap behavior | Show "Snap expired - upgrade to managed tier?" landing page with CTA | Conversion opportunity; not 404 (too harsh) |
+| 4 | Gallery visibility | Opt-in-to-list (private by default) | Privacy first; creators choose to showcase. Gallery becomes portfolio site in v1.5 |
+| 5 | Edit URL sharing | `/builder/[id]` owner-only (generate shareable invite links in v1.5) | Simpler auth v1; avoid accidental overwrites. Collaboration tooling later. |
+| 6 | Anonymous build trial | Sign in only to deploy (build without auth) | Lower friction; sign-in happens at critical moment (deploy). A/B test post-v1. |
+| 7 | v1 block lineup | Header, Text, Image, Link button, Share to feed, Poll, Divider | Core use cases covered. Music + Artist need Neynar (v1.5). Token complex (v1.5). |
 
-## Also See
+## Related Documents
 
-- [Doc 487 - QuadWork four-agent dev team](../../agents/487-quadwork-four-agent-dev-team/)
-- [Doc 497 - Quad workflow deep dive](../../agents/497-quad-workflow-deep-dive/)
-- [Doc 498 - Zlank unified SDK concept (parent vision)](../../business/498-zlank-unified-sdk-concept/)
-- [Doc 500 - Snaps as Zlank v1 pivot](../500-snaps-zlank-build-platform/)
+- [Doc 260 - Neynar Acquires Farcaster (context)](../260-neynar-acquires-farcaster/) - Infrastructure ownership, continuity
+- [Doc 295 - Farcaster Snaps (technical spec)](../295-farcaster-snaps/) - v2.0 components, actions, validation
+- [Doc 498 - Zlank unified SDK concept (long-term vision)](../../business/498-zlank-unified-sdk-concept/) - Monetization roadmap
+- [Doc 500 - Snaps as Zlank v1 pivot](../500-snaps-zlank-build-platform/) - Why Snaps over other formats
+- [Doc 527 - Zlank next 3 builds (sprint planning)](../527-zlank-next-3-builds/) - Implementation sequencing
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |---|---|---|---|
-| Confirm 7 v1 block list + theme + slug + expired-behavior decisions (open Qs above) | Zaal | Decision | Before scaffold |
-| Scaffold `bettercallzaal/zlank` repo (Next.js 16 + Hono + Tailwind v4 + shadcn + zustand + dnd-kit + cmdk + Supabase) | Claude / Quad | New repo | After Zaal greenlights |
-| Set up Supabase project for Zlank, schema: `snaps` (id, owner_fid, name, theme, expires_at) + `snap_blocks` (snap_id, position, type, config_json) + `snap_events` (snap_id, fid, action, ts) | Claude | DB schema | First scaffold |
-| Write 7 block builder components (one per v1 block) | Quad batch | Overnight run | Week 1-2 |
-| Write Snap renderer (Hono handler that reads snap_blocks ordered by position, dispatches per type, returns Snap JSON) | Claude | Implementation | Week 1 |
-| SIWF + Quick Auth dual-fork session manager | Claude | Implementation | Week 1 |
-| Mini App manifest + account association sign | Zaal + Claude | Manual + impl | Week 2 |
-| Reserve `zlank-labs` GitHub org, transfer both repos | Zaal | Manual + gh | Within 7 days |
-| Reserve `zlank.online` domain (if not done) + point to Vercel | Zaal | DNS | Before deploy |
-| Decide whether to bump @farcaster/snap to v2.1.1 (new view_token / send_token / swap_token actions) for template + new repo | Zaal | Decision | Before scaffold |
+| Confirm design decisions (7 questions above) | Zaal | Decision | 2026-05-25 |
+| Scaffold `bettercallzaal/zlank` repo (Next.js 16 + Hono + full stack) | Claude | Code | 2026-05-27 |
+| Create Supabase schema: snaps, snap_blocks, snap_events, spam_metrics | Claude | DB | 2026-05-27 |
+| Build 7 v1 block editor components | Quad/Claude | Code batch | 2026-05-30 |
+| Implement Snap JSON renderer (Hono handler) | Claude | Code | 2026-05-30 |
+| Build SIWF + Quick Auth dual-fork session | Claude | Code | 2026-06-01 |
+| Create Mini App manifest + EIP-712 account association | Claude | Code | 2026-06-02 |
+| Set up spam defense (rate limit, email verify, keyword filter, honeypot, wallet trust) | Claude | Code | 2026-06-05 |
+| Deploy v1.0 to zlank.online on Vercel | Claude | Infra | 2026-06-07 |
+| Public beta launch announcement | Zaal | Marketing | 2026-06-08 | |
 
 ## Sources
 
-**Snap UI primitives:**
-- https://github.com/farcasterxyz/snap (read packages/snap/src/ui)
-- https://docs.farcaster.xyz/snap
-- https://www.npmjs.com/package/@farcaster/snap
-- https://www.npmjs.com/package/@farcaster/snap-hono
-- duodo-snap + nouns-snap source (already in ZAO OS repo)
-
-**Mini App + dual context:**
-- https://miniapps.farcaster.xyz/docs/getting-started
-- https://miniapps.farcaster.xyz/docs/specification
-- https://miniapps.farcaster.xyz/docs/sdk/quick-auth
-- https://miniapps.farcaster.xyz/docs/sdk/is-in-mini-app
-- https://miniapps.farcaster.xyz/docs/sdk/actions/compose-cast
-- https://github.com/farcasterxyz/miniapps
-- https://docs.base.org/mini-apps/quickstart/new-apps/create-manifest
-
-**Free tier + spam mitigation:**
-- https://vercel.com/docs/limits
-- https://supabase.com/pricing
-- https://docs.neynar.com/reference/what-are-the-rate-limits-on-neynar-apis
-- https://docs.dexscreener.com/api/reference
-- https://linktr.ee/s/about/community-standards
-- https://softup.io/insight/api-rate-limiting-&-abuse-protection-in-2026
-
-**Builder UX libs:**
-- https://www.pkgpulse.com/blog/dnd-kit-vs-react-beautiful-dnd-vs-pragmatic-drag-drop-2026
-- https://www.pkgpulse.com/blog/cmdk-vs-kbar-vs-mantine-spotlight-2026
-- https://github.com/pacocoursey/cmdk
-- https://github.com/clauderic/dnd-kit
-- https://github.com/pmndrs/zustand
-- https://github.com/charkour/zundo
-- https://ui.shadcn.com/
-- https://github.com/DobroslavRadosavljevic/ogie
-- https://tally.so/help/keyboard-shortcuts
+- [farcasterxyz/snap repository](https://github.com/farcasterxyz/snap) [FULL - 117+ releases, stable]
+- [Farcaster Snaps documentation](https://docs.farcaster.xyz/snap) [FULL - v2.0 spec]
+- [@farcaster/snap npm package (v2.0.3)](https://registry.npmjs.org/@farcaster/snap) [FULL - latest release]
+- [@farcaster/snap-hono npm package (v1.4.8)](https://www.npmjs.com/package/@farcaster/snap-hono) [FULL - stable middleware]
+- [Farcaster Mini Apps SDK (v0.3.0)](https://miniapps.farcaster.xyz/docs/specification) [FULL - dual context]
+- [@farcaster/miniapp-sdk npm](https://www.npmjs.com/package/@farcaster/miniapp-sdk) [FULL - Quick Auth]
+- [dnd-kit drag-drop (v6.4)](https://github.com/clauderic/dnd-kit) [FULL - React 19 ready]
+- [cmdk command palette (v1.1+)](https://github.com/pacocoursey/cmdk) [FULL - slash menu UX]
+- [zustand state (v5)](https://github.com/pmndrs/zustand) [FULL - minimal boilerplate]
+- [zundo undo/redo middleware](https://github.com/charkour/zundo) [FULL - transparent history]
+- [shadcn/ui component library](https://ui.shadcn.com/) [FULL - Radix + Tailwind]
+- [ogie URL metadata extraction](https://github.com/DobroslavRadosavljevic/ogie) [FULL - server-side OG parser]
+- [Supabase pricing + RLS](https://supabase.com/pricing) [FULL - free tier specs]
+- [Vercel Hobby tier limits](https://vercel.com/docs/limits) [FULL - 100GB bw, 1M invocations]
+- [Neynar API rate limits](https://docs.neynar.com/reference/what-are-the-rate-limits-on-neynar-apis) [FULL - 300 RPM starter]
+- [DexScreener API reference](https://docs.dexscreener.com/api/reference) [FULL - token price feeds]

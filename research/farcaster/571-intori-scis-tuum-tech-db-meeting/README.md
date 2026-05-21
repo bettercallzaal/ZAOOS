@@ -2,7 +2,8 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-04-30
+last-validated: 2026-05-21
+original-query: "document Zaal's meeting with Donald Bullers (Tuum Tech/intori founder) and ZAO Music graph integration path (reconstructed)"
 related-docs: 472, 567, 568
 tier: STANDARD
 ---

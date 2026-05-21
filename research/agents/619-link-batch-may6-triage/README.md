@@ -2,7 +2,8 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-06
+last-validated: 2026-05-21
+original-query: Triage Zaal May 6 inbox - 16 items, map to existing docs, surface net-new (reconstructed)
 related-docs: 318, 478, 479, 483, 484, 485, 486, 487, 488, 491, 497, 586
 tier: STANDARD
 ---

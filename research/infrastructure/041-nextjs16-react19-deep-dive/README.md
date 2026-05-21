@@ -1,7 +1,17 @@
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Next.js 16 and React 19 features — use cache, useOptimistic, React Compiler, PPR, Turbopack (reconstructed)
+tier: 1-must-have
+---
+
 # 41 — Next.js 16 + React 19 Deep Dive
 
 > **Status:** Research complete
-> **Date:** March 2026
+> **Original Date:** March 2026
+> **Re-validated:** 2026-05-21
 > **Goal:** Advanced patterns, new features, and optimization for ZAO OS's core framework
 > **Current stack:** Next.js 16.1.6, React 19.2.3, Tailwind CSS v4, TypeScript 5
 
@@ -302,18 +312,29 @@ Extend `@theme` with:
 
 ---
 
-## Sources
+---
 
-- [Next.js 16 Release](https://nextjs.org/blog/next-16)
-- [Next.js 16.1 Release](https://nextjs.org/blog/next-16-1)
-- [Next.js "use cache"](https://nextjs.org/docs/app/api-reference/directives/use-cache)
-- [Next.js Proxy](https://nextjs.org/docs/app/api-reference/file-conventions/proxy)
-- [React Compiler 1.0](https://react.dev/blog/2025/10/07/react-compiler-1)
-- [React v19](https://react.dev/blog/2024/12/05/react-19)
-- [Next.js Server Actions Security](https://nextjs.org/blog/security-nextjs-server-components-actions)
-- [Next.js Testing with Vitest](https://nextjs.org/docs/app/guides/testing/vitest)
-- [TanStack Query Advanced SSR](https://tanstack.com/query/v5/docs/react/guides/advanced-ssr)
-- [Supabase Realtime + Next.js](https://supabase.com/docs/guides/realtime/realtime-with-nextjs)
-- [Tailwind CSS v4](https://tailwindcss.com/blog/tailwindcss-v4)
-- [Core Web Vitals 2026](https://www.digitalapplied.com/blog/core-web-vitals-2026-inp-lcp-cls-optimization-guide)
-- [Next.js PPR Guide](https://www.ashishgogula.in/blogs/a-practical-guide-to-partial-prerendering-in-next-js-16)
+## Findings (2026-05-21 Re-validation)
+
+### Material Changes
+1. **Next.js 16.1.6 stable:** Latest release Feb 2026. Turbopack production-ready (2-5x build speedup). middleware.ts → proxy.ts rename optional for 16.x but required in 17.x planning. [FULL]
+2. **React 19 hooks stable:** useOptimistic, use(), form actions, and Client Component caching all stable. React Compiler 1.0 production-ready (Oct 2025). No breaking changes in 2026 roadmap. [FULL]
+3. **use cache directive:** Replaces unstable_cache(). Default in-memory LRU, revalidate/expire options stable. cacheLife({ stale, revalidate, expire }) pattern correct. [FULL]
+4. **Tailwind CSS v4 stable:** Oxide engine 5x+ faster on builds. @theme inline, class renames (bg-linear-to-*, shrink-0) locked in 4.0+. [FULL]
+
+### Still Current
+- Server Actions + encryption stable, no changes to Promise serialization patterns.
+- TanStack Query v5 SSR guide unchanged.
+- Supabase Realtime + Next.js patterns stable.
+- Core Web Vitals 2026: LCP, INP, CLS still primary metrics.
+- PPR (Partial Prerendering) ready for adoption in 16.1+.
+
+### Source Status
+- Next.js 16 Release: https://nextjs.org/blog/next-16 [FULL]
+- Next.js use cache: https://nextjs.org/docs/app/api-reference/directives/use-cache [FULL]
+- React Compiler: https://react.dev/blog/2025/10/07/react-compiler-1 [FULL]
+- React v19: https://react.dev/blog/2024/12/05/react-19 [FULL]
+- Tailwind CSS v4: https://tailwindcss.com/blog/tailwindcss-v4 [FULL]
+
+### Action Items Status
+All 9 immediate action items remain valid. React Compiler enable recommended (safety high, performance gain significant).

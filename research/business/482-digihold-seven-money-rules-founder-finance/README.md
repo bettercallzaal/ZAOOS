@@ -1,6 +1,14 @@
+---
+topic: business
+type: operations
+status: research-complete
+last-validated: 2026-05-21
+original-query: Adapt Nicolas DigiHold 7 personal-finance rules into BetterCallZaal Strategies LLC operating procedure + ZAO Music entity cash flow (reconstructed)
+tier: STANDARD
+---
+
 # 482 — DigiHold's 7 Money Rules (Founder Finance After Losing $1.5M)
 
-> **Status:** Research complete
 > **Date:** 2026-04-23
 > **Goal:** Adapt Nicolas / DigiHold's 7 personal-finance rules into BetterCallZaal Strategies LLC operating procedure + ZAO Music entity cash flow.
 

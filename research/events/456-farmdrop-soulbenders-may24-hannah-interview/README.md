@@ -1,8 +1,17 @@
+---
+topic: events
+type: interview-prep
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Prep BCZ Yapz interview with Hannah Semler (FarmDrop CEO) for May 24 SoulBenders benefit; build interview questions and content calendar"
+tier: STANDARD
+---
+
 # 456 — FarmDrop x SoulBenders May 24 Benefit + Hannah Semler BCZ Yapz Interview Prep
 
 > **Status:** Research complete — ready for interview record Apr 21-23
 > **Date:** 2026-04-20
-> **Event:** Sunday May 24 2026, 5-8pm, SoulBenders play benefit for FarmDrop Food for Health (venue TBC — Halcyon Grange Blue Hill is likely based on SoulBenders history)
+> **Event:** Sunday May 24 2026, 6-9pm, SoulBenders play benefit for FarmDrop Food for Health at The Grand in Ellsworth ME (CONFIRMED via Ellsworth American May 18 2026)
 > **Interview:** BCZ Yapz with Hannah Semler. Record Apr 21-23 (she leaves Thu Apr 23 for CA → Spain). Back May 22 for event ramp.
 
 ---
@@ -182,17 +191,13 @@ Connects to:
 - `research/community/432-zao-master-context-tricky-buddha/README.md` — Zaal's Maine community positioning
 - Memory: `project_bcz_consulting_apr10.md`, `project_zao_stock_confirmed.md`
 
-## Sources
+## Sources [FULL]
 
-- [Grounded in Maine Ep 77: FarmDrop CEO Hannah Semler](https://www.groundedinmaine.com/1952444/episodes/14123404-77-farmdrop-ceo-hannah-semler-talks-about-farming-food-and-community)
-- [FarmDrop Team Highlight: Meet Hannah Semler](https://farmdrop.us/farmdrop-team-highlight-meet-hannah-semler/)
-- [FarmDrop Food for Health Report](https://farmdrop.us/ffh-report/)
-- [Hannah Semler - ReFED 2022/2024 Speaker Profile](https://summit.refed.org/speakers/2022/hannah-semler/)
-- [Hannah Semler LinkedIn - WholeCrops Consulting](https://www.linkedin.com/in/hannah-semler-wholecrops/)
-- [Cisco PL and The Soul Benders - Official](https://thesoulbenders.com/)
-- [The Soulbenders - Facebook](https://www.facebook.com/thesoulbenders/)
-- [Halcyon Grange Soulbenders Event Listing](https://bluehillpeninsula.org/events/the-soulbenders-at-the-grange-music-pie-night/)
-- [Aroostook farm-to-table mission - BDN](https://www.bangordailynews.com/2025/11/21/aroostook/aroostook-health/aroostook-farm-to-table-mission-joam40zk0w/)
-- [Maine SNAP funding coverage - Maine Morning Star](https://mainemorningstar.com/2025/10/28/maine-lawmakers-press-usda-to-release-snap-funds-while-state-braces-for-fallout/)
-- [The Maine Mag - FarmDrop feature](https://www.themainemag.com/moving-the-farmers-market-online-farmdrop/)
-- [FarmDrop About](https://farmdrop.us/aboutus/)
+- [Ellsworth American: Soul Benders May 24 Benefit](https://www.ellsworthamerican.com/lifestyle/entertainment/soul-benders-concert-dance-to-benefit-food-program/article_2e633bab-9c44-48a4-b618-b03f2ded31fd.html) [FULL] - Confirms venue: The Grand in Ellsworth, time 6-9pm, $50 advance tickets via farmdrop.us/events, pay-what-you-can at door
+- [Hannah Semler LinkedIn - CEO FarmDrop](https://linkedin.com/in/hannah-semler-wholecrops) [FULL] - 2026 live profile, 115 farmers, 1500+ customers, $800K sales 2024
+- [FarmDrop News & Media](https://farmdrop.us/news-and-events/) [PARTIAL] - Food for Health Nov 2025 launch, 1100+ lbs distributed, Aroostook + Bucksport expansion live
+- [Grounded in Maine Ep 77: FarmDrop CEO Hannah Semler](https://www.groundedinmaine.com/1952444/episodes/14123404-77-farmdrop-ceo-hannah-semler-talks-about-farming-food-and-community) [FULL]
+- [FarmDrop Team Highlight: Meet Hannah Semler](https://farmdrop.us/farmdrop-team-highlight-meet-hannah-semler/) [FULL]
+- [ReFED 2026 Summit: Hannah Semler](https://summit.refed.org/speakers/2024/hannah-semler/) [FULL] - 2024 speaker, bio matches
+- [Aroostook farm-to-table mission - BDN Nov 2025](https://www.bangordailynews.com/2025/11/21/aroostook/aroostook-health/aroostook-farm-to-table-mission-joam40zk0w/) [FULL] - Roxanne Bruce Northern Maine FarmDrop, $8000 sales since June, schools ordering
+- [Blue Hill Peninsula Halcyon Grange](https://bluehillpeninsula.org/locations/halcyon-grange-hall/) [FULL] - Hall address 1157 Pleasant St confirmed, past SoulBenders venue but NOT May 24 2026 event

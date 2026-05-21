@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "synchronized listening rooms collaborative music experiences 2026 (reconstructed)"
+tier: STANDARD
+re-fetch-status: "[FULL] - Spotify Jam (32p max), Apple Music SharePlay, Discord Listen Along patterns remain current. Supabase Realtime Broadcast/Presence approach confirmed viable for ZAO's 100-member scale (2026-05-21)."
+---
+
 # 100 — Synchronized Listening Rooms & Collaborative Music Experiences
 
 > **Status:** Research complete

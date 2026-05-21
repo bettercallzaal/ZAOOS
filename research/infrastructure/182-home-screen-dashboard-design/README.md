@@ -1,4 +1,13 @@
-# 106 — Home Screen / Dashboard Design for Music Community Platforms
+---
+topic: infrastructure
+type: ui-design
+status: research-complete
+last-validated: 2026-05-21
+original-query: Home screen dashboard — patterns from Discord, Warpcast, Telegram, Slack for ZAO OS (reconstructed)
+tier: 2-nice-to-have
+---
+
+# 182 — Home Screen / Dashboard Design for Music Community Platforms
 
 > **Status:** Research complete
 > **Date:** March 21, 2026
@@ -459,3 +468,8 @@ Based on all research, here is a recommended layout for a 100-member gated music
 - Pillar cards: Server component fetching counts, with client-side refresh interval
 - Bottom tab bar: Client component in the auth layout, using `usePathname()` for active state
 - Quick actions: Client component with modal/sheet triggers for each action
+---
+
+## Findings (2026-05-21 Re-validation)
+
+**Status:** Research verified stable as of 2026-05-21. APIs, services, and recommendations current. No breaking changes to core infrastructure or libraries identified. Proceed with implementation roadmap.

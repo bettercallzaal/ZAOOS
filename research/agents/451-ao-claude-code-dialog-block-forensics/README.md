@@ -1,7 +1,12 @@
-# AO Claude Code Dialog Block Forensics - Doc 451
+# 451 - AO Claude Code Dialog Block Forensics
 
+**Topic:** agents  
+**Type:** Debugging & Forensics  
 **Date:** 2026-04-20  
-**Status:** RESEARCH - Do Not Apply Yet  
+**Last-Validated:** 2026-05-21  
+**Original-Query:** Why did AO sessions hang on Claude Code auto-updater dialog? (reconstructed)  
+**Tier:** archive-candidate  
+**Status:** Research complete - historical debugging report  
 **Affected Sessions:** zaoos-39, zaoos-40, zaoos-41  
 **Root Cause:** Claude Code auto-updater dialog blocking stdin — sessions spawn correctly but hang waiting for dialog dismissal
 

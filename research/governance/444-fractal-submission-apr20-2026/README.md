@@ -1,6 +1,15 @@
+---
+topic: governance
+type: meeting-notes
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Weekly contribution summary for ZAO Fractal (Monday 6pm EST) (reconstructed)"
+tier: STANDARD
+---
+
 # 444 - ZAO Fractal Submission: April 20, 2026
 
-> **Status:** Ready for submission
+> **Status:** Complete (historical)
 > **Date:** 2026-04-20
 > **Goal:** Weekly contribution summary for ZAO Fractal (Monday 6pm EST)
 

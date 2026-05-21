@@ -1,3 +1,12 @@
+---
+topic: music
+type: case-study
+status: research-complete
+last-validated: 2026-05-21
+original-query: "What makes a viral summer song stick all season and how to apply that formula to create 'The Summer of 26' as a ZAO Stock anthem?"
+tier: production
+---
+
 # 320 - Anatomy of a Viral Summer Song: Making "The Summer of 26"
 
 > **Status:** Research complete

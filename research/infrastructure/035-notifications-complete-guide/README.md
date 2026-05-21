@@ -1,7 +1,17 @@
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Complete notifications architecture for ZAO OS — Mini App push, Neynar webhooks, in-app feed, email (reconstructed)
+tier: 1-must-have
+---
+
 # 35 — Notifications: Complete Implementation Guide
 
 > **Status:** Consolidated from all research + codebase analysis
-> **Date:** March 2026
+> **Original Date:** March 2026
+> **Re-validated:** 2026-05-21
 > **Goal:** Single source of truth for everything notification-related in ZAO OS
 > **Implementation:** Core infrastructure 70% built, UI 0% built
 
@@ -369,16 +379,29 @@ Supabase Realtime subscription on `notifications` table pushes live badge update
 
 ---
 
-## Sources (Consolidated)
+## Findings (2026-05-21 Re-validation)
 
-- [Neynar Notifications API](https://docs.neynar.com/reference/fetch-all-notifications)
-- [Neynar Channel Notifications](https://docs.neynar.com/reference/fetch-channel-notifications-for-user)
-- [Neynar Webhooks SDK](https://docs.neynar.com/docs/how-to-create-webhooks-on-the-go-using-the-sdk)
-- [Neynar Mini App Notifications](https://docs.neynar.com/docs/send-mini-app-notifications-with-neynar)
-- [Farcaster Mini Apps — Notifications Guide](https://miniapps.farcaster.xyz/docs/guides/notifications)
-- [Farcaster Mini Apps — Webhooks](https://miniapps.farcaster.xyz/docs/guides/notifications-webhooks)
-- [Web Push API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Push_API)
-- [Resend](https://resend.com/)
-- [Push Protocol](https://push.org/)
-- [Supabase Realtime](https://supabase.com/docs/guides/realtime)
-- ZAO OS source: `src/lib/notifications.ts`, `src/app/api/miniapp/webhook/route.ts`, `src/app/api/chat/send/route.ts`, `src/app/api/webhooks/neynar/route.ts`
+### Material Changes
+1. **Neynar Notification APIs:** fetchAllNotifications, fetchNotificationsByParentUrl, and fetchChannelNotificationsForUser all stable and current. Rate limits (max 25 per request, cursor-based pagination) unchanged. Neynar SDK reflects latest Farcaster data model. [FULL]
+2. **Mini App Notifications:** Webhook spec confirmed - 4 event types (miniapp_added, miniapp_removed, notifications_enabled, notifications_disabled). Rate limits unchanged (1 per 30s per token, 100/day per token). targetUrl domain matching requirement confirmed strict. [FULL]
+3. **Web Push API:** MDN and W3C spec both current as of 2026. Service Worker registration, PushManager.subscribe(), VAPID keys, and notification display flow unchanged. Browser support stable across Chrome, Firefox, Safari, Edge. [FULL]
+4. **Resend Pricing:** Updated 2026. Free tier 3K emails/month with 100/day limit. Pro $20-35/month (50K-100K emails). Scale $90-1150/month (100K-2.5M emails). Pay-as-you-go overages available. No EU data hosting on free/pro (data in US). [FULL]
+
+### Still Current
+- Supabase Realtime push model via websockets stable for badge count updates.
+- Notification grouping logic (like-cast_hash, recast-cast_hash) still valid UX pattern.
+- 24-hour dedup window (FID, notificationId) enforced by Farcaster hosts.
+- Push Protocol integration optional; Mini App native push sufficient for MVP.
+
+### Source Status
+- Neynar Notifications API: https://docs.neynar.com/nodejs-sdk/notification-apis/fetchAllNotifications [FULL]
+- Neynar Channel Notifications: https://docs.neynar.com/docs/fetching-channel-specific-notification-in-farcaster [FULL]
+- Neynar Mini App Notifications: https://docs.neynar.com/miniapps/guides/notifications [FULL]
+- Web Push API (MDN): https://developer.mozilla.org/en-US/docs/Web/API/Push_API [FULL]
+- Web Push subscribe: https://web.dev/articles/push-notifications-subscribing-a-user [FULL]
+- W3C Push API spec: https://www.w3.org/TR/2025/WD-push-api-20251201/ [FULL]
+- Resend Pricing: https://resend.com/pricing [FULL - verified 2026-05-21]
+- Supabase Realtime: https://supabase.com/docs/guides/realtime [PARTIAL - not re-fetched]
+
+### Key Takeaway
+Core notification architecture is stable. No breaking changes to Neynar APIs, Mini App webhooks, Web Push, or Resend email. Resend free tier 3K/month still sufficient for MVP weekly digests. Implementation roadmap (3 sprints) remains on track.

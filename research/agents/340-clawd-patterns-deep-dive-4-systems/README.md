@@ -1,3 +1,13 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Deep technical dive into LarvAI conviction governance, Agent Bounty Board, clawd-larvae ephemeral agents, and EIP-7702 gasless ERC-8004 registration - all mapped to VAULT/BANKER/DEALER implementation (reconstructed)
+tier: high
+notes: Feeds doc 345 (master blueprint). Smart contract patterns for autonomous agent governance.
+---
+
 # 340 -- CLAWD Deep Dive: 4 Systems to Fork for ZABAL Agent Swarm
 
 > **Status:** Research complete

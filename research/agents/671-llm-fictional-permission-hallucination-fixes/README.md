@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-21
+original-query: How do we fix ZAOcoworkingBot's LLM hallucinating fake system dialogs? What's the 3-phase fix? (reconstructed)
 related-docs: 461, 527, 600, 661, 662, 668
 tier: DEEP
 ---

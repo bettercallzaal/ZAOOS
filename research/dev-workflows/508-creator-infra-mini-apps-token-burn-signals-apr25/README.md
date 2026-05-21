@@ -2,9 +2,10 @@
 topic: dev-workflows
 type: market-research
 status: research-complete
-last-validated: 2026-04-25
+last-validated: 2026-05-21
 related-docs: 312, 432, 491, 506, 507
 tier: STANDARD
+original-query: What creator-infra tools, mini-app insights, and token-optimization patterns from Apr 25 research inputs matter for ZAO OS, Juke partnership, and ZAO Music? (reconstructed)
 ---
 
 # 508 - Creator Infra + Mini Apps + Token Burn Signal Brief (Apr 25 2026)

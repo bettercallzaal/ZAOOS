@@ -1,8 +1,12 @@
 # 169 — AI Education for Music Creators: Landscape Gap & ZAO Opportunity
 
-> **Status:** Research complete
+> **topic:** community
+> **type:** research-landscape
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** Assess Learn Vibe Build as a model, map the AI-for-creators education landscape, and identify whether ZAO should run music-specific AI education (reconstructed)
+> **tier:** medium
 > **Date:** March 28, 2026
-> **Goal:** Assess Learn Vibe Build as a model, map the AI-for-creators education landscape, and identify whether ZAO should run music-specific AI education
 
 ---
 

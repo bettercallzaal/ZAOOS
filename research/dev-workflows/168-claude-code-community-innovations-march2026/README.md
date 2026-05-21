@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Evaluate three community innovations around Claude Code workflows—autoresearch 10x, Council of High Intelligence, Learn Vibe Build—assess what ZAO OS should adopt, adapt, or monitor (reconstructed)
+tier: STANDARD
+---
+
 # 168 — Claude Code Community Innovations: Autoresearch 10x, Council of High Intelligence, Learn Vibe Build
 
 > **Status:** Research complete
@@ -18,7 +27,7 @@
 
 ## 1. Ole Lehmann: "How to 10x Your Claude Skills" (Autoresearch Method)
 
-**Source:** [@itsolelehmann, March 17, 2026](https://x.com/itsolelehmann/status/2033919415771713715) — 5,257 likes, 2.4M views
+**Source (updated 2026-05-21):** Ole Lehmann's autoresearch-skill repo (github.com/olelehmann100kMRR/autoresearch-skill) - 908 stars, 946 forks, last updated March 18 2026. Threads post March 20 2026. Also published on Threads (threads.com/@itsolelehmann) with 4.3K views. [FULL]
 
 ### What's New vs What ZAO Already Has
 

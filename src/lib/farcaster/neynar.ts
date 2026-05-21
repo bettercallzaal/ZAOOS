@@ -158,6 +158,31 @@ export async function getUserByFid(fid: number, viewerFid?: number) {
   return data.users?.[0] || null;
 }
 
+/**
+ * Fetch a FID's Neynar quality score (experimental.neynar_user_score),
+ * direct from Neynar — bypassing the haatz read proxy.
+ *
+ * The haatz proxy returns a 200 for /user/bulk but does NOT populate the
+ * `experimental` block (verified 2026-05-20), so it cannot serve this score.
+ * fetchWithFailover would never fall through (200 = "success"), so this
+ * helper goes straight to Neynar. Returns null when unavailable.
+ */
+export async function getNeynarUserScore(fid: number): Promise<number | null> {
+  try {
+    const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${fid}`, {
+      headers: headers(),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const user = data.users?.[0];
+    const score = user?.experimental?.neynar_user_score;
+    return typeof score === 'number' ? score : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getUsersByFids(fids: number[]) {
   if (!fids.length) return [];
   const params = new URLSearchParams({ fids: fids.join(',') });

@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: reference
+status: research-complete
+last-validated: 2026-05-20
+original-query: Complete reference for managing, monitoring, and orchestrating multiple Claude Code CLI sessions in parallel (reconstructed)
+tier: primary
+---
+
 # Doc 165 — Claude Code Multi-Session Management
 
 > **Date:** 2026-03-18

@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: reference
+status: research-complete
+last-validated: 2026-05-20
+original-query: Complete feature inventory for systematic QA testing with Vercel logs (reconstructed)
+tier: primary
+---
+
 # 159 — ZAO OS Feature Inventory & QA Checklist
 
 > **Status:** Active reference

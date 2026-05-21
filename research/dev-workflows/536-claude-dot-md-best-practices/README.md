@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-04-27
+last-validated: 2026-05-20
+original-query: Extract practical CLAUDE.md design patterns from darkzodchi's X post on instruction file architecture for shaping Claude behavior without exceeding token budgets (reconstructed)
 related-docs: 528, 506, 507, 523, 524
 tier: STANDARD
 ---

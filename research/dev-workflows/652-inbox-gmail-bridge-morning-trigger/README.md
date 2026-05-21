@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-16
+last-validated: 2026-05-20
+original-query: Lock the path from email arrives in Zaal's Gmail to doc lands in research by 7am EST - decide Gmail-MCP vs auto-forward, wire /inbox into /morning (reconstructed)
 related-docs: 422, 574, 599
 tier: STANDARD
 ---

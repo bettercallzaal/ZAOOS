@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-05
+last-validated: 2026-05-20
+original-query: How should ZAO tighten ZABAL newsletter voice prose quality and toolkit for consistent brand tone? (reconstructed)
 related-docs: 432, 549, 558, 562, 563, 607
 tier: STANDARD
 ---

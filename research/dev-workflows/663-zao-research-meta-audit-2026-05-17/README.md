@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-20
+original-query: Extend /zao-research skill to search across 30+ bettercallzaal repos - inventory every active ZAO ecosystem repo score graduation readiness - audit research library for collisions orphans stale broken refs (reconstructed)
 related-docs: 459, 547, 562, 601, 660, 661, 664
 tier: DISPATCH
 ---

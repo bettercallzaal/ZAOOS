@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: reference
+status: research-complete
+last-validated: 2026-05-20
+original-query: Should we install Cathryn Lavery's diagram-design skill for ZAO OS research visuals and docs? (reconstructed)
+tier: STANDARD
+---
+
 # 426 — diagram-design Skill (Cathryn Lavery)
 
 > **Status:** Research complete

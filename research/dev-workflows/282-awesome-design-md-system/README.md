@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate VoltAgent/awesome-design-md repo and implement a DESIGN.md for ZAO OS to improve AI-generated UI consistency across 279 components (reconstructed)
+tier: STANDARD
+---
+
 # 282 — Awesome Design MD: AI-Readable Design Systems
 
 > **Status:** Research complete + implemented

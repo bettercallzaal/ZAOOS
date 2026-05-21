@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-20
+original-query: Comprehensive 8-dimension audit of ZAO OS V1 monorepo against stated rules - surface what has drifted what is dead what is ready to graduate (reconstructed)
 related-docs: 154, 459, 547, 601, 650, 655, 660
 tier: DISPATCH
 ---

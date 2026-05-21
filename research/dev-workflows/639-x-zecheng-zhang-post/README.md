@@ -2,10 +2,10 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-20
+original-query: Zecheng Zhang Mirage unified virtual filesystem for AI agents - how it applies to agent-driven ZAO systems (reconstructed)
 related-docs: []
 tier: QUICK
-source: inbox-forward-2026-05-11
 ---
 
 # 639 - Zecheng Zhang (@zechengzh) on Mirage: Unified Virtual Filesystem for AI Agents

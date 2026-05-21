@@ -1,3 +1,17 @@
+---
+topic: dev-workflows
+type: roundup
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Roundup research on voice input, TTS, Farcaster tooling, Recoupable, Coinflow, Otoco LLCs, Intori SCIS, OpenClaw (reconstructed)"
+tier: STANDARD
+related-docs:
+  - 471 (Vercel breach - urgent)
+  - 125 (Coinflow Fiat Checkout)
+  - 406 (ISV deep dive)
+  - 365 (Recoupable-adjacent)
+---
+
 # 472 - AI Tooling + Ecosystem Roundup 2026-04-21
 
 > **Status:** Research complete

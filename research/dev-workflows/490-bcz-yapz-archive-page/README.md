@@ -1,3 +1,15 @@
+---
+topic: dev-workflows
+type: feature-design
+status: research-complete
+last-validated: 2026-05-20
+original-query: "How should we design the /bcz-yapz archive page for episodes + RAG + guest amplification? (reconstructed)"
+tier: STANDARD
+related-docs:
+  - 474 (BCZ 101 bot)
+  - 477 (YouTube description template)
+---
+
 # 490 - BCZ YapZ Archive Page (/bcz-yapz)
 
 > **Status:** Design complete, ready for implementation plan

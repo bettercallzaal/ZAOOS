@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Audit @sharbel's 20 underused Claude features against ZAO OS's current workflow and identify gaps worth closing (reconstructed)
+tier: STANDARD
+---
+
 # 242 — Claude 20 Underused Features: ZAO Power User Audit
 
 > **Status:** Research complete

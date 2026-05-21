@@ -1,8 +1,9 @@
 ---
 topic: dev-workflows
 type: decision
-status: draft
-last-validated: 2026-05-18
+status: research-complete
+last-validated: 2026-05-20
+original-query: Spec Claude Code skill that ingests meeting transcripts recordings Craig Fathom Google Meet Zoom voice memo paste - extracts actions decisions key quotes - distributes to cowork-zaodevz research docs Bonfire Telegram calendar memory (reconstructed)
 related-docs: 012, 433, 448, 539, 552, 650, 661, 662, 670, 672
 tier: STANDARD
 ---

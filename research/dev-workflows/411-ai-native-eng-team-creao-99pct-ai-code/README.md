@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: reference
+status: research-complete
+last-validated: 2026-05-20
+original-query: How did CREAO restructure a 25-person team to ship 99% AI-written code with 3-8 daily deploys? (reconstructed)
+tier: STANDARD
+---
+
 # 411 - AI-Native Engineering Team: CREAO's 99% AI-Written Code
 
 > **Status:** Research complete

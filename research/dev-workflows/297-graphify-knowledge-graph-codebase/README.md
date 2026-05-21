@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate Graphify as a knowledge graph tool for ZAO OS's 863 source files and 338 research docs—token reduction, integration, Obsidian vault generation (reconstructed)
+tier: STANDARD
+---
+
 # 297 - Graphify: Knowledge Graph for Codebases & Research
 
 > **Status:** Research complete

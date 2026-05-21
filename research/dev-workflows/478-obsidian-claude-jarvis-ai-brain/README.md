@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: decision
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Should Zaal adopt JARVIS/Cowork pattern with Obsidian + Claude Code as personal ops layer? (reconstructed)"
+tier: STANDARD
+---
+
 # 478 — Obsidian + Claude Code as Personal AI Brain (JARVIS / Cowork Pattern)
 
 > **Status:** Research complete

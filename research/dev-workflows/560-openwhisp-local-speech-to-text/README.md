@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: Should Zaal install OpenWhisp on MacBook Pro for local voice-to-text capture in newsletter, 1-pager, and research workflows? (reconstructed)
 related-docs: 432, 471, 558
 tier: STANDARD
 ---

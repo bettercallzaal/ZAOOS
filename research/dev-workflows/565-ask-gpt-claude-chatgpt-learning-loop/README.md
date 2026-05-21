@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: How should ZAO implement Claude-to-ChatGPT learning loop skill for cross-model perspective in research and coding? (reconstructed)
 related-docs: 506, 507, 548, 549, 555, 562, 564
 tier: STANDARD
 ---

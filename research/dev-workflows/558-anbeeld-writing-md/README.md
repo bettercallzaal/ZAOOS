@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: Should ZAO fold Anbeeld WRITING.md rules into content skills (/socials, /newsletter, /onepager, /article-writing)? (reconstructed)
 related-docs: 432, 552, 553
 tier: STANDARD
 ---

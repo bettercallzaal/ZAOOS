@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: market-research
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: What is Shann³ (@shannholmberg) Ronin content engine pattern - 17 Markdown files + 1 agent across 10 social accounts? (reconstructed)
 related-docs: 549, 558, 560, 562
 tier: STANDARD
 ---

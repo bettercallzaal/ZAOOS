@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Define branching/merging strategy for solo founder with Paperclip AI agents creating branches and commits (reconstructed)
+tier: primary
+---
+
 # 76 — Git Branching Strategy for ZAO OS + Paperclip Agents
 
 > **Status:** Research complete

@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: Audit 115 memory files on disk (MEMORY.md indexes 94, 20 orphans lost), find duplicates/stale entries, plan re-index and retire (reconstructed)
 related-docs: 551, 552, 554
 tier: STANDARD
 ---

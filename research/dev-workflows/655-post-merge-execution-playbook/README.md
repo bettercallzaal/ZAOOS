@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-16
+last-validated: 2026-05-20
+original-query: Three PRs merged inbox bridge cron audit ZOE post slate v1 - none changes production until Zaal deploys - specify exactly what to do in what order this week (reconstructed)
 related-docs: 422, 547, 652, 653
 tier: STANDARD
 ---

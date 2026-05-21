@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: Should ZAOstock Oct 3 2026 use Unlock Protocol, POAP, Highlight.xyz, or hybrid for NFT ticketing and RSVP attribution? (reconstructed)
 related-docs: 549, 551, 556
 tier: STANDARD
 ---

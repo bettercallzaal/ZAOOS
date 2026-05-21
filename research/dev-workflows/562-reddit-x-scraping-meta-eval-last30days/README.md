@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: How good is ZAO's Reddit/X scraping today, what's the humanizer skill, and should we install mvanhorn/last30days-skill and reddit-fetch? (reconstructed)
 related-docs: 549, 552, 553, 554, 558
 tier: STANDARD
 ---

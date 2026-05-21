@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: Audit 573-doc research library for structural debt (dupe numbers, stale topics, floating docs), find conflicts, and propose next 30 days of research with ranking (reconstructed)
 related-docs: 552, 553, 554, 555, 556, 557
 tier: STANDARD
 ---

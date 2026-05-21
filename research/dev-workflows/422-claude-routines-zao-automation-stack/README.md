@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: architecture
+status: research-complete
+last-validated: 2026-05-20
+original-query: How do Claude Code Routines work and should we adopt them as ZAO's autonomous scheduler? (reconstructed)
+tier: STANDARD
+---
+
 # 422 — Claude Routines: ZAO Automation Stack
 
 > **Status:** Research complete

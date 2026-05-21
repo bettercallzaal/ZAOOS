@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-20
+original-query: Make X Twitter content extraction reliably good without ever asking Zaal for credentials - no-login sustainable chain for tweets and articles (reconstructed)
 related-docs: 562, 656, 658
 tier: DEEP
 ---

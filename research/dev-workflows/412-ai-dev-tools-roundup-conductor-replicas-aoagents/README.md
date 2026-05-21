@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: reference
+status: research-complete
+last-validated: 2026-05-20
+original-query: What are Conductor, Replicas, and AO Agents (decentralized AI), and should ZAO adopt any of them? (reconstructed)
+tier: STANDARD
+---
+
 # 412 - AI Dev Tools Roundup: Conductor, Replicas, AO Agents
 
 > **Status:** Research complete

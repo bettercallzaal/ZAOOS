@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: market-research
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: What are the top patterns and threads in r/ClaudeAI and r/ClaudeCode from April 2026? (reconstructed)
 related-docs: 506, 507, 549, 552, 555, 562, 563, 564, 565
 tier: STANDARD
 ---

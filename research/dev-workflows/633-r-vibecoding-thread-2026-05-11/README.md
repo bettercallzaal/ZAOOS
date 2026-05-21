@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-20
+original-query: What AI-pair-coding patterns emerge from r/vibecoding thread on non-dev PM shipping 70k lines in 30 days? (reconstructed)
 related-docs: [172, 196, 440, 506, 507, 539]
 tier: QUICK
 source: reddit.com/r/vibecoding thread 2026-05-11

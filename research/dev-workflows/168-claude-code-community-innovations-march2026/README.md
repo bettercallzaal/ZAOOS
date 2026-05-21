@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate three community innovations around Claude Code workflows—autoresearch 10x, Council of High Intelligence, Learn Vibe Build—assess what ZAO OS should adopt, adapt, or monitor (reconstructed)
+tier: STANDARD
+---
+
 # 168 — Claude Code Community Innovations: Autoresearch 10x, Council of High Intelligence, Learn Vibe Build
 
 > **Status:** Research complete

@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-06
+last-validated: 2026-05-20
+original-query: What are the best-practice archive UI/UX patterns from top interview shows, and what should bczyapz.com implement? (reconstructed)
 related-docs: 477, 490, 533, 569, 617
 tier: STANDARD
 ---

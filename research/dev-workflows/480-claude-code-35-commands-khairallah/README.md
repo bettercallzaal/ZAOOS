@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: decision
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Which of Khairallah's 35 Claude Code techniques should we adopt into ZAO OS workflow? (reconstructed)"
+tier: STANDARD
+---
+
 # 480 — Khairallah's 35 Claude Code Commands & Workflows (April 2026)
 
 > **Status:** Research complete

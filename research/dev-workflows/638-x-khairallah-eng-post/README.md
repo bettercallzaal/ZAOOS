@@ -2,8 +2,9 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
-related-docs: [549-21st-skill-live, 461-fix-pr-pipeline-live]
+last-validated: 2026-05-20
+original-query: What is Khairallah AL-Awady's Anthropic Claude Code playbook for building companies with AI agents? (reconstructed)
+related-docs: [549, 461]
 tier: QUICK
 source: inbox-forward-2026-05-11
 ---

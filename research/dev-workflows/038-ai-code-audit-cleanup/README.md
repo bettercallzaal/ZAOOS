@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Best practices for auditing AI-written code, using agents for cleanup, and maintaining code health (reconstructed)
+tier: primary
+---
+
 # 38 — AI Code Audit, Cleanup Agents & Codebase Efficiency
 
 > **Status:** Research complete

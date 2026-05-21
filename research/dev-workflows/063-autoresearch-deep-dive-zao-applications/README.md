@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Map every autoresearch implementation to specific ZAO OS use cases and applications (reconstructed)
+tier: primary
+---
+
 # 63 — Autoresearch Deep Dive: Implementations & ZAO OS Applications
 
 > **Status:** Research complete

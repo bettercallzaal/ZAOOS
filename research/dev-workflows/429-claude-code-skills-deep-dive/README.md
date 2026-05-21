@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: reference
+status: research-complete
+last-validated: 2026-05-20
+original-query: What are the complete best practices for building, structuring, and optimizing Claude Code custom skills? (reconstructed)
+tier: STANDARD
+---
+
 # 429 — Claude Code Skills Deep Dive
 
 > **Status:** Research complete

@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Improve ZAO's research tool, skills, and autoresearch workflow with open-source code analysis capability (reconstructed)
+tier: primary
+---
+
 # 164 — Skills, Research Workflow & Autoresearch Improvements
 
 > **Status:** Research complete

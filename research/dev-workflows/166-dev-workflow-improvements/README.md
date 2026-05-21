@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Analyze ZAO OS git history, codebase patterns, and identify concrete workflow bottlenecks and automations to implement (reconstructed)
+tier: STANDARD
+---
+
 # 166 — ZAO OS Developer Workflow Improvements
 
 > **Status:** Research complete

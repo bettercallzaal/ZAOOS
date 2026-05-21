@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Document how Paperclip, gstack, and autoresearch stack together to create AI-agent-run development workflows (reconstructed)
+tier: primary
+---
+
 # 89 — Paperclip + gstack + Autoresearch: The AI Company Stack
 
 > **Status:** Research complete

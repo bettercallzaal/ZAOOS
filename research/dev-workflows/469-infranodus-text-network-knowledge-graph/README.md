@@ -1,3 +1,17 @@
+---
+topic: dev-workflows
+type: decision
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Should ZAO adopt InfraNodus for discourse gap analysis alongside Graphify? (reconstructed)"
+tier: STANDARD
+related-docs:
+  - 297 (Graphify codebase graph)
+  - 271 (ZAO member graph)
+  - 309 (Karpathy LLM wiki)
+  - 299 (LLM knowledge bases)
+---
+
 # 469 - InfraNodus: Text Network Analysis + Knowledge Graph for ZAO Discourse
 
 > **Status:** Research complete

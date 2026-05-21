@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: Which gasless transaction stack should ZAOstock RSVP, ZABAL first-stake, and Cipher music mint use for Base mainnet? (reconstructed)
 related-docs: 548, 549, 551, 557
 tier: STANDARD
 ---

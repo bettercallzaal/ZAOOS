@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-06
+last-validated: 2026-05-20
+original-query: How well does ZAOOS codebase follow AGENTS.md specification, and where are the gaps? (reconstructed)
 related-docs: 234, 459, 547, 601, 605, 607, 611, 613
 tier: STANDARD
 ---

@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-07
+last-validated: 2026-05-20
+original-query: How should ZAO apply Uncle Bob Clean Architecture principles to ZAOOS monorepo structure? (reconstructed)
 related-docs: 461, 506, 523, 529, 547, 601
 tier: STANDARD
 source-url: https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html

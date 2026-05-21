@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Superpowers agentic skills framework for Claude Code - install recommendation and usage guide (reconstructed)
+tier: primary
+---
+
 # 54 — Superpowers: Agentic Skills Framework for Claude Code
 
 > **Status:** Research complete

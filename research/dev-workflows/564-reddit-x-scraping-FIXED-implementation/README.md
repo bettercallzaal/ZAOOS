@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: incident-postmortem
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: How to fix Reddit/X scraping failures in /zao-research skill with curl+Mozilla User-Agent+jq pattern and last30days-skill? (reconstructed)
 related-docs: 549, 552, 554, 562
 tier: STANDARD
 ---

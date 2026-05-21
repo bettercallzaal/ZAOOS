@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Best practices for documenting, displaying, and showcasing ZAO OS and its research docs on GitHub (reconstructed)
+tier: primary
+---
+
 # 39 — GitHub Documentation, Presentation & Research Display
 
 > **Status:** Research complete

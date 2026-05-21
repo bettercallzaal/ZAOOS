@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Complete reference for every command, skill, and workflow available in ZAO OS (reconstructed)
+tier: primary
+---
+
 # 154 — Skills & Commands Master Reference
 
 > **Status:** Research complete

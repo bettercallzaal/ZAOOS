@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Audit all 277 research docs, fix duplicate numbers, archive superseded docs, plan topic-first reorganization for ZAO OS research library (reconstructed)
+tier: STANDARD
+---
+
 # 279 — Research Library Audit & Reorganization
 
 > **Status:** Phase 1 complete

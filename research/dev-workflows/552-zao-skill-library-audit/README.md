@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: Audit 33 global + 23 project ZAO skills for broken triggers, dupes, missing SKILL.md, and plan promote/retire/refactor (reconstructed)
 related-docs: 548, 549, 549e, 551, 553
 tier: STANDARD
 ---

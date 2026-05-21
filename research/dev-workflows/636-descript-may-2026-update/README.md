@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-20
+original-query: What new features did Descript ship in May 2026, and which should Zaal try for BCZ YapZ and lunch streams? (reconstructed)
 related-docs: []
 tier: QUICK
 source: inbox-forward-2026-05-11

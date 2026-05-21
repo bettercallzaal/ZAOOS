@@ -1,7 +1,14 @@
+---
+topic: security
+type: audit-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Step-by-step codebase audit checklist for security, quality, performance, accessibility (reconstructed)"
+tier: STANDARD
+---
+
 # 40 — Codebase Audit Guide: Step-by-Step
 
-> **Status:** Research complete
-> **Date:** March 2026
 > **Goal:** A practical, copy-pasteable guide to audit the ZAO OS codebase for security, quality, performance, and accessibility
 
 ---

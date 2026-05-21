@@ -1,8 +1,16 @@
-# 123 — DFOS (Dark Forest Operating System)
+---
+topic: farcaster
+type: research
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [124-sopha-deep-social-farcaster, 308-farcaster-ecosystem-spring-2026]
+original-query: "What is DFOS (Dark Forest Operating System)? Should ZAO OS integrate with it? What can we learn from its architecture and philosophy? (reconstructed)"
+tier: STANDARD
+---
 
-> **Status:** Research complete
-> **Date:** March 24, 2026
-> **Goal:** Evaluate DFOS as a social platform — architecture, protocol, and relevance to ZAO OS
+# 123 - DFOS (Dark Forest Operating System)
+
+> **Goal:** Evaluate DFOS as a social platform - architecture, protocol, and relevance to ZAO OS. Understand Metalabel's philosophy and whether cross-posting or deeper integration makes sense.
 
 ## Key Decisions / Recommendations
 
@@ -195,14 +203,12 @@ ZAO OS's advantage: deep integration with Farcaster's social graph, on-chain gov
 
 ## Sources
 
-- [DFOS Protocol Overview](https://protocol.dfos.com/overview/) — primary technical architecture
-- [DFOS Protocol Spec](https://protocol.dfos.com/spec) — full specification
-- [DFOS Protocol FAQ](https://protocol.dfos.com/faq) — comparisons to AT Protocol, blockchain, etc.
-- [DFOS DID Method](https://protocol.dfos.com/did-method) — W3C DID specification
-- [DFOS Content Model](https://protocol.dfos.com/content-model) — schemas for posts, profiles, manifests
-- [GitHub: metalabel/dfos](https://github.com/metalabel/dfos) — MIT, TypeScript reference implementation
-- [What DFOS Is Becoming](https://blog.metalabel.com/what-dfos-is-becoming/) — Feb 2026 blog post on vision
-- [Groupcore Essay](https://blog.metalabel.com/what-the-world-needs-now-is-groupcore/) — philosophy manifesto
-- [Dark Forest Theory (6 Years In)](https://blog.metalabel.com/dark-forest-theory-six-years-in/) — updated thesis
-- [Civic Tech Guide: DFOS](https://directory.civictech.guide/listing/dark-forest-operating-system-dfos) — listed Jan 29, 2026
-- [dfos.com](https://www.dfos.com/) — main site and waitlist
+- [DFOS Protocol Overview](https://protocol.dfos.com/overview/) [FULL] - Primary technical architecture
+- [DFOS Protocol Spec](https://protocol.dfos.com/spec) [FULL] - Full specification
+- [DFOS Protocol FAQ](https://protocol.dfos.com/faq) [FULL] - Comparisons to AT Protocol, blockchain
+- [DFOS DID Method](https://protocol.dfos.com/did-method) [FULL] - W3C DID specification
+- [GitHub: metalabel/dfos](https://github.com/metalabel/dfos) [FULL] - MIT, TypeScript reference implementation
+- [What DFOS Is Becoming - Metalabel Blog](https://blog.metalabel.com/what-dfos-is-becoming/) [FULL] - Feb 2026 vision post
+- [Groupcore Essay - Metalabel Blog](https://blog.metalabel.com/what-the-world-needs-now-is-groupcore/) [FULL] - Philosophy manifesto
+- [Dark Forest Theory (6 Years In) - Metalabel Blog](https://blog.metalabel.com/dark-forest-theory-six-years-in/) [FULL] - Updated thesis
+- [dfos.com](https://www.dfos.com/) [FULL] - Main site

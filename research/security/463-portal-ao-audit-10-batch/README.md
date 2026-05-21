@@ -1,9 +1,16 @@
-### 463 — Portal + Agent Orchestrator Audit (10-Agent Batch)
+---
+topic: security
+type: audit-results
+status: research-complete
+last-validated: 2026-05-20
+original-query: "10-parallel-agent audit: portal + AO orchestrator security, observability gaps, BRAIN integration - April 20 2026 (reconstructed)"
+tier: CRITICAL
+---
 
-> **Status:** Audit complete, fixes in progress
-> **Date:** 2026-04-20
-> **Goal:** Preserve the findings from 10 parallel subagent audits (5 on the portal, 5 on AO + cross-system connections). Drives the follow-up PR A/B/C security + observability + BRAIN-bridge work.
-> **Method:** Two batches of 5 `general-purpose` subagents dispatched in parallel, each with tight read-only scope. Total ~830K tokens consumed. Took ~5 min wall clock.
+# 463 - Portal + Agent Orchestrator Audit (10-Agent Batch)
+
+> **Goal:** Preserve findings from 10-parallel subagent audits (5 portal, 5 AO + cross-system). Drives PR A/B/C fixes for security, observability, BRAIN-bridge.
+> **Method:** Two batches of 5 subagents dispatched in parallel, tight read-only scope, ~830K tokens, ~5 min wall clock
 
 ---
 

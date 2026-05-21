@@ -3,6 +3,7 @@ topic: infrastructure
 type: guide
 status: research-complete
 last-validated: 2026-04-28
+original-query: How to integrate Livepeer Studio for ZAO OS streaming, Studio vs Daydream vs Orchestrator roadmap (reconstructed)
 related-docs: 213, 215, 233
 tier: STANDARD
 ---

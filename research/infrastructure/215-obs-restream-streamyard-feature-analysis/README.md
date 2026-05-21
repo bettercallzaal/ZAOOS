@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: strategic-assessment
+status: research-complete
+last-validated: 2026-05-20
+original-query: Feature inventory — OBS, Restream, StreamYard for ZAO OS spaces (reconstructed)
+tier: 2-nice-to-have
+---
+
 # 215 — OBS + Restream + StreamYard Feature Analysis: What ZAO OS Spaces Should Have
 
 > **Status:** Research complete

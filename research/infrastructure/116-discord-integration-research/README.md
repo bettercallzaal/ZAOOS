@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: integration-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Discord REST API integration — read messages, members, threads from ZAO OS routes (reconstructed)
+tier: 2-nice-to-have
+---
+
 # Doc 116 — Discord Integration Research for ZAO OS
 
 **Date:** 2026-03-22

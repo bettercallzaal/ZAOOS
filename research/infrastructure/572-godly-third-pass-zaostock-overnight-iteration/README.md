@@ -1,8 +1,9 @@
 ---
 topic: infrastructure
-type: guide
+type: design
 status: research-complete
 last-validated: 2026-04-30
+original-query: What design patterns from Lusion, Cosmos, and festival sites can we add to ZAOstock overnight (reconstructed)
 related-docs: 570, 571
 tier: STANDARD
 ---

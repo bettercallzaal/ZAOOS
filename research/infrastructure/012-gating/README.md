@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: How to restrict access to ZAO OS with allowlist, NFT, Hats, attestations (reconstructed)
+tier: 1-must-have
+---
+
 # Gating Access to ZAO OS
 
 > How to restrict who can use the client

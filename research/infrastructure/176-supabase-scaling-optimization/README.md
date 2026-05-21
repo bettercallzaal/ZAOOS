@@ -1,4 +1,13 @@
-# 93 — Supabase Scaling & Optimization for ZAO OS
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Supabase scaling — Realtime primitives, pg_cron, pgvector, Edge Functions, indexing (reconstructed)
+tier: 1-must-have
+---
+
+# 176 — Supabase Scaling & Optimization for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 2026

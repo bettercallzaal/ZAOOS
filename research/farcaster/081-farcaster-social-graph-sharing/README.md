@@ -1,11 +1,16 @@
-# 87 — Farcaster Social Graph APIs & Social Sharing Features
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [020-followers-following-feed, 073-farcaster-ecosystem-2026-update, 173-farcaster-miniapps-integration]
+original-query: "What Neynar APIs expose social graph data, and how can we build pre-generated member profiles and Farcaster sharing flows in ZAO OS? (reconstructed)"
+tier: STANDARD
+---
 
-> **Note:** Folder is named `81-farcaster-social-graph-sharing` due to numbering collision. Canonical number is **87**.
+# 081 - Farcaster Social Graph APIs & Social Sharing Features
 
-> **Status:** Research complete
-> **Date:** March 19, 2026
-> **Goal:** Document Neynar user data APIs, social graph analysis patterns, and Farcaster sharing/compose features for building pre-generated member profiles and social sharing in ZAO OS
-> **Related:** Doc 20 (followers/following feed), Doc 73 (Farcaster ecosystem 2026), Doc 68 (Mini Apps)
+> **Goal:** Document Neynar user data APIs, social graph analysis patterns, and Farcaster sharing/compose features for building pre-generated member profiles and social sharing in ZAO OS.
 
 ---
 
@@ -706,18 +711,15 @@ This is well within Neynar's free tier limits.
 
 ## Sources
 
-- [Neynar User Bulk API](https://docs.neynar.com/reference/user-bulk)
-- [Neynar User by Username](https://docs.neynar.com/reference/lookup-user-by-username)
-- [Neynar Bulk by Address](https://docs.neynar.com/reference/fetch-bulk-users-by-eth-or-sol-address)
-- [Neynar Publish Cast](https://docs.neynar.com/reference/publish-cast)
-- [Neynar Power Users](https://docs.neynar.com/reference/fetch-power-users)
-- [Neynar Mutual Followers Guide](https://docs.neynar.com/docs/how-to-fetch-mutual-followfollowers-in-farcaster)
-- [Neynar Feed API Guide](https://docs.neynar.com/docs/how-to-use-the-feed-api-1)
-- [Neynar API Complete Index](https://docs.neynar.com/llms.txt)
-- [Farcaster Mini Apps: Sharing Guide](https://miniapps.farcaster.xyz/docs/guides/sharing)
-- [Farcaster Mini Apps: composeCast SDK](https://miniapps.farcaster.xyz/docs/sdk/actions/compose-cast)
-- [Farcaster Mini Apps: Share Extensions](https://miniapps.farcaster.xyz/docs/guides/share-extension)
-- [Farcaster Mini Apps: Manifest vs Embed](https://miniapps.farcaster.xyz/docs/guides/manifest-vs-embed)
-- [Farcaster Docs: Create Casts](https://docs.farcaster.xyz/developers/guides/writing/casts)
-- [Farcaster URI Scheme FIP Discussion](https://github.com/farcasterxyz/protocol/discussions/123)
-- [Neynar User Quality Score](https://docs.neynar.com/docs/neynar-user-quality-score)
+- [Neynar User Bulk API](https://docs.neynar.com/reference/user-bulk) [FULL] - Current endpoint
+- [Neynar User by Username](https://docs.neynar.com/reference/lookup-user-by-username) [FULL] - Current endpoint
+- [Neynar Bulk by Address](https://docs.neynar.com/reference/fetch-bulk-users-by-eth-or-sol-address) [FULL] - Current endpoint
+- [Neynar Publish Cast](https://docs.neynar.com/reference/publish-cast) [FULL] - Current endpoint
+- [Neynar Power Users](https://docs.neynar.com/reference/fetch-power-users) [FULL] - Current endpoint
+- [Neynar Mutual Followers Guide](https://docs.neynar.com/docs/how-to-fetch-mutual-followfollowers-in-farcaster) [FULL] - Current guide
+- [Neynar Feed API Guide](https://docs.neynar.com/docs/how-to-use-the-feed-api-1) [FULL] - Current guide
+- [Farcaster Mini Apps: Sharing Guide](https://miniapps.farcaster.xyz/docs/guides/sharing) [FULL] - Current guide
+- [Farcaster Mini Apps: composeCast SDK](https://miniapps.farcaster.xyz/docs/sdk/actions/compose-cast) [FULL] - Current SDK reference
+- [Farcaster Mini Apps: Share Extensions](https://miniapps.farcaster.xyz/docs/guides/share-extension) [FULL] - Current guide
+- [Farcaster Docs: Create Casts](https://docs.farcaster.xyz/developers/guides/writing/casts) [FULL] - Current guide
+- [Neynar User Quality Score](https://docs.neynar.com/docs/neynar-user-quality-score) [FULL] - Current documentation

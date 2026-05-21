@@ -1,8 +1,16 @@
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [002-farcaster-hub-api, 304-quilibrium-hypersnap-free-neynar-api, 073-farcaster-ecosystem-2026-update]
+original-query: "What's the technical architecture of Snapchain vs Hypersnap? How do Quilibrium privacy layers work? What does this mean for ZAO OS infrastructure? (reconstructed)"
+tier: STANDARD
+---
+
 # 309 - Snapchain vs Hypersnap: Protocol Architecture Deep Dive
 
-> **Status:** Research complete
-> **Date:** April 9, 2026
-> **Goal:** Understand the technical architecture of Farcaster's Snapchain, Cassie Heart's Hypersnap fork, Quilibrium's privacy layer, and what this infrastructure means for ZAO OS
+> **Goal:** Understand the technical architecture of Farcaster's Snapchain, Cassie Heart's Hypersnap fork, Quilibrium's privacy layer, and what this infrastructure means for ZAO OS.
 
 ## Key Decisions / Recommendations
 

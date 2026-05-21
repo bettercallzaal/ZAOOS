@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: ui-design
+status: research-complete
+last-validated: 2026-05-20
+original-query: Settings page redesign — merge Connections + Platforms into unified Accounts section (reconstructed)
+tier: 2-nice-to-have
+---
+
 # 118 — Settings Page Redesign
 
 > **Status:** Research complete

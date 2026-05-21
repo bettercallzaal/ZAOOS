@@ -158,18 +158,14 @@ The `as any` cast on line 126 of `client.ts` (`} as any`) suggests the `dbEncryp
 
 ## Sources
 
-- [XMTP Browser SDK — npm](https://www.npmjs.com/package/@xmtp/browser-sdk)
-- [Get started with XMTP Browser SDK — docs.xmtp.org](https://docs.xmtp.org/chat-apps/sdks/browser)
-- [xmtp/xmtp-js GitHub releases](https://github.com/xmtp/xmtp-js/releases)
-- [Messaging security properties with XMTP — docs.xmtp.org](https://docs.xmtp.org/protocol/security)
-- [Build group chat with MLS and XMTP — docs.xmtp.org](https://docs.xmtp.org/groups/build-group-chat)
-- [Manage XMTP inboxes, identities, and installations — docs.xmtp.org](https://docs.xmtp.org/protocol/v3/identity)
-- [Enable history sync — docs.xmtp.org](https://docs.xmtp.org/inboxes/history-sync)
-- [Support archive-based backups — docs.xmtp.org](https://docs.xmtp.org/chat-apps/list-stream-sync/archive-backups)
-- [Fund an app to send messages — docs.xmtp.org](https://docs.xmtp.org/fund-agents-apps/fund-your-app)
-- [Decentralizing XMTP — xmtp.org](https://xmtp.org/decentralization)
-- [XMTP Protocol Roadmap 2025 — XMTP Forum](https://improve.xmtp.org/t/xmtp-protocol-roadmap-2025-development-timeline/887)
-- [XMTP July 2025 Community Update — blog.xmtp.org](https://blog.xmtp.org/xmtp-july-2025-community-update/)
-- [XMTP Review 2026 — cryptoadventure.com](https://cryptoadventure.com/xmtp-review-2026-decentralized-messaging-mls-group-chats-and-the-mainnet-transition/)
-- [Upgrade from legacy V2 to V3 — docs.xmtp.org](https://docs.xmtp.org/upgrade-from-legacy-V2)
-- [XIP-46: Multi-wallet identity — GitHub](https://github.com/xmtp/XIPs/blob/main/XIPs/xip-46-multi-wallet-identity.md)
+- [XMTP Browser SDK - npm](https://www.npmjs.com/package/@xmtp/browser-sdk) [FULL] - Current npm package
+- [Get started with XMTP Browser SDK - docs.xmtp.org](https://docs.xmtp.org/chat-apps/sdks/browser) [FULL] - Official guide
+- [xmtp/xmtp-js GitHub releases](https://github.com/xmtp/xmtp-js/releases) [FULL] - Release history
+- [Build group chat with MLS and XMTP - docs.xmtp.org](https://docs.xmtp.org/groups/build-group-chat) [FULL] - MLS group documentation
+- [Manage XMTP inboxes, identities, and installations - docs.xmtp.org](https://docs.xmtp.org/protocol/v3/identity) [FULL] - Identity management
+- [Enable history sync - docs.xmtp.org](https://docs.xmtp.org/inboxes/history-sync) [FULL] - History sync guide
+- [Fund an app to send messages - docs.xmtp.org](https://docs.xmtp.org/fund-agents-apps/fund-your-app) [FULL] - Payer wallet setup
+- [Decentralizing XMTP - xmtp.org](https://xmtp.org/decentralization) [FULL] - Decentralization roadmap
+- [XMTP Protocol Roadmap 2025 - XMTP Forum](https://improve.xmtp.org/t/xmtp-protocol-roadmap-2025-development-timeline/887) [PARTIAL] - Roadmap discussion
+- [Upgrade from legacy V2 to V3 - docs.xmtp.org](https://docs.xmtp.org/upgrade-from-legacy-V2) [FULL] - Migration guide
+- [XIP-46: Multi-wallet identity - GitHub](https://github.com/xmtp/XIPs/blob/main/XIPs/xip-46-multi-wallet-identity.md) [FULL] - Future identity standard

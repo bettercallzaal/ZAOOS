@@ -1,8 +1,16 @@
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [305-channel-moderation-community-management, 002-farcaster-hub-api]
+original-query: "What Farcaster protocol features exist? Which ones should ZAO OS build to be the best community hub? Creator rewards, verifications, subscriptions? (reconstructed)"
+tier: STANDARD
+---
+
 # 306 - Farcaster Protocol Features Gap Analysis for ZAO OS
 
-> **Status:** Research complete
-> **Date:** April 8, 2026
-> **Goal:** Map every Farcaster protocol feature available and identify what ZAO OS should add to be the best community hub client
+> **Goal:** Map every Farcaster protocol feature available and identify what ZAO OS should add to be the best community hub client.
 
 ## Key Decisions / Recommendations
 

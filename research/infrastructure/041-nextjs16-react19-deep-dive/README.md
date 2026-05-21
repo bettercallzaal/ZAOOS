@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Next.js 16 and React 19 features — use cache, useOptimistic, React Compiler, PPR, Turbopack (reconstructed)
+tier: 1-must-have
+---
+
 # 41 — Next.js 16 + React 19 Deep Dive
 
 > **Status:** Research complete

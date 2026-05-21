@@ -1,8 +1,10 @@
 ---
 topic: infrastructure
 type: decision
-status: complete
+status: research-complete
 decision-made: 2026-04-24
+last-validated: 2026-05-20
+original-query: Should ZAOstock circles use Loomio or build native consensus voting tool (reconstructed)
 tier: DISPATCH
 related-docs: 502, 497, 498, 499, 500, 501
 word-count: 420

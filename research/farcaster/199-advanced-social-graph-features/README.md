@@ -1,12 +1,16 @@
-# 199 — Advanced Social Graph Features: Visualization, Growth Tracking, Influence Mapping
-
-> **Status:** Research complete
-> **Date:** March 28, 2026
-> **Goal:** Evaluate advanced social graph features beyond basic followers/discovery — unfollower tracking, force-directed visualization, growth analytics, conversation clustering, and influence mapping
-> **Related:** Doc 198 (social graph analytics foundation), Doc 20 (followers/following feed), Doc 87 (social graph APIs), Doc 110 (community directory CRM), Doc 134/135 (reputation signals)
-> **Builds on:** Doc 198 covered Neynar v2 + OpenRank + Airstack comparison and a 4-phase integration plan. This doc extends into advanced features that 198 deferred or did not cover.
-
 ---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [020-followers-following-feed, 081-farcaster-social-graph-sharing, 306-farcaster-protocol-features-gap-analysis]
+original-query: "What advanced social graph features can ZAO OS build? Unfollower tracking, force-directed visualization, growth analytics, conversation clustering, influence scoring? (reconstructed)"
+tier: STANDARD
+---
+
+# 199 - Advanced Social Graph Features: Visualization, Growth Tracking, Influence Mapping
+
+> **Goal:** Evaluate advanced social graph features beyond basic followers/discovery - unfollower tracking, force-directed visualization, growth analytics, conversation clustering, and influence mapping.
 
 ## Recommendations Table
 

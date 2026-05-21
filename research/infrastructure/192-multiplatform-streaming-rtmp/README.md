@@ -1,4 +1,13 @@
-# 161 — Multi-Platform Streaming from ZAO OS Audio Rooms (RTMP Out)
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: RTMP multistreaming from ZAO OS spaces — YouTube, Twitch, Facebook (reconstructed)
+tier: 1-must-have
+---
+
+# 192 — Multi-Platform Streaming from ZAO OS Audio Rooms (RTMP Out)
 
 > **Status:** Research complete
 > **Date:** March 28, 2026

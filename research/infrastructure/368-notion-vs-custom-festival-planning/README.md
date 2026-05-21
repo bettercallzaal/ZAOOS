@@ -1,4 +1,16 @@
+---
+topic: infrastructure
+type: research
+status: superseded
+last-validated: 2026-05-20
+original-query: Should Notion or a custom dashboard be used for ZAOstock planning? (reconstructed)
+tier: ARCHIVED
+superseded-by: 413-zaostock-dashboard-notion-replacement
+---
+
 # 368 - Notion vs. Custom Dashboard for ZAOstock Festival Planning
+
+**NOTE: This doc is superseded by Doc 413 (ZAOstock Dashboard as Notion Replacement), which recommends USE custom dashboard over Notion.**
 
 > **Status:** Research complete
 > **Date:** 2026-04-16

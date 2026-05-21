@@ -3,6 +3,7 @@ topic: infrastructure
 type: guide
 status: research-complete
 last-validated: 2026-04-27
+original-query: What Restream API capabilities exist for ZAO OS broadcast integration and OAuth (reconstructed)
 related-docs: 163, 213, 215
 tier: STANDARD
 ---

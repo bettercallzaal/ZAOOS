@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: feature-specification
+status: research-complete
+last-validated: 2026-05-20
+original-query: Screen share integration for SongJam spaces — Stream.io SDK implementation (reconstructed)
+tier: 2-nice-to-have
+---
+
 # 122 — SongJam Screen Share PR: Stream Video SDK Integration
 
 > **Status:** Research complete

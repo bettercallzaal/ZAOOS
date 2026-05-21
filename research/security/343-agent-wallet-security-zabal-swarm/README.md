@@ -1,8 +1,15 @@
-# 343 -- Agent Wallet Security: Securing VAULT/BANKER/DEALER Beyond Env Vars
+---
+topic: security
+type: agent-security-architecture
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Agent wallet security: Privy TEE vs env vars, Safe multisig for ZABAL treasury, OWASP agent controls - April 2026 (reconstructed)"
+tier: HIGH
+---
 
-> **Status:** Research complete
-> **Date:** April 11, 2026
-> **Goal:** Map every security layer for the ZABAL agent swarm wallets -- from current risk (raw private keys in Vercel env vars) to production-grade security (Privy TEE + Safe multisig + policy engine + OWASP agentic controls)
+# 343 - Agent Wallet Security: Securing VAULT/BANKER/DEALER Beyond Env Vars
+
+> **Goal:** Map every security layer for ZABAL agent swarm wallets - from current risk (raw private keys in Vercel) to production (Privy TEE + Safe multisig + policy engine + OWASP agentic controls)
 
 ---
 

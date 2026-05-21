@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Audio/video quality for ZAO OS streaming — HiFi mode, adaptive bitrate, Krisp noise suppression (reconstructed)
+tier: 1-must-have
+---
+
 # 217 -- Audio/Video Quality Optimization for Live Streaming
 
 > **Status:** Research complete

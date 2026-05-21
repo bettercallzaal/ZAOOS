@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: api-integration-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate public APIs for ZAO OS — Songlink, MusicBrainz, Last.fm, CoinGecko, Perspective, Bandsintown (reconstructed)
+tier: 1-must-have
+---
+
 # 92 — Public APIs 2026 Update: Best Free APIs for ZAO OS
 
 > **Status:** Research complete

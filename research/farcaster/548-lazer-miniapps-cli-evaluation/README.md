@@ -3,6 +3,7 @@ topic: farcaster
 type: decision
 status: research-complete
 last-validated: 2026-04-29
+original-query: "should ZAO adopt Lazer CLI for new Farcaster/Base miniapps or stick with Neynar/MiniKit/hand-rolled (reconstructed)"
 related-docs: 173, 250, 349, 489, 508
 tier: STANDARD
 ---

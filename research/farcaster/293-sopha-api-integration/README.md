@@ -1,8 +1,16 @@
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [124-sopha-deep-social-farcaster, 020-followers-following-feed]
+original-query: "How does the Sopha Social API work? What bugs exist in ZAO OS's implementation? What improvements should we make? (reconstructed)"
+tier: STANDARD
+---
+
 # 293 - Sopha External Feed API Integration
 
-> **Status:** Research complete
-> **Date:** April 7, 2026
-> **Goal:** Document the Sopha Social API integration, fix bugs, and plan improvements for cleaner use of curated feed data
+> **Goal:** Document the Sopha Social API integration, fix bugs, and plan improvements for cleaner use of curated feed data.
 
 ## Key Decisions / Recommendations
 

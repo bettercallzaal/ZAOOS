@@ -3,6 +3,7 @@ topic: infrastructure
 type: decision
 status: research-complete
 last-validated: 2026-05-11
+original-query: Should ZAO run its own Hypersnap node, cost vs benefit analysis (reconstructed)
 related-docs: 309, 489, 597
 tier: STANDARD
 source: zaal-forwarded-url-2026-05-11

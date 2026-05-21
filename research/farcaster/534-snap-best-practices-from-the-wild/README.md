@@ -3,6 +3,7 @@ topic: farcaster
 type: guide
 status: research-complete
 last-validated: 2026-04-27
+original-query: "how production Farcaster Snaps are being built, what official examples teach, and which patterns Zlank should adopt (reconstructed)"
 related-docs: 295, 489, 498, 500, 505, 527
 tier: STANDARD
 ---

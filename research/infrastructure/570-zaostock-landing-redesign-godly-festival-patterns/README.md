@@ -1,8 +1,9 @@
 ---
 topic: infrastructure
-type: decision
+type: design
 status: research-complete
 last-validated: 2026-04-30
+original-query: How to redesign ZAOstock landing page using godly.website patterns and festival site benchmarks (reconstructed)
 related-docs: 311
 tier: STANDARD
 ---

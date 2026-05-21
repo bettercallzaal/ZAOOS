@@ -1,3 +1,13 @@
+---
+topic: infrastructure
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: How to ship a universal nav bar across all zaoos.com subdomains, version-control VPS config, and rank portal v2 improvements (reconstructed)
+tier: STANDARD
+related-docs: 428, 430
+---
+
 # 431 - Portal v2: Universal Nav + Version-Control + Backlog
 
 > **Status:** Research + build plan

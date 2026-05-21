@@ -3,6 +3,7 @@ topic: infrastructure
 type: guide
 status: research-complete
 last-validated: 2026-05-09
+original-query: How to build live streaming as upstream media factory with repurposing flywheel for ZAO across all platforms (reconstructed)
 related-docs: 627, 628, 626, 353, 354, 355, 351, 192, 215, 217, 233, 275, 311, 322, 562
 tier: DEEP
 ---

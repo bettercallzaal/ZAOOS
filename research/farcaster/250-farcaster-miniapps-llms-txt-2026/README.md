@@ -1,8 +1,16 @@
-# 250 — Farcaster Mini Apps llms.txt Deep Dive (April 2026)
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [173-farcaster-miniapps-integration, 295-farcaster-snaps]
+original-query: "What are the latest Farcaster Mini Apps SDK features (April 2026)? What gaps exist in ZAO OS's implementation? What should we adopt next? (reconstructed)"
+tier: STANDARD
+---
 
-> **Status:** Research complete
-> **Date:** April 2, 2026
-> **Goal:** Deep dive the official Farcaster Mini Apps llms-full.txt documentation, cross-reference with ZAO OS's current implementation (Doc 86, @farcaster/miniapp-sdk@0.2.3), and identify gaps + new features to adopt
+# 250 - Farcaster Mini Apps llms.txt Deep Dive (April 2026)
+
+> **Goal:** Deep dive the official Farcaster Mini Apps llms-full.txt documentation, identify gaps in ZAO OS's current implementation, and plan new features.
 
 ## Key Decisions / Recommendations
 

@@ -3,6 +3,7 @@ topic: farcaster
 type: incident-postmortem
 status: research-complete
 last-validated: 2026-04-30
+original-query: "diagnose ZAO OS miniapp splash stuck issue and codify fix plus best-practice pattern (reconstructed)"
 related-docs: 124, 293, 306, 574
 tier: STANDARD
 ---

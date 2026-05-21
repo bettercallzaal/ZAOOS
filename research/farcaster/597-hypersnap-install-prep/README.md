@@ -3,6 +3,7 @@ topic: farcaster
 type: decision
 status: research-complete
 last-validated: 2026-05-03
+original-query: "validate Hypersnap install scope, hardware requirements, VPS fit, codebase migration delta before purchasing (reconstructed)"
 related-docs: 309, 489, 586, 587, 596
 tier: STANDARD
 ---

@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: integration-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Alchemy APIs for ZAO OS — webhooks for auto-sync, getAssetTransfers for history (reconstructed)
+tier: 2-nice-to-have
+---
+
 # 129 — Alchemy APIs Deep Integration for ZAO OS
 
 > **Status:** Research complete

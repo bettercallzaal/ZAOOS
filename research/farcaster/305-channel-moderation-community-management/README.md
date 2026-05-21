@@ -1,8 +1,16 @@
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [306-farcaster-protocol-features-gap-analysis, 002-farcaster-hub-api]
+original-query: "How do Farcaster channel moderation APIs work? What toolkit should ZAO OS build for /zao channel management? (reconstructed)"
+tier: STANDARD
+---
+
 # 305 - Farcaster Channel Moderation & Community Management
 
-> **Status:** Research complete
-> **Date:** April 8, 2026
-> **Goal:** Map the full Farcaster channel moderation API surface and build a community management toolkit for ZAO OS as a /zao channel hub
+> **Goal:** Map the full Farcaster channel moderation API surface and build a community management toolkit for ZAO OS as a /zao channel hub.
 
 ## Key Decisions / Recommendations
 

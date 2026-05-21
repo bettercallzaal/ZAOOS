@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Complete notifications architecture for ZAO OS — Mini App push, Neynar webhooks, in-app feed, email (reconstructed)
+tier: 1-must-have
+---
+
 # 35 — Notifications: Complete Implementation Guide
 
 > **Status:** Consolidated from all research + codebase analysis

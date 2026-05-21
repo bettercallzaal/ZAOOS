@@ -1,8 +1,9 @@
 ---
 topic: infrastructure
-type: guide
+type: design
 status: research-complete
 last-validated: 2026-05-01
+original-query: Pull 12 new design moves from godly.website for ZAOstock content richness, donation UI, and birthday R3F patterns (reconstructed)
 superseded-by: null
 related-docs: 570, 571, 572
 tier: DEEP

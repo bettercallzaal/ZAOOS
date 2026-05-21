@@ -1,8 +1,15 @@
+---
+topic: security
+type: api-audit
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Verify status of 14+ third-party APIs (Neynar, POAP, Sound.xyz, EAS, etc) - March 2026 (reconstructed)"
+tier: STANDARD
+---
+
 # 136 — API Status Verification — March 2026
 
-> **Status:** Verified
-> **Date:** March 25, 2026
-> **Goal:** Confirm which APIs are active vs deprecated before integrating
+> **Goal:** Confirm which APIs are active vs deprecated before integrating; identify breaking changes from acquisitions
 
 ## Critical Changes Affecting ZAO OS
 

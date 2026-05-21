@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: ui-patterns
+status: research-complete
+last-validated: 2026-05-20
+original-query: UI patterns from Commonwealth for community chat — sidebar, message feed, dark theme (reconstructed)
+tier: 2-nice-to-have
+---
+
 # UI Reference — CG / Commonwealth
 
 > Source: [app.cg](https://app.cg) | [github.com/hicommonwealth/commonwealth](https://github.com/hicommonwealth/commonwealth)

@@ -1,8 +1,16 @@
+---
+topic: farcaster
+type: update
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [260-neynar-acquires-farcaster, 295-farcaster-snaps, 073-farcaster-ecosystem-2026-update]
+original-query: "What's the Farcaster ecosystem momentum in April 2026? Neynar stewardship, Snaps, FarCon Rome, Logos, ZAO snaps shipping? (reconstructed)"
+tier: STANDARD
+---
+
 # 308 - Farcaster Ecosystem Spring 2026: Snaps, Neynar Stewardship, FarCon Rome
 
-> **Status:** Research complete
-> **Date:** 2026-04-08
-> **Goal:** Capture the current Farcaster ecosystem momentum - Neynar's stewardship post-acquisition, Snaps as the new protocol primitive, FarCon Rome, Logos partnership, and ZAO's 3 shipped snaps as evidence of building
+> **Goal:** Capture the current Farcaster ecosystem momentum - Neynar's stewardship post-acquisition, Snaps as the new protocol primitive, FarCon Rome, and ZAO's shipped snaps as evidence of active building.
 
 ## Key Decisions / Recommendations
 

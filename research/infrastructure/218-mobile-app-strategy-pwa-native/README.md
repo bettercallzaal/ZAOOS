@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: strategic-assessment
+status: research-complete
+last-validated: 2026-05-20
+original-query: Mobile app strategy for ZAO OS — PWA, Capacitor, React Native, Expo comparison (reconstructed)
+tier: 1-must-have
+---
+
 # 218 — Mobile App Strategy: PWA, Capacitor, React Native, Expo, Tauri, TWA
 
 > **Status:** Research complete

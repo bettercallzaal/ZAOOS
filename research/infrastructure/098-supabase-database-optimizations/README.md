@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: Supabase optimizations — Realtime subscriptions, materialized views, functions, RLS, Vault, triggers (reconstructed)
+tier: 1-must-have
+---
+
 # 98 — Supabase Database Optimizations for ZAO OS
 
 > **Status:** Research complete

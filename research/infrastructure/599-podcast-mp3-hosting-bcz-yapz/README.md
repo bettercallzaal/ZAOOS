@@ -3,6 +3,7 @@ topic: infrastructure
 type: decision
 status: research-complete
 last-validated: 2026-05-12
+original-query: Where to host podcast MP3 files for BCZ YapZ with Apple Podcasts/Spotify compatibility (reconstructed)
 related-docs: 092, 093
 tier: STANDARD
 ---

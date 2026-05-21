@@ -1,3 +1,13 @@
+---
+topic: infrastructure
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Should we extend the custom dashboard at /stock/team instead of using Notion for festival planning? (reconstructed)
+tier: FULL
+supersedes: 368-notion-vs-custom-festival-planning
+---
+
 # 413 - ZAOstock Dashboard as Notion Replacement
 
 > **Status:** Research complete

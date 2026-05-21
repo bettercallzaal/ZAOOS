@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserByFid, getUserCasts } from '@/lib/farcaster/neynar';
+import { getUserByFid, getUserCasts, getNeynarUserScore } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 import { fidSchema } from '@/lib/validation/zabal-schemas';
@@ -65,7 +65,8 @@ export async function GET(req: NextRequest) {
     const user = await getUserByFid(fid);
     if (user) {
       username = user.username ?? null;
-      // Neynar's experimental score, present on user/bulk responses
+      // The haatz read proxy returns user/bulk without the `experimental`
+      // block, so a value here only appears when the failover hit Neynar.
       const exp = (user as { experimental?: { neynar_user_score?: number } }).experimental;
       if (typeof exp?.neynar_user_score === 'number') {
         neynarScore = exp.neynar_user_score;
@@ -73,6 +74,16 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     logger.warn?.('[zabal] getUserByFid failed', { fid, err: String(err) });
+  }
+
+  // haatz does not serve neynar_user_score. If the user lookup above came
+  // back via haatz (score still at the 0.5 default), fetch the real score
+  // direct from Neynar so the multiplier is not silently halved.
+  if (neynarScore === 0.5) {
+    const directScore = await getNeynarUserScore(fid);
+    if (directScore !== null) {
+      neynarScore = directScore;
+    }
   }
 
   try {

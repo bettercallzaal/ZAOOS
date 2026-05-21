@@ -2,7 +2,8 @@
 topic: business
 type: market-research
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-20
+original-query: "How does Takemiya's blockchain-as-monetary-substrate framing apply to ZABAL and ZAO? (reconstructed)"
 related-docs: 037, 222, 258, 050, 051, 657, 660
 tier: STANDARD
 ---

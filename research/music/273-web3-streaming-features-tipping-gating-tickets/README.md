@@ -1,3 +1,12 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "web3 streaming wallet tipping token-gated rooms NFT tickets 2026 (reconstructed)"
+tier: STANDARD
+---
+
 # 273 — Web3 Streaming Features: Wallet Tipping, Token-Gated Rooms, NFT Tickets
 
 > **Status:** Research complete

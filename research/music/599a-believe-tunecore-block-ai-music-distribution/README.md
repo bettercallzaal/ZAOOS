@@ -2,7 +2,7 @@
 topic: music
 type: market-research
 status: research-complete
-last-validated: 2026-05-03
+last-validated: 2026-05-20
 related-docs: 148, 261, 314, 475, 599
 tier: STANDARD
 ---

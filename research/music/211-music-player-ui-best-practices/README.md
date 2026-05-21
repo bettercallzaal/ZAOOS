@@ -1,3 +1,12 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "music player UI best practices design patterns 2026 (reconstructed)"
+tier: STANDARD
+---
+
 # 211 — Music Player UI Best Practices & Feature Research
 
 > **Status:** Research complete

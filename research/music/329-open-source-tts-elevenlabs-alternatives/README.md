@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Open source text-to-speech alternatives to ElevenLabs, voice cloning, quality benchmarks, 18+ models comparison (reconstructed)"
+related-docs: 328, 327, 336
+tier: STANDARD
+---
+
 # Doc 329 - Open Source Text-to-Speech: ElevenLabs Alternatives (April 2026)
 
 > Deep dive on open source TTS models that can clone voices and generate natural-sounding speech. Covers 18+ models, quality benchmarks, voice cloning requirements, Mac M-series compatibility, and deployment options.

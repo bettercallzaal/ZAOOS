@@ -1,3 +1,12 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "synchronized listening rooms collaborative music experiences 2026 (reconstructed)"
+tier: STANDARD
+---
+
 # 100 — Synchronized Listening Rooms & Collaborative Music Experiences
 
 > **Status:** Research complete

@@ -1,4 +1,14 @@
-# 280 — FISHBOWLZ: MVP to SaaS-Ready Roadmap
+---
+topic: music
+type: research-complete
+status: _archive_candidate
+last-validated: 2026-05-20
+original-query: "FISHBOWLZ MVP to SaaS roadmap polishing monetization 2026 (reconstructed)"
+tier: STANDARD
+notes: "FISHBOWLZ paused 2026-04-16 — partnering with Juke (nickysap) Farcaster audio client instead."
+---
+
+# 280 — FISHBOWLZ: MVP to SaaS-Ready Roadmap [ARCHIVE CANDIDATE]
 
 > **Status:** Research complete
 > **Date:** 2026-04-05

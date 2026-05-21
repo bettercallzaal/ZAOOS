@@ -2,7 +2,8 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-20
+original-query: Decide whether The ZAO submits to BCard partner program + Black Flag Collective endowment after Zaal conversation with @links Al Mithani (reconstructed)
 related-docs: 222, 244, 432, 458
 tier: STANDARD
 ---

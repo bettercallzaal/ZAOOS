@@ -1,6 +1,14 @@
+---
+topic: business
+type: prospect-profile
+status: research-complete
+last-validated: 2026-05-20
+original-query: Profile two new BetterCallZaal Maine leads one hotel group ZAO Stock room block target one landscape design firm website + logo refresh client both on Mount Desert Island (reconstructed)
+tier: STANDARD
+---
+
 # 455 — BCZ Maine Clients: Stephen Coston (Stay Bar Harbor) + Cameron (Riverside Group)
 
-> **Status:** Research complete
 > **Date:** 2026-04-20
 > **Goal:** Profile two new BetterCallZaal Maine leads — one hotel group (ZAO Stock room block target), one landscape-design firm (website + logo refresh client). Both on Mount Desert Island, 25 min from Ellsworth.
 

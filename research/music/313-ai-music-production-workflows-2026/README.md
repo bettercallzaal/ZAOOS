@@ -1,3 +1,12 @@
+---
+topic: music
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "What are the best AI music production workflows for independent musicians using Suno, Udio, and ElevenLabs in 2026?"
+tier: production
+---
+
 # Doc 313 - AI Music Production Workflows 2026: Complete Pipeline Guide
 
 **Created:** 2026-04-11

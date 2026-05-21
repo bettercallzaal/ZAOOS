@@ -1,10 +1,18 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: ["282", "283", "284"]
+original-query: "How should an agent wallet system work for ZABAL/SANG swaps, promoter rewards, and x402 payments? (reconstructed)"
+tier: STANDARD
+---
+
 # 324 -- ZABAL/SANG Wallet Agent System: Tokenomics, Autonomous Swaps & Promoter Incentives
 
 > **Status:** Research complete
 > **Date:** April 11, 2026
 > **Goal:** Design the autonomous wallet agent system for ZABAL<>SANG trading, COC Concertz promoter incentives, gas sponsorship, and x402 agent commerce payment flows
-
----
 
 ## Key Decisions / Recommendations
 

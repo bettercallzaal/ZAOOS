@@ -2,7 +2,8 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-04
+last-validated: 2026-05-20
+original-query: "What Phase-3 issues does the Empire Builder SKILL.md spec unblock? What are the 6 new build targets? (reconstructed)"
 related-docs: 361, 582, 583, 584, 585, 586
 tier: STANDARD
 ---

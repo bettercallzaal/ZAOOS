@@ -1,3 +1,12 @@
+---
+topic: music
+type: business-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "How to monetize a single AI-generated song through multiple revenue streams (streaming, NFTs, licensing, sync, etc.)?"
+tier: production
+---
+
 # Doc 315: Revenue Stacking - Monetizing a Single AI-Generated Song (2026)
 
 **Created:** 2026-04-11

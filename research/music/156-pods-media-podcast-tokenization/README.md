@@ -1,3 +1,12 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "podcast tokenization platforms Arweave NFT 2026 (reconstructed)"
+tier: STANDARD
+---
+
 # 156 — Pods.media & Podcast Tokenization: Can ZAO Clone It on Arweave?
 
 > **Status:** Research complete

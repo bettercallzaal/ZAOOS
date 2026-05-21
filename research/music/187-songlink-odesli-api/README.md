@@ -1,4 +1,13 @@
-# 111 — Songlink/Odesli API for Universal Music Links
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Songlink Odesli API universal music links 2026 (reconstructed)"
+tier: STANDARD
+---
+
+# 187 — Songlink/Odesli API for Universal Music Links
 
 > **Status:** Research complete
 > **Date:** March 22, 2026

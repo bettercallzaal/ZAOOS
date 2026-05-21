@@ -1,3 +1,12 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Farcaster audio apps X Spaces providers comparison 2026 (reconstructed)"
+tier: STANDARD
+---
+
 # 160 — Audio Spaces Landscape: Farcaster Apps, X Spaces Competitors & Provider Comparison
 
 > **Status:** Research complete

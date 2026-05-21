@@ -1,3 +1,12 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AI video generation tools music videos content creation 2026 (reconstructed)"
+tier: STANDARD
+---
+
 # 209 — AI Video Generation Tools for ZAO OS
 
 > **Status:** Research complete

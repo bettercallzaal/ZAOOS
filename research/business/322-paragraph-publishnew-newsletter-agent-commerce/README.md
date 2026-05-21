@@ -1,10 +1,18 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: []
+original-query: "How do Paragraph, Publish.new, and agent commerce work? How to integrate COC Concertz? (reconstructed)"
+tier: STANDARD
+---
+
 # 322 — Paragraph + Publish.new: Newsletter Platform, Agent Commerce & COC Concertz Integration
 
 > **Status:** Research complete
 > **Date:** April 11, 2026
 > **Goal:** Map Paragraph's full platform (newsletters, publish.new marketplace, coins, API/SDK/MCP, distribution) and design how COC Concertz promoters can use it with ZABAL token for monetized content creation and agent commerce
-
----
 
 ## Key Decisions / Recommendations
 

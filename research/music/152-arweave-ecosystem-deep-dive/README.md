@@ -1,7 +1,12 @@
 # 152 — Arweave Ecosystem Deep Dive: Building a Full Music Layer on the Permaweb
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** March 26, 2026
+> **Topic:** music
+> **Type:** infrastructure-research
+> **Original-Query:** What's the full Arweave ecosystem for music (AO, ArDrive Turbo, ar.io, Wayfinder, GraphQL, ArNS)? How can ZAO build on it? (reconstructed)
+> **Last-Validated:** 2026-05-20
+> **Tier:** 3-major-feature
 > **Goal:** Map the entire Arweave ecosystem (AO compute, Irys datachain, ArDrive, ar.io gateways, GraphQL, ArNS) and design a complete music distribution layer for ZAO OS
 
 ## Key Decisions / Recommendations

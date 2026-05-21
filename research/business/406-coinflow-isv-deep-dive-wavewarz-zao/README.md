@@ -1,6 +1,14 @@
+---
+topic: business
+type: integration
+status: research-complete
+last-validated: 2026-05-20
+original-query: Deep dive on Coinflow ISV program Launchpad accelerator supported chains tokens and implementation plan for WaveWarZ merchant and ZAO ISV (reconstructed)
+tier: STANDARD
+---
+
 # 406 - Coinflow ISV Deep Dive: WaveWarZ + ZAO Integration
 
-> **Status:** Research complete
 > **Date:** April 16, 2026
 > **Goal:** Deep dive on Coinflow ISV program, Launchpad accelerator, supported chains/tokens, and implementation plan for both WaveWarZ (merchant) and ZAO (ISV)
 > **Updates:** Doc 125 (Coinflow SDK), Doc 222 (payment infrastructure comparison)

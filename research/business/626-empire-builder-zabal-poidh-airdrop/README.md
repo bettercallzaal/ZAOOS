@@ -2,7 +2,8 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-09
+last-validated: 2026-05-20
+original-query: "How do we wire POIDH submitters to a leaderboard and airdrop ZABAL via Empire Builder? (reconstructed)"
 related-docs: 625, 468, 584
 tier: STANDARD
 ---

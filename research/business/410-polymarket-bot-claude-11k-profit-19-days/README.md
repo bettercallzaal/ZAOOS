@@ -1,6 +1,14 @@
+---
+topic: business
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: Analyze Lunar's Polymarket bot architecture 4 open-source repos + Claude API consensus voting strategy from X post (reconstructed)
+tier: STANDARD
+---
+
 # 410 - Polymarket Trading Bot via Claude: $11,400 Profit in 19 Days
 
-> **Status:** Research complete
 > **Date:** April 16, 2026
 > **Goal:** Analyze Lunar's Polymarket bot architecture - 4 open-source repos + Claude API consensus voting strategy
 > **Source:** [@lunarresearcher on X](https://x.com/lunarresearcher/status/2043690015675318360)

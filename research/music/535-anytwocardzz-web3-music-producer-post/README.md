@@ -2,7 +2,7 @@
 topic: music
 type: networking
 status: research-complete
-last-validated: 2026-04-27
+last-validated: 2026-05-20
 tier: STANDARD
 ---
 

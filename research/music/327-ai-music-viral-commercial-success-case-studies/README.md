@@ -1,3 +1,13 @@
+---
+topic: music
+type: case-studies
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AI-generated music viral hits, commercial success case studies 2023-2026, what makes AI songs succeed (reconstructed)"
+related-docs: 320, 333, 340
+tier: STANDARD
+---
+
 # Doc 327 - AI-Generated Music: Viral Hits & Commercial Success Case Studies
 
 **Created:** 2026-04-11

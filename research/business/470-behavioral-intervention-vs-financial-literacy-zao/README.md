@@ -1,6 +1,14 @@
+---
+topic: business
+type: playbook
+status: research-complete
+last-validated: 2026-05-20
+original-query: Translate 20+ years of behavioral economics research into ZAO OS agent + token + artist payout design ZOE is positioned better than any bank to deliver contextual financial intervention (reconstructed)
+tier: STANDARD
+---
+
 # 470 - Behavioral Intervention > Financial Literacy: ZAO Playbook
 
-> **Status:** Research complete
 > **Date:** 2026-04-21
 > **Source:** The Substrate (Rohan Handa), "Financial Literacy Doesn't Work", 2026-04-21
 > **Goal:** Translate 20+ years of behavioral economics research into ZAO OS agent + token + artist payout design. ZOE is positioned better than any bank to deliver contextual financial intervention.

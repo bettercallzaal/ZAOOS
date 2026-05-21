@@ -1,4 +1,14 @@
-# 277 — FISHBOWLZ Audio Providers & Architecture
+---
+topic: music
+type: research-complete
+status: _archive_candidate
+last-validated: 2026-05-20
+original-query: "FISHBOWLZ audio providers architecture 100ms Daily 2026 (reconstructed)"
+tier: STANDARD
+notes: "FISHBOWLZ paused 2026-04-16 — partnering with Juke (nickysap) Farcaster audio client instead."
+---
+
+# 277 — FISHBOWLZ Audio Providers & Architecture [ARCHIVE CANDIDATE]
 
 > **Status:** Research complete
 > **Date:** 2026-04-04

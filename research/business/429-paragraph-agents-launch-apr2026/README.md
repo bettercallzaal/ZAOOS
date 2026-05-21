@@ -1,6 +1,14 @@
+---
+topic: business
+type: launch
+status: research-complete
+last-validated: 2026-05-20
+original-query: Capture what shipped in Paragraph's Apr 17 2026 agent-native launch and map it to ZOE ROLO VAULT BANKER DEALER and ZAO newsletter workflow (reconstructed)
+tier: STANDARD
+---
+
 # 429 - Paragraph Agents Launch (Apr 17 2026): Skills, Micropaywalls, Archive Listing
 
-> **Status:** Research complete
 > **Date:** 2026-04-17
 > **Goal:** Capture what shipped in Paragraph's Apr 17 2026 agent-native launch and map it to ZOE, ROLO, VAULT/BANKER/DEALER, and the ZAO newsletter workflow. Extends docs 322 and 352.
 

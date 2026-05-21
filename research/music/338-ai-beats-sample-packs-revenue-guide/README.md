@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AI beats sample packs revenue monetization BeatStars Splice Airbit guide (reconstructed)"
+related-docs: 315, 319, 321
+tier: STANDARD
+---
+
 # Doc 338: Selling AI-Generated Beats & Sample Packs - Revenue Guide (2026)
 
 **Date:** 2026-04-11

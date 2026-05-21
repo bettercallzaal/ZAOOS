@@ -1,7 +1,12 @@
 # 153 — BazAR & Atomic Assets: Arweave-Native Music Distribution for ZAO
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** March 27, 2026
+> **Topic:** music
+> **Type:** platform-analysis
+> **Original-Query:** What are atomic assets on Arweave? How does BazAR + UCM + UDL licensing work for music NFTs? (reconstructed)
+> **Last-Validated:** 2026-05-20
+> **Tier:** 3-major-feature
 > **Goal:** Evaluate BazAR marketplace and Arweave atomic assets as a Zora-free, fully on-chain music distribution layer for ZAO OS
 
 ## Key Decisions / Recommendations

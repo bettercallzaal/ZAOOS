@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Open source stem separation tools 2026, Demucs UVR5, splitting tracks vocals drums, Mac performance (reconstructed)"
+related-docs: 329, 336, 324
+tier: STANDARD
+---
+
 # Doc 330 - Open Source Stem Separation Tools 2026: Deep Dive
 
 **Created:** 2026-04-11

@@ -1,6 +1,14 @@
+---
+topic: business
+type: decision
+status: research-complete
+last-validated: 2026-05-20
+original-query: Resolve the 3-in-one customer problem education-vs-distribution mismatch and redesign the validation experiment against ZAO canonical ICP (reconstructed)
+tier: STANDARD
+---
+
 # 474 — Foundercheck BLOCK (3.95): ICP Resolution + Distribution Wedge
 
-> **Status:** Research complete
 > **Date:** 2026-04-22
 > **Source:** Foundercheck export v1.2 (session 1), viability 3.95, gate BLOCK
 > **Goal:** Resolve the 3-in-one customer problem, the education-vs-distribution mismatch, and redesign the validation experiment against ZAO's canonical ICP.

@@ -1,7 +1,12 @@
-# 111 — Audius API Deep Dive for ZAO OS Integration
+# 112 — Audius API Deep Dive for ZAO OS Integration
 
 > **Date:** 2026-03-22
-> **Status:** Research Complete
+> **Status:** research-complete
+> **Topic:** music
+> **Type:** api-reference
+> **Original-Query:** What does the Audius API offer (tracks, users, playlists, streaming, SDK)? How can ZAO OS deepen integration beyond basic streaming? (reconstructed)
+> **Last-Validated:** 2026-05-20
+> **Tier:** 2-integration-ready
 > **Relevance:** High — ZAO OS already recognizes Audius URLs and streams via the v1 REST API. This doc maps the full surface area for deeper integration.
 
 ---

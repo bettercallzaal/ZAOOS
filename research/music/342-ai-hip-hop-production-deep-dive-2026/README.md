@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AI hip-hop production trap rap beats voice cloning 808 bass Suno ACE-Step (reconstructed)"
+related-docs: 313, 321, 322, 323, 324, 334
+tier: STANDARD
+---
+
 # Doc 342: AI Hip-Hop Production Deep Dive - Complete Guide for Rappers (2026)
 
 **Created:** 2026-04-11

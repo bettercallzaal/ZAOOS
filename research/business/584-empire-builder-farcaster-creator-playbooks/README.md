@@ -2,7 +2,8 @@
 topic: business
 type: market-research
 status: research-complete
-last-validated: 2026-05-01
+last-validated: 2026-05-20
+original-query: "What patterns work in top-20 Empire Builder leaderboards? What live data fixes and Phase-2 changes should we ship? (reconstructed)"
 related-docs: 361, 582, 583
 tier: DEEP
 ---

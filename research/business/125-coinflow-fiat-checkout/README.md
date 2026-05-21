@@ -1,10 +1,18 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: []
+original-query: "How does Coinflow work? Should ZAO OS use it for fiat-to-crypto checkout? (reconstructed)"
+tier: STANDARD
+---
+
 # 125 — Coinflow Fiat Checkout for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 24, 2026
 > **Goal:** Evaluate Coinflow as a fiat-to-crypto checkout solution for ZAO OS (memberships, music purchases, WaveWarZ entries)
-
----
 
 ## Key Decisions / Recommendations
 

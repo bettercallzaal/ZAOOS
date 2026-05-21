@@ -1,3 +1,12 @@
+---
+topic: music
+type: market-analysis
+status: research-complete
+last-validated: 2026-05-20
+original-query: "How are AI-generated music being used in games, Roblox, interactive media, and streaming in 2026?"
+tier: production
+---
+
 # Doc 320: AI-Generated Music for Games, Interactive Media & Roblox (2026)
 
 **Created:** 2026-04-11

@@ -1,10 +1,18 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: ["244", "264"]
+original-query: "What engagement mechanics make viral posts work? How to extract lessons for honest ZAO content? (reconstructed)"
+tier: STANDARD
+---
+
 # 350 - Anatomy of Viral Engagement Bait: Claude Shortcuts + Quant Trading Posts
 
 > **Status:** Research complete
 > **Date:** 2026-04-11
 > **Goal:** Analyze two viral @hanakoxbt posts for content strategy patterns, verify claims, extract lessons for ZAO content
-
----
 
 ## Key Decisions / Recommendations
 

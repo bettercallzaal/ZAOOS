@@ -1,6 +1,14 @@
+---
+topic: business
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate kompreni Quotient AI superforecaster as reference for ZAO thesis-based trading governance-signal tooling and copy-trade no KOL alpha framing for ZABAL SANG markets (reconstructed)
+tier: STANDARD
+---
+
 # 481 — kompreni / Quotient — Anti-"Cucktrading" AI Superforecaster
 
-> **Status:** Research complete
 > **Date:** 2026-04-23
 > **Goal:** Evaluate kompreni's Quotient (AI superforecaster "Q") as a reference for ZAO's thesis-based trading / governance-signal tooling, and whether the "no copy-trade, no KOL alpha" framing applies to ZABAL / SANG markets.
 

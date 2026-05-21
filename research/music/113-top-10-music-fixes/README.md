@@ -1,7 +1,12 @@
 # 113 — Top 10 Music Fixes for ZAO OS
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** March 22, 2026
+> **Topic:** music
+> **Type:** bug-prioritization
+> **Original-Query:** What are the top 10 highest-impact music player bugs and missing features? Prioritize by effort and impact. (reconstructed)
+> **Last-Validated:** 2026-05-20
+> **Tier:** 1-critical
 > **Goal:** Identify and prioritize the 10 highest-impact music fixes after radio started working
 
 ## Priority Fixes

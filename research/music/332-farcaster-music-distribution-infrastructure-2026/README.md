@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Farcaster music distribution infrastructure web3, Sound.xyz Vault.fm Zora mini app ecosystem, ZAO opportunity (reconstructed)"
+related-docs: 340, 331, 324
+tier: STANDARD
+---
+
 # 332 - Music Distribution Infrastructure on Farcaster & Web3 (April 2026)
 
 > **Status:** Research complete

@@ -2,7 +2,8 @@
 topic: business
 type: market-research
 status: research-complete
-last-validated: 2026-05-01
+last-validated: 2026-05-20
+original-query: Ground-truth Whop in 2026 post-Tether post-2.7% fee cut profile creators extract playbook moves document dark side decide ZAO relationship with Whop Craig Gonzalez (reconstructed)
 related-docs: 363, 364, 443, 222, 252, 547, 552
 tier: DISPATCH
 ---

@@ -2,7 +2,8 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-20
+original-query: "What's the canonical ZABAL/ZAO brand kit page? How is it structured and maintained? (reconstructed)"
 related-docs: 547, 661, 663, 665
 tier: STANDARD
 ---

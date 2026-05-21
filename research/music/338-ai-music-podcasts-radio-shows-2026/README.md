@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AI podcasts radio shows music intros licensing monetization Farcaster (reconstructed)"
+related-docs: 313, 321, 332, 322
+tier: STANDARD
+---
+
 # 338 - AI-Generated Music for Podcasts, Radio Shows & Audio Content (2026)
 
 > **Status:** Research complete

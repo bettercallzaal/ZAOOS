@@ -2,7 +2,8 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-04-25
+last-validated: 2026-05-20
+original-query: Take V3 jlcolton principles extracted in doc 485 and turn into concrete distribution playbooks for every shipping ZAO entity ZAO OS ZAOstock ZAO Music ZAO Devz Hermes BCZ Strategies FISHBOWLZ (reconstructed)
 related-docs: 485, 474, 470, 432, 264, 311, 051, 363, 475, 498, 506
 tier: DEEP
 ---

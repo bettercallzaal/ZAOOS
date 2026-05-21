@@ -1,3 +1,12 @@
+---
+topic: music
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "How to use ElevenLabs Scribe v2 for transcribing ZAO fractal meetings and Spaces with speaker diarization and ZAO-specific keyterm prompting?"
+tier: production
+---
+
 # Doc 313 - ElevenLabs Scribe v2 Speech-to-Text for Community Transcription
 
 **Date:** 2026-04-11

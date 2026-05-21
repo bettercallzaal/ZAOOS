@@ -1,7 +1,12 @@
 # 155 — End-to-End Music NFT: Upload → Mint → Buy (Implementation Plan)
 
-> **Status:** Research complete + implementation plan
+> **Status:** research-complete
 > **Date:** March 27, 2026
+> **Topic:** music
+> **Type:** implementation-guide
+> **Original-Query:** How do artists mint atomic assets on Arweave via ArDrive Turbo? How do collectors buy on BazAR? What's the complete flow with code? (reconstructed)
+> **Last-Validated:** 2026-05-20
+> **Tier:** 4-shipping-ready
 > **Goal:** Complete step-by-step plan for a ZAO musician to upload MP3/MP4 + cover art, mint as purchasable atomic asset on Arweave/BazAR, and for collectors to buy easily
 
 ## The User Story

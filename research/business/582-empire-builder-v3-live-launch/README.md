@@ -2,7 +2,8 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-01
+last-validated: 2026-05-20
+original-query: Capture what shipped in Empire Builder V3 on 2026-05-01 soft launch from Adrian document new public API surface especially leaderboard endpoints give ZAO OS concrete plan to wire new endpoints (reconstructed)
 related-docs: 361, 165
 tier: STANDARD
 ---

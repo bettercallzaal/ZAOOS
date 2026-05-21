@@ -1,4 +1,13 @@
-# Doc 216 — AI Features for ZAO OS Live Rooms & Music
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AI features live rooms music transcription moderation DJ assistant 2026 (reconstructed)"
+tier: STANDARD
+---
+
+# 216 — AI Features for ZAO OS Live Rooms & Music
 
 > **Date:** 2026-03-28
 > **Status:** Research Complete

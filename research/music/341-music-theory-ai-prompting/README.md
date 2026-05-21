@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Music theory AI prompting Suno ElevenLabs ACE-Step key modes chord progressions (reconstructed)"
+related-docs: 334, 321, 313, 324
+tier: STANDARD
+---
+
 # Doc 341: Music Theory for AI Music Generation Prompts
 
 **Date:** 2026-04-11

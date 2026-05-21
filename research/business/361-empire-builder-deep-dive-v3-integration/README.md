@@ -1,6 +1,14 @@
+---
+topic: business
+type: deep-dive
+status: research-complete
+last-validated: 2026-05-20
+original-query: Comprehensive understanding of Empire Builder's features, V3 API endpoints, distribution mechanics, and how ZAO can maximize the integration for ZABAL rewards including RaidSharks raid-to-ZABAL pipeline (reconstructed)
+tier: STANDARD
+---
+
 # 361 - Empire Builder Deep Dive: V3 Features, Distribution, and ZAO Integration Strategy
 
-> **Status:** Research complete
 > **Date:** 2026-04-15
 > **Goal:** Comprehensive understanding of Empire Builder's features, V3 API endpoints, distribution mechanics, and how ZAO can maximize the integration for ZABAL rewards (including RaidSharks raid-to-ZABAL pipeline)
 

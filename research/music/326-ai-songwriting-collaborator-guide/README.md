@@ -1,9 +1,18 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AI songwriting collaborator guide - writing original lyrics for summer festival anthem, structure, rhyme schemes, hooks, melody, crowd elements (reconstructed)"
+related-docs: 319, 320, 334
+tier: STANDARD
+---
+
 # 326 - AI Songwriting Collaborator Guide: Writing "The Summer of 26"
 
 > **Status:** Research complete
 > **Date:** 2026-04-11
 > **Goal:** Complete guide to writing original lyrics for a summer festival anthem using AI collaboration - covers structure, rhyme, hooks, melody, crowd elements, and platform-specific formatting
-> **Related:** Doc 319 (AI Music Platforms), Doc 320 (Anatomy of Viral Summer Songs), Doc 320 (ElevenLabs Music API)
 
 ## Key Decisions / Recommendations
 

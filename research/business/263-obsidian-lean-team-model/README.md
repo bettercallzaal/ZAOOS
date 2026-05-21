@@ -1,3 +1,13 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: []
+original-query: "How does Obsidian run 9 people and $25M ARR? What lessons apply to ZAO's small-team model? (reconstructed)"
+tier: STANDARD
+---
+
 # 263 — Obsidian's Lean Team Model: $350M Valuation, 9 Employees, 3 Engineers
 
 > **Status:** Research complete

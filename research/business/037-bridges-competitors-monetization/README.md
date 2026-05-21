@@ -1,10 +1,18 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: []
+original-query: "What are Discord/Telegram bridges, competitors in decentralized music, and monetization strategies at small scale? (reconstructed)"
+tier: STANDARD
+---
+
 # 37 — Platform Bridges, Competitor Deep Dives, Monetization & SEO
 
 > **Status:** Research complete
 > **Date:** March 2026
 > **Goal:** Discord/Telegram bridges, competitor analysis, monetization at small scale, discoverability
-
----
 
 ## Critical Finding: Sound.xyz & Catalog Are Dead
 

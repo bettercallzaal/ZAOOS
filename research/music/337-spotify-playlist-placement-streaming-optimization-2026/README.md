@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Spotify playlist placement AI music streaming optimization editorial pitching (reconstructed)"
+related-docs: 322, 314, 321, 313
+tier: STANDARD
+---
+
 # Doc 337: Spotify Playlist Placement & Streaming Optimization for AI-Generated Music (2026)
 
 **Date:** 2026-04-11

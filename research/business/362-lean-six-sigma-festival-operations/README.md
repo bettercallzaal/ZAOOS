@@ -1,6 +1,14 @@
+---
+topic: business
+type: operations
+status: research-complete
+last-validated: 2026-05-20
+original-query: Apply Lean Six Sigma DMAIC + 7 wastes + SIPOC to ZAOstock festival planning with 4 teams 14 people 172 days (reconstructed)
+tier: STANDARD
+---
+
 # 362 - Lean Six Sigma for ZAO Festival Operations
 
-> **Status:** Research complete
 > **Date:** 2026-04-15
 > **Goal:** Apply Lean Six Sigma (DMAIC + 7 wastes + SIPOC) to ZAOstock festival planning with 4 teams, 14 people, 172 days
 

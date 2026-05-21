@@ -2,7 +2,8 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-12
+last-validated: 2026-05-20
+original-query: "How can ZABAL Games v0 integrate Clanker tokens and Empire Builder for player tokens and viewer signals? (reconstructed)"
 related-docs: 630, 628, 626, 584, 583, 582, 361, 324, 258, 631
 tier: STANDARD
 ---

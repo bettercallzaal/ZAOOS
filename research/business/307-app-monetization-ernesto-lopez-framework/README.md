@@ -1,11 +1,19 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: ["250"]
+original-query: "How does Ernesto Lopez's $800K/year app framework apply to ZAO OS and FISHBOWLZ monetization? (reconstructed)"
+tier: STANDARD
+---
+
 # 307 - App Monetization: Ernesto Lopez Framework vs ZAO OS Reality
 
 > **Status:** Research complete
 > **Date:** April 8, 2026
 > **Goal:** Evaluate Ernesto Lopez's $800K/year app framework against ZAO OS and FISHBOWLZ monetization options
 > **Source:** Inbox item from zoe-zao@agentmail.to (forwarded X post)
-
----
 
 ## Key Decisions / Recommendations
 

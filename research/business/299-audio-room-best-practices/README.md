@@ -1,11 +1,19 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: ["255", "280", "281", "290", "298"]
+original-query: "What are best practices for audio rooms? How do Clubhouse, X Spaces, Discord work? (reconstructed)"
+tier: STANDARD
+---
+
 # 299 - Audio Room Best Practices: UX, Retention, Moderation, and Accessibility for FISHBOWLZ
 
 > **Status:** Research complete
 > **Date:** 2026-04-07
 > **Goal:** Synthesize best practices from Clubhouse, X Spaces, Discord Stage Channels, and open-source implementations into actionable recommendations for FISHBOWLZ - persistent audio rooms with hot seat rotation, transcription, and chat
 > **Updates:** Doc 255 (FISHBOWLZ spec), Doc 280 (MVP to SaaS roadmap), Doc 281 (competitive landscape), Doc 290 (agentic participants), Doc 298 (tokenization)
-
----
 
 ## Key Decisions / Recommendations
 

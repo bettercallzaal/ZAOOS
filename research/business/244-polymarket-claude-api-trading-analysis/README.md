@@ -1,10 +1,18 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: []
+original-query: "Can ZOUNZ treasury use Claude API + Polymarket for trading revenue? What's the strategy and risk? (reconstructed)"
+tier: STANDARD
+---
+
 # 244 — Polymarket Trading as ZOUNZ Treasury Revenue: Claude API + Open-Source Toolkit
 
 > **Status:** Research complete
 > **Date:** April 1, 2026
 > **Goal:** Evaluate using Polymarket prediction market trading (Claude API + open-source tools) as a revenue engine for the ZOUNZ DAO treasury
-
----
 
 ## Key Decisions / Recommendations
 

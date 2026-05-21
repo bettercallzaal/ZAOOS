@@ -1,7 +1,17 @@
-# 255 — FISHBOWLZ: Persistent Async Audio Spaces
+---
+topic: music
+type: research-complete
+status: _archive_candidate
+last-validated: 2026-05-20
+original-query: "FISHBOWLZ persistent audio spaces design spec 2026 (reconstructed)"
+tier: STANDARD
+notes: "FISHBOWLZ paused 2026-04-16 — partnering with Juke (nickysap) Farcaster audio client instead. See project_fishbowlz_deprecated in memory."
+---
+
+# 255 — FISHBOWLZ: Persistent Async Audio Spaces [ARCHIVE CANDIDATE]
 
 **Category:** Product / Miniapp
-**Status:** Pre-launch (Clanker token Apr 4 2026)
+**Status:** Pre-launch (Clanker token Apr 4 2026) - PAUSED for Juke partnership
 > **Date:** 2026-04-04
 **Priority:** P0
 

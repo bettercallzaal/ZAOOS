@@ -18,7 +18,7 @@ tier: DEEP
 | Decision | Recommendation | Why |
 |----------|---|---|
 | **orclient version for ZAO OS** | Use `@ordao/orclient` v1.4.4 (published April 2, 2026) with ethers bridge | Latest stable, active maintenance (3+ commits since April 2, GPL-3.0 compatible) |
-| **Respect.Games integration** | Monitor respectgame.web.app (beta rebuild); defer ZAO embed until v2 ships | Current version has community creation bugs; Vlad rebuilding with new consensus algo |
+| **Async Respect Game app** | Do not build on respectgame.app - it is not in active development (per Dan SingJoy, May 2026) | If ZAO wants async games, build native on @ordao/orclient or see doc 664 |
 | **Cignals status** | Consider community fork/spec if ZAO wants music-competition ranking at live events | Still "in development" but tested at 3+ Eden Fractal sessions; demo videos released May 2026 |
 | **Fractalgram for ZAO** | NOT recommended for ZAO OS integration (heavy fork, Telegram-only) | Use fractalgram at external Telegram sessions; keep ZAO OS consensus logic natively built |
 | **frapps subdomains** | Confirm zao.frapps.xyz, of.frapps.xyz, eden-fractal.frapps.xyz resolve; verify DNS/SSL quarterly | Deployment stable but no monitoring dashboard in docs |
@@ -26,40 +26,33 @@ tier: DEEP
 
 ---
 
-## 1. Respect.Games App - Current Status
+## 1. respectgame.app - Async Respect Game App
 
 ### What It Does
 
-Respect.Games is an **async-first** web app for playing the Respect Game without requiring live meetings. Communities submit contributions, peers review and rank them (Level 1-6), and soulbound Respect tokens are minted on-chain, all on a self-paced schedule.
+respectgame.app is an async-first web app for playing the Respect Game without requiring live meetings. Community members coordinate by writing - submitting contributions and ranking each other on a self-paced schedule, often with no scheduled meeting at all. Results are minted on-chain as soulbound ERC-1155 Respect tokens on a Fibonacci-curve payout.
 
-- Flexible contribution submission (week-long windows)
-- 24-hour group ranking period after submissions close
-- 2/3 consensus required on final rankings
-- Results minted as ERC-1155 soulbound Respect tokens (non-transferable)
-- Fibonacci-curve payout: rank 6 earns roughly 2x rank 5, encouraging quality over consensus-gaming
-- Built on Base (EVM), with Optimism fallback support planned
+### Current Status: NOT in active development (verified May 2026)
 
-### Current Status: Rebuilding
+Primary source: Dan SingJoy (Eden Fractal founder), written response, May 2026.
 
-- **Original beta:** https://respect.games - had community-creation bugs, limited access to existing communities
-- **New URL:** respectgame.web.app (as of May 2026)
-- **Lead developer:** Vlad (building next-generation version with redesigned architecture)
-- **New features in development:** Averaged-consensus mode (alternative to 2/3 threshold), AI-enhanced contribution summaries, liquidity pool integration for rewards
-- **Smart contracts deployed on Base:** 5 contracts live; Rankings contract at 0xe0DF8059637EEB20464Faa169227DFeA819c36d7 [PARTIAL - unable to verify all 5 addresses]
-- **Status:** Beta/rebuilding. Expect improved UX and reliability in mid-June 2026.
+- The app is `respectgame.app`, built by @cxzvnk's team.
+- Dan's assessment: "a promising app and includes many excellent features."
+- It is NOT currently in active development - per Dan, the lead developer "has been working on another project lately."
+- Dan's broader verdict on async fractal tooling: "Asynchronous fractal apps have great potential, but in my experience the simplest and most effective solution so far has been to meet at a consistent time."
+
+Correction: a March 2026 draft of this doc described an active "v2 rebuild" of this app (new consensus algorithm, AI contribution summaries, liquidity-pool rewards, a mid-June 2026 launch) attributed to a developer named "Vlad". That could not be confirmed and is contradicted by Dan SingJoy's primary-source account. Treat the async Respect Game app as dormant, not as a tool with an imminent v2. The respectgame.app site loads as a JavaScript app shell that does not render to fetch tools - the status above is sourced from Dan SingJoy directly.
 
 ### Open Source
 
-- Respect.Games smart contracts: Open-source MIT License (distinct from ORDAO's GPL-3.0)
-- ORDAO contracts (Respect1155, OREC): GPL-3.0, in [sim31/ordao](https://github.com/sim31/ordao)
-- Frontend code: Located in Optimystics org but may be in Vlad's private repo pending rewrite completion
+- ORDAO contracts (Respect1155, OREC): GPL-3.0, in [sim31/ordao](https://github.com/sim31/ordao).
+- The respectgame.app frontend and contract repo location is not confirmed.
 
 ### Integration Options for ZAO OS
 
-1. **Link out to respectgame.web.app** - Zero dev effort, but depends on Respect.Games availability
-2. **Embed via iframe** - Check CORS/CSP headers when v2 ships
-3. **Build ZAO-native async UI** - Use `@ordao/orclient` to read/write proposals; keep ZAO dark theme, mobile-first
-4. **Wait for v2 launch** - Recommended. Vlad's rebuild should address the current bugs. Monitor via Optimystics X/Discord.
+1. **Do not depend on respectgame.app** - it is not actively maintained; pointing ZAO members at a dormant app is a dead end.
+2. **Build ZAO-native async UI** - if ZAO wants async Respect Games, build on `@ordao/orclient`, or pursue the GitHub-native fractal idea in doc 664.
+3. **Keep the synchronous Monday 6pm fractal as the primary mode** - this matches Dan SingJoy's experience that a consistent meeting time is the simplest, most effective approach.
 
 ---
 
@@ -346,7 +339,7 @@ Fractalgram is a **fork of Telegram Web A** tailored for live fractal meetings. 
 **Why:** It's a heavy, complex Telegram fork. Better alternatives:
 
 1. **Keep Fractalgram in Telegram** - Use it at external ZAO meetings (Monday 6pm Discord call)
-2. **Build ZAO-native async** - Use Respect.Games v2 (coming June 2026) or GitHub-native fractal (doc 664 explores this)
+2. **Build ZAO-native async** - build on `@ordao/orclient`, or explore the GitHub-native fractal idea (doc 664). Do not wait on respectgame.app; it is dormant.
 3. **Avoid the fork cost** - Fractalgram maintenance burden is high; Optimystics is the only active maintainer
 
 **If ZAO wants live session automation:** Extract polling logic from Fractalgram and build native ZAO OS UI (React + Chakra) instead. Can reuse ORDAO contract logic via orclient.
@@ -413,7 +406,7 @@ Fractalgram is a **fork of Telegram Web A** tailored for live fractal meetings. 
 - In-app proposal creation (currently at zao.frapps.xyz)
 - In-app voting + execution
 - Breakout result submission from ZAO OS
-- Async proposal support (Respect.Games v2 integration)
+- Async proposal support (build native on @ordao/orclient; respectgame.app is dormant)
 
 ### Recommended Integration (Phase 2)
 
@@ -494,7 +487,7 @@ export async function createORClientForViem(walletClient) {
 |---|---|---|---|
 | **Choose: Link vs embed vs self-host zao.frapps.xyz** | @Zaal | Week 1 | Unblock ZAO OS `/fractals` page UX decision |
 | **Integrate orclient for proposal creation** | @ZAO Dev | Phase 2 (Jun) | Enable in-app voting without zao.frapps.xyz fallback |
-| **Test Respect.Games v2 beta** | @ZAO Dev | Jun 2026 | Evaluate for async fractal fork support |
+| **Decide async-fractal approach** | @ZAO Dev | Jun 2026 | Build native on @ordao/orclient or pursue doc 664 GitHub-native fractal; respectgame.app is dormant |
 | **Document Fractalgram setup for live sessions** | @Zaal | Ongoing | Help non-technical members (Tanja, etc) use Discord bot + Telegram |
 | **Evaluate Cignals fork for ZAOstock music ranking** | @Zaal + Cassie | May-Jun | Prepare event automation (Oct 3 deadline) |
 
@@ -515,7 +508,7 @@ export async function createORClientForViem(walletClient) {
 - [Optimystics/fractalgram GitHub](https://github.com/Optimystics/fractalgram) - Telegram fork [FULL]
 
 **Respect.Games:**
-- [respectgame.web.app](https://respectgame.web.app) - Current beta [PARTIAL - endpoint check deferred]
+- [respectgame.app](https://respectgame.app) - async Respect Game app by @cxzvnk's team [PARTIAL - JS app shell, will not render to WebFetch or exa; status sourced from Dan SingJoy's written account, May 2026]
 - [optimystics.io/respect-games-app](https://optimystics.io/respect-games-app) - Overview + features [FULL]
 
 **Deployment & frapps:**

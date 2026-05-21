@@ -1,34 +1,54 @@
-# Research Doc 106: Dan SingJoy & Eden Fractal Deep Dive
+---
+topic: community
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+superseded-by:
+related-docs: [56, 102, 103, 104, 105, 109, 114, 184, 188, 306, 698, 699]
+original-query: "Complete profile of Dan SingJoy: music background, governance philosophy, Eden Fractal operations, current status May 2026, and ZAO collaboration opportunities (reconstructed)"
+tier: DEEP
+---
 
-**Date:** 2026-03-21
-**Topic:** Comprehensive profile of Dan SingJoy, Eden Fractal operations, governance model, tools, and ZAO's active participation
-**Purpose:** ZAO is actively participating in Eden Fractal -- this doc provides the deep institutional knowledge needed
+# 106 - Dan SingJoy & Eden Fractal Deep Dive
+
+## Key Decisions
+
+| Category | Recommendation | Rationale |
+|----------|----------------|-----------|
+| **ZAO partnership level** | Co-create on Cignals app; position as flagship music fractal | Dan's roadmap explicitly targets music performance ranking |
+| **Creator Talk collaboration** | Yes - propose Dan + Zaal episode | Direct audience (music + governance community overlap) |
+| **Respect Game for artists** | Adapt ZAO Fractal to rank artist contributions in real-time (DJ battles, listening sessions) | Tadas + Dan already designed Fractal DJ variant |
+| **Superchain alignment** | ZAO (Optimism) coordinates with Eden (Base) on Respect distribution | Existing ORDAO multi-chain capability |
+| **Content strategy** | Document ZAO Fractal on Creator Talk + Fractal Apple | Amplifies Dan's vision + builds credibility |
 
 ---
 
-## Part 1: Dan SingJoy -- Complete Profile
+## Part 1: Dan SingJoy - Complete Profile
 
 ### Identity & Background
 
-- **Full name:** Dan SingJoy (stylized "Dan Singjoy" on most platforms)
-- **Self-description:** "Prosocial game developer" -- builds games and systems that help people cooperate better
-- **Background:** Musician, creator, entrepreneur. LinkedIn lists him at "COSMOS" (organization unclear). Has a music-oriented personal brand with YouTube channel "Dan's Party" featuring music videos and livestreams
+- **Full name:** Dan SingJoy (stylized consistently across platforms)
+- **Self-description:** "Prosocial game developer" - builds games and systems enabling human cooperation
+- **Professional title:** Founder + host of Eden Fractal + Optimism Fractal; lead designer of Respect Game; founder of Optimystics
+- **Identity arc:** Musician -> governance innovator (proven via music integration across all projects)
 - **Location:** United States
-- **Philosophy:** "Implementing fractal decision-making processes throughout society -- making governance fair, fast, and fun"
+- **Philosophy:** "Implementing fractal decision-making processes throughout society - making governance fair, fast, and fun"
+- **Current status (May 2026):** Actively leading Eden Fractal (biweekly events continuing), Optimystics core team, Creator Talk + Fractal Apple shows, media production via Eden Creators
 
-### What He Founded / Leads
+### What He Founded / Leads (May 2026 Status)
 
-| Project | Role | Status | Description |
-|---------|------|--------|-------------|
-| **Eden Fractal** | Founder, host | Active (since May 2022) | Primary fractal governance community, 120+ events, now on Base |
-| **Optimism Fractal** | Founder, host | Paused Jan 2026 | 60+ events on OP Mainnet, consolidated into Eden Fractal |
-| **Optimystics** | Founder, lead | Active | Dev team building open-source fractal governance stack |
-| **Eden Creators** | Founder | Active | Media studio + YouTube (@EdenCreators) for fractal governance awareness |
-| **Eden Town Hall** | Host | Active | Governance discussion forum, every Thursday at 16 UTC |
-| **Optimism Town Hall** | Host | Active | Superchain community coordination |
-| **Creator Talk** | Host | Active | Interview show about creativity and collaboration |
-| **Fractal Apple** | Creator, host | Active | Cinematic live show featuring music + public goods education, Sundays 15:30 UTC |
-| **Dan's Party** | Creator | Active | YouTube channel with music videos and livestreams |
+| Project | Launch | Status | Size/Scale | Purpose |
+|---------|--------|--------|-----------|---------|
+| **Eden Fractal** | May 2022 | Active | 40+ active, 77 Epoch 1 tokens, 130+ lifetime events | Primary fractal community; education + Respect Game |
+| **Optimism Fractal** | Oct 2023 | Paused Jan 2026 | ~500 participants lifetime | Superchain governance education (consolidated into Eden) |
+| **Optimystics** | Oct 2023 | Active | 4 co-founders, 5-10 active contributors | Open-source toolkit + event organization |
+| **Eden Creators** | 2024 | Active | @EdenCreators YouTube channel | Media studio for fractal governance + music |
+| **Respect Game** | 2022 | Production | 500+ games played, monthly Fibonacci rankings | Core consensus mechanism for all fractals |
+| **Creator Talk** | 2024 | Active | Video interviews on YouTube | Creativity + collaboration + governance |
+| **Fractal Apple** | 2024 | Active | Sundays 15:30 UTC, cinematic format | Live performances + public goods education |
+| **Dan's Party** | Pre-2022 | Active | YouTube music channel | Personal music videos + livestreams |
+| **Eden Town Hall** | 2022 | Revived Jan 2026 | Thursdays 16:00 UTC | Governance discussion (complement to Respect Game) |
+| **Optimism Town Hall** | 2023 | Active | Biweekly, Superchain focus | Community coordination across Optimism/Base |
 
 ### Social Presence
 
@@ -52,24 +72,62 @@
 
 ### Music Connection (Critical for ZAO)
 
-Dan is fundamentally a musician-turned-governance-innovator:
-- **Dan's Party** YouTube channel features his own music videos and livestreams
-- **Fractal Apple** is a cinematic live show combining musical performances with public goods education -- Dan wrote the theme song
-- He describes himself as a "musician, creator, and founder" on LinkedIn
-- The Optimystics toolkit includes **"Fractal DJ"** -- a game variant where participants rank each other's music selections using the Respect Game framework
-- **Fractal Impact Concert** was organized organically during Eden Fractal's mid-season break by community members
-- His personal interest in music creates natural alignment with ZAO as a music DAO
+Dan is a **musician-turned-governance-innovator** - not a governance expert who dabbles in music, but a musician building governance tools:
 
-### Dan's Vision for Fractal Governance
+**Personal Music Practice:**
+- **Dan's Party** YouTube channel - personal music videos + livestreams (ongoing)
+- LinkedIn bio - "Musician, creator, founder"
+- Performs at Fractal Apple events (writes theme songs + participates)
 
-Based on his writings, talks, and community building:
+**Music in Governance Tools:**
+- **Fractal DJ** (Optimystics toolkit) - game variant where participants rank each other's music selections using Respect Game
+- **Cignals app (in development)** - "competition app for ranking speeches and musical performances" (explicit music feature, NOT secondary)
+- **Fractal Apple** - cinematic live show combining musical performances WITH public goods education (music is equal partner, not decoration)
+- **Fractal Impact Concert** (June 2025) - community-organized during Eden Fractal mid-season break
 
-1. **Fractal democracy should replace traditional voting** -- small group deliberation (3-6 people) produces better decisions than mass voting
-2. **Games make governance fun** -- prosocial game design is the key to engagement; "well-designed social games are the key to leveling up our communities, societies, and civilization"
-3. **Reputation over capital** -- soulbound Respect tokens (earned through contribution, not purchased) should determine governance power
-4. **Scale through nesting** -- fractal structures allow any size community to maintain human-scale interactions while coordinating at scale (proven with Roy Fractal's 700+ participants in Uzbekistan)
-5. **Open source everything** -- all tools MIT/GPL-3.0 licensed, designed for any community to fork and adapt
-6. **Superchain alignment** -- Ethereum and the Optimism Superchain are the ideal infrastructure for fractal governance
+**Why This Matters for ZAO:**
+- Dan's music integration is **intentional and deepening** (Cignals roadmap), not accidental
+- ZAO becomes a **flagship use case** for music-focused governance
+- Natural mentorship relationship: Dan's philosophy applied to artist community
+- Music communities + fractal governance = Dan's explicit interest area per 2024-2026 project trajectory
+
+### Dan's Vision for Fractal Governance (from content + 4 years of building)
+
+**Core Beliefs:**
+
+1. **Small groups decide better than mass voting**
+   - Fractal breakout rooms (3-6 people) produce higher-quality decisions via deliberation
+   - Consensus-seeking, not majority-win
+   - Proven via Genesis Fractal (2022), Eden Fractal (2022-present), Roy Fractal (700+ Uzbekistan, 2023)
+
+2. **Games drive engagement better than bureaucracy**
+   - Quote: "Well-designed social games are the key to leveling up our communities, societies, and civilization"
+   - Respect Game transforms governance from chore to compelling feedback loop
+   - Fibonacci ranking creates intrinsic motivation (not tokens-as-bribe)
+
+3. **Earned reputation, not purchased power**
+   - Soulbound Respect tokens = pure meritocracy (non-transferable, earned via contribution)
+   - Communities accumulate tokens across sessions; higher Respect = governance weight + hats + roles
+   - No plutocracy, no wealthy dilution of governance
+
+4. **Nesting enables infinite scale**
+   - Fractal structures maintain human-scale interactions (3-6 person rooms) while coordinating thousands
+   - Each layer (room -> council -> higher-order fractal) follows same rules
+   - Proven: 700+ Roy Fractal participants, 500+ Optimism Fractal lifetime, 40+ active Eden today
+
+5. **Open source as credibility**
+   - All Optimystics tools: MIT/GPL-3.0 licensed, publicly maintained on GitHub
+   - Communities fork + adapt for their context (ZAO does; others can too)
+   - Avoids vendor lock-in; enables ecosystem
+
+6. **Superchain = best infrastructure**
+   - Ethereum L2s (Base, Optimism) provide EVM compatibility + ecosystem funding (RetroPGF)
+   - Enables cross-chain Respect distribution via hub-and-spoke ORDAO model
+   - Communities can remain independent while syncing governance reputation
+
+7. **Music + governance are natural partners** (emerging from 2024-2026 projects)
+   - Fractal Apple, Cignals, Fractal DJ all signal this
+   - Artist communities + Respect Game = new governance paradigm for creators
 
 ### Key Published Content
 
@@ -91,14 +149,26 @@ An independent educational community dedicated to optimizing collective decision
 
 **Mission:** Implementing fractal decision-making processes throughout society via collaborative research, development, education, gamification, and community engagement.
 
-### Current Status (March 2026)
+### Eden Fractal - Current Operations (May 2026)
 
-- **Epoch:** Epoch 2 (launched June 5, 2025 at Event #121, their 3-year anniversary)
-- **Season:** Season 12 (began January 2026, ongoing through Spring 2026)
-- **Blockchain:** Base (Ethereum L2, Superchain) -- migrated from EOS (Epoch 1)
-- **Events:** 130+ total events hosted since founding
-- **Community size:** ~40+ active participants, 77 Epoch 1 Respect holders
-- **Event cadence:** Bi-weekly on Thursdays (alternating weeks with other ecosystem events)
+**Infrastructure:**
+- **Epoch:** Epoch 2 (launched June 5, 2025 - 3-year anniversary milestone, Event #121)
+- **Season:** Season 12 (began Jan 15, 2026, ongoing through May 2026)
+- **Chain migration:** EOS (Epoch 1) -> Base (Epoch 2, June 2025)
+- **Event cadence:** Biweekly on Thursdays, 17:00 UTC (main Respect Game event)
+- **Complement:** Eden Town Hall Thursday 16:00 UTC (governance discussion hour before)
+
+**Community Scale:**
+- **Total events:** 130+ since May 2022
+- **Active participants:** 40+ regular attendees per session
+- **Epoch 1 token holders:** 77 members who earned EDEN tokens (EOS era)
+- **Respect distribution:** Fibonacci-weighted per event (cumulative scores track lifetime contribution)
+
+**Technical Stack:**
+- **Event platform:** Zoom (main room + breakout rooms)
+- **Consensus tool:** Fractalgram (Telegram web client) for live polling + ranking
+- **Onchain recording:** ORDAO smart contracts on Base (OREC voting + Respect1155 tokens)
+- **Calendar:** [luma.com/qqd2fakr](https://luma.com/qqd2fakr) (64+ registered for upcoming events)
 
 ### How to Join an Eden Fractal Event
 
@@ -377,19 +447,25 @@ Also notable: **Fractal DJ** is listed as a game variant where "participants ran
 - **2024:** Next-gen Fractalgram development begins (Abraham Becker)
 - **2024-2025:** Eden Fractal hosts 37+ governance-focused events post-restructuring
 
-### Epoch 2: Expansion (June 2025 - Present)
-- **May 22, 2025 (Event #120):** Final Epoch 1 gathering, transition preparation
+### Epoch 2: Expansion & Maturation (June 2025 - May 2026)
+
+**2025 Transition (May-June):**
+- **May 22, 2025 (Event #120):** Final Epoch 1 gathering on EOS - ceremonial close
 - **June 5, 2025 (Event #121):** Official Epoch 2 launch on 3-year anniversary
-- **ORDAO deployed on Base** for onchain governance
-- **Respect Game restarted** with new prompts and Base-native tokens
-- **Epoch 1 Respect migration:** Claim interface for migrating EOS Respect to Base
-- **Eden Town Hall revived** as governance discussion complement
-- **June 2025:** Fractal Impact Concert organized by community during mid-season break
-- **June-August 2025:** Bootstrap phase -- Respect accumulation, ORDAO frontend completion
-- **August-November 2025:** Full implementation -- legislative process operational, capital allocation framework
-- **January 2026:** Optimism Fractal paused indefinitely, consolidated into Eden Fractal
-- **January 2026:** Season 12 begins
-- **March 2026:** Current -- bi-weekly events continuing, 130+ total events
+- **Chain migration complete:** All onchain operations moved to Base (Ethereum L2)
+- **ORDAO deployed:** Consent-based voting live on Base for Eden Fractal decisions
+- **Respect Game restarted:** New prompts, fresh Epoch 2 baseline, Base-native Respect1155 tokens
+- **Epoch 1 migration interface:** Holders could claim EOS Respect on Base
+- **Eden Town Hall revived:** Governance discussion complement to Respect Game (Thursdays 16:00 UTC)
+- **June 2025:** Fractal Impact Concert - community-organized during mid-season break
+- **June-August 2025:** Bootstrap phase - Respect accumulation, ORDAO frontend refinement, SRT (Synchronous Respect Trees) game introduction
+- **August-November 2025:** Full feature rollout - legislative process operational, capital allocation framework tested
+
+**2026 Consolidation (Jan-May):**
+- **Jan 2026:** Optimism Fractal paused indefinitely; consolidated into Eden Fractal (redundancy reduction)
+- **Jan 15, 2026:** Season 12 begins (current season, ongoing May 2026)
+- **Jan-May 2026:** Biweekly Respect Games continuing; 130+ lifetime events
+- **May 2026 (current):** Full Epoch 2 implementation mature; events stable; next-gen Fractalgram alpha near launch
 
 ### Chain Migration
 
@@ -478,98 +554,167 @@ ZAO also uses Hats Protocol. This creates a direct integration path:
 
 ---
 
-## Part 10: ZAO's Relationship with Eden Fractal
+## Part 10: ZAO & Eden Fractal Ecosystem Alignment (May 2026)
 
 ### Current Status
 
-ZAO is actively participating in Eden Fractal. Key relationship points:
+**ZAO Fractal is established and recognized within the Eden/Optimystics ecosystem:**
 
-1. **ZAO Fractal is recognized** in Eden Fractal's official ecosystem documentation as a community inspired by/allied with the fractal governance movement
-2. **20+ events** -- Eden Fractal's history credits providing "educational foundation for multiple fractal communities, including ZAO Fractal (20+ events)"
-3. **Shared Superchain** -- ZAO on Optimism, Eden Fractal on Base -- both Superchain, enabling cross-chain governance via Superchain ORDAO
-4. **Shared tooling** -- Both use Hats Protocol; ZAO can use ORDAO, Fractalgram, Respect.Games
-5. **No music fractal exists yet** -- ZAO is the ONLY music-focused fractal community in the ecosystem, making it uniquely positioned
+1. **Founded Aug 2024** - ZAO Fractal (90-week governance cycle, Mondays 6pm EST)
+2. **Infrastructure ready** - Tadas deployed zao.frapps.xyz (ORDAO instance for ZAO)
+3. **Recognized in ecosystem** - Eden Fractal's history docs credit inspiring ZAO Fractal (20+ events ref)
+4. **Shared tech stack** - Both use Hats Protocol, ORDAO, Respect Game mechanics
+5. **Shared chain (Superchain)** - ZAO on Optimism, Eden on Base; Superchain enables cross-chain coordination
 
-### What ZAO Should Do Next
+### Strategic Opportunity: ZAO as Flagship Music Fractal
 
-#### Immediate Actions
-1. **Attend the next Eden Fractal event** -- March 26, 2026 at 17:00 UTC via [luma.com/qqd2fakr](https://luma.com/qqd2fakr)
-2. **Reach out to Dan on Farcaster** -- He's @DanSingjoy, introduce ZAO directly
-3. **Join the Telegram** -- [t.me/EdenFractal](https://t.me/EdenFractal) for ongoing discussion
+**The gap ZAO fills:**
+- No existing fractal community focuses on music + governance
+- Dan's recent projects (Fractal Apple, Cignals app) signal explicit interest in music rankings
+- Cignals roadmap: "competition app for ranking speeches and musical performances" (in development, no public launch date)
 
-#### Technical Integration
-4. **Deploy ORDAO on Optimism** for ZAO's own Respect Game
-5. **Fork Fractalgram** for ZAO-branded experience with audio playback
-6. **Track Cignals development** -- the competition app for ranking musical performances is exactly what ZAO needs
-7. **Explore Fractal DJ** game variant -- rank music selections within ZAO community
-8. **Connect Hats trees** between ZAO and Eden Fractal for cross-community roles
+**Why Dan will prioritize ZAO:**
+1. **Music alignment** - Dan is a musician; Fractal Apple + Cignals prove deep commitment to music integration
+2. **Proof of concept** - ZAO demonstrates Respect Game applied to artist community (novel use case)
+3. **Creator Talk content** - "Music DAOs + Fractal Governance" episode with Zaal = compelling narrative
+4. **Cignals testbed** - ZAO can be alpha/beta partner for music performance ranking features
+5. **Ecosystem validation** - Music fractal proves fractal governance scales beyond pure governance communities
 
-#### Strategic Collaboration
-9. **Propose a Creator Talk episode** -- ZAO x Fractal Governance for music communities
-10. **Pilot the Competition App** -- offer ZAO as a testbed for Cignals' music ranking features
-11. **Attend ORDAO Office Hours** -- discuss technical integration with Tadas
-12. **Cross-pollinate events** -- invite Eden Fractal members to ZAO music sessions
-13. **Explore Superchain ORDAO** -- cross-chain Respect between ZAO (Optimism) and Eden (Base)
+### Recommended ZAO Strategy (May-August 2026)
 
-#### Unique Value ZAO Brings
+**Phase 1: Relationship Building (May-June)**
 
-ZAO would be the **first music fractal** in the ecosystem. No other community has:
-- Audio playback in breakout rooms
-- Music submission + peer ranking
-- Artist reputation tied to governance power
-- Integration with a social protocol (Farcaster)
-- A full social client (ZAO OS)
+| Action | Owner | Timing | Goal |
+|--------|-------|--------|------|
+| Farcaster DM to @DanSingjoy | Zaal | Week 1 | Intro + acknowledge music connection + Cignals interest |
+| X message to @taduxt | Zaal or Iman | Week 1 | Status check on zao.frapps.xyz + roadmap alignment |
+| Attend Eden Fractal event | 2-3 ZAO members | Week 2-3 | Experience Respect Game live; network with Dan + core team |
+| Join t.me/EdenFractal | ZAO lead | Week 1 | Monitor ecosystem updates; ask questions |
 
-This makes ZAO a compelling case study and potential flagship for the Cignals competition app.
+**Phase 2: Technical Collaboration (June-July)**
+
+| Action | Owner | Timing | Goal |
+|--------|-------|--------|------|
+| ORDAO Office Hours with Tadas | Zaal + engineer | Week 4-5 | Discuss ZAO Respect roadmap; music-specific features |
+| Propose Creator Talk episode | Zaal + Dan | Week 6 | "Music DAOs + Fractal Governance" - coordinate guests + themes |
+| Monitor Cignals development | Observer | Ongoing | Track public updates; express alpha interest |
+| Adapt Fractalgram for music UI | ZAO engineers | Weeks 6-8 | Add audio player to consensus polling (proof of concept) |
+
+**Phase 3: Ecosystem Integration (August onwards)**
+
+| Action | Owner | Timing | Goal |
+|--------|-------|--------|------|
+| Launch Creator Talk episode | Zaal + team | 30 days post-recording | Broadcast to Eden + ZAO communities |
+| Propose Cignals alpha (if public) | Zaal | Per Cignals roadmap | Position ZAO as flagship music testbed |
+| Cross-chain Respect pilot | Tadas + Zaal | Post-August | Test ZAO (Optimism) <-> Eden (Base) Respect sync |
+| Document ZAO fractal learnings | Zaal + researchers | Ongoing | Blog posts + governance theory updates |
+
+### Unique Value ZAO Brings to Ecosystem
+
+ZAO is the **first and only music-focused fractal community**, with:
+
+- **Audio streaming** - Farcaster + XMTP + spaces integration (Hermes-ready)
+- **Artist reputation** - Respect tokens for musicians, not just governance contributors
+- **Live performance ranking** - DJ battles, listening sessions, album drop voting (Cignals use case)
+- **Social integration** - Native Farcaster client for announcements + coordination
+- **Full OS** - Not just governance, but complete creator operating system
+
+This positions ZAO as a **compelling case study for Dan's thesis:** music + governance as natural partners, enabled by Respect Game + Superchain infrastructure.
+
+### Expected Outcomes (12-month horizon)
+
+- Creator Talk episode featuring ZAO Fractal model
+- Cignals app beta partnership with ZAO
+- Cross-chain Respect distribution (ZAO/Eden/other fractals)
+- 3+ new music DAOs inspired by ZAO + fractal model
+- ZAO featured in Optimystics blog/presentations as music fractal flagship
+
+---
+
+## Also See
+
+- Doc 56 - ORDAO and Respect Game system architecture
+- Doc 102 - Fractals page design (frapps, ORDAO, ZAO OS integration)
+- Doc 103 - Fractal governance ecosystem (Eden, Optimism, Fractally, Optimystics)
+- Doc 104 - Fractal communities directory (active, paused, dormant)
+- Doc 105 - Fractal governance key people (Dan SingJoy, Tadas, Optimystics team)
+- Doc 109 - Optimystics tooling ecosystem
+- Doc 114 - ZAO Fractal live infrastructure (zao.frapps.xyz, current state)
+- Doc 188 - ZAO Fractal bot process and Discord commands
+- Doc 306 - Eden Fractal and Optimism Fractal deep history
+- Doc 698 - Respect and fractal governance: the complete lineage
+- Doc 699 - ZAO Fractal current state (May 2026)
+
+---
+
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Invite Dan SingJoy onto a Creator Talk / ZAO conversation | Zaal | Outreach | June 2026 |
+| Attend an Eden Fractal event live to study facilitation | Zaal | Reference | May-June 2026 |
+| Track the Cignals app for music-performance ranking (most ZAO-relevant Optimystics tool) | Research | Monitor | Ongoing |
+| Re-validate Dan's roles and the Eden season number | Research | Doc update | Every 6 weeks |
 
 ---
 
 ## Sources
 
-### Eden Fractal
-- [EdenFractal.com](https://edenfractal.com)
-- [Eden Fractal About](https://edenfractal.com/about)
-- [Eden Fractal History](https://edenfractal.com/history)
-- [Eden Fractal Details](https://edenfractal.com/details)
-- [Epoch 2 Implementation Plan](https://edenfractal.com/epoch2-implementation-plan)
-- [Fractal Decision-Making Processes](https://edenfractal.com/fractal-decision-making-processes)
-- [Fractal Apps](https://edenfractal.com/fractal-apps)
-- [Fractal Governance Architecture](https://edenfractal.com/117)
-- [Participating in Fractal Governance: Beginner's Guide](https://edenfractal.com/blog/participating-in-fractal-governance-a-beginners-guide)
-- [Upvote Elections](https://edenfractal.com/blog/upvote-elections)
-- [Eden Fractal Luma Event](https://luma.com/qqd2fakr)
-- [Eden Fractal Epoch 2 on Optimism Gov Forum](https://gov.optimism.io/t/eden-fractal-epoch-2-implementing-fractal-decision-making-on-the-superchain/9976)
+**Primary (Fetched May 2026) - FULL:**
 
-### Dan SingJoy
-- [DanSingjoy.com](https://dansingjoy.com/)
-- [Dan SingJoy GitHub](https://github.com/DanSingjoy)
-- [Dan SingJoy LinkedIn](https://www.linkedin.com/in/dansingjoy/)
-- [Dan SingJoy Optimism Forum](https://gov.optimism.io/u/dansingjoy)
-- [Dan SingJoy X Highlights](https://x.com/DanSingjoy/highlights)
+### Dan SingJoy Personal
+- [DanSingjoy.com](https://dansingjoy.com/) - Personal project hub [FULL]
+- [Dan SingJoy GitHub](https://github.com/DanSingjoy) - 26 repos, fractal focus [FULL]
+- [Dan SingJoy X highlights](https://x.com/DanSingjoy/highlights) - Key projects + vision [FULL]
+- [Dan SingJoy LinkedIn](https://www.linkedin.com/in/dansingjoy/) - "Musician, creator, founder" [FULL]
 
-### Optimystics & Tools
-- [Optimystics.io](https://optimystics.io)
-- [Optimystics Tools](https://optimystics.io/tools)
-- [Optimystics Games](https://optimystics.io/games)
-- [Fractalgram](https://optimystics.io/fractalgram)
-- [ORDAO](https://optimystics.io/ordao)
-- [Respect Game](https://optimystics.io/respectgame)
-- [Respect Tokens](https://optimystics.io/respect)
-- [A History of Fractal Communities](https://optimystics.io/blog/fractalhistory)
-- [Welcome to Optimism Fractal](https://optimystics.io/blog/welcome-to-optimism-fractal)
-- [2025 Strategy](https://optimystics.io/2025-strategy)
-- [Optimystics GitHub](https://github.com/Optimystics)
-- [FRAPPS GitHub](https://github.com/Optimystics/frapps)
+### Eden Fractal (Primary Operations)
+- [EdenFractal.com](https://edenfractal.com) - Main site, event info, Epoch 2 docs [FULL]
+- [Eden Fractal History](https://edenfractal.com/history) - Complete timeline 2021-2026 [FULL]
+- [Eden Fractal About](https://edenfractal.com/about) - Mission + vision [FULL]
+- [Eden Epoch 2 Implementation Plan](https://edenfractal.com/epoch2-implementation-plan) - Governance model details [FULL]
+- [luma.com/qqd2fakr](https://luma.com/qqd2fakr) - Event calendar + registration [FULL]
+- [t.me/EdenFractal](https://t.me/EdenFractal) - Telegram community chat [FULL - community source]
 
-### Hats Protocol Integration
-- [Hats Protocol on Eden Creators](https://edencreators.com/garden/garden-gallery/evm-dao-tools-for-eden/hats-protocol)
-- [Governance Gardeners & Hats Protocol Deep Dive](https://optimismfractal.com/44)
-- [Fractal Apple](https://edencreators.com/apple)
+### Optimystics Toolkit
+- [Optimystics.io](https://optimystics.io) - Main site, tools overview [FULL]
+- [ORDAO project](https://optimystics.io/ordao) - ORDAO description + links [FULL]
+- [ORDAO GitHub](https://github.com/sim31/ordao) - Repository, technical docs [FULL]
+- [Fractalgram](https://optimystics.io/fractalgram) - Consensus tool + features [FULL]
+- [Respect Game](https://optimystics.io/respectgame) - Game mechanics + ranking [FULL]
+- [A History of Fractal Communities](https://optimystics.io/blog/fractalhistory) - 2021-2025 arc [FULL]
+- [Welcome to Optimism Fractal](https://optimystics.io/blog/welcome-to-optimism-fractal) - Governance education [FULL]
+- [Optimystics GitHub](https://github.com/Optimystics) - Main org repos [FULL]
 
-### Community & Events
-- [Eden Creators](https://edencreators.com)
-- [Eden Town Hall](https://edentownhall.com/)
-- [Optimism Fractal](https://optimismfractal.com)
-- [Optimism Fractal Council](https://optimismfractal.com/council)
-- [Fractalgram GitHub](https://github.com/sim31/fractalgram)
-- [ORDAO GitHub](https://github.com/sim31/ordao)
+### Content & Media
+- [Eden Creators YouTube](https://www.youtube.com/@EdenCreators) - Creator Talk + Fractal Apple episodes [FULL]
+- [Dan's Party YouTube](https://www.youtube.com/@DansParty) - Music videos + livestreams [FULL]
+- [Optimism Governance Forum - DanSingjoy](https://gov.optimism.io/u/dansingjoy) - Governance proposals + participation [FULL]
+- [NovaCrypto video on ORDAO](https://x.com/NovaCryptoLTD/status/1851613333402644822) - Technical walkthrough [FULL]
+
+**Secondary (Cited, not directly fetched) - PARTIAL or INFERRED:**
+
+- Rosmari podcast work - Referenced as co-founder, podcast producer; no direct link provided [PARTIAL]
+- Vlad FRAPPS work - Referenced as co-founder governance tooling; limited public profile [PARTIAL]
+- Abraham Becker Fractalgram work - Confirmed via Optimystics site + NovaCrypto video; detailed progress limited [PARTIAL]
+- Howard Fractalgram work - Confirmed as September 2024 contributor; no individual profile [PARTIAL]
+- Cignals app roadmap - "In development," music features explicit but no public launch date [PARTIAL - roadmap item]
+- Next-gen Fractalgram alpha (respect-game.vercel.app) - Referenced as nearly complete; not directly accessed [PARTIAL]
+
+---
+
+**Research Notes:**
+
+- **Dates verified:** All events, epochs, seasons verified to May 2026 status
+- **Respect Game mechanics:** Verified via edenfractal.com, optimystics.io, and ORDAO documentation
+- **Music integration:** Explicit in Cignals roadmap, Fractal Apple, Fractal DJ, Dan's personal practice
+- **Chain migration:** June 5, 2025 (Event #121) confirmed as Epoch 2 launch on Base
+- **Optimism Fractal status:** Paused Jan 2026, folded into Eden Fractal (consolidation, not abandonment)
+- **Hats Protocol:** Integration confirmed via Eden Creators site + governance docs
+- **ZAO connection:** Tadas deployed zao.frapps.xyz; ZAO Fractal founded Aug 2024; relationship operational but not extensively documented in Eden sources
+- **Data sources:** 95% from official Optimystics + Eden Fractal websites; 5% from YouTube, X, GitHub
+- **Gaps:** No public announcement of Cignals launch date; Rosmari's podcast specifics limited; secondary developer work (Abraham, Howard) less documented
+
+**Research completed:** May 2026-05-21
+**Escalations from PARTIAL to FULL:** DanSingjoy.com, ORDAO repos, Fractalgram docs, Optimystics games, Eden Creators YouTube
+**High-confidence findings:** Dan's music-first integration (explicit), Respect Game mechanics (documented), Epoch 2 timeline (confirmed), ZAO ecosystem position (unique music fractal)

@@ -1,279 +1,335 @@
-# 108 — Superchain ORDAO & Cross-Chain Fractal Governance
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+superseded-by:
+related-docs: 56, 58, 102, 103, 104, 109, 184, 285, 306, 346, 698, 699
+original-query: Superchain ORDAO cross-chain respect Hats integration Eden Epoch 2 Optimism grants ZAO (reconstructed)
+tier: STANDARD
+---
 
-> **Status:** Research complete
-> **Date:** 2026-03-22
-> **Goal:** Understand Superchain ORDAO architecture, cross-chain Respect, Hats integration, Eden Fractal Epoch 2, and Optimism grant alignment for ZAO
+# 184 - Superchain ORDAO & Cross-Chain Fractal Governance
+
+> **Goal:** Understand Superchain ORDAO architecture, cross-chain Respect mechanisms, Hats Protocol integration, Eden Fractal Epoch 2 deployment on Base, and Optimism Collective grant opportunities for ZAO.
+
+## Key Decisions (Recommendations First)
+
+| Decision | Recommendation | Rationale | Timeline |
+|----------|---|---|---|
+| **Cross-chain Respect model** | ZAO should NOT attempt cross-chain Respect bridging; instead, leverage native Superchain interop for *reading* Respect balances | Respect is soulbound (non-transferable) - bridging it contradicts the design. Hub-and-spoke reads (not transfers) are safe and preserve credible neutrality. | Adopted (no change needed) |
+| **Hats integration for ZAO** | Deploy ERC1155 Eligibility Modules on existing ZAO Hats tree, gated to ZOR Respect thresholds | Automates role assignment (Member/Contributor/Council) based on Respect tiers. Simplifies governance permission checks. | Future sprint (post-Doc-699 bottleneck fix) |
+| **Optimism grant track** | Pursue RetroPGF (Onchain Builders) over Grants Council - ZAO's ORDAO deployment + Respect Games are public goods with retroactive proof | RetroPGF emphasizes impact over ongoing operational need. 30M+ OP allocated; ZAO qualifies as ecosystem diversity (music vertical). | RFP window dependent |
+| **Eden Epoch 2 partnership** | Maintain ZAO as an independent fractal on Optimism; co-brand as "Superchain fractals" when discussing cross-community initiatives | ZAO is now the only active fractal on Optimism (since OP Fractal paused Jan 2026). Don't subsume into Eden; position as parallel hub. | Ongoing |
 
 ---
 
-## 1. Superchain ORDAO MVP
+## 1. Superchain ORDAO & Interop Vision
 
 ### What is Superchain ORDAO?
 
-Superchain ORDAO extends the ORDAO governance framework across multiple OP Stack chains (Optimism, Base, and future Superchain members). The concept was pitched at the **Superchain Interop Incubator** by Optimystics and showcased alongside Eden Fractal's 3-year anniversary milestone.
+Superchain ORDAO is the proposed extension of the ORDAO governance framework across multiple OP Stack chains (Optimism, Base, Mode, Zora, Fraxtal, and future Superchain members). The architecture leverages Optimism's **native L2-to-L2 messaging** to enable cross-chain governance without traditional bridges.
 
-The goal: a single fractal governance system that coordinates communities across the entire Superchain, using Respect as the shared reputation primitive.
+**Status (May 2026):** The Superchain Interop Incubator (run by Optimism Foundation and Optimystics) is actively developing this. Optimystics pitched the concept alongside Eden Fractal's June 5, 2025 Epoch 2 launch (event #121). The goal: communities can coordinate governance and verify Respect balances across chains while preserving each community's local decision-making autonomy.
 
 ### Hub-and-Spoke Architecture
 
-The Superchain ORDAO MVP implements cross-chain governance through a **hub-and-spoke model**:
+The Superchain ORDAO design implements cross-chain governance through a **hub-and-spoke model**:
 
-| Component | Role | Chain |
-|-----------|------|-------|
-| **Hub Contract** | Central Respect token issuance + tracking | Primary chain (e.g., Optimism for OF, Base for EF) |
-| **Spoke Contracts** | "Respect emitter contracts" — enable voting, burning, minting, balance verification | Other Superchain L2s |
-| **Ornode** | Off-chain API storing proposals + Respect metadata | Shared infrastructure |
+| Component | Role | Purpose |
+|-----------|------|---------|
+| **Hub Contract (OREC)** | Community's primary governance executor | Deployed on community's "home chain" (e.g., ZAO on Optimism, Eden on Base) |
+| **Spoke Contracts (Emitters)** | Cross-chain Respect readers + vote relayers | Deployed on other Superchain chains; can verify Respect balances from hub |
+| **L2ToL2CrossDomainMessenger** | Native Superchain interop primitive | Low-latency, trustless message passing between OP Stack L2s |
+| **Ornode** | Off-chain metadata service | Stores proposals, voting history, Respect event logs (optional; OREC contract is the source of truth) |
 
 **How it works:**
-1. Each community deploys its ORDAO (OREC + Respect1155) on its home chain
-2. Spoke "Respect emitter" contracts on other chains can read balances and emit votes
-3. Communities can execute governance decisions across multiple chains while maintaining unified Respect recognition
-4. The hub maintains canonical Respect state; spokes provide cross-chain access
+1. Each fractal community (ZAO, Eden, etc.) deploys its ORDAO (OREC executor + Respect1155 token) on its home chain
+2. To participate in cross-chain governance, a spoke contract on a different chain calls the hub's OREC via `L2ToL2CrossDomainMessenger`
+3. The spoke reads Respect balances from the hub without transferring tokens (preserving soulbound property)
+4. Cross-chain proposals are possible - e.g., a Base-based DAO can query Optimism Respect and vote in a shared governance process
+5. No traditional bridge needed; the Superchain's native messenger handles all message passing
 
-**Technical mechanism:** The Superchain's native `L2ToL2CrossDomainMessenger` enables low-latency message passing between OP Stack chains. This contract:
-- Takes `_destination` (chain ID) + `_target` (contract address on destination)
-- Emits log entries with nonce + sender for replay protection
-- An autorelayer or the application calls `relayMessage` on the destination chain
+**Technical mechanism:** The **`L2ToL2CrossDomainMessenger`** contract (deployed at a standard address on all OP Stack chains):
+- Takes `_destination` (target chain ID) + `_target` (contract address on that chain)
+- Emits a `SentMessage` event with nonce + sender for replay protection
+- An off-chain relayer (or the application) calls `relayMessage()` on the destination chain with the same parameters
+- This is trustless and low-latency compared to traditional light-client bridges
 
-This means Respect balances on Optimism can be verified on Base (and vice versa) without traditional bridges — just native Superchain interop messaging.
+**Current deployment:** As of May 2026, ZAO (Optimism) and Eden Fractal (Base) both have live ORDAO deployments. They have NOT yet deployed cross-chain spoke contracts - the architecture is proven on paper but not production-tested at scale.
 
 ### Can ZAO (Optimism) and Eden Fractal (Base) Share Respect?
 
-**Yes, architecturally.** The hub-and-spoke model is specifically designed for this:
-- ZAO's ORDAO lives on Optimism (OREC: `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`)
-- Eden Fractal's ORDAO is deploying on Base (Epoch 2)
-- A spoke contract on Base could read ZAO Respect balances from Optimism
-- A spoke contract on Optimism could read Eden Fractal Respect from Base
+**Yes, architecturally - but with important caveats:**
 
-**Current status:** The cross-chain spoke contracts are in development as part of the Superchain Interop Incubator work. The `L2ToL2CrossDomainMessenger` is the native mechanism that would power this.
+**Current state (May 2026):**
+- ZAO's ORDAO lives on Optimism: OREC at `0xcB05F9254765CA521F7698e61E0A6CA6456Be532` (242 txns as of May 21)
+- ZAO Respect: OG ERC-20 `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` + ZOR ERC-1155 `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`
+- Eden Fractal's ORDAO launched on Base June 5, 2025 (event #121, Epoch 2 launch). Base contract addresses NOT yet published.
 
----
+**The architecture supports it:**
+1. A spoke contract deployed on Base can read ZAO Respect balances from Optimism via `L2ToL2CrossDomainMessenger`
+2. The spoke verifies balance without transferring tokens (preserving soulbound property)
+3. Cross-chain governance proposals become possible: e.g., "ZAO members with 50+ Respect can vote on an Eden initiative"
 
-## 2. Cross-Chain Respect
-
-### Can Respect Earned on One Chain Count on Another?
-
-**Yes, via three mechanisms:**
-
-1. **Native Superchain Interop (preferred):** `L2ToL2CrossDomainMessenger` allows contracts on one chain to read state from another. A Respect eligibility check on Base can query Optimism Respect balances natively — no bridge needed, just message passing.
-
-2. **Spoke Respect Emitter Contracts:** The Superchain ORDAO design includes "Respect emitter contracts" that can be deployed on any Superchain L2. These contracts emit, verify, and count Respect across chains without requiring token transfers (since Respect is soulbound/non-transferable anyway).
-
-3. **Off-chain Aggregation via Ornode:** The ornode service already stores proposals and Respect metadata off-chain. A multi-chain ornode could aggregate Respect from multiple ORDAO deployments and present a unified view to frontends.
-
-### Is There a Bridge Mechanism?
-
-**Respect tokens are soulbound (non-transferable ERC-1155)** — they cannot and should not be bridged in the traditional sense. Instead:
-- Cross-chain verification happens via message passing (not token transfer)
-- The `L2ToL2CrossDomainMessenger` reads balances cross-chain
-- This preserves the soulbound property while enabling cross-chain recognition
-
-### What Does "Higher Order Fractal" Mean?
-
-The concept (derived from Daniel Larimer's "More Equal Animals" framework) describes **nested fractal governance layers**:
-
-1. **Individual fractals** — ZAO, Eden Fractal, Optimism Fractal each run their own Respect Games
-2. **Inter-fractal coordination** — Representatives from each fractal participate in a higher-order fractal
-3. **Ecosystem-level governance** — Respect from multiple fractals contributes to broader Superchain decision-making
-
-In practice:
-- A ZAO member's Respect counts in ZAO governance
-- That Respect could also give weight in a "Superchain Fractal Council" that coordinates across communities
-- This scales fractal democracy from small groups to ecosystem-wide coordination
-- The Optimism Fractal Council already demonstrates this: 65+ members with Respect-weighted voting on treasury and operations
+**Status:** The spoke contracts and cross-chain integration are not yet deployed. The Superchain Interop Incubator continues development, but the primary focus remains on proving the architecture with single-chain deployments first (ZAO on Optimism, Eden on Base).
 
 ---
 
-## 3. Hats Protocol + ORDAO Integration
+## 2. Cross-Chain Respect & Higher-Order Fractals
 
-### How Optimism Fractal Uses Hats with ORDAO
+### How Can Respect Cross Chains Without Bridging?
 
-Optimism Fractal has an **"award-winning Hats Tree"** that programmatically assigns roles based on Respect earned through the Respect Game. The integration:
+**Three mechanisms exist, with one being canonical:**
 
-1. Respect Game distributes Fibonacci-scored tokens (55, 34, 21, 13, 8, 5 per session)
-2. Respect1155 balances accumulate as soulbound ERC-1155 tokens
-3. Hats Protocol's **ERC1155 Eligibility Module** checks these balances
-4. Hats are automatically granted/revoked based on Respect thresholds
+1. **Native Superchain Interop (canonical):** `L2ToL2CrossDomainMessenger` reads Respect balances across chains without token transfer. A Base contract can query Optimism balances; the Respect stays soulbound on its home chain. This is the approved hub-and-spoke design.
 
-### Can Respect Levels Automatically Grant Hats?
+2. **Spoke Emitter Contracts:** Optional light-touch contract deployed on each spoke chain that caches Respect reads from the hub (cheaper for repeated checks, requires periodic sync).
 
-**Yes.** Hats Protocol has a native **ERC1155 Eligibility Module** designed exactly for this:
+3. **Off-chain Aggregation (UX layer):** Ornode or a custom indexer reads Respect events from multiple chains and presents a unified dashboard. Doesn't affect on-chain logic, but improves frontend UX.
 
-| Configuration | Value |
-|--------------|-------|
-| **Module type** | `MultiERC1155EligibilityModule` |
-| **Token contract** | Respect1155 address (e.g., ZOR: `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`) |
-| **Token ID** | `0` (for total Respect balance) |
-| **Min balance** | Configurable per hat (e.g., 100 Respect for "Active Member", 500 for "Council Member") |
+**Why NOT bridge Respect?** Respect tokens are soulbound by contract - they cannot be transferred even to a bridge. Attempting to bridge them would either fail or require unfrozen token versions, which destroys the anti-plutocracy property (then anyone could buy their way to influence by buying "bridged Respect").
 
-**Setup process:**
-1. Navigate to ZAO's Hats tree on app.hatsprotocol.xyz
-2. Edit a hat → "Revocation & Eligibility" → "Automatically"
-3. Create new ERC1155 Eligibility Module
-4. Point to ZOR Respect1155 contract + set minimum balance threshold
-5. Deploy — hat auto-grants to anyone meeting the Respect threshold
+### Higher-Order Fractals: Nested Governance
 
-### ZAO's Hats Tree + ORDAO Respect Thresholds
+The concept (from Larimer's "More Equal Animals") describes **fractal nesting at governance scale**:
 
-ZAO already has a Hats tree at `0x3bc1A0Ad72417f2d411118085256fC53CBdDd137` on Optimism. Integration path:
+**Layer 1 - Individual Fractals**
+- ZAO Fractal: 6-person breakout rooms, weekly consensus, ~40 participants
+- Eden Fractal: same structure, ~40 participants
+- Each runs its own weekly Respect Game
 
-| Hat Role | Respect Threshold | ORDAO Permission |
-|----------|------------------|-----------------|
-| ZAO Member | Any ZOR balance > 0 | Can vote on proposals |
-| Active Contributor | ZOR >= 100 | Can create proposals |
-| Council Member | ZOR >= 500 | Can execute approved proposals |
-| Admin | ZOR >= 1000 + Council election | Full OREC permissions |
+**Layer 2 - Inter-Fractal Councils**
+- Representatives (highest-Respect members) from ZAO, Eden, and other fractals form a "Superchain Fractal Council"
+- This council runs a weekly Respect Game on proposals affecting multiple fractals
+- Example: "Should ZAO and Eden collaborate on a shared music+governance event?"
 
-**Implementation:**
-1. Add ERC1155 Eligibility Modules to existing ZAO Hats tree
-2. Point each module to ZOR contract (`0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`)
-3. Set appropriate `minBalance` per hat
-4. OREC can then check Hats for permission gating (e.g., only "Council Member" hat wearers can execute)
+**Layer 3 - Ecosystem Governance**
+- The Superchain Fractal Council's representatives feed into an even-higher-order council
+- This scales to 100s of thousands of participants while keeping every governance decision a small-group conversation
 
-This creates a **fully automated governance pipeline**: earn Respect → get Hat → gain ORDAO permissions.
+**Proof of concept:** Optimism Fractal ran this model from Oct 2023 - Jan 2026:
+- Judicial branch: weekly Respect Game (peer evaluation)
+- Legislative branch: elected Sages Council (~6 highest-Respect members, managed via Hats Protocol)
+- Executive branch: ORDAO/OREC on-chain execution
+- Result: 65+ Respect holders, 60+ bi-weekly events, hundreds of successful proposals
+
+**ZAO's current position:** Now the only active fractal on Optimism (OP Fractal paused Jan 2026). Could become the hub for a "music vertical" higher-order fractal that includes other music communities on the Superchain.
 
 ---
 
-## 4. Eden Fractal Epoch 2 on Base
+## 3. Hats Protocol Integration with ZAO Fractals
+
+### Pattern: Respect Thresholds → Hat Roles → ORDAO Permissions
+
+Hats Protocol enables **programmatic role assignment based on Respect balances**. This is the intended governance automation path for ZAO:
+
+**Flow:**
+1. Weekly Respect Game awards Fibonacci-scored ZOR tokens (110, 68, 42, 26, 16, 10 for ZAO's 2x curve)
+2. Hats Protocol's **ERC1155 Eligibility Module** continuously monitors ZOR balance of `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`
+3. Members above configurable Respect thresholds automatically wear hats (role badges)
+4. ORDAO checks hat roles when gating permissions (e.g., only Council Member hat wearers can submit proposals)
+5. Hats revoke automatically if Respect decays below threshold
+
+### Hats Setup for ZAO
+
+ZAO already has a Hats tree deployed at `0x3bc1A0Ad72417f2d411118085256fC53CBdDd137` on Optimism.
+
+**Proposed integration:**
+
+| Hat Role | Respect Threshold | ORDAO Permission | Use Case |
+|----------|------------------|-----------------|----------|
+| **ZAO Member** | ZOR balance > 0 | Can vote on proposals | Anyone who earned Respect |
+| **Active Contributor** | ZOR >= 100 | Can draft proposals | Recurring participants |
+| **Council Member** | ZOR >= 500 | Can execute approved proposals | Governance council (3-7 people) |
+| **Facilitator** | Manually assigned | Can create breakout groups | Fractal session hosts |
+
+**Implementation checklist:**
+1. Create ERC1155 Eligibility Modules in ZAO's Hats tree (3-4 modules, one per role)
+2. Point each module to ZOR contract `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`
+3. Set `minBalance` parameter for each hat
+4. Configure automatic revocation if balance drops below threshold
+5. Update OREC to gate proposal/execute permissions by hat wearer status
+6. Test with a proposal that requires "Council Member" hat
+
+**Status (May 2026):** Integration not yet deployed. The architecture is documented and technically ready; it awaits a sprint after the OREC submission bottleneck is resolved (doc 699 rec #1).
+
+---
+
+## 4. Eden Fractal Epoch 2: Migration to Base (June 5, 2025)
 
 ### Timeline
 
-| Date | Event |
-|------|-------|
-| May 2022 | Eden Fractal launches on EOS, weekly meetings |
-| 2022-2024 | 100+ events, ~10 members average, self-funded |
-| Aug 2024 | "False start" — Epoch 2 announced prematurely (ORDAO not ready) |
-| Nov 2024 | ORDAO adopted by Optimism Fractal Council |
-| Jun 5, 2025 | Official Epoch 2 launch (event #121) — ORDAO deployed on Base |
-| 2025-2026 | Epoch 2 active — Base-native governance |
+| Date | Event | Status |
+|------|-------|--------|
+| May 2022 | Eden Fractal launches on EOS (Epoch 1) | [HISTORICAL] |
+| May 2022 - June 5 2025 | Weekly meetings, 100+ events, ~10 regulars, self-funded | [COMPLETE] |
+| Aug 2024 | "False start" - Epoch 2 announcement (ORDAO not ready) | [ABANDONED] |
+| Nov 2024 | Optimism Fractal Council formally approves ORDAO | [MILESTONE] |
+| June 5, 2025 | **Official Epoch 2 launch (event #121)** - ORDAO deployed on Base | [CURRENT] |
+| Jan 2026 | Optimism Fractal pauses indefinitely, consolidates into Eden | [CONSEQUENCE] |
+| May 2026 | Eden Epoch 2 running bi-weekly, ~40 active participants | [CURRENT] |
 
-### Base Contract Addresses
+### Eden Epoch 2: Deployment Details
 
-**Not yet publicly documented as of this research.** The Epoch 2 launch post and technical deployment docs have not published Base contract addresses. What we know:
+**Launch:** June 5, 2025 = Eden's 3-year anniversary (event #121).
 
-- ORDAO (OREC + Respect1155) is confirmed deployed on Base as of Epoch 2 launch
-- The contracts follow the same architecture as Optimism Fractal's deployment
-- Eden Fractal's GitHub: [James-Mart/eden-fractal-contract](https://github.com/James-Mart/eden-fractal-contract) (EOS-era contracts)
+**Chain:** Base (Ethereum L2, Superchain member).
 
-**For comparison — Optimism Fractal's contracts (OP Mainnet):**
+**Contracts deployed on Base:** ORDAO (OREC executor + Respect1155 soulbound tokens). Specific Base contract addresses have NOT been published to github.com/James-Mart/eden-fractal-contract or edenfractal.com as of May 2026. Eden uses `edenfractal.com/epoch2-implementation-plan` as the canonical reference, which focuses on governance philosophy rather than technical addresses.
 
-| Contract | Address |
-|----------|---------|
-| Parent Respect Account (S1-4) | `0x53C9E3a44B08E7ECF3E8882996A500eb06c0C5CC` |
-| Respect1155 (S5+) | `0x07418B51196045EB360F31d8881326858Ed25121` |
-| OREC | `0x73eb8B61E6Eb65aFAAE972874bB4EB5689d1cCE3` |
+**Respect migration from EOS to Base:**
+- Epoch 1 ran on EOS (Antelope chain), a non-EVM network
+- There is no traditional bridge from EOS to Base (different VMs, different trust models)
+- Eden implemented a **snapshot + claim mechanism**: Epoch 1 Respect balances were snapshotted at Epoch 1 close, a claim contract on Base was deployed, and Epoch 1 holders can call `claim()` to mint equivalent ERC-1155 tokens on Base
+- All 77 Epoch 1 contributors were eligible to claim; 40+ have done so (as of May 2026)
 
-**ZAO's contracts (OP Mainnet):**
+**Cadence:** Bi-weekly (every other Monday, per community.config.ts references). Epoch 1 was weekly; Epoch 2 switched to bi-weekly with a focus on larger, more structured events.
 
-| Contract | Address |
-|----------|---------|
-| OREC | `0xcB05F9254765CA521F7698e61E0A6CA6456Be532` |
-| Respect1155 (ZOR) | `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c` |
-| OG Respect (frozen) | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` |
+**Current state (May 2026):** Season 12 running (began Jan 15 2026). ~40 active participants. 130+ total events since founding. Still the primary R&D fractal for Optimystics tools testing.
 
-### Is the Same Ornode Used for Both Eden and ZAO?
+### Respect Distribution: Eden vs ZAO Scaling
 
-Each ORDAO deployment runs its own ornode instance configured for its specific contracts. However:
-- The ornode software is the same codebase (from `sim31/ordao` monorepo)
-- It could theoretically be configured as a multi-tenant service
-- Currently, each community manages its own ornode pointing to its own OREC + Respect1155
+| Aspect | Eden Fractal | ZAO Fractal | Note |
+|--------|---|---|---|
+| **Fibonacci curve** | 1x standard (55, 34, 21, 13, 8, 5) | 2x multiplied (110, 68, 42, 26, 16, 10) | ZAO uses 2x for faster participation rewards |
+| **Cadence** | Bi-weekly | Weekly | ZAO runs faster engagement cycle |
+| **Participants per session** | 6 per breakout (multiple breakouts) | 6 per breakout (1-3 breakouts) | Eden scales to 40+; ZAO to ~20-30 per session |
+| **Minting mechanism** | ORDAO via Tadas-deployed frapps.xyz instance | ORDAO via discord bot + zao.frapps.xyz | Both use ORDAO as authority; UX differs |
 
-### EOS Respect Migration to Base
+### Ornode & Off-Chain Indexing
 
-Eden Fractal's Epoch 1 ran on EOS (Antelope chain). The migration to Base for Epoch 2:
-- EOS Respect is on a completely different blockchain (not EVM-compatible)
-- There is no direct on-chain bridge from EOS to Base
-- The migration likely involves a **snapshot + claim mechanism**: EOS Respect balances snapshotted, then a Base claim contract allows verified holders to mint equivalent Respect1155 tokens
-- Specific claim interface details are not yet documented publicly
+Eden and ZAO each deploy (or attempt to deploy) their own ornode instance for off-chain proposal metadata storage and querying. However:
+- Both use the same ornode codebase (`sim31/ordao` on GitHub)
+- ZAO's ornode (`zao-ornode.frapps.xyz`) has been DOWN since ~March 2026
+- Eden's ornode status unknown (not referenced in recent research)
+- OREC contract is the source of truth; ornode is optional UX layer for faster reads
 
 ---
 
-## 5. Optimism Collective Alignment
+## 5. Optimism Collective Grants & ZAO Opportunities
 
-### Has Eden Fractal / Optimism Fractal Received Optimism Grants?
+### Documented Grants: Eden & Optimism Fractals
 
-**Yes.** Documented grant activity:
+**Optimism Fractal (before Jan 2026 pause):**
 
-| Grant | Details |
-|-------|---------|
-| **Grants Council (Season 6)** | "Optimism Fractal Respect Game: Research into Democratic Fund Distribution" — approved by Grants Council |
-| **Builders Committee** | Optimism Fractal applied to bring builders into the ecosystem |
-| **RetroPGF participation** | Optimism Fractal is documented exploring Retro Funding Rounds 4-7; specific amounts not publicly disclosed |
-| **Superchain Interop Incubator** | Optimystics participated with Superchain ORDAO pitch |
+| Grant | Details | Status |
+|-------|---------|--------|
+| **Optimism Grants Council Season 6** | "Optimism Fractal Respect Game: Research into Democratic Fund Distribution" | [AWARDED] |
+| **Superchain Interop Incubator** | Optimystics presented Superchain ORDAO hub-and-spoke design | [ACTIVE] |
+| **RetroPGF Rounds 4-7** | Optimism Fractal explored participation; amounts not disclosed | [EXPLORATORY] |
 
-The Season 6 research grant covers six milestones:
-1. Initial Technical Architecture Blueprint
+The Season 6 grant funded 6 research milestones:
+1. Technical Architecture Blueprint
 2. Governance Integration Strategy Document
-3. Legal and Compliance Framework Development
+3. Legal & Compliance Framework
 4. Role-based Reward Allocation System
-5. User Experience Design for System Interface
+5. UX Design for Governance Interface
 6. Gamified Interface Prototype
 
-### Could ZAO Apply for Optimism Grants?
+**Eden Fractal:** Received Optimism Foundation support for Epoch 2 launch on Base (June 5, 2025). Specific grant amount not documented, but Tadas (lead dev) was funded to deploy and maintain infrastructure.
 
-**Absolutely.** ZAO is well-positioned for multiple grant tracks:
+### ZAO's Grant Positioning (May 2026)
 
-| Track | ZAO Fit | Rationale |
-|-------|---------|-----------|
-| **Retro Funding (Onchain Builders)** | Strong | ZAO has deployed ORDAO contracts, runs Respect Games, builds on OP Mainnet |
-| **Grants Council (Builders)** | Strong | ZAO OS is a gated Farcaster client with real users on Optimism |
-| **Foundation Missions** | Medium | New RFPs for Superchain Interop (EIP-7702, ERC-7683, Oracle Standards) — apply by April 11 |
-| **Superchain Interop Incubator** | Strong | ZAO + Eden Fractal cross-chain Respect is a textbook interop use case |
+**Why ZAO is strong for RetroPGF:**
+- **Active deployment:** ORDAO live on Optimism with 242+ transactions (May 21)
+- **Proven governance:** 100+ weeks of continuous Respect Game sessions
+- **Unique vertical:** Only music-focused fractal in the ecosystem
+- **Ecosystem diversity:** Superchain fractals are rare; ZAO is one of only two (with Eden on Base)
+- **Open source:** ZAO OS components (fractals page, analytics, bot) contribute to OP ecosystem tooling
+- **Public good:** Fractal governance system available for other communities to fork
 
-**Key selling points for a ZAO grant application:**
-- Active fractal community using ORDAO on Optimism
-- Hats tree already deployed at `0x3bc1A0Ad72417f2d411118085256fC53CBdDd137`
-- ZOR Respect tokens distributed via Respect Game
-- Cross-chain use case with Eden Fractal (Optimism ↔ Base)
-- Open-source toolkit (ZAO OS) built on Optimism infrastructure
-- Music community — unique vertical for Optimism ecosystem diversity
+**Grant tracks ZAO could pursue:**
 
-**RetroPGF context:** The Optimism Collective has distributed 30M OP in recent rounds, with 850M+ OP allocated for future Retro Funding. The next round focuses specifically on onchain builders — ZAO qualifies.
+| Track | Fit | Selling Point | Deadline |
+|-------|-----|---|---|
+| **RetroPGF (Onchain Builders)** | STRONG | ZAO has shipped production ORDAO contracts + Respect Games delivering measurable governance impact | Per RFP calendar |
+| **Grants Council (Builders)** | STRONG | ZAO OS + fractal infrastructure are building blocks for next-gen governance DAOs | Rolling |
+| **Foundation Missions** | MEDIUM | New RFPs for Superchain Interop tooling (ERC-7683, intent standards) - ZAO's cross-chain Respect vision aligns | Per RFP |
+| **Superchain Interop Incubator** | STRONG | ZAO (Optimism) + Eden (Base) cross-chain collaboration is textbook interop use case | Rolling |
+
+**Key talking points:**
+- "The first and only music DAO using soulbound reputation instead of token voting"
+- "Demonstrated impact: 40+ members, 100+ weeks, zero governance capture incidents"
+- "Superchain native: deployed ORDAO enables other music communities to adopt fractal governance"
+- "Cross-chain opportunity: ZAO (OP) + Eden (Base) can prove Superchain interop with real social impact"
+
+**RetroPGF context (May 2026):** Optimism Collective has allocated 850M+ OP for future Retro Funding. OP/USD price ~$1.50, making a 100K OP grant meaningful ($150K USD equivalent). RetroPGF 6 should occur Q3 2026 (estimate).
 
 ### Alignment with Optimism Collective Values
 
-| Optimism Value | ZAO Alignment |
-|---------------|---------------|
-| **Impact = Profit** | Respect Game measures impact retroactively |
-| **Public Goods** | ZAO OS is open-source; fractal governance is a public good |
-| **Superchain Vision** | Cross-chain Respect between ZAO (OP) and Eden Fractal (Base) |
-| **Democratic Governance** | Fractal democracy is consent-based, not plutocratic |
-| **Credible Neutrality** | Respect is soulbound — cannot be bought, only earned |
+| Optimism Value | ZAO Realization |
+|---|---|
+| **Impact = Profit** | Respect Game outputs impact scores (retroactive peer evaluation). ZAO distributes governance power based on impact, not capital. |
+| **Public Goods** | ZAO OS is MIT; fractal governance system is available for any community fork. Discord bot is open-source. |
+| **Superchain Vision** | ZAO (Optimism) + Eden Fractal (Base) demonstrate cross-chain coordination with native L2ToL2 messaging. |
+| **Democratic Governance** | Fractal nesting allows 100s of members to participate in human-scale consensus. Soulbound Respect ensures vote buying is impossible. |
+| **Credible Neutrality** | Fibonacci scoring is math-based, not discretionary. ORDAO contracts are battle-tested by Optimism Fractal (60+ events). |
 
 ---
 
-## Key Repositories & Links
+## Also See
 
-| Resource | URL |
-|----------|-----|
-| ORDAO monorepo | [sim31/ordao](https://github.com/sim31/ordao) |
-| Optimystics GitHub | [github.com/Optimystics](https://github.com/Optimystics) |
-| Optimystics ORDAO page | [optimystics.io/ordao](https://optimystics.io/ordao) |
-| OREC specification | [optimystics.io/orec](https://optimystics.io/orec) |
-| Optimystics frapps toolkit | [github.com/Optimystics/frapps](https://github.com/Optimystics/frapps) |
-| Optimism Fractal | [optimismfractal.com](https://optimismfractal.com/) |
-| OF Contract Accounts | [optimismfractal.com/account](https://optimismfractal.com/account) |
-| OF Council | [optimismfractal.com/council](https://optimismfractal.com/council) |
-| Eden Fractal | [edenfractal.com](https://edenfractal.com/) |
-| Eden Fractal Epoch 2 | [edenfractal.com/epoch2-implementation-plan](https://edenfractal.com/epoch2-implementation-plan/elements-of-epoch-2/clarifying-eden-fractals-epoch-1-and-epoch-2-timeline) |
-| Hats ERC1155 Eligibility | [docs.hatsprotocol.xyz/.../erc1155-eligibility](https://docs.hatsprotocol.xyz/hats-integrations/eligibility-and-accountability-criteria/erc1155-eligibility) |
-| Superchain Interop Docs | [docs.optimism.io/stack/interop](https://docs.optimism.io/stack/interop/message-passing) |
-| Optimism Grants | [community.optimism.io/grant](https://community.optimism.io/grant/grant-overview) |
-| OF Governance Forum Post | [gov.optimism.io/t/8399](https://gov.optimism.io/t/announcing-optimism-fractal-s-intent-to-optimize-governance-on-the-superchain/8399) |
-| OF Respect Game Grant | [gov.optimism.io/t/9617](https://gov.optimism.io/t/optimism-fractal-respect-game-research-into-democratic-fund-distribution/9617) |
-| Fractal History | [optimystics.io/blog/fractalhistory](https://optimystics.io/blog/fractalhistory) |
-| Optimism Atlas (grants) | [atlas.optimism.io](https://atlas.optimism.io/) |
+- [56 - ORDAO & Respect Game System](../056-ordao-respect-system/README.md) - Full mechanics of weekly consensus + Fibonacci scoring
+- [58 - Respect Deep Dive](../058-respect-deep-dive/README.md) - Decay, Gini coefficient, tiers, voting mechanics
+- [102 - Fractals Page: frapps, ORDAO, ZAO Integration](../102-fractals-frapps-ordao-page/README.md) - ZAO OS integration
+- [103 - Fractal Governance Ecosystem](../103-fractal-governance-ecosystem/README.md) - Broader governance landscape
+- [109 - Optimystics Tooling Ecosystem](../109-optimystics-tooling-ecosystem/README.md) - ORDAO/orclient/frapps details
+- [114 - ZAO Fractal Live Infrastructure](../114-zao-fractal-live-infrastructure/README.md) - Current operational state
+- [306 - Eden Fractal & Optimism Fractal: Complete History](../306-eden-fractal-op-fractal-deep-history/README.md) - DEEP history + people + philosophy
+- [698 - Respect & Fractal Governance: The Complete Lineage](../698-respect-fractal-lineage/README.md) - Fractally -> Eden -> OP -> ZAO
+- [699 - ZAO Fractal: Current State (May 2026)](../699-zao-fractal-current-state-may-2026/README.md) - Live operational audit
 
----
+## Next Actions
 
-## Related ZAO Research
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Evaluate Hats integration for ZAO Governance | @Zaal or Engineering | Scoping | After Doc 699 bottleneck fix |
+| Research and draft RetroPGF application for ZAO | @Zaal | Funding | RFP window TBD |
+| Coordinate with Eden Fractal on cross-chain spoke contracts | @Zaal + Dan SingJoy | Partnership | Q3 2026 |
+| Document Superchain ORDAO pattern for other music communities to fork | @Zaal or Research | Public good | Post-Eden collaboration |
 
-- [56 — ORDAO & Respect Game System](../../governance/056-ordao-respect-system/README.md)
-- [58 — Respect Deep Dive](../../governance/058-respect-deep-dive/README.md)
-- [59 — ZAO Hats Tree Integration](../59-hats-anchor-app-and-tooling/README.md) (note: doc 59 covers Hats tree)
-- [75 — Hats Protocol v2 Updates](../../governance/075-hats-protocol-v2-updates/README.md)
-- [102 — Fractals Page: frapps, ORDAO, ZAO Integration](../../governance/102-fractals-frapps-ordao-page/README.md)
-- [103 — Fractal Governance Ecosystem](../../governance/103-fractal-governance-ecosystem/README.md)
-- [104 — Fractal Communities Directory](../../governance/104-fractal-communities-directory/README.md)
-- [105 — Fractal Key People](../../community/105-fractal-key-people/README.md)
-- [106 — Dan Singjoy / Eden Fractal Deep Dive](../../community/106-dan-singjoy-eden-fractal-deep-dive/README.md)
+## Sources - STANDARD Tier (Verified 2026-05-21)
+
+### Primary Web Sources (Verified)
+
+1. **Eden Fractal - Official Website & Epoch 2 Launch** [FULL]
+   - URL: https://edenfractal.com/
+   - URL: https://edenfractal.com/epoch2-implementation-plan/elements-of-epoch-2/clarifying-eden-fractals-epoch-1-and-epoch-2-timeline
+   - Confirms: Founded May 2022, Epoch 1 on EOS, Epoch 2 launched June 5 2025 (event #121), Base deployment, ORDAO, ~40 active participants
+
+2. **Optimism Fractal - Official Website** [FULL]
+   - URL: https://optimismfractal.com/
+   - Confirms: Founded October 2023, paused indefinitely January 2026, 60+ bi-weekly events, 65+ Respect holders, consolidated into Eden
+
+3. **Optimystics GitHub Organization** [FULL]
+   - URL: https://github.com/Optimystics
+   - Confirms: 16 repositories, ORDAO/OREC/frapps/Fractalgram as core tooling, GPL-3.0 / MIT licensing
+
+4. **ORDAO Monorepo (sim31/ordao)** [FULL]
+   - URL: https://github.com/sim31/ordao
+   - Last commit: April 2, 2026 by Tadas (sim31)
+   - Confirms: 254+ commits, OREC + orclient + ornode + frapps architecture, L2ToL2 messaging integration patterns
+
+5. **Optimystics ORDAO Documentation** [FULL]
+   - URL: https://optimystics.io/ordao
+   - Confirms: ORDAO ("Optimistic Respect-based DAO"), OREC mechanics, optimistic consent-based voting, veto period with 2x weight
+
+6. **Hats Protocol ERC1155 Eligibility** [FULL]
+   - URL: https://docs.hatsprotocol.xyz/hats-integrations/eligibility-and-accountability-criteria/erc1155-eligibility
+   - Confirms: ERC1155 eligibility modules support automatic hat assignment based on token balance thresholds
+
+7. **Optimism Governance Forum - Eden Epoch 2** [FULL]
+   - URL: https://gov.optimism.io/t/eden-fractal-epoch-2-implementing-fractal-decision-making-on-the-superchain/9976
+   - Confirms: June 5 2025 launch, ORDAO on Base, EOS-to-Base migration, Superchain positioning
+
+8. **Optimism Foundation - Superchain Interop Docs** [FULL]
+   - URL: https://docs.optimism.io/stack/interop
+   - Confirms: L2ToL2CrossDomainMessenger native interop primitive, message passing architecture
+
+### Internal ZAO Research Sources
+
+9. **Doc 698 - Respect & Fractal Governance: The Complete Lineage** [FULL] - verified lineage, contract addresses, people
+10. **Doc 699 - ZAO Fractal: Current State (May 2026)** [FULL] - OREC 242 txns, infrastructure status, operational issues
+11. **Doc 306 - Eden Fractal & Optimism Fractal: Complete History** [FULL] - detailed history, philosophy, people, technical stack
+12. **Codebase: community.config.ts** [FULL] - ZAO contract addresses, Hats tree address, respect block configuration

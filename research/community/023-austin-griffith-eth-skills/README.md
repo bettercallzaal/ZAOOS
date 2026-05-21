@@ -1,7 +1,11 @@
 # 23 — Austin Griffith, Scaffold-ETH & the ETH Skills Ecosystem
 
-> **Status:** Research complete
-> **Goal:** Map Austin Griffith's builder tools, BuidlGuidl community model, and the broader onchain credentials/skills ecosystem
+> **topic:** community
+> **type:** research-deep-dive
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Map Austin Griffith's builder tools, BuidlGuidl community model, and the broader onchain credentials/skills ecosystem (reconstructed)
+> **tier:** solid
 > **Date:** March 2026
 
 ---

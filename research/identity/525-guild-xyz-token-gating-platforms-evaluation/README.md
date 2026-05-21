@@ -3,8 +3,9 @@ topic: identity
 type: comparison
 status: research-complete
 last-validated: 2026-04-25
-related-docs: 055, 273, 283, 500
+original-query: "Guild.xyz vs alternatives for token-gating platforms in ZAO OS (reconstructed)"
 tier: DISPATCH
+related-docs: [055, 273, 283, 500]
 ---
 
 # 525 - Guild.xyz + Token-Gating Platform Evaluation for ZAO OS

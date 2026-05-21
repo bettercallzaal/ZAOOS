@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research-brief
+status: research-stub
+last-validated: 2026-05-20
+original-query: "Claude Skills marketplace ecosystem survey, community platforms, top skills, critical evaluation (reconstructed)"
+tier: reference
+---
+
 # 312 - Claude Skills Marketplace & Ecosystem (Apr 2026)
 
 **Source:** r/claudeskills Reddit post (via ZOE inbox, Apr 9 2026)

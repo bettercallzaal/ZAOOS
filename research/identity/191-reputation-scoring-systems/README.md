@@ -1,4 +1,14 @@
-# 133 — Reputation Scoring Systems for ZAO OS
+---
+topic: identity
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Composite ZAO Score from internal Respect + external reputation signals (Neynar, EAS, OpenRank, Passport) (reconstructed)"
+tier: STANDARD
+related-docs: [134, 135, 271]
+---
+
+# 191 — Reputation Scoring Systems for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 25, 2026

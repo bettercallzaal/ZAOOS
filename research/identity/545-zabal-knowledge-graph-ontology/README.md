@@ -3,8 +3,9 @@ topic: identity
 type: guide
 status: research-complete
 last-validated: 2026-04-28
-related-docs: 432, 542, 543, 544
+original-query: "Unified RDF ontology for all ZABAL ecosystem projects without contradiction (reconstructed)"
 tier: DEEP
+related-docs: [432, 542, 543, 544]
 ---
 
 # 545 - ZABAL Knowledge-Graph Ontology v1

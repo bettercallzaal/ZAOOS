@@ -1,3 +1,12 @@
+---
+topic: governance
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Document the updated ORDAO and ORFrapps repos — new architecture, deployment tooling, CLI reference, configuration system — and map implications for ZAO OS integration"
+tier: STANDARD
+---
+
 # 285 — ORDAO & ORFrapps Updated Documentation (April 2026)
 
 > **Status:** Research complete

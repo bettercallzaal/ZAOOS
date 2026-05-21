@@ -1,8 +1,12 @@
 # 249 — Incented Deep Dive, New Campaign Ideas & ClawDown Challenge for ZOE
 
-> **Status:** Research complete
+> **topic:** community
+> **type:** research-deep-dive
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Deep dive into Incented protocol mechanics, propose new ZABAL campaigns, and evaluate ClawDown.xyz challenge for ZOE agent entry (reconstructed)
+> **tier:** medium
 > **Date:** April 2, 2026
-> **Goal:** Deep dive into Incented protocol mechanics, propose new ZABAL campaigns beyond the existing one, and evaluate ClawDown.xyz challenge for ZOE agent entry
 
 ## Key Decisions / Recommendations
 

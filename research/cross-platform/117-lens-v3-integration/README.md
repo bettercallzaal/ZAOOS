@@ -1,3 +1,13 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate Lens V3 integration for cross-posting from ZAO OS and assess wallet-based auth requirements (reconstructed)
+tier: STANDARD
+related-docs: 96
+---
+
 # 117 — Lens V3 Integration (Consolidated)
 
 > **Status:** Research complete — BLOCKED (no server-side posting)

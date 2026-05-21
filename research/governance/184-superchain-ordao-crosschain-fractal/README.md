@@ -1,4 +1,13 @@
-# 108 — Superchain ORDAO & Cross-Chain Fractal Governance
+---
+topic: governance
+type: research
+status: research-complete
+last-validated: 2026-05-20
+tier: STANDARD
+original-query: "Superchain ORDAO MVP: hub-and-spoke architecture, cross-chain Respect via L2ToL2CrossDomainMessenger, ZAO+Eden Fractal coordination, higher-order fractals (reconstructed)"
+---
+
+# 184 — Superchain ORDAO & Cross-Chain Fractal Governance
 
 > **Status:** Research complete
 > **Date:** 2026-03-22

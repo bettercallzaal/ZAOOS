@@ -1,3 +1,12 @@
+---
+topic: agents
+type: design-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "UX patterns for ZOE dashboard as chat-based command center, mobile-first design for agent orchestration (reconstructed)"
+tier: production
+---
+
 # Doc 289 — ZOE Dashboard: Chat-Based Command Center UX Patterns
 
 **Date:** 2026-04-06

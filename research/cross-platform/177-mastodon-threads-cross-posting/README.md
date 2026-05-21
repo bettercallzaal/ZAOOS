@@ -1,4 +1,14 @@
-# 96 — Mastodon + Threads Cross-Posting Integration for ZAO OS
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Add Mastodon and Threads as cross-posting targets from ZAO OS compose bar with SDK selection and OAuth flows (reconstructed)
+tier: STANDARD
+related-docs: 28, 77, 228
+---
+
+# 177 — Mastodon + Threads Cross-Posting Integration for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 20, 2026

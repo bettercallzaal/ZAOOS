@@ -1,6 +1,11 @@
 # 316 - Farcaster Agentic Bootcamp Week 2: Budget-Friendly Agent Dev Stack
 
-> **Status:** Research complete (updated with session transcripts)
+> **topic:** events
+> **type:** bootcamp-deep-dive-technical
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** What are the key technical lessons from Week 2 of the Farcaster Agentic Bootcamp (Apr 6-10 2026) relevant to budget-friendly ZAO agent development? (reconstructed)
+> **tier:** primary
 > **Date:** April 10, 2026
 > **Goal:** Deep dive into Week 2 sessions (April 6-10) of the Builders Garden Farcaster Agentic Bootcamp - agent setup, x402/MPP payments, viral distribution, ERC-8004 identity/reputation, multi-agent coordination with Quilibrium. Focus on budget-friendly dev options for ZAO OS.
 

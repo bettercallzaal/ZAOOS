@@ -1,3 +1,12 @@
+---
+topic: events
+type: feature-spec
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Design Road to ZAOstock Magnetic portal: 14-week pre-event drip, day-of scavenger hunt collectibles, post-event artifact archive"
+tier: STANDARD
+---
+
 # 473 - Road to ZAOstock: Magnetic Portal Spec
 
 > **Status:** Proposal, Tyler to iterate

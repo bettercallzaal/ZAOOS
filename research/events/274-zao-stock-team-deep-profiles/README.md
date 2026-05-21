@@ -1,6 +1,11 @@
 # 274 — ZAO Stock Team: Deep Profiles
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** team-profiles-compendium
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Who are the ZAO Stock team members and what are their backgrounds, skills, achievements, and web presence? (reconstructed)
+> **tier:** primary
 > **Date:** March 31, 2026
 > **Goal:** Comprehensive profiles of every ZAO Stock team member — backgrounds, capabilities, web presence, achievements, platforms
 > **Companion to:** [Doc 224 — ZAO Stock Multi-Year Vision](../../_archive/224-zao-stock-multi-year-vision/)

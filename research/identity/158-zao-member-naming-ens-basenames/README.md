@@ -1,3 +1,13 @@
+---
+topic: identity
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "ENS subnames vs Basenames vs custom identity solutions for 40+ ZAO member on-chain naming (reconstructed)"
+tier: STANDARD
+related-docs: [005, 271]
+---
+
 # 158 — ZAO Member Naming: ENS Subnames vs Basenames vs Custom
 
 > **Status:** Research complete

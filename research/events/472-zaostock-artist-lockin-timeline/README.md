@@ -1,3 +1,12 @@
+---
+topic: events
+type: policy-document
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Define ZAOstock artist lineup lockin timeline and policy: one month before Oct 3 deadline, milestones from first contact through final schedule"
+tier: STANDARD
+---
+
 # 472 - ZAOstock Artist Lockin Timeline (Internal Proposal)
 
 > **Status:** Internal proposal, not for public comms yet

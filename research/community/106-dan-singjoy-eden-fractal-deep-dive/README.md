@@ -1,8 +1,11 @@
 # Research Doc 106: Dan SingJoy & Eden Fractal Deep Dive
 
-**Date:** 2026-03-21
-**Topic:** Comprehensive profile of Dan SingJoy, Eden Fractal operations, governance model, tools, and ZAO's active participation
-**Purpose:** ZAO is actively participating in Eden Fractal -- this doc provides the deep institutional knowledge needed
+> **topic:** community
+> **type:** research-deep-dive
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Document Dan SingJoy, Eden Fractal operations, governance model, tools, and ZAO's active participation (reconstructed)
+> **tier:** solid
 
 ---
 

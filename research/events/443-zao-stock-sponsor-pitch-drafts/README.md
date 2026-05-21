@@ -1,6 +1,11 @@
 # 443 — ZAOstock Sponsor Pitch Drafts (Oct 3, 2026)
 
-> **Status:** Draft — ready for team review
+> **topic:** events
+> **type:** sponsor-pitch-templates
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** What are the sponsor pitch templates (by tier) for ZAOstock outreach to local and corporate partners? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-20
 > **Goal:** Three-tier sponsor pitch emails for ZAOstock Year 1, tailored by budget and audience
 > **Builds on:** Docs 274 (team profiles), 363 (people + brands), 270 (planning), 428 (run-of-show)

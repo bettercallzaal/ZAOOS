@@ -1,3 +1,13 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: How to add Bluesky as a cross-posting target from ZAO OS compose bar with community account and OAuth flows (reconstructed)
+tier: STANDARD
+related-docs: 28, 96, 177
+---
+
 # 77 — Bluesky Cross-Posting Integration for ZAO OS
 
 > **Status:** Research complete

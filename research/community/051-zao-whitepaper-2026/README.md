@@ -1,5 +1,12 @@
 # The ZAO — 2026 Whitepaper
 
+> **topic:** community
+> **type:** research-whitepaper
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** ZAO whitepaper 2026: technology roadmap, product architecture, token mechanics, and roadmap (reconstructed)
+> **tier:** solid
+
 **A Decentralized Impact Network for the Creator Economy**
 **Draft 4.5 — March 2026**
 > **Date:** 2026-02-12

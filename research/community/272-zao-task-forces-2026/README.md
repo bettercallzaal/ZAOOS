@@ -1,9 +1,12 @@
 # 272 — ZAO Task Forces & Team Structure: 6-Month Roadmap
 
-> **Status:** Planning
+> **topic:** community
+> **type:** research-spec
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Map ZAO task forces, team structure, and 6-month roadmap (reconstructed)
+> **tier:** medium
 > **Date:** March 30, 2026
-> **Tags:** `#governance` `#task-forces` `#teams` `#zao-os` `#zao-stock` `#wavewarz`
-> **Supersedes:** Doc 051 (whitepaper Q2-Q4 2026 roadmap)
 
 ---
 

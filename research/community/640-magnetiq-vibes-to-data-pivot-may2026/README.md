@@ -2,10 +2,10 @@
 topic: community
 type: decision
 status: research-complete
-last-validated: 2026-05-11
-related-docs: [Doc 65 — ZABAL Partner Ecosystem, Doc 641 — Whop integration for Claude Code community]
+last-validated: 2026-05-20
+original-query: "Magnetiq pivot positioning and ZAO-Magnetiq bot spec from Tyler Stambaugh call (reconstructed)"
+related-docs: [065-zabal-partner-ecosystem, 641-whop-integration]
 tier: STANDARD
-source: tyler-stambaugh-call-2026-05-11
 ---
 
 # 640 — Magnetiq pivot: from "build community" to "vibes-as-data"

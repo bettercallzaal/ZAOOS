@@ -2,10 +2,10 @@
 topic: community
 type: decision
 status: research-complete
-last-validated: 2026-05-11
-related-docs: [640 - Magnetiq vibes-to-data pivot, 641 - Whop.com for ZAO, 274 - ZAO Stock team profiles]
+last-validated: 2026-05-20
+original-query: "AttaBotty livestream playbook and Z-and-AttaBotty Telegram bot spec from call (reconstructed)"
+related-docs: [640-magnetiq-vibes-to-data-pivot, 274-zao-stock-team-profiles]
 tier: STANDARD
-source: attabotty-call-recap-2026-05-11
 ---
 
 # 642 - AttaBotty livestream playbook + Z-and-AttaBotty Telegram bot

@@ -1,6 +1,11 @@
 # 364 - ZAO Festivals Deep Research: Everything for the Pitch
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** event-research-sponsor-funding
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** What research is needed for ZAOstock sponsor pitches, funding sources, festival operations benchmarks, and Ellsworth local context? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-15
 > **Goal:** Comprehensive research for ZAOstock sponsor pitch, festival operations, comparable events, funding sources, and local context
 

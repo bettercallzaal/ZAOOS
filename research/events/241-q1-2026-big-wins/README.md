@@ -1,6 +1,11 @@
 # 241 — Q1 2026 Big Wins: The ZAO
 
-> **Status:** Research complete (deep-dive details ongoing)
+> **topic:** events
+> **type:** quarterly-wins-compendium
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** What were The ZAO's key achievements and wins during Q1 2026 (Jan-Mar) for content series documentation? (reconstructed)
+> **tier:** primary
 > **Date:** April 3, 2026
 > **Goal:** Document all Q1 2026 wins for The ZAO community — content series foundation
 

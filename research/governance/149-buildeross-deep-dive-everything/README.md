@@ -1,3 +1,12 @@
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+tier: STANDARD
+original-query: "BuilderOSS monorepo adoption guide: 17 core packages, @buildeross/sdk, hooks, UI components, Goldsky subgraph for ZOUNZ, Tier 1-3 priority matrix (reconstructed)"
+---
+
 # 149 — BuilderOSS Deep Dive: Everything ZAO Can Use
 
 > **Status:** Research complete

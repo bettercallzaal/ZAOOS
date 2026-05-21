@@ -3,8 +3,9 @@ topic: identity
 type: decision
 status: research-complete
 last-validated: 2026-04-30
-related-docs: 542, 543, 544, 545, 546, 547, 548, 549
+original-query: "Optimal ingestion pipeline to turn YapZ YouTube transcripts into queryable Bonfire knowledge graph with timestamp deeplinking (reconstructed)"
 tier: DEEP
+related-docs: [542, 543, 544, 545, 546, 547, 548, 549]
 ---
 
 # 569 — YapZ Bonfire Ingestion Strategy

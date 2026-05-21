@@ -1,3 +1,13 @@
+---
+topic: community
+type: decision
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Concrete first-call + partner onboarding path with Matteo Tambussi (reconstructed)"
+tier: STANDARD
+related-docs: 419, 432
+---
+
 # 449 - Matteo Tambussi Italy-Bridge Follow-Up
 
 > **Status:** Ready for Zaal to send

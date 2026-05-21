@@ -1,10 +1,18 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Design optimal transcript-to-YouTube pipeline for COC Concertz with comparison of external tools vs custom build approach (reconstructed)
+tier: STANDARD
+related-docs: 351
+---
+
 # 353 — YouTube Content Pipeline Automation for COC Concertz
 
 > **Status:** Research complete
 > **Date:** April 13, 2026
 > **Goal:** Design the optimal transcript-to-YouTube pipeline for COC Concertz multi-segment concert videos, comparing external tools vs custom-built, with a concrete build plan
-
----
 
 ## Key Decisions / Recommendations
 

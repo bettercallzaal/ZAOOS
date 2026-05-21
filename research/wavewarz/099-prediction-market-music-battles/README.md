@@ -1,3 +1,12 @@
+---
+topic: wavewarz
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Design a prediction-market-style voting system for music battles using virtual Respect points, purely in Supabase (reconstructed)"
+tier: production
+---
+
 # 99 — Prediction Market Music Battles for ZAO OS
 
 > **Status:** Research complete

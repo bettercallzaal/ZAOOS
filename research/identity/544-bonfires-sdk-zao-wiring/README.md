@@ -3,8 +3,9 @@ topic: identity
 type: guide
 status: research-complete
 last-validated: 2026-04-28
-related-docs: 523, 524, 527, 529, 531, 539, 541, 542
+original-query: "Bonfires SDK wiring patterns to ZOE bot, Hermes Coder, and Zaal personal intake (reconstructed)"
 tier: DEEP
+related-docs: [523, 524, 527, 529, 531, 539, 541, 542]
 ---
 
 # 544 - Bonfires SDK + Notion Config Map for ZAO Wiring

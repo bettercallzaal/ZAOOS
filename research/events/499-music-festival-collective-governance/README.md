@@ -1,10 +1,10 @@
 ---
 topic: events
 type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Research governance models for ZAOstock 18-person team: study Fugazi, Shambala, DIY house shows; recommend coordinated do-ocracy with role rotation"
 tier: STANDARD
-date: 2026-04-24
-author: Claude
-status: complete
 ---
 
 # Music Festival & Artist Collective Governance: Real-World Models for Flat Teams

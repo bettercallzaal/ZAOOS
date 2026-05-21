@@ -1,3 +1,12 @@
+---
+topic: business
+type: research-brief
+status: research-stub
+last-validated: 2026-05-20
+original-query: "Vibe-coded app development + marketing playbook for rapid MVP validation and App Store scaling (reconstructed)"
+tier: reference
+---
+
 # 311 - Vibe-Coded Apps: $800K/yr Marketing Playbook
 
 **Source:** @ernestosoftware on X (via ZOE inbox, Apr 8 2026)

@@ -1,5 +1,12 @@
 # The ZAO: Complete Guide
 
+> **topic:** community
+> **type:** research-guide
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Complete guide to The ZAO ecosystem, mission, governance, token system, identity layer, and fractals (reconstructed)
+> **tier:** solid
+
 > The canonical reference document for the ZAO ecosystem.
 > **Date:** 2026-02-10
 > **Last updated:** March 2026 | **Status:** Living document

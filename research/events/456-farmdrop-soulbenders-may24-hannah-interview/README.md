@@ -1,3 +1,12 @@
+---
+topic: events
+type: interview-prep
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Prep BCZ Yapz interview with Hannah Semler (FarmDrop CEO) for May 24 SoulBenders benefit; build interview questions and content calendar"
+tier: STANDARD
+---
+
 # 456 — FarmDrop x SoulBenders May 24 Benefit + Hannah Semler BCZ Yapz Interview Prep
 
 > **Status:** Research complete — ready for interview record Apr 21-23

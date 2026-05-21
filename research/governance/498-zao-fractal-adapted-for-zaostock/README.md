@@ -1,16 +1,16 @@
 ---
-title: "498 - ZAOstock Fractal Adaptation: Festival Team Governance Model"
-date: 2026-04-24
-status: "Research complete"
-doc_type: "governance_design"
-author: "Claude Agent Research"
+topic: governance
+type: design
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Design the ZAO Respect Game / fractal mechanic for the ZAOstock team (18 people, Oct 3 2026 festival prep) (reconstructed)"
+tier: DEEP
 tags:
   - zaostock
   - fractals
   - respect-game
   - team-governance
   - contribution-tracking
-focus: "Design the ZAO Respect Game / fractal mechanic for the ZAOstock team (18 people, Oct 3 2026 festival prep)"
 ---
 
 # 498 - ZAOstock Fractal Adaptation: Festival Team Governance Model

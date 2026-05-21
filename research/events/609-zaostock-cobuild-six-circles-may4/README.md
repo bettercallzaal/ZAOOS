@@ -2,7 +2,8 @@
 topic: events
 type: meeting-transcript
 status: research-complete
-last-validated: 2026-05-04
+last-validated: 2026-05-20
+original-query: "Log ZAOstock May 4 cobuild: zaostock.com spinout, 8 circles cut to 6, Hermes bot integration, front-page feedback loop"
 related-docs: 274, 364, 425, 428, 547
 tier: QUICK
 ---

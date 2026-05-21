@@ -1,10 +1,18 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Design ZAO Reddit reply bot using JustMakingMusic vertical pattern for music distribution without violating anti-spam or ToS (reconstructed)
+tier: STANDARD
+related-docs: 179, 354
+---
+
 # 486 — Reddit Reply Bot for ZAO + JustMakingMusic as a Distribution Vertical
 
 > **Status:** Research complete
 > **Date:** 2026-04-23
 > **Goal:** Scope a ZAO reply bot that engages Reddit threads about independent music / music distribution / DAW tools — using JustMakingMusic-style organic accounts as the distribution wedge — without tripping Reddit anti-spam, PRAW ToS, or our own brand guard rails.
-
----
 
 ## Key Decisions / Recommendations
 

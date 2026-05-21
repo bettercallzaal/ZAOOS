@@ -1,3 +1,12 @@
+---
+topic: wavewarz
+type: strategic-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Quotient anti-cucktrading manifesto — extract AI superforecaster design lessons for WaveWarZ prediction markets (reconstructed)"
+tier: production
+---
+
 # 421 — Quotient's Anti-Cucktrading Manifesto: AI Superforecaster Design for WaveWarZ
 
 > **Status:** Research complete

@@ -1,8 +1,9 @@
 ---
 topic: events
 type: guide
-status: draft
-last-validated: 2026-05-14
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Design ZABAL Games Season 1: Farcaster vibe-coding challenge, two-phase format (Phase 1 open build-a-thon, Phase 2 finals with 8 mentors), all-8-win model"
 related-docs: 646, 629, 628, 627, 626, 584, 361, 324, 322, 311
 tier: STANDARD
 ---

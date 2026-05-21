@@ -3,7 +3,7 @@ topic: events
 type: decision
 status: research-complete
 last-validated: 2026-05-20
-superseded-by:
+original-query: "Ground 4 buildables from ZAOstock May 19 standup against external practice: ZAO Scribe, NFC pro tickets, Wall of Pros, Z of All Games, AI DAO voting agent"
 related-docs: 609, 630, 654, 670, 680
 tier: STANDARD
 ---

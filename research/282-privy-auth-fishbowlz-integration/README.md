@@ -1,3 +1,13 @@
+---
+topic: farcaster
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Evaluate Privy as multi-method auth (Farcaster, wallet, email, social) for standalone apps like FISHBOWLZ (reconstructed)"
+tier: reference
+archive_note: "FISHBOWLZ paused 2026-04-16, partnering with Juke instead. These auth patterns valid for any standalone app, not FISHBOWLZ-specific."
+---
+
 # 282 — Privy Auth Integration for FISHBOWLZ
 
 > **Status:** Research complete

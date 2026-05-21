@@ -1,10 +1,18 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Define YouTube description structure, SEO strategy, and AI transcript-to-description workflow for COC Concertz multi-artist shows (reconstructed)
+tier: STANDARD
+related-docs: 353
+---
+
 # 351 — YouTube Description SEO & Transcript-to-Description Workflow for COC Concertz
 
 > **Status:** Research complete
 > **Date:** April 13, 2026
 > **Goal:** Define the optimal YouTube description structure, SEO strategy, timestamp/chapter formatting, and AI workflow for converting live concert transcripts into ready-to-paste YouTube descriptions for COC Concertz multi-artist shows
-
----
 
 ## Key Decisions / Recommendations
 

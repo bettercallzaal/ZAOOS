@@ -1,3 +1,12 @@
+---
+topic: events
+type: standup-report
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Capture ZAOstock progress on Apr 20 after team meeting, 25 PRs merged, status on volunteer signup, cypher signups, sponsor outreach"
+tier: STANDARD
+---
+
 # 445 — ZAOstock Monday Progress Report (Apr 20, 2026)
 
 > **Status:** Meeting-ready

@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research-brief
+status: research-stub
+last-validated: 2026-05-20
+original-query: "LLM wiki pattern from Karpathy — token-efficient codebase context management via persistent knowledge graphs (reconstructed)"
+tier: reference
+---
+
 # 309 - Karpathy's LLM Wiki: Codebase-to-Wiki Compiler for Token Optimization
 
 **Source:** Reddit r/ClaudeCode (via ZOE inbox, Apr 8 2026)

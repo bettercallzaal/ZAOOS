@@ -3,8 +3,9 @@ topic: identity
 type: comparison
 status: research-complete
 last-validated: 2026-04-28
-related-docs: 432, 542, 543, 544, 545
+original-query: "Patterns and anti-patterns from real Bonfires.ai deployments to guide ZAO's ZABAL Bonfire (reconstructed)"
 tier: DEEP
+related-docs: [432, 542, 543, 544, 545]
 ---
 
 # 546 - Bonfires.ai Real-World Deployments + Patterns to Adopt/Avoid

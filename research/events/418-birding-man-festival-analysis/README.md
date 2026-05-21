@@ -1,6 +1,11 @@
 # 418 — Birding Man Festival (Ramble On Farm) — Lessons for ZAOstock
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** comparable-event-analysis
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** What lessons can ZAOstock learn from Birding Man festival (May 1-2 2026, Trumansburg NY) for pricing, programming, partnerships, and positioning? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-17
 > **Goal:** Analyze Birding Man festival (May 1-2, 2026, Trumansburg NY) as a reference model for ZAOstock (Oct 3, 2026, Ellsworth ME). Extract pricing, programming, partner, and positioning lessons.
 

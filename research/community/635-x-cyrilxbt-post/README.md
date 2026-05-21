@@ -2,10 +2,10 @@
 topic: community
 type: reference
 status: research-complete
-last-validated: 2026-05-11
-related-docs: [project_hermes_canonical, project_zoe_v2_redesign]
+last-validated: 2026-05-20
+original-query: "CyrilXBT's multi-agent architecture insight from Anthropic workshop (reconstructed)"
+related-docs: [project_hermes_canonical, project_zoe_soul_architecture]
 tier: QUICK
-source: inbox-forward-2026-05-11
 ---
 
 # 635 - CyrilXBT on Anthropic AI Agents Workshop

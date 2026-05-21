@@ -1,3 +1,12 @@
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+tier: STANDARD
+original-query: "Design `/fractals` page in ZAO OS: frapps embed strategy, ORDAO proposal UI via orclient, Fibonacci scoring integration (reconstructed)"
+---
+
 # 102 — Fractals Page: frapps, ORDAO, and ZAO Fractal Governance
 
 > **Status:** Research complete — ready to build

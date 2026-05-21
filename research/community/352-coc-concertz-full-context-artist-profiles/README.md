@@ -1,8 +1,12 @@
 # 352 — COC Concertz Full Context: Show History, Artist Profiles, and Content Automation
 
-> **Status:** Research complete
+> **topic:** community
+> **type:** research-deep-dive
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Consolidate all COC Concertz context (shows, artists, links, community) into one reference doc (reconstructed)
+> **tier:** medium
 > **Date:** April 13, 2026
-> **Goal:** Consolidate all COC Concertz context (shows, artists, links, community) into one reference doc for YouTube descriptions, content generation, and the knowledge graph
 
 ---
 

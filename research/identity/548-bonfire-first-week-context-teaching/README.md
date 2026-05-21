@@ -3,8 +3,9 @@ topic: identity
 type: guide
 status: research-complete
 last-validated: 2026-04-29
-related-docs: 432, 542, 543, 544, 545, 546, 547
+original-query: "First-week context teaching playbook to accelerate Bonfire bot's ZAO ecosystem understanding (reconstructed)"
 tier: DEEP
+related-docs: [432, 542, 543, 544, 545, 546, 547]
 ---
 
 # 548 - Bonfire First-Week Context Teaching Playbook

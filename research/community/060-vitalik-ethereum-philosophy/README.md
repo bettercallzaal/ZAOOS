@@ -1,5 +1,12 @@
 # 60 — Vitalik's Ethereum Philosophy & EF Mandate: ZAO Alignment Analysis
 
+> **topic:** community
+> **type:** research-deep-dive
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Vitalik Buterin's core philosophy on Ethereum, governance, scaling, and decentralization principles (reconstructed)
+> **tier:** solid
+
 > **Status:** Research complete
 > **Date:** March 18, 2026
 > **Sources:** 6 Vitalik Buterin blog posts + EF Mandate (March 13, 2026)

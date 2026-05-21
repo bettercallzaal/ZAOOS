@@ -1,6 +1,11 @@
 # 207 — ZAO VPS Agent Stack: Full Session Log & Architecture
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** session-log-infrastructure
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** How is the ZAO VPS agent stack (OpenClaw, Paperclip, Claude Code) currently deployed and interconnected? What is the architecture for community-managed open-source agent infrastructure? (reconstructed)
+> **tier:** primary
 > **Date:** March 28, 2026
 > **Goal:** Document everything deployed on the ZAO VPS (31.97.148.88), how the systems connect, and the roadmap for turning this into a community-managed open-source agent infrastructure
 

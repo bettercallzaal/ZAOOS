@@ -2,7 +2,8 @@
 topic: governance
 type: decision
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-20
+original-query: "Capture Farcaster FIP #19 (Proof-of-Work Tokenization) + brainstorm async GitHub-native fractal tool using PRs/Discussions/Reactions/Projects as substrate (reconstructed)"
 related-docs: 056, 058, 102, 103, 109, 110, 657, 663
 tier: DEEP
 ---

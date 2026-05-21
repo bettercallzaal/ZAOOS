@@ -1,11 +1,19 @@
-# 97 — Reddit Cross-Posting Integration for ZAO OS
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Add Reddit as a cross-posting target with API research, SDK options, OAuth flow, rate limits, and music subreddit strategy (reconstructed)
+tier: STANDARD
+related-docs: 28, 77, 96, 486
+---
+
+# 179 — Reddit Cross-Posting Integration for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 20, 2026
 > **Goal:** Add Reddit as a cross-posting target from ZAO OS — API research, SDK options, OAuth flow, rate limits, costs, music subreddits, and implementation plan
 > **Builds on:** Doc 28 (Cross-Platform Publishing), Doc 77 (Bluesky Integration), Doc 96 (Cross-Post API Deep Dive)
-
----
 
 ## Key Decisions / Recommendations
 

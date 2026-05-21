@@ -1,10 +1,18 @@
-# 107 — Social Connections & X Integration for ZAO OS
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Add X/Twitter and other social platform connections to ZAO OS settings with Neynar handle discovery and UI refactor (reconstructed)
+tier: STANDARD
+related-docs: 96, 354
+---
+
+# 183 — Social Connections & X Integration for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 22, 2026
 > **Goal:** Add X/Twitter + other social platform connections to ZAO OS settings, pull X handles directly from Farcaster profiles via Neynar API, clean up the multi-social settings UI
-
----
 
 ## Key Decisions / Recommendations
 

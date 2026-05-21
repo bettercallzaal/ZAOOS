@@ -1,6 +1,11 @@
 # 326 -- Farcaster Agentic Bootcamp: Complete Session Guide & ZABAL Agent Swarm Extraction
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** bootcamp-synthesis-agent-swarm-extraction
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** What is the complete inventory of all 10 bootcamp sessions and what techniques apply to the ZABAL agent swarm? (reconstructed)
+> **tier:** primary
 > **Date:** April 11, 2026
 > **Goal:** Consolidated inventory of all 10 bootcamp sessions, identify what's covered in existing docs, what's missing, and extract every technique applicable to the ZABAL agent swarm (doc 325)
 

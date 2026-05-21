@@ -1,8 +1,12 @@
 # 200 — The Definitive Community OS: AI Agents, Platform Architecture & Vision
 
-> **Status:** Research complete
+> **topic:** community
+> **type:** research-vision
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Define what makes ZAO OS the best community operating system — AI agent strategy, competitive landscape, platform architecture, and the path to a forkable community OS (reconstructed)
+> **tier:** medium
 > **Date:** March 28, 2026
-> **Goal:** Define what makes ZAO OS the best community operating system — AI agent strategy, competitive landscape, platform architecture, and the path to a forkable community OS that any group can deploy
 
 ## Key Decisions / Recommendations
 

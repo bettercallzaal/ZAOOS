@@ -1,4 +1,13 @@
-# 97 — WaveWarZ Artist Discovery Pipeline for ZAO OS
+---
+topic: wavewarz
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Build an artist discovery pipeline that pulls WaveWarZ battle data into ZAO OS (reconstructed)"
+tier: production
+---
+
+# 180 — WaveWarZ Artist Discovery Pipeline for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 21, 2026

@@ -1,3 +1,12 @@
+---
+topic: events
+type: expansion-strategy
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Document FarmDrop 3-region statewide expansion proposals (Downeast, Southern Maine, Aroostook), Aug 6 Sam Lardner event, and generate BCZ Maine follow-up todos"
+tier: STANDARD
+---
+
 # 458 — FarmDrop Statewide Expansion + Sam Lardner & Barcelona Collab + Maine Follow-Up Todos
 
 > **Status:** Source extraction complete — ready for portal todo bulk-add + content production

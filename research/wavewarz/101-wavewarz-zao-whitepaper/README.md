@@ -1,3 +1,12 @@
+---
+topic: wavewarz
+type: strategic-guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Synthesize WaveWarZ platform mechanics and artist discovery into ZAO OS integration strategy (reconstructed)"
+tier: production
+---
+
 # 101 — WaveWarZ × ZAO OS: Integration Whitepaper
 
 > **Status:** Research complete

@@ -1,3 +1,12 @@
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+tier: STANDARD
+original-query: "ProposalsTab.tsx redesign audit: 10 UX gaps vs. Snapshot/Tally/Nouns, card design, voting UI, filters, mobile-first patterns (reconstructed)"
+---
+
 # 111 — Proposal UI Best Practices for ZAO OS
 
 > **Status:** Research complete

@@ -2,7 +2,8 @@
 topic: governance
 type: market-research
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: "Deep scrape of Nouns DAO mechanism lore, ecosystem map, governance scars, and concrete ZAO patterns to steal (reconstructed)"
 related-docs: 432, 458, 475, 502, 547, 565
 tier: DEEP
 ---

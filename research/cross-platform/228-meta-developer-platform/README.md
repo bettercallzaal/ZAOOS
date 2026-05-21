@@ -1,3 +1,13 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate all Meta/Facebook APIs and models for ZAO OS including Threads, Instagram publishing, WhatsApp notifications, and Llama models (reconstructed)
+tier: STANDARD
+related-docs: 177, 354
+---
+
 # 228 — Meta Developer Platform: APIs, Models & Integration Opportunities for ZAO OS
 
 > **Status:** Research complete

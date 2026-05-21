@@ -1,6 +1,11 @@
 # 442 — WaveWarZ Sunday Battle Recap Socials — Apr 20 2026
 
-> **Status:** Ready to post
+> **topic:** events
+> **type:** event-social-content
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** What should the WaveWarZ Sunday featured battle (Scary vs Stormy, Apr 20 2026) social media recaps be across Farcaster, X, Telegram, LinkedIn? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-20
 > **Goal:** Draft cross-platform social recaps for the WaveWarZ Sunday featured battle — Scary vs Stormy, HadeZ Throne.
 

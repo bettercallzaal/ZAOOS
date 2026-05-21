@@ -3,9 +3,9 @@ topic: identity
 type: guide
 status: research-complete
 last-validated: 2026-05-20
-related-docs: [271, 051, 158]
 original-query: "ZAO decentralized identity layer wrapping Farcaster FIDs with music profile and community context (reconstructed)"
 tier: STANDARD
+related-docs: [271, 051, 158]
 ---
 
 # 005 - ZIDs — ZAO Decentralized Identity

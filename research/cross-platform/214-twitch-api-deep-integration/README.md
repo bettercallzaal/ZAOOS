@@ -1,11 +1,19 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Map all Twitch Helix API capabilities for ZAO OS spaces streaming, identify integration gaps and build priorities (reconstructed)
+tier: STANDARD
+related-docs: 163, 213, 627
+---
+
 # 214 — Twitch API Deep Integration: Comprehensive Feature Map for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 28, 2026
 > **Goal:** Map every Twitch Helix API capability to ZAO OS features, assess current integration gaps, and prioritize what to build next
 > **Updates:** Doc 163 (Multistreaming Platforms), Doc 213 (Spaces Streaming Architecture)
-
----
 
 ## Key Decisions / Recommendations
 

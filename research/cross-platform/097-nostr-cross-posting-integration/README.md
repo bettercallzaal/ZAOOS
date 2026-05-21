@@ -1,11 +1,19 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Add Nostr as a cross-posting target with music status broadcasting and Wavlake integration for ZAO OS (reconstructed)
+tier: STANDARD
+related-docs: 28, 77, 96
+---
+
 # 97 — Nostr Cross-Posting Integration for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 20, 2026
 > **Goal:** Add Nostr as a cross-posting target — post ZAO content to the Nostr network, enable music status broadcasting, and connect with the Wavlake music ecosystem
 > **Builds on:** Doc 28 (Cross-Platform Publishing), Doc 77 (Bluesky Integration), Doc 96 (Cross-Post API Deep Dive)
-
----
 
 ## Executive Summary
 

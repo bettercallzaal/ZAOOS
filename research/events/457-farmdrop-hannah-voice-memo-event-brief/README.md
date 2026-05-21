@@ -1,3 +1,12 @@
+---
+topic: events
+type: event-deep-brief
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Extract Hannah Semler voice memo on FarmDrop platform migration, Food for Health launch, May 24 event run-of-show, and reposition event messaging"
+tier: STANDARD
+---
+
 # 457 — FarmDrop: Hannah Voice Memo Deep Brief + May 24 Event Full Run-of-Show
 
 > **Status:** Source extraction complete — ready for content production

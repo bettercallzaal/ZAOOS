@@ -1,8 +1,12 @@
 # Research Doc 105: Key People in the Fractal Governance Ecosystem
 
-**Date:** 2026-03-21
-**Topic:** Dan Singjoy (Optimystics) & Tadas Vaitiekunas (ORDAO)
-**Purpose:** Identify key collaborators for ZAO's fractal governance integration
+> **topic:** community
+> **type:** research-profiles
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Identify key collaborators for ZAO's fractal governance integration (reconstructed)
+> **tier:** medium
+> **Date:** 2026-03-21
 
 ---
 

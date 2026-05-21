@@ -1,3 +1,12 @@
+---
+topic: governance
+type: research
+status: research-complete
+last-validated: 2026-05-20
+tier: STANDARD
+original-query: "Map fractal governance ecosystem: Eden Fractal (Base, active), Optimism Fractal (paused), Fractally (dormant), ORDAO tooling landscape (reconstructed)"
+---
+
 # 103 — Fractal Governance Ecosystem Deep Dive (March 2026)
 
 > **Date:** 2026-03-05

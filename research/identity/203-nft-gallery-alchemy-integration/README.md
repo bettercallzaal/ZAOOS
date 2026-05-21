@@ -1,3 +1,13 @@
+---
+topic: identity
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "NFT gallery display on member profiles using Alchemy NFT v3 API with chain/collection filtering and ZOUNZ highlighting (reconstructed)"
+tier: STANDARD
+related-docs: [135, 271]
+---
+
 # 203 — NFT Gallery on Member Profiles via Alchemy NFT API
 
 > **Status:** Implemented

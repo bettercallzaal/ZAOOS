@@ -1,6 +1,11 @@
 # 369 - DreamEvent.ai Framework: What ZAOstock Is Missing
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** gap-analysis-event-planning
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** What event planning best practices from DreamEvent.ai are missing from ZAOstock's current planning? (reconstructed)
+> **tier:** primary
 > **Date:** 2026-04-16
 > **Goal:** Reverse-engineer DreamEvent.ai's event planning framework to find gaps in ZAOstock planning
 

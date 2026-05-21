@@ -1,3 +1,12 @@
+---
+topic: governance
+type: research
+status: research-complete
+last-validated: 2026-05-20
+tier: STANDARD
+original-query: "Document ORDAO smart contract architecture, Respect Game mechanics, and orclient SDK for ZAO OS integration (reconstructed)"
+---
+
 # ORDAO & Respect Game System -- Research
 
 > The Optimistic Respect-based DAO (ORDAO) governance system, the Respect Game, and how The ZAO uses fractal scoring for on-chain reputation.

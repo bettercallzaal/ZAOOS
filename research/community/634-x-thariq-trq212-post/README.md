@@ -1,13 +1,12 @@
 ---
 topic: community
-type: guide
+type: reference
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-20
+original-query: "Thariq's X post on HTML output format for agent systems and specs (reconstructed)"
 related-docs:
   - 549-21st-skill-deployment
-  - claude-code-cli
 tier: QUICK
-source: inbox-forward-2026-05-11
 ---
 
 # 634 - Thariq (@trq212) on X: HTML as the Unreasonable Effectiveness Format for Claude Code

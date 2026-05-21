@@ -1,5 +1,12 @@
 # 61 — Ethereum Alignment Opportunities: ZK Credentials, Curation Markets, Community Notes, Cross-Community Fractals & Grants
 
+> **topic:** community
+> **type:** research-analysis
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Map Ethereum's alignment opportunities with ZAO's impact network model (reconstructed)
+> **tier:** solid
+
 > **Status:** Research complete
 > **Date:** March 18, 2026
 > **Sources:** 5 parallel research agents

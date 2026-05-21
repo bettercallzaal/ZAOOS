@@ -1,3 +1,12 @@
+---
+topic: governance
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Design a ZAO Oracle system that captures and verifies real community outcomes on-chain, enabling trustless ZABAL reward distribution based on provable contributions"
+tier: DEEP
+---
+
 # 347 -- ZAO Oracle: Verifying Real Outcomes for ZABAL Rewards
 
 > **Status:** Research complete

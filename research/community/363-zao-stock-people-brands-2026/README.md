@@ -1,9 +1,12 @@
 # 363 - ZAOstock People + Brands: Comprehensive Profile Index
 
-> **Status:** In progress (autoresearch overnight)
+> **topic:** community
+> **type:** research-profiles
+> **status:** research-complete
+> **last-validated:** 2026-05-20
+> **original-query:** Comprehensive profile index for ZAOstock 2026 team members and ZAO brands with verified data points (reconstructed)
+> **tier:** medium
 > **Date:** 2026-04-15
-> **Goal:** Up-to-date profiles for every team member and ZAO brand, with verified data points for sponsor pitches and public pages
-> **Builds on:** Docs 229, 230, 231, 232 (existing profiles from March 2026)
 
 ---
 

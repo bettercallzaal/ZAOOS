@@ -38,3 +38,34 @@ export function jukeEmbedUrl(spaceId: string): string {
   }
   return `${JUKE_EMBED_ORIGIN}/embed/${encodeURIComponent(spaceId)}`;
 }
+
+/**
+ * Extract a Juke space id from free-form user input — either a raw id or a
+ * juke.audio link in any shape (`/embed/{id}`, `/space/{id}`, `/{id}`, ...).
+ * The last path segment is taken as the id. Returns `null` when the input is
+ * not a Juke link or does not end in a valid id, so callers can show an
+ * inline error rather than routing to a dead space.
+ */
+export function parseJukeSpaceId(input: string): string | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+
+  // Bare id pasted directly.
+  if (isValidJukeSpaceId(trimmed)) return trimmed;
+
+  // Otherwise treat it as a URL; tolerate a missing protocol.
+  const candidate = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  let url: URL;
+  try {
+    url = new URL(candidate);
+  } catch {
+    return null;
+  }
+
+  if (url.hostname !== 'juke.audio' && url.hostname !== 'www.juke.audio') {
+    return null;
+  }
+
+  const lastSegment = url.pathname.split('/').filter(Boolean).at(-1);
+  return lastSegment && isValidJukeSpaceId(lastSegment) ? lastSegment : null;
+}

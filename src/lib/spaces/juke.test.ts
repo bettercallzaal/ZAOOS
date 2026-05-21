@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { JUKE_EMBED_ORIGIN, isValidJukeSpaceId, jukeEmbedUrl } from './juke';
+import { JUKE_EMBED_ORIGIN, isValidJukeSpaceId, jukeEmbedUrl, parseJukeSpaceId } from './juke';
 
 describe('isValidJukeSpaceId', () => {
   it('accepts plain alphanumeric ids', () => {
@@ -58,5 +58,52 @@ describe('jukeEmbedUrl', () => {
   it('throws on an invalid id rather than emitting a bad URL', () => {
     expect(() => jukeEmbedUrl('../evil')).toThrow('Invalid Juke space id');
     expect(() => jukeEmbedUrl('')).toThrow('Invalid Juke space id');
+  });
+});
+
+describe('parseJukeSpaceId', () => {
+  it('returns a bare id pasted directly', () => {
+    expect(parseJukeSpaceId('zao-live-42')).toBe('zao-live-42');
+  });
+
+  it('trims surrounding whitespace', () => {
+    expect(parseJukeSpaceId('  abc123  ')).toBe('abc123');
+  });
+
+  it('extracts the id from a full embed URL', () => {
+    expect(parseJukeSpaceId('https://juke.audio/embed/abc123')).toBe('abc123');
+  });
+
+  it('extracts the id from any juke.audio path shape', () => {
+    expect(parseJukeSpaceId('https://juke.audio/space/xyz789')).toBe('xyz789');
+    expect(parseJukeSpaceId('https://juke.audio/rooms/room-1')).toBe('room-1');
+    expect(parseJukeSpaceId('https://juke.audio/abc123')).toBe('abc123');
+  });
+
+  it('tolerates a missing protocol', () => {
+    expect(parseJukeSpaceId('juke.audio/embed/abc123')).toBe('abc123');
+  });
+
+  it('accepts the www host', () => {
+    expect(parseJukeSpaceId('https://www.juke.audio/embed/abc123')).toBe('abc123');
+  });
+
+  it('ignores query strings and trailing slashes on a link', () => {
+    expect(parseJukeSpaceId('https://juke.audio/embed/abc123?utm=x')).toBe('abc123');
+    expect(parseJukeSpaceId('https://juke.audio/embed/abc123/')).toBe('abc123');
+  });
+
+  it('rejects a non-Juke host', () => {
+    expect(parseJukeSpaceId('https://evil.example.com/embed/abc123')).toBeNull();
+    expect(parseJukeSpaceId('https://juke.audio.evil.com/embed/abc')).toBeNull();
+  });
+
+  it('rejects empty or unparseable input', () => {
+    expect(parseJukeSpaceId('')).toBeNull();
+    expect(parseJukeSpaceId('   ')).toBeNull();
+  });
+
+  it('rejects a juke.audio link whose last segment is not a valid id', () => {
+    expect(parseJukeSpaceId('https://juke.audio/embed/has spaces')).toBeNull();
   });
 });

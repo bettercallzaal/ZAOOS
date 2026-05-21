@@ -2,7 +2,7 @@
 topic: identity
 type: comparison
 status: research-complete
-last-validated: 2026-04-25
+last-validated: 2026-05-21
 original-query: "Guild.xyz vs alternatives for token-gating platforms in ZAO OS (reconstructed)"
 tier: DISPATCH
 related-docs: [055, 273, 283, 500]

@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Exhaustive inventory of profile enrichment signals via wallet, FID, social accounts with Airstack as primary aggregator (reconstructed)"
 tier: STANDARD
 related-docs: [134, 191, 271]

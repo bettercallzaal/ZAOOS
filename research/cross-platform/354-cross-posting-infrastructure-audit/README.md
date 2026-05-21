@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Audit all cross-posting infrastructure in ZAO OS and design agent teaser distribution workflow with approval gates (reconstructed)
 tier: STANDARD
 related-docs: 96, 183, 355

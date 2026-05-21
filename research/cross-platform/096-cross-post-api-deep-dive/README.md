@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Comprehensive API research for each cross-posting platform including SDKs, costs, rate limits, music relevance, and code examples (reconstructed)
 tier: STANDARD
 related-docs: 28, 36, 77, 177, 179

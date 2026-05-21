@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Map StreamElements creator tooling layer to ZAO ecosystem use cases including overlays, alerts, tipping, and loyalty systems (reconstructed)
 related-docs: 214, 192, 215, 217, 233, 275
 tier: STANDARD

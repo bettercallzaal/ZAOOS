@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [005, 198, 199, 207, 050, 051, 158]
 original-query: "ZAO knowledge graph for member identity and relationship mapping across on-chain activity, chat, fractals, and IRL events (reconstructed)"
 tier: STANDARD

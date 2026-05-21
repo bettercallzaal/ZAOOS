@@ -2,7 +2,7 @@
 topic: business
 type: research-brief
 status: research-stub
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Vibe-coded app development + marketing playbook for rapid MVP validation and App Store scaling (reconstructed)"
 tier: reference
 ---

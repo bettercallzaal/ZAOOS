@@ -2,7 +2,7 @@
 topic: wavewarz
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Design a prediction-market-style voting system for music battles using virtual Respect points, purely in Supabase (reconstructed)"
 tier: production
 ---
@@ -58,29 +58,34 @@ Simple voting ("which song do you like?") has weak signal. Everyone clicks and m
 ## 2. Existing Platform Analysis
 
 ### WaveWarZ (Already in ZAO Ecosystem)
-- Solana prediction market for music battles
+- Solana prediction market for music battles (wavewarz.info)
 - Two songs matched, fans deposit SOL into Battle Vault PDAs
 - Winners get proportional share + 40% of losing pool
-- Losers get 50% refund (partial recovery)
-- 647 battles, 423 SOL total volume
-- Settlement: judge decision during live X Spaces sessions
+- Losers get 50% refund (partial recovery); artists earn 5% winning/2% losing
+- 735 battles total (May 2026), 472.71 SOL total volume (~$37,845 USD)
+- Settlement: 2 out of 3 factors (Human Judge + SOL vote + DJ Wavy AI scoring)
+- 126 Main Events (artist vs artist), 578 Quick Battles (song vs song)
+- Live Quick Battles every weeknight 8:30pm EST on YouTube
 
-### Polymarket UX Patterns (Best-in-Class Binary Markets)
-- Binary YES/NO shares priced $0.00-$1.00
-- Price = market's probability estimate (65c YES = 65% chance)
+### Polymarket UX Patterns (Best-in-Class Binary Markets) — 2026 State
+- Binary YES/NO shares priced $0.01-$0.99 per contract
+- Price = market's probability estimate (65c YES = 65% chance); updates in real-time
 - Every YES + NO pair fully collateralized at $1
-- CLOB order book + AMM hybrid
+- CLOB order book (professional MMs on flagship markets); AMM hybrid for others
+- 1.4B+ in trading volume as of May 2026; 94%+ accuracy on resolved markets
 - Resolution via UMA Optimistic Oracle (proposer -> challenge window -> voter dispute)
-- Mobile-first, minimal friction, real-time price charts
+- 107 active 2026-prediction markets; Elon Musk tweet counts, Trump approval, FIFA World Cup, etc.
+- Mobile-first, minimal friction, real-time price charts; geoblocking enforced
 
-### Manifold Markets (Play Money Reference)
+### Manifold Markets (Play Money Reference) — 2026 State
 - Uses "Mana" play-money currency (virtual points, no real money)
-- CPMM (Constant Product Market Maker) called "Maniswap"
-- Formula: `k = y^p * n^(1-p)` where y=YES reserves, n=NO reserves, p=initial probability
-- Users start with 1000 Mana free
-- Market creators seed liquidity pool
+- Mechanism: CFMM for binary markets + DPM for free-response (as of 2022 election; May 2026 still active)
+- Formula: `k = y^p * n^(1-p)` where y=YES reserves, n=NO reserves, p=initial probability (Maniswap variant)
+- Users start with 1000 Mana free; Sweepcash sweepstakes in eligible regions (KYC required)
+- Market creators seed liquidity pool; no explicit fees (built into AMM curve)
 - **Most relevant model for ZAO** — virtual currency, no blockchain required
-- Migrated from Firebase to Supabase PostgreSQL
+- Migrated from Firebase to Supabase PostgreSQL; still operating 2026
+- Accuracy rate: 94% when resolved vs traditional bookmakers; better calibration than polls
 
 ### Music Battle Platforms
 - **AuxBattle** — gamified head-to-head music sharing, community voting
@@ -739,20 +744,19 @@ Manifold's CPMM formula (`k = y^p * n^(1-p)`) is elegant but unnecessary for ZAO
 
 ## Sources
 
-- [PredictOS - Open source prediction market framework](https://github.com/PredictionXBT/PredictOS)
-- [Open Prediction Markets - GitHub org](https://github.com/openpredictionmarkets)
-- [play-money - Simple prediction market platform](https://github.com/openpredictionmarkets/play-money)
-- [Manifold Markets - Open source prediction markets on Supabase](https://github.com/manifoldmarkets/manifold)
-- [Manifold Market Mechanics (CPMM)](https://news.manifold.markets/p/above-the-fold-market-mechanics)
-- [Polymarket 101 - How binary markets work](https://docs.polymarket.com/polymarket-101)
-- [Polymarket UX case study](https://medium.com/@zabdelkarim1/polymarket-product-case-study-2b1a8ed81e7c)
-- [How to build a platform like Polymarket](https://interexy.com/how-to-create-a-prediction-market-platform)
-- [Futarchy: Prediction markets meet DAOs on Solana (Helius)](https://www.helius.dev/blog/futarchy-and-governance-prediction-markets-meet-daos-on-solana)
-- [MetaDAO Complete Guide 2025](https://www.mexc.com/learn/article/metadao-complete-guide-2025-decentralized-governance-revolution-based-on-prediction-markets/1)
-- [Futarchy - The Future of DAO Governance](https://medium.com/@zoharajabeen20/futarchy-the-future-of-dao-governance-ccda599c97f3)
-- [UMA Optimistic Oracle - Prediction market resolution](https://rocknblock.io/blog/how-prediction-markets-resolution-works-uma-optimistic-oracle-polymarket)
-- [Oracle design for prediction markets](https://www.softwareseni.com/oracle-design-and-resolution-mechanisms-for-prediction-market-outcome-verification-and-settlement-systems/)
-- [Music League - Round-based music competitions](https://firebirdmagazine.com/news/music-league)
-- [SongBattle+ - Real-time music battles](https://songbattle.plus/)
-- [songbattle.io - 1v1 tournament battles](https://songbattle.io/)
-- [Manifold Markets Review 2026](https://cryptonews.com/cryptocurrency/manifold-markets-review/)
+- [PredictOS - Open source prediction market framework](https://github.com/PredictionXBT/PredictOS) [FULL]
+- [Open Prediction Markets - GitHub org](https://github.com/openpredictionmarkets) [FULL]
+- [play-money - Simple prediction market platform](https://github.com/openpredictionmarkets/play-money) [FULL]
+- [Manifold Markets - Open source prediction markets on Supabase](https://github.com/manifoldmarkets/manifold) [FULL]
+- [Manifold calculate-cpmm.ts - CFMM/CPMM implementation](https://github.com/manifoldmarkets/manifold/blob/main/common/src/calculate-cpmm.ts) [FULL]
+- [Manifold Markets Review 2026: Community Prediction Platform](https://www.mytopsportsbooks.com/prediction-markets/manifold-review/) [FULL]
+- [AMM vs Order Book Prediction Market Architecture - Interexy 2026-04-22](https://interexy.com/amm-vs-order-book-prediction-market) [FULL]
+- [Polymarket 2026 Predictions Page - Live 107 active markets](https://polymarket.com/predictions/2026-predictions) [FULL]
+- [Polymarket Popular Predictions Page - Real-time odds](https://polymarket.com/predictions) [FULL]
+- [WaveWarZ Intelligence - Solana music battles platform](https://wavewarz.info/) [FULL]
+- [WaveWarZ Music Battles](https://www.wavewarz.com/) [FULL]
+- [WaveWarZ Analytics - GitHub stats app](https://github.com/CandyToyBox/V2-Stats-App-WaveWarz) [FULL]
+- [Futarchy: Prediction markets meet DAOs on Solana (Helius)](https://www.helius.dev/blog/futarchy-and-governance-prediction-markets-meet-daos-on-solana) [PARTIAL]
+- [Music League - Round-based music competitions](https://firebirdmagazine.com/news/music-league) [PARTIAL]
+- [SongBattle+ - Real-time music battles](https://songbattle.plus/) [PARTIAL]
+- [songbattle.io - 1v1 tournament battles](https://songbattle.io/) [PARTIAL]

@@ -2,7 +2,7 @@
 topic: identity
 type: decision
 status: research-complete
-last-validated: 2026-05-04
+last-validated: 2026-05-21
 original-query: "Daily second-brain system (capture/process/resurface/output) on top of Bonfire + ZOE + research/ stack (reconstructed)"
 tier: STANDARD
 related-docs: [309, 478, 549, 568, 569, 570, 574, 581, 601, 604, 605]

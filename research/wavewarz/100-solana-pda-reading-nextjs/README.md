@@ -2,7 +2,7 @@
 topic: wavewarz
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How to read Solana PDA data server-side in Next.js for WaveWarZ battle vaults (reconstructed)"
 tier: production
 ---

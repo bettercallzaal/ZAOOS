@@ -2,7 +2,7 @@
 topic: wavewarz
 type: strategic-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Synthesize WaveWarZ platform mechanics and artist discovery into ZAO OS integration strategy (reconstructed)"
 tier: production
 ---
@@ -50,21 +50,21 @@ WaveWarZ is a **Solana prediction market for music battles** — closer in mecha
 - Built on Solana — complements ZAO's EVM-first stack with multi-chain credibility
 - Already integrated at ZAO OS `/wavewarz` — community is aware of it
 
-### 1.2 Platform Statistics (March 21, 2026)
+### 1.2 Platform Statistics (May 21, 2026 — Updated)
 
-| Metric | Value |
-|--------|-------|
-| Total Trading Volume | 423.37 SOL ($38,005.94) |
-| Total Battles | 647 |
-| Main Events | 120 |
-| Quick Battles | 497 |
-| Tracked Artists | 43+ |
-| Artist Payouts (total) | 7.17 SOL ($643.85) |
-| Platform Revenue | 3.38 SOL ($303.08) |
-| Charity Raised | ~$1,500 USD |
-| Live Schedule | Mon–Fri, 8:30 PM EST (X Spaces) |
-| Community AMAs | Mon–Fri, 11:00 AM EST |
-| SOL Rate (at time of writing) | $89.77 |
+| Metric | Value | Change vs March 21 |
+|--------|-------|-------------------|
+| Total Trading Volume | 472.71 SOL ($37,845) | +49.34 SOL +11.6% |
+| Total Battles | 735 | +88 battles +13.6% |
+| Main Events | 126 | +6 +5% |
+| Quick Battles | 578 | +81 +16.3% |
+| Tracked Artists | 43+ | No change |
+| Artist Payouts (total) | 7.96 SOL ($637.08) | +0.79 SOL +11% |
+| Platform Revenue | 3.75 SOL | +0.37 SOL +11% |
+| Charity Raised | ~$1,500 USD | Maintained |
+| Live Schedule | Weeknight 8:30pm EST (YouTube + X Spaces) | Confirmed active |
+| Community AMAs | Daily presence | Maintained |
+| SOL Rate (at time of May 2026) | ~$79.90 USD | Down from $89.77 |
 
 ### 1.3 Battle Mechanics
 

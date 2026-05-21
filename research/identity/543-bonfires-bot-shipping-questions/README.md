@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-21
 original-query: "10 operational shipping questions for Bonfire bot to move from verdict to implementation (reconstructed)"
 tier: DEEP
 related-docs: [523, 524, 527, 529, 531, 539, 541, 542]

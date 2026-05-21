@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Design optimal transcript-to-YouTube pipeline for COC Concertz with comparison of external tools vs custom build approach (reconstructed)
 tier: STANDARD
 related-docs: 351

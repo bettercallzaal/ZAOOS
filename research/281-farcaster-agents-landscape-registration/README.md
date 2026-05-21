@@ -2,7 +2,7 @@
 topic: farcaster
 type: research-report
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Map Farcaster agents landscape, compare registration methods, find cheapest path for CASTER (reconstructed)"
 tier: production
 ---

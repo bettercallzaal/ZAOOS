@@ -2,7 +2,7 @@
 topic: wavewarz
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Build an artist discovery pipeline that pulls WaveWarZ battle data into ZAO OS (reconstructed)"
 tier: production
 ---

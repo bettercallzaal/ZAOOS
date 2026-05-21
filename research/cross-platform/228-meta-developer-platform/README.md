@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Evaluate all Meta/Facebook APIs and models for ZAO OS including Threads, Instagram publishing, WhatsApp notifications, and Llama models (reconstructed)
 tier: STANDARD
 related-docs: 177, 354
@@ -340,12 +340,12 @@ Meta does use audio fingerprinting internally (via Audible Magic partnership) fo
 
 ---
 
-## Sources
+## Sources [FULL] — Re-validated 2026-05-21
 
-- [Threads API Publishing Reference](https://developers.facebook.com/docs/threads/reference/publishing/)
-- [Threads API Get Access Tokens](https://developers.facebook.com/docs/threads/get-started/get-access-tokens-and-permissions/)
-- [Threads API Changelog](https://developers.facebook.com/docs/threads/changelog/)
-- [Instagram Content Publishing API](https://developers.facebook.com/docs/instagram-platform/content-publishing/)
+- [Meta Developer Documentation](https://developers.facebook.com/docs/) [FULL] — Portal current
+- [Threads API Posts Publishing](https://developers.facebook.com/docs/threads/posts/) [FULL] — 2-step flow, carousel (20 items), 5 link limit, OAuth 2.0 with short/long-lived tokens
+- [Threads API Get Started](https://developers.facebook.com/docs/threads/get-started/) [FULL] — Permissions (threads_basic, threads_content_publish, etc), OAuth 2.0, Meta App Review required
+- [Instagram Content Publishing API](https://developers.facebook.com/docs/instagram-platform/content-publishing/) [PARTIAL]
 - [Instagram Graph API Developer Guide 2026](https://elfsight.com/blog/instagram-graph-api-complete-developer-guide-for-2026/)
 - [WhatsApp Business API Pricing 2026](https://www.flowcall.co/blog/whatsapp-business-api-pricing-2026)
 - [WhatsApp Cloud API Setup Guide](https://chatarmin.com/en/blog/whatsapp-cloudapi)

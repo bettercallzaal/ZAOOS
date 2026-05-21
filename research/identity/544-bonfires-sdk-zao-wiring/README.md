@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-21
 original-query: "Bonfires SDK wiring patterns to ZOE bot, Hermes Coder, and Zaal personal intake (reconstructed)"
 tier: DEEP
 related-docs: [523, 524, 527, 529, 531, 539, 541, 542]
@@ -686,29 +686,39 @@ After SDK + Notion config review, the remaining real unknowns are:
 
 ## References & Citations
 
-### SDK Sources
+### SDK Sources [RE-FETCHED MAY 21 2026]
 
-1. **bonfires-sdk README.md** - https://raw.githubusercontent.com/NERDDAO/bonfires-sdk/canon/README.md (SDK v0.4.0, classes/functions: BonfiresClient, kg.search, kg.create_entity, kg.create_edge, agents.chat, agents.sync, kengrams.create, kengrams.verify, ontology.create_profile)
+1. **bonfires-sdk README.md** - https://raw.githubusercontent.com/NERDDAO/bonfires-sdk/canon/README.md [FULL] (SDK v0.4.0 confirmed, last pushed 2026-04-16. Classes/functions verified: BonfiresClient, kg.search, kg.create_entity, kg.create_edge, agents.chat, agents.sync, kengrams.create, kengrams.verify, ontology.create_profile. All methods match doc 544 implementation examples.)
 
-2. **bonfires-sdk pyproject.toml** - https://raw.githubusercontent.com/NERDDAO/bonfires-sdk/canon/pyproject.toml (version 0.4.0, dependencies, entry points)
+2. **bonfires-sdk repo metadata** - https://github.com/NERDDAO/bonfires-sdk [FULL] (Last push April 16 2026. Default branch: canon. Contributors: 1 (Ataxia123). 3 stars, 0 open issues. Python 99.7%, MIT license. Repository created 2026-03-11.)
 
-3. **bonfires-sdk CLAUDE.md** - https://raw.githubusercontent.com/NERDDAO/bonfires-sdk/canon/CLAUDE.md (architecture, config priority, API contract for graph_mode, kEngrams, CLI commands)
+3. **bonfires-sdk CLAUDE.md** - https://raw.githubusercontent.com/NERDDAO/bonfires-sdk/canon/CLAUDE.md [FULL] (Architecture confirmed: config priority, API contract for graph_mode ("adaptive", "static", "regenerate", "append"), kEngrams, CLI commands. API endpoint default tnt-v2.api.bonfires.ai still correct.)
 
-4. **bonfires-sdk source structure** - https://github.com/NERDDAO/bonfires-sdk/tree/canon (bonfires/ package containing api.py, cli.py, kg.py, agents.py, kengram/, ontology/)
+4. **bonfires-sdk source structure** - https://github.com/NERDDAO/bonfires-sdk/tree/canon [FULL] (Confirmed: bonfires/ package contains api.py, cli.py, kg.py, agents.py, kengram/, ontology/ submodules. No breaking changes to directory structure since April 2026.)
 
-### Notion Sources
+### Bonfires.ai Platform Sources [RE-FETCHED MAY 21 2026]
 
-5. **Bonfires.ai Agent Configuration Reference** - https://www.notion.so/fractalnouns/Bonfires-ai-Agent-Configuration-Reference-33b384a11f5681bbad4ec6daf9cf32d2 (community draft April 2026, core concepts: Bonfire/Cluster/Episode/Stack/kEngram, agent config tabs: General/Platform/Chat/Tools/Personality, policy hierarchy, storage toggles)
+5. **Bonfires.ai landing page** - https://mint.bonfires.ai/ [FULL] (Pricing tiers: Basic (1 admin, standard tokens), Advanced (multiple admins, higher tokens), Genesis (unlimited admins, max tokens, dedicated support). Features: knowledge graph (88k nodes), passive agent listening, semantic search, MCP integration, Telegram/Discord agents confirmed. "No new tools, no migration" messaging consistent with SDK design.)
+
+6. **Bonfires app dashboard** - https://app.bonfires.ai/ [PARTIAL] (Dashboard accessible, login required. Cannot verify live agent config UI changes May 21 2026 without credentials.)
+
+### Related Package: bonfire-ai (PyPI, separate from bonfires-sdk)
+
+7. **bonfire-ai PyPI v0.1.0a3** - https://pypi.org/project/bonfire-ai/0.1.0a3/ [FULL] (Note: DIFFERENT package. bonfire-ai is alpha Vault/agent framework on PyPI. bonfires-sdk (doc 544 focus) is the official Bonfires.ai SDK at https://github.com/NERDDAO/bonfires-sdk. No naming conflict in practice; bonfires-sdk is canonical for ZAO.)
+
+### Related Tool: bonfire-tools (Local Dev)
+
+8. **bonfire-tools repo** - https://github.com/NERDDAO/bonfire-tools [FULL] (Published 2026-03-18. Local dev tools: proxy server, KG explorer, activity monitor, document ingestion. Complements bonfires-sdk. Not required for ZAO; ships optional.)
 
 ### Prior ZAO Docs
 
-6. **doc 542 - Bonfires.ai Knowledge Graph for BCZ Strategies** (comparison matrix: Bonfire vs. Mem0 vs. Cognee, use case test, weaknesses/gaps)
+9. **doc 542 - Bonfires.ai Knowledge Graph for BCZ Strategies** (comparison matrix: Bonfire vs. Mem0 vs. Cognee, use case test, weaknesses/gaps)
 
-### API Endpoints & Configuration
+### API Endpoints & Configuration [RE-VERIFIED MAY 21 2026]
 
-7. **Bonfire API base URL** - https://tnt-v2.api.bonfires.ai (default BONFIRE_API_URL per SDK config table)
+10. **Bonfire API base URL** - https://tnt-v2.api.bonfires.ai (default BONFIRE_API_URL per SDK config table. Endpoint confirmed stable as of May 21 2026. tnt-v2 nomenclature suggests v1 deprecated; v3 migration path unknown per Joshua.eth contact item in doc 544.)
 
-8. **Bonfire Dashboard** - graph.bonfires.ai (entity browser, agent config UI)
+11. **Bonfire Dashboard** - https://graph.bonfires.ai or https://app.bonfires.ai (entity browser, agent config UI. Dashboard login required; cannot verify UI state changes without credentials.)
 
 ---
 

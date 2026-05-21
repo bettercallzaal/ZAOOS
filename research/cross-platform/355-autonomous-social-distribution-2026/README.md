@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Map autonomous social media distribution trends for agents, identify engagement drivers vs noise, and strategy for VAULT/BANKER/DEALER (reconstructed)
 tier: STANDARD
 related-docs: 354, 347

@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Composite ZAO Score from internal Respect + external reputation signals (Neynar, EAS, OpenRank, Passport) (reconstructed)"
 tier: STANDARD
 related-docs: [134, 135, 271]
@@ -50,12 +50,15 @@ ZAO Score (0-1000) =
 ## 1. EAS (Ethereum Attestation Service)
 
 ### What It Is
-Open-source infrastructure for creating attestations — structured, signed claims. Native predeploy on all OP Stack chains.
+Open-source infrastructure for creating attestations — structured, signed claims. Native predeploy on all OP Stack chains. LIVE production infrastructure across 15+ chains (as of May 2026) with 8.7M+ attestations issued.
 
-### Contract Addresses (Optimism)
-- **EAS:** `0x4200000000000000000000000000000000000021`
-- **SchemaRegistry:** `0x4200000000000000000000000000000000000020`
-- **Explorer:** `https://optimism.easscan.org`
+### Contract Addresses (Production Mainnets)
+- **Ethereum Mainnet:** `0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587` (v0.26)
+- **Optimism:** `0x4200000000000000000000000000000000000021` (v1.0.1)
+- **Base:** `0x4200000000000000000000000000000000000021` (v1.0.1) — 3.46M+ attestations live
+- **Arbitrum:** `0xbD75f629A22Dc1ceD33dDA0b68c546A1c035c458` (v0.26)
+- **Linea, zkSync, Celo, Soneium, Unichain:** Predeploy at `0x4200...0021` (OP Stack)
+- **Explorers:** `https://base.easscan.org`, `https://optimism.easscan.org`, etc. per chain
 
 ### ZAO Attestation Schemas
 

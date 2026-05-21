@@ -2,7 +2,7 @@
 topic: farcaster
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Complete Privy feature set mapping to Mini App use cases: auth, wallets, gas sponsorship, token gating, webhooks (reconstructed)"
 tier: reference
 archive_note: "FISHBOWLZ paused 2026-04-16. This is comprehensive Privy reference for any Mini App or embedded wallet use case."

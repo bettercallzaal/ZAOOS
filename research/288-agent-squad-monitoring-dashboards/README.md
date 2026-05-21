@@ -2,7 +2,7 @@
 topic: agents
 type: research-report
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Survey monitoring dashboards for AI agent squads, focused on open-source tools for visualization and observability (reconstructed)"
 tier: production
 ---

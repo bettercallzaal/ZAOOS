@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: research-brief
 status: research-stub
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Claude Skills marketplace ecosystem survey, community platforms, top skills, critical evaluation (reconstructed)"
 tier: reference
 ---

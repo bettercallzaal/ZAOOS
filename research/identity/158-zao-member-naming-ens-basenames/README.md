@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "ENS subnames vs Basenames vs custom identity solutions for 40+ ZAO member on-chain naming (reconstructed)"
 tier: STANDARD
 related-docs: [005, 271]
@@ -30,18 +30,18 @@ related-docs: [005, 271]
 
 ### Option A: ENS Subnames via NameStone (RECOMMENDED)
 
-**How it works:** Register `thezao.eth` on-chain ($5/year). Use NameStone REST API to create gasless off-chain subnames (`zaal.thezao.eth`, `candy.thezao.eth`, etc.). Names resolve in every ENS-compatible wallet and dApp via CCIP-Read (ERC-3668).
+**How it works:** Register `thezao.eth` on-chain (~$5/year). Use NameStone REST API to create gasless off-chain subnames (`zaal.thezao.eth`, `candy.thezao.eth`, etc.). Names resolve in every ENS-compatible wallet and dApp via CCIP-Read (ERC-3668). NameStone has issued 9M+ subdomains across 250+ domains as of May 2026.
 
 | Aspect | Details |
 |--------|---------|
 | **Cost** | `thezao.eth` registration: ~$5/year + gas. Subnames: FREE (unlimited) |
-| **Gas per subname** | $0 — off-chain, resolved via CCIP-Read |
-| **API** | REST API + TypeScript SDK. Endpoints: Set Name, Get Names, Search, Delete |
-| **Auth** | API key (free, request via form) |
-| **Resolution** | Works in MetaMask, Rainbow, Coinbase Wallet, Etherscan, all ENS-aware apps |
+| **Gas per subname** | $0 — off-chain, resolved via CCIP-Read (CCIP-Read resolver: 0xA87361C4E58B619c390f469B9E6F27d759715125) |
+| **API** | REST API + TypeScript SDK v2.6+. Endpoints: Set Name, Get Names, Search, Delete, Batch (50 names max) |
+| **Auth** | API key (free, via form or enableDomain endpoint) |
+| **Resolution** | Works in MetaMask, Rainbow, Coinbase Wallet, Etherscan, all ENS-aware apps + multichain coin types |
 | **Admin** | No-code admin panel for managing subnames |
 | **Trade-off** | Centralized storage (NameStone servers). Not true on-chain NFTs |
-| **Used by** | dynamic.xyz, burner.pro, POAP, ENSPro |
+| **Used by** | Burner.pro (hardwallet), POAP, ENSPro, dynamic.xyz, 1000s of projects |
 
 **Implementation in ZAO OS:**
 ```typescript
@@ -120,7 +120,9 @@ const res = await fetch('https://namestone.xyz/api/public_v1/set-name', {
 
 ## Current State of Member Basenames
 
-We already have Basename resolution built (`src/lib/ens/resolve.ts` — `resolveBasenames()`). The API at `/api/members/[username]` returns `basenames: {}` for wallets checked. As of today, **no ZAO members have Basenames registered** — this is an opportunity to create a unified identity system instead.
+We already have Basename resolution built (`src/lib/ens/resolve.ts` — `resolveBasenames()`). The API at `/api/members/[username]` returns `basenames: {}` for wallets checked. As of May 2026, **no ZAO members have Basenames registered** — this is an opportunity to create a unified identity system instead.
+
+**Update on Basenames (May 2026):** Base has completed ENSIP-19 L2 Primary Names integration (contracts audited, migration targeted for early Sept 2026). New contracts deployed: UpgradeableRegistrarController, UpgradeableL2Resolver. Basenames now fully interoperable with ENS ecosystem via ENSIP-19 + ENSIP-11 data migration. Feature parity with ENS mainnet names achieved.
 
 ## Cost Comparison
 

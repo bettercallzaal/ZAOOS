@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Map all Twitch Helix API capabilities for ZAO OS spaces streaming, identify integration gaps and build priorities (reconstructed)
 tier: STANDARD
 related-docs: 163, 213, 627
@@ -528,10 +528,10 @@ All available real-time event types, categorized by ZAO relevance:
 
 ## Sources
 
-- [Twitch API Reference — Complete Endpoint List](https://dev.twitch.tv/docs/api/reference)
-- [Twitch Authentication Scopes](https://dev.twitch.tv/docs/authentication/scopes/)
-- [Twitch EventSub Documentation](https://dev.twitch.tv/docs/eventsub/)
-- [Twitch EventSub Subscription Types](https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types)
+- [Twitch API Reference — Complete Endpoint List](https://dev.twitch.tv/docs/api/reference) [FULL] — May 15 2026 current, token-bucket rate limiting confirmed
+- [Twitch API Guide — Concepts](https://dev.twitch.tv/docs/api/guide) [FULL] — Rate limits via token-bucket algorithm, free tier, OAuth 2.0 with client credentials and auth code flows
+- [Twitch Authentication Scopes](https://dev.twitch.tv/docs/authentication/scopes/) [PARTIAL]
+- [Twitch EventSub Documentation](https://dev.twitch.tv/docs/eventsub/) [PARTIAL]
 - [Twitch Embedding Guide](https://dev.twitch.tv/docs/embed/)
 - [Twitch Chat & Chatbots Guide](https://dev.twitch.tv/docs/chat/)
 - [Twitch Polls API](https://dev.twitch.tv/docs/api/polls)

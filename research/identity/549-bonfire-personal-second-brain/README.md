@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
 original-query: "How to use Bonfire as Zaal's personal second brain + Obsidian alternative for BCZ and ZAO data (reconstructed)"
 tier: DEEP
 related-docs: [234, 432, 506, 507, 528, 542, 543, 544, 545, 546, 547, 548]

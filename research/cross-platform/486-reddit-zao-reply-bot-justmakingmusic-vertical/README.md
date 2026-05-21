@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Design ZAO Reddit reply bot using JustMakingMusic vertical pattern for music distribution without violating anti-spam or ToS (reconstructed)
 tier: STANDARD
 related-docs: 179, 354

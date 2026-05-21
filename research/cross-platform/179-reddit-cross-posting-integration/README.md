@@ -2,7 +2,7 @@
 topic: cross-platform
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Add Reddit as a cross-posting target with API research, SDK options, OAuth flow, rate limits, and music subreddit strategy (reconstructed)
 tier: STANDARD
 related-docs: 28, 77, 96, 486
@@ -27,7 +27,7 @@ related-docs: 28, 77, 96, 486
 | **Text limit** | 40,000 chars for self posts — no truncation needed (Farcaster is 1,024 chars). |
 | **Subreddit creation** | Manual — create r/thezao by hand, then automate posting to it via API. |
 | **Music subreddits** | r/listentothis, r/WeAreTheMusicMakers, r/indieheads, r/IndieMusicFeedback — each has strict self-promo rules. |
-| **Risk** | Reddit API access now requires application approval (no more self-service). Plan for 1-2 week approval wait. |
+| **Risk** | Reddit API access now requires application approval (no more self-service). Plan for 2-4 week approval wait (Jan 2026+). Rejections may occur without clear reasons. |
 
 ---
 
@@ -604,14 +604,13 @@ If Reddit API access is denied or too cumbersome, Ayrshare ($49/mo Starter plan)
 
 ---
 
-## Sources
+## Sources [FULL] — Re-validated 2026-05-21
 
-- [Reddit API Pricing 2026 — Easy Reader News](https://easyreadernews.com/reddit-api-pricing-explained-costs-limits-and-what-you-should-know-in-2026/)
-- [Complete Guide to Reddit API Pricing 2026 — BBN Times](https://www.bbntimes.com/technology/complete-guide-to-reddit-api-pricing-and-usage-tiers-in-2026)
-- [Reddit API Pricing — Data365](https://data365.co/blog/reddit-api-pricing)
-- [Reddit API Cost 2025 — RankVise](https://rankvise.com/blog/reddit-api-cost-guide/)
+- [Reddit Data API Wiki — Reddit Help](https://support.reddithelp.com/hc/en-us/articles/16160319875092-Reddit-Data-API-Wiki) [FULL] — 100 QPM OAuth, 10 QPM unauth confirmed
+- [11 Best Social Media APIs 2026 — Octolens](https://octolens.io/blog/best-social-media-apis) [FULL] — Jan 2026 approval stricter, 2-4 week wait, rejections without reasons
+- [Reddit API Pricing 2026 — Techloy](https://www.techloy.com/reddit-api-pricing-in-2026-complete-guide-for-developers-and-businesses/) [FULL] — $12K/mo commercial tier confirmed, free tier non-commercial only
+- [Reddit Data API 2026 — DEV Community](https://dev.to/agenthustler/reddit-data-api-2026-after-the-pricing-change-heres-what-developers-actually-use-4o2h) [FULL] — JSON endpoints still available, pay-per-result scraping alternatives, AI/ML forbidden
 - [Reddit API Controversy — Wikipedia](https://en.wikipedia.org/wiki/Reddit_API_controversy)
-- [Reddit Data API Wiki — Reddit Help](https://support.reddithelp.com/hc/en-us/articles/16160319875092-Reddit-Data-API-Wiki)
 - [snoowrap — npm](https://www.npmjs.com/package/snoowrap)
 - [snoowrap — GitHub](https://github.com/not-an-aardvark/snoowrap)
 - [traw (TypeScript Reddit API Wrapper) — GitHub](https://github.com/jamesrswift/traw)

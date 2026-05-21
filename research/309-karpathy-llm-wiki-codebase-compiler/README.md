@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: research-brief
 status: research-stub
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "LLM wiki pattern from Karpathy — token-efficient codebase context management via persistent knowledge graphs (reconstructed)"
 tier: reference
 ---

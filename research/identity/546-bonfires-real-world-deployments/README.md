@@ -2,7 +2,7 @@
 topic: identity
 type: comparison
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-21
 original-query: "Patterns and anti-patterns from real Bonfires.ai deployments to guide ZAO's ZABAL Bonfire (reconstructed)"
 tier: DEEP
 related-docs: [432, 542, 543, 544, 545]
@@ -702,23 +702,22 @@ Before ZAOstock (Phase 0), run a 1-week test with ZAO governance decisions from 
 
 ---
 
-## Sources Verified (15+ URLs)
+## Sources Verified [RE-VERIFIED MAY 21 2026]
 
-1. https://paragraph.com/@joshuab/ethboulder-lets-make-sense - ETHBoulder case study, founder writeup (2026-02-28)
-2. https://deepworkstudio.substack.com/p/case-study-bonfire-ai-for-co-living - Sanctuary co-living experiment (2025-08-24)
-3. https://github.com/NERDDAO/bonfire-fetch - ASI:One uAgent integration (last updated 2025-08-02)
-4. https://github.com/NERDDAO - NERDDAO organization page (confirms bonfire-fetch as active repo)
-5. https://projectcatalyst.io/funds/10/daos-cardano/powering-cardano-daos-with-ai - Cardano DAO proposal (2026-04-01)
-6. https://paragraph.com/@pods-2/bonfire-integrates-pods - Pods podcast integration (2026-04-01)
-7. https://bonfires.ai - Homepage + feature list (verified as LIVE)
-8. https://graph.bonfires.ai - Graph Explorer UI (verified, empty until Bonfire deployed)
-9. https://hyperblogs.bonfires.ai - HyperBlogs feature (verified as LIVE)
-10. https://deepworkstudio.substack.com/p/case-study-bonfire-ai-for-co-living - Full Deep Work Bonfire case study (2025-08-24)
-11. https://harness-engineering.ai/blog/lessons-learned-from-deploying-ai-agents-in-production/ - Production agent lessons (2026-03-10)
-12. https://viqus.ai/blog/ai-agents-production-lessons-2026 - Agent reliability lessons (2026-01-07)
-13. https://fireworks.ai/docs/faq/deployment/ondemand/deployment-issues - Deployment issues guide (verified)
-14. https://fordelstudios.com/research/we-built-a-multi-tenant-ai-pipeline - Multi-tenant pipeline lessons (2026-04-08)
-15. https://swarmsignal.net/from-lab-to-production-the-last-mile-marathon/ - AI deployment roadmap (2026-02-06)
+1. https://paragraph.com/@joshuab/ethboulder-lets-make-sense - ETHBoulder case study, Joshua.eth writeup [FULL] (2026-02-28, still live and linked from bonfires.ai)
+2. https://deepworkstudio.substack.com/p/case-study-bonfire-ai-for-co-living - Sanctuary Deep Work co-living experiment [FULL] (2025-08-24, published, still live)
+3. https://github.com/NERDDAO/bonfire-fetch - ASI:One uAgent integration [FULL] (last updated 2025-08-02, published on GitHub, active NERDDAO org)
+4. https://github.com/NERDDAO - NERDDAO organization page [FULL] (confirms bonfire-fetch + bonfire-tools as active repos)
+5. https://projectcatalyst.io/funds/10/daos-cardano/ - Cardano DAO funding round [PARTIAL] (project page structure verified, specific proposal may require navigation)
+6. https://paragraph.com/@pods-2/bonfire-integrates-pods - Pods podcast integration [PARTIAL] (Paragraph verified live, author @pods-2 exists, specific integration post needs re-check)
+7. https://bonfires.ai - Homepage + pricing tiers [FULL] (verified May 21 2026: Basic/Advanced/Genesis tiers, Telegram/Discord agents, MCP integration live)
+8. https://graph.bonfires.ai - Graph Explorer UI [FULL] (dashboard verified live May 21 2026, requires login)
+9. https://app.bonfires.ai - Bonfires.ai app [FULL] (main application dashboard verified live, requires authentication)
+10. https://mint.bonfires.ai - Bonfires homepage + features [FULL] (verified May 21 2026: 88K knowledge nodes, pricing, features current)
+11. https://github.com/NERDDAO/bonfire-tools - Local dev tools repo [FULL] (published 2026-03-18, active, includes proxy server + KG explorer)
+12. https://bonfire-ai.readthedocs.io - bonfire-ai package docs (separate from bonfires-sdk) [FAILED] (no RTD found; bonfire-ai is PyPI alpha package, may lack docs site)
+13. https://eips.ethereum.org/EIPS/eip-8004 - EIP-8004 Trustless Agents standard [FAILED] (EIP number may be speculative; EIP directory does not list 8004 as of May 2026)
+14. ETHBoulder metrics from Joshua.eth direct communication [PARTIAL] (paragraph writeup covers metrics; May 21 re-fetch cannot access Joshua directly)
 
 ---
 

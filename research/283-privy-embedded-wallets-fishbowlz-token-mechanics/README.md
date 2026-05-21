@@ -2,7 +2,7 @@
 topic: farcaster
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Privy embedded wallet implementation for token mechanics: tips, swaps, token-gating, fee collection on Base (reconstructed)"
 tier: reference
 archive_note: "FISHBOWLZ paused 2026-04-16. These Privy wallet patterns are valid for any Base-native app with token mechanics."

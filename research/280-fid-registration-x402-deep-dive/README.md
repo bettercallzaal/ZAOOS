@@ -2,7 +2,7 @@
 topic: farcaster
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How to register a Farcaster FID for agents, comparing direct on-chain vs fid-forge vs Neynar (reconstructed)"
 tier: production
 ---

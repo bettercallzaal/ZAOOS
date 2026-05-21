@@ -2,7 +2,7 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [005, 271, 545, 546, 549, 568, 569]
 original-query: "Zaal's personal knowledge graph for agentic memory across 16 corpora (YapZ, Fractals, research docs, Farcaster, X, Telegram, ChatGPT, code, decisions, people, music, video, newsletter, ideas, admin) with temporal validity and agent recall (reconstructed)"
 tier: DEEP

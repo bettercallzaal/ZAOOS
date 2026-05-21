@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 tier: CRITICAL
 original-query: "Fibonacci scoring math, on-chain OG/ZOR token state, ORDAO integration for Respect activation (reconstructed)"
 ---

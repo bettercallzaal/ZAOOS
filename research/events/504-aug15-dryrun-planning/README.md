@@ -3,7 +3,7 @@ topic: events
 type: planning
 tier: STANDARD
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Plan Aug 15 team dry-run mini-festival: test 6-circle governance, operational muscle, tech stack; identify 10 pass/fail criteria before Oct 3"
 related-docs: 502, 499, 213, 224, 232, 363
 date-published: 2026-04-24

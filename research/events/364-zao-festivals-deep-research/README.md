@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** event-research-sponsor-funding
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What research is needed for ZAOstock sponsor pitches, funding sources, festival operations benchmarks, and Ellsworth local context? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-15
@@ -474,6 +474,8 @@ Hybrid model unique to ZAOstock:
 ---
 
 ## Sources
+
+Validation completed 2026-05-21 via WebSearch. Spot-checked 3 key claims (Levitt Foundation $40K/year grants, Acadia 4M+ visits 2025 record, Ellsworth National Historic designation). All verified accurate. Status: [FULL].
 
 - [Heart of Ellsworth](https://www.heartofellsworth.org/)
 - [Art of Ellsworth](https://www.heartofellsworth.org/artofellsworth)

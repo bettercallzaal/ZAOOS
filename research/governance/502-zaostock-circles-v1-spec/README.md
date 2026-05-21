@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: "497, 498, 499, 500, 501, 050, 432"
 tier: STANDARD
 original-query: "Design flat-org governance spec for 19-person ZAOstock team using circles, Loomio consent, and Respect tracking (reconstructed)"

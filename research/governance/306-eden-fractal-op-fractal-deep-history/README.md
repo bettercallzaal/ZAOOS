@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Definitive deep dive into Eden Fractal and Optimism Fractal - origins, philosophy, mechanics, people, chain migrations, tooling, and ZAO's place in the fractal movement"
 tier: DEEP
 ---

@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** gap-analysis-event-planning
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What event planning best practices from DreamEvent.ai are missing from ZAOstock's current planning? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-16

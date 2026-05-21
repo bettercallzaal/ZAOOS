@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 tier: STANDARD
 original-query: "Comprehensive fractal communities inventory: 25+ communities mapped, chain distribution, ZAO as only music-focused fractal (reconstructed)"
 ---

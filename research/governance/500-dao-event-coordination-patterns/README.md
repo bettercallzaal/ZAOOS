@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: "497, 498, 499, 501, 502"
 tier: STANDARD
 original-query: "Map DAO event coordination patterns (FWB, Nouns, Devconnect, Loomio) to ZAOstock 18-person team (reconstructed)"

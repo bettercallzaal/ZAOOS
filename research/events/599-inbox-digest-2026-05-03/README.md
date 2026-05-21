@@ -2,7 +2,7 @@
 topic: events
 type: inbox-digest
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Process inbox digest from zoe-zao@agentmail.to (8 items, May 1-3 beta briefings); surface music distribution, naming, and infrastructure recommendations"
 related-docs: 123, 314, 489, 591
 tier: STANDARD

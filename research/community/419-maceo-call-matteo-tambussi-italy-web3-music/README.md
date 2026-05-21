@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Evaluate Matteo Tambussi's projects and Livepeer integration opportunities for ZAO Italy bridge (reconstructed)"
 tier: STANDARD
 related-docs: 449, 432

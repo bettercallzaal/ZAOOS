@@ -2,7 +2,7 @@
 topic: governance
 type: meeting-notes
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Weekly contribution summary for ZAO Fractal (Monday 6pm EST) (reconstructed)"
 tier: STANDARD
 ---

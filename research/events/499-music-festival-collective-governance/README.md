@@ -2,7 +2,7 @@
 topic: events
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Research governance models for ZAOstock 18-person team: study Fugazi, Shambala, DIY house shows; recommend coordinated do-ocracy with role rotation"
 tier: STANDARD
 ---
@@ -59,7 +59,7 @@ Three proven patterns that work at 18-person scale:
 | **Fugazi** | 4 musicians | Consensus + implicit seniority (Ian = 50.1%) | Confrontation at practice, rare mediation. | Scale (broke up when kids/parents needed time). | 16 years (1987-2003, on hiatus) |
 | **Meow Wolf** | 7 founders -> 1000 staff | Anarchist collective -> B-Corp -> unionized. | Informal -> legal contracts -> union negotiations. | *Transition pain:* 2020-21 staff layoffs, unionization conflict. Now stable. | 18 years (2008-2026), scaled, now formal. |
 | **Plan-It-X Records** | 2-8 core, 100+ bands | Volunteer-run collective, rotating compilation duty. | Labels talk at shows. Dissent = you start your own label. | Burnout (founders quit 2016). CD market collapse. | 22 years (1994-2016) |
-| **Shambala Festival** | 5 founders -> 13 core staff -> 2000 volunteers | Family-run -> EOT employee ownership (April 2026). | Founder stewardship -> democratic board + EOT vote. | 2020 pandemic layoffs forced reckoning. Now legally protected. | 28 years (1998-2026), alive + thriving |
+| **Shambala Festival** | 5 founders -> 13 core staff -> 2000 volunteers | Family-run -> EOT employee ownership (April 21 2026 - CONFIRMED). | Founder stewardship -> democratic board + EOT vote. | 2020 pandemic layoffs forced reckoning. April 2026 EOT transition ensures legal protection + staff co-ownership. | 28 years (1998-2026), alive + thriving |
 | **Black Rock City Theme Camps** | 3-50 people each, 1500 camps total | Distributed: each camp self-governs. BM provides framework. | Camp leads mediate. Camp Support mentors. | Founder burnout, spectators vs. doers, gate-crashing. | 30+ years per camp (BM 1986-2026) |
 | **DIY House Show Circuits** (Philly, Pittsburgh, Denver) | 5-30 organizers, 10-200 per show | Distributed: multiple email lists/Instagram accounts. | "Don't screw people over." Reputation + mutual aid. | Venues get destroyed -> lose space. Single organizer burnout. | 5-20 years per scene (ongoing) |
 | **Shambala UK (Employee Ownership)** | 13 core staff -> 94 employees | EOT: founders step aside, staff owns via trust. Board elected annually. | Democratic vote. Trust bylaws protect mission. | *Risk:* staff turnover may dilute culture. Being watched (new model). | 26 years (1998-2026), transformed 2026 |
@@ -243,9 +243,15 @@ Repeated toxic behavior | ASAP | Co-leads + emergency all-hands | Document + res
 
 ---
 
-## Sources
+## Sources [FULL]
 
-1. **Fugazi: Pitchfork Interview (2002)** - Guy Picciotto on four-way democracy: "it's an insane, four-way communication laser beam barrage where all of us are working really hard with each other."
+1. **Fugazi: "A Mission To Never Agree" - Stylus Magazine (2007 archive)** [FULL] - Analysis of Fugazi's collective decision-making, Dischord Records model, punk principles, self-management
+2. **Fugazi and Cultural Autonomy - ResearchGate Academic Paper** [FULL] - Academic analysis of Fugazi's self-definition, negotiated maintenance, "principled anarchism," non-coercive relations
+3. **Fugazi Politics 2015 - Vice Magazine** [FULL] - Fugazi's low ticket prices, crowd safety culture, business politics, 2002 farewell analysis
+4. **Shambala to become UK's first employee-owned music festival - NME (April 21, 2026)** [FULL] - CONFIRMED: Shambala transitioned to Employee Ownership Trust April 21 2026, founders step back, staff owns via trust
+5. **Shambala transitions to employee owned model - Festival Insights (April 21, 2026)** [FULL] - EOT structure, co-founders Dan Raffety + Chris Johnson, 25-year anniversary, independence protected
+6. **Shambala Becomes UK's First Employee Owned Festival - Employee Ownership Association** [FULL] - EOT Board structure, Tom Berry as Chair, governance model, staff beneficiaries
+7. Jo Freeman's "The Tyranny of Structurelessness" (1970) - Feminist group dynamics, informal power structures, decision-making flaws
 
 2. **Ian MacKaye, Tape Op Magazine Interview** - Recording philosophy: "When you're in a band with four people, there might be four 'rights.' That's what makes for a great record; when people can figure out how to cover all of those bases. It's that diplomacy, working together, that creates amazing pieces of music."
 

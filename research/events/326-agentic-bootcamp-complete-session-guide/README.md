@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** bootcamp-synthesis-agent-swarm-extraction
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What is the complete inventory of all 10 bootcamp sessions and what techniques apply to the ZABAL agent swarm? (reconstructed)
 > **tier:** primary
 > **Date:** April 11, 2026

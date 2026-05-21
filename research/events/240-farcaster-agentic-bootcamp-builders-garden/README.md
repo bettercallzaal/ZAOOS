@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** bootcamp-curriculum-notes
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What are the key concepts and patterns from the Farcaster Agentic Bootcamp (10 sessions, March 30-April 10 2026) applicable to ZAO OS agent infrastructure, miniapp integration, and ZOUNZ governance? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-03-30 through 2026-04-10

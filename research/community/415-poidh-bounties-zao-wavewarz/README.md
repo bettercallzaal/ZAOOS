@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Map POIDH bounty protocol mechanics and design ZAO + WaveWarZ bounty playbook (reconstructed)"
 tier: STANDARD
 related-docs: 468, 477, 490, 533, 625

@@ -2,7 +2,7 @@
 topic: governance
 type: meeting-notes
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Pre-fractal meeting talking points for ZAO Discord, Apr 20 2026 (reconstructed)"
 tier: STANDARD
 ---

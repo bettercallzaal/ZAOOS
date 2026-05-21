@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 tier: STANDARD
 original-query: "One-click Snapshot polling: @snapshot-labs/snapshot.js SDK, approval voting, weekly template, admin UI, 7-day cycle aligned with fractals (reconstructed)"
 ---

@@ -2,7 +2,7 @@
 topic: events
 type: meeting-recap
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Capture ZAOstock advisor call with failoften: Maine venue locked, ZABAL Games 3-month tournament, scribe bot, Zao Festivals company structure, retrospectives push"
 related-docs: 473, 476, 654, 670, 673
 tier: STANDARD

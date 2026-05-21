@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Find the simplest open-source staking contract for ZABAL (100M minimum stake) that works on Base with a Farcaster Mini App frontend for mobile promoters"
 tier: STANDARD
 ---

@@ -2,7 +2,7 @@
 topic: community
 type: reference
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "CyrilXBT's multi-agent architecture insight from Anthropic workshop (reconstructed)"
 related-docs: [project_hermes_canonical, project_zoe_soul_architecture]
 tier: QUICK

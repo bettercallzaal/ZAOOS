@@ -2,7 +2,7 @@
 topic: events
 type: standup-report
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Capture ZAOstock progress on Apr 20 after team meeting, 25 PRs merged, status on volunteer signup, cypher signups, sponsor outreach"
 tier: STANDARD
 ---

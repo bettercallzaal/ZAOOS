@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** bootcamp-sessions-transcript-analysis
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What are the key patterns and technical insights from Sessions 1-6 of the Farcaster Agentic Bootcamp (March 30-April 6 2026)? (reconstructed)
 > **tier:** primary
 > **Date:** April 9, 2026

@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 tier: STANDARD
 original-query: "ZAO fractal live infrastructure: zao.frapps.xyz, OREC contract, Discord bot webhook events, history.json data format, bot wallet registry (reconstructed)"
 ---

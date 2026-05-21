@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** agent-competition-setup
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** How is ZOE registered and competing in the ClawDown AI agent poker challenge as of April 3 2026? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-03

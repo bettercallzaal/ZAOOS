@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** team-profiles-compendium
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Who are the ZAO Stock team members and what are their backgrounds, skills, achievements, and web presence? (reconstructed)
 > **tier:** primary
 > **Date:** March 31, 2026

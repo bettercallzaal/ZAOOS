@@ -2,7 +2,7 @@
 topic: events
 type: team-document
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Log Apr 21 ZAOstock team meeting: 17-person roster, 6 scope areas, locked decisions on contributor path, team post flow, artist lockin policy"
 tier: STANDARD
 ---

@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 tier: CRITICAL
 original-query: "Complete ZAO OS governance audit: 3 tiers (ZOUNZ, Snapshot, Community Proposals), API routes, components, DB tables, test coverage (reconstructed)"
 ---

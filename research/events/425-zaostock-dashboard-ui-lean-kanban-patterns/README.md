@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** ui-design-pattern-research
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What visual management patterns from Six Sigma/Lean and modern PM tools (Linear, Notion, Plane) should inform the ZAOstock team dashboard redesign? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-17

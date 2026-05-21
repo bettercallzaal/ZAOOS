@@ -2,7 +2,7 @@
 topic: governance
 type: design
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Design the ZAO Respect Game / fractal mechanic for the ZAOstock team (18 people, Oct 3 2026 festival prep) (reconstructed)"
 tier: DEEP
 tags:

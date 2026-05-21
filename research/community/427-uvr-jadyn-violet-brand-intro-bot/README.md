@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Brand profile and assets for UVR Discord intro bot fork (reconstructed)"
 tier: STANDARD
 related-docs: 600, 050, 051

@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** event-runsheet-program
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What is the day-of run-of-show program for ZAOstock (Oct 3 2026) balancing music sets, talks, WaveWarZ bracket, transitions, and contingency? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-17

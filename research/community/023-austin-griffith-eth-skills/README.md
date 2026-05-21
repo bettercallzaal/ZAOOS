@@ -3,10 +3,10 @@
 > **topic:** community
 > **type:** research-deep-dive
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Map Austin Griffith's builder tools, BuidlGuidl community model, and the broader onchain credentials/skills ecosystem (reconstructed)
 > **tier:** solid
-> **Date:** March 2026
+> **Date:** March 2026 (re-verified May 21, 2026)
 
 ---
 
@@ -35,6 +35,7 @@ Pivoted heavily into **AI agents on Ethereum**:
 - Launched **ETHSkills.com** — curated skill files for AI agents
 - Deeply involved with **ERC-8004** standard (Trustless Agents)
 - Presented extensively at **ETHDenver 2026** alongside Jesse Pollak (Base)
+- **Ethereum Wingman** — new AI skill for Cursor/Claude guiding developers through Scaffold-ETH 2 dApp builds (tested on token launcher example, Jan 2026)
 
 ---
 
@@ -47,10 +48,11 @@ Pivoted heavily into **AI agents on Ethereum**:
 
 ### Scaffold-ETH 2 (Current)
 
-- GitHub: scaffold-eth/scaffold-eth-2 — **~1,900 stars, 1,200+ forks**
+- GitHub: scaffold-eth/scaffold-eth-2 — **2,010 stars, 1,338+ forks** (as of May 2026)
 - Docs: docs.scaffoldeth.io
 - Website: scaffoldeth.io
-- Last updated: December 2025 (active development)
+- Latest release: v0.0.37 (April 16, 2024, maintenance releases ongoing)
+- Last push: April 2, 2026 (active development confirmed 2026)
 
 ### Tech Stack
 

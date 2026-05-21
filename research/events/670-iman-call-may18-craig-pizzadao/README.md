@@ -2,7 +2,7 @@
 topic: events
 type: meeting-recap
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Capture Iman call May 18: ZAO Craig live-audio-todo bot idea, PizzaDAO Zambia Friday 5/23 drinks sponsor hunt, ZABAL Games signup drop 5/20"
 related-docs: 611, 612, 662, 663, 668, 669
 tier: STANDARD

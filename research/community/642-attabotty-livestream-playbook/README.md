@@ -2,7 +2,7 @@
 topic: community
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AttaBotty livestream playbook and Z-and-AttaBotty Telegram bot spec from call (reconstructed)"
 related-docs: [640-magnetiq-vibes-to-data-pivot, 274-zao-stock-team-profiles]
 tier: STANDARD

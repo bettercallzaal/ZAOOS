@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Sociocracy & Circles patterns for small teams (6-50 people), with ZAOstock 18-person festival team as case study (reconstructed)"
 tier: STANDARD
 audience: ZAOstock team (18 ppl), festival ops, leadership

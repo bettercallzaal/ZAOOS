@@ -2,7 +2,7 @@
 topic: community
 type: decision
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-21
 related-docs: 263, 432, 458, 477, 502, 524
 tier: STANDARD
 original-query: How should ZAO leverage the ZAOstock team-coordination infrastructure as a generalizable product beyond the festival? (reconstructed)

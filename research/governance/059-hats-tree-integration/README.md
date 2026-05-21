@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: "07, 55"
 tier: STANDARD
 original-query: "Build Hats Protocol tree reader into ZAO OS for on-chain role management (reconstructed)"

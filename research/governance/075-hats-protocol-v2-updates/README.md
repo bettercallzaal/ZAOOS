@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 tier: STANDARD
 original-query: "Hats Protocol V2 updates, new eligibility modules (CoLinks, Unlock Protocol, Gitcoin Passport), impact on ZAO OS role management (reconstructed)"
 ---

@@ -2,7 +2,7 @@
 topic: events
 type: event-deep-brief
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Extract Hannah Semler voice memo on FarmDrop platform migration, Food for Health launch, May 24 event run-of-show, and reposition event messaging"
 tier: STANDARD
 ---
@@ -12,6 +12,7 @@ tier: STANDARD
 > **Status:** Source extraction complete — ready for content production
 > **Date:** 2026-04-20
 > **Primary source:** Hannah Semler voice memo transcript (2026-04-20, ~15 min, transcribed by user)
+> **Venue update:** Event at The Grand in Ellsworth ME, 6-9pm (confirmed Ellsworth American May 18 2026)
 > **Connects to:** [doc 456](../456-farmdrop-soulbenders-may24-hannah-interview/) (interview prep + content calendar)
 > **Headline:** May 24 is not just a SoulBenders benefit — it is FarmDrop's **platform migration announcement** + Food for Health formal launch + community-forum kickoff, all in one night.
 
@@ -28,7 +29,7 @@ tier: STANDARD
 | Event series framing | BUNDLE May 24 with **May 9 Reversing Falls panel** (Brooksville) and **Aug 6 Sam Lardner + Barcelona** (Sassafras Cafe, Town Hill). FarmDrop is launching an event SERIES, not a one-off. BCZ Yapz interview should cover all 3 dates. |
 | Interview question add | INSERT platform-migration question into doc 456 question list: "You're announcing a major platform migration May 24 — for 5 years you've been building in-state, now you're moving to a new system. What changed?" |
 
-## Event Run-of-Show (May 24, Sunday, 5-8pm, venue TBC likely Halcyon Grange Blue Hill)
+## Event Run-of-Show (May 24, Sunday, 6-9pm, The Grand in Ellsworth ME)
 
 | Time block | Segment | Purpose |
 |------------|---------|---------|
@@ -229,16 +230,14 @@ Insert after Q8, before May 24 event block:
 | **May 24 Sun** | **Live event coverage 5-8pm** | IG stories + X + FC live |
 | May 25 Mon | Recap post + FFH total raised + thank-yous | X + FC + LinkedIn long-form |
 
-## Sources
+## Sources [FULL]
 
 - Hannah Semler voice memo transcript (2026-04-20, shared via user — primary source)
-- [FarmDrop Food for Health Report](https://farmdrop.us/ffh-report/)
-- [FarmDrop Team Highlight: Meet Hannah Semler](https://farmdrop.us/farmdrop-team-highlight-meet-hannah-semler/)
-- [FarmDrop About](https://farmdrop.us/aboutus/)
-- [Hannah Semler ReFED Speaker Profile](https://summit.refed.org/speakers/2022/hannah-semler/)
-- [Healthy Island Project - Deer Isle](https://www.healthyislandproject.org/)
-- [Healthy Acadia](https://healthyacadia.org/)
-- [Halcyon Grange Events](https://bluehillpeninsula.org/events/)
+- [Ellsworth American: Soul Benders May 24 Benefit](https://www.ellsworthamerican.com/lifestyle/entertainment/soul-benders-concert-dance-to-benefit-food-program/article_2e633bab-9c44-48a4-b618-b03f2ded31fd.html) [FULL] - Venue: The Grand, time 6-9pm, ticket link farmdrop.us/events
+- [FarmDrop Team Highlight: Meet Hannah Semler](https://farmdrop.us/farmdrop-team-highlight-meet-hannah-semler/) [FULL]
+- [FarmDrop News & Media](https://farmdrop.us/news-and-events/) [PARTIAL] - Food for Health Nov 2025 launch, 1100+ lbs distributed, partner orgs confirmed
+- [Healthy Island Project - Deer Isle](https://www.healthyislandproject.org/) [FULL]
+- [Healthy Acadia](https://healthyacadia.org/) [FULL]
 - Doc 456 companion — interview prep + base content calendar
 
 ## Related docs

@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** event-planning-reference
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What is the comprehensive planning, vision, and knowledge base for ZAOstock (Maine music festival Oct 2026)? (reconstructed)
 > **tier:** primary
 > **Date:** March 29, 2026

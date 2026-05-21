@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: "2026-05-20"
+last-validated: "2026-05-21"
 related-docs: "432, 547, 615, 618, 620, 621, 622"
 tier: DEEP
 original-query: "Consolidate ZAONEXUS and bettercallzaal.com/nexus.html into canonical portal strategy (reconstructed)"

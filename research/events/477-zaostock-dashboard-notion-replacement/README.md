@@ -2,7 +2,7 @@
 topic: events
 type: technical-spec
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Audit ZAOstock dashboard, identify Notion gaps (file attachments, contact logs, rich text, calendar views), spec 4 net-new tables and 5 features"
 tier: STANDARD
 ---

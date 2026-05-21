@@ -2,7 +2,7 @@
 topic: events
 type: meeting-recap
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Lock ZABAL Games timeline with Empire Builder V3: June prep, July submissions, August finals; every participant gets tokenless Empire, optional Clanker token"
 related-docs: 630, 646, 631, 584, 599, 498, 505, 527, 322, 324
 tier: STANDARD

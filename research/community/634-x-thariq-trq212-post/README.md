@@ -2,7 +2,7 @@
 topic: community
 type: reference
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Thariq's X post on HTML output format for agent systems and specs (reconstructed)"
 related-docs:
   - 549-21st-skill-deployment

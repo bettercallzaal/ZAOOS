@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** agent-architecture-snapshot
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What is the current status and architecture of the ZOE agent ecosystem (ZOE, ZOEY, FISHBOWLZ) as of April 3 2026? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-03

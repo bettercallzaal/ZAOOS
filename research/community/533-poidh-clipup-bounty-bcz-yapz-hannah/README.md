@@ -2,7 +2,7 @@
 topic: community
 type: decision
 status: shipped
-last-validated: 2026-04-27
+last-validated: 2026-05-21
 related-docs: 415, 468, 477, 490
 tier: STANDARD
 original-query: How should BCZ YapZ episodes and ZAO content establish a recurring clip-up bounty format to reward community distribution? (reconstructed)

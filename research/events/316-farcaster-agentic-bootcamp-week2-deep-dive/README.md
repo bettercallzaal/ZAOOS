@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** bootcamp-deep-dive-technical
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What are the key technical lessons from Week 2 of the Farcaster Agentic Bootcamp (Apr 6-10 2026) relevant to budget-friendly ZAO agent development? (reconstructed)
 > **tier:** primary
 > **Date:** April 10, 2026

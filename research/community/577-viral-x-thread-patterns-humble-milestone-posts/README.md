@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-05-01
+last-validated: 2026-05-21
 related-docs: 358, 558, 570
 original-query: "What are proven viral X thread patterns for framing personal milestones (birthday, hackathon win, launch) as humble community-appreciation posts rather than transactional donation asks? (reconstructed)"
 tier: STANDARD

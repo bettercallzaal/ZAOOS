@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 200, 287, 289, 415, 533, 547
 tier: STANDARD
 original-query: "Map Substack's three community models for podcasts onto ZAO shows and publications (reconstructed)"

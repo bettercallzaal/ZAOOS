@@ -8,7 +8,7 @@
 > **tier:** solid
 
 **A Decentralized Impact Network for the Creator Economy**
-**Draft 4.5 — March 2026**
+**Draft 4.5 — March 2026 (Re-validated May 21, 2026)**
 > **Date:** 2026-02-12
 
 *A record of what we built and a map of what comes next.*
@@ -96,7 +96,7 @@ The team is supported by a roster of independent artists, a network of mutual co
 | Artists in roster | 22 | [thezao.com](https://www.thezao.com) |
 | Combined Spotify listeners | 378,000+ | Individual artist profiles |
 | Tracks across roster | 500+ | Streaming platforms |
-| WaveWarZ volume | [$50,000+](https://solscan.io/account/9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo) | Solana on-chain |
+| WaveWarZ volume | [472.71 SOL (~$37,845 USD)](https://wavewarz.info/) across 735 battles | Solana on-chain (May 2026) |
 | Revenue generated | $10,000+ | Festivals + WaveWarZ |
 | IRL festivals produced | 4 | [@zaofestivals](https://www.instagram.com/zaofestivals/) |
 | Metaverse concerts (COC) | 150+ weekly | [stilo.world](https://www.stilo.world/) |

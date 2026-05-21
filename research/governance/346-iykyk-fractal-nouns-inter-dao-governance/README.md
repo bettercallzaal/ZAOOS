@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Deep dive into IYKYK DAO and Fractal Nouns -- their governance framework, inter-DAO bridge, community dashboard, and how ZOUNZ treasury can use these patterns for ZABAL agent funding and token cycling"
 tier: STANDARD
 ---

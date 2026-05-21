@@ -2,7 +2,7 @@
 topic: community
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Magnetiq pivot positioning and ZAO-Magnetiq bot spec from Tyler Stambaugh call (reconstructed)"
 related-docs: [065-zabal-partner-ecosystem, 641-whop-integration]
 tier: STANDARD

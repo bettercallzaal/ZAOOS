@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last_validated: 2026-05-07
+last_validated: 2026-05-21
 related_docs: 432, 547, 614, 615, 621
 tier: STANDARD
 original-query: How should The ZAO apply David Ehrlichman's impact networks framework to scale beyond 188 members? (reconstructed)

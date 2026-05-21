@@ -2,7 +2,7 @@
 topic: community
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Concrete first-call + partner onboarding path with Matteo Tambussi (reconstructed)"
 tier: STANDARD
 related-docs: 419, 432

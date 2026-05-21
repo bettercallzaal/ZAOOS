@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Flat-organization onboarding UX patterns to prevent informal hierarchy and protect flatness for small teams (reconstructed)"
 tier: STANDARD
 date: 2026-04-24

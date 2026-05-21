@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** platform-analysis-agent-design
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What event coordinator platforms and AI agent patterns are relevant to ZAO Stock festival management and production? (reconstructed)
 > **tier:** primary
 > Date: 2026-04-07

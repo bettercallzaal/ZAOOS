@@ -2,7 +2,7 @@
 topic: governance
 type: comparison
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "From the May 12 2026 Hubs Network / RadicalxChange meeting Zaal attended, capture five deliberation tools (Polis, Context Engine, Agora Citizen, dembrane, Quadratic Voting) and pick which to use for Maine Plural Event, ZAOstock, and ZAO governance (reconstructed)"
 related-docs: 056, 058, 109, 111, 547, 656, 658
 tier: DEEP

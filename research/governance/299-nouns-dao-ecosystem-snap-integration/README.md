@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Deep dive on OG Nouns DAO ecosystem - governance, art, auction mechanics, developer APIs - and how to enhance the Nouns Snap + connect to ZAO's existing ZOUNZ integration"
 tier: STANDARD
 ---

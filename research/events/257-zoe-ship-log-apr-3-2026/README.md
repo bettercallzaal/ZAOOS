@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** ship-log-operational
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What was shipped and deployed for ZOE agent ecosystem on April 3 2026? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-03

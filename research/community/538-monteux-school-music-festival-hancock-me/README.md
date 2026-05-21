@@ -2,7 +2,7 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Long-running classical music school/festival model near Ellsworth for ZAOstock partnership reference (reconstructed)"
 tier: STANDARD
 related-docs: 432, 547, 538a-monteux-partnership-spec

@@ -2,7 +2,7 @@
 topic: governance
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 tier: STANDARD
 original-query: "Superchain ORDAO MVP: hub-and-spoke architecture, cross-chain Respect via L2ToL2CrossDomainMessenger, ZAO+Eden Fractal coordination, higher-order fractals (reconstructed)"
 ---

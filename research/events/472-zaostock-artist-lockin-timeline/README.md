@@ -2,7 +2,7 @@
 topic: events
 type: policy-document
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Define ZAOstock artist lineup lockin timeline and policy: one month before Oct 3 deadline, milestones from first contact through final schedule"
 tier: STANDARD
 ---

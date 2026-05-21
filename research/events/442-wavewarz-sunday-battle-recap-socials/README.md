@@ -3,7 +3,7 @@
 > **topic:** events
 > **type:** event-social-content
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** What should the WaveWarZ Sunday featured battle (Scary vs Stormy, Apr 20 2026) social media recaps be across Farcaster, X, Telegram, LinkedIn? (reconstructed)
 > **tier:** primary
 > **Date:** 2026-04-20

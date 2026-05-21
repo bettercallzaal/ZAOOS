@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Analyze agent harness engineering framework (LangChain DeepAgents) and extract patterns for ZAO OS agent roadmap (reconstructed)
 tier: reference
 ---
@@ -45,7 +45,7 @@ The harness includes everything that isn't the model weights:
 - Orchestration logic for subagent coordination
 - Middleware hooks for deterministic execution
 
-**Key finding:** On Terminal Bench 2.0, Anthropic's Opus 4.6 performed significantly better in optimized third-party harnesses than in native Claude Code. Infrastructure design rivals model selection in importance.
+**Key finding (May 2026):** LangChain's coding agent improved from 52.8% to 66.5% on Terminal Bench 2.0 (rank Top 30 → Top 5) through harness engineering alone, without model changes. On Terminal Bench 2.0, Anthropic's Opus 4.6 performs significantly better in optimized third-party harnesses than in native Claude Code. Infrastructure design rivals model selection in importance.
 
 ### Six Core Harness Components
 
@@ -223,12 +223,16 @@ Don't just "add an AI agent." Design the harness:
 
 ---
 
-## Sources
+## Sources [FULL - May 21, 2026]
 
-- [The Anatomy of an Agent Harness — LangChain Blog](https://blog.langchain.com/the-anatomy-of-an-agent-harness/)
-- [Harness Engineering with LangChain DeepAgents — Analytics Vidhya](https://www.analyticsvidhya.com/blog/2026/03/harness-engineering/)
-- [LangChain Releases Deep Agents — MarkTechPost](https://www.marktechpost.com/2026/03/15/langchain-releases-deep-agents-a-structured-runtime-for-planning-memory-and-context-isolation-in-multi-step-ai-agents/)
-- [LangChain Agent Harness Architecture — MEXC News](https://www.mexc.com/news/900940)
+- [Improving Deep Agents with Harness Engineering — LangChain Blog](https://blog.langchain.com/improving-deep-agents-with-harness-engineering/) [FULL]
+- [LangChain's Harness Engineering: Top 30 to Top 5 Terminal Bench 2.0](https://medium.com/@richardhightower/langchains-harness-engineering-from-top-30-to-top-5-on-terminal-bench-2-0-8895dbab4932) [FULL]
+- [Harness Engineering: Making AI Agents Reliable — DEV Community](https://dev.to/truenakta/harness-engineering-the-emerging-discipline-of-making-ai-agents-reliable-42gf) [FULL]
+- [The Agent Harness: Why 70% of Performance Lives Outside the Model](https://medium.com/@tentenco/the-agent-harness-why-70-of-your-ai-agents-performance-lives-outside-the-model-5093cfe03df1) [FULL]
+- [LangChain Deep Agents: Harness & Context Engineering](https://medium.com/@richardhightower/langchain-deep-agents-harness-and-context-engineering-memory-skills-and-security-a68737d84940) [FULL]
+- [Building an Agent Harness with LangChain Deep Agents](https://medium.com/populix-engineering/building-an-agent-harness-with-langchain-deep-agents-e0402de12a94) [FULL]
 - [deepagents GitHub repo](https://github.com/langchain-ai/deepagents)
+- [State of Agent Engineering — LangChain](https://www.langchain.com/state-of-agent-engineering)
 - [Viv Trivedy (@vtrivedy10) on X](https://x.com/Vtrivedy10)
-- [LangSmith Fleet launch tweet](https://x.com/Vtrivedy10/status/2034690067839521114)
+
+Updated 2026-05-21: LangChain's breakthrough results confirmed - 52.8% to 66.5% improvement on Terminal Bench 2.0 (gpt-5.2-codex) through harness engineering alone. Three key improvements: system prompts with self-verification loops, enhanced tools + context injection, middleware hooks for doom-loop detection (PreCompletionChecklistMiddleware). Validates that agent infrastructure design rivals model selection in importance.

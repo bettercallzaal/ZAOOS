@@ -4,7 +4,7 @@
 > **Date:** April 4, 2026
 > **Topic:** agents
 > **Type:** product-vision
-> **Last-validated:** 2026-05-20
+> **Last-validated:** 2026-05-21
 > **Original-query:** ZOE agent factory vision - agent curator, testing, scaling to member/artist agents, self-sustaining factory
 > **Tier:** product
 > **Category:** AI/Agents / Architecture

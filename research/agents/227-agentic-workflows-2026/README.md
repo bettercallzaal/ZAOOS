@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Map agentic workflow landscape for 2026 including frameworks, patterns, and music/web3 applications for ZAO OS (reconstructed)
 tier: reference
 ---

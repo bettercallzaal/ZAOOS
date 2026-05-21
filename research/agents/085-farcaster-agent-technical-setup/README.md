@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Step-by-step guide to creating, configuring, and deploying an AI agent on Farcaster using Neynar API (reconstructed)
 tier: reference
 ---

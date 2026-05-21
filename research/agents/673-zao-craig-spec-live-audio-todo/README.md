@@ -2,7 +2,7 @@
 topic: agents
 type: spec
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 247, 464, 474, 605d, 670, 671, 672
 original-query: "ZAOscribe spec - live audio voice capture bot for action item extraction (reconstructed)"
 tier: STANDARD

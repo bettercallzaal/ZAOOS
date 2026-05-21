@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Design multi-agent orchestration hierarchy with OpenClaw, Paperclip, and ElizaOS (reconstructed)
 tier: archive
 note: OpenClaw, Paperclip, and ElizaOS migration decommissioned 2026-05-04 per CLAUDE.md. Doc archived as historical reference of attempted agent stack architecture.

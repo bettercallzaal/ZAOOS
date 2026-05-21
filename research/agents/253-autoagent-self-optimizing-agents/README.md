@@ -4,7 +4,7 @@
 > **Date:** April 3, 2026
 > **Topic:** agents
 > **Type:** infrastructure-research
-> **Last-validated:** 2026-05-20
+> **Last-validated:** 2026-05-21
 > **Original-query:** AutoAgent self-optimizing meta-agent loop for harness improvement - Python-only, GPT-5, model empathy pattern, trace-based learning, spot-checking
 > **Tier:** reference
 > **Note:** Python-only implementation, wrong stack for ZAO (TypeScript). Concepts valuable (model empathy, meta-agent optimization), patterns applicable to `/autoresearch` skill. Watch ThirdLayer product launch.
@@ -29,7 +29,7 @@
 
 ## What AutoAgent Is
 
-**Repository:** [github.com/kevinrgu/autoagent](https://github.com/kevinrgu/autoagent) — MIT license, 302 stars in <24 hours, 7 commits, all co-authored with Claude Opus 4.6.
+**Repository:** [github.com/kevinrgu/autoagent](https://github.com/kevinrgu/autoagent) — MIT license, grew from 302 stars in <24 hours (Apr 3) to 4,442 stars by May 20 (1,366% growth in 7 weeks), 7+ commits, all co-authored with Claude Opus 4.6. [FULL]
 
 **Creator:** Kevin Gu ([@kevingu](https://x.com/kevingu)), CTO of ThirdLayer (YC W25). Harvard math/stats, previously Jump Trading, Meta FAIR, IBM Research.
 

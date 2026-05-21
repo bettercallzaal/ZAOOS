@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Deep dive into multi-agent deliberation systems and design ZAO-specific decision-making triads (reconstructed)
 tier: reference
 ---
@@ -227,7 +227,7 @@ After installing, edit `~/.claude/skills/council/SKILL.md` to add the 3 ZAO-spec
 
 ---
 
-## Comparison: Multi-Agent Deliberation Ecosystem (March 2026)
+## Comparison: Multi-Agent Deliberation Ecosystem (May 2026)
 
 | Project | Stars | License | Approach | Members | Cross-Provider |
 |---------|-------|---------|----------|---------|---------------|

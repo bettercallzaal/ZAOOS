@@ -4,7 +4,7 @@
 > **Date:** April 5, 2026 (v2 expanded 2026-05-20)
 > **Topic:** agents
 > **Type:** infrastructure-research
-> **Last-validated:** 2026-05-20
+> **Last-validated:** 2026-05-21
 > **Original-query:** Virtuals Protocol agent payment rail - can ZAO agents use $VIRTUAL for micropayments and onchain identity (reconstructed)
 > **Tier:** reference
 > **Sources:** X (@dr_cintas), Virtuals Protocol docs, agent ecosystem survey

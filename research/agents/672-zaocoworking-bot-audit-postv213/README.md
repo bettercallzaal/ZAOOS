@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: What are the remaining issues in ZAOcoworkingBot after v2.13? Are there new bugs beyond doc 668 audit? (reconstructed)
 related-docs: 661, 662, 668, 670, 671
 tier: STANDARD

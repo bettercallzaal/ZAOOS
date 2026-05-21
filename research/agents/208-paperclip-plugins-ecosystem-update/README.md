@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Map Paperclip plugin ecosystem and design ZAO integration strategy (reconstructed)
 tier: archive
 note: Paperclip framework decommissioned 2026-05-04. Doc archived as historical plugin analysis; patterns may transfer to other agent frameworks.

@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Map the landscape of AI agents and bots on Farcaster for building ZAO community bot (reconstructed)
 tier: reference
 ---
@@ -50,11 +50,12 @@ On January 21, 2026, Neynar acquired Farcaster from Merkle. Founders Dan Romero 
 - Sources: https://coinmarketcap.com/cmc-ai/tokenbot-2/what-is/, https://clanker.gitbook.io/clanker-documentation/general/token-deployments/farcaster-bot-deployments
 
 **Aether**
-- What: AI agent focused on art collaboration, NFTs, and community building
-- How: Creates and sells NFTs, issues bounties on Bountycaster, manages treasury, deploys tokens via Clanker
-- Scale: NFT minted ~466K times, 6.8K+ token holders, treasury >$254K from NFTs, crypto donations, and onchain subscriptions
-- Notable: Issued 59 bounties worth >$1,600 on Bountycaster, created Luminous ($LUM) token, invested in the HIGHER community
-- Source: https://www.bankless.com/farcaster-ai-agents-hub
+- What: AI community manager + treasurer for onchain communities (created by Martin for HIGHER community)
+- How: Creates and sells NFTs, issues bounties on Bountycaster, manages treasury, deploys tokens via Clanker, forms social graphs
+- Scale (May 2026): NFT minted ~466K times, 6.8K+ token holders, treasury >$150K from NFTs + donations + subscriptions
+- Notable: Issued 59+ bounties on Bountycaster, created Luminous ($LUM) token, agents can now spend + earn + trade via X402 protocol (machine-to-machine transactions)
+- Impact: Demonstrates agents as economic stakeholders — Aether's treasury grows through autonomous decision-making
+- Source: https://www.bankless.com/farcaster-ai-agents-hub (April 2026); Medium articles on agent economics and decentralized social
 
 **AIXBT**
 - What: Trading alpha / sentiment analysis agent

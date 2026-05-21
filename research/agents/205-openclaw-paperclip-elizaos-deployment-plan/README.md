@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Define deployment steps and integration plan for OpenClaw, Paperclip, and ElizaOS stack (reconstructed)
 tier: archive
 note: All three frameworks (OpenClaw, Paperclip, ElizaOS migration) decommissioned 2026-05-04. Doc archived as historical deployment reference.

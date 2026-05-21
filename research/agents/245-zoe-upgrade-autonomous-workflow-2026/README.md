@@ -4,7 +4,7 @@
 > **Date:** April 1, 2026
 > **Topic:** agents
 > **Type:** infrastructure-research
-> **Last-validated:** 2026-05-20
+> **Last-validated:** 2026-05-21
 > **Original-query:** ZOE upgrade roadmap for Zaal's daily workflow - OpenClaw v2026.3.31, Mem0 memory, nightly consolidation, Telegram interactivity, Neynar webhooks, competitive monitoring, n8n automation
 > **Tier:** reference
 > **Builds on:** Docs 234 (OpenClaw guide), 236 (autonomous operator pattern), 202 (multi-agent orchestration), 237 (USV agents), 239 (agent frameworks)

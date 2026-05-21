@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "ElizaOS v2.0 production assessment for ZAOstock bot v1.5, memory leak issues, framework friction, character file + plugin patterns for grammy adoption (reconstructed)"
 tier: STANDARD
 ---

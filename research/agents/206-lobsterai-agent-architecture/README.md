@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Evaluate LobsterAI agent architecture patterns transferable to ZAO OS skill system (reconstructed)
 tier: reference
 ---

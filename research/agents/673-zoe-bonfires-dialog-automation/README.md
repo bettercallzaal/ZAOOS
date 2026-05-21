@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How will ZOE and Bonfires integrate in Phase 2? What are the automation primitives and build spec? (reconstructed)
 related-docs: 601, 650, 665, 668, 669, 673
 tier: DISPATCH

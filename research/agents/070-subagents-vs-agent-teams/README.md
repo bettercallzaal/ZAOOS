@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Document multi-agent paradigms (sub-agents vs agent teams) and Claude Architect patterns for ZAO OS (reconstructed)
 tier: reference
 ---

@@ -2,7 +2,7 @@
 topic: agents
 type: market-research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Agentic tooling landscape May 2026 - what to add to ZAO stack, what to skip (reconstructed)
 related-docs: 547, 568, 594, 599c, 600, 601, 603, 604
 tier: DISPATCH

@@ -4,7 +4,7 @@
 > **Date:** April 1, 2026
 > **Topic:** agents
 > **Type:** infrastructure-research
-> **Last-validated:** 2026-05-20
+> **Last-validated:** 2026-05-21
 > **Original-query:** Union Square Ventures agent roster and mentions data model - architecture patterns for ZOE on OpenClaw
 > **Tier:** reference
 > **Category:** AI Agents / Infrastructure / Strategy

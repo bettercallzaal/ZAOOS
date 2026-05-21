@@ -4,7 +4,7 @@
 > **Date:** April 1, 2026
 > **Topic:** agents
 > **Type:** infrastructure-research
-> **Last-validated:** 2026-05-20
+> **Last-validated:** 2026-05-21
 > **Original-query:** OpenClaw autonomous operator pattern for ZOE - 3-layer memory, heartbeats, delegation to Claude Code, nightly consolidation
 > **Tier:** reference
 > **Tags:** `#openclaw` `#autonomous-agent` `#memory-architecture` `#heartbeat` `#consolidation` `#delegation` `#zoe`
@@ -24,7 +24,7 @@ The "autonomous OpenClaw operator" pattern is a community-evolved design for mak
 
 The autonomous operator pattern is **not from a single author or "agent-felix2" repo**. It is a convergence of several community contributions and official OpenClaw architecture decisions:
 
-1. **OpenClaw Core Team (Peter Steinberger + contributors):** The official AGENTS.md, SOUL.md, HEARTBEAT.md, and MEMORY.md file hierarchy is built into OpenClaw's gateway. The default AGENTS.md ships with session-start read procedures and memory protocols. Source: [github.com/openclaw/openclaw/blob/main/AGENTS.md](https://github.com/openclaw/openclaw/blob/main/AGENTS.md)
+1. **OpenClaw Core Team (Peter Steinberger + contributors):** The official AGENTS.md, SOUL.md, HEARTBEAT.md, and MEMORY.md file hierarchy is built into OpenClaw's gateway. The default AGENTS.md ships with session-start read procedures and memory protocols. OpenClaw reached 373,689 GitHub stars as of May 21 2026 (up from 344,026 on April 1 = 8.6% growth). Source: [github.com/openclaw/openclaw/blob/main/AGENTS.md](https://github.com/openclaw/openclaw/blob/main/AGENTS.md) [FULL]
 
 2. **"Force Multiplier" Article (Towards Data Science, March 2026):** A widely-cited article describing how one person ships with autonomous agents. Introduces the SOLARIS reflection system (twice-daily structured synthesis), the daily log pattern, and the distinction between operational heartbeats and deep consolidation cycles. Source: [towardsdatascience.com](https://towardsdatascience.com/using-openclaw-as-a-force-multiplier-what-one-person-can-ship-with-autonomous-agents/)
 

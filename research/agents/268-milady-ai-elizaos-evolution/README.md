@@ -4,7 +4,7 @@
 > **Date:** March 28, 2026
 > **Topic:** agents
 > **Type:** infrastructure-research
-> **Last-validated:** 2026-05-20
+> **Last-validated:** 2026-05-21
 > **Original-query:** Milady AI desktop agent distribution vs ElizaOS - Steward Wallet pattern, ERC-8004 identity, VRM avatar, desktop companion, plugin architecture
 > **Tier:** archive-candidate
 > **Archive-note:** ElizaOS decommissioned per CLAUDE.md 2026-05-04. Milady v2.0.3 is trading/crypto-focused, not music/community-focused. Patterns (Steward Wallet, ERC-8004, plugin CLI) worth stealing but implementation not relevant. Keeping for historical record.
@@ -32,7 +32,7 @@
 | **Blockchain** | BSC/Solana (PancakeSwap, meme tokens) | Multi-chain via plugins | Optimism/Base (ZOUNZ, Respect) |
 | **Wallet security** | Steward Wallet (approval flow, USD limits) | Basic EVM/Solana auto-gen | App wallet (doc 205, `APP_SIGNER_PRIVATE_KEY`) |
 | **3D/Avatar** | VRM + Gaussian splats + Three.js | None | None (not needed) |
-| **Stars** | 269 | 17,800+ | N/A |
+| **Stars** | 269 | 18,419 | N/A |
 | **Release cadence** | Multiple per day (alpha.125-129 in 3 days) | 9 alphas/day on v2 branch | N/A |
 | **Cloud hosting** | Eliza Cloud (`elizacloud.ai`) | Self-host only | Railway + Hostinger VPS |
 | **Agent identity** | ERC-8004 via Conway Cloud | None built-in | None yet (track ERC-8004) |

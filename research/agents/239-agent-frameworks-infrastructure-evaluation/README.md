@@ -4,7 +4,7 @@
 > **Date:** April 1, 2026 (v2 — refreshed star counts + revised verdicts)
 > **Topic:** agents
 > **Type:** infrastructure-research
-> **Last-validated:** 2026-05-20
+> **Last-validated:** 2026-05-21
 > **Original-query:** Agent frameworks infrastructure evaluation for ZAO OS - OpenClaw, gstack, n8n, Firecrawl, ElizaOS, Paperclip, security/search/automation tools
 > **Tier:** reference
 > **Goal:** Evaluate 16 agent frameworks, security tools, search/data tools, and workflow automation for ZAO OS adoption
@@ -16,8 +16,8 @@
 
 | # | Tool | Stars | License | Last Updated |
 |---|------|------:|---------|--------------|
-| 1 | OpenClaw | 344,026 | MIT | Apr 1 2026 |
-| 2 | n8n | 181,980 | Fair-code | Apr 1 2026 |
+| 1 | OpenClaw | 373,689 | MIT | May 21 2026 |
+| 2 | n8n | 188,989 | Fair-code | May 21 2026 |
 | 3 | Firecrawl | 102,247 | AGPL-3.0 | Apr 1 2026 |
 | 4 | gstack | 60,307 | MIT | Apr 1 2026 |
 | 5 | deer-flow (ByteDance) | 55,776 | MIT | Apr 1 2026 |

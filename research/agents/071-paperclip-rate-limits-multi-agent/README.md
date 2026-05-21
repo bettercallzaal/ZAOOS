@@ -4,7 +4,7 @@
 topic: agents
 type: research
 status: archive-candidate
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Analyze rate limiting strategies for multi-agent systems using Paperclip (reconstructed)
 tier: archive
 note: Paperclip framework decommissioned 2026-05-04. Doc retained as historical reference; patterns may apply to other orchestration tools.

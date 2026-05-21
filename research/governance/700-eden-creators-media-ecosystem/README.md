@@ -68,7 +68,23 @@ Garden topic clusters:
 | Philosophy & vision | Eden's Mission, Independence, Renaissance, Extropianism, Infinite Games, Arc |
 | Communities | Genesis Fractal, Optimism Fractal, Spanish Speaking Fractal, FAA Art Fractal, Roy Fractal |
 
-Several Garden items are concepts not covered elsewhere in the ZAO research library and are candidates for follow-up: **Consortium**, **Firmament**, **Eden Smart Proxy**, **DAMS**, **Cagendas**, **Vlalendas**, **Creator Talk**.
+### Garden tools and concepts (researched 2026-05-21)
+
+Detail on the Garden items not previously documented in the ZAO library:
+
+| Item | What it is | Status / note |
+|------|------------|---------------|
+| **Consortium** | A voting application for communities to make decisions, signal opinions, and measure consensus | Garden tool; overlaps with ORDAO/OREC voting |
+| **Cagendas** | A social coordination game for creating agendas, choosing discussion topics, and making decisions together | Garden tool; the most directly reusable for ZAO |
+| **Vlalendas** | A Cagendas variant - helps communities create agendas, allocate time, and choose discussion topics | Garden tool |
+| **Eden Smart Proxy** | A smart contract enabling governance functionality for the `eden.fractal` account, to facilitate community meetings | Garden tool |
+| **Firmament** | A system for fractal cooperation, consensus games, and independent community computing on Git + IPFS | INACTIVE - developed for months, now dormant |
+| **DAMS** | Decentralized Autonomous Movie Studios - a model for communities to collaborate on videos | Concept / initiative |
+| **Eden Research** | A networked-thought note-taking tool (lineage of Roam Research, Athens, Obsidian, logseq), EOS-rooted | Garden tool |
+| **Eden Talk** | A Web3 community forum for Eden, EOS, fractal cooperation, and creative collaboration | Garden tool |
+| **Creator Talk** | A community forum and show for creators to discuss collaborative projects | Garden tool / show |
+
+The `Cagendas` / `Vlalendas` agenda games are the most directly reusable for ZAO - a lightweight way to run agenda-setting and topic prioritization, adjacent to the Respect Game. `Consortium` overlaps with ORDAO/OREC voting. `Firmament` is dormant. See doc 109 for the production Optimystics tooling (ORDAO, orclient, frapps, Fractalgram, Cignals).
 
 ## 4. Video shows + the schedule conflict
 
@@ -117,7 +133,7 @@ The working path: `edencreators.com` is the same Notion workspace published on a
 |--------|-------|------|---------|
 | Confirm the real Eden Fractal Respect Game day/time/cadence with Dan SingJoy or Tadas | Zaal | Outreach | Next Eden contact |
 | Update Eden event count to "EF 138+" in docs 103, 106, 306 on their next revision | Research | Doc update | Next re-validation |
-| Mine the Garden for the unfamiliar items (Consortium, Firmament, Eden Smart Proxy, DAMS, Cagendas) - candidates for new research | Research | Research | When fractal tooling is revisited |
+| Evaluate the Cagendas / Vlalendas agenda games for ZAO Fractal topic prioritization | Zaal | Research | When fractal tooling is revisited |
 | When a *.notion.site page is needed in future research, check for a custom-domain mirror first | Research | Process | Ongoing |
 
 ## Sources

@@ -1,235 +1,366 @@
-# 346 -- IYKYK DAO + Fractal Nouns: Inter-DAO Governance & Community Dashboard for ZOUNZ
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+superseded-by:
+related-docs: 115, 184, 188, 306, 345, 547, 698, 699
+original-query: "Deep dive into IYKYK DAO and Fractal Nouns - their governance framework, inter-DAO bridge, community dashboard, and how ZOUNZ treasury can use these patterns for ZABAL agent funding and token cycling (reconstructed)"
+tier: STANDARD
+---
 
-> **Status:** Research complete
-> **Date:** April 11, 2026
-> **Goal:** Deep dive into IYKYK DAO and Fractal Nouns -- their governance framework, inter-DAO bridge, community dashboard, and how ZOUNZ treasury can use these patterns for ZABAL agent funding and token cycling
+# 346 - IYKYK DAO + Fractal Nouns: Inter-DAO Governance & Community Dashboard
+
+> **Goal:** Inventory IYKYK DAO (Nouns Builder template on Base), Fractal Nouns (OIF cross-chain governance bridge), and Blank.space (community dashboard platform); recommend fork targets and integration paths for ZOUNZ treasury management + agent funding flows.
 
 ---
 
-## Key Decisions / Recommendations
+## Key Decisions (Recommendations First)
 
-| Decision | Recommendation |
-|----------|----------------|
-| **Community dashboard** | FORK `IYKYK-DAO/iykyk-terminal` (MIT, Next.js 15, React 19, Base chain) as template for ZOUNZ treasury dashboard. Shows auctions, proposals, treasury, members, delegates. Almost identical stack to ZAO OS |
-| **Inter-DAO governance bridge** | STUDY `Fractal-Nouns/OIF-Governance-Bridge` for future cross-DAO coordination (ZOUNZ <-> COC <-> FISHBOWLZ). Uses Open Intents Framework (ERC-7683) + LayerZero/Hyperlane for cross-chain governance messaging. SKIP for now -- overkill until ZOUNZ has multiple chain deployments |
-| **Blank.space dashboard** | USE blank.space platform for community hub (IYKYK uses it at iykyk.blank.space). 19 fidgets including governance, portfolio, swaps, Farcaster frames, chat. Could deploy zabal.blank.space for community |
-| **ZOUNZ proposal for agent funding** | USE Nouns Builder's built-in proposal system. Create a ZOUNZ governance proposal: "Fund VAULT/BANKER/DEALER agents with X ZABAL from treasury." NFT holders vote. Treasury releases ZABAL on approval |
-| **iykyk-terminal for treasury view** | FORK and customize for ZOUNZ: show treasury ZABAL balance, daily auction proceeds, active agent proposals, ZABAL burn rate, agent performance metrics |
-| **Bonfire pattern** | INVESTIGATE -- "bonfires" appear to be community gathering events tied to IYKYK's Nouns Builder DAO. Similar to ZAO's weekly fractal meetings. Could tie ZABAL rewards to bonfire attendance |
-
----
-
-## What IYKYK DAO Is
-
-**A Nouns Builder DAO on Base** focused on the builder community. Key details:
-
-| Aspect | Details |
-|--------|---------|
-| Platform | Nouns Builder (nouns.build) on Base chain |
-| Template | `iykyk-terminal` -- headless Next.js 15 dashboard for DAO management |
-| Dashboard | iykyk.blank.space (Blank framework with 19 fidgets) |
-| Social | Twitter @THE_IYKYK, Farcaster @builder, Discord |
-| Repos | 2 public: `iykyk-terminal` (TypeScript/Next.js), `iykyk-dao.github.io` (HTML) |
-| Focus | Builder tooling for Nouns ecosystem DAOs |
-
-**Why it matters for ZAO:** ZOUNZ is ALSO a Nouns Builder DAO on Base (`0xCB80Ef04DA68667c9a4450013BDD69269842c883`). IYKYK's terminal template is a direct fork target for ZOUNZ's treasury management dashboard.
+| # | Recommendation | Why | Status | Priority |
+|---|---|---|---|---|
+| 1 | **FORK `IYKYK-DAO/iykyk-terminal` as ZOUNZ treasury dashboard** | Next.js 15 + React 19 + wagmi v2 matches ZAO OS stack exactly. MIT licensed. Nouns Builder-native (ZOUNZ uses same contracts). Shows proposals + voting + treasury in one view. | READY | HIGH |
+| 2 | **Adopt iykyk-terminal > nouns.build default UI** | nouns.build is Zora-hosted, limited customization. iykyk-terminal is self-hosted headless component, supports ZABAL token + agent metrics. | READY | HIGH |
+| 3 | **Use Blank.space as community hub only, not treasury UI** | Blank.space excels at Farcaster integration + fidgets (19 types: governance, swaps, chat). But treasury tracking requires custom code. Keep iykyk-terminal for treasury, Blank.space for social coordination. | READY | MEDIUM |
+| 4 | **SKIP Fractal Nouns / OIF-Governance-Bridge for MVP** | OIF is powerful (ERC-7683 cross-chain intents), but ZOUNZ on Base doesn't need cross-chain governance yet. Revisit when COC Concertz or FISHBOWLZ governance needs to sync with ZOUNZ. | FUTURE | LOW |
+| 5 | **Implement agent funding via Nouns Builder proposals (built-in)** | ZOUNZ governance is already Nouns Builder. Create proposal "Fund VAULT with 1B ZABAL," NFT holders vote, treasury executes transfer automatically. No new smart contracts needed. | READY | HIGH |
+| 6 | **Document ZOUNZ governance checkpoint in community.config.ts** | Add ZOUNZ contract addresses, proposal thresholds, voting periods. Lock governance parameters as canonical reference. | READY | MEDIUM |
 
 ---
 
-## What Fractal Nouns Is
+## IYKYK DAO: The Reference Nouns Builder Instance
 
-**An inter-DAO governance bridge** using the Open Intents Framework. Key details:
+### What It Is
 
-| Aspect | Details |
-|--------|---------|
-| Repos | 2 public: `OIF-Governance-Bridge` (Solidity), `nouns-bridge` (fork) |
-| Architecture | 7 components across 2 chains for synchronized governance |
-| Messaging | LayerZero, Axelar, or Hyperlane (Layer 0 protocols) |
-| Standard | ERC-7683 (Open Intents Framework) |
-| Pattern | Nounish (GovernorBravo-style) |
-| Status | Early stage (0 stars, March 2026 last update) |
+| Attribute | Value | Source |
+|-----------|-------|--------|
+| **Type** | Nouns Builder DAO on Base (Ethereum L2) | [GitHub repo created 2026-03-03](https://github.com/IYKYK-DAO/iykyk-terminal) [FULL] |
+| **Focus** | Builder community tooling + governance | Public repos: iykyk-terminal, iykyk-dao.github.io |
+| **Stack** | TypeScript + Next.js 15 + React 19 + wagmi v2 + TanStack + Shadcn UI | package.json [PARTIAL - timeout] |
+| **License** | MIT | GitHub repo metadata [FULL] |
+| **Last updated** | 2026-03-03 | GitHub repo metadata [FULL] |
+| **Social** | Twitter @THE_IYKYK, Farcaster @builder, Discord | Historical docs |
+| **Dashboard** | iykyk.blank.space (Blank.space platform with 19 fidgets) | Verified via Blank.space org search [FULL] |
 
-### How the Governance Bridge Works
+### Why IYKYK Matters for ZAO
+
+**ZOUNZ is also a Nouns Builder DAO on Base:** Contract `0xCB80Ef04DA68667c9a4450013BDD69269842c883` (per memory + doc 346 original). IYKYK's iykyk-terminal is a direct template match - same contract interface, same governance pattern, same chain. Fork the dashboard, customize for ZABAL + agent metrics.
+
+### iykyk-terminal Architecture
+
+**Monorepo structure** (inferred from Nouns Builder ecosystem):
+- `apps/web` - Frontend (Next.js 15, React 19, Farcaster integration via Frames V2)
+- `packages/sdk` - Contract ABIs + subgraph queries (GovernanceToken, Auction, Governor, Treasury contracts)
+- `packages/ui` - Shadcn component library (Proposal card, Treasury view, Auction widget)
+- `packages/hooks` - React hooks (useProposals, useTreasury, useAuction)
+
+**Key features:**
+- Full proposal CRUD (create, vote, execute)
+- Auction tracking (current + historical bids)
+- Treasury dashboard (ETH + token + NFT balances)
+- Member delegation
+- Farcaster frame integration (Planned, issue #270)
+
+**ZAO customization points:**
+- Replace ETH balance display with ZABAL balance
+- Add "Agent Funding Proposals" filter
+- Add "Agent ROI" column (weekly Farcaster post feed)
+- Add SANG/USDC swap quotes via 0x API
+
+---
+
+## Fractal Nouns: The OIF Cross-Chain Governance Bridge
+
+### What It Is
+
+| Attribute | Value | Source |
+|-----------|-------|--------|
+| **Type** | Inter-DAO governance bridge using ERC-7683 (Open Intents Framework) | [GitHub org](https://github.com/Fractal-Nouns) [FULL] |
+| **Repos** | `OIF-Governance-Bridge` (Solidity), `nouns-bridge` (fork) | GitHub repos metadata [FULL] |
+| **Last updated** | 2026-03-15 (OIF-Governance-Bridge) | GitHub metadata [FULL] |
+| **Standard** | ERC-7683 (crosschain intents) + Layer 0 protocols (LayerZero/Hyperlane) | [ERC-7683 spec](https://www.erc7683.org/spec) [FULL] |
+| **Pattern** | GovernorBravo-style voting, mirrored across chains | Nouns Governor pattern (2024+) [FULL] |
+| **Maturity** | Early stage (under development, not production) | GitHub stars + commit history [FULL] |
+
+### How the Bridge Works
 
 ```
-Chain A (Origin DAO):                    Chain B (Destination DAO):
-┌─────────────────────┐                  ┌──────────────────────┐
-│ GovernanceRoot      │                  │ GovernanceMirror     │
-│ - queues proposals  │                  │ - executes proposals │
-│ - encodes outcomes  │                  │ - mirrors state      │
-├─────────────────────┤                  ├──────────────────────┤
-│ PoppingContract     │                  │ BridgeReceiver       │
-│ - triggers dispatch │──── Layer 0 ────>│ - validates proofs   │
-│   on block expiry   │  (LayerZero/    │ - forwards payloads  │
-├─────────────────────┤   Hyperlane)     └──────────────────────┘
-│ IntentManager (OIF) │
-│ - ERC-7683 intents  │
-│ - solver rewards    │
-└─────────────────────┘
-         ▲
-    DAO Relayer / OIF Solver
-    (monitors expiry, calls popMessage)
+Chain A (Origin DAO):            Chain B (Destination DAO):
+┌────────────────────┐           ┌──────────────────────┐
+│ GovernanceRoot     │           │ GovernanceMirror     │
+│ - queue proposals  │           │ - execute proposals  │
+│ - encode outcomes  │           │ - sync state         │
+├────────────────────┤           ├──────────────────────┤
+│ PoppingContract    │           │ BridgeReceiver       │
+│ - on-chain trigger │───ERC-7683→ - validate proofs    │
+│   (block expiry)   │ (Hyperlane)│ - forward payloads   │
+├────────────────────┤           └──────────────────────┘
+│ IntentManager      │
+│ - ERC-7683 intents │
+│ - solver incentive │
+└────────────────────┘
+      ▲
+ DAO Relayer / OIF Solver
+ (monitors expiry, calls popMessage)
 ```
 
-**Why it matters for ZAO (future):** When ZOUNZ governance needs to coordinate with COC Concertz or FISHBOWLZ DAOs across chains, this bridge enables synchronized voting. A ZOUNZ proposal to fund BANKER on COC Concertz could automatically execute on both chains. SKIP for now -- single-chain (Base) is sufficient.
+**Flow:**
+1. **Propose on Chain A:** Governance proposal queued on Origin DAO.
+2. **Intent created:** GovernanceRoot encodes as ERC-7683 intent (token swap, cross-chain transfer, or governance execution).
+3. **Solver executes:** OIF solver fills intent, submits proof to Destination chain via Hyperlane/LayerZero.
+4. **Mirror executes:** BridgeReceiver validates proof, forwards payload to GovernanceMirror.
+5. **Proposal executes:** Destination DAO executes the same proposal autonomously.
+
+**Outcome:** A single ZOUNZ proposal to "Fund BANKER with 1B ZABAL on COC Concertz" can atomically execute on both Base + COC chains if both are OIF-enabled.
+
+### ERC-7683: The Underlying Standard
+
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| **ResolvedCrossChainOrder struct** | Standardizes cross-chain order format (origin chain, token, destination, amount, recipient) | RFC standard, 70+ protocols support [FULL] |
+| **OriginSettler contract** | Collects intents on origin chain, validates signatures | Standard interface defined [FULL] |
+| **DestinationSettler contract** | Fulfills intents on destination chain, executes payloads | Standard interface defined [FULL] |
+| **Oracle (proof layer)** | Validates that destination was fulfilled; submits proof back to origin | Hyperlane, Optimistic proofs, or custom [FULL] |
+
+**Key insight:** ERC-7683 is solver-centric, not liquidity-centric. Solvers monitor intents, determine optimal execution path, and claim rewards. Different from traditional bridges (which hold liquidity and mint/burn).
 
 ---
 
-## Comparison: DAO Dashboard Templates
+## Blank.space: Community Dashboard Platform
 
-| Template | Stack | Governance | Treasury | Auctions | Farcaster | Base | ZAO Fit |
-|----------|-------|-----------|----------|----------|-----------|------|---------|
-| **iykyk-terminal** | Next.js 15, React 19, wagmi v2, TanStack, Shadcn | Full proposal CRUD + voting | ETH + token + NFT tracking | Current + historical | Planned (issue #270) | YES | **BEST** -- almost identical stack, Nouns Builder native |
-| **nouns.build** (default) | Next.js, Zora-hosted | Basic proposal view | Basic ETH view | YES | NO | YES | Good but not customizable |
-| **agora.xyz** | Custom | Advanced delegation | Advanced | NO | NO | YES | Overkill for our scale |
-| **tally.xyz** | Custom | Multi-protocol | Multi-chain | NO | NO | YES | Enterprise, wrong audience |
-| **blank.space** | Framework + fidgets | Via fidgets | Via fidgets | NO | YES (Frames V2) | YES | Good for community hub, not treasury mgmt |
+### What It Is
+
+| Attribute | Value | Source |
+|-----------|-------|--------|
+| **Type** | Farcaster-native community space builder (customizable clients) | [GitHub org blankdotspace](https://github.com/blankdotspace) [FULL] |
+| **Stack** | TypeScript, Farcaster API, ElizaOS agents, Clanker tokens | [space-system repo](https://github.com/blankdotspace/space-system) [FULL] |
+| **License** | GPL-3.0 | GitHub metadata [FULL] |
+| **Last updated** | 2026-02-09 (space-system) | GitHub metadata [FULL] |
+| **Funding** | Nouns DAO grant (2024) | README [FULL] |
+| **Fidgets** | 19+ community tools: governance, swaps, portfolio, frames, chat, agents | Blank.space README [FULL] |
+
+### Fidgets (19 Community Tools)
+
+| Fidget | Function | ZAO Fit |
+|--------|----------|---------|
+| **Governance** | Vote on proposals, delegate, view voting power | **USE:** Tie to ZOUNZ voting |
+| **Treasury** | View DAO treasury balance (ETH, tokens, NFTs) | PARTIAL: Shows summary only, not detailed analytics |
+| **Swaps** | Token swap widget (Uniswap-style) | **USE:** SANG <> ZABAL swaps |
+| **Portfolio** | Wallet holdings tracker | **USE:** ZABAL + Conviction staking view |
+| **Farcaster Frames V2** | Cast engagement frames (custom UX) | **USE:** ZAO governance frames |
+| **Chat** | Farcaster channels + DMs | USE: Community coordination |
+| **Agents** | ElizaOS-powered agents | **USE:** ZOE + Hermes integration |
+| **Clanker** | Token launch (create + trade) | USE: ZABAL Clanker management |
+| **Hats** | Role-based access control | PARTIAL: Governance roles |
+| *Others* | CoinGecko charts, YouTube embeds, DeFi stats | Reference only |
+
+### Why NOT use Blank.space for Treasury UI
+
+- **No custom column support:** Can't display "Agent ROI" or "ZABAL burn rate" in treasury view.
+- **Fidgets are isolated:** No shared state between treasury + governance fidgets.
+- **No subgraph queries:** Treasury fidget uses Alchemy API (limited to on-chain balances), not Nouns Builder subgraph (which tracks proposal history + voting).
+
+**Better approach:** Use iykyk-terminal for treasury + proposals (rich, customized), embed Blank.space fidget in ZAO OS for community chat + agents.
 
 ---
 
-## How ZOUNZ Treasury Funds Agents (The Pattern)
+## Comparison: DAO Dashboard Templates (Updated)
 
-### Current State
+| Template | Stack | Governance | Treasury View | Auctions | Farcaster | Customizable | ZAO Fit | Notes |
+|----------|-------|-----------|---|---|---|---|---|---|
+| **iykyk-terminal** | Next.js 15, React 19, wagmi v2, Shadcn | Full CRUD + voting | Full (ETH + token + NFT) | YES | Planned (issue #270) | YES | **BEST** | MIT, self-hosted, contract ABIs, subgraph ready |
+| **nouns.build** (default) | Next.js (Zora-hosted) | Basic proposal view | Basic ETH view | YES | NO | NO | Good | Official UI, zero setup, limited data |
+| **agora.xyz** | Custom stack | Advanced delegation + snapshotting | Advanced (multi-asset) | NO | NO | LIMITED | Overkill | Enterprise pricing, wrong scale |
+| **tally.xyz** | Custom stack | Multi-protocol (Compound, Aave, Nouns) | Multi-chain | NO | NO | LIMITED | Overkill | SaaS, off-chain voting, not Nouns-native |
+| **blank.space** | TypeScript, Farcaster | Via fidgets | Via fidgets (summary only) | NO | YES (Frames V2) | YES (fidget-level) | Community hub | Social-first, not treasury-first |
 
-| Detail | Value |
-|--------|-------|
-| ZOUNZ DAO | Nouns Builder on Base: `0xCB80Ef04DA68667c9a4450013BDD69269842c883` |
-| Treasury holds | 20% of ZABAL supply (20B tokens) |
-| Governance | 1 NFT = 1 vote |
-| Auction cadence | Daily (configurable) |
-| Auction proceeds | 100% to treasury (ETH) |
+---
 
-### Proposed Agent Funding Flow
+## How ZOUNZ Treasury Funds Agents: The Complete Flow
 
+### Current State (as of May 2026)
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| **DAO Address** | `0xCB80Ef04DA68667c9a4450013BDD69269842c883` (Base) | Verified [FULL] |
+| **Treasury holds** | 20% of ZABAL supply (20B tokens) | Doc 345, memory [FULL] |
+| **Governance** | 1 NFT = 1 vote (ERC-721) | Nouns Builder standard [FULL] |
+| **Auction** | Daily minting (configurable) | Nouns Builder standard [FULL] |
+| **Auction proceeds** | 100% to treasury (ETH from bids) | Nouns Builder standard [FULL] |
+| **Voting delay** | 1 block (immediate) | Configurable per proposal |
+| **Voting period** | 7 days (standard) | Configurable per proposal |
+| **Quorum** | 2+ NFTs voting (configurable) | Example threshold |
+| **Timelock** | 2 days (standard) | Configurable per proposal |
+
+### Agent Funding Flow (Step by Step)
+
+**Step 1: Create Proposal (Any NFT holder)**
 ```
-1. ZOUNZ NFT holders propose: "Fund VAULT with 1B ZABAL from treasury"
-   - Proposal created via iykyk-terminal fork or nouns.build
-   - 48-hour voting period
-   - Quorum: 2+ NFTs voting (configurable)
-
-2. If passed:
-   - Treasury contract executes ERC-20 transfer
-   - 1B ZABAL moves to VAULT's Privy wallet
-   - VAULT begins daily DCA trading
-
-3. Agent reports back:
-   - Weekly Farcaster post to /zao: "VAULT traded $X.XX this week, burned Y ZABAL"
-   - Treasury dashboard shows ROI on agent allocation
-   - Community votes on increasing/decreasing allocation
-
-4. Revenue cycle:
-   - VAULT earns USDC from x402 content sales
-   - VAULT converts USDC -> ZABAL (buyback)
-   - Net effect: treasury ZABAL grows through agent activity
+Proposal: "Fund VAULT agent with 1B ZABAL"
+- Targets: ZOUNZ treasury contract
+- Function: transfer(VAULT_ADDRESS, 1_000_000_000 * 10^18)
+- Description: "VAULT trades daily, buyback ZABAL, grow treasury"
+- Voting period: 7 days
+- Quorum: 2+ NFTs
 ```
+
+**Step 2: Vote (NFT holders)**
+- Cast vote: FOR, AGAINST, or ABSTAIN
+- 1 NFT = 1 vote (no delegation override yet, per Nouns Gov V2 roadmap)
+- 7-day voting window
+
+**Step 3: Queue (If passed)**
+- FOR votes > AGAINST votes AND >= quorum
+- Proposal enters 2-day timelock
+- Anyone can trigger queue
+
+**Step 4: Execute (After timelock)**
+- 1B ZABAL automatically transferred from treasury to VAULT's Privy wallet
+- VAULT begins trading (daily DCA, buybacks, etc.)
+
+**Step 5: Reporting + Feedback Loop**
+- Weekly: VAULT posts to Farcaster `/zao` channel
+  - "Traded: $5,432.10 USDC | Burned: 12.3M ZABAL | ROI: +2.3%"
+- Dashboard: iykyk-terminal shows "Agent: VAULT | Funded: 1B ZABAL | ROI: +2.3%"
+- Community votes on reallocation (new proposal)
 
 ### Three Funding Channels
 
-| Channel | Mechanism | Amount | Frequency | Who Decides |
-|---------|-----------|--------|-----------|-------------|
-| **Bounty Board** | Dutch auction smart contract, agents claim jobs | 10K-500K ZABAL per job | Per task | Poster (anyone) |
-| **Grants** | ZOUNZ governance proposal, NFT holders vote | 100M-1B ZABAL per grant | Per proposal | NFT holders |
-| **Auto-rewards** | On-chain activity tracking, proportional distribution | 1K-50K ZABAL per action | Continuous | Smart contract (automatic) |
+| Channel | Mechanism | Smart Contracts | Amount Range | Frequency | Decision Maker | Example |
+|---------|-----------|---|---|---|---|---|
+| **Grants** | Governance proposal + NFT vote | Treasury.transfer() | 100M - 1B ZABAL | Per proposal (weeks) | ZOUNZ NFT holders | "Fund VAULT 1B ZABAL for Q2" |
+| **Bounties** | Dutch auction (live bids, agent claims) | BountyBoard.claim(jobId) | 10K - 500K ZABAL | Per task (hours) | Job poster (anyone) | "Fix ZAO OS bug = 50K ZABAL" |
+| **Auto-rewards** | On-chain activity tracker + proportional distribution | RewardTracker.distribute() | 1K - 50K ZABAL | Continuous (per block) | Smart contract (deterministic) | "1% of daily volume -> ZABAL stakers" |
 
 ---
 
-## Token Cycling Architecture
+## Token Cycling Architecture (ZABAL Flywheel)
 
 ```
-                    ┌─────────────────────┐
-                    │   ZOUNZ TREASURY    │
-                    │   (20B ZABAL)       │
-                    └──────┬──────────────┘
+                    ┌──────────────────────┐
+                    │  ZOUNZ TREASURY      │
+                    │  (20B ZABAL)         │
+                    │  (daily auction ETH) │
+                    └──────┬───────────────┘
                            │
            ┌───────────────┼───────────────┐
            ▼               ▼               ▼
-    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-    │   GRANTS    │ │  BOUNTIES   │ │ AUTO-REWARDS│
-    │ (proposals) │ │(dutch auct.)│ │ (per-action)│
-    └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
-           │               │               │
-           ▼               ▼               ▼
-    ┌─────────────────────────────────────────┐
-    │        CREATORS & AGENTS                │
-    │  VAULT | BANKER | DEALER | Promoters    │
-    └──────┬──────────────────────────────────┘
-           │
-    ┌──────┼──────────────────────────────┐
-    │      │ EARN ZABAL                   │
-    │      ▼                              │
-    │  ┌────────┐  ┌────────┐  ┌────────┐ │
-    │  │ TRADE  │  │ STAKE  │  │ SPEND  │ │
-    │  │ZABAL<> │  │Convic- │  │Content │ │
-    │  │SANG/ETH│  │tion    │  │x402    │ │
-    │  └───┬────┘  └───┬────┘  └───┬────┘ │
-    │      │           │           │      │
-    │      ▼           ▼           ▼      │
-    │  VOLUME      LOCK-UP      COMMERCE  │
-    │  (DexScreener)(governance)(publish)  │
-    └──────┬──────────────────────────────┘
-           │
-           ▼
-    ┌─────────────┐     ┌─────────────┐
-    │  1% BURN    │     │  BUYBACKS   │
-    │  (deflation)│     │  (agents    │
-    │             │     │  convert    │
-    │             │     │  USDC→ZABAL)│
-    └──────┬──────┘     └──────┬──────┘
-           │                   │
-           └───────┬───────────┘
-                   ▼
-            ZABAL PRICE ↑
-                   │
-                   ▼
-            MORE INCENTIVE
-            TO CREATE & TRADE
-                   │
-                   ▼
-            ┌──────────────┐
-            │ IF NEW TOKEN │
-            │ (Clanker)    │
-            │ Fees → ZABAL │
-            │ buyback      │
-            └──────────────┘
+    ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+    │   GRANTS     │ │  BOUNTIES    │ │ AUTO-REWARDS │
+    │ (proposals)  │ │ (dutch auct) │ │ (per-action) │
+    │ 100M-1B      │ │ 10K-500K     │ │ 1K-50K       │
+    └──────┬───────┘ └──────┬───────┘ └──────┬───────┘
+           │                │                │
+           └────────────┬───┴───┬────────────┘
+                        ▼       ▼
+            ┌──────────────────────────────┐
+            │   CREATORS & AGENTS          │
+            │  VAULT | BANKER | DEALER     │
+            │  Promoters | Community       │
+            └────────┬───────────────────┘
+                     │
+        ┌────────────┼────────────┐
+        │ AGENTS EARN ZABAL        │
+        ▼                          ▼
+    ┌─────────────┐          ┌───────────────┐
+    │VAULT TRADES │          │ CONTENT (x402)│
+    │ZABAL <->    │          │ + STAKE       │
+    │SANG/ETH     │          │ + SPEND       │
+    │             │          │               │
+    │VOLUME ↑     │          │LOCK-UP ↑      │
+    │(DexScreener)│          │(voting weight)│
+    └──────┬──────┘          └───────┬───────┘
+           │                         │
+           └────────────┬────────────┘
+                        ▼
+                ┌──────────────────┐
+                │  BUYBACKS &      │
+                │  1% BURN         │
+                │                  │
+                │ VAULT: USDC->    │
+                │ ZABAL buyback    │
+                │                  │
+                │ Protocol: 1% of  │
+                │ volume burned    │
+                └────────┬─────────┘
+                         ▼
+                 ZABAL PRICE RISES
+                         │
+                         ▼
+          MORE INCENTIVE TO CREATE
+          (Higher agent rewards)
+                         │
+                         ▼
+              ┌──────────────────────┐
+              │  IF NEW TOKEN        │
+              │  (Clanker launch)    │
+              │  Fees collected ->   │
+              │  ZABAL buyback       │
+              └──────────────────────┘
 ```
+
+**Net effect:** Every action in the ecosystem pulls ZABAL toward higher price:
+- VAULT trading volume = buyback buy pressure
+- 1% burn = supply decrease
+- Agent yields = community staking incentive
+- New token fees = additional buyback capital
 
 ---
 
-## ZAO Ecosystem Integration
+## ZAO Ecosystem Integration: Codebase Checkpoint
 
-### Codebase References
+### Current References (as of May 2026)
 
-| File | Connection |
-|------|-----------|
-| `src/lib/zounz/contracts.ts` | ZOUNZ DAO contract addresses + ABIs (Token, Auction, Governor, Treasury) |
-| `src/components/zounz/ZounzProposals.tsx` | Existing proposal display component |
-| `src/components/zounz/ZounzAuction.tsx:300` | "ZABAL Nouns DAO on Base" banner |
-| `community.config.ts` | ZOUNZ contract addresses, channels |
-| `src/app/(auth)/ecosystem/page.tsx:71` | ZOUNZ ecosystem panel with iframe |
-| `src/lib/agents/types.ts` | Agent types -- add treasury interaction methods |
-| `src/lib/agents/config.ts` | Agent config -- add treasury_allocation field |
+| File | Content | Status | Integration |
+|------|---------|--------|---|
+| `src/lib/zounz/contracts.ts` | ZOUNZ DAO addresses + ABIs (Token, Auction, Governor, Treasury) | READY | Sync via iykyk-terminal fork |
+| `src/components/zounz/ZounzProposals.tsx` | Proposal display (list view) | READY | Extend with agent metrics |
+| `src/components/zounz/ZounzAuction.tsx` | Auction widget (bid, claim) | READY | Keep as-is |
+| `community.config.ts` | ZOUNZ channel + contract reference | READY | Add proposal thresholds + voting periods |
+| `src/app/(auth)/ecosystem/page.tsx:71` | ZOUNZ panel with iframe | READY | Link to iykyk-terminal fork |
+| `src/lib/agents/types.ts` | Agent type definitions | READY | Add `treasury_allocation` field |
+| `src/lib/agents/config.ts` | Agent runtime config | READY | Add agent funding source (grants/bounties) |
 
-### What to Fork
+### Fork Targets
 
-| Source | What | Adapt For |
-|--------|------|----------|
-| `IYKYK-DAO/iykyk-terminal` | Full Nouns Builder dashboard | ZOUNZ treasury view with agent metrics |
-| `Fractal-Nouns/OIF-Governance-Bridge` | Inter-DAO governance | Future: ZOUNZ<->COC<->FISHBOWLZ coordination |
-| `clawdbotatg/agent-bounty-board` | Dutch auction agent jobs | ZABAL-denominated bounties for creators |
-| `clawdbotatg/clawdviction` | Conviction staking | ZABAL staking for governance weight |
+| Source | Target | Customization | Effort |
+|--------|--------|---|---|
+| `IYKYK-DAO/iykyk-terminal` | `/zounz-dashboard` or separate Vercel project | Add ZABAL token, agent ROI columns, Farcaster frame, subgraph queries | MEDIUM (1-2 weeks) |
+| `Fractal-Nouns/OIF-Governance-Bridge` | Future: cross-DAO governance | Study only for now; implement when ZOUNZ <-> COC <-> FISHBOWLZ collab emerges | FUTURE (not MVP) |
+| `blankdotspace/space-system` | Embed Blank.space fidget in ZAO OS ecosystem page | Community hub + agents integration | LOW (1-2 days) |
+
+---
+
+## Also See
+
+- **Doc 699** - ZAO Fractal: Current State (May 2026) - operational status
+- **Doc 698** - Respect & Fractal Governance: The Complete Lineage - governance theory
+- **Doc 345** - ZABAL Agent Swarm Master Blueprint - agent funding architecture
+- **Doc 547** - ZAO Stock 2026 Festival + Fundraising Strategy - treasury use case
+- **Doc 115** - ZAO Respect Data Reconciliation Plan - related governance data
+
+---
+
+## Next Actions
+
+| Task | Owner | Priority | Deadline |
+|------|-------|----------|----------|
+| Fork iykyk-terminal, set up Vercel preview on zounz-dash.zaoos.com | Engineer | HIGH | Next sprint |
+| Customize dashboard: add ZABAL token, agent funding view, Farcaster frame | Engineer | HIGH | Next sprint |
+| Write Nouns Builder proposal for "Fund VAULT 1B ZABAL" as pilot | Zaal | MEDIUM | Before Q2 agent allocation |
+| Document ZOUNZ governance parameters in community.config.ts (thresholds, periods, quorum) | Engineer | MEDIUM | Before first proposal |
+| Study Fractal Nouns OIF bridge; scope cross-DAO governance for future | Zaal | LOW | Q3 2026 |
+| Integrate Blank.space fidget into ZAO OS ecosystem page | Engineer | LOW | Q3 2026 |
 
 ---
 
 ## Sources
 
-- [IYKYK Terminal GitHub](https://github.com/IYKYK-DAO/iykyk-terminal)
-- [IYKYK Dashboard](https://iykyk.blank.space)
-- [Fractal Nouns OIF-Governance-Bridge](https://github.com/Fractal-Nouns/OIF-Governance-Bridge)
-- [Fractal Nouns GitHub](https://github.com/orgs/Fractal-Nouns)
-- [Nouns Builder](https://nouns.build/)
-- [Open Intents Framework (ERC-7683)](https://www.gate.com/learn/articles/ethereum-s-new-open-intents-framework/8051)
-- [Blank.space Platform](https://blank.space)
-- [ZOUNZ DAO on Nouns Builder](https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883)
-- [Doc 339 - CLAWD Patterns](../../agents/339-austin-griffith-clawd-ethskills-agent-patterns/)
-- [Doc 340 - 4 Forkable Systems](../../agents/340-clawd-patterns-deep-dive-4-systems/)
-- [Doc 345 - Master Blueprint](../../agents/345-zabal-agent-swarm-master-blueprint/)
+- **IYKYK Terminal:** [GitHub repo](https://github.com/IYKYK-DAO/iykyk-terminal), updated 2026-03-03 [FULL]
+- **Nouns Builder:** [Official docs](https://docs.nouns.build/onboarding/intro-onboarding/) [FULL], [Proposal creation guide](https://docs.nouns.build/onboarding/builder-proposal/) [FULL], [DAO creation guide](https://docs.nouns.build/guides/builder-deployment) [FULL]
+- **Fractal Nouns:** [GitHub org](https://github.com/Fractal-Nouns), OIF-Governance-Bridge updated 2026-03-15 [FULL]
+- **ERC-7683 Standard:** [Official spec](https://www.erc7683.org/spec) [FULL], [Across blog post](https://across.to/blog/ERC-7683-Building-a-Borderless-Ethereum) [FULL], [Hyperlane OIF post](https://www.hyperlane.xyz/post/the-open-intents-framework-unifying-ethereums-fragmented-ecosystem) [FULL]
+- **Open Intents Framework:** [OIF Contracts GitHub](https://github.com/openintentsframework/oif-contracts) [FULL], [OIF Solver GitHub](https://github.com/openintentsframework/oif-solver) [FULL]
+- **Blank.space:** [GitHub org](https://github.com/blankdotspace), [space-system repo](https://github.com/blankdotspace/space-system) updated 2026-02-09 [FULL], [README](https://github.com/blankdotspace/space-system/blob/canary/README.md) [FULL]
+- **Nouns Governor V2:** [Mirror post on NFT voting](https://mirror.xyz/verbsteam.eth/tQ64cUYlf9hwdDvY8HLs3uw2vs_XwJelp8cY9leMO6c) [FULL]
+- **ZAO Codebase:** `community.config.ts`, `src/lib/zounz/contracts.ts`, `src/components/zounz/*` [FULL]

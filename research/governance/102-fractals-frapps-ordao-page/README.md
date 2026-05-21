@@ -20,7 +20,7 @@ tier: STANDARD
 | Decision | Recommendation | Rationale |
 |----------|----------------|-----------|
 | **frapps link (not embed)** | Link out to `zao.frapps.xyz` in hero CTA; do NOT iframe | frapps.xyz has no embed API; external link is cleaner UX and avoids CORS/framing issues |
-| **ORDAO on-chain UI** | Build native proposals tab via `@ordao/orclient` SDK v1.3.2 (May 2026 latest) | orclient abstracts both on-chain calls (viem) + ornode API; fits ZAO OS tech stack (wagmi/viem) perfectly |
+| **ORDAO on-chain UI** | Build native proposals tab via `@ordao/orclient` SDK v1.4.4 (May 2026 latest) | orclient abstracts both on-chain calls (viem) + ornode API; fits ZAO OS tech stack (wagmi/viem) perfectly |
 | **Fractalgram UI** | Fork [Optimystics/fractalgram](https://github.com/Optimystics/fractalgram) (MIT) as Phase 2; start with native session history (Phase 1) | Fractalgram is production-grade Respect Game breakout room UI; forking avoids wheel-reinvention. Phase 1 leverages existing DB tables. |
 | **Page routing** | `/fractals` as top-level nav item in community.config.ts | Mirrors `/respect` prominence; Fractal is a first-class ZAO surface (Monday 6pm EST standing call) |
 | **Respect token storage** | Keep existing DB schema (`fractal_sessions`, `fractal_scores`, `respect_members`); add on-chain sync via ORDAO | ZOR token lives on-chain (Optimism 0x9885...); DB is source of truth for UX, ORDAO executes proposals |
@@ -38,7 +38,7 @@ tier: STANDARD
 |-----------|---------|------------------|
 | **Fractalgram** | Live Respect Game breakout room UI (web client) | Production, [Optimystics/fractalgram](https://github.com/Optimystics/fractalgram), MIT license |
 | **ORDAO** | Smart contracts for proposal voting + execution | Production on OP Mainnet + Base, 300+ proposals executed (Optimism Fractal Season 1-5) |
-| **orclient** | TypeScript SDK abstracting OREC + Respect1155 + ornode | v1.3.2 published 4 days before 2026-05-21 (May 17) |
+| **orclient** | TypeScript SDK abstracting OREC + Respect1155 + ornode | v1.4.4, published 2026-04-02 (npm registry) |
 | **ornode** | Off-chain proposal storage + metadata API | Deployed, endpoints at ornode.frapps.xyz |
 | **ortypes** | Shared TypeScript types across tools | Part of ordao monorepo |
 
@@ -51,9 +51,9 @@ tier: STANDARD
 | **OG Respect** | `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957` | ERC-20 (frozen) | Epoch 1 token; migration UI at eden-fractal.frapps.xyz |
 | **Hats Protocol** | 0x3bc1A0Ad72417f2d411118085256fC53CBdDd137 (OP) | Role registry | ZAO treeId 226 |
 
-### orclient SDK v1.3.2
+### orclient SDK v1.4.4
 
-**Latest Release:** May 17, 2026 (4 days ago). Published to npm as `@ordao/orclient`.
+**Latest Release:** April 2, 2026. Published to npm as `@ordao/orclient`.
 
 **Core Methods:**
 ```typescript
@@ -244,7 +244,7 @@ export async function GET(req: Request) {
 
 ## Findings: Updates Since March 2026
 
-- **orclient SDK now v1.3.2** (was v1.0.15 in March; latest as of May 17, 2026). Improved wallet integration + error handling.
+- **orclient SDK now v1.4.4** (was v1.0.15 in March; v1.4.4 published April 2, 2026). Improved wallet integration + error handling.
 - **Optimism Fractal paused Jan 2026** (confirmed 2026-05-21). Consolidation into Eden Fractal complete. ZAO now the sole active Optimism-based fractal.
 - **ORDAO on both OP Mainnet + Base** (May 2026). Eden Fractal Epoch 2 deployed ORDAO to Base; Optimism Fractal + ZAO on OP Mainnet. Both chains supported by orclient.
 - **ZAO actively uses OREC for weekly Respect distribution** (since Sept 2025). ZOR token mints weekly through OREC execution. Hats Protocol treeId 226 integrated in community.config.ts.
@@ -280,4 +280,4 @@ Related docs in fractal governance campaign: 56, 58, 103, 104, 105, 106, 109, 11
 - [OF 57: Regenerative Governance (Optimism Fractal YouTube)](https://optimismfractal.com/57) - [FULL] ZAO mentioned; Feb 2025 event showing integration patterns
 - [ZAO Whitepaper Draft 3 (HackMD)](https://hackmd.io/@bB0dXoPfSAuUEqyo43pHZw/H1edVWM7eg) - [FULL] ZAO governance vision including ORDAO + Hats
 - [Community.config.ts (ZAOOS codebase)](file:///Users/zaalpanthaki/Documents/worktrees/research-fractal-campaign/community.config.ts) - [FULL] Contract addresses + treeId 226 verified 2026-05-21
-- npm [@ordao/orclient](https://www.npmjs.com/package/@ordao/orclient/v/1.0.15) - [PARTIAL - npm registry blocked] Latest version confirmed v1.3.2 via WebSearch
+- npm [@ordao/orclient](https://www.npmjs.com/package/@ordao/orclient) - [FULL] npm registry API confirms latest v1.4.4 (published 2026-04-02, 30 versions total)

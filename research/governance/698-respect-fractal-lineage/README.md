@@ -160,9 +160,7 @@ The software layer, all built by **Optimystics** (GitHub org, ~16 repos, mostly 
 
 **Repos and tooling:**
 - `ordao` - the core monorepo (OREC contracts, `orclient`, `ornode`, `ortypes`, GUI, console). Upstream dev repo is `sim31/ordao` (254+ commits as of Apr 2 2026, Tadas). Last push Apr 2, 2026.
-- `orclient` - the SDK, published on npm as `@ordao/orclient`. Most recent verified version 1.3.2. Built on ethers v6 + zod. Functions: `proposeBreakoutResult()`, `vote()`, `execute()`, `getRespectOf()`, etc.
-
-Updated 2026-05-21: Source doc claims v1.4.3 from Feb 2026, but most recent verified npm listing is 1.3.2. Marked as PARTIAL - unable to fetch full version history from npm directly due to crawler errors.
+- `orclient` - the SDK, published on npm as `@ordao/orclient`. Current version 1.4.4 (published 2026-04-02; 30 versions total, verified via the npm registry API). Built on ethers v6 + zod. Functions: `proposeBreakoutResult()`, `vote()`, `execute()`, `getRespectOf()`, etc.
 
 - `ornode` - Node/Express + MongoDB backend storing off-chain proposal content. ZAO's instance (`zao-ornode.frapps.xyz`) is currently down - reads now go straight to the OREC contract.
 - `frapps` - the "fractal apps" deployment platform. Each fractal gets a subdomain: `zao.frapps.xyz`, `of.frapps.xyz` (Optimism Fractal), `eden-fractal.frapps.xyz`.
@@ -312,5 +310,5 @@ Related inter-DAO work: **Fractal Nouns** (a cross-chain governance bridge exper
 
 - **Claimed vs Verified:** 22 internal ZAO docs read in full during original synthesis. External facts (Larimer, Fractally, Eden, Optimism) now verified against 6 primary sources (Medium articles, official websites, GitHub repos).
 - **Updates:** "More Equal Animals" date corrected from "2021" to "Feb 20, 2021". Fractally announcement date specified as "Jan 28, 2022" (not "~Jan 2022"). Epoch 2 launch rationale clarified (false start Aug 2024 -> official June 5 2025).
-- **orclient version:** Source doc claims v1.4.3 from Feb 2026; unable to verify full npm version history due to crawler limitations. Most recent confirmed version is 1.3.2. Tagged PARTIAL.
+- **orclient version:** confirmed v1.4.4 (npm registry API, published 2026-04-02, 30 versions total). Resolved - no longer PARTIAL.
 - **Failure cases:** No external web source found for ZAO-specific contract addresses, exact transaction counts, or Discord bot command counts. These are internal ledger/codebase facts not published externally - marked as unverified but not contradicted by external sources.

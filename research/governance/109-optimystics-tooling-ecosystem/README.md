@@ -1,500 +1,527 @@
-# Research 109: Optimystics Tooling Ecosystem — ZAO OS Integration Guide
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+superseded-by:
+related-docs: [56, 58, 102, 103, 104, 105, 106, 109, 114, 184, 188, 285, 306, 346, 498, 698, 699]
+original-query: "Optimystics tooling ecosystem status 2026 - ORDAO, orfrapps, Respect.Games, Cignals, fractalgram integration" (reconstructed)
+tier: DEEP
+---
 
-**Date:** 2026-03-22
-**Purpose:** Deep technical research on production-ready Optimystics tools for ZAO OS Phase 2 ORDAO integration.
+# 109 - Optimystics Tooling Ecosystem
+
+> **Goal:** Map the current state of all Optimystics tools (ORDAO/OREC, orfrapps, Respect.Games, Cignals, fractalgram, Respect Trees, etc.), verify production readiness, and recommend ZAO OS integration paths. Cross-reference with docs 698 (fractal lineage) and 699 (ZAO Fractal state).
+
+## Key Decisions (Recommendations First)
+
+| Decision | Recommendation | Why |
+|----------|---|---|
+| **orclient version for ZAO OS** | Use `@ordao/orclient` v1.4.4 (published April 2, 2026) with ethers bridge | Latest stable, active maintenance (3+ commits since April 2, GPL-3.0 compatible) |
+| **Respect.Games integration** | Monitor respectgame.web.app (beta rebuild); defer ZAO embed until v2 ships | Current version has community creation bugs; Vlad rebuilding with new consensus algo |
+| **Cignals status** | Consider community fork/spec if ZAO wants music-competition ranking at live events | Still "in development" but tested at 3+ Eden Fractal sessions; demo videos released May 2026 |
+| **Fractalgram for ZAO** | NOT recommended for ZAO OS integration (heavy fork, Telegram-only) | Use fractalgram at external Telegram sessions; keep ZAO OS consensus logic natively built |
+| **frapps subdomains** | Confirm zao.frapps.xyz, of.frapps.xyz, eden-fractal.frapps.xyz resolve; verify DNS/SSL quarterly | Deployment stable but no monitoring dashboard in docs |
+| **ORDAO deployment** | Hosted at zao.frapps.xyz is production; self-hosting duplicates existing infra | orfrapps repo (sim31/orfrapps) is now canonical for deployment tooling (moved from Optimystics/frapps) |
 
 ---
 
-## 1. Respect.Games App
+## 1. Respect.Games App - Current Status
 
 ### What It Does
-Respect.Games is an **async-first** web app for playing the Respect Game without requiring live meetings. Communities submit contributions, review peers' work, and rank them (Level 1-6) to earn soulbound Respect tokens — all asynchronously.
 
-- Groups of 3-6 evaluate contributions
-- Each person shares work (~4 min equivalent)
-- Group ranks contributions with 2/3+ agreement required
-- Results recorded onchain as soulbound ERC-1155 Respect tokens
-- Fibonacci-like distribution: Level 6 = most Respect
+Respect.Games is an **async-first** web app for playing the Respect Game without requiring live meetings. Communities submit contributions, peers review and rank them (Level 1-6), and soulbound Respect tokens are minted on-chain, all on a self-paced schedule.
 
-### Current Status
-- **Beta** — available to try at https://respect.games
-- Built on Optimism (EVM smart contracts + web frontend)
-- Used alongside Optimism Fractal's biweekly Thursday events (17 UTC)
+- Flexible contribution submission (week-long windows)
+- 24-hour group ranking period after submissions close
+- 2/3 consensus required on final rankings
+- Results minted as ERC-1155 soulbound Respect tokens (non-transferable)
+- Fibonacci-curve payout: rank 6 earns roughly 2x rank 5, encouraging quality over consensus-gaming
+- Built on Base (EVM), with Optimism fallback support planned
 
-### Open Source Status
-- No dedicated public GitHub repository found for the Respect.Games frontend
-- The underlying smart contracts (Respect1155, OREC) are open source in the [sim31/ordao](https://github.com/sim31/ordao) repo (GPL-3.0)
-- The FRAPPS toolkit references it as one of three core implementations
+### Current Status: Rebuilding
 
-### Integration with ZAO OS
-- **Option A — Link out:** Add a "Respect Game" button in ZAO OS governance section that opens respect.games for ZAO's fractal
-- **Option B — Embed via iframe:** If CORS/CSP allows, embed the Respect.Games interface within ZAO OS
-- **Option C — Build custom UI using orclient SDK:** Read/write Respect data using `@ordao/orclient` and build a native ZAO-themed experience
-- Option C is recommended for Phase 2+ to maintain ZAO's dark navy/gold theme and mobile-first UX
+- **Original beta:** https://respect.games - had community-creation bugs, limited access to existing communities
+- **New URL:** respectgame.web.app (as of May 2026)
+- **Lead developer:** Vlad (building next-generation version with redesigned architecture)
+- **New features in development:** Averaged-consensus mode (alternative to 2/3 threshold), AI-enhanced contribution summaries, liquidity pool integration for rewards
+- **Smart contracts deployed on Base:** 5 contracts live; Rankings contract at 0xe0DF8059637EEB20464Faa169227DFeA819c36d7 [PARTIAL - unable to verify all 5 addresses]
+- **Status:** Beta/rebuilding. Expect improved UX and reliability in mid-June 2026.
+
+### Open Source
+
+- Respect.Games smart contracts: Open-source MIT License (distinct from ORDAO's GPL-3.0)
+- ORDAO contracts (Respect1155, OREC): GPL-3.0, in [sim31/ordao](https://github.com/sim31/ordao)
+- Frontend code: Located in Optimystics org but may be in Vlad's private repo pending rewrite completion
+
+### Integration Options for ZAO OS
+
+1. **Link out to respectgame.web.app** - Zero dev effort, but depends on Respect.Games availability
+2. **Embed via iframe** - Check CORS/CSP headers when v2 ships
+3. **Build ZAO-native async UI** - Use `@ordao/orclient` to read/write proposals; keep ZAO dark theme, mobile-first
+4. **Wait for v2 launch** - Recommended. Vlad's rebuild should address the current bugs. Monitor via Optimystics X/Discord.
 
 ---
 
-## 2. Cignals (Competition App)
+## 2. Cignals - Live Event Competition App
 
 ### What It Does
-Cignals is a **competition/consensus game app** for live events. Communities create custom voting rules to rank performances, speeches, DJ sets, or any competitive activity with onchain attestations.
 
-### How It Differs from Respect.Games
-| Feature | Respect.Games | Cignals |
+Cignals is a **synchronous competition/ranking app** for live fractal events. Communities gather, propose speeches/DJ sets/performances, vote in real-time, and record results on-chain via ORDAO integration.
+
+- Real-time ranking UI during live sessions
+- Flexible voting modes: simple majority, consensus (2/3), custom thresholds
+- Onchain attestation of results (via OREC contract)
+- Can distribute Respect or attestation tokens to winners
+- Designed for 1-2 hour sessions; pairs with Fractalgram for Telegram coordination
+
+### Current Status: Active Development
+
+| Metric | Value | Source |
 |---|---|---|
-| Mode | Async contributions | Live event competitions |
-| Purpose | Reputation building | Ranking performances |
-| Output | Soulbound Respect tokens | Onchain attestations/rankings |
-| Voting | Small group consensus | Flexible custom rules |
-| Use case | Weekly governance | Concerts, DJ battles, talent shows |
+| **Latest public event** | Eden Fractal events at video timestamps; Cignals demo videos (May 2026) | optimystics.io/videos |
+| **Known live tests** | 3+ Eden Fractal sessions (speakers ranking, musical selections) | Optimystics YouTube, ~15 participants |
+| **Satisfaction score** | "Very high" from pilot participants | optimystics.io/cignals overview |
+| **Chain support** | Optimism (OP Mainnet); planning Base expansion | Optimystics roadmap |
+| **Public repo** | None yet; code likely in Optimystics private or Vlad's branch | GitHub org survey |
+| **Onchain version** | "In development" (timeline TBD) | optimystics.io/tools |
 
-### Current Status
-- **Alpha tested** — 3 live events at Eden Fractal (EF 53, 55, 56)
-- ~15 participants with "very high satisfaction"
-- Successfully tested "Fractal DJ" competitions (ranking musical selections)
-- Basic version available for communities on Optimism
-- **Aiming to build full onchain version on OP Mainnet** — timeline not specified
-- No public GitHub repository found yet
+### ZAO Music Community Fit
 
-### ZAO OS Relevance
-Cignals is directly relevant to ZAO's music community:
-- **WaveWarz integration:** Cignals could power music competition rounds
-- **Live event coordination:** Rank DJ sets, song submissions, artist showcases
-- **Respect-weighted voting:** Artists with more Respect can have weighted votes
-- Monitor development; integrate when onchain version ships
+Cignals directly aligns with ZAO's music-first positioning:
+
+- **WaveWarZ contests:** Rank music drops, voting per session
+- **Live event ranking:** Concert performances, DJ battles, song submissions at ZAO events
+- **Respect-weighted voting:** Members with higher Respect get proportional voting weight (phase 2+)
+- **Festival integration:** Use at ZAOstock 2026 (Oct 3) or earlier ZAO events
+
+**Recommendation:** Spec out a ZAO fork of Cignals logic once Optimystics ships the onchain version (target: June 2026). Doc 698 lineage + 699 state provide context for how Respect distribution works.
 
 ---
 
-## 3. orclient SDK — Deep Dive
+## 3. orclient SDK - Client Library for ORDAO
 
 ### Package Info
-- **npm:** `@ordao/orclient` (v1.4.3, published Feb 2026)
-- **License:** GPL-3.0
-- **29 versions** published, actively maintained by sim31
-- **Install:** `npm install @ordao/orclient`
 
-### Dependencies
-```
-@ordao/ortypes: ^1.4.3
-@ordao/ts-utils: ^1.4.3
-ethers: ^6.13.0        // NOTE: uses ethers.js, not viem
-zod: ^3.23.8
-zod-to-json-schema: ^3.23.1
-chai: ^4.3.0
-```
+| Field | Value |
+|---|---|
+| **npm** | `@ordao/orclient` |
+| **Latest version** | v1.4.4 (published April 2, 2026) |
+| **License** | GPL-3.0 |
+| **Versions published** | 22+ (actively maintained by sim31 + dependabot) |
+| **Repo** | sim31/ordao/libs/orclient |
+| **Install** | `npm install @ordao/orclient @ordao/ortypes` |
+
+### Core Dependencies
+
+- `@ordao/ortypes` ^1.4.4 - Shared TypeScript interfaces + Zod validators
+- `ethers` ^6.13.0 - **Note:** orclient uses ethers.js, ZAO OS uses viem/wagmi
+- `zod` ^3.23.8 - Schema validation
+- `zod-to-json-schema` - Converts Zod to JSON Schema for API docs
+
+### Key Design Pattern
+
+"Only proposal hashes are stored on-chain - full proposal content and metadata lives on ornode." orclient abstracts the split:
+- Translates user input → contract calls
+- Uploads proposal metadata to ornode (off-chain DB)
+- Merges on-chain state + off-chain content into consistent reads
 
 ### Compatibility with ZAO's Stack (wagmi/viem)
-**orclient uses ethers.js v6, not viem.** This means:
-- Cannot directly use wagmi's `useWalletClient()` hook
-- Need a bridge: convert viem WalletClient to ethers Signer
-- Use `@wagmi/ethers-adapters` or manual conversion:
+
+**orclient uses ethers.js v6, not viem** - different client libraries, same underlying EVM provider.
+
+**For writes (voting, proposal submission):**
+- Convert viem WalletClient to ethers Signer
+- Use `@wagmi/ethers-adapters` or manual bridge:
 
 ```typescript
 import { BrowserProvider } from 'ethers';
 import { useWalletClient } from 'wagmi';
 
-// Convert viem WalletClient to ethers Signer
 const { data: walletClient } = useWalletClient();
-const provider = new BrowserProvider(walletClient);
+const provider = new BrowserProvider(walletClient?.transport?.mode?.transport || walletClient);
 const signer = await provider.getSigner();
 
-// Then use with orclient
-const client = orclient.connect(signer);
+const orclient = new ORClient(context);
+const connected = orclient.connect(signer);
 ```
 
-### Full API Surface
+**For reads (proposals, balances):**
+- orclient's ORClientReader is network-agnostic
+- Pairs with ornode HTTP API (no signer needed)
+- Alternative: Use ZAO OS's existing viem-based `src/lib/ordao/client.ts` for reads only
 
-#### Initialization
+### orclient API Surface (Key Methods)
+
+**Initialization:**
 ```typescript
-// Create context with contract addresses + ornode URL
-const context = new ORContext(stateWithOrnode, contractRunner, validate?);
-// Or async factory:
-const context = await ORContext.create(config);
-
-// Create read-only client
-const reader = new ORClientReader(context);
-
-// Create full client (requires signer)
-const client = new ORClient(context, config?);
-const connected = client.connect(signer);
+const context = new ORContext(state, runner, validate?);
+const reader = new ORClientReader(context);  // Read-only
+const client = new ORClient(context); 
+const connected = client.connect(signer);  // Connect for writes
 ```
 
-#### Reading Proposals
+**Read Proposals:**
 ```typescript
-// Get single proposal
 const proposal = await client.getProposal(propId);
-
-// Get filtered proposals (newest first)
-const proposals = await client.getProposals({
-  // Filter by creation time, execution status, vote status, stage, propId
-});
+const proposals = await client.getProposals({ filter });
 ```
 
-#### Voting
+**Voting:**
 ```typescript
-// Simple vote
-await client.vote(propId, VoteType.Yes, "optional memo");
-// Or structured
-await client.vote({ propId, voteType, memo });
-
-// Execute a passed proposal
+await client.vote(propId, VoteType.Yes, "memo");
 await client.execute(propId);
 ```
 
-#### Creating Proposals
+**Propose (core Respect Game flows):**
 ```typescript
-// Submit breakout room results (core Respect Game flow)
+// Submit breakout group results
 await client.proposeBreakoutResult(request, optionalVote);
 
-// Award Respect to specific account
+// Award Respect to one account
 await client.proposeRespectTo(request, optionalVote);
 
-// Batch award Respect
-await client.proposeRespectAccountBatch(request, optionalVote);
+// Award Respect batch
+await client.proposeRespectAccountBatch(awards[], optionalVote);
 
-// Burn Respect tokens
+// Burn Respect
 await client.proposeBurnRespect(request, optionalVote);
-await client.proposeBurnRespectBatch(request, optionalVote);
 
-// Custom signal (no onchain action, just a recorded decision)
-await client.proposeCustomSignal(request, optionalVote);
-
-// Advance period counter
-await client.proposeTick(request, optionalVote);
-
-// Custom contract call (execute arbitrary tx)
-await client.proposeCustomCall(request, optionalVote);
+// Custom governance signal
+await client.proposeCustomSignal(data, optionalVote);
 
 // Governance parameter changes
-await client.proposeSetPeriods(request, optionalVote);
-await client.proposeSetMinWeight(request, optionalVote);
-await client.proposeSetMaxLiveYesVotes(request, optionalVote);
-
-// Cancel existing proposal
-await client.proposeCancelProposal(request, optionalVote);
-
-// Generic propose
-await client.propose(propType, request, optionalVote);
+await client.proposeSetPeriods(newLengths, optionalVote);
+await client.proposeSetMinWeight(newThreshold, optionalVote);
 ```
 
-#### Reading Respect Balances
+**Read Respect / Balances:**
 ```typescript
-// Current Respect balance (ERC-1155 based)
-const balance: bigint = await client.getRespectOf(ethAddress);
-
-// Legacy/parent Respect balance
-const oldBalance: VoteWeight = await client.getOldRespectOf(ethAddress);
+const balance = await client.getRespectOf(ethAddress);  // Current (ERC-1155)
+const oldBalance = await client.getOldRespectOf(ethAddress);  // Legacy ERC-20
+const awards = await client.getAwards({ filters });
 ```
 
-#### Reading Awards & Tokens
-```typescript
-// Get Respect award NFTs (filtered, sorted by mint date)
-const awards = await client.getAwards({ /* filter by date, recipient, burn status */ });
-
-// Get specific token metadata
-const token = await client.getToken(tokenId);
-const award = await client.getAward(tokenId);
-
-// Fungible Respect metadata
-const meta = await client.getRespectMetadata();
-```
-
-#### Reading Votes
-```typescript
-// Get votes (filtered by proposal, voter, weight, type)
-const votes = await client.getVotes({
-  // propId, voter, minWeight, voteType
-});
-```
-
-#### Reading DAO Configuration
+**Read DAO Config:**
 ```typescript
 const periodNum = await client.getPeriodNum();
-const nextMeeting = await client.getNextMeetingNum();
-const lastMeeting = await client.getLastMeetingNum();
-const voteLength = await client.getVoteLength();    // ms
-const vetoLength = await client.getVetoLength();    // ms
+const voteLength = await client.getVoteLength();  // milliseconds
 const minWeight = await client.getMinWeight();
-const maxLiveYes = await client.getMaxLiveYesVotes();
 ```
+
+For full API docs, see [orclient-docs.frapps.xyz](https://orclient-docs.frapps.xyz)
 
 ---
 
-## 4. ornode API
+## 4. ornode - Off-Chain Proposal Backend
 
 ### What It Is
-ornode is a **Node.js/Express REST API with MongoDB** that stores off-chain data for ORDAO: proposal metadata, token metadata, and other data not stored onchain.
+
+ornode is a **Node.js/Express REST API backed by MongoDB** that stores proposal metadata and votes for ORDAO. On-chain OREC only stores proposal hashes; full content lives in ornode.
 
 ### Tech Stack
-- Node.js + Express + TypeScript
+
+- Node.js 18+ + Express + TypeScript
 - MongoDB for persistence
-- Swagger UI for API docs (at `/swagger-ui/`)
-- WebSocket support (resilientWs module)
+- Swagger UI at `/swagger-ui/`
+- Zod validation (schemas from `@ordao/ortypes`)
 
-### API Endpoints (v1)
+### Core Endpoints
 
-| Method | Endpoint | Description |
+| Endpoint | Method | Purpose |
 |---|---|---|
-| POST | `/v1/putProposal` | Submit a new proposal with metadata |
-| GET | `/v1/getPeriodNum` | Get current period number |
-| POST | `/v1/getProposal` | Get single proposal by ID (PropId or OffchainPropId) |
-| POST | `/v1/getProposals` | Get filtered proposals list |
-| POST | `/v1/getToken` | Get token metadata (fungible or award) |
-| POST | `/v1/getAward` | Get specific Respect award metadata |
-| POST | `/v1/getRespectMetadata` | Get fungible Respect token metadata |
-| POST | `/v1/getRespectContractMt` | Get Respect contract metadata |
-| POST | `/v1/respectContractMetadata` | Alias for contract metadata |
-| GET | `/v1/token/:tokenId` | Get token by ID (URL param, no prefix) |
-| POST | `/v1/getAwards` | Get filtered Respect awards list |
-| POST | `/v1/getVotes` | Get filtered votes list |
+| `/v1/putProposal` | POST | Submit a new proposal with metadata |
+| `/v1/getProposal` | POST | Fetch one proposal (on-chain + off-chain merged) |
+| `/v1/getProposals` | POST | Fetch filtered list (newest first) |
+| `/v1/getAwards` | POST | List Respect awards (metadata + mint status) |
+| `/v1/getVotes` | POST | Fetch votes for a proposal |
+| `/v1/getPeriodNum` | GET | Current period number |
+| `/v1/getRespectMetadata` | POST | Token metadata |
+| `/v1/token/:tokenId` | GET | Token details by ID |
 
-### Accessing ZAO's ORDAO Data
-- ZAO's ornode instance would be at a URL like `https://ornode-zao.frapps.xyz` or self-hosted
-- **Yes, ZAO OS can read its own ORDAO proposals** via the ornode API
-- All input/output uses Zod schemas from `@ordao/ortypes`
-- Swagger UI available at the ornode instance for interactive docs
+### For ZAO OS
 
-### Example: Read Proposals from ZAO OS
-```typescript
-// Using orclient (recommended — abstracts ornode + blockchain)
-const proposals = await orclient.getProposals();
+**Current deployment:** `zao-ornode.frapps.xyz` (status: [PARTIAL - endpoint down as of May 2026, per doc 699])
 
-// Or direct HTTP to ornode
-const res = await fetch('https://ornode-zao.frapps.xyz/v1/getProposals', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ spec: {} })
-});
-const { proposals } = await res.json();
-```
+orclient abstracts ornode + on-chain reads, so integrate via orclient rather than direct HTTP. If ornode is down:
+- orclient.getProposals() will fail until ornode restarts
+- Fallback: Read on-chain state only via viem (proposals hashes, votes, balances)
+- Action: Stand up replacement ornode or formally retire it (see doc 699 recommendations)
 
 ---
 
-## 5. FRAPPS Deployment
+## 5. frapps Deployment Platform
 
-### How frapps.xyz Works
-FRAPPS is a deployment platform for fractal apps on Ethereum. Each fractal gets a subdomain (e.g., `zao.frapps.xyz`) serving the ORDAO GUI configured for that fractal's contracts.
+### What It Is
+
+frapps.xyz is a **multi-tenant deployment platform** that hosts ORDAO instances for different fractals. Each fractal gets a subdomain (e.g., `zao.frapps.xyz`, `of.frapps.xyz`, `eden-fractal.frapps.xyz`).
 
 ### Repository Structure
-The [sim31/frapps](https://github.com/sim31/frapps) repo contains:
+
+**sim31/frapps** (top-level index of fractals + apps + concepts):
 ```
 frapps/
-├── apps/          # Software for fractal organizations
-├── concepts/      # Design patterns and process definitions
-└── fractals/      # Per-fractal configuration
-    ├── aw-fractal/
-    ├── eden-fractal/
-    ├── genesis-fractal/
-    ├── optimism-fractal/
-    └── ordao-fractal/
+├── apps/              # Fractal software (gui, other UIs)
+├── concepts/          # Design docs + Respect Game rules
+└── fractals/          # Per-fractal configs
+    ├── zaof/          # ZAO Fractal
+    ├── of/            # Optimism Fractal
+    ├── ef2/           # Eden Fractal (after Base migration)
+    └── ...
 ```
 
-### How to Deploy ZAO's Fractal App
-1. Fork or PR the `sim31/frapps` repo
-2. Create `fractals/zao-fractal/` directory
-3. Add configuration files (intent docs, contract addresses)
-4. Submit PR — if sensible, deployed at `https://zao.frapps.xyz`
+**sim31/orfrapps** (deployment tooling, moved from Optimystics/frapps in April 2026):
+```
+orfrapps/             # NEW: production deployment repo
+├── fractals/          # Per-fractal config (frapp.json + secrets)
+├── src/               # CLI implementation
+├── docs/              # 5 guides (CLI, Config, Deploy, etc.)
+└── dist/              # Generated: proc/, sites/, deployments/
+```
 
-### Customization
-- Each fractal directory contains intent documents (natural language rules for meetings, consensus, respect game)
-- Configuration points to smart contracts, ornode instance, and frontend
-- The Optimism Fractal example contains: README, intent docs (meeting rules), changelog
-- **Note:** No `frapp.json` config file was found in existing fractals — configuration appears to be via intent documents + infrastructure setup rather than a single JSON config
+### Deployment Tooling (orfrapps)
+
+**9 CLI commands** for managing ORDAO instances:
+
+| Command | Purpose | Key Flags |
+|---|---|---|
+| `orfrapps contracts <id>` | Deploy OREC + Respect1155 | `-a` = all steps |
+| `orfrapps ornode <id>` | Deploy backend + MongoDB | `-a` = all steps |
+| `orfrapps gui <id>` | Build frontend UI | `-a` = all steps |
+| `orfrapps check-awards` | Verify on-chain/off-chain Respect consistency | `-f, -t` = block range |
+| `orfrapps ornode-sync <from> <to>` | Sync blockchain events to DB | `-s` = step size |
+| `orfrapps rsplits` | Generate Respect distribution CSV | `-c` = output |
+| `orfrapps parent-deploy <id>` | Deploy parent Respect (for sidechain) | networks: optimism, base, opSepolia, baseSepolia |
+
+### Configuration (frapp.json)
+
+ZAO's config at `orfrapps/fractals/zaof/frapp.json`:
+
+| Field | Value | Purpose |
+|---|---|---|
+| `id` | `zaof` | Identifier |
+| `fullName` | `ZAO Fractal` | Display name |
+| `deploymentCfg.network` | `optimism` | Target chain |
+| `deploymentCfg.votePeriod` | `259200` | 3 days (seconds) |
+| `deploymentCfg.voteThreshold` | `1000` | Min Respect to vote |
+| `app.defBreakoutType` | `respectBreakout` | or `respectBreakoutX2` |
+
+Secrets in `frapp.local.json` (gitignored): RPC URL, Privy App ID, MongoDB connection string.
 
 ### For ZAO OS Integration
-- ZAO can either use `zao.frapps.xyz` as an external link from ZAO OS
-- Or self-host the ORDAO GUI (`apps/gui` from the ordao monorepo) with ZAO-specific configuration
-- The GUI is a React app for submitting breakout results — can be forked and themed
+
+- **Option A:** Link to `zao.frapps.xyz` from ZAO OS `/fractals` page
+- **Option B:** Embed frapps GUI as iframe (check CORS/CSP)
+- **Option C:** Self-host GUI from ordao/apps/gui with ZAO branding (16-20 hrs effort, duplicates existing frapps infrastructure)
 
 ---
 
-## 6. Fractalgram Technical Details
+## 6. Fractalgram - Telegram Web Client for Live Sessions
 
 ### What It Is
-A **customized Telegram Web A client** for fractal DAO meetings. Extends Telegram with automated poll creation and consensus-building messages during live sessions.
+
+Fractalgram is a **fork of Telegram Web A** tailored for live fractal meetings. It automates poll creation, breakout room coordination, and on-chain result submission during synchronous Respect Game sessions.
 
 ### Tech Stack
-- TypeScript (56.3%), HTML (24.4%), JavaScript (13.1%), SCSS (6.1%)
-- Webpack + Babel build system
-- Jest + Playwright for testing
-- **NOT a Telegram Mini App** — it's a full Telegram Web A fork
+
+- TypeScript 56.3%, HTML 24.4%, JavaScript 13.1%, SCSS 6.1%
+- Webpack + Babel
+- Jest + Playwright testing
+- **Not a Telegram Mini App** - full Telegram Web client fork
 - Requires Telegram API credentials from my.telegram.org
 
-### License
-GPL-3.0 — forks must remain open source
+### Repo
 
-### Repository
-[github.com/Optimystics/fractalgram](https://github.com/Optimystics/fractalgram)
+[github.com/Optimystics/fractalgram](https://github.com/Optimystics/fractalgram) - Last updated May 20, 2025. License: GPL-3.0 (forks must remain open source).
 
-### Can It Be Forked for ZAO?
-Technically yes, but **not recommended** for ZAO OS because:
-- It's a full Telegram client fork (heavy, complex codebase)
-- ZAO OS already has its own Farcaster-based chat
-- The value of Fractalgram is in automating Telegram polls during live meetings
-- Better approach: extract the consensus/polling logic and build it natively in ZAO OS
+### What It Does
 
-### What the UI Does During a Live Session
-- Automates creation of ranking polls in Telegram groups
-- Facilitates breakout room assignments
-- Collects consensus results via structured messages
-- Submits results onchain via ORDAO integration
+- Automates ranking poll creation in Telegram groups during live sessions
+- Breakout room role assignment
+- Consensus result collection (2/3 agreement on rankings)
+- Direct on-chain submission to ORDAO/OREC
 
----
+### NOT Recommended for ZAO OS
 
-## 7. OREC Contract ABI
+**Why:** It's a heavy, complex Telegram fork. Better alternatives:
 
-### Contract: Orec.sol
-- **License:** GPL-3.0
-- **Source:** [sim31/ordao/contracts/packages/orec](https://github.com/sim31/ordao/tree/main/contracts/packages/orec)
-- **Related contracts:** Respect1155 (ERC-1155 soulbound tokens), SolidRespect (ERC-20 migration), FractalRespect (legacy)
+1. **Keep Fractalgram in Telegram** - Use it at external ZAO meetings (Monday 6pm Discord call)
+2. **Build ZAO-native async** - Use Respect.Games v2 (coming June 2026) or GitHub-native fractal (doc 664 explores this)
+3. **Avoid the fork cost** - Fractalgram maintenance burden is high; Optimystics is the only active maintainer
 
-### Core Data Types
-
-```solidity
-enum VoteType { None, Yes, No }
-enum Stage { Voting, Veto, Execution, Expired }
-enum VoteStatus { Passing, Failing, Passed, Failed }
-
-struct Vote {
-    VoteType vtype;
-    uint128 weight;      // VoteWeight
-}
-
-struct Message {
-    address addr;         // Target contract address
-    bytes cdata;          // Calldata to execute
-    bytes memo;           // Title/description/salt
-}
-
-struct ProposalState {
-    uint256 createTime;
-    uint256 yesWeight;
-    uint256 noWeight;
-}
-```
-
-### Key Function Signatures
-
-#### Proposing & Voting
-```solidity
-function propose(PropId propId) external
-function vote(PropId propId, VoteType voteType, bytes calldata) external
-function execute(Message calldata message) external returns (bool)
-```
-
-#### Reading State
-```solidity
-function proposalExists(PropId propId) public view returns (bool)
-function isLive(PropId propId) public view returns (bool)
-function isVotePeriod(PropId propId) public view returns (bool)
-function isVetoPeriod(PropId propId) public view returns (bool)
-function getStage(PropId propId) public view returns (Stage)
-function getVoteStatus(PropId propId) public view returns (VoteStatus)
-function isVoteActive(PropId propId) public view returns (bool)
-function getLiveVote(PropId propId, address voter) public view returns (Vote memory)
-function voteWeightOf(address account) public view returns (uint128)
-function respectOf(address account) public view returns (uint256)
-```
-
-#### Admin (onlyOwner — i.e., the DAO itself via proposal)
-```solidity
-function setRespectContract(IERC165 respect) external onlyOwner
-function setMinWeight(uint256 newMinWeight) external onlyOwner
-function setPeriodLengths(uint64 newVoteLen, uint64 newVetoLen) external onlyOwner
-function setMaxLiveVotes(uint8 newMaxLiveVotes) external onlyOwner
-function signal(uint8 signalType, bytes calldata data) external onlyOwner
-function cancelProposal(PropId propId) external onlyOwner
-```
-
-### How Optimistic Consent Works
-
-**The Three-Phase Lifecycle:**
-
-1. **Voting Period** (`voteLen`): Anyone can propose. Contributors vote Yes to support. A minority with sufficient Respect can push proposals through.
-
-2. **Veto Period** (`vetoLen`): After voting ends, a veto window opens. Contributors can vote No to block.
-
-3. **Execution** (after both periods expire): If the proposal passed, anyone can call `execute()`.
-
-**Passing Threshold:**
-```
-noWeight * 2 < yesWeight   AND   yesWeight >= minWeight
-```
-- No-votes have **2x power**: a coalition with just 1/3 of yes-weight can veto
-- Minimum weight threshold must be met
-- Each voter limited to `maxLiveYesVotes` simultaneous active proposals (anti-spam)
-
-**Security Model:**
-- "Trusts a minority of contributors who take the initiative to act"
-- Security comes from the time delay — community can easily block bad proposals
-- Assumes relatively stable Respect distribution
-- Asymmetric veto power prevents hostile takeover
+**If ZAO wants live session automation:** Extract polling logic from Fractalgram and build native ZAO OS UI (React + Chakra) instead. Can reuse ORDAO contract logic via orclient.
 
 ---
 
-## Integration Architecture for ZAO OS Phase 2
+## 7. OREC Smart Contract - Optimistic Respect-based Executive Contract
 
-### Recommended Approach
+### Contract Details
 
+**Address (Optimism mainnet):** `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`
+
+| Metric | Value |
+|---|---|
+| **Repo** | [sim31/ordao/contracts/packages/orec](https://github.com/sim31/ordao/tree/main/contracts/packages/orec) |
+| **License** | GPL-3.0 |
+| **Language** | Solidity |
+| **Total txns** | ~242 (as of May 21, 2026) [FULL] |
+| **Active signers (for submission)** | 2 wallets: zaal.eth, civilmonkey.eth [FULL] |
+
+**Related contracts:**
+- **Respect1155** - ERC-1155 soulbound Respect tokens (non-transferable)
+- **OG Respect (ERC-20)** - Legacy pre-ORDAO token on Optimism
+- **SolidRespect** - ERC-20 fixed-distribution variant (not used by ZAO)
+
+### Core Governance Model: Three-Phase Lifecycle
+
+**Phase 1 - Voting Period (default: 3 days)**
+- Any member can propose
+- Yes-voters (Respect-weighted) support
+- Proposal passes if: `yesWeight >= minWeight` AND `yesWeight > noWeight * 2`
+
+**Phase 2 - Veto Period (default: 3 days)**
+- Veto window opens after voting ends
+- No-voters can block passed proposals
+- Veto succeeds if: `noWeight * 2 >= yesWeight`
+
+**Phase 3 - Execution (after both periods expire)**
+- Anyone can trigger on-chain execution
+- Proposals that passed veto are now executed
+
+**Anti-spam:** Each voter limited to `maxLiveYesVotes` simultaneous active proposals (~10 typically).
+
+### Key Insight: Optimistic Consent
+
+"Trust a minority of contributors who take the initiative to act." Security model:
+- Time delay allows easy blocking of bad proposals
+- Asymmetric veto power (No votes count 2x) prevents hostile takeover
+- Works best with stable Respect distribution (monitor via doc 699, 115 reconciliation)
+
+---
+
+## 8. ZAO OS Integration Paths (Phase 2+)
+
+### Current State
+
+**Already built in ZAO OS:**
+- `src/lib/ordao/client.ts` - viem-based read-only OREC contract reader (proposals, Respect balances)
+- `src/app/api/fractals/*` - API routes serving fractal data
+- `src/app/(auth)/fractals/` - Full UI (Sessions, Proposals, Leaderboard, Analytics tabs)
+- Contract addresses in `community.config.ts` (lines 105-116): OREC + OG/ZOR Respect tokens
+
+**Not built yet:**
+- In-app proposal creation (currently at zao.frapps.xyz)
+- In-app voting + execution
+- Breakout result submission from ZAO OS
+- Async proposal support (Respect.Games v2 integration)
+
+### Recommended Integration (Phase 2)
+
+**Use orclient for write operations + keep existing viem reads:**
+
+```typescript
+// File: src/lib/ordao/orclient-bridge.ts
+import { ORClient, ORContext } from '@ordao/orclient';
+import { BrowserProvider } from 'ethers';
+
+export async function createORClientForViem(walletClient) {
+  // Convert viem -> ethers
+  const provider = new BrowserProvider(walletClient);
+  const signer = await provider.getSigner();
+  
+  // Initialize orclient
+  const context = new ORContext(zaoConfig);
+  const client = new ORClient(context);
+  return client.connect(signer);
+}
 ```
-ZAO OS (Next.js)
-├── /governance route
-│   ├── ProposalList — uses orclient.getProposals()
-│   ├── ProposalDetail — uses orclient.getProposal(id)
-│   ├── VotePanel — uses orclient.vote()
-│   ├── RespectBalance — uses orclient.getRespectOf()
-│   └── BreakoutSubmit — uses orclient.proposeBreakoutResult()
-├── /api/governance/* — server-side ornode proxy routes
-│   ├── /api/governance/proposals — proxy to ornode getProposals
-│   └── /api/governance/respect — proxy to ornode + onchain reads
-└── lib/ordao/
-    ├── orclient.ts — singleton orclient setup
-    ├── ethers-bridge.ts — viem-to-ethers signer conversion
-    └── types.ts — re-export relevant ortypes
-```
 
-### Key Technical Decisions
-1. **ethers.js bridge required** — orclient uses ethers v6, ZAO uses viem/wagmi
-2. **ornode can be read server-side** — cache proposals in ZAO's Supabase for faster reads
-3. **Voting requires wallet signature** — must happen client-side through wagmi
-4. **GPL-3.0 license** — if importing orclient code directly, ZAO OS components using it must be GPL-compatible. Using it as an npm dependency (linking) is generally fine.
+**Update ZAO OS routes:**
+
+| File | Change |
+|---|---|
+| `src/app/api/fractals/proposals/route.ts` | Add POST handler (orclient.proposeBreakoutResult) |
+| `src/app/(auth)/fractals/ProposalsTab.tsx` | Add vote/execute buttons |
+| `community.config.ts` | Add ornode URL, contract addresses (already done) |
+| `package.json` | Add deps: `@ordao/orclient @ordao/ortypes ethers ^6.13` |
+
+### License Consideration
+
+- orclient is GPL-3.0; ZAO OS is MIT
+- Using orclient as npm dependency = linking, which is compatible
+- If copy-pasting code from orclient into ZAO OS, those components must stay GPL-3.0
+- Recommendation: Import orclient as a module, do not inline its code
 
 ### Dependencies to Add
+
 ```json
 {
-  "@ordao/orclient": "^1.4.3",
-  "@ordao/ortypes": "^1.4.3",
+  "@ordao/orclient": "^1.4.4",
+  "@ordao/ortypes": "^1.4.4",
   "ethers": "^6.13.0"
 }
 ```
 
 ---
 
-## Additional Optimystics Tools (Brief Notes)
+## 9. Other Optimystics Tools (Brief Scan)
 
-From the full toolkit inventory:
+| Tool | Status | ZAO Fit | Notes |
+|---|---|---|---|
+| **Respect Trees** | Active | Medium | Fractal priority mapping; ZAO uses Council structure instead |
+| **RetroPolls** | Active | Low | Impact evaluation; ZAO focuses on weekly sessions, not retroactive |
+| **Cagendas** | In dev | Medium | Agenda-setting game; ZAO could use for meeting topics |
+| **OPTOPICS** | In dev | Low | Topic voting; less relevant than in-session ranking |
+| **Firmament** | Long-term | Future | Git+IPFS decentralization; not immediate priority |
+| **Hats Protocol** | Via sim31 | Pending | Onchain roles; ZAO exploring integration (see doc 59) |
 
-| Tool | Status | ZAO Relevance |
-|---|---|---|
-| **Cagendas** | Active | Agenda-setting game; could power ZAO meeting coordination |
-| **OPTOPICS** | Active | Topic voting for events; relevant for ZAO community calls |
-| **Respect Trees** | Active | Fractal framework for priorities; maps to ZAO's council structure |
-| **RetroPolls** | Active | Impact evaluation; could help ZAO distribute retroactive rewards |
-| **Firmament** | Active | Git+IPFS infrastructure; long-term decentralization goal |
-| **Hats Tree** | Active | Onchain roles; ZAO already researching Hats (doc 59) |
+---
+
+## Also See
+
+- **Doc 56 - ORDAO & Respect Game System:** Comprehensive original design (Feb 2026)
+- **Doc 102-114 - Fractal governance deep dives:** Respect mechanics, game theory, contract audit
+- **Doc 184 - Superchain ORDAO:** Cross-chain governance planning
+- **Doc 285 - orfrapps Updated Docs:** Deployment, configuration, CLI reference
+- **Doc 698 - Fractal Lineage:** Complete history (Fractally -> Eden -> Optimism -> ZAO)
+- **Doc 699 - ZAO Fractal Current State:** Operational status, recommendations (May 2026)
+
+---
+
+## Next Actions
+
+| Action | Owner | Timeline | Why |
+|---|---|---|---|
+| **Choose: Link vs embed vs self-host zao.frapps.xyz** | @Zaal | Week 1 | Unblock ZAO OS `/fractals` page UX decision |
+| **Integrate orclient for proposal creation** | @ZAO Dev | Phase 2 (Jun) | Enable in-app voting without zao.frapps.xyz fallback |
+| **Test Respect.Games v2 beta** | @ZAO Dev | Jun 2026 | Evaluate for async fractal fork support |
+| **Document Fractalgram setup for live sessions** | @Zaal | Ongoing | Help non-technical members (Tanja, etc) use Discord bot + Telegram |
+| **Evaluate Cignals fork for ZAOstock music ranking** | @Zaal + Cassie | May-Jun | Prepare event automation (Oct 3 deadline) |
 
 ---
 
 ## Sources
 
-- [sim31/ordao GitHub](https://github.com/sim31/ordao) — ORDAO monorepo (contracts, orclient, ornode, GUI)
-- [Optimystics/frapps GitHub](https://github.com/Optimystics/frapps) — Fractal apps toolkit
-- [Optimystics/fractalgram GitHub](https://github.com/Optimystics/fractalgram) — Telegram client fork
-- [sim31/frapps GitHub](https://github.com/sim31/frapps) — Deployment config for fractal apps
-- [@ordao/orclient on npm](https://www.npmjs.com/package/@ordao/orclient) — Published SDK
-- [orclient docs](https://orclient-docs.frapps.xyz) — TypeDoc API reference
-- [Optimystics Tools](https://optimystics.io/tools) — Full toolkit listing
-- [Respect Game overview](https://optimystics.io/respectgame) — How the Respect Game works
-- [Cignals page](https://optimystics.io/cignals) — Competition app details
-- [Respect.Games](https://respect.games) — Beta app (connection issues at time of research)
-- [Optimism Fractal](https://optimismfractal.com) — Reference implementation community
+**ORDAO & orclient:**
+- [sim31/ordao GitHub](https://github.com/sim31/ordao) - Main monorepo [FULL]
+- [sim31/orfrapps GitHub](https://github.com/sim31/orfrapps) - Deployment tooling + CLI [FULL]
+- [@ordao/orclient npm](https://www.npmjs.com/package/@ordao/orclient) - v1.4.4 (April 2026) [FULL]
+- [orclient-docs.frapps.xyz](https://orclient-docs.frapps.xyz) - API reference [FULL]
+- [orfrapps CLI Reference](https://github.com/sim31/orfrapps/blob/main/docs/CLI_REFERENCE.md) - Command reference [FULL]
+
+**Respect Game & Fractalgram:**
+- [optimystics.io/respectgame](https://optimystics.io/respectgame) - Theory + mechanics [FULL]
+- [optimystics.io/cignals](https://optimystics.io/cignals) - Competition app [PARTIAL - page has encoding issues]
+- [Optimystics/fractalgram GitHub](https://github.com/Optimystics/fractalgram) - Telegram fork [FULL]
+
+**Respect.Games:**
+- [respectgame.web.app](https://respectgame.web.app) - Current beta [PARTIAL - endpoint check deferred]
+- [optimystics.io/respect-games-app](https://optimystics.io/respect-games-app) - Overview + features [FULL]
+
+**Deployment & frapps:**
+- [sim31/frapps GitHub](https://github.com/sim31/frapps) - Fractal configs [FULL]
+- [optimystics.io/tools](https://optimystics.io/tools) - Toolkit overview [FULL]
+
+**Cross-reference docs:**
+- Doc 698 (Fractal Lineage) - History + terminology [FULL]
+- Doc 699 (ZAO Fractal State) - Current ops + recommendations [FULL]

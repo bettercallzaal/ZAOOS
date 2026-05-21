@@ -191,13 +191,13 @@ tier: DEEP
 
 | Tool | Purpose | Status | License | Latest Version |
 |------|---------|--------|---------|-----------------|
-| **ORDAO** | Governance contracts + SDK for Respect-based DAOs | Production (OP Mainnet + Base) | GPL-3.0 | v1.3.2 (@ordao/orclient, May 17, 2026) |
+| **ORDAO** | Governance contracts + SDK for Respect-based DAOs | Production (OP Mainnet + Base) | GPL-3.0 | v1.4.4 (@ordao/orclient, April 2, 2026) |
 | **OREC** | Optimistic Respect Executive Contract (core of ORDAO) | Production | GPL-3.0 | Deployed on 2+ chains |
 | **Fractalgram** | Live Respect Game web UI (peer ranking breakout rooms) | Production | GPL-3.0 | MIT fork available [Optimystics/fractalgram](https://github.com/Optimystics/fractalgram) |
 | **frapps** | Modular deployment platform for fractal apps | Production | MIT/GPL-3.0 | [Optimystics/frapps](https://github.com/Optimystics/frapps) |
 | **Respect.Games** | Async Respect Game app (MVP form filling) | Beta → Production (roadmap) | MIT | In-progress |
 | **ORConsole** | Advanced governance operations + monitoring dashboard | Available | GPL-3.0 | orclient-docs.frapps.xyz |
-| **ortypes** | Shared TypeScript interfaces across tools | Production | Part of ordao repo | Part of v1.3.2 |
+| **ortypes** | Shared TypeScript interfaces across tools | Production | Part of ordao repo | Part of v1.4.4 |
 
 ### Additional Tools & Components
 
@@ -341,7 +341,7 @@ Explicitly designed for "ranking speeches and musical performances" - this is th
    - ORDAO model preserved; contracts remain live on OP Mainnet
    - 300+ proposals executed; case study for Superchain governance
 
-2. **orclient SDK now v1.3.2 (May 17, 2026)**
+2. **orclient SDK now v1.4.4 (published April 2, 2026)**
    - Improved wallet integration + error handling vs. v1.0.15 (March)
    - Published to npm; ZAO can integrate immediately
 
@@ -442,7 +442,7 @@ Related fractal governance docs: 56, 58, 102, 104, 105, 106, 109, 114, 115, 188,
 - [Optimystics/fractalgram](https://github.com/Optimystics/fractalgram) - [FULL] Live Respect Game UI (MIT license, forkable)
 - [Optimystics/frapps](https://github.com/Optimystics/frapps) - [FULL] Fractal apps toolkit
 - [Optimystics/ordao](https://github.com/Optimystics/ordao) - [FULL] Smart contracts + orclient SDK monorepo
-- [@ordao/orclient npm](https://www.npmjs.com/package/@ordao/orclient) - [PARTIAL] npm package page (v1.3.2 confirmed via WebSearch; npm registry returned 403 on direct fetch)
+- [@ordao/orclient npm](https://www.npmjs.com/package/@ordao/orclient) - [FULL] npm registry API confirms latest v1.4.4 (published 2026-04-02)
 - [Aquariusacademy.substack.com - Aquadac](https://aquariusacademy.substack.com/p/aquadac-collective-self-realization) - [FULL] Personal development fractal
 - [ZAO Whitepaper Draft 3 (HackMD)](https://hackmd.io/@bB0dXoPfSAuUEqyo43pHZw/H1edVWM7eg) - [FULL] ZAO vision including ORDAO integration
 - [fractally.com](https://fractally.com) - [FULL] Dormant site; white paper available

@@ -1,3 +1,13 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Extract actionable patterns from bootcamp days 3-5 for FISHBOWLZ agent participants - event-driven agents, stateful memory, and ERC-8004 identity (reconstructed)
+tier: high
+notes: Core patterns (event-driven, stateful memory, ERC-8004 identity) remain valuable even though FISHBOWLZ project paused. Apply to ZOE/agent stack.
+---
+
 # 291 — Farcaster Agentic Bootcamp Days 3-5: Agents, Memory, Identity
 
 > **Status:** Research complete

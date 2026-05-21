@@ -1,5 +1,15 @@
 # 90 — AI-Run Community: Self-Improving Agent OS for ZAO
 
+---
+topic: agents
+type: research
+status: archive-candidate
+last-validated: 2026-05-20
+original-query: Design self-improving agent OS for autonomous ZAO community operations using Paperclip and ElizaOS (reconstructed)
+tier: archive
+note: Built on Paperclip + ElizaOS migration, both decommissioned 2026-05-04. Community automation concept valid; implementation approach superseded.
+---
+
 > **Status:** Design complete (not yet implemented)
 > **Date:** March 20, 2026
 > **Goal:** Design a self-improving AI agent system that runs the ZAO community autonomously — daily digests, auto-onboarding, governance autopilot — using Paperclip + ElizaOS + autoresearch

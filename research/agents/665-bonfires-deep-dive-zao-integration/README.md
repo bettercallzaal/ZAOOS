@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-20
+original-query: What is Bonfires.ai's architecture and how do we integrate it as ZOE's canonical memory layer with 6 concrete integration vectors? (reconstructed)
 related-docs: 460, 601, 657, 663, 664
 tier: DEEP
 ---

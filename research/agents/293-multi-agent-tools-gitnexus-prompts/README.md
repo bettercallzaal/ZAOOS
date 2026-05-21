@@ -1,3 +1,12 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate three tools found on X/Twitter for ZAO agent squad relevance - (1) Trellis multi-agent framework, (2) GitNexus codebase knowledge graph, (3) exploraX 40 High-Impact Prompts collection (reconstructed)
+tier: high
+---
+
 # 293 — Multi-Agent Orchestration Tools, GitNexus Knowledge Graphs & High-Impact Agent Prompts
 
 > **Status:** Research complete

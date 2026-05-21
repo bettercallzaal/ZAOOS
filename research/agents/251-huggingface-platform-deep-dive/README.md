@@ -1,7 +1,12 @@
 # 251 — HuggingFace Platform Deep Dive: What ZAO Can Do With a Write Token
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** April 2, 2026
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-20
+> **Original-query:** HuggingFace platform capabilities for ZAO - write token, organizations, custom LoRA training, Spaces hosting, datasets, ZeroGPU, ACE-Step 1.5 integration
+> **Tier:** reference
 > **Goal:** Map everything ZAO OS can do on HuggingFace beyond calling ACE-Step — organizations, custom models, LoRA training, Spaces, datasets, and community features
 
 ## Key Decisions / Recommendations

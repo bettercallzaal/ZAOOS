@@ -1,5 +1,15 @@
 # 205 — OpenClaw + Paperclip + ElizaOS: Full Agent Stack Deployment Plan
 
+---
+topic: agents
+type: research
+status: archive-candidate
+last-validated: 2026-05-20
+original-query: Define deployment steps and integration plan for OpenClaw, Paperclip, and ElizaOS stack (reconstructed)
+tier: archive
+note: All three frameworks (OpenClaw, Paperclip, ElizaOS migration) decommissioned 2026-05-04. Doc archived as historical deployment reference.
+---
+
 > **Status:** Research complete
 > **Date:** March 28, 2026
 > **Goal:** Define the exact deployment steps, configuration, and integration plan for running OpenClaw as orchestrator, Paperclip as task management, and ElizaOS as always-on social presence for ZAO OS

@@ -1,5 +1,14 @@
 # 235 - Free Web Search MCP Alternatives for AI Agents
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate free web search MCP alternatives for AI agents (reconstructed)
+tier: reference
+---
+
 **Date:** 2026-04-01
 **Status:** Complete
 **Context:** OpenClaw agent on $5/month VPS (Docker, Node.js). Need the best FREE web search option to replace Brave Search MCP.

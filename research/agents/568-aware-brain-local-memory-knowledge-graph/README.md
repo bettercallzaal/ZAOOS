@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: pick aware brain stack (KG builder + chat surface) for Zaal's thinking partner (reconstructed)
 related-docs: 235, 415, 428, 496, 546, 565, 567
 tier: DEEP
 ---

@@ -1,5 +1,14 @@
 # 227 — Agentic Workflows in 2026: Frameworks, Patterns & Music/Web3 Applications
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Map agentic workflow landscape for 2026 including frameworks, patterns, and music/web3 applications for ZAO OS (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Date:** March 29, 2026
 > **Goal:** Map the agentic workflow landscape for 2026 — frameworks, SDKs, real-world DAO/community patterns, music-specific agent use cases, and cost/pricing models. Evaluate what fits ZAO OS (Next.js + TypeScript + Supabase + web3).

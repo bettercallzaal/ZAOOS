@@ -2,7 +2,8 @@
 topic: agents
 type: guide
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-20
+original-query: design multi-agent coordination between ZOE, Hermes, and Bonfire without conflicts (reconstructed)
 related-docs: 523, 524, 527, 529, 531, 541, 542, 543, 544, 545, 546
 tier: DEEP
 ---

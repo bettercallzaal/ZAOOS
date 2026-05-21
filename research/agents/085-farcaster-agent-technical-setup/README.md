@@ -1,11 +1,16 @@
 # 85 — Building and Deploying a Farcaster AI Agent with Neynar
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Step-by-step guide to creating, configuring, and deploying an AI agent on Farcaster using Neynar API (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Date:** March 19, 2026
-
-**Date:** 2026-03-19
-**Status:** Deep Technical Research
-**Purpose:** Step-by-step guide to creating, configuring, and deploying an AI agent on Farcaster using the Neynar API.
 
 ---
 

@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-04-26
+last-validated: 2026-05-20
+original-query: prevent Hermes from opening failing PRs via pre-flight gates and conflict detection (reconstructed)
 related-docs: 461, 506, 507, 508, 523, 524, 527, 528
 tier: DISPATCH
 ---

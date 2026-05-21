@@ -1,5 +1,14 @@
 # 206 — LobsterAI Agent Architecture Analysis
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate LobsterAI agent architecture patterns transferable to ZAO OS skill system (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Date:** March 28, 2026
 > **Goal:** Evaluate LobsterAI (NetEase Youdao) for patterns transferable to ZAO OS agent/skill architecture

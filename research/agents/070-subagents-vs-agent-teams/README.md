@@ -1,5 +1,14 @@
 # 70 — Sub-agents vs Agent Teams + Claude Architect Patterns for ZAO OS
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Document multi-agent paradigms (sub-agents vs agent teams) and Claude Architect patterns for ZAO OS (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Date:** March 18, 2026
 > **Goal:** Document the two multi-agent paradigms (sub-agents vs agent teams), map to ZAO OS's Paperclip setup, and capture Claude Architect certification patterns for production-grade development

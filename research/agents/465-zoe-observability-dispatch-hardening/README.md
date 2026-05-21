@@ -1,3 +1,12 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: "ZOE observability gap map + events.jsonl architecture + daily activity digest + @agent dispatch routing + watchdog reliability + voice/file/group scope expansion (reconstructed)"
+tier: STANDARD
+---
+
 # 465 — ZOE Observability + Dispatch Hardening (post-messaging-fix)
 
 > **Status:** Research complete

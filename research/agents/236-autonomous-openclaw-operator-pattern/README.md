@@ -1,7 +1,12 @@
 # 236 -- Autonomous OpenClaw Operator Pattern: 3-Layer Memory, Heartbeats, Delegation & Nightly Consolidation
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** April 1, 2026
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-20
+> **Original-query:** OpenClaw autonomous operator pattern for ZOE - 3-layer memory, heartbeats, delegation to Claude Code, nightly consolidation
+> **Tier:** reference
 > **Tags:** `#openclaw` `#autonomous-agent` `#memory-architecture` `#heartbeat` `#consolidation` `#delegation` `#zoe`
 > **Builds on:** Doc 197 (memory system), Doc 202 (multi-agent orchestration), Doc 204 (setup runbook), Doc 226 (best practices), Doc 234 (comprehensive guide)
 

@@ -2,7 +2,8 @@
 topic: agents
 type: spec
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-20
+original-query: What's the best architecture for a Discord audio-to-action-items bot with native diarization and the cleanest extraction pipeline? (reconstructed)
 related-docs: 247, 327, 464, 474, 605d, 670, 671, 672, 673
 tier: DEEP
 supersedes: 673

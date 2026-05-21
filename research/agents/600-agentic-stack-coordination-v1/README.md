@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-03
+last-validated: 2026-05-20
+original-query: stop agent-as-island pattern and propose coordinated architecture with Claude Code as primary surface (reconstructed)
 related-docs: 234, 235, 236, 237, 238, 239, 415, 461, 506, 523, 524, 527, 528, 529, 547, 549, 569, 570, 581, 590, 599
 tier: DEEP
 ---

@@ -2,10 +2,10 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-11
-related-docs: [640, 642, 483, 547, 601]
+last-validated: 2026-05-20
+original-query: ZAO agent stack canon and team bot template - reference for Hermes pattern, five surfaces, deployment model (reconstructed)
+related-docs: 640, 642, 483, 547, 601
 tier: DEEP
-source: synthesis-of-existing-docs-2026-05-11
 ---
 
 # 644 - ZAO Agent Stack Canon + Team Bot Template

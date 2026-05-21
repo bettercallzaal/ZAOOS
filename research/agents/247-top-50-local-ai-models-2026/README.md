@@ -1,8 +1,12 @@
 # 247 — Top 50 Local AI Models for Privacy + Best Outputs (2026)
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** April 2, 2026
-> **Goal:** Evaluate the top local AI models from @meta_alchemist's comprehensive guide, filtered through ZAO OS's needs as a 188-member gated Farcaster music community on Next.js 16 + Supabase + Neynar
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-20
+> **Original-query:** Top 50 local AI models 2026 for ZAO - music generation (ACE-Step), TTS (Kokoro, Voxtral), embeddings (BGE-M3, Qwen3), coding (OmniCoder), image (FLUX.1), video (Wan 2.2)
+> **Tier:** reference
 > **Source:** [@meta_alchemist on X](https://x.com/meta_alchemist) — April 1, 2026 thread
 
 ## Key Decisions / Recommendations

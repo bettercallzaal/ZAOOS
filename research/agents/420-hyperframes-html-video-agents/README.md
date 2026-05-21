@@ -1,7 +1,12 @@
 # 420 — HyperFrames: HTML-as-Video for AI Agents
 
 > **Status:** Research complete
+> **Topic:** agents
+> **Type:** Integration & Tools
 > **Date:** 2026-04-17
+> **Last-Validated:** 2026-05-20
+> **Original-Query:** Should we adopt HeyGen HyperFrames for agent-native video generation? (reconstructed)
+> **Tier:** v2-ready
 > **Goal:** Evaluate HeyGen's HyperFrames (open-sourced 2026-04-16) as the agent-native video toolchain for ZAO OS content production, newsletter visuals, ZAO Stock promos, WaveWarZ clips, and socials.
 
 ---

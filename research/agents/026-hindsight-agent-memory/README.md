@@ -1,5 +1,14 @@
 # 26 — Hindsight: Agent Memory System (vectorize-io/hindsight)
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Evaluate Hindsight as a memory layer for ZAO OS AI agents (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Source:** github.com/vectorize-io/hindsight
 > **Goal:** Evaluate Hindsight as the memory layer for ZAO OS's AI agent

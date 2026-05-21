@@ -3,6 +3,7 @@ topic: agents
 type: decision
 status: research-complete
 last-validated: 2026-05-20
+original-query: How do we add @-mentions on action assignment and a DM-to-code-PR pipeline to cowork-zaodevz bot? (reconstructed)
 superseded-by:
 related-docs: 650, 662, 677, 461, 523, 601
 tier: STANDARD

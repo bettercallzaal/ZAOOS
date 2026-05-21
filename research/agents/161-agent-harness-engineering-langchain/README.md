@@ -1,5 +1,14 @@
 # 161 — Agent Harness Engineering: LangChain DeepAgents, Virtual Filesystems & the Ralph Loop
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Analyze agent harness engineering framework (LangChain DeepAgents) and extract patterns for ZAO OS agent roadmap (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Date:** March 27, 2026
 > **Goal:** Analyze Viv Trivedy's (LangChain) agent harness engineering framework and extract patterns applicable to ZAO OS's AI agent roadmap

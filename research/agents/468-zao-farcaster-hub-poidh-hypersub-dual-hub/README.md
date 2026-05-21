@@ -1,3 +1,12 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: "ZAO Farcaster hub design with POIDH bounty bot + HyperSub bot, Neynar signer strategy, dual-hub architecture, cross-hub handoffs (reconstructed)"
+tier: STANDARD
+---
+
 # 468 — ZAO Farcaster Hub: POIDH bot, HyperSub bot, and dual-hub (Telegram + Farcaster) design
 
 > **Status:** Research complete

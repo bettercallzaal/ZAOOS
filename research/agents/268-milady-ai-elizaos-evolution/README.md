@@ -1,7 +1,13 @@
 # 268 — Milady AI: ElizaOS Evolution for Desktop-First AI Agents
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** March 28, 2026
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-20
+> **Original-query:** Milady AI desktop agent distribution vs ElizaOS - Steward Wallet pattern, ERC-8004 identity, VRM avatar, desktop companion, plugin architecture
+> **Tier:** archive-candidate
+> **Archive-note:** ElizaOS decommissioned per CLAUDE.md 2026-05-04. Milady v2.0.3 is trading/crypto-focused, not music/community-focused. Patterns (Steward Wallet, ERC-8004, plugin CLI) worth stealing but implementation not relevant. Keeping for historical record.
 > **Goal:** Evaluate Milady AI as the next-gen ElizaOS distribution and assess implications for ZAO's agent stack (OpenClaw + Paperclip + ElizaOS per doc 205)
 
 ## Key Decisions / Recommendations

@@ -1,3 +1,12 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Deep dive into ElevenLabs Agents (formerly Conversational AI) for building a voice agent with Zaal's Professional Voice Clone for The ZAO community (reconstructed)
+tier: high
+---
+
 # 325 - ElevenLabs Agents: Voice AI Platform for ZAO OS
 
 > **Status:** Research complete

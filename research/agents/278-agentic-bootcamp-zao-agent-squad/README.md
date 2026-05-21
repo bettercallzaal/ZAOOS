@@ -1,7 +1,12 @@
 # 278 — Farcaster Agentic Bootcamp vs ZAO Agent Squad: Gap Analysis & Upgrade Plan
 
-> **Status:** Research complete
-> **Date:** 2026-04-05
+> **Status:** research-complete
+> **Date:** April 5, 2026
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-20
+> **Original-query:** Farcaster agentic bootcamp curriculum gap analysis vs ZAO agent squad - agent FID, ERC-8004, x402 payments, mini app manifest, notifications
+> **Tier:** reference
 > **Goal:** Map bootcamp curriculum against ZAO's 7-agent squad, identify gaps, and define what to build next
 
 ## Key Decisions / Recommendations

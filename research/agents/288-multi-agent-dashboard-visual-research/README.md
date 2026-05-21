@@ -1,3 +1,12 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Find real visual examples of multi-agent dashboards, extract UI patterns, and recommend an approach for ZAO's 7-agent admin dashboard (reconstructed)
+tier: high
+---
+
 # 288 — Multi-Agent Dashboard Visual Research: UI Patterns for Agent Squad Monitoring
 
 > **Status:** Research complete

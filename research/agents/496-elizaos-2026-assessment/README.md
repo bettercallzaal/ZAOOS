@@ -1,12 +1,13 @@
-# 496 — ElizaOS 2026 Assessment: For ZAOstock Bot Decision
+---
+topic: agents
+type: decision
+status: research-complete
+last-validated: 2026-05-20
+original-query: "ElizaOS v2.0 production assessment for ZAOstock bot v1.5, memory leak issues, framework friction, character file + plugin patterns for grammy adoption (reconstructed)"
+tier: STANDARD
+---
 
-> **Status:** Research complete
-> **Date:** April 24, 2026
-> **Tier:** STANDARD
-> **Topic:** Agents / Framework Selection
-> **Type:** Decision
-> **Related Docs:** 205 (OpenClaw+Paperclip+ElizaOS deployment), 268 (Milady/ElizaOS evolution), 239 (Agent frameworks evaluation)
-> **Last Validated:** April 24, 2026
+# 496 — ElizaOS 2026 Assessment: For ZAOstock Bot Decision
 
 ## The Question
 

@@ -2,7 +2,8 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-04-27
+last-validated: 2026-05-20
+original-query: decide whether to keep building Hermes or pivot after 8/9 runs failed (reconstructed)
 related-docs: 461, 506, 507, 523, 524, 527, 528, 529
 tier: DISPATCH
 ---

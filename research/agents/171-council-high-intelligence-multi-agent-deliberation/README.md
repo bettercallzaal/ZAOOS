@@ -1,5 +1,14 @@
 # 171 — Council of High Intelligence: Multi-Agent Deliberation for ZAO OS
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Deep dive into multi-agent deliberation systems and design ZAO-specific decision-making triads (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Date:** March 28, 2026
 > **Goal:** Deep dive into Nyk's 11-agent deliberation system — compare with ZAO's existing multi-agent tools, design ZAO-specific triads, and determine install/adapt/skip

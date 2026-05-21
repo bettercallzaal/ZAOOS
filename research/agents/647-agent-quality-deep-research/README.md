@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-14
+last-validated: 2026-05-20
+original-query: Concrete, prioritized patterns to make ZOE, Hermes measurably better - six dimensions: prompt engineering, memory, persona, tool-use, hallucination, evals (reconstructed)
 related-docs: 460, 483, 523, 529, 541, 547
 tier: DEEP
 ---

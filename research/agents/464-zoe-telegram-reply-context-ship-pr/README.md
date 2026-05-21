@@ -1,7 +1,12 @@
 # 464 — ZOE Telegram: Reply-Context Bug, Capability Matrix, Ship-PR Loop
 
 > **Status:** Research complete
+> **Topic:** agents
+> **Type:** Feature & Design
 > **Date:** 2026-04-20
+> **Last-Validated:** 2026-05-20
+> **Original-Query:** How do we fix ZOE's context loss in Telegram? What other Telegram APIs can ZOE use? Design tip-to-PR shipping flow. (reconstructed)
+> **Tier:** v2-ready
 > **Goal:** Fix ZOE's "I didn't send that" reply bug, map every Telegram Bot API capability ZOE can adopt, and design a tip-to-PR shipping loop (Telegram → VPS Claude Code → branch + PR).
 > **Builds on:** docs 234, 236, 245, 256, 289, 460, 463
 > **Repro case (2026-04-20):** Zaal received `[ZOE TIP] 157 — Cross-Project Asset Audit` then asked ZOE "zoe tip 157 can u see that". ZOE replied "No file matching 'tip 157' or '157' exists in the repo." The file exists at `research/dev-workflows/157-cross-project-asset-audit/README.md`.

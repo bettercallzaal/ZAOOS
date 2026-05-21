@@ -1,7 +1,12 @@
 # 364 -- Multi-Harness Agent Orchestration: OpenClaw + Hermes + Tournament Model
 
 > **Status:** Research complete
+> **Topic:** agents
+> **Type:** Architecture & Design
 > **Date:** April 15, 2026
+> **Last-Validated:** 2026-05-20
+> **Original-Query:** How should ZOE dispatch tasks across multiple agent harnesses (OpenClaw, Hermes, others) to maximize capability? (reconstructed)
+> **Tier:** v2-ready
 > **Goal:** Design how ZOE runs multiple agent frameworks (OpenClaw, Hermes, others) side by side, dispatching to whichever is best for each task, with tournament-style competition between harnesses
 
 ---

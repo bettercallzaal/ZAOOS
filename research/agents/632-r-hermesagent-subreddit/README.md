@@ -2,10 +2,10 @@
 topic: agents
 type: guide
 status: research-complete
-last-validated: 2026-05-11
-related-docs: [483-hermes-agent-local-llm-framework, 529-hermes-quality-pipeline-pre-critic-gates, 531-hermes-honest-audit-pivot-or-persist, 541-hermes-gaps-vs-industry-best-practices, 547-multi-agent-coordination-bonfire-zoe-hermes]
+last-validated: 2026-05-20
+original-query: r/hermesagent subreddit context - NousResearch project, different from ZAO Hermes, naming collision only (reconstructed)
+related-docs: 483, 529, 531, 541, 547
 tier: QUICK
-source: inbox-forward-2026-05-11
 ---
 
 # 632 - r/hermesagent: Different Project (NousResearch)

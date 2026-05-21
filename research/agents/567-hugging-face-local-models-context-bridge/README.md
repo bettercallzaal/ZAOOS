@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-20
+original-query: decide which HF surface, local runtime, web UI, and context bridge for local models (reconstructed)
 related-docs: 235, 415, 428, 496, 546, 565
 tier: STANDARD
 ---

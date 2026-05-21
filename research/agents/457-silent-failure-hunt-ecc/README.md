@@ -1,7 +1,12 @@
 ### 457 — Silent Failure Hunt: ZAO Agent System
 
-> **Status:** Hunt complete, fixes pending
+> **Status:** Research complete
+> **Topic:** agents
+> **Type:** Audit & Debugging
 > **Date:** 2026-04-20
+> **Last-Validated:** 2026-05-20
+> **Original-Query:** What silent failures exist in the ZAO agent system? Find and prioritize fixes. (reconstructed)
+> **Tier:** v2-ready
 > **Tool:** `general-purpose` subagent running `silent-failure-hunter` persona (ECC plugin agent not in registered subagent export — workaround used)
 > **Scope:** `src/lib/agents/` + 3 admin API routes
 

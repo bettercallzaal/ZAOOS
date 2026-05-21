@@ -1,5 +1,15 @@
 # 208 — Paperclip Plugins: Ecosystem Update & ZAO Integration Plan
 
+---
+topic: agents
+type: research
+status: archive-candidate
+last-validated: 2026-05-20
+original-query: Map Paperclip plugin ecosystem and design ZAO integration strategy (reconstructed)
+tier: archive
+note: Paperclip framework decommissioned 2026-05-04. Doc archived as historical plugin analysis; patterns may transfer to other agent frameworks.
+---
+
 > **Status:** Research complete
 > **Date:** March 28, 2026
 > **Goal:** Map the current Paperclip plugin ecosystem (11 community plugins, 4 examples, 2 new releases), identify which plugins ZAO should install vs build, and update the integration plan from Doc 175

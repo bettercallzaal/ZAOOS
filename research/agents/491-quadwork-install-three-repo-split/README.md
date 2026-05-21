@@ -1,3 +1,12 @@
+---
+topic: agents
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "QuadWork v1.12.0 installation and configuration for zao-chat + zao-brain repos during 3-repo extraction, agent role assignment, branch protection, per-repo allowlists (reconstructed)"
+tier: STANDARD
+---
+
 # 491 — Install QuadWork for the 3-Repo Split (zao-research / zao-chat / zao-brain)
 
 > **Status:** Plan ready, install requires Zaal at keyboard

@@ -1,7 +1,12 @@
 # 239 — Agent Frameworks & Infrastructure Evaluation for ZAO OS
 
-> **Status:** Updated with live GitHub data
+> **Status:** research-complete
 > **Date:** April 1, 2026 (v2 — refreshed star counts + revised verdicts)
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-20
+> **Original-query:** Agent frameworks infrastructure evaluation for ZAO OS - OpenClaw, gstack, n8n, Firecrawl, ElizaOS, Paperclip, security/search/automation tools
+> **Tier:** reference
 > **Goal:** Evaluate 16 agent frameworks, security tools, search/data tools, and workflow automation for ZAO OS adoption
 > **Context:** ZAO OS runs OpenClaw (ZOE agent) on a Hostinger VPS, uses gstack skills locally, and is operated by a 1-person team.
 

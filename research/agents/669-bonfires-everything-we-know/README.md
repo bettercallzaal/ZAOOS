@@ -2,7 +2,8 @@
 topic: agents
 type: market-research
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-20
+original-query: What is the complete Bonfires landscape, canonical reference, and readiness gate for Phase 1 ZOE integration? (reconstructed)
 related-docs: 601, 650, 665, 668
 tier: DEEP
 ---

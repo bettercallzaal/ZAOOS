@@ -1,9 +1,14 @@
 # 256 — ZOE Agent Factory: The Vision
 
-**Category:** AI/Agents / Architecture
-**Status:** Active design
-> **Date:** 2026-04-04
-**Priority:** P0
+> **Status:** active-design
+> **Date:** April 4, 2026
+> **Topic:** agents
+> **Type:** product-vision
+> **Last-validated:** 2026-05-20
+> **Original-query:** ZOE agent factory vision - agent curator, testing, scaling to member/artist agents, self-sustaining factory
+> **Tier:** product
+> **Category:** AI/Agents / Architecture
+> **Priority:** P0
 
 ---
 

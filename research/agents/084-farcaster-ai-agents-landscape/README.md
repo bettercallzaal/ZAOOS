@@ -1,5 +1,14 @@
 # 84 — Farcaster AI Agents Landscape (March 2026)
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-20
+original-query: Map the landscape of AI agents and bots on Farcaster for building ZAO community bot (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Date:** March 19, 2026
 

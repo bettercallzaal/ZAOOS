@@ -1,7 +1,12 @@
 # 433 - Agent Outbound Phone Calls: Ring-a-Ding vs DIY Twilio + OpenAI Realtime
 
 > **Status:** Research complete
+> **Topic:** agents
+> **Type:** Integration & Tools
 > **Date:** 2026-04-18
+> **Last-Validated:** 2026-05-20
+> **Original-Query:** Should ZAO implement agent-driven outbound phone calls for vendor coordination? Ring-a-Ding vs DIY Twilio? (reconstructed)
+> **Tier:** v2-ready
 > **Tags:** `#agents` `#voice` `#telephony` `#openai-realtime` `#twilio` `#livekit` `#ringading`
 > **Related:** Doc 325 (ElevenLabs Agents), Doc 290 (FISHBOWLZ agentic participants), Doc 234 (OpenClaw)
 > **Trigger:** Reddit r/OpenClawInstall post (Apr 17, 2026) on ring-a-ding plus tristanbrotherton comment on DIY Twilio + OpenAI Realtime build

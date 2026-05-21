@@ -2,7 +2,8 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-20
+original-query: How do we make our bots better? What are the top 10 agent stack improvements for ZAO in May 2026? (reconstructed)
 related-docs: 601, 650, 661, 663, 665
 tier: DISPATCH
 ---

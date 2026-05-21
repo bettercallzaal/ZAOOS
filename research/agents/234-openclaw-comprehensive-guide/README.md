@@ -1,5 +1,15 @@
 # 234 — OpenClaw Comprehensive Guide: Agent Memory, Knowledge Graphs, MCP Servers & Context Management
 
+---
+topic: agents
+type: research
+status: archive-candidate
+last-validated: 2026-05-20
+original-query: Comprehensive guide to OpenClaw architecture, memory systems, knowledge graphs, and MCP integration (reconstructed)
+tier: archive
+note: OpenClaw framework and agent orchestration strategy decommissioned 2026-05-04. Doc archived as comprehensive historical reference; patterns may inform future agent infrastructure.
+---
+
 > **Status:** Research complete
 > **Date:** April 1, 2026
 > **Tags:** `#openclaw` `#agent-memory` `#knowledge-graph` `#mcp` `#context-management` `#soul-md`

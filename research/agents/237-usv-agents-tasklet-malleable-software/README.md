@@ -1,9 +1,13 @@
 # 237 - USV Agents, Tasklet, Malleable Software & The "Build Something You Want" Era
 
-**Date:** 2026-04-01
-**Category:** AI Agents / Infrastructure / Strategy
-**Status:** Complete
-**Relevance:** Direct — agent architecture patterns for ZOE on OpenClaw
+> **Status:** research-complete
+> **Date:** April 1, 2026
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-20
+> **Original-query:** Union Square Ventures agent roster and mentions data model - architecture patterns for ZOE on OpenClaw
+> **Tier:** reference
+> **Category:** AI Agents / Infrastructure / Strategy
 
 ---
 

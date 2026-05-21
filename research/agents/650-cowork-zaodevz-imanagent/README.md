@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-15
+last-validated: 2026-05-20
+original-query: How do we build imanagent (Telegram bot for cowork-zaodevz) as Iman's first ground-up VPS agent with a from-scratch walkthrough? (reconstructed)
 related-docs: 467, 487, 495, 644, 645, 646, 647, 648, 649
 tier: STANDARD
 ---

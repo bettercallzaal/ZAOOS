@@ -2,7 +2,8 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-04-25
+last-validated: 2026-05-20
+original-query: audit all ZAO agentic systems and fix the broken auto-PR pipeline (reconstructed)
 related-docs: 90, 200, 234, 239, 256, 325, 346, 355, 415, 461, 467, 473, 484, 489, 506, 507, 508
 tier: DISPATCH
 ---

@@ -1,5 +1,15 @@
 # 202 — Multi-Agent Orchestration: OpenClaw Supervising Paperclip + Human-as-Agent
 
+---
+topic: agents
+type: research
+status: archive-candidate
+last-validated: 2026-05-20
+original-query: Design multi-agent orchestration hierarchy with OpenClaw, Paperclip, and ElizaOS (reconstructed)
+tier: archive
+note: OpenClaw, Paperclip, and ElizaOS migration decommissioned 2026-05-04 per CLAUDE.md. Doc archived as historical reference of attempted agent stack architecture.
+---
+
 > **Status:** Research complete
 > **Date:** March 28, 2026
 > **Goal:** Design the agent hierarchy where OpenClaw watches/improves Paperclip worker agents, Zaal acts as Claude Agent in the swarm, and ElizaOS handles always-on social presence

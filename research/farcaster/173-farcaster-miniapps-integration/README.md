@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [002-farcaster-hub-api, 017-neynar-onboarding]
 original-query: "How do we distribute ZAO OS as a Farcaster Mini App so users can access it directly from Warpcast without a separate login? (reconstructed)"
 tier: STANDARD

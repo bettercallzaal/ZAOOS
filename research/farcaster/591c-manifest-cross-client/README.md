@@ -731,5 +731,5 @@ export const metadata = {
 
 ---
 
-**Last Validated:** May 2, 2026  
+**Last Validated:** May 21, 2026  
 **Related Research:** 591a (Miniapp SDK patterns), 591b (Frame embed metadata spec)

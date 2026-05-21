@@ -3,7 +3,7 @@ topic: farcaster
 type: guide
 status: research-complete
 tier: STANDARD
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 173, 250, 308, 591, 591a, 591c, 591d
 original-query: "Farcaster miniapp HTTP headers + cookie security for iframe embedding - X-Frame-Options vs CSP frame-ancestors, SameSite=None, HttpOnly, Partitioned (CHIPS), COOP/COEP, Permissions-Policy. (reconstructed)"
 ---

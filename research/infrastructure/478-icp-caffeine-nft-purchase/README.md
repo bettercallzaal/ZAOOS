@@ -2,7 +2,7 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Should ZAO build NFT purchase app on ICP vs Base, and should we use Caffeine.ai or manual Motoko development (reconstructed)
 tier: STANDARD
 related-docs: 407

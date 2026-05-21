@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 304, 309, 489, 534, 468, 587, 588, 589
 original-query: "how to install a Hypersnap node on bare-metal VPS and wire it for ZAO bots (reconstructed)"
 tier: STANDARD

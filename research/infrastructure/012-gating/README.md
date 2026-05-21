@@ -2,7 +2,7 @@
 topic: infrastructure
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How to restrict access to ZAO OS with allowlist, NFT, Hats, attestations (reconstructed)
 tier: 1-must-have
 ---
@@ -10,7 +10,8 @@ tier: 1-must-have
 # Gating Access to ZAO OS
 
 > How to restrict who can use the client
-> **Date:** 2026-01-22
+> **Original Date:** 2026-01-22
+> **Re-validated:** 2026-05-21
 
 ## Gating Methods
 
@@ -222,3 +223,24 @@ npm install @farcaster/auth-kit @farcaster/auth-client viem @hatsprotocol/sdk-v1
 - **Phase 3:** Add Hats Protocol (role-based access tiers)
 - **Composable:** Gate system is modular — add new checks without rewriting auth
 - **All gates resolve FID → addresses via Neynar, then check on-chain**
+
+---
+
+## Findings (2026-05-21 Re-validation)
+
+### Material Changes
+1. **Farcaster AuthKit:** v0.8.2 released Feb 2026 (was undated). Latest version still uses SIWF pattern, relay server polling at 1500ms intervals, domain + siweUri required. Constructor config schema unchanged. [FULL]
+2. **Hats Protocol:** Contract address 0x3bc1A0Ad72417f2d411118085256fC53CBdDd137 confirmed deployed on Base + 10 other chains (including Ethereum, Arbitrum, Optimism, Polygon, Scroll, Celo). isWearerOfHat() view function stable. [FULL]
+3. **Viem:** Latest 2.47.6 released Mar 2026. ERC-721 ABI exported at src/constants/abis.js. balanceOf() pattern via readContract() still the standard path. No breaking changes to contract interaction APIs. [FULL]
+
+### Still Current
+- Allowlist + invite codes MVP pattern valid for 2026. No database schema changes needed.
+- Neynar /v2/farcaster/user/bulk endpoint stable for FID → address resolution.
+- On-chain gate latency estimates (200ms RPC, 300ms EAS GraphQL) accurate.
+- EAS GraphQL endpoint at base.easscan.org confirmed live for Base chain attestations. [PARTIAL]
+
+### Source Status
+- Farcaster AuthKit docs: https://docs.farcaster.xyz/auth-kit [FULL]
+- Hats Protocol contract + chain list: https://docs.hatsprotocol.xyz [FULL]
+- Viem GitHub + docs: https://viem.sh, https://github.com/wevm/viem [FULL]
+- EAS Base chain: https://base.easscan.org/graphql [PARTIAL - did not re-fetch GraphQL schema]

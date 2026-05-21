@@ -2,7 +2,7 @@
 topic: security
 type: incident-postmortem
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Vercel OAuth supply chain breach April 2026 impact assessment and remediation (reconstructed)"
 tier: STANDARD
 ---
@@ -229,7 +229,7 @@ These cover the developer-side. The Vercel breach covers the **deploy-side**. Bo
 
 ## Sources
 
-- [Vercel Knowledge Base - April 2026 Security Incident](https://vercel.com/kb/bulletin/vercel-april-2026-security-incident) [FULL] - primary source, final status April 23 2026
+- [Vercel Knowledge Base - April 2026 Security Incident](https://vercel.com/kb/bulletin/vercel-april-2026-security-incident) [FULL] - primary source, final status April 23 2026, incident resolved, Deployment Protection now shipped
 - [Securonix - Supply Chain Attack Analysis](https://connect.securonix.com/threat-research-intelligence-62/) [FULL] - timeline + attack chain, April 22 2026
 - [TrendMicro - OAuth Supply Chain Attack](https://www.trendmicro.com/en/research/26/d/vercel-breach-oauth-supply-chain.html) [FULL] - attack analysis + corrections, updated April 21
 - [Sola Fide - Anatomy of the Vercel Breach](https://solafide.ca/blog/2026-04-vercel-breach-oauth-supply-chain-attack) [FULL] - OAuth/identity risk deep dive, April 22
@@ -237,3 +237,5 @@ These cover the developer-side. The Vercel breach covers the **deploy-side**. Bo
 - [DevOps Daily - April 2026 Incident Summary](https://devops-daily.com/posts/vercel-april-2026-security-incident) [FULL] - action checklist, April 20
 - [Brendan Falk X post (audit instructions, 2026-04-19)](https://x.com/brendanfalk/status/2045953132770025769) [PARTIAL] - Google Workspace audit guide
 - Related ZAO docs: `.env.example`, `SECURITY.md`, `project_infra_keys.md` memory, Doc 280 (FID registration)
+
+**Material changes:** Vercel incident remains historical (April 2026). Remediation complete. Post-incident hardening: Vercel Deployment Protection now GA, "Sensitive" flag default flipped for new env vars. No ongoing exposure if ZAO rotated secrets per Phase 3 checklist.

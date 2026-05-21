@@ -2,7 +2,7 @@
 topic: infrastructure
 type: guide
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-21
 original-query: How to integrate Livepeer Studio for ZAO OS streaming, Studio vs Daydream vs Orchestrator roadmap (reconstructed)
 related-docs: 213, 215, 233
 tier: STANDARD
@@ -129,5 +129,5 @@ tier: STANDARD
 ## Notes
 
 - **Hallucination check:** `rtmp://rtmp.livepeer.com/live` ingest URL hardcoded in `src/app/api/livepeer/stream/route.ts:67` matches Livepeer's documented global ingest. SDK call shapes (`livepeer.stream.create`, `livepeer.multistream.create`, `livepeer.stream.createClip`) match the npm `livepeer` package surface.
-- **Staleness check:** Livepeer Studio pricing pulled directly from `livepeer.studio/pricing` on 2026-04-28. Re-validate before any pricing-driven decision after 2026-05-28.
-- **Docs link rot:** Two docs URLs returned 404 during research (`/sdks/javascript/getting-started`, `/livestream/multistream` direct path). The v2 versions in the Sources list resolve. Livepeer migrated docs paths in Q1 2026.
+- **Staleness check [FULL]:** Livepeer Studio pricing verified 2026-05-21. Sandbox + Pay As You Go pricing identical to 2026-04-28. No rate changes. Re-validate before any pricing-driven decision after 2026-08-21.
+- **Docs link rot:** Docs return CRAWLER_SERVICE_ERROR (JS-rendered). Pricing page [FULL] verified. Livepeer migrated docs paths in Q1 2026. Recommend testing SDK calls before shipping Phase 2 Daydream.

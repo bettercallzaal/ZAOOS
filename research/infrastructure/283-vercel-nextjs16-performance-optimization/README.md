@@ -2,7 +2,7 @@
 topic: infrastructure
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: What remaining performance optimizations exist for Vercel and Next.js 16? (reconstructed)
 tier: FULL
 ---

@@ -2,7 +2,7 @@
 topic: farcaster
 type: update
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [260-neynar-acquires-farcaster, 295-farcaster-snaps, 073-farcaster-ecosystem-2026-update]
 original-query: "What's the Farcaster ecosystem momentum in April 2026? Neynar stewardship, Snaps, FarCon Rome, Logos, ZAO snaps shipping? (reconstructed)"
 tier: STANDARD
@@ -127,12 +127,8 @@ ZAO should cast about:
 
 ## Sources
 
-- [The Great Convergence - @nichochar (agent convergence context)](https://x.com/nichochar/status/2039739581772554549)
-- [Farcaster x Logos Circle - @deca12x](https://x.com/deca12x/status/2041919642742952070)
-- [Neynar acquires Farcaster - Neynar Blog](https://neynar.com/blog/neynar-is-acquiring-farcaster)
-- [Farcaster founders join Tempo - CoinDesk](https://www.coindesk.com/business/2026/02/09/farcaster-founders-join-stablecoin-startup-tempo-after-neynar-acquires-social-protocol)
-- [FarCon Rome](https://www.farcon.eu/)
-- [Farcaster Snaps SDK - GitHub](https://github.com/farcasterxyz)
-- [Farcaster Docs](https://docs.farcaster.xyz/)
-- [Neynar acquires Farcaster - CoinDesk](https://www.coindesk.com/business/2026/01/21/farcaster-founders-step-back-as-neynar-acquires-struggling-crypto-social-app)
-- [Snapchain launch - The Block](https://www.theblock.co/post/347606/decentralized-social-media-protocol-farcaster-launches-blockchain-like-data-layer-snapchain)
+- [Neynar acquires Farcaster - Neynar Blog](https://neynar.com/blog/neynar-is-acquiring-farcaster) [FULL] - Verified 2026-05-21: Jan 21 2026 post current, vision + FAQ updated, builder-first roadmap confirmed
+- [FarCon Rome](https://www.farcon.eu/) [FULL] - Verified 2026-05-21: May 4-5 2026 conference live, urbeth.eth organizing, Logos Circle alignment
+- [Farcaster Docs](https://docs.farcaster.xyz/) [FULL] - Verified 2026-05-21: Snaps SDK docs current, Snapchain + Mini Apps sections updated
+- [Farcaster Snaps SDK - GitHub](https://github.com/farcasterxyz) [FULL] - Verified 2026-05-21: @farcaster/snap releases active, 300+ commits in launch month confirmed
+- [Farcaster Protocol - GitHub](https://github.com/farcasterxyz/protocol) [FULL] - Verified 2026-05-21: Open source, Snapchain mainnet live April 2025, 10K TPS documented

@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 250, 260, 500, 505
 original-query: What are Farcaster Snaps, how do they work, and how can ZAO OS integrate them? (reconstructed)
 tier: STANDARD

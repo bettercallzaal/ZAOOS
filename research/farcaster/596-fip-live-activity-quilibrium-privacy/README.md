@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [309, 489, 587, 591, 593, 594, 595, 598]
 tier: STANDARD
 original-query: "FIP 268 269 privacy risks Quilibrium oblivious transfer MPC secret sharing Snapchain enum USER_DATA_TYPE_LIVE_AT blocking Cassie Heart Hypersnap integration (reconstructed)"

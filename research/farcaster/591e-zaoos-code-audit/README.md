@@ -2,7 +2,7 @@
 topic: farcaster
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 591, 591a, 591b, 591c, 591d
 tier: STANDARD
 original-query: "ZAO OS Farcaster miniapp codebase audit - manifest, meta tags, sdk.ready(), auth flow (context-FID + Neynar + allowlist + session), QuickAuth fallback, iframe headers, cookie config, CSP nonce, service worker caching, error UX, type safety, CSRF posture, webhook signature verification, allowlist freshness, CI coverage, file:line references for PRs #436-445. (reconstructed)"

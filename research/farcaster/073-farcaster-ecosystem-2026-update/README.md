@@ -2,7 +2,7 @@
 topic: farcaster
 type: update
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [002-farcaster-hub-api, 260-neynar-acquires-farcaster, 308-farcaster-ecosystem-spring-2026]
 original-query: "What changed in the Farcaster ecosystem since early 2026? DAU, competitors, tokens, Mini Apps - comprehensive refresh. (reconstructed)"
 tier: STANDARD

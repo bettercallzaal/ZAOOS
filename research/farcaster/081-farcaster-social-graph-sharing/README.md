@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [020-followers-following-feed, 073-farcaster-ecosystem-2026-update, 173-farcaster-miniapps-integration]
 original-query: "What Neynar APIs expose social graph data, and how can we build pre-generated member profiles and Farcaster sharing flows in ZAO OS? (reconstructed)"
 tier: STANDARD

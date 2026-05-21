@@ -2,7 +2,7 @@
 topic: security
 type: api-audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Verify status of 14+ third-party APIs (Neynar, POAP, Sound.xyz, EAS, etc) - March 2026 (reconstructed)"
 tier: STANDARD
 ---
@@ -87,8 +87,11 @@ Based on verified status, here's what to actually build:
 
 ## Sources
 
-- [Sound.xyz Sunsetting](https://paragraph.com/@soundxyz/sunsetting-sound)
-- [POAP Maintenance Mode](https://thedefiant.io/news/nfts-and-web3/poap-moves-to-maintenance-mode-as-founders-eye-next-generation-of-digital-collectibles)
-- [Neynar Acquires Farcaster](https://www.theblock.co/post/386549/haun-backed-neynar-acquires-farcaster-after-founders-pivot-to-wallet-app)
-- [Gitcoin Passport → Human Passport](https://passport.human.tech/blog/from-gitcoin-passport-to-human-passport-we-re-now-part-of-human-tech)
-- [All other sources from research docs 133-135]
+- [Sound.xyz Sunsetting](https://paragraph.com/@soundxyz/sunsetting-sound) [FULL] - confirmed shutdown Jan 16, 2026; API dead, pivoted to Vault.fm
+- [POAP Maintenance Mode](https://thedefiant.io/news/nfts-and-web3/poap-moves-to-maintenance-mode-as-founders-eye-next-generation-of-digital-collectibles) [FULL] - read API still functional, new issuers paused as of Mar 16, 2026
+- [Neynar Acquires Farcaster](https://www.theblock.co/post/386549/haun-backed-neynar-acquires-farcaster-after-founders-pivot-to-wallet-app) [FULL] - 1B deal Jan 2026, founders left, credits-based pricing ongoing
+- [Gitcoin Passport → Human Passport](https://passport.human.tech/blog/from-gitcoin-passport-to-human-passport-we-re-now-part-of-human-tech) [FULL] - rebranded Feb 2025, endpoints may have changed
+- Neynar API status verified 2026-05-21: ACTIVE, credits model confirmed
+- Privy agentic wallets verified 2026-05-21: policy engine + key quorum + signing fees functional
+
+**Material changes:** Sound.xyz remains dead. Neynar status unchanged. All Tier 1 APIs verified active as of May 21, 2026.

@@ -2,7 +2,7 @@
 topic: farcaster
 type: research-profile
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 304, 309, 489, 586, 587, 589
 original-query: "who is Cassie Heart, what is she building, and how can ZAO engage her productively (reconstructed)"
 tier: STANDARD

@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [002-farcaster-hub-api, 173-farcaster-miniapps-integration]
 original-query: "How do we register new Farcaster accounts and create managed signers so users can post without owning their own keys? (reconstructed)"
 tier: STANDARD

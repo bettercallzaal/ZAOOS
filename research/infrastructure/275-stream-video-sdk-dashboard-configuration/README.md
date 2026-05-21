@@ -2,7 +2,7 @@
 topic: infrastructure
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How to configure Stream.io Video SDK dashboard for ZAO OS? (reconstructed)
 tier: FULL
 ---

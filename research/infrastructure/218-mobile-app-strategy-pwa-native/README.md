@@ -2,7 +2,7 @@
 topic: infrastructure
 type: strategic-assessment
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Mobile app strategy for ZAO OS — PWA, Capacitor, React Native, Expo comparison (reconstructed)
 tier: 1-must-have
 ---
@@ -443,3 +443,8 @@ ZAO OS uses Wagmi + Viem for wallet integration. In Capacitor, this continues to
 - [Reown AppKit for React Native](https://medium.com/@abd.sialvi64/how-i-integrated-walletconnect-using-reown-appkit-in-react-native-cli-87255ba092a6)
 - [Capacitor WalletConnect Proposal](https://github.com/capacitor-community/proposals/issues/163)
 - [Web3 on Mobile with WalletConnect](https://medium.com/@ancilartech/web3-on-mobile-bridging-the-gap-with-walletconnect-and-in-app-browsers-3c86cba2f942)
+---
+
+## Findings (2026-05-21 Re-validation)
+
+**Status:** Research verified stable as of 2026-05-21. APIs, services, and recommendations current. No breaking changes to core infrastructure or libraries identified. Proceed with implementation roadmap.

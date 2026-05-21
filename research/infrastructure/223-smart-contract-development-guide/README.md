@@ -2,7 +2,7 @@
 topic: infrastructure
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How to write, test, deploy, and verify smart contracts for ZAO OS on Base and Optimism? (reconstructed)
 tier: FULL
 ---

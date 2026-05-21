@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-03
+last-validated: 2026-05-21
 original-query: "lift production patterns from Adrienne's Farcaster agent stack and daily-drop miniapp for ZAO (reconstructed)"
 related-docs: 173, 250, 489, 591, 599
 tier: STANDARD

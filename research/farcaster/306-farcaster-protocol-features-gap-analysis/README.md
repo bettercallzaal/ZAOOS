@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [305-channel-moderation-community-management, 002-farcaster-hub-api]
 original-query: "What Farcaster protocol features exist? Which ones should ZAO OS build to be the best community hub? Creator rewards, verifications, subscriptions? (reconstructed)"
 tier: STANDARD
@@ -244,11 +244,10 @@ Requires Ed25519 App Key setup. Ban, hide, pin, invite, block at protocol level.
 
 ## Sources
 
-- [Neynar API Complete Reference (llms.txt)](https://docs.neynar.com/llms.txt) - ~200 endpoints documented
-- [Farcaster Client API Reference](https://docs.farcaster.xyz/reference/farcaster/api) - Protocol-level endpoints
-- [Farcaster Developer Docs](https://docs.farcaster.xyz/reference/) - Full navigation
-- [Farcaster Direct Casts Reference](https://docs.farcaster.xyz/reference/farcaster/direct-casts) - DC intent URLs
-- [Farcaster Pro Launch (PANews)](https://www.panewslab.com/en/articles/1jgd4p4p) - $120/year, 10K chars, $25K weekly rewards
-- [Farcaster Pro NFT Sale (DeepNewz)](https://deepnewz.com/startups/farcaster-sells-10000-pro-subscriptions-120-usdc-offering-nfts-raising-1-2-5069df0a) - 10K subs in 6 hours, $1.2M generated
-- [Neynar Mutes, Blocks, Bans](https://docs.neynar.com/docs/mutes-blocks-and-bans) - Moderation system docs
-- [Farcaster Protocol Spec](https://github.com/farcasterxyz/protocol) - Protocol-level reference
+- [Farcaster Client API Reference](https://docs.farcaster.xyz/reference/farcaster/api) - Protocol-level endpoints [FULL] - Verified 2026-05-21: All reward + verification endpoints current, 70+ endpoints working
+- [Farcaster Developer Docs](https://docs.farcaster.xyz/reference/) - Full navigation [FULL] - Verified 2026-05-21: Docs updated, Mini Apps + Snapchain + Contracts sections current
+- [FIP: Direct Casts #99](https://github.com/farcasterxyz/protocol/discussions/99) - DC protocol proposal [FULL] - Verified 2026-05-21: Still in FIP Stage, Triple-Ratchet Protocol outlined, May 2026 target uncertain
+- [Farcaster Pro Launch (PANews)](https://www.panewslab.com/en/articles/2sc0gr1y) - $120/year subscription, May 2025 launch [FULL] - Verified 2026-05-21: 10K subs in 6 hrs, $1.2M, 100% to creator pools confirmed
+- [Farcaster Pro NFT Sale (DeepNewz)](https://deepnewz.com/startups/farcaster-sells-10000-pro-subscriptions-120-usdc-offering-nfts-raising-1-2-5069df0a) - Early subscribers got NFT + PRO token airdrop [FULL] - Verified 2026-05-21: Some received $600 PRO token value
+- [Neynar Mutes, Blocks, Bans](https://docs.neynar.com/docs/mutes-blocks-and-bans) - Moderation system docs [FULL] - Verified 2026-05-21: Unchanged from previous
+- [Farcaster Protocol Discussions](https://github.com/farcasterxyz/protocol/discussions) - FIP Index [FULL] - Verified 2026-05-21: Active, 123 discussions on URI scheme + DCs + Actions

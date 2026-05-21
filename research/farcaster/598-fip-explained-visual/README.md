@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [593, 594, 595, 596, 597]
 tier: STANDARD
 original-query: "FIP 268 269 live activity visual explanation animated heartbeat stalker privacy stalking cooperative writer convention JFS signature Quilibrium OT magic trick (reconstructed)"

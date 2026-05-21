@@ -1,4 +1,14 @@
-# 74 — XMTP V3 Browser SDK & MLS Encryption
+---
+topic: xmtp
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: [013-xmtp-overview, 450-xmtp-production-setup]
+original-query: "What changed in XMTP since v7.0.0 (MLS encryption, payer wallets, history sync), and how should ZAO OS update its integration? (reconstructed)"
+tier: STANDARD
+---
+
+# 074 — XMTP V3 Browser SDK & MLS Encryption
 
 > **Status:** Research complete
 > **Date:** 2026-03-19

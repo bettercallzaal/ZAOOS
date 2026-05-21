@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [124-sopha-deep-social-farcaster, 020-followers-following-feed]
 original-query: "How does the Sopha Social API work? What bugs exist in ZAO OS's implementation? What improvements should we make? (reconstructed)"
 tier: STANDARD

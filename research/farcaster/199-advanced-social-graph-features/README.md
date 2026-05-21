@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [020-followers-following-feed, 081-farcaster-social-graph-sharing, 306-farcaster-protocol-features-gap-analysis]
 original-query: "What advanced social graph features can ZAO OS build? Unfollower tracking, force-directed visualization, growth analytics, conversation clustering, influence scoring? (reconstructed)"
 tier: STANDARD

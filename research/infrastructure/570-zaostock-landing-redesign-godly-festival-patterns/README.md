@@ -2,7 +2,7 @@
 topic: infrastructure
 type: design
 status: research-complete
-last-validated: 2026-04-30
+last-validated: 2026-05-21
 original-query: How to redesign ZAOstock landing page using godly.website patterns and festival site benchmarks (reconstructed)
 related-docs: 311
 tier: STANDARD
@@ -137,10 +137,10 @@ tier: STANDARD
 
 ## Sources
 
-- [Godly homepage](https://godly.website/) — verified 2026-04-30. Tag pages `/tags/music` + `/tags/dark` returned CRAWL_NOT_FOUND via Exa. Homepage shows the curated set used for pattern extraction.
+- [Godly homepage](https://godly.website/) [FULL] — verified 2026-05-21. Homepage shows the curated set used for pattern extraction. Color-mode toggle visible.
 - [VOLTAGE / Sonic Fest template demo](https://sonic-fest-template.pagesmith.app/) — verified 2026-04-30. Live demo of asymmetric hero + kinetic marquee + manifesto pattern. Strongest single reference for ZAOstock's redesign.
 - [Sonic Echo Fest Template / Pagesmith](https://pagesmith.ai/templates/music/sonic-echo-fest) — verified 2026-04-30. Teardown of brutalist festival template, useful for the pattern vocabulary (asymmetric hero, fluid type, CSS marquee).
-- [Glastonbury Festival — Line-Up 2025](https://glastonburyfestivals.co.uk/line-up/line-up-2025/?view=poster) — verified 2026-04-30. Color-mode toggle pattern + poster-view lineup display.
+- [Glastonbury Festival — Line-Up 2025](https://glastonburyfestivals.co.uk/line-up/line-up-2025/) [FULL] — verified 2026-05-21. Color-mode toggle pattern visible (Normal / Grayscale / High-Contrast). Lineup by stage structure documented.
 - [Paleo Festival — 2025 poster](https://yeah.paleo.ch/en/2024/11/27/affiche-2025) — verified 2026-04-30. Poster-as-hero / annual identity-as-art reference.
 - [MUTEK Montreal — 26th edition poster](https://montreal.mutek.org/en/news/official-poster-for-the-26th-edition) — verified 2026-04-30. Minimalist + geometric reference for music-festival graphic identity.
 - [Add to Calendar Pro — 8 Inspiring Event Landing Page Examples for 2025](https://add-to-calendar-pro.com/articles/event-landing-page-examples) — verified 2026-04-30. Synthesis of Coachella/Bonnaroo patterns: video hero, lineup-as-art, FOMO mechanics.

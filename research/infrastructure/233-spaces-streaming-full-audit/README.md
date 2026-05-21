@@ -2,7 +2,7 @@
 topic: infrastructure
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: What is the full inventory of Spaces and streaming code in ZAO OS? (reconstructed)
 tier: FULL
 ---

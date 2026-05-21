@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [002-farcaster-hub-api, 309-snapchain-hypersnap-protocol-deep-dive, 489-hypersnap-farcaster-node-cassonmars]
 original-query: "What is Quilibrium's Hypersnap? How does haatz.quilibrium.com's free Neynar API work? Should ZAO OS use it? (reconstructed)"
 tier: STANDARD

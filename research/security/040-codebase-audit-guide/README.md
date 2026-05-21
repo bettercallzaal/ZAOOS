@@ -2,7 +2,7 @@
 topic: security
 type: audit-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Step-by-step codebase audit checklist for security, quality, performance, accessibility (reconstructed)"
 tier: STANDARD
 ---
@@ -453,15 +453,17 @@ jobs:
 
 ## Sources
 
-- [OWASP Top 10:2025](https://owasp.org/Top10/2025/en/)
-- [OpenSSF AI Code Assistant Security Guide](https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions)
-- [Knip Dead Code Detection](https://knip.dev/)
-- [eslint-plugin-security](https://github.com/eslint-community/eslint-plugin-security)
-- [Snyk](https://snyk.io/)
-- [Socket.dev](https://socket.dev/)
-- [TruffleHog](https://github.com/trufflesecurity/trufflehog)
-- [Supabase Security Testing](https://supabase.com/docs/guides/security/security-testing)
-- [Next.js Security Headers](https://nextjs.org/docs/app/guides/security-headers)
-- [TypeScript Strict Mode](https://www.typescriptlang.org/tsconfig/)
-- [Claude Code Review Plugin](https://code.claude.com/docs/en/code-review)
-- [Claude Code Security Review Action](https://github.com/anthropics/claude-code-security-review)
+- [OWASP Top 10:2025](https://owasp.org/Top10/2025/en/) [FULL] - lists 10 critical application security risks; broken access control, security misconfiguration, software supply chain failures remain top 3
+- [OpenSSF AI Code Assistant Security Guide](https://best.openssf.org/Security-Focused-Guide-for-AI-Code-Assistant-Instructions) [FULL] - government-backed open-source security guidance
+- [Knip Dead Code Detection](https://knip.dev/) [FULL] - actively maintained dead code tool
+- [eslint-plugin-security](https://github.com/eslint-community/eslint-plugin-security) [FULL] - maintained by eslint-community
+- [Snyk](https://snyk.io/) [FULL] - vulnerability scanning SaaS
+- [Socket.dev](https://socket.dev/) [FULL] - supply chain risk detection
+- [TruffleHog](https://github.com/trufflesecurity/trufflehog) [FULL] - secret detection tool
+- [Supabase Security Testing](https://supabase.com/docs/guides/security/security-testing) [FULL] - postgres RLS verification
+- [Next.js Security Headers](https://nextjs.org/docs/app/guides/security-headers) [FULL] - Next.js security configuration
+- [TypeScript Strict Mode](https://www.typescriptlang.org/tsconfig/) [FULL] - TypeScript configuration
+- [Claude Code Review Plugin](https://code.claude.com/docs/en/code-review) [FULL] - code review automation
+- [Claude Code Security Review Action](https://github.com/anthropics/claude-code-security-review) [FULL] - GitHub action integration
+
+**Last validated:** 2026-05-21. All sources confirmed active.

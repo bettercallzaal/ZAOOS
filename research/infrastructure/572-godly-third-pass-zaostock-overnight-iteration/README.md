@@ -2,7 +2,7 @@
 topic: infrastructure
 type: design
 status: research-complete
-last-validated: 2026-04-30
+last-validated: 2026-05-21
 original-query: What design patterns from Lusion, Cosmos, and festival sites can we add to ZAOstock overnight (reconstructed)
 related-docs: 570, 571
 tier: STANDARD
@@ -40,8 +40,8 @@ Estimated diff: ~150 lines across 2-3 components + 1 new component.
 
 ## Sources
 
-- [Lusion](https://www.lusion.co/) — verified 2026-04-30. 3D studio. Source for "scroll to explore" pattern + work grid tags.
-- [Cosmos](https://www.cosmos.so/) — verified 2026-04-30. Pinterest-for-creators. Source for masonry image grid + infinite logo marquee.
+- [Lusion](https://www.lusion.co/) [FULL] — verified 2026-05-21. 3D studio. "Scroll to explore" pattern visible. Source for work grid tags.
+- [Cosmos](https://www.cosmos.so/) [FULL] — verified 2026-05-21. Pinterest-for-creators. Source for masonry image grid + infinite logo marquee.
 - [Tatem Studio](https://www.tatem.studio/) — fetch 503; revisit later.
 - [Endless](https://endless.land/) — fetch 503; revisit later.
 - [Joy From Africa awards site](https://www.refs.gallery/projects/joy-from-africa) — verified 2026-04-30. 6° tilt + GSAP letter-offsets + Monument Grotesk + electric amber accent.

@@ -2,7 +2,7 @@
 topic: security
 type: agent-security-architecture
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Agent wallet security: Privy TEE vs env vars, Safe multisig for ZABAL treasury, OWASP agent controls - April 2026 (reconstructed)"
 tier: HIGH
 ---
@@ -206,16 +206,15 @@ npm install @privy-io/server-auth
 
 ## Sources
 
-- [Privy Policy Engine](https://privy.io/blog/turning-wallets-programmable-with-privy-policy-engine)
-- [Privy + OpenClaw Security](https://privy.io/blog/securely-equipping-openclaw-agents-with-privy-wallets)
-- [Privy Key Management](https://privy.io/blog/powering-programmable-wallets-with-low-level-key-management)
-- [Privy Agentic Wallets Docs](https://docs.privy.io/recipes/agent-integrations/agentic-wallets)
-- [Safe{Wallet}](https://safe.global/)
-- [SEAL Secure Multisig Best Practices](https://frameworks.securityalliance.org/wallet-security/secure-multisig-best-practices/)
-- [OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)
-- [OWASP AI Agent Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html)
-- [Agent Wallets Compared (Crossmint)](https://www.crossmint.com/learn/agent-wallets-compared)
-- [CLAWD Treasury (3/6 Safe)](https://clawdbotatg.eth.link/)
-- [Doc 283 - Privy Embedded Wallets](../../283-privy-embedded-wallets-fishbowlz-token-mechanics/)
-- [Doc 339 - CLAWD Patterns](../../agents/339-austin-griffith-clawd-ethskills-agent-patterns/)
-- [Doc 325 - Agent Swarm Economy](../../agents/325-zabal-agent-swarm-economy/)
+- [Privy Agentic Wallets Docs](https://docs.privy.io/recipes/agent-integrations/agentic-wallets) [FULL] - verified 2026-05-21, policy engine + key quorum + Model 1 (agent-controlled) fully documented
+- [Privy Policy Engine Overview](https://docs.privy.io/controls/policies/overview) [FULL] - verified 2026-05-21, primitives (policy/rule/condition) + field sources + operators all current
+- [Privy Policy Engine Blog](https://privy.io/blog/turning-wallets-programmable-with-privy-policy-engine) [PARTIAL] - policy engine announcement
+- [Privy Key Management](https://privy.io/blog/powering-programmable-wallets-with-low-level-key-management) [PARTIAL] - key sharding via Shamir
+- [Safe{Wallet}](https://safe.global/) [FULL] - multisig framework unchanged
+- [OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) [FULL] - verified 2026-05-21, 100+ expert contributors, ASI01-ASI10 framework
+- [OWASP AI Agent Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html) [FULL] - best practices reference
+- [SEAL Secure Multisig Best Practices](https://frameworks.securityalliance.org/wallet-security/secure-multisig-best-practices/) [PARTIAL] - multisig guidance
+- [Agent Wallets Compared (Crossmint)](https://www.crossmint.com/learn/agent-wallets-compared) [PARTIAL] - feature matrix
+- Internal ZAO docs: Doc 283 (Privy embedded wallets), Doc 325 (agent swarm economy)
+
+**Material changes:** Privy policy engine primitives confirmed active. OWASP Agentic Top 10 now published (was Nov 2025 draft). No breaking changes to ZABAL agent security model.

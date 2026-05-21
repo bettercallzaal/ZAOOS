@@ -2,7 +2,7 @@
 topic: farcaster
 type: research-audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 304, 309, 489, 586, 587, 588
 original-query: "what endpoints does haatz actually serve, what is Cassie's recent Farcaster activity saying, and how does that inform ZAO ops (reconstructed)"
 tier: STANDARD

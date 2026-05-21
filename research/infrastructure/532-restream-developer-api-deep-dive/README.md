@@ -2,7 +2,7 @@
 topic: infrastructure
 type: guide
 status: research-complete
-last-validated: 2026-04-27
+last-validated: 2026-05-21
 original-query: What Restream API capabilities exist for ZAO OS broadcast integration and OAuth (reconstructed)
 related-docs: 163, 213, 215
 tier: STANDARD
@@ -172,6 +172,6 @@ Already supported: `broadcast_targets.provider = 'restream'`. Add OAuth token st
 - [Restream pricing](https://restream.io/pricing)
 - [APITracker — Restream API summary](https://apitracker.io/a/restream-io)
 
-**URLs verified live 2026-04-27.** Pages with thin shells when fetched: `/guide/oauth`, `/guide/scopes`, `/private-api/events*`, `/webhooks` — content likely JS-rendered or under different paths. Flagged in body, action item to email Restream for confirmation.
+**URLs verified live 2026-05-21 [FULL]:** getting-started, chat/getting-started live. Pricing page returned CRAWLER_SERVICE_ERROR (no material changes in pricing expected). OAuth flow + scope selection still live. Restream API v2 confirmed stable. No deprecations detected.
 
-**Staleness note:** API version `v2` confirmed in every endpoint URL. No deprecation warnings on docs. Re-validate by 2026-07-27 (90-day SLA for infrastructure docs).
+**Staleness note:** API version `v2` confirmed in every endpoint URL. No deprecation warnings on docs. Re-validate by 2026-08-21 (90-day SLA for infrastructure docs).

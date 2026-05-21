@@ -2,7 +2,7 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 260, 295, 498, 500, 527
 original-query: What is zlank.online, how should it be architected, and what's the phased rollout plan? (reconstructed)
 tier: DISPATCH

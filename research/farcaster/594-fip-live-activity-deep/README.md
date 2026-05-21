@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [081, 304, 309, 489, 587, 591, 593, 595, 596, 598]
 tier: STANDARD
 original-query: "FIP 268 and 269 live activity audio spaces protocol details threat model precedents and network load analysis (reconstructed)"

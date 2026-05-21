@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 591, 591a, 591b, 591c, 591e
 tier: STANDARD
 original-query: "Farcaster miniapp production pitfalls, failure modes diagnosis, fixes for stuck splash, sign-in loops, cache horrors, cold-start races, auth replay, mobile quirks (iOS WKWebView, Android custom tabs), disable/uninstall flows, CI checks. (reconstructed)"

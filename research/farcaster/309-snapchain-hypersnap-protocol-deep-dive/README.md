@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [002-farcaster-hub-api, 304-quilibrium-hypersnap-free-neynar-api, 073-farcaster-ecosystem-2026-update]
 original-query: "What's the technical architecture of Snapchain vs Hypersnap? How do Quilibrium privacy layers work? What does this mean for ZAO OS infrastructure? (reconstructed)"
 tier: STANDARD
@@ -331,15 +331,8 @@ On-Chain (OP Mainnet)              Off-Chain (Snapchain Network)
 
 ## Sources
 
-- [FIP: Snapchain Proposal (farcasterxyz/protocol #207)](https://github.com/farcasterxyz/protocol/discussions/207) - Original technical specification
-- [Snapchain Documentation](https://snapchain.farcaster.xyz) - Official docs
-- [Farcaster Architecture Overview](https://docs.farcaster.xyz/learn/architecture/overview) - Hybrid on-chain/off-chain design
-- [Farcaster Contracts (docs.md)](https://github.com/farcasterxyz/contracts/blob/main/docs/docs.md) - On-chain contract specs
-- [Quilibrium Whitepaper](https://quilibrium.com/quilibrium.pdf) - MPC platform architecture
-- [Quilibrium Protocol Overview](https://docs.quilibrium.com/docs/protocol/overview/) - Protocol components
-- [Quilibrium Oblivious Transfer](https://docs.quilibrium.com/docs/learn/oblivious-hypergraph/oblivious-transfer/) - OT cryptographic details
-- [Hypersnap Repository (GPL-3.0)](https://github.com/farcasterorg/hypersnap) - Fork source code
-- [Snapchain: How Farcaster Rewired Social Media (HeimLabs)](https://medium.com/@heimlabs/snapchain-how-farcaster-rewired-social-media-for-a-decentralized-future-e4c525754786) - Technical analysis
-- [Snapchain Novel Data Layer (Cuckoo AI)](https://cuckoo.network/blog/2025/04/07/farcasters-snapchain-a-novel-data-layer-solution-for-web3-social-networks) - Performance analysis
-- [Farcaster Protocol Paradox (BlockEden)](https://blockeden.xyz/blog/2025/10/28/farcaster-in-2025-the-protocol-paradox/) - Ecosystem analysis
-- [Quilibrium Token Data (CryptoRank)](https://cryptorank.io/price/quilibrium) - QUIL price and metrics
+- [FIP: Snapchain Proposal #207](https://github.com/farcasterxyz/protocol/discussions/207) [FULL] - Verified 2026-05-21: Original FIP document current, Malachite BFT consensus specs confirmed
+- [Hypersnap Repository (GPL-3.0)](https://github.com/farcasterorg/hypersnap) [FULL] - Verified 2026-05-21: Last push April 28 2026, v0.11.6 released March 31, 30 contributors active, 10K TPS spec confirmed
+- [Quilibrium Protocol Overview](https://docs.quilibrium.com/docs/protocol/overview/) [FULL] - Verified 2026-05-21: BLS48-581 + Ed448 + Zero-knowledge proofs documented, Proof of Meaningful Work consensus current
+- [Farcaster Contracts](https://github.com/farcasterxyz/contracts) [FULL] - Verified 2026-05-21: IdRegistry + StorageRegistry + KeyRegistry on OP Mainnet current
+- [Farcaster Architecture](https://docs.farcaster.xyz/learn/architecture/overview) [FULL] - Verified 2026-05-21: Snapchain data layer + on-chain registries hybrid model confirmed

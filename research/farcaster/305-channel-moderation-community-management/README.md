@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [306-farcaster-protocol-features-gap-analysis, 002-farcaster-hub-api]
 original-query: "How do Farcaster channel moderation APIs work? What toolkit should ZAO OS build for /zao channel management? (reconstructed)"
 tier: STANDARD
@@ -265,10 +265,9 @@ FARCASTER_APP_KEY_PUBLIC=<hex-encoded Ed25519 public key>
 
 ## Sources
 
-- [Farcaster Client API Reference](https://docs.farcaster.xyz/reference/farcaster/api) - Complete endpoint docs
-- [Farcaster Channels Documentation](https://docs.farcaster.xyz/learn/what-is-farcaster/channels) - Channel concepts
-- [Neynar Mutes, Blocks, and Bans](https://docs.neynar.com/docs/mutes-blocks-and-bans) - App-level moderation
-- [Farcaster Channel Moderation (Claus Wilke)](https://paragraph.com/@clauswilke/farcaster-channel-moderation) - UX analysis of new system
-- [Herocast GitHub](https://github.com/hero-org/herocast) - AGPL-3.0 reference client
-- [artlu99/shim GitHub](https://github.com/artlu99/shim) - Channel-bans caching pattern
-- [@farcaster/hub-nodejs](https://www.npmjs.com/package/@farcaster/hub-nodejs) - Ed25519 signer for auth tokens
+- [Farcaster Client API Reference](https://docs.farcaster.xyz/reference/farcaster/api) - Complete endpoint docs [FULL] - Verified 2026-05-21: All endpoints current, includes channel bans, invites, moderated-casts, pinned-casts, blocked-users. Auth token format unchanged
+- [Farcaster Channels Documentation](https://docs.farcaster.xyz/learn/what-is-farcaster/channels) - Channel concepts [FULL] - Verified 2026-05-21: Channels still experimental, hosting model + usage policy unchanged
+- [Neynar Mutes, Blocks, and Bans](https://docs.neynar.com/docs/mutes-blocks-and-bans) - App-level moderation [FULL] - Verified 2026-05-21: Endpoint list + scope (mutes vs blocks vs bans) current
+- [Farcaster Channel Moderation (Claus Wilke)](https://paragraph.com/@clauswilke/farcaster-channel-moderation) - UX analysis, curation-first model [FULL] - Verified 2026-05-21: Published June 2024, remains valid reference for moderation philosophy
+- [Herocast GitHub](https://github.com/hero-org/herocast) - AGPL-3.0 reference client [FULL] - Verified 2026-05-21: Last push 2026-03-21, multi-account + scheduled posts active
+- [@farcaster/hub-nodejs](https://www.npmjs.com/package/@farcaster/hub-nodejs) - Ed25519 signer for auth tokens [FULL] - Verified 2026-05-21: v0.15.10 current (Jun 2025 - Feb 2026 releases), NobleEd25519Signer pattern verified

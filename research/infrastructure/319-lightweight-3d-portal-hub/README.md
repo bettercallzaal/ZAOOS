@@ -2,7 +2,7 @@
 topic: infrastructure
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How can we build a lightweight 3D portal hub for ZAO OS that works on low-end phones? (reconstructed)
 tier: FULL
 ---

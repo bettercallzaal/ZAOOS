@@ -2,7 +2,7 @@
 topic: farcaster
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 173, 250, 295, 308, 591a, 591b, 591c, 591d, 591e
 tier: STANDARD
 original-query: "Closing audit of ZAO OS Farcaster Mini App after May 2 fix sprint - SDK auth flows, iframe security, manifest, pitfalls, code audit. (reconstructed)"

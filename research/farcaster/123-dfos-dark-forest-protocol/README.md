@@ -2,7 +2,7 @@
 topic: farcaster
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [124-sopha-deep-social-farcaster, 308-farcaster-ecosystem-spring-2026]
 original-query: "What is DFOS (Dark Forest Operating System)? Should ZAO OS integrate with it? What can we learn from its architecture and philosophy? (reconstructed)"
 tier: STANDARD

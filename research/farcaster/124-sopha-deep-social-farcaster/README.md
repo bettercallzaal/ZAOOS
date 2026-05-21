@@ -2,7 +2,7 @@
 topic: farcaster
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [002-farcaster-hub-api, 017-neynar-onboarding, 293-sopha-api-integration]
 original-query: "What is Sopha? How does its curation model work? What design patterns can ZAO OS borrow for deep, anti-algorithmic social? (reconstructed)"
 tier: STANDARD

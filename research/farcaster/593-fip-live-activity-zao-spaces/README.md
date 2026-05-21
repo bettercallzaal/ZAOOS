@@ -2,7 +2,7 @@
 topic: farcaster
 type: decision
 status: research-complete
-last-validated: 2026-05-03
+last-validated: 2026-05-21
 original-query: "how to implement FIP 268/269 live activity audio spaces on ZAO Spaces for cross-client presence (reconstructed)"
 related-docs: 081, 304, 309, 587
 tier: STANDARD

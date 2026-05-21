@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [309-snapchain-hypersnap-protocol-deep-dive, 304-quilibrium-hypersnap-free-neynar-api]
 original-query: "Should ZAO OS run a Hypersnap node on VPS? What does Cassie Heart (CassOnMars) offer in terms of governance and infrastructure? (reconstructed)"
 tier: STANDARD

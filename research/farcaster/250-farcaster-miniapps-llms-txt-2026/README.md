@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [173-farcaster-miniapps-integration, 295-farcaster-snaps]
 original-query: "What are the latest Farcaster Mini Apps SDK features (April 2026)? What gaps exist in ZAO OS's implementation? What should we adopt next? (reconstructed)"
 tier: STANDARD

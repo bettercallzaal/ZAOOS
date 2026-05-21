@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [309, 489, 587, 591, 593, 594, 596, 598]
 tier: STANDARD
 original-query: "FIP 268 269 adjacent FIPs coalition apps Streamly Livecaster FarHouse Fireside JFS code reference implementation JSON Farcaster signature (reconstructed)"

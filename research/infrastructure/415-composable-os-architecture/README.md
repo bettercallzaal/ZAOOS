@@ -2,7 +2,7 @@
 topic: infrastructure
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How should we architect ZAO OS as a modular OS-like system with swappable apps and shells? (reconstructed)
 tier: FULL
 ---

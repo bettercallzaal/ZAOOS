@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 173, 250, 295, 308, 591, 591b, 591c, 591d
 tier: STANDARD
 original-query: "Farcaster Mini App SDK authentication + lifecycle patterns - sdk.ready(), context, isInMiniApp, QuickAuth, SIWF, gated app init sequence. (reconstructed)"

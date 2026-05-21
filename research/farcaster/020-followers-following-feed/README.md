@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [002-farcaster-hub-api, 017-neynar-onboarding, 173-farcaster-miniapps-integration]
 original-query: "Build the best followers/following experience in any Farcaster client with sorting, filtering, and ZAO enrichment. What APIs and UX patterns enable this? (reconstructed)"
 tier: STANDARD

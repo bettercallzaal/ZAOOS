@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 021, 022, 295, 500
 original-query: What happened to Farcaster after Neynar's acquisition in January 2026? (reconstructed)
 tier: STANDARD

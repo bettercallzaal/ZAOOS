@@ -2,7 +2,7 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-21
 original-query: Should ZABAL voting use haatz, keep standalone Supabase or roll into ZAO OS (reconstructed)
 related-docs: 304, 589, 626, 661
 tier: STANDARD

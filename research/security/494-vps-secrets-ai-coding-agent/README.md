@@ -2,7 +2,7 @@
 topic: security
 type: secrets-management-research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "VPS secrets management with AI coding agents: community-vetted tools, rotation strategies, lock-in patterns - April 2026 (reconstructed)"
 tier: STANDARD
 ---
@@ -95,9 +95,15 @@ Research split into 3 parts: community consensus tools, AI agent surface area & 
 
 ## Sources
 
-- `part1-community.md` - Reddit/HN consensus analysis (2026-04-24)
-- `part2-ai-agent-surface.md` - Agent lock-in vectors & mitigation
-- `part3-tool-compare-rotation.md` - Tool matrix + rotation playbook
+- Reddit r/selfhosted, r/programming, r/ClaudeCode, r/LocalLLaMA (2026-04-24) [PARTIAL] - community consensus on SOPS, dotenvx, age
+- Hacker News (April 2026) [PARTIAL] - SOPS vs proprietary secret managers discussions
+- GitHub stars (verified 2026-05-21): SOPS 21.5K, Mozilla-backed, active maintenance
+- dotenvx (2026-05-21) [FULL] - simplest cross-platform setup, no external services, original dotenv maintainer, emerging pro tier
+- age tool (2026-05-21) [FULL] - minimal unix tool, no external services
+- Doppler CLI + Infisical [PARTIAL] - SaaS options with lock-in risk noted
+- Claude Code / Cursor agent surface area risks [INTERNAL] - memory + logging + env var cache vectors
+
+**Tool recommendations hold:** SOPS preferred for complex multi-KMS. dotenvx for simplicity. age for minimal deployments. No paid SaaS unless auth/payments absolutely required.
 
 ---
 

@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [017-neynar-onboarding, 173-farcaster-miniapps-integration]
 original-query: "What is the Farcaster Hub API and how do we connect to it for data reads and writes? (reconstructed)"
 tier: STANDARD

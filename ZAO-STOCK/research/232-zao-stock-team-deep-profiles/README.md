@@ -43,14 +43,14 @@
 ### ZAO Role
 - ZAO **Co-Founder**
 - 3,079 ZAO Respect points
-- Organized **ZAO-Chella** in Wynwood during Art Basel '24 (10 artists, AR art, trading cards)
+- Organized **ZAO-CHELLA** in Wynwood during Art Basel '24 (10 artists, AR art, trading cards)
 - Instagram: [@zaofestivals](https://www.instagram.com/zaofestivals/) ("ZAO-CHELLA | ART BASEL '24")
 
 ### Web3 Achievements
 - **10,000+ NFTs sold** since entering Web3 in 2022
 - **Base Onchain Registry** — featured across Coinbase, Coinbase Wallet, Magic Eden, OpenSea
 - **NFTNYC 2024** — featured artist (April 3-5, New York)
-- **Miami Art Week 2024** — featured artist + ZAO-Chella organizer (December 6-8)
+- **Miami Art Week 2024** — featured artist + ZAO-CHELLA organizer (December 6-8)
 - **ASTRO FEST 2025** — confirmed on lineup, June 24, 3 Dollar Bill Brooklyn, $20-25, alongside GodCloud, FRIENDSHIP, navANGL. Organized by Third Planet Studio
 
 ### Notable Work: "The Abused"
@@ -327,7 +327,7 @@ All tracks follow the "___Wavez" naming convention:
 - **Decentraland** — TRU Band Room (350+ performances venue)
 - **POAP:** [Hurric4n3Ike LIVE in TRU Band Room](https://collectors.poap.xyz/delivery/trubandroomhurric4n3ike) (January 26, 2022)
 - **XETAPLEX:** "May the Fourth" event with Alien DJ Jack Frost
-- **ZAO-Chella** Miami (Dec 2024) — live WaveWarZ battle
+- **ZAO-CHELLA** Miami (Dec 2024) — live WaveWarZ battle
 
 ### BlinkBattles
 Uses **Solana Blinks** (Blockchain Links / Solana Actions) to create shareable, executable battle links. Users participate in WaveWarZ battles directly from X/Twitter posts via Solana's Actions protocol.
@@ -470,7 +470,7 @@ Team profiles reference these codebase components:
 - **Mission:** Scholarships & grants for holders, onboard 1B to Web3
 - **Tech:** Uniswap V4 with Progressive Bid Walls (auto-buyback)
 - **Incubated by:** Gemach DAO (Dr. Justin Goldston mentorship)
-- **Gold Sponsor of ZAO-Chella** at Art Basel Miami 2024
+- **Gold Sponsor of ZAO-CHELLA** at Art Basel Miami 2024
 
 ### Medium Articles (10+)
 1. "Why Creators Need To Care About Web3" (Mar 2023)
@@ -497,7 +497,7 @@ Team profiles reference these codebase components:
 
 ### Updated Bio (April 2026 - from Candy directly)
 
-Samantha "Candy" Kinney is a Web3 operator, product tester, and AI-powered builder. Background in hospitality, branding, and business operations. Known for jumping into early-stage products, pushing them to their limits, uncovering where things break, then translating that into clear improvements, content, and growth. Co-founder of The ZAO and WaveWarz. Behind ZAO Festival experiences like ZAO-Chella and ZAO-Palooza. Early adopter of AI coding tools and agentic systems - built 200+ apps while testing platforms like Ohara, Replit, and emerging AI builders. Hosts daily X Spaces and leads vibe coding sessions.
+Samantha "Candy" Kinney is a Web3 operator, product tester, and AI-powered builder. Background in hospitality, branding, and business operations. Known for jumping into early-stage products, pushing them to their limits, uncovering where things break, then translating that into clear improvements, content, and growth. Co-founder of The ZAO and WaveWarz. Behind ZAO Festival experiences like ZAO-CHELLA and ZAO-PALOOZA. Early adopter of AI coding tools and agentic systems - built 200+ apps while testing platforms like Ohara, Replit, and emerging AI builders. Hosts daily X Spaces and leads vibe coding sessions.
 
 ### ZAOstock Role
 **Design Lead + Marketing/Branding + Dev + Sponsorship Knowledge + AI Builder**

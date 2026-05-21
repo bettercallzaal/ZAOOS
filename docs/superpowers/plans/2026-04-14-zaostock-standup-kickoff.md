@@ -41,7 +41,7 @@
 | Role | Person | Strengths |
 |------|--------|-----------|
 | **Lead** | Zaal | ZAO founder, project vision, tech, partnerships |
-| **2nd** | AttaBotty | 20+ years production, ZAO-Chella organizer, NFTNYC/Art Basel |
+| **2nd** | AttaBotty | 20+ years production, ZAO-CHELLA organizer, NFTNYC/Art Basel |
 | Member | FailOften | NEA/Warhol-funded installations, KCAI professor, Processing/TouchDesigner |
 | Member | Hurric4n3Ike | Live entertainment, WaveWarZ (647 battles), performing artist |
 | Member | Swarthy Hatter | Media/content capture, cross-fractal community bridging |

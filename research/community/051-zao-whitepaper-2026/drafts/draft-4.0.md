@@ -223,7 +223,7 @@ The ZAO operates four parallel ecosystems:
 - **Year of the ZAO/ZABAL** — daily newsletter (400+ editions)
 
 ### Real World Culture
-- **ZAO Festivals** — PALOOZA, CHELLA, PROS, Stock
+- **ZAO Festivals** — ZAO-PALOOZA, ZAO-CHELLA, PROS, Stock
 - **COC Concertz** — 150+ weekly metaverse concerts
 - **ZAOVille** — Virginia collaboration (July 2026)
 - **Proof of Meet** — IRL connection tokens via Magnetiq

@@ -67,7 +67,7 @@ Difficulty is rated 1-10 (per [feedback_no_time_estimates] — no time estimates
 
 **Why it works:** It makes the NFT a key to a real experience, not a speculative asset. Geographic expansion is a built-in growth path.
 
-**How ZAO could adapt:** ZAO already does this — PALOOZA NYC, ZAOCHELLA Miami, COC Concertz, ZAOstock Oct 3 2026. What UVR adds is the *tiering*: clear holder benefits (free/discounted entry), and using the events as visible status milestones. ZAOstock is the flagship; the question is whether future events inherit a holder-benefit structure. (Note: do not fiat future event dates — per [feedback_no_unilateral_dates], research proposes, meetings lock.)
+**How ZAO could adapt:** ZAO already does this — ZAO-PALOOZA NYC, ZAO-CHELLA Miami, COC Concertz, ZAOstock Oct 3 2026. What UVR adds is the *tiering*: clear holder benefits (free/discounted entry), and using the events as visible status milestones. ZAOstock is the flagship; the question is whether future events inherit a holder-benefit structure. (Note: do not fiat future event dates — per [feedback_no_unilateral_dates], research proposes, meetings lock.)
 
 ---
 

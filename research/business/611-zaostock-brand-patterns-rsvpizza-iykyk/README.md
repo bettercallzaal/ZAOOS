@@ -53,7 +53,7 @@ Adjacent: iykyk.com - "share yourself, on purpose" - personal destination for "c
 
 1. **Insider-vibe language as a brand asset.** "If You Know, You Know." ZAOstock has some of this with The ZAO but does not lean into it. We could lean into "ZAO" as the cultural cue without crypto-coding.
 2. **Personal customization at the user level.** Each member of the community has a customizable space. ZAOstock's `/team/m/[slug]` does this for teammates - we could extend to musicians/artists/partners.
-3. **Ecosystem framing.** Not just an event - an ecosystem with multiple surfaces (festival, podcast, community, content, partnerships). ZAO Festivals already has this latent (PALOOZA + CHELLA + ZAOstock + ZAOville) but does not communicate it as an ecosystem on the home page.
+3. **Ecosystem framing.** Not just an event - an ecosystem with multiple surfaces (festival, podcast, community, content, partnerships). ZAO Festivals already has this latent (ZAO-PALOOZA + ZAO-CHELLA + ZAOstock + ZAOville) but does not communicate it as an ecosystem on the home page.
 4. **"Share yourself, on purpose" copy ethos.** Lower the friction for community members to manifest themselves on our surfaces - removes the "what do I post?" anxiety with a clear "this is the door."
 
 ## What ZAOstock has that's distinctive
@@ -64,7 +64,7 @@ For balance: things ZAOstock does well that the reference sites do not:
 2. **Telegram bot integration** (ZAOstockTeamBot with /charter, /circles, /timeline_done) - team ops via chat
 3. **Lu.ma calendar integration** as the ticketing backbone (700+ warm audience already)
 4. **Fiscal sponsor architecture** (NMC + Fractured Atlas, post May 7 correction) handled with proper legal language
-5. **Lineage story** (PALOOZA NYC + CHELLA Miami + now ZAOstock) is real, not aspirational
+5. **Lineage story** (ZAO-PALOOZA NYC + ZAO-CHELLA Miami + now ZAOstock) is real, not aspirational
 6. **Open partner concept** (track=partner in sponsors) - Web3Metal as first row, blueprint for project-collaborator partnerships
 
 ## NEW: Three contributor entry-pages design
@@ -99,7 +99,7 @@ Each entry page is a landing for ONE persona walking into ZAOstock cold. Each an
 - Cutoff: ~one month before the event
 - Independent + ZAO-vetted only - this is not a pay-to-play festival
 
-**Subnav:** Past festivals (PALOOZA + CHELLA recordings) | Lineup so far | FAQ for musicians
+**Subnav:** Past festivals (ZAO-PALOOZA + ZAO-CHELLA recordings) | Lineup so far | FAQ for musicians
 
 ---
 
@@ -127,14 +127,14 @@ Each entry page is a landing for ONE persona walking into ZAOstock cold. Each an
 - Or DM Candy / DCoop / Zaal directly with portfolio
 - Bring an idea, not a pitch deck
 
-**Subnav:** Past visual work (PALOOZA + CHELLA archive) | Brand kit guide | Open briefs
+**Subnav:** Past visual work (ZAO-PALOOZA + ZAO-CHELLA archive) | Brand kit guide | Open briefs
 
 ---
 
 ### `/event-organizers` - For people who want to run their own ZAO chapter
 
 **Hero:** "Built a community? Run your own ZAO."
-**Subhead:** "ZAOstock is the third event in the ZAO Festivals series after PALOOZA NYC and CHELLA Miami. The next one could be yours - in your city, with your community, under the ZAO Festivals umbrella."
+**Subhead:** "ZAOstock is the third event in the ZAO Festivals series after ZAO-PALOOZA NYC and ZAO-CHELLA Miami. The next one could be yours - in your city, with your community, under the ZAO Festivals umbrella."
 
 **What you get:**
 - The full ZAOstock playbook (run-of-show, sponsor framework, fiscal sponsor infrastructure via NMC + Fractured Atlas, finders fee structure, livestream rig, partner template)
@@ -154,7 +154,7 @@ Each entry page is a landing for ONE persona walking into ZAOstock cold. Each an
 - Or schedule a 30-min intro call with Zaal
 - Open conversations now for 2027 events - first city to commit gets the slot
 
-**Subnav:** Past events (PALOOZA + CHELLA recap pages when built) | Operator playbook | FAQ for organizers
+**Subnav:** Past events (ZAO-PALOOZA + ZAO-CHELLA recap pages when built) | Operator playbook | FAQ for organizers
 
 ---
 

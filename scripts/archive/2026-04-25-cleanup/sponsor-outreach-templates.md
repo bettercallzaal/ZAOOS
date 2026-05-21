@@ -61,7 +61,7 @@ Quick pitch for [COMPANY]:
 - We operate at break-even. Every dollar goes to artists and production.
 
 Who we are: The ZAO is a decentralized music community that has run virtual
-festivals (PALOOZA, ZAO-CHELLA) for the last two years. ZAOstock 2026 is
+festivals (ZAO-PALOOZA, ZAO-CHELLA) for the last two years. ZAOstock 2026 is
 our first IRL festival, co-presented with Heart of Ellsworth and the Town
 of Ellsworth.
 
@@ -89,7 +89,7 @@ Hi [CONTACT NAME],
 
 ZAOstock is an outdoor festival The ZAO is running October 3, 2026 in
 Ellsworth, Maine. First IRL festival from a Farcaster-based music
-community that has been running virtual events (PALOOZA, ZAO-CHELLA) for
+community that has been running virtual events (ZAO-PALOOZA, ZAO-CHELLA) for
 two years.
 
 Ten artists. One stage. All day. Plus we are testing WaveWarZ live - a

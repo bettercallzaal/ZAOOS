@@ -78,7 +78,7 @@ tier: QUICK
 | Pop call recording + transcript into team chat | Zaal | message | post-call |
 | Sean adds Web3Metal as official partner via dashboard, test flow | Sean | dashboard test | today 5pm cobuild |
 | Sean + DQ submit photo + bio to Zal Festivals site | Sean, DQ | profile add | this week |
-| Stand up zalfestivals.com (bare-bones linking page: ZAOpalooza / ZAOchella / ZAOstock buttons) | Zaal | site | this week |
+| Stand up zalfestivals.com (bare-bones linking page: ZAO-PALOOZA / ZAO-CHELLA / ZAOstock buttons) | Zaal | site | this week |
 | Send Zelle Festivals logo decoup to Zaal (Candy collab on brand kit) | Zaal -> Candy | asset | this week |
 | Prepare Bangor Savings Bank sponsor application | Zaal | doc | next sprint |
 | Volunteer reviewer flagged for grant/sponsor app review (un-named on call) | Zaal | intro | before submit |

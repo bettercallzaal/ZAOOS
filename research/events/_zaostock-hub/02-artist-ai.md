@@ -55,9 +55,9 @@ Filter by:
 
 ---
 
-### 2. ZAOCHELLA Miami Cipher Feed (SECOND PRIORITY)
+### 2. ZAO-CHELLA Miami Cipher Feed (SECOND PRIORITY)
 
-**Pattern:** The ZAOCHELLA Miami cipher (10 artists, recorded Dec 2024, pending release) is a ready-made ZAO artist roster. Cross-promote these artists for ZAOstock, get two events per artist.
+**Pattern:** The ZAO-CHELLA Miami cipher (10 artists, recorded Dec 2024, pending release) is a ready-made ZAO artist roster. Cross-promote these artists for ZAOstock, get two events per artist.
 
 **Implementation:**
 - Extract artist names from the Cipher credits (GodCloud has the metadata)
@@ -66,14 +66,14 @@ Filter by:
 
 **Sources:**
 - Zaal's Cipher notes
-- ZAOCHELLA attendance data (doc 270, 364)
+- ZAO-CHELLA attendance data (doc 270, 364)
 - Artist social handles from ZAO roster
 
 **Cost:** Free
 
 **Timeline:** This week. Already have the data.
 
-**Reality check:** Yields 3-5 confirmed circulars. Huge PR value ("full-circle: ZAOCHELLA artists at ZAOstock").
+**Reality check:** Yields 3-5 confirmed circulars. Huge PR value ("full-circle: ZAO-CHELLA artists at ZAOstock").
 
 ---
 
@@ -427,7 +427,7 @@ Tone: celebratory, community-focused.
 | Dimension | Tool/Approach | Cost | Difficulty | Timeline | Verdict | Reasoning |
 |-----------|---------------|------|-----------|----------|---------|-----------|
 | Farcaster discovery | Neynar API search | $0 | Low | This week | USE | ROI leader. 50% of lineup sourced here. |
-| ZAOCHELLA artists | Manual roster pull | $0 | Low | This week | USE | Already have data. Huge PR value. |
+| ZAO-CHELLA artists | Manual roster pull | $0 | Low | This week | USE | Already have data. Huge PR value. |
 | Spotify discovery | Spotify Web API | $0 | Medium | DEFER | DEFER | Feb 2026 lockdown kills deep discovery. |
 | Bandcamp Maine | bandcamp-fetch lib | $0-20 | Medium | May+ | DEFER | Backup discovery if needed after May 1. |
 | Contact enrichment | Hunter/Apollo | $50-100/mo | Low | SKIP | SKIP | Direct outreach faster for small fest. |
@@ -447,7 +447,7 @@ Tone: celebratory, community-focused.
 
 ### Week 1 (Apr 22-28) - DISCOVER
 - Ship `/api/stock/artist-discovery/farcaster` (Neynar query)
-- Manual pull: ZAOCHELLA cipher artists
+- Manual pull: ZAO-CHELLA cipher artists
 - Target: 12-15 wishlist artists in dashboard
 
 ### Week 2-3 (Apr 29-May 12) - SHORTLIST
@@ -617,7 +617,7 @@ That decision belongs to **Zaal + DCoop**, listening to full tracks, checking Fa
 
 ## Next Steps (This Week)
 
-1. **Zaal + DCoop sync** — review Farcaster query + ZAOCHELLA roster pull
+1. **Zaal + DCoop sync** — review Farcaster query + ZAO-CHELLA roster pull
 2. **Ship Neynar discovery route** — `/api/stock/artist-discovery/farcaster`
 3. **Populate wishlist** — insert 12-15 artists into dashboard
 4. **Parallel:** Draft outreach emails (manual Claude run, not yet automated)

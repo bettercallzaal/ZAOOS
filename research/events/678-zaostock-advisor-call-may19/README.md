@@ -19,7 +19,7 @@ tier: STANDARD
 | 2 | **ZABAL Games = 3-month tournament** - June bootcamp/workshop month, July open build-a-thon + admissions, August 8 curated builders picked by 8 finals leaders. | Zaal | TODO | high |
 | 3 | **Zao Festivals -> long-term company** - next call brings in Adam (SongJam) + Tyler Stambaugh to form a 4-person strategic group (Zaal, Adam, Tyler, failoften) on company structure + startup best-practices. | Zaal | TODO | high |
 | 4 | **Bring the whole team to the non-profit meeting** (~4-5 weeks out, Tue 10:30am) with the art-conference organizers - everyone listens in + captures value. | Zaal | TODO | high |
-| 5 | **Run a Zaalpalooza retrospective** - who got paid, how, who showed up, what broke - to build a repeatable event pattern. Zaal agreed to add as a to-do. | Zaal | TODO | high |
+| 5 | **Run a ZAO-PALOOZA retrospective** - who got paid, how, who showed up, what broke - to build a repeatable event pattern. Zaal agreed to add as a to-do. | Zaal | TODO | high |
 | 6 | **Build a Discord scribe bot** - kill the manual Craig download/upload/transcript-copy loop. The bot consumes raw meeting data, organizes it, distributes action items. | Zaal | TODO | high |
 | 7 | **Formalize sponsorship tiers + volunteer expectations** - tier 1/2/3 packages (~$10k/$25k/$75k) with explicit deliverables; document volunteer room/board terms upfront. Advisor-pushed, Zaal agreed in principle. | Zaal | TODO | medium |
 | 8 | **Brand strategy: the Maine event is the engine** - every dollar funds the yearly Maine event; partner with other conferences only if they bring money; cut any side idea that does not funnel back into the engine. | Zaal | TODO | high |
@@ -64,7 +64,7 @@ Tokenomics: Zaal will eventually create a token - primarily to capture attention
 failoften's core advice this call:
 - **Role integrity** - write down your actual role + what is delegated, so an idea is not just "I came up with it" but has an owner, budget, deliverable, timeline.
 - **Minimal documents** - ask an AI for the minimum document set for the event (invoice, etc.), then hand each to whoever owns it.
-- **Retrospective** - document Zaalpalooza so the event becomes a repeatable pattern.
+- **Retrospective** - document ZAO-PALOOZA so the event becomes a repeatable pattern.
 - **Sponsorship tiers** - tier 1/2/3 with explicit deliverables removes ambiguity; corporate sponsors want to know what they get for $10k / $25k / $75k, not judge the music.
 - **Volunteer clarity** - document room/board + pay expectations upfront instead of resolving them in the moment.
 - Praise: Zaal's recent prep (e.g. honest "budget: zero", "confirmed musicians: zero") is the right move - expectations + transparency are what prevent things from ruining.
@@ -75,7 +75,7 @@ All owner Zaal. Routed to the ZAOstock tracker (@ZAOstockTeamBot), not cowork-za
 
 | # | Action | Category | Due | Confidence |
 |---|--------|----------|-----|-----------|
-| 1 | Add + run a Zaalpalooza retrospective (talk it through with AI - who paid, who showed, what broke) | Ops | TBD | high |
+| 1 | Add + run a ZAO-PALOOZA retrospective (talk it through with AI - who paid, who showed, what broke) | Ops | TBD | high |
 | 2 | Schedule the next call with Adam SongJam (8am M/W/F, bump 1-2h for timezone) | Ops | TBD | high |
 | 3 | Prep a summary + agenda of all action items for the Adam 3-way brainstorm | Ops | TBD | high |
 | 4 | Build the Discord scribe bot (replace the Craig manual flow) | Site / Tech | TBD | high |
@@ -105,7 +105,7 @@ All owner Zaal. Routed to the ZAOstock tracker (@ZAOstockTeamBot), not cowork-za
 ## Research Seeds
 
 - Discord scribe bot design - overlaps doc 670 (ZAO Craig) + doc 673 (the `/meeting` skill). Decide bot vs skill boundary.
-- Zaalpalooza retrospective - its own doc once Zaal runs it.
+- ZAO-PALOOZA retrospective - its own doc once Zaal runs it.
 - ZAOstock sponsorship-tier package spec (tier 1/2/3, deliverables).
 - Karpathy "wiki for LLMs" vault system - Zaal is applying it in Bonfire for ZABAL-specific content.
 - Zao Festivals long-term company structure - 4-person strategic group output.

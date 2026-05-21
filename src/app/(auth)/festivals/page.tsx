@@ -31,7 +31,7 @@ const UPCOMING = [
 
 const PAST = [
   {
-    name: 'PALOOZA',
+    name: 'ZAO-PALOOZA',
     date: '2024',
     description:
       'The ZAO\'s first virtual music festival — a celebration of independent artists in the Farcaster ecosystem.',

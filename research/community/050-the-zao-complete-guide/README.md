@@ -182,7 +182,7 @@ THE ZAO (impact organization / creator infrastructure ecosystem)
 ├── SUB-DAOs
 │   ├── WaveWarZ (music battles, Solana)
 │   └── ZAO Festivals (events)
-│       ├── Past: ZAO-Palooza, ZAO-Chella
+│       ├── Past: ZAO-PALOOZA, ZAO-CHELLA
 │       └── Planned: ZAOVille, ZAO Stock
 │
 ├── ZABAL (BetterCallZaal coordination layer)
@@ -456,8 +456,8 @@ It is important to distinguish between past events and planned events.
 
 | Event | Location | Date | Details |
 |-------|----------|------|---------|
-| **ZAO-Palooza** | New York (NFT NYC) | April 3, 2024 | 12 artists (6 new to Web3), ZAO Cards on Manifold. Organized in six weeks with volunteers. Broke even financially. |
-| **ZAO-Chella** | Wynwood, Miami (Art Basel) | Dec 6, 2024 | 10 artists, AR art, trading cards, WaveWarZ LIVE (Hurric4n3ike vs JANGO UU), Student $LOANZ Gold Sponsor |
+| **ZAO-PALOOZA** | New York (NFT NYC) | April 3, 2024 | 12 artists (6 new to Web3), ZAO Cards on Manifold. Organized in six weeks with volunteers. Broke even financially. |
+| **ZAO-CHELLA** | Wynwood, Miami (Art Basel) | Dec 6, 2024 | 10 artists, AR art, trading cards, WaveWarZ LIVE (Hurric4n3ike vs JANGO UU), Student $LOANZ Gold Sponsor |
 
 ### Planned Events
 
@@ -576,7 +576,7 @@ Artists the ZAO has collaborated with who remain independent. The community's fo
 | **Clejan** | "The Trap Violinist," Atlanta. 289K Spotify. Toured with Lindsey Stirling. Opened for Snoop Dogg, Soulja Boy, Busta Rhymes. [clejan.com](https://clejan.com/) |
 | **NessytheRilla** | Detroit. 6 albums. Opened for 6ix9ine, Chief Keef, Doja Cat, D12. 5+ Nina Protocol (Solana) releases. |
 | **GodCloud** | First finger drummer on Ethereum (2021). Forbes mention. Onboarded 10K+ people to web3. [godcloud.org](https://www.godcloud.org/) |
-| **Jango UU** | NYC. Genre-bending: trap, synth rock, folk-pop. ZAO-Palooza performer. [jangouu.com](https://www.jangouu.com/) |
+| **Jango UU** | NYC. Genre-bending: trap, synth rock, folk-pop. ZAO-PALOOZA performer. [jangouu.com](https://www.jangouu.com/) |
 | **Hurric4n3Ike** | WaveWarZ founder, musician, developer |
 | **AttaBotty** | ZAO co-founder. 10,000+ NFTs sold. 20+ years music production. |
 | **Mr. Darius** | Published author. 12+ Sound.xyz releases (historical). Hip-hop + EDM + Wave. [mrdariusmusic.com](https://mrdariusmusic.com/) |
@@ -585,7 +585,7 @@ Artists the ZAO has collaborated with who remain independent. The community's fo
 | **Formerly LEN** | 4 albums. Hip-hop. Stockholm to web3. |
 | **Maxwell Aden** | Atlanta pop/R&B. 11.8K Spotify. "Bounce (feat. Kodie Shane)" — 1M+ video views. |
 | **Goldilox** | 40.4K Spotify monthly listeners. |
-| **Losi** | Singer-songwriter from Cali, Colombia. ZAO-Chella performer. Active on Hive. |
+| **Losi** | Singer-songwriter from Cali, Colombia. ZAO-CHELLA performer. Active on Hive. |
 | **Songs of Eden** | Piano / Wellness. 300+ tracks. 34.3K Spotify monthly listeners. |
 | **DCoop** | Virginia-based. ZAOVille collaborator. |
 | **Hexidized, Joseph Goats, GESD1, Tabby, Jaystreetz, IzMpande, Gritbeat** | Community artists |
@@ -700,9 +700,9 @@ The surviving projects serve different functions — streaming, fan clubs, event
 |--------|-----------|
 | 2022 | ZTalent Agency founded by Zaal Panthaki. First smart contracts on Base/Solana. |
 | 2023 | Pivoted to the ZAO (ZTalent Artist Organization). WaveWarZ co-founded (Hurric4n3IKE, Zaal, Candy). |
-| April 2024 | **ZAO-Palooza** at NFT NYC — 12 artists, ZAO Cards on Manifold |
+| April 2024 | **ZAO-PALOOZA** at NFT NYC — 12 artists, ZAO Cards on Manifold |
 | 2024 | ZAO Whitepaper Draft 3. WaveWarZ DApp reaches readiness. |
-| Dec 2024 | **ZAO-Chella** at Art Basel Miami — 10 artists, WaveWarZ LIVE, AR art |
+| Dec 2024 | **ZAO-CHELLA** at Art Basel Miami — 10 artists, WaveWarZ LIVE, AR art |
 | Early 2025 | "Year of the ZAO" daily newsletter begins on Paragraph |
 | Feb 2025 | Student $LOANZ launches on Base. |
 | Apr 2025 | LTAW3 podcast launches |

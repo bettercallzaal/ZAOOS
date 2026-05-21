@@ -2,7 +2,7 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Open source speech-to-text, Whisper v3 alternatives, self-hosted transcription for meetings/podcasts/audio rooms (reconstructed)"
 related-docs: 328, 329, 322
 tier: STANDARD

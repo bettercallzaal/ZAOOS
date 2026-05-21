@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: architecture
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How do we migrate ZAO OS from 13GB single repo to pnpm workspaces + Turborepo monorepo? (reconstructed)
 tier: STANDARD
 ---

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: process-audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How do we level up Claude Code workflow for solo-founder velocity post-portal/ZOE work? (reconstructed)"
 tier: STANDARD
 ---

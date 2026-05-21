@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AI songwriting collaborator guide - writing original lyrics for summer festival anthem, structure, rhyme schemes, hooks, melody, crowd elements (reconstructed)"
 related-docs: 319, 320, 334
 tier: STANDARD

@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Matricula 4-layer self-improvement loop, energy budget tiers, 3-goal KPI scoring, Supabase+Cohere embeddings memory, TypeScript fork for ZAO agent squad (reconstructed)"
 tier: STANDARD
 ---

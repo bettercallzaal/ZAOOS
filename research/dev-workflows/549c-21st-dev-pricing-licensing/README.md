@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 549, 549a, 549b, 549d, 549e
 tier: STANDARD
 original-query: "What does 21st.dev cost per tier and what licenses apply to generated or lifted components? (reconstructed)"

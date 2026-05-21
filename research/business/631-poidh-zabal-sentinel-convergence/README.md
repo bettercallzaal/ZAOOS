@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How do POIDH, Sentinel, and ZABAL Empire converge? What's the highest-leverage next move? (reconstructed)"
 related-docs: 625, 626, 627, 628, 629, 468
 tier: STANDARD

@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "CLAWD GitHub delta Apr 11-21 2026, ss-triage-router MCP, fifth-builder secret hygiene patterns, ERC-8004 agent services, numbered job repos (reconstructed)"
 tier: STANDARD
 ---

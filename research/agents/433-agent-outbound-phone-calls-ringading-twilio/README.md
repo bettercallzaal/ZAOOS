@@ -4,7 +4,7 @@
 > **Topic:** agents
 > **Type:** Integration & Tools
 > **Date:** 2026-04-18
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Original-Query:** Should ZAO implement agent-driven outbound phone calls for vendor coordination? Ring-a-Ding vs DIY Twilio? (reconstructed)
 > **Tier:** v2-ready
 > **Tags:** `#agents` `#voice` `#telephony` `#openai-realtime` `#twilio` `#livekit` `#ringading`

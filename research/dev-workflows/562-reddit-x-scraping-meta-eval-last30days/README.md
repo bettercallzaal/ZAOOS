@@ -3,6 +3,7 @@ topic: dev-workflows
 type: decision
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Meta-eval: how good is Reddit + X scraping? WebFetch blocks both. Find the r/ClaudeCode humanizer skill (395 upvotes). Install last30days-skill + reddit-fetch fallback. (reconstructed)"
 related-docs: 549, 552, 553, 554, 558
 tier: STANDARD
 ---

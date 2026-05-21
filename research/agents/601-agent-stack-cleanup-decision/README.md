@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Agent stack proliferation - pick the smallest viable set, kill the rest (reconstructed)
 related-docs: 234, 415, 461, 506, 523, 524, 527, 547, 549, 569, 570, 581, 590, 599, 600
 tier: DEEP

@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Deep dive into ElevenLabs Agents (formerly Conversational AI) for building a voice agent with Zaal's Professional Voice Clone for The ZAO community (reconstructed)
 tier: high
 ---

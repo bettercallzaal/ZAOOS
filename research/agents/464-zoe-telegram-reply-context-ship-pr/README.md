@@ -4,7 +4,7 @@
 > **Topic:** agents
 > **Type:** Feature & Design
 > **Date:** 2026-04-20
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Original-Query:** How do we fix ZOE's context loss in Telegram? What other Telegram APIs can ZOE use? Design tip-to-PR shipping flow. (reconstructed)
 > **Tier:** v2-ready
 > **Goal:** Fix ZOE's "I didn't send that" reply bug, map every Telegram Bot API capability ZOE can adopt, and design a tip-to-PR shipping loop (Telegram → VPS Claude Code → branch + PR).

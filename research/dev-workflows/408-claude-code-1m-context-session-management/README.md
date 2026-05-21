@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: reference
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How do we best manage Claude Code's 1M token window - when to /rewind, /compact, /clear, or use subagents? (reconstructed)
 tier: STANDARD
 ---

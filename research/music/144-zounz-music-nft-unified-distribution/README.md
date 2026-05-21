@@ -5,7 +5,7 @@
 > **Topic:** music
 > **Type:** governance-integration
 > **Original-Query:** How should ZOUNZ DAO proposals fund music releases? How do Zora mints and 0xSplits connect to DAO governance? What's the revenue loop? (reconstructed)
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Tier:** 3-major-feature
 > **Goal:** Design how ZOUNZ DAO governance connects to music NFT minting and distribution — making ZAO the first DAO-governed music distribution service
 

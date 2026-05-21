@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-spec
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Map ZAO task forces, team structure, and 6-month roadmap (reconstructed)
 > **tier:** medium
 > **Date:** March 30, 2026

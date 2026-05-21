@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 491, 492, 493
 tier: STANDARD
 original-query: Should ZAO OS and BCZ adopt ByteDance's TRAE SOLO as a coding agent, or stick with Claude Code Max + QuadWork? (reconstructed)

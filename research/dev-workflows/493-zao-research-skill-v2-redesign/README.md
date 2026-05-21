@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: skill-redesign
 status: shipped
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs:
   - ~/.claude/skills/zao-research/SKILL.md (v2)
   - ~/.claude/skills/zao-research/CHANGELOG.md

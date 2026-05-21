@@ -3,6 +3,7 @@ topic: dev-workflows
 type: decision
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Lock rules that turn ZOE @newsletter from competent to 'feels like Zaal wrote it.' 8 ZABAL anti-patterns, 6 DO rules, concrete specificity gate. (reconstructed)"
 related-docs: 432, 549, 558, 562, 563, 607
 tier: STANDARD
 ---

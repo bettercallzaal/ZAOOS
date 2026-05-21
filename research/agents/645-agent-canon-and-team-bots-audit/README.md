@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Synthesize all ZAO agent docs into one reference, audit team-bots code PR 503 against canon (reconstructed)
 related-docs: 601, 607, 640, 642, 644
 tier: DISPATCH

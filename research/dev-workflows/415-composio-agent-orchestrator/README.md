@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: research-archive
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Should we adopt ComposioHQ agent-orchestrator (AO) as fleet manager for parallel agents in ZAO OS? (reconstructed)
 tier: ARCHIVE
 archive-reason: Composio AO was decommissioned from ZAO infrastructure 2026-05-04 per CLAUDE.md boundaries. Doc preserved for historical reference only. See doc 601 (Agent Stack Cleanup Decision).

@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-vision
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Define what makes ZAO OS the best community operating system — AI agent strategy, competitive landscape, platform architecture, and the path to a forkable community OS (reconstructed)
 > **tier:** medium
 > **Date:** March 28, 2026

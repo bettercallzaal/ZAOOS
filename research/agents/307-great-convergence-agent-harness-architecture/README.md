@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Map the industry-wide convergence on agent harness architecture and what it means for ZAO OS's agent stack (ZOE, OpenClaw, skills system) (reconstructed)
 tier: high
 ---

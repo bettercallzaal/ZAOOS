@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AI podcasts radio shows music intros licensing monetization Farcaster (reconstructed)"
 related-docs: 313, 321, 332, 322
 tier: STANDARD

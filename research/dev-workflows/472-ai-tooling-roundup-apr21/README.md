@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: roundup
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Roundup research on voice input, TTS, Farcaster tooling, Recoupable, Coinflow, Otoco LLCs, Intori SCIS, OpenClaw (reconstructed)"
 tier: STANDARD
 related-docs:

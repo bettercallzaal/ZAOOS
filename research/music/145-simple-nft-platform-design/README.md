@@ -5,7 +5,7 @@
 > **Topic:** music
 > **Type:** ux-design
 > **Original-Query:** How can we make music NFT minting so simple that non-crypto artists can mint in 3 steps? (reconstructed)
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Tier:** 3-major-feature
 > **Goal:** Design a dead-simple NFT minting experience for ZAO artists who are NOT crypto-native
 

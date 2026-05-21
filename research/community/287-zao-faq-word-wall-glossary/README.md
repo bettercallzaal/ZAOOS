@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-spec
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Design a ZAO FAQ page and "Word Wall" community glossary with Respect-weighted upvote/downvote (reconstructed)
 > **tier:** medium
 > **Date:** 2026-04-05

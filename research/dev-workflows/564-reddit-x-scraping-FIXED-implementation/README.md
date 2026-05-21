@@ -3,6 +3,7 @@ topic: dev-workflows
 type: incident-postmortem
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Doc 562 surfaced WebFetch block on Reddit + X. Build the fix: scripts, skills, fallback chain, test. Receipt + ship status. (reconstructed)"
 related-docs: 549, 552, 554, 562
 tier: STANDARD
 ---

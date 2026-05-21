@@ -4,7 +4,7 @@
 > **Topic:** agents
 > **Type:** Architecture & Design
 > **Date:** April 15, 2026
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Original-Query:** How should we design a profit-seeking agent (EARNER) with independent hot wallet for revenue generation? (reconstructed)
 > **Tier:** v2-ready
 > **Goal:** Design a dedicated profit-seeking agent (separate from VAULT/BANKER/DEALER ecosystem agents) with a hot wallet whose only job is generating revenue

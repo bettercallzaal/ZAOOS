@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 549, 549a, 549b, 549c, 549d
 tier: STANDARD
 original-query: "How should the /21st skill work in Claude Code to wrap 21st.dev for ZAO? (reconstructed)"

@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-deep-dive
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Consolidate all COC Concertz context (shows, artists, links, community) into one reference doc (reconstructed)
 > **tier:** medium
 > **Date:** April 13, 2026

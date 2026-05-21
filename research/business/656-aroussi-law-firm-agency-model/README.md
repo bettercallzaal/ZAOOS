@@ -2,7 +2,7 @@
 topic: business
 type: comparison
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How does Aroussi's law firm agency model apply to BCZ and ZAO? Which patterns should we adopt? (reconstructed)"
 related-docs: 475, 547, 650, 660
 tier: STANDARD

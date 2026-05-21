@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What concrete ZAO OS integrations can we ship with Empire Builder V3? How do we anchor each idea to real endpoints? (reconstructed)"
 related-docs: 582, 361, 165
 tier: STANDARD

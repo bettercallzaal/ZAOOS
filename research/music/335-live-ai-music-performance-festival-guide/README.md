@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Live AI music performance festival guide, real-time generation DJing AI tracks, Ableton visuals, ZAO Stock setup (reconstructed)"
 related-docs: 331, 324, 332
 tier: STANDARD

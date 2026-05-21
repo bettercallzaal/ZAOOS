@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: reference
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Evaluate Shann Holmberg's claim that Claude superpowers skill is the simplest way to level up project planning for code and non-code work (reconstructed)
 related-docs: 528, 523, 527
 tier: STANDARD

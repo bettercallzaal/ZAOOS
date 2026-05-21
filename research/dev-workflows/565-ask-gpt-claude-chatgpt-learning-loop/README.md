@@ -3,6 +3,7 @@ topic: dev-workflows
 type: guide
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Document /ask-gpt skill: Claude prompts ChatGPT loop via codex CLI (ChatGPT Plus auth, no API billing). Multi-turn research loops, context persist. (reconstructed)"
 related-docs: 506, 507, 548, 549, 555, 562, 564
 tier: STANDARD
 ---

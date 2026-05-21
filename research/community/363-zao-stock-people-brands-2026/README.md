@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-profiles
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Comprehensive profile index for ZAOstock 2026 team members and ZAO brands with verified data points (reconstructed)
 > **tier:** medium
 > **Date:** 2026-04-15

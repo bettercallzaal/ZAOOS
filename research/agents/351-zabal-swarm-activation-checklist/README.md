@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Exact remaining steps to go live, what happens when crons fire, what could go wrong, and honest assessment of current code vs ideal behavior (reconstructed)
 tier: high
 notes: Companion to doc 345 (master blueprint). Activation and testing playbook.

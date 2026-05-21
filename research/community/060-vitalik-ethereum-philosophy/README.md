@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-deep-dive
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Vitalik Buterin's core philosophy on Ethereum, governance, scaling, and decentralization principles (reconstructed)
 > **tier:** solid
 

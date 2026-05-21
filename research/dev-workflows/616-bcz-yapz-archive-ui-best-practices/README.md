@@ -3,6 +3,7 @@ topic: dev-workflows
 type: guide
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Best archive-page patterns from Lex Fridman / Acquired / Lenny / Dwarkesh. Apply to bczyapz.com: per-episode URL, transcript search, filters, RSS. (reconstructed)"
 related-docs: 477, 490, 533, 569, 617
 tier: STANDARD
 ---

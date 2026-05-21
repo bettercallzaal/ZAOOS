@@ -2,7 +2,7 @@
 topic: agents
 type: market-research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: identify naming collision with NousResearch Hermes and lift lessons from r/hermesagent (reconstructed)
 related-docs: 309, 312, 483, 599, 599b
 tier: STANDARD

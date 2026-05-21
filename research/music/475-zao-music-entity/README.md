@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "ZAO Music Entity artist support collective BMI publishing mechanicals distribution (reconstructed)"
 related-docs: 314, 322, 407, 599a, 601
 tier: STANDARD

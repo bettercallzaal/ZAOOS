@@ -5,7 +5,7 @@
 > **Topic:** music
 > **Type:** api-reference
 > **Original-Query:** What does the Audius API offer (tracks, users, playlists, streaming, SDK)? How can ZAO OS deepen integration beyond basic streaming? (reconstructed)
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Tier:** 2-integration-ready
 > **Relevance:** High — ZAO OS already recognizes Audius URLs and streams via the v1 REST API. This doc maps the full surface area for deeper integration.
 

@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: specification
-last-validated: 2026-05-18
+last-validated: 2026-05-21
 tier: STANDARD
 parent: 668
 related-docs: 665, 547, 435, 245, 464, 289

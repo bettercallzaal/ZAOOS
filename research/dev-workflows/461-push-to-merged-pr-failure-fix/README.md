@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How do we stop pushes to merged PRs and main via defense-in-depth enforcement? (reconstructed)"
 tier: STANDARD
 ---

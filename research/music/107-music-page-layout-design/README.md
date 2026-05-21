@@ -5,7 +5,7 @@
 > **Topic:** music
 > **Type:** ux-design
 > **Original-Query:** How should the /music page be laid out? What sections (hero, trending, submissions, playlists, recently played, artists) and responsive design approach work best? (reconstructed)
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Tier:** 2-integration-ready
 > **Goal:** Design a standalone /music page for ZAO OS — currently music is buried in the chat sidebar
 

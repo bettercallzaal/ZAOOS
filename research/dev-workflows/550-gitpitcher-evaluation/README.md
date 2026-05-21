@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Decide whether ZAO uses gitpitcher.com to turn GitHub repos into agent-ready Build Packs given existing /zao-research and superpowers skills (reconstructed)
 related-docs: 506, 507, 508, 548, 549
 tier: STANDARD

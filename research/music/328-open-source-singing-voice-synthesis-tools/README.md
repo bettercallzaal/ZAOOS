@@ -2,7 +2,7 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Open source singing voice synthesis and conversion tools, alternatives to Kits.AI, voice cloning, RVC, GPT-SoVITS (reconstructed)"
 related-docs: 329, 324, 336
 tier: STANDARD

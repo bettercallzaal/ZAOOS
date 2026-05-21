@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Three bots operating model - ZOE, ZAOstock, Bonfire shared substrate with trust tiers and dispatcher pattern (reconstructed)
 related-docs: 547, 568, 569, 570, 581, 599, 600, 601, 604, 605, 606
 tier: STANDARD

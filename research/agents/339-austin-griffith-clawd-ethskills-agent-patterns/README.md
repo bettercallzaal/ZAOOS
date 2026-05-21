@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Deep dive into Austin Griffith's CLAWD autonomous agent, ETHSkills knowledge system, and extract every pattern applicable to the ZABAL agent swarm (VAULT/BANKER/DEALER) (reconstructed)
 tier: high
 notes: Feeds doc 345 (master blueprint). ETHSkills pattern critical for agent stack.

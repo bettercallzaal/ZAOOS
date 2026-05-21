@@ -2,7 +2,7 @@
 topic: agents
 type: market-research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: synthesize 10 inbox items on agent commerce, alignment skills, local stack (reconstructed)
 related-docs: 280, 322, 352, 429, 468, 558, 562, 567, 568
 tier: STANDARD

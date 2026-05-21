@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Design how AI agents join FISHBOWLZ rooms as live participants - consuming transcript streams in real-time, contributing to conversations, and providing richer context than post-hoc transcript analysis (reconstructed)
 tier: archive-candidate
 notes: FISHBOWLZ paused 2026-04-16, killed 2026-05-04. This research on FISHBOWLZ agent features is now superseded by partnership with Juke. Archive recommended.

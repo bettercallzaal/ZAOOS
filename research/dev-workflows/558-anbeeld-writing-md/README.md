@@ -3,6 +3,7 @@ topic: dev-workflows
 type: guide
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Fold Anbeeld WRITING.md 14-rule toolkit into ZAO content skills. Adopt 5-10 required-checks gate before publishing newsletter/1-pager/pitch. (reconstructed)"
 related-docs: 432, 552, 553
 tier: STANDARD
 ---

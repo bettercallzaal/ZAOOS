@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-profiles
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Identify key collaborators for ZAO's fractal governance integration (reconstructed)
 > **tier:** medium
 > **Date:** 2026-03-21

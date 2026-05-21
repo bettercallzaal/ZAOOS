@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 154, 312, 491, 506
 tier: STANDARD
 original-query: Out of 1,116 Claude Code skills in the ecosystem, which ~15 are worth installing for ZAO OS, BCZ, and the agent fleet? (reconstructed)

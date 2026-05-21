@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "5-bot Telegram hub-and-spoke fleet design with ZOE brain, Magnetiq/WaveWarZ/ZAOstock/ZAO Devz/Research bots, autonomous coding patterns, cross-learning schema (reconstructed)"
 tier: STANDARD
 ---

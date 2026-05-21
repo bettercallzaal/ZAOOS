@@ -4,7 +4,7 @@
 > **Topic:** agents
 > **Type:** Planning & Roadmap
 > **Date:** 2026-04-20
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Original-Query:** What are the top 5 agent stack improvements to ship in one week? Prioritized with effort/value scores. (reconstructed)
 > **Tier:** v2-ready
 > **Goal:** Synthesize docs 435 (ZOE effectiveness), 436 (phone agentic stack health), and 440 (Claude Code process level-up) into the top 5 concrete agent improvements to ship in the next 7 days (2026-04-20 through 2026-04-27). Each item has specific code change locations, effort/value scores, and dependencies.

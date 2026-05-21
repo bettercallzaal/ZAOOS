@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Make pixels.zaoos.com interactive - click-to-dispatch, ZAO branding, Supabase integration (reconstructed)
 tier: archive-candidate
 notes: Dashboard research for pixels.zaoos.com (Pixel Agents = FISHBOWLZ-adjacent project). FISHBOWLZ killed 2026-05-04. Archive recommended unless pixels standalone persists.

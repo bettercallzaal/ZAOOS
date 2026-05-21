@@ -5,7 +5,7 @@
 > **Topic:** music
 > **Type:** contract-integration
 > **Original-Query:** How do 0xSplits work? How should ZAO implement 80/10/10 splits (artist/treasury/curator) for music NFT revenue? (reconstructed)
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Tier:** 3-major-feature
 > **Goal:** Implementation guide for 0xSplits integration — automated royalty splits for music NFTs on Base
 

@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Brand-fit audits for Magnetiq and AttaBotty bots - persona tightenings, scope rules, memory model (reconstructed)
 related-docs: 640, 642, 644, 645, 467, 641
 tier: DISPATCH

@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Suno v5.5 pricing deep dive May 2026 tactical operational guide (reconstructed)"
 related-docs: 321, 334, 313, 340
 tier: STANDARD

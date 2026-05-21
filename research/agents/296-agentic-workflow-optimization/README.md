@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Define the optimal division of labor between Claude Code (Opus on laptop) and VPS agents (Minimax M2.7 on OpenClaw), based on empirical testing and industry patterns (reconstructed)
 tier: high
 ---

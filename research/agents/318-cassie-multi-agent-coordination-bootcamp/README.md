@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Extract the full multi-agent coordination architecture from Cassie Heart's Farcaster Agentic Bootcamp Session 10 and map it to ZAO OS's BCZ Agent (Agent Zero) + ZOE two-agent system (reconstructed)
 tier: high
 ---

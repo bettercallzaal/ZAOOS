@@ -3,6 +3,7 @@ topic: dev-workflows
 type: decision
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Pick the gasless stack for ZAOstock RSVP, ZABAL first-stake, Cipher mint. Coinbase Smart Wallet vs Privy vs Pimlico. Who pays, quota, fallback. (reconstructed)"
 related-docs: 548, 549, 551, 557
 tier: STANDARD
 ---

@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Spatial audio Dolby Atmos AI-generated music, Logic Pro workflow, Apple Music distribution, immersive audio (reconstructed)"
 related-docs: 336, 335, 331
 tier: STANDARD

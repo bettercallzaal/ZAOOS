@@ -2,7 +2,7 @@
 topic: agents
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: r/hermesagent subreddit context - NousResearch project, different from ZAO Hermes, naming collision only (reconstructed)
 related-docs: 483, 529, 531, 541, 547
 tier: QUICK

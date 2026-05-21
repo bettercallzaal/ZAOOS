@@ -3,6 +3,7 @@ topic: dev-workflows
 type: audit
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Audit ZAOOS against AGENTS.md open spec (60k+ projects adopted). Confirm what we have, identify AGENTS.md vs CLAUDE.md drift, consolidate or keep split. (reconstructed)"
 related-docs: 234, 459, 547, 601, 605, 607, 611, 613
 tier: STANDARD
 ---

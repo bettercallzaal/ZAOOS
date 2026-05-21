@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Music theory AI prompting Suno ElevenLabs ACE-Step key modes chord progressions (reconstructed)"
 related-docs: 334, 321, 313, 324
 tier: STANDARD

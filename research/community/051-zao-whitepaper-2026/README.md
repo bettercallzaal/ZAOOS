@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-whitepaper
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** ZAO whitepaper 2026: technology roadmap, product architecture, token mechanics, and roadmap (reconstructed)
 > **tier:** solid
 

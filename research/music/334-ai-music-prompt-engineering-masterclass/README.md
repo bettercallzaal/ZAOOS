@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AI music prompt engineering masterclass 2026 Suno ElevenLabs ACE-Step Udio (reconstructed)"
 related-docs: 321, 601, 313, 340
 tier: STANDARD

@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Sound design SFX AI music production, risers drops transitions foley, ElevenLabs SFX API, free sound libraries (reconstructed)"
 related-docs: 336, 330, 329
 tier: STANDARD

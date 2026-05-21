@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Which parts of affaan-m/everything-claude-code should we integrate into ZAO OS workflow without duplication? (reconstructed)"
 tier: STANDARD
 ---

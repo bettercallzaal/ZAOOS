@@ -2,7 +2,7 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 173, 250, 308, 591, 591a, 591b, 591d
 original-query: "Farcaster miniapp manifest schema, account association domain binding, apex vs www pitfalls, cross-client compatibility (Warpcast iOS/Android/Web, Mac, Base App, Coinbase Wallet), validation tools, discovery, publishing. (reconstructed)"
 tier: STANDARD

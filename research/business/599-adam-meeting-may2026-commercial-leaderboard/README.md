@@ -2,7 +2,7 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What did Zaal and Adam decide on the leaderboard reset, ZAOstock commercial model, and next steps? (reconstructed)"
 related-docs: 582, 583, 585
 tier: QUICK

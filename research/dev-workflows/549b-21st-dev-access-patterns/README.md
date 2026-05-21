@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 549, 549a, 549c, 549d, 549e
 tier: STANDARD
 original-query: "How do we install and use 21st.dev Magic MCP, and why is it better than shadcn/ui for ZAO? (reconstructed)"

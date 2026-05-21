@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-21
+original-query: "Anthropic official Claude Code playbook: CEO 1 human, employees AI agents, ops fully automatic. Relevance to Hermes fix-PR pipeline + ZOE dispatch. (reconstructed)"
 related-docs: [549-21st-skill-live, 461-fix-pr-pipeline-live]
 tier: QUICK
 source: inbox-forward-2026-05-11

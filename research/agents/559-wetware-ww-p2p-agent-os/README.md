@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: decide whether wetware/ww P2P agent OS belongs in ZAO stack (reconstructed)
 related-docs: 506, 507, 548, 555
 tier: STANDARD

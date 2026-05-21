@@ -5,7 +5,7 @@
 > **Topic:** music
 > **Type:** infrastructure-research
 > **Original-Query:** What's the full Arweave ecosystem for music (AO, ArDrive Turbo, ar.io, Wayfinder, GraphQL, ArNS)? How can ZAO build on it? (reconstructed)
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Tier:** 3-major-feature
 > **Goal:** Map the entire Arweave ecosystem (AO compute, Irys datachain, ArDrive, ar.io gateways, GraphQL, ArNS) and design a complete music distribution layer for ZAO OS
 

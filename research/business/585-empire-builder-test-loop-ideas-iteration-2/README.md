@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What did we learn from testing the Empire Builder integration live? What bugs and iteration-2 ideas surfaced? (reconstructed)"
 related-docs: 361, 582, 583, 584
 tier: STANDARD

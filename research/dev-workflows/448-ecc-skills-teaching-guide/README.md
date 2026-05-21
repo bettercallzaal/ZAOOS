@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: reference
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How do we teach Zaal to use each ECC artifact installed in ZAO OS? (reconstructed)"
 tier: STANDARD
 ---

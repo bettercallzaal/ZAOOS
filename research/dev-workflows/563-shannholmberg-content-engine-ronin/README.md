@@ -3,6 +3,7 @@ topic: dev-workflows
 type: market-research
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Decode Shann3 (@shannholmberg) Ronin content-engine pattern (17 markdown + 1 agent = 10 social accounts). Map to ZAO brand-bot-fleet + RaidSharks. Extract architectural lesson. (reconstructed)"
 related-docs: 549, 558, 560, 562
 tier: STANDARD
 ---

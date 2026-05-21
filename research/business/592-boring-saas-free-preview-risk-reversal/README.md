@@ -2,7 +2,7 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How can BCZ apply free-preview risk reversal from r/SaaS to Bar Harbor Chamber cold pitches? What economics apply? (reconstructed)"
 related-docs: 287, 415, 449
 tier: STANDARD

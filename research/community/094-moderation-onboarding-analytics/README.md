@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-spec
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Design content moderation pipeline, improve onboarding UX, and add community analytics for ZAO OS's 100-member gated Farcaster music community (reconstructed)
 > **tier:** medium
 > **Date:** March 20, 2026

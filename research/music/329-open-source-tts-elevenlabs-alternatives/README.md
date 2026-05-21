@@ -2,7 +2,7 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Open source text-to-speech alternatives to ElevenLabs, voice cloning, quality benchmarks, 18+ models comparison (reconstructed)"
 related-docs: 328, 327, 336
 tier: STANDARD

@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Map Bankr Bot's architecture, skills marketplace, and how VAULT/BANKER/DEALER can use Bankr skills for trading, payments, and Farcaster integration (reconstructed)
 tier: high
 notes: Feeds doc 345 (master blueprint). Bankr skills = reusable DeFi primitives for agents.

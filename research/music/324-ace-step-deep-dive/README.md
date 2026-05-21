@@ -2,7 +2,7 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "ACE-Step deep dive - versions, LoRA training, local deployment, prompting, live generation, quality optimization, community ecosystem (reconstructed)"
 related-docs: 319, 321, 328, 334
 tier: STANDARD

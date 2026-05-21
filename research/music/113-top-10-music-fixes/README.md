@@ -5,7 +5,7 @@
 > **Topic:** music
 > **Type:** bug-prioritization
 > **Original-Query:** What are the top 10 highest-impact music player bugs and missing features? Prioritize by effort and impact. (reconstructed)
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Tier:** 1-critical
 > **Goal:** Identify and prioritize the 10 highest-impact music fixes after radio started working
 

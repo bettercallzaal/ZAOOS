@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-deep-dive
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Document Dan SingJoy, Eden Fractal operations, governance model, tools, and ZAO's active participation (reconstructed)
 > **tier:** solid
 

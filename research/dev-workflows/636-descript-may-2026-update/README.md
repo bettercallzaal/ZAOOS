@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-21
+original-query: "Descript May 2026 update: model picker, transcription admin, transitions. What Zaal should use for BCZ YapZ + lunch streams. (reconstructed)"
 related-docs: []
 tier: QUICK
 source: inbox-forward-2026-05-11

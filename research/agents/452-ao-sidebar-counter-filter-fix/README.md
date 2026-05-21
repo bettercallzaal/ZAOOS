@@ -3,7 +3,7 @@
 **Topic:** agents  
 **Type:** Debugging & UX  
 **Date:** 2026-04-20  
-**Last-Validated:** 2026-05-20  
+**Last-Validated:** 2026-05-21  
 **Original-Query:** Why does AO sidebar counter show stale session count vs active? (reconstructed)  
 **Tier:** archive-candidate  
 **Status:** Research complete - historical debugging report  

@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "QuadWork realproject7 4-agent PR workflow, clean-context 2-reviewer approval gate, cross-frontier model routing, overnight batch scheduling for ZAO repos (reconstructed)"
 tier: STANDARD
 ---

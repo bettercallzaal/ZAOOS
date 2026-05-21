@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "BCZ 101 Farcaster bot design with podcast transcript RAG, gmfc101 architecture fork, 3-path LLM classifier, Supabase pgvector + OpenAI embeddings (reconstructed)"
 tier: STANDARD
 ---

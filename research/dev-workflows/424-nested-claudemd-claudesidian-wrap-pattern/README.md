@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: architecture
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How do nested CLAUDE.md, Claudesidian, and /wrap patterns organize context hierarchies for ZAO repos and personal vault? (reconstructed)
 tier: STANDARD
 ---

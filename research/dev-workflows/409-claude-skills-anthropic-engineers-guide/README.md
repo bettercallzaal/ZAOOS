@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: reference
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: What did Anthropic engineers (Barry and Mahesh) explain about how Claude Skills work? (reconstructed)
 tier: STANDARD
 ---

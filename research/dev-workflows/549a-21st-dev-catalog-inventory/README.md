@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 549, 549b, 549c, 549d, 549e
 tier: STANDARD
 original-query: "What component categories exist in 21st.dev marketplace and which fit ZAO's design language? (reconstructed)"

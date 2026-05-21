@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: architecture
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: What are the best AI-native documentation patterns for monorepos (CLAUDE.md, AGENTS.md, llms.txt)? (reconstructed)
 tier: STANDARD
 ---

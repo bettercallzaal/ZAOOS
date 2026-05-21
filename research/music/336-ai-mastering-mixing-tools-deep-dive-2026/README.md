@@ -2,7 +2,7 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AI mastering mixing tools 2026, LANDR iZotope Deezer, mastering DAW plugins, open source alternatives (reconstructed)"
 related-docs: 330, 329, 324
 tier: STANDARD

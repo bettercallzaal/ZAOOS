@@ -3,6 +3,7 @@ topic: dev-workflows
 type: decision
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Where does Uncle Bob's Clean Architecture earn its keep in ZAO? Skip or lift? Agents vs api routes vs Hermes vs future spinouts. Layered or lite. (reconstructed)"
 related-docs: 461, 506, 523, 529, 547, 601
 tier: STANDARD
 source-url: https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html

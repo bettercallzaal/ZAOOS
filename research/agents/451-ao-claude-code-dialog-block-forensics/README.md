@@ -3,7 +3,7 @@
 **Topic:** agents  
 **Type:** Debugging & Forensics  
 **Date:** 2026-04-20  
-**Last-Validated:** 2026-05-20  
+**Last-Validated:** 2026-05-21  
 **Original-Query:** Why did AO sessions hang on Claude Code auto-updater dialog? (reconstructed)  
 **Tier:** archive-candidate  
 **Status:** Research complete - historical debugging report  

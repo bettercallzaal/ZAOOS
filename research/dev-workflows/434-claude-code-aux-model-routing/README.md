@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: reference
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: What aux model routing options actually exist in Claude Code vs the Hermes 8-slot myth? (reconstructed)
 tier: STANDARD
 ---

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: skill-delivery
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How do we standardize BCZ YapZ YouTube descriptions for SEO, RAG, and guest amplification? (reconstructed)"
 tier: STANDARD
 ---

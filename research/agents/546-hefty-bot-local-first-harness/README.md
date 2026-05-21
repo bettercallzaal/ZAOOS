@@ -2,7 +2,7 @@
 topic: agents
 type: market-research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: evaluate hefty.bot local-first harness for ZAO adoption (reconstructed)
 related-docs: 161, 253, 307, 364, 415, 428
 tier: STANDARD

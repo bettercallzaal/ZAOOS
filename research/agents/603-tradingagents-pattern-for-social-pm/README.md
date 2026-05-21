@@ -2,7 +2,7 @@
 topic: agents
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: TradingAgents multi-agent debate architecture - adapt debate patterns for ZOE social posting and project management decisions (reconstructed)
 related-docs: 461, 529, 547, 600, 601
 tier: STANDARD

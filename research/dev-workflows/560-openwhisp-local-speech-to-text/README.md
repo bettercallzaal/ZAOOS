@@ -3,6 +3,7 @@ topic: dev-workflows
 type: decision
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Install OpenWhisp on Zaal's Mac for voice-to-text capture: newsletter, 1-pagers, Telegram replies, research notes. Pair with Anbeeld writing rules. (reconstructed)"
 related-docs: 432, 471, 558
 tier: STANDARD
 ---

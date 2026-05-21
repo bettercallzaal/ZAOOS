@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-profiles
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Deep profiles of active ZAO community members for context in agent interactions and community planning (reconstructed)
 > **tier:** solid
 > **Date:** March 2026 (consolidated April 5, 2026)

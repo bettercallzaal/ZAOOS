@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-analysis
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Map Ethereum's alignment opportunities with ZAO's impact network model (reconstructed)
 > **tier:** solid
 

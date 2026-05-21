@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 549, 549a, 549b, 549c, 549e, 415, 506, 507, 508
 tier: STANDARD
 original-query: "What are 21st-dev's other products (1code, SDK, agent-elements) and should ZAO use them? (reconstructed)"

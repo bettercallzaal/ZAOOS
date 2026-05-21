@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How do we isolate parallel Claude Code sessions to prevent branch/file conflicts? (reconstructed)"
 tier: STANDARD
 ---

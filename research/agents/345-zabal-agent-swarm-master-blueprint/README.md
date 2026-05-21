@@ -2,7 +2,7 @@
 topic: agents
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Single source of truth for the entire ZABAL agent swarm - what to build, in what order, with what tools, referencing all 8 prior research docs (reconstructed)
 tier: critical
 notes: CANONICAL build plan. Consolidates all ZABAL agent research (325, 339, 340, 344). Active project.

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: incident-postmortem
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Postmortem of branch collisions and safe-git-push.sh hook failures in parallel worktree sessions; document root causes and propose fixes (reconstructed)
 related-docs: 459, 551, 552, 553
 tier: STANDARD

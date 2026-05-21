@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-analysis
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Define Zaal's authentic brand voice from real writing samples for consistent social content generation (reconstructed)
 > **tier:** medium
 > **Date:** 2026-04-14

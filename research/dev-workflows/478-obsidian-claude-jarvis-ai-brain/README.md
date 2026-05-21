@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Should Zaal adopt JARVIS/Cowork pattern with Obsidian + Claude Code as personal ops layer? (reconstructed)"
 tier: STANDARD
 ---

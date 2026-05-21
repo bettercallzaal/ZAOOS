@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: comparison
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Shootout of multi-agent harness platforms (1code vs QuadWork vs DevFleet vs ECC vs superpowers) to pick canonical layer for ZAO (reconstructed)
 related-docs: 506, 507, 508, 548, 549, 549d, 551
 tier: STANDARD

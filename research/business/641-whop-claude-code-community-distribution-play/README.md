@@ -2,7 +2,7 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: [640-magnetiq-pivot]
 original-query: "Should ZAO launch a paid Claude Code workshop or membership on Whop.com targeting digital creators? What are the economics, fit, and risks? (reconstructed)"
 tier: STANDARD

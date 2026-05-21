@@ -2,7 +2,7 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-04
+last-validated: 2026-05-21
 related-docs: 547, 601, 604
 tier: STANDARD
 ---

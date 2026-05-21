@@ -2,7 +2,7 @@
 topic: governance
 type: guide
 status: research-complete
-last-validated: 2026-05-16
+last-validated: 2026-05-21
 related-docs: 657, 056, 058, 111
 tier: STANDARD
 parent-doc: 657

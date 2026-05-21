@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-ecosystem
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** ZABAL partner ecosystem: map current and prospective partner relationships for The ZAO (reconstructed)
 > **tier:** solid
 

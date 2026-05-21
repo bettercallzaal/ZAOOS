@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Does caveman mode actually save 75% tokens as claimed? (reconstructed)
 tier: STANDARD
 ---

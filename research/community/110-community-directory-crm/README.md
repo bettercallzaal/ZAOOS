@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-spec
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Replace the Webflow CRM at thezao.com/community with a powerful, on-chain enriched member directory built natively in ZAO OS (reconstructed)
 > **tier:** solid
 > **Date:** March 22, 2026

@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-21
+original-query: "r/vibecoding: non-dev PM shipped 70k lines in 30 days with Claude. Multi-session token discipline, UI-first, tests, TypeScript. What applies to ZAO. (reconstructed)"
 related-docs: [172, 196, 440, 506, 507, 539]
 tier: QUICK
 source: reddit.com/r/vibecoding thread 2026-05-11

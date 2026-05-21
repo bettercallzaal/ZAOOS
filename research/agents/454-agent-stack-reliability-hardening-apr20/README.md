@@ -4,7 +4,7 @@
 > **Topic:** agents
 > **Type:** Operations & Reliability
 > **Date:** 2026-04-20
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Original-Query:** How should we harden VPS portal reliability after silent AO session failures? (reconstructed)
 > **Tier:** v2-ready
 > **Goal:** Audit the VPS portal stack's reliability and identify 7 high-impact hardening improvements, with focus on the Apr 19-20 silent overnight (3 AO sessions died, no completion notifications, no failure alerts).

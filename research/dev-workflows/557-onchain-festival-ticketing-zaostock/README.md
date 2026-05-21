@@ -3,6 +3,7 @@ topic: dev-workflows
 type: decision
 status: research-complete
 last-validated: 2026-05-21
+original-query: "Pick the onchain ticketing stack (NFT, sponsor pass, RSVP) for ZAOstock Oct 3 2026. Decide Unlock vs POAP vs Highlight, cost per layer, gasless approach. (reconstructed)"
 related-docs: 549, 551, 556
 tier: STANDARD
 ---

@@ -3,7 +3,7 @@
 > **topic:** community
 > **type:** research-mechanics
 > **status:** research-complete
-> **last-validated:** 2026-05-20
+> **last-validated:** 2026-05-21
 > **original-query:** Understand how SongJam's leaderboard scoring works and how to use it as an oracle input for ZABAL rewards (reconstructed)
 > **tier:** medium
 > **Date:** April 11, 2026

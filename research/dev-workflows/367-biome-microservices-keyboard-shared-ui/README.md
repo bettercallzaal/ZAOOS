@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: implementation
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How do Biome, Nook microservices, Herocast keyboard UX, and MakerKit shared UI patterns work - can we apply them to ZAO? (reconstructed)
 tier: STANDARD
 ---

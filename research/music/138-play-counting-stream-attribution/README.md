@@ -5,7 +5,7 @@
 > **Topic:** music
 > **Type:** platform-integration
 > **Original-Query:** Do plays on ZAO OS count on Spotify/SoundCloud/YouTube/Audius/Apple Music? How can we ensure stream attribution and add Last.fm/ListenBrainz scrobbling? (reconstructed)
-> **Last-Validated:** 2026-05-20
+> **Last-Validated:** 2026-05-21
 > **Tier:** 2-integration-ready
 > **Goal:** Determine whether music played through ZAO OS counts as legitimate streams on source platforms, and identify gaps + fixes
 

@@ -2,7 +2,7 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Identify world's leading AI music practitioners, creators, educators 2026 for ZAO Stock speaking lineup (reconstructed)"
 related-docs: 334, 601, 261, 340
 tier: STANDARD

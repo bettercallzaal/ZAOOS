@@ -2,7 +2,7 @@
 topic: agents
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AO dashboard Kill and New Session buttons not firing network requests investigation (reconstructed)"
 tier: STANDARD
 ---

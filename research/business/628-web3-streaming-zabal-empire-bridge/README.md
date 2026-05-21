@@ -2,7 +2,7 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How do we bridge stream events (Twitch/StreamElements) to ZABAL Empire scoring and rewards? (reconstructed)"
 related-docs: 627, 626, 625, 361, 324, 258, 283, 284, 222, 125
 tier: DEEP

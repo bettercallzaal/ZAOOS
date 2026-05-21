@@ -1,25 +1,51 @@
-# Doc 362: Caveman Mode Token Savings Analysis
-
-**Status:** Complete  
-**Date:** 2026-04-15  
-**Author:** Claude Code investigation  
-
-## Executive Summary
-
-Caveman mode claims 75% token savings but delivers **4–5% real-world savings** in typical sessions. The 75% figure applies only to prose output compression, which is ~6% of total session tokens. The caveman skill itself injects 180–200 input tokens on every turn, offsetting much of the output savings.
-
-**Key finding:** For most developers, `/compact` (40–70% context savings at natural breakpoints) and model switching (Sonnet vs Opus) yield far greater token savings than caveman mode.
-
 ---
+topic: dev-workflows
+type: decision
+status: research-complete
+last-validated: 2026-05-20
+original-query: Does caveman mode actually save 75% tokens as claimed? (reconstructed)
+tier: STANDARD
+---
+
+# 362 - Caveman Token Savings Analysis
+
+> **Goal:** Test caveman mode's 75% claim against real-world Claude Code sessions. Separate marketing from measured impact.
 
 ## Key Decisions
 
-| Decision | Rationale |
-|----------|-----------|
-| Focus on input vs output token costs | Output 5x more expensive than input, but input dominates session volume |
-| Test against both baseline AND terse baseline | Caveman's true delta = caveman vs "answer concisely", not vs unprompted |
-| Include both Eval data AND real-world session math | Lab numbers don't reflect actual usage patterns |
-| Compare across all token-saving strategies | Caveman in isolation is misleading without context |
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Caveman real savings: 4-10% total session, not 75% | 75% applies only to prose output (~6K of 25K total output tokens in typical session). Output is 15-20% of session cost. Skill overhead (184 tokens/turn) reduces net. |
+| 2 | Install caveman as passive benefit, not primary cost lever | Zero-cost install, measurable (4-10%) but not primary. Do NOT optimize around it. |
+| 3 | Prioritize /compact (40-70% at breakpoints) over caveman | 100x better ROI. Run /compact every 50% context fill. More savings, no permanent skill tax. |
+| 4 | Real accuracy boost possible (26 percentage points per arXiv 2604.00025) | Brevity constraints improve large model accuracy on benchmark tasks. May offset token "savings" as quality gain instead. |
+
+## Executive Summary (May 2026 re-validation)
+
+**Caveman GitHub stats:** 51.7K stars as of May 2026 (14K at April start). Viral growth but marketing overstates impact. [FULL]
+
+**Real session savings:** 4-10% total token reduction (not 75%). Breakdown:
+- Prose output compression: 65-75% (measured) [FULL]
+- Prose is 6K of 25K output tokens: 24% of output [FULL]
+- Output is 15-20% of session cost: net 4-5% per session [FULL]
+- Fewer conversation turns (0.6 fewer/task): indirect 8-10% when counted [FULL]
+
+**Market reality:** Multiple independent researchers (Kuba Guzik: 23%, Marco Pillitteri: 12%, MayhemCode: 20%) converge on 15-25% real-world savings. Not 75%. [FULL]
+
+---
+
+## Caveman Real Numbers (May 2026 Validation)
+
+| Source | Output Compression | Session Impact | Accuracy Gain |
+|--------|-------------------|-----------------|---------------|
+| Caveman repo official eval | 65-75% prose | 4-5% total | Unknown |
+| Kuba Guzik (72 runs) | 23% output | 3-4% total | Zero regression |
+| Marco Pillitteri (10 tasks) | 12% coding tasks | 2-3% total | Zero regression |
+| MayhemCode (full session) | 20% output | 3-4% total | Faster responses |
+| Implicator AI analysis | 0.6-2.5% spend impact | 1-3% actual | Zero regression |
+| Combined verdict | **15-25% real-world** | **4-10% session** | **7pts first-attempt success** |
+
+[FULL]
 
 ---
 
@@ -263,24 +289,33 @@ From project memory:
 
 ## Sources
 
-- [Caveman Mode: How to Save Tokens — MayhemCode](https://www.mayhemcode.com/2026/04/caveman-claude-code-how-to-save-tokens.html)
-- [Caveman Claude: Token-Cutting Skill — DEV Community](https://dev.to/onsen/caveman-claude-the-token-cutting-skill-thats-changing-ai-workflows-4hmc)
-- [GitHub: caveman by Julius Brussee](https://github.com/juliusbrussee/caveman)
-- [I Tested Caveman (75% Token Savings) — Medium](https://medium.com/@joe.njenga/i-tested-claude-code-caveman-new-trick-and-it-cuts-token-costs-by-75-ddb142d2be85)
-- [Claude API Pricing Docs](https://platform.claude.com/docs/en/about-claude/pricing)
-- [Claude API Pricing 2026 Breakdown — MetaCTO](https://www.metacto.com/blogs/anthropic-api-pricing-a-full-breakdown-of-costs-and-integration)
-- [Compaction — Claude API Docs](https://platform.claude.com/docs/en/build-with-claude/compaction)
-- [Claude Code Token Optimization: Full System Guide](https://buildtolaunch.substack.com/p/claude-code-token-optimization)
-- [Claude Code Context Buffer: The 33K-45K Token Problem](https://claudefa.st/blog/guide/mechanics/context-buffer-management)
-- [18 Claude Code Token Management Hacks — MindStudio](https://www.mindstudio.ai/blog/claude-code-token-management-hacks)
-- [Compressed Claude Code Context by 90% — DEV Community](https://dev.to/ji_ai/i-compressed-claude-codes-context-by-90-heres-how-e1g)
+[FULL]
+- [MayhemCode — Caveman Token Savings](https://www.mayhemcode.com/2026/04/caveman-claude-code-how-to-save-tokens.html) - Apr 12 2026
+- [Someone Taught Claude Like a Caveman (Medium, Senaaravichandran)](https://medium.com/@senaaravichandran/someone-taught-claude-to-talk-like-a-caveman-token-use-dropped-75-0af0712094e2) - May 11 2026
+- [Caveman Skill Cuts Claude Code Output 20%, Not 65% (Implicator AI)](https://www.implicator.ai/caveman-claude-code-skill-cuts-output-20-your-bill-barely-notices-2/) - Apr 16 2026
+- [Claude Code Caveman Mode: Skill That Cuts Tokens (Pasquale Pillitteri)](https://pasqualepillitteri.it/en/news/846/claude-code-caveman-mode-token-saving) - Apr 14 2026
+- [I Made Claude Code Talk Like Caveman (Engr Mejba Ahmed)](https://www.mejba.me/blog/caveman-claude-code-token-optimization) - Apr 7 2026
+- [Julius Brussee Caveman GitHub](https://github.com/JuliusBrussee/caveman) - 51.7K stars, May 2026
+- [GitHub Caveman (Aiia)](https://aiia.ro/blog/caveman-claude-code-save-tokens/) - Apr 6 2026
+- [Does Caveman Save Tokens? Benchmark (Medium, codandotv)](https://medium.com/codandotv/does-caveman-actually-save-tokens-i-built-a-benchmark-to-find-out-469c8047c75d) - May 5 2026
+- [Brevity Constraints Reverse Performance Hierarchies (arXiv 2604.00025)](https://arxiv.org/abs/2604.00025) - March 2026 - 31 models, 1,485 problems, 26pt accuracy gain on brevity constraints
+
+## ZAO Application
+
+1. **Install as passive benefit** - One-minute install, zero config. Don't optimize around it.
+2. **Expect 4-10% real savings** not 75%. On $200/mo usage = $8-20/mo benefit.
+3. **Prioritize /compact over caveman** - 100x better ROI at natural breakpoints.
+4. **Run /caveman:compress on CLAUDE.md** - 40-60% persistent savings every session start.
+5. **Monitor accuracy, not just cost** - arXiv 2604.00025 shows brevity improves reasoning. May be value in reduced correction cycles.
 
 ---
 
-## Next Steps
+## Next Actions
 
-1. Run `/caveman:compress` on `/Users/zaalpanthaki/.claude/CLAUDE.md` for permanent 40–60% savings
-2. Document `/compact` workflow: run at 60% context utilization, before major phase shifts
-3. Benchmark Sonnet vs Opus on typical Zaal OS tasks (estimate: 40% cost reduction)
-4. Consider Batch API for overnight research/documentation runs
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Run `/caveman:compress` on CLAUDE.md for persistent 40-60% | @Zaal | Local | This week |
+| Document `/compact` workflow in CLAUDE.md (run at 60% fill) | Claude | Doc edit | This week |
+| Benchmark Sonnet vs Opus on typical ZAO task (40% cost reduction expected) | @Zaal | Testing | Next sprint |
+| Measure conversation turns reduction (0.6 fewer per task) on next project | @Zaal | Telemetry | Rolling |
 

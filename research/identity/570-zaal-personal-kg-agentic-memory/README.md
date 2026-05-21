@@ -1,15 +1,70 @@
 ---
 topic: identity
 type: guide
-status: in-progress
-last-validated: 2026-04-30
-related-docs: 542, 543, 544, 545, 546, 547, 548, 549, 568, 569
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [005, 271, 545, 546, 549, 568, 569]
+original-query: "Zaal's personal knowledge graph for agentic memory across 16 corpora (YapZ, Fractals, research docs, Farcaster, X, Telegram, ChatGPT, code, decisions, people, music, video, newsletter, ideas, admin) with temporal validity and agent recall (reconstructed)"
 tier: DEEP
 ---
 
 # 570 - Zaal's Personal Knowledge Graph for Agentic Memory
 
-> **Goal:** Design a unified personal knowledge graph (in Bonfire) that ingests 16 corpus types across Zaal's web3 activity, enables agent querying for context, and preserves temporal evolution (what was true in 2024 vs 2026).
+> **Goal:** Design a unified personal knowledge graph (Bonfire or Cloudflare Agent Memory) that ingests 16 corpus types (YapZ, Fractals, research, social, ChatGPT history, decisions) across Zaal's web3 activity, enables agent querying for context (Hermes/ZOE recall), preserves temporal evolution (validity windows), and reduces hallucinations via grounded facts (ERC-8004 reputation registries).
+
+## Key Decisions
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Bonfire (Cloudflare Workers + pgvector) over pure vector-only; Cloudflare Agent Memory as fallback | Hybrid reduces hallucinations 15-20% to <2%; GraphRAG grounding cuts false facts at scale |
+| 2 | Letta (episodic 3-tier) over Mem0 for agent runtime; Mem0 as fallback for consumer features | Letta excels at long-horizon temporal coherence ("yesterday we tried X"); Mem0 more flexible for multi-framework integration |
+| 3 | ERC-8004 reputation registries for agent-authored facts (identity, confidence, validation) | Agents sign facts onchain (Jan 2026 mainnet); enables Hermes/ZOE to write to graph with audit trail |
+| 4 | Validity windows (valid_start/valid_end) + supersedes edges for temporal facts | Captures evolution: "Zaal believed X in 2024, pivoted to Y in 2026"; agents can query historical or current state |
+| 5 | Monthly batch ingest (not real-time) for YapZ + articles; quarterly reconciliation | Real-time capture = burnout (case studies: Matuschak, Forte); async + batch = durability |
+
+## Findings
+
+| Finding | Source | Evidence |
+|---------|--------|----------|
+| GraphRAG reduces hallucinations 30-40% via grounding; clinical QA 98% vs ChatGPT 37% | [GraphRAG vs Vector RAG Guide](https://www.buildmvpfast.com/blog/graphrag-vs-vector-rag-knowledge-graph-ai-2026), [Ontology-grounded KGs in Clinical QA](https://pubmed.ncbi.nlm.nih.gov/41610815/) | Structure constraint: if graph has no X-Y edge, LLM cannot fabricate it; verifiable semantics |
+| Letta has 3-tier episodic memory (core RAM, archival vector, recall conversation); Mem0 is bolt-on layer | [TokenMix Mem0 vs Letta 2026](https://tokenmix.ai/blog/ai-agent-memory-mem0-vs-letta-vs-memgpt-2026), [Vectorize Best Frameworks](https://vectorize.io/articles/best-ai-agent-memory-systems) | Letta runtime advantage: stateful agents maintain session coherence; Mem0 flexible for LangChain/CrewAI/AutoGen |
+| ERC-8004 mainnet Jan 29 2026; Identity/Reputation/Task Validation registries; 20K+ agents deployed in 2 weeks | [ERC-8004 EIP](https://eips.ethereum.org/EIPS/eip-8004), [Crypto News Launch](https://crypto.news/ethereum-erc-8004-ai-agents-mainnet-launch-2026/), [ERC-8004 Guide](https://blog.quicknode.com/erc-8004-a-developers-guide-to-trustless-ai-agent-identity/) | Agents sign facts with `authored_by` + `confidence`; reputation scores accumulate onchain; Base/OP/Polygon/Arbitrum/BNB have live registries |
+| Cloudflare Agent Memory (April 2026 beta): edge-distributed, Durable Objects + Vectorize + Workers AI; multi-channel retrieval | [Cloudflare Agents Week 2026](https://www.cloudflare.com/agents-week/updates/), [Memory Docs](https://developers.cloudflare.com/agents/concepts/memory/) | Solves context rot; tight integration with Cloudflare stack; statelessness becomes managed service |
+| 5-year KG survivor patterns: <10-12 classes, loose schema, async batch capture, outsource triage by yr 2 | Doc 570 Part 6 (case studies: Matuschak 8yr, Appleton 7yr, Forte 8yr, Linus Lee 5yr) | Over-categorization kills projects; mortality 40-60% in Roam/Logseq; digital gardens 70%+ retain |
+
+## ZAO Application (Personal KG Track)
+
+1. **Stage 1 (Week 1, May 2026):** Validate YapZ Ep 1 via Bonfire bot; test deeplink round-trip (critical blocker). If pass -> Stage 2. If fail -> switch to SDK direct ingest.
+2. **Stage 2 (Weeks 2-4):** Ingest YapZ archive (18 episodes), Q1 2026 decision memos, top-20 cited research docs. Target: 500-1000 entities (threshold for agent integration).
+3. **Stage 3 (Weeks 5-8):** Add secondary corpora (Farcaster casts 200 recent, Telegram exports, ChatGPT history Q4-Mar).
+4. **Stage 4 (Weeks 9+):** Fractals history (90+ weeks), ZAO Festivals archive, people relationships (188 members + 100 web3 contacts).
+5. **Agent Integration (defer to Stage 2 completion + ERC-8004 verification):** Wire Hermes/ZOE recall against graph; use `authored_by: agent_id` + `confidence: 0.0-1.0` for write governance.
+6. **Durability:** Monthly OWL exports to git from day 1. Assume Bonfire migration in year 5; build for portability.
+
+## Sources
+
+- [ERC-8004: Trustless Agents](https://eips.ethereum.org/EIPS/eip-8004) [FULL]
+- [ERC-8004 Mainnet Launch, Crypto News](https://crypto.news/ethereum-erc-8004-ai-agents-mainnet-launch-2026/) [FULL]
+- [ERC-8004 Developer's Guide, QuickNode](https://blog.quicknode.com/erc-8004-a-developers-guide-to-trustless-ai-agent-identity/) [FULL]
+- [Mem0 vs Letta vs MemGPT 2026, TokenMix](https://tokenmix.ai/blog/ai-agent-memory-mem0-vs-letta-vs-memgpt-2026) [FULL]
+- [Best AI Agent Memory Frameworks 2026, Vectorize](https://vectorize.io/articles/best-ai-agent-memory-systems) [FULL]
+- [GraphRAG vs Vector RAG, BuildMVPFast](https://www.buildmvpfast.com/blog/graphrag-vs-vector-rag-knowledge-graph-ai-2026) [FULL]
+- [Ontology-grounded Knowledge Graphs in Clinical QA, PubMed/ScienceDirect](https://pubmed.ncbi.nlm.nih.gov/41610815/) [FULL]
+- [Cloudflare Agents Week 2026 Updates](https://www.cloudflare.com/agents-week/updates/) [FULL]
+- [Cloudflare Agent Memory Documentation](https://developers.cloudflare.com/agents/concepts/memory/) [FULL]
+
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Stage 1: YapZ Ep 1 -> Bonfire bot; validate deeplinks | Zaal | VALIDATION | 2026-05-27 |
+| Stage 2: YapZ archive (18) + decision memos + top-20 research docs via SDK | Infrastructure | CODE | 2026-06-15 |
+| Verify ERC-8004 mainnet status + Base registry deployment (foundation for agent-write governance) | Infrastructure | RESEARCH | 2026-05-25 |
+| Schema lock: approve 4 net-new classes + 7 predicates (Part 8); resist additions for 12mo | Product | DESIGN | 2026-05-28 |
+| Email Joshua.eth: Part 11 questions (Bonfire API limits, export completeness, agent response format) | Zaal | COMMUNICATION | 2026-05-25 |
+| Decide: Bonfire vs Cloudflare Agent Memory vs Letta runtime (final vendor lock) | Zaal | DECISION | 2026-06-01 |
+| Setup monthly OWL backup pipeline to git (day 1, not day 90) | Infrastructure | CODE | 2026-06-30 |
+| Stage 3: Secondary corpora (Farcaster, Telegram, ChatGPT history) | Infrastructure | INGESTION | 2026-07-30 |
 
 ---
 
@@ -480,6 +535,36 @@ The schema in Parts 1-5 is **directionally right** (multi-corpus, source-attribu
 - Sign off on the agent-write governance pattern in Part 7 (confidence, authored_by, ACLs)?
 - Email Joshua.eth this week with the Part 11 questions + 2 fork-derived ones (MCP server roadmap, ERC-8004 alignment)?
 
+## Implementation Status (ZAOOS Codebase + Zaal Infrastructure)
+
+**Currently implemented:**
+- ZOE bot running on VPS with Hermes pattern (bot/src/zoe/)
+- Supabase + XMTP for messaging
+- YapZ podcast series: 18 episodes (YouTube IDs, timestamps, speakers, transcripts exist)
+- Decision memos and memory docs in ~/.claude/projects/.../memory/
+- Research library: 540+ docs in /research/
+
+**Not yet implemented:**
+- Bonfire instance setup (or Cloudflare Agent Memory evaluation)
+- Episodic ingestion pipeline (YapZ -> bot -> Bonfire)
+- Source attribution (source_url + source_timestamp + quote) for all 16 corpora
+- Temporal validity windows (valid_start / valid_end / supersedes) in schema
+- ERC-8004 reputation registry integration for agent-authored facts
+- Letta runtime (currently ZOE runs on Hermes pattern + Claude Sonnet/Opus)
+- OWL export + backup pipeline to git
+- Cross-corpus entity linking (people, decisions, topics across YapZ/Fractals/decisions/email)
+
+**Case study threshold:** Currently below 500 nodes (18 YapZ + ~50 decision memos + 540 research docs but not yet connected into graph). Agents wired before threshold reached = hallucination + frustration per case studies.
+
+**Critical blocker:** Bonfire API documentation (rate limits, batch payload max, export completeness) not yet validated by Joshua.eth. Fall back to Cloudflare Agent Memory if Bonfire unavailable.
+
 ---
+
+*Living document. Zaal's agentic second brain. For 5-year durability, lock schema at ~20 classes / ~50 predicates max, capture async+batch (not real-time), and export monthly to git from day 1.*
+
+*Decision required before Stage 2:*
+- *Approve schema extensions in Part 8?*
+- *Sign off on ERC-8004 agent-write governance pattern?*
+- *Email Joshua.eth with Part 11 questions this week?*
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>

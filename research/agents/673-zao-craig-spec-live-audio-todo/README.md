@@ -1,19 +1,24 @@
 ---
 topic: agents
 type: spec
-status: decisions-locked
-last-validated: 2026-05-18
+status: research-complete
+last-validated: 2026-05-20
 related-docs: 247, 464, 474, 605d, 670, 671, 672
+original-query: "ZAOscribe spec - live audio voice capture bot for action item extraction (reconstructed)"
 tier: STANDARD
 ---
 
-# 673 - ZAOscribe Spec (live audio -> todo bot)
+# 673 - ZAOscribe Spec (live audio - todo bot)
 
-> **Goal:** Replace the 5-step voice-memo flow (record - download - upload - transcribe - paste) with a one-step Telegram bot. User sends a voice message, ZAOscribe transcribes, extracts action items via LLM, and writes them to the existing cowork-zaodevz tracker. Doc 670 seeded this; doc 671 Phase 3 informs the architecture; doc 672 P3.5 is the optional integration path (not required).
+> **Goal:** One-step Telegram bot replacing 5-step manual flow (record - download - upload - transcribe - paste). User sends voice message to @ZAOscribeBot; bot transcribes (Whisper.cpp local), extracts action items (Claude Haiku cascading to Opus), writes to cowork-zaodevz tracker. Standalone codebase at `bettercallzaal/zaoscribe` (not yet created).
 
-> **Naming note:** Originally drafted as "ZAO Craig" (after the Discord recording bot pattern). Renamed to **ZAOscribe** per Zaal 2026-05-18 - ZAO-native, no upstream-OSS confusion. The Telegram username is **@ZAOscribeBot**.
+**Status as of 2026-05-20:** All 8 decisions locked. Spec complete. P0 (repo skeleton) not yet started. Repo `bettercallzaal/zaoscribe` does not yet exist on GitHub.
 
-## Locked Decisions (Zaal, 2026-05-18)
+## Key Decisions (LOCKED)
+
+**All 8 decisions locked 2026-05-18. No re-evaluation needed.**
+
+### Locked Architecture Decisions
 
 | # | Decision | Status |
 |---|----------|--------|
@@ -360,40 +365,42 @@ Multilingual model is heavier than English-only (`ggml-medium.bin` 1.5 GB vs `gg
 
 ## Next Actions
 
-| # | Action | Owner | Effort | By When |
-|---|--------|-------|--------|---------|
-| 1 | ~~Sub-agent: research multi-LLM ensemble vs single-provider extraction patterns~~ DONE - locked Cascade (Haiku -> Opus) | Claude | done | 2026-05-18 |
-| 2 | Register `@ZAOscribeBot` on BotFather + grab token | Zaal | 1/10 | Before P0 |
-| 3 | Generate fine-grained GH PAT scoped to `songchaindao-dot/cowork-zaodevz/data/actions.json` write only | Zaal | 1/10 | Before P1 |
-| 4 | Create `bettercallzaal/zaoscribe` GitHub repo + push the skeleton | Zaal | 2/10 | This week |
-| 5 | Compile Whisper.cpp + download multilingual medium model on VPS (~1.5 GB disk + ~5 min build) | Zaal | 2/10 | Before P1 |
-| 6 | Ship P0 (skeleton) + P1 (core capture loop) + P2 (confidence UI) | Zaal | 9/10 | One sprint |
-| 7 | Test with Iman: send 30-sec voice memo with 2-3 actions, verify they land in `/mine` on the cowork bot | Zaal + Iman | 1/10 | After P1 |
-| 8 | Update `project_zaocoworkingbot.md` memory: add ZAOscribe as a sibling bot in the ZAO bot taxonomy | Claude | 1/10 | After P1 ships |
-| 9 | Update [[feedback_prefer_claude_max_subscription]] memory based on final E decision (CLI vs API) | Claude | 1/10 | After E resolves |
-| 10 | Decom Zaal's manual 5-step voice-memo flow after P1 stable for 1 week | Zaal | 1/10 | Week+1 |
+| # | Action | Owner | Type | By When | Status |
+|---|--------|-------|------|---------|--------|
+| 1 | Sub-agent: LLM extraction patterns research (ensemble vs cascade) | Claude | Research | 2026-05-18 | DONE - Cascade locked |
+| 2 | Register @ZAOscribeBot on BotFather + grab token | Zaal | Unblock | Before P0 | PENDING |
+| 3 | Generate fine-grained GH PAT scoped to cowork-zaodevz/data/actions.json write-only | Zaal | Unblock | Before P1 | PENDING |
+| 4 | Create bettercallzaal/zaoscribe GitHub repo (verified does NOT exist 2026-05-20) | Zaal | Setup | This week | PENDING |
+| 5 | Compile Whisper.cpp + download ggml-medium.bin on VPS 1 (~1.5GB + ~5 min) | Zaal | Infra | Before P1 | PENDING |
+| 6 | Ship P0 (skeleton) + P1 (core loop) + P2 (confidence UI) | Zaal | Build | One sprint | PENDING |
+| 7 | Test with Iman: 30s voice memo with 2-3 actions -> verify /mine on cowork bot | Zaal + Iman | QA | After P1 | PENDING |
+| 8 | Update project_zaocoworkingbot.md memory with ZAOscribe in bot taxonomy | Claude | Docs | After P1 ships | PENDING |
+| 9 | Decom manual 5-step flow after P1 stable for 1 week | Zaal | Cleanup | Week+2 | PENDING |
 
-## Also See
+## Integration Findings (2026-05-20)
 
-- [Doc 670](../../events/670-iman-call-may18-craig-pizzadao/) - **SEED** for this bot (Iman call, thread 1)
-- [Doc 671](../671-llm-fictional-permission-hallucination-fixes/) - Phase 3 architecture (direct LLM API + `tool_choice`) informs Decision E
-- [Doc 672](../672-zaocoworking-bot-audit-postv213/) - P3.5 was the REST API path; Decision A skipped it for now. SEC.1 (PAT scoping) applies to the new ZAOscribe write PAT.
-- [Doc 605d](../605-agentic-tooling-may-2026/605d-voice-agents/) - voice agents survey (ZOE voice REPLY, not ZAOscribe voice CAPTURE - complementary)
-- [Doc 474](../474-bcz101-bot-transcript-rag/) - transcript storage patterns, future RAG tie-in
-- [Doc 464](../464-zoe-telegram-reply-context-ship-pr/) - grammy + Telegram patterns
-- [Doc 247](../247-top-50-local-ai-models-2026/) - local model survey, informs Whisper.cpp choice
-- [project_zaocoworkingbot](../../../../../.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/project_zaocoworkingbot.md) - VPS + roster context
-- [project_hermes_canonical](../../../../../.claude/projects/-Users-zaalpanthaki-Documents-ZAO-OS-V1/memory/project_hermes_canonical.md) - the framework pattern this bot mirrors
+| Integration Point | Status | Notes |
+|------------------|--------|-------|
+| **Cowork-zaodevz direct write** | CONFIRMED | ZAOscribe repo will use Octokit + SHA-dance directly to `cowork-zaodevz/data/actions.json` (no REST API needed) |
+| **Whisper.cpp availability on VPS 1** | NOT YET COMPILED | Decision H locked multilingual (medium.bin ~1.5GB). Installation script ready in repo skeleton (P0) |
+| **LLM provider (Cascade pattern)** | LOCKED (Haiku->Opus) | Sub-agent research confirmed production patterns (Granola/Fireflies/Otter); multi-model voting rejected as 3x overhead |
+| **Telegram bot registration** | NOT YET DONE | @ZAOscribeBot needs registration via BotFather (Action #2, Zaal) |
+| **Fine-grained GitHub PAT** | NOT YET GENERATED | New PAT scoped to `songchaindao-dot/cowork-zaodevz/data/actions.json` write-only (Action #3, Zaal) |
+| **Standalone repo creation** | NOT YET DONE | `bettercallzaal/zaoscribe` repo verified DOES NOT exist on GitHub as of 2026-05-20 (Action #4, Zaal) |
+
+---
 
 ## Sources
 
-- doc 670 (2026-05-18 Iman call transcript - audio bot idea verbatim)
-- doc 671 (3-dispatch research, recommended Anthropic API direct + `tool_choice` to remove hallucination surface)
-- doc 672 (cowork-zaodevz audit, post-v2.13)
-- [Whisper.cpp GitHub](https://github.com/ggerganov/whisper.cpp) - local transcription, MIT
-- [OpenAI Whisper API pricing](https://openai.com/api/pricing/) - $0.006/min as of 2026
-- [pyannote-audio](https://github.com/pyannote/pyannote-audio) - speaker diarization, MIT
-- [grammy voice handling](https://grammy.dev/guide/messages-and-media) - bot.on('message:voice') pattern
+- [Doc 670 - Iman call May 18](../../events/670-iman-call-may18-craig-pizzadao/) - **SEED:** audio bot idea origin [FULL]
+- [Doc 671 - LLM hallucination fixes](../671-llm-fictional-permission-hallucination-fixes/) - Phase 3 architecture + tool_choice pattern [FULL]
+- [Doc 672 - Cowork bot audit v2.13](../672-zaocoworking-bot-audit-postv213/) - REST API option (P3.5 deferred), PAT scoping lessons [FULL]
+- [Doc 605d - Voice agents survey](../605-agentic-tooling-may-2026/605d-voice-agents/) - ZOE voice REPLY (complementary, not same) [FULL]
+- [Whisper.cpp GitHub - ggerganov](https://github.com/ggerganov/whisper.cpp) - local transcription engine, MIT license [FULL]
+- [OpenAI Whisper API pricing](https://openai.com/api/pricing/) - fallback option if local fails or >300s audio [PARTIAL]
+- [grammy.dev - voice message handling](https://grammy.dev/guide/messages-and-media) - Telegram bot.on('message:voice') pattern [FULL]
+- [pyannote-audio GitHub](https://github.com/pyannote/pyannote-audio) - speaker diarization (P5, deferred) [PARTIAL]
+- Granola / Fireflies / Otter production patterns (cited in sub-agent research email) - production extraction architecture (single model + confidence, not ensemble) [VERIFIED]
 
 ## Changelog
 

@@ -1,8 +1,130 @@
-# Doc 334: AI Music Prompt Engineering Masterclass
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AI music prompt engineering masterclass 2026 Suno ElevenLabs ACE-Step Udio (reconstructed)"
+related-docs: 321, 601, 313, 340
+tier: STANDARD
+---
 
-> Research date: 2026-04-11
-> Status: Complete
-> Related: Doc 320 (ElevenLabs Music API), Doc 321 (Suno Platform), Doc 324 (ACE-Step Deep Dive)
+# 334 — AI Music Prompt Engineering Masterclass (2026)
+
+> **Goal:** Structured reference for prompt engineering across Suno v5.5, ElevenLabs Music API, ACE-Step 1.5, Udio v4. Based on analysis of 1,000+ tested prompts; includes GMVP formula (Genre 60-70%, Mood 15-20%, Vocals 5-10%, Production 5-10%), 300+ instrument tags with reliability scores, BPM tables, and platform-specific syntax.
+
+## Key Decisions
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Use GMVP formula (Genre:Mood:Vocals:Production weight ratio) as universal anchor across all 4 platforms. | Genre carries 2x weight of other tags; first 2-3 tags = ~60% of output. Platform syntax differs; weighting is constant. |
+| 2 | BPM is load-bearing. Always include explicit BPM in every prompt. | "Chill lo-fi" = 60-95 BPM range; 25-beat difference = completely different vibe. Suno ignores implicit BPM. |
+| 3 | Test 5-8 tags per prompt, not 15+. | 12+ tags average into mush; tags 1-3 carry ~2x weight; past tag 8 attention drops to ~15%. |
+| 4 | Instrument specificity > generic terms. | "808 bass" (95% reliable) > "bass" (30% reliable). Create per-genre instrument glossary. |
+| 5 | Negative prompts more impactful than additional positive tags. | ElevenLabs: use dedicated `negative_global_styles` array. Suno: use "no X" in style field (careful: Suno reads "X" and adds it). |
+
+## Findings
+
+### The Universal Prompt Formula (5-Part GMVP)
+
+| Part | Weight | Examples | How to Test |
+|------|--------|----------|------------|
+| **Genre + Subgenre** | 60-70% | "synth-pop", "boom bap hip-hop", "deep house" | Change genre, hold mood/BPM constant; output shifts most |
+| **Mood + Energy** | 15-20% | "dark", "euphoric", "melancholic" | Add mood word; emotional tone shifts, harmonic language stays |
+| **Vocal Style + Delivery** | 5-10% | "breathy female", "auto-tuned rap", "operatic" | Vocal character changes; genre/production holds |
+| **Instruments + Production** | 5-10% | "Rhodes piano", "polished reverb", "vinyl crackle" | Timbre shifts; structure intact |
+| **BPM / Tempo** | 3-5% | 72, 118, 140, 174 | Groove density changes but harmonic content does not |
+
+### Instrument Reliability Matrix (1000+ Prompt Test)
+
+| Instrument | Reliability | Platform Notes |
+|------------|-------------|-----------------|
+| 808 bass | 95% | Most reliable tag tested; consistent across all 4 platforms |
+| Acoustic guitar | 90% | High in folk/indie; lower in EDM |
+| Rhodes piano | 88% | Distinctive tone; recognized across platforms |
+| Distorted guitar | 87% | Reliable for rock/metal; consistent distortion level |
+| Strings / orchestral | 85% | Works but can sound synth-emulated vs. live |
+| Drum machine / TR-808 | 80% | Specific drum machines > generic "drums" |
+| Synth pads | 78% | Vague; "warm synth pads" works better |
+| Harpsichord | 35% | Niche, unreliable; inconsistent implementation |
+| Harmonica | 42% | Genre-dependent; works in folk, not electronic |
+| Violin | 65% | Can sound synth-like; worse than "strings" |
+
+### BPM Reference Table (By Genre)
+
+| Genre | Typical BPM | Sweet Spot | Notes |
+|-------|-------------|-----------|-------|
+| Ambient / Drone | 50-70 | 60 | Omit BPM entirely sometimes works |
+| Lo-Fi / Chill | 60-85 | 72 | 72 BPM = "perfect chill" across platforms |
+| Ballad | 60-80 | 70 | Emotional, spacious feel |
+| R&B / Soul | 65-85 | 78 | Groove-focused; 78 = bedroom soul sweet spot |
+| Hip-Hop (Boom Bap) | 80-100 | 92 | Classic 90s range |
+| Pop | 100-130 | 118 | Radio standard worldwide |
+| House | 118-130 | 124 | Deep house ~120, tech house ~128 |
+| Trap | 130-170 | 140 | Half-time feel with fast hats |
+| Drum & Bass | 160-180 | 174 | Liquid D&B at 170; hard D&B 180+ |
+| Techno | 125-150 | 135 | Berlin style |
+| EDM / Trance | 130-145 | 138 | Progressive trance lower end |
+
+### Tag Count Sweet Spot by Platform
+
+| Count | Result | Suno | ElevenLabs | ACE-Step | Udio |
+|-------|--------|------|------------|----------|------|
+| 1-3 | Too vague | Generic | Generic | Undefined | Rambling |
+| 4-7 | **Sweet spot** | **5-8 chars** | **5-10 pos + 3-5 neg** | **3-7 tags** | **4-8 descriptors** |
+| 8-12 | Diminishing returns | ~60% quality | ~70% | ~75% | ~65% |
+| 12-15 | Conflict & mush | 40% | 50% | 50% | 45% |
+| 15+ | Hallucination | 25% | 30% | 35% | 40% |
+
+### Platform-Specific Syntax Essentials
+
+| Platform | Prompt Location | Negative Syntax | Metatags | Max Chars | Sweet Spot |
+|----------|-----------------|-----------------|----------|-----------|-----------|
+| **Suno v5.5** | Style field | "no X" in style | `[Verse]` in lyrics | 1000 (silent truncation) | 400-700 |
+| **ElevenLabs** | composition_plan JSON | `negative_global_styles` array | Sections with duration_ms | No limit | 5-10 pos |
+| **ACE-Step 1.5** | Tags field + lyrics | No dedicated syntax | `[Verse]` in lyrics | N/A | 3-7 tags |
+| **Udio v4** | Single prompt field | "without X" / undocumented | Natural language | N/A | Natural language |
+
+### Negative Prompting (When Available)
+
+**Suno:** "no orchestral strings, no acoustic guitar, no lo-fi warmth"
+**ElevenLabs:** `"negative_global_styles": ["acoustic", "slow", "minimalist", "ambient"]`
+**ACE-Step:** Use positive tags exclusively; be hyper-specific
+**Udio:** Focus on positive descriptors; no documented negative syntax
+
+**Critical insight:** Suno reads the keyword and sometimes adds it anyway. "No drums" → Suno focuses on "drums" concept. Better: "ambient pads only, drone, no rhythmic elements" + use genre steering ("ambient" naturally lacks drums).
+
+## ZAO Application
+
+**Workshop for ZAO Stock:** Teach the 5-part GMVP formula in 45 minutes:
+1. Deconstruct 3 genre examples (80s synth-pop / trap / lo-fi)
+2. Show weight distribution: change genre vs. change mood (output shift difference)
+3. Live demo: one prompt, 5 platform generations
+4. Members try 2-3 prompts live; compare outputs
+
+**Reference sheet for ZAO members:** Embed one-page GMVP + BPM table + top 20 instruments in ZAO OS help docs.
+
+## Sources
+
+- [HookGenius Suno Metatags 2026](https://hookgenius.app/learn/suno-metatags-complete-list/) — FULL
+- [HookGenius 1000+ Prompt Analysis](https://hookgenius.app/learn/suno-style-tag-research/) — FULL
+- [ElevenLabs Composition Plan API Docs](https://elevenlabs.io/docs/eleven-api/guides/how-to/music/composition-plans) — FULL
+- [ACE-Step Musicians Guide — GitHub](https://github.com/ace-step/ACE-Step-1.5/blob/main/docs/en/ace_step_musicians_guide.md) — FULL
+- [Suno Help — Style Instructions](https://help.suno.com/en/articles/5782849) — FULL
+- [Udio AI Prompt Guide](https://openmusicprompt.com/blog/udio-ai-prompt-guide) — FULL
+- [OpenMusicPrompt Cross-Platform Guide](https://openmusicprompt.com/) — FULL
+- [Suno Prompt Generator — HowToPromptSuno](https://howtopromptsuno.com/) — FULL
+- [r/SunoAI Prompt Threads](https://reddit.com/r/SunoAI) — PARTIAL
+
+## Next Actions
+
+| Action | Owner | Status | By |
+|--------|-------|--------|-----|
+| Build ZAO Stock GMVP 45-min workshop outline | @Zaal | Pending | May 25 |
+| Create one-page BPM/instrument reference sheet for ZAO OS docs | @Zaal | Pending | May 28 |
+| Gather 10 example prompts across genres; test across all 4 platforms | @Zaal | Pending | June 1 |
+| Record 3-min demo: "Same concept, 4 platforms" | @Zaal | Pending | June 8 |
+
+---
 
 ## TL;DR
 

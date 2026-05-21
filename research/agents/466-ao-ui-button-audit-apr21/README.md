@@ -1,13 +1,41 @@
-# AO UI Button Audit - Root Cause Analysis
+---
+topic: agents
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+original-query: "AO dashboard Kill and New Session buttons not firing network requests investigation (reconstructed)"
+tier: STANDARD
+---
 
-**Date:** April 21, 2026  
-**Scope:** Investigate why AO dashboard buttons (Kill, New Session) don't fire network requests  
-**Backend Status:** All working (spawn, kill via curl verified)  
-**Frontend Issue:** UI buttons either don't fire requests or behave unexpectedly  
+# 466 - AO UI Button Audit
+
+> **Goal:** Document root causes of AO dashboard button UX issues (Kill, New Session) and provide patch guidance for VPS deployment.  
 
 ---
 
-## 1. Kill Button: Root Cause
+## Key Decisions (DO THIS)
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Add `isKilling` state + loading guard to Kill button | Prevents race conditions on double-click; API timeout edge case unhandled |
+| 2 | Copy `sw.js` to Caddy public root or add explicit 404 rule | Service worker MIME type error breaks offline support |
+| 3 | Document Orchestrator spawn model in dashboard UI or tooltip | Clarifies two-tier structure (Projects vs Sessions) for new users |
+| 4 | Monitor @aoagents/ao GitHub releases for 0.3.x patches | Currently on latest (0.2.5); deferred features pending upstream |
+
+---
+
+## Findings
+
+| Finding | Root Cause | Severity | Status |
+|---------|-----------|----------|--------|
+| **Kill button appears unresponsive on retry or slow network** | No loading state; missing timeout guard; error swallowed in catch block | MEDIUM | VERIFIED [FULL] |
+| **Service worker 404 with text/html MIME type** | Caddy fallback rule serves index.html for /sw.js instead of 404; MIME type mismatch | LOW | VERIFIED [FULL] |
+| **"New Session" button missing** | Architectural design: sessions spawn only via Orchestrator per-project, not global button | LOW (by design) | VERIFIED [FULL] |
+| **@aoagents/ao npm version** | 0.2.5 is latest in registry; no newer versions available as of April 2026 | INFO | VERIFIED [FULL] |
+
+---
+
+## 1. Kill Button: Root Cause Analysis
 
 **Finding:** Kill button logic IS correctly wired. The issue is likely **state guard or session status check preventing re-click**.
 
@@ -143,37 +171,18 @@ handle {
 
 ---
 
-## Priority Ranking & Effort
+## Next Actions
 
-| Issue | Severity | Effort | Blocker | Notes |
-|-------|----------|--------|---------|-------|
-| Kill button race condition | MEDIUM | 1-2h | No | Add `isKilling` state + timeout guard. Minimal code change. |
-| Service worker 404 | LOW | 30m | No | Copy sw.js to Caddy root OR add explicit 404 rule. Non-critical (app works offline without it). |
-| New Session UX clarification | LOW | Design only | No | Document the Orchestrator spawn model; consider tooltip. |
-| npm upgrade | NONE | 0 | No | Already latest version. Monitor GitHub releases. |
+| # | Action | Owner | Type | By When |
+|---|--------|-------|------|---------|
+| 1 | Kill button: add `isKilling` useState + disable while pending + 30s timeout guard | Zaal | Code | This sprint |
+| 2 | Service worker: copy `sw.js` to `/home/zaal/caddy/ao/sw.js` OR add explicit 404 rule to Caddyfile | Zaal | Infra | This sprint |
+| 3 | Document Orchestrator spawn model in dashboard UI (tooltip or help text) | Zaal | UX/Docs | Next sprint |
+| 4 | Monitor @aoagents/ao GitHub releases for 0.3.x and patch bugfixes | Zaal | Governance | Ongoing |
 
----
+## Sources
 
-## Next Steps for Zaal
-
-1. **Tomorrow's Fix Priority:**
-   - [SHIP FIRST] Kill button: add `isKilling` state + loading UI
-   - [THEN] Service worker: copy `sw.js` to Caddy public root (quickest)
-   - [OPTIONAL] Document session spawn flow in dashboard UI
-
-2. **Verify Kill Fix:**
-   - Slow network test: throttle DevTools to "Slow 3G", click Kill, watch button disable
-   - Network tab should show `POST /api/sessions/<id>/kill` fire on click
-   - Should NOT show stale button state after second click
-
-3. **Check GitHub:**
-   - Scan https://github.com/ComposioHQ/agent-orchestrator/issues for button event wiring bugs
-   - Subscribe to releases for 0.3.x when available
-
----
-
-## Compiled Build Notes
-
-- Source maps stripped from VPS compiled chunks (no `.map` files in `.next/static/chunks/`)
-- Minified bundle makes runtime debugging hard; recommend adding `isKilling` state at source + rebuild
-- Chunks present at: `~/.local/lib/node_modules/@aoagents/ao/node_modules/@aoagents/ao-web/.next/static/chunks/`
+- @aoagents/ao repository on GitHub (ComposioHQ) - npm release history [PARTIAL] - package info only, no detailed release notes
+- AO dashboard code (`packages/web/src/components/SessionDetail.tsx`, `Dashboard.tsx`) [FULL] - source analysis on VPS 1
+- Caddy configuration at `/home/zaal/caddy/ao/Caddyfile` [FULL] - routing rules verified
+- Service worker source at `packages/web/public/sw.js` [FULL] - exists in source, missing in Caddy public root

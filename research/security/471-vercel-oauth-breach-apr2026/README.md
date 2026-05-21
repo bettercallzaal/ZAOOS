@@ -1,29 +1,57 @@
-# 471 - Vercel OAuth Supply Chain Breach April 2026 - ZAO Action Checklist
+---
+topic: security
+type: incident-postmortem
+status: research-complete
+last-validated: 2026-05-20
+original-query: "Vercel OAuth supply chain breach April 2026 impact assessment and remediation (reconstructed)"
+tier: STANDARD
+---
 
-> **Status:** URGENT ACTION REQUIRED
-> **Date:** 2026-04-21
-> **Severity:** P0 — ZAO OS runs on Vercel (see `CLAUDE.md` + `.vercel/`)
-> **Source:** Brendan Falk X post 2026-04-19 + Vercel bulletin + TechCrunch + TrendMicro analysis
-> **Goal:** Determine ZAO's exposure to the April 2026 Vercel/Context.ai supply chain breach and execute rotation checklist
+# 471 - Vercel OAuth Supply Chain Breach April 2026
+
+> **Goal:** Document the April 2026 Vercel/Context.ai OAuth supply chain breach, verify ZAO exposure, and confirm remediation steps are current as of May 20 2026.
 
 ---
 
-## Key Decisions / Recommendations
+## Key Decisions (DO THIS)
 
-| Decision | Recommendation |
-|----------|----------------|
-| **Check Google Workspace NOW** | RUN Falk's audit immediately: https://admin.google.com/ac/owl/list?tab=apps filter by `110671459871-30f1spbu0hptbs60cb4vsmv79i7bbvqj.apps.googleusercontent.com`. If hit = revoke + treat all Workspace-adjacent tokens as burned |
-| **Assume non-sensitive env vars leaked** | ROTATE all Vercel env vars not marked "sensitive". ZAO OS has 40+ env vars; only marked-sensitive ones are safe |
-| **Rotate upstream BEFORE Vercel** | Per GitGuardian: rotate AWS/Supabase/Neynar/Stripe keys in their dashboards FIRST, then push new values to Vercel. Otherwise brief window of stolen-key validity |
-| **Re-classify secrets** | Mark `SUPABASE_SERVICE_ROLE_KEY`, `NEYNAR_API_KEY`, `SESSION_SECRET`, `APP_SIGNER_PRIVATE_KEY`, all RPC keys, Coinflow/Stream.io keys, XMTP app key as "sensitive" in Vercel. This stops future read-back per Vercel docs |
-| **MFA + deployment protection** | ENABLE MFA on Vercel account + set Deployment Protection to Standard minimum. Rotate Deployment Protection tokens if configured |
-| **Context.ai is the real lesson** | AUDIT every OAuth app in Google Workspace. Attacker pivoted via a third-party AI tool an employee used. Your team's AI tools are your attack surface |
-| **ZAO affected customer check** | CONFIRM whether ZAO received the "affected customer" email from Vercel (subset of customers). If yes, exposure certain |
-| **Post-rotate: add secret scanning** | INSTALL GitGuardian ggshield + pre-commit hook to prevent silent re-exposure |
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Assume all non-sensitive Vercel env vars ARE leaked until rotated | OAuth breach confirmed limited subset; "non-sensitive" = unencrypted plaintext at rest |
+| 2 | Rotate upstream secrets FIRST, then push to Vercel | Prevents brief window where stolen keys still have validity |
+| 3 | Mark all secrets as "sensitive" in Vercel dashboard after rotation | Default changed post-April 2026; new vars are safe, old ones must be flipped + rotated |
+| 4 | Audit Google Workspace OAuth grants quarterly | Context.ai chain confirms OAuth sprawl is systemic risk; "Allow All" is critical vector |
+| 5 | Enable Vercel Deployment Protection + MFA on team account | Prevents re-entry via same OAuth path; Vercel shipped this post-incident |
 
 ---
 
-## What Happened (Timeline)
+## Findings
+
+| Finding | Evidence | Status |
+|---------|----------|--------|
+| **Incident confirmed, scoped to non-sensitive env vars** | Vercel KB bulletin April 23, Sola Fide + Trend Micro analysis; confirmed in April 20-23 updates | VERIFIED [FULL] |
+| **Context.ai OAuth app ID published as IOC** | Client ID `110671459871-30f1spbu0hptbs60cb4vsmv79i7bbvqj.apps.googleusercontent.com` confirmed across 5 sources | VERIFIED [FULL] |
+| **Lumma Stealer malware origin confirmed, dwell ~2 months** | Hudson Rock + Trend Micro correction (initial Feb 2026, detected ~Apr 17-19) | VERIFIED [FULL] |
+| **Vercel default changed: new env vars now "sensitive" by default post-breach** | Sola Fide + AkeyLess confirm April 2026 remediation includes default flip | VERIFIED [FULL] |
+| **npm/open-source supply chain confirmed uncompromised** | GitHub + Microsoft + npm + Socket coordinated audit, no evidence of package tampering | VERIFIED [FULL] |
+| **Affected customer notification ongoing; ShinyHunters claim unverified** | April 19 BreachForums post; ShinyHunters later denied involvement; claim later deleted | PARTIAL [FULL] |
+| **No evidence Sensitive-flagged variables were accessed** | Vercel CEO confirmed in multiple sources; encrypted at rest | VERIFIED [FULL] |
+| **Vercel team audit log review recommended** | Post-incident guidance: review last 30 days for anomalous env var reads | NOT YET DONE [ACTION] |
+
+
+---
+
+## ZAO Application
+
+**ZAO OS runs on Vercel** (confirmed in `CLAUDE.md` stack + `.vercel/` directory). 301 API routes, 40+ env vars including critical secrets: `SUPABASE_SERVICE_ROLE_KEY`, `NEYNAR_API_KEY`, `SESSION_SECRET`, `APP_SIGNER_PRIVATE_KEY`.
+
+**Exposure likelihood:** MEDIUM. If ZAO did not receive Vercel's April 19-23 "affected customer" notification, assume non-sensitive vars may be leaked and treat accordingly. Check inbox for notification; if absent, rotate all secrets as precaution per Phase 3 checklist below.
+
+**Action owner:** Zaal (account + infra access). 
+
+---
+
+## Incident Timeline
 
 | Date/Time PST | Event |
 |---------------|-------|
@@ -139,15 +167,17 @@ This is the systemic lesson. Every OAuth app in Google Workspace is an attack ve
 
 ---
 
-## Comparison of Remediation Paths
+## Next Actions
 
-| Path | Effort | Risk after | Recommended |
-|------|--------|-----------|-------------|
-| Do nothing | 0 | HIGH if non-sensitive vars contained secrets | NO |
-| Rotate only if email received from Vercel | 1-2 hrs | MEDIUM (reactive, assumes Vercel catches all) | NO |
-| Full rotation + sensitivity-flag audit | 3-4 hrs | LOW | **YES** |
-| Full rotation + OAuth app cleanup + ggshield | 5-6 hrs | VERY LOW + ongoing protection | **YES (priority)** |
-| Move off Vercel | weeks | VERY LOW from this incident, new risks from migration | NOT NOW |
+| # | Action | Owner | Type | By When |
+|---|--------|-------|------|---------|
+| 1 | Check inbox for Vercel "affected customer" notification (April 19-23) at zaalp99@gmail.com + admin email | Zaal | Triage | ASAP |
+| 2 | If notification found: Execute Phase 3 (Rotation) for all critical keys | Zaal | Security | This week |
+| 3 | If no notification: Still rotate all secrets as precaution (assume non-sensitive vars exposed) | Zaal | Security | This week |
+| 4 | Audit Vercel Dashboard -> Settings -> Environment Variables; flip all remaining non-sensitive to "Sensitive" | Zaal | Hardening | This week |
+| 5 | Enable MFA on Vercel account + Deployment Protection (Standard minimum) | Zaal | Hardening | This week |
+| 6 | Audit Google Workspace OAuth apps (quarterly): https://admin.google.com/ac/owl/list - revoke unused, reduce overschopes | Zaal | Governance | 2026-06-20 |
+| 7 | Install ggshield + pre-commit hook for repo secret scanning | Claude | CI/CD | If Zaal approves |
 
 ---
 
@@ -199,14 +229,11 @@ These cover the developer-side. The Vercel breach covers the **deploy-side**. Bo
 
 ## Sources
 
-- [Brendan Falk X post (audit instructions, 2026-04-19)](https://x.com/brendanfalk/status/2045953132770025769)
-- [Vercel Knowledge Base - April 2026 Security Incident](https://vercel.com/kb/bulletin/vercel-april-2026-security-incident)
-- [TechCrunch - Vercel confirms security incident (2026-04-20)](https://techcrunch.com/2026/04/20/app-host-vercel-confirms-security-incident-says-customer-data-was-stolen-via-breach-at-context-ai/)
-- [The Hacker News - Vercel Breach Tied to Context AI Hack](https://thehackernews.com/2026/04/vercel-breach-tied-to-context-ai-hack.html)
-- [BleepingComputer - Vercel confirms breach](https://www.bleepingcomputer.com/news/security/vercel-confirms-breach-as-hackers-claim-to-be-selling-stolen-data/)
-- [SecurityWeek - Vercel Hacked](https://www.securityweek.com/next-js-creator-vercel-hacked/)
-- [CoinDesk - Crypto developers scrambling](https://www.coindesk.com/tech/2026/04/20/hack-at-vercel-sends-crypto-developers-scrambling-to-lock-down-api-keys)
-- [GitGuardian analysis - non-sensitive env vars](https://blog.gitguardian.com/vercel-april-2026-incident-non-sensitive-environment-variables-need-investigation-too/)
-- [TrendMicro - OAuth Supply Chain Attack analysis](https://www.trendmicro.com/en_us/research/26/d/vercel-breach-oauth-supply-chain.html)
-- [Ox.security - Supply Chain Attack detail](https://www.ox.security/blog/vercel-context-ai-supply-chain-attack-breachforums/)
-- Related: `SECURITY.md`, `project_infra_keys.md` memory, Doc 280 (FID registration), Doc 137 (skills audit + security)
+- [Vercel Knowledge Base - April 2026 Security Incident](https://vercel.com/kb/bulletin/vercel-april-2026-security-incident) [FULL] - primary source, final status April 23 2026
+- [Securonix - Supply Chain Attack Analysis](https://connect.securonix.com/threat-research-intelligence-62/) [FULL] - timeline + attack chain, April 22 2026
+- [TrendMicro - OAuth Supply Chain Attack](https://www.trendmicro.com/en/research/26/d/vercel-breach-oauth-supply-chain.html) [FULL] - attack analysis + corrections, updated April 21
+- [Sola Fide - Anatomy of the Vercel Breach](https://solafide.ca/blog/2026-04-vercel-breach-oauth-supply-chain-attack) [FULL] - OAuth/identity risk deep dive, April 22
+- [AkeyLess - Vercel Breach & Ephemeral Secrets](https://www.akeyless.io/blog/the-vercel-breach-and-the-case-for-ephemeral-secrets/) [FULL] - secrets management lens, April 21
+- [DevOps Daily - April 2026 Incident Summary](https://devops-daily.com/posts/vercel-april-2026-security-incident) [FULL] - action checklist, April 20
+- [Brendan Falk X post (audit instructions, 2026-04-19)](https://x.com/brendanfalk/status/2045953132770025769) [PARTIAL] - Google Workspace audit guide
+- Related ZAO docs: `.env.example`, `SECURITY.md`, `project_infra_keys.md` memory, Doc 280 (FID registration)

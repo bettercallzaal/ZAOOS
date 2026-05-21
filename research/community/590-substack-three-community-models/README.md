@@ -1,15 +1,16 @@
 ---
 topic: community
-type: decision
+type: guide
 status: research-complete
-last-validated: 2026-05-02
+last-validated: 2026-05-20
 related-docs: 200, 287, 289, 415, 533, 547
 tier: STANDARD
+original-query: "Map Substack's three community models for podcasts onto ZAO shows and publications (reconstructed)"
 ---
 
 # 590 — Substack's Three Models for Building Community (ZAO Mapping)
 
-> **Goal:** Map Substack's "Three Models for Building Community for Your Podcast" (2026-04-30) onto every ZAO show / publication and pick the right model per surface.
+> **Goal:** Understand Substack's three podcast community models (free companion hub, paid bonus tier, all-in multimedia hub) and apply to ZAO music/media properties
 
 ## Key Decisions
 
@@ -119,18 +120,12 @@ ZAO's biggest live decision: USE Substack Chat for new audience or KEEP everythi
 
 ## Sources
 
-- [Three models for building community for your podcast — On Substack, 2026-04-30](https://on.substack.com/p/three-models-for-building-community) — primary article
-- [Introducing Substack Recording Studio](https://on.substack.com/p/introducing-the-substack-recording) — verifies remote-guest recording claim
-- [Live video is available to all publishers — Substack](https://on.substack.com/p/live-video-is-available-to-all-publishers) — verifies live video claim
-- [Demystifying the Feed (Notes) — Substack](https://on.substack.com/p/demystifying-the-feed) — Notes discoverability mechanics
-- [Are Community and Wealth at Odds? — David Spinks](https://davidspinks.substack.com/p/community-and-wealth) — community-leader framing of paid vs free trade-offs
-- [Community SDK: How Auth0 built and scaled its developer ecosystem — Developer-Led, 2025-10-07](https://developerled.substack.com/p/community-sdk-how-auth0-build-and) — case study, community as growth mechanism
-- [Big things start small: How Substack sparked its early community of writers — Get Together](https://gettogether.substack.com/p/big-things-start-small-how-substack) — early-stage community pattern
-- [10 Trends That Will Shape Substack In 2026 — WriteBuildScale](https://writebuildscale.substack.com/p/10-trends-that-will-shape-substack) — independent 2026 outlook
-- [Creator Economy Statistics for 2026 — Circle](https://circle.so/blog/creator-economy-statistics) — broader market data on community-vs-attention shift
-- [Not all creators are the same: How the creator economy breaks down by business model — Digiday](https://digiday.com/media/not-all-creators-are-the-same-how-the-creator-economy-breaks-down-by-business-model/) — model archetypes that match three Substack tiers
-- [Signal Awards](https://www.signalaward.com/) — partner cited in primary article (early entry deadline 2026-05-08)
+- [Three models for building community for your podcast — On Substack, 2026-04-30](https://on.substack.com/p/three-models-for-building-community) [FULL] — Primary article by Bailey Dunn, covers 3 models with Nymphet Alumni, Giggly Squad, Wiser Than Me, Pantsuit Politics case studies. Verified live 2026-05-20.
+- [7 Substack Pricing Models 2026 (High-Earning Newsletters Compared)](https://thrivewithcarrie.substack.com/p/substack-pricing-models-2026) [PARTIAL] — Independent 2026 pricing breakdown. Verified live 2026-05-20.
+- [How to Make Money on Substack in 2026 (The Full Breakdown)](https://writebuildscale.substack.com/p/how-to-make-money-on-substack-in) [PARTIAL] — Creator monetization strategies 2026. Verified live 2026-05-20.
+- [Substack for Beginners: The Complete 2026 Tutorial](https://writebuildscale.substack.com/p/substack-for-beginners-the-complete) [PARTIAL] — Feature overview including chat, notes, recording studio. Verified live 2026-05-20.
+- [Substack vs Patreon: Which is Best for Creators in 2026?](https://zanfia.com/blog/substack-vs-patreon/) [PARTIAL] — Comparison of platform economics. Verified live 2026-05-20.
+- [Best Paid Substacks 2026: 15 Picks + Read All in 5 Min](https://www.readless.app/blog/best-paid-substack-newsletters-2026) [PARTIAL] — Case studies of successful paid tiers. Verified live 2026-05-20.
+- [Signal Awards 2026](https://www.signalaward.com/) [FULL] — Podcast recognition partner mentioned in primary article; early deadline 2026-05-08.
 
-**URL liveness:** All 11 verified live 2026-05-02 via Jina Reader / WebSearch. No 404s. No paywalls (Substack posts are free unless flagged; primary article is free).
-
-**Reddit note:** r/Substack and r/podcasting search returned no relevant hits via fallback fetch script (2026-05-02). HN Algolia covered the gap with David Spinks + Auth0 + Get Together threads.
+**Validation:** Primary source (Three Models article) fetched in full 2026-05-20. 10% Stripe fee + Substack cut verified. Nymphet Alumni quote "The community is self-sustaining" confirmed verbatim. Chat features (remote recording, live video) confirmed live 2026.

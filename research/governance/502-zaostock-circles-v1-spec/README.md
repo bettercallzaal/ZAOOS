@@ -1,15 +1,16 @@
 ---
 topic: governance
-type: decision
+type: guide
 status: research-complete
-last-validated: 2026-04-24
-related-docs: 497, 498, 499, 500, 501, 050, 432
-tier: DISPATCH
+last-validated: 2026-05-20
+related-docs: "497, 498, 499, 500, 501, 050, 432"
+tier: STANDARD
+original-query: "Design flat-org governance spec for 19-person ZAOstock team using circles, Loomio consent, and Respect tracking (reconstructed)"
 ---
 
-# 502 - ZAOstock Circles v1 Spec
+# 502 — ZAOstock Circles v1 Spec
 
-> **Goal:** Flat-org governance spec for the 19-person ZAOstock festival team. Synthesizes findings from 5 parallel research agents (docs 497-501). Zaal = convener, not boss. Everyone else flat on decisions, differentiated by scope and contribution.
+> **Goal:** Governance framework for 19-person ZAOstock team: 6 circles (music, ops, partners, merch, marketing, host), Loomio for strategy consent, Event Keys budget autonomy, Respect earnings on surplus
 
 ## Key Decisions
 
@@ -150,13 +151,14 @@ Anyone can join / leave any circle via bot command. Minimum 1 circle, max 5.
 
 ## Sources
 
-1. [Doc 497 sociocracy research](../497-sociocracy-circles-small-teams/) - local
-2. [Doc 498 ZAO fractal adapted](../498-zao-fractal-adapted-for-zaostock/) - local
-3. [Doc 499 music collective governance](../../events/499-music-festival-collective-governance/) - local
-4. [Doc 500 DAO event coordination](../500-dao-event-coordination-patterns/) - local
-5. [Doc 501 flat onboarding UX](../501-flat-org-onboarding-ux/) - local
-6. Ted Rau, "Many Voices One Song" (sociocracy manual) - referenced by 497
-7. Jo Freeman, "The Tyranny of Structurelessness" (1972) - referenced by 499, 501
-8. Loomio co-op docs - loomio.com/guides - referenced by 497, 500
-9. The ZAO complete guide - `/research/community/050/`
-10. ZAO master context - `/research/community/432/`
+- [Doc 497 — Sociocracy Circles for Small Teams](../497-sociocracy-circles-small-teams/) [FULL] — Circles + consent mechanics for 6-50 person orgs. Local research doc.
+- [Doc 498 — ZAO Fractal Adapted for ZAOstock](../498-zao-fractal-adapted-for-zaostock/) [FULL] — Fibonacci Respect scoring, soulbound ERC-1155 minting, surplus-share mechanics. Local research doc.
+- [Doc 499 — Music Festival Collective Governance](../../events/499-music-festival-collective-governance/) [FULL] — Loomio decision flow, FWB Event Keys pattern, Metagov deliberative arc. Local research doc.
+- [Doc 500 — DAO Event Coordination Patterns](../500-dao-event-coordination-patterns/) [FULL] — Nouns, FWB, Devconnect, Coordinape comparison. Local research doc.
+- [Doc 501 — Flat Org Onboarding UX](../501-flat-org-onboarding-ux/) [FULL] — "My First Week" dashboard, buddy system, routing rules, Silent Star detector. Local research doc.
+- [Doc 050 — The ZAO Complete Guide](../../community/050-the-zao-complete-guide/) [FULL] — Respect Game mechanics, OREC ledger, fractal structure baseline. Local canonical doc.
+- [Doc 432 — ZAO Master Context (Tricky Buddha, April 2026)](../../community/432-zao-master-context-tricky-buddha/) [FULL] — Music-first + community + tech positioning, event strategy, Cruise vision. Local research doc.
+- Ted Rau, "Many Voices One Song" (sociocracy manual) [PARTIAL] — Referenced in Doc 497 for consent process patterns.
+- Jo Freeman, "The Tyranny of Structurelessness" (1972) [PARTIAL] — Anti-pattern framework referenced in Docs 499 and 501.
+
+**Integration:** All 5 docs (497-501) synthesized into single spec. Timeline milestones tied to Docs 499-500 recommendations. Coordinator rotation (8-week cadence) derived from Coordinape epochs + FWB Event Keys + Nouns residency patterns.

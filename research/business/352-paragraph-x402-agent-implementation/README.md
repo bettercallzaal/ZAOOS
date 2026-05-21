@@ -1,26 +1,42 @@
-# 352 -- Paragraph + x402 Agent Content Commerce: Implementation Guide
-
-> **Status:** Research complete
-> **Date:** April 13, 2026
-> **Goal:** Exact implementation details for VAULT/BANKER/DEALER to publish content to Paragraph, sell it via x402, and convert earnings to ZABAL buybacks
-
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-20
+related-docs: [344-bankr-bot-agent-trading-skills, 322-paragraph-publishnew-newsletter]
+original-query: "How can agents (VAULT/BANKER/DEALER) publish content to Paragraph, monetize via x402 HTTP payment protocol, and automatically convert USDC earnings to ZABAL buybacks? (reconstructed)"
+tier: STANDARD
 ---
 
-## Key Decisions / Recommendations
+# 352 - Agent Content Commerce: Paragraph + x402 Paywall Framework
 
-| Decision | Recommendation |
-|----------|----------------|
-| **Publishing to Paragraph** | USE Paragraph REST API directly (`POST https://public.api.paragraph.com/api/v1/posts`). Auth via API key from publication settings. MCP also available but API is simpler for server-side agent code |
-| **Content paywall** | USE `@x402/express` middleware on our Next.js API routes. Create routes like `/api/content/recap/[id]` that serve content behind x402 paywall. Agents (and external buyers) pay USDC to access |
-| **Agent buying content** | USE `@x402/fetch` + Privy wallet. Agent wraps fetch with payment, calls another agent's x402 endpoint, USDC auto-deducted from Privy wallet |
-| **USDC to ZABAL conversion** | USE 0x Swap API (already built in `swap.ts`). After agent earns USDC from content sale, swap USDC -> ZABAL on next cron run. Creates buyback pressure |
-| **Pricing** | SET content at $0.01-0.10 USDC per item. Research docs: $0.05, show recaps: $0.10, room summaries: $0.03. Low enough for agents, meaningful in aggregate |
-| **publish.new integration** | SKIP for now -- publish.new has no programmatic listing API. Content commerce happens through our own x402 endpoints. Revisit when publish.new opens an API |
-| **Paragraph MCP** | SKIP for agent publishing -- MCP requires interactive auth. USE REST API with `PARAGRAPH_API_KEY` env var instead |
+> **Goal:** Enable agents to publish, monetize, and redistribute earnings across The ZAO treasury via x402 HTTP payment protocol (0 protocol fees, $600M annualized volume on Base, Mar 2026).
 
----
+## Key Decisions (DO THIS)
 
-## The Complete Agent Content Commerce Flow
+| # | Decision | Why |
+|----|----------|-----|
+| 1 | **Paragraph REST API** (not MCP) | Server-side agent code needs non-interactive auth; REST API simpler than MCP shell interaction. POST to `https://public.api.paragraph.com/api/v1/posts` with Bearer key |
+| 2 | **x402 middleware** on Next.js routes | `@x402/express` + ExactEvmScheme; returns 402 with payment details, client retries with signed payment, no additional auth layer needed |
+| 3 | **Dedicated x402 EOA key per agent** | Privy wallet signing is TEE (cannot export account object for x402 SDK). Workaround: small separate x402 key ($5 USDC max) for content buys only; Privy for trading |
+| 4 | **$0.03-0.10 USDC per item** | Micro-pricing ($0.05 avg) = 10K items/year = $500 revenue per agent. Meaningful aggregate, low friction for agent-to-agent trades |
+| 5 | **Auto-swap USDC → ZABAL weekly** | When agent balance > $0.50 USDC, execute swap via 0x API (0% fee). Creates organic ZABAL buyback pressure from agent commerce earnings |
+
+## Findings: x402 Protocol Status & Adoption (May 2026)
+
+| Metric | Value | Note |
+|--------|-------|------|
+| **Transactions processed (Base)** | 119M | As of March 2026 |
+| **Transactions processed (Solana)** | 35M | Secondary network |
+| **Annualized volume (all networks)** | $600M | Protocol fees: 0% |
+| **Payment networks supported** | 5+ | Base, Polygon, Arbitrum, World, Solana |
+| **HTTP status code** | 402 Payment Required | Standard (rarely used before x402) |
+| **Primary facilitator** | Coinbase Dev Platform | Fee-free on Base mainnet |
+| **Settlement token** | USDC (ERC-20) | Base native; also supports others |
+
+**Key insight:** x402 is production-grade on Base. 119M transactions = proven reliability for agent-to-agent payments. Zero protocol fees = all revenue goes to agents, not extractive middlemen.
+
+## The Agent Content Commerce Flow
 
 ```
 STEP 1: Agent creates content
@@ -436,12 +452,24 @@ DEALER_X402_KEY=             # Same
 
 ## Sources
 
-- [Paragraph API Docs](https://paragraph.com/docs/development/api-sdk-overview)
-- [Paragraph Full Documentation](https://paragraph.com/docs/llms-full.txt)
-- [x402 Buyer Quickstart (Coinbase)](https://docs.cdp.coinbase.com/x402/quickstart-for-buyers)
-- [x402 Seller Quickstart (Coinbase)](https://docs.cdp.coinbase.com/x402/quickstart-for-sellers)
-- [@x402/fetch npm](https://www.npmjs.com/package/@x402/fetch)
-- [@x402/express npm](https://www.npmjs.com/package/@x402/express)
-- [x402 Protocol](https://www.x402.org/)
-- [Doc 322 - Paragraph Research](../322-paragraph-publishnew-newsletter-agent-commerce/)
-- [Doc 344 - Bankr Skills (moltycash for x402)](../../agents/344-bankr-bot-agent-trading-skills/)
+- [x402 Welcome Documentation (Coinbase)](https://docs.cdp.coinbase.com/x402/welcome) [FULL - protocol spec, facilitator API]
+- [x402 Explained: The HTTP 402 Payment Protocol for AI Agents, APIs, and Stablecoin Payments](https://sherlock.xyz/post/x402-explained-the-http-402-payment-protocol) [FULL - how it works, use cases]
+- [The Graph x402 USDC Gateway Goes Live - Crypto.News](https://crypto.news/the-graph-x402-usdc-gateway-goes-live-machine-paywall-for-on-chain-data/) [FULL - real-world adoption]
+- [How to Implement a Crypto Paywall with x402 Payment Protocol - QuickNode](https://www.quicknode.com/guides/infrastructure/how-to-use-x402-payment-required) [FULL - step-by-step integration]
+- [Paragraph Review 2026: Web3 Publishing - CryptoAdventure](https://cryptoadventure.com/paragraph-review-2026-web3-publishing-newsletter-distribution-and-the-post-mirror-landscape/) [FULL - Paragraph ecosystem]
+- [x402 Protocol](https://www.x402.org/) [PARTIAL - core spec reference]
+- [@x402/fetch npm](https://www.npmjs.com/package/@x402/fetch) [FULL - client SDK]
+- [@x402/express npm](https://www.npmjs.com/package/@x402/express) [FULL - server middleware]
+
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Get PARAGRAPH_API_KEY from publication settings | Zaal | Admin | 2026-05-21 |
+| Test Paragraph publish via REST: create + send 1 test post | Engineering | Test | 2026-05-22 |
+| Generate x402 keys for VAULT/BANKER/DEALER (low-balance wallets) | Engineering | Setup | 2026-05-23 |
+| Build POST /api/content/publish route (list content for sale) | Engineering | Code | 2026-05-28 |
+| Build GET /api/content/[id] route with x402 middleware | Engineering | Code | 2026-05-28 |
+| Test agent-to-agent purchase flow on Base testnet | Engineering | Test | 2026-05-30 |
+| Deploy to production + wiring to agent cron jobs | Engineering | Deploy | 2026-06-10 |
+| Announce to agents: "Content commerce live" | Zaal | Social | After launch

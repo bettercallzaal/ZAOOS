@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-24
+last-validated: 2026-05-20
 related-docs: 491, 492, 493
 tier: STANDARD
 ---
@@ -49,16 +49,16 @@ Timeline:
 | Higher tiers | $30, $100 / mo | Token-based, team-oriented |
 | China Edition | Free | No invite code, Win/Mac/Linux. Pro (team + private deploy) opens preorders Q1 2026. |
 
-## Privacy Red Flags - The Decisive Issue
+## Privacy Red Flags - The Decisive Issue (May 2026)
 
-| Source | Finding |
-|--------|---------|
-| The Register (2025-07-28) | Telemetry continues after opt-out is checked. Opt-out toggle is cosmetic. |
-| TechRadar | Documented background data collection from disabled-telemetry installs. |
-| CyberNews | "Vibe coders' data harvested" - hardware specs, OS, architecture, usage patterns, unique identifiers, project information. |
-| Dhrumil Barot (Medium) | ~500 network calls in 7 minutes, ~26MB transferred even idle. Persistent connections to 5+ ByteDance domains. |
+| Source | Finding | Timestamp |
+|--------|---------|-----------|
+| The Register (2025-07-28) | Telemetry persists after opt-out toggle. Cosmetic toggle. [FULL] | Jul 2025 |
+| programming.dev (2026) | Unit 221B analysis: 5+ ByteDance domains, hardware fingerprinting, JWT tokens, MessagePack binary obfuscation. [FULL] | 2026 |
+| Vibecoding Review (2026-03) | 5-year personal data retention, no opt-out, no telemetry mode. [FULL] | Mar 2026 |
+| infraplz.dev (2026-05) | **Status unchanged May 2026**: "Aggressive telemetry; not appropriate for commercial/confidential code." [FULL] | May 2026 |
 
-5-year retention. No enterprise SSO, no policy controls, no audit trail. ByteDance is the parent entity behind TikTok and is under continuing US scrutiny. For a repo containing:
+No change since July 2025. Telemetry still active post-opt-out. 5-year data retention. For a repo with:
 
 - `src/lib/db/supabase.ts` + service-role key
 - `src/lib/agents/runner.ts` + agent wallet keys

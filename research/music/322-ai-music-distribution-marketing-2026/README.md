@@ -2,7 +2,7 @@
 topic: music
 type: business-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What are the best platforms and strategies for distributing and marketing AI-generated music commercially in 2026?"
 tier: production
 ---

@@ -2,9 +2,10 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "music player implementations APIs displays patterns 2026 (reconstructed)"
 tier: STANDARD
+re-fetch-status: "[FULL] - Spotify API restrictions confirmed 2026 (5-user dev limit, 3/2026 changes). TIDAL developer portal confirmed active with Player module available. Audius SDK available (no version specificity in 2026 docs). Odesli/Songlink free API confirmed, Audius support unconfirmed."
 ---
 
 # 167 — Audio APIs, Music Players & Display Patterns
@@ -31,6 +32,24 @@ tier: STANDARD
 
 ---
 
+## Findings Update (2026-05-21 Re-research)
+
+### Material Changes
+
+1. **Spotify API Restrictions Escalated (CRITICAL)** — As of March 2026, Spotify now mandates Premium subscriptions for Developer Mode API access (previously free dev mode). Test user limit reduced from 25 to 5 per app. This CONFIRMS the doc's warning about "hostile to indie devs." Extended quota applications now require: legally registered business, 250K+ monthly active users, active launched service, and commercial viability.
+
+2. **TIDAL Developer Portal Now Live** — The doc stated "NEW: Public developer portal exists now." Confirmed: developer.tidal.com is active with full SDK documentation. Player module is the ONLY allowed third-party playback method. TIDAL rejects any quota extensions attempting to circumvent this.
+
+3. **Odesli/Songlink API — Audius Support UNCONFIRMED** — The doc claims Odesli "supports Audius." Web search found no evidence Audius is in the Odesli platform list as of 2026-05-21. Supported platforms include 20+ majors (Spotify, Apple, YouTube, Tidal, Deezer) but Audius not explicitly listed. Recommendation: VERIFY integration before relying on it.
+
+### Still-Current Claims (Verified)
+
+- Audius SDK available, free, no rate limit (confirmed via audius.co/api and GitHub docs)
+- Spotify gutted metadata endpoints (confirmed: audio analysis, album releases, artist top tracks all removed in dev mode)
+- Songlink/Odesli free API, 10 req/min limit without auth (confirmed)
+
+---
+
 ## Part 1: What ZAO OS Already Has (Codebase Ground Truth)
 
 ### Architecture Overview
@@ -53,7 +72,7 @@ src/lib/music/          → 7 utility modules (library, audius, songlink, filter
 | **SoundCloud** | YES | YES | NO | Widget API (iframe) | Rate-limit-free widget. New API keys require manual review |
 | **Sound.xyz** | YES | YES | NO | HTML5 Audio + GraphQL | IPFS support. Web3 native |
 | **Apple Music** | NO | YES | NO | External redirect | 30s preview only unless user has Apple Music subscription |
-| **Tidal** | NO | YES | NO | External redirect | NEW: Public developer portal exists now. SDK has Player module |
+| **Tidal** | NO | YES | NO | External redirect | CONFIRMED: Public developer portal at developer.tidal.com. SDK has Player module (2026-05-21) |
 | **Bandcamp** | NO | YES | NO | External redirect | iframe limitations |
 | **Audio Files** | YES | NO | NO | HTML5 Audio | .mp3/.wav/.ogg/.flac/.aac/.m4a/.opus |
 | **Songlink/Odesli** | N/A | N/A | YES | REST API | Universal cross-platform resolver |
@@ -405,6 +424,16 @@ function createVisualizer(audioElement: HTMLAudioElement, canvas: HTMLCanvasElem
 | **130** | Tier 4 integrations roadmap. Partially built (frame, comments, artists, trending-weighted) |
 | **138** | Play counting. Internal tracking exists. Last.fm/ListenBrainz not yet built |
 | **160** | Audio spaces landscape. Separate concern (live rooms vs player) |
+
+### Sources (2026-05-21 Re-fetch)
+
+- [Spotify Web API Changelog — February 2026](https://developer.spotify.com/documentation/web-api/references/changes/february-2026) [FULL]
+- [Spotify Developer — February 2026 Migration Guide](https://developer.spotify.com/documentation/web-api/tutorials/february-2026-migration-guide) [FULL]
+- [TIDAL Developer Portal](https://developer.tidal.com/) [FULL]
+- [TIDAL SDK for Web — GitHub](https://github.com/tidal-music/tidal-sdk-web) [FULL]
+- [Odesli / Songlink API — PublicAPI](https://publicapi.dev/songlink-odesli-api) [PARTIAL]
+- [Audius Developer Documentation](https://docs.audius.co/) [FULL]
+- [Audius API — REST Documentation](https://docs.audius.org/api/) [PARTIAL]
 
 ### Research vs Reality Discrepancies Found
 

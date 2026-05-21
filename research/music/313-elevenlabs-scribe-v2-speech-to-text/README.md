@@ -2,7 +2,7 @@
 topic: music
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How to use ElevenLabs Scribe v2 for transcribing ZAO fractal meetings and Spaces with speaker diarization and ZAO-specific keyterm prompting?"
 tier: production
 ---
@@ -21,8 +21,8 @@ tier: production
 ### Scribe v2 (Batch)
 - **Optimized for:** Long, complex recordings - meetings, podcasts, multi-speaker sessions
 - **Processing:** Upload file or URL, get full transcript back
-- **Accuracy:** Highest accuracy available - 3.3% WER English on FLEURS, ~96.7% accuracy
-- **Features:** Full feature set - diarization (up to 32 speakers), entity detection (56 categories), keyterm prompting (1,000 terms), audio event tagging, multi-channel support
+- **Accuracy:** Highest accuracy available - 2.2% WER on AA-WER v2 benchmark (98% accuracy), outperforms all competitors including Google Gemini 3.1 Pro (2.9% WER) and AssemblyAI Universal-3 Pro (3.3% WER)
+- **Features:** Full feature set - diarization (up to 48 speakers), entity detection (56 categories), keyterm prompting (1,000 terms), audio event tagging, multi-channel support
 - **File limits:** Up to 3GB, 10 hours max
 - **Best for ZAO:** Post-session transcription of recorded fractal meetings and Spaces
 

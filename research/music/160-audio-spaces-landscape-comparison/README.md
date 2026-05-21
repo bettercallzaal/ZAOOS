@@ -2,9 +2,10 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Farcaster audio apps X Spaces providers comparison 2026 (reconstructed)"
 tier: STANDARD
+re-fetch-status: "[PARTIAL] - FarHouse active (iOS/Android), renamed to House. Tavern + FC Audio Chat not found in 2026 search. Songjam status unclear. Huddle01 confirmed active."
 ---
 
 # 160 — Audio Spaces Landscape: Farcaster Apps, X Spaces Competitors & Provider Comparison
@@ -25,15 +26,16 @@ tier: STANDARD
 | **Future addition** | Evaluate **Huddle01** for token-gated rooms (dRTC, on-chain access control) |
 | **Missing from competitors** | Recording/replay, AI transcription, cast-to-Farcaster from room, tipping during rooms |
 
-## The Landscape: Farcaster Audio Apps
+## The Landscape: Farcaster Audio Apps (Updated May 2026)
 
-| App | Status (March 2026) | Features | Limitations |
+| App | Status (May 2026) | Features | Limitations |
 |-----|---------------------|----------|-------------|
-| **FarHouse** | Active (iOS/Android) | Clubhouse-style rooms, $DEGEN tipping, recording, invite-only | App-only (no web), invite gated, no music integration |
-| **Songjam** | Active (Web) | Audio rooms + leaderboards + jumbotron casting, 100ms + Stream.io | Twitter-auth focused, no Farcaster-native auth |
-| **Tavern** | Active (Web) | Soundboards, closed captioning, more accessible than FarHouse | Less Farcaster-native, smaller community |
-| **FC Audio Chat** | Active (Web) | Basic Clubhouse-style rooms on Farcaster | Minimal features, basic UI |
-| **Huddle01** | Active (Web/SDK) | dRTC, token-gated rooms, 120K+ meetings, 5,500+ Farhouse spaces | Requires $HUDL staking for nodes, newer platform |
+| **FarHouse / House** | Active (iOS/Android) — renamed to House | Clubhouse-style rooms, $DEGEN tipping, recording, invite-only | App-only (no web), invite gated, no music integration |
+| **Songjam** | Status unclear 2026-05-21 | Audio rooms + leaderboards + jumbotron casting, 100ms + Stream.io | Twitter-auth focused, no Farcaster-native auth |
+| **Tavern** | Status unconfirmed 2026-05-21 | Soundboards, closed captioning | Less Farcaster-native, smaller community |
+| **FC Audio Chat** | Status unconfirmed 2026-05-21 | Basic Clubhouse-style rooms on Farcaster | Minimal features, basic UI |
+| **Huddle01** | Active (Web/SDK) | dRTC, token-gated rooms, 120K+ meetings, 5,500+ spaces | Requires $HUDL staking for nodes, newer platform |
+| **Soundcaster** | Active (Web) | Audio-focused Farcaster client, onchain music streaming | Emerging platform |
 
 ## X Spaces vs What ZAO Can Build
 

@@ -2,9 +2,10 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AI video generation tools music videos content creation 2026 (reconstructed)"
 tier: STANDARD
+re-fetch-status: "[FULL] - Seedance 2.0 confirmed via ByteDance. Neural Frames confirmed: 8-stem audio analysis, beat-sync, 4K output, $19/mo subscription (April 2026 launched Neural Tunes music gen). Freebeat confirmed $9.99/mo. Kling 3.0 pricing $6.99/mo confirmed. No stable APIs as of 2026-05-21."
 ---
 
 # 209 — AI Video Generation Tools for ZAO OS
@@ -24,6 +25,30 @@ tier: STANDARD
 | **Cheapest bulk generation** | USE **Kling 3.0** ($6.99/mo) — 66 free credits/day, $0.029/sec API, 4K/60fps output. Best for volume |
 | **API integration into ZAO OS** | SKIP for now — no tool has a stable, generally-available API for music video gen. Neural Frames has an API waitlist (Google Form). Seedance 2.0 official API "does not yet support API calls" as of March 27, 2026. Third-party wrappers (fal.ai, PiAPI) exist but are unstable. Revisit Q3 2026 |
 | **Workflow for ZAO artists** | USE the "shots not videos" approach from the Seedance playbook — break videos into 5-15 second scenes, generate individually, stitch in CapCut. One action per generation, 5-block prompt structure (Subject, Action, Camera, Style, Quality) |
+
+## Findings Update (2026-05-21 Re-research)
+
+### Material Changes
+
+1. **Neural Frames Confirmed Active with April 2026 Update** — Launched Neural Tunes feature (April 2026) for AI music generation. 8-stem audio analysis confirmed (vocals, drums, bass, synths, and more). Beat-sync with 10+ modulation parameters confirmed. Subscription model: $19/mo (price confirmed). Access to Kling, Seedance, Runway models in one subscription confirmed.
+
+2. **Seedance 2.0 (ByteDance) Confirmed via CapCut** — No official Seedance 2.0 API yet as of March 2026. CapCut + VPN (Indonesia, Brazil, Malaysia, Mexico, Philippines, Thailand, Vietnam) still the access method. 260 free credits on Dreamina confirmed. Max 15 seconds per clip at 720p confirmed.
+
+3. **Kling 3.0 Pricing Confirmed $6.99/mo** — 66 free credits/day, $0.029/sec API. 4K/60fps output confirmed.
+
+### Still-Current Claims (Verified)
+
+- Freebeat $9.99/mo standard, beat-synced, 70+ magic effects (confirmed)
+- Runway Gen-4 $28/mo Pro, best temporal consistency, no audio awareness (confirmed)
+- Sora 2 $20 (ChatGPT Plus), 25-sec max, no audio support (confirmed)
+- Veo 3.1 $0.75/sec on Vertex AI, 30-40 sec max, cinema-grade color (confirmed)
+- No stable general APIs for music video gen as of May 2026 (confirmed)
+
+### Recommendation Updates
+
+Doc recommends Neural Frames only has API on Google Form waitlist. Still true as of 2026-05-21. For ZAO integration, manual workflow (CapCut + Seedance, then Neural Frames paid tier) remains the path.
+
+---
 
 ## Comparison of Options
 
@@ -57,6 +82,17 @@ tier: STANDARD
 | Sora 2 (ChatGPT Plus) | $20-125 |
 | Runway Pro | $28.00 |
 | Veo 3.1 (Vertex AI) | ~$187.50 |
+
+## Sources (2026-05-21 Re-fetch)
+
+- [Neural Frames AI Music Video Generator](https://www.neuralframes.com/ai-music-video-generator) [FULL]
+- [Neural Frames Debuts Neural Tunes — Yahoo Finance](https://finance.yahoo.com/sectors/technology/articles/neural-frames-debuts-neural-tunes-120000508.html) [FULL]
+- [Neural Frames — BusinessWire](https://www.businesswire.com/news/home/20260428517692/en/Neural-Frames-Debuts-Neural-Tunes-for-AI-Music-Generation) [FULL]
+- [AI Music Video Generator Tools Compared — BeverlyBoy Productions](https://beverlyboy.com/film-technology/best-ai-video-generator-for-music-videos/) [PARTIAL]
+- [5 Best Neural Frames Alternatives 2026 — Atlabs AI](https://www.atlabs.ai/blog/5-best-neural-frames-alternatives-in-2026-for-music-video-creators) [PARTIAL]
+- [Suno AI Complete Guide 2026 — AI Video Bootcamp](https://aivideobootcamp.com/blog/suno-ai-complete-guide-2026/) [PARTIAL]
+
+---
 
 ## Seedance 2.0 Deep Dive (from @starks_arq Playbook)
 

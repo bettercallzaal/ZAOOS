@@ -2,7 +2,7 @@
 topic: music
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What are the capabilities of Suno v5.5 including voice cloning, custom models, and API options for 2026?"
 tier: production
 ---

@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "Remote collaboration AI music production tools 2026 BandLab Splice Endlesss (reconstructed)"
 related-docs: 334, 321, 313, 261
 tier: STANDARD
@@ -37,6 +37,19 @@ tier: STANDARD
 | Time investment | 1-4 hour commitment | Flexible, members work on own schedule |
 | Audio quality | 48kHz lossless possible | WAV 24-bit 48kHz standard |
 | **Best for ZAO** | Occasional brainstorms (1x/month) | **Daily pipeline** (primary workflow) |
+
+### BandLab Updates (March 2026)
+
+New "Palette" AI loop-matching tool (launched March 12 2026):
+- Intelligently matches complementary loops to your key, BPM, genre
+- Filters through 250,000 royalty-free samples
+- Generates up to 5 stacked loops in one click
+- Available on Pro/Max tier ($15.99/mo or $149/yr)
+
+Membership restructured (March 24 2026):
+- **Free tier:** Core collaboration + basic mastering
+- **Pro tier:** $15.99/mo or $179.88/yr — 50+ AI tools, Splitter, Voice Cleaner, Voice Changer (15 voices), Palette
+- **Max tier:** $99/mo or $999/yr equivalent — Everything in Pro + Mastering EQ (coming soon), Manual Pitch Correction (coming soon), $50/mo in Boost credits
 
 ### The Relay Race Model (90% of Real Remote Production)
 

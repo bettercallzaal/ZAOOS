@@ -2,10 +2,10 @@
 topic: music
 type: research-complete
 status: _archive_candidate
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "FISHBOWLZ persistent audio spaces design spec 2026 (reconstructed)"
 tier: STANDARD
-notes: "FISHBOWLZ paused 2026-04-16 — partnering with Juke (nickysap) Farcaster audio client instead. See project_fishbowlz_deprecated in memory."
+notes: "FISHBOWLZ paused 2026-04-16 — partnering with Juke (nickysap) Farcaster audio client instead. See project_fishbowlz_deprecated in memory. Archive candidate re-validated 2026-05-21."
 ---
 
 # 255 — FISHBOWLZ: Persistent Async Audio Spaces [ARCHIVE CANDIDATE]

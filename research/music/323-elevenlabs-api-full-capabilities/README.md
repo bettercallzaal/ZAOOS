@@ -2,7 +2,7 @@
 topic: music
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What are all the ElevenLabs API capabilities on the Creator plan with professional voice clones and what features can be built in ZAO OS?"
 tier: production
 ---

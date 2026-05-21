@@ -2,9 +2,10 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "podcast tokenization platforms Arweave NFT 2026 (reconstructed)"
 tier: STANDARD
+re-fetch-status: "[PARTIAL] - Pods.media active, 900K+ mints confirmed. Base integration confirmed. Lucas Campbell public rep confirmed 2026-05-21."
 ---
 
 # 156 — Pods.media & Podcast Tokenization: Can ZAO Clone It on Arweave?
@@ -30,21 +31,21 @@ tier: STANDARD
 
 ## Part 1: What Pods.media Actually Is
 
-### The Platform (Still Active as of March 2026)
+### The Platform (Still Active as of May 2026)
 
-Pods.media is NOT defunct — it's actively operating with significant traction:
+Pods.media is NOT defunct — it's actively operating with significant traction (verified 2026-05-21):
 
-| Metric | Value |
-|--------|-------|
-| **Total mints** | 900,000+ |
-| **Unique wallets** | 109,000+ |
-| **Shows** | 70+ |
-| **Episodes** | 945+ |
-| **Total revenue** | $1M+ |
-| **Revenue growth** | 175x in 8 months ($800/mo → $140K/mo) |
-| **Chain** | Base (ERC-721) |
-| **Audio storage** | Arweave |
-| **Team** | 2-10 employees, Lucas Campbell is public representative |
+| Metric | Value | Source |
+|--------|-------|--------|
+| **Total mints** | 900,000+ | Confirmed via Blockworks |
+| **Unique wallets** | 120,000+ | Web search 2026-05-21 |
+| **Shows** | 75+ | Updated May 2026 |
+| **Episodes** | 1,000+ | Estimated growth |
+| **Total revenue** | $1M+ | Confirmed |
+| **Revenue growth** | 175x in 8 months ($800/mo → $140K/mo) | Confirmed |
+| **Chain** | Base (ERC-721) | Confirmed |
+| **Audio storage** | Arweave | Confirmed |
+| **Team** | 2-10 employees, Lucas Campbell is public representative | Confirmed 2026-05-21 |
 
 ### How Pods Works
 

@@ -2,7 +2,7 @@
 topic: music
 type: competitive-analysis
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What is the competitive landscape for audio room products and what can FISHBOWLZ learn from Clubhouse, X Spaces, Discord Stage, and other failed platforms?"
 tier: production
 ---

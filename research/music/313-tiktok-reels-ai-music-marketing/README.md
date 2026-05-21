@@ -2,7 +2,7 @@
 topic: music
 type: marketing-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What are the best TikTok, Instagram Reels, and YouTube Shorts strategies for marketing AI-assisted music in 2026?"
 tier: production
 ---

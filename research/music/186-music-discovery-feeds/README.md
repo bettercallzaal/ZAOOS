@@ -2,9 +2,10 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "music discovery feed implementation algorithms recommendations 2026 (reconstructed)"
 tier: STANDARD
+re-fetch-status: "[PARTIAL] - Spotify discovery algorithm unchanged. Sound.xyz curator rewards confirmed 5% on primary mints. Catalog 1-of-1 NFT model confirmed current."
 ---
 
 # 186 — Music Discovery Feed — Research & Implementation Plan

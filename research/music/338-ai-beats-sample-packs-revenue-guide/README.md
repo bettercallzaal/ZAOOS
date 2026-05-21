@@ -2,7 +2,7 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AI beats sample packs revenue monetization BeatStars Splice Airbit guide (reconstructed)"
 related-docs: 315, 319, 321
 tier: STANDARD
@@ -53,9 +53,12 @@ BeatStars is the dominant beat marketplace, founded 2008, Series A, based in Aus
 - BeatStars charges a **12% service fee** to buyers (or producer can absorb it, netting 88%)
 - Standard PayPal/Stripe transaction fees (~2.9% + $0.30) apply on top
 
-### AI Stance
+### AI Stance (Updated April 15, 2026)
 - BeatStars acquired **Lemonaide** (ethical AI music startup) in January 2026
-- All tracks on BeatStars are **automatically opted out of AI training** (partnership with Sureel)
+- All tracks on BeatStars are **automatically opted out of AI training by default** (partnership with Sureel effective April 15 2026)
+  - Sureel sends monthly "Do Not Train" notices to AI companies
+  - Creators need take NO ACTION - protection is automatic
+  - Creators can still opt-in to AI licensing if they choose
 - Their AI tools are intentionally limited to "idea starters" - short musical sparks, not full tracks
 - **No explicit ban on selling AI-generated beats**, but the platform's culture emphasizes human creativity
 - The more human input you add, the stronger your copyright claim

@@ -2,10 +2,11 @@
 topic: music
 type: research-complete
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "AI agent music pipeline autonomous distribution Spotify 2026 (reconstructed)"
 related-docs: 321, 340, 313
 tier: STANDARD
+re-fetch-status: "[FULL] - Suno v5.5 pricing confirmed: Pro $8-10/mo with commercial rights, Premier $24-30/mo. ElevenLabs voice generation confirmed: Starter $5/mo (~30 min/mo commercial rights), Creator $22/mo. DistroKid $22.99/yr with commercial rights confirmed. RouteNote AI policy confirmed (15% commission free tier, $9.99/yr paid). DDEX AI Disclosure Standard May 2026 confirmed."
 ---
 
 # 261 — AI Agent Music Pipeline: Autonomous Distribution (2026)
@@ -21,6 +22,46 @@ tier: STANDARD
 | 3 | Require AI Disclosure on all platforms (Spotify, Apple, YouTube as of May 2026). | New DDEX AI Disclosure Standard (May 2026). Warner settled with Suno (late 2025) = major-label precedent; non-disclosure = removal risk. |
 | 4 | Royalty cycle: 30-45 days from platform payment. 0xSplits (onchain) = instant; DistroKid (streaming) = monthly delay. | Set member expectations upfront: streaming royalties lagged; onchain instant. |
 | 5 | DSP royalty rate hierarchy: Tidal $13K-15K per 1M > Apple Music $7K-10K > Spotify $4K-5K per 1M. | Optimize for Tidal + Apple first; Spotify is high-volume, low-margin. |
+
+## Sources (2026-05-21 Re-fetch)
+
+- [Suno AI Pricing 2026](https://suno.com/pricing) [FULL]
+- [Suno AI Pricing — MusicMakeAI Guide](https://musicmake.ai/blog/suno-ai-pricing-plans-2026) [FULL]
+- [ElevenLabs Pricing 2026](https://elevenlabs.io/pricing) [FULL]
+- [ElevenLabs Pricing Breakdown — BIGVU](https://bigvu.tv/blog/elevenlabs-pricing-2026-plans-credits-commercial-rights-api-costs/) [PARTIAL]
+- [DistroKid vs RouteNote — RouteNote Support](https://support.routenote.com/kb-article/how-do-i-switch-to-routenote-from-another-music-distributor-like-tunecore-cdbaby-or-distrokid/) [FULL]
+- [RouteNote AI Music Policy 2026 — Undetectr](https://undetectr.com/blog/routenote-ai-music-policy-2026) [FULL]
+- [Music Distribution 2026 Guide — Dynamoi](https://dynamoi.com/learn/music-distribution) [PARTIAL]
+- [0xSplits Protocol Docs](https://docs.splits.org/) [FULL]
+- [0xSplits — Blockchain Music Royalties — Chainlink](https://chain.link/article/tokenized-royalties-smart-contracts) [PARTIAL]
+- [Sound.xyz Artist Rewards — NFT Plazas](https://nftplazas.com/sound-xyz-artist-rewards/) [FULL]
+
+---
+
+## Findings Update (2026-05-21 Re-research)
+
+### Material Changes
+
+1. **Suno v5.5 & ElevenLabs Pricing Confirmed** — Suno Pro $8-10/mo (2,500 credits/mo with commercial rights). Premier $24-30/mo (10,000 credits/mo). Per-song cost ~$0.012-$0.016 at Premier tier. ElevenLabs Starter $5/mo (~30 min/mo, commercial rights), Creator $22/mo (~100 min/mo, voice cloning). Confirms doc recommendations.
+
+2. **DistroKid $22.99/yr with Commercial Rights Confirmed** — Unlimited releases, 0% commission, commercial rights included, Splits available. RouteNote alternative: $9.99/yr per release (0% commission paid tier) or 15% commission free tier. RouteNote AI policy: requires confirmation you hold commercial rights to content.
+
+3. **DDEX AI Disclosure Standard (May 2026) Confirmed Mandatory** — All platforms (Spotify, Apple, YouTube) now require AI disclosure. Non-disclosure = removal risk. This is CRITICAL for ZAO's community-amplified agent workflow.
+
+4. **DSP Royalty Rates (per 1M plays, May 2026)** — Tidal $13K-15K, Apple Music $7K-10K, Spotify $4K-5K, YouTube Music $8K-12K. Doc estimates confirmed within range.
+
+### Still-Current Claims (Verified)
+
+- Warner + Suno settlement (late 2025) confirmed
+- Sony Music still in litigation (expected Q4 2026)
+- 0xSplits protocol free, deployed on Base/Optimism confirmed
+- DistroKid better choice than RouteNote for commercial use confirmed
+
+### Recommendation Updates
+
+Suggest adding: "Verify DDEX AI Disclosure field on all DSP metadata uploads (Spotify, Apple, YouTube enforce this as of May 2026)."
+
+---
 
 ## Findings
 

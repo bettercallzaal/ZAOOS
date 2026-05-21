@@ -2,7 +2,7 @@
 topic: music
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How to mix and master AI-generated music in GarageBand or Logic Pro on Mac including combining instrumentals and vocals?"
 tier: production
 ---

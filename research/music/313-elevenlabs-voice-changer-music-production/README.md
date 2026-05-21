@@ -2,7 +2,7 @@
 topic: music
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "How to use ElevenLabs Voice Changer for music production workflows with voice cloning and singing voice synthesis?"
 tier: production
 ---

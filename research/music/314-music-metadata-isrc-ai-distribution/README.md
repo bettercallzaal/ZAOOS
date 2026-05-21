@@ -2,7 +2,7 @@
 topic: music
 type: technical-guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: "What are ISRC codes, music metadata best practices, and AI disclosure standards for distributing AI-generated music in 2026?"
 tier: production
 ---

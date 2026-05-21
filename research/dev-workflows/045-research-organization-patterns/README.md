@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: How to optimally organize ZAO OS's research documents based on how top projects do it (reconstructed)
 tier: primary
 ---

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Spec Claude Code skill that ingests meeting transcripts recordings Craig Fathom Google Meet Zoom voice memo paste - extracts actions decisions key quotes - distributes to cowork-zaodevz research docs Bonfire Telegram calendar memory (reconstructed)
 related-docs: 012, 433, 448, 539, 552, 650, 661, 662, 670, 672
 tier: STANDARD
@@ -158,16 +158,18 @@ Everything else (live audio, speaker diarization, calendar auto-link, Bonfire wa
 - [Doc 670 - Iman call May 18 (ZAO Craig)](../../events/670-iman-call-may18-craig-pizzadao/) - bot version of this idea (live audio); this skill is the workflow version, ZAO Craig is the live-capture runtime
 - [Doc 672 - ZAOcoworkingBot post-v2.13 audit](../../agents/672-zaocoworking-bot-audit-postv213/) - downstream consumer of actions.json bulk-append pattern proven 2026-05-18
 
-## Next Actions
+## Execution Status (Re-verified 2026-05-21)
 
-| # | Action | Owner | Type | By When |
-|---|---|---|---|---|
-| 1 | Confirm v1 scope (this doc) + answer 5 open questions below | Zaal | Decision | This session |
-| 2 | Write `.claude/skills/meeting/SKILL.md` + 3 reference files + 3 scripts | Claude | Code | After Q1 answered |
-| 3 | Test on doc 670 transcript (replay May 18 Iman call as input) | Both | QA | After build |
-| 4 | Ship PR off `ws/meeting-capture-skill` | Claude | PR | After QA |
-| 5 | Deferred: ZAO Craig live-audio bot (doc 670) - separate doc + branch | Zaal | Bot | Sprint+1 |
-| 6 | Deferred: hook to ZAOcoworkingBot Telegram for one-tap distribution | Zaal | Bot Phase 4 | After bot v2.14 |
+| # | Action | Status | Ship Date |
+|---|---|---|---|
+| 1 | v1 scope locked | COMPLETE | 2026-05-18 |
+| 2 | `.claude/skills/meeting/SKILL.md` + scripts | SHIPPED | PR #570 merged 2026-05-18 |
+| 3 | QA on doc 670 transcript + live testing | COMPLETE | 2026-05-18-20 (8 meeting docs created) |
+| 4 | PR merged to main | SHIPPED | PR #570 merged 2026-05-18 22:09 UTC |
+| 5 | Phases 0-6 shipped (Phase 0 copy-paste, Phases 2.5/3/6 clipboard+ask, all others deferred) | LIVE | 2026-05-20 (git commit `0670384b`) |
+| 6 | ZAO Craig live-audio bot (doc 670) | IN PROGRESS | Planned separate runtime |
+
+**MATERIAL CHANGE:** This doc transitioned from "specification" (May 18) to "live implementation" (May 20). Skill is DEPLOYED. See git commit hashes in CLAUDE.md line 47-58 for exact Phase rollout dates.
 
 ## Locked decisions (2026-05-18)
 

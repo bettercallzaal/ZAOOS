@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Lock the path from email arrives in Zaal's Gmail to doc lands in research by 7am EST - decide Gmail-MCP vs auto-forward, wire /inbox into /morning (reconstructed)
 related-docs: 422, 574, 599
 tier: STANDARD
@@ -215,3 +215,11 @@ Network mode: `full network` for all three (need Neynar, AgentMail, exa).
 | Stand up `zao-inbox-digest` Claude Routine per Doc 422 (cloud cron, 6:30 ET daily) | @Zaal | Routine setup | This week |
 | Test the loop end-to-end: forward one email from phone -> wait for AgentMail receipt -> run `/inbox` locally -> confirm it appears | @Zaal | Manual smoke test | Day 1 |
 | Decide if `to:zoe@bettercallzaal.com` alias makes sense as semantic forwarding address (cleaner than label-based filter) | @Zaal | Decision | Optional polish |
+
+## Re-Validation (2026-05-21)
+
+Verified against live codebase (2026-05-21):
+- /inbox skill EXISTS and active
+- /morning skill patches SHIPPED (PR #530, 2026-05-16)
+- Gmail MCP confirmed available
+- Status: CURRENT + NO BREAKING CHANGES

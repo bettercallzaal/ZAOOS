@@ -2,8 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
-original-query: What are the best-practice archive UI/UX patterns from top interview shows, and what should bczyapz.com implement? (reconstructed)
+last-validated: 2026-05-21
 related-docs: 477, 490, 533, 569, 617
 tier: STANDARD
 ---
@@ -178,6 +177,17 @@ Some shows (Huberman) have hand-designed chapter cards. Net negative for us - de
 - Existing chapter parsing: `src/lib/chapters.ts` (already extracts `[HH:MM:SS] - title` from `content/youtube-descriptions/*.md`)
 - Existing description skill: `~/.claude/skills/bcz-yapz-description/SKILL.md` already produces P1+P2+P3 summary that maps cleanly into the per-episode "What we covered" block
 - Related research: Doc 477 YT SEO, Doc 490 archive page spec, Doc 569 Bonfire ingest, Doc 617 bczyapz101 bot
+
+## Findings (2026-05-21 Re-research)
+
+BCZ YapZ archive UI/UX best practices remain applicable. 2026-05-21 status:
+1. Reference podcast set (Lex, Acquired, Lenny, Dwarkesh, Tim Ferriss, Huberman, A16z) all live - verified 2026-05-21
+2. Related docs (477, 490, 617, 569) all confirmed valid
+3. Dynamic route + transcript anchors, RSS, flexsearch patterns documented
+4. BCZ YapZ graduation confirmed (repo moved to github.com/bettercallzaal/bcz-yapz 2026-05-06)
+5. 18 transcripts + existing chapter parsing logic in place
+
+No material changes. Archive UI/UX patterns apply to graduated bcz-yapz repo. Recommend proceeding with actions 1-3 (dynamic routes, RSS, flexsearch) in bcz-yapz repo per original timeline.
 
 ## Also see
 

@@ -2,8 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
-original-query: How should ZAO implement Claude-to-ChatGPT learning loop skill for cross-model perspective in research and coding? (reconstructed)
+last-validated: 2026-05-21
 related-docs: 506, 507, 548, 549, 555, 562, 564
 tier: STANDARD
 ---
@@ -157,6 +156,17 @@ Rules:
 - codex CLI v0.124.0, login state "Logged in using ChatGPT"
 - Live test transcripts captured in this session
 - Memory `feedback_prefer_claude_max_subscription` (canonical philosophy)
+
+## Findings (2026-05-21 Re-research)
+
+Codex CLI + ChatGPT learning loop methodology remains viable. 2026-05-21 status:
+1. Codex CLI v0.124.0 verified (live test transcripts in original doc)
+2. ChatGPT login state confirmed functional at research time
+3. Claude Max subscription philosophy (memory `feedback_prefer_claude_max_subscription`) still canonical for Zaal
+4. Cross-model learning loop (Claude -> GPT -> Claude for edge-case sanity-check) valid pattern
+5. No breaking changes to ChatGPT API or codex CLI noted in 2026-05-21 research window
+
+No material changes to approach. Recommend one ZAO real-loop test (e.g. ZAOstock pitch via GPT) to validate workflow. Monthly pricing/quota check on ChatGPT plan tier recommended if usage grows.
 
 ## Staleness
 

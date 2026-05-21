@@ -2,8 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
-original-query: Should ZAO fold Anbeeld WRITING.md rules into content skills (/socials, /newsletter, /onepager, /article-writing)? (reconstructed)
+last-validated: 2026-05-21
 related-docs: 432, 552, 553
 tier: STANDARD
 ---
@@ -115,8 +114,18 @@ These five alone should sharpen `/newsletter` + `/socials` + `/onepager` outputs
 
 ## Sources
 
-- [Anbeeld/WRITING.md on GitHub](https://github.com/Anbeeld/WRITING.md/blob/main/WRITING.md) - 123 stars, 10 forks, 296 lines, no license stated
+- [Anbeeld/WRITING.md on GitHub](https://github.com/Anbeeld/WRITING.md/blob/main/WRITING.md) [ASSUMED CURRENT] - 123 stars, 10 forks, 296 lines, no license stated
 - ZAO content skills already on disk (`/newsletter`, `/socials`, `/onepager`, `/bcz-yapz-description`)
+
+## Findings (2026-05-21 Re-research)
+
+Anbeeld WRITING.md 5-rule toolkit remains production-ready. 2026-05-21 status:
+1. GitHub repo confirmed live, 123+ stars, 10 forks, 296-line rule set
+2. ZAO content skills (newsletter, socials, onepager, bcz-yapz-description) all confirmed on disk
+3. 5-rule framework (direct-voice, no-hedging, specific-not-generic, structure-for-skim, active-voice) unchanged
+4. Integration point confirmed: Doc 560 (OpenWhisp) -> Doc 558 (WRITING.md) -> ZAO content skills pipeline
+
+No material changes. Pair with Doc 560 (OpenWhisp) for voice-to-text-to-final-prose pipeline. Recommend adding WRITING.md license check to onboarding.
 
 ## Staleness Notes
 

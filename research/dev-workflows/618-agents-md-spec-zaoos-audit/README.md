@@ -2,8 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
-original-query: How well does ZAOOS codebase follow AGENTS.md specification, and where are the gaps? (reconstructed)
+last-validated: 2026-05-21
 related-docs: 234, 459, 547, 601, 605, 607, 611, 613
 tier: STANDARD
 ---
@@ -149,6 +148,16 @@ What's missing is mostly cosmetic linking and a security mirror in AGENTS.md. Th
 | 2 | Mirror per-package CLAUDE.md to AGENTS.md (4 files) | Claude | PR | Lower priority, next session |
 | 3 | Decide on `/agents/<role>/` rename to PERSONA.md | @Zaal | Decision | Whenever |
 | 4 | Re-validate this doc 30 days from now | Claude | Doc update | 2026-06-06 |
+
+## Findings (2026-05-21 Re-research)
+
+AGENTS.md spec + ZAOOS audit remains strategy doc (internal framework). 2026-05-21 status:
+1. agents.md homepage live (60K+ adoption noted from 2026-05-06 fetch)
+2. Doc 613 (Hermes canonical), Doc 547 (multi-agent), Doc 607 (3 bots) all confirmed valid
+3. AGENTS.md files located in root + packages + agents/ per audit
+4. 5 cleanup actions documented, actionable
+
+No material changes. AGENTS.md spec remains internal ZAOOS standard. Recommend running 5 cleanup actions (root AGENTS.md cleanup, doc 618 application, per-package CLAUDE.md mirror, PERSONA.md rename decision, re-validation) on 2026-06-06 timeline.
 
 ## Sources
 

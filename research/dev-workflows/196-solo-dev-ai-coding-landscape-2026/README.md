@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: What is the solo developer + AI coding landscape in 2026? (reconstructed)
 tier: STANDARD
 ---

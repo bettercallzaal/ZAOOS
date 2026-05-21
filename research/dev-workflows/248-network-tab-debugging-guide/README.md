@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Create a practical guide for using the browser Network tab to find and fix issues across ZAO OS's 247 API routes, 45 route directories, and 552+ logger calls (reconstructed)
 tier: STANDARD
 ---

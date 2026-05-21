@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Full inventory of every scheduled job and every running bot across local + Vercel + VPS 1 - surface dead zombie crash-looping and silent-failing units (reconstructed)
 related-docs: 422, 459, 547, 601, 652
 tier: STANDARD

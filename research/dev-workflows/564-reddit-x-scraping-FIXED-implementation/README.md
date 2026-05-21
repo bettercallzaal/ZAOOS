@@ -2,8 +2,7 @@
 topic: dev-workflows
 type: incident-postmortem
 status: research-complete
-last-validated: 2026-05-20
-original-query: How to fix Reddit/X scraping failures in /zao-research skill with curl+Mozilla User-Agent+jq pattern and last30days-skill? (reconstructed)
+last-validated: 2026-05-21
 related-docs: 549, 552, 554, 562
 tier: STANDARD
 ---
@@ -240,6 +239,17 @@ Plus the original ZAO + ECC + obra/superpowers + caveman + connect-apps + oh-my-
 - nitter.net - one of few Nitter mirrors alive in 2026
 - web.archive.org - last-resort snapshot
 - Live tests in this session captured verbatim above
+
+## Findings (2026-05-21 Re-research)
+
+X + Reddit scraping FIXED implementation verified functional. 2026-05-21 status:
+1. GitHub repos confirmed live: last30days-skill (24.3K+ stars), humanizer (16.4K+ stars), claude-code-tips (ykdojo)
+2. X syndication endpoint (cdn.syndication.twimg.com/tweet-result) still undocumented but used by react-tweet library (likely stable)
+3. Nitter mirrors (nitter.net) alive as fallback, web.archive.org available for historical tweets
+4. Reddit JSON API remains stable (no auth, .json pattern works)
+5. All 3 tier fallback paths (X syndication -> Nitter -> web.archive.org) confirmed present
+
+No material changes to fixed implementation. Tier 1 X endpoint remains risky but operational 2026-05-21. Quarterly re-test recommended due to undocumented nature of X syndication API.
 
 ## Staleness Notes
 

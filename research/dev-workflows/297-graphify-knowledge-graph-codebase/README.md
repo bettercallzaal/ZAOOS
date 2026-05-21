@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Evaluate Graphify as a knowledge graph tool for ZAO OS's 863 source files and 338 research docs—token reduction, integration, Obsidian vault generation (reconstructed)
 tier: STANDARD
 ---
@@ -19,7 +19,7 @@ tier: STANDARD
 
 | Decision | Recommendation |
 |----------|----------------|
-| **Install Graphify** | USE Graphify - MIT-licensed, free, 71.5x token reduction on large corpora. ZAO OS has 863 .ts/.tsx files + 338 research docs = ideal candidate |
+| **Install Graphify** | USE Graphify - MIT-licensed (safishamsi/graphify on GitHub), 50,273 stars, latest release v0.8.14 (May 20 2026), 71.5x avg token reduction on 52-file mixed corpus (ranges 5.4x-126.7x per query). ZAO OS has 863 .ts/.tsx files + 338 research docs = ideal candidate [FULL] |
 | **Primary use case** | Index `research/` folder first (338 docs, 5.9MB) - this is the biggest context burden in every session |
 | **Secondary use case** | Index `src/` for codebase navigation - "what calls this function" and "what connects auth to rate limiting" |
 | **Integration method** | Install as Claude Code skill via `pip install graphifyy && graphify install` - no codebase changes needed |
@@ -29,17 +29,17 @@ tier: STANDARD
 
 ---
 
-## Comparison of Options
+## Comparison of Options (Updated May 21 2026)
 
 | Tool | Token Reduction | Setup | License | Code Support | Docs/Images | Persistent Graph | Price |
 |------|----------------|-------|---------|-------------|-------------|-----------------|-------|
-| **Graphify** | 71.5x | 2 commands, Claude Code skill | MIT | 19 languages via tree-sitter | PDF, MD, images (Claude Vision) | Yes (JSON + Obsidian) | Free |
+| **Graphify** | 71.5x avg (5.4x-126.7x range) | 1 line: `pip install graphifyy` + `graphify install --platform claude` | MIT (safishamsi/graphify, 50.3K stars) | 19 languages via tree-sitter | PDF, MD, images (Claude Vision), videos | Yes (JSON + Obsidian vault + interactive HTML) | Free |
 | **GitNexus MCP** | ~5-10x (API-based) | Already installed in ZAO OS | Proprietary | Code-focused queries | No doc support | No (query-time) | Free tier |
 | **Raw file reading** | 1x (baseline) | None | N/A | All | All | No | Free |
 | **Vector DB (pgvector)** | ~10-20x | Supabase extension + embeddings pipeline | Apache-2.0 | Via embeddings | Via embeddings | Yes | Supabase included |
 | **Cursor/Windsurf indexing** | ~5-15x | IDE-specific | Proprietary | IDE languages | Limited | IDE session only | $20-40/mo |
 
-Graphify wins for ZAO OS: highest token reduction, MIT-licensed, works as Claude Code skill (our primary dev tool), supports both code AND research docs, generates persistent Obsidian vault.
+Graphify wins for ZAO OS: highest token reduction (71.5x avg on mixed corpora), MIT-licensed (safishamsi/graphify), works as Claude Code skill (our primary dev tool), supports both code AND research docs + PDFs + images + videos, generates persistent Obsidian vault + interactive HTML visualization. Latest release May 20 2026. [FULL]
 
 ---
 

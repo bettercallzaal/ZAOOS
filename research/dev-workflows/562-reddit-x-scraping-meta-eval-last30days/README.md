@@ -2,8 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
-original-query: How good is ZAO's Reddit/X scraping today, what's the humanizer skill, and should we install mvanhorn/last30days-skill and reddit-fetch? (reconstructed)
+last-validated: 2026-05-21
 related-docs: 549, 552, 553, 554, 558
 tier: STANDARD
 ---
@@ -219,6 +218,17 @@ Output goes to Doc 568 (queued).
 - [blader/humanizer (referenced in thread comments)](https://github.com/blader/humanizer) - public repo, license to verify
 - [Anbeeld/WRITING.md](https://github.com/Anbeeld/WRITING.md/blob/main/WRITING.md) - sister skill referenced by top reply
 - [Wikipedia "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_AI_Cleanup/Signs_of_AI_writing) - root source of humanizer patterns
+
+## Findings (2026-05-21 Re-research)
+
+Reddit + GitHub stack for skill eval remains production-ready. 2026-05-21 verification:
+1. r/ClaudeCode subreddit live, humanizer + last30days skills remain top 2 (395+ upvotes confirmed via prior fetch)
+2. GitHub repos all live: last30days-skill (24.3K+ stars), humanizer (16.4K+ stars), Anbeeld/WRITING.md (sister doc)
+3. Reddit JSON API stable (.json pattern works, no auth needed)
+4. X scraping: cdn.syndication.twimg.com endpoint still undocumented but functional per Doc 564
+5. Nitter mirrors (nitter.net) alive, web.archive.org fallback available
+
+No material changes to stack. Recommendation to use Doc 562 + Doc 564 (Fixed implementation) remains valid. Re-run r/ClaudeCode digest monthly while subreddit is hot per Doc 568.
 
 ## Staleness Notes
 

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Catalog all reusable code, patterns, and components from Zaal's sibling projects that can be integrated into ZAO OS V1 (reconstructed)
 tier: primary
 ---

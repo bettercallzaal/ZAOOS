@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Deep dive into Ole Lehmann's autoresearch method, compare with ZAO's installed autoresearch skill, design ready-to-use eval checklists for ZAO's top 5 skills (reconstructed)
 tier: STANDARD
 ---

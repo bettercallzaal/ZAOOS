@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Which Claude tools and MCP servers should ZAO OS evaluate and install? (reconstructed)
 tier: STANDARD
 ---
@@ -45,7 +45,7 @@ Five MCP servers are core to Claude Code workflows per May 2026 research:
 
 | Server | Purpose | ZAO Fit | Status |
 |--------|---------|---------|--------|
-| **Context7** (51.8K stars) | Fetch current library docs for Next.js, Supabase, etc. | DIRECT - solves training-cutoff hallucinations | INSTALL |
+| **Context7** (55.7K stars, updated 2026-05-21) | Fetch current library docs for Next.js, Supabase, etc. | DIRECT - solves training-cutoff hallucinations. Latest: ctx7@0.4.2 (May 11 2026), 120 contributors, 74 releases, active maintenance [FULL] | INSTALL |
 | **Playwright** (MS, official) | Browser automation + testing. Local, no data exfil risk. | MEDIUM - ZAO uses Playwright for page testing | INSTALL |
 | **GitHub MCP** (official) | PR triage, code search, issue tracking | MEDIUM - ZAO on GitHub, already have gh CLI | OPTIONAL |
 | **Sequential Thinking** (official) | Multi-step reasoning for complex problems | LOW - not a bottleneck for ZAO currently | DEFER |
@@ -59,7 +59,7 @@ All 5 are first-party or high-rep community servers. Total context tax manageabl
 
 | Tool | What It Does | License | Stars | Free Tier | Install Command | ZAO Integration Notes |
 |------|-------------|---------|-------|-----------|-----------------|----------------------|
-| **Context7** | Injects up-to-date library docs into LLM context. No more hallucinated APIs. Supports Next.js, Supabase, React, etc. | MIT | 51.3k | Free API key at context7.com/dashboard; paid = higher rate limits | `npx ctx7 setup` | Direct hit. ZAO uses Next.js 16, Supabase, React 19 — all supported. Eliminates outdated API pattern hallucinations. MCP server at `https://mcp.context7.com/mcp`. |
+| **Context7** | Injects up-to-date library docs into LLM context. No more hallucinated APIs. Supports Next.js, Supabase, React, etc. | MIT | 55,752 (updated May 20 2026) | Free API key at context7.com/dashboard; paid = higher rate limits | `npx ctx7 setup` | Direct hit. ZAO uses Next.js 16, Supabase, React 19 — all supported. Eliminates outdated API pattern hallucinations. MCP server at `https://mcp.context7.com/mcp`. Latest release ctx7@0.4.2 (May 11 2026). [FULL] |
 | **Codebase Memory MCP** | Persistent knowledge graph via tree-sitter AST parsing (66 languages). SQLite + LZ4 storage. | MIT | 1.1k | Fully free/local | `curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh \| bash` | ZAO already has `research/_graph/KNOWLEDGE.json` (194 docs) + grep/glob. This tool adds AST-level code graph (functions, classes, routes, relationships). Overkill now but valuable if codebase grows significantly. |
 | **Markdownify MCP** | Converts PDFs, images, audio, DOCX, XLSX, PPTX, YouTube transcripts to Markdown. | MIT | 2.5k | Fully free/local | Clone + `pnpm install && pnpm build` | Claude Code already reads PDFs and images natively. ZAO's research ingestion workflow uses WebFetch + WebSearch. Marginal gain. |
 | **MCPHub** | Centralized management of multiple MCP servers. Dashboard UI, Docker support, smart routing, hot-swap config. | Apache-2.0 | 2.0k | Fully free/self-hosted | `docker run -p 3000:3000 -v ./mcp_settings.json:/app/mcp_settings.json samanhappy/mcphub` | Strong fit for OpenClaw VPS (31.97.148.88). ZOE currently manages MCP servers individually. MCPHub adds unified endpoint, dashboard monitoring, and OAuth. Docker-native = easy deploy. |

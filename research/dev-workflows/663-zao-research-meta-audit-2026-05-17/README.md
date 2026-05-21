@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Extend /zao-research skill to search across 30+ bettercallzaal repos - inventory every active ZAO ecosystem repo score graduation readiness - audit research library for collisions orphans stale broken refs (reconstructed)
 related-docs: 459, 547, 562, 601, 660, 661, 664
 tier: DISPATCH
@@ -10,7 +10,9 @@ tier: DISPATCH
 
 # 663 — ZAO Ecosystem Meta-Audit + Library Hygiene + Skill Upgrade (May 2026)
 
-> **Goal:** Three-in-one DISPATCH per Zaal's prompt ("can we /zao-research the research and all the githubs"). (1) Extend the /zao-research skill to search across 30+ bettercallzaal repos by default. (2) Inventory every active ZAO ecosystem repo + score graduation readiness. (3) Audit the research library itself (729 docs) for collisions, orphans, stale, broken refs, frontmatter compliance. 7 parallel sub-agents ran for ~10 min each; this hub synthesizes their returns.
+> **Goal:** Three-in-one DISPATCH per Zaal's prompt ("can we /zao-research the research and all the githubs"). (1) Extend the /zao-research skill to search across 30+ bettercallzaal repos by default. (2) Inventory every active ZAO ecosystem repo + score graduation readiness. (3) Audit the research library itself for collisions, orphans, stale, broken refs, frontmatter compliance.
+
+**Re-verified 2026-05-21:** Research library now contains 789 docs (not 729 at May 17). /zao-research skill confirmed live on May 21. 7 parallel sub-agents ran for ~10 min each; this hub synthesizes their returns.
 
 ## Top 10 Findings (Cross-Doc Consensus)
 

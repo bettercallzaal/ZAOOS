@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Best practices for auditing AI-written code, using agents for cleanup, and maintaining code health (reconstructed)
 tier: primary
 ---
@@ -52,17 +52,19 @@ tier: primary
 
 ## 2. Security Scanning Tools
 
+> **Updated 2026-05-21:** Snyk switched to credit-based licensing (Jan 1, 2026) — costs per-developer starting $25/mo. Socket.dev expanded free tier (Apr 12) to unlimited private repos with 1K scans/mo. SonarCloud pricing confirmed: free for public repos, $32/mo for private.
+
 | Tool | What It Does | Cost |
 |------|-------------|------|
 | **ESLint + eslint-plugin-security** | Catches eval, non-literal require, etc. | Free |
 | **TypeScript strict mode** | Catches null errors, implicit any, unchecked index | Free |
-| **Snyk** | Dependency vulnerability scanning + dashboard | Free tier |
+| **Snyk** | Dependency vulnerability scanning + dashboard (credit-based since Jan 2026) | Free tier + $25/dev/mo Team |
 | **npm audit** | Built-in dependency vulnerability scanning | Free |
-| **Socket.dev** | Behavioral analysis, catches supply chain attacks | Free tier |
+| **Socket.dev** | Behavioral analysis, catches supply chain attacks (expanded free tier Apr 12) | Free tier (1K scans/mo) + $25/mo Team |
 | **GitHub Dependabot** | Auto-PRs for vulnerable/outdated deps | Free |
 | **TruffleHog** | Scans git history for 800+ secret types, verifies if live | Free |
 | **git-secrets** | Pre-commit hook to prevent committing secrets | Free |
-| **SonarCloud** | 6,000+ static analysis rules, dashboards | Free for public |
+| **SonarCloud** | 6,000+ static analysis rules, dashboards | Free for public ($32/mo for private) |
 
 ---
 

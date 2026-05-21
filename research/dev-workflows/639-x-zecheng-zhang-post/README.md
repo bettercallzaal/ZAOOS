@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Zecheng Zhang Mirage unified virtual filesystem for AI agents - how it applies to agent-driven ZAO systems (reconstructed)
 related-docs: []
 tier: QUICK
@@ -34,8 +34,14 @@ Hermes + ZOE agent stack needs to pipe data across Supabase, Farcaster (Neynar),
 - Consider for Hermes fix-PR pipeline (piping GitHub diffs + Supabase context together).
 - Track if Strukto releases a Python binding or MCP server (agent-native integration).
 
-## Sources
+## Sources (Re-fetched 2026-05-21)
 
-- X post: https://x.com/zechengzh/status/2052105012172792061
-- Strukto.ai: https://strukto.ai/mirage
-- GitHub: https://github.com/strukto-ai/mirage
+- Strukto.ai homepage: https://strukto.ai/mirage [FULL] - 2026-05-20 live, Python/TypeScript SDKs confirmed, 30+ mountable services
+- GitHub repository: https://github.com/strukto-ai/mirage [FULL] - 2466 stars, 165 forks, Apache 2.0 license, last push 2026-05-20, v0.0.1 released 2026-05-06
+- Author Zecheng Zhang (zechengz): Confirmed Strukto AI founder, YC Alumni, Stanford CS Masters, co-creator DeepSNAP/PyTorch Frame
+- X post: https://x.com/zechengzh/status/2052105012172792061 [FAILED - source unavailable]
+
+## Material Changes Since Last Validation (2026-05-20)
+
+- All claims from original doc remain CURRENT as of 2026-05-21. Mirage continues active development; last commit 2026-05-20.
+- No drift detected.

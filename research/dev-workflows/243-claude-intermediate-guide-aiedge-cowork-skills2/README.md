@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Extract actionable insights from @aiedge_'s intermediate Claude guide—Cowork, Skills 2.0, Dispatch, prompting—and audit against ZAO OS's current Claude Code workflow (reconstructed)
 tier: STANDARD
 ---

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Document the MCP (Model Context Protocol) protocol, SDK, and best practices—with ZAO OS's existing MCP server as the baseline (reconstructed)
 tier: STANDARD
 ---

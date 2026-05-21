@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Identify Vercel marketplace integrations, built-in features, and Airtable data pipelines that benefit ZAO OS—plus evaluate building a custom Vercel integration (reconstructed)
 tier: STANDARD
 ---

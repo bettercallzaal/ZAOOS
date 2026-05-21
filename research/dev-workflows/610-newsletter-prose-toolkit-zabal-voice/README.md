@@ -2,8 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
-original-query: How should ZAO tighten ZABAL newsletter voice prose quality and toolkit for consistent brand tone? (reconstructed)
+last-validated: 2026-05-21
 related-docs: 432, 549, 558, 562, 563, 607
 tier: STANDARD
 ---
@@ -73,11 +72,22 @@ Output also missed Zaal's mid-stream addition (Rome conference, second main-stag
 | Test on Zaal's May 5 entry (Rome addition) | @Zaal | Bot test | After deploy |
 | Re-validate this doc after 5 published entries | Claude | Doc update | 2026-05-12 |
 
+## Findings (2026-05-21 Re-research)
+
+Newsletter prose toolkit + ZABAL voice rules strategy remains current. 2026-05-21 status:
+1. Doc 558 (Anbeeld WRITING.md) confirmed live + paired - verified 2026-05-21
+2. Doc 562 (humanizer skill) confirmed live + functional - verified 2026-05-21
+3. Doc 563 (Shann content engine patterns) confirmed live - verified 2026-05-21
+4. 8 ZABAL anti-patterns + 6 do-rules framework documented, actionable
+5. No external API/tool dependencies - internal ZAO framework only
+
+No material changes. ZABAL voice anti-patterns + do-rules remain ZAO-specific (not externally sourced). Doc recommends newsletter-skill PR with these rules baked into bot/src/zoe/agents/newsletter.ts system prompt. Re-validate after 5 published entries per original action items (due 2026-05-12 per doc, overdue - recommend immediate validation).
+
 ## Sources
 
-- [Doc 558 - Anbeeld WRITING.md AI-Prose Diagnostic Toolkit](../558-anbeeld-writing-md/)
-- [Doc 562 - humanizer skill via blader/humanizer + last30days](../562-reddit-x-scraping-meta-eval-last30days/)
-- [Doc 563 - Shann Holmberg content engine Ronin](../563-shannholmberg-content-engine-ronin/)
+- [Doc 558 - Anbeeld WRITING.md AI-Prose Diagnostic Toolkit](../558-anbeeld-writing-md/) [VERIFIED 2026-05-21]
+- [Doc 562 - humanizer skill via blader/humanizer + last30days](../562-reddit-x-scraping-meta-eval-last30days/) [VERIFIED 2026-05-21]
+- [Doc 563 - Shann Holmberg content engine Ronin](../563-shannholmberg-content-engine-ronin/) [VERIFIED 2026-05-21]
 - [Doc 549 - Bonfire as personal second brain](../../identity/549-bonfire-personal-second-brain/)
 - [Doc 432 - ZAO master positioning Tricky Buddha space](../../community/432-zao-tricky-buddha-master-positioning/)
 - [Doc 607 - Three bots one substrate](../../agents/607-three-bots-one-substrate/)

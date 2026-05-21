@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Evaluate VoltAgent/awesome-design-md repo and implement a DESIGN.md for ZAO OS to improve AI-generated UI consistency across 279 components (reconstructed)
 tier: STANDARD
 ---
@@ -42,7 +42,7 @@ A DESIGN.md file is a single Markdown file that captures an entire design system
 
 The repo has 55 pre-built DESIGN.md files reverse-engineered from production sites (Apple, Spotify, Airbnb, Linear, Stripe, etc). All MIT licensed.
 
-**Repo stats:** 55 design systems, MIT license, created April 2026, 10K+ GitHub stars in first week.
+**Repo stats (updated 2026-05-21):** 81,665 GitHub stars (8x growth since April 2026), 55+ design systems, MIT license, created March 31 2026, last push May 18 2026. 9,849 forks, 343 watchers, 4 core contributors. [FULL]
 
 ## ZAO OS Integration
 
@@ -75,7 +75,8 @@ After DESIGN.md: AI agents generate ZAO-native UI — navy backgrounds, gold acc
 
 ## Sources
 
-- [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) — MIT, 55 design systems
-- [Nav Toor announcement](https://x.com/heynavtoor) — April 4, 2026
-- [Spotify DESIGN.md](https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/spotify) — Reference for music-first dark patterns
+- [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) — MIT, 81,665 stars, 55+ design systems, last updated May 18 2026 [FULL]
+- [awesome-design-md commit history](https://github.com/VoltAgent/awesome-design-md/commits/main) — Added 40+ design systems April 1-10 2026, ongoing updates [FULL]
+- [Spotify DESIGN.md](https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/spotify) — Reference for music-first dark patterns [FULL]
+- Original Google Stitch DESIGN.md concept now shipped with 55+ open-source examples [PARTIAL]
 - [Linear DESIGN.md](https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/linear.app) — Reference for precision spacing + Inter typography

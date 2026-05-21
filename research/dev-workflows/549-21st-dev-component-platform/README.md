@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 related-docs: 173, 250, 349, 489, 508, 548, 549a, 549b, 549c, 549d, 549e
 tier: DISPATCH
 original-query: "How should ZAO use 21st.dev for component generation in UI projects? (reconstructed)"
@@ -58,15 +58,16 @@ Separate product surface, same org:
 
 Big picture: 21st-dev is becoming a full agent-tooling company, not just a component shop.
 
-## Pricing (Official 21st.dev, confirmed 2026-05-20)
+## Pricing (Official 21st.dev, confirmed 2026-05-21)
 
-| Tier | $/mo | Credits/mo | Inspiration | Logo Search | Site Clone | Early Access |
-|---|---|---|---|---|---|---|
-| Free | $0 | 100 | Unlimited | Unlimited | No | No |
-| Pro | $20 | 400 | Unlimited | Unlimited | **Yes** | No |
-| Max | $100 | 2000 | Unlimited | Unlimited | Yes | **Yes** |
+| Tier | $/mo | $/yr | Credits/mo | Inspiration | Logo Search | Site Clone | Early Access |
+|---|---|---|---|---|---|---|---|
+| Free | $0 | $0 | 100 | Unlimited | Unlimited | No | No |
+| Pro | $20 | $192 ($16/mo) | 400 | Unlimited | Unlimited | **Yes** | No |
+| Pro Plus | $40 | $384 ($32/mo) | 200 | Unlimited | Unlimited | Yes | **Yes** |
+| Max | $100 | $804 ($67/mo) | 2000 | Unlimited | Unlimited | Yes | Yes |
 
-RESOLVED: Free tier is 100 credits/month (not 5 requests). Official `/magic` page confirms, cleared by May 20 fetch. Pro adds site cloning. Annual pricing not exposed. No team/enterprise tier documented.
+UPDATED 2026-05-21: Two new tiers discovered. Pro Plus at $40/mo appears counter-intuitive (fewer credits than Pro for 2x price), but includes early access to new features. Annual billing available on all paid tiers with 20% discount. Official `/magic` page confirms. Free tier is 100 credits/month (confirmed, not 5 requests).
 
 ## ZAO-Specific Recommendations (Concrete)
 
@@ -97,7 +98,7 @@ RESOLVED: Free tier is 100 credits/month (not 5 requests). Official `/magic` pag
 | `21st-dev/magic-mcp` forks | 340 | same |
 | `21st-dev/magic-mcp` license | MIT | repo metadata |
 | `21st-dev/magic-mcp` last update | 2026-05-21 01:17 UTC | same |
-| `1code` stars | 5,532 | `gh api repos/21st-dev/1code` (2026-05-20) |
+| `1code` stars | 5,533 | `gh api repos/21st-dev/1code` (2026-05-21, +1 since 2026-05-20) |
 | `1code` growth | +38 stars vs April | 5,494 -> 5,532 in 3 weeks; trending up |
 | `21st-sdk` stars | 107 | `gh api orgs/21st-dev/repos` |
 | `agent-elements` stars | 50 | same |
@@ -143,6 +144,6 @@ RESOLVED: Free tier is 100 credits/month (not 5 requests). Official `/magic` pag
 - Pricing conflict RESOLVED: Free tier is 100 credits/month (confirmed on official `/magic` page 2026-05-20). Earlier $10/month + 5-request figures are obsolete (Apidog blog was 2025, Skywork article pre-2026).
 - Component categories list from landing page navigation, treat as "at least these," not "only these."
 - Site cloning confirmed on Pro tier + Max tier per official pricing.
-- Beta notice: ChatForest notes "all features free during this period" - clarify what "beta" means (might be time-limited free period).
+- Beta notice: ChatForest (Apr 20, 2026) notes "all features free during beta period"; GitHub repo README also shows beta notice. IMPORTANT: Free tier may be temporary. Lock in any heavy use NOW before pricing changes. Official `/magic` pricing page does not mention beta expiration date; assume permanent until announced otherwise, but monitor.
 - 1code stars rising fast (5,532 vs 5,494 in April = +38 in 3 weeks); re-validate monthly.
 - Re-validate by 2026-05-27.

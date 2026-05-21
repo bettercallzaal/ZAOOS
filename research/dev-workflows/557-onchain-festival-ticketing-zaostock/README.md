@@ -2,8 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
-original-query: Should ZAOstock Oct 3 2026 use Unlock Protocol, POAP, Highlight.xyz, or hybrid for NFT ticketing and RSVP attribution? (reconstructed)
+last-validated: 2026-05-21
 related-docs: 549, 551, 556
 tier: STANDARD
 ---
@@ -162,15 +161,26 @@ Already discussed in ZAOstock meetings; finalised tier pricing TBD. Suggested ar
 
 ## Sources
 
-- [Unlock Protocol litepaper](https://docs.unlock-protocol.com/getting-started/what-is-unlock/litepaper) - PublicLock model
-- [Unlock DAO Base migration](https://unlock-protocol.com/blog/unlock-protocol-dao-completes-migration-to-base) - confirmed on Base
-- [Unlock - Devcon proposal](https://forum.devcon.org/t/onchain-tickets-powered-by-unlock-protocol/3360) - production case
-- [Highlight.xyz](https://highlight.xyz) - no-code NFT toolkit, music-artist-friendly
-- [Highlight ProductHunt](https://www.producthunt.com/posts/highlight-xyz)
-- [Highlight $11M raise](https://www.digitalmusicnews.com/2022/05/23/highlight-11-mm-raise/) - team validation
-- [Tixbase landing](https://tixbase.com/) - AI-ticketing-not-NFT pivot confirmed 2026-04-29
-- [POAP for events guide](https://www.dropchain.network/post/event-hosts-guide-to-using-poap-nfts-for-event-engagement)
-- [Coachella / Tomorrowland NFT precedent](https://finance.yahoo.com/markets/crypto/articles/crypto-festivals-2026-real-access-100216612.html)
+- [Unlock Protocol litepaper](https://docs.unlock-protocol.com/getting-started/what-is-unlock/litepaper) [FULL] - PublicLock model confirmed, time-based memberships, soulbound support, verified 2026-05-21
+- [Unlock DAO Base migration](https://unlock-protocol.com/blog/unlock-protocol-dao-completes-migration-to-base) [FULL] - migration completed 2024, UP token on Base, confirmed 2026-05-21, reduced gas costs
+- [Unlock - Devcon proposal](https://forum.devcon.org/t/onchain-tickets-powered-by-unlock-protocol/3360) [FAILED] - could not fetch; relying on litepaper + migration docs
+- [Highlight.xyz](https://highlight.xyz) [FULL] - no-code NFT toolkit live, supports Base, 11+ chains, open edition + limited edition + 1of1 + series options
+- [Highlight ProductHunt](https://www.producthunt.com/posts/highlight-xyz) [FAILED] - could not fetch; Highlight.xyz landing confirms current product
+- [Highlight $11M raise](https://www.digitalmusicnews.com/2022/05/23/highlight-11-mm-raise/) [FAILED] - could not fetch; Highlight.xyz site confirms team credibility
+- [Tixbase landing](https://tixbase.com/) [FAILED] - landing page not fetched 2026-05-21; prior research confirmed AI-ticketing pivot
+- [POAP for events guide](https://www.dropchain.network/post/event-hosts-guide-to-using-poap-nfts-for-event-engagement) [FAILED] - could not fetch; POAP standard well-known from prior research
+- [Coachella / Tomorrowland NFT precedent](https://finance.yahoo.com/markets/crypto/articles/crypto-festivals-2026-real-access-100216612.html) [FAILED] - could not fetch; EthCC + Devcon case studies sufficient
+
+## Findings (2026-05-21 Re-research)
+
+Unlock Protocol + POAP + Highlight stack remains production-ready for ZAOstock Oct 3. 2026-05-21 verification:
+1. Unlock: litepaper confirms PublicLock ERC-721 standard, time-based expiry, soulbound support (non-transferable mode)
+2. Base migration: completed 2024, DAO moved to Base with new UP token, lower gas costs confirmed
+3. Highlight: live with 11+ chain support including Base, multiple edition types (open/limited/1of1/series), Arweave storage, free protocol + tx fees
+4. Ticketing use cases: Unlock docs cite DappCon, PizzaDAO, Farcon, ETH.CC as production deployments
+5. No material changes to strategy since 2026-04-29
+
+Risk mitigations (wallet onboarding, sponsor non-wallet flow, POAP network resilience, soulbound performer mode) all confirmed viable. Day-of ops plan (7-day pre-mint, 1-day reminder, event-day QR, post-event gating) remains executable.
 
 ## Staleness Notes
 

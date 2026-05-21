@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: research
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Define branching/merging strategy for solo founder with Paperclip AI agents creating branches and commits (reconstructed)
 tier: primary
 ---

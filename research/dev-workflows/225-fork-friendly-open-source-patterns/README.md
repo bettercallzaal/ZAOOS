@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Research how the best forkable open-source projects structure themselves for easy cloning and customization—Cal.com, Dub.co, Ghost CMS, Discourse, Mastodon—with specific recommendations for ZAO OS (reconstructed)
 tier: STANDARD
 ---

@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
 original-query: Address two real failures of post slate v1 - drafts are off-voice missing ZAO rules and fire-and-forget bad ones still hit phone with no rejection option (reconstructed)
 related-docs: 533, 537, 558, 562, 610, 655
 tier: STANDARD

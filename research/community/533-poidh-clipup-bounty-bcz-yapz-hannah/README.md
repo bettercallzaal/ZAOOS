@@ -5,6 +5,7 @@ status: shipped
 last-validated: 2026-04-27
 related-docs: 415, 468, 477, 490
 tier: STANDARD
+original-query: How should BCZ YapZ episodes and ZAO content establish a recurring clip-up bounty format to reward community distribution? (reconstructed)
 ---
 
 # 533 — POIDH Clip-Up Bounty: BCZ YapZ Ep 17 (Hannah / Farm Drop)

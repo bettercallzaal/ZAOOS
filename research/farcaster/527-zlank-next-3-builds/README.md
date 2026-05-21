@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-04-25
 related-docs: 295, 489, 498, 500, 505
 tier: STANDARD
+original-query: What are the top 3 product priorities for Zlank after v1 ships at FarHack 2026? (reconstructed)
 ---
 
 # 527 — Zlank Next: Top 3 Builds Post-FarHack

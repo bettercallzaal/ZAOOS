@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-05-20
 related-docs: 461, 506, 507, 508, 523, 524, 527
 tier: STANDARD
+original-query: Should ZAO or Hermes adopt pi.dev as a Claude Code CLI replacement, or stick with current Anthropic API integration? (reconstructed)
 ---
 
 # 528 - pi.dev Coding Agent (Mario Zechner / @badlogic)

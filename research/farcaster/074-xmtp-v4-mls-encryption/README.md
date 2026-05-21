@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** 2026-03-19
 > **Goal:** Document what changed since doc 13, MLS group messaging details, and impact on ZAO OS's XMTP integration
+> **Original-Query:** What changed in XMTP v7 (MLS encryption, payer wallets, history sync), and how should ZAO OS update its integration? (reconstructed)
 
 ---
 

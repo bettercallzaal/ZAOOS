@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 8, 2026
 > **Goal:** Reduce Claude token consumption during ZAO OS development - hit weekly limits both of the last two weeks
+> **Original-Query:** How can ZAO OS development reduce token burn and avoid hitting weekly API limits? (reconstructed)
 
 ---
 

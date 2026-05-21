@@ -3,6 +3,7 @@
 > **Status:** Installed and active
 > **Date:** April 14, 2026
 > **Goal:** Cut ~25% total session tokens (65-75% output tokens) via compressed response style
+> **Original-Query:** Can the caveman skill reduce token burn in Claude Code sessions while maintaining code quality? (reconstructed)
 
 ---
 

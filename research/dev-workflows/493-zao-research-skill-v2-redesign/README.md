@@ -8,6 +8,7 @@ related-docs:
   - ~/.claude/skills/zao-research/CHANGELOG.md
   - ../../events/_zaostock-hub/README.md (dogfooding example of v1)
   - ../../events/492-zaostock-sixsigma-ops-and-telegram-bot/README.md (another v1 output)
+original-query: How should the /zao-research skill be redesigned to source from community platforms (Reddit, X, HN) without blind spots, and remain parallel-session safe? (reconstructed)
 ---
 
 # 493 - /zao-research Skill v2 Redesign (Audit + Community-Source Mandate)

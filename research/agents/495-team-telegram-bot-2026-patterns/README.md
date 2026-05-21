@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-04-24
 related-docs: 483, 492, 493, 494
 tier: STANDARD
+original-query: Should the ZAOstock Team Bot v1.5 use heuristics or cloud LLM for message classification, and should it serve one group or two? (reconstructed)
 ---
 
 # 495 - Team Telegram Bot 2026 Patterns — v1.5 Architecture Call

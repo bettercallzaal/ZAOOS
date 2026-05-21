@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-05-17
 related-docs: 601, 661, 661a, 661h, 660
 supersedes: project_fishbowlz_deprecated (memory)
+original-query: "Can FISHBOWLZ be revived on top of Juke - what co-host and mute-lockout moderation model would work? (reconstructed)"
 tier: DEEP
 ---
 

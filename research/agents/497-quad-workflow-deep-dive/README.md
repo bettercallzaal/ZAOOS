@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-04-24
 related-docs: 479, 487, 491, 492, 493
 tier: STANDARD
+original-query: When is QuadWork (4-agent team) faster than a single Claude session, and what's the optimal batch size? (reconstructed)
 ---
 
 # 497 - Quad / QuadWork Workflow Deep Dive

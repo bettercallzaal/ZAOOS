@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-05-09
 related-docs: 468, 467, 423
 tier: STANDARD
+original-query: What operational templates and prize curves should ZAO use for POIDH bounties across all brands? (reconstructed)
 ---
 
 # 625 - POIDH x ZAO Bounty Playbook (operational)

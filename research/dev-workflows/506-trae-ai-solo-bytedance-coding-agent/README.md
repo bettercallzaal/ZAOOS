@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-05-20
 related-docs: 491, 492, 493
 tier: STANDARD
+original-query: Should ZAO OS and BCZ adopt ByteDance's TRAE SOLO as a coding agent, or stick with Claude Code Max + QuadWork? (reconstructed)
 ---
 
 # 506 - TRAE AI + SOLO Mode (ByteDance)

@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-05-07
 related-docs: 432, 547, 601, 607, 613, 618, 620
 tier: STANDARD
+original-query: What are the canonical truths about The ZAO's positioning, history, and future vision from the May 7 grill session? (reconstructed)
 ---
 
 # 621 — ZAO context canon (May 7 2026 grill session)

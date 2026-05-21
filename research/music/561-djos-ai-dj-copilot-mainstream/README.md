@@ -5,6 +5,7 @@ status: research-complete
 last-validated: 2026-05-20
 related-docs: 432, 475, 530, 549, 557
 tier: STANDARD
+original-query: Should ZAO partner with or adopt djOS (Cory Poccia's AI DJ co-pilot) for ZAOstock Oct 3 and artist tooling? (reconstructed)
 ---
 
 # 561 - djOS™ AI DJ Co-Pilot (Mainstream Entertainment Group, Apr 27 2026)

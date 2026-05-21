@@ -4,6 +4,7 @@ type: networking
 status: research-complete
 last-validated: 2026-05-20
 tier: STANDARD
+original-query: Is AnyTwoCardzz (@anytwocardzz) a potential collaborator or opportunity for The ZAO's artist community? (reconstructed)
 ---
 
 # 535 - AnyTwoCardzz: Web3 Music Producer + NFT Collector

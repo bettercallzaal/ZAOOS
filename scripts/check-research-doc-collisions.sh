@@ -6,6 +6,10 @@
 # cross-refs - blast radius > impact). Blocks any NEW collision introduced
 # in this commit.
 #
+# Scans research/<topic>/<number>-* only. Underscore-prefixed meta dirs
+# (research/_handoffs/, _archive/, _graph/, _zaostock-hub/) are skipped -
+# their files are dated or non-numbered, not collision-eligible docs.
+#
 # Invoked from .husky/pre-commit. Standalone-safe: pass repo root as $1
 # or default to git rev-parse --show-toplevel.
 
@@ -17,7 +21,7 @@ if [[ -z "$REPO" || ! -d "$REPO/research" ]]; then
   exit 0
 fi
 
-STAGED=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '^research/[^/]+/[0-9]+-' | head -50)
+STAGED=$(git diff --cached --name-only --diff-filter=A 2>/dev/null | grep -E '^research/[^_/][^/]*/[0-9]+-' | head -50)
 if [[ -z "$STAGED" ]]; then
   exit 0
 fi
@@ -25,13 +29,13 @@ fi
 NEW_NUMS=$(echo "$STAGED" | sed -E 's|^research/[^/]+/([0-9]+)-.*|\1|' | sort -u)
 
 EXISTING_NUMS=$(git ls-tree -r HEAD --name-only 2>/dev/null \
-  | grep -E '^research/[^/]+/[0-9]+-' \
+  | grep -E '^research/[^_/][^/]*/[0-9]+-' \
   | sed -E 's|^research/[^/]+/([0-9]+)-([^/]+).*|\1\t\2|' \
   | sort -u)
 
 COLLISIONS=""
 for num in $NEW_NUMS; do
-  staged_slug=$(echo "$STAGED" | grep -E "^research/[^/]+/${num}-" | head -1 | sed -E 's|^research/[^/]+/[0-9]+-([^/]+).*|\1|')
+  staged_slug=$(echo "$STAGED" | grep -E "^research/[^/]+/${num}-" | head -1 | sed -E 's|^research/[^_/][^/]*/[0-9]+-([^/]+).*|\1|')
   existing_slugs=$(echo "$EXISTING_NUMS" | awk -v n="$num" '$1 == n { print $2 }')
   if [[ -n "$existing_slugs" ]]; then
     for slug in $existing_slugs; do
@@ -49,7 +53,7 @@ if [[ -n "$COLLISIONS" ]]; then
   echo "" >&2
   echo "Pick the next free number. Recent ceiling:" >&2
   git ls-tree -r HEAD --name-only 2>/dev/null \
-    | grep -E '^research/[^/]+/[0-9]+-' \
+    | grep -E '^research/[^_/][^/]*/[0-9]+-' \
     | sed -E 's|^research/[^/]+/([0-9]+)-.*|\1|' \
     | sort -nu | tail -5 | sed 's/^/  /' >&2
   echo "" >&2

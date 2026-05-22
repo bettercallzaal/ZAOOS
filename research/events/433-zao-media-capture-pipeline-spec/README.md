@@ -8,7 +8,7 @@
 
 ## Problem Statement
 
-Every ZAO event produces immense raw cultural value: live performances, cyphers, backstage moments, crowd energy, artist interactions. ZAOCHELLA lost most of this to the ether. Phone footage on 53 different devices that never gets uploaded. A few highlight reels emerge weeks later but 95% of the material sits in camera rolls.
+Every ZAO event produces immense raw cultural value: live performances, cyphers, backstage moments, crowd energy, artist interactions. ZAO-CHELLA lost most of this to the ether. Phone footage on 53 different devices that never gets uploaded. A few highlight reels emerge weeks later but 95% of the material sits in camera rolls.
 
 For ZAOstock and every event after, we need a **structured pipeline** so media:
 1. Gets uploaded quickly (ideally day-of)

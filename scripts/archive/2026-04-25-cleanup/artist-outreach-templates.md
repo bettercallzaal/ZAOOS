@@ -61,7 +61,7 @@ Quick pitch:
 - Run by The ZAO (thezao.com), a decentralized music community.
 
 Who we are: The ZAO is a 188-member music community on Base and Farcaster
-that has been running virtual events (PALOOZA, ZAO-CHELLA) for the last
+that has been running virtual events (ZAO-PALOOZA, ZAO-CHELLA) for the last
 two years. ZAOstock 2026 is our first full IRL festival, co-presented
 with Heart of Ellsworth and the Town of Ellsworth.
 

@@ -147,7 +147,7 @@ export const linksData: MainCategory[] = [
           { title: "ZAO Festivals Website", url: "https://zaofestivals.com/", description: "Visit the official ZAO Festivals website." },
           { title: "Merch", url: "https://merch.zaofestivals.com", description: "Shop for ZAO Festivals merchandise." },
           { title: "Donate", url: "https://giveth.io/project/sustaining-zao-festivals-creativity-technology?tab=donations", description: "Donate to support ZAO Festivals." },
-          { title: "ZAO PALOOZA Artist Cards", url: "https://zao.cards", description: "View ZAO PALOOZA Artist Cards." }
+          { title: "ZAO-PALOOZA Artist Cards", url: "https://zao.cards", description: "View ZAO-PALOOZA Artist Cards." }
         ]
       },
       {

@@ -167,7 +167,7 @@ Magnetiq is on **Flow blockchain**; ZAO OS is on **Ethereum/Base/Optimism**. No 
 | **WaveWarZ Co-Founder** | Marketing, Design, Agentic Automation (WaveWarZ co-founded in 2023) |
 | **ZID 2** | Second ZAO member ever — ZID 1 = Zaal, ZID 2 = Candy |
 | **Fractal Day 1** | Ranked 2nd on the very first ZAO Fractal Respect Game |
-| **Student $LOANZ** | Creator of the $LOANZ token on Base (launched Feb 2025 on Flaunch.gg, sponsored ZAO-Chella) |
+| **Student $LOANZ** | Creator of the $LOANZ token on Base (launched Feb 2025 on Flaunch.gg, sponsored ZAO-CHELLA) |
 | **ZAOstock role** | Design + Backup Support: visual design, materials, branding, sponsorship outreach |
 
 ### CandyToyBox on GitHub — 16 Repositories (All WaveWarZ)
@@ -216,7 +216,7 @@ Candy is a **Web3 Academy DAO Operator** and member of the Web3 Academy Writers 
 Candy creates **CC0 graphics** for the ZAO and WaveWarZ ecosystems. CC0 means "Creative Commons Zero" — public domain, no rights reserved. This aligns with the ZAO's Nounish identity (Nouns DAO is CC0). Her design work includes:
 
 - WaveWarZ branding and marketing materials
-- ZAO event visual design (ZAO-Chella, ZAO-Palooza materials)
+- ZAO event visual design (ZAO-CHELLA, ZAO-PALOOZA materials)
 - Print + digital design for community materials
 - ZAOstock design materials (assigned role in Doc 224)
 
@@ -241,8 +241,8 @@ Per Devfolio: 1 project built, 1 hackathon attended, 0 prizes won. The project l
 
 ### Design Work for ZAO Events
 
-- **ZAO-Palooza (April 2024):** Trading card design, event branding
-- **ZAO-Chella (Dec 2024):** Event materials, AR art display coordination, trading cards
+- **ZAO-PALOOZA (April 2024):** Trading card design, event branding
+- **ZAO-CHELLA (Dec 2024):** Event materials, AR art display coordination, trading cards
 - **ZAOstock (Oct 2026 planned):** Assigned to Design + Backup Support team alongside DaNici
 
 ---

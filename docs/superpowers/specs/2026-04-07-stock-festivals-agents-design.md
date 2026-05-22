@@ -59,7 +59,7 @@ Both are full agents dispatched through ZOE, visible in the dashboard, accessibl
 7. Sponsor relationship tracking across events
 8. Post-event recaps and debriefs
 
-**Knowledge base:** Past events (PALOOZA, ZAO-CHELLA), virtual series (WaveWarZ, COC Concertz), satellite events (ZAO-Ville DMV), event planning templates.
+**Knowledge base:** Past events (ZAO-PALOOZA, ZAO-CHELLA), virtual series (WaveWarZ, COC Concertz), satellite events (ZAO-Ville DMV), event planning templates.
 
 **Voice:** Energetic, community-facing, supportive. Helps anyone throw an event regardless of experience.
 

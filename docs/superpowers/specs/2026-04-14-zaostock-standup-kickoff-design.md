@@ -41,7 +41,7 @@ Steve Peer*
 *Steve Peer not yet pitched
 
 **Assignment rationale:**
-- AttaBotty as Ops 2nd: 20+ years production, ran ZAO-Chella, NFTNYC/Art Basel veteran
+- AttaBotty as Ops 2nd: 20+ years production, ran ZAO-CHELLA, NFTNYC/Art Basel veteran
 - Candy as Finance 2nd: ran $10-25K/send sponsorship pipeline at Milk Road/Impact3
 - Candy also on Design: ZAO #2, all WaveWarZ branding, 557 GitHub contributions - bridges both teams
 - Tyler on Finance: JPMorgan + Accenture finance background, grant writing experience

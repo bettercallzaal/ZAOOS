@@ -78,8 +78,8 @@ Maine has:
 
 | Event | What worked | What didn't |
 |-------|-------------|-------------|
-| PALOOZA | Community energy, in-person bonds | Thin production, thin margins |
-| CHELLA | Cross-community reach, WaveWarZ visibility | Scheduling conflicts with main event |
+| ZAO-PALOOZA | Community energy, in-person bonds | Thin production, thin margins |
+| ZAO-CHELLA | Cross-community reach, WaveWarZ visibility | Scheduling conflicts with main event |
 | PROS | Network expansion | Conference audience not converted to ZAO members |
 
 ---
@@ -109,7 +109,7 @@ These are **tools under the hood**, not marketing points:
 1. **Artist payments via 0xSplits** — transparent revenue splits, every penny on-chain, no intermediaries
 2. **Attendance POAP / NFT** — proof-of-attendance token for attendees; limited edition, collector value
 3. **Magnetiq Proof of Meet** — IRL connection tokens for attendees who meet each other at the festival
-4. **ZAO Card drops** — limited edition physical + digital cards, similar to PALOOZA format
+4. **ZAO Card drops** — limited edition physical + digital cards, similar to ZAO-PALOOZA format
 5. **Cross-event collaboration** — invite partner communities (SongJam, Magnetiq, COC Concertz, Ohnahji University)
 
 ---
@@ -167,7 +167,7 @@ These are **tools under the hood**, not marketing points:
 ## References
 
 - [ZAO Whitepaper 2026 — Doc 051](./051-zao-whitepaper-2026/) — ZAO Stock context and full vision
-- [ZAO-PALOOZA Card on Manifold](https://app.manifold.xyz/c/zao-card-jango-uu-zaopalooza)
+- [ZAO-PALOOZA Card on Manifold](https://app.manifold.xyz/c/zao-card-jango-uu-ZAO-PALOOZA)
 - [ZAO-CHELLA Instagram](https://www.instagram.com/reel/DDa-oPBJ7G7/)
 - [Magnetiq — Proof of Meet](https://www.magnetiq.xyz/)
 - [0xSplits — Transparent revenue splits](https://splits.org/)

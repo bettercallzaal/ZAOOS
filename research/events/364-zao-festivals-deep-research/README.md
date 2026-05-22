@@ -144,7 +144,7 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 2. **The Opportunity** - Gateway to Acadia (4M visitors), Maine Craft Weekend (statewide), National Historic Register town
 3. **The Audience** - ZAO community (188 gated members, 400+ newsletter editions, 90+ governance sessions) + Ellsworth locals (9,000 residents, 5,000 awareness target) + Acadia tourists
 4. **What Sponsors Get** - (customize per tier, but always include post-event metrics report)
-5. **Past Events** - ZAO-Chella Art Basel '24 (10 artists, Wynwood), PALOOZA, COC Concertz (5 events monthly), WaveWarZ (795 battles)
+5. **Past Events** - ZAO-CHELLA Art Basel '24 (10 artists, Wynwood), ZAO-PALOOZA, COC Concertz (5 events monthly), WaveWarZ (795 battles)
 6. **The Team** - 14 members + 4 advisors including Craig Gonzalez (Whop, $1.6B), Tom Fellenz (NFT Music Hall), FailOften (NEA/Warhol funded)
 7. **Tax-Deductible** - Via Fractured Atlas 501(c)(3)
 8. **Multi-Year** - Year 1 is the proof. Year 2+ scales with sponsors getting priority placement.
@@ -174,13 +174,13 @@ Fractured Atlas is a 501(c)(3) public charity. As a fiscally sponsored project:
 No other festival combines:
 1. **Decentralized governance** (90+ weeks of fractal governance, Respect-weighted)
 2. **Onchain infrastructure** (WaveWarZ, 0xSplits, POAP/Magnetiq)
-3. **Existing virtual event track record** (COC Concertz, ZAO-Chella, PALOOZA)
+3. **Existing virtual event track record** (COC Concertz, ZAO-CHELLA, ZAO-PALOOZA)
 4. **Build-in-public approach** (400+ daily newsletters documenting the journey)
 5. **Small-town IRL + global Web3 hybrid** (Ellsworth locals + worldwide Farcaster community)
 
 ---
 
-## ZAO-Chella Art Basel '24 (Past Event Proof)
+## ZAO-CHELLA Art Basel '24 (Past Event Proof)
 
 | Detail | Info |
 |--------|------|
@@ -446,7 +446,7 @@ Hybrid model unique to ZAOstock:
 
 <<<<<<< HEAD
 - Maine Craft Weekend statewide attendance (ask Cara Romano)
-- ZAO-Chella Instagram metrics (need screenshots from Zaal)
+- ZAO-CHELLA Instagram metrics (need screenshots from Zaal)
 - Wallace Events tent quote (call 207-667-6000)
 - Ellsworth Business Development Corporation support
 - Bar Harbor Chamber tourism angle
@@ -454,7 +454,7 @@ Hybrid model unique to ZAOstock:
 - OnChain Music licensing for live performance recordings
 =======
 - Maine Craft Weekend statewide attendance data (ask Cara Romano directly)
-- ZAO-Chella Instagram engagement metrics (need screenshots from Zaal)
+- ZAO-CHELLA Instagram engagement metrics (need screenshots from Zaal)
 - Specific Airbnb pricing for October 2026 in Ellsworth
 - Wallace Events tent quote (call 207-667-6000)
 - Maine Arts Commission grant eligibility via Fractured Atlas
@@ -482,7 +482,7 @@ Hybrid model unique to ZAOstock:
 - [Small Town Festivals - Ticket Fairy](https://www.ticketfairy.com/blog/small-town-festivals-grassroots-planning-with-limited-resources)
 - [Festival Insurance - The Event Helper](https://www.theeventhelper.com/festival-insurance)
 - [RaveDAO - Gate Learn](https://www.gate.com/learn/articles/what-is-ravedao-rave/14664)
-- [ZAO-Chella Instagram](https://www.instagram.com/zaofestivals/)
+- [ZAO-CHELLA Instagram](https://www.instagram.com/zaofestivals/)
 - [Giveth](https://giveth.io/)
 - Doc 362: Lean Six Sigma for Festival Operations
 - Doc 363: People + Brands Profile Index

@@ -4,14 +4,14 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: [56, 58, 102, 103, 104, 105, 106, 109, 114, 184, 188, 285, 306, 346, 498, 698, 699]
+related-docs: [56, 58, 102, 103, 104, 105, 106, 109, 114, 184, 188, 285, 306, 346, 498, 702, 703]
 original-query: "Optimystics tooling ecosystem status 2026 - ORDAO, orfrapps, Respect.Games, Cignals, fractalgram integration" (reconstructed)
 tier: DEEP
 ---
 
 # 109 - Optimystics Tooling Ecosystem
 
-> **Goal:** Map the current state of all Optimystics tools (ORDAO/OREC, orfrapps, Respect.Games, Cignals, fractalgram, Respect Trees, etc.), verify production readiness, and recommend ZAO OS integration paths. Cross-reference with docs 698 (fractal lineage) and 699 (ZAO Fractal state).
+> **Goal:** Map the current state of all Optimystics tools (ORDAO/OREC, orfrapps, Respect.Games, Cignals, fractalgram, Respect Trees, etc.), verify production readiness, and recommend ZAO OS integration paths. Cross-reference with docs 702 (fractal lineage) and 703 (ZAO Fractal state).
 
 ## Key Decisions (Recommendations First)
 
@@ -88,7 +88,7 @@ Cignals directly aligns with ZAO's music-first positioning:
 - **Respect-weighted voting:** Members with higher Respect get proportional voting weight (phase 2+)
 - **Festival integration:** Use at ZAOstock 2026 (Oct 3) or earlier ZAO events
 
-**Recommendation:** Spec out a ZAO fork of Cignals logic once Optimystics ships the onchain version (target: June 2026). Doc 698 lineage + 699 state provide context for how Respect distribution works.
+**Recommendation:** Spec out a ZAO fork of Cignals logic once Optimystics ships the onchain version (target: June 2026). Doc 702 lineage + 703 state provide context for how Respect distribution works.
 
 ---
 
@@ -234,12 +234,12 @@ ornode is a **Node.js/Express REST API backed by MongoDB** that stores proposal 
 
 ### For ZAO OS
 
-**Current deployment:** `zao-ornode.frapps.xyz` (status: [PARTIAL - endpoint down as of May 2026, per doc 699])
+**Current deployment:** `zao-ornode.frapps.xyz` (status: [PARTIAL - endpoint down as of May 2026, per doc 703])
 
 orclient abstracts ornode + on-chain reads, so integrate via orclient rather than direct HTTP. If ornode is down:
 - orclient.getProposals() will fail until ornode restarts
 - Fallback: Read on-chain state only via viem (proposals hashes, votes, balances)
-- Action: Stand up replacement ornode or formally retire it (see doc 699 recommendations)
+- Action: Stand up replacement ornode or formally retire it (see doc 703 recommendations)
 
 ---
 
@@ -388,7 +388,7 @@ Fractalgram is a **fork of Telegram Web A** tailored for live fractal meetings. 
 "Trust a minority of contributors who take the initiative to act." Security model:
 - Time delay allows easy blocking of bad proposals
 - Asymmetric veto power (No votes count 2x) prevents hostile takeover
-- Works best with stable Respect distribution (monitor via doc 699, 115 reconciliation)
+- Works best with stable Respect distribution (monitor via doc 703, 115 reconciliation)
 
 ---
 
@@ -476,8 +476,8 @@ export async function createORClientForViem(walletClient) {
 - **Doc 102-114 - Fractal governance deep dives:** Respect mechanics, game theory, contract audit
 - **Doc 184 - Superchain ORDAO:** Cross-chain governance planning
 - **Doc 285 - orfrapps Updated Docs:** Deployment, configuration, CLI reference
-- **Doc 698 - Fractal Lineage:** Complete history (Fractally -> Eden -> Optimism -> ZAO)
-- **Doc 699 - ZAO Fractal Current State:** Operational status, recommendations (May 2026)
+- **Doc 702 - Fractal Lineage:** Complete history (Fractally -> Eden -> Optimism -> ZAO)
+- **Doc 703 - ZAO Fractal Current State:** Operational status, recommendations (May 2026)
 
 ---
 
@@ -516,5 +516,5 @@ export async function createORClientForViem(walletClient) {
 - [optimystics.io/tools](https://optimystics.io/tools) - Toolkit overview [FULL]
 
 **Cross-reference docs:**
-- Doc 698 (Fractal Lineage) - History + terminology [FULL]
-- Doc 699 (ZAO Fractal State) - Current ops + recommendations [FULL]
+- Doc 702 (Fractal Lineage) - History + terminology [FULL]
+- Doc 703 (ZAO Fractal State) - Current ops + recommendations [FULL]

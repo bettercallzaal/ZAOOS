@@ -404,7 +404,7 @@ Explicitly designed for "ranking speeches and musical performances" - this is th
 
 ## Also See
 
-Related fractal governance docs: 56, 58, 102, 104, 105, 106, 109, 114, 115, 188, 285, 306, 346, 444, 450, 498, 502, 664, 698, 699.
+Related fractal governance docs: 56, 58, 102, 104, 105, 106, 109, 114, 115, 188, 285, 306, 346, 444, 450, 498, 502, 664, 702, 703.
 
 ---
 

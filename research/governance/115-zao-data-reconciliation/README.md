@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 56, 58, 102, 103, 104, 114, 184, 188, 285, 306, 698, 699
+related-docs: 56, 58, 102, 103, 104, 114, 184, 188, 285, 306, 702, 703
 original-query: "How do we unify ZAO's two Respect ledgers (OG ERC-20 fractals 1-73 in Airtable, ZOR ERC-1155 fractals 74+ on-chain) into a single source of truth in Supabase, and what is the reconciliation plan? (reconstructed)"
 tier: STANDARD
 ---
@@ -244,8 +244,8 @@ zorPct = 100 * zor_respect / (sum of all zor_respect)
 
 ## Also See
 
-- **Doc 699** - ZAO Fractal: Current State (May 2026) - operatonal status + open issues
-- **Doc 698** - Respect & Fractal Governance: The Complete Lineage - protocol history
+- **Doc 703** - ZAO Fractal: Current State (May 2026) - operatonal status + open issues
+- **Doc 702** - Respect & Fractal Governance: The Complete Lineage - protocol history
 - **Doc 114** - ZAO Fractal Governance on Optimism - original ORDAO audit
 - **Doc 188** - ZAO Fractal Bot Process - fractalbotmarch2026 design
 - **Doc 56, 58** - ORDAO-Respect system + Respect deep dive - governance mechanics

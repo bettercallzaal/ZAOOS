@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: [56, 58, 102, 103, 104, 105, 106, 109, 114, 184, 188, 285, 306, 346, 498, 698, 699]
+related-docs: [56, 58, 102, 103, 104, 105, 106, 109, 114, 184, 188, 285, 306, 346, 498, 702, 703]
 original-query: "ORDAO and ORFrapps updated docs April 2026 - deployment, configuration, CLI" (reconstructed)
 tier: STANDARD
 ---
@@ -249,8 +249,8 @@ From Tadas (sim31) via Eden Fractal Telegram (Feb 2026):
 - **Doc 56 - ORDAO & Respect Game System:** Original design + mechanics
 - **Doc 109 - Optimystics Tooling Ecosystem:** Full tool overview (DEEP tier)
 - **Doc 184 - Superchain ORDAO:** Cross-chain expansion plans
-- **Doc 698 - Fractal Lineage:** Historical context + terminology
-- **Doc 699 - ZAO Fractal State:** Current operational status + recommendations
+- **Doc 702 - Fractal Lineage:** Historical context + terminology
+- **Doc 703 - ZAO Fractal State:** Current operational status + recommendations
 
 ---
 
@@ -284,4 +284,4 @@ From Tadas (sim31) via Eden Fractal Telegram (Feb 2026):
 
 **Cross-reference:**
 - Doc 109 (Optimystics ecosystem) - Full tools overview
-- Doc 698 (Fractal lineage) - Context + history
+- Doc 702 (Fractal lineage) - Context + history

@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: [058, 102, 103, 104, 105, 109, 114, 115, 184, 188, 285, 306, 346, 698, 699]
+related-docs: [058, 102, 103, 104, 105, 109, 114, 115, 184, 188, 285, 306, 346, 702, 703]
 original-query: "ORDAO governance toolset, Respect Game mechanics, OREC contract design - how The ZAO uses fractal scoring (reconstructed)"
 tier: DEEP
 ---
@@ -22,7 +22,7 @@ tier: DEEP
 | **Use ZAO's 2x Fibonacci scoring (110/68/42/26/16/10) as standard curve** | Zaal | Live | More reward differentiation than canonical Fibonacci (55/34/21/13/8/5). See Section 4. |
 | **Keep OREC submission gated to experienced 2-3 wallets** | Zaal | Current | Risk mitigation until UI/UX in ZAO OS is finalized. Plan to open via ZAO OS UI (future sprint). |
 | **Sync on-chain Respect state (OG + ZOR) into Supabase `respect_balances` as cache** | Doc 115 owner | In progress | Leaderboard.ts already reads both contracts; cache layer adds decay + tier calculation. |
-| **Document fractal as non-technical onboarding tool** | Zaal + CLAUDE.md | Doc 699 rec | Tanja + non-builders cannot explain the fractal. Skeleton guides + video intros needed. |
+| **Document fractal as non-technical onboarding tool** | Zaal + CLAUDE.md | Doc 703 rec | Tanja + non-builders cannot explain the fractal. Skeleton guides + video intros needed. |
 
 ---
 
@@ -176,7 +176,7 @@ The Respect Game is **fractal** - it repeats at different scales:
 - **Round 2:** Top 8 participants from Round 1 (highest Respect) form a new group of 6-8, evaluate each other again, distribute additional Respect. Repeats Fibonacci per rank.
 - **Round 3+:** Continue until fewer than 6 remain.
 
-**Current ZAO practice:** Single-round (no multi-round cascade). Doc 698 confirms this as best practice for communities under 100 members. Optimism Fractal also uses single-round.
+**Current ZAO practice:** Single-round (no multi-round cascade). Doc 702 confirms this as best practice for communities under 100 members. Optimism Fractal also uses single-round.
 
 ---
 
@@ -212,7 +212,7 @@ The ZAO uses a custom curve - roughly 2x the canonical Fibonacci - to reward dif
 | 6th | 10 | 2x |
 | **Per-group total** | **272** | 2x |
 
-**Rationale:** ZAO prioritizes recognizing top contributors (musicians, builders) over baseline participation. The curve steeper than canonical Fibonacci but still resists gaming (peer-ranked, not tradeable). See doc 699 context for governance decisions on this curve choice.
+**Rationale:** ZAO prioritizes recognizing top contributors (musicians, builders) over baseline participation. The curve steeper than canonical Fibonacci but still resists gaming (peer-ranked, not tradeable). See doc 703 context for governance decisions on this curve choice.
 
 ### Why Fibonacci at All
 
@@ -336,7 +336,7 @@ The modern flow leverages OREC for democratic, automated distribution:
 
 ### Current ZAO Bottleneck (May 2026)
 
-**Note:** Only 2 wallets actively submit on-chain: zaal.eth and civilmonkey.eth. This is a centralization risk. **Recommendation (doc 699):** Expand to 3-5 signers or open via ZAO OS UI in future sprint.
+**Note:** Only 2 wallets actively submit on-chain: zaal.eth and civilmonkey.eth. This is a centralization risk. **Recommendation (doc 703):** Expand to 3-5 signers or open via ZAO OS UI in future sprint.
 
 ---
 
@@ -368,7 +368,7 @@ npm install @ordao/orclient
 |---|---|---|
 | **License** | GPL-3.0 | ZAO OS is MIT. GPL permissive for dependents, but consider license compliance. |
 | **Wallet Requirement** | EIP-1193 provider (MetaMask, Privy) | ZAO uses Farcaster signers. Wallet connection needed for on-chain actions. |
-| **ornode Dependency** | orclient requires ornode backend | ZAO has `zao-ornode.frapps.xyz` (currently down as of May 2026, doc 699 rec: restore it) |
+| **ornode Dependency** | orclient requires ornode backend | ZAO has `zao-ornode.frapps.xyz` (currently down as of May 2026, doc 703 rec: restore it) |
 | **Gas Costs** | Cheap on Optimism | Breakout submission ~$0.02-0.05 at current L2 gas |
 | **Ethers v6** | orclient uses ethers v6 | ZAO OS uses viem. May need wrapper or dual dependency. |
 | **Live Deployment** | OREC + ZOR live | 242+ transactions on OREC as of May 21, 2026. Weekly submissions active. |
@@ -445,7 +445,7 @@ npm install @ordao/orclient
   - Consensus ranking interface (ranking each other 1-6)
   - Auto-proposal generation (orclient.proposeBreakoutResult)
   - Live leaderboard + tier badges
-- **Non-technical onboarding docs** for Tanja + other musicians (doc 699 priority)
+- **Non-technical onboarding docs** for Tanja + other musicians (doc 703 priority)
 
 ### Technical Dependencies
 
@@ -460,8 +460,8 @@ npm install @ordao/orclient
 
 ## Also See
 
-- **Doc 698:** "Respect & Fractal Governance: The Complete Lineage" - full history from Dan Larimer's book through current fractals
-- **Doc 699:** "ZAO Fractal: Current State (May 2026)" - live operational status, recommendations, on-chain metrics
+- **Doc 702:** "Respect & Fractal Governance: The Complete Lineage" - full history from Dan Larimer's book through current fractals
+- **Doc 703:** "ZAO Fractal: Current State (May 2026)" - live operational status, recommendations, on-chain metrics
 - **Doc 114-115:** Respect deep dives and Supabase schema design
 - **Doc 104-109:** Historical fractal governance research and ORDAO adoption patterns
 - **Doc 184-188:** Smart contract addresses and token details
@@ -523,5 +523,5 @@ All sources fetched, read, and cross-verified 2026-05-21:
 - [src/lib/respect/leaderboard.ts (on-chain sync)](https://github.com/bettercallzaal/zaoos/blob/main/src/lib/respect/leaderboard.ts) [FULL]
 
 ### Related Governance Research Docs (This Campaign)
-- Doc 698: Respect & Fractal Governance Lineage (verified May 21, 2026)
-- Doc 699: ZAO Fractal Current State May 2026 (verified May 21, 2026)
+- Doc 702: Respect & Fractal Governance Lineage (verified May 21, 2026)
+- Doc 703: ZAO Fractal Current State May 2026 (verified May 21, 2026)

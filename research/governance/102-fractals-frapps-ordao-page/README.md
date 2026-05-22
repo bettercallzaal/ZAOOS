@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 56, 58, 103, 104, 105, 106, 114, 188, 285, 306, 346, 444, 450, 498, 502, 664, 698, 699
+related-docs: 56, 58, 103, 104, 105, 106, 114, 188, 285, 306, 346, 444, 450, 498, 502, 664, 702, 703
 original-query: "Design a dedicated `/fractals` page in ZAO OS integrating frapps.xyz frontend, ORDAO proposal UI, and ZAO's existing fractal session/respect infrastructure (reconstructed)"
 tier: STANDARD
 ---
@@ -254,7 +254,7 @@ export async function GET(req: Request) {
 
 ## Also See
 
-Related docs in fractal governance campaign: 56, 58, 103, 104, 105, 106, 109, 114, 115, 188, 285, 306, 346, 444, 450, 498, 502, 664, 698, 699.
+Related docs in fractal governance campaign: 56, 58, 103, 104, 105, 106, 109, 114, 115, 188, 285, 306, 346, 444, 450, 498, 502, 664, 702, 703.
 
 ---
 

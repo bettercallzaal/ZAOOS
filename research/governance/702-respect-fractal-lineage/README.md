@@ -4,16 +4,16 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 56, 58, 102, 103, 104, 105, 106, 109, 114, 115, 184, 188, 285, 306, 346, 498, 699
+related-docs: 56, 58, 102, 103, 104, 105, 106, 109, 114, 115, 184, 188, 285, 306, 346, 498, 703
 original-query: "prepare a full summary of respect zao fractal edenfractal optimsm fractal fractally etc"
 tier: DEEP
 ---
 
-# 698 - Respect & Fractal Governance: The Complete Lineage
+# 702 - Respect & Fractal Governance: The Complete Lineage
 
 > **Goal:** One canonical summary of the entire fractal-governance lineage ZAO sits inside - Fractally, Eden Fractal, Optimism Fractal, ZAO Fractal, the Respect token, and the ORDAO/OREC/frapps tooling - synthesized from 16+ governance research docs that currently hold this knowledge scattered across the library, with DEEP-tier verification of external claims against primary web sources.
 
-**Note:** This doc was drafted as 696 on a separate branch; renumbered to 698 because 696 was already assigned to "Zaal Panthaki + The ZAO deep audit" (doc 696).
+**Note:** This doc was drafted as 696; renumbered to 698 due to collision with "Zaal Panthaki + The ZAO deep audit" (doc 696); renumbered again to 702 due to collision with a parallel agent-research session's docs 698-701.
 
 ## What this doc is
 

@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 56, 58, 102, 103, 105, 106, 109, 114, 115, 188, 285, 306, 346, 444, 450, 498, 502, 664, 698, 699
+related-docs: 56, 58, 102, 103, 105, 106, 109, 114, 115, 188, 285, 306, 346, 444, 450, 498, 502, 664, 702, 703
 original-query: "Comprehensive inventory of every fractal governance community - active, paused, and dormant (reconstructed)"
 tier: STANDARD
 ---
@@ -140,7 +140,7 @@ tier: STANDARD
 
 ## Also See
 
-Related docs: 56, 58, 102, 103, 105, 106, 109, 114, 115, 188, 285, 306, 346, 444, 450, 498, 502, 664, 698, 699.
+Related docs: 56, 58, 102, 103, 105, 106, 109, 114, 115, 188, 285, 306, 346, 444, 450, 498, 502, 664, 702, 703.
 
 ---
 

@@ -4,12 +4,12 @@ type: audit
 status: research-complete
 last-validated: 2026-05-21
 superseded-by: 
-related-docs: 102, 103, 104, 114, 115, 188, 306, 444, 450, 498, 502, 664, 675, 696, 698
+related-docs: 102, 103, 104, 114, 115, 188, 306, 444, 450, 498, 502, 664, 675, 696, 702
 original-query: all fractal stuff - current live state of ZAO Fractal May 2026
 tier: DEEP
 ---
 
-# 699 - ZAO Fractal: Current State (May 2026)
+# 703 - ZAO Fractal: Current State (May 2026)
 
 > **Goal:** Answer one question: what is the actual live operational state of ZAO Fractal right now, May 2026? Is the weekly Respect Game still running? What is the fractal number? What changed since March 2026? What is unresolved? What is next?
 
@@ -263,7 +263,7 @@ Features lost:
 | **How many sessions have occurred since March 22, 2026?** | fractal_sessions table created_at > '2026-03-22' | [FAILED] - cannot authenticate to Supabase; only codebase routes visible | Run /api/fractals/sessions on zaoos.com with valid session |
 | **Has the ZAOstock fractal adapter (doc 498) been deployed?** | Telegram bot logs, Supabase scoring_era='zaostock', OREC event logs tagged with ZAOstock | [PARTIAL] - designed in doc 498 (April 24), first session target May 8, but no public updates found | Check ZAOstock team Telegram, look for zaostock_sessions table, or check May 8/22 session records |
 | **Is the Snapshot cog (bot v2.1 feature) working?** | Discord #fractal-call channel messages from bot with "Snapshot proposal" alerts | [FAILED] - cannot access live Discord without auth | Check Discord bot logs on bot-hosting.net or query bot database |
-| **What is the current state of the web dashboard rebuild?** | GitHub issues in ZAOOS, PRs tagged /fractals, Vercel deployment preview | [PARTIAL] - no fractal page found in src/app/fractals/ as of May 21; codebase is API-ready but UI missing | Check ZAOOS project issues/PRs for doc 699/700 bounty or /fractals task |
+| **What is the current state of the web dashboard rebuild?** | GitHub issues in ZAOOS, PRs tagged /fractals, Vercel deployment preview | [PARTIAL] - no fractal page found in src/app/fractals/ as of May 21; codebase is API-ready but UI missing | Check ZAOOS project issues/PRs for doc 703/704 bounty or /fractals task |
 | **Has Tanja from May 18 call attended a fractal session yet?** | ZAO Discord #fractal-call attendance, fractal_sessions members array | [FAILED] - cannot query Discord or DB live | Follow up with Zaal or check Tanja's ZAO profile in members table |
 | **Are there any signer committee rotation proposals in OREC history?** | OREC contract events + on-chain governance proposals (if any) | [FAILED] - Etherscan page and ornode both unreachable | Restore ornode or use Web3 CLI to query on-chain proposal history |
 
@@ -324,7 +324,7 @@ Features lost:
 - **Doc 103** - Fractal governance ecosystem (Optimism / Eden / ZAO cross-links)
 - **Doc 104** - Fractal communities directory (who runs fractals where)
 - **Doc 306** - Eden Fractal + Optimism Fractal deep history
-- **Doc 698** - Respect & Fractal lineage summary (renumbered DEEP doc)
+- **Doc 702** - Respect & Fractal lineage summary (renumbered DEEP doc)
 - **Doc 664** - Async GitHub-native fractal brainstorm (wedge strategy)
 - **Doc 675** - Tanja fractal book call recap (May 18 decision log)
 

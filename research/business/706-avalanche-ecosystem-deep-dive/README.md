@@ -11,7 +11,7 @@ tier: DISPATCH
 
 # 706 - Avalanche Ecosystem Deep Dive (Hub)
 
-> **Goal:** A full, multi-dimensional research sweep of Avalanche as of May 2026 - to settle what (if anything) ZAO should do on Avalanche. Built in two waves: Wave 1 (706a-706h) covered architecture, L1s, music/RWA, developer experience, grants, DeFi, security, and strategy. Wave 2 (706i-706o) covered gaming, enterprise/institutional, a Record Financial deep dive, a The Arena deep dive, people/orgs/events, AI/agents, and Avalanche-vs-Solana. Fifteen research agents total; this hub synthesizes all of them.
+> **Goal:** A full, multi-dimensional research sweep of Avalanche as of May 2026 - to settle what (if anything) ZAO should do on Avalanche. Built in three waves: Wave 1 (706a-706h) covered architecture, L1s, music/RWA, developer experience, grants, DeFi, security, and strategy. Wave 2 (706i-706o) covered gaming, enterprise/institutional, a Record Financial deep dive, a The Arena deep dive, people/orgs/events, AI/agents, and Avalanche-vs-Solana. Wave 3 (706p-706u) covered payments, AVAX tokenomics, regional ecosystems, events/ticketing, the full competitive landscape, and the historical arc. Twenty-one research agents total; this hub synthesizes all of them. For the corpus-wide brief that also folds in Docs 572, 573, and 695, see Doc 707.
 
 ## Key Decisions (read first)
 
@@ -100,6 +100,28 @@ Avalanche has a real, funded AI ecosystem (an infraBUIDL AI grant track, GPU-com
 ### 706o - Avalanche vs Solana for music
 Solana has genuine consumer-music momentum (large licensed-catalog and streaming apps, near-zero fees) but lacks the social infrastructure ZAO is built on. Avalanche has the artist-infrastructure layer (Record Financial, IP licensing) Solana lacks. Neither displaces Base + Farcaster as ZAO's home - the social moat is irreplaceable. Track Solana, do not prioritize it; the calculus from Wave 1 is unchanged. *See `706o-avalanche-vs-solana-for-music.md`.*
 
+## Wave 3: the six final dimensions
+
+Wave 3 ("keep studying") closed the last gaps - payments, tokenomics, regions, events, the full competitive field, and the historical arc. The headline: **Wave 3 reinforces the verdict yet again. Avalanche is an institutional and payments chain, not a creator/music chain. Nothing in Wave 3 changes the recommendation.**
+
+### 706p - Payments & consumer money rails
+The Avalanche Card is a real Visa card (USDC/AVAX collateral, self-custody), and Avalanche has genuine institutional payment traction in Asia (Korean payment processors, cross-border pilots). But merchant acceptance is thin and Base + Coinbase dominates consumer payments. For ZAOstock ticketing or artist payouts, Base plus a normal payments tool is the pragmatic choice; Avalanche payments only matter for Asia-centric corridors ZAO does not have. *See `706p-payments-consumer-rails.md`.*
+
+### 706q - AVAX tokenomics
+720M hard cap, ~432M circulating, ~55M cumulatively burned, with fee burn currently outrunning staking issuance (mildly deflationary). ~45% of supply staked at ~6-8.5% yield. AVAX around $9.49, market cap rank ~25. Running an L1 costs roughly $1,500/year in protocol fees for a 10-validator setup. This matters to ZAO only in the scenario - already rejected - where ZAO pays L1 or validator fees. *See `706q-avax-tokenomics.md`.*
+
+### 706r - Regional ecosystems
+Avalanche's regional strength is institutional finance (Asia) and stablecoin payment rails (Latin America); its Africa presence is the weakest of the three and is developer-bootcamp-stage. Crucially for ZAO: there is no music or culture activity in any region - Solana, not Avalanche, drives music/culture discourse in markets like Nigeria. The agent reported that ZAO's own WaveWarZ and a Lusaka meetup did not use Avalanche; treat that specific claim as agent-reported and verify. The honest read: no regional Avalanche strength connects to ZAO's global music work. *See `706r-regional-ecosystems.md`.*
+
+### 706s - Events & ticketing
+On-chain ticketing platforms exist on Avalanche (Fan3 and others) with real anti-scalping results, but the POAP attendance standard lives on Gnosis Chain, not Avalanche, and no major music festival has migrated to blockchain ticketing. Wallet friction caps adoption (one festival case saw ~51% uptake even with incentives). Clear recommendation for ZAOstock 2026: use Web2 ticketing plus an optional post-event Base NFT airdrop for on-chain attendance proof. Skip Avalanche for ticketing entirely. *See `706s-events-ticketing.md`.*
+
+### 706t - Competitive landscape
+Across the full L1/L2 field, Avalanche reads as a "tier-2.5" institutional-RWA and music-infrastructure play, not a tier-1 consumer chain. It is losing the broader narrative war to Ethereum (DeFi), Solana (consumer/users), and is now challenged by newer entrants (Monad, Sui). ZAO's Base-native posture is the correct call for a music/creator community; nothing in the wider field changes it. *See `706t-competitive-landscape.md`.*
+
+### 706u - History, narrative & outlook
+Avalanche's arc is a classic one: 2020 mainnet launch, a 2021 peak near $145, a ~90% 2022 collapse, the 2024 Etna/Avalanche9000 reset, and a 2025-2026 institutional phase that is operationally real (multi-billion RWA migrations, bank pilots). Operationally it is on an upswing; the AVAX token still trades ~94% below its all-time high, reflecting market doubt that institutional adoption converts to token value. It is not a creator-native chain and the 2026-2027 roadmap does not change that. *See `706u-history-narrative-outlook.md`.*
+
 ## Cross-cutting numbers (May 2026, verify before citing)
 
 | Metric | Value | Source sub-doc | Note |
@@ -126,7 +148,8 @@ Solana has genuine consumer-music momentum (large licensed-catalog and streaming
 - [Doc 572](../572-zabal-avalanche-l1-l2-gas-token/) - decided NOT to launch a $ZABAL Avalanche L1; stay on Base
 - [Doc 573](../573-zabal-avax-surfaces-arena-music/) - the original Avalanche-surfaces research (The Arena, Retro9000, Record Financial)
 - [Doc 695](../../governance/695-crypto-factor-avax-governance-decision/) - why governance stays on Optimism; the Crypto Factor pitch
-- Sub-docs: `706a` through `706o` in this folder (two waves, 15 dimensions)
+- [Doc 707](../707-avalanche-master-brief/) - the corpus-wide Avalanche master brief (all research in one place)
+- Sub-docs: `706a` through `706u` in this folder (three waves, 21 dimensions)
 
 ## Next Actions
 
@@ -137,13 +160,14 @@ Solana has genuine consumer-music momentum (large licensed-catalog and streaming
 | Compare Record Financial vs 0xSplits-on-Base before any royalty-rail commitment | @Zaal | Eval | Before committing |
 | Create a The Arena profile for Zaal as a low-cost proof-of-concept; scale to Cipher artists only if early revenue justifies it (706l) | @Zaal | Task | This quarter |
 | Join the Team1 ambassador network - lowest-friction Avalanche ecosystem entry, no migration (706m) | @Zaal | Task | Optional, low priority |
+| ZAOstock 2026 ticketing: use Web2 ticketing + optional post-event Base NFT airdrop; do NOT use Avalanche for ticketing (706s) | @Zaal | Decision | Before ZAOstock ticket launch |
 | Revisit Avalanche grants (706e) only after a real C-Chain deployment exists; verify program terms at application time | @Zaal | Funding | After any C-Chain presence |
 | Re-validate this hub if AVAX activity or ZAO scale changes materially (5,000+ wallets trigger) | @Zaal | Doc update | Every 6-8 weeks |
 | Verify agent-reported figures (RWA totals, grant amounts, Arena metrics, Record Financial founders) against primary sources before any public use or outreach | @Zaal | Verification | Before citing |
 
 ## Sources
 
-This is a DISPATCH hub built in two waves. All fifteen sub-docs (`706a`-`706o`) carry their own full Sources sections with every source classified `[FULL]` / `[PARTIAL]` / `[FAILED]` per the zao-research fetch-quality gate. Across the fifteen agents, 280+ sources were consulted (Avalanche official docs, DeFiLlama, exa/web search, Reddit, Hacker News, GitHub, and project sites), with community sources included per dimension. Headline counts by sub-doc:
+This is a DISPATCH hub built in three waves. All twenty-one sub-docs (`706a`-`706u`) carry their own full Sources sections with every source classified `[FULL]` / `[PARTIAL]` / `[FAILED]` per the zao-research fetch-quality gate. Across the twenty-one agents, 400+ sources were consulted (Avalanche official docs, DeFiLlama, exa/web search, Reddit, Hacker News, GitHub, and project sites), with community sources included per dimension. Headline counts by sub-doc:
 
 Wave 1:
 - 706a - architecture: ~7 sources (3 FULL, 3 PARTIAL, 1 FAILED)
@@ -163,5 +187,13 @@ Wave 2:
 - 706m - people/orgs/events: 27 sources, classified FULL/PARTIAL
 - 706n - AI/agents: classified FULL/PARTIAL/FAILED
 - 706o - Avalanche vs Solana: 8+ hard metrics, classified FULL/PARTIAL/FAILED
+
+Wave 3:
+- 706p - payments: 10 sections, classified FULL/PARTIAL/FAILED
+- 706q - AVAX tokenomics: 8+ sources, classified FULL/PARTIAL
+- 706r - regional ecosystems: 30+ sources, classified FULL/PARTIAL
+- 706s - events/ticketing: 6 platforms reviewed, classified FULL/PARTIAL/FAILED
+- 706t - competitive landscape: classified FULL/PARTIAL/FAILED
+- 706u - history/outlook: 25+ sources (all FULL)
 
 See each sub-doc for the verbatim URL list and per-source marks. Note (per the staleness flags above): grant, price, and TVL figures are time-sensitive and several agent-reported specifics should be re-verified against primary sources before they inform a commitment or any public statement.

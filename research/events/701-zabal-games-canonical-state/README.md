@@ -3,7 +3,7 @@ topic: events
 type: guide
 status: research-complete
 last-validated: 2026-05-22
-related-docs: 630, 654, 646, 626, 584, 631, 666
+related-docs: 630, 654, 646, 626, 584, 631, 666, 714, 473
 original-query: "zabal games in its interity and then grill me on anything thats not defined yet"
 tier: STANDARD
 ---
@@ -265,8 +265,48 @@ The `/zabal` channel exists; everything else is still ahead.
 
 ---
 
+## Part 11 - Build + Hosting Decisions (Tyler call, 2026-05-22)
+
+Two layers landed after the original 2026-05-21 interview: a mini app grilling, then the 2026-05-22 Tyler Stambaugh call ([Doc 714](../714-tyler-zabal-zaostock-may22/)). Tyler is the Magnetic founder and a confirmed ZABAL Games collaborator.
+
+### Hosting - two surfaces
+
+ZABAL Games runs on TWO surfaces, split by job:
+
+| Surface | Repo / platform | Job |
+|---------|-----------------|-----|
+| **Magnetic portal** | Magnetic (Tyler's platform) | The connection point - the full workshop video library in one place, entry/onboarding, polls, and the UGC field for submissions + suggestions. Magnetic gives native video hosting, NFT-gated magnets, opt-in email capture, and per-vendor watch analytics out of the box. |
+| **Farcaster mini app** | new standalone repo `bettercallzaal/zabalgames`, deployed on a `zabal.art` subdomain | The explainer + front door only. Explains ZABAL Games and links out to the important things (Magnetic portal, the page, `/zabal`). Light - NOT the full event hub the earlier grill scoped. |
+
+The `zabalgames.html` page stays the public marketing page. The mini app + page share no heavy backend; Magnetic is the system of record for entry + submissions.
+
+### Entry - the Zabal connector NFT
+
+Entry / RSVP to ZABAL Games is collecting the **Zabal connector** - the anchor magnet. It behaves like a Discord "general" channel; other magnets are side channels. Low-friction: opting into road-to-ZAOstock auto-drops the connector. Mechanic is decided; it needs art only - generate the image and send to Tyler for the Magnetic magnet.
+
+### The July build prompt - llms.txt + Claude skill
+
+The July submission prompt is built in BOTH formats from one source: a machine-readable **llms.txt / context file on the website** (Tyler's framing - any AI harness points at it) AND the packaged **Claude skill**. Describes every ZAO project and its current state. This is the same artifact tracked as "the context skill" in Part 9.
+
+### Workshop month - Tyler confirmed
+
+June = workshop month: builders across the ecosystem record one ~30-min session positioning their tool for the hackathon. Tyler is the **first confirmed workshop lead** - a 30-min Magnetic pitch, any day in June, livestreamed then clipped.
+
+### Launch sequence
+
+- **~2026-05-24 (this weekend):** public announcement. ZABAL Games and ZAOstock go out as SEPARATE posts (not combined). Plus Zaal live on Farcaster spaces, DJing old ZAO music for lore.
+- **~2026-05-30 (soft launch):** minimum viable surface live - a UGC submission field, a volunteer/interest poll, and Zaal's intro video. Not everything, just a place to land.
+
+### Still undecided (Tyler layer)
+
+- Whether participants get the paid Claude Code community tier (via WAP) free for 3-4 months - Zaal floated it, explicitly "not worried about that yet."
+- Magnetic's SNAPS retention framework (Status, Novelty, Access, Power, Stuff) - relevant to how ZABAL Games retains participants; not yet designed in.
+
+---
+
 ## Also See
 
+- [Doc 714](../714-tyler-zabal-zaostock-may22/) - Tyler x Zaal call - the Magnetic hosting + connector + announcement decisions in Part 11
 - [Doc 630](../630-zabal-games-claude-code-hackathon-v0/) - ZABAL Games Season 1 long-form spec + decision log + `PROMPT_CONTEXT.md`
 - [Doc 654](../654-zabal-games-empire-v3-yerbearzerker-meeting/) - Empire V3 + June/July/August calendar pivot meeting
 - [Doc 646](../../business/646-clanker-empire-builder-zabal-games-promote/) - Clanker + Empire Builder optional token mechanic

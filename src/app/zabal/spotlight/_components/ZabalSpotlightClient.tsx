@@ -37,14 +37,16 @@ export function ZabalSpotlightClient() {
         const ctx = await sdk.context;
         const userFid = ctx?.user?.fid;
         if (cancelled) return;
-        if (userFid) setFid(userFid);
+        // Base App can report fid -1 before context settles (Issue #537).
+        if (userFid && userFid >= 1) setFid(userFid);
 
+        // sdk.actions.ready() is fired globally by <MiniAppReady /> in the
+        // root layout - not called here, so a slow fetch never sticks the splash.
         const res = await fetch('/api/zabal/spotlight/nominees?limit=8');
         if (res.ok) {
           const data = (await res.json()) as { nominees: Nominee[] };
           if (!cancelled) setNominees(data.nominees ?? []);
         }
-        await sdk.actions.ready();
       } catch (err) {
         if (!cancelled) setStatus(`init failed: ${String(err).slice(0, 80)}`);
       }

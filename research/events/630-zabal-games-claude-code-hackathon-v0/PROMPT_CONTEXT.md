@@ -610,7 +610,7 @@ By the T+24h ship deadline, you must have all four:
 1. **Live deployed URL** (working, not 404). Vercel free tier is fine.
 2. **Public GitHub repo link** (MIT or similar permissive license). Verifiable empty git log at T+0 (no pre-built code).
 3. **60-second demo video link** (Loom, YouTube, or self-hosted). Show the thing working.
-4. **Tweet/cast on /zabalgames channel** announcing your ship. Tag `@bettercallzaal` so we see it.
+4. **Tweet/cast on /zabal channel** announcing your ship. Tag `@bettercallzaal` so we see it.
 
 PLUS during the 24h build, your declared **show-your-work visibility mode** must be active:
 - Mode 1 (Live Twitch stream): stream archive available afterward
@@ -646,7 +646,7 @@ Hour 0-1 (12:00-13:00 PT)
   Pick your build path - adopt a ZAO project or build from scratch
   Start your Twitch stream
   Read JUDGING.md (voting mechanism)
-  Cast on /zabalgames "I'm in - building [option] - watch at twitch.tv/[me]"
+  Cast on /zabal "I'm in - building [option] - watch at twitch.tv/[me]"
 
 Hour 1-2 (13:00-14:00 PT)
   Sketch what you're building - just a single doc/whiteboard
@@ -704,8 +704,8 @@ Hour 23-24 (11:00-12:00 PT)
 | Need | Where |
 |------|-------|
 | Stuck on Claude Code | Stream chat (your viewers may know) + Anthropic docs |
-| ZAO infra question | /zabalgames Farcaster channel - tag @bettercallzaal |
-| Stream tech issue | StreamElements support docs + /zabalgames channel |
+| ZAO infra question | /zabal Farcaster channel - tag @bettercallzaal |
+| Stream tech issue | StreamElements support docs + /zabal channel |
 | Wallet / gas / Empire Builder issue | DM @bettercallzaal directly |
 | Real emergency (laptop dies, internet dies) | Text Zaal at the number in your onboarding email |
 
@@ -752,13 +752,13 @@ Voting:      ZAO members who have earned Respect through fractals
             1-person-1-vote, NOT token-weighted
             Curated voter set, snapshot at T+0
 
-Stream:      Twitch primary, ZAO restreams every finalist to /zabalgames
+Stream:      Twitch primary, ZAO restreams every finalist to /zabal
 
 Submit by the T+24h ship deadline:
   1. Live deployed URL
   2. Public GitHub repo (MIT)
   3. 60-second demo video
-  4. Cast announcing ship on /zabalgames
+  4. Cast announcing ship on /zabal
 ```
 
 ---
@@ -766,7 +766,7 @@ Submit by the T+24h ship deadline:
 ## Appendix B - Key Links
 
 - ZABAL Games landing page: https://bettercallzaal.com/zabalgames.html
-- /zabalgames Farcaster channel: https://farcaster.xyz/~/channel/zabalgames
+- /zabal Farcaster channel: https://farcaster.xyz/~/channel/zabal
 - $ZABAL Empire leaderboard: https://songjam.space/zabal
 - $ZABAL creative hub: https://zabal.art/
 - Empire Builder: https://empirebuilder.world
@@ -799,4 +799,4 @@ Tech docs:
 
 ---
 
-*This CONTEXT.md is the Season 1 player primer for ZABAL Games. If you see something missing or wrong, flag it in /zabalgames channel before T+0 and we'll fix it. After T+0, this version is sealed for the duration of the August Finals to keep all finalists on equal context footing.*
+*This CONTEXT.md is the Season 1 player primer for ZABAL Games. If you see something missing or wrong, flag it in /zabal channel before T+0 and we'll fix it. After T+0, this version is sealed for the duration of the August Finals to keep all finalists on equal context footing.*

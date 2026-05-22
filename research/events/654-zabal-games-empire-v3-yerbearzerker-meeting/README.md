@@ -51,7 +51,7 @@ The prior framing in Doc 630 had Phase 1 building + Phase 2 Finals compressed in
 ### July - Submissions Month 1 (Open Build-a-Thon)
 
 - **Purpose:** Anyone with the chops to ship can submit a build aligned with ZABAL, ZAO, or WaveWarZ.
-- **Format:** Same as Doc 630 Phase 1 - the build IS the application. Live URL + open-source repo + 60s demo + /zabalgames cast.
+- **Format:** Same as Doc 630 Phase 1 - the build IS the application. Live URL + open-source repo + 60s demo + /zabal cast.
 - **Empire requirement:** Every submission creates a **tokenless Empire** as its public home. This gives them a leaderboard + treasury surface from day 1.
 - **Mentors watching:** 8 ZAO mentors monitor submissions rolling. Already-known champions can be picked early; surprise breakouts get picked late. First-come-first-served per mentor.
 

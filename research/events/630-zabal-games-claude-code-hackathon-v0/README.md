@@ -24,7 +24,7 @@ tier: STANDARD
 **What:** A Farcaster-creator onboarding event for the ZAO. Bring hungry, Farcaster-active vibe-coders into ZAO by having them build something real, in public, with a ZAO mentor in their corner.
 
 **Two phases:**
-- **Phase 1 - Open Build-a-Thon:** Anyone applies by building something with the ZAO context prompt + shipping it publicly (live URL + open-source repo + 60s demo + /zabalgames cast). Use any vibe-coding harness.
+- **Phase 1 - Open Build-a-Thon:** Anyone applies by building something with the ZAO context prompt + shipping it publicly (live URL + open-source repo + 60s demo + /zabal cast). Use any vibe-coding harness.
 - **Phase 2 - The Finals:** 8 builders curated from Phase 1, each paired with a ZAO mentor as embedded teammate. 24h build + 24h promote + 24h ZAO governance vote + reveal stream.
 
 **Who decides:** Mentors pick their champions from Phase 1 (first-come-first-served, rolling). Then the ZAO DAO (Respect-earning members, 1-person-1-vote) votes on Finals builds.
@@ -70,7 +70,7 @@ T+0->T+24h BUILD WINDOW. Mentor embedded as teammate (Discord/Meet,
            live with the player). Build in public via declared
            visibility mode. Open repos.
 T+24h      Ship deadline: live URL + open-source repo + 60s demo +
-           ship cast on /zabalgames
+           ship cast on /zabal
 T+24h->48h PROMOTE WINDOW. Cast it, demo it. ZAO accounts amplify all 8.
 T+48h->72h ZAO GOVERNANCE VOTING WINDOW. Respect-earning members cast
            1-person-1-vote ballots onchain. Live tally.
@@ -128,7 +128,7 @@ Players use whatever vibe-coding harness fits them - Claude Code, Cursor, Windsu
 
 ### 4 Visibility Modes
 
-Each player picks at least one primary mode + supplements with ongoing /zabalgames casts:
+Each player picks at least one primary mode + supplements with ongoing /zabal casts:
 
 1. **Live Twitch stream** - the default. ZAO restreams all 8 to one hub.
 2. **Recorded screen sessions** - upload to YouTube/Loom within 1h of each session.
@@ -260,7 +260,7 @@ Blocking step: Zaal creates the Supabase project, runs the schema, pastes the UR
 - $500 USDC tiered pool; all 8 Finalists get paid + collectible
 - ZAO governance vote: Respect-earning members, 1-person-1-vote, not token-weighted
 - Applications public by default
-- Submission bar: live URL + open-source repo + 60s demo + /zabalgames cast
+- Submission bar: live URL + open-source repo + 60s demo + /zabal cast
 - Season 1 framing - recurring format
 - Tooling subsidy dropped
 - Submission tech built (Supabase form + public board + starter projects)

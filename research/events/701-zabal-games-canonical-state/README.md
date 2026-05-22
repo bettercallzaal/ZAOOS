@@ -2,7 +2,7 @@
 topic: events
 type: guide
 status: research-complete
-last-validated: 2026-05-21
+last-validated: 2026-05-22
 related-docs: 630, 654, 646, 626, 584, 631, 666
 original-query: "zabal games in its interity and then grill me on anything thats not defined yet"
 tier: STANDARD
@@ -35,7 +35,7 @@ Recommendations and locked calls first.
 | 9 | **Participation collectible** | OPEN. "Likely a Hats Protocol role NFT" per Doc 630, spec deferred until closer to August. |
 | 10 | **Context skill** | Does NOT exist (filesystem-verified). Status was unknown to Zaal; now confirmed. Doc 654's "ship by end of May" deadline has zero skill behind it as of 2026-05-21. |
 | 11 | **PROMPT_CONTEXT.md** | REWRITE to the June/July/August open-roster model now. The current file is stale (v0 naming, T+0 2026-06-27, dropped $20/mo subsidy, all-in-June framing). |
-| 12 | **Infra** | NOTHING is live: no Supabase backend, no `/zabalgames` Farcaster channel, no `$500 USDC` secured, no `zabalgames.dev` domain. |
+| 12 | **Infra** | The `/zabal` Farcaster channel is live (created 2026-05-22). Everything else is still ahead: no Supabase backend, no `$500 USDC` secured, no `zabalgames.dev` domain. |
 | 13 | **Brand context** | The 7 `[TBD-Zaal]` voice/visual gaps in `zabalgames-brand-context.md` resolved in interview - see Part 7. |
 | 14 | **This session scope** | Full sweep: this doc + fix `zabalgames.html` mentor copy + rewrite `PROMPT_CONTEXT.md` + draft a public recruitment post. |
 
@@ -61,7 +61,7 @@ Three months. Pivoted from the original all-June compression in the 2026-05-16 m
 | Month | Phase | What runs |
 |-------|-------|-----------|
 | **June** | Prep | Recorded Far-Hack-style sessions. ZAO teachers cover governance, Respect, ZOLs, fractals. Vibe-coding instructors cover Claude Code, Cursor, MCP, agent harnesses. Tool walkthroughs: Empire Builder V3, zlank.online, POIDH bounties, Juke, Songjam. Watchable live or after. The ZAO context skill is meant to go live here for any agent to load. |
-| **July** | Open build-a-thon | Anyone with the chops ships a build aligned to ZABAL / ZAO / WaveWarZ. The build IS the application. Bar: live URL + open-source repo + 60s demo + `/zabalgames` cast. Mentors watch rolling and claim champions. Every July ship earns Respect (Decision #4). |
+| **July** | Open build-a-thon | Anyone with the chops ships a build aligned to ZABAL / ZAO / WaveWarZ. The build IS the application. Bar: live URL + open-source repo + 60s demo + `/zabal` cast. Mentors watch rolling and claim champions. Every July ship earns Respect (Decision #4). |
 | **August** | The Finals | Mentor-champion pairs lock. Same Finals prompt for all. 24h build (mentor embedded as teammate) + 24h promote + 24h ZAO governance vote + live reveal stream. Finalists who want a token Ascend their Empire via Clanker with an airdrop. |
 
 **Why three months:** the original ~30-day all-June plan compressed teach + build + judge too tightly. June-prep solves "people show up cold." July-as-open-month lets builds breathe and lets mentors evaluate a real submission pool. August gets the Finals' focused energy.
@@ -129,7 +129,7 @@ Pulled from Doc 654 action items + Doc 630 PROMPT_CONTEXT Part 7. Zaal to confir
 - zlank.online "Today's Empire Builder Stats" daily Snap template (kmac.eth template collab).
 - Twitch -> Empire Builder stream score feed.
 - New ZOE skill(s).
-- The `/zabalgames` Farcaster mini app itself (submission board, starter board).
+- The `/zabal` Farcaster mini app itself (submission board, starter board).
 - COC Concertz content-pipeline automation (record -> Descript -> newsletter -> cross-post).
 - Streaming auto-clip flywheel (30+ hours of Games stream -> 150+ short clips).
 
@@ -214,12 +214,12 @@ Still open after interview: COC Concertz voice + visual; the concrete ZABAL word
 
 ## Part 8 - Infrastructure Status
 
-Nothing is live (Decision #12). Full build-out is still ahead.
+The `/zabal` channel exists; everything else is still ahead.
 
 | Item | Status | Notes |
 |------|--------|-------|
 | Supabase submission backend | NOT LIVE | `zabalgames-schema.sql` exists (5.2 KB). Project not created, schema not run, no URL/anon key in `zabalgames.html`. The form + board are non-functional. |
-| `/zabalgames` Farcaster channel | NOT LIVE | Referenced everywhere as the cast destination. Does not exist yet. |
+| `/zabal` Farcaster channel | LIVE | The cast destination - farcaster.xyz/~/channel/zabal. Created 2026-05-22. All copy uses `/zabal` (the page stays `zabalgames.html`). |
 | `$500 USDC` prize wallet | NOT SECURED | No dedicated wallet funded. |
 | `zabalgames.dev` domain | NOT REGISTERED | `PROMPT_CONTEXT.md` promises `<player>.zabalgames.dev` subdomains. |
 | ZAO context skill | DOES NOT EXIST | Filesystem-verified - no skill folder in `~/.claude/skills`, `.agents/skills`, or ZAO OS. Raw material only: `zabalgames-brand-context.md` (7 gaps) + `PROMPT_CONTEXT.md` (stale). |
@@ -291,7 +291,6 @@ Nothing is live (Decision #12). Full build-out is still ahead.
 | Pull ZABAL wordmark + zabal.art palette into brand-context | @Zaal | Research | Before context skill ships |
 | Build the ZAO context skill (does not exist) | @Zaal | Build | Re-baseline the end-of-May deadline |
 | Create Supabase project + run schema + wire `zabalgames.html` | @Zaal | Build | Before July open call |
-| Create the `/zabalgames` Farcaster channel | @Zaal | Config | Before June bootcamp |
 | Secure $500 USDC in a dedicated wallet | @Zaal | Treasury | Before August Finals |
 | Decide: Finals size, voting mechanism, Respect threshold, collectible spec | @Zaal | Decision | After July submissions land |
 | Lock exact dates once cohort + mentor availability known | @Zaal | Decision | When open call closes |

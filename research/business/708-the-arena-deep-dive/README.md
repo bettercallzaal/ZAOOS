@@ -11,7 +11,7 @@ tier: DISPATCH
 
 # 708 - The Arena (arena.social): Complete Deep Dive (Hub)
 
-> **Goal:** Everything ZAO can find on The Arena - the SocialFi platform on Avalanche - across seven dimensions: history, mechanics, the $ARENA token, product, metrics, the creator playbook, and risks/competitors. Seven DEEP-tier research agents; this hub synthesizes them and gives ZAO a concrete, plainly-stated playbook. This supersedes the lighter Doc 706l.
+> **Goal:** Everything ZAO can find on The Arena - the SocialFi platform on Avalanche - in two waves. Wave 1 (708a-708g) is the platform: history, mechanics, the $ARENA token, product, metrics, the creator playbook, and risks/competitors. Wave 2 (708h-708l) is the operator's playbook, triggered when Zaal confirmed he already has a profile: his profile audit + social graph, the 30/60/90 operator routine, music tactics, growth case studies, and the power-user toolkit. Twelve DEEP-tier research agents total; this hub synthesizes them. Supersedes the lighter Doc 706l.
 
 ## Key Findings (read first)
 
@@ -75,11 +75,32 @@ Onboarding is free and fast (X / Google / Apple login, ~5-10 minutes to a live p
 ### 708g - Risks, criticism & competitors
 The skeptical counterweight. SocialFi is a graveyard: friend.tech fell ~$52M to ~$4M TVL, its token ~98%. The ticket mechanic is structurally a game where new entrants fund earlier exits. Creator tickets plausibly meet several prongs of the Howey securities test - so ZAO should keep to plain profiles and avoid gating content or launching tokens through Arena. Competitively, **Farcaster** (800K+ DAU, far larger and healthier) is the stronger social surface and where ZAO already operates. The Arena's builder SDK is alpha-stage. The agent's recommendation: use The Arena as a tertiary channel only; invest real social effort in Farcaster. *See `708g-risks-criticism-competitors.md`.*
 
+## Wave 2: the operator's playbook (Zaal has a profile)
+
+Wave 2 was triggered by a new fact: **Zaal already has an Arena profile.** So the question shifts from "should ZAO be on The Arena" to "how does Zaal operate the profile he has." Five tactical agents.
+
+### 708h - Zaal's profile audit + the social graph
+The honest headline: **the agent could not verify Zaal's profile from outside.** The Arena gates profiles behind X-OAuth login and does not expose them to public search or plain crawling, so a profile cannot be audited without logging in. Zaal should log in directly to confirm and read off his ticket price, holder count, and follower count. Two useful findings did land: none of ZAO's ~8 named musicians (Jango UU, Songs of Eden, Hurric4n3ike, Jadyn Violet, and others) appear to be on The Arena - an untapped lane - and Arena COO Phillip Liu Jr (ex-Ava Labs Head of Strategy) is a credible Avalanche-ecosystem bridge. *See `708h-zaal-profile-audit-social-graph.md`. Note: profile details are unverified until Zaal checks while logged in.*
+
+### 708i - Operator playbook (30/60/90 days)
+The concrete routine for a profile holder: a first-30-days setup-and-consistency checklist, the bonding-curve mechanics from the operator side, three holder-acquisition methods (tipping virality, referral codes, Stage collaborations), and a daily/weekly/monthly cadence. The agent projects day-90 earnings of roughly 200-700 AVAX/month from tips, royalties, referrals, and airdrops - treat that as an optimistic projection, not a forecast. (One agent-cited "June 2026" metric is a future date relative to today and should be disregarded.) *See `708i-operator-playbook-30-60-90.md`.*
+
+### 708j - Music & artist tactics
+The Arena audience is roughly 60-70% crypto traders and 30-40% genuine fans - so it is a tool for crypto-native indie artists building a committed core, not a mass-audience music platform. The agent gave eight concrete Cipher ideas (track teasers, listening parties on Stages, a token-gated artist room, ticket-holder music perks) and a flywheel: posts drive ticket demand, ticket sales fund music, releases drive tips and trading. The honest read: a complement to streaming and touring, not a replacement. Start with 500-1,000 crypto-native fans, not the masses. *See `708j-music-artist-tactics.md`.*
+
+### 708k - Growth case studies
+Five documented Arena growth examples were dissected (NOCHILL, GURS, Integrity DAO, LAMBO/WOLFI, and the Cast3 mechanism). The repeatable levers: the referral loop (1% of every referred trade, permanently), the bonding curve, and cross-posting from an existing X following. The agent drafted a 12-month pattern for Zaal that seeds from the 188-member ZAO community and targets 1,000+ ticket holders and ~$500/week by month 12 - again, an aspirational target, not a promise. *See `708k-growth-case-studies.md`.*
+
+### 708l - Power-user toolkit
+The tooling around The Arena: an alpha-stage Arena App Store SDK (v0.2.4), an "Arena Agent" bot skill (autonomous posting, ~3 posts/hour), the third-party Logiqical MCP SDK (176 tools, ~78 Arena social functions - relevant since ZAO runs agents), a community Dune analytics dashboard, and crossposting tools. The one ZAO-native opportunity: ZAO could deploy the Arena Agent bot on its existing VPS (~1-2 hours) so an agent keeps the profile active. Worth a small experiment, not a priority. *See `708l-power-user-toolkit.md`.*
+
 ## What ZAO should do
 
 ### Do (low cost, low stakes)
-1. **Create a The Arena profile for Zaal** (X login, ~10 minutes). A cheap, real distribution surface and a proof-of-concept. Post occasionally; do not reorganize anything around it.
-2. **Optionally add 1-3 Cipher artists** once Zaal's own profile has run for a month and there is something to learn from.
+1. **Zaal: log into the profile and read off the numbers** - ticket price, holder count, followers. Wave 2 could not see them from outside; the operator playbook only becomes concrete once those are known.
+2. **Run the 708i first-30-days checklist** - finish profile setup, set a posting cadence, use the referral code. Treat it as a light side-channel, not a job.
+3. **Optionally add 1-3 Cipher artists** once Zaal's own profile has run for a month and there is something to learn from (708j).
+4. **Optional small experiment:** deploy the Arena Agent bot on ZAO's VPS to keep the profile active autonomously (708l, ~1-2 hours).
 
 ### Do not
 - **Do not launch a token through Arena's launchpad.** Regulatory risk (launchpad tokens and tickets look like securities) and it contradicts the settled position that $ZAO is soulbound Respect, never a tradeable token (Doc 695).
@@ -124,17 +145,20 @@ The skeptical counterweight. SocialFi is a graveyard: friend.tech fell ~$52M to 
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Create a The Arena profile for Zaal as a low-stakes experiment | @Zaal | Task | This quarter, low priority |
-| Decide after ~1 month whether to add Cipher artist profiles | @Zaal | Decision | After the profile has run |
+| Log into The Arena and read off ticket price, holder count, follower count - Wave 2 could not see the profile from outside | @Zaal | Task | This week |
+| Run the 708i first-30-days checklist - finish profile setup, set a posting cadence, use the referral code | @Zaal | Task | This month |
+| Decide after ~1 month whether to add Cipher artist profiles (708j) | @Zaal | Decision | After the profile has run |
+| Optional: deploy the Arena Agent bot on ZAO's VPS to keep the profile active (708l) | @Zaal | Experiment | Optional, low priority |
 | Do NOT launch any token via Arena's launchpad - this is a standing no | @Zaal | Decision | Standing |
 | Keep ZAO's real social investment on Farcaster, not The Arena | @Zaal | Decision | Standing |
 | Re-validate this doc if The Arena's user count or TVL moves materially | @Zaal | Doc update | Every 6-8 weeks |
-| Verify agent-reported figures ($ARENA contract, fee splits, founder names) before any public use | @Zaal | Verification | Before citing |
+| Verify agent-reported figures ($ARENA contract, fee splits, founder names, growth projections) before any public use | @Zaal | Verification | Before citing |
 
 ## Sources
 
-DISPATCH hub. Each of the seven sub-docs (`708a`-`708g`) carries its own full Sources section with every source classified `[FULL]` / `[PARTIAL]` / `[FAILED]` per the zao-research fetch-quality gate. Across the seven DEEP-tier agents, 150+ sources were consulted - CoinGecko, CoinMarketCap, DexScreener, DefiLlama, CertiK / SlowMist / PeckShield / Paladin security reports, CoinDesk, The Block, the Arena blog and docs, and community sources on Reddit, X, and Hacker News. Headline counts:
+DISPATCH hub built in two waves. All twelve sub-docs (`708a`-`708l`) carry their own full Sources sections with every source classified `[FULL]` / `[PARTIAL]` / `[FAILED]` per the zao-research fetch-quality gate. Across the twelve DEEP-tier agents, 280+ sources were consulted - CoinGecko, CoinMarketCap, DexScreener, DefiLlama, CertiK / SlowMist / PeckShield / Paladin security reports, CoinDesk, The Block, the Arena blog and docs, the Playwright-loaded arena.social app, GitHub, and community sources on Reddit, X, and Hacker News. Headline counts:
 
+Wave 1 (the platform):
 - 708a - history: 32 sources (25 FULL, 7 PARTIAL)
 - 708b - mechanics: 15 sources, classified FULL/PARTIAL/FAILED
 - 708c - $ARENA token: classified FULL/PARTIAL/FAILED, 5+ hard metrics
@@ -142,5 +166,14 @@ DISPATCH hub. Each of the seven sub-docs (`708a`-`708g`) carries its own full So
 - 708e - metrics: 15+ sources, every metric dated
 - 708f - creator playbook: 20 sources, classified FULL/PARTIAL
 - 708g - risks/competitors: 40+ sources, classified FULL/PARTIAL/FAILED
+
+Wave 2 (the operator playbook):
+- 708h - profile audit / social graph: classified FULL/PARTIAL/FAILED; profile not externally verifiable
+- 708i - operator playbook: 13+ sources, classified FULL/PARTIAL
+- 708j - music tactics: classified FULL/PARTIAL
+- 708k - growth case studies: 20 sources (16 FULL, 4 PARTIAL)
+- 708l - power-user toolkit: 19 sources, classified FULL/PARTIAL
+
+Per the staleness flags above, agent growth projections (708i, 708k) are aspirational, not forecasts, and dated metrics should be re-verified before any public use.
 
 See each sub-doc for the verbatim URL list. Per the staleness flags above, dated metrics and agent-reported specifics should be re-verified against primary sources before they drive a decision or appear in anything public.

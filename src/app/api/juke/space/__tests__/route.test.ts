@@ -9,6 +9,7 @@ import {
 
 const mockEnv = vi.hoisted(() => ({
   JUKE_API_KEY: 'jk_sec_live_test' as string | undefined,
+  JUKE_USER_TOKEN: 'jwt_test' as string | undefined,
 }));
 
 const { mockGetSessionData, mockCreateJukeSpace } = vi.hoisted(() => ({
@@ -36,6 +37,7 @@ describe('POST /api/juke/space', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockEnv.JUKE_API_KEY = 'jk_sec_live_test';
+    mockEnv.JUKE_USER_TOKEN = 'jwt_test';
   });
 
   it('returns 401 when there is no session', async () => {
@@ -60,7 +62,7 @@ describe('POST /api/juke/space', () => {
     expect(mockCreateJukeSpace).not.toHaveBeenCalled();
   });
 
-  it('returns 503 when JUKE_API_KEY is not configured', async () => {
+  it('returns 503 naming JUKE_API_KEY when only the key is missing', async () => {
     mockGetSessionData.mockResolvedValue(mockAdminSession());
     mockEnv.JUKE_API_KEY = undefined;
 
@@ -68,8 +70,33 @@ describe('POST /api/juke/space', () => {
     const body = await res.json();
 
     expect(res.status).toBe(503);
-    expect(body.error).toMatch(/not configured/i);
+    expect(body.error).toContain('JUKE_API_KEY');
+    expect(body.error).not.toContain('JUKE_USER_TOKEN');
     expect(mockCreateJukeSpace).not.toHaveBeenCalled();
+  });
+
+  it('returns 503 naming JUKE_USER_TOKEN when only the token is missing', async () => {
+    mockGetSessionData.mockResolvedValue(mockAdminSession());
+    mockEnv.JUKE_USER_TOKEN = undefined;
+
+    const res = await POST(makePostRequest('/api/juke/space', { title: 'ZAO Live' }));
+    const body = await res.json();
+
+    expect(res.status).toBe(503);
+    expect(body.error).toContain('JUKE_USER_TOKEN');
+  });
+
+  it('returns 503 naming both when neither credential is set', async () => {
+    mockGetSessionData.mockResolvedValue(mockAdminSession());
+    mockEnv.JUKE_API_KEY = undefined;
+    mockEnv.JUKE_USER_TOKEN = undefined;
+
+    const res = await POST(makePostRequest('/api/juke/space', { title: 'ZAO Live' }));
+    const body = await res.json();
+
+    expect(res.status).toBe(503);
+    expect(body.error).toContain('JUKE_API_KEY');
+    expect(body.error).toContain('JUKE_USER_TOKEN');
   });
 
   it('returns 400 when the body is not valid JSON', async () => {
@@ -131,7 +158,7 @@ describe('POST /api/juke/space', () => {
     expect(body.data.embedUrl).toBe('https://juke.audio/embed/zao-live-1');
     expect(mockCreateJukeSpace).toHaveBeenCalledWith(
       { title: 'ZAOstock Standup', announceCast: true },
-      'jk_sec_live_test',
+      { apiKey: 'jk_sec_live_test', userToken: 'jwt_test' },
     );
   });
 

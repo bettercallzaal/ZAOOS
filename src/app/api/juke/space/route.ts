@@ -12,9 +12,10 @@ import { createJukeSpace } from '@/lib/spaces/juke-api';
  * weekly fractal call, COC Concertz nights); this route mints a Juke space for
  * one of them on demand and returns the `/live/{id}` embed link to share.
  *
- * The `JUKE_API_KEY` secret stays server-side. Until it is configured (apply
- * at juke.audio/developers), the route reports 503 rather than failing
- * opaquely — Path A, the keyless iframe embed, keeps working regardless.
+ * The `JUKE_API_KEY` + `JUKE_USER_TOKEN` secrets stay server-side. Until both
+ * are configured (apply at juke.audio/developers), the route reports 503
+ * rather than failing opaquely — Path A, the keyless iframe embed, keeps
+ * working regardless.
  */
 
 const createSpaceSchema = z.object({
@@ -43,13 +44,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Juke's create-space endpoint needs both the app key and a host JWT.
   const apiKey = ENV.JUKE_API_KEY;
-  if (!apiKey) {
+  const userToken = ENV.JUKE_USER_TOKEN;
+  if (!apiKey || !userToken) {
+    const missing = [
+      !apiKey ? 'JUKE_API_KEY' : null,
+      !userToken ? 'JUKE_USER_TOKEN' : null,
+    ]
+      .filter(Boolean)
+      .join(' and ');
     return NextResponse.json(
       {
         success: false,
-        error:
-          'Juke developer API is not configured. Apply at juke.audio/developers, then set JUKE_API_KEY.',
+        error: `Juke developer API is not configured (missing ${missing}). Apply at juke.audio/developers.`,
       },
       { status: 503 },
     );
@@ -74,7 +82,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await createJukeSpace(parsed.data, apiKey);
+    const result = await createJukeSpace(parsed.data, { apiKey, userToken });
     if (!result.ok) {
       // Upstream Juke failure. Log the real status server-side; report a
       // single 502 to the client — a Juke 401/400 is an integration problem,

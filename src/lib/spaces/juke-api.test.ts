@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createJukeSpace, extractSpaceId, JUKE_API_ORIGIN } from './juke-api';
+import {
+  createJukeSpace,
+  extractSpaceId,
+  JUKE_API_ORIGIN,
+  type JukeCredentials,
+} from './juke-api';
+
+/** A complete credentials pair for tests that do not assert on the values. */
+const CREDS: JukeCredentials = { apiKey: 'jk_sec_live_test', userToken: 'jwt_test' };
 
 describe('extractSpaceId', () => {
   it('reads a top-level id', () => {
@@ -64,16 +72,20 @@ describe('createJukeSpace', () => {
     } as Response);
   }
 
-  it('posts to the developer endpoint with the API key header', async () => {
+  it('posts to the developer endpoint with both auth headers', async () => {
     mockFetchOnce({ ok: true, status: 201, json: () => ({ id: 'abc123' }) });
 
-    await createJukeSpace({ title: 'ZAO Standup' }, 'jk_sec_live_test');
+    await createJukeSpace(
+      { title: 'ZAO Standup' },
+      { apiKey: 'jk_sec_live_test', userToken: 'jwt_abc' },
+    );
 
     expect(fetch).toHaveBeenCalledTimes(1);
     const [url, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(url).toBe(`${JUKE_API_ORIGIN}/v1/developer/spaces`);
     expect(options.method).toBe('POST');
     expect(options.headers['X-Juke-Api-Key']).toBe('jk_sec_live_test');
+    expect(options.headers.Authorization).toBe('Bearer jwt_abc');
     expect(options.headers['Content-Type']).toBe('application/json');
   });
 
@@ -87,7 +99,7 @@ describe('createJukeSpace', () => {
         announceCast: true,
         allowAgents: true,
       },
-      'key',
+      CREDS,
     );
 
     const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
@@ -102,7 +114,7 @@ describe('createJukeSpace', () => {
   it('defaults optional fields when omitted', async () => {
     mockFetchOnce({ ok: true, status: 201, json: () => ({ id: 'abc123' }) });
 
-    await createJukeSpace({ title: 'Quick Room' }, 'key');
+    await createJukeSpace({ title: 'Quick Room' }, CREDS);
 
     const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(JSON.parse(options.body)).toEqual({
@@ -116,7 +128,7 @@ describe('createJukeSpace', () => {
   it('returns the space with an embed URL on success', async () => {
     mockFetchOnce({ ok: true, status: 201, json: () => ({ id: 'zao-live-1' }) });
 
-    const result = await createJukeSpace({ title: 'ZAO Live' }, 'key');
+    const result = await createJukeSpace({ title: 'ZAO Live' }, CREDS);
 
     expect(result.ok).toBe(true);
     if (result.ok) {
@@ -129,7 +141,7 @@ describe('createJukeSpace', () => {
   it('fails when the Juke response carries no usable id', async () => {
     mockFetchOnce({ ok: true, status: 201, json: () => ({ title: 'orphan' }) });
 
-    const result = await createJukeSpace({ title: 'ZAO Live' }, 'key');
+    const result = await createJukeSpace({ title: 'ZAO Live' }, CREDS);
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -141,7 +153,10 @@ describe('createJukeSpace', () => {
   it('surfaces a non-2xx Juke response with its status', async () => {
     mockFetchOnce({ ok: false, status: 401, json: () => ({}) });
 
-    const result = await createJukeSpace({ title: 'ZAO Live' }, 'bad-key');
+    const result = await createJukeSpace(
+      { title: 'ZAO Live' },
+      { apiKey: 'bad-key', userToken: 'bad-jwt' },
+    );
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -153,7 +168,7 @@ describe('createJukeSpace', () => {
   it('returns a 502 when the Juke API is unreachable', async () => {
     (fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error('ECONNREFUSED'));
 
-    const result = await createJukeSpace({ title: 'ZAO Live' }, 'key');
+    const result = await createJukeSpace({ title: 'ZAO Live' }, CREDS);
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -167,7 +182,7 @@ describe('createJukeSpace', () => {
     timeout.name = 'TimeoutError';
     (fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(timeout);
 
-    const result = await createJukeSpace({ title: 'ZAO Live' }, 'key');
+    const result = await createJukeSpace({ title: 'ZAO Live' }, CREDS);
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
@@ -185,7 +200,7 @@ describe('createJukeSpace', () => {
       },
     } as Response);
 
-    const result = await createJukeSpace({ title: 'ZAO Live' }, 'key');
+    const result = await createJukeSpace({ title: 'ZAO Live' }, CREDS);
 
     expect(result.ok).toBe(false);
     if (!result.ok) {

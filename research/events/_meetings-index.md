@@ -8,6 +8,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 | 2026-05-18 | Iman call - ZAO Craig + PizzaDAO Zambia | ZAO Devz | Zaal, Iman | [670](670-iman-call-may18-craig-pizzadao/) | ~4 |
 | 2026-05-18 | Tanja Fractal Book call | ZAO OS / Fractal | Zaal, Tanja | [675](675-tanja-fractal-book-call-may18/) | 7 |
 | 2026-05-16 | ZABAL Games + Empire V3 - yerbearzerker | ZABAL Games | Zaal, Iman, yerbearzerker | [654](654-zabal-games-empire-v3-yerbearzerker-meeting/) | n/a |
+| 2026-05-12 | Ryan Kagy Limitless call - agent partnership | ZAO OS | Zaal, Ryan Kagy | [682](682-ryan-kagy-limitless-call-may12/) | 9 |
 | 2026-05-04 | ZAOstock cobuild - six circles | ZAOstock | team | [609](609-zaostock-cobuild-six-circles-may4/) | n/a |
 | 2026-05-04 | WaveWarZ Africa - RAM + SongChainn | WaveWarZ | team | [608](608-wavewarz-africa-ram-songchain-may4/) | n/a |
 | 2026-05-xx | Adam sync - commercial leaderboard | ZAOstock | Zaal, Adam | [599](../business/599-adam-meeting-may2026-commercial-leaderboard/) | n/a |

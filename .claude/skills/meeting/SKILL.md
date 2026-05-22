@@ -126,6 +126,15 @@ against the brand glossary. A frame is corroboration, never a substitute for the
 transcript - if a frame and the transcript conflict, the transcript wins and the
 item is flagged `confidence: low`.
 
+**Speaker-labeled transcript.** mlx-whisper and VPS Whisper both emit one
+unlabeled block - no speaker turns. Once the attendee list is known (Pass A),
+produce a speaker-labeled copy for `transcript.md`: prefix each turn with
+`[Name]`, inferred from content, self-introductions ("this is Sam"), and frame
+name-tags. Mark genuinely ambiguous turns `[?]`. This is best-effort attribution,
+not true diarization - for per-word speaker accuracy on 3+ person calls run the
+`sherpa-onnx` diarization step (doc 709, no HF token needed). A 1-2 person call
+rarely needs more than the labeled block.
+
 1. **Pass A - meeting metadata.** date, duration, title, attendees, platform. Date never invented - from transcript, file mtime, or ask.
 2. **Pass B - decisions.** Things explicitly decided/agreed in the call. Verbatim-anchored.
 3. **Pass C - actions.** Concrete follow-ups with an owner. One owner each.

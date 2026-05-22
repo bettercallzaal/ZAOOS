@@ -15,10 +15,23 @@
 #   BONFIRE_API_KEY  required - absent => skip all, exit 0
 #   BONFIRE_ID       required - the ZABAL bonfire id
 #   BONFIRE_API_URL  default https://tnt-v2.api.bonfires.ai
+#
+# Key source: if the vars are not already exported, this script sources a
+# local env file - default ~/.zao/bonfire.env (override with BONFIRE_ENV).
+# Put the key there once (chmod 600); it is never committed and never echoed.
+#   BONFIRE_API_KEY=...
+#   BONFIRE_ID=...
 
 set -uo pipefail
 
 INPUT="${1:?missing episodes-json path}"
+
+# Load the key from a local env file when it is not already in the environment.
+BONFIRE_ENV="${BONFIRE_ENV:-$HOME/.zao/bonfire.env}"
+if [[ -z "${BONFIRE_API_KEY:-}" && -f "$BONFIRE_ENV" ]]; then
+  set -a; . "$BONFIRE_ENV"; set +a
+fi
+
 API_URL="${BONFIRE_API_URL:-https://tnt-v2.api.bonfires.ai}"
 API_KEY="${BONFIRE_API_KEY:-}"
 BONFIRE_ID="${BONFIRE_ID:-}"

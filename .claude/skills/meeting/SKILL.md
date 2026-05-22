@@ -97,9 +97,49 @@ The script is local-first:
 2. If local tooling is absent (non-Mac machine), it falls back to Whisper on
    Iman's VPS - SCP up, transcribe, SCP the `.txt` back.
 
+It prints the `.txt` transcript path and writes a `.json` sidecar at the same
+stem (`/tmp/meeting-X.txt` + `/tmp/meeting-X.json`) - the sidecar carries
+segment timestamps that Step 3 needs. The local mlx path produces the sidecar;
+the VPS fallback does not (so Step 3 is skipped on the VPS path).
+
 One-time local setup: `uv tool install mlx-whisper`. For a hard-to-hear or
 many-name meeting, pass a bigger model:
-`transcribe.sh "$MEDIA_PATH" --model mlx-community/whisper-large-v3`.
+`transcribe.sh "$MEDIA_PATH" --model mlx-community/whisper-large-v3`. Avoid
+plain `whisper-large-v3` on long calls - it can loop catastrophically (doc
+709); `whisper-large-v3-turbo` is the safe default.
+
+**Step 3 - diarize (speaker labels).** Whisper emits one unlabeled block - no
+speaker turns. Add them so the extraction passes know who said what:
+
+```bash
+bash ${CLAUDE_SKILL_DIR}/scripts/diarize.sh "$MEDIA_PATH" "${TRANSCRIPT%.txt}.json"
+```
+
+(`$TRANSCRIPT` is the `.txt` path Step 2 printed.) The script runs `sherpa-onnx`
+diarization fully locally - no Hugging Face token, no GPU. First run downloads
+two small ONNX models (~35MB total) to `~/.zao/diarization-models/`. It prints
+the path to a speaker-labeled transcript (`[Speaker 1] ... [Speaker 2] ...`)
+and the detected speaker count on stderr.
+
+**Pass the speaker count when you know it.** Auto-detect over-clusters - it
+found 8 speakers on a 2-person test call. When the count is known (the filename
+`Tyler x zaal` = 2, a calendar invite, or a quick skim of the plain transcript),
+force it - this is the single biggest quality lever:
+
+```bash
+ZAO_DIARIZATION_NUM_SPEAKERS=2 bash ${CLAUDE_SKILL_DIR}/scripts/diarize.sh "$MEDIA_PATH" "${TRANSCRIPT%.txt}.json"
+```
+
+Leave it unset only when the count is genuinely unknown.
+
+Diarization is best-effort. If `diarize.sh` fails (uv or models unavailable, the
+VPS fallback path produced no json sidecar, or the box is out of memory),
+proceed with the plain unlabeled transcript and attribute speakers from content
+- do not abort the run. Highest value on 3+ person calls; on a 1-2 person call
+the labeled transcript is a nice-to-have, not load-bearing.
+
+When a labeled transcript is produced, use it as the Phase 2 input and as the
+body of `transcript.md`.
 
 ### Mode: craig_url
 Download Craig recording, transcribe.
@@ -125,6 +165,14 @@ shown on a slide but not said aloud (Pass B/C), and confirm name spellings
 against the brand glossary. A frame is corroboration, never a substitute for the
 transcript - if a frame and the transcript conflict, the transcript wins and the
 item is flagged `confidence: low`.
+
+**Speaker-labeled transcript - map the labels.** If Step 3 produced a
+`[Speaker N]`-labeled transcript, those labels are anonymous diarization output.
+In Pass A, map each `Speaker N` to a real attendee using content,
+self-introductions ("this is Sam"), and frame name-tags. Carry the mapping
+through every later pass and into `transcript.md`. If diarization was skipped or
+failed, attribute speakers from content alone - the recap still works, owner
+attribution is just less certain (flag affected actions `confidence: medium`).
 
 1. **Pass A - meeting metadata.** date, duration, title, attendees, platform. Date never invented - from transcript, file mtime, or ask.
 2. **Pass B - decisions.** Things explicitly decided/agreed in the call. Verbatim-anchored.
@@ -402,8 +450,10 @@ When creating the recap doc, parallel Claude sessions may race for the same numb
 
 ## Scripts
 
-- `scripts/transcribe.sh` - local-first transcription: mlx-whisper on Apple Silicon, VPS Whisper fallback
+- `scripts/transcribe.sh` - local-first transcription: mlx-whisper on Apple Silicon, VPS Whisper fallback. Emits a `.txt` transcript + `.json` segment-timestamp sidecar.
 - `scripts/extract-frames.sh` - pull scene-change + interval still frames from a meeting video
+- `scripts/diarize.sh` - speaker diarization via sherpa-onnx: who-spoke-when, merged with the whisper json into a `[Speaker N]`-labeled transcript. Local, offline, no HF token.
+- `scripts/diarize.py` - the diarization + transcript-merge engine called by `diarize.sh` (runs under `uv run --with sherpa-onnx`).
 - `scripts/fetch-craig.sh` - curl Craig recording URL, extract audio
 - `scripts/append-actions.sh` - `gh api` PUT for `data/actions.json` bulk append (ZAO Devz project only)
 - `scripts/bonfire-episode.sh` - POST meeting episodes to the ZABAL Bonfire KG (always-on, best-effort, doc 680)

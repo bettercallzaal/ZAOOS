@@ -2,9 +2,30 @@ import { Metadata } from 'next';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { ZabalSpotlightClient } from './_components/ZabalSpotlightClient';
 
+// Per-route Mini App embed - a shared spotlight link launches the
+// spotlight surface, not the root /miniapp. (Research Doc 707 P0.)
+const spotlightEmbed = JSON.stringify({
+  version: '1',
+  imageUrl: 'https://zaoos.com/og/zabal',
+  button: {
+    title: 'Member Spotlight',
+    action: {
+      type: 'launch_miniapp',
+      url: 'https://zaoos.com/zabal/spotlight',
+      name: 'ZABAL',
+      splashImageUrl: 'https://zaoos.com/splash.png',
+      splashBackgroundColor: '#0a0a0a',
+    },
+  },
+});
+
 export const metadata: Metadata = {
   title: 'ZABAL Spotlight - Member of the Week',
   description: 'Nominate and vote for ZAO members who shipped the most this week.',
+  other: {
+    'fc:miniapp': spotlightEmbed,
+    'fc:frame': spotlightEmbed,
+  },
 };
 
 export const revalidate = 60;

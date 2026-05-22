@@ -11,14 +11,14 @@ tier: DISPATCH
 
 # 708 - The Arena (arena.social): Complete Deep Dive (Hub)
 
-> **Goal:** Everything ZAO can find on The Arena - the SocialFi platform on Avalanche - in two waves. Wave 1 (708a-708g) is the platform: history, mechanics, the $ARENA token, product, metrics, the creator playbook, and risks/competitors. Wave 2 (708h-708l) is the operator's playbook, triggered when Zaal confirmed he already has a profile: his profile audit + social graph, the 30/60/90 operator routine, music tactics, growth case studies, and the power-user toolkit. Twelve DEEP-tier research agents total; this hub synthesizes them. Supersedes the lighter Doc 706l.
+> **Goal:** Everything ZAO can find on The Arena - the SocialFi platform on Avalanche - in three waves. Wave 1 (708a-708g) is the platform: history, mechanics, the $ARENA token, product, metrics, the creator playbook, and risks/competitors. Wave 2 (708h-708l) is the operator's playbook, triggered when Zaal confirmed he has a profile: profile audit + social graph, the 30/60/90 routine, music tactics, growth case studies, the power-user toolkit. Wave 3 (708m-708o) is top people and live activity: the leaderboard, the May 2026 activity pulse, and a communities walkthrough. Fifteen DEEP-tier research agents total; this hub synthesizes them. Supersedes the lighter Doc 706l.
 
 ## Key Findings (read first)
 
 | Question | Finding | Confidence |
 |----------|---------|------------|
 | Is The Arena a real, surviving platform? | **YES** - the strongest-surviving SocialFi platform, ~200K registered users, real activity | High |
-| Is it growing? | **NO - it is flat / consolidating.** User count held steady Oct 2024 to Apr 2026. Not collapsing, not hypergrowing | High |
+| Is it growing? | **NO - past peak and contracting.** Registered users held steady (~200-430K) but economic activity is down sharply: Wave 3 found trading volume off ~85-95% and $ARENA market cap off ~92% from the mid-2025 peak. It is the biggest SocialFi on Avalanche, but a shrinking one | High |
 | Is the $ARENA token worth holding? | **NO** - down ~97% from its June 2025 peak, ~$5M market cap, no CEX listings, no buyback. The token is effectively dead even though the platform is not | High |
 | Should ZAO put a profile on The Arena? | **YES - as a cheap, low-stakes experiment.** Free, ~5-10 min onboarding via X login. Not a monetization strategy | Medium |
 | Should ZAO launch a token via Arena's launchpad? | **NO** - regulatory risk (tickets/launchpad tokens look like securities) and it contradicts $ZAO being soulbound (Doc 695) | High |
@@ -94,6 +94,22 @@ Five documented Arena growth examples were dissected (NOCHILL, GURS, Integrity D
 ### 708l - Power-user toolkit
 The tooling around The Arena: an alpha-stage Arena App Store SDK (v0.2.4), an "Arena Agent" bot skill (autonomous posting, ~3 posts/hour), the third-party Logiqical MCP SDK (176 tools, ~78 Arena social functions - relevant since ZAO runs agents), a community Dune analytics dashboard, and crossposting tools. The one ZAO-native opportunity: ZAO could deploy the Arena Agent bot on its existing VPS (~1-2 hours) so an agent keeps the profile active. Worth a small experiment, not a priority. *See `708l-power-user-toolkit.md`.*
 
+## Wave 3: top people + how active is it really
+
+Wave 3 answered two direct questions - who are the top people on The Arena, and how active is it right now. The answers sharpened the verdict.
+
+### 708m - Top people & leaderboard
+There is **no public top-creators leaderboard** on The Arena. The visible "top people" are the team (CEO Jason Desimone, COO Phillip Liu Jr, ex-Ava Labs) and a layer of trader/memecoin KOLs and DAO accounts - e.g. Integrity DAO ($ID, the first successful Arena launch graduate), the trader-evangelist Spicy_Rich, the Cast3 micro-influencer network. The consistent finding across every wave: **there are essentially no prominent musicians or artists on The Arena.** That is the entire ZAO angle - the music lane is empty. *See `708m-top-people-leaderboard.md`.*
+
+### 708n - Live activity pulse (May 2026)
+The important update. The Arena is **past its peak and contracting hard.** Versus the mid-2025 peak: $ARENA market cap is down ~92% (roughly $55M to ~$4.5M), and trading volume is down ~85-95% (from the ~$284M 30-day peak). The platform is still live and shipping - the iOS app launched well in April 2026, and there is a GameFi pivot underway - but on every economic metric it has shrunk dramatically. The agent's plain verdict: a quiet platform in "recovery mode," at real risk of sliding to "zombie status" if iOS growth and the GameFi pivot do not deliver. *See `708n-live-activity-pulse.md`.*
+
+### 708o - Live walkthrough & communities
+The Arena is the **dominant SocialFi platform on Avalanche** (it has been cited as ~32% of network wallet activity and ~99% of Avalanche SocialFi TVL) - but "dominant in Avalanche SocialFi" is a small and shrinking pond. Culturally it is memecoin-first and ~65-75% traders; the biggest communities are speculative memecoin groups (LAMBO, WOLFI, NOCHILL, Integrity DAO). Daily activity peaks 13:00-17:00 UTC with ~1,000-1,800 tokens minted daily. Music and art are a near-empty niche. Note: the agents could not drive a live Playwright walkthrough (the browser tooling was unavailable in-run), so this dimension is web-research-based. *See `708o-live-walkthrough-communities.md`.*
+
+### The Wave 3 contradiction, surfaced honestly
+708n ("severe contraction, recovery mode") and 708o ("dominant, 430K monthly actives, busy") read as opposites. They are reconcilable: **708o measures registered/cumulative users and Avalanche-SocialFi market share; 708n measures live economic activity (volume, market cap, monetization).** Both are true at once - The Arena is still the biggest SocialFi on Avalanche AND its real economic activity has fallen ~85-95% from peak. The honest net read: a leading-but-shrinking platform, well past its high-water mark. This hardens, not softens, the doc's recommendation - a free profile is fine; a bet is not.
+
 ## What ZAO should do
 
 ### Do (low cost, low stakes)
@@ -152,11 +168,12 @@ The tooling around The Arena: an alpha-stage Arena App Store SDK (v0.2.4), an "A
 | Do NOT launch any token via Arena's launchpad - this is a standing no | @Zaal | Decision | Standing |
 | Keep ZAO's real social investment on Farcaster, not The Arena | @Zaal | Decision | Standing |
 | Re-validate this doc if The Arena's user count or TVL moves materially | @Zaal | Doc update | Every 6-8 weeks |
-| Verify agent-reported figures ($ARENA contract, fee splits, founder names, growth projections) before any public use | @Zaal | Verification | Before citing |
+| Treat The Arena as past-peak and contracting - profile is fine, a bet is not (Wave 3) | @Zaal | Decision | Standing |
+| Verify agent-reported figures ($ARENA contract, fee splits, founder names, growth projections, the contraction percentages) before any public use | @Zaal | Verification | Before citing |
 
 ## Sources
 
-DISPATCH hub built in two waves. All twelve sub-docs (`708a`-`708l`) carry their own full Sources sections with every source classified `[FULL]` / `[PARTIAL]` / `[FAILED]` per the zao-research fetch-quality gate. Across the twelve DEEP-tier agents, 280+ sources were consulted - CoinGecko, CoinMarketCap, DexScreener, DefiLlama, CertiK / SlowMist / PeckShield / Paladin security reports, CoinDesk, The Block, the Arena blog and docs, the Playwright-loaded arena.social app, GitHub, and community sources on Reddit, X, and Hacker News. Headline counts:
+DISPATCH hub built in three waves. All fifteen sub-docs (`708a`-`708o`) carry their own full Sources sections with every source classified `[FULL]` / `[PARTIAL]` / `[FAILED]` per the zao-research fetch-quality gate. Across the fifteen DEEP-tier agents, 350+ sources were consulted - CoinGecko, CoinMarketCap, DexScreener, DefiLlama, Dune, Avascan/Snowtrace, CertiK / SlowMist / PeckShield / Paladin security reports, CoinDesk, The Block, the Arena blog and docs, GitHub, and community sources on Reddit, X, and Hacker News. Headline counts:
 
 Wave 1 (the platform):
 - 708a - history: 32 sources (25 FULL, 7 PARTIAL)
@@ -174,6 +191,11 @@ Wave 2 (the operator playbook):
 - 708k - growth case studies: 20 sources (16 FULL, 4 PARTIAL)
 - 708l - power-user toolkit: 19 sources, classified FULL/PARTIAL
 
-Per the staleness flags above, agent growth projections (708i, 708k) are aspirational, not forecasts, and dated metrics should be re-verified before any public use.
+Wave 3 (top people + activity):
+- 708m - top people / leaderboard: classified FULL/PARTIAL/FAILED; no public leaderboard exists
+- 708n - live activity pulse: classified FULL/PARTIAL, every metric dated
+- 708o - live walkthrough / communities: 28 sources; live Playwright walkthrough was not available, so web-research-based
+
+Per the staleness flags above, agent growth projections (708i, 708k) are aspirational, not forecasts; Wave 3's contraction percentages (708n) and the 708n-vs-708o activity contradiction are agent-reported and should be re-verified before any public use.
 
 See each sub-doc for the verbatim URL list. Per the staleness flags above, dated metrics and agent-reported specifics should be re-verified against primary sources before they drive a decision or appear in anything public.

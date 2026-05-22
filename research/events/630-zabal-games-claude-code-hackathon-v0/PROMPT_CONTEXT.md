@@ -1,8 +1,8 @@
-# ZABAL Games v0 - Player Context Bundle
+# ZABAL Games Season 1 - Player Context Bundle
 
-> **You received this because you got accepted to ZABAL Games v0.** This file is the comprehensive context primer for the ZAO ecosystem. Read it once cover to cover, then load it into your AI coding tool's context (Claude Code uses `CLAUDE.md`, Cursor uses `.cursorrules`, Windsurf uses `.windsurfrules`, Aider supports conventions files, etc.).
+> **This is the comprehensive context primer for the ZAO ecosystem.** July builders get a lighter cut; August Finalists get the full bundle as their sealed prompt. Read it once cover to cover, then load it into your AI coding tool's context (Claude Code uses `CLAUDE.md`, Cursor uses `.cursorrules`, Windsurf uses `.windsurfrules`, Aider supports conventions files, etc.).
 
-> **Status:** Draft v0 (last updated 2026-05-11). Will be locked + sealed in the prompt drop bundle at T+0 on 2026-06-27.
+> **Status:** Updated 2026-05-21 to the June/July/August Season 1 model (see ZAO research Doc 701). Calendar runs June prep / July open build-a-thon / August Finals - exact dates lock once cohort + mentors are known. The August Finals bundle is sealed at T+0 so all finalists start on equal footing.
 
 > **Tool-agnostic:** This Game is harness-agnostic. Use Claude Code, Cursor, Windsurf, Aider, Cline, Bolt, v0, Lovable, or hand-roll your own pipeline - whatever fits your style. The constraint isn't the tool, it's **show your work in public** via at least one primary visibility mode (live Twitch / recorded screen sessions / public AI prompt logs / frequent build casts).
 
@@ -19,9 +19,11 @@
    - **Cline / Continue:** add to `.cline/instructions/` or via continue.dev config
    - **Other harnesses:** check your tool's docs for project-level context file
 3. Reference it actively - if your tool autoloads project context, great. If not, paste relevant sections when prompting
-4. Treat sections as menu items - when building Option A (Empire Booster Workshop), your tool needs the Empire Builder section more than the WaveWarZ section. Tell it what you're building so it focuses
+4. Treat sections as menu items - if you are building an Empire Builder tool, your agent needs the Empire Builder section more than the WaveWarZ section. Tell it what you're building so it focuses
 
-**The single most important thing:** every prompt option in `OPTIONS.md` ties to existing ZAO rails. Use the SDKs, APIs, and patterns documented here. Don't reinvent. Composability is the point.
+**The single most important thing:** whether you adopt a started ZAO project or build from scratch, tie it to existing ZAO rails. Use the SDKs, APIs, and patterns documented here. Don't reinvent. Composability is the point.
+
+**Two build paths.** You can adopt a started / in-progress ZAO project from the curated list ZAO provides and run with it, or build something new from scratch with just this ecosystem context. Both are equally valid. There are no fixed Option A-E tracks.
 
 ---
 
@@ -240,7 +242,7 @@ Contract reads are FREE via any Base RPC - skip API keys for read paths if all y
 **ZOE:** The concierge AI (Telegram `@zaoclaw_bot`). After Doc 601 decision: ZOE backend is being rewritten to mirror Hermes's runtime pattern. Same Claude Code CLI brain, different system prompt for concierge personality. Connects to Bonfire (the memory graph) via DM relay.
 
 **Where YOU might plug in:**
-- New ZOE skill (Option D in OPTIONS.md)
+- New ZOE skill
 - Extension to Hermes (e.g. integrate it with a different code-host)
 - Build-in-public infra (e.g. a builder dashboard for `/zao-devz` Farcaster channel)
 
@@ -339,8 +341,8 @@ Hats are ERC-1155 role NFTs on Base. ZAO uses Hats for:
 - ZAO Music label member
 - COC Concertz promoter
 - ZAOstock team member (4 team-specific roles)
-- ZABAL Games v0 Champion (1st place winner - if collectible spec lands on Hats)
-- ZABAL Games v0 Finisher (every finisher)
+- ZABAL Games S1 Champion (1st place - if collectible spec lands on Hats)
+- ZABAL Games S1 Finisher (every finisher)
 
 **Hats contract on Base:** `0x3bc1A0Ad72417f2d411118085256fC53CBdDd137`
 
@@ -468,20 +470,20 @@ Google Fonts CDN:
 
 ## Part 7 - Useful Research Docs (Curated)
 
-You have read-only access to the full ZAO research library (~630 docs as of 2026-05-10). Don't try to read all of them - here's the curated subset relevant to ZABAL Games builds.
+You have read-only access to the full ZAO research library (~700 docs as of 2026-05-21). Don't try to read all of them - here's the curated subset relevant to ZABAL Games builds.
 
 ### Foundation reading (read first)
 
 | Doc | Topic | Why |
 |-----|-------|-----|
-| 630 (this folder) | ZABAL Games v0 spec | The event rules itself |
+| 630 (this folder) | ZABAL Games Season 1 spec | The event rules itself |
 | 627 | Twitch + StreamElements integration | Your streaming infra |
 | 628 | Web3 streaming + ZABAL Empire bridge | Score feeds, tip flow, Hypersub, EAS |
 | 629 | Streaming as main media source | The auto-clip flywheel |
-| 626 | Empire Builder + ZABAL POIDH airdrop | apiLeaderboards pattern (Option A + B use this) |
+| 626 | Empire Builder + ZABAL POIDH airdrop | apiLeaderboards pattern (any leaderboard build uses this) |
 | 361 | Empire Builder v3 deep dive | Multiplier mechanics, distribute API |
 
-### For Option A (ZABAL Empire Booster Workshop)
+### If you're building Empire Builder / token tooling
 
 | Doc | Topic |
 |-----|-------|
@@ -491,7 +493,7 @@ You have read-only access to the full ZAO research library (~630 docs as of 2026
 | 258 | ZABAL/SANG buyback |
 | 573 | ZABAL AVAX surfaces - Arena Music |
 
-### For Option B (Twitch -> Empire Stream Feed)
+### If you're building streaming / live tooling
 
 | Doc | Topic |
 |-----|-------|
@@ -499,7 +501,7 @@ You have read-only access to the full ZAO research library (~630 docs as of 2026
 | 628 | Full pipeline (Part 1 has the diagram you'll implement) |
 | 626 | apiLeaderboards JSON contract |
 
-### For Option C (ZAO Farcaster Mini App)
+### If you're building a Farcaster mini app
 
 | Doc | Topic |
 |-----|-------|
@@ -507,7 +509,7 @@ You have read-only access to the full ZAO research library (~630 docs as of 2026
 | 627 | Streaming surface (for stream-tracker variant) |
 | 545 | ZABAL knowledge graph ontology |
 
-### For Option D (New ZOE Skill)
+### If you're building agent / ZOE tooling
 
 | Doc | Topic |
 |-----|-------|
@@ -516,7 +518,7 @@ You have read-only access to the full ZAO research library (~630 docs as of 2026
 | 524 | ZAO agentic everything - live/archived/started/planned |
 | 322 | Paragraph publish.new newsletter agent commerce |
 
-### For Option E (Bonfire / Hats Role Automation)
+### If you're building identity / reputation tooling
 
 | Doc | Topic |
 |-----|-------|
@@ -603,12 +605,12 @@ Voters will NOT see (and don't care about):
 
 ## Part 9 - The Submission Bar (Hit ALL Four)
 
-By T+48h (Sun 2026-06-28 12:00 PT), you must have all four:
+By the T+24h ship deadline, you must have all four:
 
-1. **Live deployed URL** (working, not 404). Vercel free tier is fine. `<player>.zabalgames.dev` subdomain provided.
+1. **Live deployed URL** (working, not 404). Vercel free tier is fine.
 2. **Public GitHub repo link** (MIT or similar permissive license). Verifiable empty git log at T+0 (no pre-built code).
 3. **60-second demo video link** (Loom, YouTube, or self-hosted). Show the thing working.
-4. **Tweet/cast on /zabalgames channel** announcing your ship. Tag `@bettercallzaal` so we see it.
+4. **Tweet/cast on /zabal channel** announcing your ship. Tag `@bettercallzaal` so we see it.
 
 PLUS during the 24h build, your declared **show-your-work visibility mode** must be active:
 - Mode 1 (Live Twitch stream): stream archive available afterward
@@ -641,10 +643,10 @@ This is a recommended pacing, not a requirement. Adjust to your style.
 ```
 Hour 0-1 (12:00-13:00 PT)
   Read this CONTEXT.md (you should have done this already)
-  Read OPTIONS.md and pick your option
+  Pick your build path - adopt a ZAO project or build from scratch
   Start your Twitch stream
   Read JUDGING.md (voting mechanism)
-  Cast on /zabalgames "I'm in - building [option] - watch at twitch.tv/[me]"
+  Cast on /zabal "I'm in - building [option] - watch at twitch.tv/[me]"
 
 Hour 1-2 (13:00-14:00 PT)
   Sketch what you're building - just a single doc/whiteboard
@@ -702,8 +704,8 @@ Hour 23-24 (11:00-12:00 PT)
 | Need | Where |
 |------|-------|
 | Stuck on Claude Code | Stream chat (your viewers may know) + Anthropic docs |
-| ZAO infra question | /zabalgames Farcaster channel - tag @bettercallzaal |
-| Stream tech issue | StreamElements support docs + /zabalgames channel |
+| ZAO infra question | /zabal Farcaster channel - tag @bettercallzaal |
+| Stream tech issue | StreamElements support docs + /zabal channel |
 | Wallet / gas / Empire Builder issue | DM @bettercallzaal directly |
 | Real emergency (laptop dies, internet dies) | Text Zaal at the number in your onboarding email |
 
@@ -711,11 +713,11 @@ Hour 23-24 (11:00-12:00 PT)
 
 ## Part 14 - Final Thoughts
 
-This is v0. The Games will get better with each iteration. Your role in v0 is to ship something real, get distribution from ZAO accounts, build your audience, and become part of the founding cohort.
+This is Season 1. The Games will get better with each iteration. Your role in Season 1 is to ship something real, get distribution from ZAO accounts, build your audience, and become part of the founding cohort.
 
 Whatever you build belongs to you. ZAO doesn't take IP. If it succeeds, you own that success. If it dies, you keep the learning, the footage, the audience, the collectible.
 
-Win-win-win means: even if you finish 8th, you walk away with:
+Win-win-win means: even if you place last, you walk away with:
 - Permanent onchain proof you shipped at the inaugural Games
 - 24h of Claude Code live-coding footage as a content asset
 - ~20 short-form clips of your build auto-generated by the ZAO streaming flywheel
@@ -730,29 +732,33 @@ Now go build something the community would actually use.
 ## Appendix A - Quick Reference Card
 
 ```
-T+0  :  2026-06-27 12:00 PT  -  Prompt drops + voter snapshot
-T+24h:  2026-06-28 12:00 PT  -  Ship deadline
-T+48h:  2026-06-29 12:00 PT  -  Voting opens (Snapshot)
-T+72h:  2026-06-30 12:00 PT  -  Reveal stream + USDC + collectibles
+CALENDAR (exact dates lock once cohort + mentors are known)
+  June     -  Prep month. Recorded sessions, tool walkthroughs, context.
+  July     -  Open build-a-thon. Ship a build = your application.
+  August   -  The Finals. 72-hour main event for the curated cohort.
 
-Prize pool:  $500 USDC tiered with floor (everyone selected gets paid)
+AUGUST FINALS - 72-HOUR TIMELINE (relative to T+0)
+  T+0    -  Prompt drops + voter snapshot
+  T+24h  -  Ship deadline
+  T+48h  -  Voting opens
+  T+72h  -  Reveal stream + USDC + collectibles
+
+Prize pool:  $500 USDC tiered with floor - every finalist who ships gets paid
             1st $150 / 2nd $100 / 3rd $75 / 4th-8th $35 each
             + Participation collectible (every finisher)
-            + Up to $20/mo covered for your vibe-coding tool of choice
-              (Claude Pro / Cursor Pro / Windsurf Pro / etc.)
+            (No tooling subsidy - bring your own vibe-coding tool.)
 
-Voting:      ZAO DAO members with 3-year earned vote
-            (Hats DAO Hat + Respect threshold, snapshot at T+0)
-            1-person-1-vote, vote-for-1 mechanism
-            NOT open ZABAL holder voting - this is a curated voter set
+Voting:      ZAO members who have earned Respect through fractals
+            1-person-1-vote, NOT token-weighted
+            Curated voter set, snapshot at T+0
 
-Stream:      Twitch primary, ZAO restreams all 8 to /zabalgames
+Stream:      Twitch primary, ZAO restreams every finalist to /zabal
 
-Submit by T+48h:
+Submit by the T+24h ship deadline:
   1. Live deployed URL
   2. Public GitHub repo (MIT)
   3. 60-second demo video
-  4. Tweet/cast announcing ship on /zabalgames
+  4. Cast announcing ship on /zabal
 ```
 
 ---
@@ -760,7 +766,7 @@ Submit by T+48h:
 ## Appendix B - Key Links
 
 - ZABAL Games landing page: https://bettercallzaal.com/zabalgames.html
-- /zabalgames Farcaster channel: https://farcaster.xyz/~/channel/zabalgames
+- /zabal Farcaster channel: https://farcaster.xyz/~/channel/zabal
 - $ZABAL Empire leaderboard: https://songjam.space/zabal
 - $ZABAL creative hub: https://zabal.art/
 - Empire Builder: https://empirebuilder.world
@@ -793,4 +799,4 @@ Tech docs:
 
 ---
 
-*This CONTEXT.md is the v0 player primer for ZABAL Games. If you see something missing or wrong, flag it in /zabalgames channel before T+0 and we'll fix it. After T+0, this version is sealed for the duration of the Games to keep all 8 players on equal context footing.*
+*This CONTEXT.md is the Season 1 player primer for ZABAL Games. If you see something missing or wrong, flag it in /zabal channel before T+0 and we'll fix it. After T+0, this version is sealed for the duration of the August Finals to keep all finalists on equal context footing.*

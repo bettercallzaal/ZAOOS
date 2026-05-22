@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-05-19 | Arthur intro call - WaveWarZ Base agentic version | WaveWarZ | Zaal, Sam, Arthur | [711](711-arthur-wavewarz-base-call-may19/) | 6 |
 | 2026-05-19 | ZAOstock advisor call | ZAOstock | Zaal, failoften | [678](678-zaostock-advisor-call-may19/) | 12 |
 | 2026-05-18 | Iman call - ZAO Craig + PizzaDAO Zambia | ZAO Devz | Zaal, Iman | [670](670-iman-call-may18-craig-pizzadao/) | ~4 |
 | 2026-05-18 | Tanja Fractal Book call | ZAO OS / Fractal | Zaal, Tanja | [675](675-tanja-fractal-book-call-may18/) | 7 |

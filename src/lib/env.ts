@@ -95,4 +95,8 @@ export const ENV = {
   // /api/juke/space returns 503; the keyless /live embed still works.
   JUKE_API_KEY: optionalEnv('JUKE_API_KEY'),
   JUKE_USER_TOKEN: optionalEnv('JUKE_USER_TOKEN'),
+  // Shared password for /api/juke/space — lets the /live/create page and the
+  // ZAOcoworking bot create spaces without an admin session. Unset = the
+  // password path is disabled (admin session still works).
+  JUKE_CREATE_PASSWORD: optionalEnv('JUKE_CREATE_PASSWORD'),
 } as const;

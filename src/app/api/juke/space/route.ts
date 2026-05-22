@@ -8,9 +8,14 @@ import { createJukeSpace } from '@/lib/spaces/juke-api';
 /**
  * POST /api/juke/space — create a branded Juke space (Path B of doc 695).
  *
- * Admin-only. ZAO runs recurring audio-worthy events (ZAOstock standups, the
- * weekly fractal call, COC Concertz nights); this route mints a Juke space for
- * one of them on demand and returns the `/live/{id}` embed link to share.
+ * Two ways to authorise:
+ *  - an admin ZAO OS session, or
+ *  - a `password` in the body matching `JUKE_CREATE_PASSWORD` — the path the
+ *    `/live/create` page and the ZAOcoworking bot use.
+ *
+ * ZAO runs recurring audio-worthy events (ZAOstock standups, the weekly
+ * fractal call, COC Concertz nights); this route mints a Juke space for one
+ * of them on demand and returns the space id to embed at `/live/{id}`.
  *
  * The `JUKE_API_KEY` + `JUKE_USER_TOKEN` secrets stay server-side. Until both
  * are configured (apply at juke.audio/developers), the route reports 503
@@ -27,20 +32,40 @@ const createSpaceSchema = z.object({
   announceCast: z.boolean().optional(),
   /** When true, AI agents may join the room. */
   allowAgents: z.boolean().optional(),
+  /** Shared create-password — an alternative to an admin session. */
+  password: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
+  let raw: unknown;
+  try {
+    raw = await request.json();
+  } catch {
+    return NextResponse.json(
+      { success: false, error: 'Request body must be valid JSON' },
+      { status: 400 },
+    );
+  }
+
+  const parsed = createSpaceSchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { success: false, error: 'Invalid request', details: parsed.error.flatten() },
+      { status: 400 },
+    );
+  }
+  // Keep the password out of `spaceInput` so it never reaches the Juke API.
+  const { password, ...spaceInput } = parsed.data;
+
+  // Authorised by an admin ZAO OS session OR the shared create-password.
+  // The password path is disabled unless JUKE_CREATE_PASSWORD is configured.
   const session = await getSessionData();
-  if (!session) {
+  const passwordOk =
+    !!ENV.JUKE_CREATE_PASSWORD && password === ENV.JUKE_CREATE_PASSWORD;
+  if (!session?.isAdmin && !passwordOk) {
     return NextResponse.json(
       { success: false, error: 'Unauthorized' },
       { status: 401 },
-    );
-  }
-  if (!session.isAdmin) {
-    return NextResponse.json(
-      { success: false, error: 'Admin access required' },
-      { status: 403 },
     );
   }
 
@@ -63,26 +88,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let raw: unknown;
   try {
-    raw = await request.json();
-  } catch {
-    return NextResponse.json(
-      { success: false, error: 'Request body must be valid JSON' },
-      { status: 400 },
-    );
-  }
-
-  const parsed = createSpaceSchema.safeParse(raw);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { success: false, error: 'Invalid request', details: parsed.error.flatten() },
-      { status: 400 },
-    );
-  }
-
-  try {
-    const result = await createJukeSpace(parsed.data, { apiKey, userToken });
+    const result = await createJukeSpace(spaceInput, { apiKey, userToken });
     if (!result.ok) {
       // Upstream Juke failure. Log the real status server-side; report a
       // single 502 to the client — a Juke 401/400 is an integration problem,

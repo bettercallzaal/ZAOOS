@@ -3,7 +3,7 @@ topic: events
 type: guide
 status: draft
 last-validated: 2026-05-14
-related-docs: 646, 629, 628, 627, 626, 584, 361, 324, 322, 311
+related-docs: 701, 654, 646, 629, 628, 627, 626, 584, 361, 324, 322, 311
 tier: STANDARD
 ---
 
@@ -13,7 +13,9 @@ tier: STANDARD
 
 > **Status:** DRAFT - working spec, designed in the open. Heavily iterated 2026-05-08 through 2026-05-14. The shareable public summary lives at `bettercallzaal.com/zabalgames.html` (with live Supabase-backed submission tech). This doc is the source-of-truth working spec + decision log.
 
-> **Naming note:** Earlier drafts called this "v0" and "Claude Code Hackathon." Current framing: "Season 1" + "Farcaster Vibe-Coding Challenge" (tool-agnostic). Earlier drafts also referenced a person as "Aiman" - that was a phonetic misspelling of Iman, mentor #5, already on the roster.
+> **Naming note:** Earlier drafts called this "v0" and "Claude Code Hackathon." Current framing: "Season 1" + "Farcaster Vibe-Coding Challenge" (tool-agnostic).
+
+> **State note (2026-05-21):** Doc 701 is now canonical for FORMAT, CALENDAR, MENTOR MODEL, and INFRA STATE. Changes since this doc: the named 8-mentor roster is removed (mentors openly recruited, finalist count decided after July), the calendar is June prep / July build / August Finals (Doc 654), and the build prompt drops fixed Option A-E tracks for an adopt-a-started-project-or-build-from-scratch model. This doc stays the long-form spec + decision log; where it conflicts with Doc 701, Doc 701 wins.
 
 ---
 

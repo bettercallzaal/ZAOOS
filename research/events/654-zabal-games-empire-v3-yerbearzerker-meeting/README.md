@@ -3,7 +3,7 @@ topic: events
 type: guide
 status: research-complete
 last-validated: 2026-05-16
-related-docs: 630, 646, 631, 584, 599, 498, 505, 527, 322, 324
+related-docs: 701, 630, 646, 631, 584, 599, 498, 505, 527, 322, 324
 tier: STANDARD
 ---
 
@@ -12,6 +12,8 @@ tier: STANDARD
 > **Goal:** Capture decisions + new direction from the 2026-05-16 working session with Jordan (Empire Builder) + Iman + Zaal. Two big shifts: (1) ZABAL Games timeline moves to June prep / July submissions / August finals, (2) every Phase 2 finalist creates a tokenless Empire as their pre-launch home, then optionally Ascends with a token + Clanker airdrop using their own leaderboard as the airdrop list.
 
 > **Status:** research-complete. Supersedes the "all-in-June" framing from Doc 630. Doc 630 spec stays canonical for format; this doc updates the calendar + adds the Empire V3 mechanic.
+
+> **State note (2026-05-21):** Doc 701 is the current canonical state - it carries this doc's calendar pivot forward plus the mentor-roster-open decision. Where this doc conflicts with Doc 701, Doc 701 wins.
 
 ---
 
@@ -156,7 +158,7 @@ Jordan's framing for Farcaster's role in the ecosystem - "Farcaster is the estua
 | `/Users/zaalpanthaki/Documents/BetterCallZaal/zabalgames.html` | Replace any all-June timeline with June prep / July submissions / August finals 3-column structure. Add Empire Builder tokenless-then-Ascend mechanic to the "How it works" section. |
 | `/Users/zaalpanthaki/Documents/BetterCallZaal/zabalgames-brand-context.md` | Add the master context prompt section + Empire-as-build-home requirement. |
 | `/Users/zaalpanthaki/Documents/BetterCallZaal/zabalgames-schema.sql` | Add `empire_url` field to submissions table (optional in July, required for Phase 2 finalists). |
-| `research/events/630-zabal-games-claude-code-hackathon-v0/README.md` | Add front-matter note: "Calendar updated by Doc 653 - June prep / July build / August finals." |
+| `research/events/630-zabal-games-claude-code-hackathon-v0/README.md` | Add front-matter note: "Calendar updated by Doc 654 - June prep / July build / August finals." |
 
 ---
 
@@ -178,7 +180,7 @@ Jordan's framing for Farcaster's role in the ecosystem - "Farcaster is the estua
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Update `bettercallzaal.com/zabalgames.html` to June/July/August timeline | @Zaal | Edit | This session |
-| Update Doc 630 with calendar-superseded note pointing to Doc 653 | @Zaal | PR | This week |
+| Update Doc 630 with calendar-superseded note pointing to Doc 654 | @Zaal | PR | This week |
 | Ship "ZABAL/ZAO/WaveWarZ context skill" v0 for vibe-coding agents | @Zaal | Build | End of May 2026 |
 | Get Empire Builder API key from Jordan | @Zaal | DM | Next 7 days |
 | Build Empire Builder API leaderboard for Songjam migration | @Adam + @Zaal | Build | Before June 1 |

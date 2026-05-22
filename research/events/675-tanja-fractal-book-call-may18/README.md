@@ -62,6 +62,16 @@ A living, crowd-contributed reference book: **"A work of many voices - The Refer
 - Async also lets a facilitator read an absent person's contribution; the rest of the group still votes consensus.
 - Zaal's idea: combine the async side of Fractal Circles with Farcaster's social feed into one app. ~10k daily active users on Farcaster; easy contribution sharing could pull real contributors in.
 
+## Dan SingJoy's Written Follow-Up (post-call)
+
+Dan SingJoy (Eden Fractal founder) sent Tanja a written reply to the questions raised on this call. Key points:
+
+- **Welcome + invite.** Dan welcomed the Reference Book project and invited Tanja to the upcoming Eden Town Hall and Respect Game events as a place to share the book, learn the process, and find collaborators.
+- **Async Fractal Circles (no fixed meeting time).** Dan does not know of communities running Fractal Circles with no specific meeting time; he would ask @MikaelAnanda. Async Respect Game apps do exist - the example Dan cites is `respectgame.app` from @cxzvnk's team: "a promising app, includes many excellent features," but NOT currently in active development (the lead developer moved to another project). Dan's verdict: "Asynchronous fractal apps have great potential, but in my experience the simplest and most effective solution so far has been to meet at a consistent time."
+- **The "idea pool" concept.** Eden Fractal's closest experiment is Synchronous Respect Trees (SRT), played between events earlier in 2026. Members submit Contribution Requests; members then vote on those requests with their Respect Tokens. Unlike an idea pool, a Contribution Request asks other members to contribute to an idea, task, or project - so there is no requirement that everyone picks one idea and works on it together. SRT also lets members propose and vote on town hall discussion topics. Still early-stage; Eden has a results dashboard.
+- **Respect Game instructions.** Dan recommends `EdenFractal.com/respectgame` as the full instruction booklet (what it is for, why it is necessary, advantages, rules; the "How To Play" and Eden Fractal Respect Game sections). Dan updated that page earlier this week specifically because Tanja said she did not yet understand the game. Companion articles: Respect Tokens and Fractal Democracy.
+- **How Tanja could use it.** Dan suggests Tanja organize Respect Games in her own community to coordinate book contributions - a structured way to inspire, incentivize, and measure contributions toward the book, with Respect Tokens enabling collective decision-making, prioritization, and agenda-setting. Dan frames the Respect Game and fractal governance as good material for several of the book's pillars.
+
 ## Action Items
 
 | # | Action | Owner | Category | Due |
@@ -122,3 +132,5 @@ A living, crowd-contributed reference book: **"A work of many voices - The Refer
 - fractalcircles.org/2020/04/05/fractal-circles/
 - uniteawake.com/news/
 - Eden Fractals - bi-weekly Thursdays (Luma, via Tadas)
+- EdenFractal.com/respectgame - Respect Game instruction booklet (Dan's recommended starting point for Tanja)
+- respectgame.app - async Respect Game app by @cxzvnk's team (not in active development as of May 2026)

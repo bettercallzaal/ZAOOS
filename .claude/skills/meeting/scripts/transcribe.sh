@@ -6,7 +6,9 @@
 # is absent (e.g. running from a non-Mac machine).
 #
 # Usage:   transcribe.sh <media-path> [--model <model>]
-# Outputs: prints the local path to the .txt transcript on success.
+# Outputs: prints the local path to the .txt transcript on success. Also writes
+#          a .json sidecar (same path stem) carrying segment timestamps - the
+#          diarization step (diarize.sh) needs it to label speakers.
 set -euo pipefail
 
 SRC="${1:?missing media path}"
@@ -38,10 +40,12 @@ if [[ -n "$MLX_BIN" ]]; then
   echo "[transcribe] first run for a model downloads it (~1.5GB); later runs are cached" >&2
 
   # mlx_whisper handles mp4/mov directly - ffmpeg strips the audio track.
+  # --output-format all also emits transcript.json (segment timestamps),
+  # which diarize.sh consumes to produce a speaker-labeled transcript.
   "$MLX_BIN" "$SRC" \
     --model "$MODEL" \
     --language en \
-    --output-format txt \
+    --output-format all \
     --output-name transcript \
     --output-dir "$OUTDIR" >&2
 
@@ -50,6 +54,10 @@ if [[ -n "$MLX_BIN" ]]; then
     exit 5
   fi
   cp "$OUTDIR/transcript.txt" "$LOCAL_OUT"
+  # JSON sidecar (same stem) - segment timestamps for the diarization step.
+  if [[ -f "$OUTDIR/transcript.json" ]]; then
+    cp "$OUTDIR/transcript.json" "${LOCAL_OUT%.txt}.json"
+  fi
   echo "[transcribe] done -> $LOCAL_OUT" >&2
   echo "$LOCAL_OUT"
   exit 0

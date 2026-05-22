@@ -32,7 +32,7 @@ Recommendations and locked calls first.
 | 6 | **Tokenless Empire** | OPTIONAL mention, NOT a gate. A July build without an Empire still counts if it has live URL + repo + demo + cast. Empire Builder is presented as an available tool, not a requirement. |
 | 7 | **Prize pool** | UNCHANGED. $500 USDC, tiered 1st $150 / 2nd $100 / 3rd $75 / 4th-8th $35 each, all finalists paid. NOTE: tier table assumes 8 finalists - if Finals size lands below 8 (Decision #2), the 4th-8th band needs re-cutting. |
 | 8 | **Voting** | OPEN. Locked: Respect-earning members, 1-person-1-vote, NOT token-weighted. Still undecided: mechanism (Snapshot vs onchain) and the Respect threshold N for voter eligibility. |
-| 9 | **Participation collectible** | OPEN. "Likely a Hats Protocol role NFT" per Doc 630, spec deferred until closer to August. |
+| 9 | **Participation collectible** | LOCKED (2026-05-22). A Hats Protocol role NFT on Base. Every finisher gets one - every July build that hits the bar, plus every August finalist. |
 | 10 | **Context skill** | Does NOT exist (filesystem-verified). Status was unknown to Zaal; now confirmed. Doc 654's "ship by end of May" deadline has zero skill behind it as of 2026-05-21. |
 | 11 | **PROMPT_CONTEXT.md** | REWRITE to the June/July/August open-roster model now. The current file is stale (v0 naming, T+0 2026-06-27, dropped $20/mo subsidy, all-in-June framing). |
 | 12 | **Infra** | The `/zabal` Farcaster channel is live (created 2026-05-22). Everything else is still ahead: no Supabase backend, no `$500 USDC` secured, no `zabalgames.dev` domain. |
@@ -151,9 +151,9 @@ Pulled from Doc 654 action items + Doc 630 PROMPT_CONTEXT Part 7. Zaal to confir
 
 Every finalist who ships gets paid - tiering is recognition of standout work, not win/lose. **Open risk:** the table assumes 8 finalists. If Finals size lands below 8 (Decision #2), the 4th-8th band must be re-cut before the Finals.
 
-### Participation collectible - open
+### Participation collectible - locked
 
-Doc 630: "likely a Hats Protocol role NFT, spec TBD." Deferred (Decision #9). Who gets it (finalists only vs every July ship) is part of the deferred decision.
+A Hats Protocol role NFT on Base (Decision #9, locked 2026-05-22). Every finisher gets one: every July build that hits the submission bar, plus every August finalist. It is the universal "I shipped at ZABAL Games S1" credential, sitting alongside the Respect every July ship earns.
 
 ### Respect
 
@@ -203,12 +203,12 @@ ZABAL itself is an Ascended Empire, launched via Clanker 2026-01-01. Token contr
 | **WaveWarZ** | **Yes - the loud arena brand.** Competitive, sports-energy, stats-forward (W/L records, SOL volume). Deliberately the opposite of the warm ZAO-umbrella tone. | Partner-built (Ikechi). Pull from `wavewarz-intelligence.vercel.app` - Next Action. |
 | **ZAO Festivals / ZAOstock** | Confirmed: "Partiful warmth + Luma competence," first-person, community-rooted. | **Carries a Maine/local visual influence** - Ellsworth, Art of Ellsworth, Northeast indie. |
 | **ZAO Music** | The **artist-collective** voice - members making music together (not a label voice). | Rides the ZAO umbrella visual - no separate identity. |
-| **COC Concertz** | NEEDS INPUT - voice still blank. | NEEDS INPUT - visual still blank. |
+| **COC Concertz** | Warm, communal, builder-energy - same family as the ZAO umbrella (confirmed 2026-05-22). | Its own distinct brand - colors, logo, vibe separate from the umbrella. Spec pending - Zaal to describe. |
 | **Respect + Fractals** | Confirmed: ritual, earned, communal - reputation-with-weight, not gamified-points. | **Has a visual motif** tied to the Fibonacci ranking / fractal sessions. |
 
 **COC Concertz mission line** (was blank): **"Give virtual concerts a real home"** - a real home for virtual + metaverse concerts and the promoters who run them (Decision #13).
 
-Still open after interview: COC Concertz voice + visual; the concrete ZABAL wordmark/zabal.art palette spec; the WaveWarZ palette spec.
+Still open: COC Concertz visual spec (Zaal to describe - it is its own distinct brand); the concrete ZABAL wordmark/zabal.art palette spec; the WaveWarZ palette spec.
 
 ---
 
@@ -235,12 +235,11 @@ The `/zabal` channel exists; everything else is still ahead.
 - Exact dates for all three windows + August Finals T+0.
 - August Finals size / finalist count.
 - Voting mechanism (Snapshot vs onchain) + Respect threshold N for voter eligibility.
-- Participation collectible spec + who receives it.
 
 ### Still needs Zaal input
 
 - The confirmed adoptable-project list for the build prompt (Part 4).
-- COC Concertz voice + visual identity.
+- COC Concertz visual identity (voice locked 2026-05-22 - warm + communal).
 - The concrete ZABAL wordmark + zabal.art palette spec.
 - The WaveWarZ palette spec (extract from the live UI).
 - Per-mentor category 1-liners (collected as the open roster fills).

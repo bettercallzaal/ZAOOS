@@ -24,7 +24,7 @@ tier: STANDARD
 
 ### The Idea
 
-Zaal gave Arthur the background: The ZAO ("the z talent artist organization") is a progressively-decentralized incubator for on-chain music projects, governed by soulbound, illiquid Respect tokens earned weekly through fractal meetings (groups of six reach consensus on contribution, distributed on a Fibonacci curve). The first project incubated out of The ZAO is WaveWarZ - live-traded music battles, founded by Hurric4n3ike with Zaal and Sam. It runs on Solana: 1% of trade volume routes immediately to the artist, the losing side's pool partly feeds the winning side, settled on-chain via smart contract (no custody). To date WaveWarZ has run roughly 456 SOL of volume, producing about $650 / 7.74 SOL in fees (number garbled in transcript - see VERIFY). WaveWarZ runs 11 shows a week: five morning + five night Mon-Fri, plus Sunday-night battles.
+Zaal gave Arthur the background: The ZAO ("the z talent artist organization") is a progressively-decentralized incubator for on-chain music projects, governed by soulbound, illiquid Respect tokens earned weekly through fractal meetings (groups of six reach consensus on contribution, distributed on a Fibonacci curve). The first project incubated out of The ZAO is WaveWarZ - live-traded music battles, founded by Hurric4n3ike with Zaal and Sam. It runs on Solana: 1% of trade volume routes immediately to the artist, the losing side's pool partly feeds the winning side, settled on-chain via smart contract (no custody). To date WaveWarZ has run roughly 456 SOL of volume, producing about $650 / 7.74 SOL in fees (figures garbled in transcript - see Verify / Low-confidence below). WaveWarZ runs 11 shows a week: five morning + five night Mon-Fri, plus Sunday-night battles.
 
 ### Why It Matters
 
@@ -78,11 +78,20 @@ Arthur is a multi-surface collaborator now: WaveWarZ Base smart contracts + ZABA
 
 > "Going super hard on Farcaster - it's the right place in web3 that I've landed to find what I need to build out here." - Zaal
 
+## Verify / Low-confidence
+
+Items that need a human check before being treated as fact:
+
+- **WaveWarZ stats numbers** - the transcript span "456 SOL volume / $650 / 7.74 SOL in fees" is garbled; Whisper likely mis-segmented the figures. Confirm the real volume + fee totals against the WaveWarZ stats app before quoting.
+- **Action 6 (Arthur joins a WaveWarZ event)** - an open invitation, not a firm commitment. Arthur said he would try to drop in; do not treat as owed.
+- **Arthur's name/handle** - on-screen name tag read "Art L"; the transcript has a garbled aside ("topo / tophat / Kevin") where Zaal stumbled on a name. "Arthur" is taken from the recording filename. Confirm his preferred handle.
+
 ## Research Seeds
 
 - **like.fun on Farcaster** - prediction/betting markets on likes for short-form content; Arthur flagged its gamified play loop as a UX reference for WaveWarZ.
 - **Agentic WaveWarZ on Base + x402** - AI agents generating, battling, and trading music; agent-payment rails as the economic primitive.
 - **AI-agent-musician economy** - agents that pay for their own inference by winning battles; "stable" of agent musicians where weak ones die off.
+- **WaveWarZ Africa** - an Africa-based team approached WaveWarZ about using the tech to run an on-chain battle league per country. Mentioned in passing; worth its own scoping doc.
 
 ## Memory Updates
 

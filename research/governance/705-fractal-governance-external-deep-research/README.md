@@ -4,14 +4,14 @@ type: market-research
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 056, 058, 103, 104, 109, 114, 115, 184, 188, 285, 306, 498, 502, 664, 698, 699, 700
+related-docs: 056, 058, 103, 104, 109, 114, 115, 184, 188, 285, 306, 498, 502, 664, 702, 703, 704
 original-query: "DEEP RESEARCH TASK - definitive reference report on fractal governance and the Respect Game ecosystem (commissioned via ChatGPT deep research, 2026-05-21)"
 tier: DEEP
 ---
 
-# 701 - Fractal Governance and the Respect Game Ecosystem (External Deep-Research Synthesis)
+# 705 - Fractal Governance and the Respect Game Ecosystem (External Deep-Research Synthesis)
 
-> **Goal:** Preserve an external ChatGPT deep-research report on fractal governance, commissioned 2026-05-21, as a library reference and an independent cross-check on the fractal campaign (docs 056-306, 698-700).
+> **Goal:** Preserve an external ChatGPT deep-research report on fractal governance, commissioned 2026-05-21, as a library reference and an independent cross-check on the fractal campaign (docs 056-306, 702-704).
 
 ## Editor's note - provenance and how to read this
 
@@ -286,9 +286,9 @@ Finally, some live apps - especially `zao.frapps.xyz` and `respectgame.app` - ar
 
 ## Also See
 
-- [Doc 698](../698-respect-fractal-lineage/) - the campaign's own lineage synthesis
-- [Doc 699](../699-zao-fractal-current-state-may-2026/) - ZAO Fractal current state
-- [Doc 700](../700-eden-creators-media-ecosystem/) - Eden Creators media ecosystem
+- [Doc 702](../702-respect-fractal-lineage/) - the campaign's own lineage synthesis
+- [Doc 703](../703-zao-fractal-current-state-may-2026/) - ZAO Fractal current state
+- [Doc 704](../704-eden-creators-media-ecosystem/) - Eden Creators media ecosystem
 - [Doc 109](../109-optimystics-tooling-ecosystem/) - Optimystics tooling (the orclient v1.4.4 + respectgame.app status this report corroborates)
 - [Doc 058](../058-respect-deep-dive/) - Respect token deep dive (candidate for the Fractally round-one curve note)
 
@@ -297,7 +297,7 @@ Finally, some live apps - especially `zao.frapps.xyz` and `respectgame.app` - ar
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Fold the Fractally round-one curve (21/13/8/5/3/2) into docs 058 / 698 on next revision | Research | Doc update | Next re-validation |
-| Add the "optimistic governance" philosophical tension (Fractally critique vs OREC) to doc 698 | Research | Doc update | Next re-validation |
+| Add the "optimistic governance" philosophical tension (Fractally critique vs OREC) to doc 702 | Research | Doc update | Next re-validation |
 | Standardize rank-label language to "highest-to-lowest payout order" across fractal docs | Research | Doc update | Next re-validation |
 | Use the adoption blueprint here as the Respect Game starter guide for Tanja's book project | Zaal | Reference | When Tanja is ready |
 
@@ -324,8 +324,8 @@ research/governance/497-sociocracy-circles-small-teams
 research/governance/498-zao-fractal-adapted-for-zaostock
 research/governance/502-zaostock-circles-v1-spec
 research/governance/664-farcaster-fip-pow-tokenization-and-async-github-fractal
-research/governance/698-respect-fractal-lineage
-research/governance/699-zao-fractal-current-state-may-2026
+research/governance/702-respect-fractal-lineage
+research/governance/703-zao-fractal-current-state-may-2026
 research/community/105-fractal-key-people
 research/community/106-dan-singjoy-eden-fractal-deep-dive
 research/events/675-tanja-fractal-book-call-may18

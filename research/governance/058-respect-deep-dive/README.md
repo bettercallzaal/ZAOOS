@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: [056, 102, 103, 104, 109, 114, 115, 184, 188, 285, 306, 346, 698, 699]
+related-docs: [056, 102, 103, 104, 109, 114, 115, 184, 188, 285, 306, 346, 702, 703]
 original-query: "Respect token mechanics: scoring math, decay equilibrium, tier thresholds, orclient SDK, on-chain state and implications for ZAO Sprint 2 (reconstructed)"
 tier: DEEP
 ---
@@ -170,7 +170,7 @@ When a community grows past 50 members, the Respect Game repeats in rounds:
 - Single-round produces Gini ~0.23 (very fair)
 - Multi-round is fair too (~0.23-0.30 with consistent attendance, but drifts to 0.4-0.5 with varied attendance)
 - Simplicity: less complex, easier for non-technical members to understand
-- Doc 699 confirms single-round as ZAO's model
+- Doc 703 confirms single-round as ZAO's model
 
 ---
 
@@ -307,7 +307,7 @@ npm install @ordao/orclient ethers@6
 |---|---|---|
 | **License** | GPL-3.0 | Permissive for library dependencies. No issues. |
 | **Wallet Requirement** | EIP-1193 provider needed (MetaMask, Privy, etc.) | ZAO uses Farcaster signers. Need wrapper or Privy integration. Privy package exists: @ordao/privy-react-orclient v1.4.4. |
-| **ornode Dependency** | zao-ornode.frapps.xyz currently down | **BLOCKER:** Restore ornode or implement fallback (direct OREC contract reads). Doc 699 priority: restore by 2026-06-15. |
+| **ornode Dependency** | zao-ornode.frapps.xyz currently down | **BLOCKER:** Restore ornode or implement fallback (direct OREC contract reads). Doc 703 priority: restore by 2026-06-15. |
 | **ethers v6 vs viem** | orclient uses ethers v6; ZAO OS uses viem | Need dual dependency or wrapper for compatibility. |
 | **Gas Costs** | Optimism L2 (very cheap) | Breakout submission ~$0.02-0.05 per Respect Game at current gas. Negligible cost. |
 | **Live Deployment** | OREC + ZOR live, 242+ txns as of May 21 | Ready for production use. Weekly submissions active. |
@@ -423,8 +423,8 @@ console.log(zaalsRespect); // e.g., 3,450 Respect (decayed from on-chain)
 ## Also See
 
 - **Doc 056:** ORDAO architecture, OREC contract design, orclient SDK reference
-- **Doc 698:** Fractally lineage, Fibonacci theory, Dan Larimer's philosophy
-- **Doc 699:** ZAO Fractal live state (week 100+, current participants, OREC transaction count)
+- **Doc 702:** Fractally lineage, Fibonacci theory, Dan Larimer's philosophy
+- **Doc 703:** ZAO Fractal live state (week 100+, current participants, OREC transaction count)
 - **Doc 115:** Supabase schema for Respect (respect_balances table, tier_enum)
 - **Doc 104-109:** Historical governance evolution, ORDAO adoption pattern
 
@@ -471,6 +471,6 @@ All sources fetched, read, and cross-verified 2026-05-21:
 
 ### Related Docs (This Campaign, Verified 2026-05-21)
 - Doc 056: ORDAO & Respect Game System (DEEP tier, regenerated 2026-05-21)
-- Doc 698: Respect & Fractal Governance Lineage (DEEP tier)
-- Doc 699: ZAO Fractal Current State May 2026 (DEEP tier)
+- Doc 702: Respect & Fractal Governance Lineage (DEEP tier)
+- Doc 703: ZAO Fractal Current State May 2026 (DEEP tier)
 - Doc 115: Supabase schema planning for Respect (referenced, not verified in this pass)

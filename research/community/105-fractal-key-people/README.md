@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: [56, 102, 103, 104, 106, 109, 114, 184, 188, 306, 698, 699]
+related-docs: [56, 102, 103, 104, 106, 109, 114, 184, 188, 306, 702, 703]
 original-query: "Key people in fractal governance ecosystem - who leads Eden Fractal, Optimystics, ORDAO, and how can ZAO connect? (reconstructed)"
 tier: STANDARD
 ---
@@ -219,8 +219,8 @@ tier: STANDARD
 - Doc 114 - [ZAO Fractal Live Infrastructure] (zao.frapps.xyz, bots, current state)
 - Doc 188 - [ZAO Fractal Bot Process] (Hermes + ZOE involvement in governance)
 - Doc 306 - [Respect Game Complete Rules] (detailed gameplay mechanics)
-- Doc 698 - [Fractal Governance Lineage Deep] (history + philosophy)
-- Doc 699 - [ZAO Fractal Current State] (ZAO's specific 90-week implementation)
+- Doc 702 - [Fractal Governance Lineage Deep] (history + philosophy)
+- Doc 703 - [ZAO Fractal Current State] (ZAO's specific 90-week implementation)
 
 ## Next Actions
 

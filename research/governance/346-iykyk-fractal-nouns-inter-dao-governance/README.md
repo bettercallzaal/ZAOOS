@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 115, 184, 188, 306, 345, 547, 698, 699
+related-docs: 115, 184, 188, 306, 345, 547, 702, 703
 original-query: "Deep dive into IYKYK DAO and Fractal Nouns - their governance framework, inter-DAO bridge, community dashboard, and how ZOUNZ treasury can use these patterns for ZABAL agent funding and token cycling (reconstructed)"
 tier: STANDARD
 ---
@@ -333,8 +333,8 @@ Proposal: "Fund VAULT agent with 1B ZABAL"
 
 ## Also See
 
-- **Doc 699** - ZAO Fractal: Current State (May 2026) - operational status
-- **Doc 698** - Respect & Fractal Governance: The Complete Lineage - governance theory
+- **Doc 703** - ZAO Fractal: Current State (May 2026) - operational status
+- **Doc 702** - Respect & Fractal Governance: The Complete Lineage - governance theory
 - **Doc 345** - ZABAL Agent Swarm Master Blueprint - agent funding architecture
 - **Doc 547** - ZAO Stock 2026 Festival + Fundraising Strategy - treasury use case
 - **Doc 115** - ZAO Respect Data Reconciliation Plan - related governance data

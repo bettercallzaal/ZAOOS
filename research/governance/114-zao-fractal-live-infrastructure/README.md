@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 56, 58, 102, 103, 104, 109, 188, 285, 444, 450, 698, 699
+related-docs: 56, 58, 102, 103, 104, 109, 188, 285, 444, 450, 702, 703
 original-query: "Map what's actually live, what data flows where, and what ZAO OS needs to become the one place for all data (reconstructed)"
 tier: STANDARD
 ---
@@ -319,8 +319,8 @@ respect: {
 - **Doc 285:** (Community governance deep dives)
 - **Doc 444:** (Governance tools audit)
 - **Doc 450:** (Hats Protocol integration)
-- **Doc 698:** ZAO Fractal lineage (post-research renumber)
-- **Doc 699:** ZAO Fractal current state (fresh audit, May 2026)
+- **Doc 702:** ZAO Fractal lineage (post-research renumber)
+- **Doc 703:** ZAO Fractal current state (fresh audit, May 2026)
 
 ---
 

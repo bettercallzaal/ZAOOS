@@ -87,4 +87,9 @@ export const ENV = {
   DEALER_WALLET_ID: optionalEnv('DEALER_WALLET_ID'),
   // 0x Swap API -- swap routing on Base
   ZX_API_KEY: optionalEnv('ZX_API_KEY'),
+
+  // Juke developer API -- server-side Juke space creation (doc 695, Path B).
+  // Apply at juke.audio/developers; secret shown once at key creation.
+  // Absent = /api/juke/space returns 503; the keyless /live embed still works.
+  JUKE_API_KEY: optionalEnv('JUKE_API_KEY'),
 } as const;

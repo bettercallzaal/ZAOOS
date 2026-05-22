@@ -1,3 +1,4 @@
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
@@ -6,15 +7,33 @@ import { logger } from '@/lib/logger';
 import { createJukeSpace } from '@/lib/spaces/juke-api';
 
 /**
+ * Constant-time string comparison. Both inputs are SHA-256'd to a fixed
+ * 32-byte digest first, so `timingSafeEqual` never throws on a length
+ * mismatch and the comparison leaks neither the length nor the content of
+ * the configured password.
+ */
+function constantTimeEqual(a: string, b: string): boolean {
+  const ah = createHash('sha256').update(a).digest();
+  const bh = createHash('sha256').update(b).digest();
+  return timingSafeEqual(ah, bh);
+}
+
+/**
  * POST /api/juke/space — create a branded Juke space (Path B of doc 695).
  *
- * Admin-only. ZAO runs recurring audio-worthy events (ZAOstock standups, the
- * weekly fractal call, COC Concertz nights); this route mints a Juke space for
- * one of them on demand and returns the `/live/{id}` embed link to share.
+ * Two ways to authorise:
+ *  - an admin ZAO OS session, or
+ *  - a `password` in the body matching `JUKE_CREATE_PASSWORD` — the path the
+ *    `/live/create` page and the ZAOcoworking bot use.
  *
- * The `JUKE_API_KEY` secret stays server-side. Until it is configured (apply
- * at juke.audio/developers), the route reports 503 rather than failing
- * opaquely — Path A, the keyless iframe embed, keeps working regardless.
+ * ZAO runs recurring audio-worthy events (ZAOstock standups, the weekly
+ * fractal call, COC Concertz nights); this route mints a Juke space for one
+ * of them on demand and returns the space id to embed at `/live/{id}`.
+ *
+ * The `JUKE_API_KEY` + `JUKE_USER_TOKEN` secrets stay server-side. Until both
+ * are configured (apply at juke.audio/developers), the route reports 503
+ * rather than failing opaquely — Path A, the keyless iframe embed, keeps
+ * working regardless.
  */
 
 const createSpaceSchema = z.object({
@@ -26,35 +45,11 @@ const createSpaceSchema = z.object({
   announceCast: z.boolean().optional(),
   /** When true, AI agents may join the room. */
   allowAgents: z.boolean().optional(),
+  /** Shared create-password — an alternative to an admin session. */
+  password: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
-  const session = await getSessionData();
-  if (!session) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 },
-    );
-  }
-  if (!session.isAdmin) {
-    return NextResponse.json(
-      { success: false, error: 'Admin access required' },
-      { status: 403 },
-    );
-  }
-
-  const apiKey = ENV.JUKE_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      {
-        success: false,
-        error:
-          'Juke developer API is not configured. Apply at juke.audio/developers, then set JUKE_API_KEY.',
-      },
-      { status: 503 },
-    );
-  }
-
   let raw: unknown;
   try {
     raw = await request.json();
@@ -72,9 +67,44 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     );
   }
+  // Keep the password out of `spaceInput` so it never reaches the Juke API.
+  const { password, ...spaceInput } = parsed.data;
+
+  // Authorised by an admin ZAO OS session OR the shared create-password.
+  // The password path is disabled unless JUKE_CREATE_PASSWORD is configured.
+  const session = await getSessionData();
+  const passwordOk =
+    !!ENV.JUKE_CREATE_PASSWORD &&
+    !!password &&
+    constantTimeEqual(password, ENV.JUKE_CREATE_PASSWORD);
+  if (!session?.isAdmin && !passwordOk) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 },
+    );
+  }
+
+  // Juke's create-space endpoint needs both the app key and a host JWT.
+  const apiKey = ENV.JUKE_API_KEY;
+  const userToken = ENV.JUKE_USER_TOKEN;
+  if (!apiKey || !userToken) {
+    const missing = [
+      !apiKey ? 'JUKE_API_KEY' : null,
+      !userToken ? 'JUKE_USER_TOKEN' : null,
+    ]
+      .filter(Boolean)
+      .join(' and ');
+    return NextResponse.json(
+      {
+        success: false,
+        error: `Juke developer API is not configured (missing ${missing}). Apply at juke.audio/developers.`,
+      },
+      { status: 503 },
+    );
+  }
 
   try {
-    const result = await createJukeSpace(parsed.data, apiKey);
+    const result = await createJukeSpace(spaceInput, { apiKey, userToken });
     if (!result.ok) {
       // Upstream Juke failure. Log the real status server-side; report a
       // single 502 to the client — a Juke 401/400 is an integration problem,

@@ -3,13 +3,14 @@
  *
  * Creates branded Juke spaces for recurring ZAO events via the Juke developer
  * API (`api.juke.audio`). Path A (the iframe embed in `juke.ts`) needs no
- * keys; Path B does — `POST /v1/developer/spaces` is gated by an
- * `X-Juke-Api-Key` secret.
+ * keys; Path B does — `POST /v1/developer/spaces` takes TWO credentials:
+ * `X-Juke-Api-Key` authorises the app, and `Authorization: Bearer <jwt>`
+ * identifies the Juke account that will host the new space.
  *
- * IMPORTANT: never import this module from a client component. The
- * `JUKE_API_KEY` secret is passed in by the caller (the API route reads it
- * from the environment), so this file holds no secret literal — but the Juke
- * developer API surface is server-only regardless.
+ * IMPORTANT: never import this module from a client component. Both secrets
+ * are passed in by the caller (the API route reads them from the
+ * environment), so this file holds no secret literal — but the Juke developer
+ * API surface is server-only regardless.
  *
  * The Juke developer API is in beta; its create-space *response* shape is not
  * publicly documented. `createJukeSpace` parses the response defensively and
@@ -57,6 +58,22 @@ export type CreateJukeSpaceResult =
   | { ok: true; space: JukeSpace }
   | { ok: false; status: number; error: string };
 
+/**
+ * Credentials for a Juke developer API call. BOTH are required: Juke's
+ * `POST /v1/developer/spaces` authorises the *app* with `X-Juke-Api-Key` and
+ * identifies the *host* of the new space with a user JWT.
+ */
+export interface JukeCredentials {
+  /** `JUKE_API_KEY` — the app's static developer secret (juke.audio/developers). */
+  apiKey: string;
+  /**
+   * `JUKE_USER_TOKEN` — a Juke JWT for the account that will host the space,
+   * obtained via Sign In With Farcaster. Juke JWTs expire; refreshing this
+   * server-side is an open question for nickysap — see research doc 695.
+   */
+  userToken: string;
+}
+
 /** Id fields the Juke response is most likely to use, in priority order. */
 const ID_KEYS = ['id', 'space_id', 'spaceId', 'room_id', 'roomId'] as const;
 /** Nested objects the space id may live under one level deep. */
@@ -94,16 +111,17 @@ export function extractSpaceId(payload: unknown): string | null {
 /**
  * Create a Juke space through the developer API.
  *
- * @param input  The space to create.
- * @param apiKey The `JUKE_API_KEY` secret, passed in by the caller — this
- *               module never reads it from the environment itself.
+ * @param input       The space to create.
+ * @param credentials The `JUKE_API_KEY` + `JUKE_USER_TOKEN` pair, passed in by
+ *                    the caller — this module never reads them from the
+ *                    environment itself.
  * @returns A {@link CreateJukeSpaceResult}. This function does not throw:
  *          network, timeout, and parse failures are returned as
  *          `{ ok: false }` so callers handle one shape.
  */
 export async function createJukeSpace(
   input: CreateJukeSpaceInput,
-  apiKey: string,
+  credentials: JukeCredentials,
 ): Promise<CreateJukeSpaceResult> {
   // Translate the camelCase ZAO shape into Juke's documented snake_case body.
   const body = JSON.stringify({
@@ -118,7 +136,9 @@ export async function createJukeSpace(
     response = await fetch(`${JUKE_API_ORIGIN}${CREATE_SPACE_PATH}`, {
       method: 'POST',
       headers: {
-        'X-Juke-Api-Key': apiKey,
+        // App credential + host-identifying user JWT — Juke requires both.
+        Authorization: `Bearer ${credentials.userToken}`,
+        'X-Juke-Api-Key': credentials.apiKey,
         'Content-Type': 'application/json',
       },
       body,

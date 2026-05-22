@@ -89,7 +89,14 @@ export const ENV = {
   ZX_API_KEY: optionalEnv('ZX_API_KEY'),
 
   // Juke developer API -- server-side Juke space creation (doc 695, Path B).
-  // Apply at juke.audio/developers; secret shown once at key creation.
-  // Absent = /api/juke/space returns 503; the keyless /live embed still works.
+  // Needs BOTH: JUKE_API_KEY (app secret, shown once at key creation) and
+  // JUKE_USER_TOKEN (Juke JWT for the host account, from Sign In With
+  // Farcaster). Apply at juke.audio/developers. Either absent =
+  // /api/juke/space returns 503; the keyless /live embed still works.
   JUKE_API_KEY: optionalEnv('JUKE_API_KEY'),
+  JUKE_USER_TOKEN: optionalEnv('JUKE_USER_TOKEN'),
+  // Shared password for /api/juke/space — lets the /live/create page and the
+  // ZAOcoworking bot create spaces without an admin session. Unset = the
+  // password path is disabled (admin session still works).
+  JUKE_CREATE_PASSWORD: optionalEnv('JUKE_CREATE_PASSWORD'),
 } as const;

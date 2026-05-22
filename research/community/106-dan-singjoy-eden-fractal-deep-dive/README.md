@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: [56, 102, 103, 104, 105, 109, 114, 184, 188, 306, 698, 699]
+related-docs: [56, 102, 103, 104, 105, 109, 114, 184, 188, 306, 702, 703]
 original-query: "Complete profile of Dan SingJoy: music background, governance philosophy, Eden Fractal operations, current status May 2026, and ZAO collaboration opportunities (reconstructed)"
 tier: DEEP
 ---
@@ -642,8 +642,8 @@ This positions ZAO as a **compelling case study for Dan's thesis:** music + gove
 - Doc 114 - ZAO Fractal live infrastructure (zao.frapps.xyz, current state)
 - Doc 188 - ZAO Fractal bot process and Discord commands
 - Doc 306 - Eden Fractal and Optimism Fractal deep history
-- Doc 698 - Respect and fractal governance: the complete lineage
-- Doc 699 - ZAO Fractal current state (May 2026)
+- Doc 702 - Respect and fractal governance: the complete lineage
+- Doc 703 - ZAO Fractal current state (May 2026)
 
 ---
 

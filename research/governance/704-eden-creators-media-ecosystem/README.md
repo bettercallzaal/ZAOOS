@@ -4,12 +4,12 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 103, 104, 106, 109, 306, 498, 664, 698, 699
+related-docs: 103, 104, 106, 109, 306, 498, 664, 702, 703
 original-query: "research the Eden Creators Notion (edencreators.notion.site) - the Eden Fractal media and content ecosystem"
 tier: STANDARD
 ---
 
-# 700 - Eden Creators: The Eden Fractal Media Studio and Content Garden
+# 704 - Eden Creators: The Eden Fractal Media Studio and Content Garden
 
 > **Goal:** Document Eden Creators - the media and content arm of the Eden Fractal ecosystem - what it is, what it publishes, the "Garden" knowledge hub, and the practical fetch path for getting at its content.
 
@@ -124,8 +124,8 @@ The working path: `edencreators.com` is the same Notion workspace published on a
 - [Doc 106](../../community/106-dan-singjoy-eden-fractal-deep-dive/) - Dan SingJoy and Eden Fractal deep dive
 - [Doc 109](../109-optimystics-tooling-ecosystem/) - Optimystics tooling (Cignals and other Garden tools appear here)
 - [Doc 306](../306-eden-fractal-op-fractal-deep-history/) - Eden Fractal and Optimism Fractal deep history
-- [Doc 698](../698-respect-fractal-lineage/) - the full Respect and fractal governance lineage
-- [Doc 699](../699-zao-fractal-current-state-may-2026/) - ZAO Fractal current state
+- [Doc 702](../702-respect-fractal-lineage/) - the full Respect and fractal governance lineage
+- [Doc 703](../703-zao-fractal-current-state-may-2026/) - ZAO Fractal current state
 
 ## Next Actions
 

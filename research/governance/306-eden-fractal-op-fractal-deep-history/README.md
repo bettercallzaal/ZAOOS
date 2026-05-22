@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 56, 58, 102, 103, 104, 109, 184, 285, 346, 698, 699
+related-docs: 56, 58, 102, 103, 104, 109, 184, 285, 346, 702, 703
 original-query: Complete deep history of Eden Fractal and Optimism Fractal - philosophy architecture people chain migrations tooling (reconstructed)
 tier: DEEP
 ---
@@ -450,8 +450,8 @@ Fractals are deeply integrated into ZAO OS. Key file paths:
 - [56 - ORDAO & Respect Game System](../056-ordao-respect-system/README.md) - Weekly mechanics
 - [58 - Respect Deep Dive](../058-respect-deep-dive/README.md) - Token design, decay, tiers
 - [184 - Superchain ORDAO & Cross-Chain Fractal Governance](../184-superchain-ordao-crosschain-fractal/README.md) - Hub-and-spoke architecture
-- [698 - Respect & Fractal Governance: The Complete Lineage](../698-respect-fractal-lineage/README.md) - Full lineage with verified dates
-- [699 - ZAO Fractal: Current State (May 2026)](../699-zao-fractal-current-state-may-2026/README.md) - Live operational audit
+- [702 - Respect & Fractal Governance: The Complete Lineage](../702-respect-fractal-lineage/README.md) - Full lineage with verified dates
+- [703 - ZAO Fractal: Current State (May 2026)](../703-zao-fractal-current-state-may-2026/README.md) - Live operational audit
 
 ## Next Actions
 
@@ -545,11 +545,11 @@ Fractals are deeply integrated into ZAO OS. Key file paths:
 
 ### Internal ZAO Research
 
-16. **Doc 698 - Respect & Fractal Governance: The Complete Lineage (May 21, 2026)** [FULL]
+16. **Doc 702 - Respect & Fractal Governance: The Complete Lineage (May 21, 2026)** [FULL]
     - Cross-references all above sources with ZAO-specific context
     - Unified lineage from Larimer -> Fractally -> Eden EOS -> Genesis -> Eden Fractal -> OP Fractal -> ZAO
 
-17. **Doc 699 - ZAO Fractal: Current State (May 21, 2026)** [FULL]
+17. **Doc 703 - ZAO Fractal: Current State (May 21, 2026)** [FULL]
     - Operational audit of ZAO Fractal as of May 2026
     - OREC contract analysis (242 txns), infrastructure status, participation metrics
 

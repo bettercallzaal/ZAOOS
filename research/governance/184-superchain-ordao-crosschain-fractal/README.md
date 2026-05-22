@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-21
 superseded-by:
-related-docs: 56, 58, 102, 103, 104, 109, 184, 285, 306, 346, 698, 699
+related-docs: 56, 58, 102, 103, 104, 109, 184, 285, 306, 346, 702, 703
 original-query: Superchain ORDAO cross-chain respect Hats integration Eden Epoch 2 Optimism grants ZAO (reconstructed)
 tier: STANDARD
 ---
@@ -18,7 +18,7 @@ tier: STANDARD
 | Decision | Recommendation | Rationale | Timeline |
 |----------|---|---|---|
 | **Cross-chain Respect model** | ZAO should NOT attempt cross-chain Respect bridging; instead, leverage native Superchain interop for *reading* Respect balances | Respect is soulbound (non-transferable) - bridging it contradicts the design. Hub-and-spoke reads (not transfers) are safe and preserve credible neutrality. | Adopted (no change needed) |
-| **Hats integration for ZAO** | Deploy ERC1155 Eligibility Modules on existing ZAO Hats tree, gated to ZOR Respect thresholds | Automates role assignment (Member/Contributor/Council) based on Respect tiers. Simplifies governance permission checks. | Future sprint (post-Doc-699 bottleneck fix) |
+| **Hats integration for ZAO** | Deploy ERC1155 Eligibility Modules on existing ZAO Hats tree, gated to ZOR Respect thresholds | Automates role assignment (Member/Contributor/Council) based on Respect tiers. Simplifies governance permission checks. | Future sprint (post-Doc-703 bottleneck fix) |
 | **Optimism grant track** | Pursue RetroPGF (Onchain Builders) over Grants Council - ZAO's ORDAO deployment + Respect Games are public goods with retroactive proof | RetroPGF emphasizes impact over ongoing operational need. 30M+ OP allocated; ZAO qualifies as ecosystem diversity (music vertical). | RFP window dependent |
 | **Eden Epoch 2 partnership** | Maintain ZAO as an independent fractal on Optimism; co-brand as "Superchain fractals" when discussing cross-community initiatives | ZAO is now the only active fractal on Optimism (since OP Fractal paused Jan 2026). Don't subsume into Eden; position as parallel hub. | Ongoing |
 
@@ -152,7 +152,7 @@ ZAO already has a Hats tree deployed at `0x3bc1A0Ad72417f2d411118085256fC53CBdDd
 5. Update OREC to gate proposal/execute permissions by hat wearer status
 6. Test with a proposal that requires "Council Member" hat
 
-**Status (May 2026):** Integration not yet deployed. The architecture is documented and technically ready; it awaits a sprint after the OREC submission bottleneck is resolved (doc 699 rec #1).
+**Status (May 2026):** Integration not yet deployed. The architecture is documented and technically ready; it awaits a sprint after the OREC submission bottleneck is resolved (doc 703 rec #1).
 
 ---
 
@@ -277,14 +277,14 @@ The Season 6 grant funded 6 research milestones:
 - [109 - Optimystics Tooling Ecosystem](../109-optimystics-tooling-ecosystem/README.md) - ORDAO/orclient/frapps details
 - [114 - ZAO Fractal Live Infrastructure](../114-zao-fractal-live-infrastructure/README.md) - Current operational state
 - [306 - Eden Fractal & Optimism Fractal: Complete History](../306-eden-fractal-op-fractal-deep-history/README.md) - DEEP history + people + philosophy
-- [698 - Respect & Fractal Governance: The Complete Lineage](../698-respect-fractal-lineage/README.md) - Fractally -> Eden -> OP -> ZAO
-- [699 - ZAO Fractal: Current State (May 2026)](../699-zao-fractal-current-state-may-2026/README.md) - Live operational audit
+- [702 - Respect & Fractal Governance: The Complete Lineage](../702-respect-fractal-lineage/README.md) - Fractally -> Eden -> OP -> ZAO
+- [703 - ZAO Fractal: Current State (May 2026)](../703-zao-fractal-current-state-may-2026/README.md) - Live operational audit
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Evaluate Hats integration for ZAO Governance | @Zaal or Engineering | Scoping | After Doc 699 bottleneck fix |
+| Evaluate Hats integration for ZAO Governance | @Zaal or Engineering | Scoping | After Doc 703 bottleneck fix |
 | Research and draft RetroPGF application for ZAO | @Zaal | Funding | RFP window TBD |
 | Coordinate with Eden Fractal on cross-chain spoke contracts | @Zaal + Dan SingJoy | Partnership | Q3 2026 |
 | Document Superchain ORDAO pattern for other music communities to fork | @Zaal or Research | Public good | Post-Eden collaboration |
@@ -329,7 +329,7 @@ The Season 6 grant funded 6 research milestones:
 
 ### Internal ZAO Research Sources
 
-9. **Doc 698 - Respect & Fractal Governance: The Complete Lineage** [FULL] - verified lineage, contract addresses, people
-10. **Doc 699 - ZAO Fractal: Current State (May 2026)** [FULL] - OREC 242 txns, infrastructure status, operational issues
+9. **Doc 702 - Respect & Fractal Governance: The Complete Lineage** [FULL] - verified lineage, contract addresses, people
+10. **Doc 703 - ZAO Fractal: Current State (May 2026)** [FULL] - OREC 242 txns, infrastructure status, operational issues
 11. **Doc 306 - Eden Fractal & Optimism Fractal: Complete History** [FULL] - detailed history, philosophy, people, technical stack
 12. **Codebase: community.config.ts** [FULL] - ZAO contract addresses, Hats tree address, respect block configuration

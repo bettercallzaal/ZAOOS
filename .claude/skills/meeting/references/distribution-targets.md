@@ -112,36 +112,50 @@ tier: STANDARD
 ---
 ```
 
-## 3. Bonfire ingest queue
+## 3. Bonfire knowledge-graph episodes (always-on - doc 680)
 
-**Target:** `content/bonfire-ingest/meeting-YYYY-MM-DD-<slug>.md`.
-**Method:** Write file, run secret-scan, do NOT trigger ingest client (Zaal triggers when ready).
+**Target:** the ZABAL Bonfire, `POST https://tnt-v2.api.bonfires.ai/knowledge_graph/episode/create`.
+**Method:** `scripts/bonfire-episode.sh` - curl POST per episode. Best-effort, never aborts the run.
+**Auth:** `$BONFIRE_API_KEY` + `$BONFIRE_ID` (reused from the ZOE bridge, `bot/src/zoe/recall.ts`). Unset => skip + continue.
 
-### File structure
+This is default-ON, every meeting. Goal: the knowledge graph always has full meeting context. Do NOT use the old `content/bonfire-ingest/` file path - that is the bulk-backfill pipeline (research library, GitHub READMEs), wrong tool for per-meeting real-time.
 
-```markdown
-# Meeting: <title>
+### Episodes JSON
 
-**Date:** YYYY-MM-DD
-**Attendees:** <comma-separated>
-**Platform:** <platform>
+Build `/tmp/meeting-bonfire-episodes.json`:
 
-## Transcript
-
-<full transcript here>
-
-## Recap
-
-(insert recap doc body here from template)
+```json
+{
+  "episodes": [
+    {"name": "meeting:<date>:summary",     "body": "<paragraph: title, date, attendees, project, coverage>", "source_tag": "meeting:<slug>"},
+    {"name": "meeting:<date>:decision-<n>", "body": "In the <title> meeting on <date> (<attendees>), the team decided: <text>. Owner: <owner>.", "source_tag": "meeting:<slug>"},
+    {"name": "meeting:<date>:action-<n>",   "body": "From the <title> meeting on <date>, <owner> is to <action>. Due: <due or 'no date set'>.", "source_tag": "meeting:<slug>"}
+  ]
+}
 ```
 
-### Secret-scan gate
+One summary + one per decision + one per action. Quotes skipped. Bodies are self-contained prose (Bonfires auto-extracts entities from prose; a node must stand alone).
+
+### Run
 
 ```bash
-python3 scripts/bonfire-ingest/secret_scan.py content/bonfire-ingest/meeting-<date>-<slug>.md
+bash ${CLAUDE_SKILL_DIR}/scripts/bonfire-episode.sh /tmp/meeting-bonfire-episodes.json
 ```
 
-If exit code != 0, abort write + surface to Zaal. Reference `.claude/rules/secret-hygiene.md`.
+The script secret-scans every body (9 HIGH patterns mirroring `recall.ts` `containsSecret()`), 15s timeout per POST, always exits 0. Episode `name` is deterministic so a re-run updates rather than duplicates.
+
+### Episode payload (what the script sends)
+
+```json
+{
+  "bonfire_id": "$BONFIRE_ID",
+  "name": "meeting:2026-05-19:decision-1",
+  "episode_body": "...",
+  "source": "text",
+  "source_description": "meeting:<slug>",
+  "reference_time": "<ISO now>"
+}
+```
 
 ## 4. Telegram copy-paste block
 

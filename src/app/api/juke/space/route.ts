@@ -1,9 +1,22 @@
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { createJukeSpace } from '@/lib/spaces/juke-api';
+
+/**
+ * Constant-time string comparison. Both inputs are SHA-256'd to a fixed
+ * 32-byte digest first, so `timingSafeEqual` never throws on a length
+ * mismatch and the comparison leaks neither the length nor the content of
+ * the configured password.
+ */
+function constantTimeEqual(a: string, b: string): boolean {
+  const ah = createHash('sha256').update(a).digest();
+  const bh = createHash('sha256').update(b).digest();
+  return timingSafeEqual(ah, bh);
+}
 
 /**
  * POST /api/juke/space — create a branded Juke space (Path B of doc 695).
@@ -61,7 +74,9 @@ export async function POST(request: NextRequest) {
   // The password path is disabled unless JUKE_CREATE_PASSWORD is configured.
   const session = await getSessionData();
   const passwordOk =
-    !!ENV.JUKE_CREATE_PASSWORD && password === ENV.JUKE_CREATE_PASSWORD;
+    !!ENV.JUKE_CREATE_PASSWORD &&
+    !!password &&
+    constantTimeEqual(password, ENV.JUKE_CREATE_PASSWORD);
   if (!session?.isAdmin && !passwordOk) {
     return NextResponse.json(
       { success: false, error: 'Unauthorized' },

@@ -11,7 +11,7 @@ tier: DISPATCH
 
 # 706 - Avalanche Ecosystem Deep Dive (Hub)
 
-> **Goal:** A full, multi-dimensional research sweep of Avalanche as of May 2026 - architecture, L1s, music/RWA, developer experience, grants, DeFi, security, and the Base-vs-Optimism-vs-Avalanche strategic question - to settle what (if anything) ZAO should do on Avalanche. Eight parallel research agents, one per dimension; this hub synthesizes them.
+> **Goal:** A full, multi-dimensional research sweep of Avalanche as of May 2026 - to settle what (if anything) ZAO should do on Avalanche. Built in two waves: Wave 1 (706a-706h) covered architecture, L1s, music/RWA, developer experience, grants, DeFi, security, and strategy. Wave 2 (706i-706o) covered gaming, enterprise/institutional, a Record Financial deep dive, a The Arena deep dive, people/orgs/events, AI/agents, and Avalanche-vs-Solana. Fifteen research agents total; this hub synthesizes all of them.
 
 ## Key Decisions (read first)
 
@@ -75,6 +75,31 @@ Avalanche is viable but more centralized than its marketing: ~671 primary valida
 ### 706h - Avalanche vs Base vs Optimism for ZAO
 The strategic verdict. Base owns consumer-social crypto and native Farcaster integration - that is where ZAO's users and product already live. Avalanche's strength is institutional/RWA/gaming, with a fragmented L1 landscape. The agent recommends: stay Base + Optimism native in 2026, consolidate rather than fragment, and do not make an Avalanche bet now. This hub adopts that framing, softened only by the selective-surface exceptions above. *See `706h-avalanche-vs-base-optimism-for-zao.md`.*
 
+## Wave 2: the seven follow-up dimensions
+
+Wave 2 ("keep researching the ecosystem") filled the gaps Wave 1 left. The headline: **Wave 2 reinforces the Wave 1 verdict and makes two of the recommended surfaces concrete and actionable now.**
+
+### 706i - Gaming ecosystem
+A handful of Avalanche games show real adoption (Off The Grid, MapleStory Universe with ~3.8M accounts, Beam with ~4.5M wallets), and gaming is the clearest case of L1 product-market fit. But ~93% of GameFi died, and the survivors' lessons - hide the blockchain, gate nothing behind NFT buys, sustainable tokenomics, multi-project ecosystems - are things ZAO already does. The takeaway for a music community: interesting, not transferable. Do not change course. *See `706i-gaming-ecosystem.md`.*
+
+### 706j - Enterprise & institutional
+Avalanche's institutional layer is substantially live, not vapor: tokenized funds, settlement infrastructure, and government pilots in the multi-billion range. Institutions pick Avalanche for isolated/compliant subnets and sub-second finality. For a 188-member music community this is mostly irrelevant - the one thread worth keeping is the RWA-tokenization pattern, which only becomes relevant if ZAOstock ever tokenizes fan-ownership shares. *See `706j-enterprise-institutional.md`.*
+
+### 706k - Record Financial deep dive
+The most actionable finding in the whole doc. Record Financial is a live platform settling music royalties in USDC in seconds (vs the legacy ~3-month cycle), aggregating 100,000+ pay sources, in production with the 11am Management roster. It currently targets management companies and labels rather than indie self-serve, so ZAO would need an enterprise/pilot conversation, not a signup. Recommendation: Zaal should reach out to explore an early-adopter pilot and a case study - but still compare against 0xSplits-on-Base before committing. (Founder names and funding are agent-reported; verify before any outreach references them.) *See `706k-record-financial-deep-dive.md`.*
+
+### 706l - The Arena deep dive
+The Arena is healthy and growing where most SocialFi collapsed - a real outlier, with creators earning a majority share of perpetual secondary-trade fees, and trivial (~5-minute) onboarding via X. Realistic upside for a 188-member community is modest but real. Recommendation: Zaal creates a profile now as a low-cost proof-of-concept; scale Cipher artists onto it only if early revenue justifies it. $ZABAL tipping still needs a Base-to-Avalanche bridge first. *See `706l-the-arena-deep-dive.md`.*
+
+### 706m - People, orgs & events
+The practical "how to plug in" map. The lowest-friction entry is the Team1 ambassador network (free, IRL-event support, bounties) - ZAO can join immediately with no migration. Codebase is the incubator ($50K stipend tier); Avalanche Summit is a Sep 2026 NYC gathering. The agent's playbook: join the community surfaces first, build a Fuji testnet mini-dApp, ship in public, then apply for grants once there is traction. *See `706m-people-orgs-events.md`.*
+
+### 706n - AI & agents
+Avalanche has a real, funded AI ecosystem (an infraBUIDL AI grant track, GPU-compute funds, a dedicated agent-settlement L1). But it is a secondary narrative behind RWA, and it offers ZAO's existing Base agent stack (ZOE, Hermes, the trading agents) nothing essential. Recommendation: keep agents on Base; optionally chase an AI grant if ZAO expands agent headcount; no migration. *See `706n-ai-and-agents.md`.*
+
+### 706o - Avalanche vs Solana for music
+Solana has genuine consumer-music momentum (large licensed-catalog and streaming apps, near-zero fees) but lacks the social infrastructure ZAO is built on. Avalanche has the artist-infrastructure layer (Record Financial, IP licensing) Solana lacks. Neither displaces Base + Farcaster as ZAO's home - the social moat is irreplaceable. Track Solana, do not prioritize it; the calculus from Wave 1 is unchanged. *See `706o-avalanche-vs-solana-for-music.md`.*
+
 ## Cross-cutting numbers (May 2026, verify before citing)
 
 | Metric | Value | Source sub-doc | Note |
@@ -101,31 +126,42 @@ The strategic verdict. Base owns consumer-social crypto and native Farcaster int
 - [Doc 572](../572-zabal-avalanche-l1-l2-gas-token/) - decided NOT to launch a $ZABAL Avalanche L1; stay on Base
 - [Doc 573](../573-zabal-avax-surfaces-arena-music/) - the original Avalanche-surfaces research (The Arena, Retro9000, Record Financial)
 - [Doc 695](../../governance/695-crypto-factor-avax-governance-decision/) - why governance stays on Optimism; the Crypto Factor pitch
-- Sub-docs: `706a` through `706h` in this folder
+- Sub-docs: `706a` through `706o` in this folder (two waves, 15 dimensions)
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | Treat this hub as the standing answer on Avalanche - stay Base/Optimism native, no migration, no L1 | @Zaal | Decision | Standing |
-| Open an exploratory conversation with Record Financial about ZAO Music / Cipher royalty rails | @Zaal | Outreach | When ZAO Music has its next release lined up |
+| Reach out to Record Financial to explore an early-adopter pilot for ZAO Music / Cipher royalty rails (706k) | @Zaal | Outreach | Next ZAO Music release window |
 | Compare Record Financial vs 0xSplits-on-Base before any royalty-rail commitment | @Zaal | Eval | Before committing |
-| Put ZAO leaders + Cipher artists on The Arena (cheap, no migration) | @Zaal | Task | Q3 2026 |
+| Create a The Arena profile for Zaal as a low-cost proof-of-concept; scale to Cipher artists only if early revenue justifies it (706l) | @Zaal | Task | This quarter |
+| Join the Team1 ambassador network - lowest-friction Avalanche ecosystem entry, no migration (706m) | @Zaal | Task | Optional, low priority |
 | Revisit Avalanche grants (706e) only after a real C-Chain deployment exists; verify program terms at application time | @Zaal | Funding | After any C-Chain presence |
 | Re-validate this hub if AVAX activity or ZAO scale changes materially (5,000+ wallets trigger) | @Zaal | Doc update | Every 6-8 weeks |
-| Verify agent-reported figures (RWA totals, grant amounts, Arena metrics) against primary sources before any public use | @Zaal | Verification | Before citing |
+| Verify agent-reported figures (RWA totals, grant amounts, Arena metrics, Record Financial founders) against primary sources before any public use or outreach | @Zaal | Verification | Before citing |
 
 ## Sources
 
-This is a DISPATCH hub. Each of the eight sub-docs (`706a`-`706h`) carries its own full Sources section with every source classified `[FULL]` / `[PARTIAL]` / `[FAILED]` per the zao-research fetch-quality gate. Across the eight agents, ~150 sources were consulted (Avalanche official docs, DeFiLlama, exa/web search, Reddit, Hacker News, GitHub, and project sites), with community sources included per dimension. Headline counts by sub-doc:
+This is a DISPATCH hub built in two waves. All fifteen sub-docs (`706a`-`706o`) carry their own full Sources sections with every source classified `[FULL]` / `[PARTIAL]` / `[FAILED]` per the zao-research fetch-quality gate. Across the fifteen agents, 280+ sources were consulted (Avalanche official docs, DeFiLlama, exa/web search, Reddit, Hacker News, GitHub, and project sites), with community sources included per dimension. Headline counts by sub-doc:
 
+Wave 1:
 - 706a - architecture: ~7 sources (3 FULL, 3 PARTIAL, 1 FAILED)
 - 706b - L1s: 20+ sources
-- 706c - music/RWA: 25+ sources (FULL/PARTIAL, no contradictions reported)
+- 706c - music/RWA: 25+ sources
 - 706d - dev experience: 23 sources (20 FULL, 3 PARTIAL)
 - 706e - grants: 26 sources (18 FULL, 8 PARTIAL)
 - 706f - DeFi: classified FULL/PARTIAL/FAILED, 4+ hard metrics
 - 706g - security: 44 sources (all FULL)
 - 706h - strategy: classified FULL/PARTIAL/FAILED
+
+Wave 2:
+- 706i - gaming: classified FULL/PARTIAL/FAILED, 3+ hard metrics
+- 706j - enterprise/institutional: classified FULL/PARTIAL/FAILED (press-release-vs-live flagged)
+- 706k - Record Financial: 19 sources, classified FULL/PARTIAL/FAILED
+- 706l - The Arena: 20 sources (5 FULL, 15 PARTIAL)
+- 706m - people/orgs/events: 27 sources, classified FULL/PARTIAL
+- 706n - AI/agents: classified FULL/PARTIAL/FAILED
+- 706o - Avalanche vs Solana: 8+ hard metrics, classified FULL/PARTIAL/FAILED
 
 See each sub-doc for the verbatim URL list and per-source marks. Note (per the staleness flags above): grant, price, and TVL figures are time-sensitive and several agent-reported specifics should be re-verified against primary sources before they inform a commitment or any public statement.

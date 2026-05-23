@@ -18,6 +18,7 @@ import { RoomReactions } from './RoomReactions';
 import { RoomChat } from './RoomChat';
 import { ParticipantsPanel } from './ParticipantsPanel';
 import { ClosedCaptions } from './ClosedCaptions';
+import { InviteCard } from './InviteCard';
 
 const BroadcastModal = dynamic(
   () => import('./BroadcastModal').then((m) => ({ default: m.BroadcastModal })),
@@ -86,10 +87,21 @@ export function RoomView({
   );
   const [previousLayout, setPreviousLayout] = useState<'content-first' | 'speakers-first' | null>(null);
 
-  const { useCallCustomData, useHasOngoingScreenShare } = useCallStateHooks();
+  const { useCallCustomData, useHasOngoingScreenShare, useParticipants } = useCallStateHooks();
   const callCustomData = useCallCustomData();
   const hasScreenShareActive = useHasOngoingScreenShare();
+  const participants = useParticipants();
   const roomTitle = (callCustomData as Record<string, string>)?.title || 'Audio Room';
+
+  // For Video Rooms only: show an invite card while the host is alone.
+  // Hidden as soon as a second participant joins.
+  const isAlone = participants.length <= 1;
+  const showInviteCard = roomType === 'voice_channel' && isAlone;
+  const [roomUrl, setRoomUrl] = useState('');
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setRoomUrl(window.location.href);
+  }, []);
 
   // Fetch Twitch connection info for the host (all viewers see the embed, host gets chat)
   useEffect(() => {
@@ -204,6 +216,15 @@ export function RoomView({
               <ContentView isHost={isHost} />
             ) : (
               <SpeakersGrid hostFid={hostFid} />
+            )}
+
+            {/* Invite card overlay - Video Rooms only, while alone */}
+            {showInviteCard && roomUrl && (
+              <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+                <div className="pointer-events-auto">
+                  <InviteCard roomTitle={roomTitle} roomUrl={roomUrl} />
+                </div>
+              </div>
             )}
 
             {/* Closed captions overlay */}

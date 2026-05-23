@@ -9,6 +9,7 @@ import { useAccount } from 'wagmi';
 import { createStreamUser } from '@/lib/spaces/streamHelpers';
 import { communityConfig } from '../../../../community.config';
 import { AudioRoomAdapter } from '@/components/spaces/AudioRoomAdapter';
+import { PreJoinLobby, type LobbyJoinConfig } from '@/components/spaces/PreJoinLobby';
 import type { Room } from '@/lib/spaces/roomsDb';
 
 // Lazy-load heavy SDKs — Stream.io is ~150KB, only load when entering a room
@@ -65,33 +66,40 @@ export default function PublicRoomPage() {
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
   const [gateBlocked, setGateBlocked] = useState(false);
+  // For voice_channel rooms we run a pre-join lobby (camera/mic preview,
+  // device pick, enter-with-video-off toggle) before calling Stream.io.
+  // null = lobby not yet confirmed; non-null = user clicked Join with these
+  // preferences and the Stream init effect can run.
+  const [lobbyConfig, setLobbyConfig] = useState<LobbyJoinConfig | null>(null);
 
   const isHost = user?.fid === room?.host_fid;
   const isAdmin = user ? (communityConfig.adminFids as readonly number[]).includes(user.fid) : false;
   const canEndRoom = isHost || isAdmin;
 
+  // Phase 1: fetch room metadata + run the token gate. Does not touch
+  // Stream.io. For voice_channel rooms we stop here and render the lobby —
+  // Phase 2 runs once the user confirms.
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      // Require authentication to join — guests can't get a Stream token
       setError('Sign in to join this space');
       setLoading(false);
       return;
     }
 
     let mounted = true;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let newClient: any = null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let newCall: any = null;
 
-    const init = async () => {
+    const fetchMeta = async () => {
       try {
         const roomData = await fetchRoom(roomId);
-        if (roomData.state === 'ended') throw new Error('This room has ended');
-        if (mounted) setRoom(roomData);
+        if (!mounted) return;
+        if (roomData.state === 'ended') {
+          setError('This room has ended');
+          setLoading(false);
+          return;
+        }
+        setRoom(roomData);
 
-        // Check token gate before joining
         if (roomData.gate_config && walletAddress) {
           const gateRes = await fetch('/api/spaces/gate-check', {
             method: 'POST',
@@ -108,45 +116,99 @@ export default function PublicRoomPage() {
           return;
         }
 
+        if (mounted) setLoading(false);
+      } catch (err) {
+        if (mounted) {
+          setError(err instanceof Error ? err.message : 'Failed to load room');
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchMeta();
+
+    return () => {
+      mounted = false;
+    };
+  }, [roomId, user, authLoading, walletAddress]);
+
+  // Phase 2: open the Stream.io call. For stage rooms this runs immediately
+  // after Phase 1 (lobbyConfig stays null). For voice_channel rooms this
+  // waits for the user to confirm the lobby — then `lobbyConfig` carries the
+  // mic/camera/device choices.
+  useEffect(() => {
+    if (!user || !room || gateBlocked || error) return;
+    if (room.room_type === 'voice_channel' && !lobbyConfig) return;
+
+    let mounted = true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let newClient: any = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let newCall: any = null;
+
+    const join = async () => {
+      try {
         const streamUser = createStreamUser(user);
-        const tokenProvider = async () => {
-          return fetchStreamToken(streamUser.id);
-        };
-        // Fetch initial token for immediate use
+        const tokenProvider = async () => fetchStreamToken(streamUser.id);
         const initialToken = await tokenProvider();
         const { StreamVideoClient: SVC } = await import('@stream-io/video-react-sdk');
         newClient = new SVC({ apiKey, user: streamUser, token: initialToken, tokenProvider });
         // Stage = Clubhouse-style audio room (mics-only, hand-raise to speak).
         // Voice channel = full A/V conference: everyone can mic, camera, screen-share.
-        const streamCallType = roomData.room_type === 'voice_channel' ? 'default' : 'audio_room';
-        newCall = newClient.call(streamCallType, roomData.stream_call_id);
+        const streamCallType = room.room_type === 'voice_channel' ? 'default' : 'audio_room';
+        newCall = newClient.call(streamCallType, room.stream_call_id);
 
-        const userIsHost = user.fid === roomData.host_fid;
+        const userIsHost = user.fid === room.host_fid;
         if (userIsHost) {
           await newCall.join({
             create: true,
             data: {
               members: [{ user_id: streamUser.id, role: 'host' }],
-              custom: { title: roomData.title, description: roomData.description || '' },
+              custom: { title: room.title, description: room.description || '' },
             },
           });
-          // Enable mic for host — audio_room type starts muted by default
-          await newCall.microphone.enable().catch(() => {});
+          // Stage host: audio_room starts muted by default - turn the mic on.
+          // Voice room host: honor the lobby's "mic on" preference.
+          const hostShouldMic = room.room_type === 'voice_channel'
+            ? (lobbyConfig?.audioEnabled ?? true)
+            : true;
+          if (hostShouldMic) {
+            await newCall.microphone.enable().catch(() => {});
+          } else {
+            await newCall.microphone.disable().catch(() => {});
+          }
         } else {
           await newCall.join({
             create: false,
             data: { members: [{ user_id: streamUser.id, role: 'speaker' }] },
           });
+          if (room.room_type === 'voice_channel') {
+            if (lobbyConfig?.audioEnabled) {
+              await newCall.microphone.enable().catch(() => {});
+            }
+          }
         }
 
-        // Fire-and-forget session tracking on join
+        // Voice room: apply lobby device + camera preferences.
+        if (room.room_type === 'voice_channel' && lobbyConfig) {
+          if (lobbyConfig.audioDeviceId) {
+            await newCall.microphone.select(lobbyConfig.audioDeviceId).catch(() => {});
+          }
+          if (lobbyConfig.videoDeviceId) {
+            await newCall.camera.select(lobbyConfig.videoDeviceId).catch(() => {});
+          }
+          if (lobbyConfig.videoEnabled) {
+            await newCall.camera.enable().catch(() => {});
+          }
+        }
+
         fetch('/api/spaces/session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            roomId: roomData.id,
-            roomName: roomData.title,
-            roomType: roomData.room_type ?? 'stage',
+            roomId: room.id,
+            roomName: room.title,
+            roomType: room.room_type ?? 'stage',
           }),
         }).catch(() => {});
 
@@ -156,20 +218,17 @@ export default function PublicRoomPage() {
         }
       } catch (err) {
         if (mounted) setError(err instanceof Error ? err.message : 'Failed to join room');
-      } finally {
-        if (mounted) setLoading(false);
       }
     };
 
-    init();
+    join();
 
     return () => {
       mounted = false;
-      // Clean up Stream resources on unmount to prevent stale connections
       if (newCall) newCall.leave().catch(() => {});
       if (newClient) newClient.disconnectUser().catch(() => {});
     };
-  }, [roomId, user, authLoading, walletAddress]);
+  }, [user, room, gateBlocked, error, lobbyConfig]);
 
   // End session on browser close / tab close
   useEffect(() => {
@@ -281,6 +340,22 @@ export default function PublicRoomPage() {
           onLeave={handleLeave}
         />
       </div>
+    );
+  }
+
+  // Voice rooms: gate on the pre-join lobby. Stage rooms skip this (they
+  // join immediately on Phase 2 with mic-on).
+  if (room && room.room_type === 'voice_channel' && !lobbyConfig) {
+    return (
+      <PreJoinLobby
+        roomTitle={room.title}
+        hostName={room.host_name ?? room.host_username ?? undefined}
+        participantCount={room.participant_count}
+        username={user?.username}
+        pfpUrl={user?.pfpUrl}
+        onJoin={(config) => setLobbyConfig(config)}
+        onCancel={() => router.push('/spaces')}
+      />
     );
   }
 

@@ -7,7 +7,7 @@ allowed-tools: Read Write Edit Bash WebFetch Skill AskUserQuestion
 # /meeting - ZAO Meeting Capture
 
 Turn any meeting recording or transcript into:
-- Action items in the right project's tracker (cowork-zaodevz `actions.json`, ZAOstock bot - routed in Phase 0)
+- Action items in the right project's tracker (unified Supabase cowork tracker, ZAOstock bot - routed in Phase 0)
 - A research recap doc in `research/events/NNN-<slug>/README.md` (always ZAOOS, per doc 673)
 - A row in `research/events/_meetings-index.md` - the one canonical list of every past meeting
 - A copy-paste Telegram bubble for sharing
@@ -52,7 +52,7 @@ A meeting belongs to a project. The project decides WHERE actions + the Telegram
 
 | Project | Action target | Telegram target | Recap doc |
 |---|---|---|---|
-| **ZAO Devz / general** (default) | cowork-zaodevz `data/actions.json` (GitHub PUT) | @ZAOcoworkingBot DM | ZAOOS `research/events/` |
+| **ZAO Devz / general** (default) | unified Supabase tracker `tasks` table (project `etwvzrmlxeobinrlytza`) | @ZAOcoworkingBot DM | ZAOOS `research/events/` |
 | **ZAOstock** | paste-block for @ZAOstockTeamBot (its tasks live in ZAOstock Supabase, not GitHub) | @ZAOstockTeamBot group | ZAOOS `research/events/` + cross-link in `research/events/_zaostock-hub/` |
 | **ZAO OS dev** | recap doc action table only (no external tracker) | none | ZAOOS `research/events/` |
 | **BCZ / WaveWarZ / other** | recap doc action table only | none | ZAOOS `research/events/` |
@@ -281,11 +281,11 @@ For each enabled target, follow the playbook in [references/distribution-targets
 
 ### Action tracker (routed by project - Phase 0)
 
-**Project = ZAO Devz / general:** write to cowork-zaodevz `data/actions.json`.
+**Project = ZAO Devz / general:** insert into the unified Supabase `tasks` table.
 ```bash
 bash ${CLAUDE_SKILL_DIR}/scripts/append-actions.sh /tmp/extracted-actions.json
 ```
-Script reads the actions array, fetches current `data/actions.json` from GitHub, appends new items starting at `max(existing.id) + 1`, PUTs back via `gh api` with sha. One commit per meeting.
+Script reads the actions array, resolves owner names against `team_members.legacy_owner`, and bulk-POSTs to Supabase `/rest/v1/tasks` with `legacy_source=meeting:<slug>-<date>` so every meeting's actions are traceable + revertable. Needs `SUPABASE_URL` + `SUPABASE_SERVICE_KEY` in env or sourced from `~/.zao/cowork-tracker.env` (chmod 600). Replaces the prior `gh api` PUT to the dead `data/actions.json` (doc 713 step 1, 2026-05-23).
 
 **Project = ZAOstock:** do NOT write to cowork-zaodevz. ZAOstock tasks live in the ZAOstock Supabase behind @ZAOstockTeamBot. v1: print a paste-block of the action items for Zaal to drop into @ZAOstockTeamBot (`/note` or task command). Also note them in the recap doc's action table. (v2: a `zaostock-actions.sh` that inserts into ZAOstock Supabase via service-role key - deferred until the ZAOstock task schema is confirmed.)
 
@@ -455,7 +455,7 @@ When creating the recap doc, parallel Claude sessions may race for the same numb
 - `scripts/diarize.sh` - speaker diarization via sherpa-onnx: who-spoke-when, merged with the whisper json into a `[Speaker N]`-labeled transcript. Local, offline, no HF token.
 - `scripts/diarize.py` - the diarization + transcript-merge engine called by `diarize.sh` (runs under `uv run --with sherpa-onnx`).
 - `scripts/fetch-craig.sh` - curl Craig recording URL, extract audio
-- `scripts/append-actions.sh` - `gh api` PUT for `data/actions.json` bulk append (ZAO Devz project only)
+- `scripts/append-actions.sh` - bulk insert meeting actions into the unified Supabase cowork tracker (project `etwvzrmlxeobinrlytza`, table `tasks`). ZAO Devz project only.
 - `scripts/bonfire-episode.sh` - POST meeting episodes to the ZABAL Bonfire KG (always-on, best-effort, doc 680)
 
 ## Evals

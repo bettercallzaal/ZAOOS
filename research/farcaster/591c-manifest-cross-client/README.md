@@ -2,14 +2,15 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-02
-related-docs: 173, 250, 308, 591a, 591b
+last-validated: 2026-05-21
+related-docs: 173, 250, 308, 591, 591a, 591b, 591d
+original-query: "Farcaster miniapp manifest schema, account association domain binding, apex vs www pitfalls, cross-client compatibility (Warpcast iOS/Android/Web, Mac, Base App, Coinbase Wallet), validation tools, discovery, publishing. (reconstructed)"
 tier: STANDARD
 ---
 
-# Farcaster Miniapp Manifest Production Audit: Cross-Client Compatibility & Domain Binding
+# 591c - Farcaster Miniapp Manifest + Domain Binding
 
-**Document 591c** — Manifest correctness audit for production Farcaster miniapps. Covers schema compliance, domain binding pitfalls, cross-client context injection, and validation tooling.
+> **Goal:** Complete manifest specification (version 1, iconUrl 1024x1024px PNG, accountAssociation JFS signature), domain binding best practices (apex vs www exact match, Cloudflare/Vercel redirect traps, canonicalDomain migration), cross-client behavior matrix (8 clients tested, Warpcast v Base App v Coinbase Wallet quirks), and validation tools (Neynar embed, Farcaster manifest tool, local curl checks).
 
 ---
 
@@ -730,5 +731,5 @@ export const metadata = {
 
 ---
 
-**Last Validated:** May 2, 2026  
+**Last Validated:** May 21, 2026  
 **Related Research:** 591a (Miniapp SDK patterns), 591b (Frame embed metadata spec)

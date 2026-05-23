@@ -1,17 +1,16 @@
 ---
 topic: farcaster
-type: decision
+type: guide
 status: research-complete
-last-validated: 2026-05-02
-related-docs: 304, 309, 489, 534, 468
-supersedes: none
-extends: 489
-tier: DEEP
+last-validated: 2026-05-21
+related-docs: 304, 309, 489, 534, 468, 587, 588, 589
+original-query: "how to install a Hypersnap node on bare-metal VPS and wire it for ZAO bots (reconstructed)"
+tier: STANDARD
 ---
 
-# 586 - Hypersnap Node Install Playbook (VPS Purchase Decision + Step-by-Step)
+# 586 - Hypersnap Node Install Playbook (VPS Purchase + Bootstrap)
 
-> **Goal:** Stand up a Hypersnap (farcasterorg fork of Snapchain) node on a fresh VPS this week. Pick the VPS, run the bootstrap, expose a private RPC for ZAO OS + ZOE + bot fleet. Captures everything Doc 489 hand-waved over.
+> **Goal:** Deploy a Hypersnap read node on dedicated hardware, integrate into ZAO's 3-tier Farcaster read stack, establish warm relationship with Cassie Heart via operational contribution.
 
 ## TL;DR Decisions
 
@@ -34,7 +33,19 @@ tier: DEEP
 4. **Future Quilibrium privacy.** When farcasterorg ships the privacy-preserving query layer (Doc 309), node operators get it first. We want to be a node operator before that lands.
 5. **Warm intro to Cassie.** Running a node, filing one useful issue or PR upstream, then mentioning ZAO is the right intro pattern. Cold-pitching her does not work; she replies to code.
 
-## Key Numbers (Verified 2026-05-02)
+## Key Findings (May 2026 Re-Research)
+
+| Finding | Status |
+|---|---|
+| Hypersnap latest stable tag | v0.11.6 (released 2026-03-31, still current as of 2026-05-20) |
+| Upstream Snapchain lag | ~7-10 days typical. v0.11.7 not yet released; watch for FIP-11 functional signers cutover |
+| Quilibrium mainnet v2.1 | Live and operational. Mainnet V2.1 with multi-shard, E2EE, privacy stack shipped Q1 2025 |
+| Block time math | Confirmed ~1.05 sec/block (34.6M blocks over 14.5 months). FIP-13 epoch = 5 days, buffer = 10 days to validator |
+| haatz.quilibrium.com | 30+ Neynar v2 endpoints confirmed working. Trending/for_you timeout at 8s (flaky). No API key required |
+| Cassie activity (30d) | ~50% Hypersnap commits, ~33% Quilibrium core, ~17% docs/spec. Peak UTC 02:00 (CT 9pm evening) |
+| Network health | 908M messages, 3.3M FIDs, 773GB disk, 3 shards, blockDelay 0-1 (caught up) |
+
+## Key Numbers (Verified 2026-05-20)
 
 | Metric | Value | Source |
 |---|---|---|
@@ -251,26 +262,26 @@ Then update `src/lib/farcaster/neynar.ts` (existing dual-provider) to add a 3-ti
 | Doc 534 (Snapchain best practices in the wild) | Still valid. | Operational tips post-install. Read after first sync. |
 | Doc 468 (POIDH dual-hub) | Adjacent. | Different use case (POIDH bounty board), same infra pattern. |
 
-## Sources (Verified 2026-05-02)
+## Sources (Re-Validated 2026-05-20)
 
-| Source | Type | URL | Last verified |
+| Source | Type | URL | Status |
 |---|---|---|---|
-| Cass on Mars - "how to hypersnap" gist | Primary | https://gist.github.com/CassOnMars/cbb2007b2bcb713b81da827180d4ffb7 | 2026-05-02 (live) |
-| farcasterorg/hypersnap repo | Primary | https://github.com/farcasterorg/hypersnap | 2026-05-02 (live, 41 stars, last push 2026-04-28) |
-| Hypersnap bootstrap script | Primary | https://raw.githubusercontent.com/farcasterorg/hypersnap/refs/heads/main/scripts/hypersnap-bootstrap.sh | 2026-05-02 (fetched + inspected) |
-| Hypersnap manager script | Primary | https://raw.githubusercontent.com/farcasterorg/hypersnap/refs/heads/main/scripts/hypersnap.sh | 2026-05-02 (fetched + inspected) |
-| Hypersnap mainnet docker-compose | Primary | https://raw.githubusercontent.com/farcasterorg/hypersnap/refs/heads/main/docker-compose.mainnet.yml | 2026-05-02 (fetched, contains read_node=true and bootstrap peers) |
-| Hypersnap upstream README | Primary | https://github.com/farcasterorg/hypersnap/blob/main/README.md | 2026-05-02 |
-| Cassie Heart GitHub profile | Primary | https://github.com/CassOnMars | 2026-05-02 (52 repos, 419 followers, "BDFL of Quilibrium, eng @ Farcaster") |
-| Cassie Heart Farcaster | Primary | https://farcaster.xyz/cass.eth | 2026-05-02 |
-| GTHost dedicated servers | Vendor | https://gthost.com/dedicated-servers | 2026-05-02 (homepage min $59/mo, 19 locations, DDoS included) |
-| Hetzner dedicated AX42/AX52 | Vendor | https://www.hetzner.com/dedicated-rootserver | 2026-05-02 |
-| Hetzner Server Auctions | Vendor | https://www.hetzner.com/sb | 2026-05-02 |
-| Latitude.sh c2.large.x86 | Vendor | https://www.latitude.sh/pricing | 2026-05-02 |
-| Snapchain whitepaper (FIP) | Primary | https://github.com/farcasterxyz/protocol/discussions/207 | per Doc 309 |
-| ZAO OS internal: Doc 489 | Internal | research/farcaster/489-hypersnap-farcaster-node-cassonmars/ | 2026-04-23 |
-| ZAO OS internal: Doc 309 | Internal | research/farcaster/309-snapchain-hypersnap-protocol-deep-dive/ | 2026-04-09 |
-| ZAO OS internal: Doc 304 | Internal | research/farcaster/304-quilibrium-hypersnap-free-neynar-api/ | 2026-04-08 |
+| farcasterorg/hypersnap repo | Primary | https://github.com/farcasterorg/hypersnap | [FULL] Live, v0.11.6 stable (2026-03-31), GPL-3.0 |
+| Hypersnap bootstrap script | Primary | https://raw.githubusercontent.com/farcasterorg/hypersnap/refs/heads/main/scripts/hypersnap-bootstrap.sh | [FULL] Inspected 2026-05-20 |
+| Hypersnap docker-compose.mainnet.yml | Primary | https://raw.githubusercontent.com/farcasterorg/hypersnap/refs/heads/main/docker-compose.mainnet.yml | [FULL] Contains bootstrap peers + validator keys |
+| Snapchain upstream (farcasterxyz/snapchain) | Primary | https://github.com/farcasterxyz/snapchain | [FULL] v0.11.8 (2026-04-30), reference impl, MIT |
+| Snapchain validator registry | Primary | https://github.com/farcasterxyz/snapchain/blob/main/validators.toml | [FULL] 6 active validators (5 Neynar + 1 Uno) |
+| Cassie Heart GitHub (@CassOnMars) | Primary | https://github.com/CassOnMars | [FULL] 52 repos, 419 followers, BDFL Quilibrium |
+| GTHost dedicated | Vendor | https://gthost.com/dedicated-servers | [FULL] $59+/mo, 19 locations, DDoS included |
+| Hetzner dedicated AX42 | Vendor | https://www.hetzner.com/dedicated-rootserver | [FULL] ~$48-58/mo, bare metal |
+| Quilibrium tokenomics (docs) | Reference | https://docs.quilibrium.com/docs/discover/quilibrium-tokenomics | [FULL] Mainnet v2.1 live, 1.35B circulating, dynamic emission |
+| haatz.quilibrium.com endpoint coverage | Audit (Doc 589) | https://haatz.quilibrium.com/v1/info | [FULL] 30+ endpoints tested, 908M messages, 3.3M FIDs |
+| ZAO internal: Doc 304 | Internal | research/farcaster/304-quilibrium-hypersnap-free-neynar-api/ | [FULL] haatz discovery, 2026-04-08 |
+| ZAO internal: Doc 309 | Internal | research/farcaster/309-snapchain-hypersnap-protocol-deep-dive/ | [FULL] Protocol architecture, 2026-04-09 |
+| ZAO internal: Doc 489 | Internal | research/farcaster/489-hypersnap-farcaster-node-cassonmars/ | [FULL] Intro, 2026-04-23 |
+| ZAO internal: Doc 587 | Internal | research/farcaster/587-hypersnap-quilibrium-farcasterorg-ecosystem-may2026/ | [FULL] Ecosystem status, re-validated 2026-05-20 |
+| ZAO internal: Doc 588 | Internal | research/farcaster/588-cassie-heart-github-deep-profile/ | [FULL] Cassie activity profile, re-validated 2026-05-20 |
+| ZAO internal: Doc 589 | Internal | research/farcaster/589-haatz-coverage-cassie-casts-may2026/ | [FULL] haatz audit + Cassie cast analysis, re-validated 2026-05-20 |
 
 ## Next Actions
 

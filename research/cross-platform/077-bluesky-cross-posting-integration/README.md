@@ -1,3 +1,13 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: How to add Bluesky as a cross-posting target from ZAO OS compose bar with community account and OAuth flows (reconstructed)
+tier: STANDARD
+related-docs: 28, 96, 177
+---
+
 # 77 — Bluesky Cross-Posting Integration for ZAO OS
 
 > **Status:** Research complete
@@ -9,8 +19,8 @@
 
 | Decision | Recommendation |
 |----------|----------------|
-| **SDK** | `@atproto/api` v0.19.3 — official TypeScript SDK, free, no API key needed |
-| **Phase 1 auth** | App Password — simplest for community account cross-posting. Store as `BLUESKY_APP_PASSWORD` env var. |
+| **SDK** | `@atproto/api` v0.19.16 (May 8 2026) — official TypeScript SDK, free, no API key needed |
+| **Phase 1 auth** | App Password (deprecated, but still functional) — OAuth2 recommended. Store app password as `BLUESKY_APP_PASSWORD` env var if used. |
 | **Phase 2 auth** | OAuth via `@atproto/oauth-client-node` — "Connect Your Bluesky" for individual members |
 | **Phase 3** | Custom "ZAO Music" feed generator + ZAO labeler on Bluesky |
 | **Cost** | **$0** — Bluesky API is completely free |
@@ -232,19 +242,15 @@ Adding Bluesky means:
 4. Add fire-and-forget `postToBluesky()` call in send route
 5. Add Bluesky connection status in Settings page
 
-## Sources
+## Sources [FULL] — Re-validated 2026-05-21
 
-- [@atproto/api on npm](https://www.npmjs.com/package/@atproto/api) — v0.19.3 (Mar 2026)
-- [Bluesky Creating a Post Tutorial](https://docs.bsky.app/docs/tutorials/creating-a-post)
-- [Bluesky OAuth Documentation](https://docs.bsky.app/docs/advanced-guides/oauth-client)
-- [Bluesky OAuth Blog Post](https://docs.bsky.app/blog/oauth-atproto)
-- [Bluesky Rate Limits](https://docs.bsky.app/docs/advanced-guides/rate-limits)
+- [@atproto/api on npm](https://www.npmjs.com/package/@atproto/api) — v0.19.16 (May 8 2026) [FULL]
+- [Bluesky Creating a Post Tutorial](https://docs.bsky.app/docs/tutorials/creating-a-post) [FULL] — text, facets, rich text, embeds confirmed current
+- [Bluesky OAuth Documentation](https://docs.bsky.app/docs/advanced-guides/oauth-client) [FULL] — OAuth2 recommended, app password deprecated
+- [Bluesky Rate Limits](https://docs.bsky.app/docs/advanced-guides/rate-limits) [FULL] — 5000 pts/hr, 35000/day confirmed, 300-char limit confirmed
 - [Custom Feeds Starter Template](https://github.com/bluesky-social/feed-generator)
 - [Bluesky Moderation Architecture](https://docs.bsky.app/blog/blueskys-moderation-architecture)
 - [@atproto/oauth-client-node](https://www.npmjs.com/package/@atproto/oauth-client-node)
-- [OAuth with Next.js Tutorial](https://atproto.com/guides/oauth-tutorial)
 - [Bluesky Statistics 2026](https://backlinko.com/bluesky-statistics)
 - [Musicians on Bluesky Starter Packs](https://blueskystarterpack.com/musicians)
-- [Area.cx](https://www.area.cx/)
-- [The Arena on Avalanche](https://www.avax.network/about/blog/the-arenas-comeback-socialfi-app-on-avalanche)
 - [Doc 28 — Cross-Platform Publishing](../../_archive/028-cross-platform-publishing/)

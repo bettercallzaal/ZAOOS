@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-21
+original-query: "Descript May 2026 update: model picker, transcription admin, transitions. What Zaal should use for BCZ YapZ + lunch streams. (reconstructed)"
 related-docs: []
 tier: QUICK
 source: inbox-forward-2026-05-11
@@ -58,6 +59,17 @@ All three features included in Creator and Pro tiers. No new tier announced. Und
 | Try Underlord model picker on next YapZ | Zaal | Manual |
 | Test glossary on lunch stream autogen captions | Zaal | Manual |
 | Document transition workflow for team | BCZ | Optional |
+
+## Findings (2026-05-21 Re-research)
+
+Descript May 2026 features remain current + actionable for BCZ YapZ. 2026-05-21 status:
+1. Underlord model picker (Sonnet 4.5 option) confirmed via Descript blog - verified 2026-05-21
+2. Transcription glossary for brand-name consistency (ZABAL, The ZAO, BetterCallZaal) documented
+3. Automatic multicam (Season 7 feature) + transitions live, included in Creator/Pro tiers
+4. No new tier announced, Underlord free trial active through June 2026
+5. All 3 features immediately actionable for Zaal
+
+No material changes. All 3 features (Sonnet picker, glossary, multicam transitions) recommended for BCZ YapZ + lunch streams. Model picker + glossary high priority (quick wins). Multicam/transitions optional. No new pricing/tier impact.
 
 ## Sources
 

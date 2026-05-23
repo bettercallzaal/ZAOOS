@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Deep dive into Ole Lehmann's autoresearch method, compare with ZAO's installed autoresearch skill, design ready-to-use eval checklists for ZAO's top 5 skills (reconstructed)
+tier: STANDARD
+---
+
 # 170 — Autoresearch 10x: Binary Eval Checklists for ZAO OS Skills
 
 > **Status:** Research complete

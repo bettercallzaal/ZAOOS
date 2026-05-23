@@ -1,4 +1,14 @@
-# 96 — Mastodon + Threads Cross-Posting Integration for ZAO OS
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Add Mastodon and Threads as cross-posting targets from ZAO OS compose bar with SDK selection and OAuth flows (reconstructed)
+tier: STANDARD
+related-docs: 28, 77, 228
+---
+
+# 177 — Mastodon + Threads Cross-Posting Integration for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 20, 2026
@@ -634,10 +644,10 @@ Adding Mastodon + Threads follows the exact same pattern as Bluesky:
 
 ## Sources
 
-- [Mastodon Statuses API](https://docs.joinmastodon.org/methods/statuses/) — POST /api/v1/statuses endpoint
-- [Mastodon OAuth Documentation](https://docs.joinmastodon.org/spec/oauth/) — OAuth 2.0 spec
-- [Mastodon App Registration](https://docs.joinmastodon.org/methods/apps/) — POST /api/v1/apps
-- [Mastodon Rate Limits](https://docs.joinmastodon.org/api/rate-limits/) — 300/5min default
+- [Mastodon Statuses API](https://docs.joinmastodon.org/methods/statuses/) [FULL] — POST /api/v1/statuses endpoint current
+- [Mastodon OAuth Documentation](https://docs.joinmastodon.org/spec/oauth/) [FULL] — OAuth 2.0 spec confirmed
+- [Mastodon App Registration](https://docs.joinmastodon.org/methods/apps/) [FULL] — POST /api/v1/apps current
+- [Mastodon Rate Limits](https://docs.joinmastodon.org/api/rate-limits/) [FULL] — 300/5min per account, completely free
 - [Mastodon Client Libraries](https://docs.joinmastodon.org/client/libraries/) — official list
 - [masto.js on npm](https://www.npmjs.com/package/masto) — TypeScript Mastodon client
 - [masto.js GitHub](https://github.com/neet/masto.js/) — source, docs, examples
@@ -646,9 +656,9 @@ Adding Mastodon + Threads follows the exact same pattern as Bluesky:
 - [SoNoMu.club](https://sonomu.club/) — Sound Noise Music Mastodon instance
 - [SoNoMu About](https://sonomu.club/about) — instance description and rules
 - [Music Mastodon Servers](https://mastodonservers.net/servers/music) — directory of music instances
-- [Threads API — Posts](https://developers.facebook.com/docs/threads/posts/) — publishing documentation
-- [Threads API — Get Started](https://developers.facebook.com/docs/threads) — overview and setup
-- [Threads API — Access Tokens](https://developers.facebook.com/docs/threads/get-started/get-access-tokens-and-permissions/) — OAuth flow
+- [Threads API — Posts](https://developers.facebook.com/docs/threads/posts/) [FULL] — 2-step publishing (create container, publish), carousel up to 20 items, links/GIFs supported, 5 link limit per post (Dec 22 2025+)
+- [Threads API — Get Started](https://developers.facebook.com/docs/threads) [FULL] — OAuth 2.0, short-lived (1hr) and long-lived (60 day) tokens, Meta App Review required
+- [Threads API Rate Limits](https://developers.facebook.com/docs/threads) [FULL] — rate limits not explicitly published; uses OAuth 2.0 standard patterns
 - [Threads API Changelog](https://developers.facebook.com/docs/threads/changelog/) — feature history
 - [Threads API Launch Announcement](https://developers.facebook.com/blog/post/2024/06/18/the-threads-api-is-finally-here/) — June 2024
 - [Meta Threads API Expansion](https://ppc.land/meta-expands-threads-api-with-advanced-features-for-developers/) — advanced features

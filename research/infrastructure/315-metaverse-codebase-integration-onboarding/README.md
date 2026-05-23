@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: How does the 3D metaverse integrate with ZAO OS systems and onboarding? (reconstructed)
+tier: FULL
+---
+
 # 315 - 3D Metaverse Codebase Integration & Onboarding Map
 
 > **Status:** Research complete

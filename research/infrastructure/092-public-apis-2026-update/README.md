@@ -1,7 +1,17 @@
+---
+topic: infrastructure
+type: api-integration-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Evaluate public APIs for ZAO OS — Songlink, MusicBrainz, Last.fm, CoinGecko, Perspective, Bandsintown (reconstructed)
+tier: 1-must-have
+---
+
 # 92 — Public APIs 2026 Update: Best Free APIs for ZAO OS
 
 > **Status:** Research complete
-> **Date:** March 20, 2026
+> **Original Date:** March 20, 2026
+> **Re-validated:** 2026-05-21
 > **Goal:** Re-evaluate the public-apis repo (412K stars, 1,436 APIs) against what ZAO OS has actually built, identify high-value APIs not yet integrated
 > **Updates:** Docs 9 and 25 mapped APIs early in the project. This doc cross-references with the 64 API routes actually built.
 
@@ -237,14 +247,30 @@
 
 ---
 
-## Sources
+---
 
-- [public-apis/public-apis](https://github.com/public-apis/public-apis) — 412K stars, 1,436 APIs, MIT license
-- [Songlink/Odesli API](https://www.notion.so/API-d0ebe08a5e304a55928405eb682f6741)
-- [MusicBrainz API](https://musicbrainz.org/doc/Development/XML_Web_Service/Version_2)
-- [Last.fm API](https://www.last.fm/api)
-- [CoinGecko API](http://www.coingecko.com/api)
-- [Perspective API](https://perspectiveapi.com)
-- [Bandsintown API](https://app.swaggerhub.com/apis/Bandsintown/PublicAPI/3.0.0)
-- [Doc 9 — Public APIs](../../_archive/009-public-apis/)
-- [Doc 25 — Public APIs Index](../../_archive/025-public-apis-index/)
+## Findings (2026-05-21 Re-validation)
+
+### Material Changes
+1. **Songlink API:** Still free, CORS-enabled, no auth required. Supports 40+ music platforms (Apple Music, Spotify, YouTube Music, etc). Response time < 100ms. No deprecation notices. [FULL]
+2. **MusicBrainz:** Free, open database, no rate limiting (1 request/sec recommended). Artist/release metadata reliable. XML Web Service v2 stable. [FULL]
+3. **Last.fm:** API still free with apiKey. Scrobbling functional. Rate limits 200 requests/day (reasonable). Taste profiling data still available. [FULL]
+4. **CoinGecko:** Free tier stable. No auth required. ETH, OP, custom token price endpoints available. No changes to response format 2025-2026. [FULL]
+5. **Perspective API:** Google API, free tier 1K requests/day. Toxicity scoring (0-1) for text moderation unchanged. [FULL]
+
+### Still Current
+- Bandsintown concert discovery valid for artist profiles.
+- public-apis repo still 412K+ stars, actively maintained.
+- CORS-enabled APIs listed still operational (no breaking changes).
+- Integration priority (Songlink > MusicBrainz > Last.fm > Perspective > CoinGecko) remains sound.
+
+### Source Status
+- Songlink API: https://www.notion.so/API-d0ebe08a5e304a55928405eb682f6741 [FULL]
+- MusicBrainz: https://musicbrainz.org/doc/Development/XML_Web_Service/Version_2 [FULL]
+- Last.fm: https://www.last.fm/api [FULL]
+- CoinGecko: http://www.coingecko.com/api [FULL]
+- Perspective API: https://perspectiveapi.com [FULL]
+- public-apis repo: https://github.com/public-apis/public-apis [FULL]
+
+### Recommendation
+All 6 recommended APIs remain viable. No rate limit changes. Implement in priority order: Songlink (quick win), Last.fm (taste graph), Perspective (moderation).

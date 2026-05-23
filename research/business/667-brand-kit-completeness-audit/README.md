@@ -2,7 +2,8 @@
 topic: business
 type: audit
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-21
+original-query: "Does the ZABAL Brand Kit cover all brands in the ecosystem? What's missing or needs clarification? (reconstructed)"
 related-docs: 475, 547, 661, 663, 665, 666
 tier: DEEP
 ---

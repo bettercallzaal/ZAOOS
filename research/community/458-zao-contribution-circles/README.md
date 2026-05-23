@@ -1,3 +1,13 @@
+---
+topic: community
+type: decision
+status: research-complete
+last-validated: 2026-05-21
+original-query: "ZAO participation in Impactful Giving Contribution Circles pilot (reconstructed)"
+tier: STANDARD
+related-docs: 200, 287
+---
+
 # 458 - ZAO Contribution Circles
 
 > **Status:** Meeting captured. Zaal drafting messaging next.

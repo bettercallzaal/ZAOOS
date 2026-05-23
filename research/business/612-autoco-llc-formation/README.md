@@ -2,7 +2,8 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-05-07
+last-validated: 2026-05-21
+original-query: "Should ZAO Festivals form via AutoCo or traditional LLC services? What are the tradeoffs? (reconstructed)"
 related-docs: 609, 611
 tier: STANDARD
 ---

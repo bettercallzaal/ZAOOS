@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-06
+last-validated: 2026-05-21
+original-query: bczyapz101 Farcaster bot architecture - fork gmfc101, adapt for BCZ YapZ episodes (reconstructed)
 related-docs: 474, 569, 616
 tier: STANDARD
 ---

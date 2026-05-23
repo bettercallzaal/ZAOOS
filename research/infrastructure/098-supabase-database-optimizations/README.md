@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Supabase optimizations — Realtime subscriptions, materialized views, functions, RLS, Vault, triggers (reconstructed)
+tier: 1-must-have
+---
+
 # 98 — Supabase Database Optimizations for ZAO OS
 
 > **Status:** Research complete
@@ -1337,3 +1346,8 @@ Run in order:
 - [Supavisor Architecture](https://supabase.com/blog/supavisor-postgres-connection-pooler)
 - [Next.js Serverless + Supabase](https://supabase.com/docs/guides/getting-started/quickstarts/nextjs)
 - [Supabase Realtime Publication Setup](https://supabase.com/docs/guides/realtime/postgres-changes#replication-setup)
+---
+
+## Findings (2026-05-21 Re-validation)
+
+**Status:** Research verified stable as of 2026-05-21. APIs, services, and recommendations current. No breaking changes to core infrastructure or libraries identified. Proceed with implementation roadmap.

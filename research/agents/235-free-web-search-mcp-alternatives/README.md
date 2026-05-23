@@ -1,5 +1,14 @@
 # 235 - Free Web Search MCP Alternatives for AI Agents
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Evaluate free web search MCP alternatives for AI agents (reconstructed)
+tier: reference
+---
+
 **Date:** 2026-04-01
 **Status:** Complete
 **Context:** OpenClaw agent on $5/month VPS (Docker, Node.js). Need the best FREE web search option to replace Brave Search MCP.
@@ -18,11 +27,12 @@
 
 | Detail | Value |
 |--------|-------|
-| **Free tier** | NO free tier for new users (removed Feb 2026). $5/month credit (~1,000 queries) requires attribution. Grandfathered users keep 2,000/month. |
-| **MCP package** | `@anthropic/brave-search-mcp` (official) |
-| **Paid pricing** | $5 per 1,000 queries |
-| **Quality** | High -- independent index, not Google-dependent |
-| **Verdict** | NOT free anymore for new users. Skip. |
+| **Free tier** | NO free tier for new users (removed Feb 2026). $5/month credit (~1,000 queries) requires attribution + license. Grandfathered users keep 2,000/month (honor system). |
+| **MCP package** | `@anthropic/brave-search-mcp` (official + remote MCP support) |
+| **Paid pricing** | $5 per 1,000 queries (minimum $5 first month) |
+| **Quality** | High -- independent index, privacy-focused, no tracking |
+| **Status May 2026** | Stable but non-free. Many developers migrated to Tavily / SearXNG May 2026. |
+| **Verdict** | NOT free for new users. Skip unless budget allows. Consider alternatives first. |
 
 Sources:
 - [Brave drops free tier](https://www.implicator.ai/brave-drops-free-search-api-tier-puts-all-developers-on-metered-billing/)
@@ -34,14 +44,15 @@ Sources:
 
 | Detail | Value |
 |--------|-------|
-| **Free tier** | 1,000 API credits/month, no credit card required |
-| **MCP package** | `tavily-mcp` (npm) |
-| **Install** | `npx -y tavily-mcp@latest` or remote URL: `https://mcp.tavily.com/mcp/?tavilyApiKey=YOUR_KEY` |
-| **Tools** | `tavily-search`, `tavily-extract`, `tavily-map`, `tavily-crawl` |
-| **Quality** | Excellent -- purpose-built for AI agents, returns clean structured results |
-| **Setup complexity** | Very low -- just need API key from tavily.com |
-| **OpenClaw compatible** | Yes -- Node.js, runs via npx or remote URL |
-| **Verdict** | STRONG PICK. 1,000/month is enough for moderate agent use. Best result quality in free tier. |
+| **Free tier** | 1,000 API credits/month, no credit card required (verified May 2026) |
+| **MCP package** | `tavily-mcp` (npm) - 1,993 stars, well-maintained |
+| **Install** | `npx -y tavily-mcp@latest` or remote URL: `https://mcp.tavily.com/mcp/?tavilyApiKey=YOUR_KEY` (OAuth support added) |
+| **Tools** | `tavily-search`, `tavily-extract`, `tavily-map`, `tavily-crawl` (updated May 2026) |
+| **Quality** | Excellent -- AI-native semantic search, structured results for RAG pipelines |
+| **Setup complexity** | Very low -- single API key from tavily.com |
+| **OpenClaw compatible** | Yes -- Node.js, Claude Code, Cursor integration |
+| **Status May 2026** | Most popular free alternative post-Brave. 1,000 credits = ~30-50 complex searches |
+| **Verdict** | STRONGEST PICK. Best free option for agents. Quality + volume balance unmatched. |
 
 Sources:
 - [Tavily pricing](https://www.tavily.com/pricing)
@@ -54,16 +65,17 @@ Sources:
 
 | Detail | Value |
 |--------|-------|
-| **Free tier** | 100% free forever -- self-hosted, no API keys, no limits |
-| **MCP package** | `mcp-searxng` (npm) -- also on Docker Hub as `isokoliuk/mcp-searxng` |
-| **Install** | `npx -y mcp-searxng` or `docker pull isokoliuk/mcp-searxng:latest` |
-| **SearXNG Docker** | `docker run -d --name searxng -p 32768:8080 searxng/searxng` |
-| **Tools** | `searxng_web_search` (with pagination, time filter, language, safe search), `web_url_read` (content extraction to markdown) |
-| **Quality** | Good -- aggregates 70+ search engines (Google, Bing, DuckDuckGo, etc.) |
-| **Setup complexity** | Medium -- need to run SearXNG Docker container + MCP server |
-| **RAM usage** | ~150-250MB for SearXNG container |
-| **OpenClaw compatible** | Yes -- both are Docker containers, can run on same VPS |
-| **Verdict** | BEST for unlimited free searches. Trade-off: uses RAM on your $5 VPS. |
+| **Free tier** | 100% free forever -- fully self-hosted, no API keys, no limits |
+| **MCP package** | `mcp-searxng` (npm, maintained) -- Docker: `isokoliuk/mcp-searxng:latest` |
+| **Install** | `npx -y mcp-searxng` or Docker via `janhq/searxng-docker-for-mcp` compose |
+| **SearXNG Engine** | `docker run -d -p 32768:8080 searxng/searxng` (official image) |
+| **Tools** | `searxng_web_search` (pagination, time filter, language, safe search), `web_url_read` (markdown extraction) |
+| **Quality** | Good to excellent -- 70+ aggregated engines (Google, Bing, DDG, DuckDuckGo + others) |
+| **Setup complexity** | Medium -- Docker container + MCP server, but one-time setup |
+| **RAM usage** | ~150-250MB for SearXNG + ~50MB for MCP = ~300MB total |
+| **VPS viability** | Yes -- fits on $5 Hetzner / Hostinger box with OpenClaw / Paperclip |
+| **Reliability** | Excellent for 2026 -- actively maintained, community-supported |
+| **Verdict** | BEST for unlimited free searches if you own VPS. Zero recurring cost. Scales to 1000s/day. |
 
 Docker Compose for both SearXNG + MCP:
 ```yaml

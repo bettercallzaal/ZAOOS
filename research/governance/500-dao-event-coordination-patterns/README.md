@@ -1,22 +1,16 @@
 ---
-title: DAO Event Coordination Patterns - Real-World Mechanics
-date: 2026-04-24
-status: published
-contributors:
-  - Claude Agent (research)
-  - Zaal (context, ZAOstock planning)
-tags:
-  - governance
-  - event-ops
-  - DAO-tooling
-  - coordination
-  - non-hierarchical
-  - web3-native
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: "497, 498, 499, 501, 502"
+tier: STANDARD
+original-query: "Map DAO event coordination patterns (FWB, Nouns, Devconnect, Loomio) to ZAOstock 18-person team (reconstructed)"
 ---
 
-# DAO Event Coordination Patterns - Real-World Mechanics
+# 500 — DAO Event Coordination Patterns - Real-World Mechanics
 
-Research into how decentralized communities coordinate large events flat teams, funded via DAOs. ZAOstock focus 18-person team, Sept-Oct festival prep timeline, music + community + tech-literate audience.
+> **Goal:** Document proven patterns for non-hierarchical event coordination in DAOs (250+ FWB events, Nouns grants, Devconnect 14K attendees) and recommend tools for ZAOstock Sept-Oct push
 
 ## Key Decisions
 
@@ -238,23 +232,15 @@ Possibly, but narrow fit:
 
 ## Sources
 
-1. Nouns DAO - Discourse on Event Coordination + Builder docs on DAO ops: https://discourse.nouns.wtf/t/discussion-proposal-to-decentralize-and-delegate-treasury-management-execution-for-nouns-dao/5440
+- [Nouns DAO Discourse - Event Coordination](https://discourse.nouns.wtf/t/discussion-proposal-to-decentralize-and-delegate-treasury-management-execution-for-nouns-dao/5440) [PARTIAL] — Prop House competitive grants pattern, "Events Residency" model documented. Verified 2026-05-20.
+- [ETHDenver / SporkDAO - Patronage Model](https://www.dlnews.com/research/internal/ethdenver-returns-for-its-ninth-edition-driving-web3s-global-agenda-for-2026/) [PARTIAL] — Community profit-share model. Verified 2026-05-20.
+- [Devconnect Argentina 2025 - Decentralized Event Week](https://blog.ethereum.org/2025/03/05/devconnect-2025) and [devconnect.org](https://www.devconnect.org/) [FULL] — 14K+ attendees, 40+ independent deep-dive events, 500+ side events, 200+ volunteers. Zupass-gated Telegram, shared calendar, Discussion Corners pattern verified 2026-05-20.
+- [FWB Event Keys Program](https://wiki.fwb.help/Get-Involved) and [FWB About](https://www.fwb.help/about) [FULL] — 250+ global local events, budget-tier autonomy ($500-2K per event), POAP accountability verified 2026-05-20.
+- [Coordinape Docs](https://docs.coordinape.com/) and [Protocol GitHub](https://github.com/coordinape/coordinape-protocol) [FULL] — Peer-gifting mechanics, Fibonacci scoring (L1-L6), wallet requirement confirmed. Viable for 5-20 person circles.
+- [Loomio - Consent Decision-Making](https://help.loomio.com/en/guides/consent_process/) [FULL] — 48h silent window, objection surfacing, non-blockchain verified 2026-05-20.
+- [Metagov Projects](https://metagov.org/projects) and [Deliberative Tools](https://metagov.org/delib-tools) [FULL] — Deliberative arc (Evaluating -> Proposing -> Deciding -> Actuating) verified. Decision cycle framework confirmed.
 
-2. ETHDenver / SporkDAO - Patronage model (community shares profits): https://www.dlnews.com/research/internal/ethdenver-returns-for-its-ninth-edition-driving-web3s-global-agenda-for-2026/
-
-3. Devconnect Argentina 2025 - Decentralized event week model: https://blog.ethereum.org/2025/03/05/devconnect-2025 + https://www.devconnect.org/
-
-4. FWB (Friends with Benefits) - Event Keys program (250+ events): https://wiki.fwb.help/Get-Involved + https://www.fwb.help/about
-
-5. Coordinape - Peer-gifting for DAOs (docs + GitHub protocol): https://docs.coordinape.com/ + https://github.com/coordinape/coordinape-protocol
-
-6. Loomio - Consent decision-making: https://help.loomio.com/en/guides/consent_process/
-
-7. SpaghettETH / ETHTurin - Small-team model: LinkedIn profile (Matteo Tambussi), GitHub (spaghetteth org), Substack on ETHTurin
-
-8. Metagov - Deliberative tools + governance arc: https://metagov.org/projects + https://metagov.org/delib-tools
-
-9. Reddit (r/daos, r/ethdev) - DAO event coordination discussions (linked above)
+**Additional:** SpaghettETH / ETHTurin flat-org pattern (<10 people, consensus-based, GitHub + HackMD + Airtable) documented from public sources. DAO event coordination discussions (r/daos, r/ethdev) reviewed 2026-05-20.
 
 ---
 

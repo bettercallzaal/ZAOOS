@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-21
 related-docs: 660, 661, 662, 663
 tier: STANDARD
 parent-doc: 663

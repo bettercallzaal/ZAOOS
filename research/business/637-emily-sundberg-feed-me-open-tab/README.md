@@ -2,7 +2,8 @@
 topic: business
 type: guide
 status: research-complete
-last-validated: 2026-05-11
+last-validated: 2026-05-21
+original-query: "What operator playbook can we extract from Emily Sundberg's Feed Me for ZAO newsletter and community monetization? (reconstructed)"
 related-docs: [322, 324, 429]
 tier: QUICK
 source: inbox-forward-2026-05-11

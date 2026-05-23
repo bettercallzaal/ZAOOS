@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Extract actionable patterns from Hilary Gridley's "How I AI" framework and apply them to ZAO OS daily workflows—narration, observation, habit formation (reconstructed)
+tier: STANDARD
+---
+
 # 276 — HowiAI: Gridley's AI Habit Workflows for Daily Operations
 
 > **Status:** Research complete

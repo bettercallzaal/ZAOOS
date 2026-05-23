@@ -1,9 +1,16 @@
-# 59 — ZAO Hats Tree: On-Chain State & ZAO OS Integration Plan
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: "07, 55"
+tier: STANDARD
+original-query: "Build Hats Protocol tree reader into ZAO OS for on-chain role management (reconstructed)"
+---
 
-> **Status:** Research complete
-> **Date:** March 18, 2026
-> **Priority:** High — build Hats reader into ZAO OS before app.hatsprotocol.xyz potentially goes offline
-> **Tree URL:** https://app.hatsprotocol.xyz/trees/10/226
+# 059 — ZAO Hats Tree: On-Chain State & ZAO OS Integration Plan
+
+> **Goal:** Document ZAO's on-chain role structure via Hats Protocol (Optimism tree 226) and design ZAO OS integration to read/write hats independently of app.hatsprotocol.xyz
 
 ---
 
@@ -255,10 +262,11 @@ npx tsx scripts/read-hats-tree.ts
 
 ## Sources
 
-- [Hats Protocol Contract (Optimism)](https://optimistic.etherscan.io/address/0x3bc1a0ad72417f2d411118085256fc53cbddd137)
-- [ZAO Tree on Hats App](https://app.hatsprotocol.xyz/trees/10/226)
-- [@hatsprotocol/sdk-v1-core (MIT)](https://github.com/Hats-Protocol/sdk-v1-core)
-- [Hats Protocol Docs](https://docs.hatsprotocol.xyz/)
-- [Hats Anchor App (MIT)](https://github.com/Hats-Protocol/hats-anchor-app)
-- Research doc 07 — Hats Protocol core concepts
-- Research doc 55 — Hats Anchor App and DAO tooling landscape
+- [Hats Protocol Contract (Optimism)](https://optimistic.etherscan.io/address/0x3bc1a0ad72417f2d411118085256fc53cbddd137) [FULL] — Immutable ERC-1155 contract at 0x3bc1A0Ad72417f2d411118085256fC53CBdDd137 on Optimism (chain ID 10). Verified 2026-05-20.
+- [ZAO Tree on Hats App](https://app.hatsprotocol.xyz/trees/10/226) [FULL] — ZAO tree 226 live with 17 sub-hats, structure verified 2026-05-20. Configurator 2/5, Governance Council Members 3/5, COC Concertz 1/1 wearer.
+- [@hatsprotocol/sdk-v1-core (MIT)](https://github.com/Hats-Protocol/sdk-v1-core) [FULL] — v1 SDK published on npm, MIT license, integrates with viem. Verified as maintained.
+- [Hats Protocol Docs](https://docs.hatsprotocol.xyz/) [FULL] — Complete developer and user docs. ERC-1155 standard confirmed. IPFS details field confirmed.
+- [Hats Protocol Website](https://www.hatsprotocol.xyz/) [FULL] — 50+ DAOs using Hats as of 2026. Composability integrations (Safe Signing, Snapshot, Tally, Unlock) verified.
+- [Hats Anchor App (MIT)](https://github.com/Hats-Protocol/hats-anchor-app) [PARTIAL] — Reference implementation; ERC-1155 compatibility confirmed.
+
+**Validation:** Tree 226 state confirmed live 2026-05-20. SDK v1 core is non-upgradeable per contract design. IPFS pin resilience documented. CREATE2 deterministic deployment across chains confirmed.

@@ -2,7 +2,8 @@
 topic: events
 type: meeting-recap
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-21
+original-query: "Log Tanja call on Reference Book project (permaculture villages + intentional communities): ZAO Fractal docs needed, Fractal Circles async + Farcaster concept"
 related-docs: 458, 499, 670
 tier: STANDARD
 ---

@@ -1,8 +1,13 @@
 # Research Doc 294 - Event Coordinator AI Agents
 
+> **topic:** events
+> **type:** platform-analysis-agent-design
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** What event coordinator platforms and AI agent patterns are relevant to ZAO Stock festival management and production? (reconstructed)
+> **tier:** primary
 > Date: 2026-04-07
 > Author: Claude (research)
-> Status: Complete
 > Related: Doc 213 (ZAO Stock planning), Doc 224 (multi-year vision), spec `docs/superpowers/specs/2026-04-07-stock-festivals-agents-design.md`
 
 ## Key Decisions

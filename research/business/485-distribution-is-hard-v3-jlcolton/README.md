@@ -1,6 +1,14 @@
+---
+topic: business
+type: playbook
+status: research-complete
+last-validated: 2026-05-21
+original-query: Extract the operating principles from jlcolton V3 rewrite and translate into distribution playbook for ZAO OS ZAO Music BCZ Strategies and portal bot fleet (reconstructed)
+tier: STANDARD
+---
+
 # 485 — Distribution Is Hard V3 (jlcolton) — GTM Field Guide for Builders
 
-> **Status:** Research complete
 > **Date:** 2026-04-23
 > **Goal:** Extract the operating principles from jlcolton's V3 rewrite and translate them into a distribution playbook for ZAO OS, ZAO Music, BCZ Strategies, and the portal bot fleet.
 

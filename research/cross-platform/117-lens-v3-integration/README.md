@@ -1,3 +1,13 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Evaluate Lens V3 integration for cross-posting from ZAO OS and assess wallet-based auth requirements (reconstructed)
+tier: STANDARD
+related-docs: 96
+---
+
 # 117 — Lens V3 Integration (Consolidated)
 
 > **Status:** Research complete — BLOCKED (no server-side posting)
@@ -230,10 +240,10 @@ Lens V3 requires a wallet signature to authenticate. Period. There is no server 
 
 ## Sources
 
-- [Lens Authentication Docs](https://lens.xyz/docs/protocol/authentication)
-- [Lens TypeScript SDK](https://lens.xyz/docs/protocol/getting-started/typescript)
-- [Lens Create a Post](https://lens.xyz/docs/protocol/feeds/post)
-- [Lens GraphQL API](https://lens.xyz/docs/protocol/getting-started/graphql)
+- [Lens GraphQL API](https://lens.xyz/docs/protocol/getting-started/graphql) [FULL] — Free tier + optional Server API Key for higher rate limits, rate limits not explicitly published
+- [@lens-protocol/client v2.3.2 on npm](https://lens-protocol.github.io/lens-sdk/modules/_lens_protocol_client.html) [FULL] — Official TypeScript SDK current, works with production + development environments
+- [Lens Authentication Docs](https://lens.xyz/docs/protocol/authentication) [PARTIAL]
+- [Lens Create a Post](https://lens.xyz/docs/protocol/feeds/post) [PARTIAL]
 - [Lens SDK GitHub](https://github.com/lens-protocol/lens-sdk)
 - [Lens Sponsored Transactions](https://www.lens.xyz/docs/best-practices/gasless/sponsored-transactions)
 - [Lens V3 GitHub](https://github.com/lens-protocol/lens-v3)

@@ -1,6 +1,11 @@
 # 270 — ZAO Stock: Planning & Knowledge Base
 
-> **Status:** Planning / Research
+> **topic:** events
+> **type:** event-planning-reference
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** What is the comprehensive planning, vision, and knowledge base for ZAOstock (Maine music festival Oct 2026)? (reconstructed)
+> **tier:** primary
 > **Date:** March 29, 2026
 > **Tags:** `#zao-stock` `#festival` `#irl-events` `#music` `#maine` `#community`
 > **Supersedes:** Doc 051 (whitepaper ZAO Stock section)

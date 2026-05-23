@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-05-17
+last-validated: 2026-05-21
+original-query: Comprehensive 8-dimension audit of ZAO OS V1 monorepo against stated rules - surface what has drifted what is dead what is ready to graduate (reconstructed)
 related-docs: 154, 459, 547, 601, 650, 655, 660
 tier: DISPATCH
 ---
@@ -13,18 +14,18 @@ tier: DISPATCH
 
 ## Top 10 Findings (Cross-Doc Consensus)
 
-| # | Finding | Severity | Cited by | Action |
+| # | Finding | Severity | Status as of 2026-05-21 | Change |
 |---|---|---|---|---|
-| 1 | **FISHBOWLZ code still active in 5 places** despite being killed 2026-05-04 | P0 | 661a, 661c, 661d, 661h | DELETE all `fishbowlz/` paths in one PR |
-| 2 | **CLAUDE.md numbers are stale on every count** (routes 301→324, components 279→294, research 540+→729) | P0 | 661c, 661d, 661f | Patch CLAUDE.md headline section + remove "540+ research docs" claim |
-| 3 | **ZAOstock graduation deadline passed** (2026-04-29) but code still in monorepo | P0 | 661f, 661h | Set new explicit date + ship the spinout per BCZ YapZ pattern (PR #480) |
-| 4 | **84 npm vulnerabilities** (4 Critical, 26 High) in top-level package.json | P0 | 661g | Triage Critical/High; the 1 fixable now is `ws` via `@ardrive/turbo-sdk` v1.13 (breaking) |
-| 5 | **122 inline style violations across 63 components** (forbidden per .claude/rules/components.md) | P1 | 661d | Sweep music/ + calls/ first (highest concentration), then global lint rule |
-| 6 | **8/17 root files in `bot/src/` are ZAOstock-specific** (actions, capture, zsfb, circles, onepagers, status, schedule, digest) | P1 | 661b | Move to `bot/src/teams/` before ZAOstock graduates so the spinout is clean |
-| 7 | **`duodo-snap/` + `nouns-snap/` are nested git repos** committed as cruft | P1 | 661e | Delete + .gitignore the snap pattern |
-| 8 | **Magnetiq + AttaBotty bots added 2026-05-11 without doc** (per "no new bots without doc" CLAUDE.md rule) | P1 | 661a | Write retroactive numbered doc OR remove. Don't leave undocumented. |
-| 9 | **Turbo monorepo is misconfigured** (`apps/` near-empty, scripts don't parallelize) | P2 | 661g | Either commit to turbo workspace or remove turbo:* scripts |
-| 10 | **5 components > 600 LoC** (UsersTable 834, MusicSidebar 802, chat Sidebar 730, ComposeBar 662, DiscordLinkManager 649) | P2 | 661d | Refactor + tests during respective surface graduation prep |
+| 1 | **FISHBOWLZ code still active** despite being killed 2026-05-04 | P0 | CONFIRMED: `src/app/fishbowlz/` still present | NO CHANGE |
+| 2 | **CLAUDE.md numbers are stale** | P0 | CONFIRMED WORSE: routes 301->311, components 279->293, research 540+->789 | STALE +WORSE |
+| 3 | **ZAOstock graduation deadline passed** (2026-04-29) but code still in monorepo | P0 | CONFIRMED: Bot code still live in `bot/src/` | NO CHANGE |
+| 4 | **npm vulnerabilities** in top-level package.json | P0 | VERIFIED: multiple high-severity vulns present | CONFIRMED |
+| 5 | **Inline style violations** across components (forbidden per rules) | P1 | NOT RE-VERIFIED in this pass | DEFERRED |
+| 6 | **8/17 root files in `bot/src/` are ZAOstock-specific** | P1 | CONFIRMED: `capture.ts`, `actions.ts`, `schedule.ts` present | NO CHANGE |
+| 7 | **`duodo-snap/` + `nouns-snap/` are nested git repos** committed as cruft | P1 | CONFIRMED: both still present in repo root | NO CHANGE |
+| 8 | **Magnetiq + AttaBotty bots added without doc** | P1 | NOT RE-VERIFIED in this pass | DEFERRED |
+| 9 | **Turbo monorepo misconfigured** | P2 | NOT RE-VERIFIED in this pass | DEFERRED |
+| 10 | **5 components > 600 LoC** | P2 | NOT RE-VERIFIED in this pass | DEFERRED |
 
 ## The 8 Sub-Docs
 

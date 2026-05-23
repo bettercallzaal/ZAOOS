@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Map all existing projects, identify reusable code and patterns for ZAO OS (reconstructed)
+tier: primary
+---
+
 # 30 — bettercallzaal GitHub Projects Inventory
 
 > **Status:** Research complete

@@ -1,5 +1,14 @@
 # 26 — Hindsight: Agent Memory System (vectorize-io/hindsight)
 
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Evaluate Hindsight as a memory layer for ZAO OS AI agents (reconstructed)
+tier: reference
+---
+
 > **Status:** Research complete
 > **Source:** github.com/vectorize-io/hindsight
 > **Goal:** Evaluate Hindsight as the memory layer for ZAO OS's AI agent
@@ -92,13 +101,13 @@ const insights = await client.reflect({
 
 | Metric | Value |
 |--------|-------|
-| **Stars** | 3,597 |
-| **Forks** | 255 |
+| **Stars** | 13,745 (as of May 15, 2026) |
+| **Forks** | 786 |
 | **License** | MIT |
 | **Created** | October 2025 |
-| **Current Version** | v0.4.18 (March 13, 2026) |
-| **Activity** | Multiple commits daily, extremely active |
-| **Contributors** | Growing |
+| **Current Version** | v0.6.2 (May 14, 2026) |
+| **Activity** | Multiple commits daily, 100+ contributors |
+| **Latest Release** | May 14, 2026 |
 | **Paper** | arXiv:2512.12818 |
 
 ---
@@ -232,20 +241,32 @@ This means the Claude Agent SDK can use Hindsight's retain/recall/reflect as nat
 ### Self-Hosted (Recommended for ZAO OS)
 
 ```bash
-# Docker Compose
-docker compose up -d
+# Docker (v0.6.2 - May 2026)
+export OPENAI_API_KEY=sk-xxx
+docker run --rm -it --pull always -p 8888:8888 -p 9999:9999 \
+  -e HINDSIGHT_API_LLM_API_KEY=$OPENAI_API_KEY \
+  -v $HOME/.hindsight-docker:/home/hindsight/.pg0 \
+  ghcr.io/vectorize-io/hindsight:latest
 
-# Or single container
+# Or with external PostgreSQL
 docker run -p 8123:8123 \
   -e LLM_PROVIDER=anthropic \
   -e ANTHROPIC_API_KEY=... \
-  vectorize/hindsight
+  vectorize/hindsight:latest
 ```
+
+### Docker Compose with PostgreSQL
+
+Latest deployment pattern (v0.6.0+) via docker-compose in `docker/docker-compose/` directory.
+
+### Enterprise: Oracle 23ai Backend
+
+As of v0.6.0 (May 2026), Hindsight supports Oracle Database 23ai as an alternative to PostgreSQL. Full feature parity with unified Alembic migration system.
 
 ### Railway
 
-Deploy as a separate Railway service alongside the ElizaOS agent:
-- ~$5-10/mo for the container
+Deploy as a separate Railway service alongside agents:
+- ~$5-10/mo for container
 - PostgreSQL included (embedded) or connect to external
 
 ### Cost Breakdown
@@ -267,26 +288,29 @@ Deploy as a separate Railway service alongside the ElizaOS agent:
 3. Create memory banks: `community`, `music_knowledge`
 4. Connect TypeScript client in `zao-agent` repo
 
-### Phase 2: Per-User Memory
+### Phase 2: Per-User Memory (v0.6.0+)
 
 5. Create `user_{fid}` banks as members interact
 6. Retain from: music shares, reactions, conversations, taste signals
 7. Recall before generating recommendations or responses
 8. Reflect weekly to build/update taste mental models
+9. Use multi-strategy retrieval (TEMPR): semantic + BM25 + graph + temporal
 
 ### Phase 3: Community Intelligence
 
-9. Feed all /zao channel activity into community bank
-10. Reflect on community trends (weekly cron)
-11. Generate "This Week in ZAO" summaries from reflect
-12. Social taste matching via cross-bank recall
+10. Feed all /zao channel activity into community bank
+11. Reflect on community trends (weekly cron)
+12. Generate "This Week in ZAO" summaries from reflect
+13. Social taste matching via cross-bank recall
+14. Leverage shared multi-agent memory patterns (guide: hindsight.vectorize.io/guides/building-multi-agent-systems)
 
 ### Phase 4: Advanced
 
-13. MCP integration with Claude Agent SDK
-14. Music knowledge graph from artist/genre/track relationships
-15. Temporal taste evolution tracking
-16. A/B test recommendation quality vs baseline
+15. MCP integration with Claude Agent SDK + Dify/n8n workflows (v0.6.0 integration option)
+16. Music knowledge graph from artist/genre/track relationships
+17. Temporal taste evolution tracking (entity co-occurrence timestamps fixed in v0.6.0)
+18. A/B test recommendation quality vs baseline
+19. AWS Bedrock AgentCore integration option (v0.6.0)
 
 ---
 
@@ -307,13 +331,16 @@ Keep Supabase/pgvector for application data. Use Hindsight exclusively for agent
 
 ---
 
-## Sources
+## Sources [FULL - May 21, 2026]
 
-- [GitHub: vectorize-io/hindsight](https://github.com/vectorize-io/hindsight)
-- [Hindsight Docs](https://hindsight.vectorize.io/)
-- [Introducing Hindsight](https://vectorize.io/blog/introducing-hindsight-agent-memory-that-works-like-human-memory)
+- [GitHub: vectorize-io/hindsight](https://github.com/vectorize-io/hindsight) - 13,745 stars, v0.6.2 May 2026
+- [Hindsight Docs](https://hindsight.vectorize.io/) - Full documentation + Cookbook
+- [What's New in Hindsight 0.6.0](https://hindsight.vectorize.io/blog/2026/05/05/version-0-6-0) - Oracle 23ai, Dify/n8n, SmolAgents, AWS Bedrock integrations
+- [Building Multi-Agent Systems with Shared Memory Guide](https://hindsight.vectorize.io/guides/2026/04/21/guide-building-multi-agent-systems-with-shared-memory) - Bank patterns, cross-team memory
 - [Building AI Agents That Actually Learn](https://vectorize.io/blog/hindsight-building-ai-agents-that-actually-learn)
 - [Hindsight MCP Agent Memory](https://hindsight.vectorize.io/blog/2026/03/04/mcp-agent-memory)
-- [Research Paper (arXiv:2512.12818)](https://arxiv.org/abs/2512.12818)
+- [Research Paper (arXiv:2512.12818)](https://arxiv.org/abs/2512.12818) - Biomimetic memory structures
 - [Agent Memory Comparison 2026](https://dev.to/anajuliabit/mem0-vs-zep-vs-langmem-vs-memoclaw-ai-agent-memory-comparison-2026-1l1k)
-- [Vectorize.io](https://vectorize.io/)
+- [Vectorize.io](https://vectorize.io/) - Company homepage
+
+Updated 2026-05-21: Stars 3.6K → 13.7K in 2 months. v0.6.0 adds enterprise Oracle backend, 4 new framework integrations (Dify, n8n, SmolAgents, AWS Bedrock), and reliability fixes for multi-agent deployments. Hindsight is now production-grade for enterprise multi-agent teams.

@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Establish a backend testbench for verifying AI-written API routes (reconstructed)
+tier: primary
+---
+
 # 66 — Backend Testing Strategy for ZAO OS
 
 > **Status:** Research complete

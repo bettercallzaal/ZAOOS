@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Zero dollar music production stack, free open-source tools Mac, lyric writing to distribution, ACE-Step Demucs RVC (reconstructed)"
+related-docs: 324, 328, 329, 330, 336
+tier: STANDARD
+---
+
 # 329 - The $0 Music Production Stack: Idea to Distributed Song (April 2026)
 
 > **Status:** Research complete

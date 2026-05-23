@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Catalog all reusable code, patterns, and components from Zaal's sibling projects that can be integrated into ZAO OS V1 (reconstructed)
+tier: primary
+---
+
 # 157 — Cross-Project Asset Audit: Reusable Code from Sibling ZAO Projects
 
 > **Status:** Research complete

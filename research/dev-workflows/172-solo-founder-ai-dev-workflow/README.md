@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Document ZAO OS as a case study in solo-founder AI development, analyze the workflow, compare to industry patterns, and produce a publishable article (reconstructed)
+tier: STANDARD
+---
+
 # 169 — Solo Founder AI-Powered Development: The ZAO OS Case Study
 
 > **Status:** Research complete

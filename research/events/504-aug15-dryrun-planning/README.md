@@ -2,14 +2,15 @@
 topic: events
 type: planning
 tier: STANDARD
-status: draft
-last-validated: 2026-04-24
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Plan Aug 15 team dry-run mini-festival: test 6-circle governance, operational muscle, tech stack; identify 10 pass/fail criteria before Oct 3"
 related-docs: 502, 499, 213, 224, 232, 363
 date-published: 2026-04-24
-length: 550
+superseded-by: "Oct 3 2026 ZAOstock (real event; Aug 15 was proposed dry-run, superseded by ZAOstock schedule)"
 ---
 
-# 504 - ZAOstock Aug 15 2026 Mini-Festival Dry Run
+# 504 - ZAOstock Aug 15 2026 Mini-Festival Dry Run [ARCHIVE]
 
 > **Goal:** De-risk Oct 3 full festival by running a 4-hour scaled-down version with all 19 team members. Test circles governance, operational muscle, and tech stack under real conditions.
 

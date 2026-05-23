@@ -1,7 +1,12 @@
 # 435 - ZOE Effectiveness v2: Proactive, Context-Aware, Safe Playbook
 
-> **Status:** Research + ranked build list
+> **Status:** Research complete
+> **Topic:** agents
+> **Type:** Feature & Design
 > **Date:** 2026-04-18
+> **Last-Validated:** 2026-05-21
+> **Original-Query:** What are the highest-impact ZOE upgrades to ship next? Rank by effort/impact and dependency. (reconstructed)
+> **Tier:** v2-ready
 > **Goal:** Rank every proposed ZOE upgrade against Zaal's daily flow, ship-today vs ship-this-week vs skip. Build list top 3 with exact VPS code. Companion to doc 245 (prior ZOE upgrade), doc 305 (pocket assistant), doc 434 (Telegram commands), doc 433 (portal todos).
 
 ---

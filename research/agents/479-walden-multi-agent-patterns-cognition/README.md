@@ -1,3 +1,12 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Walden Yan multi-agent patterns, single-writer parallel-reader topology, code review loop, Smart Friend cross-frontier routing, ZAO agent squad architecture (reconstructed)"
+tier: STANDARD
+---
+
 # 479 — Walden Yan (Cognition) — What's Actually Working in Multi-Agent Systems
 
 > **Status:** Research complete

@@ -1,10 +1,18 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: []
+original-query: "Can ZOUNZ treasury use Claude API + Polymarket for trading revenue? What's the strategy and risk? (reconstructed)"
+tier: STANDARD
+---
+
 # 244 — Polymarket Trading as ZOUNZ Treasury Revenue: Claude API + Open-Source Toolkit
 
 > **Status:** Research complete
 > **Date:** April 1, 2026
 > **Goal:** Evaluate using Polymarket prediction market trading (Claude API + open-source tools) as a revenue engine for the ZOUNZ DAO treasury
-
----
 
 ## Key Decisions / Recommendations
 
@@ -24,8 +32,9 @@
 
 ### The Numbers
 
-- Polymarket: **$10.15B volume in March 2026** (27.8% MoM growth)
-- Prediction markets total: **$21B monthly volume** across all platforms
+- Polymarket: **$23.7B volume in March 2026** (peak $478M single-day on Mar 1 Iran strikes, 27.8% MoM growth earlier)
+- Prediction markets total: **$23.7B monthly volume** across all platforms (March 2026, up from $1.2B early 2025)
+- Daily unique wallets: **840,000** (February 2026)
 - 87% of wallets lose money — but the **top 0.1% extracted $3.7B**
 - The edge isn't insider info or luck — it's **mathematical discipline + automation**
 - Geopolitical/world events markets = **0% taker fees** (Polymarket subsidizes these)
@@ -51,13 +60,13 @@
 
 ## Polymarket Fee Structure (Critical for Profitability)
 
-| Market Category | Taker Fee | Maker Rebate | ZOUNZ Strategy |
-|----------------|-----------|-------------|----------------|
-| **Geopolitics / World Events** | **0%** | N/A | **PRIMARY TARGET** — zero-fee markets where Claude's reasoning shines |
-| Economics, Culture, Weather | 5% | 25% rebate | Secondary — only if EV > 10% |
-| Finance, Politics, Tech | 4% | 25% rebate | Selective — high-conviction only |
-| Sports | 3% | 25% rebate | SKIP — Claude has no edge over sports models |
-| Crypto | 7.2% | 20% rebate | SKIP — too competitive, high fees |
+| Market Category | Taker Fee | Peak Rate | Maker Rebate | ZOUNZ Strategy |
+|----------------|-----------|----------|-------------|----------------|
+| **Geopolitics / World Events** | **0%** | 0% | N/A | **PRIMARY TARGET** — zero-fee markets where Claude's reasoning shines |
+| Crypto | 7% | 1.80% | 20% rebate | SKIP — too competitive, high fees |
+| Sports | 3% | 0.75% | 25% rebate | SKIP — Claude has no edge over sports models |
+| Finance, Politics, Tech | 4% | 1.00% | 25% rebate | Selective — high-conviction only |
+| Economics, Culture, Weather | 5% | 1.25-1.50% | 25% rebate | Secondary — only if EV > 10% |
 
 **Fee formula:** `fee = shares × feeRate × price × (1 - price)`
 

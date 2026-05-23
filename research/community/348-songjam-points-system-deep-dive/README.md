@@ -1,8 +1,12 @@
-# 348 -- SongJam Points System Deep Dive: Scoring, Multipliers & ZABAL Oracle Integration
+# 348 - SongJam Points System Deep Dive: Scoring, Multipliers & ZABAL Oracle Integration
 
-> **Status:** Research complete
+> **topic:** community
+> **type:** research-mechanics
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** Understand how SongJam's leaderboard scoring works and how to use it as an oracle input for ZABAL rewards (reconstructed)
+> **tier:** medium
 > **Date:** April 11, 2026
-> **Goal:** Understand how SongJam's leaderboard scoring works -- points types, multiplier formulas, data we can read, and how to use it as an oracle input for ZABAL rewards
 
 ---
 

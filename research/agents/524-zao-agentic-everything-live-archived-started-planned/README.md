@@ -2,7 +2,8 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-04-25
+last-validated: 2026-05-21
+original-query: create master index of every agent/bot/orchestrator across all ZAO systems (reconstructed)
 related-docs: 90, 200, 234, 239, 247, 256, 288, 325, 346, 354, 415, 432, 461, 467, 471, 473, 484, 488, 489, 491, 496, 506, 507, 508, 523
 tier: DISPATCH
 ---

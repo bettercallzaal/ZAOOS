@@ -1,3 +1,12 @@
+---
+topic: events
+type: expansion-strategy
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Document FarmDrop 3-region statewide expansion proposals (Downeast, Southern Maine, Aroostook), Aug 6 Sam Lardner event, and generate BCZ Maine follow-up todos"
+tier: STANDARD
+---
+
 # 458 — FarmDrop Statewide Expansion + Sam Lardner & Barcelona Collab + Maine Follow-Up Todos
 
 > **Status:** Source extraction complete — ready for portal todo bulk-add + content production
@@ -168,19 +177,16 @@ Paste this entire block into `portal.zaoos.com/todos` Bulk Add (one todo per lin
 [P3] [#maine] Schedule Maine work session retrospective at end of week to review interview + Cameron + Stephen outcomes
 ```
 
-## Sources
+## Sources [FULL]
 
 - FarmDrop statewide expansion deck (3 options + appendix, transcribed by user 2026-04-20)
-- Proposal 1: Downeast / Healthy Acadia / Washington County
-- Proposal 2: Southern Maine / Portland Public Schools / Kendall Foundation
-- Proposal 3: Aroostook / ACAP / MSAD #1
+- [Aroostook farm-to-table mission - BDN Nov 2025](https://www.bangordailynews.com/2025/11/21/aroostook/aroostook-health/aroostook-farm-to-table-mission-joam40zk0w/) [FULL] - Roxanne Bruce, Northern Maine FarmDrop operations, school partnerships confirmed, ACAP partnership
+- [Hannah Semler LinkedIn - CEO FarmDrop](https://www.linkedin.com/in/hannah-semler-wholecrops/) [FULL] - 115 farmers, 1500+ customers, $800K cumulative sales, 4-region network, 2024 data
+- [FarmDrop News & Media](https://farmdrop.us/news-and-events/) [PARTIAL] - Expansion news, Bucksport, Aroostook, Southern Maine initiatives
 - Sam Lardner & Barcelona FarmDrop Stories video (Google Drive asset): https://drive.google.com/file/d/1VWsejwBl3kL9C_ozDIaKoCrWHJ1ADeVk/view
 - Maine food security stats: gsfb.org, mdf.org, maine.gov, mcspolicycenter.umaine.edu, tramutofoundation.com (referenced inline in source)
 - USDA Census of Agriculture 2022: nass.usda.gov
-- New England Food Vision Prize: kendall.org/our-work/food-vision-prize/
-- [FarmDrop Food for Health Report](https://farmdrop.us/ffh-report/)
-- [Hannah Semler ReFED Speaker Profile](https://summit.refed.org/speakers/2022/hannah-semler/)
-- [FarmDrop Hannah Semler LinkedIn](https://www.linkedin.com/in/hannah-semler-wholecrops/)
+- [ReFED 2026 Summit: Hannah Semler](https://summit.refed.org/speakers/2024/hannah-semler/) [FULL] - Bio, background, Nogales work, Betsy Fink Fellowship 2018-present
 
 ## Related docs
 

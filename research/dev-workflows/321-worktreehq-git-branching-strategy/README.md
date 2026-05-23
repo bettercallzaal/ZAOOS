@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** 2026-04-11
 > **Goal:** Evaluate WorktreeHQ and git worktree workflows for managing parallel Claude Code sessions in ZAO OS
+> **Original-Query:** Should ZAO OS adopt git worktrees and WorktreeHQ for better branch hygiene and parallel session isolation? (reconstructed)
 
 ## Key Decisions / Recommendations
 

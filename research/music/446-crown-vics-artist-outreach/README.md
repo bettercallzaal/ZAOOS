@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Crown Vics artist outreach ZAO Stock Oct 3 performance Livepeer broadcast (reconstructed)"
+related-docs: 224, 274, 363, 419, 270
+tier: STANDARD
+---
+
 # Doc 446: Crown Vics Artist Outreach - ZAO Stock Oct 3 Music Programming
 
 **Created:** 2026-04-20

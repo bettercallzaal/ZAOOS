@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
+original-query: Audit 46 global + 27 project ZAO skills for broken triggers, dupes, missing SKILL.md, and plan promote/retire/refactor (reconstructed - counts updated from 33+23)
 related-docs: 548, 549, 549e, 551, 553
 tier: STANDARD
 ---
@@ -11,12 +12,12 @@ tier: STANDARD
 
 > **Goal:** Audit the 33 global + 23 project ZAO-specific skills for: broken triggers, dupes across global+project, missing SKILL.md, descriptions that won't auto-trigger. Plan promote/retire/refactor. Drop Lazer's `audit-skill` (Doc 548) into the global library for ongoing use.
 
-## Inventory (verified 2026-04-29)
+## Inventory (verified 2026-05-21)
 
 | Surface | Count | Where |
 |---|---|---|
-| Global ZAO-related skills | 33 | `~/.claude/skills/` |
-| Project ZAO-specific skills | 23 | `/Users/zaalpanthaki/Documents/ZAO OS V1/.claude/skills/` |
+| Global ZAO-related skills | 46 | `~/.claude/skills/` - GROWTH: +13 skills (+39%) since 2026-04-29 audit |
+| Project ZAO-specific skills | 27 | `/Users/zaalpanthaki/Documents/ZAO OS V1/.claude/skills/` - GROWTH: +4 skills (+17%) since audit |
 | Plugin/upstream skills | 200+ | ECC + obra/superpowers + claude-api + caveman + connect-apps + oh-my-mermaid (managed by plugin system, NOT in scope of this audit) |
 | **Global skill folders without `SKILL.md` or `skill.md`** | **1** | `~/.claude/skills/learned/` is an empty folder |
 | **Skills duplicated in BOTH global + project** | **3** | `autoresearch`, `socials`, `zao-research` |

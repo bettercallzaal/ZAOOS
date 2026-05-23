@@ -2,7 +2,8 @@
 topic: events
 type: meeting-transcript
 status: research-complete
-last-validated: 2026-05-04
+last-validated: 2026-05-21
+original-query: "Capture Discord coworking call with Ram (Songchain, Zambia), Z + Rev (COC Concertz, UK), Zaal (host): WaveWarZ Africa, cross-continent collab signals"
 related-docs: 423, 364, 274
 tier: QUICK
 ---

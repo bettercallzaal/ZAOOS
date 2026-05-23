@@ -2,7 +2,7 @@
 topic: agents
 type: market-research
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-21
 related-docs: 541, 523, 527, 547
 tier: STANDARD
 parent: 668

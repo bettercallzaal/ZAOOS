@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 15, 2026
 > **Goal:** Extract actionable patterns from CREAO's AI-first engineering rebuild for ZAO OS solo-dev workflow
+> **Original-Query:** What engineering patterns from CREAO's AI-first rebuild (harness engineering, self-healing loops, monorepo legibility) apply to ZAO OS? (reconstructed)
 
 ---
 

@@ -1,10 +1,18 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Define YouTube description structure, SEO strategy, and AI transcript-to-description workflow for COC Concertz multi-artist shows (reconstructed)
+tier: STANDARD
+related-docs: 353
+---
+
 # 351 — YouTube Description SEO & Transcript-to-Description Workflow for COC Concertz
 
 > **Status:** Research complete
 > **Date:** April 13, 2026
 > **Goal:** Define the optimal YouTube description structure, SEO strategy, timestamp/chapter formatting, and AI workflow for converting live concert transcripts into ready-to-paste YouTube descriptions for COC Concertz multi-artist shows
-
----
 
 ## Key Decisions / Recommendations
 
@@ -166,11 +174,10 @@ The newsletter builder at `/newsletter` could be extended with a "YouTube Descri
 
 This would be a new template in `src/components/newsletter/TemplateSelector.tsx` — the infrastructure is already built.
 
-## Sources
+## Sources [PARTIAL] — Re-validated 2026-05-21
 
-- [VidIQ: YouTube Description Best Practices 2026](https://vidiq.com/blog/post/youtube-video-descriptions/)
-- [12AM Agency: YouTube Video Descriptions for SEO 2026](https://12amagency.com/blog/how-to-write-youtube-video-descriptions-for-seo/)
-- [BananaThumbnail: YouTube SEO 2026 Timestamps](https://blog.bananathumbnail.com/youtube-seo-2026/)
-- [Influencer Marketing Hub: YouTube Chapters & Key Moments](https://influencermarketinghub.com/youtube-chapters-key-moments/)
-- [TypeCount: YouTube Character Limits 2026](https://typecount.com/blog/youtube-description-character-limit)
-- [Humble&Brag: YouTube Chapters Guide 2026](https://humbleandbrag.com/blog/youtube-chapters)
+- [YouTube Data API Quota](https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits) [FULL] — 10,000 units/day default quota, search=100 units, video upload=100 units, list/read=1 unit
+- [YouTube Data API Getting Started](https://developers.google.com/youtube/v3/getting-started) [FULL] — Quota confirmed current, compliance audit required for increases beyond default
+- [VidIQ: YouTube Description Best Practices 2026](https://vidiq.com/blog/post/youtube-video-descriptions/) [PARTIAL]
+- [12AM Agency: YouTube Video Descriptions for SEO 2026](https://12amagency.com/blog/how-to-write-youtube-video-descriptions-for-seo/) [PARTIAL]
+- [Influencer Marketing Hub: YouTube Chapters & Key Moments](https://influencermarketinghub.com/youtube-chapters-key-moments/) [PARTIAL]

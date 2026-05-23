@@ -1,3 +1,12 @@
+---
+topic: music
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "How to use the ElevenLabs Music API for programmatic music generation with composition plans and inpainting?"
+tier: production
+---
+
 # Doc 320 - ElevenLabs Music API Deep Dive (2026)
 
 **Created:** 2026-04-11

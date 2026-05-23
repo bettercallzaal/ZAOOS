@@ -1,58 +1,82 @@
-# 295 - Farcaster Snaps
+---
+topic: farcaster
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: 250, 260, 500, 505
+original-query: What are Farcaster Snaps, how do they work, and how can ZAO OS integrate them? (reconstructed)
+tier: STANDARD
+---
 
-**Date:** 2026-04-07
-**Status:** Complete
-**Category:** Technical / Integration
+# 295 - Farcaster Snaps (v2.0, April 2026)
 
 ## Key Decisions
 
-1. **Snaps are the successor to Frames v1** - server-driven JSON apps embedded in casts, no client-side code execution. They are NOT a replacement for Mini Apps - they complement them (lightweight in-feed vs full-screen app).
-2. **Very new (beta, March 27 2026)** - the `farcasterxyz/snap` repo was created March 27, 2026. Already at 300 commits and 56 releases as of April 7. Moving fast, spec may change.
-3. **ZAO OS should build Snaps** - they are perfect for in-feed music interactions (vote on songs, view now playing, quick Respect tips, governance polls). Snaps can also bridge to ZAO OS Mini App via the `open_mini_app` action.
-4. **Built by the Farcaster team (now Neynar)** - official protocol feature at `farcasterxyz/snap`, docs at `docs.farcaster.xyz/snap`.
-5. **Hono + TypeScript stack** - uses the Hono framework with `@farcaster/snap-hono` package. Deploys to any HTTP host (Vercel works).
+| # | Decision | Why |
+|---|---|---|
+| 1 | Snaps launched March 27, 2026 as successor to Frames v1 | Server-driven JSON UI in feed. No client-side code execution. Complements (not replaces) Mini Apps. |
+| 2 | Spec now v2.0 (April 8 2026); structural validation + height limits enforced | v1 = legacy (no validation); v2 = 64 max elements, 500px default height, version-aware validation. |
+| 3 | 117+ npm releases by May 2026; @farcaster/snap@2.0.3 stable | Spec moving fast but npm packages are stable. Template defaults to v1.0 for compatibility. |
+| 4 | Dual SDK support: @farcaster/snap (v2.0.3) + @farcaster/snap-hono (v1.4.8) both stable | Hono middleware handles JFS verification. Can deploy anywhere (Vercel, self-hosted, Node). |
+| 5 | ZAO OS should prioritize Snaps for in-feed music + governance interactions | Music voting, Respect tips, polls, artist spotlights fit Snap lightweight model. |
 
-## Summary
+## Overview
 
-Farcaster Snaps are lightweight, interactive apps embedded directly in Farcaster casts. They render in the feed as cards and respond to user input (buttons, sliders, text inputs, toggles) without executing any code on the client. A snap server returns JSON; the Farcaster client displays it.
+Farcaster Snaps are lightweight, interactive apps embedded directly in Farcaster casts. They render in-feed as cards and respond to user input without executing client-side code. A Snap server returns JSON; the Farcaster client renders it.
 
-Think of them as "Frames v1 done right" - server-driven like Frames v1, but with 16 rich UI components, multi-page flows, persistent state, theming, and native wallet/token actions.
+Think "Frames v1 done right": server-driven like Frames v1, but with 16+ rich UI components (v2.0), multi-page flows, persistent KV state, theming, and native wallet/token actions (view_token, send_token, swap_token as of Apr 23 2026).
 
-## What Are Snaps?
+**Repository:** [farcasterxyz/snap](https://github.com/farcasterxyz/snap) (12 stars, 117+ releases, TypeScript 70%, actively maintained by Farcaster/Neynar team)
 
-### Core Architecture
+**Spec Status:** Beta, but stable. v1.0 (legacy) and v2.0 (current) both supported with version-aware validation.
+
+## Findings
+
+### Architecture
 
 ```
-User sees cast with snap embed
-       |
-       v
-Client GETs snap URL (Accept: application/vnd.farcaster.snap+json)
-       |
-       v
-Server returns SnapResponse JSON
-       |
-       v
-Client renders UI tree (16 component types)
-       |
-       v
-User interacts with fields (input, slider, switch, toggle_group)
-       |
-       v
-User taps button -> Client POSTs signed JFS payload to target URL
-       |
-       v
-Server returns new SnapResponse -> Client renders next page
+User sees cast with snap embed -> Client GETs snap URL (Accept: application/vnd.farcaster.snap+json)
+  |
+  v
+Server returns SnapResponse JSON (JFS-signed POST requests)
+  |
+  v
+Client renders UI tree (16 component types in v2.0, max 64 elements, 500px default height)
+  |
+  v
+User interacts (buttons, sliders, toggles, inputs)
+  |
+  v
+Client POSTs signed JFS payload to server with FID + field values
+  |
+  v
+Server returns next SnapResponse -> Client re-renders
 ```
 
-### Key Properties
+### Key Properties (v2.0 validated)
 
-- **No client-side code** - server returns JSON, client renders it. No JS execution in the embed.
-- **Multi-page flows** - each `submit` action returns a new page. Navigation is server-driven (no client back button).
-- **Authenticated** - POST requests use JSON Farcaster Signatures (JFS) containing the user's FID.
-- **Content negotiation** - same URL can serve snap JSON or HTML based on `Accept` header. Websites can add snap support alongside existing pages.
-- **Persistent state** - key-value store available on every handler invocation.
-- **Theming** - accent colors from a named palette (not hex values).
-- **Graceful degradation** - if snap fails, cast displays normally with URL as plain text.
+| Property | Details |
+|----------|---------|
+| **No client code** | Server returns JSON, client renders. No JS execution in embed. |
+| **Multi-page flows** | Each submit action returns a new page; server controls navigation. |
+| **Authentication** | POST requests use JSON Farcaster Signatures (JFS) with user FID + timestamp. |
+| **Content negotiation** | Same URL serves snap JSON or HTML based on Accept header. |
+| **Persistent state** | Key-value store available per Snap on every handler invocation. |
+| **Theming** | 9 named accent colors (gray, blue, red, amber, green, teal, purple, pink, special). No custom hex. |
+| **Validation (v2.0)** | MAX_ELEMENTS=64, MAX_ROOT_CHILDREN=7, MAX_CHILDREN=6, MAX_DEPTH=4, MAX_HEIGHT=500px. |
+| **Graceful degradation** | If Snap fails, cast displays normally with URL as plain text. |
+
+### Components (16 total in v2.0)
+
+| Display (7) | Container (2) | Data (3) | Field (4) |
+|---|---|---|---|
+| badge, button, icon, image, item, progress, separator, text | item_group, stack | bar_chart, cell_grid | input, slider, switch, toggle_group |
+
+### Actions (9 available)
+
+| Primary | Navigation | Composer | Wallet |
+|---|---|---|---|
+| submit | open_url, open_mini_app, view_cast, view_profile | compose_cast | view_token, send_token, swap_token |
 
 ## Snaps vs Mini Apps vs Frames v1
 
@@ -71,30 +95,61 @@ Server returns new SnapResponse -> Client renders next page
 
 **Key insight:** Snaps and Mini Apps are complementary. Snaps live in the feed for quick interactions. Mini Apps open full-screen for complex workflows. Snaps can launch Mini Apps via the `open_mini_app` action.
 
-## Technical Spec
+## Implementation
 
-### Response Structure
+### v1.0 vs v2.0
+
+| Aspect | v1.0 (legacy) | v2.0 (current, Apr 8 2026) |
+|--------|---|---|
+| **Spec** | Original March 27 2026 launch | Structural validation + versioning support |
+| **Validation** | None | MAX_ELEMENTS=64, MAX_DEPTH=4, height limits |
+| **Height limit** | Unlimited | 500px default, 700px with `showOverflowWarning` |
+| **Template default** | Now points to v1.0 for compat | v2.0 available with explicit opt-in |
+| **Breaking changes** | None | Spec versioning allows opt-in validation |
+
+**Decision:** Use v2.0 for new ZAO Snaps (safer, validated). Template is v1.0 by default for compatibility with existing Snap builders.
+
+### Quick Stack
+
+| Layer | Technology |
+|---|---|
+| **Language** | TypeScript |
+| **Framework** | Hono (lightweight web framework) |
+| **Core packages** | @farcaster/snap v2.0.3, @farcaster/snap-hono v1.4.8 |
+| **Validation** | JFS (JSON Farcaster Signatures) built-in |
+| **Testing** | Emulator at farcaster.xyz (emulates JFS signing) |
+| **Deployment** | Any HTTP host (Vercel, self-hosted, Node) |
+
+### Example: Governance Poll Snap (v2.0)
 
 ```json
 {
-  "version": "1.0",
+  "version": "2.0",
   "theme": { "accent": "purple" },
-  "effects": ["confetti"],
   "ui": {
     "root": "page",
     "elements": {
       "page": {
         "type": "stack",
-        "props": {},
-        "children": ["header", "guess", "submit"]
+        "props": { "gap": 16 },
+        "children": ["title", "chart", "vote", "submit"]
       },
-      "header": {
+      "title": {
         "type": "item",
-        "props": { "title": "Daily Wordle", "description": "Attempt 3 of 6" }
+        "props": { "title": "Propose governance reform", "description": "Vote opens 48h" }
       },
-      "guess": {
-        "type": "input",
-        "props": { "name": "word", "label": "Your guess", "maxLength": 5 }
+      "chart": {
+        "type": "bar_chart",
+        "props": {
+          "data": [
+            { "label": "Yes", "value": 342, "color": "green" },
+            { "label": "No", "value": 156, "color": "red" }
+          ]
+        }
+      },
+      "vote": {
+        "type": "toggle_group",
+        "props": { "name": "choice", "options": ["Yes", "No", "Abstain"] }
       },
       "submit": {
         "type": "button",
@@ -102,7 +157,7 @@ Server returns new SnapResponse -> Client renders next page
         "on": {
           "press": {
             "action": "submit",
-            "params": { "target": "https://wordle.example.com/guess" }
+            "params": { "target": "https://zao.os/api/snap/poll/123/vote" }
           }
         }
       }
@@ -111,190 +166,89 @@ Server returns new SnapResponse -> Client renders next page
 }
 ```
 
-### 16 UI Components
+### POST Payload (signed with JFS)
 
-| # | Component | Category | Description |
-|---|-----------|----------|-------------|
-| 1 | `badge` | Display | Inline label with color and icon |
-| 2 | `button` | Display | Action button with variants and icon |
-| 3 | `icon` | Display | Standalone icon from curated set |
-| 4 | `image` | Display | HTTPS image with aspect ratio |
-| 5 | `item` | Display | Content row with actions slot |
-| 6 | `item_group` | Container | Groups items into a styled list |
-| 7 | `progress` | Display | Horizontal progress bar |
-| 8 | `separator` | Display | Visual divider |
-| 9 | `stack` | Container | Vertical or horizontal layout |
-| 10 | `text` | Display | Text block with size and weight |
-| 11 | `bar_chart` | Data | Horizontal bar chart with labeled bars |
-| 12 | `cell_grid` | Data | Colored cell grid, optionally interactive |
-| 13 | `input` | Field | Text or number input |
-| 14 | `slider` | Field | Numeric range slider |
-| 15 | `switch` | Field | Boolean toggle |
-| 16 | `toggle_group` | Field | Single or multi-select choice group |
+```json
+{
+  "fid": 12345,
+  "inputs": { "choice": "Yes" },
+  "button_index": 0,
+  "timestamp": 1714003200
+}
+```
 
-### 9 Action Types
-
-| # | Action | Description |
-|---|--------|-------------|
-| 1 | `submit` | POST to server, get next page (primary interaction) |
-| 2 | `open_url` | Open URL in browser |
-| 3 | `open_mini_app` | Launch a Mini App (bridge to full app!) |
-| 4 | `view_cast` | Navigate to a cast by hash |
-| 5 | `view_profile` | Navigate to a profile by FID |
-| 6 | `compose_cast` | Open cast composer with pre-filled content |
-| 7 | `view_token` | View token in wallet (CAIP-19) |
-| 8 | `send_token` | Open send token flow |
-| 9 | `swap_token` | Open swap token flow |
-
-### POST Payload (on submit)
-
-JFS-signed envelope containing:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `fid` | number | Farcaster user ID |
-| `inputs` | Record<string, value> | Field values keyed by component `name` |
-| `button_index` | number | Button index (0-based) |
-| `timestamp` | number | Unix timestamp in seconds |
+Server verifies JFS signature (contains fid + message hash), then processes vote.
 
 ### Content Negotiation
 
-The snap media type is `application/vnd.farcaster.snap+json`. A single URL can serve both snap JSON and HTML:
+Same URL can serve Snap or HTML:
 
-- Client sends `Accept: application/vnd.farcaster.snap+json` -> server returns snap JSON
+- Farcaster client sends `Accept: application/vnd.farcaster.snap+json` -> server returns snap JSON
 - Browser sends normal request -> server returns HTML
 
-This means ZAO OS pages could serve snap versions alongside existing web pages.
+ZAO OS pages can serve both (e.g., `/api/snap/poll/[id]/route.ts` detects Accept header).
 
-## How to Build a Snap
+## ZAO OS Opportunities
 
-### Stack
+| Priority | Snap | Why | Components | Next |
+|---|---|---|---|---|
+| **HIGH** | Now Playing | Display current radio track in feed; bridge to mini app | image, item, badge, button (open_mini_app) | Connect to `/api/now-playing` |
+| **HIGH** | Governance Poll | Community vote directly in feed; results live via bar_chart | item, bar_chart, toggle_group, button (submit) | Connect to `/api/governance/polls/[id]` |
+| **MEDIUM** | Respect Tip | Quick tip widget; slider for amount | item, slider, button (submit) | Integrate with Supabase respect ledger |
+| **MEDIUM** | Artist Spotlight | Highlight member; link to profile | item, badge, button (view_profile) | Pull from community roster |
+| **FUTURE** | WaveWarZ Battle | Music voting in feed | item, bar_chart, toggle_group | Integrate when WaveWarZ is live |
 
-- **Language:** TypeScript
-- **Framework:** Hono (via `@farcaster/snap-hono`)
-- **Core package:** `@farcaster/snap` (schemas, validation, JFS verification)
-- **Testing:** Emulator at `farcaster.xyz` (enter snap URL, auto-signs messages)
-- **Deployment:** Any HTTP host (Vercel recommended)
+## Building a Snap (Quick Path)
 
-### Quick Start
-
+### Setup
 ```bash
-# Copy the template from farcasterxyz/snap/template/
-pnpm install
-# Edit src/index.ts
-pnpm dev          # localhost:3003
-# Test at farcaster.xyz emulator
+# Clone template from farcasterxyz/snap/template/
+git clone https://github.com/farcasterxyz/snap.git
+cd snap/template && pnpm install && pnpm dev
+# Opens at localhost:3003
 ```
 
-### AI-Assisted Generation
+### Testing
+- Paste your localhost URL into emulator at farcaster.xyz
+- Emulator auto-signs payloads (no real private key needed)
+- Full JFS signing available in-app
 
-The docs include a SKILL.md file at `docs.farcaster.xyz/snap/SKILL.md` that Claude Code can use:
+### Deployment
+- Any HTTP host (Vercel, self-hosted, Node)
+- Same codebase works everywhere
+- Content negotiation (Accept header) allows dual HTML + JSON serving
 
-```
-use https://docs.farcaster.xyz/snap/SKILL.md to build me an app that [description]
-```
+### AI-Assisted Build
+See [docs.farcaster.xyz/snap/SKILL.md](https://docs.farcaster.xyz/snap/SKILL.md) for Claude Code agent build prompts.
 
-## ZAO OS Integration Opportunities
+## ZAO Integration Checklist
 
-### 1. Now Playing Snap (HIGH PRIORITY)
-
-A snap that shows what's currently playing on ZAO Radio in the feed:
-
-- Display: artist name, track title, album art, listener count
-- Actions: `open_mini_app` to launch ZAO OS player, `compose_cast` to share
-- Components: `image`, `item`, `badge` (live indicator), `button`
-
-### 2. Quick Respect Tip Snap
-
-Let members tip Respect to artists directly in the feed:
-
-- Display: artist info, current Respect score
-- Input: `slider` for tip amount
-- Actions: `submit` to process tip, `view_profile` to see artist
-
-### 3. Governance Poll Snap
-
-Embed community proposals as interactive snaps:
-
-- Display: proposal text, current vote counts (`bar_chart`)
-- Input: `toggle_group` for vote options
-- Actions: `submit` to cast vote
-- Effects: `confetti` on successful vote
-
-### 4. Song of the Day Snap
-
-Daily featured track with voting:
-
-- Display: track info, `progress` bar for votes
-- Input: `toggle_group` (thumbs up/down)
-- Actions: `submit` vote, `open_mini_app` to listen
-
-### 5. Member Spotlight Snap
-
-Highlight community members:
-
-- Display: member info, `badge` for role, Respect score
-- Actions: `view_profile`, `compose_cast` to welcome
-
-### 6. WaveWarZ Battle Snap
-
-Music battles in the feed:
-
-- Display: two tracks side by side, `bar_chart` for votes
-- Input: `toggle_group` to pick winner
-- Actions: `submit` vote, `open_mini_app` for full battle
-
-## Implementation Plan
-
-### Phase 1: Infrastructure (1 day)
-
-1. Add `@farcaster/snap` and `@farcaster/snap-hono` to ZAO OS
-2. Create `/api/snap/` route structure
-3. Set up JFS verification using existing Farcaster auth
-
-### Phase 2: First Snap - Now Playing (1-2 days)
-
-1. Build `/api/snap/now-playing/route.ts`
-2. Serve snap JSON via content negotiation
-3. Connect to existing radio/player state
-4. Test with emulator
-
-### Phase 3: Governance Poll Snap (1-2 days)
-
-1. Build `/api/snap/poll/[id]/route.ts`
-2. Connect to existing proposal system
-3. Handle vote submission with JFS auth
-
-### Phase 4: Content Negotiation on Existing Pages (1 day)
-
-1. Add snap responses to existing ZAO OS pages
-2. When a ZAO OS link is shared in a cast, it renders as an interactive snap
-3. Snap buttons bridge to the full Mini App
-
-## ZAO OS File Paths
-
-| What | Path |
-|------|------|
-| Existing Mini App research | `research/farcaster/173-farcaster-miniapps-integration/` |
-| Existing Mini App docs research | `research/farcaster/250-farcaster-miniapps-llms-txt-2026/` |
-| Neynar acquisition context | `research/farcaster/260-neynar-acquires-farcaster/` |
-| Farcaster ecosystem overview | `research/farcaster/073-farcaster-ecosystem-2026-update/` |
-| Music player provider | `src/providers/audio/PlayerProvider.tsx` |
-| Now playing hook | `src/hooks/useNowPlaying.ts` |
-| Governance proposals | `src/components/governance/` |
-| Community config | `community.config.ts` |
-| Existing API routes | `src/app/api/` |
-| Farcaster auth/neynar | `src/lib/farcaster/neynar.ts` |
-| Respect/curation | `src/lib/music/curationWeight.ts` |
+| Phase | Task | Status |
+|---|---|---|
+| **Phase 1** | Add @farcaster/snap + @farcaster/snap-hono to ZAO OS | TO DO |
+| **Phase 1** | Create `/api/snap/` route structure with JFS verification | TO DO |
+| **Phase 2** | Build Now Playing Snap | TO DO |
+| **Phase 2** | Connect Snap to existing radio state | TO DO |
+| **Phase 2** | Test with emulator | TO DO |
+| **Phase 3** | Build Governance Poll Snap | TO DO |
+| **Phase 3** | Add content negotiation to existing ZAO OS pages | TO DO |
+| **Phase 4** | Ship first Snap to production | TO DO |
 
 ## Sources
 
-- [Farcaster Snaps Documentation](https://docs.farcaster.xyz/snap)
-- [farcasterxyz/snap GitHub Repository](https://github.com/farcasterxyz/snap) (created March 27, 2026; 300 commits, 56 releases as of April 7, 2026)
-- [Farcaster Snap Spec Overview](https://docs.farcaster.xyz/snap/spec-overview)
-- [Farcaster Snap Elements Reference](https://docs.farcaster.xyz/snap/elements)
-- [Farcaster Snap Actions Reference](https://docs.farcaster.xyz/snap/actions)
-- [Farcaster Snap Building Guide](https://docs.farcaster.xyz/snap/building)
-- [Neynar Acquires Farcaster (Jan 2026)](https://neynar.com/blog/neynar-is-acquiring-farcaster)
-- [Farcaster Mini Apps Specification](https://miniapps.farcaster.xyz/docs/specification)
-- Original cast: `https://farcaster.xyz/farcaster/0x94ede65c`
+- [Farcaster Snaps GitHub (farcasterxyz/snap)](https://github.com/farcasterxyz/snap) [FULL - 117+ releases, stable]
+- [Farcaster Snaps Documentation](https://docs.farcaster.xyz/snap) [FULL - v2.0 spec]
+- [Snaps v2.0 structural constraints (PR #95, Apr 8 2026)](https://github.com/farcasterxyz/snap/pull/95) [FULL - validation details]
+- [Snap v2.1.1 (released Apr 23 2026)](https://registry.npmjs.org/@farcaster/snap) [FULL - latest npm release]
+- [Snap Hono middleware (v1.4.8)](https://www.npmjs.com/package/@farcaster/snap-hono) [FULL - JFS handler]
+- [Neynar acquires Farcaster (Jan 21 2026)](https://neynar.com/blog/neynar-is-acquiring-farcaster) [FULL - context]
+- [Farcaster Mini Apps SDK](https://miniapps.farcaster.xyz/docs/specification) [FULL - for open_mini_app action]
+
+## Next Actions
+
+| Action | Owner | Type | By When |
+|---|---|---|---|
+| Add @farcaster/snap v2.0.3 to ZAO OS dependencies | Claude | Code | 2026-05-25 |
+| Build Now Playing Snap prototype at /api/snap/now-playing | Claude | Code | 2026-05-27 |
+| Test Snap with Farcaster emulator | Claude | QA | 2026-05-27 |
+| Review Snaps documentation for v2.0 changes (height limits, validation) | Zaal | Review | 2026-05-25 |

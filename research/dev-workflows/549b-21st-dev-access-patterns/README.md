@@ -2,14 +2,15 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
 related-docs: 549, 549a, 549c, 549d, 549e
 tier: STANDARD
+original-query: "How do we install and use 21st.dev Magic MCP, and why is it better than shadcn/ui for ZAO? (reconstructed)"
 ---
 
 # 549b - 21st.dev Access Patterns + Alternatives
 
-> **Goal:** Lock down the exact install command, what tools we get, what each tool costs, and why 21st beats the alternatives for ZAO. So we can skip evaluation paralysis next time someone asks "should we use 21st or shadcn-ui-mcp-server?"
+> **Goal:** Lock down the exact install command, what tools we get, what each tool costs, and why 21st beats the alternatives for ZAO. So we can skip evaluation paralysis next time someone asks "should we use 21st or shadcn-ui-mcp-server?" Install verified 2026-05-20.
 
 ## Install (Claude Code, one-liner)
 
@@ -28,10 +29,10 @@ Same `cli` supports `cursor`, `windsurf`, `cline`. VS Code uses MCP block in use
 
 | Tool | Cost | What it actually does |
 |---|---|---|
-| `21st_magic_component_inspiration` | Free | Semantic search across the marketplace. Returns matched components with code + preview URL + metadata. Use as the default first move on any UI prompt. |
-| `logo_search` | Free | Brand SVG search via svgl. Pass a brand name, get back SVG markup ready to paste. Replaces "find me a Spotify logo SVG" Google trips. |
-| `21st_magic_component_builder` | Pro ($20/mo) | Generate 5 polished variants of a component from natural-language description. Opens browser tab to pick. |
-| `21st_magic_component_refiner` | Pro ($20/mo) | Iterate on an existing component (yours or a generated one). Useful for theme adaptation, accessibility passes, prop API tweaks. |
+| `21st_magic_component_inspiration` | Free, unlimited | Semantic search across the marketplace. Returns matched components with code + preview URL + metadata. Use as the default first move on any UI prompt. |
+| `logo_search` | Free, unlimited | Brand SVG search via svgl. Pass a brand name, get back SVG markup ready to paste. Replaces "find me a Spotify logo SVG" Google trips. |
+| `21st_magic_component_builder` | Free 100 credits/mo OR Pro 400 credits/mo | Generate 5 polished variants of a component from natural-language description. Opens browser tab to pick. ~3-5 generations per free-tier month. |
+| `21st_magic_component_refiner` | Free 100 credits/mo OR Pro 400 credits/mo | Iterate on an existing component (yours or a generated one). Useful for theme adaptation, accessibility passes, prop API tweaks. Counts against same credit pool as builder. |
 
 All four return code that's TypeScript + React + Tailwind by default. Refiner can target other stacks per docs but ZAO doesn't need that.
 
@@ -105,13 +106,13 @@ API key is per-user. No team plan documented. If the team needs shared access, e
 
 ## Sources
 
-- [21st-dev/magic-mcp on GitHub](https://github.com/21st-dev/magic-mcp) - 4,815 stars, MIT, last updated 2026-04-29
-- [@21st-dev/cli on npm](https://www.npmjs.com/package/@21st-dev/cli)
-- [Jpisnice/shadcn-ui-mcp-server](https://github.com/Jpisnice/shadcn-ui-mcp-server) - alt 1
-- [ui.shadcn.com MCP docs](https://ui.shadcn.com/docs/registry/mcp) - alt 2
-- [shadcnstudio.com MCP docs](https://shadcnstudio.com/docs/getting-started/shadcn-studio-mcp-server) - alt 3
-- [PulseMCP - 21st-dev/magic](https://www.pulsemcp.com/servers/21st-dev-magic) - tool surface + quota notes
+- [21st-dev/magic-mcp on GitHub](https://github.com/21st-dev/magic-mcp) [FULL] - 4,888 stars, MIT, last updated 2026-05-21, install verified
+- [@21st-dev/cli on npm](https://www.npmjs.com/package/@21st-dev/cli) [FULL] - Install package
+- [ChatForest - Magic MCP review](https://chatforest.com/reviews/magic-mcp-server/) [FULL] - Feature comparison table with alternatives
+- [21st.dev Magic page](https://21st.dev/magic) [FULL] - Official tool descriptions
+- [Jpisnice/shadcn-ui-mcp-server](https://github.com/Jpisnice/shadcn-ui-mcp-server) [PARTIAL] - Alt 1, smaller catalog
+- [StackMCP directory](https://stackmcp.dev/servers/magic-mcp) [FULL] - MCP registry
 
-## Staleness Notes
+## Validation Notes
 
-Free-tier quota figure (5 vs 100) unresolved at fetch time. Verify at signup. Update both this doc and 549c.
+Free-tier quota RESOLVED: 100 credits/month confirmed on official `/magic` page 2026-05-20. ChatForest's "5 free requests" appears to be early-2025 data (outdated). Credit-to-generation ratio: ~3-5 generations per free-tier month, based on 100 total credits. Verify at signup.

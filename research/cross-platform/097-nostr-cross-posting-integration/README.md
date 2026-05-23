@@ -1,11 +1,19 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Add Nostr as a cross-posting target with music status broadcasting and Wavlake integration for ZAO OS (reconstructed)
+tier: STANDARD
+related-docs: 28, 77, 96
+---
+
 # 97 — Nostr Cross-Posting Integration for ZAO OS
 
 > **Status:** Research complete
 > **Date:** March 20, 2026
 > **Goal:** Add Nostr as a cross-posting target — post ZAO content to the Nostr network, enable music status broadcasting, and connect with the Wavlake music ecosystem
 > **Builds on:** Doc 28 (Cross-Platform Publishing), Doc 77 (Bluesky Integration), Doc 96 (Cross-Post API Deep Dive)
-
----
 
 ## Executive Summary
 
@@ -471,8 +479,11 @@ ZAO OS already has a complete Bluesky cross-posting implementation that serves a
 
 ## Sources
 
-- [nostr-tools GitHub](https://github.com/nbd-wtf/nostr-tools) — SDK documentation and code examples
-- [NIP-38 User Statuses](https://nips.nostr.com/38) — Music status specification
+- [nostr-tools GitHub](https://github.com/nbd-wtf/nostr-tools) [PARTIAL] — Popular SDK, maintained
+- [@unicitylabs/nostr-js-sdk v0.4.1 on npm](https://registry.npmjs.org/@unicitylabs/nostr-js-sdk) [FULL] — TypeScript SDK Mar 20 2026, NIP-17/NIP-42/NIP-44 support, multi-relay
+- [basic-nostr v1.1.0 on PyPI](https://pypi.org/project/basic-nostr/) [FULL] — Python SDK Apr 18 2026, minimal library for keys/DMs/posts/products
+- [nostr-tools on npm](https://www.npmjs.com/package/nostr-tools) [PARTIAL] — Mature JS SDK
+- [NIP-38 User Statuses](https://nips.nostr.com/38) [PARTIAL] — Music status specification
 - [NIP-38 on GitHub](https://github.com/nostr-protocol/nips/blob/master/38.md) — Full spec text
 - [Wavlake NOM Spec](https://github.com/wavlake/nom-spec) — Nostr Open Media specification for music events
 - [Wavlake Documentation](https://docs.wavlake.com/) — Platform documentation

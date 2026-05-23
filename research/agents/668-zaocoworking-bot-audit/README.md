@@ -2,7 +2,8 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-21
+original-query: What are all the security, architecture, LLM safety, and ops issues in ZAOcoworkingBot after the v2.10-v2.12 emergency bug-fix cycle? (reconstructed)
 related-docs: 459, 547, 601, 650, 661, 662, 665, 668
 tier: DISPATCH
 ---

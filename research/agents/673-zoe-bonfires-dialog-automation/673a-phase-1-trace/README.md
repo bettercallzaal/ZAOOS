@@ -2,7 +2,7 @@
 topic: agents
 type: guide
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-21
 related-docs: 650, 665, 668, 669, 673
 tier: STANDARD
 parent-doc: 673

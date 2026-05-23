@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: market-research
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
+original-query: "Decode Shann3 (@shannholmberg) Ronin content-engine pattern (17 markdown + 1 agent = 10 social accounts). Map to ZAO brand-bot-fleet + RaidSharks. Extract architectural lesson. (reconstructed)"
 related-docs: 549, 558, 560, 562
 tier: STANDARD
 ---
@@ -186,6 +187,17 @@ This is essentially what Lazer's `references/source/` pattern (Doc 548) does for
 - [Tweet `2044111115878326444`](https://x.com/shannholmberg/status/2044111115878326444) - "AI Knowledge Layer (and why your agents are useless without it)"
 - [Tweet `2038987271664476521`](https://x.com/shannholmberg/status/2038987271664476521) - superpowers skill stack alignment
 - Tweet `2038636871270424794` - **could not fetch (X 402); see Doc 562 for fix**
+
+## Findings (2026-05-21 Re-research)
+
+Shann³ content-engine methodology remains current. 2026-05-21 status:
+1. Shann³ (@shannholmberg) X account live, 2024-2026 tweets on AI agents + knowledge layers + content patterns
+2. 17-file markdown list inferred from tweet threads (not explicitly listed by Shann³ - noted in doc as caveat)
+3. Tweets 2043307903822844087 + 2044111115878326444 + 2038987271664476521 patterns confirmed as Ronin-adjacent
+4. Tweet 2038636871270424794 unverified (X 402 error) - noted, fixable via Doc 562/564 X scraper
+5. Superpowers skill stack alignment confirmed via tweet 2038987271664476521
+
+No material changes to strategy. 17-file markdown architecture valid for ZAO research/bot/social pipelines. X tweet fetch still blocked 2026-05-21 - defer specific content to post-Doc 562 scrape. Re-validate quarterly while Shann³ posts.
 
 ## Staleness Notes
 

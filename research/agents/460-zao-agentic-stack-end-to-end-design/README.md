@@ -1,7 +1,12 @@
 ### 460 — ZAO Agentic Stack: End-to-End Design
 
 > **Status:** Research complete
+> **Topic:** agents
+> **Type:** Architecture & Design
 > **Date:** 2026-04-20
+> **Last-Validated:** 2026-05-21
+> **Original-Query:** How should all ZAO agents (ZOE, VAULT/BANKER/DEALER, OpenClaw, etc.) integrate across all machines? Dispatch hierarchy and source-of-truth. (reconstructed)
+> **Tier:** v2-ready
 > **Goal:** Map every agent across every ZAO machine, define dispatch hierarchy + source-of-truth + handoff flows, identify top 5 gaps + top 3 duplications, ship a week/month/quarter adoption plan.
 > **Builds on:** docs 234, 236, 412, 415, 422, 441, 442, 448, 459
 

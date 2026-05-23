@@ -1,3 +1,13 @@
+---
+topic: identity
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "NFT gallery display on member profiles using Alchemy NFT v3 API with chain/collection filtering and ZOUNZ highlighting (reconstructed)"
+tier: STANDARD
+related-docs: [135, 271]
+---
+
 # 203 — NFT Gallery on Member Profiles via Alchemy NFT API
 
 > **Status:** Implemented
@@ -8,9 +18,9 @@
 
 | Decision | Recommendation |
 |----------|----------------|
-| **NFT data source** | USE Alchemy NFT v3 API — already integrated for music NFTs in `src/app/api/music/wallet/route.ts`, free tier covers 300M compute units/month, supports ETH + Base + Optimism |
+| **NFT data source** | USE Alchemy NFT v3 API — already integrated for music NFTs in `src/app/api/music/wallet/route.ts`, free tier covers 30M compute units/month (6x discount for NFT API = 100-600 requests equiv), supports ETH + Base + Optimism + Polygon + Arbitrum + Worldchain + Avax + BNB + Gnosis + Zksync + Unichain + Blast |
 | **No new API keys** | SKIP Moralis, SimpleHash, etc. — Alchemy `ALCHEMY_API_KEY` is already in `.env` and working |
-| **Spam filtering** | USE Alchemy's built-in `excludeFilters[]=SPAM` parameter — removes known spam/airdrop NFTs automatically |
+| **Spam filtering** | USE Alchemy's built-in `excludeFilters[]=SPAM` parameter + `spamConfidenceLevel=VERY_HIGH` (free tier default) — removes known spam/airdrop NFTs. NOTE: Paid tiers only for Mainnet Base+Arbitrum+Optimism+Ethereum+Polygon+Worldchain+others; free tier limited. |
 | **ZOUNZ highlighting** | HIGHLIGHT NFTs from ZOUNZ contract `0xCB80Ef04DA68667c9a4450013BDD69269842c883` (Base chain) with gold border to make DAO membership visually prominent |
 | **Caching** | USE 5-minute server-side cache (`s-maxage=300`) — same pattern as existing music/wallet route |
 

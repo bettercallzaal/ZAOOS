@@ -2,14 +2,15 @@
 topic: farcaster
 type: audit
 status: research-complete
-last-validated: 2026-05-02
+last-validated: 2026-05-21
 related-docs: 173, 250, 295, 308, 591a, 591b, 591c, 591d, 591e
-tier: DISPATCH
+tier: STANDARD
+original-query: "Closing audit of ZAO OS Farcaster Mini App after May 2 fix sprint - SDK auth flows, iframe security, manifest, pitfalls, code audit. (reconstructed)"
 ---
 
 # 591 - Farcaster Mini App Production Audit (Hub)
 
-> **Goal:** Closing audit of ZAO OS's Farcaster Mini App after the May 2 fix sprint. Confirm the implementation is production-grade across SDK auth flows, iframe security, manifest correctness, common pitfalls, and our shipped code.
+> **Goal:** Production-ready audit of ZAO OS Farcaster Mini App implementation across 5 critical dimensions: SDK initialization (ready + context + auth flows), HTTP security headers (CSP frame-ancestors, SameSite=None), manifest correctness and domain binding, documented pitfalls (stuck splash, sign-in loops, cache horrors), and ZAO code audit (14 audited dimensions).
 
 ## TL;DR Recommendations
 

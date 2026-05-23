@@ -2,7 +2,8 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-04-28
+last-validated: 2026-05-21
+original-query: Decide whether The ZAO submits to BCard partner program + Black Flag Collective endowment after Zaal conversation with @links Al Mithani (reconstructed)
 related-docs: 222, 244, 432, 458
 tier: STANDARD
 ---
@@ -146,13 +147,13 @@ Don't touch any of these until partnership is confirmed by @links / partners@get
 
 ## Sources
 
-- [B Foundation](https://bfoundation.me/) — verified 2026-04-28
-- [Black Flag Collective](https://blackflagcollective.org/) — page shell only, content loads dynamically (verified 2026-04-28)
-- [BCard Support Center](https://support.getbcard.io/) — verified 2026-04-28
-- [BCard Partner Communities](https://support.getbcard.io/informational-articles/bcard-partner-communities) — verified 2026-04-28; 9 partners listed
-- [Just DAO It! interview with Al Mithani](https://justdaoit.transistor.fm/episodes/just-dao-it-dao-news-interview-with-al-mithani-from-bcard) — @links background
-- [Making Bank BanklessDAO podcast — BanklessCard launch](https://rss.com/podcasts/making-bankless-dao/1273308/) — Links + NFThinker interview
-- [Al Mithani LinkedIn](https://www.linkedin.com/in/almithani/) — Toronto, ON
-- [almithani.com](https://almithani.com/) — personal site
-- [Farcaster @links](https://farcaster.xyz/links) — verified handle (page shell)
-- [Farcaster /bcard channel](https://farcaster.xyz/~/channel/bcard) — verified URL (page shell)
+- [B Foundation](https://bfoundation.me/) [FULL - verified 2026-04-28, re-verified 2026-05-21]
+- [Black Flag Collective](https://blackflagcollective.org/) [PARTIAL - page shell only, content loads dynamically (verified 2026-04-28)]
+- [BCard Support Center](https://support.getbcard.io/) [FULL - verified 2026-04-28, re-verified 2026-05-21]
+- [BCard Partner Communities](https://support.getbcard.io/informational-articles/bcard-partner-communities) [FULL - verified 2026-04-28; 9 partners listed, re-verified 2026-05-21]
+- [Just DAO It! interview with Al Mithani](https://justdaoit.transistor.fm/episodes/just-dao-it-dao-news-interview-with-al-mithani-from-bcard) [@links background - PARTIAL]
+- [Making Bank BanklessDAO podcast — BanklessCard launch](https://rss.com/podcasts/making-bankless-dao/1273308/) [Links + NFThinker interview - PARTIAL]
+- [Al Mithani LinkedIn](https://www.linkedin.com/in/almithani/) [Toronto, ON - PARTIAL]
+- [almithani.com](https://almithani.com/) [personal site - PARTIAL]
+- [Farcaster @links](https://farcaster.xyz/links) [verified handle - PARTIAL]
+- [Farcaster /bcard channel](https://farcaster.xyz/~/channel/bcard) [verified URL - PARTIAL]

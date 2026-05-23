@@ -1,9 +1,12 @@
 # 229 — ZAO Member Profiles
 
-> **Status:** Living document
+> **topic:** community
+> **type:** research-profiles
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** Deep profiles of active ZAO community members for context in agent interactions and community planning (reconstructed)
+> **tier:** solid
 > **Date:** March 2026 (consolidated April 5, 2026)
-> **Goal:** Deep profiles of active ZAO community members for context in agent interactions and community planning
-> **Related:** Doc 50, Doc 101, Doc 215, Doc 224
 
 ---
 

@@ -1,3 +1,13 @@
+---
+topic: business
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+related-docs: []
+original-query: "How does Obsidian run 9 people and $25M ARR? What lessons apply to ZAO's small-team model? (reconstructed)"
+tier: STANDARD
+---
+
 # 263 — Obsidian's Lean Team Model: $350M Valuation, 9 Employees, 3 Engineers
 
 > **Status:** Research complete
@@ -18,17 +28,17 @@
 
 ## The Numbers That Matter
 
-| Metric | Obsidian | ZAO OS (current) | ZAO OS (target) |
+| Metric | Obsidian (May 2026) | ZAO OS (current) | ZAO OS (target) |
 |--------|----------|-------------------|-----------------|
-| **Engineers** | 3 (hiring 4th in Apr 2026) | 1 (Zaal + Claude Code) | 2-3 |
+| **Engineers** | 3 (+ 4th hired Apr 2026, 5th in pipeline) | 1 (Zaal + Claude Code) | 2-3 |
 | **Total team** | 9 employees | 1 founder | 3-5 |
-| **Users** | 1.5M monthly active | ~188 members (gated) | 1,000+ gated members |
-| **Revenue** | ~$25M ARR (estimated) | $0 (pre-revenue) | Sustainable via community treasury + premium |
-| **Valuation** | $300-350M (estimated) | N/A | N/A (community-owned) |
+| **Users** | 1.5M+ monthly active | ~188 members (gated) | 1,000+ gated members |
+| **Revenue** | **$25M ARR confirmed** (Apr 2026) | $0 (pre-revenue) | Sustainable via community treasury + premium |
+| **Valuation** | **$350M confirmed** (Apr 2026) | N/A | N/A (community-owned) |
 | **Funding** | $0 VC (100% bootstrapped) | $0 VC | Stay bootstrapped, use ZOUNZ treasury |
 | **Downloads** | 5M+ total | N/A (web app) | N/A |
 | **Churn** | <10% annual | N/A | Target <15% |
-| **Revenue per employee** | ~$2.8M/employee | N/A | N/A |
+| **Revenue per employee** | **$2.8M/employee** | N/A | N/A |
 | **Plugin ecosystem** | 1,000+ plugins, 100M+ downloads | 0 (not yet open) | Community config forks |
 
 ## Comparison: Lean Team Models in Software (2026)

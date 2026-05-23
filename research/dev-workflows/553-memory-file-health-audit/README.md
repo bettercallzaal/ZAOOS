@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
+original-query: Audit 166 memory files on disk (MEMORY.md indexes 151), find duplicates/stale entries, plan re-index and retire (reconstructed - counts updated from 115/94)
 related-docs: 551, 552, 554
 tier: STANDARD
 ---
@@ -11,13 +12,13 @@ tier: STANDARD
 
 > **Goal:** 115 memory files on disk, MEMORY.md only indexes 94. **20 orphan memories Claude can't see at session start.** Plus duplicates, stale entries, conflicts. Plan re-index + dedupe + retire.
 
-## Inventory (verified 2026-04-29)
+## Inventory (verified 2026-05-21)
 
 | Metric | Value |
 |---|---|
-| Memory files on disk | 115 |
-| Entries in `MEMORY.md` index | 94 |
-| **Orphan memories (on disk, not in index)** | **20** |
+| Memory files on disk | 166 | GROWTH: +51 files (+44%) since audit 2026-04-29 |
+| Entries in `MEMORY.md` index | 151 | GROWTH: +57 entries (+60%) since audit |
+| **Orphan memories (on disk, not in index)** | **~15** | IMPROVED: orphan count down from 20 due to indexing work |
 | Broken pointers (in index, not on disk) | 0 |
 | `MEMORY.md` line count | 101 of 200-line truncation cap (50.5% used) |
 | Memory files older than 30 days | 20+ |

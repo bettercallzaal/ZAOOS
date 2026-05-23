@@ -1,8 +1,12 @@
 # 245 — ZOE Upgrade: Autonomous Workflow, Telegram Patterns, Neynar API & Founder Agent Playbook
 
-> **Status:** Research complete
+> **Status:** research-complete
 > **Date:** April 1, 2026
-> **Goal:** Identify the highest-leverage upgrades to ZOE (OpenClaw agent on Hostinger VPS) for Zaal's daily workflow — combining autonomous routines, Telegram bot patterns, Neynar API creative uses, and founder agent best practices
+> **Topic:** agents
+> **Type:** infrastructure-research
+> **Last-validated:** 2026-05-21
+> **Original-query:** ZOE upgrade roadmap for Zaal's daily workflow - OpenClaw v2026.3.31, Mem0 memory, nightly consolidation, Telegram interactivity, Neynar webhooks, competitive monitoring, n8n automation
+> **Tier:** reference
 > **Builds on:** Docs 234 (OpenClaw guide), 236 (autonomous operator pattern), 202 (multi-agent orchestration), 237 (USV agents), 239 (agent frameworks)
 
 ## Key Decisions / Recommendations

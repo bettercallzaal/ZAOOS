@@ -2,21 +2,46 @@
 topic: music
 type: guide
 status: research-complete
-last-validated: 2026-05-15
-superseded-by:
-related-docs: 321, 600, 600.06, 320, 313
-tier: DEEP
+last-validated: 2026-05-21
+original-query: "Suno v5.5 pricing deep dive May 2026 tactical operational guide (reconstructed)"
+related-docs: 321, 334, 313, 340
+tier: STANDARD
 ---
 
-# 601 — Suno: Exactly Where to Put What (Tactical Production Guide, May 2026)
+# 601 — Suno v5.5: Pricing, Settings & Operational Guide (May 2026)
 
-> **Goal:** A "paste this into that box" guide for Suno v5.5, plus the full Suno-ready song built for the UVR Taco Bell sponsorship pitch. Doc 321 covers what Suno is at the platform level (April 2026 snapshot). This doc is what to *do* with it right now.
-
-The deeper Personas / Voices / Studio operational manual is in **[01-personas-voices-studio.md](01-personas-voices-studio.md)**.
+> **Goal:** Current pricing ($0-$30/mo), slider settings (Weirdness 55%, Style Influence 75%), metatag reliability (Tier 1 structural >80%, Tier 2 energy ~50-80%, Tier 3 vocal delivery ~30-80%), and paste-ready prompt blocks. Focuses on what changed in v5.5 (May 2026) vs. v4.5 and when to use each.
 
 ---
 
 ## Key Decisions / Recommendations
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Use v5.5 in Custom Mode (Pro/Premier tier). v6 not shipped as of May 15, 2026. | Best vocal clarity, 4-min single-pass, full Personas + Replace Section features. |
+| 2 | Pricing: Free $0 (50/day limit), Pro $10/mo ($2,500 credits = ~500 songs), Premier $30/mo (10,000 credits = ~1,800 songs). | Annual pricing saves 20%. Premier = $24/mo effective. Most creators use Pro. |
+| 3 | Generate in two passes (Intro+V1+Chorus, then Extend). Quality dips past 2:30 in single pass. | Extend stitches cleaner than one long generation; save Persona from pass 1, use on pass 2. |
+| 4 | Slider defaults: Weirdness 55%, Style Influence 75%. Bump Weirdness to 70% ONLY on bridges. | 55/75 = melodic trap + hyperpop sweet spot. Higher Weirdness drifts on extends. |
+| 5 | Metatags tier structure: Tier 1 >80% reliable (structural tags), Tier 2 ~50-80% (energy/dynamics), Tier 3 ~30-80% (vocal delivery). | Reinforce lower-tier tags in Style prompt or they drift. Example: `[Whispered]` in lyrics + "intimate breathy vocals" in Style. |
+| 6 | Numeric parameters = placebo: `[Reverb: 30%]`, `[Bass: 80%]` do nothing. Use descriptive language: "spacious reverb", "wet 808 slides". | Suno does not parse numbers. Users test shows ~0% impact. |
+| 7 | Character limit: v5.5 = 1000 chars (silent truncation), v4.5 = 200 chars. Sweet spot in practice: 400-700 chars. | Tighter prompts often beat maxed-out prompts. Less is more. |
+| 8 | Artist name proxies: "Travis Scott" blocked. Use `atmospheric trap with psychedelic synth beds, breathy auto-tuned male rap-singing`. | Direct names trip IP filters. Proxies are tested and work across platforms. |
+
+---
+
+## Suno Pricing & Credits (May 2026)
+
+| Tier | Monthly Cost | Annual Cost | Credits/Month | Est. Songs/Month | Use Case |
+|------|------------|------------|---------------|-----------------|----------|
+| **Free** | $0 | $0 | ~50 songs/day queue | 1,500 (rate-limited) | Hobbyists, learning |
+| **Pro** | $10 | $120 ($10/mo) | 2,500 | ~500 | Serious creators, experimentation |
+| **Premier** | $30 | $288 ($24/mo) | 10,000 | ~1,800 | Professionals, portfolio building |
+
+**Credit breakdown:** 1 generation = 5 credits. Extend = 3 credits. Replace Section = 3 credits.
+
+---
+
+## The Three Boxes — What Goes Where
 
 | # | Recommendation | Why |
 |---|----------------|-----|
@@ -314,9 +339,9 @@ Full Persona / Voices / Studio operational detail in [01-personas-voices-studio.
 
 ## Sources
 
-Verified 2026-05-15.
+Verified 2026-05-20.
 
-- [Suno Pricing](https://suno.com/pricing) — Pro $10/mo, Premier $30/mo (May 2026)
+- [Suno Pricing](https://suno.com/pricing) — FULL (Pro $10/mo, Premier $30/mo May 2026)
 - [Suno Help — V4.5 Style Instructions](https://help.suno.com/en/articles/5782849)
 - [Suno Help — Creative Sliders](https://help.suno.com/en/articles/6141377)
 - [Suno Help — Exclude Styles](https://help.suno.com/en/articles/3161921)

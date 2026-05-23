@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Open source singing voice synthesis and conversion tools, alternatives to Kits.AI, voice cloning, RVC, GPT-SoVITS (reconstructed)"
+related-docs: 329, 324, 336
+tier: STANDARD
+---
+
 # Doc 328 - Open Source Singing Voice Synthesis & Conversion Tools (April 2026)
 
 **Context:** A musician wants an open source alternative to Kits.AI (now acquired by Splice, Jan 2026) for converting raw singing into a cloned voice. This doc surveys every major open source tool as of April 2026.

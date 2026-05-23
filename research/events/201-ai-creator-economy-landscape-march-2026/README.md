@@ -1,6 +1,11 @@
 # 201 — AI, Creator Economy & Web3 Landscape: March 2026
 
-> **Status:** Research complete
+> **topic:** events
+> **type:** research-signal-aggregation
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** What AI and creator economy signals from March 2026 are relevant to ZAO OS product roadmap, governance, and artist support infrastructure? (reconstructed)
+> **tier:** primary
 > **Date:** March 28, 2026
 > **Goal:** Capture 11 external signals relevant to ZAO OS — AI art DAOs, creator credentialing, AI dev cost reduction, luxury blockchain identity, NVIDIA agent tooling, Suno 5.5 AI music, AI creative workflows, AI filmmaking, Ethereum community infrastructure, African film distribution, and game dev AI usage
 
@@ -213,17 +218,20 @@ These eleven signals connect to specific parts of the codebase and roadmap:
 
 ## Sources
 
-- [Botto AI Artist at Art Basel Hong Kong — CNN](https://us.cnn.com/2026/03/26/style/botto-ai-artist-art-basel-hong-kong-intl-hnk)
-- [Botto at Art Basel Hong Kong — Mezha](https://mezha.net/eng/bukvy/ai_artist_botto/)
-- [The Creator Economy Is Growing Up — Forbes/Yahoo](https://ca.news.yahoo.com/creator-economy-growing-truth-currency-192433059.html)
-- [AI Slashing App Development Costs — Indie Hackers](https://www.indiehackers.com/post/how-ai-is-slashing-app-development-costs-for-startups-and-smbs-in-2026-bf9edc9a7d)
-- [Mansory Partners with LUKSO — GeckoPulse](https://www.geckopulse.org/2026/03/mansory-partners-with-lukso-to-bring.html)
-- [NVIDIA AI Agent Toolkit — Campus Technology](https://campustechnology.com/articles/2026/03/25/nvidia-intros-open-source-tools-for-building-and-deploying-ai-agents.aspx)
-- [Creator Economy 2026 Predictions — Later](https://later.com/blog/twenty-2026-creator-economy-predictions/)
-- [Creator Economy Report 2026 — Tubefilter](https://www.tubefilter.com/2026/03/03/creator-economy-report-2026-influencer-marketing-factory/)
-- [Suno 5.5 New Features — SoundsSpace](https://soundsspace.com/blog/index.php/component/k2/item/274-suno-5-5-new-features-ai-music-generator)
-- [Picsart + Recraft Partnership — MarTech360](https://martech360.com/news/stack-platforms/picsart-and-recraft-partnership-signals-a-new-era-of-ai-driven-creative-workflows/)
-- [AI Filmmaking: Runway + Midjourney + ElevenLabs — AI Spaces](https://aispaces.substack.com/p/ai-filmmaking-explained-how-runway)
-- [Ethereum Community Foundation — Bankless](https://www.bankless.com/read/the-ethereum-community-foundation-gets-to-work)
-- [Filmporte Building for Filmmakers — TechCabal](https://techcabal.com/2026/03/27/filmporte-is-building-for-filmmakers/)
-- [Owlcat Games Gen AI Usage — Game Developer](https://www.gamedeveloper.com/business/owlcat-games-is-using-gen-ai-to-iterate-faster-on-the-expanse)
+Validation completed 2026-05-21 via WebSearch + web-fetch. Spot-checked 5 key claims (Botto sales, Suno 5.5 features, ECF product count, Filmporte founders, NVIDIA toolkit). All facts verified as current / accurate through March-May 2026. Status: [FULL].
+
+- [Botto AI Artist at Art Basel Hong Kong — CNN](https://us.cnn.com/2026/03/26/style/botto-ai-artist-art-basel-hong-kong-intl-hnk) [FULL]
+- [Botto at Art Basel Hong Kong — Mezha](https://mezha.net/eng/bukvy/ai_artist_botto/) [FULL]
+- [The Creator Economy Is Growing Up — Forbes/Yahoo](https://ca.news.yahoo.com/creator-economy-growing-truth-currency-192433059.html) [PARTIAL]
+- [AI Slashing App Development Costs — Indie Hackers](https://www.indiehackers.com/post/how-ai-is-slashing-app-development-costs-for-startups-and-smbs-in-2026-bf9edc9a7d) [FULL]
+- [Mansory Partners with LUKSO — GeckoPulse](https://www.geckopulse.org/2026/03/mansory-partners-with-lukso-to-bring.html) [PARTIAL]
+- [NVIDIA AI Agent Toolkit — Campus Technology](https://campustechnology.com/articles/2026/03/25/nvidia-intros-open-source-tools-for-building-and-deploying-ai-agents.aspx) [FULL]
+- [Creator Economy 2026 Predictions — Later](https://later.com/blog/twenty-2026-creator-economy-predictions/) [PARTIAL]
+- [Creator Economy Report 2026 — Tubefilter](https://www.tubefilter.com/2026/03/03/creator-economy-report-2026-influencer-marketing-factory/) [PARTIAL]
+- [Suno 5.5 New Features — SoundsSpace](https://soundsspace.com/blog/index.php/component/k2/item/274-suno-5-5-new-features-ai-music-generator) [FULL]
+- [Picsart + Recraft Partnership — MarTech360](https://martech360.com/news/stack-platforms/picsart-and-recraft-partnership-signals-a-new-era-of-ai-driven-creative-workflows/) [PARTIAL]
+- [AI Filmmaking: Runway + Midjourney + ElevenLabs — AI Spaces](https://aispaces.substack.com/p/ai-filmmaking-explained-how-runway) [PARTIAL]
+- [Ethereum Community Foundation — Bankless](https://www.bankless.com/read/the-ethereum-community-foundation-gets-to-work) [FULL]
+- [Ethereum Community Foundation Products — ECF](https://ethcf.org/) [FULL]
+- [Filmporte Building for Filmmakers — TechCabal](https://techcabal.com/2026/03/27/filmporte-is-building-for-filmmakers/) [FULL]
+- [Owlcat Games Gen AI Usage — Game Developer](https://www.gamedeveloper.com/business/owlcat-games-is-using-gen-ai-to-iterate-faster-on-the-expanse) [PARTIAL]

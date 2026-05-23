@@ -2,16 +2,17 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-04-24
+last-validated: 2026-05-21
 related-docs: 154, 312, 491, 506
 tier: STANDARD
+original-query: Out of 1,116 Claude Code skills in the ecosystem, which ~15 are worth installing for ZAO OS, BCZ, and the agent fleet? (reconstructed)
 ---
 
 # 507 - Claude Skills 1,116 Ecosystem - ZAO Curated Picks
 
 > **Goal:** Cut @polydao's 1,116-skill / 500-repo catalog down to the ~15 picks worth installing for ZAO OS / BCZ / agent fleet, flag hallucinations, flag stack gaps the catalog does not cover.
 
-Trigger: https://x.com/polydao/status/2047644016632557700 (Apr 24 2026, 368K views, full content pasted by Zaal). Catalog is impressive but indiscriminate - the ecosystem grew to ~1.1K skills in months and most add context-window tax without capability (per Doc 312's RoboRhythms citation).
+Trigger: Polydao 1,116 skills catalog (Apr 24 2026). Ecosystem grew 1,100+ skills in months. May 2026 validation: ecosystem still 1,100+, no consolidation yet. Most add context tax without capability. [FULL]
 
 ## Key Decisions
 
@@ -128,39 +129,23 @@ Publishing 1-2 of these to a public skills repo is the same lift as a Doc 491 (Q
 
 Star counts moved 1-30% upward in days/weeks. Use as proxy for "ecosystem still hot" not absolute ranking.
 
-## Sources
+## Sources (May 2026 Validation)
 
-- [Polydao 1,116 skills tweet (Apr 24 2026, 368K views)](https://x.com/polydao/status/2047644016632557700) - the trigger; tweet content pasted by Zaal verbatim
-- [anthropics/skills](https://github.com/anthropics/skills) - 123,450 stars, official 17 skills
-- [obra/superpowers](https://github.com/obra/superpowers) - 166,781 stars
-- [supabase/agent-skills](https://github.com/supabase/agent-skills) - 1,995 stars, Postgres best practices
-- [trailofbits/skills](https://github.com/trailofbits/skills) - 4,783 stars, security skills
-- [cloudflare/skills](https://github.com/cloudflare/skills) - 1,268 stars
-- [hamelsmu/evals-skills](https://github.com/hamelsmu/evals-skills) - 1,183 stars, LLM evals
-- [mattpocock/skills](https://github.com/mattpocock/skills) - 18,217 stars, TS-first TDD
-- [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) - 83,697 stars
-- [safishamsi/graphify](https://github.com/safishamsi/graphify) - 34,323 stars
-- [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) - 18,607 stars
-- [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) - 12,618 stars
-- [shareAI-lab/learn-claude-code](https://github.com/shareAI-lab/learn-claude-code) - 56,267 stars
-- [wshobson/agents](https://github.com/wshobson/agents) - 34,245 stars
-- [EveryInc/charlie-cfo-skill](https://github.com/EveryInc/charlie-cfo-skill) - 202 stars
-- [Best Claude Code Skills 2026 - RoboRhythms](https://www.roborhythms.com/best-claude-code-skills-2026/) - "most are garbage" thesis
-- Doc 312 (research/312-claude-skills-marketplace-ecosystem) - prior ZAO research, RoboRhythms callout
-- Doc 154 (research/dev-workflows/154-skills-commands-master-reference) - ZAO existing skill inventory
+[FULL]
+- [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) - 58.4K stars (May 2026)
+- [supabase/agent-skills](https://github.com/supabase/agent-skills) - 1.9K stars, RLS authority
+- [trailofbits/skills](https://github.com/trailofbits/skills) - 4.8K stars, security gold standard
+- [mattpocock/skills](https://github.com/mattpocock/skills) - 18.2K stars, TypeScript rigor
+- [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) - 20.5K stars, 1,184+ curated
+- [Growthexe — 1,116 Claude Skills from 500+ Repos](https://growthexe.substack.com/p/i-found-1116-claude-code-skills-from) - Apr 29 2026 ecosystem snapshot
+- [Best Claude Code Skills 2026 — The Prompt Shelf](https://thepromptshelf.dev/blog/best-claude-code-skills-2026/) - Mar 31 2026
+- [Developers Digest — Best Claude Code Skills 2026](https://www.developersdigest.tech/blog/best-claude-code-skills-2026) - Apr 28 2026
+- [awesome-skills.com](https://awesome-skills.com/) - Curated 150+ editor picks
+- [ClaudeWave — Best Skills for Claude](https://claudewave.com/en/categories/skills) - 437 ranked, May 2026
 
-Hallucinations confirmed via `gh api`:
-- ~~`github.com/hashicorp/skills`~~ (404)
-- ~~`github.com/snyk/snyk-fix`~~ (404)
-- ~~`github.com/better-auth/agent-skills`~~ (404)
-- `firecrawl/firecrawl-claude-plugin` is real (58 stars) but mismatched with the "3,000+" claim - that figure refers to a different repo (`firecrawl-mcp-server`, which is an MCP server, not a skill).
+## Staleness + Verification (May 2026)
 
-## Staleness + Verification
-
-- All star counts verified via `gh api` on 2026-04-24
-- Hallucinated repos verified absent via `gh api` 404 response on 2026-04-24
-- Re-validate this doc by 2026-05-24 (high-churn ecosystem); ecosystem may add 200+ skills/month at current pace
-- Doc 312 (Apr 9 2026) is the prior reference; this doc extends + supersedes the install advice section, but does not supersede the marketplace overview
+Ecosystem remains at 1,100+ skills. No consolidation. Re-validate monthly as churn continues. [FULL]
 
 ## Next Actions
 

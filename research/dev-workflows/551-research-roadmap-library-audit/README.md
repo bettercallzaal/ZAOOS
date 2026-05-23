@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: audit
 status: research-complete
-last-validated: 2026-04-29
+last-validated: 2026-05-21
+original-query: Audit 573-doc research library for structural debt (dupe numbers, stale topics, floating docs), find conflicts, and propose next 30 days of research with ranking (reconstructed)
 related-docs: 552, 553, 554, 555, 556, 557
 tier: STANDARD
 ---
@@ -11,12 +12,12 @@ tier: STANDARD
 
 > **Goal:** Take stock of the 573-doc research library, find structural debt (dupe numbers, stale topics, floating docs, conflicts), and propose the next 30 days of research with clear ranking.
 
-## Library Stats (verified 2026-04-29 via local filesystem)
+## Library Stats (verified 2026-05-21 via local filesystem)
 
 | Metric | Value | Notes |
 |---|---|---|
-| Total numbered doc folders | 573 | Includes `_archive/` |
-| Active categories | 13 | dev-workflows (98), agents (82), music (79), infrastructure (42), events (32), business (32), community (31), governance (30), farcaster (23), cross-platform (14), identity (10), security (7), wavewarz (5) |
+| Total numbered doc folders | 789 | Includes `_archive/`. GROWTH: +216 docs (+37.8%) since audit 2026-04-29 |
+| Active categories | 13 | dev-workflows (123 +25), agents (120 +38), music (84 +5), infrastructure (51 +9), events (44 +12), business (55 +23), community (43 +12), governance (34 +4), farcaster (45 +22), cross-platform (16 +2), identity (21 +11), security (7 same), wavewarz (6 +1) |
 | Archived | 77 docs in `_archive/` | No frontmatter, pre-frontmatter era |
 | **Duplicate doc numbers across categories** | **10+** | 117, 229, 280, 281, 282, 283, 288, 289, 293, 298 |
 | Floating docs (loose in `research/` root, not in category folder) | 6+ | 280-284, 288-289, 309-314 |

@@ -1,5 +1,12 @@
 # 65 — ZABAL Partner Ecosystem: MAGNETIQ, SongJam, Empire Builder, Clanker
 
+> **topic:** community
+> **type:** research-ecosystem
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** ZABAL partner ecosystem: map current and prospective partner relationships for The ZAO (reconstructed)
+> **tier:** solid
+
 > **Status:** Research complete
 > **Date:** March 18, 2026
 > **Goal:** Map all ZABAL partner platforms, document what each does, and plan how to surface them inside ZAO OS for easy access and interaction

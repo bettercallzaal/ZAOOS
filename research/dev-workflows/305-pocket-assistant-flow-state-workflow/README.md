@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 8, 2026
 > **Goal:** Redesign ZOE's interface from a broken dashboard to a pocket assistant that supports Zaal's flow state and captures ideas on the go
+> **Original-Query:** How should ZOE change from a dashboard to a pocket assistant (Telegram + email) that doesn't interrupt Zaal's morning flow? (reconstructed)
 
 ---
 

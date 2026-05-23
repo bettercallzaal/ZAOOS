@@ -1,9 +1,17 @@
-# 73 — Farcaster Ecosystem Update (March 2026)
+---
+topic: farcaster
+type: update
+status: research-complete
+last-validated: 2026-05-21
+related-docs: [002-farcaster-hub-api, 260-neynar-acquires-farcaster, 308-farcaster-ecosystem-spring-2026]
+original-query: "What changed in the Farcaster ecosystem since early 2026? DAU, competitors, tokens, Mini Apps - comprehensive refresh. (reconstructed)"
+tier: STANDARD
+---
 
-> **Status:** Research complete
-> **Date:** March 19, 2026
-> **Goal:** Comprehensive Farcaster ecosystem refresh — what changed since our earlier research (docs 01, 02, 19, 21, 22, 34)
-> **Supersedes:** Doc 01 (protocol architecture), updates docs 21/22 with 2026 data
+# 073 - Farcaster Ecosystem Update (March 2026)
+
+> **Goal:** Comprehensive Farcaster ecosystem refresh - what changed since Jan 2026 (Neynar acquisition, Snapchain, token prices, Mini Apps maturity)?
+> **Scope:** Replaces doc 01 for protocol architecture; updates docs 21/22 with 2026 data.
 
 ## Key Decisions / Recommendations for ZAO OS
 
@@ -163,19 +171,15 @@ Farcaster is becoming the preferred platform for AI agents due to open APIs and 
 
 ## Sources
 
-- [Neynar Acquires Farcaster — Neynar Blog](https://neynar.com/blog/neynar-is-acquiring-farcaster)
-- [Farcaster Founders Step Back — CoinDesk](https://www.coindesk.com/business/2026/01/21/farcaster-founders-step-back-as-neynar-acquires-struggling-crypto-social-app)
-- [Merkle Returns $180M — Decrypt](https://decrypt.co/355668/farcaster-to-repay-180m-to-investors-amid-pivot-to-developer-focused-direction)
-- [Snapchain Goes Live — Farcaster Blog](https://farcaster.blog/snapchain-is-now-live)
-- [Snapchain Technical Deep Dive — Cuckoo AI](https://cuckoo.network/blog/2025/04/07/farcasters-snapchain-a-novel-data-layer-solution-for-web3-social-networks)
-- [Farcaster in 2025: The Protocol Paradox — BlockEden](https://blockeden.xyz/blog/2025/10/28/farcaster-in-2025-the-protocol-paradox/)
-- [Farcaster vs Lens: The $2.4B Battle — BlockEden](https://blockeden.xyz/blog/2026/01/13/farcaster-vs-lens-socialfi-web3-social-graph/)
-- [CLANKER Jumps 350% — The Defiant](https://thedefiant.io/news/nfts-and-web3/farcaster-acquires-clanker-tokenbot)
-- [DEGEN Price — CoinGecko](https://www.coingecko.com/en/coins/degen-base)
-- [CLANKER Price — CoinGecko](https://www.coingecko.com/en/coins/tokenbot-2)
-- [Farcaster Mini Apps Docs](https://miniapps.farcaster.xyz/)
-- [Farcaster AI Agents — Bankless](https://www.bankless.com/farcaster-ai-agents-hub)
-- [Crypto Social Isn't Dead — CoinDesk](https://www.coindesk.com/opinion/2026/02/26/crypto-social-isn-t-dead-it-s-just-changing-hands)
-- [FarCon 2026 Rome](https://www.farcon.eu/)
-- [Neynar Docs](https://docs.neynar.com/)
-- [Farcaster Protocol Docs](https://docs.farcaster.xyz/)
+- [Neynar Acquires Farcaster - Neynar Blog](https://neynar.com/blog/neynar-is-acquiring-farcaster) [FULL] - Official Jan 2026 announcement
+- [Farcaster Founders Step Back - CoinDesk](https://www.coindesk.com/business/2026/01/21/farcaster-founders-step-back-as-neynar-acquires-struggling-crypto-social-app) [FULL] - Context on founders' transition
+- [Merkle Returns $180M - Decrypt](https://decrypt.co/355668/farcaster-to-repay-180m-to-investors-amid-pivot-to-developer-focused-direction) [FULL] - Financial terms
+- [Snapchain Goes Live - Farcaster Blog](https://farcaster.blog/snapchain-is-now-live) [PARTIAL] - Technical details
+- [Snapchain Technical Deep Dive - Cuckoo AI](https://cuckoo.network/blog/2025/04/07/farcasters-snapchain-a-novel-data-layer-solution-for-web3-social-networks) [FULL] - Architecture breakdown
+- [Farcaster in 2025: The Protocol Paradox - BlockEden](https://blockeden.xyz/blog/2025/10/28/farcaster-in-2025-the-protocol-paradox/) [FULL] - DAU/user metrics
+- [Farcaster vs Lens: The $2.4B Battle - BlockEden](https://blockeden.xyz/blog/2026/01/13/farcaster-vs-lens-socialfi-web3-social-graph/) [FULL] - Competitive analysis
+- [DEGEN Price - CoinGecko](https://www.coingecko.com/en/coins/degen-base) [FULL] - Token pricing, current
+- [CLANKER Price - CoinGecko](https://www.coingecko.com/en/coins/tokenbot-2) [FULL] - Token pricing, current
+- [Farcaster Mini Apps Docs](https://miniapps.farcaster.xyz/) [FULL] - Official Mini Apps reference
+- [Neynar Docs](https://docs.neynar.com/) [FULL] - Current API reference
+- [Farcaster Protocol Docs](https://docs.farcaster.xyz/) [FULL] - Protocol reference

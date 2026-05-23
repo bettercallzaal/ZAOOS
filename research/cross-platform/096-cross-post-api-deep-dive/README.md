@@ -1,11 +1,19 @@
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Comprehensive API research for each cross-posting platform including SDKs, costs, rate limits, music relevance, and code examples (reconstructed)
+tier: STANDARD
+related-docs: 28, 36, 77, 177, 179
+---
+
 # 96 — Cross-Post API Deep Dive: Platform-by-Platform Integration Guide
 
 > **Status:** Research complete
 > **Date:** March 20, 2026
 > **Goal:** Detailed API research for each cross-posting target — SDKs, costs, rate limits, music relevance, code examples
 > **Builds on:** Doc 28 (Cross-Platform Publishing), Doc 36 (Lens Deep Dive), Doc 77 (Bluesky Integration)
-
----
 
 ## 1. Nostr — nostr-tools / NDK
 

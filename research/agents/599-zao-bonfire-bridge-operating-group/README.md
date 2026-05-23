@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-03
+last-validated: 2026-05-21
+original-query: convert ZAO Bonfire Bridge Telegram group to autonomous agent operating surface (reconstructed)
 related-docs: 542, 543, 544, 545, 546, 547, 548, 549, 569, 570, 581, 590
 tier: STANDARD
 ---

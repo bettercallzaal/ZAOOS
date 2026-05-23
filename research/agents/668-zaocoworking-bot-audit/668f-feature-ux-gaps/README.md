@@ -4,7 +4,7 @@ doc: 668f
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-21
 related-docs: [650, 661, 662, 665, 668]
 tier: STANDARD
 parent-doc: 668

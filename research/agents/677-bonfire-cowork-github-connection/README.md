@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-20
+last-validated: 2026-05-21
+original-query: How do we pipe GitHub activity (commits, PRs, issues) into the ZABAL Bonfire so the KG has both tracking and build history? (reconstructed)
 related-docs: 650, 665, 669, 673, 676
 tier: STANDARD
 ---

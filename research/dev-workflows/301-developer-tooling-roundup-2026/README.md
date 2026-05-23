@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 8, 2026
 > **Goal:** Evaluate last30days, Nia Docs, and other developer tools from the post-Karpathy wave for ZAO OS workflow
+> **Original-Query:** Which agent-era developer tools from April 2026 (last30days, Nia Docs, etc.) should ZAO OS adopt for better research and documentation? (reconstructed)
 
 ---
 

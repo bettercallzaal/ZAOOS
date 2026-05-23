@@ -1,39 +1,38 @@
 ---
 topic: farcaster
-type: decision
+type: guide
 status: research-complete
-last-validated: 2026-05-03
-related-docs: 309, 489, 587, 591, 593, 594
-tier: DEEP
+last-validated: 2026-05-21
+related-docs: [309, 489, 587, 591, 593, 594, 596, 598]
+tier: STANDARD
+original-query: "FIP 268 269 adjacent FIPs coalition apps Streamly Livecaster FarHouse Fireside JFS code reference implementation JSON Farcaster signature (reconstructed)"
 ---
 
-# 595 — FIP Live Activity DEEPER: Adjacent-FIP Gap Map, 5-App Coalition, JFS Reference Implementation
+# 595 — FIP Live Activity: Adjacent FIPs, Coalition Map, JFS Reference Code
 
-> **Goal:** Third doc in the FIP Live Activity stack. Closes three open questions from Doc 594: (1) which adjacent FIPs would actually fix the gaps and what's their status, (2) which apps beyond Juke are real coalition partners, (3) what does the JFS reference implementation actually look like — lift-ready TypeScript.
+> **Goal:** Technical gap analysis on adjacent FIPs (#163, #262, #266, #238, #241), production coalition (Juke, Streamly, Livecaster, FarHouse, Fireside), and lift-ready JFS reference implementation from farcasterxyz/miniapps.
 
-## Critical Updates Since Doc 594
+## Key Findings
 
-| # | Update | Implication |
-|---|--------|-------------|
-| 1 | **FIP #262 (Functional Signers) explicitly PUNTS on per-`UserDataType` scopes.** Direct quote from FIP body: "`USER_DATA_ADD` comprises multiple data types. These are not decomposed for scoping as a part of this FIP. For example, a signer cannot update a PFP but not a BIO. The reason for this is that these are all client-level modifications changes a user might want to make, not app specific." | The FIP that I assumed in Doc 594 would close the no-opt-out gap **explicitly does not.** A LIVE_AT-only app cannot be granted `LIVE_AT` without also being granted PFP, BIO, location, etc. Need to advocate for an amendment to FIP #262 Part 1 OR a separate scope for ephemeral UserData types. |
-| 2 | **FIP #163 (Scaling Farcaster) is stalled and likely dying.** 8 months of comments since April 2024, last update Dec 2024. @varunsrin redirected discussion to FIP #193 (Introducing Ordering). No commitment to 5K writes/sec throughput under contention. | LIVE_AT's 5,000/hr-per-storage-unit budget cannot be validated against any committed network throughput. Ship LIVE_AT at 1s heartbeat = bet that Snapchain absorbs the load without an existing FIP guarantee. |
-| 3 | **FIP #266 (Snapchain Signers) is moving forward** — Stage 3: Review, low dispute. It's a meta-FIP about authoring conventions, not a feature. Sets the bar for FIP #268's explicit rate-limit-budget format. | Confirms FIP #268's structure is compliant. Doesn't change anything about LIVE_AT design. |
-| 4 | **JFS reference implementation is fully open source** at `farcasterxyz/miniapps/packages/miniapp-node/src/jfs.ts`. Uses `@noble/curves/ed25519`. ~100 lines TypeScript. | ZAO can lift the verification + signing functions directly. PR #2 (manifest endpoint per Doc 593) drops to ~20 lines of glue + the lifted code. Faster than estimated. |
-| 5 | **FIP #269 spec / reference-impl mismatch.** Reference impl in `jfs.ts` line 105 sets `header.type = 'app_key'`. FIP #269 spec text says `header.type === "auth"`. | Spec inconsistency. Flag in feedback comment to #269 — either spec should change to `'app_key'` or reference impl should add `'auth'` support. Could trip up implementers. |
-| 6 | **Coalition expands from 2 apps to 5.** Beyond Juke (LiveKit + iOS): Livecaster (@sayangel, chat-only on reply tree, 25K+ casts during NBA Finals), Streamly (@oyingrace, OPEN SOURCE Zego video streaming at github.com/oyingrace/streamly), FarHouse (production iOS+Android Clubhouse-like, founder opaque), Fireside (Base App + Farcaster mini-app, founder opaque). | Coalition build order is Juke → Streamly → Livecaster (DM-able), then hunt FarHouse + Fireside founders via Farcaster /builders. Stronger than 2-app coalition. |
-| 7 | **FIP #238 (Signer Revokes Only Impact Future Messages) is FINALIZED.** Revoking a key does NOT invalidate messages previously signed by it. | Compromised app key can write malicious LIVE_AT, then be revoked, but the malicious write persists in Snapchain. Mitigation: 5-second freshness check (FIP #268) means stale malicious writes won't render after 5s. But old writes are not erased. |
-| 8 | **FIP #241 (Cross-Shard Communication) is in Stage 3: Review.** Specifies inter-shard messaging. Does NOT mention rate limits or per-type sharding. | Shard load-balancing for LIVE_AT writes is NOT addressed by FIP #241. ZAO's hot-shard concern (synchronized heartbeats) requires app-layer mitigation (jitter), as Doc 594 already specified. |
+| # | Fact | Source | Status |
+|---|------|--------|--------|
+| 1 | FIP #163 (Scaling Farcaster) last updated Dec 2024; stalled ~8 months. No committed throughput target. LIVE_AT's 5000/hr budget unvalidated against network capacity. | GitHub FIP #163 comment thread | [PARTIAL] — need status refresh |
+| 2 | FIP #262 (Functional Signers) explicitly DOES NOT decompose per-UserDataType scopes. Quote: "These are not decomposed for scoping as a part of this FIP...these are all client-level modifications a user might want to make, not app specific." | FIP #262 body | [FULL] |
+| 3 | FIP #266 (Snapchain Signers) Stage 3: Review, moving forward. Meta-FIP on authoring conventions; FIP #268 compliant. | GitHub FIP #266 | [FULL] |
+| 4 | FIP #238 (Signer Revokes Only Impact Future Messages) FINALIZED. Revoked keys do NOT erase past signed messages; malicious LIVE_AT persists even after app key is revoked. | GitHub FIP #238 | [FULL] |
+| 5 | FIP #241 (Cross-Shard Communication) Stage 3: Review. Does not address per-type shard load balancing; hot-shard risk mitigated only at app layer via jitter. | GitHub FIP #241 | [FULL] |
+| 6 | Coalition: Juke (iOS LiveKit), Streamly (open-source Zego, web), Livecaster (chat-only reply tree), FarHouse (iOS+Android closed), Fireside (Base + mini-app closed). | Farcaster profiles + repos | [FULL] |
+| 7 | JFS reference impl at farcasterxyz/miniapps/packages/miniapp-node/src/jfs.ts (100 LOC, @noble/curves/ed25519). Type inconsistency: spec says `header.type="auth"`, impl uses `'app_key'`. | GitHub miniapps repo | [FULL] |
 
-## Revised Key Decisions (Supersedes Doc 594 where conflicting)
+## ZAO Application
 
-| # | Decision | Action | Why |
-|---|----------|--------|-----|
-| 1 | **EXPAND feedback comment on #268** to include three concrete spec deltas | Add: (a) per-`UserDataType` scopes amendment to FIP #262 Part 1, (b) rate limit elasticity / load-shedding spec for FIP #163 refresh, (c) cross-shard balancing amendment to FIP #241. Use the verbatim draft below. | Doc 594's draft was solid but didn't cite the three adjacent FIPs by number. Adjacent-FIP grounding makes the feedback land harder with rish + topocount + manan. |
-| 2 | **FLAG the #269 spec inconsistency** (`auth` vs `app_key`) in #269 feedback comment | One additional sentence in the #269 draft. | Trivial fix. Authors will appreciate the catch. |
-| 3 | **LIFT the JFS code from `farcasterxyz/miniapps`** for ZAO's PR #2 (manifest endpoint per Doc 593) | Use `@noble/curves/ed25519`. Copy `createJsonFarcasterSignature` + `verifyJsonFarcasterSignature` verbatim, parameterize the payload to take `{ url }` instead of `{ domain }`. | Don't rewrite. The reference impl is well-tested + audited. |
-| 4 | **EXPAND coalition outreach from "Juke only" to "Juke + Streamly + Livecaster (Tier 1)"** | DM @nickysap, @oyingrace, @sayangel within 48h. Then hunt FarHouse + Fireside founders. | Stronger coalition = harder for FIP #268 to ship without our preferred per-type-scope amendment. |
-| 5 | **DO NOT WAIT for FIP #262 Part 1** — assume per-type scopes won't ship in this cycle | Design ZAO's app-key authorization with full `USER_DATA_ADD` scope. User-facing UI must clearly disclose: "ZAO can update your live presence URL AND your profile fields." | FIP #262 is stalled. Even if Part 1 advances, per-type scopes are explicitly out of scope. Don't block ZAO's launch on a spec change that may take 6+ months. |
-| 6 | **Caveat on agent search drift:** during this research round, one secondary search agent reported FIP #268 "not found" on GitHub. **This is incorrect.** Direct `gh api repos/farcasterxyz/protocol/discussions/268` confirms the FIP exists, was created 2026-05-03 by rishavmukherji, FIP Stage 2: Draft, body verified verbatim. | Trust primary source. Note in this doc to prevent future confusion. | Demonstrates why direct API > generic search for fresh FIPs. |
+| # | Action | Implementation | Why |
+|---|--------|---|---|
+| 1 | Lift JFS verification + signing functions from farcasterxyz/miniapps | Copy `createJsonFarcasterSignature` + `verifyJsonFarcasterSignature` from packages/miniapp-node/src/jfs.ts; use @noble/curves/ed25519; parameterize payload for URL instead of domain | Reference impl is audited + tested; don't reinvent crypto. PR #2 (manifest endpoint) becomes ~20 LOC glue. |
+| 2 | Flag spec inconsistency (auth vs app_key) in community feedback | Post GitHub comment on FIP #269 noting reference impl uses `header.type='app_key'` but spec says `'auth'`; request clarification | Implementers will hit this; authors appreciate the catch. Social credit. |
+| 3 | Outreach coalition building to Juke, Streamly, Livecaster | DM @nickysap, @oyingrace, @sayangel with ZAO's FIP feedback + intent to implement. Align on cooperative writer convention. | 4-voice coalition (ZAO + 3 open/reachable founders) is credible for ecosystem discussion. Shows FIP isn't just Juke. |
+| 4 | Assume per-UserDataType scopes won't ship in FIP #262 Part 1 | Accept that ZAO app key will have full USER_DATA_ADD authority (PFP + BIO + LOCATION + LIVE_AT). Disclose clearly to users: "ZAO can update your live URL AND profile fields." | FIP #262 Part 1 is moving forward but explicitly defers per-type scopes to Part 2 (stalled). Don't block ship on a 6+ month protocol change. |
+| 5 | Monitor FIP #163 refresh and FIP #241 shard load signals | Subscribe to GitHub FIP discussions; rescan every 2 weeks for updates | Network throughput guarantee and shard-balancing spec remain open. If FIP #163 ships committed SLA, re-validate LIVE_AT 5000/hr budget. |
 
 ## Adjacent FIP Gap Map (Agent A Findings)
 
@@ -511,17 +510,19 @@ Cc @topocount.eth for the protobuf side, @manan19 for SDK alignment.
 - [Doc 594 — FIP Live Activity DEEP threats/precedents/load](../594-fip-live-activity-deep/) — sister doc, threat model + initial feedback drafts
 - Memory: `project_fishbowlz_deprecated.md`, `project_spaces_next.md`, `project_miniapp_audit_591.md`
 
-## Sources (DEEP tier — 31 verified)
+## Sources
 
-### Primary FIP material (re-verified 2026-05-03)
-
-1. [FIP #268: Live Activity Status](https://github.com/farcasterxyz/protocol/discussions/268) — confirmed exists via direct gh api
-2. [FIP #269: Live Activity Manifest](https://github.com/farcasterxyz/protocol/discussions/269) — confirmed exists via direct gh api
-3. [FIP #163: Scaling Farcaster](https://github.com/farcasterxyz/protocol/discussions/163) — Stage 2 Draft, stalled
-4. [FIP #262: Functional Signers](https://github.com/farcasterxyz/protocol/discussions/262) — Stage 2 Draft, stalled, Part 1 likely advances
-5. [FIP #266: Snapchain Signers](https://github.com/farcasterxyz/protocol/discussions/266) — Stage 3 Review, moving forward
-6. [FIP #238: Signer Revokes Only Impact Future Messages](https://github.com/farcasterxyz/protocol/discussions/238) — FINALIZED
-7. [FIP #241: Cross-Shard Communication in Snapchain](https://github.com/farcasterxyz/protocol/discussions/241) — Stage 3 Review
+| Source | Status | Coverage |
+|--------|--------|----------|
+| [FIP #262: Functional Signers](https://github.com/farcasterxyz/protocol/discussions/262) | [FULL] | Per-type scopes explicitly deferred; Part 1 moving forward, Part 2 (MPC) stalled |
+| [FIP #163: Scaling Farcaster](https://github.com/farcasterxyz/protocol/discussions/163) | [PARTIAL] | Last updated Dec 2024; redirected to FIP #193; no throughput SLA commitment |
+| [FIP #266: Snapchain Signers](https://github.com/farcasterxyz/protocol/discussions/266) — Stage 3 Review | [FULL] | Meta-FIP on authoring conventions; FIP #268 compliant |
+| [FIP #238: Signer Revokes Only Impact Future Messages](https://github.com/farcasterxyz/protocol/discussions/238) — FINALIZED | [FULL] | Revoked keys do NOT erase historical signed messages |
+| [FIP #241: Cross-Shard Communication](https://github.com/farcasterxyz/protocol/discussions/241) | [FULL] | Stage 3: Review; does not address per-type sharding |
+| [farcasterxyz/miniapps JFS reference impl](https://github.com/farcasterxyz/miniapps/blob/main/packages/miniapp-node/src/jfs.ts) | [FULL] | ~100 LOC; type inconsistency noted (spec says 'auth', impl uses 'app_key') |
+| [Streamly open source](https://github.com/oyingrace/streamly) | [PARTIAL] | Zego video, web + mini-app; active commits but README minimal |
+| [Livecaster Farcaster](https://farcaster.xyz/livecaster) + Neynar blog | [PARTIAL] | Chat-only (reply tree); no FIP #268 commitment public |
+| [FarHouse on Hunt Screens](https://huntscreens.com/products/farhouse) | [PARTIAL] — founder opaque | iOS + Android production; no public FIP #268 position |
 8. [FIP #156: Audio Support for Frames](https://github.com/farcasterxyz/protocol/discussions/156) — abandoned
 9. [FIP #208: JSON Farcaster Signature spec](https://github.com/farcasterxyz/protocol/discussions/208) — JFS origin spec
 
@@ -569,16 +570,12 @@ Cc @topocount.eth for the protobuf side, @manan19 for SDK alignment.
 
 All 30+ external URLs verified live 2026-05-03. JFS reference implementation in `farcasterxyz/miniapps` confirmed at the cited file paths via `gh api` + repo browse.
 
-### Hallucination check
+## Next Actions
 
-- All FIP body text quoted verbatim from `gh api repos/farcasterxyz/protocol/discussions/<N>` responses
-- JFS code blocks quoted verbatim from agent C report which extracted from `farcasterxyz/miniapps/packages/miniapp-node/src/jfs.ts` lines 42-105
-- Spec inconsistency (`'auth'` vs `'app_key'`) is a real divergence between FIP #269 spec text and the actual reference impl — flagged for FIP authors
-- Agent B's claim that "FIP-268 not found on GitHub" is INCORRECT — direct `gh api repos/farcasterxyz/protocol/discussions/268` returns the FIP body. Trust primary source. Noted as caveat.
-- Coalition app data is current as of 2026-05-03 with explicit dates per source
-
-### Staleness notes
-
-- FIPs are Stage 2 / Stage 3 Draft. Spec details may change.
-- FarCon is 2026-05-04 / 2026-05-05; this doc was written 2026-05-03 evening US time. Spec deltas from in-person discussion will require Doc 596 amendment.
-- JFS reference implementation in `farcasterxyz/miniapps` is actively maintained; check for breaking changes before lifting code.
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Lift + test JFS signing/verification code from miniapps repo into ZAO at src/lib/farcaster/jfs.ts | Quad | Code | PR #2 |
+| Submit GitHub comment on FIP #269 flagging spec inconsistency (auth vs app_key) | @Zaal | GitHub | Before next FIP voting round |
+| DM @oyingrace (Streamly) + @sayangel (Livecaster) re: cooperative writer alignment | @Zaal | Coordination | ASAP |
+| Monitor FIP #163 refresh + FIP #241 shard-load updates every 2 weeks | Research schedule | Monitor | Ongoing |
+| User-facing UX disclosure: "ZAO can update your live URL AND your profile (name, bio, location)" — accept full USER_DATA_ADD scope | Quad | Design | Before launch |

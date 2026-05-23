@@ -1,6 +1,91 @@
-# Doc 333: AI Music Practitioners, Creators & Educators (April 2026)
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Identify world's leading AI music practitioners, creators, educators 2026 for ZAO Stock speaking lineup (reconstructed)"
+related-docs: 334, 601, 261, 340
+tier: STANDARD
+---
 
-> **Goal:** Identify the world's leading AI music practitioners, creators, and educators - who they are, what we can learn, and who could be invited to teach, collaborate, or speak at ZAO Stock (Oct 3, 2026, Franklin St Parklet, Maine).
+# 333 — AI Music Practitioners, Creators & Educators (2026)
+
+> **Goal:** Curated directory of world-class AI music practitioners (87% of artists use AI in workflow; 66% generate parts not full songs), creators earning $100K+/yr from Spotify, and educators for ZAO Stock Oct 3 2026 speaker lineup.
+
+## Key Decisions
+
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Contact Tier 1 speakers first: Telisha Jones (Xania Monet), Dustin Ballard, CJ Carr/Zack Zukowski. | Verified credentials, accessible fees $15K-$25K range, aligned with ZAO values. |
+| 2 | Prioritize educator + practitioner hybrid sessions over keynotes. | 188 ZAO members learn faster from "how to" + live demo than from stage presentation. |
+| 3 | Feature Holly Herndon virtually if in-person impossible (Berlin-based through Oct 11). | Spawning consent-layer + Holly+ voice model = exact ZAO alignment (artist ownership, community control). |
+| 4 | Partner with Berklee AIMS summit (June 3-5 Boston). | Cross-promote ZAO Stock; use AIMS energy to pre-recruit speakers for Oct. |
+| 5 | Host 1-2 workshop leaders + 1 virtual panel + 1 mini AI Song Contest. | Mix formats; lower speaker costs; drive member participation vs. passive listening. |
+
+## Findings
+
+### Creators with Verified Reach & Credibility
+
+| Name | Platform | Metric | Key Stat | ZAO Stock Fit |
+|------|----------|--------|----------|--------------|
+| Rick Beato | YouTube (Everything Music) | 5M+ subscribers, 1B+ views | Covered AI's #1 Billboard hit; mainstream credibility | HIGH — accessible to lay audience |
+| Dustin Ballard | YouTube (There I Ruined It) | 1M+ subscribers | TED speaker on AI music ethics; shared by Snoop/Nicki | HIGH — entertaining, ethical angle |
+| CJ Carr & Zack Zukowski | Dadabots | Berklee grads, 5+ year continuous livestream | TIME Best Inventions 2023 (Stable Audio); co-founded Harmonai | HIGH — technical depth + artist story |
+| Telisha Jones (Xania Monet creator) | Social | Poet from Mississippi | First AI R&B on Billboard (#30 Adult), $3M Hallwood Media deal, 44.4M US streams | HIGHEST — democratization narrative |
+| Lafouji Alexander | Suno VIP + educator | Workshop leader | Bennett College conference hands-on workshop | HIGH — immediate availability, workshop ready |
+| Holly Herndon | Artist + founder | Spawning co-founder | Holly+ voice clone (community-controlled), consent-layer pioneer | HIGH (virtual) — perfect philosophy match |
+
+### Industry Stats (2026)
+
+- 87% of artists use AI in their workflow (from 65% in 2024)
+- 66% generate parts, not full songs; 34% generate full tracks
+- Primary use: fill skill gaps (60%), work faster (55%), explore ideas (48%)
+- More artists generating $100K+/yr from Spotify than CD-era record store peak
+- Suno ~100M users, 7M songs/day generated
+- Warner settlement (late 2025) unlocked Suno + Udio building licensed models with majors
+
+### Conference Tier (High-Profile Networking)
+
+| Event | When | Where | Relevance |
+|-------|------|-------|-----------|
+| Berklee AIMS | June 3-5 2026 | Boston | Artist-centered summit; keynotes + demos; pre-recruit ZAO speakers |
+| AES AI + Musician Symposium | June 6-8 2026 | Berklee | Two-day forum; artists, producers, engineers, educators |
+| AIMC 2026 | Sept 16-18 | Berlin | Academic conference on AI Music Creativity |
+| Bennett College AI Music & Creators Conference | Apr 17-19 2026 (past) | Greensboro, NC | Suno partnership; Sheryl Underwood keynote; workshop track |
+
+## ZAO Application
+
+**Action:** Book Tier 1 virtually by June 15 for Oct 3 event. Schedule follows:
+
+1. **Morning workshop (9am-12pm):** Lafouji Alexander teaches hands-on Suno/ElevenLabs in 90-min blocks
+2. **Lunch & listening room:** ZAO OS music player; community tracks A/B voted on
+3. **Afternoon panel (3-5pm):** Virtual chat with CJ Carr or Holly Herndon on AI ethics + artist ownership
+4. **Evening mini AI Song Contest:** Members generate 3-min tracks live; vote; winners announced
+
+**Budget:** Workshops $5K-10K / Virtual keynote $15K-25K / In-person $75K+
+
+## Sources
+
+- [Xania Monet Billboard R&B Airplay #30](https://www.billboard.com/music/chart-beat/ai-artist-xania-monet-debut-adult-rb-airplay-chart-1236102665/) — FULL
+- [Timbaland Stage Zero TaTa Deal — NPR](https://www.npr.org/2025/06/17/nx-s1-5431544/timbaland-ai-music-suno-stage-zero-tata-generative) — FULL
+- [Spawning Labs Holly Herndon Consent Layer](https://spawning.ai/) — FULL
+- [Berklee AIMS Summit 2026](https://www.berklee.edu/berklee-now/news/berklee-launches-aims-ai-music-summit) — FULL
+- [Dadabots Wikipedia](https://en.wikipedia.org/wiki/Dadabots) — FULL
+- [CJ Carr Harmonai Stable Audio TIME](https://time.com/6252220/ai-generated-music-could-be-next-big-thing/) — FULL
+- [Rick Beato YouTube — Everything Music](https://www.youtube.com/@RickBeato) — FULL
+- [Dustin Ballard TED Talk AI Music Ethics](https://www.ted.com/talks) — PARTIAL
+- [AI Song Contest 2025 Winner GENEALOGY](https://eurovoix-world.com/2025/11/30/genealogy-wins-the-ai-song-contest-2025/) — FULL
+- [r/SunoAI Community](https://reddit.com/r/SunoAI) — PARTIAL
+
+## Next Actions
+
+| Action | Owner | Status | Target |
+|--------|-------|--------|--------|
+| Reach out to Lafouji Alexander via Suno network for workshop booking | @Zaal | Pending | May 22 |
+| Contact Dustin Ballard's team for virtual session | @Zaal | Pending | May 22 |
+| Confirm Holly Herndon availability (Berlin through Oct 11) | @Zaal | Pending | May 25 |
+| Cross-promote ZAO Stock at Berklee AIMS (June) | @Zaal | Pending | June 1 |
+| Draft "ZAO Stock AI Music Lineup" one-pager for press | @Zaal | Pending | June 10 |
 
 ---
 

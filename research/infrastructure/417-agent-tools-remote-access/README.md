@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: How to expose agent dashboards (AO, ZOE, Paperclip, Pixels) through zaoos.com subdomains? (reconstructed)
+tier: FULL
+---
+
 # 417 - Agent Tools Remote Access: Making Everything Reachable from zaoos.com
 
 > **Status:** Research complete

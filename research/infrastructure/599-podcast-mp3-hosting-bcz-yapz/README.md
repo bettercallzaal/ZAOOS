@@ -2,7 +2,8 @@
 topic: infrastructure
 type: decision
 status: research-complete
-last-validated: 2026-05-12
+last-validated: 2026-05-21
+original-query: Where to host podcast MP3 files for BCZ YapZ with Apple Podcasts/Spotify compatibility (reconstructed)
 related-docs: 092, 093
 tier: STANDARD
 ---
@@ -97,11 +98,11 @@ Frontmatter `audio_url` gets re-patched; commit + Vercel rebuild; Apple/Spotify 
 
 ## Sources
 
-- [Cloudflare R2 Pricing](https://developers.cloudflare.com/r2/pricing/) - $0.015/GB-mo, 10 GB free, zero egress
+- [Cloudflare R2 Pricing](https://developers.cloudflare.com/r2/pricing/) [FULL] - $0.015/GB-mo, 10 GB free, zero egress - verified 2026-05-21
 - [Cloudflare R2 Overview](https://developers.cloudflare.com/r2/) - product docs
 - [microfeed self-hosted podcast CMS on R2](https://github.com/microfeed/microfeed) - working podcast hosted on R2
 - [Selfhost Podcasting WordPress plugin (R2 integration)](https://wordpress.org/plugins/selfhost-podcasting/) - "fully formatted RSS feed that meets the technical specifications of Apple Podcasts and Spotify"
-- [Storj S3 Gateway docs](https://storj.dev/dcs/api/s3/s3-compatible-gateway) - byte-range and HEAD support confirmed
+- [Storj S3 Gateway docs](https://storj.dev/dcs/api/s3/s3-compatible-gateway) [FULL] - byte-range and HEAD support confirmed - verified 2026-05-21
 - [Storj S3 Compatibility](https://storj.dev/dcs/api/s3/s3-compatibility) - per-operation compatibility matrix
 - [Storj forum: rate limit at <100 RPS](https://forum.storj.io/t/rate-limiting-under-100-rps-http-403-errors/19591) - flagged but not blocking for BCZ scale
 - [Filebase FAQ on public buckets](https://docs.filebase.com/getting-started/faq) - confirms S3 URL format

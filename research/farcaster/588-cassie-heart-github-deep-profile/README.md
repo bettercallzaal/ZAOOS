@@ -1,15 +1,16 @@
 ---
 topic: farcaster
-type: guide
+type: research-profile
 status: research-complete
-last-validated: 2026-05-02
-related-docs: 304, 309, 489, 586, 587
-tier: DEEP
+last-validated: 2026-05-21
+related-docs: 304, 309, 489, 586, 587, 589
+original-query: "who is Cassie Heart, what is she building, and how can ZAO engage her productively (reconstructed)"
+tier: STANDARD
 ---
 
-# 588 - Cassie Heart (CassOnMars) GitHub Deep Profile
+# 588 - Cassie Heart (CassOnMars) - Technical Profile + Engagement Strategy
 
-> **Goal:** Comprehensive map of Cassandra Heart's public GitHub presence so ZAO can engage her with maximum precision. Built from primary GitHub data (events, repos, gists, issues, discussions) on 2026-05-02. Pairs with Doc 587 (ecosystem) and Doc 586 (install playbook).
+> **Goal:** Map Cassandra Heart's GitHub activity, contribution patterns, founding mission for Hypersnap, and concrete ZAO outreach vectors (code contributions over DMs).
 
 ## Headline
 
@@ -321,46 +322,62 @@ Posts:
 7. **Wait for v0.11.7 release** (will include FIP-11 functional signers cutover). Test on testnet box before mainnet.
 8. **Time PR submissions Tue UTC 22:00** (= Wed CT 5pm = her Wed peak the next day).
 
-## Verified URLs (May 2 2026)
+## Key Findings (May 2026 Re-Research)
 
-### Profile + activity
-- https://github.com/CassOnMars (profile, 52 repos, 419 followers)
-- https://github.com/CassOnMars?tab=repositories&sort=pushed (sorted recent activity)
-- https://api.github.com/users/CassOnMars/events/public (public events, 56 in last 30d)
-- https://api.github.com/users/CassOnMars/gists (1 gist total)
-- https://api.github.com/users/CassOnMars/following (17 people)
-- https://api.github.com/users/CassOnMars/starred (23 visible)
+| Finding | Count | Source |
+|---|---|---|
+| Cassie GitHub followers | 419 (was 419) | github.com/CassOnMars |
+| Cassie Farcaster followers | 437.7K (was 403K) | firefly.social/profile/farcaster/cassie, +8.6% in 18 days |
+| Lifetime merged PRs | 224 | GitHub API search (author:CassOnMars type:pr is:merged) |
+| FIPs filed 2026 Feb-Apr | 11 | farcasterorg/protocol/discussions (1, 3-21) |
+| Hypersnap commits last 90d | ~50% of activity | GitHub events API (last 100 events) |
+| Quilibrium commits last 90d | ~33% of activity | GitHub events API (monorepo) |
+| TripleRatchet repo stars | 8 (unchanged) | github.com/CassOnMars/TripleRatchet |
+| Wesolowski-VDF stars | 4 (unchanged) | github.com/CassOnMars/Wesolowski-VDF |
+| Timelock repo stars | 8 (unchanged) | github.com/CassOnMars/Timelock |
+| qkms-sdk published | 2026-04-13 (NEW) | github.com/QuilibriumNetwork/qkms-sdk, threshold MPC wallet |
 
-### Founding mission + FIP catalogue
-- https://github.com/orgs/farcasterorg/discussions/1 - Hypersnap Meeting Notes 2026-01-06 (founding doc)
-- https://github.com/orgs/farcasterorg/discussions/13 - **FIP: Open Consensus** for ZAO validator path
-- https://github.com/orgs/farcasterorg/discussions/16 - FIP: GraphQL Query Layer
-- https://github.com/orgs/farcasterorg/discussions/17 - FIP: Proof of Quality
-- https://github.com/orgs/farcasterorg/discussions/19 - FIP: Proof of Work Tokenization (the $HYPS spec)
-- https://github.com/orgs/farcasterorg/discussions/21 - FIP: Snap Compute
+## Verified URLs (May 2026 Re-Validated)
 
-### Crypto refs
-- https://github.com/CassOnMars/TripleRatchet (P-256 + SHA-3 multiparty Triple-Ratchet, 8 stars)
-- https://github.com/CassOnMars/Wesolowski-VDF (Chia-derived, SHA-3, 4 stars, GPL/LGPL dual)
-- https://github.com/CassOnMars/Timelock (RSA-style, RSW96 paper, 8 stars)
+### Profile + activity (Re-Validated 2026-05-20)
+- https://github.com/CassOnMars [FULL] 52 repos, 419 followers, 12-year GitHub history
+- https://api.github.com/users/CassOnMars/events/public [FULL] Last 100 events, 56 in last 30d
+- https://api.github.com/users/CassOnMars/gists [FULL] 1 gist (hypersnap how-to)
+- https://firefly.social/profile/farcaster/cassie [FULL] 437.7K Farcaster followers (2026-05-20)
+- https://web3.bio/cassie.farcaster [FULL] Web3 profile aggregation
 
-### NEW Cassie projects
-- https://github.com/QuilibriumNetwork/qkms-sdk (threshold MPC wallet SDK, branch master 2026-04-13)
-- https://github.com/farcasterorg/snap (Cassie's fork of upstream Snaps)
-- https://github.com/farcasterorg/hypersnap-docs-web (docs site, branch master 2026-04-11)
+### Founding mission + FIP catalogue (Re-Validated 2026-05-20)
+- https://github.com/orgs/farcasterorg/discussions/1 [FULL] Founding doc, "we lost a lot of artists"
+- https://github.com/orgs/farcasterorg/discussions/13 [FULL] FIP-13 Open Consensus (validator path)
+- https://github.com/orgs/farcasterorg/discussions/16 [FULL] FIP-16 GraphQL Query Layer
+- https://github.com/orgs/farcasterorg/discussions/17 [FULL] FIP-17 Proof of Quality
+- https://github.com/orgs/farcasterorg/discussions/19 [FULL] FIP-19 Proof of Work (retroactive tokenization)
+- https://github.com/orgs/farcasterorg/discussions/21 [FULL] FIP-21 Snap Compute
+
+### Crypto primitives (Re-Validated 2026-05-20)
+- https://github.com/CassOnMars/TripleRatchet [FULL] 8 stars, P-256 + SHA-3 multiparty
+- https://github.com/CassOnMars/Wesolowski-VDF [FULL] 4 stars, Chia-derived, GPL/LGPL dual
+- https://github.com/CassOnMars/Timelock [FULL] 8 stars, RSA-style, RSW96 paper
+
+### Quilibrium + Hypersnap projects (Re-Validated 2026-05-20)
+- https://github.com/QuilibriumNetwork/qkms-sdk [FULL] Threshold MPC wallet SDK, published 2026-04-13
+- https://github.com/QuilibriumNetwork/monorepo [FULL] Last commit 2026-05-02, v2.1.0.23 release branch
+- https://github.com/farcasterorg/hypersnap [FULL] GPL-3.0, v0.11.6 stable (2026-03-31)
+- https://github.com/farcasterorg/hypersnap-docs-web [FULL] Docs site, updated 2026-04-14
 
 ### Old blog + history
-- https://github.com/CassOnMars/doctorless.github.io/tree/master/_posts (6 posts, last 2017-08-19)
-- https://web3galaxybrain.com/episode/Cassandra-Heart-Founder-of-Quilibrium (early 2024 podcast)
+- https://github.com/CassOnMars/doctorless.github.io/tree/master/_posts [FULL] 6 posts, dormant since 2017-08-19
+- https://web3galaxybrain.com/episode/Cassandra-Heart-Founder-of-Quilibrium [PARTIAL] Early 2024 podcast
 
-### Relevant external signals
-- https://farcaster.xyz/cass.eth (Farcaster, FID 1325)
-- https://twitter.com/cass_on_mars (X handle)
-- https://www.coingecko.com/en/coins/wrapped-quil (QUIL price tracker)
+### External signals (Re-Validated 2026-05-20)
+- https://farcaster.xyz/cass.eth [FULL] FID 1325, 437.7K followers
+- https://twitter.com/cass_on_mars [FULL] X handle @cass_on_mars
+- https://www.coingecko.com/en/coins/wrapped-quil [FULL] $0.01152 (May 20 2026)
 
-### Internal cross-references
-- research/farcaster/586-hypersnap-node-vps-install-playbook/ (install playbook)
-- research/farcaster/587-hypersnap-quilibrium-farcasterorg-ecosystem-may2026/ (broad ecosystem)
+### Internal cross-references (Re-Validated 2026-05-20)
+- research/farcaster/586-hypersnap-node-vps-install-playbook/ [FULL] Install playbook
+- research/farcaster/587-hypersnap-quilibrium-farcasterorg-ecosystem-may2026/ [FULL] Ecosystem snapshot
+- research/farcaster/589-haatz-coverage-cassie-casts-may2026/ [FULL] Cassie cast analysis
 
 ## Open Questions for Future Audits
 

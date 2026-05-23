@@ -2,9 +2,10 @@
 topic: identity
 type: incident-postmortem
 status: research-complete
-last-validated: 2026-05-01
-related-docs: 542, 543, 544, 545, 546, 547, 548, 549, 569, 570, 580
+last-validated: 2026-05-21
+original-query: "8 bug classes in Bonfire first ingest, wipe procedure, and production system prompt to prevent recurrence (reconstructed)"
 tier: DEEP
+related-docs: [542, 543, 544, 545, 546, 547, 548, 549, 569, 570, 580]
 ---
 
 # 581 — Bonfire Graph Wipe + Bot Hygiene (Post-Mortem)

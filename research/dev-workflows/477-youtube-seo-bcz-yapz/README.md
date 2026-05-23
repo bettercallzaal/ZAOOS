@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: skill-delivery
+status: research-complete
+last-validated: 2026-05-21
+original-query: "How do we standardize BCZ YapZ YouTube descriptions for SEO, RAG, and guest amplification? (reconstructed)"
+tier: STANDARD
+---
+
 # 477 - BCZ YapZ YouTube Description + Timestamp Template
 
 > **Status:** Phase 1 templates + Phase 2 /bcz-yapz-description skill shipped (smoke-tested on undated Deepa episode 2026-04-23)

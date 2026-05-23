@@ -1,7 +1,12 @@
 # 363 -- Darwinian Agent Evolution: Die, Mutate, Respawn, Iterate
 
 > **Status:** Research complete
+> **Topic:** agents
+> **Type:** Architecture & Design
 > **Date:** April 15, 2026
+> **Last-Validated:** 2026-05-21
+> **Original-Query:** How can we evolve trading agents through LLM-guided mutation when they run out of capital? (reconstructed)
+> **Tier:** v2-ready
 > **Goal:** Design how agents that run out of money die and spawn improved versions -- LLM-guided parameter mutation + natural selection for trading strategies
 
 ---

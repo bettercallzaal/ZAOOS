@@ -2,9 +2,10 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-04-26
+last-validated: 2026-05-21
 related-docs: 144, 151, 358, 432, 446, 078, 140
 tier: STANDARD
+original-query: What visual language and trait architecture should ZOUNZ NFTs use to reflect The ZAO's indie label ethos on Base chain? (reconstructed)
 ---
 
 # 530 - ZOUNZ Artist Trait + Wordmark Brief

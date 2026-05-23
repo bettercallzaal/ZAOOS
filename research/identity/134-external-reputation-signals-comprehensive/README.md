@@ -1,3 +1,13 @@
+---
+topic: identity
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Comprehensive catalog of readable reputation signals from wallet, FID, or X handle across free and premium APIs (reconstructed)"
+tier: STANDARD
+related-docs: [135, 191, 271]
+---
+
 # 134 — External Reputation Signals — Comprehensive Inventory
 
 > **Status:** Research complete

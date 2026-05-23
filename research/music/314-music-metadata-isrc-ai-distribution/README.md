@@ -1,3 +1,12 @@
+---
+topic: music
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "What are ISRC codes, music metadata best practices, and AI disclosure standards for distributing AI-generated music in 2026?"
+tier: production
+---
+
 # Doc 314 - Music Metadata, ISRC Codes & AI-Generated Music Distribution (2026)
 
 **Date:** 2026-04-11

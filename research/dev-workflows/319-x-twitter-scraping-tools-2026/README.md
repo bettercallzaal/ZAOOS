@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 11, 2026
 > **Goal:** Find reliable, low-cost ways to look up X/Twitter profiles for ZAO members and research targets - without paying $200/month for X API access
+> **Original-Query:** What free or cheap tools reliably scrape X profiles and tweets without paying for official API access? (reconstructed)
 
 ---
 

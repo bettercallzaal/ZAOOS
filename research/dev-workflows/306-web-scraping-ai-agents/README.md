@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 8, 2026
 > **Goal:** Give Claude Code the ability to read any URL (including X/Twitter posts) when processing /inbox items
+> **Original-Query:** How can Claude Code reliably read X posts, articles, and arbitrary URLs for /inbox processing without fetch failures? (reconstructed)
 
 ---
 

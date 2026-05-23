@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-19
+last-validated: 2026-05-21
+original-query: Now that ZABAL Bonfire has 780 episodes, how should the ZAO ecosystem USE the knowledge graph? What are the build specs? (reconstructed)
 related-docs: 601, 650, 664, 665, 669, 673, 676
 tier: DISPATCH
 ---

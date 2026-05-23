@@ -2,8 +2,8 @@
 topic: community
 type: guide
 status: research-complete
-last-validated: 2026-05-14
-superseded-by:
+last-validated: 2026-05-21
+original-query: "Full profile of Jadyn Violet and UVR for strategic partnerships and brand playbook (reconstructed)"
 related-docs: 427, 050, 051
 tier: DEEP
 ---

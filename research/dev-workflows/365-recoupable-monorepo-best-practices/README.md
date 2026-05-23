@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: architecture
+status: research-complete
+last-validated: 2026-05-21
+original-query: How does Recoupable's git-submodule monorepo work and can ZAO adopt their AGENTS.md + PROGRESS.md + DESIGN.md patterns? (reconstructed)
+tier: STANDARD
+---
+
 # 365 - Recoupable Monorepo Architecture & Best Practices for ZAO
 
 > **Status:** Research complete

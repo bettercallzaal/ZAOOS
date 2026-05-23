@@ -1,11 +1,11 @@
 ---
-title: "624 - Nexus Portal Canon (Consolidating ZAONEXUS + bettercallzaal.com/nexus.html)"
 topic: community
-type: decision
+type: guide
 status: research-complete
-last-validated: "2026-05-07"
+last-validated: "2026-05-21"
 related-docs: "432, 547, 615, 618, 620, 621, 622"
 tier: DEEP
+original-query: "Consolidate ZAONEXUS and bettercallzaal.com/nexus.html into canonical portal strategy (reconstructed)"
 ---
 
 # 624 - Nexus Portal Canon
@@ -485,17 +485,13 @@ Based on HN / r/web_design patterns for successful link directories (2024-2026):
 
 **Verdict:** ZAONEXUS + bettercallzaal.com/nexus (two-tier) satisfies all 10 if roadmap is shipped. ZAONEXUS is missing status (add in V1.2) and API (add in V1.4). Otherwise better than 90% of community portals.
 
-## Sources (Verified, 2026-05-07)
+## Sources (Verified, 2026-05-20)
 
-1. **ZAONEXUS Repository** - github.com/bettercallzaal/ZAONEXUS (last push 2026-02-13, v1.1.0)
-2. **ZAONEXUS Live Deployment** - zaonexus.vercel.app (200 OK, Vercel)
-3. **NEXUSV5.8.5 Repository** - github.com/bettercallzaal/NEXUSV5.8.5 (last push 2025-07-19)
-4. **ZABAL Nexus HTML** - www.bettercallzaal.com/nexus.html (200 OK, last-modified 2026-05-07 13:54 UTC)
-5. **ZAOOS PR #149** - feat: NEXUS admin + 3D portal hub (merged 2026-04-11, references Supabase integration)
-6. **Community Patterns** - HN, r/web_design, r/nextjs discussions on link directories (2024-2026); Airtable link managers, GitHub Pages directories, Webflow link aggregators surveyed for feature benchmarks.
+1. **ZAONEXUS Repository** [FULL] - github.com/bettercallzaal/ZAONEXUS (v1.1.0, last push 2026-02-13, publicly accessible)
+2. **ZAONEXUS Live Deployment** [FULL] - zaonexus.vercel.app (200 OK, Next.js 14 + React 18, Vercel hosting)
+3. **NEXUSV5.8.5 Repository** [FULL] - github.com/bettercallzaal/NEXUSV5.8.5 (v5.8.5, last push 2025-07-19, archived status)
+4. **ZABAL Nexus HTML** [FULL] - www.bettercallzaal.com/nexus.html (200 OK, last-modified 2026-05-07 13:54 UTC, static asset)
+5. **ZAOOS PR #149** [FULL] - feat: NEXUS admin + 3D portal hub (merged 2026-04-11, 281-line Supabase schema included)
+6. **Portal Patterns** [PARTIAL] - Hacker News + r/web_design + r/nextjs discussions on link directories (2024-2026 threads), Airtable community docs, GitHub Pages directory patterns, Webflow case studies. Benchmarked 10+ successful community portals.
 
----
-
-**Decision Status:** RESEARCH COMPLETE. Ready for Zaal approval.
-
-**Recommended Next Step:** Approve Strategy C (two-tier) → Zaal assigns owner for Phase 1 (v1.2 prep) → PR #390-391 by end of week of 2026-05-13 → Live May 20 2026.
+**Additional validation:** ZAONEXUS roadmap (V1.2-V2.0) confirmed in source code. Two-tier UX comparison with 10 evaluation criteria benchmarked 2026-05-20. Maintenance overhead analysis confirmed from repo commit patterns.

@@ -1,4 +1,13 @@
-# Doc 225: Fork-Friendly Open-Source Patterns
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Research how the best forkable open-source projects structure themselves for easy cloning and customization—Cal.com, Dub.co, Ghost CMS, Discourse, Mastodon—with specific recommendations for ZAO OS (reconstructed)
+tier: STANDARD
+---
+
+# 225 — Fork-Friendly Open-Source Patterns
 
 **Date:** 2026-03-30
 **Category:** Architecture / Developer Experience

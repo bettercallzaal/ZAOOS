@@ -1,42 +1,65 @@
-# 238 — Claude Tools Top 50 Evaluation for ZAO OS
+---
+topic: dev-workflows
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Which Claude tools and MCP servers should ZAO OS evaluate and install? (reconstructed)
+tier: STANDARD
+---
 
-**Date:** 2026-04-01
-**Source:** "Top 50 Claude Skills & GitHub Repos" by @zodchiii (X, March 20 2026)
-**Status:** Current
-**Category:** tooling
+# 238 - Claude Tools Top 50 Evaluation for ZAO OS
+
+> **Goal:** Filter 1,100+ Claude skills and MCP servers down to 5-10 worth installing for ZAO's stack (Supabase, Next.js, agents).
 
 ---
 
-## Recommendations Summary
+## Key Decisions
 
-| # | Tool | Verdict | Priority | Action |
-|---|------|---------|----------|--------|
-| 1 | Context7 | **USE** | P0 | Install today — solves hallucinated API problem |
-| 2 | Codebase Memory MCP | **WATCH** | P2 | ZAO's knowledge graph + grep works; revisit if codebase 3x |
-| 3 | Markdownify MCP | **SKIP** | — | Claude Code already reads PDFs/images natively |
-| 4 | MCPHub | **USE** | P1 | Deploy on OpenClaw VPS to manage ZOE's MCP servers |
-| 5 | Claude SEO | **USE** | P1 | Run full audit on thezao.com before next launch push |
-| 6 | Brand Guidelines | **SKIP** | — | ZAO already has brand rules in CLAUDE.md + components.md |
-| 7 | Skill Creator | **WATCH** | P3 | Nice-to-have; ZAO already has 9 custom skills + superpowers |
-| 8 | Doc Co-Authoring | **SKIP** | — | Whitepaper already done; not enough doc-writing volume |
-| 9 | claude-squad | **USE** | P1 | Parallel agents for sprint work; AGPL = no bundling (OK for dev tool) |
-| 10 | rendergit | **SKIP** | — | Neat but low utility — agent context solved better by Context7 |
-| 11 | TDD Guard | **USE** | P1 | Enforces test-first; ZAO has 248 tests, needs discipline |
-| 12 | Claude Inspector | **WATCH** | P3 | Useful for debugging prompt costs; not daily driver |
-| 13 | Mem9 | **WATCH** | P2 | Compare to OpenClaw built-in memory; interesting for multi-agent |
-| 14 | Codefire | **SKIP** | — | Too early (194 stars), overlaps with MEMORY.md + knowledge graph |
+| # | Decision | Why |
+|---|----------|-----|
+| 1 | Install Context7 first (P0) | 51.8K stars, MIT, solves hallucinated API docs for Next.js/Supabase (ZAO's stack). Latest docs fetched on-demand. No hallucinations = high ROI. |
+| 2 | MCPHub on OpenClaw VPS (P1) | Unified MCP server management. ZOE runs multiple MCPs; dashboard + hot-swap = easier maintenance. |
+| 3 | Install supabase/agent-skills + trailofbits/skills (P1) | Supabase RLS patterns (1.9K stars, from the team). Trail of Bits security (4.8K stars). Both high-authority, stack-specific. |
+| 4 | Skip Codebase Memory MCP for now | ZAO has KNOWLEDGE.json + grep/glob. Overkill until 50K+ LoC. Revisit Q3. |
+| 5 | Skip claude-squad, use Claude Code native subagents instead | Native subagents + /batch in Claude Code already solve parallelism. AGPL dependency not worth the overhead. |
 
-**Immediate installs (this week):** Context7, claude-squad, TDD Guard, Claude SEO
-**Next sprint:** MCPHub on OpenClaw VPS
-**Revisit Q3 2026:** Codebase Memory MCP, Mem9, Skill Creator
+## Install Priority by ROI
+
+| Rank | Tool | Verdict | Why | Install Path |
+|------|------|---------|-----|--------------|
+| **P0** | **Context7** | **INSTALL** | Next.js 16, Supabase, React 19 docs always current. Eliminates outdated API hallucinations. 51.8K stars, MIT. | `npx ctx7 setup` |
+| **P1** | **supabase/agent-skills** | **INSTALL** | RLS patterns, Postgres best practices. From Supabase team. 1.9K stars. | GitHub: `supabase/agent-skills` |
+| **P1** | **trailofbits/skills** | **INSTALL** | Static analysis, semgrep, security diffs. ZAO handles wallet keys + smart contracts. 4.8K stars. | GitHub: `trailofbits/skills` |
+| **P1** | **mattpocock/skills** | **AUDIT** | TypeScript rigor (18.2K stars). Matches ZAO's `.claude/rules/typescript-hygiene.md`. Audit for overlap with ECC. | GitHub: `mattpocock/skills` |
+| **P1** | **MCPHub** | **DEFER** | Docker deploy on VPS 1. Useful when ZOE gains 3+ MCP servers. Revisit next sprint. | Docker: `samanhappy/mcphub` |
+| **P2** | **Mem9** | **WATCH** | Multi-agent shared memory. Relevant when ZOE + Hermes + other agents need unified context. Phase 1 complete, not mature yet. | GitHub: `mem9-ai/mem9` |
+| **SKIP** | Codebase Memory MCP | **NO** | Overkill now. AST-level indexing valuable at 50K+ LoC or 3+ contributors. Revisit Q3. | — |
+| **SKIP** | Codefire | **NO** | 194 stars, requires OpenRouter key. Overlaps with MEMORY.md + research library. | — |
+| **SKIP** | claude-squad | **NO** | Claude Code native subagents sufficient. Don't add AGPL dependency for parallelism already built-in. | — |
 
 ---
 
-## Detailed Comparison Table
+## 2026 MCP Ecosystem Update
+
+Five MCP servers are core to Claude Code workflows per May 2026 research:
+
+| Server | Purpose | ZAO Fit | Status |
+|--------|---------|---------|--------|
+| **Context7** (55.7K stars, updated 2026-05-21) | Fetch current library docs for Next.js, Supabase, etc. | DIRECT - solves training-cutoff hallucinations. Latest: ctx7@0.4.2 (May 11 2026), 120 contributors, 74 releases, active maintenance [FULL] | INSTALL |
+| **Playwright** (MS, official) | Browser automation + testing. Local, no data exfil risk. | MEDIUM - ZAO uses Playwright for page testing | INSTALL |
+| **GitHub MCP** (official) | PR triage, code search, issue tracking | MEDIUM - ZAO on GitHub, already have gh CLI | OPTIONAL |
+| **Sequential Thinking** (official) | Multi-step reasoning for complex problems | LOW - not a bottleneck for ZAO currently | DEFER |
+| **Memory MCP** (Anthropic official) | Persistent knowledge graph across sessions | HIGH - ZOE needs cross-session recall | AUDIT |
+
+All 5 are first-party or high-rep community servers. Total context tax manageable: all fit under 10% of window combined. [FULL]
+
+---
+
+## Detailed Comparison Table (Updated May 2026)
 
 | Tool | What It Does | License | Stars | Free Tier | Install Command | ZAO Integration Notes |
 |------|-------------|---------|-------|-----------|-----------------|----------------------|
-| **Context7** | Injects up-to-date library docs into LLM context. No more hallucinated APIs. Supports Next.js, Supabase, React, etc. | MIT | 51.3k | Free API key at context7.com/dashboard; paid = higher rate limits | `npx ctx7 setup` | Direct hit. ZAO uses Next.js 16, Supabase, React 19 — all supported. Eliminates outdated API pattern hallucinations. MCP server at `https://mcp.context7.com/mcp`. |
+| **Context7** | Injects up-to-date library docs into LLM context. No more hallucinated APIs. Supports Next.js, Supabase, React, etc. | MIT | 55,752 (updated May 20 2026) | Free API key at context7.com/dashboard; paid = higher rate limits | `npx ctx7 setup` | Direct hit. ZAO uses Next.js 16, Supabase, React 19 — all supported. Eliminates outdated API pattern hallucinations. MCP server at `https://mcp.context7.com/mcp`. Latest release ctx7@0.4.2 (May 11 2026). [FULL] |
 | **Codebase Memory MCP** | Persistent knowledge graph via tree-sitter AST parsing (66 languages). SQLite + LZ4 storage. | MIT | 1.1k | Fully free/local | `curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh \| bash` | ZAO already has `research/_graph/KNOWLEDGE.json` (194 docs) + grep/glob. This tool adds AST-level code graph (functions, classes, routes, relationships). Overkill now but valuable if codebase grows significantly. |
 | **Markdownify MCP** | Converts PDFs, images, audio, DOCX, XLSX, PPTX, YouTube transcripts to Markdown. | MIT | 2.5k | Fully free/local | Clone + `pnpm install && pnpm build` | Claude Code already reads PDFs and images natively. ZAO's research ingestion workflow uses WebFetch + WebSearch. Marginal gain. |
 | **MCPHub** | Centralized management of multiple MCP servers. Dashboard UI, Docker support, smart routing, hot-swap config. | Apache-2.0 | 2.0k | Fully free/self-hosted | `docker run -p 3000:3000 -v ./mcp_settings.json:/app/mcp_settings.json samanhappy/mcphub` | Strong fit for OpenClaw VPS (31.97.148.88). ZOE currently manages MCP servers individually. MCPHub adds unified endpoint, dashboard monitoring, and OAuth. Docker-native = easy deploy. |
@@ -227,23 +250,37 @@ docker run -d --name mcphub \
 
 ## Sources
 
-- Context7: https://github.com/upstash/context7 (51.3k stars, MIT, v0.3.9)
-- Codebase Memory MCP: https://github.com/DeusData/codebase-memory-mcp (1.1k stars, MIT)
-- Markdownify MCP: https://github.com/zcaceres/markdownify-mcp (2.5k stars, MIT, v1.0.2)
-- MCPHub: https://github.com/samanhappy/mcphub (2.0k stars, Apache-2.0, v0.12.10)
-- Claude SEO: https://github.com/AgriciDaniel/claude-seo (3.7k stars, MIT)
-- Brand Guidelines: https://github.com/anthropics/skills/tree/main/skills/brand-guidelines (MIT)
-- Skill Creator: https://github.com/anthropics/skills/tree/main/skills/skill-creator (MIT)
-- Doc Co-Authoring: https://github.com/anthropics/skills/tree/main/skills/doc-coauthoring (MIT)
-- claude-squad: https://github.com/smtg-ai/claude-squad (6.8k stars, AGPL-3.0, v1.0.17)
-- rendergit: https://github.com/karpathy/rendergit (2.1k stars, BSD-0)
-- TDD Guard: https://github.com/nizos/tdd-guard (2.0k stars, MIT, v1.3.0)
-- Claude Inspector: https://github.com/kangraemin/claude-inspector (110 stars, MIT, v1.1.5)
-- Mem9: https://github.com/mem9-ai/mem9 (824 stars, Apache-2.0)
-- Codefire: https://github.com/websitebutlers/codefire-app (194 stars, MIT, v1.5.2)
-- ZAO Doc 165 (claude-squad reference)
-- ZAO Doc 154 (skills/commands master reference)
+[FULL]
+- [Context7 MCP](https://github.com/upstash/context7) - 51.8K stars, MIT, v0.3.9+
+- [Supabase Agent Skills](https://github.com/supabase/agent-skills) - 1.9K stars, MIT
+- [Trail of Bits Skills](https://github.com/trailofbits/skills) - 4.8K stars, MIT, 29 security skills
+- [Matt Pocock Skills](https://github.com/mattpocock/skills) - 18.2K stars, TypeScript TDD
+- [MCPHub Dashboard](https://github.com/samanhappy/mcphub) - 2.0K stars, Apache-2.0
+- [Mem9 Persistent Memory](https://github.com/mem9-ai/mem9) - 824 stars, Apache-2.0
+- [Codebase Memory MCP](https://github.com/DeusData/codebase-memory-mcp) - 1.1K stars, MIT (defer for now)
+- [MCPHub Directory - Top 100](https://mcphub.com/top-100-mcp-servers) - Live ranking, May 2026
+- [Canopy Press - Best MCP Servers](https://canopy.press/best-mcp-servers-for-claude-right-now/) - Evaluation framework
+- [Five MCP Servers Before Claude Code Writes a Line](https://dev.to/studiomeyer_io/five-mcp-servers-before-claude-code-writes-a-single-line-18f8) - May 12 2026 workflow patterns
+- [Context7 vs DeepWiki vs Ref vs Docfork Comparison](https://mcp.directory/blog/context7-vs-deepwiki-vs-ref-vs-docfork-2026/) - Apr 30 2026
+- [Claude Code MCP Servers Guide](https://cc.bruniaux.com/guide/mcp-servers-ecosystem/) - May 2026, 7.1K server ecosystem
+- [ClaudePluginHub Blog - MCP Servers for Claude Code](https://www.claudepluginhub.com/blog/mcp-server-plugins-for-claude-code) - Apr 29 2026
 
 ---
 
-*Cross-references: Doc 154 (skills master reference), Doc 165 (claude-squad), Doc 209 (Claude skills + MCP toolkit), Doc 232 (MCP server development guide), Doc 234 (OpenClaw guide)*
+## Next Actions
+
+| Action | Owner | Type | By When |
+|--------|-------|------|---------|
+| Install Context7, test on Next.js 16 routes | @Zaal | Install + verify | This week |
+| Review supabase/agent-skills for RLS pattern reuse | @Zaal | Code audit | Next sprint |
+| Evaluate Trail of Bits for agent/contract security | @Zaal | Security review | Next sprint |
+| Audit mattpocock/skills overlap with ECC TypeScript skills | Claude | Diff analysis | This week |
+| Plan MCPHub deploy on VPS 1 (ZOE multi-MCP coordination) | @Zaal | Architecture | May 31 |
+
+---
+
+## Also See
+
+- Doc 154 - Skills & Commands Master Reference
+- Doc 312 - Claude Skills Marketplace (prior, RoboRhythms analysis)
+- Doc 507 - Claude Skills 1,116 Ecosystem ZAO Picks (companion)

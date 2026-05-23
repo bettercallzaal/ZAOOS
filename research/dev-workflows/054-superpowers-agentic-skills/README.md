@@ -1,9 +1,19 @@
+---
+topic: dev-workflows
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Superpowers agentic skills framework for Claude Code - install recommendation and usage guide (reconstructed)
+tier: primary
+---
+
 # 54 — Superpowers: Agentic Skills Framework for Claude Code
 
 > **Status:** Research complete
 > **Date:** March 2026
 > **Source:** github.com/obra/superpowers
-> **Verdict:** Install it. Zero cost, MIT license, 87K stars, official Anthropic plugin. Transforms how Claude Code builds ZAO OS.
+> **Verdict:** Install it. Zero cost, MIT license, 200K+ stars (up from 87K), official Anthropic plugin. Transforms how Claude Code builds ZAO OS.
+> **Updated 2026-05-21:** Stars grew 2.3x to 200K+, latest v5.1.0 released May 4.
 
 ---
 
@@ -13,10 +23,10 @@ An agentic skills framework by **Jesse Vincent** (obra) that enforces structured
 
 | Metric | Value |
 |--------|-------|
-| **Stars** | ~87,000 |
+| **Stars** | ~200,000+ |
 | **License** | MIT |
 | **Created** | October 2025 |
-| **Latest** | Superpowers 5 (March 9, 2026) |
+| **Latest** | Superpowers 5.1.0 (May 4, 2026) |
 | **Supports** | Claude Code, Cursor, Codex, Gemini CLI, OpenCode |
 | **Status** | Official Anthropic marketplace plugin |
 

@@ -1,3 +1,13 @@
+---
+topic: music
+type: research-complete
+status: research-complete
+last-validated: 2026-05-21
+original-query: "web3 streaming wallet tipping token-gated rooms NFT tickets 2026 (reconstructed)"
+tier: STANDARD
+re-fetch-status: "[FULL] - 0xSplits smart contract protocol confirmed: zero protocol fees, deployed on Base/Optimism/Ethereum/Polygon/Arbitrum. Sound.xyz use case confirmed ($3.4M paid out via 0xSplits). Sound.xyz curator rewards confirmed: 5% on primary mints. USDC Base contract confirmed: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913."
+---
+
 # 273 — Web3 Streaming Features: Wallet Tipping, Token-Gated Rooms, NFT Tickets
 
 > **Status:** Research complete
@@ -28,6 +38,39 @@
 ### Key Takeaway
 
 ZAO OS already has the full wallet stack (wagmi, viem, RainbowKit, SIWE), on-chain read patterns (balanceOf, ownerOf via Hats and ZOUNZ), and a payable write transaction pattern (auction bidding). All three features below can be built on this foundation without new dependencies.
+
+---
+
+## Sources (2026-05-21 Re-fetch)
+
+- [0xSplits — Solidnoob Breakdown](https://www.solidnoob.com/blog/0xSplits) [FULL]
+- [Tokenized Royalties & Smart Contracts — Chainlink](https://chain.link/article/tokenized-royalties-smart-contracts) [FULL]
+- [0xSplits Docs](https://docs.splits.org/) [FULL]
+- [0xSplits GitHub — Contracts](https://github.com/0xSplits/splits-contracts) [PARTIAL]
+- [Sound.xyz Curator Rewards Announcement](https://sound.mirror.xyz/_TlNt5wOXGjnS7_2mMXPUlr-LSGKVQ_tlkE4px5yZEE) [FULL]
+- [Sound.xyz — NFT Plazas Explainer](https://nftplazas.com/sound-xyz-music-nft-marketplace/) [FULL]
+- [Sound.xyz Curator Rewards — TokenInsight](https://tokeninsight.com/en/news/sound.xyz-introduces-curator-rewards-to-earn-5-on-primary-mints-by-sharing-music-and-creating-playlists) [FULL]
+- [Wagmi & Web3 Stack Docs](https://wagmi.sh/) [PARTIAL]
+- [RainbowKit Documentation](https://www.rainbowkit.com/) [PARTIAL]
+
+---
+
+## Findings Update (2026-05-21 Re-research)
+
+### Material Changes
+
+1. **0xSplits Confirmed Deployed on Base** — Zero protocol fees, runs at gas cost only, non-upgradeable, open-source and audited. Sound.xyz use case: $3.4M paid out via 0xSplits to artists (primary + secondary royalties). This confirms doc's recommendation for onchain splits architecture.
+
+2. **Sound.xyz Curator Rewards Confirmed: 5% on Primary Mints** — Collectors earn 5% commission by sharing referral links. Free mints: 0.000222 ETH/referral. Paid mints: 0.000555 ETH ($1.20 USD)/referral. This is higher incentive structure than Pods.media and validates doc's recommendation for community-driven curation.
+
+3. **USDC on Base Confirmed** — Contract `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` verified on Base mainnet. For Mode A (USDC tips), this address is correct.
+
+### Still-Current Claims (Verified)
+
+- Wagmi v2 + RainbowKit integration patterns remain current (confirmed)
+- Farcaster $DEGEN tipping off-chain allowance system (confirmed)
+- Friend.tech / Stars Arena bonding curve models (confirmed)
+- Sound.xyz collect/mint model confirmed current
 
 ---
 

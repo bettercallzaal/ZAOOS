@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "Coinflow music NFT fiat mint Base ERC-1155 smart contract Arweave (reconstructed)"
+related-docs: 125, 145, 155, 141, 406, 143
+tier: STANDARD
+---
+
 # 407 - Music NFT Sales via Coinflow: Fiat-to-Mint on Base
 
 > **Status:** Research complete

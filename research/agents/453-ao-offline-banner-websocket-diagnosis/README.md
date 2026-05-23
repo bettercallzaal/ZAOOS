@@ -1,6 +1,12 @@
-# AO Offline Banner - WebSocket Diagnosis
+# 453 - AO Offline Banner WebSocket Diagnosis
 
-Doc: 453 | Date: 2026-04-20 | Status: Research complete
+**Topic:** agents  
+**Type:** Debugging & Infrastructure  
+**Date:** 2026-04-20  
+**Last-Validated:** 2026-05-21  
+**Original-Query:** Why does AO show persistent offline banner? WebSocket routing issue? (reconstructed)  
+**Tier:** archive-candidate  
+**Status:** Research complete - historical debugging report
 
 ## Summary
 

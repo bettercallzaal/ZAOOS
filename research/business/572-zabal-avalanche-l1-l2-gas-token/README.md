@@ -2,7 +2,8 @@
 topic: business
 type: decision
 status: research-complete
-last-validated: 2026-04-30
+last-validated: 2026-05-21
+original-query: Decide whether to launch a dedicated chain Avalanche L1 OP Stack L2 Arbitrum Orbit Cosmos zone with $ZABAL as native gas or keep $ZABAL as ERC20 on Base (reconstructed)
 related-docs: 553, 555, 567
 tier: STANDARD
 ---

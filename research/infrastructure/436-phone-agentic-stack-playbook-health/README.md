@@ -1,3 +1,12 @@
+---
+topic: infrastructure
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Create comprehensive phone-accessible agentic stack playbook with health check, list all agent surfaces Zaal can access, and rank next improvements (reconstructed)
+tier: STANDARD
+---
+
 # 436 - Phone Agentic Stack Playbook + Health Check
 
 > **Status:** Live inventory + health verified

@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 8, 2026
 > **Goal:** Evaluate MemPalace, Archivist OSS, and related memory/infrastructure tools for ZAO OS agent stack
+> **Original-Query:** Which memory and knowledge graph tools (MemPalace, Archivist, Graphify) should ZAO OS adopt for personal dev and agent fleet infrastructure? (reconstructed)
 
 ---
 

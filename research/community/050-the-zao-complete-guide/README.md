@@ -1,8 +1,15 @@
 # The ZAO: Complete Guide
 
+> **topic:** community
+> **type:** research-guide
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** Complete guide to The ZAO ecosystem, mission, governance, token system, identity layer, and fractals (reconstructed)
+> **tier:** solid
+
 > The canonical reference document for the ZAO ecosystem.
 > **Date:** 2026-02-10
-> **Last updated:** March 2026 | **Status:** Living document
+> **Last updated:** March 2026 | **Re-validated:** May 21, 2026 | **Status:** Living document
 
 ---
 
@@ -220,7 +227,7 @@ A music competition and discovery platform originally incubated within the ZAO e
 | **What** | Onchain music prediction market on Solana |
 | **Legal** | Delaware C-Corporation |
 | **Smart contract** | `9TUfEHvk5fN5vogtQyrefgNqzKy2Bqb4nWVhSFUg2fYo` (Solana Mainnet, Anchor/Rust) |
-| **Volume** | $50,000+ total |
+| **Volume** | 472.71 SOL (~$37,845 USD, May 2026) across 735 total battles |
 | **Website** | [wavewarz.com](https://www.wavewarz.com/) |
 
 **How it works:** Artists battle in 3 consecutive 20-minute rounds. Fans trade using ephemeral bonding curve tokens that exist only during each round. Triple judging combines a human judge, X poll, and SOL trading activity. Artists earn 1% of all trading volume immediately. Losing traders get 50% partial recovery.

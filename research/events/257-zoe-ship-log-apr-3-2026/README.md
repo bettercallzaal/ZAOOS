@@ -1,8 +1,12 @@
 # 257 — ZOE Ship Log: Apr 3 2026
 
-**Date:** 2026-04-03
-**Category:** Operations / Ship Log
-**Status:** Complete
+> **topic:** events
+> **type:** ship-log-operational
+> **status:** research-complete
+> **last-validated:** 2026-05-21
+> **original-query:** What was shipped and deployed for ZOE agent ecosystem on April 3 2026? (reconstructed)
+> **tier:** primary
+> **Date:** 2026-04-03
 
 ---
 

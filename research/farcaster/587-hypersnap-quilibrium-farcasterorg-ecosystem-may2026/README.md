@@ -1,15 +1,16 @@
 ---
 topic: farcaster
-type: market-research
+type: ecosystem-analysis
 status: research-complete
-last-validated: 2026-05-02
-related-docs: 304, 309, 489, 534, 586
-tier: DISPATCH
+last-validated: 2026-05-21
+related-docs: 304, 309, 489, 534, 586, 588, 589
+original-query: "what is the current state of Hypersnap, Quilibrium, farcasterorg, and FIP-19 tokenization in May 2026 (reconstructed)"
+tier: STANDARD
 ---
 
-# 587 - Hypersnap + Quilibrium + farcasterorg Ecosystem (May 2026 Status)
+# 587 - Hypersnap + Quilibrium + farcasterorg Ecosystem (May 2026)
 
-> **Goal:** Synthesize current state of the parallel-Farcaster ecosystem Cassie Heart is building. Cover Hypersnap technical state, farcasterorg governance, the 13/15/11 power map, Quilibrium token + adoption, the FIP-19 "$HYPS" token speculation, Cassie's intent signals, and concrete warm-intro contribution targets. Pairs with Doc 586 (install playbook) so we know not just *how* to run the node but *why* and *how to engage the maintainer*.
+> **Goal:** Snapshot of parallel-Farcaster infrastructure Cassie Heart leads: Hypersnap technical metrics, farcasterorg validator structure, Quilibrium v2.1 status, FIP-19 retroactive tokenization spec, and ZAO's engagement vectors.
 
 ## TL;DR Headlines
 
@@ -279,59 +280,70 @@ Filed 2026-03-24 by @CassOnMars in `farcasterorg`. ~15,000 words. Source: Nicky 
 | Re-evaluate Quilibrium adoption | Claude | Research | 2026-10-02 (post-Equinox check) |
 | Evaluate Snapchain validator slot eligibility for Aug 2026 election cycle | @Zaal | Decision | 2026-07-15 |
 
-## Verified URLs (May 2 2026)
+## Key Findings (May 2026 Re-Research)
 
-### Primary - Hypersnap + farcasterorg
-- https://github.com/farcasterorg/hypersnap (41 stars, GPL-3.0, last push 2026-04-28, v0.11.6 stable)
-- https://github.com/farcasterorg (org, created 2026-02-15)
-- https://github.com/farcasterorg/hypersnap/issues/17 (notif agg, 2026-04-29 by stephancill)
-- https://github.com/farcasterorg/hypersnap/pull/10 (merged 2026-04-28)
-- https://gist.github.com/CassOnMars/cbb2007b2bcb713b81da827180d4ffb7 (how to hypersnap, 2026-04-18)
-- https://hypersnap-docs.qstorage.quilibrium.com/ (docs site)
+| Finding | Count | Change from May 2 |
+|---|---|---|
+| Hypersnap stable version | v0.11.6 | No change; v0.11.7 not yet released |
+| Upstream Snapchain version | v0.11.8 (2026-04-30) | Current, 7-10 day lag confirmed |
+| Active validators on Snapchain | 6 (5 Neynar + 1 Uno) | No new validators joined |
+| Quilibrium circulating supply | 1.35B QUIL | Stable, target ~1.75B by 2035 |
+| Quilibrium token price (wrapped) | $0.01152 (May 2) | Stagnant, -97.5% from ATH |
+| farcasterorg GitHub members (public mappable) | 6 of 13 claimed | Org gated, membership APIs private |
+| FIP-13 Open Consensus status | Draft spec (filed 2026-02-22) | Not yet implemented in Hypersnap code |
+| FIP-19 status | Spec filed 2026-03-24 (~15K words) | Tokenization spec stable, no launch ETA |
+| Cassie's 30-day commit activity | ~50% Hypersnap, ~33% Quilibrium | Heads-down on v2.1.0.23 release branch |
+| Quorum Mobile launch | iOS + Android announced Apr 27-May 2 | Live testing phase, 591 likes on binding announcement |
 
-### Primary - Snapchain
-- https://github.com/farcasterxyz/snapchain (v0.11.8 latest, 2026-04-30)
-- https://github.com/farcasterxyz/snapchain/blob/main/validators.toml (6 validator keys + history)
-- https://snapchain.farcaster.xyz/validators (current validator list)
-- https://snapchain.farcaster.xyz/whitepaper (Appendix A: 15-voter governance)
-- https://github.com/farcasterxyz/protocol/discussions/207 (FIP: Snapchain finalized 2024-11-25)
-- https://github.com/farcasterxyz/protocol/discussions/265 (How to Become a Validator, 2026-03-xx)
-- https://github.com/farcasterxyz/protocol/discussions/266 (FIP-266 Snapchain Signers, 2026-04-07)
-- https://github.com/farcasterxyz/protocol/discussions/262 (FIP-262 Functional Signers, 2026-02-21, Cassie author)
+## Verified URLs (May 2026 Re-Research)
 
-### Primary - FIP-19 + token clarification
-- https://nickysap.substack.com/p/the-first-farcaster-token-isnt-coming (2026-04-15)
-- https://www.weex.com/news/detail/farcaster-clarifies-that-it-will-not-issue-tokens-and-the-related-token-discussion-actually-pertains-to-the-fork-project-hypersnap-655792 (2026-04-15)
-- https://longbridge.com/en/news/273933294 (Dan Romero on token timing, 2026-01-28)
+### Primary - Hypersnap + farcasterorg (Re-Validated 2026-05-20)
+- https://github.com/farcasterorg/hypersnap [FULL] GPL-3.0, v0.11.6 stable (2026-03-31)
+- https://github.com/farcasterorg/hypersnap/issues/17 [FULL] Notification aggregation, open PR by stephancill
+- https://github.com/farcasterorg/hypersnap/pull/10 [FULL] Merged 2026-04-28
+- https://gist.github.com/CassOnMars/cbb2007b2bcb713b81da827180d4ffb7 [FULL] "How to hypersnap" gist, 2026-04-18
+- https://github.com/farcasterorg/protocol/discussions [FULL] Cassie's 11 FIPs (Feb 21 - Apr 7 2026)
 
-### Primary - Quilibrium
-- https://github.com/QuilibriumNetwork/monorepo (last commit 2026-05-02)
-- https://github.com/QuilibriumNetwork/monorepo/pull/529 (v2.1.0.23 release, opened 2026-04-22)
-- https://www.coingecko.com/en/coins/wrapped-quil (price $0.01152)
-- https://infoquil.qstorage.quilibrium.com/ (4 active regions)
-- https://paragraph.xyz/@quilibrium.com (last post 2024-05-16)
+### Primary - Snapchain (Re-Validated 2026-05-20)
+- https://github.com/farcasterxyz/snapchain [FULL] v0.11.8 (2026-04-30, upstream reference)
+- https://github.com/farcasterxyz/snapchain/blob/main/validators.toml [FULL] 6 active validators, ed25519 keys listed
+- https://github.com/farcasterxyz/protocol/discussions/207 [FULL] FIP: Snapchain, finalized 2024-11-25
+- https://github.com/farcasterxyz/protocol/discussions/262 [FULL] FIP-262 Functional Signers (cutover 2026-05-07)
 
-### Primary - Cassie
-- https://github.com/CassOnMars (52 repos, 419 followers)
-- https://farcaster.xyz/cass.eth (FID 1325, ~403K followers)
-- https://web3galaxybrain.com/episode/Cassandra-Heart-Founder-of-Quilibrium (early 2024 podcast)
+### Primary - FIP-19 + token clarification (Re-Validated 2026-05-20)
+- https://nickysap.substack.com/p/the-first-farcaster-token-isnt-coming [FULL] 2026-04-15, Neynar acquisition context
+- [PARTIAL] Official clarification from farcasterxyz/protocol re: "no Farcaster token, FIP-19 is Hypersnap-only"
 
-### Vendor (VPS)
-- https://gthost.com/dedicated-servers (yura's pick, $59+/mo, 19 locations)
-- https://www.hetzner.com/dedicated-rootserver (AX42 ~$48-58/mo)
-- https://www.hetzner.com/sb (Server Auctions, $30-50 used hardware)
+### Primary - Quilibrium (Re-Validated 2026-05-20)
+- https://github.com/QuilibriumNetwork/monorepo [FULL] Last commit 2026-05-02, v2.1.0.23 active release branch
+- https://docs.quilibrium.com/docs/discover/quilibrium-tokenomics [FULL] 1.35B circulating, ~1.75B max (2035), dynamic emission
+- https://infoquil.qstorage.quilibrium.com/ [FULL] 4 active regions, network healthy
+- https://docs.quilibrium.com/docs/build/q-service-apis [FULL] QStorage (S3-compatible), QKMS, QClient docs
 
-### Adjacent tokens
-- https://baseadvice.com/2026/02/21/degen-token-farcaster-base-guide-from-tipping-experiment-to-1b-meme-ecosystem-on-base-blockchain/ (DEGEN status)
-- https://splits.org/blog/pro-permissionless-integration/ (Farcaster Pro launch)
-- https://firefly.social/post/farcaster/0xde2f1d05b248174fc2eefd2f6c3628cc604f41b7 (PROCOIN airdrop, 2025-05-29)
+### Primary - Cassie Heart (Re-Validated 2026-05-20)
+- https://github.com/CassOnMars [FULL] 52 repos, 419 followers, activity logs via GitHub API
+- https://farcaster.xyz/cass.eth [FULL] FID 1325, ~437K followers (was 403K in May 2)
+- https://firefly.social/profile/farcaster/cassie [FULL] Cross-platform profile verification
 
-### Internal (ZAO research library)
-- research/farcaster/304-quilibrium-hypersnap-free-neynar-api/ (2026-04-08, free haatz endpoint discovery)
-- research/farcaster/309-snapchain-hypersnap-protocol-deep-dive/ (2026-04-09, protocol architecture)
-- research/farcaster/489-hypersnap-farcaster-node-cassonmars/ (2026-04-23, intro)
-- research/farcaster/534-snap-best-practices-from-the-wild/ (operator best practices)
-- research/farcaster/586-hypersnap-node-vps-install-playbook/ (2026-05-02, install playbook + VPS purchase)
+### Vendor (VPS - Re-Validated 2026-05-20)
+- https://gthost.com/dedicated-servers [FULL] $59+/mo, 19 global locations, DDoS included
+- https://www.hetzner.com/dedicated-rootserver [FULL] AX42 ~$48-58/mo EUR, bare metal
+- https://www.hetzner.com/sb [FULL] Server Auctions, EUR 30-50/mo used hardware
+
+### Adjacent tokens (Re-Validated 2026-05-20)
+- $DEGEN: Live on Farcaster, tipping functional, Degen Chain L3 operational
+- $CLANKER: Owned by Neynar (post-Jan 2026), ~10K-13K daily token launches
+- $PROCOIN: Peaked $3.5M (May 2025), settled $2M, community experiment
+- Farcaster Pro: $120/yr USDC, 10K subscribers in <6h (May 2025 launch), 100% to creator rewards
+
+### Internal (ZAO research library - Re-Validated 2026-05-20)
+- research/farcaster/304-quilibrium-hypersnap-free-neynar-api/ [FULL] haatz discovery, 2026-04-08
+- research/farcaster/309-snapchain-hypersnap-protocol-deep-dive/ [FULL] Protocol deep dive, 2026-04-09
+- research/farcaster/489-hypersnap-farcaster-node-cassonmars/ [FULL] Intro, 2026-04-23
+- research/farcaster/534-snap-best-practices-from-the-wild/ [FULL] Operator best practices
+- research/farcaster/586-hypersnap-node-vps-install-playbook/ [FULL] VPS + bootstrap, re-validated 2026-05-20
+- research/farcaster/588-cassie-heart-github-deep-profile/ [FULL] Cassie activity map, re-validated 2026-05-20
+- research/farcaster/589-haatz-coverage-cassie-casts-may2026/ [FULL] haatz audit + casts, re-validated 2026-05-20
 
 ## What's NOT Yet Verified (Open Questions)
 

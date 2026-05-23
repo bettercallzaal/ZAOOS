@@ -1,3 +1,12 @@
+---
+topic: governance
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+tier: STANDARD
+original-query: "BuilderOSS repos map: nouns-builder monorepo, builder-template-app, builder-farcaster (@builderbot), ZOUNZ governance UI improvements (reconstructed)"
+---
+
 # 140 — BuilderOSS: The Complete Nouns Builder Protocol Ecosystem
 
 > **Status:** Research complete

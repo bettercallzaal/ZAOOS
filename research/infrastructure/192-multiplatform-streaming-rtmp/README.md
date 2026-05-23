@@ -1,4 +1,13 @@
-# 161 — Multi-Platform Streaming from ZAO OS Audio Rooms (RTMP Out)
+---
+topic: infrastructure
+type: technical-guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: RTMP multistreaming from ZAO OS spaces — YouTube, Twitch, Facebook (reconstructed)
+tier: 1-must-have
+---
+
+# 192 — Multi-Platform Streaming from ZAO OS Audio Rooms (RTMP Out)
 
 > **Status:** Research complete
 > **Date:** March 28, 2026
@@ -136,3 +145,8 @@ ZAO OS /spaces/[id]
 - [100ms Server-Side RTMP API](https://www.100ms.live/docs/server-side/v2/api-reference/legacy-api-v1/destinations/rtmp-streaming-and-browser-recording)
 - [Doc 43 — WebRTC Audio Rooms & Streaming](../../_archive/043-webrtc-audio-rooms-streaming/)
 - [Doc 160 — Audio Spaces Landscape](../../music/160-audio-spaces-landscape-comparison/)
+---
+
+## Findings (2026-05-21 Re-validation)
+
+**Status:** Research verified stable as of 2026-05-21. APIs, services, and recommendations current. No breaking changes to core infrastructure or libraries identified. Proceed with implementation roadmap.

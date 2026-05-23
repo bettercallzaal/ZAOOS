@@ -1,10 +1,18 @@
-# 355 -- Autonomous Social Distribution 2026: What Works, What's Noise, What to Steal
+---
+topic: cross-platform
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: Map autonomous social media distribution trends for agents, identify engagement drivers vs noise, and strategy for VAULT/BANKER/DEALER (reconstructed)
+tier: STANDARD
+related-docs: 354, 347
+---
+
+# 355 — Autonomous Social Distribution 2026: What Works, What's Noise, What to Steal
 
 > **Status:** Research complete (5 autoresearch iterations)
 > **Date:** April 13, 2026
 > **Goal:** Map the state of autonomous social media distribution for AI agents -- what actually drives engagement vs what's noise, and what VAULT/BANKER/DEALER should do
-
----
 
 ## Key Decisions / Recommendations
 

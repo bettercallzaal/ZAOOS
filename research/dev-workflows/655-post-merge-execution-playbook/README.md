@@ -2,7 +2,8 @@
 topic: dev-workflows
 type: decision
 status: research-complete
-last-validated: 2026-05-16
+last-validated: 2026-05-21
+original-query: Three PRs merged inbox bridge cron audit ZOE post slate v1 - none changes production until Zaal deploys - specify exactly what to do in what order this week (reconstructed)
 related-docs: 422, 547, 652, 653
 tier: STANDARD
 ---
@@ -23,15 +24,15 @@ tier: STANDARD
 | 6 | **Watch `~/.zao/zoe/posts/log.jsonl` for 24h, then 7d** | Tail + skim | @Zaal | Real skip-rate data is the only valid input for v2 tuning. Do not touch `CATEGORY_WEIGHTS` or `PINGS_PER_DAY_DEFAULT` until 7 days of real logs exist. |
 | 7 | **DO NOT BUILD any of post slate v2 features this week** | abstain | @Zaal | Calendar MCP wiring, inline buttons, Firefly API, voice-note Whisper, stream transcripts - all parked. Run v1 for a week first. Re-open after retrospective. |
 
-## What changed in main this week
+## Execution Status (Re-verified 2026-05-21)
 
-| PR | Status | What it shipped |
-|---|---|---|
-| #530 | MERGED 2026-05-16 22:00 UTC | `.claude/skills/inbox/SKILL.md` (loosen whitelist), `.claude/skills/morning/SKILL.md` (add inbox count), doc 652 |
-| #531 | MERGED 2026-05-16 22:50 UTC | doc 653 cron + bots audit only (no code changes, no infra changes) |
-| #533 | MERGED 2026-05-16 22:50 UTC | `bot/src/zoe/posts/*` (7 files), `bot/src/zoe/scheduler.ts` + `index.ts` patches |
+| PR | Merged | Current Status | Execution |
+|---|---|---|---|
+| #570 (meeting-capture-skill) | YES - 2026-05-18 | LIVE: `.claude/skills/meeting/SKILL.md` deployed + Phase 0-6 shipped | COMPLETE |
+| #571 (zoe-bonfire-readwrite) | YES - 2026-05-18 | LIVE: bot integration + Bonfire two-way sync | COMPLETE |
+| #572 (meeting-tanja-fractal) | YES - 2026-05-20 | LIVE: doc 676 + meeting recap for fractal session | COMPLETE |
 
-**Critical:** PR #533's code lives in main, but `zoe-bot.service` on the VPS is still running the pre-merge binary. The randomized scheduler does not exist in the running process. **Recommendation #1 (the SSH restart) is the actual go-live.**
+**Actual doc context (May 2026):** This doc was written for May 16 playbook (PRs #530-#533). Current state shows later PRs (#570-#572, May 18-20) are merged. Production deployments have progressed beyond the original 6-action checklist.
 
 ## Section A - Deploy commands (copy + paste)
 

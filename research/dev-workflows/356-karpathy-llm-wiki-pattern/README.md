@@ -3,6 +3,7 @@
 > **Status:** Research complete
 > **Date:** April 15, 2026
 > **Goal:** Evaluate LLM Wiki pattern for ZAO OS research library + potential community knowledge base feature
+> **Original-Query:** How can we structure ZAO's 300+ research docs using Karpathy's LLM Wiki pattern for better maintainability and scaling? (reconstructed)
 
 ---
 

@@ -1,3 +1,12 @@
+---
+topic: dev-workflows
+type: architecture
+status: research-complete
+last-validated: 2026-05-21
+original-query: What AGENTS.md patterns exist across 2500+ GitHub repos, Uniswap, and Farcaster, and how do we refine ZAO's nested AGENTS.md strategy? (reconstructed)
+tier: STANDARD
+---
+
 # 366 - AGENTS.md & AI-Assisted Monorepo Best Practices (2026)
 
 > **Status:** Research complete

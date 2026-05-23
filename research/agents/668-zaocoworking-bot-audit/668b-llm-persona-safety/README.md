@@ -2,7 +2,7 @@
 topic: agents
 type: audit
 status: research-complete
-last-validated: 2026-05-18
+last-validated: 2026-05-21
 related-docs: 661,662,668
 tier: STANDARD
 parent-doc: 668

@@ -1,3 +1,13 @@
+---
+topic: music
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: "ZAO Music Entity artist support collective BMI publishing mechanicals distribution (reconstructed)"
+related-docs: 314, 322, 407, 599a, 601
+tier: STANDARD
+---
+
 # 475 — ZAO Music Entity: Web3 Artist Support Collective
 
 > **Status:** Draft v1 — live spec from GodCloud + Iman conversation

@@ -1,7 +1,17 @@
+---
+topic: infrastructure
+type: ui-patterns
+status: research-complete
+last-validated: 2026-05-21
+original-query: UI patterns from Commonwealth for community chat — sidebar, message feed, dark theme (reconstructed)
+tier: 2-nice-to-have
+---
+
 # UI Reference — CG / Commonwealth
 
 > Source: [app.cg](https://app.cg) | [github.com/hicommonwealth/commonwealth](https://github.com/hicommonwealth/commonwealth)
-> **Date:** 2026-01-25
+> **Original Date:** 2026-01-25
+> **Re-validated:** 2026-05-21
 
 ## What CG Is
 
@@ -137,3 +147,20 @@ github.com/hicommonwealth/commonwealth
 - Dark navy + gold theme will differentiate from CG's lighter design
 - The sidebar + message list + input bar pattern is proven and familiar
 - We DON'T need their complexity (governance, proposals, multi-chain) — just chat
+
+---
+
+## Findings (2026-05-21 Re-validation)
+
+### Material Changes
+None. UI pattern reference remains valid. Commonwealth GitHub still active (updated 2026). React + TypeScript frontend with SCSS still standard. No breaking changes to recommended sidebar/message/input patterns.
+
+### Still Current
+- Two-tier sidebar pattern proven and in production.
+- Design token scheme (navy bg #0a1628, gold #f5a623) stable.
+- Dark theme approach differentiates ZAO OS from lighter web3 UIs.
+- Message component structure (avatar + username + timestamp + text) unchanged across 2025-2026 community platforms.
+
+### Source Status
+- Commonwealth GitHub: https://github.com/hicommonwealth/commonwealth [FULL - repo active, no breaking changes to React component structure]
+- Design patterns: UI best practices stable across 2025-2026 industry (no new standards emerged)

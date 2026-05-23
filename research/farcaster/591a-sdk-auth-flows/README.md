@@ -2,14 +2,15 @@
 topic: farcaster
 type: guide
 status: research-complete
-last-validated: 2026-05-02
-related-docs: 173, 250, 295, 308
+last-validated: 2026-05-21
+related-docs: 173, 250, 295, 308, 591, 591b, 591c, 591d
 tier: STANDARD
+original-query: "Farcaster Mini App SDK authentication + lifecycle patterns - sdk.ready(), context, isInMiniApp, QuickAuth, SIWF, gated app init sequence. (reconstructed)"
 ---
 
-# Farcaster Mini App SDK Auth + Lifecycle Flows
+# 591a - Farcaster Mini App SDK Auth + Lifecycle Flows
 
-Production audit of Farcaster Mini App SDK authentication and initialization patterns. Covers `sdk.actions.ready()`, `sdk.context`, `sdk.isInMiniApp()`, QuickAuth, and SIWF. Includes failure mode diagnosis and recommended init sequences for gated miniapps.
+> **Goal:** Authoritative reference for SDK initialization order, context detection, 3 authentication strategies (context-FID, QuickAuth JWT, SIWF), first-load prompt behavior, and recommended sequences for gated miniapps. SDK version 0.3.0+ (as of May 2026).
 
 ## Quick Reference: Auth Strategy Decision Matrix
 

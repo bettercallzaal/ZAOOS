@@ -1,3 +1,12 @@
+---
+topic: agents
+type: research
+status: research-complete
+last-validated: 2026-05-21
+original-query: "BCZ 101 Farcaster bot design with podcast transcript RAG, gmfc101 architecture fork, 3-path LLM classifier, Supabase pgvector + OpenAI embeddings (reconstructed)"
+tier: STANDARD
+---
+
 # 474 - BCZ 101 Bot + Transcript RAG Best Practices
 
 > **Status:** Research complete

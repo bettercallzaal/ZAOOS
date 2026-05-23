@@ -2,7 +2,8 @@
 topic: agents
 type: decision
 status: research-complete
-last-validated: 2026-05-06
+last-validated: 2026-05-21
+original-query: Bonfire auto-ingest pipeline from all sources - stream + static, make recall always useful (reconstructed)
 related-docs: 547, 568, 613, 614, 615, 618, 619
 tier: DISPATCH
 ---

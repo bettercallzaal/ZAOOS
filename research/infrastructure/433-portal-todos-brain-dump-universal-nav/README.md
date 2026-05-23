@@ -1,3 +1,13 @@
+---
+topic: infrastructure
+type: guide
+status: research-complete
+last-validated: 2026-05-21
+original-query: Document portal v3 shipped features (universal nav dock, todos brain-dump, session history, infra versioning) and define where to route future input (reconstructed)
+tier: STANDARD
+related-docs: 431
+---
+
 # 433 - Portal v3: Todos Brain Dump + Universal Nav + infra/portal Versioned
 
 > **Status:** Shipped + live

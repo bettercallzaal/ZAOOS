@@ -87,10 +87,15 @@ export function RoomView({
   );
   const [previousLayout, setPreviousLayout] = useState<'content-first' | 'speakers-first' | null>(null);
 
-  const { useCallCustomData, useHasOngoingScreenShare } = useCallStateHooks();
+  const { useCallCustomData, useHasOngoingScreenShare, useDominantSpeaker, useIsCallRecordingInProgress } = useCallStateHooks();
   const callCustomData = useCallCustomData();
   const hasScreenShareActive = useHasOngoingScreenShare();
+  const dominantSpeaker = useDominantSpeaker();
+  const isRecording = useIsCallRecordingInProgress();
   const roomTitle = (callCustomData as Record<string, string>)?.title || 'Audio Room';
+  // Name of the current dominant speaker, when there is one — surfaces to the
+  // header so listeners know whose voice they are hearing.
+  const speakingName = dominantSpeaker?.name || dominantSpeaker?.userId || null;
 
   // Fetch Twitch connection info for the host (all viewers see the embed, host gets chat)
   useEffect(() => {
@@ -193,6 +198,35 @@ export function RoomView({
         <div className="flex-1 flex flex-col min-w-0">
           <div className="border-b border-white/[0.08] bg-[#0d1b2a]">
             <DescriptionPanel />
+            {(speakingName || isRecording) && (
+              <div className="flex items-center gap-2 px-4 pb-2 flex-wrap">
+                {speakingName && (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[11px] font-semibold"
+                    aria-live="polite"
+                    aria-label={`Now speaking: ${speakingName}`}
+                  >
+                    <span className="relative flex h-2 w-2" aria-hidden="true">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                    </span>
+                    <span className="truncate max-w-[160px]">Speaking: {speakingName}</span>
+                  </span>
+                )}
+                {isRecording && (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[11px] font-semibold"
+                    aria-live="polite"
+                  >
+                    <span className="relative flex h-2 w-2" aria-hidden="true">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                    </span>
+                    Recording
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <TwitchEmbed
             channel={twitchInfo?.username ?? ''}

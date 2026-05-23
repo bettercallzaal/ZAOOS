@@ -11,6 +11,12 @@ interface JukeEmbedProps {
   spaceId: string;
   /** Optional extra classes for the outer wrapper. */
   className?: string;
+  /**
+   * Passive second-screen mode. Renders the same Juke UI but with
+   * `?audio=off`, so the embed never connects audio — use when the user is
+   * already in the Juke iOS app and the laptop should not double-broadcast.
+   */
+  audioOff?: boolean;
 }
 
 /**
@@ -20,7 +26,7 @@ interface JukeEmbedProps {
  * until it reports `load`. "Powered by Juke" attribution is kept visible per
  * Juke's branding requirements.
  */
-export function JukeEmbed({ spaceId, className }: JukeEmbedProps) {
+export function JukeEmbed({ spaceId, className, audioOff = false }: JukeEmbedProps) {
   const [loaded, setLoaded] = useState(false);
 
   return (
@@ -36,9 +42,9 @@ export function JukeEmbed({ spaceId, className }: JukeEmbedProps) {
           </div>
         )}
         <iframe
-          src={jukeEmbedUrl(spaceId)}
+          src={jukeEmbedUrl(spaceId, { audioOff })}
           title="Juke live audio space"
-          allow="autoplay; microphone"
+          allow={audioOff ? 'autoplay' : 'autoplay; microphone'}
           onLoad={() => setLoaded(true)}
           className="h-full w-full rounded-3xl border-0"
         />

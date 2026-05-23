@@ -102,4 +102,9 @@ export const ENV = {
   // ZAOcoworking bot create spaces without an admin session. Unset = the
   // password path is disabled (admin session still works).
   JUKE_CREATE_PASSWORD: optionalEnv('JUKE_CREATE_PASSWORD'),
+  // HMAC secret shared with Juke's webhook dispatcher. Verifies
+  // `X-Juke-Signature: t={ts},v1={hex_hmac}` on /api/juke/webhooks. Generate
+  // a random 32+ byte hex value (`openssl rand -hex 32`) and pass the same
+  // value to Juke when registering the webhook at POST /v1/developer/webhooks.
+  JUKE_WEBHOOK_SECRET: optionalEnv('JUKE_WEBHOOK_SECRET'),
 } as const;

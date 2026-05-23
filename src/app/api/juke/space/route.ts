@@ -84,27 +84,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Juke's create-space endpoint needs both the app key and a host JWT.
+  // Juke's create-space endpoint is key-only per llms.txt; room owner is the
+  // developer app's owner_fid.
   const apiKey = ENV.JUKE_API_KEY;
-  const userToken = ENV.JUKE_USER_TOKEN;
-  if (!apiKey || !userToken) {
-    const missing = [
-      !apiKey ? 'JUKE_API_KEY' : null,
-      !userToken ? 'JUKE_USER_TOKEN' : null,
-    ]
-      .filter(Boolean)
-      .join(' and ');
+  if (!apiKey) {
     return NextResponse.json(
       {
         success: false,
-        error: `Juke developer API is not configured (missing ${missing}). Apply at juke.audio/developers.`,
+        error:
+          'Juke developer API is not configured (missing JUKE_API_KEY). Apply at juke.audio/developers.',
       },
       { status: 503 },
     );
   }
 
   try {
-    const result = await createJukeSpace(spaceInput, { apiKey, userToken });
+    const result = await createJukeSpace(spaceInput, { apiKey });
     if (!result.ok) {
       // Upstream Juke failure. Log the real status server-side; report a
       // single 502 to the client — a Juke 401/400 is an integration problem,

@@ -3,19 +3,24 @@
  *
  * Creates branded Juke spaces for recurring ZAO events via the Juke developer
  * API (`api.juke.audio`). Path A (the iframe embed in `juke.ts`) needs no
- * keys; Path B does — `POST /v1/developer/spaces` takes TWO credentials:
- * `X-Juke-Api-Key` authorises the app, and `Authorization: Bearer <jwt>`
- * identifies the Juke account that will host the new space.
+ * keys; Path B sends `X-Juke-Api-Key` ONLY (per juke.audio/llms.txt, verified
+ * 2026-05-22): "`/v1/developer/spaces` — key only. Send `X-Juke-Api-Key`; do
+ * not send a bearer JWT. The room owner is derived from the key's owning
+ * developer app's `owner_fid`."
  *
- * IMPORTANT: never import this module from a client component. Both secrets
- * are passed in by the caller (the API route reads them from the
- * environment), so this file holds no secret literal — but the Juke developer
- * API surface is server-only regardless.
+ * The juke.audio/developers landing page still shows a stale example with a
+ * Bearer `JUKE_USER_TOKEN` — llms.txt (the canonical agent-facing spec) is
+ * authoritative. See research docs 695 + 710 + the supersession note in the
+ * 2026-05-22 patch.
+ *
+ * IMPORTANT: never import this module from a client component. The api key is
+ * passed in by the caller (the API route reads it from the environment), so
+ * this file holds no secret literal — but the Juke developer API surface is
+ * server-only regardless.
  *
  * The Juke developer API is in beta; its create-space *response* shape is not
  * publicly documented. `createJukeSpace` parses the response defensively and
- * only trusts a space id that passes `isValidJukeSpaceId`. See research doc
- * 695 and juke.audio/llms.txt for the verified request contract.
+ * only trusts a space id that passes `isValidJukeSpaceId`.
  */
 import { isValidJukeSpaceId, jukeEmbedUrl } from './juke';
 
@@ -59,19 +64,13 @@ export type CreateJukeSpaceResult =
   | { ok: false; status: number; error: string };
 
 /**
- * Credentials for a Juke developer API call. BOTH are required: Juke's
- * `POST /v1/developer/spaces` authorises the *app* with `X-Juke-Api-Key` and
- * identifies the *host* of the new space with a user JWT.
+ * Credentials for a Juke developer API call. `POST /v1/developer/spaces` is
+ * key-only per llms.txt: `X-Juke-Api-Key` authorises the app and the room
+ * owner is derived from `app.owner_fid` — no bearer JWT is sent.
  */
 export interface JukeCredentials {
   /** `JUKE_API_KEY` — the app's static developer secret (juke.audio/developers). */
   apiKey: string;
-  /**
-   * `JUKE_USER_TOKEN` — a Juke JWT for the account that will host the space,
-   * obtained via Sign In With Farcaster. Juke JWTs expire; refreshing this
-   * server-side is an open question for nickysap — see research doc 695.
-   */
-  userToken: string;
 }
 
 /** Id fields the Juke response is most likely to use, in priority order. */
@@ -136,8 +135,7 @@ export async function createJukeSpace(
     response = await fetch(`${JUKE_API_ORIGIN}${CREATE_SPACE_PATH}`, {
       method: 'POST',
       headers: {
-        // App credential + host-identifying user JWT — Juke requires both.
-        Authorization: `Bearer ${credentials.userToken}`,
+        // Key-only per llms.txt; the room owner is app.owner_fid.
         'X-Juke-Api-Key': credentials.apiKey,
         'Content-Type': 'application/json',
       },

@@ -1,18 +1,20 @@
 /**
  * Smoke-test the Juke developer API (research doc 695, Path B).
  *
- * Run this ONCE after JUKE_API_KEY + JUKE_USER_TOKEN land in `.env.local`.
- * It creates a throwaway Juke space and prints the result — confirming the
- * credentials work end-to-end and revealing the (undocumented) create-space
- * response shape before the live `/api/juke/space` route is relied on.
+ * Run this ONCE after JUKE_API_KEY lands in `.env.local`. Juke's
+ * `/v1/developer/spaces` is key-only per llms.txt (room owner = the app's
+ * owner_fid). It creates a throwaway Juke space and prints the result —
+ * confirming the credential works end-to-end and revealing the (undocumented)
+ * create-space response shape before the live `/api/juke/space` route is
+ * relied on.
  *
  * If the response shape differs from what `extractSpaceId` expects, this is
  * where it shows up first.
  *
  *   npx tsx scripts/test-juke-space.ts
  *
- * Reads secrets from `.env.local` (gitignored) and prints them only as
- * "set" / "MISSING" — never the values.
+ * Reads JUKE_API_KEY from `.env.local` (gitignored) and prints it only as
+ * "set" / "MISSING" — never the value.
  */
 import * as fs from 'fs';
 import { createJukeSpace } from '../src/lib/spaces/juke-api';
@@ -37,13 +39,10 @@ function loadEnv(): Record<string, string> {
 async function main(): Promise<void> {
   const env = loadEnv();
   const apiKey = env.JUKE_API_KEY;
-  const userToken = env.JUKE_USER_TOKEN;
 
-  if (!apiKey || !userToken) {
-    console.error('Missing Juke credentials in .env.local:');
-    console.error('  JUKE_API_KEY    ', apiKey ? 'set' : 'MISSING');
-    console.error('  JUKE_USER_TOKEN ', userToken ? 'set' : 'MISSING');
-    console.error('Apply at juke.audio/developers, then add both to .env.local.');
+  if (!apiKey) {
+    console.error('Missing JUKE_API_KEY in .env.local.');
+    console.error('Apply at juke.audio/developers, then add it to .env.local.');
     process.exit(1);
   }
 
@@ -52,7 +51,7 @@ async function main(): Promise<void> {
 
   const result = await createJukeSpace(
     { title, allowAgents: true },
-    { apiKey, userToken },
+    { apiKey },
   );
 
   if (!result.ok) {

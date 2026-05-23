@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 import { PageHeader } from '@/components/navigation/PageHeader';
 import StageCard from '@/components/spaces/StageCard';
-import { HostRoomModal, type RoomTheme } from '@/components/spaces/HostRoomModal';
+import { HostRoomModal, type RoomTheme, type RoomMode } from '@/components/spaces/HostRoomModal';
 import type { GateConfig } from '@/components/spaces/TokenGateSection';
 import { generateCallId, generateSlug } from '@/lib/spaces/streamHelpers';
 import SpacesTabs from '@/components/spaces/SpacesTabs';
@@ -27,10 +27,11 @@ export default function PublicSpacesPage() {
 
   const fetchStages = useCallback(async () => {
     const supabase = getSupabaseBrowser();
+    // Include both stage (audio-only) and voice_channel (full A+V) live rooms.
     const { data } = await supabase
       .from('rooms')
       .select('*')
-      .eq('room_type', 'stage')
+      .in('room_type', ['stage', 'voice_channel'])
       .eq('state', 'live')
       .order('created_at', { ascending: false });
 
@@ -55,7 +56,8 @@ export default function PublicSpacesPage() {
     description: string,
     theme: RoomTheme,
     gateConfig?: GateConfig | null,
-    provider: AudioProvider = 'stream'
+    provider: AudioProvider = 'stream',
+    roomMode: RoomMode = 'stage',
   ) => {
     if (!user) throw new Error('Not authenticated');
     const streamCallId = generateCallId();
@@ -65,7 +67,7 @@ export default function PublicSpacesPage() {
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, streamCallId, theme, room_type: 'stage', gate_config: gateConfig || null, provider, slug }),
+      body: JSON.stringify({ title, description, streamCallId, theme, room_type: roomMode, gate_config: gateConfig || null, provider, slug }),
     });
     if (!res.ok) throw new Error('Failed to create room');
     const { room } = await res.json();

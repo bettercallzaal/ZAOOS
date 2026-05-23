@@ -116,7 +116,10 @@ export default function PublicRoomPage() {
         const initialToken = await tokenProvider();
         const { StreamVideoClient: SVC } = await import('@stream-io/video-react-sdk');
         newClient = new SVC({ apiKey, user: streamUser, token: initialToken, tokenProvider });
-        newCall = newClient.call('audio_room', roomData.stream_call_id);
+        // Stage = Clubhouse-style audio room (mics-only, hand-raise to speak).
+        // Voice channel = full A/V conference: everyone can mic, camera, screen-share.
+        const streamCallType = roomData.room_type === 'voice_channel' ? 'default' : 'audio_room';
+        newCall = newClient.call(streamCallType, roomData.stream_call_id);
 
         const userIsHost = user.fid === roomData.host_fid;
         if (userIsHost) {

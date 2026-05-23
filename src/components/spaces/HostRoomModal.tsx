@@ -6,6 +6,22 @@ import { communityConfig } from '../../../community.config';
 import type { AudioProvider } from '@/lib/spaces/roomsDb';
 
 export type RoomTheme = 'default' | 'music' | 'podcast' | 'ama' | 'chill';
+export type RoomMode = 'stage' | 'voice_channel';
+
+const ROOM_MODES: { id: RoomMode; label: string; description: string; badge: string }[] = [
+  {
+    id: 'stage',
+    label: 'Stage',
+    description: 'Audio only. Host speaks; listeners raise hand to join.',
+    badge: 'MIC',
+  },
+  {
+    id: 'voice_channel',
+    label: 'Video Room',
+    description: 'Everyone can mic, camera, and screen share.',
+    badge: 'CAM',
+  },
+];
 
 const PROVIDERS: { id: AudioProvider; label: string; description: string; badge: string }[] = [
   {
@@ -76,7 +92,8 @@ interface HostRoomModalProps {
     description: string,
     theme: RoomTheme,
     gateConfig?: GateConfig | null,
-    provider?: AudioProvider
+    provider?: AudioProvider,
+    roomMode?: RoomMode,
   ) => Promise<void>;
 }
 
@@ -85,6 +102,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
   const [description, setDescription] = useState('');
   const [theme, setTheme] = useState<RoomTheme>('default');
   const [provider, setProvider] = useState<AudioProvider>(communityConfig.audioProvider ?? 'stream');
+  const [roomMode, setRoomMode] = useState<RoomMode>('stage');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [titleTouched, setTitleTouched] = useState(false);
@@ -102,10 +120,11 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
     setLoading(true);
     setError(null);
     try {
-      await onCreateRoom(title.trim(), description.trim(), theme, gateConfig, provider);
+      await onCreateRoom(title.trim(), description.trim(), theme, gateConfig, provider, roomMode);
       setTitle('');
       setDescription('');
       setTheme('default');
+      setRoomMode('stage');
       setTitleTouched(false);
       setGateConfig(null);
       onClose();
@@ -121,7 +140,9 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
       <div className="bg-[#0d1b2a] border border-white/[0.08] rounded-t-2xl sm:rounded-2xl p-6 w-full max-w-md max-h-[90dvh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-white text-lg font-bold">Create a Stage</h2>
+          <h2 className="text-white text-lg font-bold">
+            {roomMode === 'voice_channel' ? 'Create a Video Room' : 'Create a Stage'}
+          </h2>
           <button
             onClick={onClose}
             className="p-1.5 text-gray-500 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
@@ -143,6 +164,32 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
         )}
 
         <form onSubmit={handleSubmit}>
+          {/* Room mode selector */}
+          <div className="mb-5">
+            <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
+              Mode
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {ROOM_MODES.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setRoomMode(m.id)}
+                  disabled={loading}
+                  className={`flex flex-col gap-1 px-3 py-3 rounded-xl border text-left text-sm transition-all ${
+                    roomMode === m.id
+                      ? 'border-[#f5a623] bg-[#f5a623]/10 text-white'
+                      : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600'
+                  }`}
+                >
+                  <span className="text-[10px] font-bold tracking-wider text-[#f5a623]">{m.badge}</span>
+                  <span className="font-semibold text-white">{m.label}</span>
+                  <span className="text-xs text-gray-500 leading-tight">{m.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Theme selector */}
           <div className="mb-5">
             <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
@@ -280,6 +327,8 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
                   </svg>
                   Creating...
                 </span>
+              ) : roomMode === 'voice_channel' ? (
+                'Start Video Room'
               ) : (
                 'Go Live'
               )}

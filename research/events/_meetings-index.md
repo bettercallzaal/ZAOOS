@@ -4,7 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
-| 2026-05-23 | ZAO Devz call - Zee3 onboard + ZABAL Games + Iman Rwanda hackathon recap | ZAO Devz | Zaal, Zee3, Iman | [725](725-zee3-zabal-iman-rwanda-may23/) | 14 |
+| 2026-05-23 | ZAO Devz call - CannonJones (ZAO Cards) + ZABAL Games + Iman Rwanda hackathon recap | ZAO Devz | Zaal, CannonJones, Iman | [725](725-cannon-zabal-iman-rwanda-may23/) | 14 |
 | 2026-05-22 | Tyler x Zaal - ZABAL Games + Road to ZAOstock | ZABAL Games | Zaal, Tyler | [714](714-tyler-zabal-zaostock-may22/) | 9 |
 | 2026-05-19 | ZAOstock standup - ZABAL Games launch + tracker merge | ZAOstock | Zaal, Jose, Defresh, Ryan Kagy | [720](720-zaostock-standup-may19/) | 8 |
 | 2026-05-19 | Arthur intro call - WaveWarZ Base agentic version | WaveWarZ | Zaal, Sam, Arthur | [711](711-arthur-wavewarz-base-call-may19/) | 6 |

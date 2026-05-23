@@ -2,7 +2,7 @@
 
 Speaker mapping (sherpa-onnx diarization, forced 4 speakers):
 - Speaker 1 = Zaal
-- Speaker 3 = Zee3
+- Speaker 3 = CannonJones
 - Speaker 4 = Iman
 - Speaker ? = unattributed single-word fillers
 

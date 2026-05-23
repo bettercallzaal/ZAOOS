@@ -9,7 +9,6 @@ import {
 
 const mockEnv = vi.hoisted(() => ({
   JUKE_API_KEY: 'jk_sec_live_test' as string | undefined,
-  JUKE_USER_TOKEN: 'jwt_test' as string | undefined,
   JUKE_CREATE_PASSWORD: 'ZAO' as string | undefined,
 }));
 
@@ -48,7 +47,6 @@ describe('POST /api/juke/space', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockEnv.JUKE_API_KEY = 'jk_sec_live_test';
-    mockEnv.JUKE_USER_TOKEN = 'jwt_test';
     mockEnv.JUKE_CREATE_PASSWORD = 'ZAO';
     mockGetSessionData.mockResolvedValue(mockUnauthenticatedSession());
   });
@@ -105,7 +103,7 @@ describe('POST /api/juke/space', () => {
       // The password must not be forwarded to the Juke client.
       expect(mockCreateJukeSpace).toHaveBeenCalledWith(
         { title: 'Fractal Call' },
-        { apiKey: 'jk_sec_live_test', userToken: 'jwt_test' },
+        { apiKey: 'jk_sec_live_test' },
       );
     });
 
@@ -122,13 +120,13 @@ describe('POST /api/juke/space', () => {
       expect(body.data.id).toBe('zao-live-1');
       expect(mockCreateJukeSpace).toHaveBeenCalledWith(
         { title: 'ZAOstock Standup', announceCast: true },
-        { apiKey: 'jk_sec_live_test', userToken: 'jwt_test' },
+        { apiKey: 'jk_sec_live_test' },
       );
     });
   });
 
   describe('configuration', () => {
-    it('returns 503 naming JUKE_API_KEY when only the key is missing', async () => {
+    it('returns 503 naming JUKE_API_KEY when the key is missing', async () => {
       mockGetSessionData.mockResolvedValue(mockAdminSession());
       mockEnv.JUKE_API_KEY = undefined;
 
@@ -137,31 +135,6 @@ describe('POST /api/juke/space', () => {
 
       expect(res.status).toBe(503);
       expect(body.error).toContain('JUKE_API_KEY');
-      expect(body.error).not.toContain('JUKE_USER_TOKEN');
-    });
-
-    it('returns 503 naming JUKE_USER_TOKEN when only the token is missing', async () => {
-      mockGetSessionData.mockResolvedValue(mockAdminSession());
-      mockEnv.JUKE_USER_TOKEN = undefined;
-
-      const res = await POST(makePostRequest('/api/juke/space', { title: 'ZAO Live' }));
-      const body = await res.json();
-
-      expect(res.status).toBe(503);
-      expect(body.error).toContain('JUKE_USER_TOKEN');
-    });
-
-    it('returns 503 naming both when neither credential is set', async () => {
-      mockGetSessionData.mockResolvedValue(mockAdminSession());
-      mockEnv.JUKE_API_KEY = undefined;
-      mockEnv.JUKE_USER_TOKEN = undefined;
-
-      const res = await POST(makePostRequest('/api/juke/space', { title: 'ZAO Live' }));
-      const body = await res.json();
-
-      expect(res.status).toBe(503);
-      expect(body.error).toContain('JUKE_API_KEY');
-      expect(body.error).toContain('JUKE_USER_TOKEN');
     });
   });
 

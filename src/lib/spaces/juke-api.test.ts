@@ -6,8 +6,8 @@ import {
   type JukeCredentials,
 } from './juke-api';
 
-/** A complete credentials pair for tests that do not assert on the values. */
-const CREDS: JukeCredentials = { apiKey: 'jk_sec_live_test', userToken: 'jwt_test' };
+/** Credentials for tests that do not assert on the values. */
+const CREDS: JukeCredentials = { apiKey: 'jk_sec_live_test' };
 
 describe('extractSpaceId', () => {
   it('reads a top-level id', () => {
@@ -72,12 +72,12 @@ describe('createJukeSpace', () => {
     } as Response);
   }
 
-  it('posts to the developer endpoint with both auth headers', async () => {
+  it('posts to the developer endpoint with the api key header only', async () => {
     mockFetchOnce({ ok: true, status: 201, json: () => ({ id: 'abc123' }) });
 
     await createJukeSpace(
       { title: 'ZAO Standup' },
-      { apiKey: 'jk_sec_live_test', userToken: 'jwt_abc' },
+      { apiKey: 'jk_sec_live_test' },
     );
 
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -85,7 +85,7 @@ describe('createJukeSpace', () => {
     expect(url).toBe(`${JUKE_API_ORIGIN}/v1/developer/spaces`);
     expect(options.method).toBe('POST');
     expect(options.headers['X-Juke-Api-Key']).toBe('jk_sec_live_test');
-    expect(options.headers.Authorization).toBe('Bearer jwt_abc');
+    expect(options.headers.Authorization).toBeUndefined();
     expect(options.headers['Content-Type']).toBe('application/json');
   });
 
@@ -155,7 +155,7 @@ describe('createJukeSpace', () => {
 
     const result = await createJukeSpace(
       { title: 'ZAO Live' },
-      { apiKey: 'bad-key', userToken: 'bad-jwt' },
+      { apiKey: 'bad-key' },
     );
 
     expect(result.ok).toBe(false);

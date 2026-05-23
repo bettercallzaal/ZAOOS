@@ -1,125 +1,125 @@
 #!/usr/bin/env bash
-# append-actions.sh - Bulk-append meeting actions to cowork-zaodevz data/actions.json.
-# Usage: append-actions.sh <extracted-json-path> [--commit-msg "msg"]
+# append-actions.sh - Bulk-insert meeting actions into the unified Supabase
+# cowork tracker (project etwvzrmlxeobinrlytza, table public.tasks).
 #
-# Input JSON must match the /meeting output schema (see references/output-schema.md).
-# We only consume the `.actions[]` array + `.meeting.title` + `.meeting.date` for the commit msg.
+# Replaces the prior GitHub-actions.json writer (doc 713 step 1, 2026-05-23).
+# Same input shape - reads .actions[] + .meeting.title/date from the JSON the
+# /meeting Phase 2 extraction produces.
 #
-# Auth: gh auth token (verified push perm on songchaindao-dot/cowork-zaodevz 2026-05-18).
-# Confirms commit hash + item ID range on success.
+# Usage:   append-actions.sh <extracted-json-path>
+# Outputs: prints "OK <N> tasks inserted (legacy_source=meeting:<slug>)" + the
+#          generated slug so the recap doc can record it.
+#
+# Env:
+#   SUPABASE_URL          required, https://etwvzrmlxeobinrlytza.supabase.co
+#   SUPABASE_SERVICE_KEY  required, the service-role key
+#
+# Sourced from ~/.zao/cowork-tracker.env if not already in env. Drop the key
+# there once (chmod 600); the script never echoes it.
 
-set -euo pipefail
+set -uo pipefail
 
 INPUT="${1:?missing extracted-json path}"
-COMMIT_MSG_FLAG=""
-if [[ "${2:-}" == "--commit-msg" && -n "${3:-}" ]]; then
-  COMMIT_MSG_FLAG="$3"
-fi
-
 if [[ ! -f "$INPUT" ]]; then
   echo "ERROR: extracted JSON not found: $INPUT" >&2
   exit 2
 fi
 
-if ! command -v jq >/dev/null; then echo "ERROR: jq required" >&2; exit 3; fi
-if ! command -v gh >/dev/null; then echo "ERROR: gh CLI required" >&2; exit 3; fi
+command -v jq   >/dev/null || { echo "ERROR: jq required" >&2; exit 3; }
+command -v curl >/dev/null || { echo "ERROR: curl required" >&2; exit 3; }
 
-TOKEN=$(gh auth token 2>/dev/null) || { echo "ERROR: gh auth token failed - run gh auth login" >&2; exit 4; }
-
-REPO="songchaindao-dot/cowork-zaodevz"
-PATH_F="data/actions.json"
-BRANCH="main"
-
-# Preflight - verify push perm
-PERM=$(gh api "repos/$REPO" --jq '.permissions.push' 2>/dev/null || echo "false")
-if [[ "$PERM" != "true" ]]; then
-  echo "ERROR: gh auth lacks push permission on $REPO" >&2
-  exit 5
+# ---------- env / key sourcing ----------
+COWORK_ENV="${COWORK_TRACKER_ENV:-$HOME/.zao/cowork-tracker.env}"
+if [[ -z "${SUPABASE_SERVICE_KEY:-}" && -f "$COWORK_ENV" ]]; then
+  set -a; . "$COWORK_ENV"; set +a
 fi
 
-WORK=$(mktemp -d)
-trap "rm -rf $WORK" EXIT
-
-# Fetch current actions.json + sha
-echo "[append] fetching current actions.json" >&2
-RESP=$(curl -fsSL -H "Authorization: Bearer $TOKEN" \
-  "https://api.github.com/repos/$REPO/contents/$PATH_F?ref=$BRANCH")
-SHA=$(echo "$RESP" | jq -r '.sha')
-echo "$RESP" | jq -r '.content' | base64 -d > "$WORK/current.json"
-
-# Sanity check
-if ! jq -e '.items' "$WORK/current.json" >/dev/null; then
-  echo "ERROR: fetched actions.json has no .items array" >&2
-  exit 6
+SUPABASE_URL="${SUPABASE_URL:-}"
+SUPABASE_SERVICE_KEY="${SUPABASE_SERVICE_KEY:-}"
+if [[ -z "$SUPABASE_URL" || -z "$SUPABASE_SERVICE_KEY" ]]; then
+  echo "ERROR: SUPABASE_URL / SUPABASE_SERVICE_KEY missing." >&2
+  echo "       Set them in env or in $COWORK_ENV (chmod 600)." >&2
+  exit 4
 fi
 
-NEXT_ID=$(jq '[.items[] | .id | tonumber] | max + 1' "$WORK/current.json")
-NOW=$(date -u +%Y-%m-%dT%H:%M:%S.000Z)
-TODAY=$(date -u +%Y-%m-%d)
+API="${SUPABASE_URL%/}/rest/v1"
+AUTH=(-H "apikey: $SUPABASE_SERVICE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_KEY")
+
+# ---------- read input ----------
 TITLE=$(jq -r '.meeting.title // "meeting"' "$INPUT")
 DATE=$(jq -r '.meeting.date // empty' "$INPUT")
-[[ -z "$DATE" ]] && DATE="$TODAY"
-
-# Build new items
+[[ -z "$DATE" ]] && DATE=$(date -u +%Y-%m-%d)
 N_NEW=$(jq '.actions | length' "$INPUT")
 if [[ "$N_NEW" -eq 0 ]]; then
-  echo "[append] no actions to append, skipping" >&2
+  echo "[append] no actions to insert, skipping" >&2
   exit 0
 fi
 
-echo "[append] mapping $N_NEW extracted actions starting at id=$NEXT_ID" >&2
+# Slug for legacy_source: meeting:<lower-hyphen-title-<date>>
+SLUG=$(echo "$TITLE" \
+  | tr '[:upper:]' '[:lower:]' \
+  | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g' \
+  | cut -c1-40)
+SOURCE_TAG="meeting:${SLUG}-${DATE}"
 
-jq --slurpfile new "$INPUT" --argjson startId "$NEXT_ID" --arg now "$NOW" --arg today "$TODAY" '
-  $new[0].actions | to_entries | map({
-    id: (($startId + .key) | tostring),
-    title: .value.title,
-    createdBy: "Claude (/meeting skill)",
-    owner: (.value.owner // "Both"),
-    status: "TODO",
-    category: (.value.category // "Other"),
-    priority: (if (.value.due // "") == $today then "P1" else "P2" end),
-    important: false,
-    urgent: ((.value.due // "") == $today),
-    phase: "Define",
-    notes: "",
-    due: (.value.due // ""),
-    createdAt: $now,
-    updatedAt: $now
-  })
-' "$INPUT" > "$WORK/new-items.json"
+echo "[append] inserting $N_NEW actions, legacy_source=$SOURCE_TAG" >&2
 
-# Merge
-jq --slurpfile new "$WORK/new-items.json" --arg now "$NOW" '
-  .items = (.items + $new[0]) | .updatedAt = $now
-' "$WORK/current.json" > "$WORK/merged.json"
+# ---------- resolve team_members owner names -> uuids (one round-trip) ----------
+TEAM_JSON=$(curl -fsS "${AUTH[@]}" "$API/team_members?select=id,legacy_owner") \
+  || { echo "ERROR: team_members read failed" >&2; exit 5; }
 
-OLD_N=$(jq '.items | length' "$WORK/current.json")
-NEW_N=$(jq '.items | length' "$WORK/merged.json")
-echo "[append] $OLD_N -> $NEW_N items (+$((NEW_N - OLD_N)))" >&2
+# jq map: lower(name) -> uuid
+OWNER_MAP=$(echo "$TEAM_JSON" | jq -c 'map(select(.legacy_owner != null)) | map({(.legacy_owner | ascii_downcase): .id}) | add // {}')
 
-# Encode + PUT
-CONTENT_B64=$(base64 < "$WORK/merged.json" | tr -d '\n')
+# ---------- build the rows ----------
+# Map extraction action -> tasks row. Owner resolution via the OWNER_MAP.
+# project=zaodevz (the general bucket). legacy_id stable: <slug>-<index>.
+ROWS=$(jq --argjson omap "$OWNER_MAP" --arg src "$SOURCE_TAG" --arg slug "$SLUG" --arg date "$DATE" --arg title "$TITLE" '
+  .actions | to_entries | map(
+    . as $entry
+    | $entry.value as $a
+    | ($a.owner // "" | ascii_downcase) as $okey
+    | ($omap[$okey] // null) as $oid
+    | {
+        project: "zaodevz",
+        kind: "task",
+        title: $a.title,
+        status: "todo",
+        owner_id: $oid,
+        category: ($a.category // "Other"),
+        priority: (if ($a.due // "") == $date then "P1" else "P2" end),
+        due: (if (($a.due // "") | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")) then $a.due else null end),
+        notes: ("From the " + $title + " meeting on " + $date + (if ($a.owner // "") == "" then "." else ". Owner label: " + $a.owner + "." end)),
+        legacy_id: ($slug + "-" + (($entry.key + 1) | tostring)),
+        legacy_source: $src,
+        brands: [],
+        metadata: ({
+          meeting_title: $title,
+          meeting_date: $date,
+          owner_label: ($a.owner // null),
+          confidence: ($a.confidence // null),
+          auto_inserted_by: "meeting-skill-append-actions.sh"
+        } | with_entries(select(.value != null)))
+      }
+  )
+' "$INPUT")
 
-if [[ -n "$COMMIT_MSG_FLAG" ]]; then
-  MSG="$COMMIT_MSG_FLAG"
-else
-  MSG="chore(actions): meeting recap $DATE $TITLE (+$N_NEW items)
-
-Source: /meeting skill, extracted from transcript."
+# ---------- POST as a single bulk insert ----------
+RESP=$(curl -fsS -X POST "${AUTH[@]}" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: return=representation" \
+  -d "$ROWS" \
+  "$API/tasks?select=legacy_id,title")
+RC=$?
+if [[ $RC -ne 0 ]]; then
+  echo "ERROR: Supabase insert failed (rc=$RC)" >&2
+  exit 6
 fi
 
-PAYLOAD=$(jq -n --arg msg "$MSG" --arg content "$CONTENT_B64" --arg sha "$SHA" --arg branch "$BRANCH" \
-  '{message: $msg, content: $content, sha: $sha, branch: $branch}')
+INSERTED=$(echo "$RESP" | jq 'length')
+if [[ "$INSERTED" != "$N_NEW" ]]; then
+  echo "WARNING: expected $N_NEW inserts, Supabase returned $INSERTED rows" >&2
+fi
 
-echo "[append] PUT $REPO contents/$PATH_F (sha=${SHA:0:7})" >&2
-RESULT=$(curl -fsSL -X PUT \
-  "https://api.github.com/repos/$REPO/contents/$PATH_F" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Accept: application/vnd.github+json" \
-  -d "$PAYLOAD")
-
-NEW_SHA=$(echo "$RESULT" | jq -r '.commit.sha')
-URL=$(echo "$RESULT" | jq -r '.commit.html_url')
-
-echo "[append] OK commit $NEW_SHA" >&2
-echo "$URL"
+echo "[append] OK $INSERTED tasks inserted" >&2
+echo "OK $INSERTED tasks inserted (legacy_source=$SOURCE_TAG)"

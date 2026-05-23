@@ -60,16 +60,20 @@ export function ZabalVoteClient({ initialTotals }: { initialTotals: ModeTotal[] 
       try {
         const ctx = await sdk.context;
         const userFid = ctx?.user?.fid;
-        if (cancelled || !userFid) return;
+        // Base App can report fid -1 when context is not ready (Issue #537);
+        // treat anything < 1 as "no FID yet".
+        if (cancelled || !userFid || userFid < 1) return;
         setFid(userFid);
 
-        // Pre-compute vote power (also primes the cache for /vote acceptance)
+        // Pre-compute vote power (also primes the cache for /vote acceptance).
+        // Note: sdk.actions.ready() is fired globally by <MiniAppReady /> in
+        // the root layout - not called here, so a slow fetch never blocks the
+        // splash from clearing.
         const res = await fetch(`/api/zabal/calculate-vote-power?fid=${userFid}`);
         if (res.ok) {
           const data = (await res.json()) as VotePower;
           if (!cancelled) setVotePower(data);
         }
-        await sdk.actions.ready();
       } catch (err) {
         if (!cancelled) setStatus(`miniapp init failed: ${String(err).slice(0, 80)}`);
       }

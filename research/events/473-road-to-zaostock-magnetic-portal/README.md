@@ -46,12 +46,12 @@ A 12-week drip campaign via email = 12 forgotten messages. The same campaign via
 | July 25 | Ville event magnet | Live attendance magnet at Ville |
 | July 27 | Ville recap | Photos, quotes, next-event tease |
 | August 3 | Artist 3 spotlight | |
-| August 10 | The Cypher teaser | ZAOCHELLA Miami Cipher snippet |
+| August 10 | The Cypher teaser | ZAO-CHELLA Miami Cipher snippet |
 | August 17 | Full lineup poster reveal | All 10 artists public |
 | August 24 | Ticket drop | Tickets go live |
 | August 31 | Sponsor deck final | All partners named |
 | September 7 | Countdown starts | Under 30 days |
-| September 14 | ZAOCHELLA Miami Cipher full release | Drives traffic to /stock |
+| September 14 | ZAO-CHELLA Miami Cipher full release | Drives traffic to /stock |
 | September 21 | Travel + logistics | Parking, food trucks, afterparty info |
 | September 28 | Final schedule | Run-of-show public |
 | October 3 | LIVE | Day-of scavenger hunt begins |

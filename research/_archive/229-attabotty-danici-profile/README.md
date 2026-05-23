@@ -22,7 +22,7 @@ AttaBotty and DaNici are a husband-and-wife creative team based in **Jacksonvill
 | **Artist name** | AttaBotty |
 | **Location** | Jacksonville, FL 32217, United States |
 | **Website** | [attabotty.com](https://www.attabotty.com) |
-| **X/Twitter** | [@AttaBotty](https://x.com/AttaBotty) — "AttaBotty | ZAO-Chella" — 2,088 followers, 2,190 following (joined February 2020) |
+| **X/Twitter** | [@AttaBotty](https://x.com/AttaBotty) — "AttaBotty | ZAO-CHELLA" — 2,088 followers, 2,190 following (joined February 2020) |
 | **Instagram** | [@attabotty](https://www.instagram.com/attabotty/) (William Carreras) |
 | **LinkedIn** | [linkedin.com/in/attabotty](https://www.linkedin.com/in/attabotty/) — "Founder of AttaBotty Productions" — Jacksonville, 10 connections |
 | **TikTok** | [@attabotty](https://www.tiktok.com/@attabotty) |
@@ -183,9 +183,9 @@ From the ZAO Complete Guide (Doc 050) and Task Forces (Doc 215):
 | **Governance & Identity** | Co-owner of TF-03 (Governance & Identity task force) with Zaal |
 | **Fractal Bot** | Co-manages the Fractal Bot meeting history and Respect rankings with Zaal |
 
-### ZAO-Chella
+### ZAO-CHELLA
 
-AttaBotty + DaNici produced **ZAO-Chella** — a fusion of digital innovation and music hosted in **Wynwood** (Miami's cultural hub) during **Art Basel week**. Features included:
+AttaBotty + DaNici produced **ZAO-CHELLA** — a fusion of digital innovation and music hosted in **Wynwood** (Miami's cultural hub) during **Art Basel week**. Features included:
 - Live performances by 10 Web3 musicians
 - Collectable trading cards
 - Art displays with AR (augmented reality) experiences
@@ -231,8 +231,8 @@ Per Doc 224 (ZAO Stock Multi-Year Vision):
 | Event | Year | Role |
 |-------|------|------|
 | **NFTNYC 2024** | 2024 | Featured artist |
-| **Miami Art Week 2024** (Art Basel) | 2024 | Featured artist, ZAO-Chella organizer |
-| **ZAO-Chella** | 2024 | Organizer/producer (Wynwood, Miami) |
+| **Miami Art Week 2024** (Art Basel) | 2024 | Featured artist, ZAO-CHELLA organizer |
+| **ZAO-CHELLA** | 2024 | Organizer/producer (Wynwood, Miami) |
 | **ZAO Stock** | 2026 (planned) | Production Lead + Stage Manager (Ellsworth, Maine) |
 | **ZAOVille** | 2026 (planned) | Production support (Virginia, collaboration with DCOOP) |
 
@@ -294,7 +294,7 @@ Per Doc 224 (ZAO Stock Multi-Year Vision):
 - [Da'Nici Carreras on LinkedIn](https://www.linkedin.com/in/da-nici-carreras-/)
 - [AttaBotty Productions on LinkedIn](https://www.linkedin.com/company/attabotty-productions)
 - [AttaBotty on TikTok](https://www.tiktok.com/@attabotty)
-- [ZAO Festivals (ZAO-Chella)](https://zaofestivals.com/)
+- [ZAO Festivals (ZAO-CHELLA)](https://zaofestivals.com/)
 - [ZAO Festivals on Instagram](https://www.instagram.com/zaofestivals/)
 - [Third Planet Studio on X](https://x.com/3PlanetStudio)
 - [Third Planet Studio](https://thirdplanet.studio/)

@@ -58,6 +58,14 @@ tier: STANDARD
 
 > "{quote text}" - {speaker}
 
+## Verify / Low-confidence
+
+Every `confidence: low` (and notable `medium`) decision, action, quote, or garbled
+transcript span goes here so the recap never silently presents an uncertain item
+as fact. Drop this section only if the extraction was genuinely 100% high-confidence.
+
+- **{item}** - {what is uncertain and what a human should check}
+
 ## Research Seeds
 
 {Topics worth a doc later. Each as a bullet.}

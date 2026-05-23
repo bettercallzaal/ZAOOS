@@ -1,10 +1,9 @@
 ---
 topic: events
 type: guide
-status: research-complete
-last-validated: 2026-05-21
-original-query: "Design ZABAL Games Season 1: Farcaster vibe-coding challenge, two-phase format (Phase 1 open build-a-thon, Phase 2 finals with 8 mentors), all-8-win model"
-related-docs: 646, 629, 628, 627, 626, 584, 361, 324, 322, 311
+status: draft
+last-validated: 2026-05-14
+related-docs: 701, 654, 646, 629, 628, 627, 626, 584, 361, 324, 322, 311
 tier: STANDARD
 ---
 
@@ -14,7 +13,9 @@ tier: STANDARD
 
 > **Status:** DRAFT - working spec, designed in the open. Heavily iterated 2026-05-08 through 2026-05-14. The shareable public summary lives at `bettercallzaal.com/zabalgames.html` (with live Supabase-backed submission tech). This doc is the source-of-truth working spec + decision log.
 
-> **Naming note:** Earlier drafts called this "v0" and "Claude Code Hackathon." Current framing: "Season 1" + "Farcaster Vibe-Coding Challenge" (tool-agnostic). Earlier drafts also referenced a person as "Aiman" - that was a phonetic misspelling of Iman, mentor #5, already on the roster.
+> **Naming note:** Earlier drafts called this "v0" and "Claude Code Hackathon." Current framing: "Season 1" + "Farcaster Vibe-Coding Challenge" (tool-agnostic).
+
+> **State note (2026-05-21):** Doc 701 is now canonical for FORMAT, CALENDAR, MENTOR MODEL, and INFRA STATE. Changes since this doc: the named 8-mentor roster is removed (mentors openly recruited, finalist count decided after July), the calendar is June prep / July build / August Finals (Doc 654), and the build prompt drops fixed Option A-E tracks for an adopt-a-started-project-or-build-from-scratch model. This doc stays the long-form spec + decision log; where it conflicts with Doc 701, Doc 701 wins.
 
 ---
 
@@ -23,7 +24,7 @@ tier: STANDARD
 **What:** A Farcaster-creator onboarding event for the ZAO. Bring hungry, Farcaster-active vibe-coders into ZAO by having them build something real, in public, with a ZAO mentor in their corner.
 
 **Two phases:**
-- **Phase 1 - Open Build-a-Thon:** Anyone applies by building something with the ZAO context prompt + shipping it publicly (live URL + open-source repo + 60s demo + /zabalgames cast). Use any vibe-coding harness.
+- **Phase 1 - Open Build-a-Thon:** Anyone applies by building something with the ZAO context prompt + shipping it publicly (live URL + open-source repo + 60s demo + /zabal cast). Use any vibe-coding harness.
 - **Phase 2 - The Finals:** 8 builders curated from Phase 1, each paired with a ZAO mentor as embedded teammate. 24h build + 24h promote + 24h ZAO governance vote + reveal stream.
 
 **Who decides:** Mentors pick their champions from Phase 1 (first-come-first-served, rolling). Then the ZAO DAO (Respect-earning members, 1-person-1-vote) votes on Finals builds.
@@ -69,7 +70,7 @@ T+0->T+24h BUILD WINDOW. Mentor embedded as teammate (Discord/Meet,
            live with the player). Build in public via declared
            visibility mode. Open repos.
 T+24h      Ship deadline: live URL + open-source repo + 60s demo +
-           ship cast on /zabalgames
+           ship cast on /zabal
 T+24h->48h PROMOTE WINDOW. Cast it, demo it. ZAO accounts amplify all 8.
 T+48h->72h ZAO GOVERNANCE VOTING WINDOW. Respect-earning members cast
            1-person-1-vote ballots onchain. Live tally.
@@ -127,7 +128,7 @@ Players use whatever vibe-coding harness fits them - Claude Code, Cursor, Windsu
 
 ### 4 Visibility Modes
 
-Each player picks at least one primary mode + supplements with ongoing /zabalgames casts:
+Each player picks at least one primary mode + supplements with ongoing /zabal casts:
 
 1. **Live Twitch stream** - the default. ZAO restreams all 8 to one hub.
 2. **Recorded screen sessions** - upload to YouTube/Loom within 1h of each session.
@@ -259,7 +260,7 @@ Blocking step: Zaal creates the Supabase project, runs the schema, pastes the UR
 - $500 USDC tiered pool; all 8 Finalists get paid + collectible
 - ZAO governance vote: Respect-earning members, 1-person-1-vote, not token-weighted
 - Applications public by default
-- Submission bar: live URL + open-source repo + 60s demo + /zabalgames cast
+- Submission bar: live URL + open-source repo + 60s demo + /zabal cast
 - Season 1 framing - recurring format
 - Tooling subsidy dropped
 - Submission tech built (Supabase form + public board + starter projects)

@@ -442,7 +442,7 @@ His label **Hurric4n3Soundz** is credited on all 15 singles, confirming he self-
 | **Forms/Intros** | 610 points -- highest in the ecosystem (vs Zaal's 35). Indicates heavy onboarding/community contribution |
 | **Fractal Host** | 0 -- has not hosted fractals |
 | **ZAO Festivals** | 0 -- has not participated in ZAO festival point system |
-| **ZAO-Chella** | Performed at ZAO-CHELLA Miami (Dec 2024) -- WaveWarZ LIVE Rematch vs JANGO UU |
+| **ZAO-CHELLA** | Performed at ZAO-CHELLA Miami (Dec 2024) -- WaveWarZ LIVE Rematch vs JANGO UU |
 | **ZAOstock** | Assigned as Performing Artist + WaveWarZ LIVE demonstrator. Proven live performer |
 | **LTAW3 Ep. 16** | Guest on the podcast (Sep 17, 2025) -- "w/Ohnahji & EZinCrypto & BetterCallZaal & HURRIC4N3IKE" |
 

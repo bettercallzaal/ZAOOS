@@ -16,7 +16,7 @@
 | Week | Wire | Dimension | Owner | Deadline |
 |------|------|-----------|-------|----------|
 | Week 1 (Apr 24-28) | Clay enrichment + Claude email drafting + webhook logging | Sponsor (01) | Zaal + Eng | Apr 28 |
-| Week 1 (Apr 24-28) | Neynar artist discovery + ZAOCHELLA roster pull | Artist (02) | DCoop + Eng | Apr 28 |
+| Week 1 (Apr 24-28) | Neynar artist discovery + ZAO-CHELLA roster pull | Artist (02) | DCoop + Eng | Apr 28 |
 | Week 2 (May 1-5) | Volunteer skill-matching (Claude on bios) | Volunteer (03) | Eng | May 5 |
 | Week 3 (May 6-12) | Energy curve optimization (Spotify + Claude) | Run-of-Show (04) | Eng | May 12 |
 | Week 3 (May 6-12) | Voice logging + triage agent setup | Day-of (05) | Eng + Zaal | May 12 |
@@ -56,9 +56,9 @@
    - **Cost:** Clay $200/mo, Claude $0.05 (tokens), Webhook $0
    - **Time savings:** 35 hrs over 6 months (5 hrs/sponsor × 20 leads)
 
-2. **Wire: Neynar artist discovery + ZAOCHELLA roster pull** (Artist doc 02)
+2. **Wire: Neynar artist discovery + ZAO-CHELLA roster pull** (Artist doc 02)
    - Implement `/api/stock/artist-discovery/farcaster` (Neynar weekly query)
-   - Manually extract ZAOCHELLA cipher artists (GodCloud has the roster)
+   - Manually extract ZAO-CHELLA cipher artists (GodCloud has the roster)
    - Insert 12-15 wishlist artists into dashboard by May 1
    - **Cost:** Neynar free tier
    - **Output:** 12-15 artists in pipeline by May 1 (target: 10 confirmed by Sep 3)

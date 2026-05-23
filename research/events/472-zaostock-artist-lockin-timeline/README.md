@@ -101,4 +101,4 @@ The internal deadlines keep us sane. The public just sees clarity and execution.
 
 - Apr 21 meeting transcript: Zaal said "if a month before you are not locked in and signed up, like we're moving your spot to someone else, even if you're a friend."
 - Industry standard: most touring artists lock 60-90 days out; we're giving 30 because we're small
-- Precedent: ZAOCHELLA and PALOOZA lineup formation timelines
+- Precedent: ZAO-CHELLA and ZAO-PALOOZA lineup formation timelines

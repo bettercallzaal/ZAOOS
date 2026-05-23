@@ -87,4 +87,19 @@ export const ENV = {
   DEALER_WALLET_ID: optionalEnv('DEALER_WALLET_ID'),
   // 0x Swap API -- swap routing on Base
   ZX_API_KEY: optionalEnv('ZX_API_KEY'),
+
+  // Juke developer API -- server-side Juke space creation (doc 695, Path B).
+  // Key-only per juke.audio/llms.txt: `/v1/developer/spaces` takes
+  // `X-Juke-Api-Key` and derives the room owner from the app's owner_fid.
+  // No bearer JWT is sent. Apply at juke.audio/developers. Absent = 503;
+  // the keyless /live embed still works.
+  JUKE_API_KEY: optionalEnv('JUKE_API_KEY'),
+  // DEPRECATED 2026-05-22: llms.txt confirmed key-only auth on
+  // /v1/developer/spaces. Kept here to avoid breaking existing .env.local
+  // files; no longer read by the Juke client.
+  JUKE_USER_TOKEN: optionalEnv('JUKE_USER_TOKEN'),
+  // Shared password for /api/juke/space — lets the /live/create page and the
+  // ZAOcoworking bot create spaces without an admin session. Unset = the
+  // password path is disabled (admin session still works).
+  JUKE_CREATE_PASSWORD: optionalEnv('JUKE_CREATE_PASSWORD'),
 } as const;

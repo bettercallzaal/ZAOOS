@@ -51,7 +51,7 @@ We believed decentralized technology could change this — but only if the techn
 **ZAO Fractal** — Weekly governance circles using the [Respect Game](https://optimystics.io/respectgame). Peer-ranked contributions, Fibonacci-weighted soulbound token distribution. 77+ meetings and counting. [$ZAO Respect token on Base](https://basescan.org/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957).
 
 **ZAO Festivals** — Four IRL events bridging onchain culture to physical space:
-- [ZAO-PALOOZA](https://app.manifold.xyz/c/zao-card-jango-uu-zaopalooza) (NYC, NFT NYC 2024) — 12 artists, ZAO Cards minted on Manifold
+- [ZAO-PALOOZA](https://app.manifold.xyz/c/zao-card-jango-uu-ZAO-PALOOZA) (NYC, NFT NYC 2024) — 12 artists, ZAO Cards minted on Manifold
 - [ZAO-CHELLA](https://www.instagram.com/reel/DDa-oPBJ7G7/) (Miami, Art Basel 2024) — 10 artists, WaveWarZ LIVE, AR art displays
 - ZAO-PROS (ETH Denver 2025) — Conference activation
 - ZAO Stock (Maine, October 2026) — Planned recurring annual festival
@@ -201,7 +201,7 @@ The **ZAO Cypher** — a multi-artist collaboration with producers [Clejan](http
 - [Year of the ZAO/ZABAL](https://paragraph.com/@thezao) — daily newsletter (400+ editions)
 
 ### Real World Culture
-- ZAO Festivals — [PALOOZA](https://app.manifold.xyz/c/zao-card-jango-uu-zaopalooza), [CHELLA](https://www.instagram.com/reel/DDa-oPBJ7G7/), PROS, Stock
+- ZAO Festivals — [ZAO-PALOOZA](https://app.manifold.xyz/c/zao-card-jango-uu-ZAO-PALOOZA), [ZAO-CHELLA](https://www.instagram.com/reel/DDa-oPBJ7G7/), PROS, Stock
 - COC Concertz — [150+ weekly metaverse concerts](https://www.stilo.world/)
 - ZAOVille — Virginia collaboration (July 2026)
 - Proof of Meet — [IRL connection tokens via Magnetiq](https://www.magnetiq.xyz/)

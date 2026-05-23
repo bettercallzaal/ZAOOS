@@ -247,9 +247,9 @@ Beyond the 7 ZAO Projects + 4 ZABAL Projects, Zaal's whiteboard mindmap shows ad
 **Inside The ZAO orbit:**
 - **WaveWarZ** (already known)
 - **ZAO Fractals** (already known) — sub-fractals: Eden Fractal, Bad Fractal, Fractal Hours, OP Fractal
-- **ZAO Festivals** (already known) — sub-events: ZAO-Palooza, ZAO-Chella, ZAO-Stock
+- **ZAO Festivals** (already known) — sub-events: ZAO-PALOOZA, ZAO-CHELLA, ZAO-Stock
 - **The ZAO Newsletter** (= ZABAL Newsletter) — sub-newsletters: Mindful Moments (with Iain), ZABAL Recaps, Zaal Random Research
-- **ZAO Cards** — sub-products: ZAO-Palooza Cards, WaveWarZ Cards
+- **ZAO Cards** — sub-products: ZAO-PALOOZA Cards, WaveWarZ Cards
 - **LTAW3** — sub-seasons: Spaces Season 1, Livestream Season 2-3, Season 4 Revamp (with Maru). Acronym TBD.
 - **ZAO Calendar** — TBD (internal tool? public product?)
 - **Student $LoanZ** — TBD

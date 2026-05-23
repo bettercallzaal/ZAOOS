@@ -38,7 +38,7 @@
 | **Artist name** | AttaBotty |
 | **Location** | Jacksonville, FL 32217, United States |
 | **Website** | [attabotty.com](https://www.attabotty.com) |
-| **X/Twitter** | [@AttaBotty](https://x.com/AttaBotty) — "AttaBotty | ZAO-Chella" — 2,088 followers, 2,190 following (joined February 2020) |
+| **X/Twitter** | [@AttaBotty](https://x.com/AttaBotty) — "AttaBotty | ZAO-CHELLA" — 2,088 followers, 2,190 following (joined February 2020) |
 | **Instagram** | [@attabotty](https://www.instagram.com/attabotty/) (William Carreras) |
 | **LinkedIn** | [linkedin.com/in/attabotty](https://www.linkedin.com/in/attabotty/) — "Founder of AttaBotty Productions" — Jacksonville, 10 connections |
 | **TikTok** | [@attabotty](https://www.tiktok.com/@attabotty) |
@@ -98,17 +98,17 @@ From the ZAO CSV data: **3,079 total points**, 190 misc points. Activities: ZAO 
 
 **Music Archive (2006-Present):** Full discography available at [attabotty.com/attabotty-archive](https://www.attabotty.com/attabotty-archive).
 
-#### ZAO-Chella
+#### ZAO-CHELLA
 
-AttaBotty + DaNici produced **ZAO-Chella** — a fusion of digital innovation and music hosted in **Wynwood** (Miami's cultural hub) during **Art Basel week**. Features: live performances by 10 Web3 musicians, collectable trading cards, art displays with AR experiences, VIP tables hosted by community partners.
+AttaBotty + DaNici produced **ZAO-CHELLA** — a fusion of digital innovation and music hosted in **Wynwood** (Miami's cultural hub) during **Art Basel week**. Features: live performances by 10 Web3 musicians, collectable trading cards, art displays with AR experiences, VIP tables hosted by community partners.
 
 #### Event Appearances
 
 | Event | Year | Role |
 |-------|------|------|
 | **NFTNYC 2024** | 2024 | Featured artist |
-| **Miami Art Week 2024** (Art Basel) | 2024 | Featured artist, ZAO-Chella organizer |
-| **ZAO-Chella** | 2024 | Organizer/producer (Wynwood, Miami) |
+| **Miami Art Week 2024** (Art Basel) | 2024 | Featured artist, ZAO-CHELLA organizer |
+| **ZAO-CHELLA** | 2024 | Organizer/producer (Wynwood, Miami) |
 | **ZAO Stock** | 2026 (planned) | Production Lead + Stage Manager |
 | **ZAOVille** | 2026 (planned) | Production support (Virginia, collaboration with DCOOP) |
 
@@ -349,7 +349,7 @@ Most active single-wallet participant on the platform (78 battles on wallet A).
 |---------|---------|
 | **ZAO Respect Rank** | #3 all-time (2,740 points), behind only Zaal (3,558) and AttaBotty (3,079) |
 | **Forms/Intros** | 610 points — highest in the ecosystem. Heavy onboarding/community contribution |
-| **ZAO-Chella** | Performed at ZAO-CHELLA Miami (Dec 2024) — WaveWarZ LIVE Rematch vs JANGO UU |
+| **ZAO-CHELLA** | Performed at ZAO-CHELLA Miami (Dec 2024) — WaveWarZ LIVE Rematch vs JANGO UU |
 | **ZAO Stock** | Assigned as Performing Artist + WaveWarZ LIVE demonstrator |
 
 #### ZoundZ Project
@@ -437,7 +437,7 @@ $500,000 across 5 phases. Submitted October 28, 2022. Closed as completed July 3
 | **WaveWarZ Co-Founder** | Marketing, Design, Agentic Automation (co-founded 2023) |
 | **ZID 2** | Second ZAO member ever — ZID 1 = Zaal, ZID 2 = Candy |
 | **Fractal Day 1** | Ranked 2nd on the very first ZAO Fractal Respect Game |
-| **Student $LOANZ** | Creator of the $LOANZ token on Base (launched Feb 2025 on Flaunch.gg, sponsored ZAO-Chella) |
+| **Student $LOANZ** | Creator of the $LOANZ token on Base (launched Feb 2025 on Flaunch.gg, sponsored ZAO-CHELLA) |
 | **ZAO Stock role** | Design + Backup Support: visual design, materials, branding, sponsorship outreach |
 
 #### GitHub — 16 Repositories (All WaveWarZ)
@@ -456,7 +456,7 @@ Sponsorship Administrator at Impact3.co (Web3 Product & Marketing Studio, sister
 
 #### CC0 Art & Design
 
-Creates CC0 graphics for ZAO and WaveWarZ ecosystems. Design work includes: WaveWarZ branding, ZAO event visual design (ZAO-Chella, ZAO-Palooza), print + digital community materials, ZAO Stock design materials.
+Creates CC0 graphics for ZAO and WaveWarZ ecosystems. Design work includes: WaveWarZ branding, ZAO event visual design (ZAO-CHELLA, ZAO-PALOOZA), print + digital community materials, ZAO Stock design materials.
 
 #### Medium Articles
 
@@ -579,7 +579,7 @@ DCoop's ZAO Stock role: Performing Artist + Parallel Event Organizer + productio
 ZAO Core
 ├── AttaBotty + DaNici (Co-Founders, Festivals & Production)
 │   ├── AttaBotty Productions (Jacksonville, FL)
-│   ├── ZAO-Chella (Miami Art Week 2024)
+│   ├── ZAO-CHELLA (Miami Art Week 2024)
 │   └── ZAO Stock Production Lead + Stage Manager
 │
 ├── Candy (Co-Founder, ZID 2)
@@ -637,7 +637,7 @@ ZAO Core
 - [Da'Nici Carreras on LinkedIn](https://www.linkedin.com/in/da-nici-carreras-/)
 - [AttaBotty Productions on LinkedIn](https://www.linkedin.com/company/attabotty-productions)
 - [AttaBotty on TikTok](https://www.tiktok.com/@attabotty)
-- [ZAO Festivals (ZAO-Chella)](https://zaofestivals.com/)
+- [ZAO Festivals (ZAO-CHELLA)](https://zaofestivals.com/)
 - [ZAO Festivals on Instagram](https://www.instagram.com/zaofestivals/)
 - [Third Planet Studio on X](https://x.com/3PlanetStudio)
 - [Third Planet Studio](https://thirdplanet.studio/)

@@ -1,254 +1,287 @@
 ---
 topic: governance
-type: research
+type: guide
 status: research-complete
 last-validated: 2026-05-21
-original-query: "Document the updated ORDAO and ORFrapps repos — new architecture, deployment tooling, CLI reference, configuration system — and map implications for ZAO OS integration"
+superseded-by:
+related-docs: [56, 58, 102, 103, 104, 105, 106, 109, 114, 184, 188, 285, 306, 346, 498, 702, 703]
+original-query: "ORDAO and ORFrapps updated docs April 2026 - deployment, configuration, CLI" (reconstructed)
 tier: STANDARD
 ---
 
-# 285 — ORDAO & ORFrapps Updated Documentation (April 2026)
+# 285 - ORDAO & orfrapps: Deployment & Configuration (April 2026 Update)
 
-> **Status:** Research complete
-> **Date:** 2026-04-05
-> **Goal:** Document the updated ORDAO and ORFrapps repos — new architecture, deployment tooling, CLI reference, configuration system — and map implications for ZAO OS integration
+> **Goal:** Document the split between ORDAO (sim31/ordao) and orfrapps (sim31/orfrapps) repos, the new CLI tooling, configuration system (frapp.json), and implications for ZAO OS integration. Cross-reference doc 109 for full ecosystem overview.
 
----
+## Key Decisions (Recommendations First)
 
-## Key Decisions / Recommendations
-
-| Decision | Recommendation |
-|----------|----------------|
-| **ZAO frapp config** | USE the orfrapps `frapp.json` config format for any future ZAO fractal deployment changes — it's now the canonical way to configure ORDAO instances |
-| **orclient in ZAO OS** | USE `@ordao/orclient` (from `libs/orclient/`) instead of raw viem calls in `src/lib/ordao/client.ts` — it abstracts the on-chain/off-chain split and handles proposal content storage on ornode automatically |
-| **Repo split awareness** | ORDAO (`sim31/ordao`) = codebase + dev environment. ORFrapps (`sim31/orfrapps`) = production deployment + config. Two repos, two concerns. Do not conflate them |
-| **privy-react-orclient** | SKIP for ZAO OS — we use SIWF + iron-session auth, not Privy. Use `orclient` directly instead of the Privy wrapper |
-| **Self-hosting vs hosted** | USE hosted deployment at `zao.frapps.xyz` for now — self-hosting requires Linux + nginx + MongoDB + PM2 infrastructure that duplicates the existing frapps.xyz setup |
-| **SolidRespect** | SKIP — ZAO uses Respect1155 (ERC-1155 NTTs), not the fixed-distribution ERC-20 variant |
-| **check-awards CLI** | USE `orfrapps check-awards` to verify on-chain/off-chain consistency for ZAO's Respect data — catches discrepancies between ornode DB and actual Respect1155 mints |
-| **Network support** | ORDAO now supports Optimism, Base, OP Sepolia, and Base Sepolia — ZAO is on Optimism mainnet, but Base support enables future Superchain ORDAO (see Doc 184) |
+| Recommendation | Rationale | ZAO Action |
+|---|---|---|
+| **Use orfrapps for deployment tooling** | It's now canonical; moved from Optimystics/frapps in April 2026 | If deploying new ORDAO instance, use sim31/orfrapps CLI |
+| **Use frapp.json config format** | Standardized, Zod-validated, supports multi-instance deployments | All fractal config changes → orfrapps format |
+| **Integrate orclient for writes** | Abstracts on-chain/off-chain split; handles ornode proposal storage | Phase 2: add to src/lib/ordao/client.ts |
+| **Skip privy-react-orclient** | ZAO uses iron-session + SIWF, not Privy | Use orclient directly; no auth wrapper |
+| **Stay on zao.frapps.xyz** | Self-hosting duplicates existing infrastructure (nginx, MongoDB, PM2, Linux sysadmin) | Link from ZAO OS; do not self-host ornode |
+| **Use check-awards CLI** | Verifies on-chain vs off-chain Respect consistency | Before major fractal migrations |
+| **Plan Base expansion** | ORDAO now supports Base; future Superchain (see doc 184) | Defer to 2027; monitor doc 184 progress |
 
 ---
 
 ## What Changed Since Doc 56 (Feb 2026)
 
-Doc 56 documented the ORDAO system comprehensively. Here's what's new:
-
-| Change | Before (Doc 56) | Now (April 2026) |
-|--------|-----------------|-------------------|
-| **Deployment tooling** | Lived in `Optimystics/frapps` | Moved to `sim31/orfrapps` — dedicated repo with CLI, config system, docs |
-| **frapps repo** | Deployment scripts + configs | Repurposed as top-level index of fractals, apps, and concepts |
-| **Documentation** | Minimal, code-was-the-docs | 5 comprehensive docs: CLI_REFERENCE, CONFIGURATION, WALKTHROUGH_CONFIGURE, WALKTHROUGH_DEPLOY, MULTIPLE_DEPLOYMENTS |
-| **CLI tool** | Ad-hoc scripts | Full `orfrapps` CLI with 9 commands, composable flags |
-| **Config format** | Undocumented | `frapp.json` + `frapp.local.json` with Zod validation |
-| **New contract** | OREC + Respect1155 | Added `SolidRespect` (fixed ERC-20 variant) |
-| **New library** | orclient + ortypes | Added `privy-react-orclient` (React hooks + Privy auth wrapper) |
-| **Network support** | Optimism + OP Sepolia | Added Base + Base Sepolia |
-| **Active instances** | 3 (Eden, Optimism, ZAO) | Still 3, but now with proper config management |
+| Dimension | Before (Doc 56, Feb) | Now (April-May 2026) |
+|---|---|---|
+| **Deployment tooling** | Lived in Optimystics/frapps (ad-hoc scripts) | Moved to sim31/orfrapps (dedicated repo, 9 CLI commands) |
+| **frapps repo** | Deployment scripts + configs mixed | Repurposed: fractal index + app definitions only |
+| **Documentation** | Minimal ("code-was-docs") | 5 new guides (CLI_REFERENCE, CONFIGURATION, WALKTHROUGH_*, MULTIPLE_DEPLOYMENTS) |
+| **CLI tool** | Manual shell scripts | Full `orfrapps` CLI with 9 commands, composable flags, help text |
+| **Config format** | Undocumented per-instance setup | `frapp.json` (public) + `frapp.local.json` (secrets) with Zod validation |
+| **New contracts** | OREC + Respect1155 only | Added SolidRespect (fixed ERC-20, not used by ZAO) |
+| **New libraries** | orclient + ortypes | Added privy-react-orclient (Privy hooks; not used by ZAO) |
+| **Network support** | Optimism + OP Sepolia | Added Base + Base Sepolia (enables future Superchain) |
+| **Active fractals** | 3 (Eden, Optimism paused, ZAO) | Same 3; Optimism Fractal paused Jan 2026, ZAO only active on OP |
 
 ---
 
-## ORDAO Architecture (Updated)
+## 1. ORDAO Repository: The Monorepo (sim31/ordao)
 
-### Package Structure
+**sim31/ordao** is the development monorepo. Structure:
 
 ```
-ordao/                          # sim31/ordao — development repo
+ordao/
 ├── contracts/
-│   ├── orec/                   # OREC: Optimistic Respect-based Executive Contract
-│   ├── respect1155/            # ERC-1155 non-transferable Respect tokens
-│   └── solid-respect/          # NEW: ERC-20 fixed-distribution Respect
+│   ├── orec/              # OREC: Optimistic Executive Contract
+│   ├── respect1155/       # ERC-1155 soulbound Respect tokens
+│   └── solid-respect/     # ERC-20 variant (not used by ZAO)
 ├── libs/
-│   ├── orclient/               # Client library (on-chain + off-chain abstraction)
-│   ├── ortypes/                # Shared TypeScript types + Zod schemas
-│   ├── privy-react-orclient/   # NEW: React hooks wrapping orclient + Privy
-│   ├── ts-utils/               # General TS utilities
-│   ├── zod-utils/              # Zod schema utilities
-│   └── ethers-decode-error/    # Smart contract error decoding
+│   ├── orclient/          # Client library - abstracts on-chain/off-chain split
+│   ├── ortypes/           # Shared types + Zod validators
+│   ├── privy-react-orclient/  # React + Privy hooks (skip for ZAO)
+│   └── ts-utils, zod-utils, ethers-decode-error
 ├── services/
-│   └── ornode/                 # Backend API (proposals, votes, metadata → MongoDB)
+│   └── ornode/            # REST API backend (MongoDB + Node.js)
 ├── apps/
-│   ├── gui/                    # Frontend (React + Chakra UI + TanStack Router)
-│   └── orclient-docs/          # Generated API docs (orclient-docs.frapps.xyz)
+│   ├── gui/               # React frontend (Chakra UI, TanStack Router)
+│   └── orclient-docs/     # Generated TypeDoc site
 └── docs/
-    └── OREC.md                 # OREC specification
+    └── OREC.md            # Smart contract spec
 ```
 
-### Dependency Graph
-
-```
-apps/gui ──────────────► libs/privy-react-orclient ──► libs/orclient ──► libs/ortypes
-                                                                              │
-                         services/ornode ──────────────────────────────────────┘
-                                                                              │
-                                                              contracts/orec ◄┘
-                                                              contracts/respect1155
-```
-
-### Key Design Principle
-
-> "Only proposal hashes are stored on-chain — full proposal content and metadata lives on the ornode."
-
-This hybrid approach keeps gas costs low while maintaining data integrity through hash verification.
+**Core design principle:** "Only proposal hashes live on-chain; full content lives in ornode." This hybrid model keeps gas costs low while maintaining integrity via hash verification.
 
 ---
 
-## ORFrapps: Deployment & Configuration System
+## 2. orfrapps Repository: Production Deployment Tooling (sim31/orfrapps)
 
 ### Why a Separate Repo
 
-Tadas (sim31) explains: ORDAO is oriented toward developing a single DAO's tooling with dev-environment scripts. ORFrapps manages deploying and maintaining multiple ORDAO instances in production. Different concerns prompted different project structures.
+ORDAO (sim31/ordao) = development environment. orfrapps (sim31/orfrapps) = production deployment + multi-instance management. Different concerns, different repos.
 
-### Repository Structure
+**sim31/orfrapps structure:**
 
 ```
-orfrapps/                       # sim31/orfrapps — production deployment
-├── fractals/                   # Per-community configurations
-│   ├── zaof/                   # ZAO Fractal config
-│   │   ├── frapp.json          # Public config (committed)
-│   │   └── frapp.local.json    # Secrets (gitignored)
-│   ├── ef2/                    # Eden Fractal
-│   └── of/                     # Optimism Fractal
-├── ordao/                      # Git submodule → sim31/ordao
-├── src/                        # CLI implementation
-├── docs/                       # 5 documentation files
-│   ├── CLI_REFERENCE.md
-│   ├── CONFIGURATION.md
-│   ├── WALKTHROUGH_CONFIGURE.md
-│   ├── WALKTHROUGH_DEPLOY.md
-│   └── MULTIPLE_DEPLOYMENTS.md
-└── dist/                       # Generated: proc/, sites/, deployments/
+orfrapps/
+├── fractals/              # Per-fractal configs
+│   ├── zaof/              # ZAO Fractal
+│   │   ├── frapp.json     # Public (committed)
+│   │   └── frapp.local.json  # Secrets (gitignored)
+│   ├── ef2/, of/          # Other fractals
+├── ordao/                 # Git submodule → sim31/ordao
+├── src/                   # CLI TypeScript code
+├── docs/                  # 5 guides
+├── dist/                  # Generated: proc/, sites/, deployments/
 ```
 
-### CLI Reference (9 Commands)
+### CLI Commands (9 Total)
 
-| Command | Purpose | Key Flags |
-|---------|---------|-----------|
-| `orfrapps contracts <id>` | Deploy smart contracts | `-b` build, `-d` deploy, `-v` verify, `-a` all |
-| `orfrapps ornode <id>` | Configure + build ornode backend | `-c` config, `-s` nginx, `-p` PM2, `-a` all |
-| `orfrapps gui <id>` | Build web frontend | `-c` config, `-b` build, `-s` nginx, `-a` all |
-| `orfrapps ornode-sync <from> <to>` | Sync blockchain events to DB | `-s` step range (default 8000) |
-| `orfrapps ornode-backup` | MongoDB backup via mongodump | Requires `BACKUP_DIR`, `MONGO_DUMP_URI` env vars |
-| `orfrapps check-awards` | Verify on-chain/off-chain Respect consistency | `-f` from block, `-t` to block |
-| `orfrapps rsplits` | Generate Respect distribution CSV for splits contracts | `-c` output CSV |
-| `orfrapps parent-deploy <id> <net>` | Deploy parent fractal Respect | Networks: optimism, base, opSepolia, baseSepolia |
-| `orfrapps orclient-docs` | Build orclient API docs site | `-a` all |
+| Command | Purpose | Typical Flags |
+|---|---|---|
+| `orfrapps contracts <id>` | Deploy OREC + Respect1155 | `-a` (all: build, deploy, verify) |
+| `orfrapps ornode <id>` | Deploy backend service + config | `-a` (all) + `--domain <domain>` |
+| `orfrapps gui <id>` | Build + deploy frontend | `-a` + `--domain` |
+| `orfrapps ornode-sync` | Sync blockchain events to MongoDB | `-s` (step size, default 8000) |
+| `orfrapps ornode-backup` | Backup MongoDB via mongodump | Requires `BACKUP_DIR` env var |
+| `orfrapps check-awards` | Verify on-chain/off-chain consistency | `-f, -t` (block range) |
+| `orfrapps rsplits` | Generate Respect CSV for splits contracts | `-c` (output) |
+| `orfrapps parent-deploy` | Deploy parent Respect token | Networks: optimism, base, opSepolia, baseSepolia |
+| `orfrapps orclient-docs` | Rebuild API docs site | `-a` (all) |
 
-### Configuration System
+### Configuration Files
 
-**`frapp.json`** (public, committed):
+**frapp.json** (public config, committed):
 
-| Field | Example | Purpose |
-|-------|---------|---------|
-| `id` | `"zaof"` | 2-12 char identifier |
-| `fullName` | `"ZAO Fractal"` | Display name |
-| `frappsSubdomains` | `["zao"]` | Domain routing → zao.frapps.xyz |
-| `deploymentCfg.network` | `"optimism"` | Target chain |
-| `deploymentCfg.oldRespectAddr` | `"0x34cE..."` | Parent ERC-20 Respect token |
-| `deploymentCfg.votePeriod` | `259200` | 3 days in seconds |
-| `deploymentCfg.vetoPeriod` | `259200` | 3 days in seconds |
-| `deploymentCfg.voteThreshold` | `1000` | Min Respect for YES eligibility |
-| `deploymentCfg.maxLiveYesVotes` | `10` | Anti-spam limit |
-| `app.defBreakoutType` | `"respectBreakout"` | or `"respectBreakoutX2"` |
-| `app.startPeriodNum` | `0` | First period number |
+```json
+{
+  "id": "zaof",
+  "fullName": "ZAO Fractal",
+  "frappsSubdomains": ["zao"],
+  "deploymentCfg": {
+    "network": "optimism",
+    "oldRespectAddr": "0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957",
+    "votePeriod": 259200,
+    "vetoPeriod": 259200,
+    "voteThreshold": "1000",
+    "maxLiveYesVotes": 10
+  },
+  "app": {
+    "defBreakoutType": "respectBreakout",
+    "startPeriodNum": 0
+  }
+}
+```
 
-**`frapp.local.json`** (secrets, gitignored):
+**frapp.local.json** (secrets, .gitignored):
 
-| Field | Purpose |
-|-------|---------|
-| `providerUrl` | RPC endpoint (Alchemy/Infura) |
-| `privyAppId` | Privy auth service ID |
-| `mongoCfg.url` | MongoDB connection string |
-| `mongoCfg.dbName` | Database name |
-| `ornode.host` | Default: `"localhost"` |
-| `ornode.port` | Default: `8090` |
+```json
+{
+  "providerUrl": "https://optimism.alchemyapi.io/v2/...",
+  "privyAppId": "...",
+  "mongoCfg": {
+    "url": "mongodb://...",
+    "dbName": "zaof_fractal"
+  },
+  "ornode": {
+    "host": "localhost",
+    "port": 8090
+  }
+}
+```
 
-All configs validated via Zod schemas — invalid configs fail at CLI command time.
+All configs validated via Zod at CLI runtime (early failure on errors).
 
----
+### Deployment Procedure
 
-## Deployment Walkthrough (11 Steps)
+**High-level (11 steps):**
 
-1. `git clone` + `npm run init` + `source ./orfrapps-alias`
+1. `git clone sim31/orfrapps` + `npm run init`
 2. Create `.env` with RPC URLs + deployer private key
-3. `orfrapps contracts <id> -a` — deploys OREC + Respect1155 (1-5 min)
-4. Create `frapp.local.json` with provider, Privy, MongoDB credentials
-5. `orfrapps ornode <id> -a --domain <domain>` — builds + configures ornode
-6. Copy nginx configs → `/etc/nginx/sites-available/`, symlink, reload
-7. DNS A records for subdomains
-8. `sudo certbot --nginx -d <subdomain>.<domain>` — SSL
-9. `npx pm2 start dist/proc/<id>/ornode.pm2.json` — start ornode
-10. `orfrapps gui <id> -a --domain <domain>` — build + deploy frontend
-11. Verify at `https://<subdomain>.<domain>`
+3. Run `orfrapps contracts zaof -a` (deploys OREC + Respect1155, 1-5 min)
+4. Create `frapp.local.json` with secrets
+5. Run `orfrapps ornode zaof -a --domain zaoos.com` (builds + config backend)
+6. Copy nginx configs, symlink, reload
+7. Create DNS A records for `zao.zaoos.com`
+8. Run `certbot --nginx -d zao.zaoos.com` (SSL)
+9. Start ornode with PM2
+10. Run `orfrapps gui zaof -a --domain zaoos.com` (build + deploy frontend)
+11. Verify at `https://zao.zaoos.com`
 
-Infrastructure requirements: Linux server, nginx, Node.js 18+, MongoDB, PM2.
-
----
-
-## Comparison: ZAO OS Integration Options
-
-| Approach | Effort | Benefit | Risk |
-|----------|--------|---------|------|
-| **Keep current `src/lib/ordao/client.ts`** (raw viem) | 0 hrs | Already works, reads proposals + balances | Duplicates orclient logic, doesn't handle ornode proposal content |
-| **Replace with `orclient` library** | 8-12 hrs | Full proposal lifecycle (create/vote/execute), auto-handles on-chain/off-chain split | Adds ethers.js dependency (orclient uses ethers, ZAO uses viem) |
-| **Hybrid: keep viem for reads, add orclient for writes** | 4-6 hrs | Best of both — lightweight reads + full write support | Two blockchain client patterns in one codebase |
-| **Build custom orclient wrapper with viem** | 16-20 hrs | Clean integration with ZAO's existing viem stack | High effort, fragile to upstream orclient changes |
-
-**Best option for ZAO OS:** Hybrid approach. Keep the existing `src/lib/ordao/client.ts` for read-only operations (it works and is lightweight), but integrate `orclient` for write operations when building the in-app proposal creation/voting UI. The ethers.js dependency is only needed server-side.
+**Infrastructure requirements:** Linux server, nginx, Node.js 18+, MongoDB, PM2.
 
 ---
 
-## ZAO OS Integration
+## 3. ZAO OS Integration Options
 
-### What's Already Built
+### Current State
 
-- `src/lib/ordao/client.ts` — Direct on-chain reader using viem, reads OREC proposals + Respect balances on Optimism
-- `src/app/api/fractals/proposals/route.ts` — API route serving proposal data
-- `src/app/api/fractals/member/[wallet]/route.ts` — Per-member fractal data
-- `src/app/api/fractals/analytics/route.ts` — Fractal analytics
-- `src/app/api/fractals/sessions/route.ts` — Session history
-- `src/app/(auth)/fractals/` — Full fractals UI (Sessions, Proposals, Analytics, About, Leaderboard tabs)
-- Contract addresses: OREC at `0xcB05F9254765CA521F7698e61E0A6CA6456Be532`, ZOR at `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`
+ZAO OS already has:
+- `src/lib/ordao/client.ts` - viem-based read-only OREC reader
+- `src/app/api/fractals/*` - API routes
+- Contract addresses in `community.config.ts`
 
-### What's Not Built Yet
+**Missing:** Proposal creation, voting, execution (all happen at zao.frapps.xyz currently).
 
-- In-app proposal creation (currently done at zao.frapps.xyz)
-- In-app voting on OREC proposals
-- Breakout result submission from within ZAO OS
-- Respect distribution execution trigger
-- `orclient` integration for write operations
+### Integration Approaches
 
-### Key Files to Modify for Deeper Integration
+| Approach | Effort | Benefit | Risk | Recommendation |
+|---|---|---|---|---|
+| Keep viem reads only | 0 hrs | Works now, lightweight | No proposal creation in ZAO OS | Keep short-term |
+| Add orclient for writes | 4-6 hrs | Full proposal lifecycle in ZAO OS | ethers.js dependency (not viem) | **DO THIS in Phase 2** |
+| Replace with orclient entirely | 8-12 hrs | Single client pattern | Refactor all reads | Skip |
+| Custom viem-based orclient wrapper | 16-20 hrs | Pure viem stack | Maintenance burden, fragile to orclient updates | Skip |
 
-| File | Change |
-|------|--------|
-| `src/lib/ordao/client.ts` | Add orclient for write operations alongside existing viem reads |
-| `src/app/api/fractals/proposals/route.ts` | Add POST handler for creating proposals via orclient |
-| `src/app/(auth)/fractals/ProposalsTab.tsx` | Add vote/execute buttons |
-| `community.config.ts` | Add ORDAO config section (ornode URL, frapp ID, periods) |
-| `package.json` | Add `@ordao/orclient` + `@ordao/ortypes` dependencies |
+**Recommended:** Hybrid (Phase 2). Keep viem for reads; add orclient for writes (proposal creation, voting, execution). Ethers dependency is server-side only (not exposed to browser).
 
 ---
 
-## Tadas's Caveats (From Eden Fractal Telegram, Feb 12 2026)
+## 4. ZAO OS Integration: Next Steps
 
-1. **ORFrapps docs are deployment/maintenance only** — ORDAO repo codebase docs still need updating
-2. **Docs are AI-generated** with small manual edits — reviewed and accurate but don't follow console commands blindly
-3. **Tooling is not user-friendly** — built for Tadas to manage infrastructure, not for easy self-deployment by anyone
-4. **GPL-3.0 license** on orfrapps — all modifications must remain open source
+### Built Already
+
+| Component | File(s) | Status |
+|---|---|---|
+| **Read OREC state** | `src/lib/ordao/client.ts` | Viem-based, works |
+| **API routes** | `src/app/api/fractals/*` | 7 routes (proposals, member, sessions, analytics) |
+| **UI** | `src/app/(auth)/fractals/` | Sessions, Proposals, Analytics, Leaderboard, About |
+| **Config** | `community.config.ts` lines 105-116 | OREC address, Respect contracts |
+
+### Not Built
+
+- In-app proposal creation
+- In-app voting + execution
+- Breakout result submission
+- Respect distribution triggers
+
+### Phase 2 Files to Modify
+
+| File | Change | Effort |
+|---|---|---|
+| `src/lib/ordao/client.ts` | Add orclient for writes | 4-6 hrs |
+| `src/app/api/fractals/proposals/route.ts` | POST handler (orclient.proposeBreakoutResult) | 2 hrs |
+| `src/app/(auth)/fractals/ProposalsTab.tsx` | Vote/execute buttons | 2 hrs |
+| `src/app/(auth)/fractals/BreakoutSubmit.tsx` | NEW: breakout result form | 3 hrs |
+| `package.json` | Add @ordao/orclient, @ordao/ortypes, ethers | 0.5 hrs |
+
+### Dependencies to Add
+
+```json
+{
+  "@ordao/orclient": "^1.4.4",
+  "@ordao/ortypes": "^1.4.4",
+  "ethers": "^6.13.0"
+}
+```
+
+---
+
+## 5. Important Caveats
+
+From Tadas (sim31) via Eden Fractal Telegram (Feb 2026):
+
+1. **Docs cover deployment only** - ORDAO codebase docs in sim31/ordao still need work
+2. **Docs are AI-generated with manual review** - Generally accurate, but test commands in a test env first
+3. **Tooling built for infrastructure teams** - Not designed for casual self-deployment by non-operators
+4. **GPL-3.0 applies** - All forks/modifications of orfrapps must remain open source
+
+---
+
+## Also See
+
+- **Doc 56 - ORDAO & Respect Game System:** Original design + mechanics
+- **Doc 109 - Optimystics Tooling Ecosystem:** Full tool overview (DEEP tier)
+- **Doc 184 - Superchain ORDAO:** Cross-chain expansion plans
+- **Doc 702 - Fractal Lineage:** Historical context + terminology
+- **Doc 703 - ZAO Fractal State:** Current operational status + recommendations
+
+---
+
+## Next Actions
+
+| Action | Owner | When |
+|---|---|---|
+| **Decision: link vs embed vs self-host zao.frapps.xyz** | @Zaal | Week 1 |
+| **Integrate orclient for Phase 2** | @ZAO Dev | June 2026 |
+| **Test orfrapps on staging instance** | @DevOps | Post-decision |
+| **Document ornode migration plan** | @Zaal | June 2026 |
 
 ---
 
 ## Sources
 
-- [sim31/ordao](https://github.com/sim31/ordao) — ORDAO core monorepo (TypeScript 93.6%, Solidity 5.6%)
-- [sim31/orfrapps](https://github.com/sim31/orfrapps) — Deployment tooling + configs (TypeScript 54.5%, Solidity 45.3%)
-- [ORFrapps CLI Reference](https://github.com/sim31/orfrapps/blob/main/docs/CLI_REFERENCE.md)
-- [ORFrapps Configuration Reference](https://github.com/sim31/orfrapps/blob/main/docs/CONFIGURATION.md)
-- [ORFrapps Deployment Walkthrough](https://github.com/sim31/orfrapps/blob/main/docs/WALKTHROUGH_DEPLOY.md)
-- [ORFrapps Configuration Walkthrough](https://github.com/sim31/orfrapps/blob/main/docs/WALKTHROUGH_CONFIGURE.md)
-- [orclient API Docs](https://orclient-docs.frapps.xyz)
-- [Eden Fractal Telegram — Tadas's announcement](https://t.me/edenfractal/1/6225)
-- [ZAO Fractal on frapps.xyz](https://zao.frapps.xyz)
-- [Doc 56 — ORDAO & Respect Game System](../056-ordao-respect-system/)
-- [Doc 184 — Superchain ORDAO Cross-Chain Fractal](../184-superchain-ordao-crosschain-fractal/)
+**ORDAO:**
+- [sim31/ordao GitHub](https://github.com/sim31/ordao) - Monorepo (TypeScript 93.6%, Solidity 5.6%) [FULL]
+- [OREC Specification](https://github.com/sim31/ordao/blob/main/docs/OREC.md) - Smart contract design [FULL]
+- [orclient README](https://github.com/sim31/ordao/tree/main/libs/orclient) - Client library overview [FULL]
+
+**orfrapps (Deployment):**
+- [sim31/orfrapps GitHub](https://github.com/sim31/orfrapps) - CLI + deployment tools (TypeScript 54.5%, Solidity 45.3%) [FULL]
+- [CLI Reference](https://github.com/sim31/orfrapps/blob/main/docs/CLI_REFERENCE.md) - All 9 commands [FULL]
+- [Configuration Guide](https://github.com/sim31/orfrapps/blob/main/docs/CONFIGURATION.md) - frapp.json format [FULL]
+- [Deployment Walkthrough](https://github.com/sim31/orfrapps/blob/main/docs/WALKTHROUGH_DEPLOY.md) - Step-by-step [FULL]
+
+**API & Docs:**
+- [orclient-docs.frapps.xyz](https://orclient-docs.frapps.xyz) - TypeDoc API reference [FULL]
+- [ZAO frapps deployment](https://zao.frapps.xyz) - Live instance [FULL]
+
+**Cross-reference:**
+- Doc 109 (Optimystics ecosystem) - Full tools overview
+- Doc 702 (Fractal lineage) - Context + history

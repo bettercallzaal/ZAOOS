@@ -1,6 +1,6 @@
 ---
 name: meeting
-description: Capture meeting transcripts (voice memo, Craig recording, Fathom URL, paste-in-chat) and distribute extracted decisions, action items, and key quotes to the right ZAO surfaces - cowork-zaodevz actions.json, a research/events/NNN-* recap doc, Bonfire ingest queue, Telegram copy-paste block, memory, and calendar. Use when the user just finished a meeting, shares a recording or transcript, says "process this call", "extract todos from this", "recap that meeting", or types "/meeting <path-or-url>". Always fires on meeting context - undertriggering wastes the capture.
+description: Capture meeting transcripts (voice memo, Craig recording, Fathom URL, paste-in-chat) and distribute extracted decisions, action items, and key quotes to the right ZAO surfaces - cowork-zaodevz actions.json, a research/events/NNN-* recap doc, the ZABAL Bonfire knowledge graph, a meetings index, Telegram copy-paste block, memory, and calendar. Use when the user just finished a meeting, shares a recording or transcript, says "process this call", "extract todos from this", "recap that meeting", or types "/meeting <path-or-url>". Always fires on meeting context - undertriggering wastes the capture.
 allowed-tools: Read Write Edit Bash WebFetch Skill AskUserQuestion
 ---
 
@@ -12,7 +12,8 @@ Turn any meeting recording or transcript into:
 - A row in `research/events/_meetings-index.md` - the one canonical list of every past meeting
 - A copy-paste Telegram bubble for sharing
 - A next-actions clipboard page the moment the meeting ends (Phase 6)
-- Optional Bonfire ingest, memory write, calendar update
+- Episodes posted to the ZABAL Bonfire knowledge graph - always-on, so the graph always has full meeting context (doc 680)
+- Optional memory write, calendar update
 
 One command, multiple inputs, project-routed output targets. User-gated per run.
 
@@ -39,7 +40,7 @@ Look at what the user supplied (the slash-command argument, a pasted block, or j
 
 - **craig_url** - the input is a URL starting `https://craig.horse/`
 - **fathom_url** - the input is a URL starting `https://fathom.video/`
-- **local_audio** - the input is a path ending `.m4a` / `.mp3` / `.wav` / `.mp4` / `.opus` and the file exists
+- **local_audio** - the input is a path ending `.m4a` / `.mp3` / `.wav` / `.mp4` / `.mov` / `.opus` and the file exists. A video file (mp4/mov) additionally triggers frame extraction - see Phase 1.
 - **paste** - the input (or the last user message) is a block of transcript / meeting-notes text, roughly 200+ chars. Also covers the user narrating the meeting in chat ("Iman said X, then Zaal said Y...") - use the conversation context as the transcript.
 - **unclear** - none of the above. Ask the user one question: paste the transcript, give a file path, or give a Craig/Fathom URL.
 
@@ -65,18 +66,80 @@ What DOES route per project is the **action tracker** and the **Telegram destina
 ### Mode: paste
 Use the pasted text directly. Skip Phase 1.
 
-### Mode: local_audio
-Audio file is on Zaal's mac. Transcribe via Iman's VPS (per doc 673 decision).
+### Mode: local_audio (audio OR video file)
+
+The file is on Zaal's mac. Transcription runs locally - no upload, no VPS round-trip.
+
+**Step 1 - extract video frames (video files only).** If the file has a video
+stream (mp4, mov), pull representative still frames first. Frames give the
+Phase 2 extraction passes visual context the audio cannot: shared slides,
+screenshares, whiteboards, and the call UI's participant name tags.
 
 ```bash
-bash ${CLAUDE_SKILL_DIR}/scripts/transcribe.sh "$AUDIO_PATH"
+bash ${CLAUDE_SKILL_DIR}/scripts/extract-frames.sh "$MEDIA_PATH"
 ```
 
-The script:
-1. Checks Whisper is installed on VPS. If not, prints install command and exits.
-2. SCPs the audio file to `root@187.77.3.104:/tmp/meeting-input.<ext>`
-3. Runs `whisper --model base --language en /tmp/meeting-input.<ext> --output_dir /tmp/meeting-output/`
-4. SCPs the `.txt` back, prints transcript path.
+The script prints a frames directory path, or the literal `NO_VIDEO` for an
+audio-only file (then skip straight to Step 2). Scene-change detection catches
+slide flips and screenshare switches; a fixed-interval fallback covers static
+talking-head calls. Capped at 24 frames. Keep the frames dir path for Phase 2.
+
+**Step 2 - transcribe.**
+
+```bash
+bash ${CLAUDE_SKILL_DIR}/scripts/transcribe.sh "$MEDIA_PATH"
+```
+
+The script is local-first:
+1. If `mlx-whisper` is installed (Apple Silicon), it transcribes locally with
+   `whisper-large-v3-turbo` - fast, offline, accurate on names. Handles mp4/mov
+   directly (ffmpeg strips the audio track). First run for a model downloads it.
+2. If local tooling is absent (non-Mac machine), it falls back to Whisper on
+   Iman's VPS - SCP up, transcribe, SCP the `.txt` back.
+
+It prints the `.txt` transcript path and writes a `.json` sidecar at the same
+stem (`/tmp/meeting-X.txt` + `/tmp/meeting-X.json`) - the sidecar carries
+segment timestamps that Step 3 needs. The local mlx path produces the sidecar;
+the VPS fallback does not (so Step 3 is skipped on the VPS path).
+
+One-time local setup: `uv tool install mlx-whisper`. For a hard-to-hear or
+many-name meeting, pass a bigger model:
+`transcribe.sh "$MEDIA_PATH" --model mlx-community/whisper-large-v3`. Avoid
+plain `whisper-large-v3` on long calls - it can loop catastrophically (doc
+709); `whisper-large-v3-turbo` is the safe default.
+
+**Step 3 - diarize (speaker labels).** Whisper emits one unlabeled block - no
+speaker turns. Add them so the extraction passes know who said what:
+
+```bash
+bash ${CLAUDE_SKILL_DIR}/scripts/diarize.sh "$MEDIA_PATH" "${TRANSCRIPT%.txt}.json"
+```
+
+(`$TRANSCRIPT` is the `.txt` path Step 2 printed.) The script runs `sherpa-onnx`
+diarization fully locally - no Hugging Face token, no GPU. First run downloads
+two small ONNX models (~35MB total) to `~/.zao/diarization-models/`. It prints
+the path to a speaker-labeled transcript (`[Speaker 1] ... [Speaker 2] ...`)
+and the detected speaker count on stderr.
+
+**Pass the speaker count when you know it.** Auto-detect over-clusters - it
+found 8 speakers on a 2-person test call. When the count is known (the filename
+`Tyler x zaal` = 2, a calendar invite, or a quick skim of the plain transcript),
+force it - this is the single biggest quality lever:
+
+```bash
+ZAO_DIARIZATION_NUM_SPEAKERS=2 bash ${CLAUDE_SKILL_DIR}/scripts/diarize.sh "$MEDIA_PATH" "${TRANSCRIPT%.txt}.json"
+```
+
+Leave it unset only when the count is genuinely unknown.
+
+Diarization is best-effort. If `diarize.sh` fails (uv or models unavailable, the
+VPS fallback path produced no json sidecar, or the box is out of memory),
+proceed with the plain unlabeled transcript and attribute speakers from content
+- do not abort the run. Highest value on 3+ person calls; on a 1-2 person call
+the labeled transcript is a nice-to-have, not load-bearing.
+
+When a labeled transcript is produced, use it as the Phase 2 input and as the
+body of `transcript.md`.
 
 ### Mode: craig_url
 Download Craig recording, transcribe.
@@ -93,6 +156,23 @@ Use WebFetch on the share URL to extract transcript JSON from the page. Fathom s
 ## Phase 2 - Extract structure
 
 Multi-pass extraction, NOT one monolithic prompt (doc 676 - monolithic extraction hallucinates). Run these passes in order, each over the same transcript:
+
+**Video input - read the frames first.** If Phase 1 produced a frames directory,
+`Read` every JPG in it before Pass A. Use what the frames show - slide text,
+shared screens, whiteboards, participant name tags - as corroborating context
+across all five passes: they disambiguate attendees (Pass A), surface decisions
+shown on a slide but not said aloud (Pass B/C), and confirm name spellings
+against the brand glossary. A frame is corroboration, never a substitute for the
+transcript - if a frame and the transcript conflict, the transcript wins and the
+item is flagged `confidence: low`.
+
+**Speaker-labeled transcript - map the labels.** If Step 3 produced a
+`[Speaker N]`-labeled transcript, those labels are anonymous diarization output.
+In Pass A, map each `Speaker N` to a real attendee using content,
+self-introductions ("this is Sam"), and frame name-tags. Carry the mapping
+through every later pass and into `transcript.md`. If diarization was skipped or
+failed, attribute speakers from content alone - the recap still works, owner
+attribution is just less certain (flag affected actions `confidence: medium`).
 
 1. **Pass A - meeting metadata.** date, duration, title, attendees, platform. Date never invented - from transcript, file mtime, or ask.
 2. **Pass B - decisions.** Things explicitly decided/agreed in the call. Verbatim-anchored.
@@ -188,7 +268,7 @@ Then ask Zaal:
 > Targets (action target depends on project - see Phase 0):
 > - [x] Action tracker for `<project>` (default ON)
 > - [x] research/events/NNN-<slug>/README.md (default ON, every meeting, always ZAOOS)
-> - [ ] Bonfire ingest queue (opt-in)
+> - [x] Bonfire knowledge-graph episodes (default ON - the graph should always have meeting context, doc 680)
 > - [ ] Telegram copy-paste block (opt-in, default OFF - print only on request)
 > - [ ] Memory writes (opt-in, confirm each)
 > - [ ] Calendar event update (opt-in if title matches a Google Cal event)
@@ -241,10 +321,33 @@ Then insert the new meeting as the first data row:
 
 This is not optional and not project-routed - every meeting, every project, one index. Commit it alongside the recap doc.
 
-### Bonfire ingest queue
-- Write transcript + recap to `content/bonfire-ingest/meeting-YYYY-MM-DD-<slug>.md`.
-- Run `python3 scripts/bonfire-ingest/secret_scan.py <file>` to filter secrets.
-- Do NOT run `bonfire_client.py` ingest automatically - Zaal triggers when ready (PR #568 just shipped, integration still warm).
+### Bonfire knowledge-graph episodes (always-on - doc 680)
+
+Post the meeting into the ZABAL Bonfire so the knowledge graph always has full context. This is default-ON, not opt-in.
+
+Build an episodes JSON file at `/tmp/meeting-bonfire-episodes.json`:
+
+```json
+{
+  "episodes": [
+    {"name": "meeting:<date>:summary", "body": "<one paragraph: title, date, attendees, project, what it covered>", "source_tag": "meeting:<slug>"},
+    {"name": "meeting:<date>:decision-1", "body": "In the <title> meeting on <date> (<attendees>), the team decided: <decision text>. Owner: <owner>.", "source_tag": "meeting:<slug>"},
+    {"name": "meeting:<date>:action-1", "body": "From the <title> meeting on <date>, <owner> is to <action title>. Due: <due or 'no date set'>.", "source_tag": "meeting:<slug>"}
+  ]
+}
+```
+
+- One summary episode + one per decision + one per action. Quotes are skipped (low KG value as standalone nodes).
+- Episode bodies are natural-language prose, self-contained (name the meeting + date + people) - Bonfires auto-extraction reads prose, and a node must make sense alone.
+- Then run:
+
+```bash
+bash ${CLAUDE_SKILL_DIR}/scripts/bonfire-episode.sh /tmp/meeting-bonfire-episodes.json
+```
+
+The script POSTs each episode to `POST /knowledge_graph/episode/create` (Bearer `$BONFIRE_API_KEY`, `$BONFIRE_ID`). It is best-effort: secret-scans every body, 15s timeout per POST, always exits 0 - a Bonfire failure never aborts the run. If `$BONFIRE_API_KEY` is unset it prints "skipped (no key)" and continues.
+
+Do NOT use the old `content/bonfire-ingest/` file path - that is the bulk-backfill pipeline (research library, READMEs), wrong tool for per-meeting real-time. See doc 680.
 
 ### Telegram copy-paste block
 Print a single fenced block ready for long-press-copy. No header/footer (per `feedback_copyable_content_own_bubble`). Format:
@@ -331,7 +434,7 @@ Rules:
 - Do NOT propose a new Telegram bot for meeting capture (= ZAO Craig, separate doc 670 work).
 - Do NOT replace `bot/src/capture.ts` `/gemba /idea /note` (ZAOstock bot, different DB, different scope).
 - Do NOT use Deepgram (ZAOstock-only per doc 12; this skill stays free for personal use).
-- Do NOT install Whisper locally on Zaal's mac - all transcription runs on Iman's VPS (per doc 673 decision).
+- Transcription is local-first: mlx-whisper on Zaal's Apple Silicon mac (fast, offline). The VPS is the fallback for non-Mac machines only. This supersedes the doc 673 VPS-only decision - the VPS has no GPU, so local Apple Silicon is faster and has no upload step.
 - Do NOT use emojis in any output (per global `feedback_no_emojis`).
 - Do NOT use em dashes (per global `feedback_no_em_dashes`).
 
@@ -347,9 +450,13 @@ When creating the recap doc, parallel Claude sessions may race for the same numb
 
 ## Scripts
 
-- `scripts/transcribe.sh` - SCP to VPS, run Whisper, SCP back
+- `scripts/transcribe.sh` - local-first transcription: mlx-whisper on Apple Silicon, VPS Whisper fallback. Emits a `.txt` transcript + `.json` segment-timestamp sidecar.
+- `scripts/extract-frames.sh` - pull scene-change + interval still frames from a meeting video
+- `scripts/diarize.sh` - speaker diarization via sherpa-onnx: who-spoke-when, merged with the whisper json into a `[Speaker N]`-labeled transcript. Local, offline, no HF token.
+- `scripts/diarize.py` - the diarization + transcript-merge engine called by `diarize.sh` (runs under `uv run --with sherpa-onnx`).
 - `scripts/fetch-craig.sh` - curl Craig recording URL, extract audio
 - `scripts/append-actions.sh` - `gh api` PUT for `data/actions.json` bulk append (ZAO Devz project only)
+- `scripts/bonfire-episode.sh` - POST meeting episodes to the ZABAL Bonfire KG (always-on, best-effort, doc 680)
 
 ## Evals
 

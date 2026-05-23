@@ -27,7 +27,7 @@ tier: DEEP
 | 8 | Typewriter character-by-character text reveal (40ms stagger) | Birthday Bloom + Birthday V3 | `birthday.zaostock.com` greeting + `/test` hero | S | Ship Phase 2 |
 | 9 | R3F frameloop="demand" (render on state change only, not 60fps) | Mastering 3D Web Experiences (oboe.com) | `birthday.zaostock.com` R3F canvas optimization | S | Ship Phase 1 |
 | 10 | Stats-gl performance monitor overlay (FPS / GPU mem / draw calls, Alt+D toggle) | JOYCO Hub DebugCanvas + Mastering 3D Web | `birthday.zaostock.com` dev + QA phase | S | Ship Phase 2 (dev only) |
-| 11 | Horizontal timeline scroll (snap-scroll + progressive detail reveal on hover) | Festival lineage pattern | `/test` lineage section (PALOOZA → CHELLA → ZAOville → ZAOstock) | M | Ship Phase 3 |
+| 11 | Horizontal timeline scroll (snap-scroll + progressive detail reveal on hover) | Festival lineage pattern | `/test` lineage section (ZAO-PALOOZA → ZAO-CHELLA → ZAOville → ZAOstock) | M | Ship Phase 3 |
 | 12 | Editorial asymmetric grid (12-col, 7+5 split, mixed aspect ratios, hover text overlay fade) | Museum / editorial sites (implied festival patterns) | `/test` photo/content grid + `/donate` stats bento | M | Ship Phase 3 |
 
 ## Per-Move Details

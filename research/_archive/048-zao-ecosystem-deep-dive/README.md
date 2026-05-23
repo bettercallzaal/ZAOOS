@@ -22,7 +22,7 @@ Inner Ring (Core)
 Middle Ring (Products & Events)
 ├── WaveWarZ (music prediction market, Solana) — FIRST incubator project
 ├── ZABAL (coordination engine + token)
-├── ZAO Festivals (PALOOZA, CHELLA, Stock)
+├── ZAO Festivals (ZAO-PALOOZA, ZAO-CHELLA, Stock)
 ├── Let's Talk About Web3 (podcast by Zaal + Ohnahji)
 └── Student Loanz Initiative (education + $LOANZ on Base)
 

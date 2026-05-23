@@ -89,7 +89,7 @@ window.linksData = [
    - ZAO Staff EZinCrypto Links
    - ZAO Staff Ohnaji B Links
    - ZAO Community Member Jed XO Links
-3. ZAO Festivals (PALOOZA, CHELLA, ZAOstock event pages)
+3. ZAO Festivals (ZAO-PALOOZA, ZAO-CHELLA, ZAOstock event pages)
 4. ZAO Music (DistroKid releases, Cipher when live)
 5. ZAO Research (zaoos.com/research, key DEEP docs)
 

@@ -543,7 +543,7 @@ export default function FestivalsPage() {
 ```bash
 npm run dev
 ```
-Open `http://localhost:3000/festivals` — should see all 5 events (PALOOZA, CHELLA, COC Concertz, ZAO Stock, ZAOVille) with status badges.
+Open `http://localhost:3000/festivals` — should see all 5 events (ZAO-PALOOZA, ZAO-CHELLA, COC Concertz, ZAO Stock, ZAOVille) with status badges.
 
 - [ ] **Step 4: Commit**
 

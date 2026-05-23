@@ -109,8 +109,8 @@ Submit the application by **end of day Friday April 24** so we can say we have i
 
 ## Separately shipping
 
-- **ZAO Web3 music label** (separate from the festival): distributing the ZAOCHELLA Miami Cipher + other ZAO artist songs. Artists keep all rights. Cross-promote across ZAO accounts.
-- **ZAOCHELLA Miami Cipher** (recorded Dec 2024) getting finished + released to promote ZAOstock. Release window TBD.
+- **ZAO Web3 music label** (separate from the festival): distributing the ZAO-CHELLA Miami Cipher + other ZAO artist songs. Artists keep all rights. Cross-promote across ZAO accounts.
+- **ZAO-CHELLA Miami Cipher** (recorded Dec 2024) getting finished + released to promote ZAOstock. Release window TBD.
 
 ---
 

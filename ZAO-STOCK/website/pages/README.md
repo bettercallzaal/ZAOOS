@@ -133,7 +133,7 @@ src/components/festivals/
 
 ### Assets
 - Logo: `public/images/zao-stock-logo.jpeg` (copy from ZAO-STOCK/assets/)
-- Event photos from past events (PALOOZA, CHELLA)
+- Event photos from past events (ZAO-PALOOZA, ZAO-CHELLA)
 
 ### Data
 - No database needed initially — hardcoded event data in components

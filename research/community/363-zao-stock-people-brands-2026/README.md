@@ -17,7 +17,7 @@
 | **Profile gaps** | Tom Fellenz profile COMPLETE. Shawn, DFresh, Craig G need bios from them directly - no public web presence found. |
 | **Brand profiles** | WaveWarZ and COC Concertz have strong public data. FISHBOWLZ, Songjam, ZAOVille are internal/early-stage. |
 | **For pitch page** | USE WaveWarZ stats (795 battles, 435 SOL), COC Concertz (5 events), newsletter (400+ editions), fractals (90+ weeks) as credibility proof |
-| **Missing data** | NEED photos/video from ZAO-Chella, Maine Craft Weekend attendance numbers, Fractured Atlas exact wording |
+| **Missing data** | NEED photos/video from ZAO-CHELLA, Maine Craft Weekend attendance numbers, Fractured Atlas exact wording |
 
 ---
 
@@ -206,7 +206,7 @@
 | Team members | 14 active + 4 advisors | Dashboard |
 | ZAO members | ~188 gated | ZAO OS |
 | Songjam leaderboard | Active with $SANG staking | leaderboard.songjam.space |
-| ZAO-Chella | Art Basel Miami '24, 10 artists | @zaofestivals Instagram |
+| ZAO-CHELLA | Art Basel Miami '24, 10 artists | @zaofestivals Instagram |
 | Code commits | 863+ source files, 360+ research docs | GitHub bettercallzaal/ZAOOS |
 
 ---

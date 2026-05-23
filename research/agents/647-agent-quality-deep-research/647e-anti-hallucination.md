@@ -75,7 +75,7 @@ When extended thinking is enabled, hallucination rates jump across all models te
 
 **Example:**
 - Claim: "The ZAO began in 2023"
-- Retrieved doc 432: "The ZAO community started in 2023 with ZAOCHELLA Miami"
+- Retrieved doc 432: "The ZAO community started in 2023 with ZAO-CHELLA Miami"
 - Valid: Span includes exact text match
 - Invalid: "The ZAO began in 2024" (doesn't overlap doc; would flag)
 

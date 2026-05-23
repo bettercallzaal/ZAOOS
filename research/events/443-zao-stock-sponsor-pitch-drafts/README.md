@@ -18,7 +18,7 @@
 |----------|--------|
 | **Tier structure** | Small (under $1K), Medium ($1-5K), Large ($5K+) |
 | **Tone** | Warm, community-first, music-forward. Lead with the event, not the tech. |
-| **Proof points** | Use credibility stats from Doc 363: 90+ governance sessions, 795 WaveWarZ battles, 400+ newsletter editions, ZAO-Chella/ZAO-Palooza track record |
+| **Proof points** | Use credibility stats from Doc 363: 90+ governance sessions, 795 WaveWarZ battles, 400+ newsletter editions, ZAO-CHELLA/ZAO-PALOOZA track record |
 | **Venue details** | Franklin Street Parklet, Ellsworth ME. Part of 9th Annual Art of Ellsworth / Maine Craft Weekend. 12pm-6pm. After-party at Black Moon Public House. |
 | **Customization notes** | Replace [BUSINESS NAME], [YOUR NAME], and specific benefit lines per prospect |
 
@@ -134,7 +134,7 @@ zaoos.com/stock | cocconcertz.com
 ## Usage Notes
 
 - **Personalize every email.** Replace bracketed fields. Add a sentence about why that specific business fits.
-- **Attach or link:** Event one-pager (to be created), zaoos.com/stock page, @zaofestivals Instagram for ZAO-Chella photos.
+- **Attach or link:** Event one-pager (to be created), zaoos.com/stock page, @zaofestivals Instagram for ZAO-CHELLA photos.
 - **Follow up:** 5 business days after send. Reference a specific thing about their business.
 - **Track:** Use a shared spreadsheet (Finance team — DFresh, Ohnahji B, Maceo) to log every outreach, response, and status.
 

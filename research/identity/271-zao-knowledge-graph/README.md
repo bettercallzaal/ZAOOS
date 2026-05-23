@@ -110,7 +110,7 @@ This graph powers:
 | **OREC contract (Base)** | On-chain fractal vote/respect records | `ornode` currently DOWN |
 | **ZOR Respect1155** | On-chain ZOR holders (4 holders — early) | Direct |
 | **OG Respect ERC-20** | On-chain ZAO Respect holders (122 holders) | Direct |
-| **POAP / Attendance NFTs** | ZAO Stock (future), ZAO-CHELLA, PALOOZA | TBD |
+| **POAP / Attendance NFTs** | ZAO Stock (future), ZAO-CHELLA, ZAO-PALOOZA | TBD |
 
 ### What's Connected in ZAO OS Today
 

@@ -26,17 +26,54 @@ export function isValidJukeSpaceId(value: unknown): value is string {
   return typeof value === 'string' && SPACE_ID_PATTERN.test(value);
 }
 
+/** Options for {@link jukeEmbedUrl}. */
+export interface JukeEmbedOptions {
+  /**
+   * When `true`, append `?audio=off` so the embed renders a passive,
+   * second-screen view: same metadata + participants but no audio connection.
+   * Use this when the listener is already in the Juke iOS app on their phone
+   * and the laptop should not double-broadcast (Juke PR 2026-05-23, item #6).
+   */
+  audioOff?: boolean;
+}
+
 /**
  * Build the Juke embed URL for a space.
  *
  * @throws if `spaceId` is not a valid Juke space id — callers must validate
  *         with {@link isValidJukeSpaceId} (and 404) before reaching here.
  */
-export function jukeEmbedUrl(spaceId: string): string {
+export function jukeEmbedUrl(spaceId: string, options: JukeEmbedOptions = {}): string {
   if (!isValidJukeSpaceId(spaceId)) {
     throw new Error('Invalid Juke space id');
   }
-  return `${JUKE_EMBED_ORIGIN}/embed/${encodeURIComponent(spaceId)}`;
+  const base = `${JUKE_EMBED_ORIGIN}/embed/${encodeURIComponent(spaceId)}`;
+  return options.audioOff ? `${base}?audio=off` : base;
+}
+
+/** Canonical Juke space page URL for a given id (the share/permalink URL). */
+export function jukeSpaceUrl(spaceId: string): string {
+  if (!isValidJukeSpaceId(spaceId)) throw new Error('Invalid Juke space id');
+  return `${JUKE_EMBED_ORIGIN}/space/${encodeURIComponent(spaceId)}`;
+}
+
+/**
+ * Juke's per-space OG image. Returned by the Juke landing app and safe to use
+ * as `og:image` / `twitter:image` for our `/live/{id}` route - Juke renders a
+ * branded card for the space (PR 2026-05-23, item #10).
+ */
+export function jukeSpaceOgImageUrl(spaceId: string): string {
+  if (!isValidJukeSpaceId(spaceId)) throw new Error('Invalid Juke space id');
+  return `${JUKE_EMBED_ORIGIN}/space/${encodeURIComponent(spaceId)}/opengraph-image`;
+}
+
+/**
+ * Native-app deeplink for "Open in Juke" CTAs on desktop and Farcaster
+ * miniapps. Apple universal-link form so it resolves on both web and iOS.
+ */
+export function jukeAppDeeplinkUrl(spaceId: string): string {
+  if (!isValidJukeSpaceId(spaceId)) throw new Error('Invalid Juke space id');
+  return `${JUKE_EMBED_ORIGIN}/space/${encodeURIComponent(spaceId)}?open=app`;
 }
 
 /**

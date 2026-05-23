@@ -5,6 +5,7 @@ import { getSessionData } from '@/lib/auth/session';
 import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { createJukeSpace } from '@/lib/spaces/juke-api';
+import { insertJukeSpace } from '@/lib/spaces/jukeSpacesDb';
 
 /**
  * Constant-time string comparison. Both inputs are SHA-256'd to a fixed
@@ -109,6 +110,21 @@ export async function POST(request: NextRequest) {
         { success: false, error: result.error },
         { status: 502 },
       );
+    }
+    // Persist the room so /live/{id} can render server-side + webhooks can
+    // update its lifecycle. Best-effort: if Supabase is down we still
+    // return the space id so the caller can proceed.
+    try {
+      await insertJukeSpace({
+        id: result.space.id,
+        title: spaceInput.title,
+        createdByFid: session?.fid ?? 0,
+        scheduledAt: spaceInput.scheduledAt ?? null,
+        embedUrl: result.space.embedUrl,
+        raw: result.space.raw,
+      });
+    } catch (dbErr: unknown) {
+      logger.error('[juke/space] insertJukeSpace failed (non-fatal):', dbErr);
     }
     return NextResponse.json(
       { success: true, data: result.space },

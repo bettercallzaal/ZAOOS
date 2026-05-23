@@ -11,6 +11,8 @@ import { communityConfig } from '../../../../community.config';
 import { AudioRoomAdapter } from '@/components/spaces/AudioRoomAdapter';
 import type { Room } from '@/lib/spaces/roomsDb';
 
+import { EndRoomConfirm } from '@/components/spaces/EndRoomConfirm';
+
 // Lazy-load heavy SDKs — Stream.io is ~150KB, only load when entering a room
 const StreamWrapper = dynamic(
   () => import('@/components/spaces/StreamWrapper').then((m) => ({ default: m.StreamWrapper })),
@@ -187,8 +189,12 @@ export default function PublicRoomPage() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [room?.id]);
 
-  const handleLeave = async () => {
-    // End session tracking (keepalive so it survives navigation)
+  /**
+   * Leave the room for this user only. Does NOT close the room for everyone
+   * else - safe to call from the host's "Leave only" path or any non-host's
+   * Leave button.
+   */
+  const leaveSelfOnly = async () => {
     if (room?.id) {
       fetch('/api/spaces/session', {
         method: 'PATCH',
@@ -199,14 +205,33 @@ export default function PublicRoomPage() {
     }
     if (call) await call.leave().catch(console.error);
     if (client) await client.disconnectUser().catch(console.error);
-    if (canEndRoom && room) {
-      await fetch(`/api/stream/rooms/${room.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'end' }),
-      }).catch(console.error);
-    }
     router.push('/spaces');
+  };
+
+  /**
+   * End the room for everyone, then leave for this user. Host + admin only.
+   * Triggered after the EndRoomConfirm dialog accepts.
+   */
+  const endRoomForEveryone = async () => {
+    if (!room) return;
+    await fetch(`/api/stream/rooms/${room.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'end' }),
+    }).catch(console.error);
+    await leaveSelfOnly();
+  };
+
+  // Click handler for the room's Leave/End button. Hosts + admins land in
+  // the confirm dialog before the room ends for everyone; listeners leave
+  // straight away.
+  const [confirmingEnd, setConfirmingEnd] = useState(false);
+  const handleLeave = async () => {
+    if (canEndRoom) {
+      setConfirmingEnd(true);
+      return;
+    }
+    await leaveSelfOnly();
   };
 
   if (loading || authLoading) {
@@ -305,6 +330,24 @@ export default function PublicRoomPage() {
           currentTheme={room.theme || 'default'}
           onClose={() => setShowEdit(false)}
           onSaved={(updated) => setRoom(prev => prev ? { ...prev, ...updated } : prev)}
+        />
+      )}
+      {confirmingEnd && room && (
+        <EndRoomConfirm
+          roomTitle={room.title}
+          onCancel={() => setConfirmingEnd(false)}
+          onConfirm={async () => {
+            setConfirmingEnd(false);
+            await endRoomForEveryone();
+          }}
+          onLeaveOnly={
+            isAdmin && !isHost
+              ? async () => {
+                  setConfirmingEnd(false);
+                  await leaveSelfOnly();
+                }
+              : undefined
+          }
         />
       )}
       <header className="border-b border-white/[0.08] bg-[#0d1b2a] relative">

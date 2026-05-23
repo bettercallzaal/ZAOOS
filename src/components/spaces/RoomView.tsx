@@ -18,6 +18,7 @@ import { RoomReactions } from './RoomReactions';
 import { RoomChat } from './RoomChat';
 import { ParticipantsPanel } from './ParticipantsPanel';
 import { ClosedCaptions } from './ClosedCaptions';
+import { RoomFirstTimeTour } from './RoomFirstTimeTour';
 
 const BroadcastModal = dynamic(
   () => import('./BroadcastModal').then((m) => ({ default: m.BroadcastModal })),
@@ -186,6 +187,7 @@ export function RoomView({
 
   return (
     <div className="flex flex-col h-full bg-[#0a1628]">
+      <RoomFirstTimeTour roomMode={roomType === 'voice_channel' ? 'voice_channel' : 'stage'} />
       <div className="flex flex-1 overflow-hidden">
         {/* Main room content */}
         <div className="flex-1 flex flex-col min-w-0">

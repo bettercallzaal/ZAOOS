@@ -41,6 +41,8 @@ function formatLiveDuration(createdAt: string): string {
 export default function StageCard({ room, onJoin, isOwn }: StageCardProps) {
   const theme = THEME_BADGES[room.theme] || THEME_BADGES.default;
   const dot = THEME_DOTS[room.theme] || THEME_DOTS.default;
+  const isVideoRoom = room.room_type === 'voice_channel';
+  const isEmpty = room.participant_count <= 1;
 
   return (
     <div
@@ -50,6 +52,7 @@ export default function StageCard({ room, onJoin, isOwn }: StageCardProps) {
       onClick={() => onJoin(room)}
       role="button"
       tabIndex={0}
+      aria-label={`Join ${isVideoRoom ? 'Video Room' : 'Stage'}: ${room.title}, hosted by ${room.host_name}`}
       onKeyDown={(e) => e.key === 'Enter' && onJoin(room)}
     >
       {/* Top: Theme color accent bar */}
@@ -60,10 +63,21 @@ export default function StageCard({ room, onJoin, isOwn }: StageCardProps) {
         <h3 className="text-white font-bold text-sm leading-tight line-clamp-2 group-hover:text-[#f5a623] transition-colors">
           {room.title}
         </h3>
-        <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="flex flex-col items-end gap-1 flex-shrink-0">
           <span className="inline-flex items-center gap-1 text-red-400 text-[10px] font-bold uppercase tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
             Live
+          </span>
+          <span
+            className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-full border ${
+              isVideoRoom
+                ? 'bg-blue-500/15 border-blue-500/30 text-blue-300'
+                : 'bg-white/[0.04] border-white/[0.08] text-gray-400'
+            }`}
+            title={isVideoRoom ? 'Mic, camera, screen share' : 'Audio-only Clubhouse stage'}
+          >
+            {isVideoRoom ? 'CAM' : 'MIC'}
+            {isVideoRoom ? ' Video Room' : ' Stage'}
           </span>
         </div>
       </div>
@@ -95,17 +109,17 @@ export default function StageCard({ room, onJoin, isOwn }: StageCardProps) {
       {/* Bottom: meta row + join button */}
       <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/[0.08]/60">
         <div className="flex items-center gap-3 text-xs text-gray-500">
-          {/* Participant count */}
+          {/* Participant count - phrased so an empty room reads honestly. */}
           <span className="flex items-center gap-1">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128H5.228A2 2 0 013 17.16v-.088c0-2.517 1.813-4.607 4.2-5.032a8.153 8.153 0 011.6-.16c.549 0 1.085.055 1.6.16 2.387.425 4.2 2.515 4.2 5.032v.088c0 .465-.171.89-.453 1.217" />
             </svg>
-            {room.participant_count}
+            {isEmpty ? 'Just host' : `${room.participant_count} listening`}
           </span>
 
           {/* Duration */}
           <span className="flex items-center gap-1">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {formatLiveDuration(room.created_at)}
@@ -122,9 +136,10 @@ export default function StageCard({ room, onJoin, isOwn }: StageCardProps) {
             e.stopPropagation();
             onJoin(room);
           }}
+          aria-label={isEmpty ? `Be the first to join ${room.title}` : `Join ${room.title}`}
           className="px-4 py-1.5 bg-[#f5a623] text-[#0a1628] text-xs font-bold rounded-lg hover:bg-[#ffd700] transition-colors shadow-sm"
         >
-          Join
+          {isEmpty ? 'Be first' : 'Join'}
         </button>
       </div>
     </div>

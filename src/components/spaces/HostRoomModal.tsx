@@ -27,14 +27,20 @@ const PROVIDERS: { id: AudioProvider; label: string; description: string; badge:
   {
     id: 'stream',
     label: 'Stream.io',
-    description: 'HiFi music mode, native RTMP multistream',
-    badge: '🎵',
+    description: 'HiFi music mode, native RTMP multistream. ZAO-side video room option.',
+    badge: 'MUSIC',
   },
   {
     id: '100ms',
     label: '100ms',
-    description: 'Live transcription, best for fractal meetings',
-    badge: '🎙️',
+    description: 'Live transcription, best for fractal meetings.',
+    badge: 'CALL',
+  },
+  {
+    id: 'juke',
+    label: 'Juke',
+    description: 'Farcaster-native audio. Anyone with the link listens, SIWF to speak. Best for public ZAO events.',
+    badge: 'FC',
   },
 ];
 
@@ -141,7 +147,11 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-white text-lg font-bold">
-            {roomMode === 'voice_channel' ? 'Create a Video Room' : 'Create a Stage'}
+            {provider === 'juke'
+              ? 'Create a Juke space'
+              : roomMode === 'voice_channel'
+                ? 'Create a Video Room'
+                : 'Create a Stage'}
           </h2>
           <button
             onClick={onClose}
@@ -164,7 +174,8 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* Room mode selector */}
+          {/* Room mode selector — hidden for Juke (Juke is audio-only Clubhouse). */}
+          {provider !== 'juke' && (
           <div className="mb-5">
             <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
               Mode
@@ -189,8 +200,10 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
               ))}
             </div>
           </div>
+          )}
 
-          {/* Theme selector */}
+          {/* Theme selector — hidden for Juke (theme is a ZAO-side rendering concept). */}
+          {provider !== 'juke' && (
           <div className="mb-5">
             <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
               Theme
@@ -215,6 +228,7 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
               ))}
             </div>
           </div>
+          )}
 
           {/* Title */}
           <div className="mb-4">
@@ -262,47 +276,71 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
             <div className="text-gray-600 text-xs mt-1 text-right">{description.length}/500</div>
           </div>
 
-          {/* Token Gate */}
-          <TokenGateSection value={gateConfig} onChange={setGateConfig} disabled={loading} />
+          {/* Token Gate — gating is enforced ZAO-side at room-join; Juke is
+              public-listen by default so token-gating does not apply. */}
+          {provider !== 'juke' && (
+            <TokenGateSection value={gateConfig} onChange={setGateConfig} disabled={loading} />
+          )}
 
           {/* Audio Provider */}
           <div className="mb-5">
             <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
               Audio Provider
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {PROVIDERS.map((p) => (
                 <button
                   key={p.id}
                   type="button"
                   onClick={() => setProvider(p.id)}
                   disabled={loading}
-                  className={`flex flex-col gap-1 px-3 py-3 rounded-xl border text-left text-sm transition-all ${
+                  aria-pressed={provider === p.id}
+                  className={`flex flex-col gap-1 px-3 py-3 rounded-xl border text-left text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] ${
                     provider === p.id
                       ? 'border-[#f5a623] bg-[#f5a623]/10 text-white'
                       : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600'
                   }`}
                 >
-                  <span className="text-base">{p.badge}</span>
+                  <span className="text-[10px] font-bold tracking-wider text-[#f5a623]">{p.badge}</span>
                   <span className="font-semibold text-white">{p.label}</span>
                   <span className="text-xs text-gray-500 leading-tight">{p.description}</span>
                 </button>
               ))}
             </div>
             <p className="text-gray-600 text-xs mt-1.5">
-              {provider === 'stream' ? '🎵 Best for music rooms — HiFi stereo mode, native multistream' : '🎙️ Best for fractal meetings — live transcription included'}
+              {provider === 'stream'
+                ? 'Best for music rooms - HiFi stereo, native multistream.'
+                : provider === '100ms'
+                  ? 'Best for fractal meetings - live transcription included.'
+                  : 'Best for public Farcaster events - lands on /live/{id} with the Juke iframe.'}
             </p>
           </div>
 
-          {/* Broadcast info */}
-          <div className="mb-6">
-            <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
-              Multistream
-            </label>
-            <p className="text-gray-500 text-xs leading-relaxed">
-              After creating, use the <span className="text-[#f5a623]">Broadcast</span> button in the room controls to stream to Twitch, YouTube, Kick, or Facebook. Connect your accounts in Settings first.
-            </p>
-          </div>
+          {/* Broadcast info — Juke owns its own distribution (Farcaster) and
+              has no ZAO-side multistream surface. */}
+          {provider !== 'juke' ? (
+            <div className="mb-6">
+              <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
+                Multistream
+              </label>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                After creating, use the <span className="text-[#f5a623]">Broadcast</span> button in the room controls to stream to Twitch, YouTube, Kick, or Facebook. Connect your accounts in Settings first.
+              </p>
+            </div>
+          ) : (
+            <div className="mb-6">
+              <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
+                Juke notes
+              </label>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                The room lives on Juke. After creating you land on{' '}
+                <span className="text-[#f5a623]">/live/&#123;id&#125;</span> with the keyless
+                iframe. Listening is anonymous; speaking prompts Sign In With Farcaster inside the
+                embed. To create from a non-admin account use{' '}
+                <span className="text-[#f5a623]">/live/create</span> with the team password.
+              </p>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex gap-3">
@@ -327,6 +365,8 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
                   </svg>
                   Creating...
                 </span>
+              ) : provider === 'juke' ? (
+                'Open Juke space'
               ) : roomMode === 'voice_channel' ? (
                 'Start Video Room'
               ) : (

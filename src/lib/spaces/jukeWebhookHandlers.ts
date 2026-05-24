@@ -27,8 +27,15 @@ import {
 } from './jukeSpacesDb';
 
 interface JukeWebhookBody {
+  // Juke 2026-05-23 shape uses snake_case `event_type` + `event_id` at top level
+  // and nests details under `data` (with `room_id`, `host_fid`, etc.). The
+  // aliases below cover earlier-doc / alternative shapes we still see in tests
+  // so the parser is defensive across versions.
   event?: string;
   type?: string;
+  event_type?: string;
+  event_id?: string;
+  eventId?: string;
   data?: Record<string, unknown>;
   space?: Record<string, unknown>;
   space_id?: string;
@@ -55,24 +62,31 @@ export interface ParsedWebhookEvent {
  */
 export function parseWebhookEvent(body: unknown): ParsedWebhookEvent {
   const b = (body ?? {}) as JukeWebhookBody;
-  const eventType = (b.event ?? b.type ?? '').toString();
+  const eventType = (b.event_type ?? b.event ?? b.type ?? '').toString();
+  const data = (typeof b.data === 'object' && b.data !== null
+    ? (b.data as { space_id?: string; spaceId?: string; id?: string; room_id?: string; roomId?: string })
+    : null);
   const spaceId =
     b.space_id ??
     b.spaceId ??
-    (typeof b.data === 'object' && b.data !== null
-      ? ((b.data as { space_id?: string; spaceId?: string; id?: string }).space_id ??
-        (b.data as { space_id?: string; spaceId?: string; id?: string }).spaceId ??
-        (b.data as { space_id?: string; spaceId?: string; id?: string }).id ??
-        null)
-      : null) ??
+    data?.room_id ??
+    data?.roomId ??
+    data?.space_id ??
+    data?.spaceId ??
+    data?.id ??
     (typeof b.space === 'object' && b.space !== null
       ? ((b.space as { id?: string }).id ?? null)
       : null) ??
     null;
   const eventId =
-    typeof b.data === 'object' && b.data !== null
-      ? ((b.data as { id?: string }).id ?? null)
-      : null;
+    b.event_id ??
+    b.eventId ??
+    (typeof b.data === 'object' && b.data !== null
+      ? ((b.data as { id?: string; event_id?: string }).event_id ??
+        (b.data as { id?: string; event_id?: string }).id ??
+        null)
+      : null) ??
+    null;
   return { eventType, spaceId, eventId };
 }
 
@@ -102,11 +116,17 @@ function readParticipant(body: unknown, occurredAt: string): JukeParticipantEntr
   const b = (body ?? {}) as { data?: Record<string, unknown> };
   const d = (b.data ?? {}) as {
     fid?: unknown;
+    host_fid?: unknown;
+    participant_fid?: unknown;
+    user_fid?: unknown;
     display_name?: unknown;
     displayName?: unknown;
+    username?: unknown;
     role?: unknown;
   };
-  const fidRaw = d.fid;
+  // Juke's 2026-05-23 room.started used `host_fid`; participant events likely
+  // use `participant_fid` or `fid`. Be defensive across aliases.
+  const fidRaw = d.fid ?? d.participant_fid ?? d.user_fid ?? d.host_fid;
   const fid = typeof fidRaw === 'number' ? fidRaw : typeof fidRaw === 'string' ? Number(fidRaw) : null;
   if (fid === null || !Number.isFinite(fid)) return null;
   const display_name =
@@ -114,7 +134,9 @@ function readParticipant(body: unknown, occurredAt: string): JukeParticipantEntr
       ? d.display_name
       : typeof d.displayName === 'string'
         ? d.displayName
-        : null;
+        : typeof d.username === 'string'
+          ? d.username
+          : null;
   const role = typeof d.role === 'string' ? d.role : null;
   return { fid, display_name, role, joined_at: occurredAt };
 }

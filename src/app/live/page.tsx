@@ -73,7 +73,7 @@ export default async function LiveIndexPage() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
             <Link
               href="/live/recordings"
               className="hidden sm:inline-flex px-3 py-1.5 text-xs font-medium text-gray-300 border border-white/[0.12] rounded-lg hover:bg-white/[0.04] transition-colors"
@@ -85,6 +85,15 @@ export default async function LiveIndexPage() {
               className="hidden sm:inline-flex px-3 py-1.5 text-xs font-medium text-[#f5a623] border border-[#f5a623]/30 rounded-lg hover:bg-[#f5a623]/10 transition-colors"
             >
               Build status
+            </Link>
+            <Link
+              href="/live/create"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#0a1628] bg-[#f5a623] hover:bg-[#ffd700] rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1b2a]"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Schedule
             </Link>
           </div>
         </div>

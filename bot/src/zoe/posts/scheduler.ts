@@ -17,6 +17,7 @@ import { join } from 'node:path';
 import { ZOE_PATHS } from '../memory';
 import { sendDraftWithKeyboard } from './buttons';
 import { draftPost } from './drafters';
+import { sendFractalPromo } from './fractal-promo';
 import { clearPending, isExpired, loadPending, shouldResend } from './pending';
 import {
   gatherBuildSignals,
@@ -267,12 +268,33 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
     { timezone: 'America/New_York' },
   );
 
-  console.log(`[zoe/posts] scheduler started (target ${pings} pings/day, window ${WINDOW_START_HOUR_ET}am-${WINDOW_END_HOUR_ET - 12}pm ET)`);
+  // Sunday Fractal-promo - dedicated weekly slot (doc 722, task #220).
+  // Fires every Sunday at 3pm ET. The 6pm Monday Fractal needs lead-time
+  // outreach to convert new ZAO members; this is the standing reminder.
+  // Goes through the standard POST/REGEN/SKIP review like every other
+  // draft - Zaal still gates whether it actually publishes.
+  const fractalTask = cron.schedule(
+    '0 15 * * 0', // 15:00 (3pm) every Sunday
+    async () => {
+      try {
+        await sendFractalPromo(opts.bot, opts.zaalTgId);
+        await appendLog({ event: 'fractal-promo-sent' });
+        console.log('[zoe/posts] fractal-promo: sent Sunday draft');
+      } catch (err) {
+        await appendLog({ event: 'fractal-promo-error', error: (err as Error).message });
+        console.error('[zoe/posts] fractal-promo failed:', (err as Error).message);
+      }
+    },
+    { timezone: 'America/New_York' },
+  );
+
+  console.log(`[zoe/posts] scheduler started (target ${pings} pings/day, window ${WINDOW_START_HOUR_ET}am-${WINDOW_END_HOUR_ET - 12}pm ET) + sunday-3pm fractal slot`);
 
   return {
     stop: () => {
       midnightTask.stop();
       tickTask.stop();
+      fractalTask.stop();
     },
   };
 }

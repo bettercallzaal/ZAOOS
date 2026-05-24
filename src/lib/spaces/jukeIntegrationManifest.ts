@@ -198,9 +198,41 @@ const SHIPPED: ShippedFeature[] = [
     id: 'recurring-schedule-script',
     title: 'Recurring weekly Juke schedule script',
     description:
-      'scripts/schedule-zao-recurring.ts pre-creates Juke spaces for ZAO\'s weekly events (fractal call, ZAOstock standups). Idempotent (dedupes against juke_spaces.scheduled_at +/- 30min). Safe to wire into a weekly cron.',
+      "scripts/schedule-zao-recurring.ts pre-creates Juke spaces for ZAO's weekly events (fractal call, ZAOstock standups). Idempotent (dedupes against juke_spaces.scheduled_at +/- 30min). Safe to wire into a weekly cron.",
     shippedAt: '2026-05-23',
     files: ['scripts/schedule-zao-recurring.ts', 'scripts/zao-recurring-events.json'],
+  },
+  {
+    id: 'admin-register-webhook',
+    title: 'Admin route to register the Juke webhook server-side',
+    description:
+      'POST /api/juke/admin/register-webhook calls Juke /v1/developer/webhooks from a Vercel context that already has JUKE_API_KEY loaded. Juke generates the HMAC secret server-side and returns it in the response; the admin caller copies it into the JUKE_WEBHOOK_SECRET env var (Production + Preview + Development) and redeploys. Admin-only.',
+    shippedAt: '2026-05-24',
+    pr: 'https://github.com/bettercallzaal/ZAOOS/pull/666',
+    files: ['src/app/api/juke/admin/register-webhook/route.ts'],
+  },
+  {
+    id: 'juke-status-richer',
+    title: 'Richer /juke-status: recent webhooks + recent spaces + code examples',
+    description:
+      "Three new sections on the public dashboard. (1) Recent webhooks - last 15 events with type / space_id / age / processed-vs-failed pill. (2) Recent spaces - last 10 juke_spaces rows with status pill + time marker + participant count + recording link. (3) Code examples - 4 reference snippets matching production (create-space, embed, webhook verify, subscribe). Plus OG + Twitter card meta on the page itself, and recent_spaces + recent_events arrays added to /api/juke/status and /juke-integration.md.",
+    shippedAt: '2026-05-24',
+    pr: 'https://github.com/bettercallzaal/ZAOOS/pull/668',
+    files: [
+      'src/lib/spaces/jukeSpacesDb.ts',
+      'src/app/juke-status/page.tsx',
+      'src/app/api/juke/status/route.ts',
+      'src/app/juke-integration.md/route.ts',
+    ],
+  },
+  {
+    id: 'register-webhook-fix',
+    title: 'Register-webhook fix: Juke generates the HMAC secret, not us',
+    description:
+      "Initial admin route POSTed { url, events, secret } and Juke returned 422 extra_forbidden on the secret field - Juke generates the secret server-side and returns it in the response. Route now POSTs { url, events } only, captures juke.secret from the response, returns it with an action_required instructing the admin to copy it into Vercel's JUKE_WEBHOOK_SECRET env. Server logs the registration with the secret redacted.",
+    shippedAt: '2026-05-24',
+    pr: 'https://github.com/bettercallzaal/ZAOOS/pull/669',
+    files: ['src/app/api/juke/admin/register-webhook/route.ts'],
   },
 ];
 
@@ -324,7 +356,7 @@ export const INTEGRATION_ARCHITECTURE_ASCII = String.raw`
 
 export function getJukeIntegrationManifest(): IntegrationManifest {
   return {
-    version: '1',
+    version: '1.1',
     generated_at: new Date().toISOString(),
     about: {
       name: 'The ZAO',

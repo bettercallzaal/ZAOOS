@@ -25,6 +25,11 @@ export default function PublicSpacesPage() {
   const [activeTab, setActiveTab] = useState('live');
   const [category, setCategory] = useState('all');
 
+  // Juke-hosted spaces live in a separate Supabase table (juke_spaces, RLS
+  // publicly readable). Different shape than ZAO Stream/100ms rooms, so kept
+  // as its own state slice + rendered in its own section.
+  const [jukeRooms, setJukeRooms] = useState<JukeRoomCard[]>([]);
+
   const fetchStages = useCallback(async () => {
     const supabase = getSupabaseBrowser();
     // Include both stage (audio-only) and voice_channel (full A+V) live rooms.
@@ -39,17 +44,29 @@ export default function PublicSpacesPage() {
     setLoading(false);
   }, []);
 
+  const fetchJuke = useCallback(async () => {
+    const supabase = getSupabaseBrowser();
+    const { data } = await supabase
+      .from('juke_spaces')
+      .select('id, title, status, participant_count, started_at, created_by_fid')
+      .eq('status', 'active')
+      .order('started_at', { ascending: false });
+    setJukeRooms((data as JukeRoomCard[] | null) ?? []);
+  }, []);
+
   useEffect(() => {
     const supabase = getSupabaseBrowser();
     fetchStages();
+    fetchJuke();
 
     const channel = supabase
-      .channel('live-stages')
+      .channel('live-spaces-mixed')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms' }, () => fetchStages())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'juke_spaces' }, () => fetchJuke())
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [fetchStages]);
+  }, [fetchStages, fetchJuke]);
 
   const handleCreateRoom = async (
     title: string,
@@ -163,7 +180,7 @@ export default function PublicSpacesPage() {
 
       <div className="flex-1 px-4 pb-6 max-w-4xl mx-auto w-full">
         {activeTab === 'live' && (
-          <LiveTab loading={loading} stages={filteredStages} myRooms={myRooms} otherRooms={otherRooms} user={user} onHost={() => setShowHostModal(true)} onJoin={handleJoinStage} />
+          <LiveTab loading={loading} stages={filteredStages} jukeRooms={jukeRooms} myRooms={myRooms} otherRooms={otherRooms} user={user} onHost={() => setShowHostModal(true)} onJoin={handleJoinStage} />
         )}
         {activeTab === 'upcoming' && <ScheduledRooms category={category} />}
         {activeTab === 'past' && <PastRooms category={category} />}
@@ -174,8 +191,19 @@ export default function PublicSpacesPage() {
   );
 }
 
-function LiveTab({ loading, stages, myRooms, otherRooms, user, onHost, onJoin }: {
-  loading: boolean; stages: Room[]; myRooms: Room[]; otherRooms: Room[];
+/** Minimal shape /spaces needs to render a Juke-hosted live row.
+ * Source: public.juke_spaces (RLS allow-all on SELECT). */
+interface JukeRoomCard {
+  id: string;
+  title: string;
+  status: 'scheduled' | 'active' | 'ended';
+  participant_count: number;
+  started_at: string | null;
+  created_by_fid: number;
+}
+
+function LiveTab({ loading, stages, jukeRooms, myRooms, otherRooms, user, onHost, onJoin }: {
+  loading: boolean; stages: Room[]; jukeRooms: JukeRoomCard[]; myRooms: Room[]; otherRooms: Room[];
   user: { fid: number } | null; onHost: () => void; onJoin: (room: Room) => void;
 }) {
   if (loading) {
@@ -188,7 +216,7 @@ function LiveTab({ loading, stages, myRooms, otherRooms, user, onHost, onJoin }:
     );
   }
 
-  if (stages.length === 0) {
+  if (stages.length === 0 && jukeRooms.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="w-16 h-16 rounded-full bg-[#f5a623]/10 flex items-center justify-center mb-5">
@@ -214,6 +242,8 @@ function LiveTab({ loading, stages, myRooms, otherRooms, user, onHost, onJoin }:
 
   return (
     <div className="space-y-6">
+      {jukeRooms.length > 0 && <JukeLiveSection rooms={jukeRooms} />}
+
       {myRooms.length > 0 && (
         <section>
           <h3 className="text-xs font-semibold text-[#f5a623] uppercase tracking-wider mb-3 flex items-center gap-2">
@@ -238,5 +268,58 @@ function LiveTab({ loading, stages, myRooms, otherRooms, user, onHost, onJoin }:
         </div>
       </section>
     </div>
+  );
+}
+
+/**
+ * Live Juke spaces section. Different look + CTA than ZAO Stream/100ms rooms
+ * because the routing target is /live/{id} (keyless Juke iframe) and the data
+ * shape is distinct. A subtle "FC" badge per-card makes the source obvious so
+ * a listener knows what they are walking into.
+ */
+function JukeLiveSection({ rooms }: { rooms: JukeRoomCard[] }) {
+  return (
+    <section>
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-2 text-[#855dcd]">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#855dcd] animate-pulse" aria-hidden="true" />
+        Live on Juke
+      </h3>
+      <div className="grid gap-4 md:grid-cols-2">
+        {rooms.map((r) => (
+          <Link
+            key={r.id}
+            href={`/live/${r.id}`}
+            aria-label={`Join Juke space: ${r.title}`}
+            className="group block bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 transition-all hover:border-gray-600 hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#855dcd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
+          >
+            <div className="w-8 h-1 rounded-full bg-[#855dcd] mb-3 opacity-60" aria-hidden="true" />
+            <div className="flex items-start justify-between gap-2 mb-3">
+              <h4 className="text-white font-bold text-sm leading-tight line-clamp-2 group-hover:text-[#a78bfa] transition-colors">
+                {r.title || 'Untitled space'}
+              </h4>
+              <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                <span className="inline-flex items-center gap-1 text-red-400 text-[10px] font-bold uppercase tracking-wide">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
+                  Live
+                </span>
+                <span className="inline-flex items-center text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded-full border border-[#855dcd]/40 bg-[#855dcd]/10 text-[#a78bfa]">
+                  FC Juke
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span>
+                {r.participant_count <= 1
+                  ? 'Just host'
+                  : `${r.participant_count} listening`}
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-lg bg-[#855dcd] text-white text-xs font-bold group-hover:bg-[#a78bfa] transition-colors">
+                Listen
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }

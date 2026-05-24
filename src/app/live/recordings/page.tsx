@@ -121,7 +121,6 @@ function RecordingCard({ row, endedLabel }: { row: JukeSpaceRow; endedLabel: str
         aria-label={`Open recording: ${row.title}`}
       >
         <div className="aspect-[1200/630] bg-[#0a1628] relative overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ogImage}
             alt=""

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars */
 /**
  * NEXUS V5 - Links Structure Update Script
- * 
+ *
  * This script updates the links structure based on the new organization
  * provided in the linksData array and saves it to the links.json file.
  */

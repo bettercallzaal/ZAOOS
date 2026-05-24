@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars */
 /**
  * NEXUS V5 - Links Data Structure Migration Script
- * 
+ *
  * This script migrates the existing links.json data to the new optimized structure
  * with improved organization, metadata, and tag management.
  * 

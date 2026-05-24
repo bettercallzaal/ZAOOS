@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities, @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';

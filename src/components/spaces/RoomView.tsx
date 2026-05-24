@@ -315,6 +315,7 @@ export function RoomView({
               pfpUrl={pfpUrl}
               onRoomChat={() => setShowRoomChat((prev) => !prev)}
               onParticipants={() => setShowParticipants((prev) => !prev)}
+              onShortcutsHelp={() => setShowShortcuts(true)}
             />
           </div>
           {roomId && <RoomMusicPanel roomId={roomId} isHost={isHost} onOpenMusicBrowser={() => setShowMusicSidebar(true)} />}

@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-05-23 | Shriyash Soni x Zaal intro call (Apna Coding, India - ZABAL Games + DevCon) | Networking | Zaal, Shriyash Soni, IMan | [736](736-shriyash-soni-intro-call-may23/) | 9 |
 | 2026-05-23 | ZAO Devz call - CannonJones (ZAO Cards) + ZABAL Games + Iman hackathon recap | ZAO Devz | Zaal, CannonJones, Iman | [725](725-cannon-zabal-iman-hackathon-may23/) | 14 |
 | 2026-05-22 | Tyler x Zaal - ZABAL Games + Road to ZAOstock | ZABAL Games | Zaal, Tyler | [714](714-tyler-zabal-zaostock-may22/) | 9 |
 | 2026-05-19 | ZAOstock standup - ZABAL Games launch + tracker merge | ZAOstock | Zaal, Jose, Defresh, Ryan Kagy | [720](720-zaostock-standup-may19/) | 8 |

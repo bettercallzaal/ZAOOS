@@ -28,6 +28,9 @@ interface ControlsPanelProps {
   pfpUrl?: string;
   onRoomChat?: () => void;
   onParticipants?: () => void;
+  /** Opens the keyboard-shortcuts cheatsheet. The "?" key already opens it
+   * via useRoomKeyboardShortcuts; this button is the visible discovery path. */
+  onShortcutsHelp?: () => void;
 }
 
 export function ControlsPanel({
@@ -47,6 +50,7 @@ export function ControlsPanel({
   pfpUrl,
   onRoomChat,
   onParticipants,
+  onShortcutsHelp,
 }: ControlsPanelProps) {
   const [showTwitchPanel, setShowTwitchPanel] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -57,7 +61,8 @@ export function ControlsPanel({
     (isHost && twitchUsername) ||
     (!isHost && roomType === 'stage') ||
     onRoomChat ||
-    onParticipants;
+    onParticipants ||
+    !!onShortcutsHelp;
 
   return (
     <div className="space-y-0">
@@ -194,6 +199,20 @@ export function ControlsPanel({
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                </svg>
+              </button>
+            )}
+
+            {/* Keyboard shortcuts help (also bound to "?") */}
+            {onShortcutsHelp && (
+              <button
+                onClick={onShortcutsHelp}
+                aria-label="Keyboard shortcuts"
+                title="Keyboard shortcuts (?)"
+                className="p-2.5 rounded-xl text-sm transition-colors bg-[#1a2a3a] text-gray-400 hover:text-white border border-white/[0.08] hover:border-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d1b2a]"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
                 </svg>
               </button>
             )}

@@ -131,6 +131,18 @@ Fetch all messages then filter client-side for messages that have the folder lab
      -d '{"add_labels": ["<folder>", "processed"], "remove_labels": ["unread"]}'
    ```
 
+7. **If `action-items` label was applied -> fire a cowork tracker task (NEW v2 - 2026-05-24).** This auto-creates a `todo` row in the Supabase cowork tracker (project `etwvzrmlxeobinrlytza`, table `tasks`) so the action lands in Iman/Zaal's Kanban without manual re-entry.
+
+   ```bash
+   # Short slug from message-id (last 12 chars, alphanumeric only) for legacy_id stability:
+   MSG_SLUG=$(echo "$MSG_ID" | tr -cd 'a-zA-Z0-9' | tail -c 12)
+   ~/bin/zao-tracker inbox "$MSG_SLUG" "<subject or first 60 chars>"
+   ```
+
+   This creates `legacy_source=inbox:<slug>` + `legacy_id=inbox-<slug>`. Owner defaults to Zaal (his inbox = his actions; pass third arg to override). Best-effort: if Supabase env unset, skill prints the error and continues - the AgentMail PATCH already happened, the tracker task is a nice-to-have.
+
+   Only fire when `action-items` label was applied. Items going to `research` / `x-posts` / `events` / `ideas` do NOT fire a tracker task (those don't need do-something actions).
+
 ### Cluster Mode (`/inbox cluster`)
 
 For draining a large backlog. Forwarded items pile up faster than `/inbox next` clears them, and processing each as its own doc produces many thin docs that miss the cross-cutting pattern. Cluster mode fixes both.
@@ -141,8 +153,8 @@ For draining a large backlog. Forwarded items pile up faster than `/inbox next` 
 
 2. **Triage.** Sort every item into one of three buckets:
    - **Research** - has a topic worth a doc.
-   - **Action-item** - needs Zaal to do something (account setup, a reply, a follow-up). Label `action-items` + `processed`, no doc.
-   - **Noise** - bounce-backs, delivery failures, dead ends. Label `processed` only, no doc.
+   - **Action-item** - needs Zaal to do something (account setup, a reply, a follow-up). Label `action-items` + `processed`, **AND fire `~/bin/zao-tracker inbox <slug> "<subject>"`** to create the matching Kanban row (v2 - 2026-05-24).
+   - **Noise** - bounce-backs, delivery failures, dead ends. Label `processed` only, no doc, no tracker.
 
 3. **Cluster the research bucket by theme.** Group items that share a subject (e.g. "Claude Code workflows", "agent memory", "vibecoding economics"). A cluster = 3+ related items. Leftover singletons go in a "standalone roundup" cluster.
 

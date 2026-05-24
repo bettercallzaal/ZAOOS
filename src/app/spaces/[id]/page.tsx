@@ -390,7 +390,8 @@ export default function PublicRoomPage() {
               )}
               <button
                 onClick={handleLeave}
-                className="px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-500/20 transition-colors"
+                aria-label={canEndRoom ? 'End room for everyone' : 'Leave room'}
+                className="px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
               >
                 {canEndRoom ? 'End' : 'Leave'}
               </button>

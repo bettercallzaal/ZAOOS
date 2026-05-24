@@ -25,7 +25,8 @@ export function CameraButton() {
           }
         }}
         disabled={requesting}
-        className="px-4 py-2.5 bg-[#1a2a3a] text-gray-300 border border-white/[0.08] rounded-xl text-sm transition-colors hover:text-white disabled:opacity-50"
+        aria-label={requesting ? 'Requesting camera permission' : 'Request camera'}
+        className="px-4 py-2.5 bg-[#1a2a3a] text-gray-300 border border-white/[0.08] rounded-xl text-sm transition-colors hover:text-white disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
       >
         {requesting ? 'Requesting...' : 'Camera'}
       </button>
@@ -35,7 +36,9 @@ export function CameraButton() {
   return (
     <button
       onClick={() => camera.toggle()}
-      className={`px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors flex items-center gap-1.5 ${
+      aria-pressed={!isCameraOff}
+      aria-label={isCameraOff ? 'Turn camera on (C)' : 'Turn camera off (C)'}
+      className={`px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628] ${
         isCameraOff
           ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
           : 'bg-blue-600 text-white hover:bg-blue-500'

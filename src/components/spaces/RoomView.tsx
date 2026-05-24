@@ -20,6 +20,7 @@ import { ParticipantsPanel } from './ParticipantsPanel';
 import { ClosedCaptions } from './ClosedCaptions';
 import { RoomFirstTimeTour } from './RoomFirstTimeTour';
 import { ShortcutsHelp } from './ShortcutsHelp';
+import { PromotionConfirm } from './PromotionConfirm';
 import { useRoomKeyboardShortcuts } from './useRoomKeyboardShortcuts';
 
 const BroadcastModal = dynamic(
@@ -213,6 +214,7 @@ export function RoomView({
         onClose={() => setShowShortcuts(false)}
         hasMediaPermissions={hasMediaPermissions}
       />
+      {!isHost && <PromotionConfirm />}
       <div className="flex flex-1 overflow-hidden">
         {/* Main room content */}
         <div className="flex-1 flex flex-col min-w-0">

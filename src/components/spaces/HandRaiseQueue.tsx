@@ -95,7 +95,7 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
           disabled={loading}
           aria-pressed={isRaised}
           aria-label={label}
-          className={`relative p-2.5 rounded-xl text-sm transition-colors border ${
+          className={`relative p-2.5 rounded-xl text-sm transition-colors border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628] ${
             isRaised
               ? 'bg-[#f5a623]/15 border-[#f5a623]/40 text-[#f5a623]'
               : 'bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border-white/[0.08] hover:border-[#f5a623]/40'

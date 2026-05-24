@@ -137,7 +137,7 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             <p className="text-gray-500 text-xs">No recording was made.</p>
           </div>
         ) : (
-          <JukeEmbed spaceId={spaceId} audioOff={audioOff} />
+          <JukeEmbed spaceId={spaceId} audioOff={audioOff} useSsoToken />
         )}
 
         <div className="flex flex-wrap gap-2 justify-center">

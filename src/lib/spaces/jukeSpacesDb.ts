@@ -9,6 +9,16 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 
 export type JukeSpaceStatus = 'scheduled' | 'active' | 'ended';
 
+/** One participant entry inside `juke_spaces.participants` jsonb array.
+ * Populated by participant.joined webhooks (Juke 2026-05-23 ship: events
+ * carry fid + display_name + role for real humans + agents only). */
+export interface JukeParticipantEntry {
+  fid: number;
+  display_name: string | null;
+  role: string | null;
+  joined_at: string;
+}
+
 export interface JukeSpaceRow {
   id: string;
   title: string;
@@ -19,6 +29,7 @@ export interface JukeSpaceRow {
   ended_at: string | null;
   recording_url: string | null;
   participant_count: number;
+  participants: JukeParticipantEntry[];
   embed_url: string | null;
   raw: unknown;
   created_at: string;
@@ -234,6 +245,48 @@ export async function bumpParticipantCount(id: string, delta: number): Promise<v
     .update({ participant_count: next })
     .eq('id', id);
   if (error) throw new Error(`bumpParticipantCount failed: ${error.message}`);
+}
+
+/** Upsert a participant entry into juke_spaces.participants jsonb (read-modify-
+ * write). Dedupes on fid - rejoin updates joined_at + role. Best-effort: if
+ * the column does not exist yet (migration #2 not applied) we silently skip. */
+export async function addParticipant(id: string, entry: JukeParticipantEntry): Promise<void> {
+  const { data } = await supabaseAdmin
+    .from('juke_spaces')
+    .select('participants')
+    .eq('id', id)
+    .maybeSingle();
+  const current = (data as { participants?: JukeParticipantEntry[] } | null)?.participants ?? [];
+  const filtered = current.filter((p) => p.fid !== entry.fid);
+  const next = [...filtered, entry];
+  const { error } = await supabaseAdmin
+    .from('juke_spaces')
+    .update({ participants: next })
+    .eq('id', id);
+  if (error) {
+    // Column missing = migration not applied yet. Do not block the webhook.
+    if (/column .*participants/i.test(error.message)) return;
+    throw new Error(`addParticipant failed: ${error.message}`);
+  }
+}
+
+export async function removeParticipant(id: string, fid: number): Promise<void> {
+  const { data } = await supabaseAdmin
+    .from('juke_spaces')
+    .select('participants')
+    .eq('id', id)
+    .maybeSingle();
+  const current = (data as { participants?: JukeParticipantEntry[] } | null)?.participants ?? [];
+  const next = current.filter((p) => p.fid !== fid);
+  if (next.length === current.length) return;
+  const { error } = await supabaseAdmin
+    .from('juke_spaces')
+    .update({ participants: next })
+    .eq('id', id);
+  if (error) {
+    if (/column .*participants/i.test(error.message)) return;
+    throw new Error(`removeParticipant failed: ${error.message}`);
+  }
 }
 
 export interface WebhookEventInsert {

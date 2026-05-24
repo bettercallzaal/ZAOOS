@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getJukeIntegrationManifest } from '@/lib/spaces/jukeIntegrationManifest';
+import { buildResolutionIndex, fetchJukeChangelog } from '@/lib/spaces/jukeChangelog';
 import {
   getJukeIntegrationStats,
   listRecentJukeSpaces,
@@ -19,25 +20,35 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const manifest = getJukeIntegrationManifest();
-  const [stats, recentSpaces, recentEvents] = await Promise.all([
+  const [stats, recentSpaces, recentEvents, changelog] = await Promise.all([
     getJukeIntegrationStats().catch(() => null),
     listRecentJukeSpaces(10).catch(() => []),
     listRecentWebhookEvents(15).catch(() => []),
+    fetchJukeChangelog(),
   ]);
+  const resolutionIndex = buildResolutionIndex(changelog);
+  // Decorate open_asks with juke_resolved so consumers see closed asks
+  // without re-joining against juke.audio/changelog.json themselves.
+  const open_asks = manifest.open_asks.map((ask) => {
+    const resolved = resolutionIndex.get(ask.id);
+    return resolved ? { ...ask, juke_resolved: resolved } : ask;
+  });
 
   return NextResponse.json(
     {
       ...manifest,
+      open_asks,
       stats,
       recent_spaces: recentSpaces,
       recent_events: recentEvents,
+      release_feed: 'https://juke.audio/changelog.json',
     },
     {
       status: 200,
       headers: {
         'Cache-Control': 'public, max-age=30, s-maxage=60, stale-while-revalidate=120',
         'Access-Control-Allow-Origin': '*',
-        'X-ZAO-Juke-Status': 'v2',
+        'X-ZAO-Juke-Status': 'v3',
       },
     },
   );

@@ -50,6 +50,8 @@ export interface IntegrationManifest {
   open_asks: OpenAsk[];
   conventions: string[];
   contact: IntegrationContact;
+  /** Upstream release feed - polled by /juke-status to auto-resolve open asks. */
+  juke_release_feed: string;
 }
 
 const SHIPPED: ShippedFeature[] = [
@@ -277,15 +279,12 @@ const OPEN_ASKS: OpenAsk[] = [
     blocks: 'Friction-free participate (react / raise hand / speak) inside ZAO OS embeds',
     priority: 'p1',
   },
-  {
-    id: 'oss-spec',
-    title: 'Open-source SPEC.md / codebase drop',
-    reason:
-      'You offered to open the codebase + SPEC.md "if there was demand." ZAO is the demand. 13 files of integration code against your llms.txt + a full HMAC webhook handler. Happy to be the first community reference implementation.',
-    blocks: 'Deeper integration patterns + co-marketing as reference impl',
-    priority: 'p2',
-  },
 ];
+
+// oss-spec was declined-as-framed by Nicky on 2026-05-24: juke.audio/llms.txt
+// + juke.audio/SKILL.md are the public spec and stay atomic with every ship.
+// Partnership conversation stays open on its own terms; the ask is removed
+// from the queue so the dashboard does not nag.
 
 const CONVENTIONS = [
   'All Juke calls server-side. JUKE_API_KEY never leaves the server.',
@@ -356,7 +355,7 @@ export const INTEGRATION_ARCHITECTURE_ASCII = String.raw`
 
 export function getJukeIntegrationManifest(): IntegrationManifest {
   return {
-    version: '1.1',
+    version: '1.2',
     generated_at: new Date().toISOString(),
     about: {
       name: 'The ZAO',
@@ -371,6 +370,7 @@ export function getJukeIntegrationManifest(): IntegrationManifest {
     open_asks: OPEN_ASKS,
     conventions: CONVENTIONS,
     contact: CONTACT,
+    juke_release_feed: 'https://juke.audio/changelog.json',
   };
 }
 

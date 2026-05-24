@@ -19,9 +19,38 @@ interface CreatedSpace {
 
 type Status = 'idle' | 'creating' | 'done' | 'error';
 
+/**
+ * Convert a `<input type="datetime-local">` value (yyyy-MM-ddTHH:mm in the
+ * user's local zone) into an ISO-8601 string Juke + Supabase will accept.
+ * Returns null when the input is empty or unparseable.
+ */
+function localDateTimeToIso(value: string): string | null {
+  if (!value.trim()) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
+/**
+ * Default a `<input type="datetime-local">` to "1 hour from now, rounded up
+ * to the next half hour" in the user's local zone. Pre-fills the scheduled
+ * field with a sensible value so the typical "schedule for soon" case is one
+ * click instead of a date-pick.
+ */
+function defaultScheduledLocal(): string {
+  const d = new Date(Date.now() + 60 * 60_000);
+  d.setMinutes(d.getMinutes() < 30 ? 30 : 60, 0, 0);
+  // Strip seconds + the trailing Z; <input> expects local time without zone.
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function CreateLiveSpacePage() {
   const [password, setPassword] = useState('');
   const [title, setTitle] = useState('');
+  const [mode, setMode] = useState<'now' | 'scheduled'>('now');
+  const [scheduledLocal, setScheduledLocal] = useState<string>(defaultScheduledLocal());
+  const [announceCast, setAnnounceCast] = useState<boolean>(false);
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
   const [space, setSpace] = useState<CreatedSpace | null>(null);
@@ -34,11 +63,32 @@ export default function CreateLiveSpacePage() {
   const createSpace = async () => {
     setStatus('creating');
     setError(null);
+
+    let scheduledAt: string | null = null;
+    if (mode === 'scheduled') {
+      scheduledAt = localDateTimeToIso(scheduledLocal);
+      if (!scheduledAt) {
+        setError('Pick a valid date and time.');
+        setStatus('error');
+        return;
+      }
+      if (new Date(scheduledAt).getTime() <= Date.now()) {
+        setError('Scheduled time must be in the future.');
+        setStatus('error');
+        return;
+      }
+    }
+
     try {
       const res = await fetch('/api/juke/space', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), password }),
+        body: JSON.stringify({
+          title: title.trim(),
+          password,
+          scheduledAt,
+          announceCast,
+        }),
       });
       const body = await res.json();
       if (!res.ok || !body.success) {
@@ -71,6 +121,9 @@ export default function CreateLiveSpacePage() {
   const reset = () => {
     setSpace(null);
     setTitle('');
+    setMode('now');
+    setScheduledLocal(defaultScheduledLocal());
+    setAnnounceCast(false);
     setStatus('idle');
     setError(null);
   };
@@ -96,10 +149,13 @@ export default function CreateLiveSpacePage() {
         <div className="w-full max-w-md">
           {status === 'done' && space ? (
             <div>
-              <h2 className="text-2xl font-bold text-white">Space created</h2>
+              <h2 className="text-2xl font-bold text-white">
+                {mode === 'scheduled' ? 'Space scheduled' : 'Space created'}
+              </h2>
               <p className="mt-2 text-sm text-gray-400">
-                Share this link - anyone can listen in. To speak, they sign in
-                with Farcaster inside the space.
+                {mode === 'scheduled'
+                  ? `Set for ${new Date(localDateTimeToIso(scheduledLocal) ?? Date.now()).toLocaleString()}. Share the link - anyone with it sees a countdown until start.`
+                  : 'Share this link - anyone can listen in. To speak, they sign in with Farcaster inside the space.'}
               </p>
               <div className="mt-6 rounded-xl border border-white/[0.08] bg-[#0d1b2a] p-4">
                 <p className="break-all font-mono text-sm text-[#f5a623]">{liveUrl}</p>
@@ -170,8 +226,76 @@ export default function CreateLiveSpacePage() {
                     setTitle(e.target.value);
                     if (error) setError(null);
                   }}
-                  className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-[#0d1b2a] px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:border-[#f5a623]/50 focus:outline-none"
+                  className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-[#0d1b2a] px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:border-[#f5a623]/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623]"
                 />
+
+                {/* Mode: now vs scheduled */}
+                <fieldset className="mt-4">
+                  <legend className="text-xs font-medium text-gray-400 mb-1.5">When</legend>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        { id: 'now', label: 'Open now', desc: 'Live the moment you submit' },
+                        { id: 'scheduled', label: 'Schedule', desc: 'Pre-create with a start time' },
+                      ] as const
+                    ).map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setMode(opt.id);
+                          if (error) setError(null);
+                        }}
+                        aria-pressed={mode === opt.id}
+                        className={`text-left p-3 rounded-xl border text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] ${
+                          mode === opt.id
+                            ? 'border-[#f5a623] bg-[#f5a623]/10 text-white'
+                            : 'border-white/[0.08] bg-[#0a1628] text-gray-400 hover:border-gray-600'
+                        }`}
+                      >
+                        <p className="font-semibold text-white">{opt.label}</p>
+                        <p className="text-[11px] text-gray-500 leading-tight mt-0.5">{opt.desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+
+                {mode === 'scheduled' && (
+                  <>
+                    <label htmlFor="create-scheduled" className="mt-4 block text-xs font-medium text-gray-400">
+                      Start time (your timezone)
+                    </label>
+                    <input
+                      id="create-scheduled"
+                      type="datetime-local"
+                      value={scheduledLocal}
+                      onChange={(e) => {
+                        setScheduledLocal(e.target.value);
+                        if (error) setError(null);
+                      }}
+                      className="mt-1.5 w-full rounded-xl border border-white/[0.08] bg-[#0d1b2a] px-4 py-3 text-sm text-white focus:border-[#f5a623]/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623]"
+                    />
+                    <p className="mt-1 text-[11px] text-gray-600">
+                      Juke renders a countdown until {scheduledLocal ? new Date(scheduledLocal).toLocaleString() : 'the chosen time'}.
+                    </p>
+                  </>
+                )}
+
+                {/* Announce-cast option */}
+                <label className="mt-4 flex items-start gap-2 p-3 rounded-xl border border-white/[0.08] bg-[#0a1628] cursor-pointer hover:border-gray-600 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={announceCast}
+                    onChange={(e) => setAnnounceCast(e.target.checked)}
+                    className="mt-1 accent-[#f5a623]"
+                  />
+                  <span className="flex-1">
+                    <span className="block text-sm font-semibold text-white">Announce on Farcaster</span>
+                    <span className="block text-[11px] text-gray-500 leading-tight">
+                      Juke posts a cast from the host account when the space goes live.
+                    </span>
+                  </span>
+                </label>
 
                 {error && <p className="mt-3 text-xs text-red-400">{error}</p>}
 
@@ -182,9 +306,15 @@ export default function CreateLiveSpacePage() {
                     password.trim().length === 0 ||
                     title.trim().length === 0
                   }
-                  className="mt-4 w-full rounded-xl bg-[#f5a623] py-3 text-sm font-semibold text-[#0a1628] transition-colors hover:bg-[#ffd700] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="mt-4 w-full rounded-xl bg-[#f5a623] py-3 text-sm font-semibold text-[#0a1628] transition-colors hover:bg-[#ffd700] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
                 >
-                  {status === 'creating' ? 'Creating...' : 'Create space'}
+                  {status === 'creating'
+                    ? mode === 'scheduled'
+                      ? 'Scheduling...'
+                      : 'Creating...'
+                    : mode === 'scheduled'
+                      ? 'Schedule space'
+                      : 'Create space'}
                 </button>
               </form>
             </>

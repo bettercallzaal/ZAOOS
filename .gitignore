@@ -96,3 +96,10 @@ scripts/.stock-codes-iman-*.txt
 *.contacts.json
 .claude/.private/
 .claude/private-queries/
+
+# Build / CI artifacts (cleanup 2026-05-24, see /tmp/zao-os-audit-20260524.md)
+graphify-out/
+build-log/
+coverage/
+autoresearch-test-coverage/
+tmp/

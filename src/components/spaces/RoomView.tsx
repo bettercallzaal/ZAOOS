@@ -19,6 +19,7 @@ import { RoomChat } from './RoomChat';
 import { ParticipantsPanel } from './ParticipantsPanel';
 import { ClosedCaptions } from './ClosedCaptions';
 import { RoomFirstTimeTour } from './RoomFirstTimeTour';
+import { useRoomKeyboardShortcuts } from './useRoomKeyboardShortcuts';
 
 const BroadcastModal = dynamic(
   () => import('./BroadcastModal').then((m) => ({ default: m.BroadcastModal })),
@@ -96,6 +97,14 @@ export function RoomView({
   // Name of the current dominant speaker, when there is one — surfaces to the
   // header so listeners know whose voice they are hearing.
   const speakingName = dominantSpeaker?.name || dominantSpeaker?.userId || null;
+
+  // Zoom-style keyboard shortcuts. Stage listeners with no mic do not get the
+  // Space binding — there is nothing for them to toggle.
+  useRoomKeyboardShortcuts({
+    enableMic: roomType === 'voice_channel' || isHost,
+    enableCamera: roomType === 'voice_channel' || isHost,
+    enableScreen: roomType === 'voice_channel' || isHost,
+  });
 
   // Fetch Twitch connection info for the host (all viewers see the embed, host gets chat)
   useEffect(() => {

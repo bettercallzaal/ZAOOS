@@ -1,0 +1,39 @@
+import { NextResponse } from 'next/server';
+import { getJukeIntegrationManifest } from '@/lib/spaces/jukeIntegrationManifest';
+import { getJukeIntegrationStats } from '@/lib/spaces/jukeSpacesDb';
+
+/**
+ * GET /api/juke/status - machine-readable ZAO + Juke integration state.
+ *
+ * Same data as /juke-status (HTML) and /juke-integration.md (markdown). Built
+ * for the Juke team's agent to fetch without scraping the HTML page.
+ *
+ * Cached short (60s) at the CDN; ZAO ships new features faster than Juke
+ * polls, so a one-minute staleness ceiling is fine.
+ */
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
+  const manifest = getJukeIntegrationManifest();
+  let stats;
+  try {
+    stats = await getJukeIntegrationStats();
+  } catch {
+    stats = null;
+  }
+
+  return NextResponse.json(
+    {
+      ...manifest,
+      stats,
+    },
+    {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, max-age=30, s-maxage=60, stale-while-revalidate=120',
+        'Access-Control-Allow-Origin': '*',
+        'X-ZAO-Juke-Status': 'v1',
+      },
+    },
+  );
+}

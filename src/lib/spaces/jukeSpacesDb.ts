@@ -64,6 +64,86 @@ export async function getJukeSpace(id: string): Promise<JukeSpaceRow | null> {
   return (data as JukeSpaceRow) ?? null;
 }
 
+/** List Juke spaces currently in `active` status. Most-recent first. */
+export async function listActiveJukeSpaces(limit: number = 25): Promise<JukeSpaceRow[]> {
+  const { data, error } = await supabaseAdmin
+    .from('juke_spaces')
+    .select('*')
+    .eq('status', 'active')
+    .order('started_at', { ascending: false, nullsFirst: false })
+    .limit(Math.min(Math.max(1, limit), 100));
+  if (error) throw new Error(`listActiveJukeSpaces failed: ${error.message}`);
+  return (data ?? []) as JukeSpaceRow[];
+}
+
+/** List Juke spaces scheduled to start in the future. Soonest first. */
+export async function listScheduledJukeSpaces(limit: number = 25): Promise<JukeSpaceRow[]> {
+  const nowIso = new Date().toISOString();
+  const { data, error } = await supabaseAdmin
+    .from('juke_spaces')
+    .select('*')
+    .eq('status', 'scheduled')
+    .gte('scheduled_at', nowIso)
+    .order('scheduled_at', { ascending: true })
+    .limit(Math.min(Math.max(1, limit), 100));
+  if (error) throw new Error(`listScheduledJukeSpaces failed: ${error.message}`);
+  return (data ?? []) as JukeSpaceRow[];
+}
+
+/** Aggregate counts for the /juke-status dashboard + JSON endpoint. */
+export interface JukeIntegrationStats {
+  total_spaces: number;
+  active: number;
+  scheduled: number;
+  ended: number;
+  with_recording: number;
+  total_webhook_events: number;
+  recent_event_types: Record<string, number>;
+  last_event_at: string | null;
+}
+
+export async function getJukeIntegrationStats(): Promise<JukeIntegrationStats> {
+  const stats: JukeIntegrationStats = {
+    total_spaces: 0,
+    active: 0,
+    scheduled: 0,
+    ended: 0,
+    with_recording: 0,
+    total_webhook_events: 0,
+    recent_event_types: {},
+    last_event_at: null,
+  };
+  try {
+    const counts = await Promise.all([
+      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }),
+      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }).eq('status', 'scheduled'),
+      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }).eq('status', 'ended'),
+      supabaseAdmin.from('juke_spaces').select('*', { count: 'exact', head: true }).not('recording_url', 'is', null),
+      supabaseAdmin.from('juke_webhook_events').select('*', { count: 'exact', head: true }),
+    ]);
+    stats.total_spaces = counts[0].count ?? 0;
+    stats.active = counts[1].count ?? 0;
+    stats.scheduled = counts[2].count ?? 0;
+    stats.ended = counts[3].count ?? 0;
+    stats.with_recording = counts[4].count ?? 0;
+    stats.total_webhook_events = counts[5].count ?? 0;
+
+    const { data: recent } = await supabaseAdmin
+      .from('juke_webhook_events')
+      .select('event_type, received_at')
+      .order('received_at', { ascending: false })
+      .limit(50);
+    for (const row of (recent ?? []) as Array<{ event_type: string; received_at: string }>) {
+      stats.recent_event_types[row.event_type] = (stats.recent_event_types[row.event_type] ?? 0) + 1;
+      if (!stats.last_event_at) stats.last_event_at = row.received_at;
+    }
+  } catch {
+    /* surfaces zero stats instead of 500 on transient DB issues */
+  }
+  return stats;
+}
+
 /**
  * List ended Juke spaces that have a recording_url. Most-recent first.
  * Limited to a sensible default the shelf page can show without paging.

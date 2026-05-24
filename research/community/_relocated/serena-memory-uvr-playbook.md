@@ -1,5 +1,16 @@
 # UVR (Underground Violet Rave) Playbook - Research Complete
 
+> **Relocated 2026-05-23 (doc 728 Action #3):** This file used to live at `.serena/memories/project_uvr_playbook.md`. That directory is for per-project structural memories (project_structure, commands, agent_stack) consumed by Serena MCP, NOT for research content. The playbook summary belongs in `research/community/`.
+>
+> **Related primary UVR research docs:**
+> - [Doc 427 - UVR / Jadyn Violet brand intro bot](../427-uvr-jadyn-violet-brand-intro-bot/)
+> - [Doc 600 - Jadyn Violet UVR deep dive](../600-jadyn-violet-uvr-deep-dive/)
+> - [Doc 651 - Jadyn Violet UVR producer brief](../../music/651-jadyn-violet-uvr-producer-brief.md)
+>
+> The "Doc 560" path referenced below does not exist on `main` (the path was speculative when this summary was written). Use the docs listed above as the canonical references.
+
+---
+
 **Doc:** research/community/uvr-underground-violet-rave-playbook.md (Doc 560)
 **Completed:** May 14 2026
 **Tier:** STANDARD (7 sources verified)

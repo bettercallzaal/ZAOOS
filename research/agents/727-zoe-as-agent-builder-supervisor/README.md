@@ -304,3 +304,62 @@ bot/src/zoe/orchestrator/
 PR1 ships: `router.ts` + `learner.ts` (record only) + `patterns/hermes.ts` + `autonomy.ts` + `channels.ts` (the ZAO Devz GC status path) + concurrent job queue (max 3) + Bonfire wiring for classify + spawn + done + intervention-skipped (PR2 adds real intervention). Cost cap = $2. End-to-end: any Hermes-bug-fix task DM'd to ZOE gets classified, gated through `autonomy.ts` (AUTO -> run), spawned, queued (max 3 concurrent), logged to Bonfire at each step, status-pinged to ZAO Devz GC, fully streamed to ZOE DM, final summary returned to Zaal.
 
 PR1 LOC estimate: ~400 (up from 250 because of the autonomy gate + dual-channel + queue additions).
+
+---
+
+## Update 2026-05-23 (later) - PIVOT: born in own public repo, OSS from day 1
+
+Per Zaal 2026-05-23: "open source Hermes supervisor framework and someone can watch it for GitHub history for people to see the learning process." This changes the structural location - the orchestrator is born in **`bettercallzaal/hermes-orchestrator`** (new PUBLIC repo, MIT-licensed), NOT in `bot/src/zoe/orchestrator/` inside ZAOOS.
+
+Deliberate deviation from monorepo-as-lab canon. Justified by: (a) framework's value reusable beyond ZAO, (b) the GitHub history IS content - every PR teaches a step to outside builders, (c) public commitment forces cleaner adapter interfaces from day 1.
+
+### What changes from earlier design
+
+| Earlier (monorepo) | Now (own repo) |
+|--------------------|----------------|
+| `bot/src/zoe/orchestrator/*` inside ZAOOS | `bettercallzaal/hermes-orchestrator` - own public repo |
+| Tight coupling to ZOE runtime OK | Adapter interfaces: RunnerAdapter, MemoryAdapter, PatternAdapter, ChannelAdapter |
+| ZOE imports orchestrator directly | ZOE installs `hermes-orchestrator` as an npm dep, wires its own adapters |
+| Hermes-specific imports | Hermes is the DEFAULT RunnerAdapter; others can plug their own |
+| Bonfire-specific writes | Bonfire is the DEFAULT MemoryAdapter; KG-agnostic (Letta, ChromaDB, Mem0 all pluggable) |
+| PR1 = 400 LOC in monorepo | PR1 = ~800-1000 LOC, ships as v0.1.0 release |
+
+### Repo basics
+
+- URL: `github.com/bettercallzaal/hermes-orchestrator`
+- License: MIT
+- Language: TypeScript
+- Status at first commit: pre-alpha (README + LICENSE + design doc; code lands in PR1)
+- Build-in-public: every PR teaches a step; PR descriptions explain the why
+
+### Adapter contracts
+
+```ts
+interface RunnerAdapter {
+  spawn(task: Task, context: Context): Promise<RunHandle>
+  stream(handle: RunHandle): AsyncIterable<RunEvent>
+  intervene(handle: RunHandle, message: string): Promise<void>
+  kill(handle: RunHandle): Promise<void>
+}
+interface MemoryAdapter {
+  record(event: OrchestratorEvent): Promise<void>
+  retrieve(pattern: string, taskClass: string, limit: number): Promise<MemoryHit[]>
+}
+interface PatternAdapter {
+  matches(task: Task): boolean
+  prepare(task: Task, memory: MemoryHit[]): RunnerInput
+  costCap: number
+}
+interface ChannelAdapter {
+  status(line: string): Promise<void>
+  firehose(event: RunEvent): Promise<void>
+}
+```
+
+### ZAOOS integration
+
+When `hermes-orchestrator@0.1.0` ships, ZAOOS adds it as a dep in `bot/package.json` and wires HermesRunner -> `bot/src/hermes/claude-cli.ts`, BonfireMemory -> `bot/src/zoe/recall.ts`, TelegramChannel -> the ZAO Devz GC + ZOE DM dual surface. No orchestrator code lives inside ZAOOS - all integration at the adapter boundary.
+
+### Build-in-public discipline
+
+Every PR title + description teaches the step. PRs answer: WHY this PR exists, WHAT design choice it makes, WHAT was rejected, WHAT failure mode it solves. The repo's git log becomes a teaching corpus.

@@ -144,6 +144,36 @@ const SHIPPED: ShippedFeature[] = [
     shippedAt: '2026-05-23',
     files: ['src/lib/spaces/jukeWebhookHandlers.ts', 'src/lib/publish/auto-cast.ts'],
   },
+  {
+    id: 'public-status-surfaces',
+    title: 'Public build-status surfaces for the Juke team',
+    description:
+      'Three mirrors of the integration manifest: /juke-status (HTML dashboard with live stats), /api/juke/status (JSON, CORS open, 60s CDN cache, X-ZAO-Juke-Status: v1 header), /juke-integration.md (llms.txt-style markdown). Single source of truth is jukeIntegrationManifest.ts - update the SHIPPED + OPEN_ASKS arrays and all three surfaces refresh.',
+    shippedAt: '2026-05-23',
+    files: [
+      'src/lib/spaces/jukeIntegrationManifest.ts',
+      'src/app/juke-status/page.tsx',
+      'src/app/api/juke/status/route.ts',
+      'src/app/juke-integration.md/route.ts',
+    ],
+  },
+  {
+    id: 'live-public-discovery',
+    title: 'Public /live index of ZAO Juke spaces',
+    description:
+      'Anyone can browse Live / Scheduled / Recent ZAO Juke spaces without authentication. Server-fetched from juke_spaces. Each card links to /live/{id} (keyless Path A iframe). A paste-link form at the bottom keeps the original "open any Juke link in ZAO OS" flow.',
+    shippedAt: '2026-05-23',
+    files: ['src/app/live/page.tsx', 'src/app/live/JukeLinkOpener.tsx'],
+  },
+  {
+    id: 'schedule-space-ui',
+    title: 'Schedule-a-space UI on /live/create',
+    description:
+      'Operator form to pre-create Juke spaces with a real scheduled_at - threads through to Juke. Pre-fills "1h from now, rounded up to the next half hour". Optional announceCast toggle. Scheduled rows surface on the public /live index until they go active.',
+    shippedAt: '2026-05-23',
+    files: ['src/app/live/create/page.tsx', 'src/app/api/juke/space/route.ts'],
+    reference: 'Juke 2026-05-23 PR — scheduled spaces (item #5)',
+  },
 ];
 
 const OPEN_ASKS: OpenAsk[] = [

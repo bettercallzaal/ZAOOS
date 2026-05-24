@@ -15,7 +15,9 @@
  * consume the fields we recognise. Extra fields are stored verbatim in
  * `juke_webhook_events.body`.
  */
-import { bumpParticipantCount, updateJukeSpace } from './jukeSpacesDb';
+import { autoCastToZao } from '@/lib/publish/auto-cast';
+import { logger } from '@/lib/logger';
+import { bumpParticipantCount, getJukeSpace, updateJukeSpace } from './jukeSpacesDb';
 
 interface JukeWebhookBody {
   event?: string;
@@ -122,8 +124,20 @@ export async function applyWebhookEvent(
     }
     case 'recording.ready': {
       const url = readRecordingUrl(body);
-      if (url) {
-        await updateJukeSpace(spaceId, { recording_url: url });
+      if (!url) return;
+      await updateJukeSpace(spaceId, { recording_url: url });
+      // Best-effort recap cast - autoCastToZao silently no-ops if the
+      // @thezao signer is not configured, so this is safe on local + preview.
+      try {
+        const row = await getJukeSpace(spaceId);
+        const title = row?.title ?? 'A ZAO space';
+        const liveUrl = `https://zaoos.com/live/${spaceId}`;
+        await autoCastToZao(
+          `Recording up: ${title}\n\nListen back: ${liveUrl}`,
+          liveUrl,
+        );
+      } catch (err: unknown) {
+        logger.warn('[juke/webhooks] recap cast failed (non-fatal):', err);
       }
       return;
     }

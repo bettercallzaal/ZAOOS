@@ -25,8 +25,18 @@ export interface ParsedSignature {
 }
 
 export type VerifyResult =
-  | { ok: true; ts: number; signatureHash: string }
-  | { ok: false; reason: string };
+  | { ok: true; ts: number; signatureHash: string; matchedVariant?: string }
+  | { ok: false; reason: string; debug?: VerifyDebug };
+
+export interface VerifyDebug {
+  secretLen: number;
+  secretFp: string;
+  bodyLen: number;
+  headerRaw: string;
+  expectedRawPrefix: string;
+  receivedV1Prefix: string;
+  variantsTried: string[];
+}
 
 /** Parse `t={ts},v1={hex}` (order-insensitive, ignores unknown keys). */
 export function parseJukeSignature(header: string | null | undefined): ParsedSignature | null {
@@ -72,18 +82,78 @@ export function verifyJukeWebhook(
     return { ok: false, reason: 'Signature timestamp outside replay window' };
   }
 
-  const expected = createHmac('sha256', secret).update(`${parsed.ts}.${rawBody}`).digest('hex');
-
-  // timingSafeEqual requires equal-length buffers and throws otherwise.
-  if (expected.length !== parsed.v1.length) {
-    return { ok: false, reason: 'Signature length mismatch' };
+  // Juke's secret arrives as `whsec_<app-prefix>_<key>`. Different webhook
+  // libraries differ on what bytes get used as the HMAC key — some sign with
+  // the literal string, some strip the `whsec_` prefix, some base64-decode the
+  // key tail. Try every plausible canonicalization so we don't fail loudly
+  // because of a 5-character prefix convention.
+  const variants = buildSecretVariants(secret);
+  const message = `${parsed.ts}.${rawBody}`;
+  let firstExpected = '';
+  for (const variant of variants) {
+    const expected = createHmac('sha256', variant.key).update(message).digest('hex');
+    if (!firstExpected) firstExpected = expected;
+    if (expected.length !== parsed.v1.length) continue;
+    const a = Buffer.from(expected, 'utf8');
+    const b = Buffer.from(parsed.v1, 'utf8');
+    if (timingSafeEqual(a, b)) {
+      const signatureHash = createHash('sha256').update(parsed.v1).digest('hex');
+      return { ok: true, ts: parsed.ts, signatureHash, matchedVariant: variant.name };
+    }
   }
-  const a = Buffer.from(expected, 'utf8');
-  const b = Buffer.from(parsed.v1, 'utf8');
-  if (!timingSafeEqual(a, b)) {
-    return { ok: false, reason: 'Signature mismatch' };
+
+  const debug: VerifyDebug = {
+    secretLen: secret.length,
+    secretFp: createHash('sha256').update(secret).digest('hex').slice(0, 12),
+    bodyLen: rawBody.length,
+    headerRaw: signatureHeader ?? '',
+    expectedRawPrefix: firstExpected.slice(0, 16),
+    receivedV1Prefix: parsed.v1.slice(0, 16),
+    variantsTried: variants.map((v) => `${v.name}:${v.key.length}b`),
+  };
+  return { ok: false, reason: 'Signature mismatch', debug };
+}
+
+interface SecretVariant {
+  name: string;
+  key: Buffer | string;
+}
+
+function buildSecretVariants(secret: string): SecretVariant[] {
+  const variants: SecretVariant[] = [];
+  variants.push({ name: 'raw', key: secret });
+
+  // Strip `whsec_` (Stripe/Svix convention).
+  if (secret.startsWith('whsec_')) {
+    const stripped = secret.slice('whsec_'.length);
+    variants.push({ name: 'no-whsec', key: stripped });
+
+    // Strip `whsec_<app>_` (Juke convention: whsec_awt4_<key>).
+    const nextUnderscore = stripped.indexOf('_');
+    if (nextUnderscore > 0 && nextUnderscore < stripped.length - 1) {
+      const innerKey = stripped.slice(nextUnderscore + 1);
+      variants.push({ name: 'no-whsec-noapp', key: innerKey });
+      // Try base64-decoded key tail (common in webhook libs).
+      try {
+        const decoded = Buffer.from(innerKey, 'base64');
+        if (decoded.length > 0) {
+          variants.push({ name: 'no-whsec-noapp-b64', key: decoded });
+        }
+      } catch {
+        // ignore, base64 decode failed
+      }
+    }
+
+    // Base64 decode of the whole post-whsec tail.
+    try {
+      const decoded = Buffer.from(stripped, 'base64');
+      if (decoded.length > 0) {
+        variants.push({ name: 'no-whsec-b64', key: decoded });
+      }
+    } catch {
+      // ignore
+    }
   }
 
-  const signatureHash = createHash('sha256').update(parsed.v1).digest('hex');
-  return { ok: true, ts: parsed.ts, signatureHash };
+  return variants;
 }

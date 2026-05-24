@@ -40,8 +40,18 @@ export async function POST(request: NextRequest) {
 
   const verification = verifyJukeWebhook(rawBody, signatureHeader, secret);
   if (!verification.ok) {
-    logger.warn('[juke/webhooks] signature failed:', verification.reason);
+    logger.warn(
+      '[juke/webhooks] signature failed:',
+      verification.reason,
+      verification.debug ? JSON.stringify(verification.debug) : '',
+    );
     return NextResponse.json({ ok: false, error: verification.reason }, { status: 401 });
+  }
+  if (verification.matchedVariant && verification.matchedVariant !== 'raw') {
+    logger.warn(
+      '[juke/webhooks] signature verified via non-raw variant:',
+      verification.matchedVariant,
+    );
   }
 
   let body: unknown;

@@ -80,3 +80,19 @@ ellsworth info/
 # ZAOstock plaintext codes - never commit (secrets)
 scripts/.stock-codes-*.txt
 scripts/.stock-codes-iman-*.txt
+.env*.local
+
+# Private-data perimeter (2026-05-23) - any output from connected services
+# Gmail / Google Calendar / Google Drive / GitHub queries that may contain PII
+# Canonical off-repo location: ~/.zao/private/  (this is belt + suspenders in case
+# something writes inside the repo by accident)
+**/.private/
+**/private-queries/
+**/.zao-private/
+*.private.json
+*.gmail.json
+*.gcal.json
+*.gdrive.json
+*.contacts.json
+.claude/.private/
+.claude/private-queries/

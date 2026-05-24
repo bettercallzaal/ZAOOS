@@ -19,6 +19,18 @@ const nextConfig: NextConfig = {
         destination: 'https://bczyapz.com/:path*',
         permanent: true,
       },
+      // ZABAL hub re-homed to zabal.art (research Doc 708). Keep old
+      // shared links working - 301 to the canonical surface.
+      {
+        source: '/zabal',
+        destination: 'https://zabal.art',
+        permanent: true,
+      },
+      {
+        source: '/zabal/:path*',
+        destination: 'https://zabal.art/:path*',
+        permanent: true,
+      },
     ]
   },
 

@@ -172,6 +172,14 @@ const OPEN_ASKS: OpenAsk[] = [
     priority: 'p1',
   },
   {
+    id: 'partner-sso-bridge',
+    title: 'Parent-frame SSO so authed users on partner sites do not re-sign',
+    reason:
+      "ZAO uses Sign In With Neynar (SIWN) - a managed signer registered by ZAO's app FID. Juke uses SIWF (fresh EIP-4361 SIWE in the moment by user's custody). Different primitives, so a direct hand-off does not exist - a ZAO user already signed in at zaoos.com still has to do a second SIWF dance inside the Juke iframe to react/raise hand/speak. Anonymous listen is fine (one-tap autoplay bypass). Three options for an SSO bridge, in ascending lift on your side: (1) Parent-frame Quick Auth via postMessage - ZAO posts {fid, signed-proof} into the iframe, Juke mints its JWT without showing the QR. You already have the miniapp Quick Auth code path; this is essentially 'trust the parent frame like a miniapp host'. (2) Trusted-partner pre-mint endpoint - ZAO server POSTs {fid, signed-proof} to a Juke endpoint, gets back a short-lived Juke JWT, passes it as ?token=... on the iframe src. Juke trusts ZAO because we hold a developer key + a registered allowed_origin. Cleanest SSO. (3) Quick Auth via the Farcaster miniapp shell already exists but only works when ZAO is loaded INSIDE the FC client, not on zaoos.com directly. Any of these closes the double-sign-in.",
+    blocks: 'Friction-free participate (react / raise hand / speak) inside ZAO OS embeds',
+    priority: 'p1',
+  },
+  {
     id: 'oss-spec',
     title: 'Open-source SPEC.md / codebase drop',
     reason:

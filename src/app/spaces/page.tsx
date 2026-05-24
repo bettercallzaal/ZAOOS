@@ -60,6 +60,37 @@ export default function PublicSpacesPage() {
     roomMode: RoomMode = 'stage',
   ) => {
     if (!user) throw new Error('Not authenticated');
+
+    // Juke is owned + hosted on juke.audio — Path B via /api/juke/space mints
+    // the room on Juke's side and we land on /live/{spaceId} (keyless iframe).
+    // ZAO concepts (theme, room_mode, gate_config, slug) do not apply to Juke.
+    if (provider === 'juke') {
+      const res = await fetch('/api/juke/space', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      });
+      if (res.status === 401) {
+        throw new Error(
+          'Juke creation requires admin access. /live/create has a team-password path for non-admins.',
+        );
+      }
+      if (res.status === 503) {
+        throw new Error(
+          'Juke is not configured on this environment yet (missing JUKE_API_KEY).',
+        );
+      }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error ?? 'Failed to create Juke space');
+      }
+      const body = await res.json();
+      const spaceId = body?.data?.id;
+      if (!spaceId) throw new Error('Juke returned no space id');
+      router.push(`/live/${spaceId}`);
+      return;
+    }
+
     const streamCallId = generateCallId();
     const slug = generateSlug(title);
 

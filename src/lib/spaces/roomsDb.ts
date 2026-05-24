@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '@/lib/db/supabase';
 
-export type AudioProvider = 'stream' | '100ms';
+export type AudioProvider = 'stream' | '100ms' | 'juke';
 
 export interface Room {
   id: string;

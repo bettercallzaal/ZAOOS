@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   getJukeIntegrationManifest,
+  INTEGRATION_ARCHITECTURE_ASCII,
   type IntegrationManifest,
   type ShippedFeature,
   type OpenAsk,
@@ -88,6 +89,7 @@ export default async function JukeStatusPage() {
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-10">
         <StatsRow stats={stats} lastEvent={lastEvent} />
+        <ArchitectureSection />
         <ShippedSection manifest={manifest} />
         <AsksSection manifest={manifest} />
         <ConventionsSection manifest={manifest} />
@@ -125,6 +127,27 @@ function StatsRow({ stats, lastEvent }: { stats: JukeIntegrationStats; lastEvent
           Last webhook delivered {lastEvent.toLocaleString('en-US')}
         </p>
       )}
+    </section>
+  );
+}
+
+function ArchitectureSection() {
+  return (
+    <section>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">
+        Architecture
+      </h2>
+      <div className="bg-[#0a1628] border border-white/[0.08] rounded-xl p-4 overflow-x-auto">
+        <pre className="text-[11px] sm:text-xs leading-snug text-gray-300 font-mono whitespace-pre">
+{INTEGRATION_ARCHITECTURE_ASCII}
+        </pre>
+      </div>
+      <p className="text-xs text-gray-500 mt-3 leading-relaxed">
+        ZAO holds two persisted tables: <code className="text-gray-300">juke_spaces</code> (one row per
+        Juke-minted space, publicly readable) + <code className="text-gray-300">juke_webhook_events</code>{' '}
+        (audit + idempotency, service-role only). Every other surface is a read against those two
+        tables or against juke.audio directly.
+      </p>
     </section>
   );
 }

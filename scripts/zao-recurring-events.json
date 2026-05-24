@@ -1,0 +1,30 @@
+{
+  "$schema_note": "Recurring weekly ZAO events. scripts/schedule-zao-recurring.ts reads this file and pre-creates Juke spaces for each occurrence in the next N days. Edit titles + cadence here; the script picks up changes on next run.",
+  "timezone": "America/New_York",
+  "events": [
+    {
+      "id": "zao-fractal-weekly",
+      "title": "ZAO Fractal Call",
+      "weekday": "monday",
+      "time": "18:00",
+      "announce_cast": true,
+      "notes": "Weekly Respect-distribution + community sync. Per project_fractal_process."
+    },
+    {
+      "id": "zaostock-cobuild-mon",
+      "title": "ZAOstock Cobuild",
+      "weekday": "monday",
+      "time": "11:30",
+      "announce_cast": false,
+      "notes": "Mon 11:30am EST. Per project_zaostock_team_meeting."
+    },
+    {
+      "id": "zaostock-standup-tue",
+      "title": "ZAOstock Standup",
+      "weekday": "tuesday",
+      "time": "10:00",
+      "announce_cast": false,
+      "notes": "Tue 10am EST. Per project_zaostock_team_meeting."
+    }
+  ]
+}

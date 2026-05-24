@@ -19,6 +19,7 @@ import { RoomChat } from './RoomChat';
 import { ParticipantsPanel } from './ParticipantsPanel';
 import { ClosedCaptions } from './ClosedCaptions';
 import { RoomFirstTimeTour } from './RoomFirstTimeTour';
+import { ShortcutsHelp } from './ShortcutsHelp';
 import { useRoomKeyboardShortcuts } from './useRoomKeyboardShortcuts';
 
 const BroadcastModal = dynamic(
@@ -98,12 +99,17 @@ export function RoomView({
   // header so listeners know whose voice they are hearing.
   const speakingName = dominantSpeaker?.name || dominantSpeaker?.userId || null;
 
+  // Shortcuts cheatsheet, opened via "?" inside the room.
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const hasMediaPermissions = roomType === 'voice_channel' || isHost;
+
   // Zoom-style keyboard shortcuts. Stage listeners with no mic do not get the
   // Space binding — there is nothing for them to toggle.
   useRoomKeyboardShortcuts({
-    enableMic: roomType === 'voice_channel' || isHost,
-    enableCamera: roomType === 'voice_channel' || isHost,
-    enableScreen: roomType === 'voice_channel' || isHost,
+    enableMic: hasMediaPermissions,
+    enableCamera: hasMediaPermissions,
+    enableScreen: hasMediaPermissions,
+    onToggleHelp: () => setShowShortcuts((v) => !v),
   });
 
   // Fetch Twitch connection info for the host (all viewers see the embed, host gets chat)
@@ -202,6 +208,11 @@ export function RoomView({
   return (
     <div className="flex flex-col h-full bg-[#0a1628]">
       <RoomFirstTimeTour roomMode={roomType === 'voice_channel' ? 'voice_channel' : 'stage'} />
+      <ShortcutsHelp
+        open={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
+        hasMediaPermissions={hasMediaPermissions}
+      />
       <div className="flex flex-1 overflow-hidden">
         {/* Main room content */}
         <div className="flex-1 flex flex-col min-w-0">

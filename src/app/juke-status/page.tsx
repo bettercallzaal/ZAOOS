@@ -8,6 +8,11 @@ import {
   type OpenAsk,
 } from '@/lib/spaces/jukeIntegrationManifest';
 import {
+  buildResolutionIndex,
+  fetchJukeChangelog,
+  type JukeChangelogEntry,
+} from '@/lib/spaces/jukeChangelog';
+import {
   getJukeIntegrationStats,
   listRecentJukeSpaces,
   listRecentWebhookEvents,
@@ -87,11 +92,13 @@ function ago(value: string | null | undefined): string {
  */
 export default async function JukeStatusPage() {
   const manifest = getJukeIntegrationManifest();
-  const [stats, recentSpaces, recentEvents] = await Promise.all([
+  const [stats, recentSpaces, recentEvents, changelog] = await Promise.all([
     safeStats(),
     safeRecentSpaces(),
     safeRecentEvents(),
+    fetchJukeChangelog(),
   ]);
+  const resolutionIndex = buildResolutionIndex(changelog);
   const lastEvent = stats.last_event_at ? new Date(stats.last_event_at) : null;
 
   return (
@@ -138,7 +145,7 @@ export default async function JukeStatusPage() {
         <RecentSpacesSection rows={recentSpaces} />
         <ArchitectureSection />
         <ShippedSection manifest={manifest} />
-        <AsksSection manifest={manifest} />
+        <AsksSection manifest={manifest} resolutionIndex={resolutionIndex} />
         <CodeExamplesSection />
         <ConventionsSection manifest={manifest} />
         <ContactSection manifest={manifest} />
@@ -463,22 +470,47 @@ function ShippedRow({ feature }: { feature: ShippedFeature }) {
   );
 }
 
-function AsksSection({ manifest }: { manifest: IntegrationManifest }) {
+function AsksSection({
+  manifest,
+  resolutionIndex,
+}: {
+  manifest: IntegrationManifest;
+  resolutionIndex: Map<string, JukeChangelogEntry>;
+}) {
+  const resolvedCount = manifest.open_asks.filter((a) => resolutionIndex.has(a.id)).length;
   return (
     <section>
       <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">
         Open asks for Juke ({manifest.open_asks.length})
+        {resolvedCount > 0 && (
+          <span className="ml-2 text-green-400 normal-case font-normal">
+            - {resolvedCount} resolved by Juke
+          </span>
+        )}
       </h2>
+      <p className="text-[11px] text-gray-500 mb-3 leading-relaxed">
+        Auto-resolved from{' '}
+        <a
+          href="https://juke.audio/changelog.json"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="text-gray-300 hover:text-[#f5a623] underline"
+        >
+          juke.audio/changelog.json
+        </a>
+        . Each entry's <code className="text-gray-300">resolves[]</code> array maps to{' '}
+        <code className="text-gray-300">open_asks[].id</code> on this page.
+      </p>
       <ul className="space-y-3">
         {manifest.open_asks.map((ask) => (
-          <AskRow key={ask.id} ask={ask} />
+          <AskRow key={ask.id} ask={ask} resolved={resolutionIndex.get(ask.id) ?? null} />
         ))}
       </ul>
     </section>
   );
 }
 
-function AskRow({ ask }: { ask: OpenAsk }) {
+function AskRow({ ask, resolved }: { ask: OpenAsk; resolved: JukeChangelogEntry | null }) {
   const priorityStyles: Record<OpenAsk['priority'], { bg: string; text: string; border: string }> = {
     p0: { bg: 'bg-red-500/15', text: 'text-red-400', border: 'border-red-500/30' },
     p1: { bg: 'bg-[#f5a623]/15', text: 'text-[#f5a623]', border: 'border-[#f5a623]/30' },
@@ -486,17 +518,66 @@ function AskRow({ ask }: { ask: OpenAsk }) {
   };
   const ps = priorityStyles[ask.priority];
   return (
-    <li className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4">
+    <li
+      className={`border rounded-xl p-4 ${
+        resolved
+          ? 'bg-green-500/[0.04] border-green-500/30'
+          : 'bg-[#111d2e] border-white/[0.08]'
+      }`}
+    >
       <div className="flex items-center gap-2 mb-2 flex-wrap">
         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${ps.bg} ${ps.text} ${ps.border}`}>
           {ask.priority}
         </span>
-        <h3 className="text-sm font-bold text-white">{ask.title}</h3>
+        {resolved && (
+          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border bg-green-500/15 text-green-400 border-green-500/30">
+            Resolved by Juke
+          </span>
+        )}
+        <h3 className={`text-sm font-bold ${resolved ? 'text-green-300' : 'text-white'}`}>
+          {ask.title}
+        </h3>
       </div>
       <p className="text-xs text-gray-400 leading-relaxed">{ask.reason}</p>
       <p className="text-[11px] text-gray-500 mt-2">
         <span className="font-semibold text-gray-400">Blocks:</span> {ask.blocks}
       </p>
+      {resolved && (
+        <div className="mt-3 pt-3 border-t border-green-500/15">
+          <p className="text-[11px] text-green-300 font-semibold mb-1">
+            Shipped {resolved.shipped_at}: {resolved.title}
+          </p>
+          <p className="text-[11px] text-gray-400 leading-relaxed mb-2">{resolved.summary}</p>
+          {resolved.endpoints && resolved.endpoints.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2">
+              {resolved.endpoints.map((ep) => (
+                <code
+                  key={ep}
+                  className="text-[10px] px-1.5 py-0.5 rounded bg-[#0a1628] border border-white/[0.06] text-gray-300 font-mono"
+                >
+                  {ep}
+                </code>
+              ))}
+            </div>
+          )}
+          {resolved.docs && (
+            <p className="text-[10px] text-gray-500">
+              Docs:{' '}
+              <a
+                href={resolved.docs}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-gray-400 hover:text-[#f5a623] underline"
+              >
+                {resolved.docs}
+              </a>
+              {resolved.docs_section && (
+                <span className="text-gray-600"> &middot; section: {resolved.docs_section}</span>
+              )}
+            </p>
+          )}
+        </div>
+      )}
     </li>
   );
 }

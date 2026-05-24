@@ -2,6 +2,7 @@ import {
   getJukeIntegrationManifest,
   renderIntegrationMarkdown,
 } from '@/lib/spaces/jukeIntegrationManifest';
+import { buildResolutionIndex, fetchJukeChangelog } from '@/lib/spaces/jukeChangelog';
 import {
   getJukeIntegrationStats,
   listRecentJukeSpaces,
@@ -22,11 +23,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const manifest = getJukeIntegrationManifest();
-  const [stats, recentSpaces, recentEvents] = await Promise.all([
+  const [stats, recentSpaces, recentEvents, changelog] = await Promise.all([
     getJukeIntegrationStats().catch(() => null),
     listRecentJukeSpaces(10).catch(() => []),
     listRecentWebhookEvents(15).catch(() => []),
+    fetchJukeChangelog(),
   ]);
+  const resolutionIndex = buildResolutionIndex(changelog);
   const statsObject: Record<string, unknown> | undefined = stats
     ? {
         total_spaces: stats.total_spaces,
@@ -40,6 +43,30 @@ export async function GET() {
     : undefined;
 
   const lines: string[] = [renderIntegrationMarkdown(manifest, statsObject)];
+
+  if (resolutionIndex.size > 0) {
+    lines.push('## Asks resolved by Juke');
+    lines.push(
+      `Joined from https://juke.audio/changelog.json — \`entries[].resolves[]\` maps to \`open_asks[].id\` on this page.`,
+    );
+    lines.push('');
+    for (const ask of manifest.open_asks) {
+      const r = resolutionIndex.get(ask.id);
+      if (!r) continue;
+      lines.push(`### ${ask.id} → ${r.id}`);
+      lines.push(`- Ask: ${ask.title}`);
+      lines.push(`- Juke shipped: ${r.shipped_at} — ${r.title}`);
+      lines.push(`- Summary: ${r.summary}`);
+      if (r.endpoints && r.endpoints.length > 0) {
+        lines.push(`- Endpoints: ${r.endpoints.map((e) => `\`${e}\``).join(', ')}`);
+      }
+      if (r.docs) {
+        lines.push(`- Docs: ${r.docs}${r.docs_section ? ` (section: ${r.docs_section})` : ''}`);
+      }
+      lines.push('');
+    }
+  }
+
 
   if (recentEvents.length > 0) {
     lines.push('## Recent webhooks');

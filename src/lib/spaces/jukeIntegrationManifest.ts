@@ -144,6 +144,64 @@ const SHIPPED: ShippedFeature[] = [
     shippedAt: '2026-05-23',
     files: ['src/lib/spaces/jukeWebhookHandlers.ts', 'src/lib/publish/auto-cast.ts'],
   },
+  {
+    id: 'public-status-surfaces',
+    title: 'Public build-status surfaces for the Juke team',
+    description:
+      'Three mirrors of this manifest: /juke-status (HTML dashboard with live stats + architecture diagram), /api/juke/status (JSON, CORS open, X-ZAO-Juke-Status: v1 header), /juke-integration.md (llms.txt-style markdown). Single source of truth in jukeIntegrationManifest.ts.',
+    shippedAt: '2026-05-23',
+    files: [
+      'src/lib/spaces/jukeIntegrationManifest.ts',
+      'src/app/juke-status/page.tsx',
+      'src/app/api/juke/status/route.ts',
+      'src/app/juke-integration.md/route.ts',
+    ],
+  },
+  {
+    id: 'live-public-discovery',
+    title: 'Public /live index of ZAO Juke spaces',
+    description:
+      'Anyone can browse Live / Scheduled / Recent ZAO Juke spaces without auth. Each card routes to /live/{id} (keyless iframe). Includes a paste-link form for non-ZAO spaces.',
+    shippedAt: '2026-05-23',
+    files: ['src/app/live/page.tsx', 'src/app/live/JukeLinkOpener.tsx'],
+  },
+  {
+    id: 'schedule-space-ui',
+    title: 'Schedule-a-space UI on /live/create',
+    description:
+      'Operator form to pre-create Juke spaces with a real scheduled_at - threads through to Juke. Optional announceCast toggle. Pre-fills "1h from now, rounded up to the next half hour".',
+    shippedAt: '2026-05-23',
+    files: ['src/app/live/create/page.tsx', 'src/app/api/juke/space/route.ts'],
+    reference: 'Juke 2026-05-23 PR — scheduled spaces (item #5)',
+  },
+  {
+    id: 'juke-go-live-provider',
+    title: 'Juke as 3rd audio provider in the Go-Live modal',
+    description:
+      'HostRoomModal on /spaces now exposes Juke alongside Stream.io + 100ms. When picked, the modal collapses (mode/theme/gate/multistream hidden), POSTs /api/juke/space, redirects to /live/{spaceId}.',
+    shippedAt: '2026-05-23',
+    files: [
+      'src/lib/spaces/roomsDb.ts',
+      'src/components/spaces/HostRoomModal.tsx',
+      'src/app/spaces/page.tsx',
+    ],
+  },
+  {
+    id: 'spaces-unified-feed',
+    title: 'Unified /spaces Live tab - Juke spaces alongside Stream/100ms',
+    description:
+      'Browser-side juke_spaces query in parallel with the rooms query, realtime subscription on both tables, JukeLiveSection rendered above ZAO stages when active rows exist. Cards route to /live/{id} with a purple Juke accent.',
+    shippedAt: '2026-05-23',
+    files: ['src/app/spaces/page.tsx'],
+  },
+  {
+    id: 'recurring-schedule-script',
+    title: 'Recurring weekly Juke schedule script',
+    description:
+      'scripts/schedule-zao-recurring.ts pre-creates Juke spaces for ZAO\'s weekly events (fractal call, ZAOstock standups). Idempotent (dedupes against juke_spaces.scheduled_at +/- 30min). Safe to wire into a weekly cron.',
+    shippedAt: '2026-05-23',
+    files: ['scripts/schedule-zao-recurring.ts', 'scripts/zao-recurring-events.json'],
+  },
 ];
 
 const OPEN_ASKS: OpenAsk[] = [
@@ -180,6 +238,14 @@ const OPEN_ASKS: OpenAsk[] = [
     priority: 'p1',
   },
   {
+    id: 'partner-sso-bridge',
+    title: 'Parent-frame SSO so authed users on partner sites do not re-sign',
+    reason:
+      "ZAO uses Sign In With Neynar (SIWN) - managed signer registered by ZAO's app FID. Juke uses SIWF (fresh EIP-4361 SIWE in the moment by user's custody). Different primitives, so a direct hand-off does not exist - a ZAO user already signed in at zaoos.com still has to do a second SIWF dance inside the Juke iframe to participate. Anonymous listen is fine (one-tap autoplay bypass). Three options in ascending lift: (1) Parent-frame Quick Auth via postMessage - ZAO posts {fid, signed-proof} into the iframe, Juke mints its JWT without showing the QR. Likely closest to your miniapp Quick Auth code path. (2) Trusted-partner pre-mint endpoint - ZAO server POSTs {fid, signed-proof} to Juke, gets back a short-lived JWT, passes as ?token=... on iframe src. Cleanest SSO. (3) Quick Auth via miniapp shell already works when ZAO is loaded INSIDE the FC client. Any of these closes the double-sign-in.",
+    blocks: 'Friction-free participate (react / raise hand / speak) inside ZAO OS embeds',
+    priority: 'p1',
+  },
+  {
     id: 'oss-spec',
     title: 'Open-source SPEC.md / codebase drop',
     reason:
@@ -203,6 +269,58 @@ const CONTACT: IntegrationContact = {
   general: 'https://www.thezao.com',
   partnership: 'See /juke-status on zaoos.com for the live build state.',
 };
+
+/**
+ * ASCII architecture diagram shared by /juke-status (HTML) and
+ * /juke-integration.md (markdown). One source so the two surfaces never drift.
+ */
+export const INTEGRATION_ARCHITECTURE_ASCII = String.raw`
+  USER (web browser)
+    |
+    |  (1) loads /live/{spaceId} on zaoos.com - SSR
+    v
+  ZAO OS (Next.js, Vercel)
+    |
+    | reads juke_spaces row              (2) renders <iframe
+    | (RLS public-read)                       src="juke.audio/embed/{id}">
+    v                                       |
+  Supabase                                  v
+    |                                     Juke (juke.audio, hosted by nickysap)
+    |                                       |
+    |                                       |  LiveKit transport (audio + presence)
+    |                                       v
+    |                                     OTHER LISTENERS
+    |                                       |
+    |  (3) outbound webhooks                |
+    |   X-Juke-Signature: t=,v1=            |
+    |<--------------------------------------+
+    |
+    | POST /api/juke/webhooks
+    v
+  ZAO OS webhook receiver
+    |  HMAC-verify, idempotency on signature_hash
+    |  dispatch by event:
+    |    room.started      -> juke_spaces.status='active'
+    |    room.finished     -> juke_spaces.status='ended'
+    |    participant.*     -> juke_spaces.participant_count
+    |    recording.ready   -> juke_spaces.recording_url
+    |                        + autoCastToZao recap to /zao channel
+    v
+  Supabase juke_spaces + juke_webhook_events
+
+  CREATE PATH (host):
+    USER -> /spaces (Go Live) OR /live/create
+         -> POST /api/juke/space
+         -> POST api.juke.audio/v1/developer/spaces
+            X-Juke-Api-Key only (room owner = app.owner_fid)
+         -> juke_spaces.insert
+         -> redirect to /live/{spaceId}
+
+  AGENT READ PATH (Nicky's agent):
+    AGENT -> GET zaoos.com/api/juke/status (JSON)
+          OR GET zaoos.com/juke-integration.md (markdown, llms.txt-style)
+    same shape as juke.audio/llms.txt, refreshed on every shipped feature
+`;
 
 export function getJukeIntegrationManifest(): IntegrationManifest {
   return {
@@ -255,6 +373,16 @@ export function renderIntegrationMarkdown(
     }
     lines.push('');
   }
+
+  lines.push('## Architecture');
+  lines.push('```');
+  lines.push(INTEGRATION_ARCHITECTURE_ASCII.trim());
+  lines.push('```');
+  lines.push('');
+  lines.push(
+    'ZAO holds two persisted tables: `juke_spaces` (one row per Juke-minted space, RLS public-read) and `juke_webhook_events` (audit + idempotency, service-role only). Every other public surface is a read against those two tables or against juke.audio directly.',
+  );
+  lines.push('');
 
   lines.push('## Shipped');
   for (const f of manifest.shipped) {

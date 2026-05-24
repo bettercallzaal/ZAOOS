@@ -38,6 +38,7 @@ The pattern: **Monorepo as Lab.**
 | ZAOstock 2026 dashboard + Telegram bot | **Graduating to its own repo + zaostock.com (Wed 2026-04-29)** |
 | Agent stack (ZOE, Hermes, others) | In R&D until one is solid + worth its own brand |
 | Music player components (Sonata-pattern, etc) | In R&D |
+| Live audio: ZAO Spaces (Stream.io + 100ms) + Juke integration ([/spaces](https://zaoos.com/spaces), [/live](https://zaoos.com/live), [/juke-status](https://zaoos.com/juke-status)) | In production - 3 providers from one Go-Live button, public Juke dashboard for partner |
 | Research library (540+ docs across 13 topic areas) | Always stays here |
 
 ### What&rsquo;s already graduated

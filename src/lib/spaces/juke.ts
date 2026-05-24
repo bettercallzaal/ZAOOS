@@ -35,6 +35,14 @@ export interface JukeEmbedOptions {
    * and the laptop should not double-broadcast (Juke PR 2026-05-23, item #6).
    */
   audioOff?: boolean;
+  /**
+   * Partner-SSO JWT minted via /api/juke/partner-token (Juke 2026-05-23
+   * Partner SSO Bridge). When present, the iframe adopts the session
+   * client-side, strips ?token= from the URL via history.replaceState, and
+   * renders as already-authenticated — no SIWF QR for the visitor. Token is
+   * single-use-per-mount + short-TTL (5min default); refetch on every embed.
+   */
+  partnerToken?: string;
 }
 
 /**
@@ -48,7 +56,11 @@ export function jukeEmbedUrl(spaceId: string, options: JukeEmbedOptions = {}): s
     throw new Error('Invalid Juke space id');
   }
   const base = `${JUKE_EMBED_ORIGIN}/embed/${encodeURIComponent(spaceId)}`;
-  return options.audioOff ? `${base}?audio=off` : base;
+  const params = new URLSearchParams();
+  if (options.audioOff) params.set('audio', 'off');
+  if (options.partnerToken) params.set('token', options.partnerToken);
+  const qs = params.toString();
+  return qs ? `${base}?${qs}` : base;
 }
 
 /** Canonical Juke space page URL for a given id (the share/permalink URL). */

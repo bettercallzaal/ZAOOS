@@ -17,7 +17,14 @@
  */
 import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
-import { bumpParticipantCount, getJukeSpace, updateJukeSpace } from './jukeSpacesDb';
+import {
+  addParticipant,
+  bumpParticipantCount,
+  getJukeSpace,
+  removeParticipant,
+  updateJukeSpace,
+  type JukeParticipantEntry,
+} from './jukeSpacesDb';
 
 interface JukeWebhookBody {
   event?: string;
@@ -88,6 +95,30 @@ function readOccurredAt(body: unknown): string {
   return b.occurred_at ?? b.occurredAt ?? new Date().toISOString();
 }
 
+/** Pull a JukeParticipantEntry from a participant.joined/left body. Returns
+ * null if no usable fid is present (Juke filters anon listeners + virtual
+ * participants out, so an event without an fid is unexpected but possible). */
+function readParticipant(body: unknown, occurredAt: string): JukeParticipantEntry | null {
+  const b = (body ?? {}) as { data?: Record<string, unknown> };
+  const d = (b.data ?? {}) as {
+    fid?: unknown;
+    display_name?: unknown;
+    displayName?: unknown;
+    role?: unknown;
+  };
+  const fidRaw = d.fid;
+  const fid = typeof fidRaw === 'number' ? fidRaw : typeof fidRaw === 'string' ? Number(fidRaw) : null;
+  if (fid === null || !Number.isFinite(fid)) return null;
+  const display_name =
+    typeof d.display_name === 'string'
+      ? d.display_name
+      : typeof d.displayName === 'string'
+        ? d.displayName
+        : null;
+  const role = typeof d.role === 'string' ? d.role : null;
+  return { fid, display_name, role, joined_at: occurredAt };
+}
+
 /**
  * Apply the side effects for one verified, deduplicated webhook event.
  *
@@ -116,10 +147,14 @@ export async function applyWebhookEvent(
     }
     case 'participant.joined': {
       await bumpParticipantCount(spaceId, +1);
+      const p = readParticipant(body, readOccurredAt(body));
+      if (p) await addParticipant(spaceId, p);
       return;
     }
     case 'participant.left': {
       await bumpParticipantCount(spaceId, -1);
+      const p = readParticipant(body, readOccurredAt(body));
+      if (p) await removeParticipant(spaceId, p.fid);
       return;
     }
     case 'recording.ready': {

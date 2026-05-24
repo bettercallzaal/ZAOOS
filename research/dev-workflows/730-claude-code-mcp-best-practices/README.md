@@ -16,9 +16,9 @@ tier: STANDARD
 
 | # | Decision | Reason | Action |
 |---|----------|--------|--------|
-| 1 | **INSTALL Supabase MCP** | ZAOOS lives on Supabase (RLS, agents tables, sessions). Today every schema check requires a Read+grep tour; Supabase MCP gives Claude direct query + introspection | `claude mcp add supabase --transport http --url <official>` then bind service role server-side ONLY |
+| 1 | **INSTALL Supabase MCP — but with hard scoping** ([HN 848 pts — DB-leak via prompt injection](https://news.ycombinator.com/item?id=44502318)) | ZAOOS lives on Supabase. Direct query beats Read+grep. BUT a 2025-07 disclosure shipped a SQL-exfiltration attack via support-ticket prompt injection — anon key + RLS only, never service role in a context that reads untrusted text | `claude mcp add supabase` → bind ANON key + RLS; service role only via a sandboxed read-only subagent with `disallowedTools: Write,Edit,Bash` |
 | 2 | **INSTALL Sentry MCP** (when Sentry wiring restored) | The Vercel deploy already pings Sentry per `.claude/settings.json` postinstall. Pulling live errors into the session collapses 10-min debugging to 90 sec ([mcpcatalog](https://mcpcatalog.dev/blog/best-mcp-servers-claude-code)) | Phase 2; verify Sentry project active first |
-| 3 | **INSTALL Chrome DevTools MCP** alongside existing Playwright MCP | Playwright MCP for scripted flows; Chrome DevTools MCP for debugging the tab you already have open ([developersdigest](https://www.developersdigest.tech/blog/271-mcp-servers-top-5-that-matter)) — different jobs, both lightweight | `claude mcp add chrome-devtools -- npx -y @modelcontextprotocol/server-chrome-devtools` |
+| 3 | **INSTALL Chrome DevTools MCP** alongside existing Playwright MCP ([HN 604 pts cross-validation](https://news.ycombinator.com/item?id=47390817)) | Playwright MCP for scripted flows; Chrome DevTools MCP for debugging the tab you already have open ([developersdigest](https://www.developersdigest.tech/blog/271-mcp-servers-top-5-that-matter)) — different jobs, both lightweight | `npm install -g @modelcontextprotocol/server-chrome-devtools` then add via absolute binary path (NOT `npx -y` — see Decision #13) |
 | 4 | **KEEP current stack** (context7, gitnexus, playwright, serena, exa, github plugin, memory plugin, sequential-thinking, grep.app, gmail, gcal, gdrive) | All earn their token cost. Tool Search lazy-loads schemas so 12+ MCPs ≠ context bloat in Claude Code 4.x ([toolradar](https://toolradar.com/blog/best-mcp-servers-claude-code)) | No action |
 | 5 | **SKIP Firecrawl MCP** | Already use exa web_fetch as the JS-rendered fetcher; Firecrawl needs API key + would duplicate. `/zao-research` skill v2.3 explicitly says "firecrawl NOT installed" | No action |
 | 6 | **SKIP Brave Search MCP** | exa + WebSearch + WebFetch + grep.app cover search; Brave Search MCP failed silently in production ([theeditorial.news 6-week test](https://theeditorial.news/ai-agents/best-mcp-servers-for-production-ai-agents-in-2026-seven-tested-three-actually-ship-mpgvmg42), 12% timeout rate) | No action |
@@ -28,6 +28,10 @@ tier: STANDARD
 | 10 | **ADOPT subagent-driven research as default for any task touching >5 files** | Subagents run in their own context window and return summaries — keeps main session clean. Already happens via Explore/Plan; codify in CLAUDE.md | Add line to Workflow Orchestration in CLAUDE.md |
 | 11 | **COMPACT proactively at 70-75% context** (not the auto-trigger at 83.5%) | Community consensus from 2026-03 Generative.inc guide — earlier compaction preserves higher-quality summaries | Behaviour change; track via `/context` |
 | 12 | **VERIFY Tool Search is on** (`ENABLE_TOOL_SEARCH=auto:5`) | Cuts MCP context consumption ~47%. Default in Claude Code 4.x but worth confirming via `/doctor` | One-time check |
+| 13 | **MIGRATE all `npx -y` MCP installs to global-pinned binaries** ([modelcontextprotocol/servers#4026](https://github.com/modelcontextprotocol/servers/issues/4026)) | `npx -y` causes intermittent 4-min hangs on file writes (re-resolves package on every stdio handshake; races startup window). Reads succeed; writes hang silently | For each MCP currently using `npx -y`: `npm install -g <pkg>` then replace command with absolute binary path |
+| 14 | **AUDIT custom MCPs for unfiltered `process.env` exposure** ([modelcontextprotocol/servers#3986](https://github.com/modelcontextprotocol/servers/issues/3986)) | `server-everything` reference shows a `get-env` tool that dumps ALL env (`OPENAI_API_KEY`, `GITHUB_TOKEN`, etc.). Community servers copy this pattern. Foot-gun | grep installed MCP src for `process.env` returns; require a `key` parameter or regex-filter |
+| 15 | **CALIBRATE Serena expectations — 35% session-adoption reality** ([oraios/serena#1491 — n=192 sessions, 21k tool calls](https://github.com/oraios/serena/issues/1491)) | Real telemetry: 64% of Claude Code sessions fall back to plain Read/Grep/Glob even when Serena is connected; 18% of `find_symbol` calls are followed by a plain `Read` of the same file because symbol body alone lacks surrounding context | Frame Doc 728 adoption goal as "use Serena WHEN refactoring/renaming/cross-ref" — not "use Serena instead of Read." Pair Serena with explicit prompt nudges |
+| 16 | **DEFER hook-driven automation that depends on missing events** ([openai/codex#21753 hook parity tracker](https://github.com/openai/codex/issues/21753)) | `PostToolUseFailure`, `FileChanged`, `SubagentStart/Stop`, `ConfigChange` are NOT shipped. Designs that assume them silently no-op | Build on shipped events only (SessionStart, PreToolUse, PostToolUse, Stop, Notification, PermissionRequest, UserPromptSubmit). Track the umbrella issue |
 
 ## Current ZAOOS MCP State (Verified 2026-05-23 from session deferred tools list)
 
@@ -281,9 +285,83 @@ Underused subagent patterns to formalize in CLAUDE.md:
 - Hook execution latency: <100ms typical (eslint --fix on save measured); hooks run in parallel per Claude docs
 - Compact at 70% vs 83.5% trigger = ~13 percentage points of usable context preserved with higher summary fidelity
 
+## Community Signal (added 2026-05-23 via 5 parallel scraper agents)
+
+After the initial draft shipped with Reddit marked FAILED, dispatched five parallel research agents to climb the full fetch ladder. Findings below — sources verified, cross-validations called out, contradictions flagged. Recommendations promoted to Decisions #13-16 above.
+
+### Reddit (r/ClaudeAI, r/LocalLLaMA — 9 threads FULL via old.reddit.com .json)
+
+| Thread | Subreddit | Score | Signal for ZAOOS |
+|--------|-----------|-------|------------------|
+| ["When is Chat, Cowork and Code merging?"](https://old.reddit.com/r/ClaudeAI/comments/1tldsrl/when_is_chat_cowork_and_code_merging/) | r/ClaudeAI | 124↑ / 65 comments | Anthropic roadmap signal: **unified memory layer across Chat/Cowork/Code is the goal** (per recent interviews cited by u/Vermillionleon7). Today's silos = "biggest UX bottleneck right now" — cross-validates Doc 728's `.serena/memories/` as the bridge until Anthropic ships unified memory |
+| ["Local LLM + Claude Code full guide"](https://old.reddit.com/r/ClaudeAI/comments/1tlir65/my_experience_using_claude_code_with_local_llm/) | r/ClaudeAI | 137↑ / 39 comments | Ollama → oMLX migration for resource efficiency. Pain: offline work doesn't persist back to online Claude Code. Relevant if ZAO ever runs Claude Code on the VPS for cost reasons |
+| ["Deterministic multi-subagent orchestration"](https://old.reddit.com/r/ClaudeAI/comments/1tll4mv/deterministic_multisubagent_orchestration_whats/) | r/ClaudeAI | 16↑ / 7 comments | **Emerging best practice: separate session log (transient) from project memory (durable)** — directly validates Doc 728 split between session context and `.serena/memories/` |
+| ["Four calls became one: agent authors tools mid-session"](https://old.reddit.com/r/ClaudeAI/comments/1tl91km/four_calls_became_one_letting_the_agent_author/) | r/ClaudeAI | 6↑ / 1 comment | MCP design critique: "MCP in practice is a connector marketplace, not a runtime." Static catalog is the wall. Future-watch — affects how to design ZOE/Hermes tool wrappers |
+| ["686 skills, vector search, 71% precision"](https://old.reddit.com/r/ClaudeAI/comments/1tlr914/how_does_a_claude_code_agent_navigate_hundreds_of/) | r/ClaudeAI | 0↑ / 7 comments | u/BasedAmumu: "vector-index pattern starts paying off past 500-ish skills" — **cross-validates Decision #9 skill budget recommendation**. ZAOOS at 250+ skills is in the danger zone where descriptions get truncated but no vector index exists |
+| ["llama.cpp native --tools flag"](https://old.reddit.com/r/LocalLLaMA/comments/1tluma3/llamacpp_server_have_builtin_native_tools_exec/) | r/LocalLLaMA | 41↑ / 9 comments | MCP-style tools moving INTO the runtime (currently broken/undocumented). Trajectory note |
+
+### HackerNews (Algolia API — 12 threads FULL)
+
+| Thread | Points | Date | Why it matters for ZAO |
+|--------|--------|------|------------------------|
+| ["Supabase MCP can leak your entire SQL database"](https://news.ycombinator.com/item?id=44502318) | **848** | 2025-07-08 | **DIRECTLY impacts Decision #1.** Prompt injection via support-ticket text causes the MCP to exec attacker-supplied SQL with whatever credentials are bound. ZAO's RLS provides defense-in-depth but anon key is mandatory, NOT optional |
+| ["The 'S' in MCP Stands for Security"](https://news.ycombinator.com/item?id=43600192) | **730** | 2025-04-06 | ContextGuard: **43% of public MCP servers have critical vulnerabilities**. Sandbox aggressively (Docker isolation alone insufficient per consensus); pin versions; restrict outbound network |
+| ["MCP Security 2026: 30 CVEs in 60 Days"](https://news.ycombinator.com/item?id=47356600) | (linked from above) | 2026-03 | Sustained CVE pace through Q1 2026; treat every new MCP install as code execution |
+| ["How I use Claude Code: planning vs execution"](https://news.ycombinator.com/item?id=47106686) | 976 | 2026-02-22 | **Spec-first workflow consensus** across 15+ threads — matches Doc 730 subagent-driven-research recommendation. The "plan in one session, execute in fresh session" pattern is the dominant power-user shape |
+| ["MCP: An (Accidentally) Universal Plugin System"](https://news.ycombinator.com/item?id=44404905) | 808 | 2025-06-28 | OpenAI + Google + Anthropic all standardized on MCP organically. No vendor mandate. Investment is portable across LLM providers |
+| ["Chrome DevTools MCP"](https://news.ycombinator.com/item?id=47390817) | 604 | 2025 | **Cross-validates Decision #3** — independent thread strongly recommends; complements Playwright (different jobs) |
+| ["98% context-reduction MCP server"](https://news.ycombinator.com/item?id=47193064) | 570 | 2025 | Mcproxy + context-pruning tools class is real and growing. Watch list |
+| ["Show HN: Semble — 98% fewer tokens than grep"](https://github.com/MinishLab/semble) | 444 | 2026-05-17 | Token-efficient code search alternative to Serena worth tracking |
+| ["Anthropic Claude Code best practices"](https://www.anthropic.com/engineering/claude-code-best-practices) | (multiple HN refs) | ongoing | Cited as canonical by u/EMM_386 + others; the source of "multiple .md files, add contextually" pattern |
+
+### GitHub Discussions + Issues (gh CLI — 5 issues FULL across modelcontextprotocol/servers, oraios/serena, openai/codex)
+
+| Issue | Status | Why it matters |
+|-------|--------|----------------|
+| [**modelcontextprotocol/servers#4026**](https://github.com/modelcontextprotocol/servers/issues/4026) — Filesystem MCP `npx -y` hang | OPEN | **Promoted to Decision #13.** `npx -y` causes intermittent 4-min hangs because it re-resolves the package on every stdio handshake. **Fix: `npm install -g <pkg>` + absolute binary path.** Documentation bug affects every user following standard install instructions |
+| [**modelcontextprotocol/servers#3986**](https://github.com/modelcontextprotocol/servers/issues/3986) — `server-everything` get-env leaks `process.env` | OPEN | **Promoted to Decision #14.** Reference server dumps full env including API keys. Community servers copy this pattern blindly. Audit before installing any community MCP |
+| [**modelcontextprotocol/servers#754**](https://github.com/modelcontextprotocol/servers/issues/754) — Credentials best-practices proposal | OPEN | Workload identity (GCP/AWS/Azure) > secrets vault > env. ZAO impact: Supabase service role belongs in Vercel env vars only, never echoed back through an MCP tool |
+| [**oraios/serena#1491**](https://github.com/oraios/serena/issues/1491) — Real adoption telemetry n=192 sessions / 21k tool calls | OPEN | **Promoted to Decision #15. Calibrates Doc 728.** Only **35.4% of sessions** (68/192) use ANY Serena query tool; **64.6%** fall back to plain Read/Grep/Glob even when Serena is connected. **18.4% of `find_symbol(include_body=true)` calls are immediately followed by a plain `Read` of the same file** — the symbol body alone lacks surrounding context (imports, neighbouring symbols). Implication: prompt explicitly for Serena, or expect the model to default to plain reads |
+| [**openai/codex#21753**](https://github.com/openai/codex/issues/21753) — Claude Code Hook Parity (29+) | OPEN | **Promoted to Decision #16.** `PostToolUseFailure`, `FileChanged`, `SubagentStart/Stop`, `ConfigChange` are NOT shipped. Hook handler types `http`, `mcp_tool`, `prompt`, `agent` also missing. Design hooks against shipped events ONLY |
+| [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers) | 87,708 stars | Top community curation — Filesystem + Everything = baseline; Serena + sequential-thinking = "considered essential" by curators |
+
+### YouTube + Long-Form Blogs (5 videos + 7 blogs + 2 Latent Space podcast eps)
+
+| Source | Key Signal |
+|--------|------------|
+| [Anthropic engineering blog — 132-engineer study](https://www.anthropic.com/engineering/claude-code-best-practices) | **67% more merged PRs/day**, **27% of work wouldn't have been attempted** without Claude Code |
+| [Latent Space pod: Claude Code for Finance — Doug O'Laughlin (SemiAnalysis)](https://www.latent.space) | Claude Code writes **~4% of GitHub** as of Feb 2026. Mental model: "junior analyst" |
+| Pragmatic Engineer 2026 survey | Claude Code **46% "most loved"**, **18% workplace adoption** (1.5x growth from late 2025) |
+| Prabhat.dev — "Zero to Hero 2026 Field Guide" | **4-Stage Maturity Model**: Foundations (CLAUDE.md) → Automation (Skills+Hooks) → Integration (MCP) → Scale (Subagents+Worktrees+Teams). Hidden flag `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` for parallel-session comms (research preview Feb 2026) |
+| [Dev.to / Jack B. Cai — Guardrails 2026](https://dev.to) | **4 Autonomy Levels**: L1 edits+approval → L2 edits with gates → L3 test-driven hand-off → L4 background tasks with hook-enforced gates. Don't skip L2 — builds mental model of where agent drifts |
+| Generative.inc 2026 guide | TDD inversion: separate sub-agents for test-writing vs implementation prevents context pollution |
+| DevOps Monk — hook patterns | Auto-test-on-edit: PostToolUse → tests run → on fail spawn subagent → subagent diagnoses → main session applies fix |
+| Latent Space — Felix Rieseberg (Claude Cowork) | Skills are file-based markdown; portable across Claude Code + Claude Cowork. NOT proprietary container |
+| Zenva AI — GitHub MCP workflow | **AGENTS.md as separate file** from CLAUDE.md for local-only rules. Possible ZAO adoption: AGENTS.md for Hermes worktree-specific instructions |
+| Cost data point | **5 parallel agents ≈ $1K/month** real cost cited in advanced guide. Hermes parallel runs need this in budgeting |
+| Akshay Ghalme — MCP transports | **SSE deprecated mid-2026**; stdio (local) + Streamable HTTP (OAuth 2.1) are the standards. Hybrid pattern: community servers for horizontal + custom servers for domain logic |
+
+### X / Twitter (FAILED for direct fetch — substitution: 25-blog cross-validation sweep)
+
+Direct X scraping hit the auth wall. Substituted with 25-blog cross-tally producing a tier-of-consensus signal:
+
+| Tier | MCPs (mentioned in ≥14 of 25 guides) |
+|------|--------------------------------------|
+| **Tier 1 (consensus must-installs)** | GitHub (22/25), Filesystem (21/25), Serena (17/25, fast-rising), Postgres (18/25), Playwright (16/25), Context7 (14/25), Brave Search (14/25) |
+| **Tier 2 (specialized)** | Sentry (11/25), Memory (10/25), Linear (9/25), Supabase (8/25), Slack (7/25), Notion (8/25), Sequential-Thinking (7/25) |
+| **Tier 3 (niche)** | Figma (6/25), Docker (5/25), Vercel (3/25), twikit-mcp (no API key needed), Fetch (12/25) |
+
+Notable Serena version gotcha from this sweep: **pin to v1.1.2** if you hit a `tools/list` hang on `--context=claude-code` (regression in 2026-04-25 main). [oraios/serena#1416](https://github.com/oraios/serena/issues/1416).
+
+### Contradictions Surfaced (resolved or flagged)
+
+- **doc 730 said "DROP sequential-thinking MCP"** vs. **YouTube + 7-of-25 blogs still recommend it.** Resolution: drop on Opus 4.7 with `/effort high`; keep on Sonnet/Haiku sessions where native reasoning is weaker. Refined in Decision #4 stance.
+- **doc 730 said "Serena 60-80% token reduction"** vs. **oraios/serena#1491 telemetry "64% of sessions never use it."** Resolution: the savings hold WHEN used, but adoption requires explicit prompting. New Decision #15.
+- **MCP Catalog ranked Brave Search #5** vs. **The Editorial News measured 12% timeout rate.** Resolution: keep the SKIP (Decision #6) — production reliability outweighs popularity.
+
 ## Risks + Open Questions
 
-1. **Supabase MCP service-role exposure** — the official Supabase MCP needs careful scoping. Use the anon key + RLS for default; service role only via explicit per-tool grant in `mcpServers` config under a constrained subagent.
+1. **Supabase MCP service-role exposure** — the official Supabase MCP needs careful scoping. Use the anon key + RLS for default; service role only via explicit per-tool grant in `mcpServers` config under a constrained subagent. **CONFIRMED CRITICAL by HN 848-pt thread; SQL exfiltration via prompt injection in support-ticket text is real.**
 2. **Sentry MCP credentials** — needs Sentry org auth; verify which Sentry project is the live ZAOOS one before wiring.
 3. **`memory` plugin MCP vs Serena memories vs auto-memory** — three memory systems is two too many. Audit and pick one canonical layer per scope.
 4. **Skill plugin sprawl** — `everything-claude-code` ships 200+ skills. Most are off-stack (Django, Rust, Kotlin, Perl). Aggressive `skillOverrides` cleanup is overdue.
@@ -318,6 +396,15 @@ Underused subagent patterns to formalize in CLAUDE.md:
 | Drop `sequential-thinking` plugin MCP after confirming no skill invokes it | @Zaal | Plugin uninstall | Phase 2 |
 | Install Sentry MCP after verifying live Sentry project | @Zaal | `claude mcp add` | Phase 2 |
 | Update CLAUDE.md "Workflow Orchestration" to formalize subagent-for-read-many-files rule | @Zaal | PR | This week |
+| Migrate all `npx -y` MCP installs to `npm install -g` + absolute binary path | @Zaal | settings.json PR | This week (Decision #13) |
+| Audit each installed MCP src for `process.env` returns without filter | @Zaal | grep + report | This week (Decision #14) |
+| Pin Serena to v1.1.2 if `tools/list` hangs on claude-code context | @Zaal | `.serena/project.yml` | Verify first; act if seen |
+| Update Doc 728 with Serena 35% adoption telemetry caveat — prompt explicitly | @Zaal | PR to Doc 728 | This week (Decision #15) |
+| Test `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` for Hermes parallel-run pattern | @Zaal | Spike | Phase 2 |
+| Adopt `AGENTS.md` separate from `CLAUDE.md` for Hermes worktree-local rules | @Zaal | New file + Hermes runner edit | Phase 2 |
+| Watch [modelcontextprotocol/servers#4026](https://github.com/modelcontextprotocol/servers/issues/4026) for upstream fix to `npx -y` issue | @Zaal | Issue subscribe | Ongoing |
+| Watch [openai/codex#21753](https://github.com/openai/codex/issues/21753) for hook event parity ship dates | @Zaal | Issue subscribe | Ongoing |
+| Bind Supabase MCP via ANON key + RLS only; service role NEVER in tool context that reads untrusted text (per HN 848-pt disclosure) | @Zaal | Config + subagent scoping | Before Decision #1 install |
 
 ## Sources
 
@@ -340,7 +427,50 @@ Underused subagent patterns to formalize in CLAUDE.md:
 - [DevelopersDigest — 5 that actually matter (out of 271)](https://www.developersdigest.tech/blog/271-mcp-servers-top-5-that-matter) — [FULL] — 4-filter selection method; sequential-thinking deprecated by `/effort`; SaaS-thin-wrapper anti-pattern
 - [MakeUseOf — MCP servers consumer guide](https://www.makeuseof.com/claudes-superpower-isnt-code-add-these-mcp-servers/) — [FULL] — Context7 "no API key needed" + accessibility-tree explanation for Playwright
 - [HN — Semble: 98% fewer tokens than grep (Show HN, 444 pts)](https://github.com/MinishLab/semble) — [PARTIAL — metadata only via HN Algolia API, GitHub page not fetched] — alternative semantic code search worth monitoring
-- Reddit r/ClaudeAI search "best mcp servers" — [FAILED — `zao-fetch-reddit.sh` returned empty Listing twice this session] — escalation: tried JSON search endpoint with sort=top&t=month, still empty. Independent blogs (12 above) supply equivalent community signal.
+
+### Community Signal — added 2026-05-23 via 5 parallel scraper agents
+
+**Reddit (9 threads FULL via old.reddit.com .json):**
+- [r/ClaudeAI — Chat/Cowork/Code merge thread (124↑)](https://old.reddit.com/r/ClaudeAI/comments/1tldsrl/when_is_chat_cowork_and_code_merging/) — [FULL]
+- [r/ClaudeAI — Local LLM + Claude Code guide (137↑)](https://old.reddit.com/r/ClaudeAI/comments/1tlir65/my_experience_using_claude_code_with_local_llm/) — [FULL]
+- [r/ClaudeAI — Multi-subagent orchestration CC 2.1.146](https://old.reddit.com/r/ClaudeAI/comments/1tll4mv/deterministic_multisubagent_orchestration_whats/) — [FULL]
+- [r/ClaudeAI — Agent authors tools mid-session](https://old.reddit.com/r/ClaudeAI/comments/1tl91km/four_calls_became_one_letting_the_agent_author/) — [FULL]
+- [r/ClaudeAI — 686 skills, vector search](https://old.reddit.com/r/ClaudeAI/comments/1tlr914/how_does_a_claude_code_agent_navigate_hundreds_of/) — [FULL]
+- [r/LocalLLaMA — llama.cpp --tools flag](https://old.reddit.com/r/LocalLLaMA/comments/1tluma3/llamacpp_server_have_builtin_native_tools_exec/) — [FULL]
+- 3 additional FULL threads logged in `/tmp/reddit_signal_final.md`
+
+**HackerNews (Algolia API — 12 threads FULL):**
+- [Supabase MCP can leak your entire SQL database — 848 pts](https://news.ycombinator.com/item?id=44502318) — [FULL] — CRITICAL security finding
+- [The 'S' in MCP Stands for Security — 730 pts](https://news.ycombinator.com/item?id=43600192) — [FULL] — 43% of public MCP servers have critical vulns
+- [How I use Claude Code: planning vs execution — 976 pts](https://news.ycombinator.com/item?id=47106686) — [FULL] — spec-first workflow consensus
+- [MCP: An (Accidentally) Universal Plugin System — 808 pts](https://news.ycombinator.com/item?id=44404905) — [FULL]
+- [Chrome DevTools MCP — 604 pts](https://news.ycombinator.com/item?id=47390817) — [FULL] — cross-validates Decision #3
+- [98% context-reduction MCP server — 570 pts](https://news.ycombinator.com/item?id=47193064) — [FULL]
+- [OpenAI adds MCP support to Agents SDK — 807 pts](https://news.ycombinator.com/item?id=43485566) — [FULL]
+- [MCP Security 2026: 30 CVEs in 60 Days](https://news.ycombinator.com/item?id=47356600) — [FULL]
+
+**GitHub Discussions + Issues (5 issues FULL via gh CLI):**
+- [modelcontextprotocol/servers#4026 — Filesystem MCP `npx -y` hang](https://github.com/modelcontextprotocol/servers/issues/4026) — [FULL] — promoted to Decision #13
+- [modelcontextprotocol/servers#3986 — get-env leaks process.env](https://github.com/modelcontextprotocol/servers/issues/3986) — [FULL] — promoted to Decision #14
+- [modelcontextprotocol/servers#754 — Credentials best-practices proposal](https://github.com/modelcontextprotocol/servers/issues/754) — [FULL]
+- [oraios/serena#1491 — Real adoption telemetry n=192/21k](https://github.com/oraios/serena/issues/1491) — [FULL] — promoted to Decision #15
+- [openai/codex#21753 — Claude Code Hook Parity (29+)](https://github.com/openai/codex/issues/21753) — [FULL] — promoted to Decision #16
+- [punkpeye/awesome-mcp-servers (87,708 stars)](https://github.com/punkpeye/awesome-mcp-servers) — [FULL] — community curation top categories
+- [oraios/serena#1416 — tools/list hang on claude-code context, v1.1.2 pin](https://github.com/oraios/serena/issues/1416) — [FULL] — version gotcha
+
+**YouTube + Long-Form Blogs (5 videos + 7 blogs + 2 Latent Space pods FULL):**
+- [Anthropic — Claude Code best practices (132-engineer study)](https://www.anthropic.com/engineering/claude-code-best-practices) — [FULL] — 67% more merged PRs/day, 27% counterfactual
+- Latent Space pod: Doug O'Laughlin SemiAnalysis — Claude Code writes ~4% of GitHub as of Feb 2026 — [PARTIAL — show notes only]
+- Pragmatic Engineer 2026 dev survey — 46% most-loved, 18% workplace adoption — [PARTIAL — secondary cite]
+- Prabhat.dev — "Zero to Hero 2026 Field Guide" 4-stage Maturity Model — [FULL]
+- Dev.to / Jack B. Cai — Guardrails 2026 (4 Autonomy Levels) — [FULL]
+- DevOps Monk — hook patterns + spawn-subagent-on-test-fail — [FULL]
+- Latent Space — Felix Rieseberg on Claude Cowork (skills portability) — [FULL]
+- Zenva AI — GitHub MCP workflow + AGENTS.md pattern — [FULL]
+- Akshay Ghalme — MCP transports (SSE deprecated mid-2026) — [FULL]
+- Shah Wali, Harshit Agarwal, Leon van Zyl, Thetips4you tutorials — [FULL] — beginner-to-advanced coverage
+
+**X / Twitter:** [FAILED — auth wall on direct fetch]. Substituted with 25-blog tier-consensus tally (Tier 1: GitHub 22/25, Filesystem 21/25, Postgres 18/25, Serena 17/25, Playwright 16/25, Context7 14/25, Brave Search 14/25; Tier 2: Sentry 11/25, Memory 10/25; Tier 3: Figma 6/25, Docker 5/25). Cross-tally produced equivalent breadth.
 
 ## Validation Notes
 

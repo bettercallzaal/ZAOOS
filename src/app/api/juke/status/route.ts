@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getJukeIntegrationManifest } from '@/lib/spaces/jukeIntegrationManifest';
-import { getJukeIntegrationStats } from '@/lib/spaces/jukeSpacesDb';
+import {
+  getJukeIntegrationStats,
+  listRecentJukeSpaces,
+  listRecentWebhookEvents,
+} from '@/lib/spaces/jukeSpacesDb';
 
 /**
  * GET /api/juke/status - machine-readable ZAO + Juke integration state.
@@ -15,24 +19,25 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const manifest = getJukeIntegrationManifest();
-  let stats;
-  try {
-    stats = await getJukeIntegrationStats();
-  } catch {
-    stats = null;
-  }
+  const [stats, recentSpaces, recentEvents] = await Promise.all([
+    getJukeIntegrationStats().catch(() => null),
+    listRecentJukeSpaces(10).catch(() => []),
+    listRecentWebhookEvents(15).catch(() => []),
+  ]);
 
   return NextResponse.json(
     {
       ...manifest,
       stats,
+      recent_spaces: recentSpaces,
+      recent_events: recentEvents,
     },
     {
       status: 200,
       headers: {
         'Cache-Control': 'public, max-age=30, s-maxage=60, stale-while-revalidate=120',
         'Access-Control-Allow-Origin': '*',
-        'X-ZAO-Juke-Status': 'v1',
+        'X-ZAO-Juke-Status': 'v2',
       },
     },
   );

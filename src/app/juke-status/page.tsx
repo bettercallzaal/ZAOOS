@@ -7,13 +7,31 @@ import {
   type ShippedFeature,
   type OpenAsk,
 } from '@/lib/spaces/jukeIntegrationManifest';
-import { getJukeIntegrationStats, type JukeIntegrationStats } from '@/lib/spaces/jukeSpacesDb';
+import {
+  getJukeIntegrationStats,
+  listRecentJukeSpaces,
+  listRecentWebhookEvents,
+  type JukeIntegrationStats,
+  type RecentJukeSpaceRow,
+  type RecentWebhookEventRow,
+} from '@/lib/spaces/jukeSpacesDb';
 import { communityConfig } from '../../../community.config';
 
 export const metadata: Metadata = {
   title: `ZAO + Juke - Integration Status`,
   description:
-    'Public dashboard of what The ZAO has built using Juke, live integration stats, and open asks for the Juke team. Machine-readable mirror at /api/juke/status.',
+    'Public dashboard of what The ZAO has built using Juke, live integration stats, recent webhook deliveries, and open asks for the Juke team. Machine-readable mirror at /api/juke/status.',
+  openGraph: {
+    title: 'ZAO + Juke - Integration Status',
+    description: "Live build status of ZAO's Juke integration. Shipped features, recent webhooks, open asks. Refreshes the moment we ship.",
+    siteName: communityConfig.name,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ZAO + Juke - Integration Status',
+    description: "Live build status of ZAO's Juke integration. Shipped features, recent webhooks, open asks.",
+  },
 };
 
 async function safeStats(): Promise<JukeIntegrationStats> {
@@ -33,6 +51,29 @@ async function safeStats(): Promise<JukeIntegrationStats> {
   }
 }
 
+async function safeRecentSpaces(): Promise<RecentJukeSpaceRow[]> {
+  try { return await listRecentJukeSpaces(10); } catch { return []; }
+}
+
+async function safeRecentEvents(): Promise<RecentWebhookEventRow[]> {
+  try { return await listRecentWebhookEvents(15); } catch { return []; }
+}
+
+/** Friendly relative time - "2m ago" / "3h ago" / "May 22". */
+function ago(value: string | null | undefined): string {
+  if (!value) return '-';
+  const ts = new Date(value).getTime();
+  if (Number.isNaN(ts)) return '-';
+  const diffMin = Math.floor((Date.now() - ts) / 60_000);
+  if (diffMin < 1) return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffD = Math.floor(diffHr / 24);
+  if (diffD < 7) return `${diffD}d ago`;
+  return new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
 /**
  * /juke-status - public dashboard for the Juke team (and their agent) to see
  * what ZAO has shipped, live stats, and what is blocking the next slice of
@@ -46,7 +87,11 @@ async function safeStats(): Promise<JukeIntegrationStats> {
  */
 export default async function JukeStatusPage() {
   const manifest = getJukeIntegrationManifest();
-  const stats = await safeStats();
+  const [stats, recentSpaces, recentEvents] = await Promise.all([
+    safeStats(),
+    safeRecentSpaces(),
+    safeRecentEvents(),
+  ]);
   const lastEvent = stats.last_event_at ? new Date(stats.last_event_at) : null;
 
   return (
@@ -89,9 +134,12 @@ export default async function JukeStatusPage() {
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-10">
         <StatsRow stats={stats} lastEvent={lastEvent} />
+        <WebhookTimelineSection events={recentEvents} />
+        <RecentSpacesSection rows={recentSpaces} />
         <ArchitectureSection />
         <ShippedSection manifest={manifest} />
         <AsksSection manifest={manifest} />
+        <CodeExamplesSection />
         <ConventionsSection manifest={manifest} />
         <ContactSection manifest={manifest} />
       </main>
@@ -128,6 +176,219 @@ function StatsRow({ stats, lastEvent }: { stats: JukeIntegrationStats; lastEvent
         </p>
       )}
     </section>
+  );
+}
+
+function WebhookTimelineSection({ events }: { events: RecentWebhookEventRow[] }) {
+  return (
+    <section>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">
+        Recent webhooks ({events.length})
+      </h2>
+      {events.length === 0 ? (
+        <div className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 text-xs text-gray-500">
+          No webhook deliveries yet. Confirm the subscription via{' '}
+          <code className="text-gray-300">POST /api/juke/admin/register-webhook</code>; once Juke
+          starts posting, the most recent 15 events show up here.
+        </div>
+      ) : (
+        <ul className="bg-[#111d2e] border border-white/[0.08] rounded-xl divide-y divide-white/[0.04]">
+          {events.map((ev) => {
+            const ok = !!ev.processed_at && !ev.error;
+            return (
+              <li key={ev.id} className="flex items-center gap-3 px-4 py-2.5">
+                <span
+                  className={`flex-shrink-0 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold ${
+                    ok
+                      ? 'bg-green-500/20 text-green-400'
+                      : ev.error
+                        ? 'bg-red-500/20 text-red-400'
+                        : 'bg-gray-500/20 text-gray-400'
+                  }`}
+                  aria-label={ok ? 'processed' : ev.error ? 'failed' : 'pending'}
+                >
+                  {ok ? 'OK' : ev.error ? '!' : '...'}
+                </span>
+                <code className="text-xs text-gray-200 font-mono w-44 truncate">{ev.event_type}</code>
+                <code className="text-[11px] text-gray-500 font-mono flex-1 truncate">
+                  {ev.space_id ?? 'no space_id'}
+                </code>
+                <span className="text-[11px] text-gray-500 flex-shrink-0">{ago(ev.received_at)}</span>
+                {ev.error && (
+                  <span
+                    className="text-[10px] text-red-400 truncate max-w-[200px]"
+                    title={ev.error}
+                  >
+                    {ev.error}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function RecentSpacesSection({ rows }: { rows: RecentJukeSpaceRow[] }) {
+  if (rows.length === 0) {
+    return (
+      <section>
+        <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">
+          Recent Juke spaces
+        </h2>
+        <div className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 text-xs text-gray-500">
+          No Juke spaces minted yet through this integration. Create one via{' '}
+          <a href="/spaces" className="text-[#f5a623] hover:underline">/spaces (Go Live - Juke)</a>{' '}
+          or <a href="/live/create" className="text-[#f5a623] hover:underline">/live/create</a>.
+        </div>
+      </section>
+    );
+  }
+  return (
+    <section>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">
+        Recent Juke spaces ({rows.length})
+      </h2>
+      <div className="bg-[#111d2e] border border-white/[0.08] rounded-xl overflow-hidden">
+        <ul className="divide-y divide-white/[0.04]">
+          {rows.map((r) => {
+            const statusStyle =
+              r.status === 'active'
+                ? 'text-red-400 border-red-500/30 bg-red-500/10'
+                : r.status === 'scheduled'
+                  ? 'text-[#f5a623] border-[#f5a623]/30 bg-[#f5a623]/10'
+                  : 'text-gray-400 border-white/[0.08] bg-white/[0.02]';
+            const timeLabel = r.status === 'scheduled'
+              ? `starts ${ago(r.scheduled_at)}`
+              : r.status === 'ended'
+                ? `ended ${ago(r.ended_at)}`
+                : `started ${ago(r.started_at)}`;
+            return (
+              <li key={r.id} className="flex items-center gap-3 px-4 py-2.5">
+                <span
+                  className={`flex-shrink-0 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${statusStyle}`}
+                >
+                  {r.status}
+                </span>
+                <a
+                  href={`/live/${r.id}`}
+                  className="text-sm text-white truncate flex-1 hover:text-[#f5a623] transition-colors"
+                >
+                  {r.title || 'Untitled space'}
+                </a>
+                <span className="text-[11px] text-gray-500 flex-shrink-0">{timeLabel}</span>
+                {r.participant_count > 0 && (
+                  <span className="text-[11px] text-gray-500 flex-shrink-0">
+                    {r.participant_count} listening
+                  </span>
+                )}
+                {r.recording_url && (
+                  <a
+                    href={r.recording_url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="text-[10px] text-[#f5a623] hover:underline flex-shrink-0"
+                  >
+                    Recording
+                  </a>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function CodeExamplesSection() {
+  return (
+    <section>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">
+        How ZAO calls Juke
+      </h2>
+      <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+        Reference snippets so Nicky's agent can see ZAO's actual integration patterns. Every line
+        matches the live production code paths.
+      </p>
+      <div className="space-y-3">
+        <CodeBlock
+          title="Create a space (Path B) - src/lib/spaces/juke-api.ts"
+          body={`POST https://api.juke.audio/v1/developer/spaces
+X-Juke-Api-Key: <JUKE_API_KEY>
+Content-Type: application/json
+
+{
+  "title": "ZAO Fractal Call",
+  "scheduled_at": null,
+  "announce_cast": false,
+  "allow_agents": true
+}`}
+        />
+        <CodeBlock
+          title="Embed (Path A) - src/components/spaces/JukeEmbed.tsx"
+          body={`<iframe
+  src="https://juke.audio/embed/{spaceId}"
+  title="Juke live audio space"
+  allow="autoplay; microphone"
+  style="width:100%;max-width:480px;height:720px;border:0;border-radius:24px"
+></iframe>`}
+        />
+        <CodeBlock
+          title="Webhook verification - src/lib/spaces/jukeWebhookVerify.ts"
+          body={`// Header from Juke:
+//   X-Juke-Signature: t={unix-ts-seconds},v1={hex-hmac-sha256}
+// Signed payload: \`\${ts}.\${rawBody}\`
+// HMAC key: JUKE_WEBHOOK_SECRET (shared on POST /v1/developer/webhooks)
+
+const expected = createHmac('sha256', secret)
+  .update(\`\${parsed.ts}.\${rawBody}\`)
+  .digest('hex');
+
+if (!timingSafeEqual(
+  Buffer.from(expected, 'utf8'),
+  Buffer.from(parsed.v1, 'utf8'),
+)) return { ok: false, reason: 'Signature mismatch' };
+
+// Plus: reject ts more than 5min from now (replay window).`}
+        />
+        <CodeBlock
+          title="Subscribe to webhooks - src/app/api/juke/admin/register-webhook/route.ts"
+          body={`POST https://api.juke.audio/v1/developer/webhooks
+X-Juke-Api-Key: <JUKE_API_KEY>
+Content-Type: application/json
+
+{
+  "url": "https://zaoos.com/api/juke/webhooks",
+  "secret": "<JUKE_WEBHOOK_SECRET>",
+  "events": [
+    "room.started",
+    "room.finished",
+    "participant.joined",
+    "participant.left",
+    "recording.ready"
+  ]
+}`}
+        />
+      </div>
+    </section>
+  );
+}
+
+function CodeBlock({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="bg-[#0a1628] border border-white/[0.08] rounded-xl overflow-hidden">
+      <div className="px-4 py-2 border-b border-white/[0.04] bg-[#111d2e]">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
+          {title}
+        </span>
+      </div>
+      <pre className="text-[11px] sm:text-xs leading-snug text-gray-300 font-mono whitespace-pre-wrap px-4 py-3 overflow-x-auto">
+{body}
+      </pre>
+    </div>
   );
 }
 

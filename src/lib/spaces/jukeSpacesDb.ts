@@ -64,6 +64,54 @@ export async function getJukeSpace(id: string): Promise<JukeSpaceRow | null> {
   return (data as JukeSpaceRow) ?? null;
 }
 
+/** List the N most-recently-touched juke_spaces rows regardless of status.
+ * Powers the "Recent spaces" table on /juke-status so Nicky's agent can see
+ * real usage at a glance. Returns title, status, and time markers only. */
+export interface RecentJukeSpaceRow {
+  id: string;
+  title: string;
+  status: JukeSpaceStatus;
+  participant_count: number;
+  scheduled_at: string | null;
+  started_at: string | null;
+  ended_at: string | null;
+  recording_url: string | null;
+  updated_at: string;
+}
+
+export async function listRecentJukeSpaces(limit: number = 10): Promise<RecentJukeSpaceRow[]> {
+  const { data, error } = await supabaseAdmin
+    .from('juke_spaces')
+    .select('id, title, status, participant_count, scheduled_at, started_at, ended_at, recording_url, updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(Math.min(Math.max(1, limit), 50));
+  if (error) throw new Error(`listRecentJukeSpaces failed: ${error.message}`);
+  return (data ?? []) as RecentJukeSpaceRow[];
+}
+
+/** Last N webhook events received from Juke, newest first. Powers the
+ * "Webhook timeline" section on /juke-status - proof the integration is
+ * actively running, not just shipped code. Surfaces failures (error set)
+ * alongside successes so it doubles as a debug feed. */
+export interface RecentWebhookEventRow {
+  id: string;
+  event_type: string;
+  space_id: string | null;
+  received_at: string;
+  processed_at: string | null;
+  error: string | null;
+}
+
+export async function listRecentWebhookEvents(limit: number = 25): Promise<RecentWebhookEventRow[]> {
+  const { data, error } = await supabaseAdmin
+    .from('juke_webhook_events')
+    .select('id, event_type, space_id, received_at, processed_at, error')
+    .order('received_at', { ascending: false })
+    .limit(Math.min(Math.max(1, limit), 100));
+  if (error) throw new Error(`listRecentWebhookEvents failed: ${error.message}`);
+  return (data ?? []) as RecentWebhookEventRow[];
+}
+
 /** List Juke spaces currently in `active` status. Most-recent first. */
 export async function listActiveJukeSpaces(limit: number = 25): Promise<JukeSpaceRow[]> {
   const { data, error } = await supabaseAdmin

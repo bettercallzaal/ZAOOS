@@ -32,7 +32,9 @@ export function ScreenShareButton({ isHost, isAuthenticated, roomType }: ScreenS
   return (
     <button
       onClick={handleToggle}
-      className={`px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2 ${
+      aria-pressed={isSharing}
+      aria-label={isSharing ? 'Stop sharing screen (S)' : 'Share your screen (S)'}
+      className={`px-4 py-2.5 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628] ${
         isSharing
           ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30 hover:bg-blue-600/30'
           : 'bg-[#1a2a3a] text-gray-300 hover:text-white border border-white/[0.08] hover:border-gray-500'

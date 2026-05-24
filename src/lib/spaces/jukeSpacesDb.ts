@@ -64,6 +64,22 @@ export async function getJukeSpace(id: string): Promise<JukeSpaceRow | null> {
   return (data as JukeSpaceRow) ?? null;
 }
 
+/**
+ * List ended Juke spaces that have a recording_url. Most-recent first.
+ * Limited to a sensible default the shelf page can show without paging.
+ */
+export async function listRecordedJukeSpaces(limit: number = 25): Promise<JukeSpaceRow[]> {
+  const { data, error } = await supabaseAdmin
+    .from('juke_spaces')
+    .select('*')
+    .eq('status', 'ended')
+    .not('recording_url', 'is', null)
+    .order('ended_at', { ascending: false })
+    .limit(Math.min(Math.max(1, limit), 100));
+  if (error) throw new Error(`listRecordedJukeSpaces failed: ${error.message}`);
+  return (data ?? []) as JukeSpaceRow[];
+}
+
 /** Update lifecycle fields driven by webhooks. */
 export async function updateJukeSpace(
   id: string,

@@ -11,6 +11,8 @@ import { communityConfig } from '../../../../community.config';
 import { AudioRoomAdapter } from '@/components/spaces/AudioRoomAdapter';
 import type { Room } from '@/lib/spaces/roomsDb';
 
+import { EndRoomConfirm } from '@/components/spaces/EndRoomConfirm';
+
 // Lazy-load heavy SDKs — Stream.io is ~150KB, only load when entering a room
 const StreamWrapper = dynamic(
   () => import('@/components/spaces/StreamWrapper').then((m) => ({ default: m.StreamWrapper })),
@@ -187,8 +189,12 @@ export default function PublicRoomPage() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [room?.id]);
 
-  const handleLeave = async () => {
-    // End session tracking (keepalive so it survives navigation)
+  /**
+   * Leave the room for this user only. Does NOT close the room for everyone
+   * else - safe to call from the host's "Leave only" path or any non-host's
+   * Leave button.
+   */
+  const leaveSelfOnly = async () => {
     if (room?.id) {
       fetch('/api/spaces/session', {
         method: 'PATCH',
@@ -199,14 +205,33 @@ export default function PublicRoomPage() {
     }
     if (call) await call.leave().catch(console.error);
     if (client) await client.disconnectUser().catch(console.error);
-    if (canEndRoom && room) {
-      await fetch(`/api/stream/rooms/${room.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'end' }),
-      }).catch(console.error);
-    }
     router.push('/spaces');
+  };
+
+  /**
+   * End the room for everyone, then leave for this user. Host + admin only.
+   * Triggered after the EndRoomConfirm dialog accepts.
+   */
+  const endRoomForEveryone = async () => {
+    if (!room) return;
+    await fetch(`/api/stream/rooms/${room.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'end' }),
+    }).catch(console.error);
+    await leaveSelfOnly();
+  };
+
+  // Click handler for the room's Leave/End button. Hosts + admins land in
+  // the confirm dialog before the room ends for everyone; listeners leave
+  // straight away.
+  const [confirmingEnd, setConfirmingEnd] = useState(false);
+  const handleLeave = async () => {
+    if (canEndRoom) {
+      setConfirmingEnd(true);
+      return;
+    }
+    await leaveSelfOnly();
   };
 
   if (loading || authLoading) {
@@ -307,6 +332,24 @@ export default function PublicRoomPage() {
           onSaved={(updated) => setRoom(prev => prev ? { ...prev, ...updated } : prev)}
         />
       )}
+      {confirmingEnd && room && (
+        <EndRoomConfirm
+          roomTitle={room.title}
+          onCancel={() => setConfirmingEnd(false)}
+          onConfirm={async () => {
+            setConfirmingEnd(false);
+            await endRoomForEveryone();
+          }}
+          onLeaveOnly={
+            isAdmin && !isHost
+              ? async () => {
+                  setConfirmingEnd(false);
+                  await leaveSelfOnly();
+                }
+              : undefined
+          }
+        />
+      )}
       <header className="border-b border-white/[0.08] bg-[#0d1b2a] relative">
         {/* Theme accent bar */}
         <div className="absolute top-0 left-0 right-0 h-0.5" style={{ backgroundColor: themeAccent, opacity: 0.5 }} />
@@ -347,7 +390,8 @@ export default function PublicRoomPage() {
               )}
               <button
                 onClick={handleLeave}
-                className="px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-500/20 transition-colors"
+                aria-label={canEndRoom ? 'End room for everyone' : 'Leave room'}
+                className="px-3 py-1.5 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-xs sm:text-sm font-medium hover:bg-red-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
               >
                 {canEndRoom ? 'End' : 'Leave'}
               </button>

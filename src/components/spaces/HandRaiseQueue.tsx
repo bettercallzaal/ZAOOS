@@ -69,27 +69,59 @@ export function HandRaiseQueue({ roomId, fid, isHost }: HandRaiseQueueProps) {
   };
 
   const raisedHands = raises.filter((r) => r.status === 'raised');
+  // Listener-only: 1-indexed position of this FID in the raised-hand queue,
+  // or null when the user has not raised. Surfacing this closes the "did the
+  // host see me?" doubt loop documented in the Clubhouse postmortem.
+  const myQueuePosition = (() => {
+    if (myStatus !== 'raised') return null;
+    const idx = raisedHands.findIndex((r) => r.fid === fid);
+    return idx >= 0 ? idx + 1 : null;
+  })();
 
-  // Listener view: raise/lower hand button
+  // Listener view: raise/lower hand button + queue position when raised.
   if (!isHost) {
+    const isRaised = myStatus === 'raised';
+    const label = isRaised
+      ? myQueuePosition === 1
+        ? 'You are next'
+        : myQueuePosition
+          ? `You are #${myQueuePosition} in line`
+          : 'Hand raised'
+      : 'Raise hand';
     return (
-      <button
-        onClick={() => doAction(myStatus === 'raised' ? 'lower' : 'raise')}
-        disabled={loading}
-        className={`relative p-2.5 rounded-xl text-sm transition-colors border ${
-          myStatus === 'raised'
-            ? 'bg-[#f5a623]/15 border-[#f5a623]/40 text-[#f5a623]'
-            : 'bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border-white/[0.08] hover:border-[#f5a623]/40'
-        }`}
-        title={myStatus === 'raised' ? 'Lower hand' : 'Raise hand'}
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l-.075 5.925m3.075-5.925a1.575 1.575 0 013.15 0v1.5m-3.15-1.5v5.925m3.15-5.925v3.075M16.5 12.75v-3m0 3c0 3.375-2.7 6.75-6 6.75s-6-3.375-6-6.75V7.5m0 0a1.575 1.575 0 013.15 0" />
-        </svg>
-        {myStatus === 'raised' && (
-          <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#f5a623] rounded-full" />
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => doAction(isRaised ? 'lower' : 'raise')}
+          disabled={loading}
+          aria-pressed={isRaised}
+          aria-label={label}
+          className={`relative p-2.5 rounded-xl text-sm transition-colors border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628] ${
+            isRaised
+              ? 'bg-[#f5a623]/15 border-[#f5a623]/40 text-[#f5a623]'
+              : 'bg-[#1a2a3a] text-gray-400 hover:text-[#f5a623] border-white/[0.08] hover:border-[#f5a623]/40'
+          }`}
+          title={isRaised ? 'Lower hand' : 'Raise hand'}
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 10-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 013.15 0v1.5m-3.15 0l-.075 5.925m3.075-5.925a1.575 1.575 0 013.15 0v1.5m-3.15-1.5v5.925m3.15-5.925v3.075M16.5 12.75v-3m0 3c0 3.375-2.7 6.75-6 6.75s-6-3.375-6-6.75V7.5m0 0a1.575 1.575 0 013.15 0" />
+          </svg>
+          {isRaised && (
+            <span
+              className="absolute -top-1 -right-1 w-2 h-2 bg-[#f5a623] rounded-full"
+              aria-hidden="true"
+            />
+          )}
+        </button>
+        {isRaised && (
+          <span
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f5a623]/10 border border-[#f5a623]/30 text-[#f5a623] text-xs font-semibold"
+            aria-live="polite"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#f5a623] animate-pulse" aria-hidden="true" />
+            {label}
+          </span>
         )}
-      </button>
+      </div>
     );
   }
 

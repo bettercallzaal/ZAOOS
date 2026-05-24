@@ -242,3 +242,65 @@ All internal - this is a ZAO architecture decision grounded in the existing code
 - Doc 717 meeting-Bonfire-via-VPS - [FULL]
 - Doc 722 hub + sub-docs (the recent corpus synthesis this orchestrator is informed by) - [FULL]
 - Memories: `project_hermes_canonical`, `project_zoe_soul_architecture`, `project_zoe_v2_pivot_agent_zero`, `project_zaocoworkingbot` - [FULL]
+
+---
+
+## Update 2026-05-23 - autonomy policy + answered questions
+
+The five open questions are now answered (and three more surfaced + answered in the same call). These supersede the speculative recommendations earlier in the doc.
+
+### Key Decision 6 (added 2026-05-23)
+
+**Autonomy by blast-radius.** Research + internal builds run autonomously. Anything that touches main on a repo with users, posts to live external surfaces, or makes a permanent commitment requires explicit Zaal confirmation. Per Zaal's call: "if it's researching just keep going and building in the background, but if we push anything to a main that has some users we want to check first." The `autonomy.ts` gate classifies every action before it executes.
+
+### Autonomy policy - blast-radius tiers
+
+| Tier | Examples | Behaviour |
+|------|----------|-----------|
+| **AUTO** - low blast-radius | Run a Whisper transcription, run `/zao-research`, draft a research doc, create a branch + PR, write a Bonfire episode, run Hermes coder + critic on a ws/ branch, write a memory file, post a status line to the ZAO Devz dev-only GC | Just runs. No prompt. |
+| **CONFIRM** - touches users or permanence | Merge to main on any repo with users (ZAOOS, bettercallzaal-website, bczyapz, fishbowlz, riverside-internal), edit `community.config.ts`, edit `~/.zao/zoe/persona.md`, change a systemd unit, write a "decision-locked" memory, modify a hook, change a feedback memory | Prompts Zaal in his ZOE DM with a one-screen summary + diff + single Y/n. Idle 4 hours = cancel. |
+| **REFUSE** - irreversible to others | Send a DM/email/cast as Zaal, post to a public ZAO Telegram or Farcaster channel, transact on-chain, publish to bczyapz.com or zaoos.com, share a key, force-push to main, delete a repo | Hard stop. ZOE asks in DM, never auto-fires. |
+
+**Heuristics for classify (encoded in `autonomy.ts`):**
+- Path-based: writes to a repo + branch where remote shows protected `main` -> CONFIRM/REFUSE
+- Tool-based: `gh pr merge`, `git push origin main`, `curl ... social-api`, `farcaster cast` -> CONFIRM/REFUSE
+- Content-based: episode body or commit message contains "lock", "delete", "publish", "merge" -> bump tier
+- Default on unknown action: CONFIRM (fail-safe upward)
+
+**Built-in inheritance from existing feedback memories** (auto-applied rules):
+- `feedback_no_unauthorized_commitments` - reward thresholds / benefit gates -> REFUSE without sign-off
+- `feedback_no_unsolicited_features` - "build exactly what's asked" -> CONFIRM scope creep
+- `feedback_no_unilateral_dates` - dates beyond locked anchors -> CONFIRM
+- `feedback_dont_invent_outreach` - DMs/emails to people Zaal didn't name -> REFUSE
+- `feedback_no_unconfirmed_roadmap` - speculative roadmap on public pages -> REFUSE
+- `feedback_no_unconfirmed_anchor_partners` - listing unconfirmed partners -> REFUSE
+- `feedback_check_pr_state_always` - PR state check before any push -> AUTO precondition
+
+The orchestrator is permitted to act AUTONOMOUSLY for everything in AUTO. That is the explicit Zaal-2026-05-23 grant. No need to ask "should I write the research doc" or "should I run the supervisor" - just do it.
+
+### File map - additions
+
+```
+bot/src/zoe/orchestrator/
+  autonomy.ts       - classify(action) -> AUTO | CONFIRM | REFUSE; gate before any side effect
+  channels.ts       - dual-surface posting: ZAO Devz GC status line + ZOE DM firehose, /zoe snooze 1h support
+```
+
+### Open questions - answered table
+
+| # | Question | Answer (Zaal 2026-05-23) |
+|---|----------|--------------------------|
+| 1 | Visibility surface | **Dual channel**: ZAO Devz GC = one-line STATUS pings per task + "done"; ZOE DM = full firehose every step (snoozable with `/zoe snooze 1h`). Built in `channels.ts`. |
+| 2 | CC subagent bridging | **Shell out** per task (Hermes-style). Slow but simple. Revisit if latency hurts. |
+| 3 | Cost cap | **$2 per task.** |
+| 4 | Concurrency | **Up to 3 at once.** Adds a small job-queue piece (~50 LOC) to PR1. |
+| 5 | Improvement metric | **Success rate per pattern over rolling 20 tasks**, with cost and intervention-count logged alongside but not optimised. Instrumented in PR4. |
+| 6 | Autonomy policy | **By blast-radius.** See section above. |
+| 7 | Dual-channel permissions | ZOE posts to ZAO Devz GC via cross-bot dispatch through `@zaodevz_bot` (shared Supabase queue), instead of direct write. Keeps ZAO Devz GC's identity intact. |
+| 8 | Snooze UX | `/zoe snooze <duration>` (1h, 4h, until-tomorrow), persisted to `~/.zao/zoe/orchestrator-snooze.json`. Default off. Auto-expires. |
+
+### PR1 scope, finalised
+
+PR1 ships: `router.ts` + `learner.ts` (record only) + `patterns/hermes.ts` + `autonomy.ts` + `channels.ts` (the ZAO Devz GC status path) + concurrent job queue (max 3) + Bonfire wiring for classify + spawn + done + intervention-skipped (PR2 adds real intervention). Cost cap = $2. End-to-end: any Hermes-bug-fix task DM'd to ZOE gets classified, gated through `autonomy.ts` (AUTO -> run), spawned, queued (max 3 concurrent), logged to Bonfire at each step, status-pinged to ZAO Devz GC, fully streamed to ZOE DM, final summary returned to Zaal.
+
+PR1 LOC estimate: ~400 (up from 250 because of the autonomy gate + dual-channel + queue additions).

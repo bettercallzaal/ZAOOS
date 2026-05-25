@@ -277,7 +277,35 @@ function LiveTab({ loading, stages, jukeRooms, myRooms, otherRooms, user, onHost
  * shape is distinct. A subtle "FC" badge per-card makes the source obvious so
  * a listener knows what they are walking into.
  */
+/**
+ * Rooms marked `active` in our DB but whose host walked away without
+ * triggering room.finished show up as Live forever. Until Juke's webhook
+ * lifecycle is bulletproof, anything `active` older than 30 minutes is
+ * suspect — surface a soft "may have ended" hint so listeners are not
+ * fooled into clicking dead rooms first.
+ *
+ * Calling this `stale` rather than `ended` is deliberate: we don't have
+ * authoritative evidence the room is over, so we keep the row clickable
+ * (a curious listener can still try it) but visually dim it so live rooms
+ * dominate.
+ */
+const STALE_JUKE_THRESHOLD_MS = 30 * 60 * 1000;
+function isJukeRoomStale(r: JukeRoomCard): boolean {
+  if (!r.started_at) return false;
+  const ageMs = Date.now() - new Date(r.started_at).getTime();
+  return ageMs > STALE_JUKE_THRESHOLD_MS;
+}
+
 function JukeLiveSection({ rooms }: { rooms: JukeRoomCard[] }) {
+  // Sort fresh first so a freshly-launched room beats a 4-hour-old ghost.
+  const sorted = [...rooms].sort((a, b) => {
+    const aStale = isJukeRoomStale(a) ? 1 : 0;
+    const bStale = isJukeRoomStale(b) ? 1 : 0;
+    if (aStale !== bStale) return aStale - bStale;
+    const at = a.started_at ? new Date(a.started_at).getTime() : 0;
+    const bt = b.started_at ? new Date(b.started_at).getTime() : 0;
+    return bt - at;
+  });
   return (
     <section>
       <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-2 text-[#855dcd]">
@@ -285,40 +313,71 @@ function JukeLiveSection({ rooms }: { rooms: JukeRoomCard[] }) {
         Live on Juke
       </h3>
       <div className="grid gap-4 md:grid-cols-2">
-        {rooms.map((r) => (
-          <Link
-            key={r.id}
-            href={`/live/${r.id}`}
-            aria-label={`Join Juke space: ${r.title}`}
-            className="group block bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 transition-all hover:border-gray-600 hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#855dcd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
-          >
-            <div className="w-8 h-1 rounded-full bg-[#855dcd] mb-3 opacity-60" aria-hidden="true" />
-            <div className="flex items-start justify-between gap-2 mb-3">
-              <h4 className="text-white font-bold text-sm leading-tight line-clamp-2 group-hover:text-[#a78bfa] transition-colors">
-                {r.title || 'Untitled space'}
-              </h4>
-              <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                <span className="inline-flex items-center gap-1 text-red-400 text-[10px] font-bold uppercase tracking-wide">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
-                  Live
+        {sorted.map((r) => {
+          const stale = isJukeRoomStale(r);
+          return (
+            <Link
+              key={r.id}
+              href={`/live/${r.id}`}
+              aria-label={`Join Juke space: ${r.title}${stale ? ' (may have ended)' : ''}`}
+              className={`group block border rounded-xl p-4 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#855dcd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628] ${
+                stale
+                  ? 'bg-[#0d1620] border-white/[0.04] opacity-60 hover:opacity-100 hover:border-amber-500/30'
+                  : 'bg-[#111d2e] border-white/[0.08] hover:border-gray-600 hover:shadow-lg hover:shadow-black/20'
+              }`}
+            >
+              <div
+                className={`w-8 h-1 rounded-full mb-3 ${stale ? 'bg-amber-500 opacity-50' : 'bg-[#855dcd] opacity-60'}`}
+                aria-hidden="true"
+              />
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <h4
+                  className={`font-bold text-sm leading-tight line-clamp-2 transition-colors ${
+                    stale
+                      ? 'text-gray-400 group-hover:text-gray-200'
+                      : 'text-white group-hover:text-[#a78bfa]'
+                  }`}
+                >
+                  {r.title || 'Untitled space'}
+                </h4>
+                <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                  {stale ? (
+                    <span className="inline-flex items-center gap-1 text-amber-400 text-[10px] font-bold uppercase tracking-wide">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true" />
+                      Stale
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-red-400 text-[10px] font-bold uppercase tracking-wide">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
+                      Live
+                    </span>
+                  )}
+                  <span className="inline-flex items-center text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded-full border border-[#855dcd]/40 bg-[#855dcd]/10 text-[#a78bfa]">
+                    FC Juke
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <span>
+                  {stale
+                    ? 'May have ended - tap to check'
+                    : r.participant_count <= 1
+                      ? 'Just host'
+                      : `${r.participant_count} listening`}
                 </span>
-                <span className="inline-flex items-center text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded-full border border-[#855dcd]/40 bg-[#855dcd]/10 text-[#a78bfa]">
-                  FC Juke
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-lg text-white text-xs font-bold transition-colors ${
+                    stale
+                      ? 'bg-gray-600 group-hover:bg-amber-600'
+                      : 'bg-[#855dcd] group-hover:bg-[#a78bfa]'
+                  }`}
+                >
+                  {stale ? 'Check' : 'Listen'}
                 </span>
               </div>
-            </div>
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span>
-                {r.participant_count <= 1
-                  ? 'Just host'
-                  : `${r.participant_count} listening`}
-              </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-lg bg-[#855dcd] text-white text-xs font-bold group-hover:bg-[#a78bfa] transition-colors">
-                Listen
-              </span>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

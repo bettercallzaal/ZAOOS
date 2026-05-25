@@ -60,11 +60,22 @@ export function buildResolutionIndex(
   const out = new Map<string, JukeChangelogEntry>();
   if (!changelog) return out;
   for (const entry of changelog.entries) {
+    // 1) Explicit join: entry.resolves[] -> OpenAsk.id (canonical path).
     for (const askId of entry.resolves ?? []) {
       const prior = out.get(askId);
       if (!prior || entry.shipped_at > prior.shipped_at) {
         out.set(askId, entry);
       }
+    }
+    // 2) Implicit join: an OpenAsk.id matches the entry.id directly. Lets a
+    // newly-shipped Juke entry resolve our ask without needing Nicky to
+    // backfill the resolves[] array. Pre-condition is identical ids on both
+    // sides - which is exactly how we author asks for new Juke features
+    // (e.g. our 'developer-end-space' ask matches Juke's 'developer-end-space'
+    // changelog entry). resolves[] still wins for explicit cross-id mappings.
+    const idMatch = out.get(entry.id);
+    if (!idMatch || entry.shipped_at > idMatch.shipped_at) {
+      out.set(entry.id, entry);
     }
   }
   return out;

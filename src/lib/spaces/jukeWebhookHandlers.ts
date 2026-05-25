@@ -205,16 +205,41 @@ export async function applyWebhookEvent(
     case 'room.ended': {
       // Juke 2026-05-24 ship (Nicky PR #174): room.finished carries
       // `ended_via: "host" | "api"` on the payload. Omitted means LiveKit's
-      // empty-room timeout fired (no human action). We don't store it as a
-      // typed column yet - the raw body persists in `juke_webhook_events`
-      // for any later analysis - but we log it so future recap-cast routing
-      // (e.g. only auto-cast on host/api ends, skip silent timeouts) has a
-      // clear signal to wire onto.
+      // empty-room timeout fired (no human action). We log it so future
+      // analysis can branch on it; the raw body also persists in
+      // `juke_webhook_events`.
       const endedVia = readEndedVia(body);
+      const occurredAt = readOccurredAt(body);
       if (endedVia) {
         logger.info('[juke/webhooks] room.finished ended_via=' + endedVia, { spaceId });
       }
-      await updateJukeSpace(spaceId, { status: 'ended', ended_at: readOccurredAt(body) });
+      await updateJukeSpace(spaceId, { status: 'ended', ended_at: occurredAt });
+
+      // Recap cast: fire only for real session ends (host or api). Idle
+      // empty-room timeouts (endedVia=null) had nobody to recap to so we
+      // stay quiet there. recording.ready emits a separate "Recording up"
+      // follow-up cast with the link if recording was on, so this first
+      // cast intentionally does NOT speculate about a recording.
+      if (endedVia === 'host' || endedVia === 'api') {
+        try {
+          const row = await getJukeSpace(spaceId);
+          const title = row?.title ?? 'A ZAO space';
+          const liveUrl = `https://zaoos.com/live/${spaceId}`;
+          const participants = Array.isArray(row?.participants)
+            ? row.participants.length
+            : 0;
+          const lines = [`Just wrapped: ${title}`];
+          if (participants > 0) {
+            lines.push(
+              `${participants} ZAO ${participants === 1 ? 'member' : 'members'} joined.`,
+            );
+          }
+          lines.push(liveUrl);
+          await autoCastToZao(lines.join('\n\n'), liveUrl);
+        } catch (err: unknown) {
+          logger.warn('[juke/webhooks] room.finished recap cast failed (non-fatal):', err);
+        }
+      }
       return;
     }
     case 'participant.joined': {

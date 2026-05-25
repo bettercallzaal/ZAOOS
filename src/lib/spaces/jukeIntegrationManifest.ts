@@ -246,6 +246,15 @@ const SHIPPED: ShippedFeature[] = [
     files: ['src/lib/spaces/jukeWebhookHandlers.ts'],
   },
   {
+    id: 'recap-cast-room-finished',
+    title: 'Recap cast on room.finished (ended_via host/api only)',
+    description:
+      "When a Juke space ends with ended_via in {host, api}, the webhook handler auto-casts a 'Just wrapped: {title}' message to /zao from @thezao via autoCastToZao. Embeds the /live/{id} URL so Farcaster unfurls the OG card. Skips silent idle-timeouts (ended_via=null) since there's nobody to recap to. The recording.ready handler still fires its own 'Recording up' follow-up cast independently when a recording is on - two-cast pattern is intentional so listeners get a re-engagement ping when the file lands.",
+    shippedAt: '2026-05-25',
+    files: ['src/lib/spaces/jukeWebhookHandlers.ts'],
+    reference: 'Branches on Nicky 2026-05-24 ended_via payload addition.',
+  },
+  {
     id: 'host-end-space-button',
     title: 'Host "End space" button on /live/{id} + admin end-space route',
     description:
@@ -378,7 +387,7 @@ export const INTEGRATION_ARCHITECTURE_ASCII = String.raw`
 
 export function getJukeIntegrationManifest(): IntegrationManifest {
   return {
-    version: '1.3',
+    version: '1.4',
     generated_at: new Date().toISOString(),
     about: {
       name: 'The ZAO',

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getSessionData } from '@/lib/auth/session';
+import { EndJukeSpaceButton } from '@/components/spaces/EndJukeSpaceButton';
 import { JukeEmbed } from '@/components/spaces/JukeEmbed';
 import {
   isValidJukeSpaceId,
@@ -76,10 +78,20 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
     notFound();
   }
 
-  const row = await safeGetJukeSpace(spaceId);
+  const [row, session] = await Promise.all([safeGetJukeSpace(spaceId), getSessionData()]);
   const audioOff = audio === 'off';
   const isEnded = row?.status === 'ended';
   const recordingUrl = row?.recording_url ?? null;
+  // Host-or-admin gate for the End space button. Iframe Leave is participant-
+  // only (LiveKit disconnect, no API hit), so without this the room stays
+  // ACTIVE in our DB forever; the button calls our admin endpoint that proxies
+  // to Juke's new POST /v1/developer/spaces/{id}/end (Nicky PR #174).
+  const canEnd = Boolean(
+    !isEnded &&
+      row?.created_by_fid &&
+      session?.fid &&
+      (session.isAdmin || row.created_by_fid === session.fid),
+  );
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-[#0a1628]">
@@ -166,6 +178,15 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
             </Link>
           )}
         </div>
+
+        {canEnd && (
+          <div className="flex flex-col items-center gap-1.5 pt-2">
+            <EndJukeSpaceButton spaceId={spaceId} />
+            <p className="text-[10px] text-gray-600">
+              Iframe Leave only disconnects you. Use this to end the room for everyone.
+            </p>
+          </div>
+        )}
 
         <p className="mt-2 max-w-[480px] text-center text-xs text-gray-500">
           {audioOff

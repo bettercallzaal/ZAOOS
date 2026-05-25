@@ -109,6 +109,20 @@ function readOccurredAt(body: unknown): string {
   return b.occurred_at ?? b.occurredAt ?? new Date().toISOString();
 }
 
+/**
+ * Extract `ended_via` from a room.finished body. Lives on `data.ended_via`
+ * per Nicky 2026-05-24 ship, with `endedVia` as a defensive camelCase alias.
+ * `host` = iOS host-end, `api` = developer-API end (e.g. our End-space
+ * button), undefined = LiveKit empty-room timeout.
+ */
+function readEndedVia(body: unknown): 'host' | 'api' | null {
+  const b = (body ?? {}) as { data?: Record<string, unknown> };
+  const d = (b.data ?? {}) as { ended_via?: unknown; endedVia?: unknown };
+  const raw = d.ended_via ?? d.endedVia;
+  if (raw === 'host' || raw === 'api') return raw;
+  return null;
+}
+
 /** Pull a JukeParticipantEntry from a participant.joined/left body. Returns
  * null if no usable fid is present (Juke filters anon listeners + virtual
  * participants out, so an event without an fid is unexpected but possible). */
@@ -164,6 +178,17 @@ export async function applyWebhookEvent(
     }
     case 'room.finished':
     case 'room.ended': {
+      // Juke 2026-05-24 ship (Nicky PR #174): room.finished carries
+      // `ended_via: "host" | "api"` on the payload. Omitted means LiveKit's
+      // empty-room timeout fired (no human action). We don't store it as a
+      // typed column yet - the raw body persists in `juke_webhook_events`
+      // for any later analysis - but we log it so future recap-cast routing
+      // (e.g. only auto-cast on host/api ends, skip silent timeouts) has a
+      // clear signal to wire onto.
+      const endedVia = readEndedVia(body);
+      if (endedVia) {
+        logger.info('[juke/webhooks] room.finished ended_via=' + endedVia, { spaceId });
+      }
       await updateJukeSpace(spaceId, { status: 'ended', ended_at: readOccurredAt(body) });
       return;
     }

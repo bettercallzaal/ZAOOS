@@ -236,6 +236,29 @@ const SHIPPED: ShippedFeature[] = [
     pr: 'https://github.com/bettercallzaal/ZAOOS/pull/669',
     files: ['src/app/api/juke/admin/register-webhook/route.ts'],
   },
+  {
+    id: 'webhook-payload-parser',
+    title: 'Webhook payload parser: event_type / data.room_id / event_id',
+    description:
+      'parseWebhookEvent now reads Juke 2026-05-23 shape (event_type + event_id at top level, data.room_id for the space id) instead of the legacy event / type / data.id fields. Defensive aliases keep the older shape working. readParticipant accepts fid / participant_fid / user_fid / host_fid + display_name / displayName / username for human-or-agent identification. Result: webhooks no longer log "no space_id" and lifecycle updates apply.',
+    shippedAt: '2026-05-24',
+    pr: 'https://github.com/bettercallzaal/ZAOOS/pull/677',
+    files: ['src/lib/spaces/jukeWebhookHandlers.ts'],
+  },
+  {
+    id: 'host-end-space-button',
+    title: 'Host "End space" button on /live/{id} + admin end-space route',
+    description:
+      "Iframe Leave is a pure LiveKit room.disconnect() with anon: participant identity - no API call, so rooms we create via developer API stay alive until LiveKit's 300s empty-room timeout. EndJukeSpaceButton on /live/{id} (gated to host or admin via SSR session) calls POST /api/juke/admin/end-space which proxies to Juke's POST /v1/developer/spaces/{id}/end (Nicky's PR #174). On a 404 from Juke (endpoint not shipped yet, or cross-app room), the route falls back to flipping our local juke_spaces row to ended so /spaces stops showing dead rooms as Live. The webhook handler remains the source of truth for the canonical room.finished event - we do not pre-flip our DB on the success path. Two-step confirm pattern on the button prevents fat-finger ends.",
+    shippedAt: '2026-05-24',
+    files: [
+      'src/app/api/juke/admin/end-space/route.ts',
+      'src/app/api/juke/admin/mark-ended/route.ts',
+      'src/components/spaces/EndJukeSpaceButton.tsx',
+      'src/app/live/[spaceId]/page.tsx',
+    ],
+    reference: "Nicky 2026-05-24 confirmation: POST /v1/developer/spaces/{room_id}/end, X-Juke-Api-Key auth, idempotent, fires room.finished synchronously with ended_via: 'host'|'api' payload.",
+  },
 ];
 
 const OPEN_ASKS: OpenAsk[] = [
@@ -272,12 +295,12 @@ const OPEN_ASKS: OpenAsk[] = [
     priority: 'p1',
   },
   {
-    id: 'partner-sso-bridge',
-    title: 'Parent-frame SSO so authed users on partner sites do not re-sign',
+    id: 'developer-end-space',
+    title: 'Developer API to end a space (host-end + immediate webhook dispatch)',
     reason:
-      "ZAO uses Sign In With Neynar (SIWN) - managed signer registered by ZAO's app FID. Juke uses SIWF (fresh EIP-4361 SIWE in the moment by user's custody). Different primitives, so a direct hand-off does not exist - a ZAO user already signed in at zaoos.com still has to do a second SIWF dance inside the Juke iframe to participate. Anonymous listen is fine (one-tap autoplay bypass). Three options in ascending lift: (1) Parent-frame Quick Auth via postMessage - ZAO posts {fid, signed-proof} into the iframe, Juke mints its JWT without showing the QR. Likely closest to your miniapp Quick Auth code path. (2) Trusted-partner pre-mint endpoint - ZAO server POSTs {fid, signed-proof} to Juke, gets back a short-lived JWT, passes as ?token=... on iframe src. Cleanest SSO. (3) Quick Auth via miniapp shell already works when ZAO is loaded INSIDE the FC client. Any of these closes the double-sign-in.",
-    blocks: 'Friction-free participate (react / raise hand / speak) inside ZAO OS embeds',
-    priority: 'p1',
+      "Surfaced 2026-05-24 while debugging the missing room.finished webhook. Iframe Leave is a pure LiveKit room.disconnect() with anon: participant identity — no API call to api.juke.audio, so the room stays alive on Juke's side until LiveKit's empty-room 300s timeout. Additionally Juke's own end_room handler was flipping Room.status to 'ended' before livekit teardown, so the room_finished dispatcher's WHERE status='active' filter excluded the row and the outbound webhook silently never fired (same blind spot for iOS host-end). We need either a developer POST /v1/developer/spaces/{id}/end (we'd wire it to a host 'End space' button on /live/{id}), OR room.finished firing synchronously when end_room flips status (not after a 5min wait). Confirmed by Nicky 2026-05-24: both ship in their PR #174 (POST /v1/developer/spaces/{room_id}/end, X-Juke-Api-Key auth, idempotent, fires room.finished inline with ended_via: 'host'|'api' on the payload).",
+    blocks: '/spaces showing dead rooms as Live + recap-cast trigger never firing for host-ended rooms',
+    priority: 'p0',
   },
 ];
 
@@ -355,7 +378,7 @@ export const INTEGRATION_ARCHITECTURE_ASCII = String.raw`
 
 export function getJukeIntegrationManifest(): IntegrationManifest {
   return {
-    version: '1.2',
+    version: '1.3',
     generated_at: new Date().toISOString(),
     about: {
       name: 'The ZAO',

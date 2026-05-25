@@ -1,9 +1,11 @@
 # 43 — WebRTC Audio Rooms, Live Listening Parties & Streaming
 
-> **Status:** Research complete
+> **Status:** Research complete (SFU recommendation revisited 2026-05-25 - see doc 741)
 > **Date:** March 2026
 > **Goal:** How to add live audio rooms, synchronized listening parties, and streaming to ZAO OS
 > **Recommendation:** LiveKit (open source SFU) + Livepeer (decentralized transcoding)
+>
+> **2026-05-25 update:** The `/spaces` SFU recommendation in this doc was not adopted - ZAO shipped on Stream.io + 100ms, then layered the Juke iframe for user-facing live audio (PR #598, #673). Doc [741](../../infrastructure/741-pion-livekit-webrtc-stack/) supersedes the LiveKit-for-`/spaces` call. LiveKit's role in the ZAO stack is now LiveKit Agents for ZOE / Hermes voice-agent legs, NOT the member-facing room SFU. The Livepeer + listening-party + multistream content below is still live.
 
 ---
 

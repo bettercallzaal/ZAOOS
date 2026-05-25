@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
+import { getJukeRoomDetail } from '@/lib/spaces/juke-api-reads';
 
 /**
  * GET /api/cron/juke-stale-rooms
@@ -94,16 +96,64 @@ export async function GET(request: NextRequest) {
   const nowIso = new Date().toISOString();
   let endedCount = 0;
   let skipped = 0;
+  let confirmedByJuke = 0;
+  let heuristicOnly = 0;
   const endedIds: string[] = [];
+
+  // Juke shipped GET /v1/developer/spaces/{id} on 2026-05-25 (Nicky PR #175).
+  // When the key is present, treat Juke as the authoritative source - if Juke
+  // says the room is still active, leave our row alone even if our webhook
+  // timeline is quiet. Only flip when Juke confirms ended (or 404s, meaning
+  // the room no longer exists on their side). When the key is absent (local
+  // dev / preview without the env var), fall back to the heuristic.
+  const apiKey = ENV.JUKE_API_KEY;
+  const useAuthoritative = Boolean(apiKey);
 
   for (const c of candidates) {
     const lastEvent = lastEventByRoom.get(c.id);
     if (lastEvent && lastEvent > thresholdIso) {
       // Recent activity on this room - probably a long-form session, not a
-      // ghost. Skip.
+      // ghost. Skip without even hitting Juke.
       skipped += 1;
       continue;
     }
+
+    if (useAuthoritative) {
+      const detail = await getJukeRoomDetail(c.id, apiKey as string);
+      if (detail.ok && detail.data) {
+        const jukeStatus = detail.data.status;
+        if (jukeStatus === 'active') {
+          // Juke says it's still active. Our webhook timeline lied (or just
+          // ran quiet because no one joined/left). Trust Juke.
+          skipped += 1;
+          continue;
+        }
+        // Juke says ended (or scheduled) - flip our row.
+      } else if (detail.status === 404) {
+        // Cross-app or deleted on Juke's side. Flip locally so /spaces stops
+        // listing a row Juke does not even know about.
+      } else if (detail.status === 429) {
+        // Read budget hit (120/min per key per Nicky's PR #175). Fall back
+        // to heuristic for the rest of this run + back off.
+        logger.warn('[cron/juke-stale-rooms] hit Juke read rate limit; falling back', {
+          spaceId: c.id,
+          rate_limit: detail.rateLimit,
+        });
+      } else {
+        // Other failure (5xx, timeout) - don't trust either side, skip.
+        logger.warn('[cron/juke-stale-rooms] Juke read failed; skipping', {
+          spaceId: c.id,
+          status: detail.status,
+          error: detail.error,
+        });
+        skipped += 1;
+        continue;
+      }
+      confirmedByJuke += 1;
+    } else {
+      heuristicOnly += 1;
+    }
+
     try {
       const { error } = await supabaseAdmin
         .from('juke_spaces')
@@ -122,7 +172,7 @@ export async function GET(request: NextRequest) {
   }
 
   logger.info(
-    `[cron/juke-stale-rooms] checked=${candidates.length} ended=${endedCount} skipped=${skipped}`,
+    `[cron/juke-stale-rooms] checked=${candidates.length} ended=${endedCount} skipped=${skipped} authoritative=${confirmedByJuke} heuristic=${heuristicOnly}`,
     { endedIds },
   );
 
@@ -131,6 +181,8 @@ export async function GET(request: NextRequest) {
     checked: candidates.length,
     ended: endedCount,
     skipped,
+    confirmed_by_juke: confirmedByJuke,
+    heuristic_only: heuristicOnly,
     threshold_minutes: STALE_THRESHOLD_MINUTES,
     ended_ids: endedIds,
   });

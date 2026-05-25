@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { JukeStatusTabs } from './JukeStatusTabs';
 import {
   getJukeIntegrationManifest,
   INTEGRATION_ARCHITECTURE_ASCII,
@@ -139,16 +140,45 @@ export default async function JukeStatusPage() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-10">
-        <StatsRow stats={stats} lastEvent={lastEvent} />
-        <WebhookTimelineSection events={recentEvents} />
-        <RecentSpacesSection rows={recentSpaces} />
-        <ArchitectureSection />
-        <ShippedSection manifest={manifest} />
-        <AsksSection manifest={manifest} resolutionIndex={resolutionIndex} />
-        <CodeExamplesSection />
-        <ConventionsSection manifest={manifest} />
-        <ContactSection manifest={manifest} />
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-12">
+        <JukeStatusTabs
+          counts={{
+            shipped: manifest.shipped.length,
+            asks: manifest.open_asks.length,
+            resolvedAsks: manifest.open_asks.filter((a) => resolutionIndex.has(a.id)).length,
+            webhooks: stats.total_webhook_events,
+            spaces: stats.total_spaces,
+          }}
+          overview={
+            <div className="space-y-8">
+              <StatsRow stats={stats} lastEvent={lastEvent} />
+              <WebhookTimelineSection events={recentEvents.slice(0, 8)} />
+              <RecentSpacesSection rows={recentSpaces.slice(0, 6)} />
+            </div>
+          }
+          shipped={
+            <div className="space-y-6">
+              <ShippedSection manifest={manifest} />
+            </div>
+          }
+          asks={
+            <div className="space-y-6">
+              <AsksSection manifest={manifest} resolutionIndex={resolutionIndex} />
+            </div>
+          }
+          architecture={
+            <div className="space-y-8">
+              <ArchitectureSection />
+              <CodeExamplesSection />
+            </div>
+          }
+          about={
+            <div className="space-y-8">
+              <ConventionsSection manifest={manifest} />
+              <ContactSection manifest={manifest} />
+            </div>
+          }
+        />
       </main>
     </div>
   );

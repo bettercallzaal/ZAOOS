@@ -3,9 +3,9 @@ topic: infrastructure
 type: comparison
 status: research-complete
 last-validated: 2026-05-25
-related-docs: 043, 080, 119, 163, 161
+related-docs: 043, 080, 119, 163, 161, 741a, 741b, 741c, 741d
 original-query: "https://github.com/pion/webrtc https://github.com/livekit https://livekit.com/"
-tier: STANDARD
+tier: DISPATCH
 ---
 
 # 741 - Pion + LiveKit: open-source WebRTC stack for ZAO voice/video + AI agents
@@ -111,6 +111,17 @@ Doc 043 (March 2026) recommended LiveKit and ZAO never adopted it. The actual st
 4. The 100ms cost at ZAO scale is ~$1/1k pm for audio - 75% audio discount per trtc.io. Effectively free for our minute volume.
 
 Migrating off this would burn engineering on a re-platform that produces zero new capability for members. Doc 591 (miniapp production-ready audit, 2026-05-02) and the Juke integration manifest treat the current stack as the shipped surface. Re-platforming is the wrong tax to pay.
+
+## Sub-docs (DISPATCH cluster, added 2026-05-25)
+
+Hub 741 was originally shipped as STANDARD tier (PR #688, merged 2026-05-25). Zaal asked for deeper coverage in the same session, so the topic was promoted to DISPATCH and four sub-agents researched independent dimensions in parallel:
+
+| Sub-doc | Dimension | Headline finding |
+|---------|-----------|------------------|
+| [741a](../741a-pion-ecosystem-internals/) | Pion internals + sister projects + production users | OpenAI ChatGPT voice runs on Pion (900M+ weekly users). Sean DuBois (Pion creator) is now at OpenAI on Realtime API. Three valid raw-Pion use cases: WHIP/WHEP ingest, custom-signaling voice agent, custom SFU. ZAO scenario: still none for now. |
+| [741b](../741b-livekit-agents-production/) | LiveKit Agents production playbook | Process-per-session model (Celery-style autoscaling). Turn-detector model saves 4 days vs VAD-only. `false_interruption_timeout=1.2s` (not 2.0s default). 60+ STT/LLM/TTS plugins. Telli runs 15k calls/day on it. |
+| [741c](../741c-voice-agent-stack-comparison/) | LiveKit Agents vs Pipecat vs Vapi vs Retell vs ElevenLabs vs OpenAI Realtime native vs Cartesia | LiveKit Agents pick from hub doc survives 7-platform scrutiny. Upset: Cartesia Sonic-3 TTS at 90ms latency is best-in-class premium voice layer. Retell at $0.125/min is cheaper if cost is the only axis. |
+| [741d](../741d-zoe-voice-agent-blueprint/) | ZOE voice-agent integration blueprint | v1 surface = Telegram voice notes (lowest friction, 1-week ship). $1.66/mo at 50 calls/mo. 5-week build timeline. 7 explicit decision gates Zaal must answer before shipping. |
 
 ## Also See
 

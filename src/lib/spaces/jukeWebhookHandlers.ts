@@ -17,6 +17,7 @@
  */
 import { autoCastToZao } from '@/lib/publish/auto-cast';
 import { logger } from '@/lib/logger';
+import { isAutoAgentJoinEnabled, joinAgentInJukeRoom } from './jukeAgentJoin';
 import {
   addParticipant,
   bumpParticipantCount,
@@ -174,6 +175,30 @@ export async function applyWebhookEvent(
   switch (eventType) {
     case 'room.started': {
       await updateJukeSpace(spaceId, { status: 'active', started_at: readOccurredAt(body) });
+      // Optional: drop ZOE into the room as a partner-scoped agent. Gated
+      // by ZAO_AUTO_AGENT_JOIN=true env var since agents are data-publish
+      // only in Juke v1 (no audio yet) and we don't have a VPS consumer
+      // for the session token yet. Flag exists so the wiring is in place
+      // the moment ZOE-on-the-VPS is ready to consume sessions.
+      if (isAutoAgentJoinEnabled()) {
+        try {
+          const join = await joinAgentInJukeRoom({ spaceId, agentName: 'ZOE' });
+          if (join.ok && join.sessionToken) {
+            logger.info('[juke/webhooks] auto agent-join ok', {
+              spaceId,
+              token_len: join.sessionToken.length,
+            });
+          } else if (!join.ok) {
+            logger.warn('[juke/webhooks] auto agent-join failed', {
+              spaceId,
+              status: join.status,
+              error: join.error,
+            });
+          }
+        } catch (err: unknown) {
+          logger.warn('[juke/webhooks] auto agent-join threw (non-fatal):', err);
+        }
+      }
       return;
     }
     case 'room.finished':

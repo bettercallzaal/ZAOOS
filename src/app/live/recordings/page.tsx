@@ -62,10 +62,16 @@ export default async function LiveRecordingsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="text-base sm:text-lg font-bold">Juke recordings</h1>
             <p className="text-xs text-gray-500">Past audio spaces hosted by {communityConfig.name}.</p>
           </div>
+          <span
+            className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full bg-[#f5a623]/10 border border-[#f5a623]/30 text-[#f5a623] text-[11px] font-bold"
+            aria-label={`${recordings.length} ${recordings.length === 1 ? 'recording' : 'recordings'}`}
+          >
+            {recordings.length}
+          </span>
         </div>
       </header>
 
@@ -147,14 +153,24 @@ function RecordingCard({ row, endedLabel }: { row: JukeSpaceRow; endedLabel: str
           </p>
         </div>
       </Link>
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 space-y-2">
+        {/* Native HTML5 player so desktop visitors can preview without opening
+            a new tab. Mobile + Safari still get a usable control set. */}
+        <audio
+          controls
+          preload="none"
+          src={recordingUrl}
+          className="w-full h-9 [&::-webkit-media-controls-panel]:bg-[#0a1628]"
+        >
+          Your browser does not support inline audio playback.
+        </audio>
         <a
           href={recordingUrl}
           target="_blank"
           rel="noreferrer noopener"
-          className="inline-flex items-center justify-center w-full px-4 py-2 rounded-xl bg-[#f5a623] hover:bg-[#ffd700] text-[#0a1628] text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
+          className="inline-flex items-center justify-center w-full px-4 py-2 rounded-xl border border-white/[0.12] bg-[#1a2a3a] text-gray-300 text-[11px] font-semibold hover:bg-[#22364a] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a623] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
         >
-          Listen to recording
+          Open recording in new tab
         </a>
       </div>
     </li>

@@ -17,7 +17,7 @@ tier: DISPATCH
 | # | Decision | Rationale |
 |---|----------|-----------|
 | 1 | USE **"Director of Ecosystem Strategy & Partnerships"** as on-camera title | Matches Feb 2024 - Present role. WaveWarZ public whitepaper lists "Internal & External Communications" — Alliance application gets the upgraded title that reflects deal-flow ownership (Coinflow ISV, Privy, Juke, Magnetiq, Empire Builder). |
-| 2 | USE **"The Connector / Bridge-Builder"** as Zaal's archetype in the brag | All three public surfaces converge on it: bettercallzaal.com headline ("The Connector"), Farcaster bio ("focused on bringing"), HackMD resume ("Swiss Army Knife engineer"), public testimonials ("creating spaces where to coordinate"). |
+| 2 | USE **"The Front Door / Gravity Well"** as Zaal's archetype (LOCKED 2026-05-25 by Zaal) | Zaal corrected the framing during draft review: he is not the rails-closer or partnerships negotiator (those are outcomes). He is the person other founders bring their own ecosystems through. The ZAO is the gravity well; WaveWarZ is what those founders discover once they're inside. Proof points: Tyler/Magnetiq, Jordan/Empire Builder, Arthur/Neynar, Ryan/Bonfires, Nicky/Juke, Vlad/Singularity, Shriyash/Apna Coding — all run their own ecosystems and orbit The ZAO. See [[feedback_zaal_wavewarz_positioning]]. |
 | 3 | USE **BetterCallZaal nickname tie-back** as mythology hook | Direct structural mirror of Ike's "Hurric4n3IKE → WaveZ" tie-back. "Got a problem? BetterCallZaal" is already on the homepage. Lands the same kind of name-foretells-destiny move. |
 | 4 | USE **The ZAO is the purpose, WaveWarZ is the role** framing | Important nuance: Ike's purpose = WaveWarZ. Zaal's purpose = The ZAO (decentralized impact network). WaveWarZ is where his role finally synthesizes every skill he stacked. Honest, and stronger than copy-pasting Ike's "purpose" line. |
 | 5 | USE Solana volume + ZAO scale + Coinflow rail as the proof points | Concrete, specific, verifiable: $50-60K+ trading volume, 735 battles, 472 SOL, 188 ZAO members already trading, Coinflow ISV closed (merchantID "wavestation"). |
@@ -220,11 +220,15 @@ Ike's structure decoded:
 6. Mythology hook (Hurricane Ike + jersey 43)
 7. Tie-back (name foretold the destiny)
 
-### v1 — "The Connector finally finds the rail" (closest mirror of Ike's shape)
+### v3 — "The Front Door" (LOCKED ANGLE, 2026-05-25)
+
+> After years of accumulating skills from completely different worlds — Eagle Scout discipline and ski patrol training in the mountains of Maine, a BS in Electrical Engineering from RIT, a $1.5 million robotics project at PCC Structurals that delivered seven-times throughput, the 2022 bear market revelation that software could not just compute but actually move value, founding The ZAO music collective in the depth of crypto winter when only the serious people were still building, running ninety consecutive weeks of fractal Respect governance, producing ZAO-PALOOZA at NFT NYC and ZAO-CHELLA at Miami Art Basel from a six-person team on a six-week runway, publishing four hundred newsletters building in public, hosting twenty episodes of the BCZ YapZ builder podcast, and quietly building a fourteen-brand ecosystem out of a corner of rural Maine where the blockchain exposure was zero — I have finally found my role. I'm not the loudest person in the room and I'm not the one closing the cap table. I'm the person other founders bring their own ecosystems through. Tyler from Magnetiq, Jordan from Empire Builder, Arthur from Neynar, Ryan from Bonfires, Nicky from Juke, Vlad from Singularity, Shriyash from Apna Coding with his fifty thousand developers — they all walked through The ZAO because that's where they meet each other. And once they're in, they discover WaveWarZ. That's not partnership development. That's gravity. WaveWarZ is the first global music battle league that has ever existed and it doesn't need to chase distribution because The ZAO already pulls in the operators who can carry it. They call me BetterCallZaal because when builders and ecosystems need a room to walk into, somebody calls. Little did I know that nickname would foretell the role I would play — not the closer, not the founder, the front door. The WaveZ hitting the world right now? They flow through it.
+
+### v1 — "The Connector finally finds the rail" (SUPERSEDED by v3 — kept for reference)
 
 > After years of searching and accumulating skills — discipline and risk-reading from Eagle Scout work and ski patrol in the mountains of Maine, systems thinking from a BS in Electrical Engineering at RIT, running a $1.5 million robotics project that delivered seven-times throughput as an automation engineer at PCC Structurals, learning during the 2022 bear market that software could not just compute but actually move value, founding The ZAO music collective in the depths of crypto winter when only the serious people were still building, running ninety consecutive weeks of fractal Respect governance, producing ZAO-PALOOZA at NFT NYC and ZAO-CHELLA at Miami Art Basel from a six-person team on a six-week runway, publishing four hundred daily newsletters building in public, hosting twenty episodes of the BCZ YapZ builder podcast, and walking into room after room to close the rails (Coinflow as the fiat on-ramp, Privy as the onboarding, Juke as the audio, Magnetiq as the IRL, Empire Builder as the rewards) — I have finally found my role. The thing that ties together every system I have ever built and every person I have ever introduced. WaveWarZ. We are building the first global music battle league that has ever existed, and I am the connector who turns a Solana platform into an ecosystem: $60K+ already traded, seven hundred and thirty-five battles already run, The ZAO's 188 members already trading and watching nightly, every rail in place because somebody had to walk into the room and close it. My brand for years has been BetterCallZaal because when artists, builders, and ecosystems hit a problem, they call. Little did I know that nickname would foretell the role I would play in the WaveZ that are about to hit the world…
 
-### v2 — "The bridge-builder finds a sport worth bridging" (sharper thesis)
+### v2 — "The bridge-builder finds a sport worth bridging" (SUPERSEDED by v3 — kept for reference)
 
 > After years of building things people could actually touch — robotic systems that moved metal through factories, a $1.5 million automation project at PCC Structurals that pulled seven-times throughput out of a manufacturing line, an Electrical Engineering degree from RIT spent learning that the hardest part of any system is the interface between two things that were never meant to talk — I crossed over into software during the 2022 bear market and found something that broke me open. Software could not just compute. Software could move value. I founded The ZAO music collective that winter when most of crypto was leaving the room, ran ninety consecutive weeks of fractal Respect governance, produced ZAO-PALOOZA at NFT NYC and ZAO-CHELLA at Art Basel with six weeks and a six-person team, shipped four hundred newsletters building in public, started a builder podcast that's run twenty episodes, and relocated to a corner of rural Maine where the blockchain exposure was zero — because building bridges between two things that were never meant to talk is the only thing I have ever actually been good at. WaveWarZ is the synthesis. The first global music battle league that has ever existed runs on Solana because I closed Coinflow as the fiat rail, Privy as the onboarding rail, Juke as the audio rail, Magnetiq as the IRL rail, and brought The ZAO's 188 members in as the first thousand live trades. They call me BetterCallZaal because when artists, builders, and ecosystems need a rail built — somebody calls. The WaveZ hitting the world right now? That's what happens when a Maine engineer who builds bridges between things finally finds a sport worth bridging the world around.
 
@@ -234,15 +238,15 @@ Script context (verbatim from user):
 
 > [ZAAL] "I'm Zaal — I founded The ZAO music collective and I'm [his role on WaveWarz]. [His brag line here.]"
 
-Three options, distinct angles:
+Four options, distinct angles. Zaal locked the **gravity-well / front-door** angle 2026-05-25 — C-family wins; A + B kept for reference.
 
-| # | Line | Angle |
-|---|---|---|
-| A | "I'm Zaal. I founded The ZAO music collective and I'm Director of Ecosystem Strategy & Partnerships. **I close the rails that turn a Solana platform into an ecosystem.**" | Rails / partnerships angle. Most direct map to title. |
-| B | "I'm Zaal. I founded The ZAO music collective and I'm Director of Ecosystem Strategy & Partnerships. **If WaveWarZ has a deal, a partner, or a room — I closed it.**" | Closer / dealmaker angle. Punchier, matches Samantha's "I build from the ground up and ship" energy. |
-| C | "I'm Zaal. I founded The ZAO music collective and I'm Director of Ecosystem Strategy & Partnerships. **I built a 14-brand ecosystem around music ownership — WaveWarZ is the engine.**" | Ecosystem-thesis angle. Bigger swing, ties brand work to WaveWarZ. |
-
-**Recommended: B.** Matches the cadence + register of Samantha's line ("I build from the ground up and ship"). Punchier than A. More personal than C.
+| # | Line | Angle | Status |
+|---|---|---|---|
+| **C1** | "I'm Zaal. I founded The ZAO music collective and I'm Director of Ecosystem Strategy & Partnerships. **I bring ecosystem founders into The ZAO — WaveWarZ is what they take home.**" | Gravity-well / front-door (~12 words). Punchiest, mirrors Samantha's cadence. | **LOCKED — RECOMMENDED** |
+| C2 | "...**I bring founders with their own ecosystems into The ZAO — WaveWarZ is what they find when they get there.**" | Same angle, more setup (~16 words). | Alt |
+| C3 | "...**I'm the front door for founders who already run ecosystems — they come for The ZAO, they leave talking about WaveWarZ.**" | Same angle, fullest (~21 words). | Alt |
+| A | "...**I close the rails that turn a Solana platform into an ecosystem.**" | Rails / partnerships. | SUPERSEDED — wrong frame |
+| B | "...**If WaveWarZ has a deal, a partner, or a room — I closed it.**" | Closer / dealmaker. | SUPERSEDED — wrong frame |
 
 ## Also See
 
@@ -257,13 +261,15 @@ Three options, distinct angles:
 
 ## Next Actions
 
-| Action | Owner | Type | By When |
-|--------|-------|------|---------|
-| Pick v1 vs v2 brag paragraph + optional edits | @Zaal | Decision | Before Alliance submission deadline |
-| Pick script brag line A / B / C | @Zaal | Decision | Before video shoot |
-| Confirm "Director of Ecosystem Strategy & Partnerships" is the title Zaal wants public for Alliance + downstream materials | @Zaal | Decision | Before submission |
-| Escalate PARTIAL public-footprint sources (X profile, Nexus Hub JS, YouTube channel) via Playwright if needed for follow-up | @Claude | Follow-up | When next public-bio refresh is requested |
-| Update memory `user_zaal.md` + create `user_zaal_full_bio.md` with the locked title + brag final | @Claude | Memory write | After Zaal locks v1/v2 |
+| Action | Owner | Type | By When | Status |
+|--------|-------|------|---------|--------|
+| Lock gravity-well positioning (front-door, not closer) | @Zaal | Decision | 2026-05-25 | DONE |
+| Pick brag paragraph version | @Zaal | Decision | DONE — v3 locked | DONE |
+| Pick script brag line | @Zaal | Decision | DONE — C1 locked | DONE |
+| Save positioning to memory | @Claude | Memory write | 2026-05-25 | DONE — `feedback_zaal_wavewarz_positioning.md` |
+| Confirm "Director of Ecosystem Strategy & Partnerships" title for downstream materials beyond Alliance | @Zaal | Decision | When next bio published | Pending |
+| Apply v3 brag + C1 line into the Alliance video script + written submission | @Zaal | Application | Before Alliance deadline | Pending |
+| Escalate 3 PARTIAL public-footprint sources via Playwright on next refresh | @Claude | Follow-up | Next bio request | Queued |
 
 ## Sources
 

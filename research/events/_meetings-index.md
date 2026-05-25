@@ -4,6 +4,14 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-05-25 14:26 | Leeward x Zaal WebRTC + Pion + LiveKit handoff (2nd call) | ZAO Devz | Zaal, Leeward (Lee Edward Bound) | [752](752-leeward-x-zaal-webrtc-pion-livekit-handoff-may25/) | 7 |
+| 2026-05-23 8:39 | Zaal + Iman silent / idle session | ZAO Devz | Zaal, Iman | [749](749-zaal-iman-may23-silent-session/) | 0 |
+| 2026-05-23 7:53 | ZABAL Games pitch to ThyRev + Iman hackathon recap | ZABAL Games | Zaal, ThyRev, Iman | [748](748-zabal-games-thyrev-hackathon-recap-may23/) | 11 |
+| 2026-05-21 8:03 | Cowork tracker task-creation demo (COC Concerts six post one) | ZAO Devz | Iman, Zaal, ThyRev | [747](747-cowork-tracker-task-demo-may21/) | 3 |
+| 2026-05-21 7:51 | ThyRev cowork tracker onboarding | ZAO Devz | Zaal, ThyRev, Iman | [746](746-thyrev-iman-cowork-tracker-onboarding-may21/) | 3 |
+| 2026-05-19 9:52 | Jose Acabrera x Iman regen / Fractal intro | ZAO OS / Fractal | Zaal, Jose Acabrera, Iman | [745](745-jose-acabrera-iman-regen-intro-may19/) | 6 |
+| 2026-05-19 9:04 | Deez (d333z) call - token launcher + ZABAL Games pitch | ZAO OS / ZABAL Games | Zaal, deez, ThyRev, Iman | [751](751-deez-token-launcher-pitch-may19/) | 11 |
+| 2026-05-19 5:47 | Zowscribe Discord bot setup | ZAO OS dev | Zaal | [750](750-zowscribe-discord-bot-setup-may19/) | 2 |
 | 2026-05-24 | Vlad (singularity.diy) x Zaal Restream - Fractal governance + Singularity funding launchpad | Networking / Fractal | Zaal, Vlad | [738](738-vlad-singularity-fractal-call-may24/) | 7 |
 | 2026-05-23 | Shriyash Soni x Zaal intro call (Apna Coding, India - ZABAL Games + DevCon) | Networking | Zaal, Shriyash Soni, IMan | [736](736-shriyash-soni-intro-call-may23/) | 9 |
 | 2026-05-23 | ZAO Devz call - CannonJones (ZAO Cards) + ZABAL Games + Iman hackathon recap | ZAO Devz | Zaal, CannonJones, Iman | [725](725-cannon-zabal-iman-hackathon-may23/) | 14 |

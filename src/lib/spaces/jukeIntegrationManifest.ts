@@ -255,6 +255,19 @@ const SHIPPED: ShippedFeature[] = [
     reference: 'Branches on Nicky 2026-05-24 ended_via payload addition.',
   },
   {
+    id: 'developer-reads-and-observability',
+    title: 'Consumer code for Juke developer reads + rate-limit observability',
+    description:
+      "Wraps Juke's PR #175 ship (2026-05-25): GET /v1/developer/spaces/{id} returns RoomDetailResponse (status + participants + recording in one call), GET /v1/developer/webhooks/{id} returns delivery health, DELETE /v1/developer/webhooks/{id} cleans up orphans (already existed). New helper at src/lib/spaces/juke-api-reads.ts surfaces all three behind one client + extracts X-Juke-Rate-Limit-Limit / Remaining / Reset from every response, logging a warn when remaining drops below 20% of the limit. Stale-room cron at /api/cron/juke-stale-rooms now uses GET /spaces/{id} as the authoritative source - only flips a row to ended when Juke confirms ended (or 404s), trusting Juke over our webhook timeline. Fallback to the older heuristic when JUKE_API_KEY is absent (local/preview). Admin route /api/juke/admin/delete-webhook wraps DELETE with an introspection-before-delete audit log.",
+    shippedAt: '2026-05-25',
+    files: [
+      'src/lib/spaces/juke-api-reads.ts',
+      'src/app/api/juke/admin/delete-webhook/route.ts',
+      'src/app/api/cron/juke-stale-rooms/route.ts',
+    ],
+    reference: "Nicky 2026-05-25 ship: GET reads + X-Juke-Rate-Limit-* + X-Juke-Idempotency-Key headers (PR #175).",
+  },
+  {
     id: 'host-end-space-button',
     title: 'Host "End space" button on /live/{id} + admin end-space route',
     description:
@@ -310,6 +323,30 @@ const OPEN_ASKS: OpenAsk[] = [
       "Surfaced 2026-05-24 while debugging the missing room.finished webhook. Iframe Leave is a pure LiveKit room.disconnect() with anon: participant identity — no API call to api.juke.audio, so the room stays alive on Juke's side until LiveKit's empty-room 300s timeout. Additionally Juke's own end_room handler was flipping Room.status to 'ended' before livekit teardown, so the room_finished dispatcher's WHERE status='active' filter excluded the row and the outbound webhook silently never fired (same blind spot for iOS host-end). We need either a developer POST /v1/developer/spaces/{id}/end (we'd wire it to a host 'End space' button on /live/{id}), OR room.finished firing synchronously when end_room flips status (not after a 5min wait). Confirmed by Nicky 2026-05-24: both ship in their PR #174 (POST /v1/developer/spaces/{room_id}/end, X-Juke-Api-Key auth, idempotent, fires room.finished inline with ended_via: 'host'|'api' on the payload).",
     blocks: '/spaces showing dead rooms as Live + recap-cast trigger never firing for host-ended rooms',
     priority: 'p0',
+  },
+  {
+    id: 'webhook-delivery-log',
+    title: 'GET /v1/developer/webhooks/{id}/deliveries - delivery audit log',
+    reason:
+      'Nicky filed as issue #177 on 2026-05-25 (P1). We need per-delivery visibility (timestamp, event_type, status, retry count, last_error, body) so when our /api/juke/webhooks endpoint was down during a retry window we can see exactly what was dropped. Unblocks the webhook-replay endpoint (issue #181) - replay needs a delivery id to target.',
+    blocks: 'Detecting missed webhooks during downtime + queueing replays',
+    priority: 'p1',
+  },
+  {
+    id: 'participant-role-changed',
+    title: 'participant.role_changed webhook event',
+    reason:
+      "Nicky filed as issue #183 on 2026-05-25 (P1). Fires when a host promotes a hand-raiser to speaker. Real social signal - we'd cast 'X just stepped up to speak in {title}' to /zao, driving organic discovery of who is contributing. Payload shape we want: { participant_fid, old_role, new_role, occurred_at }.",
+    blocks: 'Speaker-promotion recap casts + contributor discovery',
+    priority: 'p1',
+  },
+  {
+    id: 'agent-visibility-flag',
+    title: 'Agent silent-observer flag (hide ZOE from iframe avatar bar)',
+    reason:
+      'Nicky filed as issue #190 on 2026-05-25 (P1). When ZOE joins as a partner-scoped agent for note-taking, we want her hidden from the iframe avatar bar / participant count to avoid the "why is there a robot in the room" UX surprise. Pairs with ZAO_AUTO_AGENT_JOIN going live - without this flag, every ZAO room would visibly grow a robot.',
+    blocks: 'Clean UX for ZOE-in-Juke once we flip ZAO_AUTO_AGENT_JOIN',
+    priority: 'p1',
   },
 ];
 
@@ -387,7 +424,7 @@ export const INTEGRATION_ARCHITECTURE_ASCII = String.raw`
 
 export function getJukeIntegrationManifest(): IntegrationManifest {
   return {
-    version: '1.4',
+    version: '1.5',
     generated_at: new Date().toISOString(),
     about: {
       name: 'The ZAO',

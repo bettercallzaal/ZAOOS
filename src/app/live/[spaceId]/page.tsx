@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getSessionData } from '@/lib/auth/session';
 import { EndJukeSpaceButton } from '@/components/spaces/EndJukeSpaceButton';
 import { JukeEmbed } from '@/components/spaces/JukeEmbed';
+import { JukeListenerBadge } from '@/components/spaces/JukeListenerBadge';
 import {
   isValidJukeSpaceId,
   jukeAppDeeplinkUrl,
@@ -130,6 +131,12 @@ export default async function LivePage({ params, searchParams }: LivePageProps) 
       </header>
 
       <main className="flex flex-1 flex-col items-center px-4 py-6 gap-4">
+        {!isEnded && (
+          <JukeListenerBadge
+            participants={row?.participants}
+            participantCount={row?.participant_count ?? 0}
+          />
+        )}
         {isEnded && recordingUrl ? (
           <div className="w-full max-w-md flex flex-col gap-3 bg-[#0d1b2a] border border-white/[0.08] rounded-2xl p-6 text-center">
             <h2 className="text-white font-bold text-base">This space has ended</h2>

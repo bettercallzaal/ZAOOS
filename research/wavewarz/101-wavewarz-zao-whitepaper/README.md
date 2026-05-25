@@ -1,15 +1,16 @@
 ---
 topic: wavewarz
 type: strategic-guide
-status: research-complete
+status: superseded
 last-validated: 2026-05-21
+superseded-by: "743"
 original-query: "Synthesize WaveWarZ platform mechanics and artist discovery into ZAO OS integration strategy (reconstructed)"
 tier: production
 ---
 
-# 101 — WaveWarZ × ZAO OS: Integration Whitepaper
+# 101 — WaveWarZ × ZAO OS: Integration Whitepaper [SUPERSEDED]
 
-> **Status:** Research complete
+> **Status:** SUPERSEDED 2026-05-25 by [Doc 743 - WaveWarZ Whitepaper v2 Deep Dive](../743-wavewarz-whitepaper-v2-deep-dive/). Doc 743 incorporates the official Hackmd whitepaper v1 (Oct 2025), the live Intelligence + Analytics dashboards, and the 7-month delta. This doc is kept for historical reference - do not cite for current state. Numbers + roadmap below are March 21, 2026 baseline.
 > **Date:** March 21, 2026
 > **Goal:** Synthesize docs 95–100 into a comprehensive strategic integration document — what WaveWarZ is, how it fits ZAO OS, what we build, and in what order
 

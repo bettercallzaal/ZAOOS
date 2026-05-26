@@ -24,6 +24,13 @@ const ROOM_MODES: { id: RoomMode; label: string; description: string; badge: str
 ];
 
 const PROVIDERS: { id: AudioProvider; label: string; description: string; badge: string }[] = [
+  // Juke first - it's the default + headline surface. Order matters visually.
+  {
+    id: 'juke',
+    label: 'Juke',
+    description: 'Farcaster-native audio. Anyone with the link listens, SIWF to speak. Best for public ZAO events.',
+    badge: 'FC',
+  },
   {
     id: 'stream',
     label: 'Stream.io',
@@ -35,12 +42,6 @@ const PROVIDERS: { id: AudioProvider; label: string; description: string; badge:
     label: '100ms',
     description: 'Live transcription, best for fractal meetings.',
     badge: 'CALL',
-  },
-  {
-    id: 'juke',
-    label: 'Juke',
-    description: 'Farcaster-native audio. Anyone with the link listens, SIWF to speak. Best for public ZAO events.',
-    badge: 'FC',
   },
 ];
 

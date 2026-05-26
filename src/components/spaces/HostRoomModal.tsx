@@ -100,14 +100,37 @@ interface HostRoomModalProps {
     gateConfig?: GateConfig | null,
     provider?: AudioProvider,
     roomMode?: RoomMode,
+    jukeOpts?: JukeCreateOptions,
   ) => Promise<void>;
+}
+
+/**
+ * Juke-specific create-time options. Plumbed through HostRoomModal when the
+ * Juke tile is selected; ignored by Stream.io + 100ms paths.
+ */
+export interface JukeCreateOptions {
+  /** Record the room - drives /live/recordings shelf + recording.ready cast. */
+  record: boolean;
+  /** Let agents (e.g. ZOE) join the room via partner-scoped agent-join. */
+  allowAgents: boolean;
+  /** Have Juke post an announcement cast on Farcaster when the space opens. */
+  announceCast?: boolean;
 }
 
 export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [theme, setTheme] = useState<RoomTheme>('default');
-  const [provider, setProvider] = useState<AudioProvider>(communityConfig.audioProvider ?? 'stream');
+  // Juke is the default provider - "Live audio on Farcaster" is the headline
+  // surface today. communityConfig.audioProvider can override if a forked
+  // community wants Stream.io / 100ms as the default.
+  const [provider, setProvider] = useState<AudioProvider>(communityConfig.audioProvider ?? 'juke');
+  // Juke-specific defaults: record=true (every space becomes a recording
+  // artifact unless host opts out), allowAgents=true (gates ZOE auto-join when
+  // we flip ZAO_AUTO_AGENT_JOIN once Nicky's #190 visibility flag ships).
+  const [jukeRecord, setJukeRecord] = useState<boolean>(true);
+  const [jukeAllowAgents, setJukeAllowAgents] = useState<boolean>(true);
+  const [jukeAnnounceCast, setJukeAnnounceCast] = useState<boolean>(false);
   const [roomMode, setRoomMode] = useState<RoomMode>('stage');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -126,7 +149,21 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
     setLoading(true);
     setError(null);
     try {
-      await onCreateRoom(title.trim(), description.trim(), theme, gateConfig, provider, roomMode);
+      await onCreateRoom(
+        title.trim(),
+        description.trim(),
+        theme,
+        gateConfig,
+        provider,
+        roomMode,
+        provider === 'juke'
+          ? {
+              record: jukeRecord,
+              allowAgents: jukeAllowAgents,
+              announceCast: jukeAnnounceCast,
+            }
+          : undefined,
+      );
       setTitle('');
       setDescription('');
       setTheme('default');
@@ -328,18 +365,51 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
               </p>
             </div>
           ) : (
-            <div className="mb-6">
-              <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
-                Juke notes
-              </label>
-              <p className="text-gray-500 text-xs leading-relaxed">
-                The room lives on Juke. After creating you land on{' '}
-                <span className="text-[#f5a623]">/live/&#123;id&#125;</span> with the keyless
-                iframe. Listening is anonymous; speaking prompts Sign In With Farcaster inside the
-                embed. To create from a non-admin account use{' '}
-                <span className="text-[#f5a623]">/live/create</span> with the team password.
-              </p>
-            </div>
+            <>
+              <div className="mb-5">
+                <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
+                  Juke options
+                </label>
+                <div className="space-y-2">
+                  <JukeToggle
+                    id="juke-record"
+                    label="Record the space"
+                    hint="Drops a Juke recording into /live/recordings + auto-casts the listen-back."
+                    checked={jukeRecord}
+                    disabled={loading}
+                    onChange={setJukeRecord}
+                  />
+                  <JukeToggle
+                    id="juke-allow-agents"
+                    label="Allow agents (ZOE)"
+                    hint="Lets ZOE join silently for note-taking. Activated when ZAO_AUTO_AGENT_JOIN flips on."
+                    checked={jukeAllowAgents}
+                    disabled={loading}
+                    onChange={setJukeAllowAgents}
+                  />
+                  <JukeToggle
+                    id="juke-announce-cast"
+                    label="Announce on Farcaster"
+                    hint="Asks Juke to post a kickoff cast when the space opens."
+                    checked={jukeAnnounceCast}
+                    disabled={loading}
+                    onChange={setJukeAnnounceCast}
+                  />
+                </div>
+              </div>
+              <div className="mb-6">
+                <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-2.5 block">
+                  Juke notes
+                </label>
+                <p className="text-gray-500 text-xs leading-relaxed">
+                  The room lives on Juke. After creating you land on{' '}
+                  <span className="text-[#f5a623]">/live/&#123;id&#125;</span> with the keyless
+                  iframe. Listening is anonymous; speaking prompts Sign In With Farcaster inside the
+                  embed. To create from a non-admin account use{' '}
+                  <span className="text-[#f5a623]">/live/create</span> with the team password.
+                </p>
+              </div>
+            </>
           )}
 
           {/* Actions */}
@@ -377,5 +447,49 @@ export function HostRoomModal({ isOpen, onClose, onCreateRoom }: HostRoomModalPr
         </form>
       </div>
     </div>
+  );
+}
+
+/**
+ * Compact toggle row for the Juke options block. Visual style matches the
+ * surrounding modal (border + bg + gold accent on checked).
+ */
+function JukeToggle({
+  id,
+  label,
+  hint,
+  checked,
+  disabled,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  hint: string;
+  checked: boolean;
+  disabled: boolean;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <label
+      htmlFor={id}
+      className={`flex items-start gap-3 px-3 py-2.5 rounded-xl border cursor-pointer transition-colors ${
+        checked
+          ? 'border-[#f5a623]/40 bg-[#f5a623]/[0.06]'
+          : 'border-white/[0.08] bg-[#0a1628] hover:border-white/[0.12]'
+      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+    >
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+        className="mt-0.5 h-4 w-4 rounded border-white/20 bg-[#0d1b2a] text-[#f5a623] focus:ring-[#f5a623] focus:ring-offset-0"
+      />
+      <span className="flex-1 min-w-0">
+        <span className="block text-sm font-medium text-white">{label}</span>
+        <span className="block text-[11px] text-gray-500 leading-snug mt-0.5">{hint}</span>
+      </span>
+    </label>
   );
 }

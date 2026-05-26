@@ -46,6 +46,14 @@ const createSpaceSchema = z.object({
   announceCast: z.boolean().optional(),
   /** When true, AI agents may join the room. */
   allowAgents: z.boolean().optional(),
+  /**
+   * When true, Juke records the room. recording.ready webhook lands when the
+   * file is ready and drives the /live/recordings shelf + "Recording up" cast.
+   * ZAO default is true so every space contributes to the archive.
+   */
+  record: z.boolean().optional(),
+  /** Space description shown inside the Juke embed. */
+  description: z.string().trim().max(500).optional(),
   /** Shared create-password — an alternative to an admin session. */
   password: z.string().optional(),
 });

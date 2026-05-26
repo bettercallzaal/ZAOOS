@@ -46,6 +46,16 @@ export interface CreateJukeSpaceInput {
   announceCast?: boolean;
   /** When true, AI agents are permitted to join the room. */
   allowAgents?: boolean;
+  /**
+   * When true, Juke records the room. The recording.ready webhook fires when
+   * the file lands and `recording_url` populates on the juke_spaces row, which
+   * also drives the auto "Recording up" cast + /live/recordings shelf.
+   * Default OFF on Juke's side per llms.txt; ZAO defaults this ON in the UI
+   * because the recording is what powers the post-live discovery loop.
+   */
+  record?: boolean;
+  /** Optional space description shown inside the Juke embed. */
+  description?: string;
 }
 
 /** A Juke space created through the developer API. */
@@ -125,9 +135,11 @@ export async function createJukeSpace(
   // Translate the camelCase ZAO shape into Juke's documented snake_case body.
   const body = JSON.stringify({
     title: input.title,
+    description: input.description ?? undefined,
     scheduled_at: input.scheduledAt ?? null,
     announce_cast: input.announceCast ?? false,
     allow_agents: input.allowAgents ?? false,
+    record: input.record ?? false,
   });
 
   let response: Response;

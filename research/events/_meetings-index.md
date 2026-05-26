@@ -5,6 +5,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
 | 2026-05-25 14:26 | Leeward x Zaal WebRTC + Pion + LiveKit handoff (2nd call) | ZAO Devz | Zaal, Leeward (Lee Edward Bound) | [752](752-leeward-x-zaal-webrtc-pion-livekit-handoff-may25/) | 7 |
+| 2026-05-23 9:12 | ZAO coworking - 1h17m, mostly background music + brief Discord-bot-on-VPS chat | ZAO Devz | Zaal, Iman, ThyRev, z3rodol | [753](753-may23-zaal-iman-thyrev-z3rodol-coworking/) | 3 |
 | 2026-05-23 8:39 | Zaal + Iman silent / idle session | ZAO Devz | Zaal, Iman | [749](749-zaal-iman-may23-silent-session/) | 0 |
 | 2026-05-23 7:53 | ZABAL Games pitch to ThyRev + Iman hackathon recap | ZABAL Games | Zaal, ThyRev, Iman | [748](748-zabal-games-thyrev-hackathon-recap-may23/) | 11 |
 | 2026-05-21 8:03 | Cowork tracker task-creation demo (COC Concerts six post one) | ZAO Devz | Iman, Zaal, ThyRev | [747](747-cowork-tracker-task-demo-may21/) | 3 |

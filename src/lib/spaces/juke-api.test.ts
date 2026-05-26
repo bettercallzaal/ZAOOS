@@ -108,6 +108,7 @@ describe('createJukeSpace', () => {
       scheduled_at: '2026-06-01T18:00:00.000Z',
       announce_cast: true,
       allow_agents: true,
+      record: false,
     });
   });
 
@@ -122,6 +123,7 @@ describe('createJukeSpace', () => {
       scheduled_at: null,
       announce_cast: false,
       allow_agents: false,
+      record: false,
     });
   });
 

@@ -75,17 +75,26 @@ export default function PublicSpacesPage() {
     gateConfig?: GateConfig | null,
     provider: AudioProvider = 'stream',
     roomMode: RoomMode = 'stage',
+    jukeOpts?: { record: boolean; allowAgents: boolean; announceCast?: boolean },
   ) => {
     if (!user) throw new Error('Not authenticated');
 
     // Juke is owned + hosted on juke.audio — Path B via /api/juke/space mints
     // the room on Juke's side and we land on /live/{spaceId} (keyless iframe).
-    // ZAO concepts (theme, room_mode, gate_config, slug) do not apply to Juke.
+    // ZAO concepts (theme, room_mode, gate_config, slug) do not apply to Juke;
+    // jukeOpts carries the record / allowAgents / announceCast flags from
+    // HostRoomModal so they reach Juke's create payload.
     if (provider === 'juke') {
       const res = await fetch('/api/juke/space', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({
+          title,
+          description: description || undefined,
+          record: jukeOpts?.record ?? true,
+          allowAgents: jukeOpts?.allowAgents ?? true,
+          announceCast: jukeOpts?.announceCast ?? false,
+        }),
       });
       if (res.status === 401) {
         throw new Error(

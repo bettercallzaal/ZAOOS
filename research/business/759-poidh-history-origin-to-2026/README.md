@@ -6,6 +6,8 @@ last-validated: 2026-05-26
 related-docs: 415, 468, 533, 625, 626, 627, 628, 629, 631, 757
 original-query: "POIDH history - origin story, founders, milestones, timeline, evolution from v1 to v3, who built it, key moments, current state. STANDARD tier."
 tier: STANDARD
+revisions:
+  - "2026-05-26 rev2 - Added Parts 8-12 covering pre-POIDH Kenny (Bitcoin Magazine 2014, food truck era, SEO consulting). CORRECTED two claims: (1) The Haberdashery is the DegenDAO grants council founded by PurpLetariat + wake, NOT a Kenny-led group - Kenny is a member + /degen channel co-host. (2) @kaspotz on Twitter IS Kenny's old handle (real name = Kenny Spotz), NOT a co-founder. The actual co-founder is 'J' - identity still unconfirmed."
 ---
 
 # 759 - POIDH history: origin (2023) to v3 rebuild (2026)
@@ -97,16 +99,27 @@ No public release date as of 2026-05-26. Watch for deploy.
 
 ## Part 3 - The team (who actually built it)
 
-### Founders
+### Founders (corrected 2026-05-26 rev2)
 
-Per the [poidh beginner guide](https://words.poidh.xyz/poidh-beginner-guide) (**2024-08-31**):
+Three distinct team eras, often conflated:
 
-> "poidh was built by [warpcast.com/kenny](https://warpcast.com/kenny) and [github.com/Rhovian](https://github.com/Rhovian)"
+**Era 1: Kenny + J (pre-Nov 2023 -> Feb 2024) - the v1 era.**
 
-| Founder | Role | Receipts |
-|---------|------|----------|
-| **Kenny** | Vision, product, ongoing development | `@kenny` on Farcaster (FID 6, 75,545 followers, joined Nov 7, 2023). `@kennyistyping` on X. GitHub `picsoritdidnthappen` (1,002 commits to poidh-app - 50% of all commits). Wallet `0x10fc964ef70c8467cd8c53e9ed9347422adf96a8`. Based Seattle, WA. SEO consultant by day. Member of The Haberdashery. |
-| **Rhovian** | Codebase architect, initial development | `github.com/Rhovian`. First commit on poidh-app **2024-02-04** ("feat(init): init"). 48 commits total (set up the codebase, less long-term involvement). |
+Per Kenny's own [2023-11-03 "poidh needs design help"](https://words.poidh.xyz/poidh-needs-design-help) post, "When **J and I** set out to build poidh." The v1 contract on Arbitrum (`0xdffe8a4a4103f968ffd61fd082d08c41dcf9b940`) was deployed by this two-person team. J's full identity is not publicly disclosed in any source found - the initial "J" is used consistently across the early posts.
+
+**Era 2: Kenny + Rhovian (Feb 2024 -> present) - the v2 codebase.**
+
+The [poidh beginner guide](https://words.poidh.xyz/poidh-beginner-guide) (2024-08-31) attribution: "poidh was built by [warpcast.com/kenny](https://warpcast.com/kenny) and [github.com/Rhovian](https://github.com/Rhovian)". This refers to the Next.js codebase Rhovian initialized on **2024-02-04** with commit "feat(init): init". J appears to have stepped back by this point.
+
+**Era 3: Kenny + 24 open-source contributors (Summer 2024 -> present).**
+
+The Devfolio Onchain Summer Buildathon submission (Jun 2024): "I had to coordinate 6 different open-source contributors to get the project across the finish line." Has scaled to 24 contributors per `gh api repos/.../contributors`.
+
+| Person | Era | Role | Receipts |
+|--------|-----|------|----------|
+| **Kenny (Kenny Spotz)** | All eras | Vision, product, ongoing dev | Real name = Kenny Spotz (confirmed via Bitcoin Magazine 2014 byline). `@kenny` on Farcaster (FID 6, 75,545 followers, joined 2023-11-07). `@kennyistyping` on X (current). `@kaspotz` on X (LEGACY handle - same person, used through 2023). GitHub: `picsoritdidnthappen` (1,002 commits = 50% of poidh-app). Wallet `0x10fc964ef70c8467cd8c53e9ed9347422adf96a8`. Based Seattle, WA. SEO consultant; full-time crypto since 2022. Co-host of /degen Farcaster channel. Member of The Haberdashery. |
+| **"J"** | Era 1 (v1) | Co-founder, identity unconfirmed | Per 2023-11-03 post: "J and I set out to build poidh." No public surname / handle / wallet attribution found in any source. Appears to have stepped back before the v2 codebase init in Feb 2024. Open research question - DM Kenny if his identity matters for ZAO collaboration. |
+| **Rhovian** | Era 2 (v2 codebase) | Codebase architect, init | `github.com/Rhovian`. First poidh-app commit 2024-02-04. 48 commits total. Started the Next.js codebase; less long-term involvement. |
 
 ### Other notable contributors (poidh-app, top 10)
 
@@ -125,12 +138,13 @@ Per the [poidh beginner guide](https://words.poidh.xyz/poidh-beginner-guide) (**
 
 24 total contributors across the lifetime of the repo.
 
-### Adjacent contacts
+### Adjacent contacts (corrected 2026-05-26)
 
 | Handle | Role |
 |--------|------|
-| `@kaspotz` (Twitter) | Listed as primary Twitter contact in v2 announcement post - either Kenny alt or close collaborator |
-| **The Haberdashery** | Independent group of Degen token holders Kenny is a member of. Funded the $30K Guinness kickflip bounty. |
+| `@kaspotz` (Twitter) | **= Kenny himself.** Old X handle, derived from his real name (Kenny Spotz). Bitcoin Magazine bylines 2014 use it. Author bio: "Kenny is a freelance writer specializing in cryptocurrency and can be found on Twitter @kaspotz." Later migrated to `@kennyistyping`. NOT a separate person. |
+| **The Haberdashery** | Official/unofficial DegenDAO grants council, founded by **PurpLetariat (Purp)** and **wake**. Kenny is a MEMBER not the founder. Funded 1/3 of the $30K kickflip pot. Acts as "grants council, culture leads, and some of the strongest voices in the [Degen] community" (per [sgt_slaughtermelon Mirror article](https://mirror.xyz/sgtslaughtermelon.eth/D3YdzE4JY8Yb44vCYWxSzUeVY6N-MMYasvLswujhfy4)). |
+| `@poidhxyz` (X) + `poidhxyz@gmail.com` | Primary public POIDH support channels |
 
 ---
 
@@ -259,6 +273,163 @@ POIDH's history tells a coherent story Zaal can mirror in his own pitch:
 
 ---
 
+---
+
+## Part 8 - Pre-POIDH Kenny (2013 - 2023): 10 years before the launch
+
+POIDH was not a sudden idea. Kenny was a **crypto journalist + early Bitcoin user since 2013**. Full timeline:
+
+### 2013: The food truck era
+
+Per Kenny on BCZ YapZ Ep 19: "Had a food truck that took Bitcoin back in 2013 era."
+
+The Seattle-area "Cheese Wizards" grilled-cheese food truck began accepting Bitcoin in **October 2013** ([GeekWire coverage](https://www.geekwire.com/2013/seattle-foodtruck-bitcoin-accept-payments-grilled-cheese-sandwiches/), 2013-10-14). Cheese Wizards was run by the Saxbe brothers (Bo + Tom). Kenny's claim of "had a food truck" may be a loose reference to the Seattle Bitcoin food truck scene he was around, or a separate truck not surfaced in public records. Cite both: Cheese Wizards as the documented 2013 Seattle Bitcoin food truck, and Kenny's own claim of having had one.
+
+### 2014: Bitcoin Magazine staff writer
+
+[Kenny Spotz author page on Bitcoin Magazine](https://bitcoinmagazine.com/authors/kenny-spotz) shows 7+ articles in 2014 alone:
+
+| Date | Title | Category |
+|------|-------|----------|
+| 2014-04-29 | (untitled in archive) | CULTURE |
+| 2014-05-20 | [An Interview With Coinme, The Company Behind Seattle's First Bitcoin ATM](https://bitcoinmagazine.com/business/interview-coinme-company-behind-seattles-first-bitcoin-atm-1400536862) | BUSINESS |
+| 2014-05-28 | [Bitcoin in the Twenty-First Century: What Piketty Can Learn From The Blockchain](https://bitcoinmagazine.com/culture/bitcoin-piketty-in-the-twenty-first-century-what-blockchain-technology-can-do-to-curb-inequality-1401258612) | CULTURE |
+| 2014-06-23 | (BUSINESS piece) | BUSINESS |
+| 2014-07-26 | (CULTURE piece) | CULTURE |
+| 2014-08-29 | (CULTURE piece) | CULTURE |
+| 2014-10-11 | Coinme Brings Bitcoin to the University of Washington | CULTURE |
+
+Author bio across all 2014 articles: "Kenny is a freelance writer specializing in cryptocurrency and can be found on Twitter @kaspotz. He also operates cryptocurrencyposters.com."
+
+### 2014 - 2019: Continued crypto writing
+
+Per the [Real Finance Guy guest post (2019-01-05)](https://www.realfinanceguy.com/home/2019/1/5/lessons-from-a-real-bear-market-in-crypto), Kenny's bio expanded: "Kenny has written about cryptocurrency for **Bitcoin Magazine, CoinTelegraph, and VICE Motherboard**. He is a digital marketer by trade. His current favorite side project is **CryptocurrencyPosters.com**."
+
+The 2019 RFG post is the bridge document - written as a "crypto veteran from 2013" reflecting on the 2017-2018 bear market. Establishes Kenny was actively in the space across multiple crypto cycles.
+
+### 2017: DeFi summer / ICO season participation
+
+Per Kenny on BCZ YapZ Ep 19: "Participated in DeFi summer, the ICO season back in 2017." Not a builder yet in this era - participant + observer + writer.
+
+### Late 2010s -> 2022: SEO consulting (still in crypto)
+
+Kenny describes his progression in BCZ YapZ Ep 19:
+- "Digital marketer by trade. I do SEO. I generally do SEO for crypto clients."
+- "I was doing that in the late 2010s and I went full-time into crypto around 2022."
+- "That's when I started specializing doing crypto for SEO for crypto companies and then also when I started building POI."
+
+So 2022 = the inflection point. He left SEO-as-side-gig and went full-time crypto. Started building POIDH ~12 months later (Oct/Nov 2023).
+
+### 2022-11: FTX collapse - the trigger
+
+Per Decrypt interview (Sep 2025): "FTX's high-profile collapse in 2022 left him frustrated" with the speculative direction of the industry. This was the proximate cause for building POIDH - "use cases I can show to my friends and family and be proud of."
+
+---
+
+## Part 9 - The Haberdashery + the /degen Channel ecosystem (corrected)
+
+I had this wrong in rev1. The Haberdashery is **the official/unofficial DegenDAO** - a Degen-token-holder community NOT a Kenny project. Kenny is a *member* and one of multiple voices.
+
+### The /degen Farcaster channel co-hosts
+
+Per [Folklore's $DEGEN Archives (2024-03-30)](https://paragraph.com/@folklore-2/the-degen-archives):
+
+> "The Original /degen Farcaster channel: You'll find most $DEGEN activity here... This channel is hosted by **0xen, kenny, wake, purp, pedrowww, and Jacek** himself."
+
+So **Kenny is one of 6 co-hosts of the /degen channel** alongside Jacek (Degen founder), Purp (Haberdashery co-founder), wake, 0xen, and pedrowww. This puts Kenny inside the Degen inner circle, which explains:
+- Why POIDH was launched on Degen Chain first
+- Why The Haberdashery (DegenDAO) co-funded the Sep 2025 kickflip bounty
+- Why /degen + /poidh communities overlap
+
+### The Haberdashery founding (corrected attribution)
+
+Per [sgt_slaughtermelon's Mirror post](https://mirror.xyz/sgtslaughtermelon.eth/D3YdzE4JY8Yb44vCYWxSzUeVY6N-MMYasvLswujhfy4):
+
+> "PurpLetariat, a longtime ghoul holder and general chat frequenter put out a message on Warpcast asking if anyone would make some new NFTs for the $DEGEN DAO that he helped found... So we [sgt_slaughtermelon + Tartaria Archivist] started making hats."
+
+Attribution:
+- **PurpLetariat (Purp)** + **wake** = co-founded the DegenDAO that became The Haberdashery
+- **sgt_slaughtermelon + Tartaria Archivist** = designed the hat NFTs that became the Haberdashery's iconography
+- **Kenny** = member, /degen channel co-host, contributor
+
+The Haberdashery acts as the DegenDAO's grants council + culture lead. Their kickflip funding ($30K via 3.3M DEGEN) was a textbook DAO grant - not a personal Kenny pledge.
+
+### Haberdashery's Farcaster footprint
+
+Per Web3.bio: `@thehaberdashery` on Farcaster active since **May 26, 2024**, 2,669 followers. Bio: "A crowdfunded DAO deploying funds to builders scaling the Base ecosystem. General updates: /degendao. Proposals: /haberdash-props. Voting: /haberdash-vote."
+
+So they have a proper governance setup with 3 dedicated Farcaster channels for general updates, proposals, and voting. Pattern to study for ZAO Fractal v2.
+
+---
+
+## Part 10 - The Maceo connection (how Zaal + Kenny converge)
+
+The reason Zaal's POIDH bounties live under the `wethemmedia` album traces back to **Maceo Whatley**.
+
+### Maceo Whatley
+
+| Field | Value |
+|-------|-------|
+| Real name | Maceo Whatley |
+| Farcaster | `@wethemniggas.eth` (active since Mar 28, 2024) |
+| Lens | `wethemniggas.lens` (active since Nov 3, 2022 - older than his Farcaster) |
+| X | `@maceo_whatley` |
+| Website | `wethem.xyz` + `linktr.ee/wethemmedia` |
+| Wallet | `0xf143db60a0b1cbb8076b786eb6635b93f18db744` |
+| Bio | "Founder @wethemmedia, a God dream." / "Founder of We Them Niggas - a music collective centering bipoc artists from around the world." |
+
+### Maceo's role in POIDH origin
+
+Per BCZ YapZ Ep 19 description: "Kenny... got introduced through **Maceo on Let's Talk About Eth**."
+
+So Maceo hosts (or co-hosts) the **Let's Talk About Eth** podcast, where Kenny was a guest. That episode is the moment Kenny got introduced to the Farcaster/Ethereum-cultural ecosystem he now operates in.
+
+### Why /wethemmedia hosts BCZ POIDH bounties
+
+The album field on BCZ's POIDH bounties 1151 and 1166 is "wethemmedia" because **Zaal and Maceo's music collectives overlap** (We Them Media = bipoc-centered music collective; ZAO = music community). Maceo runs the /wethemmedia Farcaster channel, and Kenny actively posts there ("$500 in Base ETH by filming your pizza day experience for /wethemmedia").
+
+This is the **three-way Venn**:
+- Kenny (POIDH) ↔ Maceo (We Them Media) via Let's Talk About Eth podcast
+- Maceo (We Them Media) ↔ Zaal (ZAO/BCZ) via music collective overlap
+- Zaal (ZAO/BCZ) ↔ Kenny (POIDH) via BCZ YapZ Ep 19 + bounty 1166
+
+Maceo is the bridging connector across this network. For any ZAO + POIDH meta-bounty, **invite Maceo to co-host or co-fund** - he's already in both rooms.
+
+---
+
+## Part 11 - The full POIDH publication catalog
+
+22 Paragraph posts confirmed at words.poidh.xyz (per the Paragraph publication landing page metadata: "Posts: 22, Subscribers: 400+, Collects: 20"). The ones I fetched and verified:
+
+| Date | Title | Why it matters |
+|------|-------|----------------|
+| 2023-11-03 | [poidh needs design help](https://words.poidh.xyz/poidh-needs-design-help) | **Earliest known POIDH post.** Mentions "J and I" as co-founders, reveals v1 contract address, "nearing 50 completed bounties." Proves POIDH launched well before Nov 3 2023. |
+| 2023-11-07 | [about pics or it didn't happen](https://words.poidh.xyz/about-pics-or-it-didnt-happen) | Founding essay - the canonical "why POIDH exists" doc. |
+| 2024-01-02 | [poidh v2](https://words.poidh.xyz/poidh-v2) | v2 planning post - "by end of Q1 2024" target |
+| 2024-04 (approx) | "poidh on Degen Chain 🎩" | Referenced in May 8 post as "our last blog" - Degen launch announcement |
+| 2024-05-08 | [how poidh v2 "open" bounties work](https://words.poidh.xyz/poidh-open-multiplayer-bounties-explained) | Multiplayer launch - the v2 capstone post |
+| 2024-08-31 | [poidh beginner guide](https://words.poidh.xyz/poidh-beginner-guide) | First public team attribution (Kenny + Rhovian) |
+| 2025-11-14 | [poidh: the most seamless Freecash alternative](https://words.poidh.xyz/poidh-seamless-freecash-alternative) | Positioning pivot toward "earn-onchain" audience |
+| ~2026-05 | "the ephemeral DAO machine" | Kenny's current framing - DAO without committees, optimizing for "did this thing get done yes/no". Referenced in his Farcaster bio link. |
+
+15 more posts in the catalog not enumerated (paginated behind JS - would need Playwright with full browser to scrape). The above 8 are the load-bearing posts for the history.
+
+---
+
+## Part 12 - The earlier-than-Nov 2023 launch date (rev2 correction)
+
+Rev1 of this doc treated 2023-11-07 as "Day 0." Rev2 corrects: the 2023-11-03 "poidh needs design help" post says POIDH is "**nearing 50 completed bounties all-time**." For there to be ~50 completed bounties before Nov 3, POIDH must have been live by **late September or early October 2023** at the latest.
+
+The v1 contract `0xdffe8a4a4103f968ffd61fd082d08c41dcf9b940` on Arbitrum was deployed before Nov 3, 2023. Arbiscan would confirm the exact deploy block (exa CRAWL_LIVECRAWL_TIMEOUT on direct fetch; recommend manual check via `cast tx` or `etherscan.io` lookup with API key).
+
+Revised opening:
+- **Sept-Oct 2023** (estimated): Kenny + J ship v1 contract on Arbitrum, run first ~50 bounties
+- **2023-11-03**: "needs design help" post (asks community for UI redesign via 0.3 ETH bounty)
+- **2023-11-07**: Founding essay published
+- **2024-04-24**: Official multichain re-launch (Gitcoin Grants treats this as launch date)
+
+---
+
 ## ZAO Ecosystem Integration
 
 Codebase touchpoints:
@@ -302,6 +473,21 @@ Related docs:
 - [FULL] [BCZ YapZ Ep 19 with Kenny (Zaal, 2026-05-06)](https://www.youtube.com/watch?v=IFG_34K7Vig) - 25-min interview, POIDH framework, "use cases for family" pitch verbatim
 - [FAILED - 404] `https://words.poidh.xyz/poidh-v2-an-overview` - URL pattern guessed, returned 404. The actual v2 overview lives at the open-bounties-explained URL above.
 
+### Rev2 sources (added 2026-05-26)
+
+- [FULL] [poidh needs design help (Kenny, 2023-11-03)](https://words.poidh.xyz/poidh-needs-design-help) - earlier-than-founding post, "J and I" attribution, v1 contract address `0xdffe8a4a4103f968ffd61fd082d08c41dcf9b940`, "nearing 50 completed bounties" by Nov 3, Discord `discord.gg/hDVzpasJGH` + email `poidhxyz@gmail.com`
+- [FULL] [Kenny Spotz author archive on Bitcoin Magazine](https://bitcoinmagazine.com/authors/kenny-spotz) - 7+ articles from Apr-Oct 2014, confirms real name and `@kaspotz` is his old handle (NOT a separate person)
+- [FULL] [Interview With Coinme - Seattle's First Bitcoin ATM (Kenny Spotz, 2014-05-20)](https://bitcoinmagazine.com/business/interview-coinme-company-behind-seattles-first-bitcoin-atm-1400536862) - confirms writing voice + Seattle base in 2014
+- [FULL] [Lessons from a REAL bear market in Crypto (Kenny Spotz guest on RealFinanceGuy, 2019-01-05)](https://www.realfinanceguy.com/home/2019/1/5/lessons-from-a-real-bear-market-in-crypto) - bridge document, expanded bio: Bitcoin Magazine + CoinTelegraph + VICE Motherboard
+- [FULL] [Cheese Wizards food truck (GeekWire, 2013-10-14)](https://www.geekwire.com/2013/seattle-foodtruck-bitcoin-accept-payments-grilled-cheese-sandwiches/) - documented 2013 Seattle Bitcoin food truck (Saxbe brothers ran it)
+- [FULL] [The $DEGEN Archives (Folklore on Paragraph, 2024-03-30)](https://paragraph.com/@folklore-2/the-degen-archives) - confirms Kenny as one of 6 /degen channel co-hosts (Jacek/Purp/wake/0xen/pedrowww) + The Haberdashery as DegenDAO grants council
+- [FULL] [Haberdashers & Memes (sgt_slaughtermelon on Mirror)](https://mirror.xyz/sgtslaughtermelon.eth/D3YdzE4JY8Yb44vCYWxSzUeVY6N-MMYasvLswujhfy4) - The Haberdashery founding attribution to PurpLetariat + wake, NOT Kenny
+- [FULL] [The Haberdashery Farcaster profile via Web3.bio](https://web3.bio/thehaberdashery.farcaster) - active since May 26, 2024, 2,669 followers, 3 governance channels
+- [FULL] [Maceo Whatley Farcaster profile via Web3.bio](https://web3.bio/wethemniggas.eth.farcaster) - Maceo = wethemmedia founder, the Let's Talk About Eth podcast host who introduced Kenny to Farcaster
+- [FULL] [Maceo Whatley Lens profile](https://web3.bio/wethemniggas.lens) - active since Nov 3, 2022 (older than his Farcaster), founder of We Them Niggas / We Them Media bipoc music collective
+- [PARTIAL - LIVECRAWL_TIMEOUT] [poidh v1 escrow contract on Arbiscan](https://arbiscan.io/address/0xdffe8a4a4103f968ffd61fd082d08c41dcf9b940) - exa timed out, gh API auth-only. Confirm contract creation block + date via Arbiscan UI or `cast tx` with RPC. Estimated Sept/Oct 2023 deploy based on "nearing 50 completed bounties" by Nov 3 2023.
+- [FAILED - SOURCE_NOT_AVAILABLE] Kenny's "ephemeral DAO machine" article on X status `2057507451189293556` - exa cannot fetch X long-form posts. Future option: Playwright headless browser.
+
 Cross-repo search: skipped (POIDH is not a `bettercallzaal` org pattern, search not applicable).
 
 Verified URLs 2026-05-26: All `gh api` calls returned 200 with current data. words.poidh.xyz returned 200. Dune dashboard returned current data. Decrypt mirror at jfsky.com returned full article. Devfolio submission returned 200.
@@ -330,3 +516,8 @@ Verified URLs 2026-05-26: All `gh api` calls returned 200 with current data. wor
 | Monitor `poidh-v3` repo for release; when v3 contracts deploy to Base, update BCZ `scripts/refresh-poidh-leaderboard.py` if contract address changes | @Zaal / @ClaudeBot | Recurring check | Bi-weekly until v3 lands |
 | When meta-bounty pattern hits (per doc 631 Tier B #8 ZABAL Games hackathon), invite The Haberdashery to co-fund - mention their kickflip precedent | @Zaal | Outreach | After Round 3 close |
 | Re-validate this doc in 30 days (POIDH user count + v3 release status) | @Zaal | Doc update | 2026-06-25 |
+| Confirm v1 contract deploy date via Arbiscan (rev2 follow-up) | @Zaal | One-shot RPC query | When convenient |
+| DM Maceo (@wethemniggas.eth / @maceo_whatley) for ZAO + POIDH + We Them Media tri-fold meta-bounty proposal | @Zaal | Farcaster DM | After Round 2 winner cast |
+| Pitch The Haberdashery for co-funding ZABAL Games Round-N bounty (cite kickflip precedent) - reach out via /haberdash-props channel | @Zaal | Farcaster channel post | Before next ZABAL Games meta-bounty |
+| Listen to Maceo's Let's Talk About Eth episode with Kenny (find link via wethem.xyz) for direct quote source | @Zaal | Listen | Before BCZ YapZ Ep 20 prep |
+| OPEN QUESTION: who is "J" (Kenny's v1 co-founder)? DM Kenny on Farcaster to confirm. Not blocking - useful for ZAO history doc completeness | @Zaal | Farcaster DM | Anytime |

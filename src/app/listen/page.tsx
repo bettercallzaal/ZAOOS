@@ -76,12 +76,35 @@ function formatEnded(value: string | null): string {
  * /live remains the operator-facing dashboard with finer controls. /listen is
  * the "tap me on a phone, I want to hear something now" surface.
  */
+// "Live now" stale guard - hide DB rows still flagged active but with no
+// recent participant activity. We've been bitten repeatedly by rows that
+// stay active forever because the host walked away without triggering
+// room.finished and the stale-room cron only runs daily on Hobby tier. A
+// row started >60min ago is suspect unless we can prove someone is still
+// in it. /spaces uses the same 30min threshold for its "Stale" badge, but
+// /listen is a member-pull surface so we exclude rather than dim - showing
+// 5 dead rooms as Live actively hurts trust.
+const LIVE_STALE_THRESHOLD_MS = 60 * 60 * 1000;
+function isJukeRowProbablyLive(row: JukeSpaceRow): boolean {
+  if (row.status !== 'active') return false;
+  if (!row.started_at) return true;
+  const ageMs = Date.now() - new Date(row.started_at).getTime();
+  if (ageMs <= LIVE_STALE_THRESHOLD_MS) return true;
+  // Older than threshold - only keep if at least one ZAO member is in the
+  // room (populated by participant.joined/left webhooks). updated_at lets
+  // us be a touch more permissive when there's been recent webhook traffic.
+  if ((row.participant_count ?? 0) > 0) return true;
+  const updatedMs = row.updated_at ? Date.now() - new Date(row.updated_at).getTime() : Infinity;
+  return updatedMs <= LIVE_STALE_THRESHOLD_MS;
+}
+
 export default async function ListenPage() {
-  const [live, scheduled, recorded] = await Promise.all([
-    safe(listActiveJukeSpaces(8), []),
+  const [liveRaw, scheduled, recorded] = await Promise.all([
+    safe(listActiveJukeSpaces(16), []),
     safe(listScheduledJukeSpaces(4), []),
     safe(listRecordedJukeSpaces(6), []),
   ]);
+  const live = liveRaw.filter(isJukeRowProbablyLive).slice(0, 8);
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-[#0a1628] text-white">

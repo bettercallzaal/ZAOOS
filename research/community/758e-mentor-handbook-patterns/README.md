@@ -10,19 +10,35 @@ tier: STANDARD
 
 # 758e - Mentor handbook patterns (for ZABAL Games)
 
-> **Goal:** 1-page web-doc that mentors read BEFORE saying yes. Recruiting asset + scope-of-work + no surprises. Outline below ready for Zaal to draft in 20 min.
+> **Goal:** Document what canonical accelerator mentor handbooks contain. Provide the STRUCTURE for a ZABAL Games handbook, not the content - specific compensation / cadence / dates must come from Zaal, not from this doc.
 
-## Key Decisions
+## FABRICATION CORRECTION (2026-05-26)
+
+An earlier version of this doc contained fabricated specifics (USDC honorarium amount, ETH Champion-pool size, hour/week commitment, week count, kickoff date, monthly group call cadence, NDA-at-intake) that were never confirmed by Zaal. The fabrications originated in the sub-agent prompt context block (which the parent wrote), got laundered through the agent output, and landed in this doc as if they were Zaal's priors. They have been stripped. See `feedback_no_sub_agent_context_fabrication` in memory for the root-cause rule.
+
+The PATTERN research below (Techstars / YC / Antler / ETHGlobal / FAST / IPAS analysis) is FULL-sourced and stays. The OUTLINE has been reduced to section names + placeholders; ALL specific numbers, dates, and cadences in any future handbook must come from Zaal, not from this doc.
+
+## What is actually confirmed by Zaal (only these are safe to use)
+
+- ZABAL Games = build-a-thon, June through August 2026, "3 months"
+- 8 mentors confirmed (Tyler Stambaugh, Arthur, kmac.eth, Jordan Oram, CannonJones, Shriyash Soni, yerbearzerker, deez)
+- 8 finalists (count, not selected as of 2026-05-26)
+- Mentor mechanics decided (Q1-Q6 from 2026-05-26 - see `project_zabal_games.md` memory or doc 758e's source thread): claim via Telegram /claim bot in private mentor channel, submissions via FC + TG feed + /submissions page, mentor coordination in Telegram group, handbook to ship before mentor commitments, Hats Protocol Champion NFT for Top-3 mentors (manual mint path), conflict resolution = builder picks with 24h FCFS fallback
+- ZAO operates as INCUBATOR; builders own their projects; mentors advise
+
+That's it. Everything else (USDC amount, ETH amount, time-commitment hours, week count, weekly/monthly cadence, kickoff date, NDA requirements, intake form fields) is UNCONFIRMED.
+
+## Key Decisions (patterns only, no specifics)
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | **TARGET 1 page** (1.5 max for detailed conflict disclosures) | Techstars Mentor Manifesto = 1 page; YC = none; FAST = 3 pages; >5 pages = not read pre-commit |
-| 2 | **LEAD with culture, not legal** - 80% culture signal / 20% legal | "Build with us, champion a winner, earn on-chain" is the narrative hook |
-| 3 | **PUBLISH compensation transparently** ($2k USDC + 5 ETH Top-3 split pool) | On-chain visible anyway; transparency = recruiting asset, not weakness |
+| 1 | **TARGET 1 page web doc** | Techstars Mentor Manifesto = 1 page; YC = none; FAST = 3 pages; >5 pages = not read pre-commitment |
+| 2 | **LEAD with culture, not legal** - 80% culture signal / 20% legal | Recruiting asset first, contract second |
+| 3 | **PUBLISH compensation transparently** (whatever Zaal sets) - on-chain rewards are public anyway | Transparency = recruiting asset, not weakness. BUT amounts must come from Zaal, not from this doc. |
 | 4 | **REQUIRE pre-program conflict-of-interest intake** (not post-hoc disclosure) | Antler / IPAS pattern: flag conflicts at matching time, not during program |
-| 5 | **DECISION RIGHTS clause: builders are the boss; mentors advise** | Inverts traditional accelerator power dynamics; matches ZAO's principle that founders own projects |
+| 5 | **DECISION RIGHTS clause: builders are the boss; mentors advise** | Inverts traditional accelerator power dynamics; matches ZAO's principle that founders own projects (Zaal-confirmed) |
 | 6 | **CODE-OF-CONDUCT focuses on "no-asshole" + confidentiality + no-poaching** | Skip harassment policy (TG-gated 8-person group); poaching is the realistic risk |
-| 7 | **NO NDA for handbook** - reference NDA at intake form | Handbook is recruiting; NDA is operational. Don't conflate. |
+| 7 | **NO NDA in the handbook itself** - the handbook is recruiting copy; any NDA decision is separate and pending Zaal | Don't conflate. Don't ship "NDA at intake" as if Zaal approved it - he didn't. |
 
 ## Findings
 
@@ -42,16 +58,17 @@ tier: STANDARD
 
 1. **Ambiguous time commitment** -> mentors ghost or over-commit
 2. **Unwritten conflict rules** -> mentor invests in mentee / advises competitor / poaches founder
-3. **IP/confidentiality leakage** -> mentors copy mentee ideas without NDA
+3. **IP/confidentiality leakage** -> mentors copy mentee ideas
 4. **Mentor-to-mentor tension** -> no cadence or protocol for info-sharing
+5. **Surprise compensation specifics** -> mentor signs up based on assumed comp, then real numbers don't match (this doc's prior version is itself a case study)
 
 ### ZABAL-specific advantage
 
-You're not running a residential cohort or equity accelerator. 8 mentors / 8 finalists / 3 months / async Telegram / on-chain rewards (5 ETH split pool + USDC honorarium) / builder autonomy. Founders own projects; mentors advise. This INVERTS traditional accelerator power dynamics and simplifies the handbook: it's not "what we demand of you" but "here's what great mentors do + here's what you're committing to."
+You're not running a residential cohort or equity accelerator. 8 mentors / 8 finalists / 3 months (June-Aug 2026) / async Telegram / on-chain rewards (specifics TBD by Zaal) / builder autonomy. Founders own projects; mentors advise. This INVERTS traditional accelerator power dynamics and simplifies the handbook: it's not "what we demand of you" but "here's what great mentors do + here's what you're committing to."
 
-### Compensation transparency
+### Compensation transparency principle (no specifics from this doc)
 
-Most accelerator mentors are unpaid (Techstars, YC) or sponsored-in-kind (Antler). FAST publishes equity ranges publicly (0.25-1%). ZABAL's $2k USDC + 5 ETH Champion pool is on-chain visible anyway - publish it in the handbook. Transparency is the recruiting hook.
+Most accelerator mentors are unpaid (Techstars, YC) or sponsored-in-kind (Antler). FAST publishes equity ranges publicly (0.25-1%). **For ZABAL: whatever compensation Zaal sets should be published in the handbook. Transparency is the recruiting hook. But this doc does not set the numbers - Zaal does.**
 
 ### Decision rights
 
@@ -59,59 +76,52 @@ Every program is explicit: builders decide, mentors advise. Techstars "Guide, do
 
 ### Conflict of interest
 
-Techstars / Antler: disclose at matching time. IPAS: written conflict-check forms pre-assignment. YC / FAST: embedded in advisor agreement ("No Conflicts"). MetaCartel: post-hoc transparency. **For ZABAL:** pre-program intake form. Champion-pool incentive (5 ETH visible on-chain) is enough motivation to flag conflicts upfront.
+Techstars / Antler: disclose at matching time. IPAS: written conflict-check forms pre-assignment. YC / FAST: embedded in advisor agreement ("No Conflicts"). MetaCartel: post-hoc transparency. **For ZABAL:** pre-program intake form recommended; specific clauses pending Zaal.
 
 ### Mentor-builder matching
 
-ETHGlobal: pure self-serve. Antler: curated 1:1. Founder Institute: FCFS after 8 hours of intro calls. **ZABAL's /claim FCFS + weekly mentor calls is a hybrid:** founders surface profiles via /submissions page, mentors claim async in private Telegram (per doc 758c). Low friction + public transparency. Precedented.
+ETHGlobal: pure self-serve. Antler: curated 1:1. Founder Institute: FCFS after 8 hours of intro calls. **ZABAL's /claim FCFS is the confirmed mechanism (Q1=A). Cadence of mentor calls is NOT yet confirmed.**
 
 ### The recruiting-asset angle
 
-Great mentor handbook = 20% legal, 80% culture signal. ETHGlobal: "high-energy, zero-bs 48-hour sprint." YC: "access to 6000+ domain experts." ZABAL's unique hook: **"Build with us, champion a winner, earn on-chain."** Mentors join because builders are real, rewards are transparent, culture is collaborate-not-gatekeep.
+Great mentor handbook = 20% legal, 80% culture signal. ETHGlobal: "high-energy, zero-bs 48-hour sprint." YC: "access to 6000+ domain experts." A ZABAL hook could be along the lines of "Build with us, champion a winner, earn on-chain" - but the specific tagline is Zaal's call.
 
-## Proposed ZABAL Games Mentor Handbook Outline (12 sections, ~1 page web)
+## Proposed handbook OUTLINE (section names only; ALL content pending Zaal)
 
-1. **Welcome + Program Mission** - 3-month build-a-thon, 8 mentors guide 8 finalists. Mentors are advisors, not operators; finalists own projects. You're invited because you've shipped + give generously + see Web3 music as the frontier.
+These are the SECTIONS a great handbook covers. The CONTENT of each section must come from Zaal, not from this doc. Do not draft any section's content using this doc as the source of specific numbers, dates, or cadences.
 
-2. **Your Role as Mentor** - Advise (not direct). Ask Socratic questions. Connect dots (network). Call BS (direct feedback). Share specific experience. Listen more than you talk.
-
-3. **Time Commitment + Cadence** - 3-5 hr/week for 12 weeks: weekly 1:1 check-in (30-60 min async TG thread or 15-min voice), optional 4 group mentor calls (Thu 7pm EST, monthly), optional bonus engagement (code review / intros / deck feedback).
-
-4. **Compensation Transparency** - $2k USDC honorarium for participation. Top-3 mentor Champions split 5 ETH (~$18k) post-Finals (voted by finalist teams). Champion NFTs minted via Hats Protocol post-event. **On-chain visible. No secrets.**
-
-5. **Confidentiality + IP** - Finalist projects confidential until demo day. Don't discuss tech / metrics / fundraising / team drama outside ZABAL TG. Don't copy ideas; if inspired, credit them. NDA signed at intake.
-
-6. **Conflict of Interest Disclosure** - Flag now if you: invest in / advise a competitor; recruiting/hiring their team; have undisclosed financial stake in protocol they're building on; anticipate a real conflict by Sept 1.
-
-7. **Decision Rights + Boundaries** - Finalists boss their projects. Your role: point out blind spots + offer paths. Don't insist on your way. If a builder rejects your advice, that's their call. **Guide, never control.**
-
-8. **Mentor-to-Mentor Cadence** - Weekly async TG recap + 1 monthly live mentor group call. Common blockers, what's working, prevent siloed advice. You're a team, not a lone wolf.
-
-9. **Code of Conduct (Be Great, Not Gatekeeping)** - Be Socratic, authentic, responsive (<48hr), direct, empathetic. Don't: ghost, patronize, gatekeep, make it weird.
-
-10. **If Things Go Sideways** - Mentor-builder conflict / confidentiality breach / equity offer mid-program -> tell [ZABAL leadership]. Goal: success for all 8, not purity tests.
-
-11. **Post-Finals + Champion Minting** - After demo day, finalists vote top mentor impact. Top 3 split 5 ETH (likely 2/2/1). Hats Protocol Champion NFT minted on-chain. Celebrate together.
-
-12. **How to Get Started (This Week)** - Sign intake form (1:1 intro + conflict check + NDA). Review /submissions by [date]. Claim mentee (or wait for assignment). First check-in Thu [date].
+1. **Welcome + Program Mission** - frame ZABAL Games. (Confirmed inputs: 3-month, June-August 2026, 8 mentors, 8 finalists, builder autonomy.)
+2. **Your Role as Mentor** - advise vs operate. (Standard pattern, safe to draft from Techstars Manifesto + ZAO incubator language.)
+3. **Time Commitment + Cadence** - hours/week, 1:1 cadence, group call cadence. **All specifics TBD by Zaal. Do not invent numbers.**
+4. **Compensation** - honorarium amount, Champion pool size + split rule, payment timing, NFT mint mechanics. **ALL TBD by Zaal. Do not invent numbers.**
+5. **Confidentiality + IP** - what's private, what's public, whether NDA is required. **NDA decision TBD by Zaal.**
+6. **Conflict of Interest Disclosure** - what mentors must flag, when. (Recommended categories: investing in competitor, hiring from team, financial stake in protocol, anticipated conflicts. Cutoff dates TBD by Zaal.)
+7. **Decision Rights + Boundaries** - builders own, mentors advise. (Safe to draft.)
+8. **Mentor-to-Mentor Cadence** - if any. (Pending Q3 + Zaal's call on whether there IS a recurring mentor call.)
+9. **Code of Conduct** - Socratic / responsive / direct / empathetic; don't ghost / patronize / gatekeep / poach. (Safe to draft from pattern.)
+10. **If Things Go Sideways** - escalation path. (Pattern safe; specific contacts TBD.)
+11. **Post-Finals + Champion Minting** - vote mechanism, mint cadence. (Mechanism per Q5=C manual mint confirmed; specifics TBD.)
+12. **How to Get Started** - intake form fields, /submissions page review timeline, /claim mechanism, first-call schedule. **Dates + form fields TBD by Zaal.**
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Draft 1-page handbook (use outline above) | @Zaal | docs | 2026-05-28 |
-| Build /submissions page (finalist bios + tech stacks + mentorship ask) | @Zaal | PR (zabalgames.com) | 2026-05-30 |
-| Spin up private mentor TG group (8 mentors); pin handbook | @Zaal | ops | 2026-05-30 |
-| Build intake form (mentor name + expertise + conflicts + timezone + NDA sig) | @Zaal | PR / Typeform | 2026-05-30 |
-| Schedule first mentor call (Thu 7pm EST kickoff + group norms) | @Zaal | cal | 2026-06-01 |
-| Pre-wire Hats Protocol Champion NFT (manual mint path per Q5=C) | @Zaal | infra | 2026-08-15 |
+| Set compensation specifics (USDC amount, ETH pool size, split rule, payment timing) | @Zaal | decision | before drafting handbook |
+| Set time commitment specifics (hr/week, 1:1 cadence, group call cadence if any) | @Zaal | decision | before drafting handbook |
+| Set timeline specifics (kickoff date, /submissions page launch, intake-form deadline) | @Zaal | decision | before drafting handbook |
+| Decide NDA-or-not for handbook + intake | @Zaal | decision | before drafting handbook |
+| Confirm escalation contact (who do mentors message when things go sideways?) | @Zaal | decision | before drafting handbook |
+| Draft 1-page handbook from outline using ZAAL-CONFIRMED specifics only | @Zaal or @Claude with explicit inputs | docs | post-decisions |
+| Build /submissions page | @Zaal | PR (zabalgames.com) | TBD by Zaal |
+| Spin up private mentor TG group; pin handbook | @Zaal | ops | TBD by Zaal |
 
 ## Also See
 
 - Doc 758 (hub) - parent
 - Doc 758c - Telegram /claim bot (the mechanical companion to this handbook)
 - Doc 720 - ZAOstock standup May 19 (ZABAL Games initial commitment)
-- Memory: project_zabal_games.md, mentor mechanics Q1-Q6 decisions
+- Memory: project_zabal_games.md, feedback_no_sub_agent_context_fabrication (the rule this doc's prior version broke)
 
 ## Sources
 

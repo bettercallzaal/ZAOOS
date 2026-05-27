@@ -92,6 +92,12 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
       'mcp__playwright__browser_press_key',
       'mcp__playwright__browser_wait_for',
       'mcp__playwright__browser_close',
+      // Doc 759 Gap 2 (locked Q1=GATEWAY, Q5=8 workers): subagent dispatch via
+      // Task tool. Workers live in bot/src/zoe/.claude/agents/*.md and ZOE
+      // routes per the persona ROUTING block. Both 'Task' and 'Agent' added
+      // because Claude Code CLI tool name varies by version.
+      'Task',
+      'Agent',
     ],
     disallowedTools: [
       'Bash(git push*)',

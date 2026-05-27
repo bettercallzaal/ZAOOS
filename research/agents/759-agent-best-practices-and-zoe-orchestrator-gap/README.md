@@ -320,3 +320,182 @@ These limits stay even at 100% orchestrator readiness. Self-improvement does not
 - [FAILED - sub-agent watchdog stalled] Original DEEP-tier dispatch for agent state-of-the-art + 100-list methodology + Anthropic SDK survey (3 sub-agents timed out on 600s stream watchdog; parent synthesized from grounded knowledge instead)
 
 Re-validation note: the Part A external-framework claims (LangGraph / AutoGen / CrewAI / Letta / MCP) should be verified before adopting any of them. The Part C gap analysis is FULL-grounded in code reads and is the load-bearing part of the doc.
+
+---
+
+# v2 deltas (appended 2026-05-26 after tighter re-dispatch)
+
+Original 3 DEEP-tier sub-agents stalled on the 600s watchdog. 3 tighter STANDARD-tier re-dispatches (5-fetch cap, 10-min wall) all returned cleanly. Material updates to Parts A + B below; Part C unchanged (already FULL-grounded in code).
+
+## Part A delta - 2026 framework reality (updated from training cutoff)
+
+| Framework | Version | Production? | Strength | Weakness | MCP / Claude Code fit |
+|-----------|---------|-------------|----------|----------|----------------------|
+| **LangGraph** | v1.0 GA Oct 2025 | YES - Uber, LinkedIn, Klarna in prod | Graph state persistence + durable execution across restarts | Requires PostgreSQL for prod checkpointing | PARTIAL - MCP support planned Q2 2026 |
+| **AutoGen** | v0.7.5 (Sept 2025) | **NO - MAINTENANCE MODE.** Microsoft migrated to Microsoft Agent Framework | Multi-agent group-chat patterns | Architecture deprecated | NO - abandon, don't adopt |
+| **CrewAI** | v1.14.5 (Feb 2026) | YES | Role-based agents + delegation | Sequential/hierarchical only; parallel + consensual WIP | UNKNOWN, likely NO |
+| **Letta** (MemGPT) | v1.0 (April 2026) | YES - managed SaaS + self-hosted | Cross-session memory + dream-agent continual learning | Self-hosted ops cost unpredictable | NO - Python/TS only |
+| **ElizaOS** | 294 releases, May 2026 | YES | Plugin ecosystem + Farcaster/Discord/Telegram out-of-box | Unstable as a framework dep | PARTIAL - MCP example exists |
+
+**ZAO recommendation: ADOPT NONE.** Stay on Claude Code + Hermes. Letta-managed tier is the ONE revisit case IF cross-restart memory becomes a real constraint that `~/.zao/zoe/` file-block memory can't solve.
+
+## Part A delta - Anthropic Claude Code primitives ZOE should adopt (concrete APIs)
+
+### 1. Subagents (`Agent` tool)
+Define custom subagents in `.claude/agents/AGENT.md` or `settings.json` `subagents` block. Each gets own context window + tool access. Semantic auto-delegation. Doc: `code.claude.com/docs/en/subagents.md`
+
+**For ZOE:** define 8 worker subagent types in `bot/src/zoe/.claude/agents/`. Haiku for workers, Sonnet for ZOE core, Opus on escalate (locked Q2).
+
+### 2. Skills (`SKILL.md`) - 3-stage progressive disclosure
+Stages: frontmatter (~100 tok always) -> body (~5k tok on trigger) -> bundled resources (zero until accessed). Auto-discovery via `~/.claude/skills/` scan. Doc: `platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md`
+
+### 3. Hooks - 6 lifecycle events
+`SessionStart / UserPromptSubmit / PreToolUse / PostToolUse / Stop / PermissionRequest`. Exit 0 = JSON processed; 2 = block action. Doc: `code.claude.com/docs/en/hooks.md`
+
+### 4. MCP servers - 3 transports + plugin scope
+`http` (OAuth via RFC 8414) / `stdio` (subprocess) / `sse` (deprecated). Plugin MCPs auto-load with `${CLAUDE_PLUGIN_ROOT}` env expansion. Doc: `code.claude.com/docs/en/mcp-servers.md`
+
+**For ZOE:** GitHub (OAuth) + Supabase (stdio, service-role via `headersHelper`) + Serena in `bot/src/zoe/plugins/mcp-connectors/plugin.json` with `alwaysLoad: true`.
+
+### 5. Memory - CLAUDE.md hierarchy + auto-memory + MEMORY.md
+5-level CLAUDE.md search path. Auto-memory at `~/.claude/projects/<project>/memory/MEMORY.md` (first 200 lines or 25KB auto-load). Worktrees share auto-memory. Doc: `code.claude.com/docs/en/memory.md`
+
+## Part B delta - 100-list methodology (per Q11 build now)
+
+### Lists that aged badly (avoid the failure shape)
+
+- IT best practices 2018 (password rotation, drive defrag, RAID 5 bad rap) - hardware evolution + security reversals killed them
+- Email marketing 2018 (double opt-in, short subject lines) - born from 2000s ISP whitelist + AOL truncation, persisted past relevance
+- HR 360-feedback - co-opted for performance evaluation contrary to design
+
+**Pattern killer:** copy-without-context + no re-validation loop + framework-coupled wording.
+
+### Templates worth copying
+
+- **Kubernetes Security Baseline** - 6 domains, each its own MD file, items mapped to CIS Benchmark v1.8.0 / SOC 2, YAML templates ready-to-apply, severity implicit via order
+- **CKS Cheat Sheet** - one-page printable + production reference, sub-100 items grouped by function, each = command/config + expected output + common pitfall
+
+### Recommended machine-readable structure
+
+```
+research/agents/100-ai-agent-best-practices/
+  _meta.yaml          (TOC + category tree + maintenance cadence)
+  001-prompt-grounding.md
+  002-token-budgeting.md
+  ...
+  100-deployment-safety.md
+```
+
+Per-item frontmatter:
+
+```yaml
+---
+id: agent-001
+category: prompt-engineering
+severity: critical | high | medium | low
+applies_to: [llm, multi-agent, autonomous]
+deprecated_since: null
+rationale: "Why this matters"
+sources: ["doc-734", "anthropic-2024-essay"]
+---
+```
+
+`_meta.yaml`:
+
+```yaml
+version: "1.0"
+last_updated: "2026-05-26"
+categories:
+  prompt-engineering: [001-010]
+  agent-architecture: [011-035]
+  multi-agent-coordination: [036-055]
+  deployment-ops: [056-100]
+maintenance_cadence: "quarterly"
+deprecated_items: []
+```
+
+ZOE queries by severity / category at runtime; humans read the markdown; each item has `deprecated_since` + `sources` audit trail.
+
+## v2 sub-agent sources (added)
+
+- [FULL] LangGraph v1.0 GA - https://changelog.langchain.com/announcements/langgraph-1-0-is-now-generally-available
+- [FULL] AutoGen GitHub (maintenance warning) - https://github.com/microsoft/autogen
+- [FULL] CrewAI changelog - https://docs.crewai.com/en/changelog
+- [FULL] Letta production patterns - https://callsphere.ai/blog/td30-fw-letta-1-0-formerly-memgpt-production-patterns-guide
+- [FULL] ElizaOS - https://github.com/elizaOS/eliza
+- [FULL] Claude Code subagents - https://code.claude.com/docs/en/subagents.md
+- [FULL] Agent Skills overview - https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview.md
+- [FULL] Hooks reference - https://code.claude.com/docs/en/hooks.md
+- [FULL] MCP servers - https://code.claude.com/docs/en/mcp-servers.md
+- [FULL] Memory system - https://code.claude.com/docs/en/memory.md
+- [FULL] Kubernetes Security Baseline + CKS Cheat Sheet - 100-list templates
+
+---
+
+# Locked architecture decisions (2026-05-26 grill)
+
+The 17-question grill ran 2026-05-26 with Zaal. Every decision below is binding for the 6-week sprint. Target: **ZOE 90%+ orchestrator-ready by 2026-07-07.**
+
+## Phase 1 - ZOE orchestrator architecture (Q1-Q11)
+
+| Q | Locked | Notes |
+|---|--------|-------|
+| Q1 - ZOE shape | **A GATEWAY** | All agent dispatch flows through ZOE. ZOE owns master task graph + learns from every run. |
+| Q2 - Model mix | **A Haiku/Sonnet/Opus** | Workers Haiku, ZOE core Sonnet, Opus on escalate. Matches Hermes cost routing. |
+| Q3 - Self-improvement authority | **A** | ZOE drafts patches; Zaal Y/N every patch via Telegram. No auto-apply for first 3 months. |
+| Q4 - human.md write authority | **B+ hybrid** | ZOE writes patches herself after y/n approval. On LOW-CONFIDENCE patches, ZOE asks Zaal for a voice note FIRST, drafts from voice note, then y/n. **Voice-note-as-clarification is a new ZOE design rule.** |
+| Q5 - Worker subagent_types | **A + C** | 8 workers: research-worker, code-reviewer, comms-drafter, task-dispatcher, data-runner, brief-writer + recap-agent (post-worker summarizer) + watcher-agent (in-flight sanity check). |
+| Q6 - Critics | **A** | 3 critics: research-critic (Hard Reqs 1-12), comms-critic (brand.md voice), task-result-critic (goal met?). |
+| Q7 - Cost ceiling | **B SPLIT** | $20 Hermes + $10 ZOE concierge + $20 worker dispatches = $50/day. |
+| Q8 - Failure policy | **A** | Worker fails 3x -> Telegram escalation to Zaal. First 30 days while we learn failure shapes. |
+| Q9 - Telemetry storage | **B HYBRID** | Hermes Postgres for raw run telemetry. Bonfires for weekly CURATED LESSONS only (one well-formed episode per cluster from learn.ts). |
+| Q10 - Gap ship order | **A** | 2 -> 1 -> 3 -> 4 -> 5. Dependency-graph order. |
+| Q11 - 100-list timing | **B NOW** | Build 100-list NOW in parallel with gap sprint. |
+
+## Phase 2 - Bonus already-waiting decisions (Q12-Q15)
+
+| Q | Locked | Notes |
+|---|--------|-------|
+| Q12 - Mentor mechanics | **1A 2D 3A 4A 5C 6B** | Confirmed full set. Q5=C (manual Hats mint at Finals) is Claude override of Zaal default B. |
+| Q13 - Magnetiq rebrand | **A fix-on-touch** | Next time I edit Tyler context, patch the "Magnetic" -> "Magnetiq" typo in the same diff. |
+| Q14 - Vlad/Singularity park | **A stands** | Re-evaluate 2026-06-23. |
+| Q15 - 758e fix disposition | **A fork-terminal owns** | (PR #708 already merged to main; fork inherits clean baseline + the new `feedback_no_sub_agent_context_fabrication` memory rule.) |
+
+## Phase 3 - TIER sequencing (Q16)
+
+| Q | Locked | Notes |
+|---|--------|-------|
+| Q16 - Parallel tracks | **A** | Week 1 = ZOE Gap 2 + Cowork hardening + Leeward Jun 2 prep simultaneously. Week 2-3 = zaofractal review + Discord radio + Quick wins. |
+
+## Phase 4 - Persistence (Q17)
+
+| Q | Locked | Notes |
+|---|--------|-------|
+| Q17 - Locked-decisions storage | **A land here** | This doc 759 section + new `project_zoe_orchestrator_locked.md` memory file + PR #705 update commit. Future ZOE-context Claude turns auto-load the table. |
+
+## Sprint plan (post-grill)
+
+**Week 1 (2026-05-26 to 2026-06-01):**
+- Gap 2: Add Agent tool to ZOE `concierge.ts` allowedTools + persona update directing dispatch via Agent for subtasks (~50 LOC)
+- Define 8 worker subagent_types in `bot/src/zoe/.claude/agents/AGENT.md` files
+- Cowork hardening: CI workflow + Husky pre-commit + GH branch protection (Claude solo)
+- Leeward Jun 2 prep: verify UDP 52000-52100 on VPS 31.97.148.88; pull m1k1o/neko v3.1.0; local docker compose test
+
+**Week 2 (2026-06-02 to 2026-06-08):**
+- Gap 1: `decompose.ts` router + structured-output decomposition prompt
+- 100-list bootstrap: `research/agents/100-ai-agent-best-practices/` folder + `_meta.yaml` + first 10 items
+- Leeward kickoff Jun 2
+
+**Week 3 (2026-06-09 to 2026-06-15):**
+- Gap 3 critics: `research-critic.ts` + `comms-critic.ts` + `task-result-critic.ts`
+- 100-list: items 11-40
+
+**Week 4 (2026-06-16 to 2026-06-22):**
+- Gap 4: `reflexion.ts` with voice-note clarification flow
+- 100-list: items 41-70
+
+**Week 5-6 (2026-06-23 to 2026-07-06):**
+- Gap 5: `learn.ts` weekly cron + Bonfire-summary writer
+- 100-list: items 71-100 + first quarterly re-validation pass
+
+**Measurement of done:** % of Zaal goals that route through ZOE decompose -> worker dispatch -> critic -> recap, without manual fork. Target 90%+ by 2026-07-07.

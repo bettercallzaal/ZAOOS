@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
   // 10min ago is still genuinely active (long-form space). One query per
   // candidate is cheap given the limit of 50 and the index on space_id.
   const ids = candidates.map((c) => c.id);
-  let lastEventByRoom = new Map<string, string>();
+  const lastEventByRoom = new Map<string, string>();
   try {
     const { data, error } = await supabaseAdmin
       .from('juke_webhook_events')

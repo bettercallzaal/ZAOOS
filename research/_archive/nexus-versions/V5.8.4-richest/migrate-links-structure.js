@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars */
+// Archived: superseded by live bettercallzaal.com/nexus.html per project_nexus_hub_live.
 /**
  * NEXUS V5 - Links Data Structure Migration Script
- * 
+ *
  * This script migrates the existing links.json data to the new optimized structure
  * with improved organization, metadata, and tag management.
  * 

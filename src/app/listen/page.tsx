@@ -312,7 +312,7 @@ function RecordingChip({ row }: { row: JukeSpaceRow }) {
       aria-label={`Recording: ${row.title}`}
     >
       <div className="aspect-[1200/630] bg-[#0a1628] overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        { }
         <img
           src={ogImage}
           alt=""

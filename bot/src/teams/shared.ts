@@ -3,7 +3,7 @@
  * detection, intent classification (cheap), daily-summary scheduler.
  */
 import { Bot, Context } from 'grammy';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+ 
 // @ts-expect-error: node-cron has no types bundled
 import cron from 'node-cron';
 import { resolve, dirname } from 'node:path';

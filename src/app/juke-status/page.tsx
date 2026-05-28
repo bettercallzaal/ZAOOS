@@ -277,8 +277,8 @@ function RecentSpacesSection({ rows }: { rows: RecentJukeSpaceRow[] }) {
         </h2>
         <div className="bg-[#111d2e] border border-white/[0.08] rounded-xl p-4 text-xs text-gray-500">
           No Juke spaces minted yet through this integration. Create one via{' '}
-          <a href="/spaces" className="text-[#f5a623] hover:underline">/spaces (Go Live - Juke)</a>{' '}
-          or <a href="/live/create" className="text-[#f5a623] hover:underline">/live/create</a>.
+          <Link href="/spaces" className="text-[#f5a623] hover:underline">/spaces (Go Live - Juke)</Link>{' '}
+          or <Link href="/live/create" className="text-[#f5a623] hover:underline">/live/create</Link>.
         </div>
       </section>
     );
@@ -347,7 +347,7 @@ function CodeExamplesSection() {
         How ZAO calls Juke
       </h2>
       <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-        Reference snippets so Nicky's agent can see ZAO's actual integration patterns. Every line
+        Reference snippets so Nicky&apos;s agent can see ZAO&apos;s actual integration patterns. Every line
         matches the live production code paths.
       </p>
       <div className="space-y-3">
@@ -528,7 +528,7 @@ function AsksSection({
         >
           juke.audio/changelog.json
         </a>
-        . Each entry's <code className="text-gray-300">resolves[]</code> array maps to{' '}
+        . Each entry&apos;s <code className="text-gray-300">resolves[]</code> array maps to{' '}
         <code className="text-gray-300">open_asks[].id</code> on this page.
       </p>
       <ul className="space-y-3">

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+// Archived: superseded by live bettercallzaal.com/nexus.html per project_nexus_hub_live.
 const fs = require('fs');
 const path = require('path');
 

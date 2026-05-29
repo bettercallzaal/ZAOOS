@@ -28,7 +28,6 @@ import {
   createPublicClient,
   createWalletClient,
   http,
-  encodeAbiParameters,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
@@ -37,7 +36,7 @@ import {
   OP_CHAIN_ID,
   SIGNED_KEY_REQUEST_DOMAIN,
   SIGNED_KEY_REQUEST_TYPES,
-  SIGNED_KEY_REQUEST_METADATA_ABI,
+  SIGNED_KEY_REQUEST_VALIDATOR_ABI,
   ID_GATEWAY_ABI,
   ID_REGISTRY_ABI,
   KEY_GATEWAY_ABI,
@@ -133,10 +132,14 @@ async function main() {
     message: { requestFid: fid, key: signerPubHex, deadline },
   });
 
-  // 4. ABI-encode SignedKeyRequestMetadata tuple.
-  const metadata = encodeAbiParameters(SIGNED_KEY_REQUEST_METADATA_ABI, [
-    { requestFid: fid, requestSigner: account.address, signature, deadline },
-  ]);
+  // 4. Encode metadata via the validator's on-chain encodeMetadata (NOT manual ABI encoding -
+  //    manual misses the dynamic offset pointer and the validator rejects it; doc 762).
+  const metadata = (await publicClient.readContract({
+    address: FARCASTER_CONTRACTS.SignedKeyRequestValidator,
+    abi: SIGNED_KEY_REQUEST_VALIDATOR_ABI,
+    functionName: 'encodeMetadata',
+    args: [fid, account.address, signature, deadline],
+  })) as `0x${string}`;
 
   // 5. KeyGateway.add(keyType=1, key=pubkey, metadataType=1, metadata).
   console.log('Adding signer key via KeyGateway.add ...');

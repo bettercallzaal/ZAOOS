@@ -15,6 +15,7 @@
  */
 import { makeCastAdd, FarcasterNetwork, Message } from '@farcaster/hub-nodejs';
 import { makeSigner } from './signer';
+import { buildX402Header, useX402 } from './x402';
 
 export interface PublishResult {
   hash: `0x${string}`;
@@ -63,7 +64,11 @@ export async function publishCast(input: CastInput): Promise<PublishResult> {
 
   const bytes = Message.encode(message).finish();
   const headers: Record<string, string> = { 'Content-Type': 'application/octet-stream' };
-  if (process.env.FARCASTER_WRITE_API_KEY) {
+  // Neynar hub is paid per call via x402 (EIP-3009 USDC on Base) - NOT a bearer key (doc 762).
+  // Set FARCASTER_WRITE_MODE=bearer only for a self-hosted/3rd-party hub that uses key auth.
+  if (useX402()) {
+    headers['X-PAYMENT'] = await buildX402Header();
+  } else if (process.env.FARCASTER_WRITE_API_KEY) {
     headers['api_key'] = process.env.FARCASTER_WRITE_API_KEY;
     headers['Authorization'] = `Bearer ${process.env.FARCASTER_WRITE_API_KEY}`;
   }

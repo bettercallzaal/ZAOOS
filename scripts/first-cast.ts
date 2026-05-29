@@ -20,6 +20,7 @@
  */
 import { makeCastAdd, FarcasterNetwork, Message } from '@farcaster/hub-nodejs';
 import { makeSigner } from '../bot/src/zoe/farcaster/signer';
+import { buildX402Header, useX402 } from '../bot/src/zoe/farcaster/x402';
 
 function getArg(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -59,7 +60,10 @@ async function main() {
   //  with a managed signer - see doc 761.)
   const bytes = Message.encode(message).finish();
   const headers: Record<string, string> = { 'Content-Type': 'application/octet-stream' };
-  if (process.env.FARCASTER_WRITE_API_KEY) {
+  // Neynar hub is paid via x402 (EIP-3009 USDC on Base), not a bearer key (doc 762).
+  if (useX402()) {
+    headers['X-PAYMENT'] = await buildX402Header();
+  } else if (process.env.FARCASTER_WRITE_API_KEY) {
     headers['api_key'] = process.env.FARCASTER_WRITE_API_KEY;
     headers['Authorization'] = `Bearer ${process.env.FARCASTER_WRITE_API_KEY}`;
   }

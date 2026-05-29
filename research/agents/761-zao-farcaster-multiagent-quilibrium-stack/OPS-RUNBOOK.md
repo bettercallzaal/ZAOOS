@@ -51,10 +51,17 @@ FARCASTER_NODE_GRPC=<ip>:3383
    `node --import tsx scripts/register-signer.ts --gen-key` and store
    `FARCASTER_SIGNER_PRIVATE_KEY` (hex, 32 bytes) somewhere safe.
 
-### Write endpoint
-Pick one and set `FARCASTER_WRITE_API_BASE` (+ `FARCASTER_WRITE_API_KEY` if Neynar):
-- Neynar write API (metered via x402), or
-- another write-enabled hub.
+### Write endpoint (verified - doc 762)
+USE the Neynar hub: `FARCASTER_WRITE_API_BASE=https://hub-api.neynar.com`. It is paid per call
+via x402 (NOT a bearer key): an `X-PAYMENT` header carrying an EIP-3009 USDC transfer, 0.001
+USDC/call on Base to `0xA6a8736f18f383f1cc2d938576933E5eA7Df01A1`. The scripts build this header
+automatically (default `FARCASTER_WRITE_MODE=x402`).
+- Fund a Base wallet with a few USDC and set `X402_PAYMENT_PRIVATE_KEY` (or reuse
+  `CUSTODY_PRIVATE_KEY` if it also holds USDC on Base).
+- Alternative: a self-hosted / 3rd-party write-enabled hub with key auth - set
+  `FARCASTER_WRITE_MODE=bearer` + `FARCASTER_WRITE_API_KEY`.
+- Simpler-but-less-sovereign fallback: Neynar REST `POST /v2/farcaster/cast` with a managed
+  `signer_uuid` + `x-api-key` (Neynar holds the signer).
 
 ## Phase 1 - bot FID + signer + registration -> first cast
 
@@ -64,21 +71,26 @@ npm install                 # picks up @farcaster/hub-nodejs, viem already prese
 ( cd bot && npm install )   # signer.ts lives in bot/
 ```
 
+# Verified costs (doc 762): FID registration ~$0.20 (Optimism), add signer ~$0.05 gas,
+# each cast 0.001 USDC (Base x402). Fund ~$2-3 total on Optimism for gas + a few USDC on Base.
 ```bash
 # env required:
 #   OP_RPC_URL=<Optimism RPC>
-#   CUSTODY_PRIVATE_KEY=<secp256k1 custody wallet, funded ~$2 on Optimism>
-#   SIGNER_BACKEND=noble | qkms
-#   FARCASTER_SIGNER_PRIVATE_KEY=<hex>        # if noble
+#   CUSTODY_PRIVATE_KEY=<secp256k1 custody wallet, funded ~$2-3 on Optimism for gas>
+#   SIGNER_BACKEND=noble | qkms                # noble is the day-one path (doc 762)
+#   FARCASTER_SIGNER_PRIVATE_KEY=<hex>         # if noble
 #   QKMS_* vars                                # if qkms
-#   FARCASTER_WRITE_API_BASE=...               # write endpoint
+#   FARCASTER_WRITE_API_BASE=https://hub-api.neynar.com
+#   X402_PAYMENT_PRIVATE_KEY=<Base wallet holding USDC>   # for write payment
+#   FARCASTER_VERIFY_OK=1                       # after confirming contract addresses
 
 # 1. (if noble + no key yet) generate signer key
 node --import tsx scripts/register-signer.ts --gen-key
 
 # 2. register a DEDICATED bot FID (separate from node operator FID) + add the signer key
 node --import tsx scripts/register-signer.ts
-# -> registers FID via IdGateway (~$1 gas), builds EIP-712 SignedKeyRequest,
+# -> registers FID via IdGateway (~$0.20), builds EIP-712 SignedKeyRequest,
+#    encodes metadata via SignedKeyRequestValidator.encodeMetadata (on-chain),
 #    calls KeyGateway.add(1, pubkey, 1, metadata). Prints BOT_FID. Set it:
 #   FARCASTER_BOT_FID=<printed fid>
 

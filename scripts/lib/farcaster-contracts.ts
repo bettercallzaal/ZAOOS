@@ -84,18 +84,25 @@ export const KEY_GATEWAY_ABI = [
 ] as const;
 
 /**
- * SignedKeyRequestMetadata ABI tuple for encoding the `metadata` arg of KeyGateway.add.
- * struct SignedKeyRequestMetadata { uint256 requestFid; address requestSigner; bytes signature; uint256 deadline; }
+ * SignedKeyRequestValidator.encodeMetadata - the CORRECT way to build the `metadata` arg for
+ * KeyGateway.add. Do NOT manually ABI-encode the struct: the metadata is a dynamic struct and
+ * manual encoding misses the dynamic offset pointer, producing bytes the validator rejects
+ * (verified, Neynar docs / doc 762). Call this view function on-chain instead.
+ *
+ * function encodeMetadata(uint256 requestFid, address signer, bytes signature, uint256 deadline)
+ *   external view returns (bytes)
  */
-export const SIGNED_KEY_REQUEST_METADATA_ABI = [
+export const SIGNED_KEY_REQUEST_VALIDATOR_ABI = [
   {
-    components: [
+    type: 'function',
+    name: 'encodeMetadata',
+    stateMutability: 'view',
+    inputs: [
       { name: 'requestFid', type: 'uint256' },
-      { name: 'requestSigner', type: 'address' },
+      { name: 'signer', type: 'address' },
       { name: 'signature', type: 'bytes' },
       { name: 'deadline', type: 'uint256' },
     ],
-    name: 'metadata',
-    type: 'tuple',
+    outputs: [{ name: '', type: 'bytes' }],
   },
 ] as const;

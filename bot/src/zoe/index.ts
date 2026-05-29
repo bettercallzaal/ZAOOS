@@ -44,8 +44,24 @@ import {
   type GroupMode,
 } from './groups';
 import { handleVoiceMemo, handlePostCallback } from './posts';
+import { decomposeGoal, renderPlanForApproval } from './decompose';
+import { dispatchPlan } from './dispatch';
+import {
+  getPending,
+  setPending,
+  clearPending,
+  loadPending,
+  parseApprovalReply,
+  type PendingApproval,
+  type ApprovalReply,
+} from './approvals';
+import type { DecompositionPlan } from './decompose';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
+// Opt-in goal decomposition + dispatch (doc 759 Gaps 1+2). Zaal sends
+// `plan: <goal>` / `decompose: <goal>` to get a routed plan; on "y" ZOE
+// dispatches the workers. Default chat stays a normal concierge turn.
+const PLAN_PREFIX = /^(plan|decompose):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
 
@@ -400,6 +416,19 @@ bot.on('message:text', async (ctx) => {
 });
 
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
+  // Pending-approval interception (doc 759 keystone). If ZOE is waiting on a
+  // y/n for this chat, route the reply to the resolver. Ambiguous messages
+  // (not-an-approval) fall through to normal handling and leave the pending
+  // item in place — it auto-expires via TTL.
+  const pending = getPending('private');
+  if (pending) {
+    const reply = parseApprovalReply(text);
+    if (reply.decision !== 'not-an-approval') {
+      await resolvePendingApproval(ctx, pending, reply);
+      return;
+    }
+  }
+
   // Hourly nudge toggle. Accepts "nudges" and the legacy "tips" phrasing.
   const nudgeToggle = /^(stop|pause|disable)\s+(nudges?|tips?)$/i.exec(text.trim())
     ? 'off'
@@ -432,6 +461,13 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
       console.error('[zoe/index] note save failed:', msg);
       await ctx.reply(`(note save failed - ${msg.slice(0, 200)})`);
     }
+    return;
+  }
+
+  // Goal decomposition + dispatch: opt-in `plan:`/`decompose:` prefix.
+  const planMatch = PLAN_PREFIX.exec(text);
+  if (planMatch) {
+    await handlePlanCommand(ctx, planMatch[2]);
     return;
   }
 
@@ -557,6 +593,158 @@ async function dispatchConcierge(
   }
 }
 
+// Eastern-time stamp for ZOE reasoning context (Zaal's tz).
+function currentDateString(): string {
+  return new Date().toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
+}
+
+function zoeContext() {
+  return {
+    zaal_tg_id: zaalId,
+    workspace_dir: repoDir,
+    current_date: currentDateString(),
+  };
+}
+
+/**
+ * `plan:`/`decompose:` handler — decompose the goal, store it as a pending
+ * approval, and render it for y/n. On "y" the resolver dispatches the workers.
+ * If the plan has unresolved ambiguities, nothing is stored (there's nothing
+ * to dispatch yet) and ZOE just asks for clarification.
+ */
+async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
+  if (!ctx.chat) return;
+  const chatId = ctx.chat.id;
+  await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  const typingInterval = setInterval(() => {
+    ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  }, TYPING_REFRESH_MS);
+  const ackTimeout = setTimeout(() => {
+    ctx.reply('Decomposing into a routed plan — one moment.').catch(() => {});
+  }, ACK_THRESHOLD_MS);
+
+  try {
+    const result = await decomposeGoal({ goal, context: zoeContext() });
+    const { plan } = result;
+    const dispatchable = plan.ambiguities.length === 0 && plan.subtasks.length > 0;
+    if (dispatchable) {
+      await setPending({
+        kind: 'plan',
+        chatScope: 'private',
+        createdAt: new Date().toISOString(),
+        goal,
+        plan,
+      });
+    }
+    await replyChunked(ctx, renderPlanForApproval(plan));
+    console.log(
+      `[zoe/index] plan proposed — subtasks=${plan.subtasks.length} ambiguities=${plan.ambiguities.length} dispatchable=${dispatchable} cost=$${result.costUsd.toFixed(4)}`,
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] decompose failed:', msg);
+    await ctx.reply(`(decompose error - ${msg.slice(0, 200)})`);
+  } finally {
+    clearInterval(typingInterval);
+    clearTimeout(ackTimeout);
+  }
+}
+
+/** Route a parsed y/n/edit reply against whatever ZOE is waiting to approve. */
+async function resolvePendingApproval(
+  ctx: Context,
+  pending: PendingApproval,
+  reply: ApprovalReply,
+): Promise<void> {
+  if (reply.decision === 'reject') {
+    await clearPending(pending.chatScope);
+    await ctx.reply('Cancelled. Nothing dispatched.');
+    return;
+  }
+
+  if (reply.decision === 'edit') {
+    await clearPending(pending.chatScope);
+    if (pending.kind === 'plan' || pending.kind === 'plan-gate') {
+      await ctx.reply('Re-planning with your changes…');
+      await handlePlanCommand(ctx, `${pending.goal}\n\nRevision from Zaal: ${reply.editText ?? ''}`);
+    } else {
+      await ctx.reply('Okay, dropped that. Send a fresh request when ready.');
+    }
+    return;
+  }
+
+  // approve-all / approve-ids
+  switch (pending.kind) {
+    case 'plan':
+      await clearPending(pending.chatScope);
+      await runApprovedPlan(ctx, pending.goal, pending.plan, []);
+      return;
+    case 'plan-gate':
+      await clearPending(pending.chatScope);
+      await runApprovedPlan(ctx, pending.goal, pending.plan, pending.completed);
+      return;
+    case 'reflexion':
+    case 'learn':
+      // Wired in later phases (Gap 4 / Gap 5).
+      await clearPending(pending.chatScope);
+      await ctx.reply('(approval noted — handler for this type lands in a later phase)');
+      return;
+  }
+}
+
+/** Dispatch an approved plan with live Telegram progress, then report. */
+async function runApprovedPlan(
+  ctx: Context,
+  goal: string,
+  plan: DecompositionPlan,
+  alreadyCompleted: string[],
+): Promise<void> {
+  if (!ctx.chat) return;
+  const chatId = ctx.chat.id;
+  await ctx.reply(alreadyCompleted.length > 0 ? 'Continuing past the gate…' : 'Dispatching the plan…');
+
+  const report = await dispatchPlan({
+    goal,
+    plan,
+    context: zoeContext(),
+    chatId,
+    zaalTgId: zaalId,
+    alreadyCompleted,
+    hooks: {
+      onSubtaskStart: async (st) => {
+        await ctx.reply(`▶ ${st.id} (${st.worker}): ${st.title}`.slice(0, 300)).catch(() => {});
+      },
+    },
+  });
+
+  // Paused at a gate — stash the partial plan so the next "y" resumes it.
+  if (report.status === 'paused-for-gate' && report.gateAfterId) {
+    await setPending({
+      kind: 'plan-gate',
+      chatScope: 'private',
+      createdAt: new Date().toISOString(),
+      goal,
+      plan,
+      completed: report.completedIds,
+      gateAfterId: report.gateAfterId,
+    });
+  }
+
+  await replyChunked(ctx, report.summary);
+  console.log(
+    `[zoe/index] dispatch ${report.status} — ${report.results.length} subtask(s) $${report.totalCostUsd.toFixed(2)}`,
+  );
+}
+
 bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
   const action = ctx.match[1];
   await ctx.answerCallbackQuery({ text: `Marked ${action}.` });
@@ -565,6 +753,7 @@ bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
 
 async function main(): Promise<void> {
   await ensureZoeHome();
+  await loadPending(); // restore any approval ZOE was waiting on before restart
   console.log(
     '[zoe/index] ZOE booting — token set, zaalId=',
     zaalId,

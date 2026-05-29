@@ -58,6 +58,12 @@ Pick one and set `FARCASTER_WRITE_API_BASE` (+ `FARCASTER_WRITE_API_KEY` if Neyn
 
 ## Phase 1 - bot FID + signer + registration -> first cast
 
+Install deps first (added to package.json; run install at repo root AND in bot/):
+```bash
+npm install                 # picks up @farcaster/hub-nodejs, viem already present
+( cd bot && npm install )   # signer.ts lives in bot/
+```
+
 ```bash
 # env required:
 #   OP_RPC_URL=<Optimism RPC>

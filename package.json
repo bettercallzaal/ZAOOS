@@ -45,6 +45,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@farcaster/auth-client": "^0.7.1",
     "@farcaster/auth-kit": "^0.8.2",
+    "@farcaster/hub-nodejs": "^0.16.0",
     "@farcaster/miniapp-node": "^0.2.0",
     "@farcaster/miniapp-sdk": "^0.2.3",
     "@farcaster/quick-auth": "^0.0.8",

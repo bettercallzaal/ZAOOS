@@ -23,13 +23,7 @@ import { join } from 'node:path';
 import { ZOE_PATHS } from './memory';
 import type { DecompositionPlan } from './decompose';
 import type { ProposedPatch, ReflectionAnswers } from './reflexion';
-
-/** A learn.ts improvement proposal (Gap 5). Kept structural here to avoid a
- * circular import with learn.ts (which imports this module). */
-export interface LearnProposalRef {
-  id: string;
-  summary: string;
-}
+import type { LearnProposal } from './learn';
 
 export type PendingKind =
   | 'plan'
@@ -88,7 +82,7 @@ export interface PendingAwaitReflection extends PendingBase {
 /** learn.ts self-improvement proposals awaiting approval (Gap 5). */
 export interface PendingLearn extends PendingBase {
   kind: 'learn';
-  proposals: LearnProposalRef[];
+  proposals: LearnProposal[];
 }
 
 export type PendingApproval =

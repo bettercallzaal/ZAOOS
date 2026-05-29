@@ -40,6 +40,7 @@ import {
   type ReflectionAnswers,
   type ProposedPatch,
 } from './reflexion';
+import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn } from './recall';
@@ -722,7 +723,7 @@ async function resolvePendingApproval(
       return;
     case 'learn':
       await clearPending(pending.chatScope);
-      await ctx.reply('(learn approval handler lands in the Gap 5 phase)');
+      await applyLearnProposals(ctx, pending.proposals, reply);
       return;
     case 'await-reflection':
       // Shouldn't reach here (handled in the interception), but be safe.
@@ -900,6 +901,37 @@ async function applyReflexionPatches(
     console.error('[zoe/index] applyReflexionPatches failed:', msg);
     await ctx.reply(`(patch apply failed - ${msg.slice(0, 200)})`);
   }
+}
+
+/** Apply the Zaal-approved subset of weekly learn proposals (Gap 5). */
+async function applyLearnProposals(
+  ctx: Context,
+  proposals: LearnProposal[],
+  reply: ApprovalReply,
+): Promise<void> {
+  const selected =
+    reply.decision === 'approve-all'
+      ? proposals
+      : proposals.filter((p) => reply.ids.includes(p.id.toLowerCase()));
+  if (selected.length === 0) {
+    await ctx.reply('No matching proposal ids — nothing applied. Reply "y all" or "y lp-1".');
+    return;
+  }
+  const applied: string[] = [];
+  for (const p of selected) {
+    try {
+      await applyLearnProposal(p);
+      applied.push(`${p.id} -> ${p.target}`);
+    } catch (err) {
+      console.error('[zoe/index] applyLearnProposal failed:', (err as Error).message);
+    }
+  }
+  await ctx.reply(
+    applied.length > 0
+      ? `Applied ${applied.length} learning${applied.length === 1 ? '' : 's'}:\n${applied.join('\n')}`
+      : '(learning apply failed - check logs)',
+  );
+  console.log(`[zoe/index] learnings applied: ${applied.join(', ')}`);
 }
 
 bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {

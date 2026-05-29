@@ -27,6 +27,7 @@ import { CRITIQUE_PASS_THRESHOLD, type CritiqueOutput } from './critics/types';
 import { runResearchCritic } from './critics/research-critic';
 import { runCommsCritic } from './critics/comms-critic';
 import { runTaskResultCritic } from './critics/task-result-critic';
+import { readLearnings } from './learn';
 
 /** Workers runnable via direct callClaudeCli here (everything except hermes). */
 export type ClaudeWorkerKind = Exclude<WorkerKind, 'hermes'>;
@@ -169,7 +170,12 @@ function agentsDir(context: ZoeContext): string {
 async function loadSpec(worker: ClaudeWorkerKind, context: ZoeContext): Promise<string> {
   const path = join(agentsDir(context), WORKER_CONFIG[worker].specFile);
   const raw = await fs.readFile(path, 'utf8');
-  return stripFrontmatter(raw);
+  const spec = stripFrontmatter(raw);
+  // Gap 5: fold in any Zaal-approved learnings accrued for this worker.
+  const learnings = await readLearnings(worker);
+  return learnings.trim()
+    ? `${spec}\n\n# Learnings (apply these — accrued from past runs)\n\n${learnings.trim()}`
+    : spec;
 }
 
 function buildWorkerPrompt(args: RunWorkerArgs, criticFeedback?: string): string {

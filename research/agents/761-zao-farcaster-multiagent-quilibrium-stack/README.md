@@ -16,6 +16,14 @@ related-docs: [084, 085, 291, 318, 304/haatz, 468, 727, 759]
 > (Hypersnap reads/events, QKMS signer custody, FFX serverless exec, Klearu safety,
 > Router402 x402-metered reasoning later). Reasoning starts on OpenRouter.
 
+## Current focus (depth-first, 2026-05-29)
+
+The ONLY goal that matters right now: **one real, reviewed cast end-to-end** -
+Phase 0 (node) -> Phase 1 (FID + signer) -> Phase 2 (single caster + Telegram approval).
+Phases 3 (multi-agent registry/ranker/guards) and 4 (FFX exec) are BUILT but DORMANT - they
+are not in the bot boot path (only the single-agent caster is, gated by `CASTER_ENABLED=1`).
+Do not light up Phase 3/4 until the single reviewed cast works end-to-end.
+
 ## What this doc is
 
 The architecture + step-by-step build guide. A prior cowork session did the research and
@@ -31,7 +39,7 @@ FFX beta) are operator tasks and live in `OPS-RUNBOOK.md` in this directory.
 | Plane | Decision | Status |
 |-------|----------|--------|
 | Reads / events | Self-host a Hypersnap node | UNBLOCKED - build day one |
-| Signer custody | QKMS (Ed25519) | INFERRED - VERIFY key-spec; noble fallback shipped |
+| Signer | **noble-in-process is THE signer** (NobleEd25519Signer). QKMS = optional at-rest custody of the key blob ONLY | RESOLVED (doc 762): QKMS CANNOT sign Ed25519 - its key types are ed448/x448/decaf448/bls48581. Not co-equal. |
 | Reasoning | OpenRouter (user-selectable models) -> Router402 (x402/USDC-on-Base) later | OpenRouter shipped as sibling path |
 | Safety / classification | Klearu ONLY (CLI/socket, no HTTP - wrapped) | wrapper shipped |
 | Serverless exec | FFX (Quilibrium private beta) | beta request drafted |
@@ -49,9 +57,12 @@ BlockRun. Do not design against "Lucid".
    to a write-enabled hub / Neynar write API, metered via x402 (cheap - dozens of casts/day).
    Do **not** design writes against the read node.
 
-2. **QKMS Ed25519 support is INFERRED** from its AWS-KMS compatibility, not directly
-   confirmed (Quilibrium docs are login-walled). VERIFY before relying. Fallback (shipped):
-   hold the Ed25519 private key in QKMS as custody, sign in-process with `@noble/ed25519`.
+2. **QKMS cannot sign Ed25519 - RESOLVED (doc 762).** Quilibrium's key types are
+   ed448/x448/decaf448/bls48581 (`qclient key create <Name> <KeyType>`); there is no Ed25519
+   spec, and its AWS-KMS "compatibility" is API-surface only. Therefore **noble-in-process is
+   THE signer** (`NobleEd25519Signer` over `FARCASTER_SIGNER_PRIVATE_KEY`). QKMS's only role is
+   optional at-rest custody of the key blob (store encrypted, fetch at boot, sign with noble).
+   `SIGNER_BACKEND=qkms` is rejected by the code with this verdict.
 
 3. **Prompt-vs-code drift:** ZOE has no `callLLM` switch. The real path is
    `dispatchConcierge` (bot/src/zoe/index.ts) -> `runConciergeTurn` (concierge.ts) ->
@@ -180,9 +191,12 @@ human sign-off).
 ---
 
 ## Verify-before-build checklist
-- [ ] **QKMS:** log into qconsole.quilibrium.com -> create key -> confirm key-spec
-  `ECC_NIST_EDWARDS25519` / Ed25519. Else use noble fallback (already shipped).
-- [ ] **WRITE endpoint:** pick Neynar write API (via x402) or another write-enabled hub.
+- [x] **QKMS: RESOLVED (doc 762)** - cannot sign Ed25519 (ed448/x448/decaf448/bls48581 only).
+  noble-in-process is THE signer; QKMS is optional at-rest key-blob custody only. No qconsole
+  check needed for the signing decision.
+- [x] **WRITE endpoint: RESOLVED (doc 762) = Neynar hub `https://hub-api.neynar.com`**, paid
+  per call via x402 `X-PAYMENT` (EIP-3009 USDC on Base, 0.001/call). Self-custodied Ed25519
+  signer. Implemented in `farcaster/write.ts` + `farcaster/x402.ts`.
 - [ ] **FFX beta:** request from Cassie (@cassie, FID 1325; prefers GitHub over DMs; offered
   beta in Bootcamp #10). Send her the `FFX-BETA-REQUEST.md` GitHub link after push.
 - [ ] **Bootstrap gist (resolved):**
@@ -224,7 +238,7 @@ Every specific number/date/amount here traces to a source - never extrapolation.
 | ~$2 Optimism custody fund / ~$1 FID registration | prompt -> docs.farcaster.xyz gas |
 | Cassie @cassie FID 1325, prefers GitHub, offered beta Bootcamp #10 | prompt |
 | Bootstrap gist hash | prompt (resolved) |
-| QKMS Ed25519 support | **INFERRED** from AWS-KMS compat - UNVERIFIED, login-walled |
+| QKMS cannot sign Ed25519 (ed448/x448/decaf448/bls48581 only) | **RESOLVED** - doc 762, `qclient key create` key types |
 | FFX API surface | **UNVERIFIED** - private beta, login-walled |
 | Router402/GPU-Bridge/BlockRun are the x402-LLM gateways; "Lucid" is not real | prompt |
 

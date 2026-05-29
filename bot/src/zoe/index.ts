@@ -23,6 +23,8 @@ import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
+import { runBotRelayOps, summarizeRelayResults } from './relay';
+import { decomposeGoal, renderPlanForApproval } from './decompose';
 import {
   buildMemoryBlocks,
   ensureZoeHome,
@@ -55,7 +57,6 @@ import {
   type GroupMode,
 } from './groups';
 import { handleVoiceMemo, handlePostCallback } from './posts';
-import { decomposeGoal, renderPlanForApproval } from './decompose';
 import { dispatchPlan } from './dispatch';
 import {
   getPending,
@@ -162,6 +163,21 @@ const botIdHolder: { value: number | null } = { value: null };
 
 function isFromZaal(ctx: Context): boolean {
   return ctx.from?.id === zaalId;
+}
+
+// ZOE anchors all reasoning to Eastern time (Zaal's tz). Shared by the
+// concierge turn and the decompose path so the model never sees a UTC date.
+function currentDateString(): string {
+  return new Date().toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
 }
 
 function senderLabel(ctx: Context): string {
@@ -560,7 +576,7 @@ async function dispatchConcierge(
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
-        current_date: new Date().toISOString().slice(0, 10),
+        current_date: currentDateString(),
       },
     });
 
@@ -570,6 +586,25 @@ async function dispatchConcierge(
 
     if (result.quest_ops.length > 0) {
       await applyQuestOps(result.quest_ops);
+    }
+
+    // Cross-bot relay (Phase 2 Bonfire integration). ZOE can ask other bots
+    // in Telegram groups (e.g. @zabal_bonfire_bot in ZAO Civilization) by
+    // emitting bot_relay_ops in her JSON reply. v1 is fire-and-forget;
+    // result summary appends to her DM reply so Zaal sees what was sent.
+    let relayPostscript = '';
+    if (result.bot_relay_ops && result.bot_relay_ops.length > 0) {
+      try {
+        const relayResults = await runBotRelayOps(
+          (chatId, text) => bot.api.sendMessage(chatId, text),
+          result.bot_relay_ops,
+        );
+        const summary = summarizeRelayResults(relayResults);
+        if (summary) relayPostscript = '\n\n' + summary;
+      } catch (err) {
+        console.error('[zoe/index] bot relay failed:', (err as Error).message);
+        relayPostscript = '\n\n(bot relay failed - check logs)';
+      }
     }
 
     // Bonfire: mirror this turn's captures + task/quest changes into the
@@ -589,7 +624,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim();
+    const safeReply = result.reply.trim() + relayPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(
@@ -616,20 +651,6 @@ async function dispatchConcierge(
     clearInterval(typingInterval);
     clearTimeout(ackTimeout);
   }
-}
-
-// Eastern-time stamp for ZOE reasoning context (Zaal's tz).
-function currentDateString(): string {
-  return new Date().toLocaleString('en-US', {
-    timeZone: 'America/New_York',
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  });
 }
 
 function zoeContext() {

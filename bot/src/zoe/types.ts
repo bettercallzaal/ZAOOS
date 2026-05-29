@@ -34,6 +34,19 @@ export interface ZoeContext {
   current_date: string;
 }
 
+export interface BotRelayOp {
+  op: "relay_to_bot";
+  /** Group chat title (resolved against groups.json) OR explicit chat_id. */
+  to_group?: string;
+  to_chat_id?: number;
+  /** Bot username to tag, e.g. "@zabal_bonfire_bot". The runtime prepends this to message. */
+  tag_bot: string;
+  /** The question/message body (without the tag). */
+  message: string;
+  /** v1: fire-and-forget. v2 will support await_reply_seconds for ZOE to capture + summarize. */
+  await_reply_seconds?: number;
+}
+
 export interface ConciergeOptions {
   /** User message text */
   message: string;
@@ -56,6 +69,8 @@ export interface ConciergeResult {
   quest_ops: QuestOp[];
   /** Captures to log */
   captures: ZoeCaptureNote[];
+  /** Cross-bot relay ops (e.g. ZOE asks @zabal_bonfire_bot in ZAO Civilization). */
+  bot_relay_ops: BotRelayOp[];
   /** Cost stats from Claude CLI call */
   inputTokens: number;
   outputTokens: number;

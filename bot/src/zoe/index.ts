@@ -24,6 +24,7 @@ import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
+import { decomposeGoal, renderPlanForApproval } from './decompose';
 import {
   buildMemoryBlocks,
   ensureZoeHome,
@@ -47,6 +48,11 @@ import {
 import { handleVoiceMemo, handlePostCallback } from './posts';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
+// Opt-in goal decomposition (doc 759 Gap 1). Zaal sends `plan: <goal>` or
+// `decompose: <goal>` to get a routed DecompositionPlan back for y/n approval,
+// instead of a normal conversational turn. Default chat stays a "doer" turn —
+// decomposition only fires on this explicit prefix.
+const PLAN_PREFIX = /^(plan|decompose):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
 
@@ -136,6 +142,21 @@ const botIdHolder: { value: number | null } = { value: null };
 
 function isFromZaal(ctx: Context): boolean {
   return ctx.from?.id === zaalId;
+}
+
+// ZOE anchors all reasoning to Eastern time (Zaal's tz). Shared by the
+// concierge turn and the decompose path so the model never sees a UTC date.
+function currentDateString(): string {
+  return new Date().toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
 }
 
 function senderLabel(ctx: Context): string {
@@ -436,6 +457,13 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
     return;
   }
 
+  // Goal decomposition: opt-in `plan:`/`decompose:` prefix.
+  const planMatch = PLAN_PREFIX.exec(text);
+  if (planMatch) {
+    await handlePlanCommand(ctx, planMatch[2]);
+    return;
+  }
+
   await dispatchConcierge(ctx, text, 'private', 'Zaal');
 }
 
@@ -500,7 +528,7 @@ async function dispatchConcierge(
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
-        current_date: new Date().toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }),
+        current_date: currentDateString(),
       },
     });
 
@@ -571,6 +599,51 @@ async function dispatchConcierge(
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[zoe/index] concierge turn failed:', msg);
     await ctx.reply(`(concierge error - ${msg.slice(0, 200)})`);
+  } finally {
+    clearInterval(typingInterval);
+    clearTimeout(ackTimeout);
+  }
+}
+
+/**
+ * Decompose a Zaal goal (opt-in `plan:`/`decompose:` prefix) into a routed
+ * subtask plan and surface it for y/n approval. v1 stops at the plan — actual
+ * worker dispatch on "y" is doc 759 Gap 2 (Task-tool dispatch) and lands
+ * separately. Until then this gives Zaal the routed breakdown to eyeball.
+ */
+async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
+  if (!ctx.chat) return;
+  const chatId = ctx.chat.id;
+  await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+
+  const typingInterval = setInterval(() => {
+    ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  }, TYPING_REFRESH_MS);
+  const ackTimeout = setTimeout(() => {
+    ctx.reply('Decomposing the goal into a routed plan — one moment.').catch(() => {});
+  }, ACK_THRESHOLD_MS);
+
+  try {
+    const result = await decomposeGoal({
+      goal,
+      context: {
+        zaal_tg_id: zaalId,
+        workspace_dir: repoDir,
+        current_date: currentDateString(),
+      },
+    });
+    await replyChunked(ctx, renderPlanForApproval(result.plan), {
+      replyToMessageId: ctx.message?.message_id,
+    });
+    console.log(
+      `[zoe/index] decompose handled — model=${result.model} cost=$${result.costUsd.toFixed(
+        4,
+      )} subtasks=${result.plan.subtasks.length} ambiguities=${result.plan.ambiguities.length} duration=${result.durationMs}ms`,
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] decompose failed:', msg);
+    await ctx.reply(`(decompose error - ${msg.slice(0, 200)})`);
   } finally {
     clearInterval(typingInterval);
     clearTimeout(ackTimeout);

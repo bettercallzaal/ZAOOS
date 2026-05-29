@@ -23,6 +23,7 @@ import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
+import { runBotRelayOps, summarizeRelayResults } from './relay';
 import {
   buildMemoryBlocks,
   ensureZoeHome,
@@ -511,6 +512,25 @@ async function dispatchConcierge(
       await applyQuestOps(result.quest_ops);
     }
 
+    // Cross-bot relay (Phase 2 Bonfire integration). ZOE can ask other bots
+    // in Telegram groups (e.g. @zabal_bonfire_bot in ZAO Civilization) by
+    // emitting bot_relay_ops in her JSON reply. v1 is fire-and-forget;
+    // result summary appends to her DM reply so Zaal sees what was sent.
+    let relayPostscript = '';
+    if (result.bot_relay_ops && result.bot_relay_ops.length > 0) {
+      try {
+        const relayResults = await runBotRelayOps(
+          (chatId, text) => bot.api.sendMessage(chatId, text),
+          result.bot_relay_ops,
+        );
+        const summary = summarizeRelayResults(relayResults);
+        if (summary) relayPostscript = '\n\n' + summary;
+      } catch (err) {
+        console.error('[zoe/index] bot relay failed:', (err as Error).message);
+        relayPostscript = '\n\n(bot relay failed - check logs)';
+      }
+    }
+
     // Bonfire: mirror this turn's captures + task/quest changes into the
     // ZABAL knowledge graph. Best-effort, fire-and-forget — never blocks the
     // reply, never throws. No-op if BONFIRE_API_KEY/BONFIRE_ID are unset.
@@ -528,7 +548,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim();
+    const safeReply = result.reply.trim() + relayPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(

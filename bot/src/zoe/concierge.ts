@@ -26,7 +26,13 @@ function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string): string {
       : `Chat: group "${blocks.chat_title ?? blocks.chat_scope}" (id ${blocks.chat_scope})`;
 
   return [
-    `Today is ${currentDate}. ZOE v${ZOE_VERSION}.`,
+    `<current_time>`,
+    `${currentDate}`,
+    `</current_time>`,
+    ``,
+    `<runtime>`,
+    `ZOE v${ZOE_VERSION}. The <current_time> block above is your authoritative time. When asked 'what time is it' / 'what day is it' / similar, answer with THAT exact value. Do not infer from message metadata or your own clock.`,
+    `</runtime>`,
     ``,
     `<persona>`,
     blocks.persona,
@@ -118,13 +124,14 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     bare: false,
   });
 
-  const { reply, taskOps, questOps, captures } = splitReplyAndOps(result.text);
+  const { reply, taskOps, questOps, captures, botRelayOps } = splitReplyAndOps(result.text);
 
   return {
     reply,
     task_ops: taskOps,
     quest_ops: questOps,
     captures,
+    bot_relay_ops: botRelayOps,
     inputTokens: result.inputTokens,
     outputTokens: result.outputTokens,
     costUsd: result.totalCostUsd,
@@ -140,10 +147,11 @@ function splitReplyAndOps(text: string): {
   taskOps: TaskOp[];
   questOps: QuestOp[];
   captures: ZoeCaptureNote[];
+  botRelayOps: BotRelayOp[];
 } {
   const match = text.match(OPS_FENCE_RE);
   if (!match) {
-    return { reply: text.trim(), taskOps: [], questOps: [], captures: [] };
+    return { reply: text.trim(), taskOps: [], questOps: [], captures: [], botRelayOps: [] };
   }
   const jsonStr = match[1];
   const reply = text.replace(OPS_FENCE_RE, '').trim();
@@ -152,6 +160,7 @@ function splitReplyAndOps(text: string): {
       task_ops?: TaskOp[];
       quest_ops?: QuestOp[];
       captures?: Array<{ text: string; topic: string }>;
+      bot_relay_ops?: BotRelayOp[];
     };
     const captures: ZoeCaptureNote[] = (parsed.captures ?? []).map((c) => ({
       id: `cap-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -165,10 +174,11 @@ function splitReplyAndOps(text: string): {
       taskOps: parsed.task_ops ?? [],
       questOps: parsed.quest_ops ?? [],
       captures,
+      botRelayOps: parsed.bot_relay_ops ?? [],
     };
   } catch (err) {
     console.error('[zoe/concierge] failed to parse ops JSON:', (err as Error).message, 'raw:', jsonStr.slice(0, 200));
-    return { reply, taskOps: [], questOps: [], captures: [] };
+    return { reply, taskOps: [], questOps: [], captures: [], botRelayOps: [] };
   }
 }
 

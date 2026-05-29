@@ -499,7 +499,7 @@ async function dispatchConcierge(
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
-        current_date: new Date().toISOString().slice(0, 10),
+        current_date: new Date().toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }),
       },
     });
 

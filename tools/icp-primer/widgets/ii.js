@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// Reference / educational primer for Zaal pre-Caffeine.ai (tools/icp-primer/README.md).
 import { AuthClient } from 'https://esm.sh/@dfinity/auth-client@2';
 import { setAuthClient, clearAuthClient, getIdentity } from './state.js';
 import { renderError } from './error.js';

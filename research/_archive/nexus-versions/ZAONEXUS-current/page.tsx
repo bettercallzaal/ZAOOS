@@ -386,7 +386,7 @@ export default function Home() {
 
           {filteredData.length === 0 && (
             <div className="text-center py-12 opacity-75">
-              <p className="text-xl">No links found matching "{searchQuery}"</p>
+              <p className="text-xl">No links found matching &quot;{searchQuery}&quot;</p>
               <p className="text-sm mt-2">Try a different search term</p>
             </div>
           )}

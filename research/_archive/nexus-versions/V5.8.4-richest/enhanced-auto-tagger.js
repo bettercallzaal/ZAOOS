@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unused-vars */
+// Archived: superseded by live bettercallzaal.com/nexus.html per project_nexus_hub_live.
+// CommonJS require() preserved as written; do not refactor archive code.
 /**
  * NEXUS V5 - Enhanced Auto-Tagging System
- * 
+ *
  * This script automatically generates and applies tags to links in the new optimized
  * data structure. It uses multiple strategies for tag generation:
  * 

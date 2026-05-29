@@ -207,7 +207,7 @@ function SpaceCard({
         aria-label={`${cta}: ${row.title}`}
       >
         <div className="aspect-[1200/630] bg-[#0a1628] relative overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img
             src={jukeSpaceOgImageUrl(row.id)}
             alt=""

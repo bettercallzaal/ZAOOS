@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// Reference / educational primer for Zaal pre-Caffeine.ai (tools/icp-primer/README.md).
 import { Actor } from 'https://esm.sh/@dfinity/agent@2';
 import { IDL } from 'https://esm.sh/@dfinity/candid@2';
 import { getAnonymousAgent } from './state.js';

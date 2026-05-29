@@ -15,6 +15,7 @@ import { Bot, Context, InlineKeyboard } from 'grammy';
 import { checkCast, type SafetyVerdict } from '../safety/klearu';
 import { draftCast } from './reason';
 import { publishCast } from '../farcaster/write';
+import { ffxAvailable, executeActionOnFfx } from '../exec/ffx';
 
 export interface CasterTrigger {
   /** which registry agent is acting */
@@ -138,14 +139,25 @@ export function attachCaster(bot: Bot, opts: { zaalId: number }): void {
       return;
     }
 
-    // approve -> publish
+    // approve -> publish. Phase 4: execution moves onto FFX when available (the human gate
+    // above is unchanged); otherwise publish in-process.
     await ctx.answerCallbackQuery('publishing...');
     try {
-      const result = await publishCast({ text: entry.draftText, parent: entry.trigger.parent });
+      let line: string;
+      if (ffxAvailable()) {
+        await executeActionOnFfx({
+          agentId: entry.trigger.agentId,
+          kind: entry.trigger.parent ? 'reply' : 'cast',
+          text: entry.draftText,
+          parent: entry.trigger.parent,
+        });
+        line = 'PUBLISHED via FFX.';
+      } else {
+        const result = await publishCast({ text: entry.draftText, parent: entry.trigger.parent });
+        line = `PUBLISHED.\nhash: ${result.hash}\nfid: ${result.fid}`;
+      }
       pending.delete(id);
-      await ctx.editMessageText(
-        `[caster:${entry.trigger.agentId}] PUBLISHED.\nhash: ${result.hash}\nfid: ${result.fid}\n\n${entry.draftText}`,
-      );
+      await ctx.editMessageText(`[caster:${entry.trigger.agentId}] ${line}\n\n${entry.draftText}`);
     } catch (e) {
       await ctx.editMessageText(
         `[caster:${entry.trigger.agentId}] publish FAILED: ${e instanceof Error ? e.message : e}\n\n` +

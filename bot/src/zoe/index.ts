@@ -44,6 +44,8 @@ import {
   type GroupMode,
 } from './groups';
 import { handleVoiceMemo, handlePostCallback } from './posts';
+import { attachCaster, runCasterPipeline } from './caster';
+import { subscribeToCasts } from './farcaster/event-stream';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
@@ -582,6 +584,28 @@ async function main(): Promise<void> {
   }
 
   startScheduler({ bot, zaalTgId: zaalId, repoDir, devzChatId });
+
+  // Caster (doc 761, Phase 2). Approval callback always attached; the event-stream subscriber
+  // only starts when a node gRPC is configured. Single-agent persona via CASTER_PERSONA.
+  attachCaster(bot, { zaalId });
+  if (process.env.FARCASTER_NODE_GRPC && process.env.CASTER_ENABLED === '1') {
+    const persona =
+      process.env.CASTER_PERSONA ??
+      'You are the ZAO community caster. Reply in a warm, sharp, builder voice. Never shill, never overpromise.';
+    try {
+      await subscribeToCasts((cast) =>
+        runCasterPipeline(bot, zaalId, {
+          agentId: 'caster',
+          persona,
+          context: `Someone cast (fid ${cast.fid}): "${cast.text}". Draft a reply.`,
+          parent: { fid: cast.fid, hash: cast.hash },
+        }),
+      );
+      console.log('[zoe/index] caster event stream subscribed');
+    } catch (err) {
+      console.warn('[zoe/index] caster event stream not started:', (err as Error).message);
+    }
+  }
 
   try {
     const seed = await seedInitialTasks();

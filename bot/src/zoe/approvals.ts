@@ -22,7 +22,7 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from './memory';
 import type { DecompositionPlan } from './decompose';
-import type { ProposedPatch } from './reflexion';
+import type { ProposedPatch, ReflectionAnswers } from './reflexion';
 
 /** A learn.ts improvement proposal (Gap 5). Kept structural here to avoid a
  * circular import with learn.ts (which imports this module). */
@@ -31,13 +31,20 @@ export interface LearnProposalRef {
   summary: string;
 }
 
-export type PendingKind = 'plan' | 'plan-gate' | 'reflexion' | 'learn';
+export type PendingKind =
+  | 'plan'
+  | 'plan-gate'
+  | 'reflexion'
+  | 'await-reflection'
+  | 'learn';
 
 interface PendingBase {
   kind: PendingKind;
   chatScope: string;
   /** ISO 8601 timestamp the approval was raised. Drives TTL expiry. */
   createdAt: string;
+  /** Optional per-item TTL override (ms). Defaults to PENDING_TTL_MS. */
+  ttlMs?: number;
 }
 
 /** A freshly-decomposed plan awaiting the initial y/n before any dispatch. */
@@ -61,7 +68,21 @@ export interface PendingPlanGate extends PendingBase {
 /** Reflexion memory patches awaiting per-id approval (Gap 4). */
 export interface PendingReflexion extends PendingBase {
   kind: 'reflexion';
+  /** High-confidence patches offered for y/n. */
   patches: ProposedPatch[];
+  /** The reflection answers that produced these patches (for voice-note re-run). */
+  answers: ReflectionAnswers;
+  /** True if there were low-confidence patches needing a voice-note clarification. */
+  hasVoiceNoteRequests: boolean;
+}
+
+/**
+ * Waiting for Zaal's free-form reply to the evening reflection. The NEXT DM
+ * (any text, not a y/n) is captured as the reflection answer and fed to the
+ * reflexion layer. Longer TTL since answers can land hours later.
+ */
+export interface PendingAwaitReflection extends PendingBase {
+  kind: 'await-reflection';
 }
 
 /** learn.ts self-improvement proposals awaiting approval (Gap 5). */
@@ -74,6 +95,7 @@ export type PendingApproval =
   | PendingPlan
   | PendingPlanGate
   | PendingReflexion
+  | PendingAwaitReflection
   | PendingLearn;
 
 export interface ApprovalReply {
@@ -150,7 +172,7 @@ function extractIds(text: string): string[] {
 export function isPendingExpired(p: PendingApproval, now: number = Date.now()): boolean {
   const created = Date.parse(p.createdAt);
   if (Number.isNaN(created)) return true; // corrupt timestamp = treat as stale
-  return now - created > PENDING_TTL_MS;
+  return now - created > (p.ttlMs ?? PENDING_TTL_MS);
 }
 
 /** Load persisted pending items on boot. Best-effort; never throws. */

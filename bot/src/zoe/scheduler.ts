@@ -23,6 +23,10 @@ import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled } from './nudges';
 import { startPostsScheduler } from './posts';
+import { setPending } from './approvals';
+
+/** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
+const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
 
 const SENTINEL_DIR = join(ZOE_PATHS.home, 'sentinels');
 
@@ -85,7 +89,15 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           const prompt = await generateEveningReflection({ repoDir: opts.repoDir });
           await opts.bot.api.sendMessage(opts.zaalTgId, prompt);
           await markFired('evening-reflect');
-          console.log('[zoe/scheduler] evening reflection sent');
+          // Arm reflexion (Gap 4): Zaal's next free-form DM is captured as the
+          // reflection answer and fed to the reflexion layer for memory patches.
+          await setPending({
+            kind: 'await-reflection',
+            chatScope: 'private',
+            createdAt: new Date().toISOString(),
+            ttlMs: AWAIT_REFLECTION_TTL_MS,
+          });
+          console.log('[zoe/scheduler] evening reflection sent + reflexion armed');
         } catch (err) {
           console.error('[zoe/scheduler] evening reflection failed:', (err as Error).message);
         }

@@ -27,9 +27,19 @@ import {
   buildMemoryBlocks,
   ensureZoeHome,
   pushRecent,
+  readHuman,
+  readPersona,
+  writeHuman,
+  writePersona,
   ZOE_PATHS,
   type ChatScope,
 } from './memory';
+import {
+  runReflexion,
+  applyPatch,
+  type ReflectionAnswers,
+  type ProposedPatch,
+} from './reflexion';
 import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn } from './recall';
@@ -422,9 +432,23 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
   // item in place — it auto-expires via TTL.
   const pending = getPending('private');
   if (pending) {
+    // await-reflection: the next free-form DM is Zaal's reflection answer.
+    if (pending.kind === 'await-reflection') {
+      await clearPending('private');
+      await handleReflectionAnswer(ctx, text);
+      return;
+    }
     const reply = parseApprovalReply(text);
     if (reply.decision !== 'not-an-approval') {
       await resolvePendingApproval(ctx, pending, reply);
+      return;
+    }
+    // reflexion with outstanding voice-note requests: a free-form (non-y/n)
+    // reply is Zaal's clarification — re-run reflexion with it as the
+    // transcript (typed clarification stands in for an audio voice note).
+    if (pending.kind === 'reflexion' && pending.hasVoiceNoteRequests && text.trim().length > 10) {
+      await clearPending('private');
+      await runReflexionFlow(ctx, pending.answers, text);
       return;
     }
   }
@@ -693,10 +717,16 @@ async function resolvePendingApproval(
       await runApprovedPlan(ctx, pending.goal, pending.plan, pending.completed);
       return;
     case 'reflexion':
-    case 'learn':
-      // Wired in later phases (Gap 4 / Gap 5).
       await clearPending(pending.chatScope);
-      await ctx.reply('(approval noted — handler for this type lands in a later phase)');
+      await applyReflexionPatches(ctx, pending.patches, reply);
+      return;
+    case 'learn':
+      await clearPending(pending.chatScope);
+      await ctx.reply('(learn approval handler lands in the Gap 5 phase)');
+      return;
+    case 'await-reflection':
+      // Shouldn't reach here (handled in the interception), but be safe.
+      await clearPending(pending.chatScope);
       return;
   }
 }
@@ -743,6 +773,133 @@ async function runApprovedPlan(
   console.log(
     `[zoe/index] dispatch ${report.status} — ${report.results.length} subtask(s) $${report.totalCostUsd.toFixed(2)}`,
   );
+}
+
+// --- Reflexion / Gap 4: learn-from-reflection -> memory patches ------------
+
+/**
+ * Loosely parse a free-form evening-reflection reply into the 3 answer slots.
+ * If the reply has numbered parts (1. / 2) / 3:) map them; otherwise dump the
+ * whole thing into `extra` and let the reflexion prompt sort it out.
+ */
+function parseReflectionAnswers(text: string): ReflectionAnswers {
+  const parts = text
+    .split(/\n?\s*[1-3][.):]\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (parts.length >= 3) {
+    return {
+      shipped: parts[0],
+      stuck: parts[1],
+      tomorrow_first: parts[2],
+      extra: parts.slice(3).join('\n') || undefined,
+    };
+  }
+  return { shipped: '', stuck: '', tomorrow_first: '', extra: text };
+}
+
+/** Entry from the await-reflection interception: parse + run reflexion. */
+async function handleReflectionAnswer(ctx: Context, rawText: string): Promise<void> {
+  await runReflexionFlow(ctx, parseReflectionAnswers(rawText));
+}
+
+/**
+ * Run the reflexion layer over reflection answers (optionally clarified by a
+ * voice note), then offer high-confidence memory patches for y/n approval.
+ */
+async function runReflexionFlow(
+  ctx: Context,
+  answers: ReflectionAnswers,
+  voiceNoteTranscript?: string,
+): Promise<void> {
+  if (!ctx.chat) return;
+  const chatId = ctx.chat.id;
+  await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  try {
+    const [human_md, persona_md] = await Promise.all([readHuman(), readPersona()]);
+    const result = await runReflexion({
+      answers,
+      human_md,
+      persona_md,
+      context: zoeContext(),
+      voiceNoteTranscript,
+    });
+    const { plan } = result;
+
+    if (plan.patches.length === 0) {
+      await ctx.reply('Reflection logged. No memory updates needed tonight.');
+      return;
+    }
+
+    // Stash high-confidence patches for y/n; low-confidence ones get a
+    // voice-note request and are resolved on Zaal's next free-form reply.
+    if (plan.highConfidence.length > 0 || plan.needsVoiceNote.length > 0) {
+      await setPending({
+        kind: 'reflexion',
+        chatScope: 'private',
+        createdAt: new Date().toISOString(),
+        patches: plan.highConfidence,
+        answers,
+        hasVoiceNoteRequests: plan.needsVoiceNote.length > 0,
+      });
+    }
+
+    if (plan.highConfidence.length > 0) {
+      await replyChunked(ctx, plan.approval_message);
+    }
+    if (plan.voice_note_request) {
+      await replyChunked(ctx, plan.voice_note_request);
+    }
+    console.log(
+      `[zoe/index] reflexion — ${plan.highConfidence.length} hi-conf, ${plan.needsVoiceNote.length} need-voice, cost=$${result.costUsd.toFixed(4)}`,
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] reflexion failed:', msg);
+    await ctx.reply(`(reflexion error - ${msg.slice(0, 200)})`);
+  }
+}
+
+/** Apply the Zaal-approved subset of reflexion patches to the memory files. */
+async function applyReflexionPatches(
+  ctx: Context,
+  patches: ProposedPatch[],
+  reply: ApprovalReply,
+): Promise<void> {
+  const selected =
+    reply.decision === 'approve-all'
+      ? patches
+      : patches.filter((p) => reply.ids.includes(p.id.toLowerCase()));
+
+  if (selected.length === 0) {
+    await ctx.reply('No matching patch ids — nothing applied. Reply "y all" or "y patch-1".');
+    return;
+  }
+
+  // Apply per target file: read once, fold all selected patches in, write once.
+  const byTarget = new Map<ProposedPatch['target'], ProposedPatch[]>();
+  for (const p of selected) {
+    byTarget.set(p.target, [...(byTarget.get(p.target) ?? []), p]);
+  }
+
+  const applied: string[] = [];
+  try {
+    for (const [target, group] of byTarget) {
+      let content = target === 'human.md' ? await readHuman() : await readPersona();
+      for (const patch of group) {
+        content = applyPatch(content, patch);
+        applied.push(`${patch.id} -> ${target}`);
+      }
+      if (target === 'human.md') await writeHuman(content);
+      else await writePersona(content);
+    }
+    await ctx.reply(`Applied ${applied.length} patch${applied.length === 1 ? '' : 'es'}:\n${applied.join('\n')}`);
+    console.log(`[zoe/index] reflexion patches applied: ${applied.join(', ')}`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] applyReflexionPatches failed:', msg);
+    await ctx.reply(`(patch apply failed - ${msg.slice(0, 200)})`);
+  }
 }
 
 bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {

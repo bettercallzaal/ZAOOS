@@ -70,10 +70,9 @@ test('reject is checked before approve so "no thanks" never approves', () => {
 
 function mkPending(createdAt: string): PendingApproval {
   return {
-    kind: 'reflexion',
+    kind: 'await-reflection',
     chatScope: 'private',
     createdAt,
-    patches: [],
   };
 }
 
@@ -98,4 +97,16 @@ test('pending exactly at TTL boundary is not yet expired', () => {
 test('corrupt timestamp is treated as expired', () => {
   const p = mkPending('not-a-date');
   assert.equal(isPendingExpired(p, Date.now()), true);
+});
+
+test('per-item ttlMs override extends the lifetime', () => {
+  const now = Date.now();
+  const p: PendingApproval = {
+    kind: 'await-reflection',
+    chatScope: 'private',
+    createdAt: new Date(now - PENDING_TTL_MS - 1000).toISOString(),
+    ttlMs: 14 * 60 * 60 * 1000, // 14h
+  };
+  // Older than the 30-min default, but well within the 14h override.
+  assert.equal(isPendingExpired(p, now), false);
 });

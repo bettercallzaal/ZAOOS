@@ -9,7 +9,7 @@
  * from PERSONA_DEFAULT in memory.ts on first boot, hand-editable after).
  */
 import { callClaudeCli } from '../hermes/claude-cli';
-import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote } from './types';
+import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
 import type { MemoryBlocks } from './memory';
 

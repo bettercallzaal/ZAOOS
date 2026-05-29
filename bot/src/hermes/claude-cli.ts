@@ -116,7 +116,21 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     child.on('close', (code) => {
       clearTimeout(timeout);
       if (code !== 0) {
-        reject(new Error(`claude CLI exited ${code}. stderr: ${stderr.slice(0, 800)}`));
+        // Echo BOTH streams. claude CLI frequently exits non-zero with an
+        // EMPTY stderr (the actual diagnostic — auth window expired, bad
+        // flag, JSON error payload — lands on stdout). Logging stderr alone
+        // made every such failure mute ("claude CLI exited 1. stderr: ").
+        console.error(
+          '[hermes/claude-cli] non-zero exit. exit_code=', code,
+          '\n  stderr=', stderr.slice(0, 800) || '(empty)',
+          '\n  stdout=', stdout.slice(0, 800) || '(empty)',
+          '\n  args=', JSON.stringify(args).slice(0, 400),
+        );
+        reject(
+          new Error(
+            `claude CLI exited ${code}. stderr: ${stderr.slice(0, 400) || '(empty)'} | stdout: ${stdout.slice(0, 400) || '(empty)'}`,
+          ),
+        );
         return;
       }
 

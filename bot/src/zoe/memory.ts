@@ -352,6 +352,21 @@ export async function readHuman(): Promise<string> {
   return fs.readFile(HUMAN_PATH, 'utf8');
 }
 
+/**
+ * Overwrite human.md / persona.md. Used by the reflexion layer (doc 759 Gap 4)
+ * to persist a Zaal-approved memory patch. Only ever called after explicit
+ * y/n approval — never autonomously.
+ */
+export async function writeHuman(contents: string): Promise<void> {
+  await ensureZoeHome();
+  await fs.writeFile(HUMAN_PATH, contents, 'utf8');
+}
+
+export async function writePersona(contents: string): Promise<void> {
+  await ensureZoeHome();
+  await fs.writeFile(PERSONA_PATH, contents, 'utf8');
+}
+
 function recentPathFor(scope: ChatScope): string {
   return join(RECENT_DIR, `${scope}.json`);
 }

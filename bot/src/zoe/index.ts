@@ -23,13 +23,26 @@ import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
+import { runBotRelayOps, summarizeRelayResults } from './relay';
+import { decomposeGoal, renderPlanForApproval } from './decompose';
 import {
   buildMemoryBlocks,
   ensureZoeHome,
   pushRecent,
+  readHuman,
+  readPersona,
+  writeHuman,
+  writePersona,
   ZOE_PATHS,
   type ChatScope,
 } from './memory';
+import {
+  runReflexion,
+  applyPatch,
+  type ReflectionAnswers,
+  type ProposedPatch,
+} from './reflexion';
+import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn } from './recall';
@@ -44,10 +57,25 @@ import {
   type GroupMode,
 } from './groups';
 import { handleVoiceMemo, handlePostCallback } from './posts';
+import { dispatchPlan } from './dispatch';
+import {
+  getPending,
+  setPending,
+  clearPending,
+  loadPending,
+  parseApprovalReply,
+  type PendingApproval,
+  type ApprovalReply,
+} from './approvals';
+import type { DecompositionPlan } from './decompose';
 import { attachCaster, runCasterPipeline } from './caster';
 import { subscribeToCasts } from './farcaster/event-stream';
 
 const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
+// Opt-in goal decomposition + dispatch (doc 759 Gaps 1+2). Zaal sends
+// `plan: <goal>` / `decompose: <goal>` to get a routed plan; on "y" ZOE
+// dispatches the workers. Default chat stays a normal concierge turn.
+const PLAN_PREFIX = /^(plan|decompose):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
 
@@ -137,6 +165,21 @@ const botIdHolder: { value: number | null } = { value: null };
 
 function isFromZaal(ctx: Context): boolean {
   return ctx.from?.id === zaalId;
+}
+
+// ZOE anchors all reasoning to Eastern time (Zaal's tz). Shared by the
+// concierge turn and the decompose path so the model never sees a UTC date.
+function currentDateString(): string {
+  return new Date().toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
 }
 
 function senderLabel(ctx: Context): string {
@@ -402,6 +445,33 @@ bot.on('message:text', async (ctx) => {
 });
 
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
+  // Pending-approval interception (doc 759 keystone). If ZOE is waiting on a
+  // y/n for this chat, route the reply to the resolver. Ambiguous messages
+  // (not-an-approval) fall through to normal handling and leave the pending
+  // item in place — it auto-expires via TTL.
+  const pending = getPending('private');
+  if (pending) {
+    // await-reflection: the next free-form DM is Zaal's reflection answer.
+    if (pending.kind === 'await-reflection') {
+      await clearPending('private');
+      await handleReflectionAnswer(ctx, text);
+      return;
+    }
+    const reply = parseApprovalReply(text);
+    if (reply.decision !== 'not-an-approval') {
+      await resolvePendingApproval(ctx, pending, reply);
+      return;
+    }
+    // reflexion with outstanding voice-note requests: a free-form (non-y/n)
+    // reply is Zaal's clarification — re-run reflexion with it as the
+    // transcript (typed clarification stands in for an audio voice note).
+    if (pending.kind === 'reflexion' && pending.hasVoiceNoteRequests && text.trim().length > 10) {
+      await clearPending('private');
+      await runReflexionFlow(ctx, pending.answers, text);
+      return;
+    }
+  }
+
   // Hourly nudge toggle. Accepts "nudges" and the legacy "tips" phrasing.
   const nudgeToggle = /^(stop|pause|disable)\s+(nudges?|tips?)$/i.exec(text.trim())
     ? 'off'
@@ -434,6 +504,13 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
       console.error('[zoe/index] note save failed:', msg);
       await ctx.reply(`(note save failed - ${msg.slice(0, 200)})`);
     }
+    return;
+  }
+
+  // Goal decomposition + dispatch: opt-in `plan:`/`decompose:` prefix.
+  const planMatch = PLAN_PREFIX.exec(text);
+  if (planMatch) {
+    await handlePlanCommand(ctx, planMatch[2]);
     return;
   }
 
@@ -501,7 +578,7 @@ async function dispatchConcierge(
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
-        current_date: new Date().toISOString().slice(0, 10),
+        current_date: currentDateString(),
       },
     });
 
@@ -511,6 +588,25 @@ async function dispatchConcierge(
 
     if (result.quest_ops.length > 0) {
       await applyQuestOps(result.quest_ops);
+    }
+
+    // Cross-bot relay (Phase 2 Bonfire integration). ZOE can ask other bots
+    // in Telegram groups (e.g. @zabal_bonfire_bot in ZAO Civilization) by
+    // emitting bot_relay_ops in her JSON reply. v1 is fire-and-forget;
+    // result summary appends to her DM reply so Zaal sees what was sent.
+    let relayPostscript = '';
+    if (result.bot_relay_ops && result.bot_relay_ops.length > 0) {
+      try {
+        const relayResults = await runBotRelayOps(
+          (chatId, text) => bot.api.sendMessage(chatId, text),
+          result.bot_relay_ops,
+        );
+        const summary = summarizeRelayResults(relayResults);
+        if (summary) relayPostscript = '\n\n' + summary;
+      } catch (err) {
+        console.error('[zoe/index] bot relay failed:', (err as Error).message);
+        relayPostscript = '\n\n(bot relay failed - check logs)';
+      }
     }
 
     // Bonfire: mirror this turn's captures + task/quest changes into the
@@ -530,7 +626,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim();
+    const safeReply = result.reply.trim() + relayPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(
@@ -559,6 +655,308 @@ async function dispatchConcierge(
   }
 }
 
+function zoeContext() {
+  return {
+    zaal_tg_id: zaalId,
+    workspace_dir: repoDir,
+    current_date: currentDateString(),
+  };
+}
+
+/**
+ * `plan:`/`decompose:` handler — decompose the goal, store it as a pending
+ * approval, and render it for y/n. On "y" the resolver dispatches the workers.
+ * If the plan has unresolved ambiguities, nothing is stored (there's nothing
+ * to dispatch yet) and ZOE just asks for clarification.
+ */
+async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
+  if (!ctx.chat) return;
+  const chatId = ctx.chat.id;
+  await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  const typingInterval = setInterval(() => {
+    ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  }, TYPING_REFRESH_MS);
+  const ackTimeout = setTimeout(() => {
+    ctx.reply('Decomposing into a routed plan — one moment.').catch(() => {});
+  }, ACK_THRESHOLD_MS);
+
+  try {
+    const result = await decomposeGoal({ goal, context: zoeContext() });
+    const { plan } = result;
+    const dispatchable = plan.ambiguities.length === 0 && plan.subtasks.length > 0;
+    if (dispatchable) {
+      await setPending({
+        kind: 'plan',
+        chatScope: 'private',
+        createdAt: new Date().toISOString(),
+        goal,
+        plan,
+      });
+    }
+    await replyChunked(ctx, renderPlanForApproval(plan));
+    console.log(
+      `[zoe/index] plan proposed — subtasks=${plan.subtasks.length} ambiguities=${plan.ambiguities.length} dispatchable=${dispatchable} cost=$${result.costUsd.toFixed(4)}`,
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] decompose failed:', msg);
+    await ctx.reply(`(decompose error - ${msg.slice(0, 200)})`);
+  } finally {
+    clearInterval(typingInterval);
+    clearTimeout(ackTimeout);
+  }
+}
+
+/** Route a parsed y/n/edit reply against whatever ZOE is waiting to approve. */
+async function resolvePendingApproval(
+  ctx: Context,
+  pending: PendingApproval,
+  reply: ApprovalReply,
+): Promise<void> {
+  if (reply.decision === 'reject') {
+    await clearPending(pending.chatScope);
+    await ctx.reply('Cancelled. Nothing dispatched.');
+    return;
+  }
+
+  if (reply.decision === 'edit') {
+    await clearPending(pending.chatScope);
+    if (pending.kind === 'plan' || pending.kind === 'plan-gate') {
+      await ctx.reply('Re-planning with your changes…');
+      await handlePlanCommand(ctx, `${pending.goal}\n\nRevision from Zaal: ${reply.editText ?? ''}`);
+    } else {
+      await ctx.reply('Okay, dropped that. Send a fresh request when ready.');
+    }
+    return;
+  }
+
+  // approve-all / approve-ids
+  switch (pending.kind) {
+    case 'plan':
+      await clearPending(pending.chatScope);
+      await runApprovedPlan(ctx, pending.goal, pending.plan, []);
+      return;
+    case 'plan-gate':
+      await clearPending(pending.chatScope);
+      await runApprovedPlan(ctx, pending.goal, pending.plan, pending.completed);
+      return;
+    case 'reflexion':
+      await clearPending(pending.chatScope);
+      await applyReflexionPatches(ctx, pending.patches, reply);
+      return;
+    case 'learn':
+      await clearPending(pending.chatScope);
+      await applyLearnProposals(ctx, pending.proposals, reply);
+      return;
+    case 'await-reflection':
+      // Shouldn't reach here (handled in the interception), but be safe.
+      await clearPending(pending.chatScope);
+      return;
+  }
+}
+
+/** Dispatch an approved plan with live Telegram progress, then report. */
+async function runApprovedPlan(
+  ctx: Context,
+  goal: string,
+  plan: DecompositionPlan,
+  alreadyCompleted: string[],
+): Promise<void> {
+  if (!ctx.chat) return;
+  const chatId = ctx.chat.id;
+  await ctx.reply(alreadyCompleted.length > 0 ? 'Continuing past the gate…' : 'Dispatching the plan…');
+
+  const report = await dispatchPlan({
+    goal,
+    plan,
+    context: zoeContext(),
+    chatId,
+    zaalTgId: zaalId,
+    alreadyCompleted,
+    hooks: {
+      onSubtaskStart: async (st) => {
+        await ctx.reply(`▶ ${st.id} (${st.worker}): ${st.title}`.slice(0, 300)).catch(() => {});
+      },
+    },
+  });
+
+  // Paused at a gate — stash the partial plan so the next "y" resumes it.
+  if (report.status === 'paused-for-gate' && report.gateAfterId) {
+    await setPending({
+      kind: 'plan-gate',
+      chatScope: 'private',
+      createdAt: new Date().toISOString(),
+      goal,
+      plan,
+      completed: report.completedIds,
+      gateAfterId: report.gateAfterId,
+    });
+  }
+
+  await replyChunked(ctx, report.summary);
+  console.log(
+    `[zoe/index] dispatch ${report.status} — ${report.results.length} subtask(s) $${report.totalCostUsd.toFixed(2)}`,
+  );
+}
+
+// --- Reflexion / Gap 4: learn-from-reflection -> memory patches ------------
+
+/**
+ * Loosely parse a free-form evening-reflection reply into the 3 answer slots.
+ * If the reply has numbered parts (1. / 2) / 3:) map them; otherwise dump the
+ * whole thing into `extra` and let the reflexion prompt sort it out.
+ */
+function parseReflectionAnswers(text: string): ReflectionAnswers {
+  const parts = text
+    .split(/\n?\s*[1-3][.):]\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (parts.length >= 3) {
+    return {
+      shipped: parts[0],
+      stuck: parts[1],
+      tomorrow_first: parts[2],
+      extra: parts.slice(3).join('\n') || undefined,
+    };
+  }
+  return { shipped: '', stuck: '', tomorrow_first: '', extra: text };
+}
+
+/** Entry from the await-reflection interception: parse + run reflexion. */
+async function handleReflectionAnswer(ctx: Context, rawText: string): Promise<void> {
+  await runReflexionFlow(ctx, parseReflectionAnswers(rawText));
+}
+
+/**
+ * Run the reflexion layer over reflection answers (optionally clarified by a
+ * voice note), then offer high-confidence memory patches for y/n approval.
+ */
+async function runReflexionFlow(
+  ctx: Context,
+  answers: ReflectionAnswers,
+  voiceNoteTranscript?: string,
+): Promise<void> {
+  if (!ctx.chat) return;
+  const chatId = ctx.chat.id;
+  await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  try {
+    const [human_md, persona_md] = await Promise.all([readHuman(), readPersona()]);
+    const result = await runReflexion({
+      answers,
+      human_md,
+      persona_md,
+      context: zoeContext(),
+      voiceNoteTranscript,
+    });
+    const { plan } = result;
+
+    if (plan.patches.length === 0) {
+      await ctx.reply('Reflection logged. No memory updates needed tonight.');
+      return;
+    }
+
+    // Stash high-confidence patches for y/n; low-confidence ones get a
+    // voice-note request and are resolved on Zaal's next free-form reply.
+    if (plan.highConfidence.length > 0 || plan.needsVoiceNote.length > 0) {
+      await setPending({
+        kind: 'reflexion',
+        chatScope: 'private',
+        createdAt: new Date().toISOString(),
+        patches: plan.highConfidence,
+        answers,
+        hasVoiceNoteRequests: plan.needsVoiceNote.length > 0,
+      });
+    }
+
+    if (plan.highConfidence.length > 0) {
+      await replyChunked(ctx, plan.approval_message);
+    }
+    if (plan.voice_note_request) {
+      await replyChunked(ctx, plan.voice_note_request);
+    }
+    console.log(
+      `[zoe/index] reflexion — ${plan.highConfidence.length} hi-conf, ${plan.needsVoiceNote.length} need-voice, cost=$${result.costUsd.toFixed(4)}`,
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] reflexion failed:', msg);
+    await ctx.reply(`(reflexion error - ${msg.slice(0, 200)})`);
+  }
+}
+
+/** Apply the Zaal-approved subset of reflexion patches to the memory files. */
+async function applyReflexionPatches(
+  ctx: Context,
+  patches: ProposedPatch[],
+  reply: ApprovalReply,
+): Promise<void> {
+  const selected =
+    reply.decision === 'approve-all'
+      ? patches
+      : patches.filter((p) => reply.ids.includes(p.id.toLowerCase()));
+
+  if (selected.length === 0) {
+    await ctx.reply('No matching patch ids — nothing applied. Reply "y all" or "y patch-1".');
+    return;
+  }
+
+  // Apply per target file: read once, fold all selected patches in, write once.
+  const byTarget = new Map<ProposedPatch['target'], ProposedPatch[]>();
+  for (const p of selected) {
+    byTarget.set(p.target, [...(byTarget.get(p.target) ?? []), p]);
+  }
+
+  const applied: string[] = [];
+  try {
+    for (const [target, group] of byTarget) {
+      let content = target === 'human.md' ? await readHuman() : await readPersona();
+      for (const patch of group) {
+        content = applyPatch(content, patch);
+        applied.push(`${patch.id} -> ${target}`);
+      }
+      if (target === 'human.md') await writeHuman(content);
+      else await writePersona(content);
+    }
+    await ctx.reply(`Applied ${applied.length} patch${applied.length === 1 ? '' : 'es'}:\n${applied.join('\n')}`);
+    console.log(`[zoe/index] reflexion patches applied: ${applied.join(', ')}`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] applyReflexionPatches failed:', msg);
+    await ctx.reply(`(patch apply failed - ${msg.slice(0, 200)})`);
+  }
+}
+
+/** Apply the Zaal-approved subset of weekly learn proposals (Gap 5). */
+async function applyLearnProposals(
+  ctx: Context,
+  proposals: LearnProposal[],
+  reply: ApprovalReply,
+): Promise<void> {
+  const selected =
+    reply.decision === 'approve-all'
+      ? proposals
+      : proposals.filter((p) => reply.ids.includes(p.id.toLowerCase()));
+  if (selected.length === 0) {
+    await ctx.reply('No matching proposal ids — nothing applied. Reply "y all" or "y lp-1".');
+    return;
+  }
+  const applied: string[] = [];
+  for (const p of selected) {
+    try {
+      await applyLearnProposal(p);
+      applied.push(`${p.id} -> ${p.target}`);
+    } catch (err) {
+      console.error('[zoe/index] applyLearnProposal failed:', (err as Error).message);
+    }
+  }
+  await ctx.reply(
+    applied.length > 0
+      ? `Applied ${applied.length} learning${applied.length === 1 ? '' : 's'}:\n${applied.join('\n')}`
+      : '(learning apply failed - check logs)',
+  );
+  console.log(`[zoe/index] learnings applied: ${applied.join(', ')}`);
+}
+
 bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
   const action = ctx.match[1];
   await ctx.answerCallbackQuery({ text: `Marked ${action}.` });
@@ -567,6 +965,7 @@ bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
 
 async function main(): Promise<void> {
   await ensureZoeHome();
+  await loadPending(); // restore any approval ZOE was waiting on before restart
   console.log(
     '[zoe/index] ZOE booting — token set, zaalId=',
     zaalId,

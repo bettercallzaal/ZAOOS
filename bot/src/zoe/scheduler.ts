@@ -23,6 +23,11 @@ import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled } from './nudges';
 import { startPostsScheduler } from './posts';
+import { setPending } from './approvals';
+import { runLearnCycle, renderLearnProposals } from './learn';
+
+/** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
+const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
 
 const SENTINEL_DIR = join(ZOE_PATHS.home, 'sentinels');
 
@@ -85,7 +90,15 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           const prompt = await generateEveningReflection({ repoDir: opts.repoDir });
           await opts.bot.api.sendMessage(opts.zaalTgId, prompt);
           await markFired('evening-reflect');
-          console.log('[zoe/scheduler] evening reflection sent');
+          // Arm reflexion (Gap 4): Zaal's next free-form DM is captured as the
+          // reflection answer and fed to the reflexion layer for memory patches.
+          await setPending({
+            kind: 'await-reflection',
+            chatScope: 'private',
+            createdAt: new Date().toISOString(),
+            ttlMs: AWAIT_REFLECTION_TTL_MS,
+          });
+          console.log('[zoe/scheduler] evening reflection sent + reflexion armed');
         } catch (err) {
           console.error('[zoe/scheduler] evening reflection failed:', (err as Error).message);
         }
@@ -116,6 +129,42 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           console.log(`[zoe/scheduler] hourly nudge sent (hour=${hour})`);
         } catch (err) {
           console.error('[zoe/scheduler] hourly nudge failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // Gap 5 weekly learning loop — Sunday 18:00 UTC. Clusters the week's
+  // dispatch telemetry and proposes worker learnings for Zaal to approve.
+  tasks.push(
+    cron.schedule(
+      '0 18 * * 0',
+      async () => {
+        if (await alreadyFired('learn-cycle')) return;
+        try {
+          const result = await runLearnCycle({
+            context: {
+              zaal_tg_id: opts.zaalTgId,
+              workspace_dir: opts.repoDir,
+              current_date: new Date().toISOString().slice(0, 10),
+            },
+          });
+          await markFired('learn-cycle');
+          if (result.proposals.length === 0) {
+            console.log(`[zoe/scheduler] learn cycle: ${result.runsAnalyzed} runs, no proposals`);
+            return;
+          }
+          await setPending({
+            kind: 'learn',
+            chatScope: 'private',
+            createdAt: new Date().toISOString(),
+            proposals: result.proposals,
+          });
+          await opts.bot.api.sendMessage(opts.zaalTgId, renderLearnProposals(result.proposals));
+          console.log(`[zoe/scheduler] learn cycle: ${result.proposals.length} proposals sent`);
+        } catch (err) {
+          console.error('[zoe/scheduler] learn cycle failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

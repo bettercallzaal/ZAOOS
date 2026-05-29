@@ -186,7 +186,26 @@ Current configured groups: ~/.zao/zoe/groups.json (managed by /zoe-group-* comma
 - Use bullet lists when listing 3+ items. One thought per bullet.
 - Default reply: 3-6 lines, broken into 2-4 paragraphs.
 - Long replies (>10 lines) only when Zaal asks for "full" / "deep" / "detail".
-- Phone-readable. Imagine Zaal scrolling Telegram one-handed.`;
+- Phone-readable. Imagine Zaal scrolling Telegram one-handed.
+## CROSS-BOT RELAY (NEW per doc 759 Bonfire integration)
+
+When Zaal asks you to ask another bot in a Telegram group (most commonly @zabal_bonfire_bot in ZAO Civilization), do NOT output the message text and ask him to paste. Emit a bot_relay_op in your JSON ops section + the runtime sends it for you. Confirm in your prose reply that you are dispatching it.
+
+Op shape (append alongside task_ops / captures / etc in the JSON ops fence):
+
+{
+  "bot_relay_ops": [
+    {"op": "relay_to_bot", "to_group": "ZAO Civilization", "tag_bot": "@zabal_bonfire_bot", "message": "the question text - DO NOT include the tag, runtime prepends it"}
+  ]
+}
+
+to_group is matched case-insensitively against group titles in groups.json. Use question shape that triggers a graph query: name specific docs (e.g. doc 759), decisions (the 17-Q grill, Gap 2 GATEWAY), dates, people, projects. The runtime appends a one-line confirmation to your reply.
+
+v1 is fire-and-forget. When the target bot replies in the group, Zaal pastes the reply back + you summarize. v2 captures the reply automatically.
+
+If target group isn't registered, the runtime tells Zaal to /zg enable it first. Always emit the relay_op; runtime handles the check.
+
+`;
 
 const HUMAN_DEFAULT = `# Zaal Panthaki
 
@@ -275,6 +294,7 @@ Match the elder's JSON-block trailer. Reuse task_ops + captures + escalate shape
 ## Review gate
 Before shipping, run draft past ZOE elder. Ask: "Voice drift? Tool gaps? Scope overlap?"
 Children that ship without elder review get reverted.
+
 `;
 
 export interface MemoryBlocks {
@@ -330,6 +350,21 @@ export async function readPersona(): Promise<string> {
 export async function readHuman(): Promise<string> {
   await ensureZoeHome();
   return fs.readFile(HUMAN_PATH, 'utf8');
+}
+
+/**
+ * Overwrite human.md / persona.md. Used by the reflexion layer (doc 759 Gap 4)
+ * to persist a Zaal-approved memory patch. Only ever called after explicit
+ * y/n approval — never autonomously.
+ */
+export async function writeHuman(contents: string): Promise<void> {
+  await ensureZoeHome();
+  await fs.writeFile(HUMAN_PATH, contents, 'utf8');
+}
+
+export async function writePersona(contents: string): Promise<void> {
+  await ensureZoeHome();
+  await fs.writeFile(PERSONA_PATH, contents, 'utf8');
 }
 
 function recentPathFor(scope: ChatScope): string {

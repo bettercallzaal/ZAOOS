@@ -2,9 +2,9 @@
 topic: identity
 type: guide
 status: research-complete
-last-validated: 2026-05-29
+last-validated: 2026-05-30
 superseded-by:
-related-docs: 665, 669, 542, 544, 569, 726, 754
+related-docs: 665, 669, 542, 544, 546, 569, 680, 726, 754
 original-query: "https://docs.fileverse.io/d/0200039b000d#k=vK13_Bm1s7JDW5bqpxtIuVMgp87ySuynflgRAe9I-SY"
 tier: STANDARD
 ---
@@ -15,6 +15,8 @@ tier: STANDARD
 
 > **Source is the primary artifact.** The Fileverse dDoc Zaal sent is the Bonfires team's own architecture essay, fetched FULL via headless browser (1838 words, 11 min read, "Built on Bonfires - May 2026"). This doc is the decode + ZAO-impact layer on top of it.
 
+> **Correction note (2026-05-30):** The first merged cut (PR #731) inferred that NERDDAO `trimtab` was the kernel's likely home. A DEEP cross-ref pass (4-agent fan-out over ~50 NERDDAO repos + the public Graphiti fork + the competitive landscape) **refuted that**. `trimtab` is Tracery + n-gram + HDBSCAN, NOT FCG; the FCG kernel is proprietary/unreleased. Those corrections are now folded into the Key Decisions, Findings, and Next Actions below.
+
 ## Key Decisions
 
 | Decision | Verdict | Why |
@@ -22,7 +24,7 @@ tier: STANDARD
 | Treat the new kernel as the canonical direction for ZAO's Bonfire integration | YES | Bonfires is ZAO's locked-in KG/memory partner (Doc 601, 665, 669). A kernel rewrite changes what we ingest into and read out of zabal.bonfires.ai. Track it, don't re-architect ZAO's side yet. |
 | Keep ZAO's Phase-1 subprocess-CLI ingest path unchanged for now | YES | The kernel change is internal to Bonfires extraction. ZAO posts natural-language episodes; the kernel decides how to structure them. No ZAO-side code change required to benefit. Doc 665/669 ingest path stands. |
 | Re-frame ZAO episodes as "source material to compile", not "text to summarize" | YES | The kernel rewards typed, provenance-rich, recomposable input. Meeting recaps, decisions, captures with explicit who/what/when/why extract into cleaner artifacts (RoleBoundEventFrame, TemporalEdge, MentionCluster). The `/meeting` + `/bonfire` skills already write prose summaries - keep them structured. |
-| Watch NERDDAO `trimtab` repo as the kernel's likely home | YES | `trimtab` is described in Doc 665/669 as "context-aware grammar generation with cascading embedding search" - that matches the FCG-kernel-as-retrieval-strategy thesis in this essay almost exactly. Likely where the construction library + retrieval composition lives. |
+| The FCG kernel is proprietary / not in any public NERDDAO repo - do NOT chase `trimtab` | CORRECTED 2026-05-30 | DEEP cross-ref of ~50 NERDDAO repos found ZERO public FCG/GLiNER/typed-artifact code. `trimtab` is NOT the kernel: it is Tracery-style grammar gen + n-gram extraction + HDBSCAN clustering + a `real-ladybug` vector store (~156KB Python, updated 2026-04-22; verified via `gh repo view` + code search). The only public GLiNER footprint is `NERDDAO/graphiti` (a fork of getzep/graphiti, Apache 2.0), so Bonfires likely extends Graphiti as the substrate. Treat the essay as a roadmap/architecture statement, not shipped code. |
 | Expect "Oral History of the World" as the kernel's public stress-test product | YES | Essay names it: wallet-gated, story + map-pin submission, audio transcription, artifact extraction, bounded remix, directed influence graph. A folklore corpus. ZAO has an adjacent surface pattern (wallet-gated contribution + remix) worth noting. |
 | Adopt the procedural-vs-generative split as a ZOE memory principle | INVESTIGATE | ZOE's own memory (Letta 4-block + Bonfires) could borrow the separation: deterministic structure for durable recall, LLM only for expressive output. Open question whether ZOE needs its own GLiNER/FCG layer or just rides Bonfires'. |
 
@@ -94,7 +96,10 @@ The kernel's stress test. A "planetary folklore survey":
 | Fluid Construction Grammar is a real formalism | Verified - fcg-net.org + VUB AI lab (Luc Steels lineage), Babel framework, Lisp-based, `def-fcg-cxn` macro, comprehension/formulation via construction application. Constructions = form+meaning feature structures with typed slots and variable unification. | FULL |
 | GLiNER does zero-shot span classification against arbitrary labels | Verified - urchade/GLiNER, NAACL 2024 (Zaratiana et al.), bidirectional encoder (BERT/DeBERTa-v3), treats Open NER as matching entity-type embeddings to span embeddings. Smallest model ~50M params, runs on CPU, beats ChatGPT zero-shot on OOD benchmark, supports joint entity+relation extraction. | FULL |
 | spaCy + WordNet for surface grammar + categorical expansion | Well-established NLP tooling; no verification needed. spaCy = production dependency parser; WordNet = lexical database. | FULL (background) |
-| The kernel likely lives in / relates to NERDDAO `trimtab` | Inference from Doc 665/669: `trimtab` = "context-aware grammar generation with cascading embedding search." Matches the essay's FCG-as-retrieval-kernel + cascading-embedding-search description. NOT confirmed by the essay itself. | PARTIAL - flagged |
+| The kernel lives in NERDDAO `trimtab` | REFUTED 2026-05-30 (DEEP pass): `trimtab` is Tracery + n-gram + HDBSCAN + a `real-ladybug` vector store (verified via `gh repo view` + code search), NOT FCG. Zero hits for GLiNER / fluid construction grammar / RoleBoundEventFrame / TemporalEdge / MentionCluster across ~50 NERDDAO repos. The FCG kernel is proprietary / unreleased. | CORRECTED |
+| The only public GLiNER usage is `NERDDAO/graphiti` | Verified - a fork of getzep/graphiti (Apache 2.0, arXiv 2501.13956) carrying `examples/gliner2/gliner2_neo4j.py` (GLiNER2 by Fastino + Gemini edge extraction + Neo4j bi-temporal `valid_at`/`invalid_at`). Likely the substrate Bonfires extends. | FULL |
+| Deterministic extraction is a real 2024-26 trend | Verified - LazyGraphRAG, FastGraphRAG, GraphRAG-V all moved off per-chunk LLM extraction (75-700x cost cuts). What is NOVEL to Bonfires is a *learnable* FCG kernel (vs fixed spaCy noun-phrase rules) - no other commercial agent-memory vendor does this. Closest OSS analog = DerwenAI/Strwythura (spaCy -> GLiNER -> TextRank). Academic grounding: Beuls & Van Eecke 2025. | FULL |
+| Old (pre-kernel) Bonfires arch = Weaviate + Graphiti/Neo4j + MongoDB + ~20-min LLM batch extraction | Verified via Doc 546, which logged the motivating symptom: entity fragmentation ("zabal" vs "ZABAL" vs "zabal-coin") at 88K nodes / 7 days (ETHBoulder). The kernel exists to fix exactly that instability. | FULL |
 | Essay is genuinely from Bonfires team, May 2026 | Footer "Built on Bonfires - May 2026"; hosted on Fileverse with E2E-encryption key Zaal holds; aligns with Ryan Kagy / NERDDAO public direction (Docs 648, 669, 682). | FULL |
 
 ### Why this matters to ZAO specifically
@@ -113,6 +118,37 @@ The kernel's stress test. A "planetary folklore survey":
 | `bot/src/zoe/index.ts`, `types.ts` | Bonfire wiring + types. No change needed for kernel adoption (server-side). |
 | `bot/.env.example` | Bonfire API key config (key migration landed 2026-05-24, Doc 754). |
 
+## Live API surface + recall diagnosis (2026-05-30)
+
+Probed the live Bonfires API (`https://tnt-v2.api.bonfires.ai`, FastAPI - `/openapi.json` enumerates everything) with ZAO's key, plus read the public `NERDDAO/bonfires-sdk` (`canon` branch) + `NERDDAO/graphiti` fork. Findings:
+
+### The kernel is proprietary; the substrate is a Graphiti fork
+
+- `NERDDAO/graphiti` is a fork of `getzep/graphiti` (Apache 2.0, Zep paper arXiv 2501.13956). Its `examples/gliner2/gliner2_neo4j.py` runs **GLiNER2** (205-340M NER, CPU) for entity extraction + **Gemini** (gemini-2.5-flash-lite reasoning + gemini-embedding-001) for edges/dedup, writing **Neo4j bi-temporal** edges (`valid_at`/`invalid_at`). This is the public substrate Bonfires extends - NOT the FCG kernel.
+- Zero public code for the FCG kernel across NERDDAO repos: no `FCG`, `RoleBoundEventFrame`, `TemporalEdge` (typed), `fluid construction grammar`, GLiNER (beyond the graphiti fork). **The FCG extraction kernel is proprietary / unreleased** - the May-2026 essay is a roadmap statement, not shipped code. (Confirms the trimtab correction above.)
+
+### But structured/typed intake IS live (ZAO is not stuck with prose-only)
+
+The API exposes **190 endpoints**, including typed write paths beyond `POST /knowledge_graph/episode/create` (prose):
+
+- `POST /knowledge_graph/add_triples` + `POST /api/kg/add-triplet` - typed subject-predicate-object triples
+- `POST /knowledge_graph/entity` + `/edge` + `/entities/batch` - direct typed node/edge creation
+- `POST /knowledge_graph/ontology/{ingest,generate-profile,match,gaps}` - an ontology/schema layer
+- `POST /agents/{id}/stack/{add,process,search}` - the procedural "stack" (the essay's layered pipeline surface)
+- `/bonfire/{id}/{labeled_chunks,taxonomy_stats}` + `POST /trigger_taxonomy` - the taxonomy/labeling layer (essay layer 2)
+
+So if ZAO later wants higher-fidelity ingestion than prose episodes, `/knowledge_graph/add_triples` + `/entity`/`/edge` + `/ontology/ingest` are the typed paths - no need to wait for the FCG kernel.
+
+### Recall root cause (resolves the doc-680 read blocker)
+
+ZOE's `recall.ts` queried `POST /vector_store/search` `{bonfire_ref, search_string}` and always got `count:0`. Diagnosis:
+
+- `GET /vector_store/diagnostics/<bonfire_id>` -> `Labeled_chunks: 0, Bonfire_labels: 0`. The vector-search collections are genuinely empty (a platform-internal indexing step that never populated for this bonfire). This - not a "Ryan toggle" - is what the old "needs admin labeling" comments were grasping at.
+- `GET /bonfire/<id>/taxonomy_stats` -> `total_chunks: 283, labeled_chunks: 283, taxonomy_count: 0`. The graph has 283 chunks.
+- `POST /delve {bonfire_id, query}` -> the SDK's real graph-query path; `"What is ZAO?"` returns **51 episodes** with full content.
+
+Fix (PR #740): `recall.ts` now uses `/delve`, not the empty `/vector_store/search`. The SDK confirms `client.kg.search()` maps to `/delve`. Read path is unblocked - no labeling action required (closes the doc-680 read worry).
+
 ## Also See
 
 - [Doc 665](../../agents/665-bonfires-deep-dive-zao-integration/) - Bonfires architecture deep dive + 6 ZAO integration vectors + `trimtab`/kEngram detail
@@ -127,7 +163,8 @@ The kernel's stress test. A "planetary folklore survey":
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Confirm whether the FCG kernel ships in NERDDAO `trimtab` or a new repo; update Doc 665/669 repo map | @Zaal | Research follow-up | Next Ryan/Rskagy sync |
+| Confirm where the FCG kernel actually runs (proprietary backend vs unreleased repo) + whether a structured-episode intake endpoint is planned; ask Ryan/Rskagy directly. NOT `trimtab` (refuted). Update Doc 665/669 repo map | @Zaal | Research follow-up | Next Ryan/Rskagy sync |
+| Read `NERDDAO/graphiti` `examples/gliner2/gliner2_neo4j.py` + `bonfires-sdk` `canon` branch in full - the only public substrate matching the essay | Claude/@Zaal | Research follow-up | Backlog |
 | Audit `/meeting` + `/bonfire` skill output: ensure episodes carry explicit actor/decision/timestamp/causal structure (compile-ready, not summary-blob) | @Zaal | Skill review | Next sprint |
 | Decide if ZOE needs its own GLiNER/FCG layer or rides Bonfires' kernel entirely | @Zaal | Architecture decision | After kernel public |
 | Note "Oral History of the World" bounded-remix pattern as a candidate ZAO content primitive (lore/recap/song provenance remix) | @Zaal | Idea capture | Backlog |
@@ -140,3 +177,10 @@ The kernel's stress test. A "planetary folklore survey":
 - [FCG Syntax and Semantics - Babel Wiki](https://emergent-languages.org/wiki/docs/recipes/fcg/syntax-and-semantics/) + [Getting Started](https://emergent-languages.org/wiki/docs/recipes/fcg/getting-started/) - `[FULL]` - transient structures, `def-fcg-cxn` macro, predicate-calculus meaning representation, meta-layer learning.
 - [urchade/GLiNER (GitHub)](https://github.com/urchade/gliner) - `[FULL]` - zero-shot generalist NER, CPU-optimized, joint entity+relation extraction.
 - [GLiNER paper (NAACL 2024)](https://aclanthology.org/anthology-files/pdf/naacl/2024.naacl-long.300.pdf) - `[FULL]` - Zaratiana et al., bidirectional-encoder Open NER, ~50M smallest model, beats ChatGPT zero-shot on OOD benchmark.
+- [NERDDAO/trimtab (GitHub)](https://github.com/NERDDAO/trimtab) - `[FULL]` - DEEP-pass verification (`gh repo view` + code search): Tracery grammar gen + n-gram + HDBSCAN + `real-ladybug` vector store, ~156KB Python, updated 2026-04-22. NOT the FCG kernel - refutes the v1 inference.
+- [NERDDAO/graphiti (GitHub)](https://github.com/NERDDAO/graphiti) - `[FULL]` - fork of [getzep/graphiti](https://github.com/getzep/graphiti) (Apache 2.0, arXiv 2501.13956); `examples/gliner2/gliner2_neo4j.py` = GLiNER2 + Gemini + Neo4j bi-temporal. Only public GLiNER footprint across ~50 NERDDAO repos.
+- Beuls & Van Eecke 2025 (CxGs-NLP 2025 workshop) - academic grounding for the learnable-FCG novelty claim. `[PARTIAL - surfaced by the DEEP competitive-landscape pass; not independently re-fetched this session, no canonical URL verified - confirm before citing externally]`.
+- Live Bonfires API `https://tnt-v2.api.bonfires.ai/openapi.json` - `[FULL]` - 190-endpoint FastAPI spec, probed 2026-05-30 with ZAO's key. Confirmed `/delve`, `/knowledge_graph/add_triples`, `/api/kg/add-triplet`, `/knowledge_graph/ontology/*`, `/agents/{id}/stack/*`, `/bonfire/{id}/{labeled_chunks,taxonomy_stats}`, `/vector_store/diagnostics/{id}`.
+- [NERDDAO/bonfires-sdk (`canon`)](https://github.com/NERDDAO/bonfires-sdk/tree/canon) - `[FULL]` - `client.kg.search()` -> `POST /delve`; `kg.create_entity/create_edge` -> typed graph writes; `trimtab.*` -> Tracery grammar service. No typed-artifact/FCG intake exposed.
+- [NERDDAO/graphiti `examples/gliner2/gliner2_neo4j.py`](https://github.com/NERDDAO/graphiti/blob/main/examples/gliner2/gliner2_neo4j.py) - `[FULL]` - GLiNER2 + Gemini + Neo4j bi-temporal; fork of getzep/graphiti. The public substrate.
+- [NERDDAO/trimtab](https://github.com/NERDDAO/trimtab) - `[FULL]` - Tracery + n-gram + HDBSCAN + LadybugDB vector store. NOT the FCG kernel.

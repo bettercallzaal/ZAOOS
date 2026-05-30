@@ -24,6 +24,7 @@ import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
+import { runCrmOps, summarizeCrmResults } from './crm';
 import { decomposeGoal, renderPlanForApproval } from './decompose';
 import {
   buildMemoryBlocks,
@@ -45,7 +46,7 @@ import {
 import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
-import { mirrorTurn } from './recall';
+import { mirrorTurn, recall } from './recall';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -447,6 +448,10 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
   // y/n for this chat, route the reply to the resolver. Ambiguous messages
   // (not-an-approval) fall through to normal handling and leave the pending
   // item in place — it auto-expires via TTL.
+  //
+  // Command-prefixed messages (plan:/note:/nudge) are exempt (H1): they always
+  // reach their handler even while a pending is armed. The pending stays in
+  // place, so a later free-form DM still resolves it.
   const pending = getPending('private');
   if (pending) {
     if (pending.kind === 'await-reflection') {
@@ -577,10 +582,29 @@ async function dispatchConcierge(
 
     const blocks = await buildMemoryBlocks(scope, chatTitle);
 
+    // Pull relevant prior context from the ZABAL knowledge graph (Bonfire) via
+    // recall()/delve and inject it into the turn. DMs only + substantive
+    // messages (skip "y"/"ok"/short acks). Best-effort: no-op if Bonfire
+    // unconfigured or delve returns nothing; never blocks the turn.
+    let recallContext: string | undefined;
+    if (scope === 'private' && text.trim().length >= 12) {
+      try {
+        const r = await recall({
+          query: text,
+          reason: 'concierge turn context',
+          expected_kind: 'mixed',
+        });
+        if (r.kind === 'sdk_response' && r.text) recallContext = r.text;
+      } catch (err) {
+        console.warn('[zoe/index] recall failed (nbd):', (err as Error).message);
+      }
+    }
+
     const result = await runConciergeTurn({
       message: text,
       blocks,
       senderLabel: label,
+      recallContext,
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,
@@ -615,6 +639,22 @@ async function dispatchConcierge(
       }
     }
 
+    // CRM write path (doc 772). ZOE can upsert a contact + log an interaction
+    // by emitting crm_ops in her JSON reply; this POSTs to the app's
+    // /api/crm/interactions with the CRM_BOT_SECRET bearer. Fire-and-forget;
+    // a one-line summary appends to her DM reply.
+    let crmPostscript = '';
+    if (result.crm_ops && result.crm_ops.length > 0) {
+      try {
+        const crmResults = await runCrmOps(result.crm_ops);
+        const summary = summarizeCrmResults(crmResults);
+        if (summary) crmPostscript = '\n\n' + summary;
+      } catch (err) {
+        console.error('[zoe/index] crm write failed:', (err as Error).message);
+        crmPostscript = '\n\n(CRM write failed - check logs)';
+      }
+    }
+
     // Bonfire: mirror this turn's captures + task/quest changes into the
     // ZABAL knowledge graph. Best-effort, fire-and-forget — never blocks the
     // reply, never throws. No-op if BONFIRE_API_KEY/BONFIRE_ID are unset.
@@ -632,7 +672,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim() + relayPostscript;
+    const safeReply = result.reply.trim() + relayPostscript + crmPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(
@@ -696,11 +736,19 @@ async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
     ctx.reply('Decomposing into a routed plan — one moment.').catch(() => {});
   }, ACK_THRESHOLD_MS);
 
+  // H2 (doc 770): note if a new plan replaces an unresolved approval, so a
+  // live plan-gate / reflexion / learn pending is never silently clobbered.
+  const prior = getPending('private');
+
   try {
     const result = await decomposeGoal({ goal, context: zoeContext() });
     const { plan } = result;
     const dispatchable = plan.ambiguities.length === 0 && plan.subtasks.length > 0;
+    let priorNote = '';
     if (dispatchable) {
+      if (prior && (prior.kind === 'plan-gate' || prior.kind === 'reflexion' || prior.kind === 'learn')) {
+        priorNote = `\n\n(Heads up: this replaced a pending ${prior.kind} you hadn't resolved.)`;
+      }
       await setPending({
         kind: 'plan',
         chatScope: 'private',
@@ -709,7 +757,7 @@ async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
         plan,
       });
     }
-    await replyChunked(ctx, renderPlanForApproval(plan));
+    await replyChunked(ctx, renderPlanForApproval(plan) + priorNote);
     console.log(
       `[zoe/index] plan proposed — subtasks=${plan.subtasks.length} ambiguities=${plan.ambiguities.length} dispatchable=${dispatchable} cost=$${result.costUsd.toFixed(4)}`,
     );
@@ -802,39 +850,48 @@ async function runApprovedPlan(
 ): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
-  await ctx.reply(alreadyCompleted.length > 0 ? 'Continuing past the gate…' : 'Dispatching the plan…');
+  // H5 (doc 770): the whole dispatch + gate-stash + reply path is wrapped so a
+  // throw (ctx.reply, setPending disk write, etc.) can never silently drop the
+  // plan. dispatchPlan never throws by contract; this guards the rest.
+  try {
+    await ctx.reply(alreadyCompleted.length > 0 ? 'Continuing past the gate…' : 'Dispatching the plan…');
 
-  const report = await dispatchPlan({
-    goal,
-    plan,
-    context: zoeContext(),
-    chatId,
-    zaalTgId: zaalId,
-    alreadyCompleted,
-    hooks: {
-      onSubtaskStart: async (st) => {
-        await ctx.reply(`▶ ${st.id} (${st.worker}): ${st.title}`.slice(0, 300)).catch(() => {});
-      },
-    },
-  });
-
-  // Paused at a gate — stash the partial plan so the next "y" resumes it.
-  if (report.status === 'paused-for-gate' && report.gateAfterId) {
-    await setPending({
-      kind: 'plan-gate',
-      chatScope: 'private',
-      createdAt: new Date().toISOString(),
+    const report = await dispatchPlan({
       goal,
       plan,
-      completed: report.completedIds,
-      gateAfterId: report.gateAfterId,
+      context: zoeContext(),
+      chatId,
+      zaalTgId: zaalId,
+      alreadyCompleted,
+      hooks: {
+        onSubtaskStart: async (st) => {
+          await ctx.reply(`▶ ${st.id} (${st.worker}): ${st.title}`.slice(0, 300)).catch(() => {});
+        },
+      },
     });
-  }
 
-  await replyChunked(ctx, report.summary);
-  console.log(
-    `[zoe/index] dispatch ${report.status} — ${report.results.length} subtask(s) $${report.totalCostUsd.toFixed(2)}`,
-  );
+    // Paused at a gate — stash the partial plan so the next "y" resumes it.
+    if (report.status === 'paused-for-gate' && report.gateAfterId) {
+      await setPending({
+        kind: 'plan-gate',
+        chatScope: 'private',
+        createdAt: new Date().toISOString(),
+        goal,
+        plan,
+        completed: report.completedIds,
+        gateAfterId: report.gateAfterId,
+      });
+    }
+
+    await replyChunked(ctx, report.summary);
+    console.log(
+      `[zoe/index] dispatch ${report.status} — ${report.results.length} subtask(s) $${report.totalCostUsd.toFixed(2)}`,
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] runApprovedPlan failed:', msg);
+    await ctx.reply(`(dispatch error - ${msg.slice(0, 200)})`).catch(() => {});
+  }
 }
 
 // --- Reflexion / Gap 4: learn-from-reflection -> memory patches ------------
@@ -1039,8 +1096,11 @@ async function main(): Promise<void> {
       process.env.CASTER_PERSONA ??
       'You are the ZAO community caster. Reply in a warm, sharp, builder voice. Never shill, never overpromise.';
     try {
-      await subscribeToCasts(async (cast) => {
-        await runCasterPipeline(bot, zaalId, {
+      await subscribeToCasts((cast) => {
+        // Fire-and-forget per cast (the pipeline self-gates + returns a verdict
+        // we don't consume here). Wrapped so the callback returns void — unbreaks
+        // the bot typecheck after #729. See doc 770/773.
+        void runCasterPipeline(bot, zaalId, {
           agentId: 'caster',
           persona,
           context: `Someone cast (fid ${cast.fid}): "${cast.text}". Draft a reply.`,

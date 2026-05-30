@@ -107,4 +107,10 @@ export const ENV = {
   // a random 32+ byte hex value (`openssl rand -hex 32`) and pass the same
   // value to Juke when registering the webhook at POST /v1/developer/webhooks.
   JUKE_WEBHOOK_SECRET: optionalEnv('JUKE_WEBHOOK_SECRET'),
+  // Bearer secret shared with ZOE (Telegram bot) so it can write CRM
+  // contacts/interactions via POST /api/crm/interactions without an admin
+  // session. Generate `openssl rand -hex 32`; set the same value in the bot's
+  // env (CRM_BOT_SECRET). Unset = the bot write path is disabled (an admin
+  // iron-session still works on the same route).
+  CRM_BOT_SECRET: optionalEnv('CRM_BOT_SECRET'),
 } as const;

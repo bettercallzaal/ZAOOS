@@ -68,14 +68,10 @@ import {
   type ApprovalReply,
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
+import { NOTE_PREFIX, PLAN_PREFIX, isZoeCommand } from './commands';
 import { attachCaster, runCasterPipeline } from './caster';
 import { subscribeToCasts } from './farcaster/event-stream';
 
-const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
-// Opt-in goal decomposition + dispatch (doc 759 Gaps 1+2). Zaal sends
-// `plan: <goal>` / `decompose: <goal>` to get a routed plan; on "y" ZOE
-// dispatches the workers. Default chat stays a normal concierge turn.
-const PLAN_PREFIX = /^(plan|decompose):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
 
@@ -451,24 +447,32 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
   // item in place — it auto-expires via TTL.
   const pending = getPending('private');
   if (pending) {
-    // await-reflection: the next free-form DM is Zaal's reflection answer.
     if (pending.kind === 'await-reflection') {
-      await clearPending('private');
-      await handleReflectionAnswer(ctx, text);
-      return;
-    }
-    const reply = parseApprovalReply(text);
-    if (reply.decision !== 'not-an-approval') {
-      await resolvePendingApproval(ctx, pending, reply);
-      return;
-    }
-    // reflexion with outstanding voice-note requests: a free-form (non-y/n)
-    // reply is Zaal's clarification — re-run reflexion with it as the
-    // transcript (typed clarification stands in for an audio voice note).
-    if (pending.kind === 'reflexion' && pending.hasVoiceNoteRequests && text.trim().length > 10) {
-      await clearPending('private');
-      await runReflexionFlow(ctx, pending.answers, text);
-      return;
+      // The next free-form DM is Zaal's reflection answer — UNLESS it's a
+      // command (plan:/note:/nudge toggle). A command is not a reflection
+      // answer, so let it fall through to normal handling and leave the
+      // reflection pending armed (it auto-expires via TTL). Fixes doc 770 H1:
+      // a `plan:` sent in the long reflection window was being swallowed and
+      // never dispatched.
+      if (!isZoeCommand(text)) {
+        await clearPending('private');
+        await handleReflectionAnswer(ctx, text);
+        return;
+      }
+    } else {
+      const reply = parseApprovalReply(text);
+      if (reply.decision !== 'not-an-approval') {
+        await resolvePendingApproval(ctx, pending, reply);
+        return;
+      }
+      // reflexion with outstanding voice-note requests: a free-form (non-y/n)
+      // reply is Zaal's clarification — re-run reflexion with it as the
+      // transcript (typed clarification stands in for an audio voice note).
+      if (pending.kind === 'reflexion' && pending.hasVoiceNoteRequests && text.trim().length > 10) {
+        await clearPending('private');
+        await runReflexionFlow(ctx, pending.answers, text);
+        return;
+      }
     }
   }
 
@@ -707,8 +711,30 @@ async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
   }
 }
 
-/** Route a parsed y/n/edit reply against whatever ZOE is waiting to approve. */
+/**
+ * Route a parsed y/n/edit reply against whatever ZOE is waiting to approve.
+ * Wraps the resolver in a try/catch (doc 770 H5): the inner path clears the
+ * pending item before dispatching, so a throw from ctx.reply / setPending /
+ * dispatch would otherwise propagate to grammY and the user would see nothing
+ * with the plan already lost. On error we always reply so Zaal can re-send.
+ */
 async function resolvePendingApproval(
+  ctx: Context,
+  pending: PendingApproval,
+  reply: ApprovalReply,
+): Promise<void> {
+  try {
+    await doResolvePendingApproval(ctx, pending, reply);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] approval resolution failed:', msg);
+    await ctx
+      .reply(`(couldn't complete that — ${msg.slice(0, 200)}. Nothing is pending now; re-send when ready.)`)
+      .catch(() => {});
+  }
+}
+
+async function doResolvePendingApproval(
   ctx: Context,
   pending: PendingApproval,
   reply: ApprovalReply,

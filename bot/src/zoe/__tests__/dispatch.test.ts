@@ -110,3 +110,36 @@ test('cancellation stops before the first wave', async () => {
   assert.equal(report.status, 'cancelled');
   assert.equal(report.results.length, 0);
 });
+
+// =========================
+// doc 770 H3 — wave-concurrency cap + pre-flight budget
+// =========================
+
+test('pre-flight budget refuses to launch a batch it cannot afford (no worker runs)', async () => {
+  // research-worker estimates at its $1.00 hard per-invocation cap. A $0.50
+  // budget can't cover even one, so the wave is refused BEFORE any claude
+  // subprocess launches — the test stays pure (no CLI call).
+  const p = plan([st('st-1', { worker: 'research-worker' })]);
+  const report = await dispatchPlan(args(p, { maxPlanBudgetUsd: 0.5 }));
+  assert.equal(report.status, 'budget-exceeded');
+  assert.equal(report.results.length, 0);
+  assert.equal(report.totalCostUsd, 0);
+});
+
+test('a wave larger than the concurrency cap still completes every subtask', async () => {
+  // 7 independent task-dispatcher subtasks (cost 0) exceed WAVE_CONCURRENCY (3),
+  // so they run across multiple batches. Batching must not drop any.
+  const p = plan([
+    st('st-1'),
+    st('st-2'),
+    st('st-3'),
+    st('st-4'),
+    st('st-5'),
+    st('st-6'),
+    st('st-7'),
+  ]);
+  const report = await dispatchPlan(args(p));
+  assert.equal(report.status, 'completed');
+  assert.equal(report.results.length, 7);
+  assert.equal(report.completedIds.length, 7);
+});

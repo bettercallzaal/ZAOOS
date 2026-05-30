@@ -992,14 +992,14 @@ async function main(): Promise<void> {
       process.env.CASTER_PERSONA ??
       'You are the ZAO community caster. Reply in a warm, sharp, builder voice. Never shill, never overpromise.';
     try {
-      await subscribeToCasts((cast) =>
-        runCasterPipeline(bot, zaalId, {
+      await subscribeToCasts(async (cast) => {
+        await runCasterPipeline(bot, zaalId, {
           agentId: 'caster',
           persona,
           context: `Someone cast (fid ${cast.fid}): "${cast.text}". Draft a reply.`,
           parent: { fid: cast.fid, hash: cast.hash },
-        }),
-      );
+        });
+      });
       console.log('[zoe/index] caster event stream subscribed');
     } catch (err) {
       console.warn('[zoe/index] caster event stream not started:', (err as Error).message);

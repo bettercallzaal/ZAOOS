@@ -20,7 +20,7 @@ tier: DEEP
 | **Write endpoint: USE Neynar hub `hub-api.neynar.com/v1/submitMessage`** | CONFIRMED | POST raw protobuf (octet-stream), x402 `X-PAYMENT` header (EIP-3009), 0.001 USDC/call on Base to `0xA6a8736f18f383f1cc2d938576933E5eA7Df01A1`. Well-synced (seconds vs public hubs millions behind). |
 | **FIX write.ts: it sends a Bearer key, not the x402 `X-PAYMENT` header** | BUG FOUND | The Neynar hub is paid via EIP-3009 `transferWithAuthorization`, not an api_key. Bearer auth will not pay -> writes fail. Corrected on the branch. |
 | **FIX register-signer.ts: call `SignedKeyRequestValidator.encodeMetadata()`, do NOT manual-ABI-encode** | BUG FOUND | Neynar docs: manual encoding misses the dynamic offset pointer in the metadata struct. Use the on-chain view function. Corrected on the branch. |
-| **Signer: SHIP on `@noble/ed25519` (in-process), treat QKMS Ed25519 as unlikely** | SHARPENED | Quilibrium's native curve is Ed448 / BLS48-581, not Ed25519. AWS KMS only added Ed25519 on 2025-11-07. QKMS (Q1 2026, KMS-compatible) covering the newest AWS key-spec for a curve its own network does not use is improbable. Keep QKMS as optional custody; do not block on it. |
+| **Signer: noble-in-process is THE signer. QKMS CANNOT sign Ed25519.** | RESOLVED (definitive) | `qclient key create <Name> <KeyType>` enumerates the supported key types: **ed448, decaf448, x448, bls48581**. No Ed25519, no secp256k1. QKMS's "AWS-KMS compatibility" is API-surface only and does not add the Ed25519 curve. Farcaster requires Ed25519 -> QKMS is out as a signer. QKMS's only role: optional at-rest custody of the key blob (store encrypted, fetch at boot, sign with noble). Not co-equal. |
 | **Klearu is NOT classification-only - it is a private LLM inference runtime** | CONTRADICTION | Doc 761 locked "Klearu = classification ONLY, never reasoning". Reality: Klearu (github.com/QuilibriumNetwork/klearu) is a LLaMA-compatible E2EE inference + sparse-training stack. It CAN reason. Re-scope: Klearu is a candidate REASONING plane (private inference), and a safety gate is a prompt on top of it - not a separate "classifier-only" product. |
 | **"FFX" is not a shipped Quilibrium product - it is a beta codename for the future lambda layer** | CLARIFIED | No "FFX" in public docs. Quilibrium serverless today = QCL via `qclient deploy compute` + `qclient compute execute` (MPC, party/rendezvous). The roadmap lists "lambda functions" + "AI execution" as ETA TBD. FFX exec is NOT an HTTP API today; the exec/ffx.ts HTTP shape is a placeholder, correctly stubbed. |
 | **Reasoning: OpenRouter today, Router402 swap CONFIRMED viable** | CONFIRMED | Router402 (router402.xyz, HackMoney 2026 finalist) is an OpenRouter-compatible `/v1/chat/completions` gateway, x402 USDC on Base, ~0.2s Flashblocks settlement. Drop-in base-URL swap = exactly caster/reason.ts's design. Caveat: hackathon-stage, Claude+Gemini only, no SLA. |
@@ -57,7 +57,22 @@ Verified ecosystem figures (Neynar guide + rishavmukherji/farcaster-agent):
 
 So the doc 761 "~$1 FID / ~$2 custody" was a high estimate. Real day-one spend is ~$0.30-0.50 of gas plus a few USDC for casts. Fund ~$2-3 total to be safe (covers gas + a swap + headroom).
 
-### 3. QKMS - Ed25519 unconfirmed, and less likely than doc 761 assumed
+### 3. QKMS - DEFINITIVE: cannot sign Ed25519
+
+**The deciding evidence:** `qclient key create <Name> <KeyType>` documents the supported key
+types as **ed448, decaf448, x448, bls48581** (the Key Commands doc). There is no Ed25519 (and
+no secp256k1) key type. QKMS manages these Quilibrium-native curves; its "use existing KMS
+toolsets by changing endpoints" compatibility is about the API surface, not the curve set. AWS
+KMS only added `ECC_NIST_EDWARDS25519` on 2025-11-07; nothing indicates QKMS implements that
+newest AWS spec for a curve Quilibrium itself does not use.
+
+**Verdict:** QKMS is OUT as the Farcaster signer. noble-in-process (`NobleEd25519Signer`) is THE
+signer. QKMS's only possible role is at-rest custody of the 32-byte key blob (store encrypted in
+QStorage / a QKMS secret, fetch at boot, sign with noble in-process). The code now rejects
+`SIGNER_BACKEND=qkms` with this verdict. No qconsole login is needed to settle the signing
+decision - the key-type list already settles it.
+
+#### (prior framing, now superseded)
 
 - QKMS is real, launched Q1 2026 via QConsole, alongside QStorage (S3-compatible), QQ (SQS), QPing (SNS). "Drop-in solution... manage multi party keys... without single points of failure."
 - KMS compatibility = "use existing KMS toolsets by changing their endpoints to Quilibrium's" (same model as QStorage/S3). So AWS-KMS SDK/CLI tooling is the integration path.
@@ -121,7 +136,7 @@ None of these break the doc 761 architecture - the planes are right. They sharpe
 | Fix register-signer.ts to call `SignedKeyRequestValidator.encodeMetadata()` | @Zaal | PR (this branch) | This session |
 | Correct cost figures in doc 761 OPS-RUNBOOK (FID ~$0.20, signer ~$0.05, cast 0.001 USDC) | @Zaal | PR (this branch) | This session |
 | Decide: keep Klearu as safety-only OR adopt it as a private reasoning plane | @Zaal | Decision | Before Phase 4 |
-| Verify QKMS Ed25519 at qconsole.quilibrium.com (likely absent -> noble) | @Zaal | Manual | Before Phase 1 run |
+| QKMS Ed25519 - RESOLVED (cannot sign; noble is THE signer). No qconsole check needed. | - | Done | Done |
 | When FFX beta lands, re-shape exec/ffx.ts to qclient/QCL compute, not HTTP | @Zaal | PR | On beta access |
 
 ## Sources
@@ -133,6 +148,8 @@ None of these break the doc 761 architecture - the planes are right. They sharpe
 - [Quilibrium Compute Commands](https://docs.quilibrium.com/docs/run-node/qclient/commands/compute/) [FULL] - `qclient compute execute`, MPC, rendezvous/party
 - [Quilibrium Deploy Commands](https://docs.quilibrium.com/docs/run-node/qclient/commands/deploy/) [FULL] - `qclient deploy compute` QCL
 - [Quilibrium Node RPC](https://docs.quilibrium.com/docs/run-node/qclient/rpc/) [FULL] - MPC signing -> ImplicitAccount
+- [Quilibrium Key Commands](https://docs.quilibrium.com/docs/run-node/qclient/commands/key/) [FULL] - DECIDING SOURCE: key types ed448/decaf448/x448/bls48581, no Ed25519
+- [AWS KMS CreateKey](https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html) [FULL] - valid KeySpec values incl ECC_NIST_EDWARDS25519
 - [Quilibrium / Klearu landing](https://qstorage.quilibrium.com/infoquil/index.html) [FULL] - Klearu crates, LLaMA inference, SLIDE, Ed448/BLS48-581 stack
 - [Klearu repo](https://github.com/QuilibriumNetwork/klearu) [PARTIAL - landing page describes crates; repo source not deep-read] - klearu-llm, klearu-private 2PC inference
 - [AWS KMS EdDSA announcement (2025-11-07)](https://aws.amazon.com/about-aws/whats-new/2025/11/aws-kms-edwards-curve-digital-signature-algorithm/) [FULL] - Ed25519 added Nov 2025

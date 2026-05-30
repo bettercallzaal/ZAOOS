@@ -24,6 +24,7 @@ import { runConciergeTurn } from './concierge';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
+import { runCrmOps, summarizeCrmResults } from './crm';
 import { decomposeGoal, renderPlanForApproval } from './decompose';
 import {
   buildMemoryBlocks,
@@ -628,6 +629,22 @@ async function dispatchConcierge(
       }
     }
 
+    // CRM write path (doc 772). ZOE can upsert a contact + log an interaction
+    // by emitting crm_ops in her JSON reply; this POSTs to the app's
+    // /api/crm/interactions with the CRM_BOT_SECRET bearer. Fire-and-forget;
+    // a one-line summary appends to her DM reply.
+    let crmPostscript = '';
+    if (result.crm_ops && result.crm_ops.length > 0) {
+      try {
+        const crmResults = await runCrmOps(result.crm_ops);
+        const summary = summarizeCrmResults(crmResults);
+        if (summary) crmPostscript = '\n\n' + summary;
+      } catch (err) {
+        console.error('[zoe/index] crm write failed:', (err as Error).message);
+        crmPostscript = '\n\n(CRM write failed - check logs)';
+      }
+    }
+
     // Bonfire: mirror this turn's captures + task/quest changes into the
     // ZABAL knowledge graph. Best-effort, fire-and-forget — never blocks the
     // reply, never throws. No-op if BONFIRE_API_KEY/BONFIRE_ID are unset.
@@ -645,7 +662,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim() + relayPostscript;
+    const safeReply = result.reply.trim() + relayPostscript + crmPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(

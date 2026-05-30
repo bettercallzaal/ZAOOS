@@ -43,6 +43,7 @@ import {
   type ProposedPatch,
 } from './reflexion';
 import { applyLearnProposal, type LearnProposal } from './learn';
+import { renderProgress, type ProgressRow } from './progress';
 import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn } from './recall';
@@ -795,21 +796,68 @@ async function runApprovedPlan(
   // throw (ctx.reply, setPending disk write, etc.) can never silently drop the
   // plan. dispatchPlan never throws by contract; this guards the rest.
   try {
-    await ctx.reply(alreadyCompleted.length > 0 ? 'Continuing past the gate…' : 'Dispatching the plan…');
+    // Live progress (doc 772): ONE message edited in place + a typing
+    // indicator. Token-free — Telegram edits cost no LLM tokens.
+    const rows = new Map<string, ProgressRow>();
+    for (const st of plan.subtasks) {
+      rows.set(st.id, { id: st.id, worker: st.worker, status: 'pending' });
+    }
+    for (const id of alreadyCompleted) {
+      const r = rows.get(id);
+      if (r) r.status = 'done';
+    }
+    const startedAt = Date.now();
+    const title = alreadyCompleted.length > 0 ? '🔄 Continuing past the gate' : '🔄 Dispatching';
+    let lastText = '';
+    const sent = await ctx.reply(renderProgress([...rows.values()], 0, { title }));
+    const progressId = sent.message_id;
 
-    const report = await dispatchPlan({
-      goal,
-      plan,
-      context: zoeContext(),
-      chatId,
-      zaalTgId: zaalId,
-      alreadyCompleted,
-      hooks: {
-        onSubtaskStart: async (st) => {
-          await ctx.reply(`▶ ${st.id} (${st.worker}): ${st.title}`.slice(0, 300)).catch(() => {});
+    const refresh = async (final = false): Promise<void> => {
+      const text = renderProgress([...rows.values()], Date.now() - startedAt, {
+        title: final ? 'Plan complete' : title,
+        final,
+      });
+      if (text === lastText) return;
+      lastText = text;
+      await ctx.api.editMessageText(chatId, progressId, text).catch(() => {});
+    };
+    // Tick every 5s: refresh elapsed + keep the typing indicator alive so the
+    // chat never looks frozen during a long worker call.
+    const ticker = setInterval(() => {
+      ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+      void refresh();
+    }, 5000);
+
+    let report;
+    try {
+      report = await dispatchPlan({
+        goal,
+        plan,
+        context: zoeContext(),
+        chatId,
+        zaalTgId: zaalId,
+        alreadyCompleted,
+        hooks: {
+          onSubtaskStart: async (st) => {
+            const r = rows.get(st.id);
+            if (r) r.status = 'running';
+            await refresh();
+          },
+          onSubtaskDone: async (st, res) => {
+            const r = rows.get(st.id);
+            if (r) {
+              r.status =
+                res.status === 'completed' ? 'done' : res.status === 'needs-revision' ? 'warn' : 'failed';
+              r.score = res.critique ? res.critique.score : null;
+            }
+            await refresh();
+          },
         },
-      },
-    });
+      });
+    } finally {
+      clearInterval(ticker);
+    }
+    await refresh(true);
 
     // Paused at a gate — stash the partial plan so the next "y" resumes it.
     if (report.status === 'paused-for-gate' && report.gateAfterId) {

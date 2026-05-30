@@ -1,4 +1,34 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+
+/**
+ * Resolve the `claude` binary to an absolute path ONCE and cache it.
+ *
+ * Spawning the bare name `claude` makes the OS do a PATH lookup on every
+ * spawn. Under concurrent dispatch (multiple workers + critics at once) that
+ * lookup intermittently fails with ENOENT — the failure that killed a parallel
+ * comms-drafter subtask (doc 772). An absolute path skips the lookup entirely.
+ * Honors HERMES_CLAUDE_BIN; falls back to the bare name if nothing resolves.
+ */
+let cachedClaudeBin: string | null = null;
+function resolveClaudeBin(env: NodeJS.ProcessEnv): string {
+  if (process.env.HERMES_CLAUDE_BIN) return process.env.HERMES_CLAUDE_BIN;
+  if (cachedClaudeBin) return cachedClaudeBin;
+  const home = env.HOME ?? '/home/zaal';
+  const candidates = [
+    `${home}/.local/bin/claude`,
+    '/usr/local/bin/claude',
+    '/usr/bin/claude',
+    '/opt/homebrew/bin/claude',
+  ];
+  for (const c of candidates) {
+    if (existsSync(c)) {
+      cachedClaudeBin = c;
+      return c;
+    }
+  }
+  return 'claude'; // last resort — PATH lookup (may ENOENT under load)
+}
 
 export interface ClaudeCliResult {
   text: string;
@@ -83,7 +113,7 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
       augmentedEnv.PATH = `${localBin}:${augmentedEnv.PATH ?? '/usr/local/bin:/usr/bin:/bin'}`;
     }
 
-    const child = spawn(process.env.HERMES_CLAUDE_BIN || 'claude', args, {
+    const child = spawn(resolveClaudeBin(augmentedEnv), args, {
       cwd: opts.cwd,
       env: augmentedEnv,
       // CRITICAL: claude CLI waits 3s for stdin if not explicitly closed,

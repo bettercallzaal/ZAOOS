@@ -15,8 +15,8 @@
  *     direct callClaudeCli. Both produce the same DecompositionPlan JSON.)
  *
  * Per locked Q5 the workers ZOE can route to are:
- *   research-worker / code-reviewer / comms-drafter / task-dispatcher /
- *   data-runner / brief-writer / recap-agent / watcher-agent
+ *   research-worker / doc-extractor / code-reviewer / comms-drafter /
+ *   task-dispatcher / data-runner / brief-writer / recap-agent / watcher-agent
  * Plus the existing Hermes runtime for code-fix work, which is dispatched
  * via bot/src/hermes/runner.ts dispatchHermesRun() not Task.
  */
@@ -27,6 +27,7 @@ import type { ZoeContext } from './types';
 
 export type WorkerKind =
   | 'research-worker'
+  | 'doc-extractor'
   | 'code-reviewer'
   | 'comms-drafter'
   | 'task-dispatcher'
@@ -101,7 +102,8 @@ When Zaal hands you a multi-step goal, you produce a structured DecompositionPla
 
 WORKERS YOU CAN ROUTE TO:
 
-- research-worker (Haiku) - STANDARD-tier research (~30 min wall, 5-7 sources). Use for "look into X", market scans, codebase audits via grep.
+- research-worker (Haiku) - EXTERNAL/web research at STANDARD tier (~30 min wall, 5-7 web sources). Use ONLY when the answer needs the open web: market scans, competitor/tool comparisons, "what's the state of the art on X". Graded against full research-doc standards (clickable URLs + a community source), so do NOT route a pure internal read here.
+- doc-extractor (Haiku) - INTERNAL extraction from the ZAO research library (research/) or the codebase. Use for "read doc N", "summarize our X doc", "pull the decisions from doc Y", "extract from the codebase". Read-only, no web. Graded on faithful grounding in the cited internal source, not on web sources. This is the right worker whenever the source is something WE already wrote.
 - code-reviewer (Sonnet) - read-only diff/file audit. Use for "review PR #N" or "audit this file". Sibling to Hermes critic, generalized.
 - comms-drafter (Sonnet) - external copy in brand voice per bot/src/zoe/brand.md. Refuses to draft with fabricated specifics.
 - task-dispatcher (Sonnet) - recursive goal decomposition. Use when a subtask is itself too big for a single worker.
@@ -237,6 +239,7 @@ function coerceToPlan(raw: unknown): DecompositionPlan {
 
 const VALID_WORKERS: ReadonlySet<WorkerKind> = new Set<WorkerKind>([
   'research-worker',
+  'doc-extractor',
   'code-reviewer',
   'comms-drafter',
   'task-dispatcher',

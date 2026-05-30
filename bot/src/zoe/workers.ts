@@ -91,6 +91,16 @@ const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
     critic: 'research',
     maxBudgetUsd: 1.0,
   },
+  'doc-extractor': {
+    // Internal-only extraction: no web tools, graded on faithfulness to the
+    // cited internal source (task-result), not research-critic's web rules.
+    specFile: 'doc-extractor.md',
+    model: ZOE_QUICK_MODEL,
+    allowedTools: ['Read', 'Glob', 'Grep'],
+    disallowedTools: READ_ONLY_DISALLOW,
+    critic: 'task-result',
+    maxBudgetUsd: 0.5,
+  },
   'code-reviewer': {
     specFile: 'code-reviewer.md',
     model: ZOE_DEFAULT_MODEL,

@@ -46,7 +46,7 @@ import {
 import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
-import { mirrorTurn } from './recall';
+import { mirrorTurn, recall } from './recall';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -591,10 +591,29 @@ async function dispatchConcierge(
 
     const blocks = await buildMemoryBlocks(scope, chatTitle);
 
+    // Pull relevant prior context from the ZABAL knowledge graph (Bonfire) via
+    // recall()/delve and inject it into the turn. DMs only + substantive
+    // messages (skip "y"/"ok"/short acks). Best-effort: no-op if Bonfire
+    // unconfigured or delve returns nothing; never blocks the turn.
+    let recallContext: string | undefined;
+    if (scope === 'private' && text.trim().length >= 12) {
+      try {
+        const r = await recall({
+          query: text,
+          reason: 'concierge turn context',
+          expected_kind: 'mixed',
+        });
+        if (r.kind === 'sdk_response' && r.text) recallContext = r.text;
+      } catch (err) {
+        console.warn('[zoe/index] recall failed (nbd):', (err as Error).message);
+      }
+    }
+
     const result = await runConciergeTurn({
       message: text,
       blocks,
       senderLabel: label,
+      recallContext,
       context: {
         zaal_tg_id: zaalId,
         workspace_dir: repoDir,

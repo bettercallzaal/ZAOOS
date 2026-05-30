@@ -90,6 +90,8 @@ export interface ConciergeOptions {
   senderLabel?: string;
   /** Override model: 'sonnet' | 'opus' | 'haiku'. Default: sonnet (cheap), escalate to opus on hard reasoning */
   model?: string;
+  /** Prior context retrieved from the Bonfire graph (via recall/delve), injected as a <bonfire_recall> block. */
+  recallContext?: string;
 }
 
 export interface ConciergeResult {

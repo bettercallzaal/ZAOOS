@@ -110,3 +110,21 @@ test('cancellation stops before the first wave', async () => {
   assert.equal(report.status, 'cancelled');
   assert.equal(report.results.length, 0);
 });
+
+// --- H3 (doc 770/771) guards: refuse oversized plans + budget pre-flight ---
+
+test('H3: a plan over the subtask ceiling is refused as too-large', async () => {
+  const many = Array.from({ length: 13 }, (_, i) => st(`st-${i + 1}`));
+  const report = await dispatchPlan(args(plan(many)));
+  assert.equal(report.status, 'too-large');
+  assert.equal(report.results.length, 0); // nothing dispatched
+});
+
+test('H3: budget pre-flight stops a costed wave BEFORE spawning the worker', async () => {
+  // research-worker has a $1.00 cap; a $0.50 budget must trip pre-flight and
+  // never invoke the CLI (results stays empty — no worker ran).
+  const p = plan([st('st-1', { worker: 'research-worker' })]);
+  const report = await dispatchPlan(args(p, { maxPlanBudgetUsd: 0.5 }));
+  assert.equal(report.status, 'budget-exceeded');
+  assert.equal(report.results.length, 0);
+});

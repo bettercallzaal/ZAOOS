@@ -1,20 +1,21 @@
 /**
  * Bonfire bridge for ZOE — read (recall) + write (remember).
  *
- * Verified against the live Bonfires API 2026-05-19:
- *   - WRITE  POST /knowledge_graph/episode/create   (works with non-admin key)
- *   - READ   POST /vector_store/search              (works, but returns []
- *            until an admin runs labeling on the bonfire)
+ * Verified against the live Bonfires API 2026-05-30:
+ *   - WRITE  POST /knowledge_graph/episode/create     (works with non-admin key)
+ *   - READ   POST /delve  {bonfire_id, query}          (works - returns ranked
+ *            episodes with content; this is the SDK's delve path)
  *
- * The 780 episodes ZAO ingested live in the knowledge graph and show in the
- * dashboard, but vector search stays empty until labeling runs (admin-gated:
- * /labeling/hybrid is 403 for non-admin keys). So `recall()` degrades
- * gracefully: it tries vector search, and if the store is empty it falls
- * back to the manual-relay pattern (ask Zaal to query @zabal_bonfire).
+ * FIX (2026-05-30): the prior read path used POST /vector_store/search with
+ * {bonfire_ref, search_string} and ALWAYS returned count:0. That was NOT an
+ * admin-labeling gate - labeling is internal to the Bonfires platform, not a
+ * key we flip. It was the WRONG ENDPOINT: /vector_store/search is empty for
+ * this bonfire; /delve actually queries the graph. Confirmed live - a
+ * "What is ZAO?" delve returned 51 episodes with full content. recall() now
+ * uses /delve and only falls back to manual relay on a genuine error/empty.
  *
  * `remember()` works today — ZOE's captures + decisions get mirrored into
- * the bonfire as episodes, so the knowledge graph keeps growing from daily
- * use even before read is unlocked.
+ * the bonfire as episodes, so the knowledge graph keeps growing from daily use.
  *
  * Env:
  *   BONFIRE_API_KEY  required for any API path; absent => manual relay only
@@ -122,54 +123,61 @@ export async function remember(opts: {
 }
 
 // --- read --------------------------------------------------------------------
-interface VectorSearchResponse {
+interface DelveEpisode {
+  uuid?: string;
+  name?: string;
+  source_description?: string;
+  summary?: string | null;
+  content?: string;
+}
+interface DelveResponse {
   success?: boolean;
-  count?: number;
-  results?: Array<Record<string, unknown>>;
+  query?: string;
+  num_results?: number;
+  episodes?: DelveEpisode[];
 }
 
-/** Query the bonfire vector store. Returns hits (possibly empty). Never throws. */
-async function searchVectorStore(
+/**
+ * Query the bonfire via /delve (the SDK's graph-query path). Returns ranked
+ * episodes (possibly empty). Never throws. `limit` is applied client-side
+ * since /delve returns the full ranked set.
+ */
+async function delveBonfire(
   query: string,
   limit = 5,
-): Promise<{ ok: boolean; results: Array<Record<string, unknown>>; error?: string }> {
+): Promise<{ ok: boolean; results: DelveEpisode[]; error?: string }> {
   try {
-    const res = await fetch(`${API_URL}/vector_store/search`, {
+    const res = await fetch(`${API_URL}/delve`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${API_KEY}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ bonfire_ref: BONFIRE_ID, search_string: query, limit }),
+      body: JSON.stringify({ bonfire_id: BONFIRE_ID, query }),
       signal: AbortSignal.timeout(READ_TIMEOUT_MS),
     });
     if (!res.ok) {
       return { ok: false, results: [], error: `HTTP ${res.status}` };
     }
-    const json = (await res.json()) as VectorSearchResponse;
-    return { ok: true, results: json.results ?? [] };
+    const json = (await res.json()) as DelveResponse;
+    return { ok: true, results: (json.episodes ?? []).slice(0, limit) };
   } catch (err) {
     return { ok: false, results: [], error: err instanceof Error ? err.message : String(err) };
   }
 }
 
-function formatHit(hit: Record<string, unknown>): string {
-  const text =
-    (hit.text as string) ??
-    (hit.content as string) ??
-    (hit.chunk as string) ??
-    (hit.snippet as string) ??
-    JSON.stringify(hit);
+function formatHit(hit: DelveEpisode): string {
+  const text = hit.summary || hit.content || hit.name || JSON.stringify(hit);
   return `- ${String(text).slice(0, 300)}`;
 }
 
 /**
- * Telegram-ready manual-relay text — used when vector search is empty
- * (labeling not run yet) or the bonfire isn't configured.
+ * Telegram-ready manual-relay text — fallback used only when /delve errors or
+ * returns nothing, or the bonfire isn't configured.
  */
 export function formatManualRelay(req: RecallRequest): string {
   return [
-    `_Bonfire vector search is not live yet (needs labeling). Manual relay for: ${req.reason}_`,
+    `_Bonfire delve returned nothing for this query. Manual relay for: ${req.reason}_`,
     '',
     'Paste into @zabal_bonfire DM:',
     '```',
@@ -188,7 +196,7 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
   if (!bonfireConfigured()) {
     return { kind: 'manual_relay_needed', query: req.query, relay: formatManualRelay(req) };
   }
-  const search = await searchVectorStore(req.query, 5);
+  const search = await delveBonfire(req.query, 5);
   if (search.ok && search.results.length > 0) {
     return {
       kind: 'sdk_response',
@@ -197,7 +205,7 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
       text: search.results.map(formatHit).join('\n'),
     };
   }
-  // search ok-but-empty => vector store not labeled yet. Graceful fallback.
+  // delve ok-but-empty (or errored) => graceful manual-relay fallback.
   return {
     kind: 'manual_relay_needed',
     query: req.query,

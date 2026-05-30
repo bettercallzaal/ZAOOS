@@ -5,7 +5,7 @@ status: research-complete
 last-validated: 2026-05-29
 superseded-by:
 related-docs: 665, 669, 542, 544, 569, 726, 754
-original-query: "https://docs.fileverse.io/d/0200039b000d#k=vK13_Bm1s7JDW5bqpxtIuVMgp87ySuynflgRAe9I-SY"
+original-query: "https://docs.fileverse.io/d/0200039b000d#k=REDACTED-fileverse-share-key"
 tier: STANDARD
 ---
 
@@ -135,7 +135,7 @@ The kernel's stress test. A "planetary folklore survey":
 
 ## Sources
 
-- [Beyond Prompt Engineering: Why Procedural Narrative (Extraction)](https://docs.fileverse.io/d/0200039b000d#k=vK13_Bm1s7JDW5bqpxtIuVMgp87ySuynflgRAe9I-SY) - Bonfires team, May 2026. `[FULL]` - fetched complete via gstack headless browser (Fileverse E2E-encrypted dDoc; WebFetch/exa stripped the `#k=` decryption fragment, headless browser with full key URL rendered + decrypted client-side). 1838 words.
+- [Beyond Prompt Engineering: Why Procedural Narrative (Extraction)](https://docs.fileverse.io/d/0200039b000d#k=REDACTED-fileverse-share-key) - Bonfires team, May 2026. `[FULL]` - fetched complete via gstack headless browser (Fileverse E2E-encrypted dDoc; WebFetch/exa stripped the `#k=` decryption fragment, headless browser with full key URL rendered + decrypted client-side). 1838 words. NOTE: the `#k=` decryption key was redacted from this doc (2026-05-30) because ZAOOS is a public repo - Zaal holds the live share link.
 - [Fluid Construction Grammar (fcg-net.org)](https://fcg-net.org/) + [Basics of FCG](https://fcg-net.org/demos/basics-of-fcg/) - `[FULL]` - FCG home + worked comprehension/formulation examples (transitive/ditransitive constructions, feature-value unification).
 - [FCG Syntax and Semantics - Babel Wiki](https://emergent-languages.org/wiki/docs/recipes/fcg/syntax-and-semantics/) + [Getting Started](https://emergent-languages.org/wiki/docs/recipes/fcg/getting-started/) - `[FULL]` - transient structures, `def-fcg-cxn` macro, predicate-calculus meaning representation, meta-layer learning.
 - [urchade/GLiNER (GitHub)](https://github.com/urchade/gliner) - `[FULL]` - zero-shot generalist NER, CPU-optimized, joint entity+relation extraction.

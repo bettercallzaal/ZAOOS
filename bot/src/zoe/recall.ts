@@ -198,6 +198,7 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
   }
   const search = await delveBonfire(req.query, 5);
   if (search.ok && search.results.length > 0) {
+    console.log(`[zoe/recall] delve: ${search.results.length} hit(s) for "${req.query.slice(0, 60)}"`);
     return {
       kind: 'sdk_response',
       query: req.query,
@@ -205,6 +206,7 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
       text: search.results.map(formatHit).join('\n'),
     };
   }
+  console.log(`[zoe/recall] delve: 0 hits${search.error ? ` (error: ${search.error})` : ''} for "${req.query.slice(0, 60)}" - manual-relay fallback`);
   // delve ok-but-empty (or errored) => graceful manual-relay fallback.
   return {
     kind: 'manual_relay_needed',

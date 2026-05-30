@@ -64,6 +64,8 @@ import {
   clearPending,
   loadPending,
   parseApprovalReply,
+  wouldClobber,
+  pendingKindLabel,
   type PendingApproval,
   type ApprovalReply,
 } from './approvals';
@@ -676,6 +678,16 @@ function zoeContext() {
 async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
+  // Refuse-when-busy (doc 770 H2): don't decompose (or clobber) a plan while a
+  // different approval is already waiting on Zaal's y/n. Checked before the
+  // decompose spend.
+  const busy = getPending('private');
+  if (wouldClobber(busy, 'plan')) {
+    await ctx.reply(
+      `You've got a pending ${pendingKindLabel(busy!.kind)} waiting on your y/n. Reply to it (or say "cancel") first, then re-send your plan.`,
+    );
+    return;
+  }
   await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
   const typingInterval = setInterval(() => {
     ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
@@ -884,7 +896,7 @@ async function runReflexionFlow(
     // Stash high-confidence patches for y/n; low-confidence ones get a
     // voice-note request and are resolved on Zaal's next free-form reply.
     if (plan.highConfidence.length > 0 || plan.needsVoiceNote.length > 0) {
-      await setPending({
+      const armed = await setPending({
         kind: 'reflexion',
         chatScope: 'private',
         createdAt: new Date().toISOString(),
@@ -892,6 +904,15 @@ async function runReflexionFlow(
         answers,
         hasVoiceNoteRequests: plan.needsVoiceNote.length > 0,
       });
+      if (!armed.armed) {
+        // doc 770 H2: a live approval is already waiting — don't clobber it.
+        await ctx.reply(
+          `Reflection logged, but I couldn't queue the memory updates — you have a pending ${pendingKindLabel(
+            armed.blockedBy!.kind,
+          )} first. Resolve it and re-run reflect.`,
+        );
+        return;
+      }
     }
 
     if (plan.highConfidence.length > 0) {

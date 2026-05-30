@@ -23,7 +23,7 @@ import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled } from './nudges';
 import { startPostsScheduler } from './posts';
-import { setPending } from './approvals';
+import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
@@ -92,13 +92,22 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await markFired('evening-reflect');
           // Arm reflexion (Gap 4): Zaal's next free-form DM is captured as the
           // reflection answer and fed to the reflexion layer for memory patches.
-          await setPending({
+          const armed = await setPending({
             kind: 'await-reflection',
             chatScope: 'private',
             createdAt: new Date().toISOString(),
             ttlMs: AWAIT_REFLECTION_TTL_MS,
           });
-          console.log('[zoe/scheduler] evening reflection sent + reflexion armed');
+          if (armed.armed) {
+            console.log('[zoe/scheduler] evening reflection sent + reflexion armed');
+          } else {
+            // doc 770 H2: don't clobber a live approval Zaal is mid-way through.
+            console.log(
+              `[zoe/scheduler] evening reflection sent, capture NOT armed — ${pendingKindLabel(
+                armed.blockedBy!.kind,
+              )} pending`,
+            );
+          }
         } catch (err) {
           console.error('[zoe/scheduler] evening reflection failed:', (err as Error).message);
         }
@@ -155,12 +164,21 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             console.log(`[zoe/scheduler] learn cycle: ${result.runsAnalyzed} runs, no proposals`);
             return;
           }
-          await setPending({
+          const armed = await setPending({
             kind: 'learn',
             chatScope: 'private',
             createdAt: new Date().toISOString(),
             proposals: result.proposals,
           });
+          if (!armed.armed) {
+            // doc 770 H2: a live approval is waiting — defer rather than clobber.
+            console.log(
+              `[zoe/scheduler] learn cycle: deferring ${result.proposals.length} proposals — ${pendingKindLabel(
+                armed.blockedBy!.kind,
+              )} pending`,
+            );
+            return;
+          }
           await opts.bot.api.sendMessage(opts.zaalTgId, renderLearnProposals(result.proposals));
           console.log(`[zoe/scheduler] learn cycle: ${result.proposals.length} proposals sent`);
         } catch (err) {

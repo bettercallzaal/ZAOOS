@@ -112,6 +112,56 @@ export interface ApprovalReply {
 /** Pending items older than this auto-expire. 30 min. */
 export const PENDING_TTL_MS = 30 * 60 * 1000;
 
+/**
+ * Kinds that carry an outstanding y/n Zaal must answer. A new pending may not
+ * silently clobber one of these (doc 770 H2). `await-reflection` is omitted on
+ * purpose: it's a passive "capture the next DM" slot, so an explicit command
+ * (which H1 already says is not a reflection answer) is allowed to supersede it.
+ */
+const APPROVAL_BEARING_KINDS: ReadonlySet<PendingKind> = new Set<PendingKind>([
+  'plan',
+  'plan-gate',
+  'reflexion',
+  'learn',
+]);
+
+/** Human-readable label for a pending kind, for refuse-when-busy messages. */
+export function pendingKindLabel(kind: PendingKind): string {
+  switch (kind) {
+    case 'plan':
+      return 'plan approval';
+    case 'plan-gate':
+      return 'paused plan (at its approval gate)';
+    case 'reflexion':
+      return 'memory-update approval';
+    case 'await-reflection':
+      return 'evening reflection';
+    case 'learn':
+      return 'learning-proposal approval';
+  }
+}
+
+/**
+ * Pure decision (doc 770 H2): would arming `newKind` clobber a live
+ * approval-bearing pending of a different kind? Re-arming the SAME kind
+ * (e.g. plan -> plan after a re-decompose) is always allowed.
+ */
+export function wouldClobber(
+  existing: PendingApproval | undefined,
+  newKind: PendingKind,
+): boolean {
+  return (
+    !!existing && existing.kind !== newKind && APPROVAL_BEARING_KINDS.has(existing.kind)
+  );
+}
+
+/** Outcome of an attempt to arm a pending item. */
+export interface SetPendingResult {
+  armed: boolean;
+  /** When armed=false, the live pending that blocked the arm. */
+  blockedBy?: PendingApproval;
+}
+
 const PENDING_FILE = join(ZOE_PATHS.home, 'pending-approvals.json');
 
 // In-memory store, one pending item per chat scope. Mirror of disk.
@@ -198,10 +248,19 @@ export function getPending(scope: string): PendingApproval | undefined {
   return p;
 }
 
-/** Set (replace) the pending item for a scope and persist. */
-export async function setPending(p: PendingApproval): Promise<void> {
+/**
+ * Arm the pending item for a scope and persist. Refuses (doc 770 H2) if a
+ * different live approval-bearing pending already occupies the scope, so
+ * concurrent flows can't silently clobber each other. Returns whether it armed.
+ */
+export async function setPending(p: PendingApproval): Promise<SetPendingResult> {
+  const existing = getPending(p.chatScope);
+  if (wouldClobber(existing, p.kind)) {
+    return { armed: false, blockedBy: existing };
+  }
   pendingByScope.set(p.chatScope, p);
   await persist();
+  return { armed: true };
 }
 
 /** Clear the pending item for a scope and persist. */

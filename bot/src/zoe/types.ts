@@ -47,6 +47,38 @@ export interface BotRelayOp {
   await_reply_seconds?: number;
 }
 
+export interface CrmOp {
+  op: "log_crm";
+  /** Person record. Upserted by a deterministic slug (handle/name). */
+  contact: {
+    name: string;
+    farcaster_handle?: string;
+    x_handle?: string;
+    github_handle?: string;
+    telegram_handle?: string;
+    role?: string;
+    org?: string;
+    how_we_met?: string;
+    /** Public-safe one-liner shown on /network. */
+    public_summary?: string;
+    email?: string;
+    location?: string;
+    /** Default false. Only true if Zaal OK'd showing this contact publicly. */
+    is_public?: boolean;
+  };
+  /** The interaction to log against the contact. */
+  interaction: {
+    type?: "meeting" | "call" | "email" | "message" | "gcal" | "github" | "note";
+    title?: string;
+    /** Shown on /network only if visibility=public. */
+    public_summary?: string;
+    private_notes?: string;
+    /** Default private. */
+    visibility?: "public" | "private";
+    occurred_at?: string;
+  };
+}
+
 export interface ConciergeOptions {
   /** User message text */
   message: string;
@@ -71,6 +103,8 @@ export interface ConciergeResult {
   captures: ZoeCaptureNote[];
   /** Cross-bot relay ops (e.g. ZOE asks @zabal_bonfire_bot in ZAO Civilization). */
   bot_relay_ops: BotRelayOp[];
+  /** CRM ops - upsert a contact + log an interaction via the app API (doc 772). */
+  crm_ops: CrmOp[];
   /** Cost stats from Claude CLI call */
   inputTokens: number;
   outputTokens: number;

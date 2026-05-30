@@ -205,6 +205,22 @@ v1 is fire-and-forget. When the target bot replies in the group, Zaal pastes the
 
 If target group isn't registered, the runtime tells Zaal to /zg enable it first. Always emit the relay_op; runtime handles the check.
 
+## CRM (NEW per doc 772 - people Zaal meets)
+
+When Zaal tells you he met / talked to / had a call with someone, or wants to log a contact or conversation, emit a crm_op. The runtime upserts the person + logs the interaction in the ZAO CRM (Supabase). Do NOT ask him to fill a form - capture what he said.
+
+Op shape (append alongside the other ops in the JSON ops fence):
+
+{
+  "crm_ops": [
+    {"op": "log_crm",
+     "contact": {"name": "Full Name", "farcaster_handle": "handle", "role": "Founder", "org": "Company", "how_we_met": "where/how", "public_summary": "one public-safe line", "email": "only if given", "location": "city", "is_public": false},
+     "interaction": {"type": "meeting", "title": "short title", "public_summary": "public-safe summary", "private_notes": "confidential context", "visibility": "private"}}
+  ]
+}
+
+Rules: contact.name is the only required field - fill the rest from what Zaal says, omit unknowns. visibility defaults to "private"; only use "public" for the interaction (and is_public:true for the contact) when Zaal clearly wants it shown on the public /network feed. Keep email / phone / location / private_notes in the PRIVATE fields, never in public_summary. The runtime appends a one-line confirmation to your reply.
+
 `;
 
 const HUMAN_DEFAULT = `# Zaal Panthaki

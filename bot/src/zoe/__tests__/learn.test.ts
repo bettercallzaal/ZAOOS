@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { summarizeRuns, renderLearnProposals } from '../learn.ts';
+import { summarizeRuns, renderLearnProposals, capLearnings } from '../learn.ts';
 import type { LearnProposal } from '../learn.ts';
 import type { RunRecord } from '../runs.ts';
 
@@ -74,4 +74,36 @@ test('renderLearnProposals handles empty + populated', () => {
   assert.match(out, /lp-1 \(research-worker\)/);
   assert.match(out, /Always cite the file path/);
   assert.match(out, /y all/);
+});
+
+// =========================
+// capLearnings — doc 770 MED (bounded + deduped worker-prompt learnings)
+// =========================
+
+test('capLearnings keeps the header and the most recent N bullets', () => {
+  const header = '# Learnings for research-worker\n\nAppended by ZOE.\n';
+  const bullets = Array.from({ length: 50 }, (_, i) => `- (2026-05-${String((i % 28) + 1).padStart(2, '0')}) lesson ${i}`);
+  const out = capLearnings(`${header}${bullets.join('\n')}\n`, 30);
+  assert.match(out, /# Learnings for research-worker/);
+  const kept = out.split('\n').filter((l) => l.trimStart().startsWith('- '));
+  assert.equal(kept.length, 30);
+  assert.match(out, /lesson 49/); // newest kept
+  assert.doesNotMatch(out, /lesson 0\b/); // oldest dropped
+});
+
+test('capLearnings dedupes identical learning text (ignoring the date prefix)', () => {
+  const raw = [
+    '# Learnings',
+    '- (2026-05-01) always cite sources',
+    '- (2026-05-20) Always cite sources', // dup (case-insensitive, different date)
+    '- (2026-05-21) keep it short',
+  ].join('\n');
+  const out = capLearnings(raw, 30);
+  const kept = out.split('\n').filter((l) => l.trimStart().startsWith('- '));
+  assert.equal(kept.length, 2);
+});
+
+test('capLearnings returns empty for empty input', () => {
+  assert.equal(capLearnings(''), '');
+  assert.equal(capLearnings('   \n  '), '');
 });

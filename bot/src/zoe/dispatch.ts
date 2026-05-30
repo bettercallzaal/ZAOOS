@@ -222,6 +222,20 @@ export async function dispatchPlan(args: DispatchPlanArgs): Promise<DispatchRepo
   const results: WorkerResult[] = [];
   let totalCost = 0;
 
+  // Duplicate ids break the completed-Set loop bound + outputsById (doc 770
+  // MED): the Set size can never reach plan.subtasks.length, so the loop would
+  // otherwise return a misleading 'dependency unsatisfiable' failure. Bail with
+  // a clear diagnostic instead.
+  if (new Set(plan.subtasks.map((s) => s.id)).size !== plan.subtasks.length) {
+    return {
+      status: 'failed',
+      results: [],
+      completedIds: [...completed],
+      totalCostUsd: 0,
+      summary: 'Stopped — the plan has duplicate subtask ids and cannot be dispatched safely. Re-decompose.',
+    };
+  }
+
   const finish = (status: DispatchReport['status'], gateAfterId?: string): DispatchReport => {
     const partial = {
       status,

@@ -49,14 +49,53 @@ interface WorkerConfig {
 // Read-only lockdown shared by every worker. No worker may push, commit,
 // reset, rm, or write files — anything that mutates state stays behind an
 // explicit Zaal approval at the ZOE layer, never inside an autonomous worker.
+//
+// doc 770 H4: a denylist is inherently leaky, so the per-worker `allowedTools`
+// whitelist above is the real authority — this list is defense-in-depth that
+// closes the obvious write/move/exec vectors the audit named (mv, chmod, git
+// clean, npx/node, …). One residual it CANNOT catch: shell redirection inside
+// an otherwise-allowed Bash prefix (e.g. `cat x > y` under `Bash(cat*)`). That
+// guarantee depends on the CLI treating `allowedTools` as authoritative under
+// permissionMode, which must be verified live, not asserted in config.
 const READ_ONLY_DISALLOW = [
+  // File / notebook mutation tools.
+  'Edit',
+  'Write',
+  'NotebookEdit',
+  // git state mutation.
   'Bash(git push*)',
   'Bash(git commit*)',
   'Bash(git reset*)',
+  'Bash(git clean*)',
+  'Bash(git checkout*)',
+  'Bash(git stash*)',
+  // Filesystem mutation / move / link.
   'Bash(rm*)',
-  'Edit',
-  'Write',
+  'Bash(mv*)',
+  'Bash(cp*)',
+  'Bash(chmod*)',
+  'Bash(chown*)',
+  'Bash(ln*)',
+  'Bash(mkdir*)',
+  'Bash(touch*)',
+  'Bash(dd*)',
+  'Bash(tee*)',
+  // Arbitrary code execution (can write/exfiltrate).
+  'Bash(npx*)',
+  'Bash(npm*)',
+  'Bash(pnpm*)',
+  'Bash(yarn*)',
+  'Bash(node*)',
+  'Bash(python*)',
+  'Bash(python3*)',
+  'Bash(bash*)',
+  'Bash(sh*)',
+  'Bash(zsh*)',
+  'Bash(eval*)',
 ];
+
+/** Floor below which a revision pass isn't worth launching (doc 770 MED). */
+const MIN_REVISION_BUDGET_USD = 0.05;
 
 const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
   'research-worker': {
@@ -259,7 +298,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
     };
   }
 
-  const call = async (criticFeedback?: string) =>
+  const call = async (criticFeedback?: string, budgetUsd: number = cfg.maxBudgetUsd) =>
     callClaudeCli({
       model: cfg.model,
       prompt: buildWorkerPrompt(args, criticFeedback),
@@ -269,7 +308,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
       disallowedTools: cfg.disallowedTools,
       permissionMode: 'auto',
       outputFormat: 'json',
-      maxBudgetUsd: cfg.maxBudgetUsd,
+      maxBudgetUsd: budgetUsd,
       bare: false,
     });
 
@@ -285,19 +324,25 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
     let revised = false;
 
     if (critique && critique.score < CRITIQUE_PASS_THRESHOLD) {
-      // One revision pass with the critic's feedback.
-      revised = true;
-      const feedback = [
-        `Score ${critique.score}/100: ${critique.summary}`,
-        ...critique.issues.map((i) => `- [${i.severity}] ${i.location ?? ''} ${i.issue}`),
-      ].join('\n');
-      const second = await call(feedback);
-      output = second.text;
-      inTok += second.inputTokens;
-      outTok += second.outputTokens;
-      cost += second.totalCostUsd;
-      dur += second.durationMs;
-      critique = await runCriticFor(cfg.critic, args, output);
+      // One revision pass with the critic's feedback — but only within the
+      // REMAINING per-worker budget (doc 770 MED). Previously the revision got
+      // a fresh full cap, so a failing critique silently doubled the ceiling to
+      // ~2×maxBudget. Now total worker spend stays under cfg.maxBudgetUsd.
+      const remaining = revisionBudget(cfg.maxBudgetUsd, cost);
+      if (remaining >= MIN_REVISION_BUDGET_USD) {
+        revised = true;
+        const feedback = [
+          `Score ${critique.score}/100: ${critique.summary}`,
+          ...critique.issues.map((i) => `- [${i.severity}] ${i.location ?? ''} ${i.issue}`),
+        ].join('\n');
+        const second = await call(feedback, remaining);
+        output = second.text;
+        inTok += second.inputTokens;
+        outTok += second.outputTokens;
+        cost += second.totalCostUsd;
+        dur += second.durationMs;
+        critique = await runCriticFor(cfg.critic, args, output);
+      }
     }
 
     // Fold critic cost into the worker total.
@@ -330,4 +375,9 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
 /** Expose the config for tests / introspection (e.g. dispatch budget sums). */
 export function workerMaxBudget(worker: ClaudeWorkerKind): number {
   return WORKER_CONFIG[worker].maxBudgetUsd;
+}
+
+/** Budget for the single revision pass: whatever's left under the cap (doc 770 MED). */
+export function revisionBudget(cap: number, spentSoFar: number): number {
+  return Math.max(0, cap - spentSoFar);
 }

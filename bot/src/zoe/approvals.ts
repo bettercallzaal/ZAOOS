@@ -170,28 +170,42 @@ const pendingByScope = new Map<string, PendingApproval>();
 const REJECT_RE = /^\s*(n|no|nope|cancel|stop|abort|skip|nah|nvm|never\s*mind)\b/i;
 const APPROVE_RE = /^\s*(y|yes|yep|yeah|yup|approve|approved|go|go ahead|ship it|ship|send it|do it|lgtm|sounds good)\b/i;
 const EDIT_RE = /^\s*(edit|revise|change|tweak|adjust|instead|actually|no but|wait)\b[:,]?\s*(.*)/i;
+// An explicit approval verb appearing ANYWHERE (not just at the start). Used to
+// override a leading edit/reject prefix (doc 770 MED): "actually yes do it" and
+// "no but go ahead" are approvals, not edits/rejects. Conservative — omits the
+// bare "y"/"go"/"ship" forms that would false-positive mid-sentence.
+const APPROVE_ANYWHERE_RE = /\b(yes|yep|yeah|yup|approved?|go ahead|ship it|send it|do it|lgtm|sounds good)\b/i;
 // Subtask / patch / proposal ids: st-1, patch-2, lp-3, etc.
 const ID_RE = /\b((?:st|patch|lp|sq|task)-[a-z0-9]+)\b/gi;
 
 /**
  * Parse a Telegram reply against a pending approval. Pure — no IO, no state.
- * Order matters: reject is checked first (so "no" never reads as approve),
- * then explicit edit, then approve (all vs ids), else not-an-approval.
+ *
+ * Precedence (doc 770 MED — fixes EDIT_RE/REJECT_RE swallowing approvals):
+ *   1. reject — unless an explicit approval verb is also present ("no but go ahead")
+ *   2. edit — only when there's real instruction content AND no approval present
+ *      ("actually research X" → edit; "actually yes do it" → approve below)
+ *   3. approve — leading approve verb OR an approval verb anywhere
+ *   4. otherwise not-an-approval (a bare "wait" with no content lands here, so
+ *      the pending is left in place rather than re-decomposed with empty text)
  */
 export function parseApprovalReply(text: string): ApprovalReply {
   const trimmed = text.trim();
   if (!trimmed) return { decision: 'not-an-approval', ids: [] };
 
-  if (REJECT_RE.test(trimmed)) {
+  const containsApprove = APPROVE_ANYWHERE_RE.test(trimmed);
+
+  if (REJECT_RE.test(trimmed) && !containsApprove) {
     return { decision: 'reject', ids: [] };
   }
 
   const editMatch = trimmed.match(EDIT_RE);
-  if (editMatch) {
-    return { decision: 'edit', ids: [], editText: editMatch[2]?.trim() || trimmed };
+  const editText = editMatch?.[2]?.trim();
+  if (editMatch && editText && !containsApprove) {
+    return { decision: 'edit', ids: [], editText };
   }
 
-  if (APPROVE_RE.test(trimmed)) {
+  if (APPROVE_RE.test(trimmed) || containsApprove) {
     const ids = extractIds(trimmed);
     // "y all" or a bare "y/yes/approve" with no specific ids = approve all.
     if (/\ball\b/i.test(trimmed) || ids.length === 0) {

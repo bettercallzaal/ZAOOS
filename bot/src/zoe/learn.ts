@@ -242,10 +242,52 @@ function learningsPath(target: string): string {
   return join(learningsDir(), `${safe}.md`);
 }
 
-/** Read the accrued learnings for a worker/persona, or '' if none. */
+/**
+ * Cap (doc 770 MED): worker learnings are spliced verbatim into every worker
+ * system prompt. Left unbounded they silently inflate input-token cost on every
+ * run. Defaults: keep the most recent 30 bullets, dedupe identical text, cap at
+ * ~4000 chars. Override via ZOE_MAX_LEARNING_LINES / ZOE_MAX_LEARNING_CHARS.
+ */
+export const MAX_LEARNING_LINES = Math.max(1, Number(process.env.ZOE_MAX_LEARNING_LINES ?? 30));
+export const MAX_LEARNING_CHARS = Math.max(200, Number(process.env.ZOE_MAX_LEARNING_CHARS ?? 4000));
+
+/** Pure cap+dedupe of a learnings file body. Keeps header lines + recent bullets. */
+export function capLearnings(
+  raw: string,
+  maxLines: number = MAX_LEARNING_LINES,
+  maxChars: number = MAX_LEARNING_CHARS,
+): string {
+  if (!raw.trim()) return '';
+  const header: string[] = [];
+  const bullets: string[] = [];
+  for (const line of raw.split('\n')) {
+    if (line.trimStart().startsWith('- ')) bullets.push(line);
+    else if (bullets.length === 0) header.push(line); // header precedes the bullets
+  }
+  // Dedupe by the learning text (strip the leading "- (YYYY-MM-DD) " prefix).
+  const seen = new Set<string>();
+  const deduped: string[] = [];
+  for (const b of bullets) {
+    const key = b.replace(/^\s*-\s*(\(\d{4}-\d{2}-\d{2}\))?\s*/, '').trim().toLowerCase();
+    if (key && !seen.has(key)) {
+      seen.add(key);
+      deduped.push(b);
+    }
+  }
+  const kept = deduped.slice(-maxLines); // bullets are appended chronologically → keep the tail
+  let out = [...header, ...kept].join('\n').trim();
+  if (out.length > maxChars) {
+    out = out.slice(out.length - maxChars);
+    const nl = out.indexOf('\n');
+    if (nl >= 0) out = out.slice(nl + 1); // drop a partial leading line
+  }
+  return out;
+}
+
+/** Read the accrued learnings for a worker/persona, capped + deduped, or '' if none. */
 export async function readLearnings(target: string): Promise<string> {
   try {
-    return await fs.readFile(learningsPath(target), 'utf8');
+    return capLearnings(await fs.readFile(learningsPath(target), 'utf8'));
   } catch {
     return '';
   }

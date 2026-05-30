@@ -126,6 +126,15 @@ test('pre-flight budget refuses to launch a batch it cannot afford (no worker ru
   assert.equal(report.totalCostUsd, 0);
 });
 
+test('duplicate subtask ids fail fast with a clear diagnostic (not "unsatisfiable")', async () => {
+  // doc 770 MED: the completed-Set bound can never reach length with dup ids.
+  const p = plan([st('st-1'), st('st-1', { title: 'dup' })]);
+  const report = await dispatchPlan(args(p));
+  assert.equal(report.status, 'failed');
+  assert.equal(report.results.length, 0);
+  assert.match(report.summary, /duplicate subtask ids/);
+});
+
 test('a wave larger than the concurrency cap still completes every subtask', async () => {
   // 7 independent task-dispatcher subtasks (cost 0) exceed WAVE_CONCURRENCY (3),
   // so they run across multiple batches. Batching must not drop any.

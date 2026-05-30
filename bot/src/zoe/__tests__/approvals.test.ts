@@ -145,3 +145,27 @@ test('a live approval-bearing pending blocks a different-kind arm', () => {
   assert.equal(wouldClobber(pendingOf('learn'), 'plan'), true); // new plan: vs live learn
   assert.equal(wouldClobber(pendingOf('reflexion'), 'plan'), true);
 });
+
+// =========================
+// parseApprovalReply — doc 770 MED tightening
+// =========================
+
+test('an approval verb anywhere overrides a leading edit prefix', () => {
+  assert.equal(parseApprovalReply('actually yes do it').decision, 'approve-all');
+  assert.equal(parseApprovalReply('change nothing, ship it').decision, 'approve-all');
+});
+
+test('an approval verb anywhere overrides a leading reject ("no but go ahead")', () => {
+  assert.equal(parseApprovalReply('no but go ahead').decision, 'approve-all');
+});
+
+test('a bare edit keyword with no content is NOT an edit (leaves pending)', () => {
+  // "wait" alone used to become edit with empty text → empty re-decompose.
+  assert.equal(parseApprovalReply('wait').decision, 'not-an-approval');
+});
+
+test('edit with real instruction and no approval verb still parses as edit', () => {
+  const r = parseApprovalReply('actually research the pricing first');
+  assert.equal(r.decision, 'edit');
+  assert.equal(r.editText, 'research the pricing first');
+});

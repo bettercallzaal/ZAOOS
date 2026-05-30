@@ -247,6 +247,11 @@ function coerceToPlan(raw: unknown): DecompositionPlan {
       `decompose: plan has ${subtasks.length} subtasks (max ${MAX_SUBTASKS}) - goal is too big; split it into smaller goals`,
     );
   }
+  // Duplicate ids corrupt the dispatch loop bound + depends_on resolution
+  // (doc 770 MED) — escalate so Zaal gets a re-decompose, not a stuck plan.
+  if (new Set(subtasks.map((s) => s.id)).size !== subtasks.length) {
+    throw new Error('decompose: plan has duplicate subtask ids - re-decompose');
+  }
   return { goal_summary, subtasks, execution_plan, ambiguities };
 }
 

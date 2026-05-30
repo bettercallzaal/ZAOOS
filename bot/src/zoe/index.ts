@@ -1031,7 +1031,7 @@ async function main(): Promise<void> {
       await subscribeToCasts((cast) => {
         // Fire-and-forget per cast (the pipeline self-gates + returns a verdict
         // we don't consume here). Wrapped so the callback returns void — unbreaks
-        // the bot typecheck after #729. See doc 770/771.
+        // the bot typecheck after #729. See doc 770/773.
         void runCasterPipeline(bot, zaalId, {
           agentId: 'caster',
           persona,

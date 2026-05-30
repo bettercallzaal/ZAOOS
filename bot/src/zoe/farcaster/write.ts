@@ -13,7 +13,7 @@
  *   FC_NETWORK_ID              1 = MAINNET
  *   + signer env (see signer.ts)
  */
-import { makeCastAdd, FarcasterNetwork, Message } from '@farcaster/hub-nodejs';
+import { makeCastAdd, FarcasterNetwork, Message, CastType } from '@farcaster/hub-nodejs';
 import { makeSigner } from './signer';
 import { buildX402Header, useX402 } from './x402';
 
@@ -49,6 +49,7 @@ export async function publishCast(input: CastInput): Promise<PublishResult> {
     embedsDeprecated: [],
     mentions: [],
     mentionsPositions: [],
+    type: CastType.CAST,
   };
   if (input.parent) {
     // parentCastId expects { fid, hash: Uint8Array }

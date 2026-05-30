@@ -4,7 +4,6 @@
  */
 import { Bot, Context } from 'grammy';
  
-// @ts-expect-error: node-cron has no types bundled
 import cron from 'node-cron';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

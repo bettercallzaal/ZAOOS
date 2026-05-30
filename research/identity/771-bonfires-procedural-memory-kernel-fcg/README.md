@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-05-30
 superseded-by:
-related-docs: 665, 669, 542, 544, 546, 569, 726, 754
+related-docs: 665, 669, 542, 544, 546, 569, 680, 726, 754
 original-query: "https://docs.fileverse.io/d/0200039b000d#k=vK13_Bm1s7JDW5bqpxtIuVMgp87ySuynflgRAe9I-SY"
 tier: STANDARD
 ---
@@ -118,6 +118,37 @@ The kernel's stress test. A "planetary folklore survey":
 | `bot/src/zoe/index.ts`, `types.ts` | Bonfire wiring + types. No change needed for kernel adoption (server-side). |
 | `bot/.env.example` | Bonfire API key config (key migration landed 2026-05-24, Doc 754). |
 
+## Live API surface + recall diagnosis (2026-05-30)
+
+Probed the live Bonfires API (`https://tnt-v2.api.bonfires.ai`, FastAPI - `/openapi.json` enumerates everything) with ZAO's key, plus read the public `NERDDAO/bonfires-sdk` (`canon` branch) + `NERDDAO/graphiti` fork. Findings:
+
+### The kernel is proprietary; the substrate is a Graphiti fork
+
+- `NERDDAO/graphiti` is a fork of `getzep/graphiti` (Apache 2.0, Zep paper arXiv 2501.13956). Its `examples/gliner2/gliner2_neo4j.py` runs **GLiNER2** (205-340M NER, CPU) for entity extraction + **Gemini** (gemini-2.5-flash-lite reasoning + gemini-embedding-001) for edges/dedup, writing **Neo4j bi-temporal** edges (`valid_at`/`invalid_at`). This is the public substrate Bonfires extends - NOT the FCG kernel.
+- Zero public code for the FCG kernel across NERDDAO repos: no `FCG`, `RoleBoundEventFrame`, `TemporalEdge` (typed), `fluid construction grammar`, GLiNER (beyond the graphiti fork). **The FCG extraction kernel is proprietary / unreleased** - the May-2026 essay is a roadmap statement, not shipped code. (Confirms the trimtab correction above.)
+
+### But structured/typed intake IS live (ZAO is not stuck with prose-only)
+
+The API exposes **190 endpoints**, including typed write paths beyond `POST /knowledge_graph/episode/create` (prose):
+
+- `POST /knowledge_graph/add_triples` + `POST /api/kg/add-triplet` - typed subject-predicate-object triples
+- `POST /knowledge_graph/entity` + `/edge` + `/entities/batch` - direct typed node/edge creation
+- `POST /knowledge_graph/ontology/{ingest,generate-profile,match,gaps}` - an ontology/schema layer
+- `POST /agents/{id}/stack/{add,process,search}` - the procedural "stack" (the essay's layered pipeline surface)
+- `/bonfire/{id}/{labeled_chunks,taxonomy_stats}` + `POST /trigger_taxonomy` - the taxonomy/labeling layer (essay layer 2)
+
+So if ZAO later wants higher-fidelity ingestion than prose episodes, `/knowledge_graph/add_triples` + `/entity`/`/edge` + `/ontology/ingest` are the typed paths - no need to wait for the FCG kernel.
+
+### Recall root cause (resolves the doc-680 read blocker)
+
+ZOE's `recall.ts` queried `POST /vector_store/search` `{bonfire_ref, search_string}` and always got `count:0`. Diagnosis:
+
+- `GET /vector_store/diagnostics/<bonfire_id>` -> `Labeled_chunks: 0, Bonfire_labels: 0`. The vector-search collections are genuinely empty (a platform-internal indexing step that never populated for this bonfire). This - not a "Ryan toggle" - is what the old "needs admin labeling" comments were grasping at.
+- `GET /bonfire/<id>/taxonomy_stats` -> `total_chunks: 283, labeled_chunks: 283, taxonomy_count: 0`. The graph has 283 chunks.
+- `POST /delve {bonfire_id, query}` -> the SDK's real graph-query path; `"What is ZAO?"` returns **51 episodes** with full content.
+
+Fix (PR #740): `recall.ts` now uses `/delve`, not the empty `/vector_store/search`. The SDK confirms `client.kg.search()` maps to `/delve`. Read path is unblocked - no labeling action required (closes the doc-680 read worry).
+
 ## Also See
 
 - [Doc 665](../../agents/665-bonfires-deep-dive-zao-integration/) - Bonfires architecture deep dive + 6 ZAO integration vectors + `trimtab`/kEngram detail
@@ -149,3 +180,7 @@ The kernel's stress test. A "planetary folklore survey":
 - [NERDDAO/trimtab (GitHub)](https://github.com/NERDDAO/trimtab) - `[FULL]` - DEEP-pass verification (`gh repo view` + code search): Tracery grammar gen + n-gram + HDBSCAN + `real-ladybug` vector store, ~156KB Python, updated 2026-04-22. NOT the FCG kernel - refutes the v1 inference.
 - [NERDDAO/graphiti (GitHub)](https://github.com/NERDDAO/graphiti) - `[FULL]` - fork of [getzep/graphiti](https://github.com/getzep/graphiti) (Apache 2.0, arXiv 2501.13956); `examples/gliner2/gliner2_neo4j.py` = GLiNER2 + Gemini + Neo4j bi-temporal. Only public GLiNER footprint across ~50 NERDDAO repos.
 - Beuls & Van Eecke 2025 (CxGs-NLP 2025 workshop) - academic grounding for the learnable-FCG novelty claim. `[PARTIAL - surfaced by the DEEP competitive-landscape pass; not independently re-fetched this session, no canonical URL verified - confirm before citing externally]`.
+- Live Bonfires API `https://tnt-v2.api.bonfires.ai/openapi.json` - `[FULL]` - 190-endpoint FastAPI spec, probed 2026-05-30 with ZAO's key. Confirmed `/delve`, `/knowledge_graph/add_triples`, `/api/kg/add-triplet`, `/knowledge_graph/ontology/*`, `/agents/{id}/stack/*`, `/bonfire/{id}/{labeled_chunks,taxonomy_stats}`, `/vector_store/diagnostics/{id}`.
+- [NERDDAO/bonfires-sdk (`canon`)](https://github.com/NERDDAO/bonfires-sdk/tree/canon) - `[FULL]` - `client.kg.search()` -> `POST /delve`; `kg.create_entity/create_edge` -> typed graph writes; `trimtab.*` -> Tracery grammar service. No typed-artifact/FCG intake exposed.
+- [NERDDAO/graphiti `examples/gliner2/gliner2_neo4j.py`](https://github.com/NERDDAO/graphiti/blob/main/examples/gliner2/gliner2_neo4j.py) - `[FULL]` - GLiNER2 + Gemini + Neo4j bi-temporal; fork of getzep/graphiti. The public substrate.
+- [NERDDAO/trimtab](https://github.com/NERDDAO/trimtab) - `[FULL]` - Tracery + n-gram + HDBSCAN + LadybugDB vector store. NOT the FCG kernel.

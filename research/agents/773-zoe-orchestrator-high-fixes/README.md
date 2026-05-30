@@ -8,9 +8,11 @@ original-query: "do the pr and then fix high items in 771"
 scope: "bot/src/zoe/{index,dispatch,workers,scheduler}.ts"
 ---
 
-# 771 - ZOE orchestrator HIGH-severity fixes (doc 770 follow-up)
+# 773 - ZOE orchestrator HIGH-severity fixes (doc 770 follow-up)
 
 > **Goal:** Fix the 5 HIGH findings from the doc 770 audit so the orchestrator is safe to trust with autonomous, cost-incurring runs. Each fix lands with a regression test where the logic is pure.
+
+> **Renumbered 771 -> 773 on 2026-05-30.** Doc 771 was assigned in parallel to the Bonfires kernel decode (`research/identity/771-bonfires-procedural-memory-kernel-fcg`, merged to main via PR #731). This orchestrator doc yielded the number. The git branch keeps its original `-771` suffix.
 
 Branch: `ws/zoe-orchestrator-high-fixes-771`. Builds on doc 770.
 

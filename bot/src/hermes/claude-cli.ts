@@ -116,7 +116,12 @@ export function callClaudeCli(opts: ClaudeCliOptions): Promise<ClaudeCliResult> 
     child.on('close', (code) => {
       clearTimeout(timeout);
       if (code !== 0) {
-        reject(new Error(`claude CLI exited ${code}. stderr: ${stderr.slice(0, 800)}`));
+        // claude in -p json mode often writes the real error (rate-limit /
+        // usage-limit / auth) to STDOUT as JSON while exiting non-zero with
+        // EMPTY stderr. Surface stdout too so the failure is never mute.
+        const detail = stderr.trim() || stdout.trim() || "(both empty)";
+        console.error("[hermes/claude-cli] non-zero exit", code, "stdout=", stdout.slice(0, 800), "stderr=", stderr.slice(0, 800), "args=", JSON.stringify(args).slice(0, 400));
+        reject(new Error(`claude CLI exited ${code}. detail: ${detail.slice(0, 800)}`));
         return;
       }
 

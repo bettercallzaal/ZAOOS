@@ -1,9 +1,10 @@
 ---
 topic: business
 type: decision
-status: research-complete
+status: superseded
 last-validated: 2026-05-23
-related-docs: "110, 212, 670, 673, 712, 713, 726, 727, 734, 735, 736"
+superseded-by: 772
+related-docs: "110, 212, 670, 673, 712, 713, 726, 727, 734, 735, 736, 772"
 original-query: "Set up a new Airtable workspace as the agentic CRM destination for connected MCP queries (Gmail / Google Calendar / Google Drive / GitHub). Past CRM was an older Airtable; upgrade it agentic. Pair with the just-shipped private-data perimeter (PR #666). Replaces the people-CRM intent of docs 712 + 713 on the Airtable side while leaving the cowork-tracker Supabase work intact."
 tier: STANDARD
 ---
@@ -11,6 +12,8 @@ tier: STANDARD
 # 737 - Airtable agentic CRM v3 (People + Activity + Opportunities)
 
 > **Goal:** Lock the schema + agentic-ingestion design for the new Airtable CRM workspace Zaal just joined. The CRM is the canonical destination for synthesized people-data from the 4 connected MCPs (Gmail, Google Calendar, Google Drive, GitHub) while raw query output stays at `~/.zao/private/` per PR #666. Coexists with the Supabase cowork tracker; does not migrate it.
+
+> **SUPERSEDED 2026-05-29 by [doc 772](../772-crm-supabase-native/).** Zaal reversed the Airtable-canonical decision in favor of a Supabase-native, RLS-gated CRM with a public `/network` feed Airtable cannot serve. The Airtable workspace becomes a read-only archive after the doc-772 migration runs, then frozen. The schema below remains the migration source map (Airtable columns -> Supabase columns).
 
 This doc supersedes the Airtable-versus-Supabase half of docs 712 + 713 for the people-CRM. The tasks half (cowork tracker on Supabase, project `etwvzrmlxeobinrlytza`) stays as shipped.
 

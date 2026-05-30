@@ -46,16 +46,40 @@ interface WorkerConfig {
   maxBudgetUsd: number;
 }
 
-// Read-only lockdown shared by every worker. No worker may push, commit,
-// reset, rm, or write files — anything that mutates state stays behind an
-// explicit Zaal approval at the ZOE layer, never inside an autonomous worker.
+// Read-only lockdown shared by every worker. Anything that mutates state stays
+// behind an explicit Zaal approval at the ZOE layer, never inside an autonomous
+// worker.
+//
+// H4 (doc 770): a Bash *denylist* is inherently leaky — it cannot catch shell
+// redirection (`cmd > file`), here-docs, or arbitrary interpreters. The real
+// guarantee comes from each worker's `allowedTools` being an EXPLICIT allowlist
+// of `Bash(<cmd>*)` patterns (see WORKER_CONFIG) combined with the CLI denying
+// anything not allowed. This denylist is defense-in-depth on top of that, and
+// blocks the obvious write/exec vectors. TODO: verify `permissionMode: 'auto'`
+// enforces the allowlist (deny-by-default) before granting any worker write or
+// real spend; if it does not, switch workers to bypassPermissions + allowlist.
 const READ_ONLY_DISALLOW = [
   'Bash(git push*)',
   'Bash(git commit*)',
   'Bash(git reset*)',
+  'Bash(git clean*)',
   'Bash(rm*)',
+  'Bash(mv*)',
+  'Bash(dd*)',
+  'Bash(truncate*)',
+  'Bash(tee*)',
+  'Bash(chmod*)',
+  'Bash(chown*)',
+  'Bash(sh*)',
+  'Bash(bash*)',
+  'Bash(zsh*)',
+  'Bash(eval*)',
+  'Bash(node*)',
+  'Bash(npx*)',
+  'Bash(python*)',
   'Edit',
   'Write',
+  'NotebookEdit',
 ];
 
 const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {

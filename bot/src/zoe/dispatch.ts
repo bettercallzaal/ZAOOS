@@ -2,11 +2,13 @@
  * dispatch.ts — ZOE's Node-orchestrated dispatch loop (doc 759 Gap 2).
  *
  * Takes an APPROVED DecompositionPlan and runs it:
- *   - schedules subtasks in dependency waves (all deps-satisfied subtasks run
- *     concurrently via Promise.allSettled)
+ *   - schedules subtasks in dependency waves (deps-satisfied subtasks run with
+ *     bounded concurrency, MAX_WAVE_CONCURRENCY at a time)
  *   - routes each subtask to its worker (workers.ts) or to Hermes for code-fix
  *   - records every run for the Gap 5 learning loop (runs.ts)
- *   - enforces a hard per-plan USD budget
+ *   - enforces a per-plan USD budget via per-wave pre-flight (worst-case spend
+ *     is checked BEFORE a wave launches) + a subtask-count ceiling. NOTE:
+ *     Hermes subtasks self-account, so their spend is not seen here.
  *   - honors approval_gate_before_next: pauses the loop and returns
  *     'paused-for-gate' so the caller raises a fresh approval. On resume the
  *     caller re-invokes with alreadyCompleted set.
@@ -19,10 +21,47 @@
 import { dispatchHermesRun } from '../hermes/runner';
 import type { ZoeContext } from './types';
 import type { DecompositionPlan, Subtask } from './decompose';
-import { runClaudeWorker, type WorkerResult } from './workers';
+import { runClaudeWorker, workerMaxBudget, type ClaudeWorkerKind, type WorkerResult } from './workers';
 import { recordRun, newRunId, type RunRecord } from './runs';
 
 const DEFAULT_PLAN_BUDGET_USD = Number(process.env.ZOE_PLAN_BUDGET_USD ?? 5);
+// H3 (doc 770): hard ceilings so one plan can't spawn unbounded `claude`
+// processes or blow far past budget in a single wave.
+const MAX_SUBTASKS = Number(process.env.ZOE_MAX_SUBTASKS ?? 12);
+const MAX_WAVE_CONCURRENCY = Number(process.env.ZOE_MAX_WAVE_CONCURRENCY ?? 3);
+
+/** Worst-case authorized spend for a subtask (hermes/inline track their own). */
+function estimateSubtaskCost(st: Subtask): number {
+  if (st.worker === 'hermes' || st.worker === 'task-dispatcher') return 0;
+  return workerMaxBudget(st.worker as ClaudeWorkerKind);
+}
+
+/**
+ * Run `fn` over items with at most `limit` in flight at once. Returns
+ * PromiseSettledResult[] in input order. Caps concurrent CLI subprocesses.
+ */
+async function runWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>,
+): Promise<PromiseSettledResult<R>[]> {
+  const results: PromiseSettledResult<R>[] = new Array(items.length);
+  let next = 0;
+  const worker = async (): Promise<void> => {
+    for (;;) {
+      const i = next++;
+      if (i >= items.length) return;
+      try {
+        results[i] = { status: 'fulfilled', value: await fn(items[i]) };
+      } catch (e) {
+        results[i] = { status: 'rejected', reason: e };
+      }
+    }
+  };
+  const pool = Array.from({ length: Math.min(Math.max(1, limit), items.length) }, worker);
+  await Promise.all(pool);
+  return results;
+}
 
 export interface DispatchHooks {
   onSubtaskStart?: (st: Subtask) => Promise<void> | void;
@@ -50,6 +89,7 @@ export interface DispatchReport {
     | 'paused-for-gate'
     | 'cancelled'
     | 'budget-exceeded'
+    | 'too-large'
     | 'failed';
   results: WorkerResult[];
   completedIds: string[];
@@ -167,10 +207,12 @@ function summarize(report: Omit<DispatchReport, 'summary'>): string {
       : report.status === 'paused-for-gate'
         ? `Paused at the approval gate after ${report.gateAfterId}.`
         : report.status === 'budget-exceeded'
-          ? `Stopped — plan budget exceeded after ${report.results.length} subtask(s).`
-          : report.status === 'cancelled'
-            ? `Cancelled after ${report.results.length} subtask(s).`
-            : `Stopped — ${report.results.length} subtask(s) ran, dependency unsatisfiable.`;
+          ? `Stopped — plan budget would be exceeded (ran ${report.results.length} subtask(s)).`
+          : report.status === 'too-large'
+            ? `Refused — plan has too many subtasks (max ${MAX_SUBTASKS}). Narrow the goal.`
+            : report.status === 'cancelled'
+              ? `Cancelled after ${report.results.length} subtask(s).`
+              : `Stopped — ${report.results.length} subtask(s) ran, dependency unsatisfiable.`;
   lines.push(head);
   for (const r of report.results) {
     const score = r.critique ? ` [${r.critique.score}/100]` : '';
@@ -208,6 +250,11 @@ export async function dispatchPlan(args: DispatchPlanArgs): Promise<DispatchRepo
     return { ...partial, summary: summarize(partial) };
   };
 
+  // H3: refuse oversized plans up front — never spawn an unbounded fan-out.
+  if (plan.subtasks.length > MAX_SUBTASKS) {
+    return finish('too-large');
+  }
+
   while (completed.size < plan.subtasks.length) {
     if (args.hooks?.isCancelled?.()) return finish('cancelled');
 
@@ -220,15 +267,21 @@ export async function dispatchPlan(args: DispatchPlanArgs): Promise<DispatchRepo
       return finish('failed');
     }
 
-    // Run the wave concurrently.
-    const settled = await Promise.allSettled(
-      runnable.map(async (st) => {
-        await args.hooks?.onSubtaskStart?.(st);
-        const res = await runOne(st, args, outputsById);
-        await args.hooks?.onSubtaskDone?.(st, res);
-        return res;
-      }),
-    );
+    // H3: budget pre-flight — don't authorize a wave whose worst-case spend
+    // would exceed the remaining budget. Stops the overspend BEFORE spawning,
+    // not after (the old post-wave check could blow far past on a wide wave).
+    const waveEstimate = runnable.reduce((sum, s) => sum + estimateSubtaskCost(s), 0);
+    if (totalCost + waveEstimate > budget) {
+      return finish('budget-exceeded');
+    }
+
+    // Run the wave with bounded concurrency (caps simultaneous CLI processes).
+    const settled = await runWithConcurrency(runnable, MAX_WAVE_CONCURRENCY, async (st) => {
+      await args.hooks?.onSubtaskStart?.(st);
+      const res = await runOne(st, args, outputsById);
+      await args.hooks?.onSubtaskDone?.(st, res);
+      return res;
+    });
 
     for (let i = 0; i < settled.length; i++) {
       const st = runnable[i];

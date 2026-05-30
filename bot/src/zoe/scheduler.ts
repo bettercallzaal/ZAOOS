@@ -23,7 +23,7 @@ import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled } from './nudges';
 import { startPostsScheduler } from './posts';
-import { setPending } from './approvals';
+import { setPending, getPending } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
@@ -92,6 +92,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await markFired('evening-reflect');
           // Arm reflexion (Gap 4): Zaal's next free-form DM is captured as the
           // reflection answer and fed to the reflexion layer for memory patches.
+          // H2 (doc 770): don't stomp a live user approval (plan-gate/reflexion/
+          // learn) — only arm when nothing else is pending.
+          const livePending = getPending('private');
+          if (livePending && livePending.kind !== 'await-reflection') {
+            console.log(`[zoe/scheduler] reflexion not armed — ${livePending.kind} pending`);
+            return;
+          }
           await setPending({
             kind: 'await-reflection',
             chatScope: 'private',
@@ -153,6 +160,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           await markFired('learn-cycle');
           if (result.proposals.length === 0) {
             console.log(`[zoe/scheduler] learn cycle: ${result.runsAnalyzed} runs, no proposals`);
+            return;
+          }
+          // H2 (doc 770): don't clobber a live user approval. Defer to next
+          // cycle rather than stomping a pending plan/reflexion.
+          const liveLearn = getPending('private');
+          if (liveLearn) {
+            console.log(`[zoe/scheduler] learn proposals not surfaced — ${liveLearn.kind} pending; retry next cycle`);
             return;
           }
           await setPending({

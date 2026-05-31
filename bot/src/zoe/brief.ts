@@ -167,7 +167,7 @@ Output the brief now in the exact format from your system prompt.`;
     prompt: userPrompt,
     cwd: opts.repoDir,
     appendSystemPrompt: BRIEF_SYSTEM_PROMPT,
-    permissionMode: 'auto',
+    permissionMode: 'default',
     bare: false,
   });
 

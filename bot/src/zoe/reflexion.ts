@@ -310,7 +310,7 @@ export async function runReflexion(input: ReflexionInput): Promise<ReflexionResu
     appendSystemPrompt: REFLEXION_SYSTEM_PROMPT,
     allowedTools: [],
     disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
-    permissionMode: 'auto',
+    permissionMode: 'default',
     outputFormat: 'json',
     bare: false,
   });

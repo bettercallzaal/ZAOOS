@@ -50,23 +50,30 @@ interface WorkerConfig {
 // reset, rm, or write files — anything that mutates state stays behind an
 // explicit Zaal approval at the ZOE layer, never inside an autonomous worker.
 //
-// doc 770 H4: a denylist is inherently leaky, so the per-worker `allowedTools`
-// whitelist above is the real authority — this list is defense-in-depth that
-// closes the obvious write/move/exec/exfil vectors the audit named (mv, chmod,
-// git clean, npx/node, curl/wget, …). After the H4 follow-up, no worker is
-// granted a broad shell-read prefix (`Bash(cat*)`/`Bash(curl*)`) anymore — file
-// reads go through Read/Glob/Grep and network reads through WebFetch — so the
-// only remaining Bash any worker can run is `git log/diff/status`. The one
-// residual a denylist still CANNOT catch is shell redirection inside those
-// allowed git prefixes (e.g. `git log > f`). That ultimately depends on the CLI
-// treating `allowedTools` as authoritative under permissionMode — which is now
-// VERIFIED, not asserted: run `npx tsx bot/scripts/verify-tool-lockdown.ts` on
-// the VPS (see doc 770 H4) before trusting a worker with autonomous spend.
+// doc 770 H4 (VPS-verified 2026-05-31, three iterations): the ONLY control the
+// Claude CLI reliably enforces in non-interactive (-p) mode is this
+// `--disallowedTools` DENYLIST. It does NOT enforce `--allowedTools` as a
+// restrictive allowlist — a worker can run Bash commands that were never
+// granted (proven: `git log > f` and an `echo > f` Write-fallback both wrote on
+// a bare box under both 'auto' and 'default'). Pattern denials like
+// `Bash(rm*)`/`Bash(curl*)` DO hold, but a pattern denylist can never catch
+// every write path (`echo > f`, `git log > f`, …). So the airtight move is to
+// deny the entire `Bash` tool: with no shell at all, the only tools left are
+// Read/Glob/Grep/WebFetch/WebSearch — none can write. The specific patterns
+// below are kept as defense-in-depth. (My earlier 'all blocked' local result
+// was the harness container sandbox, not the CLI — IS_SANDBOX. The VPS has no
+// such sandbox, which is why the probe is the source of truth.)
+// Re-verify after CLI upgrades or any allowlist change:
+// `npx tsx bot/scripts/verify-tool-lockdown.ts` on the VPS (doc 770 H4).
 const READ_ONLY_DISALLOW = [
+  // The whole Bash tool — the catch-all that closes every shell write/redirect
+  // path (echo>f, git>f, tee, python, …). No worker is granted Bash anymore.
+  'Bash',
   // File / notebook mutation tools.
   'Edit',
   'Write',
   'NotebookEdit',
+  // Specific Bash patterns kept as defense-in-depth (redundant under bare Bash).
   // git state mutation.
   'Bash(git push*)',
   'Bash(git commit*)',
@@ -118,7 +125,12 @@ const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
   'research-worker': {
     specFile: 'research-worker.md',
     model: ZOE_DEFAULT_MODEL,
-    allowedTools: ['Read', 'Glob', 'Grep', 'WebFetch', 'WebSearch', 'Bash(git log*)'],
+    // doc 770 H4 (VPS-verified 2026-05-31): no raw Bash. Even an exact prefix
+    // like Bash(git log*) leaks a write under `default` via redirection
+    // (`git log > f`), which the probe caught on a bare box. Reads go through
+    // Read/Glob/Grep; web via WebFetch/WebSearch. Zero allowed Bash = no prefix
+    // to ride a redirect on.
+    allowedTools: ['Read', 'Glob', 'Grep', 'WebFetch', 'WebSearch'],
     disallowedTools: READ_ONLY_DISALLOW,
     critic: 'research',
     maxBudgetUsd: 1.0,
@@ -126,7 +138,11 @@ const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
   'code-reviewer': {
     specFile: 'code-reviewer.md',
     model: ZOE_DEFAULT_MODEL,
-    allowedTools: ['Read', 'Glob', 'Grep', 'Bash(git diff*)', 'Bash(git log*)', 'Bash(git status)'],
+    // doc 770 H4: dropped Bash(git diff/log/status) — the redirection write
+    // vector (`git diff > f`) leaks under `default`. The reviewer reads files
+    // via Read/Grep; when a diff is needed it must be pre-fetched by the trusted
+    // Node layer and injected as context, never run by the worker. (follow-up)
+    allowedTools: ['Read', 'Glob', 'Grep'],
     disallowedTools: READ_ONLY_DISALLOW,
     critic: 'task-result',
     maxBudgetUsd: 0.75,
@@ -326,7 +342,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
       appendSystemPrompt: spec,
       allowedTools: cfg.allowedTools,
       disallowedTools: cfg.disallowedTools,
-      permissionMode: 'auto',
+      permissionMode: 'default',
       outputFormat: 'json',
       maxBudgetUsd: budgetUsd,
       bare: false,

@@ -104,7 +104,7 @@ export async function runResearchCritic(
     appendSystemPrompt: RESEARCH_CRITIC_SYSTEM,
     allowedTools: [],
     disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
-    permissionMode: 'auto',
+    permissionMode: 'default',
     outputFormat: 'json',
     bare: false,
   });

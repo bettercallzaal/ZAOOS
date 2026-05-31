@@ -124,7 +124,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
       'Edit',
       'Write',
     ],
-    permissionMode: 'auto',
+    permissionMode: 'default',
     outputFormat: 'json',
     // bare: false on purpose. Claude Code CLI 2.1.140+ explicitly disables
     // OAuth credential reads under --bare ("Anthropic auth is strictly

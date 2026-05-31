@@ -137,7 +137,7 @@ export async function runCommsCritic(input: CommsCritiqueInput): Promise<Critiqu
     appendSystemPrompt: COMMS_CRITIC_SYSTEM,
     allowedTools: [],
     disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
-    permissionMode: 'auto',
+    permissionMode: 'default',
     outputFormat: 'json',
     bare: false,
   });

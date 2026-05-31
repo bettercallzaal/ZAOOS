@@ -263,7 +263,7 @@ export const agent: Agent = {
       cwd: ctx.repoDir,
       appendSystemPrompt: NEWSLETTER_SYSTEM,
       allowedTools: ['Read', 'Glob', 'Grep'],
-      permissionMode: 'auto',
+      permissionMode: 'default',
       outputFormat: 'json',
     });
 

@@ -38,6 +38,8 @@ const contactSchema = z.object({
   github_handle: z.string().max(120).optional(),
   telegram_handle: z.string().max(120).optional(),
   role: z.string().max(200).optional(),
+  category: z.string().max(64).optional(),
+  tags: z.array(z.string().max(64)).max(30).optional(),
   org: z.string().max(200).optional(),
   how_we_met: z.string().max(2000).optional(),
   public_summary: z.string().max(4000).optional(),

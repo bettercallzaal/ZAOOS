@@ -3,7 +3,7 @@ topic: agents
 type: audit
 status: research-complete
 last-validated: 2026-05-29
-related-docs: "759, 601, 605, 734, 758"
+related-docs: "759, 601, 605, 734, 758, 793"
 original-query: "lets recap what we learned and then audit and zao research all the files in github"
 tier: STANDARD (independent code-reviewer sub-agent + parent verification of routing/budget math)
 scope: "bot/src/zoe/{approvals,dispatch,workers,runs,learn,index,scheduler,relay}.ts on main after PR #728/#727/#729"
@@ -82,4 +82,8 @@ The whole `runnable` wave runs concurrently via `Promise.allSettled`; cost is su
 5. MED batch: `parseApprovalReply` tightening, decompose id-dedupe, learnings cap/dedupe, relay exact-match, sentinel-before-send.
 
 ## Verification status
+> **CLOSED OUT — see doc 793** (`research/agents/793-cli-lockdown-learnings-770-followups/`). All HIGH (H1-H5) + the MED batch are fixed and in code: 131 ZOE tests pass, typecheck clean, and the H4 read-only lockdown is proven 4/4 on the live VPS via `bot/scripts/verify-tool-lockdown.ts`. LOW items have an explicit per-item disposition there (fix / accept-risk / defer-with-trigger). The H4 needs-verification tag resolved to: the CLI enforces `--disallowedTools` but NOT `--allowedTools` in `-p` mode, so the lockdown denies the whole `Bash` tool rather than allowlisting patterns.
+
+Below was the state at audit time (pre-fix):
+
 Static audit only — no typecheck/tests run, nothing modified. The 69 unit tests cover pure logic (resolver, dispatch scheduling on zero-CLI plans, summarization) but **none of these HIGH findings are exercised by the existing tests** (they need live CLI + concurrent Telegram traffic). Each fix should ship with a regression test where pure (e.g. an `await-reflection`-plus-`plan:` routing test, a duplicate-id dispatch test, a budget-pre-flight test).

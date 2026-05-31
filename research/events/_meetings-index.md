@@ -5,6 +5,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
 | 2026-05-31 | Iman x Zaal - Request for Collaborators walkthrough | ZAO Devz | Zaal, Iman | [779](779-iman-zaal-request-for-collaborators-may31/) | 3 |
+| 2026-05-29 12:06 | Plat0x (Carlos, Bonfires) x Zaal - GitHub-to-Bonfire submission + judging architecture for ZABAL Games | ZABAL Games | Zaal, Plat0x (Carlos) | [784](784-plat0x-bonfire-zabal-architecture-may29/) | 4 |
 | 2026-05-29 11:02 | Tyler / Magnetic x Zaal - ZABAL Games magnet built live + Connector explainer recorded | ZABAL Games | Zaal, Tyler Stambaugh | [783](783-tyler-magnetic-zabal-magnet-build-may29/) | 5 |
 | 2026-05-27 17:01 | Ven (The Open Machine) x Zaal - catch-up + collaboration | Networking | Zaal, Ven | [782](782-ven-open-machine-catchup-may27/) | 4 |
 | 2026-05-27 16:30 | Tyler / Magnetic x Zaal + team - ZABAL Games build on Magnetic | ZABAL Games | Zaal, Tyler Stambaugh, Samantha, Shawn | [778](778-tyler-magnetic-zabal-games-build-may27/) | 9 |

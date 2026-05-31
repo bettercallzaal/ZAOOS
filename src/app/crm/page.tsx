@@ -90,10 +90,22 @@ export default async function CrmPage() {
                       </span>
                     </span>
                   </div>
-                  {(c.role || c.org) && (
+                  {(c.category || c.org) && (
                     <p className="mt-0.5 text-sm text-white/60">
-                      {[c.role, c.org].filter(Boolean).join(' - ')}
+                      {[c.category, c.org].filter(Boolean).join(' - ')}
                     </p>
+                  )}
+                  {c.tags && c.tags.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {c.tags.slice(0, 6).map((t) => (
+                        <span
+                          key={t}
+                          className="rounded bg-[#f5a623]/10 px-1.5 py-0.5 text-[10px] text-[#f5a623]/80"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
                   )}
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-white/40">
                     {c.farcaster_handle && <span>@{c.farcaster_handle}</span>}

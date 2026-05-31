@@ -1,15 +1,16 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { getSupabaseAnon } from '@/lib/db/supabase';
 import type { CrmContactPublic, CrmInteractionPublic } from '@/lib/crm/types';
 
 // Public per-contact detail page. Reads only the *_public views (safe columns,
-// is_public=true). Server-rendered, no auth. Doc 772.
+// is_public=true) via the ANON client (C-H3) so RLS + the granted view is the
+// enforced boundary, not service-role. Server-rendered, no auth. Doc 772.
 export const revalidate = 300;
 export const dynamicParams = true; // allow on-demand render for new public contacts
 
 async function getContact(slug: string): Promise<CrmContactPublic | null> {
-  const { data, error } = await getSupabaseAdmin()
+  const { data, error } = await getSupabaseAnon()
     .from('crm_contacts_public')
     .select('*')
     .eq('slug', slug)
@@ -19,7 +20,7 @@ async function getContact(slug: string): Promise<CrmContactPublic | null> {
 }
 
 async function getInteractions(contactId: string): Promise<CrmInteractionPublic[]> {
-  const { data, error } = await getSupabaseAdmin()
+  const { data, error } = await getSupabaseAnon()
     .from('crm_interactions_public')
     .select('*')
     .eq('contact_id', contactId)
@@ -30,7 +31,7 @@ async function getInteractions(contactId: string): Promise<CrmInteractionPublic[
 }
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  const { data } = await getSupabaseAdmin()
+  const { data } = await getSupabaseAnon()
     .from('crm_contacts_public')
     .select('slug')
     .not('slug', 'is', null)

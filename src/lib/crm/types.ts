@@ -85,6 +85,26 @@ export function deriveContactSlug(input: {
   return slugify(raw);
 }
 
+/**
+ * True when the input carries a key that uniquely identifies a person (explicit
+ * slug or a social handle). A name alone is NOT stable — two different people
+ * can share a name — so it must never be used as an upsert conflict target
+ * (C-M2: a name-only upsert overwrites a different person's PII).
+ */
+export function hasStableContactKey(input: {
+  slug?: string | null;
+  farcaster_handle?: string | null;
+  x_handle?: string | null;
+  github_handle?: string | null;
+}): boolean {
+  return Boolean(
+    input.slug ||
+      input.farcaster_handle ||
+      input.x_handle ||
+      input.github_handle,
+  );
+}
+
 export function slugify(value: string): string {
   return value
     .toLowerCase()

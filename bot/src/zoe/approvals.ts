@@ -284,12 +284,22 @@ export async function clearPending(scope: string): Promise<void> {
   }
 }
 
-async function persist(): Promise<void> {
-  try {
-    await fs.mkdir(ZOE_PATHS.home, { recursive: true });
-    const arr = [...pendingByScope.values()];
-    await fs.writeFile(PENDING_FILE, JSON.stringify(arr, null, 2), 'utf8');
-  } catch (err) {
-    console.error('[zoe/approvals] persist failed:', (err as Error).message);
-  }
+// Serialize disk writes behind a single promise chain (doc 770 MED — persist
+// race). getPending's fire-and-forget `void persist()` after a TTL delete could
+// otherwise interleave with setPending's awaited write and lay down stale data.
+// Each queued write snapshots the map at its own turn, so the last write always
+// reflects the final in-memory state regardless of call ordering.
+let persistChain: Promise<void> = Promise.resolve();
+
+function persist(): Promise<void> {
+  persistChain = persistChain.then(async () => {
+    try {
+      await fs.mkdir(ZOE_PATHS.home, { recursive: true });
+      const arr = [...pendingByScope.values()];
+      await fs.writeFile(PENDING_FILE, JSON.stringify(arr, null, 2), 'utf8');
+    } catch (err) {
+      console.error('[zoe/approvals] persist failed:', (err as Error).message);
+    }
+  });
+  return persistChain;
 }

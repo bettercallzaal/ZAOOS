@@ -1,10 +1,27 @@
+import { createHash, timingSafeEqual } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
-import { deriveContactSlug, type InteractionType } from '@/lib/crm/types';
+import {
+  deriveContactSlug,
+  hasStableContactKey,
+  type InteractionType,
+} from '@/lib/crm/types';
+
+/**
+ * Constant-time secret comparison (C-H2). Hashing both sides to a fixed-length
+ * digest avoids a length-leak and lets timingSafeEqual run on equal buffers, so
+ * a `===` short-circuit can't be used as a byte-by-byte timing oracle against a
+ * long-lived PII-write bearer.
+ */
+function secretsMatch(a: string, b: string): boolean {
+  const ha = createHash('sha256').update(a).digest();
+  const hb = createHash('sha256').update(b).digest();
+  return timingSafeEqual(ha, hb);
+}
 
 // POST /api/crm/interactions
 // Upserts a contact (by deterministic slug) then logs one interaction.
@@ -55,7 +72,7 @@ async function authenticate(req: NextRequest): Promise<Caller | null> {
   const authHeader = req.headers.get('authorization');
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.slice(7);
-    if (ENV.CRM_BOT_SECRET && token === ENV.CRM_BOT_SECRET) {
+    if (ENV.CRM_BOT_SECRET && secretsMatch(token, ENV.CRM_BOT_SECRET)) {
       return { kind: 'bot' };
     }
     return null; // a Bearer was offered but it was wrong - reject, don't fall through
@@ -72,6 +89,31 @@ function compact<T extends Record<string, unknown>>(obj: T): Partial<T> {
   return Object.fromEntries(
     Object.entries(obj).filter(([, v]) => v !== undefined),
   ) as Partial<T>;
+}
+
+/**
+ * Pick a free slug for a name-only contact (C-M2): `john-smith`, then
+ * `john-smith-2`, etc., so two different people who share a name never collide.
+ * Best-effort — a concurrent insert can still race the unique index, which
+ * surfaces as a normal 500 rather than a silent PII overwrite.
+ */
+async function uniqueNameSlug(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  base: string,
+): Promise<string> {
+  const { data } = await supabase
+    .from('crm_contacts')
+    .select('slug')
+    .like('slug', `${base}%`);
+  const taken = new Set(
+    (data ?? []).map((r) => (r as { slug: string | null }).slug),
+  );
+  if (!taken.has(base)) return base;
+  for (let i = 2; i < 1000; i++) {
+    const candidate = `${base}-${i}`;
+    if (!taken.has(candidate)) return candidate;
+  }
+  return `${base}-${Date.now()}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -91,20 +133,42 @@ export async function POST(req: NextRequest) {
     }
     const { contact, interaction } = parsed.data;
 
-    const slug = deriveContactSlug(contact);
+    // C-H1: the bot is LLM-driven and prompt-injectable, so it may NEVER
+    // publish to /network or set an interaction public. Publishing is an
+    // admin-only action. Stripping is_public (rather than forcing false) leaves
+    // an admin's existing publish flag untouched on a later bot re-touch.
+    if (caller.kind === 'bot') {
+      delete contact.is_public;
+      interaction.visibility = 'private';
+    }
+
     const supabase = getSupabaseAdmin();
 
-    // 1. Upsert the contact by slug. Only provided fields are written, so a
-    // re-upsert never nulls out columns set on a prior touch.
+    // C-M2: only upsert (overwrite by slug) when the contact has a STABLE key
+    // (handle/explicit slug). A name-only slug is shared across different people
+    // — upserting on it merges person B's PII onto person A's row — so insert a
+    // fresh row with a uniquified slug instead.
+    const stableKey = hasStableContactKey(contact);
+    const baseSlug = deriveContactSlug(contact);
+    const slug = stableKey
+      ? baseSlug
+      : await uniqueNameSlug(supabase, baseSlug);
+
+    // Only provided fields are written, so a re-upsert never nulls out columns
+    // set on a prior touch.
     const contactRow = compact({
       ...contact,
       slug,
       owner_fid: caller.kind === 'admin' ? caller.fid : undefined,
     });
 
-    const { data: upserted, error: contactErr } = await supabase
-      .from('crm_contacts')
-      .upsert(contactRow, { onConflict: 'slug' })
+    const contactQuery = stableKey
+      ? supabase
+          .from('crm_contacts')
+          .upsert(contactRow, { onConflict: 'slug' })
+      : supabase.from('crm_contacts').insert(contactRow);
+
+    const { data: upserted, error: contactErr } = await contactQuery
       .select('id, slug, is_public')
       .single();
 

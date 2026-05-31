@@ -1,9 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { dispatchPlan } from '../dispatch.ts';
+import {
+  dispatchPlan,
+  subtaskBudgetEstimate,
+  hermesToWorkerResult,
+} from '../dispatch.ts';
 import type { DispatchPlanArgs } from '../dispatch.ts';
 import type { DecompositionPlan, Subtask } from '../decompose.ts';
+import { workerMaxBudget } from '../workers.ts';
 
 // task-dispatcher subtasks short-circuit inside dispatch.ts (no Claude CLI,
 // no Hermes), so a plan made of them exercises the scheduler — dependency
@@ -151,4 +156,47 @@ test('a wave larger than the concurrency cap still completes every subtask', asy
   assert.equal(report.status, 'completed');
   assert.equal(report.results.length, 7);
   assert.equal(report.completedIds.length, 7);
+});
+
+// --- doc 770 MED: Hermes cost is no longer invisible to the plan budget ---
+
+test('subtaskBudgetEstimate gives Hermes a non-zero pre-flight estimate', () => {
+  // Previously 0, so a plan of N Hermes subtasks never tripped the budget.
+  assert.ok(subtaskBudgetEstimate('hermes') > 0);
+  // task-dispatcher is still free (runs inline, no subprocess).
+  assert.equal(subtaskBudgetEstimate('task-dispatcher'), 0);
+  // claude workers estimate at their hard per-invocation cap.
+  assert.equal(
+    subtaskBudgetEstimate('research-worker'),
+    workerMaxBudget('research-worker'),
+  );
+});
+
+type HermesOutcome = Parameters<typeof hermesToWorkerResult>[1];
+
+test('hermesToWorkerResult surfaces the run notional cost + tokens (not 0)', () => {
+  const subtask: Subtask = st('st-h', { worker: 'hermes' });
+  // Only the fields the mapper reads matter; cast the minimal shape.
+  const outcome = {
+    kind: 'ready',
+    run: { id: 'run-1', total_input_tokens: 1200, total_output_tokens: 800, estimated_cost_usd: 0.42 },
+  } as unknown as HermesOutcome;
+  const result = hermesToWorkerResult(subtask, outcome);
+  assert.equal(result.status, 'completed');
+  assert.equal(result.costUsd, 0.42);
+  assert.equal(result.inputTokens, 1200);
+  assert.equal(result.outputTokens, 800);
+});
+
+test('hermesToWorkerResult tolerates null cost/tokens (falls back to 0)', () => {
+  const subtask: Subtask = st('st-h2', { worker: 'hermes' });
+  const outcome = {
+    kind: 'failed',
+    run: { id: 'r', total_input_tokens: null, total_output_tokens: null, estimated_cost_usd: null },
+    reason: 'boom',
+  } as unknown as HermesOutcome;
+  const result = hermesToWorkerResult(subtask, outcome);
+  assert.equal(result.status, 'failed');
+  assert.equal(result.costUsd, 0);
+  assert.equal(result.error, 'boom');
 });

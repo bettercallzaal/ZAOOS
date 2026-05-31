@@ -59,13 +59,14 @@ interface WorkerConfig {
 //      python, Write/Edit) is blocked, while allowlisted reads still run. The
 //      previous 'auto' mode AUTO-APPROVED everything not explicitly denied, so
 //      the allowlist did nothing and a worker could `echo > file` (proven).
-//   2. This hardened denylist + narrowed allowlists as belt-and-suspenders:
-//      no worker gets a broad shell-read prefix (`Bash(cat*)`/`Bash(curl*)`)
-//      anymore — file reads go through Read/Glob/Grep, network reads through
-//      WebFetch — so the only Bash any worker can run is `git log/diff/status`.
-// The residual a denylist alone can't catch (redirection inside an allowed git
-// prefix, e.g. `git log > f`) is closed by layer 1. Re-verify after CLI
-// upgrades: `npx tsx bot/scripts/verify-tool-lockdown.ts` on the VPS (doc 770 H4).
+//   2. This hardened denylist + Bash-free allowlists as belt-and-suspenders.
+//      No worker is granted ANY raw Bash (VPS-verified 2026-05-31): even an
+//      exact prefix like `Bash(git log*)` leaks a write under `default` via
+//      redirection (`git log > f`), so file reads go through Read/Glob/Grep and
+//      web reads through WebFetch/WebSearch. With zero allowed Bash there is no
+//      prefix to ride a redirect on.
+// Re-verify after CLI upgrades or any allowlist change:
+// `npx tsx bot/scripts/verify-tool-lockdown.ts` on the VPS (doc 770 H4).
 const READ_ONLY_DISALLOW = [
   // File / notebook mutation tools.
   'Edit',
@@ -122,7 +123,12 @@ const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
   'research-worker': {
     specFile: 'research-worker.md',
     model: ZOE_DEFAULT_MODEL,
-    allowedTools: ['Read', 'Glob', 'Grep', 'WebFetch', 'WebSearch', 'Bash(git log*)'],
+    // doc 770 H4 (VPS-verified 2026-05-31): no raw Bash. Even an exact prefix
+    // like Bash(git log*) leaks a write under `default` via redirection
+    // (`git log > f`), which the probe caught on a bare box. Reads go through
+    // Read/Glob/Grep; web via WebFetch/WebSearch. Zero allowed Bash = no prefix
+    // to ride a redirect on.
+    allowedTools: ['Read', 'Glob', 'Grep', 'WebFetch', 'WebSearch'],
     disallowedTools: READ_ONLY_DISALLOW,
     critic: 'research',
     maxBudgetUsd: 1.0,
@@ -130,7 +136,11 @@ const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
   'code-reviewer': {
     specFile: 'code-reviewer.md',
     model: ZOE_DEFAULT_MODEL,
-    allowedTools: ['Read', 'Glob', 'Grep', 'Bash(git diff*)', 'Bash(git log*)', 'Bash(git status)'],
+    // doc 770 H4: dropped Bash(git diff/log/status) — the redirection write
+    // vector (`git diff > f`) leaks under `default`. The reviewer reads files
+    // via Read/Grep; when a diff is needed it must be pre-fetched by the trusted
+    // Node layer and injected as context, never run by the worker. (follow-up)
+    allowedTools: ['Read', 'Glob', 'Grep'],
     disallowedTools: READ_ONLY_DISALLOW,
     critic: 'task-result',
     maxBudgetUsd: 0.75,

@@ -49,3 +49,22 @@ export function getSupabaseBrowser(): SupabaseClient {
   _browserClient = createClient(url, key);
   return _browserClient;
 }
+
+// ---------- Anon client for server-side PUBLIC reads (C-H3) ----------
+// Use this — never the service-role admin client — for unauthenticated routes
+// like /network. It uses the anon key, so RLS + the `grant select` on the
+// curated *_public views is the ENFORCED boundary, not just a clean SELECT
+// list. A future bug that points a public page at a base table then leaks
+// nothing (anon is RLS-denied) instead of dumping PII via service-role.
+let _anonClient: SupabaseClient | null = null;
+
+export function getSupabaseAnon(): SupabaseClient {
+  if (_anonClient) return _anonClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  }
+  _anonClient = createClient(url, key, { auth: { persistSession: false } });
+  return _anonClient;
+}

@@ -4,7 +4,11 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-05-31 | Iman x Zaal - Request for Collaborators walkthrough | ZAO Devz | Zaal, Iman | [779](779-iman-zaal-request-for-collaborators-may31/) | 3 |
+| 2026-05-27 16:30 | Tyler / Magnetic x Zaal + team - ZABAL Games build on Magnetic | ZABAL Games | Zaal, Tyler Stambaugh, Samantha, Shawn | [778](778-tyler-magnetic-zabal-games-build-may27/) | 9 |
 | 2026-05-25 14:26 | Leeward x Zaal WebRTC + Pion + LiveKit handoff (2nd call) | ZAO Devz | Zaal, Leeward (Lee Edward Bound) | [752](752-leeward-x-zaal-webrtc-pion-livekit-handoff-may25/) | 7 |
+| 2026-05-25 | Telamon Ardavanis x Zaal - Edge Esmeralda invite + Goa | Networking | Zaal, Telamon Ardavanis | [777](777-telamon-edge-esmeralda-may25/) | 4 |
+| 2026-05-23 12:05 | Duo Do (Clementine + Santiago) x Zaal - ZABAL Games musician talk format | ZABAL Games | Zaal, Clementine, Santiago | [776](776-duo-do-clementine-santiago-zabal-games-may23/) | 5 |
 | 2026-05-23 9:12 | ZAO coworking - 1h17m, mostly background music + brief Discord-bot-on-VPS chat | ZAO Devz | Zaal, Iman, ThyRev, z3rodol | [753](753-may23-zaal-iman-thyrev-z3rodol-coworking/) | 3 |
 | 2026-05-23 8:39 | Zaal + Iman silent / idle session | ZAO Devz | Zaal, Iman | [749](749-zaal-iman-may23-silent-session/) | 0 |
 | 2026-05-23 7:53 | ZABAL Games pitch to ThyRev + Iman hackathon recap | ZABAL Games | Zaal, ThyRev, Iman | [748](748-zabal-games-thyrev-hackathon-recap-may23/) | 11 |

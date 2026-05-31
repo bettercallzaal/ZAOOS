@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { getSupabaseAdmin } from '@/lib/db/supabase';
+import { getSupabaseAnon } from '@/lib/db/supabase';
 import type { CrmContactPublic } from '@/lib/crm/types';
 
 // Public "who I've met" feed. Reads only the crm_contacts_public view (safe
-// columns, is_public=true). Server-rendered, no auth. Doc 772.
+// columns, is_public=true) via the ANON client (C-H3) so RLS + the granted view
+// is the enforced boundary, not service-role. Server-rendered, no auth. Doc 772.
 export const revalidate = 300; // ISR: refresh every 5 min
 
 export const metadata = {
@@ -12,7 +13,7 @@ export const metadata = {
 };
 
 async function getPublicContacts(): Promise<CrmContactPublic[]> {
-  const { data, error } = await getSupabaseAdmin()
+  const { data, error } = await getSupabaseAnon()
     .from('crm_contacts_public')
     .select('*')
     .order('created_at', { ascending: false })

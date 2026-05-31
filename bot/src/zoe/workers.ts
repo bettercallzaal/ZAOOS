@@ -50,14 +50,22 @@ interface WorkerConfig {
 // reset, rm, or write files — anything that mutates state stays behind an
 // explicit Zaal approval at the ZOE layer, never inside an autonomous worker.
 //
-// doc 770 H4 (verified 2026-05-31): the lockdown is enforced by running with
-// permissionMode: 'default' + this per-worker `allowedTools` whitelist. Under
-// 'default', non-allowlisted tools are denied in non-interactive (-p) mode —
-// every write path (shell redirection, tee, python, Write/Edit) is blocked,
-// while allowlisted reads still run. The previous 'auto' mode AUTO-APPROVED
-// everything not explicitly denied, so the allowlist did nothing and a worker
-// could `echo > file`. This denylist is now belt-and-suspenders on top of the
-// authoritative allowlist.
+//
+// doc 770 H4 (verified 2026-05-31): the lockdown is now enforced, not asserted.
+// Two layers:
+//   1. permissionMode: 'default' (see the callClaudeCli call below). Under
+//      'default', tools NOT on this worker's `allowedTools` are denied in
+//      non-interactive (-p) mode — every write path (shell redirection, tee,
+//      python, Write/Edit) is blocked, while allowlisted reads still run. The
+//      previous 'auto' mode AUTO-APPROVED everything not explicitly denied, so
+//      the allowlist did nothing and a worker could `echo > file` (proven).
+//   2. This hardened denylist + narrowed allowlists as belt-and-suspenders:
+//      no worker gets a broad shell-read prefix (`Bash(cat*)`/`Bash(curl*)`)
+//      anymore — file reads go through Read/Glob/Grep, network reads through
+//      WebFetch — so the only Bash any worker can run is `git log/diff/status`.
+// The residual a denylist alone can't catch (redirection inside an allowed git
+// prefix, e.g. `git log > f`) is closed by layer 1. Re-verify after CLI
+// upgrades: `npx tsx bot/scripts/verify-tool-lockdown.ts` on the VPS (doc 770 H4).
 const READ_ONLY_DISALLOW = [
   // File / notebook mutation tools.
   'Edit',
@@ -81,6 +89,18 @@ const READ_ONLY_DISALLOW = [
   'Bash(touch*)',
   'Bash(dd*)',
   'Bash(tee*)',
+  // Network egress / exfiltration channels (doc 770 H4 follow-up).
+  'Bash(curl*)',
+  'Bash(wget*)',
+  'Bash(scp*)',
+  'Bash(sftp*)',
+  'Bash(rsync*)',
+  'Bash(nc*)',
+  'Bash(ncat*)',
+  'Bash(netcat*)',
+  'Bash(ssh*)',
+  'Bash(telnet*)',
+  'Bash(ftp*)',
   // Arbitrary code execution (can write/exfiltrate).
   'Bash(npx*)',
   'Bash(npm*)',
@@ -126,7 +146,10 @@ const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
   'data-runner': {
     specFile: 'data-runner.md',
     model: ZOE_QUICK_MODEL,
-    allowedTools: ['Read', 'Glob', 'Grep', 'Bash(cat*)', 'Bash(ls*)', 'Bash(curl -s*)'],
+    // doc 770 H4: dropped Bash(cat*)/Bash(ls*) (redundant with Read/Glob and a
+    // shell-redirection write vector) and Bash(curl -s*) (exfiltration / -o
+    // write vector). File reads use Read/Glob/Grep; network reads use WebFetch.
+    allowedTools: ['Read', 'Glob', 'Grep', 'WebFetch'],
     disallowedTools: READ_ONLY_DISALLOW,
     critic: 'task-result',
     maxBudgetUsd: 0.5,

@@ -10,6 +10,21 @@ function optionalEnv(name: string): string | undefined {
   return process.env[name] || undefined;
 }
 
+/**
+ * Optional secret that, IF set, must meet a minimum length. Throws at module
+ * load on a misconfigured (too-short / placeholder) value rather than letting a
+ * guessable credential silently reach production. Unset stays undefined.
+ */
+function optionalSecretEnv(name: string, minLength: number): string | undefined {
+  const value = process.env[name] || undefined;
+  if (value && value.length < minLength) {
+    throw new Error(
+      `${name} is set but too short (min ${minLength} chars). Generate with: openssl rand -hex 32`,
+    );
+  }
+  return value;
+}
+
 export const ENV = {
   // Public (safe for client)
   NEXT_PUBLIC_SUPABASE_URL: requireEnv('NEXT_PUBLIC_SUPABASE_URL'),
@@ -111,6 +126,6 @@ export const ENV = {
   // contacts/interactions via POST /api/crm/interactions without an admin
   // session. Generate `openssl rand -hex 32`; set the same value in the bot's
   // env (CRM_BOT_SECRET). Unset = the bot write path is disabled (an admin
-  // iron-session still works on the same route).
-  CRM_BOT_SECRET: optionalEnv('CRM_BOT_SECRET'),
+  // iron-session still works on the same route). Must be >=32 chars if set (C-H2).
+  CRM_BOT_SECRET: optionalSecretEnv('CRM_BOT_SECRET', 32),
 } as const;

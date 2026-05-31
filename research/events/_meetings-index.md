@@ -6,6 +6,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 |------|-------|---------|-----------|-----|---------|
 | 2026-05-31 | Iman x Zaal - Request for Collaborators walkthrough | ZAO Devz | Zaal, Iman | [779](779-iman-zaal-request-for-collaborators-may31/) | 3 |
 | 2026-05-27 16:30 | Tyler / Magnetic x Zaal + team - ZABAL Games build on Magnetic | ZABAL Games | Zaal, Tyler Stambaugh, Samantha, Shawn | [778](778-tyler-magnetic-zabal-games-build-may27/) | 9 |
+| 2026-05-26 19:03 | Adrian (Empire Builder) x Zaal - Empire Builder workshop for ZABAL Games | ZABAL Games | Zaal, Adrian | [780](780-adrian-empire-builder-zabal-workshop-may26/) | 6 |
 | 2026-05-25 14:26 | Leeward x Zaal WebRTC + Pion + LiveKit handoff (2nd call) | ZAO Devz | Zaal, Leeward (Lee Edward Bound) | [752](752-leeward-x-zaal-webrtc-pion-livekit-handoff-may25/) | 7 |
 | 2026-05-25 | Telamon Ardavanis x Zaal - Edge Esmeralda invite + Goa | Networking | Zaal, Telamon Ardavanis | [777](777-telamon-edge-esmeralda-may25/) | 4 |
 | 2026-05-23 12:05 | Duo Do (Clementine + Santiago) x Zaal - ZABAL Games musician talk format | ZABAL Games | Zaal, Clementine, Santiago | [776](776-duo-do-clementine-santiago-zabal-games-may23/) | 5 |

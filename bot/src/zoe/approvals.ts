@@ -234,14 +234,64 @@ export function isPendingExpired(p: PendingApproval, now: number = Date.now()): 
 }
 
 /** Load persisted pending items on boot. Best-effort; never throws. */
+/** Every known pending discriminant, for the load-time shape guard. */
+const KNOWN_PENDING_KINDS: ReadonlySet<PendingKind> = new Set<PendingKind>([
+  'plan',
+  'plan-gate',
+  'reflexion',
+  'await-reflection',
+  'learn',
+]);
+
+/**
+ * Shape-guard a pending item read from disk (doc 770 LOW / doc 793). A corrupt
+ * or hand-edited `pending.json` could otherwise seed a malformed pending the
+ * resolver later mishandles (e.g. a `plan` with no `plan`, a `learn` with no
+ * `proposals`). We validate the base fields, the `kind` discriminant, and the
+ * payload each kind relies on; anything that fails is dropped — the same
+ * fail-safe as a missing file (start empty for that slot).
+ */
+export function isValidPending(p: unknown): p is PendingApproval {
+  if (!p || typeof p !== 'object') return false;
+  const o = p as Record<string, unknown>;
+  if (typeof o.chatScope !== 'string' || typeof o.createdAt !== 'string') return false;
+  if (typeof o.kind !== 'string' || !KNOWN_PENDING_KINDS.has(o.kind as PendingKind)) return false;
+  switch (o.kind as PendingKind) {
+    case 'plan':
+      return typeof o.goal === 'string' && typeof o.plan === 'object' && o.plan !== null;
+    case 'plan-gate':
+      return (
+        typeof o.goal === 'string' &&
+        typeof o.plan === 'object' &&
+        o.plan !== null &&
+        Array.isArray(o.completed) &&
+        typeof o.gateAfterId === 'string'
+      );
+    case 'reflexion':
+      return (
+        Array.isArray(o.patches) &&
+        typeof o.answers === 'object' &&
+        o.answers !== null &&
+        typeof o.hasVoiceNoteRequests === 'boolean'
+      );
+    case 'await-reflection':
+      return true;
+    case 'learn':
+      return Array.isArray(o.proposals);
+    default:
+      return false;
+  }
+}
+
 export async function loadPending(): Promise<void> {
   try {
     const raw = await fs.readFile(PENDING_FILE, 'utf8');
-    const arr = JSON.parse(raw) as PendingApproval[];
+    const parsed: unknown = JSON.parse(raw);
+    const arr: unknown[] = Array.isArray(parsed) ? parsed : [];
     pendingByScope.clear();
     const now = Date.now();
     for (const p of arr) {
-      if (p && typeof p.chatScope === 'string' && !isPendingExpired(p, now)) {
+      if (isValidPending(p) && !isPendingExpired(p, now)) {
         pendingByScope.set(p.chatScope, p);
       }
     }

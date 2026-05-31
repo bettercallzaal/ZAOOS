@@ -117,12 +117,12 @@ State as of 2026-05-31, verified against `bot/src/zoe/*` on this branch.
 | `learn.ts` `coerceProposals` brace-matching mis-extract | **accept-risk** | guarded by `try/JSON.parse`; worst case = zero proposals (safe degrade). |
 | learn filename sanitization collisions | **accept-risk** | traversal is blocked; collision overwrites a same-day proposal file, not a security issue. |
 | `workers.ts` unchecked `as ClaudeWorkerKind` cast | **accept-risk** | dispatch routes `hermes` away before this cast; defensive-only gap, no live path reaches it. |
-| `index.ts` clearPending-before-side-effect (reflexion/reflection) | **defer w/ trigger** | same shape as H5; H5's ordering fix covers the approval path. Apply the identical "clear after side effect" reorder to the reflexion/reflection branches **if** a write-failure-strands-pending report ever appears. Not observed live. |
-| `approvals.ts` `loadPending` no shape validation | **defer w/ trigger** | a corrupt pending file is the only trigger; TTL self-heals most cases. Add a Zod shape-guard if a malformed-pending incident occurs. |
+| `index.ts` clearPending-before-side-effect (reflexion/reflection) | **accept-risk (was defer; investigated → non-fix)** | The clear-first ordering is **load-bearing, not a bug**: `runReflexionFlow` internally re-arms a `reflexion` pending via `setPending`, which the H2 guard would *refuse* if the `await-reflection` slot were still live. And `parseReflectionAnswers` is pure string ops (no throw) while `runReflexionFlow` has a full internal try/catch — the strand window is empty. Reordering would regress H2 to fix nothing. The approval-apply path's strand risk was already closed by H5. |
+| `approvals.ts` `loadPending` no shape validation | **FIXED ✅** | Added `isValidPending` type-guard (`approvals.ts`) validating the base fields, the `kind` discriminant, and each kind's payload; `loadPending` drops anything that fails (same fail-safe as a missing file). 3 table-driven tests in `approvals.test.ts`. |
 | `scheduler.ts` Devz tip cron no-op stub | **wontfix (intentional)** | Phase-4 placeholder per the Primary Surfaces table; Devz folds into Hermes. |
 | group-message prefix routing is DM-only | **documented** | `plan:`/`nudge` are DM-only by design; captured here so a future "plan: went to concierge in a group" report has an answer. |
 
-**Net:** no LOW item is a correctness or safety risk in the live path. The two `defer w/ trigger` items have a named trigger and a known one-line fix; everything else is accept-risk or intentional. This closes the LOW batch as a reviewed decision rather than silent code churn on already-deployed agent files.
+**Net:** no LOW item is a correctness or safety risk in the live path. `loadPending` shape validation shipped (it was the one with a real, clean fix); the clear-ordering item was investigated and is a deliberate non-fix (reordering would regress H2). Everything else is accept-risk or intentional. The LOW batch is now closed as a reviewed decision, not silent code churn on deployed agent files.
 
 ---
 

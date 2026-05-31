@@ -5,6 +5,7 @@ import {
   parseApprovalReply,
   isPendingExpired,
   wouldClobber,
+  isValidPending,
   PENDING_TTL_MS,
 } from '../approvals.ts';
 import type { PendingApproval, PendingKind } from '../approvals.ts';
@@ -168,4 +169,56 @@ test('edit with real instruction and no approval verb still parses as edit', () 
   const r = parseApprovalReply('actually research the pricing first');
   assert.equal(r.decision, 'edit');
   assert.equal(r.editText, 'research the pricing first');
+});
+
+// =========================
+// isValidPending — doc 770 LOW / doc 793 load-time shape guard
+// =========================
+
+// Minimal-but-valid shapes fed to the runtime guard as `unknown` (the guard's
+// real input type) — the payload fields are present, deeper structure isn't the
+// guard's concern.
+const validPendings: Array<[string, unknown]> = [
+  ['plan', { kind: 'plan', chatScope: 'private', createdAt: new Date().toISOString(), goal: 'g', plan: {} }],
+  ['plan-gate', { kind: 'plan-gate', chatScope: 'private', createdAt: new Date().toISOString(), goal: 'g', plan: {}, completed: [], gateAfterId: 'st-1' }],
+  ['reflexion', { kind: 'reflexion', chatScope: 'private', createdAt: new Date().toISOString(), patches: [], answers: {}, hasVoiceNoteRequests: false }],
+  ['await-reflection', { kind: 'await-reflection', chatScope: 'private', createdAt: new Date().toISOString() }],
+  ['learn', { kind: 'learn', chatScope: 'private', createdAt: new Date().toISOString(), proposals: [] }],
+];
+
+test('isValidPending accepts every well-formed kind', () => {
+  for (const [label, p] of validPendings) {
+    assert.equal(isValidPending(p), true, `${label} should be valid`);
+  }
+});
+
+test('isValidPending rejects junk, wrong types, and unknown kinds', () => {
+  const bad: unknown[] = [
+    null,
+    undefined,
+    42,
+    'a string',
+    {},
+    { kind: 'plan' }, // missing base fields
+    { kind: 'bogus', chatScope: 'private', createdAt: 'now' }, // unknown discriminant
+    { chatScope: 'private', createdAt: 'now' }, // no kind
+    { kind: 'plan', chatScope: 'private', createdAt: 'now' }, // plan w/o goal+plan
+    { kind: 'learn', chatScope: 'private', createdAt: 'now' }, // learn w/o proposals
+    { kind: 'reflexion', chatScope: 'private', createdAt: 'now', patches: [] }, // missing answers/flag
+    { kind: 'plan-gate', chatScope: 'private', createdAt: 'now', goal: 'g', plan: {}, completed: [] }, // no gateAfterId
+    { kind: 'plan', chatScope: 5, createdAt: 'now', goal: 'g', plan: {} }, // non-string chatScope
+  ];
+  for (const b of bad) {
+    assert.equal(isValidPending(b), false, `${JSON.stringify(b)} should be invalid`);
+  }
+});
+
+test('isValidPending narrows the type for downstream use', () => {
+  const p: unknown = { kind: 'learn', chatScope: 'private', createdAt: 'now', proposals: [] };
+  if (isValidPending(p)) {
+    // Type narrowed to PendingApproval — chatScope is now a string.
+    assert.equal(p.chatScope, 'private');
+  } else {
+    assert.fail('should have validated');
+  }
 });

@@ -22,6 +22,8 @@ tier: DEEP
 | 3 | USE Remotion + Claude Code for ZAOstock / ZABAL Games promo video, NOT After Effects or an editor | One developer shipped a full 51-second launch video in one evening for $0 - video is JSX, every animation is `interpolate(frame, ...)`, Claude writes the React scene components. ZAO ships video constantly (recaps, announcements). This collapses the cost to near-zero. | @Zaal |
 | 4 | The ZOE orchestrator (doc 759, locked) sits correctly on the Claude-Teams side of the swarm/teams fork, NOT the Kimi 300-agent side | Kimi Swarm = 300 parallel sub-agents + central coordinator, built for broad-coverage content batches (100 CVs, 30 landing pages). Claude Agent Teams = 4-6 peer agents for deep codebase work. ZOE's 8-worker/3-critic GATEWAY shape with a $50/day cap is a small-team coder pattern - the doc-759 design is on the right side. Do NOT pivot ZOE toward a 300-agent swarm. | @Zaal |
 | 5 | INVESTIGATE adopting `AGENTS.md` as the canonical file with `@AGENTS.md` inlined from `CLAUDE.md` | ZAO already maintains both `CLAUDE.md` and `AGENTS.md` (CLAUDE.md says AGENTS.md is source-of-truth for Boundaries). AGENTS.md now has 60,000+ projects and Linux Foundation governance; Claude Code reads it as fallback. The `@AGENTS.md` inline syntax would collapse the two-file drift the current CLAUDE.md explicitly warns about. | @Zaal |
+| 6 | ADD a `/til` slash command (`.claude/commands/til.md`) that appends symptom+fix one-liners to a `TIL.md` that survives `/clear` | Cheapest compounding win in the cluster (r/ClaudeCode, tonyboi76). ZAO already has a memory/feedback-file system; a `/til` is the lightweight in-session capture layer that feeds it. Stop re-solving the same arcane error. | @Zaal |
+| 7 | OWN the "personal software / problem-shaping over artifact" thesis as ZAO positioning + build-in-public voice | ZAO OS is itself hyper-specific software for one 188-member community - "useless to anyone else, and that's the point" (the 1.4K-upvote r/ClaudeAI thesis). When ZAO ships build-in-public, lead with the problem-shaping (the thought pattern that transfers), not just the artifact screenshot. This is also the honest frame for the "clone, no deps" graduation model in `CLAUDE.md`. | @Zaal |
 
 ## The Cross-Cutting Pattern
 
@@ -50,14 +52,34 @@ Core mechanics (consensus across Anthropic + 5 independent guides):
 
 Karpathy connection (relevant - ZAO already uses `/autoresearch` built on his principles, doc 789): on 2026-01-26 Karpathy posted about shifting from 80% manual to 80% agent-driven coding in ~2 months. Forrest Chang turned his complaints into a viral behavioral `CLAUDE.md` (four principles: think before coding, keep it simple, surgical changes, goal-driven execution) - designed to MERGE with project-context files, not replace them. This is the split ZAO should mirror: behavioral principles in a Skill, project context in CLAUDE.md.
 
-### 2. Daily-driver Claude Code workflows + vibecoding (Items 3, 4, 5 - reddit, FAILED, content pending paste)
+### 2a. Daily-driver Claude Code workflows (Items 3/5 family - r/ClaudeCode "Things I wish I knew", FULL via paste)
 
-Three forwarded reddit threads sit at the center of this cluster and their content could NOT be fetched - reddit network-blocks this datacenter IP at the HTML-shell level, and the full ladder (zao-fetch-reddit, exa web_fetch, old.reddit json, alternate UAs) was exhausted. They are marked FAILED pending a manual paste. Titles + resolved URLs are known:
-- r/ClaudeAI 1tp3en9 - "the thing you built with claude is useless to me" (a critique thread - likely about shipped-but-unusable vibecoded output).
-- r/vibecoding 1tomshw - "vibe coding gets better when the agent has a live [feedback loop]" (the live-feedback-loop thesis - matches the Remotion "change a value, re-render, see what happens" point below).
-- r/ClaudeCode comment ons9vgp on 1tn8xmb - "Pretty sure I'm using maybe 30% of Claude Code - what's your daily workflow?" (a workflow-sharing thread).
+A high-signal "habits I locked in" post (r/ClaudeCode, solo_dev_builds, 90 upvotes, 27 comments) from a zero-CS-background builder shipping Flutter + web apps since April. The five habits + the best comments are a ready-made onboarding checklist:
 
-These three are the "how do real people actually delegate day-to-day" leg of the cluster. Their absence is the one real gap in this doc - flagged loudly per the fetch-gate rule. The synthesis below holds on the other items; backfill when pasted.
+1. **Living project prompt** - a master context file Claude updates at the end of every session (what changed, what was decided, what's pending). Every new session starts with full context. (This IS the CLAUDE.md pattern from finding 1, applied per-project.)
+2. **Fresh sessions per feature, not per day** - long sessions cause context bloat; Claude makes "weird decisions" carrying too much. One session per feature, paste only what's relevant. (Anthropic's own guide says the same: one task per conversation, `/clear` between them.)
+3. **Paste functions, not files** - paste the function/component that matters, not the whole file. Saves tokens, keeps Claude focused. (ZAO's `@path/to/file` reference habit does this better - point, don't paste.)
+4. **Vault credentials + build log** - a password-protected HTML file per phase. NOTE the comment-thread correction (jWoose, "Senior Developer"): pull real creds OUT into a password manager (1Password/Bitwarden), keep the HTML as a pure build-log. This is the exact `secret-hygiene.md` rule ZAO already enforces - real keys never in a file, even an "encrypted" one.
+5. **Let Claude write the next session's prompt** - at the end of a build session, have Claude write the prompt for the next instance. It knows where you left off. (This is the ZAO `/handoff` skill, manualized.)
+
+Best comment additions:
+- **`/til` custom slash command** (tonyboi76): a `.claude/commands/til.md` that makes Claude append a one-line symptom+fix to `TIL.md` after every gnarly debug session - a personal playbook that survives `/clear`. "You stop re-googling the same arcane error six months later." This is directly adoptable by ZAO and complements the existing memory/feedback file system.
+- **BMAD** spec-driven framework: powerful but a token hog (Max-tier only) and over-engineers if unwatched - aligns with ZAO's existing skepticism of heavy frameworks.
+- **The "wish I knew earlier" = Supabase RLS** (OP, replying to Duck-Entire): "Claude can write the policy but if you don't understand what it's doing you'll never debug it when it breaks." Directly relevant - ZAO runs RLS on all Supabase tables (`CLAUDE.md` Security section).
+
+### 2b. "The thing you built with Claude is useless to me... and that's the point" (Item 3 - r/ClaudeAI, FULL via paste)
+
+The cluster's most-discussed thread (r/ClaudeAI, HispaniaObscura, **1.4K upvotes, 249 comments**) and the most strategically interesting for ZAO. Thesis: the things people build with Claude are each perfect for exactly one person and useless to anyone else as-is - and that is the whole point. **Vibe coding is the 3D-printing / DIY of software: personal software on demand.** The artifact (the code) is "just a souvenir / a receipt"; the only thing that transfers is the **thought pattern** - how you spotted a friction in your own life and shaped a tool to its exact contour. The author now puts a note atop every public repo: "this is an artifact, the interesting part is how I thought about the problem - steal the idea, write your own."
+
+Why this matters beyond the meme (synthesized from the 249 comments):
+- **The transferable unit is problem-shaping, not the prompt or the code** (WorthBathroom3268, zrail, Relative_Register_79: "thought patterns without artifacts = intellectual aesthetics; artifacts without thought patterns = shallow demos; the power is the loop between them").
+- **"Stopped building features, started building workflows"** (Hefty_Bodybuilder893): md files telling agents how to work + who we are, scripts matching agents to tasks by skill, checkpoint/cron systems so context survives sessions. Product vs prototype. This is precisely the ZOE/Hermes design.
+- **The honest counterweight - shadow IT + tech debt** (asielen, fixitchris): "Personal tools are great for personal problems. No problem in a company is personal." A "personal" KPI tool turned out load-bearing for two teams on one laptop. SaaS (JIRA, Sentry) won't disappear - carbon-copy apps are "an inch deep."
+- Karpathy's CLAUDE.md gist surfaces again in-thread (devjonas, amado88) - the same through-line as finding 1.
+
+### 2c. r/vibecoding "live feedback loop" (Item 4 - STILL FAILED, pending paste)
+
+The one remaining gap: r/vibecoding 1tomshw "vibe coding gets better when the agent has a live [feedback loop]". Reddit IP-blocked, not yet pasted. Its likely thesis (live render/re-run loop) is already corroborated by the Remotion "change a value, re-render, see what happens" point (finding 3). Backfill when pasted; the synthesis does not depend on it.
 
 ### 3. Remotion + Claude Code: $0 launch video in one evening (Item 6 - r/ClaudeCode, FULL via paste)
 
@@ -110,7 +132,9 @@ The honest caveat (Kirill states it directly): "300 agents and 4,000 steps are s
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Paste reddit items 3/4/5 so Doc A's vibecoding/daily-driver leg gets filled (currently FAILED) | @Zaal | Paste-in-chat | Next /inbox pass |
+| Paste the last reddit item (4 - r/vibecoding 1tomshw) to close the final FAILED source | @Zaal | Paste-in-chat | Next /inbox pass |
+| Add a `/til` slash command (`.claude/commands/til.md`) writing to a `/clear`-surviving `TIL.md` | @Zaal | PR | This sprint |
+| Add a "problem-shaping, not just the artifact" note to public ZAO repo READMEs (build-in-public framing) | @Zaal | PR | When next graduating a repo |
 | Audit ZAO OS `CLAUDE.md` against 200-line / 2,500-token ceiling, prune low-signal lines | @Zaal | PR | This sprint |
 | Spike a Remotion + Claude Code 30-60s ZAO recap-video template (5 cinematic tricks) | @Zaal | Spike | June |
 | Decide on `@AGENTS.md` inline to kill CLAUDE.md/AGENTS.md drift | @Zaal | PR | This sprint |
@@ -126,6 +150,6 @@ The honest caveat (Kirill states it directly): "300 agents and 4,000 steps are s
 - [Vibe Coder Blog - CLAUDE.md File Format, Sections, and Real Examples](https://blog.vibecoder.me/claude-md-file-format-guide-sections-examples) - `[FULL]`
 - [r/ClaudeCode - Used Claude Code to build a full launch video with Remotion. $0, one evening](https://www.reddit.com/r/ClaudeCode/comments/1tn8xmb/) - `[FULL - via paste-in-chat by Zaal; reddit IP-blocked from this machine]`
 - [Kirill (kirillk_web3) X long-form - Kimi Agent Swarm: Complete A-Z Guide](https://x.com/kirillk_web3) - `[FULL - via paste-in-chat by Zaal; 662.5K views, 2026-05-21]`
-- [r/ClaudeAI - "the thing you built with claude is useless to me"](https://www.reddit.com/r/ClaudeAI/comments/1tp3en9/) - `[FAILED - reddit serves JS shell to this datacenter IP; zao-fetch-reddit/exa/old.reddit/alt-UA all exhausted. Pending paste.]`
-- [r/vibecoding - "vibe coding gets better when the agent has a live..."](https://www.reddit.com/r/vibecoding/comments/1tomshw/) - `[FAILED - same IP block. Pending paste.]`
-- [r/ClaudeCode comment - "using maybe 30% of Claude Code - what's your daily workflow"](https://www.reddit.com/r/ClaudeCode/comments/1tn8xmb/comment/ons9vgp/) - `[FAILED - same IP block. Pending paste.]`
+- [r/ClaudeAI - "The thing you built with Claude is useless to me... and that's the point"](https://www.reddit.com/r/ClaudeAI/comments/1tp3en9/) - `[FULL - via paste-in-chat by Zaal; 1.4K upvotes, 249 comments, post + comment tree]`
+- [r/ClaudeCode - "Things I wish I knew when I started building with Claude Code"](https://www.reddit.com/r/ClaudeCode/comments/) - `[FULL - via paste-in-chat by Zaal; 90 upvotes, 27 comments; the daily-driver workflow thread (items 3/5 family)]`
+- [r/vibecoding - "vibe coding gets better when the agent has a live..."](https://www.reddit.com/r/vibecoding/comments/1tomshw/) - `[FAILED - reddit IP-blocks this datacenter; zao-fetch-reddit/exa/old.reddit/alt-UA all exhausted. NOT yet pasted. Thesis corroborated by the Remotion live-render-loop point (finding 3); synthesis does not depend on it.]`

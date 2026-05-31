@@ -3,7 +3,8 @@ topic: dev-workflows
 type: guide
 status: research-complete
 last-validated: 2026-05-20
-related-docs: 685
+related-docs: 685, 793
+original-query: "is there a Cowork Dispatch equivalent for Claude Code, focused on making it easy to parallelize agents? (reconstructed from r/ClaudeCode inbox item)"
 tier: QUICK
 ---
 

@@ -39,13 +39,28 @@ const DEFAULT_PLAN_BUDGET_USD = Number(process.env.ZOE_PLAN_BUDGET_USD ?? 5);
 const WAVE_CONCURRENCY = Math.max(1, Number(process.env.ZOE_WAVE_CONCURRENCY ?? 3));
 
 /**
+ * Pre-flight estimate for a single Hermes subtask against ZOE's plan budget
+ * (doc 770 MED — Hermes cost). Hermes runs under the Max plan so its marginal
+ * cost is ~$0, but it tracks a NOTIONAL "would-have-cost" and has its own fleet
+ * daily cap. Counting a notional estimate here makes ZOE's per-plan budget a
+ * real ceiling on how many Hermes subtasks one plan can fan out into, instead
+ * of treating Hermes as free and letting a plan spawn unbounded code-fix runs.
+ * Override via ZOE_HERMES_SUBTASK_ESTIMATE_USD.
+ */
+const HERMES_SUBTASK_ESTIMATE_USD = Number(
+  process.env.ZOE_HERMES_SUBTASK_ESTIMATE_USD ?? 0.5,
+);
+
+/**
  * Worst-case USD a subtask can spend against ZOE's plan budget, used to
  * pre-flight a batch before launching it (doc 770 H3). Inline task-dispatcher
- * runs spend nothing; Hermes accounts for its own spend in its own DB, so it
- * is 0 against the plan budget here.
+ * runs spend nothing; Hermes is estimated at its notional per-run figure so a
+ * plan full of Hermes subtasks still trips the budget (doc 770 MED).
+ * Exported for tests.
  */
-function subtaskBudgetEstimate(worker: WorkerKind): number {
-  if (worker === 'task-dispatcher' || worker === 'hermes') return 0;
+export function subtaskBudgetEstimate(worker: WorkerKind): number {
+  if (worker === 'task-dispatcher') return 0;
+  if (worker === 'hermes') return HERMES_SUBTASK_ESTIMATE_USD;
   return workerMaxBudget(worker as ClaudeWorkerKind);
 }
 
@@ -106,8 +121,14 @@ function toRunRecord(goal: string, r: WorkerResult): RunRecord {
   };
 }
 
-/** Map a Hermes dispatch outcome onto the uniform WorkerResult shape. */
-function hermesToWorkerResult(
+/**
+ * Map a Hermes dispatch outcome onto the uniform WorkerResult shape. Surfaces
+ * Hermes's real run figures (notional cost + token counts) so the dispatch loop
+ * counts Hermes spend against the plan budget and the learning loop sees it
+ * (doc 770 MED — previously hardcoded 0, leaving Hermes invisible to the cap).
+ * Exported for tests.
+ */
+export function hermesToWorkerResult(
   subtask: Subtask,
   outcome: Awaited<ReturnType<typeof dispatchHermesRun>>,
 ): WorkerResult {
@@ -130,9 +151,9 @@ function hermesToWorkerResult(
     critique: null, // Hermes runs its own coder/critic loop internally
     revised: false,
     model: 'hermes',
-    inputTokens: 0,
-    outputTokens: 0,
-    costUsd: 0, // Hermes accounts for its own spend via its runs DB
+    inputTokens: outcome.run.total_input_tokens ?? 0,
+    outputTokens: outcome.run.total_output_tokens ?? 0,
+    costUsd: outcome.run.estimated_cost_usd ?? 0,
     durationMs: 0,
     error: status === 'failed' ? reason : undefined,
   };

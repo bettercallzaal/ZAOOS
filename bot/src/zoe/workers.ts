@@ -52,11 +52,16 @@ interface WorkerConfig {
 //
 // doc 770 H4: a denylist is inherently leaky, so the per-worker `allowedTools`
 // whitelist above is the real authority — this list is defense-in-depth that
-// closes the obvious write/move/exec vectors the audit named (mv, chmod, git
-// clean, npx/node, …). One residual it CANNOT catch: shell redirection inside
-// an otherwise-allowed Bash prefix (e.g. `cat x > y` under `Bash(cat*)`). That
-// guarantee depends on the CLI treating `allowedTools` as authoritative under
-// permissionMode, which must be verified live, not asserted in config.
+// closes the obvious write/move/exec/exfil vectors the audit named (mv, chmod,
+// git clean, npx/node, curl/wget, …). After the H4 follow-up, no worker is
+// granted a broad shell-read prefix (`Bash(cat*)`/`Bash(curl*)`) anymore — file
+// reads go through Read/Glob/Grep and network reads through WebFetch — so the
+// only remaining Bash any worker can run is `git log/diff/status`. The one
+// residual a denylist still CANNOT catch is shell redirection inside those
+// allowed git prefixes (e.g. `git log > f`). That ultimately depends on the CLI
+// treating `allowedTools` as authoritative under permissionMode — which is now
+// VERIFIED, not asserted: run `npx tsx bot/scripts/verify-tool-lockdown.ts` on
+// the VPS (see doc 770 H4) before trusting a worker with autonomous spend.
 const READ_ONLY_DISALLOW = [
   // File / notebook mutation tools.
   'Edit',
@@ -80,6 +85,18 @@ const READ_ONLY_DISALLOW = [
   'Bash(touch*)',
   'Bash(dd*)',
   'Bash(tee*)',
+  // Network egress / exfiltration channels (doc 770 H4 follow-up).
+  'Bash(curl*)',
+  'Bash(wget*)',
+  'Bash(scp*)',
+  'Bash(sftp*)',
+  'Bash(rsync*)',
+  'Bash(nc*)',
+  'Bash(ncat*)',
+  'Bash(netcat*)',
+  'Bash(ssh*)',
+  'Bash(telnet*)',
+  'Bash(ftp*)',
   // Arbitrary code execution (can write/exfiltrate).
   'Bash(npx*)',
   'Bash(npm*)',
@@ -125,7 +142,10 @@ const WORKER_CONFIG: Record<ClaudeWorkerKind, WorkerConfig> = {
   'data-runner': {
     specFile: 'data-runner.md',
     model: ZOE_QUICK_MODEL,
-    allowedTools: ['Read', 'Glob', 'Grep', 'Bash(cat*)', 'Bash(ls*)', 'Bash(curl -s*)'],
+    // doc 770 H4: dropped Bash(cat*)/Bash(ls*) (redundant with Read/Glob and a
+    // shell-redirection write vector) and Bash(curl -s*) (exfiltration / -o
+    // write vector). File reads use Read/Glob/Grep; network reads use WebFetch.
+    allowedTools: ['Read', 'Glob', 'Grep', 'WebFetch'],
     disallowedTools: READ_ONLY_DISALLOW,
     critic: 'task-result',
     maxBudgetUsd: 0.5,

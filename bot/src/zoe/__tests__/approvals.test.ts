@@ -4,9 +4,14 @@ import assert from 'node:assert/strict';
 import {
   parseApprovalReply,
   isPendingExpired,
+  wouldClobber,
   PENDING_TTL_MS,
 } from '../approvals.ts';
-import type { PendingApproval } from '../approvals.ts';
+import type { PendingApproval, PendingKind } from '../approvals.ts';
+
+function pendingOf(kind: PendingKind): PendingApproval {
+  return { kind, chatScope: 'private', createdAt: new Date().toISOString() } as PendingApproval;
+}
 
 // =========================
 // parseApprovalReply
@@ -109,4 +114,58 @@ test('per-item ttlMs override extends the lifetime', () => {
   };
   // Older than the 30-min default, but well within the 14h override.
   assert.equal(isPendingExpired(p, now), false);
+});
+
+// =========================
+// wouldClobber — doc 770 H2 regression
+// A new pending must not silently clobber a live approval-bearing one of a
+// different kind. Same-kind re-arm and superseding the passive await-reflection
+// slot are both allowed.
+// =========================
+
+test('no existing pending never clobbers', () => {
+  assert.equal(wouldClobber(undefined, 'plan'), false);
+});
+
+test('same-kind re-arm is allowed (e.g. plan -> plan after re-decompose)', () => {
+  assert.equal(wouldClobber(pendingOf('plan'), 'plan'), false);
+  assert.equal(wouldClobber(pendingOf('reflexion'), 'reflexion'), false);
+});
+
+test('a command/new pending may supersede the passive await-reflection slot', () => {
+  // await-reflection is not approval-bearing — arming over it is allowed so a
+  // plan: in the reflection window isn't blocked (keeps the H1 benefit).
+  assert.equal(wouldClobber(pendingOf('await-reflection'), 'plan'), false);
+  assert.equal(wouldClobber(pendingOf('await-reflection'), 'learn'), false);
+});
+
+test('a live approval-bearing pending blocks a different-kind arm', () => {
+  assert.equal(wouldClobber(pendingOf('plan'), 'await-reflection'), true); // scheduler vs live plan
+  assert.equal(wouldClobber(pendingOf('plan-gate'), 'learn'), true); // scheduler vs paused plan
+  assert.equal(wouldClobber(pendingOf('learn'), 'plan'), true); // new plan: vs live learn
+  assert.equal(wouldClobber(pendingOf('reflexion'), 'plan'), true);
+});
+
+// =========================
+// parseApprovalReply — doc 770 MED tightening
+// =========================
+
+test('an approval verb anywhere overrides a leading edit prefix', () => {
+  assert.equal(parseApprovalReply('actually yes do it').decision, 'approve-all');
+  assert.equal(parseApprovalReply('change nothing, ship it').decision, 'approve-all');
+});
+
+test('an approval verb anywhere overrides a leading reject ("no but go ahead")', () => {
+  assert.equal(parseApprovalReply('no but go ahead').decision, 'approve-all');
+});
+
+test('a bare edit keyword with no content is NOT an edit (leaves pending)', () => {
+  // "wait" alone used to become edit with empty text → empty re-decompose.
+  assert.equal(parseApprovalReply('wait').decision, 'not-an-approval');
+});
+
+test('edit with real instruction and no approval verb still parses as edit', () => {
+  const r = parseApprovalReply('actually research the pricing first');
+  assert.equal(r.decision, 'edit');
+  assert.equal(r.editText, 'research the pricing first');
 });

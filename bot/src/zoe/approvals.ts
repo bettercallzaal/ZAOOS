@@ -112,6 +112,56 @@ export interface ApprovalReply {
 /** Pending items older than this auto-expire. 30 min. */
 export const PENDING_TTL_MS = 30 * 60 * 1000;
 
+/**
+ * Kinds that carry an outstanding y/n Zaal must answer. A new pending may not
+ * silently clobber one of these (doc 770 H2). `await-reflection` is omitted on
+ * purpose: it's a passive "capture the next DM" slot, so an explicit command
+ * (which H1 already says is not a reflection answer) is allowed to supersede it.
+ */
+const APPROVAL_BEARING_KINDS: ReadonlySet<PendingKind> = new Set<PendingKind>([
+  'plan',
+  'plan-gate',
+  'reflexion',
+  'learn',
+]);
+
+/** Human-readable label for a pending kind, for refuse-when-busy messages. */
+export function pendingKindLabel(kind: PendingKind): string {
+  switch (kind) {
+    case 'plan':
+      return 'plan approval';
+    case 'plan-gate':
+      return 'paused plan (at its approval gate)';
+    case 'reflexion':
+      return 'memory-update approval';
+    case 'await-reflection':
+      return 'evening reflection';
+    case 'learn':
+      return 'learning-proposal approval';
+  }
+}
+
+/**
+ * Pure decision (doc 770 H2): would arming `newKind` clobber a live
+ * approval-bearing pending of a different kind? Re-arming the SAME kind
+ * (e.g. plan -> plan after a re-decompose) is always allowed.
+ */
+export function wouldClobber(
+  existing: PendingApproval | undefined,
+  newKind: PendingKind,
+): boolean {
+  return (
+    !!existing && existing.kind !== newKind && APPROVAL_BEARING_KINDS.has(existing.kind)
+  );
+}
+
+/** Outcome of an attempt to arm a pending item. */
+export interface SetPendingResult {
+  armed: boolean;
+  /** When armed=false, the live pending that blocked the arm. */
+  blockedBy?: PendingApproval;
+}
+
 const PENDING_FILE = join(ZOE_PATHS.home, 'pending-approvals.json');
 
 // In-memory store, one pending item per chat scope. Mirror of disk.
@@ -120,28 +170,42 @@ const pendingByScope = new Map<string, PendingApproval>();
 const REJECT_RE = /^\s*(n|no|nope|cancel|stop|abort|skip|nah|nvm|never\s*mind)\b/i;
 const APPROVE_RE = /^\s*(y|yes|yep|yeah|yup|approve|approved|go|go ahead|ship it|ship|send it|do it|lgtm|sounds good)\b/i;
 const EDIT_RE = /^\s*(edit|revise|change|tweak|adjust|instead|actually|no but|wait)\b[:,]?\s*(.*)/i;
+// An explicit approval verb appearing ANYWHERE (not just at the start). Used to
+// override a leading edit/reject prefix (doc 770 MED): "actually yes do it" and
+// "no but go ahead" are approvals, not edits/rejects. Conservative — omits the
+// bare "y"/"go"/"ship" forms that would false-positive mid-sentence.
+const APPROVE_ANYWHERE_RE = /\b(yes|yep|yeah|yup|approved?|go ahead|ship it|send it|do it|lgtm|sounds good)\b/i;
 // Subtask / patch / proposal ids: st-1, patch-2, lp-3, etc.
 const ID_RE = /\b((?:st|patch|lp|sq|task)-[a-z0-9]+)\b/gi;
 
 /**
  * Parse a Telegram reply against a pending approval. Pure — no IO, no state.
- * Order matters: reject is checked first (so "no" never reads as approve),
- * then explicit edit, then approve (all vs ids), else not-an-approval.
+ *
+ * Precedence (doc 770 MED — fixes EDIT_RE/REJECT_RE swallowing approvals):
+ *   1. reject — unless an explicit approval verb is also present ("no but go ahead")
+ *   2. edit — only when there's real instruction content AND no approval present
+ *      ("actually research X" → edit; "actually yes do it" → approve below)
+ *   3. approve — leading approve verb OR an approval verb anywhere
+ *   4. otherwise not-an-approval (a bare "wait" with no content lands here, so
+ *      the pending is left in place rather than re-decomposed with empty text)
  */
 export function parseApprovalReply(text: string): ApprovalReply {
   const trimmed = text.trim();
   if (!trimmed) return { decision: 'not-an-approval', ids: [] };
 
-  if (REJECT_RE.test(trimmed)) {
+  const containsApprove = APPROVE_ANYWHERE_RE.test(trimmed);
+
+  if (REJECT_RE.test(trimmed) && !containsApprove) {
     return { decision: 'reject', ids: [] };
   }
 
   const editMatch = trimmed.match(EDIT_RE);
-  if (editMatch) {
-    return { decision: 'edit', ids: [], editText: editMatch[2]?.trim() || trimmed };
+  const editText = editMatch?.[2]?.trim();
+  if (editMatch && editText && !containsApprove) {
+    return { decision: 'edit', ids: [], editText };
   }
 
-  if (APPROVE_RE.test(trimmed)) {
+  if (APPROVE_RE.test(trimmed) || containsApprove) {
     const ids = extractIds(trimmed);
     // "y all" or a bare "y/yes/approve" with no specific ids = approve all.
     if (/\ball\b/i.test(trimmed) || ids.length === 0) {
@@ -198,10 +262,19 @@ export function getPending(scope: string): PendingApproval | undefined {
   return p;
 }
 
-/** Set (replace) the pending item for a scope and persist. */
-export async function setPending(p: PendingApproval): Promise<void> {
+/**
+ * Arm the pending item for a scope and persist. Refuses (doc 770 H2) if a
+ * different live approval-bearing pending already occupies the scope, so
+ * concurrent flows can't silently clobber each other. Returns whether it armed.
+ */
+export async function setPending(p: PendingApproval): Promise<SetPendingResult> {
+  const existing = getPending(p.chatScope);
+  if (wouldClobber(existing, p.kind)) {
+    return { armed: false, blockedBy: existing };
+  }
   pendingByScope.set(p.chatScope, p);
   await persist();
+  return { armed: true };
 }
 
 /** Clear the pending item for a scope and persist. */

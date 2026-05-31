@@ -12,7 +12,7 @@
  * authored the goal that produced the relay_op. No additional y/n gate.
  */
 
-import { readGroups } from './groups';
+import { readGroups, type GroupConfig } from './groups';
 import type { BotRelayOp } from './types';
 
 export interface RelayResult {
@@ -20,6 +20,19 @@ export interface RelayResult {
   status: 'sent' | 'group-not-registered' | 'send-failed';
   resolved_chat_id?: number;
   error?: string;
+}
+
+/**
+ * Resolve a relay op to a target chat id. Pure (doc 770 MED). Uses an EXACT
+ * case-insensitive title match, not a substring — `"ZAO"` must not silently
+ * resolve to `"ZAO Devz"` / `"ZAO Civilization"` and post to the wrong group.
+ */
+export function resolveRelayChatId(groups: GroupConfig[], op: BotRelayOp): number | undefined {
+  if (op.to_chat_id) return op.to_chat_id;
+  if (!op.to_group) return undefined;
+  const wanted = op.to_group.trim().toLowerCase();
+  const target = groups.find((g) => (g.chat_title ?? '').trim().toLowerCase() === wanted);
+  return target?.chat_id;
 }
 
 export async function runBotRelayOps(
@@ -31,16 +44,7 @@ export async function runBotRelayOps(
   const results: RelayResult[] = [];
 
   for (const op of ops) {
-    let chatId: number | undefined = op.to_chat_id;
-    if (!chatId && op.to_group) {
-      // Resolve by group title (case-insensitive)
-      const target = groups.find(
-        (g) => (g.chat_title ?? '')
-          .toLowerCase()
-          .includes(op.to_group!.toLowerCase()),
-      );
-      if (target) chatId = target.chat_id;
-    }
+    const chatId = resolveRelayChatId(groups, op);
     if (!chatId) {
       results.push({ op, status: 'group-not-registered' });
       continue;

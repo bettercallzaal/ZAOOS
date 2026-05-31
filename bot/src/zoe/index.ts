@@ -65,18 +65,16 @@ import {
   clearPending,
   loadPending,
   parseApprovalReply,
+  wouldClobber,
+  pendingKindLabel,
   type PendingApproval,
   type ApprovalReply,
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
+import { NOTE_PREFIX, PLAN_PREFIX, isZoeCommand } from './commands';
 import { attachCaster, runCasterPipeline } from './caster';
 import { subscribeToCasts } from './farcaster/event-stream';
 
-const NOTE_PREFIX = /^(note|cc|claude):\s*(.+)/is;
-// Opt-in goal decomposition + dispatch (doc 759 Gaps 1+2). Zaal sends
-// `plan: <goal>` / `decompose: <goal>` to get a routed plan; on "y" ZOE
-// dispatches the workers. Default chat stays a normal concierge turn.
-const PLAN_PREFIX = /^(plan|decompose):\s*(.+)/is;
 const CLAUDE_NOTES_FILE = join(ZOE_PATHS.home, 'claude-code-notes.md');
 const VALID_GROUP_MODES: GroupMode[] = ['silent', 'mention', 'all'];
 
@@ -445,21 +443,6 @@ bot.on('message:text', async (ctx) => {
   await handleGroupMessage(ctx, text, String(chatId));
 });
 
-/**
- * True if the message is an explicit command prefix (plan/decompose, note,
- * nudge toggle). Such messages must bypass the pending-approval interception
- * (H1, doc 770) — otherwise an armed `await-reflection` (14h TTL) or a
- * reflexion voice-note request would silently swallow a `plan:` DM.
- */
-function isCommandPrefixed(text: string): boolean {
-  const t = text.trim();
-  return (
-    PLAN_PREFIX.test(t) ||
-    NOTE_PREFIX.test(t) ||
-    /^(stop|pause|disable|start|resume|enable)\s+(nudges?|tips?)$/i.test(t)
-  );
-}
-
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
   // Pending-approval interception (doc 759 keystone). If ZOE is waiting on a
   // y/n for this chat, route the reply to the resolver. Ambiguous messages
@@ -470,25 +453,33 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
   // reach their handler even while a pending is armed. The pending stays in
   // place, so a later free-form DM still resolves it.
   const pending = getPending('private');
-  if (pending && !isCommandPrefixed(text)) {
-    // await-reflection: the next free-form DM is Zaal's reflection answer.
+  if (pending) {
     if (pending.kind === 'await-reflection') {
-      await clearPending('private');
-      await handleReflectionAnswer(ctx, text);
-      return;
-    }
-    const reply = parseApprovalReply(text);
-    if (reply.decision !== 'not-an-approval') {
-      await resolvePendingApproval(ctx, pending, reply);
-      return;
-    }
-    // reflexion with outstanding voice-note requests: a free-form (non-y/n)
-    // reply is Zaal's clarification — re-run reflexion with it as the
-    // transcript (typed clarification stands in for an audio voice note).
-    if (pending.kind === 'reflexion' && pending.hasVoiceNoteRequests && text.trim().length > 10) {
-      await clearPending('private');
-      await runReflexionFlow(ctx, pending.answers, text);
-      return;
+      // The next free-form DM is Zaal's reflection answer — UNLESS it's a
+      // command (plan:/note:/nudge toggle). A command is not a reflection
+      // answer, so let it fall through to normal handling and leave the
+      // reflection pending armed (it auto-expires via TTL). Fixes doc 770 H1:
+      // a `plan:` sent in the long reflection window was being swallowed and
+      // never dispatched.
+      if (!isZoeCommand(text)) {
+        await clearPending('private');
+        await handleReflectionAnswer(ctx, text);
+        return;
+      }
+    } else {
+      const reply = parseApprovalReply(text);
+      if (reply.decision !== 'not-an-approval') {
+        await resolvePendingApproval(ctx, pending, reply);
+        return;
+      }
+      // reflexion with outstanding voice-note requests: a free-form (non-y/n)
+      // reply is Zaal's clarification — re-run reflexion with it as the
+      // transcript (typed clarification stands in for an audio voice note).
+      if (pending.kind === 'reflexion' && pending.hasVoiceNoteRequests && text.trim().length > 10) {
+        await clearPending('private');
+        await runReflexionFlow(ctx, pending.answers, text);
+        return;
+      }
     }
   }
 
@@ -727,6 +718,16 @@ function zoeContext() {
 async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
+  // Refuse-when-busy (doc 770 H2): don't decompose (or clobber) a plan while a
+  // different approval is already waiting on Zaal's y/n. Checked before the
+  // decompose spend.
+  const busy = getPending('private');
+  if (wouldClobber(busy, 'plan')) {
+    await ctx.reply(
+      `You've got a pending ${pendingKindLabel(busy!.kind)} waiting on your y/n. Reply to it (or say "cancel") first, then re-send your plan.`,
+    );
+    return;
+  }
   await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
   const typingInterval = setInterval(() => {
     ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
@@ -770,8 +771,30 @@ async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
   }
 }
 
-/** Route a parsed y/n/edit reply against whatever ZOE is waiting to approve. */
+/**
+ * Route a parsed y/n/edit reply against whatever ZOE is waiting to approve.
+ * Wraps the resolver in a try/catch (doc 770 H5): the inner path clears the
+ * pending item before dispatching, so a throw from ctx.reply / setPending /
+ * dispatch would otherwise propagate to grammY and the user would see nothing
+ * with the plan already lost. On error we always reply so Zaal can re-send.
+ */
 async function resolvePendingApproval(
+  ctx: Context,
+  pending: PendingApproval,
+  reply: ApprovalReply,
+): Promise<void> {
+  try {
+    await doResolvePendingApproval(ctx, pending, reply);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[zoe/index] approval resolution failed:', msg);
+    await ctx
+      .reply(`(couldn't complete that — ${msg.slice(0, 200)}. Nothing is pending now; re-send when ready.)`)
+      .catch(() => {});
+  }
+}
+
+async function doResolvePendingApproval(
   ctx: Context,
   pending: PendingApproval,
   reply: ApprovalReply,
@@ -930,7 +953,7 @@ async function runReflexionFlow(
     // Stash high-confidence patches for y/n; low-confidence ones get a
     // voice-note request and are resolved on Zaal's next free-form reply.
     if (plan.highConfidence.length > 0 || plan.needsVoiceNote.length > 0) {
-      await setPending({
+      const armed = await setPending({
         kind: 'reflexion',
         chatScope: 'private',
         createdAt: new Date().toISOString(),
@@ -938,6 +961,15 @@ async function runReflexionFlow(
         answers,
         hasVoiceNoteRequests: plan.needsVoiceNote.length > 0,
       });
+      if (!armed.armed) {
+        // doc 770 H2: a live approval is already waiting — don't clobber it.
+        await ctx.reply(
+          `Reflection logged, but I couldn't queue the memory updates — you have a pending ${pendingKindLabel(
+            armed.blockedBy!.kind,
+          )} first. Resolve it and re-run reflect.`,
+        );
+        return;
+      }
     }
 
     if (plan.highConfidence.length > 0) {

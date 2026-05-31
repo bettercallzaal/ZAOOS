@@ -214,6 +214,13 @@ function findLastJsonObject(text: string): string | null {
 }
 
 /**
+ * Hard ceiling on the number of subtasks a single plan may carry (doc 770 H3).
+ * The decompose prompt targets <=8; this is the safety net above that. Override
+ * via ZOE_MAX_SUBTASKS.
+ */
+export const MAX_SUBTASKS = Math.max(1, Number(process.env.ZOE_MAX_SUBTASKS ?? 12));
+
+/**
  * Validate + narrow the parsed JSON into a DecompositionPlan. Throws on
  * obviously-bad shapes so the caller knows to escalate instead of silently
  * dispatching workers from a malformed plan.
@@ -231,6 +238,19 @@ function coerceToPlan(raw: unknown): DecompositionPlan {
   if (!goal_summary) throw new Error('decompose: plan.goal_summary missing');
   if (subtasks.length === 0 && ambiguities.length === 0) {
     throw new Error('decompose: plan has no subtasks AND no ambiguities - empty plan');
+  }
+  // Hard ceiling on subtask count (doc 770 H3). The system prompt already asks
+  // the model to return an ambiguity at 8+, so anything past MAX_SUBTASKS is a
+  // malformed/runaway plan — escalate to Zaal instead of dispatching it.
+  if (subtasks.length > MAX_SUBTASKS) {
+    throw new Error(
+      `decompose: plan has ${subtasks.length} subtasks (max ${MAX_SUBTASKS}) - goal is too big; split it into smaller goals`,
+    );
+  }
+  // Duplicate ids corrupt the dispatch loop bound + depends_on resolution
+  // (doc 770 MED) — escalate so Zaal gets a re-decompose, not a stuck plan.
+  if (new Set(subtasks.map((s) => s.id)).size !== subtasks.length) {
+    throw new Error('decompose: plan has duplicate subtask ids - re-decompose');
   }
   return { goal_summary, subtasks, execution_plan, ambiguities };
 }

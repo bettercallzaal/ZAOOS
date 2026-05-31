@@ -23,7 +23,7 @@ import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
 import { nextNudge, nudgesEnabled } from './nudges';
 import { startPostsScheduler } from './posts';
-import { setPending, getPending } from './approvals';
+import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
@@ -31,22 +31,35 @@ const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
 
 const SENTINEL_DIR = join(ZOE_PATHS.home, 'sentinels');
 
-async function alreadyFired(trigger: string): Promise<boolean> {
+function sentinelPath(trigger: string): string {
   const today = new Date().toISOString().slice(0, 10);
-  const sentinel = join(SENTINEL_DIR, `${trigger}-${today}.flag`);
+  return join(SENTINEL_DIR, `${trigger}-${today}.flag`);
+}
+
+/**
+ * Atomically claim a trigger for today (doc 770 MED). Writes the sentinel with
+ * O_EXCL ('wx') BEFORE the side-effecting send, so a restart mid-send can't
+ * double-fire and two racing ticks can't both proceed. Returns true iff THIS
+ * call won the claim. On send failure the caller calls releaseFire() so a later
+ * tick can retry.
+ */
+async function claimFire(trigger: string): Promise<boolean> {
+  await fs.mkdir(SENTINEL_DIR, { recursive: true });
   try {
-    await fs.access(sentinel);
+    await fs.writeFile(sentinelPath(trigger), new Date().toISOString(), { flag: 'wx' });
     return true;
   } catch {
-    return false;
+    return false; // sentinel already exists → already fired today
   }
 }
 
-async function markFired(trigger: string): Promise<void> {
-  const today = new Date().toISOString().slice(0, 10);
-  await fs.mkdir(SENTINEL_DIR, { recursive: true });
-  const sentinel = join(SENTINEL_DIR, `${trigger}-${today}.flag`);
-  await fs.writeFile(sentinel, new Date().toISOString(), 'utf8');
+/** Release a claim so a later tick can retry (used when the send itself fails). */
+async function releaseFire(trigger: string): Promise<void> {
+  try {
+    await fs.unlink(sentinelPath(trigger));
+  } catch {
+    // already gone — nothing to release
+  }
 }
 
 export interface SchedulerOptions {
@@ -66,13 +79,13 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '0 9 * * *',
       async () => {
-        if (await alreadyFired('morning-brief')) return;
+        if (!(await claimFire('morning-brief'))) return;
         try {
           const brief = await generateMorningBrief({ repoDir: opts.repoDir });
           await opts.bot.api.sendMessage(opts.zaalTgId, brief);
-          await markFired('morning-brief');
           console.log('[zoe/scheduler] morning brief sent');
         } catch (err) {
+          await releaseFire('morning-brief');
           console.error('[zoe/scheduler] morning brief failed:', (err as Error).message);
         }
       },
@@ -85,28 +98,30 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '0 1 * * *',
       async () => {
-        if (await alreadyFired('evening-reflect')) return;
+        if (!(await claimFire('evening-reflect'))) return;
         try {
           const prompt = await generateEveningReflection({ repoDir: opts.repoDir });
           await opts.bot.api.sendMessage(opts.zaalTgId, prompt);
-          await markFired('evening-reflect');
           // Arm reflexion (Gap 4): Zaal's next free-form DM is captured as the
           // reflection answer and fed to the reflexion layer for memory patches.
-          // H2 (doc 770): don't stomp a live user approval (plan-gate/reflexion/
-          // learn) — only arm when nothing else is pending.
-          const livePending = getPending('private');
-          if (livePending && livePending.kind !== 'await-reflection') {
-            console.log(`[zoe/scheduler] reflexion not armed — ${livePending.kind} pending`);
-            return;
-          }
-          await setPending({
+          const armed = await setPending({
             kind: 'await-reflection',
             chatScope: 'private',
             createdAt: new Date().toISOString(),
             ttlMs: AWAIT_REFLECTION_TTL_MS,
           });
-          console.log('[zoe/scheduler] evening reflection sent + reflexion armed');
+          if (armed.armed) {
+            console.log('[zoe/scheduler] evening reflection sent + reflexion armed');
+          } else {
+            // doc 770 H2: don't clobber a live approval Zaal is mid-way through.
+            console.log(
+              `[zoe/scheduler] evening reflection sent, capture NOT armed — ${pendingKindLabel(
+                armed.blockedBy!.kind,
+              )} pending`,
+            );
+          }
         } catch (err) {
+          await releaseFire('evening-reflect');
           console.error('[zoe/scheduler] evening reflection failed:', (err as Error).message);
         }
       },
@@ -148,7 +163,7 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     cron.schedule(
       '0 18 * * 0',
       async () => {
-        if (await alreadyFired('learn-cycle')) return;
+        if (!(await claimFire('learn-cycle'))) return;
         try {
           const result = await runLearnCycle({
             context: {
@@ -157,27 +172,29 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
               current_date: new Date().toISOString().slice(0, 10),
             },
           });
-          await markFired('learn-cycle');
           if (result.proposals.length === 0) {
             console.log(`[zoe/scheduler] learn cycle: ${result.runsAnalyzed} runs, no proposals`);
             return;
           }
-          // H2 (doc 770): don't clobber a live user approval. Defer to next
-          // cycle rather than stomping a pending plan/reflexion.
-          const liveLearn = getPending('private');
-          if (liveLearn) {
-            console.log(`[zoe/scheduler] learn proposals not surfaced — ${liveLearn.kind} pending; retry next cycle`);
-            return;
-          }
-          await setPending({
+          const armed = await setPending({
             kind: 'learn',
             chatScope: 'private',
             createdAt: new Date().toISOString(),
             proposals: result.proposals,
           });
+          if (!armed.armed) {
+            // doc 770 H2: a live approval is waiting — defer rather than clobber.
+            console.log(
+              `[zoe/scheduler] learn cycle: deferring ${result.proposals.length} proposals — ${pendingKindLabel(
+                armed.blockedBy!.kind,
+              )} pending`,
+            );
+            return;
+          }
           await opts.bot.api.sendMessage(opts.zaalTgId, renderLearnProposals(result.proposals));
           console.log(`[zoe/scheduler] learn cycle: ${result.proposals.length} proposals sent`);
         } catch (err) {
+          await releaseFire('learn-cycle');
           console.error('[zoe/scheduler] learn cycle failed:', (err as Error).message);
         }
       },

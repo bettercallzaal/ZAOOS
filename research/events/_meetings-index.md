@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-05-27 16:30 | Tyler / Magnetic x Zaal + team - ZABAL Games build on Magnetic | ZABAL Games | Zaal, Tyler Stambaugh, Samantha, Shawn | [778](778-tyler-magnetic-zabal-games-build-may27/) | 9 |
 | 2026-05-25 14:26 | Leeward x Zaal WebRTC + Pion + LiveKit handoff (2nd call) | ZAO Devz | Zaal, Leeward (Lee Edward Bound) | [752](752-leeward-x-zaal-webrtc-pion-livekit-handoff-may25/) | 7 |
 | 2026-05-23 9:12 | ZAO coworking - 1h17m, mostly background music + brief Discord-bot-on-VPS chat | ZAO Devz | Zaal, Iman, ThyRev, z3rodol | [753](753-may23-zaal-iman-thyrev-z3rodol-coworking/) | 3 |
 | 2026-05-23 8:39 | Zaal + Iman silent / idle session | ZAO Devz | Zaal, Iman | [749](749-zaal-iman-may23-silent-session/) | 0 |

@@ -84,6 +84,24 @@ Entity resolution (cross-checking names against `research/` + `MEMORY.md` so kno
 | Enum-constrain `owner` + add `source_span` citations to extraction (P1) | @Zaal | Skill edit | Next sprint |
 | Spike pyannote.audio 3.1 vs sherpa-onnx for 3+ person calls (P2) | @Zaal | Spike | When a 3+ call needs it |
 
+## Autoresearch addendum (2026-05-31) - corrected ship order
+
+After the literature research above, an `/autoresearch` pass scored every candidate by **(friction removed per session) / (implementation effort)**, using the 9 meetings processed this session as the eval set. It converged on a finding the literature missed:
+
+**This doc optimized the wrong layer for "ship first."** The transcription/diarization/extraction *quality* items are real, but doc 781 (trim-loops + single-feed-skip) already removed most of the user-visible friction. The dominant *repeated* cost this session was the **git/index/PR workflow run 9 separate times**: 9 branches, 9 PRs (#748-762), and **4 merge conflicts** on `_meetings-index.md` (every PR inserted at the same top region).
+
+So the metric crowned the cheapest non-literature fix:
+
+| Rank | Ship | Friction removed (evidence) | Effort | Status |
+|------|------|------------------------------|--------|--------|
+| 1 | **One branch + one PR per session** (not per meeting) | 9/9 meetings + would have made this session's 4 index conflicts ZERO | trivial (SKILL.md rule) | SHIPPED 2026-05-31 |
+| 2 | Anti-loop mlx params (`condition_on_previous_text=False`, `compression_ratio_threshold=1.35`, `no_speech_threshold=0.3`) | prevents loops at source; trim-loops becomes belt-and-suspenders | 1 line | SHIPPED 2026-05-31 |
+| 3 | Per-month index split (`_meetings-index-YYYY-MM.md`) | kills the conflict class across parallel same-day sessions | ~20 min | documented as go-forward convention |
+| 4 | Voice-enrollment speaker-ID (P1 above) | THE durable win, but compounds over TIME not per-session - right investment, wrong "first ship" | half day | next sprint |
+| 5 | Silero VAD pre-filter (P0 above) | narrow this session (1/9 silence-dominated) | 30 min | when a silence-heavy recording recurs |
+
+Key correction: voice-enrollment speaker-ID is still the best *durable* investment, but the autoresearch separated "highest leverage eventually" from "ship this first." The session's identity questions were nearly all for FIRST-time people (whom enrollment can't pre-label), so its per-session payoff was smaller than the quality-first framing assumed.
+
 ## Sources
 
 - openai/whisper issues #1253, #2052, #29, #1059 - repetition root cause + `condition_on_previous_text` fix [FULL]

@@ -12,6 +12,28 @@ export type InteractionType =
 
 export type Visibility = 'public' | 'private';
 
+/**
+ * The canonical CRM segments (doc 772 follow-up). The Airtable import had 114
+ * free-text categories with heavy spelling drift; these are the ~11 real ones
+ * everything normalizes to. `category` holds one of these; `tags` keeps the
+ * granular original label + acquisition channel.
+ */
+export const CANONICAL_CATEGORIES = [
+  'Musician',
+  'Music Industry',
+  'Web3 / Onchain',
+  'Founder / Business',
+  'Visual / Creative',
+  'Developer / Tech',
+  'Games',
+  'DAO / Regen',
+  'Local / Maine',
+  'Community / Personal',
+  'Other',
+] as const;
+
+export type CrmCategory = (typeof CANONICAL_CATEGORIES)[number];
+
 /** A contact row as stored privately (service-role reads only). */
 export interface CrmContact {
   id: string;
@@ -23,6 +45,8 @@ export interface CrmContact {
   x_handle: string | null;
   github_handle: string | null;
   role: string | null;
+  category: string | null;
+  tags: string[];
   org: string | null;
   how_we_met: string | null;
   public_summary: string | null;
@@ -48,6 +72,8 @@ export interface CrmContactPublic {
   x_handle: string | null;
   github_handle: string | null;
   role: string | null;
+  category: string | null;
+  tags: string[];
   org: string | null;
   how_we_met: string | null;
   public_summary: string | null;

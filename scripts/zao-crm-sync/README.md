@@ -18,6 +18,21 @@ All scripts source `~/.zao/zao.env` for `AIRTABLE_CRM_TOKEN` + `AIRTABLE_CRM_BAS
 |--------|------|----------------|
 | `gmail-week-import.py` | Curated list of recent Gmail threads -> contacts + activity rows. Filters noise (Vercel / GitHub / newsletters), enriches existing contacts with newly-discovered email addresses. | 2026-05-25 (10 activity + 6 new contacts + 3 enriched) |
 | `jordan-workshop-fixture.py` | One-shot fixture: Jordan Oram (yerbearzerker) June 1 6am EST workshop activity + opportunity. Reference example of the manual-import shape. | 2026-05-25 |
+| `airtable-to-supabase.py` | **One-time migration** of every contact + activity from the Airtable base into the native Supabase CRM (`crm_contacts` / `crm_interactions`, doc 772). Dry-run by default; `--apply` to write. Stamps `legacy_airtable_id` for re-runnable idempotency. | (pending) |
+
+## Migrating Airtable -> Supabase (doc 772)
+
+`airtable-to-supabase.py` moves the Airtable CRM into the native Supabase tables. It needs BOTH cred sets in env — the Airtable token (`~/.zao/zao.env`) and the Supabase service-role key (the bot's `.env`):
+
+```bash
+source ~/.zao/zao.env && set -a && . ~/zao-os/bot/.env && set +a
+python3 scripts/zao-crm-sync/airtable-to-supabase.py            # dry run — writes nothing
+python3 scripts/zao-crm-sync/airtable-to-supabase.py --apply    # migrate for real
+```
+
+- **Safe by default**: no `--apply` = prints a summary only.
+- **Idempotent**: `--apply` clears prior migrated rows (`legacy_airtable_id IS NOT NULL`, cascading their interactions) then re-inserts. Manually-added contacts (NULL legacy id) are untouched. A re-run resets migrated rows, so publish/edit migrated contacts *after* the final run.
+- **Private by default**: migrated contacts land `is_public=false`; nothing hits `/network` until you publish it in `/crm`.
 
 ## Adding a new sync source
 

@@ -33,7 +33,11 @@ import { callClaudeCli } from '../src/hermes/claude-cli.ts';
 import { ZOE_QUICK_MODEL } from '../src/zoe/types.ts';
 
 // The exact read-only denylist workers run under (kept in sync with workers.ts).
+// The bare 'Bash' entry is the catch-all: the CLI honors --disallowedTools in
+// -p mode but NOT --allowedTools, so denying the whole Bash tool is what closes
+// every shell write/redirect path (doc 770 H4).
 const READ_ONLY_DISALLOW = [
+  'Bash',
   'Edit',
   'Write',
   'NotebookEdit',

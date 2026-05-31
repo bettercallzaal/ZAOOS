@@ -50,28 +50,30 @@ interface WorkerConfig {
 // reset, rm, or write files — anything that mutates state stays behind an
 // explicit Zaal approval at the ZOE layer, never inside an autonomous worker.
 //
-//
-// doc 770 H4 (verified 2026-05-31): the lockdown is now enforced, not asserted.
-// Two layers:
-//   1. permissionMode: 'default' (see the callClaudeCli call below). Under
-//      'default', tools NOT on this worker's `allowedTools` are denied in
-//      non-interactive (-p) mode — every write path (shell redirection, tee,
-//      python, Write/Edit) is blocked, while allowlisted reads still run. The
-//      previous 'auto' mode AUTO-APPROVED everything not explicitly denied, so
-//      the allowlist did nothing and a worker could `echo > file` (proven).
-//   2. This hardened denylist + Bash-free allowlists as belt-and-suspenders.
-//      No worker is granted ANY raw Bash (VPS-verified 2026-05-31): even an
-//      exact prefix like `Bash(git log*)` leaks a write under `default` via
-//      redirection (`git log > f`), so file reads go through Read/Glob/Grep and
-//      web reads through WebFetch/WebSearch. With zero allowed Bash there is no
-//      prefix to ride a redirect on.
+// doc 770 H4 (VPS-verified 2026-05-31, three iterations): the ONLY control the
+// Claude CLI reliably enforces in non-interactive (-p) mode is this
+// `--disallowedTools` DENYLIST. It does NOT enforce `--allowedTools` as a
+// restrictive allowlist — a worker can run Bash commands that were never
+// granted (proven: `git log > f` and an `echo > f` Write-fallback both wrote on
+// a bare box under both 'auto' and 'default'). Pattern denials like
+// `Bash(rm*)`/`Bash(curl*)` DO hold, but a pattern denylist can never catch
+// every write path (`echo > f`, `git log > f`, …). So the airtight move is to
+// deny the entire `Bash` tool: with no shell at all, the only tools left are
+// Read/Glob/Grep/WebFetch/WebSearch — none can write. The specific patterns
+// below are kept as defense-in-depth. (My earlier 'all blocked' local result
+// was the harness container sandbox, not the CLI — IS_SANDBOX. The VPS has no
+// such sandbox, which is why the probe is the source of truth.)
 // Re-verify after CLI upgrades or any allowlist change:
 // `npx tsx bot/scripts/verify-tool-lockdown.ts` on the VPS (doc 770 H4).
 const READ_ONLY_DISALLOW = [
+  // The whole Bash tool — the catch-all that closes every shell write/redirect
+  // path (echo>f, git>f, tee, python, …). No worker is granted Bash anymore.
+  'Bash',
   // File / notebook mutation tools.
   'Edit',
   'Write',
   'NotebookEdit',
+  // Specific Bash patterns kept as defense-in-depth (redundant under bare Bash).
   // git state mutation.
   'Bash(git push*)',
   'Bash(git commit*)',

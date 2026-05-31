@@ -385,7 +385,7 @@ export async function decomposeGoal(opts: DecomposeOptions): Promise<Decompositi
     // can't get distracted by Read/Grep mid-decomposition.
     allowedTools: [],
     disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
-    permissionMode: 'auto',
+    permissionMode: 'default',
     outputFormat: 'json',
     // bare:false on purpose - matches concierge.ts (Max plan OAuth flow).
     bare: false,

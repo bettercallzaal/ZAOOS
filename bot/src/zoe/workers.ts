@@ -50,13 +50,14 @@ interface WorkerConfig {
 // reset, rm, or write files — anything that mutates state stays behind an
 // explicit Zaal approval at the ZOE layer, never inside an autonomous worker.
 //
-// doc 770 H4: a denylist is inherently leaky, so the per-worker `allowedTools`
-// whitelist above is the real authority — this list is defense-in-depth that
-// closes the obvious write/move/exec vectors the audit named (mv, chmod, git
-// clean, npx/node, …). One residual it CANNOT catch: shell redirection inside
-// an otherwise-allowed Bash prefix (e.g. `cat x > y` under `Bash(cat*)`). That
-// guarantee depends on the CLI treating `allowedTools` as authoritative under
-// permissionMode, which must be verified live, not asserted in config.
+// doc 770 H4 (verified 2026-05-31): the lockdown is enforced by running with
+// permissionMode: 'default' + this per-worker `allowedTools` whitelist. Under
+// 'default', non-allowlisted tools are denied in non-interactive (-p) mode —
+// every write path (shell redirection, tee, python, Write/Edit) is blocked,
+// while allowlisted reads still run. The previous 'auto' mode AUTO-APPROVED
+// everything not explicitly denied, so the allowlist did nothing and a worker
+// could `echo > file`. This denylist is now belt-and-suspenders on top of the
+// authoritative allowlist.
 const READ_ONLY_DISALLOW = [
   // File / notebook mutation tools.
   'Edit',
@@ -306,7 +307,7 @@ export async function runClaudeWorker(args: RunWorkerArgs): Promise<WorkerResult
       appendSystemPrompt: spec,
       allowedTools: cfg.allowedTools,
       disallowedTools: cfg.disallowedTools,
-      permissionMode: 'auto',
+      permissionMode: 'default',
       outputFormat: 'json',
       maxBudgetUsd: budgetUsd,
       bare: false,

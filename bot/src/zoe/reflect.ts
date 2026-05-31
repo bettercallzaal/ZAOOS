@@ -92,7 +92,7 @@ Output the reflection prompt in the exact format from your system prompt. Refere
     prompt: userPrompt,
     cwd: opts.repoDir,
     appendSystemPrompt: REFLECT_SYSTEM_PROMPT,
-    permissionMode: 'auto',
+    permissionMode: 'default',
     bare: false,
   });
 

@@ -213,7 +213,7 @@ export async function runLearnCycle(opts: {
       appendSystemPrompt: LEARN_SYSTEM_PROMPT,
       allowedTools: [],
       disallowedTools: ['Bash', 'Read', 'Edit', 'Write', 'Grep', 'Glob', 'WebFetch', 'Task'],
-      permissionMode: 'auto',
+      permissionMode: 'default',
       outputFormat: 'json',
       maxBudgetUsd: 0.5,
       bare: false,

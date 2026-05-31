@@ -134,7 +134,7 @@ export async function draftPost(
     prompt: userPrompt,
     cwd: opts.cwd,
     appendSystemPrompt: SHARED_VOICE,
-    permissionMode: 'auto',
+    permissionMode: 'default',
     bare: false,
   });
 

@@ -1,32 +1,55 @@
 /**
- * Miniapp context-based auth — silent (no SIWF signature prompt).
+ * Miniapp silent auth — QuickAuth-verified (no SIWF signature prompt).
  *
- * Reads FID from request body (provided by client via sdk.context.user.fid).
- * Trust model: the FID claim is UNSIGNED. A non-Farcaster caller could POST
- * any allowlisted FID and obtain a session for that user. Acceptable for
- * gating an invite-only community where the alternative is a SIWF prompt
- * every miniapp launch. For sensitive ops, keep using /api/miniapp/auth
- * (QuickAuth/JWT-verified).
+ * SECURITY (doc 795): the FID is taken from a verified QuickAuth JWT
+ * (`payload.sub`), never from the request body. An earlier version trusted an
+ * UNSIGNED `fid` in the POST body, which let any unauthenticated caller mint a
+ * session — including an admin session, since `saveSession` derives `isAdmin`
+ * from the FID — for any allowlisted FID (admin FIDs are public). That was a
+ * live account-takeover / privilege-escalation bypass; this route now requires
+ * a verified credential before `saveSession`, identical to /api/miniapp/auth.
+ *
+ * The client attaches the token via `sdk.quickAuth.fetch(...)`. QuickAuth is
+ * silent (a JWT signed by the Farcaster client, not a SIWF signature prompt),
+ * so the no-prompt UX is preserved.
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
+import { createClient } from '@farcaster/quick-auth';
 import { checkAllowlist } from '@/lib/gates/allowlist';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { saveSession } from '@/lib/auth/session';
+import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
-const BodySchema = z.object({
-  fid: z.number().int().positive(),
-});
+const quickAuthClient = createClient();
 
 export async function POST(req: NextRequest) {
+  const authorization = req.headers.get('Authorization');
+  if (!authorization?.startsWith('Bearer ')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const token = authorization.slice('Bearer '.length).trim();
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    const json = await req.json().catch(() => null);
-    const parsed = BodySchema.safeParse(json);
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
+    // QuickAuth JWTs are tied to the domain in the Farcaster manifest
+    // (zaoos.com), not the request host — verify against the pinned domain.
+    const domain = ENV.NEXT_PUBLIC_SIWF_DOMAIN || 'zaoos.com';
+
+    let fid: number;
+    try {
+      const payload = await quickAuthClient.verifyJwt({ token, domain });
+      fid = Number(payload.sub);
+    } catch {
+      // Invalid / expired / wrong-domain token — never falls through to a
+      // body-supplied FID.
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
-    const { fid } = parsed.data;
+    if (!Number.isInteger(fid) || fid <= 0) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
 
     const neynarUser = await getUserByFid(fid);
     if (!neynarUser) {

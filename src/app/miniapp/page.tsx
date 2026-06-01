@@ -58,21 +58,17 @@ export default function MiniAppPage() {
       try {
         let response: Response | undefined;
 
-        if (ctxFid) {
-          response = await fetch('/api/miniapp/auth-context', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fid: ctxFid }),
-          });
-        } else {
-          // No context FID — try QuickAuth (will SIWF-prompt on first run).
-          // If that also fails, fall back to web landing.
-          try {
-            response = await sdk.quickAuth.fetch('/api/miniapp/auth');
-          } catch {
-            window.location.href = '/';
-            return;
-          }
+        // Silent auth via QuickAuth (verified JWT). The context FID only tells
+        // us we're inside a miniapp; the authoritative FID is verified from the
+        // token server-side (doc 795: never trust an unsigned body FID). If
+        // QuickAuth fails, fall back to the web landing.
+        try {
+          response = ctxFid
+            ? await sdk.quickAuth.fetch('/api/miniapp/auth-context', { method: 'POST' })
+            : await sdk.quickAuth.fetch('/api/miniapp/auth');
+        } catch {
+          window.location.href = '/';
+          return;
         }
         if (cancelled) return;
 

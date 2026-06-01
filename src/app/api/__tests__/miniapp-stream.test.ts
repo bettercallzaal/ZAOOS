@@ -24,7 +24,8 @@ vi.mock('@/lib/db/audit-log', () => ({
   getClientIp: vi.fn().mockReturnValue('127.0.0.1'),
 }));
 vi.mock('@farcaster/quick-auth', () => ({
-  createClient: vi.fn(() => ({ verify: mockVerify })),
+  // Routes call `verifyJwt`; keep `verify` aliased for any older callers.
+  createClient: vi.fn(() => ({ verifyJwt: mockVerify, verify: mockVerify })),
 }));
 vi.mock('@stream-io/node-sdk', () => ({
   StreamClient: vi.fn().mockImplementation(() => ({
@@ -41,6 +42,7 @@ vi.mock('@farcaster/miniapp-node', () => ({
 
 // ── Route imports ────────────────────────────────────────────────────────────
 import { GET as miniAppAuthGET } from '@/app/api/miniapp/auth/route';
+import { POST as miniAppAuthContextPOST } from '@/app/api/miniapp/auth-context/route';
 import { POST as miniAppWebhookPOST } from '@/app/api/miniapp/webhook/route';
 import { POST as streamTokenPOST } from '@/app/api/stream/token/route';
 import { GET as quickStatsGET } from '@/app/api/admin/quick-stats/route';
@@ -80,6 +82,83 @@ describe('GET /api/miniapp/auth', () => {
     const res = await miniAppAuthGET(req('/api/miniapp/auth', { headers: { Authorization: 'Bearer invalid' } }));
     expect(res.status).toBe(401);
     expect((await res.json()).error).toBe('Invalid token');
+  });
+});
+
+// ── Miniapp context auth (doc 795 — admin-takeover regression) ──────────────
+// The vulnerable version minted a session (incl. admin, via saveSession's
+// ADMIN_FIDS check) from an UNSIGNED body FID. These tests pin that the FID now
+// comes only from a verified QuickAuth JWT and never from the request body.
+describe('POST /api/miniapp/auth-context', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetSessionData.mockResolvedValue(null);
+  });
+
+  it('401 + no session when an unsigned body FID is posted with no Bearer token (the bypass)', async () => {
+    const res = await miniAppAuthContextPOST(
+      req('/api/miniapp/auth-context', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fid: 3 }), // would-be admin FID
+      }),
+    );
+    expect(res.status).toBe(401);
+    expect(mockVerify).not.toHaveBeenCalled();
+    expect(mockSaveSession).not.toHaveBeenCalled(); // no session minted
+  });
+
+  it('401 with a non-Bearer Authorization scheme', async () => {
+    const res = await miniAppAuthContextPOST(
+      req('/api/miniapp/auth-context', { method: 'POST', headers: { Authorization: 'Basic abc' } }),
+    );
+    expect(res.status).toBe(401);
+    expect(mockSaveSession).not.toHaveBeenCalled();
+  });
+
+  it('401 when the token fails verification (never falls back to a body FID)', async () => {
+    mockVerify.mockRejectedValue(new Error('bad signature'));
+    const res = await miniAppAuthContextPOST(
+      req('/api/miniapp/auth-context', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer forged', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fid: 3 }),
+      }),
+    );
+    expect(res.status).toBe(401);
+    expect((await res.json()).error).toBe('Invalid token');
+    expect(mockSaveSession).not.toHaveBeenCalled();
+  });
+
+  it('saves a session using the VERIFIED token FID, ignoring any body FID', async () => {
+    mockVerify.mockResolvedValue({ sub: '111' }); // verified FID
+    mockGetUserByFid.mockResolvedValue({ username: 'real', display_name: 'Real', pfp_url: '' });
+    mockCheckAllowlist.mockResolvedValue({ allowed: true });
+    const res = await miniAppAuthContextPOST(
+      req('/api/miniapp/auth-context', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer good', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fid: 3 }), // attacker-supplied admin FID — must be ignored
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(mockSaveSession).toHaveBeenCalledTimes(1);
+    expect(mockSaveSession.mock.calls[0][0].fid).toBe(111); // token FID, NOT body's 3
+  });
+
+  it('does not save a session when the verified FID is not allowlisted', async () => {
+    mockVerify.mockResolvedValue({ sub: '222' });
+    mockGetUserByFid.mockResolvedValue({ username: 'x', display_name: 'X', pfp_url: '' });
+    mockCheckAllowlist.mockResolvedValue({ allowed: false });
+    const res = await miniAppAuthContextPOST(
+      req('/api/miniapp/auth-context', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer good', 'Content-Type': 'application/json' },
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect((await res.json()).hasAccess).toBe(false);
+    expect(mockSaveSession).not.toHaveBeenCalled();
   });
 });
 

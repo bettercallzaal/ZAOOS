@@ -124,6 +124,62 @@ export async function postCast(
   return res.json();
 }
 
+/**
+ * Publish a simple top-level cast (no channel) with optional URL embeds.
+ * For channel posts / replies with cast embeds use `postCast`.
+ */
+export async function publishCast(
+  signerUuid: string,
+  text: string,
+  embedUrls: string[] = [],
+): Promise<{ cast?: unknown }> {
+  const body: Record<string, unknown> = { signer_uuid: signerUuid, text };
+  if (embedUrls.length > 0) body.embeds = embedUrls.map((url) => ({ url }));
+
+  const res = await fetch(`${NEYNAR_BASE}/cast`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    const errBody = await res.text();
+    throw new Error(`Neynar cast error ${res.status}: ${errBody.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+type ReactionType = 'like' | 'recast';
+
+/** Add a like/recast reaction to a cast on behalf of the signer. */
+export async function reactToCast(
+  signerUuid: string,
+  castHash: string,
+  reactionType: ReactionType,
+): Promise<unknown> {
+  const res = await fetch(`${NEYNAR_BASE}/reaction`, {
+    method: 'POST',
+    headers: headers(),
+    body: JSON.stringify({
+      signer_uuid: signerUuid,
+      reaction_type: reactionType,
+      target: castHash,
+    }),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) {
+    const errBody = await res.text();
+    throw new Error(`Neynar reaction (${reactionType}) error ${res.status}: ${errBody.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+export const likeCast = (signerUuid: string, castHash: string): Promise<unknown> =>
+  reactToCast(signerUuid, castHash, 'like');
+
+export const recastCast = (signerUuid: string, castHash: string): Promise<unknown> =>
+  reactToCast(signerUuid, castHash, 'recast');
+
 export async function getCastThread(hash: string) {
   const params = new URLSearchParams({
     identifier: hash,
@@ -158,31 +214,6 @@ export async function getUserByFid(fid: number, viewerFid?: number) {
   return data.users?.[0] || null;
 }
 
-/**
- * Fetch a FID's Neynar quality score (experimental.neynar_user_score),
- * direct from Neynar — bypassing the haatz read proxy.
- *
- * The haatz proxy returns a 200 for /user/bulk but does NOT populate the
- * `experimental` block (verified 2026-05-20), so it cannot serve this score.
- * fetchWithFailover would never fall through (200 = "success"), so this
- * helper goes straight to Neynar. Returns null when unavailable.
- */
-export async function getNeynarUserScore(fid: number): Promise<number | null> {
-  try {
-    const res = await fetch(`${NEYNAR_BASE}/user/bulk?fids=${fid}`, {
-      headers: headers(),
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const user = data.users?.[0];
-    const score = user?.experimental?.neynar_user_score;
-    return typeof score === 'number' ? score : null;
-  } catch {
-    return null;
-  }
-}
-
 export async function getUsersByFids(fids: number[]) {
   if (!fids.length) return [];
   const params = new URLSearchParams({ fids: fids.join(',') });
@@ -196,21 +227,6 @@ export async function getUsersByFids(fids: number[]) {
   }
   const data = await res.json();
   return data.users || [];
-}
-
-/** Fetch recent casts for a FID. Used by ZABAL vote-power calc (counts /zao channel casts). */
-export async function getUserCasts(fid: number, limit = 100) {
-  const params = new URLSearchParams({ fid: String(fid), limit: String(limit) });
-  const res = await fetchWithFailover(`/feed/user/casts?${params}`, {
-    headers: readHeaders(),
-    signal: AbortSignal.timeout(10000),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Neynar user casts error ${res.status}: ${body.slice(0, 200)}`);
-  }
-  const data = await res.json();
-  return data.casts || [];
 }
 
 export async function getUserByAddress(address: string) {
@@ -449,23 +465,6 @@ export async function unblockUser(signerUuid: string, targetFid: number) {
     signal: AbortSignal.timeout(10000),
   });
   if (!res.ok) throw new Error(`Neynar unblock error: ${res.status}`);
-  return res.json();
-}
-
-export async function getMuteList(fid: number, limit = 100, cursor?: string) {
-  const params = new URLSearchParams({
-    fid: String(fid),
-    limit: String(limit),
-  });
-  if (cursor) params.set('cursor', cursor);
-  const res = await fetch(`${NEYNAR_BASE}/mute/list?${params}`, {
-    headers: headers(),
-    signal: AbortSignal.timeout(10000),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Neynar mute list error ${res.status}: ${body.slice(0, 200)}`);
-  }
   return res.json();
 }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
+import { publishCast } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
 
 const CastSchema = z.object({
@@ -21,29 +22,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { text, embeds } = parsed.data;
-    const response = await fetch('https://api.neynar.com/v2/farcaster/cast', {
-      method: 'POST',
-      headers: {
-        'x-api-key': process.env.NEYNAR_API_KEY!,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        signer_uuid: session.signerUuid,
-        text,
-        embeds: embeds.map((url) => ({ url })),
-      }),
-    });
-
-    const data = await response.json();
-    if (!response.ok) {
-      logger.error('Neynar cast error:', data);
-      return NextResponse.json({ error: 'Failed to publish cast' }, { status: 500 });
-    }
-
+    const data = await publishCast(session.signerUuid, parsed.data.text, parsed.data.embeds);
     return NextResponse.json({ success: true, cast: data.cast });
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Cast route error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to publish cast' }, { status: 500 });
   }
 }

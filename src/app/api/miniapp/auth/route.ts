@@ -1,69 +1,24 @@
+/**
+ * Miniapp auth via QuickAuth JWT (Authorization: Bearer ...).
+ *
+ * Twin of /api/miniapp/auth-context (POST). Both verify the token and mint a
+ * session through the shared `authenticateMiniappToken` helper — the FID is
+ * taken from the verified JWT, never from client input.
+ */
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@farcaster/quick-auth';
-import { checkAllowlist } from '@/lib/gates/allowlist';
-import { getUserByFid } from '@/lib/farcaster/neynar';
-import { saveSession } from '@/lib/auth/session';
-import { ENV } from '@/lib/env';
+import { authenticateMiniappToken, extractBearerToken } from '@/lib/auth/miniapp-quickauth';
 import { logger } from '@/lib/logger';
 
-const quickAuthClient = createClient();
-
 export async function GET(req: NextRequest) {
-  const authorization = req.headers.get('Authorization');
-  if (!authorization?.startsWith('Bearer ')) {
+  const token = extractBearerToken(req.headers.get('Authorization'));
+  if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const token = authorization.split(' ')[1];
-
   try {
-    // Use production domain for JWT verification — QuickAuth JWTs are tied
-    // to the domain in the Farcaster manifest (zaoos.com), not the request host
-    const domain = ENV.NEXT_PUBLIC_SIWF_DOMAIN || 'zaoos.com';
-
-    const payload = await quickAuthClient.verifyJwt({
-      token,
-      domain,
-    });
-
-    const fid = Number(payload.sub);
-
-    // Get user profile from Neynar
-    const neynarUser = await getUserByFid(fid);
-
-    // Check allowlist
-    const gate = await checkAllowlist(fid);
-    let hasAccess = gate.allowed;
-
-    // If not found by FID, check by wallet addresses
-    if (!hasAccess && neynarUser?.verified_addresses?.eth_addresses) {
-      for (const addr of neynarUser.verified_addresses.eth_addresses) {
-        const walletCheck = await checkAllowlist(undefined, addr);
-        if (walletCheck.allowed) {
-          hasAccess = true;
-          break;
-        }
-      }
-    }
-
-    // If allowed, create a session
-    if (hasAccess) {
-      await saveSession({
-        fid,
-        username: neynarUser?.username || '',
-        displayName: neynarUser?.display_name || '',
-        pfpUrl: neynarUser?.pfp_url || '',
-      });
-    }
-
-    return NextResponse.json({
-      fid,
-      hasAccess,
-      username: neynarUser?.username || '',
-      displayName: neynarUser?.display_name || '',
-      pfpUrl: neynarUser?.pfp_url || '',
-    });
-  } catch (error) {
+    const result = await authenticateMiniappToken(token);
+    return NextResponse.json(result.body, { status: result.status });
+  } catch (error: unknown) {
     logger.error('Mini app auth error:', error);
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }

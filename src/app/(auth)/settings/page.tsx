@@ -1,4 +1,4 @@
-import { getSessionData } from '@/lib/auth/session';
+import { getSessionData, toPublicSession } from '@/lib/auth/session';
 import { getUserByFid } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { SettingsClientLoader } from './SettingsClientLoader';
@@ -76,7 +76,9 @@ export default async function SettingsPage() {
 
   return (
     <SettingsClientLoader
-      session={session}
+      // Strip the server-only signerUuid before it crosses into the client
+      // component's serialized props.
+      session={session ? toPublicSession(session) : null}
       profile={profile}
     />
   );

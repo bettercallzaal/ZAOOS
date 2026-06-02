@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSessionData } from '@/lib/auth/session';
+import { getSessionData, toPublicSession } from '@/lib/auth/session';
 import { logger } from '@/lib/logger';
 
 export async function GET() {
@@ -8,7 +8,9 @@ export async function GET() {
     if (!session) {
       return NextResponse.json({ authenticated: false }, { status: 401 });
     }
-    return NextResponse.json({ authenticated: true, ...session });
+    // Never ship the managed-signer credential to the browser — clients read
+    // `hasSigner` instead.
+    return NextResponse.json({ authenticated: true, ...toPublicSession(session) });
   } catch (err) {
     logger.error('Session read error:', err);
     return NextResponse.json({ authenticated: false }, { status: 401 });

@@ -8,7 +8,10 @@ import { checkAllowlist } from '@/lib/gates/allowlist';
 import { saveWalletSession } from '@/lib/auth/session';
 import { getUserByAddress } from '@/lib/farcaster/neynar';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
+
+const isProd = process.env.NODE_ENV === 'production';
 
 const publicClient = createPublicClient({
   chain: mainnet,
@@ -79,8 +82,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired nonce. Please try again.' }, { status: 400 });
     }
 
-    // Validate domain matches
-    const expectedDomain = req.headers.get('host') || '';
+    // Validate domain matches. In production, pin to the configured canonical
+    // domain (consistent with the SIWF/miniapp routes) rather than trusting the
+    // client-controllable Host header — this prevents replaying a signature
+    // scoped to another site. Outside production, fall back to the request host
+    // so localhost/preview deployments keep working.
+    const requestHost = req.headers.get('host') || '';
+    const expectedDomain = isProd ? (ENV.NEXT_PUBLIC_SIWF_DOMAIN || requestHost) : requestHost;
     if (siweMessage.domain !== expectedDomain) {
       return NextResponse.json({ error: 'Domain mismatch' }, { status: 400 });
     }

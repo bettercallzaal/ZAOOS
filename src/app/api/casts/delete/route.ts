@@ -14,13 +14,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Signer required' }, { status: 401 });
   }
 
-  const body = await request.json();
-  const parsed = deleteCastSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
-  }
-
   try {
+    const body = await request.json();
+    const parsed = deleteCastSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+    }
+
     await deleteCast(session.signerUuid, parsed.data.castHash);
     return NextResponse.json({ success: true });
   } catch (err) {

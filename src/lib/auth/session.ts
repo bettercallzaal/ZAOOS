@@ -54,9 +54,20 @@ export const getSessionData = cache(async (): Promise<SessionData | null> => {
     displayName: session.displayName || '',
     pfpUrl: session.pfpUrl || '',
     signerUuid: session.signerUuid || null,
+    hasSigner: !!session.signerUuid,
     isAdmin: session.isAdmin || false,
   };
 });
+
+/**
+ * Strip server-only fields (the `signerUuid` posting credential) before handing
+ * session data to the client. Use at EVERY server→client boundary: the
+ * /api/auth/session response and any server component passing session as props.
+ * `hasSigner` preserves the only thing the client needs to know.
+ */
+export function toPublicSession(session: SessionData): SessionData {
+  return { ...session, signerUuid: null };
+}
 
 export async function saveSession(data: {
   fid: number;

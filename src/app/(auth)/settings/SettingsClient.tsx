@@ -473,7 +473,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
     }
   }, [zaoFields]);
 
-  const hasSigner = !!session?.signerUuid;
+  const hasSigner = !!session?.hasSigner;
 
   const handleSignerSuccess = useCallback(async (data: { signer_uuid: string; fid: string }) => {
     setSignerStatus('saving');
@@ -645,7 +645,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
               status={session.fid ? 'connected' : 'disconnected'}
               detail={session.fid ? `@${profile?.username || `FID ${session.fid}`}` : 'Not connected'}
               action={
-                session.signerUuid ? (
+                session.hasSigner ? (
                   <span className="text-[10px] text-green-500/70">Posting &#10003;</span>
                 ) : session.fid ? (
                   <span className="text-[10px] text-[#f59e0b]">No signer</span>
@@ -1101,7 +1101,7 @@ export function SettingsClient({ session, profile }: SettingsClientProps) {
                 <svg className="w-3.5 h-3.5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                 </svg>
-                <span className="text-xs text-green-500/80">Signer active — {shortAddr(session.signerUuid || '')}</span>
+                <span className="text-xs text-green-500/80">Signer active</span>
               </div>
             ) : (
               <div>

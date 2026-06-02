@@ -4,6 +4,8 @@ const mockGetSessionData = vi.hoisted(() => vi.fn());
 
 vi.mock('@/lib/auth/session', () => ({
   getSessionData: () => mockGetSessionData(),
+  // Real behavior: strip the server-only signerUuid before responding.
+  toPublicSession: (s: Record<string, unknown>) => ({ ...s, signerUuid: null }),
 }));
 
 import { GET } from '@/app/api/auth/session/route';
@@ -32,22 +34,35 @@ describe('GET /api/auth/session', () => {
     expect(body.username).toBe('testuser');
   });
 
-  it('includes all session fields in response', async () => {
+  it('includes session fields in response', async () => {
     const sessionData = {
       fid: 999,
       username: 'admin',
       isAdmin: true,
       displayName: 'Admin User',
+      hasSigner: true,
     };
     mockGetSessionData.mockResolvedValue(sessionData);
     const res = await GET();
     const body = await res.json();
-    expect(body).toEqual({
-      authenticated: true,
+    expect(body.authenticated).toBe(true);
+    expect(body.fid).toBe(999);
+    expect(body.isAdmin).toBe(true);
+    expect(body.hasSigner).toBe(true);
+  });
+
+  it('never ships the signerUuid posting credential to the client (A1)', async () => {
+    mockGetSessionData.mockResolvedValue({
       fid: 999,
       username: 'admin',
-      isAdmin: true,
-      displayName: 'Admin User',
+      isAdmin: false,
+      signerUuid: 'secret-signer-uuid',
+      hasSigner: true,
     });
+    const res = await GET();
+    const body = await res.json();
+    expect(body.signerUuid).toBeNull();
+    expect(JSON.stringify(body)).not.toContain('secret-signer-uuid');
+    expect(body.hasSigner).toBe(true);
   });
 });

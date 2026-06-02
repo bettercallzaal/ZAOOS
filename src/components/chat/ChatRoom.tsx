@@ -161,7 +161,7 @@ export function ChatRoom() {
 
   if (!user) return null;
 
-  const hasSigner = !!user.signerUuid;
+  const hasSigner = user.hasSigner;
 
   return (
     <div className="flex h-[calc(100dvh-9rem)] md:h-[calc(100dvh-6.5rem)] bg-[#0a1628] text-white overflow-hidden">

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   try {
     const status = await getSignerStatus(signerUuid);
 
-    // Verify the signer belongs to the current user whenever FID is available
+    // Never reveal/bind a signer that belongs to a different FID.
     if (status.fid && status.fid !== sessionData.fid) {
       return NextResponse.json(
         { error: 'Signer does not belong to this user' },
@@ -25,8 +25,17 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Save signer UUID to session once approved
+    // Save signer UUID to session once approved — but ONLY when Neynar confirms
+    // the signer's FID matches this user. Fail CLOSED on a missing FID (mirrors
+    // signer/save/route.ts:32) so an approved-but-unassociated signer can never
+    // be bound to the session.
     if (status.status === 'approved') {
+      if (!status.fid || status.fid !== sessionData.fid) {
+        return NextResponse.json(
+          { error: 'Signer does not belong to this user' },
+          { status: 403 }
+        );
+      }
       const session = await getSession();
       session.signerUuid = signerUuid;
       await session.save();

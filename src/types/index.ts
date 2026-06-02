@@ -23,7 +23,16 @@ export interface SessionData {
   username: string;
   displayName: string;
   pfpUrl: string;
+  /**
+   * Managed-signer posting credential. SERVER-ONLY: never serialize this to the
+   * client. It is stripped at every server→client boundary via
+   * `toPublicSession()` (the /api/auth/session response and any server
+   * component passing session data as props). Client code must read `hasSigner`
+   * instead of `!!signerUuid`.
+   */
   signerUuid: string | null;
+  /** Client-safe boolean: whether the user has an approved managed signer. */
+  hasSigner: boolean;
   isAdmin: boolean;
 }
 

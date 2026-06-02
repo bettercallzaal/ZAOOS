@@ -204,7 +204,7 @@ export function SocialPage() {
 
   if (!user) return null;
 
-  const hasSigner = !!user.signerUuid;
+  const hasSigner = user.hasSigner;
 
   return (
     <div className="flex h-[100dvh] pb-14 md:pb-0 md:h-[calc(100dvh-2.5rem)] bg-[#0a1628] text-white overflow-hidden">

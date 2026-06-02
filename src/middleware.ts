@@ -46,6 +46,10 @@ const RATE_LIMITS: [string, RateLimitConfig][] = [
   ['/api/library/delete',   { limit: 10, windowMs: MINUTE }],
   ['/api/library',          { limit: 30, windowMs: MINUTE }],
 
+  // Casts sub-routes (Farcaster posting/deletion via managed signer)
+  ['/api/casts/delete',  { limit: 10, windowMs: MINUTE }],
+  ['/api/casts',         { limit: 15, windowMs: MINUTE }],
+
   // Top-level routes (no sub-route ordering concerns)
   ['/api/admin',         { limit: 5,  windowMs: MINUTE }],
   ['/api/auth',          { limit: 10, windowMs: MINUTE }],

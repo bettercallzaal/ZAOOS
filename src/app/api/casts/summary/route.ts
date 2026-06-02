@@ -14,13 +14,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json();
-  const parsed = summarySchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
-  }
-
   try {
+    const body = await request.json();
+    const parsed = summarySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
+    }
+
     const data = await getCastConversationSummary(parsed.data.castHash);
     return NextResponse.json(data);
   } catch (err) {

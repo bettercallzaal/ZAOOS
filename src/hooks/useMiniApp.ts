@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { logger } from '@/lib/logger';
 
 interface SafeAreaInsets {
   top: number;
@@ -118,7 +119,7 @@ export function useMiniApp(): MiniAppResult {
         });
         return true;
       } catch (err) {
-        console.error('[useMiniApp] composeCast failed:', err);
+        logger.error('[useMiniApp] composeCast failed:', err);
         return false;
       }
     },

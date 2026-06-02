@@ -18,7 +18,9 @@ const publicClient = createPublicClient({
   transport: http(),
 });
 
-const NONCE_TTL = 5 * 60 * 1000;
+// 15 minutes — aligned with the SIWF /api/auth/verify nonce TTL (both store in
+// the shared auth_nonces table).
+const NONCE_TTL = 15 * 60 * 1000;
 
 /**
  * GET — Generate a nonce for SIWE

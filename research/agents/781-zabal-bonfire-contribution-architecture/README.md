@@ -161,6 +161,48 @@ machine + the CRM pending-table pattern, with the graph as the one source of
 truth. That is what makes it shippable in June and lets tiers/confidence/
 federation layer on without a rewrite.
 
+## Phase 2 wire-up - Option A contract (BUILT 2026-05-31)
+
+Phase 1 (read) shipped on the zabalgames website (separate repo: Vercel edge +
+Upstash Redis, verifies Farcaster Quick Auth). Phase 2 (submit -> pending ->
+promote) uses **Option A**: the website owns the Upstash queue; ZOE drains it.
+
+**Why A over a ZOE-hosted HTTP ingest (B):** Quick Auth lives on the website, so
+the website is an unavoidably-trusted authenticated producer in either design.
+Given that, the cleanest boundary is website = authenticated intake, ZOE = the
+promotion gate (the part that protects canonical truth). A also avoids standing
+up a new public inbound endpoint on the VPS - ZOE stays outbound-only. Migrate to
+B if/when there are multiple producers or a Supabase admin dashboard is wanted.
+
+### The contract (both repos reference this)
+
+- **Queue:** Upstash LIST key `zg:bonfire:pending`. Website `LPUSH`es items with
+  the FID **verified server-side** from Quick Auth (never client-sent).
+- **Item shape:**
+  ```jsonc
+  { "id":"zg-<ts>-<rand>", "fid":1234, "username":"name|null",
+    "type":"fact|project|doc", "title":"opt", "body":"required",
+    "url":"opt", "source":"zabalgames-web", "status":"pending", "ts":1748736000000 }
+  ```
+- **ZOE loop** (`bot/src/zoe/bonfire-queue.ts` + `index.ts` `/bonfire` command):
+  `LRANGE zg:bonfire:pending 0 -1` -> surface oldest item in the approval machine
+  (kind `bonfire-submission`, gated by Zaal's DM in v1; `BONFIRE_STEWARD_FIDS` is
+  the forward-looking multi-steward list) -> on **y** promote via
+  `episode/create` (reusing `recall.remember`, incl. its secret-scan) with a
+  provenance line `(Submitted by @user (fid) via ZABAL Gamez, <date>.)` +
+  `sourceTag: zabalgames-web`, then `LREM` the exact item -> on **n**, `LREM` +
+  log, no write.
+- **Creds (ZOE env):** `ZG_UPSTASH_REST_URL` + `ZG_UPSTASH_REST_TOKEN`
+  (read-write; LREM needs write) for a **dedicated** Upstash DB.
+- **Steward env:** `BONFIRE_STEWARD_FIDS` (v1 = `19640`).
+
+### v1 known limits (documented, not bugs)
+- Steward gate is Zaal's DM in practice; `BONFIRE_STEWARD_FIDS` becomes the real
+  gate in v2 once steward FIDs are mapped to Telegram ids.
+- `LREM`-by-value relies on the item's exact serialized string (ZOE keeps the raw
+  it read). The unique `id` keeps items distinct.
+- Promotion emits a prose episode for all types; typed intake for `project` is v2.
+
 ## Open questions (need verification before v2)
 
 - Does Bonfire/FCG expose a first-class `confidence` + `canonical/status` field

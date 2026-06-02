@@ -24,13 +24,15 @@ import { ZOE_PATHS } from './memory';
 import type { DecompositionPlan } from './decompose';
 import type { ProposedPatch, ReflectionAnswers } from './reflexion';
 import type { LearnProposal } from './learn';
+import type { QueueEntry } from './bonfire-queue';
 
 export type PendingKind =
   | 'plan'
   | 'plan-gate'
   | 'reflexion'
   | 'await-reflection'
-  | 'learn';
+  | 'learn'
+  | 'bonfire-submission';
 
 interface PendingBase {
   kind: PendingKind;
@@ -85,12 +87,20 @@ export interface PendingLearn extends PendingBase {
   proposals: LearnProposal[];
 }
 
+/** A ZABAL Gamez community submission under steward review (doc 781 Phase 2). */
+export interface PendingBonfireSubmission extends PendingBase {
+  kind: 'bonfire-submission';
+  /** The submission under review + its exact raw string (for LREM). */
+  entry: QueueEntry;
+}
+
 export type PendingApproval =
   | PendingPlan
   | PendingPlanGate
   | PendingReflexion
   | PendingAwaitReflection
-  | PendingLearn;
+  | PendingLearn
+  | PendingBonfireSubmission;
 
 export interface ApprovalReply {
   /**
@@ -123,6 +133,7 @@ const APPROVAL_BEARING_KINDS: ReadonlySet<PendingKind> = new Set<PendingKind>([
   'plan-gate',
   'reflexion',
   'learn',
+  'bonfire-submission',
 ]);
 
 /** Human-readable label for a pending kind, for refuse-when-busy messages. */
@@ -138,6 +149,8 @@ export function pendingKindLabel(kind: PendingKind): string {
       return 'evening reflection';
     case 'learn':
       return 'learning-proposal approval';
+    case 'bonfire-submission':
+      return 'ZABAL Bonfire submission review';
   }
 }
 

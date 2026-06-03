@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-06-03 | Jose Acabrera (Joseph Goats) x Zaal - ZAO contributor onboarding | ZAO Devz | Zaal, Jose Acabrera | [795](795-jose-acabrera-onboarding-zao-contributor/) | 6 |
 | 2026-05-31 | Iman x Zaal - Request for Collaborators walkthrough | ZAO Devz | Zaal, Iman | [779](779-iman-zaal-request-for-collaborators-may31/) | 3 |
 | 2026-05-30 11:01 | kmac.eth x Zaal - ZABAL Games + Farcaster distribution + JFS-signer ask | Farcaster / ZABAL Games | Zaal, kmac.eth | [788](788-kmac-zabal-farcaster-distribution-may30/) | 3 |
 | 2026-05-29 17:03 | Iman x Zaal - Discord bot setup walkthrough | ZAO Devz | Zaal, Iman | [787](787-iman-discord-bot-setup-may29/) | 3 |

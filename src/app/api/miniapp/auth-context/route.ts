@@ -7,6 +7,12 @@
  * gating an invite-only community where the alternative is a SIWF prompt
  * every miniapp launch. For sensitive ops, keep using /api/miniapp/auth
  * (QuickAuth/JWT-verified).
+ *
+ * HARDENED 2026-06: this path NEVER grants isAdmin (saveSession allowAdmin:false)
+ * because the FID is unsigned. Admin only comes from the JWT-verified sibling.
+ * TODO: consolidate both routes onto QuickAuth JWT (sdk.quickAuth.fetch) to also
+ * close the unsigned-FID account-impersonation surface — needs a real
+ * miniapp-launch test before flipping the client.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -47,12 +53,18 @@ export async function POST(req: NextRequest) {
     }
 
     if (hasAccess) {
-      await saveSession({
-        fid,
-        username: neynarUser.username || '',
-        displayName: neynarUser.display_name || '',
-        pfpUrl: neynarUser.pfp_url || '',
-      });
+      // SECURITY: the FID here is UNSIGNED (client-supplied). Never grant admin
+      // from this path — otherwise POSTing the public admin FID would mint an
+      // admin session. Admin requires the JWT-verified /api/miniapp/auth path.
+      await saveSession(
+        {
+          fid,
+          username: neynarUser.username || '',
+          displayName: neynarUser.display_name || '',
+          pfpUrl: neynarUser.pfp_url || '',
+        },
+        { allowAdmin: false },
+      );
     }
 
     return NextResponse.json({

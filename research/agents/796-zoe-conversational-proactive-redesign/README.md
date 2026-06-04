@@ -1,9 +1,9 @@
 ---
 topic: agents
 type: design-proposal
-status: proposed (needs Zaal greenlight before build — per CLAUDE.md "no new ZOE loop without a doc")
+status: refined-with-zaal-2026-06-04 (4 design decisions locked; needs build greenlight — per CLAUDE.md "no new ZOE loop without a doc")
 last-validated: 2026-06-04
-related-docs: "601, 604, 759, 770, 781"
+related-docs: "601, 604, 734, 759, 770, 781"
 original-query: "make ZOE more of a back-and-forth conversational bot that reminds me at the right times"
 tier: STANDARD (codebase audit of bot/src/zoe outbound + external research synthesis)
 ---
@@ -63,6 +63,33 @@ The chief-of-staff product crop (Lindy, Dex) confirms it: the felt magic is
 **memory of open loops + a gate on the push channel**, not fancier scheduled
 content.
 
+## Decisions locked (Zaal, 2026-06-04)
+
+These four choices override the generic defaults in the original draft and steer
+the moves below:
+
+1. **No daily cap — the relevance threshold is the only gate.** ZOE speaks
+   whenever a candidate thought clears the interrupt threshold; there is no quota
+   backstop. *Implication:* the threshold (plus its observability and
+   dialogue-tuning) is now the entire safety mechanism against drift back to
+   noise. The **morning brief stays an always-on floor** so "too quiet" has a
+   guaranteed anchor; everything else is threshold-gated.
+2. **Post-drafts: silent generation + one daily batch notice + `/drafts` pull.**
+   ZOE drafts in the background, sends exactly one "*N drafts ready — `/drafts` to
+   review*" per day, and Zaal pulls on demand. No per-draft pushes, no resends
+   (`MAX_RESENDS=0`). This kills the single loudest channel while preserving the
+   build-in-public flow.
+3. **Proactive triggers: commitment follow-ups + calendar/meetings + went-quiet
+   check-ins.** PR/CI events are deferred (not in the first trigger set).
+   Inbox/research-queue items fold into the morning brief rather than firing their
+   own ping.
+4. **Bonfire is the memory backbone, and ZOE is a memory source for other
+   agents.** Open loops, commitments, decisions, and resolutions emit as Bonfire
+   episodes; Hermes / ZAO Devz / future agents query ZOE's memory *from the graph*
+   rather than from ZOE's private store. Operational hot-state (status, due dates,
+   nudge counts) stays in a fast local store; **Bonfire is the durable,
+   cross-agent layer** (see Move 2).
+
 ## The redesign — 3 moves
 
 ### Move 1 — Reasoning-tick gate replaces the content-cron (highest leverage)
@@ -70,25 +97,59 @@ Today: cron -> generate content -> send. New: cron (hourly) -> ZOE runs a
 **silent reasoning turn** through the concierge/memory path that loads memory
 blocks + open threads + calendar + recent inactivity and answers one question:
 *"Is there anything worth saying right now, and if so, the single best thing?"*
-Most ticks return `stay_silent`. Respects a hard **~3-4/day unsolicited budget**
-(replies to Zaal are free/unlimited); non-urgent thoughts are **deferred** and
-bundled into the next low-cost slot (e.g. the morning brief). The 7 post-drafts
-collapse to **one** opt-in "drafts ready — want to see them?" or a pull command
-`/drafts`. Expected effect: ~9+/day -> 2-4/day, each having cleared a relevance bar.
+Most ticks return `stay_silent`. **No daily quota** (per Decision 1) — a thought
+ships iff it clears the **interrupt threshold**, so the threshold is the sole
+control and must be observable + tunable in dialogue (see Move 3). Replies to
+Zaal are always free/unlimited. Non-urgent thoughts that *don't* clear the bar
+are **deferred** and bundled into the next low-cost slot (e.g. the morning brief,
+which is the always-on floor). The 7 post-drafts collapse per Decision 2: silent
+generation + one daily "*N drafts ready — `/drafts`*" notice + on-demand pull.
+Expected effect: ~9+/day -> a handful of high-relevance pushes, each past the bar.
 
-### Move 2 — Open-threads table (the continuity layer)
-A small store ZOE reads/writes each turn, separate from Bonfire (Bonfire =
-long-term recall; this = short-term open loops):
+> **Threshold-only safety (Decision 1 consequence):** with no quota backstop, a
+> mis-calibrated threshold can flood. Three guards replace the budget: (a) the
+> per-tick "single best thing" cap (≤1 push per hourly tick by construction);
+> (b) a logged `silence_rate` metric so a too-low threshold is visible within a
+> day; (c) a soft self-throttle — if N pushes go unacked in a window, ZOE raises
+> its own threshold and surfaces "I've been chatty — want me to dial back?"
+> rather than waiting for Zaal to complain.
+
+### Move 2 — Two-layer memory: hot open-threads store + Bonfire backbone (the continuity layer)
+Per Decision 4, continuity is **two layers, not one**:
+
+**Layer A — hot operational store** (`threads.json`, ~/.zao/zoe/). The state
+machine for live loops — fast, atomic, transactional. Holds the fields the gate
+and escalation logic mutate every tick:
 ```
 open_threads(id, summary, source_turn, created_at, due_at|null,
              status: open|snoozed|done|dropped, last_nudged_at,
-             nudge_count, snooze_until)
+             nudge_count, snooze_until, bonfire_episode_id|null)
 ```
-When Zaal says "I'll ship the onepager today," ZOE writes a thread `due_at=tonight`.
-A later reasoning tick sees it past-due + unacked -> *"you said you'd ship the
-onepager today — did it land?"* **Rule: a proactive message must open a new
-thread or advance an existing one — never a context-free template.** This single
-mechanism manufactures the "it's paying attention" feeling.
+This layer must **not** live in Bonfire — status transitions / due-date math /
+nudge counters are transactional hot-state, wrong shape for a knowledge graph.
+
+**Layer B — Bonfire (durable, cross-agent memory).** On meaningful transitions
+(thread *opened*, *resolved*, *dropped*, key *decision* captured), ZOE emits a
+natural-language episode to the ZABAL Bonfire graph and stores the returned
+`bonfire_episode_id` on the hot row. Bonfire becomes the **long-term, queryable,
+cross-agent** record — and this is what makes **ZOE a memory source for other
+agents**: Hermes / ZAO Devz / future agents recall "what did Zaal commit to" or
+"what was decided about X" by querying the graph, not ZOE's private files. ZOE
+reads its own deeper history back from Bonfire too (the concierge already has
+Bonfire recall — `concierge.ts`), so continuity survives a wiped `threads.json`.
+
+Flow: Zaal says "I'll ship the onepager today" -> ZOE writes a hot thread
+`due_at=tonight` **and** emits a Bonfire episode ("Zaal committed to shipping the
+onepager 2026-06-04"). A later tick sees it past-due + unacked -> *"you said
+you'd ship the onepager today — did it land?"* On "done", ZOE flips the hot row
+**and** emits a resolution episode. **Rule: a proactive message must open a new
+thread or advance an existing one — never a context-free template.** This is the
+mechanism that manufactures the "it's paying attention" feeling; routing it
+through Bonfire is what lets the rest of the stack feel it too.
+
+> Episodes are written via the existing `/bonfire` skill path (SSH to VPS; the
+> API key never touches local). Episode bodies are prose summaries — see the
+> PII/secret scan requirement in Tradeoffs before any emit ships.
 
 ### Move 3 — Ack / snooze / escalate + conversational tuning
 Every push carries an implicit ack contract. Replies ("done" / "not yet" / "stop
@@ -104,11 +165,12 @@ that thread class. Dismissals are silent negative signal.
 | New piece | Where | Note |
 |-----------|-------|------|
 | Reasoning-tick (`shouldSpeak`) | new `proactive.ts`, called by `scheduler.ts` hourly | runs the concierge/memory path; returns `{speak:bool, message?, threadOp?}` |
-| Open-threads store | new `threads.ts` (~/.zao/zoe/threads.json) | mirrors the `approvals.ts`/`pending.ts` file-store pattern + the `claimFire` O_EXCL guard |
-| Daily budget + threshold | memory block (`~/.zao/zoe/`) | read by the tick, tunable in dialogue |
+| Open-threads store (Layer A) | new `threads.ts` (~/.zao/zoe/threads.json) | hot transactional state; mirrors `approvals.ts`/`pending.ts` + `claimFire` O_EXCL guard; carries `bonfire_episode_id` |
+| Bonfire emit (Layer B) | new `threads.ts` -> existing `/bonfire` skill path (SSH) | episode on thread open/resolve/drop + key decisions; makes ZOE a cross-agent memory source; PII/secret-scan before POST |
+| Interrupt threshold + observability | memory block (`~/.zao/zoe/`) | **the sole gate** (no quota); tunable in dialogue; logs `silence_rate` + unacked-count for the self-throttle |
 | Reflection -> 1 contextual question | `reflect.ts` | pick the single most relevant open thread; fixed list -> fallback only |
-| Post-drafts -> opt-in | `posts/scheduler.ts` + `pending.ts` | `MAX_RESENDS=0`; bundle/`/drafts` pull |
-| Event triggers | reuse the GitHub webhook (`bot/src/.../github`) + calendar/inbox deltas | feed the reservoir instead of cron |
+| Post-drafts -> silent + daily batch | `posts/scheduler.ts` + `pending.ts` | `MAX_RESENDS=0`; 1 daily "N drafts ready" + `/drafts` pull |
+| Event triggers | calendar deltas + inactivity timer + commitment due-dates | the 3 chosen triggers feed the reservoir; PR/CI webhook deferred to a later phase |
 
 ## Phased plan
 
@@ -116,22 +178,41 @@ that thread class. Dismissals are silent negative signal.
   nag; collapse 7 post-drafts into one opt-in message / `/drafts`. ~halves daily
   volume immediately, no architecture change. Add the missing O_EXCL in-flight
   guard to the posts tick.
-- **Phase 1:** open-threads store + route the reflection through it (one
-  contextual question that references an open loop). First taste of back-and-forth.
-- **Phase 2:** the reasoning-tick gate + daily budget + bounded deferral. The big
+- **Phase 1:** open-threads store (Layer A) **+ Bonfire emit (Layer B)** + route
+  the reflection through it (one contextual question referencing an open loop).
+  First taste of back-and-forth; ZOE becomes a cross-agent memory source from day
+  one of the continuity layer (Decision 4).
+- **Phase 2:** the reasoning-tick gate + **interrupt threshold (no quota)** +
+  bounded deferral + the threshold observability/self-throttle guards. The big
   broadcast -> conversational lever.
-- **Phase 3:** event triggers (PR/CI/calendar/inbox/inactivity) feed the reservoir;
-  ack/snooze/escalate state machine; conversational frequency tuning.
+- **Phase 3:** the 3 chosen event triggers (commitment due-dates, calendar/meeting
+  deltas, went-quiet inactivity) feed the reservoir; ack/snooze/escalate state
+  machine; conversational frequency tuning. PR/CI triggers deferred to a later
+  phase once the trigger framework is proven.
 
 ## Tradeoffs / risks
-- A reasoning tick that defaults silent could go *too* quiet — needs a floor
-  (e.g. always-deliver the morning brief) + observability on "ticks that chose
-  silence" to tune the threshold.
+- **No quota backstop (Decision 1) cuts both ways.** A reasoning tick that defaults
+  silent could go *too* quiet — mitigated by the always-on morning-brief floor +
+  the logged `silence_rate`. But it could also go *too loud* if the threshold is
+  mis-set, since nothing caps the day. The three guards in Move 1 (per-tick single-
+  push cap, silence-rate observability, unacked self-throttle) are load-bearing,
+  not nice-to-haves — they replace the budget entirely.
+- **Bonfire emit adds a PII/secret-leak surface (per `.claude/rules/pii-hygiene.md`
+  + `secret-hygiene.md`).** Episode bodies are graph-wide queryable by every agent,
+  so this is the highest-leakage path in the stack. ZOE's emit MUST run the PII
+  regex set + the secret-scan patterns before any POST and SKIP on match — the
+  `BonfireMemory` adapter (doc 734) does *not* yet scan PII; that gap must close
+  before/with this work, not after.
 - Open-threads inference (turning "I'll ship X" into a thread) is LLM-extracted —
-  needs a light review/undo so it doesn't track phantom commitments.
-- Per-process state (budget, threads) must use the atomic file-write pattern
-  (`claimFire`) the brief/reflect schedulers already use — the posts machine's
-  missing guard is exactly the bug that bunches resends.
+  needs a light review/undo so it doesn't track phantom commitments **or emit a
+  phantom Bonfire episode** (an undo must also retract/supersede the episode).
+- Per-process state (threshold block, threads) must use the atomic file-write
+  pattern (`claimFire`) the brief/reflect schedulers already use — the posts
+  machine's missing guard is exactly the bug that bunches resends.
+- **Bonfire is on the VPS, reachable only via SSH** — emits can fail when the VPS
+  is down. The hot store (Layer A) is the source of truth for live behavior; a
+  failed emit is queued/retried, never blocks the reminder. Continuity degrades
+  gracefully to local-only if Bonfire is unreachable.
 
 ## Sources
 Horvitz CHI'99 (Mixed-Initiative UIs / bounded deferral); Inner Thoughts CHI'25

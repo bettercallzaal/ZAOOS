@@ -1,29 +1,82 @@
 # Events
 
-> Session logs, ship logs, status snapshots, bootcamps, quarterly wins, and ZAO Stock festival planning.
+> Session logs, ship logs, status snapshots, bootcamps, quarterly wins, meeting/call recaps, and ZAO Stock / ZABAL Games / festival planning.
 
 | # | Title | Type | Summary |
 |---|-------|------|---------|
-| 201 | [AI, Creator Economy & Web3 Landscape (March 2026)](./201-ai-creator-economy-landscape-march-2026/) | STANDALONE | 11 external signals — AI art DAOs, Suno 5.5, creator credentialing, NVIDIA agent tooling |
-| 207 | [ZAO VPS Agent Stack Session Log](./207-zao-vps-agent-stack-session-log/) | EVENT/LOG | Everything deployed on the ZAO VPS, how systems connect, and the roadmap |
-| 240 | [Farcaster Agentic Bootcamp (Builders Garden)](./240-farcaster-agentic-bootcamp-builders-garden/) | EVENT/LOG | Live session coverage of the Builders Garden / urbe eth bootcamp series |
-| 241 | [Q1 2026 Big Wins](./241-q1-2026-big-wins/) | EVENT/LOG | All Q1 2026 wins for The ZAO community — content series foundation |
-| 254 | [ZOE Agent Ecosystem Status](./254-zoe-agent-ecosystem-status/) | EVENT/LOG | Living document of ZOE agent ecosystem status from VPS workspace dump |
-| 257 | [ZOE Ship Log: Apr 3 2026](./257-zoe-ship-log-apr-3-2026/) | EVENT/LOG | Ship log documenting ZOE's April 3 operations |
+| 201 | [AI, Creator Economy & Web3 Landscape (March 2026)](./201-ai-creator-economy-landscape-march-2026/) | STANDALONE | 11 external signals — AI art DAOs, Suno 5.5, creator credentialing, NVIDIA agent tooling, AI filmmaking, Ethereum infra |
+| 207 | [ZAO VPS Agent Stack Session Log](./207-zao-vps-agent-stack-session-log/) | EVENT/LOG | Everything deployed on the ZAO VPS, how systems connect, roadmap to community-managed agent infra |
+| 240 | [Farcaster Agentic Bootcamp (Builders Garden)](./240-farcaster-agentic-bootcamp-builders-garden/) | EVENT/LOG | Live coverage of the Builders Garden / urbe.eth Farcaster bootcamp series |
+| 241 | [Q1 2026 Big Wins](./241-q1-2026-big-wins/) | EVENT/LOG | All Q1 2026 wins for The ZAO — content series foundation |
+| 254 | [ZOE Agent Ecosystem Status (Apr 3 2026)](./254-zoe-agent-ecosystem-status/) | EVENT/LOG | Living status of the ZOE agent ecosystem from VPS workspace dump |
+| 257 | [ZOE Ship Log: Apr 3 2026](./257-zoe-ship-log-apr-3-2026/) | EVENT/LOG | Ship log of ZOE's April 3 operations |
 | 265 | [ClawDown Poker Agent (ZOE)](./265-clawdown-poker-agent/) | EVENT/LOG | ZOE competing live in the ClawDown poker agent challenge |
-| 270 | [ZAO Stock Planning](./270-zao-stock-planning/) | EVENT/LOG | ZAO Stock festival planning and knowledge base (October 2026) |
-| 274 | [ZAO Stock Team Deep Profiles](./274-zao-stock-team-deep-profiles/) | EVENT/LOG | Comprehensive profiles of every ZAO Stock team member |
-| 316 | [Agentic Bootcamp Week 2 Deep Dive](./316-farcaster-agentic-bootcamp-week2-deep-dive/) | CANONICAL | Sessions 6-9 full transcripts: Privy wallets, x402/MPP commerce, Emerge viral loop, ERC-8004 identity |
-| 317 | [Agentic Bootcamp Week 1 Transcripts](./317-farcaster-agentic-bootcamp-week1-transcripts/) | CANONICAL | Sessions 1-6 full transcripts: building blocks, miniapps, agents 101, memory/context, wallets, deploy |
-| 326 | [Agentic Bootcamp Complete Session Guide](./326-agentic-bootcamp-complete-session-guide/) | CANONICAL | All 10 sessions inventoried, cross-referenced across 6 docs, every technique extracted for ZABAL agent swarm |
-| 418 | [Birding Man Festival Analysis](./418-birding-man-festival-analysis/) | STANDALONE | Propagate/Ramble On Farm festival as reference model for ZAOstock — Year 1 cheap wins vs Year 2+ ideas |
-| 423 | [Music x Crypto Connect Sesh — Apr 17 (WaveWarZ x BCZ Strategies)](./423-music-x-crypto-connect-sesh-apr17/) | STANDALONE | X Space recap: 0.9049 SOL live music trades, 10 speakers. Sunday Scary vs Stormy battle. Weekly ritual + routine cadence proposal. |
-| 425 | [ZAOstock Dashboard UI: Six Sigma + Kanban](./425-zaostock-dashboard-ui-lean-kanban-patterns/) | STANDALONE | Lean visual management + modern PM tool UI patterns for /stock/team redesign |
-| 428 | [ZAOstock Run-of-Show Program](./428-zaostock-run-of-show-program/) | STANDALONE | Day-of schedule draft: music sets + WaveWarZ bracket + 5 short talks, with 5-10 min flex transitions between every block |
-| 456 | [FarmDrop x SoulBenders May 24 + Hannah Semler Interview](./456-farmdrop-soulbenders-may24-hannah-interview/) | STANDALONE | BCZ Yapz interview prep for Hannah Semler (record Apr 21-23 before she leaves for CA/Spain) + May 24 benefit event playbook: 10 interview questions, 7-touchpoint content calendar, Food for Health messaging, SoulBenders/Blue Hill context, $150K USDA SARE grant bridge framing |
-| 457 | [FarmDrop Hannah Voice Memo Deep Brief + May 24 Full Run-of-Show](./457-farmdrop-hannah-voice-memo-event-brief/) | CANONICAL | Extends 456 with full source extraction from Hannah's voice memo: 5 confirmed FFH partner orgs (Healthy Island Project, Friendship Cottage, Simmering Pot, Conscious Cafe, Healthy Acadia Grange), 3 donation mechanics (2% auto + round-up + Buy-One-Donate-One), May 24 run-of-show (talks/panel/films/dance), platform migration announcement (new tech May 24), FarmDrop event series (May 9 Reversing Falls + Aug 6 Sassafras), 20+ pull quotes, 10 ready-to-schedule social posts, updated content calendar |
-| 472 | [ZAOstock Artist Lockin Timeline](./472-zaostock-artist-lockin-timeline/) | STANDALONE | Internal artist confirmation milestones with Sep 3 hard cutoff — 1 month before Oct 3 festival |
-| 473 | [Road to ZAOstock Magnetic Portal](./473-road-to-zaostock-magnetic-portal/) | STANDALONE | Tyler Stambaugh spec: weekly Magnetic drip content series leading up to Oct 3 |
-| 476 | [ZAOstock Apr 22 Team Recap](./476-zaostock-apr22-team-recap/) | BROADCAST | Full team recap of Apr 21 meeting: 17 teammates, contributor path locked, hybrid meetings start Apr 28 |
-| 477 | [ZAOstock Dashboard Notion Replacement (170-Day Build)](./477-zaostock-dashboard-notion-replacement/) | STANDALONE | Audit of built-vs-missing on /stock/team, 4 new tables, 5-phase MVP spec to fully retire Notion by Oct 3 |
-| 599 | [Inbox Digest 2026-05-03](./599-inbox-digest-2026-05-03/) | BROADCAST | 8-message inbox processed. Reddit `.json` scrape pattern confirmed. Sub-docs: 599a (music distribution AI block), 599b (GMFC101 + Word-A-Day), 599c (Hermes Agent prior art), 599d (DFOS update). |
+| 270 | [ZAO Stock Planning & Knowledge Base](./270-zao-stock-planning/) | EVENT/LOG | 500–1,000 attendees, experience-first festival; on-chain tools power logistics/payments/memorabilia |
+| 274 | [ZAO Stock Team Deep Profiles](./274-zao-stock-team-deep-profiles/) | EVENT/LOG | Profiles of every ZAO Stock team member — backgrounds, capabilities, web presence |
+| 294 | [Event Coordinator AI Agents](./294-event-coordinator-ai-agents/) | STANDALONE | Research on AI agents for event coordination |
+| 316 | [Agentic Bootcamp Week 2 Deep Dive](./316-farcaster-agentic-bootcamp-week2-deep-dive/) | CANONICAL | Week 2 (Apr 6-10): agent setup, x402/MPP payments, viral distribution, ERC-8004, Quilibrium multi-agent |
+| 317 | [Agentic Bootcamp Week 1 Transcripts](./317-farcaster-agentic-bootcamp-week1-transcripts/) | CANONICAL | Week 1: 238-participant bootcamp — building blocks, miniapps, agent architecture, context, wallets, deploy |
+| 326 | [Agentic Bootcamp Complete Session Guide](./326-agentic-bootcamp-complete-session-guide/) | CANONICAL | All 10 sessions inventoried + cross-referenced; every technique extracted for the ZABAL agent swarm |
+| 364 | [ZAO Festivals Deep Research](./364-zao-festivals-deep-research/) | STANDALONE | Everything for the ZAOstock sponsor pitch — operations, comparable events, funding, local context |
+| 369 | [DreamEvent.ai Framework Gap Analysis](./369-dreamevent-framework-gap-analysis/) | STANDALONE | Reverse-engineer DreamEvent.ai's event-planning framework to find ZAOstock gaps |
+| 418 | [Birding Man Festival Analysis](./418-birding-man-festival-analysis/) | STANDALONE | Ramble On Farm festival (May 1-2 2026, Trumansburg NY) as a reference model for ZAOstock |
+| 423 | [Music x Crypto Connect Sesh — Apr 17](./423-music-x-crypto-connect-sesh-apr17/) | EVENT/LOG | WaveWarZ × BCZ X Space recap — speakers, signal, weekly-ritual cadence proposal |
+| 425 | [ZAOstock Dashboard UI: Six Sigma + Kanban](./425-zaostock-dashboard-ui-lean-kanban-patterns/) | STANDALONE | Lean visual-management + modern PM-tool patterns for the `/stock/team` redesign |
+| 428 | [ZAOstock Run-of-Show Program](./428-zaostock-run-of-show-program/) | STANDALONE | Day-of program: ~15-min content blocks + 5-10 min transitions, WaveWarZ bracket, short talks, slippage buffers |
+| 433 | [ZAO Media Capture Pipeline Spec](./433-zao-media-capture-pipeline-spec/) | STANDALONE | Structured media-capture pipeline for ZAOstock + every future ZAO event (closes doc 432 media-loss gap) |
+| 442 | [WaveWarZ Sunday Battle Recap Socials — Apr 20](./442-wavewarz-sunday-battle-recap-socials/) | EVENT/LOG | Cross-platform recap drafts for the Sunday featured battle — Scary vs Stormy, HadeZ Throne |
+| 443 | [ZAOstock Sponsor Pitch Drafts](./443-zao-stock-sponsor-pitch-drafts/) | STANDALONE | Three-tier sponsor pitch emails for ZAOstock Year 1, tailored by budget + audience |
+| 445 | [ZAOstock Monday Progress Report (Apr 20)](./445-zao-stock-monday-apr20-report/) | EVENT/LOG | ZAOstock weekly progress report |
+| 456 | [FarmDrop x SoulBenders May 24 + Hannah Interview](./456-farmdrop-soulbenders-may24-hannah-interview/) | STANDALONE | BCZ Yapz interview prep for Hannah Semler + May 24 benefit event playbook |
+| 457 | [FarmDrop Hannah Voice Memo Brief + Run-of-Show](./457-farmdrop-hannah-voice-memo-event-brief/) | CANONICAL | Full source extraction from Hannah's voice memo + May 24 run-of-show, FFH partners, donation mechanics |
+| 458 | [FarmDrop Statewide Expansion + Sam Lardner Collab](./458-farmdrop-statewide-expansion-sam-lardner-collab/) | STANDALONE | FarmDrop statewide expansion, Sam Lardner & Barcelona collab, Maine follow-up todos |
+| 472 | [ZAOstock Artist Lockin Timeline](./472-zaostock-artist-lockin-timeline/) | STANDALONE | Lockin timeline for the Oct 3 lineup — "1 month before or your spot goes" policy |
+| 473 | [Road to ZAOstock Magnetic Portal](./473-road-to-zaostock-magnetic-portal/) | STANDALONE | Tyler Stambaugh spec: weekly Magnetic drip → day-of scavenger hunt → post-event artifact |
+| 476 | [ZAOstock Apr 22 Team Recap](./476-zaostock-apr22-team-recap/) | BROADCAST | Apr 21 meeting recap — 17 teammates, contributor path locked, hybrid meetings start Apr 28 |
+| 477 | [ZAOstock Dashboard Notion Replacement (170-Day Build)](./477-zaostock-dashboard-notion-replacement/) | STANDALONE | Built-vs-missing audit on `/stock/team`, 4 new tables, 5-phase MVP to retire Notion by Oct 3 |
+| 499 | [Music Festival & Artist Collective Governance](./499-music-festival-collective-governance/) | STANDALONE | Real-world flat-team governance models for music festivals + artist collectives |
+| 504 | [ZAOstock Aug 15 Mini-Festival Dry Run](./504-aug15-dryrun-planning/) | EVENT/LOG | De-risk Oct 3 with a 4-hour scaled run + all 19 team members — circles governance + tech under load [ARCHIVE] |
+| 599 | [Inbox Digest 2026-05-03](./599-inbox-digest-2026-05-03/) | BROADCAST | 8-message inbox processed; Reddit `.json` scrape pattern. Sub-docs 599a-d |
+| 608 | [WaveWarZ Africa x Ram (Songchain) x COC — May 4](./608-wavewarz-africa-ram-songchain-may4/) | EVENT/LOG | Cross-continent collab call — Ram (Zambia/Songchain), Z+Rev (COC, UK/Wales), Zaal |
+| 609 | [ZAOstock Co-Build May 4 — Six-Circle Lock](./609-zaostock-cobuild-six-circles-may4/) | EVENT/LOG | Cobuild w/ Sean (Web3Metal) + DQ (Decoup) — six-circle team structure locked, front-page push |
+| 630 | [ZABAL Games Season 1: Vibe-Coding Challenge](./630-zabal-games-claude-code-hackathon-v0/) | STANDALONE | Farcaster-creator onboarding event — open build-a-thon → 8-builder/8-mentor Finals |
+| 654 | [ZABAL Games + Empire V3: yerbearzerker Meeting](./654-zabal-games-empire-v3-yerbearzerker-meeting/) | EVENT/LOG | Jordan + Iman + Zaal — June/July/Aug timeline; finalists make tokenless Empires, optionally Ascend w/ Clanker airdrop |
+| 670 | [Iman Call May 18 — ZAO Craig + PizzaDAO Zambia](./670-iman-call-may18-craig-pizzadao/) | EVENT/LOG | ZAO Craig auto-todo bot idea, PizzaDAO Zambia (May 23) financing, ZABAL Games signup drop (May 20) |
+| 674 | [Edge Esmeralda + Telamon Ardavanis Outreach](./674-edge-esmeralda-artizen-telamon-outreach/) | STANDALONE | 1:1 brief + ready-to-send collab email — Telamon's Edge Esmeralda accepted into ZAO Fund (Artizen S6) |
+| 675 | [Tanja Fractal Book Call (May 18)](./675-tanja-fractal-book-call-may18/) | EVENT/LOG | Crowd-contributed book on communal living organized via ZAO Fractals + Fractal Circles |
+| 678 | [ZAOstock Advisor Call (May 19)](./678-zaostock-advisor-call-may19/) | EVENT/LOG | failoften advisor call — venue locked, ZABAL Games tournament, scribe bot, company structure, docs push |
+| 681 | [ZAOstock 5/19 Standup: New Build Initiatives](./681-zaostock-may19-new-build-initiatives/) | STANDALONE | Build-vs-buy on Z of All Games, NFC pro tickets/digital twins, ZAO Cards, ZAO Scribe, AI DAO voting agent |
+| 682 | [Ryan Kagy Limitless Call (May 12)](./682-ryan-kagy-limitless-call-may12/) | EVENT/LOG | Bonfires founder — origin of Option A/B partnership fork + agent architecture + ZOE-rebirth direction |
+| 684 | [ZAOstock Task Tracking + Six Circles](./684-zaostock-task-tracking-circles-connection/) | STANDALONE | Todos live in 3 disconnected stores, none linked to a circle — recommend FK + canonical-store split |
+| 686 | [Kane Brown "Miles On It" Festival Model](./686-kane-brown-miles-on-it-automotive-festival/) | STANDALONE | Artist-branded passion-festival model broken down for ZAO Festivals / ZAOstock |
+| 695 | [ZABAL Games Ecosystem Context Prompt](./695-zabal-games-context-prompt/) | CANONICAL | Paste-ready orientation prompt for ZABAL Games builders + their coding agents (15-agent audit) |
+| 700 | [Devcon 8 Mumbai Music Stage Co-Programming](./700-devcon-mumbai-music-stage-coprogramming/) | STANDALONE | Reply kit + brief on the Devcon music stage + Indian-artist landscape to pitch into |
+| 701 | [ZABAL Games Canonical State](./701-zabal-games-canonical-state/) | CANONICAL | Single source of truth (2026-05-21) folding docs 630/654/646 + 24 decisions from a structured interview |
+| 711 | [Arthur Intro: WaveWarZ Base Agentic Version](./711-arthur-wavewarz-base-call-may19/) | EVENT/LOG | Zaal + Sam + Arthur (Neynar) — incubator model, agentic WaveWarZ on Base, Arthur as contract collaborator |
+| 714 | [Tyler x Zaal: ZABAL Games + Road to ZAOstock](./714-tyler-zabal-zaostock-may22/) | EVENT/LOG | Cowork action-item tracker, ZABAL Games, road-to-ZAOstock campaign, Magnetic retention method |
+| 715 | [Session: /meeting Skill Upgrade + Diarization](./715-session-2026-05-22-meeting-skill-diarization/) | EVENT/LOG | `/meeting` skill → full local capture (transcription + frames + diarization); skill-drift bug fixed |
+| 718 | [kmac.eth: Farcaster Snaps + Ad Networks](./718-kmac-farcaster-snaps-ad-networks-may13/) | EVENT/LOG | Making Snaps a real distribution primitive — relax JFS, off-Farcaster embeds, community vs ad networks |
+| 719 | [Jordan Oram: ZABAL Games + Empire Builder v3](./719-jordan-empire-builder-zabal-games-may15/) | EVENT/LOG | Integrating Empire Builder v3 + Zlank into ZABAL Games, tokenless-empires, 3-month shape |
+| 720 | [ZAOstock Standup — May 19](./720-zaostock-standup-may19/) | EVENT/LOG | ZABAL Games launch, action-tracker consolidation, ZAOscribe, NFC cards, team reorg |
+| 721 | [ZAOstock Standup — May 12](./721-zaostock-standup-may12/) | EVENT/LOG | Routine standup + hard decision: musicians submit all requirements 1 month before Oct 3 or be replaced |
+| 725 | [ZAO Devz: Zee3 Onboard + Iman Hackathon Recap](./725-cannon-zabal-iman-hackathon-may23/) | EVENT/LOG | Brief Zee3 on ZABAL Games, debrief Iman's Lovable hackathon (45 builders), lock cowork tracker + Farcaster space |
+| 726 | [Session: Cowork Tracker Operational Pack](./726-session-2026-05-23-tracker-ops-pack/) | EVENT/LOG | Cowork tracker → full ops system; 7 PRs landed, sync bug closed at root, auto-test-task pattern locked |
+| 735 | [leewardbound Composite-Streaming Spec](./735-leewardbound-composite-streaming/) | STANDALONE | Prior art on browser-orchestrated composite video streaming for post-2026-06-02 pickup |
+| 736 | [Shriyash Soni Intro Call (May 23)](./736-shriyash-soni-intro-call-may23/) | EVENT/LOG | Apna Coding (India) — confirmed ZABAL Games presenter + hackathon submission rail + DevCon side-event |
+| 738 | [Vlad (singularity.diy): Fractal Governance](./738-vlad-singularity-fractal-call-may24/) | EVENT/LOG | Singularity mission w/ gas covered, Respect Game open-source codebase, liquid-token incentive layer rec |
+| 752 | [Leeward: WebRTC + Pion + LiveKit Handoff (May 25)](./752-leeward-x-zaal-webrtc-pion-livekit-handoff-may25/) | EVENT/LOG | Pion-era OG confirms doc 741's LiveKit pick, SFU vs MPU tradeoff, composite-stream pattern |
+| 753 | [ZAO Coworking Session — May 23](./753-may23-zaal-iman-thyrev-z3rodol-coworking/) | EVENT/LOG | 4-user coworking session, mostly idle / background music |
+| 753 | [ADVANCED Acronym (@pjdlifts Reel Capture)](./753-pjdlifts-advanced-acronym-reel-capture/) | STANDALONE | ADVANCED productivity framework captured from a Reel — source for the Zaal Productivity Planner |
+| 776 | [Duo Do: ZABAL Games Musician Talk Format](./776-duo-do-clementine-santiago-zabal-games-may23/) | EVENT/LOG | Pre-recorded musician-on-Farcaster presentation + live Q&A, slotted into June session calendar |
+| 777 | [Telamon Ardavanis: Edge Esmeralda Invite + Goa](./777-telamon-edge-esmeralda-may25/) | EVENT/LOG | Invite to Edge Esmeralda (June 2026) + the late-July Goa gathering |
+| 778 | [Tyler/Magnetic: ZABAL Games Build on Magnetic](./778-tyler-magnetic-zabal-games-build-may27/) | EVENT/LOG | Architecting the ZABAL Games magnet — cards, GitHub-auth judging, June 1 demo + AMA |
+| 779 | [Iman: Request for Collaborators Walkthrough](./779-iman-zaal-request-for-collaborators-may31/) | EVENT/LOG | Walkthrough of the Request for Collaborators flow |
+| 780 | [Adrian (Empire Builder): ZABAL Workshop](./780-adrian-empire-builder-zabal-workshop-may26/) | EVENT/LOG | June workshop on Empire Builder API (V3 endpoints, leaderboard, tokenless empire deploy) |
+| 782 | [Ven (The Open Machine): Catch-Up + Collab](./782-ven-open-machine-catchup-may27/) | EVENT/LOG | Mutual update — Crop Circle, mindz.fun, Gitcoin research-a-thon, Dark Forest |
+| 783 | [Tyler/Magnetic: ZABAL Games Magnet Built Live](./783-tyler-magnetic-zabal-magnet-build-may29/) | EVENT/LOG | Build-execution follow-on to doc 778 — the magnet now exists + Connector explainer recorded |
+| 784 | [Plat0x (Bonfires): GitHub→Bonfire Architecture](./784-plat0x-bonfire-zabal-architecture-may29/) | EVENT/LOG | Load-bearing design: ZABAL Games submission + judging spine with Bonfires as knowledge-graph backend |
+| 785 | [Jonathan Colton (FounderCheck): ZABAL Talks](./785-jonathan-colton-foundercheck-zabal-may29/) | EVENT/LOG | June ZABAL Games talks + FounderCheck live walkthrough (founder-validation / Farcaster-dev) |
+| 787 | [Iman: Discord Bot Setup Walkthrough](./787-iman-discord-bot-setup-may29/) | EVENT/LOG | Screen-share registering + configuring a Discord bot (OAuth, intents, install link) |
+| 788 | [kmac.eth: ZABAL Games + Farcaster Distribution](./788-kmac-zabal-farcaster-distribution-may30/) | EVENT/LOG | kmac's ZABAL Games talks, onboarding/distribution, JFS-signer softening ask, Quorum space test |
+| 795 | [Jose Acabrera (Joseph Goats): Contributor Onboarding](./795-jose-acabrera-onboarding-zao-contributor/) | EVENT/LOG | ZAO contributor onboarding session |
+| 796 | [The WIP Meetup: Web3 Metaverse Community](./796-the-wip-meetup-metaverse-community/) | STANDALONE | Longest-running web3 metaverse meetup (Thursdays since 2019, Hyperfy). Steal the weekly ritual + persistent 3D room; evaluate Hyperfy v2 (AI-agent NPCs) as the portal-hub venue; $HYPER attendance reward → Respect |

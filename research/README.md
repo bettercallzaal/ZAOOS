@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **202 active research documents** across 13 topic folders (79 superseded docs in `_archive/`) covering every aspect of building a decentralized social media platform for music.
+> **751+ active research documents** across 13 topic folders (77 superseded docs in `_archive/`, plus 12 legacy docs at the `research/` root and 9 daily inspiration logs) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy.
 
 ---
 
@@ -8,21 +8,21 @@
 
 | Topic | Docs | Description |
 |-------|------|-------------|
-| [Agents](./agents/) | 30 | OpenClaw, ZOE, frameworks, memory, orchestration, self-optimization |
-| [Music](./music/) | 40 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
-| [Dev Workflows](./dev-workflows/) | 37 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
-| [Infrastructure](./infrastructure/) | 24 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
-| [Community](./community/) | 19 | ZAO guide, whitepaper, onboarding, member profiles, task forces |
-| [Governance](./governance/) | 17 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
-| [Farcaster](./farcaster/) | 12 | Protocol, Mini Apps, XMTP, ecosystem, social graph |
-| [Cross-Platform](./cross-platform/) | 11 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
-| [Business](./business/) | 11 | Revenue, payments, strategy, Obsidian model, marketplace, FISHBOWLZ tokenization |
-| [Events](./events/) | 9 | Bootcamp, ZAO Stock, ship logs, big wins, status snapshots |
-| [Identity](./identity/) | 7 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph |
-| [WaveWarZ](./wavewarz/) | 4 | Prediction markets, artist pipeline, Solana PDAs |
-| [Security](./security/) | 3 | Audits, API verification, testing |
-| [Inspiration](./inspiration/) | 5 | Daily "steal like an artist" research — 3 apps analyzed per session, gap analysis |
-| [Archive](./_archive/) | 70 | Superseded docs (preserved for history) |
+| [Dev Workflows](./dev-workflows/) | 150 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
+| [Agents](./agents/) | 136 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization |
+| [Music](./music/) | 85 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
+| [Events](./events/) | 76 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
+| [Business](./business/) | 74 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
+| [Infrastructure](./infrastructure/) | 53 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
+| [Community](./community/) | 44 | ZAO guide, whitepaper, onboarding, member profiles, task forces, people/brands |
+| [Farcaster](./farcaster/) | 42 | Protocol, Mini Apps, XMTP, ecosystem, social graph, agentic bootcamp |
+| [Governance](./governance/) | 41 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
+| [Identity](./identity/) | 22 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph |
+| [Cross-Platform](./cross-platform/) | 15 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
+| [Inspiration](./inspiration/) | 9 | Daily "steal like an artist" research — apps analyzed per session, gap analysis |
+| [Security](./security/) | 7 | Audits, API verification, testing |
+| [WaveWarZ](./wavewarz/) | 6 | Prediction markets, artist pipeline, Solana PDAs |
+| [Archive](./_archive/) | 77 | Superseded docs (preserved for history) |
 
 ---
 
@@ -137,9 +137,9 @@
 
 ## Research Stats
 
-- **Active documents:** 202 (across 13 topic folders)
-- **Archived (superseded/merged):** 79 (in `_archive/`)
-- **Total coverage:** ~500,000+ words
-- **Time span:** January — April 2026
-- **Topic folders:** agents, music, dev-workflows, infrastructure, governance, community, cross-platform, farcaster, identity, business, wavewarz, security, events
-- **CANONICAL docs:** 42 (living references — see [279 Audit](./279-research-library-audit-reorganization/))
+- **Active documents:** 751 across 13 topic folders (+12 legacy docs at the `research/` root, +9 daily inspiration logs)
+- **Highest doc number:** 797
+- **Archived (superseded/merged):** 77 (in `_archive/`)
+- **Time span:** January — June 2026
+- **Topic folders:** dev-workflows, agents, music, events, business, infrastructure, community, farcaster, governance, identity, cross-platform, security, wavewarz
+- **CANONICAL docs:** 65+ (living references tagged in topic indexes — see [279 Audit](./279-research-library-audit-reorganization/))

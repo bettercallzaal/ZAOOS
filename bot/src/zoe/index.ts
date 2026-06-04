@@ -72,6 +72,14 @@ import {
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
 import { NOTE_PREFIX, PLAN_PREFIX, isZoeCommand } from './commands';
+import {
+  fetchPending,
+  removeFromQueue,
+  promoteSubmission,
+  renderSubmission,
+  queueConfigured,
+} from './bonfire-queue';
+import type { PendingBonfireSubmission } from './approvals';
 import { attachCaster, runCasterPipeline } from './caster';
 import { subscribeToCasts } from './farcaster/event-stream';
 
@@ -245,6 +253,20 @@ bot.callbackQuery(/^post-(approve|regen|skip):/, async (ctx) => {
     return;
   }
   await handlePostCallback({ ctx, repoDir, zaalTgId: zaalId });
+});
+
+// /bonfire — review the ZABAL Gamez community submission queue (doc 781 Phase 2).
+// v1 steward gate = Zaal's DM (the only allowed DM); BONFIRE_STEWARD_FIDS is the
+// forward-looking multi-steward list. Surfaces one pending item; reply y/n.
+bot.command('bonfire', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (!queueConfigured()) {
+    await ctx.reply(
+      'Bonfire queue not configured — set ZG_UPSTASH_REST_URL + ZG_UPSTASH_REST_TOKEN.',
+    );
+    return;
+  }
+  await showNextSubmission(ctx);
 });
 
 bot.command('notes', async (ctx) => {
@@ -799,6 +821,13 @@ async function doResolvePendingApproval(
   pending: PendingApproval,
   reply: ApprovalReply,
 ): Promise<void> {
+  // Bonfire submissions have their own promote/reject/LREM lifecycle (doc 781
+  // Phase 2) — route the whole decision there before the generic plan handling.
+  if (pending.kind === 'bonfire-submission') {
+    await resolveBonfireSubmission(ctx, pending, reply);
+    return;
+  }
+
   if (reply.decision === 'reject') {
     await clearPending(pending.chatScope);
     await ctx.reply('Cancelled. Nothing dispatched.');
@@ -839,6 +868,81 @@ async function doResolvePendingApproval(
       await clearPending(pending.chatScope);
       return;
   }
+}
+
+// --- ZABAL Bonfire submission queue (doc 781 Phase 2) ----------------------
+
+/** Fetch the queue and arm the oldest pending submission for y/n review. */
+async function showNextSubmission(ctx: Context): Promise<void> {
+  let pending;
+  try {
+    pending = await fetchPending();
+  } catch (err) {
+    await ctx.reply(`(bonfire queue read failed — ${(err as Error).message.slice(0, 160)})`);
+    return;
+  }
+  if (pending.length === 0) {
+    await ctx.reply('ZABAL Bonfire queue is empty — nothing to review.');
+    return;
+  }
+  // LPUSH puts newest at the head, so the last element is the oldest (FIFO).
+  const entry = pending[pending.length - 1];
+  const armed = await setPending({
+    kind: 'bonfire-submission',
+    chatScope: 'private',
+    createdAt: new Date().toISOString(),
+    entry,
+  });
+  if (!armed.armed) {
+    await ctx.reply(
+      `Can't review yet — you have a pending ${pendingKindLabel(armed.blockedBy!.kind)}. Resolve that first, then /bonfire.`,
+    );
+    return;
+  }
+  await replyChunked(ctx, renderSubmission(entry, pending.length));
+}
+
+/** Promote / reject one reviewed submission, then advance to the next. */
+async function resolveBonfireSubmission(
+  ctx: Context,
+  pending: PendingBonfireSubmission,
+  reply: ApprovalReply,
+): Promise<void> {
+  await clearPending(pending.chatScope);
+  const { item, raw } = pending.entry;
+  const who = item.username ? `@${item.username}` : `fid ${item.fid}`;
+
+  if (reply.decision === 'edit') {
+    // No meaningful "edit" for a submission — leave it queued, re-arm for y/n.
+    await setPending({
+      kind: 'bonfire-submission',
+      chatScope: 'private',
+      createdAt: new Date().toISOString(),
+      entry: pending.entry,
+    });
+    await ctx.reply('Left in the queue (submissions are promote/reject only — reply y or n).');
+    return;
+  }
+
+  if (reply.decision === 'reject') {
+    await removeFromQueue(raw).catch(() => 0);
+    console.log(`[zoe/bonfire] rejected ${item.id} from ${who}`);
+    await ctx.reply(`Rejected ${item.type} from ${who} — removed from the queue.`);
+    await showNextSubmission(ctx);
+    return;
+  }
+
+  // approve-all / approve-ids -> promote into the canonical graph.
+  const result = await promoteSubmission(item);
+  if (!result.ok) {
+    const why = result.skipped ?? result.error ?? 'unknown';
+    await ctx.reply(`Could not promote ${item.type} from ${who} (${why}). Left in the queue.`);
+    return;
+  }
+  await removeFromQueue(raw).catch(() => 0);
+  console.log(`[zoe/bonfire] promoted ${item.id} from ${who} to the graph`);
+  await ctx.reply(`✅ Promoted ${item.type} from ${who} to the ZABAL Bonfire graph.`);
+  await showNextSubmission(ctx);
 }
 
 /** Dispatch an approved plan with live Telegram progress, then report. */

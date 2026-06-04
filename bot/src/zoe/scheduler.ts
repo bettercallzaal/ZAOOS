@@ -21,11 +21,11 @@ import type { Bot } from 'grammy';
 import { generateMorningBrief } from './brief';
 import { generateEveningReflection } from './reflect';
 import { ZOE_PATHS } from './memory';
-import { nextNudge, nudgesEnabled } from './nudges';
+import { nextNudge, nudgesEnabled, nudgeCooldownElapsed, markNudgeSent } from './nudges';
 import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
-import { runReasoningTick, recordPush } from './proactive';
+import { runReasoningTick, recordPush, type Candidate } from './proactive';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 
@@ -132,62 +132,58 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
     ),
   );
 
-  // Hourly forward nudge - surfaces the real next move from the task queue.
-  // Per doc 648: a generic "be productive" cron does not work; the nudge has
-  // to name the actual next thing. Skips the 09:00 / 01:00 UTC slots so it
-  // never overlaps morning brief / evening reflect. Self-disables if Zaal
-  // sends "stop nudges" (handled in index.ts). Sends nothing on an empty
-  // queue - an empty ping is worse than no ping.
+  // doc 796 Move 1 — reasoning-tick gate (the single proactive channel). Runs
+  // hourly. Gathers candidate thoughts and speaks AT MOST the single best one,
+  // only if it clears the interrupt threshold. Most ticks stay silent. NO daily
+  // quota (Decision 1): the threshold + the unacked self-throttle inside
+  // runReasoningTick are the sole control.
+  //
+  // The old hourly task-queue nudge is FOLDED IN here (Zaal 2026-06-04) as one
+  // candidate among many, instead of its own unconditional cron — so it now
+  // competes with commitment threads and must clear the bar. It carries its own
+  // 4h cooldown (nudges.ts) so it stays occasional. Skips 09:00 / 01:00 UTC so
+  // it never collides with the morning brief / evening reflection. Also flushes
+  // any Bonfire emits queued while the graph was unreachable.
   tasks.push(
     cron.schedule(
       '0 * * * *',
       async () => {
         const hour = new Date().getUTCHours();
         if (hour === 9 || hour === 1) return; // dodge brief + reflect collisions
-        try {
-          if (!(await nudgesEnabled())) {
-            return;
-          }
-          const nudge = await nextNudge();
-          if (!nudge) return; // empty queue - skip
-          await opts.bot.api.sendMessage(opts.zaalTgId, nudge);
-          console.log(`[zoe/scheduler] hourly nudge sent (hour=${hour})`);
-        } catch (err) {
-          console.error('[zoe/scheduler] hourly nudge failed:', (err as Error).message);
-        }
-      },
-      { timezone: 'UTC' },
-    ),
-  );
 
-  // doc 796 Move 1 — reasoning-tick gate. Runs at :30 each hour (offset from
-  // the top-of-hour nudge). Gathers candidate thoughts (open commitment threads
-  // that are due/overdue, two-snooze decisions), scores them, and speaks AT
-  // MOST the single best one — only if it clears the interrupt threshold. Most
-  // ticks stay silent. NO daily quota (Decision 1): the threshold + the
-  // unacked self-throttle inside runReasoningTick are the sole control. Silent
-  // by default until commitment threads exist, so this adds zero noise on its
-  // own. Also flushes any Bonfire emits queued while the VPS/graph was down.
-  tasks.push(
-    cron.schedule(
-      '30 * * * *',
-      async () => {
         try {
           await flushEmitQueue();
         } catch (err) {
           console.warn('[zoe/scheduler] emit-queue flush failed (nbd):', (err as Error).message);
         }
+
+        // Build the task-queue nudge as a gate candidate (folded in). Only when
+        // nudges are enabled, the cooldown has elapsed, and the queue is non-empty.
+        const extraCandidates = async (): Promise<Candidate[]> => {
+          try {
+            if (!(await nudgesEnabled())) return [];
+            if (!(await nudgeCooldownElapsed())) return [];
+            const nudge = await nextNudge();
+            if (!nudge) return [];
+            // Score at the default threshold: it can fire when nothing outranks
+            // it, but any due/overdue commitment thread (>=0.75) wins the tick.
+            return [{ kind: 'task-nudge', score: 0.6, message: nudge }];
+          } catch {
+            return [];
+          }
+        };
+
         try {
-          const decision = await runReasoningTick();
+          const decision = await runReasoningTick({ extraCandidates });
           if (!decision.speak || !decision.message) return;
           await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
           if (decision.candidate) {
             await recordPush(decision.candidate);
-            // Advance the thread's nudge cooldown so it isn't re-surfaced next tick.
             if (decision.threadId) await markNudged(decision.threadId);
+            if (decision.candidate.kind === 'task-nudge') await markNudgeSent();
           }
           console.log(
-            `[zoe/scheduler] reasoning tick spoke (${decision.reason}, threshold=${decision.threshold})`,
+            `[zoe/scheduler] reasoning tick spoke (${decision.reason}, kind=${decision.candidate?.kind ?? 'n/a'}, threshold=${decision.threshold})`,
           );
         } catch (err) {
           console.error('[zoe/scheduler] reasoning tick failed:', (err as Error).message);

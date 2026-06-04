@@ -25,6 +25,10 @@ const RATE_LIMITS: [string, RateLimitConfig][] = [
   ['/api/fractals/webhook', { limit: 30, windowMs: MINUTE }],
   ['/api/fractals',         { limit: 20, windowMs: MINUTE }],
 
+  // Inbound webhooks (signed, but cap to blunt replay/DoS — see Alchemy hardening)
+  ['/api/webhooks',      { limit: 100, windowMs: MINUTE }],
+  ['/api/juke/webhooks', { limit: 100, windowMs: MINUTE }],
+
   // Users sub-routes
   ['/api/users/follow', { limit: 15, windowMs: MINUTE }],
   ['/api/users',        { limit: 20, windowMs: MINUTE }],
@@ -35,6 +39,7 @@ const RATE_LIMITS: [string, RateLimitConfig][] = [
   ['/api/proposals',         { limit: 5,  windowMs: MINUTE }],
 
   // Music sub-routes
+  ['/api/music/generate',    { limit: 5,  windowMs: 60 * MINUTE }], // expensive paid AI inference
   ['/api/music/submissions', { limit: 2,  windowMs: MINUTE }],
   ['/api/music/metadata',    { limit: 20, windowMs: MINUTE }],
   ['/api/music/radio',       { limit: 10, windowMs: MINUTE }],

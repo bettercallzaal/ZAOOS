@@ -22,8 +22,16 @@ export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
 
+    // Fail CLOSED: if no signing key is configured we cannot verify the sender,
+    // and this endpoint writes into the Respect system — so reject rather than
+    // process an unauthenticated payload (was previously skipped = fail-open).
+    if (SIGNING_KEYS.length === 0) {
+      logger.error('[alchemy-webhook] no signing key configured — rejecting');
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+    }
+
     // Validate HMAC signature — try all configured signing keys
-    if (SIGNING_KEYS.length > 0) {
+    {
       const signature = req.headers.get('x-alchemy-signature') || '';
       let valid = false;
 

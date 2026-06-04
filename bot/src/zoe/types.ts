@@ -107,6 +107,8 @@ export interface ConciergeResult {
   bot_relay_ops: BotRelayOp[];
   /** CRM ops - upsert a contact + log an interaction via the app API (doc 772). */
   crm_ops: CrmOp[];
+  /** Open-thread ops - track/advance commitments Zaal makes (doc 796 Move 2). */
+  thread_ops: ThreadOp[];
   /** Cost stats from Claude CLI call */
   inputTokens: number;
   outputTokens: number;
@@ -120,6 +122,20 @@ export type TaskOp =
   | { op: 'update'; id: string; patch: Partial<Pick<ZoeTask, 'status' | 'description' | 'priority' | 'notes'>> }
   | { op: 'complete'; id: string; outcome?: string }
   | { op: 'defer'; id: string; reason?: string };
+
+/**
+ * Open-thread ops (doc 796 Move 2). ZOE opens a thread when Zaal commits to
+ * something ("I'll ship X today"), and resolves/snoozes/drops it as the loop
+ * closes. `open` is the only op the concierge emits proactively; resolve/snooze/
+ * drop usually come from Zaal's reply to a nudge (handled in index.ts), but the
+ * concierge may also emit them when Zaal says "done with X" mid-conversation.
+ * `dueAt` is an ISO timestamp or a natural phrase the runtime resolves.
+ */
+export type ThreadOp =
+  | { op: 'open'; summary: string; dueAt?: string | null }
+  | { op: 'resolve'; id: string }
+  | { op: 'snooze'; id: string; untilHours?: number }
+  | { op: 'drop'; id: string };
 
 /** Cost-routing helper — match bot/src/hermes/claude-cli.ts ZOE-side defaults. */
 export const ZOE_DEFAULT_MODEL = process.env.ZOE_DEFAULT_MODEL ?? 'sonnet';

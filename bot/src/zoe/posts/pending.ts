@@ -13,7 +13,12 @@ const PENDING_FILE = join(POSTS_STATE_DIR, 'pending.json');
 
 export const PENDING_TTL_MS = 4 * 60 * 60_000; // 4 hours absolute
 export const RESEND_INTERVAL_MS = 30 * 60_000; // 30 minutes between resends
-export const MAX_RESENDS = 3;
+// doc 796 Phase 0 / Decision 2: resend nag killed. A draft is sent once and
+// waits; it never re-pings. With MAX_RESENDS=0, shouldResend() always returns
+// false, so an un-tapped draft simply expires via PENDING_TTL_MS. Removes the
+// single loudest symptom (one un-tapped draft → up to 4 messages) with no
+// change to POST/REGEN/SKIP handling.
+export const MAX_RESENDS = 0;
 
 export interface PendingDraft {
   id: string;

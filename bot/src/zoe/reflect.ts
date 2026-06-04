@@ -11,6 +11,27 @@
  */
 import { callClaudeCli } from '../hermes/claude-cli';
 import { listOpenTasks } from './tasks';
+import { listLiveThreads, isOverdue, type OpenThread } from './threads';
+
+/**
+ * doc 796 Move 1 — pick the single most relevant open commitment to anchor the
+ * reflection on (overdue first, then due-soonest, then most recent). When one
+ * exists, the reflection leads with ONE contextual question about it instead of
+ * the fixed survey. The 3-question list stays as the fallback.
+ */
+function pickReflectionThread(now: number = Date.now()): OpenThread | null {
+  const live = listLiveThreads(now).filter((t) => t.status === 'open' || t.status === 'snoozed');
+  if (live.length === 0) return null;
+  return [...live].sort((a, b) => {
+    const ao = isOverdue(a, now) ? 0 : 1;
+    const bo = isOverdue(b, now) ? 0 : 1;
+    if (ao !== bo) return ao - bo;
+    const ad = a.dueAt ? Date.parse(a.dueAt) : Number.MAX_SAFE_INTEGER;
+    const bd = b.dueAt ? Date.parse(b.dueAt) : Number.MAX_SAFE_INTEGER;
+    if (ad !== bd) return ad - bd;
+    return Date.parse(b.createdAt) - Date.parse(a.createdAt);
+  })[0];
+}
 
 const REFLECT_SYSTEM_PROMPT = `You are ZOE asking Zaal his evening reflection at 9pm EST.
 
@@ -78,14 +99,22 @@ export async function generateEveningReflection(opts: { repoDir: string; model?:
   const ctx = loadReflectContext(opts.repoDir);
   ctx.open_tasks = (await listOpenTasks()).slice(0, 5).map((t) => ({ priority: t.priority, title: t.title }));
 
+  const anchor = pickReflectionThread();
+  const anchorLine = anchor
+    ? `\n- Open commitment to anchor on: "${anchor.summary}"${anchor.dueAt && isOverdue(anchor) ? ' (past due)' : ''}`
+    : '';
+
   const userPrompt = `Generate Zaal's evening reflection for ${ctx.today}.
 
 Today's signals:
 - Recent commits: ${ctx.recent_commits.length ? ctx.recent_commits.slice(0, 3).join(' | ') : '(none)'}
 - Open PRs: ${ctx.recent_prs.length ? ctx.recent_prs.slice(0, 3).map((p) => `#${p.number}`).join(' ') : '(none)'}
-- Top open tasks: ${ctx.open_tasks.length ? ctx.open_tasks.slice(0, 3).map((t) => t.title).join(' | ') : '(none)'}
-
-Output the reflection prompt in the exact format from your system prompt. Reference 1-2 specifics from today.`;
+- Top open tasks: ${ctx.open_tasks.length ? ctx.open_tasks.slice(0, 3).map((t) => t.title).join(' | ') : '(none)'}${anchorLine}
+${
+  anchor
+    ? `\nLEAD with ONE contextual question about that open commitment ("${anchor.summary}") — did it land, what's blocking it, or is it tomorrow's first task. One question, conversational, not the 3-question survey. Then invite a free-form reply.`
+    : '\nOutput the reflection prompt in the exact format from your system prompt. Reference 1-2 specifics from today.'
+}`;
 
   const result = await callClaudeCli({
     model: opts.model ?? 'haiku',

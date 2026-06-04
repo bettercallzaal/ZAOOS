@@ -9,7 +9,7 @@
  * from PERSONA_DEFAULT in memory.ts on first boot, hand-editable after).
  */
 import { callClaudeCli } from '../hermes/claude-cli';
-import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp, CrmOp } from './types';
+import type { ConciergeOptions, ConciergeResult, TaskOp, QuestOp, ZoeCaptureNote, BotRelayOp, CrmOp, ThreadOp } from './types';
 import { selectModel, ZOE_DEFAULT_MODEL } from './types';
 import type { MemoryBlocks } from './memory';
 
@@ -64,6 +64,10 @@ function buildSystemBlocks(blocks: MemoryBlocks, currentDate: string, recallCont
     `<quests>`,
     blocks.quests,
     `</quests>`,
+    ``,
+    `<open_threads>`,
+    blocks.open_threads ?? '(no open threads)',
+    `</open_threads>`,
     ...recallBlock,
   ].join('\n');
 }
@@ -135,7 +139,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     bare: false,
   });
 
-  const { reply, taskOps, questOps, captures, botRelayOps, crmOps } = splitReplyAndOps(result.text);
+  const { reply, taskOps, questOps, captures, botRelayOps, crmOps, threadOps } = splitReplyAndOps(result.text);
 
   return {
     reply,
@@ -144,6 +148,7 @@ export async function runConciergeTurn(opts: ConciergeOptions): Promise<Concierg
     captures,
     bot_relay_ops: botRelayOps,
     crm_ops: crmOps,
+    thread_ops: threadOps,
     inputTokens: result.inputTokens,
     outputTokens: result.outputTokens,
     costUsd: result.totalCostUsd,
@@ -161,10 +166,11 @@ function splitReplyAndOps(text: string): {
   captures: ZoeCaptureNote[];
   botRelayOps: BotRelayOp[];
   crmOps: CrmOp[];
+  threadOps: ThreadOp[];
 } {
   const match = text.match(OPS_FENCE_RE);
   if (!match) {
-    return { reply: text.trim(), taskOps: [], questOps: [], captures: [], botRelayOps: [], crmOps: [] };
+    return { reply: text.trim(), taskOps: [], questOps: [], captures: [], botRelayOps: [], crmOps: [], threadOps: [] };
   }
   const jsonStr = match[1];
   const reply = text.replace(OPS_FENCE_RE, '').trim();
@@ -175,6 +181,7 @@ function splitReplyAndOps(text: string): {
       captures?: Array<{ text: string; topic: string }>;
       bot_relay_ops?: BotRelayOp[];
       crm_ops?: CrmOp[];
+      thread_ops?: ThreadOp[];
     };
     const captures: ZoeCaptureNote[] = (parsed.captures ?? []).map((c) => ({
       id: `cap-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -190,10 +197,11 @@ function splitReplyAndOps(text: string): {
       captures,
       botRelayOps: parsed.bot_relay_ops ?? [],
       crmOps: parsed.crm_ops ?? [],
+      threadOps: parsed.thread_ops ?? [],
     };
   } catch (err) {
     console.error('[zoe/concierge] failed to parse ops JSON:', (err as Error).message, 'raw:', jsonStr.slice(0, 200));
-    return { reply, taskOps: [], questOps: [], captures: [], botRelayOps: [], crmOps: [] };
+    return { reply, taskOps: [], questOps: [], captures: [], botRelayOps: [], crmOps: [], threadOps: [] };
   }
 }
 

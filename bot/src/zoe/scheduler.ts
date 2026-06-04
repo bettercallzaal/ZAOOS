@@ -25,6 +25,9 @@ import { nextNudge, nudgesEnabled } from './nudges';
 import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
+import { runReasoningTick, recordPush } from './proactive';
+import { markNudged } from './threads';
+import { flushEmitQueue } from './thread-memory';
 
 /** await-reflection waits overnight for Zaal's reply, so a 14h TTL not 30m. */
 const AWAIT_REFLECTION_TTL_MS = 14 * 60 * 60 * 1000;
@@ -151,6 +154,43 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           console.log(`[zoe/scheduler] hourly nudge sent (hour=${hour})`);
         } catch (err) {
           console.error('[zoe/scheduler] hourly nudge failed:', (err as Error).message);
+        }
+      },
+      { timezone: 'UTC' },
+    ),
+  );
+
+  // doc 796 Move 1 — reasoning-tick gate. Runs at :30 each hour (offset from
+  // the top-of-hour nudge). Gathers candidate thoughts (open commitment threads
+  // that are due/overdue, two-snooze decisions), scores them, and speaks AT
+  // MOST the single best one — only if it clears the interrupt threshold. Most
+  // ticks stay silent. NO daily quota (Decision 1): the threshold + the
+  // unacked self-throttle inside runReasoningTick are the sole control. Silent
+  // by default until commitment threads exist, so this adds zero noise on its
+  // own. Also flushes any Bonfire emits queued while the VPS/graph was down.
+  tasks.push(
+    cron.schedule(
+      '30 * * * *',
+      async () => {
+        try {
+          await flushEmitQueue();
+        } catch (err) {
+          console.warn('[zoe/scheduler] emit-queue flush failed (nbd):', (err as Error).message);
+        }
+        try {
+          const decision = await runReasoningTick();
+          if (!decision.speak || !decision.message) return;
+          await opts.bot.api.sendMessage(opts.zaalTgId, decision.message);
+          if (decision.candidate) {
+            await recordPush(decision.candidate);
+            // Advance the thread's nudge cooldown so it isn't re-surfaced next tick.
+            if (decision.threadId) await markNudged(decision.threadId);
+          }
+          console.log(
+            `[zoe/scheduler] reasoning tick spoke (${decision.reason}, threshold=${decision.threshold})`,
+          );
+        } catch (err) {
+          console.error('[zoe/scheduler] reasoning tick failed:', (err as Error).message);
         }
       },
       { timezone: 'UTC' },

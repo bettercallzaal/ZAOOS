@@ -214,6 +214,53 @@ that thread class. Dismissals are silent negative signal.
   failed emit is queued/retried, never blocks the reminder. Continuity degrades
   gracefully to local-only if Bonfire is unreachable.
 
+## Implementation status (2026-06-04)
+
+Built on branch `claude/gifted-euler-bYhl7`. Bot typechecks clean; 171/171
+`bot/src/zoe` tests pass (79 new across the modules below).
+
+**New modules (`bot/src/zoe/`):**
+
+| File | Layer / move | Tests |
+|------|--------------|-------|
+| `pii.ts` | PII scan + redaction (hygiene-rule Rule 3, gates Bonfire emit) | `__tests__/pii.test.ts` |
+| `threads.ts` | Layer A hot open-threads store + pure escalation logic | `__tests__/threads.test.ts` |
+| `thread-memory.ts` | Layer B Bonfire emit (secret+PII gated, file-backed retry queue) | `__tests__/thread-memory.test.ts` |
+| `proactive.ts` | Move 1 reasoning-tick gate (threshold-only + 3 guards) | `__tests__/proactive.test.ts` |
+| `thread-ops.ts` | apply concierge `thread_ops` + natural-language due-date resolver | `__tests__/thread-ops.test.ts` |
+| `posts/drafts-queue.ts` | Decision 2 silent backlog + once-a-day notice sentinel | — |
+
+**Wiring:** `thread_ops` added to the concierge JSON-op schema (LLM-emitted like
+`task_ops`); `index.ts` applies them + `untrack th-…` undo + `ackPush` on reply;
+`scheduler.ts` runs the reasoning tick at `:30` hourly + flushes the emit queue;
+`reflect.ts` leads with one contextual question about the top open thread;
+`memory.ts` renders an `<open_threads>` block + teaches the `OPEN THREADS` op
+format; posts scheduler generates silently + sends one `14:00 UTC` notice;
+`/drafts` pulls through the unchanged POST/REGEN/SKIP flow; `pending.ts`
+`MAX_RESENDS=0`.
+
+**Deviations from the design above (decided while building):**
+
+1. **Bonfire emit reuses `recall.ts` `remember()`** (direct HTTPS to the
+   Bonfires API with `BONFIRE_API_KEY`, the path already proven in the codebase
+   2026-05-30) — NOT the SSH `/bonfire` skill the doc assumed. Cleaner, no new
+   surface. The skill's SSH path stays for human-driven posts.
+2. **The reasoning tick is additive + silent-by-default**, not yet a replacement
+   for the hourly nudge. It only produces candidates from open commitment
+   threads, so until threads exist it adds zero messages. Full cron→gate
+   replacement (folding the nudge in) is deferred to a follow-up once the gate
+   has run live.
+3. **Commitment extraction is an LLM op (`thread_ops`)**, not a heuristic — it
+   rides the existing concierge op-emission path, with `untrack` as the review/
+   undo. Calendar + went-quiet triggers are stubbed via `proactive.ts`'s
+   `extraCandidates` hook but not yet fed (thread + commitment triggers shipped
+   first, matching Decision 3's priority order).
+
+**Operational follow-up required before it's live:** the deployed
+`~/.zao/zoe/persona.md` on the VPS must get the new `OPEN THREADS` op block
+appended (PERSONA_DEFAULT only seeds fresh installs) — otherwise the LLM won't
+emit `thread_ops` and no threads get opened.
+
 ## Sources
 Horvitz CHI'99 (Mixed-Initiative UIs / bounded deferral); Inner Thoughts CHI'25
 (arXiv 2501.00383); Background Agents & the Notification Budget (tianpan.co,

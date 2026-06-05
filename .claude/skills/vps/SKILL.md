@@ -1,354 +1,227 @@
 ---
 name: vps
-description: Manage ZOE + agent squad (ZOEY, WALLET) on the VPS via SSH, or send messages via Telegram. Three agents, one dispatcher.
+description: Manage the ZAO Telegram bot fleet (ZOE, ZAO Devz, ZAOstock, team bots) on VPS 1 via SSH, or send messages to ZOE via Telegram. systemd user units, one dispatcher.
 ---
 
-# VPS — ZOE Remote Management
+# VPS — ZAO Bot Fleet Remote Management
 
 Two modes of interaction:
-- **SSH direct** → Execute commands on the VPS via `ssh zaal@31.97.148.88 "command"` (for system changes, config, debugging, status checks)
-- **Telegram** → Generate copy-paste messages for ZOE directly (for task instructions, context updates, questions)
+- **SSH direct** → Run commands on the VPS via `ssh zaal@31.97.148.88 "command"` (system changes, config, debugging, status, deploys)
+- **Telegram** → Generate copy-paste messages for ZOE (task instructions, context updates, questions)
 
-You HAVE direct SSH access as `zaal@31.97.148.88`. Use the Bash tool to run commands remotely. For docker commands, SSH in and run them — the zaal user is in the docker group.
+You HAVE direct SSH access as `zaal@31.97.148.88`. Use the Bash tool to run commands remotely.
 
-## Usage
+> **Architecture note (2026-05-04 cutover).** The old openclaw Docker container + 7-agent squad (ZOEY/BUILDER/SCOUT/WALLET/FISHBOWLZ/CASTER) was **decommissioned**. Do NOT reference, restart, or `docker exec` into `openclaw-openclaw-gateway-1` — it is gone. The fleet now runs as **systemd user units** under the `zaal` account, each a `tsx`-run Node process from a ZAOOS clone. No Docker, no openclaw CLI, no `/home/node/openclaw-workspace/`. See `CLAUDE.md` → "Primary Surfaces" and `research/agents/601-agent-stack-cleanup-decision/`.
 
-- `/vps` — interactive, asks what you need
-- `/vps status` — health check (runs directly via SSH)
-- `/vps deploy <what to change>` — deploy config/files/upgrades (runs directly via SSH)
-- `/vps zoe <instructions>` — update ZOE's workspace files + generate Telegram message (runs directly via SSH)
-- `/vps tell <message>` — send a direct message to ZOE (→ Telegram copy-paste)
-- `/vps ask <question>` — ask ZOE a question (→ Telegram copy-paste)
+## VPS Environment
+
+```
+VPS: Hostinger KVM 2, Ubuntu 24.04, 31.97.148.88, user `zaal`
+Runtime: systemd USER units (systemctl --user ...), processes run as zaal via tsx
+Repo (main ZAOOS clone): /home/zaal/zao-os   (per bot/src/zoe/posts/README.md)
+ZAOstock bots clone:      /home/zaal/zaostock-bot
+Node tooling: tsx, npm, git, gh (authenticated as bettercallzaal)
+LLM: Minimax (local API; see the `minimax` skill)
+```
+
+### Live systemd user units (verified against `bot/systemd/` + bot READMEs)
+
+| Unit | What | Source | Entry |
+|------|------|--------|-------|
+| `zoe-bot` | **ZOE** — `@zaoclaw_bot`, the single concierge/dispatcher | `bot/src/zoe/` | `bot/src/index.ts` (`npm start` → `tsx src/index.ts`) |
+| `zao-devz-stack` | **ZAO Devz** — `@zaodevz_bot`, group dispatch + hourly tip | `bot/src/devz/` | `bot/src/devz/index.ts` |
+| `zaostock-bot` | **ZAOstock** — `@ZAOstockTeamBot`, festival team coordination | `bot/` (root) | `npm run start` |
+| `zao-team-bots` | Magnetiq + AttaBotty brand bots | `bot/src/teams/` | `bot/src/teams/index.ts` |
+
+Hermes (`@zoe_hermes_bot`, autonomous fix-PR pipeline) lives in `bot/src/hermes/` — confirm its unit name on the box before acting (`systemctl --user list-units '*hermes*'`); it is not in the committed `bot/systemd/` set.
+
+### ZOE's filesystem (host, NOT a container)
+
+ZOE reads/writes its memory under `~/.zao/zoe/` (`ZOE_HOME`, override via `$ZOE_HOME`). These are plain files on the host, writable by `zaal` — no Docker, no root needed.
+
+```
+~/.zao/zoe/persona.md          ZOE identity + VOICE + ANTI-PATTERNS + FORMAT RULES
+                               (seeded from PERSONA_DEFAULT in bot/src/zoe/memory.ts;
+                                RE-READ EVERY TURN — edits take effect with no restart)
+~/.zao/zoe/human.md            human context cache, refreshed daily
+~/.zao/zoe/recent/<chat_id>.json   last-N turns per chat (FIFO ring buffer)
+~/.zao/zoe/archive/<scope>/<yyyy-mm>.jsonl   rolled-off history
+~/.zao/zoe/tasks.json          open task queue (global)
+~/.zao/zoe/groups.json         configured groups (managed by /zoe-group-* commands)
+~/.zao/zoe/bootloader-template.md   child-bot seed (Magnetiq, AttaBotty, future brand bots)
+```
+
+> **persona.md vs code.** A persona/human/tasks edit takes effect on ZOE's **next turn** automatically (these files are re-read per turn) — no restart. A **code** change (anything under `bot/src/`) needs `git pull` + `systemctl --user restart zoe-bot`.
 
 ## Routing: SSH or Telegram?
 
 | Intent | Method |
 |--------|--------|
-| Check health, logs, container state | SSH direct — run it |
-| Change config, install packages, update files | SSH direct — run it |
-| Update SOUL.md, AGENTS.md, MEMORY.md, TASKS.md | SSH direct — run it |
+| Check health, logs, unit state | SSH direct — run it |
+| Deploy code, change config, install packages | SSH direct — run it |
+| Edit `persona.md` / `human.md` / `tasks.json` | SSH direct — run it (no restart for persona/human/tasks) |
 | Tell ZOE to build something, start a task | Telegram copy-paste |
 | Ask ZOE a question, give feedback | Telegram copy-paste |
-| Fix a bug ZOE introduced | SSH direct — run it |
+| Fix a bug in bot code | SSH direct — deploy + restart |
 
-**Rule of thumb:** If it touches the filesystem, Docker, or config → SSH direct. If it's a conversation with ZOE → Telegram.
+**Rule of thumb:** touches the filesystem, systemd, or repo → SSH direct. A conversation with ZOE → Telegram.
 
 ## SSH Patterns
 
 **Single command:**
 ```bash
-ssh zaal@31.97.148.88 "docker ps"
+ssh zaal@31.97.148.88 "systemctl --user status zoe-bot --no-pager"
 ```
 
-**Multi-command:**
+**Read a ZOE memory file:**
 ```bash
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/TASKS.md"
+ssh zaal@31.97.148.88 "cat ~/.zao/zoe/persona.md"
 ```
 
-**Writing files (heredoc over SSH):**
+**Append to a workspace file (heredoc — no Docker wrapping needed):**
 ```bash
-ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 bash -c "cat > /home/node/openclaw-workspace/file.md << '"'"'EOF'"'"'
-content here
-EOF"'
+ssh zaal@31.97.148.88 "cat >> ~/.zao/zoe/persona.md << 'EOF'
+<content>
+EOF"
 ```
 
-**Config writes (need root inside container):**
-```bash
-ssh zaal@31.97.148.88 'docker exec -u root openclaw-openclaw-gateway-1 bash -c "..."'
-```
-
-## Mode: tell (NEW — direct to ZOE on Telegram)
-
-For sending ZOE instructions, task assignments, or feedback directly via Telegram. No VPS Claude Code involved.
-
-1. **Gather context** from this conversation — what does ZOE need to know?
-2. **Generate a Telegram message** that is:
-   - Under 500 characters
-   - Direct, no fluff
-   - Includes specific task or question
-   - Ends with "What are your Next 3 Moves?" (for task assignments) or a specific question
-3. **Output format:**
-
-```
-💬 Send to ZOE on Telegram:
-```
-Then the message in a fenced code block.
-
-**Examples of /vps tell:**
-- `/vps tell proceed with P2 tasks` → Telegram message telling ZOE to start
-- `/vps tell fix the import on calendar branch` → Telegram message with the fix instruction
-- `/vps tell merge PR #86 first, then the rest` → Telegram message with merge order
-
-## Mode: ask (NEW — question for ZOE on Telegram)
-
-Same as tell but for questions. Does NOT end with "Next 3 Moves" — ends with the question.
-
-**Examples:**
-- `/vps ask what's the status of the lint warnings?`
-- `/vps ask did you check if the calendar build passed?`
-
-## VPS Environment (always include in generated prompts)
-
-```
-VPS: Hostinger KVM 2, Ubuntu 24.04, 31.97.148.88
-Container: openclaw-openclaw-gateway-1 (Docker, image openclaw:local)
-User inside container: node (uid 1000)
-Config file owner: uid 1001 (use docker exec -u root for openclaw.json edits)
-Workspace: /home/node/openclaw-workspace/
-Repo: /home/node/openclaw-workspace/ZAOOS/
-Config: /home/node/.openclaw/openclaw.json (OWNED BY 1001 — need root to write)
-Agents:
-  🦞 ZOE (main) — orchestrator/dispatcher, workspace: /home/node/openclaw-workspace/
-  ⚡ ZOEY (zoey) — action agent, workspace: /home/node/openclaw-workspace/zoey/
-  💰 WALLET (wallet) — on-chain ops, workspace: /home/node/openclaw-workspace/zao-wallet/
-Telegram bot: @zaoclaw_bot (all DMs → ZOE, ZOE dispatches to ZOEY/WALLET)
-GitHub: bettercallzaal/ZAOOS (gh CLI installed + authenticated as bettercallzaal)
-LLM: Minimax M2.7 (all agents)
-Tools: git, gh, npx, uvx (uv 0.11.3), python3
-Crons: auto-pull (15m/ZOE), pulse (6h/ZOEY), community voice (8am+8pm/ZOEY), FC scan (6am/ZOEY)
-```
-
-## Agent Management Commands
-
-```bash
-# List all agents
-ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw agents list'
-
-# Dispatch task to ZOEY
-ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw agent --agent zoey --message "task here"'
-
-# Dispatch task to WALLET
-ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw agent --agent wallet --message "task here"'
-
-# List cron jobs
-ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw cron list'
-
-# Add new agent
-ssh zaal@31.97.148.88 'docker exec openclaw-openclaw-gateway-1 openclaw agents add <name> --workspace /home/node/openclaw-workspace/<name> --model minimax/MiniMax-M2.7 --non-interactive'
-```
-
-## Known Gotchas (learned from real deploys)
-
-These MUST be included as warnings in every generated prompt:
-
-1. **openclaw.json is owned by uid 1001, container runs as uid 1000 (node).** All config writes MUST use `docker exec -u root` or the write will fail with PermissionError.
-2. **Workspace files (.md) are writable by node.** SOUL.md, MEMORY.md, AGENTS.md, TASKS.md, HEARTBEAT.md can be written without root.
-3. **pip is NOT installed in the container.** Use `curl -LsSf https://astral.sh/uv/install.sh | sh` for Python tools, or npx for Node tools.
-4. **After container restart, gh CLI and uvx survive** (installed to /usr/local/bin/ and /home/node/.local/bin/). But if the container is REBUILT (docker compose down/up with fresh image), they'll need reinstalling.
-5. **The heredoc quoting inside docker exec is tricky.** Use this pattern:
-   ```
-   docker exec openclaw-openclaw-gateway-1 bash -c 'cat << '"'"'EOF'"'"' > /path/to/file
-   content here
-   EOF'
-   ```
-6. **ZOE's GitHub workflow order matters.** Code first, then commit, then push, then PR. ZOE has gotten this wrong before (created PR before writing code).
-7. **Config changes require container restart.** Workspace file changes (.md) take effect on ZOE's next session automatically.
+**Read before overwrite, always.** For structured files (`tasks.json`, `groups.json`) prefer a targeted `jq`/python edit over a blind overwrite.
 
 ## Mode: status
 
-**Run these commands directly via SSH using the Bash tool.** Run multiple SSH commands in parallel for speed.
+**Run these directly via SSH using the Bash tool.** Run them in parallel for speed. All read-only.
 
-Commands to run (all read-only):
 ```bash
-# Run these in parallel via separate Bash tool calls:
-ssh zaal@31.97.148.88 "docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' | grep openclaw"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'head -5 /home/node/openclaw-workspace/SOUL.md'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'wc -l /home/node/openclaw-workspace/MEMORY.md'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cat /home/node/openclaw-workspace/TASKS.md'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'head -3 /home/node/openclaw-workspace/AGENTS.md 2>/dev/null || echo no AGENTS.md'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'head -3 /home/node/openclaw-workspace/HEARTBEAT.md 2>/dev/null || echo no HEARTBEAT.md'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'ls -la /home/node/openclaw-workspace/memory/ 2>/dev/null || echo no daily notes'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cd /home/node/openclaw-workspace/zaoos && git log --oneline -5'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cd /home/node/openclaw-workspace/zaoos && git status --short | head -10'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'gh pr list --repo bettercallzaal/ZAOOS --limit 5 2>&1'"
-ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'gh issue list --repo bettercallzaal/ZAOOS --limit 5 2>&1'"
-ssh zaal@31.97.148.88 "docker logs openclaw-openclaw-gateway-1 --tail 15 2>&1"
+# Unit health for the whole fleet
+ssh zaal@31.97.148.88 "systemctl --user status zoe-bot zao-devz-stack zaostock-bot zao-team-bots --no-pager | grep -E 'Loaded|Active|●' "
+# ZOE identity (first lines of live persona)
+ssh zaal@31.97.148.88 "head -5 ~/.zao/zoe/persona.md"
+# ZOE task queue
+ssh zaal@31.97.148.88 "cat ~/.zao/zoe/tasks.json 2>/dev/null | head -40"
+# Repo state (main clone)
+ssh zaal@31.97.148.88 "cd /home/zaal/zao-os && git log --oneline -5 && echo '---' && git status --short | head -10"
+# Open PRs / issues
+ssh zaal@31.97.148.88 "cd /home/zaal/zao-os && gh pr list --repo bettercallzaal/ZAOOS --limit 5 2>&1"
+ssh zaal@31.97.148.88 "cd /home/zaal/zao-os && gh issue list --repo bettercallzaal/ZAOOS --limit 5 2>&1"
+# Recent ZOE logs (errors? restarts? clean?)
+ssh zaal@31.97.148.88 "journalctl --user -u zoe-bot -n 20 --no-pager"
 ```
 
-Then present results in this format:
+Present results as:
 
-## ZOE Status Report
+## ZAO Fleet Status
 
-**Container:** [up/down, uptime, ports]
-**Identity:** [SOUL.md first line]
-**Workspace files:** [which exist: AGENTS.md, HEARTBEAT.md, TASKS.md, daily notes]
-**MEMORY.md:** [line count]
+**Units:** [zoe-bot / zao-devz-stack / zaostock-bot / zao-team-bots — active|failed, uptime]
+**ZOE identity:** [persona.md first line]
+**Task queue:** [tasks.json summary]
 
-### Git State
-- Branch: [current]
-- Last 5 commits: [list]
-- Dirty files: [list or "clean"]
+### Git State (main clone)
+- Last 5 commits + dirty files
 
 ### Open PRs / Issues
 [list or "none"]
 
-### Tasks (from TASKS.md)
-[full contents]
-
-### Container Logs (last 15 lines)
-[any errors? MCP failures? healthy?]
+### ZOE Logs (last 20)
+[errors? restart loop? healthy?]
 
 ### Suggested Actions
-[based on what you see — stale tasks, errors, missing files, etc.]
+[stale tasks, failed units, errors, drift]
 
 ## Mode: deploy
 
-**Execute directly via SSH.** Follow this workflow:
+**Execute directly via SSH.** Workflow:
 
-1. **Gather local context first:**
-   - Read any files the user references
-   - Check recent research docs if relevant
-   - Check git status for uncommitted local changes
-
-2. **Read current state on VPS** (via SSH, read before write):
-   ```bash
-   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /path/to/file"
-   ```
-
-3. **Make changes** (via SSH):
-   ```bash
-   # Workspace files (node can write):
-   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cat > /home/node/openclaw-workspace/file.md << ...'"
-   
-   # Config files (need root):
-   ssh zaal@31.97.148.88 "docker exec -u root openclaw-openclaw-gateway-1 bash -c '...'"
-   ```
-
-4. **Verify** (via SSH):
-   ```bash
-   # After config changes, restart:
-   ssh zaal@31.97.148.88 "docker restart openclaw-openclaw-gateway-1 && sleep 30 && docker logs openclaw-openclaw-gateway-1 --tail 20"
-   ```
-
-5. **Generate Telegram message** for ZOE (output as copy-paste text)
+1. **Gather local context** — read referenced files, check local git status.
+2. **Read current VPS state before writing** (`ssh ... "cat <file>"`).
+3. **Deploy:**
+   - **Code change** (anything under `bot/src/`):
+     ```bash
+     ssh zaal@31.97.148.88 "cd /home/zaal/zao-os && git pull && systemctl --user restart zoe-bot && sleep 5 && journalctl --user -u zoe-bot -n 30 --no-pager"
+     ```
+     (Swap `zoe-bot` for `zao-devz-stack` / `zaostock-bot` / `zao-team-bots` as appropriate.)
+   - **persona / human / tasks edit** (no restart):
+     ```bash
+     ssh zaal@31.97.148.88 "cp ~/.zao/zoe/persona.md ~/.zao/zoe/persona.md.bak && cat >> ~/.zao/zoe/persona.md << 'EOF'
+     <block>
+     EOF"
+     ```
+4. **Verify:** `systemctl --user status <unit>` + tail the journal. For persona edits, confirm with `tail` of the file (it applies on ZOE's next turn).
 
 **Rules:**
-- ALWAYS read before write
-- Use `docker exec -u root` for openclaw.json writes and package installs
-- For config: read first, merge with python3 script, don't overwrite
-- Workspace .md files writable by node (no root needed)
-- After config changes: restart container + check logs
-- Always generate a Telegram message for ZOE at the end if workspace files changed
+- ALWAYS read before write; back up `persona.md` before appending.
+- Code change → `git pull` + restart. persona/human/tasks → no restart.
+- Never write secrets to any file — `bot/.env` holds tokens (`TELEGRAM_BOT_TOKEN`, etc.) and is the systemd `EnvironmentFile`. Use `${VAR}` placeholders in anything you generate. See `.claude/rules/secret-hygiene.md`.
+- After a code deploy, watch the journal for a clean boot before declaring done.
 
-## Mode: zoe
+## Mode: zoe (update ZOE's memory files)
 
-For sending ZOE new context, instructions, or task updates. **Execute directly via SSH.**
+For giving ZOE new context, tasks, or persona/voice corrections. **Execute directly via SSH.**
 
-1. **Gather context from this conversation** — what does ZOE need to know?
-   - New tasks or priority changes
-   - Research findings to add to MEMORY.md
-   - Corrections or new patterns for SOUL.md/AGENTS.md
-   - Completed work to mark in TASKS.md
+1. Decide the target file:
+   - identity / voice / format rules / new behavioral instructions → `~/.zao/zoe/persona.md`
+   - human context (who/what/preferences) → `~/.zao/zoe/human.md`
+   - work queue → `~/.zao/zoe/tasks.json`
+2. Read current state (`ssh ... "cat ~/.zao/zoe/<file>"`).
+3. Append/edit (back up first; no restart needed — re-read per turn).
+4. Verify with `tail`.
+5. Optionally generate a Telegram message for ZOE (≤280 chars, ends with "What are your Next 3 Moves?").
 
-2. **Read current state via SSH:**
-   ```bash
-   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/MEMORY.md"
-   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/TASKS.md"
-   ```
+> Persona changes should mirror `PERSONA_DEFAULT` in `bot/src/zoe/memory.ts`. If a change is permanent, also land it in `memory.ts` via PR so fresh installs inherit it — otherwise the live file and the seed drift (the exact failure mode that motivated rewriting this skill).
 
-3. **Update files via SSH:**
-   ```bash
-   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 bash -c 'cat >> /home/node/openclaw-workspace/MEMORY.md << ...'"
-   ```
+## Mode: tell (direct to ZOE on Telegram)
 
-4. **Verify via SSH:**
-   ```bash
-   ssh zaal@31.97.148.88 "docker exec openclaw-openclaw-gateway-1 cat /home/node/openclaw-workspace/MEMORY.md | tail -5"
-   ```
+For instructions / task assignments / feedback to ZOE via Telegram. No VPS code involved.
 
-5. **Generate Telegram message** for ZOE (output as copy-paste text, under 280 chars, ends with "What are your Next 3 Moves?")
+1. Gather context — what does ZOE need to know?
+2. Draft a message: under 500 chars, direct, specific task/question, ends with "What are your Next 3 Moves?" (for task assignments).
+3. Output:
+
+```
+💬 Send to ZOE on Telegram (@zaoclaw_bot):
+```
+Then the message in a fenced code block.
+
+## Mode: ask (question for ZOE on Telegram)
+
+Same as `tell` but ends with the question, not "Next 3 Moves".
 
 ## Mode: interactive (no args)
 
 Ask: "What do you need? I can:
-1. **Check ZOE's status** (`/vps status`) — runs directly
+1. **Check fleet status** (`/vps status`) — runs directly
 2. **Deploy changes** (`/vps deploy ...`) — runs directly
-3. **Update ZOE's files** (`/vps zoe ...`) — runs directly
+3. **Update ZOE's memory files** (`/vps zoe ...`) — runs directly
 4. **Tell ZOE to do something** (`/vps tell ...`) — Telegram message
 5. **Ask ZOE a question** (`/vps ask ...`) — Telegram message"
 
-## Output Format
+## Known Gotchas (current architecture)
 
-For SSH modes (status, deploy, zoe): **Execute commands directly via Bash tool + SSH.** No copy-paste needed. Report results inline.
-
-For Telegram modes (tell, ask): Output the message in a fenced code block labeled `Send to ZOE on Telegram:`
-
-## Prompt Size Rules
-
-- Status prompts: under 500 words
-- Deploy prompts: under 2000 words
-- ZOE context prompts: under 1000 words
-- Never include API keys or secrets — use ${VAR} placeholders
-- Always use full paths, never ~ or relative inside docker exec
-
-## Path Reference
-
-| Wrong | Right |
-|-------|-------|
-| `~/.openclaw/workspace/` | `/home/node/openclaw-workspace/` |
-| `~/.openclaw/workspace/zaoos/` | `/home/node/openclaw-workspace/ZAOOS/` |
-| MCP filesystem for writes | Terminal: `cat << 'EOF' > path` |
-| PR before code committed | Code → commit → push → PR |
-| `pip install` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` or `npx` |
-| `docker exec ... python3 script.py` for config | `docker exec -u root ... python3 -c '...'` for config |
-| Brave Search MCP | DuckDuckGo MCP + Jina Reader ($0) |
-
-## Research Docs Reference
-
-When generating prompts, check if these are relevant:
-- Doc 234: OpenClaw comprehensive guide — memory, knowledge graphs, MCP, context mgmt
-- Doc 235: Free web search MCP — DuckDuckGo + Jina Reader
-- Doc 236: Autonomous operator pattern — heartbeat, consolidation, "Next 3 Moves"
-- Doc 237: USV agents — named agents, "mentions" data model
-- Doc 238: Claude tools Top 50 — Context7, TDD Guard, Claude SEO
-- Doc 239: Agent frameworks — OpenClaw stays, promptfoo, n8n
+1. **It's systemd `--user`, not system-wide.** Always pass `--user` to `systemctl` / `journalctl`. Without it you'll query the wrong (empty) scope.
+2. **persona/human/tasks files are re-read every turn** → no restart for those edits. Only `bot/src/` code changes need a restart.
+3. **Two clones on the box.** Main ZAOOS at `/home/zaal/zao-os`; ZAOstock bots run from `/home/zaal/zaostock-bot`. `git pull` the right one for the unit you're deploying.
+4. **Tokens live in `bot/.env`** (systemd `EnvironmentFile`). Never echo or commit it. A unit that won't start is often a missing/return-changed env var.
+5. **gh CLI** is authenticated as `bettercallzaal`. Workflow order for any bot-driven change: code → commit → push → (PR only if asked).
+6. **No Docker.** If a command in an old doc says `docker exec openclaw-...`, it is stale — the container is decommissioned. Translate to a host path / `systemctl --user`.
 
 ## Vercel Build Monitoring
 
-ZOE can check if Vercel built a PR successfully using gh CLI:
-
 ```bash
-# Check PR status checks (includes Vercel)
-gh pr checks <PR_NUMBER> --repo bettercallzaal/ZAOOS
-
-# Get Vercel deployment URL from PR
-gh pr view <PR_NUMBER> --repo bettercallzaal/ZAOOS --json statusCheckRollup --jq '.statusCheckRollup[] | select(.context | contains("vercel")) | {state: .state, url: .targetUrl}'
+ssh zaal@31.97.148.88 "cd /home/zaal/zao-os && gh pr checks <PR_NUMBER> --repo bettercallzaal/ZAOOS"
 ```
+Common ZAO OS build failures: `@/community.config` → `@/../community.config` (config is at repo root, not `src/`); missing `"use client"` on hook-using components; TS strict-mode errors.
 
-To add build monitoring to ZOE's task workflow, include this in deploy/zoe prompts when relevant:
+## Prompt Size Rules
 
-```
-After creating a PR, wait 5 minutes then check the build:
-gh pr checks <PR_NUMBER> --repo bettercallzaal/ZAOOS --watch --fail-fast
-If it fails, read the Vercel logs and fix the issue on the same branch.
-```
+- Status output: under 500 words
+- Deploy steps: under 2000 words
+- Never include API keys or secrets — `${VAR}` placeholders only
+- Always use full paths, never `~` inside a heredoc target that another user owns
 
-Common Vercel build failures for ZAO OS:
-- `@/community.config` → should be `@/../community.config` (file is at repo root, not in src/)
-- Missing "use client" directive on components using hooks
-- TypeScript strict mode errors
+## Reference Docs
 
-## Workspace Layout (as of April 5, 2026)
-
-```
-openclaw-workspace/
-├── SOUL.md          ZOE identity + dispatch protocol
-├── AGENTS.md        Session protocol, memory protocol, security
-├── HEARTBEAT.md     Health checks, failure handling (6h pulse cadence)
-├── TASKS.md         Work queue (deduplicated, clean)
-├── MEMORY.md        Tools, config, research refs, patterns
-├── ZAOOS/           Git repo (main branch, clean)
-├── memory/          Daily notes + strategy docs
-├── zoey/            ZOEY agent workspace
-│   ├── SOUL.md      ZOEY identity
-│   ├── AGENTS.md    ZOEY procedures
-│   ├── results/     Task output + daily summaries
-│   ├── tasks/       Pending task files
-│   └── failure-log.md
-└── zao-wallet/      WALLET agent workspace
-    ├── SOUL.md      WALLET identity
-    ├── AGENTS.md    WALLET procedures
-    ├── results/     Transaction logs
-    ├── tasks/       Pending ops
-    └── skills/      On-chain operation skills
-```
+- `bot/src/zoe/README.md` / `USERGUIDE.md` — ZOE deploy + `zoe-bot.service` ops
+- `bot/src/zoe/posts/README.md` — the canonical `git pull && systemctl --user restart zoe-bot` deploy line
+- `bot/AGENTS.md` — fleet overview, Hermes canonical pattern
+- `bot/systemd/` — committed unit files (`zaostock-bot.service`, `zao-team-bots.service`)
+- `CLAUDE.md` → Primary Surfaces — the 5 live surfaces + the decommission list
+- `research/agents/601-agent-stack-cleanup-decision/` — why openclaw/the squad is gone

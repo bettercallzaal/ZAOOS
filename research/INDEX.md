@@ -1,29 +1,28 @@
 # ZAO OS Research Library — Master Index (auto-generated)
 
-> **858 active research documents** across 14 groups, plus **76** superseded docs in `_archive/`. Auto-generated 2026-06-06 by scanning every `research/**/README.md`. Regenerate by re-scanning research/**/README.md (generator in this commit). For the curated topic descriptions see [README.md](./README.md); for machine-readable entries see [search-index.json](./search-index.json).
+> **858 active research documents** across 13 groups, plus **76** superseded docs in `_archive/`. Auto-generated 2026-06-06 by scanning every `research/**/README.md`. Regenerate by re-scanning research/**/README.md. For the curated topic descriptions see [README.md](./README.md); for machine-readable entries see [search-index.json](./search-index.json).
 
 ## Counts by group
 
 | Group | Docs |
 |---|---|
-| dev-workflows | 193 |
-| agents | 171 |
+| dev-workflows | 195 |
+| agents | 174 |
 | music | 86 |
+| business | 75 |
 | events | 74 |
-| business | 73 |
-| infrastructure | 57 |
-| farcaster | 50 |
+| infrastructure | 59 |
+| farcaster | 52 |
 | community | 46 |
 | governance | 46 |
 | identity | 22 |
 | cross-platform | 15 |
-| uncategorized-root | 11 |
 | security | 8 |
 | wavewarz | 6 |
 | _archive | 76 |
 
 
-## dev-workflows (193)
+## dev-workflows (195)
 
 - **030** [30 — bettercallzaal GitHub Projects Inventory](./dev-workflows/030-bettercallzaal-github/) — _2026-05-21 · research-complete · research_
 - **038** [38 — AI Code Audit, Cleanup Agents & Codebase Efficiency](./dev-workflows/038-ai-code-audit-cleanup/) — _2026-05-21 · research-complete · research_
@@ -65,6 +64,8 @@
 - **303** [303 - Daily AI Skill Building Curriculum](./dev-workflows/303-daily-ai-skill-building-curriculum/)
 - **305** [305 - Pocket Assistant: ZOE as Flow State Support, Not Dashboard](./dev-workflows/305-pocket-assistant-flow-state-workflow/)
 - **306** [306 - Web Scraping for AI Agents: Reading X Posts, Articles, and Any URL](./dev-workflows/306-web-scraping-ai-agents/)
+- **309** [309 - Karpathy's LLM Wiki: Codebase-to-Wiki Compiler for Token Optimization](./dev-workflows/309-karpathy-llm-wiki-codebase-compiler/) — _2026-05-21 · research-stub · research-brief_
+- **312** [312 - Claude Skills Marketplace & Ecosystem (Apr 2026)](./dev-workflows/312-claude-skills-marketplace-ecosystem/) — _2026-05-21 · research-stub · research-brief_
 - **319** [319 - X/Twitter Scraping Tools That Work in April 2026](./dev-workflows/319-x-twitter-scraping-tools-2026/)
 - **321** [321 - WorktreeHQ + Git Worktree Branching Strategy](./dev-workflows/321-worktreehq-git-branching-strategy/)
 - **353** [353 - Claude Code Token Optimization v2: What's Actually Working (and What Isn't)](./dev-workflows/353-claude-code-token-optimization-v2/)
@@ -219,7 +220,7 @@
 - **789** [789 - /meeting skill improvement roadmap (2026 tooling research)](./dev-workflows/789-meeting-skill-improvement-roadmap/) — _2026-05-31 · research-complete · decision_
 - **790** [790 — Agentic Coding Workflows: CLAUDE.md, Daily-Driver Patterns, Vibecoding, Remotion Video-Gen, and the Swarm-vs-Teams Orchestration Split](./dev-workflows/790-agentic-coding-workflows-claudemd-swarms-vibecoding/) — _2026-05-31 · research-complete · market-research_
 
-## agents (171)
+## agents (174)
 
 - **026** [26 — Hindsight: Agent Memory System (vectorize-io/hindsight)](./agents/026-hindsight-agent-memory/)
 - **070** [70 — Sub-agents vs Agent Teams + Claude Architect Patterns for ZAO OS](./agents/070-subagents-vs-agent-teams/)
@@ -251,13 +252,16 @@
 - **267** [267 — OpenClaw Skills & Capabilities Reference](./agents/267-openclaw-skills-capabilities/)
 - **268** [268 — Milady AI: ElizaOS Evolution for Desktop-First AI Agents](./agents/268-milady-ai-elizaos-evolution/)
 - **278** [278 — Farcaster Agentic Bootcamp vs ZAO Agent Squad: Gap Analysis & Upgrade Plan](./agents/278-agentic-bootcamp-zao-agent-squad/)
+- **288** [Doc 288 — Agent Squad Monitoring & Visualization Dashboards](./agents/288-agent-squad-monitoring-dashboards/) — _2026-05-21 · research-complete · research-report_
 - **288** [288 — Multi-Agent Dashboard Visual Research: UI Patterns for Agent Squad Monitoring](./agents/288-multi-agent-dashboard-visual-research/) — _2026-05-21 · research-complete · research_
+- **289** [Doc 289 — ZOE Dashboard: Chat-Based Command Center UX Patterns](./agents/289-zoe-dashboard-chat-ux-patterns/) — _2026-05-21 · research-complete · design-guide_
 - **290** [290 — FISHBOWLZ Agentic Participants: AI Agents as Live Room Members](./agents/290-fishbowlz-agentic-participants/) — _2026-05-21 · research-complete · research_
 - **291** [291 — Farcaster Agentic Bootcamp Days 3-5: Agents, Memory, Identity](./agents/291-farcaster-agentic-bootcamp-days-3-5/) — _2026-05-21 · research-complete · research_
 - **292** [292 — Pixel Agents Dashboard Customization for ZAO OS](./agents/292-pixel-agents-dashboard-customization/) — _2026-05-21 · research-complete · research_
 - **293** [293 — Multi-Agent Orchestration Tools, GitNexus Knowledge Graphs & High-Impact Agent Prompts](./agents/293-multi-agent-tools-gitnexus-prompts/) — _2026-05-21 · research-complete · research_
 - **296** [296 - Agentic Workflow Optimization: Powerful Center + Cheap Edge Operating Model](./agents/296-agentic-workflow-optimization/) — _2026-05-21 · research-complete · research_
 - **307** [307 - The Great Convergence: Agent Harness Architecture](./agents/307-great-convergence-agent-harness-architecture/) — _2026-05-21 · research-complete · research_
+- **310** [310 - Meta TRIBE v2: Brain Prediction Model for Content Optimization](./agents/310-meta-tribe-v2-brain-prediction-content/) — _2026-05-21 · research-stub · research-brief_
 - **318** [318 - Multi-Agent Coordination: Cassie Heart's Agentic Bootcamp Session 10](./agents/318-cassie-multi-agent-coordination-bootcamp/) — _2026-05-21 · research-complete · research_
 - **325** [325 - ElevenLabs Agents: Voice AI Platform for ZAO OS](./agents/325-elevenlabs-agents-voice-ai-platform/) — _2026-05-21 · research-complete · research_
 - **325** [325 -- ZABAL Agent Swarm Economy: 3 Brand Agents Trading, Buying & Building Volume](./agents/325-zabal-agent-swarm-economy/) — _2026-05-21 · research-complete · research_
@@ -482,6 +486,84 @@
 - **710** [710 - Juke Path B: Bringing It Together (Architecture + Best Practices)](./music/710-juke-path-b-architecture/) — _2026-05-22 · research-complete · decision_
 - **712** [712 - Juke Integration: Remaining Gaps After Path B](./music/712-juke-integration-remaining-gaps/) — _2026-05-22 · research-complete · decision_
 
+## business (75)
+
+- **029** [29 — Artist Revenue, IP Rights & the ZAO Revenue Model](./business/029-artist-revenue-ip-rights/) — _2026-05-21 · research-complete · guide_
+- **037** [37 — Platform Bridges, Competitor Deep Dives, Monetization & SEO](./business/037-bridges-competitors-monetization/) — _2026-05-21 · research-complete · guide_
+- **125** [125 — Coinflow Fiat Checkout for ZAO OS](./business/125-coinflow-fiat-checkout/) — _2026-05-21 · research-complete · guide_
+- **139** [139 — Trustware SDK: Secure Crypto Payments & Asset Infrastructure](./business/139-trustware-sdk-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **222** [222 — Payment Infrastructure: Stripe, Coinbase Commerce, Coinflow, 0xSplits](./business/222-payment-infrastructure-stripe-coinbase/) — _2026-05-21 · research-complete · guide_
+- **244** [244 — Polymarket Trading as ZOUNZ Treasury Revenue: Claude API + Open-Source Toolkit](./business/244-polymarket-claude-api-trading-analysis/) — _2026-05-21 · research-complete · guide_
+- **252** [252 — Publish.new: Paragraph's AI-Native Marketplace for Digital Goods](./business/252-publish-new-agent-marketplace/) — _2026-05-21 · research-complete · guide_
+- **258** [258 — ZABAL + SANG Token Economics & Buyback Strategy](./business/258-zabal-sang-buyback/) — _2026-05-21 · research-complete · guide_
+- **263** [263 — Obsidian's Lean Team Model: $350M Valuation, 9 Employees, 3 Engineers](./business/263-obsidian-lean-team-model/) — _2026-05-21 · research-complete · guide_
+- **264** [264 - LinkedIn Build-in-Public Content Playbook (2026)](./business/264-linkedin-build-in-public-playbook/) — _2026-05-21 · research-complete · guide_
+- **283** [283 — Privy Embedded Wallets & Smart Wallets for FISHBOWLZ Token Mechanics on Base](./business/283-privy-embedded-wallets-fishbowlz-token-mechanics/) — _2026-05-21 · research-complete · technical-guide_
+- **298** [298 - FISHBOWLZ Tokenization: Token Design, Fee Splits, and ZABAL Auto-Buyback](./business/298-fishbowlz-tokenization/) — _2026-05-21 · archive · guide_
+- **299** [299 - Audio Room Best Practices: UX, Retention, Moderation, and Accessibility for FISHBOWLZ](./business/299-audio-room-best-practices/) — _2026-05-21 · research-complete · guide_
+- **307** [307 - App Monetization: Ernesto Lopez Framework vs ZAO OS Reality](./business/307-app-monetization-ernesto-lopez-framework/) — _2026-05-21 · research-complete · guide_
+- **311** [311 - Vibe-Coded Apps: $800K/yr Marketing Playbook](./business/311-vibe-coded-apps-marketing-playbook/) — _2026-05-21 · research-stub · research-brief_
+- **322** [322 — Paragraph + Publish.new: Newsletter Platform, Agent Commerce & COC Concertz Integration](./business/322-paragraph-publishnew-newsletter-agent-commerce/) — _2026-05-21 · research-complete · guide_
+- **324** [324 -- ZABAL/SANG Wallet Agent System: Tokenomics, Autonomous Swaps & Promoter Incentives](./business/324-zabal-sang-wallet-agent-tokenomics/) — _2026-05-21 · research-complete · guide_
+- **333** [333 - AI Music Licensing, Sync Placement & Web3 Label Framework (2026)](./business/333-ai-music-licensing-sync-label-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **350** [350 - Anatomy of Viral Engagement Bait: Claude Shortcuts + Quant Trading Posts](./business/350-viral-engagement-bait-anatomy/) — _2026-05-21 · research-complete · guide_
+- **352** [352 - Agent Content Commerce: Paragraph + x402 Paywall Framework](./business/352-paragraph-x402-agent-implementation/) — _2026-05-21 · research-complete · guide_
+- **361** [361 - Empire Builder Deep Dive: V3 Features, Distribution, and ZAO Integration Strategy](./business/361-empire-builder-deep-dive-v3-integration/) — _2026-05-21 · research-complete · deep-dive_
+- **362** [362 - Lean Six Sigma for ZAO Festival Operations](./business/362-lean-six-sigma-festival-operations/) — _2026-05-21 · research-complete · operations_
+- **406** [406 - Coinflow ISV Deep Dive: WaveWarZ + ZAO Integration](./business/406-coinflow-isv-deep-dive-wavewarz-zao/) — _2026-05-21 · research-complete · integration_
+- **410** [410 - Polymarket Trading Bot via Claude: $11,400 Profit in 19 Days](./business/410-polymarket-bot-claude-11k-profit-19-days/) — _2026-05-21 · research-complete · research-complete_
+- **429** [429 - Paragraph Agents Launch (Apr 17 2026): Skills, Micropaywalls, Archive Listing](./business/429-paragraph-agents-launch-apr2026/) — _2026-05-21 · research-complete · launch_
+- **455** [455 — BCZ Maine Clients: Stephen Coston (Stay Bar Harbor) + Cameron (Riverside Group)](./business/455-bcz-maine-clients-stephen-cameron/) — _2026-05-21 · research-complete · prospect-profile_
+- **470** [470 - Behavioral Intervention > Financial Literacy: ZAO Playbook](./business/470-behavioral-intervention-vs-financial-literacy-zao/) — _2026-05-21 · research-complete · playbook_
+- **474** [474 — Foundercheck BLOCK (3.95): ICP Resolution + Distribution Wedge](./business/474-foundercheck-block-icp-resolution/) — _2026-05-21 · research-complete · decision_
+- **481** [481 — kompreni / Quotient — Anti-"Cucktrading" AI Superforecaster](./business/481-kompreni-quotient-anti-cucktrading-superforecaster/) — _2026-05-21 · research-complete · research-complete_
+- **482** [482 — DigiHold's 7 Money Rules (Founder Finance After Losing $1.5M)](./business/482-digihold-seven-money-rules-founder-finance/) — _2026-05-21 · research-complete · operations_
+- **485** [485 — Distribution Is Hard V3 (jlcolton) — GTM Field Guide for Builders](./business/485-distribution-is-hard-v3-jlcolton/) — _2026-05-21 · research-complete · playbook_
+- **498** [498 - Zlank: Unified Agent-Native SDK (Clanker + Empire Builder + Farcaster Graph)](./business/498-zlank-unified-sdk-concept/) — _2026-05-21 · research-complete · decision_
+- **526** [526 - Distribution Is Hard V3, Applied: Per-Entity Playbooks for the ZAO Stack](./business/526-distribution-v3-zao-entity-playbooks/) — _2026-05-21 · research-complete · guide_
+- **547** [547 — BCard / B Foundation / Black Flag Collective: ZAO Partnership Opportunity](./business/547-bcard-bfoundation-black-flag-collective/) — _2026-05-21 · research-complete · decision_
+- **572** [572 — $ZABAL Chain: Avalanche L1, L2, or Stay on Base?](./business/572-zabal-avalanche-l1-l2-gas-token/) — _2026-05-21 · research-complete · decision_
+- **573** [573 — Where AVAX Ecosystem Helps $ZABAL: The Arena, Music Royalties, Retro9000](./business/573-zabal-avax-surfaces-arena-music/) — _2026-05-21 · research-complete · market-research_
+- **581** [581 - Whop Platform + Top Whop Creators Deep Dive (DISPATCH)](./business/581-whop-creator-deep-dive/) — _2026-05-21 · research-complete · market-research_
+- **582** [582 - Empire Builder V3 Live (Soft Launch) + New Public API](./business/582-empire-builder-v3-live-launch/) — _2026-05-21 · research-complete · guide_
+- **583** [583 - Empire Builder x ZAO OS: Integration Idea Surface](./business/583-empire-builder-zao-os-integration-ideas/) — _2026-05-21 · research-complete · guide_
+- **584** [584 - Empire Builder x Farcaster: Top-Creator Playbooks + Live ZABAL Data](./business/584-empire-builder-farcaster-creator-playbooks/) — _2026-05-21 · research-complete · market-research_
+- **585** [585 - Empire Builder x ZAO OS: Test-Loop Findings + Iteration-2 Idea Surface](./business/585-empire-builder-test-loop-ideas-iteration-2/) — _2026-05-21 · research-complete · guide_
+- **592** [592 — "Boring Beats AI SaaS" + Free-Preview Risk Reversal (BCZ Strategies Application)](./business/592-boring-saas-free-preview-risk-reversal/) — _2026-05-21 · research-complete · decision_
+- **599** [599 - Adam Sync (May 2026): Leaderboard Reset, ZAOstock Commercial Model, Adam's Bandwidth](./business/599-adam-meeting-may2026-commercial-leaderboard/) — _2026-05-21 · research-complete · decision_
+- **602** [602 - Empire Builder SKILL.md Spec: Phase 3 Unblock + 6 New Build Targets](./business/602-empire-builder-skill-spec-phase3-unblock/) — _2026-05-21 · research-complete · guide_
+- **611** [611 - ZAOstock brand-pattern audit: RSV.Pizza + IYKYK / blank.space + contributor entry-page design](./business/611-zaostock-brand-patterns-rsvpizza-iykyk/) — _2026-05-21 · research-complete · comparison_
+- **612** [612 - AutoCo + LLC formation options for ZAO Festivals](./business/612-autoco-llc-formation/) — _2026-05-21 · research-complete · decision_
+- **626** [626 - Empire Builder + ZABAL Empire: POIDH submitter airdrop architecture](./business/626-empire-builder-zabal-poidh-airdrop/) — _2026-05-21 · research-complete · guide_
+- **628** [628 - Web3 Streaming + ZABAL Empire Bridge: From Stream Events to On-Chain Rewards](./business/628-web3-streaming-zabal-empire-bridge/) — _2026-05-21 · research-complete · guide_
+- **631** [631 - POIDH x $ZABAL x Sentinel: convergence map + best ideas for ZABAL's next move](./business/631-poidh-zabal-sentinel-convergence/) — _2026-05-21 · research-complete · guide_
+- **637** [637 - Emily Sundberg "Open Tab" - Feed Me as solo media business](./business/637-emily-sundberg-feed-me-open-tab/) — _2026-05-21 · research-complete · guide_
+- **641** [641 - Whop for ZAO: Paid Claude Code Creator Community](./business/641-whop-claude-code-community-distribution-play/) — _2026-05-21 · research-complete · decision_
+- **646** [646 - Clanker + Empire Builder for ZABAL Games Promote Window](./business/646-clanker-empire-builder-zabal-games-promote/) — _2026-05-21 · research-complete · guide_
+- **656** [656 — Aroussi: Law Firm Model for Software Developers and Agencies](./business/656-aroussi-law-firm-agency-model/) — _2026-05-21 · research-complete · comparison_
+- **658** [658 — Takemiya: Blockchain as the Geopolitical Monetary Substrate](./business/658-takemiya-blockchain-geopolitical-monetary-substrate/) — _2026-05-21 · research-complete · market-research_
+- **666** [666 — ZABAL Brand Kit Page (bettercallzaal.com/kit.html)](./business/666-zabal-brand-kit-page/) — _2026-05-21 · research-complete · decision_
+- **667** [667 — Brand Kit Completeness Audit (/zao-research after Doc 666)](./business/667-brand-kit-completeness-audit/) — _2026-05-21 · research-complete · audit_
+- **683** [683 - Artizen Fund: Platform Mechanics + Fund Director Guide](./business/683-artizen-platform-fund-director-guide/) — _2026-05-20 · research-complete · guide_
+- **706** [706 - Avalanche Ecosystem Deep Dive (Hub)](./business/706-avalanche-ecosystem-deep-dive/) — _2026-05-21 · research-complete · market-research_
+- **707** [707 - Avalanche: The Master Brief (All ZAO Avalanche Research In One Place)](./business/707-avalanche-master-brief/) — _2026-05-22 · research-complete · guide_
+- **708** [708 - The Arena (arena.social): Complete Deep Dive (Hub)](./business/708-the-arena-deep-dive/) — _2026-05-22 · research-complete · market-research_
+- **708** [708 — ZABAL Hub: zaoos.com/zabal as the canonical ZABAL landing page](./business/708-zabal-hub-landing-page/) — _2026-05-22 · research-complete · decision_
+- **712** [712 — ZAO CRM: a relationship layer for the cowork tracker](./business/712-zao-crm-coworking-app/) — _2026-05-22 · research-complete · decision_
+- **723** [723 - $ZABAL on Avalanche through x402 + Agentic WaveWarZ (Hub)](./business/723-zabal-avax-x402-wavewarz-agentic/) — _2026-05-23 · research-complete · decision_
+- **724** [724 - ZAO Artist Tokenization on Avalanche: Master Plan](./business/724-zao-artist-tokenization-on-avalanche-plan/) — _2026-05-23 · research-complete · decision_
+- **737** [737 - Airtable agentic CRM v3 (People + Activity + Opportunities)](./business/737-airtable-agentic-crm-v3/) — _2026-05-23 · superseded · decision_
+- **743** [743 - Agentic cold outreach: workflow for The ZAO](./business/743-agentic-cold-outreach-workflow/) — _2026-05-25 · research-complete · decision_
+- **759** [759 - POIDH history: origin (2023) to v3 rebuild (2026)](./business/759-poidh-history-origin-to-2026/) — _2026-05-26 · research-complete · guide_
+- **768** [768 - POIDH bounty best practices + ZABAL Games Round 3 bounty draft](./business/768-poidh-bounty-best-practices-zabalgames-r3/) — _2026-05-28 · research-complete · guide_
+- **769** [769 - ZAODEVZ/zabalgames repo state (the production codebase)](./business/769-zaodevz-zabalgames-repo-state/) — _2026-05-28 · research-complete · audit_
+- **769** [769 - Zuke Admin Auth UX (kill the DevTools cookie hack)](./business/769-zuke-admin-auth-ux/) — _2026-05-28 · research-complete · decision_
+- **772** [772 - ZAO CRM: Supabase-Native Public/Private Relationship CRM](./business/772-crm-supabase-native/) — _2026-05-29 · research-complete · decision_
+- **786** [786 - ZABAL Gamez brand kit rebuild](./business/786-zabal-gamez-brand-kit-rebuild/) — _2026-05-31 · research-complete · audit_
+- **791** [791 — Charity-Fund Token Mechanism: Mint/Redeem-at-1-USDC + Hold-to-Earn + Funding Stream (MemeForTrees / regen funding lens for ZAO)](./business/791-charity-fund-token-mechanism-regen/) — _2026-05-31 · research-complete · market-research_
+- **792** [792 — Nicky Sap (Juke founder) Worldview + His Farcaster / Base / Creator-Coin Strategy Writing](./business/792-nicky-sap-juke-founder-worldview-farcaster-strategy/) — _2026-05-31 · research-complete · market-research_
+- **797** [797 — Graduation candidates: what can split off into its own repo](./business/797-graduation-candidates-monorepo-split/) — _2026-06-02 · research-complete · strategy_
+
 ## events (74)
 
 - **201** [201 — AI, Creator Economy & Web3 Landscape: March 2026](./events/201-ai-creator-economy-landscape-march-2026/)
@@ -559,83 +641,7 @@
 - **787** [787 - Iman x Zaal: Discord bot setup walkthrough](./events/787-iman-discord-bot-setup-may29/) — _2026-05-29 · research-complete · meeting-recap_
 - **788** [788 - kmac.eth x Zaal: ZABAL Games + Farcaster distribution + the JFS-signer ask](./events/788-kmac-zabal-farcaster-distribution-may30/) — _2026-05-30 · research-complete · meeting-recap_
 
-## business (73)
-
-- **029** [29 — Artist Revenue, IP Rights & the ZAO Revenue Model](./business/029-artist-revenue-ip-rights/) — _2026-05-21 · research-complete · guide_
-- **037** [37 — Platform Bridges, Competitor Deep Dives, Monetization & SEO](./business/037-bridges-competitors-monetization/) — _2026-05-21 · research-complete · guide_
-- **125** [125 — Coinflow Fiat Checkout for ZAO OS](./business/125-coinflow-fiat-checkout/) — _2026-05-21 · research-complete · guide_
-- **139** [139 — Trustware SDK: Secure Crypto Payments & Asset Infrastructure](./business/139-trustware-sdk-deep-dive/) — _2026-05-21 · research-complete · guide_
-- **222** [222 — Payment Infrastructure: Stripe, Coinbase Commerce, Coinflow, 0xSplits](./business/222-payment-infrastructure-stripe-coinbase/) — _2026-05-21 · research-complete · guide_
-- **244** [244 — Polymarket Trading as ZOUNZ Treasury Revenue: Claude API + Open-Source Toolkit](./business/244-polymarket-claude-api-trading-analysis/) — _2026-05-21 · research-complete · guide_
-- **252** [252 — Publish.new: Paragraph's AI-Native Marketplace for Digital Goods](./business/252-publish-new-agent-marketplace/) — _2026-05-21 · research-complete · guide_
-- **258** [258 — ZABAL + SANG Token Economics & Buyback Strategy](./business/258-zabal-sang-buyback/) — _2026-05-21 · research-complete · guide_
-- **263** [263 — Obsidian's Lean Team Model: $350M Valuation, 9 Employees, 3 Engineers](./business/263-obsidian-lean-team-model/) — _2026-05-21 · research-complete · guide_
-- **264** [264 - LinkedIn Build-in-Public Content Playbook (2026)](./business/264-linkedin-build-in-public-playbook/) — _2026-05-21 · research-complete · guide_
-- **298** [298 - FISHBOWLZ Tokenization: Token Design, Fee Splits, and ZABAL Auto-Buyback](./business/298-fishbowlz-tokenization/) — _2026-05-21 · archive · guide_
-- **299** [299 - Audio Room Best Practices: UX, Retention, Moderation, and Accessibility for FISHBOWLZ](./business/299-audio-room-best-practices/) — _2026-05-21 · research-complete · guide_
-- **307** [307 - App Monetization: Ernesto Lopez Framework vs ZAO OS Reality](./business/307-app-monetization-ernesto-lopez-framework/) — _2026-05-21 · research-complete · guide_
-- **322** [322 — Paragraph + Publish.new: Newsletter Platform, Agent Commerce & COC Concertz Integration](./business/322-paragraph-publishnew-newsletter-agent-commerce/) — _2026-05-21 · research-complete · guide_
-- **324** [324 -- ZABAL/SANG Wallet Agent System: Tokenomics, Autonomous Swaps & Promoter Incentives](./business/324-zabal-sang-wallet-agent-tokenomics/) — _2026-05-21 · research-complete · guide_
-- **333** [333 - AI Music Licensing, Sync Placement & Web3 Label Framework (2026)](./business/333-ai-music-licensing-sync-label-deep-dive/) — _2026-05-21 · research-complete · guide_
-- **350** [350 - Anatomy of Viral Engagement Bait: Claude Shortcuts + Quant Trading Posts](./business/350-viral-engagement-bait-anatomy/) — _2026-05-21 · research-complete · guide_
-- **352** [352 - Agent Content Commerce: Paragraph + x402 Paywall Framework](./business/352-paragraph-x402-agent-implementation/) — _2026-05-21 · research-complete · guide_
-- **361** [361 - Empire Builder Deep Dive: V3 Features, Distribution, and ZAO Integration Strategy](./business/361-empire-builder-deep-dive-v3-integration/) — _2026-05-21 · research-complete · deep-dive_
-- **362** [362 - Lean Six Sigma for ZAO Festival Operations](./business/362-lean-six-sigma-festival-operations/) — _2026-05-21 · research-complete · operations_
-- **406** [406 - Coinflow ISV Deep Dive: WaveWarZ + ZAO Integration](./business/406-coinflow-isv-deep-dive-wavewarz-zao/) — _2026-05-21 · research-complete · integration_
-- **410** [410 - Polymarket Trading Bot via Claude: $11,400 Profit in 19 Days](./business/410-polymarket-bot-claude-11k-profit-19-days/) — _2026-05-21 · research-complete · research-complete_
-- **429** [429 - Paragraph Agents Launch (Apr 17 2026): Skills, Micropaywalls, Archive Listing](./business/429-paragraph-agents-launch-apr2026/) — _2026-05-21 · research-complete · launch_
-- **455** [455 — BCZ Maine Clients: Stephen Coston (Stay Bar Harbor) + Cameron (Riverside Group)](./business/455-bcz-maine-clients-stephen-cameron/) — _2026-05-21 · research-complete · prospect-profile_
-- **470** [470 - Behavioral Intervention > Financial Literacy: ZAO Playbook](./business/470-behavioral-intervention-vs-financial-literacy-zao/) — _2026-05-21 · research-complete · playbook_
-- **474** [474 — Foundercheck BLOCK (3.95): ICP Resolution + Distribution Wedge](./business/474-foundercheck-block-icp-resolution/) — _2026-05-21 · research-complete · decision_
-- **481** [481 — kompreni / Quotient — Anti-"Cucktrading" AI Superforecaster](./business/481-kompreni-quotient-anti-cucktrading-superforecaster/) — _2026-05-21 · research-complete · research-complete_
-- **482** [482 — DigiHold's 7 Money Rules (Founder Finance After Losing $1.5M)](./business/482-digihold-seven-money-rules-founder-finance/) — _2026-05-21 · research-complete · operations_
-- **485** [485 — Distribution Is Hard V3 (jlcolton) — GTM Field Guide for Builders](./business/485-distribution-is-hard-v3-jlcolton/) — _2026-05-21 · research-complete · playbook_
-- **498** [498 - Zlank: Unified Agent-Native SDK (Clanker + Empire Builder + Farcaster Graph)](./business/498-zlank-unified-sdk-concept/) — _2026-05-21 · research-complete · decision_
-- **526** [526 - Distribution Is Hard V3, Applied: Per-Entity Playbooks for the ZAO Stack](./business/526-distribution-v3-zao-entity-playbooks/) — _2026-05-21 · research-complete · guide_
-- **547** [547 — BCard / B Foundation / Black Flag Collective: ZAO Partnership Opportunity](./business/547-bcard-bfoundation-black-flag-collective/) — _2026-05-21 · research-complete · decision_
-- **572** [572 — $ZABAL Chain: Avalanche L1, L2, or Stay on Base?](./business/572-zabal-avalanche-l1-l2-gas-token/) — _2026-05-21 · research-complete · decision_
-- **573** [573 — Where AVAX Ecosystem Helps $ZABAL: The Arena, Music Royalties, Retro9000](./business/573-zabal-avax-surfaces-arena-music/) — _2026-05-21 · research-complete · market-research_
-- **581** [581 - Whop Platform + Top Whop Creators Deep Dive (DISPATCH)](./business/581-whop-creator-deep-dive/) — _2026-05-21 · research-complete · market-research_
-- **582** [582 - Empire Builder V3 Live (Soft Launch) + New Public API](./business/582-empire-builder-v3-live-launch/) — _2026-05-21 · research-complete · guide_
-- **583** [583 - Empire Builder x ZAO OS: Integration Idea Surface](./business/583-empire-builder-zao-os-integration-ideas/) — _2026-05-21 · research-complete · guide_
-- **584** [584 - Empire Builder x Farcaster: Top-Creator Playbooks + Live ZABAL Data](./business/584-empire-builder-farcaster-creator-playbooks/) — _2026-05-21 · research-complete · market-research_
-- **585** [585 - Empire Builder x ZAO OS: Test-Loop Findings + Iteration-2 Idea Surface](./business/585-empire-builder-test-loop-ideas-iteration-2/) — _2026-05-21 · research-complete · guide_
-- **592** [592 — "Boring Beats AI SaaS" + Free-Preview Risk Reversal (BCZ Strategies Application)](./business/592-boring-saas-free-preview-risk-reversal/) — _2026-05-21 · research-complete · decision_
-- **599** [599 - Adam Sync (May 2026): Leaderboard Reset, ZAOstock Commercial Model, Adam's Bandwidth](./business/599-adam-meeting-may2026-commercial-leaderboard/) — _2026-05-21 · research-complete · decision_
-- **602** [602 - Empire Builder SKILL.md Spec: Phase 3 Unblock + 6 New Build Targets](./business/602-empire-builder-skill-spec-phase3-unblock/) — _2026-05-21 · research-complete · guide_
-- **611** [611 - ZAOstock brand-pattern audit: RSV.Pizza + IYKYK / blank.space + contributor entry-page design](./business/611-zaostock-brand-patterns-rsvpizza-iykyk/) — _2026-05-21 · research-complete · comparison_
-- **612** [612 - AutoCo + LLC formation options for ZAO Festivals](./business/612-autoco-llc-formation/) — _2026-05-21 · research-complete · decision_
-- **626** [626 - Empire Builder + ZABAL Empire: POIDH submitter airdrop architecture](./business/626-empire-builder-zabal-poidh-airdrop/) — _2026-05-21 · research-complete · guide_
-- **628** [628 - Web3 Streaming + ZABAL Empire Bridge: From Stream Events to On-Chain Rewards](./business/628-web3-streaming-zabal-empire-bridge/) — _2026-05-21 · research-complete · guide_
-- **631** [631 - POIDH x $ZABAL x Sentinel: convergence map + best ideas for ZABAL's next move](./business/631-poidh-zabal-sentinel-convergence/) — _2026-05-21 · research-complete · guide_
-- **637** [637 - Emily Sundberg "Open Tab" - Feed Me as solo media business](./business/637-emily-sundberg-feed-me-open-tab/) — _2026-05-21 · research-complete · guide_
-- **641** [641 - Whop for ZAO: Paid Claude Code Creator Community](./business/641-whop-claude-code-community-distribution-play/) — _2026-05-21 · research-complete · decision_
-- **646** [646 - Clanker + Empire Builder for ZABAL Games Promote Window](./business/646-clanker-empire-builder-zabal-games-promote/) — _2026-05-21 · research-complete · guide_
-- **656** [656 — Aroussi: Law Firm Model for Software Developers and Agencies](./business/656-aroussi-law-firm-agency-model/) — _2026-05-21 · research-complete · comparison_
-- **658** [658 — Takemiya: Blockchain as the Geopolitical Monetary Substrate](./business/658-takemiya-blockchain-geopolitical-monetary-substrate/) — _2026-05-21 · research-complete · market-research_
-- **666** [666 — ZABAL Brand Kit Page (bettercallzaal.com/kit.html)](./business/666-zabal-brand-kit-page/) — _2026-05-21 · research-complete · decision_
-- **667** [667 — Brand Kit Completeness Audit (/zao-research after Doc 666)](./business/667-brand-kit-completeness-audit/) — _2026-05-21 · research-complete · audit_
-- **683** [683 - Artizen Fund: Platform Mechanics + Fund Director Guide](./business/683-artizen-platform-fund-director-guide/) — _2026-05-20 · research-complete · guide_
-- **706** [706 - Avalanche Ecosystem Deep Dive (Hub)](./business/706-avalanche-ecosystem-deep-dive/) — _2026-05-21 · research-complete · market-research_
-- **707** [707 - Avalanche: The Master Brief (All ZAO Avalanche Research In One Place)](./business/707-avalanche-master-brief/) — _2026-05-22 · research-complete · guide_
-- **708** [708 - The Arena (arena.social): Complete Deep Dive (Hub)](./business/708-the-arena-deep-dive/) — _2026-05-22 · research-complete · market-research_
-- **708** [708 — ZABAL Hub: zaoos.com/zabal as the canonical ZABAL landing page](./business/708-zabal-hub-landing-page/) — _2026-05-22 · research-complete · decision_
-- **712** [712 — ZAO CRM: a relationship layer for the cowork tracker](./business/712-zao-crm-coworking-app/) — _2026-05-22 · research-complete · decision_
-- **723** [723 - $ZABAL on Avalanche through x402 + Agentic WaveWarZ (Hub)](./business/723-zabal-avax-x402-wavewarz-agentic/) — _2026-05-23 · research-complete · decision_
-- **724** [724 - ZAO Artist Tokenization on Avalanche: Master Plan](./business/724-zao-artist-tokenization-on-avalanche-plan/) — _2026-05-23 · research-complete · decision_
-- **737** [737 - Airtable agentic CRM v3 (People + Activity + Opportunities)](./business/737-airtable-agentic-crm-v3/) — _2026-05-23 · superseded · decision_
-- **743** [743 - Agentic cold outreach: workflow for The ZAO](./business/743-agentic-cold-outreach-workflow/) — _2026-05-25 · research-complete · decision_
-- **759** [759 - POIDH history: origin (2023) to v3 rebuild (2026)](./business/759-poidh-history-origin-to-2026/) — _2026-05-26 · research-complete · guide_
-- **768** [768 - POIDH bounty best practices + ZABAL Games Round 3 bounty draft](./business/768-poidh-bounty-best-practices-zabalgames-r3/) — _2026-05-28 · research-complete · guide_
-- **769** [769 - ZAODEVZ/zabalgames repo state (the production codebase)](./business/769-zaodevz-zabalgames-repo-state/) — _2026-05-28 · research-complete · audit_
-- **769** [769 - Zuke Admin Auth UX (kill the DevTools cookie hack)](./business/769-zuke-admin-auth-ux/) — _2026-05-28 · research-complete · decision_
-- **772** [772 - ZAO CRM: Supabase-Native Public/Private Relationship CRM](./business/772-crm-supabase-native/) — _2026-05-29 · research-complete · decision_
-- **786** [786 - ZABAL Gamez brand kit rebuild](./business/786-zabal-gamez-brand-kit-rebuild/) — _2026-05-31 · research-complete · audit_
-- **791** [791 — Charity-Fund Token Mechanism: Mint/Redeem-at-1-USDC + Hold-to-Earn + Funding Stream (MemeForTrees / regen funding lens for ZAO)](./business/791-charity-fund-token-mechanism-regen/) — _2026-05-31 · research-complete · market-research_
-- **792** [792 — Nicky Sap (Juke founder) Worldview + His Farcaster / Base / Creator-Coin Strategy Writing](./business/792-nicky-sap-juke-founder-worldview-farcaster-strategy/) — _2026-05-31 · research-complete · market-research_
-- **797** [797 — Graduation candidates: what can split off into its own repo](./business/797-graduation-candidates-monorepo-split/) — _2026-06-02 · research-complete · strategy_
-
-## infrastructure (57)
+## infrastructure (59)
 
 - **012** [Gating Access to ZAO OS](./infrastructure/012-gating/) — _2026-05-21 · research-complete · technical-guide_
 - **016** [UI Reference — CG / Commonwealth](./infrastructure/016-ui-reference/) — _2026-05-21 · research-complete · ui-patterns_
@@ -658,7 +664,9 @@
 - **223** [223 -- Smart Contract Development Guide for ZAO OS](./infrastructure/223-smart-contract-development-guide/) — _2026-05-21 · research-complete · research_
 - **233** [233 — Spaces & Streaming Full Codebase Audit](./infrastructure/233-spaces-streaming-full-audit/) — _2026-05-21 · research-complete · research_
 - **275** [275 -- Stream.io Video SDK Dashboard Configuration](./infrastructure/275-stream-video-sdk-dashboard-configuration/) — _2026-05-21 · research-complete · research_
+- **282** [282 — Privy Auth Integration for FISHBOWLZ](./infrastructure/282-privy-auth-fishbowlz-integration/) — _2026-05-21 · research-complete · technical-guide_
 - **283** [283 — Vercel + Next.js 16 Performance Optimization Guide](./infrastructure/283-vercel-nextjs16-performance-optimization/) — _2026-05-21 · research-complete · research_
+- **284** [284 — Privy Full Feature Set for FISHBOWLZ](./infrastructure/284-privy-full-feature-set-fishbowlz/) — _2026-05-21 · research-complete · technical-guide_
 - **286** [286 — Claude Cowork SEO Workflow & ZAO OS SEO Audit](./infrastructure/286-claude-cowork-seo-workflow/) — _2026-05-21 · research-complete · research_
 - **313** [313 - Metaverse & 3D Virtual World for ZAO OS](./infrastructure/313-metaverse-3d-virtual-world-zao/) — _2026-05-21 · research-complete · research_
 - **314** [314 - Quilibrium Network: Comprehensive Deep Dive](./infrastructure/314-quilibrium-network-comprehensive-deep-dive/) — _2026-05-21 · research-complete · research_
@@ -695,7 +703,7 @@
 - **741c** [741c - Voice-agent stack comparison: 2026 landscape stress-test](./infrastructure/741c-voice-agent-stack-comparison/) — _2026-05-25 · research-complete · comparison_
 - **741d** [741d - ZOE voice-agent integration blueprint](./infrastructure/741d-zoe-voice-agent-blueprint/) — _2026-05-25 · research-complete · guide_
 
-## farcaster (50)
+## farcaster (52)
 
 - **002** [002 - Farcaster Hub API](./farcaster/002-farcaster-hub-api/) — _2026-05-21 · research-complete · guide_
 - **017** [017 - Neynar Onboarding & Managed Signers](./farcaster/017-neynar-onboarding/) — _2026-05-21 · research-complete · guide_
@@ -709,6 +717,8 @@
 - **199** [199 - Advanced Social Graph Features: Visualization, Growth Tracking, Influence Mapping](./farcaster/199-advanced-social-graph-features/) — _2026-05-21 · research-complete · guide_
 - **250** [250 - Farcaster Mini Apps llms.txt Deep Dive (April 2026)](./farcaster/250-farcaster-miniapps-llms-txt-2026/) — _2026-05-21 · research-complete · guide_
 - **260** [260 - Neynar Acquires Farcaster (January 21, 2026)](./farcaster/260-neynar-acquires-farcaster/) — _2026-05-21 · research-complete · guide_
+- **280** [280 — FID Registration & x402 Deep Dive: How to Give ZAO Agents a Farcaster Identity](./farcaster/280-fid-registration-x402-deep-dive/) — _2026-05-21 · research-complete · technical-guide_
+- **281** [281 — Farcaster Agents Landscape & Registration Paths: The Complete Picture](./farcaster/281-farcaster-agents-landscape-registration/) — _2026-05-21 · research-complete · research-report_
 - **293** [293 - Sopha External Feed API Integration](./farcaster/293-sopha-api-integration/) — _2026-05-21 · research-complete · guide_
 - **295** [295 - Farcaster Snaps (v2.0, April 2026)](./farcaster/295-farcaster-snaps/) — _2026-05-21 · research-complete · guide_
 - **304** [304 - Quilibrium, Hypersnap, and Free Neynar API via haatz.quilibrium.com](./farcaster/304-quilibrium-hypersnap-free-neynar-api/) — _2026-05-21 · research-complete · guide_
@@ -888,20 +898,6 @@
 - **355** [355 — Autonomous Social Distribution 2026: What Works, What's Noise, What to Steal](./cross-platform/355-autonomous-social-distribution-2026/) — _2026-05-21 · research-complete · research_
 - **486** [486 — Reddit Reply Bot for ZAO + JustMakingMusic as a Distribution Vertical](./cross-platform/486-reddit-zao-reply-bot-justmakingmusic-vertical/) — _2026-05-21 · research-complete · research_
 - **627** [627 - Twitch Streaming + StreamElements Integration for ZAO](./cross-platform/627-twitch-streaming-streamelements-integration/) — _2026-05-21 · research-complete · research_
-
-## uncategorized-root (11)
-
-- **280** [280 — FID Registration & x402 Deep Dive: How to Give ZAO Agents a Farcaster Identity](./280-fid-registration-x402-deep-dive/) — _2026-05-21 · research-complete · technical-guide_
-- **281** [281 — Farcaster Agents Landscape & Registration Paths: The Complete Picture](./281-farcaster-agents-landscape-registration/) — _2026-05-21 · research-complete · research-report_
-- **282** [282 — Privy Auth Integration for FISHBOWLZ](./282-privy-auth-fishbowlz-integration/) — _2026-05-21 · research-complete · technical-guide_
-- **283** [283 — Privy Embedded Wallets & Smart Wallets for FISHBOWLZ Token Mechanics on Base](./283-privy-embedded-wallets-fishbowlz-token-mechanics/) — _2026-05-21 · research-complete · technical-guide_
-- **284** [284 — Privy Full Feature Set for FISHBOWLZ](./284-privy-full-feature-set-fishbowlz/) — _2026-05-21 · research-complete · technical-guide_
-- **288** [Doc 288 — Agent Squad Monitoring & Visualization Dashboards](./288-agent-squad-monitoring-dashboards/) — _2026-05-21 · research-complete · research-report_
-- **289** [Doc 289 — ZOE Dashboard: Chat-Based Command Center UX Patterns](./289-zoe-dashboard-chat-ux-patterns/) — _2026-05-21 · research-complete · design-guide_
-- **309** [309 - Karpathy's LLM Wiki: Codebase-to-Wiki Compiler for Token Optimization](./309-karpathy-llm-wiki-codebase-compiler/) — _2026-05-21 · research-stub · research-brief_
-- **310** [310 - Meta TRIBE v2: Brain Prediction Model for Content Optimization](./310-meta-tribe-v2-brain-prediction-content/) — _2026-05-21 · research-stub · research-brief_
-- **311** [311 - Vibe-Coded Apps: $800K/yr Marketing Playbook](./311-vibe-coded-apps-marketing-playbook/) — _2026-05-21 · research-stub · research-brief_
-- **312** [312 - Claude Skills Marketplace & Ecosystem (Apr 2026)](./312-claude-skills-marketplace-ecosystem/) — _2026-05-21 · research-stub · research-brief_
 
 ## security (8)
 

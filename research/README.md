@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **858 active numbered research documents** across 14 topic groups (76 superseded in `_archive/`; 11 uncategorized at the research root awaiting filing) covering every aspect of building a decentralized social media platform for music.
+> **858 active numbered research documents** across 13 topic groups (76 superseded in `_archive/`) covering every aspect of building a decentralized social media platform for music.
 >
 > 📑 **[INDEX.md](./INDEX.md)** is the complete, auto-generated listing of every doc (number · title · date · status). **[search-index.json](./search-index.json)** is the machine-readable version. The per-folder counts below are refreshed from disk (2026-06-06); regenerate by re-scanning `research/**/README.md`.
 
@@ -10,20 +10,19 @@
 
 | Topic | Docs | Description |
 |-------|------|-------------|
-| [Dev Workflows](./dev-workflows/) | 193 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
-| [Agents](./agents/) | 171 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization |
+| [Dev Workflows](./dev-workflows/) | 195 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
+| [Agents](./agents/) | 174 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization |
 | [Music](./music/) | 86 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
+| [Business](./business/) | 75 | Revenue, payments, strategy, Obsidian model, marketplace, graduation candidates |
 | [Events](./events/) | 74 | Bootcamp, ZAO Stock, ship logs, big wins, status snapshots, meeting recaps |
-| [Business](./business/) | 73 | Revenue, payments, strategy, Obsidian model, marketplace, graduation candidates |
-| [Infrastructure](./infrastructure/) | 57 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
-| [Farcaster](./farcaster/) | 50 | Protocol, Mini Apps, XMTP, ecosystem, social graph, client architecture |
+| [Infrastructure](./infrastructure/) | 59 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
+| [Farcaster](./farcaster/) | 52 | Protocol, Mini Apps, XMTP, ecosystem, social graph, client architecture |
 | [Community](./community/) | 46 | ZAO guide, whitepaper, onboarding, member profiles, task forces, link index |
 | [Governance](./governance/) | 46 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
 | [Identity](./identity/) | 22 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph |
 | [Cross-Platform](./cross-platform/) | 15 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
 | [Security](./security/) | 8 | Audits, API verification, testing, client security |
 | [WaveWarZ](./wavewarz/) | 6 | Prediction markets, artist pipeline, Solana PDAs |
-| [Uncategorized (root)](./) | 11 | Numbered docs 280–314 not yet filed into a topic folder |
 | [Inspiration](./inspiration/) | — | Daily "steal like an artist" research (date-named, outside the numbered scheme) |
 | [Archive](./_archive/) | 76 | Superseded docs (preserved for history) |
 

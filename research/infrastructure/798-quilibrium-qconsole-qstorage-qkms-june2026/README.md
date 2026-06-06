@@ -130,6 +130,16 @@ The **high-value** use is the autonomous agents. `src/lib/agents/` (VAULT/BANKER
 - **Event Horizon** Q3/Q4 2026: distributed AI model training.
 - Rising mainstream crypto-media coverage framing Quilibrium as "the next ICP" / "decentralized AWS" (Bitget, Gate, ChainCatcher).
 
+## QCL / Bedlam - The App-Deployment Layer (additive to doc 314)
+
+For network-native apps (beyond just storage/keys), Quilibrium uses **QCL (Q Compute Language)**:
+
+- QCL is a **subset of Go**. Constraints: primitive types must have bounded sizes (`int` -> `int8/int16/int32`), arrays must be bounded (`[]byte` -> `[8]byte`).
+- The compiler is **Bedlam** - doc 314 listed `bedlam` only as a "network testing/chaos tool"; it is also the QCL compiler. It compiles QCL into **OT circuits** (oblivious-transfer circuits) so computation runs privately over the oblivious hypergraph, and defines the RDF data schema + hypergraph relationships.
+- **Deploy flow:** publish RDF schema -> compile QCL -> pay a QUIL fee. The `qclient` CLI does it in one step. You can deploy apps, tokens, files, and hypergraph schemas.
+
+**ZAO read:** This is the path for the doc-314 "2027: deploy ZAO-specific curation/moderation logic as a QCL app" item. It is niche (Go-subset, requires QUIL fees, OT-circuit model) and only worth it once a privacy-preserving compute need is concrete. **Not now** - QStorage + QKMS cover the near-term value without writing QCL.
+
 ## Farcaster / haatz Touchpoint (additive to doc 304)
 
 - haatz is still live and is ZAO's current Quilibrium touchpoint (`src/lib/farcaster/neynar.ts` dual-provider, free reads).

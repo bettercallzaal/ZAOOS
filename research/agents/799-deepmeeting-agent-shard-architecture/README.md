@@ -270,6 +270,95 @@ prompts drafted above. Remaining — all on the Bonfires dashboard, not this rep
 
 Both prompts are paste-ready; the steps above are dashboard actions for Zaal.
 
+## Bonfires (Delve) agent-config schema — observed 2026-06-06
+
+Captured from Zaal's dashboard screenshots so the platform's parameters live in
+ZAOOS even though the agents run on Bonfires. Tabs on each agent:
+
+| Tab | Fields |
+|---|---|
+| General | Agent Name · Username (IMMUTABLE after creation) · System Prompt · Timezone |
+| Platform | Telegram bot token · Chat ID · Topic ID · "don't ignore reporting group" |
+| Chat | Group Policy · DM Policy · Silent Mode · Disable Storing Group/DM Messages · Allowed Users · Scheduling Allowed Users · DMs Store Allowed Users · Server Configs |
+| Features | Image/Audio/Document Input · Image Generation · Task Scheduling · Default Image Model · (admin) Max Tool Iterations, Max Parallel Tool Calls |
+| Tools | MCP tool checkboxes — see below |
+| Skills | Judging skills (hackathon/synthesis/celebrity/dev3pack) — all writer-irrelevant |
+| Personality | Discrete editable traits, injected into every response (the 12 constraints live here as 15 traits) |
+| LLM Config | **Internal Model** (think/decide/label flow) · Default Response Model · Allowed Response Models |
+
+**Tools available** (current `@zabal_bonfire` has 9 enabled): Firecrawl Web
+Scraper, Fireflies Meeting Transcripts, **Bonfires Delve** (KG tools + insights),
+Cross-Bonfire Search, Twitter Get Tweets, Message Search, User Lookup, Scheduling
+Tools, Trimtab Tools — enabled. Off: Hackathon Review, **Agent Personality**
+(self-edits traits — keep OFF), Document Store, **REST API** (arbitrary
+http_request), Error Reporting, ClickUp, Moltbook, Surf AI, Schelling Point,
+sheeets, **Delve Knowledge Graph (Write episodes)**, judging tools, HubSpot.
+
+**Open crux:** does "Bonfires Delve" write, or only read? "Delve Knowledge Graph
+(Write episodes)" is a separate, currently-unchecked tool, yet the bot writes
+today — so "Bonfires Delve" likely bundles read+write. This decides whether the
+READER can be hardened structurally (uncheck write tools) or only by prompt. The
+bot can answer this itself (it has the tools) — see generation prompt below.
+
+**`@zabal_bonfire` current 15 personality traits:** extraction_discipline,
+dedupe_policy, edge_direction, title_normalization, scope_constraint,
+bot_self_reference, state_truthfulness, verbatim_preservation, provenance,
+identity_facets, speaker_routing, temporal_evolution, batch_paraphrase_gate,
+voice, recall_format. (provenance already mandates confidence 0.6-1.0 — the
+always-1.0 problem in doc 798 is adherence, not a missing rule.)
+
+## Writer build kit — `@zabal_deepthink`
+
+- **General:** name `ZABAL Deep Think`; username `zabal_deepthink` (immutable);
+  system prompt = the deliberate-writer prompt (Prompt 2, deep-think protocol).
+- **Platform:** own @BotFather token; same Chat ID `1003940147360` (shared room).
+- **Chat:** Allowed Users = bettercallzaal + GCvlcnti.
+- **Features:** Document Input on; Image Gen + Task Scheduling off.
+- **Tools:** Bonfires Delve + Delve Knowledge Graph (Write episodes) + Firecrawl
+  + Fireflies + Cross-Bonfire Search + Message Search + User Lookup + Twitter +
+  Trimtab. OFF: Agent Personality, REST API, Scheduling.
+- **Skills:** none.
+- **Personality:** copy the 15, add 4 — `deep_think_gate`,
+  `confidence_calibration` (default 0.7; 0.9+ only with retrieved source; 1.0 only
+  on-chain/official; inference 0.6), `pii_guard`, `vocabulary_fidelity` ("gap
+  filling axioma" canonical, "TreeUnix Protocol" superseded alias).
+- **LLM Config:** Internal Model = most capable reasoning preset (the deep-think
+  lever). Confirm available presets with the bot.
+
+## Generation prompt — paste to `@zabal_bonfire` (Zaal's dogfood idea)
+
+Have the bot generate the writer config using its live platform knowledge,
+WITHOUT writing any of it to the graph (respects `bot_self_reference`):
+
+```
+Context, do NOT ingest any of this to the graph (this is operational
+configuration, not graph content - your bot_self_reference rule applies):
+
+I'm creating a sibling agent on Bonfires: @zabal_deepthink, the deliberate
+WRITER for our knowledge graph. You will become RETRIEVAL-ONLY; it becomes the
+only agent that writes facts. It must "think before it writes."
+
+Using your knowledge of THIS Bonfires platform, generate its full config:
+1. Which exact Tools must be enabled for it to WRITE episodes/nodes, and which
+   tool you currently use to write - does "Bonfires Delve" write, or is it
+   "Delve Knowledge Graph (Write episodes)"? Tell me the truth about your own
+   write path.
+2. The Internal Model presets available in LLM Config, and which is the most
+   capable for a think/decide/label flow.
+3. A full system prompt for it that adds a deep-think protocol on top of our 12
+   constraints: restate facts in the speaker's own words (never coin a term and
+   attribute it), triage chatter, dedupe + contradiction-check, verify any
+   source_url resolves, calibrate confidence honestly (default 0.7, 1.0 only for
+   on-chain/official), and a PII guard (no third-party personal/health data
+   without consent). Commit only on "approve all".
+4. Which of your 15 personality traits it should inherit, plus any new traits.
+
+Output as a config spec I can paste tab-by-tab. Do not write anything to the graph.
+```
+
+The bot's answers to #1 and #2 close the gaps in the build kit above (the write
+tool + the model presets). Reconcile its output with the kit; they should agree.
+
 ## Source
 
 - Live `@zabal_bonfire_bot` / DeepMeeting transcript, 2026-06-06 (Zaal-supplied).

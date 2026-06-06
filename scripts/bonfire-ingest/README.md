@@ -9,8 +9,9 @@ mandatory secret-scan gate. Built 2026-05-18 after the Phase 1 deploy
 
 | File | Role |
 |---|---|
-| `secret_scan.py` | Sensitive-info detector. Distinguishes template placeholders from real secrets. Exports `scan_text`, `sanitize_text`, `preflight`. |
-| `bonfire_client.py` | `IngestPipeline` class. v0.2: generates client-side UUID per episode, supplies via `uuid` field, captures in manifest. Calls preflight before every POST; HIGH severity hits block by default. Writes a manifest per run. |
+| `secret_scan.py` | Sensitive-info detector (API keys / tokens / PEM). Distinguishes template placeholders from real secrets. Exports `scan_text`, `sanitize_text`, `preflight`. |
+| `pii_scan.py` | Third-party **PII** detector (phone / SSN / card / address / personal email / personal Telegram handle), allowlist-aware per `.claude/rules/pii-hygiene.md`. Same `scan_text` / `sanitize_text` / `preflight` API. Catches *structured* PII only — not names or free-text health disclosures (see doc 798). |
+| `bonfire_client.py` | `IngestPipeline` class. v0.2: generates client-side UUID per episode, supplies via `uuid` field, captures in manifest. Runs BOTH the secret gate and the PII gate before every POST; HIGH hits from either block by default. Writes a manifest per run. |
 | `ingest_brand_kit.py` | Pipes `bettercallzaal.com/brands.json` (31 brands) into bonfire, one episode per brand. |
 | `ingest_github_readmes.py` | Pipes README files for every `bettercallzaal/*` repo (80 active). Public via raw.githubusercontent.com, private via GitHub API + `GITHUB_TOKEN`. |
 | `ingest_research_library.py` | Pipes every `research/<topic>/<NNN>-<slug>/README.md` from ZAOOS (~670 active docs). Skips `_archive`, `_graph`, `_handoffs`. |
@@ -35,6 +36,28 @@ To override the block on HIGH hits and post a sanitized version
 (actual key replaced with `[REDACTED:pattern_name]`), pass `--sanitize`
 to the ingest script.
 
+## PII-scan policy
+
+A second, independent gate (`pii_scan.py`) runs after the secret gate.
+Distinct concern: secrets = credential theft; PII = third-party personal
+data leakage. Severity is deliberately asymmetric — the graph legitimately
+holds people, so emails/handles are flagged not blocked, and over-blocking
+the 670-doc research-library ingest is the failure mode we avoid.
+
+| Severity | Examples | Default action |
+|---|---|---|
+| HIGH | formatted phone `(555) 123-4567`, US SSN, Luhn-valid credit card, context-labeled DOB | BLOCK (don't post) |
+| MED | non-allowlisted email, non-allowlisted personal Telegram handle (`@GCvlcnti`), street address | Log + post |
+| (skip) | allowlisted emails (`zaal@thezao.com`, role emails) + bot handles (`@zabal_bonfire_bot`, `*_bot`) | ignored |
+
+`--sanitize` redacts PII HIGH hits to `<redacted-phone>` / `<redacted-ssn>` /
+`<redacted-cc>` and posts the cleaned body, same as the secret gate.
+
+**Hard limitation:** regex catches structured PII only. A person's NAME or a
+free-text sensitive disclosure ("diagnosed with X") is just words — this gate
+will not catch it. The bot's human `Approve?` step is the backstop for those.
+The full analysis + recommended LLM-classifier follow-up is in doc 798.
+
 ## Running an ingest
 
 All scripts assume env vars from the bot's `.env`:
@@ -55,7 +78,7 @@ Env needed:
 ## Manifests
 
 Each run writes a JSON manifest to `~/.zaocoworking/ingest-<label>-<epoch>.json`
-with the full list of (sent, blocked, failed, sanitized) episodes + task ids.
+with the full list of (sent, blocked, failed, sanitized, pii_blocked) episodes + task ids.
 
 ## Adding a new ingest source
 
@@ -83,3 +106,7 @@ The `IngestPipeline` handles preflight + POST + manifest writing.
 - `research/agents/673-zoe-bonfires-dialog-automation/` - Phase 2 spec
 - `.claude/rules/secret-hygiene.md` - the broader secret-handling policy
   that informed `secret_scan.py`'s pattern list
+- `.claude/rules/pii-hygiene.md` - the PII policy + allowlists that informed
+  `pii_scan.py` (Rule 3 banned patterns, email + Telegram-handle allowlists)
+- `research/agents/798-bonfire-graph-quality-audit/` - graph data-quality
+  audit (confidence calibration, provenance, the PII-gate gap this closes)

@@ -34,7 +34,11 @@
 | 267 | [OpenClaw Skills & Capabilities Reference](./267-openclaw-skills-capabilities/) | STANDALONE | All available OpenClaw skills, extensions, and channel integrations |
 | 268 | [Milady AI: ElizaOS Evolution](./268-milady-ai-elizaos-evolution/) | STANDALONE | Milady AI as next-gen ElizaOS distribution for desktop-first agents |
 | 278 | [Agentic Bootcamp vs ZAO Agent Squad](./278-agentic-bootcamp-zao-agent-squad/) | STANDALONE | Gap analysis between bootcamp curriculum and ZAO's 7-agent squad |
+| 280 | [FID Registration & x402 Deep Dive: How to Give ZAO Agents a Farcaster Identity](./280-fid-registration-x402-deep-dive/) | STANDALONE | Map every path to registering a Farcaster FID for CASTER agent, understand why fid-forge x402 failed, and determine the cheapest/fastest approach |
+| 281 | [Farcaster Agents Landscape & Registration Paths: The Complete Picture](./281-farcaster-agents-landscape-registration/) | STANDALONE | Map every active Farcaster agent, understand how they registered, find the cheapest proven path for CASTER |
+| 288 | [Agent Squad Monitoring & Visualization Dashboards](./288-agent-squad-monitoring-dashboards/) | STANDALONE | Agent Squad Monitoring & Visualization Dashboards |
 | 288 | [Multi-Agent Dashboard Visual Research: UI Patterns for Agent Squad Monitoring](./288-multi-agent-dashboard-visual-research/) | STANDALONE | Find real visual examples of multi-agent dashboards, extract UI patterns, and recommend an approach for ZAO's 7-agent admin dashboard |
+| 289 | [ZOE Dashboard: Chat-Based Command Center UX Patterns](./289-zoe-dashboard-chat-ux-patterns/) | STANDALONE | ZOE Dashboard: Chat-Based Command Center UX Patterns |
 | 290 | [FISHBOWLZ Agentic Participants](./290-fishbowlz-agentic-participants/) | STANDALONE | AI agents as persistent room participants in FISHBOWLZ audio spaces |
 | 291 | [Farcaster Agentic Bootcamp Days 3-5: Agents, Memory, Identity](./291-farcaster-agentic-bootcamp-days-3-5/) | STANDALONE | Extract actionable patterns from bootcamp days 3-5 for FISHBOWLZ agent participants — event-driven agents, stateful memory, and ERC-8004 identity. |
 | 292 | [Pixel Agents Dashboard Customization for ZAO OS](./292-pixel-agents-dashboard-customization/) | STANDALONE | Make pixels.zaoos.com interactive — click-to-dispatch, ZAO branding, Supabase integration |

@@ -83,7 +83,7 @@ Add to the ZAO OS V1 `CLAUDE.md`:
 
 ## Also See
 
-- [Doc 311](../../311-vibe-coded-apps-marketing-playbook/) - prior marketing patterns for vibe-coded apps
+- [Doc 311](../../business/311-vibe-coded-apps-marketing-playbook/) - prior marketing patterns for vibe-coded apps
 - [Doc 549](../../dev-workflows/549-21st-dev-magic-mcp/) - the `/21st` skill's draft pattern
 - [Doc 715](../../events/715-session-2026-05-22-meeting-skill-diarization/) - yesterday's session recap (no writing failure)
 - [Doc 726](../../events/726-session-2026-05-23-tracker-ops-pack/) - today's session recap (where this gap was exposed)

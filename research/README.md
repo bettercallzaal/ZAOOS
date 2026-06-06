@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **751+ active research documents** across 13 topic folders (77 superseded docs in `_archive/`, plus 12 legacy docs at the `research/` root and 9 daily inspiration logs) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy.
+> **762+ active research documents** across 13 topic folders (77 superseded docs in `_archive/`, plus 9 daily inspiration logs) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy.
 
 ---
 
@@ -8,16 +8,16 @@
 
 | Topic | Docs | Description |
 |-------|------|-------------|
-| [Dev Workflows](./dev-workflows/) | 150 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
-| [Agents](./agents/) | 136 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization |
+| [Dev Workflows](./dev-workflows/) | 152 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
+| [Agents](./agents/) | 140 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization, agent identity/registration |
 | [Music](./music/) | 85 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
 | [Events](./events/) | 76 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
-| [Business](./business/) | 74 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
+| [Business](./business/) | 76 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
 | [Infrastructure](./infrastructure/) | 53 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
 | [Community](./community/) | 44 | ZAO guide, whitepaper, onboarding, member profiles, task forces, people/brands |
 | [Farcaster](./farcaster/) | 42 | Protocol, Mini Apps, XMTP, ecosystem, social graph, agentic bootcamp |
 | [Governance](./governance/) | 41 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
-| [Identity](./identity/) | 22 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph |
+| [Identity](./identity/) | 25 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph, Privy auth/wallets |
 | [Cross-Platform](./cross-platform/) | 15 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
 | [Inspiration](./inspiration/) | 9 | Daily "steal like an artist" research — apps analyzed per session, gap analysis |
 | [Security](./security/) | 7 | Audits, API verification, testing |
@@ -137,7 +137,7 @@
 
 ## Research Stats
 
-- **Active documents:** 751 across 13 topic folders (+12 legacy docs at the `research/` root, +9 daily inspiration logs)
+- **Active documents:** 762 across 13 topic folders (+9 daily inspiration logs; all docs now filed in topic folders)
 - **Highest doc number:** 797
 - **Archived (superseded/merged):** 77 (in `_archive/`)
 - **Time span:** January — June 2026

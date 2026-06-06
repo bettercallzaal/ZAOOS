@@ -186,7 +186,7 @@ Self-host Redis on VPS 1, or use Supabase Redis add-on ($5-60/mo). 80% RPC reduc
 
 - [Doc 055](../../_archive/055-hats-anchor-app-and-tooling/) - Hats Anchor app + tooling (archived)
 - [Doc 273](../../music/273-web3-streaming-features-tipping-gating-tickets/) - Web3 streaming features incl. gating
-- [Doc 283](../../283-privy-embedded-wallets-fishbowlz-token-mechanics/) - Privy + token mechanics
+- [Doc 283](../../identity/283-privy-embedded-wallets-fishbowlz-token-mechanics/) - Privy + token mechanics
 - [Doc 500](../../governance/500-dao-event-coordination-patterns/) - DAO event coordination
 - `src/lib/spaces/tokenGate.ts` - current gate code
 - `src/lib/hats/gating.ts` - current Hats integration

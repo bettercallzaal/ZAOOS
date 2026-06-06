@@ -120,7 +120,7 @@ Three output channels Zaal already runs:
 
 ## Also see
 
-- [Doc 309 - Karpathy LLM wiki codebase compiler](../../309-karpathy-llm-wiki-codebase-compiler/) (the philosophy of "your repo is your wiki")
+- [Doc 309 - Karpathy LLM wiki codebase compiler](../../dev-workflows/309-karpathy-llm-wiki-codebase-compiler/) (the philosophy of "your repo is your wiki")
 - [Doc 478 - Obsidian + Claude Jarvis AI Brain](../../dev-workflows/478-obsidian-claude-jarvis-ai-brain/) (the alt path that lost to Bonfire)
 - [Doc 549 - Bonfire as personal second brain](../549-bonfire-personal-second-brain/) (the foundation decision)
 - [Doc 568 - Aware brain local memory + KG](../../agents/568-aware-brain-local-memory-knowledge-graph/) (Phase 3 local backup)

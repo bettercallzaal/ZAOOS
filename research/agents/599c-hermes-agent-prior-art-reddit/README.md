@@ -73,7 +73,7 @@ ZAO is already aligned with these lessons. Fixing collision is the only urgent a
 ## Also See
 
 - [Doc 483](../483-hermes-agent-local-llm-framework/) - **Existing ZAO research on Nous Hermes + Qwen3.6-27B for per-brand bot fleet on VPS 1.** This is the same upstream project the r/hermesagent subreddit covers. Doc 599c (this) supersedes the naming-collision question; Doc 483 stays canonical for the local-LLM framework decision.
-- [Doc 312](../../312-claude-skills-marketplace-ecosystem/) - Skills ecosystem
+- [Doc 312](../../dev-workflows/312-claude-skills-marketplace-ecosystem/) - Skills ecosystem
 - [Doc 599](../../events/599-inbox-digest-2026-05-03/) - parent
 - [Doc 599b](../../farcaster/599b-gmfc101-wordaday-mini-app-patterns/) - Adjacent agent stack lessons
 

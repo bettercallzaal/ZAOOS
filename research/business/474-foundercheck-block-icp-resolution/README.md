@@ -214,7 +214,7 @@ Grounded in current codebase:
 - [Doc 472 — ZAO Stock Artist Lockin Timeline](../../../research/events/472-zaostock-artist-lockin-timeline/)
 - [Doc 361 — Empire Builder Deep Dive](../361-empire-builder-deep-dive-v3-integration/)
 - [Doc 264 — LinkedIn Build-in-Public Playbook](../264-linkedin-build-in-public-playbook/)
-- [Doc 311 — Vibe-Coded Apps Marketing Playbook](../../../research/311-vibe-coded-apps-marketing-playbook/)
+- [Doc 311 — Vibe-Coded Apps Marketing Playbook](../../../research/business/311-vibe-coded-apps-marketing-playbook/)
 - [Doc 455 — BCZ Maine Clients (Stephen + Cameron)](../455-bcz-maine-clients-stephen-cameron/README.md)
 - Financial literacy meta-analysis (168 studies, 2014), via doc 470
 - Madrian & Shea default-flip study (2001), via doc 470

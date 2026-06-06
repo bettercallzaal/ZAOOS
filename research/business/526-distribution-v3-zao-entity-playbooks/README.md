@@ -161,7 +161,7 @@ Do NOT batch entities. ZAO OS sprint and ZAOstock sprint and Devz sprint run in 
 - [Doc 470](../470-behavioral-intervention-vs-financial-literacy-zao/) - Why education-only fails (0.1% behavior change), where ZAO's wedge actually is
 - [Doc 432](../../community/432-zao-master-context-tricky-buddha/) - Music first, community second, tech third positioning
 - [Doc 264](../264-linkedin-build-in-public-playbook/) - HSLC post structure, hook formulas, anti-AI-slop hooks
-- [Doc 311](../../311-vibe-coded-apps-marketing-playbook/) - Adjacent vibe-coded marketing playbook
+- [Doc 311](../../business/311-vibe-coded-apps-marketing-playbook/) - Adjacent vibe-coded marketing playbook
 - [Doc 051](../../community/051-zao-whitepaper-2026/) - Whitepaper canonical artist-first language
 - [Doc 363](../../community/363-zao-stock-people-brands-2026/) - ZAOstock people + brands
 - [Doc 475](../475-zao-music-entity/) - ZAO Music DBA + team + Cipher = release #1

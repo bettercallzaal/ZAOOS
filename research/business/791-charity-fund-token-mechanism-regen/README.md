@@ -4,7 +4,7 @@ type: market-research
 status: research-complete
 last-validated: 2026-05-31
 superseded-by:
-related-docs: 674, 745, 790
+related-docs: 674, 745, 790, 794
 original-query: "/inbox - forwarded X post by +MemeForTrees: 'You can mint and redeem charity fund tokens here for 1USDC any time. If you hold a charity token you earn more of that charity token always redeemable 1:1 for USDC, while you hold a stream of funding is also going to the charity of your choice. For normies this still seems risky'"
 tier: STANDARD
 ---
@@ -33,6 +33,8 @@ Decoded mechanism (4 claims):
 4. **Self-aware risk flag** - the poster concedes "for normies this still seems risky", i.e. the UX/trust gap is unsolved.
 
 The mechanism is a **par-redeemable charity stablecoin with a yield + donation stream**. The open question (unanswered in the post): where does the "earn more" + "funding stream" yield come from? If from reserve yield (e.g. USDC lent / T-bill-backed), it is sustainable. If from token inflation or new mints, it is reflexive and fails.
+
+> **Update 2026-05-31 (Doc 794):** the actual mint/burn page (tasern.quest/fund/mint.html) answers this. Yield = Aave V3 USDC lending, split 33.33% holders / 33.33% Meme for Trees / 33.34% ops, principal redeemable 1:1 any time, immutable, no admin keys, "follows aUSDC legal precedent - deposit position, not a payment instrument." It is the SUSTAINABLE (reserve-funded) shape, and the charity vault is LIVE, not aspirational. See [Doc 794](../794-tasern-charity-vaults-refi-funding-pattern/).
 
 ## Who MemeForTrees is (grounding)
 

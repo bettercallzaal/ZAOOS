@@ -359,6 +359,57 @@ Output as a config spec I can paste tab-by-tab. Do not write anything to the gra
 The bot's answers to #1 and #2 close the gaps in the build kit above (the write
 tool + the model presets). Reconcile its output with the kit; they should agree.
 
+## Reconciled final writer config (2026-06-06)
+
+`@zabal_bonfire` generated a config spec (Zaal's dogfood). Reconciled with the
+build kit. What the bot added, what it got wrong, and the final answer:
+
+**Adopted from the bot (good):**
+- **Confidence ladder refinement** — "conversational claims max 0.85" caps a
+  single human assertion below a sourced fact. Merged into the final ladder:
+  0.6 = inference / no verifiable source · ≤0.85 = single conversational claim
+  (reported, unverified) · 0.9 = verified secondary source_url you retrieved ·
+  1.0 = on-chain or official primary data only.
+- Crux **hypothesis**: bot claims "Bonfires Delve = read; writes go via
+  `POST /knowledge_graph/episode/create`" (the "Delve Knowledge Graph (Write
+  episodes)" tool — same endpoint `scripts/bonfire-ingest/` posts to).
+
+**Corrected (bot was wrong / unreliable narrator — cf. its own state_truthfulness):**
+1. **Crux is CONTRADICTORY, treat as unverified.** The bot says Bonfires Delve is
+   read-only, but the live bot *writes today with "Delve KG (Write episodes)"
+   unchecked* — so either Bonfires Delve writes, or there's another path. Don't
+   trust the bot's self-report. Writer: enable BOTH tools (covers it either way).
+   Reader: empirical test — after hardening, try to make it write; if it still
+   can with only Bonfires Delve on, that tool writes and the reader needs
+   prompt-enforcement, not just tool-unchecking.
+2. **Keep Firecrawl ON.** The bot wanted to disable web search, but its own
+   protocol step 4 (verify source_url resolves) REQUIRES it. Disabling its
+   verification tool guts the verification step. Keep it.
+3. **Keep `batch_paraphrase_gate` + `voice` traits.** The bot dropped 3 of 15;
+   `recall_format` is fine to drop (writer doesn't recall), but
+   `batch_paraphrase_gate` IS the writer's manifest/preview/batch-approval commit
+   discipline — core. `voice` stays for register consistency.
+4. **Keep `vocabulary_fidelity` as a named trait** with the seed ("gap filling
+   axioma" canonical / "TreeUnix Protocol" superseded). The bot folded it into a
+   vague "no new terminology" and lost the seed — the exact fix doc 798 needs.
+
+**Final tools:** Delve Knowledge Graph (Write episodes) + Bonfires Delve +
+Firecrawl + Fireflies + Cross-Bonfire Search + Message Search + User Lookup +
+Twitter + Trimtab. OFF: Agent Personality, REST API, Scheduling, autonomous triggers.
+
+**Final personality:** inherit 14 of 15 (drop only `recall_format`), add 4 —
+`deep_think_gate`, `confidence_calibration` (the ladder above),
+`pii_guard` (consent-based; ZAO names ok, sensitive attributes not),
+`vocabulary_fidelity` (with seed).
+
+**LLM Config:** Internal Model = highest-capability reasoning preset (bot
+recommends "Claude Opus tier"). Still need the actual dropdown preset names.
+
+**OPEN — Zaal decides (changes Chat tab + Telegram policy):** does the writer
+take messages directly (gated to Zaal + GCvlcnti via Allowed Users), or only
+structured hand-offs routed from the reader / Zaal? Direct-but-gated is less
+friction; hand-off-only is more controlled. Pending Zaal.
+
 ## Source
 
 - Live `@zabal_bonfire_bot` / DeepMeeting transcript, 2026-06-06 (Zaal-supplied).

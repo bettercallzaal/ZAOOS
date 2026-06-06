@@ -405,10 +405,10 @@ Twitter + Trimtab. OFF: Agent Personality, REST API, Scheduling, autonomous trig
 **LLM Config:** Internal Model = highest-capability reasoning preset (bot
 recommends "Claude Opus tier"). Still need the actual dropdown preset names.
 
-**OPEN — Zaal decides (changes Chat tab + Telegram policy):** does the writer
-take messages directly (gated to Zaal + GCvlcnti via Allowed Users), or only
-structured hand-offs routed from the reader / Zaal? Direct-but-gated is less
-friction; hand-off-only is more controlled. Pending Zaal.
+**RESOLVED — intake (Zaal, 2026-06-06):** direct, gated to two. The writer
+processes messages only from `bettercallzaal` + GCvlcnti (Allowed Users);
+everyone else is ignored. Less friction than hand-off-only, but not open to the
+group — the two trusted writers can DM or tag it directly to add facts.
 
 ## Source
 

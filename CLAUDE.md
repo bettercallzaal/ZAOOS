@@ -33,9 +33,9 @@ The pattern: **Monorepo as Lab.**
 | `src/lib/publish/` | Cross-platform posting (Farcaster, X, Bluesky) | Working on distribution |
 | `src/providers/` | Audio player, contexts | Working on player |
 | `community.config.ts` | All branding, channels, admin FIDs, contracts, nav | Forking or configuring |
-| `research/` | 240+ research docs (see research/README.md) | Use grep, not bulk reads |
+| `research/` | 858+ research docs (see research/INDEX.md + README.md) | Use grep, not bulk reads |
 | `scripts/` | SQL migrations, wallet generation, webhook setup | DB or infra work |
-| `contracts/` | Solidity (staking, bounty board) | Smart contract work |
+| `community.config.ts` + `src/lib/{respect,ordao,zounz,staking}` | On-chain contract addresses + ABIs — all external deployments (no in-repo Solidity / `contracts/` dir) | Smart contract work |
 
 ## Quick Start
 

@@ -124,8 +124,8 @@ prefer an explicit gap over a synthesized answer.
 | # | Fix | Effort | Status |
 |---|---|---|---|
 | 2 | PII gate at ingest (structured) | done | ✅ shipped this doc |
+| 1b | Provenance tier (`canonical`/`reported`/`inferred`) in episode body | done | ✅ shipped (Zaal greenlit 2026-06-06) |
 | 1a | Stop gating on server `Confidence`; document it | doc-only | recommend |
-| 1b | Provenance tier (`canonical`/`reported`/`inferred`) in episode body | S | recommend |
 | 3b | `HEAD`-check `source_url` before stamping canonical | S | recommend |
 | 1c | Require `supersedes` shape for corrections | S | recommend |
 | 4 | Recall "I don't know" floor (prompt) | S | recommend — bot-prompt, lives on VPS |

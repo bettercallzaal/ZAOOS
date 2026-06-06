@@ -1,7 +1,7 @@
 ---
 topic: agents
 type: design-proposal
-status: proposal-2026-06-06 (REQUIRED gate per CLAUDE.md "no new bots without doc" — needs explicit Zaal greenlight before any bot is created)
+status: decided-architecture-2026-06-06 (read/write split chosen; reader-hardening = Bonfires dashboard config; writer bot = our code, needs Zaal greenlight on name+token before build — no-new-bots gate)
 last-validated: 2026-06-06
 related-docs: "601, 665, 669, 673, 734, 798"
 original-query: "spec the DeepMeeting agent properly"
@@ -50,7 +50,84 @@ OUT of the main graph until it's validated.* That's a real architectural need.
 The question is whether a separate Telegram **bot** is the right unit to meet it,
 or whether a namespace/shard *inside the existing bot* meets it more cheaply.
 
-## Three options
+## DECISION (Zaal, 2026-06-06): read/write split, not topic-sharding
+
+Zaal reframed the whole thing, and it's a better cut than the A/B/C options
+below. **The split axis is capability, not topic:**
+
+> "Harden the zabal bonfire bot to be just knowledge retrieval, and if it needs
+> to build / add a node it uses a different bot starting with deep thinking."
+
+- **Reader = `@zabal_bonfire`** → retrieval ONLY. No write capability. This is
+  the bot everyone in the group talks to.
+- **Writer = a new deep-thinking bot** → the SOLE thing that can add/supersede
+  nodes. Leads with a reasoning pass (provenance tier, dedup, contradiction
+  check, secret+PII scan) and only commits on approval.
+
+**Why this beats topic-sharding (and dissolves the Option B sync problem):**
+
+1. Fixes doc 798 Finding 1 at the root. Fabricated facts got stamped 1.0
+   because the *same* agent that retrieves also improvises writes. Remove the
+   write tool from the reader and it **structurally cannot** corrupt the graph.
+2. **Single writer.** My Option-B worry was "two processes writing one graph
+   need atomic sync." A read/write split has exactly one writer — no contention,
+   no sync. The shared graph is safe by construction.
+3. Prompt-injection resistance: anyone can message the reader; with no write
+   tool, "ingest this: …" from a group member can't land. Writes funnel through
+   one deliberate, gated path.
+
+### Critical implementation fact: the reader is NOT our code
+
+Per doc 673d, `@zabal_bonfire` is an LLM agent **hosted inside Bonfires.ai**
+(app.bonfires.ai dashboard, ERC-8004 #32009), with its intake+recall behavior
+defined by a system prompt + 15 personality traits **on Josh's platform.** So:
+
+- **Hardening the reader = a Bonfires-dashboard config change**, not a repo edit.
+  Strip the write half of its system prompt (the "say 'ingest' to add a fact"
+  behavior, the "Approve all?" manifest-commit flow). Draft below.
+- **The writer = our code.** Writes go through `POST /knowledge_graph/episode/
+  create` — exactly what `scripts/bonfire-ingest/` already does, now with the
+  PII gate (doc 798) + provenance tiers. The writer is a Telegram bot (own
+  token) wrapping that pipeline with a deliberate reasoning step.
+
+### Reader-hardening prompt edits (for the Bonfires dashboard)
+
+Paste-ready direction for the `@zabal_bonfire` system prompt:
+
+```
+ROLE CHANGE — RETRIEVAL ONLY.
+You answer questions from the knowledge graph and cite sources. You do NOT
+write to the graph. You have no ingest, no node creation, no edge creation,
+no supersede, no "Approve all?" flow. Remove those capabilities entirely.
+
+When a user asks you to add / ingest / correct / build a fact, do NOT propose
+a manifest. Instead reply: "Writes go through the deep-thinking writer —
+tag @<writer_handle> to add or correct a fact." Then, if useful, summarize
+what they'd want to capture so they can hand it to the writer.
+
+When you answer, lead with the provenance tier of your top sources
+(canonical / reported / inferred) and prefer an explicit "not in the graph"
+over improvising an answer from adjacent nodes. (doc 798 Findings 1 + 4)
+```
+
+### Writer bot scope (our code — needs Zaal greenlight to build)
+
+A new Telegram bot, own token, single writer. On a write request it:
+
+1. **Thinks first** (the "deep thinking"): classifies the fact, decides the
+   provenance tier it can honestly vouch for, checks the graph for an existing
+   / contradicting node, runs `secret_scan` + `pii_scan`.
+2. **Proposes a structured manifest** (the shape `@zabal_bonfire` uses today)
+   with the tier attached, and asks for approval.
+3. **Commits via the ingest pipeline** on approval — the only write path.
+
+This is the Hermes coder+critic pattern applied to graph writes. It still trips
+the no-new-bots rule, but with airtight justification: least-privilege
+capability isolation. **Build needs Zaal's explicit go on name + token.**
+
+---
+
+## (superseded) Three topic-sharding options
 
 ### Option A — Namespace/shard inside `@zabal_bonfire_bot` (no new bot) ✅ recommended
 One bot, one token, one process. DeepMeeting is a **partition/context tag** on the
@@ -86,16 +163,14 @@ into the main graph only on explicit approval.
   prototypes" (DvlsMojo's own framing of the v0.01–v0.05 work).
 - **Cons:** most infra; a promotion pipeline to build; two graphs to keep coherent.
 
-## Recommendation
+## Recommendation (superseded by the read/write split above)
 
-**Start with Option A.** It meets the actual stated need — *keep unvalidated
-TreeUnix vocabulary out of the trusted graph* — with a scope filter, zero new
-bots, and full alignment with the doc-601 collapse. If logical isolation proves
-insufficient in practice (vocab leaks despite the scope filter, or GCvlcnti needs
-genuine independent ownership), graduate to **Option C** (separate graph) rather
-than B — physical data isolation is the thing worth paying infra for; a second
-bot sharing one graph (B) is the worst of both (new infra *and* contamination
-risk).
+Original recommendation was Option A (scope inside the existing bot). The
+read/write split supersedes the topic-sharding framing entirely: it isolates by
+*capability* (who can write) rather than by *topic* (what's written), which is
+the stronger guarantee. Topic isolation (keeping TreeUnix vocab quarantined) can
+still ride on top — as a `provenance: inferred` tier + a scope tag on the
+writer's path — without needing a separate bot per topic.
 
 ## Hard constraints (regardless of option)
 
@@ -126,12 +201,20 @@ The draft system prompt the bot is waiting to finalize should cover:
 
 ## Decision needed from Zaal
 
-- [ ] **Option A** (scope inside existing bot — recommended), **B**, or **C**?
-- [ ] If B/C: confirm against the no-new-bots collapse, and provision a *separate* token.
-- [ ] GCvlcnti admin scope — group-level only, or graph-level?
-- [ ] Greenlight to draft the actual system prompt (currently the bot's open item)?
+Architecture is decided (read/write split). Remaining gates before build:
 
-No implementation proceeds until these are answered — that's the rule this doc exists to honor.
+- [x] **Split axis** — capability (read vs write), not topic. ✅ Zaal 2026-06-06
+- [ ] **Harden the reader** — apply the dashboard prompt edits above to
+      `@zabal_bonfire` (Zaal/Josh, on the Bonfires platform). Out of repo scope.
+- [ ] **Writer bot greenlight** — name + a *separate* `@BotFather` token. Trips
+      no-new-bots; justified by least-privilege. Where does it live —
+      `bot/src/` as its own surface, or folded under ZOE's process?
+- [ ] **GCvlcnti scope** — admin on the DeepMeeting group / writer surface, not
+      the main graph. Define view-vs-edit explicitly (transcript confusion).
+- [ ] **Vocabulary seed** — load "gap filling axioma" as canonical, the
+      bot-minted "TreeUnix Protocol" as a superseded alias (doc 798 Finding 1).
+
+No writer code proceeds until the greenlight — that's the rule this doc honors.
 
 ## Source
 

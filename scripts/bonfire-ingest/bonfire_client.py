@@ -35,6 +35,10 @@ import uuid as _uuid
 import secret_scan
 import pii_scan
 
+# doc 798 Finding 1 — provenance tiers. Confidence the SERVER returns is
+# decorative (1.0 on fabrications); these are the trust tiers WE stamp at write.
+PROVENANCE_TIERS = {"canonical", "reported", "inferred"}
+
 
 class IngestPipeline:
     def __init__(self, label, sanitize=False, dry_run=False):
@@ -54,8 +58,26 @@ class IngestPipeline:
             "sent": [], "blocked": [], "failed": [], "sanitized": [], "pii_blocked": [],
         }
 
-    def ingest(self, name, body, source_description, reference_time=None, source="text"):
-        """Single-episode ingest. Returns dict with status info."""
+    def ingest(self, name, body, source_description, reference_time=None,
+               source="text", provenance="reported"):
+        """Single-episode ingest. Returns dict with status info.
+
+        provenance (doc 798 Finding 1 — calibration): the trust tier the caller
+        VOUCHES FOR. Stamped into the episode body so recall can cite it instead
+        of leaning on the server's decorative `Confidence: 1.0`:
+          - canonical : sourced from repo code / a ZAOOS research README / a doc
+                        Zaal authored. Verifiable.
+          - reported  : a single human's assertion (meeting/chat), unverified.
+          - inferred  : the agent connected facts itself. Lowest trust — this is
+                        the tier the three transcript fabrications actually were.
+        The forthcoming deep-thinking writer bot MUST decide this consciously
+        per write, which is the whole point: no fact enters untiered.
+        """
+        if provenance not in PROVENANCE_TIERS:
+            raise ValueError(f"provenance must be one of {sorted(PROVENANCE_TIERS)}, got {provenance!r}")
+        # Stamp the tier so it travels with the fact into recall.
+        body = f"[provenance: {provenance}]\n\n{body}"
+
         # Mandatory pre-flight scan
         scan = secret_scan.preflight(body, label=name)
         high = scan["summary"].get("HIGH", 0)
@@ -167,6 +189,7 @@ class IngestPipeline:
                     "uuid": episode_uuid,
                     "task": task,
                     "source_description": source_description,
+                    "provenance": provenance,
                 })
                 print(f"  [OK] {name} -> uuid={episode_uuid[:8]}... task={task}")
                 return {"status": "sent", "uuid": episode_uuid, "task_id": task}

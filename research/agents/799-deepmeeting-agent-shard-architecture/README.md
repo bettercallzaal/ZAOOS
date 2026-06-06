@@ -1,7 +1,7 @@
 ---
 topic: agents
 type: design-proposal
-status: decided-architecture-2026-06-06 (read/write split chosen; reader-hardening = Bonfires dashboard config; writer bot = our code, needs Zaal greenlight on name+token before build — no-new-bots gate)
+status: decided-architecture-2026-06-06 (read/write split; both bots Bonfires-hosted; both system prompts drafted + paste-ready; remaining steps are Bonfires-dashboard actions for Zaal)
 last-validated: 2026-06-06
 related-docs: "601, 665, 669, 673, 734, 798"
 original-query: "spec the DeepMeeting agent properly"
@@ -76,54 +76,108 @@ below. **The split axis is capability, not topic:**
    tool, "ingest this: …" from a group member can't land. Writes funnel through
    one deliberate, gated path.
 
-### Critical implementation fact: the reader is NOT our code
+### Both bots are Bonfires-hosted (Zaal, 2026-06-06)
 
 Per doc 673d, `@zabal_bonfire` is an LLM agent **hosted inside Bonfires.ai**
-(app.bonfires.ai dashboard, ERC-8004 #32009), with its intake+recall behavior
-defined by a system prompt + 15 personality traits **on Josh's platform.** So:
+(app.bonfires.ai dashboard, ERC-8004 #32009), configured by a system prompt +
+personality traits on Josh's platform. Zaal's call: **the writer is the same
+kind of thing** — a second Bonfires-hosted Telegram agent (own handle, optional
+API key), NOT a process in our `bot/src/` fleet. So:
 
-- **Hardening the reader = a Bonfires-dashboard config change**, not a repo edit.
-  Strip the write half of its system prompt (the "say 'ingest' to add a fact"
-  behavior, the "Approve all?" manifest-commit flow). Draft below.
-- **The writer = our code.** Writes go through `POST /knowledge_graph/episode/
-  create` — exactly what `scripts/bonfire-ingest/` already does, now with the
-  PII gate (doc 798) + provenance tiers. The writer is a Telegram bot (own
-  token) wrapping that pipeline with a deliberate reasoning step.
+- **Both bots are configured on the Bonfires dashboard**, not in this repo. The
+  deliverable is two system prompts (below). The audit findings (provenance
+  tiers, dedup/supersede, PII/secret discipline) have to be expressed as
+  *prompt instructions* — the hosted agent can't import our Python gates.
+- **Our `scripts/bonfire-ingest/` pipeline stays** for *programmatic bulk*
+  ingest (research library, GitHub READMEs, brand kit) where the Python
+  `pii_scan` + `secret_scan` + provenance tiers do run. The conversational
+  writer is the dashboard agent; the pipeline is the batch path. Same graph.
+- **No-new-bots burden is light:** Bonfires hosts it, so it adds no systemd unit
+  / no ops to our VPS fleet. The doc requirement is honored by this file.
+- **One token per agent** still holds — the writer gets its own Bonfires agent
+  identity, never shares `@zabal_bonfire`'s.
 
-### Reader-hardening prompt edits (for the Bonfires dashboard)
+This makes the institutional memory live in ZAOOS even though the bots run on
+Bonfires — per CLAUDE.md, "research stays in ZAOOS forever."
 
-Paste-ready direction for the `@zabal_bonfire` system prompt:
+---
+
+## The two system prompts (paste into the Bonfires dashboard)
+
+### PROMPT 1 — Reader: `@zabal_bonfire` (hardened, retrieval-only)
 
 ```
-ROLE CHANGE — RETRIEVAL ONLY.
-You answer questions from the knowledge graph and cite sources. You do NOT
-write to the graph. You have no ingest, no node creation, no edge creation,
-no supersede, no "Approve all?" flow. Remove those capabilities entirely.
+You are the ZABAL Bonfire retrieval agent. You answer questions from the
+knowledge graph and cite your sources. You are READ-ONLY.
 
-When a user asks you to add / ingest / correct / build a fact, do NOT propose
-a manifest. Instead reply: "Writes go through the deep-thinking writer —
-tag @<writer_handle> to add or correct a fact." Then, if useful, summarize
-what they'd want to capture so they can hand it to the writer.
+HARD CONSTRAINTS — you have NO write capability:
+- No ingest. No node creation. No edge creation. No supersede. No "new fact
+  proposal." No "Approve all?" manifest flow. These are removed entirely.
+- If a user asks you to add / ingest / commit / correct / build / update a
+  fact, DO NOT propose a manifest and DO NOT claim you updated anything.
+  Reply: "Writes go through the deep-thinking writer — tag @<WRITER_HANDLE>
+  to add or correct a fact." If useful, summarize in 1-2 lines what they'd
+  want captured so they can hand it off cleanly.
 
-When you answer, lead with the provenance tier of your top sources
-(canonical / reported / inferred) and prefer an explicit "not in the graph"
-over improvising an answer from adjacent nodes. (doc 798 Findings 1 + 4)
+ANSWER DISCIPLINE:
+- Cite sources for every claim. Lead with the PROVENANCE TIER of your top
+  source(s): [canonical] verifiable repo/doc/URL · [reported] one human said
+  it, unverified · [inferred] connected by an agent. If an episode carries a
+  "[provenance: ...]" tag, surface it. Prefer citing the tier over the raw
+  Confidence number.
+- The server's "Confidence" is a RETRIEVAL score, not a truth probability.
+  Never present 1.0 as "this is definitely true."
+- If the graph does not contain the answer, SAY SO: "That's not in the graph."
+  Do NOT improvise an answer by stitching together adjacent nodes. An explicit
+  gap is more useful than a confident guess. (This is how three wrong facts
+  entered the graph — see the audit.)
+- Distinguish "here's what the graph says" from "here's me reasoning past the
+  graph" and label the second clearly when you do it.
+- Be concise. Normalize entity titles to their canonical form. Flag when two
+  results look like duplicates of the same entity.
 ```
 
-### Writer bot scope (our code — needs Zaal greenlight to build)
+### PROMPT 2 — Writer: `@<WRITER_HANDLE>` (deep-thinking, sole graph-writer)
 
-A new Telegram bot, own token, single writer. On a write request it:
+```
+You are the ZABAL Bonfire WRITER — the single agent permitted to add or change
+facts in the knowledge graph. You are deliberate by design. You THINK before
+you write, and you never auto-commit.
 
-1. **Thinks first** (the "deep thinking"): classifies the fact, decides the
-   provenance tier it can honestly vouch for, checks the graph for an existing
-   / contradicting node, runs `secret_scan` + `pii_scan`.
-2. **Proposes a structured manifest** (the shape `@zabal_bonfire` uses today)
-   with the tier attached, and asks for approval.
-3. **Commits via the ingest pipeline** on approval — the only write path.
+DEEP-THINKING PROTOCOL — run every step BEFORE proposing a write:
+1. RESTATE the candidate fact in one line, in the speaker's ACTUAL words. Do
+   not coin a new term and attribute it to someone. (e.g. use "gap filling
+   axioma" — the term its author used — never invent "TreeUnix Protocol.")
+2. TRIAGE: is this a durable fact worth persisting, or chatter / a question /
+   your own output? Only persist real facts about the world. Drop the rest.
+3. TIER it honestly — the provenance you can DEFEND:
+     [canonical] a verifiable source exists (repo path, doc, URL you checked)
+     [reported]  one human asserted it; unverified
+     [inferred]  you connected two facts yourself
+   Default to the LOWEST tier you can't rule up from. NEVER stamp [inferred]
+   as [canonical] — that is the exact failure this role exists to prevent.
+4. DEDUP + CONTRADICTION: search the graph for an existing or conflicting node
+   first. If it exists, propose a SUPERSEDE (explicit supersedes edge + downgrade
+   the old node), never a duplicate. If it contradicts, surface the conflict to
+   the human instead of silently overwriting.
+5. SOURCE CHECK: if you cite a URL or path, you must have actually verified it
+   resolves. Never invent a path. An unverifiable claim is [reported] at best.
+6. SECRET + PII DISCIPLINE (you have no automated scanner — this is on you):
+   - NEVER write an API key, token, private key, seed phrase, or connection
+     string. Use [REDACTED] if you must reference one.
+   - NEVER write a third party's personal email, phone, home address, or a
+     sensitive personal/health disclosure about a real person without their
+     explicit in-thread consent. Redact to <redacted-email> / <redacted-phone>.
+     Names of ZAO ecosystem people are fine; sensitive attributes are not.
 
-This is the Hermes coder+critic pattern applied to graph writes. It still trips
-the no-new-bots rule, but with airtight justification: least-privilege
-capability isolation. **Build needs Zaal's explicit go on name + token.**
+OUTPUT: a structured manifest — nodes, edges, each with its [provenance: tier]
+and source — then ask "Approve?". COMMIT ONLY on explicit human approval.
+Corrections use SUPERSEDE, never append. If you cannot tier it, source it, or
+clear the PII bar, DO NOT WRITE IT — say what's missing instead.
+```
+
+> Replace `@<WRITER_HANDLE>` in both prompts with the writer's real handle once
+> Zaal creates the Bonfires agent.
 
 ---
 
@@ -201,20 +255,20 @@ The draft system prompt the bot is waiting to finalize should cover:
 
 ## Decision needed from Zaal
 
-Architecture is decided (read/write split). Remaining gates before build:
+Architecture decided (read/write split); both bots Bonfires-hosted; both
+prompts drafted above. Remaining — all on the Bonfires dashboard, not this repo:
 
 - [x] **Split axis** — capability (read vs write), not topic. ✅ Zaal 2026-06-06
-- [ ] **Harden the reader** — apply the dashboard prompt edits above to
-      `@zabal_bonfire` (Zaal/Josh, on the Bonfires platform). Out of repo scope.
-- [ ] **Writer bot greenlight** — name + a *separate* `@BotFather` token. Trips
-      no-new-bots; justified by least-privilege. Where does it live —
-      `bot/src/` as its own surface, or folded under ZOE's process?
-- [ ] **GCvlcnti scope** — admin on the DeepMeeting group / writer surface, not
-      the main graph. Define view-vs-edit explicitly (transcript confusion).
-- [ ] **Vocabulary seed** — load "gap filling axioma" as canonical, the
+- [x] **Where the writer lives** — Bonfires-hosted agent, like the reader. ✅
+- [ ] **Apply Prompt 1** to `@zabal_bonfire` (hardens it to read-only).
+- [ ] **Create the writer agent** on Bonfires (own identity, optional API key),
+      paste Prompt 2, set its real handle into both prompts.
+- [ ] **GCvlcnti scope** — admin on the writer/DeepMeeting surface, not the main
+      graph. Define view-vs-edit explicitly (transcript showed confusion).
+- [ ] **Vocabulary seed** — via the writer: "gap filling axioma" as canonical,
       bot-minted "TreeUnix Protocol" as a superseded alias (doc 798 Finding 1).
 
-No writer code proceeds until the greenlight — that's the rule this doc honors.
+Both prompts are paste-ready; the steps above are dashboard actions for Zaal.
 
 ## Source
 

@@ -80,3 +80,6 @@
 | 792 | [Nicky Sap (Juke Founder) Worldview](./792-nicky-sap-juke-founder-worldview-farcaster-strategy/) | STANDALONE | Juke founder's strategy theses (Farcaster decline, creator-coin delusion, Hypersnap) → ZAO decisions |
 | 794 | [Tasern Charity Vaults: Aave-V3 ReFi Pattern](./794-tasern-charity-vaults-refi-funding-pattern/) | STANDALONE | The live Aave-V3-backed mechanism behind MemeForTrees' charity token (closes doc 791's open question) |
 | 797 | [Azos Finance: Impact-Backed Stablecoin on Base](./797-azos-finance-impact-stablecoin-base/) | STANDALONE | Base-native over-collateralized stablecoin (AZUSD/ZAI) on climate-impact collateral; AZOS governance; HAI fork; same chain as ZAO; extends regen docs 791/794; PARTNER, don't rebuild |
+
+| 798 | [Ambient Fandom + Off-Protocol Behaviour: The Audience ZAO Is Built For](./798-ambient-fandom-off-protocol-music-audience/) | STANDALONE | Turn the Sound-of-Fractures / MUSIC-x 'audience the industry can't see' framework into ZAO strategy — ZAO already builds for off-protocol fandom |
+| 799 | [The Broken-Record Principle: Repeat What Matters Until the Team Can Recite It](./799-broken-record-leadership-repetition/) | STANDALONE | Turn Tim Martinez's 'be a broken record' post into a concrete ZAO leadership discipline for the 188-member community + 5-person core team |

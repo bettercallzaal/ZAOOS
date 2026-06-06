@@ -80,3 +80,5 @@
 | 788 | [kmac.eth: ZABAL Games + Farcaster Distribution](./788-kmac-zabal-farcaster-distribution-may30/) | EVENT/LOG | kmac's ZABAL Games talks, onboarding/distribution, JFS-signer softening ask, Quorum space test |
 | 795 | [Jose Acabrera (Joseph Goats): Contributor Onboarding](./795-jose-acabrera-onboarding-zao-contributor/) | EVENT/LOG | ZAO contributor onboarding session |
 | 796 | [The WIP Meetup: Web3 Metaverse Community](./796-the-wip-meetup-metaverse-community/) | STANDALONE | Longest-running web3 metaverse meetup (Thursdays since 2019, Hyperfy). Steal the weekly ritual + persistent 3D room; evaluate Hyperfy v2 (AI-agent NPCs) as the portal-hub venue; $HYPER attendance reward → Respect |
+
+| 800 | [Jose Acabrera (Joseph Goats) x Zaal — Claude Code Onboarding + Mini-App Hackathon](./800-jose-claude-code-onboarding-june5/) | EVENT/LOG | June 5 onboarding session — Claude Code setup + mini-app hackathon plan with new contributor Jose Acabrera (follow-on to doc 795) |

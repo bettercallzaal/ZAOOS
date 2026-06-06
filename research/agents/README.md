@@ -144,3 +144,6 @@
 | 773 | [ZOE orchestrator HIGH-severity fixes (doc 770 follow-up)](./773-zoe-orchestrator-high-fixes/) | STANDALONE | Fix the 5 HIGH findings from the doc 770 audit so the orchestrator is safe to trust with autonomous, cost-incurring runs. Each fix lands with a regression test where the … |
 | 775 | [What ZAO's Agent Stack Can Do Now (2026-05-30)](./775-zao-stack-capabilities-2026/) | STANDALONE | Inventory the new capabilities unlocked after this session's work (live graph recall, orchestrator Gaps 1+2, Supabase CRM, typed Bonfire intake), name the single … |
 | 781 | [ZABAL Bonfire contribution architecture (shared graph + soft barrier)](./781-zabal-bonfire-contribution-architecture/) | STANDALONE | let EVERYONE in the ZABAL Gamez 3-month buildathon contribute to the |
+
+| 796 | [ZOE: Broadcast Bot → Conversational, Well-Timed Assistant](./796-zoe-conversational-proactive-redesign/) | STANDALONE | Redesign ZOE from a broadcast bot into a conversational, well-timed concierge — proactive timing, reply quality, not blast messaging |
+| 801 | [ZOE / Cowork Bot / Cowork Dashboard — Systems Audit + Consolidation Map](./801-zoe-cowork-systems-audit-consolidation/) | CANONICAL | Single ground-truth audit of the three live ZAO agent/app systems (ZOE concierge, cowork tracker bot, cowork Kanban dashboard) + consolidation map |

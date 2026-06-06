@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **762+ active research documents** across 13 topic folders (77 superseded docs in `_archive/`, plus 9 daily inspiration logs) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy.
+> **771+ active research documents** across 13 topic folders (77 superseded docs in `_archive/`, plus 9 daily inspiration logs) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy.
 
 ---
 
@@ -8,11 +8,11 @@
 
 | Topic | Docs | Description |
 |-------|------|-------------|
-| [Dev Workflows](./dev-workflows/) | 152 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
-| [Agents](./agents/) | 140 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization, agent identity/registration |
+| [Dev Workflows](./dev-workflows/) | 156 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
+| [Agents](./agents/) | 142 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization, agent identity/registration |
 | [Music](./music/) | 85 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
-| [Events](./events/) | 76 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
-| [Business](./business/) | 76 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
+| [Business](./business/) | 78 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
+| [Events](./events/) | 77 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
 | [Infrastructure](./infrastructure/) | 53 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
 | [Community](./community/) | 44 | ZAO guide, whitepaper, onboarding, member profiles, task forces, people/brands |
 | [Farcaster](./farcaster/) | 42 | Protocol, Mini Apps, XMTP, ecosystem, social graph, agentic bootcamp |
@@ -137,8 +137,8 @@
 
 ## Research Stats
 
-- **Active documents:** 762 across 13 topic folders (+9 daily inspiration logs; all docs now filed in topic folders)
-- **Highest doc number:** 797
+- **Active documents:** 771 across 13 topic folders (+9 daily inspiration logs; all docs filed in topic folders)
+- **Highest doc number:** 802
 - **Archived (superseded/merged):** 77 (in `_archive/`)
 - **Time span:** January — June 2026
 - **Topic folders:** dev-workflows, agents, music, events, business, infrastructure, community, farcaster, governance, identity, cross-platform, security, wavewarz

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getSessionData } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
@@ -56,9 +57,9 @@ export default async function CrmPage() {
           <h1 className="text-2xl font-bold sm:text-3xl">CRM</h1>
           <p className="mt-1 text-sm text-white/60">
             {contacts.length} contacts - {publicCount} public on{' '}
-            <a href="/network" className="text-[#f5a623] hover:underline">
+            <Link href="/network" className="text-[#f5a623] hover:underline">
               /network
-            </a>
+            </Link>
           </p>
         </header>
 

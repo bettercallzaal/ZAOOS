@@ -10,7 +10,10 @@ function verifySignature(payload: string, signature: string): boolean {
   const hmac = crypto.createHmac('sha256', PRIVY_WEBHOOK_SECRET);
   hmac.update(payload);
   const expected = hmac.digest('hex');
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+  const sigBuf = Buffer.from(signature);
+  const expBuf = Buffer.from(expected);
+  // Length-guard before timingSafeEqual — mismatched lengths throw RangeError.
+  return sigBuf.length === expBuf.length && crypto.timingSafeEqual(sigBuf, expBuf);
 }
 
 export async function POST(req: NextRequest) {
@@ -18,8 +21,11 @@ export async function POST(req: NextRequest) {
     const body = await req.text();
     const signature = req.headers.get('x-privy-signature') || '';
 
-    // Verify webhook signature
-    if (PRIVY_WEBHOOK_SECRET && !verifySignature(body, signature)) {
+    // Fail CLOSED: reject if the webhook secret isn't configured (was fail-open).
+    if (!PRIVY_WEBHOOK_SECRET) {
+      return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+    }
+    if (!verifySignature(body, signature)) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 

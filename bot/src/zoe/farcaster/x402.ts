@@ -90,6 +90,6 @@ export async function buildX402Header(): Promise<string> {
 }
 
 /** True when the write endpoint should be paid via x402 (default) rather than a bearer key. */
-export function useX402(): boolean {
+export function isX402Enabled(): boolean {
   return (process.env.FARCASTER_WRITE_MODE ?? 'x402').toLowerCase() !== 'bearer';
 }

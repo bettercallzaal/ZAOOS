@@ -58,15 +58,24 @@ export const getSessionData = cache(async (): Promise<SessionData | null> => {
   };
 });
 
-export async function saveSession(data: {
-  fid: number;
-  username: string;
-  displayName: string;
-  pfpUrl: string;
-  walletAddress?: string;
-  authMethod?: 'farcaster' | 'wallet';
-  signerUuid?: string | null;
-}) {
+export async function saveSession(
+  data: {
+    fid: number;
+    username: string;
+    displayName: string;
+    pfpUrl: string;
+    walletAddress?: string;
+    authMethod?: 'farcaster' | 'wallet';
+    signerUuid?: string | null;
+  },
+  opts: { allowAdmin?: boolean } = {},
+) {
+  // allowAdmin defaults true. Callers that authenticate via an UNSIGNED claim
+  // (e.g. /api/miniapp/auth-context, which trusts a client-supplied FID) MUST
+  // pass allowAdmin:false — otherwise POSTing a known admin FID would mint an
+  // admin session (the public admin FID is in community.config.ts). Admin must
+  // only ever come from a signature/JWT-verified path.
+  const allowAdmin = opts.allowAdmin !== false;
   const session = await getSession();
   session.fid = data.fid;
   session.walletAddress = data.walletAddress || undefined;
@@ -75,8 +84,8 @@ export async function saveSession(data: {
   session.displayName = data.displayName;
   session.pfpUrl = data.pfpUrl;
   session.signerUuid = data.signerUuid || null;
-  session.isAdmin = ADMIN_FIDS.includes(data.fid) ||
-    (data.walletAddress ? ADMIN_WALLETS.includes(data.walletAddress.toLowerCase()) : false);
+  session.isAdmin = allowAdmin && (ADMIN_FIDS.includes(data.fid) ||
+    (data.walletAddress ? ADMIN_WALLETS.includes(data.walletAddress.toLowerCase()) : false));
   await session.save();
 }
 

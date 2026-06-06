@@ -204,5 +204,5 @@ Deferred to Year 2 review (Sept 2026): cmd+K, realtime, multi-view, gallery, cal
 
 - [270 — ZAOstock planning](../270-zao-stock-planning/)
 - [274 — ZAOstock team deep profiles](../274-zao-stock-team-deep-profiles/)
-- [289 — ZOE dashboard chat UX patterns](../../289-zoe-dashboard-chat-ux-patterns/)
+- [289 — ZOE dashboard chat UX patterns](../../agents/289-zoe-dashboard-chat-ux-patterns/)
 - [418 — Birding Man Festival Analysis](../418-birding-man-festival-analysis/)

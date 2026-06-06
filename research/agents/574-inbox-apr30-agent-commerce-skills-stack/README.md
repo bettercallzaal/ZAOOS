@@ -195,7 +195,7 @@ No URL 404s found. All 10 inbox URLs resolved. Reddit short URLs needed redirect
 
 ## Also See
 
-- [Doc 280](../../280-fid-registration-x402-deep-dive/) — x402 deep dive
+- [Doc 280](../../agents/280-fid-registration-x402-deep-dive/) — x402 deep dive
 - [Doc 352](../../business/352-paragraph-x402-agent-implementation/) — x402 agent impl
 - [Doc 429](../../business/429-paragraph-agents-launch-apr2026/) — Paragraph agents
 - [Doc 472](../../dev-workflows/472-ai-tooling-roundup-apr21/) — AI tooling roundup

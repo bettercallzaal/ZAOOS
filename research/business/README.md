@@ -17,6 +17,8 @@
 | 298 | [FISHBOWLZ Tokenization](./298-fishbowlz-tokenization/) | STANDALONE | Token design, room-creation fees, fee splits, ZABAL auto-buyback, token-gated tiers on Base |
 | 299 | [Audio Room Best Practices](./299-audio-room-best-practices/) | STANDALONE | UX/retention/moderation/accessibility for FISHBOWLZ — from Clubhouse, X Spaces, Discord Stage |
 | 307 | [App Monetization: Ernesto Lopez Framework](./307-app-monetization-ernesto-lopez-framework/) | STANDALONE | $800K/year app framework vs ZAO OS + FISHBOWLZ monetization reality |
+| 310 | [Meta TRIBE v2: Brain Prediction Model for Content Optimization](./310-meta-tribe-v2-brain-prediction-content/) | STANDALONE | Brain-prediction model for content optimization — neuroscience-informed scoring to predict content performance before posting |
+| 311 | [Vibe-Coded Apps: $800K/yr Marketing Playbook](./311-vibe-coded-apps-marketing-playbook/) | STANDALONE | Marketing playbook for vibe-coded apps — the $800K/yr distribution + growth tactics, mapped to ZAO/BCZ shipping |
 | 322 | [Paragraph + Publish.new: Agent Commerce](./322-paragraph-publishnew-newsletter-agent-commerce/) | STANDALONE | Newsletters, marketplace, coins, API/SDK/MCP + COC Concertz promoter monetization with ZABAL |
 | 324 | [ZABAL/SANG Wallet Agent System](./324-zabal-sang-wallet-agent-tokenomics/) | STANDALONE | Autonomous wallet agent for ZABAL↔SANG swaps, promoter incentives, gas sponsorship, x402 |
 | 333 | [AI Music Licensing, Sync & Web3 Label](./333-ai-music-licensing-sync-label-deep-dive/) | STANDALONE | Legal compliance + revenue + GTM for a ZAO AI music label. Sync = $650M market, +7.4% YoY |

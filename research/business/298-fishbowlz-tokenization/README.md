@@ -509,7 +509,7 @@ DEGEN is the closest successful precedent on Farcaster/Base:
 - [Unlonely - Crypto Livestreaming with Channel Tokens](https://www.rootdata.com/Projects/detail/Unlonely?k=MTAzODA%3D) - per-creator tokens, channel arcade, NFC clips
 - [Pump.fun Bonding Curve Mechanics 2026](https://flashift.app/blog/bonding-curves-pump-fun-meme-coin-launches/) - $69K bonding curve completion, 0.5 SOL creator reward
 - [Clanker SDK v4 Docs](https://clanker.gitbook.io/clanker-documentation/sdk/v4.0.0) - ERC-20 + Uniswap V4 pool in single tx, 100B fixed supply, dynamic fees
-- [Privy Embedded Wallets + Token Mechanics (Doc 283)](../283-privy-embedded-wallets-fishbowlz-token-mechanics/) - wagmi integration, fee split patterns, server wallet ops
+- [Privy Embedded Wallets + Token Mechanics (Doc 283)](../../identity/283-privy-embedded-wallets-fishbowlz-token-mechanics/) - wagmi integration, fee split patterns, server wallet ops
 - [ZABAL/SANG Buyback Research (Doc 258)](./258-zabal-sang-buyback/) - ZABAL on-chain data, $14K FDV, $552 liquidity, buyback math
 
 ---
@@ -518,8 +518,8 @@ DEGEN is the closest successful precedent on Farcaster/Base:
 
 - [255 - FISHBOWLZ Spec](../../music/255-fishbowlz-spec/) - core product spec, MVP features, post-MVP roadmap
 - [258 - ZABAL + SANG Buyback](../258-zabal-sang-buyback/) - ZABAL/SANG on-chain data, buyback math, WALLET agent flow
-- [283 - Privy Embedded Wallets](../283-privy-embedded-wallets-fishbowlz-token-mechanics/) - wallet integration, token gate wiring, swap code, fee split patterns
-- [282 - Privy Auth for FISHBOWLZ](../282-privy-auth-fishbowlz-integration/) - auth setup, embedded wallet creation on login
-- [284 - Privy Full Feature Set](../284-privy-full-feature-set-fishbowlz/) - complete Privy capabilities for FISHBOWLZ
+- [283 - Privy Embedded Wallets](../../identity/283-privy-embedded-wallets-fishbowlz-token-mechanics/) - wallet integration, token gate wiring, swap code, fee split patterns
+- [282 - Privy Auth for FISHBOWLZ](../../identity/282-privy-auth-fishbowlz-integration/) - auth setup, embedded wallet creation on login
+- [284 - Privy Full Feature Set](../../identity/284-privy-full-feature-set-fishbowlz/) - complete Privy capabilities for FISHBOWLZ
 - [222 - Payment Infrastructure](../222-payment-infrastructure-stripe-coinbase/) - Stripe, Coinbase Commerce, 0xSplits for broader ZAO payments
 - [290 - FISHBOWLZ Agentic Participants](../../agents/290-fishbowlz-agentic-participants/) - AI agents joining rooms as speakers/listeners

@@ -121,7 +121,7 @@ tier: STANDARD
 
 ## Also See
 
-- [Doc 311 — Vibe-coded apps marketing playbook](../../311-vibe-coded-apps-marketing-playbook/)
+- [Doc 311 — Vibe-coded apps marketing playbook](../../business/311-vibe-coded-apps-marketing-playbook/)
 
 ## Next Actions
 

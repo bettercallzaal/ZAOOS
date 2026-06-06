@@ -173,4 +173,4 @@ YouTube "Fix Karpathy's LLM Wiki with Knowledge Graph" demos exactly this stack:
 - [SaaSworthy April 2026](https://www.saasworthy.com/product/infranodus)
 - [Related: Doc 297 — Graphify](../297-graphify-knowledge-graph-codebase/)
 - [Related: Doc 271 — ZAO Knowledge Graph](../../identity/271-zao-knowledge-graph/)
-- [Related: Doc 309 — Karpathy LLM Wiki](../../309-karpathy-llm-wiki-codebase-compiler/)
+- [Related: Doc 309 — Karpathy LLM Wiki](../../dev-workflows/309-karpathy-llm-wiki-codebase-compiler/)

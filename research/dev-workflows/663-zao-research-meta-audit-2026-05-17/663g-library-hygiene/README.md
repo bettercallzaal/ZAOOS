@@ -27,7 +27,7 @@ Collision pattern: parallel sessions (e.g., agent dev + music dev) both claim sa
 | 111 | `./governance/111-proposal-ui-best-practices/` | `./music/112-audius-api-deep-dive/` | Rename governance/111 to governance/200 |
 | 113 | `./governance/188-zao-fractal-bot-process/` | `./music/113-top-10-music-fixes/` | Rename governance/188 to governance/201 |
 | 117 | `./_archive/117-lens-v3-cross-posting/` | `./cross-platform/117-lens-v3-integration/` | Archive older, keep newer in cross-platform/117 |
-| 280 | `./280-fid-registration-x402-deep-dive/` | `./music/280-fishbowlz-mvp-to-saas-roadmap/` | MOVE 280-* from root to agents/ or farcaster/ |
+| 280 | `./agents/280-fid-registration-x402-deep-dive/` | `./music/280-fishbowlz-mvp-to-saas-roadmap/` | MOVE 280-* from root to agents/ or farcaster/ |
 | 299 | `./business/299-audio-room-best-practices/` | `./dev-workflows/299-llm-knowledge-bases-wiki-systems/` | Rename one to business/320, other to dev-workflows/321 |
 | 325 | `./agents/325-elevenlabs-agents-voice-ai-platform/` | `./agents/325-zabal-agent-swarm-economy/` | Both in agents; rename second to agents/390 |
 | 659 | UNKNOWN (mentioned in brief) | UNKNOWN (mentioned in brief) | Audit both instances + rename |
@@ -43,17 +43,17 @@ These numbered docs live in research/ root, not in a topic folder. Verdict: move
 
 | Doc | Path | Belongs in | Action |
 |---|---|---|---|
-| 280 | `./280-fid-registration-x402-deep-dive/` | agents/ or farcaster/ | Move to farcaster/280 (Farcaster-specific) |
-| 281 | `./281-farcaster-agents-landscape-registration/` | agents/ | Move to agents/281 |
-| 282 | `./282-privy-auth-fishbowlz-integration/` | identity/ | Move to identity/282 |
-| 283 | `./283-privy-embedded-wallets-fishbowlz-token-mechanics/` | identity/ | Move to identity/283 |
-| 284 | `./284-privy-full-feature-set-fishbowlz/` | identity/ | Move to identity/284 |
-| 288 | `./288-agent-squad-monitoring-dashboards/` | agents/ | Move to agents/288 |
-| 289 | `./289-zoe-dashboard-chat-ux-patterns/` | agents/ | Move to agents/289 |
-| 309 | `./309-karpathy-llm-wiki-codebase-compiler/` | dev-workflows/ | Move to dev-workflows/309 |
-| 310 | `./310-meta-tribe-v2-brain-prediction-content/` | agents/ | Move to agents/310 |
-| 311 | `./311-vibe-coded-apps-marketing-playbook/` | business/ | Move to business/311 |
-| 312 | `./312-claude-skills-marketplace-ecosystem/` | dev-workflows/ | Move to dev-workflows/312 |
+| 280 | `./agents/280-fid-registration-x402-deep-dive/` | agents/ or farcaster/ | Move to farcaster/280 (Farcaster-specific) |
+| 281 | `./agents/281-farcaster-agents-landscape-registration/` | agents/ | Move to agents/281 |
+| 282 | `./identity/282-privy-auth-fishbowlz-integration/` | identity/ | Move to identity/282 |
+| 283 | `./identity/283-privy-embedded-wallets-fishbowlz-token-mechanics/` | identity/ | Move to identity/283 |
+| 284 | `./identity/284-privy-full-feature-set-fishbowlz/` | identity/ | Move to identity/284 |
+| 288 | `./agents/288-agent-squad-monitoring-dashboards/` | agents/ | Move to agents/288 |
+| 289 | `./agents/289-zoe-dashboard-chat-ux-patterns/` | agents/ | Move to agents/289 |
+| 309 | `./dev-workflows/309-karpathy-llm-wiki-codebase-compiler/` | dev-workflows/ | Move to dev-workflows/309 |
+| 310 | `./business/310-meta-tribe-v2-brain-prediction-content/` | agents/ | Move to agents/310 |
+| 311 | `./business/311-vibe-coded-apps-marketing-playbook/` | business/ | Move to business/311 |
+| 312 | `./dev-workflows/312-claude-skills-marketplace-ecosystem/` | dev-workflows/ | Move to dev-workflows/312 |
 
 ---
 

@@ -283,4 +283,4 @@ Post: https://x.com/noisyb0y1/status/2043609541477044439
 - Related: [Doc 365 — Recoupable Monorepo & Best Practices](../365-recoupable-monorepo-best-practices/)
 - Related: [Doc 406 — Coinflow ISV Deep Dive](../../business/406-coinflow-isv-deep-dive-wavewarz-zao/)
 - Related: [Doc 333 — AI Music Licensing + ZAO AI Label](../../business/333-ai-music-licensing-sync-label-deep-dive/)
-- Related: [Doc 280 — FID Registration x402 Deep Dive](../../280-fid-registration-x402-deep-dive/)
+- Related: [Doc 280 — FID Registration x402 Deep Dive](../../agents/280-fid-registration-x402-deep-dive/)

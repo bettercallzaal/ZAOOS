@@ -512,7 +512,7 @@ From r/Twitch, r/streaming, creator economy blogs (Uscreen, NBH, Riverside, Mark
 - [Doc 354 - Cross-posting infrastructure audit](../../cross-platform/354-cross-posting-infrastructure-audit/) - 10 platform publish modules
 - [Doc 355 - Autonomous social distribution](../../cross-platform/355-autonomous-social-distribution-2026/) - Distribution agent
 - [Doc 322 - Paragraph publish.new newsletter agent](../../322-paragraph-publishnew-newsletter-agent-commerce/) - Newsletter automation
-- [Doc 311 - Vibe-coded apps marketing playbook](../../311-vibe-coded-apps-marketing-playbook/) - Marketing patterns
+- [Doc 311 - Vibe-coded apps marketing playbook](../../business/311-vibe-coded-apps-marketing-playbook/) - Marketing patterns
 - [Doc 562 - YapZ Bonfire ingestion](../../identity/569-yapz-bonfire-ingestion-strategy/) - Knowledge graph
 
 ---

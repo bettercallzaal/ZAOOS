@@ -447,7 +447,7 @@ Per Doc 324, the agent stack is Privy + 0x + Base Paymaster. Streaming-specific 
 - [Doc 361 - Empire Builder v3 Integration](../361-empire-builder-deep-dive-v3-integration/) - v3 API, multiplier formula, distribute/burn endpoints
 - [Doc 324 - ZABAL/SANG Wallet Agent Tokenomics](../324-zabal-sang-wallet-agent-tokenomics/) - 0x + Privy + Base Paymaster agent stack
 - [Doc 258 - ZABAL/SANG buyback](../258-zabal-sang-buyback/) - Treasury buyback flow
-- [Doc 283 - Privy Embedded Wallets](../../283-privy-embedded-wallets-fishbowlz-token-mechanics/) - Wallet provider rationale
+- [Doc 283 - Privy Embedded Wallets](../../identity/283-privy-embedded-wallets-fishbowlz-token-mechanics/) - Wallet provider rationale
 - [Doc 222 - Payment Infrastructure (Stripe + Coinbase)](../222-payment-infrastructure-stripe-coinbase/) - Fiat rail comparison
 - [Doc 125 - Coinflow Fiat Checkout](../../125-coinflow-fiat-checkout/) - Coinflow integration patterns
 - [Doc 542 / 546 / 569 - Bonfire reputation graph](../../identity/) - Attestation consumer

@@ -44,6 +44,8 @@
 | 303 | [Daily AI Skill Building Curriculum](./303-daily-ai-skill-building-curriculum/) | STANDALONE | 30-day learning plan, ZOE daily tips, codebase improvements, tool mastery |
 | 305 | [Pocket Assistant: ZOE as Flow State Support, Not Dashboard](./305-pocket-assistant-flow-state-workflow/) | STANDALONE | Redesign ZOE's interface from a broken dashboard to a pocket assistant that supports Zaal's flow state and captures ideas on the go |
 | 306 | [Web Scraping & AI Agents](./306-web-scraping-ai-agents/) | STANDALONE | Web scraping tools for AI agents |
+| 309 | [Karpathy's LLM Wiki: Codebase-to-Wiki Compiler for Token Optimization](./309-karpathy-llm-wiki-codebase-compiler/) | STANDALONE | Karpathy's LLM Wiki: Codebase-to-Wiki Compiler for Token Optimization |
+| 312 | [Claude Skills Marketplace & Ecosystem (Apr 2026)](./312-claude-skills-marketplace-ecosystem/) | STANDALONE | Claude Skills Marketplace & Ecosystem (Apr 2026) |
 | 319 | [X/Twitter Scraping Tools 2026](./319-x-twitter-scraping-tools-2026/) | STANDALONE | Twitter scraping tools evaluation |
 | 321 | [WorktreeHQ Git Branching Strategy](./321-worktreehq-git-branching-strategy/) | STANDALONE | Git worktree-based branching for parallel Claude Code sessions |
 | 353 | [Claude Code Token Optimization v2](./353-claude-code-token-optimization-v2/) | STANDALONE | Updated token strategy - .claudeignore, thinking cap, subagent routing, caveman |

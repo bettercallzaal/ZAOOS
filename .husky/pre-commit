@@ -7,3 +7,7 @@ bash "$(git rev-parse --show-toplevel)/scripts/check-research-doc-collisions.sh"
 
 # 2. Block secrets in the staged diff (.claude/rules/secret-hygiene.md, doc 683).
 bash "$(git rev-parse --show-toplevel)/scripts/git-secret-scan.sh" || exit 1
+
+# 3. Block research/ index drift: a newly added doc must be listed in its
+#    folder README. From the 2026-06-06 session that backfilled 313+ rows.
+bash "$(git rev-parse --show-toplevel)/scripts/check-research-index.sh" || exit 1

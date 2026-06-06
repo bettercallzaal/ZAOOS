@@ -57,7 +57,14 @@ import {
   readGroups,
   type GroupMode,
 } from './groups';
-import { handleVoiceMemo, handlePostCallback } from './posts';
+import {
+  handleVoiceMemo,
+  handlePostCallback,
+  countDrafts,
+  dequeueDraft,
+  sendDraftWithKeyboard,
+  loadPending as loadPostsPending,
+} from './posts';
 import { dispatchPlan } from './dispatch';
 import {
   getPending,
@@ -72,6 +79,9 @@ import {
 } from './approvals';
 import type { DecompositionPlan } from './decompose';
 import { NOTE_PREFIX, PLAN_PREFIX, isZoeCommand } from './commands';
+import { applyThreadOps, summarizeThreadOps } from './thread-ops';
+import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
+import { ackPush } from './proactive';
 import {
   fetchPending,
   removeFromQueue,
@@ -244,6 +254,39 @@ bot.command('quests', async (ctx) => {
 // Appends to ~/.zao/zoe/voice-memos/YYYY-MM-DD.md for the personal-post drafter.
 bot.command(['voicememo', 'vm'], async (ctx) => {
   await handleVoiceMemo(ctx, isFromZaal(ctx));
+});
+
+// doc 796 Decision 2 - /drafts pull. Surfaces the next silently-queued post
+// draft into the existing POST/REGEN/SKIP review flow. One at a time: if a
+// review is already in flight, ask Zaal to disposition it first.
+bot.command('drafts', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  const inFlight = await loadPostsPending();
+  if (inFlight && inFlight.state === 'pending') {
+    await ctx.reply('A draft is already up for review - tap POST/REGEN/SKIP on it first, then /drafts for the next.');
+    return;
+  }
+  const remaining = await countDrafts();
+  if (remaining === 0) {
+    await ctx.reply('No drafts queued. I generate them silently through the day - check back, or I\'ll ping you once a day when some are ready.');
+    return;
+  }
+  const next = await dequeueDraft();
+  if (!next) {
+    await ctx.reply('No drafts queued.');
+    return;
+  }
+  await sendDraftWithKeyboard({
+    bot: ctx.api,
+    zaalTgId: zaalId,
+    category: next.category,
+    text: next.text,
+    isResend: false,
+  });
+  const left = remaining - 1;
+  if (left > 0) {
+    await ctx.reply(`${left} more draft${left === 1 ? '' : 's'} queued. /drafts for the next.`);
+  }
 });
 
 // Post slate v2 - callback handler for POST/REGEN/SKIP buttons under draft messages.
@@ -523,6 +566,29 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
     return;
   }
 
+  // doc 796 — phantom-thread undo. "untrack th-... th-..." deletes mis-extracted
+  // commitment threads so ZOE never nudges on something Zaal never committed to.
+  const untrackMatch = /^untrack\s+(.+)$/i.exec(text.trim());
+  if (untrackMatch) {
+    const ids = untrackMatch[1].match(/th-[\w-]+/gi) ?? [];
+    let removed = 0;
+    for (const id of ids) {
+      if (await deleteThread(id)) removed += 1;
+    }
+    await ctx.reply(
+      removed > 0
+        ? `Untracked ${removed} thread${removed === 1 ? '' : 's'}. I won't nudge on those.`
+        : 'No matching threads to untrack.',
+    );
+    return;
+  }
+
+  // doc 796 — a reply after a proactive nudge acks the latest push, so the
+  // unacked self-throttle stays honest (an answered ping isn't "ignored").
+  // Best-effort; the concierge still handles the content (e.g. "done with X"
+  // emits a resolve thread_op).
+  await ackPush().catch(() => {});
+
   // Note: capture path
   const noteMatch = NOTE_PREFIX.exec(text);
   if (noteMatch) {
@@ -603,6 +669,9 @@ async function dispatchConcierge(
     await pushRecent({ from: label === 'Zaal' ? 'zaal' : 'other', text, sender: label }, scope);
 
     const blocks = await buildMemoryBlocks(scope, chatTitle);
+    // doc 796 Move 2: surface live commitment threads so the concierge can
+    // resolve/snooze/drop them by id (DMs with Zaal only).
+    if (scope === 'private') blocks.open_threads = renderOpenThreadsBlock();
 
     // Pull relevant prior context from the ZABAL knowledge graph (Bonfire) via
     // recall()/delve and inject it into the turn. DMs only + substantive
@@ -677,6 +746,20 @@ async function dispatchConcierge(
       }
     }
 
+    // Open-threads (doc 796 Move 2). ZOE opens/advances commitments Zaal makes
+    // ("I'll ship X today") so a later reasoning tick can surface them at the
+    // right time. Opening a thread also emits to Bonfire (cross-agent memory).
+    let threadPostscript = '';
+    if (result.thread_ops && result.thread_ops.length > 0) {
+      try {
+        const summary = await applyThreadOps(result.thread_ops);
+        const line = summarizeThreadOps(summary);
+        if (line) threadPostscript = '\n\n' + line;
+      } catch (err) {
+        console.error('[zoe/index] thread ops failed:', (err as Error).message);
+      }
+    }
+
     // Bonfire: mirror this turn's captures + task/quest changes into the
     // ZABAL knowledge graph. Best-effort, fire-and-forget — never blocks the
     // reply, never throws. No-op if BONFIRE_API_KEY/BONFIRE_ID are unset.
@@ -694,7 +777,7 @@ async function dispatchConcierge(
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 
-    const safeReply = result.reply.trim() + relayPostscript + crmPostscript;
+    const safeReply = result.reply.trim() + relayPostscript + crmPostscript + threadPostscript;
     if (safeReply.length < 5) {
       await ctx.reply('(empty reply guarded - check logs)');
       console.error(
@@ -1174,6 +1257,7 @@ bot.callbackQuery(/^nudge:(now|later|shelve)$/, async (ctx) => {
 async function main(): Promise<void> {
   await ensureZoeHome();
   await loadPending(); // restore any approval ZOE was waiting on before restart
+  await loadThreads(); // restore open commitment threads (doc 796 Move 2)
   console.log(
     '[zoe/index] ZOE booting — token set, zaalId=',
     zaalId,

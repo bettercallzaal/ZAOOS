@@ -15,10 +15,9 @@ import cron from 'node-cron';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from '../memory';
-import { sendDraftWithKeyboard } from './buttons';
 import { draftPost } from './drafters';
+import { claimDailyBatchNotice, countDrafts, enqueueDraft } from './drafts-queue';
 import { sendFractalPromo } from './fractal-promo';
-import { clearPending, isExpired, loadPending, shouldResend } from './pending';
 import {
   gatherBuildSignals,
   gatherEcosystemSignals,
@@ -155,7 +154,10 @@ async function gatherAll(repoDir: string): Promise<PostSourceSnapshot> {
   return { build, ecosystem, event, personal };
 }
 
-async function fireOneDraft(bot: Bot, zaalTgId: number, repoDir: string): Promise<void> {
+// doc 796 Decision 2: generate the draft SILENTLY into the backlog instead of
+// DMing it. No push here. The once-a-day notice + /drafts pull surface it
+// through the unchanged POST/REGEN/SKIP review flow.
+async function generateOneDraft(repoDir: string): Promise<void> {
   const category = pickWeightedCategory();
   const snapshot = await gatherAll(repoDir);
   let draft;
@@ -169,16 +171,8 @@ async function fireOneDraft(bot: Bot, zaalTgId: number, repoDir: string): Promis
     await appendLog({ event: 'skip', category, reason: 'empty-or-skip-marker' });
     return;
   }
-  // v2: send with inline keyboard [POST] [REGEN] [SKIP]. Persists as the
-  // single pending draft - scheduler will not fire a new one until this is
-  // dispositioned.
-  await sendDraftWithKeyboard({
-    bot: bot.api,
-    zaalTgId,
-    category,
-    text: draft.text,
-    isResend: false,
-  });
+  const depth = await enqueueDraft(category, draft.text);
+  await appendLog({ event: 'queued', category, charCount: draft.text.length, depth });
 }
 
 export interface PostsSchedulerOptions {
@@ -209,29 +203,11 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
   const tickTask = cron.schedule(
     '* * * * *',
     async () => {
-      // v2: single in-flight draft. If pending exists and not expired, handle it:
-      // - shouldResend (30 min since lastSentAt, max 3 resends) -> resend same text
-      // - expired (4h) -> clear, log expired, allow new draft next tick
-      // - otherwise -> wait, do not fire new
-      const pending = await loadPending();
-      if (pending && pending.state === 'pending') {
-        if (isExpired(pending)) {
-          await appendLog({ event: 'expired', category: pending.category, id: pending.id });
-          await clearPending();
-        } else if (shouldResend(pending)) {
-          await sendDraftWithKeyboard({
-            bot: opts.bot.api,
-            zaalTgId: opts.zaalTgId,
-            category: pending.category,
-            text: pending.text,
-            isResend: true,
-          });
-          return;
-        } else {
-          // waiting - do not fire new
-          return;
-        }
-      }
+      // doc 796 Decision 2: due slots GENERATE drafts silently into the backlog.
+      // No per-draft DM, no pending gate, no resend. The /drafts pull is what
+      // surfaces them into the POST/REGEN/SKIP review flow. A pending review
+      // (from a prior /drafts pull) no longer blocks new silent generation —
+      // drafts simply stack in the backlog until pulled.
       const schedule = await loadOrRollSchedule(pings);
       const now = Date.now();
       const LATE_THRESHOLD_MS = 30 * 60_000; // 30 min - any older = treat as missed, don't fire late
@@ -259,13 +235,37 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
         entry.fired = true;
         changed = true;
         firedThisTick = true;
-        fireOneDraft(opts.bot, opts.zaalTgId, opts.repoDir).catch((err) => {
-          console.error('[zoe/posts] fire failed:', (err as Error).message);
+        generateOneDraft(opts.repoDir).catch((err) => {
+          console.error('[zoe/posts] silent draft generation failed:', (err as Error).message);
         });
       }
       if (changed) await saveSchedule(schedule);
     },
     { timezone: 'America/New_York' },
+  );
+
+  // doc 796 Decision 2: ONE notice a day. If the silent backlog is non-empty
+  // and we haven't notified today, send a single "N drafts ready - /drafts".
+  // 14:00 UTC = 10am ET (mid-morning, after the 9am-UTC brief). Owns its own
+  // once-a-day sentinel so a restart can't double-notify.
+  const batchNoticeTask = cron.schedule(
+    '0 14 * * *',
+    async () => {
+      try {
+        const today = todayET();
+        if (!(await claimDailyBatchNotice(today))) return;
+        const n = await countDrafts();
+        await opts.bot.api.sendMessage(
+          opts.zaalTgId,
+          `${n} post draft${n === 1 ? '' : 's'} ready. Send /drafts to review.`,
+        );
+        await appendLog({ event: 'batch-notice', date: today, count: n });
+        console.log(`[zoe/posts] batch notice sent: ${n} drafts ready`);
+      } catch (err) {
+        console.error('[zoe/posts] batch notice failed:', (err as Error).message);
+      }
+    },
+    { timezone: 'UTC' },
   );
 
   // Sunday Fractal-promo - dedicated weekly slot (doc 722, task #220).
@@ -294,6 +294,7 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
     stop: () => {
       midnightTask.stop();
       tickTask.stop();
+      batchNoticeTask.stop();
       fractalTask.stop();
     },
   };

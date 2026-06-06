@@ -115,11 +115,25 @@ Reply naturally to Zaal. If you want to add/update tasks OR captured a note, app
   "captures": [
     {"text": "verbatim what zaal said worth remembering", "topic": "decision"}
   ],
+  "thread_ops": [
+    {"op": "open", "summary": "ship the onepager", "dueAt": "today"},
+    {"op": "resolve", "id": "th-..."},
+    {"op": "snooze", "id": "th-...", "untilHours": 24},
+    {"op": "drop", "id": "th-..."}
+  ],
   "escalate": false
 }
 \`\`\`
 
 Set "escalate": true ONLY if your current model (Sonnet) cannot answer well and the response should be re-run on Opus. Include "reason" when escalating.
+
+## OPEN THREADS (doc 796 - the continuity layer)
+
+When Zaal commits to doing something with a rough time ("I'll ship X today", "gonna send the deck tonight", "finishing the contract by Friday"), emit a thread_op {"op":"open", "summary":"<short, his words>", "dueAt":"<today|tonight|tomorrow|this week|in 3h|ISO date>"}. dueAt may be a natural phrase - the runtime resolves it. Open-ended intentions with no time get dueAt omitted (tracked, never clock-nudged).
+
+When he reports a commitment is done ("shipped it", "sent the deck", "done with X"), emit {"op":"resolve", "id":"th-..."} using the thread id from the <open_threads> block. "stop reminding me about X" / "dropping that" -> {"op":"drop"}. "not today, push it" -> {"op":"snooze", "untilHours":N}.
+
+Rules: open a thread ONLY for a real commitment Zaal makes about his OWN next actions - not for facts, questions, or things you're doing. One open op per distinct commitment. Don't re-open a commitment already in <open_threads>. A wrong thread is worse than none (he gets nudged on a phantom) - when unsure, don't open.
 
 If no ops/captures and no escalation: omit the JSON block entirely.
 
@@ -319,6 +333,8 @@ export interface MemoryBlocks {
   working: string;
   tasks: string;
   quests: string;
+  /** Live open commitment threads, rendered by the caller (doc 796 Move 2). */
+  open_threads?: string;
   chat_scope: ChatScope;
   chat_title?: string;
 }

@@ -88,3 +88,33 @@ export async function enableNudges(): Promise<void> {
     }
   }
 }
+
+// doc 796: the task-queue nudge is now folded into the reasoning-tick gate
+// (scheduler.ts) as one candidate among many, rather than its own hourly cron.
+// To keep it occasional (the gate fires at :30 every hour), it carries its own
+// cooldown: a nudge candidate is only offered once the cooldown since the last
+// one actually SENT has elapsed.
+const NUDGE_LAST_SENT_FILE = join(ZOE_PATHS.home, 'nudge-last-sent.txt');
+export const NUDGE_COOLDOWN_MS = 4 * 60 * 60 * 1000; // 4h between task nudges
+
+/** True if enough time has passed since the last task-nudge was sent. */
+export async function nudgeCooldownElapsed(now: number = Date.now()): Promise<boolean> {
+  try {
+    const raw = (await fs.readFile(NUDGE_LAST_SENT_FILE, 'utf8')).trim();
+    const last = Date.parse(raw);
+    if (Number.isNaN(last)) return true;
+    return now - last >= NUDGE_COOLDOWN_MS;
+  } catch {
+    return true; // never sent
+  }
+}
+
+/** Record that a task-nudge just went out (starts the cooldown). */
+export async function markNudgeSent(now: number = Date.now()): Promise<void> {
+  try {
+    await fs.mkdir(ZOE_PATHS.home, { recursive: true });
+    await fs.writeFile(NUDGE_LAST_SENT_FILE, new Date(now).toISOString(), 'utf8');
+  } catch {
+    // best-effort
+  }
+}

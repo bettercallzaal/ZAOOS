@@ -87,6 +87,11 @@ This dissent is real but cuts the ZAO way: the value of the A-Corp is not that i
 - [Doc 499](../../events/499-music-festival-collective-governance/) - collective governance for festivals
 - [Doc 051](../../community/051-zao-whitepaper-2026/) - ZAO whitepaper / ownership thesis
 
+## Two gates to check before acting
+
+1. **51% floor is a hard dilution ceiling.** Do NOT recommend an A-Corp to any ZAO artist raising real outside capital that needs to push artists below majority. It is built for artist-controlled creative businesses, not VC-scale plays. This is the same property the lone opponent (Colorado Bar's Lidstone) used to argue "just use a normal LLC" - it protects and constrains in equal measure.
+2. **Colorado registration overhead.** An A-Corp is a Colorado registration - registered agent, out-of-state filing. Non-blocking (founders register in Delaware the same way today) but a real cost, and The ZAO is Maine/Delaware-centered. A home-state (Maine/Delaware) equivalent, if one appears, would likely beat the Colorado original for ZAO's purposes.
+
 ## Next Actions
 
 | Action | Owner | Type | By When |

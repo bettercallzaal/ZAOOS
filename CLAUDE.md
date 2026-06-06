@@ -132,13 +132,14 @@ See [Doc 154](research/154-skills-commands-master-reference/) for complete refer
 
 ## Primary Surfaces (post-doc-601 cleanup, 2026-05-04)
 
-ZAO operating surfaces collapsed from 12+ systems to 5. When proposing automation or new bots, check this list first.
+ZAO operating surfaces collapsed from 12+ systems to 6. When proposing automation or new bots, check this list first.
 
 | Surface | What | Source of truth |
 |---------|------|-----------------|
 | **ZOE** (`@zaoclaw_bot`) | Single concierge — tasks, captures, brief/reflect, recall | `bot/src/zoe/` (Hermes-brain pattern) |
 | **Hermes** (`@zoe_hermes_bot`) | Autonomous fix-PR pipeline (coder + critic + auto-PR) | `bot/src/hermes/` |
 | **ZAO Devz** (`@zaodevz_bot`) | Group dispatch + hourly learning tip | `bot/src/devz/` (Phase 3 fold-in to Hermes pending) |
+| **Team bots** (`@zao_magnetiq_bot`, `@z_attabotty_bot`) | 2-person collab pairing bots — one bot per private group where Zaal pairs with a teammate (Magnetiq = Zaal+Tyler, AttaBotty = Zaal+Onagi). NOT the decommissioned brand fleet — built on the doc-644 team-bot template, sibling to the Devz dual-bot pattern. | `bot/src/teams/` (docs 644/645/646; canon-locked 2026-05-11) |
 | **Bonfire** (`@zabal_bonfire`) | Knowledge graph recall + multi-corpus ingest | bonfires.ai (Genesis tier, wallet-gated) |
 | **ZAOstock bot** (`@ZAOstockTeamBot`) | Festival team coordination, graduates with ZAOstock spinout | `bot/` (root, separate from `bot/src/zoe/`) |
 
@@ -147,7 +148,7 @@ ZAO operating surfaces collapsed from 12+ systems to 5. When proposing automatio
 - openclaw container + 7-agent squad (ZOEY/BUILDER/SCOUT/WALLET/FISHBOWLZ/CASTER) — source of "·" pings
 - Composio AO orchestrator
 - ZOE v2 / Agent Zero migration plan
-- 10-bot branded fleet (Magnetiq/Research/WaveWarZ/POIDH as own bots) — folds into ZOE memory blocks
+- 10-bot branded fleet (Magnetiq/Research/WaveWarZ/POIDH as *brand-broadcast* bots) — folds into ZOE memory blocks. ⚠️ Name collision: the **Magnetiq** here is the killed brand-broadcast concept, NOT the sanctioned `bot/src/teams/` Magnetiq collab-pairing bot (a Primary Surface above, docs 644/645/646).
 - FISHBOWLZ (paused 2026-04-16, killed 2026-05-04 — Juke partnership stands)
 
 **Rule: no new bots without doc.** Before adding a new Telegram bot, agent process, or autonomous loop, write a numbered research doc + get explicit Zaal approval. New brand voices = persona block in `bot/src/zoe/` `human.md`, NOT a new bot. Reference `research/agents/601-agent-stack-cleanup-decision/`.

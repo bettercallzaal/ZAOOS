@@ -4,6 +4,9 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-06-06 | ZABAL Games fireside - Carlos (Plat0x / Bonfires) x Zaal - vibe-coding + Bonfires workshop | ZAO Devz | Zaal, Carlos (Plat0x) | [807](807-zabal-games-fireside-carlos-bonfires-jun6/) | 5 |
+| 2026-06-06 | Arun Phillips x Zaal - collaboration catch-up (DreamStarter, ZABAL Games, WaveWarZ India) | ZAO Devz | Zaal, Arun Phillips | [805](805-arun-phillips-collab-jun6/) | 10 |
+| 2026-06-01 | Rodrigo Nuñez (Rodo) x Zaal - DeSci / conservation collaboration + ZABAL Games | ZAO Devz | Zaal, Rodrigo Nuñez | [806](806-rodrigo-nunez-desci-collab-jun1/) | 8 |
 | 2026-06-05 | Jose Acabrera (Joseph Goats) x Zaal - Claude Code onboarding + mini-app hackathon | ZAO Devz | Zaal, Jose Acabrera | [800](800-jose-claude-code-onboarding-june5/) | 7 |
 | 2026-06-03 | Jose Acabrera (Joseph Goats) x Zaal - ZAO contributor onboarding | ZAO Devz | Zaal, Jose Acabrera | [795](795-jose-acabrera-onboarding-zao-contributor/) | 6 |
 | 2026-05-31 | Iman x Zaal - Request for Collaborators walkthrough | ZAO Devz | Zaal, Iman | [779](779-iman-zaal-request-for-collaborators-may31/) | 3 |

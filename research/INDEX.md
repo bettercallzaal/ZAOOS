@@ -1,0 +1,1003 @@
+# ZAO OS Research Library — Master Index (auto-generated)
+
+> **858 active research documents** across 14 groups, plus **76** superseded docs in `_archive/`. Auto-generated 2026-06-06 by scanning every `research/**/README.md`. Regenerate by re-scanning research/**/README.md (generator in this commit). For the curated topic descriptions see [README.md](./README.md); for machine-readable entries see [search-index.json](./search-index.json).
+
+## Counts by group
+
+| Group | Docs |
+|---|---|
+| dev-workflows | 193 |
+| agents | 171 |
+| music | 86 |
+| events | 74 |
+| business | 73 |
+| infrastructure | 57 |
+| farcaster | 50 |
+| community | 46 |
+| governance | 46 |
+| identity | 22 |
+| cross-platform | 15 |
+| uncategorized-root | 11 |
+| security | 8 |
+| wavewarz | 6 |
+| _archive | 76 |
+
+
+## dev-workflows (193)
+
+- **030** [30 — bettercallzaal GitHub Projects Inventory](./dev-workflows/030-bettercallzaal-github/) — _2026-05-21 · research-complete · research_
+- **038** [38 — AI Code Audit, Cleanup Agents & Codebase Efficiency](./dev-workflows/038-ai-code-audit-cleanup/) — _2026-05-21 · research-complete · research_
+- **039** [39 — GitHub Documentation, Presentation & Research Display](./dev-workflows/039-github-documentation-presentation/) — _2026-05-21 · research-complete · research_
+- **045** [45 — Research Organization Patterns: How Others Do It](./dev-workflows/045-research-organization-patterns/) — _2026-05-21 · research-complete · research_
+- **054** [54 — Superpowers: Agentic Skills Framework for Claude Code](./dev-workflows/054-superpowers-agentic-skills/) — _2026-05-21 · research-complete · research_
+- **063** [63 — Autoresearch Deep Dive: Implementations & ZAO OS Applications](./dev-workflows/063-autoresearch-deep-dive-zao-applications/) — _2026-05-21 · research-complete · research_
+- **066** [66 — Backend Testing Strategy for ZAO OS](./dev-workflows/066-backend-testing-strategy/) — _2026-05-21 · research-complete · research_
+- **076** [76 — Git Branching Strategy for ZAO OS + Paperclip Agents](./dev-workflows/076-git-branching-ai-agents/) — _2026-05-21 · research-complete · research_
+- **089** [89 — Paperclip + gstack + Autoresearch: The AI Company Stack](./dev-workflows/089-paperclip-gstack-autoresearch-stack/) — _2026-05-21 · research-complete · research_
+- **137** [137 — Skills Audit, Cleanup & Security Best Practices](./dev-workflows/137-skills-audit-security-practices/) — _2026-05-21 · research-complete · research_
+- **154** [154 — Skills & Commands Master Reference](./dev-workflows/154-skills-commands-master-reference/) — _2026-05-21 · research-complete · research_
+- **157** [157 — Cross-Project Asset Audit: Reusable Code from Sibling ZAO Projects](./dev-workflows/157-cross-project-asset-audit/) — _2026-05-21 · research-complete · research_
+- **159** [159 — ZAO OS Feature Inventory & QA Checklist](./dev-workflows/159-feature-inventory-qa-checklist/) — _2026-05-21 · research-complete · reference_
+- **162** [162 — Open Source Projects Directory for ZAO OS](./dev-workflows/162-open-source-projects-directory/) — _2026-05-21 · research-complete · research_
+- **164** [164 — Skills, Research Workflow & Autoresearch Improvements](./dev-workflows/164-skills-research-workflow-improvements/) — _2026-05-21 · research-complete · research_
+- **165** [Doc 165 — Claude Code Multi-Session Management](./dev-workflows/165-claude-code-multi-session-management/) — _2026-05-21 · research-complete · reference_
+- **166** [166 — ZAO OS Developer Workflow Improvements](./dev-workflows/166-dev-workflow-improvements/) — _2026-05-21 · research-complete · guide_
+- **168** [168 — Claude Code Community Innovations: Autoresearch 10x, Council of High Intelligence, Learn Vibe Build](./dev-workflows/168-claude-code-community-innovations-march2026/) — _2026-05-21 · research-complete · guide_
+- **170** [170 — Autoresearch 10x: Binary Eval Checklists for ZAO OS Skills](./dev-workflows/170-autoresearch-10x-eval-checklists-zao-skills/) — _2026-05-21 · research-complete · guide_
+- **172** [169 — Solo Founder AI-Powered Development: The ZAO OS Case Study](./dev-workflows/172-solo-founder-ai-dev-workflow/) — _2026-05-21 · research-complete · guide_
+- **196** [196 - Solo Developer + AI Coding Landscape 2026](./dev-workflows/196-solo-dev-ai-coding-landscape-2026/) — _2026-05-21 · research-complete · guide_
+- **212** [212 — Vercel Integrations, Airtable & Custom Integration Console for ZAO OS](./dev-workflows/212-vercel-integrations-airtable/) — _2026-05-21 · research-complete · guide_
+- **225** [225 — Fork-Friendly Open-Source Patterns](./dev-workflows/225-fork-friendly-open-source-patterns/) — _2026-05-21 · research-complete · guide_
+- **232** [232 — MCP Server Development Guide](./dev-workflows/232-mcp-server-development-guide/) — _2026-05-21 · research-complete · guide_
+- **238** [238 - Claude Tools Top 50 Evaluation for ZAO OS](./dev-workflows/238-claude-tools-top50-evaluation/) — _2026-05-21 · research-complete · guide_
+- **242** [242 — Claude 20 Underused Features: ZAO Power User Audit](./dev-workflows/242-claude-20-underused-features-power-user/) — _2026-05-21 · research-complete · guide_
+- **243** [243 — Claude Intermediate Guide (AI Edge): Cowork, Skills 2.0, Dispatch & Prompting](./dev-workflows/243-claude-intermediate-guide-aiedge-cowork-skills2/) — _2026-05-21 · research-complete · guide_
+- **248** [248 — Network Tab Debugging Guide for ZAO OS](./dev-workflows/248-network-tab-debugging-guide/) — _2026-05-21 · research-complete · guide_
+- **276** [276 — HowiAI: Gridley's AI Habit Workflows for Daily Operations](./dev-workflows/276-howiai-gridley-ai-habit-workflows/) — _2026-05-21 · research-complete · guide_
+- **279** [279 — Research Library Audit & Reorganization](./dev-workflows/279-research-library-audit-reorganization/) — _2026-05-21 · research-complete · guide_
+- **282** [282 — Awesome Design MD: AI-Readable Design Systems](./dev-workflows/282-awesome-design-md-system/) — _2026-05-21 · research-complete · guide_
+- **297** [297 - Graphify: Knowledge Graph for Codebases & Research](./dev-workflows/297-graphify-knowledge-graph-codebase/) — _2026-05-21 · research-complete · guide_
+- **298** [298 - Claude Token Optimization Strategies for ZAO OS Development](./dev-workflows/298-claude-token-optimization-strategies/)
+- **299** [299 - LLM Knowledge Bases & Personal Wiki Systems](./dev-workflows/299-llm-knowledge-bases-wiki-systems/)
+- **300** [300 - AI Memory & Agent Infrastructure Tools](./dev-workflows/300-ai-memory-agent-infrastructure/)
+- **301** [301 - Developer Tooling Roundup: Agent-Era Tools (April 2026)](./dev-workflows/301-developer-tooling-roundup-2026/)
+- **302** [302 - AI Content Engine & SEO Automation Patterns](./dev-workflows/302-ai-content-engine-automation-patterns/)
+- **303** [303 - Daily AI Skill Building Curriculum](./dev-workflows/303-daily-ai-skill-building-curriculum/)
+- **305** [305 - Pocket Assistant: ZOE as Flow State Support, Not Dashboard](./dev-workflows/305-pocket-assistant-flow-state-workflow/)
+- **306** [306 - Web Scraping for AI Agents: Reading X Posts, Articles, and Any URL](./dev-workflows/306-web-scraping-ai-agents/)
+- **319** [319 - X/Twitter Scraping Tools That Work in April 2026](./dev-workflows/319-x-twitter-scraping-tools-2026/)
+- **321** [321 - WorktreeHQ + Git Worktree Branching Strategy](./dev-workflows/321-worktreehq-git-branching-strategy/)
+- **353** [353 - Claude Code Token Optimization v2: What's Actually Working (and What Isn't)](./dev-workflows/353-claude-code-token-optimization-v2/)
+- **354** [354 - Local LLM Coding Alternatives: Hermes, Ollama, and Stretching Token Limits](./dev-workflows/354-local-llm-coding-alternatives-hermes/)
+- **355** [355 - Harness Engineering: CREAO's AI-First Workflow (Peter Pang)](./dev-workflows/355-harness-engineering-creao-ai-first/)
+- **356** [356 - Karpathy's LLM Wiki Pattern: Persistent Compounding Knowledge Bases](./dev-workflows/356-karpathy-llm-wiki-pattern/)
+- **357** [357 - Caveman: Token Compression Skill for Claude Code](./dev-workflows/357-caveman-token-compression-skill/)
+- **359** [359 — Web Scraping & Data Extraction for AI Tools: Best Practices](./dev-workflows/359-web-scraping-ai-tools-best-practices/)
+- **362** [362 - Caveman Token Savings Analysis](./dev-workflows/362-caveman-token-savings-analysis/) — _2026-05-21 · research-complete · decision_
+- **365** [365 - Recoupable Monorepo Architecture & Best Practices for ZAO](./dev-workflows/365-recoupable-monorepo-best-practices/) — _2026-05-21 · research-complete · architecture_
+- **366** [366 - AGENTS.md & AI-Assisted Monorepo Best Practices (2026)](./dev-workflows/366-agents-md-monorepo-best-practices-2026/) — _2026-05-21 · research-complete · architecture_
+- **367** [367 - Biome Migration, Microservice Decomposition, Keyboard UX & Shared UI Patterns](./dev-workflows/367-biome-microservices-keyboard-shared-ui/) — _2026-05-21 · research-complete · implementation_
+- **405** [405 -- ZAO OS Monorepo Migration Plan](./dev-workflows/405-monorepo-migration/) — _2026-05-21 · research-complete · architecture_
+- **408** [408 - Claude Code 1M Context Window Session Management](./dev-workflows/408-claude-code-1m-context-session-management/) — _2026-05-21 · research-complete · reference_
+- **409** [409 - Claude Skills: Anthropic Engineers Barry & Mahesh Explain](./dev-workflows/409-claude-skills-anthropic-engineers-guide/) — _2026-05-21 · research-complete · reference_
+- **411** [411 - AI-Native Engineering Team: CREAO's 99% AI-Written Code](./dev-workflows/411-ai-native-eng-team-creao-99pct-ai-code/) — _2026-05-21 · research-complete · reference_
+- **412** [412 - AI Dev Tools Roundup: Conductor, Replicas, AO Agents](./dev-workflows/412-ai-dev-tools-roundup-conductor-replicas-aoagents/) — _2026-05-21 · research-complete · reference_
+- **414** [414 - AI-Native Documentation Patterns for Monorepos (2026)](./dev-workflows/414-ai-native-documentation-patterns/) — _2026-05-21 · research-complete · architecture_
+- **415** [415 — Composio Agent Orchestrator (AO)](./dev-workflows/415-composio-agent-orchestrator/) — _2026-05-21 · research-complete · research-archive_
+- **422** [422 — Claude Routines: ZAO Automation Stack](./dev-workflows/422-claude-routines-zao-automation-stack/) — _2026-05-21 · research-complete · architecture_
+- **424** [424 — Nested CLAUDE.md + Claudesidian + /wrap Pattern](./dev-workflows/424-nested-claudemd-claudesidian-wrap-pattern/) — _2026-05-21 · research-complete · architecture_
+- **426** [426 — diagram-design Skill (Cathryn Lavery)](./dev-workflows/426-diagram-design-skill-cathryn-lavery/) — _2026-05-21 · research-complete · reference_
+- **429** [429 — Claude Code Skills Deep Dive](./dev-workflows/429-claude-code-skills-deep-dive/) — _2026-05-21 · research-complete · reference_
+- **434** [434 - Claude Code Aux Model Routing: What Actually Exists vs the Hermes 8-Slot Myth](./dev-workflows/434-claude-code-aux-model-routing/) — _2026-05-21 · research-complete · reference_
+- **440** [440 - Claude Code + Process Level-Up (meta review)](./dev-workflows/440-claude-code-process-level-up/) — _2026-05-21 · research-complete · process-audit_
+- **441** [441-everything-claude-code-integration](./dev-workflows/441-everything-claude-code-integration/) — _2026-05-21 · research-complete · decision_
+- **448** [Project config scan](./dev-workflows/448-ecc-skills-teaching-guide/) — _2026-05-21 · research-complete · reference_
+- **459** [Spawn a fresh Claude Code session in an isolated worktree off ZAO OS V1.](./dev-workflows/459-parallel-workspace-isolation-zao-os/) — _2026-05-21 · research-complete · decision_
+- **461** [Block git pushes that would land on main or on a branch whose PR is already merged.](./dev-workflows/461-push-to-merged-pr-failure-fix/) — _2026-05-21 · research-complete · decision_
+- **469** [469 - InfraNodus: Text Network Analysis + Knowledge Graph for ZAO Discourse](./dev-workflows/469-infranodus-text-network-knowledge-graph/) — _2026-05-21 · research-complete · decision_
+- **472** [472 - AI Tooling + Ecosystem Roundup 2026-04-21](./dev-workflows/472-ai-tooling-roundup-apr21/) — _2026-05-21 · research-complete · roundup_
+- **477** [477 - BCZ YapZ YouTube Description + Timestamp Template](./dev-workflows/477-youtube-seo-bcz-yapz/) — _2026-05-21 · research-complete · skill-delivery_
+- **478** [478 — Obsidian + Claude Code as Personal AI Brain (JARVIS / Cowork Pattern)](./dev-workflows/478-obsidian-claude-jarvis-ai-brain/) — _2026-05-21 · research-complete · decision_
+- **480** [480 — Khairallah's 35 Claude Code Commands & Workflows (April 2026)](./dev-workflows/480-claude-code-35-commands-khairallah/) — _2026-05-21 · research-complete · decision_
+- **490** [490 - BCZ YapZ Archive Page (/bcz-yapz)](./dev-workflows/490-bcz-yapz-archive-page/) — _2026-05-21 · research-complete · feature-design_
+- **493** [493 - /zao-research Skill v2 Redesign (Audit + Community-Source Mandate)](./dev-workflows/493-zao-research-skill-v2-redesign/) — _2026-05-21 · shipped · skill-redesign_
+- **506** [506 - TRAE AI + SOLO Mode (ByteDance)](./dev-workflows/506-trae-ai-solo-bytedance-coding-agent/) — _2026-05-21 · research-complete · decision_
+- **507** [507 - Claude Skills 1,116 Ecosystem - ZAO Curated Picks](./dev-workflows/507-claude-skills-1116-ecosystem-zao-picks/) — _2026-05-21 · research-complete · decision_
+- **508** [508 - Creator Infra + Mini Apps + Token Burn Signal Brief (Apr 25 2026)](./dev-workflows/508-creator-infra-mini-apps-token-burn-signals-apr25/) — _2026-05-21 · research-complete · market-research_
+- **528** [528 - pi.dev Coding Agent (Mario Zechner / @badlogic)](./dev-workflows/528-pi-dev-coding-agent-mario-zechner/) — _2026-05-21 · research-complete · decision_
+- **536** [536 - Claude.md Best Practices (darkzodchi, X post)](./dev-workflows/536-claude-dot-md-best-practices/) — _2026-05-21 · research-complete · guide_
+- **537** [537 - Shann's Superpowers Planning Framework for Project Execution](./dev-workflows/537-shann-superpowers-planning-framework/) — _2026-05-21 · research-complete · reference_
+- **539** [539 - "Grill Me" Claude Skill - Specs-to-Code Interrogation Pattern](./dev-workflows/539-grill-me-claude-skill-specs-to-code/) — _2026-05-21 · research-complete · evaluation_
+- **545** [545 — MitcheIl's 6-Agent Viral X Content Pipeline (Apr 2026)](./dev-workflows/545-mitcheil-6agent-viral-x-content-pipeline/) — _2026-05-21 · research-complete · guide_
+- **549** [549 - 21st.dev Hub: Component Platform + Magic MCP + 1code](./dev-workflows/549-21st-dev-component-platform/) — _2026-05-21 · research-complete · decision_
+- **549a** [549a - 21st.dev Catalog Inventory](./dev-workflows/549a-21st-dev-catalog-inventory/) — _2026-05-21 · research-complete · guide_
+- **549b** [549b - 21st.dev Access Patterns + Alternatives](./dev-workflows/549b-21st-dev-access-patterns/) — _2026-05-21 · research-complete · guide_
+- **549c** [549c - 21st.dev Pricing & Licensing](./dev-workflows/549c-21st-dev-pricing-licensing/) — _2026-05-21 · research-complete · guide_
+- **549d** [549d - 21st.dev AI Features: Magic, 1code, SDK](./dev-workflows/549d-21st-dev-ai-features-magic/) — _2026-05-21 · research-complete · guide_
+- **549e** [549e - /21st Skill Spec for ZAO](./dev-workflows/549e-21st-dev-zao-skill-spec/) — _2026-05-21 · research-complete · guide_
+- **550** [550 - GitPitcher Evaluation (gitpitcher.com)](./dev-workflows/550-gitpitcher-evaluation/) — _2026-05-21 · research-complete · decision_
+- **551** [551 - Research Roadmap + Library Audit (573 docs, audit + next 30 days)](./dev-workflows/551-research-roadmap-library-audit/) — _2026-05-21 · research-complete · audit_
+- **552** [552 - ZAO Skill Library Audit](./dev-workflows/552-zao-skill-library-audit/) — _2026-05-21 · research-complete · audit_
+- **553** [553 - Memory File Health Audit](./dev-workflows/553-memory-file-health-audit/) — _2026-05-21 · research-complete · audit_
+- **554** [554 - Worktree Collision Postmortem (2026-04-29)](./dev-workflows/554-worktree-collision-postmortem/) — _2026-05-21 · research-complete · incident-postmortem_
+- **555** [555 - Agent Harness Shootout: 1code vs QuadWork vs DevFleet vs ECC vs obra/superpowers vs Lazer](./dev-workflows/555-agent-harness-shootout/) — _2026-05-21 · research-complete · comparison_
+- **556** [556 - Gasless Onboarding Stack for ZAOstock RSVP + ZABAL First-Stake + Cipher Mint](./dev-workflows/556-gasless-onboarding-stack-zaostock/) — _2026-05-21 · research-complete · decision_
+- **557** [557 - Onchain Festival Ticketing for ZAOstock Oct 3 2026](./dev-workflows/557-onchain-festival-ticketing-zaostock/) — _2026-05-21 · research-complete · decision_
+- **558** [558 - Anbeeld WRITING.md (AI-Prose Diagnostic Toolkit)](./dev-workflows/558-anbeeld-writing-md/) — _2026-05-21 · research-complete · guide_
+- **560** [560 - OpenWhisp: Local Speech-to-Text for ZAO Content + Voice Notes](./dev-workflows/560-openwhisp-local-speech-to-text/) — _2026-05-21 · research-complete · decision_
+- **562** [562 - Reddit/X Scraping Capability + r/ClaudeCode Top Skill (Humanizer) + last30days-skill](./dev-workflows/562-reddit-x-scraping-meta-eval-last30days/) — _2026-05-21 · research-complete · decision_
+- **563** [563 - Shann³ (@shannholmberg) Content-Engine Pattern: 17 Markdown Files + 1 Agent = 10 Social Accounts](./dev-workflows/563-shannholmberg-content-engine-ronin/) — _2026-05-21 · research-complete · market-research_
+- **564** [564 - Reddit/X Scraping FIXED (Implementation Doc)](./dev-workflows/564-reddit-x-scraping-FIXED-implementation/) — _2026-05-21 · research-complete · incident-postmortem_
+- **565** [565 - /ask-gpt Skill: Claude ↔ ChatGPT Learning Loop](./dev-workflows/565-ask-gpt-claude-chatgpt-learning-loop/) — _2026-05-21 · research-complete · guide_
+- **566** [566 - Claude Reddit Gems (r/ClaudeAI + r/ClaudeCode, Apr 2026)](./dev-workflows/566-claude-reddit-gems-apr-2026/) — _2026-05-21 · research-complete · market-research_
+- **610** [610 - Newsletter prose toolkit + ZABAL voice tightening](./dev-workflows/610-newsletter-prose-toolkit-zabal-voice/) — _2026-05-21 · research-complete · decision_
+- **616** [616 — BCZ YapZ archive UI/UX best practices](./dev-workflows/616-bcz-yapz-archive-ui-best-practices/) — _2026-05-21 · research-complete · guide_
+- **618** [618 - AGENTS.md spec audit + ZAOOS adoption status](./dev-workflows/618-agents-md-spec-zaoos-audit/) — _2026-05-21 · research-complete · audit_
+- **623** [623 - Clean Architecture (Uncle Bob, 2012) - ZAO Fit Audit](./dev-workflows/623-clean-architecture-uncle-bob-zao-fit/) — _2026-05-21 · research-complete · decision_
+- **633** [633 - r/vibecoding thread: 200+ hours of AI-pair-coding as a non-dev PM](./dev-workflows/633-r-vibecoding-thread-2026-05-11/) — _2026-05-21 · research-complete · guide_
+- **636** [636 - Descript update (May 2026): Underlord model picker, transcription admin, transitions](./dev-workflows/636-descript-may-2026-update/) — _2026-05-21 · research-complete · guide_
+- **638** [638 - Khairallah AL-Awady (@eng_khairallah1) on X: Anthropic Claude Code Playbook for AI-Driven Companies](./dev-workflows/638-x-khairallah-eng-post/) — _2026-05-21 · research-complete · guide_
+- **639** [639 - Zecheng Zhang (@zechengzh) on Mirage: Unified Virtual Filesystem for AI Agents](./dev-workflows/639-x-zecheng-zhang-post/) — _2026-05-21 · research-complete · guide_
+- **652** [652 - Gmail to /inbox Bridge + Morning Auto-Research Trigger](./dev-workflows/652-inbox-gmail-bridge-morning-trigger/) — _2026-05-21 · research-complete · decision_
+- **653** [653 - Cron Jobs + Bots Audit (May 2026)](./dev-workflows/653-cron-bots-audit-may2026/) — _2026-05-21 · research-complete · audit_
+- **655** [655 - Post-Merge Execution Playbook (Week 1 after PRs #530 #531 #533)](./dev-workflows/655-post-merge-execution-playbook/) — _2026-05-21 · research-complete · decision_
+- **659** [659 - ZOE Posts v2: Voice Fix + Persistent Confirm Flow](./dev-workflows/659-zoe-posts-v2-voice-and-confirm-flow/) — _2026-05-21 · research-complete · decision_
+- **660** [660 — X Content Extraction v2 (No-Login Sustainable Chain)](./dev-workflows/660-x-content-extraction-v2/) — _2026-05-21 · research-complete · guide_
+- **661** [661 — ZAOOS Codebase Audit (May 2026)](./dev-workflows/661-zaoos-codebase-audit-may-2026/) — _2026-05-21 · research-complete · audit_
+- **661a** [661a — Primary-Surface Drift Audit](./dev-workflows/661-zaoos-codebase-audit-may-2026/661a-primary-surface-drift/) — _2026-05-21 · research-complete · audit_
+- **661b** [661b — bot/src/ Sprawl Audit](./dev-workflows/661-zaoos-codebase-audit-may-2026/661b-bot-src-sprawl/) — _2026-05-21 · research-complete · audit_
+- **661c** [661c - src/app/api/ Route Taxonomy Audit](./dev-workflows/661-zaoos-codebase-audit-may-2026/661c-api-route-taxonomy/) — _2026-05-21 · research-complete · audit_
+- **661d** [661d - Component Layer Audit](./dev-workflows/661-zaoos-codebase-audit-may-2026/661d-component-layer/) — _2026-05-21 · research-complete · audit_
+- **661e** [661e - Top-Level Repo Cruft Audit](./dev-workflows/661-zaoos-codebase-audit-may-2026/661e-top-level-cruft/) — _2026-05-21 · research-complete · audit_
+- **661f** [661f - CLAUDE.md Drift Audit](./dev-workflows/661-zaoos-codebase-audit-may-2026/661f-claudemd-drift/) — _2026-05-21 · research-complete · audit_
+- **661g** [661g - Dependency + Script Health Audit](./dev-workflows/661-zaoos-codebase-audit-may-2026/661g-dep-script-health/) — _2026-05-21 · research-complete · audit_
+- **661h** [661h - Graduation-Readiness Audit](./dev-workflows/661-zaoos-codebase-audit-may-2026/661h-graduation-readiness/) — _2026-05-21 · research-complete · audit_
+- **662** [662 - ZAOcoworkingBot v2 + v3 Architecture](./dev-workflows/662-zaocoworking-v2-v3-architecture/) — _2026-05-21 · research-complete · decision_
+- **663** [663 — ZAO Ecosystem Meta-Audit + Library Hygiene + Skill Upgrade (May 2026)](./dev-workflows/663-zao-research-meta-audit-2026-05-17/) — _2026-05-21 · research-complete · audit_
+- **663a** [663a — /zao-research Cross-Repo Search Upgrade](./dev-workflows/663-zao-research-meta-audit-2026-05-17/663a-skill-cross-repo-search/) — _2026-05-21 · research-complete · decision_
+- **663b** [663b - Active ZAO Products Audit](./dev-workflows/663-zao-research-meta-audit-2026-05-17/663b-active-zao-products/) — _2026-05-21 · research-complete · audit_
+- **663c** [663c: WaveWarZ + Music/Audio Repos Audit](./dev-workflows/663-zao-research-meta-audit-2026-05-17/663c-wavewarz-music-audio/)
+- **663d** [663d Audit: Farcaster Snaps + Zlank Family](./dev-workflows/663-zao-research-meta-audit-2026-05-17/663d-snaps-zlank-family/)
+- **663e** [Sub-Agent 663e: BOTS + STANDALONE TOOLS Audit](./dev-workflows/663-zao-research-meta-audit-2026-05-17/663e-bots-standalone-tools/)
+- **663f** [Audit 663f: Brand/Website + Misc Utility Repos](./dev-workflows/663-zao-research-meta-audit-2026-05-17/663f-brand-misc-utility/)
+- **663g** [663g — Research Library Hygiene Audit](./dev-workflows/663-zao-research-meta-audit-2026-05-17/663g-library-hygiene/) — _2026-05-21 · research-complete · audit_
+- **673** [673 - Meeting Capture Skill Design](./dev-workflows/673-meeting-capture-skill/) — _2026-05-21 · research-complete · decision_
+- **683** [683 - ZAO Ecosystem Consolidation + Automation Audit (DISPATCH)](./dev-workflows/683-ecosystem-consolidation-automation/) — _2026-05-20 · research-complete · audit_
+- **683a** [683a - Bot Fleet Consolidation](./dev-workflows/683-ecosystem-consolidation-automation/683a-bot-fleet-consolidation/) — _2026-05-20 · research-complete · audit_
+- **683b** [683b - Content + Social Automation: Manual Step Audit](./dev-workflows/683-ecosystem-consolidation-automation/683b-content-social-automation/) — _2026-05-20 · research-complete · audit_
+- **683c** [683c - Repo + Site Sprawl Consolidation](./dev-workflows/683-ecosystem-consolidation-automation/683c-repo-site-sprawl/) — _2026-05-20 · research-complete · audit_
+- **683d** [683d - Infra + VPS Ops Automation](./dev-workflows/683-ecosystem-consolidation-automation/683d-infra-vps-ops/) — _2026-05-20 · research-complete · audit_
+- **683e** [683e - Skills + Workflows + Connective Layer Audit](./dev-workflows/683-ecosystem-consolidation-automation/683e-skills-workflows-connective/) — _2026-05-20 · research-complete · audit_
+- **684** [684 - Claude Code Agent Dispatch + Parallelization](./dev-workflows/684-claude-code-agent-dispatch-parallelization/) — _2026-05-20 · research-complete · guide_
+- **685** [685 - code-on-incus: Isolated Machines for AI Agents](./dev-workflows/685-code-on-incus-agent-sandbox/) — _2026-05-20 · research-complete · guide_
+- **687** [687 - Claude Code Workflow + Context-Engineering Patterns (Community, May 2026)](./dev-workflows/687-claude-code-workflow-context-patterns/) — _2026-05-20 · research-complete · guide_
+- **688** [688 - Vibecoding Economics + Tooling (Community Signal, May 2026)](./dev-workflows/688-vibecoding-economics-tooling/) — _2026-05-20 · research-complete · guide_
+- **691** [691 - Inbox Standalone Roundup (ZOE Inbox, May 2026)](./dev-workflows/691-inbox-standalone-roundup-may2026/) — _2026-05-20 · research-complete · guide_
+- **693** [693 - /zao-research Fetch-Quality Audit: Why We Miss Info, and the Fix](./dev-workflows/693-zao-research-fetch-quality-audit/) — _2026-05-20 · research-complete · audit_
+- **694** [694 - Research Library Audit: All 649 Live Docs Scored](./dev-workflows/694-research-library-audit/) — _2026-05-20 · research-complete · audit_
+- **709** [709 - Meeting Transcription Pipeline Audit + ZAOscribe Status Check](./dev-workflows/709-meeting-transcription-pipeline-audit/) — _2026-05-22 · research-complete · audit_
+- **713** [713 — ZAO Ops: meeting capture unified into the tracker + CRM + Bonfire](./dev-workflows/713-zao-ops-meeting-tracker-crm-bonfire/) — _2026-05-22 · research-complete · decision_
+- **716** [716 - Inbox Cluster: AI-Augmented Workflows & Productivity Systems](./dev-workflows/716-inbox-agent-workflows-productivity/) — _2026-05-22 · research-complete · guide_
+- **722** [722 - ZAO Claude Code + GitHub: 3-Month Synthesis (2026-02-23 to 2026-05-23)](./dev-workflows/722-zao-claude-code-3-month-synthesis/) — _2026-05-23 · research-complete · audit_
+- **722a** [722a - Claude Code Skills Inventory (2026-05-23)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722a-skills-inventory/) — _2026-05-23 · research-complete · audit_
+- **722b** [722b: PR Timeline - 500 PRs in 3 Months (2026-02-23 to 2026-05-23)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722b-pr-timeline/)
+- **722c** [722c - ZAO Research Corpus Map (Feb 23 - May 23, 2026)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722c-research-corpus-map/)
+- **722d** [Doc 722d: ZAO Ecosystem Repository Audit (Feb 23 - May 23, 2026)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722d-repos-created/) — _2026-05-23 · research-complete · audit_
+- **722e** [722e - Patterns & Lessons: 3 Months of Claude Code + GitHub Work](./dev-workflows/722-zao-claude-code-3-month-synthesis/722e-patterns-lessons/) — _2026-05-23 · research-complete · audit_
+- **722f** [722f - ZAO Collaborator Network Map (3-Month Synthesis)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722f-people-network/) — _2026-05-23 · research-complete · audit_
+- **722g** [Memory State Audit - ZAOOS Claude Code (2026-05-23)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722g-memory-state/) — _2026-05-23 · research-complete · audit_
+- **722h** [722h - ZAO Runtime State Audit (as of 2026-05-23)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722h-runtime-bot-deployment/) — _2026-05-23 · research-complete · audit_
+- **722i** [722i - ZABAL Bonfire Knowledge Graph State Audit (2026-05-23)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722i-bonfire-kg-state/) — _2026-05-23 · research-complete · audit_
+- **722j** [722j - ZAO Ecosystem Public Surface Map (2026-05-23)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722j-public-surface-map/) — _2026-05-23 · research-complete · audit_
+- **722k** [722k - Content & Social Cadence Audit (3-Month Synthesis)](./dev-workflows/722-zao-claude-code-3-month-synthesis/722k-content-social-cadence/) — _2026-05-23 · research-complete · audit_
+- **728** [728 — Serena MCP for ZAO OS: Integration Plan Across All 5 Primary Surfaces](./dev-workflows/728-serena-mcp-zao-integration/) — _2026-05-23 · research-complete · decision_
+- **728** [728 — zabal.art voting UX overhaul: link fixes + optimistic UI + perceived speed](./dev-workflows/728-zabal-voting-ux-overhaul/) — _2026-05-24 · research-complete · decision_
+- **729** [729 - Operationalizing the v2 Operator-Profile Dossier in Claude Code](./dev-workflows/729-v2-dossier-operationalization-claude-code/) — _2026-05-23 · research-complete · guide_
+- **730** [730 — Claude Code Best Practices + Best-of-Breed MCP Stack for ZAOOS](./dev-workflows/730-claude-code-mcp-best-practices/) — _2026-05-23 · research-complete · decision_
+- **731** [731 - Writing-skills audit: the gap between "have the rules" and "follow them every time"](./dev-workflows/731-writing-skills-audit/) — _2026-05-23 · research-complete · audit_
+- **732** [732 - Agentic Writing + X/Reddit Scraping (DISPATCH hub)](./dev-workflows/732-agentic-writing-deep/) — _2026-05-23 · research-complete · market-research_
+- **732a** [Autonomous Post-Writing Agents in 2026: Production Patterns & Architecture](./dev-workflows/732-agentic-writing-deep/732a-autonomous-writers/) — _2026-05-23 · research-complete · guide_
+- **732b** [732b — X Scraping Toolkit 2026](./dev-workflows/732-agentic-writing-deep/732b-x-scraping-2026/) — _2026-05-23 · research-complete · guide_
+- **732c** [732c - Reddit Scraping Toolkit 2026: Methods, Tools, Rate Limits & Legal Landscape](./dev-workflows/732-agentic-writing-deep/732c-reddit-scraping-2026/) — _2026-05-23 · research-complete · guide_
+- **732f** [Hook Engineering + Copywriting Patterns for Elite Writers - 2026](./dev-workflows/732-agentic-writing-deep/732f-hook-engineering-copywriting/) — _2026-05-23 · research-complete · guide_
+- **732g** [Doc 732g: AI Detection & Humanization State in 2026](./dev-workflows/732-agentic-writing-deep/732g-ai-detection-humanizer-2026/)
+- **732h** [Posting Cadence + Algorithm Research Per Platform 2026](./dev-workflows/732-agentic-writing-deep/732h-posting-cadence-algorithms/)
+- **732i** [Multi-Agent Writing Teams: Drafter-Critic Architectures](./dev-workflows/732-agentic-writing-deep/732i-multiagent-writing-teams/) — _2026-05-23 · research-complete · comparison_
+- **739** [739 - Claude Code efficiency + native Claude.ai MCP connectors (Gmail / GCal / GDrive / GitHub)](./dev-workflows/739-claude-code-efficiency-native-mcps/) — _2026-05-25 · research-complete · guide_
+- **740** [740 - HTML vs Markdown for Publishing ZAO Documentation](./dev-workflows/740-html-vs-markdown-publishing/) — _2026-05-24 · research-complete · decision_
+- **744** [744 - Clay (chadbyte/clay) - multiplayer Claude Code + Codex browser workspace](./dev-workflows/744-clay-cc-browser-relay/) — _2026-05-25 · research-complete · comparison_
+- **755** [755 - /handoff - ZAO session handoff skill spec](./dev-workflows/755-handoff-skill-design/) — _2026-05-25 · research-complete · decision_
+- **756** [756 - /capture skill spec - content-source captures distinct from /meeting](./dev-workflows/756-capture-skill-spec/) — _2026-05-25 · research-complete · skill-spec_
+- **758** [758 - Next-week stack hub (5 sub-agents, DISPATCH-tier)](./dev-workflows/758-next-week-stack-hub/) — _2026-05-26 · research-complete · decision_
+- **758a** [758a - Coworking GitHub Edit Playbook (ZAODEVZ/ZAOcowork)](./dev-workflows/758a-coworking-github-edit-playbook/) — _2026-05-26 · research-complete · guide_
+- **763** [763 — Kanban best practices for small async teams (ZAOcowork improvements)](./dev-workflows/763-kanban-async-team-best-practices/) — _2026-05-26 · research-complete · market-research_
+- **764** [764 - ZAOcowork next improvements (post Phase F)](./dev-workflows/764-zaocowork-next-improvements/) — _2026-05-27 · research-complete · market-research_
+- **765** [765 - Coordination layers for agent + human teams (ZAOcowork)](./dev-workflows/765-coordination-layers-agent-human/) — _2026-05-27 · research-complete · decision_
+- **766** [766 - Midway-work audit (what's started but not finished)](./dev-workflows/766-midway-work-audit-2026-05-27/) — _2026-05-27 · research-complete · audit_
+- **767** [767 - ZAOcowork /admin audit (post Phase I)](./dev-workflows/767-zaocowork-admin-audit-post-phase-i/) — _2026-05-28 · research-complete · audit_
+- **781** [781 - /meeting skill friction fixes (4-run empirical pass)](./dev-workflows/781-meeting-skill-friction-fixes/) — _2026-05-31 · shipped · skill-iteration_
+- **789** [789 - /meeting skill improvement roadmap (2026 tooling research)](./dev-workflows/789-meeting-skill-improvement-roadmap/) — _2026-05-31 · research-complete · decision_
+- **790** [790 — Agentic Coding Workflows: CLAUDE.md, Daily-Driver Patterns, Vibecoding, Remotion Video-Gen, and the Swarm-vs-Teams Orchestration Split](./dev-workflows/790-agentic-coding-workflows-claudemd-swarms-vibecoding/) — _2026-05-31 · research-complete · market-research_
+
+## agents (171)
+
+- **026** [26 — Hindsight: Agent Memory System (vectorize-io/hindsight)](./agents/026-hindsight-agent-memory/)
+- **070** [70 — Sub-agents vs Agent Teams + Claude Architect Patterns for ZAO OS](./agents/070-subagents-vs-agent-teams/)
+- **071** [Research 71: Paperclip AI Rate Limiting & Multi-Agent API Key Management](./agents/071-paperclip-rate-limits-multi-agent/)
+- **084** [84 — Farcaster AI Agents Landscape (March 2026)](./agents/084-farcaster-ai-agents-landscape/)
+- **085** [85 — Building and Deploying a Farcaster AI Agent with Neynar](./agents/085-farcaster-agent-technical-setup/)
+- **090** [90 — AI-Run Community: Self-Improving Agent OS for ZAO](./agents/090-ai-run-community-agent-os/)
+- **161** [161 — Agent Harness Engineering: LangChain DeepAgents, Virtual Filesystems & the Ralph Loop](./agents/161-agent-harness-engineering-langchain/)
+- **171** [171 — Council of High Intelligence: Multi-Agent Deliberation for ZAO OS](./agents/171-council-high-intelligence-multi-agent-deliberation/)
+- **202** [202 — Multi-Agent Orchestration: OpenClaw Supervising Paperclip + Human-as-Agent](./agents/202-multi-agent-orchestration-openclaw-paperclip/)
+- **205** [205 — OpenClaw + Paperclip + ElizaOS: Full Agent Stack Deployment Plan](./agents/205-openclaw-paperclip-elizaos-deployment-plan/)
+- **206** [206 — LobsterAI Agent Architecture Analysis](./agents/206-lobsterai-agent-architecture/)
+- **208** [208 — Paperclip Plugins: Ecosystem Update & ZAO Integration Plan](./agents/208-paperclip-plugins-ecosystem-update/)
+- **227** [227 — Agentic Workflows in 2026: Frameworks, Patterns & Music/Web3 Applications](./agents/227-agentic-workflows-2026/)
+- **234** [234 — OpenClaw Comprehensive Guide: Agent Memory, Knowledge Graphs, MCP Servers & Context Management](./agents/234-openclaw-comprehensive-guide/)
+- **235** [235 - Free Web Search MCP Alternatives for AI Agents](./agents/235-free-web-search-mcp-alternatives/)
+- **236** [236 -- Autonomous OpenClaw Operator Pattern: 3-Layer Memory, Heartbeats, Delegation & Nightly Consolidation](./agents/236-autonomous-openclaw-operator-pattern/)
+- **237** [237 - USV Agents, Tasklet, Malleable Software & The "Build Something You Want" Era](./agents/237-usv-agents-tasklet-malleable-software/)
+- **239** [239 — Agent Frameworks & Infrastructure Evaluation for ZAO OS](./agents/239-agent-frameworks-infrastructure-evaluation/)
+- **245** [245 — ZOE Upgrade: Autonomous Workflow, Telegram Patterns, Neynar API & Founder Agent Playbook](./agents/245-zoe-upgrade-autonomous-workflow-2026/)
+- **246** [246 — Neynar API: Creative Agent Uses for ZOE](./agents/246-neynar-api-creative-agent-uses/)
+- **247** [247 — Top 50 Local AI Models for Privacy + Best Outputs (2026)](./agents/247-top-50-local-ai-models-2026/)
+- **251** [251 — HuggingFace Platform Deep Dive: What ZAO Can Do With a Write Token](./agents/251-huggingface-platform-deep-dive/)
+- **253** [253 — AutoAgent: Self-Optimizing Agent Harnesses (Kevin Gu / ThirdLayer)](./agents/253-autoagent-self-optimizing-agents/)
+- **256** [256 — ZOE Agent Factory: The Vision](./agents/256-zoe-agent-factory-vision/)
+- **259** [259 — Agent Self-Optimization: AutoAgent + Claude Code Hooks](./agents/259-agent-self-optimization/)
+- **262** [262 — Virtuals Protocol: Agent Payment Rail & Onchain Identity](./agents/262-virtuals-protocol-agent-rail/)
+- **266** [266 — Mission Control v2: Open-Source AI Agent Orchestration](./agents/266-mission-control-v2/)
+- **267** [267 — OpenClaw Skills & Capabilities Reference](./agents/267-openclaw-skills-capabilities/)
+- **268** [268 — Milady AI: ElizaOS Evolution for Desktop-First AI Agents](./agents/268-milady-ai-elizaos-evolution/)
+- **278** [278 — Farcaster Agentic Bootcamp vs ZAO Agent Squad: Gap Analysis & Upgrade Plan](./agents/278-agentic-bootcamp-zao-agent-squad/)
+- **288** [288 — Multi-Agent Dashboard Visual Research: UI Patterns for Agent Squad Monitoring](./agents/288-multi-agent-dashboard-visual-research/) — _2026-05-21 · research-complete · research_
+- **290** [290 — FISHBOWLZ Agentic Participants: AI Agents as Live Room Members](./agents/290-fishbowlz-agentic-participants/) — _2026-05-21 · research-complete · research_
+- **291** [291 — Farcaster Agentic Bootcamp Days 3-5: Agents, Memory, Identity](./agents/291-farcaster-agentic-bootcamp-days-3-5/) — _2026-05-21 · research-complete · research_
+- **292** [292 — Pixel Agents Dashboard Customization for ZAO OS](./agents/292-pixel-agents-dashboard-customization/) — _2026-05-21 · research-complete · research_
+- **293** [293 — Multi-Agent Orchestration Tools, GitNexus Knowledge Graphs & High-Impact Agent Prompts](./agents/293-multi-agent-tools-gitnexus-prompts/) — _2026-05-21 · research-complete · research_
+- **296** [296 - Agentic Workflow Optimization: Powerful Center + Cheap Edge Operating Model](./agents/296-agentic-workflow-optimization/) — _2026-05-21 · research-complete · research_
+- **307** [307 - The Great Convergence: Agent Harness Architecture](./agents/307-great-convergence-agent-harness-architecture/) — _2026-05-21 · research-complete · research_
+- **318** [318 - Multi-Agent Coordination: Cassie Heart's Agentic Bootcamp Session 10](./agents/318-cassie-multi-agent-coordination-bootcamp/) — _2026-05-21 · research-complete · research_
+- **325** [325 - ElevenLabs Agents: Voice AI Platform for ZAO OS](./agents/325-elevenlabs-agents-voice-ai-platform/) — _2026-05-21 · research-complete · research_
+- **325** [325 -- ZABAL Agent Swarm Economy: 3 Brand Agents Trading, Buying & Building Volume](./agents/325-zabal-agent-swarm-economy/) — _2026-05-21 · research-complete · research_
+- **339** [339 -- Austin Griffith, CLAWD Agent, ETHSkills & Patterns to Steal for VAULT/BANKER/DEALER](./agents/339-austin-griffith-clawd-ethskills-agent-patterns/) — _2026-05-21 · research-complete · research_
+- **340** [340 -- CLAWD Deep Dive: 4 Systems to Fork for ZABAL Agent Swarm](./agents/340-clawd-patterns-deep-dive-4-systems/) — _2026-05-21 · research-complete · research_
+- **344** [344 -- Bankr Bot: AI Trading Agent + Skills Marketplace for ZABAL Swarm](./agents/344-bankr-bot-agent-trading-skills/) — _2026-05-21 · research-complete · research_
+- **345** [345 -- ZABAL Agent Swarm: Master Blueprint (CANONICAL)](./agents/345-zabal-agent-swarm-master-blueprint/) — _2026-05-21 · research-complete · research_
+- **351** [351 -- ZABAL Agent Swarm Activation Checklist: How It SHOULD Work vs How It COULD Work](./agents/351-zabal-swarm-activation-checklist/) — _2026-05-21 · research-complete · research_
+- **353** [353 -- Autonomous Agent Trading: Beyond Fixed Schedules](./agents/353-autonomous-trading-beyond-schedules/)
+- **360** [360 -- Profit Agent: Hot Wallet Money-Making Strategy](./agents/360-profit-agent-hot-wallet-strategy/)
+- **363** [363 -- Darwinian Agent Evolution: Die, Mutate, Respawn, Iterate](./agents/363-darwinian-agent-evolution/)
+- **364** [364 -- Multi-Harness Agent Orchestration: OpenClaw + Hermes + Tournament Model](./agents/364-multi-harness-agent-orchestration/)
+- **420** [420 — HyperFrames: HTML-as-Video for AI Agents](./agents/420-hyperframes-html-video-agents/)
+- **433** [433 - Agent Outbound Phone Calls: Ring-a-Ding vs DIY Twilio + OpenAI Realtime](./agents/433-agent-outbound-phone-calls-ringading-twilio/)
+- **435** [435 - ZOE Effectiveness v2: Proactive, Context-Aware, Safe Playbook](./agents/435-zoe-effectiveness-v2-playbook/)
+- **447** [447 - Agent Stack 7-Day Improvement Sprint](./agents/447-agent-stack-week-improvement-sprint/)
+- **451** [451 - AO Claude Code Dialog Block Forensics](./agents/451-ao-claude-code-dialog-block-forensics/)
+- **452** [452 - AO Sidebar Counter Filter Fix](./agents/452-ao-sidebar-counter-filter-fix/)
+- **453** [453 - AO Offline Banner WebSocket Diagnosis](./agents/453-ao-offline-banner-websocket-diagnosis/)
+- **454** [454 - Agent Stack Reliability Hardening (Apr 20)](./agents/454-agent-stack-reliability-hardening-apr20/)
+- **457** [457-silent-failure-hunt-ecc](./agents/457-silent-failure-hunt-ecc/)
+- **460** [460-zao-agentic-stack-end-to-end-design](./agents/460-zao-agentic-stack-end-to-end-design/)
+- **464** [464 — ZOE Telegram: Reply-Context Bug, Capability Matrix, Ship-PR Loop](./agents/464-zoe-telegram-reply-context-ship-pr/)
+- **465** [465 — ZOE Observability + Dispatch Hardening (post-messaging-fix)](./agents/465-zoe-observability-dispatch-hardening/) — _2026-05-21 · research-complete · research_
+- **466** [466 - AO UI Button Audit](./agents/466-ao-ui-button-audit-apr21/) — _2026-05-21 · research-complete · guide_
+- **467** [467 — ZAO Branded Bot Fleet Design, Telegram hub (Magnetiq / WaveWarZ / ZAO Stock / ZAO Devz / Research)](./agents/467-zao-bot-fleet-design-magnetiq/) — _2026-05-21 · research-complete · research_
+- **468** [468 — ZAO Farcaster Hub: POIDH bot, HyperSub bot, and dual-hub (Telegram + Farcaster) design](./agents/468-zao-farcaster-hub-poidh-hypersub-dual-hub/) — _2026-05-21 · research-complete · research_
+- **473** [473 — clawdbotatg Apr 21 Update: Patterns to Steal for ZOE / OpenClaw / Agent Squad](./agents/473-clawdbotatg-apr21-updates-zoe-openclaw/) — _2026-05-21 · research-complete · research_
+- **474** [474 - BCZ 101 Bot + Transcript RAG Best Practices](./agents/474-bcz101-bot-transcript-rag/) — _2026-05-21 · research-complete · research_
+- **479** [479 — Walden Yan (Cognition) — What's Actually Working in Multi-Agent Systems](./agents/479-walden-multi-agent-patterns-cognition/) — _2026-05-21 · research-complete · research_
+- **483** [483 — r/hermesagent — Nous Research Hermes as a Local-First Agent Framework](./agents/483-hermes-agent-local-llm-framework/) — _2026-05-21 · research-complete · research_
+- **484** [484 — Matricula — Autonomous Self-Improving Farcaster Agent (@matricula)](./agents/484-matricula-autonomous-farcaster-agent/) — _2026-05-21 · research-complete · research_
+- **487** [487 — QuadWork — 4-Agent Coding Team (Head + Dev + 2 Reviewers)](./agents/487-quadwork-four-agent-dev-team/) — _2026-05-21 · research-complete · research_
+- **488** [488 — CORTEX — Synthetic Cognition Memory Architecture (Rezzyman / ATERNA.AI)](./agents/488-cortex-synthetic-cognition-memory/)
+- **491** [491 — Install QuadWork for the 3-Repo Split (zao-research / zao-chat / zao-brain)](./agents/491-quadwork-install-three-repo-split/) — _2026-05-21 · research-complete · guide_
+- **495** [495 - Team Telegram Bot 2026 Patterns — v1.5 Architecture Call](./agents/495-team-telegram-bot-2026-patterns/) — _2026-05-21 · research-complete · decision_
+- **496** [496 — ElizaOS 2026 Assessment: For ZAOstock Bot Decision](./agents/496-elizaos-2026-assessment/) — _2026-05-21 · research-complete · decision_
+- **497** [497 - Quad / QuadWork Workflow Deep Dive](./agents/497-quad-workflow-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **523** [523 - ZAO Agentic Systems Full Audit + Fix-PR Pipeline + Hermes Dual-Bot Architecture](./agents/523-zao-agentic-systems-full-audit-fix-pr-pipeline/) — _2026-05-21 · research-complete · audit_
+- **524** [524 - ZAO Agentic Systems - Everything Map (LIVE / STARTED / PLANNED / ARCHIVED)](./agents/524-zao-agentic-everything-live-archived-started-planned/) — _2026-05-21 · research-complete · audit_
+- **527** [527 - Multi-Bot Telegram Coordination - The Best-Practice Playbook for ZAO](./agents/527-multi-bot-telegram-coordination-best-practices/) — _2026-05-21 · research-complete · decision_
+- **529** [529 - Hermes Quality Pipeline - Pre-Critic Gates + Conflict Policy](./agents/529-hermes-quality-pipeline-pre-critic-gates/) — _2026-05-21 · research-complete · decision_
+- **531** [531 - Hermes Honest Audit - Pivot or Persist](./agents/531-hermes-honest-audit-pivot-or-persist/) — _2026-05-21 · research-complete · audit_
+- **541** [541 - Hermes Gaps vs Industry Best Practices (Apr 27 2026)](./agents/541-hermes-gaps-vs-industry-best-practices/) — _2026-05-21 · research-complete · comparison_
+- **546** [546 - Hefty.bot: Local-First Personal AI Harness (Slava / Based Rooms tip)](./agents/546-hefty-bot-local-first-harness/) — _2026-05-21 · research-complete · market-research_
+- **547** [547 - Multi-Agent Coordination: Bonfire, ZOE, Hermes (Apr 28 2026)](./agents/547-multi-agent-coordination-bonfire-zoe-hermes/) — _2026-05-21 · research-complete · guide_
+- **559** [559 - Wetware (ww): P2P OS for Autonomous Agents](./agents/559-wetware-ww-p2p-agent-os/) — _2026-05-21 · research-complete · decision_
+- **567** [567 - Hugging Face Local Models + Web UI + Claude Code Context Bridge](./agents/567-hugging-face-local-models-context-bridge/) — _2026-05-21 · research-complete · decision_
+- **568** [Doc 568: Aware Brain - Local-First Knowledge Graph Chat for ZAO](./agents/568-aware-brain-local-memory-knowledge-graph/) — _2026-05-21 · research-complete · decision_
+- **574** [574 — Inbox Batch Apr 30: Agent Commerce, Alignment Skills, Local Stack Update](./agents/574-inbox-apr30-agent-commerce-skills-stack/) — _2026-05-21 · research-complete · market-research_
+- **599** [599 — ZAO Bonfire Bridge: Multi-Agent Operating Group](./agents/599-zao-bonfire-bridge-operating-group/) — _2026-05-21 · research-complete · decision_
+- **599c** [599c - Hermes Agent (NousResearch) Prior Art - Naming Collision Watch + Lessons](./agents/599c-hermes-agent-prior-art-reddit/) — _2026-05-21 · research-complete · market-research_
+- **600** [600 — ZAO Agentic Stack Coordination v1](./agents/600-agentic-stack-coordination-v1/) — _2026-05-21 · research-complete · decision_
+- **601** [601 — Agent Stack Cleanup Decision](./agents/601-agent-stack-cleanup-decision/) — _2026-05-21 · research-complete · decision_
+- **602** [602 — TradingAgents Multi-Agent Pattern → Adapt for ZAO Social + Project Management (NOT Trading)](./agents/602-tradingagents-pattern-for-social-pm/) — _2026-05-21 · research-complete · guide_
+- **603** [603 — TradingAgents Multi-Agent Pattern → Adapt for ZAO Social + Project Management (NOT Trading)](./agents/603-tradingagents-pattern-for-social-pm/) — _2026-05-21 · research-complete · guide_
+- **604** [604 — Best Personal Concierge AI Agent Architectures (2026) → Apply to ZOE](./agents/604-best-personal-concierge-agents-2026/) — _2026-05-21 · research-complete · decision_
+- **605** [605 - Agentic tooling landscape (May 2026) - what to add to the ZAO stack](./agents/605-agentic-tooling-may-2026/) — _2026-05-21 · research-complete · market-research_
+- **605a** [605a - Claude Agent SDK + OpenAI SDKs vs current ZOE Claude CLI subprocess](./agents/605-agentic-tooling-may-2026/605a-claude-agent-sdk/) — _2026-05-21 · research-complete · decision_
+- **605b** [605b - Browser + computer-use agents for ZOE](./agents/605-agentic-tooling-may-2026/605b-browser-computer-use/) — _2026-05-21 · research-complete · decision_
+- **605c** [605c - Eval and observability tools for ZOE + Hermes](./agents/605-agentic-tooling-may-2026/605c-eval-observability/) — _2026-05-21 · research-complete · decision_
+- **605d** [605d - Voice agents for ZOE](./agents/605-agentic-tooling-may-2026/605d-voice-agents/) — _2026-05-21 · research-complete · decision_
+- **605e** [605e - Workflow + agent-orchestration platforms for ZAO](./agents/605-agentic-tooling-may-2026/605e-workflow-orchestration/) — _2026-05-21 · research-complete · decision_
+- **607** [607 - Three bots, one substrate: ZOE + ZAOstock + Bonfire operating model (May 2026)](./agents/607-three-bots-one-substrate/) — _2026-05-21 · research-complete · decision_
+- **617** [617 — bczyapz101 bot architecture (gmfc101 fork plan)](./agents/617-bczyapz101-bot-architecture/) — _2026-05-21 · research-complete · decision_
+- **619** [619 - Link Batch May 6 Triage](./agents/619-link-batch-may6-triage/) — _2026-05-21 · research-complete · audit_
+- **620** [620 - Bonfire push-everything: auto-ingest pipeline for Zaal's personal knowledge graph](./agents/620-bonfire-push-everything/) — _2026-05-21 · research-complete · decision_
+- **632** [632 - r/hermesagent: Different Project (NousResearch)](./agents/632-r-hermesagent-subreddit/) — _2026-05-21 · research-complete · guide_
+- **644** [644 - ZAO Agent Stack Canon + Team Bot Template](./agents/644-zao-agent-stack-canon-and-team-bot-template/) — _2026-05-21 · research-complete · decision_
+- **645** [645 - Agent canon + team-bots audit (Magnetiq + AttaBotty)](./agents/645-agent-canon-and-team-bots-audit/) — _2026-05-21 · research-complete · audit_
+- **646** [646 - Brand-fit audits: Magnetiq + AttaBotty bots](./agents/646-brand-fit-audits-magnetiq-attabotty/) — _2026-05-21 · research-complete · audit_
+- **647** [647 — Agent Quality Deep Research (Hub)](./agents/647-agent-quality-deep-research/) — _2026-05-21 · research-complete · decision_
+- **648** [648 — Ryan Kagy Sync: ZAO Civilization, Agent Lineage, Soul of All Games](./agents/648-ryan-kagy-zao-civilization-sync/) — _2026-05-21 · research-complete · decision_
+- **650** [650 — cowork-zaodevz: the imanagent + a from-scratch VPS build Iman can follow](./agents/650-cowork-zaodevz-imanagent/) — _2026-05-21 · research-complete · decision_
+- **665** [665 — Bonfires Deep Dive + ZAO Integration Plan](./agents/665-bonfires-deep-dive-zao-integration/) — _2026-05-21 · research-complete · decision_
+- **668** [668 — ZAO Agent + Bot Improvement (May 2026 Hub)](./agents/668-zao-agent-improvement-may-2026/) — _2026-05-21 · research-complete · audit_
+- **668** [668 - ZAOcoworkingBot Full Audit (May 2026)](./agents/668-zaocoworking-bot-audit/) — _2026-05-21 · research-complete · audit_
+- **668a** [668a - ZAOcoworkingBot Architecture Audit](./agents/668-zaocoworking-bot-audit/668a-architecture/) — _2026-05-21 · research-complete · audit_
+- **668a** [668a - Current ZAO Bot Inventory + Health Scores](./agents/668-zao-agent-improvement-may-2026/668a-current-bot-inventory-health/) — _2026-05-21 · research-complete · audit_
+- **668b** [ZAOcoworkingBot LLM Persona & Hallucination Safety Audit](./agents/668-zaocoworking-bot-audit/668b-llm-persona-safety/) — _2026-05-21 · research-complete · audit_
+- **668b** [668b - ZOE Memory Architecture Upgrade Path (May 2026)](./agents/668-zao-agent-improvement-may-2026/668b-zoe-memory-upgrade/) — _2026-05-21 · specification · decision_
+- **668c** [668c - ZAO Agent Infrastructure: Industry Best Practices 2026](./agents/668-zao-agent-improvement-may-2026/668c-industry-best-practices-2026/) — _2026-05-21 · research-complete · market-research_
+- **668c** [ZAOcoworkingBot State & Persistence Audit](./agents/668-zaocoworking-bot-audit/668c-state-persistence/) — _SHIPPED · audit_
+- **668d** [ZAOcoworkingBot Security Audit](./agents/668-zaocoworking-bot-audit/668d-security/) — _2026-05-21 · research-complete · audit_
+- **668d** [668d — ZAOcoworkingBot ↔ ZABAL Bonfire Integration Spec](./agents/668-zao-agent-improvement-may-2026/668d-zaocoworking-bonfires-integration/) — _2026-05-21 · research-complete · decision_
+- **668e** [ZAOcoworkingBot Ops Audit - Deploy + Systemd Health + Cron Reliability](./agents/668-zaocoworking-bot-audit/668e-deploy-ops/) — _2026-05-18 · research-complete · audit_
+- **668f** [ZAOcoworkingBot v2.11 Feature & UX Audit](./agents/668-zaocoworking-bot-audit/668f-feature-ux-gaps/) — _2026-05-21 · research-complete · audit_
+- **669** [669 — Bonfires: Everything We Know (Consolidated + Extended)](./agents/669-bonfires-everything-we-know/) — _2026-05-21 · research-complete · market-research_
+- **671** [671 - LLM Fictional-Permission Hallucination Fixes (ZAOcoworkingBot)](./agents/671-llm-fictional-permission-hallucination-fixes/) — _2026-05-21 · research-complete · decision_
+- **672** [672 - ZAOcoworkingBot Full Audit (post-v2.13)](./agents/672-zaocoworking-bot-audit-postv213/) — _2026-05-21 · research-complete · audit_
+- **673** [673 - ZAOscribe Spec (live audio - todo bot)](./agents/673-zao-craig-spec-live-audio-todo/) — _2026-05-21 · research-complete · spec_
+- **673** [673 - ZOE <-> Bonfires Dialog + Automation (Phase 2 Research)](./agents/673-zoe-bonfires-dialog-automation/) — _2026-05-21 · research-complete · decision_
+- **673a** [ZAOcoworkingBot v0.3.0 Phase 1: Data Flow to ZABAL Bonfire](./agents/673-zoe-bonfires-dialog-automation/673a-phase-1-trace/) — _2026-05-21 · research-complete · guide_
+- **673b** [673b — Bonfires Automation Primitives: What Runs Automatically](./agents/673-zoe-bonfires-dialog-automation/673b-bonfires-automation/) — _2026-05-21 · research-complete · market-research_
+- **673c** [ZOE Architecture Guide - Where to Hook Bonfire Dialog](./agents/673-zoe-bonfires-dialog-automation/673c-zoe-architecture/) — _research-complete · guide_
+- **673d** [673d — ZABAL Bonfire Bot: What It Is + How ZOE Talks to It](./agents/673-zoe-bonfires-dialog-automation/673d-zabal-bonfire-bot/) — _2026-05-21 · research-complete · market-research_
+- **673e** [Phase 2: ZOE ↔ Bonfire Bi-Directional Dialog + Automation](./agents/673-zoe-bonfires-dialog-automation/673e-phase-2-spec/) — _2026-05-21 · research-complete · decision_
+- **674** [674 - ZAOscribe: Discord Audio -> Action Items (Best-of + Build Plan)](./agents/674-zaoscribe-discord-best-plan/) — _2026-05-21 · research-complete · spec_
+- **676** [676 - Bonfires Knowledge-Graph Utilization (DISPATCH)](./agents/676-bonfires-kg-utilization/) — _2026-05-21 · research-complete · decision_
+- **676a** [676a — ZOE Bonfire Recall: Agent Memory Architecture & Integration](./agents/676-bonfires-kg-utilization/676a-zoe-recall-agent-memory/) — _2026-05-21 · research-complete · decision_
+- **676b** [676b — Cross-Bot KG Architecture: Unified Bonfires Integration](./agents/676-bonfires-kg-utilization/676b-cross-bot-kg/) — _2026-05-21 · research-complete · decision_
+- **676c** [676c — Content Flywheel: ZABAL Bonfire KG to Published Content](./agents/676-bonfires-kg-utilization/676c-content-flywheel/) — _2026-05-21 · research-complete · decision_
+- **676d** [676d - @zabal_bonfire as Queryable Teammate + Team-Facing Search Surfaces](./agents/676-bonfires-kg-utilization/676d-zabal-bonfire-teammate-search/) — _2026-05-21 · research-complete · decision_
+- **676e** [676e — Bonfires KG for ZAO Governance: Weekly Fractal + Respect Reconciliation](./agents/676-bonfires-kg-utilization/676e-governance-fractal/) — _2026-05-21 · research-complete · decision_
+- **676f** [676f — Bonfires KG for Onboarding & $KNOW Economy](./agents/676-bonfires-kg-utilization/676f-onboarding-know-economy/) — _2026-05-21 · research-complete · decision_
+- **677** [677 - Connecting the Bonfire to the cowork-zaodevz GitHub Repo](./agents/677-bonfire-cowork-github-connection/) — _2026-05-21 · research-complete · decision_
+- **679** [679 - Coworking Agent: Telegram @-Mentions + Iman DM-to-Code Pipeline](./agents/679-coworking-agent-mentions-code-pipeline/) — _2026-05-21 · research-complete · decision_
+- **683** [683 - ZOE Troubles Analysis + Ryan Kagy Followup](./agents/683-zoe-troubles-analysis-ryan-followup/) — _2026-05-20 · research-complete · audit_
+- **684** [684 - ZAO Bot Fleet Architecture (locked)](./agents/684-zao-bot-fleet-architecture/) — _2026-05-20 · research-complete · decision_
+- **689** [689 - AI Agent Memory + Personal Knowledge Systems (Community, May 2026)](./agents/689-ai-agent-memory-personal-systems/) — _2026-05-20 · research-complete · guide_
+- **690** [690 - X Posts Roundup (ZOE Inbox, May 2026)](./agents/690-inbox-x-posts-roundup-may2026/) — _2026-05-20 · research-complete · guide_
+- **698** [698 - Agent Stack Re-Audit + Codebase Audit + Next-Fix Todos + Paperclip Restart Plan](./agents/698-agent-stack-reaudit-codebase-todos-paperclip/) — _2026-05-21 · research-complete · audit_
+- **699** [699 - The State of Agentic AI, 2026: A Deep Study](./agents/699-state-of-agentic-2026-deep-study/) — _2026-05-21 · research-complete · market-research_
+- **699a** [699a - Agent Memory: The Graph Layer for ZAO](./agents/699a-agent-memory-graph-layer-for-zao/) — _2026-05-21 · research-complete · decision_
+- **699b** [699b - Agent Security Hardening for the ZAO Stack](./agents/699b-agent-security-hardening/) — _2026-05-21 · research-complete · audit_
+- **699c** [699c - Agent Evaluation + Observability for ZAO](./agents/699c-agent-evaluation-observability/) — _2026-05-21 · research-complete · decision_
+- **699d** [699d - Advanced Agentic Coding Workflows: Hermes + QuadWork Upgrades](./agents/699d-advanced-agentic-coding-workflows/) — _2026-05-21 · research-complete · guide_
+- **701** [701 - Agent Harness Engineering: A Deep Dive](./agents/701-agent-harness-engineering-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **717** [717 - Posting /meeting Bonfire episodes via the VPS](./agents/717-meeting-bonfire-posting-via-vps/) — _2026-05-22 · research-complete · decision_
+- **727** [727 - ZOE as agent builder: orchestrator + supervisor + learning loop](./agents/727-zoe-as-agent-builder-supervisor/) — _2026-05-23 · research-complete · decision_
+- **734** [734 - hermes-orchestrator framework](./agents/734-hermes-orchestrator-framework/) — _2026-05-23 · research-complete · guide_
+- **735** [735 - Apple Containerization as a sandbox for autonomous agents on macOS](./agents/735-apple-containerization-sandbox-for-agents/) — _2026-05-23 · research-complete · guide_
+- **754** [754 - Why /meeting did not push to Bonfire today (config gap, not architecture mismatch)](./agents/754-meeting-bonfire-bridge-config-gap/) — _2026-05-25 · research-complete · incident-postmortem_
+- **758b** [758b - m1k1o/neko install + RTMP forward (24/7 ZAO radio)](./agents/758b-nurdism-neko-install-rtmp-forward/) — _2026-05-26 · research-complete · guide_
+- **758c** [758c - Telegram /claim bot pattern for ZABAL Games mentors](./agents/758c-telegram-claim-bot-pattern/) — _2026-05-26 · research-complete · decision_
+- **758d** [758d - Discord 24/7 ZAO musician radio bot](./agents/758d-discord-247-radio-bot/) — _2026-05-26 · research-complete · decision_
+- **759** [759 - Agent best practices + ZOE orchestrator gap analysis](./agents/759-agent-best-practices-and-zoe-orchestrator-gap/) — _2026-05-26 · research-complete · decision_
+- **760** [760 — InfiniteZero / DIN: Decentralized Intelligence Network on Optimism Sepolia](./agents/760-infinitezero-din-decentralized-ai/) — _2026-05-28 · research-complete · market-research_
+- **761** [761 - ZAO Farcaster Multi-Agent System on the Quilibrium Stack](./agents/761-zao-farcaster-multiagent-quilibrium-stack/) — _2026-05-29 · in-flight (Phase 0/1 ops blocked on operator; in-repo scaffold landed) · architecture + build-guide_
+- **770** [770 - ZOE orchestrator code audit (post-merge, pre-trust)](./agents/770-zoe-orchestrator-audit/) — _2026-05-29 · research-complete · audit_
+- **773** [773 - ZOE orchestrator HIGH-severity fixes (doc 770 follow-up)](./agents/773-zoe-orchestrator-high-fixes/) — _2026-05-29 · implemented · changelog_
+- **775** [775 - What ZAO's Agent Stack Can Do Now (2026-05-30)](./agents/775-zao-stack-capabilities-2026/) — _2026-05-30 · research-complete · market-research_
+- **793** [793 — Claude CLI lockdown learnings + doc 770 follow-up closeout](./agents/793-cli-lockdown-learnings-770-followups/) — _2026-05-31 · research-complete · learnings_
+- **794** [794 — Hermes pipeline + trading-stack audit (pre-trust)](./agents/794-hermes-trading-stack-audit/) — _2026-05-31 · research-complete · audit_
+
+## music (86)
+
+- **079** [79 — SongJam Ecosystem & Music Player Research](./music/079-songjam-music-player-research/)
+- **082** [88 — Music-First Social Platform Redesign Research](./music/082-music-social-platform-redesign/)
+- **107** [107 — Music Page Layout & Design for ZAO OS](./music/107-music-page-layout-design/)
+- **112** [112 — Audius API Deep Dive for ZAO OS Integration](./music/112-audius-api-deep-dive/)
+- **113** [113 — Top 10 Music Fixes for ZAO OS](./music/113-top-10-music-fixes/)
+- **130** [130 — Next Music Integrations: Deep Research + Implementation Plan](./music/130-next-music-integrations/)
+- **138** [138 — Do Plays on ZAO OS Count? Stream Attribution Deep Dive](./music/138-play-counting-stream-attribution/)
+- **141** [141 — On-Chain Music Distribution Landscape 2026](./music/141-onchain-music-distribution-landscape/)
+- **143** [143 — 0xSplits: Automated Revenue Distribution for ZAO Artists](./music/143-0xsplits-revenue-distribution/)
+- **144** [144 — ZOUNZ + Music NFTs: Unified DAO-Powered Music Distribution](./music/144-zounz-music-nft-unified-distribution/)
+- **145** [145 — Simple NFT Platform Design: Music Collectibles for ZAO Members](./music/145-simple-nft-platform-design/)
+- **146** [146 — Open Contracts: Multi-Artist Distribution via Forkable Smart Contracts](./music/146-open-contracts-multi-artist-distribution/)
+- **148** [148 — Master Integration Plan: ZAO On-Chain Music Distribution Service](./music/148-master-integration-plan-onchain-distribution/)
+- **151** [151 — ZOUNZ Music Distribution Without Zora: Arweave + Thirdweb + 0xSplits](./music/151-zounz-distribution-without-zora/)
+- **152** [152 — Arweave Ecosystem Deep Dive: Building a Full Music Layer on the Permaweb](./music/152-arweave-ecosystem-deep-dive/)
+- **153** [153 — BazAR & Atomic Assets: Arweave-Native Music Distribution for ZAO](./music/153-bazar-arweave-atomic-assets-music/)
+- **155** [155 — End-to-End Music NFT: Upload → Mint → Buy (Implementation Plan)](./music/155-music-nft-end-to-end-implementation/)
+- **156** [156 — Pods.media & Podcast Tokenization: Can ZAO Clone It on Arweave?](./music/156-pods-media-podcast-tokenization/) — _2026-05-21 · research-complete · research-complete_
+- **160** [160 — Audio Spaces Landscape: Farcaster Apps, X Spaces Competitors & Provider Comparison](./music/160-audio-spaces-landscape-comparison/) — _2026-05-21 · research-complete · research-complete_
+- **167** [167 — Audio APIs, Music Players & Display Patterns](./music/167-audio-apis-music-players-displays/) — _2026-05-21 · research-complete · research-complete_
+- **185** [100 — Synchronized Listening Rooms & Collaborative Music Experiences](./music/185-synchronized-listening-rooms/) — _2026-05-21 · research-complete · research-complete_
+- **186** [186 — Music Discovery Feed — Research & Implementation Plan](./music/186-music-discovery-feeds/) — _2026-05-21 · research-complete · research-complete_
+- **187** [187 — Songlink/Odesli API for Universal Music Links](./music/187-songlink-odesli-api/) — _2026-05-21 · research-complete · research-complete_
+- **189** [189 — Mobile Music Player Optimization & Advanced Features](./music/189-mobile-player-optimization/) — _2026-05-21 · research-complete · research-complete_
+- **190** [190 — ZAO OS Music Player: Complete Audit & Future Roadmap](./music/190-music-player-complete-audit/) — _2026-05-21 · research-complete · research-complete_
+- **209** [209 — AI Video Generation Tools for ZAO OS](./music/209-ai-video-generation-tools/) — _2026-05-21 · research-complete · research-complete_
+- **211** [211 — Music Player UI Best Practices & Feature Research](./music/211-music-player-ui-best-practices/) — _2026-05-21 · research-complete · research-complete_
+- **216** [216 — AI Features for ZAO OS Live Rooms & Music](./music/216-ai-features-live-rooms-music/) — _2026-05-21 · research-complete · research-complete_
+- **220** [220 — Mobile-First Music App UX Patterns for ZAO OS](./music/220-mobile-first-music-ux-patterns/) — _2026-05-21 · research-complete · research-complete_
+- **255** [255 — FISHBOWLZ: Persistent Async Audio Spaces [ARCHIVE CANDIDATE]](./music/255-fishbowlz-spec/) — _2026-05-21 · _archive_candidate · research-complete_
+- **261** [261 — AI Agent Music Pipeline: Autonomous Distribution (2026)](./music/261-ai-agent-music-pipeline/) — _2026-05-21 · research-complete · research-complete_
+- **273** [273 — Web3 Streaming Features: Wallet Tipping, Token-Gated Rooms, NFT Tickets](./music/273-web3-streaming-features-tipping-gating-tickets/) — _2026-05-21 · research-complete · research-complete_
+- **277** [277 — FISHBOWLZ Audio Providers & Architecture [ARCHIVE CANDIDATE]](./music/277-fishbowlz-audio-providers/) — _2026-05-21 · _archive_candidate · research-complete_
+- **280** [280 — FISHBOWLZ: MVP to SaaS-Ready Roadmap [ARCHIVE CANDIDATE]](./music/280-fishbowlz-mvp-to-saas-roadmap/) — _2026-05-21 · _archive_candidate · research-complete_
+- **281** [281 — Audio Room Competitive Landscape 2026](./music/281-audio-room-competitive-landscape/) — _2026-05-21 · research-complete · competitive-analysis_
+- **313** [Doc 313 - AI Music Production Workflows 2026: Complete Pipeline Guide](./music/313-ai-music-production-workflows-2026/) — _2026-05-21 · research-complete · technical-guide_
+- **313** [Doc 313 - ElevenLabs Scribe v2 Speech-to-Text for Community Transcription](./music/313-elevenlabs-scribe-v2-speech-to-text/) — _2026-05-21 · research-complete · technical-guide_
+- **313** [Doc 313 - ElevenLabs Voice Changer for Music Production](./music/313-elevenlabs-voice-changer-music-production/) — _2026-05-21 · research-complete · technical-guide_
+- **313** [Doc 313: TikTok, Reels & Shorts Marketing for AI-Assisted Musicians (2026)](./music/313-tiktok-reels-ai-music-marketing/) — _2026-05-21 · research-complete · marketing-guide_
+- **314** [Doc 314 - Music Metadata, ISRC Codes & AI-Generated Music Distribution (2026)](./music/314-music-metadata-isrc-ai-distribution/) — _2026-05-21 · research-complete · technical-guide_
+- **315** [Doc 315: Revenue Stacking - Monetizing a Single AI-Generated Song (2026)](./music/315-ai-song-revenue-stacking/) — _2026-05-21 · research-complete · business-guide_
+- **319** [319 - AI Music Creation Platforms: Multi-Output Song Production](./music/319-ai-music-creation-platforms-multi-output/) — _2026-05-21 · research-complete · comparative-analysis_
+- **320** [Doc 320: AI-Generated Music for Games, Interactive Media & Roblox (2026)](./music/320-ai-music-games-interactive-media/) — _2026-05-21 · research-complete · market-analysis_
+- **320** [320 - Anatomy of a Viral Summer Song: Making "The Summer of 26"](./music/320-anatomy-viral-summer-songs/) — _2026-05-21 · research-complete · case-study_
+- **320** [Doc 320 - ElevenLabs Music API Deep Dive (2026)](./music/320-elevenlabs-music-api-deep-dive/) — _2026-05-21 · research-complete · technical-guide_
+- **321** [Doc 321: Suno AI Music Platform - Deep Dive (April 2026)](./music/321-suno-ai-music-platform-2026/) — _2026-05-21 · research-complete · technical-guide_
+- **322** [Doc 322: AI Music Distribution & Marketing for Independent Artists (2026)](./music/322-ai-music-distribution-marketing-2026/) — _2026-05-21 · research-complete · business-guide_
+- **322** [Doc 322: Kits.AI - Singing Voice Conversion Platform](./music/322-kits-ai-singing-voice-conversion/) — _2026-05-21 · research-complete · technical-guide_
+- **323** [323 - ElevenLabs API: Full Capabilities & What We Can Build](./music/323-elevenlabs-api-full-capabilities/) — _2026-05-21 · research-complete · technical-guide_
+- **323** [Doc 323 - ElevenLabs Music Dubbing & Song Translation (2026)](./music/323-elevenlabs-music-dubbing-translation/) — _2026-05-21 · research-complete · technical-guide_
+- **323** [Doc 323: Mixing & Mastering AI-Generated Music in a DAW (2026 Guide)](./music/323-mixing-mastering-ai-music-daw-guide/) — _2026-05-21 · research-complete · technical-guide_
+- **324** [324 - ACE-Step Deep Dive: Getting the Most Out of AI Music Generation](./music/324-ace-step-deep-dive/) — _2026-05-21 · research-complete · research-complete_
+- **326** [326 - AI Songwriting Collaborator Guide: Writing "The Summer of 26"](./music/326-ai-songwriting-collaborator-guide/) — _2026-05-21 · research-complete · guide_
+- **327** [Doc 327 - AI-Generated Music: Viral Hits & Commercial Success Case Studies](./music/327-ai-music-viral-commercial-success-case-studies/) — _2026-05-21 · research-complete · case-studies_
+- **327** [Doc 327 - Open Source Speech-to-Text: Whisper & Alternatives Deep Dive](./music/327-open-source-speech-to-text-whisper-alternatives/) — _2026-05-21 · research-complete · research-complete_
+- **328** [328 - Open Source Music Generation Landscape 2026: Complete Model Directory](./music/328-open-source-music-generation-landscape-2026/) — _2026-05-21 · research-complete · research-complete_
+- **328** [Doc 328 - Open Source Singing Voice Synthesis & Conversion Tools (April 2026)](./music/328-open-source-singing-voice-synthesis-tools/) — _2026-05-21 · research-complete · research-complete_
+- **329** [Doc 329 - Open Source Text-to-Speech: ElevenLabs Alternatives (April 2026)](./music/329-open-source-tts-elevenlabs-alternatives/) — _2026-05-21 · research-complete · research-complete_
+- **329** [329 - The $0 Music Production Stack: Idea to Distributed Song (April 2026)](./music/329-zero-dollar-music-production-stack/) — _2026-05-21 · research-complete · guide_
+- **330** [Doc 330 - Open Source Stem Separation Tools 2026: Deep Dive](./music/330-open-source-stem-separation-tools-2026/) — _2026-05-21 · research-complete · research-complete_
+- **331** [331 - AI Music Video Generation Tools Deep Dive (April 2026)](./music/331-ai-music-video-generation-deep-dive-2026/) — _2026-05-21 · research-complete · research-complete_
+- **332** [332 - Music Distribution Infrastructure on Farcaster & Web3 (April 2026)](./music/332-farcaster-music-distribution-infrastructure-2026/) — _2026-05-21 · research-complete · research-complete_
+- **333** [333 — AI Music Practitioners, Creators & Educators (2026)](./music/333-ai-music-practitioners-creators-educators-2026/) — _2026-05-21 · research-complete · research-complete_
+- **334** [334 — AI Music Prompt Engineering Masterclass (2026)](./music/334-ai-music-prompt-engineering-masterclass/) — _2026-05-21 · research-complete · guide_
+- **335** [Doc 335: Live AI Music Performance & Festival Guide (2026)](./music/335-live-ai-music-performance-festival-guide/) — _2026-05-21 · research-complete · guide_
+- **336** [Doc 336: AI Mastering & Mixing Tools Deep Dive (2026)](./music/336-ai-mastering-mixing-tools-deep-dive-2026/) — _2026-05-21 · research-complete · research-complete_
+- **336** [Doc 336: Sound Design & SFX for AI-Generated Music Production (2026)](./music/336-sound-design-sfx-ai-music-production/) — _2026-05-21 · research-complete · guide_
+- **336** [Doc 336: Spatial Audio & Dolby Atmos for AI-Generated Music](./music/336-spatial-audio-dolby-atmos-ai-music/) — _2026-05-21 · research-complete · guide_
+- **337** [Doc 337: Microphone & Recording Setup for AI Voice Cloning + Music Production](./music/337-microphone-recording-setup-voice-cloning/) — _2026-05-21 · research-complete · guide_
+- **337** [Doc 337: Spotify Playlist Placement & Streaming Optimization for AI-Generated Music (2026)](./music/337-spotify-playlist-placement-streaming-optimization-2026/) — _2026-05-21 · research-complete · guide_
+- **338** [Doc 338: Selling AI-Generated Beats & Sample Packs - Revenue Guide (2026)](./music/338-ai-beats-sample-packs-revenue-guide/) — _2026-05-21 · research-complete · guide_
+- **338** [338 - AI-Generated Music for Podcasts, Radio Shows & Audio Content (2026)](./music/338-ai-music-podcasts-radio-shows-2026/) — _2026-05-21 · research-complete · guide_
+- **340** [340 — Remote Collaboration Tools for AI Music (2026)](./music/340-remote-collaboration-tools-ai-music-2026/) — _2026-05-21 · research-complete · guide_
+- **341** [Doc 341: Music Theory for AI Music Generation Prompts](./music/341-music-theory-ai-prompting/) — _2026-05-21 · research-complete · guide_
+- **342** [Doc 342: AI Hip-Hop Production Deep Dive - Complete Guide for Rappers (2026)](./music/342-ai-hip-hop-production-deep-dive-2026/) — _2026-05-21 · research-complete · guide_
+- **407** [407 - Music NFT Sales via Coinflow: Fiat-to-Mint on Base](./music/407-music-nft-coinflow-fiat-mint/) — _2026-05-21 · research-complete · guide_
+- **446** [Doc 446: Crown Vics Artist Outreach - ZAO Stock Oct 3 Music Programming](./music/446-crown-vics-artist-outreach/) — _2026-05-21 · research-complete · guide_
+- **475** [475 — ZAO Music Entity: Web3 Artist Support Collective](./music/475-zao-music-entity/) — _2026-05-21 · research-complete · guide_
+- **535** [535 - AnyTwoCardzz: Web3 Music Producer + NFT Collector](./music/535-anytwocardzz-web3-music-producer-post/) — _2026-05-21 · research-complete · networking_
+- **561** [561 - djOS™ AI DJ Co-Pilot (Mainstream Entertainment Group, Apr 27 2026)](./music/561-djos-ai-dj-copilot-mainstream/) — _2026-05-21 · research-complete · market-research_
+- **599a** [599a - Believe + TuneCore Auto-Block Unlicensed AI Music (Suno)](./music/599a-believe-tunecore-block-ai-music-distribution/) — _2026-05-21 · research-complete · market-research_
+- **601** [601 — Suno v5.5: Pricing, Settings & Operational Guide (May 2026)](./music/601-suno-music-generation-deep-tooling-2026/) — _2026-05-21 · research-complete · guide_
+- **662** [662 — FISHBOWLZ Revival on Juke (Co-Host + Mute-Lockout Moderation Model)](./music/662-fishbowlz-revival-juke-mute-lockout/) — _2026-05-21 · research-complete · decision_
+- **695** [695 — Juke Integration For The ZAO (Ecosystem-Wide Map)](./music/695-juke-integration-zao/) — _2026-05-20 · research-complete · decision_
+- **710** [710 - Juke Path B: Bringing It Together (Architecture + Best Practices)](./music/710-juke-path-b-architecture/) — _2026-05-22 · research-complete · decision_
+- **712** [712 - Juke Integration: Remaining Gaps After Path B](./music/712-juke-integration-remaining-gaps/) — _2026-05-22 · research-complete · decision_
+
+## events (74)
+
+- **201** [201 — AI, Creator Economy & Web3 Landscape: March 2026](./events/201-ai-creator-economy-landscape-march-2026/)
+- **207** [207 — ZAO VPS Agent Stack: Full Session Log & Architecture](./events/207-zao-vps-agent-stack-session-log/)
+- **240** [240 — Farcaster Agentic Bootcamp (Builders Garden)](./events/240-farcaster-agentic-bootcamp-builders-garden/)
+- **241** [241 — Q1 2026 Big Wins: The ZAO](./events/241-q1-2026-big-wins/)
+- **254** [254 — ZOE Agent Ecosystem Status (Apr 3 2026)](./events/254-zoe-agent-ecosystem-status/)
+- **257** [257 — ZOE Ship Log: Apr 3 2026](./events/257-zoe-ship-log-apr-3-2026/)
+- **265** [265 — ClawDown Poker Agent (ZOE)](./events/265-clawdown-poker-agent/)
+- **270** [270 — ZAO Stock: Planning & Knowledge Base](./events/270-zao-stock-planning/)
+- **274** [274 — ZAO Stock Team: Deep Profiles](./events/274-zao-stock-team-deep-profiles/)
+- **294** [Research Doc 294 - Event Coordinator AI Agents](./events/294-event-coordinator-ai-agents/)
+- **316** [316 - Farcaster Agentic Bootcamp Week 2: Budget-Friendly Agent Dev Stack](./events/316-farcaster-agentic-bootcamp-week2-deep-dive/)
+- **317** [317 - Farcaster Agentic Bootcamp Week 1: Session Transcripts & Extracted Insights](./events/317-farcaster-agentic-bootcamp-week1-transcripts/)
+- **326** [326 -- Farcaster Agentic Bootcamp: Complete Session Guide & ZABAL Agent Swarm Extraction](./events/326-agentic-bootcamp-complete-session-guide/)
+- **364** [364 - ZAO Festivals Deep Research: Everything for the Pitch](./events/364-zao-festivals-deep-research/)
+- **369** [369 - DreamEvent.ai Framework: What ZAOstock Is Missing](./events/369-dreamevent-framework-gap-analysis/)
+- **418** [418 — Birding Man Festival (Ramble On Farm) — Lessons for ZAOstock](./events/418-birding-man-festival-analysis/)
+- **423** [423 — Music x Crypto Connect Sesh — Apr 17 2026 (WaveWarZ × BCZ Strategies)](./events/423-music-x-crypto-connect-sesh-apr17/)
+- **425** [425 — ZAOstock Dashboard UI: Six Sigma + Modern PM Tool Patterns](./events/425-zaostock-dashboard-ui-lean-kanban-patterns/)
+- **428** [428 — ZAOstock Run-of-Show Program (Oct 3, 2026)](./events/428-zaostock-run-of-show-program/)
+- **433** [433 - ZAO Media Capture Pipeline Spec](./events/433-zao-media-capture-pipeline-spec/)
+- **442** [442 — WaveWarZ Sunday Battle Recap Socials — Apr 20 2026](./events/442-wavewarz-sunday-battle-recap-socials/)
+- **443** [443 — ZAOstock Sponsor Pitch Drafts (Oct 3, 2026)](./events/443-zao-stock-sponsor-pitch-drafts/)
+- **445** [445 — ZAOstock Monday Progress Report (Apr 20, 2026)](./events/445-zao-stock-monday-apr20-report/) — _2026-05-21 · research-complete · standup-report_
+- **456** [456 — FarmDrop x SoulBenders May 24 Benefit + Hannah Semler BCZ Yapz Interview Prep](./events/456-farmdrop-soulbenders-may24-hannah-interview/) — _2026-05-21 · research-complete · interview-prep_
+- **457** [457 — FarmDrop: Hannah Voice Memo Deep Brief + May 24 Event Full Run-of-Show](./events/457-farmdrop-hannah-voice-memo-event-brief/) — _2026-05-21 · research-complete · event-deep-brief_
+- **458** [458 — FarmDrop Statewide Expansion + Sam Lardner & Barcelona Collab + Maine Follow-Up Todos](./events/458-farmdrop-statewide-expansion-sam-lardner-collab/) — _2026-05-21 · research-complete · expansion-strategy_
+- **472** [472 - ZAOstock Artist Lockin Timeline (Internal Proposal)](./events/472-zaostock-artist-lockin-timeline/) — _2026-05-21 · research-complete · policy-document_
+- **473** [473 - Road to ZAOstock: Magnetic Portal Spec](./events/473-road-to-zaostock-magnetic-portal/) — _2026-05-21 · research-complete · feature-spec_
+- **476** [476 - ZAOstock Apr 22 Team Recap (Internal)](./events/476-zaostock-apr22-team-recap/) — _2026-05-21 · research-complete · team-document_
+- **477** [477 — ZAOstock Dashboard: Replace Notion Completely (170-Day Build)](./events/477-zaostock-dashboard-notion-replacement/) — _2026-05-21 · research-complete · technical-spec_
+- **499** [Music Festival & Artist Collective Governance: Real-World Models for Flat Teams](./events/499-music-festival-collective-governance/) — _2026-05-21 · research-complete · guide_
+- **504** [504 - ZAOstock Aug 15 2026 Mini-Festival Dry Run [ARCHIVE]](./events/504-aug15-dryrun-planning/) — _2026-05-21 · research-complete · planning_
+- **599** [599 - Inbox Digest 2026-05-03](./events/599-inbox-digest-2026-05-03/) — _2026-05-21 · research-complete · inbox-digest_
+- **608** [608 — WaveWarZ Africa x Ram (Songchain) x COC Convo, May 4 2026](./events/608-wavewarz-africa-ram-songchain-may4/) — _2026-05-21 · research-complete · meeting-transcript_
+- **609** [609 — ZAOstock Co-Build May 4 2026 — Six-Circle Lock + Front-Page Push](./events/609-zaostock-cobuild-six-circles-may4/) — _2026-05-21 · research-complete · meeting-transcript_
+- **630** [630 - ZABAL Games Season 1: Farcaster Vibe-Coding Challenge](./events/630-zabal-games-claude-code-hackathon-v0/) — _2026-05-14 · draft · guide_
+- **654** [654 - ZABAL Games + Empire Builder V3: Meeting with yerbearzerker (Jordan)](./events/654-zabal-games-empire-v3-yerbearzerker-meeting/) — _2026-05-16 · research-complete · guide_
+- **670** [670 - Iman Call May 18 - ZAO Craig + PizzaDAO Zambia + ZABAL Games Drop](./events/670-iman-call-may18-craig-pizzadao/) — _2026-05-21 · research-complete · meeting-recap_
+- **674** [674 - Edge Esmeralda 2026 + ZAO Fund for Emerging Culture: Telamon Ardavanis Grantee Outreach](./events/674-edge-esmeralda-artizen-telamon-outreach/) — _2026-05-21 · research-complete · market-research_
+- **675** [675 - Tanja Fractal Book Call (May 18)](./events/675-tanja-fractal-book-call-may18/) — _2026-05-21 · research-complete · meeting-recap_
+- **678** [678 - ZAOstock Advisor Call (May 19)](./events/678-zaostock-advisor-call-may19/) — _2026-05-21 · research-complete · meeting-recap_
+- **681** [681 — ZAOstock 5/19 Standup: New Build Initiatives Research](./events/681-zaostock-may19-new-build-initiatives/) — _2026-05-21 · research-complete · decision_
+- **682** [682 - Ryan Kagy Limitless Call (May 12)](./events/682-ryan-kagy-limitless-call-may12/) — _2026-05-12 · research-complete · meeting-recap_
+- **684** [684 — ZAOstock Task Tracking: The Fragmentation + Connecting It to the Six Circles](./events/684-zaostock-task-tracking-circles-connection/) — _2026-05-20 · research-complete · decision_
+- **686** [686 - Kane Brown "Miles On It Tour": The Artist-Branded Passion Festival Model](./events/686-kane-brown-miles-on-it-automotive-festival/) — _2026-05-20 · research-complete · market-research_
+- **695** [695 - ZABAL Games: Ecosystem Context Prompt](./events/695-zabal-games-context-prompt/) — _2026-05-20 · research-complete · guide_
+- **700** [700 — Devcon 8 Mumbai Music Stage: co-programming brief + reply kit](./events/700-devcon-mumbai-music-stage-coprogramming/) — _2026-05-21 · research-complete · guide_
+- **701** [701 - ZABAL Games: Canonical State (post mentor-open pivot)](./events/701-zabal-games-canonical-state/) — _2026-05-22 · research-complete · guide_
+- **711** [711 - Arthur intro call: WaveWarZ Base agentic version](./events/711-arthur-wavewarz-base-call-may19/) — _2026-05-22 · research-complete · meeting-recap_
+- **714** [714 - Tyler x Zaal: ZABAL Games + Road to ZAOstock](./events/714-tyler-zabal-zaostock-may22/) — _2026-05-22 · research-complete · meeting-recap_
+- **715** [715 - Session recap: /meeting skill upgrade + diarization (2026-05-22)](./events/715-session-2026-05-22-meeting-skill-diarization/) — _2026-05-22 · research-complete · guide_
+- **718** [718 - kmac.eth x Zaal: Farcaster Snaps, ad networks, JFS strictness](./events/718-kmac-farcaster-snaps-ad-networks-may13/) — _2026-05-22 · research-complete · meeting-recap_
+- **719** [719 - Jordan Oram x Zaal: ZABAL Games + Empire Builder v3 integration](./events/719-jordan-empire-builder-zabal-games-may15/) — _2026-05-22 · research-complete · meeting-recap_
+- **720** [720 - ZAOstock Standup - 2026-05-19](./events/720-zaostock-standup-may19/) — _2026-05-22 · research-complete · meeting-recap_
+- **721** [721 - ZAOstock Standup - 2026-05-12](./events/721-zaostock-standup-may12/) — _2026-05-22 · research-complete · meeting-recap_
+- **725** [725 - ZAO Devz call: Zee3 onboard + ZABAL Games + Iman hackathon recap](./events/725-cannon-zabal-iman-hackathon-may23/) — _2026-05-23 · research-complete · meeting-recap_
+- **726** [726 - Session recap: cowork tracker operational pack (2026-05-23)](./events/726-session-2026-05-23-tracker-ops-pack/) — _2026-05-23 · research-complete · guide_
+- **735** [735 - leewardbound composite-streaming spec (WIP, for collab post-2026-06-02)](./events/735-leewardbound-composite-streaming/) — _2026-05-23 · draft · decision_
+- **736** [736 - Shriyash Soni x Zaal intro call](./events/736-shriyash-soni-intro-call-may23/) — _2026-05-23 · research-complete · meeting-recap_
+- **738** [738 - Vlad (singularity.diy) x Zaal - Fractal governance + Singularity funding launchpad](./events/738-vlad-singularity-fractal-call-may24/) — _2026-05-24 · research-complete · meeting-recap_
+- **752** [752 - Leeward (Lee Edward Bound) x Zaal: WebRTC + Pion + LiveKit handoff (May 25 2026)](./events/752-leeward-x-zaal-webrtc-pion-livekit-handoff-may25/) — _2026-05-25 · research-complete · decision_
+- **753** [ZAO coworking session - May 23 9:12 AM (4-user, mostly idle / background music)](./events/753-may23-zaal-iman-thyrev-z3rodol-coworking/)
+- **753** [753 - ADVANCED acronym - engineer personal time around a 9-5 (@pjdlifts Reel capture)](./events/753-pjdlifts-advanced-acronym-reel-capture/) — _2026-05-25 · research-complete · content-capture_
+- **776** [776 - Duo Do (Clementine + Santiago) x Zaal: ZABAL Games musician talk format](./events/776-duo-do-clementine-santiago-zabal-games-may23/) — _2026-05-23 · research-complete · meeting-recap_
+- **777** [777 - Telamon Ardavanis x Zaal: Edge Esmeralda invite + Goa](./events/777-telamon-edge-esmeralda-may25/) — _2026-05-25 · research-complete · meeting-recap_
+- **778** [778 - Tyler / Magnetic x Zaal + team: ZABAL Games build on Magnetic](./events/778-tyler-magnetic-zabal-games-build-may27/) — _2026-05-27 · research-complete · meeting-recap_
+- **779** [779 - Iman x Zaal: Request for Collaborators walkthrough](./events/779-iman-zaal-request-for-collaborators-may31/)
+- **780** [780 - Adrian (Empire Builder) x Zaal: Empire Builder workshop for ZABAL Games](./events/780-adrian-empire-builder-zabal-workshop-may26/) — _2026-05-26 · research-complete · meeting-recap_
+- **782** [782 - Ven (The Open Machine) x Zaal: catch-up + collaboration](./events/782-ven-open-machine-catchup-may27/) — _2026-05-27 · research-complete · meeting-recap_
+- **783** [783 - Tyler / Magnetic x Zaal: ZABAL Games magnet built live + Connector explainer recorded](./events/783-tyler-magnetic-zabal-magnet-build-may29/) — _2026-05-29 · research-complete · meeting-recap_
+- **784** [784 - Plat0x (Carlos, Bonfires) x Zaal: the GitHub-to-Bonfire architecture for ZABAL Games submissions](./events/784-plat0x-bonfire-zabal-architecture-may29/) — _2026-05-29 · research-complete · meeting-recap_
+- **785** [785 - Jonathan Colton (JC, FounderCheck) x Zaal: ZABAL Games talks + FounderCheck](./events/785-jonathan-colton-foundercheck-zabal-may29/) — _2026-05-29 · research-complete · meeting-recap_
+- **787** [787 - Iman x Zaal: Discord bot setup walkthrough](./events/787-iman-discord-bot-setup-may29/) — _2026-05-29 · research-complete · meeting-recap_
+- **788** [788 - kmac.eth x Zaal: ZABAL Games + Farcaster distribution + the JFS-signer ask](./events/788-kmac-zabal-farcaster-distribution-may30/) — _2026-05-30 · research-complete · meeting-recap_
+
+## business (73)
+
+- **029** [29 — Artist Revenue, IP Rights & the ZAO Revenue Model](./business/029-artist-revenue-ip-rights/) — _2026-05-21 · research-complete · guide_
+- **037** [37 — Platform Bridges, Competitor Deep Dives, Monetization & SEO](./business/037-bridges-competitors-monetization/) — _2026-05-21 · research-complete · guide_
+- **125** [125 — Coinflow Fiat Checkout for ZAO OS](./business/125-coinflow-fiat-checkout/) — _2026-05-21 · research-complete · guide_
+- **139** [139 — Trustware SDK: Secure Crypto Payments & Asset Infrastructure](./business/139-trustware-sdk-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **222** [222 — Payment Infrastructure: Stripe, Coinbase Commerce, Coinflow, 0xSplits](./business/222-payment-infrastructure-stripe-coinbase/) — _2026-05-21 · research-complete · guide_
+- **244** [244 — Polymarket Trading as ZOUNZ Treasury Revenue: Claude API + Open-Source Toolkit](./business/244-polymarket-claude-api-trading-analysis/) — _2026-05-21 · research-complete · guide_
+- **252** [252 — Publish.new: Paragraph's AI-Native Marketplace for Digital Goods](./business/252-publish-new-agent-marketplace/) — _2026-05-21 · research-complete · guide_
+- **258** [258 — ZABAL + SANG Token Economics & Buyback Strategy](./business/258-zabal-sang-buyback/) — _2026-05-21 · research-complete · guide_
+- **263** [263 — Obsidian's Lean Team Model: $350M Valuation, 9 Employees, 3 Engineers](./business/263-obsidian-lean-team-model/) — _2026-05-21 · research-complete · guide_
+- **264** [264 - LinkedIn Build-in-Public Content Playbook (2026)](./business/264-linkedin-build-in-public-playbook/) — _2026-05-21 · research-complete · guide_
+- **298** [298 - FISHBOWLZ Tokenization: Token Design, Fee Splits, and ZABAL Auto-Buyback](./business/298-fishbowlz-tokenization/) — _2026-05-21 · archive · guide_
+- **299** [299 - Audio Room Best Practices: UX, Retention, Moderation, and Accessibility for FISHBOWLZ](./business/299-audio-room-best-practices/) — _2026-05-21 · research-complete · guide_
+- **307** [307 - App Monetization: Ernesto Lopez Framework vs ZAO OS Reality](./business/307-app-monetization-ernesto-lopez-framework/) — _2026-05-21 · research-complete · guide_
+- **322** [322 — Paragraph + Publish.new: Newsletter Platform, Agent Commerce & COC Concertz Integration](./business/322-paragraph-publishnew-newsletter-agent-commerce/) — _2026-05-21 · research-complete · guide_
+- **324** [324 -- ZABAL/SANG Wallet Agent System: Tokenomics, Autonomous Swaps & Promoter Incentives](./business/324-zabal-sang-wallet-agent-tokenomics/) — _2026-05-21 · research-complete · guide_
+- **333** [333 - AI Music Licensing, Sync Placement & Web3 Label Framework (2026)](./business/333-ai-music-licensing-sync-label-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **350** [350 - Anatomy of Viral Engagement Bait: Claude Shortcuts + Quant Trading Posts](./business/350-viral-engagement-bait-anatomy/) — _2026-05-21 · research-complete · guide_
+- **352** [352 - Agent Content Commerce: Paragraph + x402 Paywall Framework](./business/352-paragraph-x402-agent-implementation/) — _2026-05-21 · research-complete · guide_
+- **361** [361 - Empire Builder Deep Dive: V3 Features, Distribution, and ZAO Integration Strategy](./business/361-empire-builder-deep-dive-v3-integration/) — _2026-05-21 · research-complete · deep-dive_
+- **362** [362 - Lean Six Sigma for ZAO Festival Operations](./business/362-lean-six-sigma-festival-operations/) — _2026-05-21 · research-complete · operations_
+- **406** [406 - Coinflow ISV Deep Dive: WaveWarZ + ZAO Integration](./business/406-coinflow-isv-deep-dive-wavewarz-zao/) — _2026-05-21 · research-complete · integration_
+- **410** [410 - Polymarket Trading Bot via Claude: $11,400 Profit in 19 Days](./business/410-polymarket-bot-claude-11k-profit-19-days/) — _2026-05-21 · research-complete · research-complete_
+- **429** [429 - Paragraph Agents Launch (Apr 17 2026): Skills, Micropaywalls, Archive Listing](./business/429-paragraph-agents-launch-apr2026/) — _2026-05-21 · research-complete · launch_
+- **455** [455 — BCZ Maine Clients: Stephen Coston (Stay Bar Harbor) + Cameron (Riverside Group)](./business/455-bcz-maine-clients-stephen-cameron/) — _2026-05-21 · research-complete · prospect-profile_
+- **470** [470 - Behavioral Intervention > Financial Literacy: ZAO Playbook](./business/470-behavioral-intervention-vs-financial-literacy-zao/) — _2026-05-21 · research-complete · playbook_
+- **474** [474 — Foundercheck BLOCK (3.95): ICP Resolution + Distribution Wedge](./business/474-foundercheck-block-icp-resolution/) — _2026-05-21 · research-complete · decision_
+- **481** [481 — kompreni / Quotient — Anti-"Cucktrading" AI Superforecaster](./business/481-kompreni-quotient-anti-cucktrading-superforecaster/) — _2026-05-21 · research-complete · research-complete_
+- **482** [482 — DigiHold's 7 Money Rules (Founder Finance After Losing $1.5M)](./business/482-digihold-seven-money-rules-founder-finance/) — _2026-05-21 · research-complete · operations_
+- **485** [485 — Distribution Is Hard V3 (jlcolton) — GTM Field Guide for Builders](./business/485-distribution-is-hard-v3-jlcolton/) — _2026-05-21 · research-complete · playbook_
+- **498** [498 - Zlank: Unified Agent-Native SDK (Clanker + Empire Builder + Farcaster Graph)](./business/498-zlank-unified-sdk-concept/) — _2026-05-21 · research-complete · decision_
+- **526** [526 - Distribution Is Hard V3, Applied: Per-Entity Playbooks for the ZAO Stack](./business/526-distribution-v3-zao-entity-playbooks/) — _2026-05-21 · research-complete · guide_
+- **547** [547 — BCard / B Foundation / Black Flag Collective: ZAO Partnership Opportunity](./business/547-bcard-bfoundation-black-flag-collective/) — _2026-05-21 · research-complete · decision_
+- **572** [572 — $ZABAL Chain: Avalanche L1, L2, or Stay on Base?](./business/572-zabal-avalanche-l1-l2-gas-token/) — _2026-05-21 · research-complete · decision_
+- **573** [573 — Where AVAX Ecosystem Helps $ZABAL: The Arena, Music Royalties, Retro9000](./business/573-zabal-avax-surfaces-arena-music/) — _2026-05-21 · research-complete · market-research_
+- **581** [581 - Whop Platform + Top Whop Creators Deep Dive (DISPATCH)](./business/581-whop-creator-deep-dive/) — _2026-05-21 · research-complete · market-research_
+- **582** [582 - Empire Builder V3 Live (Soft Launch) + New Public API](./business/582-empire-builder-v3-live-launch/) — _2026-05-21 · research-complete · guide_
+- **583** [583 - Empire Builder x ZAO OS: Integration Idea Surface](./business/583-empire-builder-zao-os-integration-ideas/) — _2026-05-21 · research-complete · guide_
+- **584** [584 - Empire Builder x Farcaster: Top-Creator Playbooks + Live ZABAL Data](./business/584-empire-builder-farcaster-creator-playbooks/) — _2026-05-21 · research-complete · market-research_
+- **585** [585 - Empire Builder x ZAO OS: Test-Loop Findings + Iteration-2 Idea Surface](./business/585-empire-builder-test-loop-ideas-iteration-2/) — _2026-05-21 · research-complete · guide_
+- **592** [592 — "Boring Beats AI SaaS" + Free-Preview Risk Reversal (BCZ Strategies Application)](./business/592-boring-saas-free-preview-risk-reversal/) — _2026-05-21 · research-complete · decision_
+- **599** [599 - Adam Sync (May 2026): Leaderboard Reset, ZAOstock Commercial Model, Adam's Bandwidth](./business/599-adam-meeting-may2026-commercial-leaderboard/) — _2026-05-21 · research-complete · decision_
+- **602** [602 - Empire Builder SKILL.md Spec: Phase 3 Unblock + 6 New Build Targets](./business/602-empire-builder-skill-spec-phase3-unblock/) — _2026-05-21 · research-complete · guide_
+- **611** [611 - ZAOstock brand-pattern audit: RSV.Pizza + IYKYK / blank.space + contributor entry-page design](./business/611-zaostock-brand-patterns-rsvpizza-iykyk/) — _2026-05-21 · research-complete · comparison_
+- **612** [612 - AutoCo + LLC formation options for ZAO Festivals](./business/612-autoco-llc-formation/) — _2026-05-21 · research-complete · decision_
+- **626** [626 - Empire Builder + ZABAL Empire: POIDH submitter airdrop architecture](./business/626-empire-builder-zabal-poidh-airdrop/) — _2026-05-21 · research-complete · guide_
+- **628** [628 - Web3 Streaming + ZABAL Empire Bridge: From Stream Events to On-Chain Rewards](./business/628-web3-streaming-zabal-empire-bridge/) — _2026-05-21 · research-complete · guide_
+- **631** [631 - POIDH x $ZABAL x Sentinel: convergence map + best ideas for ZABAL's next move](./business/631-poidh-zabal-sentinel-convergence/) — _2026-05-21 · research-complete · guide_
+- **637** [637 - Emily Sundberg "Open Tab" - Feed Me as solo media business](./business/637-emily-sundberg-feed-me-open-tab/) — _2026-05-21 · research-complete · guide_
+- **641** [641 - Whop for ZAO: Paid Claude Code Creator Community](./business/641-whop-claude-code-community-distribution-play/) — _2026-05-21 · research-complete · decision_
+- **646** [646 - Clanker + Empire Builder for ZABAL Games Promote Window](./business/646-clanker-empire-builder-zabal-games-promote/) — _2026-05-21 · research-complete · guide_
+- **656** [656 — Aroussi: Law Firm Model for Software Developers and Agencies](./business/656-aroussi-law-firm-agency-model/) — _2026-05-21 · research-complete · comparison_
+- **658** [658 — Takemiya: Blockchain as the Geopolitical Monetary Substrate](./business/658-takemiya-blockchain-geopolitical-monetary-substrate/) — _2026-05-21 · research-complete · market-research_
+- **666** [666 — ZABAL Brand Kit Page (bettercallzaal.com/kit.html)](./business/666-zabal-brand-kit-page/) — _2026-05-21 · research-complete · decision_
+- **667** [667 — Brand Kit Completeness Audit (/zao-research after Doc 666)](./business/667-brand-kit-completeness-audit/) — _2026-05-21 · research-complete · audit_
+- **683** [683 - Artizen Fund: Platform Mechanics + Fund Director Guide](./business/683-artizen-platform-fund-director-guide/) — _2026-05-20 · research-complete · guide_
+- **706** [706 - Avalanche Ecosystem Deep Dive (Hub)](./business/706-avalanche-ecosystem-deep-dive/) — _2026-05-21 · research-complete · market-research_
+- **707** [707 - Avalanche: The Master Brief (All ZAO Avalanche Research In One Place)](./business/707-avalanche-master-brief/) — _2026-05-22 · research-complete · guide_
+- **708** [708 - The Arena (arena.social): Complete Deep Dive (Hub)](./business/708-the-arena-deep-dive/) — _2026-05-22 · research-complete · market-research_
+- **708** [708 — ZABAL Hub: zaoos.com/zabal as the canonical ZABAL landing page](./business/708-zabal-hub-landing-page/) — _2026-05-22 · research-complete · decision_
+- **712** [712 — ZAO CRM: a relationship layer for the cowork tracker](./business/712-zao-crm-coworking-app/) — _2026-05-22 · research-complete · decision_
+- **723** [723 - $ZABAL on Avalanche through x402 + Agentic WaveWarZ (Hub)](./business/723-zabal-avax-x402-wavewarz-agentic/) — _2026-05-23 · research-complete · decision_
+- **724** [724 - ZAO Artist Tokenization on Avalanche: Master Plan](./business/724-zao-artist-tokenization-on-avalanche-plan/) — _2026-05-23 · research-complete · decision_
+- **737** [737 - Airtable agentic CRM v3 (People + Activity + Opportunities)](./business/737-airtable-agentic-crm-v3/) — _2026-05-23 · superseded · decision_
+- **743** [743 - Agentic cold outreach: workflow for The ZAO](./business/743-agentic-cold-outreach-workflow/) — _2026-05-25 · research-complete · decision_
+- **759** [759 - POIDH history: origin (2023) to v3 rebuild (2026)](./business/759-poidh-history-origin-to-2026/) — _2026-05-26 · research-complete · guide_
+- **768** [768 - POIDH bounty best practices + ZABAL Games Round 3 bounty draft](./business/768-poidh-bounty-best-practices-zabalgames-r3/) — _2026-05-28 · research-complete · guide_
+- **769** [769 - ZAODEVZ/zabalgames repo state (the production codebase)](./business/769-zaodevz-zabalgames-repo-state/) — _2026-05-28 · research-complete · audit_
+- **769** [769 - Zuke Admin Auth UX (kill the DevTools cookie hack)](./business/769-zuke-admin-auth-ux/) — _2026-05-28 · research-complete · decision_
+- **772** [772 - ZAO CRM: Supabase-Native Public/Private Relationship CRM](./business/772-crm-supabase-native/) — _2026-05-29 · research-complete · decision_
+- **786** [786 - ZABAL Gamez brand kit rebuild](./business/786-zabal-gamez-brand-kit-rebuild/) — _2026-05-31 · research-complete · audit_
+- **791** [791 — Charity-Fund Token Mechanism: Mint/Redeem-at-1-USDC + Hold-to-Earn + Funding Stream (MemeForTrees / regen funding lens for ZAO)](./business/791-charity-fund-token-mechanism-regen/) — _2026-05-31 · research-complete · market-research_
+- **792** [792 — Nicky Sap (Juke founder) Worldview + His Farcaster / Base / Creator-Coin Strategy Writing](./business/792-nicky-sap-juke-founder-worldview-farcaster-strategy/) — _2026-05-31 · research-complete · market-research_
+- **797** [797 — Graduation candidates: what can split off into its own repo](./business/797-graduation-candidates-monorepo-split/) — _2026-06-02 · research-complete · strategy_
+
+## infrastructure (57)
+
+- **012** [Gating Access to ZAO OS](./infrastructure/012-gating/) — _2026-05-21 · research-complete · technical-guide_
+- **016** [UI Reference — CG / Commonwealth](./infrastructure/016-ui-reference/) — _2026-05-21 · research-complete · ui-patterns_
+- **035** [35 — Notifications: Complete Implementation Guide](./infrastructure/035-notifications-complete-guide/) — _2026-05-21 · research-complete · technical-guide_
+- **041** [41 — Next.js 16 + React 19 Deep Dive](./infrastructure/041-nextjs16-react19-deep-dive/) — _2026-05-21 · research-complete · technical-guide_
+- **092** [92 — Public APIs 2026 Update: Best Free APIs for ZAO OS](./infrastructure/092-public-apis-2026-update/) — _2026-05-21 · research-complete · api-integration-guide_
+- **093** [93 — Missing Infrastructure: Testing, CI/CD, Monitoring, Design System, PWA](./infrastructure/093-missing-infrastructure-gaps/) — _2026-05-21 · research-complete · strategic-assessment_
+- **098** [98 — Supabase Database Optimizations for ZAO OS](./infrastructure/098-supabase-database-optimizations/) — _2026-05-21 · research-complete · technical-guide_
+- **116** [Doc 116 — Discord Integration Research for ZAO OS](./infrastructure/116-discord-integration-research/) — _2026-05-21 · research-complete · integration-guide_
+- **118** [118 — Settings Page Redesign](./infrastructure/118-settings-page-redesign/) — _2026-05-21 · research-complete · ui-design_
+- **122** [122 — SongJam Screen Share PR: Stream Video SDK Integration](./infrastructure/122-songjam-screen-share-pr/) — _2026-05-21 · research-complete · feature-specification_
+- **129** [129 — Alchemy APIs Deep Integration for ZAO OS](./infrastructure/129-alchemy-apis-deep-integration/) — _2026-05-21 · research-complete · integration-guide_
+- **176** [176 — Supabase Scaling & Optimization for ZAO OS](./infrastructure/176-supabase-scaling-optimization/) — _2026-05-21 · research-complete · technical-guide_
+- **182** [182 — Home Screen / Dashboard Design for Music Community Platforms](./infrastructure/182-home-screen-dashboard-design/) — _2026-05-21 · research-complete · ui-design_
+- **192** [192 — Multi-Platform Streaming from ZAO OS Audio Rooms (RTMP Out)](./infrastructure/192-multiplatform-streaming-rtmp/) — _2026-05-21 · research-complete · technical-guide_
+- **215** [215 — OBS + Restream + StreamYard Feature Analysis: What ZAO OS Spaces Should Have](./infrastructure/215-obs-restream-streamyard-feature-analysis/) — _2026-05-21 · research-complete · strategic-assessment_
+- **217** [217 -- Audio/Video Quality Optimization for Live Streaming](./infrastructure/217-av-quality-optimization-live-streaming/) — _2026-05-21 · research-complete · technical-guide_
+- **218** [218 — Mobile App Strategy: PWA, Capacitor, React Native, Expo, Tauri, TWA](./infrastructure/218-mobile-app-strategy-pwa-native/) — _2026-05-21 · research-complete · strategic-assessment_
+- **221** [221 — Admin Dashboard Best Practices for Web3 Community Apps](./infrastructure/221-admin-dashboard-best-practices/) — _2026-05-21 · research-complete · research_
+- **223** [223 -- Smart Contract Development Guide for ZAO OS](./infrastructure/223-smart-contract-development-guide/) — _2026-05-21 · research-complete · research_
+- **233** [233 — Spaces & Streaming Full Codebase Audit](./infrastructure/233-spaces-streaming-full-audit/) — _2026-05-21 · research-complete · research_
+- **275** [275 -- Stream.io Video SDK Dashboard Configuration](./infrastructure/275-stream-video-sdk-dashboard-configuration/) — _2026-05-21 · research-complete · research_
+- **283** [283 — Vercel + Next.js 16 Performance Optimization Guide](./infrastructure/283-vercel-nextjs16-performance-optimization/) — _2026-05-21 · research-complete · research_
+- **286** [286 — Claude Cowork SEO Workflow & ZAO OS SEO Audit](./infrastructure/286-claude-cowork-seo-workflow/) — _2026-05-21 · research-complete · research_
+- **313** [313 - Metaverse & 3D Virtual World for ZAO OS](./infrastructure/313-metaverse-3d-virtual-world-zao/) — _2026-05-21 · research-complete · research_
+- **314** [314 - Quilibrium Network: Comprehensive Deep Dive](./infrastructure/314-quilibrium-network-comprehensive-deep-dive/) — _2026-05-21 · research-complete · research_
+- **315** [315 - 3D Metaverse Codebase Integration & Onboarding Map](./infrastructure/315-metaverse-codebase-integration-onboarding/) — _2026-05-21 · research-complete · research_
+- **319** [319 - Lightweight 3D Portal Hub for ZAO OS](./infrastructure/319-lightweight-3d-portal-hub/) — _2026-05-21 · research-complete · research_
+- **368** [368 - Notion vs. Custom Dashboard for ZAOstock Festival Planning](./infrastructure/368-notion-vs-custom-festival-planning/) — _2026-05-21 · superseded · research_
+- **413** [413 - ZAOstock Dashboard as Notion Replacement](./infrastructure/413-zaostock-dashboard-notion-replacement/) — _2026-05-21 · research-complete · research_
+- **415** [415 - Composable OS-Style Architecture for ZAO OS](./infrastructure/415-composable-os-architecture/) — _2026-05-21 · research-complete · research_
+- **416** [416 - Native App Distribution: TestFlight + Play Store for ZAO OS](./infrastructure/416-native-app-testflight-playstore/) — _2026-05-21 · research-complete · research_
+- **417** [417 - Agent Tools Remote Access: Making Everything Reachable from zaoos.com](./infrastructure/417-agent-tools-remote-access/) — _2026-05-21 · research-complete · research_
+- **428** [428 — Unified Agent Portal + ao.zaoos.com + Phone Claude Code](./infrastructure/428-unified-agent-portal-ao-phone-access/) — _2026-05-21 · research-complete · research_
+- **430** [430 - Portal Stack Improvements + Prioritized Build Order](./infrastructure/430-portal-stack-improvements-plan/) — _2026-05-21 · research-complete · research_
+- **431** [431 - Portal v2: Universal Nav + Version-Control + Backlog](./infrastructure/431-portal-universal-nav-v2-improvements/) — _2026-05-21 · research-complete · guide_
+- **433** [433 - Portal v3: Todos Brain Dump + Universal Nav + infra/portal Versioned](./infrastructure/433-portal-todos-brain-dump-universal-nav/) — _2026-05-21 · research-complete · guide_
+- **436** [436 - Phone Agentic Stack Playbook + Health Check](./infrastructure/436-phone-agentic-stack-playbook-health/) — _2026-05-21 · research-complete · guide_
+- **478** [478 — ICP + Caffeine: Simple NFT Purchase App](./infrastructure/478-icp-caffeine-nft-purchase/) — _2026-05-21 · research-complete · decision_
+- **503** [503 - Loomio vs Native: Consensus Voting for ZAOstock Circles v1](./infrastructure/503-loomio-integration-feasibility/) — _2026-05-21 · research-complete · decision_
+- **532** [532 — Restream Developer API Deep Dive](./infrastructure/532-restream-developer-api-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **543** [543 — Vercel Fluid Active CPU Cap on bettercallzaals-projects (40+ Projects, 1 Free Team)](./infrastructure/543-vercel-fluid-active-cpu-cap-bcz-team/) — _2026-05-21 · research-complete · decision_
+- **544** [544 — Livepeer Streaming for ZAO OS Spaces + Broadcast](./infrastructure/544-livepeer-streaming-zao-os/) — _2026-05-21 · research-complete · guide_
+- **570** [570 — ZAOstock Landing Redesign: Godly + Festival Patterns](./infrastructure/570-zaostock-landing-redesign-godly-festival-patterns/) — _2026-05-21 · research-complete · design_
+- **572** [572 — Godly Third Pass + Festival Microsites Overnight Iteration](./infrastructure/572-godly-third-pass-zaostock-overnight-iteration/) — _2026-05-21 · research-complete · design_
+- **576** [576 — Godly Fourth Pass: Content Richness + 2-Path Donate + Birthday R3F Patterns](./infrastructure/576-godly-fourth-pass-zaostock-richness-donate-birthday/) — _2026-05-21 · research-complete · design_
+- **599** [599 - Podcast MP3 Hosting for BCZ YapZ](./infrastructure/599-podcast-mp3-hosting-bcz-yapz/) — _2026-05-21 · research-complete · decision_
+- **610** [610 - ZAOstock Database Consolidation: Two Supabase Projects to One (May 4-5 2026)](./infrastructure/610-zaostock-database-consolidation-may4-5/) — _2026-05-21 · research-complete · incident-postmortem_
+- **629** [629 - Streaming as Main Media Source: Live -> YouTube -> Short-Form Flywheel for ZAO](./infrastructure/629-streaming-as-main-media-source-flywheel/) — _2026-05-21 · research-complete · guide_
+- **643** [643 - Hypersnap: Should ZAO Run a Node?](./infrastructure/643-hypersnap-run-a-node/) — _2026-05-21 · research-complete · decision_
+- **665** [665 — ZABAL Live Hub: haatz swap + standalone Supabase vs ZAO OS rollup](./infrastructure/665-zabal-haatz-voting-rollup-decision/) — _2026-05-21 · research-complete · decision_
+- **692** [692 — Unifying ZAOstock + ZAOcoworking onto One Operational Database](./infrastructure/692-cowork-zaostock-unified-db/) — _2026-05-20 · research-complete · decision_
+- **741** [741 - 21st.dev + Docs-Site UI/UX Improvements for ZAOfractal](./infrastructure/741-21st-dev-ui-ux-zaofractal-improvements/) — _2026-05-25 · research-complete · decision_
+- **741** [741 - Pion + LiveKit: open-source WebRTC stack for ZAO voice/video + AI agents](./infrastructure/741-pion-livekit-webrtc-stack/) — _2026-05-25 · research-complete · comparison_
+- **741a** [Pion Ecosystem + Internals (Doc 741a)](./infrastructure/741a-pion-ecosystem-internals/) — _2026-05-25 · research-complete · guide_
+- **741b** [741b - LiveKit Agents Production Playbook](./infrastructure/741b-livekit-agents-production/) — _2026-05-25 · research-complete · guide_
+- **741c** [741c - Voice-agent stack comparison: 2026 landscape stress-test](./infrastructure/741c-voice-agent-stack-comparison/) — _2026-05-25 · research-complete · comparison_
+- **741d** [741d - ZOE voice-agent integration blueprint](./infrastructure/741d-zoe-voice-agent-blueprint/) — _2026-05-25 · research-complete · guide_
+
+## farcaster (50)
+
+- **002** [002 - Farcaster Hub API](./farcaster/002-farcaster-hub-api/) — _2026-05-21 · research-complete · guide_
+- **017** [017 - Neynar Onboarding & Managed Signers](./farcaster/017-neynar-onboarding/) — _2026-05-21 · research-complete · guide_
+- **020** [020 - Followers/Following Feed (Sortable, Filterable)](./farcaster/020-followers-following-feed/) — _2026-05-21 · research-complete · guide_
+- **073** [073 - Farcaster Ecosystem Update (March 2026)](./farcaster/073-farcaster-ecosystem-2026-update/) — _2026-05-21 · research-complete · update_
+- **074** [074 — XMTP V3 Browser SDK & MLS Encryption](./farcaster/074-xmtp-v4-mls-encryption/) — _2026-05-21 · research-complete · guide_
+- **081** [081 - Farcaster Social Graph APIs & Social Sharing Features](./farcaster/081-farcaster-social-graph-sharing/) — _2026-05-21 · research-complete · guide_
+- **123** [123 - DFOS (Dark Forest Operating System)](./farcaster/123-dfos-dark-forest-protocol/) — _2026-05-21 · research-complete · research_
+- **124** [124 - Sopha: Deep Social on Farcaster (Curation Client)](./farcaster/124-sopha-deep-social-farcaster/) — _2026-05-21 · research-complete · research_
+- **173** [173 - Farcaster Mini Apps Integration](./farcaster/173-farcaster-miniapps-integration/) — _2026-05-21 · research-complete · guide_
+- **199** [199 - Advanced Social Graph Features: Visualization, Growth Tracking, Influence Mapping](./farcaster/199-advanced-social-graph-features/) — _2026-05-21 · research-complete · guide_
+- **250** [250 - Farcaster Mini Apps llms.txt Deep Dive (April 2026)](./farcaster/250-farcaster-miniapps-llms-txt-2026/) — _2026-05-21 · research-complete · guide_
+- **260** [260 - Neynar Acquires Farcaster (January 21, 2026)](./farcaster/260-neynar-acquires-farcaster/) — _2026-05-21 · research-complete · guide_
+- **293** [293 - Sopha External Feed API Integration](./farcaster/293-sopha-api-integration/) — _2026-05-21 · research-complete · guide_
+- **295** [295 - Farcaster Snaps (v2.0, April 2026)](./farcaster/295-farcaster-snaps/) — _2026-05-21 · research-complete · guide_
+- **304** [304 - Quilibrium, Hypersnap, and Free Neynar API via haatz.quilibrium.com](./farcaster/304-quilibrium-hypersnap-free-neynar-api/) — _2026-05-21 · research-complete · guide_
+- **305** [305 - Farcaster Channel Moderation & Community Management](./farcaster/305-channel-moderation-community-management/) — _2026-05-21 · research-complete · guide_
+- **306** [306 - Farcaster Protocol Features Gap Analysis for ZAO OS](./farcaster/306-farcaster-protocol-features-gap-analysis/) — _2026-05-21 · research-complete · guide_
+- **308** [308 - Farcaster Ecosystem Spring 2026: Snaps, Neynar Stewardship, FarCon Rome](./farcaster/308-farcaster-ecosystem-spring-2026/) — _2026-05-21 · research-complete · update_
+- **309** [309 - Snapchain vs Hypersnap: Protocol Architecture Deep Dive](./farcaster/309-snapchain-hypersnap-protocol-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **489** [489 - Hypersnap + Cass on Mars: Run a Farcaster Snapchain Node](./farcaster/489-hypersnap-farcaster-node-cassonmars/) — _2026-05-21 · research-complete · guide_
+- **505** [505 - Zlank.online Builder Spec (Snap No-Code Platform)](./farcaster/505-zlank-online-builder-spec/) — _2026-05-21 · research-complete · decision_
+- **527** [527 — Zlank Next: Top 3 Builds Post-FarHack](./farcaster/527-zlank-next-3-builds/) — _2026-05-21 · research-complete · decision_
+- **534** [534 — Snap Best Practices From The Wild](./farcaster/534-snap-best-practices-from-the-wild/) — _2026-05-21 · research-complete · guide_
+- **548** [548 - Lazer Mini Apps CLI Evaluation (miniapps.lazer.tools)](./farcaster/548-lazer-miniapps-cli-evaluation/) — _2026-05-21 · research-complete · decision_
+- **571** [571 - Intori SCIS + Tuum Tech: Donald Bullers Meeting + ZAO Integration Path](./farcaster/571-intori-scis-tuum-tech-db-meeting/) — _2026-05-21 · research-complete · decision_
+- **575** [575 — Mini App Splash Stuck: Postmortem + Best Practices](./farcaster/575-miniapp-splash-best-practices/) — _2026-05-21 · research-complete · incident-postmortem_
+- **586** [586 - Hypersnap Node Install Playbook (VPS Purchase + Bootstrap)](./farcaster/586-hypersnap-node-vps-install-playbook/) — _2026-05-21 · research-complete · guide_
+- **587** [587 - Hypersnap + Quilibrium + farcasterorg Ecosystem (May 2026)](./farcaster/587-hypersnap-quilibrium-farcasterorg-ecosystem-may2026/) — _2026-05-21 · research-complete · ecosystem-analysis_
+- **588** [588 - Cassie Heart (CassOnMars) - Technical Profile + Engagement Strategy](./farcaster/588-cassie-heart-github-deep-profile/) — _2026-05-21 · research-complete · research-profile_
+- **589** [589 - haatz.quilibrium.com Endpoint Audit + Cassie Heart Cast Analysis (May 2026)](./farcaster/589-haatz-coverage-cassie-casts-may2026/) — _2026-05-21 · research-complete · research-audit_
+- **591** [591 - Farcaster Mini App Production Audit (Hub)](./farcaster/591-miniapp-production-audit/) — _2026-05-21 · research-complete · audit_
+- **591a** [591a - Farcaster Mini App SDK Auth + Lifecycle Flows](./farcaster/591a-sdk-auth-flows/) — _2026-05-21 · research-complete · guide_
+- **591b** [591b - Farcaster Miniapp Security Headers + Cookie Attributes](./farcaster/591b-iframe-security/) — _2026-05-21 · research-complete · guide_
+- **591c** [591c - Farcaster Miniapp Manifest + Domain Binding](./farcaster/591c-manifest-cross-client/) — _2026-05-21 · research-complete · guide_
+- **591d** [591d - Farcaster Mini App Production Pitfalls](./farcaster/591d-production-pitfalls/) — _2026-05-21 · research-complete · guide_
+- **591e** [591e - ZAO OS Farcaster Miniapp Code Audit](./farcaster/591e-zaoos-code-audit/) — _2026-05-21 · research-complete · audit_
+- **593** [593 — FIP: Live Activity (Audio Spaces) — ZAO Spaces Cross-Client Integration](./farcaster/593-fip-live-activity-zao-spaces/) — _2026-05-21 · research-complete · decision_
+- **594** [594 — FIP Live Activity Deep Dive: Threat Model, Precedents, Network Load](./farcaster/594-fip-live-activity-deep/) — _2026-05-21 · research-complete · guide_
+- **595** [595 — FIP Live Activity: Adjacent FIPs, Coalition Map, JFS Reference Code](./farcaster/595-fip-live-activity-deeper/) — _2026-05-21 · research-complete · guide_
+- **596** [596 — FIP Live Activity: Quilibrium Privacy Bridge + Implementation Blockers](./farcaster/596-fip-live-activity-quilibrium-privacy/) — _2026-05-21 · research-complete · guide_
+- **597** [597 — Hypersnap Install Reality Check (Pre-Purchase Decision)](./farcaster/597-hypersnap-install-prep/) — _2026-05-21 · research-complete · decision_
+- **598** [598 — FIP Live Activity: Visual Explorable Explainer](./farcaster/598-fip-explained-visual/) — _2026-05-21 · research-complete · guide_
+- **599b** [599b - Adrienne's Stack: GMFC101 (Eliza-free Farcaster Agent) + Word-A-Day (Mini App w/ Token + AI Eval)](./farcaster/599b-gmfc101-wordaday-mini-app-patterns/) — _2026-05-21 · research-complete · guide_
+- **599d** [599d - DFOS State Update May 2026 - Custom-Internet-Per-Community Pitch](./farcaster/599d-dfos-spaces-update-may-2026/) — _2026-05-21 · research-complete · market-research_
+- **707** [707 — ZABAL Mini App Conformance: applying the Doc 591 standard to /zabal](./farcaster/707-zabal-miniapp-conformance/) — _2026-05-22 · research-complete · audit_
+- **710** [710 — Mini App registration, deep-linking, and running many surfaces on zaoos.com](./farcaster/710-miniapp-registration-deeplinking/) — _2026-05-22 · research-complete · guide_
+- **733** [733 - ZABAL Virality + Ecosystem Incorporation](./farcaster/733-zabal-virality-and-ecosystem-incorporation/) — _2026-05-23 · research-complete · market-research_
+- **762** [762 - Quilibrium Stack Verification (companion to doc 761)](./farcaster/762-quilibrium-stack-verification/) — _2026-05-29 · research-complete · audit_
+- **774** [774 — farscout: A Free Autonomous Farcaster Research Scout](./farcaster/774-farscout-autonomous-research-scout/) — _2026-05-30 · research-complete · guide_
+- **796** [796 — ZAOOS Farcaster client architecture](./farcaster/796-zaoos-farcaster-client-architecture/) — _2026-06-02 · research-complete · architecture_
+
+## community (46)
+
+- **023** [23 — Austin Griffith, Scaffold-ETH & the ETH Skills Ecosystem](./community/023-austin-griffith-eth-skills/)
+- **050** [The ZAO: Complete Guide](./community/050-the-zao-complete-guide/)
+- **051** [The ZAO — 2026 Whitepaper](./community/051-zao-whitepaper-2026/)
+- **060** [60 — Vitalik's Ethereum Philosophy & EF Mandate: ZAO Alignment Analysis](./community/060-vitalik-ethereum-philosophy/)
+- **061** [61 — Ethereum Alignment Opportunities: ZK Credentials, Curation Markets, Community Notes, Cross-Community Fractals & Grants](./community/061-ethereum-alignment-opportunities/)
+- **065** [65 — ZABAL Partner Ecosystem: MAGNETIQ, SongJam, Empire Builder, Clanker](./community/065-zabal-partner-ecosystem/)
+- **094** [94 — Content Moderation, Onboarding UX & Community Analytics](./community/094-moderation-onboarding-analytics/)
+- **105** [105 - Fractal Governance: Key People & Collaborators](./community/105-fractal-key-people/) — _2026-05-21 · research-complete · guide_
+- **106** [106 - Dan SingJoy & Eden Fractal Deep Dive](./community/106-dan-singjoy-eden-fractal-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **110** [110 — Community Directory & CRM for ZAO OS](./community/110-community-directory-crm/)
+- **169** [169 — AI Education for Music Creators: Landscape Gap & ZAO Opportunity](./community/169-ai-education-music-creators-landscape/)
+- **200** [200 — The Definitive Community OS: AI Agents, Platform Architecture & Vision](./community/200-community-os-ai-agents-platform-vision/)
+- **229** [229 — ZAO Member Profiles](./community/229-zao-member-profiles/)
+- **249** [249 — Incented Deep Dive, New Campaign Ideas & ClawDown Challenge for ZOE](./community/249-incented-deep-dive-new-campaigns-clawdown/)
+- **272** [272 — ZAO Task Forces & Team Structure: 6-Month Roadmap](./community/272-zao-task-forces-2026/)
+- **287** [287 — ZAO FAQ + Word Wall: Community-Driven Web3 Glossary](./community/287-zao-faq-word-wall-glossary/)
+- **289** [289 — ZAO Tool Box](./community/289-zao-tool-box/)
+- **348** [348 - SongJam Points System Deep Dive: Scoring, Multipliers & ZABAL Oracle Integration](./community/348-songjam-points-system-deep-dive/)
+- **352** [352 — COC Concertz Full Context: Show History, Artist Profiles, and Content Automation](./community/352-coc-concertz-full-context-artist-profiles/)
+- **358** [358 - BetterCallZaal Brand Voice Analysis](./community/358-bettercallzaal-brand-voice-analysis/)
+- **363** [363 - ZAOstock People + Brands: Comprehensive Profile Index](./community/363-zao-stock-people-brands-2026/)
+- **415** [415 — POIDH Bounties: Deep Dive for The ZAO + WaveWarZ](./community/415-poidh-bounties-zao-wavewarz/) — _2026-05-21 · research-complete · guide_
+- **419** [419 — Maceo Call: Matteo Tambussi + Italy Web3 Music Ecosystem](./community/419-maceo-call-matteo-tambussi-italy-web3-music/) — _2026-05-21 · research-complete · guide_
+- **427** [427 — UVR (Underground Violet Rave) & Jadyn Violet — Brand Brief for Discord Intro Bot](./community/427-uvr-jadyn-violet-brand-intro-bot/) — _2026-05-21 · research-complete · guide_
+- **432** [432 - ZAO Master Context: Tricky Buddha Space Recap](./community/432-zao-master-context-tricky-buddha/) — _2026-05-21 · research-complete · synthesis_
+- **449** [449 - Matteo Tambussi Italy-Bridge Follow-Up](./community/449-matteo-tambussi-followup/) — _2026-05-21 · research-complete · decision_
+- **458** [458 - ZAO Contribution Circles](./community/458-zao-contribution-circles/) — _2026-05-21 · research-complete · decision_
+- **530** [530 - ZOUNZ Artist Trait + Wordmark Brief](./community/530-zounz-artist-trait-brief/) — _2026-05-21 · research-complete · guide_
+- **533** [533 — POIDH Clip-Up Bounty: BCZ YapZ Ep 17 (Hannah / Farm Drop)](./community/533-poidh-clipup-bounty-bcz-yapz-hannah/) — _2026-05-21 · shipped · decision_
+- **538** [538 - Monteux School & Music Festival: Hancock, Maine](./community/538-monteux-school-music-festival-hancock-me/) — _2026-05-21 · research-complete · guide_
+- **547** [547 — Cassie advisor session: AI-augmented community coordination as the bigger play](./community/547-cassie-advisor-ai-human-coordination-validation/) — _2026-05-21 · research-complete · decision_
+- **577** [577 — Viral X Thread Patterns: Humble Milestone Posts (Birthday, Hackathon, Launch)](./community/577-viral-x-thread-patterns-humble-milestone-posts/) — _2026-05-21 · research-complete · guide_
+- **590** [590 — Substack's Three Models for Building Community (ZAO Mapping)](./community/590-substack-three-community-models/) — _2026-05-21 · research-complete · guide_
+- **600** [600 — Jadyn Violet & UVR (Underground Violet Rave) — Deep Dive](./community/600-jadyn-violet-uvr-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **621** [621 — ZAO context canon (May 7 2026 grill session)](./community/621-zao-context-canon-may7/) — _2026-05-21 · research-complete · synthesis_
+- **622** [622 - Impact Networks (David Ehrlichman framework) applied to The ZAO](./community/622-impact-networks-david-ehrlichman/) — _research-complete · guide_
+- **624** [624 - Nexus Portal Canon](./community/624-nexus-portal-canon-may7/) — _2026-05-21 · research-complete · guide_
+- **625** [625 - POIDH x ZAO Bounty Playbook (operational)](./community/625-poidh-zao-bounty-playbook/) — _2026-05-21 · research-complete · guide_
+- **634** [634 - Thariq (@trq212) on X: HTML as the Unreasonable Effectiveness Format for Claude Code](./community/634-x-thariq-trq212-post/) — _2026-05-21 · research-complete · reference_
+- **635** [635 - CyrilXBT on Anthropic AI Agents Workshop](./community/635-x-cyrilxbt-post/) — _2026-05-21 · research-complete · reference_
+- **640** [640 — Magnetiq pivot: from "build community" to "vibes-as-data"](./community/640-magnetiq-vibes-to-data-pivot-may2026/) — _2026-05-21 · research-complete · decision_
+- **642** [642 - AttaBotty livestream playbook + Z-and-AttaBotty Telegram bot](./community/642-attabotty-livestream-playbook/) — _2026-05-21 · research-complete · decision_
+- **696** [696 - Zaal Panthaki + The ZAO: Deep Audit](./community/696-zaal-zao-deep-audit/) — _2026-05-21 · research-complete · audit_
+- **742** [742 — Zaal Panthaki: Founder Dossier + WaveWarZ Brag Source](./community/742-zaal-panthaki-profile-dossier/) — _2026-05-25 · research-complete · guide_
+- **758e** [758e - Mentor handbook patterns (for ZABAL Games)](./community/758e-mentor-handbook-patterns/) — _2026-05-26 · research-complete · guide_
+- **798** [798 — ZAO Ecosystem Master Link Index](./community/798-zao-ecosystem-master-link-index/) — _2026-06-02 · living-index · reference_
+
+## governance (46)
+
+- **056** [056 - ORDAO & Respect Game System](./governance/056-ordao-respect-system/) — _2026-05-21 · research-complete · guide_
+- **058** [058 - Respect System Deep Dive: Scoring, Decay, On-Chain State](./governance/058-respect-deep-dive/) — _2026-05-21 · research-complete · guide_
+- **059** [059 — ZAO Hats Tree: On-Chain State & ZAO OS Integration Plan](./governance/059-hats-tree-integration/) — _2026-05-21 · research-complete · guide_
+- **075** [75 — Hats Protocol V2 Updates & New Tooling](./governance/075-hats-protocol-v2-updates/) — _2026-05-21 · research-complete · research_
+- **102** [102 - Fractals Page: frapps, ORDAO, and ZAO Fractal Governance](./governance/102-fractals-frapps-ordao-page/) — _2026-05-21 · research-complete · guide_
+- **103** [103 - Fractal Governance Ecosystem: State of the Art (May 2026)](./governance/103-fractal-governance-ecosystem/) — _2026-05-21 · research-complete · comparison_
+- **104** [104 - Fractal Communities Directory (May 2026 Edition)](./governance/104-fractal-communities-directory/) — _2026-05-21 · research-complete · guide_
+- **109** [109 - Optimystics Tooling Ecosystem](./governance/109-optimystics-tooling-ecosystem/) — _2026-05-21 · research-complete · guide_
+- **111** [111 — Proposal UI Best Practices for ZAO OS](./governance/111-proposal-ui-best-practices/) — _2026-05-21 · research-complete · guide_
+- **114** [114 - ZAO Fractal Live Infrastructure and Data Flow](./governance/114-zao-fractal-live-infrastructure/) — _2026-05-21 · research-complete · guide_
+- **115** [115 - ZAO Respect Data Reconciliation Plan](./governance/115-zao-data-reconciliation/) — _2026-05-21 · research-complete · guide_
+- **132** [132 — Snapshot Weekly Priority Polls for ZAO OS](./governance/132-snapshot-weekly-polls/) — _2026-05-21 · research-complete · guide_
+- **133** [133 — Governance System: Complete Audit](./governance/133-governance-system-audit/) — _2026-05-21 · research-complete · research_
+- **140** [140 — BuilderOSS: The Complete Nouns Builder Protocol Ecosystem](./governance/140-buildeross-nouns-protocol-ecosystem/) — _2026-05-21 · research-complete · guide_
+- **149** [149 — BuilderOSS Deep Dive: Everything ZAO Can Use](./governance/149-buildeross-deep-dive-everything/) — _2026-05-21 · research-complete · guide_
+- **184** [184 - Superchain ORDAO & Cross-Chain Fractal Governance](./governance/184-superchain-ordao-crosschain-fractal/) — _2026-05-21 · research-complete · guide_
+- **188** [188 - ZAO Fractal Bot Process and Discord Commands](./governance/188-zao-fractal-bot-process/) — _2026-05-21 · research-complete · guide_
+- **285** [285 - ORDAO & orfrapps: Deployment & Configuration (April 2026 Update)](./governance/285-ordao-orfrapps-updated-docs/) — _2026-05-21 · research-complete · guide_
+- **299** [299 - Nouns DAO Ecosystem & Snap Integration](./governance/299-nouns-dao-ecosystem-snap-integration/) — _2026-05-21 · research-complete · research_
+- **306** [306 - Eden Fractal & Optimism Fractal: Complete History, Philosophy & Architecture](./governance/306-eden-fractal-op-fractal-deep-history/) — _2026-05-21 · research-complete · guide_
+- **346** [346 - IYKYK DAO + Fractal Nouns: Inter-DAO Governance & Community Dashboard](./governance/346-iykyk-fractal-nouns-inter-dao-governance/) — _2026-05-21 · research-complete · guide_
+- **347** [347 -- ZAO Oracle: Verifying Real Outcomes for ZABAL Rewards](./governance/347-zao-oracle-outcome-verification/) — _2026-05-21 · research-complete · research_
+- **349** [349 -- ZABAL Staking: Simple Contracts + Farcaster Mini App Options](./governance/349-zabal-staking-miniapp-options/) — _2026-05-21 · research-complete · research_
+- **444** [444 - ZAO Fractal Submission: April 20, 2026](./governance/444-fractal-submission-apr20-2026/) — _2026-05-21 · research-complete · meeting-notes_
+- **450** [450 - Pre-Fractal Discord Talking Points: Apr 20 2026 5pm EST](./governance/450-pre-fractal-discord-talking-points-apr20/) — _2026-05-21 · research-complete · meeting-notes_
+- **497** [Sociocracy & Circles for Small Teams: ZAOstock Implementation Guide](./governance/497-sociocracy-circles-small-teams/) — _2026-05-21 · research-complete · guide_
+- **498** [498 - ZAOstock Fractal Adaptation: Festival Team Governance Model](./governance/498-zao-fractal-adapted-for-zaostock/) — _2026-05-21 · research-complete · design_
+- **500** [500 — DAO Event Coordination Patterns - Real-World Mechanics](./governance/500-dao-event-coordination-patterns/) — _2026-05-21 · research-complete · guide_
+- **501** [Flat-Org Onboarding UX: From First Day to Invisible Structure](./governance/501-flat-org-onboarding-ux/) — _2026-05-21 · research-complete · guide_
+- **502** [502 — ZAOstock Circles v1 Spec](./governance/502-zaostock-circles-v1-spec/) — _2026-05-21 · research-complete · guide_
+- **567** [567 - Nouns DAO Deep Dive: Mechanism Lore + ZAO Angles](./governance/567-nouns-dao-deep-zao-angles/) — _2026-05-21 · research-complete · market-research_
+- **657** [657 — Plural Events Deliberation Toolkit (Hubs Network meeting hub)](./governance/657-plural-events-deliberation-toolkit/) — _2026-05-21 · research-complete · comparison_
+- **657a** [657a — Polis](./governance/657-plural-events-deliberation-toolkit/657a-polis/) — _2026-05-21 · research-complete · guide_
+- **657b** [657b — Context Engine](./governance/657-plural-events-deliberation-toolkit/657b-context-engine/) — _2026-05-21 · research-complete · guide_
+- **657c** [657c — Agora Citizen Network](./governance/657-plural-events-deliberation-toolkit/657c-agora-citizen/) — _2026-05-21 · research-complete · guide_
+- **657d** [657d — dembrane (note: NOT "Dembrain")](./governance/657-plural-events-deliberation-toolkit/657d-dembrane/) — _2026-05-21 · research-complete · guide_
+- **657e** [657e — RadicalxChange Quadratic Voting (+ Vokwal alternative)](./governance/657-plural-events-deliberation-toolkit/657e-radxchange-quadratic-voting/) — _2026-05-21 · research-complete · guide_
+- **664** [664 — Farcaster FIP #19 (Proof-of-Work Tokenization) + Brainstorm: Async GitHub-Native Fractal](./governance/664-farcaster-fip-pow-tokenization-and-async-github-fractal/) — _2026-05-21 · research-complete · decision_
+- **695** [695 — Crypto Factor + $ZAO on Avalanche: Should ZAO Bring Governance to Avax?](./governance/695-crypto-factor-avax-governance-decision/) — _2026-05-20 · research-complete · decision_
+- **696** [696 — Respect & Fractal Governance: The Complete Lineage](./governance/696-respect-fractal-lineage-summary/) — _2026-05-20 · research-complete · guide_
+- **702** [702 - Respect & Fractal Governance: The Complete Lineage](./governance/702-respect-fractal-lineage/) — _2026-05-21 · research-complete · guide_
+- **703** [703 - ZAO Fractal: Current State (May 2026)](./governance/703-zao-fractal-current-state-may-2026/) — _2026-05-21 · research-complete · audit_
+- **704** [704 - Eden Creators: The Eden Fractal Media Studio and Content Garden](./governance/704-eden-creators-media-ecosystem/) — _2026-05-21 · research-complete · guide_
+- **705** [705 - Fractal Governance and the Respect Game Ecosystem (External Deep-Research Synthesis)](./governance/705-fractal-governance-external-deep-research/) — _2026-05-21 · research-complete · market-research_
+- **718** [718 - ZAO Fractal Whitepaper: Research Foundations (Hub)](./governance/718-zao-fractal-whitepaper-foundations/) — _2026-05-22 · research-complete · guide_
+- **719** [719 - Crypto Factor Proposal Review: The Two PDFs (Doc 695 Follow-Up)](./governance/719-crypto-factor-proposal-review/) — _2026-05-22 · research-complete · decision_
+
+## identity (22)
+
+- **005** [005 - ZIDs — ZAO Decentralized Identity](./identity/005-zao-identity/) — _2026-05-21 · research-complete · guide_
+- **134** [134 — External Reputation Signals — Comprehensive Inventory](./identity/134-external-reputation-signals-comprehensive/) — _2026-05-21 · research-complete · guide_
+- **135** [135 — Exhaustive Profile Enrichment Signals](./identity/135-exhaustive-profile-enrichment-signals/) — _2026-05-21 · research-complete · guide_
+- **158** [158 — ZAO Member Naming: ENS Subnames vs Basenames vs Custom](./identity/158-zao-member-naming-ens-basenames/) — _2026-05-21 · research-complete · guide_
+- **191** [191 — Reputation Scoring Systems for ZAO OS](./identity/191-reputation-scoring-systems/) — _2026-05-21 · research-complete · guide_
+- **203** [203 — NFT Gallery on Member Profiles via Alchemy NFT API](./identity/203-nft-gallery-alchemy-integration/) — _2026-05-21 · research-complete · guide_
+- **271** [271 — ZAO Knowledge Graph: Member Identity & Relationship Mapping](./identity/271-zao-knowledge-graph/) — _2026-05-21 · research-complete · guide_
+- **525** [525 - Guild.xyz + Token-Gating Platform Evaluation for ZAO OS](./identity/525-guild-xyz-token-gating-platforms-evaluation/) — _2026-05-21 · research-complete · comparison_
+- **542** [542 - Bonfires.ai Knowledge Graph for BCZ Strategies + ZAO Ecosystem](./identity/542-bonfires-ai-knowledge-graph-bcz-strategies/) — _2026-05-21 · research-complete · guide_
+- **543** [543 - Bonfires Bot Shipping Questions (Round 2, Operational Deep Dive)](./identity/543-bonfires-bot-shipping-questions/) — _2026-05-21 · research-complete · guide_
+- **544** [544 - Bonfires SDK + Notion Config Map for ZAO Wiring](./identity/544-bonfires-sdk-zao-wiring/) — _2026-05-21 · research-complete · guide_
+- **545** [545 - ZABAL Knowledge-Graph Ontology v1](./identity/545-zabal-knowledge-graph-ontology/) — _2026-05-21 · research-complete · guide_
+- **546** [546 - Bonfires.ai Real-World Deployments + Patterns to Adopt/Avoid](./identity/546-bonfires-real-world-deployments/) — _2026-05-21 · research-complete · comparison_
+- **548** [548 - Bonfire First-Week Context Teaching Playbook](./identity/548-bonfire-first-week-context-teaching/) — _2026-05-21 · research-complete · guide_
+- **549** [549 - Bonfire as Zaal's Personal Second Brain (Obsidian Alternative)](./identity/549-bonfire-personal-second-brain/) — _2026-05-21 · research-complete · guide_
+- **569** [569 — YapZ Bonfire Ingestion Strategy](./identity/569-yapz-bonfire-ingestion-strategy/) — _2026-05-21 · research-complete · decision_
+- **570** [570 - Zaal's Personal Knowledge Graph for Agentic Memory](./identity/570-zaal-personal-kg-agentic-memory/) — _2026-05-21 · research-complete · guide_
+- **581** [581 — Bonfire Graph Wipe + Bot Hygiene (Post-Mortem)](./identity/581-bonfire-graph-wipe-bot-hygiene/) — _2026-05-21 · research-complete · incident-postmortem_
+- **606** [606 - Zaal's second-brain operating system (May 2026)](./identity/606-zaal-second-brain-system/) — _2026-05-21 · research-complete · decision_
+- **649** [649 — Zaal Build Profile + ZAO Ecosystem Survey](./identity/649-zaal-build-profile-ecosystem-survey/) — _2026-05-21 · research-complete · audit_
+- **726** [726 - Bonfires: a hand-off guide so another bot can read + write the ZABAL knowledge graph](./identity/726-bonfires-teaching-another-bot/) — _2026-05-23 · research-complete · guide_
+- **771** [771 — Bonfires Procedural Memory Kernel (FCG): "Beyond Prompt Engineering"](./identity/771-bonfires-procedural-memory-kernel-fcg/) — _2026-05-30 · research-complete · guide_
+
+## cross-platform (15)
+
+- **077** [77 — Bluesky Cross-Posting Integration for ZAO OS](./cross-platform/077-bluesky-cross-posting-integration/) — _2026-05-21 · research-complete · research_
+- **096** [96 — Cross-Post API Deep Dive: Platform-by-Platform Integration Guide](./cross-platform/096-cross-post-api-deep-dive/) — _2026-05-21 · research-complete · research_
+- **097** [97 — Nostr Cross-Posting Integration for ZAO OS](./cross-platform/097-nostr-cross-posting-integration/) — _2026-05-21 · research-complete · research_
+- **117** [117 — Lens V3 Integration (Consolidated)](./cross-platform/117-lens-v3-integration/) — _2026-05-21 · research-complete · research_
+- **177** [177 — Mastodon + Threads Cross-Posting Integration for ZAO OS](./cross-platform/177-mastodon-threads-cross-posting/) — _2026-05-21 · research-complete · research_
+- **179** [179 — Reddit Cross-Posting Integration for ZAO OS](./cross-platform/179-reddit-cross-posting-integration/) — _2026-05-21 · research-complete · research_
+- **183** [183 — Social Connections & X Integration for ZAO OS](./cross-platform/183-social-connections-x-integration/) — _2026-05-21 · research-complete · research_
+- **214** [214 — Twitch API Deep Integration: Comprehensive Feature Map for ZAO OS](./cross-platform/214-twitch-api-deep-integration/) — _2026-05-21 · research-complete · research_
+- **228** [228 — Meta Developer Platform: APIs, Models & Integration Opportunities for ZAO OS](./cross-platform/228-meta-developer-platform/) — _2026-05-21 · research-complete · research_
+- **351** [351 — YouTube Description SEO & Transcript-to-Description Workflow for COC Concertz](./cross-platform/351-youtube-description-seo-concert-transcripts/) — _2026-05-21 · research-complete · research_
+- **353** [353 — YouTube Content Pipeline Automation for COC Concertz](./cross-platform/353-youtube-content-pipeline-automation/) — _2026-05-21 · research-complete · research_
+- **354** [354 — Cross-Posting Infrastructure Audit: What Exists for Agent Teaser Distribution](./cross-platform/354-cross-posting-infrastructure-audit/) — _2026-05-21 · research-complete · research_
+- **355** [355 — Autonomous Social Distribution 2026: What Works, What's Noise, What to Steal](./cross-platform/355-autonomous-social-distribution-2026/) — _2026-05-21 · research-complete · research_
+- **486** [486 — Reddit Reply Bot for ZAO + JustMakingMusic as a Distribution Vertical](./cross-platform/486-reddit-zao-reply-bot-justmakingmusic-vertical/) — _2026-05-21 · research-complete · research_
+- **627** [627 - Twitch Streaming + StreamElements Integration for ZAO](./cross-platform/627-twitch-streaming-streamelements-integration/) — _2026-05-21 · research-complete · research_
+
+## uncategorized-root (11)
+
+- **280** [280 — FID Registration & x402 Deep Dive: How to Give ZAO Agents a Farcaster Identity](./280-fid-registration-x402-deep-dive/) — _2026-05-21 · research-complete · technical-guide_
+- **281** [281 — Farcaster Agents Landscape & Registration Paths: The Complete Picture](./281-farcaster-agents-landscape-registration/) — _2026-05-21 · research-complete · research-report_
+- **282** [282 — Privy Auth Integration for FISHBOWLZ](./282-privy-auth-fishbowlz-integration/) — _2026-05-21 · research-complete · technical-guide_
+- **283** [283 — Privy Embedded Wallets & Smart Wallets for FISHBOWLZ Token Mechanics on Base](./283-privy-embedded-wallets-fishbowlz-token-mechanics/) — _2026-05-21 · research-complete · technical-guide_
+- **284** [284 — Privy Full Feature Set for FISHBOWLZ](./284-privy-full-feature-set-fishbowlz/) — _2026-05-21 · research-complete · technical-guide_
+- **288** [Doc 288 — Agent Squad Monitoring & Visualization Dashboards](./288-agent-squad-monitoring-dashboards/) — _2026-05-21 · research-complete · research-report_
+- **289** [Doc 289 — ZOE Dashboard: Chat-Based Command Center UX Patterns](./289-zoe-dashboard-chat-ux-patterns/) — _2026-05-21 · research-complete · design-guide_
+- **309** [309 - Karpathy's LLM Wiki: Codebase-to-Wiki Compiler for Token Optimization](./309-karpathy-llm-wiki-codebase-compiler/) — _2026-05-21 · research-stub · research-brief_
+- **310** [310 - Meta TRIBE v2: Brain Prediction Model for Content Optimization](./310-meta-tribe-v2-brain-prediction-content/) — _2026-05-21 · research-stub · research-brief_
+- **311** [311 - Vibe-Coded Apps: $800K/yr Marketing Playbook](./311-vibe-coded-apps-marketing-playbook/) — _2026-05-21 · research-stub · research-brief_
+- **312** [312 - Claude Skills Marketplace & Ecosystem (Apr 2026)](./312-claude-skills-marketplace-ecosystem/) — _2026-05-21 · research-stub · research-brief_
+
+## security (8)
+
+- **040** [40 — Codebase Audit Guide: Step-by-Step](./security/040-codebase-audit-guide/) — _2026-05-21 · research-complete · audit-guide_
+- **057** [57 — Codebase Security Audit (March 17, 2026)](./security/057-codebase-security-audit-march-2026/) — _2026-05-21 · research-complete · audit-results_
+- **136** [136 — API Status Verification — March 2026](./security/136-api-status-verification-march-2026/) — _2026-05-21 · research-complete · api-audit_
+- **343** [343 - Agent Wallet Security: Securing VAULT/BANKER/DEALER Beyond Env Vars](./security/343-agent-wallet-security-zabal-swarm/) — _2026-05-21 · research-complete · agent-security-architecture_
+- **463** [463 - Portal + Agent Orchestrator Audit (10-Agent Batch)](./security/463-portal-ao-audit-10-batch/) — _2026-05-21 · research-complete · audit-results_
+- **471** [471 - Vercel OAuth Supply Chain Breach April 2026](./security/471-vercel-oauth-breach-apr2026/) — _2026-05-21 · research-complete · incident-postmortem_
+- **494** [494 - VPS Secrets Management with AI Coding Agents](./security/494-vps-secrets-ai-coding-agent/) — _2026-05-21 · research-complete · secrets-management-research_
+- **795** [795 — Farcaster client security audit + cleanup](./security/795-farcaster-client-audit-cleanup/) — _2026-06-02 · research-complete · audit_
+
+## wavewarz (6)
+
+- **099** [99 — Prediction Market Music Battles for ZAO OS](./wavewarz/099-prediction-market-music-battles/) — _2026-05-21 · research-complete · technical-guide_
+- **100** [100 — Reading Solana PDA Data from Next.js (WaveWarZ Battle Vaults)](./wavewarz/100-solana-pda-reading-nextjs/) — _2026-05-21 · research-complete · technical-guide_
+- **101** [101 — WaveWarZ × ZAO OS: Integration Whitepaper [SUPERSEDED]](./wavewarz/101-wavewarz-zao-whitepaper/) — _2026-05-21 · superseded · strategic-guide_
+- **180** [180 — WaveWarZ Artist Discovery Pipeline for ZAO OS](./wavewarz/180-wavewarz-integration-blueprints/) — _2026-05-21 · research-complete · technical-guide_
+- **421** [421 — Quotient's Anti-Cucktrading Manifesto: AI Superforecaster Design for WaveWarZ](./wavewarz/421-quotient-anti-cucktrading-ai-superforecaster/) — _2026-05-21 · research-complete · strategic-guide_
+- **743** [743 - WaveWarZ Whitepaper v2 Deep Dive](./wavewarz/743-wavewarz-whitepaper-v2-deep-dive/) — _2026-05-25 · research-complete · guide_
+
+## _archive (76)
+
+- **001** [Farcaster Protocol](./_archive/001-farcaster-protocol/)
+- **003** [Music Integration Research](./_archive/003-music-integration/)
+- **004** [ZAO Respect Tokens — Social Capital System](./_archive/004-respect-tokens/)
+- **006** [Quilibrium Network](./_archive/006-quilibrium/)
+- **007** [Hats Protocol — NFT Role Hierarchies](./_archive/007-hats-protocol/)
+- **008** [AI Memory Patterns](./_archive/008-ai-memory/)
+- **009** [Public APIs for ZAO OS](./_archive/009-public-apis/)
+- **010** [HyperSnap](./_archive/010-hypersnap/)
+- **011** [Reference Repositories](./_archive/011-reference-repos/)
+- **013** [Chat & Messaging on Farcaster](./_archive/013-chat-messaging/)
+- **014** [Project Structure & Organization](./_archive/014-project-structure/)
+- **015** [MVP Spec — Gated Chat Client](./_archive/015-mvp-spec/)
+- **018** [Security Audit — Pre-Build](./_archive/018-security-audit/)
+- **019** [Farcaster Ecosystem Landscape Analysis](./_archive/019-farcaster-ecosystem-landscape/)
+- **021** [Farcaster Landscape Research (2025-2026)](./_archive/021-farcaster-deep-dive/)
+- **022** [22 — Farcaster Ecosystem Players, Leaderboards & Active Users](./_archive/022-farcaster-ecosystem-players/)
+- **024** [24 — ZAO AI Agent: Research, Architecture & Plan](./_archive/024-zao-ai-agent/)
+- **025** [25 — Public APIs Index for ZAO OS](./_archive/025-public-apis-index/)
+- **027** [27 — Comprehensive Research Overview & Cross-Platform Expansion Plan](./_archive/027-comprehensive-overview/)
+- **028** [28 — Cross-Platform Publishing: Publish Once, Distribute Everywhere](./_archive/028-cross-platform-publishing/)
+- **031** [31 — Governance, DAO Structure & Token Economics](./_archive/031-governance-dao-tokenomics/)
+- **032** [32 — Onboarding, Growth, Moderation, Engagement & Discovery](./_archive/032-onboarding-growth-moderation/)
+- **033** [33 — Infrastructure: Media Storage, Mobile, Real-Time, Audio & Privacy](./_archive/033-infrastructure-mobile-storage/)
+- **034** [34 — Farcaster Clients Comparison & Notification Architecture](./_archive/034-farcaster-clients-notifications/)
+- **036** [36 — Lens Protocol Deep Dive](./_archive/036-lens-protocol-deep-dive/)
+- **042** [42 — Supabase Advanced Patterns](./_archive/042-supabase-advanced-patterns/)
+- **043** [43 — WebRTC Audio Rooms, Live Listening Parties & Streaming](./_archive/043-webrtc-audio-rooms-streaming/)
+- **044** [44 — Agentic Development Workflows: AI Agents Building & Maintaining ZAO OS](./_archive/044-agentic-development-workflows/)
+- **046** [46 — OpenFang: Agent Operating System (RightNow-AI)](./_archive/046-openfang-agent-os/)
+- **047** [47 — The ZAO Community & Ecosystem](./_archive/047-zao-community-ecosystem/)
+- **048** [48 — ZAO Ecosystem Deep Dive: Communities, People, Architecture](./_archive/048-zao-ecosystem-deep-dive/)
+- **052** [52 — Whitepaper Presentation, Critique & Recording Guide](./_archive/052-whitepaper-presentation-critique/)
+- **053** [53 — Whitepaper User Testing: 4 Personas Read Draft 4.4](./_archive/053-whitepaper-user-testing/)
+- **055** [55 — Hats Anchor App, DAO Tooling & Ecosystem Research](./_archive/055-hats-anchor-app-and-tooling/)
+- **062** [62 — Autoresearch: Autonomous Skill & Prompt Improvement](./_archive/062-autoresearch-skill-improvement/)
+- **064** [64 — Incented Protocol: ZABAL Campaigns & ZAO OS Integration](./_archive/064-incented-zabal-campaigns/)
+- **067** [67 — Paperclip AI: Running ZAO as an AI Agent Company](./_archive/067-paperclip-ai-agent-company/)
+- **068** [68 — Alibaba Page Agent: In-Page AI Copilot for ZAO OS](./_archive/068-alibaba-page-agent/)
+- **069** [69 — Claude Code Tips & Best Practices for ZAO OS](./_archive/069-claude-code-tips-best-practices/)
+- **072** [72 — Paperclip Functionality Deep Dive: How Agents Actually Work](./_archive/072-paperclip-functionality-deep-dive/)
+- **078** [Research 78: Nouns Protocol & Nouns Builder Integration](./_archive/078-nouns-builder-integration/)
+- **080** [80 — Jitsi Meet Live Rooms for ZAO OS](./_archive/080-jitsi-meet-live-rooms/)
+- **083** [83 — ElizaOS March 2026 Update: Current State for ZAO Community Bot](./_archive/083-elizaos-2026-update/)
+- **091** [91 — Top Claude Skills, MCP Servers & GitHub Repos for ZAO OS](./_archive/091-top-claude-skills-mcp-repos/)
+- **095** [95 — Solana + WaveWarz Integration & Multi-Wallet/Social Settings Redesign](./_archive/095-solana-wavewarz-multi-wallet-settings/)
+- **108** [Research 100: Music NFT Landscape 2026 — ZAO OS Integration](./_archive/108-music-nft-landscape-2026/)
+- **117** [117 — Lens Protocol V3 Cross-Posting for ZAO OS](./_archive/117-lens-v3-cross-posting/)
+- **119** [119 — SongJam Audio Spaces Embed for ZAO OS](./_archive/119-songjam-audio-spaces-embed/)
+- **120** [120 — Lens V3 Posting Fix: Grove Storage + Correct URI Format](./_archive/120-lens-v3-posting-fix/)
+- **121** [121 — Lens V3 Auth Verdict: Can We Post Server-Side?](./_archive/121-lens-v3-auth-verdict/)
+- **126** [126 — Music Player Gap Analysis: What ZAO OS Is Missing](./_archive/126-music-player-gap-analysis/)
+- **127** [127 — ENS Integration Deep Dive for ZAO OS](./_archive/127-ens-integration-deep-dive/)
+- **128** [128 — Free API Keys & Alchemy Enhancements for ZAO OS](./_archive/128-free-api-keys-alchemy-enhancements/)
+- **131** [131 — On-Chain Proposals & Governance for ZAO OS](./_archive/131-onchain-proposals-governance/)
+- **142** [142 — Zora Protocol SDK: Building ZAO's Music NFT Minting Platform](./_archive/142-zora-protocol-sdk-music-nfts/)
+- **147** [147 — The Full Distribution Pipeline: Audius Streaming + Zora Collecting + ZOUNZ Governance](./_archive/147-audius-zora-zounz-full-pipeline/)
+- **150** [150 — Arweave: Permanent Music Storage for ZAO OS](./_archive/150-arweave-permanent-music-storage/)
+- **163** [163 — Multistreaming Platforms: Restream, StreamYard, Meld, Livepeer for ZAO OS](./_archive/163-multistreaming-platforms-integration/)
+- **174** [Paperclip AI: Multi-Company Support & Advanced Agent Coordination](./_archive/174-paperclip-multi-company-agents/)
+- **175** [Research Doc 82 — Paperclip AI: ClipMart Marketplace & Plugin System](./_archive/175-paperclip-clipmart-plugins/)
+- **178** [96 — WaveWarZ Deep Dive & ZAO OS Integration](./_archive/178-wavewarz-deep-dive-integration/)
+- **181** [105 — Music Player UI Patterns & Showcase Design](./_archive/181-music-player-ui-showcase/)
+- **194** [165 — Claude Code Multi-Terminal Management](./_archive/194-claude-code-multi-terminal-management/)
+- **195** [Doc 166 — Developer Workflow Tools & Automations for Solo Devs Using Claude Code (2026)](./_archive/195-dev-workflow-tools-automations/)
+- **197** [197 — OpenClaw Agent Memory & Knowledge System for ZAO OS](./_archive/197-openclaw-agent-memory-knowledge-system/)
+- **198** [198 — Social Graph Analytics & Discovery for Farcaster](./_archive/198-social-graph-analytics-discovery/)
+- **204** [204 — OpenClaw Setup Runbook: VPS Configuration & ZAO Agent Deployment](./_archive/204-openclaw-setup-runbook/)
+- **210** [210 — Microsoft Agent Lightning: RL Training for AI Agents](./_archive/210-microsoft-agent-lightning/)
+- **213** [213 — Spaces & Streaming Architecture: Debug Guide + SongJam Patterns](./_archive/213-spaces-streaming-architecture-debug-guide/)
+- **219** [219 — Free APIs & Zero-Cost Integrations for ZAO OS](./_archive/219-free-apis-zero-cost-integrations/)
+- **224** [224 — ZAO Stock: Multi-Year Vision — Culture, Art, Music & Tech Conference](./_archive/224-zao-stock-multi-year-vision/)
+- **226** [226 — Paperclip + OpenClaw Best Practices for ZAO OS](./_archive/226-paperclip-openclaw-best-practices/)
+- **229** [229 — AttaBotty (William Stewart) & DaNici — Co-Founder Profile](./_archive/229-attabotty-danici-profile/)
+- **230** [230 -- Community Member Deep Profiles: Ohnahji B, Maceo, Hurric4n3Ike](./_archive/230-community-member-profiles-ohnahji-maceo-ike/)
+- **231** [231 — Community Member Deep Profiles: Tyler/Magnetiq, Candy, Swarthy Hatter, DCoop/ZAOVille](./_archive/231-community-profiles-tyler-candy-swarthy-dcoop/)
+- **269** [269 — Claude Skills, MCP Servers & Agent Toolkit for ZAO OS](./_archive/269-claude-skills-mcp-agent-toolkit/)

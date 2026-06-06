@@ -1,6 +1,8 @@
 # ZAO OS Research Library
 
-> **202 active research documents** across 13 topic folders (79 superseded docs in `_archive/`) covering every aspect of building a decentralized social media platform for music.
+> **858 active numbered research documents** across 14 topic groups (76 superseded in `_archive/`; 11 uncategorized at the research root awaiting filing) covering every aspect of building a decentralized social media platform for music.
+>
+> 📑 **[INDEX.md](./INDEX.md)** is the complete, auto-generated listing of every doc (number · title · date · status). **[search-index.json](./search-index.json)** is the machine-readable version. The per-folder counts below are refreshed from disk (2026-06-06); regenerate by re-scanning `research/**/README.md`.
 
 ---
 
@@ -8,21 +10,22 @@
 
 | Topic | Docs | Description |
 |-------|------|-------------|
-| [Agents](./agents/) | 30 | OpenClaw, ZOE, frameworks, memory, orchestration, self-optimization |
-| [Music](./music/) | 40 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
-| [Dev Workflows](./dev-workflows/) | 37 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
-| [Infrastructure](./infrastructure/) | 24 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
-| [Community](./community/) | 19 | ZAO guide, whitepaper, onboarding, member profiles, task forces |
-| [Governance](./governance/) | 17 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
-| [Farcaster](./farcaster/) | 12 | Protocol, Mini Apps, XMTP, ecosystem, social graph |
-| [Cross-Platform](./cross-platform/) | 11 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
-| [Business](./business/) | 11 | Revenue, payments, strategy, Obsidian model, marketplace, FISHBOWLZ tokenization |
-| [Events](./events/) | 9 | Bootcamp, ZAO Stock, ship logs, big wins, status snapshots |
-| [Identity](./identity/) | 7 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph |
-| [WaveWarZ](./wavewarz/) | 4 | Prediction markets, artist pipeline, Solana PDAs |
-| [Security](./security/) | 3 | Audits, API verification, testing |
-| [Inspiration](./inspiration/) | 5 | Daily "steal like an artist" research — 3 apps analyzed per session, gap analysis |
-| [Archive](./_archive/) | 70 | Superseded docs (preserved for history) |
+| [Dev Workflows](./dev-workflows/) | 193 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
+| [Agents](./agents/) | 171 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization |
+| [Music](./music/) | 86 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
+| [Events](./events/) | 74 | Bootcamp, ZAO Stock, ship logs, big wins, status snapshots, meeting recaps |
+| [Business](./business/) | 73 | Revenue, payments, strategy, Obsidian model, marketplace, graduation candidates |
+| [Infrastructure](./infrastructure/) | 57 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
+| [Farcaster](./farcaster/) | 50 | Protocol, Mini Apps, XMTP, ecosystem, social graph, client architecture |
+| [Community](./community/) | 46 | ZAO guide, whitepaper, onboarding, member profiles, task forces, link index |
+| [Governance](./governance/) | 46 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
+| [Identity](./identity/) | 22 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph |
+| [Cross-Platform](./cross-platform/) | 15 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
+| [Security](./security/) | 8 | Audits, API verification, testing, client security |
+| [WaveWarZ](./wavewarz/) | 6 | Prediction markets, artist pipeline, Solana PDAs |
+| [Uncategorized (root)](./) | 11 | Numbered docs 280–314 not yet filed into a topic folder |
+| [Inspiration](./inspiration/) | — | Daily "steal like an artist" research (date-named, outside the numbered scheme) |
+| [Archive](./_archive/) | 76 | Superseded docs (preserved for history) |
 
 ---
 

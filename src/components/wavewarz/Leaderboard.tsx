@@ -167,8 +167,9 @@ export default function WaveWarZLeaderboard() {
     try {
       const res = await fetch(`/api/wavewarz/artists?sort=${sort}&limit=50`);
       if (!res.ok) throw new Error('Failed to load leaderboard');
-      const data: WaveWarZArtist[] = await res.json();
-      setArtists(data);
+      // API returns { artists: [...] }, not a bare array.
+      const data: { artists: WaveWarZArtist[] } = await res.json();
+      setArtists(data.artists ?? []);
     } catch {
       setError('Could not load leaderboard. Please try again.');
     } finally {

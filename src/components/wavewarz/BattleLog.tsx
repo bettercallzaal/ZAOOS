@@ -122,8 +122,9 @@ export default function BattleLog() {
       if (artist.trim()) params.set('artist', artist.trim());
       const res = await fetch(`/api/wavewarz/battles?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to fetch battles');
-      const data: Battle[] = await res.json();
-      setBattles(data);
+      // API returns { battles: [...] }, not a bare array.
+      const data: { battles: Battle[] } = await res.json();
+      setBattles(data.battles ?? []);
     } catch {
       setError('Could not load battle log. Please try again.');
     } finally {

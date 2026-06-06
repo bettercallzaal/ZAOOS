@@ -169,8 +169,8 @@ export const NEXUS_LINKS: NexusCategory[] = [
         links: [
           {
             title: 'WaveWarZ Platform',
-            url: 'https://wavewarz.io',
-            description: 'Compete in music battles and earn rewards',
+            url: 'https://www.wavewarz.com',
+            description: 'Compete in music battles and earn rewards (Solana-first, going multi-chain to Base)',
             type: 'platform',
             tags: ['gaming', 'music', 'competition'],
             chain: 'base',

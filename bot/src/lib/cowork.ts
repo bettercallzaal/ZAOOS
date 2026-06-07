@@ -145,6 +145,23 @@ export function heartbeat(
   return request<unknown>('POST', '/api/v1/bots/heartbeat', meta === undefined ? { status } : { status, meta });
 }
 
+/**
+ * Report an activity event to the coworking board (Phase 1 Observe).
+ * Dormant-safe + fault-tolerant like heartbeat: a no-op while dormant, and
+ * network/HTTP errors are caught and returned, never thrown into a bot loop.
+ * The bot identity is the token, not the body.
+ */
+export function reportEvent(
+  kind: string,
+  message?: string,
+  meta?: Record<string, unknown>,
+): Promise<CoworkResult<unknown>> {
+  const body: Record<string, unknown> = { kind };
+  if (message !== undefined) body.message = message;
+  if (meta !== undefined) body.meta = meta;
+  return request<unknown>('POST', '/api/v1/bots/events', body);
+}
+
 /** Read the fleet status board. */
 export function getBots(): Promise<CoworkResult<{ bots: BotHealth[] }>> {
   return request<{ bots: BotHealth[] }>('GET', '/api/v1/bots');
@@ -154,15 +171,24 @@ export function getBots(): Promise<CoworkResult<{ bots: BotHealth[] }>> {
  * Start a periodic heartbeat. Returns a stop() function.
  * No-op (returns a noop stop) when the client is dormant, so it is safe to call
  * unconditionally from any bot's startup.
+ *
+ * `meta` is static per-process metadata (e.g. { unit }). `metaFn`, when given,
+ * is evaluated each tick and merged over `meta`, so a bot can report live detail
+ * (current_task, last_error, uptime) to the board's per-bot panel. Backwards-
+ * compatible: existing 3-arg callers are unaffected (metaFn stays undefined).
  */
 export function startHeartbeat(
   intervalMs = 60_000,
   statusFn: () => BotHealthStatus = () => 'up',
   meta?: Record<string, unknown>,
+  metaFn?: () => Record<string, unknown>,
 ): () => void {
   if (!coworkEnabled()) return () => {};
   const tick = (): void => {
-    void heartbeat(statusFn(), meta);
+    const dynamic = metaFn ? metaFn() : undefined;
+    const merged =
+      meta === undefined && dynamic === undefined ? undefined : { ...(meta ?? {}), ...(dynamic ?? {}) };
+    void heartbeat(statusFn(), merged);
   };
   tick();
   const handle = setInterval(tick, intervalMs);

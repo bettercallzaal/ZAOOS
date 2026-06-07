@@ -18,7 +18,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
-import { startHeartbeat } from '../lib/cowork';
+import { startHeartbeat, reportEvent } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
@@ -180,6 +180,17 @@ const devzChatId = devzChatRaw ? Number(devzChatRaw) : undefined;
 const bot = new Bot(token);
 const usernameHolder: { value: string | null } = { value: null };
 const botIdHolder: { value: number | null } = { value: null };
+
+// Cowork control-plane (Phase 1 Observe): live detail surfaced to the board.
+const COWORK_BOOT_TS = Date.now();
+let coworkTask = 'booting';
+let coworkLastError: string | null = null;
+bot.catch((err) => {
+  const msg = err instanceof Error ? err.message : String(err);
+  coworkLastError = msg;
+  console.error('[zoe/index] bot error:', msg);
+  void reportEvent('error', msg, { unit: 'zoe-bot' });
+});
 
 function isFromZaal(ctx: Context): boolean {
   return ctx.from?.id === zaalId;
@@ -1312,10 +1323,17 @@ async function main(): Promise<void> {
   }
 
   // Heartbeat to the coworking status board (dormant unless COWORK_API_URL/TOKEN set).
-  startHeartbeat(60_000, () => 'up', { unit: 'zoe-bot' });
+  // metaFn enriches each heartbeat with live detail for the board's per-bot panel.
+  startHeartbeat(60_000, () => 'up', { unit: 'zoe-bot' }, () => ({
+    current_task: coworkTask,
+    last_error: coworkLastError,
+    uptime_s: Math.round((Date.now() - COWORK_BOOT_TS) / 1000),
+  }));
   await bot.start({
     onStart: (info) => {
       console.log(`[zoe/index] polling as @${info.username}`);
+      coworkTask = 'idle (polling)';
+      void reportEvent('startup', `online as @${info.username}`, { unit: 'zoe-bot' });
     },
   });
 }

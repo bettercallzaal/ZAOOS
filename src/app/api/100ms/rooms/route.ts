@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { createMSRoom } from '@/lib/social/msRoomsDb';
+import { createMSRoom, getActiveMSRooms } from '@/lib/social/msRoomsDb';
 import { logger } from '@/lib/logger';
 
 const CreateSchema = z.object({
   title: z.string().min(1).max(100),
 });
+
+// Public list of active 100ms rooms — powers the "Live on 100ms" section on
+// /spaces so created rooms are discoverable, not just reachable by shared URL.
+export async function GET() {
+  try {
+    const rooms = await getActiveMSRooms();
+    return NextResponse.json({ rooms });
+  } catch (error) {
+    logger.error('List 100ms rooms error:', error);
+    return NextResponse.json({ error: 'Failed to list rooms' }, { status: 500 });
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {

@@ -14,6 +14,7 @@ import SpacesTabs from '@/components/spaces/SpacesTabs';
 import CategoryFilter from '@/components/spaces/CategoryFilter';
 import ScheduledRooms from '@/components/spaces/ScheduledRooms';
 import PastRooms from '@/components/spaces/PastRooms';
+import { SongjamSpaceCard } from '@/components/spaces/SongjamSpaceCard';
 import type { Room, AudioProvider } from '@/lib/spaces/roomsDb';
 
 export default function PublicSpacesPage() {
@@ -189,7 +190,10 @@ export default function PublicSpacesPage() {
 
       <div className="flex-1 px-4 pb-6 max-w-4xl mx-auto w-full">
         {activeTab === 'live' && (
-          <LiveTab loading={loading} stages={filteredStages} jukeRooms={jukeRooms} myRooms={myRooms} otherRooms={otherRooms} user={user} onHost={() => setShowHostModal(true)} onJoin={handleJoinStage} />
+          <>
+            <SongjamSpaceCard />
+            <LiveTab loading={loading} stages={filteredStages} jukeRooms={jukeRooms} myRooms={myRooms} otherRooms={otherRooms} user={user} onHost={() => setShowHostModal(true)} onJoin={handleJoinStage} />
+          </>
         )}
         {activeTab === 'upcoming' && <ScheduledRooms category={category} />}
         {activeTab === 'past' && <PastRooms category={category} />}

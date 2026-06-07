@@ -74,8 +74,12 @@ async function request<T>(
   method: 'GET' | 'POST' | 'PATCH',
   path: string,
   body?: unknown,
+  token: string = BOT_TOKEN,
 ): Promise<CoworkResult<T>> {
-  if (!coworkEnabled()) return { ok: false, skipped: true };
+  // Dormant unless we have a base URL AND a token. `token` lets one process
+  // report as multiple bot identities (e.g. teams: magnetiq + attabotty), each
+  // with its own cowork token; default is this process's COWORK_BOT_TOKEN.
+  if (!API_URL || !token) return { ok: false, skipped: true };
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -83,7 +87,7 @@ async function request<T>(
     const res = await fetch(`${API_URL}${path}`, {
       method,
       headers: {
-        Authorization: `Bearer ${BOT_TOKEN}`,
+        Authorization: `Bearer ${token}`,
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
       },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -145,6 +149,20 @@ export function heartbeat(
   return request<unknown>('POST', '/api/v1/bots/heartbeat', meta === undefined ? { status } : { status, meta });
 }
 
+/** Heartbeat as a specific identity (explicit token). Used by multi-bot processes. */
+function heartbeatWith(
+  token: string,
+  status: BotHealthStatus = 'up',
+  meta?: Record<string, unknown>,
+): Promise<CoworkResult<unknown>> {
+  return request<unknown>(
+    'POST',
+    '/api/v1/bots/heartbeat',
+    meta === undefined ? { status } : { status, meta },
+    token,
+  );
+}
+
 /**
  * Report an activity event to the coworking board (Phase 1 Observe).
  * Dormant-safe + fault-tolerant like heartbeat: a no-op while dormant, and
@@ -183,12 +201,29 @@ export function startHeartbeat(
   meta?: Record<string, unknown>,
   metaFn?: () => Record<string, unknown>,
 ): () => void {
-  if (!coworkEnabled()) return () => {};
+  return startHeartbeatAs(BOT_TOKEN, intervalMs, statusFn, meta, metaFn);
+}
+
+/**
+ * Like startHeartbeat, but reports as the identity behind an explicit `token`.
+ * This lets a single process heartbeat as multiple bots (the teams process runs
+ * Magnetiq + AttaBotty; the devz process also reports a 'hermes' identity), each
+ * with its own cowork token so they appear as separate rows on the board.
+ * Dormant (no-op) unless COWORK_API_URL is set AND `token` is non-empty.
+ */
+export function startHeartbeatAs(
+  token: string,
+  intervalMs = 60_000,
+  statusFn: () => BotHealthStatus = () => 'up',
+  meta?: Record<string, unknown>,
+  metaFn?: () => Record<string, unknown>,
+): () => void {
+  if (!API_URL || !token) return () => {};
   const tick = (): void => {
     const dynamic = metaFn ? metaFn() : undefined;
     const merged =
       meta === undefined && dynamic === undefined ? undefined : { ...(meta ?? {}), ...(dynamic ?? {}) };
-    void heartbeat(statusFn(), merged);
+    void heartbeatWith(token, statusFn(), merged);
   };
   tick();
   const handle = setInterval(tick, intervalMs);

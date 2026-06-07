@@ -18,6 +18,30 @@ scope: "every meaningful link discoverable in the ZAOOS monorepo: curated ZAO/ec
 
 ---
 
+## §0 — Audit Addendum: Verified-Dead & Conflicting Links
+
+> **Verified 2026-06-07** via DNS resolution + HTTP probe (control: `thezao.com` / `midipunkz.com` resolve, so failures below are genuine NXDOMAIN, not a network-policy block). This section is hand-authored and survives §5/§6 regeneration. Do **not** sync the entries below into any external link directory (e.g. zaonexus).
+
+**Dead — NXDOMAIN (host does not resolve):**
+
+| URL | Status | Where listed |
+|---|---|---|
+| `quakeynation.com` | DEAD (NXDOMAIN) | §5 "Quakey Nation — Artist collective partner" |
+| `dao.flix.fun` | DEAD (NXDOMAIN) | §5 "Flix.fun DAO — governance partner" |
+| `blockchainmusicnews.com` | DEAD (NXDOMAIN) | §5 "Blockchain Music News — media partner" |
+| `thezao.io` | DEAD (NXDOMAIN) | §5 seed — non-canonical variant of `thezao.com` |
+| `midipunkz.io` | DEAD (NXDOMAIN) | §5 seed — non-canonical variant of `midipunkz.com` |
+| `zao.gg` (+ all `*.zao.gg` subdomains/paths) | DEAD (NXDOMAIN) | §5 seed — non-canonical; use `thezao.com` / `zaoos.com` |
+
+**Conflicting / ambiguous (host resolves, but identity disputed inside this repo):**
+
+- `magnetiq.io` — **disputed.** `.claude/skills/zabal-games-context` calls it "Tyler Stambaugh's ZAO platform," but `ZAO-STOCK/research/232` states `magnetiq.io` (luxury event mgmt for Valentino/Bulgari/Saint Laurent) is a **completely separate company**. The ZAO-controlled surface is `app.magnetiq.xyz`. Until the two docs are reconciled, do not list `magnetiq.io` as a ZAO surface.
+- `sigea.io` vs `sigeacloud.io` — **canonicalization pending.** Both resolve. §5/`links.ts` use `sigea.io`; the archived `seed-nexus-links.sql` + `x.com/SigeaOfficial` use `sigeacloud.io`. Pick one canonical before syncing (zaonexus currently carries `sigeacloud.io`).
+
+**Verified-alive + ZAO-affiliated (safe to surface):** `cannonjones.com`, `farcaster.xyz/cannonjones`, `mumbomusic.com`, `flix.fun`. (CannonJones corroborated by `data/missing-fids.csv` + WaveWarZ whitepapers + `zabal-games-context`.)
+
+---
+
 ## §1 — ZAO Official, Surfaces & Channels
 
 ### Core domains
@@ -293,24 +317,24 @@ _ZAO partners and collaborators_
 ##### Tech Partners
 _Technology and platform partners_
 
-- [SIGEA](https://sigea.io) — Strategic technology partner `(partner, tech, partner)`
-- [Magnetiq](https://magnetiq.io) — Music technology partner `(partner, tech, music)`
+- [SIGEA](https://sigea.io) — Strategic technology partner `(partner, tech, partner)` ⚠️ canonical TBD vs `sigeacloud.io` — see §0
+- [Magnetiq](https://magnetiq.io) — Music technology partner `(partner, tech, music)` ⚠️ disputed identity — see §0
 - [Flix.fun](https://flix.fun) — Streaming and content partner `(partner, tech, streaming)`
 
 ##### Music & Artist Partners
 _Music industry partnerships_
 
-- [Quakey Nation](https://quakeynation.com) — Artist collective partnership `(partner, music, artists)`
+- [Quakey Nation](https://quakeynation.com) — Artist collective partnership `(partner, music, artists)` ⚠️ DEAD (NXDOMAIN, verified 2026-06-07) — see §0
 
 ##### DAO/Community Partners
 _Decentralized community partnerships_
 
-- [Flix.fun DAO](https://dao.flix.fun) — Community governance partner `(partner, base, dao, community)`
+- [Flix.fun DAO](https://dao.flix.fun) — Community governance partner `(partner, base, dao, community)` ⚠️ DEAD (NXDOMAIN, verified 2026-06-07) — see §0
 
 ##### Media Partners
 _Media and press partnerships_
 
-- [Blockchain Music News](https://blockchainmusicnews.com) — Media coverage partner `(partner, media, press)`
+- [Blockchain Music News](https://blockchainmusicnews.com) — Media coverage partner `(partner, media, press)` ⚠️ DEAD (NXDOMAIN, verified 2026-06-07) — see §0
 
 ### People of the ZAO
 _The team and community behind ZAO_

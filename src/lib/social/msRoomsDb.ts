@@ -16,16 +16,35 @@ export interface MSRoom {
   participant_count: number;
 }
 
+export interface SpeakerRequest {
+  id: string;
+  room_id: string;
+  requester_fid: number;
+  requester_name: string;
+  status: 'pending' | 'approved' | 'denied';
+  created_at: string;
+}
+
+/** True when a room runs in stage mode (host speaks, listeners raise hand). */
+export function isStageRoom(room: Pick<MSRoom, 'settings'>): boolean {
+  return room.settings?.room_type === 'stage';
+}
+
 export async function createMSRoom(data: {
   title: string;
   hostFid: number;
   hostName: string;
   roomId100ms?: string;
   gateConfig?: TokenGateConfig | null;
+  roomType?: 'stage' | 'video';
 }): Promise<MSRoom> {
-  // Token gate lives in the `settings` jsonb column (no dedicated column /
-  // migration). Read back via room.settings.gate_config and enforced
-  // client-side at /spaces/hms/[id], mirroring the Stream room flow.
+  // Token gate + room_type live in the `settings` jsonb column (no dedicated
+  // column / migration). Read back via room.settings.*. The gate is enforced
+  // client-side at /spaces/hms/[id]; room_type drives stage mode.
+  const settings: Record<string, unknown> = {};
+  if (data.gateConfig) settings.gate_config = data.gateConfig;
+  if (data.roomType) settings.room_type = data.roomType;
+
   const { data: room, error } = await supabaseAdmin
     .from('ms_rooms')
     .insert({
@@ -34,7 +53,7 @@ export async function createMSRoom(data: {
       host_name: data.hostName,
       room_id_100ms: data.roomId100ms || null,
       state: 'active',
-      settings: data.gateConfig ? { gate_config: data.gateConfig } : {},
+      settings,
     })
     .select()
     .single();
@@ -75,4 +94,82 @@ export async function endMSRoom(id: string): Promise<void> {
     .from('speaker_requests')
     .delete()
     .eq('room_id', id);
+}
+
+/** Approved speaker FIDs for a room (the host is always implicitly a speaker). */
+export function getRoomSpeakerFids(room: Pick<MSRoom, 'speakers'>): number[] {
+  return Array.isArray(room.speakers)
+    ? room.speakers.filter((s): s is number => typeof s === 'number')
+    : [];
+}
+
+/** Add a FID to a room's approved-speakers list (idempotent). */
+export async function addMSRoomSpeaker(roomId: string, fid: number): Promise<void> {
+  const room = await getMSRoomById(roomId);
+  if (!room) throw new Error('Room not found');
+  const speakers = getRoomSpeakerFids(room);
+  if (speakers.includes(fid)) return;
+  const { error } = await supabaseAdmin
+    .from('ms_rooms')
+    .update({ speakers: [...speakers, fid] })
+    .eq('id', roomId);
+  if (error) throw new Error(`Failed to add speaker: ${error.message}`);
+}
+
+/** Remove a FID from a room's approved-speakers list. */
+export async function removeMSRoomSpeaker(roomId: string, fid: number): Promise<void> {
+  const room = await getMSRoomById(roomId);
+  if (!room) throw new Error('Room not found');
+  const speakers = getRoomSpeakerFids(room).filter((f) => f !== fid);
+  const { error } = await supabaseAdmin
+    .from('ms_rooms')
+    .update({ speakers })
+    .eq('id', roomId);
+  if (error) throw new Error(`Failed to remove speaker: ${error.message}`);
+}
+
+/** Listener raises their hand. Replaces any prior request from the same FID so
+ * a re-raise after a deny starts fresh as pending. */
+export async function createSpeakerRequest(
+  roomId: string,
+  fid: number,
+  name: string,
+): Promise<SpeakerRequest> {
+  await supabaseAdmin
+    .from('speaker_requests')
+    .delete()
+    .eq('room_id', roomId)
+    .eq('requester_fid', fid);
+
+  const { data, error } = await supabaseAdmin
+    .from('speaker_requests')
+    .insert({ room_id: roomId, requester_fid: fid, requester_name: name, status: 'pending' })
+    .select()
+    .single();
+  if (error) throw new Error(`Failed to create speaker request: ${error.message}`);
+  return data;
+}
+
+export async function getSpeakerRequests(
+  roomId: string,
+  status?: SpeakerRequest['status'],
+): Promise<SpeakerRequest[]> {
+  let query = supabaseAdmin.from('speaker_requests').select('*').eq('room_id', roomId);
+  if (status) query = query.eq('status', status);
+  const { data, error } = await query.order('created_at', { ascending: true });
+  if (error) throw new Error(`Failed to fetch speaker requests: ${error.message}`);
+  return data || [];
+}
+
+export async function setSpeakerRequestStatus(
+  roomId: string,
+  fid: number,
+  status: SpeakerRequest['status'],
+): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('speaker_requests')
+    .update({ status })
+    .eq('room_id', roomId)
+    .eq('requester_fid', fid);
+  if (error) throw new Error(`Failed to update speaker request: ${error.message}`);
 }

@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/hooks/useAuth';
 import type { MSRoom } from '@/lib/social/msRoomsDb';
 
-const HMSRoom = dynamic(() => import('@/components/spaces/HMSRoom'), { ssr: false });
+const HMSVideoRoom = dynamic(() => import('@/components/spaces/HMSVideoRoom'), { ssr: false });
 
 async function fetchMSRoom(id: string): Promise<MSRoom> {
   const res = await fetch(`/api/100ms/rooms/${id}`);
@@ -85,9 +85,6 @@ export default function HMSRoomPage() {
 
   if (!room) return null;
 
-  const userName = user?.displayName || user?.username || `guest-${Math.random().toString(36).slice(2, 8)}`;
-  const role = isHost ? 'host' : 'listener';
-
   return (
     <div className="min-h-[100dvh] bg-[#0a1628] flex flex-col">
       <header className="px-4 py-3 border-b border-white/[0.08] bg-[#0d1b2a] flex items-center justify-between">
@@ -109,8 +106,13 @@ export default function HMSRoomPage() {
           )}
         </div>
       </header>
-      <div className="flex-1">
-        <HMSRoom userName={userName} role={role} onLeave={handleLeave} />
+      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+        <HMSVideoRoom
+          roomId={room.room_id_100ms ?? undefined}
+          roomName={room.room_id_100ms ? undefined : room.id}
+          role="speaker"
+          onLeave={handleLeave}
+        />
       </div>
     </div>
   );

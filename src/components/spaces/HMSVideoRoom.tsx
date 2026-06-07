@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import {
   HMSRoomProvider,
   useHMSActions,
@@ -15,6 +15,7 @@ import {
   selectScreenShareByPeerID,
   selectIsPeerAudioEnabled,
   selectDominantSpeaker,
+  selectBroadcastMessages,
 } from '@100mslive/react-sdk';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -29,6 +30,9 @@ import { useAuth } from '@/hooks/useAuth';
  */
 
 type Role = 'speaker' | 'listener';
+
+/** 100ms broadcast-message type used to tag live-transcription lines. */
+const TRANSCRIPT_TYPE = 'transcript';
 
 /** Renders a 100ms video track into a <video> element. */
 function VideoTile({ trackId, isLocal }: { trackId: string; isLocal?: boolean }) {
@@ -137,6 +141,68 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
   const { screenSharingPeerId, screenSharingPeerName, toggleScreenShare } = useScreenShare();
   const [status, setStatus] = useState<'joining' | 'connected' | 'error'>('joining');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Live transcription: each speaker transcribes their own mic locally (Web
+  // Speech API) and broadcasts final lines over the 100ms data channel as
+  // `transcript` messages, so every participant sees a live, multi-speaker feed.
+  // No server/DB — closing the tab clears it (persistence is a follow-up).
+  const broadcastMessages = useHMSStore(selectBroadcastMessages);
+  const transcriptLines = broadcastMessages.filter((m) => m.type === TRANSCRIPT_TYPE);
+  const [transcribing, setTranscribing] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const pendingTextRef = useRef('');
+
+  const toggleTranscription = useCallback(() => {
+    if (transcribing) {
+      recognitionRef.current?.stop();
+      recognitionRef.current = null;
+      setTranscribing(false);
+      return;
+    }
+
+    const hasSpeechApi = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+    if (!hasSpeechApi) {
+      setErrorMessage('Live transcription needs a Chromium browser (Chrome, Edge, Brave).');
+      return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognitionCtor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognitionCtor();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognitionRef.current = recognition;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const result of Array.from(event.results) as any[]) {
+        const transcript = (result[0]?.transcript ?? '').trim();
+        if (!transcript) continue;
+        if (result.isFinal) {
+          const text = `${pendingTextRef.current} ${transcript}`.trim();
+          pendingTextRef.current = '';
+          hmsActions.sendBroadcastMessage(text, TRANSCRIPT_TYPE).catch(() => {});
+        } else {
+          pendingTextRef.current = transcript;
+        }
+      }
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (e: any) => {
+      if (e.error === 'no-speech') return;
+      setTranscribing(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.start();
+    setTranscribing(true);
+  }, [transcribing, hmsActions]);
+
+  // Stop recognition on unmount.
+  useEffect(() => () => recognitionRef.current?.stop(), []);
 
   useEffect(() => {
     if (!user?.fid) return;
@@ -281,6 +347,12 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
               label="Share screen"
               activeLabel="Stop sharing"
             />
+            <ControlButton
+              active={transcribing}
+              onClick={toggleTranscription}
+              label="Transcribe"
+              activeLabel="Stop transcribing"
+            />
           </>
         ) : (
           <span className="text-xs text-gray-500">You joined as a listener — watching only.</span>
@@ -293,6 +365,47 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
           Leave room
         </button>
       </div>
+
+      {(transcribing || transcriptLines.length > 0) && (
+        <div className="rounded-xl border border-white/[0.08] bg-[#0d1b2a] px-4 py-3">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Live transcript
+              {transcribing && (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-red-400">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
+                  REC
+                </span>
+              )}
+            </h3>
+            {transcriptLines.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  const text = transcriptLines
+                    .map((m) => `${m.senderName || 'Speaker'}: ${m.message}`)
+                    .join('\n');
+                  navigator.clipboard?.writeText(text).catch(() => {});
+                }}
+                className="text-xs text-[#f5a623] hover:underline"
+              >
+                Copy
+              </button>
+            )}
+          </div>
+          {transcriptLines.length === 0 ? (
+            <p className="text-xs text-gray-500">Listening… speak and your words appear here for everyone.</p>
+          ) : (
+            <div className="max-h-48 space-y-1.5 overflow-y-auto text-sm">
+              {transcriptLines.slice(-40).map((m) => (
+                <p key={m.id} className="leading-snug text-gray-300">
+                  <span className="font-semibold text-white">{m.senderName || 'Speaker'}:</span> {m.message}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

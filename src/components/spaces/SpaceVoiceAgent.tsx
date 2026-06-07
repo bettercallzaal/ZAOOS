@@ -87,9 +87,11 @@ export function SpaceVoiceAgent({
         throw new Error(data.error || 'Could not start voice session');
       }
 
+      // Signed URLs use the WebSocket transport; WebRTC needs a separate
+      // conversation token. See @elevenlabs/client SessionConfig union.
       await conversation.startSession({
         signedUrl: data.signedUrl,
-        connectionType: 'webrtc',
+        connectionType: 'websocket',
       });
     } catch (error: unknown) {
       if (error instanceof DOMException && error.name === 'NotAllowedError') {

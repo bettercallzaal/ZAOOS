@@ -5,9 +5,15 @@ import {
   HMSRoomProvider,
   useHMSActions,
   useHMSStore,
+  useVideo,
+  useScreenShare,
   selectIsConnectedToRoom,
   selectPeers,
   selectIsLocalAudioEnabled,
+  selectIsLocalVideoEnabled,
+  selectVideoTrackByPeerID,
+  selectScreenShareByPeerID,
+  selectIsPeerAudioEnabled,
   selectDominantSpeaker,
 } from '@100mslive/react-sdk';
 import { useAuth } from '@/hooks/useAuth';
@@ -18,64 +24,120 @@ import { useAuth } from '@/hooks/useAuth';
  * two browsers (or with a teammate) is a full multiplayer test — without
  * touching the main /spaces flow or the `rooms` Supabase table.
  *
- * Unlike `HMSRoom`, this passes the caller's FID as `userId` (the token route
- * requires `userId === session.fid`) and requests the `speaker` role so any
- * authenticated tester can actually talk during the test.
+ * v2: adds camera + screen share + a video grid, reusing the same 100ms hooks
+ * and `speaker` role proven in HMSFishbowlRoom (the role already permits video
+ * and screenshare publish).
  */
 
-// Fixed room name → all testers share one room. Auto-provisioned 100ms-side by
-// the token route; no DB row needed.
 const TEST_ROOM_NAME = 'zao-audit-test';
 
 type Role = 'speaker' | 'listener';
 
-function PeerList() {
-  const peers = useHMSStore(selectPeers);
-  const dominantSpeaker = useHMSStore(selectDominantSpeaker);
-
+/** Renders a 100ms video track into a <video> element. */
+function VideoTile({ trackId, isLocal }: { trackId: string; isLocal?: boolean }) {
+  const { videoRef } = useVideo({ trackId });
   return (
-    <ul className="flex flex-col gap-2">
-      {peers.map((peer) => {
-        const isSpeaking = dominantSpeaker?.id === peer.id;
-        return (
-          <li
-            key={peer.id}
-            className={`flex items-center justify-between rounded-lg border px-3 py-2 transition-colors ${
-              isSpeaking
-                ? 'border-[#f5a623] bg-[#f5a623]/10'
-                : 'border-white/[0.08] bg-[#0d1b2a]'
-            }`}
-          >
-            <span className="flex items-center gap-2 text-sm text-white">
-              <span
-                className={`h-2 w-2 rounded-full ${
-                  isSpeaking ? 'bg-[#f5a623]' : 'bg-gray-600'
-                }`}
-              />
-              {peer.name}
-              {peer.isLocal && (
-                <span className="text-[10px] text-gray-500">(you)</span>
-              )}
-            </span>
-            <span className="text-[10px] uppercase tracking-wider text-gray-500">
-              {peer.roleName}
-            </span>
-          </li>
-        );
-      })}
-    </ul>
+    <video
+      ref={videoRef}
+      autoPlay
+      muted={isLocal}
+      playsInline
+      className="h-full w-full object-cover"
+    />
   );
 }
 
-function AuditTestRoomInner({ role }: { role: Role }) {
+/** Full-width screen-share surface. */
+function ScreenShareTile({ trackId }: { trackId: string }) {
+  const { videoRef } = useVideo({ trackId });
+  return (
+    <video ref={videoRef} autoPlay muted playsInline className="h-full w-full object-contain" />
+  );
+}
+
+function ScreenShareView({ peerId, peerName }: { peerId: string; peerName: string }) {
+  const screenShare = useHMSStore(selectScreenShareByPeerID(peerId));
+  if (!screenShare?.id) return null;
+  return (
+    <div className="relative mb-4 max-h-[420px] w-full overflow-hidden rounded-xl bg-black aspect-video">
+      <ScreenShareTile trackId={screenShare.id} />
+      <div className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
+        {peerName} is sharing their screen
+      </div>
+    </div>
+  );
+}
+
+/** One participant: live video when their camera is on, else an avatar tile. */
+function PeerTile({ peerId, peerName, isLocal }: { peerId: string; peerName: string; isLocal: boolean }) {
+  const videoTrack = useHMSStore(selectVideoTrackByPeerID(peerId));
+  const isAudioEnabled = useHMSStore(selectIsPeerAudioEnabled(peerId));
+  const dominantSpeaker = useHMSStore(selectDominantSpeaker);
+  const isSpeaking = dominantSpeaker?.id === peerId;
+  const hasVideo = Boolean(videoTrack?.enabled && videoTrack?.id);
+  const initial = (peerName || '?')[0]?.toUpperCase() ?? '?';
+
+  return (
+    <div
+      className={`relative flex aspect-video items-center justify-center overflow-hidden rounded-xl border bg-[#0d1b2a] transition-colors ${
+        isSpeaking ? 'border-[#f5a623] shadow-[0_0_14px_rgba(245,166,35,0.35)]' : 'border-white/[0.08]'
+      }`}
+    >
+      {hasVideo && videoTrack?.id ? (
+        <VideoTile trackId={videoTrack.id} isLocal={isLocal} />
+      ) : (
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#1a2a3a] to-[#0d1b2a] text-lg font-semibold text-white">
+          {initial}
+        </div>
+      )}
+      <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">
+        {!isAudioEnabled && (
+          <svg className="h-3 w-3 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5.586 5.586A2 2 0 005 7v0m1 4v1a6 6 0 006 6m0 0v3m0-3a6 6 0 003.293-.98M12 1a3 3 0 013 3v6M3 3l18 18" />
+          </svg>
+        )}
+        <span className="max-w-[7rem] truncate">
+          {peerName}
+          {isLocal && ' (you)'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+interface ControlButtonProps {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  activeLabel: string;
+}
+
+function ControlButton({ active, onClick, label, activeLabel }: ControlButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+        active
+          ? 'bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]'
+          : 'border border-white/20 text-white hover:bg-white/10'
+      }`}
+    >
+      {active ? activeLabel : label}
+    </button>
+  );
+}
+
+function AuditTestRoomInner({ role, onLeave }: { role: Role; onLeave: () => void }) {
   const { user } = useAuth();
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
+  const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const peers = useHMSStore(selectPeers);
-  const [status, setStatus] = useState<'joining' | 'connected' | 'error'>(
-    'joining',
-  );
+  const { screenSharingPeerId, screenSharingPeerName, toggleScreenShare } = useScreenShare();
+  const [status, setStatus] = useState<'joining' | 'connected' | 'error'>('joining');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -89,11 +151,7 @@ function AuditTestRoomInner({ role }: { role: Role }) {
         const res = await fetch('/api/100ms/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: String(user.fid),
-            role,
-            roomName: TEST_ROOM_NAME,
-          }),
+          body: JSON.stringify({ userId: String(user.fid), role, roomName: TEST_ROOM_NAME }),
         });
         const data = await res.json();
         if (!res.ok || !data.token) {
@@ -125,6 +183,16 @@ function AuditTestRoomInner({ role }: { role: Role }) {
   const toggleMute = async () => {
     await hmsActions.setLocalAudioEnabled(!isLocalAudioEnabled);
   };
+  const toggleVideo = async () => {
+    await hmsActions.setLocalVideoEnabled(!isLocalVideoEnabled);
+  };
+  const handleScreenShare = async () => {
+    try {
+      await toggleScreenShare?.();
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : 'Screen share failed');
+    }
+  };
 
   if (status === 'error') {
     return (
@@ -132,23 +200,29 @@ function AuditTestRoomInner({ role }: { role: Role }) {
         <p className="text-red-400">{errorMessage}</p>
         <p className="max-w-sm text-xs text-gray-500">
           If this says configuration missing, the 100ms env vars
-          (NEXT_PUBLIC_100MS_ACCESS_KEY, HMS_APP_SECRET,
-          NEXT_PUBLIC_100MS_TEMPLATE_ID) are not set on this environment.
+          (NEXT_PUBLIC_100MS_ACCESS_KEY, HMS_APP_SECRET, NEXT_PUBLIC_100MS_TEMPLATE_ID)
+          are not set on this environment.
         </p>
+        <button
+          type="button"
+          onClick={onLeave}
+          className="rounded-lg border border-white/20 px-4 py-1.5 text-sm text-white hover:bg-white/10"
+        >
+          Back
+        </button>
       </div>
     );
   }
 
   if (status === 'joining') {
-    return (
-      <div className="flex items-center justify-center py-10 text-gray-400">
-        Joining the test room…
-      </div>
-    );
+    return <div className="flex items-center justify-center py-10 text-gray-400">Joining the test room…</div>;
   }
+
+  const canPublish = role === 'speaker';
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Status bar */}
       <div className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-[#0d1b2a] px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
@@ -158,34 +232,57 @@ function AuditTestRoomInner({ role }: { role: Role }) {
           <span className="text-sm font-medium text-white">Live</span>
           <span className="text-xs text-gray-500">{peers.length} in room</span>
         </div>
-        {role === 'speaker' && (
-          <button
-            type="button"
-            onClick={toggleMute}
-            className={`rounded-lg px-4 py-1.5 text-sm font-semibold transition-colors ${
-              isLocalAudioEnabled
-                ? 'bg-[#f5a623] text-[#0a1628] hover:bg-[#ffd700]'
-                : 'border border-white/20 text-white hover:bg-white/10'
-            }`}
-          >
-            {isLocalAudioEnabled ? 'Mute' : 'Unmute'}
-          </button>
-        )}
       </div>
 
-      <PeerList />
+      {/* Screen share (if anyone is sharing) */}
+      {screenSharingPeerId && (
+        <ScreenShareView peerId={screenSharingPeerId} peerName={screenSharingPeerName || 'Someone'} />
+      )}
+
+      {/* Participant grid */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {peers.map((peer) => (
+          <PeerTile key={peer.id} peerId={peer.id} peerName={peer.name} isLocal={peer.isLocal} />
+        ))}
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/[0.08] bg-[#0d1b2a] px-4 py-3">
+        {canPublish ? (
+          <>
+            <ControlButton active={isLocalAudioEnabled} onClick={toggleMute} label="Unmute" activeLabel="Mute" />
+            <ControlButton active={isLocalVideoEnabled} onClick={toggleVideo} label="Start video" activeLabel="Stop video" />
+            <ControlButton
+              active={Boolean(screenSharingPeerId)}
+              onClick={handleScreenShare}
+              label="Share screen"
+              activeLabel="Stop sharing"
+            />
+          </>
+        ) : (
+          <span className="text-xs text-gray-500">You joined as a listener — watching only.</span>
+        )}
+        <button
+          type="button"
+          onClick={onLeave}
+          className="ml-auto rounded-lg border border-white/20 px-4 py-2 text-sm text-white transition-colors hover:bg-white/10"
+        >
+          Leave room
+        </button>
+      </div>
     </div>
   );
 }
 
 interface AuditTestRoomProps {
   role: Role;
+  onLeave: () => void;
 }
 
-export default function AuditTestRoom({ role }: AuditTestRoomProps) {
+export default function AuditTestRoom({ role, onLeave }: AuditTestRoomProps) {
   return (
     <HMSRoomProvider>
-      <AuditTestRoomInner role={role} />
+      <AuditTestRoomInner role={role} onLeave={onLeave} />
     </HMSRoomProvider>
   );
 }

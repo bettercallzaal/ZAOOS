@@ -110,16 +110,7 @@ export default function AuditTestPage() {
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            <AuditTestRoom role={role} />
-            <button
-              type="button"
-              onClick={() => setJoined(false)}
-              className="self-start rounded-lg border border-white/20 px-4 py-1.5 text-sm text-white transition-colors hover:bg-white/10"
-            >
-              Leave room
-            </button>
-          </div>
+          <AuditTestRoom role={role} onLeave={() => setJoined(false)} />
         )}
       </div>
     </div>

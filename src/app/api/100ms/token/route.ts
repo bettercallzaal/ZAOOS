@@ -3,6 +3,7 @@ import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { getMSRoomById, isStageRoom, getRoomSpeakerFids } from '@/lib/social/msRoomsDb';
 import { logger } from '@/lib/logger';
 
 const TokenSchema = z.object({
@@ -56,6 +57,24 @@ export async function POST(req: NextRequest) {
     }
     if ((role === 'host' || role === 'moderator') && !session.isAdmin && !isFishbowlHost) {
       return NextResponse.json({ error: 'Forbidden: only admins can request moderator role' }, { status: 403 });
+    }
+
+    // Stage rooms (100ms): only the host or an approved speaker may publish.
+    // roomName carries the ms_rooms UUID for these rooms; fishbowl rooms use a
+    // 'fishbowl-' prefix and the shared default uses 'zao-live-room'. Without
+    // this check any signed-in listener could mint a speaker token directly.
+    if (role === 'speaker' && roomName && !roomName.startsWith('fishbowl-') && roomName !== 'zao-live-room') {
+      const msRoom = await getMSRoomById(roomName);
+      if (msRoom && isStageRoom(msRoom)) {
+        const authorized =
+          session.fid === msRoom.host_fid || getRoomSpeakerFids(msRoom).includes(session.fid);
+        if (!authorized) {
+          return NextResponse.json(
+            { error: 'Not approved to speak in this room' },
+            { status: 403 },
+          );
+        }
+      }
     }
 
     // Generate management token

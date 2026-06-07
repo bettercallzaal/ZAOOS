@@ -21,6 +21,8 @@ const GateConfigSchema = z
 const CreateSchema = z.object({
   title: z.string().min(1).max(100),
   gate_config: GateConfigSchema,
+  // 'stage' = host speaks, listeners raise hand; anything else = open video room.
+  room_type: z.enum(['stage', 'voice_channel']).optional(),
 });
 
 // Public list of active 100ms rooms — powers the "Live on 100ms" section on
@@ -53,6 +55,7 @@ export async function POST(req: NextRequest) {
       hostFid: session.fid,
       hostName: session.displayName,
       gateConfig: parsed.data.gate_config ?? undefined,
+      roomType: parsed.data.room_type === 'stage' ? 'stage' : 'video',
     });
 
     return NextResponse.json({ room });

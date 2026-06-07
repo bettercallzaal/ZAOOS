@@ -196,3 +196,127 @@ export function startHeartbeat(
   (handle as { unref?: () => void }).unref?.();
   return () => clearInterval(handle);
 }
+
+// ===========================================================================
+// Control plane (doc 800 Phases 2-4) — pull-based command queue.
+// A bot polls its own pending commands, executes, and posts results back.
+// All dormant-safe + fault-tolerant like the rest of this client.
+// ===========================================================================
+
+export interface BotCommand {
+  id: number;
+  bot: string;
+  command: string;
+  args: Record<string, unknown> | null;
+  status: string;
+  created_at: string;
+}
+
+/** Pull + atomically claim this bot's pending commands (its own queue). */
+export function getCommands(): Promise<CoworkResult<{ commands: BotCommand[] }>> {
+  return request<{ commands: BotCommand[] }>('GET', '/api/v1/bots/commands');
+}
+
+/** Pull + claim pending host commands (start|stop). Fleet-agent ("fleet" token) only. */
+export function getHostCommands(): Promise<CoworkResult<{ commands: BotCommand[] }>> {
+  return request<{ commands: BotCommand[] }>('GET', '/api/v1/bots/commands?scope=host');
+}
+
+/** Report the outcome of a claimed command. */
+export function postCommandResult(
+  id: number,
+  status: 'done' | 'error',
+  result?: Record<string, unknown>,
+): Promise<CoworkResult<unknown>> {
+  return request<unknown>(
+    'POST',
+    `/api/v1/bots/commands/${id}/result`,
+    result === undefined ? { status } : { status, result },
+  );
+}
+
+/**
+ * Handlers a bot supplies to startCommandPoller. All optional: a bot that omits
+ * onRunTask/onAsk reports those commands as unsupported (error result), so the
+ * board shows a clear outcome rather than silently dropping them. Lifecycle
+ * (pause/resume/restart) is handled generically below.
+ */
+export interface CommandHandlers {
+  onPause?: () => void;
+  onResume?: () => void;
+  onRunTask?: (args: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  onAsk?: (args: Record<string, unknown>) => Promise<Record<string, unknown>>;
+}
+
+async function executeCommand(cmd: BotCommand, h: CommandHandlers): Promise<void> {
+  try {
+    switch (cmd.command) {
+      case 'pause':
+        h.onPause?.();
+        await postCommandResult(cmd.id, 'done', { message: 'paused' });
+        return;
+      case 'resume':
+        h.onResume?.();
+        await postCommandResult(cmd.id, 'done', { message: 'resumed' });
+        return;
+      case 'restart':
+        // Report first, then exit non-zero so systemd restarts the unit
+        // (zoe-bot Restart=on-failure, zaostock-bot Restart=always).
+        await postCommandResult(cmd.id, 'done', { message: 'restarting' });
+        setTimeout(() => process.exit(1), 500);
+        return;
+      case 'run_task': {
+        if (!h.onRunTask) {
+          await postCommandResult(cmd.id, 'error', { error: 'run_task not supported by this bot' });
+          return;
+        }
+        const result = await h.onRunTask(cmd.args ?? {});
+        await postCommandResult(cmd.id, 'done', result);
+        return;
+      }
+      case 'ask': {
+        if (!h.onAsk) {
+          await postCommandResult(cmd.id, 'error', { error: 'ask not supported by this bot' });
+          return;
+        }
+        const result = await h.onAsk(cmd.args ?? {});
+        await postCommandResult(cmd.id, 'done', result);
+        return;
+      }
+      default:
+        await postCommandResult(cmd.id, 'error', { error: `unknown command: ${cmd.command}` });
+    }
+  } catch (err) {
+    await postCommandResult(cmd.id, 'error', {
+      error: err instanceof Error ? err.message : 'execution failed',
+    });
+  }
+}
+
+/**
+ * Poll this bot's command queue on a timer and execute claimed commands.
+ * No-op while dormant. Returns a stop() function. Commands run sequentially
+ * per tick so a long run_task/ask doesn't overlap the next poll's work.
+ */
+export function startCommandPoller(handlers: CommandHandlers, intervalMs = 20_000): () => void {
+  if (!coworkEnabled()) return () => {};
+  let running = false;
+  const tick = async (): Promise<void> => {
+    if (running) return;
+    running = true;
+    try {
+      const res = await getCommands();
+      if (res.ok && res.data?.commands?.length) {
+        for (const cmd of res.data.commands) {
+          await executeCommand(cmd, handlers);
+        }
+      }
+    } finally {
+      running = false;
+    }
+  };
+  void tick();
+  const handle = setInterval(() => void tick(), intervalMs);
+  (handle as { unref?: () => void }).unref?.();
+  return () => clearInterval(handle);
+}

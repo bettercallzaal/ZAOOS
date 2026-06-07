@@ -58,15 +58,18 @@ await markDone(123, 'handled out-of-band');
 const stop = startHeartbeat(60_000, () => 'up', { unit: 'zoe-bot' });
 ```
 
-## Wire-up status (staged — flip on once tokens exist)
+## Wire-up status
 
-The client is built and dormant. To activate, per bot, add one line at startup:
+Heartbeats are **wired into the live bot startups** (env-gated — no-op until tokens exist):
 
-- **ZOE** (`bot/src/zoe/index.ts`): `startHeartbeat(60_000, () => 'up', { unit: 'zoe-bot' });`
-- **ZAO Devz** (`bot/src/devz/index.ts`): `startHeartbeat(60_000, () => 'up', { unit: 'zao-devz-stack' });`
-- **ZAOstock** (`bot/src/index.ts`): `startHeartbeat(60_000, () => 'up', { unit: 'zaostock-bot' });`
-- **Hermes** (`bot/src/hermes/runner.ts`): call `pushItem`/`markDone` only where a
-  task is created or closed outside the normal PR-merge path.
+- ✅ **ZOE** (`bot/src/zoe/index.ts`) — `unit: 'zoe-bot'`
+- ✅ **ZAO Devz** (`bot/src/devz/index.ts`) — `unit: 'zao-devz-stack'` (covers devz + hermes, same process)
+- ✅ **ZAOstock** (`bot/src/index.ts`) — `unit: 'zaostock-bot'`
+- ⏳ **Team bots** (`bot/src/teams/index.ts`) — NOT wired; boots Magnetiq/AttaBotty which doc 601 flagged to fold into ZOE. Confirm live before adding.
+
+Still manual (no obvious call site yet):
+- **Hermes `pushItem`/`markDone`** — call only where a task is created/closed *outside* the normal PR-merge path (merge closes are auto-handled by cowork's webhook).
+- **ZOE / `/meeting` `pushItem`** — wire when the capture→cowork push is built.
 
 ## Go-live checklist
 

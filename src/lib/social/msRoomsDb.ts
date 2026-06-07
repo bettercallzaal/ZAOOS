@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/db/supabase';
+import type { TokenGateConfig } from '@/lib/spaces/tokenGate';
 
 export interface MSRoom {
   id: string;
@@ -20,7 +21,11 @@ export async function createMSRoom(data: {
   hostFid: number;
   hostName: string;
   roomId100ms?: string;
+  gateConfig?: TokenGateConfig | null;
 }): Promise<MSRoom> {
+  // Token gate lives in the `settings` jsonb column (no dedicated column /
+  // migration). Read back via room.settings.gate_config and enforced
+  // client-side at /spaces/hms/[id], mirroring the Stream room flow.
   const { data: room, error } = await supabaseAdmin
     .from('ms_rooms')
     .insert({
@@ -29,6 +34,7 @@ export async function createMSRoom(data: {
       host_name: data.hostName,
       room_id_100ms: data.roomId100ms || null,
       state: 'active',
+      settings: data.gateConfig ? { gate_config: data.gateConfig } : {},
     })
     .select()
     .single();

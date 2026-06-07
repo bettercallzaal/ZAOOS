@@ -169,6 +169,7 @@ def main():
             name=f"research:{topic}:{doc_id}:{slug}",
             body=body,
             source_description=f"zaoos-research:{rel}",
+            provenance="canonical",  # ZAOOS research README, verifiable source
         )
         # Gentle pacing to be nice to the API
         time.sleep(0.2)

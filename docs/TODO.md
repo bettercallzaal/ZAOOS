@@ -52,6 +52,25 @@ Purpose: Zaal's personal assistant on Telegram. Morning briefs, voice memos, con
 - [ ] **P2** Evaluate MPP for streaming payments (fractal meetings, live rooms)
 - [ ] **P3** Multi-agent coordination via Quilibrium (await Session 10 transcript)
 
+### Flow-Aware Intake (Rian Doris flow cycle + capture)
+
+Note (2026-06-07): Design frame for how ZOE takes in info from people. Core idea —
+ZOE is Zaal's *smart impulsivity outlet* (Rian Doris's "paper notebook beside you
+during a flow block"): frictionless one-way capture in the moment, structure async
+later, surface for review during recovery windows. Flow cycle = struggle -> release
+-> flow -> recovery. Zaal's ask on "flow": just be *reminded* of the framework, not
+detect a flow state. Captured from Rian Doris / FlowState emails. Builds on doc 796.
+
+- [ ] **P1** Ingest Rian Doris flow framework into ZABAL Bonfire (flow cycle, 3 levers, Flow Fortress, impulsivity outlet, allostatic load, active recovery) so it is recallable
+- [ ] **P1** ZOE capture = dumb-at-capture: silent/minimal ack (✓ reaction, no chatty reply), structure async — a chatty reply re-creates the distraction portal + resets the struggle clock
+- [ ] **P1** Flow-aware timing: hold + batch non-urgent, release only at recovery windows (morning brief / EOD reflect), never mid-block (reframes doc 796 gate: cost of a mistimed ping = 10-20min reload tax, not 30s)
+- [ ] **P2** Brief outputs 3-10 specific next-actions (first-step-of-first-step), never vague projects — Rian's clear-goals lever
+- [ ] **P2** Reminder role: ZOE surfaces flow concepts on grind days / when recovery skipped (answers the "just remind me" ask; auto-enabled once framework is ingested + recallable)
+- [ ] **P2** Commitment extraction from sent mail ("what did I commit to this week that's still open?")
+- [ ] **P2** Granola-style silent call transcription -> ZOE structures commitments/decisions after, no bot in the room
+- [ ] **P2** Save the reusable auto-structure ingest prompt as a snippet/skill (paste + raw dump -> graph, with fidelity/provenance/dedupe/supersede rails)
+- [ ] **P3** ZOE guards the active-recovery calendar (5min/hr, 1hr/day, 1day/wk, 1wk/quarter) — the thing cut first under pressure
+
 ---
 
 ## BOOTCAMP (Farcaster Agentic Bootcamp - Feed Full Transcripts)

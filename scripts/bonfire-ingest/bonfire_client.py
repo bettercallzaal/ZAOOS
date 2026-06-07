@@ -33,6 +33,11 @@ import urllib.request
 import uuid as _uuid
 
 import secret_scan
+import pii_scan
+
+# doc 798 Finding 1 — provenance tiers. Confidence the SERVER returns is
+# decorative (1.0 on fabrications); these are the trust tiers WE stamp at write.
+PROVENANCE_TIERS = {"canonical", "reported", "inferred"}
 
 
 class IngestPipeline:
@@ -49,10 +54,30 @@ class IngestPipeline:
 
         self.now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         self.epoch = int(time.time())
-        self.results = {"sent": [], "blocked": [], "failed": [], "sanitized": []}
+        self.results = {
+            "sent": [], "blocked": [], "failed": [], "sanitized": [], "pii_blocked": [],
+        }
 
-    def ingest(self, name, body, source_description, reference_time=None, source="text"):
-        """Single-episode ingest. Returns dict with status info."""
+    def ingest(self, name, body, source_description, reference_time=None,
+               source="text", provenance="reported"):
+        """Single-episode ingest. Returns dict with status info.
+
+        provenance (doc 798 Finding 1 — calibration): the trust tier the caller
+        VOUCHES FOR. Stamped into the episode body so recall can cite it instead
+        of leaning on the server's decorative `Confidence: 1.0`:
+          - canonical : sourced from repo code / a ZAOOS research README / a doc
+                        Zaal authored. Verifiable.
+          - reported  : a single human's assertion (meeting/chat), unverified.
+          - inferred  : the agent connected facts itself. Lowest trust — this is
+                        the tier the three transcript fabrications actually were.
+        The forthcoming deep-thinking writer bot MUST decide this consciously
+        per write, which is the whole point: no fact enters untiered.
+        """
+        if provenance not in PROVENANCE_TIERS:
+            raise ValueError(f"provenance must be one of {sorted(PROVENANCE_TIERS)}, got {provenance!r}")
+        # Stamp the tier so it travels with the fact into recall.
+        body = f"[provenance: {provenance}]\n\n{body}"
+
         # Mandatory pre-flight scan
         scan = secret_scan.preflight(body, label=name)
         high = scan["summary"].get("HIGH", 0)
@@ -83,6 +108,37 @@ class IngestPipeline:
             for h in scan["hits"]:
                 if h["severity"] in ("MED", "LOW"):
                     print(f"  [{h['severity']}] {name}: {h['pattern']} {h['excerpt']}")
+
+        # Second gate: PII scan (sibling to the secret gate, distinct policy).
+        # Catches structured third-party PII — phone / SSN / card / address /
+        # personal email / personal Telegram handle. HIGH blocks; MED logs.
+        # Does NOT catch names or free-text health disclosures (regex can't) —
+        # the bot's human "Approve?" step remains the backstop for those.
+        # See scripts/bonfire-ingest/pii_scan.py + doc 798.
+        pii = pii_scan.preflight(body, label=name)
+        pii_high = pii["summary"].get("HIGH", 0)
+        if pii_high > 0:
+            if not self.sanitize:
+                self.results["pii_blocked"].append({
+                    "name": name,
+                    "source_description": source_description,
+                    "high": pii_high,
+                    "med": pii["summary"].get("MED", 0),
+                    "hits": pii["hits"],
+                })
+                print(f"  [PII-BLOCKED] {name}: {pii_high} HIGH-severity PII hits - not posting")
+                for h in pii["hits"]:
+                    if h["severity"] == "HIGH":
+                        print(f"             - {h['pattern']:26s} {h['excerpt']}")
+                return {"status": "pii_blocked", "pii_high_hits": pii_high}
+            else:
+                body, _ = pii_scan.sanitize_text(body)
+                self.results["sanitized"].append({"name": name, "pii_high": pii_high})
+                print(f"  [PII-SANITIZED] {name}: {pii_high} HIGH-severity PII hits redacted")
+        if pii["summary"].get("MED", 0) > 0:
+            for h in pii["hits"]:
+                if h["severity"] == "MED":
+                    print(f"  [PII-MED] {name}: {h['pattern']} {h['excerpt']}")
 
         # v0.2 - generate a client-side UUID per episode + supply via the
         # `uuid` field on CreateEpisodeDirectRequest. The Bonfires API accepts
@@ -133,6 +189,7 @@ class IngestPipeline:
                     "uuid": episode_uuid,
                     "task": task,
                     "source_description": source_description,
+                    "provenance": provenance,
                 })
                 print(f"  [OK] {name} -> uuid={episode_uuid[:8]}... task={task}")
                 return {"status": "sent", "uuid": episode_uuid, "task_id": task}
@@ -183,6 +240,11 @@ if __name__ == "__main__":
     p.ingest(
         name="test:2",
         body="This has a synthetic key-shaped string sk-ant-FAKE000FAKE000FAKE000FAKE000FAKE",
+        source_description="test",
+    )
+    p.ingest(
+        name="test:3-pii",
+        body="Contact info leak: call (555) 123-4567 or SSN 123-45-6789.",
         source_description="test",
     )
     p.report(manifest_path="/tmp/test-manifest.json")

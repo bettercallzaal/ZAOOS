@@ -121,6 +121,7 @@ def main():
             name=f"github:{name}",
             body=body,
             source_description=f"bettercallzaal-github:{name}",
+            provenance="canonical",  # repo README, verifiable source
         )
         time.sleep(0.25)
 

@@ -2,6 +2,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
+import { startHeartbeat } from './lib/cowork';
 import {
   resolveMember,
   linkUsernameToMember,
@@ -592,6 +593,8 @@ bot.catch((err) => {
 // ---- Startup ---------------------------------------------------------------
 
 console.log('[zaostock-bot] starting...');
+// Heartbeat to the coworking status board (dormant unless COWORK_API_URL/TOKEN set).
+startHeartbeat(60_000, () => 'up', { unit: 'zaostock-bot' });
 bot.start({
   onStart: async (info) => {
     console.log(`[zaostock-bot] running as @${info.username}`);

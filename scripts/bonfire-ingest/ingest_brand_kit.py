@@ -82,6 +82,7 @@ def main():
             name=f"brand:{brand['id']}",
             body=body,
             source_description=f"bcz-brand-kit:{brand['id']}",
+            provenance="canonical",  # official BCZ brand kit
         )
     p.report()
 

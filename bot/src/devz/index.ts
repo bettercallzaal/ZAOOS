@@ -24,6 +24,7 @@ import { listOpenRuns, getRun } from '../hermes/db';
 import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import * as http from 'node:http';
+import { startHeartbeat } from '../lib/cowork';
 
 const devzToken = process.env.ZAO_DEVZ_BOT_TOKEN;
 const hermesToken = process.env.HERMES_BOT_TOKEN;
@@ -484,6 +485,9 @@ async function boot(): Promise<void> {
   console.log(`[devz] ZAODevzBot=@${devzInfo.username} HermesBot=@${hermesInfo.username} chat=${devzChatId}`);
 
   startHermesHttpListener();
+
+  // Heartbeat to the coworking status board (covers devz + hermes; dormant unless COWORK_API_URL/TOKEN set).
+  startHeartbeat(60_000, () => 'up', { unit: 'zao-devz-stack', bots: ['zaodevz', 'hermes'] });
 
   await Promise.all([
     devz.start({ drop_pending_updates: true, onStart: () => console.log('[devz] ZAODevzBot polling') }),

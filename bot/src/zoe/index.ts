@@ -18,6 +18,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
+import { startHeartbeat } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
@@ -1310,6 +1311,8 @@ async function main(): Promise<void> {
     console.warn('[zoe/index] task seed failed (nbd):', (err as Error).message);
   }
 
+  // Heartbeat to the coworking status board (dormant unless COWORK_API_URL/TOKEN set).
+  startHeartbeat(60_000, () => 'up', { unit: 'zoe-bot' });
   await bot.start({
     onStart: (info) => {
       console.log(`[zoe/index] polling as @${info.username}`);

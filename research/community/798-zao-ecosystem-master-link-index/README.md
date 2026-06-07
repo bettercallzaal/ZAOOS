@@ -21,6 +21,8 @@ scope: "every meaningful link discoverable in the ZAOOS monorepo: curated ZAO/ec
 ## §0 — Audit Addendum: Verified-Dead & Conflicting Links
 
 > **Verified 2026-06-07** via DNS resolution + HTTP probe (control: `thezao.com` / `midipunkz.com` resolve, so failures below are genuine NXDOMAIN, not a network-policy block). This section is hand-authored and survives §5/§6 regeneration. Do **not** sync the entries below into any external link directory (e.g. zaonexus).
+>
+> **Remediation (2026-06-07):** `src/lib/nexus/links.ts` (the source that generates §5 and feeds the live ecosystem page) was pruned to verified-live links only — the dead/placeholder entries below were removed and the surfaces that map to a real canonical URL were fixed to the `community.config.ts` value (`thezao.com`, `discord.gg/thezao`, `t.me/thezao`, `app.magnetiq.xyz`, `sigeacloud.io`). Regenerate §5 to drop the stale rows here.
 
 **Dead — NXDOMAIN (host does not resolve):**
 

@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-06-06 | ZABAL Games workshop - ZAO Fractal intro (solo teaching, Respect Game + Discord tooling) | ZABAL Games | Zaal | [808](808-zabal-games-zao-fractal-intro-workshop-jun6/) | 3 |
 | 2026-06-06 | ZABAL Games fireside - Carlos (Plat0x / Bonfires) x Zaal - vibe-coding + Bonfires workshop | ZAO Devz | Zaal, Carlos (Plat0x) | [807](807-zabal-games-fireside-carlos-bonfires-jun6/) | 5 |
 | 2026-06-06 | Arun Phillips x Zaal - collaboration catch-up (DreamStarter, ZABAL Games, WaveWarZ India) | ZAO Devz | Zaal, Arun Phillips | [805](805-arun-phillips-collab-jun6/) | 10 |
 | 2026-06-01 | Rodrigo Nuñez (Rodo) x Zaal - DeSci / conservation collaboration + ZABAL Games | ZAO Devz | Zaal, Rodrigo Nuñez | [806](806-rodrigo-nunez-desci-collab-jun1/) | 8 |
@@ -18,7 +19,10 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 | 2026-05-27 17:01 | Ven (The Open Machine) x Zaal - catch-up + collaboration | Networking | Zaal, Ven | [782](782-ven-open-machine-catchup-may27/) | 4 |
 | 2026-05-27 16:30 | Tyler / Magnetic x Zaal + team - ZABAL Games build on Magnetic | ZABAL Games | Zaal, Tyler Stambaugh, Samantha, Shawn | [778](778-tyler-magnetic-zabal-games-build-may27/) | 9 |
 | 2026-05-26 19:03 | Adrian (Empire Builder) x Zaal - Empire Builder workshop for ZABAL Games | ZABAL Games | Zaal, Adrian | [780](780-adrian-empire-builder-zabal-workshop-may26/) | 6 |
+| 2026-05-26 14:02 | Dcoop x Zaal + Sam - Zaoville DC day-party planning (run of show + lineup) | ZAO Festivals / Zaoville | Zaal, Sam, Dcoop | [814](814-dcoop-zaoville-dc-dayparty-planning-may26/) | 7 |
 | 2026-05-25 14:26 | Leeward x Zaal WebRTC + Pion + LiveKit handoff (2nd call) | ZAO Devz | Zaal, Leeward (Lee Edward Bound) | [752](752-leeward-x-zaal-webrtc-pion-livekit-handoff-may25/) | 7 |
+| 2026-05-25 14:00 | Duh x Zaal - Music X AI catch-up (Cadence, ZABAL Games, festival sponsors) | ZAO Devz | Zaal, Duh | [813](813-duh-cadence-music-ai-catchup-may25/) | 6 |
+| 2026-05-25 12:07 | attabotty x Zaal - VJ streaming setup + AI out-of-body performance agent | ZAO Devz / COC | Zaal, attabotty | [812](812-atta-streaming-ai-agent-vj-setup-may25/) | 7 |
 | 2026-05-25 | Telamon Ardavanis x Zaal - Edge Esmeralda invite + Goa | Networking | Zaal, Telamon Ardavanis | [777](777-telamon-edge-esmeralda-may25/) | 4 |
 | 2026-05-23 12:05 | Duo Do (Clementine + Santiago) x Zaal - ZABAL Games musician talk format | ZABAL Games | Zaal, Clementine, Santiago | [776](776-duo-do-clementine-santiago-zabal-games-may23/) | 5 |
 | 2026-05-23 9:12 | ZAO coworking - 1h17m, mostly background music + brief Discord-bot-on-VPS chat | ZAO Devz | Zaal, Iman, ThyRev, z3rodol | [753](753-may23-zaal-iman-thyrev-z3rodol-coworking/) | 3 |
@@ -45,7 +49,10 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 | 2026-05-12 | ZAOstock standup - musician submission deadline | ZAOstock | Zaal, Iman, ThyRev, Samantha, failoften, Adam | [721](721-zaostock-standup-may12/) | 4 |
 | 2026-05-04 | ZAOstock cobuild - six circles | ZAOstock | team | [609](609-zaostock-cobuild-six-circles-may4/) | n/a |
 | 2026-05-04 | WaveWarZ Africa - RAM + SongChainn | WaveWarZ | team | [608](608-wavewarz-africa-ram-songchain-may4/) | n/a |
+| 2026-05-03 | Chikodi (Chika) x Zaal - ZAOstock volunteer onboarding (marketing -> ops/PM) | ZAOstock | Zaal, Chikodi | [811](811-chikodi-zaostock-volunteer-onboarding-may3/) | 6 |
 | 2026-05-xx | Adam sync - commercial leaderboard | ZAOstock | Zaal, Adam | [599](../business/599-adam-meeting-may2026-commercial-leaderboard/) | n/a |
+| 2026-04-30 | Roddy (Ellsworth Parks/Rec) x Zaal - ZAOstock Oct 3 Parklet lock + tent extension | ZAOstock | Zaal, Roddy Ehrlenbach | [809](809-roddy-zaostock-parklet-lock-apr30/) | 10 |
+| 2026-04-29 | Kshitij Garg + Rishabh (DDAN pop-up stays) x Zaal + Sam - DevCon India collab | ZAO Devz | Zaal, Sam, Kshitij Garg, Rishabh | [810](810-kshitij-rishabh-ddan-devcon-india-apr29/) | 7 |
 | 2026-04-22 | ZAOstock Apr 22 team recap | ZAOstock | team | [476](476-zaostock-apr22-team-recap/) | n/a |
 | 2026-xx-xx | Intori SCIS + Tuum Tech DB meeting | ZAO OS | Zaal + Intori | [571](../farcaster/571-intori-scis-tuum-tech-db-meeting/) | n/a |
 

@@ -128,7 +128,7 @@ interface HMSVideoRoomInnerProps {
 }
 
 function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInnerProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
@@ -163,6 +163,10 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
         await hmsActions.join({
           userName: user.displayName || user.username || `fid-${user.fid}`,
           authToken: data.token,
+          // Join with mic + camera OFF — users opt in via the controls. Avoids
+          // broadcasting a camera the moment you land, and means listeners
+          // (no controls) never publish.
+          settings: { isAudioMuted: true, isVideoMuted: true },
         });
       } catch (err: unknown) {
         if (cancelled) return;
@@ -195,6 +199,27 @@ function HMSVideoRoomInner({ roomId, roomName, role, onLeave }: HMSVideoRoomInne
       setErrorMessage(err instanceof Error ? err.message : 'Screen share failed');
     }
   };
+
+  if (!authLoading && !user?.fid) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-10 text-center">
+        <p className="text-white">Sign in to join this room.</p>
+        <a
+          href="/"
+          className="rounded-lg bg-[#f5a623] px-4 py-2 text-sm font-semibold text-[#0a1628] hover:bg-[#ffd700]"
+        >
+          Sign in
+        </a>
+        <button
+          type="button"
+          onClick={onLeave}
+          className="rounded-lg border border-white/20 px-4 py-1.5 text-sm text-white hover:bg-white/10"
+        >
+          Back
+        </button>
+      </div>
+    );
+  }
 
   if (status === 'error') {
     return (

@@ -31,6 +31,22 @@ export default function PublicSpacesPage() {
   // as its own state slice + rendered in its own section.
   const [jukeRooms, setJukeRooms] = useState<JukeRoomCard[]>([]);
 
+  // 100ms rooms live in their own table (ms_rooms) reached via /spaces/hms/[id].
+  // Listed in their own section (like Juke) so created rooms are discoverable,
+  // not just reachable by a shared URL. Fetched server-side via GET /api/100ms/rooms.
+  const [hmsRooms, setHmsRooms] = useState<HmsRoomCard[]>([]);
+
+  const fetchHms = useCallback(async () => {
+    try {
+      const res = await fetch('/api/100ms/rooms');
+      if (!res.ok) return;
+      const { rooms } = await res.json();
+      setHmsRooms((rooms as HmsRoomCard[] | null) ?? []);
+    } catch {
+      // Non-fatal — the rest of the page still renders without 100ms rooms.
+    }
+  }, []);
+
   const fetchStages = useCallback(async () => {
     const supabase = getSupabaseBrowser();
     // Include both stage (audio-only) and voice_channel (full A+V) live rooms.
@@ -59,6 +75,7 @@ export default function PublicSpacesPage() {
     const supabase = getSupabaseBrowser();
     fetchStages();
     fetchJuke();
+    fetchHms();
 
     const channel = supabase
       .channel('live-spaces-mixed')
@@ -67,7 +84,7 @@ export default function PublicSpacesPage() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [fetchStages, fetchJuke]);
+  }, [fetchStages, fetchJuke, fetchHms]);
 
   const handleCreateRoom = async (
     title: string,
@@ -192,7 +209,7 @@ export default function PublicSpacesPage() {
         {activeTab === 'live' && (
           <>
             <SongjamSpaceCard />
-            <LiveTab loading={loading} stages={filteredStages} jukeRooms={jukeRooms} myRooms={myRooms} otherRooms={otherRooms} user={user} onHost={() => setShowHostModal(true)} onJoin={handleJoinStage} />
+            <LiveTab loading={loading} stages={filteredStages} jukeRooms={jukeRooms} hmsRooms={hmsRooms} myRooms={myRooms} otherRooms={otherRooms} user={user} onHost={() => setShowHostModal(true)} onJoin={handleJoinStage} />
           </>
         )}
         {activeTab === 'upcoming' && <ScheduledRooms category={category} />}
@@ -215,8 +232,17 @@ interface JukeRoomCard {
   created_by_fid: number;
 }
 
-function LiveTab({ loading, stages, jukeRooms, myRooms, otherRooms, user, onHost, onJoin }: {
-  loading: boolean; stages: Room[]; jukeRooms: JukeRoomCard[]; myRooms: Room[]; otherRooms: Room[];
+/** Minimal shape /spaces needs to render a live 100ms room row.
+ * Source: GET /api/100ms/rooms (public.ms_rooms, state='active'). */
+interface HmsRoomCard {
+  id: string;
+  title: string;
+  host_name: string;
+  participant_count: number;
+}
+
+function LiveTab({ loading, stages, jukeRooms, hmsRooms, myRooms, otherRooms, user, onHost, onJoin }: {
+  loading: boolean; stages: Room[]; jukeRooms: JukeRoomCard[]; hmsRooms: HmsRoomCard[]; myRooms: Room[]; otherRooms: Room[];
   user: { fid: number } | null; onHost: () => void; onJoin: (room: Room) => void;
 }) {
   if (loading) {
@@ -229,7 +255,7 @@ function LiveTab({ loading, stages, jukeRooms, myRooms, otherRooms, user, onHost
     );
   }
 
-  if (stages.length === 0 && jukeRooms.length === 0) {
+  if (stages.length === 0 && jukeRooms.length === 0 && hmsRooms.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="w-16 h-16 rounded-full bg-[#f5a623]/10 flex items-center justify-center mb-5">
@@ -256,6 +282,7 @@ function LiveTab({ loading, stages, jukeRooms, myRooms, otherRooms, user, onHost
   return (
     <div className="space-y-6">
       {jukeRooms.length > 0 && <JukeLiveSection rooms={jukeRooms} />}
+      {hmsRooms.length > 0 && <HmsLiveSection rooms={hmsRooms} />}
 
       {myRooms.length > 0 && (
         <section>
@@ -391,6 +418,57 @@ function JukeLiveSection({ rooms }: { rooms: JukeRoomCard[] }) {
             </Link>
           );
         })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Live 100ms rooms section. These live in ms_rooms (separate from the Stream/
+ * `rooms` table) and are reached via /spaces/hms/[id], so they get their own
+ * section + orange "100ms" badge — matching the badge on the room page.
+ */
+function HmsLiveSection({ rooms }: { rooms: HmsRoomCard[] }) {
+  return (
+    <section>
+      <h3 className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-2 text-orange-400">
+        <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" aria-hidden="true" />
+        Live Video Rooms
+      </h3>
+      <div className="grid gap-4 md:grid-cols-2">
+        {rooms.map((r) => (
+          <Link
+            key={r.id}
+            href={`/spaces/hms/${r.id}`}
+            aria-label={`Join video room: ${r.title}`}
+            className="group block border rounded-xl p-4 transition-all bg-[#111d2e] border-white/[0.08] hover:border-gray-600 hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
+          >
+            <div className="w-8 h-1 rounded-full mb-3 bg-orange-400 opacity-60" aria-hidden="true" />
+            <div className="flex items-start justify-between gap-2 mb-3">
+              <h4 className="font-bold text-sm leading-tight line-clamp-2 text-white group-hover:text-orange-300 transition-colors">
+                {r.title || 'Untitled room'}
+              </h4>
+              <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                <span className="inline-flex items-center gap-1 text-red-400 text-[10px] font-bold uppercase tracking-wide">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
+                  Live
+                </span>
+                <span className="inline-flex items-center text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded-full border border-orange-400/40 bg-orange-400/10 text-orange-300">
+                  100ms
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span>
+                Hosted by {r.host_name}
+                {r.participant_count > 1 ? ` · ${r.participant_count} in room` : ''}
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-lg text-white text-xs font-bold bg-orange-500 group-hover:bg-orange-400 transition-colors">
+                Join
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   );

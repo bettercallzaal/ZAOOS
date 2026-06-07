@@ -1,0 +1,474 @@
+Oh
+That was all be all about.
+Go, got a problem.
+Better call Zao.
+Need a founder.
+Go.
+Better call Zao.
+Need connections.
+Go.
+Better call Zao.
+Get everything down.
+Go.
+Better call Zao.
+Go, go, go.
+Bring the honors around.
+Wave wars.
+Hear the sound.
+Build us out, dog.
+From the ground.
+Ecosystem.
+Gather around.
+Yeah.
+Yeah.
+We been working.
+Work, work, work, work through the night.
+RIT, your engineer.
+Getting everything right.
+Robotics project automation.
+Million five.
+Yeah.
+You heard me say a million five building future.
+Better calls out.
+Need a launch?
+Better calls out.
+Need a team?
+Better calls out for anything.
+Better calls out.
+Keep it moving.
+Keep it going.
+Keep it strong.
+Open source repos all day long.
+Builder connector.
+Putting people on.
+That's the reason that I'm going to be able to get a new job.
+I'm going to be able to get a new job.  [repeated 5x, trimmed]
+people long. That's the reason everybody sing along. Better
+go down. Uh, engine to build a speed dial. Better go down. Uh,
+community leader with a style. Better go down. Uh, need it done
+right with a smile. Better go down. Check, check, check, check,
+check, check. Making things connect. Build, build, build,
+build. Every project gets respect. Make, make, make, make,
+make. Every move collects. Turning ideas to a business.
+that's a bet honey honey honey honey keep the road
+yo what up carlos how we doing big bro hey man good and you i'm doing phenomenal it's a beautiful
+day i um i'm challenged with going through my second bonfire actually i was creating one for
+one of the community members the deep um deep thinking homie who's been working um that i was
+messaging you about yesterday and i was just um at the end point trying to get the uh what's it
+called it works in dms but not in groups and i have i believe i have turned on all the settings
+that i need to and i eventually just allowed groups but it's still not seeming to um
+it's still not seeming to listen in the group i think you're in that group as well
+but i need that look yeah it's um right now it's a mess of configs and like the main issue that we
+have right now is like we're kind of like in this refactoring time period which is weird from a
+development perspective because basically we started over.
+So a lot of the code that's currently there,
+it's going to be there in some slightly different way
+once we're done.
+So since it's going to change, it's
+hard to um get you guys to use that because it's going to change anyways so like we would rather
+get finished as soon as possible which our deadline by the way just fyi is the 14th
+to get everything integrated so it should get easier soon um em you know these things are hard
+awesome no i love that what's up with you what have you been working on otherwise so
+14th in about a week or so here you guys are going to be doing that upgrade um i know we had
+a brief conversation about bonfires a little bit earlier this week i'm actually working on
+um getting that out on the youtube but i have started to essentially make this of all games
+dash recordings dash two or three i guess for the bonfires um will be the will be where it'll
+be stored so i think it'll be really valuable for the graph to also be able to be able to point
+okay this is the url where the video is actually stored because the youtube is embedded on this
+page so it's like i i don't know if you remember that conversation we had at the very beginning
+with my Wave Wars team of, okay, like we have a ton of these videos.
+How can we leverage the Bonfire's tooling where it's just text
+to actually point to media of some type that's not just a file?
+And I think this could be a way to do that is just using my custom website
+and making a subpage for that specifically to point to.
+Yeah, I mean, there's – yeah, totally.
+But having your own, basically, we envision these things as like, I like to think about
+it as like the librarian of a library.
+So as you grow your library of things that you have available and memories, the idea
+of the agent is the place you tell people to go to, to experience the Sabal games, like
+to guide them through it, right?
+I also, like on this week, it's been also interesting.
+I've had a lot of conversations with Josh
+in terms of like messaging and like how we kind of like,
+like talk about bonfires and what we're doing.
+And I think it's very exciting, like in terms of,
+I just like the concept and the idea
+that we want to kind of push this idea that what does bonfires do?
+And as like this shortest definition is like, it's a sense making tool.
+And sense making is cool because the definition isn't a word, so it's to make sense.
+So what are we doing? We're making sense of things.
+We're the sense makers as a group of people in an activity that we're doing.
+that we're doing.
+And I think that starting to have this team of like, OK,
+I'm making sense of this as your goal.
+And that's kind of what we're doing with the survival games,
+right?
+You're trying to make sense of open source development
+and all these toolings and stuff.
+And I think that's also an invitation of let's make sense
+together of these things.
+and it can be like a like a good call to action you know what i mean
+yeah 100 no i appreciate that yeah so um what else is up with you tell me more
+honestly i've been one of the places that i've been wanting to spend more time developing is my
+video editing setup.
+And I think this time I've gotten into a nice rhythm with this Zabal Games workflow because
+I'm basically giving everything into the repo and it's capturing a lot of it.
+And a lot of the conversations I'm having are all tied together here.
+So it's easy to kind of keep the theme there.
+Right.
+so it's been really uh powerful to try and i'm using a paid platform right now so i'm trying to
+like think of the different things that i like using the platform for the things that i want to
+like offload so that i can also automate part of that process so that like it's basically just an
+api call for my own bots right right that's cool and like um how's your like coding setup like
+these days basically just clock code in the terminal for the longest time uh since basically
+we met actually before that i was using windsurf and um and now i've been recently actually
+i'm a little bit sometimes like limited by my hardware and my setup in different capacities
+my my travel mac is super weird and wants to shut down every fucking like four hours that is super
+weird but ever since i started using the terminal because the terminal and clod is open it actually
+asks me to shut that down and asks me to do it and that stops the shutdown so that's been really
+interesting on a different level um i've been recently actually just using the clod code in the
+cloud because then i could use any device and pop in and out but i've heard dispatch is good i'm
+kind of building my bots and telegram in different capacities but the bonfire has been actually
+super powerful in being the memory side of things so i'm just pushing a lot of data there has been
+my goal so i definitely want to get on this wave of every git commit i do or a fellow uh teammate
+does on our repos is added uh the information from that is added to the bonfire so i don't know
+if that might be something we could talk a little bit more about as well yeah um i there is i i did
+do this as like a CLI tool and I think it's still around. I'm gonna send you the link but
+I did like set up my cloud thing so that every time it pushed. Explain CLI's a little bit more
+for me if you wouldn't mind. Like a CLI is like a command line interface so like
+like so there's there's different ways to interact with software right you can either have a GUI which
+is a graphical interface like Telegram, for example.
+Or you could have a command line interface, which
+is basically just a set of terminal commands,
+like similar to how you use cloud code.
+And the cloud code is not a CLI, but a TUI,
+because it's a terminal UI, because it renders
+like a user interface inside of a terminal.
+A real CLI is just a bunch of commands that you can call.
+So the idea is that instead of calling bonfires,
+because the other way to do it is that you would use HTTP requests.
+And there's this thing called curl, which you can use to just
+call any server.
+But the problem with that is that every time you do a call,
+you have to add every environment and all these things
+to make it work.
+So CLI kind of turns all that into add to bonfire.
+And you set it up once.
+when you install the thing, you set up the environment.
+So you're and the thing about CLIs
+is that Claude can call these from using the terminal access.
+So you install it once, and then you
+make a skill that explains how to call the CLI,
+and then your agent is able to use it.
+And this works for stuff like, for example, GitHub has a CLI,
+Amazon Web Services has a CLI.
+Basically, every software has also a CLI package
+that you can call.
+And this was usually just used by developers.
+But now that you have agents, you can tell your agent
+to use them for you.
+So my pipeline is like, oh, I want to,
+we have the server for run first, right?
+And there's a bug.
+I want to query AWS with a specific thing,
+with specific parameters.
+So instead of writing a script, well, I still write a script.
+But then I save that script.
+And then I say log check.
+And it checks the logs with that logic using the CLI.
+It makes a lot more sense.
+Thanks for explaining that.
+That's cool.
+Yeah, actually, I think there's a lot of value in like,
+especially for people who are just starting to live code
+to just have this kind of like, ask questions like,
+what the fuck is this?
+What the fuck is that?
+And also making sense of coding patterns.
+Like, because at the end of the day,
+like the AI knows everything, but it will only
+use whatever you query about, right?
+Like, probably it's easier to start with, like, make me a,
+like, if you, there's two, two, imagine you're
+going to make an app, right?
+You can either say, make me an app that does this and that.
+Or you could say, define types in Python
+for an application that does this and that.
+Just that prompt changes what the AI starts doing.
+So it avoids you having to add types retroactively
+and having to rewrite your app.
+Because every time it's like, oh, let's make an app.
+Oh, but let's add a database.
+So you have to rewrite the app to make a database.
+Oh, but let's add authentication.
+So you have to rewrite the app to make a database.
+Oh, but let's use a graph database.
+So you have to change the database.
+And now you're like, oh, but it's
+better to use a protocol contract where you,
+instead of having to commit to using Mongo,
+you just say, I'm going to use a database
+and like have an adapter system that you can change the thing.
+But that's something that if you make the decision later,
+it's another rewrite.
+And if you forgot about the types.
+Yeah, no.
+Actually knowing like the big picture at the very beginning
+when you start initially, like that plan,
+I've always heard that if you spend like 15, 20 more minutes
+in that plan phase, you'll save hours and hours in the long term, right?
+Yeah.
+And the thing is, like, the only way to get, yes, like you're saying, and I would say, like, spending even, like, an extra day, just, like, even, like, maybe you're not, like, what I would do if I started up from scratch right now, right?
+like if i had an idea i want to make it up um i would first write it down as like a sketch diagram
+and you know like you know how people have you ever heard about bob and alice
+i have not so like every tech demo like has like whenever they have a diagram is like bob
+Bob and Alice are the users.
+So you put Bob on one side and Alice on the other.
+And for example, if you make an e-commerce website,
+you go like, OK, Bob wants to sell a vape,
+and Alice wants to buy a vape.
+I want an app that will facilitate that transaction.
+So you're not talking about code yet,
+but talking about what's the exchange or what's
+the pipeline that you want to make.
+So you go like, OK, so first Bob has to,
+they don't know each other.
+So it's like Bob has to post his like sale, his object as like a sale item.
+And then Alice has to be able to find that sales item somehow.
+And she has to have enough information to execute that transaction.
+Bob has to be notified of that transaction.
+and then he has to send the package and Alice has to receive the package
+so that I can verify that Bob has done the thing, right?
+Yeah, I think I understand.
+And you could draw that on a paper.
+You can draw Bob on one side and then draw Alice on the other side
+and then start drawing arrows.
+On the middle is your app.
+So first Bob, and then you can order things because like if Alice comes to the app first and Bob hasn't come to the app, then she won't find anything.
+Right.
+So you can know the sequence.
+Okay.
+Totally.
+Yeah.
+You're like being the middleman essentially, but being at the right time of supply and demand.
+Right.
+And like, and like.
+And like timing that.
+Yeah.
+Yeah.
+And like that's what an e-commerce app is at the end of the day.
+But by doing this, what you're defining
+is what things need to be built for your thing to work.
+So you need, for example, a way for Bob to register on the app
+and then for Bob to post an item and then a way for Alice
+to register on the app and for her to feed of the items that
+are available.
+So far, we have the early functions.
+But if we stop there, Alice can see there's a thing,
+but she can't buy it.
+So now we have to keep going.
+Alice needs to have a function that she
+can call to buy an item that I've already established
+that I have before.
+And then Bob needs to be notified of the thing.
+And then in this case, money has been transferred.
+So is this a crypto app?
+If this is a crypto app, do you give the money straight to Bob?
+Or do you wait until he sends the item
+and you can release the money from escrow?
+Totally, yeah, because you're confirming like the thing was actually accepted on the other users front.
+Right. And if you keep doing this exercise, you will be able to describe and draw all the things that your app needs.
+And then you take a picture of that and then you send that to your terminal.
+And then you turn that into your architecture diagram.
+and just think about it so far you haven't even decided like what program and language you're
+going to use you're just defining what needs to be done to achieve your goal
+right
+yeah one thousand percent another tip i've always heard is you know not trying to be too specific
+about how it's going to be done,
+but just saying what you want it to get done.
+So I've seen that be very successful
+on my end as well sometimes.
+Yeah, that is true.
+I mean, and yeah, like,
+and the more you can explain the,
+and that's why, that's also why,
+like some of the better,
+like use cases of coding agents
+is like when you have like a metric
+that you can optimize for.
+So, for example, like let's say you've already built the app, but it's slow.
+And then like you can say, you can ask your agent like, okay, your goal for today is to make this app faster.
+Like, and then you can give it constraints.
+Like, and the thing is like the latency, since it's a specific number, you can leave that with like a goal open.
+and it's just going to keep going until it achieves the thing.
+So that's also a good way to do it.
+Awesome.
+Yeah.
+Have you used, what's the longest goal that you've pursued?
+Like does Cloud Core have goals?
+it does i haven't found it like i've used it here and there but sometimes i
+i don't know i i think i just need to understand it or prompt it better but uh
+i haven't had much more than a couple hours here or there but sometimes it's also through a stall
+which is always right somewhat a challenge right where it's like okay how to know if it's stalled
+out or if it's actually doing something or if it's in a loop yeah yeah i mean what i what i found
+useful because I did notice that, for example,
+Claude has great plan-making skills,
+and he's very thorough.
+But usually, when it comes to executing the plan,
+it will start executing the plan, and then it will call it
+the first phase, like a bunch of work and stuff.
+And then it will be like, OK, I did the first phase.
+And then you have to be like, OK, but keep going, keep going,
+keep going.
+And I found that making a plan and then making a goal where the prompt is only complete the plan, use this and that skill.
+And the threshold, for example, the other day I was doing the threshold is having less than five seconds in a query.
+And it just went away in the smear way for lack of a day.
+That makes sense.
+Do you want to share a little bit more of some of the skills you use and how you use them?
+because I think that can also be a valuable conversation.
+Yeah.
+I mean, I actually use very few skills nowadays.
+I have a skill to make plans.
+And to do that, I ask the agent to go online and search for papers about it
+and make a skill of how to make good plans with AIs.
+And I found papers and made it a skill.
+It was good.
+So I will usually start by doing that.
+And then I have a skill for sub-agents.
+So that skill basically tells the agent,
+you are the senior dev, and your job
+is to keep all the sub-agent threads full
+and just organize their work and verify them
+and integrate it with the goal.
+And that one works really well to get more things done,
+and especially if you have a really broad thing, which
+many parts that don't interlap too much.
+And then I have one that I don't use that much,
+but it's a sub-skill of the agents that
+is make adversarial agents for a thing that I'm discussing.
+So it will be like one argues for the idea
+and the other argues against the idea.
+And then the main agent is like reading both
+and like making an opinion.
+And that's pretty much it, really.
+Like I used to have the bonfires one.
+That last one seems really interesting.
+Yeah.
+I mean, I haven't used it that much
+and I'm kind of curious to use it with like the Opus 4.8.
+But right nowadays I'm using Codex.
+I really hope they release a new model soon.
+But yeah, it's good because usually like these things will just agree with you and everything.
+And I want like, I often times like to have like several opinions, especially if it's like, especially if it's like go research papers and then argue like base, like, like connect the papers with the code base.
+and such and such.
+That's another
+also, I think,
+good
+advice.
+Because I'm kind of
+it's kind of fun because
+I was
+like
+a self-trained coder
+before AI started
+to be a thing.
+And
+there was
+like with a lot of libraries, a lot of things that are out there, there's so much things out there,
+right? And like the best skill that you would have before is like being able to clone repos
+and like look for GitHub and like clone a repo to make it work. But also there were like
+a lot of libraries that like kind of like above my pay grade in terms of like that's too hard for
+me to like do or comprehend or it's too like obtuse or too like whatever like you know just
+like boring um or like stuff like reading technical papers or like very like deep discussions and
+stuff.
+But the point is that I think with AI,
+you can kind of punch above your weight
+and ask the AI to do those things that you wouldn't do.
+And with documentation, it's kind of easy to like.
+I'll give you an example.
+I'm using this library for the grammar stuff that I'm doing.
+And this is like front end for a Lisp back end.
+Lisp is a language I haven't ever seen in code.
+And it has a bunch of functions, and it's super cool,
+but it's kind of hard.
+And I would have never made an app with a Lisp back end
+that I need to understand and run before AI.
+But with AI, it's like, OK, go to the web page,
+read all the papers about it, read the documentation about it,
+make a bunch of documents.
+And that's another important one.
+I like to make a lot of architectural documents
+and be like, OK, research this and make
+a dossier and a briefing about the topic
+so that you can have some continuity in what you're doing.
+And I think maintaining good documentation
+and good research documents is really
+important to maintain good quality in the code ways.
+But yeah, punch off your weight and keep documentation about it.
+And you don't have to reason the details, but you need to be able to reason enough to find it interesting.
+That's all you need.
+Yeah, I think people understanding how important documentation makes a big difference nowadays than it did before.
+being like very clear with your instructions and having the communication layer really on tap of
+like really understanding how you can leverage that tool because it's the most important way
+making sure that you can hand things off to different tools and be able to kind of have
+that recursive bit of knowledge right it's super important yeah and also actually i think this is
+This is a very interesting or insightful thing that Linus actually said, like Linus Terbalt,
+like the Linux guy, he was recently on an interview and he's like, okay, I get that people say like AI has let them like code 10 times more than before,
+But I don't hear anyone say that about the compiler, which actually lets you go a thousand times faster.
+And the compiler, what it does, it takes the syntax that you're writing and it turns it to machine instructions.
+So when you're writing code, you're really writing prompts for a program to turn those prompts into instructions inside of another language.
+And to a degree, what we're doing with AI is kind of the same, but more abstracted in a way.
+OK?
+So you're still coding by prompting the coding agent,
+but it's way fuzzier, to give it a word.
+But it still has the same effect.
+It's still programming using syntax
+to produce machine outputs.
+So the point of that is that the documentation layer
+should be the equivalent to the code.
+So when you think about it, the documents should,
+kind of like if you removed all the code
+and you just only had documentation,
+you should be able to reproduce the code exactly
+because you have a normal language explanation.
+It could even be stored as voice notes.
+It could even be like, you could even go kind of crazy with it.
+But the point still stands.
+the semantics should transform into the execution
+in a one-to-one way.
+Yeah, no, I think it's pretty cool to see
+like what we can do here
+and where the evolution of coding is going.
+And I'm excited to be able to leverage bonfires
+in such a way to do that as well.
+Yeah, dude, you're doing such a cool, important job in being an early adopter of it.
+And it is actually through the realization of projects like yours that we're going to
+be able to get to the next level, really.
+And I think that if we all like the narrative of, or like the idea of becoming sense makers
+and like making this like a thing that we do as like, you know, as a concept, I think
+that more people could catch on and start either participating in our experiences of
+all games or like making their own, which is also fun because it gives you more things
+to do.
+Totally. Well, thank you, Carlos. I appreciate your time. Definitely want to keep chatting more
+about bonfires, figure out the rest of this issue so we can get our second agent up on the
+Zipall bonfire. And I think it'll be really cool to have some of these other agents for specific
+use cases. So I would love to know maybe in our last minute here, if you have any thoughts on the
+different agents for one bonfire and like what the different benefit of like having those different
+personalities can be yeah i mean i think that's that's one of the more interesting things um
+so right now the cool thing about the agents is that they each produce their own stack and episodes
+but those drain into the same bonfire.
+So two agents can kind of share the context
+but they can still use their episode production
+to track their history.
+So they should become distinctly them
+rather than be perceived as the same agent.
+uh in in like so much so that like when you create the new agent and you start producing episodes
+the existing agent is going to start seeing episodes produced by a different agent so
+it's going to be aware that it's there's a second agent on the bonfire um so there's a lot of
+interesting dynamics there um and yeah i mean i think that is like especially for like multi
+like for like kind of like federated crew current situations is ideal because they
+all kind of operate inside of the same information structure
+totally no i appreciate that
+yeah man thanks for having me i'm gonna go and get something to it now
+it's time to awesome perfect thank you appreciate it we'll chat soon
+bye

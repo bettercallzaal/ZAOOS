@@ -1,0 +1,277 @@
+away wherever i can it's been where are you at where are you at up in maine in the northeast
+oh in maine yeah i'm more into more away far away from boston isn't it uh yeah like a few hours
+north exactly yeah like three hours or four yeah like four hours exactly so i'm originally from
+the boston suburbs actually oh cool i was in boston a year ago like three months i believe
+that i just told you this before yeah maybe yeah i was staying there exploring the biotech sector
+you know in terms of marine biotech stuff i just thought we talked from scripts i just
+talk with some people from tufts university and you know create blockchain conference
+of a year ago in harvard you know the harvard blockchain conference it was pretty insightful
+at least for me because people at that time were not aware about how can they use blockchain to
+particular use cases in sciences so basically i've been quite exploring that since six years ago but
+but not formally, just experimenting and prototyping stuff.
+Yeah.
+No, but the thing is with people like you in the space
+who are experimenting, trying things out,
+you have so much more experience than someone who's,
+you know, this richy rich person who has a person or company
+that has a lot of money and is like,
+oh, hey, like I want to do this.
+It's like, you can't just like come in and do this.
+You need like some knowledge
+and like you need to have built something over time, right?
+It's not just like, especially decentralized tooling, right?
+It's not just something you do.
+that's the funny thing in terms of my experience that's a funny thing that I just saw because many
+many individuals in biotech said hey we're basically doing the same thing but on a centralized
+way how can we mitigate this and I was like okay you should do this but okay how much do we need I
+was like it's not how much do you need actually it's more in what would be the the proper way to
+do it you know exactly right so it's quite difficult you're trying to spend as little
+money as possible and it's like okay like you can do that but you'll you'll only go this far
+it's like if you want to make this long-term sustainable this is how we need to do it and
+yeah it might cost more right now but that's the whole point is that like this will last right
+total agree it was quite funny because some individuals you know mesurif dao right now is
+quite uh incubating certain projects and it's part of certain projects actually we're quite
+updating up here it will be a way to a wet lab here with some of our partners uh the coalition
+so basically these days have been quite busy you know checking some time you know doing doing some
+work you know in terms of okay supporting people right now is uh for a reef awareness day so we're
+trying to figure out how to build this and we're going to get incubated by by molecule
+i just saw the uh um the prototype i'm i have been working with a friend since a few months
+we just delayed a little bit because the jurisdiction problem you know because as a
+ngo you could not have a token you know even if it's for governance the mexican law will give
+you some gaps if you launch a token you need to be regulated by the bank of mexico and all these
+kind of situations so we just decided to do uh llc in prospera in this special jurisdiction so
+everyone will go smoothly you know we believe that but you know we're we're i believe that in
+two weeks we're going to to be quite curated in the in their dashboard you know that's awesome
+start to knowledge graph for conservation yeah man i i i love that i love to hear that it's cool to
+hear that you're just moving and chugging along i'm excited because it's a space that i'm not
+personally that deep into so it's really good to know that when and if i have an individual that
+asks me about geological or ecological pieces and ways to support that with blockchain i have
+a place to now send them so that's what i love about meeting folks like you and just like going
+to these events where like you meet a random person a completely different side of the industry but
+it's all we're all in blockchain right so it's like it's different still because we still have
+the all baseline level of knowledge of like xyz thing and then like in the general ecosystem this
+is what people are looking at but like we're all in regen ecosystems in different parts of it though
+right so it's like i'm over on the music side you're over on the world side and it's like we're
+We're meeting together in blockchain.
+Yeah.
+So how has been your journey so far?
+You know, after Denver and after Boulder, what did you do after that?
+You go back to the end?
+It was really good.
+Yeah, mostly.
+So I'm out here and being.
+I saw that you sent me an application for bathing, but I didn't comprehend a lot.
+Will you explain me a little bit?
+Yeah, no, for sure.
+Because I think that conservation could be gamified, you know?
+That's my theoretical framework.
+It needs to be quite a few.
+A million percent.
+So my essential goal is I'm doing a three-month long hackathon,
+kind of an evolution of the Ethereum, the ETH Boulder event.
+So I'm doing one month of workshops.
+That's where I want you to come in and be a teacher
+and come in and share about what you've done,
+the tools you've used and the ways you use agentic tooling right now and the goal is
+is it going to be remotely or yeah yeah yeah everything's remote oh yeah so you can either
+we can do a live stream or we can do a pre-recorded set where you just send it to me and then i go
+live at a specific time and i play your video so we can do it either way super easy but the idea
+is to knowledge share in the first month.
+And once all the knowledge sharing happens in the first month,
+during the second month,
+I'm going to send everyone who wants to participate
+a prompt that explains all of our projects.
+Essentially, it explains the ZOW.
+It explains ZOW festivals.
+It explains the ball games.
+It explains everything we've done so far in the space.
+And the idea is you take that prompt.
+It really is just an llms.text URL
+that you're just pointing people to.
+and I want to essentially tell everyone, you know, point to this URL and say to your AI,
+you know, this is a project I want to get involved in.
+Knowing me, where do you think I could make the most impact?
+And the idea is that anyone can use any harness and do an open build during the month of July.
+And out of all those people that do an open build,
+we're going to have eight teammates from the Zao pick and choose a champion.
+Essentially, each of those eight people is going to each pick eight coders to kind of team up with for the finals.
+Essentially, being a 1v1 vibe coding battle where we can just get as much distribution to these builders as possible by creating a kind of streamers games energy.
+There's a lot of streamers that are doing kind of like streamer games where they're doing like pointless stuff and bring that energy to vibe coding and building.
+and actually like moving forward with your projects
+that you were already going to be working on.
+Sounds awesome.
+Do you have some partners?
+Because I know a guy that...
+It's honestly all just me.
+Oh man, why?
+I believe that if we create a proper team,
+we could scale it properly in terms of now.
+Well, I'm not, but I'm not looking to scale it like that.
+This is V0, right?
+The idea is that I put up $500 that I won in a hackathon.
+I'm using that as the prize money for the end of August and essentially I've seen so many people do
+the hackathon thing wrong in my opinion and they always ask people to make random stuff for their
+sponsors which isn't really aligned with what the person wants to do but they have to build because
+that's the person sponsoring it so they have to use like Arbitrum or like Monad or something right
+pointless which it doesn't align with what they want to do the second thing i've seen is it's not
+a very um collaborative atmosphere in terms of actually distributing what the person's building
+the idea is at the end you do a presentation and then this project repo is just like there
+no one ever touches it other than the winner and no one ever really sees anything other than the
+winner. I agree. Have you seen the approach that Eat Global is having right now regarding, okay,
+if you have a repo and if you already built something, you could submit your project into
+another vertical, you know, to continue to scale that project. So I believe that is quite necessary.
+Can you send me any extra documentation you have on that? Because I haven't seen that
+and I would love to take a look. Okay. Yeah, I would do it after this call,
+but after this guy i'm going through diving so uh here let me shoot you a reminder so you have it
+perfect let me shoot you a reminder so you have it in your dms yeah no worries but in the dms
+could be properly and i will give you a list of everything and that's the thing i i have been
+participating in many hackathons and organized hackathons um you know i just wanted to create
+a hackathon in harvard a year ago regarding the stuff that you said that's awesome okay
+i just talked with many research labs and many research labs have many verticals that they want
+to tackle to mitigate certain situations in their scientific daily or particular projects that they
+so it was quite funny because okay how can i fit this here okay so you are a researcher
+you could share your project with someone that is quite fed up to build stuff in defy
+into the next LLM or the next deck and share your insight.
+You know, protocol, I really appreciate
+what protocol labs have been done in the past
+because protocol labs have been supported
+many, many great ideas with a scientific,
+with a good scientific background.
+For example, IPFS was created by protocol labs in a way.
+And it's insane, man.
+I believe that we need to identify those kind of,
+the hackathons needs to be more like direct in necessities of the participants.
+For example, we just in RSI, we just create a science hackathon a year ago. And it was a good
+experience, but we lack because many researchers do not have interest in this. They believe that
+we're playing games. It doesn't matter that they know. And we know that there are many scientific
+papers published in DSA
+into blockchain
+use cases and everything, but they
+do not know
+how can they apply stuff.
+So I believe that bridging that gap
+is quite necessary or
+just only start building stuff.
+You know, because everything
+could be replicated, depends of
+your niche of expertise as a researcher.
+It could be in social sciences,
+it could be in biological sciences,
+it could be more in humanities.
+No, I think it's
+Yeah, it's super awesome.
+You're going to buy everything.
+So the idea for my hackathon more than anything is
+we have seven to 10 projects within our community,
+just like what we've built.
+And everyone always asks me like,
+what is this or what is that?
+So this hackathon is all about distributing information
+about what we've done already
+and giving the opportunity for anyone to,
+I have like 50 plus repos that are like,
+some are partial ideas started.
+Some are like, okay,
+like this is drafted and technically works, but not scalable.
+So the goal is to put all of those things in one bucket and tell people if
+you're a builder and you don't know what to build or you don't know where you
+want to build, here's a place where you can learn more and have a project to
+work on.
+I agree.
+For example, that's my purpose to go on hackathons.
+I have been participating in many global hackathons in Bangkok, in Mexico,
+in Argentina, in the one that was in Monaco a year ago.
+But you see many individuals usually,
+I usually lurking, looking for talent in hackathons for that.
+Because I know that many individuals or many hackers
+usually are quite eager to build something
+or an idea that they have in their mind
+because they want bounties, you know,
+or they could build only a useless application
+you know for that event and one because that's the perspective after that it's gone you know
+it's done you know so i comprehend the stuff that you said because you know you need to keep building
+this the exact project or you need to plug in some other applications in the project and
+scale the use case you know i have been exploring that particularly in coral conservation but
+you know i think that it would be cool to share my experiences so far so yeah no that would be
+amazing i think honestly just a hackathon conversation let's do a spaces let's just
+talk about hackathons what are pros what are cons i think that would be an amazing first session
+because they don't me understand what i need to do better for mine right and so the reason that i'm
+doing it also mostly alone is i can do a lot in a very i do have teammates and stuff that are
+helping me but like when you add other people it just slows everything down and i've done all of
+this preparation in the last two weeks so it's literally just been like this is the only thing
+i'm working on and when i need someone i message them and then i wait for them to do the thing and
+while they're doing the thing i'm just continuing on the other thing i can knock out agree sounds
+great man so let me know if you have a certain guideline or a certain there's honestly no
+guideline other than i'm trying to keep them under under 30 minutes but if we do longer than 30
+minutes we'll just split it up into two workshops so i would love to i mean it'd be great to do a
+presentation of like five to ten minutes and then do a q a and have a conversation that's definitely
+the style that i'm going for but we can do multiple we can do multiple so we can do exactly we can do
+the first one what is mezzo reefed out like what tools do you guys use right yeah cool and then
+we can do a second one where it's a hey this is the ball games we're having a conversation about
+hackathons come up and say your pros and cons with hackathons and we'll just talk about it
+that could be another very powerful one are you planning to create on the space of that because
+a twitter space could work that's what i'm thinking for the second one for the first one i
+i mean i do i'm gonna live stream it either way whether we're on a twitter space or just video
+um i would love to have a video of you talking because i want to push that to the socials and
+show that out but that's why i'm saying like multiple workshops would be great let's do the
+first one we just jump on you do a 15 5 to 10 minute or 15 minute presentation and if anyone
+has questions we we answer them then we'll post that we'll get that out to people so they can see
+it and then during that we'll plan a time for a space and invite people to that that's kind of
+what i'm thinking that's pretty cool that's pretty cool man sounds awesome as your how's the rest of
+week look do you want me to schedule something in your calendar is that the best way to do it
+by this week i will be pretty full because i'm organizing the the ocean week here in
+costum it will be from five until eight so it could be after now it could be after eight probably nine
+what day is today it could be in nine days let me know i will let you know if if why don't you just
+let me know the date i have the calendar invite so you can actually just schedule it yourself i'll
+send you that over right now so you have that in your in your calendar and you can just schedule
+the date that works best for you okay sounds great and in terms of the i don't know if if
+we could create only for mesuritao or we could invite other initiatives but as you said dude
+the more the merrier the more the merrier okay it would be only me mesuritao you know sharing
+some highlights our experiences and after that you know some q a's about looking for talent in
+hackathons experiences and the things that you have seen in the past two projects that usually
+got stuck i love it i think that's a yeah amazing i think that's a great plan i appreciate your
+willingness to get involved your excitement i'm stoked to just connect with you i'm like very
+excited about like this year is the year of creators yeah and for example in terms of the
+um the dates i will let you know because if i'm available to record that before the date that i
+just shared to you i believe i would be proper to have it earlier it could be around the sixth or
+five perfect yeah if you if you haven't recorded we can do it at any time because then i'll just
+press play and then i'll watch it basically is what it'll be but it would be more more useful
+to be quite live stream or something like that or whatever you like it would be great but if we
+can't i'm okay with the recording and we'll do the second space live okay sounds great
+sounds awesome thank you for your time rodrigo bro i'm super excited thank you so much
+and like for all you do bro i i love i love daoish people because it always everyone is so down on
+Everyone tells me oh no you can't do it. I'm like yes, I can like I am doing it like that's the thing I'm doing it you're wrong
+The ATB is basically a proto-DAO you know because we we do not have a proper yet, you know
+Because there's there's no legal entity that can handle what I am
+So I can't make my thing a real entity because the the government and laws aren't in place for what I want to build
+right
+entity actually owned by the by the people that are part of it right which isn't something that
+can be created yet i don't come first for sure but that's why we just create that that enterprise
+in prospera you know to to scale the sports properly but amazing well let me know how i
+can be of help anytime i see an x post i try and share it but the group chats are so busy that
+like i miss nobody if there's if there's anything ever you're like hey i want extra eyes on this
+just dm it over to me i'll definitely share it out okay sounds great man awesome hey have a great
+rest of your day in the water in probably 15 minutes so i don't know i need to figure it out
+have fun send over some photos i would love to see some sorry i was saying send over some photos of
+the snorkeling i would love to see some ah okay or not snorkeling diving no and as i told you before
+i'm quite creating uh the house of my infancy i want to create a kind of collating there for the
+battle definitely let me know also organization of that if there's something i can do to help out
+with the organization of that i would love to be involved because that sounds awesome
+if you need support on the marketing promo whatever just hit me up i'm around yeah that's awesome man
+a pleasure actually i'll catch you soon yeah no no it's okay what were you gonna say sorry
+no no no uh we we have a live round in artisan i don't want to show a little bit but we already
+i actually have i think you might be in my project i'm not sure but i have a project
+a curated project i mean we're we're at 10 000 out of 10 i still don't really understand how
+artisan works to be honest with you but but whatever now it will be a call with renee because
+it is uh it's going to be launched the b2 oh that's awesome so yeah essentially it will be
+it will be quite insane i believe that it will be in two hours or so the release check check the dm
+if you're in the artisan group i think that yeah i just put something i received an email yesterday
+But I was like, okay, I think that I could be there or I could not be there. I need to check
+I need to check the date actually
+To figure it out if I could made it. Oh, it's not usually Rene records everything
+Totally awesome. Well, I will catch you soon shoot me a message with timings and we'll go from there. Okay?
+Yeah, that sounds great, man
+Thank you Rodrigo. Have a good one
+You're welcome. Have a good one too, man
+Thank you. Cheers
+I have a little trouble with that.

@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 import { ENV } from '@/lib/env';
 import { logger } from '@/lib/logger';
 import { getJukeRoomDetail } from '@/lib/spaces/juke-api-reads';
+import { sweepStale100msRooms } from '@/lib/social/sweep100msRooms';
 
 /**
  * GET /api/cron/juke-stale-rooms
@@ -176,6 +177,21 @@ export async function GET(request: NextRequest) {
     { endedIds },
   );
 
+  // Piggyback the 100ms ghost-room sweep on this daily job — the cron budget is
+  // full, so the two providers' stale-room cleanup share one schedule. Best
+  // effort: a 100ms failure never affects the Juke result.
+  let hms: { checked: number; ended: number; skipped: number; endedIds: string[] } = {
+    checked: 0,
+    ended: 0,
+    skipped: 0,
+    endedIds: [],
+  };
+  try {
+    hms = await sweepStale100msRooms();
+  } catch (err: unknown) {
+    logger.warn('[cron/juke-stale-rooms] 100ms sweep failed', err);
+  }
+
   return NextResponse.json({
     ok: true,
     checked: candidates.length,
@@ -185,5 +201,6 @@ export async function GET(request: NextRequest) {
     heuristic_only: heuristicOnly,
     threshold_minutes: STALE_THRESHOLD_MINUTES,
     ended_ids: endedIds,
+    hms_rooms: { checked: hms.checked, ended: hms.ended, skipped: hms.skipped, ended_ids: hms.endedIds },
   });
 }

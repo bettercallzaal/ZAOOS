@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-06-08 | Iman x Zaal - ZABAL Games recordings pages + cowork board mentions | ZAO Devz | Zaal, Iman | [819](819-iman-zaal-zabalgames-recordings-cowork-mentions-jun8/) | 6 |
 | 2026-06-08 | Logesh x Zaal - X Space audio extension test (SongJam) | ZAO Devz | Zaal, Logesh | [818](818-logesh-zaal-xspace-audio-extension-jun8/) | 4 |
 | 2026-06-06 | ZABAL Games workshop - ZAO Fractal intro (solo teaching, Respect Game + Discord tooling) | ZABAL Games | Zaal | [808](808-zabal-games-zao-fractal-intro-workshop-jun6/) | 3 |
 | 2026-06-06 | ZABAL Games fireside - Carlos (Plat0x / Bonfires) x Zaal - vibe-coding + Bonfires workshop | ZAO Devz | Zaal, Carlos (Plat0x) | [807](807-zabal-games-fireside-carlos-bonfires-jun6/) | 5 |

@@ -14,10 +14,14 @@ import type { Room } from '@/lib/spaces/roomsDb';
 // Each provider drags in a different ~150KB video SDK (@100mslive/react-sdk
 // vs @stream-io/video-react-sdk). Only one is used per room — split them so
 // visitors only pay for the SDK their room actually needs.
-const HMSRoomAdapter = dynamic(
-  () => import('./HMSRoomAdapter').then((m) => ({ default: m.HMSRoomAdapter })),
-  { ssr: false, loading: () => <RoomLoadingSkeleton label="Joining room…" /> },
-);
+//
+// The 100ms branch renders HMSVideoRoom — the same modern room used by
+// /spaces/hms/[id] (video grid, spotlight, screen share, transcription,
+// reactions). The old minimal HMSRoom/HMSRoomAdapter pair was retired.
+const HMSVideoRoom = dynamic(() => import('./HMSVideoRoom'), {
+  ssr: false,
+  loading: () => <RoomLoadingSkeleton label="Joining room…" />,
+});
 const StreamRoomAdapter = dynamic(
   () => import('./StreamRoomAdapter').then((m) => ({ default: m.StreamRoomAdapter })),
   { ssr: false, loading: () => <RoomLoadingSkeleton label="Joining room…" /> },
@@ -48,13 +52,17 @@ export function AudioRoomAdapter({ room, user, onLeave }: AudioRoomAdapterProps)
   }, [onLeave]);
 
   if (provider === '100ms') {
-    return (
-      <HMSRoomAdapter
-        room={room}
-        user={user}
-        onLeave={handleLeave}
-      />
-    );
+    if (!user) {
+      return (
+        <div className="flex items-center justify-center py-12 text-gray-400">
+          Sign in to join this room
+        </div>
+      );
+    }
+    // Host publishes (speaker); everyone else listens. HMSVideoRoom uses the
+    // room's id as the 100ms room name (find-or-create) — its own distinct room.
+    const role = user.fid === room.host_fid ? 'speaker' : 'listener';
+    return <HMSVideoRoom roomName={room.id} role={role} onLeave={handleLeave} />;
   }
 
   return (

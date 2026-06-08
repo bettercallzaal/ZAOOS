@@ -8,7 +8,7 @@ original-query: "/meeting dcoopxzaalcraig - ZABAL Games workshop invite + cowork
 tier: STANDARD
 ---
 
-# 823 - Zaal x Dcoop: ZABAL Games workshop invite + cowork onboarding + Zaoville prep
+# 824 - Zaal x Dcoop: ZABAL Games workshop invite + cowork onboarding + Zaoville prep
 
 > **Goal:** Pitch Dcoop on doing a ZABAL Games artist-track workshop, onboard him to the cowork tracker, and sync on Zaoville prep.
 

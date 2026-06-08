@@ -1,0 +1,30 @@
+# zao-fleet-agent — cowork control-plane host supervisor (doc 800 Phase 2).
+#
+# STAGED, NOT ENABLED. Install as a systemd --user unit on the bots box:
+#   cp bot/systemd/zao-fleet-agent.service ~/.config/systemd/user/
+# Then provide its env via a drop-in (the fleet token is a secret, never in git):
+#   ~/.config/systemd/user/zao-fleet-agent.service.d/cowork.conf
+#     [Service]
+#     Environment=COWORK_API_URL=https://www.thezao.xyz
+#     Environment=COWORK_BOT_TOKEN=<fleet token>   # also add `fleet=<token>` to Vercel COWORK_BOT_TOKENS
+# Enable (one line):
+#   systemctl --user daemon-reload && systemctl --user enable --now zao-fleet-agent
+#
+# Authority is whitelisted in code to `systemctl --user {start,stop,restart}` on
+# {zoe-bot, zao-devz-stack, zaostock-bot} only - never arbitrary shell.
+
+[Unit]
+Description=ZAO fleet-agent - executes whitelisted start/stop/restart for the cowork control plane
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/zao-os/bot
+ExecStart=%h/zao-os/bot/node_modules/.bin/tsx %h/zao-os/bot/src/fleet-agent/index.ts
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PATH=/home/zaal/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[Install]
+WantedBy=default.target

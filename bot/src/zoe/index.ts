@@ -18,7 +18,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv();
 
 import { Bot, Context } from 'grammy';
-import { startHeartbeat } from '../lib/cowork';
+import { startHeartbeat, reportEvent, startCommandPoller, markDone } from '../lib/cowork';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
@@ -180,6 +180,25 @@ const devzChatId = devzChatRaw ? Number(devzChatRaw) : undefined;
 const bot = new Bot(token);
 const usernameHolder: { value: string | null } = { value: null };
 const botIdHolder: { value: number | null } = { value: null };
+
+// Cowork control-plane (Phase 1 Observe): live detail surfaced to the board.
+const COWORK_BOOT_TS = Date.now();
+let coworkTask = 'booting';
+let coworkLastError: string | null = null;
+let coworkPaused = false;
+bot.catch((err) => {
+  const msg = err instanceof Error ? err.message : String(err);
+  coworkLastError = msg;
+  console.error('[zoe/index] bot error:', msg);
+  void reportEvent('error', msg, { unit: 'zoe-bot' });
+});
+// Phase 2 Control: a `pause` command drops incoming Telegram updates (control-
+// plane ask/run_task still work - they call the brain directly, not via this
+// middleware). `resume` clears it. Registered before handlers so it gates them.
+bot.use(async (ctx, next) => {
+  if (coworkPaused) return;
+  await next();
+});
 
 function isFromZaal(ctx: Context): boolean {
   return ctx.from?.id === zaalId;
@@ -1312,10 +1331,73 @@ async function main(): Promise<void> {
   }
 
   // Heartbeat to the coworking status board (dormant unless COWORK_API_URL/TOKEN set).
-  startHeartbeat(60_000, () => 'up', { unit: 'zoe-bot' });
+  // metaFn enriches each heartbeat with live detail for the board's per-bot panel.
+  startHeartbeat(60_000, () => 'up', { unit: 'zoe-bot' }, () => ({
+    current_task: coworkTask,
+    last_error: coworkLastError,
+    uptime_s: Math.round((Date.now() - COWORK_BOOT_TS) / 1000),
+  }));
+
+  // Phases 2-4 Control/Task/Converse: pull + execute commands from the board.
+  // ZOE has a brain, so it serves run_task (assign a cowork todo) and ask
+  // (answer a question) via the concierge; lifecycle is handled generically.
+  startCommandPoller({
+    onPause: () => {
+      coworkPaused = true;
+      coworkTask = 'paused';
+      void reportEvent('paused', 'paused via control plane', { unit: 'zoe-bot' });
+    },
+    onResume: () => {
+      coworkPaused = false;
+      coworkTask = 'idle (polling)';
+      void reportEvent('resumed', 'resumed via control plane', { unit: 'zoe-bot' });
+    },
+    onAsk: async (args) => {
+      const prompt = typeof args.prompt === 'string' ? args.prompt : '';
+      if (!prompt) return { error: 'no prompt' };
+      coworkTask = 'answering (ask)';
+      void reportEvent('ask', prompt.slice(0, 200), { unit: 'zoe-bot' });
+      const blocks = await buildMemoryBlocks('private');
+      const result = await runConciergeTurn({
+        message: prompt,
+        blocks,
+        senderLabel: 'Board',
+        context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
+      });
+      coworkTask = 'idle (polling)';
+      return { reply: result.reply };
+    },
+    onRunTask: async (args) => {
+      const instructions = typeof args.instructions === 'string' ? args.instructions : '';
+      const todoId = args.todo_id != null && args.todo_id !== '' ? String(args.todo_id) : '';
+      coworkTask = `run_task ${todoId}`.trim();
+      void reportEvent('run_task', instructions.slice(0, 200), { unit: 'zoe-bot', todo_id: todoId });
+      const blocks = await buildMemoryBlocks('private');
+      const result = await runConciergeTurn({
+        message:
+          `You are executing an assigned task${todoId ? ` (cowork todo #${todoId})` : ''}. ` +
+          `Instructions: ${instructions || '(none provided)'}\n\n` +
+          `Do what you can from here and summarize the outcome concisely.`,
+        blocks,
+        senderLabel: 'Board',
+        context: { zaal_tg_id: zaalId, workspace_dir: repoDir, current_date: currentDateString() },
+      });
+      if (result.task_ops.length > 0) await applyTaskOps(result.task_ops);
+      let todoMarked = false;
+      if (todoId) {
+        const r = await markDone(todoId, 'completed by ZOE via control plane');
+        todoMarked = r.ok;
+      }
+      coworkTask = 'idle (polling)';
+      return { reply: result.reply, todo_marked: todoMarked };
+    },
+  });
+
   await bot.start({
     onStart: (info) => {
       console.log(`[zoe/index] polling as @${info.username}`);
+      coworkTask = 'idle (polling)';
+      void reportEvent('startup', `online as @${info.username}`, { unit: 'zoe-bot' });
     },
   });
 }

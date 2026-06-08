@@ -26,10 +26,19 @@ loadEnv();
 import { Bot, Context } from 'grammy';
 import { envBotConfig, scheduleDailySummary } from './shared';
 import { registerCommands } from './commands';
+import { startHeartbeatAs } from '../lib/cowork';
 
 interface BootedBot {
   cfg: ReturnType<typeof envBotConfig>;
   bot: Bot<Context>;
+}
+
+// Each team bot reports to the cowork board as its own identity, using its own
+// cowork token (dormant unless COWORK_API_URL + that token are set).
+function coworkTokenFor(name: 'magnetiq' | 'attabotty'): string {
+  return name === 'magnetiq'
+    ? (process.env.COWORK_TOKEN_MAGNETIQ ?? '')
+    : (process.env.COWORK_TOKEN_ATTABOTTY ?? '');
 }
 
 async function bootBot(name: 'magnetiq' | 'attabotty'): Promise<BootedBot> {
@@ -42,6 +51,11 @@ async function bootBot(name: 'magnetiq' | 'attabotty'): Promise<BootedBot> {
   console.log(`[teams] ${name} bot=@${cfg.username} chat=${cfg.chatId} allowlist=[${cfg.allowedTelegramIds.join(',')}]`);
 
   scheduleDailySummary(bot, cfg);
+  // Cowork board heartbeat - one row per team bot.
+  startHeartbeatAs(coworkTokenFor(name), 60_000, () => 'up', {
+    unit: 'zao-team-bots',
+    identity: name,
+  });
   return { cfg, bot };
 }
 

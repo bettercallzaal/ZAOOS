@@ -22,7 +22,6 @@
     },
     { "path": "/api/cron/agents/banker", "schedule": "0 14 * * *" },
     { "path": "/api/cron/agents/dealer", "schedule": "0 22 * * *" },
-    { "path": "/api/cron/juke-stale-rooms", "schedule": "0 4 * * *" },
-    { "path": "/api/cron/100ms-stale-rooms", "schedule": "*/30 * * * *" }
+    { "path": "/api/cron/juke-stale-rooms", "schedule": "0 4 * * *" }
   ]
 }

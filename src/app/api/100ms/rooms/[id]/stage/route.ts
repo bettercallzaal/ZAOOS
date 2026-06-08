@@ -10,6 +10,7 @@ import {
   setSpeakerRequestStatus,
   addMSRoomSpeaker,
   removeMSRoomSpeaker,
+  getApprovedSpeakerNames,
 } from '@/lib/social/msRoomsDb';
 import { logger } from '@/lib/logger';
 
@@ -28,7 +29,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const room = await getMSRoomById(id);
     if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     const requests = await getSpeakerRequests(id, 'pending');
-    return NextResponse.json({ requests, speakers: getRoomSpeakerFids(room) });
+    const speakerNames = await getApprovedSpeakerNames(id);
+    return NextResponse.json({ requests, speakers: getRoomSpeakerFids(room), speakerNames });
   } catch (error) {
     logger.error('Get 100ms stage state error:', error);
     return NextResponse.json({ error: 'Failed to load stage state' }, { status: 500 });

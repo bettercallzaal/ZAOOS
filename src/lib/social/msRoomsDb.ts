@@ -1,6 +1,12 @@
 import { supabaseAdmin } from '@/lib/db/supabase';
 import type { TokenGateConfig } from '@/lib/spaces/tokenGate';
 
+/** A host-curated quick link / agenda item pinned to a room. */
+export interface PinnedLink {
+  label: string;
+  url: string;
+}
+
 export interface MSRoom {
   id: string;
   title: string;
@@ -9,7 +15,7 @@ export interface MSRoom {
   room_id_100ms: string | null;
   state: 'active' | 'ended';
   settings: Record<string, unknown>;
-  pinned_links: unknown[];
+  pinned_links: PinnedLink[];
   speakers: unknown[];
   created_at: string;
   ended_at: string | null;
@@ -82,6 +88,48 @@ export async function getMSRoomById(id: string): Promise<MSRoom | null> {
 
   if (error) return null;
   return data;
+}
+
+/** Persist the resolved 100ms room id on first join (only when not already set,
+ * so a re-resolution never clobbers a good value). Lets later joins skip the
+ * list/create round-trip and keeps stage-auth reads fast. */
+export async function setMSRoom100msId(id: string, roomId100ms: string): Promise<void> {
+  await supabaseAdmin
+    .from('ms_rooms')
+    .update({ room_id_100ms: roomId100ms })
+    .eq('id', id)
+    .is('room_id_100ms', null);
+}
+
+/** Replace a room's pinned links (host-curated quick links / agenda). */
+export async function setMSRoomPinnedLinks(id: string, links: PinnedLink[]): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('ms_rooms')
+    .update({ pinned_links: links })
+    .eq('id', id);
+  if (error) throw new Error(`Failed to update pinned links: ${error.message}`);
+}
+
+/** Cache the live participant count (best-effort, sourced from the 100ms API). */
+export async function setMSRoomParticipantCount(id: string, count: number): Promise<void> {
+  await supabaseAdmin.from('ms_rooms').update({ participant_count: count }).eq('id', id);
+}
+
+/** fid -> display name for a room's approved speakers (from speaker_requests),
+ * so the host's "on stage" panel can show names rather than bare FIDs. */
+export async function getApprovedSpeakerNames(roomId: string): Promise<Record<number, string>> {
+  const { data } = await supabaseAdmin
+    .from('speaker_requests')
+    .select('requester_fid, requester_name')
+    .eq('room_id', roomId)
+    .eq('status', 'approved');
+  const map: Record<number, string> = {};
+  for (const r of data ?? []) {
+    if (typeof r.requester_fid === 'number') {
+      map[r.requester_fid] = r.requester_name || `fid-${r.requester_fid}`;
+    }
+  }
+  return map;
 }
 
 export async function endMSRoom(id: string): Promise<void> {

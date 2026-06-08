@@ -14,6 +14,7 @@ import SpacesTabs from '@/components/spaces/SpacesTabs';
 import CategoryFilter from '@/components/spaces/CategoryFilter';
 import ScheduledRooms from '@/components/spaces/ScheduledRooms';
 import PastRooms from '@/components/spaces/PastRooms';
+import SpacesLeaderboard from '@/components/spaces/SpacesLeaderboard';
 import { SongjamSpaceCard } from '@/components/spaces/SongjamSpaceCard';
 import type { Room, AudioProvider } from '@/lib/spaces/roomsDb';
 
@@ -200,9 +201,11 @@ export default function PublicSpacesPage() {
 
       <div className="px-4 max-w-4xl mx-auto w-full">
         <SpacesTabs active={activeTab} onChange={setActiveTab} liveBadge={stages.length} />
-        <div className="py-4">
-          <CategoryFilter value={category} onChange={setCategory} />
-        </div>
+        {activeTab !== 'leaderboard' && (
+          <div className="py-4">
+            <CategoryFilter value={category} onChange={setCategory} />
+          </div>
+        )}
       </div>
 
       <div className="flex-1 px-4 pb-6 max-w-4xl mx-auto w-full">
@@ -214,6 +217,7 @@ export default function PublicSpacesPage() {
         )}
         {activeTab === 'upcoming' && <ScheduledRooms category={category} />}
         {activeTab === 'past' && <PastRooms category={category} />}
+        {activeTab === 'leaderboard' && <SpacesLeaderboard />}
       </div>
 
       {user && <HostRoomModal isOpen={showHostModal} onClose={() => setShowHostModal(false)} onCreateRoom={handleCreateRoom} />}

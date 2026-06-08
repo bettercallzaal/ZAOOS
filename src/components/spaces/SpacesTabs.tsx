@@ -11,6 +11,7 @@ const TABS = [
   { id: 'live', label: 'Live' },
   { id: 'upcoming', label: 'Upcoming' },
   { id: 'past', label: 'Past' },
+  { id: 'leaderboard', label: 'Leaderboard' },
 ];
 
 export default function SpacesTabs({ active, onChange, liveBadge, upcomingBadge }: SpacesTabsProps) {

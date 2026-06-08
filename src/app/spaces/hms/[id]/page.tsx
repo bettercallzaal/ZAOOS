@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -138,6 +138,42 @@ export default function HMSRoomPage() {
   useEffect(() => {
     if (room) setPinnedLinks(Array.isArray(room.pinned_links) ? room.pinned_links : []);
   }, [room]);
+
+  // Leaderboard session tracking — parity with the Stream room page. Records
+  // time spent in 100ms rooms into space_sessions so it counts on the
+  // leaderboard. Starts once the user has actually entered (room loaded, gate
+  // passed, signed in); ends on tab close + on unmount (route change / leave).
+  const sessionStartedRef = useRef(false);
+  useEffect(() => {
+    if (!room || gateBlocked || loading || !user?.fid || sessionStartedRef.current) return;
+    sessionStartedRef.current = true;
+    fetch('/api/spaces/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        roomId: room.id,
+        roomName: room.title,
+        roomType: isStage ? 'stage' : 'voice_channel',
+      }),
+    }).catch(() => {});
+  }, [room, gateBlocked, loading, user?.fid, isStage]);
+
+  useEffect(() => {
+    const endSession = () => {
+      if (!room?.id || !sessionStartedRef.current) return;
+      fetch('/api/spaces/session', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId: room.id }),
+        keepalive: true,
+      }).catch(() => {});
+    };
+    window.addEventListener('beforeunload', endSession);
+    return () => {
+      window.removeEventListener('beforeunload', endSession);
+      endSession(); // route change / leave
+    };
+  }, [room?.id]);
 
   const raiseHand = async () => {
     setHandRaised(true);

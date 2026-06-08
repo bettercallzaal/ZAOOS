@@ -53,9 +53,14 @@ export default function HMSRoomPage() {
   const canSpeak = !isStage || isHost || (user ? speakers.includes(user.fid) : false);
   const hmsRole = canSpeak ? 'speaker' : 'listener';
 
+  // Post-load API/realtime calls key off the room's real UUID (room.id), not the
+  // URL param — which may be a share slug. Only the initial fetch uses the param.
+  const roomDbId = room?.id;
+
   const refreshStage = useCallback(async () => {
+    if (!roomDbId) return;
     try {
-      const res = await fetch(`/api/100ms/rooms/${roomId}/stage`);
+      const res = await fetch(`/api/100ms/rooms/${roomDbId}/stage`);
       if (!res.ok) return;
       const data = await res.json();
       setSpeakers((data.speakers as number[]) ?? []);
@@ -64,7 +69,7 @@ export default function HMSRoomPage() {
     } catch {
       // Non-fatal — the room still works without live stage state.
     }
-  }, [roomId]);
+  }, [roomDbId]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -120,13 +125,13 @@ export default function HMSRoomPage() {
 
     const supabase = getSupabaseBrowser();
     const channel = supabase
-      .channel(`hms-stage-${roomId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'speaker_requests', filter: `room_id=eq.${roomId}` }, () => refreshStage())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'ms_rooms', filter: `id=eq.${roomId}` }, () => refreshStage())
+      .channel(`hms-stage-${room.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'speaker_requests', filter: `room_id=eq.${room.id}` }, () => refreshStage())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ms_rooms', filter: `id=eq.${room.id}` }, () => refreshStage())
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [isStage, room, roomId, refreshStage]);
+  }, [isStage, room, refreshStage]);
 
   // Clear the local "hand raised" flag once the host acts (we're now a speaker)
   // or the request is gone from the pending list.
@@ -138,6 +143,15 @@ export default function HMSRoomPage() {
   useEffect(() => {
     if (room) setPinnedLinks(Array.isArray(room.pinned_links) ? room.pinned_links : []);
   }, [room]);
+
+  // Canonicalize the address bar to the shareable slug URL, so a host who landed
+  // on the raw /spaces/hms/<uuid> link can just copy /spaces/hms/<slug>.
+  useEffect(() => {
+    const slug = room?.settings?.slug;
+    if (typeof slug === 'string' && slug && typeof window !== 'undefined' && roomId !== slug) {
+      window.history.replaceState(null, '', `/spaces/hms/${slug}`);
+    }
+  }, [room, roomId]);
 
   // Leaderboard session tracking — parity with the Stream room page. Records
   // time spent in 100ms rooms into space_sessions so it counts on the
@@ -178,7 +192,7 @@ export default function HMSRoomPage() {
   const raiseHand = async () => {
     setHandRaised(true);
     try {
-      const res = await fetch(`/api/100ms/rooms/${roomId}/stage`, {
+      const res = await fetch(`/api/100ms/rooms/${roomDbId}/stage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'raise_hand' }),
@@ -190,7 +204,7 @@ export default function HMSRoomPage() {
   };
 
   const hostAction = async (action: 'approve' | 'deny' | 'demote', fid: number) => {
-    await fetch(`/api/100ms/rooms/${roomId}/stage`, {
+    await fetch(`/api/100ms/rooms/${roomDbId}/stage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, fid }),
@@ -201,7 +215,7 @@ export default function HMSRoomPage() {
   const savePinnedLinks = async (next: PinnedLink[]) => {
     setSavingLinks(true);
     try {
-      const res = await fetch(`/api/100ms/rooms/${roomId}`, {
+      const res = await fetch(`/api/100ms/rooms/${roomDbId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pinnedLinks: next }),

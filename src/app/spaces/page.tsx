@@ -243,6 +243,7 @@ interface HmsRoomCard {
   title: string;
   host_name: string;
   participant_count: number;
+  slug?: string | null;
 }
 
 function LiveTab({ loading, stages, jukeRooms, hmsRooms, myRooms, otherRooms, user, onHost, onJoin }: {
@@ -443,7 +444,7 @@ function HmsLiveSection({ rooms }: { rooms: HmsRoomCard[] }) {
         {rooms.map((r) => (
           <Link
             key={r.id}
-            href={`/spaces/hms/${r.id}`}
+            href={`/spaces/hms/${r.slug || r.id}`}
             aria-label={`Join video room: ${r.title}`}
             className="group block border rounded-xl p-4 transition-all bg-[#111d2e] border-white/[0.08] hover:border-gray-600 hover:shadow-lg hover:shadow-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a1628]"
           >

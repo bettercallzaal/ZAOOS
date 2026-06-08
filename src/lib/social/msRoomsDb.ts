@@ -36,6 +36,31 @@ export function isStageRoom(room: Pick<MSRoom, 'settings'>): boolean {
   return room.settings?.room_type === 'stage';
 }
 
+/** A room's human-readable share slug (stored in settings — no dedicated column). */
+export function roomSlug(room: Pick<MSRoom, 'settings'>): string | null {
+  const slug = room.settings?.slug;
+  return typeof slug === 'string' && slug.length > 0 ? slug : null;
+}
+
+/** Build a readable, collision-resistant slug from a title (base + short suffix). */
+export function slugifyTitle(title: string): string {
+  const base =
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60) || 'room';
+  const suffix = Math.random().toString(36).slice(2, 6);
+  return `${base}-${suffix}`;
+}
+
+/** True for a canonical ms_rooms UUID (vs a share slug). */
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 export async function createMSRoom(data: {
   title: string;
   hostFid: number;
@@ -43,13 +68,16 @@ export async function createMSRoom(data: {
   roomId100ms?: string;
   gateConfig?: TokenGateConfig | null;
   roomType?: 'stage' | 'video';
+  slug?: string;
 }): Promise<MSRoom> {
-  // Token gate + room_type live in the `settings` jsonb column (no dedicated
-  // column / migration). Read back via room.settings.*. The gate is enforced
-  // client-side at /spaces/hms/[id]; room_type drives stage mode.
+  // Token gate + room_type + share slug live in the `settings` jsonb column (no
+  // dedicated column / migration). Read back via room.settings.*. The gate is
+  // enforced client-side at /spaces/hms/[id]; room_type drives stage mode; slug
+  // powers the shareable /spaces/hms/<slug> URL.
   const settings: Record<string, unknown> = {};
   if (data.gateConfig) settings.gate_config = data.gateConfig;
   if (data.roomType) settings.room_type = data.roomType;
+  settings.slug = data.slug?.trim() || slugifyTitle(data.title);
 
   const { data: room, error } = await supabaseAdmin
     .from('ms_rooms')
@@ -88,6 +116,33 @@ export async function getMSRoomById(id: string): Promise<MSRoom | null> {
 
   if (error) return null;
   return data;
+}
+
+/** Resolve a room by its UUID or its share slug (settings->>slug). Powers the
+ * /spaces/hms/<slug> URL while keeping old /spaces/hms/<uuid> links working. */
+export async function getMSRoomBySlugOrId(idOrSlug: string): Promise<MSRoom | null> {
+  if (isUuid(idOrSlug)) return getMSRoomById(idOrSlug);
+  const { data, error } = await supabaseAdmin
+    .from('ms_rooms')
+    .select('*')
+    .eq('settings->>slug', idOrSlug)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return data;
+}
+
+/** Ensure a room has a share slug, generating + persisting one if missing (used
+ * to backfill rooms created before slugs existed). Returns the slug. */
+export async function ensureMSRoomSlug(room: MSRoom): Promise<string> {
+  const existing = roomSlug(room);
+  if (existing) return existing;
+  const slug = slugifyTitle(room.title);
+  const settings = { ...(room.settings ?? {}), slug };
+  await supabaseAdmin.from('ms_rooms').update({ settings }).eq('id', room.id);
+  room.settings = settings;
+  return slug;
 }
 
 /** Look up the active room for a resolved 100ms room id (used by the webhook). */

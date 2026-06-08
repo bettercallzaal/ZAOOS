@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { createMSRoom, getActiveMSRooms, setMSRoomParticipantCount } from '@/lib/social/msRoomsDb';
+import { createMSRoom, getActiveMSRooms, setMSRoomParticipantCount, roomSlug } from '@/lib/social/msRoomsDb';
 import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
 import { logger } from '@/lib/logger';
 
@@ -24,6 +24,8 @@ const CreateSchema = z.object({
   gate_config: GateConfigSchema,
   // 'stage' = host speaks, listeners raise hand; anything else = open video room.
   room_type: z.enum(['stage', 'voice_channel']).optional(),
+  // Human-readable share slug for /spaces/hms/<slug> (generated server-side if omitted).
+  slug: z.string().max(80).optional(),
 });
 
 // Public list of active 100ms rooms — powers the "Live on 100ms" section on
@@ -37,7 +39,9 @@ export async function GET() {
     // Fault-tolerant: any room whose count can't be resolved keeps its stored
     // value, and the whole thing is skipped when 100ms creds are absent.
     const mgmt = mintManagementToken();
-    if (!mgmt) return NextResponse.json({ rooms });
+    if (!mgmt) {
+      return NextResponse.json({ rooms: rooms.map((r) => ({ ...r, slug: roomSlug(r) })) });
+    }
 
     const settled = await Promise.allSettled(
       rooms.map(async (room) => {
@@ -50,7 +54,9 @@ export async function GET() {
         return { ...room, participant_count: count };
       }),
     );
-    const live = settled.map((r, i) => (r.status === 'fulfilled' ? r.value : rooms[i]));
+    const live = settled
+      .map((r, i) => (r.status === 'fulfilled' ? r.value : rooms[i]))
+      .map((r) => ({ ...r, slug: roomSlug(r) }));
     return NextResponse.json({ rooms: live });
   } catch (error) {
     logger.error('List 100ms rooms error:', error);
@@ -77,9 +83,10 @@ export async function POST(req: NextRequest) {
       hostName: session.displayName,
       gateConfig: parsed.data.gate_config ?? undefined,
       roomType: parsed.data.room_type === 'stage' ? 'stage' : 'video',
+      slug: parsed.data.slug,
     });
 
-    return NextResponse.json({ room });
+    return NextResponse.json({ room: { ...room, slug: roomSlug(room) } });
   } catch (error) {
     logger.error('Create 100ms room error:', error);
     return NextResponse.json({ error: 'Failed to create room' }, { status: 500 });

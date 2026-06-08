@@ -18,6 +18,7 @@ vi.mock('@/lib/auth/session', () => ({
 vi.mock('@/lib/social/msRoomsDb', () => ({
   createMSRoom: mockCreateMSRoom,
   getActiveMSRooms: mockGetActiveMSRooms,
+  roomSlug: (room: { settings?: { slug?: string } }) => room?.settings?.slug ?? null,
 }));
 
 vi.mock('@/lib/logger', () => ({

@@ -7,12 +7,14 @@ import {
 
 const {
   mockGetSessionData,
-  mockGetMSRoomById,
+  mockGetMSRoomBySlugOrId,
+  mockEnsureMSRoomSlug,
   mockEndMSRoom,
   mockSetMSRoomPinnedLinks,
 } = vi.hoisted(() => ({
   mockGetSessionData: vi.fn(),
-  mockGetMSRoomById: vi.fn(),
+  mockGetMSRoomBySlugOrId: vi.fn(),
+  mockEnsureMSRoomSlug: vi.fn(),
   mockEndMSRoom: vi.fn(),
   mockSetMSRoomPinnedLinks: vi.fn(),
 }));
@@ -22,7 +24,8 @@ vi.mock('@/lib/auth/session', () => ({
 }));
 
 vi.mock('@/lib/social/msRoomsDb', () => ({
-  getMSRoomById: mockGetMSRoomById,
+  getMSRoomBySlugOrId: mockGetMSRoomBySlugOrId,
+  ensureMSRoomSlug: mockEnsureMSRoomSlug,
   endMSRoom: mockEndMSRoom,
   setMSRoomPinnedLinks: mockSetMSRoomPinnedLinks,
 }));
@@ -31,7 +34,7 @@ vi.mock('@/lib/logger', () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
-import { PATCH } from '../route';
+import { GET, PATCH } from '../route';
 
 const ctx = { params: Promise.resolve({ id: 'room-1' }) };
 const HOST_ROOM = { id: 'room-1', host_fid: 123, state: 'active' };
@@ -47,7 +50,7 @@ describe('PATCH /api/100ms/rooms/[id]', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetSessionData.mockResolvedValue(mockAuthenticatedSession()); // fid 123 = host
-    mockGetMSRoomById.mockResolvedValue(HOST_ROOM);
+    mockGetMSRoomBySlugOrId.mockResolvedValue(HOST_ROOM);
   });
 
   it('returns 401 when unauthenticated', async () => {
@@ -93,5 +96,27 @@ describe('PATCH /api/100ms/rooms/[id]', () => {
     const res = await PATCH(makePatch({ pinnedLinks: links }), ctx);
     expect(res.status).toBe(400);
     expect(mockSetMSRoomPinnedLinks).not.toHaveBeenCalled();
+  });
+});
+
+describe('GET /api/100ms/rooms/[id]', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetMSRoomBySlugOrId.mockResolvedValue(HOST_ROOM);
+    mockEnsureMSRoomSlug.mockResolvedValue('test3-ab12');
+  });
+
+  it('resolves by slug-or-id and returns the (backfilled) share slug', async () => {
+    const res = await GET(makeRequest('/x'), { params: Promise.resolve({ id: 'test3-ab12' }) });
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(mockGetMSRoomBySlugOrId).toHaveBeenCalledWith('test3-ab12');
+    expect(body.room.slug).toBe('test3-ab12');
+  });
+
+  it('returns 404 for an unknown room', async () => {
+    mockGetMSRoomBySlugOrId.mockResolvedValue(null);
+    const res = await GET(makeRequest('/x'), ctx);
+    expect(res.status).toBe(404);
   });
 });

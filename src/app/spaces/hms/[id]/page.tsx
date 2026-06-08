@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -8,7 +8,7 @@ import { useAccount } from 'wagmi';
 import { useAuth } from '@/hooks/useAuth';
 import { getSupabaseBrowser } from '@/lib/db/supabase';
 // Type-only imports — the msRoomsDb module itself is server-only (service role).
-import type { MSRoom, SpeakerRequest } from '@/lib/social/msRoomsDb';
+import type { MSRoom, SpeakerRequest, PinnedLink } from '@/lib/social/msRoomsDb';
 import type { TokenGateConfig } from '@/lib/spaces/tokenGate';
 
 const HMSVideoRoom = dynamic(() => import('@/components/spaces/HMSVideoRoom'), { ssr: false });
@@ -34,8 +34,16 @@ export default function HMSRoomPage() {
 
   // Stage state (only meaningful when room.settings.room_type === 'stage').
   const [speakers, setSpeakers] = useState<number[]>([]);
+  const [speakerNames, setSpeakerNames] = useState<Record<number, string>>({});
   const [pendingRequests, setPendingRequests] = useState<SpeakerRequest[]>([]);
   const [handRaised, setHandRaised] = useState(false);
+
+  // Pinned links (host-curated quick links / agenda).
+  const [pinnedLinks, setPinnedLinks] = useState<PinnedLink[]>([]);
+  const [editingLinks, setEditingLinks] = useState(false);
+  const [savingLinks, setSavingLinks] = useState(false);
+  const [linkLabel, setLinkLabel] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
 
   const isHost = user?.fid === room?.host_fid;
   const isStage = room?.settings?.room_type === 'stage';
@@ -51,6 +59,7 @@ export default function HMSRoomPage() {
       if (!res.ok) return;
       const data = await res.json();
       setSpeakers((data.speakers as number[]) ?? []);
+      setSpeakerNames((data.speakerNames as Record<number, string>) ?? {});
       setPendingRequests((data.requests as SpeakerRequest[]) ?? []);
     } catch {
       // Non-fatal — the room still works without live stage state.
@@ -125,6 +134,47 @@ export default function HMSRoomPage() {
     if (canSpeak) setHandRaised(false);
   }, [canSpeak]);
 
+  // Keep the editable pinned-links list in sync with the loaded room.
+  useEffect(() => {
+    if (room) setPinnedLinks(Array.isArray(room.pinned_links) ? room.pinned_links : []);
+  }, [room]);
+
+  // Leaderboard session tracking — parity with the Stream room page. Records
+  // time spent in 100ms rooms into space_sessions so it counts on the
+  // leaderboard. Starts once the user has actually entered (room loaded, gate
+  // passed, signed in); ends on tab close + on unmount (route change / leave).
+  const sessionStartedRef = useRef(false);
+  useEffect(() => {
+    if (!room || gateBlocked || loading || !user?.fid || sessionStartedRef.current) return;
+    sessionStartedRef.current = true;
+    fetch('/api/spaces/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        roomId: room.id,
+        roomName: room.title,
+        roomType: isStage ? 'stage' : 'voice_channel',
+      }),
+    }).catch(() => {});
+  }, [room, gateBlocked, loading, user?.fid, isStage]);
+
+  useEffect(() => {
+    const endSession = () => {
+      if (!room?.id || !sessionStartedRef.current) return;
+      fetch('/api/spaces/session', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId: room.id }),
+        keepalive: true,
+      }).catch(() => {});
+    };
+    window.addEventListener('beforeunload', endSession);
+    return () => {
+      window.removeEventListener('beforeunload', endSession);
+      endSession(); // route change / leave
+    };
+  }, [room?.id]);
+
   const raiseHand = async () => {
     setHandRaised(true);
     try {
@@ -139,13 +189,41 @@ export default function HMSRoomPage() {
     }
   };
 
-  const hostAction = async (action: 'approve' | 'deny', fid: number) => {
+  const hostAction = async (action: 'approve' | 'deny' | 'demote', fid: number) => {
     await fetch(`/api/100ms/rooms/${roomId}/stage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, fid }),
     }).catch(() => {});
     refreshStage();
+  };
+
+  const savePinnedLinks = async (next: PinnedLink[]) => {
+    setSavingLinks(true);
+    try {
+      const res = await fetch(`/api/100ms/rooms/${roomId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pinnedLinks: next }),
+      });
+      if (res.ok) setPinnedLinks(next);
+    } finally {
+      setSavingLinks(false);
+    }
+  };
+
+  const addPinnedLink = () => {
+    const label = linkLabel.trim();
+    let url = linkUrl.trim();
+    if (!label || !url) return;
+    if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+    setLinkLabel('');
+    setLinkUrl('');
+    savePinnedLinks([...pinnedLinks, { label, url }].slice(0, 10));
+  };
+
+  const removePinnedLink = (index: number) => {
+    savePinnedLinks(pinnedLinks.filter((_, i) => i !== index));
   };
 
   const handleLeave = async () => {
@@ -274,6 +352,31 @@ export default function HMSRoomPage() {
           </div>
         )}
 
+        {/* Host stage moderation: remove an already-approved speaker. */}
+        {isStage && isHost && speakers.filter((f) => f !== room.host_fid).length > 0 && (
+          <div className="mb-4 rounded-xl border border-white/[0.08] bg-[#0d1b2a] p-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+              On stage ({speakers.filter((f) => f !== room.host_fid).length})
+            </h2>
+            <ul className="space-y-2">
+              {speakers
+                .filter((f) => f !== room.host_fid)
+                .map((fid) => (
+                  <li key={fid} className="flex items-center justify-between gap-3">
+                    <span className="text-white text-sm truncate">🎙️ {speakerNames[fid] || `fid-${fid}`}</span>
+                    <button
+                      type="button"
+                      onClick={() => hostAction('demote', fid)}
+                      className="px-3 py-1 rounded-lg border border-red-500/40 text-red-400 text-xs hover:bg-red-500/10 flex-shrink-0"
+                    >
+                      Remove from stage
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
+
         {/* Listener raise-hand control. */}
         {isStage && !canSpeak && user && (
           <div className="mb-4 flex items-center justify-center">
@@ -287,6 +390,85 @@ export default function HMSRoomPage() {
               >
                 ✋ Raise hand to speak
               </button>
+            )}
+          </div>
+        )}
+
+        {/* Pinned links / agenda — visible to everyone, editable by the host. */}
+        {(pinnedLinks.length > 0 || isHost) && (
+          <div className="mb-4 rounded-xl border border-white/[0.08] bg-[#0d1b2a] p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400">Pinned links</h2>
+              {isHost && (
+                <button
+                  type="button"
+                  onClick={() => setEditingLinks((v) => !v)}
+                  className="text-xs text-[#f5a623] hover:underline"
+                >
+                  {editingLinks ? 'Done' : 'Edit'}
+                </button>
+              )}
+            </div>
+
+            {pinnedLinks.length === 0 ? (
+              <p className="text-gray-500 text-sm">
+                {isHost ? 'Add links for everyone in the room — agenda, docs, mints.' : 'No links pinned.'}
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {pinnedLinks.map((link, i) => (
+                  <span
+                    key={`${link.url}-${i}`}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1 text-sm"
+                  >
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="max-w-[12rem] truncate text-[#f5a623] hover:underline"
+                    >
+                      {link.label}
+                    </a>
+                    {isHost && editingLinks && (
+                      <button
+                        type="button"
+                        onClick={() => removePinnedLink(i)}
+                        aria-label={`Remove ${link.label}`}
+                        className="text-gray-500 hover:text-red-400"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {isHost && editingLinks && pinnedLinks.length < 10 && (
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <input
+                  value={linkLabel}
+                  onChange={(e) => setLinkLabel(e.target.value)}
+                  placeholder="Label"
+                  maxLength={80}
+                  className="min-w-[8rem] flex-1 rounded-lg border border-white/15 bg-[#0a1628] px-3 py-1.5 text-sm text-white placeholder:text-gray-600"
+                />
+                <input
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="https://…"
+                  maxLength={500}
+                  className="min-w-[10rem] flex-[2] rounded-lg border border-white/15 bg-[#0a1628] px-3 py-1.5 text-sm text-white placeholder:text-gray-600"
+                />
+                <button
+                  type="button"
+                  onClick={addPinnedLink}
+                  disabled={savingLinks || !linkLabel.trim() || !linkUrl.trim()}
+                  className="rounded-lg bg-[#f5a623] px-3 py-1.5 text-xs font-semibold text-[#0a1628] hover:bg-[#ffd700] disabled:opacity-50"
+                >
+                  Add
+                </button>
+              </div>
             )}
           </div>
         )}

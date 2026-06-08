@@ -14,6 +14,7 @@ const {
   mockSetSpeakerRequestStatus,
   mockAddMSRoomSpeaker,
   mockRemoveMSRoomSpeaker,
+  mockGetApprovedSpeakerNames,
 } = vi.hoisted(() => ({
   mockGetSessionData: vi.fn(),
   mockGetMSRoomById: vi.fn(),
@@ -22,6 +23,7 @@ const {
   mockSetSpeakerRequestStatus: vi.fn(),
   mockAddMSRoomSpeaker: vi.fn(),
   mockRemoveMSRoomSpeaker: vi.fn(),
+  mockGetApprovedSpeakerNames: vi.fn(),
 }));
 
 vi.mock('@/lib/auth/session', () => ({
@@ -38,6 +40,7 @@ vi.mock('@/lib/social/msRoomsDb', () => ({
   setSpeakerRequestStatus: mockSetSpeakerRequestStatus,
   addMSRoomSpeaker: mockAddMSRoomSpeaker,
   removeMSRoomSpeaker: mockRemoveMSRoomSpeaker,
+  getApprovedSpeakerNames: mockGetApprovedSpeakerNames,
 }));
 
 vi.mock('@/lib/logger', () => ({
@@ -118,14 +121,16 @@ describe('GET /api/100ms/rooms/[id]/stage', () => {
     vi.clearAllMocks();
     mockGetMSRoomById.mockResolvedValue({ ...STAGE_ROOM, speakers: [123, 555] });
     mockGetSpeakerRequests.mockResolvedValue([{ id: 'r1', requester_fid: 777 }]);
+    mockGetApprovedSpeakerNames.mockResolvedValue({ 555: 'Lou' });
   });
 
-  it('returns pending requests and the approved speakers', async () => {
+  it('returns pending requests, approved speakers, and their names', async () => {
     const res = await GET(makeGetRequest('/x'), ctx);
     const body = await res.json();
     expect(res.status).toBe(200);
     expect(body.speakers).toEqual([123, 555]);
     expect(body.requests).toHaveLength(1);
+    expect(body.speakerNames).toEqual({ 555: 'Lou' });
   });
 
   it('returns 404 for a missing room', async () => {

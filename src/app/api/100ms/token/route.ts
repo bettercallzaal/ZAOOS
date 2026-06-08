@@ -3,7 +3,7 @@ import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
 import { supabaseAdmin } from '@/lib/db/supabase';
-import { getMSRoomById, isStageRoom, getRoomSpeakerFids } from '@/lib/social/msRoomsDb';
+import { getMSRoomById, isStageRoom, getRoomSpeakerFids, setMSRoom100msId } from '@/lib/social/msRoomsDb';
 import { logger } from '@/lib/logger';
 
 const TokenSchema = z.object({
@@ -119,6 +119,13 @@ export async function POST(req: NextRequest) {
         });
         const created = await createRes.json();
         hmsRoomId = created.id;
+      }
+
+      // Persist the resolved 100ms room id back onto its ms_rooms row (when the
+      // roomName is an ms_rooms UUID, not a fishbowl/default room) so future
+      // joins skip this list/create round-trip. Best-effort, non-blocking.
+      if (hmsRoomId && roomName && !roomName.startsWith('fishbowl-') && roomName !== 'zao-live-room') {
+        setMSRoom100msId(roomName, hmsRoomId).catch((e) => logger.error('persist room_id_100ms failed', e));
       }
     }
 

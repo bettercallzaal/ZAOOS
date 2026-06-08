@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
-import { createMSRoom, getActiveMSRooms } from '@/lib/social/msRoomsDb';
+import { createMSRoom, getActiveMSRooms, setMSRoomParticipantCount } from '@/lib/social/msRoomsDb';
+import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
 import { logger } from '@/lib/logger';
 
 // Mirrors the Stream room create schema so a token gate set in HostRoomModal is
@@ -30,7 +31,27 @@ const CreateSchema = z.object({
 export async function GET() {
   try {
     const rooms = await getActiveMSRooms();
-    return NextResponse.json({ rooms });
+
+    // Enrich the stored participant_count with the live 100ms peer count so the
+    // /spaces listing shows real numbers, not the stale value cached at create.
+    // Fault-tolerant: any room whose count can't be resolved keeps its stored
+    // value, and the whole thing is skipped when 100ms creds are absent.
+    const mgmt = mintManagementToken();
+    if (!mgmt) return NextResponse.json({ rooms });
+
+    const settled = await Promise.allSettled(
+      rooms.map(async (room) => {
+        if (!room.room_id_100ms) return room;
+        const count = await get100msPeerCount(room.room_id_100ms, mgmt);
+        if (count === null) return room;
+        if (count !== room.participant_count) {
+          setMSRoomParticipantCount(room.id, count).catch(() => {});
+        }
+        return { ...room, participant_count: count };
+      }),
+    );
+    const live = settled.map((r, i) => (r.status === 'fulfilled' ? r.value : rooms[i]));
+    return NextResponse.json({ rooms: live });
   } catch (error) {
     logger.error('List 100ms rooms error:', error);
     return NextResponse.json({ error: 'Failed to list rooms' }, { status: 500 });

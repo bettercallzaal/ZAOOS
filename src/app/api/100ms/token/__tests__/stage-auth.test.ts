@@ -17,7 +17,8 @@ vi.mock('@/lib/social/msRoomsDb', () => ({
     Array.isArray(room.speakers) ? room.speakers.filter((s) => typeof s === 'number') : [],
 }));
 
-vi.mock('@/lib/db/supabase', () => ({ supabaseAdmin: {} }));
+vi.mock('@/lib/spaces/tokenGate', () => ({ checkTokenGate: vi.fn() }));
+vi.mock('@/lib/farcaster/neynar', () => ({ getUserByFid: vi.fn() }));
 vi.mock('@/lib/db/audit-log', () => ({
   logAuditEvent: vi.fn(),
   getClientIp: vi.fn(() => '127.0.0.1'),

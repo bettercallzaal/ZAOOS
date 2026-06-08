@@ -46,7 +46,9 @@ export async function get100msPeerCount(
       return Object.keys(data.peers).length;
     }
     if (typeof data?.peer_count === 'number') return data.peer_count;
-    return 0;
+    // Unrecognized shape — treat as "unknown", not "empty", so callers fall back
+    // to the cached count instead of sweeping a room that may still be live.
+    return null;
   } catch (err) {
     logger.error('[hms100ms] peer count failed', err);
     return null;

@@ -69,10 +69,11 @@ const MORE_ITEMS = [
   { label: 'Assistant', href: '/assistant', icon: '🤖' },
   { label: 'Notifications', href: '/notifications', icon: '🔔' },
   { label: 'Library', href: '/library', icon: '📚' },
+  { label: 'Overview', href: '/overview', icon: '🗺️' },
   { label: 'Settings', href: '/settings', icon: '⚙️' },
 ] as const;
 
-const MORE_MATCH_PATHS = ['/ecosystem', '/tools', '/contribute', '/settings', '/social', '/fishbowlz', '/spaces', '/wavewarz', '/members', '/assistant', '/notifications', '/calls', '/library'];
+const MORE_MATCH_PATHS = ['/overview', '/ecosystem', '/tools', '/contribute', '/settings', '/social', '/fishbowlz', '/spaces', '/wavewarz', '/members', '/assistant', '/notifications', '/calls', '/library'];
 
 export function BottomNav() {
   const pathname = usePathname();

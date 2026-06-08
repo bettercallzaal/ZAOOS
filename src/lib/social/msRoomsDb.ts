@@ -90,6 +90,28 @@ export async function getMSRoomById(id: string): Promise<MSRoom | null> {
   return data;
 }
 
+/** Look up the active room for a resolved 100ms room id (used by the webhook). */
+export async function getMSRoomByHmsRoomId(roomId100ms: string): Promise<MSRoom | null> {
+  const { data, error } = await supabaseAdmin
+    .from('ms_rooms')
+    .select('*')
+    .eq('room_id_100ms', roomId100ms)
+    .eq('state', 'active')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) return null;
+  return data;
+}
+
+/** Store a recording URL on a room (in the settings jsonb — no dedicated column). */
+export async function setMSRoomRecording(id: string, url: string): Promise<void> {
+  const room = await getMSRoomById(id);
+  if (!room) return;
+  const settings = { ...(room.settings ?? {}), recording_url: url };
+  await supabaseAdmin.from('ms_rooms').update({ settings }).eq('id', id);
+}
+
 /** Persist the resolved 100ms room id on first join (only when not already set,
  * so a re-resolution never clobbers a good value). Lets later joins skip the
  * list/create round-trip and keeps stage-auth reads fast. */

@@ -15,13 +15,15 @@ tier: STANDARD
 
 ## TL;DR
 
-The `old.reddit.com + .json + Mozilla UA` technique that doc 564 shipped on 2026-05-21 as "FIXED + TESTED" **is now dead.** Reddit tightened the gate in the ~3 weeks since. Every server-side fetcher in the ladder (curl, exa web_fetch, Jina Reader, WebSearch's UA) is blocked, and the local Playwright bridge isn't installed. The fix is **authenticated access via a free Reddit OAuth script-app** - auth defeats both gates Reddit now enforces. Separately, `/s/` mobile share links were never resolved to canonical first, so they'd fail even if the gate were open.
+The `old.reddit.com + .json + Mozilla UA` technique that doc 564 shipped on 2026-05-21 as "FIXED + TESTED" **is now dead.** Reddit tightened the gate in the ~3 weeks since. Every server-side fetcher in the ladder (curl, exa web_fetch, Jina Reader, WebSearch's UA) is blocked, and the local Playwright bridge isn't installed.
+
+> **SUPERSEDED 2026-06-08 by [doc 824](../824-keyless-forkable-fetch-trio/):** the shipped fix is NOT OAuth. To keep the script forkable (no env vars, no app registration), `~/bin/zao-fetch-reddit.sh` v3 now reads through **Redlib** (a public Reddit front-end that emulates the official Reddit Android app, so Reddit serves it normally) - keyless, multi-instance fallback. Verified on all 4 stuck threads. The OAuth path below remains accurate and is the **optional power-user upgrade** for higher reliability, but is no longer the default. The diagnosis (double-gate) and the `/s/` resolution fix below still stand.
 
 ## Key Decisions
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | **Add a Reddit OAuth script-app; rewrite `~/bin/zao-fetch-reddit.sh` to use `oauth.reddit.com` with a bearer token** | Reddit now gates on IP reputation AND TLS/client fingerprint at once. Authenticated `client_credentials` requests bypass both. Free tier = 100 QPM, no residential proxy, no browser. This is the only path that is not fragile. |
+| 1 | ~~Add a Reddit OAuth script-app~~ -> **REVISED (doc 824): default to keyless Redlib; OAuth is the optional upgrade** | OAuth works and defeats both gates, but the creds = env vars = not forkable (the whole point Zaal raised). Redlib needs zero config. Use Redlib by default; add OAuth only when you need higher reliability than public Redlib instances give. The OAuth mechanics below remain correct for that upgrade path. |
 | 2 | **Resolve `/s/` share links to the canonical `/comments/ID/slug` URL BEFORE fetching** | `old.reddit.com` 403s on `/s/` paths; the share URL must be followed on `www.reddit.com` first, then the query string dropped. The current script appends `.json` to the `/s/` URL directly - it can never work. Done manually in doc 819 (grep the interstitial for `/comments/`); automate it. |
 | 3 | **X long-form articles are login-walled - stop trying to fetch the body unauthenticated** | The syndication endpoint returns tweet text + article title + preview thesis, NOT the article body. Jina/exa return the X login shell. Either accept title+thesis (doc 819 did) or import a logged-in X session cookie via the `setup-browser-cookies` skill. Do not write a doc pretending the body was read. |
 | 4 | **Retire doc 564's "FIXED" claim; this doc is the current source of truth** | Doc 564 is now a historical postmortem of a fix that lasted ~3 weeks. Anyone trusting it will silently index off blocked HTML. |

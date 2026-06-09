@@ -4,7 +4,7 @@ type: guide
 status: research-complete
 last-validated: 2026-06-09
 superseded-by:
-related-docs: "825, 819, 826"
+related-docs: "832, 830, 833"
 original-query: "Fwd: Post by Kirill on X - 'grab this 16 min video, get transcript and summarize it' (Anthropic 'Claude Skills from scratch' talk by Barry + Mahesh). Surfaced from the past-inbox drain (doc 826)."
 tier: STANDARD
 ---
@@ -17,7 +17,7 @@ tier: STANDARD
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | **ZAO's skill library is the strategy, not a side-tool - this talk is the primary-source mandate for doc 825 Cluster 1** | Anthropic's own framing: "stop rebuilding agents, start building skills." ZAO already has 50+ skills (`/worksession`, `/zao-research`, `/inbox`, the fetch trio). Treat that library as the core asset and grow it deliberately - it's exactly the paradigm Anthropic is betting on. |
+| 1 | **ZAO's skill library is the strategy, not a side-tool - this talk is the primary-source mandate for doc 832 Cluster 1** | Anthropic's own framing: "stop rebuilding agents, start building skills." ZAO already has 50+ skills (`/worksession`, `/zao-research`, `/inbox`, the fetch trio). Treat that library as the core asset and grow it deliberately - it's exactly the paradigm Anthropic is betting on. |
 | 2 | **Adopt "MCP = connectivity, Skills = expertise" as ZAO's mental model** | The talk's cleanest line: MCP connects the agent to the outside world; skills carry the domain expertise. ZAO's stack already splits this way (MCP: context7/serena/supabase; skills: the ZAO library). Name it so new tooling lands in the right bucket. |
 | 3 | **Treat ZAO skills like software: testing, versioning, dependencies** | Anthropic's stated next focus. ZAO's session today proved the cost of NOT doing this (doc 564 skill rotted silently). The `zao-fetch-healthcheck.sh` weekly cron is the first instance of this discipline - extend it. |
 | 4 | **Use the skill-creator + "write-down-for-future-self" loop as ZAO's continuous-learning mechanic** | The talk: "anything Claude writes down can be used efficiently by a future version of itself." ZAO's feedback memories (`feedback_*.md`) + research docs ARE this. Lean in: every correction becomes a skill or memory, compounding across the org. |
@@ -46,15 +46,15 @@ tier: STANDARD
 
 ## ZAO Application
 
-- **Validates doc 825 Cluster 1 + doc 826 Cluster A** with the authoritative source. ZAO is already living this paradigm - the move is to be deliberate: a curated, versioned, tested skill library as institutional memory.
+- **Validates doc 832 Cluster 1 + doc 833 Cluster A** with the authoritative source. ZAO is already living this paradigm - the move is to be deliberate: a curated, versioned, tested skill library as institutional memory.
 - **ZABAL Games:** "non-technical people building skills" is the bootcamp thesis. Teach skill-authoring (folder + SKILL.md + progressive disclosure) as a core module.
 - **Continuous learning:** ZAO's `feedback_*.md` memories + research docs are the "write-down-for-future-self" loop. The skill-creator skill is the automation path.
 - **Today's session is a live example:** the keyless fetch trio = three skills/tools that encode expertise (how to read Reddit/X/Farcaster), versioned in `~/bin`, health-checked weekly. Exactly the talk's pattern.
 
 ## Also See
 
-- [Doc 825](../825-past-inbox-redrain/) - skill-library decision this talk mandates (Cluster 1)
-- [Doc 826](../../dev-workflows/826-past-inbox-nonsocial-drain/) - the drain that surfaced this video
+- [Doc 832](../832-past-inbox-redrain/) - skill-library decision this talk mandates (Cluster 1)
+- [Doc 833](../../dev-workflows/833-past-inbox-nonsocial-drain/) - the drain that surfaced this video
 
 ## Next Actions
 

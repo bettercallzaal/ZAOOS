@@ -4,22 +4,22 @@ type: market-research
 status: research-complete
 last-validated: 2026-06-09
 superseded-by:
-related-docs: "819, 824, 822, 823, 820, 759, 778"
+related-docs: "830, 831, 822, 823, 820, 759, 778"
 original-query: "How about past articles -> re-drain the PAST ZOE inbox (84 already-processed social items) properly now that the keyless fetch trio works"
 tier: DISPATCH
 ---
 
-# 825 - Past-Inbox Re-Drain (84 social items, keyless)
+# 832 - Past-Inbox Re-Drain (84 social items, keyless)
 
 > **Goal:** The ZOE inbox had 84+ already-processed social items (X, Reddit, Farcaster) indexed BEFORE today's keyless fetch trio existed - many off blocked or thin fetches. Re-fetch all of them with the working scripts and synthesize what they actually say.
 
 ## How this was produced
 
-Multi-agent workflow (22 agents, ~1M tokens, ~6 min): 12 parallel fetch agents re-pulled every item through the keyless trio - **Redlib** (Reddit, doc 824), **FxTwitter** (X, doc 822), **Haatz** (Farcaster, doc 823) - a cluster agent grouped them, 7 synthesis agents wrote one section each, a critic checked completeness.
+Multi-agent workflow (22 agents, ~1M tokens, ~6 min): 12 parallel fetch agents re-pulled every item through the keyless trio - **Redlib** (Reddit, doc 831), **FxTwitter** (X, doc 822), **Haatz** (Farcaster, doc 823) - a cluster agent grouped them, 7 synthesis agents wrote one section each, a critic checked completeness.
 
 **Result: 84 of 85 items fetched FULL, no keys, no env.** 1 failure (`x.com/mattepstein/status/2048190139055423779` - likely deleted/private; worth a manual retry only if you remember it being high-signal). This is the proof that the keyless trio works at backlog scale, not just on the 6 fresh items.
 
-The 84 items cluster into 7 themes below. The dominant two (Claude Code workflows + agentic orchestration, 49 of 84 items) extend and reinforce [doc 819](../819-ai-coding-agent-discourse-inbox-cluster/).
+The 84 items cluster into 7 themes below. The dominant two (Claude Code workflows + agentic orchestration, 49 of 84 items) extend and reinforce [doc 830](../830-ai-coding-agent-discourse-inbox-cluster/).
 
 ## Cluster Map
 

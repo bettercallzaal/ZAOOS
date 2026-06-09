@@ -4,20 +4,20 @@ type: market-research
 status: research-complete
 last-validated: 2026-06-09
 superseded-by:
-related-docs: "825, 824, 822, 823, 778, 780"
+related-docs: "832, 831, 822, 823, 778, 780"
 original-query: "yes lets drain everything i'd like to rerun research on these - the ~23 non-social inbox items (newsletters, Spotify, substacks, GitHub, tool links)"
 tier: STANDARD
 ---
 
-# 826 - Past-Inbox Non-Social Drain (the tail)
+# 833 - Past-Inbox Non-Social Drain (the tail)
 
-> **Goal:** Finish the inbox drain. Doc 825 covered the 84 social items; this covers the remaining 25 non-social ones - forwarded newsletters, tool/skill links, GitHub repos, a podcast, and several of Zaal's own embedded ideas/requests. Content lived in the email bodies (key-gated AgentMail), so this was fetched inline, not via the workflow.
+> **Goal:** Finish the inbox drain. Doc 832 covered the 84 social items; this covers the remaining 25 non-social ones - forwarded newsletters, tool/skill links, GitHub repos, a podcast, and several of Zaal's own embedded ideas/requests. Content lived in the email bodies (key-gated AgentMail), so this was fetched inline, not via the workflow.
 
 ## Key Decisions
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | **Adopt the `superpowers` skill + study the Anthropic "Claude Skills from scratch" build** | Two separate inbox items point here: Shann's post (808 likes) calls superpowers "the simplest way to level up any project in Claude, code or non-code, setup under 5 min"; Kirill's (5.3M views) is the Anthropic engineers' 16-min Claude Skills build. ZAO already uses superpowers - formalize a ZAO skill library (extends doc 825 Cluster 1). |
+| 1 | **Adopt the `superpowers` skill + study the Anthropic "Claude Skills from scratch" build** | Two separate inbox items point here: Shann's post (808 likes) calls superpowers "the simplest way to level up any project in Claude, code or non-code, setup under 5 min"; Kirill's (5.3M views) is the Anthropic engineers' 16-min Claude Skills build. ZAO already uses superpowers - formalize a ZAO skill library (extends doc 832 Cluster 1). |
 | 2 | **Empire Builder's `SKILL.md` is the reference pattern for any ZAO on-chain agent skill** | It's a clean ERC-4337 SmartVault treasury-orchestration skill (Base/Arbitrum: payouts, burns, airdrops, Clanker deploys) with the owner-signs-not-cosigners guard. Empire Builder is already a ZAO partner (docs 780/778). Copy its self-contained 4-file structure (SKILL + http-api + workflows + contracts) for ZAO treasury/bounty skills. |
 | 3 | **Steal "signal diversity" from the clear retrospective as ZAO's vibe-code QA doctrine** | The retrospective's core lesson: LLMs write code that passes tests while not working; the fix is MULTIPLE independent verification streams (design doc + review + independent tests + fuzz + mutation + multi-LLM review), never one metric (Goodhart's Law). This IS ZAO's GAN/`/qa`/`/verify` pattern - name it explicitly in agent prompts. |
 | 4 | **Two of Zaal's embedded ideas are worth real follow-up; the rest of the tail is personal reading** | The inbox tail carried Zaal's own notes: a Red Sox inspiration-account idea, a Crypto-Fam auto-caption photo tool, an Ellsworth-library Plural event, and a request to transcribe Kirill's 4hr->18min video. These become Next Actions. The daily briefings / substacks are reading, not research - logged, not deep-dived. |
@@ -64,8 +64,8 @@ Daily briefings + substacks - personal reading, not ZAO research: Beta Briefing 
 
 ## Also See
 
-- [Doc 825](../../agents/825-past-inbox-redrain/) - the social half of the inbox drain
-- [Doc 824](../824-keyless-forkable-fetch-trio/) - the keyless fetch trio used here
+- [Doc 832](../../agents/832-past-inbox-redrain/) - the social half of the inbox drain
+- [Doc 831](../831-keyless-forkable-fetch-trio/) - the keyless fetch trio used here
 - [Doc 780](../../events/780-adrian-empire-builder/) / [Doc 778](../../events/778-tyler-magnetic-zabal-games-build-may27/) - Empire Builder / ZABAL Games
 
 ## Next Actions

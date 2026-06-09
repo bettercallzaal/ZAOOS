@@ -4,7 +4,7 @@ type: decision
 status: research-complete
 last-validated: 2026-06-08
 superseded-by:
-related-docs: "822, 820, 819"
+related-docs: "822, 820, 830"
 original-query: "for farcaster lets use https://haatz.quilibrium.com/ for free read"
 tier: STANDARD
 ---
@@ -72,7 +72,7 @@ Verified end-to-end: `zao-fetch-farcaster.sh farcaster.xyz/dwr.eth/0xd658bb46` r
 
 - [Doc 822](../822-x-scraping-without-login/) - X fetch fix (FxTwitter)
 - [Doc 820](../820-reliable-inbox-url-fetching/) - Reddit fetch fix (OAuth)
-- [Doc 819](../../agents/819-ai-coding-agent-discourse-inbox-cluster/) - the cluster that surfaced the fetch wall
+- [Doc 830](../../agents/830-ai-coding-agent-discourse-inbox-cluster/) - the cluster that surfaced the fetch wall
 
 ## Next Actions
 

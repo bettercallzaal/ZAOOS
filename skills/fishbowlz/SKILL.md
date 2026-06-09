@@ -1,177 +1,38 @@
 ---
 name: fishbowlz
-description: |
-  Join and participate in FISHBOWLZ persistent async fishbowl audio spaces.
-  Create rooms, join as speaker or listener, rotate in/out of hot seat,
-  and read transcripts. All actions are logged for future tokenomics.
-tools:
-  - Bash
-  - Read
-  - Write
-  - WebFetch
-requires:
-  env:
-    - FISHBOWLZ_API_BASE (optional, defaults to https://zaoos.com/api/fishbowlz)
+description: FISHBOWLZ is a standalone product — it no longer lives in ZAOOS. Development and deployment happen in the bettercallzaal/fishbowlz repo, deployed at fishbowlz.com. Use this skill when asked to work on FISHBOWLZ; it points you at the right repo and explains why the code is not in ZAOOS.
 ---
 
-# FISHBOWLZ Agent Skill
+# FISHBOWLZ — Standalone Product
 
-Join and act in FISHBOWLZ persistent fishbowl audio spaces.
+**FISHBOWLZ graduated out of ZAOOS.** As of 2026-06 the FISHBOWLZ code was removed
+from this monorepo (decommissioned-from-lab per `research/agents/601-agent-stack-cleanup-decision/`
+and the "graduate → own repo, delete from ZAOOS" pattern in CLAUDE.md). It now
+stands alone:
 
-## Setup
+- **Repo:** `github.com/bettercallzaal/fishbowlz` (canonical — build here)
+- **Site:** https://fishbowlz.com
+- **DB:** its own Supabase project + `fishbowl_*` tables (no longer shared with ZAOOS)
+
+## How to work on FISHBOWLZ
+
+Do **not** rebuild FISHBOWLZ inside ZAOOS. There is no `src/app/fishbowlz/`,
+`src/app/api/fishbowlz/`, `src/components/fishbowlz/`, or `src/lib/fishbowlz/`
+here anymore, and there is no sync-from-ZAOOS workflow. Instead:
 
 ```bash
-# Set API base (optional — defaults to /api/fishbowlz on current host)
-export FISHBOWLZ_API_BASE="https://your-host.com/api/fishbowlz"
-
-# Your agent's FID (your identity on Far caster)
-export FISHBOWLZ_AGENT_FID="your-agent-fid"
-
-# Your agent's username
-export FISHBOWLZ_AGENT_USERNAME="your-agent-name"
+git clone https://github.com/bettercallzaal/fishbowlz
+cd fishbowlz
+npm install
+npm run dev
 ```
 
-## Commands
+The standalone repo stands alone (clone, no deps) — that is the ZAO sharing
+model for graduates. Open the feature there, ship there; Vercel deploys to
+fishbowlz.com on push to `main`.
 
-### List active rooms
-```bash
-curl -s "$FISHBOWLZ_API_BASE/rooms?state=active" | jq '.rooms[] | {id, title, speakers, listeners}'
-```
+## If someone asks to add FISHBOWLZ back to ZAOOS
 
-### Get room details
-```bash
-ROOM_ID="<room-id>"
-curl -s "$FISHBOWLZ_API_BASE/rooms/$ROOM_ID" | jq
-```
-
-### Create a room
-```bash
-curl -s -X POST "$FISHBOWLZ_API_BASE/rooms" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "My Fishbowl",
-    "description": "Topic discussion",
-    "hostFid": '"$FISHBOWLZ_AGENT_FID"',
-    "hostName": "'$FISHBOWLZ_AGENT_USERNAME'",
-    "hostUsername": "'$FISHBOWLZ_AGENT_USERNAME'",
-    "hotSeatCount": 5,
-    "rotationEnabled": true
-  }' | jq '{id: .id, slug: .slug}'
-```
-
-### Join as listener
-```bash
-curl -s -X PATCH "$FISHBOWLZ_API_BASE/rooms/$ROOM_ID" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "action": "join_listener",
-    "fid": '"$FISHBOWLZ_AGENT_FID"',
-    "username": "'$FISHBOWLZ_AGENT_USERNAME'"
-  }' | jq
-```
-
-### Join as speaker (hot seat)
-```bash
-curl -s -X PATCH "$FISHBOWLZ_API_BASE/rooms/$ROOM_ID" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "action": "join_speaker",
-    "fid": '"$FISHBOWLZ_AGENT_FID"',
-    "username": "'$FISHBOWLZ_AGENT_USERNAME'"
-  }' | jq
-```
-
-### Rotate in (listener → hot seat)
-```bash
-curl -s -X PATCH "$FISHBOWLZ_API_BASE/rooms/$ROOM_ID" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "action": "rotate_in",
-    "listenerFid": '"$FISHBOWLZ_AGENT_FID"',
-    "listenerUsername": "'$FISHBOWLZ_AGENT_USERNAME'"
-  }' | jq
-```
-
-### Leave hot seat
-```bash
-curl -s -X PATCH "$FISHBOWLZ_API_BASE/rooms/$ROOM_ID" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "action": "leave_speaker",
-    "fid": '"$FISHBOWLZ_AGENT_FID"'
-  }' | jq
-```
-
-### Get transcript
-```bash
-curl -s "$FISHBOWLZ_API_BASE/transcripts?roomId=$ROOM_ID&limit=20" \
-  | jq '.transcripts[] | "\(.speaker_name): \(.text)"'
-```
-
-### Post a transcript segment (manual or via Whisper)
-```bash
-curl -s -X POST "$FISHBOWLZ_API_BASE/transcripts" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "roomId": "'"$ROOM_ID"'",
-    "speakerFid": '"$FISHBOWLZ_AGENT_FID"',
-    "speakerName": "'$FISHBOWLZ_AGENT_USERNAME'",
-    "speakerRole": "agent",
-    "text": "This is what I said in the fishbowl.",
-    "startedAt": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"
-  }' | jq
-```
-
-### Log a custom event
-```bash
-curl -s -X POST "$FISHBOWLZ_API_BASE/events" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "eventType": "agent.action",
-    "eventData": {"action": "joined", "role": "speaker"},
-    "roomId": "'"$ROOM_ID"'",
-    "actorFid": '"$FISHBOWLZ_AGENT_FID"',
-    "actorType": "agent"
-  }' | jq
-```
-
-## Agent Patterns
-
-### Monitor a room (poll every 30s)
-```bash
-while true; do
-  SPEAKERS=$(curl -s "$FISHBOWLZ_API_BASE/rooms/$ROOM_ID" | jq '.current_speakers | length')
-  echo "[$(date)] Hot seat: $SPEAKERS speakers"
-  sleep 30
-done
-```
-
-### Join every active room as listener (scout mode)
-```bash
-curl -s "$FISHBOWLZ_API_BASE/rooms?state=active" | jq -r '.rooms[].id' | while read ROOM; do
-  curl -s -X PATCH "$FISHBOWLZ_API_BASE/rooms/$ROOM" \
-    -H "Content-Type: application/json" \
-    -d '{"action":"join_listener","fid":'"$FISHBOWLZ_AGENT_FID"','\''username":"'"$FISHBOWLZ_AGENT_USERNAME"'"}' > /dev/null
-  echo "Joined: $ROOM"
-done
-```
-
-### Passive transcript collector
-```bash
-# Collect transcripts from a room every 60s
-ROOM_ID="<room-id>"
-LAST_SEG=""
-while true; do
-  NEW=$(curl -s "$FISHBOWLZ_API_BASE/transcripts?roomId=$ROOM_ID&limit=5" | jq -r '.transcripts[-1].text // empty')
-  if [ "$NEW" != "$LAST_SEG" ] && [ -n "$NEW" ]; then
-    echo "[$(date)] $NEW"
-    LAST_SEG="$NEW"
-  fi
-  sleep 60
-done
-```
-
-## Notes
-- All fishbowl actions are logged to JSONL (append-only) for future tokenomics
-- FISHBOWLZ is built on ZAO OS — https://github.com/bettercallzaal/ZAOOS
-- See spec: ZAOOS/research/XXX-fishbowlz.md
+Don't, without an explicit decision from Zaal that reverses the graduation. The
+"no new bots / no re-adding decommissioned surfaces without a doc" rule in
+CLAUDE.md applies. Point them at this skill and the standalone repo first.

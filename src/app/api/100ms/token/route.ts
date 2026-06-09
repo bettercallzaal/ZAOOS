@@ -2,9 +2,32 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import { logAuditEvent, getClientIp } from '@/lib/db/audit-log';
-import { supabaseAdmin } from '@/lib/db/supabase';
 import { getMSRoomById, isStageRoom, getRoomSpeakerFids, setMSRoom100msId } from '@/lib/social/msRoomsDb';
+import { checkTokenGate, type TokenGateConfig } from '@/lib/spaces/tokenGate';
+import { getUserByFid } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
+
+/**
+ * Collect every on-chain address we can attribute to a FID — the session's
+ * connected wallet plus the user's Farcaster-verified eth addresses and custody
+ * address — so a token gate is satisfied if ANY of them holds the asset.
+ * Best-effort: a Neynar failure falls back to the session wallet alone.
+ */
+async function resolveUserWallets(fid: number, sessionWallet: string | null): Promise<string[]> {
+  const set = new Set<string>();
+  if (sessionWallet) set.add(sessionWallet.toLowerCase());
+  try {
+    const user = await getUserByFid(fid);
+    const verified: unknown = user?.verified_addresses?.eth_addresses;
+    if (Array.isArray(verified)) {
+      for (const a of verified) if (typeof a === 'string') set.add(a.toLowerCase());
+    }
+    if (typeof user?.custody_address === 'string') set.add(user.custody_address.toLowerCase());
+  } catch (err) {
+    logger.error('[100ms-token] wallet resolve failed', err);
+  }
+  return [...set];
+}
 
 const TokenSchema = z.object({
   userId: z.string().min(1),
@@ -44,36 +67,52 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden: cannot generate token for another user' }, { status: 403 });
     }
 
-    // Role validation — non-admins cannot request host role unless they're a verified fishbowl host
-    let isFishbowlHost = false;
-    if (roomName?.startsWith('fishbowl-') && (role === 'host' || role === 'moderator')) {
-      const { data: fishbowlRoom } = await supabaseAdmin
-        .from('fishbowl_rooms')
-        .select('host_fid')
-        .or(`slug.eq.${roomName.replace('fishbowl-', '')},id.eq.${roomId}`)
-        .single();
+    // Resolve the managed room once (roomName carries the ms_rooms UUID; the
+    // shared default uses 'zao-live-room' and has no row). Reused below for
+    // role checks, stage-speaker auth, and token-gate enforcement.
+    const msRoom =
+      roomName && roomName !== 'zao-live-room' ? await getMSRoomById(roomName) : null;
+    const isRoomHost = !!msRoom && session.fid === msRoom.host_fid;
 
-      isFishbowlHost = fishbowlRoom?.host_fid === session.fid;
-    }
-    if ((role === 'host' || role === 'moderator') && !session.isAdmin && !isFishbowlHost) {
+    // Role validation — host/moderator (100ms moderation powers) is limited to
+    // global admins and the room's own host.
+    if ((role === 'host' || role === 'moderator') && !session.isAdmin && !isRoomHost) {
       return NextResponse.json({ error: 'Forbidden: only admins can request moderator role' }, { status: 403 });
     }
 
     // Stage rooms (100ms): only the host or an approved speaker may publish.
-    // roomName carries the ms_rooms UUID for these rooms; fishbowl rooms use a
-    // 'fishbowl-' prefix and the shared default uses 'zao-live-room'. Without
-    // this check any signed-in listener could mint a speaker token directly.
-    if (role === 'speaker' && roomName && !roomName.startsWith('fishbowl-') && roomName !== 'zao-live-room') {
-      const msRoom = await getMSRoomById(roomName);
-      if (msRoom && isStageRoom(msRoom)) {
-        const authorized =
-          session.fid === msRoom.host_fid || getRoomSpeakerFids(msRoom).includes(session.fid);
-        if (!authorized) {
-          return NextResponse.json(
-            { error: 'Not approved to speak in this room' },
-            { status: 403 },
-          );
-        }
+    // Without this check any signed-in listener could mint a speaker token directly.
+    if (role === 'speaker' && msRoom && isStageRoom(msRoom)) {
+      const authorized =
+        session.fid === msRoom.host_fid || getRoomSpeakerFids(msRoom).includes(session.fid);
+      if (!authorized) {
+        return NextResponse.json(
+          { error: 'Not approved to speak in this room' },
+          { status: 403 },
+        );
+      }
+    }
+
+    // Token gate: a gated room (settings.gate_config) only mints a token — of any
+    // role — to the host, a global admin, or a user who holds the required asset
+    // in one of their wallets. Enforced here so the client-side gate at
+    // /spaces/hms/[id] cannot be bypassed by calling this route directly.
+    const gate = (msRoom?.settings?.gate_config ?? null) as TokenGateConfig | null;
+    if (gate && !session.isAdmin && !isRoomHost) {
+      const wallets = await resolveUserWallets(session.fid, session.walletAddress);
+      if (wallets.length === 0) {
+        return NextResponse.json(
+          { error: 'Token-gated room — connect or verify a wallet to join' },
+          { status: 403 },
+        );
+      }
+      const checks = await Promise.allSettled(wallets.map((w) => checkTokenGate(w, gate)));
+      const allowed = checks.some((c) => c.status === 'fulfilled' && c.value.allowed);
+      if (!allowed) {
+        return NextResponse.json(
+          { error: 'Token-gated room — required token not held' },
+          { status: 403 },
+        );
       }
     }
 
@@ -90,7 +129,7 @@ export async function POST(req: NextRequest) {
       { algorithm: 'HS256', expiresIn: '24h', jwtid: crypto.randomUUID() }
     );
 
-    // Find or create room — use roomName for per-fishbowl rooms, fallback to default
+    // Find or create room — use roomName for per-room IDs, fallback to default
     let hmsRoomId = roomId;
     const targetRoomName = roomName || 'zao-live-room';
 
@@ -112,7 +151,7 @@ export async function POST(req: NextRequest) {
           },
           body: JSON.stringify({
             name: targetRoomName,
-            description: roomName ? `FISHBOWLZ: ${targetRoomName}` : 'ZAO OS Live Audio Room',
+            description: msRoom ? `ZAO OS: ${msRoom.title}` : 'ZAO OS Live Audio Room',
             template_id: templateId,
             region: 'us',
           }),
@@ -121,11 +160,10 @@ export async function POST(req: NextRequest) {
         hmsRoomId = created.id;
       }
 
-      // Persist the resolved 100ms room id back onto its ms_rooms row (when the
-      // roomName is an ms_rooms UUID, not a fishbowl/default room) so future
+      // Persist the resolved 100ms room id back onto its ms_rooms row so future
       // joins skip this list/create round-trip. Best-effort, non-blocking.
-      if (hmsRoomId && roomName && !roomName.startsWith('fishbowl-') && roomName !== 'zao-live-room') {
-        setMSRoom100msId(roomName, hmsRoomId).catch((e) => logger.error('persist room_id_100ms failed', e));
+      if (hmsRoomId && msRoom) {
+        setMSRoom100msId(msRoom.id, hmsRoomId).catch((e) => logger.error('persist room_id_100ms failed', e));
       }
     }
 

@@ -21,6 +21,10 @@ export interface LeaderboardEntry {
 /**
  * Start a new session when a user joins a room.
  * Returns the session ID.
+ *
+ * Closes any already-open session for this (fid, room) first so a double-join
+ * (StrictMode re-mount, reconnect, second tab) can never leave two open rows
+ * racing to be closed — the prior row is settled before the new one opens.
  */
 export async function startSession(
   fid: number,
@@ -28,6 +32,8 @@ export async function startSession(
   roomName: string,
   roomType: 'voice_channel' | 'stage'
 ): Promise<string> {
+  await endSessionByFid(fid, roomId);
+
   const { data, error } = await supabaseAdmin
     .from('space_sessions')
     .insert({
@@ -44,36 +50,75 @@ export async function startSession(
 }
 
 /**
- * End an open session for a user in a specific room.
- * Finds the most recent session where left_at is null, calculates duration, and updates.
+ * End every open session for a user in a specific room.
+ *
+ * Closes all rows where left_at is null (not just the most recent) so a user
+ * who somehow accumulated duplicate open rows is fully settled — each row gets
+ * a duration computed from its own joined_at. A missing open session is a no-op.
  */
 export async function endSessionByFid(fid: number, roomId: string): Promise<void> {
-  // Find the open session
-  const { data: session, error: fetchError } = await supabaseAdmin
+  const { data: sessions, error: fetchError } = await supabaseAdmin
     .from('space_sessions')
     .select('id, joined_at')
     .eq('fid', fid)
     .eq('room_id', roomId)
     .is('left_at', null)
-    .order('joined_at', { ascending: false })
-    .limit(1)
-    .single();
+    .order('joined_at', { ascending: false });
 
-  if (fetchError || !session) return; // No open session — silently return
+  if (fetchError) throw new Error(`Failed to fetch open sessions: ${fetchError.message}`);
+  if (!sessions || sessions.length === 0) return; // No open session — nothing to do
 
-  const durationSeconds = Math.floor(
-    (Date.now() - new Date(session.joined_at).getTime()) / 1000
+  const leftAt = new Date().toISOString();
+  const results = await Promise.allSettled(
+    sessions.map((session) => {
+      const durationSeconds = Math.floor(
+        (Date.now() - new Date(session.joined_at).getTime()) / 1000
+      );
+      return supabaseAdmin
+        .from('space_sessions')
+        .update({ left_at: leftAt, duration_seconds: durationSeconds })
+        .eq('id', session.id)
+        .then(({ error }) => {
+          if (error) throw new Error(error.message);
+        });
+    })
   );
 
-  const { error: updateError } = await supabaseAdmin
-    .from('space_sessions')
-    .update({
-      left_at: new Date().toISOString(),
-      duration_seconds: durationSeconds,
-    })
-    .eq('id', session.id);
+  const failed = results.find((r) => r.status === 'rejected');
+  if (failed && failed.status === 'rejected') {
+    throw new Error(`Failed to end session: ${failed.reason}`);
+  }
+}
 
-  if (updateError) throw new Error(`Failed to end session: ${updateError.message}`);
+/**
+ * End every open session in a room, regardless of fid.
+ *
+ * Called when a room itself ends (host left / room swept) so listeners who never
+ * fired their own leave never strand an open row — each is closed with a duration
+ * from its own joined_at. Best-effort: logs nothing, throws only on hard failure.
+ */
+export async function endRoomSessions(roomId: string): Promise<void> {
+  const { data: sessions, error: fetchError } = await supabaseAdmin
+    .from('space_sessions')
+    .select('id, joined_at')
+    .eq('room_id', roomId)
+    .is('left_at', null);
+
+  if (fetchError) throw new Error(`Failed to fetch room sessions: ${fetchError.message}`);
+  if (!sessions || sessions.length === 0) return;
+
+  const leftAt = new Date().toISOString();
+  await Promise.allSettled(
+    sessions.map((session) => {
+      const durationSeconds = Math.floor(
+        (Date.now() - new Date(session.joined_at).getTime()) / 1000
+      );
+      return supabaseAdmin
+        .from('space_sessions')
+        .update({ left_at: leftAt, duration_seconds: durationSeconds })
+        .eq('id', session.id);
+    })
+  );
 }
 
 /**

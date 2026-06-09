@@ -6,6 +6,7 @@ import {
   setMSRoomRecording,
 } from '@/lib/social/msRoomsDb';
 import { get100msPeerCount, mintManagementToken } from '@/lib/social/hms100ms';
+import { timingSafeEqual } from '@/lib/security/timingSafeEqual';
 import { logger } from '@/lib/logger';
 
 /**
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Not configured' }, { status: 500 });
   }
   const auth = req.headers.get('authorization') ?? '';
-  if (auth !== secret && auth !== `Bearer ${secret}`) {
+  if (!timingSafeEqual(auth, secret) && !timingSafeEqual(auth, `Bearer ${secret}`)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

@@ -77,7 +77,18 @@ export async function createMSRoom(data: {
   const settings: Record<string, unknown> = {};
   if (data.gateConfig) settings.gate_config = data.gateConfig;
   if (data.roomType) settings.room_type = data.roomType;
-  settings.slug = data.slug?.trim() || slugifyTitle(data.title);
+
+  // Resolve a unique share slug. A custom slug can collide outright, and even a
+  // generated one (random 4-char suffix) has a small collision chance — both
+  // would make /spaces/hms/<slug> ambiguous. Re-suffix until free (bounded).
+  let slug = data.slug?.trim() || slugifyTitle(data.title);
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const existing = await getMSRoomBySlugOrId(slug);
+    if (!existing) break;
+    const stem = slug.replace(/-[a-z0-9]{4}$/, '');
+    slug = `${stem}-${Math.random().toString(36).slice(2, 6)}`;
+  }
+  settings.slug = slug;
 
   const { data: room, error } = await supabaseAdmin
     .from('ms_rooms')
@@ -219,6 +230,12 @@ export async function endMSRoom(id: string): Promise<void> {
     .from('speaker_requests')
     .delete()
     .eq('room_id', id);
+
+  // Close any session rows still open for this room — listeners who left without
+  // firing their own leave (tab close, network drop) would otherwise strand an
+  // open row that never counts toward the leaderboard.
+  const { endRoomSessions } = await import('@/lib/spaces/sessionsDb');
+  await endRoomSessions(id).catch(() => {});
 }
 
 /** Approved speaker FIDs for a room (the host is always implicitly a speaker). */

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { timingSafeEqual } from '@/lib/security/timingSafeEqual';
 import { logger } from '@/lib/logger';
 
 const STREAM_API_SECRET = process.env.STREAM_API_SECRET;
@@ -21,7 +22,7 @@ async function verifySignature(body: string, signature: string | null): Promise<
   const computed = Array.from(new Uint8Array(sig))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
-  return computed === signature;
+  return timingSafeEqual(computed, signature);
 }
 
 export async function POST(req: NextRequest) {

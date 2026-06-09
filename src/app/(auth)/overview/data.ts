@@ -192,7 +192,7 @@ export const improvements: Improvement[] = [
     priority: 'P2',
     title: 'Decommissioned code lingering',
     detail:
-      'Magnetiq/AttaBotty (bot/src/teams/) and FISHBOWLZ (src/components/fishbowlz, src/lib/fishbowlz, src/app/api/fishbowlz, skills/fishbowlz) are decommissioned per doc 601 but still in the tree. Archive or delete.',
+      'Magnetiq/AttaBotty (bot/src/teams/) is decommissioned per doc 601 but still in the tree. Archive or delete. (FISHBOWLZ has been removed from ZAOOS — it now lives standalone at fishbowlz.com.)',
     effort: '1–2h',
   },
   {

@@ -62,10 +62,13 @@ A message can get multiple folder labels (e.g. an X post about an event gets bot
 
 ### Environment Setup (All Commands)
 
+`AGENTMAIL_API_KEY` lives in `~/.zao/zao.env` (durable - survives repo re-clones, unlike the old `.env.local` which was wiped by the 2026-06-04 bare-clone repair). Source it from there, with `.env.local` as a legacy fallback:
+
 ```bash
-source .env.local 2>/dev/null
-export $(grep AGENTMAIL_API_KEY .env.local | tr -d ' ')
+export $(grep -h '^AGENTMAIL_API_KEY=' ~/.zao/zao.env .env.local 2>/dev/null | head -1 | tr -d ' ')
 ```
+
+If the key is missing, STOP and tell Zaal to add `AGENTMAIL_API_KEY=...` to `~/.zao/zao.env` (from the agentmail.to dashboard, inbox `zoe-zao@agentmail.to`). Do not proceed unauthenticated - an unauthenticated call returns an empty list that looks like an empty inbox (false negative).
 
 ### Reading the Inbox
 
@@ -114,12 +117,19 @@ Fetch all messages then filter client-side for messages that have the folder lab
 
 3. Extract URLs from the body text (look for https:// patterns).
 
-4. If it contains a URL: fetch it via Jina Reader to get clean content:
+4. If it contains a URL: fetch it with the **keyless fetch trio** (NOT Jina Reader - Jina is dead for Reddit/X as of 2026-06; it returns the block shell / login wall). Route by host (docs 822/823/824):
    ```bash
-   curl -s "https://r.jina.ai/{URL}"
+   # Reddit (incl /s/ share links)  -> Redlib, full body + comments, no key
+   ~/bin/zao-fetch-reddit.sh "<url>"
+   # X / Twitter (incl long-form Articles) -> FxTwitter, full article body, no key
+   ~/bin/zao-fetch-x.sh "<url-or-tweet-id>"
+   # Farcaster casts/profiles -> Haatz Snapchain mirror, no key
+   ~/bin/zao-fetch-farcaster.sh "<url-or-fid>"
+   # Anything else (articles, GitHub, blogs) -> WebFetch, then exa web_fetch if it returns a shell
    ```
-   This works on X/Twitter posts, articles, GitHub repos, any URL. Returns clean markdown.
-   Then run /zao-research on the extracted content.
+   The `/fetch` skill auto-routes by host if you'd rather not case-handle. Spotify/YouTube -> `~/bin/zao-ingest.sh "<url>"` to transcribe. Then run /zao-research on the extracted content.
+
+   **Never index off the email subject or a title alone** - it lies (per `feedback_no_synthesis_from_titles`: doc 819 shipped 2 wrong decisions from subjects). If a fetch genuinely fails after the trio, mark it FAILED loudly; do not synthesize from the preview.
 
 5. If it's plain text: treat as a research topic, run /zao-research directly.
 
@@ -149,7 +159,7 @@ For draining a large backlog. Forwarded items pile up faster than `/inbox next` 
 
 **Workflow:**
 
-1. **Inventory.** Fetch all unread (whitelisted sender only). Resolve opaque short links so each item's real content is known - reddit `/s/` links resolve with `curl -sL -o /dev/null -w '%{url_effective}'`; strip query strings.
+1. **Inventory.** Fetch all unread (whitelisted sender only). Re-fetch each item's real content with the keyless trio (`zao-fetch-reddit.sh` resolves `/s/` share links to canonical internally; `zao-fetch-x.sh` handles tweet IDs + Articles; `zao-fetch-farcaster.sh` for casts). For large backlogs, a Workflow that fans out the re-fetch is the proven pattern (doc 825: 84/85 items, 22 agents) - hardcode the item list into the workflow script (`args` does not bind, per `feedback_workflow_args_binding`).
 
 2. **Triage.** Sort every item into one of three buckets:
    - **Research** - has a topic worth a doc.

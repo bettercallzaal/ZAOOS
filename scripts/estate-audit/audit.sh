@@ -72,10 +72,10 @@ vercel_section() {
   curl -sf -H "${auth}" "https://api.vercel.com/v2/teams?limit=100" \
     > "${OUT_DIR}/vercel-teams-${STAMP}.json" 2>/dev/null || echo '{"teams":[]}' > "${OUT_DIR}/vercel-teams-${STAMP}.json"
 
-  # Personal scope first, then each team
-  : > "${raw}"
-  echo "[" >> "${raw}"
-  local first=1
+  # Collect projects across personal + each team scope as JSONL (one obj per
+  # line), then slurp into a valid JSON array. Avoids subshell comma bugs.
+  local jsonl="${OUT_DIR}/vercel-estate-${STAMP}.jsonl"
+  : > "${jsonl}"
 
   fetch_scope() {
     local teamq="$1" scopelabel="$2"
@@ -83,11 +83,16 @@ vercel_section() {
     while [[ -n "${url}" ]]; do
       local page
       page=$(curl -sf -H "${auth}" "${url}") || break
-      echo "${page}" | jq -c --arg scope "${scopelabel}" '.projects[] | {scope:$scope, name, id, framework, updatedAt, latestDeployments: (.latestDeployments // []), repo: (.link.repo // .link.org + "/" + .link.repo // null), link}' \
-        | while IFS= read -r line; do
-            if [[ ${first} -eq 1 ]]; then first=0; else echo "," >> "${raw}"; fi
-            echo "${line}" >> "${raw}"
-          done
+      echo "${page}" | jq -c --arg scope "${scopelabel}" '
+        .projects[] | {
+          scope: $scope,
+          name, id, framework, updatedAt,
+          latestDeployments: (.latestDeployments // []),
+          repo: ((.link.org // "") as $o | (.link.repo // "") as $r |
+                 if $r == "" then null
+                 elif $o == "" then $r
+                 else $o + "/" + $r end)
+        }' >> "${jsonl}"
       local next
       next=$(echo "${page}" | jq -r '.pagination.next // empty')
       if [[ -n "${next}" ]]; then
@@ -104,7 +109,11 @@ vercel_section() {
         [[ -z "${tid}" ]] && continue
         fetch_scope "&teamId=${tid}" "${tslug}"
       done
-  echo "]" >> "${raw}"
+
+  # Slurp JSONL -> JSON array, dedupe by project id (a project is returned once
+  # under personal scope AND once per team the token can see - same id).
+  jq -s 'unique_by(.id)' "${jsonl}" > "${raw}"
+  rm -f "${jsonl}"
 
   echo
   echo "----------------------------------------------------------------"

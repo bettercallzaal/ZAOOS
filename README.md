@@ -46,6 +46,19 @@ The pattern: **Monorepo as Lab.**
 - **COC Concertz** — own repo, virtual concert community
 - **FISHBOWLZ** — was its own thing, paused 2026-04-16 (partnership with Juke). Code stays in ZAOOS as-is.
 
+### Repo & estate at a glance
+
+Full status census: [research/infrastructure/836](./research/infrastructure/836-zaoos-repo-estate-census/). Reproduce the cloud half with `scripts/estate-audit/audit.sh`.
+
+| Area | Snapshot (2026-06-10) |
+|---|---|
+| Code | 302 API routes / 54 domains, ~360 components, 18 hooks, 41 lib domains |
+| Tests | 16 of 54 API domains have suites (38 untested = top gap) |
+| Agents | 5-surface model (ZOE, Hermes, ZAO Devz, Teams, ZAOstock bot), no zombie code |
+| Half-built | Music NFT mint (Arweave not wired), ambient mixer, Kick/festival stubs, Lens/Hive disabled |
+| Vercel estate | 86 projects — 32 live, **54 dead** (12 old NEXUS iterations + ~5 dupes lead the kill-list) |
+| Supabase estate | 4 projects — 2 active (ZAOOS, ZAO STOCK), 2 inactive/paused |
+
 ---
 
 ## The original product still lives here: a gated Farcaster client

@@ -209,3 +209,105 @@ export const improvements: Improvement[] = [
       "Hermes' /hermes-dispatch secret check isn't constant-time (loopback-only, low sev) — use crypto.timingSafeEqual. And the Bonfires-platform bots (@zabal_bonfire, @zdeepmeeting_bot) need a separate heartbeat path to appear on the board.",
   },
 ];
+
+// --- At-a-glance stats -------------------------------------------------------
+
+export const stats: { label: string; value: string }[] = [
+  { label: 'API routes', value: '336' },
+  { label: 'Components', value: '304' },
+  { label: 'Lib domains', value: '42' },
+  { label: 'Research docs', value: '1,183' },
+  { label: 'Skills', value: '28' },
+  { label: 'Bots live', value: '4' },
+];
+
+// --- Quick-links command center ----------------------------------------------
+
+export interface QuickLink {
+  label: string;
+  href: string;
+  note?: string;
+  external?: boolean;
+}
+
+export const quickLinks: { group: string; links: QuickLink[] }[] = [
+  {
+    group: 'Live surfaces',
+    links: [
+      { label: 'Bot fleet board', href: 'https://www.thezao.xyz/bots', external: true },
+      { label: 'Coworking app', href: 'https://www.thezao.xyz', external: true },
+      { label: 'Research index', href: '/research' },
+    ],
+  },
+  {
+    group: 'Code & deploys',
+    links: [
+      { label: 'GitHub repo', href: 'https://github.com/bettercallzaal/ZAOOS', external: true },
+      { label: 'Open PRs', href: 'https://github.com/bettercallzaal/ZAOOS/pulls', external: true },
+      { label: 'Vercel', href: 'https://vercel.com/dashboard', external: true },
+      { label: 'Supabase', href: 'https://supabase.com/dashboard', external: true },
+    ],
+  },
+  {
+    group: 'On-chain contracts',
+    links: [
+      { label: 'Respect OG (ERC-20)', href: 'https://optimistic.etherscan.io/address/0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957', note: 'Optimism', external: true },
+      { label: 'ZOR (ERC-1155)', href: 'https://optimistic.etherscan.io/address/0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c', note: 'Optimism', external: true },
+      { label: 'Hats Protocol', href: 'https://optimistic.etherscan.io/address/0x3bc1A0Ad72417f2d411118085256fC53CBdDd137', note: 'Optimism', external: true },
+      { label: 'ZAO Nouns DAO', href: 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883', note: 'Base', external: true },
+    ],
+  },
+];
+
+// --- Lab lifecycle (monorepo-as-lab) -----------------------------------------
+
+export interface LabItem {
+  name: string;
+  detail: string;
+}
+
+export const labLifecycle: { stage: string; blurb: string; items: LabItem[] }[] = [
+  {
+    stage: 'In the lab',
+    blurb: 'Prototyped here before earning their own home.',
+    items: [
+      { name: 'The ZAO Farcaster client', detail: 'Gated social client — the original surface (188 members on Base)' },
+      { name: 'Agent stack', detail: 'ZOE concierge + Hermes fix-PR pipeline + the cowork control plane' },
+      { name: 'ZAOstock dashboard + bot', detail: 'Festival coordination (graduating)' },
+      { name: 'Music player + radio', detail: 'Audius-backed components' },
+      { name: 'Research library', detail: '1,183 docs — institutional memory across every product' },
+    ],
+  },
+  {
+    stage: 'Graduating',
+    blurb: 'Ready for production + public + new users → own repo, DB, domain.',
+    items: [
+      { name: 'ZAOstock 2026', detail: 'Spinout in progress; code will be deleted from ZAOOS, routes redirect' },
+    ],
+  },
+  {
+    stage: 'Graduated',
+    blurb: 'Own repo / DB / domain. Code removed from ZAOOS so there is no drift.',
+    items: [
+      { name: 'COC Concertz', detail: 'Spun out to its own repo' },
+    ],
+  },
+  {
+    stage: 'Paused',
+    blurb: 'On hold; code being archived.',
+    items: [
+      { name: 'FISHBOWLZ', detail: 'Paused 2026-04-16, killed 2026-05-04 (Juke partnership stands)' },
+    ],
+  },
+];
+
+// --- Live bot status (from the /api/overview/bots proxy) ----------------------
+
+export interface LiveBot {
+  bot: string;
+  status: 'up' | 'degraded' | 'down';
+  ts: number;
+  meta?: Record<string, unknown>;
+  online: boolean;
+  ageSeconds: number;
+}

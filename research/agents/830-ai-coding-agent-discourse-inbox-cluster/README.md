@@ -9,7 +9,7 @@ original-query: "/inbox cluster - drain 6 forwarded items (4 Reddit threads on C
 tier: STANDARD
 ---
 
-# 819 - AI Coding-Agent Discourse (June 2026 Inbox Cluster)
+# 830 - AI Coding-Agent Discourse (June 2026 Inbox Cluster)
 
 > **Goal:** Synthesize the cross-cutting signal across 6 AI-coding items Zaal forwarded to the ZOE inbox, and map it to where ZAO's agent stack already sits.
 

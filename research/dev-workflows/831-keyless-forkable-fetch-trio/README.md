@@ -4,12 +4,12 @@ type: decision
 status: research-complete
 last-validated: 2026-06-08
 superseded-by:
-related-docs: "820, 822, 823, 819, 564"
+related-docs: "820, 822, 823, 830, 564"
 original-query: "can you find another way instead of using env variables i wanna make these shareable and easily forkable without much extra work"
 tier: STANDARD
 ---
 
-# 824 - Keyless, Forkable Fetch Trio (X + Farcaster + Reddit, no env vars)
+# 831 - Keyless, Forkable Fetch Trio (X + Farcaster + Reddit, no env vars)
 
 > **Goal:** Make the inbox/research fetchers clone-and-run. No API keys, no OAuth apps, no `~/.zao/zao.env`. Anyone can fork the three scripts and they work immediately.
 
@@ -83,7 +83,7 @@ Tradeoff vs OAuth: public Redlib instances are rate-limited and Reddit periodica
 - [Doc 822](../822-x-scraping-without-login/) - X via FxTwitter
 - [Doc 823](../823-farcaster-fetch-haatz-free/) - Farcaster via Haatz
 - [Doc 820](../820-reliable-inbox-url-fetching/) - Reddit diagnosis + OAuth (now the optional upgrade)
-- [Doc 819](../../agents/819-ai-coding-agent-discourse-inbox-cluster/) - all 6 items now FULL via this trio
+- [Doc 830](../../agents/830-ai-coding-agent-discourse-inbox-cluster/) - all 6 items now FULL via this trio
 
 ## Next Actions
 

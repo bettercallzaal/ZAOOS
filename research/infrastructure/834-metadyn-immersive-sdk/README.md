@@ -4,12 +4,12 @@ type: guide
 status: research-complete
 last-validated: 2026-06-09
 superseded-by:
-related-docs: "741, 826"
+related-docs: "741, 833"
 original-query: "https://x.com/MetaverseDyn/status/2062662268123328752 can you research this for me /zao-research"
 tier: QUICK
 ---
 
-# 827 - MetaDyn Immersive SDK
+# 834 - MetaDyn Immersive SDK
 
 > **Goal:** Research the MetaverseDyn (MetaDyn) post Zaal forwarded - an immersive/metaverse SDK - and judge its relevance to ZAO Spaces / COC virtual events.
 
@@ -38,7 +38,7 @@ So MetaDyn is a **multi-target 3D/immersive SDK** - one toolkit emitting to thre
 ## Also See
 
 - [Doc 741](../741-pion-livekit-webrtc-stack/) - LiveKit Spaces pick (ZAO's actual real-time stack)
-- [Doc 826](../../dev-workflows/826-past-inbox-nonsocial-drain/) - the inbox drain this follow-up came out of
+- [Doc 833](../../dev-workflows/833-past-inbox-nonsocial-drain/) - the inbox drain this follow-up came out of
 
 ## Next Actions
 

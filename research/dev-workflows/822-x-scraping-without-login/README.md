@@ -4,7 +4,7 @@ type: decision
 status: research-complete
 last-validated: 2026-06-08
 superseded-by:
-related-docs: "820, 819, 564, 562, 319, 660"
+related-docs: "820, 830, 564, 562, 319, 660"
 original-query: "is there any way other than an x session cookie that we can do that really think of the best ways to scrap x and then look online aswell"
 tier: STANDARD
 ---
@@ -44,7 +44,7 @@ curl -s "https://api.fxtwitter.com/status/2062149859394585061"
 
 ### Why the syndication endpoint missed it
 
-`cdn.syndication.twimg.com/tweet-result` (the old Tier 1) returns the article's `title` + `preview_text` + cover image but **not** the body - which is why doc 819 had to mark both X items PARTIAL. FxTwitter wraps X's richer internal data and exposes the full `content`.
+`cdn.syndication.twimg.com/tweet-result` (the old Tier 1) returns the article's `title` + `preview_text` + cover image but **not** the body - which is why doc 830 had to mark both X items PARTIAL. FxTwitter wraps X's richer internal data and exposes the full `content`.
 
 ### Full ranked landscape
 
@@ -66,14 +66,14 @@ Notes from the research:
 ## ZAO Application
 
 - **`~/bin/zao-fetch-x.sh` - PATCHED 2026-06-08** with FxTwitter as Tier 0 (article-body aware), syndication demoted to Tier 1. Verified on both inbox articles. `/inbox`, `/zao-research`, `/fetch` all call this script, so the fix propagates.
-- **Doc 819** - both X sources upgraded PARTIAL -> FULL using the re-fetched bodies (see that doc's revision).
+- **Doc 830** - both X sources upgraded PARTIAL -> FULL using the re-fetched bodies (see that doc's revision).
 - **Companion to doc 820** (Reddit OAuth fix). Together they close the inbox fetch wall: Reddit via OAuth, X via FxTwitter. Both cookie-free where it counts.
 - **Content signal:** 0xRicker's article body confirms the doc-819 read - Opus-4.8-as-planner + Kimi Agent Swarm (300 parallel sub-agents) is the org-chart pattern ZAO's Workflow/Hermes/ZOE already encode. 0xMorty's is a clean "build your first agent in 30 min" template - direct fuel for the ZABAL Games onboarding workshop (doc 778).
 
 ## Also See
 
 - [Doc 820](../820-reliable-inbox-url-fetching/) - the Reddit half of the inbox fetch fix (OAuth)
-- [Doc 819](../../agents/819-ai-coding-agent-discourse-inbox-cluster/) - the cluster whose X items this unblocks
+- [Doc 830](../../agents/830-ai-coding-agent-discourse-inbox-cluster/) - the cluster whose X items this unblocks
 - [Doc 660](../660-x-content-extraction-v2/) - prior X article "needs mirror search" workaround, now obsolete for bodies
 - [Doc 319](../319-x-twitter-scraping-tools-2026/) - earlier X scraping tool landscape
 
@@ -82,7 +82,7 @@ Notes from the research:
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
 | `zao-fetch-x.sh` Tier 0 FxTwitter patch - SHIPPED + verified | Claude | Done | 2026-06-08 |
-| Upgrade doc 819 X sources PARTIAL -> FULL with re-fetched bodies | Claude | Done (this session) | 2026-06-08 |
+| Upgrade doc 830 X sources PARTIAL -> FULL with re-fetched bodies | Claude | Done (this session) | 2026-06-08 |
 | Update `/fetch` skill + doc 660 to point at FxTwitter for article bodies | @Zaal | Edit | Next sprint |
 | If FxTwitter breaks, wire xquik/getxapi (`$0.001/call`) as Tier 2 article fallback | @Zaal | PR | On failure |
 | Pull both article bodies into the ZABAL Games agentic-workflows curriculum | @Zaal | Content | Pre-June demo |

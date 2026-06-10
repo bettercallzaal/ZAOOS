@@ -9,7 +9,7 @@ original-query: "/zao-research https://www.deepfunding.org/ https://x.com/deep_f
 tier: STANDARD
 ---
 
-# 828 - Deep Funding (AI-PGF: a market of AI models, a human jury)
+# 835 - Deep Funding (AI-PGF: a market of AI models, a human jury)
 
 > **Goal:** Research Deep Funding (deepfunding.org + @deep_funding) - Vitalik's AI-assisted public-goods funding mechanism - and map its pattern to ZAO's ZABAL Games judging, POIDH bounties, and contribution-weighting.
 

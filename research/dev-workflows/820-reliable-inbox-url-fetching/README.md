@@ -11,7 +11,7 @@ tier: STANDARD
 
 # 820 - Reliable Inbox URL Fetching (Reddit OAuth + /s/ resolve + X article reality)
 
-> **Goal:** The 2026-06-08 inbox cluster (doc 819) fetched almost nothing - 4 Reddit threads came back title-only, 2 X articles body-less. Diagnose exactly why and ship the durable fix so inbox/research runs stop indexing off titles.
+> **Goal:** The 2026-06-08 inbox cluster (doc 830) fetched almost nothing - 4 Reddit threads came back title-only, 2 X articles body-less. Diagnose exactly why and ship the durable fix so inbox/research runs stop indexing off titles.
 
 ## TL;DR
 
@@ -22,8 +22,8 @@ The `old.reddit.com + .json + Mozilla UA` technique that doc 564 shipped on 2026
 | # | Decision | Why |
 |---|----------|-----|
 | 1 | **Add a Reddit OAuth script-app; rewrite `~/bin/zao-fetch-reddit.sh` to use `oauth.reddit.com` with a bearer token** | Reddit now gates on IP reputation AND TLS/client fingerprint at once. Authenticated `client_credentials` requests bypass both. Free tier = 100 QPM, no residential proxy, no browser. This is the only path that is not fragile. |
-| 2 | **Resolve `/s/` share links to the canonical `/comments/ID/slug` URL BEFORE fetching** | `old.reddit.com` 403s on `/s/` paths; the share URL must be followed on `www.reddit.com` first, then the query string dropped. The current script appends `.json` to the `/s/` URL directly - it can never work. Done manually in doc 819 (grep the interstitial for `/comments/`); automate it. |
-| 3 | **X long-form articles are login-walled - stop trying to fetch the body unauthenticated** | The syndication endpoint returns tweet text + article title + preview thesis, NOT the article body. Jina/exa return the X login shell. Either accept title+thesis (doc 819 did) or import a logged-in X session cookie via the `setup-browser-cookies` skill. Do not write a doc pretending the body was read. |
+| 2 | **Resolve `/s/` share links to the canonical `/comments/ID/slug` URL BEFORE fetching** | `old.reddit.com` 403s on `/s/` paths; the share URL must be followed on `www.reddit.com` first, then the query string dropped. The current script appends `.json` to the `/s/` URL directly - it can never work. Done manually in doc 830 (grep the interstitial for `/comments/`); automate it. |
+| 3 | **X long-form articles are login-walled - stop trying to fetch the body unauthenticated** | The syndication endpoint returns tweet text + article title + preview thesis, NOT the article body. Jina/exa return the X login shell. Either accept title+thesis (doc 830 did) or import a logged-in X session cookie via the `setup-browser-cookies` skill. Do not write a doc pretending the body was read. |
 | 4 | **Retire doc 564's "FIXED" claim; this doc is the current source of truth** | Doc 564 is now a historical postmortem of a fix that lasted ~3 weeks. Anyone trusting it will silently index off blocked HTML. |
 
 ## Findings - Why the inbox under-indexed
@@ -72,7 +72,7 @@ canon=$(curl -sL -A "Mozilla/5.0 (Macintosh)" "$SHARE_URL" \
 # -> /r/ClaudeCode/comments/1typ8fb/has_anyone_actually_replaced_claude_code_codex
 ```
 
-This is the manual step doc 819 used; fold it into `zao-fetch-reddit.sh` as a pre-pass whenever the URL matches `/r/[\w-]+/s/\w+`.
+This is the manual step doc 830 used; fold it into `zao-fetch-reddit.sh` as a pre-pass whenever the URL matches `/r/[\w-]+/s/\w+`.
 
 ### X long-form articles: tweet text yes, article body no
 
@@ -101,7 +101,7 @@ Only authentication changes the outcome.
 - `~/bin/zao-fetch-reddit.sh` - rewrite per Decisions 1 + 2. Add `/s/` resolve pre-pass + OAuth token mint + `oauth.reddit.com` host. Keep the HTML-shell sniff as a hard error, not a silent pass.
 - `~/.zao/zao.env` - add `REDDIT_CLIENT_ID` + `REDDIT_CLIENT_SECRET` (sits beside the AgentMail/Bonfire/Supabase keys; survives repo re-clones, unlike `.env.local`).
 - `/inbox` + `/zao-research` + `/fetch` skills - all call the same script, so the fix propagates automatically. Update doc 564's status line to point here.
-- Fetch-quality gate (doc 693, Hard Req #11) already forces FULL/PARTIAL/FAILED marking - doc 819 obeyed it. This doc removes the reason FAILED happens at all for Reddit.
+- Fetch-quality gate (doc 693, Hard Req #11) already forces FULL/PARTIAL/FAILED marking - doc 830 obeyed it. This doc removes the reason FAILED happens at all for Reddit.
 
 ## Also See
 
@@ -109,7 +109,7 @@ Only authentication changes the outcome.
 - [Doc 562](../562-reddit-x-scraping-meta-eval-last30days/) - original block discovery + last30days eval
 - [Doc 319](../319-x-twitter-scraping-tools-2026/) - X/Twitter scraping tool landscape
 - [Doc 693](../693-zao-research-fetch-quality-audit/) - fetch-quality gate (FULL/PARTIAL/FAILED)
-- [Doc 819](../../agents/819-ai-coding-agent-discourse-inbox-cluster/) - the under-indexed cluster that triggered this
+- [Doc 830](../../agents/830-ai-coding-agent-discourse-inbox-cluster/) - the under-indexed cluster that triggered this
 
 ## Next Actions
 
@@ -119,7 +119,7 @@ Only authentication changes the outcome.
 | Rewrite ~/bin/zao-fetch-reddit.sh: /s/ resolve pre-pass + OAuth token + oauth.reddit.com | @Zaal | PR | After creds exist |
 | Update doc 564 status -> "superseded by 820 for Reddit" | @Zaal | Edit | With the script PR |
 | Decide X-article posture: accept thesis-only, or wire setup-browser-cookies for logged-in body | @Zaal | Decision | When an article actually needs the body |
-| Re-run doc 819 cluster fetch once OAuth lands, upgrade FAILED sources to FULL | @Zaal | Research | After script PR |
+| Re-run doc 830 cluster fetch once OAuth lands, upgrade FAILED sources to FULL | @Zaal | Research | After script PR |
 
 ## Sources
 

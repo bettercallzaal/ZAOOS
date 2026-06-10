@@ -97,6 +97,11 @@ scripts/.stock-codes-iman-*.txt
 .claude/.private/
 .claude/private-queries/
 
+# estate-audit tokens (canonical home is ~/.zao/estate-tokens.env, off-repo).
+# Defensive guard in case a copy lands in the tree. See scripts/estate-audit/.
+*estate-tokens*
+*.estate.json
+
 # Build / CI artifacts (cleanup 2026-05-24, see /tmp/zao-os-audit-20260524.md)
 graphify-out/
 build-log/

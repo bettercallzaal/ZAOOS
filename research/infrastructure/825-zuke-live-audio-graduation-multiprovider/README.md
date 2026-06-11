@@ -20,7 +20,7 @@ tier: DEEP
 | 2 | **Zuke is multi-provider, not Juke-only.** Juke is primary; 100ms, Stream.io, Songjam are backup options behind a provider-adapter layer | Zaal: "make ZUKE our premier app… give it many backups, as many options as we can, including Juke APIs". Resilience + reach (Juke = Farcaster-native; 100ms/Stream = full control; Songjam = X Spaces ingest) | LOCKED 2026-06-11 |
 | 3 | **The hardened ZAOOS 100ms code becomes Zuke's `HmsProvider` adapter — it is NOT thrown away** | The #817 work (gate enforcement, session integrity, one-open-session index) is hard-won; it ports as a provider, not a copy-paste | LOCKED 2026-06-11 |
 | 4 | **Delete 100ms/spaces code from ZAOOS only AFTER it is confirmed working in Zuke** | Zaal: "we can delete the code after we confirm it works on ZUKE." No premature deletion; run both until cutover proven | LOCKED 2026-06-11 |
-| 5 | **Listener token-gating is an open design gap in Zuke** — Juke's hosted embed is open-by-default; ZAO holder-gating does not exist there yet | Must be solved before Zuke replaces gated ZAOOS spaces. Candidate hook: Juke Partner-SSO token minted only for gated FIDs | OPEN — needs decision |
+| 5 | **No hard listener gate. Live audio on Zuke is open + members-first discovery.** Juke's embed stays open; we do not block listeners by ZAO holding | Zaal 2026-06-11: "no hard gate." Reach > exclusivity for live audio; the open Farcaster-native model is the point. Drops the gating blocker entirely | LOCKED 2026-06-11 |
 | 6 | **ZAOOS `/spaces` redirects to Zuke `/live` at cutover; code deleted, routes redirect** | Standard ZAO graduation model (CLAUDE.md): own repo, own DB, own domain, delete from lab, redirect routes | PLANNED |
 | 7 | **Zuke gets its own custom domain** (`zuke.thezao.com` per its setup doc) | Premier standalone product, not a Vercel preview alias | PLANNED (in Zuke's own v1 roadmap) |
 | 8 | **Cross-repo work is driven by prompting Zuke's own Claude Code sessions + monitoring**, since this session is scoped to `bettercallzaal/zaoos` | Zaal: "we can prompt the zuke claude code sessions too if we wanna just monitor that". This doc is the handoff brief for those sessions | LOCKED 2026-06-11 |
@@ -152,21 +152,18 @@ These are 100ms-specific guarantees with no current equivalent in Zuke's Juke pa
 
 ---
 
-## Part 4 — The Gating Gap (the one real blocker)
+## Part 4 — Gating: Resolved (no hard gate)
 
-ZAOOS 100ms spaces are **holder-gated server-side**: you can't get a join token unless you pass the ZAO gate. Zuke's Juke embed is **open** — anyone with the link can listen, and SIWF participation is Juke's, not gated to ZAO holders.
+**Decision (Zaal 2026-06-11): no hard listener gate.** ZAO live audio on Zuke is **open + members-first discovery**, not holder-gated. This removes what was the only real blocker.
 
-If "all ZAO live audio" includes **member-only** rooms, Zuke needs gating before it can replace gated ZAOOS spaces. Options:
+What this means concretely:
 
-| Option | How | Trade-off |
-|--------|-----|-----------|
-| **A. Gate the page, embed stays open** | `/live/[spaceId]` SSR checks ZAO holding (Neynar + contract) before rendering the Juke iframe | Soft gate — the raw `juke.audio/embed/{id}` URL is still public. OK for "members-first discovery," not hard enforcement |
-| **B. Juke Partner-SSO token, minted only for gated FIDs** | `/api/juke/partner-token` already exists; only mint when the session FID passes the gate; embed requires the token | Depends on whether Juke can require a partner token (i.e. refuse anonymous joins). Needs confirmation from Juke (nickysap) |
-| **C. Route gated rooms to the HMS provider** | Public/community rooms → Juke; member-only rooms → 100ms adapter (hard server-side gate, #817) | Cleanest hard gate; this is exactly why multi-provider matters. Juke for open, HMS for gated |
+- **Listeners are not blocked by ZAO holding.** Anyone with the link can listen — that is the Farcaster-native, reach-first model Juke is built for.
+- **"Members-first" is a discovery/surfacing nuance, not enforcement.** Member-facing surfaces (ZAO app, member feeds, the ZAOcoworking bot) promote rooms first; the room itself stays open.
+- **Creation stays gated** as it already is in Zuke — only `ZUKE_ADMIN_FIDS` (or the `JUKE_CREATE_PASSWORD` path) can spin up a space. Open to listen, controlled to host.
+- **The #817 server-side *token-gate* logic does NOT port.** It was the holder-gate on `api/100ms/token`; with no hard gate it's dropped. The rest of the #817 hardening — **session integrity, the one-open-session index, the stale-room sweeper** — still ports into the HMS provider (those are correctness, not gating).
 
-**Recommendation:** **C** as the durable answer (multi-provider earns its keep here), with **A** as the cheap interim for Juke rooms. Confirm **B**'s feasibility with Juke since it'd let even Juke rooms be gated.
-
-> **Decision needed from Zaal:** does "all ZAO live audio on Zuke" include hard member-gated rooms, or is open + members-first discovery acceptable for the Juke surface?
+Net effect on the plan: Part 5 loses its "decide + implement gating" step; the HMS provider port gets simpler (mint join tokens without a holder check).
 
 ---
 
@@ -175,10 +172,9 @@ If "all ZAO live audio" includes **member-only** rooms, Zuke needs gating before
 Phased, with ZAOOS spaces running the whole time until step 6.
 
 1. **Provider layer in Zuke** — add `providers/types.ts` + wrap existing Juke code as `providers/juke.ts`. No behavior change. (Zuke session)
-2. **Port HMS as a provider** — bring `hms100ms.ts` + `api/100ms/**` + `HMSVideoRoom` into `providers/hms.ts` / `api/hms/**`, carrying the #817 gate + session-integrity + sweeper. Generalize `juke_spaces` → `spaces` with a `provider` column (additive migration). (Zuke session)
-3. **Decide + implement gating** (Part 4). (Zuke session, after Zaal answers)
-4. **Wire backups + auto-cast** — provider failover registry; replace the auto-cast stub with the ZAO signer. (Zuke session)
-5. **Prove parity** — run a real ZAO event on Zuke (Juke room + one gated HMS room). Recording lands, webhooks fire, gate holds. This is the "confirmed working" bar from Decision #4.
+2. **Port HMS as a provider** — bring `hms100ms.ts` + `api/100ms/**` + `HMSVideoRoom` into `providers/hms.ts` / `api/hms/**`, carrying the #817 **session-integrity + one-open-session index + sweeper** (drop the holder-gate per Part 4). Generalize `juke_spaces` → `spaces` with a `provider` column (additive migration). (Zuke session)
+3. **Wire backups + auto-cast** — provider failover registry; replace the auto-cast stub with the ZAO signer. (Zuke session)
+4. **Prove parity** — run a real ZAO event on Zuke (a Juke room + one HMS room). Recording lands, webhooks fire, both providers join cleanly. This is the "confirmed working" bar from Decision #4.
 6. **Deprecate ZAOOS spaces** — only now: delete the 100ms/spaces surface from ZAOOS (Part 3 list), add redirects `/spaces` + `/spaces/hms/[id]` → Zuke `/live`, drop nav entries, remove `space_sessions` etc. after a verification window. (ZAOOS session — this repo, this branch)
 7. **Domain + branding** — `zuke.thezao.com`, Zuke identity/logo. (Zuke session)
 
@@ -194,7 +190,7 @@ To add for the HMS/Stream providers (from ZAOOS `.env.example`): `HMS_*` (100ms 
 
 ## Part 7 — Open Questions / Risks
 
-1. **Gating model (Part 4)** — needs a Zaal decision; everything else can proceed without it.
+1. ~~Gating model~~ — **resolved: no hard gate** (Part 4). Open + members-first discovery.
 2. **Juke beta surface** — create-space response is undocumented; `extractSpaceId` is defensive but could break if Juke changes shape. Keep the HMS provider as the proven fallback.
 3. **Two Supabase projects** — Zuke has its own DB (clean break). Don't let ZAOOS and Zuke schemas drift; after cutover, ZAOOS holds no spaces tables (echoes the doc 610 two-project lesson).
 4. **Recording/storage** — Juke hosts recordings; the HMS provider needs its own recording sink (S3/Supabase storage). Decide where HMS recordings live.

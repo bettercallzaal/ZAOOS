@@ -13,7 +13,7 @@
 | [Music](./music/) | 85 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
 | [Business](./business/) | 78 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
 | [Events](./events/) | 77 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
-| [Infrastructure](./infrastructure/) | 53 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub |
+| [Infrastructure](./infrastructure/) | 54 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub, repo+estate census (836) |
 | [Community](./community/) | 44 | ZAO guide, whitepaper, onboarding, member profiles, task forces, people/brands |
 | [Farcaster](./farcaster/) | 42 | Protocol, Mini Apps, XMTP, ecosystem, social graph, agentic bootcamp |
 | [Governance](./governance/) | 41 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |

@@ -1,10 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
 
 const VALID_SORT_FIELDS = ['score', 'name', 'first_met', 'last_interaction'] as const;
 type SortField = (typeof VALID_SORT_FIELDS)[number];
+
+// Strict contact field schema - bounds every field and rejects unknown keys so
+// arbitrary attacker-supplied columns can't reach the DB write.
+const str = (max: number) => z.string().trim().max(max);
+const contactFields = {
+  name: str(200),
+  handle: str(200),
+  category: str(64),
+  met_at: str(200),
+  organization: str(200),
+  location: str(200),
+  location_2: str(200),
+  notes: str(5000),
+  can_support: z.boolean(),
+  background: str(5000),
+  extra: z.record(z.string(), z.unknown()),
+  score: z.number().int().min(0).max(1000),
+  first_met: str(64),
+  source: str(120),
+};
+// POST: name required, everything else optional, no unknown keys.
+const createContactSchema = z
+  .object({ ...contactFields, name: contactFields.name.min(1) })
+  .partial()
+  .required({ name: true })
+  .strict();
+// PATCH: id required, any subset of the known fields, no unknown keys.
+const updateContactSchema = z
+  .object({ id: z.string().trim().min(1), ...contactFields })
+  .partial()
+  .required({ id: true })
+  .strict();
 
 async function requireAdmin() {
   const session = await getSessionData();
@@ -105,35 +138,18 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-
-    const { name, handle, category, met_at, organization, location, location_2, notes,
-      can_support, background, extra, score, first_met, source } = body;
-
-    if (!name || typeof name !== 'string' || !name.trim()) {
-      return NextResponse.json({ error: 'name is required' }, { status: 400 });
+    const raw = await req.json().catch(() => null);
+    const parsed = createContactSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid contact', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
     }
-
-    const record: Record<string, unknown> = {
-      name: name.trim(),
-    };
-    if (handle !== undefined) record.handle = handle;
-    if (category !== undefined) record.category = category;
-    if (met_at !== undefined) record.met_at = met_at;
-    if (organization !== undefined) record.organization = organization;
-    if (location !== undefined) record.location = location;
-    if (location_2 !== undefined) record.location_2 = location_2;
-    if (notes !== undefined) record.notes = notes;
-    if (can_support !== undefined) record.can_support = can_support;
-    if (background !== undefined) record.background = background;
-    if (extra !== undefined) record.extra = extra;
-    if (score !== undefined) record.score = score;
-    if (first_met !== undefined) record.first_met = first_met;
-    if (source !== undefined) record.source = source;
 
     const { data, error } = await supabaseAdmin
       .from('contacts')
-      .insert(record)
+      .insert(parsed.data)
       .select()
       .single();
 
@@ -159,11 +175,18 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const { id, ...fields } = body;
+    const raw = await req.json().catch(() => null);
+    const parsed = updateContactSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid update', details: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
+    }
 
-    if (!id || typeof id !== 'string' || !id.trim()) {
-      return NextResponse.json({ error: 'id is required' }, { status: 400 });
+    const { id, ...fields } = parsed.data;
+    if (Object.keys(fields).length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
     const updates: Record<string, unknown> = { ...fields, updated_at: new Date().toISOString() };

@@ -4,6 +4,7 @@ Every meeting captured as a research recap, newest first. Maintained automatical
 
 | Date | Title | Project | Attendees | Doc | Actions |
 |------|-------|---------|-----------|-----|---------|
+| 2026-06-09 | Bayo x Zaal - MPC / Atrium / cross-collab catch-up | The ZAO / BD | Zaal, Bayo | [841](841-bayo-zaal-mpc-atrium-bd/) | 7 |
 | 2026-06-10 | WIP Meetup x ZABAL Games - co-hosted event prep (event Jun 11) | ZABAL Games / ZAO Devz | Zaal, rizzle | [840](840-wip-meetup-zabal-games-event-prep/) | 6 |
 | 2026-06-10 | Fellenz x Zaal - brand + org-structure strategy (IMPORTANT) | The ZAO / ZAOstock | Zaal, Tom Fellenz | [839](839-fellenz-brand-org-strategy/) | 10 |
 | 2026-06-09 | Zaal x civilmonkey - DevCon India music stage + builder series + ZABAL Games proto-DAO | ZAO Devz | Zaal, civilmonkey, Iman | [827](827-zaal-civilmonkey-devcon-india-builder-series-proto-dao-jun9/) | 5 |

@@ -1,0 +1,90 @@
+name: Estate Health
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 13 * * 1' # Mondays 13:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  # PR guardrail: token-free checks, sticky comment, ratchet (fail only on NEW debt).
+  guardrail:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run estate checks
+        id: checks
+        run: |
+          MAX=$(jq -r '.baseline.ratchetMaxFails' tools/estate-control-plane/config.json)
+          echo "max_fails=$MAX" >> "$GITHUB_OUTPUT"
+          set +e
+          npx -y tsx tools/estate-control-plane/run-checks.ts \
+            --ci --max-fails="$MAX" \
+            --pr-comment=/tmp/estate-pr.md --baseline-fails="$MAX" \
+            --out=/tmp/estate-report.json
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+          set -e
+
+      - name: Upsert sticky PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('/tmp/estate-pr.md', 'utf8');
+            const marker = '<!-- estate-control-plane -->';
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+      - name: Enforce ratchet
+        if: steps.checks.outputs.exit != '0'
+        run: |
+          echo "Estate health ratchet breached - new debt added above baseline ${{ steps.checks.outputs.max_fails }}."
+          exit 1
+
+  # Weekly sweep: regenerate dashboard + digest, upload as artifacts.
+  # Next steps (need secrets, wire when ready): deploy dashboard to Vercel,
+  # open/update an 'Estate Health' issue, push the digest to ZOE/Telegram,
+  # open an auto count-fix PR for fixable drift.
+  sweep:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run + render
+        run: |
+          npx -y tsx tools/estate-control-plane/run-checks.ts \
+            --out=/tmp/estate-report.json \
+            --dashboard=/tmp/estate-dashboard.html \
+            --digest=/tmp/estate-digest.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: estate-health
+          path: |
+            /tmp/estate-report.json
+            /tmp/estate-dashboard.html
+            /tmp/estate-digest.txt
+          retention-days: 30

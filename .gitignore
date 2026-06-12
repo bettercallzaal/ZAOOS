@@ -108,3 +108,7 @@ build-log/
 coverage/
 autoresearch-test-coverage/
 tmp/
+
+# estate-control-plane generated artifacts
+tools/estate-control-plane/estate-report.json
+.estate-scan-stamp

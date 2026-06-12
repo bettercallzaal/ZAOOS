@@ -136,7 +136,11 @@
     "patch-package": "^8.0.1",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vite": "^8.0.1",
-    "vitest": "^3.2.4"
+    "vite": "^8.0.16",
+    "vitest": "^3.2.6"
+  },
+  "overrides": {
+    "elliptic": "6.6.1",
+    "protobufjs": "^7.6.3"
   }
 }

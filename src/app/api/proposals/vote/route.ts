@@ -220,7 +220,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
   const threshold = proposal.respect_threshold || 1000;
 
   if (totalRespectFor >= threshold) {
-    console.info(`[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`);
+    logger.info(`[publish-threshold] Proposal ${proposalId} reached ${totalRespectFor}/${threshold} Respect — auto-publishing`);
 
     const { data: fullProposal } = await supabaseAdmin
       .from('proposals')
@@ -290,7 +290,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     // Extract Farcaster result
     if (fcResult.status === 'fulfilled') {
       castHash = fcResult.value;
-      console.info(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
+      logger.info(`[publish-threshold] Published to /${publishChannel}: ${castHash}`);
     } else {
       fcError = fcResult.reason instanceof Error ? fcResult.reason.message : 'Farcaster publish failed';
       if (fcError.includes('Signer not configured')) {
@@ -304,7 +304,7 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
     if (bskyResult.status === 'fulfilled') {
       bskyUri = bskyResult.value;
       if (bskyUri) {
-        console.info(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
+        logger.info(`[publish-threshold] Published to @thezao Bluesky: ${bskyUri}`);
       }
     } else {
       bskyError = bskyResult.reason instanceof Error ? bskyResult.reason.message : 'Bluesky publish failed';
@@ -418,37 +418,37 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
           logger.error('[publish-threshold] X publish failed:', xError);
         } else if ('url' in val) {
           xUrl = val.url ?? null;
-          console.info(`[publish-threshold] Published to @thezaodao X: ${xUrl}`);
+          logger.info(`[publish-threshold] Published to @thezaodao X: ${xUrl}`);
         }
       } else if (val.platform === 'telegram') {
         if ('skipped' in val) {
-          console.info('[publish-threshold] Telegram skipped — not configured');
+          logger.info('[publish-threshold] Telegram skipped — not configured');
         } else if ('error' in val) {
           telegramError = val.error || 'Telegram publish failed';
           logger.error('[publish-threshold] Telegram publish failed:', telegramError);
         } else if ('messageId' in val) {
           telegramMessageId = val.messageId ?? null;
-          console.info(`[publish-threshold] Published to Telegram: ${telegramMessageId}`);
+          logger.info(`[publish-threshold] Published to Telegram: ${telegramMessageId}`);
         }
       } else if (val.platform === 'discord') {
         if ('skipped' in val) {
-          console.info('[publish-threshold] Discord skipped — not configured');
+          logger.info('[publish-threshold] Discord skipped — not configured');
         } else if ('error' in val) {
           discordError = val.error || 'Discord publish failed';
           logger.error('[publish-threshold] Discord publish failed:', discordError);
         } else if ('messageId' in val) {
           discordMessageId = val.messageId ?? null;
-          console.info(`[publish-threshold] Published to Discord: ${discordMessageId}`);
+          logger.info(`[publish-threshold] Published to Discord: ${discordMessageId}`);
         }
       } else if (val.platform === 'threads') {
         if ('skipped' in val) {
-          console.info('[publish-threshold] Threads skipped — not configured');
+          logger.info('[publish-threshold] Threads skipped — not configured');
         } else if ('error' in val) {
           threadsError = val.error || 'Threads publish failed';
           logger.error('[publish-threshold] Threads publish failed:', threadsError);
         } else if ('url' in val) {
           threadsUrl = val.url ?? null;
-          console.info(`[publish-threshold] Published to Threads: ${threadsUrl}`);
+          logger.info(`[publish-threshold] Published to Threads: ${threadsUrl}`);
         }
       }
     }
@@ -493,10 +493,10 @@ async function checkPublishThreshold(proposalId: string): Promise<boolean> {
       if (retryErr) {
         logger.error('[publish-threshold] DB retry also failed:', retryErr);
       } else {
-        console.info('[publish-threshold] DB updated (without bluesky URI column)');
+        logger.info('[publish-threshold] DB updated (without bluesky URI column)');
       }
     } else {
-      console.info('[publish-threshold] DB updated successfully — status: published');
+      logger.info('[publish-threshold] DB updated successfully — status: published');
     }
 
     return true;

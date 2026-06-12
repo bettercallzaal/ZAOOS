@@ -35,13 +35,19 @@ export async function getDailySpend(
   todayStart.setUTCHours(0, 0, 0, 0);
 
   const statuses = includePending ? ['success', 'pending'] : ['success'];
-  const { data } = await db
+  const { data, error } = await db
     .from('agent_events')
     .select('usd_value')
     .eq('agent_name', name)
     .in('status', statuses)
     .gte('created_at', todayStart.toISOString());
 
+  // A failed read must NOT be reported as $0 spent - that would let claimBudget
+  // wave a trade through during a DB blip. Surface it so the caller fails closed.
+  if (error) {
+    logger.error(`[${name}] getDailySpend query failed: ${error.message}`);
+    throw new Error(`getDailySpend failed: ${error.message}`);
+  }
   if (!data) return 0;
   return data.reduce((sum, e) => sum + (e.usd_value || 0), 0);
 }
@@ -69,7 +75,14 @@ export async function claimBudget(
   const db = getSupabaseAdmin();
 
   // Fast pre-check on committed + pending spend to avoid pointless inserts.
-  const preSpent = await getDailySpend(name, true);
+  // If the spend read fails, fail CLOSED (deny the trade) rather than assume $0.
+  let preSpent: number;
+  try {
+    preSpent = await getDailySpend(name, true);
+  } catch (err) {
+    logger.error(`[${name}] Budget pre-check read failed; denying trade: ${err instanceof Error ? err.message : String(err)}`);
+    return false;
+  }
   if (preSpent + tradeUsd > maxDailySpend) return false;
 
   // Reserve the slot, capturing the row id so we can roll it back if needed.
@@ -85,7 +98,15 @@ export async function claimBudget(
   }
 
   // Re-verify: total now includes our reservation AND any concurrent claim.
-  const committed = await getDailySpend(name, true);
+  // If the re-read fails we can't prove we're under cap - roll back and deny.
+  let committed: number;
+  try {
+    committed = await getDailySpend(name, true);
+  } catch (err) {
+    logger.error(`[${name}] Budget re-verify read failed; rolling back reservation ${reserved.id}: ${err instanceof Error ? err.message : String(err)}`);
+    await db.from('agent_events').delete().eq('id', reserved.id);
+    return false;
+  }
   if (committed > maxDailySpend) {
     // A concurrent run also claimed; we lost the race. Roll our reservation back.
     const { error: delErr } = await db.from('agent_events').delete().eq('id', reserved.id);

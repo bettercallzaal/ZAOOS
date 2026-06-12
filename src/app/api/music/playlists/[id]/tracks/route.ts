@@ -70,6 +70,22 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
+    // Ownership/collaborative check - same gate the POST path enforces. Without
+    // this any authenticated user could delete tracks from any playlist (IDOR).
+    const { data: playlist, error: plError } = await supabaseAdmin
+      .from('playlists')
+      .select('created_by_fid, collaborative')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (plError) throw plError;
+    if (!playlist) {
+      return NextResponse.json({ error: 'Playlist not found' }, { status: 404 });
+    }
+    if (playlist.created_by_fid !== session.fid && !playlist.collaborative) {
+      return NextResponse.json({ error: 'Not allowed to modify this playlist' }, { status: 403 });
+    }
+
     const { error } = await supabaseAdmin
       .from('playlist_tracks')
       .delete()

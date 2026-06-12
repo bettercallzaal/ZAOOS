@@ -1,0 +1,59 @@
+{
+  "repoRoot": ".",
+  "live": {
+    "apiRoutes": "src/app/api/**/route.ts",
+    "apiDomainsDir": "src/app/api",
+    "components": "src/components/**/*.tsx",
+    "hooks": "src/hooks",
+    "libDomainsDir": "src/lib",
+    "researchDir": "research"
+  },
+  "docPointers": [
+    {
+      "file": "CLAUDE.md",
+      "claims": {
+        "apiRoutes": "(\\d+) (?:API )?route handlers?",
+        "components": "(\\d+) components",
+        "hooks": "(\\d+) (?:custom )?hooks"
+      }
+    },
+    {
+      "file": "AGENTS.md",
+      "claims": {
+        "apiRoutes": "(\\d+) route handlers",
+        "components": "(\\d+) components",
+        "hooks": "(\\d+) custom hooks"
+      }
+    }
+  ],
+  "phantomPathScan": [{ "file": "CLAUDE.md" }, { "file": "AGENTS.md" }],
+  "zombie": {
+    "denylist": [
+      { "pattern": "openclaw", "label": "decommissioned: openclaw (doc 601)", "paths": ["src", "bot/src"] },
+      { "pattern": "composio", "label": "decommissioned: Composio AO (doc 601)", "paths": ["src", "bot/src"] },
+      { "pattern": "agent-zero", "label": "decommissioned: Agent Zero (doc 601)", "paths": ["src", "bot/src"] },
+      { "pattern": "coming soon", "label": "half-built: 'coming soon' placeholder", "paths": ["src"] },
+      { "pattern": "not yet configured", "label": "half-built: 'not yet configured'", "paths": ["src"] }
+    ],
+    "graduation": []
+  },
+  "quality": {
+    "apiDomainsDir": "src/app/api",
+    "testDirName": "__tests__"
+  },
+  "staleness": {
+    "maxDays": 120,
+    "estateMaxDays": 100,
+    "estateStampFile": ".estate-scan-stamp"
+  },
+  "baseline": {
+    "auditAllowlist": [
+      "axios", "ws", "@xmldom/xmldom", "lodash", "lodash-es", "lodash.set",
+      "defu", "basic-ftp", "brace-expansion", "protobufjs", "elliptic",
+      "@snapshot-labs/snapshot.js", "@solana/wallet-adapter-wallets"
+    ],
+    "typecheckErrors": 0,
+    "untestedDomains": 39,
+    "ratchetMaxFails": 7
+  }
+}

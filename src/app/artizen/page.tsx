@@ -220,11 +220,13 @@ export default function ArtizenPage() {
           <h2 className="text-lg font-bold sm:text-xl">About Artizen</h2>
           <p className="mt-3 text-sm leading-relaxed text-white/70">
             Artizen is a Web3 crowdfunding and match-funding platform for projects at the intersection
-            of art, science, technology, and culture, founded by René Pinnell. As of June 2026 it
-            relaunched a rebuilt platform with its Phoenix Fund Drive — creators raised{' '}
-            <span className="text-white">over $270,000 in three days</span> — and is standing up
-            marquee funds with collaborators including RZA (Wu-Tang) and Lilly Wachowski (The Matrix).
-            Season 6 closes July 9, 2026.
+            of art, science, technology, and culture, founded by René Pinnell. Creators mint $10
+            open-edition Artifacts — 100% goes to the creator — and every dollar of sales instantly
+            unlocks a matching dollar from each fund backing the project. As of June 2026 a rebuilt
+            platform is running weekly match drives: the Phoenix Fund Drive raised{' '}
+            <span className="text-white">over $270,000 in three days</span>, and the Frontier Fund
+            Drive is live now with a 2x match. The fund with RZA (Wu-Tang) took the gold. Season 6
+            closes July 9, 2026.
           </p>
           <p className="mt-3 text-xs text-white/40">
             Standings on this page are a point-in-time snapshot ({SNAPSHOT_DATE}) and move as artifacts

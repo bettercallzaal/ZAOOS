@@ -59,8 +59,21 @@ npx vitest run --config tools/estate-control-plane/vitest.config.ts
 
 ## Wired vs next
 
-Wired: checks engine, all surfaces' renderers, PR guardrail (sticky comment +
-ratchet), weekly artifact upload.
-Next (need secrets): deploy dashboard to Vercel, open/update an "Estate Health"
-issue, push the digest to ZOE/Telegram, auto count-fix PR for fixable drift,
-live token-gated estate scan, trend history.
+Wired (no setup needed - uses the built-in `GITHUB_TOKEN`):
+- checks engine + all surface renderers
+- PR guardrail: sticky comment + ratchet
+- weekly sweep: auto count-fix PR for fixable drift (`fix-drift.ts`), Estate Health
+  issue upsert, artifact upload
+
+Wired but secret-gated (skipped cleanly until you add the secret):
+- Dashboard deploy to Vercel - set `VERCEL_TOKEN` (+ `VERCEL_ORG_ID`,
+  `VERCEL_ESTATE_PROJECT_ID`)
+- Telegram digest (change-gated: silent when all-green) - set `TELEGRAM_BOT_TOKEN`,
+  `TELEGRAM_CHAT_ID`
+
+Intentionally manual (design decision, not a gap): the Vercel/Supabase estate scan
+stays a manual `scripts/estate-audit/audit.sh` run - storing a long-lived cloud
+token in CI is the concentration risk we are avoiding. `estate.ts` reports the
+freshness of the last manual scan.
+
+Later: trend history (health-score over time on the dashboard).

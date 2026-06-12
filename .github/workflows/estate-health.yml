@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   issues: write
 
@@ -59,15 +59,17 @@ jobs:
           echo "Estate health ratchet breached - new debt added above baseline ${{ steps.checks.outputs.max_fails }}."
           exit 1
 
-  # Weekly sweep: regenerate dashboard + digest, upload as artifacts.
-  # Next steps (need secrets, wire when ready): deploy dashboard to Vercel,
-  # open/update an 'Estate Health' issue, push the digest to ZOE/Telegram,
-  # open an auto count-fix PR for fixable drift.
+  # Weekly sweep: render dashboard/digest, open a count-fix PR for fixable drift,
+  # update the 'Estate Health' issue, deploy the dashboard, push a digest.
+  # Estate (Vercel/Supabase) scan stays MANUAL by design (no stored long-lived
+  # token = avoids the concentration risk); estate.ts reports its freshness.
   sweep:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -78,6 +80,69 @@ jobs:
             --out=/tmp/estate-report.json \
             --dashboard=/tmp/estate-dashboard.html \
             --digest=/tmp/estate-digest.txt
+
+      - name: Open/refresh count-fix PR (fixable drift)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          npx -y tsx tools/estate-control-plane/fix-drift.ts
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "no count drift to fix"; exit 0
+          fi
+          BR=estate/auto-count-fix
+          git config user.name "estate-control-plane[bot]"
+          git config user.email "estate-bot@users.noreply.github.com"
+          git checkout -B "$BR"
+          git commit -am "chore(docs): auto-fix drifted counts (estate control plane)"
+          git push -f origin "$BR"
+          if ! gh pr view "$BR" >/dev/null 2>&1; then
+            gh pr create --base main --head "$BR" \
+              --title "Auto count-fix: docs drifted from live repo" \
+              --body "Opened by the Estate Control Plane weekly sweep. Mechanical count corrections only - review and merge."
+          fi
+
+      - name: Update Estate Health issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const digest = fs.readFileSync('/tmp/estate-digest.txt', 'utf8');
+            const report = JSON.parse(fs.readFileSync('/tmp/estate-report.json', 'utf8'));
+            const marker = '<!-- estate-health-issue -->';
+            const title = 'Estate Health';
+            const body = `${marker}\n## Estate Health: ${report.healthScore}/100\n\n\`\`\`\n${digest}\n\`\`\`\n\n_Updated by the weekly sweep. ${report.summary.fixable} auto-fixable (see the count-fix PR if open)._`;
+            const { owner, repo } = context.repo;
+            const found = await github.rest.search.issuesAndPullRequests({ q: `repo:${owner}/${repo} in:body "${marker}" is:issue is:open` });
+            if (found.data.total_count > 0) {
+              await github.rest.issues.update({ owner, repo, issue_number: found.data.items[0].number, body });
+            } else {
+              await github.rest.issues.create({ owner, repo, title, body, labels: ['estate-health'] });
+            }
+
+      - name: Deploy dashboard to Vercel (if configured)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_ESTATE_PROJECT_ID }}
+        if: ${{ env.VERCEL_TOKEN != '' }}
+        run: |
+          mkdir -p _estate_site && cp /tmp/estate-dashboard.html _estate_site/index.html
+          npx -y vercel deploy _estate_site --prod --yes --token "$VERCEL_TOKEN"
+
+      - name: Push digest to Telegram (only when not all-green)
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        if: ${{ env.TG_TOKEN != '' }}
+        run: |
+          FAILS=$(jq -r '.summary.fail' /tmp/estate-report.json)
+          WARNS=$(jq -r '.summary.warn' /tmp/estate-report.json)
+          if [ "$FAILS" -eq 0 ] && [ "$WARNS" -eq 0 ]; then
+            echo "all green - staying silent (no-nag)"; exit 0
+          fi
+          curl -s -X POST "https://api.telegram.org/bot$TG_TOKEN/sendMessage" \
+            --data-urlencode "chat_id=$TG_CHAT" \
+            --data-urlencode "text=$(cat /tmp/estate-digest.txt)" >/dev/null
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

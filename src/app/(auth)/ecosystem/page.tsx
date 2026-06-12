@@ -66,13 +66,13 @@ const ECOSYSTEM_APPS: EcosystemApp[] = [
   {
     name: 'ZOUNZ',
     icon: '\uD83C\uDFAD',
-    description: 'ZABAL Nouns DAO - daily NFT auctions funding the community treasury on Base.',
+    description: 'ZABAL Nouns DAO - daily NFT auctions funding The ZAO community treasury on Base.',
     url: 'https://nouns.build/dao/base/0xCB80Ef04DA68667c9a4450013BDD69269842c883',
   },
   {
     name: 'Empire Builder',
     icon: '\uD83C\uDFF0',
-    description: 'Token empire rewards - stake and earn in the ZABAL ecosystem.',
+    description: 'Token empire rewards - stake and earn in The ZAO ecosystem.',
     url: 'https://empirebuilder.world/profile/0x7234c36A71ec237c2Ae7698e8916e0735001E9Af',
   },
   {
@@ -237,7 +237,7 @@ export default function EcosystemPage() {
                 : 'bg-[#1a2a3a] text-gray-400 hover:text-gray-200'
             }`}
           >
-            ZABAL Partners
+            ZAO Ecosystem
           </button>
           <button
             onClick={() => setShowDiscover(true)}

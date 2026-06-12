@@ -1,6 +1,6 @@
 # ZAO OS Research Library
 
-> **771+ active research documents** across 13 topic folders (77 superseded docs in `_archive/`, plus 9 daily inspiration logs) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy.
+> **~820 active research documents** across 14 topic folders (77 superseded docs in `_archive/`, plus 9 daily inspiration logs) covering the full ZAO ecosystem — a decentralized social media platform for music, plus festivals, agents, governance, and the ZABAL economy. Counts verified 2026-06-11 ([Doc 836](./infrastructure/836-zaoos-repo-estate-census/)).
 
 ---
 
@@ -8,19 +8,19 @@
 
 | Topic | Docs | Description |
 |-------|------|-------------|
-| [Dev Workflows](./dev-workflows/) | 156 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
-| [Agents](./agents/) | 142 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization, agent identity/registration |
+| [Dev Workflows](./dev-workflows/) | 167 | Skills, Claude Code, testing, autoresearch, git, worktrees, MCP servers |
+| [Agents](./agents/) | 152 | OpenClaw, ZOE, Hermes, frameworks, memory, orchestration, self-optimization, agent identity/registration |
 | [Music](./music/) | 85 | Player, NFTs, distribution, Arweave, audio APIs, FISHBOWLZ, AI generation, ElevenLabs, metadata/ISRC, games/interactive media |
-| [Business](./business/) | 78 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
-| [Events](./events/) | 77 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
-| [Infrastructure](./infrastructure/) | 54 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub, repo+estate census (836) |
-| [Community](./community/) | 44 | ZAO guide, whitepaper, onboarding, member profiles, task forces, people/brands |
+| [Business](./business/) | 81 | Revenue, payments, token economics, strategy, marketplace, brand kits, partnerships |
+| [Events](./events/) | 94 | Bootcamps, ZAOstock, ZABAL Games, meeting/call recaps, ship logs, big wins, status snapshots |
+| [Infrastructure](./infrastructure/) | 59 | Next.js 16, Supabase, streaming, mobile, notifications, admin, 3D portal hub, repo+estate census (836), estate map (844) |
+| [Community](./community/) | 45 | ZAO guide, whitepaper, onboarding, member profiles, task forces, people/brands |
 | [Farcaster](./farcaster/) | 42 | Protocol, Mini Apps, XMTP, ecosystem, social graph, agentic bootcamp |
-| [Governance](./governance/) | 41 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
+| [Governance](./governance/) | 43 | Respect, ORDAO, Hats, ZOUNZ, fractals, Snapshot, BuilderOSS |
 | [Identity](./identity/) | 25 | ZIDs, ENS/Basenames, reputation scoring, knowledge graph, Privy auth/wallets |
 | [Cross-Platform](./cross-platform/) | 15 | Bluesky, Lens, Nostr, Mastodon, Reddit, X, Twitch, Meta |
 | [Inspiration](./inspiration/) | 9 | Daily "steal like an artist" research — apps analyzed per session, gap analysis |
-| [Security](./security/) | 7 | Audits, API verification, testing |
+| [Security](./security/) | 8 | Audits, API verification, testing |
 | [WaveWarZ](./wavewarz/) | 6 | Prediction markets, artist pipeline, Solana PDAs |
 | [Archive](./_archive/) | 77 | Superseded docs (preserved for history) |
 
@@ -137,8 +137,8 @@
 
 ## Research Stats
 
-- **Active documents:** 771 across 13 topic folders (+9 daily inspiration logs; all docs filed in topic folders)
-- **Highest doc number:** 802
+- **Active documents:** ~820 across 14 topic folders (+9 daily inspiration logs; all docs filed in topic folders)
+- **Highest doc number:** 841
 - **Archived (superseded/merged):** 77 (in `_archive/`)
 - **Time span:** January — June 2026
 - **Topic folders:** dev-workflows, agents, music, events, business, infrastructure, community, farcaster, governance, identity, cross-platform, security, wavewarz

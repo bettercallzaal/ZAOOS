@@ -1,6 +1,6 @@
 ---
 topic: events
-type: decision
+type: audit
 status: research-complete
 last-validated: 2026-06-13
 superseded-by:
@@ -9,101 +9,111 @@ original-query: "whats next to do on the zao-stock event site - prioritized back
 tier: STANDARD
 ---
 
-# 853 - ZAOstock Event Site: Launch-Ready Backlog
+# 853 - ZAOstock Event Site: Brand Audit + Launch Backlog (canonical repo)
 
-> **Goal:** Prioritized backlog to take the public ZAOstock site from "brand-correct skeleton" to launch-ready for October 3, 2026 (Franklin Street Parklet, Ellsworth Maine). Grounded in the actual current state of the `bettercallzaal/zao-stock` repo after the Fellenz brand cleanup (PR #1).
+> **Goal:** Audit the REAL ZAOstock event site for Fellenz brand compliance and remaining launch work, and record the repo consolidation. Corrected 2026-06-13: the canonical site is the mature `ZAODEVZ/ZAOstock` repo, not the thin `bettercallzaal/zao-stock` skeleton this doc was first (wrongly) written against.
+
+## Correction note (2026-06-13)
+
+The first version of this doc audited `bettercallzaal/zao-stock` (a 4-page skeleton) believing it was the event site. It is not. The canonical site is a mature 22-page / 27-API-route app that already absorbed most of the Fellenz critique. This rewrite reflects the real repo and the consolidation that happened.
+
+## Repo consolidation (done this session)
+
+Three repos existed; now one canonical home:
+
+| Repo | Was | Now |
+|------|-----|-----|
+| `ZAODEVZ/ZAOstock` | did not exist | **CANONICAL** - full history migrated from `bettercallzaal/zaostock` (30 branches, all tags, `main` HEAD `3b7a2b3` verified identical) |
+| `bettercallzaal/zaostock` (no hyphen) | the real mature site | README points to new home, **archived** (read-only) |
+| `bettercallzaal/zao-stock` (hyphen) | thin skeleton; got a brand-cleanup PR (#1, merged) | README points to new home, **archived** (read-only) |
+
+Pending (owner: Zaal): point `zaostock.com` domain + Vercel project at `ZAODEVZ/ZAOstock`; move the 5 env vars (see Infra below).
 
 ## Key Decisions (read first)
 
 | # | Decision | Why |
 |---|----------|-----|
-| D1 | **RESOLVE the two-surface fork before building anything else.** There are two live public surfaces: the standalone `zao-stock` repo (minimal, just brand-cleaned) and `zaoos.com/stock` inside the main ZAO OS app (already has team dashboard, RSVP, countdown, partners per MASTER-PLAN). Pick ONE canonical public site; make the other redirect or retire. | Building the backlog twice is waste. Two public URLs for one event splits SEO, RSVP data, and confuses the Ellsworth audience. This is the gating decision - everything below depends on it. |
-| D2 | If the standalone repo stays canonical: **port the existing `SubmitForm` + `/api/library/submit` pattern** from the main app (Farcaster-auth-gated, zod-validated, Supabase-backed, moderated) for the musician intake. Do NOT hand-roll a new form. | A battle-tested intake pattern already exists at `src/components/library/SubmitForm.tsx`. Reuse beats reinvention. |
-| D3 | **Ship the passive `/submit` intake, not outreach.** Musician path = a passive submission form. No outreach campaigns, no target lists (standing rule). | Active musician outreach is months away; the site's job is to catch inbound, not push. |
-| D4 | **Lineup is the highest-value content gap.** Repo shows 5 names (Hurric4n3ike, DJANGO UU, CLEJAN, ATTABOTTY, Mr. Darius) all marked "TBA"; MASTER-PLAN calls for 10 artists noon-6pm. Fill confirmed slots, mark the rest "more TBA". | The lineup is what a music audience comes to see. Half-empty + "TBA" reads as unfinished. |
-| D5 | **Wire the dead RSVP + Farcaster buttons or remove them.** `stock/page.tsx` has a non-functional "Sign in with Farcaster & RSVP" button. A button that does nothing is worse than no button. | Either make it real or cut it until it is. |
+| D1 | **Canonical repo = `ZAODEVZ/ZAOstock`.** All new work happens there. | Migration done + verified; old repos archived. |
+| D2 | **The site is already ~90% Fellenz-brand-correct.** Do NOT re-do the brand cleanup; only apply the 2 remaining correction sets below. | Spelling, parent framing, fiscal-sponsor wording, donate paths, entry doors, "digital creators", member-count rule all already pass. |
+| D3 | **COC Concertz is framed as owned/portfolio on public pages - correct to partnership.** Reframe to "ZAO Festivals + COC Concertz" and add "(framing pending COC confirmation)" wherever a relationship is asserted. | Standing rule: COC is a community partnership, never a sub-brand owned by The ZAO. |
+| D4 | **Strip ZABAL + raw crypto jargon from public copy.** "Year of the ZABAL", VibesGrid "ZABAL" tags, "435 SOL / Solana" on the public sponsor page. | Standing rules: ZABAL never leads public copy; public copy uses digital-creator positioning, not crypto/web3/token jargon. |
 
-## Current State (ground truth, post-PR #1)
+## Brand Audit (Fellenz rules) - canonical repo
 
-Repo: `bettercallzaal/zao-stock`, Next.js 16 + React 19 + Tailwind, build now green.
+### PASS (already correct)
+| Rule | Evidence |
+|------|----------|
+| Canonical spelling "ZAOstock" | No "ZAO Stock"/"ZAO-STOCK" anywhere in `src`/`public`. |
+| The ZAO is parent | `layout.tsx` "Run by The ZAO"; `page.tsx` "ZAOstock is The ZAO's flagship IRL music festival"; footer + CTAs link `thezao.com`. |
+| ZAO Festivals as the arm | "under the ZAO Festivals umbrella"; sponsor Ecosystem track "Year-round ZAO Festivals partnership". |
+| Fiscal sponsor wording | sponsor `page.tsx`: "Eligible support administered through New Media Commons, a fiscally sponsored project of Fractured Atlas" - matches the approved phrasing. |
+| Donate = 2 paths | `donate/page.tsx`: PayPal (fiat) + Giveth (crypto), exactly the approved structure. |
+| No specific member count | Uses "90+", "400+", "19 Team Members + Advisors". |
+| Digital-creator positioning | sponsor Virtual track: "Digital creator brands and digital-native companies"; "digital attendance collectible" not "NFT". |
+| Entry doors exist | nav + "How To Plug In - Pick a door": `/musicians`, `/artists`, `/event-organizers`; volunteer -> `/apply`; ticket -> `ticket.zaostock.com`. |
 
-Routes that exist (all static):
-- `/` - hero, now "ZAO Festivals presents ZAOstock / by The ZAO", Oct 3 + Ellsworth, two CTA cards (musicians / volunteers) pointing at `mailto:info@thezao.com` with `TODO: confirm submission link`.
-- `/stock` - event detail: date/location/capacity/ticket cards, dead RSVP button, 5-name lineup, "Schedule (TBD)", "Community Feed" placeholder.
-- `/talks` - Schelling Point roundtables (2 entries), Archive placeholder.
-- `/past` - ZAO-PALOOZA + ZAO-CHELLA stats, "Help us gather media" mailto.
+### CORRECT (the 2 remaining sets)
+| # | Where | Current | Fix |
+|---|-------|---------|-----|
+| C1 | `src/app/sponsor/page.tsx:23` | stat "5 COC Concertz Events" listed as a ZAO credibility number | Frame as partnership; or label "COC Concertz (partner) events" + pending-confirmation note |
+| C2 | `src/app/sponsor/page.tsx:51,62` | "Featured in COC Concertz monthly virtual events", "Logo in COC Concertz monthly metaverse concerts" | "via our COC Concertz partnership (framing pending COC confirmation)" |
+| C3 | `src/app/sponsor/page.tsx:58` | Ecosystem subtitle "(Stock, Ville, WaveWarZ, COC)" | "(Stock, Ville, WaveWarZ) + COC Concertz partnership" |
+| C4 | `src/app/sponsor/page.tsx` PAST_PROOF | "COC Concertz - 5 monthly metaverse concerts" as ZAO proof | Mark as partner proof, not owned event |
+| C5 | `src/app/llms.txt/route.ts:41` | "Iman ... leading COC Concertz #6" | "Iman ... helps run COC Concertz #6 (community partnership)" |
+| C6 | `src/app/sponsor/page.tsx:52` | "Mentioned in 400+ edition daily newsletter (Year of the ZABAL)" | Drop "(Year of the ZABAL)" - ZABAL must not surface in public copy |
+| C7 | `src/components/festival/VibesGrid.tsx:26-29` | public tags/captions "ZABAL", "ZABAL energy across the day", "ZABAL geometric art" | Re-caption without leading ZABAL |
+| C8 | `src/app/sponsor/page.tsx` PAST_PROOF (WaveWarZ) | "435 SOL ($37K+) volume, artists paid instantly via Solana" | Soften crypto jargon for the public sponsor audience (keep $ figure, drop SOL/Solana or move behind digital-creator framing) |
 
-What is missing or fake:
-- No real submission flow (mailto placeholder only).
-- No volunteer signup flow (mailto placeholder only).
-- RSVP button has no handler.
-- Schedule is "TBD"; Community Feed is "coming soon"; lineup details are "TBA".
-- No navigation between pages (no header/nav component - homepage does not link to `/stock`, `/talks`, `/past`).
-- No OG image / share preview; `farcaster.json` accountAssociation signature is empty.
-- Ticket shows "$10"; donate/sponsor path absent.
+Note: "Web3Metal" appears on home + pitch - that is a partner's proper name, not editable jargon. Leave.
 
-## Findings (prioritized backlog)
+## Launch Backlog (what actually remains)
 
-### P0 - Gating (do before anything)
-| Item | Detail |
-|------|--------|
-| Resolve two-surface fork (D1) | Decide canonical public site: standalone `zao-stock` repo vs `zaoos.com/stock`. The main-app page already has RSVP + team dashboard + countdown + partners. If `zaoos.com/stock` wins, the standalone repo becomes a redirect and most of this backlog moves there. |
+Most of the original backlog is ALREADY BUILT (musician submit, RSVP, donate, sponsor, team dashboard all exist). Real remaining gaps:
 
-### P1 - Core launch (musician + helper entry, the brief)
-| Item | Detail |
-|------|--------|
-| Musician submission flow | Replace homepage `mailto` with a real `/submit` page. Port `SubmitForm` + `/api/library/submit` pattern. Fields: act name, links (Farcaster/music), short bio, building-with-tech note. Honor Sep 3 deliverable cutoff messaging. |
-| Volunteer signup flow | Same pattern, lighter form: name, contact, what they can help with (ops/design/music/livestream). Routes to info@thezao.com inbox or Supabase table. |
-| Add site navigation | Header linking `/` `/stock` `/talks` `/past` (+ `/submit`). Homepage is currently a dead end. |
-| Fill the lineup (D4) | Confirm which of the 5 are locked; target 10 per MASTER-PLAN; mark unconfirmed as "more artists TBA". Confirmed-only on the public grid (standing rule). |
-| Wire or cut RSVP (D5) | Either implement Farcaster sign-in RSVP (Neynar) or remove the button until backend exists. |
+| Pri | Item | Detail |
+|-----|------|--------|
+| P0 | Domain + Vercel cutover | Point `zaostock.com` + Vercel project at `ZAODEVZ/ZAOstock`; migrate the 5 env vars (Infra below). Owner: Zaal. |
+| P1 | Apply C1-C8 brand corrections | One PR on `ZAODEVZ/ZAOstock`. |
+| P2 | Lineup confirmation | Verify which artists are locked vs TBA on `/artists` + home lineup; confirmed-only public grid. |
+| P2 | Program / run-of-show | `/program` page exists - confirm it has the public-safe noon-6pm schedule + Black Moon after-party. |
+| P3 | Verify musician deliverable cutoff messaging | Sep 3 cutoff (one month before event) surfaced on `/musicians/submit`. |
 
-### P2 - Content completeness
-| Item | Detail |
-|------|--------|
-| Schedule / run-of-show | MASTER-PLAN has `planning/run-of-show.md` (10 artists, DJ transitions, livestream, noon-6pm + Black Moon after-party). Publish a public-safe version. |
-| Event context | Add "Part of the 9th Annual Art of Ellsworth / Maine Craft Weekend", gateway to Acadia. Lead with music, zero web3 jargon (Ellsworth audience framing). |
-| Partners / sponsors grid | Confirmed partners only. Add a sponsor CTA (tax-deductible via Fractured Atlas 501(c)(3) - use approved fiscal-sponsor phrasing). |
-| Donate path | Two paths only: PayPal (fiat) + Giveth (crypto). |
-| Past festivals polish | Galleries are "Coming Soon"; wire real media or drop the buttons. |
+## Infra: env var move (the 5 that matter)
 
-### P3 - Polish / distribution
-| Item | Detail |
-|------|--------|
-| OG image + share preview | Needed for Farcaster/social shares. No OG currently. |
-| Farcaster Mini App / frame | `farcaster.json` exists but signature is empty; decide if this ships as a Mini App. Livestream group (Mickey/Rev lead) + COC Concertz partnership framing if surfaced. |
-| Countdown timer | MASTER-PLAN lists a countdown on `zaoos.com/stock`; port if standalone wins. |
-| Remove section emojis | Per house style, strip remaining 🎵 / 💬 / 🎸 from `/stock` sections (left out of brand PR scope). |
+Pulled from Vercel project `zaostock` (scope `bettercallzaals-projects`) to a local gitignored file this session. The 5 app vars:
 
-## Reusable assets already in the ecosystem
+| Var | Notes |
+|-----|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role (secret) |
+| `SESSION_SECRET` | iron-session secret (`openssl rand -base64 32`) |
+| `NEXT_PUBLIC_APP_URL` | `https://zaostock.com` |
 
-- `src/components/library/SubmitForm.tsx` - Farcaster-gated submission UI (zod tags, optimistic feedback). Copy for musician/volunteer intake.
-- `src/app/api/library/submit/route.ts` - POST handler: session auth, fid gate, zod validation, Supabase insert, moderation. Template for the intake backend.
-- `ZAO-STOCK/MASTER-PLAN.md` + `planning/*` - the full event plan (run-of-show, venue, budget, staffing, contingency). The public site should surface the public-safe slices of these.
-- `zaoos.com/stock` + `zaoos.com/stock/team` - existing built-out festival page + team dashboard (the D1 fork candidate).
+(All documented in repo `.env.example`.) Two cutover paths:
+- **Re-point (simplest):** change the existing `zaostock` Vercel project's connected Git repo to `ZAODEVZ/ZAOstock`. Envs + domain stay put - nothing to move.
+- **New project:** create a Vercel project for `ZAODEVZ/ZAOstock`, then push the 5 vars in and reassign the domain.
 
 ## Also See
 
-- [Doc 224 - ZAO Stock multi-year vision](../../_archive/224-zao-stock-multi-year-vision/) (archived)
-- [Doc 364 - ZAO Festivals deep research](../364-zao-festivals-deep-research/) (Ellsworth context, sponsor framework, Fractured Atlas wording)
+- [Doc 839 - Fellenz brand + org strategy](../839-fellenz-brand-org-strategy/)
+- [Doc 364 - ZAO Festivals deep research](../364-zao-festivals-deep-research/)
 - [Doc 369 - DreamEvent gap analysis](../369-dreamevent-framework-gap-analysis/)
-- [Doc 839 - Fellenz brand + org strategy](../839-fellenz-brand-org-strategy/) (the critique that drove PR #1)
 
 ## Next Actions
 
 | Action | Owner | Type | By When |
 |--------|-------|------|---------|
-| Decide canonical public site: standalone `zao-stock` vs `zaoos.com/stock` (D1) | @Zaal | Decision | Before further site work |
-| If standalone canonical: build `/submit` from SubmitForm pattern (D2) | @Zaal | PR | Next sprint |
-| Add site nav + fill confirmed lineup slots | @Zaal | PR | Before public push |
-| Wire or remove dead RSVP button | @Zaal | PR | Next sprint |
-| Confirm musician submission link to replace `TODO` in `page.tsx` | @Zaal | PR | After D1 |
-| Publish public-safe schedule + Art of Ellsworth context | @Team | PR | After lineup locked |
+| Re-point Vercel `zaostock` project + domain to `ZAODEVZ/ZAOstock` | @Zaal | Infra | This week |
+| Apply C1-C8 brand corrections | @Zaal | PR on ZAODEVZ/ZAOstock | After approval |
+| Confirm COC Concertz public framing with COC | @Zaal | Decision | Before C1-C5 ship |
+| Confirm locked lineup; filter public grid to confirmed | @Zaal | PR | Before public push |
 
 ## Sources
 
-- [FULL] `bettercallzaal/zao-stock` repo - full audit of all routes/components, post-PR #1 (cloned + read every user-facing file this session).
-- [FULL] `ZAO OS V1/ZAO-STOCK/MASTER-PLAN.md` - event master plan (venue, teams, pitch, run-of-show index, live page URLs).
-- [FULL] `ZAO OS V1/src/components/library/SubmitForm.tsx` - reusable submission form pattern.
-- [FULL] `ZAO OS V1/src/app/api/library/submit/route.ts` - submission backend pattern.
-- Note: this is an internal product backlog grounded in primary repo sources; no external community source applies. All citations are first-read of working-tree files (FULL), not snippets.
+- [FULL] `ZAODEVZ/ZAOstock` repo (cloned this session) - full audit of all 22 pages, 27 API routes, components, metadata.
+- [FULL] `src/app/sponsor/page.tsx` - COC + ZABAL + fiscal-sponsor + crypto findings (line-cited above).
+- [FULL] `src/app/page.tsx`, `src/app/layout.tsx`, `src/app/donate/page.tsx` - parent framing, entry doors, donate paths.
+- [FULL] `src/app/llms.txt/route.ts`, `src/components/festival/VibesGrid.tsx` - COC + ZABAL public mentions.
+- [FULL] `.env.example` + Vercel `zaostock` project env list - the 5 vars to migrate.
+- Note: internal product audit grounded in primary repo + infra sources (all FULL); no external community source applies.

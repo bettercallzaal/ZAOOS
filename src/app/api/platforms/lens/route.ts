@@ -5,7 +5,18 @@ import { logger } from '@/lib/logger';
 
 const LENS_API = 'https://api.lens.xyz/graphql';
 
+// Strict EVM address shape. Validating to 0x + 40 hex chars BEFORE interpolating
+// into the GraphQL query removes the injection surface entirely - a value that
+// can only be hex cannot carry GraphQL directives, fragments, or quote breaks.
+const EVM_ADDRESS = /^0x[a-fA-F0-9]{40}$/;
+const isEvmAddress = (v: unknown): v is string => typeof v === 'string' && EVM_ADDRESS.test(v);
+
 async function checkLensProfile(wallet: string) {
+  // Defense in depth: never query with an unvalidated wallet.
+  if (!isEvmAddress(wallet)) {
+    logger.error('[lens] refused to query non-address wallet');
+    return [];
+  }
   const res = await fetch(LENS_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -75,8 +86,9 @@ export async function POST(req: NextRequest) {
           || account?.metadata?.name
           || null;
 
-        // If we got an address but no username, try fetching the account directly
-        if (!handle && accountAddress) {
+        // If we got an address but no username, try fetching the account directly.
+        // accountAddress comes from the Lens API, but validate before interpolating.
+        if (!handle && isEvmAddress(accountAddress)) {
           try {
             const accountRes = await fetch(LENS_API, {
               method: 'POST',
@@ -109,8 +121,12 @@ export async function POST(req: NextRequest) {
     const updateData: Record<string, string | null> = {
       lens_profile_id: handle || null,
     };
-    if (body.accessToken) updateData.lens_access_token = body.accessToken;
-    if (body.refreshToken) updateData.lens_refresh_token = body.refreshToken;
+    // Only persist tokens that look like real bearer tokens (bounded length,
+    // no control chars). Avoids storing arbitrary attacker-supplied blobs.
+    const isToken = (v: unknown): v is string =>
+      typeof v === 'string' && v.length >= 8 && v.length <= 4096 && !/[\x00-\x1f]/.test(v);
+    if (isToken(body.accessToken)) updateData.lens_access_token = body.accessToken;
+    if (isToken(body.refreshToken)) updateData.lens_refresh_token = body.refreshToken;
 
     await supabaseAdmin
       .from('users')

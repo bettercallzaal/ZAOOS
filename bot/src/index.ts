@@ -590,6 +590,28 @@ bot.catch((err) => {
   alertDevops(bot, `error: ${err?.message ?? String(err)}`).catch(() => undefined);
 });
 
+// ---- Process-level safety net ----------------------------------------------
+// The grammy bot.catch hook only covers errors thrown inside update handlers.
+// Fire-and-forget work (mirrorTurn, bonfire relays, schedulers) and async code
+// outside the update loop can still reject unhandled and crash the process
+// silently. Capture both at the process level so nothing dies without a trace.
+// NOTE: a hosted error tracker (Sentry) would need @sentry/node added as a dep
+// (pending sign-off); until then we route through the existing devops alert.
+process.on('unhandledRejection', (reason) => {
+  const msg = reason instanceof Error ? `${reason.message}\n${reason.stack ?? ''}` : String(reason);
+  console.error('[zaostock-bot] unhandledRejection:', msg);
+  alertDevops(bot, `unhandledRejection: ${msg.slice(0, 500)}`).catch(() => undefined);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[zaostock-bot] uncaughtException:', err);
+  // Best-effort alert, then let the process exit so the supervisor (systemd)
+  // restarts a clean instance rather than limping on in a corrupt state.
+  alertDevops(bot, `uncaughtException: ${err.message}`)
+    .catch(() => undefined)
+    .finally(() => process.exit(1));
+});
+
 // ---- Startup ---------------------------------------------------------------
 
 console.log('[zaostock-bot] starting...');

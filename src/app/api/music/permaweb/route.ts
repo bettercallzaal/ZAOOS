@@ -21,7 +21,12 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
-    if (artist) query = query.ilike('artist', `%${artist}%`);
+    // Escape LIKE metacharacters (% _ \) so the user-supplied artist string
+    // can't widen the match or perform LIKE-pattern information disclosure.
+    if (artist) {
+      const safeArtist = artist.slice(0, 100).replace(/[%_\\]/g, '\\$&');
+      query = query.ilike('artist', `%${safeArtist}%`);
+    }
     if (fid) query = query.eq('fid', Number(fid));
 
     const { data: assets, error } = await query;

@@ -20,6 +20,7 @@ tier: STANDARD
 | 1 | WaveWarZ shifts from a **live-only event** to an **always-on 24h market with a live settlement heartbeat** (8:30-8:45pm EST) | Makes "outsiders come in and engage" true at any hour, not just one window - the thing Fellenz praised WaveWarZ for |
 | 2 | The WaveWarZ protocol is **the fan/player door** of the ZAO ecosystem; ZABAL Games is the **builder door**; both feed The ZAO umbrella | This is the org chart (doc 842) made operational - "protocol is the focus" because it is the flywheel |
 | 3 | Two play modes ship as one system: **be present + decide on the fly** OR **let your AI agent ride it** | The agent path IS the agentic Base build (doc 741/wwbase) - unify human play and agent play under one protocol |
+| 3b | **Chain = Base. Agent bets via x402. Onramp = a simple bridge.** (Confirmed Zaal 2026-06-13) | x402 lets ANY agent walk up and place bets before or during a battle - the open-access agent door. A simple bridge gets funds onto Base. **Candytoybox (Samantha) has already shipped the Base testnet contracts**, matching the wwbase brief's "deployed + verified on Base Sepolia." Solana was the prior live proof; the 24h protocol is built on Base |
 | 4 | "Play both sides just to make money" = TODAY just the **loser-pool refund** (losers get partial money back), NOT a true two-sided market | Confirmed by Zaal 2026-06-13: no two-sided market-making exists yet. A real side-agnostic "arb the curve" mechanic is an OPEN design question, not a shipped feature - do not market it as arb |
 | 5 | Frame this in the WaveWarZ brand + the Fellenz reply as **the concrete answer to challenge #7 ("where do I plug in?")** | The brand cleanup said what the pieces are; this says how a stranger becomes a participant |
 
@@ -70,7 +71,7 @@ This protocol concept is the answer to that, operationalized:
 2. **24h price discovery vs a 15-min settlement:** if picks are open all day but battles resolve in a 15-min window, what is the price path during the day vs at settlement? Is there continuous trading or a daily clearing?
 3. **Agent autonomy bounds:** budget caps per agent per day, which signals it trades on (song, chart movement, social), and how a present human overrides their agent mid-battle.
 4. **Song sourcing for 20/day:** where do the 20 songs come from each day (Audius catalog, artist submissions, ZAO roster)? This is also the artist on-ramp.
-5. **Solana (live) vs Base (agentic):** which chain hosts this, given the live mechanics are proven on Solana and the agentic build is on Base (doc 741)?
+5. **Chain:** RESOLVED (Zaal, 2026-06-13) - **Base.** Agent bets go through **x402** (any agent can walk up and place bets before/during a battle); onramp via a **simple bridge**; **Candytoybox already shipped the Base testnet contracts**. Solana stays the prior live proof, but the 24h protocol is built on Base. Remaining sub-question: which bridge, and whether Solana liquidity migrates or the two co-exist.
 
 ## Also See
 
@@ -85,7 +86,7 @@ This protocol concept is the answer to that, operationalized:
 | Decide: brainstorm this into a full protocol spec (mechanics + the 5 open questions) | Zaal | Brainstorm | When ready |
 | Fold the "WaveWarZ = always-on fan door" framing into the WaveWarZ brand brief (wwbase) | Zaal | PR | After Fellenz brand PRs land |
 | Use this as the concrete entry-point answer in the Fellenz reply (challenge #7) | Zaal | Doc | When writing the reply |
-| Resolve chain choice (Solana live vs Base agentic) for the 24h market | Zaal + Hurric4n3ike | Decision | Before spec |
+| Chain RESOLVED: Base + x402 + simple bridge; Candy's Base testnet contracts exist. Open sub-task: pick the bridge | Zaal + Candytoybox | Decision | Before mainnet |
 
 ## Sources
 

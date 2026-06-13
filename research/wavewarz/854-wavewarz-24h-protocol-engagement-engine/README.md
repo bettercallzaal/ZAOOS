@@ -17,7 +17,7 @@ tier: STANDARD
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | WaveWarZ shifts from a **live-only event** to an **always-on 24h market with a live settlement heartbeat** (8:30-8:45pm EST) | Makes "outsiders come in and engage" true at any hour, not just one window - the thing Fellenz praised WaveWarZ for |
+| 1 | WaveWarZ shifts to a **~23h open ENTRY QUEUE + one ~10-min live Quick Battle at the end**, resolved on the WaveWarZ chart. NOT a continuous 24h trading market - nothing moves during the queue (corrected Zaal 2026-06-13) | Anyone/any agent can enter any hour of the day -> "outsiders come in and engage" without needing to be present for the live window |
 | 2 | The WaveWarZ protocol is **the fan/player door** of the ZAO ecosystem; ZABAL Games is the **builder door**; both feed The ZAO umbrella | This is the org chart (doc 842) made operational - "protocol is the focus" because it is the flywheel |
 | 3 | Two play modes ship as one system: **be present + decide on the fly** OR **let your AI agent ride it** | The agent path IS the agentic Base build (doc 741/wwbase) - unify human play and agent play under one protocol |
 | 3b | **Chain = Base. Agent bets via x402. Onramp = a simple bridge.** (Confirmed Zaal 2026-06-13) | x402 lets ANY agent walk up and place bets before or during a battle - the open-access agent door. A simple bridge gets funds onto Base. **Candytoybox (Samantha) has already shipped the Base testnet contracts**, matching the wwbase brief's "deployed + verified on Base Sepolia." Solana was the prior live proof; the 24h protocol is built on Base |
@@ -26,17 +26,14 @@ tier: STANDARD
 
 ## The concept (as captured)
 
-Each day:
-- **10 battles, 20 songs.** Each battle = two songs head to head.
-- **Open for 24 hours.** Any person, any time in the day, can:
-  - listen to any of the 20 songs,
-  - place a pick on the side they think wins, OR
-  - **play both sides** if they don't care who wins (today this just softens losses via the **loser-pool refund** - it is NOT true arb / two-sided market-making yet; see open question 1).
-- **Live settlement window 8:30-8:45pm EST** - the quick battles actually run and resolve. The "event" is now the heartbeat of an all-day market, not the whole thing.
-- **Two ways to play, your choice:**
-  - **Present:** come back at 8:30, watch, and make decisions on the fly - react to the song, how it's changing, how the charts are moving.
-  - **Agentic:** let your AI agent ride it whether you show up or not. Set it and let it go.
-- **The point:** get people onto the **WaveWarZ protocol**. The protocol is the focus; it leverages the other ZAO toolings (Audius catalog, Farcaster/X distribution, the agent stack).
+Corrected model (Zaal, 2026-06-13): this is **a ~23h open queue + one short live battle**, NOT a continuously-trading 24h market.
+
+- **A Quick Battle = two songs head to head**, sourced from an **Audius pull** into a quick-battle queue. Start with **1 battle**, with a config knob to raise the count later (10 battles/20 songs is the scale-up target, not v1).
+- **~23h queue window.** Any person OR any agent (via x402) can come in any time during the day and **place their pick**. Nothing "moves" during this window - you are queuing entries, not trading a live curve.
+- **Live for ~10 minutes at the end.** That is the only live action. The Quick Battle runs and **resolves on the normal WaveWarZ chart (trading dominance)** - the existing chart-based win condition.
+- **"Play both sides"** = the existing **loser-pool refund** (softens losses), NOT arb / two-sided market-making (open question 1).
+- **Two ways to play:** be **present** for the ~10-min live window and decide on the fly, OR let your **AI agent** place/ride it via x402 whether you show up or not. **A present human can override their agent.**
+- **The point:** get people (and their agents) onto the **WaveWarZ protocol** on **Base**. The protocol is the focus; it leverages the other ZAO toolings (Audius catalog, Farcaster/X distribution, the agent stack, x402).
 
 ## Why it's "all 1" (the connection to the Fellenz work)
 
@@ -68,10 +65,16 @@ This protocol concept is the answer to that, operationalized:
 ## Open design questions (to resolve before it's a spec)
 
 1. **Liquidity / "both sides to make money":** RESOLVED for now (Zaal, 2026-06-13) - today "play both sides" is just the existing **loser-pool refund** (losers recoup part of their stake), NOT two-sided market-making. Open part: do we WANT a real side-agnostic market-maker role (two-sided liquidity / LP rewards) for the 24h market? On a single bonding curve, buying both sides pays spread both ways and nets a loss without a real AMM or opposing-pool structure - so "arb the curve" is not free and is not built. Decide whether to design it or keep the loser-pool refund as the only "make money either way" path.
-2. **24h price discovery vs a 15-min settlement:** if picks are open all day but battles resolve in a 15-min window, what is the price path during the day vs at settlement? Is there continuous trading or a daily clearing?
-3. **Agent autonomy bounds:** budget caps per agent per day, which signals it trades on (song, chart movement, social), and how a present human overrides their agent mid-battle.
-4. **Song sourcing for 20/day:** where do the 20 songs come from each day (Audius catalog, artist submissions, ZAO roster)? This is also the artist on-ramp.
+2. **Price path during the queue:** RESOLVED (Zaal, 2026-06-13) - moot. There is no continuous trading day; it's a ~23h entry queue then a ~10-min live battle. Nothing "moves" until the live window. No daytime price-discovery problem to design.
+3. **Agent autonomy bounds:** OPEN - budget caps per agent, per-battle limits, which signals it acts on. Resolved part: a present human CAN override their agent (Zaal, 2026-06-13). Agent pay/entry rail = x402.
+4. **Song sourcing:** RESOLVED (Zaal, 2026-06-13) - **Audius pull** into the quick-battle queue. Start with **1 battle**, add a config to raise the count over time. Still open: rights posture for putting an Audius track into a money battle (likely fine for testnet v1; revisit before mainnet).
 5. **Chain:** RESOLVED (Zaal, 2026-06-13) - **Base.** Agent bets go through **x402** (any agent can walk up and place bets before/during a battle); onramp via a **simple bridge**; **Candytoybox already shipped the Base testnet contracts**. Solana stays the prior live proof, but the 24h protocol is built on Base. Remaining sub-question: which bridge, and whether Solana liquidity migrates or the two co-exist.
+
+## Build reality + v1 scope (the build extends what exists)
+
+- **Contracts already exist:** `CandyToyBox/wavewarz-base` (Samantha/Candytoybox) - deployed on **Base Sepolia**, README says "audited A+, 8/8 tests passing." It already implements the bonding curve, ephemeral battle tokens, fees, settlement, and **Quick Battles (6-9 min, chart-based / trading dominance)**. The "quick battle queue" idea rides on this Quick Battle type. **The build EXTENDS these contracts - do not rebuild them.** Read that repo first.
+- **What's new to build (the gap):** the **~23h entry queue** layer, **x402 agent betting** (open-access agent door), the **simple bridge** onramp, the **Audius pull** that feeds songs into the queue, and the front end / orchestration that opens the queue for ~23h then triggers the ~10-min live Quick Battle.
+- **v1 scope (Zaal, 2026-06-13):** **1 Quick Battle**, built on **testnet** end to end, try it, then go **mainnet**. Config knob to increase battle count later. Thin slice first.
 
 ## Also See
 

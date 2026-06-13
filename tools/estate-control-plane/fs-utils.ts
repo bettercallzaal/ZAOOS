@@ -9,12 +9,11 @@ export async function walk(
   predicate: (relPath: string, name: string) => boolean,
   base = root,
 ): Promise<string[]> {
-  let entries: Awaited<ReturnType<typeof readdir>>;
-  try {
-    entries = await readdir(root, { withFileTypes: true });
-  } catch {
-    return []; // missing dir -> empty, not a throw (a check decides if that's a finding)
-  }
+  // Infer the Dirent type from the call rather than hand-writing it — the
+  // `Awaited<ReturnType<typeof readdir>>` form breaks across @types/node versions
+  // (the Buffer/NonSharedBuffer overload split). Missing dir -> empty, not a throw.
+  const entries = await readdir(root, { withFileTypes: true }).catch(() => null);
+  if (entries === null) return [];
   const out: string[] = [];
   for (const e of entries) {
     if (e.isDirectory()) {

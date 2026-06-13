@@ -88,8 +88,30 @@ const ELIGIBILITY: string[] = [
   'Culminates in a public-facing, real-world activation (performance, installation, gathering, exhibition, release, or showcase)',
 ];
 
+interface LikemindedFund {
+  name: string;
+  theme: string;
+}
+
+// Funds on Artizen aligned with the ZAO Fund — the company we keep + cross-curation
+// targets. See research/business/846 + 847.
+const LIKEMINDED: LikemindedFund[] = [
+  { name: 'Greenpill Fund for Regenerative Gatherings', theme: 'Local events that bring regenerative communities together' },
+  { name: 'Funding the Commons Frontier Fund', theme: 'Infrastructure, research, and cultural work for the commons' },
+  { name: 'Terminus Fund', theme: 'Sovereign communities and network-state experiments' },
+  { name: 'Hubs Network Fund for Solarpunk Spaces', theme: 'Independent physical spaces for culture, care, and governance' },
+];
+
 function usd(n: number): string {
   return `$${n.toLocaleString('en-US')}`;
+}
+
+// Day-of-year, so the featured project rotates through the roster once per day
+// without any client JS. Server-rendered; ISR keeps it fresh.
+function dayOfYear(d: Date): number {
+  const start = Date.UTC(d.getUTCFullYear(), 0, 0);
+  const now = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  return Math.floor((now - start) / 86_400_000);
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -105,6 +127,7 @@ export const revalidate = 3600; // ISR: refresh hourly
 
 export default function ArtizenPage() {
   const totalSales = PROJECTS.reduce((sum, p) => sum + p.sales, 0);
+  const featured = PROJECTS[dayOfYear(new Date()) % PROJECTS.length];
 
   return (
     <main className="min-h-screen bg-[#0a1628] text-white px-4 py-10 sm:px-6 lg:px-8">
@@ -150,6 +173,40 @@ export default function ArtizenPage() {
           <Stat label="Projects backed" value={String(PROJECTS.length)} />
           <Stat label="Fund pool" value="$10K" />
           <Stat label="Artifact volume" value={usd(totalSales)} />
+        </section>
+
+        {/* Featured project of the day */}
+        <section className="mb-12">
+          <div className="mb-3 flex items-baseline justify-between">
+            <h2 className="text-lg font-bold sm:text-xl">Project of the day</h2>
+            <span className="text-xs text-white/50">Rotates daily through the fund</span>
+          </div>
+          <div className="rounded-2xl border border-[#f5a623]/40 bg-gradient-to-br from-[#f5a623]/10 to-transparent p-6">
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <h3 className="text-xl font-bold leading-snug">{featured.name}</h3>
+              <span className="rounded-full bg-[#f5a623]/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-[#f5a623]">
+                {featured.category}
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-white/50">by {featured.creator}</p>
+            <p className="mt-3 text-sm leading-relaxed text-white/80">{featured.blurb}</p>
+            {featured.zaoTie ? (
+              <p className="mt-2 text-xs font-medium text-[#f5a623]">ZAO link: {featured.zaoTie}</p>
+            ) : null}
+            <p className="mt-4 text-sm leading-relaxed text-white/70">
+              One of the best ways to back {featured.creator}: collect their Artifact. Because they are
+              part of the ZAO Fund, every dollar they raise unlocks matching from the fund, paid
+              straight to the creator. Support the project, support the fund.
+            </p>
+            <a
+              href={FUND_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-block rounded-full bg-[#f5a623] px-5 py-2.5 text-sm font-semibold text-[#0a1628] transition hover:brightness-110"
+            >
+              Collect on Artizen
+            </a>
+          </div>
         </section>
 
         {/* How it works */}
@@ -213,6 +270,52 @@ export default function ArtizenPage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        {/* Like-minded funds */}
+        <section className="mb-12">
+          <h2 className="text-lg font-bold sm:text-xl">The company we keep</h2>
+          <p className="mt-2 text-sm leading-relaxed text-white/70">
+            We are not alone on Artizen. These funds point at the same frontier — we back their
+            builders, they back ours, and projects curated into more than one fund multiply their
+            match. If your work fits both, that is the goal.
+          </p>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {LIKEMINDED.map((f) => (
+              <li key={f.name} className="rounded-xl border border-white/10 bg-white/5 p-4">
+                <h3 className="text-sm font-semibold">{f.name}</h3>
+                <p className="mt-1 text-xs text-white/60">{f.theme}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Submit your project */}
+        <section className="mb-12 rounded-2xl border border-[#f5a623]/30 bg-white/5 p-6">
+          <h2 className="text-lg font-bold sm:text-xl">Building something? Join the fund.</h2>
+          <p className="mt-3 text-sm leading-relaxed text-white/70">
+            The ZAO Fund backs creator-owned projects that merge art, emerging technology, and real
+            community — and end in something public: a release, a show, a gathering, an exhibition.
+            If that is you, submit your project on Artizen and put it in front of the ZAO community.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <a
+              href="https://artizen.fund/submit"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-[#f5a623] px-5 py-2.5 text-sm font-semibold text-[#0a1628] transition hover:brightness-110"
+            >
+              Submit a project
+            </a>
+            <a
+              href={FUND_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/5"
+            >
+              See the fund
+            </a>
+          </div>
         </section>
 
         {/* About Artizen */}

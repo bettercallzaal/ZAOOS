@@ -20,7 +20,7 @@ tier: STANDARD
 | 1 | WaveWarZ shifts from a **live-only event** to an **always-on 24h market with a live settlement heartbeat** (8:30-8:45pm EST) | Makes "outsiders come in and engage" true at any hour, not just one window - the thing Fellenz praised WaveWarZ for |
 | 2 | The WaveWarZ protocol is **the fan/player door** of the ZAO ecosystem; ZABAL Games is the **builder door**; both feed The ZAO umbrella | This is the org chart (doc 842) made operational - "protocol is the focus" because it is the flywheel |
 | 3 | Two play modes ship as one system: **be present + decide on the fly** OR **let your AI agent ride it** | The agent path IS the agentic Base build (doc 741/wwbase) - unify human play and agent play under one protocol |
-| 4 | "Play both sides just to make money" = **market-making / liquidity**, side-agnostic | The bonding-curve mechanic can reward LPs who don't care who wins - a second reason to show up that isn't fandom |
+| 4 | "Play both sides just to make money" = TODAY just the **loser-pool refund** (losers get partial money back), NOT a true two-sided market | Confirmed by Zaal 2026-06-13: no two-sided market-making exists yet. A real side-agnostic "arb the curve" mechanic is an OPEN design question, not a shipped feature - do not market it as arb |
 | 5 | Frame this in the WaveWarZ brand + the Fellenz reply as **the concrete answer to challenge #7 ("where do I plug in?")** | The brand cleanup said what the pieces are; this says how a stranger becomes a participant |
 
 ## The concept (as captured)
@@ -30,7 +30,7 @@ Each day:
 - **Open for 24 hours.** Any person, any time in the day, can:
   - listen to any of the 20 songs,
   - place a pick on the side they think wins, OR
-  - **play both sides** if they don't care who wins and just want to make money (market-make / arb the curve).
+  - **play both sides** if they don't care who wins (today this just softens losses via the **loser-pool refund** - it is NOT true arb / two-sided market-making yet; see open question 1).
 - **Live settlement window 8:30-8:45pm EST** - the quick battles actually run and resolve. The "event" is now the heartbeat of an all-day market, not the whole thing.
 - **Two ways to play, your choice:**
   - **Present:** come back at 8:30, watch, and make decisions on the fly - react to the song, how it's changing, how the charts are moving.
@@ -66,7 +66,7 @@ This protocol concept is the answer to that, operationalized:
 
 ## Open design questions (to resolve before it's a spec)
 
-1. **Liquidity / "both sides to make money":** how does the bonding-curve reward a side-agnostic market-maker? Fee rebate? LP position per battle? Does it cannibalize the artist payout or add to it?
+1. **Liquidity / "both sides to make money":** RESOLVED for now (Zaal, 2026-06-13) - today "play both sides" is just the existing **loser-pool refund** (losers recoup part of their stake), NOT two-sided market-making. Open part: do we WANT a real side-agnostic market-maker role (two-sided liquidity / LP rewards) for the 24h market? On a single bonding curve, buying both sides pays spread both ways and nets a loss without a real AMM or opposing-pool structure - so "arb the curve" is not free and is not built. Decide whether to design it or keep the loser-pool refund as the only "make money either way" path.
 2. **24h price discovery vs a 15-min settlement:** if picks are open all day but battles resolve in a 15-min window, what is the price path during the day vs at settlement? Is there continuous trading or a daily clearing?
 3. **Agent autonomy bounds:** budget caps per agent per day, which signals it trades on (song, chart movement, social), and how a present human overrides their agent mid-battle.
 4. **Song sourcing for 20/day:** where do the 20 songs come from each day (Audius catalog, artist submissions, ZAO roster)? This is also the artist on-ramp.

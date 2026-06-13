@@ -17,7 +17,7 @@ The pattern: **Monorepo as Lab.**
 - Sharing model: clone, no deps. Each graduate stands alone.
 - Research stays in ZAOOS forever - it's the institutional memory across every product.
 
-**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (graduating Wed), agent stack (ZOE, Hermes), music player components, 540+ research docs. 301 API routes, 279 components, 19 hooks.
+**Today the lab includes:** the original Farcaster client for The ZAO, the ZAOstock dashboard + Telegram bot (spinning out to its own repo), agent stack (ZOE, Hermes), music player components, ~820 active research docs. 302 API routes, 295 components, 18 hooks. (Counts verified 2026-06-11 - see [Doc 836](research/infrastructure/836-zaoos-repo-estate-census/).)
 
 **Stack:** Next.js 16, React 19, Supabase (RLS), Neynar, XMTP, Stream.io, Wagmi/Viem, Tailwind v4, iron-session.
 
@@ -25,17 +25,16 @@ The pattern: **Monorepo as Lab.**
 
 | Directory | What | When to Read |
 |-----------|------|-------------|
-| `src/app/api/` | 301 route handlers across 54 domains | Working on backend |
-| `src/components/` | 279 components by feature | Working on UI |
-| `src/hooks/` | 19 custom hooks (useAuth, useChat, useRadio, etc.) | Working on state |
-| `src/lib/` | Utils by domain: auth, db, farcaster, music, publish, agents | Working on business logic |
+| `src/app/api/` | 302 route handlers across 55 domains | Working on backend |
+| `src/components/` | 295 components by feature | Working on UI |
+| `src/hooks/` | 18 custom hooks (useAuth, useChat, useRadio, etc.) | Working on state |
+| `src/lib/` | Utils across 42 domains: auth, db, farcaster, music, publish, agents | Working on business logic |
 | `src/lib/agents/` | VAULT/BANKER/DEALER autonomous trading bots | Working on agents |
 | `src/lib/publish/` | Cross-platform posting (Farcaster, X, Bluesky) | Working on distribution |
 | `src/providers/` | Audio player, contexts | Working on player |
-| `community.config.ts` | All branding, channels, admin FIDs, contracts, nav | Forking or configuring |
-| `research/` | 240+ research docs (see research/README.md) | Use grep, not bulk reads |
+| `community.config.ts` | All branding, channels, admin FIDs, contract addresses, nav | Forking or configuring |
+| `research/` | ~820 active research docs (see research/README.md) | Use grep, not bulk reads |
 | `scripts/` | SQL migrations, wallet generation, webhook setup | DB or infra work |
-| `contracts/` | Solidity (staking, bounty board) | Smart contract work |
 
 ## Quick Start
 

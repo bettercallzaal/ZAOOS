@@ -39,16 +39,15 @@ npx biome check src/lib/agents        # lint specific module
 ## Project Structure
 
 ```
-src/app/api/         # 301 route handlers: /api/[feature]/[action]/route.ts
-src/components/      # 279 components organized by feature
-src/hooks/           # 19 custom hooks (useAuth, useChat, useRadio, etc.)
-src/lib/             # Utilities by domain (auth, db, farcaster, music, publish, agents)
+src/app/api/         # 302 route handlers across 55 domains: /api/[feature]/[action]/route.ts
+src/components/      # 295 components organized by feature
+src/hooks/           # 18 custom hooks (useAuth, useChat, useRadio, etc.)
+src/lib/             # Utilities across 42 domains (auth, db, farcaster, music, publish, agents)
 src/providers/       # React providers (audio player, contexts)
 src/types/           # TypeScript type definitions
-community.config.ts  # Branding, channels, contracts, nav - THE fork point
-research/            # 240+ research docs
+community.config.ts  # Branding, channels, contract addresses, nav - THE fork point
+research/            # ~820 active research docs (counts verified 2026-06-11, Doc 836)
 scripts/             # SQL migrations, wallet generation, webhooks
-contracts/           # Solidity (staking, bounty board)
 ```
 
 ## Code Style

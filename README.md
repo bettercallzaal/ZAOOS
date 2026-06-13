@@ -39,7 +39,7 @@ The pattern: **Monorepo as Lab.**
 | Agent stack (ZOE, Hermes, others) | In R&D until one is solid + worth its own brand |
 | Music player components (Sonata-pattern, etc) | In R&D |
 | Live audio: ZAO Spaces (Stream.io + 100ms) + Juke integration ([/spaces](https://zaoos.com/spaces), [/live](https://zaoos.com/live), [/juke-status](https://zaoos.com/juke-status)) | In production - 3 providers from one Go-Live button, public Juke dashboard for partner |
-| Research library (540+ docs across 13 topic areas) | Always stays here |
+| Research library (~820 active docs across 14 topic areas) | Always stays here |
 
 ### What&rsquo;s already graduated
 
@@ -646,16 +646,16 @@ Compose once in ZAO OS, publish to multiple platforms simultaneously. Farcaster 
 src/
 ├── app/                  # Next.js App Router
 │   ├── (auth)/           # Protected routes (chat, messages, governance, fractals, social, admin, etc.)
-│   ├── api/              # 121 route handlers: /api/[feature]/[action]/route.ts
+│   ├── api/              # 302 route handlers across 55 domains: /api/[feature]/[action]/route.ts
 │   └── page.tsx          # Landing / login
 ├── components/           # React components by feature (chat, messages, music, admin, social, etc.)
-├── hooks/                # 16+ custom hooks (useAuth, useChat, useRadio, usePlayerQueue, useNowPlaying, useListeningRoom, useENS, etc.)
+├── hooks/                # 18 custom hooks (useAuth, useChat, useRadio, usePlayerQueue, useNowPlaying, useListeningRoom, useENS, etc.)
 ├── contexts/             # React contexts (XMTPContext, QueueContext)
 ├── providers/            # Provider wrappers (8 audio providers, PostHog)
 ├── lib/                  # Utilities by domain (auth, db, farcaster, gates, music, xmtp, hats, publish, moderation, etc.)
 └── types/                # TypeScript type definitions
 community.config.ts       # All community config — fork-friendly
-research/                 # 155+ research docs (see research/README.md)
+research/                 # ~820 active research docs (see research/README.md)
 scripts/                  # DB setup, wallet generation, webhook registration, data import
 docs/                     # Internal plans, QA checklists, architecture decisions
 ```
@@ -664,7 +664,7 @@ docs/                     # Internal plans, QA checklists, architecture decision
 
 ## Research Library
 
-**155+ research documents** covering every aspect of building a decentralized music platform — protocol, identity, music, AI agents, governance, revenue, cross-platform publishing, on-chain distribution, Arweave, NFTs, reputation, security, and developer tooling.
+**~820 active research documents** (plus 77 superseded in `_archive/`) covering every aspect of building a decentralized music platform — protocol, identity, music, AI agents, governance, revenue, cross-platform publishing, on-chain distribution, Arweave, NFTs, reputation, security, and developer tooling.
 
 Start with:
 - [research/50 — The ZAO Complete Guide](./research/50-the-zao-complete-guide/) — canonical ecosystem reference

@@ -101,15 +101,22 @@ tier: STANDARD
   spent real time confused. The fix is structural (one pinned list, Iman
   co-carrying), not more explaining.
 
-## "zabal deepmeeting" group logging - NOT yet captured
+## "zabal deepmeeting" group logging - DONE, moved to its own repo
 
-Zaal also asked to "start logging all the stuff from zabal deepmeeting." That is
-a separate Telegram **group** with resources/tools/screenshots - distinct from
-these DMs. It is **not in scope of this doc** because the group content was not
-provided. To log it: export the group (Telegram desktop -> Export chat history ->
-JSON), drop the export at `~/.zao/private/gcal-... -> ~/.zao/private/tg-zabal-deepmeeting-YYYYMMDD.json`
-(per PII rule, off-repo), then run it through the same FULL/PARTIAL classify +
-graph-ingest. Tracked in Next Actions.
+Updated 2026-06-14: the DeepMeeting **group** ([DeepMeeting][@Zaabal], created
+21 May 2026, 20 members) was exported and now has its own public home:
+**github.com/bettercallzaal/zdeepmeeting**.
+
+- Backlog: 1,381 entries through 2026-06-14 redacted into `transcript/`
+  (emails/phones stripped; DvlsMojo 795, ZABAL Bonfire Bot 267, Zaal 112).
+- 51 non-Telegram shared links indexed in `links/`.
+- Raw export stays off-repo at `~/.zao/private/zdeepmeeting-raw-20260614/` (PII).
+- `CONTEXT.md` in that repo carries the relationship + the ZAO DeepMeeting bot
+  plan (extraction done; live Q&A-proxy gated by doc 799, guardrails deferred).
+
+The deepmeeting **content store is now zdeepmeeting, not ZAOOS.** This doc remains
+the ZAOOS-side relationship + governance record (research stays in ZAOOS per the
+monorepo-as-lab model).
 
 ## Also See
 

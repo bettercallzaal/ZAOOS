@@ -118,8 +118,45 @@ The deepmeeting **content store is now zdeepmeeting, not ZAOOS.** This doc remai
 the ZAOOS-side relationship + governance record (research stays in ZAOOS per the
 monorepo-as-lab model).
 
+## Follow-up study (2026-06-14): Brazil DD + graph pollution audit
+
+### Brazil network - the people are real, the BNDES path is not
+
+Verified his named contacts via web research:
+- **Sentinela Web3 + Juscelino** - CONFIRMED. Real registered company (CNPJ
+  55.414.034/0001-14), Juscelino listed as partner. Caveat: site currently
+  suspended ("Conta Interrompida").
+- **Upland BR + Mucida** - CONFIRMED. Lucas Mucida is the official Brazilian
+  Upland moderator (t.me/uplandbr). Reach modest (~5k TikTok).
+- **CastaCrypto (Castaneda)** - CONFIRMED. Rafael Castaneda, real mid-tier crypto
+  influencer (~70k IG, co-founder of a stablecoin/payments co).
+- **Brazil Web3 scene** - real + sizable (#9 globally for crypto devs, ~24M holders).
+- **BNDES grant claim - the red flag.** He overstated scale (~314M BRL/day actual,
+  not 1B) and BNDES categorically does not fund small foreign crypto-arts projects
+  (foreign-ownership barrier, no crypto/arts mandate). The funding story is not
+  credible; the people are. **Lean on the network, ignore the BNDES pitch.**
+
+### Graph pollution audit (DeepMeeting slice)
+
+From the 1,381-entry backlog: GCvlcnti's framework vocabulary outweighs canonical
+ZAO terms **~4:1 (381 vs 95)**, across 291 ingest/commit triggers, 125
+confidence-1.0 claims, and **20 record self-corrections** (the bot absorbed bad
+data then walked it back). This is the DeepMeeting slice, not the whole ZABAL
+graph - true blast radius needs the live `/delve` recall script. Fairness note:
+he later clarified he was distinguishing working-memory from stored facts and told
+the bot "not to store" some items - so it was not pure carelessness; but the 4:1
+ratio still confirms the shard-isolation rule is warranted. Detail: doc 798.
+
+### Co-resident bot leakage
+
+Mira (mira.tg) sitting in the group is an active cross-chat leak vector for the
+ZABAL graph - he is, ironically, the one championing it. Full assessment + the
+remove-Mira action: doc 856. The TON/Telegram strategic question it raised: doc 857.
+
 ## Also See
 
+- [Doc 856](../../security/856-mira-cross-chat-graph-leakage/) - Mira graph leakage + remove action
+- [Doc 857](../../infrastructure/857-ton-telegram-native-strategy/) - TON/Telegram SKIP/WAIT decision
 - [Doc 799](../../agents/799-deepmeeting-agent-shard-architecture/) - the gated DeepMeeting shard bot (this contact = admin)
 - [Doc 798](../../agents/798-bonfire-graph-quality-audit/) - where his vocabulary polluted the main graph
 - [Doc 781](../../agents/781-zabal-bonfire-contribution-architecture/) - shared-graph + soft-barrier contribution model

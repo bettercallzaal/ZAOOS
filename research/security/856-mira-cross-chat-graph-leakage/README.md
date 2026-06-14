@@ -18,7 +18,7 @@ tier: STANDARD
 
 | # | Decision | Rationale |
 |---|----------|-----------|
-| 1 | REMOVE Mira (`@mira`) from the DeepMeeting group now | Mira is designed to learn from every chat it joins and stores cross-chat memory on its own servers, outside ZAO control. It has been ingesting the ZABAL bot's system prompt, graph architecture, and Zaal's strategy since it joined. |
+| 1 | Keep Mira (`@mira`) OUT of the private graph-coordination group, but USE it elsewhere (content, explainer videos, translation, GCvlcnti's Brazil outreach) | Mira learns from every chat it joins and stores cross-chat memory on its own servers, outside ZAO control - bad for private graph internals. But it's a capable tool; the fix is a safe lane, not a ban. Use it for public/content/personal work, not where the ZABAL bot's architecture + strategy live. |
 | 2 | Ask GCvlcnti to disable Mira's daily summaries + audit what it has stored | Daily recaps have run since ~2026-06-02; the already-ingested data lives on mira.tg servers. Reduce ongoing capture. |
 | 3 | ADOPT a standing rule: no third-party bot/agent added to any ZAO coordination group without Zaal's explicit approval | The leak happened because bots were added freely. Gate it. |
 | 4 | CLARIFY Socrat0x / kEngram status with GCvlcnti - collaborator or sovereign external graph | Socrat0x is GCvlcnti's own separate ~36,000-node graph actively querying the ZABAL bot. Not leakage (separate system) but it is modeling ZAO structure. Decide the boundary. |

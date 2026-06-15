@@ -147,3 +147,4 @@
 
 | 796 | [ZOE: Broadcast Bot → Conversational, Well-Timed Assistant](./796-zoe-conversational-proactive-redesign/) | STANDALONE | Redesign ZOE from a broadcast bot into a conversational, well-timed concierge — proactive timing, reply quality, not blast messaging |
 | 801 | [ZOE / Cowork Bot / Cowork Dashboard — Systems Audit + Consolidation Map](./801-zoe-cowork-systems-audit-consolidation/) | CANONICAL | Single ground-truth audit of the three live ZAO agent/app systems (ZOE concierge, cowork tracker bot, cowork Kanban dashboard) + consolidation map |
+| 858 | [Bonfires / Graphiti: current-state + build guide](./858-bonfires-graphiti-current-state/) | STANDALONE | Verified current-state of Bonfires + its engine Graphiti; build path; why ZOE stays on Letta blocks. Supersedes 665/669. |

@@ -26,6 +26,7 @@ import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
+import { gatherEventCandidates } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 
@@ -160,17 +161,27 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
         // Build the task-queue nudge as a gate candidate (folded in). Only when
         // nudges are enabled, the cooldown has elapsed, and the queue is non-empty.
         const extraCandidates = async (): Promise<Candidate[]> => {
+          const cands: Candidate[] = [];
+          // Event candidates (doc 859/860): ZOE leads - tagged pings when notable
+          // things happen across Zaal's work ([STALE PR], ...). Threshold-gated.
           try {
-            if (!(await nudgesEnabled())) return [];
-            if (!(await nudgeCooldownElapsed())) return [];
+            cands.push(...(await gatherEventCandidates()));
+          } catch {
+            // best-effort; events never block the tick
+          }
+          // Task-queue nudge (only when enabled + cooldown elapsed + queue non-empty).
+          try {
+            if (!(await nudgesEnabled())) return cands;
+            if (!(await nudgeCooldownElapsed())) return cands;
             const nudge = await nextNudge();
-            if (!nudge) return [];
+            if (!nudge) return cands;
             // Score at the default threshold: it can fire when nothing outranks
             // it, but any due/overdue commitment thread (>=0.75) wins the tick.
-            return [{ kind: 'task-nudge', score: 0.6, message: nudge }];
+            cands.push({ kind: 'task-nudge', score: 0.6, message: nudge });
           } catch {
-            return [];
+            // ignore - return whatever events we gathered
           }
+          return cands;
         };
 
         try {

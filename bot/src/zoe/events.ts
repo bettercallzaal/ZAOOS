@@ -105,6 +105,46 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     });
   }
 
+  // [CI FAIL] - a red build is high-signal + actionable. Check CI on the most
+  // recently-updated open PRs (capped, bounded gh calls per tick). Best-effort.
+  for (const pr of prs.slice(0, CI_CHECK_LIMIT)) {
+    const slug = pr.repository?.nameWithOwner;
+    if (!slug) continue;
+    const key = `cifail:${repoName(pr)}#${pr.number}:${today}`;
+    if (seen[key]) continue; // once per day per PR
+    const failing = await ciIsFailing(slug, pr.number);
+    if (!failing) continue;
+    seen[key] = now;
+    out.push({
+      kind: 'github-event',
+      score: 0.82, // a broken build outranks a stale PR + most nudges
+      message: `[CI FAIL] ${repoName(pr)} #${pr.number} has failing checks: "${pr.title}". Want me to look at what broke?`,
+    });
+  }
+
   if (out.length > 0) await writeSeen(seen);
   return out;
+}
+
+const CI_CHECK_LIMIT = 8; // bound the per-tick gh calls
+
+/** True iff the PR's check rollup contains a FAILURE/ERROR. Best-effort. */
+async function ciIsFailing(repoSlug: string, num: number): Promise<boolean> {
+  try {
+    const { stdout } = await execFileP(
+      'gh',
+      ['pr', 'view', String(num), '--repo', repoSlug, '--json', 'statusCheckRollup'],
+      { timeout: 10_000, encoding: 'utf8' },
+    );
+    const data = JSON.parse(stdout) as {
+      statusCheckRollup?: Array<{ conclusion?: string; state?: string }>;
+    };
+    const checks = data.statusCheckRollup ?? [];
+    return checks.some((c) => {
+      const v = (c.conclusion ?? c.state ?? '').toUpperCase();
+      return v === 'FAILURE' || v === 'ERROR' || v === 'TIMED_OUT';
+    });
+  } catch {
+    return false; // gh failure / no checks -> not failing, stay silent
+  }
 }

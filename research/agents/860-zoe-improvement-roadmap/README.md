@@ -48,8 +48,17 @@ Research surfaced 10 generic "agent upgrades." Filtered against the code, these 
 5. **Context efficiency**: the per-turn 4-block rebuild + 12-episode recall grows the prompt. Lever (CLI-compatible): only inject `<bonfire_recall>` when the message is graph-shaped (already gated at len>=12; tighten to intent), and trim stale `working` memory. NOT manual cache_control (CLI handles caching).
 6. **Tool/permission audit**: ZOE's `allowedTools` in `concierge.ts` - confirm it has the read tools it actually needs (this session found `gh` underused). Add `gh search`, keep the list tight.
 
-### Tier C - reliability (pending deeper research, fold in when the reliability agent returns)
-7. Self-verification on factual claims (cite-or-abstain), confidence gating on escalations, regression suite of past transcripts. Overlaps Tier A #3.
+### Tier C - reliability (grounded in ZOE's actual routing/worker code)
+
+**The real silent-failure gaps for ZOE** (the highest-value reliability work):
+- **Read-after-write verification.** `recall.ts` `remember()` and the task writes return `ok` but never read back to confirm the episode/task actually persisted. The "13 agent eval tests" pattern (Thinking Loop, 2026) + read-after-write is the fix: after a write, fetch it and assert. Catches the "I logged it" / "no memory updates needed" class of silent failure. Low effort, high trust.
+- **Stuck-loop watchdog.** No detector for a worker calling the same tool with the same args repeatedly (OpenClaw issue 16808 pattern: flag if same tool+args > N in last M calls). Cheap to add; prevents runaway loops.
+- **Eval foundation already exists.** `runs.ts` writes per-run telemetry (cost, score, critic issues) to `~/.zao/zoe/runs/YYYY-MM-DD.jsonl`, and `learn.ts` already clusters recurring critic issues weekly. So the Tier A #3 eval harness has a data foundation - golden journeys + rubric scoring layer on top of this, not from scratch.
+
+**Model routing - ZOE's concierge routing is SOTA-aligned; the worker path has one real gap.**
+- Concierge `selectModel()` (Sonnet default; Opus for plan/strategy/architecture or >280 chars; Haiku for short factual) + `escalate:true -> Opus` matches 2026 best practice: Sonnet 4.6 hits 79.6% SWE-bench (vs Opus 80.8%) at ~5x less; escalate to Opus for deep reasoning (Opus keeps a 17-pt GPQA lead). The unified routing+cascade result (arXiv 2410.10347) confirms cheap-default + escalate is optimal. No concierge change needed.
+- **The gap: workers never escalate to Opus.** When a worker fails its critic (score <70, threshold in `workers.ts`), ZOE does ONE revision pass *on the same Sonnet model* with feedback - it never escalates a repeatedly-failing worker to Opus (confirmed: no Opus fallback in `workers.ts`/`dispatch.ts`). The cascade literature says this is exactly when to escalate. **Upgrade: after a worker fails revision once, escalate the retry to `ZOE_HARD_MODEL` (Opus) instead of returning `needs-revision`.** Bounded, reuses the existing budget cap, directly improves output quality on hard tasks.
+- Caveat (no action): concierge escalation uses self-reported `escalate:true` (verbalized confidence), weaker than probe-based UQ (ICML 2025, openreview DJpEIwKJt7) - but probe-UQ isn't feasible through the Claude Code CLI, so it's the right call for ZOE's runtime.
 
 ## Sequencing
 

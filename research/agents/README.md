@@ -147,3 +147,4 @@
 
 | 796 | [ZOE: Broadcast Bot → Conversational, Well-Timed Assistant](./796-zoe-conversational-proactive-redesign/) | STANDALONE | Redesign ZOE from a broadcast bot into a conversational, well-timed concierge — proactive timing, reply quality, not blast messaging |
 | 801 | [ZOE / Cowork Bot / Cowork Dashboard — Systems Audit + Consolidation Map](./801-zoe-cowork-systems-audit-consolidation/) | CANONICAL | Single ground-truth audit of the three live ZAO agent/app systems (ZOE concierge, cowork tracker bot, cowork Kanban dashboard) + consolidation map |
+| 860 | [ZOE improvement roadmap (grounded)](./860-zoe-improvement-roadmap/) | STANDALONE | Prioritized real upgrades for ZOE, filtered against actual code: graph-driven proactivity, recall-before-act, lightweight eval, memory compaction. Skips manual cache_control / MCP rewrite (CLI handles it; workers already role-carded). |

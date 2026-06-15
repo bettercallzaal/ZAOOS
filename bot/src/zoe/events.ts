@@ -24,7 +24,11 @@ import { graphTopicAgeDays } from './recall';
 
 const execFileP = promisify(execFile);
 const SEEN_FILE = join(ZOE_PATHS.home, 'seen-events.json');
-const STALE_PR_HOURS = 48; // an open PR untouched this long is worth surfacing
+// Only nudge PRs in the ACTIONABLE window: stuck a few days (worth a poke) but
+// not abandoned (older = not a nudge target, just noise). Tuned down from 48h
+// after a first run surfaced 12 stale PRs including dead repos.
+const STALE_PR_MIN_HOURS = 96; // stuck 4+ days = worth surfacing
+const STALE_PR_MAX_DAYS = 21; // older than this = abandoned, do not nag
 const SEEN_TTL_MS = 14 * 24 * 60 * 60 * 1000; // forget event keys after 2 weeks
 
 interface SearchPr {
@@ -91,7 +95,8 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     const updated = pr.updatedAt ? Date.parse(pr.updatedAt) : NaN;
     if (!Number.isFinite(updated)) continue;
     const ageHrs = (now - updated) / 3_600_000;
-    if (ageHrs < STALE_PR_HOURS) continue;
+    if (ageHrs < STALE_PR_MIN_HOURS) continue; // not stuck long enough yet
+    if (ageHrs / 24 > STALE_PR_MAX_DAYS) continue; // abandoned, not a nudge target
 
     // once per day per PR so a long-stale PR doesn't nag every hour
     const key = `stale:${repoName(pr)}#${pr.number}:${today}`;

@@ -102,8 +102,9 @@ async function fetchInboxSnapshot(): Promise<AgentMailFetchResult | null> {
 
 function todayLabel(): { day: string; date: string } {
   const d = new Date();
-  const day = d.toLocaleDateString('en-US', { weekday: 'short' });
-  const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const tz = 'America/New_York'; // Zaal is EST/EDT; VPS runs UTC
+  const day = d.toLocaleDateString('en-US', { weekday: 'short', timeZone: tz });
+  const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: tz });
   return { day, date };
 }
 

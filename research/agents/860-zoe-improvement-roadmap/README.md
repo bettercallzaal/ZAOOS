@@ -60,6 +60,19 @@ Research surfaced 10 generic "agent upgrades." Filtered against the code, these 
 - **The gap: workers never escalate to Opus.** When a worker fails its critic (score <70, threshold in `workers.ts`), ZOE does ONE revision pass *on the same Sonnet model* with feedback - it never escalates a repeatedly-failing worker to Opus (confirmed: no Opus fallback in `workers.ts`/`dispatch.ts`). The cascade literature says this is exactly when to escalate. **Upgrade: after a worker fails revision once, escalate the retry to `ZOE_HARD_MODEL` (Opus) instead of returning `needs-revision`.** Bounded, reuses the existing budget cap, directly improves output quality on hard tasks.
 - Caveat (no action): concierge escalation uses self-reported `escalate:true` (verbalized confidence), weaker than probe-based UQ (ICML 2025, openreview DJpEIwKJt7) - but probe-UQ isn't feasible through the Claude Code CLI, so it's the right call for ZOE's runtime.
 
+**ZOE's reliability surface - what it HAS vs LACKS** (from full code audit, 2026-06-15):
+
+ZOE is far more built-out than generic "agent reliability" advice assumes. It HAS: a confidence-scored memory-patch flow (`reflexion.ts` - HIGH>=80 -> y/n, LOW -> voice-note request, never invents specifics), weekly issue-clustering into per-worker prompt learnings (`learn.ts`), per-run telemetry (`runs.jsonl` + the `hermes_runs` Supabase table), open-thread escalation (2 snoozes -> "decide", `threads.ts`), per-worker + per-plan budget caps + read-only tool lockdown for workers, secret+PII scans before every Bonfire/thread write, and a cowork heartbeat.
+
+The real LACKS (the buildable reliability gaps, in priority order):
+1. **Divergence detection** - a worker can claim success while making no actual change; nothing validates output against intent. (= read-after-write, top of this tier.)
+2. **Stuck-task / hung-worker detection** - no timeout guard on a dispatch worker; a hung subprocess isn't escalated. (= the stuck-loop watchdog.)
+3. **Convergence tracking** - `learn.ts` proposes learnings but nothing measures whether runs actually improve after a learning is applied. Add: tag runs post-learning, compare avg critic score. Closes the self-improvement loop honestly.
+4. **Worker Opus-escalation on repeat failure** (above).
+5. **Emit-queue max-retry bound** - `thread-emit-queue.json` retries failed Bonfire writes indefinitely (cap 200, no max-attempts). Add a retry ceiling + dead-letter surface.
+
+These five ARE the reliability roadmap - bounded, code-located, each closing a specific silent-failure class.
+
 ## Sequencing
 
 - **This week:** graph-driven candidates (#1) + recall-before-act (#2) - both reuse existing pieces, biggest day-to-day impact.

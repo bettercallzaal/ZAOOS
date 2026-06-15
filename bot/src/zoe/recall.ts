@@ -167,8 +167,9 @@ async function delveBonfire(
 }
 
 function formatHit(hit: DelveEpisode): string {
-  const text = hit.summary || hit.content || hit.name || JSON.stringify(hit);
-  return `- ${String(text).slice(0, 300)}`;
+  const body = hit.summary || hit.content || hit.name || JSON.stringify(hit);
+  const src = hit.source_description ? ` [src: ${hit.source_description}]` : '';
+  return `- ${String(body).slice(0, 500)}${src}`;
 }
 
 /**
@@ -196,7 +197,7 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
   if (!bonfireConfigured()) {
     return { kind: 'manual_relay_needed', query: req.query, relay: formatManualRelay(req) };
   }
-  const search = await delveBonfire(req.query, 5);
+  const search = await delveBonfire(req.query, 12);
   if (search.ok && search.results.length > 0) {
     console.log(`[zoe/recall] delve: ${search.results.length} hit(s) for "${req.query.slice(0, 60)}"`);
     return {

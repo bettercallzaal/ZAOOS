@@ -26,7 +26,7 @@ import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
-import { gatherEventCandidates, gatherGraphCandidates } from './events';
+import { gatherEventCandidates, gatherGraphCandidates, gatherInactivityCandidates, gatherCalendarCandidates } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 
@@ -172,6 +172,18 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
           // Graph-staleness nudges (doc 859): cold watched fronts. Daily-gated.
           try {
             cands.push(...(await gatherGraphCandidates()));
+          } catch {
+            // best-effort
+          }
+          // Inactivity check-in: went quiet 4h+ during waking hours. Daily-gated.
+          try {
+            cands.push(...(await gatherInactivityCandidates()));
+          } catch {
+            // best-effort
+          }
+          // Calendar nudges: events starting within 2h from ~/.zao/private/gcal-*.json.
+          try {
+            cands.push(...(await gatherCalendarCandidates()));
           } catch {
             // best-effort
           }

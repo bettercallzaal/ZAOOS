@@ -197,3 +197,128 @@ export async function gatherGraphCandidates(now: number = Date.now()): Promise<C
     },
   ];
 }
+
+// ---- inactivity check-in ---------------------------------------------------
+
+const LAST_SEEN_FILE = join(ZOE_PATHS.home, 'last-seen.txt');
+const INACTIVITY_HOURS = 4; // silent for 4h during the day → soft check-in
+
+/**
+ * Write a last-seen timestamp when Zaal sends a DM. Called by the message
+ * handler in index.ts so inactivity detection knows he was active.
+ */
+export async function touchLastSeen(now: number = Date.now()): Promise<void> {
+  await fs.mkdir(ZOE_PATHS.home, { recursive: true });
+  await fs.writeFile(LAST_SEEN_FILE, String(now), 'utf8');
+}
+
+/**
+ * Surface a soft check-in if Zaal has been silent for INACTIVITY_HOURS during
+ * waking hours (9am-9pm EDT). Once per day, lowest score that still clears the
+ * default threshold. Best-effort: never throws.
+ */
+export async function gatherInactivityCandidates(now: number = Date.now()): Promise<Candidate[]> {
+  // Waking hours: 9am-9pm EDT (UTC-4 summer) = 13:00-01:00 UTC.
+  const hourUtc = new Date(now).getUTCHours();
+  if (hourUtc < 13 && hourUtc >= 1) return []; // not daytime EDT
+
+  let lastSeen: number;
+  try {
+    const raw = await fs.readFile(LAST_SEEN_FILE, 'utf8');
+    lastSeen = Number(raw.trim());
+    if (!Number.isFinite(lastSeen)) return [];
+  } catch {
+    return []; // no file yet → skip
+  }
+
+  const silentHrs = (now - lastSeen) / 3_600_000;
+  if (silentHrs < INACTIVITY_HOURS) return [];
+
+  // Once per day dedup
+  const seen = await readSeen();
+  const today = new Date(now).toISOString().slice(0, 10);
+  const key = `inactivity:${today}`;
+  if (seen[key]) return [];
+  seen[key] = now;
+  await writeSeen(seen);
+
+  const hrs = Math.floor(silentHrs);
+  return [
+    {
+      kind: 'inactivity',
+      score: 0.62, // just clears the 0.6 bar — lowest interrupt priority
+      message: `You've been quiet for ${hrs}h. Everything on track, or anything stuck?`,
+    },
+  ];
+}
+
+// ---- calendar nudges -------------------------------------------------------
+
+const ZAO_PRIVATE_DIR = join(ZOE_PATHS.home, '..', 'private');
+const GCAL_FILE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // skip stale dumps (>24h old)
+const CALENDAR_LOOKAHEAD_MS = 2 * 60 * 60 * 1000;  // events starting within 2h
+
+interface GCalEvent {
+  id?: string;
+  summary?: string;
+  start?: { dateTime?: string; date?: string };
+}
+
+/**
+ * Surface calendar events starting within 2 hours, read from the most recent
+ * gcal-*.json dump in ~/.zao/private/. Skips stale files (>24h). Scores at
+ * 0.72 (time-sensitive: outranks stale PR, beaten by overdue commitment thread).
+ * Best-effort: never throws.
+ */
+export async function gatherCalendarCandidates(now: number = Date.now()): Promise<Candidate[]> {
+  let files: string[] = [];
+  try {
+    const entries = await fs.readdir(ZAO_PRIVATE_DIR);
+    files = entries.filter((f) => f.startsWith('gcal-') && f.endsWith('.json')).sort();
+  } catch {
+    return []; // no private dir yet
+  }
+  if (files.length === 0) return [];
+
+  const latestPath = join(ZAO_PRIVATE_DIR, files[files.length - 1]);
+  try {
+    const stat = await fs.stat(latestPath);
+    if (now - stat.mtimeMs > GCAL_FILE_MAX_AGE_MS) return []; // stale
+  } catch {
+    return [];
+  }
+
+  let events: GCalEvent[] = [];
+  try {
+    const raw = await fs.readFile(latestPath, 'utf8');
+    const data = JSON.parse(raw) as GCalEvent[] | { items?: GCalEvent[]; events?: GCalEvent[] };
+    events = Array.isArray(data) ? data : (data.items ?? data.events ?? []);
+  } catch {
+    return [];
+  }
+
+  const seen = await readSeen();
+  const windowEnd = now + CALENDAR_LOOKAHEAD_MS;
+  const out: Candidate[] = [];
+
+  for (const ev of events) {
+    const startStr = ev.start?.dateTime ?? ev.start?.date;
+    if (!startStr) continue;
+    const start = Date.parse(startStr);
+    if (!Number.isFinite(start) || start < now || start > windowEnd) continue;
+
+    const key = `calendar:${ev.id ?? ev.summary}:${new Date(start).toISOString().slice(0, 10)}`;
+    if (seen[key]) continue;
+    seen[key] = now;
+
+    const minsAway = Math.round((start - now) / 60_000);
+    out.push({
+      kind: 'calendar',
+      score: 0.72,
+      message: `[CALENDAR] "${ev.summary ?? 'Event'}" in ${minsAway}m. Anything to prep?`,
+    });
+  }
+
+  if (out.length > 0) await writeSeen(seen);
+  return out;
+}

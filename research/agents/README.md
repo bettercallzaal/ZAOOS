@@ -147,3 +147,4 @@
 
 | 796 | [ZOE: Broadcast Bot → Conversational, Well-Timed Assistant](./796-zoe-conversational-proactive-redesign/) | STANDALONE | Redesign ZOE from a broadcast bot into a conversational, well-timed concierge — proactive timing, reply quality, not blast messaging |
 | 801 | [ZOE / Cowork Bot / Cowork Dashboard — Systems Audit + Consolidation Map](./801-zoe-cowork-systems-audit-consolidation/) | CANONICAL | Single ground-truth audit of the three live ZAO agent/app systems (ZOE concierge, cowork tracker bot, cowork Kanban dashboard) + consolidation map |
+| 861 | [ZOE: how it's set up + how to use it effectively](./861-zoe-setup-effective-use/) | CANONICAL | The user-facing how-to: ZOE's real architecture, the proactive tags now live (STALE PR / CI FAIL / GRAPH / calendar / inactivity), commands, the habits that make it useful, and the gotchas. Companion to 860. |

@@ -1,11 +1,11 @@
 /**
- * events.ts — proactive EVENT candidates for ZOE's reasoning tick.
+ * events.ts - proactive EVENT candidates for ZOE's reasoning tick.
  *
  * The point: ZOE leads Zaal. Instead of waiting to be asked, each tick this
  * detects notable things that happened across Zaal's work and surfaces them as
  * TAGGED candidates ([SHIPPED], [STALE PR], [CI FAIL], ...). They flow through
  * the same pickBest + threshold gate as everything else (proactive.ts), so only
- * the genuinely-important ones actually ping — routine churn stays silent.
+ * the genuinely-important ones actually ping - routine churn stays silent.
  *
  * Dedup: a seen-events file (~/.zao/zoe/seen-events.json) keyed per event so the
  * same thing never pings twice (merged once ever; stale/ci once per day).
@@ -20,6 +20,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { ZOE_PATHS } from './memory';
 import type { Candidate } from './proactive';
+import { graphTopicAgeDays } from './recall';
 
 const execFileP = promisify(execFile);
 const SEEN_FILE = join(ZOE_PATHS.home, 'seen-events.json');
@@ -79,7 +80,7 @@ export async function gatherEventCandidates(now: number = Date.now()): Promise<C
     );
     prs = JSON.parse(stdout) as SearchPr[];
   } catch {
-    return []; // gh missing / rate-limited / offline — stay silent, no crash
+    return []; // gh missing / rate-limited / offline - stay silent, no crash
   }
 
   const seen = await readSeen();
@@ -147,4 +148,47 @@ async function ciIsFailing(repoSlug: string, num: number): Promise<boolean> {
   } catch {
     return false; // gh failure / no checks -> not failing, stay silent
   }
+}
+
+// ---- graph-staleness nudges (doc 859) --------------------------------------
+// ZOE watches Zaal's active fronts and pings when one goes COLD in the graph
+// (no new episode in GRAPH_STALE_DAYS). Edit this list to change what she watches.
+const WATCH_TOPICS = ['ZAOstock', 'WaveWarZ', 'ZABAL Games', 'Brazil network', 'ZAO Festivals'];
+const GRAPH_STALE_DAYS = 10;
+
+/**
+ * Detect the coldest watched topic in the graph and surface a single tagged
+ * nudge. Daily-gated (one full check per day) so the 5 /delve calls don't run
+ * every tick, and deduped per topic per day. Best-effort: never throws.
+ */
+export async function gatherGraphCandidates(now: number = Date.now()): Promise<Candidate[]> {
+  const seen = await readSeen();
+  const today = new Date(now).toISOString().slice(0, 10);
+
+  // Daily gate: only run the graph sweep once per day.
+  if (seen[`graphcheck:${today}`]) return [];
+
+  let coldest: { topic: string; days: number } | null = null;
+  for (const topic of WATCH_TOPICS) {
+    let days: number | null = null;
+    try {
+      days = await graphTopicAgeDays(topic, now);
+    } catch {
+      days = null;
+    }
+    if (days == null || days < GRAPH_STALE_DAYS) continue;
+    if (!coldest || days > coldest.days) coldest = { topic, days };
+  }
+
+  seen[`graphcheck:${today}`] = now; // mark the sweep done for today regardless
+  await writeSeen(seen);
+
+  if (!coldest) return [];
+  return [
+    {
+      kind: 'graph-event',
+      score: 0.62, // clears the 0.6 bar but a due commitment/CI-fail outranks
+      message: `[GRAPH] Nothing new on "${coldest.topic}" in the graph for ${coldest.days}d. Still active, or want to log an update?`,
+    },
+  ];
 }

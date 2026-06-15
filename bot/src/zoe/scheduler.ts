@@ -26,7 +26,7 @@ import { startPostsScheduler } from './posts';
 import { setPending, pendingKindLabel } from './approvals';
 import { runLearnCycle, renderLearnProposals } from './learn';
 import { runReasoningTick, recordPush, type Candidate } from './proactive';
-import { gatherEventCandidates } from './events';
+import { gatherEventCandidates, gatherGraphCandidates } from './events';
 import { markNudged } from './threads';
 import { flushEmitQueue } from './thread-memory';
 
@@ -168,6 +168,12 @@ export function startScheduler(opts: SchedulerOptions): { stop: () => void } {
             cands.push(...(await gatherEventCandidates()));
           } catch {
             // best-effort; events never block the tick
+          }
+          // Graph-staleness nudges (doc 859): cold watched fronts. Daily-gated.
+          try {
+            cands.push(...(await gatherGraphCandidates()));
+          } catch {
+            // best-effort
           }
           // Task-queue nudge (only when enabled + cooldown elapsed + queue non-empty).
           try {

@@ -88,7 +88,7 @@ function loadReflectContext(repoDir: string): ReflectContext {
   }
 
   return {
-    today: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+    today: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'America/New_York' }),
     open_tasks: [],  // populated below
     recent_commits: commits,
     recent_prs: prs,

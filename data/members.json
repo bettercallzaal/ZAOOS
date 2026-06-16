@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "generatedAt": "2026-06-16T00:00:00.000Z",
+    "source": "seed",
+    "count": 1,
+    "notes": "SEED ONLY - not yet generated against the live DB. Contains a single verifiably-public entry so the Nexus /journeys ingestion contract can be validated. To populate the full ~188-member list with real timelines, run `npx tsx scripts/generate-members.ts` with SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in the environment (server-side only, never in the browser). The generator derives real milestones from respect_members (Onchain OG, respect tiers, fractal sessions). Do not hand-add third-party members here - that is consent-gated PII (see .claude/rules/pii-hygiene.md)."
+  },
+  "members": [
+    {
+      "id": "bettercallzaal",
+      "name": "Zaal",
+      "handle": "bettercallzaal",
+      "fid": 19640,
+      "role": "Founder",
+      "links": [
+        { "label": "The ZAO", "href": "https://thezao.com" },
+        { "label": "Better Call Zaal", "href": "https://bettercallzaal.com" }
+      ],
+      "milestones": [
+        { "date": null, "title": "Founded The ZAO", "detail": "Decentralized music label and community on Base." }
+      ],
+      "source": "manual"
+    }
+  ]
+}

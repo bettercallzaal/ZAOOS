@@ -48,6 +48,7 @@ interface BriefContext {
   today_iso: string;
   open_tasks: Array<{ priority: string; title: string }>;
   commits_24h: string[];
+  cross_repo_24h: string[];
   open_prs: Array<{ number: number; title: string }>;
   inbox: { unreadCount: number; recentSubjects: string[] } | null;
 }
@@ -101,8 +102,9 @@ async function fetchInboxSnapshot(): Promise<AgentMailFetchResult | null> {
 
 function todayLabel(): { day: string; date: string } {
   const d = new Date();
-  const day = d.toLocaleDateString('en-US', { weekday: 'short' });
-  const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const tz = 'America/New_York'; // Zaal is EST/EDT; VPS runs UTC
+  const day = d.toLocaleDateString('en-US', { weekday: 'short', timeZone: tz });
+  const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: tz });
   return { day, date };
 }
 
@@ -131,12 +133,38 @@ async function loadBriefContext(repoDir: string): Promise<BriefContext> {
     prs = [];
   }
 
+  // Cross-repo activity: what Zaal shipped across ALL his repos in the last day,
+  // not just the ZAOOS clone on this box. gh is authed as bettercallzaal.
+  let crossRepo24h: string[] = [];
+  try {
+    const json = execSync(
+      'gh search commits --author=bettercallzaal --sort=committer-date --order=desc --limit 20 --json repository,commit',
+      { encoding: 'utf8', timeout: 12000 },
+    );
+    const rows = JSON.parse(json) as Array<{
+      repository?: { name?: string; nameWithOwner?: string };
+      commit?: { message?: string };
+    }>;
+    crossRepo24h = rows
+      .map((r) => {
+        const repo = r.repository?.name ?? r.repository?.nameWithOwner ?? 'repo';
+        const msg = (r.commit?.message ?? '').split('\n')[0];
+        return msg ? `${repo}: ${msg}` : '';
+      })
+      .filter(Boolean)
+      .slice(0, 15);
+  } catch (err) {
+    console.error('[zoe/brief] gh search commits failed:', (err as Error).message);
+    crossRepo24h = [];
+  }
+
   const inbox = await fetchInboxSnapshot();
 
   return {
     today_iso: new Date().toISOString().slice(0, 10),
     open_tasks: tasks.map((t) => ({ priority: t.priority, title: t.title })),
     commits_24h: commits24h,
+    cross_repo_24h: crossRepo24h,
     open_prs: prs,
     inbox,
   };
@@ -156,7 +184,8 @@ export async function generateMorningBrief(opts: { repoDir: string; model?: stri
 
 CONTEXT:
 - Open tasks: ${JSON.stringify(ctx.open_tasks, null, 2)}
-- Last 24h commits: ${ctx.commits_24h.length === 0 ? '(none)' : ctx.commits_24h.join(' | ')}
+- Last 24h commits (ZAOOS): ${ctx.commits_24h.length === 0 ? '(none)' : ctx.commits_24h.join(' | ')}
+- Recent activity across ALL Zaal's repos: ${ctx.cross_repo_24h.length === 0 ? '(none)' : ctx.cross_repo_24h.join(' | ')}
 - Open PRs: ${ctx.open_prs.length === 0 ? '(none)' : ctx.open_prs.map((p) => `#${p.number} ${p.title}`).join(' | ')}
 - ${inboxLine}
 

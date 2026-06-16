@@ -83,6 +83,7 @@ import { NOTE_PREFIX, PLAN_PREFIX, isZoeCommand } from './commands';
 import { applyThreadOps, summarizeThreadOps } from './thread-ops';
 import { loadThreads, deleteThread, renderOpenThreadsBlock } from './threads';
 import { ackPush } from './proactive';
+import { touchLastSeen } from './events';
 import {
   fetchPending,
   removeFromQueue,
@@ -529,6 +530,8 @@ bot.on('message:text', async (ctx) => {
 });
 
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
+  // Track activity for inactivity detection (best-effort: never blocks the handler).
+  touchLastSeen().catch(() => {});
   // Pending-approval interception (doc 759 keystone). If ZOE is waiting on a
   // y/n for this chat, route the reply to the resolver. Ambiguous messages
   // (not-an-approval) fall through to normal handling and leave the pending

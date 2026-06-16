@@ -54,6 +54,6 @@
     ],
     "typecheckErrors": 0,
     "untestedDomains": 39,
-    "ratchetMaxFails": 7
+    "ratchetMaxFails": 0
   }
 }

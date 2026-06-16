@@ -1,5 +1,5 @@
 /**
- * Bonfire bridge for ZOE — read (recall) + write (remember).
+ * Bonfire bridge for ZOE - read (recall) + write (remember).
  *
  * Verified against the live Bonfires API 2026-05-30:
  *   - WRITE  POST /knowledge_graph/episode/create     (works with non-admin key)
@@ -14,7 +14,7 @@
  * "What is ZAO?" delve returned 51 episodes with full content. recall() now
  * uses /delve and only falls back to manual relay on a genuine error/empty.
  *
- * `remember()` works today — ZOE's captures + decisions get mirrored into
+ * `remember()` works today - ZOE's captures + decisions get mirrored into
  * the bonfire as episodes, so the knowledge graph keeps growing from daily use.
  *
  * Env:
@@ -34,7 +34,7 @@ export function bonfireConfigured(): boolean {
 }
 
 // --- secret guard for writes -------------------------------------------------
-// ZOE's captures are facts about Zaal/the team — low risk, but never let an
+// ZOE's captures are facts about Zaal/the team - low risk, but never let an
 // API key / private key slip into the knowledge graph. Minimal HIGH-severity
 // check mirroring scripts/bonfire-ingest/secret_scan.py.
 const SECRET_PATTERNS: RegExp[] = [
@@ -129,6 +129,8 @@ interface DelveEpisode {
   source_description?: string;
   summary?: string | null;
   content?: string;
+  created_at?: string;
+  valid_at?: string;
 }
 interface DelveResponse {
   success?: boolean;
@@ -167,12 +169,13 @@ async function delveBonfire(
 }
 
 function formatHit(hit: DelveEpisode): string {
-  const text = hit.summary || hit.content || hit.name || JSON.stringify(hit);
-  return `- ${String(text).slice(0, 300)}`;
+  const body = hit.summary || hit.content || hit.name || JSON.stringify(hit);
+  const src = hit.source_description ? ` [src: ${hit.source_description}]` : '';
+  return `- ${String(body).slice(0, 500)}${src}`;
 }
 
 /**
- * Telegram-ready manual-relay text — fallback used only when /delve errors or
+ * Telegram-ready manual-relay text - fallback used only when /delve errors or
  * returns nothing, or the bonfire isn't configured.
  */
 export function formatManualRelay(req: RecallRequest): string {
@@ -196,7 +199,7 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
   if (!bonfireConfigured()) {
     return { kind: 'manual_relay_needed', query: req.query, relay: formatManualRelay(req) };
   }
-  const search = await delveBonfire(req.query, 5);
+  const search = await delveBonfire(req.query, 12);
   if (search.ok && search.results.length > 0) {
     console.log(`[zoe/recall] delve: ${search.results.length} hit(s) for "${req.query.slice(0, 60)}"`);
     return {
@@ -216,14 +219,33 @@ export async function recall(req: RecallRequest): Promise<RecallResult> {
   };
 }
 
+/**
+ * Days since the NEWEST graph episode for a topic (via /delve created_at).
+ * Used by proactive graph-staleness nudges - if nothing new on a watched
+ * front in N days, it has gone cold. Returns null if unconfigured / no hits.
+ */
+export async function graphTopicAgeDays(topic: string, now: number = Date.now()): Promise<number | null> {
+  if (!bonfireConfigured()) return null;
+  const search = await delveBonfire(topic, 25);
+  if (!search.ok || search.results.length === 0) return null;
+  let newest = 0;
+  for (const ep of search.results) {
+    const raw = ep.created_at ?? ep.valid_at;
+    const t = raw ? Date.parse(raw) : Number.NaN;
+    if (Number.isFinite(t) && t > newest) newest = t;
+  }
+  if (!newest) return null;
+  return Math.floor((now - newest) / 86_400_000);
+}
+
 // --- turn mirroring ----------------------------------------------------------
 /**
  * Mirror the meaningful output of a concierge turn into the bonfire as
- * episodes — captures, new tasks, completed tasks, side-quest changes.
+ * episodes - captures, new tasks, completed tasks, side-quest changes.
  * The knowledge graph grows from ZOE's daily use. Best-effort, fire-and-forget.
  *
  * Loosely typed on purpose (captures/task_ops/quest_ops) so this stays
- * decoupled from concierge.ts's exact types — the caller passes the result's
+ * decoupled from concierge.ts's exact types - the caller passes the result's
  * arrays straight through.
  */
 export async function mirrorTurn(turn: {

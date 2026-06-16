@@ -24,6 +24,23 @@ tier: STANDARD
 | 5 | **Fill the thin placeholders** + add a getting-started/resource layer (best practice) | zao-101 `/pillars`, `/faq`, `/join` |
 | 6 | **ZAOstock bot: DM-only.** Turn OFF its sharing messages in the group; it posts only in DM. No daily digest for now (Zaal: leave it out). | ZAOstock bot (infra, not zao-101) |
 
+## ZAO 101 vs ZAO 201 - the two-tier split (Zaal, 2026-06-16)
+
+Decision: ONE repo (extend the existing zao-101), TWO tiers.
+
+- **ZAO 101 = the front door (open, public, static).** For anyone fresh/new: what The ZAO is, the org chart, the doors (artist / builder / supporter, ZABAL Games, WaveWarZ), "Start here" + the commitment model, basic FAQ. Ends with a "go deeper -> ZAO 201" bridge.
+- **ZAO 201 = the member floor (TOKEN-GATED).** For community members: the resource/how-to layer - fractal + Respect + OREC depth, the tools (ZABAL toolstack, ZOE, the zaoos.com app), how contribution + the two-per-task model works day to day, the lab + graduation model, active-project deep dives.
+
+**Token gate on 201** (ZAO OG + ZAO ZOR Respect tokens, on Optimism):
+- OG = ERC-20, `0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957`. Gate check: `balanceOf(wallet) > 0`.
+- ZOR = ERC-1155, `0x9885CCeEf7E8371Bf8d6f2413723D25917E7445c`, tokenId `0`. Gate check: `balanceOf(wallet, 0) > 0`.
+- Chain = **Optimism** (the Respect tokens live there; NOT Base, where $ZABAL lives).
+- Access rule: hold OG OR ZOR -> in. Connect wallet -> read balances on Optimism -> reveal 201.
+
+**Caveat (be honest):** a static-site token gate is **client-side curation, not security** - view-source bypasses it. Fine for shaping the member experience / a resource directory; do NOT put anything truly sensitive behind it. Real protection needs a backend verifying a signed message + balance server-side.
+
+**NEXUS overlap:** ZAO NEXUS `/community` is already the member link directory. 201 should be the **narrative + how-to** layer and POINT to NEXUS for raw links, not duplicate them. 201 = the guide; NEXUS = the index.
+
 ## The accountability + contribution model (Zaal, 2026-06-16) - challenge 8
 
 This is the volunteer/commitment model Fellenz said was the hardest and Zaal had skipped. Now defined:

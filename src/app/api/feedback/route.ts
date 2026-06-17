@@ -24,7 +24,7 @@ const rateLimitMap = new Map<number, number>();
 
 function getPageLabel(path: string): string {
   const segment = path.split('/').filter(Boolean)[0] || 'general';
-  const known = ['fishbowlz', 'music', 'spaces', 'governance', 'social', 'chat', 'messages', 'settings', 'members'];
+  const known = ['music', 'spaces', 'governance', 'social', 'chat', 'messages', 'settings', 'members'];
   return known.includes(segment) ? segment : 'general';
 }
 

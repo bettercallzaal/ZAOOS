@@ -123,7 +123,12 @@ behaviours make her feel responsive instead of frozen:
 - Hard reasoning: Opus (when LLM self-flags `escalate: true` in JSON output)
 - Quick factual: Haiku (auto-routed for short factual queries)
 
-Hard cap: 50 LLM calls/day (alert if exceeded).
+Hard cap: 50 LLM calls/day, **enforced** in the concierge turn path via
+`call-budget.ts` (doc 869). It warns (logs an alert + posts a one-time notice)
+once the cap is crossed, and still answers — the owner is never silently locked
+out. Set `ZOE_CALL_CAP_ENFORCE=block` to hard soft-block past the cap, or
+`ZOE_DAILY_CALL_CAP=<n>` to change the limit. Counter is in-process, resets at
+UTC midnight.
 
 ## Run locally (dev)
 

@@ -22,6 +22,7 @@ import { startHeartbeat, reportEvent, startCommandPoller, markDone } from '../li
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { runConciergeTurn } from './concierge';
+import { checkAndRecordZoeCall } from './call-budget';
 import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
@@ -761,6 +762,23 @@ async function dispatchConcierge(
   });
 
   try {
+    // doc 869 fix: enforce ZOE's documented 50-call/day cap. Warn (alert) once
+    // crossed; soft-block only if ZOE_CALL_CAP_ENFORCE=block, so the owner is
+    // never silently locked out by default.
+    const budget = checkAndRecordZoeCall();
+    if (!budget.allowed) {
+      console.error(`[zoe/index] ALERT daily LLM call cap hit (${budget.count}/${budget.cap}) — soft-blocked this turn`);
+      progress.stop();
+      await ctx
+        .reply(`I've hit today's ${budget.cap}-call cap (set ZOE_CALL_CAP_ENFORCE=off or bump ZOE_DAILY_CALL_CAP to keep going).`)
+        .catch(() => {});
+      return;
+    }
+    if (budget.justCrossed) {
+      console.error(`[zoe/index] ALERT daily LLM call cap exceeded (${budget.count}/${budget.cap}) — still answering (warn-only)`);
+      await ctx.reply(`⚠️ Past today's ${budget.cap}-call budget (${budget.count}). Still answering, but worth a glance.`).catch(() => {});
+    }
+
     const chatTitle =
       ctx.chat && 'title' in ctx.chat ? ctx.chat.title : undefined;
     await pushRecent({ from: label === 'Zaal' ? 'zaal' : 'other', text, sender: label }, scope);

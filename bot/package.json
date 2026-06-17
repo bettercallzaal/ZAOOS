@@ -9,9 +9,9 @@
     "start": "tsx src/index.ts",
     "dev:devz": "tsx watch src/devz/index.ts",
     "start:devz": "tsx src/devz/index.ts",
-    "dev:teams": "tsx watch src/teams/index.ts",
-    "start:teams": "tsx src/teams/index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@farcaster/hub-nodejs": "^0.16.0",
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@types/node": "^22.7.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^3.2.6"
   }
 }

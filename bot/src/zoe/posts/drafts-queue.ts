@@ -16,6 +16,7 @@ import type { PostCategory } from './types';
 
 const POSTS_STATE_DIR = join(ZOE_PATHS.home, 'posts');
 const DRAFTS_FILE = join(POSTS_STATE_DIR, 'drafts.json');
+const ARCHIVE_FILE = join(POSTS_STATE_DIR, 'drafts-archive.jsonl');
 const NOTICE_SENTINEL = join(POSTS_STATE_DIR, 'last-batch-notice.txt');
 
 /** Cap the backlog so a quiet week of un-pulled drafts can't grow unbounded. */
@@ -68,6 +69,23 @@ export async function dequeueDraft(): Promise<QueuedDraft | null> {
   if (!next) return null;
   await saveDrafts(drafts);
   return next;
+}
+
+/**
+ * Empty the live backlog, appending the dropped drafts to the archive log so a
+ * "one best draft" surface step can discard the losers without losing the audit
+ * trail. No-op-safe if `dropped` is empty.
+ */
+export async function clearDrafts(dropped: QueuedDraft[] = []): Promise<void> {
+  await fs.mkdir(POSTS_STATE_DIR, { recursive: true });
+  if (dropped.length > 0) {
+    const stamp = new Date().toISOString();
+    const lines = dropped
+      .map((d) => `${JSON.stringify({ archivedAt: stamp, reason: 'not-best', ...d })}\n`)
+      .join('');
+    await fs.appendFile(ARCHIVE_FILE, lines, 'utf8');
+  }
+  await fs.writeFile(DRAFTS_FILE, JSON.stringify([], null, 2), 'utf8');
 }
 
 /** Remove a specific draft by id (e.g. after it's posted/skipped from /drafts). */

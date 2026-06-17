@@ -62,8 +62,9 @@ import {
 import {
   handleVoiceMemo,
   handlePostCallback,
-  countDrafts,
-  dequeueDraft,
+  loadDrafts as loadPostDrafts,
+  clearDrafts,
+  pickBestDraft,
   sendDraftWithKeyboard,
   loadPending as loadPostsPending,
 } from './posts';
@@ -288,26 +289,29 @@ bot.command('drafts', async (ctx) => {
     await ctx.reply('A draft is already up for review - tap POST/REGEN/SKIP on it first, then /drafts for the next.');
     return;
   }
-  const remaining = await countDrafts();
-  if (remaining === 0) {
-    await ctx.reply('No drafts queued. I generate them silently through the day - check back, or I\'ll ping you once a day when some are ready.');
+  // v4: surface the SINGLE best draft from the backlog, then clear the rest.
+  // No more paging through a queue of 30 - ZOE judges the day's drafts and
+  // sends Zaal the one strongest candidate to POST/REGEN/SKIP.
+  const all = await loadPostDrafts();
+  if (all.length === 0) {
+    await ctx.reply('No drafts queued. I generate them silently through the day - check back, or I\'ll ping you once a day when one is ready.');
     return;
   }
-  const next = await dequeueDraft();
-  if (!next) {
+  const pick = await pickBestDraft(all, { cwd: repoDir });
+  if (!pick) {
     await ctx.reply('No drafts queued.');
     return;
   }
+  await clearDrafts(pick.dropped);
   await sendDraftWithKeyboard({
     bot: ctx.api,
     zaalTgId: zaalId,
-    category: next.category,
-    text: next.text,
+    category: pick.best.category,
+    text: pick.best.text,
     isResend: false,
   });
-  const left = remaining - 1;
-  if (left > 0) {
-    await ctx.reply(`${left} more draft${left === 1 ? '' : 's'} queued. /drafts for the next.`);
+  if (pick.considered > 1) {
+    await ctx.reply(`Picked the best of ${pick.considered} fresh drafts. The rest are cleared.`);
   }
 });
 

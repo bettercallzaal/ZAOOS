@@ -2,6 +2,15 @@
 
 ZOE drafts 4 categories of social posts and DMs Zaal random suggestions throughout the day. He copy-pastes the keepers into Firefly. Hand-tunes weights after a week of real usage.
 
+> **v4 (2026-06-17): one best draft, not 30.** Drafts still generate silently
+> into the backlog through the day, but ZOE no longer pages Zaal through the
+> whole queue. When drafts are surfaced — the once-a-day notice *and* on-demand
+> `/drafts` — `select-best.ts` judges the fresh backlog (LLM judge + heuristic
+> fallback, drops drafts >24h old) and surfaces the **single strongest** draft
+> into the existing POST/REGEN/SKIP flow, archiving the losers to
+> `drafts-archive.jsonl`. One decision per day instead of a 30-deep triage.
+
+
 ## Categories
 
 | Category | Source(s) v1 | Source(s) v2 (planned) |

@@ -16,7 +16,9 @@ import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { ZOE_PATHS } from '../memory';
 import { draftPost } from './drafters';
-import { claimDailyBatchNotice, countDrafts, enqueueDraft } from './drafts-queue';
+import { claimDailyBatchNotice, clearDrafts, enqueueDraft, loadDrafts } from './drafts-queue';
+import { sendDraftWithKeyboard } from './buttons';
+import { pickBestDraft } from './select-best';
 import { sendFractalPromo } from './fractal-promo';
 import {
   gatherBuildSignals,
@@ -244,25 +246,41 @@ export function startPostsScheduler(opts: PostsSchedulerOptions): { stop: () => 
     { timezone: 'America/New_York' },
   );
 
-  // doc 796 Decision 2: ONE notice a day. If the silent backlog is non-empty
-  // and we haven't notified today, send a single "N drafts ready - /drafts".
-  // 14:00 UTC = 10am ET (mid-morning, after the 9am-UTC brief). Owns its own
-  // once-a-day sentinel so a restart can't double-notify.
+  // v4: ONE best draft a day. If the silent backlog is non-empty and we haven't
+  // surfaced today, ZOE judges the whole backlog, sends the SINGLE best draft
+  // straight into the POST/REGEN/SKIP review flow, and clears the rest. No more
+  // "N drafts ready - /drafts" page-through. 14:00 UTC = 10am ET (mid-morning,
+  // after the 9am-UTC brief). Owns its own once-a-day sentinel so a restart
+  // can't double-surface. /drafts still works on demand if Zaal wants it sooner.
   const batchNoticeTask = cron.schedule(
     '0 14 * * *',
     async () => {
       try {
         const today = todayET();
         if (!(await claimDailyBatchNotice(today))) return;
-        const n = await countDrafts();
-        await opts.bot.api.sendMessage(
-          opts.zaalTgId,
-          `${n} post draft${n === 1 ? '' : 's'} ready. Send /drafts to review.`,
-        );
-        await appendLog({ event: 'batch-notice', date: today, count: n });
-        console.log(`[zoe/posts] batch notice sent: ${n} drafts ready`);
+        const all = await loadDrafts();
+        const pick = await pickBestDraft(all, { cwd: opts.repoDir });
+        if (!pick) {
+          await appendLog({ event: 'best-notice-empty', date: today });
+          return;
+        }
+        await clearDrafts(pick.dropped);
+        await sendDraftWithKeyboard({
+          bot: opts.bot.api,
+          zaalTgId: opts.zaalTgId,
+          category: pick.best.category,
+          text: pick.best.text,
+        });
+        await appendLog({
+          event: 'best-notice',
+          date: today,
+          considered: pick.considered,
+          via: pick.via,
+          category: pick.best.category,
+        });
+        console.log(`[zoe/posts] best-of-${pick.considered} draft surfaced (${pick.via})`);
       } catch (err) {
-        console.error('[zoe/posts] batch notice failed:', (err as Error).message);
+        console.error('[zoe/posts] best-draft notice failed:', (err as Error).message);
       }
     },
     { timezone: 'UTC' },

@@ -69,6 +69,7 @@ import {
   loadPending as loadPostsPending,
 } from './posts';
 import { dispatchPlan } from './dispatch';
+import { enqueueTurn } from './turn-queue';
 import {
   getPending,
   setPending,
@@ -487,7 +488,17 @@ bot.on('message:text', async (ctx) => {
   // DM path: Zaal-only allowlist preserved.
   if (chatType === 'private') {
     if (!isFromZaal(ctx)) return;
-    await handlePrivateMessage(ctx, text);
+    // doc 872 (live steering / "finish then apply"): run the turn OFF the poll
+    // loop so a new message is received mid-turn instead of blocking the bot.
+    // Same-chat turns are serialized in turn-queue; a deferred turn gets a quick
+    // ack so Zaal knows it landed and will run after the current one.
+    enqueueTurn(chatId, () => handlePrivateMessage(ctx, text), {
+      onDeferred: () => {
+        ctx
+          .reply("Got that - finishing what I'm on, then I'll pick it up.")
+          .catch(() => {});
+      },
+    }).catch((e) => console.error('[zoe/index] private turn failed:', (e as Error)?.message));
     return;
   }
 
@@ -531,7 +542,11 @@ bot.on('message:text', async (ctx) => {
     return;
   }
 
-  await handleGroupMessage(ctx, text, String(chatId));
+  // Groups: serialize per chat off the poll loop too (no deferred ack - groups
+  // are noisy and an extra "queued" line per message would add to the noise).
+  enqueueTurn(chatId, () => handleGroupMessage(ctx, text, String(chatId))).catch((e) =>
+    console.error('[zoe/index] group turn failed:', (e as Error)?.message),
+  );
 });
 
 async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
@@ -688,10 +703,49 @@ async function handleGroupMessage(
 
 // A concierge turn can take 60s+ on Opus. Telegram clears the typing
 // indicator after ~5s, so without this the user stares at silence and
-// assumes the bot is dead. We refresh the typing action every 4s and, if
-// the turn crosses ACK_THRESHOLD_MS, send one "still working" text ping.
+// assumes the bot is dead. We refresh the typing action every 4s and narrate
+// progress with up to two text pings as the turn drags on (doc 872).
 const ACK_THRESHOLD_MS = 6000;
 const TYPING_REFRESH_MS = 4000;
+// Second, "still on it" narration ping for genuinely long turns. Keeps Zaal
+// informed without being chatty - capped at these two pings total.
+const SECOND_NARRATION_MS = 28000;
+
+interface ProgressHandle {
+  stop: () => void;
+}
+
+/**
+ * Keep the typing indicator alive and narrate progress on a slow turn:
+ * one ack at ACK_THRESHOLD_MS, one "still on it" at SECOND_NARRATION_MS.
+ * Returns a handle whose stop() clears the timers (call it once the reply is
+ * sent). doc 872 progress narration; replaces the old single-ack pattern.
+ */
+function startProgressNarration(
+  ctx: Context,
+  chatId: number,
+  messages: { first: string; second?: string },
+): ProgressHandle {
+  ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  const typingInterval = setInterval(() => {
+    ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
+  }, TYPING_REFRESH_MS);
+  const firstAck = setTimeout(() => {
+    ctx.reply(messages.first).catch(() => {});
+  }, ACK_THRESHOLD_MS);
+  const secondAck = messages.second
+    ? setTimeout(() => {
+        ctx.reply(messages.second as string).catch(() => {});
+      }, SECOND_NARRATION_MS)
+    : null;
+  return {
+    stop: () => {
+      clearInterval(typingInterval);
+      clearTimeout(firstAck);
+      if (secondAck) clearTimeout(secondAck);
+    },
+  };
+}
 
 async function dispatchConcierge(
   ctx: Context,
@@ -701,14 +755,10 @@ async function dispatchConcierge(
 ): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
-  await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
-
-  const typingInterval = setInterval(() => {
-    ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
-  }, TYPING_REFRESH_MS);
-  const ackTimeout = setTimeout(() => {
-    ctx.reply('Got it. Working on this one - reply incoming.').catch(() => {});
-  }, ACK_THRESHOLD_MS);
+  const progress = startProgressNarration(ctx, chatId, {
+    first: 'Got it. Working on this one - reply incoming.',
+    second: "Still on it - bigger one than it looked. Hang tight.",
+  });
 
   try {
     const chatTitle =
@@ -862,8 +912,7 @@ async function dispatchConcierge(
     console.error('[zoe/index] concierge turn failed:', msg);
     await ctx.reply(`(concierge error - ${msg.slice(0, 200)})`);
   } finally {
-    clearInterval(typingInterval);
-    clearTimeout(ackTimeout);
+    progress.stop();
   }
 }
 
@@ -898,13 +947,10 @@ async function handlePlanCommand(
     );
     return;
   }
-  await ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
-  const typingInterval = setInterval(() => {
-    ctx.api.sendChatAction(chatId, 'typing').catch(() => {});
-  }, TYPING_REFRESH_MS);
-  const ackTimeout = setTimeout(() => {
-    ctx.reply('Decomposing into a routed plan — one moment.').catch(() => {});
-  }, ACK_THRESHOLD_MS);
+  const progress = startProgressNarration(ctx, chatId, {
+    first: 'Decomposing into a routed plan — one moment.',
+    second: 'Still mapping the subtasks - almost there.',
+  });
 
   // H2 (doc 770): note if a new plan replaces an unresolved approval, so a
   // live plan-gate / reflexion / learn pending is never silently clobbered.
@@ -940,8 +986,7 @@ async function handlePlanCommand(
     console.error('[zoe/index] decompose failed:', msg);
     await ctx.reply(`(decompose error - ${msg.slice(0, 200)})`);
   } finally {
-    clearInterval(typingInterval);
-    clearTimeout(ackTimeout);
+    progress.stop();
   }
 }
 
@@ -1122,6 +1167,12 @@ async function runApprovedPlan(
       hooks: {
         onSubtaskStart: async (st) => {
           await ctx.reply(`▶ ${st.id} (${st.worker}): ${st.title}`.slice(0, 300)).catch(() => {});
+        },
+        // doc 872 progress narration: tick each subtask as it lands so a long
+        // plan reads as live progress, not silence between start and summary.
+        onSubtaskDone: async (st, res) => {
+          const mark = res.status === 'completed' ? '✓' : res.status === 'failed' ? '✗' : '↻';
+          await ctx.reply(`${mark} ${st.id} ${res.status}`.slice(0, 120)).catch(() => {});
         },
       },
     });

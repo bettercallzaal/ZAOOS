@@ -74,3 +74,16 @@ export async function getDevopsChats(): Promise<ChatRow[]> {
     .eq('mode', 'devops');
   return (data as ChatRow[]) ?? [];
 }
+
+/**
+ * Zaal's Telegram user id (= his private DM chat id), from ZAAL_TELEGRAM_ID.
+ * Proactive ZAOstock pings (digests, devops alerts) DM Zaal instead of posting
+ * into the team group so they don't crowd out the actual conversation there.
+ * Returns null if unset/invalid — callers should refuse to fall back to the
+ * group (the whole point is to stop pinging it).
+ */
+export function getZaalDmId(): number | null {
+  const raw = process.env.ZAAL_TELEGRAM_ID;
+  const id = raw ? Number(raw) : Number.NaN;
+  return Number.isFinite(id) && id !== 0 ? id : null;
+}

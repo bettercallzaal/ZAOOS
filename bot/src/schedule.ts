@@ -2,7 +2,7 @@
 
 import cron from 'node-cron';
 import { morningDigest, eveningRecap, weekAheadDigest, fridayRetro } from './digest';
-import { getDigestChats } from './group';
+import { getZaalDmId } from './group';
 
 interface MinimalBot {
   api: { sendMessage: (chatId: number, text: string) => Promise<unknown> };
@@ -10,14 +10,19 @@ interface MinimalBot {
 
 const TZ = 'America/New_York';
 
-async function postToAllDigestChats(bot: MinimalBot, text: string): Promise<void> {
-  const chats = await getDigestChats();
-  for (const chat of chats) {
-    try {
-      await bot.api.sendMessage(chat.chat_id, text);
-    } catch (err) {
-      console.error(`[schedule] send to ${chat.chat_id} failed:`, err);
-    }
+// Digests DM Zaal instead of posting into the team group (so scheduled noise
+// doesn't crowd out the group conversation). If ZAAL_TELEGRAM_ID is unset we
+// drop the digest rather than fall back to pinging the group.
+async function postDigestToZaal(bot: MinimalBot, text: string): Promise<void> {
+  const zaalDm = getZaalDmId();
+  if (!zaalDm) {
+    console.error('[schedule] ZAAL_TELEGRAM_ID not set — digest not sent (refusing to ping the team group)');
+    return;
+  }
+  try {
+    await bot.api.sendMessage(zaalDm, text);
+  } catch (err) {
+    console.error('[schedule] digest DM to Zaal failed:', err);
   }
 }
 
@@ -28,7 +33,7 @@ export function scheduleAll(bot: MinimalBot, onError: (err: unknown, label: stri
     async () => {
       try {
         const text = await morningDigest();
-        await postToAllDigestChats(bot, text);
+        await postDigestToZaal(bot, text);
         console.log('[schedule] morning posted');
       } catch (err) {
         onError(err, 'morning-digest');
@@ -48,7 +53,7 @@ export function scheduleAll(bot: MinimalBot, onError: (err: unknown, label: stri
           console.log('[schedule] evening skipped - no activity to recap');
           return;
         }
-        await postToAllDigestChats(bot, text);
+        await postDigestToZaal(bot, text);
         console.log('[schedule] evening posted');
       } catch (err) {
         onError(err, 'evening-recap');
@@ -63,7 +68,7 @@ export function scheduleAll(bot: MinimalBot, onError: (err: unknown, label: stri
     async () => {
       try {
         const text = await weekAheadDigest();
-        await postToAllDigestChats(bot, text);
+        await postDigestToZaal(bot, text);
         console.log('[schedule] week-ahead posted');
       } catch (err) {
         onError(err, 'week-ahead');
@@ -78,7 +83,7 @@ export function scheduleAll(bot: MinimalBot, onError: (err: unknown, label: stri
     async () => {
       try {
         const text = await fridayRetro();
-        await postToAllDigestChats(bot, text);
+        await postDigestToZaal(bot, text);
         console.log('[schedule] friday-retro posted');
       } catch (err) {
         onError(err, 'friday-retro');

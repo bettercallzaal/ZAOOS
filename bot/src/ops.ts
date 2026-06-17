@@ -1,22 +1,24 @@
 // Ops alerts — bot self-reports errors/startup/shutdown to devops chats.
 
-import { getDevopsChats } from './group';
+import { getZaalDmId } from './group';
 
 interface MinimalBot {
   api: { sendMessage: (chatId: number, text: string) => Promise<unknown> };
 }
 
+// DevOps alerts (startup/shutdown/errors) DM Zaal instead of posting into a
+// group, keeping operational noise out of the team conversation. Drops the
+// alert if ZAAL_TELEGRAM_ID is unset rather than fall back to a group chat.
 export async function alertDevops(bot: MinimalBot, text: string): Promise<void> {
+  const zaalDm = getZaalDmId();
+  if (!zaalDm) {
+    console.error('[ops] ZAAL_TELEGRAM_ID not set — devops alert dropped:', text);
+    return;
+  }
   try {
-    const chats = await getDevopsChats();
-    if (chats.length === 0) return;
-    await Promise.all(
-      chats.map((chat) =>
-        bot.api.sendMessage(chat.chat_id, `[devops] ${text}`).catch((e) => console.error('[ops] send failed:', e)),
-      ),
-    );
+    await bot.api.sendMessage(zaalDm, `[devops] ${text}`);
   } catch (err) {
-    console.error('[ops] alert failed:', err);
+    console.error('[ops] devops DM to Zaal failed:', err);
   }
 }
 

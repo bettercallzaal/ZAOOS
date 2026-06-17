@@ -83,3 +83,4 @@
 
 | 798 | [Ambient Fandom + Off-Protocol Behaviour: The Audience ZAO Is Built For](./798-ambient-fandom-off-protocol-music-audience/) | STANDALONE | Turn the Sound-of-Fractures / MUSIC-x 'audience the industry can't see' framework into ZAO strategy — ZAO already builds for off-protocol fandom |
 | 799 | [The Broken-Record Principle: Repeat What Matters Until the Team Can Recite It](./799-broken-record-leadership-repetition/) | STANDALONE | Turn Tim Martinez's 'be a broken record' post into a concrete ZAO leadership discipline for the 188-member community + 5-person core team |
+| 863 | [Brand Weakness Audit + ZOE Agent-Builder Status](./863-brand-weakness-audit-zoe-agent-status/) | AUDIT | 8 ranked, doc-grounded brand weaknesses (entry-point sprawl, ZABAL eclipsing The ZAO, unlocked acronym, non-repeating pitch) + straight answer on whether ZOE spawns agents on command (yes, only via plan: prefix) |

@@ -26,7 +26,7 @@ import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
-import { decomposeGoal, renderPlanForApproval } from './decompose';
+import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
   ensureZoeHome,
@@ -637,6 +637,16 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
     return;
   }
 
+  // Efficiency (doc 863): agent-worthy DMs auto-route to the decompose+approve
+  // flow so Zaal never has to remember the `plan:` prefix. ZOE proposes a plan
+  // and ASKS y/n - no agent spends until he approves. Plain questions + short
+  // messages stay inline (shouldDecompose filters them). Skipped while another
+  // approval is already pending, so we never clobber a waiting y/n.
+  if (shouldDecompose(text) && !getPending('private')) {
+    await handlePlanCommand(ctx, text, { autoDetected: true });
+    return;
+  }
+
   await dispatchConcierge(ctx, text, 'private', 'Zaal');
 }
 
@@ -858,7 +868,11 @@ function zoeContext() {
  * If the plan has unresolved ambiguities, nothing is stored (there's nothing
  * to dispatch yet) and ZOE just asks for clarification.
  */
-async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
+async function handlePlanCommand(
+  ctx: Context,
+  goal: string,
+  opts: { autoDetected?: boolean } = {},
+): Promise<void> {
   if (!ctx.chat) return;
   const chatId = ctx.chat.id;
   // Refuse-when-busy (doc 770 H2): don't decompose (or clobber) a plan while a
@@ -900,7 +914,11 @@ async function handlePlanCommand(ctx: Context, goal: string): Promise<void> {
         plan,
       });
     }
-    await replyChunked(ctx, renderPlanForApproval(plan) + priorNote);
+    const autoNote =
+      opts.autoDetected && dispatchable
+        ? 'This looks like multi-step work, so I drafted a plan to run with agents.\n\n'
+        : '';
+    await replyChunked(ctx, autoNote + renderPlanForApproval(plan) + priorNote);
     console.log(
       `[zoe/index] plan proposed — subtasks=${plan.subtasks.length} ambiguities=${plan.ambiguities.length} dispatchable=${dispatchable} cost=$${result.costUsd.toFixed(4)}`,
     );

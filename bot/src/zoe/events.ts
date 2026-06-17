@@ -158,7 +158,9 @@ async function ciIsFailing(repoSlug: string, num: number): Promise<boolean> {
 // ---- graph-staleness nudges (doc 859) --------------------------------------
 // ZOE watches Zaal's active fronts and pings when one goes COLD in the graph
 // (no new episode in GRAPH_STALE_DAYS). Edit this list to change what she watches.
-const WATCH_TOPICS = ['ZAOstock', 'WaveWarZ', 'ZABAL Games', 'Brazil network', 'ZAO Festivals'];
+// 'farscout' watches the Farcaster research scout's own graph output - if it
+// goes cold (>GRAPH_STALE_DAYS with no new finding), the bot likely went down.
+const WATCH_TOPICS = ['ZAOstock', 'WaveWarZ', 'ZABAL Games', 'Brazil network', 'ZAO Festivals', 'farscout'];
 const GRAPH_STALE_DAYS = 10;
 
 /**

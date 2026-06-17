@@ -80,6 +80,7 @@ export const botFleet: BotRow[] = [
   { name: 'AttaBotty', handle: '@z_attabotty_bot', source: 'bot/src/teams/', status: 'decommissioned', board: 'Off — doc 601, fold into ZOE' },
   { name: 'Bonfire', handle: '@zabal_bonfire', source: 'bonfires.ai', status: 'external', board: 'Off-VPS (Bonfires platform)' },
   { name: 'DeepMeeting', handle: '@zdeepmeeting_bot', source: 'bonfires.ai', status: 'external', board: 'Off-VPS — group routing broken' },
+  { name: 'farscout', handle: 'Discord (DM + slash cmds)', source: 'github.com/bettercallzaal/farscout (cowork VPS 187.77.3.104)', status: 'live', board: 'Farcaster research scout — grounds findings in real sources, writes to ZABAL Bonfire (ZOE recalls via delve)' },
 ];
 
 export const controlPlane = {

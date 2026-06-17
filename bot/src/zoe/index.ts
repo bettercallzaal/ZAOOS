@@ -48,6 +48,7 @@ import { applyLearnProposal, type LearnProposal } from './learn';
 import { startScheduler } from './scheduler';
 import { disableNudges, enableNudges, nudgesEnabled } from './nudges';
 import { mirrorTurn, recall } from './recall';
+import { fanOutKnowledgeExtractors, EXTRACT_MIN_LEN } from './extractors';
 import {
   addAllowlistMember,
   getGroupConfig,
@@ -797,6 +798,20 @@ async function dispatchConcierge(
         }
       })
       .catch((e) => console.error('[zoe/index] bonfire mirror failed:', e));
+
+    // Knowledge extraction fan-out (doc 862): on substantive DMs, fan out 4
+    // Haiku readers that comb Zaal's message for people/projects/decisions/
+    // commitments and write graph-ready episodes. Silent, fire-and-forget,
+    // never blocks the reply. DMs only - group chatter does not seed Zaal's graph.
+    if (scope === 'private' && text.trim().length >= EXTRACT_MIN_LEN) {
+      fanOutKnowledgeExtractors(text, { cwd: repoDir })
+        .then((f) => {
+          if (f.written > 0) {
+            console.log(`[zoe/index] extract — ${f.written} episode(s), ${f.skipped} skipped`);
+          }
+        })
+        .catch((e) => console.error('[zoe/index] extract fan-out failed:', e));
+    }
 
     await pushRecent({ from: 'zoe', text: result.reply }, scope);
 

@@ -545,12 +545,15 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
   if (pending) {
     if (pending.kind === 'await-reflection') {
       // The next free-form DM is Zaal's reflection answer — UNLESS it's a
-      // command (plan:/note:/nudge toggle). A command is not a reflection
-      // answer, so let it fall through to normal handling and leave the
-      // reflection pending armed (it auto-expires via TTL). Fixes doc 770 H1:
-      // a `plan:` sent in the long reflection window was being swallowed and
-      // never dispatched.
-      if (!isZoeCommand(text)) {
+      // command (plan:/note:/nudge toggle) OR an agent-worthy request. A
+      // command is not a reflection answer; neither is "research X and draft
+      // Y" (that's a job to dispatch). Let those fall through to normal
+      // handling and leave the reflection pending armed (it auto-expires via
+      // TTL). Fixes doc 770 H1 (a `plan:` in the reflection window was
+      // swallowed) and the auto-decompose swallow (an agent request sent while
+      // an unanswered reflection was pending got logged as a reflection answer
+      // instead of spawning agents).
+      if (!isZoeCommand(text) && !shouldDecompose(text)) {
         await clearPending('private');
         await handleReflectionAnswer(ctx, text);
         return;
@@ -640,11 +643,17 @@ async function handlePrivateMessage(ctx: Context, text: string): Promise<void> {
   // Efficiency (doc 863): agent-worthy DMs auto-route to the decompose+approve
   // flow so Zaal never has to remember the `plan:` prefix. ZOE proposes a plan
   // and ASKS y/n - no agent spends until he approves. Plain questions + short
-  // messages stay inline (shouldDecompose filters them). Skipped while another
-  // approval is already pending, so we never clobber a waiting y/n.
-  if (shouldDecompose(text) && !getPending('private')) {
-    await handlePlanCommand(ctx, text, { autoDetected: true });
-    return;
+  // messages stay inline (shouldDecompose filters them). We never clobber a
+  // waiting y/n approval (plan/learn/reflexion/bonfire), but an unanswered
+  // evening reflection IS superseded - a fresh agent request means Zaal moved
+  // on, so we clear it and dispatch rather than swallow the request.
+  if (shouldDecompose(text)) {
+    const blocking = getPending('private');
+    if (!blocking || blocking.kind === 'await-reflection') {
+      if (blocking) await clearPending('private');
+      await handlePlanCommand(ctx, text, { autoDetected: true });
+      return;
+    }
   }
 
   await dispatchConcierge(ctx, text, 'private', 'Zaal');

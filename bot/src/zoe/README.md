@@ -97,6 +97,26 @@ Unconfigured groups log non-Zaal sender IDs to journal so Zaal can discover Tele
 | `ZOE_HARD_MODEL` | no | default `opus` |
 | `ZOE_QUICK_MODEL` | no | default `haiku` |
 
+## Turn model (doc 872 - effectiveness)
+
+ZOE runs on grammY's default `bot.start()`, which processes updates
+sequentially. A turn is a single Claude CLI call that can take 60s+, so three
+behaviours make her feel responsive instead of frozen:
+
+- **Live steering ("finish then apply").** `message:text` handlers run OFF the
+  poll loop (`turn-queue.ts`) so a follow-up message is *received* mid-turn
+  instead of blocking the whole bot. Same-chat turns run one-at-a-time in
+  arrival order; a deferred DM gets a one-line ack ("finishing what I'm on,
+  then I'll pick it up"). Different chats never block each other.
+- **Progress narration.** `startProgressNarration()` keeps the typing indicator
+  alive and sends up to two pings on a slow turn (ack at 6s, "still on it" at
+  28s). The plan/dispatch path also ticks each subtask as it finishes
+  (`onSubtaskDone` → `✓ st-N completed`).
+- **Non-blocking clarify.** The `<clarify_policy>` block in `concierge.ts` tells
+  ZOE to act on the most sensible interpretation and state the assumption,
+  rather than ending a turn with a bare question. She only stops to ask first
+  for costly/irreversible/external actions.
+
 ## Cost routing (Sprint 1 pattern from Hermes)
 
 - Default: Sonnet (cheap, fast, $0 marginal via Max plan)

@@ -135,9 +135,19 @@ export async function createSessionReminderProposal(authorId: string) {
   });
 }
 
+/**
+ * Decide whether an artist's win count promotes them to a NEW (higher) spotlight
+ * tier. Returns the highest tier they now qualify for that is strictly above
+ * their current tier, or null if no promotion (already at/above it, or below the
+ * lowest threshold). Never demotes.
+ *
+ * Tier ordering is derived from SPOTLIGHT_TIERS directly (single source of
+ * truth) so reordering or renaming a tier there cannot silently break this.
+ */
 export function getNewSpotlightTier(wins: number, currentTier: string | null): SpotlightTier | null {
-  const tierOrder: SpotlightTier[] = ['rising_star', 'veteran', 'legend'];
-  const currentIdx = currentTier ? tierOrder.indexOf(currentTier as SpotlightTier) : -1;
+  const currentIdx = currentTier
+    ? SPOTLIGHT_TIERS.findIndex((t) => t.tier === currentTier)
+    : -1;
 
   for (let i = SPOTLIGHT_TIERS.length - 1; i >= 0; i--) {
     const t = SPOTLIGHT_TIERS[i];

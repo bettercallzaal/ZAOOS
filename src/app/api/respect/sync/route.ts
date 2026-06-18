@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createPublicClient, http, parseAbi, formatEther } from 'viem';
+import { createPublicClient, http, parseAbi } from 'viem';
 import { optimism } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { communityConfig } from '@/../community.config';
+import { readMemberBalances } from '@/lib/respect/onchainBalances';
 import { logger } from '@/lib/logger';
 
 const { ogContract: OG_RESPECT, zorContract: ZOR_RESPECT, zorTokenId: ZOR_TOKEN_ID } =
@@ -79,41 +80,47 @@ export async function POST() {
     // 3. Update each member's onchain_og and onchain_zor in Supabase
     let syncedCount = 0;
     const errors: string[] = [];
+    const skipped: string[] = [];
 
-    const updates = walletsToSync.map((member, idx) => {
-      const ogResult = results[idx * 2];
-      const zorResult = results[idx * 2 + 1];
+    const updates = walletsToSync
+      .map((member, idx) => {
+        const balances = readMemberBalances(results[idx * 2], results[idx * 2 + 1]);
 
-      const ogRaw = ogResult.status === 'success' ? (ogResult.result as bigint) : BigInt(0);
-      const zorRaw = zorResult.status === 'success' ? (zorResult.result as bigint) : BigInt(0);
+        // A failed on-chain read must NOT be written as 0 - that would silently
+        // wipe the member's cached Respect. Skip them so their value is kept.
+        if (!balances.complete) {
+          skipped.push(`${member.name} (${balances.failed.join(',')} read failed)`);
+          return null;
+        }
 
-      // OG is ERC-20 with 18 decimals, ZOR is ERC-1155 (whole tokens)
-      // Store full precision — rounding happens at display layer only
-      const onchainOg = Number(formatEther(ogRaw));
-      const onchainZor = Number(zorRaw);
-
-      return supabaseAdmin
-        .from('respect_members')
-        .update({
-          onchain_og: onchainOg,
-          onchain_zor: onchainZor,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', member.id)
-        .then(({ error: updateErr }) => {
-          if (updateErr) {
-            errors.push(`${member.name}: ${updateErr.message}`);
-          } else {
-            syncedCount++;
-          }
-        });
-    });
+        return supabaseAdmin
+          .from('respect_members')
+          .update({
+            onchain_og: balances.onchainOg,
+            onchain_zor: balances.onchainZor,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', member.id)
+          .then(({ error: updateErr }) => {
+            if (updateErr) {
+              errors.push(`${member.name}: ${updateErr.message}`);
+            } else {
+              syncedCount++;
+            }
+          });
+      })
+      .filter((u): u is NonNullable<typeof u> => u !== null);
 
     await Promise.allSettled(updates);
+
+    if (skipped.length > 0) {
+      logger.warn(`[respect-sync] skipped ${skipped.length} members with failed balance reads`);
+    }
 
     return NextResponse.json({
       synced: syncedCount,
       total: walletsToSync.length,
+      skipped: skipped.length > 0 ? skipped : undefined,
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (err) {

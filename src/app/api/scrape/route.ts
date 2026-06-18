@@ -6,6 +6,7 @@ import {
   scrapeContent,
   scrapeWaveWarzBattles,
   scrapeBczFarcasterHistory,
+  scrapeBczSite,
   scrapeXUserTimeline,
   scrapeFarcasterHistoryByUsername,
 } from '@/lib/scrape';
@@ -22,6 +23,7 @@ import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
  *   ?wavewarzBattles=1[&maxPages=N]       -> battle history (paginated)
  *   ?farcasterFid=<fid>[&maxPages=N]      -> full Farcaster post history (Neynar)
  *   ?farcasterUser=<username>[&maxPages=N] -> resolve username, then full history
+ *   ?bczSite=1                            -> bettercallzaal.com profile + links
  *
  * No arbitrary-host fetching: the X path only ever calls api.fxtwitter.com /
  * syndication for a parsed tweet id, and the others hit fixed known hosts.
@@ -34,6 +36,7 @@ const QuerySchema = z
     wavewarzBattles: z.string().optional(),
     farcasterFid: z.coerce.number().int().positive().optional(),
     farcasterUser: z.string().min(1).max(64).optional(),
+    bczSite: z.string().optional(),
     maxPages: z.coerce.number().int().positive().max(500).optional(),
     cache: z.string().optional(),
   })
@@ -45,11 +48,12 @@ const QuerySchema = z
           q.wavewarzArtist ||
           q.wavewarzBattles ||
           q.farcasterFid ||
-          q.farcasterUser,
+          q.farcasterUser ||
+          q.bczSite,
       ),
     {
       message:
-        'one of url, xUser, wavewarzArtist, wavewarzBattles, farcasterFid, farcasterUser is required',
+        'one of url, xUser, wavewarzArtist, wavewarzBattles, farcasterFid, farcasterUser, bczSite is required',
     },
   );
 
@@ -132,6 +136,12 @@ export async function GET(req: NextRequest) {
       });
       const cached = await persist('farcaster', String(history.fid), history);
       return NextResponse.json({ source: 'farcaster', cached, username: q.farcasterUser, ...history });
+    }
+
+    if (q.bczSite) {
+      const site = await scrapeBczSite();
+      const cached = await persist('x', 'bcz-site', site);
+      return NextResponse.json({ source: 'bcz-site', cached, data: site });
     }
 
     return NextResponse.json({ error: 'no target supplied' }, { status: 400 });

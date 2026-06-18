@@ -13,6 +13,7 @@
  */
 
 export * from './x-fetch';
+export * from './x-timeline';
 export * from './bcz-history';
 export * from './wavewarz';
 export * from './wavewarz-battles';

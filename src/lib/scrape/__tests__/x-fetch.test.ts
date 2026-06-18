@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest';
 import { parseTweetId, fetchXContent, XFetchError, type FetchImpl } from '../x-fetch';
 

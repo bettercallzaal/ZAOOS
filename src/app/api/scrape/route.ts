@@ -7,6 +7,7 @@ import {
   scrapeWaveWarzBattles,
   scrapeBczFarcasterHistory,
   scrapeXUserTimeline,
+  scrapeFarcasterHistoryByUsername,
 } from '@/lib/scrape';
 import { cacheScrape, type ScrapeCacheSource } from '@/lib/scrape/persist';
 import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
@@ -20,6 +21,7 @@ import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
  *   ?wavewarzArtist=<solana wallet>       -> artist battle stats
  *   ?wavewarzBattles=1[&maxPages=N]       -> battle history (paginated)
  *   ?farcasterFid=<fid>[&maxPages=N]      -> full Farcaster post history (Neynar)
+ *   ?farcasterUser=<username>[&maxPages=N] -> resolve username, then full history
  *
  * No arbitrary-host fetching: the X path only ever calls api.fxtwitter.com /
  * syndication for a parsed tweet id, and the others hit fixed known hosts.
@@ -31,12 +33,24 @@ const QuerySchema = z
     wavewarzArtist: z.string().min(1).optional(),
     wavewarzBattles: z.string().optional(),
     farcasterFid: z.coerce.number().int().positive().optional(),
+    farcasterUser: z.string().min(1).max(64).optional(),
     maxPages: z.coerce.number().int().positive().max(500).optional(),
     cache: z.string().optional(),
   })
   .refine(
-    (q) => Boolean(q.url || q.xUser || q.wavewarzArtist || q.wavewarzBattles || q.farcasterFid),
-    { message: 'one of url, xUser, wavewarzArtist, wavewarzBattles, farcasterFid is required' },
+    (q) =>
+      Boolean(
+        q.url ||
+          q.xUser ||
+          q.wavewarzArtist ||
+          q.wavewarzBattles ||
+          q.farcasterFid ||
+          q.farcasterUser,
+      ),
+    {
+      message:
+        'one of url, xUser, wavewarzArtist, wavewarzBattles, farcasterFid, farcasterUser is required',
+    },
   );
 
 export async function GET(req: NextRequest) {
@@ -105,6 +119,19 @@ export async function GET(req: NextRequest) {
       });
       const cached = await persist('farcaster', String(q.farcasterFid), history);
       return NextResponse.json({ source: 'farcaster', cached, ...history });
+    }
+
+    if (q.farcasterUser) {
+      const apiKey = process.env.NEYNAR_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json({ error: 'NEYNAR_API_KEY not configured' }, { status: 500 });
+      }
+      const history = await scrapeFarcasterHistoryByUsername(q.farcasterUser, {
+        apiKey,
+        maxPages: q.maxPages,
+      });
+      const cached = await persist('farcaster', String(history.fid), history);
+      return NextResponse.json({ source: 'farcaster', cached, username: q.farcasterUser, ...history });
     }
 
     return NextResponse.json({ error: 'no target supplied' }, { status: 400 });

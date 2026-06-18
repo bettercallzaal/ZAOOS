@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createPublicClient, http, parseAbi, formatEther } from 'viem';
+import { createPublicClient, http, parseAbi } from 'viem';
 import { optimism } from 'viem/chains';
 import { getSessionData } from '@/lib/auth/session';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { createInAppNotification } from '@/lib/notifications';
 import { proposalVoteSchema } from '@/lib/validation/schemas';
+import { computeRespectWeight } from '@/lib/respect/voteWeight';
 import { logger } from '@/lib/logger';
 
 const OG_RESPECT = '0x34cE89baA7E4a4B00E17F7E4C0cb97105C216957' as const;
@@ -86,9 +87,18 @@ export async function POST(req: NextRequest) {
         ],
       });
 
-      const og = ogBalance.status === 'success' ? Number(formatEther(ogBalance.result as bigint)) : 0;
-      const zor = zorBalance.status === 'success' ? Number(zorBalance.result as bigint) : 0;
-      respectWeight = Math.round(og + zor);
+      const computed = computeRespectWeight(ogBalance, zorBalance);
+      // A failed on-chain read previously became 0, silently undercounting the
+      // vote. Refuse to record a vote with an incomplete balance read - ask the
+      // voter to retry rather than store a corrupted weight.
+      if (!computed.complete) {
+        logger.error(`[vote] respect balance read failed (${computed.failed.join(',')}) for ${wallet}`);
+        return NextResponse.json(
+          { error: 'Could not read your on-chain Respect balance. Please try again.' },
+          { status: 503 },
+        );
+      }
+      respectWeight = computed.weight;
     }
 
     // Upsert vote (allows changing vote)

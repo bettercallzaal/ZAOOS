@@ -5,8 +5,10 @@ import { join } from 'node:path';
 import {
   parseWaveWarzBattlesPage,
   scrapeWaveWarzBattles,
+  httpBattlesPageFetcher,
   type FetchBattlesPage,
 } from '../wavewarz-battles';
+import type { FetchImpl } from '../x-fetch';
 
 const fixture = readFileSync(join(__dirname, 'wavewarz-battles-fixture.txt'), 'utf-8');
 
@@ -75,5 +77,31 @@ describe('scrapeWaveWarzBattles', () => {
     const { truncated, pagesFetched } = await scrapeWaveWarzBattles({ fetchPage, maxPages: 3 });
     expect(pagesFetched).toBe(3);
     expect(truncated).toBe(true);
+  });
+});
+
+describe('httpBattlesPageFetcher retry', () => {
+  it('retries a transient 503 then succeeds', async () => {
+    let calls = 0;
+    const fetchImpl = (async () => {
+      calls += 1;
+      if (calls === 1) return { ok: false, status: 503 } as Response;
+      return { ok: true, status: 200, text: async () => '{"battle_id":7}' } as Response;
+    }) as unknown as FetchImpl;
+    const fetchPage = httpBattlesPageFetcher(fetchImpl);
+    const html = await fetchPage(1);
+    expect(calls).toBe(2);
+    expect(parseWaveWarzBattlesPage(html)[0].battleId).toBe(7);
+  });
+
+  it('does not retry a permanent 404', async () => {
+    let calls = 0;
+    const fetchImpl = (async () => {
+      calls += 1;
+      return { ok: false, status: 404 } as Response;
+    }) as unknown as FetchImpl;
+    const fetchPage = httpBattlesPageFetcher(fetchImpl);
+    await expect(fetchPage(1)).rejects.toThrow(/404/);
+    expect(calls).toBe(1);
   });
 });

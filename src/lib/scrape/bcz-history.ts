@@ -15,6 +15,7 @@
  */
 
 import { z } from 'zod';
+import { withRetry, isRetryableHttpError } from './retry';
 
 /** A single Farcaster cast in a Neynar feed page (subset we read). */
 const RawCastSchema = z
@@ -118,19 +119,23 @@ export function neynarCastPageFetcher(
   apiKey: string,
   fetchImpl: typeof fetch = fetch,
 ): FetchCastPage {
-  return async (cursor: string | null): Promise<CastPage> => {
-    const params = new URLSearchParams({ fid: String(fid), limit: '100' });
-    if (cursor) params.set('cursor', cursor);
-    const res = await fetchImpl(`${NEYNAR_BASE}/feed/user/casts?${params}`, {
-      headers: { 'x-api-key': apiKey, Accept: 'application/json' },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!res.ok) {
-      throw new BczScrapeError(`Neynar casts error ${res.status} for fid ${fid}`);
-    }
-    const data = (await res.json()) as { casts?: unknown[]; next?: { cursor?: string | null } };
-    return { casts: data.casts ?? [], nextCursor: data.next?.cursor ?? null };
-  };
+  return (cursor: string | null): Promise<CastPage> =>
+    withRetry(
+      async () => {
+        const params = new URLSearchParams({ fid: String(fid), limit: '100' });
+        if (cursor) params.set('cursor', cursor);
+        const res = await fetchImpl(`${NEYNAR_BASE}/feed/user/casts?${params}`, {
+          headers: { 'x-api-key': apiKey, Accept: 'application/json' },
+          signal: AbortSignal.timeout(10000),
+        });
+        if (!res.ok) {
+          throw new BczScrapeError(`Neynar casts error ${res.status} for fid ${fid}`);
+        }
+        const data = (await res.json()) as { casts?: unknown[]; next?: { cursor?: string | null } };
+        return { casts: data.casts ?? [], nextCursor: data.next?.cursor ?? null };
+      },
+      { shouldRetry: isRetryableHttpError },
+    );
 }
 
 /**

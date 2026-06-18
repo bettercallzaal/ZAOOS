@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod';
+import { withRetry, isRetryableHttpError } from './retry';
 
 const INTELLIGENCE_BASE = 'https://wavewarz-intelligence.vercel.app';
 
@@ -159,17 +160,21 @@ export function parseWaveWarzBattlesPage(html: string): WaveWarzBattle[] {
 export type FetchBattlesPage = (page: number) => Promise<string>;
 
 export function httpBattlesPageFetcher(fetchImpl: typeof fetch = fetch): FetchBattlesPage {
-  return async (page: number): Promise<string> => {
-    const url = page <= 1 ? `${INTELLIGENCE_BASE}/battles` : `${INTELLIGENCE_BASE}/battles?page=${page}`;
-    const res = await fetchImpl(url, {
-      headers: { 'User-Agent': 'ZAO-OS-Sync/1.0' },
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) {
-      throw new WaveWarzBattlesError(`/battles page ${page} returned HTTP ${res.status}`);
-    }
-    return res.text();
-  };
+  return (page: number): Promise<string> =>
+    withRetry(
+      async () => {
+        const url = page <= 1 ? `${INTELLIGENCE_BASE}/battles` : `${INTELLIGENCE_BASE}/battles?page=${page}`;
+        const res = await fetchImpl(url, {
+          headers: { 'User-Agent': 'ZAO-OS-Sync/1.0' },
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!res.ok) {
+          throw new WaveWarzBattlesError(`/battles page ${page} returned HTTP ${res.status}`);
+        }
+        return res.text();
+      },
+      { shouldRetry: isRetryableHttpError },
+    );
 }
 
 /**

@@ -1,7 +1,9 @@
 // Structured content for the /overview project dashboard.
 // Hand-maintained snapshot — update as the repo evolves. Sources: CLAUDE.md
 // Project Map, bot/REGISTRY.md, the .claude/skills catalog, and the bot audit.
-// Last refreshed: 2026-06-08.
+// The Bots tab overlays LIVE status from the cowork board (GET /api/bots/status)
+// on top of these rows, matched by `coworkId`.
+// Last refreshed: 2026-06-18.
 
 export interface RepoArea {
   area: string;
@@ -69,15 +71,15 @@ export interface BotRow {
   source: string;
   status: BotStatus;
   board: string;
+  /** Identity on the cowork heartbeat board, for overlaying live status. */
+  coworkId?: string;
 }
 
 export const botFleet: BotRow[] = [
-  { name: 'ZOE', handle: '@zaoclaw_bot', source: 'bot/src/zoe/', status: 'live', board: 'On board — full ask / run_task / lifecycle' },
-  { name: 'ZAO Devz', handle: '@zaodevz_bot', source: 'bot/src/devz/', status: 'live', board: 'On board — lifecycle' },
-  { name: 'Hermes', handle: '@zoe_hermes_bot', source: 'bot/src/hermes/ (in zao-devz-stack)', status: 'pending', board: 'Wired — needs token + Vercel redeploy' },
-  { name: 'ZAOstock', handle: '@ZAOstockTeamBot', source: 'bot/src/index.ts', status: 'live', board: 'On board — lifecycle (graduating)' },
-  { name: 'Magnetiq', handle: '@zao_magnetiq_bot', source: 'bot/src/teams/', status: 'decommissioned', board: 'Off — doc 601, fold into ZOE' },
-  { name: 'AttaBotty', handle: '@z_attabotty_bot', source: 'bot/src/teams/', status: 'decommissioned', board: 'Off — doc 601, fold into ZOE' },
+  { name: 'ZOE', handle: '@zaoclaw_bot', source: 'bot/src/zoe/', status: 'live', board: 'On board — full ask / run_task / lifecycle', coworkId: 'zoe' },
+  { name: 'ZAO Devz', handle: '@zaodevz_bot', source: 'bot/src/devz/', status: 'live', board: 'On board — lifecycle', coworkId: 'zao-devz' },
+  { name: 'Hermes', handle: '@zoe_hermes_bot', source: 'bot/src/hermes/ (in zao-devz-stack)', status: 'pending', board: 'Wired — needs token + Vercel redeploy', coworkId: 'hermes' },
+  { name: 'ZAOstock', handle: '@ZAOstockTeamBot', source: 'bot/src/index.ts', status: 'live', board: 'On board — lifecycle (graduating). Digests/alerts now DM Zaal, not the group', coworkId: 'zaostock' },
   { name: 'Bonfire', handle: '@zabal_bonfire', source: 'bonfires.ai', status: 'external', board: 'Off-VPS (Bonfires platform)' },
   { name: 'DeepMeeting', handle: '@zdeepmeeting_bot', source: 'bonfires.ai', status: 'external', board: 'Off-VPS — group routing broken' },
   { name: 'farscout', handle: 'Discord (DM + slash cmds)', source: 'github.com/bettercallzaal/farscout (cowork VPS 187.77.3.104)', status: 'live', board: 'Farcaster research scout — grounds findings in real sources, writes to ZABAL Bonfire (ZOE recalls via delve)' },
@@ -188,13 +190,6 @@ export const improvements: Improvement[] = [
     detail:
       'Hermes heartbeat code is wired (separate identity) but its token isn’t in the cowork COWORK_BOT_TOKENS env. Add hermes= token + redeploy + restart zao-devz-stack. Blocked on the Vercel daily-deploy cap.',
     effort: '~10min',
-  },
-  {
-    priority: 'P2',
-    title: 'Decommissioned code lingering',
-    detail:
-      'Magnetiq/AttaBotty (bot/src/teams/) is decommissioned per doc 601 but still in the tree. Archive or delete. (FISHBOWLZ has been removed from ZAOOS — it now lives standalone at fishbowlz.com.)',
-    effort: '1–2h',
   },
   {
     priority: 'P2',

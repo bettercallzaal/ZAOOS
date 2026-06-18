@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   repoMap,
   botFleet,
@@ -8,9 +8,36 @@ import {
   tooling,
   toolingNote,
   improvements,
+  type BotRow,
   type BotStatus,
   type Priority,
 } from './data';
+
+interface LiveBot {
+  bot: string;
+  status: 'up' | 'degraded' | 'down';
+  online: boolean;
+  ageSeconds: number;
+  meta?: Record<string, unknown>;
+}
+
+interface FleetStatus {
+  configured: boolean;
+  fetchedAt: string;
+  bots: LiveBot[];
+  error?: string;
+}
+
+function normalizeId(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+function formatAge(seconds: number): string {
+  if (seconds < 90) return `${Math.round(seconds)}s ago`;
+  if (seconds < 5400) return `${Math.round(seconds / 60)}m ago`;
+  if (seconds < 129_600) return `${Math.round(seconds / 3600)}h ago`;
+  return `${Math.round(seconds / 86_400)}d ago`;
+}
 
 type Tab = 'repo' | 'bots' | 'tooling' | 'fixes';
 
@@ -113,7 +140,64 @@ function RepoMap() {
   );
 }
 
+function LiveDot({ online }: { online: boolean }) {
+  return (
+    <span
+      className={`inline-block h-2 w-2 shrink-0 rounded-full ${
+        online ? 'bg-green-400 shadow-[0_0_6px] shadow-green-400/60' : 'bg-red-400'
+      }`}
+      aria-hidden
+    />
+  );
+}
+
+function LiveHeader({ status, loading }: { status: FleetStatus | null; loading: boolean }) {
+  if (loading) return <span className="text-[11px] text-white/40">checking live status…</span>;
+  if (!status) return null;
+  if (!status.configured)
+    return (
+      <span className="text-[11px] text-white/40">
+        live status not wired — set <code>COWORK_API_URL</code> + <code>COWORK_BOT_TOKEN</code>
+      </span>
+    );
+  if (status.error)
+    return <span className="text-[11px] text-red-400/80">live: {status.error}</span>;
+  const onlineCount = status.bots.filter((b) => b.online).length;
+  return (
+    <span className="text-[11px] text-white/40">
+      live · {onlineCount}/{status.bots.length} online · updated{' '}
+      {new Date(status.fetchedAt).toLocaleTimeString()}
+    </span>
+  );
+}
+
 function Bots() {
+  const [live, setLive] = useState<FleetStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/bots/status')
+      .then((r) => r.json() as Promise<FleetStatus>)
+      .then((d) => {
+        if (!cancelled) setLive(d);
+      })
+      .catch(() => {
+        if (!cancelled) setLive({ configured: false, fetchedAt: '', bots: [] });
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const liveById = new Map<string, LiveBot>();
+  for (const b of live?.bots ?? []) liveById.set(normalizeId(b.bot), b);
+  const liveFor = (row: BotRow): LiveBot | undefined =>
+    row.coworkId ? liveById.get(normalizeId(row.coworkId)) : undefined;
+
   return (
     <div className="space-y-5">
       <section>
@@ -137,22 +221,38 @@ function Bots() {
       </section>
 
       <section>
-        <h2 className="mb-2 text-sm font-semibold text-[#f5a623]">Fleet</h2>
+        <div className="mb-2 flex items-baseline justify-between gap-3">
+          <h2 className="text-sm font-semibold text-[#f5a623]">Fleet</h2>
+          <LiveHeader status={live} loading={loading} />
+        </div>
         <Card>
           <ul className="divide-y divide-white/5">
-            {botFleet.map((b) => (
-              <li key={b.name} className="flex items-start justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-medium">{b.name}</span>
-                    <code className="text-xs text-white/40">{b.handle}</code>
+            {botFleet.map((b) => {
+              const l = liveFor(b);
+              const task = l?.meta?.current_task;
+              const uptime = l?.meta?.uptime;
+              return (
+                <li key={b.name} className="flex items-start justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {l && <LiveDot online={l.online} />}
+                      <span className="text-sm font-medium">{b.name}</span>
+                      <code className="text-xs text-white/40">{b.handle}</code>
+                    </div>
+                    <p className="mt-0.5 text-xs text-white/60">{b.board}</p>
+                    {l && (
+                      <p className="mt-0.5 text-[11px] text-white/50">
+                        {l.online ? 'online' : 'offline'} · seen {formatAge(l.ageSeconds)}
+                        {typeof uptime === 'string' || typeof uptime === 'number' ? ` · up ${uptime}` : ''}
+                        {typeof task === 'string' && task ? ` · ${task}` : ''}
+                      </p>
+                    )}
+                    <code className="text-[11px] text-white/30">{b.source}</code>
                   </div>
-                  <p className="mt-0.5 text-xs text-white/60">{b.board}</p>
-                  <code className="text-[11px] text-white/30">{b.source}</code>
-                </div>
-                <Badge label={b.status} className={BOT_STATUS_STYLE[b.status]} />
-              </li>
-            ))}
+                  <Badge label={b.status} className={BOT_STATUS_STYLE[b.status]} />
+                </li>
+              );
+            })}
           </ul>
         </Card>
       </section>

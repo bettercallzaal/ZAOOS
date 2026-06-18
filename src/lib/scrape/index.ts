@@ -14,6 +14,7 @@
 
 export * from './x-fetch';
 export * from './bcz-history';
+export * from './bcz-site';
 export * from './wavewarz';
 export * from './wavewarz-battles';
 

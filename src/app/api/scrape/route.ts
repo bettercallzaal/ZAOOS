@@ -6,6 +6,7 @@ import {
   scrapeContent,
   scrapeWaveWarzBattles,
   scrapeBczFarcasterHistory,
+  scrapeBczSite,
 } from '@/lib/scrape';
 import { cacheScrape, type ScrapeCacheSource } from '@/lib/scrape/persist';
 import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
@@ -18,6 +19,7 @@ import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
  *   ?wavewarzArtist=<solana wallet>       -> artist battle stats
  *   ?wavewarzBattles=1[&maxPages=N]       -> battle history (paginated)
  *   ?farcasterFid=<fid>[&maxPages=N]      -> full Farcaster post history (Neynar)
+ *   ?bczSite=1                            -> bettercallzaal.com profile + links
  *
  * No arbitrary-host fetching: the X path only ever calls api.fxtwitter.com /
  * syndication for a parsed tweet id, and the others hit fixed known hosts.
@@ -28,12 +30,13 @@ const QuerySchema = z
     wavewarzArtist: z.string().min(1).optional(),
     wavewarzBattles: z.string().optional(),
     farcasterFid: z.coerce.number().int().positive().optional(),
+    bczSite: z.string().optional(),
     maxPages: z.coerce.number().int().positive().max(500).optional(),
     cache: z.string().optional(),
   })
   .refine(
-    (q) => Boolean(q.url || q.wavewarzArtist || q.wavewarzBattles || q.farcasterFid),
-    { message: 'one of url, wavewarzArtist, wavewarzBattles, farcasterFid is required' },
+    (q) => Boolean(q.url || q.wavewarzArtist || q.wavewarzBattles || q.farcasterFid || q.bczSite),
+    { message: 'one of url, wavewarzArtist, wavewarzBattles, farcasterFid, bczSite is required' },
   );
 
 export async function GET(req: NextRequest) {
@@ -96,6 +99,12 @@ export async function GET(req: NextRequest) {
       });
       const cached = await persist('farcaster', String(q.farcasterFid), history);
       return NextResponse.json({ source: 'farcaster', cached, ...history });
+    }
+
+    if (q.bczSite) {
+      const site = await scrapeBczSite();
+      const cached = await persist('x', 'bcz-site', site);
+      return NextResponse.json({ source: 'bcz-site', cached, data: site });
     }
 
     return NextResponse.json({ error: 'no target supplied' }, { status: 400 });

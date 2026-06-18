@@ -1,4 +1,6 @@
 import { INTELLIGENCE_BASE } from './constants';
+import { parseWaveWarzArtistPage } from '@/lib/scrape/wavewarz';
+import { logger } from '@/lib/logger';
 
 export interface ArtistStats {
   name: string;
@@ -13,7 +15,13 @@ export interface ArtistStats {
 
 /**
  * Fetch and parse an artist's stats from WaveWarZ Intelligence.
- * The page is a Next.js SSR page — stats are in the initial HTML payload.
+ *
+ * The Intelligence site is an App-Router (RSC) Next.js app with no public JSON
+ * API; stats live in the React flight payload. Parsing is delegated to
+ * src/lib/scrape/wavewarz.ts, which extracts the values from the flight tree and
+ * validates them with Zod. Unlike the previous regex (which silently returned 0
+ * for every artist), a parse failure is logged with a reason and returns null so
+ * the caller can count it as failed rather than store bad zeros.
  */
 export async function scrapeArtistStats(wallet: string): Promise<ArtistStats | null> {
   try {
@@ -21,35 +29,32 @@ export async function scrapeArtistStats(wallet: string): Promise<ArtistStats | n
       headers: { 'User-Agent': 'ZAO-OS-Sync/1.0' },
       signal: AbortSignal.timeout(10000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      logger.warn(`[wavewarz-scraper] ${wallet} returned HTTP ${res.status}`);
+      return null;
+    }
 
     const html = await res.text();
+    const result = parseWaveWarzArtistPage(html, wallet);
+    if (!result.ok) {
+      logger.warn(`[wavewarz-scraper] ${wallet} parse failed: ${result.reason}`);
+      return null;
+    }
 
-    // Extract artist name from page title or heading
-    const nameMatch = html.match(/<(?:h1|h2|title)[^>]*>([^<]+)/i);
-    const name = nameMatch?.[1]?.replace(/ \| WaveWarZ.*/, '').trim() || 'Unknown';
-
-    // Parse stats from Next.js hydration payload or visible text
-    const winsMatch = html.match(/(?:Wins|wins)[:\s]*(\d+)/);
-    const lossesMatch = html.match(/(?:Losses|losses)[:\s]*(\d+)/);
-    const volumeMatch = html.match(/(?:Total Volume|volume)[:\s]*([\d.]+)\s*SOL/i);
-    const earningsMatch = html.match(/(?:Career Earnings|earnings)[:\s]*([\d.]+)\s*SOL/i);
-
-    const wins = winsMatch ? parseInt(winsMatch[1], 10) : 0;
-    const losses = lossesMatch ? parseInt(lossesMatch[1], 10) : 0;
-
+    const { name, wins, losses, battlesCount, totalVolumeSol, careerEarningsSol } = result.data;
     return {
       name,
       wallet,
       wins,
       losses,
-      battlesCount: wins + losses,
-      totalVolumeSol: volumeMatch ? parseFloat(volumeMatch[1]) : 0,
-      careerEarningsSol: earningsMatch ? parseFloat(earningsMatch[1]) : 0,
+      battlesCount,
+      totalVolumeSol,
+      careerEarningsSol,
       lastBattleId: null,
     };
-  } catch (err) {
-    console.error(`[wavewarz-scraper] Failed to scrape ${wallet}:`, err);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'unknown error';
+    logger.error(`[wavewarz-scraper] Failed to scrape ${wallet}: ${message}`);
     return null;
   }
 }

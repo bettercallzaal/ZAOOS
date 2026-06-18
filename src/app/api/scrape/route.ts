@@ -6,6 +6,7 @@ import {
   scrapeContent,
   scrapeWaveWarzBattles,
   scrapeBczFarcasterHistory,
+  scrapeXUserTimeline,
   scrapeFarcasterHistoryByUsername,
 } from '@/lib/scrape';
 import { cacheScrape, type ScrapeCacheSource } from '@/lib/scrape/persist';
@@ -16,6 +17,7 @@ import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
  *
  * Exactly one target must be supplied:
  *   ?url=<x tweet/article url or id>      -> full tweet / X Article body (FxTwitter)
+ *   ?xUser=<handle>                       -> recent X timeline (~100 tweets, no login)
  *   ?wavewarzArtist=<solana wallet>       -> artist battle stats
  *   ?wavewarzBattles=1[&maxPages=N]       -> battle history (paginated)
  *   ?farcasterFid=<fid>[&maxPages=N]      -> full Farcaster post history (Neynar)
@@ -27,6 +29,7 @@ import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
 const QuerySchema = z
   .object({
     url: z.string().min(1).optional(),
+    xUser: z.string().min(1).max(64).optional(),
     wavewarzArtist: z.string().min(1).optional(),
     wavewarzBattles: z.string().optional(),
     farcasterFid: z.coerce.number().int().positive().optional(),
@@ -36,8 +39,18 @@ const QuerySchema = z
   })
   .refine(
     (q) =>
-      Boolean(q.url || q.wavewarzArtist || q.wavewarzBattles || q.farcasterFid || q.farcasterUser),
-    { message: 'one of url, wavewarzArtist, wavewarzBattles, farcasterFid, farcasterUser is required' },
+      Boolean(
+        q.url ||
+          q.xUser ||
+          q.wavewarzArtist ||
+          q.wavewarzBattles ||
+          q.farcasterFid ||
+          q.farcasterUser,
+      ),
+    {
+      message:
+        'one of url, xUser, wavewarzArtist, wavewarzBattles, farcasterFid, farcasterUser is required',
+    },
   );
 
 export async function GET(req: NextRequest) {
@@ -72,6 +85,12 @@ export async function GET(req: NextRequest) {
       }
       const cached = await persist('x', result.data.id, result.data);
       return NextResponse.json({ source: 'x', cached, data: result.data });
+    }
+
+    if (q.xUser) {
+      const timeline = await scrapeXUserTimeline(q.xUser);
+      const cached = await persist('x', `timeline:${timeline.handle}`, timeline);
+      return NextResponse.json({ source: 'x-timeline', cached, ...timeline });
     }
 
     if (q.wavewarzArtist) {

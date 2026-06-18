@@ -113,6 +113,36 @@ export async function paginateCasts(
 
 const NEYNAR_BASE = 'https://api.neynar.com/v2/farcaster';
 
+/**
+ * Resolve a Farcaster username (e.g. "bettercallzaal") to its fid via Neynar.
+ * Returns null when the username does not exist. Throws BczScrapeError on a
+ * transport/HTTP failure (after retry) so the caller can distinguish "no such
+ * user" from "lookup failed".
+ */
+export async function resolveFarcasterFid(
+  username: string,
+  apiKey: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<number | null> {
+  const handle = username.trim().replace(/^@/, '');
+  if (!handle) return null;
+  return withRetry(
+    async () => {
+      const res = await fetchImpl(
+        `${NEYNAR_BASE}/user/by_username?username=${encodeURIComponent(handle)}`,
+        { headers: { 'x-api-key': apiKey, Accept: 'application/json' }, signal: AbortSignal.timeout(10000) },
+      );
+      if (res.status === 404) return null;
+      if (!res.ok) {
+        throw new BczScrapeError(`Neynar username lookup error ${res.status} for ${handle}`);
+      }
+      const data = (await res.json()) as { user?: { fid?: number } };
+      return typeof data.user?.fid === 'number' ? data.user.fid : null;
+    },
+    { shouldRetry: isRetryableHttpError },
+  );
+}
+
 /** Build a Neynar-backed page fetcher for a fid. Injectable fetch for tests. */
 export function neynarCastPageFetcher(
   fid: number,
@@ -160,4 +190,24 @@ export async function scrapeBczFarcasterHistory(
   }
   const { casts, truncated } = await paginateCasts(fetchPage, { maxPages: opts.maxPages });
   return { fid, total: casts.length, casts, truncated };
+}
+
+/**
+ * Resolve a Farcaster username to a fid and scrape its full post history in one
+ * call (e.g. scrapeFarcasterHistoryByUsername('bettercallzaal', { apiKey })).
+ * Throws BczScrapeError when the username cannot be resolved.
+ */
+export async function scrapeFarcasterHistoryByUsername(
+  username: string,
+  opts: { apiKey: string; fetchImpl?: typeof fetch; maxPages?: number },
+): Promise<BczHistory> {
+  const fid = await resolveFarcasterFid(username, opts.apiKey, opts.fetchImpl);
+  if (fid === null) {
+    throw new BczScrapeError(`Could not resolve Farcaster username: ${username}`);
+  }
+  return scrapeBczFarcasterHistory(fid, {
+    apiKey: opts.apiKey,
+    fetchImpl: opts.fetchImpl,
+    maxPages: opts.maxPages,
+  });
 }

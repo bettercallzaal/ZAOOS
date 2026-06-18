@@ -7,6 +7,8 @@ import {
   scrapeWaveWarzBattles,
   scrapeBczFarcasterHistory,
   scrapeBczSite,
+  scrapeXUserTimeline,
+  scrapeFarcasterHistoryByUsername,
 } from '@/lib/scrape';
 import { cacheScrape, type ScrapeCacheSource } from '@/lib/scrape/persist';
 import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
@@ -16,9 +18,11 @@ import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
  *
  * Exactly one target must be supplied:
  *   ?url=<x tweet/article url or id>      -> full tweet / X Article body (FxTwitter)
+ *   ?xUser=<handle>                       -> recent X timeline (~100 tweets, no login)
  *   ?wavewarzArtist=<solana wallet>       -> artist battle stats
  *   ?wavewarzBattles=1[&maxPages=N]       -> battle history (paginated)
  *   ?farcasterFid=<fid>[&maxPages=N]      -> full Farcaster post history (Neynar)
+ *   ?farcasterUser=<username>[&maxPages=N] -> resolve username, then full history
  *   ?bczSite=1                            -> bettercallzaal.com profile + links
  *
  * No arbitrary-host fetching: the X path only ever calls api.fxtwitter.com /
@@ -27,16 +31,30 @@ import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
 const QuerySchema = z
   .object({
     url: z.string().min(1).optional(),
+    xUser: z.string().min(1).max(64).optional(),
     wavewarzArtist: z.string().min(1).optional(),
     wavewarzBattles: z.string().optional(),
     farcasterFid: z.coerce.number().int().positive().optional(),
+    farcasterUser: z.string().min(1).max(64).optional(),
     bczSite: z.string().optional(),
     maxPages: z.coerce.number().int().positive().max(500).optional(),
     cache: z.string().optional(),
   })
   .refine(
-    (q) => Boolean(q.url || q.wavewarzArtist || q.wavewarzBattles || q.farcasterFid || q.bczSite),
-    { message: 'one of url, wavewarzArtist, wavewarzBattles, farcasterFid, bczSite is required' },
+    (q) =>
+      Boolean(
+        q.url ||
+          q.xUser ||
+          q.wavewarzArtist ||
+          q.wavewarzBattles ||
+          q.farcasterFid ||
+          q.farcasterUser ||
+          q.bczSite,
+      ),
+    {
+      message:
+        'one of url, xUser, wavewarzArtist, wavewarzBattles, farcasterFid, farcasterUser, bczSite is required',
+    },
   );
 
 export async function GET(req: NextRequest) {
@@ -73,6 +91,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ source: 'x', cached, data: result.data });
     }
 
+    if (q.xUser) {
+      const timeline = await scrapeXUserTimeline(q.xUser);
+      const cached = await persist('x', `timeline:${timeline.handle}`, timeline);
+      return NextResponse.json({ source: 'x-timeline', cached, ...timeline });
+    }
+
     if (q.wavewarzArtist) {
       const stats = await scrapeArtistStats(q.wavewarzArtist);
       if (!stats) {
@@ -99,6 +123,19 @@ export async function GET(req: NextRequest) {
       });
       const cached = await persist('farcaster', String(q.farcasterFid), history);
       return NextResponse.json({ source: 'farcaster', cached, ...history });
+    }
+
+    if (q.farcasterUser) {
+      const apiKey = process.env.NEYNAR_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json({ error: 'NEYNAR_API_KEY not configured' }, { status: 500 });
+      }
+      const history = await scrapeFarcasterHistoryByUsername(q.farcasterUser, {
+        apiKey,
+        maxPages: q.maxPages,
+      });
+      const cached = await persist('farcaster', String(history.fid), history);
+      return NextResponse.json({ source: 'farcaster', cached, username: q.farcasterUser, ...history });
     }
 
     if (q.bczSite) {

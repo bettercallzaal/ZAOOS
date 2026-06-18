@@ -7,6 +7,7 @@ import {
   scrapeWaveWarzBattles,
   scrapeBczFarcasterHistory,
 } from '@/lib/scrape';
+import { cacheScrape, type ScrapeCacheSource } from '@/lib/scrape/persist';
 import { scrapeArtistStats } from '@/lib/wavewarz/scraper';
 
 /**
@@ -28,6 +29,7 @@ const QuerySchema = z
     wavewarzBattles: z.string().optional(),
     farcasterFid: z.coerce.number().int().positive().optional(),
     maxPages: z.coerce.number().int().positive().max(500).optional(),
+    cache: z.string().optional(),
   })
   .refine(
     (q) => Boolean(q.url || q.wavewarzArtist || q.wavewarzBattles || q.farcasterFid),
@@ -48,6 +50,15 @@ export async function GET(req: NextRequest) {
     );
   }
   const q = parsed.data;
+  const wantCache = Boolean(q.cache);
+
+  // Best-effort persistence (only when ?cache=1 and the scrape_cache table
+  // exists). Never fails the request; returns whether the write succeeded.
+  const persist = async (source: ScrapeCacheSource, key: string, data: unknown): Promise<boolean> => {
+    if (!wantCache) return false;
+    const r = await cacheScrape(source, key, data);
+    return r.ok;
+  };
 
   try {
     if (q.url) {
@@ -55,7 +66,8 @@ export async function GET(req: NextRequest) {
       if (result.source !== 'x') {
         return NextResponse.json({ error: result.reason }, { status: 422 });
       }
-      return NextResponse.json({ source: 'x', data: result.data });
+      const cached = await persist('x', result.data.id, result.data);
+      return NextResponse.json({ source: 'x', cached, data: result.data });
     }
 
     if (q.wavewarzArtist) {
@@ -63,12 +75,14 @@ export async function GET(req: NextRequest) {
       if (!stats) {
         return NextResponse.json({ error: 'artist stats unavailable' }, { status: 404 });
       }
-      return NextResponse.json({ source: 'wavewarz-artist', data: stats });
+      const cached = await persist('wavewarz-artist', q.wavewarzArtist, stats);
+      return NextResponse.json({ source: 'wavewarz-artist', cached, data: stats });
     }
 
     if (q.wavewarzBattles) {
       const result = await scrapeWaveWarzBattles({ maxPages: q.maxPages });
-      return NextResponse.json({ source: 'wavewarz-battles', ...result });
+      const cached = await persist('wavewarz-battles', 'all', result);
+      return NextResponse.json({ source: 'wavewarz-battles', cached, ...result });
     }
 
     if (q.farcasterFid) {
@@ -80,7 +94,8 @@ export async function GET(req: NextRequest) {
         apiKey,
         maxPages: q.maxPages,
       });
-      return NextResponse.json({ source: 'farcaster', ...history });
+      const cached = await persist('farcaster', String(q.farcasterFid), history);
+      return NextResponse.json({ source: 'farcaster', cached, ...history });
     }
 
     return NextResponse.json({ error: 'no target supplied' }, { status: 400 });

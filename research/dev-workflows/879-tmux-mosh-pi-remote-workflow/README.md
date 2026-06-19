@@ -2,7 +2,7 @@
 topic: dev-workflows
 type: guide
 status: research-complete
-last-validated: 2026-06-18
+last-validated: 2026-06-19
 superseded-by:
 related-docs: "528, 165, 459"
 original-query: "cheat sheet for the tmux + mosh + Pi remote workflow so I can understand how to best use it - SSH into ansuz from the Mac or Blink and never lose Claude Code context on disconnect"
@@ -76,6 +76,26 @@ claude
 ```
 
 Start a task on the Mac, `Ctrl-b d`, then reattach from Blink later and the same Claude is still going.
+
+## Continuous session: choose new vs continue on reconnect
+
+For a "close the Mac whenever, reopen and pick up or start fresh" flow, a small menu on the Pi
+(`~/.local/bin/pi-claude`, also wired into no-arg `/pi`) runs every time you connect:
+
+```
+1) Continue the LIVE session   (reattach - exactly where you left off, full in-memory state)
+2) New Claude session          (fresh)
+3) Continue last conversation  (claude --continue - new process, reloads last transcript)
+4) Resume a past conversation  (claude --resume picker)
+5) Plain shell
+```
+
+Two senses of "continue": option 1 reattaches the still-running tmux process (best while the Pi
+has not rebooted); option 3 starts a fresh Claude that reloads the previous conversation from disk
+(works after a reboot, since `--continue`/`--resume` read saved transcripts, which are keyed to the
+working directory). Everything launches inside the `pi` tmux session, so disconnects never kill it.
+
+From the Mac: `/pi` (no prompt) opens the menu. From Blink: `mosh ansuz -- pi-claude`.
 
 ## Cheat sheet (matches the Pi's tmux.conf)
 

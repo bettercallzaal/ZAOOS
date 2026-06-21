@@ -25,6 +25,7 @@ import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import * as http from 'node:http';
 import { startHeartbeat, startHeartbeatAs } from '../lib/cowork';
+import { safeEqual, isValidDocPath } from './dispatch-auth';
 
 const devzToken = process.env.ZAO_DEVZ_BOT_TOKEN;
 const hermesToken = process.env.HERMES_BOT_TOKEN;
@@ -407,7 +408,7 @@ function startHermesHttpListener(): void {
         res.end(JSON.stringify({ error: 'not found' }));
         return;
       }
-      if ((req.headers['x-hermes-secret'] ?? '') !== secret) {
+      if (!safeEqual(String(req.headers['x-hermes-secret'] ?? ''), secret)) {
         res.writeHead(401, { 'content-type': 'application/json' });
         res.end(JSON.stringify({ error: 'unauthorized' }));
         return;
@@ -432,7 +433,7 @@ function startHermesHttpListener(): void {
         const title = (parsed.title ?? '').trim().slice(0, 120);
         const intent = (parsed.intent ?? 'review').trim();
         const extra = (parsed.extra ?? '').trim().slice(0, 600);
-        if (!doc || !/^[a-z0-9][a-z0-9/_.-]*\.md$/i.test(doc) || doc.includes('..')) {
+        if (!isValidDocPath(doc)) {
           res.writeHead(400, { 'content-type': 'application/json' });
           res.end(JSON.stringify({ error: 'invalid doc path' }));
           return;

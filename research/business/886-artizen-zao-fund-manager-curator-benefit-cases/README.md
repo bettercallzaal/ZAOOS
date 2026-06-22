@@ -258,6 +258,86 @@ phase community vote -> competition phase sell + match). Exact UI clicks = a liv
 - ZAO Fund live standings move daily - re-render `zaoos.com/artizen` before quoting numbers in any message.
 - Live curation UI steps - capture from a real walk-through (the public playbook URL is dead).
 
+## How to WIN (tactical, loop research 2026-06-21) - RESOLVES the boost-formula gap
+
+The win condition is now clear, and it CORRECTS doc 844 + upgrades doc 885's [FAILED]:
+
+- **The prize goes to the project that SELLS THE MOST ARTIFACTS (count).** Per Artizen's own Playbook: "at the
+  end of the season, the project with the most Artifacts sold claims the prestigious Artizen Prize." This matches
+  the 2024 source code (leaderboard sorts by copies-sold count). **Boosts / voting points are a SEPARATE
+  engagement + visibility layer, NOT the prize metric.** Doc 844's "SCORE = raised x boosts" conflated the
+  on-screen score with the actual win rule. Net: to win, maximize the NUMBER of Artifacts sold - which is the
+  ZAO's crowd advantage exactly.
+- **Prize structure:** each Fund awards a cash prize to ITS top-selling project; the **top 3 projects across ALL
+  funds win the Artizen Prize.** (The ~$41k prize Thy Rev saw on the call = a fund-level top prize.)
+- **Match math (confirmed):** for every $10 in Artifact sales, $10 is matched by EACH fund backing the project.
+  Multi-fund curation multiplies it ($2, $3+ per $1). Submit to every eligible fund.
+- **Artifact craft (matters for winning):** visually stunning; GIFs/videos perform best; **square; NO text or
+  graphic overlays.** This is a concrete production spec for COC / PolyRaiders / WaveWarZ Zambia Artifacts.
+- **Promotion playbook:** post frequently on X tagging `@ArtizenFund`; engage the private community on **Console**;
+  email + text + DM + phone outreach to your own fans; host virtual + in-person events. Anyone who joins Artizen
+  earns voting points, so wide signups help.
+
+**ZAO takeaway:** the ZAO Fund should pick ONE horse to push for the Artizen Prize (most Artifacts sold) per
+season and aim the whole crowd at it during high-multiplier drives, while curating broadly for stacked match.
+
+## Money mechanics + risk (loop research 2026-06-21)
+
+- **Match:** 1:1 instant, $10 sale -> $10 from each backing fund; 90% of a fund = match pool, 10% = its top-project
+  prize. Fluid quadratic funding via Superfluid (continuous, not batched rounds).
+- **ART token (Revnet, ETH mainnet):** buying ART mints new tokens OR buys on the open market (whichever is
+  cheaper); a cut of every transaction flows to the **Endowment**. Each ART is backed by the treasury, redeemable
+  for USD at a **floor that climbs over time**; mint price **doubles on a fixed schedule** -> ART trades between an
+  exponential ceiling and a rising floor. Inflows locked in USDC. René frames it "Infinite Money Glitch" /
+  "largest endowment in the world for human creativity."
+- **Risk:** it is a reflexive bonding curve - "the feedback loop that compounds belief can just as easily unwind
+  it" (René's own words, doc 844). Other risks: match-pool depletion (first movers drain a fund), payout
+  reliability (no public confirmation creators always receive promised match), and the self-reported "$14M
+  endowment" vs thin on-chain reality (~34 ETH dormant in the Juicebox project, repo `art-token-onchain.md`).
+- **Funding history:** raised ~$2.2M from crypto backers (2023, Decrypt); ~$1.89M awarded in Season 6; $2M+
+  funded to creators to date. The model is real and operating; the TOKEN layer is the speculative part.
+- **ZAO stance (unchanged, reinforced):** ride the funding rail; keep ZAO treasury OFF ART (per [[project_zartizen_repo]]).
+
+## Questions for Zaal (batch - answer when you have a sec)
+
+Accumulating per the autonomous-loop choice; not blocking. Answer any/all later.
+
+1. **Artifact production:** winning Artifacts are square + video/GIF + no text. Do you already have art like that for
+   COC Concertz / PolyRaiders / WaveWarZ Zambia, or should I spec a template/brief for each?
+2. **The horse to back:** the prize = most Artifacts SOLD. Which single ZAO-curated project do you want to push for
+   the Artizen Prize this season (the one the whole crowd rallies behind)?
+3. **Promo kit:** want me to draft an Artizen promo playbook kit file (X/@ArtizenFund cadence, Console, outreach
+   scripts) tuned for the ZAO crew?
+4. **Token risk one-pager:** confirmed keeping treasury off ART - want a short team-facing one-pager on the ART/
+   endowment risk so the group understands it, or skip?
+5. **René/Nate ask:** want me to draft the DM asking René/Nate to confirm the exact current boost/score mechanics
+   and any Season 7 timing? (GitHub route is exhausted; they are the only source left.)
+
+## Artizen history + founder (loop research, 2026-06-21)
+
+Captured so the team understands where Artizen comes from (sync-worthy to the repo `rene-pinnell-digest.md`).
+
+**René Pinnell - founder.** 5 generations of artists in his family (dancers, painters, filmmakers, circus
+performers). Studied film, sold a pilot to MTV, then moved into tech. ~2 decades helping creators raise $50M+.
+Executive producer on VR films **BATTLESCAR** (Rosario Dawson) and **SPHERES** (Jessica Chastain, Millie Bobby
+Brown, Patti Smith) - secured the first seven-figure VR film deal at Sundance. Directed the documentary "The
+King of Texas." Founded two companies before Artizen; was Product Lead at **TapRoot** (a parents' social network
+that raised $1.5M) and built **Storybox** (photo-scanning). Techstars Web3 accelerator, class of 2024.
+
+**Timeline:**
+- **2007** - the spark: a creative-mania stretch at OnNetworks (49 hours awake, office walls of post-its) crystallized the "invent a new game for creators" idea.
+- **2015** - Kaleidoscope: private curated marketplace events presenting artists' work to industry funders. The conceptual precursor to Artizen.
+- **Feb 2021** - Artizen built + launched. First grant = the Black Reality's Grant, raised $18,371. Early Stripe logistics hurdle, then cleared.
+- **2024** - Techstars Web3 accelerator.
+- **Oct 2025** - ART token + Endowment layer added (Revnet-style; on-chain reality is thin, see repo `art-token-onchain.md` + doc 845).
+- **2026** - seasons + weekly fund drives; $2M+ funded to creators to date (~$2.7M per doc 844).
+
+**Read of the arc:** Kaleidoscope (curated funding events) -> Artizen one-click grants (2021) -> Web3
+match-funding (2024) -> token/endowment reflexivity (2025) -> gamified seasons/drives (2026). The throughline is
+consistent - "fund human creativity" - but the money machine got more financialized over time, which is exactly
+where the unverified $14M-endowment / ART-token risk lives. The ZAO should ride the funding rail, keep treasury
+off ART (per [[project_zartizen_repo]]).
+
 ## Sources
 
 - [Doc 884](../../events/884-zao-artizen-mechanics-call/) - the 2026-06-21 mechanics call (transcript + recap)
@@ -267,4 +347,10 @@ phase community vote -> competition phase sell + match). Exact UI clicks = a liv
 - [Doc 843](../843-zao-fund-artizen-roster-june2026/) - ZAO Fund roster (S6)
 - Repo: `github.com/ZAODEVZ/ZAOartizen` - operating home (research + kit)
 - `artizen.fund` / `boost.artizen.fund` / `zaoos.com/artizen` - live platform + ZAO Fund page
-- Memories: [[project_coc_concertz_framing]], [[project_moses_polyraiders]], [[project_tom_fellenz]], [[project_arun]], [[project_zao_fund_artizen]], [[project_zartizen_repo]]
+- Memories: [[project_coc_concertz_framing]], [[project_moses_polyraiders]], [[project_tom_fellenz]], [[project_arun]], [[project_iman_role]], [[project_zao_fund_artizen]], [[project_zartizen_repo]]
+- [FULL] Artizen Playbook + "Guide to Funding Big Ideas" (news.artizen.fund) - win condition, Artifact craft, promo
+- [FULL] Artizen leaderboard (artizen.fund/index/leaderboard) - $1.89M awarded S6, sort by Artifacts sold
+- [FULL] `artizen-fund/artizen-frontend` (GitHub, src/lib/useSeasonSubscriptionData.ts) - rank = copies-sold count (2024 source)
+- [FULL] MoneyNeverSleeps ep 274 "Filmmaker to Founder" + Decential + Blockleaders - René history
+- [FULL] Decrypt / NFTevening - $2.2M raise (2023); artizen.fund/endowment + "Infinite Money Glitch" newsletter - Revnet/ART
+- [PARTIAL] Trustpilot / cryptorank / crypto-fundraising - token sentiment (not yet deep-read)

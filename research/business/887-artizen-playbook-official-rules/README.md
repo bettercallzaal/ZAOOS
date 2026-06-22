@@ -102,10 +102,16 @@ Prizes are paid in ART, so a creator's ART prize is an illiquid stake, not casha
 **Endowment operational-maturity signal (2026-06-22):** Artizen's ORIGINAL Juicebox project hit a
 misconfiguration - a 100% redemption rate bug - so it was archived with funds temporarily locked (a 101-day
 duration), and Juicebox core devs (Jango, Filipv) covered with personal funds into a new project. This is a
-real reliability wrinkle in the endowment's history; the engine is experimental (the playbook says so). The
-current Juicebox treasury balance is JS-walled (`juicebox.money/@artizenfund` renders client-side) - getting a
-hard endowment dollar figure needs the browser scraper or a logged-in view. Net: the "$14M endowment" stays
-unverified on-chain; treat it as a self-reported, partly-off-chain figure (consistent with docs 845 + above).
+real reliability wrinkle in the endowment's history; the engine is experimental (the playbook says so).
+
+**Scraped `juicebox.money/@artizenfund` (browse, 2026-06-22):** total raised **34.21 ETH**, 61 payments,
+owned by `nene❤.eth`, created **Oct 27 2023**, last activity ~a year ago (most payouts 2 years ago) - dormant.
+**Critical distinction:** this is the LEGACY Juicebox project (matches doc 845's "~34 ETH dormant"), NOT the
+current endowment. The CURRENT endowment is the new **Revnet** (Stage 1 Genesis started Sept 17 2025, ART
+contract `0x44c45...`) - a separate vehicle, not this handle. So the oft-cited "~34 ETH" = the OLD project, not
+today's endowment; do NOT equate them. The "$14M" would live in the new Revnet + off-chain reserves (insured
+USD, BTC/ETH/SOL, Artifacts); the new Revnet treasury is JS-walled on revnet.app and still not pinned to a hard
+figure. Net unchanged: the "$14M endowment" is self-reported + partly off-chain - do not bank on it.
 
 ## "Boosts" (capital-B events) vs boost points
 

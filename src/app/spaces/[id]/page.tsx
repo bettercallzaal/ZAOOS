@@ -10,6 +10,7 @@ import { createStreamUser } from '@/lib/spaces/streamHelpers';
 import { communityConfig } from '../../../../community.config';
 import { AudioRoomAdapter } from '@/components/spaces/AudioRoomAdapter';
 import type { Room } from '@/lib/spaces/roomsDb';
+import type { StreamVideoClient, Call } from '@stream-io/video-react-sdk';
 
 import { EndRoomConfirm } from '@/components/spaces/EndRoomConfirm';
 
@@ -59,9 +60,9 @@ export default function PublicRoomPage() {
   const { address: walletAddress } = useAccount();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState<StreamVideoClient | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [call, setCall] = useState<any>(null);
+  const [call, setCall] = useState<Call | null>(null);
   const [room, setRoom] = useState<Room | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,9 +84,9 @@ export default function PublicRoomPage() {
 
     let mounted = true;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let newClient: any = null;
+    let newClient: StreamVideoClient | null = null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let newCall: any = null;
+    let newCall: Call | null = null;
 
     const init = async () => {
       try {

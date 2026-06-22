@@ -2,12 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { getBestFriends } from '@/lib/farcaster/neynar';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+const usernameParamSchema = z.string().min(1).max(100);
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ username: string }> },
 ) {
   const { username } = await params;
+  const usernameCheck = usernameParamSchema.safeParse(username);
+  if (!usernameCheck.success) {
+    return NextResponse.json({ error: 'Invalid username' }, { status: 400 });
+  }
   try {
     const { data: user } = await supabaseAdmin
       .from('users')

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { resolveENSNames, getENSTextRecords, getENSAvatar, resolveBasenames } from '@/lib/ens/resolve';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+const usernameParamSchema = z.string().min(1).max(100);
 
 /**
  * GET /api/members/[username] — Unified member profile
@@ -14,6 +17,10 @@ export async function GET(
 ) {
 
   const { username } = await params;
+  const usernameCheck = usernameParamSchema.safeParse(username);
+  if (!usernameCheck.success) {
+    return NextResponse.json({ error: 'Invalid username' }, { status: 400 });
+  }
   const lookup = decodeURIComponent(username).toLowerCase();
 
   try {

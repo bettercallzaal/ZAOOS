@@ -100,6 +100,10 @@ Confusing naming - two different things:
   for a cash prize) + Match Boosts (temporary match multipliers). Season 6 deployed $400k+ in sprint prizes +
   $129k in match-boost caps across 22 events; single-sprint pools $5k-$60k+. These also have a 5-min fair finish.
 
+**Live Boosts page is login-gated.** `boost.artizen.fund` requires an email magic-link login - no public view
+of currently-live sprints (scraped 2026-06-22: returns only a login form). To see/target a live sprint, Zaal
+must check it from his logged-in account. The playbook FAQ is the only public source for the aggregate stats.
+
 ## Platform economics
 
 - Artizen fee: **10%** on Artifact sales + sponsorships, taken upfront -> flows to the Endowment. Plus 10% of

@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
+import { z } from 'zod';
+
+const nexusLinksQuerySchema = z.object({
+  portal_group: z.string().max(100).nullish(),
+  category: z.string().max(100).nullish(),
+  tag: z.string().max(100).nullish(),
+  featured: z.string().max(10).nullish(),
+});
 
 /**
  * Public API: GET /api/nexus/links
@@ -15,10 +23,16 @@ import { supabaseAdmin } from '@/lib/db/supabase';
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const portalGroup = searchParams.get('portal_group');
-    const category = searchParams.get('category');
-    const tag = searchParams.get('tag');
-    const featured = searchParams.get('featured');
+    const parsed = nexusLinksQuerySchema.safeParse({
+      portal_group: searchParams.get('portal_group'),
+      category: searchParams.get('category'),
+      tag: searchParams.get('tag'),
+      featured: searchParams.get('featured'),
+    });
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+    }
+    const { portal_group: portalGroup, category, tag, featured } = parsed.data;
 
     let query = supabaseAdmin
       .from('nexus_links')

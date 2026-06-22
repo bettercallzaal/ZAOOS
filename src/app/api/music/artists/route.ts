@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+const artistsQuerySchema = z.object({ artist: z.string().trim().min(1).max(120) });
 
 /**
  * GET /api/music/artists?artist=... — get aggregated data for an artist
  */
 export async function GET(req: NextRequest) {
-  const artist = req.nextUrl.searchParams.get('artist');
-  if (!artist || !artist.trim()) {
-    return NextResponse.json({ error: 'Missing artist parameter' }, { status: 400 });
+  const parsed = artistsQuerySchema.safeParse({ artist: req.nextUrl.searchParams.get('artist') ?? '' });
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Missing or invalid artist parameter' }, { status: 400 });
   }
+  const artist = parsed.data.artist;
 
   try {
     // Query songs where artist matches (case-insensitive partial match)

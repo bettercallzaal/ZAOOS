@@ -1,15 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { checkGatingEligibility, getFcQualityScoreByFid } from '@/lib/fc-identity';
+
+const checkQuerySchema = z
+  .object({
+    address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'invalid address').optional(),
+    fid: z.coerce.number().int().positive().optional(),
+    minScore: z.coerce.number().int().min(0).default(0),
+  })
+  .refine((d) => d.address !== undefined || d.fid !== undefined, {
+    message: 'address or fid required',
+  });
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const address = searchParams.get('address');
-  const fid = searchParams.get('fid');
-  const minScore = parseInt(searchParams.get('minScore') ?? '0', 10);
-
-  if (!address && !fid) {
-    return NextResponse.json({ error: 'address or fid required' }, { status: 400 });
+  const parsed = checkQuerySchema.safeParse({
+    address: searchParams.get('address') ?? undefined,
+    fid: searchParams.get('fid') ?? undefined,
+    minScore: searchParams.get('minScore') ?? undefined,
+  });
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? 'invalid query parameters' },
+      { status: 400 },
+    );
   }
+  const { address, fid, minScore } = parsed.data;
 
   try {
     // Check by ETH address
@@ -23,12 +39,11 @@ export async function GET(req: NextRequest) {
     }
 
     // Check by FID
-    if (fid) {
-      const fidNum = parseInt(fid, 10);
-      const score = await getFcQualityScoreByFid(fidNum);
+    if (fid !== undefined) {
+      const score = await getFcQualityScoreByFid(fid);
       return NextResponse.json({
         type: 'fid',
-        fid: fidNum,
+        fid,
         score,
         eligible: score !== null ? score >= BigInt(minScore) : true,
       });

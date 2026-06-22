@@ -35,6 +35,8 @@ export async function GET(req: NextRequest) {
         type: 'address',
         address,
         ...result,
+        // result.score is a bigint; override the spread with a serializable value
+        score: result.score !== null ? result.score.toString() : null,
       });
     }
 

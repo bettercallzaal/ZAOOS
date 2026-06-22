@@ -32,12 +32,13 @@ describe('GET /api/fc-identity/check', () => {
   });
 
   it('checks eligibility by address', async () => {
-    mockCheckGating.mockResolvedValue({ eligible: true, score: '5' });
+    mockCheckGating.mockResolvedValue({ eligible: true, score: 5n, fid: 100 });
     const res = await GET(req(`?address=${VALID_ADDR}&minScore=3`));
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.type).toBe('address');
     expect(body.eligible).toBe(true);
+    expect(body.score).toBe('5');
     expect(mockCheckGating).toHaveBeenCalledWith(VALID_ADDR, 3);
   });
 

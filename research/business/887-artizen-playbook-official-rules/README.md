@@ -92,6 +92,13 @@ alone only get you so far. **The ZAO lever is BOTH: rally the crowd to buy $10 A
   airdropped, no balances lost. Launching on Base, expanding to Solana/Arbitrum/Optimism/Ethereum.
 - ZAO stance unchanged: ride the funding rail, treat ART as speculative, keep treasury off it (doc 845).
 
+**On-chain check of the current ART contract (Basescan, 2026-06-22):** `0x44c4516768e47cd97cfF2561B81a74699F23f8Ec`
+(Base) - total supply ~959,607,599 ART, **237 holders**, **no listed market price / market cap** ($0.00,
+"-"), **0 transfers in 24h**. Thin, illiquid, effectively unpriced - a 237-holder community token, not a
+liquid market. This updates doc 845's "~34 ETH dormant" with current data: the conclusion holds even harder -
+do NOT treat ART (or the "$14M endowment") as a liquid/verifiable treasury asset; keep ZAO treasury off it.
+Prizes are paid in ART, so a creator's ART prize is an illiquid stake, not cashable at a market price today.
+
 ## "Boosts" (capital-B events) vs boost points
 
 Confusing naming - two different things:

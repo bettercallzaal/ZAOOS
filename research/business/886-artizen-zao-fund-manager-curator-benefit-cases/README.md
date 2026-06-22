@@ -348,6 +348,23 @@ Concrete relationships + programs the ZAO should plug into:
   funded to creators to date. The model is real and operating; the TOKEN layer is the speculative part.
 - **ZAO stance (unchanged, reinforced):** ride the funding rail; keep ZAO treasury OFF ART (per [[project_zartizen_repo]]).
 
+**Risk update (loop research 2026-06-21) - payout reliability is BETTER than doc 844 feared.** Trustpilot +
+creator reports: founder support is responsive ("highly commendable," quick to resolve), creators confirm they
+RECEIVE payouts (one raised $100k and got paid), and the payout timeframe was shortened vs prior seasons.
+Scamadviser rates the site legit. Creators who checked with peers got positive payout confirmations. So the
+"payout reliability" concern in 844 is largely resolved - the funding rail works. The ONLY material risk is the
+speculative ART/endowment token layer (reflexive bonding curve) - which the ZAO simply does not touch. Net: the
+core match-funding product is safe to lean on; just keep treasury off ART.
+
+**Venus = the AI chatbot on Artizen (loop research 2026-06-21).** Artizen ships an in-platform AI assistant
+called **Venus** that explains the ecosystem. This is the permissionless route to close our open gaps - ask
+Venus the exact current boost/score formula and Season 7 timing (the GitHub route was dead, the newsletter
+404s). Quick win: paste our open mechanics questions into Venus before going to Rene.
+
+**Stacking confirmed in the wild:** InfiniteZero Network (#1 in the ZAO Fund, doc 760) was matched by the ZAO
+Fund AND the Funding the Commons (FTC) Fund for Public Goods - real multi-fund stacking. Credibility names on the
+platform: Wu-Tang / RZA (36 Cinema) + Cate Blanchett. $2.3M+ distributed to date.
+
 ## Questions for Zaal (batch - answer when you have a sec)
 
 Accumulating per the autonomous-loop choice; not blocking. Answer any/all later.
@@ -361,7 +378,9 @@ Accumulating per the autonomous-loop choice; not blocking. Answer any/all later.
 4. **Token risk one-pager:** confirmed keeping treasury off ART - want a short team-facing one-pager on the ART/
    endowment risk so the group understands it, or skip?
 5. **René/Nate ask:** want me to draft the DM asking René/Nate to confirm the exact current boost/score mechanics
-   and any Season 7 timing? (GitHub route is exhausted; they are the only source left.)
+   and any Season 7 timing? (GitHub route is exhausted.)
+6. **Venus first:** before René - want me to draft the exact questions to paste into Artizen's AI bot "Venus"
+   to confirm the boost/score formula + Season 7 timing permissionlessly? (Likely faster than waiting on René.)
 
 ## Artizen history + founder (loop research, 2026-06-21)
 

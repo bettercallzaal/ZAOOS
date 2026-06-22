@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkGatingEligibility, getFcQualityScoreByFid } from '@/lib/fc-identity';
+import { logger } from '@/lib/logger';
 
 const checkQuerySchema = z
   .object({
@@ -50,6 +51,7 @@ export async function GET(req: NextRequest) {
       });
     }
   } catch (err) {
-    return NextResponse.json({ error: 'Chain read failed', details: String(err) }, { status: 502 });
+    logger.error('[fc-identity] chain read failed:', err);
+    return NextResponse.json({ error: 'Chain read failed' }, { status: 502 });
   }
 }

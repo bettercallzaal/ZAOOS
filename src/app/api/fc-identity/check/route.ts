@@ -44,7 +44,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         type: 'fid',
         fid,
-        score,
+        // score is a bigint; JSON.stringify cannot serialize BigInt, so stringify it
+        score: score !== null ? score.toString() : null,
         eligible: score !== null ? score >= BigInt(minScore) : true,
       });
     }

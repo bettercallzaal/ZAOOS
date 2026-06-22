@@ -285,6 +285,12 @@ phase community vote -> competition phase sell + match). Exact UI clicks = a liv
 - Boost Score formula - GitHub path CLOSED (stale repo + closed boost system). Only route left = ask René/Nate.
 - ZAO Fund live standings move daily - re-render `zaoos.com/artizen` before quoting numbers in any message.
 - Live curation UI steps - capture from a real walk-through (the public playbook URL is dead).
+- **Live ZAO Fund standings are NOT fetchable** - Artizen is fully client-rendered (Bubble.io); WebFetch returns
+  empty. The `/dashboard` page (repo) must be filled from Zaal's logged-in dashboard manually (or a Playwright
+  scrape). No public API/SSR for standings.
+- **Research wall reached (2026-06-21):** the remaining unknowns (live numbers, exact boost formula, Season 7
+  timing, curation UI flow) all need a human source - Zaal's dashboard, the Venus bot, or René - not more web
+  search. Pure web research is now dry; next value is building + Zaal's inputs.
 
 ## How to WIN (tactical, loop research 2026-06-21) - RESOLVES the boost-formula gap
 

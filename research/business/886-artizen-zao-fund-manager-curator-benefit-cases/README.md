@@ -164,6 +164,20 @@ sale. So the ZAO's play is not one fund in isolation - it is a coordinated bloc:
 Net: the ZAO's edge on Artizen is not capital, it is a coordinated crowd. The fund-manager job is to organize
 that crowd around a rotating spotlight, drive by drive.
 
+**Cross-back stacking - active targets (from the repo `fund-directory.md` map, loop iteration):** the stacking
+map already exists. For the 3 messaged projects, the funds to curate each into (beyond the ZAO Fund for
+Emerging Culture as home):
+
+| Project | Stack into (beyond ZAO Fund) | Notes |
+|---------|------------------------------|-------|
+| COC Concertz | We're Loud (DIY Music Festivals) + Global Music + Music + Healing | live-music fit; We're Loud is the DIY-festival home |
+| PolyRaiders (Moses) | Global Music + (any fund already backing him) | already live; just add ZAO Fund + Global Music for stacked match |
+| WaveWarZ Zambia | Global Music + We're Loud | indie-music fit; battles map to crowd-rally |
+
+Pool sizes are small right now (We're Loud ~$3,784, Global Music ~$256, Bonfires ~$104; Greenpill is the big
+one at ~$37,149 for regen gatherings = ZAOstock/Zaoville). Stacking still matters - many small pools each add a
+match stream. ZOE/Hermes agent work belongs in the **Bonfires Fund for Agentic Creativity** (our KG partner).
+
 ## 8. Boost + ranking strategy - how the ZAO Fund climbs
 
 Ranking axis = **SCORE** (per 844: raised x boosts; formula unverified, flagged in 885). Both sales AND boosts
@@ -190,6 +204,10 @@ a soft "look these over, then let's call" ask. Verified links: `github.com/ZAODE
 
 **Send order (Zaal, 2026-06-21):** send the first 3 (Thy Rev / Moses / Iman) now; **HOLD the Fellenz message
 until those three give feedback.** Get the practitioners' read before looping in the advisor.
+
+**STATUS 2026-06-21:** the 3 messages (Thy Rev / Moses / Iman) were SENT. Awaiting their feedback + a call.
+Fellenz still held. Next: when they reply yes, curate each into the ZAO Fund + cross-back into the external
+funds mapped in section 7 / the repo `fund-directory.md` + `priority-funds.md`.
 
 **COC Concertz (to Thy Revolution):**
 Bro - mapped how COC Concertz plugs into Artizen. Short version: COC Concertz goes up as its own project, each

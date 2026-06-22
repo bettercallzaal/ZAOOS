@@ -12,7 +12,10 @@ import { logger } from '@/lib/logger';
  */
 export async function GET(req: NextRequest) {
   try {
-    const cursor = req.nextUrl.searchParams.get('cursor') || undefined;
+    // External endpoint (Bluesky AppView). Validate defensively but do NOT 400 -
+    // clamp/ignore bad input so the feed keeps rendering. Ignore an over-long cursor.
+    const rawCursor = req.nextUrl.searchParams.get('cursor') || undefined;
+    const cursor = rawCursor && rawCursor.length <= 200 ? rawCursor : undefined;
     const limit = Math.min(
       parseInt(req.nextUrl.searchParams.get('limit') || '30', 10),
       100,

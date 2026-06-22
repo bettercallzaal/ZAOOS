@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase';
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
+
+const introsQuerySchema = z.object({
+  discord_id: z.string().regex(/^\d{1,32}$/, 'invalid discord_id').nullish(),
+  all: z.string().nullish(),
+});
 
 /**
  * GET /api/discord/intros — Fetch Discord intro(s)
@@ -9,8 +15,15 @@ import { logger } from '@/lib/logger';
  *   ?all=true              — return all intros
  */
 export async function GET(req: NextRequest) {
-  const discordId = req.nextUrl.searchParams.get('discord_id');
-  const all = req.nextUrl.searchParams.get('all') === 'true';
+  const parsed = introsQuerySchema.safeParse({
+    discord_id: req.nextUrl.searchParams.get('discord_id'),
+    all: req.nextUrl.searchParams.get('all'),
+  });
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid query parameters' }, { status: 400 });
+  }
+  const discordId = parsed.data.discord_id ?? null;
+  const all = parsed.data.all === 'true';
 
   if (!discordId && !all) {
     return NextResponse.json(

@@ -52,4 +52,13 @@ describe('GET /api/fc-identity/check', () => {
     expect(body.score).toBe('10');
     expect(body.eligible).toBe(true);
   });
+
+  it('502 with no leaked error details when the chain read throws', async () => {
+    mockCheckGating.mockRejectedValue(new Error('RPC timeout at 0xdeadbeef internal'));
+    const res = await GET(req(`?address=${VALID_ADDR}`));
+    expect(res.status).toBe(502);
+    const body = await res.json();
+    expect(body.error).toBe('Chain read failed');
+    expect(body.details).toBeUndefined(); // internal error string must not reach the client
+  });
 });

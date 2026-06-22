@@ -261,6 +261,23 @@ for ZAOstock - curate it into existing music funds instead of only chasing spons
 Emerging Culture" is a clean, public The-ZAO-branded surface, which is the brand point you made. Would value 15
 min on the fund-manager play and whether there is a producer angle for you on funded events. Worth a call?
 
+## LIVE ZAO Fund standings (scraped via headless browser, 2026-06-21)
+
+Pulled directly from `artizen.thezao.com` (Bubble.io renders client-side; scraped with the gstack `browse`
+headless browser since WebFetch returned empty). Numbers move daily - re-scrape before quoting.
+
+- **Fund rank: #11** among Artizen funds. **Score: 522.19. Prize: $4,262.**
+- **Pool (total): $10,547.** Match DEPLOYED (RAISED): **$4,262.** Match remaining (AVAILABLE): **$6,331.**
+- **Active drive: Flourish Fund Drive, ends in ~3 days (~2026-06-24).**
+- Zaal is the fund's top booster (60,303 boosts).
+- Season board (top, with ZAO ties): #1 InfiniteZero Network / Abraham Nash ($46,021 sales); #2 Edge Esmeralda
+  2026 / Telamon ($30,569); #4 Edge City Fellowship / Telamon ($10,567); #32 The Impact Concerts / EZinCrypto.
+- **CORRECTION to doc 884:** PolyRaiders = **HuRya Empowerment Foundation (Poly Raiders)**, Moses - ranked **#22,
+  ~$1,200 sales, $40 match** (cause: dignity for girls via web3 art - pads, education, vocational center). The
+  call's "#17 / ~$14k / $150k in / 6x" was misheard. Use the scraped figures.
+
+These now populate the `/dashboard` page in the repo (`app/dashboard/data.ts`).
+
 ## Iteration findings log (second 10-loop batch, 2026-06-21)
 
 **Iter 1 - Boost Score formula via open source: PATH CLOSED.** Searched the `artizen-fund` GitHub org (6 public

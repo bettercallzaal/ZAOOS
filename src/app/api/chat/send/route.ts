@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     // Track member activity + save music links (fire and forget)
     touchActivity(session.fid);
-    extractAndSaveSongs(text, embedUrls, session.fid, 'chat').catch(() => {});
+    extractAndSaveSongs(text, embedUrls, session.fid, 'chat').catch((err) => logger.error('[chat/send] song extraction failed:', err));
 
     // Cross-post to additional channels (fire and forget)
     const additionalChannels = [...channels].filter((ch) => ch !== primaryChannel);

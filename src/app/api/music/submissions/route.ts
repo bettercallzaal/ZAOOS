@@ -187,7 +187,7 @@ export async function POST(req: NextRequest) {
       submittedByFid: session.fid,
       source: 'submission',
       tags: tags as string[] | undefined,
-    }).catch(() => {});
+    }).catch((err) => logger.error('[music/submissions] background upsert failed:', err));
 
     return NextResponse.json({ success: true, submission: result.data });
   } catch (error) {

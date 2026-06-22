@@ -325,6 +325,21 @@ Concrete relationships + programs the ZAO should plug into:
 - **Warm ecosystem allies (from repo fund-directory):** Bonfires (ZAO's KG partner), Edge City (grantee Telamon),
   DeSci Asia, Pressman Film (36 Cinema broker) - warm cross-curation paths.
 
+**Accelerator terms (loop research 2026-06-21):** the Artizen Accelerator for Community Funds selects **20
+applications** into a **3-month program** with **up to $10,000** to launch a Community Fund. Note it funds
+*launching* a fund - so it is most relevant if the ZAO ever spins up a second fund (e.g. ZAO Festivals Fund);
+for the existing ZAO Fund the value is the mentorship + curator-network access. Phase 2 target.
+
+**ETH Boulder = a warm in-person path to René (loop research 2026-06-21).** René organizes **ETH Boulder**, a
+200-300 person art/science/tech gathering ("creativity is a contact sport"). This is a face-to-face route to
+René that beats a cold DM. **Ven (PDX, The Open Machine) is ETH Boulder-connected** ([[project_ven_open_machine]])
+- a possible warm intro vector. Worth exploring as the Phase 2 relationship bridge.
+
+**Where Artizen is going (vision):** René's stated arc is $4M -> $1 trillion endowment, to "underwrite the next
+Renaissance," via a dual strategy of enterprise sales + grassroots community funds. Key newsletters to read:
+"The Ecology of Creativity," "Fork the Frontier," "Keep It Simple Stupid," "Infinite Money Glitch." Season 7 is
+not yet publicly announced (a "Cycle 5 / May 2026" reference appeared - terminology ambiguous; confirm via Venus).
+
 **How Zaal can help / plug in (the action menu):**
 1. Apply to the Artizen Accelerator for Community Funds (level-up + network).
 2. Get the ZAO crew signed up on Artizen + Console (the crowd lever; signups = boost + buyers).

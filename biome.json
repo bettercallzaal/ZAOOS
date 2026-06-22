@@ -38,13 +38,19 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "src",
-      "scripts",
+      "src/**",
+      "scripts/**",
       "community.config.ts",
       "next.config.js",
       "tailwind.config.ts",
       "postcss.config.js",
       "vitest.config.ts"
     ]
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "defaultBranch": "main",
+    "useIgnoreFile": true
   }
 }

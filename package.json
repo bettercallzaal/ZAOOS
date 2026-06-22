@@ -26,7 +26,8 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "format:check": "biome format .",
-    "ci:lint": "biome ci ."
+    "ci:lint": "biome ci .",
+    "ci:lint:changed": "biome ci --changed --since=origin/main"
   },
   "dependencies": {
     "@100mslive/hms-video-store": "^0.13.2",

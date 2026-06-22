@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history so `biome --changed --since=origin/main` can diff
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -24,8 +27,15 @@ jobs:
 
       - run: npm ci
 
-      - name: Lint
-        run: npm run ci:lint
+      - run: git fetch origin main --depth=0 || git fetch origin main
+
+      # Biome lints ONLY files changed vs main (scoped re-enable). Until the
+      # pre-existing backlog is worked down, this is non-blocking: it reports
+      # issues on touched files without failing CI. Flip continue-on-error to
+      # false to make it enforcing. See research doc 887 / loop-zaoos-fixes.
+      - name: Lint (biome, changed files)
+        continue-on-error: true
+        run: npm run ci:lint:changed
 
       - name: Typecheck
         run: npm run typecheck

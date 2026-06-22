@@ -31,6 +31,34 @@ loop: self-paced 10-iteration build (doc 884 follow-up)
 
 ---
 
+## Operating strategy: permissionless-first, then René (Zaal, 2026-06-21)
+
+The decided sequence: **do everything we can permissionlessly first, build a track record of bootstrapping
+communities well, THEN approach René from a position of proven strength.** Don't ask for the accelerator / curator
+network up front - earn the conversation.
+
+**Phase 1 - permissionless (now, no permission needed):**
+1. **Mobilize the crew** - get ZAO members signed up on Artizen + Console; organize coordinated buy + boost waves,
+   timed to high-multiplier drives. (Signups + Artifact sales are the actual ranking lever.)
+2. **Bring artists in** - run the Discord curation votes and curate Marie Chain, COC Concertz, PolyRaiders, and
+   WaveWarZ Zambia into the ZAO Fund; help each mint a winning Artifact (square, video/GIF, no text).
+3. **Run the bootstrap motion** - pick one horse per drive, rally the crowd, climb the leaderboard, document it.
+4. **Build the proof** - a simple recap/dashboard of the metrics René actually cares about (below).
+
+**The proof metrics that matter** (derived from the model - the engine rewards distribution, not deposits):
+- **Match DEPLOYED** by the ZAO Fund (not just deposited) - the true KPI of a good fund.
+- **Distinct Artifact buyers** mobilized from the ZAO community.
+- **ZAO projects curated + how they performed** (sales, leaderboard climb).
+- **Community signups** driven onto Artizen / Console.
+- A **repeatable** bootstrap motion (rally -> buy -> boost -> climb), shown across more than one drive.
+
+**Phase 2 - then René (after proof):** approach René / Nate + the Accelerator for Community Funds with the track
+record. The pitch writes itself: "we bootstrap communities really well - here's the match we deployed and the
+crowd we moved." That earns the accelerator seat, the curator-network intros, and a deeper partnership.
+
+> NOTE: the Artizen Accelerator newsletter + Playbook URLs 404 for direct fetch (Substack-gated). Criteria above
+> are derived from the platform model; confirm specifics with René directly in Phase 2.
+
 ## 1. The ZAO as Fund Manager
 
 The ZAO already runs the **ZAO Fund for Emerging Culture** (Season 6, `artizen.thezao.com` -> the S6 fund;
@@ -280,6 +308,28 @@ The win condition is now clear, and it CORRECTS doc 844 + upgrades doc 885's [FA
 
 **ZAO takeaway:** the ZAO Fund should pick ONE horse to push for the Artizen Prize (most Artifacts sold) per
 season and aim the whole crowd at it during high-multiplier drives, while curating broadly for stacked match.
+
+## People + network to tap (loop research 2026-06-21)
+
+Concrete relationships + programs the ZAO should plug into:
+
+- **Artizen Accelerator for Community Funds** - René runs an accelerator + mentorship program specifically for
+  community-fund organizers. Zaal runs a fund -> direct fit. Likely the single highest-leverage way to level up
+  as a fund manager + get inside the curator network. (news.artizen.fund/p/artizen-accelerator-for-community)
+- **Console (console.xyz)** - Artizen's official community-platform partner; a match-fund partnership where
+  projects earn funding via community engagement. The "Console" Zaal saw on the platform. A surface to mobilize
+  the ZAO crowd + run engagement.
+- **Festival-curator network on Artizen:** Shari Frilot (Sundance), Blake Kammerdiener (SXSW), Loren Hammonds
+  (Tribeca), Liz + Michel (Venice), RZA (36 Cinema / film). These are real festival programmers curating funds -
+  aspirational relationships + credibility signal for ZAOstock + COC Concertz.
+- **Warm ecosystem allies (from repo fund-directory):** Bonfires (ZAO's KG partner), Edge City (grantee Telamon),
+  DeSci Asia, Pressman Film (36 Cinema broker) - warm cross-curation paths.
+
+**How Zaal can help / plug in (the action menu):**
+1. Apply to the Artizen Accelerator for Community Funds (level-up + network).
+2. Get the ZAO crew signed up on Artizen + Console (the crowd lever; signups = boost + buyers).
+3. Run the curation votes + bring artists in (Marie Chain, COC Concertz, PolyRaiders, WaveWarZ Zambia).
+4. Outreach to René/Nate + the curator network for cross-curation + credibility.
 
 ## Money mechanics + risk (loop research 2026-06-21)
 

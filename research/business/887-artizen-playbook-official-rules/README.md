@@ -99,6 +99,14 @@ liquid market. This updates doc 845's "~34 ETH dormant" with current data: the c
 do NOT treat ART (or the "$14M endowment") as a liquid/verifiable treasury asset; keep ZAO treasury off it.
 Prizes are paid in ART, so a creator's ART prize is an illiquid stake, not cashable at a market price today.
 
+**Endowment operational-maturity signal (2026-06-22):** Artizen's ORIGINAL Juicebox project hit a
+misconfiguration - a 100% redemption rate bug - so it was archived with funds temporarily locked (a 101-day
+duration), and Juicebox core devs (Jango, Filipv) covered with personal funds into a new project. This is a
+real reliability wrinkle in the endowment's history; the engine is experimental (the playbook says so). The
+current Juicebox treasury balance is JS-walled (`juicebox.money/@artizenfund` renders client-side) - getting a
+hard endowment dollar figure needs the browser scraper or a logged-in view. Net: the "$14M endowment" stays
+unverified on-chain; treat it as a self-reported, partly-off-chain figure (consistent with docs 845 + above).
+
 ## "Boosts" (capital-B events) vs boost points
 
 Confusing naming - two different things:

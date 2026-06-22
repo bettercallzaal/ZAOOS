@@ -113,6 +113,17 @@ today's endowment; do NOT equate them. The "$14M" would live in the new Revnet +
 USD, BTC/ETH/SOL, Artifacts); the new Revnet treasury is JS-walled on revnet.app and still not pinned to a hard
 figure. Net unchanged: the "$14M endowment" is self-reported + partly off-chain - do not bank on it.
 
+**CAPSTONE - scraped the CURRENT endowment Revnet `revnet.app/v5:base:6` (operator `artizenendowment.eth`),
+2026-06-22:** on-chain balance **$96.96**, **261 owners**, last activity ~2 months ago (USDC-in / ART-out,
+"Funding Human Creativity"). So the **on-chain endowment holds under $100** - NOT $14M. The autonomous Revnet
+the playbook touts as "the engine behind everything" currently holds <$100 redeemable. Therefore the "$14M
+endowment" is almost entirely a claim about OFF-CHAIN reserves (insured USD deposits, BTC/ETH/SOL, a copy of
+every Artifact) that are not verifiable on-chain and not in the Revnet. **Verdict on the $14M: refuted as an
+on-chain / liquid figure - treat it as a self-reported off-chain claim only.** This is the strongest data yet
+behind the standing ZAO rule: ride the funding rail (sales + match in USDC are real), keep treasury OFF ART,
+and do not value the endowment at its headline number. Prizes paid in ART remain illiquid (237 ART holders,
+no market price - see above).
+
 ## "Boosts" (capital-B events) vs boost points
 
 Confusing naming - two different things:

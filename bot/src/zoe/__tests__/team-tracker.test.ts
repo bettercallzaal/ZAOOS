@@ -6,19 +6,48 @@ describe('formatTeamTasks', () => {
     expect(formatTeamTasks([])).toMatch(/no open team tasks/i);
   });
 
-  it('lists tasks with project, priority, due, and status', () => {
+  it('priority-sorts, tags P-levels, and marks in-progress', () => {
     const tasks: TeamTask[] = [
-      { title: 'Ship the board', status: 'doing', priority: 'high', due: '2026-06-25', project: 'ZAOstock', legacy_id: '42' },
-      { title: 'Write recap', status: 'todo', priority: 'normal', due: null, project: null, legacy_id: '43' },
+      { title: 'Low thing', status: 'todo', priority: 'P3', due: null, project: 'ZAOstock', legacy_id: '1' },
+      { title: 'Urgent thing', status: 'in_progress', priority: 'P1', due: null, project: 'zaodevz', legacy_id: '2' },
     ];
     const out = formatTeamTasks(tasks);
     expect(out).toMatch(/2 open/);
-    expect(out).toContain('ZAOstock: Ship the board');
-    expect(out).toContain('[high]');
-    expect(out).toContain('due 2026-06-25');
-    expect(out).toContain('doing');
-    // normal priority is not shown as a tag
-    expect(out).not.toContain('[normal]');
+    expect(out).toContain('[P1] Urgent thing - doing');
+    // P1 sorts above P3
+    expect(out.indexOf('Urgent thing')).toBeLessThan(out.indexOf('Low thing'));
+  });
+
+  it('summarizes overdue in the header, not per line', () => {
+    const tasks: TeamTask[] = [
+      { title: 'Stale task', status: 'todo', priority: 'P2', due: '2020-01-01', project: null, legacy_id: '3' },
+    ];
+    const out = formatTeamTasks(tasks);
+    expect(out).toMatch(/1 overdue/);
+    expect(out).not.toContain('due 2020-01-01'); // overdue dates are not shown per-line
+  });
+
+  it('sorts recurring/standing tasks last', () => {
+    const tasks: TeamTask[] = [
+      { title: 'Daily checkin [STANDING]', status: 'todo', priority: 'P1', due: null, project: null, legacy_id: '4' },
+      { title: 'One-off P2', status: 'todo', priority: 'P2', due: null, project: null, legacy_id: '5' },
+    ];
+    const out = formatTeamTasks(tasks);
+    expect(out.indexOf('One-off P2')).toBeLessThan(out.indexOf('Daily checkin'));
+  });
+
+  it('caps the list and shows a +N more footer', () => {
+    const tasks: TeamTask[] = Array.from({ length: 20 }, (_, i) => ({
+      title: `Task ${i}`,
+      status: 'todo',
+      priority: 'P2',
+      due: null,
+      project: null,
+      legacy_id: String(i),
+    }));
+    const out = formatTeamTasks(tasks);
+    expect(out).toContain('20 open');
+    expect(out).toMatch(/\+5 more/);
   });
 });
 

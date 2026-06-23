@@ -61,14 +61,50 @@ export async function getOpenTeamTasks(): Promise<TeamTask[]> {
   }
 }
 
-/** Render team tasks as a compact, scannable list for a Telegram reply. */
+const MAX_SHOWN = 15;
+
+function priorityRank(p: string | null): number {
+  const m = (p ?? '').toUpperCase().match(/P([0-9])/);
+  return m ? Number(m[1]) : 5;
+}
+
+function isRecurring(title: string): boolean {
+  return /\[(standing|recurring)\]/i.test(title);
+}
+
+function isOverdue(due: string | null): boolean {
+  if (!due) return false;
+  return due < new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Render team tasks as a smooth, scannable Telegram reply: priority-sorted
+ * (recurring/standing last), overdue summarized in the header (not on every
+ * line), capped to the top N with a "+N more" footer. Drops the repeated
+ * project prefix and the noisy uniform due dates.
+ */
 export function formatTeamTasks(tasks: TeamTask[]): string {
   if (tasks.length === 0) return 'No open team tasks (or the tracker is not wired up).';
-  const lines = tasks.map((t) => {
-    const due = t.due ? ` (due ${t.due})` : '';
-    const pri = t.priority && t.priority !== 'normal' ? ` [${t.priority}]` : '';
-    const proj = t.project ? `${t.project}: ` : '';
-    return `- ${proj}${t.title}${pri}${due} - ${t.status}`;
+
+  const overdue = tasks.filter((t) => isOverdue(t.due)).length;
+  const sorted = [...tasks].sort((a, b) => {
+    const ra = isRecurring(a.title) ? 1 : 0;
+    const rb = isRecurring(b.title) ? 1 : 0;
+    if (ra !== rb) return ra - rb;
+    return priorityRank(a.priority) - priorityRank(b.priority);
   });
-  return `Team tracker - ${tasks.length} open:\n\n${lines.join('\n')}`;
+
+  const lines = sorted.slice(0, MAX_SHOWN).map((t) => {
+    const pri = priorityRank(t.priority) <= 4 ? `[${t.priority!.toUpperCase()}] ` : '';
+    const doing = t.status === 'in_progress' || t.status === 'doing' ? ' - doing' : '';
+    // Show due only when it's a real future date; overdue is in the header.
+    const due = t.due && !isOverdue(t.due) ? ` (due ${t.due})` : '';
+    return `- ${pri}${t.title}${doing}${due}`;
+  });
+
+  const header =
+    `Team tracker - ${tasks.length} open` + (overdue ? `, ${overdue} overdue` : '') + ':';
+  const more =
+    tasks.length > MAX_SHOWN ? `\n\n+${tasks.length - MAX_SHOWN} more (full board: thezao.xyz)` : '';
+  return `${header}\n\n${lines.join('\n')}${more}`;
 }

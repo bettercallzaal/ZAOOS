@@ -1,5 +1,22 @@
 import { describe, it, expect } from 'vitest';
-import { formatTeamTasks, teamTrackerConfigured, buildTeamTaskRow, type TeamTask } from '../team-tracker';
+import { formatTeamTasks, teamTrackerConfigured, summarizeTeamForBrief, buildTeamTaskRow, type TeamTask } from '../team-tracker';
+
+describe('summarizeTeamForBrief', () => {
+  it('returns null when empty (so the brief skips the section)', () => {
+    expect(summarizeTeamForBrief([])).toBeNull();
+  });
+  it('summarizes open/overdue and top non-recurring items', () => {
+    const tasks: TeamTask[] = [
+      { title: 'Daily standup [STANDING]', status: 'todo', priority: 'P1', due: null, project: null, legacy_id: '1' },
+      { title: 'Ship feature', status: 'todo', priority: 'P1', due: '2020-01-01', project: null, legacy_id: '2' },
+    ];
+    const out = summarizeTeamForBrief(tasks)!;
+    expect(out).toMatch(/2 open/);
+    expect(out).toMatch(/1 overdue/);
+    expect(out).toContain('Ship feature');
+    expect(out).not.toContain('Daily standup'); // recurring excluded from "Top"
+  });
+});
 
 describe('buildTeamTaskRow', () => {
   it('builds a minimal row with required fields + zoe tagging', () => {

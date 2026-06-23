@@ -27,6 +27,7 @@ import { applyTaskOps, seedInitialTasks } from './tasks';
 import { applyQuestOps, buildQuestsBlock, formatQuestList } from './sidequests';
 import { runBotRelayOps, summarizeRelayResults } from './relay';
 import { runCrmOps, summarizeCrmResults } from './crm';
+import { getOpenTeamTasks, formatTeamTasks, teamTrackerConfigured } from './team-tracker';
 import { decomposeGoal, renderPlanForApproval, shouldDecompose } from './decompose';
 import {
   buildMemoryBlocks,
@@ -251,6 +252,18 @@ bot.command('tasks', async (ctx) => {
   if (!isFromZaal(ctx)) return;
   const blocks = await buildMemoryBlocks('private');
   await replyChunked(ctx, `Open tasks:\n\n${blocks.tasks}`);
+});
+
+bot.command('team', async (ctx) => {
+  if (!isFromZaal(ctx)) return;
+  if (!teamTrackerConfigured()) {
+    await ctx.reply(
+      'Team tracker not wired up yet - set COWORK_TRACKER_URL + COWORK_TRACKER_KEY in bot/.env to read the team board.',
+    );
+    return;
+  }
+  const tasks = await getOpenTeamTasks();
+  await replyChunked(ctx, formatTeamTasks(tasks));
 });
 
 bot.command('seed', async (ctx) => {
